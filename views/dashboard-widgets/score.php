@@ -14,7 +14,7 @@ use Progress_Planner\Badges\Monthly;
 			<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) \progress_planner()->get_widgets__suggested_tasks()->get_score(); ?>">
 				<prpl-badge
 					complete="true"
-					badge-id="<?php echo esc_attr( 'monthly-' . gmdate( 'Y' ) . '-m' . (int) gmdate( 'n' ) ); ?>"
+					badge-id="<?php echo esc_attr( Monthly::get_badge_id_from_date( new \DateTime() ) ); ?>"
 				></prpl-badge>
 			</progress>
 		</prpl-gauge>

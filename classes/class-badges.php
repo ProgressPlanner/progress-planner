@@ -131,7 +131,7 @@ class Badges {
 		}
 
 		// Clear monthly saved progress.
-		$badge_id      = 'monthly-' . $activities[0]->date->format( 'Y' ) . '-m' . $activities[0]->date->format( 'n' );
+		$badge_id      = Monthly::get_badge_id_from_date( $activities[0]->date );
 		$monthly_badge = $this->get_badge( $badge_id );
 
 		if ( $monthly_badge ) {

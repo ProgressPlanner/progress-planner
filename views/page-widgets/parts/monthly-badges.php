@@ -37,7 +37,7 @@ $prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] :
 		$prpl_badges_per_row = 3;
 		$prpl_badges_count   = count( $prpl_badges );
 		$prpl_scroll_to_row  = 1;
-
+		$prpl_current_month_badge_id = Monthly::get_badge_id_from_date( new \DateTime() );
 		if ( 'popover' !== $prpl_location ) {
 
 			$prpl_total_rows = (int) ceil( $prpl_badges_count / $prpl_badges_per_row );
@@ -47,7 +47,7 @@ $prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] :
 
 			foreach ( $prpl_badges as $prpl_badge ) {
 				++$prpl_current_month_position;
-				if ( 'monthly-' . gmdate( 'Y' ) . '-m' . (int) gmdate( 'n' ) === $prpl_badge->get_id() ) {
+				if ( $prpl_current_month_badge_id === $prpl_badge->get_id() ) {
 					break;
 				}
 			}
