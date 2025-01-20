@@ -62,21 +62,40 @@ class Page_Settings {
 				continue;
 			}
 
-			$value = '_no_page_needed';
-			if ( \progress_planner()->get_page_types()->is_page_needed( $page_type['slug'] ) ) {
-				$type_pages = \progress_planner()->get_page_types()->get_posts_by_type( 'any', $page_type['slug'] );
-				$value      = empty( $type_pages )
-					? \progress_planner()->get_page_types()->get_default_page_id_by_type( $page_type['slug'] )
-					: $type_pages[0]->ID;
-			}
 			$settings[ $page_type['slug'] ] = [
 				'id'          => $page_type['slug'],
+				'value'       => '_no_page_needed',
+				'isset'       => 'no',
 				'title'       => $page_type['title'],
 				'description' => $page_type['description'] ?? '',
 				'type'        => 'page-select',
-				'value'       => $value,
 				'page'        => $page_type['slug'],
 			];
+
+			if ( \progress_planner()->get_page_types()->is_page_needed( $page_type['slug'] ) ) {
+				$type_pages = \progress_planner()->get_page_types()->get_posts_by_type( 'any', $page_type['slug'] );
+				if ( empty( $type_pages ) ) {
+					$settings[ $page_type['slug'] ]['value'] = \progress_planner()->get_page_types()->get_default_page_id_by_type( $page_type['slug'] );
+				} else {
+					$settings[ $page_type['slug'] ]['value'] = $type_pages[0]->ID;
+					$settings[ $page_type['slug'] ]['isset'] = 'yes';
+
+					// If there is more than one page, we need to check if the page has a parent with the same page-type assigned.
+					if ( 1 < count( $type_pages ) ) {
+						$type_pages_ids = [];
+						foreach ( $type_pages as $type_page ) {
+							$type_pages_ids[] = (int) $type_page->ID;
+						}
+						foreach ( $type_pages as $type_page ) {
+							$parent = \get_post_field( 'post_parent', $type_page->ID );
+							if ( $parent && in_array( (int) $parent, $type_pages_ids, true ) ) {
+								$settings[ $page_type['slug'] ]['value'] = $parent;
+								break;
+							}
+						}
+					}
+				}
+			}
 		}
 
 		return $settings;
@@ -125,7 +144,7 @@ class Page_Settings {
 				// Remove the post-meta from the existing posts.
 				$existing_posts = \progress_planner()->get_page_types()->get_posts_by_type( 'any', $type );
 				foreach ( $existing_posts as $post ) {
-					if ( $post->ID === (int) $page_args['id'] ) {
+					if ( $post->ID === (int) $page_args['id'] && 'no' !== $page_args['have_page'] ) {
 						continue;
 					}
 
@@ -144,8 +163,10 @@ class Page_Settings {
 					continue;
 				}
 
-				// Add the term to the `progress_planner_page_types` taxonomy.
-				\progress_planner()->get_page_types()->set_page_type_by_id( (int) $page_args['id'], $type );
+				if ( 'no' !== $page_args['have_page'] ) {
+					// Add the term to the `progress_planner_page_types` taxonomy.
+					\progress_planner()->get_page_types()->set_page_type_by_id( (int) $page_args['id'], $type );
+				}
 			}
 		}
 

@@ -56,11 +56,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 			</div>
 		</div>
 
-		<div class="prpl-column" style="display:none;">
+		<div class="prpl-column">
 			<div class="prpl-widget-wrapper">
 				<h2 class="prpl-settings-section-license">
 					<span>
-						<?php \esc_html_e( 'Licenses', 'progress-planner' ); ?>
+						<?php \esc_html_e( 'License', 'progress-planner' ); ?>
 					</span>
 				</h2>
 				<div class="prpl-license-keys-wrapper">
@@ -78,13 +78,24 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<?php endif ?>
 
 					<div style="<?php echo ( '' === $prpl_free_license_key ) ? 'display: none;' : ''; ?>">
-						<label for="prpl-setting-pro-license-key">
-							<?php \esc_html_e( 'Progress Planner Pro license key', 'progress-planner' ); ?>
-						</label>
 						<?php
 						$prpl_pro_license        = \get_option( 'progress_planner_pro_license_key', '' );
 						$prpl_pro_license_status = \get_option( 'progress_planner_pro_license_status', '' );
 						?>
+						<?php if ( empty( $prpl_pro_license ) || 'valid' !== $prpl_pro_license_status ) : ?>
+							<p>
+								<?php
+								printf(
+									// translators: %s is a link to the Pro page, with the text "Progress Planner Pro".
+									\esc_html__( 'Take part in interactive challenges to solve website problems like broken links and sharpen your skills with in-context mini courses. Upgrade to %s!', 'progress-planner' ),
+									'<a href="https://progressplanner.com/pro/" target="_blank">Progress Planner Pro</a>'
+								);
+								?>
+							</p>
+						<?php endif; ?>
+						<label for="prpl-setting-pro-license-key">
+							<?php \esc_html_e( 'Progress Planner Pro license key', 'progress-planner' ); ?>
+						</label>
 						<div class="prpl-license-key-wrapper">
 							<input
 								id="prpl-setting-pro-license-key"

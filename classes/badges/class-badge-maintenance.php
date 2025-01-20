@@ -16,6 +16,13 @@ use Progress_Planner\Goals\Goal;
 abstract class Badge_Maintenance extends Badge {
 
 	/**
+	 * The background color for the badge.
+	 *
+	 * @var string
+	 */
+	protected $background = 'var(--prpl-background-red)';
+
+	/**
 	 * Get a recurring goal for any type of weekly activity.
 	 *
 	 * @return \Progress_Planner\Goals\Goal_Recurring
@@ -31,7 +38,7 @@ abstract class Badge_Maintenance extends Badge {
 				'status'      => 'active',
 				'priority'    => 'low',
 				'evaluate'    => function ( $goal_object ) {
-					return (bool) count(
+					return count(
 						\progress_planner()->get_query()->query_activities(
 							[
 								'start_date' => $goal_object->get_details()['start_date'],
@@ -71,14 +78,5 @@ abstract class Badge_Maintenance extends Badge {
 		}
 
 		return [];
-	}
-
-	/**
-	 * Get the background color for the badge.
-	 *
-	 * @return string
-	 */
-	public function get_background() {
-		return 'var(--prpl-background-red)';
 	}
 }
