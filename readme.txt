@@ -83,6 +83,7 @@ https://youtu.be/e1bmxZYyXFY
 Fixed:
 
 * Detection of page-types in the settings page.
+* Properly resetting caches for monthly badges.
 
 = 1.0.2 =
 
