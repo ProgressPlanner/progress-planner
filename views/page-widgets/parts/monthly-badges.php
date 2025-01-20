@@ -47,7 +47,7 @@ $prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] :
 
 			foreach ( $prpl_badges as $prpl_badge ) {
 				++$prpl_current_month_position;
-				if ( 'monthly-' . gmdate( 'Y' ) . '-m' . (int) gmdate( 'm' ) === $prpl_badge->get_id() ) {
+				if ( 'monthly-' . gmdate( 'Y' ) . '-m' . (int) gmdate( 'n' ) === $prpl_badge->get_id() ) {
 					break;
 				}
 			}
