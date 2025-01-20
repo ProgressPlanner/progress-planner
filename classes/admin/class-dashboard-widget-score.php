@@ -74,8 +74,6 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 			return $cached[ $category ];
 		}
 
-		$result = [];
-
 		// Get the badge to display.
 		foreach ( \progress_planner()->get_badges()->get_badges( $category ) as $badge ) {
 			$progress = $badge->get_progress();
@@ -85,20 +83,22 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 		}
 
 		if ( ! isset( $badge ) || ! isset( $progress ) ) {
-			return $result;
+			return [];
 		}
 
-		$result['progress'] = $progress;
-		$result['badge']    = $badge;
+		$result = [
+			'progress'   => $progress,
+			'badge'      => $badge,
+			'color'      => 'var(--prpl-color-accent-red)',
+			'background' => $badge->get_background(),
+		];
 
-		$result['color'] = 'var(--prpl-color-accent-red)';
 		if ( $result['progress']['progress'] > 50 ) {
 			$result['color'] = 'var(--prpl-color-accent-orange)';
 		}
 		if ( $result['progress']['progress'] > 75 ) {
 			$result['color'] = 'var(--prpl-color-accent-green)';
 		}
-		$result['background'] = $badge->get_background();
 
 		$cached[ $category ] = $result;
 

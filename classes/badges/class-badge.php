@@ -27,6 +27,13 @@ abstract class Badge {
 	protected $icon_url;
 
 	/**
+	 * The background color for the badge.
+	 *
+	 * @var string
+	 */
+	protected $background = 'none';
+
+	/**
 	 * Get the badge ID.
 	 *
 	 * @return string
@@ -93,5 +100,14 @@ abstract class Badge {
 	 */
 	public function clear_progress() {
 		\progress_planner()->get_settings()->set( [ 'badges', $this->id ], [] );
+	}
+
+	/**
+	 * Get the background color for the badge.
+	 *
+	 * @return string
+	 */
+	public function get_background() {
+		return $this->background;
 	}
 }

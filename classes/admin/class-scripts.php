@@ -106,6 +106,7 @@ class Scripts {
 					]
 				);
 				break;
+
 			case 'progress-planner-web-components-prpl-suggested-task':
 				\wp_localize_script(
 					$handle,
