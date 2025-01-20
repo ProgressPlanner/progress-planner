@@ -59,8 +59,12 @@ if ( !! settingsLicenseForm ) {
 
 							// Timeout so the license key is saved.
 							setTimeout( () => {
-								// Reload the page.
-								window.location.reload();
+								// Reload the page and remove `#prpl-popover-subscribe-form-trigger` from the URL.
+								window.location.href =
+									window.location.href.replace(
+										'#prpl-popover-subscribe-form-trigger',
+										''
+									);
 							}, 500 );
 						},
 						failAction: ( apiResponse ) => {
@@ -76,4 +80,10 @@ if ( !! settingsLicenseForm ) {
 		document.getElementById( 'submit-license-key' ).innerHTML =
 			progressPlanner.l10n.subscribing;
 	} );
+}
+
+// Check if the URL has #prpl-popover-subscribe-form-trigger.
+if ( window.location.hash === '#prpl-popover-subscribe-form-trigger' ) {
+	// Show the popover.
+	document.querySelector( '#prpl-popover-subscribe-form-trigger' ).click();
 }

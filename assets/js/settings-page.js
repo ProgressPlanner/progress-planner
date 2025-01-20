@@ -11,12 +11,6 @@ const prplTogglePageSelectorSettingVisibility = function ( page, value ) {
 
 	// Show only create button.
 	if ( 'no' === value || 'not-applicable' === value ) {
-		// Select is not there if we have no published pages.
-		if ( null !== itemRadiosWrapperEl.querySelector( 'select' ) ) {
-			// Clear the <select> element value.
-			itemRadiosWrapperEl.querySelector( 'select' ).value = '';
-		}
-
 		// Hide <select> wrapper.
 		itemRadiosWrapperEl.querySelector(
 			'.prpl-select-page'

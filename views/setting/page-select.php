@@ -49,6 +49,10 @@ if ( is_numeric( $prpl_setting_value ) && 0 < $prpl_setting_value ) {
 					'no'             => esc_html__( 'I don\'t have this page yet', 'progress-planner' ),
 					'not-applicable' => esc_html__( 'My site doesn\'t need this page', 'progress-planner' ),
 				] as $prpl_r_value => $prpl_r_label ) :
+					$prpl_radio_checked = ( 'no' === $prpl_r_value && 'no' === $prpl_setting['isset'] );
+					if ( ! $prpl_radio_checked ) {
+						$prpl_radio_checked = ( $prpl_radio_value === $prpl_r_value );
+					}
 					?>
 					<div class="prpl-radio-wrapper">
 						<label>
@@ -58,7 +62,7 @@ if ( is_numeric( $prpl_setting_value ) && 0 < $prpl_setting_value ) {
 							name="<?php echo esc_attr( 'pages[' . esc_attr( $prpl_setting['id'] ) . '][have_page]' ); ?>"
 								value="<?php echo esc_attr( $prpl_r_value ); ?>"
 								data-page="<?php echo esc_attr( $prpl_setting['page'] ); ?>"
-								<?php checked( $prpl_radio_value, $prpl_r_value ); ?>
+								<?php echo $prpl_radio_checked ? ' checked' : ''; ?>
 							>
 							<?php echo esc_html( $prpl_r_label ); ?>
 						</label>
