@@ -13,11 +13,9 @@ namespace Progress_Planner\Badges;
 abstract class Badge_Content extends Badge {
 
 	/**
-	 * Get the background color for the badge.
+	 * The background color for the badge.
 	 *
-	 * @return string
+	 * @var string
 	 */
-	public function get_background() {
-		return 'var(--prpl-background-blue)';
-	}
+	protected $background = 'var(--prpl-background-blue)';
 }

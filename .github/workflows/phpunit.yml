@@ -61,6 +61,10 @@ jobs:
           ini-values: zend.assertions=1, error_reporting=-1, display_errors=On
           coverage: none
 
+      # Install SVN.
+      - name: Install SVN
+        run: sudo apt-get install subversion
+
       # Install dependencies and handle caching in one go.
       # @link https://github.com/marketplace/actions/install-composer-dependencies
       - name: "Composer: remove the PHP platform requirement"

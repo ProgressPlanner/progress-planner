@@ -140,10 +140,9 @@ final class Monthly extends Badge {
 	 * @return string
 	 */
 	public function get_name() {
-		if ( ! $this->id ) {
-			return '';
-		}
-		return self::get_months()[ 'm' . $this->get_month() ];
+		return $this->id
+			? self::get_months()[ 'm' . $this->get_month() ]
+			: '';
 	}
 
 	/**

@@ -86,6 +86,10 @@ class Remote_Tasks {
 				}
 			}
 		}
+
+		// If we don't have a valid response, cache an empty array for 5 minutes. This will prevent the API from being called too often.
+		\progress_planner()->get_cache()->set( self::CACHE_KEY, [], 5 * MINUTE_IN_SECONDS );
+
 		return [];
 	}
 

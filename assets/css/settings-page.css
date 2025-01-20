@@ -222,3 +222,30 @@
 		gap: 3rem;
 	}
 }
+
+.prpl-license-keys-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+
+	.prpl-license-key-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+
+		.prpl-license-status {
+			width: 1rem;
+			height: 1rem;
+
+			svg {
+				width: 1rem;
+				height: 1rem;
+			}
+		}
+	}
+
+	input {
+		width: 20rem;
+		max-width: calc(100% - 2rem);
+	}
+}
