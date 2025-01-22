@@ -51,24 +51,29 @@ prplDocumentReady( function () {
  * Handle the form submission.
  */
 prplDocumentReady( function () {
+	const prplFormSubmit = function ( event ) {
+		event.preventDefault();
+		const formData = new FormData(
+			document.getElementById( 'prpl-settings' )
+		);
+		const data = {
+			action: 'prpl_settings_form',
+		};
+		formData.forEach( function ( value, key ) {
+			data[ key ] = value;
+		} );
+		const request = wp.ajax.post( 'prpl_settings_form', data );
+		request.done( function () {
+			window.location.reload();
+		} );
+		request.fail( function ( response ) {
+			alert( response.licensingError || response ); // eslint-disable-line no-alert
+		} );
+	};
 	document
 		.getElementById( 'prpl-settings-submit' )
-		.addEventListener( 'click', function () {
-			const formData = new FormData(
-				document.getElementById( 'prpl-settings' )
-			);
-			const data = {
-				action: 'prpl_settings_form',
-			};
-			formData.forEach( function ( value, key ) {
-				data[ key ] = value;
-			} );
-			const request = wp.ajax.post( 'prpl_settings_form', data );
-			request.done( function () {
-				window.location.reload();
-			} );
-			request.fail( function ( response ) {
-				alert( response.licensingError || response ); // eslint-disable-line no-alert
-			} );
-		} );
+		.addEventListener( 'click', prplFormSubmit );
+	document
+		.getElementById( 'prpl-settings' )
+		.addEventListener( 'submit', prplFormSubmit );
 } );
