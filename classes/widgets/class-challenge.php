@@ -56,6 +56,9 @@ final class Challenge extends \Progress_Planner\Widget {
 
 				$feed_data['feed']    = $feed;
 				$feed_data['expires'] = time() + 1 * DAY_IN_SECONDS;
+				if ( empty( $feed ) ) {
+					$feed_data['expires'] = time() + 1 * HOUR_IN_SECONDS;
+				}
 			}
 
 			// Transient uses 'expires' key to determine if it's expired.
