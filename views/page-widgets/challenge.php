@@ -12,6 +12,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 $prpl_challenge = \progress_planner()->get_widgets__challenge()->get_challenge();
 ?>
 <h2 class="prpl-widget-title">
+	<?php if ( $prpl_challenge['icon'] ) : ?>
+		<img src="<?php echo \esc_url( $prpl_challenge['icon'] ); ?>" alt="">
+	<?php endif; ?>
 	<?php echo \esc_html( $prpl_challenge['name'] ); ?>
 </h2>
 
