@@ -280,12 +280,12 @@ button.prpl-info-icon {
   Buttons
 \*------------------------------------*/
 
-.prpl-wrap input.prpl-button-primary.prpl-button-primary,
-.prpl-wrap input.prpl-button-secondary.prpl-button-secondary,
-.prpl-wrap button.prpl-button-primary.prpl-button-primary,
-.prpl-wrap button.prpl-button-secondary.prpl-button-secondary,
-.prpl-wrap a.prpl-button-primary.prpl-button-primary,
-.prpl-wrap a.prpl-button-secondary.prpl-button-secondary {
+.prpl-wrap input.prpl-button-primary,
+.prpl-wrap input.prpl-button-secondary,
+.prpl-wrap button.prpl-button-primary,
+.prpl-wrap button.prpl-button-secondary,
+.prpl-wrap a.prpl-button-primary,
+.prpl-wrap a.prpl-button-secondary {
 	display: block;
 	margin: 1rem 0;
 	padding: 0.75rem 1.25rem;

@@ -14,12 +14,4 @@
 			max-height: 1em;
 		}
 	}
-
-	.prpl-challenge-content {
-
-		a {
-			color: var(--prpl-color-link);
-		}
-
-	}
 }
