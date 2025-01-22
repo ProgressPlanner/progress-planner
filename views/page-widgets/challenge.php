@@ -18,7 +18,6 @@ $prpl_challenge = \progress_planner()->get_widgets__challenge()->get_challenge()
 	<?php echo \esc_html( $prpl_challenge['name'] ); ?>
 </h2>
 
-
 <div class="prpl-challenge-content">
-	<?php echo \wp_kses_post( $prpl_challenge['content'] ); ?>
+	<?php echo \wp_kses_post( str_replace( '{{admin_url}}', \admin_url(), $prpl_challenge['content'] ) ); ?>
 </div>
