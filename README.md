@@ -7,7 +7,7 @@
 
 # Progress Planner
 
-![Progress Planner - Powering your website's progress](https://repository-images.githubusercontent.com/753019432/24c42936-cd56-4192-8f28-503073087bd1)
+![Progress Planner - Powering your website's progress](https://repository-images.githubusercontent.com/753019432/5ca27f0c-4380-4b01-a18c-1c7633262659)
 
 ## What does this plugin do?
 

@@ -291,12 +291,16 @@ class Page_Types {
 	 * @return int
 	 */
 	public function get_default_page_id_by_type( $page_type ) {
+
+		$homepage_id = \get_option( 'page_on_front' ) ?? 0;
+
+		// Early return for the homepage.
 		if ( 'homepage' === $page_type ) {
-			return \get_option( 'page_on_front' );
+			return $homepage_id;
 		}
 
 		$types_pages = [
-			'homepage' => [ \get_post( \get_option( 'page_on_front' ) ) ],
+			'homepage' => [ $homepage_id ],
 			'contact'  => $this->get_posts_by_title( __( 'Contact', 'progress-planner' ) ),
 			'about'    => $this->get_posts_by_title( __( 'About', 'progress-planner' ) ),
 			'faq'      => array_merge(
@@ -305,35 +309,33 @@ class Page_Types {
 			),
 		];
 
-		$homepage_id = isset( $types_pages['homepage'][0] ) ? (int) $types_pages['homepage'][0]->ID : 0;
+		$defined_page_types = array_keys( $types_pages );
 
-		if ( 'contact' === $page_type || 'about' === $page_type || 'faq' === $page_type ) {
-			foreach ( [ 'contact', 'about', 'faq' ] as $page_type ) {
-				$filtered_type_pages = $types_pages;
-				unset( $filtered_type_pages[ $page_type ] );
-				unset( $filtered_type_pages['homepage'] );
-
-				$posts = $types_pages['contact'];
-				// Exclude the homepage and any pages that are already assigned to another page-type.
-				$posts = \array_filter(
-					$posts,
-					function ( $post ) use ( $homepage_id, $filtered_type_pages ) {
-						if ( (int) $post === (int) $homepage_id ) {
-							return false;
-						}
-						foreach ( $filtered_type_pages as $type_pages ) {
-							if ( \in_array( (int) $post, $type_pages, true ) ) {
-								return false;
-							}
-						}
-						return true;
-					}
-				);
-				return empty( $posts ) ? 0 : $posts[0];
-			}
+		// If the page type is not among defined page types, return 0.
+		if ( ! in_array( $page_type, $defined_page_types, true ) ) {
+			return 0;
 		}
 
-		return 0;
+		// Get the posts for the page-type.
+		$posts = $types_pages[ $page_type ];
+
+		// If we have no posts, return 0.
+		if ( empty( $posts ) ) {
+			return 0;
+		}
+
+		// Exclude the homepage and any pages that are already assigned to another page-type.
+		foreach ( $defined_page_types as $defined_page_type ) {
+
+			// Skip the current page-type.
+			if ( $page_type === $defined_page_type ) {
+				continue;
+			}
+
+			$posts = \array_diff( $posts, $types_pages[ $defined_page_type ] );
+		}
+
+		return empty( $posts ) ? 0 : $posts[0];
 	}
 
 	/**
