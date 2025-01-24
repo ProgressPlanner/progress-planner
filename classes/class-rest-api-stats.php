@@ -166,6 +166,16 @@ class Rest_API_Stats {
 		}
 		$data['todo'] = $pending_todo_items;
 
+		$ravis_recommendations   = \progress_planner()->get_suggested_tasks()->get_tasks();
+		$data['recommendations'] = [];
+		foreach ( $ravis_recommendations as $recommendation ) {
+			$data['recommendations'][] = [
+				'id'    => $recommendation['task_id'],
+				'title' => $recommendation['title'],
+				'url'   => isset( $recommendation['url'] ) ? $recommendation['url'] : '',
+			];
+		}
+
 		$data['plugin_url'] = \esc_url( \get_admin_url( null, 'admin.php?page=progress-planner' ) );
 
 		return new \WP_REST_Response( $data );
