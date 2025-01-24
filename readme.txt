@@ -78,6 +78,12 @@ https://youtu.be/e1bmxZYyXFY
 
 == Changelog ==
 
+= 1.0.4 =
+
+Enhancements:
+
+* Improvements to the REST-API endpoint for getting stats.
+
 = 1.0.3 =
 
 Fixed:
