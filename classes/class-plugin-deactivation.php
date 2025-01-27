@@ -265,6 +265,9 @@ class Plugin_Deactivation {
 	protected function the_inline_style() {
 		?>
 		<style>
+			#<?php echo \esc_attr( self::PLUGIN_SLUG ); ?>-popover::backdrop {
+				background-color: rgba( 0, 0, 0, 0.5 );
+			}
 			#<?php echo \esc_attr( self::PLUGIN_SLUG ); ?>-popover {
 				border: 1px solid #ccc;
 				padding: 2rem;
