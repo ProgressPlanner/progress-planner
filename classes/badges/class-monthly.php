@@ -108,6 +108,17 @@ final class Monthly extends Badge {
 	}
 
 	/**
+	 * Get the badge ID from a date.
+	 *
+	 * @param \DateTime $date The date.
+	 *
+	 * @return string
+	 */
+	public static function get_badge_id_from_date( $date ) {
+		return 'monthly-' . $date->format( 'Y' ) . '-m' . $date->format( 'n' );
+	}
+
+	/**
 	 * Get an array of months.
 	 *
 	 * @return array
@@ -140,10 +151,9 @@ final class Monthly extends Badge {
 	 * @return string
 	 */
 	public function get_name() {
-		if ( ! $this->id ) {
-			return '';
-		}
-		return self::get_months()[ 'm' . $this->get_month() ];
+		return $this->id
+			? self::get_months()[ 'm' . $this->get_month() ]
+			: '';
 	}
 
 	/**

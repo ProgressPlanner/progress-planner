@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.2
+Stable tag: 1.0.4
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -77,6 +77,23 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.0.4 =
+
+Enhancements:
+
+* Improvements to the REST-API endpoint for getting stats.
+
+= 1.0.3 =
+
+Fixed:
+
+* Detection of page-types in the settings page.
+* Properly resetting caches for monthly badges.
+
+Enhancements:
+
+* Added a new "Challenges" widget to the dashboard.
 
 = 1.0.2 =
 
