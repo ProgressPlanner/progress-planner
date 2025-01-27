@@ -44,6 +44,9 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		foreach ( $group_badges as $badge ) {
 			if ( 'wonderful-writer' === $badge->get_id() ) {
 				$this->assertEquals( 0, $badge->progress_callback()['progress'] );
+
+				// Delete the badge value so it can be re-calculated.
+				$badge->clear_progress();
 			}
 		}
 	}
@@ -65,6 +68,9 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		foreach ( $group_badges as $badge ) {
 			if ( 'wonderful-writer' === $badge->get_id() ) {
 				$this->assertEquals( 50, $badge->progress_callback()['progress'] );
+
+				// Delete the badge value so it can be re-calculated.
+				$badge->clear_progress();
 			}
 		}
 	}
@@ -86,6 +92,9 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		foreach ( $group_badges as $badge ) {
 			if ( 'wonderful-writer' === $badge->get_id() ) {
 				$this->assertEquals( 100, $badge->progress_callback()['progress'] );
+
+				// Delete the badge value so it can be re-calculated.
+				$badge->clear_progress();
 			}
 		}
 	}
@@ -107,6 +116,9 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		foreach ( $group_badges as $badge ) {
 			if ( 'bold-blogger' === $badge->get_id() ) {
 				$this->assertEquals( 50, $badge->progress_callback()['progress'] );
+
+				// Delete the badge value so it can be re-calculated.
+				$badge->clear_progress();
 			}
 		}
 	}
@@ -128,6 +140,9 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		foreach ( $group_badges as $badge ) {
 			if ( 'bold-blogger' === $badge->get_id() ) {
 				$this->assertEquals( 100, $badge->progress_callback()['progress'] );
+
+				// Delete the badge value so it can be re-calculated.
+				$badge->clear_progress();
 			}
 		}
 	}
@@ -149,6 +164,9 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		foreach ( $group_badges as $badge ) {
 			if ( 'bold-blogger' === $badge->get_id() ) {
 				$this->assertEquals( 100, $badge->progress_callback()['progress'] );
+
+				// Delete the badge value so it can be re-calculated.
+				$badge->clear_progress();
 			}
 		}
 	}
@@ -170,6 +188,9 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		foreach ( $group_badges as $badge ) {
 			if ( 'awesome-author' === $badge->get_id() ) {
 				$this->assertEquals( 50, $badge->progress_callback()['progress'] );
+
+				// Delete the badge value so it can be re-calculated.
+				$badge->clear_progress();
 			}
 		}
 	}
@@ -191,6 +212,9 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		foreach ( $group_badges as $badge ) {
 			if ( 'awesome-author' === $badge->get_id() ) {
 				$this->assertEquals( 100, $badge->progress_callback()['progress'] );
+
+				// Delete the badge value so it can be re-calculated.
+				$badge->clear_progress();
 			}
 		}
 	}
@@ -212,6 +236,9 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		foreach ( $group_badges as $badge ) {
 			if ( 'awesome-author' === $badge->get_id() ) {
 				$this->assertEquals( 100, $badge->progress_callback()['progress'] );
+
+				// Delete the badge value so it can be re-calculated.
+				$badge->clear_progress();
 			}
 		}
 	}
