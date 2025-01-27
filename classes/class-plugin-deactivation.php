@@ -225,19 +225,19 @@ class Plugin_Deactivation {
 						plugin: '<?php echo \esc_attr( self::PLUGIN_SLUG ); ?>',
 						site: '<?php echo \esc_attr( get_site_url() ); ?>',
 					};
-					console.log( requestData );
 					deactivatePluginFeedbackAjaxRequest( {
 						// Get a nonce from the remote server.
 						url: '<?php echo \esc_url( self::REMOTE_URL ); ?>/?rest_route=/deactivation-feedback-server/v1/get-nonce',
 						data: requestData,
 						action: ( response ) => {
+							response = response || {};
 							// Add the nonce to the request data, and build the data object for the feedback.
 							requestData.nonce = response.nonce;
 							const formData = new FormData( deactivationPopover.querySelector( 'form' ) );
 							requestData.reason = formData.get( 'reason' );
-							requestData.feedback = document.getElementById( `deactivate-plugin-reason-${requestData.reason}-feedback` ).value;
+							const feedbackEl = document.getElementById( `deactivate-plugin-reason-${requestData.reason}-feedback` );
+							requestData.feedback = feedbackEl ? feedbackEl.value : '';
 
-							console.log( requestData );
 							// Make the request to the remote server to submit the feedback.
 							deactivatePluginFeedbackAjaxRequest( {
 								url: '<?php echo \esc_url( self::REMOTE_URL ); ?>/?rest_route=/deactivation-feedback-server/v1/submit-feedback',
