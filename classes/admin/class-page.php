@@ -28,6 +28,7 @@ class Page {
 		\add_action( 'admin_menu', [ $this, 'add_page' ] );
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		\add_action( 'wp_ajax_progress_planner_save_cpt_settings', [ $this, 'save_cpt_settings' ] );
+		\add_action( 'wp_dashboard_setup', [ $this, 'add_dashboard_widgets' ] );
 	}
 
 	/**
@@ -191,5 +192,20 @@ class Page {
 				'message' => \esc_html__( 'Settings saved.', 'progress-planner' ),
 			]
 		);
+	}
+
+	/**
+	 * Add dashboard widgets.
+	 *
+	 * @return void
+	 */
+	public function add_dashboard_widgets() {
+		foreach ( $this->get_widgets() as $widget ) {
+			\wp_add_dashboard_widget(
+				$widget->get_id(),
+				$widget->get_title(),
+				[ $widget, 'render' ]
+			);
+		}
 	}
 }

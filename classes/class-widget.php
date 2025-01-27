@@ -38,6 +38,15 @@ abstract class Widget {
 	}
 
 	/**
+	 * Get the widget title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return '';
+	}
+
+	/**
 	 * Get the widget range.
 	 *
 	 * @return string

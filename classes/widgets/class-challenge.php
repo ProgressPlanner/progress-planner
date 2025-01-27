@@ -20,6 +20,15 @@ final class Challenge extends \Progress_Planner\Widget {
 	protected $id = 'challenge';
 
 	/**
+	 * The title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Your challenge', 'progress-planner' );
+	}
+
+	/**
 	 * Get the feed from the blog.
 	 *
 	 * @param bool $force_free Whether to force the free version.

@@ -22,6 +22,15 @@ final class Badge_Streak extends Widget {
 	protected $id = 'badge-streak';
 
 	/**
+	 * The title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Your streak badges', 'progress-planner' );
+	}
+
+	/**
 	 * Get the badge.
 	 *
 	 * @param string $context The context of the badges (content|maintenance|monthly).

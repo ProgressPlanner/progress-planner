@@ -22,6 +22,15 @@ final class Published_Content extends Widget {
 	protected $id = 'published-content';
 
 	/**
+	 * The title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Published content', 'progress-planner' );
+	}
+
+	/**
 	 * Get stats for posts, by post-type.
 	 *
 	 * @return array The stats.

@@ -24,6 +24,15 @@ final class Activity_Scores extends Widget {
 	protected $id = 'activity-scores';
 
 	/**
+	 * The title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Your website activity score', 'progress-planner' );
+	}
+
+	/**
 	 * The color callback.
 	 *
 	 * @param int       $number The number to calculate the color for.
