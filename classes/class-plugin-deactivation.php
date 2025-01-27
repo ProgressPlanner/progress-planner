@@ -304,6 +304,7 @@ class Plugin_Deactivation {
 						background-color: green;
 						cursor: pointer;
 						color: #fff;
+						margin: 0;
 
 						&.dismiss {
 							background-color: #fff;
