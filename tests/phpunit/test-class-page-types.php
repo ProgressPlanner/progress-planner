@@ -36,7 +36,8 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public static function setUpBeforeClass(): void {
-		\set_site_transient( 'progress_planner_lessons', self::get_lessons(), WEEK_IN_SECONDS );
+
+		self::set_lessons_cache();
 
 		\progress_planner()->get_page_types()->create_taxonomy();
 		\progress_planner()->get_page_types()->maybe_add_terms();
@@ -59,6 +60,30 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	 */
 	public static function get_lessons() {
 		return \json_decode( self::REMOTE_API_RESPONSE, true );
+	}
+
+	/**
+	 * Set the lessons cache.
+	 *
+	 * @return void
+	 */
+	public static function set_lessons_cache() {
+		// Mimic the URL building and caching of the lessons, see Progress_Planner\Lessons::get_remote_api_items .
+		$url = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/lessons';
+
+		$url = ( \progress_planner()->is_pro_site() )
+			? \add_query_arg(
+				[
+					'site'        => \get_site_url(),
+					'license_key' => \get_option( 'progress_planner_pro_license_key' ),
+				],
+				$url
+			)
+			: \add_query_arg( [ 'site' => \get_site_url() ], $url );
+
+		$cache_key = md5( $url );
+
+		\progress_planner()->get_cache()->set( $cache_key, self::get_lessons(), WEEK_IN_SECONDS );
 	}
 
 	/**
