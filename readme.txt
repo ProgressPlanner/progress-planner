@@ -83,6 +83,7 @@ https://youtu.be/e1bmxZYyXFY
 Enhancements:
 
 * Improvements to the REST-API endpoint for getting stats.
+* Added a plugin-deactivation feedback form.
 
 = 1.0.3 =
 
