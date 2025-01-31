@@ -34,9 +34,9 @@ $prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] :
 	<?php $prpl_badges = Monthly::get_instances_for_year( $prpl_badges_year ); ?>
 	<?php if ( $prpl_badges ) : ?>
 		<?php
-		$prpl_badges_per_row = 3;
-		$prpl_badges_count   = count( $prpl_badges );
-		$prpl_scroll_to_row  = 1;
+		$prpl_badges_per_row         = 3;
+		$prpl_badges_count           = count( $prpl_badges );
+		$prpl_scroll_to_row          = 1;
 		$prpl_current_month_badge_id = Monthly::get_badge_id_from_date( new \DateTime() );
 		if ( 'popover' !== $prpl_location ) {
 
