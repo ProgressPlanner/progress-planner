@@ -2,7 +2,7 @@
 
 Enhancements:
 
-* Removed celeration for "Perform all updates" if it was done by WordPress' automatic update.
+* Removed celebration for "Perform all updates" if it was done by WordPress' automatic update.
 
 = 1.0.2 =
 
