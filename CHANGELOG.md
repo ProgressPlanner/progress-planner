@@ -1,3 +1,9 @@
+= 1.0.4 =
+
+Enhancements:
+
+* Removed celeration for "Perform all updates" if it was done by WordPress' automatic update.
+
 = 1.0.2 =
 
 Fixed:
