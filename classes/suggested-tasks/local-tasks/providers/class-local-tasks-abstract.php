@@ -23,12 +23,21 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 	protected $capability = 'manage_options';
 
 	/**
-	 * Get the provider ID.
+	 * Get the provider type.
 	 *
 	 * @return string
 	 */
 	public function get_provider_type() {
 		return self::TYPE;
+	}
+
+	/**
+	 * Get the provider ID.
+	 *
+	 * @return string
+	 */
+	public function get_provider_id() {
+		return self::ID;
 	}
 
 	/**
@@ -40,5 +49,41 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 		return $this->capability
 			? \current_user_can( $this->capability )
 			: true;
+	}
+
+	/**
+	 * Get the data from a task-ID.
+	 *
+	 * @param string $task_id The task ID (unused here).
+	 *
+	 * @return array The data.
+	 */
+	public function get_data_from_task_id( $task_id ) {
+		$data = [
+			'type' => self::TYPE,
+			'id'   => self::ID,
+		];
+
+		return $data;
+	}
+
+	/**
+	 * Check if a task type is snoozed.
+	 *
+	 * @return bool
+	 */
+	public function is_task_type_snoozed() {
+		$snoozed = \progress_planner()->get_suggested_tasks()->get_snoozed_tasks();
+		if ( ! \is_array( $snoozed ) || empty( $snoozed ) ) {
+			return false;
+		}
+
+		foreach ( $snoozed as $task ) {
+			if ( self::ID === $task['id'] ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 }

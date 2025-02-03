@@ -13,20 +13,18 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 class Settings_Saved extends Local_Tasks_Abstract {
 
 	/**
+	 * The provider type.
+	 *
+	 * @var string
+	 */
+	const TYPE = 'configuration';
+
+	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'settings-saved';
-
-	/**
-	 * Get the provider ID.
-	 *
-	 * @return string
-	 */
-	public function get_provider_type() {
-		return self::TYPE;
-	}
+	const ID = 'settings-saved';
 
 	/**
 	 * Evaluate a task.
