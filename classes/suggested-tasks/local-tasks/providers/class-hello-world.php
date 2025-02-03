@@ -19,7 +19,7 @@ class Hello_World extends Local_Tasks_Abstract {
 	 */
 	const TYPE = 'hello-world';
 
-    /**
+	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
@@ -35,14 +35,12 @@ class Hello_World extends Local_Tasks_Abstract {
 	 */
 	public function evaluate_task( $task_id ) {
 
-        die( 'muhaha' );
-
 		// Early bail if the user does not have the capability to manage options.
 		if ( ! $this->capability_required() ) {
 			return false;
 		}
 
-        $hello_world = get_page_by_path( 'hello-world', OBJECT, 'post' );
+		$hello_world = get_page_by_path( 'hello-world', OBJECT, 'post' );
 
 		if ( $hello_world !== null ) {
 			return $task_id;

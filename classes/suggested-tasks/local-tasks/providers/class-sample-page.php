@@ -19,7 +19,7 @@ class Sample_Page extends Local_Tasks_Abstract {
 	 */
 	const TYPE = 'sample-page';
 
-    /**
+	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
@@ -35,14 +35,12 @@ class Sample_Page extends Local_Tasks_Abstract {
 	 */
 	public function evaluate_task( $task_id ) {
 
-        die( 'muhaha' );
-
 		// Early bail if the user does not have the capability to manage options.
 		if ( ! $this->capability_required() ) {
 			return false;
 		}
 
-        $sample_page = get_page_by_path( 'sample-page' );
+		$sample_page = get_page_by_path( 'sample-page' );
 
 		if ( $sample_page !== null ) {
 			return $task_id;

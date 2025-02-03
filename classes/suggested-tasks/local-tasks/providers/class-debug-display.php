@@ -89,6 +89,7 @@ class Debug_Display extends Local_Tasks_Abstract {
 			'type'        => 'maintenance',
 			'points'      => 1,
 			'url'         => '',
+			// translators: %s is the name of the WP_DEBUG_DISPLAY constant.
 			'description' => '<p>' . sprintf( \esc_html__( '%s is enabled. This means that errors are shown to users. We recommend disabling it.', 'progress-planner' ), '<code>WP_DEBUG_DISPLAY</code>' ) . '</p>',
 		];
 	}
