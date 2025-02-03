@@ -4,13 +4,18 @@ document
 	.addEventListener( 'submit', function ( event ) {
 		event.preventDefault();
 		const form = new FormData( this );
-		const data = form.getAll( 'prpl-settings-post-types-include[]' );
+		const cptData = form.getAll( 'prpl-settings-post-types-include[]' );
+		const widgetsData = form.getAll( 'prpl-settings-widgets-display[]' );
 
 		// Save the options.
-		const request = wp.ajax.post( 'progress_planner_save_cpt_settings', {
-			_ajax_nonce: progressPlanner.nonce,
-			include_post_types: data.join( ',' ),
-		} );
+		const request = wp.ajax.post(
+			'progress_planner_save_settings_popover',
+			{
+				_ajax_nonce: progressPlanner.nonce,
+				include_post_types: cptData.join( ',' ),
+				widgets: widgetsData.join( ',' ),
+			}
+		);
 		request.done( () => {
 			window.location.reload();
 		} );

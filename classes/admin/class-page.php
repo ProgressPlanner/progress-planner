@@ -27,7 +27,8 @@ class Page {
 	private function register_hooks() {
 		\add_action( 'admin_menu', [ $this, 'add_page' ] );
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
-		\add_action( 'wp_ajax_progress_planner_save_cpt_settings', [ $this, 'save_cpt_settings' ] );
+		\add_action( 'wp_ajax_progress_planner_save_settings_popover', [ $this, 'save_settings_popover' ] );
+		\add_filter( 'progress_planner_admin_widgets', [ $this, 'filter_active_widgets' ] );
 	}
 
 	/**
@@ -64,6 +65,22 @@ class Page {
 		return \apply_filters( 'progress_planner_admin_widgets', $this->get_widgets() );
 	}
 
+	/**
+	 * Filter the widgets.
+	 *
+	 * @param array<\Progress_Planner\Widget> $widgets The widgets.
+	 *
+	 * @return array<\Progress_Planner\Widget>
+	 */
+	public function filter_active_widgets( $widgets ) {
+		$active_widgets = \progress_planner()->get_settings()->get( 'active_widgets' );
+		return \array_filter(
+			$widgets,
+			function ( $widget ) use ( $active_widgets ) {
+				return \in_array( $widget->get_id(), $active_widgets, true );
+			}
+		);
+	}
 	/**
 	 * Get a widget object.
 	 *
@@ -206,11 +223,16 @@ class Page {
 	 *
 	 * @return void
 	 */
-	public function save_cpt_settings() {
+	public function save_settings_popover() {
 		\check_ajax_referer( 'progress_planner', 'nonce', false );
 		$include_post_types = isset( $_POST['include_post_types'] ) ? \sanitize_text_field( \wp_unslash( $_POST['include_post_types'] ) ) : 'post,page';
 		$include_post_types = \explode( ',', $include_post_types );
+
+		$widgets = isset( $_POST['widgets'] ) ? \sanitize_text_field( \wp_unslash( $_POST['widgets'] ) ) : '';
+		$widgets = \explode( ',', $widgets );
+
 		\progress_planner()->get_settings()->set( 'include_post_types', $include_post_types );
+		\progress_planner()->get_settings()->set( 'active_widgets', $widgets );
 
 		\wp_send_json_success(
 			[

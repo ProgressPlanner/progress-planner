@@ -15,7 +15,7 @@ $prpl_saved_settings_widgets    = [];
 foreach ( \progress_planner()->get_admin__page()->get_widgets_filtered() as $prpl_admin_widget ) {
 	$prpl_saved_settings_widgets[] = $prpl_admin_widget->get_id();
 }
-$prpl_post_types     = \array_filter( \get_post_types( [ 'public' => true ] ), 'is_post_type_viewable' );
+$prpl_post_types = \array_filter( \get_post_types( [ 'public' => true ] ), 'is_post_type_viewable' );
 unset( $prpl_post_types['attachment'] );
 unset( $prpl_post_types['elementor_library'] ); // Elementor templates are not a post type we want to track.
 ?>
