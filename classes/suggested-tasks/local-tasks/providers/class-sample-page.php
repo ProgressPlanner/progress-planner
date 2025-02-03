@@ -81,6 +81,9 @@ class Sample_Page extends Local_Tasks_Abstract {
 	public function get_task_details( $task_id ) {
 
 		$sample_page = get_page_by_path( 'sample-page' );
+		if ( null === $sample_page ) {
+			return [];
+		}
 
 		return [
 			'task_id'     => $task_id,

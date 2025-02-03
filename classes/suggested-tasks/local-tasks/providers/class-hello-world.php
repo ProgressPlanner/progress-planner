@@ -81,6 +81,9 @@ class Hello_World extends Local_Tasks_Abstract {
 	public function get_task_details( $task_id ) {
 
 		$hello_world = get_page_by_path( 'hello-world', OBJECT, 'post' );
+		if ( null === $hello_world ) {
+			return [];
+		}
 
 		return [
 			'task_id'     => $task_id,
