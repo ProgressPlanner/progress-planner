@@ -74,6 +74,10 @@ class Page {
 	 */
 	public function filter_active_widgets( $widgets ) {
 		$active_widgets = \progress_planner()->get_settings()->get( 'active_widgets' );
+		if ( empty( $active_widgets ) ) {
+			return $widgets;
+		}
+
 		return \array_filter(
 			$widgets,
 			function ( $widget ) use ( $active_widgets ) {
