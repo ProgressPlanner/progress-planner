@@ -2,7 +2,20 @@
 
 Enhancements:
 
+* Improvements to the REST-API endpoint for getting stats.
+* Added a plugin-deactivation feedback form.
 * Removed celebration for "Perform all updates" if it was done by WordPress' automatic update.
+
+= 1.0.3 =
+
+Fixed:
+
+* Detection of page-types in the settings page.
+* Properly resetting caches for monthly badges.
+
+Enhancements:
+
+* Added a new "Challenges" widget to the dashboard.
 
 = 1.0.2 =
 
@@ -27,7 +40,6 @@ Fixed:
 * Confetti being triggered on every page load.
 * Assets versioning.
 * Duplicate update-core tasks.
-* Update old post task being celebrated as completed when post is trashed.
 * Information icon for 'Create a long post' task was showing text of 'create a short post' task.
 * Numerous other minor bugfixes.
 
@@ -53,6 +65,11 @@ Fixed:
 
 = 0.9.5 =
 
+Enhancements:
+
+* Added functionality to make it easier to demo the plugin on the WordPress playground.
+* Improved the onboarding and added a tour of the plugin.
+
 Fixed:
 
 * Post-type filters intruduced in v0.9.4 now also affect the graph results.
@@ -73,7 +90,7 @@ Fixed:
 
 Security:
 
-* Stricter sanitization & escaping of data in to-do items. Props to [justakazh](https://github.com/justakazh) for reporting through our [PatchStack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/progress-planner).
+* Stricter sanitization & escaping of data in to-do items.  Props to [justakazh](https://github.com/justakazh) for reporting through our [PatchStack Vulnerability Disclosure Program](https://patchstack.com/database/vdp/progress-planner).
 * Restrict access to the plugin's dashboard widgets to users with the `publish_posts` capability.
 
 = 0.9.2 =
