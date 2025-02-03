@@ -35,4 +35,13 @@ final class Latest_Badge extends Widget {
 		parent::__construct();
 		$this->endpoint = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/share-badge-image?badge=';
 	}
+
+	/**
+	 * Get the widget title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Latest badge', 'progress-planner' );
+	}
 }

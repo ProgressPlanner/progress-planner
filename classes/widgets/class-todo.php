@@ -22,6 +22,15 @@ final class ToDo extends Widget {
 	protected $id = 'todo';
 
 	/**
+	 * The widget title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'ToDo', 'progress-planner' );
+	}
+
+	/**
 	 * Print the widget content.
 	 *
 	 * @return void

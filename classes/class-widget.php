@@ -29,12 +29,28 @@ abstract class Widget {
 	protected $id;
 
 	/**
+	 * The widget title.
+	 *
+	 * @var string
+	 */
+	protected $title = '';
+
+	/**
 	 * Get the widget ID.
 	 *
 	 * @return string
 	 */
 	public function get_id() {
 		return $this->id;
+	}
+
+	/**
+	 * Get the widget title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return $this->title;
 	}
 
 	/**

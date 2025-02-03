@@ -24,6 +24,15 @@ final class Suggested_Tasks extends Widget {
 	protected $id = 'suggested-tasks';
 
 	/**
+	 * The widget title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Suggested tasks', 'progress-planner' );
+	}
+
+	/**
 	 * Get the score.
 	 *
 	 * @return int The score.
