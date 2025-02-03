@@ -36,7 +36,7 @@ class Page {
 	 * @return array<\Progress_Planner\Widget>
 	 */
 	public function get_widgets() {
-		$widgets = [
+		return [
 			\progress_planner()->get_widgets__activity_scores(),
 			\progress_planner()->get_widgets__suggested_tasks(),
 			\progress_planner()->get_widgets__todo(),
@@ -46,7 +46,14 @@ class Page {
 			\progress_planner()->get_widgets__published_content(),
 			\progress_planner()->get_widgets__whats_new(),
 		];
+	}
 
+	/**
+	 * Get the widgets objects, filtered and sorted.
+	 *
+	 * @return array<\Progress_Planner\Widget>
+	 */
+	public function get_widgets_filtered() {
 		/**
 		 * Filter the widgets.
 		 *
@@ -54,7 +61,7 @@ class Page {
 		 *
 		 * @return array<\Progress_Planner\Widget>
 		 */
-		return \apply_filters( 'progress_planner_admin_widgets', $widgets );
+		return \apply_filters( 'progress_planner_admin_widgets', $this->get_widgets() );
 	}
 
 	/**
