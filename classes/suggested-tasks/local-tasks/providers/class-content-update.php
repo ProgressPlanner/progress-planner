@@ -38,15 +38,6 @@ class Content_Update extends Content_Abstract {
 	}
 
 	/**
-	 * Get the provider ID.
-	 *
-	 * @return string
-	 */
-	public function get_provider_type() {
-		return self::TYPE;
-	}
-
-	/**
 	 * Evaluate a task.
 	 *
 	 * @param string $task_id The task ID.

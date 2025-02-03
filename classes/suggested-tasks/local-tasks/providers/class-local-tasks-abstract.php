@@ -14,12 +14,22 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface
  */
 abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 
+	const TYPE = '';
 	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
 	 */
 	protected $capability = 'manage_options';
+
+	/**
+	 * Get the provider ID.
+	 *
+	 * @return string
+	 */
+	public function get_provider_type() {
+		return self::TYPE;
+	}
 
 	/**
 	 * Check if the user has the capability to perform the task.

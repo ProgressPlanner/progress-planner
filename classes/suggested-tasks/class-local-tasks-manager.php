@@ -12,7 +12,9 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Create;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Update;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Settings_Saved;
-
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Debug_Display;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Sample_Page;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Hello_World;
 
 /**
  * Local_Tasks_Manager class.
@@ -47,6 +49,9 @@ class Local_Tasks_Manager {
 			new Content_Update(),
 			new Core_Update(),
 			new Settings_Saved(),
+			new Debug_Display(),
+			new Sample_Page(),
+			new Hello_World(),
 		];
 
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );

@@ -29,15 +29,6 @@ class Content_Create extends Content_Abstract {
 	const ITEMS_TO_INJECT = 2;
 
 	/**
-	 * Get the provider ID.
-	 *
-	 * @return string
-	 */
-	public function get_provider_type() {
-		return self::TYPE;
-	}
-
-	/**
 	 * Get an array of tasks to inject.
 	 *
 	 * @return array

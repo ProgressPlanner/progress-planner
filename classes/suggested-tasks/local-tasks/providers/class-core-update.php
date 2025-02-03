@@ -28,15 +28,6 @@ class Core_Update extends Local_Tasks_Abstract {
 	const TYPE = 'update-core';
 
 	/**
-	 * Get the provider ID.
-	 *
-	 * @return string
-	 */
-	public function get_provider_type() {
-		return self::TYPE;
-	}
-
-	/**
 	 * Evaluate a task.
 	 *
 	 * @param string $task_id The task ID.
