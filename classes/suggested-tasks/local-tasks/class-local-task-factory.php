@@ -57,6 +57,7 @@ class Local_Task_Factory {
 
 			return new Task_Local(
 				[
+					'task_id'        => $this->task_id,
 					'type'           => $type,
 					$task_suffix_key => $task_suffix,
 				]
