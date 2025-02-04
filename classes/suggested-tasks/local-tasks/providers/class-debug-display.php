@@ -80,6 +80,8 @@ class Debug_Display extends Local_Tasks_Abstract {
 	/**
 	 * Get the task details.
 	 *
+	 * @param string $task_id The task ID.
+	 *
 	 * @return array
 	 */
 	public function get_task_details( $task_id = '' ) {
