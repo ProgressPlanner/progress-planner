@@ -204,7 +204,7 @@ class Page_Settings {
 
 		// Call the custom API.
 		$response = \wp_remote_post(
-			'https://progressplanner.com',
+			\progress_planner()->get_remote_server_root_url(),
 			[
 				'timeout'   => 15,
 				'sslverify' => false,
