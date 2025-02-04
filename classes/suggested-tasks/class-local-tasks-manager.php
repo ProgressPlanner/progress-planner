@@ -278,6 +278,16 @@ class Local_Tasks_Manager {
 				$task_object = ( new Local_Task_Factory( $task ) )->get_task();
 				$task_data   = $task_object->get_data();
 
+				// If the task was already completed, remove it.
+				if ( true === \progress_planner()->get_suggested_tasks()->check_task_condition(
+					[
+						'type'    => 'completed',
+						'task_id' => $task_data['task_id'],
+					]
+				) ) {
+					return false;
+				}
+
 				if ( isset( $task_data['year_week'] ) ) {
 					return \gmdate( 'YW' ) === $task_data['year_week'];
 				}
