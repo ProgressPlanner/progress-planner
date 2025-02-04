@@ -8,6 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 
 /**
  * Add tasks for content updates.
@@ -73,8 +74,8 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 	 */
 	public function get_data_from_task_id( $task_id ) {
 		$data = [
-			'type' => static::TYPE,
-			'id'   => static::ID,
+			'type' => static::ID,
+			'id'   => $task_id,
 		];
 
 		return $data;
@@ -92,7 +93,10 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 		}
 
 		foreach ( $snoozed as $task ) {
-			if ( static::ID === $task['id'] ) {
+			$task_object = ( new Local_Task_Factory( $task['id'] ) )->get_task();
+			$provider_id = $task_object->get_provider_id();
+
+			if ( $provider_id === static::ID ) {
 				return true;
 			}
 		}

@@ -19,7 +19,14 @@ class Content_Update extends Content_Abstract {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'update-post';
+	const ID = 'update-post';
+
+	/**
+	 * The provider type.
+	 *
+	 * @var string
+	 */
+	const TYPE = 'content';
 
 	/**
 	 * The number of items to inject.

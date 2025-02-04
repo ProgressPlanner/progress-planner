@@ -19,7 +19,14 @@ class Content_Create extends Content_Abstract {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'create-post';
+	const ID = 'create-post';
+
+	/**
+	 * The provider type.
+	 *
+	 * @var string
+	 */
+	const TYPE = 'content';
 
 	/**
 	 * The number of items to inject.

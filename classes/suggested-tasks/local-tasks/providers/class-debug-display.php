@@ -40,7 +40,7 @@ class Debug_Display extends Local_Tasks_Abstract {
 			return false;
 		}
 
-		if ( 0 === strpos( $task_id, static::ID ) && defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY ) {
+		if ( 0 === strpos( $task_id, static::ID ) && ( ! defined( 'WP_DEBUG_DISPLAY' ) || ! WP_DEBUG_DISPLAY ) ) {
 			return $task_id;
 		}
 		return false;
@@ -59,16 +59,6 @@ class Debug_Display extends Local_Tasks_Abstract {
 		}
 
 		if ( ! defined( 'WP_DEBUG_DISPLAY' ) || ! WP_DEBUG_DISPLAY ) {
-			return [];
-		}
-
-		// If the task with this id is completed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->check_task_condition(
-			[
-				'type'    => 'completed',
-				'task_id' => static::ID,
-			]
-		) ) {
 			return [];
 		}
 

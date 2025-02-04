@@ -104,7 +104,7 @@ final class Suggested_Tasks extends Widget {
 		foreach ( $tasks['pending_celebration'] as $task_id ) {
 
 			$task_object   = ( new Local_Task_Factory( $task_id ) )->get_task();
-			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_object->get_provider_type() );
+			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_object->get_provider_id() );
 
 			if ( $task_provider->capability_required() ) {
 				$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task_id );

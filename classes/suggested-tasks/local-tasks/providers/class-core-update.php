@@ -109,42 +109,4 @@ class Core_Update extends Local_Tasks_Abstract {
 			'description' => '<p>' . \esc_html__( 'Perform all updates to ensure your website is secure and up-to-date.', 'progress-planner' ) . '</p>',
 		];
 	}
-
-	/**
-	 * Get the data from a task-ID.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array The data.
-	 */
-	public function get_data_from_task_id( $task_id ) {
-		$data = [
-			'type' => static::TYPE,
-			'id'   => $task_id,
-		];
-
-		return $data;
-	}
-
-	/**
-	 * Check if a task type is snoozed.
-	 *
-	 * @return bool
-	 */
-	public function is_task_type_snoozed() {
-		$snoozed = \progress_planner()->get_suggested_tasks()->get_snoozed_tasks();
-		if ( ! \is_array( $snoozed ) || empty( $snoozed ) ) {
-			return false;
-		}
-
-		foreach ( $snoozed as $task ) {
-			$task_object = ( new Local_Task_Factory( $task['id'] ) )->get_task();
-			$task_data   = $task_object->get_data();
-			if ( $task_data['type'] === static::TYPE ) {
-				return true;
-			}
-		}
-
-		return false;
-	}
 }

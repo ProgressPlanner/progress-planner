@@ -49,7 +49,7 @@ class Hello_World extends Local_Tasks_Abstract {
 
 		$hello_world = get_page_by_path( 'hello-world', OBJECT, 'post' );
 
-		if ( $hello_world !== null ) {
+		if ( null === $hello_world ) {
 			return $task_id;
 		}
 		return false;
@@ -86,9 +86,6 @@ class Hello_World extends Local_Tasks_Abstract {
 	public function get_task_details( $task_id = '' ) {
 
 		$hello_world = get_page_by_path( 'hello-world', OBJECT, 'post' );
-		if ( null === $hello_world ) {
-			return [];
-		}
 
 		return [
 			'task_id'     => static::ID,
@@ -97,7 +94,7 @@ class Hello_World extends Local_Tasks_Abstract {
 			'priority'    => 'high',
 			'type'        => static::TYPE,
 			'points'      => 1,
-			'url'         => admin_url( 'post.php?post=' . $hello_world->ID . '&action=edit' ),
+			'url'         => $this->capability_required() && null !== $hello_world ? \esc_url( \get_edit_post_link( $hello_world->ID ) ) : '', // @phpstan-ignore-line property.nonObject
 			'description' => '<p>' . \esc_html__( 'On install, WordPress creates a "Hello World!" post. This post is not needed and should be deleted.', 'progress-planner' ) . '</p>',
 		];
 	}

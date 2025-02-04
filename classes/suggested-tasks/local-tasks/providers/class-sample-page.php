@@ -49,7 +49,7 @@ class Sample_Page extends Local_Tasks_Abstract {
 
 		$sample_page = get_page_by_path( 'sample-page' );
 
-		if ( $sample_page !== null ) {
+		if ( null === $sample_page ) {
 			return $task_id;
 		}
 		return false;
@@ -86,9 +86,6 @@ class Sample_Page extends Local_Tasks_Abstract {
 	public function get_task_details( $task_id = '' ) {
 
 		$sample_page = get_page_by_path( 'sample-page' );
-		if ( null === $sample_page ) {
-			return [];
-		}
 
 		return [
 			'task_id'     => static::ID,
@@ -97,7 +94,7 @@ class Sample_Page extends Local_Tasks_Abstract {
 			'priority'    => 'high',
 			'type'        => static::TYPE,
 			'points'      => 1,
-			'url'         => admin_url( 'post.php?post=' . $sample_page->ID . '&action=edit' ),
+			'url'         => $this->capability_required() && null !== $sample_page ? \esc_url( \get_edit_post_link( $sample_page->ID ) ) : '', // @phpstan-ignore-line property.nonObject
 			'description' => '<p>' . \esc_html__( 'On install, WordPress creates a Sample Page. This page is not needed and should be deleted.', 'progress-planner' ) . '</p>',
 		];
 	}

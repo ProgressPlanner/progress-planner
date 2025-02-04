@@ -96,13 +96,13 @@ class Local_Tasks_Manager {
 	/**
 	 * Get a task provider by its type.
 	 *
-	 * @param string $provider_type The provider type.
+	 * @param string $provider_id The provider ID.
 	 *
 	 * @return \Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface|null
 	 */
-	public function get_task_provider( $provider_type ) {
+	public function get_task_provider( $provider_id ) {
 		foreach ( $this->task_providers as $provider_instance ) {
-			if ( $provider_instance->get_provider_type() === $provider_type ) {
+			if ( $provider_instance->get_provider_id() === $provider_id ) {
 				return $provider_instance;
 			}
 		}
@@ -130,7 +130,7 @@ class Local_Tasks_Manager {
 					$types_covered[] = $type;
 					$tasks_to_inject = \array_merge( $tasks_to_inject, $new_tasks_to_inject );
 				}
-			}			
+			}
 		}
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.
@@ -172,7 +172,7 @@ class Local_Tasks_Manager {
 	 */
 	public function evaluate_task( $task_id ) {
 		$task_object   = ( new Local_Task_Factory( $task_id ) )->get_task();
-		$task_provider = $this->get_task_provider( $task_object->get_provider_type() );
+		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
 
 		if ( ! $task_provider ) {
 			return false;
@@ -190,7 +190,7 @@ class Local_Tasks_Manager {
 	 */
 	public function get_task_details( $task_id ) {
 		$task_object   = ( new Local_Task_Factory( $task_id ) )->get_task();
-		$task_provider = $this->get_task_provider( $task_object->get_provider_type() );
+		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
 
 		if ( ! $task_provider ) {
 			return false;
