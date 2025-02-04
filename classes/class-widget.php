@@ -72,7 +72,11 @@ abstract class Widget {
 		$this->enqueue_styles();
 		$this->enqueue_scripts();
 		?>
-		<div class="prpl-widget-wrapper prpl-<?php echo \esc_attr( $this->id ); ?>">
+		<div
+			class="prpl-widget-wrapper prpl-<?php echo \esc_attr( $this->id ); ?>"
+			data-id="<?php echo \esc_attr( $this->id ); ?>"
+			draggable="true"
+		>
 			<div class="widget-inner-container">
 				<?php \progress_planner()->the_view( "page-widgets/{$this->id}.php" ); ?>
 			</div>

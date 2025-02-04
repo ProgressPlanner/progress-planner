@@ -83,6 +83,9 @@ class Scripts {
 			case 'settings-page':
 				return [ 'wp-util', 'progress-planner-document-ready' ];
 
+			case 'draggable':
+				return [ 'progress-planner-ajax-request' ];
+
 			default:
 				return [];
 		}
@@ -209,6 +212,15 @@ class Scripts {
 				);
 				break;
 
+			case 'progress-planner-draggable':
+				\wp_localize_script(
+					$handle,
+					'progressPlannerDraggable',
+					[
+						'nonce' => \wp_create_nonce( 'progress_planner' ),
+					]
+				);
+				break;
 			default:
 				return;
 		}
