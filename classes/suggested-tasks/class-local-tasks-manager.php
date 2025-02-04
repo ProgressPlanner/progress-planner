@@ -124,7 +124,7 @@ class Local_Tasks_Manager {
 		// Loop through all registered task providers and inject their tasks, one per type.
 		foreach ( $this->task_providers as $provider_instance ) {
 			$type = $provider_instance->get_provider_type();
-			if ( ! \in_array( $type, $types_covered ) ) {
+			if ( ! \in_array( $type, $types_covered, true ) ) {
 				$new_tasks_to_inject = $provider_instance->get_tasks_to_inject();
 				if ( [] !== $new_tasks_to_inject ) {
 					$types_covered[] = $type;

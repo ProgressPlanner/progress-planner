@@ -34,8 +34,9 @@ class Remote_Tasks {
 	 * @return array
 	 */
 	public function inject_tasks( $tasks ) {
-		$inject_items = $this->get_tasks_to_inject();
-		$items        = [];
+		$inject_items     = $this->get_tasks_to_inject();
+		$items            = [];
+		$channels_covered = [];
 		foreach ( $inject_items as $item ) {
 			if ( ! is_array( $item ) ) {
 				continue;
@@ -46,8 +47,13 @@ class Remote_Tasks {
 				continue;
 			}
 
-			$item['task_id'] = "remote-task-{$item['task_id']}";
-			$items[]         = $item;
+			// TODO: Maybe skip task which don't have channel defined (to not allow wrongly defined 3rd party tasks to override default channel).
+			$channel = isset( $item['channel'] ) ? $item['channel'] : 'default';
+			if ( ! \in_array( $channel, $channels_covered, true ) ) {
+				$channels_covered[] = $channel;
+				$item['task_id']    = "remote-task-{$item['task_id']}";
+				$items[]            = $item;
+			}
 		}
 
 		return \array_merge( $items, $tasks );
