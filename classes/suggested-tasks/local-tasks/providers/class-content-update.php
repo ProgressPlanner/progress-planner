@@ -26,7 +26,7 @@ class Content_Update extends Content_Abstract {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'content';
+	const TYPE = 'writing';
 
 	/**
 	 * The number of items to inject.
@@ -119,7 +119,7 @@ class Content_Update extends Content_Abstract {
 			'title'       => sprintf( 'Update post "%s"', \esc_html( $post->post_title ) ), // @phpstan-ignore-line property.nonObject
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => 'writing',
+			'type'        => static::TYPE,
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \get_edit_post_link( $post->ID ) ) : '', // @phpstan-ignore-line property.nonObject
 			'description' => '<p>' . sprintf(
