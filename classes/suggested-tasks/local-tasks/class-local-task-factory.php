@@ -37,9 +37,17 @@ class Local_Task_Factory {
 
 		// Parse simple format, e.g. 'update-core-202449'.
 		if ( ! str_contains( $this->task_id, '|' ) ) {
+
 			$last_pos = strrpos( $this->task_id, '-' );
-			if ( false === $last_pos ) {
-				return new Task_Local( [ 'task_id' => $this->task_id ] );
+
+			// Check if the task ID ends with a '-12345' or not.
+			if ( $last_pos === false || ! preg_match( '/-\d+$/', $this->task_id ) ) {
+				return new Task_Local(
+					[
+						'task_id' => $this->task_id,
+						'type'    => $this->task_id,
+					]
+				);
 			}
 
 			$type        = substr( $this->task_id, 0, $last_pos );

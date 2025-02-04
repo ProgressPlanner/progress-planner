@@ -40,7 +40,7 @@ class Debug_Display extends Local_Tasks_Abstract {
 			return false;
 		}
 
-		if ( 0 === strpos( $task_id, self::ID ) && defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY ) {
+		if ( 0 === strpos( $task_id, static::ID ) && defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY ) {
 			return $task_id;
 		}
 		return false;
@@ -66,7 +66,7 @@ class Debug_Display extends Local_Tasks_Abstract {
 		if ( true === \progress_planner()->get_suggested_tasks()->check_task_condition(
 			[
 				'type'    => 'completed',
-				'task_id' => self::ID,
+				'task_id' => static::ID,
 			]
 		) ) {
 			return [];
@@ -85,11 +85,11 @@ class Debug_Display extends Local_Tasks_Abstract {
 	public function get_task_details( $task_id = '' ) {
 
 		return [
-			'task_id'     => self::ID,
+			'task_id'     => static::ID,
 			'title'       => \esc_html__( 'Disable public display of PHP errors', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => 'maintenance',
+			'type'        => static::TYPE,
 			'points'      => 1,
 			'url'         => '',
 			// translators: %s is the name of the WP_DEBUG_DISPLAY constant.

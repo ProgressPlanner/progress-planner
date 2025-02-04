@@ -15,6 +15,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface
 abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 
 	const TYPE = '';
+
 	/**
 	 * The capability required to perform the task.
 	 *
@@ -28,7 +29,7 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 	 * @return string
 	 */
 	public function get_provider_type() {
-		return self::TYPE;
+		return static::TYPE;
 	}
 
 	/**
@@ -37,7 +38,7 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 	 * @return string
 	 */
 	public function get_provider_id() {
-		return self::ID;
+		return static::ID;
 	}
 
 	/**
@@ -60,8 +61,8 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 	 */
 	public function get_data_from_task_id( $task_id ) {
 		$data = [
-			'type' => self::TYPE,
-			'id'   => self::ID,
+			'type' => static::TYPE,
+			'id'   => static::ID,
 		];
 
 		return $data;
@@ -79,7 +80,7 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 		}
 
 		foreach ( $snoozed as $task ) {
-			if ( self::ID === $task['id'] ) {
+			if ( static::ID === $task['id'] ) {
 				return true;
 			}
 		}

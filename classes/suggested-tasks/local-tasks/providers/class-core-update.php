@@ -21,11 +21,18 @@ class Core_Update extends Local_Tasks_Abstract {
 	protected $capability = 'update_core';
 
 	/**
+	 * The provider type.
+	 *
+	 * @var string
+	 */
+	const TYPE = 'maintenance';
+
+	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'update-core';
+	const ID = 'update-core';
 
 	/**
 	 * Evaluate a task.
@@ -49,7 +56,7 @@ class Core_Update extends Local_Tasks_Abstract {
 		$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
 		$task_data   = $task_object->get_data();
 
-		if ( $task_data['type'] === self::TYPE && \gmdate( 'YW' ) === $task_data['year_week'] && 0 === \wp_get_update_data()['counts']['total'] ) {
+		if ( $task_data['type'] === static::ID && \gmdate( 'YW' ) === $task_data['year_week'] && 0 === \wp_get_update_data()['counts']['total'] ) {
 			return $task_id;
 		}
 		return false;
@@ -78,7 +85,7 @@ class Core_Update extends Local_Tasks_Abstract {
 		}
 
 		return [
-			$this->get_task_details( self::TYPE . '-' . \gmdate( 'YW' ) ),
+			$this->get_task_details( static::ID . '-' . \gmdate( 'YW' ) ),
 		];
 	}
 
@@ -112,7 +119,7 @@ class Core_Update extends Local_Tasks_Abstract {
 	 */
 	public function get_data_from_task_id( $task_id ) {
 		$data = [
-			'type' => self::TYPE,
+			'type' => static::TYPE,
 			'id'   => $task_id,
 		];
 
@@ -133,7 +140,7 @@ class Core_Update extends Local_Tasks_Abstract {
 		foreach ( $snoozed as $task ) {
 			$task_object = ( new Local_Task_Factory( $task['id'] ) )->get_task();
 			$task_data   = $task_object->get_data();
-			if ( $task_data['type'] === self::TYPE ) {
+			if ( $task_data['type'] === static::TYPE ) {
 				return true;
 			}
 		}

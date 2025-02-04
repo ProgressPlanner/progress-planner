@@ -30,6 +30,10 @@ Enhancements:
 
 * Refocus the "add new task" input after a to-do item is added.
 
+Enhancements:
+
+* Added new task types for setting site icon and tagline.
+
 = 1.0.1 =
 
 Fixed:

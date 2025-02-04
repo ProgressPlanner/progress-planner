@@ -89,11 +89,11 @@ class Hello_World extends Local_Tasks_Abstract {
 		}
 
 		return [
-			'task_id'     => self::ID,
+			'task_id'     => static::ID,
 			'title'       => \esc_html__( 'Delete "Hello World!" post', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => 'maintenance',
+			'type'        => static::TYPE,
 			'points'      => 1,
 			'url'         => admin_url( 'post.php?post=' . $hello_world->ID . '&action=edit' ),
 			'description' => '<p>' . \esc_html__( 'On install, WordPress creates a "Hello World!" post. This post is not needed and should be deleted.', 'progress-planner' ) . '</p>',

@@ -63,7 +63,7 @@ class Content_Update extends Content_Abstract {
 		$args = apply_filters(
 			'progress_planner_update_posts_tasks_args',
 			[
-				'posts_per_page' => self::ITEMS_TO_INJECT,
+				'posts_per_page' => static::ITEMS_TO_INJECT,
 				'post_status'    => 'publish',
 				'orderby'        => 'modified',
 				'order'          => 'ASC',
@@ -174,7 +174,7 @@ class Content_Update extends Content_Abstract {
 		foreach ( \progress_planner()->get_suggested_tasks()->get_local()->get_pending_tasks() as $task_id ) {
 			$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
 			$task_data   = $task_object->get_data();
-			if ( self::TYPE === $task_data['type'] && ( isset( $task_data['post_id'] ) && (int) $task_data['post_id'] === (int) $post->ID ) ) {
+			if ( static::TYPE === $task_data['type'] && ( isset( $task_data['post_id'] ) && (int) $task_data['post_id'] === (int) $post->ID ) ) {
 				// Remove the task from the pending local tasks list.
 				\progress_planner()->get_suggested_tasks()->get_local()->remove_pending_task( $task_id ); // @phpstan-ignore-line method.nonObject
 			}

@@ -11,10 +11,12 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Create;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Update;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Update;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Blogdescription;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Settings_Saved;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Debug_Display;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Sample_Page;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Hello_World;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Siteicon;
 
 /**
  * Local_Tasks_Manager class.
@@ -48,10 +50,12 @@ class Local_Tasks_Manager {
 			new Content_Create(),
 			new Content_Update(),
 			new Core_Update(),
+			new Core_Blogdescription(),
 			new Settings_Saved(),
 			new Debug_Display(),
 			new Sample_Page(),
 			new Hello_World(),
+			new Core_Siteicon(),
 		];
 
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
@@ -115,10 +119,18 @@ class Local_Tasks_Manager {
 	 */
 	public function inject_tasks( $tasks ) {
 		$tasks_to_inject = [];
+		$types_covered   = [];
 
-		// Loop through all registered task providers and inject their tasks.
+		// Loop through all registered task providers and inject their tasks, one per type.
 		foreach ( $this->task_providers as $provider_instance ) {
-			$tasks_to_inject = \array_merge( $tasks_to_inject, $provider_instance->get_tasks_to_inject() );
+			$type = $provider_instance->get_provider_type();
+			if ( ! \in_array( $type, $types_covered ) ) {
+				$new_tasks_to_inject = $provider_instance->get_tasks_to_inject();
+				if ( [] !== $new_tasks_to_inject ) {
+					$types_covered[] = $type;
+					$tasks_to_inject = \array_merge( $tasks_to_inject, $new_tasks_to_inject );
+				}
+			}			
 		}
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.

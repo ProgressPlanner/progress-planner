@@ -89,11 +89,11 @@ class Sample_Page extends Local_Tasks_Abstract {
 		}
 
 		return [
-			'task_id'     => self::ID,
+			'task_id'     => static::ID,
 			'title'       => \esc_html__( 'Delete "Sample Page"', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => 'maintenance',
+			'type'        => static::TYPE,
 			'points'      => 1,
 			'url'         => admin_url( 'post.php?post=' . $sample_page->ID . '&action=edit' ),
 			'description' => '<p>' . \esc_html__( 'On install, WordPress creates a Sample Page. This page is not needed and should be deleted.', 'progress-planner' ) . '</p>',
