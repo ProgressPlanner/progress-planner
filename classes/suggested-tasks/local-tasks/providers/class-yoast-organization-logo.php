@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 /**
  * Add tasks for Yoast integration.
  */
-class Yoast_Organization_Logo implements \Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface {
+class Yoast_Organization_Logo extends Local_Tasks_Abstract {
 
 	/**
 	 * The provider ID.

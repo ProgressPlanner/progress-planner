@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 /**
  * Add tasks for Core blogdescription.
  */
-class Core_Blogdescription implements \Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface {
+class Core_Blogdescription extends Local_Tasks_Abstract {
 
 	/**
 	 * The provider ID.
