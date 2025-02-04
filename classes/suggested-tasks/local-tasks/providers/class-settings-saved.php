@@ -67,12 +67,7 @@ class Settings_Saved extends Local_Tasks_Abstract {
 		$task_id = static::TYPE;
 
 		// If the task with this id is completed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->check_task_condition(
-			[
-				'type'    => 'completed',
-				'task_id' => $task_id,
-			]
-		) ) {
+		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
 			return [];
 		}
 

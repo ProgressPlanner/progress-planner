@@ -85,12 +85,7 @@ class Content_Create extends Content_Abstract {
 		);
 
 		// If the task with this length and id is completed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->check_task_condition(
-			[
-				'type'    => 'completed',
-				'task_id' => $task_id,
-			]
-		) ) {
+		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
 			return [];
 		}
 

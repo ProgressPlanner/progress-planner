@@ -522,6 +522,22 @@ class Suggested_Tasks {
 	}
 
 	/**
+	 * Check if a task was completed.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function was_task_completed( $task_id ) {
+		return true === $this->check_task_condition(
+			[
+				'type'    => 'completed',
+				'task_id' => $task_id,
+			]
+		);
+	}
+
+	/**
 	 * Handle the suggested task action.
 	 *
 	 * @return void

@@ -63,6 +63,11 @@ class Core_Blogdescription extends Local_Tasks_Abstract {
 			return [];
 		}
 
+		// If the task with this id is completed, don't add a task.
+		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( static::ID ) ) {
+			return [];
+		}
+
 		return [
 			$this->get_task_details( static::ID ),
 		];

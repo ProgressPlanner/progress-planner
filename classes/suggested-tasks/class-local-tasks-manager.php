@@ -230,7 +230,7 @@ class Local_Tasks_Manager {
 	 */
 	public function add_pending_task( $task ) {
 		$tasks = (array) $this->get_pending_tasks();
-		if ( \in_array( $task, $tasks, true ) || true === $this->was_task_completed( $task ) ) {
+		if ( \in_array( $task, $tasks, true ) || true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task ) ) {
 			return true;
 		}
 		$tasks[] = $task;
@@ -248,22 +248,6 @@ class Local_Tasks_Manager {
 		$tasks = (array) $this->get_pending_tasks();
 		$tasks = \array_diff( $tasks, [ $task ] );
 		return \update_option( self::OPTION_NAME, $tasks );
-	}
-
-	/**
-	 * Check if a task was completed.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool
-	 */
-	public function was_task_completed( $task_id ) {
-		return true === \progress_planner()->get_suggested_tasks()->check_task_condition(
-			[
-				'type'    => 'completed',
-				'task_id' => $task_id,
-			]
-		);
 	}
 
 	/**
@@ -295,7 +279,7 @@ class Local_Tasks_Manager {
 				$task_data   = $task_object->get_data();
 
 				// If the task was already completed, remove it.
-				if ( true === $this->was_task_completed( $task_data['task_id'] ) ) {
+				if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_data['task_id'] ) ) {
 					return false;
 				}
 
