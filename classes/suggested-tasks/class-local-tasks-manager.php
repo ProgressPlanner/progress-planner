@@ -230,7 +230,7 @@ class Local_Tasks_Manager {
 	 */
 	public function add_pending_task( $task ) {
 		$tasks = (array) $this->get_pending_tasks();
-		if ( \in_array( $task, $tasks, true ) ) {
+		if ( \in_array( $task, $tasks, true ) || true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task ) ) {
 			return true;
 		}
 		$tasks[] = $task;
