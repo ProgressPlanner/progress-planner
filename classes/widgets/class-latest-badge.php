@@ -29,6 +29,15 @@ final class Latest_Badge extends Widget {
 	public $endpoint;
 
 	/**
+	 * The title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Latest new badge!', 'progress-planner' );
+	}
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {

@@ -30,6 +30,15 @@ final class Whats_New extends Widget {
 	protected $id = 'whats-new';
 
 	/**
+	 * The title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'What\'s new', 'progress-planner' );
+	}
+
+	/**
 	 * Get the feed from the blog.
 	 *
 	 * @return array
