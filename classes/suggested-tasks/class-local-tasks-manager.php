@@ -174,7 +174,7 @@ class Local_Tasks_Manager {
 	 *
 	 * @return void
 	 */
-	public function cleanup_pending_tasks() {
+	public function cleanup_inactive_pending_tasks() {
 		$tasks = $this->get_pending_tasks();
 
 		foreach ( $tasks as $task ) {
