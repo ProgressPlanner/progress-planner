@@ -14,7 +14,20 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface
  */
 abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 
+	/**
+	 * The type of the task.
+	 *
+	 * @var string
+	 */
 	const TYPE = '';
+
+	/**
+	 * The ID of the task.
+	 *
+	 * @var string
+	 */
+	const ID = '';
+
 	/**
 	 * The capability required to perform the task.
 	 *

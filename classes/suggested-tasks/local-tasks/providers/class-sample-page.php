@@ -12,7 +12,7 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
  */
 class Sample_Page extends Local_Tasks_Abstract {
 
-   	/**
+	/**
 	 * The provider type.
 	 *
 	 * @var string
@@ -78,6 +78,8 @@ class Sample_Page extends Local_Tasks_Abstract {
 
 	/**
 	 * Get the task details.
+	 *
+	 * @param string $task_id The task ID.
 	 *
 	 * @return array
 	 */
