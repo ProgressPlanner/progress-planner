@@ -40,6 +40,12 @@ class Remote_Tasks {
 			if ( ! is_array( $item ) ) {
 				continue;
 			}
+
+			// If the task with this id is completed, don't add a task.
+			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( "remote-task-{$item['task_id']}" ) ) {
+				continue;
+			}
+
 			$item['task_id'] = "remote-task-{$item['task_id']}";
 			$items[]         = $item;
 		}
