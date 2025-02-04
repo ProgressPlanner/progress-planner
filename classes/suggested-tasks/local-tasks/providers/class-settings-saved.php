@@ -40,7 +40,7 @@ class Settings_Saved extends Local_Tasks_Abstract {
 			return false;
 		}
 
-		if ( 0 === strpos( $task_id, static::TYPE ) && false !== \get_option( 'progress_planner_pro_license_key', false ) ) {
+		if ( 0 === strpos( $task_id, static::ID ) && false !== \get_option( 'progress_planner_pro_license_key', false ) ) {
 			return $task_id;
 		}
 		return false;
@@ -64,7 +64,7 @@ class Settings_Saved extends Local_Tasks_Abstract {
 			return [];
 		}
 
-		$task_id = static::TYPE;
+		$task_id = static::ID;
 
 		// If the task with this id is completed, don't add a task.
 		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
