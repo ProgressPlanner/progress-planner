@@ -566,11 +566,6 @@ class Suggested_Tasks {
 				$updated  = $this->snooze_task( $task_id, $duration );
 				break;
 
-			case 'celebrated':
-				// We dont need to do anything here, since the task is already marked as completed.
-				$updated = true;
-				break;
-
 			default:
 				\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid action.', 'progress-planner' ) ] );
 		}

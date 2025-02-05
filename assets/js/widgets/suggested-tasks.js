@@ -1,4 +1,4 @@
-/* global customElements, progressPlannerSuggestedTasks, confetti, prplDocumentReady, progressPlannerSuggestedTask */
+/* global customElements, progressPlannerSuggestedTasks, confetti, prplDocumentReady */
 
 /**
  * Count the number of items in the list.
@@ -193,46 +193,34 @@ const prplStrikeCompletedTasks = () => {
 			.forEach( ( item ) => {
 				const taskId = item.getAttribute( 'data-task-id' );
 
-				const request = wp.ajax.post(
-					'progress_planner_suggested_task_action',
-					{
-						task_id: taskId,
-						nonce: progressPlannerSuggestedTask.nonce,
-						action_type: 'celebrated',
-					}
+				const el = document.querySelector(
+					`.prpl-suggested-task[data-task-id="${ taskId }"]`
 				);
-				request.done( () => {
-					const el = document.querySelector(
-						`.prpl-suggested-task[data-task-id="${ taskId }"]`
+
+				if ( el ) {
+					el.parentElement.remove();
+				}
+
+				// Remove the task from the pending celebration.
+				window.progressPlannerSuggestedTasks.tasks.pending_celebration =
+					window.progressPlannerSuggestedTasks.tasks.pending_celebration.filter(
+						( id ) => id !== taskId
 					);
 
-					if ( el ) {
-						el.parentElement.remove();
-					}
-
-					// Remove the task from the pending celebration.
-					window.progressPlannerSuggestedTasks.tasks.pending_celebration =
-						window.progressPlannerSuggestedTasks.tasks.pending_celebration.filter(
-							( id ) => id !== taskId
-						);
-
-					// Add the task to the completed tasks.
-					if (
-						window.progressPlannerSuggestedTasks.tasks.completed.indexOf(
-							taskId
-						) === -1
-					) {
-						window.progressPlannerSuggestedTasks.tasks.completed.push(
-							taskId
-						);
-					}
-
-					// Refresh the list.
-					const event = new Event(
-						'prplMaybeInjectSuggestedTaskEvent'
+				// Add the task to the completed tasks.
+				if (
+					window.progressPlannerSuggestedTasks.tasks.completed.indexOf(
+						taskId
+					) === -1
+				) {
+					window.progressPlannerSuggestedTasks.tasks.completed.push(
+						taskId
 					);
-					document.dispatchEvent( event );
-				} );
+				}
+
+				// Refresh the list.
+				const event = new Event( 'prplMaybeInjectSuggestedTaskEvent' );
+				document.dispatchEvent( event );
 			} );
 	}, 2000 );
 };
