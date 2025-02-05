@@ -34,6 +34,13 @@ class Sample_Page extends Local_Tasks_Abstract {
 	protected $capability = 'edit_pages';
 
 	/**
+	 * The sample page.
+	 *
+	 * @var \WP_Post|null|false
+	 */
+	protected $sample_page = false;
+
+	/**
 	 * Evaluate a task.
 	 *
 	 * @param string $task_id The task ID.
@@ -47,23 +54,12 @@ class Sample_Page extends Local_Tasks_Abstract {
 			return false;
 		}
 
-		$sample_page = get_page_by_path( __( 'sample-page' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-		if ( null === $sample_page ) {
-			$query = new \WP_Query(
-				[
-					'post_type'      => 'page',
-					'title'          => __( 'Sample Page' ), // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-					'post_status'    => 'all',
-					'posts_per_page' => 1,
-				]
-			);
-
-			$sample_page = ! empty( $query->post ) ? $query->post : null;
-		}
+		$sample_page = $this->get_sample_page();
 
 		if ( null === $sample_page ) {
 			return $task_id;
 		}
+
 		return false;
 	}
 
@@ -79,7 +75,9 @@ class Sample_Page extends Local_Tasks_Abstract {
 			return [];
 		}
 
-		if ( null === get_page_by_path( 'sample-page' ) ) {
+		$sample_page = $this->get_sample_page();
+
+		if ( null === $sample_page ) {
 			return [];
 		}
 
@@ -94,6 +92,36 @@ class Sample_Page extends Local_Tasks_Abstract {
 	}
 
 	/**
+	 * Get the sample page.
+	 *
+	 * @return \WP_Post|null
+	 */
+	protected function get_sample_page() {
+
+		if ( false !== $this->sample_page ) {
+			return $this->sample_page;
+		}
+
+		$sample_page = get_page_by_path( __( 'sample-page' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+		if ( null === $sample_page ) {
+			$query = new \WP_Query(
+				[
+					'post_type'      => 'page',
+					'title'          => __( 'Sample Page' ), // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+					'post_status'    => 'publish',
+					'posts_per_page' => 1,
+				]
+			);
+
+			$sample_page = ! empty( $query->post ) ? $query->post : null;
+		}
+
+		$this->sample_page = $sample_page;
+
+		return $sample_page;
+	}
+
+	/**
 	 * Get the task details.
 	 *
 	 * @param string $task_id The task ID.
@@ -102,7 +130,7 @@ class Sample_Page extends Local_Tasks_Abstract {
 	 */
 	public function get_task_details( $task_id = '' ) {
 
-		$sample_page = get_page_by_path( 'sample-page' );
+		$sample_page = $this->get_sample_page();
 
 		return [
 			'task_id'     => static::ID,

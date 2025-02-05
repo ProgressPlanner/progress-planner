@@ -34,6 +34,13 @@ class Hello_World extends Local_Tasks_Abstract {
 	protected $capability = 'edit_posts';
 
 	/**
+	 * The sample post.
+	 *
+	 * @var \WP_Post|null|false
+	 */
+	protected $sample_post = false;
+
+	/**
 	 * Evaluate a task.
 	 *
 	 * @param string $task_id The task ID.
@@ -47,7 +54,7 @@ class Hello_World extends Local_Tasks_Abstract {
 			return false;
 		}
 
-		$hello_world = get_page_by_path( 'hello-world', OBJECT, 'post' );
+		$hello_world = $this->get_sample_post();
 
 		if ( null === $hello_world ) {
 			return $task_id;
@@ -67,7 +74,9 @@ class Hello_World extends Local_Tasks_Abstract {
 			return [];
 		}
 
-		if ( null === get_page_by_path( 'hello-world', OBJECT, 'post' ) ) {
+		$sample_post = $this->get_sample_post();
+
+		if ( null === $sample_post ) {
 			return [];
 		}
 
@@ -82,6 +91,36 @@ class Hello_World extends Local_Tasks_Abstract {
 	}
 
 	/**
+	 * Get the sample post.
+	 *
+	 * @return \WP_Post|null
+	 */
+	protected function get_sample_post() {
+
+		if ( false !== $this->sample_post ) {
+			return $this->sample_post;
+		}
+
+		$sample_post = get_page_by_path( __( 'hello-world' ), OBJECT, 'post' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+		if ( null === $sample_post ) {
+			$query = new \WP_Query(
+				[
+					'post_type'      => 'post',
+					'title'          => __( 'Hello world!' ), // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+					'post_status'    => 'publish',
+					'posts_per_page' => 1,
+				]
+			);
+
+			$sample_post = ! empty( $query->post ) ? $query->post : null;
+		}
+
+		$this->sample_post = $sample_post;
+
+		return $sample_post;
+	}
+
+	/**
 	 * Get the task details.
 	 *
 	 * @param string $task_id The task ID.
@@ -90,7 +129,7 @@ class Hello_World extends Local_Tasks_Abstract {
 	 */
 	public function get_task_details( $task_id = '' ) {
 
-		$hello_world = get_page_by_path( 'hello-world', OBJECT, 'post' );
+		$hello_world = $this->get_sample_post();
 
 		return [
 			'task_id'     => static::ID,
