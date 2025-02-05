@@ -85,6 +85,11 @@ Enhancements:
 * Improvements to the REST-API endpoint for getting stats.
 * Added a plugin-deactivation feedback form.
 * Removed celebration for "Perform all updates" if it was done by WordPress' automatic update.
+* Added new suggested task for setting site icon.
+* Added new suggested task for setting the tagline.
+* Added new suggested task for deactivating the display of PHP debug messages
+* Added new suggested task for removing the default WP "Hello world" post.
+* Added new suggested task for removing the default WP "Sample page" page.
 
 = 1.0.3 =
 
