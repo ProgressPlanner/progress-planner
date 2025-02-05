@@ -34,7 +34,7 @@ class Page {
 	/**
 	 * Get the widgets objects
 	 *
-	 * @return array<\Progress_Planner\Widget>
+	 * @return array<\Progress_Planner\Widgets\Widget>
 	 */
 	public function get_widgets() {
 		return [
@@ -58,9 +58,9 @@ class Page {
 		/**
 		 * Filter the widgets.
 		 *
-		 * @param array<\Progress_Planner\Widget> $widgets The widgets.
+		 * @param array<\Progress_Planner\Widgets\Widget> $widgets The widgets.
 		 *
-		 * @return array<\Progress_Planner\Widget>
+		 * @return array<\Progress_Planner\Widgets\Widget>
 		 */
 		return \apply_filters( 'progress_planner_admin_widgets', $this->get_widgets() );
 	}
@@ -90,7 +90,7 @@ class Page {
 	 *
 	 * @param string $id The widget ID.
 	 *
-	 * @return \Progress_Planner\Widget|void
+	 * @return \Progress_Planner\Widgets\Widget|void
 	 */
 	public function get_widget( $id ) {
 		$widgets = $this->get_widgets();
