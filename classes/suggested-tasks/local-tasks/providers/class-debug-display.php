@@ -60,7 +60,7 @@ class Debug_Display extends Local_Tasks_Abstract {
 			'title'       => \esc_html__( 'Disable public display of PHP errors', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => static::TYPE,
+			'type'        => $this->get_provider_type(),
 			'points'      => 1,
 			'url'         => '',
 			// translators: %s is the name of the WP_DEBUG_DISPLAY constant.

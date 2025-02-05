@@ -160,7 +160,7 @@ class Content_Create extends Content_Abstract {
 				: esc_html__( 'Create a short post', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'medium',
-			'type'        => static::TYPE,
+			'type'        => $this->get_provider_type(),
 			'points'      => isset( $data['long'] ) && $data['long'] ? 2 : 1,
 			'url'         => \esc_url( \admin_url( 'post-new.php?post_type=post' ) ),
 			'description' => isset( $data['long'] ) && $data['long']

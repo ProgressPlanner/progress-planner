@@ -87,7 +87,7 @@ class Core_Blogdescription extends Local_Tasks_Abstract {
 			'title'       => \esc_html__( 'Set tagline', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => static::TYPE,
+			'type'        => $this->get_provider_type(),
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php' ) ) : '',
 			'description' => '<p>' . sprintf(
