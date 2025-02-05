@@ -98,7 +98,17 @@ final class Suggested_Tasks extends Widget {
 		$tasks = \progress_planner()->get_suggested_tasks()->get_saved_tasks();
 
 		// Get pending tasks.
-		$tasks['details'] = \progress_planner()->get_suggested_tasks()->get_tasks();
+		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
+
+		// Sort them by type (channel).
+		foreach ( $pending_tasks as $task ) {
+
+			if ( ! isset( $tasks['details'][ $task['type'] ] ) ) {
+				$tasks['details'][ $task['type'] ] = [];
+			}
+
+			$tasks['details'][ $task['type'] ][] = $task;
+		}
 
 		// Insert the pending celebration tasks as high priority tasks, so they are shown always.
 		foreach ( $tasks['pending_celebration'] as $task_id ) {
@@ -112,7 +122,13 @@ final class Suggested_Tasks extends Widget {
 				if ( $task_details ) {
 					$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
 					$task_details['action']   = 'celebrate';
-					$tasks['details'][]       = $task_details;
+					$task_details['type']     = 'pending_celebration';
+
+					if ( ! isset( $tasks['details']['pending_celebration'] ) ) {
+						$tasks['details']['pending_celebration'] = [];
+					}
+
+					$tasks['details']['pending_celebration'][] = $task_details;
 				}
 
 				// Mark the pending celebration tasks as completed.
@@ -128,7 +144,7 @@ final class Suggested_Tasks extends Widget {
 				'ajaxUrl'  => \admin_url( 'admin-ajax.php' ),
 				'nonce'    => \wp_create_nonce( 'progress_planner' ),
 				'tasks'    => $tasks,
-				'maxItems' => $current_screen && 'dashboard' === $current_screen->id ? 3 : 5,
+				'maxItems' => apply_filters( 'progress_planner_suggested_tasks_max_items', 1 ), // ( $current_screen && 'dashboard' === $current_screen->id ? 3 : 5 ) ),
 			]
 		);
 	}

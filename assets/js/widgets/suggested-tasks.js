@@ -5,8 +5,14 @@
  *
  * @return {number} The number of items in the list.
  */
-const progressPlannerCountItems = () => {
-	const items = document.querySelectorAll( '.prpl-suggested-task' );
+const progressPlannerCountItems = ( type ) => {
+
+	// We want to display all pending celebration tasks on page load.
+	if ( 'pending_celebration' === type ) {
+		return 0;
+	}
+
+	const items = document.querySelectorAll( `.prpl-suggested-task[data-task-type="${ type }"]` );
 	return items.length;
 };
 
@@ -15,10 +21,16 @@ const progressPlannerCountItems = () => {
  *
  * @return {Object} The next item to inject.
  */
-const progressPlannerGetNextItem = () => {
+const progressPlannerGetNextItemFromType = ( type ) => {
+
+	// If the are no items of this type, return null.
+	if ( 'undefined' === typeof progressPlannerSuggestedTasks.tasks.details[ type ] ) {
+		return null;
+	}
+
 	// Remove completed and snoozed items.
 	const tasks = progressPlannerSuggestedTasks.tasks;
-	const items = tasks.details;
+	const items = tasks.details[ type ];
 	const completed = tasks.completed;
 	const snoozed = tasks.snoozed;
 
@@ -71,8 +83,8 @@ const progressPlannerGetNextItem = () => {
 /**
  * Inject the next item.
  */
-const progressPlannerInjectNextItem = () => {
-	const nextItem = progressPlannerGetNextItem();
+const progressPlannerInjectNextItem = ( type ) => {
+	const nextItem = progressPlannerGetNextItemFromType( type );
 	if ( ! nextItem ) {
 		return;
 	}
@@ -94,7 +106,8 @@ const progressPlannerInjectSuggestedTodoItem = ( details ) => {
 		details.description,
 		details.points ?? 1,
 		details.action ?? '',
-		details.url ?? ''
+		details.url ?? '',
+		details.type ?? ''
 	);
 
 	/**
@@ -191,8 +204,8 @@ const prplStrikeCompletedTasks = () => {
 		document
 			.querySelectorAll( '.prpl-suggested-task-celebrated' )
 			.forEach( ( item ) => {
-				const taskId = item.getAttribute( 'data-task-id' );
-
+				const taskId = item.getAttribute( 'data-task-id' ),
+					type = item.getAttribute( 'data-task-type' );
 				const el = document.querySelector(
 					`.prpl-suggested-task[data-task-id="${ taskId }"]`
 				);
@@ -219,8 +232,13 @@ const prplStrikeCompletedTasks = () => {
 				}
 
 				// Refresh the list.
-				const event = new Event( 'prplMaybeInjectSuggestedTaskEvent' );
-				document.dispatchEvent( event );
+				const event = new CustomEvent('prplMaybeInjectSuggestedTaskEvent', {
+					detail: {
+						taskId: taskId,
+						type: type,
+					}
+				} );
+				document.dispatchEvent(event);
 			} );
 	}, 2000 );
 };
@@ -247,16 +265,20 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		return;
 	}
 
-	// Inject items, until we reach the maximum number of items.
-	while (
-		progressPlannerCountItems() <
-			parseInt( progressPlannerSuggestedTasks.maxItems ) &&
-		progressPlannerGetNextItem()
-	) {
-		progressPlannerInjectNextItem();
+	// Loop through each type and inject items.
+	for ( const type in progressPlannerSuggestedTasks.tasks.details ) {
+
+		// Inject items, until we reach the maximum number of channel items.
+		while (
+			progressPlannerCountItems( type ) <
+				parseInt( progressPlannerSuggestedTasks.maxItems ) &&
+			progressPlannerGetNextItemFromType( type )
+		) {
+			progressPlannerInjectNextItem( type );
+		}
 	}
 
-	const event = new Event( 'prplResizeAllGridItemsEvent' );
+	const event = new CustomEvent( 'prplResizeAllGridItemsEvent' );
 	document.dispatchEvent( event );
 } );
 
@@ -412,13 +434,19 @@ const prplMaybeInjectSuggestedTaskEvent = new Event( // eslint-disable-line no-u
 // Listen for the event.
 document.addEventListener(
 	'prplMaybeInjectSuggestedTaskEvent',
-	() => {
+	( e ) => {
+		const type = e.detail.type;
+
+		if ( 'pending_celebration' === type ) {
+			return;
+		}
+
 		while (
-			progressPlannerCountItems() <
+			progressPlannerCountItems( type ) <
 				parseInt( progressPlannerSuggestedTasks.maxItems ) &&
-			progressPlannerGetNextItem()
+			progressPlannerGetNextItemFromType( type )
 		) {
-			progressPlannerInjectNextItem();
+			progressPlannerInjectNextItem( type );
 		}
 
 		const event = new Event( 'prplResizeAllGridItemsEvent' );
