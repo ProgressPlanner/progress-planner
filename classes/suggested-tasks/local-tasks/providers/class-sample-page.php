@@ -92,6 +92,29 @@ class Sample_Page extends Local_Tasks_Abstract {
 	}
 
 	/**
+	 * Get the task details.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return array
+	 */
+	public function get_task_details( $task_id = '' ) {
+
+		$sample_page = $this->get_sample_page();
+
+		return [
+			'task_id'     => static::ID,
+			'title'       => \esc_html__( 'Delete "Sample Page"', 'progress-planner' ),
+			'parent'      => 0,
+			'priority'    => 'high',
+			'type'        => static::TYPE,
+			'points'      => 1,
+			'url'         => $this->capability_required() && null !== $sample_page ? \esc_url( \get_edit_post_link( $sample_page->ID ) ) : '', // @phpstan-ignore-line property.nonObject
+			'description' => '<p>' . \esc_html__( 'On install, WordPress creates a Sample Page. This page is not needed and should be deleted.', 'progress-planner' ) . '</p>',
+		];
+	}
+
+	/**
 	 * Get the sample page.
 	 *
 	 * @return \WP_Post|null
@@ -119,28 +142,5 @@ class Sample_Page extends Local_Tasks_Abstract {
 		$this->sample_page = $sample_page;
 
 		return $sample_page;
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-
-		$sample_page = $this->get_sample_page();
-
-		return [
-			'task_id'     => static::ID,
-			'title'       => \esc_html__( 'Delete "Sample Page"', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'high',
-			'type'        => static::TYPE,
-			'points'      => 1,
-			'url'         => $this->capability_required() && null !== $sample_page ? \esc_url( \get_edit_post_link( $sample_page->ID ) ) : '', // @phpstan-ignore-line property.nonObject
-			'description' => '<p>' . \esc_html__( 'On install, WordPress creates a Sample Page. This page is not needed and should be deleted.', 'progress-planner' ) . '</p>',
-		];
 	}
 }

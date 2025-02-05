@@ -91,6 +91,29 @@ class Hello_World extends Local_Tasks_Abstract {
 	}
 
 	/**
+	 * Get the task details.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return array
+	 */
+	public function get_task_details( $task_id = '' ) {
+
+		$hello_world = $this->get_sample_post();
+
+		return [
+			'task_id'     => static::ID,
+			'title'       => \esc_html__( 'Delete "Hello World!" post', 'progress-planner' ),
+			'parent'      => 0,
+			'priority'    => 'high',
+			'type'        => static::TYPE,
+			'points'      => 1,
+			'url'         => $this->capability_required() && null !== $hello_world ? \esc_url( \get_edit_post_link( $hello_world->ID ) ) : '', // @phpstan-ignore-line property.nonObject
+			'description' => '<p>' . \esc_html__( 'On install, WordPress creates a "Hello World!" post. This post is not needed and should be deleted.', 'progress-planner' ) . '</p>',
+		];
+	}
+
+	/**
 	 * Get the sample post.
 	 *
 	 * @return \WP_Post|null
@@ -118,28 +141,5 @@ class Hello_World extends Local_Tasks_Abstract {
 		$this->sample_post = $sample_post;
 
 		return $sample_post;
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-
-		$hello_world = $this->get_sample_post();
-
-		return [
-			'task_id'     => static::ID,
-			'title'       => \esc_html__( 'Delete "Hello World!" post', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'high',
-			'type'        => static::TYPE,
-			'points'      => 1,
-			'url'         => $this->capability_required() && null !== $hello_world ? \esc_url( \get_edit_post_link( $hello_world->ID ) ) : '', // @phpstan-ignore-line property.nonObject
-			'description' => '<p>' . \esc_html__( 'On install, WordPress creates a "Hello World!" post. This post is not needed and should be deleted.', 'progress-planner' ) . '</p>',
-		];
 	}
 }
