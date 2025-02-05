@@ -40,7 +40,7 @@ class Core_Blogdescription extends Local_Tasks_Abstract {
 			return false;
 		}
 
-		if ( 0 === strpos( $task_id, static::ID ) && '' !== \get_bloginfo( 'description' ) ) {
+		if ( 0 === strpos( $task_id, $this->get_provider_id() ) && '' !== \get_bloginfo( 'description' ) ) {
 			return $task_id;
 		}
 		return false;
@@ -64,12 +64,12 @@ class Core_Blogdescription extends Local_Tasks_Abstract {
 		}
 
 		// If the task with this id is completed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( static::ID ) ) {
+		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_provider_id() ) ) {
 			return [];
 		}
 
 		return [
-			$this->get_task_details( static::ID ),
+			$this->get_task_details( $this->get_provider_id() ),
 		];
 	}
 
@@ -83,7 +83,7 @@ class Core_Blogdescription extends Local_Tasks_Abstract {
 	public function get_task_details( $task_id ) {
 
 		return [
-			'task_id'     => static::ID,
+			'task_id'     => $this->get_provider_id(),
 			'title'       => \esc_html__( 'Set tagline', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',

@@ -40,40 +40,10 @@ class Settings_Saved extends Local_Tasks_Abstract {
 			return false;
 		}
 
-		if ( 0 === strpos( $task_id, static::ID ) && false !== \get_option( 'progress_planner_pro_license_key', false ) ) {
+		if ( 0 === strpos( $task_id, $this->get_provider_id() ) && false !== \get_option( 'progress_planner_pro_license_key', false ) ) {
 			return $task_id;
 		}
 		return false;
-	}
-
-	/**
-	 * Get an array of tasks to inject.
-	 *
-	 * @return array
-	 */
-	public function get_tasks_to_inject() {
-
-		// Early bail if the user does not have the capability to manage options or if the task is snoozed.
-		if ( true === $this->is_task_type_snoozed() || ! $this->capability_required() ) {
-			return [];
-		}
-
-		$prpl_pro_license_key = \get_option( 'progress_planner_pro_license_key', false );
-
-		if ( false !== $prpl_pro_license_key ) {
-			return [];
-		}
-
-		$task_id = static::ID;
-
-		// If the task with this id is completed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
-			return [];
-		}
-
-		return [
-			$this->get_task_details( $task_id ),
-		];
 	}
 
 	/**

@@ -41,38 +41,10 @@ class Core_Siteicon extends Local_Tasks_Abstract {
 		}
 
 		$site_icon = \get_option( 'site_icon' );
-		if ( 0 === strpos( $task_id, static::ID ) && ( '' !== $site_icon && '0' !== $site_icon ) ) {
+		if ( 0 === strpos( $task_id, $this->get_provider_id() ) && ( '' !== $site_icon && '0' !== $site_icon ) ) {
 			return $task_id;
 		}
 		return false;
-	}
-
-	/**
-	 * Get an array of tasks to inject.
-	 *
-	 * @return array
-	 */
-	public function get_tasks_to_inject() {
-
-		// Early bail if the user does not have the capability to manage options or if the task is snoozed.
-		if ( true === $this->is_task_type_snoozed() || ! $this->capability_required() ) {
-			return [];
-		}
-
-		$site_icon = \get_option( 'site_icon' );
-		// If site icon is set, do not add the task.
-		if ( '' !== $site_icon && '0' !== $site_icon ) {
-			return [];
-		}
-
-		// If the task with this id is completed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( static::ID ) ) {
-			return [];
-		}
-
-		return [
-			$this->get_task_details( static::ID ),
-		];
 	}
 
 	/**

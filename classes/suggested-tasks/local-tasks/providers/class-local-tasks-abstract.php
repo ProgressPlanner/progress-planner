@@ -74,7 +74,7 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 	 */
 	public function get_data_from_task_id( $task_id ) {
 		$data = [
-			'type' => static::ID,
+			'type' => $this->get_provider_id(),
 			'id'   => $task_id,
 		];
 
@@ -96,11 +96,30 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 			$task_object = ( new Local_Task_Factory( $task['id'] ) )->get_task();
 			$provider_id = $task_object->get_provider_id();
 
-			if ( $provider_id === static::ID ) {
+			if ( $provider_id === $this->get_provider_id() ) {
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get an array of tasks to inject.
+	 *
+	 * @return array
+	 */
+	public function get_tasks_to_inject() {
+		if (
+			true === $this->is_task_type_snoozed() ||
+			false === $this->evaluate_task( $this->get_provider_id() ) ||
+			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_provider_id() )
+		) {
+			return [];
+		}
+
+		return [
+			$this->get_task_details( $this->get_provider_id() ),
+		];
 	}
 }

@@ -63,34 +63,6 @@ class Hello_World extends Local_Tasks_Abstract {
 	}
 
 	/**
-	 * Get an array of tasks to inject.
-	 *
-	 * @return array
-	 */
-	public function get_tasks_to_inject() {
-
-		// Early bail if the user does not have the capability to manage options or if the task is snoozed.
-		if ( true === $this->is_task_type_snoozed() || ! $this->capability_required() ) {
-			return [];
-		}
-
-		$sample_post = $this->get_sample_post();
-
-		if ( null === $sample_post ) {
-			return [];
-		}
-
-		// If the task with this id is completed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( static::ID ) ) {
-			return [];
-		}
-
-		return [
-			$this->get_task_details(),
-		];
-	}
-
-	/**
 	 * Get the task details.
 	 *
 	 * @param string $task_id The task ID.
@@ -102,7 +74,7 @@ class Hello_World extends Local_Tasks_Abstract {
 		$hello_world = $this->get_sample_post();
 
 		return [
-			'task_id'     => static::ID,
+			'task_id'     => $this->get_provider_id(),
 			'title'       => \esc_html__( 'Delete "Hello World!" post', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
