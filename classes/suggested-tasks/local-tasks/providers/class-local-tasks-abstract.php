@@ -103,23 +103,4 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 
 		return false;
 	}
-
-	/**
-	 * Get an array of tasks to inject.
-	 *
-	 * @return array
-	 */
-	public function get_tasks_to_inject() {
-		if (
-			true === $this->is_task_type_snoozed() ||
-			false === $this->evaluate_task( $this->get_provider_id() ) ||
-			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_provider_id() )
-		) {
-			return [];
-		}
-
-		return [
-			$this->get_task_details( $this->get_provider_id() ),
-		];
-	}
 }

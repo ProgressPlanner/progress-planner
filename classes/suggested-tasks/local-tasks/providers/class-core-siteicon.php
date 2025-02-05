@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 /**
  * Add tasks for Core siteicon.
  */
-class Core_Siteicon extends Local_Tasks_Abstract {
+class Core_Siteicon extends Local_OneTime_Tasks_Abstract {
 
 	/**
 	 * The provider ID.
@@ -27,24 +27,13 @@ class Core_Siteicon extends Local_Tasks_Abstract {
 	const TYPE = 'configuration';
 
 	/**
-	 * Evaluate a task.
+	 * Check if the task condition is met.
 	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool|string
+	 * @return bool
 	 */
-	public function evaluate_task( $task_id ) {
-
-		// Early bail if the user does not have the capability to manage options.
-		if ( ! $this->capability_required() ) {
-			return false;
-		}
-
+	public function check_task_condition() {
 		$site_icon = \get_option( 'site_icon' );
-		if ( 0 === strpos( $task_id, $this->get_provider_id() ) && ( '' !== $site_icon && '0' !== $site_icon ) ) {
-			return $task_id;
-		}
-		return false;
+		return '' !== $site_icon ? true : false;
 	}
 
 	/**
@@ -54,7 +43,11 @@ class Core_Siteicon extends Local_Tasks_Abstract {
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id ) {
+	public function get_task_details( $task_id = '' ) {
+
+		if ( ! $task_id ) {
+			$task_id = $this->get_provider_id();
+		}
 
 		return [
 			'task_id'     => $task_id,

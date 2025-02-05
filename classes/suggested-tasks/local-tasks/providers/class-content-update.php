@@ -111,6 +111,10 @@ class Content_Update extends Content_Abstract {
 	 */
 	public function get_task_details( $task_id ) {
 
+		if ( ! $task_id ) {
+			return [];
+		}
+
 		$data = $this->get_data_from_task_id( $task_id );
 
 		$post         = \get_post( $data['post_id'] );

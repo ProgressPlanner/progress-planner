@@ -56,7 +56,7 @@ class Core_Update extends Local_Tasks_Abstract {
 		$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
 		$task_data   = $task_object->get_data();
 
-		if ( $task_data['type'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['year_week'] && 0 === \wp_get_update_data()['counts']['total'] ) {
+		if ( $task_data['type'] === static::ID && \gmdate( 'YW' ) === $task_data['year_week'] && 0 === \wp_get_update_data()['counts']['total'] ) {
 			return $task_id;
 		}
 		return false;
@@ -85,7 +85,7 @@ class Core_Update extends Local_Tasks_Abstract {
 		}
 
 		return [
-			$this->get_task_details( $this->get_provider_id() . '-' . \gmdate( 'YW' ) ),
+			$this->get_task_details( static::ID . '-' . \gmdate( 'YW' ) ),
 		];
 	}
 
@@ -103,7 +103,7 @@ class Core_Update extends Local_Tasks_Abstract {
 			'title'       => \esc_html__( 'Perform all updates', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
+			'type'        => static::TYPE,
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'update-core.php' ) ) : '',
 			'description' => '<p>' . \esc_html__( 'Perform all updates to ensure your website is secure and up-to-date.', 'progress-planner' ) . '</p>',

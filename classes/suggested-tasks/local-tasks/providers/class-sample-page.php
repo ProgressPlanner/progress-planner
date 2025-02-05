@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 /**
  * Add tasks to check if WP debug is enabled.
  */
-class Sample_Page extends Local_Tasks_Abstract {
+class Sample_Page extends Local_OneTime_Tasks_Abstract {
 
 	/**
 	 * The provider type.
@@ -41,26 +41,14 @@ class Sample_Page extends Local_Tasks_Abstract {
 	protected $sample_page = false;
 
 	/**
-	 * Evaluate a task.
+	 * Check if the task condition is met.
 	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool|string
+	 * @return bool
 	 */
-	public function evaluate_task( $task_id ) {
-
-		// Early bail if the user does not have the capability to manage options.
-		if ( ! $this->capability_required() ) {
-			return false;
-		}
-
+	public function check_task_condition() {
 		$sample_page = $this->get_sample_page();
 
-		if ( null === $sample_page ) {
-			return $task_id;
-		}
-
-		return false;
+		return null === $sample_page ? true : false;
 	}
 
 	/**
@@ -72,10 +60,14 @@ class Sample_Page extends Local_Tasks_Abstract {
 	 */
 	public function get_task_details( $task_id = '' ) {
 
+		if ( ! $task_id ) {
+			$task_id = $this->get_provider_id();
+		}
+
 		$sample_page = $this->get_sample_page();
 
 		return [
-			'task_id'     => $this->get_provider_id(),
+			'task_id'     => $task_id,
 			'title'       => \esc_html__( 'Delete "Sample Page"', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',

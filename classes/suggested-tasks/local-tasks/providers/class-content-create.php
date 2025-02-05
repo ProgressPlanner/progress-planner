@@ -149,7 +149,11 @@ class Content_Create extends Content_Abstract {
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id ) {
+	public function get_task_details( $task_id = '' ) {
+
+		if ( ! $task_id ) {
+			return [];
+		}
 
 		$data = $this->get_data_from_task_id( $task_id );
 
