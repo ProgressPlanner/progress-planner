@@ -35,15 +35,6 @@ class Core_Update extends Local_Tasks_Abstract {
 	const ID = 'update-core';
 
 	/**
-	 * Get the provider ID.
-	 *
-	 * @return string
-	 */
-	public function get_provider_id() {
-		return static::ID . '-' . \gmdate( 'YW' );
-	}
-
-	/**
 	 * Evaluate a task.
 	 *
 	 * @param string $task_id The task ID.
@@ -65,10 +56,37 @@ class Core_Update extends Local_Tasks_Abstract {
 		$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
 		$task_data   = $task_object->get_data();
 
-		if ( $task_data['type'] === static::ID && \gmdate( 'YW' ) === $task_data['year_week'] && 0 === \wp_get_update_data()['counts']['total'] ) {
+		if ( $task_data['type'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['year_week'] && 0 === \wp_get_update_data()['counts']['total'] ) {
 			return $task_id;
 		}
 		return false;
+	}
+
+	/**
+	 * Get an array of tasks to inject.
+	 *
+	 * @return array
+	 */
+	public function get_tasks_to_inject() {
+
+		// Early bail if the user does not have the capability to update the core or if the task is snoozed.
+		if ( true === $this->is_task_type_snoozed() || ! $this->capability_required() ) {
+			return [];
+		}
+
+		// Without this \wp_get_update_data() might not return correct data for the core updates (depending on the timing).
+		if ( ! function_exists( 'get_core_updates' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/update.php'; // @phpstan-ignore requireOnce.fileNotFound
+		}
+
+		// If all updates are performed, do not add the task.
+		if ( 0 === \wp_get_update_data()['counts']['total'] ) {
+			return [];
+		}
+
+		return [
+			$this->get_task_details( $this->get_provider_id() . '-' . \gmdate( 'YW' ) ),
+		];
 	}
 
 	/**

@@ -47,6 +47,29 @@ class Settings_Saved extends Local_Tasks_Abstract {
 	}
 
 	/**
+	 * Get an array of tasks to inject.
+	 *
+	 * @return array
+	 */
+	public function get_tasks_to_inject() {
+
+		// Early bail if the user does not have the capability to manage options or if the task is snoozed.
+		if ( true === $this->is_task_type_snoozed() || ! $this->capability_required() || true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_provider_id() ) ) {
+			return [];
+		}
+
+		$prpl_pro_license_key = \get_option( 'progress_planner_pro_license_key', false );
+
+		if ( false !== $prpl_pro_license_key ) {
+			return [];
+		}
+
+		return [
+			$this->get_task_details( $this->get_provider_id() ),
+		];
+	}
+
+	/**
 	 * Get the task details.
 	 *
 	 * @param string $task_id The task ID.
