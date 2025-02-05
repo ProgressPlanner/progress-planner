@@ -47,7 +47,19 @@ class Sample_Page extends Local_Tasks_Abstract {
 			return false;
 		}
 
-		$sample_page = get_page_by_path( 'sample-page' );
+		$sample_page = get_page_by_path( __( 'sample-page' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+		if ( null === $sample_page ) {
+			$query = new \WP_Query(
+				[
+					'post_type'      => 'page',
+					'title'          => __( 'Sample Page' ), // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+					'post_status'    => 'all',
+					'posts_per_page' => 1,
+				]
+			);
+
+			$sample_page = ! empty( $query->post ) ? $query->post : null;
+		}
 
 		if ( null === $sample_page ) {
 			return $task_id;
