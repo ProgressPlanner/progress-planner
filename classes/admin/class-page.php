@@ -52,7 +52,7 @@ class Page {
 	/**
 	 * Get the widgets objects, filtered and sorted.
 	 *
-	 * @return array<\Progress_Planner\Widget>
+	 * @return array<\Progress_Planner\Widgets\Widget>
 	 */
 	public function get_widgets_filtered() {
 		/**
@@ -68,9 +68,9 @@ class Page {
 	/**
 	 * Filter the widgets.
 	 *
-	 * @param array<\Progress_Planner\Widget> $widgets The widgets.
+	 * @param array<\Progress_Planner\Widgets\Widget> $widgets The widgets.
 	 *
-	 * @return array<\Progress_Planner\Widget>
+	 * @return array<\Progress_Planner\Widgets\Widget>
 	 */
 	public function filter_active_widgets( $widgets ) {
 		$active_widgets = \progress_planner()->get_settings()->get( 'active_widgets' );
