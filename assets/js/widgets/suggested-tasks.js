@@ -94,7 +94,8 @@ const progressPlannerInjectSuggestedTodoItem = ( details ) => {
 		details.description,
 		details.points ?? 1,
 		details.action ?? '',
-		details.url ?? ''
+		details.url ?? '',
+		details.dismissable ?? false
 	);
 
 	/**

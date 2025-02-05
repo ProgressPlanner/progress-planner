@@ -9,7 +9,7 @@ namespace Progress_Planner\Suggested_Tasks;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Create;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Update;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Review;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Settings_Saved;
 
@@ -44,7 +44,7 @@ class Local_Tasks_Manager {
 
 		$this->task_providers = [
 			new Content_Create(),
-			new Content_Update(),
+			new Content_Review(),
 			new Core_Update(),
 			new Settings_Saved(),
 		];

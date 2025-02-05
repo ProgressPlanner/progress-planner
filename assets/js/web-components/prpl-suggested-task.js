@@ -12,7 +12,8 @@ customElements.define(
 			taskDescription,
 			taskPoints,
 			taskAction = '',
-			taskUrl = ''
+			taskUrl = '',
+			taskDismissable = false
 		) {
 			// Get parent class properties
 			super();
@@ -25,6 +26,7 @@ customElements.define(
 			}
 
 			const isRemoteTask = taskId.startsWith( 'remote-task-' );
+			const isDismissable = taskDismissable || isRemoteTask;
 
 			const actionButtons = {
 				info: `<button
@@ -51,7 +53,7 @@ customElements.define(
 							<img src="${ progressPlannerSuggestedTask.assets.snoozeIcon }" alt="${ progressPlannerSuggestedTask.i18n.snooze }" class="icon">
 							<span class="screen-reader-text">${ progressPlannerSuggestedTask.i18n.snooze }</span>
 						</button>`,
-				complete: isRemoteTask
+				complete: isDismissable
 					? `<button
 							type="button"
 							class="prpl-suggested-task-button"

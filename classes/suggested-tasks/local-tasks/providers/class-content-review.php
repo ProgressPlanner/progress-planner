@@ -12,14 +12,14 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 /**
  * Add tasks for content updates.
  */
-class Content_Update extends Content_Abstract {
+class Content_Review extends Content_Abstract {
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'update-post';
+	const TYPE = 'review-post';
 
 	/**
 	 * The number of items to inject.
@@ -88,13 +88,13 @@ class Content_Update extends Content_Abstract {
 
 		$items = [];
 		foreach ( $last_updated_posts as $post ) {
-			// If the last update was more than 6 months ago, add a task.
+			// If the last review was more than 6 months ago, add a task.
 			if ( strtotime( $post->post_modified ) > strtotime( '-6 months' ) ) { // @phpstan-ignore-line property.nonObject
 				continue;
 			}
 			$task_id = $this->get_task_id(
 				[
-					'type'    => 'update-post',
+					'type'    => 'review-post',
 					'post_id' => $post->ID, // @phpstan-ignore-line property.nonObject
 				]
 			);
@@ -118,15 +118,16 @@ class Content_Update extends Content_Abstract {
 		$post         = \get_post( $data['post_id'] );
 		$task_details = [
 			'task_id'     => $task_id,
-			'title'       => sprintf( 'Update post "%s"', \esc_html( $post->post_title ) ), // @phpstan-ignore-line property.nonObject
+			'title'       => sprintf( 'Review post "%s"', \esc_html( $post->post_title ) ), // @phpstan-ignore-line property.nonObject
 			'parent'      => 0,
 			'priority'    => 'high',
 			'type'        => 'writing',
 			'points'      => 1,
+			'dismissable' => true,
 			'url'         => $this->capability_required() ? \esc_url( \get_edit_post_link( $post->ID ) ) : '', // @phpstan-ignore-line property.nonObject
 			'description' => '<p>' . sprintf(
 				/* translators: %s: The post title. */
-				\esc_html__( 'Update the post "%s" as it was last updated more than 6 months ago.', 'progress-planner' ),
+				\esc_html__( 'Review the post "%s" as it was last updated more than 6 months ago.', 'progress-planner' ),
 				\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
 			) . '</p>' . ( $this->capability_required() ? '<p><a href="' . \esc_url( \get_edit_post_link( $post->ID ) ) . '">' . \esc_html__( 'Edit the post', 'progress-planner' ) . '</a>.</p>' : '' ), // @phpstan-ignore-line property.nonObject
 		];
@@ -148,7 +149,7 @@ class Content_Update extends Content_Abstract {
 		if ( \is_array( $snoozed ) && ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
 				$data = $this->get_data_from_task_id( $task['id'] );
-				if ( isset( $data['type'] ) && 'update-post' === $data['type'] ) {
+				if ( isset( $data['type'] ) && 'review-post' === $data['type'] ) {
 					$snoozed_post_ids[] = $data['post_id'];
 				}
 			}
