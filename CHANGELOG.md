@@ -5,6 +5,7 @@ Enhancements:
 * Improvements to the REST-API endpoint for getting stats.
 * Added a plugin-deactivation feedback form.
 * Removed celebration for "Perform all updates" if it was done by WordPress' automatic update.
+* Removed admin notices on the Progress Planner page.
 
 = 1.0.3 =
 
