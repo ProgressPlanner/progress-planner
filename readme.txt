@@ -86,11 +86,14 @@ Enhancements:
 * Added a plugin-deactivation feedback form.
 * Removed celebration for "Perform all updates" if it was done by WordPress' automatic update.
 * Removed admin notices on the Progress Planner page.
-* Added new suggested task for setting site icon.
-* Added new suggested task for setting the tagline.
-* Added new suggested task for deactivating the display of PHP debug messages
-* Added new suggested task for removing the default WP "Hello world" post.
-* Added new suggested task for removing the default WP "Sample page" page.
+* Added option to redirect users to the Progress Planner dashboard after login.
+
+Added Recommendations from Ravi:
+* Setting site icon.
+* Setting the tagline.
+* Deactivating the display of PHP debug messages.
+* Removing the default WP "Hello world" post.
+* Removing the default WP "Sample page" page.
 
 = 1.0.3 =
 
