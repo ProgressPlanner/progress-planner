@@ -29,6 +29,7 @@ class Page {
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		\add_action( 'wp_ajax_progress_planner_save_settings_popover', [ $this, 'save_settings_popover' ] );
 		\add_filter( 'progress_planner_admin_widgets', [ $this, 'filter_active_widgets' ] );
+		\add_action( 'in_admin_header', [ $this, 'remove_admin_notices' ], PHP_INT_MAX );
 	}
 
 	/**
@@ -243,5 +244,29 @@ class Page {
 				'message' => \esc_html__( 'Settings saved.', 'progress-planner' ),
 			]
 		);
+	}
+
+	/**
+	 * Remove all admin notices when the user is on the Progress Planner page.
+	 *
+	 * @return void
+	 */
+	public function remove_admin_notices() {
+		$current_screen = \get_current_screen();
+		if ( ! $current_screen ) {
+			return;
+		}
+		if ( ! \in_array(
+			$current_screen->id,
+			[
+				'toplevel_page_progress-planner',
+				'progress-planner_page_progress-planner-settings',
+			],
+			true
+		) ) {
+			return;
+		}
+
+		\remove_all_actions( 'admin_notices' );
 	}
 }
