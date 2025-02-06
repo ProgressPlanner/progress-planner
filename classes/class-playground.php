@@ -162,7 +162,8 @@ class Playground {
 	/**
 	 * Create a random post.
 	 *
-	 * @param bool $random_date Whether to use a random date or not.
+	 * @param bool   $random_date Whether to use a random date or not.
+	 * @param string $post_type   The post type to create.
 	 *
 	 * @return int Post ID.
 	 */

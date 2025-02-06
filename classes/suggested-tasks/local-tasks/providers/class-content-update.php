@@ -33,7 +33,7 @@ class Content_Update extends Content_Abstract {
 	 *
 	 * @var int
 	 */
-	const ITEMS_TO_INJECT = 2;
+	const ITEMS_TO_INJECT = 10;
 
 	/**
 	 * Constructor.
