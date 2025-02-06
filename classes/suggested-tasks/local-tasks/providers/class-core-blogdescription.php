@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 /**
  * Add tasks for Core blogdescription.
  */
-class Core_Blogdescription extends Local_Tasks_Abstract {
+class Core_Blogdescription extends Local_OneTime_Tasks_Abstract {
 
 	/**
 	 * The provider ID.
@@ -27,50 +27,12 @@ class Core_Blogdescription extends Local_Tasks_Abstract {
 	const TYPE = 'configuration';
 
 	/**
-	 * Evaluate a task.
+	 * Check if the task condition is met.
 	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool|string
+	 * @return bool
 	 */
-	public function evaluate_task( $task_id ) {
-
-		// Early bail if the user does not have the capability to manage options.
-		if ( ! $this->capability_required() ) {
-			return false;
-		}
-
-		if ( 0 === strpos( $task_id, static::ID ) && '' !== \get_bloginfo( 'description' ) ) {
-			return $task_id;
-		}
-		return false;
-	}
-
-	/**
-	 * Get an array of tasks to inject.
-	 *
-	 * @return array
-	 */
-	public function get_tasks_to_inject() {
-
-		// Early bail if the user does not have the capability to manage options or if the task is snoozed.
-		if ( true === $this->is_task_type_snoozed() || ! $this->capability_required() ) {
-			return [];
-		}
-
-		// If tagline is set, do not add the task.
-		if ( '' !== \get_bloginfo( 'description' ) ) {
-			return [];
-		}
-
-		// If the task with this id is completed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( static::ID ) ) {
-			return [];
-		}
-
-		return [
-			$this->get_task_details( static::ID ),
-		];
+	public function check_task_condition() {
+		return '' !== \get_bloginfo( 'description' ) ? true : false;
 	}
 
 	/**
@@ -80,14 +42,18 @@ class Core_Blogdescription extends Local_Tasks_Abstract {
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id ) {
+	public function get_task_details( $task_id = '' ) {
+
+		if ( ! $task_id ) {
+			$task_id = $this->get_provider_id();
+		}
 
 		return [
-			'task_id'     => static::ID,
+			'task_id'     => $task_id,
 			'title'       => \esc_html__( 'Set tagline', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => static::TYPE,
+			'type'        => $this->get_provider_type(),
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php' ) ) : '',
 			'description' => '<p>' . sprintf(

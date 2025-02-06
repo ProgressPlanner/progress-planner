@@ -111,6 +111,10 @@ class Content_Update extends Content_Abstract {
 	 */
 	public function get_task_details( $task_id ) {
 
+		if ( ! $task_id ) {
+			return [];
+		}
+
 		$data = $this->get_data_from_task_id( $task_id );
 
 		$post         = \get_post( $data['post_id'] );
@@ -119,7 +123,7 @@ class Content_Update extends Content_Abstract {
 			'title'       => sprintf( 'Update post "%s"', \esc_html( $post->post_title ) ), // @phpstan-ignore-line property.nonObject
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => static::TYPE,
+			'type'        => $this->get_provider_type(),
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \get_edit_post_link( $post->ID ) ) : '', // @phpstan-ignore-line property.nonObject
 			'description' => '<p>' . sprintf(
@@ -181,7 +185,13 @@ class Content_Update extends Content_Abstract {
 		foreach ( \progress_planner()->get_suggested_tasks()->get_local()->get_pending_tasks() as $task_id ) {
 			$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
 			$task_data   = $task_object->get_data();
-			if ( static::TYPE === $task_data['type'] && ( isset( $task_data['post_id'] ) && (int) $task_data['post_id'] === (int) $post->ID ) ) {
+			if (
+				$this->get_provider_type() === $task_data['type'] &&
+				(
+					isset( $task_data['post_id'] ) &&
+					(int) $task_data['post_id'] === (int) $post->ID
+				)
+			) {
 				// Remove the task from the pending local tasks list.
 				\progress_planner()->get_suggested_tasks()->get_local()->remove_pending_task( $task_id ); // @phpstan-ignore-line method.nonObject
 			}
