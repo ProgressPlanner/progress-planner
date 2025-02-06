@@ -66,7 +66,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</h2>
 				<div class="prpl-settings-wrapper">
 					<?php
-					$prpl_redirect_on_login = \progress_planner()->get_settings()->get( 'redirect_on_login', false );
+					$prpl_redirect_on_login = \get_user_meta( \get_current_user_id(), 'prpl_redirect_on_login', true );
 					?>
 					<label for="prpl-setting-redirect-on-login">
 						<input

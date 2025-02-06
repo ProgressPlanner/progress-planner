@@ -397,6 +397,11 @@ class Base {
 			return;
 		}
 
+		// Check if the user has the `prpl_redirect_on_login` meta.
+		if ( ! \get_user_meta( $user->ID, 'prpl_redirect_on_login', true ) ) {
+			return;
+		}
+
 		// Redirect to the Progress Planner dashboard.
 		\wp_safe_redirect( \admin_url( 'admin.php?page=progress-planner' ) );
 		exit;
