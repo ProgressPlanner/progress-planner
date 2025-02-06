@@ -121,12 +121,8 @@ class Content_Review extends Content_Abstract {
 		$post         = \get_post( $data['post_id'] );
 		$task_details = [
 			'task_id'     => $task_id,
-<<<<<<< HEAD:classes/suggested-tasks/local-tasks/providers/class-content-review.php
-			'title'       => sprintf( 'Review post "%s"', \esc_html( $post->post_title ) ), // @phpstan-ignore-line property.nonObject
-=======
 			// translators: %1$s: The post type, %2$s: The post title.
 			'title'       => sprintf( 'Update %1$s "%2$s"', \esc_html( $post->post_type ), \esc_html( $post->post_title ) ), // @phpstan-ignore-line property.nonObject
->>>>>>> develop:classes/suggested-tasks/local-tasks/providers/class-content-update.php
 			'parent'      => 0,
 			'priority'    => 'high',
 			'type'        => $this->get_provider_type(),
