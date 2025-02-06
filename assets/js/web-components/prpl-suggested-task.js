@@ -13,7 +13,8 @@ customElements.define(
 			taskPoints,
 			taskAction = '',
 			taskUrl = '',
-			taskDismissable = false
+			taskDismissable = false,
+			taskType = ''
 		) {
 			// Get parent class properties
 			super();
@@ -70,7 +71,7 @@ customElements.define(
 			};
 
 			this.innerHTML = `
-			<li class="prpl-suggested-task" data-task-id="${ taskId }" data-task-action="${ taskAction }" data-task-url="${ taskUrl }">
+			<li class="prpl-suggested-task" data-task-id="${ taskId }" data-task-action="${ taskAction }" data-task-url="${ taskUrl }" data-task-type="${ taskType }">
 				<h3><span>${ taskHeading }</span></h3>
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
@@ -279,6 +280,8 @@ customElements.define(
 		 */
 		runTaskAction = ( taskId, actionType, snoozeDuration ) => {
 			taskId = taskId.toString();
+			const type =
+				this.querySelector( 'li' ).getAttribute( 'data-task-type' );
 
 			const data = {
 				task_id: taskId,
@@ -309,7 +312,9 @@ customElements.define(
 							) === -1
 						) {
 							window.progressPlannerSuggestedTasks.tasks.snoozed.push(
-								taskId
+								{
+									id: taskId,
+								}
 							);
 						}
 						break;
@@ -330,7 +335,15 @@ customElements.define(
 						break;
 				}
 
-				const event = new Event( 'prplMaybeInjectSuggestedTaskEvent' );
+				const event = new CustomEvent(
+					'prplMaybeInjectSuggestedTaskEvent',
+					{
+						detail: {
+							taskId,
+							type,
+						},
+					}
+				);
 				document.dispatchEvent( event );
 			} );
 		};
