@@ -67,19 +67,40 @@ class Content_Update extends Content_Abstract {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-		$args = apply_filters(
-			'progress_planner_update_posts_tasks_args',
-			[
-				'posts_per_page' => static::ITEMS_TO_INJECT,
-				'post_type'      => [ 'page', 'post' ],
-				'post_status'    => 'publish',
-				'orderby'        => 'modified',
-				'order'          => 'ASC',
-			],
-		);
+		$number_of_posts_to_inject = static::ITEMS_TO_INJECT;
+		$last_updated_posts        = [];
 
-		// Get the post that was updated last.
-		$last_updated_posts = \get_posts( $args );
+		// Check if there are any important pages to update.
+		$important_page_ids = [];
+		foreach ( \progress_planner()->get_admin__page_settings()->get_settings() as $key => $important_page ) {
+			if ( 0 !== (int) $important_page['value'] ) {
+				$important_page_ids[] = $important_page['value'];
+			}
+		}
+
+		if ( ! empty( $important_page_ids ) ) {
+			$last_updated_posts = $this->get_old_posts(
+				[
+					'post__in' => $important_page_ids,
+				]
+			);
+
+		}
+
+		// Lets check for other posts to update.
+		$number_of_posts_to_inject = $number_of_posts_to_inject - count( $last_updated_posts );
+
+		if ( 0 < $number_of_posts_to_inject ) {
+			// Get the post that was updated last.
+			$last_updated_posts = array_merge(
+				$last_updated_posts,
+				$this->get_old_posts(
+					[
+						'post__not_in' => $important_page_ids, // This can be an empty array.
+					]
+				)
+			);
+		}
 
 		if ( ! $last_updated_posts ) {
 			return [];
@@ -139,6 +160,39 @@ class Content_Update extends Content_Abstract {
 	}
 
 	/**
+	 * Get the old posts.
+	 *
+	 * @param array $args The args.
+	 *
+	 * @return array
+	 */
+	public function get_old_posts( $args = [] ) {
+		$args = wp_parse_args(
+			$args,
+			[
+				'posts_per_page' => static::ITEMS_TO_INJECT,
+				'post_type'      => [ 'page', 'post' ],
+				'post_status'    => 'publish',
+				'orderby'        => 'modified',
+				'order'          => 'ASC',
+				'date_query'     => [
+					[
+						'column' => 'post_modified',
+						'before' => '-6 months',
+					],
+				],
+			]
+		);
+
+		$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
+
+		// Get the post that was updated last.
+		$posts = \get_posts( $args );
+
+		return $posts ? $posts : [];
+	}
+
+	/**
 	 * Filter the update posts tasks args.
 	 *
 	 * @param array $args The args.
@@ -158,7 +212,10 @@ class Content_Update extends Content_Abstract {
 			}
 
 			if ( ! empty( $snoozed_post_ids ) ) {
-				$args['post__not_in'] = $snoozed_post_ids;
+				if ( ! isset( $args['post__not_in'] ) ) {
+					$args['post__not_in'] = [];
+				}
+				$args['post__not_in'] = array_merge( $args['post__not_in'], $snoozed_post_ids );
 			}
 		}
 
