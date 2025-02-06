@@ -159,7 +159,7 @@ class Page_Settings {
 				}
 
 				// Skip if the ID is not set.
-				if ( 1 > (int) $page_args['id'] ) {
+				if ( ! isset( $page_args['id'] ) || 1 > (int) $page_args['id'] ) {
 					continue;
 				}
 
