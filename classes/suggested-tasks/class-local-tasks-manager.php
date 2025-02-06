@@ -279,6 +279,11 @@ class Local_Tasks_Manager {
 					return \gmdate( 'YW' ) === $task_data['year_week'];
 				}
 
+				// We have changed type name, so we need to remove all tasks of the old type.
+				if ( isset( $task_data['type'] ) && 'update-post' === $task_data['type'] ) {
+					return false;
+				}
+
 				return true;
 			}
 		);
