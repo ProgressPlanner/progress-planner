@@ -279,7 +279,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		// Inject items, until we reach the maximum number of channel items.
 		while (
 			progressPlannerCountItems( type ) <
-				parseInt( progressPlannerSuggestedTasks.maxItemsPerType ) &&
+				parseInt( progressPlannerSuggestedTasks.maxItemsPerType[ type ] ) &&
 			progressPlannerGetNextItemFromType( type )
 		) {
 			progressPlannerInjectNextItem( type );
@@ -451,7 +451,7 @@ document.addEventListener(
 
 		while (
 			progressPlannerCountItems( type ) <
-				parseInt( progressPlannerSuggestedTasks.maxItemsPerType ) &&
+				parseInt( progressPlannerSuggestedTasks.maxItemsPerType[ type ] ) &&
 			progressPlannerGetNextItemFromType( type )
 		) {
 			progressPlannerInjectNextItem( type );

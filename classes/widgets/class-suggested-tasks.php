@@ -133,6 +133,16 @@ final class Suggested_Tasks extends Widget {
 			}
 		}
 
+		$max_items_per_type = [];
+		foreach ( $tasks['details'] as $type => $items ) {
+			$max_items_per_type[ $type ] = $type === 'content-update' ? 2 : 1;
+		}
+
+		// We want all pending_celebration' tasks to be shown.
+		if ( isset( $max_items_per_type['pending_celebration'] ) ) {
+			$max_items_per_type['pending_celebration'] = 0;
+		}
+
 		// Localize the script.
 		\wp_localize_script(
 			$handle,
@@ -141,7 +151,7 @@ final class Suggested_Tasks extends Widget {
 				'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
 				'nonce'           => \wp_create_nonce( 'progress_planner' ),
 				'tasks'           => $tasks,
-				'maxItemsPerType' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_type', 1 ),
+				'maxItemsPerType' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_type', $max_items_per_type ),
 			]
 		);
 	}
