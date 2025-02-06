@@ -558,6 +558,9 @@ class Suggested_Tasks {
 		switch ( $action ) {
 			case 'complete':
 				$this->mark_task_as( 'completed', $task_id );
+
+				// Insert an activity.
+				$this->insert_activity( $task_id );
 				$updated = true;
 				break;
 

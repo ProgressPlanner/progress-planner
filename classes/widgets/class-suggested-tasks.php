@@ -23,6 +23,13 @@ final class Suggested_Tasks extends Widget {
 	protected $id = 'suggested-tasks';
 
 	/**
+	 * The tasks.
+	 *
+	 * @var array|null
+	 */
+	protected $pending_tasks = null;
+
+	/**
 	 * Get the score.
 	 *
 	 * @return int The score.
@@ -53,6 +60,7 @@ final class Suggested_Tasks extends Widget {
 		$handle = 'progress-planner-' . $this->id;
 
 		$pending_celebration = \progress_planner()->get_suggested_tasks()->get_pending_celebration();
+		$pending_tasks       = $this->get_pending_tasks();
 		$deps                = [
 			'progress-planner-todo',
 			'progress-planner-grid-masonry',
@@ -61,7 +69,7 @@ final class Suggested_Tasks extends Widget {
 		];
 
 		// Check if need to load confetti.
-		if ( ! empty( $pending_celebration ) ) {
+		if ( isset( $pending_tasks['content-update'] ) || ! empty( $pending_celebration ) ) {
 			$deps[] = 'particles-confetti';
 		} else {
 			// Check if there are remote tasks to inject, checking here as it might involve an API call.
@@ -95,17 +103,7 @@ final class Suggested_Tasks extends Widget {
 		$tasks = \progress_planner()->get_suggested_tasks()->get_saved_tasks();
 
 		// Get pending tasks.
-		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
-
-		// Sort them by type (channel).
-		foreach ( $pending_tasks as $task ) {
-
-			if ( ! isset( $tasks['details'][ $task['type'] ] ) ) {
-				$tasks['details'][ $task['type'] ] = [];
-			}
-
-			$tasks['details'][ $task['type'] ][] = $task;
-		}
+		$tasks['details'] = $this->get_pending_tasks();
 
 		// Insert the pending celebration tasks as high priority tasks, so they are shown always.
 		foreach ( $tasks['pending_celebration'] as $task_id ) {
@@ -154,5 +152,32 @@ final class Suggested_Tasks extends Widget {
 				'maxItemsPerType' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_type', $max_items_per_type ),
 			]
 		);
+	}
+
+	/**
+	 * Get the tasks.
+	 *
+	 * @return array The tasks.
+	 */
+	public function get_pending_tasks() {
+
+		if ( null === $this->pending_tasks ) {
+			$tasks         = [];
+			$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
+
+			// Sort them by type (channel).
+			foreach ( $pending_tasks as $task ) {
+
+				if ( ! isset( $tasks[ $task['type'] ] ) ) {
+					$tasks[ $task['type'] ] = [];
+				}
+
+				$tasks[ $task['type'] ][] = $task;
+			}
+
+			$this->pending_tasks = $tasks;
+		}
+
+		return $this->pending_tasks;
 	}
 }
