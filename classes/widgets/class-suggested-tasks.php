@@ -140,7 +140,7 @@ final class Suggested_Tasks extends Widget {
 
 		// We want all pending_celebration' tasks to be shown.
 		if ( isset( $max_items_per_type['pending_celebration'] ) ) {
-			$max_items_per_type['pending_celebration'] = 0;
+			$max_items_per_type['pending_celebration'] = 99;
 		}
 
 		// Localize the script.
