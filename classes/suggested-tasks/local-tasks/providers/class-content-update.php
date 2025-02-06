@@ -71,6 +71,7 @@ class Content_Update extends Content_Abstract {
 			'progress_planner_update_posts_tasks_args',
 			[
 				'posts_per_page' => static::ITEMS_TO_INJECT,
+				'post_type'      => [ 'page', 'post' ],
 				'post_status'    => 'publish',
 				'orderby'        => 'modified',
 				'order'          => 'ASC',
