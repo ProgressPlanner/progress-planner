@@ -33,7 +33,7 @@ class Core_Siteicon extends Local_OneTime_Tasks_Abstract {
 	 */
 	public function check_task_condition() {
 		$site_icon = \get_option( 'site_icon' );
-		return '' !== $site_icon ? true : false;
+		return ( '' !== $site_icon && '0' !== $site_icon ) ? true : false;
 	}
 
 	/**
