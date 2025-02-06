@@ -103,6 +103,13 @@ class Base {
 
 			new Plugin_Deactivation();
 		}
+
+		/**
+		 * Redirect on login.
+		 */
+		if ( $this->get_settings()->get( 'redirect_on_login' ) ) {
+			\add_action( 'wp_login', [ $this, 'redirect_on_login' ], 10, 2 );
+		}
 	}
 
 	/**
@@ -369,6 +376,30 @@ class Base {
 	public function is_pro_site() {
 		return \get_option( 'progress_planner_pro_license_key' )
 			&& 'valid' === \get_option( 'progress_planner_pro_license_status' );
+	}
+
+	/**
+	 * Redirect on login.
+	 *
+	 * @param string   $user_login The user login.
+	 * @param \WP_User $user The user object.
+	 *
+	 * @return void
+	 */
+	public function redirect_on_login( $user_login, $user ) {
+		// Check if we want to redirect on login.
+		if ( ! $this->get_settings()->get( 'redirect_on_login', false ) ) {
+			return;
+		}
+
+		// Check if the $user can `manage_options`.
+		if ( ! $user->has_cap( 'manage_options' ) ) {
+			return;
+		}
+
+		// Redirect to the Progress Planner dashboard.
+		\wp_safe_redirect( \admin_url( 'admin.php?page=progress-planner' ) );
+		exit;
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

@@ -58,7 +58,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		<div class="prpl-column">
 			<div class="prpl-widget-wrapper">
-				<h2 class="prpl-settings-section-license">
+				<h2 class="prpl-settings-section-title">
+					<span class="dashicons dashicons-admin-settings"></span>
+					<span>
+						<?php \esc_html_e( 'Settings', 'progress-planner' ); ?>
+					</span>
+				</h2>
+				<div class="prpl-settings-wrapper">
+					<?php
+					$prpl_redirect_on_login = \progress_planner()->get_settings()->get( 'redirect_on_login', false );
+					?>
+					<label for="prpl-setting-redirect-on-login">
+						<input
+							id="prpl-setting-redirect-on-login"
+							name="prpl-redirect-on-login"
+							type="checkbox"
+							<?php checked( $prpl_redirect_on_login ); ?>
+						/>
+						<span><?php \esc_html_e( 'Redirect users to the Progress Planner stats page after login.', 'progress-planner' ); ?></span>
+					</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="prpl-column">
+			<div class="prpl-widget-wrapper">
+				<h2 class="prpl-settings-section-title prpl-settings-section-license">
+					<span class="dashicons dashicons-awards"></span>
 					<span>
 						<?php \esc_html_e( 'License', 'progress-planner' ); ?>
 					</span>
