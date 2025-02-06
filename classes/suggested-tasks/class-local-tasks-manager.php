@@ -119,18 +119,10 @@ class Local_Tasks_Manager {
 	 */
 	public function inject_tasks( $tasks ) {
 		$tasks_to_inject = [];
-		$types_covered   = [];
 
-		// Loop through all registered task providers and inject their tasks, one per type.
+		// Loop through all registered task providers and inject their tasks.
 		foreach ( $this->task_providers as $provider_instance ) {
-			$type = $provider_instance->get_provider_type();
-			if ( ! \in_array( $type, $types_covered, true ) ) {
-				$new_tasks_to_inject = $provider_instance->get_tasks_to_inject();
-				if ( [] !== $new_tasks_to_inject ) {
-					$types_covered[] = $type;
-					$tasks_to_inject = \array_merge( $tasks_to_inject, $new_tasks_to_inject );
-				}
-			}
+			$tasks_to_inject = \array_merge( $tasks_to_inject, $provider_instance->get_tasks_to_inject() );
 		}
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.
