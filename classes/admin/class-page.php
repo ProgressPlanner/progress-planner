@@ -220,7 +220,17 @@ class Page {
 	 */
 	public function remove_admin_notices() {
 		$current_screen = \get_current_screen();
-		if ( ! $current_screen || 'toplevel_page_progress-planner' !== $current_screen->id ) {
+		if ( ! $current_screen ) {
+			return;
+		}
+		if ( ! \in_array(
+			$current_screen->id,
+			[
+				'toplevel_page_progress-planner',
+				'progress-planner_page_progress-planner-settings',
+			],
+			true
+		) ) {
 			return;
 		}
 
