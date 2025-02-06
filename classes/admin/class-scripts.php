@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Admin;
 
+use Progress_Planner\Badges\Monthly;
+
 /**
  * Assets class.
  */
@@ -205,6 +207,16 @@ class Scripts {
 					[
 						'siteUrl'    => \get_site_url(),
 						'savingText' => \esc_html__( 'Saving...', 'progress-planner' ),
+					]
+				);
+				break;
+
+			case 'progress-planner-web-components-prpl-gauge':
+				\wp_localize_script(
+					$handle,
+					'progressPlannerGauge',
+					[
+						'monthlyMaxPoints' => (int) Monthly::TARGET_POINTS,
 					]
 				);
 				break;

@@ -1,4 +1,4 @@
-/* global customElements, progressPlannerSuggestedTask, HTMLElement */
+/* global customElements, progressPlannerSuggestedTask, HTMLElement, progressPlannerGauge */
 
 /**
  * Register the custom web component.
@@ -326,6 +326,27 @@ customElements.define(
 						);
 						// Set the task action to celebrate.
 						el.setAttribute( 'data-task-action', 'celebrate' );
+
+						// Update the points.
+						const pointsElement = document.querySelector(
+							'.prpl-widget-content-points-number'
+						);
+
+						if ( pointsElement ) {
+							const currentPoints = parseInt(
+								pointsElement.textContent
+							);
+
+							if (
+								progressPlannerGauge.monthlyMaxPoints >
+								currentPoints
+							) {
+								pointsElement.textContent =
+									parseInt( pointsElement.textContent ) +
+									1 +
+									'pt'; // For this type of tasks we always award 1 point.
+							}
+						}
 
 						// Trigger the celebration event.
 						document.dispatchEvent(
