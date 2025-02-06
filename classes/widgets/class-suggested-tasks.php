@@ -88,8 +88,6 @@ final class Suggested_Tasks extends Widget {
 	public function enqueue_scripts() {
 		$handle = 'progress-planner-' . $this->id;
 
-		$current_screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
-
 		// Enqueue the script.
 		\wp_enqueue_script( $handle );
 
@@ -140,10 +138,10 @@ final class Suggested_Tasks extends Widget {
 			$handle,
 			'progressPlannerSuggestedTasks',
 			[
-				'ajaxUrl'  => \admin_url( 'admin-ajax.php' ),
-				'nonce'    => \wp_create_nonce( 'progress_planner' ),
-				'tasks'    => $tasks,
-				'maxItems' => apply_filters( 'progress_planner_suggested_tasks_max_items', 1 ), // ( $current_screen && 'dashboard' === $current_screen->id ? 3 : 5 ) ),
+				'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
+				'nonce'           => \wp_create_nonce( 'progress_planner' ),
+				'tasks'           => $tasks,
+				'maxItemsPerType' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_type', 1 ),
 			]
 		);
 	}
