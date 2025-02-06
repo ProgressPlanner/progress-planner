@@ -26,7 +26,7 @@ class Content_Update extends Content_Abstract {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'writing';
+	const TYPE = 'content-update';
 
 	/**
 	 * The number of items to inject.

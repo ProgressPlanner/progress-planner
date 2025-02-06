@@ -26,7 +26,7 @@ class Content_Create extends Content_Abstract {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'writing';
+	const TYPE = 'content-new';
 
 	/**
 	 * The number of items to inject.
