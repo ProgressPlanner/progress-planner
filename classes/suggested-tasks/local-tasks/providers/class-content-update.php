@@ -19,14 +19,21 @@ class Content_Update extends Content_Abstract {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'update-post';
+	const ID = 'update-post';
+
+	/**
+	 * The provider type.
+	 *
+	 * @var string
+	 */
+	const TYPE = 'content-update';
 
 	/**
 	 * The number of items to inject.
 	 *
 	 * @var int
 	 */
-	const ITEMS_TO_INJECT = 2;
+	const ITEMS_TO_INJECT = 10;
 
 	/**
 	 * Constructor.
@@ -35,15 +42,6 @@ class Content_Update extends Content_Abstract {
 		\add_filter( 'progress_planner_update_posts_tasks_args', [ $this, 'filter_update_posts_args' ] );
 
 		\add_action( 'transition_post_status', [ $this, 'transition_post_status' ], 10, 3 );
-	}
-
-	/**
-	 * Get the provider ID.
-	 *
-	 * @return string
-	 */
-	public function get_provider_type() {
-		return self::TYPE;
 	}
 
 	/**
@@ -72,7 +70,8 @@ class Content_Update extends Content_Abstract {
 		$args = apply_filters(
 			'progress_planner_update_posts_tasks_args',
 			[
-				'posts_per_page' => self::ITEMS_TO_INJECT,
+				'posts_per_page' => static::ITEMS_TO_INJECT,
+				'post_type'      => [ 'page', 'post' ],
 				'post_status'    => 'publish',
 				'orderby'        => 'modified',
 				'order'          => 'ASC',
@@ -113,15 +112,20 @@ class Content_Update extends Content_Abstract {
 	 */
 	public function get_task_details( $task_id ) {
 
+		if ( ! $task_id ) {
+			return [];
+		}
+
 		$data = $this->get_data_from_task_id( $task_id );
 
 		$post         = \get_post( $data['post_id'] );
 		$task_details = [
 			'task_id'     => $task_id,
-			'title'       => sprintf( 'Update post "%s"', \esc_html( $post->post_title ) ), // @phpstan-ignore-line property.nonObject
+			// translators: %1$s: The post type, %2$s: The post title.
+			'title'       => sprintf( 'Update %1$s "%2$s"', \esc_html( $post->post_type ), \esc_html( $post->post_title ) ), // @phpstan-ignore-line property.nonObject
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => 'writing',
+			'type'        => $this->get_provider_type(),
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \get_edit_post_link( $post->ID ) ) : '', // @phpstan-ignore-line property.nonObject
 			'description' => '<p>' . sprintf(
@@ -183,7 +187,13 @@ class Content_Update extends Content_Abstract {
 		foreach ( \progress_planner()->get_suggested_tasks()->get_local()->get_pending_tasks() as $task_id ) {
 			$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
 			$task_data   = $task_object->get_data();
-			if ( self::TYPE === $task_data['type'] && ( isset( $task_data['post_id'] ) && (int) $task_data['post_id'] === (int) $post->ID ) ) {
+			if (
+				$this->get_provider_type() === $task_data['type'] &&
+				(
+					isset( $task_data['post_id'] ) &&
+					(int) $task_data['post_id'] === (int) $post->ID
+				)
+			) {
 				// Remove the task from the pending local tasks list.
 				\progress_planner()->get_suggested_tasks()->get_local()->remove_pending_task( $task_id ); // @phpstan-ignore-line method.nonObject
 			}

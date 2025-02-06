@@ -8,9 +8,9 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 
 /**
- * Add tasks for settings saved.
+ * Add tasks to check if WP debug is enabled.
  */
-class Settings_Saved extends Local_OneTime_Tasks_Abstract {
+class Debug_Display extends Local_OneTime_Tasks_Abstract {
 
 	/**
 	 * The provider type.
@@ -24,7 +24,7 @@ class Settings_Saved extends Local_OneTime_Tasks_Abstract {
 	 *
 	 * @var string
 	 */
-	const ID = 'settings-saved';
+	const ID = 'wp-debug-display';
 
 	/**
 	 * Check if the task condition is met.
@@ -32,9 +32,7 @@ class Settings_Saved extends Local_OneTime_Tasks_Abstract {
 	 * @return bool
 	 */
 	public function check_task_condition() {
-		$prpl_pro_license_key = \get_option( 'progress_planner_pro_license_key', false );
-
-		return false !== $prpl_pro_license_key ? true : false;
+		return ( ! defined( 'WP_DEBUG_DISPLAY' ) || ! WP_DEBUG_DISPLAY ) ? true : false;
 	}
 
 	/**
@@ -52,13 +50,14 @@ class Settings_Saved extends Local_OneTime_Tasks_Abstract {
 
 		return [
 			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Fill settings page', 'progress-planner' ),
+			'title'       => \esc_html__( 'Disable public display of PHP errors', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
 			'type'        => $this->get_provider_type(),
 			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'admin.php?page=progress-planner-settings' ) ) : '',
-			'description' => '<p>' . \esc_html__( 'Head over to the settings page and fill in the required information.', 'progress-planner' ) . '</p>',
+			'url'         => '',
+			// translators: %s is the name of the WP_DEBUG_DISPLAY constant.
+			'description' => '<p>' . sprintf( \esc_html__( '%s is enabled. This means that errors are shown to users. We recommend disabling it.', 'progress-planner' ), '<code>WP_DEBUG_DISPLAY</code>' ) . '</p>',
 		];
 	}
 }

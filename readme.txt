@@ -88,6 +88,13 @@ Enhancements:
 * Removed admin notices on the Progress Planner page.
 * Added option to redirect users to the Progress Planner dashboard after login.
 
+Added Recommendations from Ravi:
+* Setting site icon.
+* Setting the tagline.
+* Deactivating the display of PHP debug messages.
+* Removing the default WP "Hello world" post.
+* Removing the default WP "Sample page" page.
+
 = 1.0.3 =
 
 Fixed:
