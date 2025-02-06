@@ -107,9 +107,7 @@ class Base {
 		/**
 		 * Redirect on login.
 		 */
-		if ( $this->get_settings()->get( 'redirect_on_login' ) ) {
-			\add_action( 'wp_login', [ $this, 'redirect_on_login' ], 10, 2 );
-		}
+		\add_action( 'wp_login', [ $this, 'redirect_on_login' ], 10, 2 );
 	}
 
 	/**
