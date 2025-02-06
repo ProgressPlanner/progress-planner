@@ -278,7 +278,8 @@ customElements.define(
 		 */
 		runTaskAction = ( taskId, actionType, snoozeDuration ) => {
 			taskId = taskId.toString();
-			const type = this.querySelector( 'li' ).getAttribute( 'data-task-type' );
+			const type =
+				this.querySelector( 'li' ).getAttribute( 'data-task-type' );
 
 			const data = {
 				task_id: taskId,
@@ -308,9 +309,10 @@ customElements.define(
 								taskId
 							) === -1
 						) {
-							window.progressPlannerSuggestedTasks.tasks.snoozed.push( {
-								id: taskId,
-							}
+							window.progressPlannerSuggestedTasks.tasks.snoozed.push(
+								{
+									id: taskId,
+								}
 							);
 						}
 						break;
@@ -331,12 +333,15 @@ customElements.define(
 						break;
 				}
 
-				const event = new CustomEvent( 'prplMaybeInjectSuggestedTaskEvent', {
-					detail: {
-						taskId: taskId,
-						type: type,
+				const event = new CustomEvent(
+					'prplMaybeInjectSuggestedTaskEvent',
+					{
+						detail: {
+							taskId,
+							type,
+						},
 					}
-				} );
+				);
 				document.dispatchEvent( event );
 			} );
 		};

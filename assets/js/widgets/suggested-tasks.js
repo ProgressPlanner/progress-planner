@@ -3,28 +3,33 @@
 /**
  * Count the number of items in the list.
  *
+ * @param {string} type The type of items to count.
  * @return {number} The number of items in the list.
  */
 const progressPlannerCountItems = ( type ) => {
-
 	// We want to display all pending celebration tasks on page load.
 	if ( 'pending_celebration' === type ) {
 		return 0;
 	}
 
-	const items = document.querySelectorAll( `.prpl-suggested-task[data-task-type="${ type }"]` );
+	const items = document.querySelectorAll(
+		`.prpl-suggested-task[data-task-type="${ type }"]`
+	);
 	return items.length;
 };
 
 /**
  * Get the next item to inject.
  *
+ * @param {string} type The type of items to get the next item from.
  * @return {Object} The next item to inject.
  */
 const progressPlannerGetNextItemFromType = ( type ) => {
-
 	// If the are no items of this type, return null.
-	if ( 'undefined' === typeof progressPlannerSuggestedTasks.tasks.details[ type ] ) {
+	if (
+		'undefined' ===
+		typeof progressPlannerSuggestedTasks.tasks.details[ type ]
+	) {
 		return null;
 	}
 
@@ -82,6 +87,7 @@ const progressPlannerGetNextItemFromType = ( type ) => {
 
 /**
  * Inject the next item.
+ * @param {string} type The type of items to inject the next item from.
  */
 const progressPlannerInjectNextItem = ( type ) => {
 	const nextItem = progressPlannerGetNextItemFromType( type );
@@ -232,13 +238,16 @@ const prplStrikeCompletedTasks = () => {
 				}
 
 				// Refresh the list.
-				const event = new CustomEvent('prplMaybeInjectSuggestedTaskEvent', {
-					detail: {
-						taskId: taskId,
-						type: type,
+				const event = new CustomEvent(
+					'prplMaybeInjectSuggestedTaskEvent',
+					{
+						detail: {
+							taskId,
+							type,
+						},
 					}
-				} );
-				document.dispatchEvent(event);
+				);
+				document.dispatchEvent( event );
 			} );
 	}, 2000 );
 };
@@ -267,7 +276,6 @@ document.addEventListener( 'DOMContentLoaded', () => {
 
 	// Loop through each type and inject items.
 	for ( const type in progressPlannerSuggestedTasks.tasks.details ) {
-
 		// Inject items, until we reach the maximum number of channel items.
 		while (
 			progressPlannerCountItems( type ) <
