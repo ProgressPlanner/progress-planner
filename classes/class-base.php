@@ -387,11 +387,6 @@ class Base {
 	 * @return void
 	 */
 	public function redirect_on_login( $user_login, $user ) {
-		// Check if we want to redirect on login.
-		if ( ! $this->get_settings()->get( 'redirect_on_login', false ) ) {
-			return;
-		}
-
 		// Check if the $user can `manage_options`.
 		if ( ! $user->has_cap( 'manage_options' ) ) {
 			return;
