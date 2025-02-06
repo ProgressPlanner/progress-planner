@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Widgets;
 
-use Progress_Planner\Widget;
 use Progress_Planner\Badges\Monthly;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 
