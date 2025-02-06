@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 /**
  * Add tasks to check if WP debug is enabled.
  */
-class Debug_Display extends Local_Tasks_Abstract {
+class Debug_Display extends Local_OneTime_Tasks_Abstract {
 
 	/**
 	 * The provider type.
@@ -27,49 +27,12 @@ class Debug_Display extends Local_Tasks_Abstract {
 	const ID = 'wp-debug-display';
 
 	/**
-	 * Evaluate a task.
+	 * Check if the task condition is met.
 	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool|string
+	 * @return bool
 	 */
-	public function evaluate_task( $task_id ) {
-
-		// Early bail if the user does not have the capability to manage options.
-		if ( ! $this->capability_required() ) {
-			return false;
-		}
-
-		if ( 0 === strpos( $task_id, static::ID ) && ( ! defined( 'WP_DEBUG_DISPLAY' ) || ! WP_DEBUG_DISPLAY ) ) {
-			return $task_id;
-		}
-		return false;
-	}
-
-	/**
-	 * Get an array of tasks to inject.
-	 *
-	 * @return array
-	 */
-	public function get_tasks_to_inject() {
-
-		// Early bail if the user does not have the capability to manage options or if the task is snoozed.
-		if ( true === $this->is_task_type_snoozed() || ! $this->capability_required() ) {
-			return [];
-		}
-
-		if ( ! defined( 'WP_DEBUG_DISPLAY' ) || ! WP_DEBUG_DISPLAY ) {
-			return [];
-		}
-
-		// If the task with this id is completed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( static::ID ) ) {
-			return [];
-		}
-
-		return [
-			$this->get_task_details(),
-		];
+	public function check_task_condition() {
+		return ( ! defined( 'WP_DEBUG_DISPLAY' ) || ! WP_DEBUG_DISPLAY ) ? true : false;
 	}
 
 	/**
@@ -81,12 +44,16 @@ class Debug_Display extends Local_Tasks_Abstract {
 	 */
 	public function get_task_details( $task_id = '' ) {
 
+		if ( ! $task_id ) {
+			$task_id = $this->get_provider_id();
+		}
+
 		return [
-			'task_id'     => static::ID,
+			'task_id'     => $task_id,
 			'title'       => \esc_html__( 'Disable public display of PHP errors', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => static::TYPE,
+			'type'        => $this->get_provider_type(),
 			'points'      => 1,
 			'url'         => '',
 			// translators: %s is the name of the WP_DEBUG_DISPLAY constant.

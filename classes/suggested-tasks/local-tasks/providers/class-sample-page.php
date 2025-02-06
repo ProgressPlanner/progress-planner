@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 /**
  * Add tasks to check if WP debug is enabled.
  */
-class Sample_Page extends Local_Tasks_Abstract {
+class Sample_Page extends Local_OneTime_Tasks_Abstract {
 
 	/**
 	 * The provider type.
@@ -41,54 +41,14 @@ class Sample_Page extends Local_Tasks_Abstract {
 	protected $sample_page = false;
 
 	/**
-	 * Evaluate a task.
+	 * Check if the task condition is met.
 	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool|string
+	 * @return bool
 	 */
-	public function evaluate_task( $task_id ) {
-
-		// Early bail if the user does not have the capability to manage options.
-		if ( ! $this->capability_required() ) {
-			return false;
-		}
-
+	public function check_task_condition() {
 		$sample_page = $this->get_sample_page();
 
-		if ( null === $sample_page ) {
-			return $task_id;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Get an array of tasks to inject.
-	 *
-	 * @return array
-	 */
-	public function get_tasks_to_inject() {
-
-		// Early bail if the user does not have the capability to manage options or if the task is snoozed.
-		if ( true === $this->is_task_type_snoozed() || ! $this->capability_required() ) {
-			return [];
-		}
-
-		$sample_page = $this->get_sample_page();
-
-		if ( null === $sample_page ) {
-			return [];
-		}
-
-		// If the task with this id is completed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( static::ID ) ) {
-			return [];
-		}
-
-		return [
-			$this->get_task_details(),
-		];
+		return null === $sample_page ? true : false;
 	}
 
 	/**
@@ -100,14 +60,18 @@ class Sample_Page extends Local_Tasks_Abstract {
 	 */
 	public function get_task_details( $task_id = '' ) {
 
+		if ( ! $task_id ) {
+			$task_id = $this->get_provider_id();
+		}
+
 		$sample_page = $this->get_sample_page();
 
 		return [
-			'task_id'     => static::ID,
+			'task_id'     => $task_id,
 			'title'       => \esc_html__( 'Delete "Sample Page"', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => static::TYPE,
+			'type'        => $this->get_provider_type(),
 			'points'      => 1,
 			'url'         => $this->capability_required() && null !== $sample_page ? \esc_url( \get_edit_post_link( $sample_page->ID ) ) : '', // @phpstan-ignore-line property.nonObject
 			'description' => '<p>' . \esc_html__( 'On install, WordPress creates a Sample Page. This page is not needed and should be deleted.', 'progress-planner' ) . '</p>',
