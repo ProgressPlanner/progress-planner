@@ -145,11 +145,12 @@ final class Suggested_Tasks extends Widget {
 
 		// Check if current date is between Feb 12-16.
 		$confetti_options = [];
-		$current_date     = \gmdate( 'Y-m-d' );
+		$year             = '2025';
+		$current_date     = $year . '-' . \gmdate( 'm-d' );
 
 		// TODO: GET params just for testing.
-		$start_date = isset( $_GET['start_date'] ) ? \sanitize_text_field( \wp_unslash( $_GET['start_date'] ) ) : '2025-02-12';
-		$end_date   = isset( $_GET['end_date'] ) ? \sanitize_text_field( \wp_unslash( $_GET['end_date'] ) ) : '2025-02-16';
+		$start_date = $year . '-' . ( isset( $_GET['start_date'] ) ? \sanitize_text_field( \wp_unslash( $_GET['start_date'] ) ) : '02-12' );
+		$end_date   = $year . '-' . ( isset( $_GET['end_date'] ) ? \sanitize_text_field( \wp_unslash( $_GET['end_date'] ) ) : '02-16' );
 
 		if ( $current_date >= $start_date && $current_date <= $end_date ) {
 			$confetti_options = [
