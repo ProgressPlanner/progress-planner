@@ -72,7 +72,7 @@ class Content_Update extends Content_Abstract {
 
 		// Check if there are any important pages to update.
 		$important_page_ids = [];
-		foreach ( \progress_planner()->get_admin__page_settings()->get_settings() as $key => $important_page ) {
+		foreach ( \progress_planner()->get_admin__page_settings()->get_settings() as $important_page ) {
 			if ( 0 !== (int) $important_page['value'] ) {
 				$important_page_ids[] = $important_page['value'];
 			}
@@ -84,7 +84,6 @@ class Content_Update extends Content_Abstract {
 					'post__in' => $important_page_ids,
 				]
 			);
-
 		}
 
 		// Lets check for other posts to update.
@@ -108,10 +107,6 @@ class Content_Update extends Content_Abstract {
 
 		$items = [];
 		foreach ( $last_updated_posts as $post ) {
-			// If the last update was more than 6 months ago, add a task.
-			if ( strtotime( $post->post_modified ) > strtotime( '-6 months' ) ) { // @phpstan-ignore-line property.nonObject
-				continue;
-			}
 			$task_id = $this->get_task_id(
 				[
 					'type'    => 'update-post',
@@ -119,7 +114,6 @@ class Content_Update extends Content_Abstract {
 				]
 			);
 			$items[] = $this->get_task_details( $task_id );
-
 		}
 		return $items;
 	}
