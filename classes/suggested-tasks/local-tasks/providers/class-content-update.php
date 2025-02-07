@@ -91,6 +91,11 @@ class Content_Update extends Content_Abstract {
 			$important_page_ids[] = $privacy_policy_page_id;
 		}
 
+		/**
+		 * Filters the pages we deem more important for content updates.
+		 *
+		 * @param int[] $important_page_ids Post & page IDs of the important pages.
+		 */
 		$important_page_ids = \apply_filters( 'progress_planner_update_posts_important_page_ids', $important_page_ids );
 
 		if ( ! empty( $important_page_ids ) ) {
@@ -193,6 +198,11 @@ class Content_Update extends Content_Abstract {
 			]
 		);
 
+		/**
+		 * Filters the args for the posts & pages we want user to review.
+		 *
+		 * @param array $args The get_postsargs.
+		 */
 		$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
 
 		// Get the post that was updated last.
