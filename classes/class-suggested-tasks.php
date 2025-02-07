@@ -522,6 +522,22 @@ class Suggested_Tasks {
 	}
 
 	/**
+	 * Check if a task was completed.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function was_task_completed( $task_id ) {
+		return true === $this->check_task_condition(
+			[
+				'type'    => 'completed',
+				'task_id' => $task_id,
+			]
+		);
+	}
+
+	/**
 	 * Handle the suggested task action.
 	 *
 	 * @return void
@@ -548,11 +564,6 @@ class Suggested_Tasks {
 			case 'snooze':
 				$duration = isset( $_POST['duration'] ) ? \sanitize_text_field( \wp_unslash( $_POST['duration'] ) ) : '';
 				$updated  = $this->snooze_task( $task_id, $duration );
-				break;
-
-			case 'celebrated':
-				// We dont need to do anything here, since the task is already marked as completed.
-				$updated = true;
 				break;
 
 			default:

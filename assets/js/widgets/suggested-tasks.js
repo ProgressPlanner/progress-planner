@@ -1,24 +1,41 @@
-/* global customElements, progressPlannerSuggestedTasks, confetti, prplDocumentReady, progressPlannerSuggestedTask */
+/* global customElements, progressPlannerSuggestedTasks, confetti, prplDocumentReady */
 
 /**
  * Count the number of items in the list.
  *
+ * @param {string} type The type of items to count.
  * @return {number} The number of items in the list.
  */
-const progressPlannerCountItems = () => {
-	const items = document.querySelectorAll( '.prpl-suggested-task' );
+const progressPlannerCountItems = ( type ) => {
+	// We want to display all pending celebration tasks on page load.
+	if ( 'pending_celebration' === type ) {
+		return 0;
+	}
+
+	const items = document.querySelectorAll(
+		`.prpl-suggested-task[data-task-type="${ type }"]`
+	);
 	return items.length;
 };
 
 /**
  * Get the next item to inject.
  *
+ * @param {string} type The type of items to get the next item from.
  * @return {Object} The next item to inject.
  */
-const progressPlannerGetNextItem = () => {
+const progressPlannerGetNextItemFromType = ( type ) => {
+	// If the are no items of this type, return null.
+	if (
+		'undefined' ===
+		typeof progressPlannerSuggestedTasks.tasks.details[ type ]
+	) {
+		return null;
+	}
+
 	// Remove completed and snoozed items.
 	const tasks = progressPlannerSuggestedTasks.tasks;
-	const items = tasks.details;
+	const items = tasks.details[ type ];
 	const completed = tasks.completed;
 	const snoozed = tasks.snoozed;
 
@@ -70,9 +87,10 @@ const progressPlannerGetNextItem = () => {
 
 /**
  * Inject the next item.
+ * @param {string} type The type of items to inject the next item from.
  */
-const progressPlannerInjectNextItem = () => {
-	const nextItem = progressPlannerGetNextItem();
+const progressPlannerInjectNextItem = ( type ) => {
+	const nextItem = progressPlannerGetNextItemFromType( type );
 	if ( ! nextItem ) {
 		return;
 	}
@@ -94,7 +112,8 @@ const progressPlannerInjectSuggestedTodoItem = ( details ) => {
 		details.description,
 		details.points ?? 1,
 		details.action ?? '',
-		details.url ?? ''
+		details.url ?? '',
+		details.type ?? ''
 	);
 
 	/**
@@ -191,48 +210,44 @@ const prplStrikeCompletedTasks = () => {
 		document
 			.querySelectorAll( '.prpl-suggested-task-celebrated' )
 			.forEach( ( item ) => {
-				const taskId = item.getAttribute( 'data-task-id' );
+				const taskId = item.getAttribute( 'data-task-id' ),
+					type = item.getAttribute( 'data-task-type' );
+				const el = document.querySelector(
+					`.prpl-suggested-task[data-task-id="${ taskId }"]`
+				);
 
-				const request = wp.ajax.post(
-					'progress_planner_suggested_task_action',
+				if ( el ) {
+					el.parentElement.remove();
+				}
+
+				// Remove the task from the pending celebration.
+				window.progressPlannerSuggestedTasks.tasks.pending_celebration =
+					window.progressPlannerSuggestedTasks.tasks.pending_celebration.filter(
+						( id ) => id !== taskId
+					);
+
+				// Add the task to the completed tasks.
+				if (
+					window.progressPlannerSuggestedTasks.tasks.completed.indexOf(
+						taskId
+					) === -1
+				) {
+					window.progressPlannerSuggestedTasks.tasks.completed.push(
+						taskId
+					);
+				}
+
+				// Refresh the list.
+				const event = new CustomEvent(
+					'prplMaybeInjectSuggestedTaskEvent',
 					{
-						task_id: taskId,
-						nonce: progressPlannerSuggestedTask.nonce,
-						action_type: 'celebrated',
+						detail: {
+							taskId,
+							type,
+						},
 					}
 				);
-				request.done( () => {
-					const el = document.querySelector(
-						`.prpl-suggested-task[data-task-id="${ taskId }"]`
-					);
-
-					if ( el ) {
-						el.parentElement.remove();
-					}
-
-					// Remove the task from the pending celebration.
-					window.progressPlannerSuggestedTasks.tasks.pending_celebration =
-						window.progressPlannerSuggestedTasks.tasks.pending_celebration.filter(
-							( id ) => id !== taskId
-						);
-
-					// Add the task to the completed tasks.
-					if (
-						window.progressPlannerSuggestedTasks.tasks.completed.indexOf(
-							taskId
-						) === -1
-					) {
-						window.progressPlannerSuggestedTasks.tasks.completed.push(
-							taskId
-						);
-					}
-
-					// Refresh the list.
-					const event = new Event(
-						'prplMaybeInjectSuggestedTaskEvent'
-					);
-					document.dispatchEvent( event );
-				} );
+				document.dispatchEvent( event );
 			} );
 	}, 2000 );
 };
@@ -259,16 +274,21 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		return;
 	}
 
-	// Inject items, until we reach the maximum number of items.
-	while (
-		progressPlannerCountItems() <
-			parseInt( progressPlannerSuggestedTasks.maxItems ) &&
-		progressPlannerGetNextItem()
-	) {
-		progressPlannerInjectNextItem();
+	// Loop through each type and inject items.
+	for ( const type in progressPlannerSuggestedTasks.tasks.details ) {
+		// Inject items, until we reach the maximum number of channel items.
+		while (
+			progressPlannerCountItems( type ) <
+				parseInt(
+					progressPlannerSuggestedTasks.maxItemsPerType[ type ]
+				) &&
+			progressPlannerGetNextItemFromType( type )
+		) {
+			progressPlannerInjectNextItem( type );
+		}
 	}
 
-	const event = new Event( 'prplResizeAllGridItemsEvent' );
+	const event = new CustomEvent( 'prplResizeAllGridItemsEvent' );
 	document.dispatchEvent( event );
 } );
 
@@ -424,13 +444,21 @@ const prplMaybeInjectSuggestedTaskEvent = new Event( // eslint-disable-line no-u
 // Listen for the event.
 document.addEventListener(
 	'prplMaybeInjectSuggestedTaskEvent',
-	() => {
+	( e ) => {
+		const type = e.detail.type;
+
+		if ( 'pending_celebration' === type ) {
+			return;
+		}
+
 		while (
-			progressPlannerCountItems() <
-				parseInt( progressPlannerSuggestedTasks.maxItems ) &&
-			progressPlannerGetNextItem()
+			progressPlannerCountItems( type ) <
+				parseInt(
+					progressPlannerSuggestedTasks.maxItemsPerType[ type ]
+				) &&
+			progressPlannerGetNextItemFromType( type )
 		) {
-			progressPlannerInjectNextItem();
+			progressPlannerInjectNextItem( type );
 		}
 
 		const event = new Event( 'prplResizeAllGridItemsEvent' );

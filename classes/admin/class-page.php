@@ -30,12 +30,13 @@ class Page {
 		\add_action( 'wp_ajax_progress_planner_save_cpt_settings', [ $this, 'save_cpt_settings' ] );
 		\add_action( 'wp_ajax_progress_planner_save_widgets_order', [ $this, 'save_widgets_order' ] );
 		\add_filter( 'progress_planner_admin_widgets', [ $this, 'filter_active_widgets' ] );
+		\add_action( 'in_admin_header', [ $this, 'remove_admin_notices' ], PHP_INT_MAX );
 	}
 
 	/**
 	 * Get the widgets objects
 	 *
-	 * @return array<\Progress_Planner\Widget>
+	 * @return array<\Progress_Planner\Widgets\Widget>
 	 */
 	public function get_widgets() {
 		return [
@@ -59,9 +60,9 @@ class Page {
 		/**
 		 * Filter the widgets.
 		 *
-		 * @param array<\Progress_Planner\Widget> $widgets The widgets.
+		 * @param array<\Progress_Planner\Widgets\Widget> $widgets The widgets.
 		 *
-		 * @return array<\Progress_Planner\Widget>
+		 * @return array<\Progress_Planner\Widgets\Widget>
 		 */
 		return \apply_filters( 'progress_planner_admin_widgets', $this->get_widgets() );
 	}
@@ -96,7 +97,7 @@ class Page {
 	 *
 	 * @param string $id The widget ID.
 	 *
-	 * @return \Progress_Planner\Widget|void
+	 * @return \Progress_Planner\Widgets\Widget|void
 	 */
 	public function get_widget( $id ) {
 		$widgets = $this->get_widgets();
@@ -245,6 +246,30 @@ class Page {
 				'message' => \esc_html__( 'Settings saved.', 'progress-planner' ),
 			]
 		);
+	}
+
+	/**
+	 * Remove all admin notices when the user is on the Progress Planner page.
+	 *
+	 * @return void
+	 */
+	public function remove_admin_notices() {
+		$current_screen = \get_current_screen();
+		if ( ! $current_screen ) {
+			return;
+		}
+		if ( ! \in_array(
+			$current_screen->id,
+			[
+				'toplevel_page_progress-planner',
+				'progress-planner_page_progress-planner-settings',
+			],
+			true
+		) ) {
+			return;
+		}
+
+		\remove_all_actions( 'admin_notices' );
 	}
 
 	/**
