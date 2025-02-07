@@ -75,7 +75,7 @@ abstract class Widget {
 		<div
 			class="prpl-widget-wrapper prpl-<?php echo \esc_attr( $this->id ); ?>"
 			data-id="<?php echo \esc_attr( $this->id ); ?>"
-			draggable="true"
+			draggable="false"
 		>
 			<div class="widget-inner-container">
 				<?php \progress_planner()->the_view( "page-widgets/{$this->id}.php" ); ?>

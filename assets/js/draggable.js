@@ -40,6 +40,14 @@ const prplHandleDrop = () => {
 };
 
 ( () => {
+	document.querySelector( '.prpl-info-icon.prpl-draggable-icon' ).addEventListener( 'click', ( event ) => {
+		event.preventDefault();
+		event.target.classList.toggle( 'active' );
+		document.querySelector( '.prpl-widgets-container' ).classList.toggle( 'prpl-draggable' );
+		document.querySelectorAll( '.prpl-widget-wrapper' ).forEach( ( item ) => {
+			item.draggable = ! item.draggable;
+		} );
+	} );
 	document.querySelectorAll( '.prpl-widget-wrapper' ).forEach( ( item ) => {
 		item.ondrag = prplHandleDrag;
 		item.ondragend = prplHandleDrop;

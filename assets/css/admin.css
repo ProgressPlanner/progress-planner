@@ -202,6 +202,11 @@ button.prpl-info-icon {
 			border-color: var(--prpl-color-link);
 			background-color: var(--prpl-background-blue);
 		}
+
+		&.active {
+			background-color: var(--prpl-color-link);
+			color: #fff;
+		}
 	}
 }
 
@@ -222,6 +227,13 @@ button.prpl-info-icon {
 	h3 {
 		font-size: 1.15rem;
 		margin-top: 0;
+	}
+
+	&.prpl-draggable {
+		.prpl-widget-wrapper {
+			cursor: move;
+			outline: 2px dashed var(--prpl-color-gray-4);
+		}
 	}
 }
 
