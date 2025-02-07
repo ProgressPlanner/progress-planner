@@ -461,6 +461,85 @@ const prplMaybeInjectSuggestedTaskEvent = new Event( // eslint-disable-line no-u
 	'prplMaybeInjectSuggestedTaskEvent'
 );
 
+const prplGetRaviGaugeProps = () => {
+	const gauge = document.getElementById( 'prpl-gauge-ravi' );
+	if ( ! gauge ) {
+		return;
+	}
+
+	return {
+		id: gauge.id,
+		background: gauge.getAttribute( 'background' ),
+		color: gauge.getAttribute( 'color' ),
+		max: gauge.getAttribute( 'data-max' ),
+		value: gauge.getAttribute( 'data-value' ),
+		badgeId: gauge.getAttribute( 'data-badge-id' ),
+	};
+};
+
+const prplUpdateRaviGauge = ( pointsDiff = 0 ) => {
+	if ( ! pointsDiff ) {
+		return;
+	}
+
+	const gaugeProps = prplGetRaviGaugeProps();
+
+	if ( ! gaugeProps ) {
+		return;
+	}
+
+	let newValue = parseInt( gaugeProps.value ) + pointsDiff;
+	newValue = Math.round( newValue );
+	newValue = Math.max( 0, newValue );
+	newValue = Math.min( newValue, parseInt( gaugeProps.max ) );
+
+	const Gauge = customElements.get( 'prpl-gauge' );
+	const gauge = new Gauge(
+		{
+			max: parseInt( gaugeProps.max ),
+			value: parseFloat( newValue / parseInt( gaugeProps.max ) ),
+			background: gaugeProps.background,
+			color: gaugeProps.color,
+			maxDeg: '180deg',
+			start: '270deg',
+			cutout: '57%',
+			contentFontSize: 'var(--prpl-font-size-6xl)',
+			contentPadding:
+				'var(--prpl-padding) var(--prpl-padding) calc(var(--prpl-padding) * 2) var(--prpl-padding)',
+			marginBottom: 'var(--prpl-padding)',
+		},
+		`<prpl-badge complete="true" badge-id="${ gaugeProps.badgeId }"></prpl-badge>`
+	);
+	gauge.id = gaugeProps.id;
+	gauge.setAttribute( 'background', gaugeProps.background );
+	gauge.setAttribute( 'color', gaugeProps.color );
+	gauge.setAttribute( 'data-max', gaugeProps.max );
+	gauge.setAttribute( 'data-value', newValue );
+	gauge.setAttribute( 'data-badge-id', gaugeProps.badgeId );
+
+	// Replace the old gauge with the new one.
+	const oldGauge = document.getElementById( gaugeProps.id );
+	if ( oldGauge ) {
+		oldGauge.replaceWith( gauge );
+	}
+
+	const oldCounter = document.getElementById(
+		'prpl-widget-content-ravi-points-number'
+	);
+	if ( oldCounter ) {
+		oldCounter.textContent = newValue + 'pt';
+	}
+};
+
+// Listen for the event.
+document.addEventListener(
+	'prplUpdateRaviGaugeEvent',
+	( e ) => {
+		prplUpdateRaviGauge( e.detail.pointsDiff );
+	},
+	false
+);
+
 // Listen for the event.
 document.addEventListener(
 	'prplMaybeInjectSuggestedTaskEvent',

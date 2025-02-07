@@ -71,7 +71,7 @@ customElements.define(
 			};
 
 			this.innerHTML = `
-			<li class="prpl-suggested-task" data-task-id="${ taskId }" data-task-action="${ taskAction }" data-task-url="${ taskUrl }" data-task-type="${ taskType }">
+			<li class="prpl-suggested-task" data-task-id="${ taskId }" data-task-action="${ taskAction }" data-task-url="${ taskUrl }" data-task-type="${ taskType }" data-task-points="${ taskPoints }">
 				<h3><span>${ taskHeading }</span></h3>
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
@@ -326,6 +326,20 @@ customElements.define(
 						);
 						// Set the task action to celebrate.
 						el.setAttribute( 'data-task-action', 'celebrate' );
+
+						const event = new CustomEvent(
+							'prplUpdateRaviGaugeEvent',
+							{
+								detail: {
+									pointsDiff: parseInt(
+										this.querySelector( 'li' ).getAttribute(
+											'data-task-points'
+										)
+									),
+								},
+							}
+						);
+						document.dispatchEvent( event );
 
 						// Trigger the celebration event.
 						document.dispatchEvent(
