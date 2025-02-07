@@ -280,7 +280,7 @@ class Local_Tasks_Manager {
 				}
 
 				// We have changed type name, so we need to remove all tasks of the old type.
-				if ( isset( $task_data['type'] ) && 'review-post' === $task_data['type'] ) {
+				if ( isset( $task_data['type'] ) && 'update-post' === $task_data['type'] ) {
 					return false;
 				}
 
