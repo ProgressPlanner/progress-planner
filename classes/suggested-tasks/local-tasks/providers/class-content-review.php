@@ -213,7 +213,7 @@ class Content_Review extends Content_Abstract {
 	}
 
 	/**
-	 * Filter the update posts tasks args.
+	 * Filter the review posts tasks args.
 	 *
 	 * @param array $args The args.
 	 *
