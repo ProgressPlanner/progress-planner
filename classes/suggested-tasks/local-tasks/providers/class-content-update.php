@@ -81,14 +81,14 @@ class Content_Update extends Content_Abstract {
 		$important_page_ids = [];
 		foreach ( \progress_planner()->get_admin__page_settings()->get_settings() as $important_page ) {
 			if ( 0 !== (int) $important_page['value'] ) {
-				$important_page_ids[] = $important_page['value'];
+				$important_page_ids[] = (int) $important_page['value'];
 			}
 		}
 
 		// Add the privacy policy page ID if it exists. Not 'publish' page will not be fetched by get_posts().
 		$privacy_policy_page_id = \get_option( 'wp_page_for_privacy_policy' );
 		if ( $privacy_policy_page_id ) {
-			$important_page_ids[] = $privacy_policy_page_id;
+			$important_page_ids[] = (int) $privacy_policy_page_id;
 		}
 
 		/**
