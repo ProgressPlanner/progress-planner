@@ -36,6 +36,13 @@ class Content_Update extends Content_Abstract {
 	const ITEMS_TO_INJECT = 10;
 
 	/**
+	 * The snoozed post IDs.
+	 *
+	 * @var array|null
+	 */
+	protected $snoozed_post_ids = null;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -194,26 +201,42 @@ class Content_Update extends Content_Abstract {
 	 * @return array
 	 */
 	public function filter_update_posts_args( $args ) {
-		$snoozed          = \progress_planner()->get_suggested_tasks()->get_snoozed_tasks();
-		$snoozed_post_ids = [];
+		$snoozed_post_ids = $this->get_snoozed_post_ids();
+
+		if ( ! empty( $snoozed_post_ids ) ) {
+			if ( ! isset( $args['post__not_in'] ) ) {
+				$args['post__not_in'] = [];
+			}
+			$args['post__not_in'] = array_merge( $args['post__not_in'], $snoozed_post_ids );
+		}
+
+		return $args;
+	}
+
+	/**
+	 * Get the snoozed post IDs.
+	 *
+	 * @return array
+	 */
+	protected function get_snoozed_post_ids() {
+
+		if ( null !== $this->snoozed_post_ids ) {
+			return $this->snoozed_post_ids;
+		}
+
+		$this->snoozed_post_ids = [];
+		$snoozed                = \progress_planner()->get_suggested_tasks()->get_snoozed_tasks();
 
 		if ( \is_array( $snoozed ) && ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
 				$data = $this->get_data_from_task_id( $task['id'] );
 				if ( isset( $data['type'] ) && 'update-post' === $data['type'] ) {
-					$snoozed_post_ids[] = $data['post_id'];
+					$this->snoozed_post_ids[] = $data['post_id'];
 				}
-			}
-
-			if ( ! empty( $snoozed_post_ids ) ) {
-				if ( ! isset( $args['post__not_in'] ) ) {
-					$args['post__not_in'] = [];
-				}
-				$args['post__not_in'] = array_merge( $args['post__not_in'], $snoozed_post_ids );
 			}
 		}
 
-		return $args;
+		return $this->snoozed_post_ids;
 	}
 
 	/**
