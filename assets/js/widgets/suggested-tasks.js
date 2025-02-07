@@ -174,19 +174,38 @@ const prplTriggerConfetti = () => {
 	};
 
 	const progressPlannerRenderAttemptshoot = () => {
-		confetti( {
-			...prplConfettiDefaults,
-			particleCount: 40,
-			scalar: 1.2,
-			shapes: [ 'star' ],
-		} );
+		let confettiOptions = [
+			{
+				particleCount: 40,
+				scalar: 1.2,
+				shapes: [ 'star' ],
+			},
+			{
+				particleCount: 10,
+				scalar: 0.75,
+				shapes: [ 'circle' ],
+			},
+		];
 
-		confetti( {
-			...prplConfettiDefaults,
-			particleCount: 10,
-			scalar: 0.75,
-			shapes: [ 'circle' ],
-		} );
+		// Tripple check if the confetti options are an array and not undefined.
+		if (
+			'undefined' !==
+				typeof progressPlannerSuggestedTasks.confettiOptions &&
+			true ===
+				Array.isArray(
+					progressPlannerSuggestedTasks.confettiOptions
+				) &&
+			progressPlannerSuggestedTasks.confettiOptions.length
+		) {
+			confettiOptions = progressPlannerSuggestedTasks.confettiOptions;
+		}
+
+		for ( const value of confettiOptions ) {
+			confetti( {
+				...prplConfettiDefaults,
+				...value,
+			} );
+		}
 	};
 
 	setTimeout( progressPlannerRenderAttemptshoot, 0 );

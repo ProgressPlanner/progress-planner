@@ -141,6 +141,32 @@ final class Suggested_Tasks extends Widget {
 			$max_items_per_type['pending_celebration'] = 99;
 		}
 
+		// Check if current date is between Feb 12-16.
+		$confetti_options = [];
+		$year             = \gmdate( 'Y' );
+		$current_date     = $year . '-' . \gmdate( 'm-d' );
+
+		// TODO: GET params just for testing.
+		$start_date = $year . '-' . ( isset( $_GET['start_date'] ) ? \sanitize_text_field( \wp_unslash( $_GET['start_date'] ) ) : '02-12' );
+		$end_date   = $year . '-' . ( isset( $_GET['end_date'] ) ? \sanitize_text_field( \wp_unslash( $_GET['end_date'] ) ) : '02-16' );
+
+		if ( $current_date >= $start_date && $current_date <= $end_date ) {
+			$confetti_options = [
+				[
+					'particleCount' => 50,
+					'scalar'        => 2.2,
+					'shapes'        => [ 'heart' ],
+					'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
+				],
+				[
+					'particleCount' => 20,
+					'scalar'        => 3.2,
+					'shapes'        => [ 'heart' ],
+					'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
+				],
+			];
+		}
+
 		// Localize the script.
 		\wp_localize_script(
 			$handle,
@@ -150,6 +176,7 @@ final class Suggested_Tasks extends Widget {
 				'nonce'           => \wp_create_nonce( 'progress_planner' ),
 				'tasks'           => $tasks,
 				'maxItemsPerType' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_type', $max_items_per_type ),
+				'confettiOptions' => $confetti_options,
 			]
 		);
 	}
