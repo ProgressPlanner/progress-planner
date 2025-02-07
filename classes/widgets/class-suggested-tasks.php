@@ -145,7 +145,7 @@ final class Suggested_Tasks extends Widget {
 
 		// Check if current date is between Feb 12-16.
 		$confetti_options = [];
-		$year             = '2025';
+		$year             = \gmdate( 'Y' );
 		$current_date     = $year . '-' . \gmdate( 'm-d' );
 
 		// TODO: GET params just for testing.
