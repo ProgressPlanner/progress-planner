@@ -85,6 +85,14 @@ class Content_Update extends Content_Abstract {
 			}
 		}
 
+		// Add the privacy policy page ID if it exists. Not 'publish' page will not be fetched by get_posts().
+		$privacy_policy_page_id = \get_option( 'wp_page_for_privacy_policy' );
+		if ( $privacy_policy_page_id ) {
+			$important_page_ids[] = $privacy_policy_page_id;
+		}
+
+		$important_page_ids = \apply_filters( 'progress_planner_update_posts_important_page_ids', $important_page_ids );
+
 		if ( ! empty( $important_page_ids ) ) {
 			$last_updated_posts = $this->get_old_posts(
 				[
