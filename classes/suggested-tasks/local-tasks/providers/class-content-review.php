@@ -36,6 +36,13 @@ class Content_Review extends Content_Abstract {
 	const ITEMS_TO_INJECT = 10;
 
 	/**
+	 * The snoozed post IDs.
+	 *
+	 * @var array|null
+	 */
+	protected $snoozed_post_ids = null;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -67,19 +74,52 @@ class Content_Review extends Content_Abstract {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-		$args = apply_filters(
-			'progress_planner_update_posts_tasks_args',
-			[
-				'posts_per_page' => static::ITEMS_TO_INJECT,
-				'post_type'      => [ 'page', 'post' ],
-				'post_status'    => 'publish',
-				'orderby'        => 'modified',
-				'order'          => 'ASC',
-			],
-		);
+		$number_of_posts_to_inject = static::ITEMS_TO_INJECT;
+		$last_updated_posts        = [];
 
-		// Get the post that was updated last.
-		$last_updated_posts = \get_posts( $args );
+		// Check if there are any important pages to update.
+		$important_page_ids = [];
+		foreach ( \progress_planner()->get_admin__page_settings()->get_settings() as $important_page ) {
+			if ( 0 !== (int) $important_page['value'] ) {
+				$important_page_ids[] = (int) $important_page['value'];
+			}
+		}
+
+		// Add the privacy policy page ID if it exists. Not 'publish' page will not be fetched by get_posts().
+		$privacy_policy_page_id = \get_option( 'wp_page_for_privacy_policy' );
+		if ( $privacy_policy_page_id ) {
+			$important_page_ids[] = (int) $privacy_policy_page_id;
+		}
+
+		/**
+		 * Filters the pages we deem more important for content updates.
+		 *
+		 * @param int[] $important_page_ids Post & page IDs of the important pages.
+		 */
+		$important_page_ids = \apply_filters( 'progress_planner_update_posts_important_page_ids', $important_page_ids );
+
+		if ( ! empty( $important_page_ids ) ) {
+			$last_updated_posts = $this->get_old_posts(
+				[
+					'post__in' => $important_page_ids,
+				]
+			);
+		}
+
+		// Lets check for other posts to update.
+		$number_of_posts_to_inject = $number_of_posts_to_inject - count( $last_updated_posts );
+
+		if ( 0 < $number_of_posts_to_inject ) {
+			// Get the post that was updated last.
+			$last_updated_posts = array_merge(
+				$last_updated_posts,
+				$this->get_old_posts(
+					[
+						'post__not_in' => $important_page_ids, // This can be an empty array.
+					]
+				)
+			);
+		}
 
 		if ( ! $last_updated_posts ) {
 			return [];
@@ -87,10 +127,6 @@ class Content_Review extends Content_Abstract {
 
 		$items = [];
 		foreach ( $last_updated_posts as $post ) {
-			// If the last review was more than 6 months ago, add a task.
-			if ( strtotime( $post->post_modified ) > strtotime( '-6 months' ) ) { // @phpstan-ignore-line property.nonObject
-				continue;
-			}
 			$task_id = $this->get_task_id(
 				[
 					'type'    => 'review-post',
@@ -98,7 +134,6 @@ class Content_Review extends Content_Abstract {
 				]
 			);
 			$items[] = $this->get_task_details( $task_id );
-
 		}
 		return $items;
 	}
@@ -140,6 +175,44 @@ class Content_Review extends Content_Abstract {
 	}
 
 	/**
+	 * Get the old posts.
+	 *
+	 * @param array $args The args.
+	 *
+	 * @return array
+	 */
+	public function get_old_posts( $args = [] ) {
+		$args = wp_parse_args(
+			$args,
+			[
+				'posts_per_page' => static::ITEMS_TO_INJECT,
+				'post_type'      => [ 'page', 'post' ],
+				'post_status'    => 'publish',
+				'orderby'        => 'modified',
+				'order'          => 'ASC',
+				'date_query'     => [
+					[
+						'column' => 'post_modified',
+						'before' => '-6 months',
+					],
+				],
+			]
+		);
+
+		/**
+		 * Filters the args for the posts & pages we want user to review.
+		 *
+		 * @param array $args The get_postsargs.
+		 */
+		$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
+
+		// Get the post that was updated last.
+		$posts = \get_posts( $args );
+
+		return $posts ? $posts : [];
+	}
+
+	/**
 	 * Filter the update posts tasks args.
 	 *
 	 * @param array $args The args.
@@ -147,23 +220,42 @@ class Content_Review extends Content_Abstract {
 	 * @return array
 	 */
 	public function filter_update_posts_args( $args ) {
-		$snoozed          = \progress_planner()->get_suggested_tasks()->get_snoozed_tasks();
-		$snoozed_post_ids = [];
+		$snoozed_post_ids = $this->get_snoozed_post_ids();
+
+		if ( ! empty( $snoozed_post_ids ) ) {
+			if ( ! isset( $args['post__not_in'] ) ) {
+				$args['post__not_in'] = [];
+			}
+			$args['post__not_in'] = array_merge( $args['post__not_in'], $snoozed_post_ids );
+		}
+
+		return $args;
+	}
+
+	/**
+	 * Get the snoozed post IDs.
+	 *
+	 * @return array
+	 */
+	protected function get_snoozed_post_ids() {
+
+		if ( null !== $this->snoozed_post_ids ) {
+			return $this->snoozed_post_ids;
+		}
+
+		$this->snoozed_post_ids = [];
+		$snoozed                = \progress_planner()->get_suggested_tasks()->get_snoozed_tasks();
 
 		if ( \is_array( $snoozed ) && ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
 				$data = $this->get_data_from_task_id( $task['id'] );
 				if ( isset( $data['type'] ) && 'review-post' === $data['type'] ) {
-					$snoozed_post_ids[] = $data['post_id'];
+					$this->snoozed_post_ids[] = $data['post_id'];
 				}
-			}
-
-			if ( ! empty( $snoozed_post_ids ) ) {
-				$args['post__not_in'] = $snoozed_post_ids;
 			}
 		}
 
-		return $args;
+		return $this->snoozed_post_ids;
 	}
 
 	/**
