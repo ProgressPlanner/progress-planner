@@ -31,7 +31,7 @@ $prpl_redirect_on_login = \get_user_meta( \get_current_user_id(), 'prpl_redirect
 					type="checkbox"
 					<?php checked( $prpl_redirect_on_login ); ?>
 				/>
-				<span><?php \esc_html_e( 'Redirect users to the Progress Planner stats page after login.', 'progress-planner' ); ?></span>
+				<span><?php \esc_html_e( 'Redirect me to the Progress Planner stats page after login.', 'progress-planner' ); ?></span>
 			</label>
 		</div>
 	</div>
