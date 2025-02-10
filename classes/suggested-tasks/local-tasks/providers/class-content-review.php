@@ -12,14 +12,14 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 /**
  * Add tasks for content updates.
  */
-class Content_Update extends Content_Abstract {
+class Content_Review extends Content_Abstract {
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'update-post';
+	const ID = 'review-post';
 
 	/**
 	 * The provider type.
@@ -129,7 +129,7 @@ class Content_Update extends Content_Abstract {
 		foreach ( $last_updated_posts as $post ) {
 			$task_id = $this->get_task_id(
 				[
-					'type'    => 'update-post',
+					'type'    => 'review-post',
 					'post_id' => $post->ID, // @phpstan-ignore-line property.nonObject
 				]
 			);
@@ -157,15 +157,16 @@ class Content_Update extends Content_Abstract {
 		$task_details = [
 			'task_id'     => $task_id,
 			// translators: %1$s: The post type, %2$s: The post title.
-			'title'       => sprintf( 'Update %1$s "%2$s"', \esc_html( $post->post_type ), \esc_html( $post->post_title ) ), // @phpstan-ignore-line property.nonObject
+			'title'       => sprintf( 'Review %1$s "%2$s"', \esc_html( $post->post_type ), \esc_html( $post->post_title ) ), // @phpstan-ignore-line property.nonObject
 			'parent'      => 0,
 			'priority'    => 'high',
 			'type'        => $this->get_provider_type(),
 			'points'      => 1,
+			'dismissable' => true,
 			'url'         => $this->capability_required() ? \esc_url( \get_edit_post_link( $post->ID ) ) : '', // @phpstan-ignore-line property.nonObject
 			'description' => '<p>' . sprintf(
 				/* translators: %s: The post title. */
-				\esc_html__( 'Update the post "%s" as it was last updated more than 6 months ago.', 'progress-planner' ),
+				\esc_html__( 'Review the post "%s" as it was last updated more than 6 months ago.', 'progress-planner' ),
 				\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
 			) . '</p>' . ( $this->capability_required() ? '<p><a href="' . \esc_url( \get_edit_post_link( $post->ID ) ) . '">' . \esc_html__( 'Edit the post', 'progress-planner' ) . '</a>.</p>' : '' ), // @phpstan-ignore-line property.nonObject
 		];
@@ -212,7 +213,7 @@ class Content_Update extends Content_Abstract {
 	}
 
 	/**
-	 * Filter the update posts tasks args.
+	 * Filter the review posts tasks args.
 	 *
 	 * @param array $args The args.
 	 *
@@ -248,7 +249,7 @@ class Content_Update extends Content_Abstract {
 		if ( \is_array( $snoozed ) && ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
 				$data = $this->get_data_from_task_id( $task['id'] );
-				if ( isset( $data['type'] ) && 'update-post' === $data['type'] ) {
+				if ( isset( $data['type'] ) && 'review-post' === $data['type'] ) {
 					$this->snoozed_post_ids[] = $data['post_id'];
 				}
 			}
