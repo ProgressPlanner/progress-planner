@@ -19,7 +19,14 @@ class Content_Create extends Content_Abstract {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'create-post';
+	const ID = 'create-post';
+
+	/**
+	 * The provider type.
+	 *
+	 * @var string
+	 */
+	const TYPE = 'content-new';
 
 	/**
 	 * The number of items to inject.
@@ -27,15 +34,6 @@ class Content_Create extends Content_Abstract {
 	 * @var int
 	 */
 	const ITEMS_TO_INJECT = 2;
-
-	/**
-	 * Get the provider ID.
-	 *
-	 * @return string
-	 */
-	public function get_provider_type() {
-		return self::TYPE;
-	}
 
 	/**
 	 * Get an array of tasks to inject.
@@ -87,12 +85,7 @@ class Content_Create extends Content_Abstract {
 		);
 
 		// If the task with this length and id is completed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->check_task_condition(
-			[
-				'type'    => 'completed',
-				'task_id' => $task_id,
-			]
-		) ) {
+		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
 			return [];
 		}
 
@@ -156,7 +149,11 @@ class Content_Create extends Content_Abstract {
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id ) {
+	public function get_task_details( $task_id = '' ) {
+
+		if ( ! $task_id ) {
+			return [];
+		}
 
 		$data = $this->get_data_from_task_id( $task_id );
 
@@ -167,7 +164,7 @@ class Content_Create extends Content_Abstract {
 				: esc_html__( 'Create a short post', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'medium',
-			'type'        => 'writing',
+			'type'        => $this->get_provider_type(),
 			'points'      => isset( $data['long'] ) && $data['long'] ? 2 : 1,
 			'url'         => \esc_url( \admin_url( 'post-new.php?post_type=post' ) ),
 			'description' => isset( $data['long'] ) && $data['long']

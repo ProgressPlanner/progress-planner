@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Widgets;
 
-use Progress_Planner\Widget;
 use Progress_Planner\Cache;
 
 /**

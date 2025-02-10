@@ -152,6 +152,9 @@ class Playground {
 		for ( $i = 0; $i < 24; $i++ ) {
 			$this->create_random_post();
 		}
+		for ( $i = 0; $i < 5; $i++ ) {
+			$this->create_random_post( true, 'page' );
+		}
 		// One post for today.
 		$this->create_random_post( false );
 	}
@@ -159,16 +162,17 @@ class Playground {
 	/**
 	 * Create a random post.
 	 *
-	 * @param bool $random_date Whether to use a random date or not.
+	 * @param bool   $random_date Whether to use a random date or not.
+	 * @param string $post_type   The post type to create.
 	 *
 	 * @return int Post ID.
 	 */
-	private function create_random_post( $random_date = true ) {
+	private function create_random_post( $random_date = true, $post_type = 'post' ) {
 		$postarr = [
 			'post_title'   => str_replace( '.', '', $this->create_random_string( 5 ) ),
 			'post_content' => $this->create_random_string( wp_rand( 200, 500 ) ),
 			'post_status'  => 'publish',
-			'post_type'    => 'post',
+			'post_type'    => $post_type,
 			'post_date'    => $this->get_random_date_last_12_months(),
 		];
 

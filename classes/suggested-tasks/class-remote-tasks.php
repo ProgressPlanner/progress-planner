@@ -40,6 +40,14 @@ class Remote_Tasks {
 			if ( ! is_array( $item ) ) {
 				continue;
 			}
+
+			// If the task with this id is completed, don't add a task.
+			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( "remote-task-{$item['task_id']}" ) ) {
+				continue;
+			}
+
+			// TODO: Maybe skip task which don't have type defined (to not allow wrongly defined 3rd party tasks to override default type).
+			$item['type']    = 'remote-' . ( isset( $item['type'] ) ? $item['type'] : 'default' );
 			$item['task_id'] = "remote-task-{$item['task_id']}";
 			$items[]         = $item;
 		}

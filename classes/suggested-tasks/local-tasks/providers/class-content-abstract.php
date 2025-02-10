@@ -20,6 +20,13 @@ abstract class Content_Abstract extends Local_Tasks_Abstract {
 	protected $capability = 'edit_others_posts';
 
 	/**
+	 * The provider type.
+	 *
+	 * @var string
+	 */
+	const TYPE = 'writing';
+
+	/**
 	 * Get the task ID.
 	 *
 	 * @param array $data The data to use for the task ID.

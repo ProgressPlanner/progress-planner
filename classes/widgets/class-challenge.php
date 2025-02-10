@@ -10,7 +10,7 @@ namespace Progress_Planner\Widgets;
 /**
  * Challenge class.
  */
-final class Challenge extends \Progress_Planner\Widget {
+final class Challenge extends Widget {
 
 	/**
 	 * The widget ID.

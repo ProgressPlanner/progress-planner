@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Widgets;
 
-use Progress_Planner\Widget;
-
 /**
  * ToDo class.
  */

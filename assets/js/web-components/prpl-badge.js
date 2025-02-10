@@ -11,13 +11,13 @@ customElements.define(
 			super();
 			complete =
 				true === complete && 'true' === this.getAttribute( 'complete' );
+
+			badgeId = badgeId || this.getAttribute( 'badge-id' );
 			this.innerHTML = `
 				<img
 					src="${
 						progressPlannerBadge.remoteServerRootUrl
-					}/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${
-						badgeId || this.getAttribute( 'badge-id' )
-					}"
+					}/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ badgeId }"
 					alt="Badge"
 					${ false === complete ? 'style="filter: grayscale(1);opacity: 0.25;"' : '' }
 					onerror="this.onerror=null;this.src='${
