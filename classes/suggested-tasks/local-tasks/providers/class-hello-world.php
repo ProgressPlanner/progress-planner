@@ -74,7 +74,11 @@ class Hello_World extends Local_OneTime_Tasks_Abstract {
 			'type'        => $this->get_provider_type(),
 			'points'      => 1,
 			'url'         => $this->capability_required() && null !== $hello_world ? \esc_url( \get_edit_post_link( $hello_world->ID ) ) : '', // @phpstan-ignore-line property.nonObject
-			'description' => '<p>' . \esc_html__( 'On install, WordPress creates a "Hello World!" post. This post is not needed and should be deleted.', 'progress-planner' ) . '</p>',
+			'description' => '<p>' . sprintf(
+				/* translators: %s:<a href="https://progressplanner.com/recommendations/delete-the-default-wordpress-hello-world-post/" target="_blank">Hello World!</a> link */
+				\esc_html__( 'On install, WordPress creates a %s post. This post is not needed and should be deleted.', 'progress-planner' ),
+				'<a href="https://progressplanner.com/recommendations/delete-the-default-wordpress-hello-world-post/" target="_blank">' . \esc_html__( '"Hello World!"', 'progress-planner' ) . '</a>'
+			) . '</p>',
 		];
 	}
 

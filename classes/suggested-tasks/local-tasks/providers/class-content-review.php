@@ -165,8 +165,9 @@ class Content_Review extends Content_Abstract {
 			'dismissable' => true,
 			'url'         => $this->capability_required() ? \esc_url( \get_edit_post_link( $post->ID ) ) : '', // @phpstan-ignore-line property.nonObject
 			'description' => '<p>' . sprintf(
-				/* translators: %s: The post title. */
-				\esc_html__( 'Review the post "%s" as it was last updated more than 6 months ago.', 'progress-planner' ),
+				/* translators: %1$s <a href="https://progressplanner.com/recommendations/review-post/" target="_blank">Review</a> link, %2$s: The post title. */
+				\esc_html__( '%1$s the post "%2$s" as it was last updated more than 6 months ago.', 'progress-planner' ),
+				'<a href="https://progressplanner.com/recommendations/review-post/" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
 				\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
 			) . '</p>' . ( $this->capability_required() ? '<p><a href="' . \esc_url( \get_edit_post_link( $post->ID ) ) . '">' . \esc_html__( 'Edit the post', 'progress-planner' ) . '</a>.</p>' : '' ), // @phpstan-ignore-line property.nonObject
 		];
