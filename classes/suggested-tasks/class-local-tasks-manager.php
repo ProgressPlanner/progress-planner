@@ -9,7 +9,7 @@ namespace Progress_Planner\Suggested_Tasks;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Create;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Update;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Review;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Blogdescription;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Settings_Saved;
@@ -48,7 +48,7 @@ class Local_Tasks_Manager {
 
 		$this->task_providers = [
 			new Content_Create(),
-			new Content_Update(),
+			new Content_Review(),
 			new Core_Update(),
 			new Core_Blogdescription(),
 			new Settings_Saved(),
@@ -277,6 +277,11 @@ class Local_Tasks_Manager {
 
 				if ( isset( $task_data['year_week'] ) ) {
 					return \gmdate( 'YW' ) === $task_data['year_week'];
+				}
+
+				// We have changed type name, so we need to remove all tasks of the old type.
+				if ( isset( $task_data['type'] ) && 'update-post' === $task_data['type'] ) {
+					return false;
 				}
 
 				return true;

@@ -557,7 +557,16 @@ class Suggested_Tasks {
 
 		switch ( $action ) {
 			case 'complete':
+				// It's local task, remove it from pending tasks.
+				if ( false === strpos( $task_id, 'remote-task' ) ) {
+					$this->local->remove_pending_task( $task_id ); // @phpstan-ignore-line method.nonObject
+				}
+
+				// Mark the task as completed.
 				$this->mark_task_as( 'completed', $task_id );
+
+				// Insert an activity.
+				$this->insert_activity( $task_id );
 				$updated = true;
 				break;
 

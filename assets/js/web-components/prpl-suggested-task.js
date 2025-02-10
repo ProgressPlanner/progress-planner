@@ -13,6 +13,7 @@ customElements.define(
 			taskPoints,
 			taskAction = '',
 			taskUrl = '',
+			taskDismissable = false,
 			taskType = ''
 		) {
 			// Get parent class properties
@@ -26,6 +27,7 @@ customElements.define(
 			}
 
 			const isRemoteTask = taskId.startsWith( 'remote-task-' );
+			const isDismissable = taskDismissable || isRemoteTask;
 
 			const actionButtons = {
 				info: `<button
@@ -52,7 +54,7 @@ customElements.define(
 							<img src="${ progressPlannerSuggestedTask.assets.snoozeIcon }" alt="${ progressPlannerSuggestedTask.i18n.snooze }" class="icon">
 							<span class="screen-reader-text">${ progressPlannerSuggestedTask.i18n.snooze }</span>
 						</button>`,
-				complete: isRemoteTask
+				complete: isDismissable
 					? `<button
 							type="button"
 							class="prpl-suggested-task-button"
@@ -69,7 +71,7 @@ customElements.define(
 			};
 
 			this.innerHTML = `
-			<li class="prpl-suggested-task" data-task-id="${ taskId }" data-task-action="${ taskAction }" data-task-url="${ taskUrl }" data-task-type="${ taskType }">
+			<li class="prpl-suggested-task" data-task-id="${ taskId }" data-task-action="${ taskAction }" data-task-url="${ taskUrl }" data-task-type="${ taskType }" data-task-points="${ taskPoints }">
 				<h3><span>${ taskHeading }</span></h3>
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
@@ -324,6 +326,20 @@ customElements.define(
 						);
 						// Set the task action to celebrate.
 						el.setAttribute( 'data-task-action', 'celebrate' );
+
+						const event = new CustomEvent(
+							'prplUpdateRaviGaugeEvent',
+							{
+								detail: {
+									pointsDiff: parseInt(
+										this.querySelector( 'li' ).getAttribute(
+											'data-task-points'
+										)
+									),
+								},
+							}
+						);
+						document.dispatchEvent( event );
 
 						// Trigger the celebration event.
 						document.dispatchEvent(
