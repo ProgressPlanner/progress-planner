@@ -23,7 +23,7 @@ if ( ! $prpl_privacy_policy_accepted ) {
 		<h1 class="screen-reader-text"><?php \esc_html_e( 'Progress Planner', 'progress-planner' ); ?></h1>
 		<?php \progress_planner()->the_view( 'admin-page-header.php' ); ?>
 		<div class="prpl-widgets-container">
-			<?php foreach ( \progress_planner()->get_admin__page()->get_widgets() as $prpl_admin_widget ) : ?>
+			<?php foreach ( \progress_planner()->get_admin__page()->get_widgets_filtered() as $prpl_admin_widget ) : ?>
 				<?php $prpl_admin_widget->render(); ?>
 			<?php endforeach; ?>
 		</div>

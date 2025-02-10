@@ -28,6 +28,8 @@ class Page {
 		\add_action( 'admin_menu', [ $this, 'add_page' ] );
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		\add_action( 'wp_ajax_progress_planner_save_cpt_settings', [ $this, 'save_cpt_settings' ] );
+		\add_action( 'wp_ajax_progress_planner_save_widgets_order', [ $this, 'save_widgets_order' ] );
+		\add_filter( 'progress_planner_admin_widgets', [ $this, 'filter_active_widgets' ] );
 		\add_action( 'in_admin_header', [ $this, 'remove_admin_notices' ], PHP_INT_MAX );
 	}
 
@@ -37,7 +39,7 @@ class Page {
 	 * @return array<\Progress_Planner\Widgets\Widget>
 	 */
 	public function get_widgets() {
-		$widgets = [
+		return [
 			\progress_planner()->get_widgets__activity_scores(),
 			\progress_planner()->get_widgets__suggested_tasks(),
 			\progress_planner()->get_widgets__todo(),
@@ -47,7 +49,14 @@ class Page {
 			\progress_planner()->get_widgets__published_content(),
 			\progress_planner()->get_widgets__whats_new(),
 		];
+	}
 
+	/**
+	 * Get the widgets objects, filtered and sorted.
+	 *
+	 * @return array<\Progress_Planner\Widget>
+	 */
+	public function get_widgets_filtered() {
 		/**
 		 * Filter the widgets.
 		 *
@@ -55,7 +64,32 @@ class Page {
 		 *
 		 * @return array<\Progress_Planner\Widgets\Widget>
 		 */
-		return \apply_filters( 'progress_planner_admin_widgets', $widgets );
+		return \apply_filters( 'progress_planner_admin_widgets', $this->get_widgets() );
+	}
+
+	/**
+	 * Filter the widgets.
+	 *
+	 * @param \Progress_Planner\Widget[] $widgets The widgets.
+	 *
+	 * @return \Progress_Planner\Widget[]
+	 */
+	public function filter_active_widgets( $widgets ) {
+		$active_widgets = \progress_planner()->get_settings()->get( 'active_widgets' );
+		if ( empty( $active_widgets ) ) {
+			return $widgets;
+		}
+
+		$filtered_widgets = [];
+
+		foreach ( $active_widgets as $widget_id ) {
+			$widget = $this->get_widget( $widget_id );
+			if ( $widget ) {
+				$filtered_widgets[] = $widget;
+			}
+		}
+
+		return $filtered_widgets;
 	}
 
 	/**
@@ -138,6 +172,7 @@ class Page {
 				\wp_enqueue_script( 'progress-planner-header-filters' );
 				\wp_enqueue_script( 'progress-planner-settings' );
 				\wp_enqueue_script( 'progress-planner-grid-masonry' );
+				\wp_enqueue_script( 'progress-planner-draggable' );
 			} else {
 				\wp_enqueue_script( 'progress-planner-onboard' );
 			}
@@ -235,5 +270,24 @@ class Page {
 		}
 
 		\remove_all_actions( 'admin_notices' );
+	}
+
+	/**
+	 * Save the widgets order.
+	 *
+	 * @return void
+	 */
+	public function save_widgets_order() {
+		\check_ajax_referer( 'progress_planner', 'nonce', false );
+		$widgets = isset( $_POST['widgets'] ) ? \sanitize_text_field( \wp_unslash( $_POST['widgets'] ) ) : '';
+		$widgets = \explode( ',', $widgets );
+
+		\progress_planner()->get_settings()->set( 'active_widgets', $widgets );
+
+		\wp_send_json_success(
+			[
+				'message' => \esc_html__( 'Widgets order saved.', 'progress-planner' ),
+			]
+		);
 	}
 }

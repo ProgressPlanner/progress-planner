@@ -33,6 +33,10 @@ $progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_tex
 			<?php \progress_planner()->the_asset( 'images/icon_tour.svg' ); ?>
 			<span class="screen-reader-text"><?php \esc_html_e( 'Start tour', 'progress-planner' ); ?>
 		</button>
+		<button class="prpl-info-icon prpl-draggable-icon" id="prpl-draggable-icon-button" title="<?php \esc_html_e( 'Reorder widgets', 'progress-planner' ); ?>">
+			⇄
+			<span class="screen-reader-text"><?php \esc_html_e( 'Reorder widgets', 'progress-planner' ); ?>
+		</button>
 		<?php
 		// Render the settings button.
 		\progress_planner()->get_popover()->the_popover( 'settings' )->render_button(
