@@ -30,7 +30,7 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 	 */
 	private $token;
 
-		/**
+	/**
 	 * The remote API response.
 	 *
 	 * @see https://progressplanner.com/wp-json/progress-planner-saas/v1/lessons/?site=test.com
