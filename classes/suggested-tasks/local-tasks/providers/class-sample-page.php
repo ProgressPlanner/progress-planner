@@ -75,9 +75,9 @@ class Sample_Page extends Local_OneTime_Tasks_Abstract {
 			'points'      => 1,
 			'url'         => $this->capability_required() && null !== $sample_page ? \esc_url( \get_edit_post_link( $sample_page->ID ) ) : '', // @phpstan-ignore-line property.nonObject
 			'description' => '<p>' . sprintf(
-				/* translators: %s:<a href="https://progressplanner.com/recommendations/delete-the-default-wordpress-sample-page-post/" target="_blank">Sample Page</a> link */
+				/* translators: %s:<a href="https://prpl.fyi/delete-sample-page" target="_blank">Sample Page</a> link */
 				\esc_html__( 'On install, WordPress creates a %s page. This page is not needed and should be deleted.', 'progress-planner' ),
-				'<a href="https://progressplanner.com/recommendations/delete-the-default-wordpress-sample-page-post/" target="_blank">' . \esc_html__( '"Sample Page"', 'progress-planner' ) . '</a>'
+				'<a href="https://prpl.fyi/delete-sample-page" target="_blank">' . \esc_html__( '"Sample Page"', 'progress-planner' ) . '</a>'
 			) . '</p>',
 		];
 	}

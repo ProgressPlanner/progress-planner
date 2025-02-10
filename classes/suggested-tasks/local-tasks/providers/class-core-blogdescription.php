@@ -57,9 +57,9 @@ class Core_Blogdescription extends Local_OneTime_Tasks_Abstract {
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php' ) ) : '',
 			'description' => '<p>' . sprintf(
-				/* translators: %s:<a href="https://progressplanner.com/recommendations/set-tagline/" target="_blank">tagline</a> link */
+				/* translators: %s:<a href="https://prpl.fyi/set-tagline" target="_blank">tagline</a> link */
 				\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
-				'<a href="https://progressplanner.com/recommendations/set-tagline/" target="_blank">' . \esc_html__( 'tagline', 'progress-planner' ) . '</a>'
+				'<a href="https://prpl.fyi/set-tagline" target="_blank">' . \esc_html__( 'tagline', 'progress-planner' ) . '</a>'
 			) . '</p>',
 		];
 	}

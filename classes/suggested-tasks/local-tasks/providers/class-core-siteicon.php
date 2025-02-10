@@ -58,9 +58,9 @@ class Core_Siteicon extends Local_OneTime_Tasks_Abstract {
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php' ) ) : '',
 			'description' => '<p>' . sprintf(
-				/* translators: %s:<a href="https://progressplanner.com/recommendations/set-a-site-icon-aka-favicon/" target="_blank">site icon</a> link */
+				/* translators: %s:<a href="https://prpl.fyi/set-site-icon" target="_blank">site icon</a> link */
 				\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
-				'<a href="https://progressplanner.com/recommendations/set-a-site-icon-aka-favicon/" target="_blank">' . \esc_html__( 'site icon', 'progress-planner' ) . '</a>'
+				'<a href="https://prpl.fyi/set-site-icon" target="_blank">' . \esc_html__( 'site icon', 'progress-planner' ) . '</a>'
 			) . '</p>',
 		];
 	}

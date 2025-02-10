@@ -57,10 +57,10 @@ class Debug_Display extends Local_OneTime_Tasks_Abstract {
 			'points'      => 1,
 			'url'         => '',
 			'description' => '<p>' . sprintf(
-				// translators: %1$s is the name of the WP_DEBUG_DISPLAY constant, %2$s <a href="https://progressplanner.com/recommendations/set-wp_debug-to-false/" target="_blank">We recommend</a> link.
+				// translators: %1$s is the name of the WP_DEBUG_DISPLAY constant, %2$s <a href="https://prpl.fyi/set-wp-debug" target="_blank">We recommend</a> link.
 				\esc_html__( '%1$s is enabled. This means that errors are shown to users. %2$s disabling it.', 'progress-planner' ),
 				'<code>WP_DEBUG_DISPLAY</code>',
-				'<a href="https://progressplanner.com/recommendations/set-wp_debug-to-false/" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>'
+				'<a href="https://prpl.fyi/set-wp-debug" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>'
 			) . '</p>',
 		];
 	}
