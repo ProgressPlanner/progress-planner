@@ -159,7 +159,7 @@ class Page_Settings {
 				}
 
 				// Skip if the ID is not set.
-				if ( 1 > (int) $page_args['id'] ) {
+				if ( ! isset( $page_args['id'] ) || 1 > (int) $page_args['id'] ) {
 					continue;
 				}
 
@@ -170,11 +170,25 @@ class Page_Settings {
 			}
 		}
 
+		$this->save_settings();
 		$this->save_license();
 
 		do_action( 'progress_planner_settings_form_options_stored' );
 
 		\wp_send_json_success( \esc_html__( 'Options stored successfully', 'progress-planner' ) );
+	}
+
+	/**
+	 * Save the settings.
+	 *
+	 * @return void
+	 */
+	public function save_settings() {
+		$redirect_on_login = isset( $_POST['prpl-redirect-on-login'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			? \sanitize_text_field( \wp_unslash( $_POST['prpl-redirect-on-login'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			: false;
+
+		\update_user_meta( \get_current_user_id(), 'prpl_redirect_on_login', (bool) $redirect_on_login );
 	}
 
 	/**

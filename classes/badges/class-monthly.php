@@ -54,7 +54,11 @@ final class Monthly extends Badge {
 		}
 
 		$activation_date = \progress_planner()->get_base()->get_activation_date();
-		$start_date      = $activation_date->modify( 'first day of this month' );
+		if ( $activation_date < new \DateTime( 'first day of November 2024' ) ) { // When badges were introduced.
+			$start_date = $activation_date->modify( 'first day of November 2024' );
+		} else {
+			$start_date = $activation_date->modify( 'first day of this month' );
+		}
 
 		// Year when plugin was released.
 		$end_date = ( 2024 === (int) $start_date->format( 'Y' ) && 2024 === (int) \gmdate( 'Y' ) )

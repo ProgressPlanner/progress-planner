@@ -1,6 +1,6 @@
 <?php
 /**
- * Add tasks for Core blogdescription.
+ * Add tasks for Core siteicon.
  *
  * @package Progress_Planner
  */
@@ -8,16 +8,16 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 
 /**
- * Add tasks for Core blogdescription.
+ * Add tasks for Core siteicon.
  */
-class Core_Blogdescription extends Local_OneTime_Tasks_Abstract {
+class Core_Siteicon extends Local_OneTime_Tasks_Abstract {
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'core-blogdescription';
+	const ID = 'core-siteicon';
 
 	/**
 	 * The provider type.
@@ -32,7 +32,8 @@ class Core_Blogdescription extends Local_OneTime_Tasks_Abstract {
 	 * @return bool
 	 */
 	public function check_task_condition() {
-		return '' !== \get_bloginfo( 'description' ) ? true : false;
+		$site_icon = \get_option( 'site_icon' );
+		return ( '' !== $site_icon && '0' !== $site_icon ) ? true : false;
 	}
 
 	/**
@@ -50,16 +51,16 @@ class Core_Blogdescription extends Local_OneTime_Tasks_Abstract {
 
 		return [
 			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Set tagline', 'progress-planner' ),
+			'title'       => \esc_html__( 'Set site icon', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
 			'type'        => $this->get_provider_type(),
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php' ) ) : '',
 			'description' => '<p>' . sprintf(
-				/* translators: %s:<a href="https://prpl.fyi/set-tagline" target="_blank">tagline</a> link */
+				/* translators: %s:<a href="https://prpl.fyi/set-site-icon" target="_blank">site icon</a> link */
 				\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
-				'<a href="https://prpl.fyi/set-tagline" target="_blank">' . \esc_html__( 'tagline', 'progress-planner' ) . '</a>'
+				'<a href="https://prpl.fyi/set-site-icon" target="_blank">' . \esc_html__( 'site icon', 'progress-planner' ) . '</a>'
 			) . '</p>',
 		];
 	}
