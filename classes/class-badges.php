@@ -83,11 +83,7 @@ class Badges {
 	 * @return array<\Progress_Planner\Badges\Badge>
 	 */
 	public function get_badges( $context ) {
-		if ( ! isset( $this->$context ) ) {
-			return [];
-		}
-
-		return $this->$context;
+		return isset( $this->$context ) ? $this->$context : [];
 	}
 
 	/**
@@ -155,7 +151,7 @@ class Badges {
 		foreach ( $this->content as $badge ) {
 
 			// If the badge is already complete, skip it.
-			if ( 100 === $badge->progress_callback()['progress'] ) {
+			if ( 100 <= $badge->progress_callback()['progress'] ) {
 				continue;
 			}
 
