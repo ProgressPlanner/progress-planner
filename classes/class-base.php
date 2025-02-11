@@ -98,10 +98,16 @@ class Base {
 		$this->cached['suggested_tasks'] = new Suggested_Tasks();
 		$this->cached['badges']          = new Badges();
 
-		// Dont add the widget if the privacy policy is not accepted.
 		if ( true === $this->is_privacy_policy_accepted() ) {
 			$this->cached['settings_page'] = new Admin_Page_Settings();
+
+			new Plugin_Deactivation();
 		}
+
+		/**
+		 * Redirect on login.
+		 */
+		\add_action( 'wp_login', [ $this, 'redirect_on_login' ], 10, 2 );
 	}
 
 	/**
@@ -155,7 +161,7 @@ class Base {
 	 * @return string
 	 */
 	public function get_placeholder_svg( $width = 1200, $height = 675 ) {
-		return 'data:image/svg+xml;base64,' . base64_encode( sprintf( '<svg width="%1$d" height="%2$d" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="%3$d" height="%4$d" style="fill:#F6F5FB;stroke:#534786;stroke-width:2"/><text x="50%%" y="50%%" font-size="20" text-anchor="middle" alignment-baseline="middle" font-family="monospace" fill="#534786">progressplanner.com</text></svg>', $width, $height, ( $width - 4 ), ( $height - 4 ) ) );
+		return 'data:image/svg+xml;base64,' . base64_encode( sprintf( '<svg width="%1$d" height="%2$d" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="%3$d" height="%4$d" style="fill:#F6F5FB;stroke:#534786;stroke-width:2"/><text x="50%%" y="50%%" font-size="20" text-anchor="middle" alignment-baseline="middle" font-family="monospace" fill="#534786">progressplanner.com</text></svg>', $width, $height, ( $width - 4 ), ( $height - 4 ) ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 	}
 
 	/**
@@ -368,6 +374,30 @@ class Base {
 	public function is_pro_site() {
 		return \get_option( 'progress_planner_pro_license_key' )
 			&& 'valid' === \get_option( 'progress_planner_pro_license_status' );
+	}
+
+	/**
+	 * Redirect on login.
+	 *
+	 * @param string   $user_login The user login.
+	 * @param \WP_User $user The user object.
+	 *
+	 * @return void
+	 */
+	public function redirect_on_login( $user_login, $user ) {
+		// Check if the $user can `manage_options`.
+		if ( ! $user->has_cap( 'manage_options' ) ) {
+			return;
+		}
+
+		// Check if the user has the `prpl_redirect_on_login` meta.
+		if ( ! \get_user_meta( $user->ID, 'prpl_redirect_on_login', true ) ) {
+			return;
+		}
+
+		// Redirect to the Progress Planner dashboard.
+		\wp_safe_redirect( \admin_url( 'admin.php?page=progress-planner' ) );
+		exit;
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

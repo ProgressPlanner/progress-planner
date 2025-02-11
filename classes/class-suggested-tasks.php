@@ -10,6 +10,7 @@ namespace Progress_Planner;
 use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
 use Progress_Planner\Suggested_Tasks\Remote_Tasks;
 use Progress_Planner\Activities\Suggested_Task;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 
 /**
  * Suggested_Tasks class.
@@ -51,6 +52,9 @@ class Suggested_Tasks {
 		if ( \is_admin() ) {
 			\add_action( 'init', [ $this, 'init' ], 1 );
 		}
+
+		// Add the automatic updates complete action.
+		\add_action( 'automatic_updates_complete', [ $this, 'on_automatic_updates_complete' ] );
 	}
 
 	/**
@@ -66,18 +70,67 @@ class Suggested_Tasks {
 		$completed_tasks = $this->local->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
 
 		foreach ( $completed_tasks as $task_id ) {
+			// Change the task status to pending celebration.
 			$this->mark_task_as_pending_celebration( $task_id );
 
 			// Insert an activity.
-			$activity          = new Suggested_Task();
-			$activity->type    = 'completed';
-			$activity->data_id = (string) $task_id;
-			$activity->date    = new \DateTime();
-			$activity->user_id = \get_current_user_id();
-			$activity->save();
+			$this->insert_activity( $task_id );
+		}
+	}
 
-			// Allow other classes to react to the completion of a suggested task.
-			do_action( 'progress_planner_suggested_task_completed', $task_id );
+	/**
+	 * Insert an activity.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return void
+	 */
+	public function insert_activity( $task_id ) {
+		// Insert an activity.
+		$activity          = new Suggested_Task();
+		$activity->type    = 'completed';
+		$activity->data_id = (string) $task_id;
+		$activity->date    = new \DateTime();
+		$activity->user_id = \get_current_user_id();
+		$activity->save();
+
+		// Allow other classes to react to the completion of a suggested task.
+		do_action( 'progress_planner_suggested_task_completed', $task_id );
+	}
+
+	/**
+	 * If done via automatic updates, the "core update" task should be marked as "completed" (and skip "pending celebration" status).
+	 *
+	 * @param array $update_results The update results.
+	 *
+	 * @return void
+	 */
+	public function on_automatic_updates_complete( $update_results ) {
+
+		$pending_tasks = $this->local->get_pending_tasks(); // @phpstan-ignore-line method.nonObject
+
+		if ( empty( $pending_tasks ) ) {
+			return;
+		}
+
+		// TODO: Get this from task provider.
+		$update_core_task_id = 'update-core';
+
+		foreach ( $pending_tasks as $task_id ) {
+			$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
+			$task_data   = $task_object->get_data();
+
+			if ( $task_data['type'] === $update_core_task_id && \gmdate( 'YW' ) === $task_data['year_week'] ) {
+				// Remove from local (pending tasks).
+				$this->local->remove_pending_task( $task_id ); // @phpstan-ignore-line method.nonObject
+
+				// Change the task status to completed.
+				$this->mark_task_as_completed( $task_id );
+
+				// Insert an activity.
+				$this->insert_activity( $task_id );
+				break;
+			}
 		}
 	}
 
@@ -469,6 +522,22 @@ class Suggested_Tasks {
 	}
 
 	/**
+	 * Check if a task was completed.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function was_task_completed( $task_id ) {
+		return true === $this->check_task_condition(
+			[
+				'type'    => 'completed',
+				'task_id' => $task_id,
+			]
+		);
+	}
+
+	/**
 	 * Handle the suggested task action.
 	 *
 	 * @return void
@@ -488,18 +557,22 @@ class Suggested_Tasks {
 
 		switch ( $action ) {
 			case 'complete':
+				// It's local task, remove it from pending tasks.
+				if ( false === strpos( $task_id, 'remote-task' ) ) {
+					$this->local->remove_pending_task( $task_id ); // @phpstan-ignore-line method.nonObject
+				}
+
+				// Mark the task as completed.
 				$this->mark_task_as( 'completed', $task_id );
+
+				// Insert an activity.
+				$this->insert_activity( $task_id );
 				$updated = true;
 				break;
 
 			case 'snooze':
 				$duration = isset( $_POST['duration'] ) ? \sanitize_text_field( \wp_unslash( $_POST['duration'] ) ) : '';
 				$updated  = $this->snooze_task( $task_id, $duration );
-				break;
-
-			case 'celebrated':
-				// We dont need to do anything here, since the task is already marked as completed.
-				$updated = true;
 				break;
 
 			default:

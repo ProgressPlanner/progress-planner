@@ -47,11 +47,18 @@ interface Local_Tasks_Interface {
 	public function get_data_from_task_id( $task_id );
 
 	/**
-	 * Get the provider ID.
+	 * Get the provider type.
 	 *
 	 * @return string
 	 */
 	public function get_provider_type();
+
+	/**
+	 * Get the provider ID.
+	 *
+	 * @return string
+	 */
+	public function get_provider_id();
 
 	/**
 	 * Check if the user has the capability to perform the task.
