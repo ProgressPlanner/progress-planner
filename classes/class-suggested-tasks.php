@@ -480,6 +480,14 @@ class Suggested_Tasks {
 			}
 		}
 
+		if ( 'pending_celebration' === $parsed_condition['type'] ) {
+			$pending_celebration_tasks = $this->get_pending_celebration();
+
+			if ( \in_array( $parsed_condition['task_id'], $pending_celebration_tasks, true ) ) {
+				return true;
+			}
+		}
+
 		if ( 'snoozed' === $parsed_condition['type'] ) {
 			$snoozed_tasks = $this->get_snoozed_tasks();
 
@@ -522,19 +530,35 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Check if a task was completed.
+	 * Check if a task was completed. Task is considered completed if it was completed or pending celebration.
 	 *
 	 * @param string $task_id The task ID.
 	 *
 	 * @return bool
 	 */
 	public function was_task_completed( $task_id ) {
-		return true === $this->check_task_condition(
+
+		// Check if the task was pending celebration.
+		if ( true === $this->check_task_condition(
+			[
+				'type'    => 'pending_celebration',
+				'task_id' => $task_id,
+			]
+		) ) {
+			return true;
+		}
+
+		// Check if the task was completed.
+		if ( true === $this->check_task_condition(
 			[
 				'type'    => 'completed',
 				'task_id' => $task_id,
 			]
-		);
+		) ) {
+			return true;
+		}
+
+		return false;
 	}
 
 	/**
