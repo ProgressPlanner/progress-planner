@@ -157,7 +157,11 @@ class Content_Review extends Content_Abstract {
 		$task_details = [
 			'task_id'     => $task_id,
 			// translators: %1$s: The post type, %2$s: The post title.
-			'title'       => sprintf( 'Review %1$s "%2$s"', \esc_html( $post->post_type ), \esc_html( $post->post_title ) ), // @phpstan-ignore-line property.nonObject
+			'title'       => sprintf(
+				'Review %1$s "%2$s"',
+				strtolower( get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
+				\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
+			),
 			'parent'      => 0,
 			'priority'    => 'high',
 			'type'        => $this->get_provider_type(),
