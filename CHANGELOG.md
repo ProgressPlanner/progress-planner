@@ -1,3 +1,9 @@
+= 1.0.5 =
+
+Under the hood:
+
+* Improved suggested tasks completion conditions.
+
 = 1.0.4 =
 
 Enhancements:
