@@ -318,8 +318,7 @@ class Suggested_Tasks {
 		$option[ $status ] = isset( $option[ $status ] )
 			? $option[ $status ]
 			: [];
-
-		$remove_index = \array_search( $task_id, $option[ $status ], true );
+		$remove_index      = false;
 
 		if ( 'snoozed' === $status ) {
 			foreach ( $option[ $status ] as $key => $task ) {
@@ -328,6 +327,8 @@ class Suggested_Tasks {
 					break;
 				}
 			}
+		} else {
+			$remove_index = \array_search( $task_id, $option[ $status ], true );
 		}
 
 		if ( false === $remove_index ) {
