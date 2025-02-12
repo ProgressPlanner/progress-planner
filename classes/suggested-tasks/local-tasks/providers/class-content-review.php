@@ -133,6 +133,12 @@ class Content_Review extends Content_Abstract {
 					'post_id' => $post->ID, // @phpstan-ignore-line property.nonObject
 				]
 			);
+
+			// Don't add the task if it was completed.
+			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
+				continue;
+			}
+
 			$items[] = $this->get_task_details( $task_id );
 		}
 		return $items;
