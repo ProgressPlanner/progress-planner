@@ -61,31 +61,18 @@ class Scripts {
 	 * @return array
 	 */
 	public function get_dependencies( $file ) {
-		switch ( $file ) {
-			case 'web-components/prpl-gauge':
-				return [ 'progress-planner-web-components-prpl-badge' ];
-
-			case 'tour':
-				return [ 'driver' ];
-
-			case 'grid-masonry':
-				return [ 'progress-planner-document-ready' ];
-
-			case 'scan-posts':
-				return [ 'progress-planner-ajax-request' ];
-
-			case 'onboard':
-				return [ 'progress-planner-ajax-request', 'progress-planner-scan-posts' ];
-
-			case 'settings':
-				return [ 'progress-planner-ajax-request', 'wp-util' ];
-
-			case 'settings-page':
-				return [ 'wp-util', 'progress-planner-document-ready' ];
-
-			default:
-				return [];
+		$path    = PROGRESS_PLANNER_DIR . '/assets/js/' . $file . '.js';
+		$headers = \get_file_data(
+			$path,
+			[
+				'dependencies' => 'Dependencies',
+			]
+		);
+		if ( ! isset( $headers['dependencies'] ) ) {
+			return [];
 		}
+
+		return \array_filter( \array_map( 'trim', \explode( ',', $headers['dependencies'] ) ) );
 	}
 
 	/**

@@ -1,4 +1,11 @@
-/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerTriggerScan */
+/*
+ * Onboard
+ *
+ * A script to handle the onboarding process.
+ *
+ * Dependencies: progress-planner-ajax-request, progress-planner-scan-posts
+ *
+ * global progressPlanner, progressPlannerAjaxRequest, progressPlannerTriggerScan */
 
 /**
  * Make a request to save the license key.
