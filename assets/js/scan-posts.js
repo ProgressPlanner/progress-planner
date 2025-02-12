@@ -1,4 +1,12 @@
-/* global progressPlanner, progressPlannerAjaxRequest */
+/*
+ * Scan Posts
+ *
+ * A script to scan posts for the Progress Planner.
+ *
+ * Dependencies: progress-planner-ajax-request
+ *
+ * global progressPlanner, progressPlannerAjaxRequest
+ */
 
 // eslint-disable-next-line no-unused-vars
 const progressPlannerTriggerScan = () => {
