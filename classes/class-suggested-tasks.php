@@ -371,10 +371,8 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_snoozed_tasks() {
-		$option  = \get_option( self::OPTION_NAME, [] );
-		$snoozed = $option['snoozed'] ?? [];
-
-		return $snoozed;
+		$option = \get_option( self::OPTION_NAME, [] );
+		return $option['snoozed'] ?? [];
 	}
 
 	/**
@@ -383,10 +381,8 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_completed_tasks() {
-		$option    = \get_option( self::OPTION_NAME, [] );
-		$completed = $option['completed'] ?? [];
-
-		return $completed;
+		$option = \get_option( self::OPTION_NAME, [] );
+		return $option['completed'] ?? [];
 	}
 
 	/**
@@ -538,27 +534,23 @@ class Suggested_Tasks {
 	 */
 	public function was_task_completed( $task_id ) {
 
-		// Check if the task was pending celebration.
-		if ( true === $this->check_task_condition(
-			[
-				'type'    => 'pending_celebration',
-				'task_id' => $task_id,
-			]
-		) ) {
-			return true;
-		}
-
-		// Check if the task was completed.
-		if ( true === $this->check_task_condition(
-			[
-				'type'    => 'completed',
-				'task_id' => $task_id,
-			]
-		) ) {
-			return true;
-		}
-
-		return false;
+		return (
+			// Check if the task was pending celebration.
+			true === $this->check_task_condition(
+				[
+					'type'    => 'pending_celebration',
+					'task_id' => $task_id,
+				]
+			)
+			||
+			// Check if the task was completed.
+			true === $this->check_task_condition(
+				[
+					'type'    => 'completed',
+					'task_id' => $task_id,
+				]
+			)
+		);
 	}
 
 	/**
