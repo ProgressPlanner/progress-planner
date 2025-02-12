@@ -3,6 +3,7 @@
 Under the hood:
 
 * Improved suggested tasks completion conditions.
+* Improved checks for suggested 'review post' tasks.
 
 = 1.0.4 =
 

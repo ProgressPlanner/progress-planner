@@ -118,15 +118,23 @@ class Local_Tasks_Manager {
 	 * @return array
 	 */
 	public function inject_tasks( $tasks ) {
+		$provider_tasks  = [];
 		$tasks_to_inject = [];
 
 		// Loop through all registered task providers and inject their tasks.
 		foreach ( $this->task_providers as $provider_instance ) {
-			$tasks_to_inject = \array_merge( $tasks_to_inject, $provider_instance->get_tasks_to_inject() );
+			$provider_tasks = \array_merge( $provider_tasks, $provider_instance->get_tasks_to_inject() );
 		}
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.
-		foreach ( $tasks_to_inject as $task ) {
+		foreach ( $provider_tasks as $task ) {
+
+			// Skip the task if it was completed.
+			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task['task_id'] ) ) {
+				continue;
+			}
+
+			$tasks_to_inject[] = $task;
 			$this->add_pending_task( $task['task_id'] );
 		}
 
