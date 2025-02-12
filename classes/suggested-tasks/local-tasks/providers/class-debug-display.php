@@ -27,12 +27,22 @@ class Debug_Display extends Local_OneTime_Tasks_Abstract {
 	const ID = 'wp-debug-display';
 
 	/**
-	 * Check if the task condition is met.
+	 * Check if the task condition is satisfied.
+	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *
 	 * @return bool
 	 */
 	public function check_task_condition() {
-		return ( ! defined( 'WP_DEBUG_DISPLAY' ) || ! WP_DEBUG_DISPLAY ) ? true : false;
+		/**
+		 * For WP_DEBUG_DISPLAY to do anything, WP_DEBUG must be enabled (true).
+		 * link: https://developer.wordpress.org/advanced-administration/debug/debug-wordpress/#wp_debug_display
+		 */
+		return (
+			defined( 'WP_DEBUG' ) && (
+				false === WP_DEBUG ||
+				( ! defined( 'WP_DEBUG_DISPLAY' ) || ! WP_DEBUG_DISPLAY )
+			)
+		);
 	}
 
 	/**

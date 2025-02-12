@@ -41,7 +41,8 @@ class Hello_World extends Local_OneTime_Tasks_Abstract {
 	protected $sample_post = false;
 
 	/**
-	 * Check if the task condition is met.
+	 * Check if the task condition is satisfied.
+	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *
 	 * @return bool
 	 */
