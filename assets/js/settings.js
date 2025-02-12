@@ -1,4 +1,11 @@
-/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerSaveLicenseKey */
+/*
+ * Settings
+ *
+ * A script to handle the settings page.
+ *
+ * Dependencies: progress-planner-ajax-request, wp-util
+ *
+ * global progressPlanner, progressPlannerAjaxRequest, progressPlannerSaveLicenseKey */
 document
 	.getElementById( 'prpl-settings-form' )
 	.addEventListener( 'submit', function ( event ) {
