@@ -28,7 +28,7 @@ abstract class Local_OneTime_Tasks_Abstract extends Local_Tasks_Abstract {
 			return false;
 		}
 
-		return ! $this->should_add_task() ? $task_id : false;
+		return $this->is_task_completed() ? $task_id : false;
 	}
 
 	/**
@@ -38,6 +38,15 @@ abstract class Local_OneTime_Tasks_Abstract extends Local_Tasks_Abstract {
 	 * @return bool
 	 */
 	abstract protected function should_add_task();
+
+	/**
+	 * Alias for should_add_task(), for better readability when using in the evaluate_task() method.
+	 *
+	 * @return bool
+	 */
+	protected function is_task_completed() {
+		return ! $this->should_add_task();
+	}
 
 	/**
 	 * Backwards-compatible method to check if the task condition is satisfied.

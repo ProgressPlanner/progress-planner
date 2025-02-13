@@ -31,7 +31,7 @@ abstract class Local_Repetitive_Tasks_Abstract extends Local_Tasks_Abstract {
 		$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
 		$task_data   = $task_object->get_data();
 
-		if ( $task_data['type'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['year_week'] && ! $this->should_add_task() ) {
+		if ( $task_data['type'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['year_week'] && ! $this->is_task_completed() ) {
 			return $task_id;
 		}
 
@@ -45,6 +45,15 @@ abstract class Local_Repetitive_Tasks_Abstract extends Local_Tasks_Abstract {
 	 * @return bool
 	 */
 	abstract protected function should_add_task();
+
+	/**
+	 * Alias for should_add_task(), for better readability when using in the evaluate_task() method.
+	 *
+	 * @return bool
+	 */
+	protected function is_task_completed() {
+		return ! $this->should_add_task();
+	}
 
 	/**
 	 * Backwards-compatible method to check if the task condition is satisfied.
