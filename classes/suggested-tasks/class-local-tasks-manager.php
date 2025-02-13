@@ -14,6 +14,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Blogdescription;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Settings_Saved;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Debug_Display;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Disable_Comments;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Sample_Page;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Hello_World;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Siteicon;
@@ -53,6 +54,7 @@ class Local_Tasks_Manager {
 			new Core_Blogdescription(),
 			new Settings_Saved(),
 			new Debug_Display(),
+			new Disable_Comments(),
 			new Sample_Page(),
 			new Hello_World(),
 			new Core_Siteicon(),
