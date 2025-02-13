@@ -458,7 +458,7 @@ class Suggested_Tasks {
 	 *
 	 * @return bool
 	 */
-	public function should_add_task( $condition ) {
+	public function check_task_condition( $condition ) {
 		$parsed_condition = \wp_parse_args(
 			$condition,
 			[
@@ -471,19 +471,19 @@ class Suggested_Tasks {
 		switch ( $parsed_condition['type'] ) {
 			case 'completed':
 				if ( \in_array( $parsed_condition['task_id'], $this->get_completed_tasks(), true ) ) {
-					return false;
+					return true;
 				}
 				break;
 
 			case 'pending_celebration':
 				if ( \in_array( $parsed_condition['task_id'], $this->get_pending_celebration(), true ) ) {
-					return false;
+					return true;
 				}
 				break;
 
 			case 'snoozed':
 				if ( \in_array( $parsed_condition['task_id'], $this->get_snoozed_tasks(), true ) ) {
-					return false;
+					return true;
 				}
 				break;
 
@@ -510,28 +510,16 @@ class Suggested_Tasks {
 					// Check if the snoozed post lengths match the condition.
 					foreach ( $parsed_condition['post_lengths'] as $post_length ) {
 						if ( ! isset( $snoozed_post_lengths[ $post_length ] ) ) {
-							return true;
+							return false;
 						}
 					}
+
+					return true;
 				}
 				break;
-
-			default:
-				return false;
 		}
 
-		return true;
-	}
-
-	/**
-	 * Backwards-compatible method to check if a task should be added.
-	 *
-	 * @param array $condition The condition.
-	 *
-	 * @return bool
-	 */
-	public function check_task_condition( $condition ) {
-		return ! $this->should_add_task( $condition );
+		return false;
 	}
 
 	/**
@@ -545,7 +533,7 @@ class Suggested_Tasks {
 
 		return (
 			// Check if the task was pending celebration.
-			false === $this->should_add_task(
+			true === $this->check_task_condition(
 				[
 					'type'    => 'pending_celebration',
 					'task_id' => $task_id,
@@ -553,7 +541,7 @@ class Suggested_Tasks {
 			)
 			||
 			// Check if the task was completed.
-			false === $this->should_add_task(
+			true === $this->check_task_condition(
 				[
 					'type'    => 'completed',
 					'task_id' => $task_id,
