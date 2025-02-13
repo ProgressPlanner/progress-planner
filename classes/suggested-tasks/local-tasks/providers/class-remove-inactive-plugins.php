@@ -33,6 +33,10 @@ class Remove_Inactive_Plugins extends Local_OneTime_Tasks_Abstract {
 	 * @return bool
 	 */
 	public function check_task_condition() {
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+		}
+
 		$plugins        = get_plugins();
 		$plugins_active = 0;
 		$plugins_total  = 0;
