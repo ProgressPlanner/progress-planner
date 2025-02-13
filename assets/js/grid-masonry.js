@@ -1,3 +1,4 @@
+/* global prplDocumentReady */
 /*
  * Grid Masonry
  *
@@ -5,8 +6,6 @@
  * Inspired by https://medium.com/@andybarefoot/a-masonry-style-layout-using-css-grid-8c663d355ebb
  *
  * Dependencies: progress-planner-document-ready
- *
- * global prplDocumentReady
  */
 
 /**
