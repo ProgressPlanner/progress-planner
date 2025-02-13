@@ -66,7 +66,7 @@ abstract class Local_Repetitive_Tasks_Abstract extends Local_Tasks_Abstract {
 
 		if (
 			true === $this->is_task_type_snoozed() ||
-			false === $this->should_add_task() || // No need to add the task.
+			! $this->should_add_task() || // No need to add the task.
 			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id )
 		) {
 			return [];
