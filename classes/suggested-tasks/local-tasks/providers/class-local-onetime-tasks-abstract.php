@@ -28,7 +28,7 @@ abstract class Local_OneTime_Tasks_Abstract extends Local_Tasks_Abstract {
 			return false;
 		}
 
-		return ! $this->should_add_task() ? $task_id : false;
+		return ! $this->maybe_add_task() ? $task_id : false;
 	}
 
 	/**
@@ -37,7 +37,7 @@ abstract class Local_OneTime_Tasks_Abstract extends Local_Tasks_Abstract {
 	 *
 	 * @return bool
 	 */
-	abstract protected function should_add_task();
+	abstract protected function maybe_add_task();
 
 	/**
 	 * Backwards-compatible method to check if the task condition is satisfied.
@@ -45,7 +45,7 @@ abstract class Local_OneTime_Tasks_Abstract extends Local_Tasks_Abstract {
 	 * @return bool
 	 */
 	protected function check_task_condition() {
-		return ! $this->should_add_task();
+		return ! $this->maybe_add_task();
 	}
 
 	/**
@@ -56,7 +56,7 @@ abstract class Local_OneTime_Tasks_Abstract extends Local_Tasks_Abstract {
 	public function get_tasks_to_inject() {
 		if (
 			true === $this->is_task_type_snoozed() ||
-			! $this->should_add_task() || // No need to add the task.
+			! $this->maybe_add_task() || // No need to add the task.
 			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_provider_id() )
 		) {
 			return [];

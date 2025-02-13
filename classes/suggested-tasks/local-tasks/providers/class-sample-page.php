@@ -45,7 +45,7 @@ class Sample_Page extends Local_OneTime_Tasks_Abstract {
 	 *
 	 * @return bool
 	 */
-	public function should_add_task() {
+	public function maybe_add_task() {
 		return null !== $this->get_sample_page();
 	}
 

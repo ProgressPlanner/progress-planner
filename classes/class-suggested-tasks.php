@@ -458,7 +458,7 @@ class Suggested_Tasks {
 	 *
 	 * @return bool
 	 */
-	public function should_add_task( $condition ) {
+	public function maybe_add_task( $condition ) {
 		$parsed_condition = \wp_parse_args(
 			$condition,
 			[
@@ -468,61 +468,59 @@ class Suggested_Tasks {
 			]
 		);
 
-		if ( 'completed' === $parsed_condition['type'] ) {
-			$completed_tasks = $this->get_completed_tasks();
+		switch ( $parsed_condition['type'] ) {
+			case 'completed':
+				if ( \in_array( $parsed_condition['task_id'], $this->get_completed_tasks(), true ) ) {
+					return false;
+				}
+				break;
 
-			if ( \in_array( $parsed_condition['task_id'], $completed_tasks, true ) ) {
-				return false;
-			}
-		}
+			case 'pending_celebration':
+				if ( \in_array( $parsed_condition['task_id'], $this->get_pending_celebration(), true ) ) {
+					return false;
+				}
+				break;
 
-		if ( 'pending_celebration' === $parsed_condition['type'] ) {
-			$pending_celebration_tasks = $this->get_pending_celebration();
+			case 'snoozed':
+				if ( \in_array( $parsed_condition['task_id'], $this->get_snoozed_tasks(), true ) ) {
+					return false;
+				}
+				break;
 
-			if ( \in_array( $parsed_condition['task_id'], $pending_celebration_tasks, true ) ) {
-				return false;
-			}
-		}
+			case 'snoozed-post-length':
+				if ( isset( $parsed_condition['post_lengths'] ) ) {
+					if ( ! \is_array( $parsed_condition['post_lengths'] ) ) {
+						$parsed_condition['post_lengths'] = [ $parsed_condition['post_lengths'] ];
+					}
 
-		if ( 'snoozed' === $parsed_condition['type'] ) {
-			$snoozed_tasks = $this->get_snoozed_tasks();
+					$snoozed_tasks        = $this->get_snoozed_tasks();
+					$snoozed_post_lengths = [];
 
-			if ( \in_array( $parsed_condition['task_id'], $snoozed_tasks, true ) ) {
-				return false;
-			}
-		}
+					// Get the post lengths of the snoozed tasks.
+					foreach ( $snoozed_tasks as $task ) {
+						$data = $this->local->get_data_from_task_id( $task['id'] ); // @phpstan-ignore-line method.nonObject
+						if ( isset( $data['type'] ) && 'create-post' === $data['type'] ) {
+							$key = true === $data['long'] ? 'long' : 'short';
+							if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
+								$snoozed_post_lengths[ $key ] = true;
+							}
+						}
+					}
 
-		if ( 'snoozed-post-length' === $parsed_condition['type'] && isset( $parsed_condition['post_lengths'] ) ) {
-			if ( ! \is_array( $parsed_condition['post_lengths'] ) ) {
-				$parsed_condition['post_lengths'] = [ $parsed_condition['post_lengths'] ];
-			}
-
-			$snoozed_tasks        = $this->get_snoozed_tasks();
-			$snoozed_post_lengths = [];
-
-			// Get the post lengths of the snoozed tasks.
-			foreach ( $snoozed_tasks as $task ) {
-				$data = $this->local->get_data_from_task_id( $task['id'] ); // @phpstan-ignore-line method.nonObject
-				if ( isset( $data['type'] ) && 'create-post' === $data['type'] ) {
-					$key = true === $data['long'] ? 'long' : 'short';
-					if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
-						$snoozed_post_lengths[ $key ] = true;
+					// Check if the snoozed post lengths match the condition.
+					foreach ( $parsed_condition['post_lengths'] as $post_length ) {
+						if ( ! isset( $snoozed_post_lengths[ $post_length ] ) ) {
+							return true;
+						}
 					}
 				}
-			}
+				break;
 
-			// Check if the snoozed post lengths match the condition.
-			foreach ( $parsed_condition['post_lengths'] as $post_length ) {
-				if ( ! isset( $snoozed_post_lengths[ $post_length ] ) ) {
-					return true;
-				}
-			}
-
-			return false;
+			default:
+				return false;
 		}
 
-		// If no condition is met, return false.
-		return false;
+		return true;
 	}
 
 	/**
@@ -533,7 +531,7 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function check_task_condition( $condition ) {
-		return ! $this->should_add_task( $condition );
+		return ! $this->maybe_add_task( $condition );
 	}
 
 	/**
@@ -547,7 +545,7 @@ class Suggested_Tasks {
 
 		return (
 			// Check if the task was pending celebration.
-			false === $this->should_add_task(
+			false === $this->maybe_add_task(
 				[
 					'type'    => 'pending_celebration',
 					'task_id' => $task_id,
@@ -555,7 +553,7 @@ class Suggested_Tasks {
 			)
 			||
 			// Check if the task was completed.
-			false === $this->should_add_task(
+			false === $this->maybe_add_task(
 				[
 					'type'    => 'completed',
 					'task_id' => $task_id,

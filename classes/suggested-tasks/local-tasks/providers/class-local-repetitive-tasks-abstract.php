@@ -31,7 +31,7 @@ abstract class Local_Repetitive_Tasks_Abstract extends Local_Tasks_Abstract {
 		$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
 		$task_data   = $task_object->get_data();
 
-		if ( $task_data['type'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['year_week'] && ! $this->should_add_task() ) {
+		if ( $task_data['type'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['year_week'] && ! $this->maybe_add_task() ) {
 			return $task_id;
 		}
 
@@ -44,7 +44,7 @@ abstract class Local_Repetitive_Tasks_Abstract extends Local_Tasks_Abstract {
 	 *
 	 * @return bool
 	 */
-	abstract protected function should_add_task();
+	abstract protected function maybe_add_task();
 
 	/**
 	 * Backwards-compatible method to check if the task condition is satisfied.
@@ -52,7 +52,7 @@ abstract class Local_Repetitive_Tasks_Abstract extends Local_Tasks_Abstract {
 	 * @return bool
 	 */
 	protected function check_task_condition() {
-		return ! $this->should_add_task();
+		return ! $this->maybe_add_task();
 	}
 
 	/**
@@ -66,7 +66,7 @@ abstract class Local_Repetitive_Tasks_Abstract extends Local_Tasks_Abstract {
 
 		if (
 			true === $this->is_task_type_snoozed() ||
-			false === $this->should_add_task() || // No need to add the task.
+			false === $this->maybe_add_task() || // No need to add the task.
 			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id )
 		) {
 			return [];
