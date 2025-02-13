@@ -16,6 +16,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Settings_Saved;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Debug_Display;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Sample_Page;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Hello_World;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Remove_Inactive_Plugins;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Siteicon;
 
 /**
@@ -55,6 +56,7 @@ class Local_Tasks_Manager {
 			new Debug_Display(),
 			new Sample_Page(),
 			new Hello_World(),
+			new Remove_Inactive_Plugins(),
 			new Core_Siteicon(),
 		];
 
