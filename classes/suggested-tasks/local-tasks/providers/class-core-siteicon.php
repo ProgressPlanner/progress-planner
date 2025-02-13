@@ -31,7 +31,7 @@ class Core_Siteicon extends Local_OneTime_Tasks_Abstract {
 	 *
 	 * @return bool
 	 */
-	public function maybe_add_task() {
+	public function should_add_task() {
 		$site_icon = \get_option( 'site_icon' );
 		return '' === $site_icon || '0' === $site_icon;
 	}

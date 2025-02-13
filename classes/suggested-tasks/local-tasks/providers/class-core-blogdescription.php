@@ -31,7 +31,7 @@ class Core_Blogdescription extends Local_OneTime_Tasks_Abstract {
 	 *
 	 * @return bool
 	 */
-	public function maybe_add_task() {
+	public function should_add_task() {
 		return '' === \get_bloginfo( 'description' );
 	}
 

@@ -458,7 +458,7 @@ class Suggested_Tasks {
 	 *
 	 * @return bool
 	 */
-	public function maybe_add_task( $condition ) {
+	public function should_add_task( $condition ) {
 		$parsed_condition = \wp_parse_args(
 			$condition,
 			[
@@ -531,7 +531,7 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function check_task_condition( $condition ) {
-		return ! $this->maybe_add_task( $condition );
+		return ! $this->should_add_task( $condition );
 	}
 
 	/**
@@ -545,7 +545,7 @@ class Suggested_Tasks {
 
 		return (
 			// Check if the task was pending celebration.
-			false === $this->maybe_add_task(
+			false === $this->should_add_task(
 				[
 					'type'    => 'pending_celebration',
 					'task_id' => $task_id,
@@ -553,7 +553,7 @@ class Suggested_Tasks {
 			)
 			||
 			// Check if the task was completed.
-			false === $this->maybe_add_task(
+			false === $this->should_add_task(
 				[
 					'type'    => 'completed',
 					'task_id' => $task_id,

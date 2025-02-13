@@ -46,7 +46,7 @@ class Hello_World extends Local_OneTime_Tasks_Abstract {
 	 *
 	 * @return bool
 	 */
-	public function maybe_add_task() {
+	public function should_add_task() {
 		return null !== $this->get_sample_post();
 	}
 
