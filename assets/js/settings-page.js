@@ -1,5 +1,11 @@
 /* global alert, prplDocumentReady */
-
+/*
+ * Settings Page
+ *
+ * A script to handle the settings page.
+ *
+ * Dependencies: prpl-document-ready, wp-util
+ */
 const prplTogglePageSelectorSettingVisibility = function ( page, value ) {
 	const itemRadiosWrapperEl = document.querySelector(
 		`.prpl-pages-item-${ page } .radios`

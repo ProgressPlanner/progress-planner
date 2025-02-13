@@ -1,19 +1,32 @@
+= 1.0.5 =
+
+Under the hood:
+
+* Improved suggested tasks completion conditions.
+* Improved checks for suggested 'review post' tasks.
+
 = 1.0.4 =
 
 Enhancements:
 
-* Improvements to the REST-API endpoint for getting stats.
-* Added a plugin-deactivation feedback form.
-* Removed celebration for "Perform all updates" if it was done by WordPress' automatic update.
-* Removed admin notices on the Progress Planner page.
-* Added option to redirect users to the Progress Planner dashboard after login.
+* We've moved Ravi's recommendations to the top left of your Progress Planner dashboard. They're the most important thing on there, so we wanted to give it prime placement.
+* We changed "Update post" to "Review post" / "Review page" and [wrote better instructions for reviewing old posts and pages](https://progressplanner.com/recommendations/review-post/). These tasks now prioritize the most important pages, like your About page, Privacy policy, Contact page and FAQ page.
+* Added an option to redirect users to the Progress Planner dashboard after login. The WordPress dashboard isn't particularly useful in our eyes, this mind entice you to action more.
+* Added a plugin-deactivation feedback form (we tell you, because you'll never see it, right? :) ).
+* Removed the celebration for "Perform all updates" if it was done by WordPress's automatic update. We all love confetti, but when it comes all the time without you doing anything, it loses its value, right? Hence this fix.
 
-Added Recommendations from Ravi:
-* Setting site icon.
-* Setting the tagline.
-* Deactivating the display of PHP debug messages.
-* Removing the default WP "Hello world" post.
-* Removing the default WP "Sample page" page.
+We've added the following Recommendations from Ravi:
+
+* [Setting site icon](https://progressplanner.com/recommendations/set-a-site-icon-aka-favicon/).
+* [Setting the tagline](https://progressplanner.com/recommendations/set-tagline/).
+* [Deactivating the display of PHP debug messages](https://progressplanner.com/recommendations/set-wp-debug/).
+* [Removing the default WP "Hello world" post](https://progressplanner.com/recommendations/delete-the-default-wordpress-hello-world-post/).
+* [Removing the default WP "Sample page" page](https://progressplanner.com/recommendations/delete-the-default-wordpress-sample-page-post/).
+
+Under the hood:
+
+* Improvements to the REST-API endpoint for getting stats.
+* Removed admin notices on the Progress Planner page.
 
 = 1.0.3 =
 

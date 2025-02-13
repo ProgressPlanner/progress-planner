@@ -41,14 +41,12 @@ class Sample_Page extends Local_OneTime_Tasks_Abstract {
 	protected $sample_page = false;
 
 	/**
-	 * Check if the task condition is met.
+	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
-	public function check_task_condition() {
-		$sample_page = $this->get_sample_page();
-
-		return null === $sample_page ? true : false;
+	public function should_add_task() {
+		return null !== $this->get_sample_page();
 	}
 
 	/**
