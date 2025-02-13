@@ -458,7 +458,7 @@ class Suggested_Tasks {
 	 *
 	 * @return bool
 	 */
-	public function check_task_condition( $condition ) {
+	public function should_add_task( $condition ) {
 		$parsed_condition = \wp_parse_args(
 			$condition,
 			[
@@ -472,7 +472,7 @@ class Suggested_Tasks {
 			$completed_tasks = $this->get_completed_tasks();
 
 			if ( \in_array( $parsed_condition['task_id'], $completed_tasks, true ) ) {
-				return true;
+				return false;
 			}
 		}
 
@@ -480,7 +480,7 @@ class Suggested_Tasks {
 			$pending_celebration_tasks = $this->get_pending_celebration();
 
 			if ( \in_array( $parsed_condition['task_id'], $pending_celebration_tasks, true ) ) {
-				return true;
+				return false;
 			}
 		}
 
@@ -488,7 +488,7 @@ class Suggested_Tasks {
 			$snoozed_tasks = $this->get_snoozed_tasks();
 
 			if ( \in_array( $parsed_condition['task_id'], $snoozed_tasks, true ) ) {
-				return true;
+				return false;
 			}
 		}
 
@@ -514,15 +514,26 @@ class Suggested_Tasks {
 			// Check if the snoozed post lengths match the condition.
 			foreach ( $parsed_condition['post_lengths'] as $post_length ) {
 				if ( ! isset( $snoozed_post_lengths[ $post_length ] ) ) {
-					return false;
+					return true;
 				}
 			}
 
-			return true;
+			return false;
 		}
 
 		// If no condition is met, return false.
 		return false;
+	}
+
+	/**
+	 * Backwards-compatible method to check if a task should be added.
+	 *
+	 * @param array $condition The condition.
+	 *
+	 * @return bool
+	 */
+	public function check_task_condition( $condition ) {
+		return ! $this->should_add_task( $condition );
 	}
 
 	/**
@@ -536,7 +547,7 @@ class Suggested_Tasks {
 
 		return (
 			// Check if the task was pending celebration.
-			true === $this->check_task_condition(
+			false === $this->should_add_task(
 				[
 					'type'    => 'pending_celebration',
 					'task_id' => $task_id,
@@ -544,7 +555,7 @@ class Suggested_Tasks {
 			)
 			||
 			// Check if the task was completed.
-			true === $this->check_task_condition(
+			false === $this->should_add_task(
 				[
 					'type'    => 'completed',
 					'task_id' => $task_id,

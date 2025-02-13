@@ -42,7 +42,7 @@ class Content_Create extends Content_Abstract {
 	 */
 	public function get_tasks_to_inject() {
 		// Early exit if we have both long and short posts snoozed.
-		if ( true === \progress_planner()->get_suggested_tasks()->check_task_condition(
+		if ( false === \progress_planner()->get_suggested_tasks()->should_add_task(
 			[
 				'type'         => 'snoozed-post-length',
 				'post_lengths' => [ 'long', 'short' ],
@@ -67,7 +67,7 @@ class Content_Create extends Content_Abstract {
 		);
 
 		// If the task with this length is snoozed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->check_task_condition(
+		if ( false === \progress_planner()->get_suggested_tasks()->should_add_task(
 			[
 				'type'         => 'snoozed-post-length',
 				'post_lengths' => [ $is_last_post_long ? 'short' : 'long' ],
