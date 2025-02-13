@@ -1,11 +1,10 @@
+/* global progressPlannerTour */
 /*
  * Tour
  *
  * A tour for the Progress Planner.
  *
  * Dependencies: driver
- *
- * global progressPlannerTour
  */
 const prplDriver = window.driver.js.driver;
 
