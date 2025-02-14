@@ -18,6 +18,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Sample_Page;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Hello_World;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Siteicon;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Php_Version;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Search_Engine_Visibility;
 
 /**
  * Local_Tasks_Manager class.
@@ -58,6 +59,7 @@ class Local_Tasks_Manager {
 			new Hello_World(),
 			new Core_Siteicon(),
 			new Php_Version(),
+			new Search_Engine_Visibility(),
 		];
 
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
