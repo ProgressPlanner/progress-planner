@@ -5,6 +5,10 @@ Under the hood:
 * Improved suggested tasks completion conditions.
 * Improved checks for suggested 'review post' tasks.
 
+We've added the following Recommendations from Ravi:
+
+* [Update PHP version](TBD).
+
 = 1.0.4 =
 
 Enhancements:
