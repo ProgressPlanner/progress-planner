@@ -34,6 +34,13 @@ class Rename_Uncategorized_Category extends Local_OneTime_Tasks_Abstract {
 	protected $capability = 'manage_categories';
 
 	/**
+	 * The Uncategorized category.
+	 *
+	 * @var int|null
+	 */
+	protected $uncategorized_category = null;
+
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
@@ -41,14 +48,13 @@ class Rename_Uncategorized_Category extends Local_OneTime_Tasks_Abstract {
 	public function should_add_task() {
 		global $wpdb;
 
-		$uncategorized_category = \progress_planner()->get_cache()->get( 'uncategorized-category' );
+		if ( null === $this->uncategorized_category ) {
 
-		if ( false === $uncategorized_category ) {
 			$default_category_name = __( 'Uncategorized' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 			$default_category_slug = sanitize_title( _x( 'Uncategorized', 'Default category slug' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 
 			// Get the Uncategorized category by name or slug.
-			$uncategorized_category = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$this->uncategorized_category = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
 					"SELECT $wpdb->terms.term_id FROM {$wpdb->terms}
 					LEFT JOIN {$wpdb->term_taxonomy} ON {$wpdb->terms}.term_id = {$wpdb->term_taxonomy}.term_id
@@ -59,10 +65,9 @@ class Rename_Uncategorized_Category extends Local_OneTime_Tasks_Abstract {
 				)
 			);
 
-			\progress_planner()->get_cache()->set( 'uncategorized-category', $uncategorized_category );
 		}
 
-		return ! empty( $uncategorized_category );
+		return ! empty( $this->uncategorized_category );
 	}
 
 	/**
