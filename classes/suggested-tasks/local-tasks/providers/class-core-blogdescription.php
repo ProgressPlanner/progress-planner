@@ -55,7 +55,7 @@ class Core_Blogdescription extends Local_OneTime_Tasks_Abstract {
 			'priority'    => 'high',
 			'type'        => $this->get_provider_type(),
 			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php' ) ) : '',
+			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php?pp-focus-el=tr:has(#blogdescription)' ) ) : '',
 			'description' => '<p>' . sprintf(
 				/* translators: %s:<a href="https://prpl.fyi/set-tagline" target="_blank">tagline</a> link */
 				\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
