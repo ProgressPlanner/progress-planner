@@ -107,6 +107,7 @@ class Page {
 	 * @return void
 	 */
 	public function enqueue_assets( $hook ) {
+		$this->maybe_enqueue_focus_el_script( $hook );
 		if ( 'toplevel_page_progress-planner' !== $hook && 'progress-planner_page_progress-planner-settings' !== $hook ) {
 			return;
 		}
@@ -146,6 +147,52 @@ class Page {
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
 			\wp_enqueue_script( 'progress-planner-settings-page' );
 		}
+	}
+
+	/**
+	 * Enqueue the focus element script.
+	 *
+	 * @param string $hook The current admin page.
+	 *
+	 * @return void
+	 */
+	public function maybe_enqueue_focus_el_script( $hook ) {
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
+		if ( empty( $tasks ) ) {
+			return;
+		}
+
+		// Check if we need to load the script.
+		$tasks_with_link_setting = [];
+		foreach ( $tasks as $task ) {
+			if ( ! isset( $task['link_setting']['hook'] ) ) {
+				continue;
+			}
+			if ( $hook === $task['link_setting']['hook'] ) {
+				$tasks_with_link_setting[] = $task;
+			}
+		}
+		if ( empty( $tasks_with_link_setting ) ) {
+			return;
+		}
+
+		// Register the scripts.
+		\progress_planner()->get_admin__scripts()->register_scripts();
+
+		\wp_enqueue_script( 'progress-planner-focus-element' );
+		\wp_localize_script(
+			'progress-planner-focus-element',
+			'progressPlannerFocusElement',
+			[
+				'tasks' => $tasks_with_link_setting,
+			]
+		);
+		\wp_enqueue_style(
+			'progress-planner-focus-element',
+			PROGRESS_PLANNER_URL . '/assets/css/focus-element.css',
+			[],
+			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/focus-element.css' )
+		);
 	}
 
 	/**
