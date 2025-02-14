@@ -39,12 +39,18 @@ class Rename_Uncategorized_Category extends Local_OneTime_Tasks_Abstract {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		$uncategorized_category = \get_terms(
-			[
-				'taxonomy'   => 'category',
-				'name'       => __( 'Uncategorized' ),  // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-				'hide_empty' => false,
-			]
+		global $wpdb;
+
+		$default_category_name = __( 'Uncategorized' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+		$default_category_slug = sanitize_title( _x( 'Uncategorized', 'Default category slug' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+
+		// Get the Uncategorized category by name or slug.
+		$uncategorized_category = $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT term_id FROM {$wpdb->terms} WHERE name = %s OR slug = %s",
+				$default_category_name,
+				$default_category_slug
+			)
 		);
 
 		return ! empty( $uncategorized_category );
