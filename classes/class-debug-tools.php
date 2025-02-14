@@ -71,46 +71,42 @@ class Debug_Tools {
 		);
 
 		// Add Delete Local Tasks submenu item.
-		$delete_url = add_query_arg( 'prpl_delete_local_tasks', '1', $current_url );
 		$admin_bar->add_node(
 			[
 				'id'     => 'prpl-delete-local-tasks',
 				'parent' => 'prpl-debug',
 				'title'  => 'Delete Local Tasks',
-				'href'   => $delete_url,
+				'href'   => add_query_arg( 'prpl_delete_local_tasks', '1', $current_url ),
 			]
 		);
 
 		// Add Delete Suggested Tasks submenu item.
-		$delete_url = add_query_arg( 'prpl_delete_suggested_tasks', '1', $current_url );
 		$admin_bar->add_node(
 			[
 				'id'     => 'prpl-delete-suggested-tasks',
 				'parent' => 'prpl-debug',
 				'title'  => 'Delete Suggested Tasks',
-				'href'   => $delete_url,
+				'href'   => add_query_arg( 'prpl_delete_suggested_tasks', '1', $current_url ),
 			]
 		);
 
 		// Add Delete License submenu item.
-		$delete_url = add_query_arg( 'prpl_delete_licenses', '1', $current_url );
 		$admin_bar->add_node(
 			[
 				'id'     => 'prpl-delete-licenses',
 				'parent' => 'prpl-debug',
 				'title'  => 'Delete Licenses',
-				'href'   => $delete_url,
+				'href'   => add_query_arg( 'prpl_delete_licenses', '1', $current_url ),
 			]
 		);
 
 		// Show all suggested tasks.
-		$show_all_tasks_url = add_query_arg( 'prpl_show_all_suggested_tasks', '99', $current_url );
 		$admin_bar->add_node(
 			[
 				'id'     => 'prpl-show-all-suggested-tasks',
 				'parent' => 'prpl-debug',
 				'title'  => 'Show All Suggested Tasks',
-				'href'   => $show_all_tasks_url,
+				'href'   => add_query_arg( 'prpl_show_all_suggested_tasks', '99', $current_url ),
 			]
 		);
 
@@ -193,30 +189,7 @@ class Debug_Tools {
 	}
 
 	/**
-	 * Modify the maximum number of suggested tasks to display.
-	 *
-	 * @param array $max_items_per_type Array of maximum items per task type.
-	 * @return array Modified array of maximum items per task type.
-	 */
-	public function check_show_all_suggested_tasks( $max_items_per_type ) {
-		if (
-			! isset( $_GET['prpl_show_all_suggested_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		) {
-			return $max_items_per_type;
-		}
-
-		$max_items = \absint( \wp_unslash( $_GET['prpl_show_all_suggested_tasks'] ) );  // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-		foreach ( $max_items_per_type as $key => $value ) {
-			$max_items_per_type[ $key ] = $max_items;
-		}
-
-		return $max_items_per_type;
-	}
-
-	/**
-	 * Add Suggestions submenu to the debug menu.
+	 * Add Suggestion Tasks submenu to the debug menu.
 	 *
 	 * Displays lists of completed, snoozed, and pending celebration tasks.
 	 *
@@ -280,6 +253,29 @@ class Debug_Tools {
 				);
 			}
 		}
+	}
+
+	/**
+	 * Modify the maximum number of suggested tasks to display.
+	 *
+	 * @param array $max_items_per_type Array of maximum items per task type.
+	 * @return array Modified array of maximum items per task type.
+	 */
+	public function check_show_all_suggested_tasks( $max_items_per_type ) {
+		if (
+			! isset( $_GET['prpl_show_all_suggested_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			! current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		) {
+			return $max_items_per_type;
+		}
+
+		$max_items = \absint( \wp_unslash( $_GET['prpl_show_all_suggested_tasks'] ) );  // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		foreach ( $max_items_per_type as $key => $value ) {
+			$max_items_per_type[ $key ] = $max_items;
+		}
+
+		return $max_items_per_type;
 	}
 
 	/**
