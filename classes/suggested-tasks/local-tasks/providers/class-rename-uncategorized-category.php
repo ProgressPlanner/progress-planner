@@ -47,7 +47,10 @@ class Rename_Uncategorized_Category extends Local_OneTime_Tasks_Abstract {
 		// Get the Uncategorized category by name or slug.
 		$uncategorized_category = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT term_id FROM {$wpdb->terms} WHERE name = %s OR slug = %s",
+				"SELECT $wpdb->terms.term_id FROM {$wpdb->terms}
+				LEFT JOIN {$wpdb->term_taxonomy} ON {$wpdb->terms}.term_id = {$wpdb->term_taxonomy}.term_id
+				WHERE ({$wpdb->terms}.name = %s OR {$wpdb->terms}.slug = %s)
+				AND {$wpdb->term_taxonomy}.taxonomy = 'category'",
 				$default_category_name,
 				$default_category_slug
 			)
