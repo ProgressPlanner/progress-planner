@@ -1,20 +1,23 @@
-// Get the focus element from the URL.
-const prplFocusElementFromUrl = window.location.href
-	.split( 'pp-focus-el=' )[ 1 ]
-	.replace( new RegExp( '---', 'g' ), ' ' ) // Replace spaces in the URL with 3 dashes.
-	.replace( new RegExp( '%28', 'g' ), '(' )
-	.replace( new RegExp( '%29', 'g' ), ')' )
-	.replace( new RegExp( '%3A', 'g' ), ':' )
-	.replace( new RegExp( '%2F', 'g' ), '/' )
-	.replace( new RegExp( '%2C', 'g' ), ',' )
-	.replace( new RegExp( '%20', 'g' ), ' ' );
+/* global progressPlannerFocusElement */
+console.log( progressPlannerFocusElement );
+if ( progressPlannerFocusElement.tasks ) {
+	progressPlannerFocusElement.tasks.forEach( ( task ) => {
+		const element = document.querySelector( task.link_setting.el );
+		const points = task.points || 0;
+		console.log( element, points );
+		if ( ! element || ! points ) {
+			return;
+		}
 
-if ( prplFocusElementFromUrl ) {
-	const prplFocusElement = document.querySelector( prplFocusElementFromUrl );
+		element.classList.add( 'prpl-element-awards-points' );
 
-	if ( prplFocusElement ) {
-		prplFocusElement.focus();
-		prplFocusElement.scrollIntoView( { behavior: 'smooth' } );
-		prplFocusElement.style.border = '2px solid #000';
-	}
+		// Check if we want to focus on the element, based on the URL.
+		const url = new URL( window.location.href );
+		const focusOnElement = url.searchParams.get( 'pp-focus-el' );
+		if ( focusOnElement === task.task_id ) {
+			element.focus();
+			element.scrollIntoView( { behavior: 'smooth' } );
+			element.classList.add( 'prpl-element-focused' );
+		}
+	} );
 }
