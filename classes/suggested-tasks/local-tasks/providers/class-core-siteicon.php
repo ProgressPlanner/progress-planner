@@ -56,7 +56,7 @@ class Core_Siteicon extends Local_OneTime_Tasks_Abstract {
 			'priority'    => 'high',
 			'type'        => $this->get_provider_type(),
 			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php' ) ) : '',
+			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php?pp-focus-el=.site-icon-section' ) ) : '',
 			'description' => '<p>' . sprintf(
 				/* translators: %s:<a href="https://prpl.fyi/set-site-icon" target="_blank">site icon</a> link */
 				\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),

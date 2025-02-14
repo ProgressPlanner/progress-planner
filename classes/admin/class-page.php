@@ -107,7 +107,11 @@ class Page {
 	 * @return void
 	 */
 	public function enqueue_assets( $hook ) {
-		if ( 'toplevel_page_progress-planner' !== $hook && 'progress-planner_page_progress-planner-settings' !== $hook ) {
+		if (
+			'toplevel_page_progress-planner' !== $hook &&
+			'progress-planner_page_progress-planner-settings' !== $hook
+			&& ! isset( $_GET['pp-focus-el'] ) // phpcs:ignore WordPress.Security.NonceVerification
+		) {
 			return;
 		}
 
@@ -145,6 +149,10 @@ class Page {
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
 			\wp_enqueue_script( 'progress-planner-settings-page' );
+		}
+
+		if ( isset( $_GET['pp-focus-el'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			\wp_enqueue_script( 'progress-planner-focus-element' );
 		}
 	}
 
