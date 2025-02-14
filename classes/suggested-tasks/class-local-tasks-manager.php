@@ -17,6 +17,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Debug_Display;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Sample_Page;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Hello_World;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Siteicon;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Php_Version;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Search_Engine_Visibility;
 
 /**
@@ -57,6 +58,7 @@ class Local_Tasks_Manager {
 			new Sample_Page(),
 			new Hello_World(),
 			new Core_Siteicon(),
+			new Php_Version(),
 			new Search_Engine_Visibility(),
 		];
 
