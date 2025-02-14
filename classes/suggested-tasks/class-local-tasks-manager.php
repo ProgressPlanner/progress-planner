@@ -18,6 +18,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Disable_Comments;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Sample_Page;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Hello_World;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Siteicon;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Rename_Uncategorized_Category;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Php_Version;
 
 /**
@@ -59,6 +60,7 @@ class Local_Tasks_Manager {
 			new Sample_Page(),
 			new Hello_World(),
 			new Core_Siteicon(),
+			new Rename_Uncategorized_Category(),
 			new Php_Version(),
 		];
 
