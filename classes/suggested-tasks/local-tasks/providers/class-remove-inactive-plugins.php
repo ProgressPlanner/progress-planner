@@ -32,9 +32,9 @@ class Remove_Inactive_Plugins extends Local_OneTime_Tasks_Abstract {
 	 *
 	 * @return bool
 	 */
-	public function check_task_condition() {
+	public function should_add_task() {
 		if ( ! function_exists( 'get_plugins' ) ) {
-			require_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
 		$plugins        = get_plugins();
@@ -42,7 +42,7 @@ class Remove_Inactive_Plugins extends Local_OneTime_Tasks_Abstract {
 		$plugins_total  = 0;
 
 		// Loop over the available plugins and check their versions and active state.
-		foreach ( $plugins as $plugin_path => $plugin ) {
+		foreach ( array_keys( $plugins ) as $plugin_path ) {
 			++$plugins_total;
 
 			if ( is_plugin_active( $plugin_path ) ) {
@@ -55,7 +55,7 @@ class Remove_Inactive_Plugins extends Local_OneTime_Tasks_Abstract {
 			$unused_plugins = $plugins_total - $plugins_active;
 		}
 
-		return $unused_plugins <= 0;
+		return $unused_plugins > 0;
 	}
 
 	/**
