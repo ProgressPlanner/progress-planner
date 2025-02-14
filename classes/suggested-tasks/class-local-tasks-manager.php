@@ -14,9 +14,11 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Blogdescription;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Settings_Saved;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Debug_Display;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Disable_Comments;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Sample_Page;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Hello_World;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Siteicon;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Php_Version;
 
 /**
  * Local_Tasks_Manager class.
@@ -53,9 +55,11 @@ class Local_Tasks_Manager {
 			new Core_Blogdescription(),
 			new Settings_Saved(),
 			new Debug_Display(),
+			new Disable_Comments(),
 			new Sample_Page(),
 			new Hello_World(),
 			new Core_Siteicon(),
+			new Php_Version(),
 		];
 
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
@@ -118,15 +122,23 @@ class Local_Tasks_Manager {
 	 * @return array
 	 */
 	public function inject_tasks( $tasks ) {
+		$provider_tasks  = [];
 		$tasks_to_inject = [];
 
 		// Loop through all registered task providers and inject their tasks.
 		foreach ( $this->task_providers as $provider_instance ) {
-			$tasks_to_inject = \array_merge( $tasks_to_inject, $provider_instance->get_tasks_to_inject() );
+			$provider_tasks = \array_merge( $provider_tasks, $provider_instance->get_tasks_to_inject() );
 		}
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.
-		foreach ( $tasks_to_inject as $task ) {
+		foreach ( $provider_tasks as $task ) {
+
+			// Skip the task if it was completed.
+			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task['task_id'] ) ) {
+				continue;
+			}
+
+			$tasks_to_inject[] = $task;
 			$this->add_pending_task( $task['task_id'] );
 		}
 

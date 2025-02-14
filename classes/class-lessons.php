@@ -54,9 +54,7 @@ class Lessons {
 			return $cached;
 		}
 
-		$response = \wp_remote_get(
-			$url
-		);
+		$response = \wp_remote_get( $url );
 
 		if ( \is_wp_error( $response ) ) {
 			\progress_planner()->get_cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );

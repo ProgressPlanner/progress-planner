@@ -396,6 +396,7 @@ class Page_Types {
 		if ( 'page' !== $post->post_type || 'publish' !== $post->post_status ) {
 			return;
 		}
+
 		$terms = \get_the_terms( $post_id, self::TAXONOMY_NAME );
 		if ( ! \is_array( $terms ) || ! isset( $terms[0] ) ) {
 			return;
