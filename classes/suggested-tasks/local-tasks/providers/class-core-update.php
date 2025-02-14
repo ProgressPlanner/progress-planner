@@ -43,18 +43,16 @@ class Core_Update extends Local_Repetitive_Tasks_Abstract {
 	 */
 
 	/**
-	 * Check if the task condition is satisfied.
-	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
+	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
-	public function check_task_condition() {
+	public function should_add_task() {
 		// Without this \wp_get_update_data() might not return correct data for the core updates (depending on the timing).
 		if ( ! function_exists( 'get_core_updates' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/update.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
-
-		return 0 === \wp_get_update_data()['counts']['total'] ? true : false;
+		return 0 < \wp_get_update_data()['counts']['total'];
 	}
 
 	/**
