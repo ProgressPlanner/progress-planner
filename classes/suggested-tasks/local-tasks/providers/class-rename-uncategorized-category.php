@@ -81,7 +81,6 @@ class Rename_Uncategorized_Category extends Local_OneTime_Tasks_Abstract {
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' ) ) : '',
 			'description' => '<p>' . sprintf(
-				/* translators: %s: php version */
 				\esc_html__( 'The Uncategorized category is used for posts that don\'t have a category. We recommend renaming it to something more descriptive, like "Posts without a category".', 'progress-planner' ),
 				phpversion()
 			) . '</p>',
