@@ -14,10 +14,12 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Blogdescription;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Settings_Saved;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Debug_Display;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Disable_Comments;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Sample_Page;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Hello_World;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Siteicon;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Permalink_Structure;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Php_Version;
 
 /**
  * Local_Tasks_Manager class.
@@ -54,10 +56,12 @@ class Local_Tasks_Manager {
 			new Core_Blogdescription(),
 			new Settings_Saved(),
 			new Debug_Display(),
+			new Disable_Comments(),
 			new Sample_Page(),
 			new Hello_World(),
 			new Core_Siteicon(),
 			new Core_Permalink_Structure(),
+			new Php_Version(),
 		];
 
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
