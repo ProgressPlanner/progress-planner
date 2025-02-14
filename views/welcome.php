@@ -185,7 +185,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 				</p>
 				<?php
 				// WIP: This is a temporary solution to display the completed tasks during onboarding.
-				$prpl_completed_task_providers = \progress_planner()->get_suggested_tasks()->get_onboarding_task_providers();
+				$prpl_completed_task_providers = \progress_planner()->get_plugin_upgrade_handler()->get_completed_task_providers();
 				if ( ! empty( $prpl_completed_task_providers ) ) :
 					?>
 				<div id="prpl-onboarding-tasks" style="display:none;">
