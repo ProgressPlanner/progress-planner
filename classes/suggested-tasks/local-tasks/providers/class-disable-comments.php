@@ -37,6 +37,15 @@ class Disable_Comments extends Local_OneTime_Tasks_Abstract {
 	}
 
 	/**
+	 * Check if the task is completed.
+	 *
+	 * @return bool
+	 */
+	public function is_task_completed() {
+		return 'closed' === \get_option( 'disable_comments' );
+	}
+
+	/**
 	 * Get the task details.
 	 *
 	 * @param string $task_id The task ID.
