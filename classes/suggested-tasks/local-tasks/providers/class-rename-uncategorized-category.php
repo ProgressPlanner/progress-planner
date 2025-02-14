@@ -41,20 +41,26 @@ class Rename_Uncategorized_Category extends Local_OneTime_Tasks_Abstract {
 	public function should_add_task() {
 		global $wpdb;
 
-		$default_category_name = __( 'Uncategorized' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-		$default_category_slug = sanitize_title( _x( 'Uncategorized', 'Default category slug' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+		$uncategorized_category = \progress_planner()->get_cache()->get( 'uncategorized-category' );
 
-		// Get the Uncategorized category by name or slug.
-		$uncategorized_category = $wpdb->get_var(
-			$wpdb->prepare(
-				"SELECT $wpdb->terms.term_id FROM {$wpdb->terms}
-				LEFT JOIN {$wpdb->term_taxonomy} ON {$wpdb->terms}.term_id = {$wpdb->term_taxonomy}.term_id
-				WHERE ({$wpdb->terms}.name = %s OR {$wpdb->terms}.slug = %s)
-				AND {$wpdb->term_taxonomy}.taxonomy = 'category'",
-				$default_category_name,
-				$default_category_slug
-			)
-		);
+		if ( false === $uncategorized_category ) {
+			$default_category_name = __( 'Uncategorized' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+			$default_category_slug = sanitize_title( _x( 'Uncategorized', 'Default category slug' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+
+			// Get the Uncategorized category by name or slug.
+			$uncategorized_category = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->prepare(
+					"SELECT $wpdb->terms.term_id FROM {$wpdb->terms}
+					LEFT JOIN {$wpdb->term_taxonomy} ON {$wpdb->terms}.term_id = {$wpdb->term_taxonomy}.term_id
+					WHERE ({$wpdb->terms}.name = %s OR {$wpdb->terms}.slug = %s)
+					AND {$wpdb->term_taxonomy}.taxonomy = 'category'",
+					$default_category_name,
+					$default_category_slug
+				)
+			);
+
+			\progress_planner()->get_cache()->set( 'uncategorized-category', $uncategorized_category );
+		}
 
 		return ! empty( $uncategorized_category );
 	}
@@ -80,10 +86,7 @@ class Rename_Uncategorized_Category extends Local_OneTime_Tasks_Abstract {
 			'type'        => $this->get_provider_type(),
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' ) ) : '',
-			'description' => '<p>' . sprintf(
-				\esc_html__( 'The Uncategorized category is used for posts that don\'t have a category. We recommend renaming it to something more descriptive.', 'progress-planner' ),
-				phpversion()
-			) . '</p>',
+			'description' => '<p>' . \esc_html__( 'The Uncategorized category is used for posts that don\'t have a category. We recommend renaming it to something more descriptive.', 'progress-planner' ) . '</p>',
 		];
 	}
 }
