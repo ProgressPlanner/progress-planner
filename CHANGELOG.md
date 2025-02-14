@@ -8,6 +8,7 @@ Under the hood:
 We've added the following Recommendations from Ravi:
 
 * [Update PHP version](TBD).
+* [Disable comments on your site](TBD).
 
 = 1.0.4 =
 
