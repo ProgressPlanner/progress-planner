@@ -183,6 +183,28 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					);
 					?>
 				</p>
+				<?php
+				// WIP: This is a temporary solution to display the completed tasks during onboarding.
+				$prpl_completed_task_providers = \progress_planner()->get_suggested_tasks()->get_onboarding_task_providers();
+				if ( ! empty( $prpl_completed_task_providers ) ) :
+					?>
+				<div id="prpl-onboarding-tasks" style="display:none;">
+					<strong class="prpl-onboarding-tasks-title"><?php echo \esc_html( \_n( 'Congratulations! You’ve already completed the following task:', 'Congratulations! You’ve already completed the following tasks:', count( $prpl_completed_task_providers ), 'progress-planner' ) ); ?></strong>
+					<ul class="prpl-onboarding-tasks-list">
+					<?php
+					foreach ( $prpl_completed_task_providers as $prpl_task_provider ) {
+						$prpl_task_details = $prpl_task_provider->get_task_details();
+						?>
+							<li class="prpl-onboarding-task">
+								<span class="dashicons dashicons-yes"></span> <span class="prpl-onboarding-task-title"><?php echo \esc_html( $prpl_task_details['title'] ); ?></span>
+							</li>
+						<?php
+					}
+					?>
+					</ul>
+				</div>
+				<?php endif; ?>
+
 				<div id="progress-planner-scan-progress" style="display:none;">
 					<progress value="0" max="100"></progress>
 				</div>

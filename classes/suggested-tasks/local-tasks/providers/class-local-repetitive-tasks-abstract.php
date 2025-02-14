@@ -51,7 +51,7 @@ abstract class Local_Repetitive_Tasks_Abstract extends Local_Tasks_Abstract {
 	 *
 	 * @return bool
 	 */
-	protected function is_task_completed() {
+	public function is_task_completed() {
 		return ! $this->should_add_task();
 	}
 

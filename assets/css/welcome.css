@@ -61,4 +61,21 @@
 		opacity: 0.5;
 		pointer-events: none;
 	}
+
+	#prpl-onboarding-tasks {
+
+		.prpl-onboarding-tasks-list {
+			margin-top: 1rem;
+			margin-left: 0;
+			padding-left: 0;
+			list-style: none;
+		}
+
+		.prpl-onboarding-task {
+			margin-top: 0.5rem;
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+	}
 }

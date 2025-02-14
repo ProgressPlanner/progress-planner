@@ -39,11 +39,12 @@ const progressPlannerTriggerScan = () => {
 				'progress-planner-scan-progress'
 			).style.display = 'none';
 
-			window.location.href =
-				window.location.href
-					.replace( '&content-scan-finished=true', '' )
-					.replace( '&content-scan', '' ) +
-				'&content-scan-finished=true';
+			// TODO: Depends on the new onboarding flow.
+			// window.location.href =
+			// 	window.location.href
+			// 		.replace( '&content-scan-finished=true', '' )
+			// 		.replace( '&content-scan', '' ) +
+			// 	'&content-scan-finished=true';
 
 			return;
 		}

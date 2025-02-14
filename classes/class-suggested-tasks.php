@@ -153,6 +153,36 @@ class Suggested_Tasks {
 	}
 
 	/**
+	 * Get the onboarding tasks.
+	 *
+	 * @return array
+	 */
+	public function get_onboarding_task_providers() {
+
+		// Whitelist the tasks that should be shown during onboarding.
+		$whitelisted_tasks = [
+			'core-blogdescription',
+			'core-siteicon',
+			'debug-display',
+			'disable-comments',
+			'hello-world',
+			'sample-page',
+			'php-version',
+		];
+
+		$completed_tasks = [];
+
+		foreach ( $whitelisted_tasks as $task_provider_id ) {
+			$task_provider = $this->local->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
+			if ( $task_provider && method_exists( $task_provider, 'is_task_completed' ) && $task_provider->is_task_completed() ) {
+				$completed_tasks[] = $task_provider;
+			}
+		}
+
+		return $completed_tasks;
+	}
+
+	/**
 	 * Return filtered items.
 	 *
 	 * @return array

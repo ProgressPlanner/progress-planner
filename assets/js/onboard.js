@@ -49,6 +49,13 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 			// Make a local request to save the response data.
 			progressPlannerSaveLicenseKey( response.license_key );
 
+			// Display the tasks.
+			if ( document.getElementById( 'prpl-onboarding-tasks' ) ) {
+				document.getElementById(
+					'prpl-onboarding-tasks'
+				).style.display = 'block';
+			}
+
 			// Start scanning posts.
 			progressPlannerTriggerScan();
 		},
