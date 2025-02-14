@@ -32,8 +32,8 @@ class Disable_Comments extends Local_OneTime_Tasks_Abstract {
 	 *
 	 * @return bool
 	 */
-	public function check_task_condition() {
-		return 10 < \wp_count_comments()->approved;
+	public function should_add_task() {
+		return 10 >= \wp_count_comments()->approved;
 	}
 
 	/**
