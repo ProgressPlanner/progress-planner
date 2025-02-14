@@ -27,14 +27,13 @@ class Core_Siteicon extends Local_OneTime_Tasks_Abstract {
 	const TYPE = 'configuration';
 
 	/**
-	 * Check if the task condition is satisfied.
-	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
+	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
-	public function check_task_condition() {
+	public function should_add_task() {
 		$site_icon = \get_option( 'site_icon' );
-		return ( '' !== $site_icon && '0' !== $site_icon ) ? true : false;
+		return '' === $site_icon || '0' === $site_icon;
 	}
 
 	/**

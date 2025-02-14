@@ -468,60 +468,57 @@ class Suggested_Tasks {
 			]
 		);
 
-		if ( 'completed' === $parsed_condition['type'] ) {
-			$completed_tasks = $this->get_completed_tasks();
+		switch ( $parsed_condition['type'] ) {
+			case 'completed':
+				if ( \in_array( $parsed_condition['task_id'], $this->get_completed_tasks(), true ) ) {
+					return true;
+				}
+				break;
 
-			if ( \in_array( $parsed_condition['task_id'], $completed_tasks, true ) ) {
-				return true;
-			}
-		}
+			case 'pending_celebration':
+				if ( \in_array( $parsed_condition['task_id'], $this->get_pending_celebration(), true ) ) {
+					return true;
+				}
+				break;
 
-		if ( 'pending_celebration' === $parsed_condition['type'] ) {
-			$pending_celebration_tasks = $this->get_pending_celebration();
+			case 'snoozed':
+				if ( \in_array( $parsed_condition['task_id'], $this->get_snoozed_tasks(), true ) ) {
+					return true;
+				}
+				break;
 
-			if ( \in_array( $parsed_condition['task_id'], $pending_celebration_tasks, true ) ) {
-				return true;
-			}
-		}
-
-		if ( 'snoozed' === $parsed_condition['type'] ) {
-			$snoozed_tasks = $this->get_snoozed_tasks();
-
-			if ( \in_array( $parsed_condition['task_id'], $snoozed_tasks, true ) ) {
-				return true;
-			}
-		}
-
-		if ( 'snoozed-post-length' === $parsed_condition['type'] && isset( $parsed_condition['post_lengths'] ) ) {
-			if ( ! \is_array( $parsed_condition['post_lengths'] ) ) {
-				$parsed_condition['post_lengths'] = [ $parsed_condition['post_lengths'] ];
-			}
-
-			$snoozed_tasks        = $this->get_snoozed_tasks();
-			$snoozed_post_lengths = [];
-
-			// Get the post lengths of the snoozed tasks.
-			foreach ( $snoozed_tasks as $task ) {
-				$data = $this->local->get_data_from_task_id( $task['id'] ); // @phpstan-ignore-line method.nonObject
-				if ( isset( $data['type'] ) && 'create-post' === $data['type'] ) {
-					$key = true === $data['long'] ? 'long' : 'short';
-					if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
-						$snoozed_post_lengths[ $key ] = true;
+			case 'snoozed-post-length':
+				if ( isset( $parsed_condition['post_lengths'] ) ) {
+					if ( ! \is_array( $parsed_condition['post_lengths'] ) ) {
+						$parsed_condition['post_lengths'] = [ $parsed_condition['post_lengths'] ];
 					}
-				}
-			}
 
-			// Check if the snoozed post lengths match the condition.
-			foreach ( $parsed_condition['post_lengths'] as $post_length ) {
-				if ( ! isset( $snoozed_post_lengths[ $post_length ] ) ) {
-					return false;
-				}
-			}
+					$snoozed_tasks        = $this->get_snoozed_tasks();
+					$snoozed_post_lengths = [];
 
-			return true;
+					// Get the post lengths of the snoozed tasks.
+					foreach ( $snoozed_tasks as $task ) {
+						$data = $this->local->get_data_from_task_id( $task['id'] ); // @phpstan-ignore-line method.nonObject
+						if ( isset( $data['type'] ) && 'create-post' === $data['type'] ) {
+							$key = true === $data['long'] ? 'long' : 'short';
+							if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
+								$snoozed_post_lengths[ $key ] = true;
+							}
+						}
+					}
+
+					// Check if the snoozed post lengths match the condition.
+					foreach ( $parsed_condition['post_lengths'] as $post_length ) {
+						if ( ! isset( $snoozed_post_lengths[ $post_length ] ) ) {
+							return false;
+						}
+					}
+
+					return true;
+				}
+				break;
 		}
 
-		// If no condition is met, return false.
 		return false;
 	}
 
