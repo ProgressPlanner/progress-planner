@@ -42,6 +42,13 @@ class Reduce_Autoloaded_Options extends Local_OneTime_Tasks_Abstract {
 	private $is_plugin_active = null;
 
 	/**
+	 * Threshold for the number of autoloaded options.
+	 *
+	 * @var int
+	 */
+	private $autoloaded_options_threshold = 10; // TODO: 10 is just for testing purposes.
+
+	/**
 	 * The plugin path.
 	 *
 	 * @var string
@@ -60,7 +67,7 @@ class Reduce_Autoloaded_Options extends Local_OneTime_Tasks_Abstract {
 			return true;
 		}
 
-		return $this->get_autoloaded_options_count() > 10; // TODO: 10 is just for testing purposes.
+		return $this->get_autoloaded_options_count() > $this->autoloaded_options_threshold;
 	}
 
 	/**
@@ -69,7 +76,7 @@ class Reduce_Autoloaded_Options extends Local_OneTime_Tasks_Abstract {
 	 * @return bool
 	 */
 	public function is_task_completed() {
-		return $this->is_plugin_active();
+		return $this->is_plugin_active() || $this->get_autoloaded_options_count() <= $this->autoloaded_options_threshold;
 	}
 
 	/**
