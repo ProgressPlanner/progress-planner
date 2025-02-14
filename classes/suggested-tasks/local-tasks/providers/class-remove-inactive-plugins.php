@@ -34,7 +34,7 @@ class Remove_Inactive_Plugins extends Local_OneTime_Tasks_Abstract {
 	 */
 	public function should_add_task() {
 		if ( ! function_exists( 'get_plugins' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+			require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
 
 		$plugins        = get_plugins();
