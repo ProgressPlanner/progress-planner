@@ -63,8 +63,9 @@ class Core_Siteicon extends Local_OneTime_Tasks_Abstract {
 				'<a href="https://prpl.fyi/set-site-icon" target="_blank">' . \esc_html__( 'site icon', 'progress-planner' ) . '</a>'
 			) . '</p>',
 			'link_setting' => [
-				'hook' => 'options-general.php',
-				'el'   => '.site-icon-section th',
+				'hook'      => 'options-general.php',
+				'iconEl'    => '.site-icon-section th',
+				'wrapperEl' => '.site-icon-section',
 			],
 		];
 	}

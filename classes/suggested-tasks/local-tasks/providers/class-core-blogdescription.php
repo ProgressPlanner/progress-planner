@@ -62,8 +62,9 @@ class Core_Blogdescription extends Local_OneTime_Tasks_Abstract {
 				'<a href="https://prpl.fyi/set-tagline" target="_blank">' . \esc_html__( 'tagline', 'progress-planner' ) . '</a>'
 			) . '</p>',
 			'link_setting' => [
-				'hook' => 'options-general.php',
-				'el'   => 'th:has(+td #tagline-description)',
+				'hook'      => 'options-general.php',
+				'iconEl'    => 'th:has(+td #tagline-description)',
+				'wrapperEl' => 'tr:has(#tagline-description)',
 			],
 		];
 	}
