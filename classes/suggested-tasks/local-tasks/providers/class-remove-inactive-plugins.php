@@ -80,7 +80,7 @@ class Remove_Inactive_Plugins extends Local_OneTime_Tasks_Abstract {
 			'points'      => 1,
 			'url'         => '',
 			'dismissible' => true,
-			'description' => '<p>' . \esc_html__( 'You have inactive plugins. Consider removing any plugins that are not activated to free up resources, improve site performance and security.', 'progress-planner' ) . '</p>',
+			'description' => '<p>' . \esc_html__( 'You have inactive plugins. Consider removing any plugins that are not activated to free up resources, and improve security.', 'progress-planner' ) . '</p>',
 		];
 	}
 }
