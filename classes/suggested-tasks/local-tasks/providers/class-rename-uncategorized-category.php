@@ -48,6 +48,8 @@ class Rename_Uncategorized_Category extends Local_OneTime_Tasks_Abstract {
 	public function should_add_task() {
 		global $wpdb;
 
+		$this->uncategorized_category = null;
+
 		if ( null === $this->uncategorized_category ) {
 
 			$default_category_name = __( 'Uncategorized' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
