@@ -106,14 +106,12 @@ class Base {
 			new Plugin_Deactivation();
 		}
 
-<<<<<<< HEAD
 		$this->cached['plugin_upgrade_handler'] = new Plugin_Upgrade_Handler();
-=======
+
 		// Debug tools.
 		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {
 			new Debug_Tools();
 		}
->>>>>>> develop
 
 		/**
 		 * Redirect on login.
