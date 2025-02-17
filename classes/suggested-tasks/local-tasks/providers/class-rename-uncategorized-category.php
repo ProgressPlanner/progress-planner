@@ -91,7 +91,7 @@ class Rename_Uncategorized_Category extends Local_OneTime_Tasks_Abstract {
 			'type'        => $this->get_provider_type(),
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' ) ) : '',
-			'description' => '<p>' . \esc_html__( 'The Uncategorized category is used for posts that don\'t have a category. We recommend renaming it to something more descriptive.', 'progress-planner' ) . '</p>',
+			'description' => '<p>' . \esc_html__( 'The Uncategorized category is used for posts that don\'t have a category. We recommend renaming it to something that fits your site better.', 'progress-planner' ) . '</p>',
 		];
 	}
 }
