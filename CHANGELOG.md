@@ -7,6 +7,7 @@ Under the hood:
 
 We've added the following Recommendations from Ravi:
 
+* [Setting the permalink structure](TBD).
 * [Update PHP version](TBD).
 * [Disable comments on your site](TBD).
 * [Search engine visibility](TBD).
