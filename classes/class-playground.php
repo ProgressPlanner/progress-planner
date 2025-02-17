@@ -16,7 +16,7 @@ class Playground {
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_action( 'init', [ $this, 'register_hooks' ] );
+		\add_action( 'init', [ $this, 'register_hooks' ], 9 );
 	}
 
 	/**
