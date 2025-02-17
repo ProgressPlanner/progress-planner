@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 /**
  * Add tasks to check if WP debug is enabled.
  */
-class Debug_Display extends Local_OneTime_Tasks_Abstract {
+class Search_Engine_Visibility extends Local_OneTime_Tasks_Abstract {
 
 	/**
 	 * The provider type.
@@ -24,7 +24,7 @@ class Debug_Display extends Local_OneTime_Tasks_Abstract {
 	 *
 	 * @var string
 	 */
-	const ID = 'wp-debug-display';
+	const ID = 'search-engine-visibility';
 
 	/**
 	 * Check if the task should be added.
@@ -32,7 +32,7 @@ class Debug_Display extends Local_OneTime_Tasks_Abstract {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
+		return 0 === (int) \get_option( 'blog_public' );
 	}
 
 	/**
@@ -50,18 +50,14 @@ class Debug_Display extends Local_OneTime_Tasks_Abstract {
 
 		return [
 			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Disable public display of PHP errors', 'progress-planner' ),
+			'title'       => \esc_html__( 'Allow your site to be indexed by search engines', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
 			'type'        => $this->get_provider_type(),
 			'points'      => 1,
-			'url'         => '',
-			'description' => '<p>' . sprintf(
-				// translators: %1$s is the name of the WP_DEBUG_DISPLAY constant, %2$s <a href="https://prpl.fyi/set-wp-debug" target="_blank">We recommend</a> link.
-				\esc_html__( '%1$s is enabled. This means that errors are shown to users. %2$s disabling it.', 'progress-planner' ),
-				'<code>WP_DEBUG_DISPLAY</code>',
-				'<a href="https://prpl.fyi/set-wp-debug" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>'
-			) . '</p>',
+			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-reading.php' ) ) : '',
+			'dismissible' => true,
+			'description' => '<p>' . \esc_html__( 'Your site is not currently visible to search engines. Consider allowing search engines to index your site.', 'progress-planner' ) . '</p>',
 		];
 	}
 }

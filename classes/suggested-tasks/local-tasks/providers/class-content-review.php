@@ -133,6 +133,12 @@ class Content_Review extends Content_Abstract {
 					'post_id' => $post->ID, // @phpstan-ignore-line property.nonObject
 				]
 			);
+
+			// Don't add the task if it was completed.
+			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
+				continue;
+			}
+
 			$items[] = $this->get_task_details( $task_id );
 		}
 		return $items;
@@ -157,7 +163,11 @@ class Content_Review extends Content_Abstract {
 		$task_details = [
 			'task_id'     => $task_id,
 			// translators: %1$s: The post type, %2$s: The post title.
-			'title'       => sprintf( 'Review %1$s "%2$s"', \esc_html( $post->post_type ), \esc_html( $post->post_title ) ), // @phpstan-ignore-line property.nonObject
+			'title'       => sprintf(
+				'Review %1$s "%2$s"',
+				strtolower( get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
+				\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
+			),
 			'parent'      => 0,
 			'priority'    => 'high',
 			'type'        => $this->get_provider_type(),

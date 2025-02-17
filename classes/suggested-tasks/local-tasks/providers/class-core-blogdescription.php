@@ -27,12 +27,12 @@ class Core_Blogdescription extends Local_OneTime_Tasks_Abstract {
 	const TYPE = 'configuration';
 
 	/**
-	 * Check if the task condition is met.
+	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
-	public function check_task_condition() {
-		return '' !== \get_bloginfo( 'description' ) ? true : false;
+	public function should_add_task() {
+		return '' === \get_bloginfo( 'description' );
 	}
 
 	/**

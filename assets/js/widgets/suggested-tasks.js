@@ -35,7 +35,7 @@ const progressPlannerGetNextItemFromType = ( type ) => {
 
 	// Remove completed and snoozed items.
 	const tasks = progressPlannerSuggestedTasks.tasks;
-	const items = tasks.details[ type ];
+	let items = tasks.details[ type ];
 	const completed = tasks.completed;
 	const snoozed = tasks.snoozed;
 
@@ -47,19 +47,28 @@ const progressPlannerGetNextItemFromType = ( type ) => {
 			inList.push( item.getAttribute( 'data-task-id' ).toString() );
 		} );
 
-	items.forEach( function ( item ) {
-		if (
-			completed.includes( item.task_id.toString() ) ||
-			inList.includes( item.task_id.toString() )
-		) {
-			items.splice( items.indexOf( item ), 1 );
-		}
-		snoozed.forEach( ( snoozedItem ) => {
-			if ( item.task_id.toString() === snoozedItem.id ) {
-				items.splice( items.indexOf( item ), 1 );
-			}
-		} );
+	// Remove items which are completed or already in the list.
+	items = items.filter( function ( item ) {
+		return (
+			! completed.includes( item.task_id.toString() ) &&
+			! inList.includes( item.task_id.toString() )
+		);
 	} );
+
+	// Remove items which are snoozed.
+	items = items.filter( function ( item ) {
+		for ( let i = 0; i < snoozed.length; i++ ) {
+			if ( item.task_id.toString() === snoozed[ i ].id.toString() ) {
+				return false;
+			}
+		}
+		return true;
+	} );
+
+	// Do nothing if there are no items left.
+	if ( 0 === items.length ) {
+		return null;
+	}
 
 	// Get items with a priority set to `high`.
 	const highPriorityItems = items.filter( function ( item ) {

@@ -68,8 +68,20 @@ final class Suggested_Tasks extends Widget {
 			'progress-planner-document-ready',
 		];
 
+		// Check if need to load confetti for the local tasks.
+		$load_confetti = ! empty( $pending_celebration );
+
+		foreach ( $pending_tasks as $type => $tasks ) {
+			foreach ( $tasks as $task ) {
+				if ( isset( $task['dismissable'] ) && $task['dismissable'] ) {
+					$load_confetti = true;
+					break 2; // Break out of the foreach loops.
+				}
+			}
+		}
+
 		// Check if need to load confetti.
-		if ( isset( $pending_tasks['content-update'] ) || ! empty( $pending_celebration ) ) {
+		if ( $load_confetti ) {
 			$deps[] = 'particles-confetti';
 		} else {
 			// Check if there are remote tasks to inject, checking here as it might involve an API call.
