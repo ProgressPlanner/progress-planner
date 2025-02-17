@@ -19,7 +19,10 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Sample_Page;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Hello_World;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Remove_Inactive_Plugins;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Siteicon;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Rename_Uncategorized_Category;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Permalink_Structure;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Php_Version;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Search_Engine_Visibility;
 
 /**
  * Local_Tasks_Manager class.
@@ -61,7 +64,10 @@ class Local_Tasks_Manager {
 			new Hello_World(),
 			new Remove_Inactive_Plugins(),
 			new Core_Siteicon(),
+			new Rename_Uncategorized_Category(),
+			new Core_Permalink_Structure(),
 			new Php_Version(),
+			new Search_Engine_Visibility(),
 		];
 
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
