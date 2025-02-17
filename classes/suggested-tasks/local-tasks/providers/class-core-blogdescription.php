@@ -63,7 +63,7 @@ class Core_Blogdescription extends Local_OneTime_Tasks_Abstract {
 			) . '</p>',
 			'link_setting' => [
 				'hook' => 'options-general.php',
-				'el'   => 'tr:has(#blogdescription)',
+				'el'   => 'th:has(+td #tagline-description)',
 			],
 		];
 	}

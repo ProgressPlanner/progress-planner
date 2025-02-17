@@ -64,7 +64,7 @@ class Core_Siteicon extends Local_OneTime_Tasks_Abstract {
 			) . '</p>',
 			'link_setting' => [
 				'hook' => 'options-general.php',
-				'el'   => '.site-icon-section .site-icon-action-buttons button',
+				'el'   => '.site-icon-section th',
 			],
 		];
 	}
