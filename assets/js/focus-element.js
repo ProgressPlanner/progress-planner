@@ -5,11 +5,10 @@ if ( progressPlannerFocusElement.tasks ) {
 		const iconEl = document.querySelector( task.link_setting.iconEl );
 		const wrapperEl = document.querySelector( task.link_setting.wrapperEl );
 		const points = task.points || 0;
-		if ( ! iconEl || ! wrapperEl || ! points ) {
-			return;
-		}
 
 		iconEl.classList.add( 'prpl-element-awards-points-icon' );
+		iconEl.setAttribute( 'data-prpl-points', points );
+		wrapperEl.setAttribute( 'data-prpl-points', points );
 
 		// Check if we want to focus on the element, based on the URL.
 		const url = new URL( window.location.href );
