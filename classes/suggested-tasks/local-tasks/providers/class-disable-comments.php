@@ -73,10 +73,11 @@ class Disable_Comments extends Local_OneTime_Tasks_Abstract {
 					\_n(
 						'There is %d comment. If you don\'t need comments on your site, consider disabling them.',
 						'There are %d comments. If you don\'t need comments on your site, consider disabling them.',
-						\wp_count_comments()->approved,
+						(int) \wp_count_comments()->approved,
 						'progress-planner'
 					)
-				)
+				),
+				(int) \wp_count_comments()->approved
 			) . '</p>',
 		];
 	}
