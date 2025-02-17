@@ -33,7 +33,7 @@ class Disable_Comments extends Local_OneTime_Tasks_Abstract {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return 10 < \wp_count_comments()->approved && 'closed' !== \get_option( 'disable_comments' );
+		return 10 > \wp_count_comments()->approved && 'closed' !== \get_option( 'disable_comments' );
 	}
 
 	/**
@@ -68,9 +68,16 @@ class Disable_Comments extends Local_OneTime_Tasks_Abstract {
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-discussion.php' ) ) : '', // @phpstan-ignore-line property.nonObject
 			'dismissable' => true,
 			'description' => '<p>' . sprintf(
-				// translators: %d is the number of approved comments.
-				\esc_html__( 'There are %d comments. If you don\'t need comments on your site, consider disabling them.', 'progress-planner' ),
-				\wp_count_comments()->approved,
+				\esc_html(
+					// translators: %d is the number of approved comments.
+					\_n(
+						'There is %d comment. If you don\'t need comments on your site, consider disabling them.',
+						'There are %d comments. If you don\'t need comments on your site, consider disabling them.',
+						(int) \wp_count_comments()->approved,
+						'progress-planner'
+					)
+				),
+				(int) \wp_count_comments()->approved
 			) . '</p>',
 		];
 	}
