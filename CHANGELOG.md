@@ -5,6 +5,14 @@ Under the hood:
 * Improved suggested tasks completion conditions.
 * Improved checks for suggested 'review post' tasks.
 
+We've added the following Recommendations from Ravi:
+
+* [Setting the permalink structure](TBD).
+* [Update PHP version](TBD).
+* [Disable comments on your site](TBD).
+* [Remove inactive plugins](TBD).
+* [Search engine visibility](TBD).
+
 = 1.0.4 =
 
 Enhancements:
