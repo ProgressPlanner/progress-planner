@@ -46,7 +46,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 		<div class="left">
 			<form id="prpl-onboarding-form">
 				<div class="prpl-form-notice">
-					<strong><?php \esc_html_e( 'Stay on track with weekly updates', 'progress-planner' ); ?></strong>
+					<strong class="prpl-form-notice-title"><?php \esc_html_e( 'Stay on track with weekly updates', 'progress-planner' ); ?></strong>
 					<ul>
 						<li>
 						<?php
