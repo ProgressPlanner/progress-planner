@@ -169,6 +169,7 @@ if ( document.getElementById( 'prpl-onboarding-form' ) ) {
 
 async function progressPlannerOnboardTasks() {
 	const tasksElement = document.getElementById( 'prpl-onboarding-tasks' );
+	const timeToWait = 2000;
 
 	if ( ! tasksElement ) {
 		return;
@@ -212,7 +213,7 @@ async function progressPlannerOnboardTasks() {
 
 					resolve(); // Mark this task as complete.
 				},
-				( index + 1 ) * 2000
+				( index + 1 ) * timeToWait
 			);
 		} );
 	} );
@@ -220,19 +221,65 @@ async function progressPlannerOnboardTasks() {
 	// Wait for all tasks to complete.
 	await Promise.all( tasks );
 
+	// We add a small delay to make sure the user sees if the last task is completed and total points.
+	await new Promise( ( resolve ) => setTimeout( resolve, timeToWait ) );
+
 	// Set the data-onboarding-finished attribute.
 	tasksElement.setAttribute( 'data-onboarding-finished', 'true' );
 
 	// Redirect if scanning is finished.
+	onBoardRedirect( 'onboardTasks' );
+}
+
+/**
+ * Redirect user to the stats page after onboarding.
+ * We redirect if both post scanning and onboarding tasks are finished.
+ *
+ * @param {string} context The context of the redirect.
+ */
+function onBoardRedirect( context = '' ) {
+	const scanProgressElement = document.getElementById(
+		'progress-planner-scan-progress'
+	);
+	const onboardingTasksElement = document.getElementById(
+		'prpl-onboarding-tasks'
+	);
+
+	const redirectUrl = window.location.href
+		.replace( '&content-scan-finished=true', '' )
+		.replace( '&content-scan', '' )
+		.replace( '&delay-tour=true', '' );
+
+	// If context is scanPosts and for some reason the onboarding tasks element is not found (or other way around), redirect.
 	if (
-		'true' ===
-		document
-			.getElementById( 'progress-planner-scan-progress' )
-			.getAttribute( 'data-onboarding-finished' )
+		( 'scanPosts' === context && ! onboardingTasksElement ) ||
+		( context === 'onboardTasks' && ! scanProgressElement )
 	) {
-		window.location.href =
-			window.location.href
-				.replace( '&content-scan-finished=true', '' )
-				.replace( '&content-scan', '' ) + '&content-scan-finished=true';
+		window.location.href = redirectUrl + '&content-scan-finished=true';
+	}
+
+	// Both elements are found, check if both are completed.
+	if ( onboardingTasksElement && scanProgressElement ) {
+		if (
+			'true' ===
+				onboardingTasksElement.getAttribute(
+					'data-onboarding-finished'
+				) &&
+			'true' ===
+				scanProgressElement.getAttribute( 'data-onboarding-finished' )
+		) {
+			// Check if there are completed tasks, delay tour so the user can see the celebration.
+			if (
+				onboardingTasksElement.querySelectorAll(
+					'.prpl-onboarding-task-completed'
+				).length > 0
+			) {
+				window.location.href =
+					redirectUrl + '&content-scan-finished=true&delay-tour=true';
+			} else {
+				window.location.href =
+					redirectUrl + '&content-scan-finished=true';
+			}
+		}
 	}
 }

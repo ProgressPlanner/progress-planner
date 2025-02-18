@@ -1,4 +1,4 @@
-/* global progressPlanner, progressPlannerAjaxRequest */
+/* global progressPlanner, progressPlannerAjaxRequest, onBoardRedirect */
 /*
  * Scan Posts
  *
@@ -45,19 +45,8 @@ const progressPlannerTriggerScan = () => {
 				'true'
 			);
 
-			// Check if scanning task is completed, redirect if so.
-			if (
-				'true' ===
-				document
-					.getElementById( 'prpl-onboarding-tasks' )
-					.getAttribute( 'data-onboarding-finished' )
-			) {
-				window.location.href =
-					window.location.href
-						.replace( '&content-scan-finished=true', '' )
-						.replace( '&content-scan', '' ) +
-					'&content-scan-finished=true';
-			}
+			// Redirect if scanning is finished.
+			onBoardRedirect( 'scanPosts' );
 
 			return;
 		}

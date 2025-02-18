@@ -125,10 +125,21 @@ function prplStartTour() {
 		window.location.href
 			.replace( '&content-scan-finished=true', '' )
 			.replace( 'content-scan-finished=true', '' )
+			.replace( '&delay-tour=true', '' )
+			.replace( 'delay-tour=true', '' )
 	);
 }
 
 // Start the tour if the URL contains the query parameter.
 if ( window.location.href.includes( 'content-scan-finished=true' ) ) {
-	prplStartTour();
+	let delay = 0;
+
+	// If there are pending celebration tasks, delay the tour until celebration is done.
+	if ( window.location.href.includes( 'delay-tour=true' ) ) {
+		delay = 5000;
+	}
+
+	setTimeout( () => {
+		prplStartTour();
+	}, delay );
 }

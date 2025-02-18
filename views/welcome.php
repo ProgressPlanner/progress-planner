@@ -193,7 +193,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 
 					$prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 					?>
-				<div id="prpl-onboarding-tasks">
+				<div id="prpl-onboarding-tasks" style="display:none;">
 					<strong class="prpl-onboarding-tasks-title"><?php \esc_html_e( "Let's check off what you've already done! We're checking your site now—this will only take a minute...", 'progress-planner' ); ?></strong>
 					<ul class="prpl-onboarding-tasks-list">
 					<?php

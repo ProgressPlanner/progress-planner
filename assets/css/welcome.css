@@ -169,7 +169,7 @@
 		}
 
 		/* Hide the points loader and icons. */
-		.prpl-suggested-task-points-loader,
+		.prpl-suggested-task-loader,
 		.icon-check-circle,
 		.icon-exclamation-circle {
 			display: none;
@@ -177,7 +177,7 @@
 
 		.prpl-onboarding-task-loading {
 
-			.prpl-suggested-task-points-loader {
+			.prpl-suggested-task-loader {
 				display: grid;
 			}
 
