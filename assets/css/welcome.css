@@ -132,8 +132,8 @@
 			/* display: grid; */
 			border-radius: 50%;
 			background:
-				linear-gradient(0deg, rgb(244 63 94/50%) 30%, #0000 0 70%, rgb(244 63 94/100%) 0) 50%/8% 100%,
-				linear-gradient(90deg, rgb(244 63 94/25%) 30%, #0000 0 70%, rgb(244 63 94/75%) 0) 50%/100% 8%;
+				linear-gradient(0deg, rgb(250 163 16/50%) 30%, #0000 0 70%, rgb(250 163 16/100%) 0) 50%/8% 100%,
+				linear-gradient(90deg, rgb(250 163 16/25%) 30%, #0000 0 70%, rgb(250 163 16/75%) 0) 50%/100% 8%;
 			background-repeat: no-repeat;
 			animation: l23 1s infinite steps(12);
 
@@ -193,7 +193,8 @@
 	.prpl-onboarding-tasks-footer {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
+		align-items: flex-start;
+		gap: 2rem;
 
 		.prpl-onboarding-tasks-montly-badge {
 			display: flex;

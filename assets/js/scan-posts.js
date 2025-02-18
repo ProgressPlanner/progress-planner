@@ -35,16 +35,22 @@ const progressPlannerTriggerScan = () => {
 
 		// Refresh the page when scan has finished.
 		if ( response.data.progress >= 100 ) {
-			document.getElementById(
+			const scanProgressElement = document.getElementById(
 				'progress-planner-scan-progress'
-			).style.display = 'none';
+			);
 
-			// TODO: Depends on the new onboarding flow.
-			// window.location.href =
-			// 	window.location.href
-			// 		.replace( '&content-scan-finished=true', '' )
-			// 		.replace( '&content-scan', '' ) +
-			// 	'&content-scan-finished=true';
+			scanProgressElement.style.display = 'none';
+			scanProgressElement.setAttribute( 'data-onboarding-finished', 'true' );
+
+			// Check if scanning task is completed, redirect if so.
+			if ( document.getElementById( 'prpl-onboarding-tasks' ).getAttribute( 'data-onboarding-finished' ) === 'true' ) {
+				console.log( 'Scan finished' );
+				// window.location.href =
+				// 	window.location.href
+				// 		.replace( '&content-scan-finished=true', '' )
+				// 		.replace( '&content-scan', '' ) +
+				// '&content-scan-finished=true';
+			}
 
 			return;
 		}

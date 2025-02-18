@@ -49,13 +49,6 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 			// Make a local request to save the response data.
 			progressPlannerSaveLicenseKey( response.license_key );
 
-			// Display the tasks.
-			if ( document.getElementById( 'prpl-onboarding-tasks' ) ) {
-				document.getElementById(
-					'prpl-onboarding-tasks'
-				).style.display = 'block';
-			}
-
 			// Start scanning posts.
 			progressPlannerTriggerScan();
 
@@ -176,7 +169,16 @@ if ( document.getElementById( 'prpl-onboarding-form' ) ) {
 
 
 function progressPlannerOnboardTasks() {
-	const listItems = document.querySelectorAll( '#prpl-onboarding-tasks li' );
+	const tasksElement = document.getElementById( 'prpl-onboarding-tasks' );
+
+	if ( ! tasksElement ) {
+		return;
+	}
+
+	// Display the tasks.
+	tasksElement.style.display = 'block';
+
+	const listItems = tasksElement.querySelectorAll( 'li' );
 
 	listItems.forEach((li, index) => {
 		li.classList.add( 'prpl-onboarding-task--loading' );
@@ -194,7 +196,20 @@ function progressPlannerOnboardTasks() {
 				const taskPoints         = parseInt( li.querySelector( '.prpl-suggested-task-points' ).textContent );
 				totalPointsElement.textContent = ( totalPoints + taskPoints ) + 'pt';
 			}
-		}, (index + 1) * 2000); // Staggered effect
+		}, (index + 1) * 2000);
 	});
+
+	// Set the data-onboarding-finished attribute.
+	tasksElement.setAttribute( 'data-onboarding-finished', 'true' );
+
+	// Redirect if scanning is finished.
+	if ( document.getElementById( 'progress-planner-scan-progress' ).getAttribute( 'data-onboarding-finished' ) === 'true' ) {
+		console.log( 'Onboarding finished' );
+		// window.location.href =
+		// 	window.location.href
+		// 		.replace( '&content-scan-finished=true', '' )
+		// 		.replace( '&content-scan', '' ) +
+		// 		'&content-scan-finished=true';
+	}
 }
 

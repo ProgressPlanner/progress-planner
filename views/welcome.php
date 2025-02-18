@@ -193,7 +193,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					$prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 					?>
 				<div id="prpl-onboarding-tasks" style="display:none;">
-					<strong class="prpl-onboarding-tasks-title"><?php echo \esc_html( \_n( 'Congratulations! You’ve already completed the following task:', 'Congratulations! You’ve already completed the following tasks:', count( $prpl_task_providers ), 'progress-planner' ) ); ?></strong>
+					<strong class="prpl-onboarding-tasks-title"><?php \esc_html_e( "Let's check off what you've already done! We're checking your site now—this will only take a minute...", 'progress-planner' ); ?></strong>
 					<ul class="prpl-onboarding-tasks-list">
 					<?php
 					foreach ( $prpl_task_providers as $prpl_task_provider ) {
@@ -235,7 +235,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 								onerror="this.onerror=null;this.src='<?php echo \progress_planner()->get_placeholder_svg(); ?>';"
 								/>
 							</span>
-							<?php \esc_html_e( 'Progress monthly badge', 'progress-planner' ); ?>
+							<?php \esc_html_e( 'These tasks contribute to your monthly badge—every check completed brings you closer!', 'progress-planner' ); ?>
 						</span>
 						<span class="prpl-onboarding-tasks-total-points">
 							0pt
@@ -244,7 +244,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 				</div>
 				<?php endif; ?>
 
-				<div id="progress-planner-scan-progress" style="display:none;">
+				<div id="progress-planner-scan-progress">
 					<progress value="0" max="100"></progress>
 				</div>
 			</div>
