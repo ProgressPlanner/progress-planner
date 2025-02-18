@@ -153,6 +153,12 @@
 			}
 		}
 
+		.icon-exclamation-circle {
+			path {
+				fill: #6B7280;
+			}
+		}
+
 		.prpl-suggested-task-points-loader,
 		.icon-check-circle,
 		.icon-exclamation-circle {
