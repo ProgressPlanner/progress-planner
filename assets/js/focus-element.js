@@ -2,7 +2,6 @@
 
 const prplAddPointsToElement = ( task ) => {
 	const iconEl = document.querySelector( task.link_setting.iconEl );
-	const wrapperEl = document.querySelector( task.link_setting.wrapperEl );
 	const points = task.points || 0;
 
 	iconEl.classList.add( 'prpl-element-awards-points-icon' );
@@ -10,15 +9,14 @@ const prplAddPointsToElement = ( task ) => {
 	if ( task.is_complete ) {
 		iconEl.classList.add( 'prpl-element-awards-points-icon-complete' );
 	}
-	wrapperEl.setAttribute( 'data-prpl-points', points );
 
 	// Check if we want to focus on the element, based on the URL.
 	const url = new URL( window.location.href );
 	const focusOnElement = url.searchParams.get( 'pp-focus-el' );
 	if ( focusOnElement === task.task_id ) {
-		wrapperEl.focus();
-		wrapperEl.scrollIntoView( { behavior: 'smooth' } );
-		wrapperEl.classList.add( 'prpl-element-focused' );
+		iconEl.focus();
+		iconEl.scrollIntoView( { behavior: 'smooth' } );
+		iconEl.classList.add( 'prpl-element-focused' );
 	}
 };
 

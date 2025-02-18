@@ -19,7 +19,7 @@
 		border-radius: 2rem;
 	}
 
-	.prpl-element-focused & {
+	&.prpl-element-focused {
 
 		&::after {
 			border-color: #14b8a6;

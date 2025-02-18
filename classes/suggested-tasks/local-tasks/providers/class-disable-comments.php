@@ -59,15 +59,15 @@ class Disable_Comments extends Local_OneTime_Tasks_Abstract {
 		}
 
 		return [
-			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Disable comments', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
-			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-discussion.php' ) ) : '', // @phpstan-ignore-line property.nonObject
-			'dismissable' => true,
-			'description' => '<p>' . sprintf(
+			'task_id'      => $task_id,
+			'title'        => \esc_html__( 'Disable comments', 'progress-planner' ),
+			'parent'       => 0,
+			'priority'     => 'high',
+			'type'         => $this->get_provider_type(),
+			'points'       => 1,
+			'url'          => $this->capability_required() ? \esc_url( \admin_url( 'options-discussion.php' ) ) : '', // @phpstan-ignore-line property.nonObject
+			'dismissable'  => true,
+			'description'  => '<p>' . sprintf(
 				\esc_html(
 					// translators: %d is the number of approved comments.
 					\_n(
@@ -79,6 +79,10 @@ class Disable_Comments extends Local_OneTime_Tasks_Abstract {
 				),
 				(int) \wp_count_comments()->approved
 			) . '</p>',
+			'link_setting' => [
+				'hook'   => 'options-discussion.php',
+				'iconEl' => 'tr th:has(+td label[for="default_comment_status"])',
+			],
 		];
 	}
 }
