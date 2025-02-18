@@ -30,7 +30,7 @@ if ( progressPlannerFocusElement.tasks ) {
 	prplPageTitle.setAttribute(
 		'data-prpl-points',
 		progressPlannerFocusElement.completedPoints +
-			' / ' +
+			'/' +
 			progressPlannerFocusElement.totalPoints
 	);
 	prplPageTitle.style.width = 'max-content';
