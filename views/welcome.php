@@ -244,7 +244,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 				</div>
 				<?php endif; ?>
 
-				<div id="progress-planner-scan-progress">
+				<div id="progress-planner-scan-progress" style="display:none;">
 					<progress value="0" max="100"></progress>
 				</div>
 			</div>
