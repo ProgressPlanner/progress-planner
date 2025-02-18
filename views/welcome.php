@@ -185,6 +185,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					);
 					?>
 				</p>
+
 				<?php
 				// WIP: This is a temporary solution to display the completed tasks during onboarding.
 				$prpl_task_providers = \progress_planner()->get_plugin_upgrade_handler()->get_onboarding_task_providers();
@@ -192,14 +193,16 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 
 					$prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 					?>
-				<div id="prpl-onboarding-tasks" style="display:none;">
+				<div id="prpl-onboarding-tasks">
 					<strong class="prpl-onboarding-tasks-title"><?php \esc_html_e( "Let's check off what you've already done! We're checking your site now—this will only take a minute...", 'progress-planner' ); ?></strong>
 					<ul class="prpl-onboarding-tasks-list">
 					<?php
 					foreach ( $prpl_task_providers as $prpl_task_provider ) {
-						$prpl_task_details = $prpl_task_provider['task_provider']->get_task_details();
+						$prpl_task_details   = $prpl_task_provider->get_task_details();
+						$prpl_task_completed = $prpl_task_provider->evaluate_task( $prpl_task_details['task_id'] );
 
-						if ( $prpl_task_provider['completed'] ) {
+						// If the task is completed, mark it as pending celebration.
+						if ( $prpl_task_completed ) {
 							// Change the task status to pending celebration.
 							\progress_planner()->get_suggested_tasks()->mark_task_as_pending_celebration( $prpl_task_details['task_id'] );
 
@@ -207,13 +210,13 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 							\progress_planner()->get_suggested_tasks()->insert_activity( $prpl_task_details['task_id'] );
 						}
 						?>
-							<li class="prpl-onboarding-task" data-prpl-task-completed="<?php echo $prpl_task_provider['completed'] ? 'true' : 'false'; ?>">
-								<span class="prpl-onboarding-task-title"><?php echo \esc_html( $prpl_task_details['title'] ); ?></span>
-								<span class="prpl-onboarding-task-meta">
+							<li class="prpl-onboarding-task" data-prpl-task-completed="<?php echo $prpl_task_completed ? 'true' : 'false'; ?>">
+								<h3><?php echo \esc_html( $prpl_task_details['title'] ); ?></h3>
+								<span class="prpl-onboarding-task-status">
 									<span class="prpl-suggested-task-points">
 										+<?php echo \esc_html( $prpl_task_details['points'] ); ?>
 									</span>
-									<span class="prpl-suggested-task-points-loader"></span>
+									<span class="prpl-suggested-task-loader"></span>
 									<span class="icon icon-check-circle">
 										<?php \progress_planner()->the_asset( 'images/icon_check_circle.svg' ); ?>
 									</span>
@@ -226,6 +229,8 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					}
 					?>
 					</ul>
+
+					<?php // Display badge and the points. ?>
 					<div class="prpl-onboarding-tasks-footer">
 						<span class="prpl-onboarding-tasks-montly-badge">
 							<span class="prpl-onboarding-tasks-montly-badge-image">

@@ -64,10 +64,7 @@ class Plugin_Upgrade_Handler {
 		foreach ( $task_provider_ids as $task_provider_id ) {
 			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
 			if ( $task_provider ) { // @phpstan-ignore-line
-				$task_providers[] = [
-					'task_provider' => $task_provider,
-					'completed'     => $task_provider->evaluate_task( $task_provider_id ),
-				];
+				$task_providers[] = $task_provider;
 			}
 		}
 

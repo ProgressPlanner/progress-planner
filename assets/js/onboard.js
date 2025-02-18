@@ -190,7 +190,7 @@ async function progressPlannerOnboardTasks() {
 						'true' === li.dataset.prplTaskCompleted;
 					const classToAdd = taskCompleted
 						? 'prpl-onboarding-task-completed'
-						: 'prpl-onboarding-task-pending';
+						: 'prpl-onboarding-task-not-completed';
 					li.classList.remove( 'prpl-onboarding-task-loading' );
 					li.classList.add( classToAdd );
 
