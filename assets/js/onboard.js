@@ -182,7 +182,7 @@ async function progressPlannerOnboardTasks() {
 	// Create an array of Promises
 	const tasks = Array.from( listItems ).map( ( li, index ) => {
 		return new Promise( ( resolve ) => {
-			li.classList.add( 'prpl-onboarding-task--loading' );
+			li.classList.add( 'prpl-onboarding-task-loading' );
 
 			setTimeout(
 				() => {
