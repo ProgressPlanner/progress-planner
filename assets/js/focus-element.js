@@ -7,6 +7,9 @@ const prplAddPointsToElement = ( task ) => {
 
 	iconEl.classList.add( 'prpl-element-awards-points-icon' );
 	iconEl.setAttribute( 'data-prpl-points', points );
+	if ( task.is_complete ) {
+		iconEl.classList.add( 'prpl-element-awards-points-icon-complete' );
+	}
 	wrapperEl.setAttribute( 'data-prpl-points', points );
 
 	// Check if we want to focus on the element, based on the URL.
@@ -29,7 +32,7 @@ if ( progressPlannerFocusElement.tasks ) {
 	prplPageTitle.setAttribute(
 		'data-prpl-points',
 		progressPlannerFocusElement.completedPoints +
-			'/' +
+			' / ' +
 			progressPlannerFocusElement.totalPoints
 	);
 	prplPageTitle.style.width = 'max-content';

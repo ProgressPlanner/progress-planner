@@ -18,6 +18,14 @@
 		border: 2px solid #faa310;
 		border-radius: 2rem;
 	}
+
+	&.prpl-element-awards-points-icon-complete {
+
+		&::after {
+			content: "✓";
+			color: #14b8a6;
+		}
+	}
 }
 
 h1.prpl-element-awards-points-icon {
