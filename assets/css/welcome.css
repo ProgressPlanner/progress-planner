@@ -129,13 +129,14 @@
 		.prpl-suggested-task-points-loader {
 			width: 25px;
 			aspect-ratio: 1;
+
 			/* display: grid; */
 			border-radius: 50%;
 			background:
 				linear-gradient(0deg, rgb(250 163 16/50%) 30%, #0000 0 70%, rgb(250 163 16/100%) 0) 50%/8% 100%,
 				linear-gradient(90deg, rgb(250 163 16/25%) 30%, #0000 0 70%, rgb(250 163 16/75%) 0) 50%/100% 8%;
 			background-repeat: no-repeat;
-			animation: l23 1s infinite steps(12);
+			animation: loaderAnimation 1s infinite steps(12);
 
 			&::before,
 			&::after {
@@ -154,8 +155,9 @@
 		}
 
 		.icon-exclamation-circle {
+
 			path {
-				fill: #6B7280;
+				fill: #6b7280;
 			}
 		}
 
@@ -165,7 +167,8 @@
 			display: none;
 		}
 
-		.prpl-onboarding-task--loading {
+		.prpl-onboarding-task-loading {
+
 			.prpl-suggested-task-points-loader {
 				display: grid;
 			}
@@ -175,7 +178,8 @@
 			}
 		}
 
-		.prpl-onboarding-task--completed {
+		.prpl-onboarding-task-completed {
+
 			.icon-check-circle {
 				display: inline;
 			}
@@ -185,7 +189,8 @@
 			}
 		}
 
-		.prpl-onboarding-task--pending {
+		.prpl-onboarding-task-pending {
+
 			.icon-exclamation-circle {
 				display: inline;
 			}
@@ -221,8 +226,9 @@
 	}
 }
 
-@keyframes l23 {
+@keyframes loaderAnimation {
+
 	100% {
-		transform: rotate(1turn)
+		transform: rotate(1turn);
 	}
 }

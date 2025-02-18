@@ -190,7 +190,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 				$prpl_task_providers = \progress_planner()->get_plugin_upgrade_handler()->get_onboarding_task_providers();
 				if ( ! empty( $prpl_task_providers ) ) :
 
-					$prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
+					$prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 					?>
 				<div id="prpl-onboarding-tasks" style="display:none;">
 					<strong class="prpl-onboarding-tasks-title"><?php \esc_html_e( "Let's check off what you've already done! We're checking your site now—this will only take a minute...", 'progress-planner' ); ?></strong>
@@ -230,9 +230,9 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 						<span class="prpl-onboarding-tasks-montly-badge">
 							<span class="prpl-onboarding-tasks-montly-badge-image">
 								<img
-									src="<?php echo \progress_planner()->get_remote_server_root_url(); ?>/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+									src="<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . \esc_attr( $prpl_badge->get_id() ) ); ?>"
 									alt="Badge"
-								onerror="this.onerror=null;this.src='<?php echo \progress_planner()->get_placeholder_svg(); ?>';"
+									onerror="this.onerror=null;this.src='<?php echo esc_url( \progress_planner()->get_placeholder_svg() ); ?>';"
 								/>
 							</span>
 							<?php \esc_html_e( 'These tasks contribute to your monthly badge—every check completed brings you closer!', 'progress-planner' ); ?>

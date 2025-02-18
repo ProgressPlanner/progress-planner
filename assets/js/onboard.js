@@ -167,7 +167,6 @@ if ( document.getElementById( 'prpl-onboarding-form' ) ) {
 		} );
 }
 
-
 async function progressPlannerOnboardTasks() {
 	const tasksElement = document.getElementById( 'prpl-onboarding-tasks' );
 
@@ -182,27 +181,41 @@ async function progressPlannerOnboardTasks() {
 
 	// Create an array of Promises
 	const tasks = Array.from( listItems ).map( ( li, index ) => {
-		 return new Promise( resolve => {
+		return new Promise( ( resolve ) => {
 			li.classList.add( 'prpl-onboarding-task--loading' );
 
-			setTimeout(() => {
-				const taskCompleted = 'true' === li.dataset.prplTaskCompleted;
-				const classToAdd = taskCompleted ? 'prpl-onboarding-task--completed' : 'prpl-onboarding-task--pending';
-				li.classList.remove( 'prpl-onboarding-task--loading' );
-				li.classList.add( classToAdd );
+			setTimeout(
+				() => {
+					const taskCompleted =
+						'true' === li.dataset.prplTaskCompleted;
+					const classToAdd = taskCompleted
+						? 'prpl-onboarding-task-completed'
+						: 'prpl-onboarding-task-pending';
+					li.classList.remove( 'prpl-onboarding-task-loading' );
+					li.classList.add( classToAdd );
 
-				// Update total points.
-				if ( taskCompleted ) {
-					const totalPointsElement = document.querySelector( '#prpl-onboarding-tasks .prpl-onboarding-tasks-total-points' );
-					const totalPoints        = parseInt( totalPointsElement.textContent );
-					const taskPoints         = parseInt( li.querySelector( '.prpl-suggested-task-points' ).textContent );
-					totalPointsElement.textContent = ( totalPoints + taskPoints ) + 'pt';
-				}
+					// Update total points.
+					if ( taskCompleted ) {
+						const totalPointsElement = document.querySelector(
+							'#prpl-onboarding-tasks .prpl-onboarding-tasks-total-points'
+						);
+						const totalPoints = parseInt(
+							totalPointsElement.textContent
+						);
+						const taskPoints = parseInt(
+							li.querySelector( '.prpl-suggested-task-points' )
+								.textContent
+						);
+						totalPointsElement.textContent =
+							totalPoints + taskPoints + 'pt';
+					}
 
-				resolve(); // Mark this task as complete.
-			}, ( index + 1 ) * 2000);
-		});
-	});
+					resolve(); // Mark this task as complete.
+				},
+				( index + 1 ) * 2000
+			);
+		} );
+	} );
 
 	// Wait for all tasks to complete.
 	await Promise.all( tasks );
@@ -211,12 +224,15 @@ async function progressPlannerOnboardTasks() {
 	tasksElement.setAttribute( 'data-onboarding-finished', 'true' );
 
 	// Redirect if scanning is finished.
-	if ( 'true' === document.getElementById( 'progress-planner-scan-progress' ).getAttribute( 'data-onboarding-finished' ) ) {
+	if (
+		'true' ===
+		document
+			.getElementById( 'progress-planner-scan-progress' )
+			.getAttribute( 'data-onboarding-finished' )
+	) {
 		window.location.href =
 			window.location.href
 				.replace( '&content-scan-finished=true', '' )
-				.replace( '&content-scan', '' ) +
-				'&content-scan-finished=true';
+				.replace( '&content-scan', '' ) + '&content-scan-finished=true';
 	}
 }
-
