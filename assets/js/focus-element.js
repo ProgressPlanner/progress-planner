@@ -1,6 +1,29 @@
 /* global progressPlannerFocusElement */
 
-const prplAddPointsToElement = ( task ) => {
+/**
+ * Maybe focus on the element, based on the URL.
+ *
+ * @param {Object} task The task object.
+ */
+const prplMaybeFocusOnElement = ( task ) => {
+	// Check if we want to focus on the element, based on the URL.
+	const url = new URL( window.location.href );
+	const focusOnElement = url.searchParams.get( 'pp-focus-el' );
+	if ( focusOnElement === task.task_id ) {
+		const iconEl = document.querySelector( task.link_setting.iconEl );
+
+		iconEl.focus();
+		iconEl.scrollIntoView( { behavior: 'smooth' } );
+		iconEl.classList.add( 'prpl-element-focused' );
+	}
+};
+
+/**
+ * Add the points indicator to the element.
+ *
+ * @param {Object} task The task object.
+ */
+const prplAddPointsIndicatorToElement = ( task ) => {
 	const iconEl = document.querySelector( task.link_setting.iconEl );
 	const points = task.points || 0;
 
@@ -9,22 +32,20 @@ const prplAddPointsToElement = ( task ) => {
 	if ( task.is_complete ) {
 		iconEl.classList.add( 'prpl-element-awards-points-icon-complete' );
 	}
-
-	// Check if we want to focus on the element, based on the URL.
-	const url = new URL( window.location.href );
-	const focusOnElement = url.searchParams.get( 'pp-focus-el' );
-	if ( focusOnElement === task.task_id ) {
-		iconEl.focus();
-		iconEl.scrollIntoView( { behavior: 'smooth' } );
-		iconEl.classList.add( 'prpl-element-focused' );
-	}
 };
 
 if ( progressPlannerFocusElement.tasks ) {
+	/**
+	 * Add the points indicator to the element and maybe focus on it.
+	 */
 	progressPlannerFocusElement.tasks.forEach( ( task ) => {
-		prplAddPointsToElement( task );
+		prplAddPointsIndicatorToElement( task );
+		prplMaybeFocusOnElement( task );
 	} );
 
+	/**
+	 * Add the points indicator to the page title.
+	 */
 	const prplPageTitle = document.querySelector( 'h1' );
 	prplPageTitle.classList.add( 'prpl-element-awards-points-icon' );
 	prplPageTitle.setAttribute(
