@@ -20,18 +20,17 @@ const prplAddPointsToElement = ( task ) => {
 };
 
 if ( progressPlannerFocusElement.tasks ) {
-	let prplFocusElementsTotalPoints = 0;
-
 	progressPlannerFocusElement.tasks.forEach( ( task ) => {
 		prplAddPointsToElement( task );
-		prplFocusElementsTotalPoints += task.points || 0;
 	} );
 
 	const prplPageTitle = document.querySelector( 'h1' );
 	prplPageTitle.classList.add( 'prpl-element-awards-points-icon' );
 	prplPageTitle.setAttribute(
 		'data-prpl-points',
-		prplFocusElementsTotalPoints
+		progressPlannerFocusElement.completedPoints +
+			'/' +
+			progressPlannerFocusElement.totalPoints
 	);
 	prplPageTitle.style.width = 'max-content';
 }

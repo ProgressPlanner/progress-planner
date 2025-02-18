@@ -157,22 +157,30 @@ class Page {
 	 * @return void
 	 */
 	public function maybe_enqueue_focus_el_script( $hook ) {
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
-		if ( empty( $tasks ) ) {
-			return;
-		}
-
-		// Check if we need to load the script.
-		$tasks_with_link_setting = [];
-		foreach ( $tasks as $task ) {
-			if ( ! isset( $task['link_setting']['hook'] ) ) {
+		$suggested_tasks       = \progress_planner()->get_suggested_tasks();
+		$local_tasks_providers = $suggested_tasks->get_local()->get_task_providers();
+		$tasks_details         = [];
+		$total_points          = 0;
+		$completed_points      = 0;
+		foreach ( $local_tasks_providers as $provider ) {
+			if ( 'configuration' !== $provider->get_provider_type() ) {
 				continue;
 			}
-			if ( $hook === $task['link_setting']['hook'] ) {
-				$tasks_with_link_setting[] = $task;
+			$details = $provider->get_task_details();
+			if ( ! isset( $details['link_setting']['hook'] ) ||
+				$hook !== $details['link_setting']['hook']
+			) {
+				continue;
+			}
+			$details['is_complete'] = $provider->is_task_completed();
+			$tasks_details[]        = $details;
+			$total_points          += $details['points'];
+			if ( $details['is_complete'] ) {
+				$completed_points += $details['points'];
 			}
 		}
-		if ( empty( $tasks_with_link_setting ) ) {
+
+		if ( empty( $tasks_details ) ) {
 			return;
 		}
 
@@ -184,7 +192,9 @@ class Page {
 			'progress-planner-focus-element',
 			'progressPlannerFocusElement',
 			[
-				'tasks' => $tasks_with_link_setting,
+				'tasks'           => $tasks_details,
+				'totalPoints'     => $total_points,
+				'completedPoints' => $completed_points,
 			]
 		);
 		\wp_enqueue_style(
