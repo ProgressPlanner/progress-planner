@@ -19,6 +19,15 @@
 		border-radius: 2rem;
 	}
 
+	.prpl-element-focused & {
+
+		&::after {
+			border-color: #14b8a6;
+			background-color: #f2faf9;
+			box-shadow: 2px 2px 0 0 #14b8a6;
+		}
+	}
+
 	&.prpl-element-awards-points-icon-complete {
 
 		&::after {
@@ -37,17 +46,6 @@ h1.prpl-element-awards-points-icon {
 		position: relative;
 		top: 0;
 		right: 0;
-	}
-}
-
-.prpl-element-focused {
-	border: 2px solid #f00;
-
-	.prpl-element-awards-points-icon {
-
-		&::after {
-			display: none;
-		}
 	}
 }
 
