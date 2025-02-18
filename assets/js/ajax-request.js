@@ -34,14 +34,18 @@ const progressPlannerAjaxRequest = ( {
 				return http.response;
 			}
 		}
-		if ( http.readyState === 4 && http.status === 200 ) {
-			return successAction
-				? successAction( response )
+		if ( http.readyState === 4 ) {
+			if ( http.status === 200 ) {
+				return successAction
+					? successAction( response )
+					: defaultCallback( response );
+			}
+
+			// Request is completed, but the status is not 200.
+			return failAction
+				? failAction( response )
 				: defaultCallback( response );
 		}
-		return failAction
-			? failAction( response )
-			: defaultCallback( response );
 	};
 
 	const dataForm = new FormData();
