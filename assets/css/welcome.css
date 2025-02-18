@@ -106,5 +106,116 @@
 				background-color: #f9fafb;
 			}
 		}
+
+		.prpl-onboarding-task-meta {
+			display: block;
+			width: 1.5rem;
+			height: 1.5rem;
+		}
+
+		.prpl-suggested-task-points {
+			font-size: var(--prpl-font-size-xs);
+			font-weight: 700;
+			color: var(--prpl-color-headings);
+			background-color: var(--prpl-color-400-orange);
+			width: 1.5rem;
+			height: 1.5rem;
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.prpl-suggested-task-points-loader {
+			width: 25px;
+			aspect-ratio: 1;
+			/* display: grid; */
+			border-radius: 50%;
+			background:
+				linear-gradient(0deg, rgb(244 63 94/50%) 30%, #0000 0 70%, rgb(244 63 94/100%) 0) 50%/8% 100%,
+				linear-gradient(90deg, rgb(244 63 94/25%) 30%, #0000 0 70%, rgb(244 63 94/75%) 0) 50%/100% 8%;
+			background-repeat: no-repeat;
+			animation: l23 1s infinite steps(12);
+
+			&::before,
+			&::after {
+				content: "";
+				grid-area: 1/1;
+				border-radius: 50%;
+				background: inherit;
+				opacity: 0.915;
+				transform: rotate(30deg);
+			}
+
+			&::after {
+				opacity: 0.83;
+				transform: rotate(60deg);
+			}
+		}
+
+		.prpl-suggested-task-points-loader,
+		.icon-check-circle,
+		.icon-exclamation-circle {
+			display: none;
+		}
+
+		.prpl-onboarding-task--loading {
+			.prpl-suggested-task-points-loader {
+				display: grid;
+			}
+
+			.prpl-suggested-task-points {
+				display: none;
+			}
+		}
+
+		.prpl-onboarding-task--completed {
+			.icon-check-circle {
+				display: inline;
+			}
+
+			.prpl-suggested-task-points {
+				display: none;
+			}
+		}
+
+		.prpl-onboarding-task--pending {
+			.icon-exclamation-circle {
+				display: inline;
+			}
+
+			.prpl-suggested-task-points {
+				display: none;
+			}
+		}
+	}
+
+	.prpl-onboarding-tasks-footer {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		.prpl-onboarding-tasks-montly-badge {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+		}
+
+		.prpl-onboarding-tasks-montly-badge-image {
+			display: inline-block;
+			width: 100px;
+		}
+
+		.prpl-onboarding-tasks-total-points {
+			font-size: var(--prpl-font-size-3xl);
+			font-weight: 600;
+		}
+
+	}
+}
+
+@keyframes l23 {
+	100% {
+		transform: rotate(1turn)
 	}
 }

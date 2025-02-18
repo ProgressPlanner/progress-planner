@@ -58,6 +58,9 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 
 			// Start scanning posts.
 			progressPlannerTriggerScan();
+
+			// Start the tasks.
+			progressPlannerOnboardTasks();
 		},
 		failAction: ( response ) => {
 			// eslint-disable-next-line no-console
@@ -170,3 +173,28 @@ if ( document.getElementById( 'prpl-onboarding-form' ) ) {
 			progressPlannerOnboardCall( data );
 		} );
 }
+
+
+function progressPlannerOnboardTasks() {
+	const listItems = document.querySelectorAll( '#prpl-onboarding-tasks li' );
+
+	listItems.forEach((li, index) => {
+		li.classList.add( 'prpl-onboarding-task--loading' );
+
+		setTimeout(() => {
+			const taskCompleted = 'true' === li.dataset.prplTaskCompleted;
+			const classToAdd = taskCompleted ? 'prpl-onboarding-task--completed' : 'prpl-onboarding-task--pending';
+			li.classList.remove( 'prpl-onboarding-task--loading' );
+			li.classList.add( classToAdd );
+
+			// Update total points.
+			if ( taskCompleted ) {
+				const totalPointsElement = document.querySelector( '#prpl-onboarding-tasks .prpl-onboarding-tasks-total-points' );
+				const totalPoints        = parseInt( totalPointsElement.textContent );
+				const taskPoints         = parseInt( li.querySelector( '.prpl-suggested-task-points' ).textContent );
+				totalPointsElement.textContent = ( totalPoints + taskPoints ) + 'pt';
+			}
+		}, (index + 1) * 2000); // Staggered effect
+	});
+}
+

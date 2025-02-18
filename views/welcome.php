@@ -7,6 +7,8 @@
 
 namespace Progress_Planner;
 
+use Progress_Planner\Badges\Monthly;
+
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -187,6 +189,8 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 				// WIP: This is a temporary solution to display the completed tasks during onboarding.
 				$prpl_task_providers = \progress_planner()->get_plugin_upgrade_handler()->get_onboarding_task_providers();
 				if ( ! empty( $prpl_task_providers ) ) :
+
+					$prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 					?>
 				<div id="prpl-onboarding-tasks" style="display:none;">
 					<strong class="prpl-onboarding-tasks-title"><?php echo \esc_html( \_n( 'Congratulations! You’ve already completed the following task:', 'Congratulations! You’ve already completed the following tasks:', count( $prpl_task_providers ), 'progress-planner' ) ); ?></strong>
@@ -203,18 +207,40 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 							\progress_planner()->get_suggested_tasks()->insert_activity( $prpl_task_details['task_id'] );
 						}
 						?>
-							<li class="prpl-onboarding-task">
+							<li class="prpl-onboarding-task" data-prpl-task-completed="<?php echo $prpl_task_provider['completed'] ? 'true' : 'false'; ?>">
 								<span class="prpl-onboarding-task-title"><?php echo \esc_html( $prpl_task_details['title'] ); ?></span>
-								<?php if ( $prpl_task_provider['completed'] ) : ?>
-									<span class="dashicons dashicons-yes"></span>
-								<?php else : ?>
-									<span class="dashicons dashicons-no-alt"></span>
-								<?php endif; ?>
+								<span class="prpl-onboarding-task-meta">
+									<span class="prpl-suggested-task-points">
+										+<?php echo \esc_html( $prpl_task_details['points'] ); ?>
+									</span>
+									<span class="prpl-suggested-task-points-loader"></span>
+									<span class="icon icon-check-circle">
+										<?php \progress_planner()->the_asset( 'images/icon_check_circle.svg' ); ?>
+									</span>
+									<span class="icon icon-exclamation-circle">
+										<?php \progress_planner()->the_asset( 'images/icon_exclamation_circle.svg' ); ?>
+									</span>
+								</span>
 							</li>
 						<?php
 					}
 					?>
 					</ul>
+					<div class="prpl-onboarding-tasks-footer">
+						<span class="prpl-onboarding-tasks-montly-badge">
+							<span class="prpl-onboarding-tasks-montly-badge-image">
+								<img
+									src="<?php echo \progress_planner()->get_remote_server_root_url(); ?>/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+									alt="Badge"
+								onerror="this.onerror=null;this.src='<?php echo \progress_planner()->get_placeholder_svg(); ?>';"
+								/>
+							</span>
+							<?php \esc_html_e( 'Progress monthly badge', 'progress-planner' ); ?>
+						</span>
+						<span class="prpl-onboarding-tasks-total-points">
+							0pt
+						</span>
+					</div>
 				</div>
 				<?php endif; ?>
 
