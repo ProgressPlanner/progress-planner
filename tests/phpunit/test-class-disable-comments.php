@@ -25,6 +25,6 @@ class Disable_Comments_Test extends Task_Provider_Test_Abstract {
 	 * @return void
 	 */
 	protected function complete_task() {
-		\update_option( 'disable_comments', 'closed' );
+		\update_option( 'default_comment_status', 'closed' );
 	}
 }
