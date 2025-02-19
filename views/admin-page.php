@@ -28,20 +28,9 @@ if ( ! $prpl_privacy_policy_accepted ) {
 			<?php endforeach; ?>
 		</div>
 
-		<?php // Display the upgrade tasks popover, important to be after the widgets. ?>
+		<?php // Display the upgrade tasks popover if needed. ?>
 		<?php if ( \progress_planner()->get_plugin_upgrade_handler()->get_newly_added_task_providers() ) : ?>
 			<?php \progress_planner()->get_popover()->the_popover( 'upgrade-tasks' )->render(); ?>
-
-			<script>
-				document.addEventListener('DOMContentLoaded', function() {
-					const popover = document.getElementById('prpl-popover-upgrade-tasks');
-					if (popover) {
-						popover.showPopover();
-
-						progressPlannerOnboardTasks();
-					}
-				});
-			</script>
 		<?php endif; ?>
 	<?php else : ?>
 		<?php \progress_planner()->the_view( 'welcome.php' ); ?>

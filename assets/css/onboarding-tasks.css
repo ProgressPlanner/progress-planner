@@ -172,4 +172,11 @@
 /* Onboarding tasks popover (when plugin is updated). */
 #prpl-popover-upgrade-tasks.prpl-popover {
 	max-width: 40vw;
+	padding: calc(var(--prpl-padding) * 1.5); /* So popover's X button doesn't overlap the tasks. */
+
+	#prpl-onboarding-tasks {
+		display: block !important;
+		margin-bottom: 0;
+	}
 }
+

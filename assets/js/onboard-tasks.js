@@ -1,8 +1,10 @@
+/* global prplDocumentReady */
 /*
  * Onboard tasks
  *
  * A script to process the onboarding task checklist.
  *
+ * Dependencies: progress-planner-document-ready
  */
 
 /**
@@ -74,8 +76,8 @@ async function progressPlannerOnboardTasks() {
 }
 
 /**
- * Redirect user to the stats page after onboarding.
- * We redirect if both post scanning and onboarding tasks are finished.
+ * Redirect user to the stats page after onboarding or plugin upgrade.
+ * On onboard screen we redirect only if both post scanning and onboarding tasks are finished.
  *
  * @param {string} context The context of the redirect.
  */
@@ -132,3 +134,13 @@ function onBoardRedirect( context = '' ) {
 		}
 	}
 }
+
+// Trigger the onboarding tasks popover if it is in the DOM.
+prplDocumentReady( function () {
+	const popover = document.getElementById( 'prpl-popover-upgrade-tasks' );
+	if ( popover ) {
+		popover.showPopover();
+
+		progressPlannerOnboardTasks();
+	}
+} );
