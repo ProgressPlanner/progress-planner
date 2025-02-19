@@ -10,6 +10,7 @@
 	font-weight: 600;
 	padding: 0.25rem;
 	margin: 0 1rem;
+	transform: translateY(0.25rem);
 
 	img {
 		width: 0.815rem;
