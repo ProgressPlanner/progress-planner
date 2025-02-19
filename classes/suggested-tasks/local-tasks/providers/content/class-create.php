@@ -12,7 +12,7 @@ use Progress_Planner\Activities\Content_Helpers;
 /**
  * Add tasks for content creation.
  */
-class Create extends Content_Abstract {
+class Create extends Content {
 
 	/**
 	 * The provider ID.

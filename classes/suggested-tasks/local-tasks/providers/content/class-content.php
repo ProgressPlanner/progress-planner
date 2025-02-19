@@ -11,7 +11,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Abstract;
 /**
  * Add tasks for content updates.
  */
-abstract class Content_Abstract extends Local_Tasks_Abstract {
+abstract class Content extends Local_Tasks_Abstract {
 
 	/**
 	 * The capability required to perform the task.

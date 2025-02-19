@@ -12,7 +12,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 /**
  * Add tasks for content updates.
  */
-class Review extends Content_Abstract {
+class Review extends Content {
 
 	/**
 	 * The provider ID.
