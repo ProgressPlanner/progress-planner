@@ -34,6 +34,13 @@ class Sample_Page extends Local_OneTime_Tasks_Abstract {
 	protected $capability = 'edit_pages';
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected $is_onboarding_task = true;
+
+	/**
 	 * The sample page.
 	 *
 	 * @var \WP_Post|null|false

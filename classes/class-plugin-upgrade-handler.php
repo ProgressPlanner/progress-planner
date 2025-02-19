@@ -23,20 +23,8 @@ class Plugin_Upgrade_Handler {
 	 * Constructor.
 	 */
 	public function __construct() {
-
 		// We should update this array when we add new task providers we want to show.
-		$this->whitelisted_task_provider_ids = apply_filters(
-			'prpl_onboarding_task_providers',
-			[
-				'core-blogdescription',
-				'core-siteicon',
-				'debug-display',
-				'disable-comments',
-				'hello-world',
-				'sample-page',
-				'php-version',
-			]
-		);
+		$this->whitelisted_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', [] );
 	}
 
 	/**

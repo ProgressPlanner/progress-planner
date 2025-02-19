@@ -34,6 +34,13 @@ class Hello_World extends Local_OneTime_Tasks_Abstract {
 	protected $capability = 'edit_posts';
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected $is_onboarding_task = true;
+
+	/**
 	 * The sample post.
 	 *
 	 * @var \WP_Post|null|false

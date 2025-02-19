@@ -27,6 +27,13 @@ class Debug_Display extends Local_OneTime_Tasks_Abstract {
 	const ID = 'wp-debug-display';
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected $is_onboarding_task = true;
+
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool

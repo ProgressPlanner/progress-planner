@@ -37,6 +37,13 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 	protected $capability = 'manage_options';
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected $is_onboarding_task = false;
+
+	/**
 	 * Get the provider type.
 	 *
 	 * @return string
@@ -63,6 +70,15 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 		return $this->capability
 			? \current_user_can( $this->capability )
 			: true;
+	}
+
+	/**
+	 * Check if the task is an onboarding task.
+	 *
+	 * @return bool
+	 */
+	public function is_onboarding_task() {
+		return $this->is_onboarding_task;
 	}
 
 	/**
