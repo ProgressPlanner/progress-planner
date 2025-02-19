@@ -5,12 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
  * Add tasks to check if WP debug is enabled.
  */
-class Disable_Comments extends Local_OneTime_Tasks_Abstract {
+class Disable_Comments extends One_Time {
 
 	/**
 	 * The provider type.
