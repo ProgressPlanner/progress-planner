@@ -12,16 +12,20 @@ namespace Progress_Planner;
  */
 class Plugin_Upgrade_Handler {
 
+	/**
+	 * IDs of the task providers that should be shown to user during onboarding or updating the plugin.
+	 *
+	 * @var array
+	 */
+	private $whitelisted_task_provider_ids;
 
 	/**
-	 * Get the added task providers.
-	 *
-	 * @return array
+	 * Constructor.
 	 */
-	public function get_added_task_providers() {
+	public function __construct() {
 
-		// Whitelist the task provider ids that should be shown to user during onboarding.
-		$whitelisted_task_providers = apply_filters(
+		// We should update this array when we add new task providers we want to show.
+		$this->whitelisted_task_provider_ids = apply_filters(
 			'prpl_onboarding_task_providers',
 			[
 				'core-blogdescription',
@@ -33,20 +37,34 @@ class Plugin_Upgrade_Handler {
 				'php-version',
 			]
 		);
+	}
 
-		$old_task_providers = \get_option( 'progress_planner_task_providers', [] );
+	/**
+	 * Get the IDs of the newly added task providers.
+	 *
+	 * @return array
+	 */
+	public function get_newly_added_task_provider_ids() {
+		static $newly_added_task_providers;
 
-		$added_task_providers = [];
+		if ( null === $newly_added_task_providers ) {
 
-		foreach ( $whitelisted_task_providers as $task_provider_id ) {
-			if ( ! in_array( $task_provider_id, $old_task_providers, true ) ) {
-				$added_task_providers[] = $task_provider_id;
+			// Check if task providers option exists, it will not on fresh installs.
+			$old_task_providers = \get_option( 'progress_planner_previous_version_task_providers', [] );
+
+			$newly_added_task_providers = [];
+
+			foreach ( $this->whitelisted_task_provider_ids as $task_provider_id ) {
+				if ( ! in_array( $task_provider_id, $old_task_providers, true ) ) {
+					$newly_added_task_providers[] = $task_provider_id;
+				}
 			}
+
+			// Update 'progress_planner_previous_version_task_providers' option.
+			\update_option( 'progress_planner_previous_version_task_providers', $this->whitelisted_task_provider_ids );
 		}
 
-		// TODO: Update 'progress_planner_task_providers' option. That is done on upgrade.
-
-		return $added_task_providers;
+		return $newly_added_task_providers;
 	}
 
 
@@ -55,9 +73,9 @@ class Plugin_Upgrade_Handler {
 	 *
 	 * @return array
 	 */
-	public function get_onboarding_task_providers() {
+	public function get_newly_added_task_providers() {
 
-		$task_provider_ids = $this->get_added_task_providers();
+		$task_provider_ids = $this->get_newly_added_task_provider_ids();
 
 		$task_providers = [];
 

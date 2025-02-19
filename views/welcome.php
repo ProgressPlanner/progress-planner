@@ -7,8 +7,6 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Badges\Monthly;
-
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -32,6 +30,14 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 	PROGRESS_PLANNER_URL . '/assets/css/onboard.css',
 	[],
 	\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/onboard.css' )
+);
+
+// Enqueue onboarding styles.
+\wp_enqueue_style(
+	'progress-planner-onboarding-tasks',
+	PROGRESS_PLANNER_URL . '/assets/css/onboarding-tasks.css',
+	[],
+	\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/onboarding-tasks.css' )
 );
 
 
@@ -186,68 +192,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					?>
 				</p>
 
-				<?php
-				// WIP: This is a temporary solution to display the completed tasks during onboarding.
-				$prpl_task_providers = \progress_planner()->get_plugin_upgrade_handler()->get_onboarding_task_providers();
-				if ( ! empty( $prpl_task_providers ) ) :
-
-					$prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
-					?>
-				<div id="prpl-onboarding-tasks" style="display:none;">
-					<strong class="prpl-onboarding-tasks-title"><?php \esc_html_e( "Let's check off what you've already done! We're checking your site now—this will only take a minute...", 'progress-planner' ); ?></strong>
-					<ul class="prpl-onboarding-tasks-list">
-					<?php
-					foreach ( $prpl_task_providers as $prpl_task_provider ) {
-						$prpl_task_details   = $prpl_task_provider->get_task_details();
-						$prpl_task_completed = $prpl_task_provider->evaluate_task( $prpl_task_details['task_id'] );
-
-						// If the task is completed, mark it as pending celebration.
-						if ( $prpl_task_completed ) {
-							// Change the task status to pending celebration.
-							\progress_planner()->get_suggested_tasks()->mark_task_as_pending_celebration( $prpl_task_details['task_id'] );
-
-							// Insert an activity.
-							\progress_planner()->get_suggested_tasks()->insert_activity( $prpl_task_details['task_id'] );
-						}
-						?>
-							<li class="prpl-onboarding-task" data-prpl-task-completed="<?php echo $prpl_task_completed ? 'true' : 'false'; ?>">
-								<h3><?php echo \esc_html( $prpl_task_details['title'] ); ?></h3>
-								<span class="prpl-onboarding-task-status">
-									<span class="prpl-suggested-task-points">
-										+<?php echo \esc_html( $prpl_task_details['points'] ); ?>
-									</span>
-									<span class="prpl-suggested-task-loader"></span>
-									<span class="icon icon-check-circle">
-										<?php \progress_planner()->the_asset( 'images/icon_check_circle.svg' ); ?>
-									</span>
-									<span class="icon icon-exclamation-circle">
-										<?php \progress_planner()->the_asset( 'images/icon_exclamation_circle.svg' ); ?>
-									</span>
-								</span>
-							</li>
-						<?php
-					}
-					?>
-					</ul>
-
-					<?php // Display badge and the points. ?>
-					<div class="prpl-onboarding-tasks-footer">
-						<span class="prpl-onboarding-tasks-montly-badge">
-							<span class="prpl-onboarding-tasks-montly-badge-image">
-								<img
-									src="<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . \esc_attr( $prpl_badge->get_id() ) ); ?>"
-									alt="Badge"
-									onerror="this.onerror=null;this.src='<?php echo esc_url( \progress_planner()->get_placeholder_svg() ); ?>';"
-								/>
-							</span>
-							<?php \esc_html_e( 'These tasks contribute to your monthly badge—every check completed brings you closer!', 'progress-planner' ); ?>
-						</span>
-						<span class="prpl-onboarding-tasks-total-points">
-							0pt
-						</span>
-					</div>
-				</div>
-				<?php endif; ?>
+				<?php \progress_planner()->the_view( 'popovers/parts/upgrade-tasks.php', [ 'context' => 'onboarding' ] ); ?>
 
 				<div id="progress-planner-scan-progress" style="display:none;">
 					<progress value="0" max="100"></progress>
