@@ -14,3 +14,4 @@ jobs:
           message: |
             **Test on Playground**
             [Test this pull request on the Playground](https://playground.wordpress.net/#{"landingPage":"/wp-admin/admin.php?page=progress-planner","features":{"networking":true},"login":true,"plugins":["https://github-proxy.com/proxy/?repo=${{ github.repository }}&branch=${{ github.head_ref }}"],"steps":[{"step":"defineWpConfigConsts","consts":{"IS_PLAYGROUND_PREVIEW":true}}]}) or [download the zip](${{ github.server_url }}/${{ github.repository }}/archive/${{ github.sha }}.zip).
+
