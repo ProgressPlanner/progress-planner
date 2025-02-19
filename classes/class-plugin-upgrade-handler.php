@@ -74,18 +74,23 @@ class Plugin_Upgrade_Handler {
 	 * @return array
 	 */
 	public function get_newly_added_task_providers() {
+		static $newly_added_task_providers;
 
-		$task_provider_ids = $this->get_newly_added_task_provider_ids();
+		if ( null === $newly_added_task_providers ) {
+			$task_provider_ids = $this->get_newly_added_task_provider_ids();
 
-		$task_providers = [];
+			$task_providers = [];
 
-		foreach ( $task_provider_ids as $task_provider_id ) {
-			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
-			if ( $task_provider ) { // @phpstan-ignore-line
-				$task_providers[] = $task_provider;
+			foreach ( $task_provider_ids as $task_provider_id ) {
+				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
+				if ( $task_provider ) { // @phpstan-ignore-line
+					$task_providers[] = $task_provider;
+				}
 			}
+
+				$newly_added_task_providers = $task_providers;
 		}
 
-		return $task_providers;
+		return $newly_added_task_providers;
 	}
 }
