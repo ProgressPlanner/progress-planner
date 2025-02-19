@@ -66,7 +66,7 @@ class Core_Permalink_Structure extends Local_OneTime_Tasks_Abstract {
 			) . '</p>',
 			'link_setting' => [
 				'hook'   => 'options-permalink.php',
-				'iconEl' => 'th:has(+td #permalink-input-plain)',
+				'iconEl' => 'label[for="permalink-input-month-name"], label[for="permalink-input-post-name"]',
 			],
 		];
 	}

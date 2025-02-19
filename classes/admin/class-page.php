@@ -195,6 +195,7 @@ class Page {
 				'tasks'           => $tasks_details,
 				'totalPoints'     => $total_points,
 				'completedPoints' => $completed_points,
+				'base_url'        => PROGRESS_PLANNER_URL,
 			]
 		);
 		\wp_enqueue_style(

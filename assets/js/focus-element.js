@@ -1,5 +1,29 @@
 /* global progressPlannerFocusElement */
 
+const prplGetIndicatorElement = ( content, taskId ) => {
+	// Create an <img> element.
+	const imgEl = document.createElement( 'img' );
+	imgEl.src =
+		progressPlannerFocusElement.base_url +
+		'/assets/images/icon_progress_planner.svg';
+	imgEl.alt = '';
+
+	// Create a span element for the points.
+	const spanEl = document.createElement( 'span' );
+	spanEl.textContent = content;
+
+	// Create a span element for the wrapper.
+	const wrapperEl = document.createElement( 'span' );
+	wrapperEl.classList.add( 'prpl-element-awards-points-icon-wrapper' );
+	wrapperEl.setAttribute( 'data-prpl-task-id', taskId );
+
+	// Add the image and span to the wrapper.
+	wrapperEl.appendChild( imgEl );
+	wrapperEl.appendChild( spanEl );
+
+	return wrapperEl;
+};
+
 /**
  * Maybe focus on the element, based on the URL.
  *
@@ -10,11 +34,18 @@ const prplMaybeFocusOnElement = ( task ) => {
 	const url = new URL( window.location.href );
 	const focusOnElement = url.searchParams.get( 'pp-focus-el' );
 	if ( focusOnElement === task.task_id ) {
-		const iconEl = document.querySelector( task.link_setting.iconEl );
-
-		iconEl.focus();
-		iconEl.scrollIntoView( { behavior: 'smooth' } );
-		iconEl.classList.add( 'prpl-element-focused' );
+		let focused = false;
+		const iconEls = document.querySelectorAll(
+			`[data-prpl-task-id="${ task.task_id }"]`
+		);
+		iconEls.forEach( ( el ) => {
+			el.classList.add( 'focused' );
+			if ( ! focused ) {
+				el.focus();
+				el.scrollIntoView( { behavior: 'smooth' } );
+				focused = true;
+			}
+		} );
 	}
 };
 
@@ -24,14 +55,17 @@ const prplMaybeFocusOnElement = ( task ) => {
  * @param {Object} task The task object.
  */
 const prplAddPointsIndicatorToElement = ( task ) => {
-	const iconEl = document.querySelector( task.link_setting.iconEl );
-	const points = task.points || 0;
-
-	iconEl.classList.add( 'prpl-element-awards-points-icon' );
-	iconEl.setAttribute( 'data-prpl-points', points );
-	if ( task.is_complete ) {
-		iconEl.classList.add( 'prpl-element-awards-points-icon-complete' );
-	}
+	const points = task.points || 1;
+	document.querySelectorAll( task.link_setting.iconEl ).forEach( ( el ) => {
+		const iconEl = prplGetIndicatorElement(
+			task.is_complete ? '✓' : '+' + points,
+			task.task_id
+		);
+		if ( task.is_complete ) {
+			iconEl.classList.add( 'complete' );
+		}
+		el.appendChild( iconEl );
+	} );
 };
 
 if ( progressPlannerFocusElement.tasks ) {
@@ -47,12 +81,11 @@ if ( progressPlannerFocusElement.tasks ) {
 	 * Add the points indicator to the page title.
 	 */
 	const prplPageTitle = document.querySelector( 'h1' );
-	prplPageTitle.classList.add( 'prpl-element-awards-points-icon' );
-	prplPageTitle.setAttribute(
-		'data-prpl-points',
+	const prplPageTitleIndicator = prplGetIndicatorElement(
 		progressPlannerFocusElement.completedPoints +
 			'/' +
-			progressPlannerFocusElement.totalPoints
+			progressPlannerFocusElement.totalPoints,
+		'total'
 	);
-	prplPageTitle.style.width = 'max-content';
+	prplPageTitle.appendChild( prplPageTitleIndicator );
 }
