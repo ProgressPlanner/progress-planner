@@ -43,9 +43,10 @@ const prplMaybeFocusOnElement = ( task ) => {
 			`[data-prpl-task-id="${ task.task_id }"]`
 		);
 		iconEls.forEach( ( el ) => {
-			el.classList.add( 'focused' );
+			const iconEl = el.querySelector( '.prpl-element-awards-points-icon-wrapper' );
+			iconEl.classList.add( 'focused' );
 			if ( ! focused ) {
-				el.focus();
+				iconEl.focus();
 				el.scrollIntoView( { behavior: 'smooth' } );
 				focused = true;
 			}
@@ -66,7 +67,7 @@ const prplAddPointsIndicatorToElement = ( task ) => {
 			task.task_id
 		);
 		if ( task.is_complete ) {
-			iconEl.classList.add( 'complete' );
+			iconEl.querySelector( '.prpl-element-awards-points-icon-wrapper' ).classList.add( 'complete' );
 		}
 		el.appendChild( iconEl );
 	} );
