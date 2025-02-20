@@ -169,6 +169,15 @@
 	}
 }
 
+/* Welcome screen. */
+.prpl-welcome {
+
+	/* Hide the onboarding tasks by default. */
+	#prpl-onboarding-tasks {
+		display: none;
+	}
+}
+
 /* Onboarding tasks popover (when plugin is updated). */
 #prpl-popover-upgrade-tasks.prpl-popover {
 	max-width: 40vw;
