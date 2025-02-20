@@ -26,6 +26,12 @@ class Permalink_Structure extends One_Time {
 	 */
 	const ID = 'core-permalink-structure';
 
+	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected $is_onboarding_task = true;
 
 	/**
 	 * Check if the task condition is satisfied.

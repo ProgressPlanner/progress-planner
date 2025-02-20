@@ -54,8 +54,22 @@ class Plugin_Upgrade_Handler {
 
 		if ( null === $newly_added_task_providers ) {
 
-			// Check if task providers option exists, it will not on fresh installs.
+			// Privacy policy is not accepted, so it's a fresh install.
+			$fresh_install = ! \progress_planner()->is_privacy_policy_accepted();
+
+			// Check if task providers option exists, it will not on fresh installs and v1.0.4 and older.
 			$old_task_providers = \get_option( 'progress_planner_previous_version_task_providers', [] );
+
+			// We're upgrading from v1.0.4 and older, set the old task providers to what we had before the upgrade.
+			if ( ! $fresh_install && empty( $old_task_providers ) ) {
+				$old_task_providers = [
+					'core-blogdescription',
+					'wp-debug-display',
+					'sample-page',
+					'hello-world',
+					'core-siteicon',
+				];
+			}
 
 			$newly_added_task_providers = [];
 
