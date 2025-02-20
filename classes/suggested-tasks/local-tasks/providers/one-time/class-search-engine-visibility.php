@@ -60,7 +60,7 @@ class Search_Engine_Visibility extends One_Time {
 			'description'  => '<p>' . \esc_html__( 'Your site is not currently visible to search engines. Consider allowing search engines to index your site.', 'progress-planner' ) . '</p>',
 			'link_setting' => [
 				'hook'   => 'options-reading.php',
-				'iconEl' => 'tr th:has(+td label[for="blog_public"])',
+				'iconEl' => 'label[for="blog_public"]',
 			],
 		];
 	}
