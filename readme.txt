@@ -78,11 +78,30 @@ https://youtu.be/e1bmxZYyXFY
 
 == Changelog ==
 
-= 1.0.5 =
+= 1.1.0 =
+
+In this release, we've added more recommendations from Ravi on how to improve your site. We've also made these recommendations more visible on your WordPress 
+settings pages, by showing on settings pages exactly which things we think you should change. Also, if you're just now starting to use Progress Planner, 
+we've made the onboarding experience a lot more fun: we show you immediately which of Ravi's recommended tasks you've already completed and we give 
+you points for those!
+
+Added these recommendations from Ravi:
+
+* Properly set your [permalink structure](https://progressplanner.com/recommendations/change-default-permalink-structure/).
+* Fix it if your site is [set to not be shown in search engines](https://progressplanner.com/recommendations/blog-indexing-settings/).
+* Rename and change the slug of your [Uncategorized category](https://progressplanner.com/recommendations/rename-uncategorized-category/).
+* Remove [inactive plugins](https://progressplanner.com/recommendations/remove-inactive-plugins/).
+* [Upgrade your PHP version](https://progressplanner.com/recommendations/update-php-version/) if possible.
+* [Fully disable comments](https://progressplanner.com/recommendations/disable-comments/) if they're not needed on your site.
+
+Bugs we fixed:
+
+* If you had `WP_DEBUG` set to false, the plugin would still tell you to disable `WP_DEBUG_DISPLAY`. We think Ravi was a bit overzealous in his recommendation, so we've fixed that.
 
 Under the hood:
 
-* Improved suggested tasks completion conditions.
+* We've added our set of debug tools straight into the plugin. If you define `PRPL_DEBUG` as `true` in your `wp-config.php` file, you'll get a PRPL Debug admin bar menu item.
+* Improved suggested tasks completion conditions so they don't trigger at the wrong moment.
 
 = 1.0.4 =
 
