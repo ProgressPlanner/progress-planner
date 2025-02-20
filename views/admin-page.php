@@ -27,6 +27,11 @@ if ( ! $prpl_privacy_policy_accepted ) {
 				<?php $prpl_admin_widget->render(); ?>
 			<?php endforeach; ?>
 		</div>
+
+		<?php // Display the upgrade tasks popover if needed. ?>
+		<?php if ( \progress_planner()->get_plugin_upgrade_handler()->get_newly_added_task_providers() ) : ?>
+			<?php \progress_planner()->get_popover()->the_popover( 'upgrade-tasks' )->render(); ?>
+		<?php endif; ?>
 	<?php else : ?>
 		<?php \progress_planner()->the_view( 'welcome.php' ); ?>
 	<?php endif; ?>

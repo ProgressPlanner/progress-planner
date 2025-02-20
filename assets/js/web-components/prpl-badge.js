@@ -18,7 +18,7 @@ customElements.define(
 					src="${
 						progressPlannerBadge.remoteServerRootUrl
 					}/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ badgeId }"
-					alt="Badge"
+					alt="${ progressPlannerBadge.l10n.badge }"
 					${ false === complete ? 'style="filter: grayscale(1);opacity: 0.25;"' : '' }
 					onerror="this.onerror=null;this.src='${
 						progressPlannerBadge.placeholderImageUrl

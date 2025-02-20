@@ -78,6 +78,9 @@ class Local_Tasks_Manager {
 
 		// Add the cleanup action.
 		\add_action( 'admin_init', [ $this, 'cleanup_pending_tasks' ] );
+
+		// Add the onboarding task providers.
+		\add_filter( 'prpl_onboarding_task_providers', [ $this, 'add_onboarding_task_providers' ] );
 	}
 
 	/**
@@ -87,6 +90,25 @@ class Local_Tasks_Manager {
 	 */
 	public function add_plugin_integration() {
 		// Add the plugin integration here.
+	}
+
+	/**
+	 * Add the onboarding task providers.
+	 *
+	 * @param array $task_providers The task providers.
+	 *
+	 * @return array
+	 */
+	public function add_onboarding_task_providers( $task_providers ) {
+
+		foreach ( $this->task_providers as $task_provider ) {
+
+			if ( $task_provider->is_onboarding_task() ) {
+				$task_providers[] = $task_provider->get_provider_id();
+			}
+		}
+
+		return $task_providers;
 	}
 
 	/**

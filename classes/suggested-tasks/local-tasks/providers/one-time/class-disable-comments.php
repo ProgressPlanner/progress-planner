@@ -27,6 +27,13 @@ class Disable_Comments extends One_Time {
 	const ID = 'disable-comments';
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected $is_onboarding_task = true;
+
+	/**
 	 * Check if the task condition is satisfied.
 	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *
