@@ -5,12 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
  * Add tasks for settings saved.
  */
-class Rename_Uncategorized_Category extends Local_OneTime_Tasks_Abstract {
+class Rename_Uncategorized_Category extends One_Time {
 
 	/**
 	 * The provider type.

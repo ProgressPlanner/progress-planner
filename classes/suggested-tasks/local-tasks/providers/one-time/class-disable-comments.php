@@ -5,12 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
  * Add tasks to check if WP debug is enabled.
  */
-class Disable_Comments extends Local_OneTime_Tasks_Abstract {
+class Disable_Comments extends One_Time {
 
 	/**
 	 * The provider type.
@@ -33,7 +33,7 @@ class Disable_Comments extends Local_OneTime_Tasks_Abstract {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return 10 > \wp_count_comments()->approved && 'closed' !== \get_option( 'disable_comments' );
+		return 10 > \wp_count_comments()->approved && 'closed' !== \get_option( 'default_comment_status' );
 	}
 
 	/**
@@ -42,7 +42,7 @@ class Disable_Comments extends Local_OneTime_Tasks_Abstract {
 	 * @return bool
 	 */
 	public function is_task_completed() {
-		return 'closed' === \get_option( 'disable_comments' );
+		return 'closed' === \get_option( 'default_comment_status' );
 	}
 
 	/**
