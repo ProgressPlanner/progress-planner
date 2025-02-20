@@ -93,7 +93,7 @@ class Plugin_Upgrade_Handler {
 				}
 			}
 
-				$newly_added_task_providers = $task_providers;
+			$newly_added_task_providers = $task_providers;
 		}
 
 		return $newly_added_task_providers;
