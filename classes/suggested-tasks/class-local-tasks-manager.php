@@ -131,6 +131,15 @@ class Local_Tasks_Manager {
 	}
 
 	/**
+	 * Get the task providers.
+	 *
+	 * @return array
+	 */
+	public function get_task_providers() {
+		return $this->task_providers;
+	}
+
+	/**
 	 * Get a task provider by its type.
 	 *
 	 * @param string $provider_id The provider ID.

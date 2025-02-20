@@ -49,15 +49,19 @@ class Search_Engine_Visibility extends One_Time {
 		}
 
 		return [
-			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Allow your site to be indexed by search engines', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
-			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-reading.php' ) ) : '',
-			'dismissible' => true,
-			'description' => '<p>' . \esc_html__( 'Your site is not currently visible to search engines. Consider allowing search engines to index your site.', 'progress-planner' ) . '</p>',
+			'task_id'      => $task_id,
+			'title'        => \esc_html__( 'Allow your site to be indexed by search engines', 'progress-planner' ),
+			'parent'       => 0,
+			'priority'     => 'high',
+			'type'         => $this->get_provider_type(),
+			'points'       => 1,
+			'url'          => $this->capability_required() ? \esc_url( \admin_url( 'options-reading.php' ) ) : '',
+			'dismissible'  => true,
+			'description'  => '<p>' . \esc_html__( 'Your site is not currently visible to search engines. Consider allowing search engines to index your site.', 'progress-planner' ) . '</p>',
+			'link_setting' => [
+				'hook'   => 'options-reading.php',
+				'iconEl' => 'label[for="blog_public"]',
+			],
 		];
 	}
 }

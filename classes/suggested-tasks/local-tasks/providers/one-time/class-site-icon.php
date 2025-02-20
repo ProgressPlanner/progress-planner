@@ -57,18 +57,22 @@ class Site_Icon extends One_Time {
 		}
 
 		return [
-			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Set site icon', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
-			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php' ) ) : '',
-			'description' => '<p>' . sprintf(
+			'task_id'      => $task_id,
+			'title'        => \esc_html__( 'Set site icon', 'progress-planner' ),
+			'parent'       => 0,
+			'priority'     => 'high',
+			'type'         => $this->get_provider_type(),
+			'points'       => 1,
+			'url'          => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php?pp-focus-el=' . $task_id ) ) : '',
+			'description'  => '<p>' . sprintf(
 				/* translators: %s:<a href="https://prpl.fyi/set-site-icon" target="_blank">site icon</a> link */
 				\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
 				'<a href="https://prpl.fyi/set-site-icon" target="_blank">' . \esc_html__( 'site icon', 'progress-planner' ) . '</a>'
 			) . '</p>',
+			'link_setting' => [
+				'hook'   => 'options-general.php',
+				'iconEl' => '.site-icon-section th',
+			],
 		];
 	}
 }

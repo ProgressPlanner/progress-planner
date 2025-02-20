@@ -40,7 +40,7 @@ class Disable_Comments extends One_Time {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return 10 > \wp_count_comments()->approved && 'closed' !== \get_option( 'default_comment_status' );
+		return 10 > \wp_count_comments()->approved && 'open' === \get_default_comment_status();
 	}
 
 	/**
@@ -49,7 +49,7 @@ class Disable_Comments extends One_Time {
 	 * @return bool
 	 */
 	public function is_task_completed() {
-		return 'closed' === \get_option( 'default_comment_status' );
+		return 'open' !== \get_default_comment_status();
 	}
 
 	/**
@@ -66,15 +66,15 @@ class Disable_Comments extends One_Time {
 		}
 
 		return [
-			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Disable comments', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
-			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-discussion.php' ) ) : '', // @phpstan-ignore-line property.nonObject
-			'dismissable' => true,
-			'description' => '<p>' . sprintf(
+			'task_id'      => $task_id,
+			'title'        => \esc_html__( 'Disable comments', 'progress-planner' ),
+			'parent'       => 0,
+			'priority'     => 'high',
+			'type'         => $this->get_provider_type(),
+			'points'       => 1,
+			'url'          => $this->capability_required() ? \esc_url( \admin_url( 'options-discussion.php' ) ) : '', // @phpstan-ignore-line property.nonObject
+			'dismissable'  => true,
+			'description'  => '<p>' . sprintf(
 				\esc_html(
 					// translators: %d is the number of approved comments.
 					\_n(
@@ -86,6 +86,10 @@ class Disable_Comments extends One_Time {
 				),
 				(int) \wp_count_comments()->approved
 			) . '</p>',
+			'link_setting' => [
+				'hook'   => 'options-discussion.php',
+				'iconEl' => 'label[for="default_comment_status"]',
+			],
 		];
 	}
 }

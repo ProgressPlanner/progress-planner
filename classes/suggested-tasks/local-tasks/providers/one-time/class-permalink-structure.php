@@ -52,18 +52,22 @@ class Permalink_Structure extends One_Time {
 		}
 
 		return [
-			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Set permalink structure', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
-			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( admin_url( 'options-permalink.php' ) ) : '',
-			'description' => '<p>' . sprintf(
+			'task_id'      => $task_id,
+			'title'        => \esc_html__( 'Set permalink structure', 'progress-planner' ),
+			'parent'       => 0,
+			'priority'     => 'high',
+			'type'         => $this->get_provider_type(),
+			'points'       => 1,
+			'url'          => $this->capability_required() ? \esc_url( admin_url( 'options-permalink.php' ) ) : '',
+			'description'  => '<p>' . sprintf(
 				/* translators: %1$s <a href="https://prpl.fyi/" target="_blank">We recommend</a> link */
 				\esc_html__( 'On install, WordPress sets the permalink structure to a format that is not SEO-friendly. %1$s changing it.', 'progress-planner' ),
 				'<a href="https://prpl.fyi/" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
 			) . '</p>',
+			'link_setting' => [
+				'hook'   => 'options-permalink.php',
+				'iconEl' => 'label[for="permalink-input-month-name"], label[for="permalink-input-post-name"]',
+			],
 		];
 	}
 }
