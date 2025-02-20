@@ -27,6 +27,13 @@ class Php_Version extends One_Time {
 	const ID = 'php-version';
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected $is_onboarding_task = true;
+
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool

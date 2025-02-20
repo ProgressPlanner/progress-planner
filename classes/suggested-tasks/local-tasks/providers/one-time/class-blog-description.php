@@ -27,6 +27,13 @@ class Blog_Description extends One_Time {
 	const TYPE = 'configuration';
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected $is_onboarding_task = true;
+
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
