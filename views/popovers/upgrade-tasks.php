@@ -11,7 +11,5 @@ use Progress_Planner\Badges\Monthly;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-?>
 
-<?php
 \progress_planner()->the_view( 'popovers/parts/upgrade-tasks.php', [ 'context' => 'upgrade' ] );
