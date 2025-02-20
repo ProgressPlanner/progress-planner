@@ -102,11 +102,11 @@ const prplOnboardRedirect = ( context = '' ) => {
 	// If context is onboardTasks and for some reason the scanning progress element is not found (ie on plugin upgrade), redirect.
 	if ( context === 'onboardTasks' && ! scanProgressElement ) {
 		// If plugin is upgraded, we dont show the tour.
-		if ( document.getElementById( 'prpl-popover-upgrade-tasks' ) ) {
-			window.location.href = redirectUrl;
-		} else {
-			window.location.href = redirectUrl + '&content-scan-finished=true';
-		}
+		window.location.href = document.getElementById(
+			'prpl-popover-upgrade-tasks'
+		)
+			? redirectUrl
+			: redirectUrl + '&content-scan-finished=true';
 	}
 
 	// Both elements are found, check if both are completed.
@@ -120,17 +120,13 @@ const prplOnboardRedirect = ( context = '' ) => {
 				scanProgressElement.getAttribute( 'data-onboarding-finished' )
 		) {
 			// Check if there are completed tasks, delay tour so the user can see the celebration.
-			if (
+			const redirectArgs =
 				onboardingTasksElement.querySelectorAll(
 					'.prpl-onboarding-task-completed'
 				).length > 0
-			) {
-				window.location.href =
-					redirectUrl + '&content-scan-finished=true&delay-tour=true';
-			} else {
-				window.location.href =
-					redirectUrl + '&content-scan-finished=true';
-			}
+					? '&content-scan-finished=true&delay-tour=true'
+					: '&content-scan-finished=true';
+			window.location.href = redirectUrl + redirectArgs;
 		}
 	}
 };

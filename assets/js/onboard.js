@@ -91,25 +91,22 @@ if ( document.getElementById( 'prpl-onboarding-form' ) ) {
 		.querySelectorAll( 'input[name="with-email"]' )
 		.forEach( ( input ) => {
 			input.addEventListener( 'change', function () {
+				const inputs = document
+					.getElementById( 'prpl-onboarding-form' )
+					.querySelectorAll( 'input' );
 				if ( 'no' === this.value ) {
-					document
-						.getElementById( 'prpl-onboarding-form' )
-						.querySelectorAll( 'input' )
-						.forEach( ( inputField ) => {
-							inputField.required = false;
-						} );
+					inputs.forEach( ( inputField ) => {
+						inputField.required = false;
+					} );
 				} else {
-					document
-						.getElementById( 'prpl-onboarding-form' )
-						.querySelectorAll( 'input' )
-						.forEach( ( inputField ) => {
-							if (
-								'name' === inputField.name ||
-								'email' === inputField.name
-							) {
-								inputField.required = true;
-							}
-						} );
+					inputs.forEach( ( inputField ) => {
+						if (
+							'name' === inputField.name ||
+							'email' === inputField.name
+						) {
+							inputField.required = true;
+						}
+					} );
 				}
 				document
 					.getElementById( 'prpl-onboarding-form' )

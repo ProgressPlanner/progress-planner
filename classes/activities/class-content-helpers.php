@@ -65,7 +65,7 @@ class Content_Helpers {
 
 		$word_count_type = function_exists( 'wp_get_word_count_type' ) ? wp_get_word_count_type() : 'words';
 		if ( function_exists( 'wp_word_count' ) ) {
-			$count = wp_word_count( $content, $word_count_type );
+			$count = \wp_word_count( $content, $word_count_type );
 		} else {
 			$content = \wp_strip_all_tags( // Strip HTML.
 				\do_blocks( // Parse blocks.
