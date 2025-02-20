@@ -63,9 +63,10 @@ class Php_Version extends One_Time {
 			'type'        => $this->get_provider_type(),
 			'points'      => 1,
 			'description' => '<p>' . sprintf(
-				/* translators: %s: php version */
-				\esc_html__( 'Your site is running on PHP version %s. We recommend updating to PHP version 8.0 or higher.', 'progress-planner' ),
-				phpversion()
+				/* translators: %1$s: php version, %2$s: <a href="https://prpl.fyi/update-php-version" target="_blank">We recommend</a> link */
+				\esc_html__( 'Your site is running on PHP version %1$s. %2$s updating to PHP version 8.0 or higher.', 'progress-planner' ),
+				phpversion(),
+				'<a href="https://prpl.fyi/update-php-version" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
 			) . '</p>',
 		];
 	}
