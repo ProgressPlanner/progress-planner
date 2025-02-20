@@ -81,7 +81,7 @@ class Disable_Comments extends One_Time {
 			) . '</p>',
 			'link_setting' => [
 				'hook'   => 'options-discussion.php',
-				'iconEl' => 'label[for="default_comment_status"]',
+				'iconEl' => 'tr th:has(+td label[for="default_comment_status"])',
 			],
 		];
 	}
