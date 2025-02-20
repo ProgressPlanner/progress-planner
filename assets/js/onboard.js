@@ -1,4 +1,4 @@
-/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerTriggerScan, progressPlannerOnboardTasks */
+/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerTriggerScan, prplOnboardTasks */
 /*
  * Onboard
  *
@@ -53,7 +53,7 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 			progressPlannerTriggerScan();
 
 			// Start the tasks.
-			progressPlannerOnboardTasks();
+			prplOnboardTasks();
 		},
 		failAction: ( response ) => {
 			// eslint-disable-next-line no-console

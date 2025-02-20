@@ -17,14 +17,14 @@ class Plugin_Upgrade_Handler {
 	 *
 	 * @var array
 	 */
-	private $whitelisted_task_provider_ids;
+	private $onboard_task_provider_ids;
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		// Add the onboarding task providers.
-		$this->whitelisted_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', [] );
+		$this->onboard_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', [] );
 	}
 
 	/**
@@ -42,14 +42,14 @@ class Plugin_Upgrade_Handler {
 
 			$newly_added_task_providers = [];
 
-			foreach ( $this->whitelisted_task_provider_ids as $task_provider_id ) {
+			foreach ( $this->onboard_task_provider_ids as $task_provider_id ) {
 				if ( ! in_array( $task_provider_id, $old_task_providers, true ) ) {
 					$newly_added_task_providers[] = $task_provider_id;
 				}
 			}
 
 			// Update 'progress_planner_previous_version_task_providers' option.
-			\update_option( 'progress_planner_previous_version_task_providers', $this->whitelisted_task_provider_ids );
+			\update_option( 'progress_planner_previous_version_task_providers', $this->onboard_task_provider_ids );
 		}
 
 		return $newly_added_task_providers;

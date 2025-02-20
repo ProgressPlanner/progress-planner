@@ -1,4 +1,4 @@
-/* global progressPlanner, progressPlannerAjaxRequest, onBoardRedirect */
+/* global progressPlanner, progressPlannerAjaxRequest, prplOnboardRedirect */
 /*
  * Scan Posts
  *
@@ -46,7 +46,7 @@ const progressPlannerTriggerScan = () => {
 			);
 
 			// Redirect if scanning is finished.
-			onBoardRedirect( 'scanPosts' );
+			prplOnboardRedirect( 'scanPosts' );
 
 			return;
 		}

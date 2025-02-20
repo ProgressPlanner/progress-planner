@@ -11,7 +11,7 @@
  * Process the onboarding task checklist.
  */
 // eslint-disable-next-line no-unused-vars
-async function progressPlannerOnboardTasks() {
+async function prplOnboardTasks() {
 	const tasksElement = document.getElementById( 'prpl-onboarding-tasks' );
 	const timeToWait = 2000;
 
@@ -72,7 +72,7 @@ async function progressPlannerOnboardTasks() {
 	tasksElement.setAttribute( 'data-onboarding-finished', 'true' );
 
 	// Redirect if scanning is finished.
-	onBoardRedirect( 'onboardTasks' );
+	prplOnboardRedirect( 'onboardTasks' );
 }
 
 /**
@@ -81,7 +81,7 @@ async function progressPlannerOnboardTasks() {
  *
  * @param {string} context The context of the redirect.
  */
-function onBoardRedirect( context = '' ) {
+const prplOnboardRedirect = ( context = '' ) => {
 	const scanProgressElement = document.getElementById(
 		'progress-planner-scan-progress'
 	);
@@ -133,7 +133,7 @@ function onBoardRedirect( context = '' ) {
 			}
 		}
 	}
-}
+};
 
 // Trigger the onboarding tasks popover if it is in the DOM.
 prplDocumentReady( function () {
@@ -141,6 +141,6 @@ prplDocumentReady( function () {
 	if ( popover ) {
 		popover.showPopover();
 
-		progressPlannerOnboardTasks();
+		prplOnboardTasks();
 	}
 } );
