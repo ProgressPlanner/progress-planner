@@ -1,4 +1,11 @@
 /* global progressPlannerTour */
+/*
+ * Tour
+ *
+ * A tour for the Progress Planner.
+ *
+ * Dependencies: driver
+ */
 const prplDriver = window.driver.js.driver;
 
 const prplDriverObj = prplDriver( {
@@ -118,10 +125,17 @@ function prplStartTour() {
 		window.location.href
 			.replace( '&content-scan-finished=true', '' )
 			.replace( 'content-scan-finished=true', '' )
+			.replace( '&delay-tour=true', '' )
+			.replace( 'delay-tour=true', '' )
 	);
 }
 
 // Start the tour if the URL contains the query parameter.
 if ( window.location.href.includes( 'content-scan-finished=true' ) ) {
-	prplStartTour();
+	// If there are pending celebration tasks, delay the tour until celebration is done.
+	const delay = window.location.href.includes( 'delay-tour=true' ) ? 5000 : 0;
+
+	setTimeout( () => {
+		prplStartTour();
+	}, delay );
 }

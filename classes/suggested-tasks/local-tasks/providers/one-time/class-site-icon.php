@@ -5,12 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
  * Add tasks for Core siteicon.
  */
-class Core_Siteicon extends Local_OneTime_Tasks_Abstract {
+class Site_Icon extends One_Time {
 
 	/**
 	 * The provider ID.
@@ -27,13 +27,20 @@ class Core_Siteicon extends Local_OneTime_Tasks_Abstract {
 	const TYPE = 'configuration';
 
 	/**
-	 * Check if the task condition is met.
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected $is_onboarding_task = true;
+
+	/**
+	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
-	public function check_task_condition() {
+	public function should_add_task() {
 		$site_icon = \get_option( 'site_icon' );
-		return ( '' !== $site_icon && '0' !== $site_icon ) ? true : false;
+		return '' === $site_icon || '0' === $site_icon;
 	}
 
 	/**
@@ -50,18 +57,22 @@ class Core_Siteicon extends Local_OneTime_Tasks_Abstract {
 		}
 
 		return [
-			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Set site icon', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
-			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php' ) ) : '',
-			'description' => '<p>' . sprintf(
+			'task_id'      => $task_id,
+			'title'        => \esc_html__( 'Set site icon', 'progress-planner' ),
+			'parent'       => 0,
+			'priority'     => 'high',
+			'type'         => $this->get_provider_type(),
+			'points'       => 1,
+			'url'          => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php?pp-focus-el=' . $task_id ) ) : '',
+			'description'  => '<p>' . sprintf(
 				/* translators: %s:<a href="https://prpl.fyi/set-site-icon" target="_blank">site icon</a> link */
 				\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
 				'<a href="https://prpl.fyi/set-site-icon" target="_blank">' . \esc_html__( 'site icon', 'progress-planner' ) . '</a>'
 			) . '</p>',
+			'link_setting' => [
+				'hook'   => 'options-general.php',
+				'iconEl' => '.site-icon-section th',
+			],
 		];
 	}
 }

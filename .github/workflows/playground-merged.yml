@@ -1,0 +1,19 @@
+name: Playground Comment
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  if_merged:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - uses: mshick/add-pr-comment@v2
+        with:
+          message: |
+            **Test merged PR on Playground**
+            [Test this pull request on the Playground](https://playground.wordpress.net/#{"landingPage":"/wp-admin/admin.php?page=progress-planner","features":{"networking":true},"login":true,"plugins":["https://github-proxy.com/proxy/?repo=${{ github.repository }}"],"steps":[{"step":"defineWpConfigConsts","consts":{"IS_PLAYGROUND_PREVIEW":true}}]}) or [download the zip](${{ github.server_url }}/${{ github.repository }}/archive/refs/heads/develop.zip). 

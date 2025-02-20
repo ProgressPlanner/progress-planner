@@ -5,12 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
  * Add tasks for hello world post.
  */
-class Hello_World extends Local_OneTime_Tasks_Abstract {
+class Hello_World extends One_Time {
 
 	/**
 	 * The provider type.
@@ -34,6 +34,13 @@ class Hello_World extends Local_OneTime_Tasks_Abstract {
 	protected $capability = 'edit_posts';
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected $is_onboarding_task = true;
+
+	/**
 	 * The sample post.
 	 *
 	 * @var \WP_Post|null|false
@@ -41,14 +48,13 @@ class Hello_World extends Local_OneTime_Tasks_Abstract {
 	protected $sample_post = false;
 
 	/**
-	 * Check if the task condition is met.
+	 * Check if the task condition is satisfied.
+	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *
 	 * @return bool
 	 */
-	public function check_task_condition() {
-		$hello_world = $this->get_sample_post();
-
-		return null === $hello_world ? true : false;
+	public function should_add_task() {
+		return null !== $this->get_sample_post();
 	}
 
 	/**

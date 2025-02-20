@@ -16,6 +16,8 @@ use Progress_Planner\Actions\Content as Actions_Content;
 use Progress_Planner\Actions\Content_Scan as Actions_Content_Scan;
 use Progress_Planner\Actions\Maintenance as Actions_Maintenance;
 use Progress_Planner\Admin\Page_Settings as Admin_Page_Settings;
+use Progress_Planner\Plugin_Upgrade_Handler;
+use Progress_Planner\Debug_Tools;
 /**
  * Main plugin class.
  */
@@ -102,6 +104,13 @@ class Base {
 			$this->cached['settings_page'] = new Admin_Page_Settings();
 
 			new Plugin_Deactivation();
+		}
+
+		$this->cached['plugin_upgrade_handler'] = new Plugin_Upgrade_Handler();
+
+		// Debug tools.
+		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {
+			new Debug_Tools();
 		}
 
 		/**
@@ -196,9 +205,16 @@ class Base {
 	 * @return array
 	 */
 	public function add_action_links( $actions ) {
-		$action_link = [ '<a href="' . admin_url( 'admin.php?page=progress-planner' ) . '">' . __( 'Dashboard', 'progress-planner' ), '</a>' ];
-		$actions     = array_merge( $action_link, $actions );
-		return $actions;
+		return array_merge(
+			[
+				sprintf(
+					'<a href="%1$s">%2$s</a>',
+					admin_url( 'admin.php?page=progress-planner' ),
+					__( 'Dashboard', 'progress-planner' )
+				),
+			],
+			$actions
+		);
 	}
 
 	/**

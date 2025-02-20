@@ -1,4 +1,11 @@
-/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerTriggerScan */
+/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerTriggerScan, prplOnboardTasks */
+/*
+ * Onboard
+ *
+ * A script to handle the onboarding process.
+ *
+ * Dependencies: progress-planner-ajax-request, progress-planner-scan-posts, progress-planner-upgrade-tasks
+ */
 
 /**
  * Make a request to save the license key.
@@ -44,6 +51,9 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 
 			// Start scanning posts.
 			progressPlannerTriggerScan();
+
+			// Start the tasks.
+			prplOnboardTasks();
 		},
 		failAction: ( response ) => {
 			// eslint-disable-next-line no-console

@@ -5,12 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
  * Add tasks to check if WP debug is enabled.
  */
-class Debug_Display extends Local_OneTime_Tasks_Abstract {
+class Debug_Display extends One_Time {
 
 	/**
 	 * The provider type.
@@ -27,12 +27,19 @@ class Debug_Display extends Local_OneTime_Tasks_Abstract {
 	const ID = 'wp-debug-display';
 
 	/**
-	 * Check if the task condition is met.
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected $is_onboarding_task = true;
+
+	/**
+	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
-	public function check_task_condition() {
-		return ( ! defined( 'WP_DEBUG_DISPLAY' ) || ! WP_DEBUG_DISPLAY ) ? true : false;
+	public function should_add_task() {
+		return defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
 	}
 
 	/**

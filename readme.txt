@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.0.4
+Stable tag: 1.1.0
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -12,25 +12,57 @@ Powering your website’s progress! Track, motivate, and enhance your website ma
 
 == Description ==
 
-Welcome to Progress Planner! This transformative WordPress plugin will empower website owners to keep up the good work on their site. Progress Planner introduces an exciting, interactive approach to website management with badges and achievements to collect. Our mission is to tackle the all-too-common challenge of procrastination. With Progress Planner, the upkeep of your website is a rewarding experience! We’ll encourage you to contribute to the success of your site consistently.
+A website isn’t something you set up once and forget about. Over time, small issues pile up — broken links, outdated content, slow load times — and suddenly, your site isn’t performing as well as it should. But staying on top of maintenance and optimization takes time and effort. Where do you even start?
 
-=== Problem We Solve ===
-We understand many website owners' dilemma — knowing the necessity of regular updates, content creation, and maintenance, yet often postponing these tasks —. Progress Planner seeks to address this procrastination head-on. A successful website demands regular attention, whether writing engaging content, adding internal links, updating plugins, resolving 404 errors, or optimizing site speed. These tasks are pivotal for a website to rank well and convert visitors effectively. Progress Planner ensures you stay on track, providing the tools and motivation to maintain and enhance your site's success.
+Progress Planner makes website upkeep easy. Built by the founders of Yoast, this plugin helps you keep your site optimized with clear, actionable recommendations, a smart to-do list and guided challenges that help you improve your site step by step. No more guesswork — just the right tasks at the right time.
 
-=== Features ===
+### 🔑 Key features
 
-* **Activity Tracking**: Monitor your actions on your website, from publishing posts to updating pages, and see how they contribute to your overall site health.
-* **Gamification**: Unlock achievements, earn badges, and track your progress in a fun and motivating way.
-* **Progress Reports**: Receive detailed reports on your website's performance and progress.
-* **To-do list**: Keep all those content and maintenance tasks in one place.
-* **More to come**: We are creating a Pro version and extra features for the Free version of Progress Planner. Stay tuned for updates!
+#### Get personalized recommendations with Ravi’s Recommendations
+Keeping up with all the little tasks that make a website run smoothly can be overwhelming. That’s why we’ve curated an interactive list of important but often-overlooked improvements for you. With Ravi’s Recommendations, you don’t have to figure out what needs attention — we do that for you.
 
-=== Getting Started ===
-* **Install Progress Planner**: Download and activate the plugin from the WordPress plugin repository on your WordPress site.
-* **Define your goals**: Set specific, realistic goals for your website's improvement and growth.
-* **Engage in daily tasks**: Regularly update your website, with Progress Planner tracking each step and providing motivational feedback.
-* **Earn and celebrate**: Achieve your milestones and celebrate your success with rewards and recognitions from Progress Planner.
-* **Strive for continuous Improvement**: Utilize our guides and analytics to refine your site perpetually, ensuring its ongoing success.
+From setting your site’s tagline and icon to reviewing your permalink structure or removing default WordPress content, we surface the tasks that help keep your site professional, optimized and secure. Each recommendation comes with clear instructions, so all you have to do is put them into practice — no guesswork required.
+
+#### Stay organized with an in-context to-do list
+Managing website tasks can be messy, but Progress Planner keeps everything in one place. Your to-do list isn’t just another checklist — it’s right where you need it. Add your own website tasks and keep them in context, so you have them on hand while working on your site. No more forgetting what needs to be done!
+
+#### Track your website activity over time
+A well-maintained website isn’t built in a day — it’s improved with regular updates. Your website activity score reflects the maintenance work you’ve done over the past 30 days, helping you stay on track and keep your site in top shape.
+
+#### Earn badges and streaks for your progress
+Motivation matters! Stay engaged with Progress Planner’s built-in gamification. Earn badges and track your streaks as you complete tasks and keep your website in great shape.
+
+#### Everything in one place: Your dashboard
+Your dashboard gives you a clear overview of your website’s progress. See your recommendations, to-do list and achievements at a glance — so you can jump right into the most important tasks.
+
+### 🆘 Want expert guidance? Get Progress Planner Pro
+
+If you’re ready to take things further, [Progress Planner Pro](https://progressplanner.com/pro/) gives you access to in-depth guidance and structured challenges that walk you through key website improvements step by step.
+
+#### Get results with guided challenges
+Maintaining a website can feel overwhelming — but you don’t have to do it alone. With Progress Planner Pro, you get access to expert-led challenges that guide you through key website improvements step by step.
+
+Each challenge is interactive and tailored to help you make real progress. You can expect:
+
+* Live **webinars & workshops** with experts sharing insights and strategies
+* Actionable **reports & exercises** to apply what you’ve learned to your own site
+* Personal **feedback & support**, like having your copywriting reviewed
+* A **structured plan**, so you always know what to do next
+
+It’s not just advice — it’s a hands-on, practical experience that helps you take real action and see results.
+
+#### Learn with practical mini courses
+
+Want to sharpen your skills while improving your site? [Progress Planner Pro](https://progressplanner.com/pro/) includes mini courses that give you the knowledge you need — without the fluff.
+
+#### Get support when you need it
+Sometimes you just need a little extra help. With Pro, you get access to our support team, ready to answer your questions and guide you through website improvements.
+
+### 🧹 Ready to make website maintenance easier?
+Progress Planner takes the frustration out of keeping your website in top shape. Whether you’re tackling quick fixes or diving into bigger improvements, you’ll always know what to do next.
+
+Download Progress Planner for free and start optimizing your site today!
+
 
 == Frequently Asked Questions ==
 
@@ -44,7 +76,7 @@ Currently, Progress Planner supports tracking for one website per WordPress inst
 
 = Is there a Pro version of Progress Planner? =
 
-We are currently creating a Pro version of Progress Planner. The Pro version will include guided tutorials, goal settings, and reminders.
+Yes! You can [find it right here](https://progressplanner.com/pro/).
 
 = Where do I file bugs? =
 
@@ -77,6 +109,31 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.1.0 =
+
+In this release, we've added more recommendations from Ravi on how to improve your site. We've also made these recommendations more visible on your WordPress 
+settings pages, by showing on settings pages exactly which things we think you should change. Also, if you're just now starting to use Progress Planner, 
+we've made the onboarding experience a lot more fun: we show you immediately which of Ravi's recommended tasks you've already completed and we give 
+you points for those!
+
+Added these recommendations from Ravi:
+
+* Properly set your [permalink structure](https://progressplanner.com/recommendations/change-default-permalink-structure/).
+* Fix it if your site is [set to not be shown in search engines](https://progressplanner.com/recommendations/blog-indexing-settings/).
+* Rename and change the slug of your [Uncategorized category](https://progressplanner.com/recommendations/rename-uncategorized-category/).
+* Remove [inactive plugins](https://progressplanner.com/recommendations/remove-inactive-plugins/).
+* [Upgrade your PHP version](https://progressplanner.com/recommendations/update-php-version/) if needed.
+* [Fully disable comments](https://progressplanner.com/recommendations/disable-comments/) if they're not needed on your site.
+
+Bugs we fixed:
+
+* If you had `WP_DEBUG` set to false, the plugin would still tell you to disable `WP_DEBUG_DISPLAY`. We think Ravi was a bit overzealous in his recommendation, so we've fixed that.
+
+Under the hood:
+
+* We've added our set of debug tools straight into the plugin. If you define `PRPL_DEBUG` as `true` in your `wp-config.php` file, you'll get a PRPL Debug admin bar menu item.
+* Improved suggested tasks completion conditions so they don't trigger at the wrong moment.
 
 = 1.0.4 =
 
