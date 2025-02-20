@@ -1,12 +1,14 @@
 /* global progressPlannerFocusElement */
 
-const prplGetIndicatorElement = ( content, taskId ) => {
+const prplGetIndicatorElement = ( content, taskId, points ) => {
 	// Create an <img> element.
 	const imgEl = document.createElement( 'img' );
 	imgEl.src =
 		progressPlannerFocusElement.base_url +
 		'/assets/images/icon_progress_planner.svg';
-	imgEl.alt = '';
+	imgEl.alt = points
+		? progressPlannerFocusElement.l10n.fixThisIssue.replace( '%d', points )
+		: '';
 
 	// Create a span element for the points.
 	const spanEl = document.createElement( 'span' );
@@ -59,7 +61,8 @@ const prplAddPointsIndicatorToElement = ( task ) => {
 	document.querySelectorAll( task.link_setting.iconEl ).forEach( ( el ) => {
 		const iconEl = prplGetIndicatorElement(
 			task.is_complete ? '✓' : '+' + points,
-			task.task_id
+			task.task_id,
+			points
 		);
 		if ( task.is_complete ) {
 			iconEl.classList.add( 'complete' );
@@ -67,7 +70,9 @@ const prplAddPointsIndicatorToElement = ( task ) => {
 
 		// Create a positioning wrapper.
 		const wrapperEl = document.createElement( 'span' );
-		wrapperEl.classList.add( 'prpl-element-awards-points-icon-positioning-wrapper' );
+		wrapperEl.classList.add(
+			'prpl-element-awards-points-icon-positioning-wrapper'
+		);
 
 		// Add the icon to the wrapper.
 		wrapperEl.appendChild( iconEl );
