@@ -5,14 +5,14 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
 use Progress_Planner\Activities\Content_Helpers;
 
 /**
  * Add tasks for content creation.
  */
-class Content_Create extends Content_Abstract {
+class Create extends Content {
 
 	/**
 	 * The provider ID.

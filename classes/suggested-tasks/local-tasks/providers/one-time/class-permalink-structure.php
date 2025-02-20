@@ -5,12 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
  * Add tasks for hello world post.
  */
-class Core_Permalink_Structure extends Local_OneTime_Tasks_Abstract {
+class Permalink_Structure extends One_Time {
 
 	/**
 	 * The provider type.
