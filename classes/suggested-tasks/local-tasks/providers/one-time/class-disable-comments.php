@@ -76,15 +76,16 @@ class Disable_Comments extends One_Time {
 			'dismissable'  => true,
 			'description'  => '<p>' . sprintf(
 				\esc_html(
-					// translators: %d is the number of approved comments.
+					// translators: %d is the number of approved comments, %s is the <a href="https://prpl.fyi/disable-comments" target="_blank">disabling them</a> link.
 					\_n(
-						'There is %d comment. If you don\'t need comments on your site, consider disabling them.',
-						'There are %d comments. If you don\'t need comments on your site, consider disabling them.',
+						'There is %1$d comment. If you don\'t need comments on your site, consider %2$s.',
+						'There are %1$d comments. If you don\'t need comments on your site, consider %2$s.',
 						(int) \wp_count_comments()->approved,
 						'progress-planner'
 					)
 				),
-				(int) \wp_count_comments()->approved
+				(int) \wp_count_comments()->approved,
+				'<a href="https://prpl.fyi/disable-comments" target="_blank">' . \esc_html__( 'disabling them', 'progress-planner' ) . '</a>',
 			) . '</p>',
 			'link_setting' => [
 				'hook'   => 'options-discussion.php',
