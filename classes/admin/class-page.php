@@ -138,7 +138,7 @@ class Page {
 				\wp_enqueue_script( 'progress-planner-header-filters' );
 				\wp_enqueue_script( 'progress-planner-settings' );
 				\wp_enqueue_script( 'progress-planner-grid-masonry' );
-				\wp_enqueue_script( 'progress-planner-onboard-tasks' );
+				\wp_enqueue_script( 'progress-planner-upgrade-tasks' );
 			} else {
 				\wp_enqueue_script( 'progress-planner-onboard' );
 			}
@@ -177,12 +177,12 @@ class Page {
 		}
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
-			// Enqueue onboarding tasks styles, these are needed both when privacy policy is accepted and when it is not.
+			// Enqueue ugprading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
 			\wp_enqueue_style(
-				'progress-planner-onboarding-tasks',
-				PROGRESS_PLANNER_URL . '/assets/css/onboarding-tasks.css',
+				'progress-planner-upgrade-tasks',
+				PROGRESS_PLANNER_URL . '/assets/css/upgrade-tasks.css',
 				[],
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/onboarding-tasks.css' )
+				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/upgrade-tasks.css' )
 			);
 		}
 

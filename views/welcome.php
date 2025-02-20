@@ -32,12 +32,12 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 	\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/onboard.css' )
 );
 
-// Enqueue onboarding styles.
+// Enqueue upgrade styles.
 \wp_enqueue_style(
-	'progress-planner-onboarding-tasks',
-	PROGRESS_PLANNER_URL . '/assets/css/onboarding-tasks.css',
+	'progress-planner-upgrade-tasks',
+	PROGRESS_PLANNER_URL . '/assets/css/upgrade-tasks.css',
 	[],
-	\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/onboarding-tasks.css' )
+	\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/upgrade-tasks.css' )
 );
 
 
