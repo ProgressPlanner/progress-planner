@@ -33,7 +33,7 @@ class Disable_Comments extends One_Time {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return 10 > \wp_count_comments()->approved && 'closed' !== \get_option( 'disable_comments' );
+		return 10 > \wp_count_comments()->approved && 'closed' !== \get_option( 'default_comment_status' );
 	}
 
 	/**
@@ -42,7 +42,7 @@ class Disable_Comments extends One_Time {
 	 * @return bool
 	 */
 	public function is_task_completed() {
-		return 'closed' === \get_option( 'disable_comments' );
+		return 'closed' === \get_option( 'default_comment_status' );
 	}
 
 	/**
