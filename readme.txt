@@ -123,7 +123,7 @@ Added these recommendations from Ravi:
 * Fix it if your site is [set to not be shown in search engines](https://progressplanner.com/recommendations/blog-indexing-settings/).
 * Rename and change the slug of your [Uncategorized category](https://progressplanner.com/recommendations/rename-uncategorized-category/).
 * Remove [inactive plugins](https://progressplanner.com/recommendations/remove-inactive-plugins/).
-* [Upgrade your PHP version](https://progressplanner.com/recommendations/update-php-version/) if possible.
+* [Upgrade your PHP version](https://progressplanner.com/recommendations/update-php-version/) if needed.
 * [Fully disable comments](https://progressplanner.com/recommendations/disable-comments/) if they're not needed on your site.
 
 Bugs we fixed:
