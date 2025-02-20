@@ -17,14 +17,31 @@ class Plugin_Upgrade_Handler {
 	 *
 	 * @var array
 	 */
-	private $onboard_task_provider_ids;
+	private $onboard_task_provider_ids = [];
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
+		// Delay the init action to allow so the onboarding task providers are initialized.
+		\add_action( 'init', [ $this, 'init' ], 20 );
+	}
+
+	/**
+	 * Initialize the plugin upgrade handler.
+	 * We want it only to run on the Progress Planner page in the admin (not on WP Dashboard or any other page) so we can properly display the onboarding tasks.
+	 *
+	 * @return void
+	 */
+	public function init() {
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- We're not processing any data.
+		if ( ! \is_admin() || ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'progress-planner' ) ) {
+			return;
+		}
+
 		// Add the onboarding task providers.
-		$this->onboard_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', [] );
+		$this->onboard_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', $this->onboard_task_provider_ids );
 	}
 
 	/**
