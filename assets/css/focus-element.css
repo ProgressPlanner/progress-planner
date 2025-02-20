@@ -11,6 +11,7 @@
 	padding: 0.25rem;
 	margin: 0 1rem;
 	transform: translateY(0.25rem);
+	scroll-margin-top: 30px;
 
 	img {
 		width: 0.815rem;
