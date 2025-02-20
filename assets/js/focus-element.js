@@ -21,7 +21,11 @@ const prplGetIndicatorElement = ( content, taskId ) => {
 	wrapperEl.appendChild( imgEl );
 	wrapperEl.appendChild( spanEl );
 
-	return wrapperEl;
+	const positioningWrapper = document.createElement( 'span' );
+	positioningWrapper.classList.add( 'prpl-element-awards-points-icon-positioning-wrapper' );
+	positioningWrapper.appendChild( wrapperEl );
+
+	return positioningWrapper;
 };
 
 /**
