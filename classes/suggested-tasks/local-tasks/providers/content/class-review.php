@@ -5,14 +5,14 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 
 /**
  * Add tasks for content updates.
  */
-class Content_Review extends Content_Abstract {
+class Review extends Content {
 
 	/**
 	 * The provider ID.

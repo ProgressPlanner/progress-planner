@@ -5,12 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
  * Add tasks to check if WP debug is enabled.
  */
-class Reduce_Autoloaded_Options extends Local_OneTime_Tasks_Abstract {
+class Reduce_Autoloaded_Options extends One_Time {
 
 	/**
 	 * The provider type.
@@ -62,9 +62,9 @@ class Reduce_Autoloaded_Options extends Local_OneTime_Tasks_Abstract {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		// If the plugin is active, we don't need to add the task.
+		// If the plugin is  active, we don't need to add the task.
 		if ( $this->is_plugin_active() ) {
-			return true;
+			return false;
 		}
 
 		return $this->get_autoloaded_options_count() > $this->autoloaded_options_threshold;

@@ -8,18 +8,25 @@
 namespace Progress_Planner\Suggested_Tasks;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Create;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Review;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Update;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Blogdescription;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Settings_Saved;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Debug_Display;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Disable_Comments;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Sample_Page;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Hello_World;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Siteicon;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Php_Version;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Reduce_Autoloaded_Options;
+// Repetitive tasks.
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
+// Content tasks.
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Create as Content_Create;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Review as Content_Review;
+// One-time tasks.
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Blog_Description;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Settings_Saved;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Debug_Display;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Disable_Comments;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Sample_Page;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Hello_World;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Remove_Inactive_Plugins;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Site_Icon;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Rename_Uncategorized_Category;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Permalink_Structure;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Php_Version;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engine_Visibility;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Reduce_Autoloaded_Options;
 
 /**
  * Local_Tasks_Manager class.
@@ -53,14 +60,18 @@ class Local_Tasks_Manager {
 			new Content_Create(),
 			new Content_Review(),
 			new Core_Update(),
-			new Core_Blogdescription(),
+			new Blog_Description(),
 			new Settings_Saved(),
 			new Debug_Display(),
 			new Disable_Comments(),
 			new Sample_Page(),
 			new Hello_World(),
-			new Core_Siteicon(),
+			new Remove_Inactive_Plugins(),
+			new Site_Icon(),
+			new Rename_Uncategorized_Category(),
+			new Permalink_Structure(),
 			new Php_Version(),
+			new Search_Engine_Visibility(),
 			new Reduce_Autoloaded_Options(),
 		];
 
