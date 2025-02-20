@@ -1,0 +1,191 @@
+.prpl-onboarding-tasks-title,
+.prpl-onboarding-tasks-description {
+	display: block;
+	margin-bottom: 1rem;
+}
+
+#prpl-onboarding-tasks {
+	border: 1px solid var(--prpl-color-gray-2);
+	border-radius: var(--prpl-border-radius);
+	padding: var(--prpl-padding);
+	min-width: 0;
+	min-height: 0;
+	margin-bottom: var(--prpl-gap);
+	box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.07), -2px 0 6px rgba(0, 0, 0, 0.07);
+
+	.prpl-onboarding-tasks-list {
+		margin-top: 1rem;
+		margin-left: 0;
+		padding-left: 0;
+		list-style: none;
+	}
+
+	.prpl-onboarding-task {
+		margin: 0;
+		padding: 0.5rem 0.5rem;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		position: relative;
+
+		&:nth-child(2n+1) {
+			background-color: #f9fafb;
+		}
+
+		h3 {
+			font-size: 1rem;
+			margin: 0;
+			font-weight: 500;
+		}
+	}
+
+
+	.prpl-onboarding-task-status {
+		display: block;
+		width: 1.5rem;
+		height: 1.5rem;
+	}
+
+	.prpl-suggested-task-points {
+		font-size: var(--prpl-font-size-xs);
+		font-weight: 700;
+		color: var(--prpl-color-headings);
+		background-color: var(--prpl-color-400-orange);
+		width: 1.5rem;
+		height: 1.5rem;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.prpl-suggested-task-loader {
+		width: 25px;
+		aspect-ratio: 1;
+
+		/* display: grid; */
+		border-radius: 50%;
+		background:
+			linear-gradient(0deg, rgb(250 163 16/50%) 30%, #0000 0 70%, rgb(250 163 16/100%) 0) 50%/8% 100%,
+			linear-gradient(90deg, rgb(250 163 16/25%) 30%, #0000 0 70%, rgb(250 163 16/75%) 0) 50%/100% 8%;
+		background-repeat: no-repeat;
+		animation: loaderAnimation 1s infinite steps(12);
+
+		&::before,
+		&::after {
+			content: "";
+			grid-area: 1/1;
+			border-radius: 50%;
+			background: inherit;
+			opacity: 0.915;
+			transform: rotate(30deg);
+		}
+
+		&::after {
+			opacity: 0.83;
+			transform: rotate(60deg);
+		}
+	}
+
+	.icon-exclamation-circle {
+
+		path {
+			fill: #6b7280;
+		}
+	}
+
+	/* Hide the points loader and icons. */
+	.prpl-suggested-task-loader,
+	.icon-check-circle,
+	.icon-exclamation-circle {
+		display: none;
+	}
+
+	/* Loading state. */
+	.prpl-onboarding-task-loading {
+
+		.prpl-suggested-task-loader {
+			display: grid;
+		}
+
+		.prpl-suggested-task-points {
+			display: none;
+		}
+	}
+
+	/* Completed state. */
+	.prpl-onboarding-task-completed {
+
+		.icon-check-circle {
+			display: inline;
+		}
+
+		.prpl-suggested-task-points {
+			display: none;
+		}
+	}
+
+	/* Not completed state. */
+	.prpl-onboarding-task-not-completed {
+
+		.icon-exclamation-circle {
+			display: inline;
+		}
+
+		.prpl-suggested-task-points {
+			display: none;
+		}
+	}
+}
+
+.prpl-onboarding-tasks-footer {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 2rem;
+
+	.prpl-onboarding-tasks-montly-badge {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.prpl-onboarding-tasks-montly-badge-image {
+		display: inline-block;
+		width: 100px;
+	}
+
+	.prpl-onboarding-tasks-total-points {
+		font-size: var(--prpl-font-size-3xl);
+		font-weight: 600;
+	}
+
+}
+
+@keyframes loaderAnimation {
+
+	100% {
+		transform: rotate(1turn);
+	}
+}
+
+/* Welcome screen. */
+.prpl-welcome {
+
+	/* Hide the onboarding tasks by default. */
+	#prpl-onboarding-tasks {
+		display: none;
+	}
+}
+
+/* Onboarding tasks popover (when plugin is updated). */
+#prpl-popover-upgrade-tasks.prpl-popover {
+	max-width: 40vw;
+	padding: calc(var(--prpl-padding) * 1.5); /* So popover's X button doesn't overlap the tasks. */
+
+	#prpl-onboarding-tasks {
+		display: block !important;
+		margin-bottom: 0;
+	}
+}
+
