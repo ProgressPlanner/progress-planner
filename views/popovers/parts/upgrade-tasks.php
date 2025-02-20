@@ -77,7 +77,7 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 			<span class="prpl-onboarding-tasks-montly-badge-image">
 				<img
 					src="<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . \esc_attr( $prpl_badge->get_id() ) ); ?>"
-					alt="Badge"
+					alt="<?php \esc_attr_e( 'Badge', 'progress-planner' ); ?>"
 					onerror="this.onerror=null;this.src='<?php echo esc_url( \progress_planner()->get_placeholder_svg() ); ?>';"
 				/>
 			</span>
