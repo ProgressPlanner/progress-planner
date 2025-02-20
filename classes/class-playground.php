@@ -16,7 +16,9 @@ class Playground {
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_action( 'init', [ $this, 'register_hooks' ] );
+		\add_action( 'init', [ $this, 'register_hooks' ], 9 );
+
+		\add_action( 'plugins_loaded', [ $this, 'enable_debug_tools' ], 1 );
 	}
 
 	/**
@@ -47,6 +49,15 @@ class Playground {
 		\add_action( 'progress_planner_admin_page_header_before', [ $this, 'show_header_notice' ] );
 		\add_action( 'wp_ajax_progress_planner_hide_onboarding', [ $this, 'hide_onboarding' ] );
 		\add_action( 'wp_ajax_progress_planner_show_onboarding', [ $this, 'show_onboarding' ] );
+	}
+
+	/**
+	 * Enable debug tools.
+	 *
+	 * @return void
+	 */
+	public function enable_debug_tools() {
+		\update_option( 'prpl_debug', true );
 	}
 
 	/**

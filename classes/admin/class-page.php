@@ -38,8 +38,8 @@ class Page {
 	 */
 	public function get_widgets() {
 		$widgets = [
-			\progress_planner()->get_widgets__activity_scores(),
 			\progress_planner()->get_widgets__suggested_tasks(),
+			\progress_planner()->get_widgets__activity_scores(),
 			\progress_planner()->get_widgets__todo(),
 			\progress_planner()->get_widgets__challenge(),
 			\progress_planner()->get_widgets__latest_badge(),

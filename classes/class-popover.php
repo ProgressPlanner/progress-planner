@@ -40,19 +40,14 @@ class Popover {
 	 * @return void
 	 */
 	public function render_button( $icon, $content ) {
-		?>
-		<!-- The triggering button. -->
-		<button
-			class="prpl-info-icon"
-			popovertarget="prpl-popover-<?php echo \esc_attr( $this->id ); ?>"
-			id="prpl-popover-<?php echo \esc_attr( $this->id ); ?>-trigger"
-		>
-			<?php if ( '' !== $icon ) : ?>
-				<span class="dashicons dashicons-<?php echo \esc_attr( $icon ); ?>"></span>
-			<?php endif; ?>
-			<?php echo $content; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		</button>
-		<?php
+		\progress_planner()->the_view(
+			'popovers/parts/icon.php',
+			[
+				'prpl_popover_id'              => $this->id,
+				'prpl_popover_trigger_icon'    => $icon,
+				'prpl_popover_trigger_content' => $content,
+			]
+		);
 	}
 
 	/**
@@ -61,22 +56,11 @@ class Popover {
 	 * @return void
 	 */
 	public function render() {
-		?>
-		<div id="prpl-popover-<?php echo \esc_attr( $this->id ); ?>" class="prpl-popover" popover>
-			<!-- The content. -->
-			<?php \progress_planner()->the_view( 'popovers/' . $this->id . '.php' ); ?>
-
-			<!-- The close button. -->
-			<button
-				class="prpl-popover-close"
-				popovertarget="prpl-popover-<?php echo \esc_attr( $this->id ); ?>"
-				popovertargetaction="hide"
-			>
-				<span class="dashicons dashicons-no-alt"></span>
-				<span class="screen-reader-text"><?php \esc_html_e( 'Close', 'progress-planner' ); ?>
-			</button>
-
-		</div>
-		<?php
+		\progress_planner()->the_view(
+			'popovers/popover.php',
+			[
+				'prpl_popover_id' => $this->id,
+			]
+		);
 	}
 }

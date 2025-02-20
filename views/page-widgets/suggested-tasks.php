@@ -14,6 +14,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 $prpl_widget = \progress_planner()->get_widgets__suggested_tasks();
 $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 ?>
+
+
+<div class="prpl-dashboard-widget-suggested-tasks">
+	<h2 class="prpl-widget-title">
+		<?php \esc_html_e( 'Ravi\'s Recommendations', 'progress-planner' ); ?>
+	</h2>
+
+	<ul style="display:none"></ul>
+	<ul class="prpl-suggested-tasks-list"></ul>
+
+	<hr>
+</div>
+
 <?php if ( $prpl_badge ) : ?>
 	<h2 class="prpl-widget-title">
 		<?php \esc_html_e( 'Your monthly badge', 'progress-planner' ); ?>
@@ -65,17 +78,6 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 
 	<hr>
 <?php endif; ?>
-
-<div class="prpl-dashboard-widget-suggested-tasks">
-	<h2 class="prpl-widget-title">
-		<?php \esc_html_e( 'Ravi\'s Recommendations', 'progress-planner' ); ?>
-	</h2>
-
-	<ul style="display:none"></ul>
-	<ul class="prpl-suggested-tasks-list"></ul>
-
-	<hr>
-</div>
 
 <div class="prpl-widget-content">
 	<?php if ( 2024 === (int) \gmdate( 'Y' ) ) : ?>

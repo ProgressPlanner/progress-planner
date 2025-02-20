@@ -19,7 +19,7 @@ use Progress_Planner\Admin\Page_Settings as Admin_Page_Settings;
 use Progress_Planner\Events\Event_Dispatcher;
 use Progress_Planner\Events\Task_Completed_Event;
 use Progress_Planner\Events\Listeners\Send_Task_Completed_Message;
-
+use Progress_Planner\Debug_Tools;
 /**
  * Main plugin class.
  */
@@ -111,6 +111,11 @@ class Base {
 		// Events.
 		$this->cached['event_dispatcher'] = new Event_Dispatcher();
 		$this->cached['event_dispatcher']->listen( Task_Completed_Event::class, [ new Send_Task_Completed_Message(), 'handle' ] );
+
+		// Debug tools.
+		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {
+			new Debug_Tools();
+		}
 
 		/**
 		 * Redirect on login.
@@ -204,9 +209,16 @@ class Base {
 	 * @return array
 	 */
 	public function add_action_links( $actions ) {
-		$action_link = [ '<a href="' . admin_url( 'admin.php?page=progress-planner' ) . '">' . __( 'Dashboard', 'progress-planner' ), '</a>' ];
-		$actions     = array_merge( $action_link, $actions );
-		return $actions;
+		return array_merge(
+			[
+				sprintf(
+					'<a href="%1$s">%2$s</a>',
+					admin_url( 'admin.php?page=progress-planner' ),
+					__( 'Dashboard', 'progress-planner' )
+				),
+			],
+			$actions
+		);
 	}
 
 	/**

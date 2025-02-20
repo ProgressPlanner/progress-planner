@@ -5,12 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
  * Add tasks for settings saved.
  */
-class Settings_Saved extends Local_OneTime_Tasks_Abstract {
+class Settings_Saved extends One_Time {
 
 	/**
 	 * The provider type.
@@ -27,14 +27,12 @@ class Settings_Saved extends Local_OneTime_Tasks_Abstract {
 	const ID = 'settings-saved';
 
 	/**
-	 * Check if the task condition is met.
+	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
-	public function check_task_condition() {
-		$prpl_pro_license_key = \get_option( 'progress_planner_pro_license_key', false );
-
-		return false !== $prpl_pro_license_key ? true : false;
+	public function should_add_task() {
+		return false === \get_option( 'progress_planner_pro_license_key', false );
 	}
 
 	/**
