@@ -5,33 +5,26 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
  * Add tasks for settings saved.
  */
-class Php_Version extends Local_OneTime_Tasks_Abstract {
+class Settings_Saved extends One_Time {
 
 	/**
 	 * The provider type.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'maintenance';
+	const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'php-version';
-
-	/**
-	 * Whether the task is an onboarding task.
-	 *
-	 * @var bool
-	 */
-	protected $is_onboarding_task = true;
+	const ID = 'settings-saved';
 
 	/**
 	 * Check if the task should be added.
@@ -39,7 +32,7 @@ class Php_Version extends Local_OneTime_Tasks_Abstract {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return version_compare( phpversion(), '8.0', '<' );
+		return false === \get_option( 'progress_planner_pro_license_key', false );
 	}
 
 	/**
@@ -57,16 +50,13 @@ class Php_Version extends Local_OneTime_Tasks_Abstract {
 
 		return [
 			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Update PHP version', 'progress-planner' ),
+			'title'       => \esc_html__( 'Fill settings page', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
 			'type'        => $this->get_provider_type(),
 			'points'      => 1,
-			'description' => '<p>' . sprintf(
-				/* translators: %s: php version */
-				\esc_html__( 'Your site is running on PHP version %s. We recommend updating to PHP version 8.0 or higher.', 'progress-planner' ),
-				phpversion()
-			) . '</p>',
+			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'admin.php?page=progress-planner-settings' ) ) : '',
+			'description' => '<p>' . \esc_html__( 'Head over to the settings page and fill in the required information.', 'progress-planner' ) . '</p>',
 		];
 	}
 }

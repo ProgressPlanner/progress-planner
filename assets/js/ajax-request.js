@@ -34,6 +34,7 @@ const progressPlannerAjaxRequest = ( {
 				return http.response;
 			}
 		}
+
 		if ( http.readyState === 4 ) {
 			if ( http.status === 200 ) {
 				return successAction

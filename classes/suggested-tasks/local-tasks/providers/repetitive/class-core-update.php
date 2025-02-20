@@ -5,13 +5,13 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 /**
  * Add tasks for Core updates.
  */
-class Core_Update extends Local_Repetitive_Tasks_Abstract {
+class Core_Update extends Repetitive {
 
 	/**
 	 * The capability required to perform the task.

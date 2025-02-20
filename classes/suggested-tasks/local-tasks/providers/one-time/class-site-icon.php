@@ -5,12 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
  * Add tasks for Core siteicon.
  */
-class Core_Siteicon extends Local_OneTime_Tasks_Abstract {
+class Site_Icon extends One_Time {
 
 	/**
 	 * The provider ID.
