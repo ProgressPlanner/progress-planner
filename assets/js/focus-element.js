@@ -64,7 +64,14 @@ const prplAddPointsIndicatorToElement = ( task ) => {
 		if ( task.is_complete ) {
 			iconEl.classList.add( 'complete' );
 		}
-		el.appendChild( iconEl );
+
+		// Create a positioning wrapper.
+		const wrapperEl = document.createElement( 'span' );
+		wrapperEl.classList.add( 'prpl-element-awards-points-icon-positioning-wrapper' );
+
+		// Add the icon to the wrapper.
+		wrapperEl.appendChild( iconEl );
+		el.appendChild( wrapperEl );
 	} );
 };
 

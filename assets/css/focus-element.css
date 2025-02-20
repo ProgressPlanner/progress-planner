@@ -1,3 +1,15 @@
+.prpl-element-awards-points-icon-positioning-wrapper {
+	position: relative;
+	display: inline-block;
+	height: 100%;
+
+	.prpl-element-awards-points-icon-wrapper {
+		position: absolute;
+		top: -2em;
+		left: 0;
+	}
+}
+
 .prpl-element-awards-points-icon-wrapper {
 	display: inline-flex;
 	align-items: center;
