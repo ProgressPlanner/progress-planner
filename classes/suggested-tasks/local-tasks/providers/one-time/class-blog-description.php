@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
+
 /**
  * Add tasks for Core blogdescription.
  */
@@ -17,21 +19,21 @@ class Blog_Description extends One_Time {
 	 *
 	 * @var string
 	 */
-	const ID = 'core-blogdescription';
+	protected const ID = 'core-blogdescription';
 
 	/**
 	 * The provider type.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'configuration';
+	protected const TYPE = 'configuration';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	protected $is_onboarding_task = true;
+	protected const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * Check if the task should be added.
@@ -52,7 +54,7 @@ class Blog_Description extends One_Time {
 	public function get_task_details( $task_id = '' ) {
 
 		if ( ! $task_id ) {
-			$task_id = $this->get_provider_id();
+			$task_id = $this->get_task_id();
 		}
 
 		return [

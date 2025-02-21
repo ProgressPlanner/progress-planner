@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
+
 /**
  * Add tasks to check if WP debug is enabled.
  */
@@ -17,14 +19,14 @@ class Remove_Inactive_Plugins extends One_Time {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'configuration';
+	protected const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'remove-inactive-plugins';
+	protected const ID = 'remove-inactive-plugins';
 
 	/**
 	 * Check if the task condition is satisfied.
@@ -68,7 +70,7 @@ class Remove_Inactive_Plugins extends One_Time {
 	public function get_task_details( $task_id = '' ) {
 
 		if ( ! $task_id ) {
-			$task_id = $this->get_provider_id();
+			$task_id = $this->get_task_id();
 		}
 
 		return [

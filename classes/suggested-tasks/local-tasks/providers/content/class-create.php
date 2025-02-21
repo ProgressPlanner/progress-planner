@@ -8,6 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
 use Progress_Planner\Activities\Content_Helpers;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
 /**
  * Add tasks for content creation.
@@ -19,21 +20,21 @@ class Create extends Content {
 	 *
 	 * @var string
 	 */
-	const ID = 'create-post';
+	protected const ID = 'create-post';
 
 	/**
 	 * The provider type.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'content-new';
+	protected const TYPE = 'content-new';
 
 	/**
 	 * The number of items to inject.
 	 *
 	 * @var int
 	 */
-	const ITEMS_TO_INJECT = 2;
+	protected const ITEMS_TO_INJECT = 2;
 
 	/**
 	 * Get an array of tasks to inject.
@@ -76,7 +77,7 @@ class Create extends Content {
 			return [];
 		}
 
-		$task_id = $this->get_task_id(
+		$task_id = $this->get_task_id_from_data(
 			[
 				'type' => 'create-post',
 				'date' => \gmdate( 'YW' ),
@@ -132,7 +133,7 @@ class Create extends Content {
 			return false;
 		}
 
-		return $this->get_task_id(
+		return $this->get_task_id_from_data(
 			[
 				'type'    => 'create-post',
 				'date'    => \gmdate( 'YW' ),
