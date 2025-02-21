@@ -32,7 +32,14 @@ class Rename_Uncategorized_Category_Test extends Task_Provider_Test_Abstract {
 		$term = \get_term_by( 'slug', 'better-category-name', 'category' );
 
 		if ( $term ) {
-			\wp_update_term( $term->term_id, 'category', [ 'name' => 'Uncategorized', 'slug' => 'uncategorized' ] );
+			\wp_update_term(
+				$term->term_id,
+				'category',
+				[
+					'name' => 'Uncategorized',
+					'slug' => 'uncategorized',
+				]
+			);
 		}
 	}
 
@@ -44,6 +51,13 @@ class Rename_Uncategorized_Category_Test extends Task_Provider_Test_Abstract {
 	protected function complete_task() {
 		$term = \get_term_by( 'slug', 'uncategorized', 'category' );
 
-		\wp_update_term( $term->term_id, 'category', [ 'name' => 'Better Category Name', 'slug' => 'better-category-name' ] );
+		\wp_update_term(
+			$term->term_id,
+			'category',
+			[
+				'name' => 'Better Category Name',
+				'slug' => 'better-category-name',
+			]
+		);
 	}
 }
