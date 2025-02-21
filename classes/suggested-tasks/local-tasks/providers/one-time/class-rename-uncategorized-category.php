@@ -19,28 +19,28 @@ class Rename_Uncategorized_Category extends One_Time {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'configuration';
+	protected const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'rename-uncategorized-category';
+	protected const ID = 'rename-uncategorized-category';
 
 	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
 	 */
-	protected $capability = 'manage_categories';
+	protected const CAPABILITY = 'manage_categories';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	protected $is_onboarding_task = true;
+	protected const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * The Uncategorized category.
@@ -89,7 +89,7 @@ class Rename_Uncategorized_Category extends One_Time {
 	public function get_task_details( $task_id = '' ) {
 
 		if ( ! $task_id ) {
-			$task_id = $this->get_provider_id();
+			$task_id = $this->get_task_id();
 		}
 
 		return [

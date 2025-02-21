@@ -19,28 +19,28 @@ class Hello_World extends One_Time {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'configuration';
+	protected const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'hello-world';
+	protected const ID = 'hello-world';
 
 	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
 	 */
-	protected $capability = 'edit_posts';
+	protected const CAPABILITY = 'edit_posts';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	protected $is_onboarding_task = true;
+	protected const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * The sample post.
@@ -69,7 +69,7 @@ class Hello_World extends One_Time {
 	public function get_task_details( $task_id = '' ) {
 
 		if ( ! $task_id ) {
-			$task_id = $this->get_provider_id();
+			$task_id = $this->get_task_id();
 		}
 
 		$hello_world = $this->get_sample_post();
