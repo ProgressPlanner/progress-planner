@@ -184,16 +184,35 @@ const prplTriggerConfetti = () => {
 	};
 
 	const progressPlannerRenderAttemptshoot = () => {
+		// Get the tasks list position
+		const tasksList = document.querySelector(
+			'.prpl-suggested-tasks-list'
+		);
+		const origin = tasksList
+			? {
+					x:
+						( tasksList.getBoundingClientRect().left +
+							tasksList.offsetWidth / 2 ) /
+						window.innerWidth,
+					y:
+						( tasksList.getBoundingClientRect().top + 50 ) /
+						window.innerHeight,
+			  }
+			: { x: 0.5, y: 0.3 }; // fallback if list not found
+
 		let confettiOptions = [
 			{
-				particleCount: 40,
-				scalar: 1.2,
-				shapes: [ 'star' ],
-			},
-			{
-				particleCount: 10,
-				scalar: 0.75,
-				shapes: [ 'circle' ],
+				particleCount: 60,
+				scalar: 1.4,
+				shapes: [ 'image' ],
+				shapeOptions: {
+					image: {
+						src: progressPlannerSuggestedTasks.raviIconUrl,
+						width: 32,
+						height: 32,
+					},
+				},
+				origin,
 			},
 		];
 
