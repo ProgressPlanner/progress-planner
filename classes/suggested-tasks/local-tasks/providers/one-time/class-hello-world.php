@@ -34,14 +34,14 @@ class Hello_World extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected $capability = 'edit_posts';
+	const CAPABILITY = 'edit_posts';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	protected $is_onboarding_task = true;
+	const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * The sample post.

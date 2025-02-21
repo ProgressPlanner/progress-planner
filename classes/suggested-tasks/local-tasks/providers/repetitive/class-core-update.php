@@ -15,13 +15,6 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 class Core_Update extends Repetitive {
 
 	/**
-	 * The capability required to perform the task.
-	 *
-	 * @var string
-	 */
-	protected $capability = 'update_core';
-
-	/**
 	 * The provider type.
 	 *
 	 * @var string
@@ -36,12 +29,11 @@ class Core_Update extends Repetitive {
 	const ID = 'update-core';
 
 	/**
-	 * Evaluate a task.
+	 * The capability required to perform the task.
 	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool|string
+	 * @var string
 	 */
+	const CAPABILITY = 'update_core';
 
 	/**
 	 * Check if the task should be added.

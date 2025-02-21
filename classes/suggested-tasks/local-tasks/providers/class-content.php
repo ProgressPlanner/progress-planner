@@ -18,7 +18,7 @@ abstract class Content extends Local_Tasks {
 	 *
 	 * @var string
 	 */
-	protected $capability = 'edit_others_posts';
+	const CAPABILITY = 'edit_others_posts';
 
 	/**
 	 * The provider type.

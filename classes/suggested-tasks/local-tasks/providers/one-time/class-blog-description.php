@@ -33,7 +33,7 @@ class Blog_Description extends One_Time {
 	 *
 	 * @var bool
 	 */
-	protected $is_onboarding_task = true;
+	const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * Check if the task should be added.

@@ -33,14 +33,14 @@ class Rename_Uncategorized_Category extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected $capability = 'manage_categories';
+	const CAPABILITY = 'manage_categories';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	protected $is_onboarding_task = true;
+	const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * The Uncategorized category.

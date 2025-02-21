@@ -33,14 +33,14 @@ class Sample_Page extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected $capability = 'edit_pages';
+	const CAPABILITY = 'edit_pages';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	protected $is_onboarding_task = true;
+	const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * The sample page.
