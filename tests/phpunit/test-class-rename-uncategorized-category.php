@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Tests;
 
-require_once 'class-task-provider-test-abstract.php';
-
 /**
  * Rename Uncategorized Category test case.
  */
