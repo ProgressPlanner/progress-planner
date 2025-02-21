@@ -115,16 +115,17 @@ const progressPlannerInjectNextItem = ( type ) => {
 const progressPlannerInjectSuggestedTodoItem = ( details ) => {
 	// Clone the template element.
 	const Item = customElements.get( 'prpl-suggested-task' );
-	const item = new Item(
-		details.task_id,
-		details.title,
-		details.description,
-		details.points ?? 1,
-		details.action ?? '',
-		details.url ?? '',
-		details.dismissable ?? false,
-		details.type ?? ''
-	);
+	const item = new Item( {
+		taskId: details.task_id,
+		taskTitle: details.title,
+		taskDescription: details.description,
+		taskPoints: details.points ?? 1,
+		taskAction: details.action ?? '',
+		taskUrl: details.url ?? '',
+		taskDismissable: details.dismissable ?? false,
+		taskType: details.type ?? '',
+		taskPopoverId: details.popover_id ?? '',
+	} );
 
 	/**
 	 * @todo Implement the parent task functionality.
@@ -183,16 +184,35 @@ const prplTriggerConfetti = () => {
 	};
 
 	const progressPlannerRenderAttemptshoot = () => {
+		// Get the tasks list position
+		const tasksList = document.querySelector(
+			'.prpl-suggested-tasks-list'
+		);
+		const origin = tasksList
+			? {
+					x:
+						( tasksList.getBoundingClientRect().left +
+							tasksList.offsetWidth / 2 ) /
+						window.innerWidth,
+					y:
+						( tasksList.getBoundingClientRect().top + 50 ) /
+						window.innerHeight,
+			  }
+			: { x: 0.5, y: 0.3 }; // fallback if list not found
+
 		let confettiOptions = [
 			{
-				particleCount: 40,
-				scalar: 1.2,
-				shapes: [ 'star' ],
-			},
-			{
-				particleCount: 10,
-				scalar: 0.75,
-				shapes: [ 'circle' ],
+				particleCount: 60,
+				scalar: 1.4,
+				shapes: [ 'image' ],
+				shapeOptions: {
+					image: {
+						src: progressPlannerSuggestedTasks.raviIconUrl,
+						width: 32,
+						height: 32,
+					},
+				},
+				origin,
 			},
 		];
 

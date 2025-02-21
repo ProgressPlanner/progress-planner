@@ -195,6 +195,7 @@ final class Suggested_Tasks extends Widget {
 				'maxItemsPerType'  => apply_filters( 'progress_planner_suggested_tasks_max_items_per_type', $max_items_per_type ),
 				'confettiOptions'  => $confetti_options,
 				'delayCelebration' => $delay_celebration,
+				'raviIconUrl'      => PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg',
 			]
 		);
 	}
