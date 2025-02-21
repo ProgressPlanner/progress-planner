@@ -36,13 +36,13 @@ customElements.define( 'prpl-email-test-popup', class extends HTMLElement {
 					</p>
 				</div>
 				<div id="prpl-sending-email-troubleshooting" style="display: none;">
-					<h2>Email Troubleshooting</h2>
-					<p>Here are some steps to fix email sending issues:</p>
+					<h2>` + prplEmailSending.l10n.popoverHeadingTroubleshooting + `</h2>
+					<p>` + prplEmailSending.l10n.popoverDescriptionTroubleshooting + `</p>
 					<ul>
-						<li>Check your SMTP settings are correct</li>
-						<li>Verify your email provider credentials</li>
-						<li>Ensure your domain's SPF records are properly configured</li>
-						<li>Try sending from a different email address</li>
+						<li>` + prplEmailSending.l10n.popoverTroubleshootingStep1 + `</li>
+						<li>` + prplEmailSending.l10n.popoverTroubleshootingStep2 + `</li>
+						<li>` + prplEmailSending.l10n.popoverTroubleshootingStep3 + `</li>
+						<li>` + prplEmailSending.l10n.popoverTroubleshootingStep4 + `</li>
 					</ul>
 					<button class="prpl-button" data-action="closePopover">` + prplEmailSending.l10n.popoverButtonClose + `</button>
 				</div>

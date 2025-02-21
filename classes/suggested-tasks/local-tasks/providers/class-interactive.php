@@ -22,13 +22,6 @@ abstract class Interactive extends One_Time {
 	protected $popover_id = 'interactive-task';
 
 	/**
-	 * The popover content.
-	 *
-	 * @var string
-	 */
-	protected $popover_content = '';
-
-	/**
 	 * Constructor.
 	 *
 	 * @return void
@@ -60,7 +53,7 @@ abstract class Interactive extends One_Time {
 	}
 
 	/**
-	 * Check if the task should be added.
+	 * We want task to be added always.
 	 *
 	 * @return bool
 	 */
@@ -69,7 +62,7 @@ abstract class Interactive extends One_Time {
 	}
 
 	/**
-	 * Check if the task is completed.
+	 * Task should be completed only manually by the user.
 	 *
 	 * @return bool
 	 */
@@ -78,7 +71,7 @@ abstract class Interactive extends One_Time {
 	}
 
 	/**
-	 * Evaluate a task.
+	 * Task should be completed only manually by the user.
 	 *
 	 * @param string $task_id The task ID.
 	 *
