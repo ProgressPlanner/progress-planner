@@ -5,26 +5,28 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
+
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
  * Add tasks to check if WP debug is enabled.
  */
-class Remove_Inactive_Plugins extends Local_OneTime_Tasks_Abstract {
+class Remove_Inactive_Plugins extends One_Time {
 
 	/**
 	 * The provider type.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'configuration';
+	protected const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'remove-inactive-plugins';
+	protected const ID = 'remove-inactive-plugins';
 
 	/**
 	 * Check if the task condition is satisfied.
@@ -68,7 +70,7 @@ class Remove_Inactive_Plugins extends Local_OneTime_Tasks_Abstract {
 	public function get_task_details( $task_id = '' ) {
 
 		if ( ! $task_id ) {
-			$task_id = $this->get_provider_id();
+			$task_id = $this->get_task_id();
 		}
 
 		return [
@@ -80,7 +82,11 @@ class Remove_Inactive_Plugins extends Local_OneTime_Tasks_Abstract {
 			'points'      => 1,
 			'url'         => '',
 			'dismissible' => true,
-			'description' => '<p>' . \esc_html__( 'You have inactive plugins. Consider removing any plugins that are not activated to free up resources, and improve security.', 'progress-planner' ) . '</p>',
+			'description' => '<p>' . sprintf(
+				/* translators: %1$s <a href="https://prpl.fyi/remove-inactive-plugins" target="_blank">removing any plugins</a> link */
+				\esc_html__( 'You have inactive plugins. Consider %1$s that are not activated to free up resources, and improve security.', 'progress-planner' ),
+				'<a href="https://prpl.fyi/remove-inactive-plugins" target="_blank">' . \esc_html__( 'removing any plugins', 'progress-planner' ) . '</a>',
+			) . '</p>',
 		];
 	}
 }

@@ -5,42 +5,34 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 /**
  * Add tasks for Core updates.
  */
-class Core_Update extends Local_Repetitive_Tasks_Abstract {
-
-	/**
-	 * The capability required to perform the task.
-	 *
-	 * @var string
-	 */
-	protected $capability = 'update_core';
+class Core_Update extends Repetitive {
 
 	/**
 	 * The provider type.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'maintenance';
+	protected const TYPE = 'maintenance';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'update-core';
+	protected const ID = 'update-core';
 
 	/**
-	 * Evaluate a task.
+	 * The capability required to perform the task.
 	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool|string
+	 * @var string
 	 */
+	protected const CAPABILITY = 'update_core';
 
 	/**
 	 * Check if the task should be added.
@@ -65,7 +57,7 @@ class Core_Update extends Local_Repetitive_Tasks_Abstract {
 	public function get_task_details( $task_id ) {
 
 		if ( ! $task_id ) {
-			$task_id = $this->get_provider_id() . '-' . \gmdate( 'YW' );
+			$task_id = $this->get_task_id();
 		}
 
 		return [

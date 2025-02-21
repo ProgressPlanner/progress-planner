@@ -8,21 +8,25 @@
 namespace Progress_Planner\Suggested_Tasks;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Create;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content_Review;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Update;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Blogdescription;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Settings_Saved;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Debug_Display;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Disable_Comments;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Sample_Page;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Hello_World;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Remove_Inactive_Plugins;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Siteicon;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Rename_Uncategorized_Category;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Core_Permalink_Structure;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Php_Version;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Search_Engine_Visibility;
+// Repetitive tasks.
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
+// Content tasks.
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Create as Content_Create;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Review as Content_Review;
+// One-time tasks.
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Blog_Description;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Settings_Saved;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Debug_Display;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Disable_Comments;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Sample_Page;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Hello_World;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Remove_Inactive_Plugins;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Site_Icon;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Rename_Uncategorized_Category;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Permalink_Structure;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Php_Version;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engine_Visibility;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
 
 /**
  * Local_Tasks_Manager class.
@@ -56,25 +60,47 @@ class Local_Tasks_Manager {
 			new Content_Create(),
 			new Content_Review(),
 			new Core_Update(),
-			new Core_Blogdescription(),
+			new Blog_Description(),
 			new Settings_Saved(),
 			new Debug_Display(),
 			new Disable_Comments(),
 			new Sample_Page(),
 			new Hello_World(),
 			new Remove_Inactive_Plugins(),
-			new Core_Siteicon(),
+			new Site_Icon(),
 			new Rename_Uncategorized_Category(),
-			new Core_Permalink_Structure(),
+			new Permalink_Structure(),
 			new Php_Version(),
 			new Search_Engine_Visibility(),
 		];
+
+		/**
+		 * Filter the task providers.
+		 *
+		 * @param array $task_providers The task providers.
+		 */
+		$this->task_providers = \apply_filters( 'progress_planner_suggested_tasks_providers', $this->task_providers );
+		foreach ( $this->task_providers as $key => $task_provider ) {
+			if ( ! $task_provider instanceof Local_Tasks_Interface ) {
+				error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					sprintf(
+						'Task provider %1$s is not an instance of %2$s',
+						$task_provider->get_provider_id(),
+						Local_Tasks_Interface::class
+					)
+				);
+				unset( $this->task_providers[ $key ] );
+			}
+		}
 
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
 		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
 
 		// Add the cleanup action.
 		\add_action( 'admin_init', [ $this, 'cleanup_pending_tasks' ] );
+
+		// Add the onboarding task providers.
+		\add_filter( 'prpl_onboarding_task_providers', [ $this, 'add_onboarding_task_providers' ] );
 	}
 
 	/**
@@ -84,6 +110,25 @@ class Local_Tasks_Manager {
 	 */
 	public function add_plugin_integration() {
 		// Add the plugin integration here.
+	}
+
+	/**
+	 * Add the onboarding task providers.
+	 *
+	 * @param array $task_providers The task providers.
+	 *
+	 * @return array
+	 */
+	public function add_onboarding_task_providers( $task_providers ) {
+
+		foreach ( $this->task_providers as $task_provider ) {
+
+			if ( $task_provider->is_onboarding_task() ) {
+				$task_providers[] = $task_provider->get_provider_id();
+			}
+		}
+
+		return $task_providers;
 	}
 
 	/**
@@ -103,6 +148,15 @@ class Local_Tasks_Manager {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Get the task providers.
+	 *
+	 * @return array
+	 */
+	public function get_task_providers() {
+		return $this->task_providers;
 	}
 
 	/**

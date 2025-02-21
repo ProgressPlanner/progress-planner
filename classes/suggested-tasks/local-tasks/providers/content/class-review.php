@@ -5,35 +5,36 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
 /**
  * Add tasks for content updates.
  */
-class Content_Review extends Content_Abstract {
+class Review extends Content {
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'review-post';
+	protected const ID = 'review-post';
 
 	/**
 	 * The provider type.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'content-update';
+	protected const TYPE = 'content-update';
 
 	/**
 	 * The number of items to inject.
 	 *
 	 * @var int
 	 */
-	const ITEMS_TO_INJECT = 10;
+	protected const ITEMS_TO_INJECT = 10;
 
 	/**
 	 * The snoozed post IDs.
@@ -63,7 +64,7 @@ class Content_Review extends Content_Abstract {
 
 		if ( isset( $data['post_id'] ) && (int) \get_post_modified_time( 'U', false, (int) $data['post_id'] ) > strtotime( '-6 months' ) ) {
 			$data['date'] = \gmdate( 'YW' );
-			return $this->get_task_id( $data );
+			return $this->get_task_id_from_data( $data );
 		}
 		return false;
 	}
@@ -127,7 +128,7 @@ class Content_Review extends Content_Abstract {
 
 		$items = [];
 		foreach ( $last_updated_posts as $post ) {
-			$task_id = $this->get_task_id(
+			$task_id = $this->get_task_id_from_data(
 				[
 					'type'    => 'review-post',
 					'post_id' => $post->ID, // @phpstan-ignore-line property.nonObject
