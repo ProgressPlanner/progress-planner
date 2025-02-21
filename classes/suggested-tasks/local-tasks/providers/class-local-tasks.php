@@ -13,28 +13,35 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 /**
  * Add tasks for content updates.
  */
-abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
+abstract class Local_Tasks implements Local_Tasks_Interface {
 
 	/**
 	 * The type of the task.
 	 *
 	 * @var string
 	 */
-	const TYPE = '';
+	protected const TYPE = '';
 
 	/**
 	 * The ID of the task.
 	 *
 	 * @var string
 	 */
-	const ID = '';
+	protected const ID = '';
 
 	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
 	 */
-	protected $capability = 'manage_options';
+	protected const CAPABILITY = 'manage_options';
+
+	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected const IS_ONBOARDING_TASK = false;
 
 	/**
 	 * Get the provider type.
@@ -55,14 +62,32 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 	}
 
 	/**
+	 * Get the task ID.
+	 *
+	 * @return string
+	 */
+	public function get_task_id() {
+		return $this->get_provider_id();
+	}
+
+	/**
 	 * Check if the user has the capability to perform the task.
 	 *
 	 * @return bool
 	 */
 	public function capability_required() {
-		return $this->capability
-			? \current_user_can( $this->capability )
+		return static::CAPABILITY
+			? \current_user_can( static::CAPABILITY )
 			: true;
+	}
+
+	/**
+	 * Check if the task is an onboarding task.
+	 *
+	 * @return bool
+	 */
+	public function is_onboarding_task() {
+		return static::IS_ONBOARDING_TASK;
 	}
 
 	/**

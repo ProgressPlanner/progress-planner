@@ -17,6 +17,7 @@ use Progress_Planner\Actions\Content_Scan as Actions_Content_Scan;
 use Progress_Planner\Actions\Maintenance as Actions_Maintenance;
 use Progress_Planner\Admin\Page_Settings as Admin_Page_Settings;
 use Progress_Planner\Admin\Slack_Settings as Admin_Slack_Settings;
+use Progress_Planner\Plugin_Upgrade_Handler;
 use Progress_Planner\Debug_Tools;
 /**
  * Main plugin class.
@@ -106,6 +107,8 @@ class Base {
 
 			new Plugin_Deactivation();
 		}
+
+		$this->cached['plugin_upgrade_handler'] = new Plugin_Upgrade_Handler();
 
 		// Debug tools.
 		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {

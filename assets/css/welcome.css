@@ -24,10 +24,13 @@
 	}
 
 	.welcome-header {
-		background: var(--prpl-color-accent-orange);
+		background: var(--prpl-color-400-orange);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
+		border-top-left-radius: var(--prpl-border-radius);
+		border-top-right-radius: var(--prpl-border-radius);
+		overflow: hidden;
 
 		h1 {
 			font-size: var(--prpl-font-size-3xl);
@@ -36,8 +39,8 @@
 		}
 
 		.welcome-header-icon {
-			background: var(--prpl-background-orange);
-			background: linear-gradient(105deg, var(--prpl-color-accent-orange) 25%, var(--prpl-background-orange) 25%);
+			background: var(--prpl-color-400-orange);
+			background: linear-gradient(105deg, var(--prpl-color-400-orange) 25%, var(--prpl-background-orange) 25%);
 			padding: var(--prpl-padding);
 			padding-left: 100px;
 			padding-right: calc(var(--prpl-gap) * 1.5);
@@ -48,6 +51,10 @@
 		}
 	}
 
+	.prpl-form-notice-title {
+		font-size: var(--prpl-font-size-lg);
+	}
+
 	ul {
 		list-style: disc;
 		margin-left: 1rem;
@@ -55,6 +62,14 @@
 
 	.prpl-onboard-form-radio-select {
 		margin-top: 0.75rem;
+
+		label {
+			margin-top: 0.5rem;
+
+			&:first-child {
+				margin-top: 0;
+			}
+		}
 	}
 
 	.prpl-disabled {
