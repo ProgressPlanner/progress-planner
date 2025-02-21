@@ -62,6 +62,15 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	}
 
 	/**
+	 * Get the task ID.
+	 *
+	 * @return string
+	 */
+	public function get_task_id() {
+		return $this->get_provider_id();
+	}
+
+	/**
 	 * Check if the user has the capability to perform the task.
 	 *
 	 * @return bool
