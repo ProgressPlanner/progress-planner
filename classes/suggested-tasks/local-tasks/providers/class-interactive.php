@@ -27,7 +27,7 @@ abstract class Interactive extends One_Time {
 	 * @return void
 	 */
 	public function __construct() {
-		add_action( 'admin_footer', [ $this, 'add_popover' ] );
+		add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
 	}
 
 	/**
