@@ -57,33 +57,34 @@ class Email_Sending extends Interactive {
 	 */
 	public function enqueue_scripts() {
 
+		// Don't enqueue the script if the task is already completed.
+		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() ) ) {
+			return;
+		}
+
+		$handle = 'progress-planner-web-components-prpl-task-' . $this->get_provider_id();
+
 		// Enqueue the web component.
-		wp_enqueue_script(
-			'prpl-task-sending-email',
-			PROGRESS_PLANNER_URL . '/assets/js/tasks/sending-email.js',
-			[],
-			'1.0.0',
-			true
-		);
+		wp_enqueue_script( $handle );
 
 		// Localize the script.
 		wp_localize_script(
-			'prpl-task-sending-email',
+			$handle,
 			'prplEmailSending',
 			[
 				'ajax_url' => \admin_url( 'admin-ajax.php' ),
 				'l10n'     => [
-					'popoverHeading'     => \esc_html__( 'Test email sending', 'progress-planner' ),
-					'popoverDescription' => \esc_html__( 'Are you ready to test that email from your site works?', 'progress-planner' ),
-					'popoverButtonYes'   => \esc_html__( 'Yes', 'progress-planner' ),
-					'popoverButtonNo'    => \esc_html__( 'No', 'progress-planner' ),
-					'popoverButtonClose' => \esc_html__( 'Close', 'progress-planner' ),
-					'popoverHeadingTroubleshooting' => \esc_html__( 'Email Troubleshooting', 'progress-planner' ),
+					'popoverHeading'                    => \esc_html__( 'Test email sending', 'progress-planner' ),
+					'popoverDescription'                => \esc_html__( 'Are you ready to test that email from your site works?', 'progress-planner' ),
+					'popoverButtonYes'                  => \esc_html__( 'Yes', 'progress-planner' ),
+					'popoverButtonNo'                   => \esc_html__( 'No', 'progress-planner' ),
+					'popoverButtonClose'                => \esc_html__( 'Close', 'progress-planner' ),
+					'popoverHeadingTroubleshooting'     => \esc_html__( 'Email Troubleshooting', 'progress-planner' ),
 					'popoverDescriptionTroubleshooting' => \esc_html__( 'Here are some steps to fix email sending issues:', 'progress-planner' ),
-					'popoverTroubleshootingStep1' => \esc_html__( 'Check your SMTP settings are correct', 'progress-planner' ),
-					'popoverTroubleshootingStep2' => \esc_html__( 'Ensure your domain\'s SPF records are properly configured', 'progress-planner' ),
-					'popoverTroubleshootingStep3' => \esc_html__( 'Verify your email provider credentials', 'progress-planner' ),
-					'popoverTroubleshootingStep4' => \esc_html__( 'Try sending from a different email address', 'progress-planner' ),
+					'popoverTroubleshootingStep1'       => \esc_html__( 'Check your SMTP settings are correct', 'progress-planner' ),
+					'popoverTroubleshootingStep2'       => \esc_html__( 'Ensure your domain\'s SPF records are properly configured', 'progress-planner' ),
+					'popoverTroubleshootingStep3'       => \esc_html__( 'Verify your email provider credentials', 'progress-planner' ),
+					'popoverTroubleshootingStep4'       => \esc_html__( 'Try sending from a different email address', 'progress-planner' ),
 				],
 			]
 		);
