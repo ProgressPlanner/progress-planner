@@ -10,7 +10,9 @@ namespace Progress_Planner\Tests;
 /**
  * Settings saved test case.
  */
-class Disable_Comments_Test extends Task_Provider_Test_Abstract {
+class Disable_Comments_Test extends \WP_UnitTestCase {
+
+	use Task_Provider_Test_Trait;
 
 	/**
 	 * The task provider ID.

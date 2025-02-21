@@ -10,7 +10,9 @@ namespace Progress_Planner\Tests;
 /**
  * Settings saved test case.
  */
-class Settings_Saved_Test extends Task_Provider_Test_Abstract {
+class Settings_Saved_Test extends \WP_UnitTestCase {
+
+	use Task_Provider_Test_Trait;
 
 	/**
 	 * The task provider ID.

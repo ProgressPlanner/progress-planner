@@ -10,7 +10,9 @@ namespace Progress_Planner\Tests;
 /**
  * Rename Uncategorized Category test case.
  */
-class Rename_Uncategorized_Category_Test extends Task_Provider_Test_Abstract {
+class Rename_Uncategorized_Category_Test extends \WP_UnitTestCase {
+
+	use Task_Provider_Test_Trait;
 
 	/**
 	 * The task provider ID.

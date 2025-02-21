@@ -10,7 +10,11 @@ namespace Progress_Planner\Tests;
 /**
  * Settings saved test case.
  */
-class Search_Engine_Visibility_Test extends Task_Provider_Test_Abstract {
+class Search_Engine_Visibility_Test extends \WP_UnitTestCase {
+
+	use Task_Provider_Test_Trait {
+		setUpBeforeClass as public parentSetUpBeforeClass;
+	}
 
 	/**
 	 * The task provider ID.
@@ -25,7 +29,7 @@ class Search_Engine_Visibility_Test extends Task_Provider_Test_Abstract {
 	 * @return void
 	 */
 	public static function setUpBeforeClass(): void {
-		parent::setUpBeforeClass();
+		self::parentSetUpBeforeClass();
 
 		\update_option( 'blog_public', 0 );
 	}

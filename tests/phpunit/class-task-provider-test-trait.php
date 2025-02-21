@@ -13,14 +13,7 @@ use Progress_Planner\Suggested_Tasks;
 /**
  * Task provider test case.
  */
-abstract class Task_Provider_Test_Abstract extends \WP_UnitTestCase {
-
-	/**
-	 * The task provider ID.
-	 *
-	 * @var string
-	 */
-	protected $task_provider_id;
+trait Task_Provider_Test_Trait {
 
 	/**
 	 * The task provider instance.
@@ -41,7 +34,7 @@ abstract class Task_Provider_Test_Abstract extends \WP_UnitTestCase {
 	 *
 	 * @return void
 	 */
-	public static function setUpBeforeClass(): void {
+	public static function setUpBeforeClass(): void { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
 		// Set the current user to the admin user.
 		wp_set_current_user( 1 );
 	}
@@ -51,7 +44,7 @@ abstract class Task_Provider_Test_Abstract extends \WP_UnitTestCase {
 	 *
 	 * @return void
 	 */
-	public static function tearDownAfterClass(): void {
+	public static function tearDownAfterClass(): void { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
 		// Reset the current user.
 		wp_set_current_user( 0 );
 	}

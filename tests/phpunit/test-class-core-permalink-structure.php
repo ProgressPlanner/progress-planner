@@ -10,7 +10,12 @@ namespace Progress_Planner\Tests;
 /**
  * Core permalink structure test case.
  */
-class Core_Permalink_Structure_Test extends Task_Provider_Test_Abstract {
+class Core_Permalink_Structure_Test extends \WP_UnitTestCase {
+
+	use Task_Provider_Test_Trait {
+		setUpBeforeClass as public parentSetUpBeforeClass;
+		tearDownAfterClass as public parentTearDownAfterClass;
+	}
 
 	/**
 	 * The task provider ID.
@@ -25,7 +30,7 @@ class Core_Permalink_Structure_Test extends Task_Provider_Test_Abstract {
 	 * @return void
 	 */
 	public static function setUpBeforeClass(): void {
-		parent::setUpBeforeClass();
+		self::parentSetUpBeforeClass();
 
 		\update_option( 'permalink_structure', '/%year%/%monthnum%/%day%/%postname%/' );
 	}
@@ -36,7 +41,7 @@ class Core_Permalink_Structure_Test extends Task_Provider_Test_Abstract {
 	 * @return void
 	 */
 	public static function tearDownAfterClass(): void {
-		parent::tearDownAfterClass();
+		self::parentTearDownAfterClass();
 
 		\update_option( 'permalink_structure', '' );
 	}

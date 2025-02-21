@@ -10,7 +10,9 @@ namespace Progress_Planner\Tests;
 /**
  * Core siteicon test case.
  */
-class Core_Siteicon_Test extends Task_Provider_Test_Abstract {
+class Core_Siteicon_Test extends \WP_UnitTestCase {
+
+	use Task_Provider_Test_Trait;
 
 	/**
 	 * The task provider ID.

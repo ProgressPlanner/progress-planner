@@ -43,4 +43,4 @@ tests_add_filter( 'muplugins_loaded', '_manually_load_plugin' );
 require "{$_tests_dir}/includes/bootstrap.php";
 
 // Load base provider test class.
-require_once __DIR__ . '/phpunit/class-task-provider-test-abstract.php';
+require_once __DIR__ . '/phpunit/class-task-provider-test-trait.php';
