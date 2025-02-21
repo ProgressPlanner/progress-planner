@@ -25,6 +25,9 @@ class Plugin_Upgrade_Handler {
 	public function __construct() {
 		// Delay the init action to allow so the onboarding task providers are initialized.
 		\add_action( 'init', [ $this, 'init' ], 20 );
+
+		// Add the action to add the upgrade tasks popover.
+		\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_upgrade_tasks_popover' ] );
 	}
 
 	/**
@@ -42,6 +45,18 @@ class Plugin_Upgrade_Handler {
 
 		// Add the onboarding task providers.
 		$this->onboard_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', $this->onboard_task_provider_ids );
+	}
+
+	/**
+	 * Add the upgrade tasks popover.
+	 *
+	 * @return void
+	 */
+	public function add_upgrade_tasks_popover() {
+
+		if ( $this->get_newly_added_task_providers() ) {
+			\progress_planner()->get_popover()->the_popover( 'upgrade-tasks' )->render();
+		}
 	}
 
 	/**
