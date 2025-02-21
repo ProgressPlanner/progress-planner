@@ -73,6 +73,13 @@ class Local_Tasks_Manager {
 			new Search_Engine_Visibility(),
 		];
 
+		/**
+		 * Filter the task providers.
+		 *
+		 * @param array $task_providers The task providers.
+		 */
+		$this->task_providers = \apply_filters( 'progress_planner_suggested_tasks_providers', $this->task_providers );
+
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
 		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
 
