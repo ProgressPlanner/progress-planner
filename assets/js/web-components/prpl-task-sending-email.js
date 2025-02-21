@@ -82,9 +82,10 @@ customElements.define(
 		`;
 
 			// Add event listeners.
-			this.querySelectorAll( 'button' ).forEach( ( button ) => {
-				button.addEventListener( 'click', ( e ) => {
-					const action = e.target.dataset.action;
+			this.querySelectorAll( 'button' ).forEach( ( buttonElement ) => {
+				buttonElement.addEventListener( 'click', ( e ) => {
+					const button = e.target.closest( 'button' );
+					const action = button?.dataset.action;
 					if ( action && typeof this[ action ] === 'function' ) {
 						this[ action ]();
 					}
