@@ -34,7 +34,7 @@ abstract class Content extends Local_Tasks {
 	 *
 	 * @return string The task ID.
 	 */
-	public function get_task_id( $data ) {
+	public function get_task_id_from_data( $data ) {
 
 		// Remove the task_id if it was added to the data.
 		if ( isset( $data['task_id'] ) ) {

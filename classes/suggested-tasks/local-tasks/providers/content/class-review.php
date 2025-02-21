@@ -64,7 +64,7 @@ class Review extends Content {
 
 		if ( isset( $data['post_id'] ) && (int) \get_post_modified_time( 'U', false, (int) $data['post_id'] ) > strtotime( '-6 months' ) ) {
 			$data['date'] = \gmdate( 'YW' );
-			return $this->get_task_id( $data );
+			return $this->get_task_id_from_data( $data );
 		}
 		return false;
 	}
@@ -128,7 +128,7 @@ class Review extends Content {
 
 		$items = [];
 		foreach ( $last_updated_posts as $post ) {
-			$task_id = $this->get_task_id(
+			$task_id = $this->get_task_id_from_data(
 				[
 					'type'    => 'review-post',
 					'post_id' => $post->ID, // @phpstan-ignore-line property.nonObject

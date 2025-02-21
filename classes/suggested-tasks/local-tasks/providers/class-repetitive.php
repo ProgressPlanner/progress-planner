@@ -15,6 +15,15 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 abstract class Repetitive extends Local_Tasks {
 
 	/**
+	 * Get the task ID.
+	 *
+	 * @return string
+	 */
+	public function get_task_id() {
+		return $this->get_provider_id() . '-' . \gmdate( 'YW' );
+	}
+
+	/**
 	 * Evaluate a task.
 	 *
 	 * @param string $task_id The task ID.
@@ -24,7 +33,7 @@ abstract class Repetitive extends Local_Tasks {
 	public function evaluate_task( $task_id ) {
 
 		// Early bail if the user does not have the capability to manage options.
-		if ( ! $this->capability_required() || 0 !== strpos( $task_id, $this->get_provider_id() ) ) {
+		if ( ! $this->capability_required() || 0 !== strpos( $task_id, $this->get_task_id() ) ) {
 			return false;
 		}
 
@@ -71,7 +80,7 @@ abstract class Repetitive extends Local_Tasks {
 	 */
 	public function get_tasks_to_inject() {
 
-		$task_id = $this->get_provider_id() . '-' . \gmdate( 'YW' );
+		$task_id = $this->get_task_id();
 
 		if (
 			true === $this->is_task_type_snoozed() ||

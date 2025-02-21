@@ -77,7 +77,7 @@ class Create extends Content {
 			return [];
 		}
 
-		$task_id = $this->get_task_id(
+		$task_id = $this->get_task_id_from_data(
 			[
 				'type' => 'create-post',
 				'date' => \gmdate( 'YW' ),
@@ -133,7 +133,7 @@ class Create extends Content {
 			return false;
 		}
 
-		return $this->get_task_id(
+		return $this->get_task_id_from_data(
 			[
 				'type'    => 'create-post',
 				'date'    => \gmdate( 'YW' ),

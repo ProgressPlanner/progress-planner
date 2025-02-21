@@ -24,7 +24,7 @@ abstract class One_Time extends Local_Tasks {
 	public function evaluate_task( $task_id ) {
 
 		// Early bail if the user does not have the capability to manage options.
-		if ( ! $this->capability_required() || 0 !== strpos( $task_id, $this->get_provider_id() ) ) {
+		if ( ! $this->capability_required() || 0 !== strpos( $task_id, $this->get_task_id() ) ) {
 			return false;
 		}
 
@@ -66,13 +66,13 @@ abstract class One_Time extends Local_Tasks {
 		if (
 			true === $this->is_task_type_snoozed() ||
 			! $this->should_add_task() || // No need to add the task.
-			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_provider_id() )
+			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() )
 		) {
 			return [];
 		}
 
 		return [
-			$this->get_task_details( $this->get_provider_id() ),
+			$this->get_task_details( $this->get_task_id() ),
 		];
 	}
 }
