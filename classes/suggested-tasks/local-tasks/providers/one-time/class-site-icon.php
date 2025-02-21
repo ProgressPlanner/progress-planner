@@ -19,21 +19,21 @@ class Site_Icon extends One_Time {
 	 *
 	 * @var string
 	 */
-	const ID = 'core-siteicon';
+	private const ID = 'core-siteicon';
 
 	/**
 	 * The provider type.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'configuration';
+	private const TYPE = 'configuration';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	const IS_ONBOARDING_TASK = true;
+	private const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * Check if the task should be added.

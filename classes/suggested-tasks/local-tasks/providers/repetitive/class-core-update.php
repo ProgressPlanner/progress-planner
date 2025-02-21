@@ -19,21 +19,21 @@ class Core_Update extends Repetitive {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'maintenance';
+	private const TYPE = 'maintenance';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'update-core';
+	private const ID = 'update-core';
 
 	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
 	 */
-	const CAPABILITY = 'update_core';
+	private const CAPABILITY = 'update_core';
 
 	/**
 	 * Check if the task should be added.

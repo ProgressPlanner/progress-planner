@@ -19,28 +19,28 @@ class Rename_Uncategorized_Category extends One_Time {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'configuration';
+	private const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'rename-uncategorized-category';
+	private const ID = 'rename-uncategorized-category';
 
 	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
 	 */
-	const CAPABILITY = 'manage_categories';
+	private const CAPABILITY = 'manage_categories';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	const IS_ONBOARDING_TASK = true;
+	private const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * The Uncategorized category.

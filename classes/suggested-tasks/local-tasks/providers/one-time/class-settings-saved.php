@@ -19,14 +19,14 @@ class Settings_Saved extends One_Time {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'configuration';
+	private const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'settings-saved';
+	private const ID = 'settings-saved';
 
 	/**
 	 * Check if the task should be added.

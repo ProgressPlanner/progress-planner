@@ -19,28 +19,28 @@ class Sample_Page extends One_Time {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'configuration';
+	private const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'sample-page';
+	private const ID = 'sample-page';
 
 	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
 	 */
-	const CAPABILITY = 'edit_pages';
+	private const CAPABILITY = 'edit_pages';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	const IS_ONBOARDING_TASK = true;
+	private const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * The sample page.

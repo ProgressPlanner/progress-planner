@@ -19,21 +19,21 @@ class Php_Version extends One_Time {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'maintenance';
+	private const TYPE = 'maintenance';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'php-version';
+	private const ID = 'php-version';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	const IS_ONBOARDING_TASK = true;
+	private const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * Check if the task should be added.

@@ -20,28 +20,28 @@ class Hello_World extends One_Time {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'configuration';
+	private const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'hello-world';
+	private const ID = 'hello-world';
 
 	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
 	 */
-	const CAPABILITY = 'edit_posts';
+	private const CAPABILITY = 'edit_posts';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	const IS_ONBOARDING_TASK = true;
+	private const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * The sample post.

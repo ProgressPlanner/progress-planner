@@ -20,21 +20,21 @@ class Review extends Content {
 	 *
 	 * @var string
 	 */
-	const ID = 'review-post';
+	private const ID = 'review-post';
 
 	/**
 	 * The provider type.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'content-update';
+	private const TYPE = 'content-update';
 
 	/**
 	 * The number of items to inject.
 	 *
 	 * @var int
 	 */
-	const ITEMS_TO_INJECT = 10;
+	private const ITEMS_TO_INJECT = 10;
 
 	/**
 	 * The snoozed post IDs.

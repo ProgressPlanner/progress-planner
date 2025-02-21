@@ -20,28 +20,28 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	 *
 	 * @var string
 	 */
-	const TYPE = '';
+	private const TYPE = '';
 
 	/**
 	 * The ID of the task.
 	 *
 	 * @var string
 	 */
-	const ID = '';
+	private const ID = '';
 
 	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
 	 */
-	const CAPABILITY = 'manage_options';
+	private const CAPABILITY = 'manage_options';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	const IS_ONBOARDING_TASK = false;
+	private const IS_ONBOARDING_TASK = false;
 
 	/**
 	 * Get the provider type.

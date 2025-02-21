@@ -19,21 +19,21 @@ class Blog_Description extends One_Time {
 	 *
 	 * @var string
 	 */
-	const ID = 'core-blogdescription';
+	private const ID = 'core-blogdescription';
 
 	/**
 	 * The provider type.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'configuration';
+	private const TYPE = 'configuration';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	const IS_ONBOARDING_TASK = true;
+	private const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * Check if the task should be added.
