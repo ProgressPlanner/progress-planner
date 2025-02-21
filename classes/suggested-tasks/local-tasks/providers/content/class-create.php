@@ -20,21 +20,21 @@ class Create extends Content {
 	 *
 	 * @var string
 	 */
-	private const ID = 'create-post';
+	protected const ID = 'create-post';
 
 	/**
 	 * The provider type.
 	 *
 	 * @var string
 	 */
-	private const TYPE = 'content-new';
+	protected const TYPE = 'content-new';
 
 	/**
 	 * The number of items to inject.
 	 *
 	 * @var int
 	 */
-	private const ITEMS_TO_INJECT = 2;
+	protected const ITEMS_TO_INJECT = 2;
 
 	/**
 	 * Get an array of tasks to inject.

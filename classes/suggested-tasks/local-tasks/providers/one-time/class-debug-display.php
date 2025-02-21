@@ -19,21 +19,21 @@ class Debug_Display extends One_Time {
 	 *
 	 * @var string
 	 */
-	private const TYPE = 'configuration';
+	protected const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	private const ID = 'wp-debug-display';
+	protected const ID = 'wp-debug-display';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	private const IS_ONBOARDING_TASK = true;
+	protected const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * Check if the task should be added.

@@ -19,21 +19,21 @@ class Search_Engine_Visibility extends One_Time {
 	 *
 	 * @var string
 	 */
-	private const TYPE = 'configuration';
+	protected const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	private const ID = 'search-engine-visibility';
+	protected const ID = 'search-engine-visibility';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	private const IS_ONBOARDING_TASK = true;
+	protected const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * Check if the task should be added.

@@ -18,14 +18,14 @@ abstract class Content extends Local_Tasks {
 	 *
 	 * @var string
 	 */
-	private const CAPABILITY = 'edit_others_posts';
+	protected const CAPABILITY = 'edit_others_posts';
 
 	/**
 	 * The provider type.
 	 *
 	 * @var string
 	 */
-	private const TYPE = 'writing';
+	protected const TYPE = 'writing';
 
 	/**
 	 * Get the task ID.

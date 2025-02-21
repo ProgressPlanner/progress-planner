@@ -19,14 +19,14 @@ class Remove_Inactive_Plugins extends One_Time {
 	 *
 	 * @var string
 	 */
-	private const TYPE = 'configuration';
+	protected const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	private const ID = 'remove-inactive-plugins';
+	protected const ID = 'remove-inactive-plugins';
 
 	/**
 	 * Check if the task condition is satisfied.
