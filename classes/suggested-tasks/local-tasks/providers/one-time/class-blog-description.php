@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
+
 /**
  * Add tasks for Core blogdescription.
  */

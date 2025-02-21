@@ -5,14 +5,14 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Abstract;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 /**
  * Add tasks for content updates.
  */
-abstract class Repetitive extends Local_Tasks_Abstract {
+abstract class Repetitive extends Local_Tasks {
 
 	/**
 	 * Evaluate a task.

@@ -5,13 +5,13 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Abstract;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks;
 /**
  * Add tasks for content updates.
  */
-abstract class Content extends Local_Tasks_Abstract {
+abstract class Content extends Local_Tasks {
 
 	/**
 	 * The capability required to perform the task.

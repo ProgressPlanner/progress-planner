@@ -13,7 +13,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 /**
  * Add tasks for content updates.
  */
-abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
+abstract class Local_Tasks implements Local_Tasks_Interface {
 
 	/**
 	 * The type of the task.

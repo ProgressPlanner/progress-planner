@@ -7,6 +7,7 @@
 
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 /**
  * Add tasks for Core updates.

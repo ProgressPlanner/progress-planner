@@ -5,14 +5,14 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Abstract;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks;
 
 /**
  * Add tasks for content updates.
  */
-abstract class One_Time extends Local_Tasks_Abstract {
+abstract class One_Time extends Local_Tasks {
 
 	/**
 	 * Evaluate a task.

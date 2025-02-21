@@ -8,6 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
 use Progress_Planner\Activities\Content_Helpers;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
 /**
  * Add tasks for content creation.
