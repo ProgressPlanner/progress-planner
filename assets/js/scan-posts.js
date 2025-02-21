@@ -1,10 +1,10 @@
-/* global progressPlanner, progressPlannerAjaxRequest */
+/* global progressPlanner, progressPlannerAjaxRequest, prplOnboardRedirect */
 /*
  * Scan Posts
  *
  * A script to scan posts for the Progress Planner.
  *
- * Dependencies: progress-planner-ajax-request
+ * Dependencies: progress-planner-ajax-request, progress-planner-upgrade-tasks
  */
 
 // eslint-disable-next-line no-unused-vars
@@ -35,15 +35,18 @@ const progressPlannerTriggerScan = () => {
 
 		// Refresh the page when scan has finished.
 		if ( response.data.progress >= 100 ) {
-			document.getElementById(
+			const scanProgressElement = document.getElementById(
 				'progress-planner-scan-progress'
-			).style.display = 'none';
+			);
 
-			window.location.href =
-				window.location.href
-					.replace( '&content-scan-finished=true', '' )
-					.replace( '&content-scan', '' ) +
-				'&content-scan-finished=true';
+			scanProgressElement.style.display = 'none';
+			scanProgressElement.setAttribute(
+				'data-onboarding-finished',
+				'true'
+			);
+
+			// Redirect if scanning is finished.
+			prplOnboardRedirect( 'scanPosts' );
 
 			return;
 		}

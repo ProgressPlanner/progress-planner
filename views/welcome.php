@@ -32,6 +32,14 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 	\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/onboard.css' )
 );
 
+// Enqueue upgrade styles.
+\wp_enqueue_style(
+	'progress-planner-upgrade-tasks',
+	PROGRESS_PLANNER_URL . '/assets/css/upgrade-tasks.css',
+	[],
+	\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/upgrade-tasks.css' )
+);
+
 
 ?>
 <div class="prpl-welcome">
@@ -46,7 +54,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 		<div class="left">
 			<form id="prpl-onboarding-form">
 				<div class="prpl-form-notice">
-					<strong><?php \esc_html_e( 'Stay on track with weekly updates', 'progress-planner' ); ?></strong>
+					<strong class="prpl-form-notice-title"><?php \esc_html_e( 'Stay on track with weekly updates', 'progress-planner' ); ?></strong>
 					<ul>
 						<li>
 						<?php
@@ -183,6 +191,9 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					);
 					?>
 				</p>
+
+				<?php \progress_planner()->the_view( 'popovers/parts/upgrade-tasks.php', [ 'context' => 'onboarding' ] ); ?>
+
 				<div id="progress-planner-scan-progress" style="display:none;">
 					<progress value="0" max="100"></progress>
 				</div>

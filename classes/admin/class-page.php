@@ -107,6 +107,7 @@ class Page {
 	 * @return void
 	 */
 	public function enqueue_assets( $hook ) {
+		$this->maybe_enqueue_focus_el_script( $hook );
 		if ( 'toplevel_page_progress-planner' !== $hook && 'progress-planner_page_progress-planner-settings' !== $hook ) {
 			return;
 		}
@@ -138,6 +139,7 @@ class Page {
 				\wp_enqueue_script( 'progress-planner-header-filters' );
 				\wp_enqueue_script( 'progress-planner-settings' );
 				\wp_enqueue_script( 'progress-planner-grid-masonry' );
+				\wp_enqueue_script( 'progress-planner-upgrade-tasks' );
 			} else {
 				\wp_enqueue_script( 'progress-planner-onboard' );
 			}
@@ -146,6 +148,67 @@ class Page {
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
 			\wp_enqueue_script( 'progress-planner-settings-page' );
 		}
+	}
+
+	/**
+	 * Enqueue the focus element script.
+	 *
+	 * @param string $hook The current admin page.
+	 *
+	 * @return void
+	 */
+	public function maybe_enqueue_focus_el_script( $hook ) {
+		$suggested_tasks       = \progress_planner()->get_suggested_tasks();
+		$local_tasks_providers = $suggested_tasks->get_local()->get_task_providers();
+		$tasks_details         = [];
+		$total_points          = 0;
+		$completed_points      = 0;
+		foreach ( $local_tasks_providers as $provider ) {
+			if ( 'configuration' !== $provider->get_provider_type() ) {
+				continue;
+			}
+			$details = $provider->get_task_details();
+			if ( ! isset( $details['link_setting']['hook'] ) ||
+				$hook !== $details['link_setting']['hook']
+			) {
+				continue;
+			}
+			$details['is_complete'] = $provider->is_task_completed();
+			$tasks_details[]        = $details;
+			$total_points          += $details['points'];
+			if ( $details['is_complete'] ) {
+				$completed_points += $details['points'];
+			}
+		}
+
+		if ( empty( $tasks_details ) ) {
+			return;
+		}
+
+		// Register the scripts.
+		\progress_planner()->get_admin__scripts()->register_scripts();
+
+		\wp_enqueue_script( 'progress-planner-focus-element' );
+		\wp_localize_script(
+			'progress-planner-focus-element',
+			'progressPlannerFocusElement',
+			[
+				'tasks'           => $tasks_details,
+				'totalPoints'     => $total_points,
+				'completedPoints' => $completed_points,
+				'base_url'        => PROGRESS_PLANNER_URL,
+				'l10n'            => [
+					/* translators: %d: The number of points. */
+					'fixThisIssue' => \esc_html__( 'Fix this issue to get %d point(s) in Progress Planner', 'progress-planner' ),
+				],
+			]
+		);
+		\wp_enqueue_style(
+			'progress-planner-focus-element',
+			PROGRESS_PLANNER_URL . '/assets/css/focus-element.css',
+			[],
+			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/focus-element.css' )
+		);
 	}
 
 	/**
@@ -172,6 +235,16 @@ class Page {
 				PROGRESS_PLANNER_URL . '/assets/css/settings-page.css',
 				[],
 				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/settings-page.css' )
+			);
+		}
+
+		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
+			// Enqueue ugprading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
+			\wp_enqueue_style(
+				'progress-planner-upgrade-tasks',
+				PROGRESS_PLANNER_URL . '/assets/css/upgrade-tasks.css',
+				[],
+				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/upgrade-tasks.css' )
 			);
 		}
 

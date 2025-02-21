@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
+
 /**
  * Add tasks to check if WP debug is enabled.
  */
@@ -17,14 +19,21 @@ class Search_Engine_Visibility extends One_Time {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'configuration';
+	protected const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'search-engine-visibility';
+	protected const ID = 'search-engine-visibility';
+
+	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected const IS_ONBOARDING_TASK = true;
 
 	/**
 	 * Check if the task should be added.
@@ -45,19 +54,27 @@ class Search_Engine_Visibility extends One_Time {
 	public function get_task_details( $task_id = '' ) {
 
 		if ( ! $task_id ) {
-			$task_id = $this->get_provider_id();
+			$task_id = $this->get_task_id();
 		}
 
 		return [
-			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Allow your site to be indexed by search engines', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
-			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'options-reading.php' ) ) : '',
-			'dismissible' => true,
-			'description' => '<p>' . \esc_html__( 'Your site is not currently visible to search engines. Consider allowing search engines to index your site.', 'progress-planner' ) . '</p>',
+			'task_id'      => $task_id,
+			'title'        => \esc_html__( 'Allow your site to be indexed by search engines', 'progress-planner' ),
+			'parent'       => 0,
+			'priority'     => 'high',
+			'type'         => $this->get_provider_type(),
+			'points'       => 1,
+			'url'          => $this->capability_required() ? \esc_url( \admin_url( 'options-reading.php' ) ) : '',
+			'dismissible'  => true,
+			'description'  => '<p>' . sprintf(
+				/* translators: %1$s <a href="https://prpl.fyi/blog-indexing-settings" target="_blank">allowing search engines</a> link */
+				\esc_html__( 'Your site is not currently visible to search engines. Consider %1$s to index your site.', 'progress-planner' ),
+				'<a href="https://prpl.fyi/blog-indexing-settings" target="_blank">' . \esc_html__( 'allowing search engines', 'progress-planner' ) . '</a>',
+			) . '</p>',
+			'link_setting' => [
+				'hook'   => 'options-reading.php',
+				'iconEl' => 'label[for="blog_public"]',
+			],
 		];
 	}
 }

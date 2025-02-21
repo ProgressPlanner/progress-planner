@@ -5,27 +5,27 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Abstract;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks;
 /**
  * Add tasks for content updates.
  */
-abstract class Content extends Local_Tasks_Abstract {
+abstract class Content extends Local_Tasks {
 
 	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
 	 */
-	protected $capability = 'edit_others_posts';
+	protected const CAPABILITY = 'edit_others_posts';
 
 	/**
 	 * The provider type.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'writing';
+	protected const TYPE = 'writing';
 
 	/**
 	 * Get the task ID.
@@ -34,7 +34,7 @@ abstract class Content extends Local_Tasks_Abstract {
 	 *
 	 * @return string The task ID.
 	 */
-	public function get_task_id( $data ) {
+	public function get_task_id_from_data( $data ) {
 
 		// Remove the task_id if it was added to the data.
 		if ( isset( $data['task_id'] ) ) {

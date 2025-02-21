@@ -1,0 +1,41 @@
+.prpl-element-awards-points-icon-positioning-wrapper {
+	position: relative;
+	display: inline-block;
+	height: 100%;
+
+	.prpl-element-awards-points-icon-wrapper {
+		position: absolute;
+		top: -2em;
+		left: 0;
+	}
+}
+
+.prpl-element-awards-points-icon-wrapper {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.25rem;
+	background-color: #fff9f0;
+	font-size: 0.75rem;
+	border: 2px solid #faa310;
+	border-radius: 1rem;
+	color: #534786;
+	font-weight: 600;
+	padding: 0.25rem;
+	margin: 0 1rem;
+	transform: translateY(0.25rem);
+	scroll-margin-top: 30px;
+
+	img {
+		width: 0.815rem;
+	}
+
+	&.focused {
+		border-color: #14b8a6;
+		background-color: #f2faf9;
+		box-shadow: 2px 2px 0 0 #14b8a6;
+	}
+
+	&.complete {
+		color: #14b8a6;
+	}
+}

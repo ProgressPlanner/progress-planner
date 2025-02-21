@@ -283,7 +283,11 @@ const prplStrikeCompletedTasks = () => {
 
 const prplPendingCelebration =
 	progressPlannerSuggestedTasks.tasks.pending_celebration;
-if ( prplPendingCelebration && prplPendingCelebration.length ) {
+if (
+	! progressPlannerSuggestedTasks.delayCelebration &&
+	prplPendingCelebration &&
+	prplPendingCelebration.length
+) {
 	setTimeout( () => {
 		// Trigger the celebration event.
 		document.dispatchEvent( new Event( 'prplCelebrateTasks' ) );

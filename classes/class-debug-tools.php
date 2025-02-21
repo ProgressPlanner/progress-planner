@@ -110,10 +110,46 @@ class Debug_Tools {
 			]
 		);
 
+		$this->add_upgrading_tasks_submenu_item( $admin_bar );
+
 		$this->add_local_tasks_submenu_item( $admin_bar );
 		$this->add_suggestions_submenu_item( $admin_bar );
 
 		$this->add_more_info_submenu_item( $admin_bar );
+	}
+
+	/**
+	 * Add Upgrading Tasks submenu to the debug menu.
+	 *
+	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
+	 * @return void
+	 */
+	public function add_upgrading_tasks_submenu_item( $admin_bar ) {
+
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-upgrading-tasks',
+				'parent' => 'prpl-debug',
+				'title'  => 'Onboarding / Upgrade Tasks',
+			]
+		);
+
+		$onboard_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', [] );
+
+		foreach ( $onboard_task_provider_ids as $task_provider_id ) {
+			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
+			if ( $task_provider ) { // @phpstan-ignore-line
+				$task_provider_details = $task_provider->get_task_details();
+
+				$admin_bar->add_node(
+					[
+						'id'     => 'prpl-upgrading-task-' . $task_provider_id,
+						'parent' => 'prpl-upgrading-tasks',
+						'title'  => $task_provider_details['title'],
+					]
+				);
+			}
+		}
 	}
 
 	/**

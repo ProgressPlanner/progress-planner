@@ -90,6 +90,9 @@ class Scripts {
 					[
 						'remoteServerRootUrl' => \progress_planner()->get_remote_server_root_url(),
 						'placeholderImageUrl' => \progress_planner()->get_placeholder_svg(),
+						'l10n'                => [
+							'badge' => \esc_html__( 'Badge', 'progress-planner' ),
+						],
 					]
 				);
 				break;

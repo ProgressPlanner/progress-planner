@@ -244,6 +244,11 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function mark_task_as_pending_celebration( $task_id ) {
+		// Don't mark the task as pending celebration if it's already completed.
+		if ( $this->was_task_completed( $task_id ) ) {
+			return false;
+		}
+
 		return $this->mark_task_as( 'pending_celebration', $task_id );
 	}
 
