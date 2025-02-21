@@ -18,69 +18,6 @@ customElements.define(
 				}
 			} );
 
-			this.innerHTML =
-				`
-			<div>
-				<h2>` +
-				prplEmailSending.l10n.popoverHeading +
-				`</h2>
-				<p>` +
-				prplEmailSending.l10n.popoverDescription +
-				`</p>
-				<div id="prpl-sending-email-actions">
-					<button class="prpl-button" data-action="showResults">` +
-				prplEmailSending.l10n.popoverButtonYes +
-				`</button>
-					<button class="prpl-button" data-action="closePopover">` +
-				prplEmailSending.l10n.popoverButtonNo +
-				`</button>
-				</div>
-				<div id="prpl-sending-email-result" style="display: none;">
-					<p>Was it successful?</p>
-					<p>
-						<button class="prpl-button" data-action="completeTask">` +
-				prplEmailSending.l10n.popoverButtonYes +
-				`</button>
-						<button class="prpl-button" data-action="showTroubleshooting">` +
-				prplEmailSending.l10n.popoverButtonNo +
-				`</button>
-					</p>
-				</div>
-				<div id="prpl-sending-email-troubleshooting" style="display: none;">
-					<h2>` +
-				prplEmailSending.l10n.popoverHeadingTroubleshooting +
-				`</h2>
-					<p>` +
-				prplEmailSending.l10n.popoverDescriptionTroubleshooting +
-				`</p>
-					<ul>
-						<li>` +
-				prplEmailSending.l10n.popoverTroubleshootingStep1 +
-				`</li>
-						<li>` +
-				prplEmailSending.l10n.popoverTroubleshootingStep2 +
-				`</li>
-						<li>` +
-				prplEmailSending.l10n.popoverTroubleshootingStep3 +
-				`</li>
-						<li>` +
-				prplEmailSending.l10n.popoverTroubleshootingStep4 +
-				`</li>
-					</ul>
-					<button class="prpl-button" data-action="closePopover">` +
-				prplEmailSending.l10n.popoverButtonClose +
-				`</button>
-				</div>
-
-				<button class="prpl-popover-close" data-action="closePopover">
-					<span class="dashicons dashicons-no-alt"></span>
-					<span class="screen-reader-text">` +
-				prplEmailSending.l10n.popoverButtonClose +
-				`</span>
-				</button>
-			</div>
-		`;
-
 			// Add event listeners.
 			this.querySelectorAll( 'button' ).forEach( ( button ) => {
 				button.addEventListener( 'click', ( e ) => {

@@ -73,19 +73,6 @@ class Email_Sending extends Interactive {
 			'prplEmailSending',
 			[
 				'ajax_url' => \admin_url( 'admin-ajax.php' ),
-				'l10n'     => [
-					'popoverHeading'                    => \esc_html__( 'Test email sending', 'progress-planner' ),
-					'popoverDescription'                => \esc_html__( 'Are you ready to test that email from your site works?', 'progress-planner' ),
-					'popoverButtonYes'                  => \esc_html__( 'Yes', 'progress-planner' ),
-					'popoverButtonNo'                   => \esc_html__( 'No', 'progress-planner' ),
-					'popoverButtonClose'                => \esc_html__( 'Close', 'progress-planner' ),
-					'popoverHeadingTroubleshooting'     => \esc_html__( 'Email Troubleshooting', 'progress-planner' ),
-					'popoverDescriptionTroubleshooting' => \esc_html__( 'Here are some steps to fix email sending issues:', 'progress-planner' ),
-					'popoverTroubleshootingStep1'       => \esc_html__( 'Check your SMTP settings are correct', 'progress-planner' ),
-					'popoverTroubleshootingStep2'       => \esc_html__( 'Ensure your domain\'s SPF records are properly configured', 'progress-planner' ),
-					'popoverTroubleshootingStep3'       => \esc_html__( 'Verify your email provider credentials', 'progress-planner' ),
-					'popoverTroubleshootingStep4'       => \esc_html__( 'Try sending from a different email address', 'progress-planner' ),
-				],
 			]
 		);
 	}
@@ -116,7 +103,39 @@ class Email_Sending extends Interactive {
 		<prpl-email-test-popup
 			popover-id="<?php echo \esc_attr( 'prpl-popover-' . $this->popover_id ); ?>"
 			provider-id="<?php echo \esc_attr( $this->get_provider_id() ); ?>"
-		></prpl-email-test-popup>
+		>
+			<div>
+				<h2><?php \esc_html_e( 'Test email sending', 'progress-planner' ); ?></h2>
+				<p><?php \esc_html_e( 'Are you ready to test that email from your site works?', 'progress-planner' ); ?></p>
+				<div id="prpl-sending-email-actions">
+					<button class="prpl-button" data-action="showResults"><?php \esc_html_e( 'Yes', 'progress-planner' ); ?></button>
+					<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'No', 'progress-planner' ); ?></button>
+				</div>
+				<div id="prpl-sending-email-result" style="display: none;">
+					<p><?php \esc_html_e( 'Was it successful?', 'progress-planner' ); ?></p>
+					<p>
+						<button class="prpl-button" data-action="completeTask"><?php \esc_html_e( 'Yes', 'progress-planner' ); ?></button>
+						<button class="prpl-button" data-action="showTroubleshooting"><?php \esc_html_e( 'No', 'progress-planner' ); ?></button>
+					</p>
+				</div>
+				<div id="prpl-sending-email-troubleshooting" style="display: none;">
+					<h2><?php \esc_html_e( 'Email Troubleshooting', 'progress-planner' ); ?></h2>
+					<p><?php \esc_html_e( 'Here are some steps to fix email sending issues:', 'progress-planner' ); ?></p>
+					<ul>
+						<li><?php \esc_html_e( 'Check your SMTP settings are correct', 'progress-planner' ); ?></li>
+						<li><?php \esc_html_e( 'Ensure your domain\'s SPF records are properly configured', 'progress-planner' ); ?></li>
+						<li><?php \esc_html_e( 'Verify your email provider credentials', 'progress-planner' ); ?></li>
+						<li><?php \esc_html_e( 'Try sending from a different email address', 'progress-planner' ); ?></li>
+					</ul>
+					<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></button>
+				</div>
+
+				<button class="prpl-popover-close" data-action="closePopover">
+					<span class="dashicons dashicons-no-alt"></span>
+					<span class="screen-reader-text"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></span>
+				</button>
+			</div>
+		</prpl-email-test-popup>
 		<?php
 	}
 
