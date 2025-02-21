@@ -108,13 +108,15 @@ class Email_Sending extends Interactive {
 	/**
 	 * The popover content.
 	 *
-	 * @return string
+	 * @return void
 	 */
-	public function get_popover_content() {
-		return '<prpl-email-test-popup
-			popover-id="prpl-popover-' . $this->popover_id . '"
-			provider-id="' . $this->get_provider_id() . '"
-		></prpl-email-test-popup>';
+	public function the_popover_content() {
+		?>
+		<prpl-email-test-popup
+			popover-id="<?php echo \esc_attr( 'prpl-popover-' . $this->popover_id ); ?>"
+			provider-id="<?php echo \esc_attr( $this->get_provider_id() ); ?>"
+		></prpl-email-test-popup>
+		<?php
 	}
 
 	/**

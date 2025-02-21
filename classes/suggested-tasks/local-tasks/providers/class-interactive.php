@@ -38,19 +38,17 @@ abstract class Interactive extends One_Time {
 	public function add_popover() {
 		?>
 		<div id="prpl-popover-<?php echo \esc_attr( $this->popover_id ); ?>" class="prpl-popover prpl-popover-interactive" popover>
-			<?php echo $this->get_popover_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+			<?php $this->the_popover_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</div>
 		<?php
 	}
 
 	/**
-	 * Get the popover content.
+	 * Print the popover content.
 	 *
-	 * @return string
+	 * @return void
 	 */
-	public function get_popover_content() {
-		return '';
-	}
+	abstract public function the_popover_content();
 
 	/**
 	 * We want task to be added always.
