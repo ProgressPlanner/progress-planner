@@ -26,6 +26,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Rename_Uncat
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Permalink_Structure;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Php_Version;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engine_Visibility;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
 
 /**
  * Local_Tasks_Manager class.
@@ -72,6 +73,25 @@ class Local_Tasks_Manager {
 			new Php_Version(),
 			new Search_Engine_Visibility(),
 		];
+
+		/**
+		 * Filter the task providers.
+		 *
+		 * @param array $task_providers The task providers.
+		 */
+		$this->task_providers = \apply_filters( 'progress_planner_suggested_tasks_providers', $this->task_providers );
+		foreach ( $this->task_providers as $key => $task_provider ) {
+			if ( ! $task_provider instanceof Local_Tasks_Interface ) {
+				error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					sprintf(
+						'Task provider %1$s is not an instance of %2$s',
+						$task_provider->get_provider_id(),
+						Local_Tasks_Interface::class
+					)
+				);
+				unset( $this->task_providers[ $key ] );
+			}
+		}
 
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
 		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
