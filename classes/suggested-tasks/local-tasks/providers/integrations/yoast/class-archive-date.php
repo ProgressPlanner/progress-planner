@@ -35,7 +35,7 @@ class Archive_Date extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		// If the permalink structure includes %year%, %monthnum%, or %day%, we don't need to add the task.	
+		// If the permalink structure includes %year%, %monthnum%, or %day%, we don't need to add the task.
 		$permalink_structure = get_option( 'permalink_structure' );
 		if ( strpos( $permalink_structure, '%year%' ) !== false || strpos( $permalink_structure, '%monthnum%' ) !== false || strpos( $permalink_structure, '%day%' ) !== false ) {
 			return false;

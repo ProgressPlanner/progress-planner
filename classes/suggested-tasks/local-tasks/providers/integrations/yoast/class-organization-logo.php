@@ -22,7 +22,7 @@ class Organization_Logo extends Yoast_Provider {
 	/**
 	 * Yoast SEO instance.
 	 *
-	 * @var YoastSEO
+	 * @var \YoastSEO
 	 */
 	protected $yoast_seo;
 
@@ -50,7 +50,7 @@ class Organization_Logo extends Yoast_Provider {
 			'<a href="https://prpl.fyi/yoast-organization-logo" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
 		}
 
-		$this->url         = admin_url( 'admin.php?page=wpseo_page_settings#/site-representation' );
+		$this->url = admin_url( 'admin.php?page=wpseo_page_settings#/site-representation' );
 	}
 
 	/**

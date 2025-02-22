@@ -36,6 +36,7 @@ class Archive_Format extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		// Check if there are any posts that use a post format using get_posts and get only the IDs.
+		// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 		$args = [
 			'posts_per_page' => -1,
 			'fields'         => 'ids',
@@ -48,6 +49,7 @@ class Archive_Format extends Yoast_Provider {
 		];
 
 		$posts_with_format_ids = get_posts( $args );
+		// phpcs:enable WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 
 		// If there are more than 3 posts with a post format, we don't need to add the task.
 		if ( count( $posts_with_format_ids ) > 3 ) {
