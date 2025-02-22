@@ -43,7 +43,7 @@ class Organization_Logo extends Yoast_Provider {
 		if ( $this->company_or_person !== 'person' ) {
 			$this->title       = \esc_html__( 'Yoast SEO: set your organization logo', 'progress-planner' );
 			$this->description = \esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your organization logo in the Yoast SEO settings.', 'progress-planner' ) .
-			'<a href="https://prpl.fyi/yoast-organization-logo" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
+			'<a href="https://prpl.fyi/yoast-person-logo" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
 		} else {
 			$this->title       = \esc_html__( 'Yoast SEO: set your person logo', 'progress-planner' );
 			$this->description = \esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your person logo in the Yoast SEO settings.', 'progress-planner' ) .

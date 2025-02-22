@@ -31,11 +31,12 @@ class Add_Yoast_Providers {
 		return array_merge(
 			$providers,
 			[
-				new Organization_Logo(),
-				new Crawl_Settings(),
 				new Archive_Author(),
 				new Archive_Date(),
 				new Archive_Format(),
+				new Crawl_Settings(),
+				new Media_Pages(),
+				new Organization_Logo(),
 			]
 		);
 	}
