@@ -83,16 +83,7 @@ abstract class Yoast_Provider extends One_Time {
 	 *
 	 * @return bool
 	 */
-	public function should_add_task() {
-		return $this->task_check();
-	}
-
-	/**
-	 * Check if the task condition is satisfied.
-	 *
-	 * @return bool
-	 */
-	abstract protected function task_check();
+	abstract public function should_add_task();
 
 	/**
 	 * Get the task details.

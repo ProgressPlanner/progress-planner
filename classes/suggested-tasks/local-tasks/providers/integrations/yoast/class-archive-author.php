@@ -30,11 +30,11 @@ class Archive_Author extends Yoast_Provider {
 	}
 
 	/**
-	 * If the author archive is already disabled or there is more than one author, we don't need to add the task.
+	 * Determine if the task should be added.
 	 *
 	 * @return bool
 	 */
-	public function task_check() {
+	public function should_add_task() {
 		global $wpdb;
 
 		// If the author archive is already disabled, we don't need to add the task.

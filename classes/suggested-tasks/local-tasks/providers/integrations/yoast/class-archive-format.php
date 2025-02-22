@@ -30,11 +30,31 @@ class Archive_Format extends Yoast_Provider {
 	}
 
 	/**
-	 * Check if the task condition is satisfied.
+	 * Determine if the task should be added.
 	 *
 	 * @return bool
 	 */
-	public function task_check() {
+	public function should_add_task() {
+		// Check if there are any posts that use a post format using get_posts and get only the IDs.
+		$args = [
+			'posts_per_page' => -1,
+			'fields'         => 'ids',
+			'tax_query'      => [
+				[
+					'taxonomy' => 'post_format',
+					'operator' => 'EXISTS',
+				],
+			],
+		];
+
+		$posts_with_format_ids = get_posts( $args );
+
+		// If there are more than 3 posts with a post format, we don't need to add the task.
+		if ( count( $posts_with_format_ids ) > 3 ) {
+			return false;
+		}
+
+		// If the post format archive is already disabled, we don't need to add the task.
 		if ( YoastSEO()->helpers->options->get( 'disable-post_format' ) === true ) {
 			return false;
 		}
