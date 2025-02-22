@@ -163,9 +163,8 @@ final class Suggested_Tasks extends Widget {
 		$year             = \gmdate( 'Y' );
 		$current_date     = $year . '-' . \gmdate( 'm-d' );
 
-		// TODO: GET params just for testing.
-		$start_date = $year . '-' . ( isset( $_GET['start_date'] ) ? \sanitize_text_field( \wp_unslash( $_GET['start_date'] ) ) : '02-12' );
-		$end_date   = $year . '-' . ( isset( $_GET['end_date'] ) ? \sanitize_text_field( \wp_unslash( $_GET['end_date'] ) ) : '02-16' );
+		$start_date = $year . '-02-12';
+		$end_date   = $year . '-02-16';
 
 		if ( $current_date >= $start_date && $current_date <= $end_date ) {
 			$confetti_options = [
