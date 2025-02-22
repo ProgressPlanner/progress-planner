@@ -101,11 +101,9 @@ class Suggested_Tasks {
 	/**
 	 * If done via automatic updates, the "core update" task should be marked as "completed" (and skip "pending celebration" status).
 	 *
-	 * @param array $update_results The update results.
-	 *
 	 * @return void
 	 */
-	public function on_automatic_updates_complete( $update_results ) {
+	public function on_automatic_updates_complete() {
 
 		$pending_tasks = $this->local->get_pending_tasks(); // @phpstan-ignore-line method.nonObject
 

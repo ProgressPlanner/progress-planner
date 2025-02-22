@@ -10,7 +10,8 @@ parameters:
     - identifier: constant.notFound
     - identifier: missingType.iterableValue
     - identifier: missingType.generics
+    - '#Function YoastSEO not found.#'
     - '#Variable \$prpl_[a-zA-Z0-9_]+ might not be defined.#'
-    - '#Call to an undefined method Progress_Planner\\Base\:\:get_[a-zA-Z0-9\\_]+().#'
+    - '#Call to an undefined method Progress_Planner\\Base\:\:get_[a-zA-Z0-9\\_]+\(\).#'
     - '#Cannot call method modify\(\) on DateTime\|false.#'
     - '#Cannot call method format\(\) on DateTime\|false.#'
