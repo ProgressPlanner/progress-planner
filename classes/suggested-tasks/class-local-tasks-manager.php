@@ -57,8 +57,8 @@ class Local_Tasks_Manager {
 	 */
 	public function __construct() {
 
-		\add_action( 'plugins_loaded', [ $this, 'init' ] );
 		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
+		\add_action( 'plugins_loaded', [ $this, 'init' ], 11 );
 
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
 
