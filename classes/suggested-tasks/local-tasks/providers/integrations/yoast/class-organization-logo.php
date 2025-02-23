@@ -38,7 +38,7 @@ class Organization_Logo extends Yoast_Provider {
 	 */
 	public function __construct() {
 		$this->yoast_seo         = YoastSEO();
-		$this->company_or_person = $this->yoast_seo->helpers->options->get( 'company_or_person', '' );
+		$this->company_or_person = $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' );
 
 		if ( $this->company_or_person !== 'person' ) {
 			$this->title       = \esc_html__( 'Yoast SEO: set your organization logo', 'progress-planner' );
