@@ -203,14 +203,23 @@ const prplTriggerConfetti = () => {
 		let confettiOptions = [
 			{
 				particleCount: 60,
-				scalar: 1.4,
+				scalar: 4,
 				shapes: [ 'image' ],
 				shapeOptions: {
-					image: {
-						src: progressPlannerSuggestedTasks.raviIconUrl,
-						width: 32,
-						height: 32,
-					},
+					image: [
+						{
+							src: progressPlannerSuggestedTasks.raviIconUrl,
+						},
+						{
+							src: progressPlannerSuggestedTasks.monthIconUrl,
+						},
+						{
+							src: progressPlannerSuggestedTasks.contentIconUrl,
+						},
+						{
+							src: progressPlannerSuggestedTasks.maintenanceIconUrl,
+						},
+					],
 				},
 				origin,
 			},
