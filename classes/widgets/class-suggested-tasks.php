@@ -196,7 +196,7 @@ final class Suggested_Tasks extends Widget {
 
 		foreach ( $this->get_badge_urls() as $context => $url ) {
 			$localize_data[ $context . 'IconUrl' ] = $url;
-		}	
+		}
 
 		// Localize the script.
 		\wp_localize_script(
