@@ -118,7 +118,7 @@ trait Task_Provider_Test_Trait {
 			// Change the task status to pending celebration.
 			$this->suggested_tasks->mark_task_as_pending_celebration( $task_id );
 
-			// TODO: In production we insert an activity here.
+			// In production we insert an activity here.
 		}
 
 		// Verify that the task(s) we're testing is pending celebration.
