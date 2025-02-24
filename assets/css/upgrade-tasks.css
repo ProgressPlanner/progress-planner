@@ -12,6 +12,7 @@
 	min-height: 0;
 	margin-bottom: var(--prpl-gap);
 	box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.07), -2px 0 6px rgba(0, 0, 0, 0.07);
+	color: var(--prpl-color-gray-6);
 
 	.prpl-onboarding-tasks-list {
 		margin-top: 1rem;
@@ -152,12 +153,13 @@
 
 	.prpl-onboarding-tasks-montly-badge-image {
 		display: inline-block;
-		width: 100px;
+		width: 130px;
 	}
 
 	.prpl-onboarding-tasks-total-points {
 		font-size: var(--prpl-font-size-3xl);
 		font-weight: 600;
+		color: var(--prpl-color-gray-5);
 	}
 
 }
