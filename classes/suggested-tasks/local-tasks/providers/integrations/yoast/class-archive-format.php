@@ -26,7 +26,7 @@ class Archive_Format extends Yoast_Provider {
 		$this->title       = \esc_html__( 'Yoast SEO: disable the format archives', 'progress-planner' );
 		$this->url         = admin_url( 'admin.php?page=wpseo_page_settings#/format-archives' );
 		$this->description = \esc_html__( 'WordPress creates an archive for each post format. This is not useful and can be disabled in the Yoast SEO settings.', 'progress-planner' ) .
-			'<a href="https://prpl.fyi/yoast-format-archive" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
+			' <a href="https://prpl.fyi/yoast-format-archive" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
 	}
 
 	/**

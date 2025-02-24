@@ -26,7 +26,7 @@ class Archive_Author extends Yoast_Provider {
 		$this->title       = \esc_html__( 'Yoast SEO: disable the author archive', 'progress-planner' );
 		$this->url         = admin_url( 'admin.php?page=wpseo_page_settings#/author-archives' );
 		$this->description = \esc_html__( 'Yoast SEO can disable the author archive when you have only one author, as it is the same as the homepage.', 'progress-planner' ) .
-			'<a href="https://prpl.fyi/yoast-author-archive" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
+			' <a href="https://prpl.fyi/yoast-author-archive" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
 	}
 
 	/**
