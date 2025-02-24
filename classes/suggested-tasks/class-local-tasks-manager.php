@@ -26,6 +26,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Rename_Uncat
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Permalink_Structure;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Php_Version;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engine_Visibility;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Reduce_Autoloaded_Options;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
 
 /**
@@ -72,6 +73,7 @@ class Local_Tasks_Manager {
 			new Permalink_Structure(),
 			new Php_Version(),
 			new Search_Engine_Visibility(),
+			new Reduce_Autoloaded_Options(),
 		];
 
 		/**
