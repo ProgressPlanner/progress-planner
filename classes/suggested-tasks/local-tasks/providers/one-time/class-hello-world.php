@@ -45,8 +45,8 @@ class Hello_World extends One_Time {
 			$this->url = \get_edit_post_link( $this->sample_post->ID );
 		}
 
-		$this->title        = \esc_html__( 'Delete the "Hello World!" post.', 'progress-planner' );
-		$this->description  = sprintf(
+		$this->title       = \esc_html__( 'Delete the "Hello World!" post.', 'progress-planner' );
+		$this->description = sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">Hello World!</a> link */
 			\esc_html__( 'On install, WordPress creates a %s post. This post is not needed and should be deleted.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">' . \esc_html__( '"Hello World!"', 'progress-planner' ) . '</a>'

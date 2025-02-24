@@ -25,13 +25,13 @@ class Site_Icon extends One_Time {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->title = \esc_html__( 'Set site icon', 'progress-planner' );
+		$this->title       = \esc_html__( 'Set site icon', 'progress-planner' );
 		$this->description = sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/set-site-icon" target="_blank">site icon</a> link */
 			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/set-site-icon" target="_blank">' . \esc_html__( 'site icon', 'progress-planner' ) . '</a>'
 		);
-		$this->url = \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() );
+		$this->url          = \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() );
 		$this->link_setting = [
 			'hook'   => 'options-general.php',
 			'iconEl' => '.site-icon-section th',

@@ -28,9 +28,9 @@ class Debug_Display extends One_Time {
 		$this->title       = \esc_html__( 'Disable public display of PHP errors', 'progress-planner' );
 		$this->description = sprintf(
 				// translators: %1$s is the name of the WP_DEBUG_DISPLAY constant, %2$s <a href="https://prpl.fyi/set-wp-debug" target="_blank">We recommend</a> link.
-				\esc_html__( '%1$s is enabled. This means that errors are shown to users. %2$s disabling it.', 'progress-planner' ),
-				'<code>WP_DEBUG_DISPLAY</code>',
-				'<a href="https://prpl.fyi/set-wp-debug" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>'
+			\esc_html__( '%1$s is enabled. This means that errors are shown to users. %2$s disabling it.', 'progress-planner' ),
+			'<code>WP_DEBUG_DISPLAY</code>',
+			'<a href="https://prpl.fyi/set-wp-debug" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>'
 		);
 	}
 

@@ -25,7 +25,7 @@ class Settings_Saved extends One_Time {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->title = \esc_html__( 'Fill settings page', 'progress-planner' );
+		$this->title       = \esc_html__( 'Fill settings page', 'progress-planner' );
 		$this->description = sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/fill-settings-page" target="_blank">settings page</a> link */
 			\esc_html__( 'Head over to the settings page and fill in the required information. %s', 'progress-planner' ),
