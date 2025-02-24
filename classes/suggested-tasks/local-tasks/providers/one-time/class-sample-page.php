@@ -39,8 +39,10 @@ class Sample_Page extends One_Time {
 	 * Constructor.
 	 */
 	public function __construct() {
-		if ( is_a( $this->get_sample_page(), \WP_Post::class ) ) {
-			$this->url = \get_edit_post_link( $this->sample_page->ID );
+		$this->sample_page = $this->get_sample_page();
+
+		if ( is_object( $this->sample_page ) && is_a( $this->sample_page, \WP_Post::class ) ) {
+			$this->url = (string) \get_edit_post_link( $this->sample_page->ID );
 		}
 
 		$this->title       = \esc_html__( 'Delete "Sample Page"', 'progress-planner' );
@@ -57,7 +59,7 @@ class Sample_Page extends One_Time {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return is_a( $this->get_sample_page(), \WP_Post::class );
+		return ( is_object( $this->sample_page ) && is_a( $this->sample_page, \WP_Post::class ) );
 	}
 
 	/**

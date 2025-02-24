@@ -41,8 +41,8 @@ class Hello_World extends One_Time {
 	public function __construct() {
 		$this->sample_post = $this->get_sample_post();
 
-		if ( is_a( $this->sample_post, \WP_Post::class ) ) {
-			$this->url = \get_edit_post_link( $this->sample_post->ID );
+		if ( is_object( $this->sample_post ) && is_a( $this->sample_post, \WP_Post::class ) ) {
+			$this->url = (string) \get_edit_post_link( $this->sample_post->ID );
 		}
 
 		$this->title       = \esc_html__( 'Delete the "Hello World!" post.', 'progress-planner' );
@@ -60,7 +60,7 @@ class Hello_World extends One_Time {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( is_a( $this->sample_post, \WP_Post::class ) ) {
+		if ( is_object( $this->sample_post ) && is_a( $this->sample_post, \WP_Post::class ) ) {
 			return true;
 		}
 
