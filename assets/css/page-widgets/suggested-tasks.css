@@ -162,10 +162,6 @@
 			display: flex;
 			gap: 0.5rem;
 			flex-shrink: 0; /* Prevent the actions from shrinking when the task title is too long */
-
-			.prpl-suggested-task-button {
-				line-height: 0;
-			}
 		}
 
 		.prpl-suggested-task-points {
@@ -204,6 +200,7 @@
 
 		button {
 			padding: 0.1rem;
+			line-height: 0;
 			margin: 0;
 			background: none;
 			border: none;
@@ -422,11 +419,4 @@
 	color: var(--prpl-color-link);
 	text-decoration: underline;
 	margin-top: var(--prpl-padding);
-}
-
-/*------------------------------------*\
-	Interactive task popover styles.
-\*------------------------------------*/
-.prpl-popover-interactive {
-	width: 800px;
 }

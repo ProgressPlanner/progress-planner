@@ -6,47 +6,24 @@
 customElements.define(
 	'prpl-suggested-task',
 	class extends HTMLElement {
-		constructor( props = {} ) {
-			const defaults = {
-				taskId: '',
-				taskTitle: '',
-				taskDescription: '',
-				taskPoints: 0,
-				taskAction: '',
-				taskUrl: '',
-				taskDismissable: false,
-				taskType: '',
-				taskPopoverId: '',
-			};
-
-			// Merge defaults with props.
-			const options = { ...defaults, ...props };
-
-			// Get parent class properties.
+		constructor(
+			taskId,
+			taskTitle,
+			taskDescription,
+			taskPoints,
+			taskAction = '',
+			taskUrl = '',
+			taskDismissable = false,
+			taskType = ''
+		) {
+			// Get parent class properties
 			super();
-
-			// Destructure the options.
-			const {
-				taskId,
-				taskTitle,
-				taskDescription,
-				taskPoints,
-				taskAction,
-				taskUrl,
-				taskDismissable,
-				taskType,
-				taskPopoverId = '',
-			} = options;
 
 			this.setAttribute( 'role', 'listitem' );
 
 			let taskHeading = taskTitle;
 			if ( taskUrl ) {
 				taskHeading = `<a href="${ taskUrl }">${ taskTitle }</a>`;
-			}
-
-			if ( taskPopoverId ) {
-				taskHeading = `<button popovertarget="${ taskPopoverId }">${ taskTitle }</button>`;
 			}
 
 			const isRemoteTask = taskId.startsWith( 'remote-task-' );

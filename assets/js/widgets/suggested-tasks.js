@@ -115,17 +115,16 @@ const progressPlannerInjectNextItem = ( type ) => {
 const progressPlannerInjectSuggestedTodoItem = ( details ) => {
 	// Clone the template element.
 	const Item = customElements.get( 'prpl-suggested-task' );
-	const item = new Item( {
-		taskId: details.task_id,
-		taskTitle: details.title,
-		taskDescription: details.description,
-		taskPoints: details.points ?? 1,
-		taskAction: details.action ?? '',
-		taskUrl: details.url ?? '',
-		taskDismissable: details.dismissable ?? false,
-		taskType: details.type ?? '',
-		taskPopoverId: details.popover_id ?? '',
-	} );
+	const item = new Item(
+		details.task_id,
+		details.title,
+		details.description,
+		details.points ?? 1,
+		details.action ?? '',
+		details.url ?? '',
+		details.dismissable ?? false,
+		details.type ?? ''
+	);
 
 	/**
 	 * @todo Implement the parent task functionality.

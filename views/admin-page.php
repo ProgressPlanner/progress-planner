@@ -28,15 +28,10 @@ if ( ! $prpl_privacy_policy_accepted ) {
 			<?php endforeach; ?>
 		</div>
 
-		<?php
-			/**
-			 * Fires after the widgets are rendered.
-			 * Nice place to add custom content since our styling is in general applied inside .prpl-wrap .
-			 *
-			 * @since 1.0.0
-			 */
-			do_action( 'progress_planner_admin_page_after_widgets' );
-		?>
+		<?php // Display the upgrade tasks popover if needed. ?>
+		<?php if ( \progress_planner()->get_plugin_upgrade_handler()->get_newly_added_task_providers() ) : ?>
+			<?php \progress_planner()->get_popover()->the_popover( 'upgrade-tasks' )->render(); ?>
+		<?php endif; ?>
 	<?php else : ?>
 		<?php \progress_planner()->the_view( 'welcome.php' ); ?>
 	<?php endif; ?>
