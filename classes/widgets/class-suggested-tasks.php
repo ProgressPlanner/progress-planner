@@ -158,15 +158,14 @@ final class Suggested_Tasks extends Widget {
 			$max_items_per_type['pending_celebration'] = 99;
 		}
 
-		// Check if current date is between Feb 12-16.
+		// Check if current date is between Feb 12-16 to use hearts confetti.
 		$confetti_options = [];
-		$year             = \gmdate( 'Y' );
-		$current_date     = $year . '-' . \gmdate( 'm-d' );
+		// February 12 will be (string) '0212', and when converted to int it will be 212.
+		// February 16 will be (string) '0216', and when converted to int it will be 216.
+		// The integer conversion makes it easier and faster to compare the dates.
+		$date_md = (int) \gmdate( 'md' );
 
-		$start_date = $year . '-02-12';
-		$end_date   = $year . '-02-16';
-
-		if ( $current_date >= $start_date && $current_date <= $end_date ) {
+		if ( 212 <= $date_md && $date_md <= 216 ) {
 			$confetti_options = [
 				[
 					'particleCount' => 50,
