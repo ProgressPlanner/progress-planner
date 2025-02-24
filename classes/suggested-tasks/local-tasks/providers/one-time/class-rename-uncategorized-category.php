@@ -1,6 +1,6 @@
 <?php
 /**
- * Add tasks for settings saved.
+ * Add task to rename the Uncategorized category.
  *
  * @package Progress_Planner
  */
@@ -10,16 +10,9 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
- * Add tasks for settings saved.
+ * Add task to rename the Uncategorized category.
  */
 class Rename_Uncategorized_Category extends One_Time {
-
-	/**
-	 * The provider type.
-	 *
-	 * @var string
-	 */
-	protected const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
@@ -36,18 +29,24 @@ class Rename_Uncategorized_Category extends One_Time {
 	protected const CAPABILITY = 'manage_categories';
 
 	/**
-	 * Whether the task is an onboarding task.
-	 *
-	 * @var bool
-	 */
-	protected const IS_ONBOARDING_TASK = true;
-
-	/**
 	 * The Uncategorized category.
 	 *
 	 * @var int|null
 	 */
 	protected $uncategorized_category = null;
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$this->title       = \esc_html__( 'Rename Uncategorized category', 'progress-planner' );
+		$this->url         = \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' );
+		$this->description = sprintf(
+			/* translators: %1$s <a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">We recommend</a> link */
+			\esc_html__( 'The Uncategorized category is used for posts that don\'t have a category. %1$s renaming it to something that fits your site better.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
+		);
+	}
 
 	/**
 	 * Check if the task should be added.
@@ -77,35 +76,5 @@ class Rename_Uncategorized_Category extends One_Time {
 		}
 
 		return ! empty( $this->uncategorized_category );
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-
-		if ( ! $task_id ) {
-			$task_id = $this->get_task_id();
-		}
-
-		return [
-			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Rename Uncategorized category', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'medium',
-			'type'        => $this->get_provider_type(),
-			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' ) ) : '',
-			'description' => '<p>' . sprintf(
-				/* translators: %1$s <a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">We recommend</a> link */
-				\esc_html__( 'The Uncategorized category is used for posts that don\'t have a category. %1$s renaming it to something that fits your site better.', 'progress-planner' ),
-				'<a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
-			) . '</p>',
-
-		];
 	}
 }
