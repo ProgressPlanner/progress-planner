@@ -1,6 +1,6 @@
 <?php
 /**
- * Add tasks for settings saved.
+ * Add task to delete the Sample Page.
  *
  * @package Progress_Planner
  */
@@ -10,16 +10,9 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 /**
- * Add tasks to check if WP debug is enabled.
+ * Add task to delete the Sample Page.
  */
 class Sample_Page extends One_Time {
-
-	/**
-	 * The provider type.
-	 *
-	 * @var string
-	 */
-	protected const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
@@ -36,13 +29,6 @@ class Sample_Page extends One_Time {
 	protected const CAPABILITY = 'edit_pages';
 
 	/**
-	 * Whether the task is an onboarding task.
-	 *
-	 * @var bool
-	 */
-	protected const IS_ONBOARDING_TASK = true;
-
-	/**
 	 * The sample page.
 	 *
 	 * @var \WP_Post|null|false
@@ -50,43 +36,28 @@ class Sample_Page extends One_Time {
 	protected $sample_page = false;
 
 	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		if ( is_a( $this->get_sample_page(), \WP_Post::class ) ) {
+			$this->url = \get_edit_post_link( $this->sample_page->ID );
+		}
+
+		$this->title = \esc_html__( 'Delete "Sample Page"', 'progress-planner' );
+		$this->description = sprintf(
+			/* translators: %s:<a href="https://prpl.fyi/delete-sample-page" target="_blank">Sample Page</a> link */
+			\esc_html__( 'On install, WordPress creates a %s page. This page is not needed and should be deleted.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/delete-sample-page" target="_blank">' . \esc_html__( '"Sample Page"', 'progress-planner' ) . '</a>'
+		);
+	}
+
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return null !== $this->get_sample_page();
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-
-		if ( ! $task_id ) {
-			$task_id = $this->get_task_id();
-		}
-
-		$sample_page = $this->get_sample_page();
-
-		return [
-			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Delete "Sample Page"', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
-			'points'      => 1,
-			'url'         => $this->capability_required() && null !== $sample_page ? \esc_url( \get_edit_post_link( $sample_page->ID ) ) : '', // @phpstan-ignore-line property.nonObject
-			'description' => '<p>' . sprintf(
-				/* translators: %s:<a href="https://prpl.fyi/delete-sample-page" target="_blank">Sample Page</a> link */
-				\esc_html__( 'On install, WordPress creates a %s page. This page is not needed and should be deleted.', 'progress-planner' ),
-				'<a href="https://prpl.fyi/delete-sample-page" target="_blank">' . \esc_html__( '"Sample Page"', 'progress-planner' ) . '</a>'
-			) . '</p>',
-		];
+		return is_a( $this->get_sample_page(), \WP_Post::class );
 	}
 
 	/**

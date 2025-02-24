@@ -15,13 +15,6 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 class Hello_World extends One_Time {
 
 	/**
-	 * The provider type.
-	 *
-	 * @var string
-	 */
-	protected const TYPE = 'configuration';
-
-	/**
 	 * The provider ID.
 	 *
 	 * @var string
@@ -36,18 +29,29 @@ class Hello_World extends One_Time {
 	protected const CAPABILITY = 'edit_posts';
 
 	/**
-	 * Whether the task is an onboarding task.
-	 *
-	 * @var bool
-	 */
-	protected const IS_ONBOARDING_TASK = true;
-
-	/**
 	 * The sample post.
 	 *
 	 * @var \WP_Post|null|false
 	 */
 	protected $sample_post = false;
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$this->sample_post = $this->get_sample_post();
+
+		if ( is_a( $this->sample_post, \WP_Post::class ) ) {
+			$this->url = \get_edit_post_link( $this->sample_post->ID );
+		}
+
+		$this->title        = \esc_html__( 'Delete the "Hello World!" post.', 'progress-planner' );
+		$this->description  = sprintf(
+			/* translators: %s:<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">Hello World!</a> link */
+			\esc_html__( 'On install, WordPress creates a %s post. This post is not needed and should be deleted.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">' . \esc_html__( '"Hello World!"', 'progress-planner' ) . '</a>'
+		);
+	}
 
 	/**
 	 * Check if the task condition is satisfied.
@@ -56,38 +60,11 @@ class Hello_World extends One_Time {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return null !== $this->get_sample_post();
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-
-		if ( ! $task_id ) {
-			$task_id = $this->get_task_id();
+		if ( is_a( $this->sample_post, \WP_Post::class ) ) {
+			return true;
 		}
 
-		$hello_world = $this->get_sample_post();
-
-		return [
-			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Delete "Hello World!" post', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
-			'points'      => 1,
-			'url'         => $this->capability_required() && null !== $hello_world ? \esc_url( \get_edit_post_link( $hello_world->ID ) ) : '', // @phpstan-ignore-line property.nonObject
-			'description' => '<p>' . sprintf(
-				/* translators: %s:<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">Hello World!</a> link */
-				\esc_html__( 'On install, WordPress creates a %s post. This post is not needed and should be deleted.', 'progress-planner' ),
-				'<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">' . \esc_html__( '"Hello World!"', 'progress-planner' ) . '</a>'
-			) . '</p>',
-		];
+		return false;
 	}
 
 	/**
@@ -96,11 +73,6 @@ class Hello_World extends One_Time {
 	 * @return \WP_Post|null
 	 */
 	protected function get_sample_post() {
-
-		if ( false !== $this->sample_post ) {
-			return $this->sample_post;
-		}
-
 		$sample_post = get_page_by_path( __( 'hello-world' ), OBJECT, 'post' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 		if ( null === $sample_post ) {
 			$query = new \WP_Query(
@@ -114,8 +86,6 @@ class Hello_World extends One_Time {
 
 			$sample_post = ! empty( $query->post ) ? $query->post : null;
 		}
-
-		$this->sample_post = $sample_post;
 
 		return $sample_post;
 	}
