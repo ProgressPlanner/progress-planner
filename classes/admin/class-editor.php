@@ -31,6 +31,23 @@ class Editor {
 			return;
 		}
 
+		$page_types = \progress_planner()->get_page_types()->get_page_types();
+
+		// Check if the page-type is set in the URL (user is coming from the Settings page).
+		if ( isset( $_GET['prpl_page_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$prpl_pt = sanitize_text_field( wp_unslash( $_GET['prpl_page_type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+			foreach ( $page_types as $page_type ) {
+				if ( $page_type['slug'] === $prpl_pt ) {
+					$prpl_preselected_page_type = $page_type['id'];
+					break;
+				}
+			}
+		} else {
+			// Get the default page-type.
+			$prpl_preselected_page_type = \progress_planner()->get_page_types()->get_default_page_type( (string) \get_post_type(), (int) \get_the_ID() );
+		}
+
 		\wp_enqueue_script(
 			'progress-planner-editor',
 			\plugins_url( '/assets/js/editor.js', PROGRESS_PLANNER_FILE ),
@@ -44,8 +61,8 @@ class Editor {
 			'progressPlannerEditor',
 			[
 				'lessons'         => \progress_planner()->get_lessons()->get_items(),
-				'pageTypes'       => \progress_planner()->get_page_types()->get_page_types(),
-				'defaultPageType' => \progress_planner()->get_page_types()->get_default_page_type( (string) \get_post_type(), (int) \get_the_ID() ),
+				'pageTypes'       => $page_types,
+				'defaultPageType' => $prpl_preselected_page_type,
 				'i18n'            => [
 					'pageType'                     => \esc_html__( 'Page type', 'progress-planner' ),
 					'progressPlannerSidebar'       => \esc_html__( 'Progress Planner Sidebar', 'progress-planner' ),
