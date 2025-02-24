@@ -34,12 +34,6 @@ class Page_Types {
 		\add_action( 'post_updated', [ $this, 'post_updated' ], 10, 2 );
 		\add_action( 'wp_insert_post', [ $this, 'post_updated' ], 10, 2 );
 		\add_action( 'transition_post_status', [ $this, 'transition_post_status' ], 10, 3 );
-
-		// Add hidden field to the "New page" screen.
-		\add_action( 'edit_form_after_title', [ $this, 'add_prpl_page_type_field_to_new_page' ] );
-
-		// Process the hidden field on page save.
-		\add_action( 'save_post', [ $this, 'process_prpl_page_type_field_on_page_save' ] );
 	}
 
 	/**
@@ -523,60 +517,5 @@ class Page_Types {
 			$posts_ids[] = (int) $post->ID;
 		}
 		return $posts_ids;
-	}
-
-	/**
-	 * Add a hidden field to the "Add New Page" screen.
-	 *
-	 * @return void
-	 */
-	public function add_prpl_page_type_field_to_new_page() {
-		global $pagenow, $post;
-
-		// Only run on the "Add New Page" screen.
-		if ( $pagenow === 'post-new.php' && isset( $_GET['post_type'] ) && $_GET['post_type'] === 'page' ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$prpl_page_type = isset( $_GET['prpl_page_type'] ) ? sanitize_text_field( wp_unslash( $_GET['prpl_page_type'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			echo '<input type="hidden" name="_prpl_page_type" value="' . esc_attr( $prpl_page_type ) . '">';
-			wp_nonce_field( 'prpl_page_type_nonce', 'prpl_page_type_nonce', true, true );
-		}
-	}
-
-	/**
-	 * Process the hidden field on page save.
-	 *
-	 * @param int $post_id The post ID.
-	 *
-	 * @return void
-	 */
-	public function process_prpl_page_type_field_on_page_save( $post_id ) {
-
-		// Check if we are in an autosave routine to prevent duplicate saves.
-		if ( defined( 'DOING_AUTOSAVE' ) && DOING_AUTOSAVE ) {
-			return;
-		}
-
-		// Verify the nonce.
-		if ( ! isset( $_POST['prpl_page_type_nonce'] ) || ! wp_verify_nonce( wp_unslash( $_POST['prpl_page_type_nonce'] ), 'prpl_page_type_nonce' ) ) {  // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			return;
-		}
-
-		// Verify this is a "page" post type and that it is published.
-		if ( 'page' !== \get_post_type( $post_id ) || 'publish' !== \get_post_status( $post_id ) ) {
-			return;
-		}
-
-		// Verify the hidden field is set.
-		if ( ! isset( $_POST['_prpl_page_type'] ) ) {
-			return;
-		}
-
-		$page_type_slug = \sanitize_text_field( wp_unslash( $_POST['_prpl_page_type'] ) );
-
-		foreach ( \progress_planner()->get_page_types()->get_page_types() as $page_type ) {
-			if ( $page_type['slug'] === $page_type_slug ) {
-				\wp_set_object_terms( $post_id, $page_type['id'], self::TAXONOMY_NAME );
-				break;
-			}
-		}
 	}
 }
