@@ -56,10 +56,11 @@ const PrplRenderPageTypeSelector = () => {
 		label: progressPlannerEditor.i18n.pageType,
 		// Get the current term from the TAXONOMY.
 		value: wp.data.useSelect( ( select ) => {
-			return (
-				select( 'core/editor' ).getEditedPostAttribute( TAXONOMY ) ||
-				parseInt( progressPlannerEditor.defaultPageType )
-			);
+			const pageTypeArr =
+				select( 'core/editor' ).getEditedPostAttribute( TAXONOMY );
+			return 0 < pageTypeArr.length
+				? parseInt( pageTypeArr[ 0 ] )
+				: parseInt( progressPlannerEditor.defaultPageType );
 		}, [] ),
 		options: pageTypes,
 		onChange: ( value ) => {

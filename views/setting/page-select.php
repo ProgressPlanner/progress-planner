@@ -85,15 +85,10 @@ if ( is_numeric( $prpl_setting_value ) && 0 < $prpl_setting_value ) {
 
 						<?php if ( 'no' === $prpl_r_value ) : ?>
 							<div data-action="create">
-								<?php
-								/**
-								 * TODO: Find a way to assign the term for the new page.
-								 */
-								?>
 								<a
 									target="_blank"
 									class="prpl-button"
-									href="<?php echo esc_url( admin_url( 'post-new.php?post_type=page' ) ); ?>"
+									href="<?php echo esc_url( admin_url( 'post-new.php?post_type=page&prpl_page_type=' . esc_attr( $prpl_setting['page'] ) ) ); ?>"
 								>
 									<?php esc_html_e( 'Create this page', 'progress-planner' ); ?>
 								</a>
