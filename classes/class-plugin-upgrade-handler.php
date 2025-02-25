@@ -121,10 +121,6 @@ class Plugin_Upgrade_Handler {
 	 */
 	protected function is_on_progress_planner_page() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- We're not processing any data.
-		if ( ! \is_admin() || ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'progress-planner' ) ) {
-			return false;
-		}
-
-		return true;
+		return \is_admin() && isset( $_GET['page'] ) && $_GET['page'] !== 'progress-planner';
 	}
 }
