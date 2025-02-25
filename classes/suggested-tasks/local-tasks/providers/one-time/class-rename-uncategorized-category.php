@@ -8,6 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
+use Progress_Planner\Data_Collector\Uncategorized_Category as Uncategorized_Category_Data_Collector;
 
 /**
  * Add task to rename the Uncategorized category.
@@ -29,16 +30,19 @@ class Rename_Uncategorized_Category extends One_Time {
 	protected const CAPABILITY = 'manage_categories';
 
 	/**
-	 * The Uncategorized category.
+	 * The data collector.
 	 *
-	 * @var int|null
+	 * @var \Progress_Planner\Data_Collector\Uncategorized_Category
 	 */
-	protected $uncategorized_category = null;
+	protected $data_collector;
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
+		$this->data_collector = new Uncategorized_Category_Data_Collector();
+		$this->data_collector->init();
+
 		$this->title       = \esc_html__( 'Rename Uncategorized category', 'progress-planner' );
 		$this->url         = \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' );
 		$this->description = sprintf(
@@ -54,38 +58,15 @@ class Rename_Uncategorized_Category extends One_Time {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		global $wpdb;
-
-		if ( null === $this->uncategorized_category ) {
-
-			$default_category_name = __( 'Uncategorized' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-			$default_category_slug = sanitize_title( _x( 'Uncategorized', 'Default category slug' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-
-			// Get the Uncategorized category by name or slug.
-			$this->uncategorized_category = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->prepare(
-					"SELECT $wpdb->terms.term_id FROM {$wpdb->terms}
-					LEFT JOIN {$wpdb->term_taxonomy} ON {$wpdb->terms}.term_id = {$wpdb->term_taxonomy}.term_id
-					WHERE ({$wpdb->terms}.name = %s OR {$wpdb->terms}.slug = %s)
-					AND {$wpdb->term_taxonomy}.taxonomy = 'category'",
-					$default_category_name,
-					$default_category_slug
-				)
-			);
-
-		}
-
-		return ! empty( $this->uncategorized_category );
+		return 0 !== $this->data_collector->collect();
 	}
 
 	/**
-	 * Set the Uncategorized category.
-	 *
-	 * @param int|null $uncategorized_category The Uncategorized category.
+	 * Update the Uncategorized category cache.
 	 *
 	 * @return void
 	 */
-	public function set_uncategorized_category( $uncategorized_category ) {
-		$this->uncategorized_category = $uncategorized_category;
+	public function update_uncategorized_category_cache() {
+		$this->data_collector->update_uncategorized_category_cache();
 	}
 }
