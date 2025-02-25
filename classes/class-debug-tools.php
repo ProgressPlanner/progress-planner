@@ -18,6 +18,14 @@ namespace Progress_Planner;
  * Only accessible to users with 'manage_options' capability.
  */
 class Debug_Tools {
+
+	/**
+	 * Current URL.
+	 *
+	 * @var string
+	 */
+	protected $current_url;
+
 	/**
 	 * Constructor.
 	 *
@@ -25,6 +33,12 @@ class Debug_Tools {
 	 * and various debugging functions.
 	 */
 	public function __construct() {
+		if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
+			return;
+		}
+
+		$this->current_url = wp_nonce_url( esc_url_raw( \wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'prpl_debug_tools' );
+
 		\add_action( 'admin_bar_menu', [ $this, 'add_toolbar_items' ], 100 );
 		\add_action( 'init', [ $this, 'check_clear_cache' ] );
 		\add_action( 'init', [ $this, 'check_delete_suggested_tasks' ] );
@@ -47,12 +61,6 @@ class Debug_Tools {
 			return;
 		}
 
-		if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
-			return;
-		}
-
-		$current_url = wp_nonce_url( esc_url_raw( \wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'prpl_debug_tools' );
-
 		// Add top level menu item.
 		$admin_bar->add_node(
 			[
@@ -69,7 +77,7 @@ class Debug_Tools {
 				'id'     => 'prpl-show-all-suggested-tasks',
 				'parent' => 'prpl-debug',
 				'title'  => 'Show All Suggested Tasks',
-				'href'   => add_query_arg( 'prpl_show_all_suggested_tasks', '99', $current_url ),
+				'href'   => add_query_arg( 'prpl_show_all_suggested_tasks', '99', $this->current_url ),
 			]
 		);
 
@@ -93,8 +101,6 @@ class Debug_Tools {
 			return;
 		}
 
-		$current_url = wp_nonce_url( esc_url_raw( \wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'prpl_debug_tools' );
-
 		// Add delete submenu item.
 		$admin_bar->add_node(
 			[
@@ -110,7 +116,7 @@ class Debug_Tools {
 				'id'     => 'prpl-clear-cache',
 				'parent' => 'prpl-debug-delete',
 				'title'  => 'Delete Cache',
-				'href'   => add_query_arg( 'prpl_clear_cache', '1', $current_url ),
+				'href'   => add_query_arg( 'prpl_clear_cache', '1', $this->current_url ),
 			]
 		);
 
@@ -120,7 +126,7 @@ class Debug_Tools {
 				'id'     => 'prpl-delete-local-tasks',
 				'parent' => 'prpl-debug-delete',
 				'title'  => 'Delete Local Tasks',
-				'href'   => add_query_arg( 'prpl_delete_local_tasks', '1', $current_url ),
+				'href'   => add_query_arg( 'prpl_delete_local_tasks', '1', $this->current_url ),
 			]
 		);
 
@@ -130,7 +136,7 @@ class Debug_Tools {
 				'id'     => 'prpl-delete-suggested-tasks',
 				'parent' => 'prpl-debug-delete',
 				'title'  => 'Delete Suggested Tasks',
-				'href'   => add_query_arg( 'prpl_delete_suggested_tasks', '1', $current_url ),
+				'href'   => add_query_arg( 'prpl_delete_suggested_tasks', '1', $this->current_url ),
 			]
 		);
 
@@ -140,7 +146,7 @@ class Debug_Tools {
 				'id'     => 'prpl-delete-licenses',
 				'parent' => 'prpl-debug-delete',
 				'title'  => 'Delete Licenses',
-				'href'   => add_query_arg( 'prpl_delete_licenses', '1', $current_url ),
+				'href'   => add_query_arg( 'prpl_delete_licenses', '1', $this->current_url ),
 			]
 		);
 
@@ -150,7 +156,7 @@ class Debug_Tools {
 				'id'     => 'prpl-delete-badges',
 				'parent' => 'prpl-debug-delete',
 				'title'  => 'Delete Badges',
-				'href'   => add_query_arg( 'prpl_delete_badges', '1', $current_url ),
+				'href'   => add_query_arg( 'prpl_delete_badges', '1', $this->current_url ),
 			]
 		);
 	}
@@ -216,7 +222,6 @@ class Debug_Tools {
 						'id'     => 'prpl-local-task-' . $key,
 						'parent' => 'prpl-local-tasks',
 						'title'  => $task,
-						'href'   => '#',
 					]
 				);
 			}
@@ -226,7 +231,6 @@ class Debug_Tools {
 					'id'     => 'prpl-no-local-tasks',
 					'parent' => 'prpl-local-tasks',
 					'title'  => 'No local tasks found',
-					'href'   => '#',
 				]
 			);
 		}
