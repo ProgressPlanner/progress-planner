@@ -101,11 +101,9 @@ class Suggested_Tasks {
 	/**
 	 * If done via automatic updates, the "core update" task should be marked as "completed" (and skip "pending celebration" status).
 	 *
-	 * @param array $update_results The update results.
-	 *
 	 * @return void
 	 */
-	public function on_automatic_updates_complete( $update_results ) {
+	public function on_automatic_updates_complete() {
 
 		$pending_tasks = $this->local->get_pending_tasks(); // @phpstan-ignore-line method.nonObject
 
@@ -113,14 +111,14 @@ class Suggested_Tasks {
 			return;
 		}
 
-		// TODO: Get this from task provider.
-		$update_core_task_id = 'update-core';
+		// ID of the 'Core_Update' provider.
+		$update_core_provider_id = 'update-core';
 
 		foreach ( $pending_tasks as $task_id ) {
 			$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
 			$task_data   = $task_object->get_data();
 
-			if ( $task_data['type'] === $update_core_task_id && \gmdate( 'YW' ) === $task_data['year_week'] ) {
+			if ( $task_data['type'] === $update_core_provider_id && \gmdate( 'YW' ) === $task_data['year_week'] ) {
 				// Remove from local (pending tasks).
 				$this->local->remove_pending_task( $task_id ); // @phpstan-ignore-line method.nonObject
 

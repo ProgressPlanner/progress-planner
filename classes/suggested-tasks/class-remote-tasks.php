@@ -46,7 +46,7 @@ class Remote_Tasks {
 				continue;
 			}
 
-			// TODO: Maybe skip task which don't have type defined (to not allow wrongly defined 3rd party tasks to override default type).
+			// Task which don't have type defined are added as a 'default' type.
 			$item['type']    = 'remote-' . ( isset( $item['type'] ) ? $item['type'] : 'default' );
 			$item['task_id'] = "remote-task-{$item['task_id']}";
 			$items[]         = $item;

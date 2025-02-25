@@ -93,7 +93,7 @@
 			}
 		}
 
-		&:has(option[value=""]:not(:checked)),
+		&:has(option[value=""]:not(:checked)):has(input[type="radio"][value="yes"]:checked),
 		&:has(input[type="radio"][value="not-applicable"]:checked) {
 
 			h3 {
