@@ -108,4 +108,15 @@ class Rename_Uncategorized_Category extends One_Time {
 
 		];
 	}
+
+	/**
+	 * Set the Uncategorized category.
+	 *
+	 * @param int|null $uncategorized_category The Uncategorized category.
+	 *
+	 * @return void
+	 */
+	public function set_uncategorized_category( $uncategorized_category ) {
+		$this->uncategorized_category = $uncategorized_category;
+	}
 }
