@@ -80,7 +80,7 @@ class Remove_Inactive_Plugins extends One_Time {
 			'priority'    => 'high',
 			'type'        => $this->get_provider_type(),
 			'points'      => 1,
-			'url'         => '',
+			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'plugins.php' ) ) : '',
 			'dismissible' => true,
 			'description' => '<p>' . sprintf(
 				/* translators: %1$s <a href="https://prpl.fyi/remove-inactive-plugins" target="_blank">removing any plugins</a> link */
