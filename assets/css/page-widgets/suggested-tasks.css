@@ -60,6 +60,21 @@
 			> * {
 				align-self: center;
 			}
+
+			prpl-badge {
+
+				img {
+					transition: opacity 0.3s ease-in-out, filter 0.3s ease-in-out;
+				}
+
+				&[complete="false"] {
+
+					img {
+						opacity: 0.25;
+						filter: grayscale(1);
+					}
+				}
+			}
 		}
 
 		p {
