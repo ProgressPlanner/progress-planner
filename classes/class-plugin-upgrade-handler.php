@@ -34,10 +34,9 @@ class Plugin_Upgrade_Handler {
 	 * @return void
 	 */
 	public function init() {
-
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- We're not processing any data.
 		if ( ! \is_admin() || ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'progress-planner' ) ) {
-			return;
+			return; // Early exit if we're not on the Progress Planner page.
 		}
 
 		// Add the onboarding task providers.
@@ -49,7 +48,7 @@ class Plugin_Upgrade_Handler {
 	 *
 	 * @return array
 	 */
-	public function get_newly_added_task_provider_ids() {
+	protected function get_newly_added_task_provider_ids() {
 		static $newly_added_task_providers;
 
 		if ( null === $newly_added_task_providers ) {
@@ -94,6 +93,11 @@ class Plugin_Upgrade_Handler {
 	 */
 	public function get_newly_added_task_providers() {
 		static $newly_added_task_providers;
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- We're not processing any data.
+		if ( ! \is_admin() || ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'progress-planner' ) ) {
+			return []; // Early exit if we're not on the Progress Planner page.
+		}
 
 		if ( null === $newly_added_task_providers ) {
 			$task_provider_ids = $this->get_newly_added_task_provider_ids();
