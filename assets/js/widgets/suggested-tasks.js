@@ -306,7 +306,7 @@ const prplCreateUserSuggestedTask = ( content ) => {
 		parent: 0,
 		points: 0,
 		priority: "medium",
-		task_id: 'user|' + crypto.randomUUID(),
+		task_id: 'user-task-' + crypto.randomUUID() + '|type/user',
 		title: content,
 		type: "user",
 		url: "",

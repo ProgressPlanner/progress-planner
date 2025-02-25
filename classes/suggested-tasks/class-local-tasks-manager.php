@@ -27,7 +27,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Permalink_St
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Php_Version;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engine_Visibility;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
-
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\User as User_Tasks;
 /**
  * Local_Tasks_Manager class.
  */
@@ -72,6 +72,7 @@ class Local_Tasks_Manager {
 			new Permalink_Structure(),
 			new Php_Version(),
 			new Search_Engine_Visibility(),
+			new User_Tasks(),
 		];
 
 		/**
@@ -194,7 +195,9 @@ class Local_Tasks_Manager {
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.
 		foreach ( $provider_tasks as $task ) {
-
+			if ( ! isset( $task['task_id'] ) ) {
+				continue;
+			}
 			// Skip the task if it was completed.
 			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task['task_id'] ) ) {
 				continue;
@@ -218,7 +221,9 @@ class Local_Tasks_Manager {
 
 		$tasks = \array_unique( $tasks );
 		foreach ( $tasks as $task_id ) {
-
+			if ( ! $task_id ) {
+				continue;
+			}
 			$task_result = $this->evaluate_task( $task_id );
 			if ( false !== $task_result ) {
 				$this->remove_pending_task( $task_id );
@@ -284,7 +289,15 @@ class Local_Tasks_Manager {
 	 * @return array
 	 */
 	public function get_pending_tasks() {
-		return \get_option( self::OPTION_NAME, [] );
+		static $tasks = null;
+		if ( null !== $tasks ) {
+			return $tasks;
+		}
+		$tasks = \array_merge(
+			\get_option( self::OPTION_NAME, [] ),
+			\array_keys( \progress_planner()->get_settings()->get( 'user_tasks', [] ) )
+		);
+		return $tasks;
 	}
 
 	/**

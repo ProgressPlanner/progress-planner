@@ -614,7 +614,18 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
 
-		error_log( print_r( $_POST, true ) );
-		error_log( print_r( \get_option( self::OPTION_NAME ), true ) );
+		$user_tasks = \progress_planner()->get_settings()->get( 'user_tasks', [] );
+		$task_id = isset( $_POST['task']['task_id'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['task_id'] ) ) : '';
+		if ( ! $task_id ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing task ID.', 'progress-planner' ) ] );
+		}
+
+		$user_tasks[ $task_id ] = [
+			'title' => isset( $_POST['task']['title'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['title'] ) ) : '',
+		];
+
+		\progress_planner()->get_settings()->set( 'user_tasks', $user_tasks );
+
+		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
 	}
 }
