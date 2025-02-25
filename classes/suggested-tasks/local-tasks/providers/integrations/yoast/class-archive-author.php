@@ -13,6 +13,13 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Integrations\Yo
 class Archive_Author extends Yoast_Provider {
 
 	/**
+	 * The minimum number of posts with a post format to add the task.
+	 *
+	 * @var int
+	 */
+	protected const MINIMUM_AUTHOR_WITH_POSTS = 1;
+
+	/**
 	 * The provider ID.
 	 *
 	 * @var string
@@ -39,16 +46,16 @@ class Archive_Author extends Yoast_Provider {
 
 		// If the author archive is already disabled, we don't need to add the task.
 		if ( YoastSEO()->helpers->options->get( 'disable-author' ) !== true ) {
-			return true;
+			return false;
 		}
 
 		// If there is more than one author, we don't need to add the task.
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$author_count = $wpdb->get_var( "SELECT COUNT(DISTINCT post_author) FROM {$wpdb->posts} WHERE post_status = 'publish' AND post_type = 'post'" );
-		if ( $author_count > 1 ) {
-			return true;
+		$author_count = $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(DISTINCT post_author) FROM {$wpdb->posts} WHERE post_status = 'publish' AND post_type = 'post' LIMIT %d", static::MINIMUM_AUTHOR_WITH_POSTS + 1 ) );
+		if ( $author_count > static::MINIMUM_AUTHOR_WITH_POSTS ) {
+			return false;
 		}
 
-		return false;
+		return true;
 	}
 }
