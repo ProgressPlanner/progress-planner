@@ -23,6 +23,12 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 
 	<ul style="display:none"></ul>
 	<ul class="prpl-suggested-tasks-list"></ul>
+	<form id="create-suggested-item">
+		<input type="text" id="new-suggested-item-content" placeholder="<?php \esc_attr_e( 'Add a new task', 'progress-planner' ); ?>" aria-label="<?php \esc_attr_e( 'Add a new task', 'progress-planner' ); ?>" required />
+		<button type="submit" title="<?php \esc_attr_e( 'Add', 'progress-planner' ); ?>">
+			<span class="dashicons dashicons-plus-alt2"></span>
+		</button>
+	</form>
 
 	<hr>
 </div>

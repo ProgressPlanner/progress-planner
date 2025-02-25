@@ -103,7 +103,7 @@ const progressPlannerInjectNextItem = ( type ) => {
 	if ( ! nextItem ) {
 		return;
 	}
-
+	console.log( nextItem );
 	progressPlannerInjectSuggestedTodoItem( nextItem );
 };
 
@@ -299,6 +299,45 @@ document.addEventListener( 'prplCelebrateTasks', () => {
 	prplTriggerConfetti();
 	prplStrikeCompletedTasks();
 } );
+
+const prplCreateUserSuggestedTask = ( content ) => {
+	return {
+		description: '',
+		parent: 0,
+		points: 0,
+		priority: "medium",
+		task_id: 'user|' + crypto.randomUUID(),
+		title: content,
+		type: "user",
+		url: "",
+		dismissable: true,
+	}
+}
+
+const prplSubmitUserSuggestedTask = ( task ) => {
+	wp.ajax.post( 'progress_planner_save_user_suggested_task', {
+		task,
+		nonce: progressPlannerSuggestedTasks.nonce,
+	} );
+};
+
+// When the '#create-suggested-item' form is submitted,
+// add a new todo item to the list
+document
+	.getElementById( 'create-suggested-item' )
+	.addEventListener( 'submit', ( event ) => {
+		event.preventDefault();
+		const userTask = prplCreateUserSuggestedTask(
+			document.getElementById( 'new-suggested-item-content' ).value
+		);
+		progressPlannerInjectSuggestedTodoItem( userTask );
+		prplSubmitUserSuggestedTask( userTask );
+
+		document.getElementById( 'new-suggested-item-content' ).value = '';
+
+		// Focus the new task input element.
+		document.getElementById( 'new-suggested-item-content' ).focus();
+	} );
 
 // Populate the list on load.
 document.addEventListener( 'DOMContentLoaded', () => {
