@@ -41,7 +41,6 @@ class Rename_Uncategorized_Category extends One_Time {
 	 */
 	public function __construct() {
 		$this->data_collector = new Uncategorized_Category_Data_Collector();
-		$this->data_collector->init();
 
 		$this->title       = \esc_html__( 'Rename Uncategorized category', 'progress-planner' );
 		$this->url         = \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' );

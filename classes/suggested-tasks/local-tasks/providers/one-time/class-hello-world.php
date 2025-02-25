@@ -40,7 +40,6 @@ class Hello_World extends One_Time {
 	 */
 	public function __construct() {
 		$this->data_collector = new Hello_World_Data_Collector();
-		$this->data_collector->init();
 
 		$hello_world_post_id = $this->data_collector->collect();
 

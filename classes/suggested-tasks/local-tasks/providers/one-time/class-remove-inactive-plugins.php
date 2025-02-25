@@ -41,7 +41,6 @@ class Remove_Inactive_Plugins extends One_Time {
 	 */
 	public function __construct() {
 		$this->data_collector = new Inactive_Plugins_Data_Collector();
-		$this->data_collector->init();
 
 		$this->url         = \admin_url( 'plugins.php' );
 		$this->title       = \esc_html__( 'Remove inactive plugins', 'progress-planner' );

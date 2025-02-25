@@ -41,7 +41,6 @@ class Sample_Page extends One_Time {
 	 */
 	public function __construct() {
 		$this->data_collector = new Sample_Page_Data_Collector();
-		$this->data_collector->init();
 
 		$sample_page_id = $this->data_collector->collect();
 

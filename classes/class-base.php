@@ -18,6 +18,12 @@ use Progress_Planner\Actions\Maintenance as Actions_Maintenance;
 use Progress_Planner\Admin\Page_Settings as Admin_Page_Settings;
 use Progress_Planner\Plugin_Upgrade_Handler;
 use Progress_Planner\Debug_Tools;
+use Progress_Planner\Data_Collector\Hello_World as Hello_World_Data_Collector;
+use Progress_Planner\Data_Collector\Sample_Page as Sample_Page_Data_Collector;
+use Progress_Planner\Data_Collector\Inactive_Plugins as Inactive_Plugins_Data_Collector;
+use Progress_Planner\Data_Collector\Uncategorized_Category as Uncategorized_Category_Data_Collector;
+use Progress_Planner\Data_Collector\Post_Author as Post_Author_Data_Collector;
+
 /**
  * Main plugin class.
  */
@@ -107,6 +113,13 @@ class Base {
 		}
 
 		$this->cached['plugin_upgrade_handler'] = new Plugin_Upgrade_Handler();
+
+		// Add hooks for data collectors.
+		( new Hello_World_Data_Collector() )->init();
+		( new Sample_Page_Data_Collector() )->init();
+		( new Inactive_Plugins_Data_Collector() )->init();
+		( new Uncategorized_Category_Data_Collector() )->init();
+		( new Post_Author_Data_Collector() )->init();
 
 		// Debug tools.
 		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {
