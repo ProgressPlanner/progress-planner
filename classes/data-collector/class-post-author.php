@@ -53,7 +53,7 @@ class Post_Author extends Base_Data_Collector {
 	protected function calculate_data() {
 		global $wpdb;
 
-		$author_ids = $wpdb->get_col(
+		$author_ids = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			"
 			SELECT DISTINCT post_author
 			FROM {$wpdb->posts}
