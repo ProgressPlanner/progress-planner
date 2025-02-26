@@ -113,6 +113,9 @@ class Base {
 			new Debug_Tools();
 		}
 
+		// Plugin upgrade.
+		$this->cached['plugin_migrations'] = new Plugin_Migrations();
+
 		/**
 		 * Redirect on login.
 		 */
