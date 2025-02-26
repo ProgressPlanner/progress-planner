@@ -37,9 +37,7 @@ class Plugin_Upgrade_Handler {
 	 * @return void
 	 */
 	public function init() {
-
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- We're not processing any data.
-		if ( ! \is_admin() || ( ! isset( $_GET['page'] ) || $_GET['page'] !== 'progress-planner' ) ) {
+		if ( ! $this->is_on_progress_planner_page() ) {
 			return;
 		}
 
@@ -64,7 +62,7 @@ class Plugin_Upgrade_Handler {
 	 *
 	 * @return array
 	 */
-	public function get_newly_added_task_provider_ids() {
+	protected function get_newly_added_task_provider_ids() {
 		static $newly_added_task_providers;
 
 		if ( null === $newly_added_task_providers ) {
@@ -101,7 +99,6 @@ class Plugin_Upgrade_Handler {
 		return $newly_added_task_providers;
 	}
 
-
 	/**
 	 * Get the newly added task providers.
 	 *
@@ -109,6 +106,10 @@ class Plugin_Upgrade_Handler {
 	 */
 	public function get_newly_added_task_providers() {
 		static $newly_added_task_providers;
+
+		if ( ! $this->is_on_progress_planner_page() ) {
+			return [];
+		}
 
 		if ( null === $newly_added_task_providers ) {
 			$task_provider_ids = $this->get_newly_added_task_provider_ids();
@@ -126,5 +127,15 @@ class Plugin_Upgrade_Handler {
 		}
 
 		return $newly_added_task_providers;
+	}
+
+	/**
+	 * Check if we're on the Progress Planner page.
+	 *
+	 * @return bool
+	 */
+	protected function is_on_progress_planner_page() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- We're not processing any data.
+		return \is_admin() && isset( $_GET['page'] ) && $_GET['page'] === 'progress-planner';
 	}
 }
