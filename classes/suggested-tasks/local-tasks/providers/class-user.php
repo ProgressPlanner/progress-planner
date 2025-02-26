@@ -29,6 +29,28 @@ class User extends One_Time {
 	}
 
 	/**
+	 * Get an array of tasks to inject.
+	 *
+	 * @return array
+	 */
+	public function get_tasks_to_inject() {
+		if (
+			true === $this->is_task_type_snoozed() ||
+			! $this->should_add_task() || // No need to add the task.
+			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() )
+		) {
+			return [];
+		}
+
+		$user_tasks = \progress_planner()->get_settings()->get( 'user_tasks', [] );
+		foreach ( $user_tasks as $task_id => $task_data ) {
+			$tasks[] = $this->get_task_details( $task_id );
+		}
+
+		return $tasks;
+	}
+
+	/**
 	 * Get the task details.
 	 *
 	 * @param string $task_id The task ID.

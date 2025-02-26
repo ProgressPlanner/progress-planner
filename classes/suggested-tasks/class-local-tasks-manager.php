@@ -297,7 +297,12 @@ class Local_Tasks_Manager {
 			\get_option( self::OPTION_NAME, [] ),
 			\array_keys( \progress_planner()->get_settings()->get( 'user_tasks', [] ) )
 		);
-		return $tasks;
+		foreach ( $tasks as $key => $task ) {
+			if ( ! $task ) {
+				unset( $tasks[ $key ] );
+			}
+		}
+		return \array_unique( $tasks );
 	}
 
 	/**
@@ -344,7 +349,6 @@ class Local_Tasks_Manager {
 		}
 
 		$tasks = (array) $this->get_pending_tasks();
-
 		if ( empty( $tasks ) ) {
 			return;
 		}
