@@ -16,7 +16,7 @@ use Progress_Planner\Actions\Content as Actions_Content;
 use Progress_Planner\Actions\Content_Scan as Actions_Content_Scan;
 use Progress_Planner\Actions\Maintenance as Actions_Maintenance;
 use Progress_Planner\Admin\Page_Settings as Admin_Page_Settings;
-use Progress_Planner\Plugin_Upgrade_Handler;
+use Progress_Planner\Plugin_Upgrade_Tasks;
 use Progress_Planner\Debug_Tools;
 use Progress_Planner\Data_Collector\Hello_World as Hello_World_Data_Collector;
 use Progress_Planner\Data_Collector\Sample_Page as Sample_Page_Data_Collector;
@@ -112,7 +112,7 @@ class Base {
 			new Plugin_Deactivation();
 		}
 
-		$this->cached['plugin_upgrade_handler'] = new Plugin_Upgrade_Handler();
+		$this->cached['plugin_upgrade_tasks'] = new Plugin_Upgrade_Tasks();
 
 		// Add hooks for data collectors.
 		( new Hello_World_Data_Collector() )->init();

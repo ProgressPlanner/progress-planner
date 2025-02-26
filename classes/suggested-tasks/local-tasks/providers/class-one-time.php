@@ -57,6 +57,13 @@ abstract class One_Time extends Local_Tasks {
 	protected $parent = 0;
 
 	/**
+	 * The task points.
+	 *
+	 * @var int
+	 */
+	protected $points = 1;
+
+	/**
 	 * The task priority.
 	 *
 	 * @var string
@@ -80,10 +87,12 @@ abstract class One_Time extends Local_Tasks {
 	/**
 	 * Get the task description.
 	 *
+	 * @param bool $wrap_in_p Whether to wrap the description in a <p> tag.
+	 *
 	 * @return string
 	 */
-	public function get_description() {
-		return $this->description;
+	public function get_description( $wrap_in_p = true ) {
+		return $wrap_in_p ? '<p>' . $this->description . '</p>' : $this->description;
 	}
 
 	/**
@@ -102,6 +111,15 @@ abstract class One_Time extends Local_Tasks {
 	 */
 	public function get_parent() {
 		return $this->parent;
+	}
+
+	/**
+	 * Get the task points.
+	 *
+	 * @return int
+	 */
+	public function get_points() {
+		return $this->points;
 	}
 
 	/**
@@ -221,9 +239,9 @@ abstract class One_Time extends Local_Tasks {
 			'parent'       => $this->get_parent(),
 			'priority'     => $this->get_priority(),
 			'type'         => $this->get_provider_type(),
-			'points'       => 1,
+			'points'       => $this->get_points(),
 			'url'          => $this->capability_required() ? \esc_url( $this->get_url() ) : '',
-			'description'  => '<p>' . $this->get_description() . '</p>',
+			'description'  => $this->get_description(),
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
 		];
