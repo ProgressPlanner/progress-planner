@@ -8,6 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
+use Progress_Planner\Data_Collector\Sample_Page as Sample_Page_Data_Collector;
 
 /**
  * Add task to delete the Sample Page.
@@ -29,20 +30,22 @@ class Sample_Page extends One_Time {
 	protected const CAPABILITY = 'edit_pages';
 
 	/**
-	 * The sample page.
+	 * The data collector.
 	 *
-	 * @var \WP_Post|null|false
+	 * @var \Progress_Planner\Data_Collector\Sample_Page
 	 */
-	protected $sample_page = false;
+	protected $data_collector;
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->sample_page = $this->get_sample_page();
+		$this->data_collector = new Sample_Page_Data_Collector();
 
-		if ( is_object( $this->sample_page ) && is_a( $this->sample_page, \WP_Post::class ) ) {
-			$this->url = (string) \get_edit_post_link( $this->sample_page->ID );
+		$sample_page_id = $this->data_collector->collect();
+
+		if ( 0 !== $sample_page_id ) {
+			$this->url = (string) \get_edit_post_link( $sample_page_id );
 		}
 
 		$this->title       = \esc_html__( 'Delete "Sample Page"', 'progress-planner' );
@@ -59,36 +62,6 @@ class Sample_Page extends One_Time {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return ( is_object( $this->sample_page ) && is_a( $this->sample_page, \WP_Post::class ) );
-	}
-
-	/**
-	 * Get the sample page.
-	 *
-	 * @return \WP_Post|null
-	 */
-	protected function get_sample_page() {
-
-		if ( false !== $this->sample_page ) {
-			return $this->sample_page;
-		}
-
-		$sample_page = get_page_by_path( __( 'sample-page' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-		if ( null === $sample_page ) {
-			$query = new \WP_Query(
-				[
-					'post_type'      => 'page',
-					'title'          => __( 'Sample Page' ), // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-					'post_status'    => 'publish',
-					'posts_per_page' => 1,
-				]
-			);
-
-			$sample_page = ! empty( $query->post ) ? $query->post : null;
-		}
-
-		$this->sample_page = $sample_page;
-
-		return $sample_page;
+		return 0 !== $this->data_collector->collect();
 	}
 }

@@ -8,7 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
-
+use Progress_Planner\Data_Collector\Hello_World as Hello_World_Data_Collector;
 /**
  * Add tasks for hello world post.
  */
@@ -29,20 +29,22 @@ class Hello_World extends One_Time {
 	protected const CAPABILITY = 'edit_posts';
 
 	/**
-	 * The sample post.
+	 * The data collector.
 	 *
-	 * @var \WP_Post|null|false
+	 * @var \Progress_Planner\Data_Collector\Hello_World
 	 */
-	protected $sample_post = false;
+	protected $data_collector;
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->sample_post = $this->get_sample_post();
+		$this->data_collector = new Hello_World_Data_Collector();
 
-		if ( is_object( $this->sample_post ) && is_a( $this->sample_post, \WP_Post::class ) ) {
-			$this->url = (string) \get_edit_post_link( $this->sample_post->ID );
+		$hello_world_post_id = $this->data_collector->collect();
+
+		if ( 0 !== $hello_world_post_id ) {
+			$this->url = (string) \get_edit_post_link( $hello_world_post_id );
 		}
 
 		$this->title       = \esc_html__( 'Delete the "Hello World!" post.', 'progress-planner' );
@@ -60,33 +62,6 @@ class Hello_World extends One_Time {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( is_object( $this->sample_post ) && is_a( $this->sample_post, \WP_Post::class ) ) {
-			return true;
-		}
-
-		return false;
-	}
-
-	/**
-	 * Get the sample post.
-	 *
-	 * @return \WP_Post|null
-	 */
-	protected function get_sample_post() {
-		$sample_post = get_page_by_path( __( 'hello-world' ), OBJECT, 'post' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-		if ( null === $sample_post ) {
-			$query = new \WP_Query(
-				[
-					'post_type'      => 'post',
-					'title'          => __( 'Hello world!' ), // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-					'post_status'    => 'publish',
-					'posts_per_page' => 1,
-				]
-			);
-
-			$sample_post = ! empty( $query->post ) ? $query->post : null;
-		}
-
-		return $sample_post;
+		return 0 !== $this->data_collector->collect();
 	}
 }

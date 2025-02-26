@@ -8,6 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
+use Progress_Planner\Data_Collector\Inactive_Plugins as Inactive_Plugins_Data_Collector;
 
 /**
  * Add tasks to remove inactive plugins.
@@ -29,9 +30,18 @@ class Remove_Inactive_Plugins extends One_Time {
 	protected $is_dismissable = true;
 
 	/**
+	 * The data collector.
+	 *
+	 * @var \Progress_Planner\Data_Collector\Inactive_Plugins
+	 */
+	protected $data_collector;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
+		$this->data_collector = new Inactive_Plugins_Data_Collector();
+
 		$this->url         = \admin_url( 'plugins.php' );
 		$this->title       = \esc_html__( 'Remove inactive plugins', 'progress-planner' );
 		$this->description = sprintf(
@@ -48,28 +58,6 @@ class Remove_Inactive_Plugins extends One_Time {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( ! function_exists( 'get_plugins' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore requireOnce.fileNotFound
-		}
-
-		$plugins        = get_plugins();
-		$plugins_active = 0;
-		$plugins_total  = 0;
-
-		// Loop over the available plugins and check their versions and active state.
-		foreach ( array_keys( $plugins ) as $plugin_path ) {
-			++$plugins_total;
-
-			if ( is_plugin_active( $plugin_path ) ) {
-				++$plugins_active;
-			}
-		}
-
-		$unused_plugins = 0;
-		if ( ! is_multisite() && $plugins_total > $plugins_active ) {
-			$unused_plugins = $plugins_total - $plugins_active;
-		}
-
-		return $unused_plugins > 0;
+		return $this->data_collector->collect() > 0;
 	}
 }
