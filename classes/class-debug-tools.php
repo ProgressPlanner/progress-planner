@@ -214,7 +214,7 @@ class Debug_Tools {
 		);
 
 		// Get and display local tasks.
-		$local_tasks = get_option( 'progress_planner_local_tasks', [] );
+		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 		if ( ! empty( $local_tasks ) ) {
 			foreach ( $local_tasks as $key => $task ) {
 				$admin_bar->add_node(
@@ -325,7 +325,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the option.
-		delete_option( 'progress_planner_local_tasks' );
+		\progress_planner()->get_settings()->set( 'local_tasks', [] );
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( 'prpl_delete_local_tasks' ) );

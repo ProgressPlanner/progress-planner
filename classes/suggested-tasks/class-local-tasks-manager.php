@@ -34,17 +34,6 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface
 class Local_Tasks_Manager {
 
 	/**
-	 * The option name, holding pending local tasks.
-	 *
-	 * We're using an option to store these tasks,
-	 * because otherwise we have no way to keep track of
-	 * what was completed in order to award points.
-	 *
-	 * @var string
-	 */
-	const OPTION_NAME = 'progress_planner_local_tasks';
-
-	/**
 	 * The task providers.
 	 *
 	 * @var array
@@ -284,7 +273,7 @@ class Local_Tasks_Manager {
 	 * @return array
 	 */
 	public function get_pending_tasks() {
-		return \get_option( self::OPTION_NAME, [] );
+		return \progress_planner()->get_settings()->get( 'local_tasks', [] );
 	}
 
 	/**
@@ -300,7 +289,7 @@ class Local_Tasks_Manager {
 			return true;
 		}
 		$tasks[] = $task;
-		return \update_option( self::OPTION_NAME, $tasks );
+		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 	}
 
 	/**
@@ -313,7 +302,7 @@ class Local_Tasks_Manager {
 	public function remove_pending_task( $task ) {
 		$tasks = (array) $this->get_pending_tasks();
 		$tasks = \array_diff( $tasks, [ $task ] );
-		return \update_option( self::OPTION_NAME, $tasks );
+		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 	}
 
 	/**
@@ -363,7 +352,7 @@ class Local_Tasks_Manager {
 		);
 
 		if ( count( $tasks ) !== $task_count ) {
-			\update_option( self::OPTION_NAME, $tasks );
+			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 		}
 
 		\progress_planner()->get_cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );

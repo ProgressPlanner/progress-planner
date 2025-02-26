@@ -73,7 +73,7 @@ trait Task_Provider_Test_Trait {
 		parent::tear_down();
 
 		// Delete local tasks.
-		delete_option( Local_Tasks_Manager::OPTION_NAME );
+		\progress_planner()->get_settings()->set( 'local_tasks', [] );
 
 		// Delete suggested tasks.
 		delete_option( Suggested_Tasks::OPTION_NAME );

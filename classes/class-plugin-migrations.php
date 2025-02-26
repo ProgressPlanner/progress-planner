@@ -106,5 +106,11 @@ class Plugin_Migrations {
 	 * @return void
 	 */
 	private function upgrade_1_1_1() {
+		// Migrate the `progress_planner_local_tasks` option.
+		$local_tasks_option = \get_option( 'progress_planner_local_tasks', [] );
+		if ( ! empty( $local_tasks_option ) ) {
+			\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks_option );
+			\delete_option( 'progress_planner_local_tasks' );
+		}
 	}
 }
