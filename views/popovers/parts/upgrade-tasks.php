@@ -27,7 +27,7 @@ $prpl_title = 'onboarding' === $prpl_context
 
 $prpl_subtitle = 'onboarding' === $prpl_context
 	? ''
-	: \__( "Let's check if you've already don those tasks, this will take only a minute...", 'progress-planner' );
+	: \__( "Let's check if you've already done those tasks, this will take only a minute...", 'progress-planner' );
 
 $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 ?>
