@@ -54,7 +54,7 @@ class Archive_Format extends Base_Data_Collector {
 		// Check if there are any posts that use a post format using get_posts and get only the IDs.
 		// phpcs:disable WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 		$args = [
-			'posts_per_page' => -1,
+			'posts_per_page' => 10,
 			'fields'         => 'ids',
 			'tax_query'      => [
 				[
