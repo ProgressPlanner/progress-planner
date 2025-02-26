@@ -90,6 +90,14 @@ class Plugin_Migrations {
 		}
 
 		\update_option( 'progress_planner_version', $this->version );
+
+		/**
+		 * Fires when the plugin is updated.
+		 *
+		 * @param string $version The new version of the plugin.
+		 * @param string $db_version The old version of the plugin.
+		 */
+		do_action( 'progress_planner_plugin_updated', $this->version, $this->db_version );
 	}
 
 	/**
