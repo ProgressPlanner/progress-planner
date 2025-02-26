@@ -118,7 +118,7 @@ final class Suggested_Tasks extends Widget {
 		$tasks['details'] = $this->get_pending_tasks();
 
 		// If there are newly added task providers, delay the celebration in order not to get confetti behind the popover.
-		$delay_celebration = \progress_planner()->get_plugin_upgrade_handler()->get_newly_added_task_providers() ? true : false;
+		$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
 
 		if ( ! $delay_celebration ) {
 			// Insert the pending celebration tasks as high priority tasks, so they are shown always.
