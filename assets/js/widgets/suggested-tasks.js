@@ -175,7 +175,7 @@ const prplTriggerConfetti = () => {
 	const prplConfettiDefaults = {
 		spread: 360,
 		ticks: 50,
-		gravity: 0,
+		gravity: 1,
 		decay: 0.94,
 		startVelocity: 30,
 		shapes: [ 'star' ],
