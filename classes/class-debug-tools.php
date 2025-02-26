@@ -256,7 +256,7 @@ class Debug_Tools {
 		);
 
 		// Get suggested tasks.
-		$suggested_tasks = get_option( 'progress_planner_suggested_tasks', [] );
+		$suggested_tasks = \progress_planner()->get_settings()->get( 'suggested_tasks', [] );
 
 		$menu_items = [
 			'completed'           => 'Completed',
@@ -469,7 +469,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the option.
-		delete_option( 'progress_planner_suggested_tasks' );
+		\progress_planner()->get_settings()->set( 'suggested_tasks', [] );
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( 'prpl_delete_suggested_tasks' ) );

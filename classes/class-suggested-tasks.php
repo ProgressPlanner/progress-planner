@@ -32,13 +32,6 @@ class Suggested_Tasks {
 	private $remote;
 
 	/**
-	 * The name of the settings option.
-	 *
-	 * @var string
-	 */
-	const OPTION_NAME = 'progress_planner_suggested_tasks';
-
-	/**
 	 * Constructor.
 	 *
 	 * @return void
@@ -172,10 +165,11 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_saved_tasks() {
-		$option                        = \get_option( self::OPTION_NAME, [] );
+		$option                        = \progress_planner()->get_settings()->get( 'suggested_tasks', [] );
 		$option['completed']           = $option['completed'] ?? [];
 		$option['snoozed']             = $option['snoozed'] ?? [];
 		$option['pending_celebration'] = $option['pending_celebration'] ?? [];
+		$option['pending']             = $option['pending'] ?? [];
 
 		// Convert the task IDs to strings.
 		$option['completed']           = \array_map( 'strval', $option['completed'] );
@@ -210,7 +204,7 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_pending_celebration() {
-		$option = \get_option( self::OPTION_NAME, [] );
+		$option = \progress_planner()->get_settings()->get( 'suggested_tasks', [] );
 		return $option['pending_celebration'] ?? [];
 	}
 
@@ -272,7 +266,7 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function mark_task_as( $status, $task_id, $data = [] ) {
-		$option            = \get_option( self::OPTION_NAME, [] );
+		$option            = \progress_planner()->get_settings()->get( 'suggested_tasks', [] );
 		$option[ $status ] = isset( $option[ $status ] )
 			? $option[ $status ]
 			: [];
@@ -305,7 +299,7 @@ class Suggested_Tasks {
 			$option[ $status ][] = (string) $task_id;
 		}
 
-		return \update_option( self::OPTION_NAME, $option );
+		return \progress_planner()->get_settings()->set( 'suggested_tasks', $option );
 	}
 
 	/**
@@ -317,7 +311,7 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function remove_task_from( $status, $task_id ) {
-		$option            = \get_option( self::OPTION_NAME, [] );
+		$option            = \progress_planner()->get_settings()->get( 'suggested_tasks', [] );
 		$option[ $status ] = isset( $option[ $status ] )
 			? $option[ $status ]
 			: [];
@@ -339,7 +333,7 @@ class Suggested_Tasks {
 		}
 
 		unset( $option[ $status ][ $remove_index ] );
-		return \update_option( self::OPTION_NAME, $option );
+		return \progress_planner()->get_settings()->set( 'suggested_tasks', $option );
 	}
 
 	/**
@@ -374,7 +368,7 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_snoozed_tasks() {
-		$option = \get_option( self::OPTION_NAME, [] );
+		$option = \progress_planner()->get_settings()->get( 'suggested_tasks', [] );
 		return $option['snoozed'] ?? [];
 	}
 
@@ -384,7 +378,7 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_completed_tasks() {
-		$option = \get_option( self::OPTION_NAME, [] );
+		$option = \progress_planner()->get_settings()->get( 'suggested_tasks', [] );
 		return $option['completed'] ?? [];
 	}
 
@@ -436,7 +430,7 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	private function maybe_unsnooze_tasks() {
-		$option = \get_option( self::OPTION_NAME, [] );
+		$option = \progress_planner()->get_settings()->get( 'suggested_tasks', [] );
 		if ( ! isset( $option['snoozed'] ) ) {
 			return;
 		}

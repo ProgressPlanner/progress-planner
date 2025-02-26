@@ -76,7 +76,7 @@ trait Task_Provider_Test_Trait {
 		\progress_planner()->get_settings()->set( 'local_tasks', [] );
 
 		// Delete suggested tasks.
-		delete_option( Suggested_Tasks::OPTION_NAME );
+		\progress_planner()->get_settings()->set( 'suggested_tasks', [] );
 	}
 
 	/**

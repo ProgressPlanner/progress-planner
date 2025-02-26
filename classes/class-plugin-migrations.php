@@ -112,5 +112,12 @@ class Plugin_Migrations {
 			\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks_option );
 			\delete_option( 'progress_planner_local_tasks' );
 		}
+
+		// Migrate the `progress_planner_suggested_tasks` option.
+		$suggested_tasks_option = \get_option( 'progress_planner_suggested_tasks', [] );
+		if ( ! empty( $suggested_tasks_option ) ) {
+			\progress_planner()->get_settings()->set( 'suggested_tasks', $suggested_tasks_option );
+			\delete_option( 'progress_planner_suggested_tasks' );
+		}
 	}
 }
