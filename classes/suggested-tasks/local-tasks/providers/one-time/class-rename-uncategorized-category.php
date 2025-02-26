@@ -1,6 +1,6 @@
 <?php
 /**
- * Add tasks for settings saved.
+ * Add task to rename the Uncategorized category.
  *
  * @package Progress_Planner
  */
@@ -8,18 +8,12 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
+use Progress_Planner\Data_Collector\Uncategorized_Category as Uncategorized_Category_Data_Collector;
 
 /**
- * Add tasks for settings saved.
+ * Add task to rename the Uncategorized category.
  */
 class Rename_Uncategorized_Category extends One_Time {
-
-	/**
-	 * The provider type.
-	 *
-	 * @var string
-	 */
-	protected const TYPE = 'configuration';
 
 	/**
 	 * The provider ID.
@@ -36,18 +30,26 @@ class Rename_Uncategorized_Category extends One_Time {
 	protected const CAPABILITY = 'manage_categories';
 
 	/**
-	 * Whether the task is an onboarding task.
+	 * The data collector.
 	 *
-	 * @var bool
+	 * @var \Progress_Planner\Data_Collector\Uncategorized_Category
 	 */
-	protected const IS_ONBOARDING_TASK = true;
+	protected $data_collector;
 
 	/**
-	 * The Uncategorized category.
-	 *
-	 * @var int|null
+	 * Constructor.
 	 */
-	protected $uncategorized_category = null;
+	public function __construct() {
+		$this->data_collector = new Uncategorized_Category_Data_Collector();
+
+		$this->title       = \esc_html__( 'Rename Uncategorized category', 'progress-planner' );
+		$this->url         = \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' );
+		$this->description = sprintf(
+			/* translators: %1$s <a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">We recommend</a> link */
+			\esc_html__( 'The Uncategorized category is used for posts that don\'t have a category. %1$s renaming it to something that fits your site better.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
+		);
+	}
 
 	/**
 	 * Check if the task should be added.
@@ -55,57 +57,15 @@ class Rename_Uncategorized_Category extends One_Time {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		global $wpdb;
-
-		if ( null === $this->uncategorized_category ) {
-
-			$default_category_name = __( 'Uncategorized' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-			$default_category_slug = sanitize_title( _x( 'Uncategorized', 'Default category slug' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-
-			// Get the Uncategorized category by name or slug.
-			$this->uncategorized_category = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->prepare(
-					"SELECT $wpdb->terms.term_id FROM {$wpdb->terms}
-					LEFT JOIN {$wpdb->term_taxonomy} ON {$wpdb->terms}.term_id = {$wpdb->term_taxonomy}.term_id
-					WHERE ({$wpdb->terms}.name = %s OR {$wpdb->terms}.slug = %s)
-					AND {$wpdb->term_taxonomy}.taxonomy = 'category'",
-					$default_category_name,
-					$default_category_slug
-				)
-			);
-
-		}
-
-		return ! empty( $this->uncategorized_category );
+		return 0 !== $this->data_collector->collect();
 	}
 
 	/**
-	 * Get the task details.
+	 * Update the Uncategorized category cache.
 	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
+	 * @return void
 	 */
-	public function get_task_details( $task_id = '' ) {
-
-		if ( ! $task_id ) {
-			$task_id = $this->get_task_id();
-		}
-
-		return [
-			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Rename Uncategorized category', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'medium',
-			'type'        => $this->get_provider_type(),
-			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' ) ) : '',
-			'description' => '<p>' . sprintf(
-				/* translators: %1$s <a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">We recommend</a> link */
-				\esc_html__( 'The Uncategorized category is used for posts that don\'t have a category. %1$s renaming it to something that fits your site better.', 'progress-planner' ),
-				'<a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
-			) . '</p>',
-
-		];
+	public function update_uncategorized_category_cache() {
+		$this->data_collector->update_uncategorized_category_cache();
 	}
 }

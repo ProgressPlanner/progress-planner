@@ -542,6 +542,22 @@ const prplUpdateRaviGauge = ( pointsDiff = 0 ) => {
 	if ( oldCounter ) {
 		oldCounter.textContent = newValue + 'pt';
 	}
+
+	// Mark badge as completed, in the a Monthly badges widgets, if we reached the max points.
+	if ( newValue >= parseInt( gaugeProps.max ) ) {
+		// We have multiple badges, one in widget and the other in the popover.
+		const badges = document.querySelectorAll(
+			'.prpl-badge-row-wrapper-inner .prpl-badge prpl-badge[complete="false"][badge-id="' +
+				gaugeProps.badgeId +
+				'"]'
+		);
+
+		if ( badges ) {
+			badges.forEach( ( badge ) => {
+				badge.setAttribute( 'complete', 'true' );
+			} );
+		}
+	}
 };
 
 // Listen for the event.
