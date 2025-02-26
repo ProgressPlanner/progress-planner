@@ -258,6 +258,13 @@ class Debug_Tools {
 		// Get suggested tasks.
 		$suggested_tasks = \progress_planner()->get_settings()->get( 'suggested_tasks', [] );
 
+		$suggested_tasks_sorted = [];
+		foreach ( $suggested_tasks as $task ) {
+			if ( isset( $task['status'] ) ) {
+				$suggested_tasks_sorted[ $task['status'] ][] = $task;
+			}
+		}
+
 		$menu_items = [
 			'completed'           => 'Completed',
 			'snoozed'             => 'Snoozed',
@@ -273,14 +280,14 @@ class Debug_Tools {
 				]
 			);
 
-			if ( ! empty( $suggested_tasks[ $key ] ) ) {
-				foreach ( $suggested_tasks[ $key ] as $task_key => $task_id ) {
+			if ( ! empty( $suggested_tasks_sorted[ $key ] ) ) {
+				foreach ( $suggested_tasks_sorted[ $key ] as $task_key => $task_id ) {
 
-					if ( 'snoozed' === $key ) {
-						$until = is_float( $task_id['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task_id['time'] ) . ')';
-						$title = $task_id['id'] . ' ' . $until;
-					} else {
-						$title = $task_id;
+					$title = $task_id['id'];
+					if ( 'snoozed' === $key && isset( $task_id['time'] ) ) {
+						$title .= is_float( $task_id['time'] )
+							? ' (forever)'
+							: ' (until ' . \gmdate( 'Y-m-d H:i', $task_id['time'] ) . ')';
 					}
 
 					$admin_bar->add_node(

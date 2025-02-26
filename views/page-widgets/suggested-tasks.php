@@ -65,7 +65,7 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 		data-badge-id="<?php echo esc_attr( $prpl_badge->get_id() ); ?>"
 	>
 		<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) $prpl_widget->get_score(); ?>">
-			<prpl-badge complete="true" badge-id="<?php echo esc_attr( $prpl_badge->get_id() ); ?>"></prpl-badge>
+			<prpl-badge completed="true" badge-id="<?php echo esc_attr( $prpl_badge->get_id() ); ?>"></prpl-badge>
 		</progress>
 	</prpl-gauge>
 

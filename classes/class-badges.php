@@ -150,7 +150,7 @@ class Badges {
 		// Clear content saved progress.
 		foreach ( $this->content as $badge ) {
 
-			// If the badge is already complete, skip it.
+			// If the badge is already completed, skip it.
 			if ( 100 <= $badge->progress_callback()['progress'] ) {
 				continue;
 			}

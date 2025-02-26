@@ -1,5 +1,16 @@
 /* global customElements, progressPlannerSuggestedTasks, confetti, prplDocumentReady */
 
+const prplGetTasksByType = () => {
+	const tasksByType = {};
+	for ( const task of progressPlannerSuggestedTasks.tasks ) {
+		if ( ! tasksByType[ task.type ] ) {
+			tasksByType[ task.type ] = [];
+		}
+		tasksByType[ task.type ].push( task );
+	}
+	return tasksByType;
+};
+
 /**
  * Count the number of items in the list.
  *
@@ -25,19 +36,23 @@ const progressPlannerCountItems = ( type ) => {
  * @return {Object} The next item to inject.
  */
 const progressPlannerGetNextItemFromType = ( type ) => {
-	// If the are no items of this type, return null.
-	if (
-		'undefined' ===
-		typeof progressPlannerSuggestedTasks.tasks.details[ type ]
-	) {
+	const tasksByType = prplGetTasksByType();
+	let items = tasksByType[ type ];
+
+	// If there are no items left, return null.
+	if ( 0 === items.length ) {
 		return null;
 	}
 
 	// Remove completed and snoozed items.
-	const tasks = progressPlannerSuggestedTasks.tasks;
-	let items = tasks.details[ type ];
-	const completed = tasks.completed;
-	const snoozed = tasks.snoozed;
+	items = items.filter( function ( item ) {
+		return 'completed' !== item.status && 'snoozed' !== item.status;
+	} );
+
+	// If there are no items left, return null.
+	if ( 0 === items.length ) {
+		return null;
+	}
 
 	// Create an array of items that are in the list.
 	const inList = [];
@@ -47,22 +62,9 @@ const progressPlannerGetNextItemFromType = ( type ) => {
 			inList.push( item.getAttribute( 'data-task-id' ).toString() );
 		} );
 
-	// Remove items which are completed or already in the list.
+	// Remove items which are already in the list.
 	items = items.filter( function ( item ) {
-		return (
-			! completed.includes( item.task_id.toString() ) &&
-			! inList.includes( item.task_id.toString() )
-		);
-	} );
-
-	// Remove items which are snoozed.
-	items = items.filter( function ( item ) {
-		for ( let i = 0; i < snoozed.length; i++ ) {
-			if ( item.task_id.toString() === snoozed[ i ].id.toString() ) {
-				return false;
-			}
-		}
-		return true;
+		return ! inList.includes( item.task_id.toString() );
 	} );
 
 	// Do nothing if there are no items left.
@@ -115,16 +117,16 @@ const progressPlannerInjectNextItem = ( type ) => {
 const progressPlannerInjectSuggestedTodoItem = ( details ) => {
 	// Clone the template element.
 	const Item = customElements.get( 'prpl-suggested-task' );
-	const item = new Item(
-		details.task_id,
-		details.title,
-		details.description,
-		details.points ?? 1,
-		details.action ?? '',
-		details.url ?? '',
-		details.dismissable ?? false,
-		details.type ?? ''
-	);
+	const item = new Item( {
+		taskId: details.task_id,
+		taskTitle: details.title,
+		taskDescription: details.description,
+		taskPoints: details.points ?? 1,
+		taskAction: details.action ?? '',
+		taskUrl: details.url ?? '',
+		taskDismissable: details.dismissable ?? false,
+		taskType: details.type ?? '',
+	} );
 
 	/**
 	 * @todo Implement the parent task functionality.
@@ -307,8 +309,10 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		return;
 	}
 
+	const tasksByType = prplGetTasksByType();
+
 	// Loop through each type and inject items.
-	for ( const type in progressPlannerSuggestedTasks.tasks.details ) {
+	for ( const type in tasksByType ) {
 		// Inject items, until we reach the maximum number of channel items.
 		while (
 			progressPlannerCountItems( type ) <
@@ -521,7 +525,7 @@ const prplUpdateRaviGauge = ( pointsDiff = 0 ) => {
 				'var(--prpl-padding) var(--prpl-padding) calc(var(--prpl-padding) * 2) var(--prpl-padding)',
 			marginBottom: 'var(--prpl-padding)',
 		},
-		`<prpl-badge complete="true" badge-id="${ gaugeProps.badgeId }"></prpl-badge>`
+		`<prpl-badge completed="true" badge-id="${ gaugeProps.badgeId }"></prpl-badge>`
 	);
 	gauge.id = gaugeProps.id;
 	gauge.setAttribute( 'background', gaugeProps.background );
@@ -547,14 +551,14 @@ const prplUpdateRaviGauge = ( pointsDiff = 0 ) => {
 	if ( newValue >= parseInt( gaugeProps.max ) ) {
 		// We have multiple badges, one in widget and the other in the popover.
 		const badges = document.querySelectorAll(
-			'.prpl-badge-row-wrapper-inner .prpl-badge prpl-badge[complete="false"][badge-id="' +
+			'.prpl-badge-row-wrapper-inner .prpl-badge prpl-badge[completed="false"][badge-id="' +
 				gaugeProps.badgeId +
 				'"]'
 		);
 
 		if ( badges ) {
 			badges.forEach( ( badge ) => {
-				badge.setAttribute( 'complete', 'true' );
+				badge.setAttribute( 'completed', 'true' );
 			} );
 		}
 	}
@@ -582,7 +586,7 @@ document.addEventListener(
 		while (
 			progressPlannerCountItems( type ) <
 				parseInt(
-					progressPlannerSuggestedTasks.maxItemsPerType[ type ]
+					progressPlannerSuggestedTasks.maxItemsPerType[ type ] || 1
 				) &&
 			progressPlannerGetNextItemFromType( type )
 		) {

@@ -6,7 +6,7 @@
 customElements.define(
 	'prpl-suggested-task',
 	class extends HTMLElement {
-		constructor(
+		constructor( {
 			taskId,
 			taskTitle,
 			taskDescription,
@@ -14,8 +14,8 @@ customElements.define(
 			taskAction = '',
 			taskUrl = '',
 			taskDismissable = false,
-			taskType = ''
-		) {
+			taskType = '',
+		} ) {
 			// Get parent class properties
 			super();
 
@@ -306,23 +306,23 @@ customElements.define(
 					case 'snooze':
 						el.remove();
 						// Update the global var.
-						if (
-							window.progressPlannerSuggestedTasks.tasks.snoozed.indexOf(
-								taskId
-							) === -1
-						) {
-							window.progressPlannerSuggestedTasks.tasks.snoozed.push(
-								{
-									id: taskId,
-								}
-							);
-						}
+						window.progressPlannerSuggestedTasks.tasks.forEach(
+							( taskItem, taskItemKey ) => {
+								window.progressPlannerSuggestedTasks.tasks[
+									taskItemKey
+								].status = 'snoozed';
+							}
+						);
 						break;
 
 					case 'complete':
 						// Add the task to the pending celebration.
-						window.progressPlannerSuggestedTasks.tasks.pending_celebration.push(
-							taskId
+						window.progressPlannerSuggestedTasks.tasks.forEach(
+							( taskItem, taskItemKey ) => {
+								window.progressPlannerSuggestedTasks.tasks[
+									taskItemKey
+								].status = 'completed';
+							}
 						);
 						// Set the task action to celebrate.
 						el.setAttribute( 'data-task-action', 'celebrate' );

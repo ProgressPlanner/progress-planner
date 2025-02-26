@@ -65,7 +65,7 @@ const prplAddPointsIndicatorToElement = ( task ) => {
 			points
 		);
 		if ( task.is_complete ) {
-			iconEl.classList.add( 'complete' );
+			iconEl.classList.add( 'completed' );
 		}
 
 		// Create a positioning wrapper.

@@ -61,7 +61,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 								data-value="<?php echo \esc_attr( $prpl_badge_progress['progress'] ); ?>"
 							>
 								<prpl-badge
-									complete="<?php echo $prpl_badge_completed ? 'true' : 'false'; ?>"
+									completed="<?php echo $prpl_badge_completed ? 'true' : 'false'; ?>"
 									badge-id="<?php echo esc_attr( $prpl_badge->get_id() ); ?>"
 								></prpl-badge>
 								<p><?php echo \esc_html( $prpl_badge->get_name() ); ?></p>

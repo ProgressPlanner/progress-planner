@@ -13,7 +13,7 @@ use Progress_Planner\Badges\Monthly;
 		<prpl-gauge background="#fff" color="var(--prpl-color-accent-orange)" contentFontSize="var(--prpl-font-size-4xl)" contentPadding="var(--prpl-padding)" marginBottom="0">
 			<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) \progress_planner()->get_widgets__suggested_tasks()->get_score(); ?>">
 				<prpl-badge
-					complete="true"
+					completed="true"
 					badge-id="<?php echo esc_attr( Monthly::get_badge_id_from_date( new \DateTime() ) ); ?>"
 				></prpl-badge>
 			</progress>

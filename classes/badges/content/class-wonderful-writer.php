@@ -61,7 +61,7 @@ final class Wonderful_Writer extends Badge_Content {
 
 		$remaining = 20 - min( 20, $total_posts_count );
 
-		// If there are 20 existing posts, save the badge as complete and return.
+		// If there are 20 existing posts, save the badge as completed and return.
 		if ( 0 === $remaining ) {
 			$this->save_progress(
 				[

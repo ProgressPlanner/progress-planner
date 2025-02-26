@@ -55,7 +55,7 @@ async function prplOnboardTasks() {
 							totalPoints + taskPoints + 'pt';
 					}
 
-					resolve(); // Mark this task as complete.
+					resolve(); // Mark this task as completed.
 				},
 				( index + 1 ) * timeToWait
 			);

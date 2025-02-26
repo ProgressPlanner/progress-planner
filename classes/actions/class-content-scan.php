@@ -59,7 +59,7 @@ class Content_Scan extends Content {
 				'lastPage'    => $updated_stats['lastPage'],
 				'progress'    => $updated_stats['progress'],
 				'messages'    => [
-					'scanComplete' => \esc_html__( 'Scan complete.', 'progress-planner' ),
+					'scanComplete' => \esc_html__( 'Scan completed.', 'progress-planner' ),
 				],
 			]
 		);
@@ -89,7 +89,7 @@ class Content_Scan extends Content {
 		\wp_send_json_success(
 			[
 				'messages' => [
-					'resetComplete' => \esc_html__( 'Reset complete.', 'progress-planner' ),
+					'resetComplete' => \esc_html__( 'Reset completed.', 'progress-planner' ),
 				],
 			]
 		);

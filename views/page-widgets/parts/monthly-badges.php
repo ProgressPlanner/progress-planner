@@ -84,7 +84,7 @@ $prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] :
 							data-value="<?php echo \esc_attr( $prpl_badge->progress_callback()['progress'] ); ?>"
 						>
 							<prpl-badge
-								complete="<?php echo 100 === (int) $prpl_badge->progress_callback()['progress'] ? 'true' : 'false'; ?>"
+								completed="<?php echo 100 === (int) $prpl_badge->progress_callback()['progress'] ? 'true' : 'false'; ?>"
 								badge-id="<?php echo esc_attr( $prpl_badge->get_id() ); ?>"
 							></prpl-badge>
 							<p><?php echo \esc_html( $prpl_badge->get_name() ); ?></p>

@@ -116,7 +116,17 @@ class Plugin_Migrations {
 		// Migrate the `progress_planner_suggested_tasks` option.
 		$suggested_tasks_option = \get_option( 'progress_planner_suggested_tasks', [] );
 		if ( ! empty( $suggested_tasks_option ) ) {
-			\progress_planner()->get_settings()->set( 'suggested_tasks', $suggested_tasks_option );
+			$sorted_tasks = [];
+			foreach ( $suggested_tasks_option as $status => $tasks ) {
+				foreach ( $tasks as $task ) {
+					if ( is_string( $task ) ) {
+						$task = [ 'id' => $task ];
+					}
+					$task['status'] = $status;
+					$sorted_tasks[] = $task;
+				}
+			}
+			\progress_planner()->get_settings()->set( 'suggested_tasks', $sorted_tasks );
 			\delete_option( 'progress_planner_suggested_tasks' );
 		}
 	}
