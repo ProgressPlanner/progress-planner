@@ -1,8 +1,15 @@
+= 1.1.1 =
+
+Bugs we fixed:
+
+* Fixed unnecessary display of the upgrade popover.
+
+
 = 1.1.0 =
 
-In this release, we've added more recommendations from Ravi on how to improve your site. We've also made these recommendations more visible on your WordPress 
-settings pages, by showing on settings pages exactly which things we think you should change. Also, if you're just now starting to use Progress Planner, 
-we've made the onboarding experience a lot more fun: we show you immediately which of Ravi's recommended tasks you've already completed and we give 
+In this release, we've added more recommendations from Ravi on how to improve your site. We've also made these recommendations more visible on your WordPress
+settings pages, by showing on settings pages exactly which things we think you should change. Also, if you're just now starting to use Progress Planner,
+we've made the onboarding experience a lot more fun: we show you immediately which of Ravi's recommended tasks you've already completed and we give
 you points for those!
 
 Added these recommendations from Ravi:
