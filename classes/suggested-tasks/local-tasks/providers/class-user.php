@@ -42,6 +42,7 @@ class User extends One_Time {
 			return [];
 		}
 
+		$tasks      = [];
 		$user_tasks = \progress_planner()->get_settings()->get( 'user_tasks', [] );
 		foreach ( $user_tasks as $task_id => $task_data ) {
 			$tasks[] = $this->get_task_details( $task_id );
