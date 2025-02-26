@@ -33,7 +33,7 @@ if ( ! $prpl_privacy_policy_accepted ) {
 			 * Fires after the widgets are rendered.
 			 * Nice place to add custom content since our styling is in general applied inside .prpl-wrap .
 			 *
-			 * @since 1.0.0
+			 * @since 1.1.1
 			 */
 			do_action( 'progress_planner_admin_page_after_widgets' );
 		?>
