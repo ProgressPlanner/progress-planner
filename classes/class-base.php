@@ -114,7 +114,7 @@ class Base {
 		}
 
 		// Plugin upgrade.
-		$this->cached['plugin_upgrade'] = new Plugin_Upgrade();
+		$this->cached['plugin_migrations'] = new Plugin_Migrations();
 
 		/**
 		 * Redirect on login.

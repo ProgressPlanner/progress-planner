@@ -16,7 +16,7 @@ namespace Progress_Planner;
  *
  * @package Progress_Planner
  */
-class Plugin_Upgrade {
+class Plugin_Migrations {
 
 	/**
 	 * The plugin database version.
@@ -56,7 +56,7 @@ class Plugin_Upgrade {
 	 * @return string
 	 */
 	private function get_plugin_version() {
-		return \get_file_data( \plugin_basename( __FILE__ ), [ 'Version' => 'Version' ] )['Version'];
+		return \get_file_data( PROGRESS_PLANNER_FILE, [ 'Version' => 'Version' ] )['Version'];
 	}
 
 	/**
