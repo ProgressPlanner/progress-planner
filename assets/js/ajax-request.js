@@ -16,45 +16,51 @@ const progressPlannerAjaxRequest = ( {
 	successAction,
 	failAction,
 } ) => {
-	const http = new XMLHttpRequest();
-	http.open( 'POST', url, true );
-	http.onreadystatechange = () => {
-		const defaultCallback = ( response ) => {
-			// eslint-disable-next-line no-console
-			console.info( response );
+	return new Promise( ( resolve, reject ) => {
+		const http = new XMLHttpRequest();
+		http.open( 'POST', url, true );
+		http.onreadystatechange = () => {
+			const defaultCallback = ( response ) => {
+				// eslint-disable-next-line no-console
+				console.info( response );
+			};
+
+			let response;
+			try {
+				response = JSON.parse( http.response );
+			} catch ( e ) {
+				if ( http.readyState === 4 && http.status !== 200 ) {
+					// eslint-disable-next-line no-console
+					console.warn( http, e );
+					return http.response;
+				}
+			}
+
+			if ( http.readyState === 4 ) {
+				if ( http.status === 200 ) {
+					successAction
+						? successAction( response )
+						: defaultCallback( response );
+
+					resolve( response );
+				}
+
+				// Request is completed, but the status is not 200.
+				failAction
+					? failAction( response )
+					: defaultCallback( response );
+
+				reject( response );
+			}
 		};
 
-		let response;
-		try {
-			response = JSON.parse( http.response );
-		} catch ( e ) {
-			if ( http.readyState === 4 && http.status !== 200 ) {
-				// eslint-disable-next-line no-console
-				console.warn( http, e );
-				return http.response;
-			}
+		const dataForm = new FormData();
+
+		// eslint-disable-next-line prefer-const
+		for ( let [ key, value ] of Object.entries( data ) ) {
+			dataForm.append( key, value );
 		}
 
-		if ( http.readyState === 4 ) {
-			if ( http.status === 200 ) {
-				return successAction
-					? successAction( response )
-					: defaultCallback( response );
-			}
-
-			// Request is completed, but the status is not 200.
-			return failAction
-				? failAction( response )
-				: defaultCallback( response );
-		}
-	};
-
-	const dataForm = new FormData();
-
-	// eslint-disable-next-line prefer-const
-	for ( let [ key, value ] of Object.entries( data ) ) {
-		dataForm.append( key, value );
-	}
-
-	http.send( dataForm );
+		http.send( dataForm );
+	} );
 };

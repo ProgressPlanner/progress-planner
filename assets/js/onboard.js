@@ -50,10 +50,16 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 			progressPlannerSaveLicenseKey( response.license_key );
 
 			// Start scanning posts.
-			progressPlannerTriggerScan();
+			const scanPromise = progressPlannerTriggerScan();
 
 			// Start the tasks.
-			prplOnboardTasks();
+			const tasksPromise = prplOnboardTasks();
+
+			// Wait for all promises to resolve.
+			Promise.all( [ scanPromise, tasksPromise ] ).then( () => {
+				// All promises resolved, redirect to the next step.
+				prplOnboardRedirect();
+			} );
 		},
 		failAction: ( response ) => {
 			// eslint-disable-next-line no-console
