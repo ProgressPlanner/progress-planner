@@ -81,7 +81,7 @@ class Plugin_Migrations {
 
 		// Run the upgrades.
 		foreach ( self::UPGRADE_METHODS as $version => $upgrade_method ) {
-			if ( version_compare( $version, $this->db_version, '>' ) ) {
+			if ( PRPL_DEBUG || version_compare( $version, $this->db_version, '>' ) ) {
 				$this->$upgrade_method();
 			}
 		}
