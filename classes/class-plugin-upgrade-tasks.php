@@ -18,20 +18,19 @@ class Plugin_Upgrade_Tasks {
 	public function __construct() {
 
 		// Plugin activated.
-		\add_action( 'activated_plugin', [ $this, 'plugin_activated' ], 10, 2 );
+		\add_action( 'activated_plugin', [ $this, 'plugin_activated' ], 10 );
 
 		// Plugin updated.
-		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_updated' ], 10, 2 );
+		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_updated' ], 10 );
 	}
 
 	/**
 	 * Plugin activated.
 	 *
 	 * @param string $plugin The plugin file.
-	 * @param bool   $network_wide Whether the plugin is network-wide.
 	 * @return void
 	 */
-	public function plugin_activated( $plugin, $network_wide ) {
+	public function plugin_activated( $plugin ) {
 		if ( 'progress-planner/progress-planner.php' !== $plugin ) {
 			return;
 		}
@@ -42,11 +41,9 @@ class Plugin_Upgrade_Tasks {
 	/**
 	 * Plugin updated.
 	 *
-	 * @param string $version The new version of the plugin.
-	 * @param string $db_version The old version of the plugin.
 	 * @return void
 	 */
-	public function plugin_updated( $version, $db_version ) {
+	public function plugin_updated() {
 		$this->maybe_add_onboarding_tasks();
 	}
 
