@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_task_providers = \progress_planner()->get_plugin_upgrade_handler()->get_newly_added_task_providers();
+$prpl_task_providers = \progress_planner()->get_plugin_upgrade_tasks()->get_newly_added_task_providers();
 
 // If there are no task providers, don't show anything.
 if ( empty( $prpl_task_providers ) ) {
@@ -86,3 +86,7 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 		<span class="prpl-onboarding-tasks-total-points">0pt</span>
 	</div>
 </div>
+
+<?php
+// We have displayed the upgrade popover tasks, so delete them.
+\progress_planner()->get_plugin_upgrade_tasks()->delete_upgrade_popover_task_providers();
