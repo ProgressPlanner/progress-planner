@@ -65,7 +65,7 @@ class Plugin_Migrations {
 	 * @return string
 	 */
 	private function get_db_version() {
-		return \get_option( 'progress_planner_version', '1.0.0' );
+		return \get_option( 'progress_planner_version', '1.1.0' );
 	}
 
 	/**
