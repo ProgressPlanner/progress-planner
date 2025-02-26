@@ -30,6 +30,13 @@ class Remove_Inactive_Plugins extends One_Time {
 	protected $is_dismissable = true;
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected const IS_ONBOARDING_TASK = false;
+
+	/**
 	 * The data collector.
 	 *
 	 * @var \Progress_Planner\Data_Collector\Inactive_Plugins
