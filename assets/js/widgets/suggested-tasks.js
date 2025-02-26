@@ -19,25 +19,42 @@ const progressPlannerCountItems = ( type ) => {
 };
 
 /**
+ * Get all items of a type.
+ *
+ * @param {string} type The type of items to get.
+ * @return {Array} The items.
+ */
+const progressPlannerGetItemsOfType = ( type ) => {
+	return progressPlannerSuggestedTasks.finalTasks.filter(
+		( task ) => type === task.type
+	);
+};
+
+/**
+ * Get items that have a specific status.
+ *
+ * @param {string} status The status of the items to get.
+ * @return {Array} The items.
+ */
+const progressPlannerGetItemsWithStatus = ( status ) => {
+	return progressPlannerSuggestedTasks.finalTasks.filter(
+		( task ) => status === task.status
+	);
+};
+
+/**
  * Get the next item to inject.
  *
  * @param {string} type The type of items to get the next item from.
  * @return {Object} The next item to inject.
  */
 const progressPlannerGetNextItemFromType = ( type ) => {
-	// If the are no items of this type, return null.
-	if (
-		'undefined' ===
-		typeof progressPlannerSuggestedTasks.tasks.details[ type ]
-	) {
+	// Get items of this type.
+	const itemsOfType = progressPlannerGetItemsOfType( type );
+	// If there are no items of this type, return null.
+	if ( 0 === itemsOfType.length ) {
 		return null;
 	}
-
-	// Remove completed and snoozed items.
-	const tasks = progressPlannerSuggestedTasks.tasks;
-	let items = tasks.details[ type ];
-	const completed = tasks.completed;
-	const snoozed = tasks.snoozed;
 
 	// Create an array of items that are in the list.
 	const inList = [];
@@ -47,20 +64,14 @@ const progressPlannerGetNextItemFromType = ( type ) => {
 			inList.push( item.getAttribute( 'data-task-id' ).toString() );
 		} );
 
-	// Remove items which are completed or already in the list.
-	items = items.filter( function ( item ) {
-		return (
-			! completed.includes( item.task_id.toString() ) &&
-			! inList.includes( item.task_id.toString() )
-		);
-	} );
-
-	// Remove items which are snoozed.
-	items = items.filter( function ( item ) {
-		for ( let i = 0; i < snoozed.length; i++ ) {
-			if ( item.task_id.toString() === snoozed[ i ].id.toString() ) {
-				return false;
-			}
+	const items = itemsOfType.filter( function ( item ) {
+		// Remove items which are completed or snoozed.
+		if ( 'completed' === item.status || 'snoozed' === item.status ) {
+			return false;
+		}
+		// Remove items which are already in the list.
+		if ( inList.includes( item.task_id.toString() ) ) {
+			return false;
 		}
 		return true;
 	} );
@@ -68,26 +79,6 @@ const progressPlannerGetNextItemFromType = ( type ) => {
 	// Do nothing if there are no items left.
 	if ( 0 === items.length ) {
 		return null;
-	}
-
-	// Get items with a priority set to `high`.
-	const highPriorityItems = items.filter( function ( item ) {
-		return 'high' === item.priority;
-	} );
-
-	// If there are high priority items, return the first one.
-	if ( highPriorityItems.length ) {
-		return highPriorityItems[ 0 ];
-	}
-
-	// Get items with a priority set to `medium`.
-	const mediumPriorityItems = items.filter( function ( item ) {
-		return 'medium' === item.priority;
-	} );
-
-	// If there are medium priority items, return the first one.
-	if ( mediumPriorityItems.length ) {
-		return mediumPriorityItems[ 0 ];
 	}
 
 	// Return the first item.
