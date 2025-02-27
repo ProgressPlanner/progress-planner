@@ -66,6 +66,6 @@ class Rename_Uncategorized_Category_Test extends \WP_UnitTestCase {
 
 		// Reset cached class property.
 		$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( 'rename-uncategorized-category' );
-		$task_provider->set_uncategorized_category( null );
+		$task_provider->update_uncategorized_category_cache();
 	}
 }
