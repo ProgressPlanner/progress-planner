@@ -6,7 +6,7 @@
 customElements.define(
 	'prpl-suggested-task',
 	class extends HTMLElement {
-		constructor(
+		constructor( {
 			taskId,
 			taskTitle,
 			taskDescription,
@@ -14,8 +14,8 @@ customElements.define(
 			taskAction = '',
 			taskUrl = '',
 			taskDismissable = false,
-			taskType = ''
-		) {
+			taskType = '',
+		} ) {
 			// Get parent class properties
 			super();
 
