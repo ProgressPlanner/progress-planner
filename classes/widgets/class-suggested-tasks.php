@@ -59,42 +59,16 @@ final class Suggested_Tasks extends Widget {
 	public function register_scripts() {
 		$handle = 'progress-planner-' . $this->id;
 
-		$pending_celebration = \progress_planner()->get_suggested_tasks()->get_pending_celebration();
-		$pending_tasks       = $this->get_pending_tasks();
-		$deps                = [
-			'progress-planner-todo',
-			'progress-planner-grid-masonry',
-			'progress-planner-web-components-prpl-suggested-task',
-			'progress-planner-document-ready',
-		];
-
-		// Check if need to load confetti for the local tasks.
-		$load_confetti = ! empty( $pending_celebration );
-
-		foreach ( $pending_tasks as $type => $tasks ) {
-			foreach ( $tasks as $task ) {
-				if ( isset( $task['dismissable'] ) && $task['dismissable'] ) {
-					$load_confetti = true;
-					break 2; // Break out of the foreach loops.
-				}
-			}
-		}
-
-		// Check if need to load confetti.
-		if ( $load_confetti ) {
-			$deps[] = 'particles-confetti';
-		} else {
-			// Check if there are remote tasks to inject, checking here as it might involve an API call.
-			$remote_tasks = \progress_planner()->get_suggested_tasks()->get_remote_tasks();
-			if ( ! empty( $remote_tasks ) ) {
-				$deps[] = 'particles-confetti';
-			}
-		}
-
 		\wp_register_script(
 			$handle,
 			PROGRESS_PLANNER_URL . '/assets/js/widgets/suggested-tasks.js',
-			$deps,
+			[
+				'progress-planner-todo',
+				'progress-planner-grid-masonry',
+				'progress-planner-web-components-prpl-suggested-task',
+				'progress-planner-document-ready',
+				'particles-confetti',
+			],
 			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/suggested-tasks.js' ),
 			true
 		);
@@ -230,32 +204,5 @@ final class Suggested_Tasks extends Widget {
 				'delayCelebration' => $delay_celebration,
 			]
 		);
-	}
-
-	/**
-	 * Get the tasks.
-	 *
-	 * @return array The tasks.
-	 */
-	public function get_pending_tasks() {
-
-		if ( null === $this->pending_tasks ) {
-			$tasks         = [];
-			$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
-
-			// Sort them by type (channel).
-			foreach ( $pending_tasks as $task ) {
-
-				if ( ! isset( $tasks[ $task['type'] ] ) ) {
-					$tasks[ $task['type'] ] = [];
-				}
-
-				$tasks[ $task['type'] ][] = $task;
-			}
-
-			$this->pending_tasks = $tasks;
-		}
-
-		return $this->pending_tasks;
 	}
 }
