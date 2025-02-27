@@ -184,7 +184,6 @@ final class Suggested_Tasks extends Widget {
 		if ( isset( $max_items_per_type['pending_celebration'] ) ) {
 			$max_items_per_type['pending_celebration'] = 99;
 		}
-		$max_items_per_type = array_unique( $max_items_per_type );
 
 		// Check if current date is between Feb 12-16 to use hearts confetti.
 		$confetti_options = [];
