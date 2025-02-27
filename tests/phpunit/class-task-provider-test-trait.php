@@ -105,7 +105,7 @@ trait Task_Provider_Test_Trait {
 		}
 
 		// Verify that the task(s) are in the local suggested tasks.
-		$pending_tasks = (array) $this->suggested_tasks->get_local()->get_pending_tasks();
+		$pending_tasks = (array) \progress_planner()->get_settings()->get( 'local_tasks', [] );
 		foreach ( $tasks as $task ) {
 			$this->assertContains( $task['task_id'], $pending_tasks );
 		}

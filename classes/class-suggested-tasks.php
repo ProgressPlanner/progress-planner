@@ -105,7 +105,7 @@ class Suggested_Tasks {
 	 */
 	public function on_automatic_updates_complete() {
 
-		$pending_tasks = $this->local->get_pending_tasks(); // @phpstan-ignore-line method.nonObject
+		$pending_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] ); // @phpstan-ignore-line method.nonObject
 
 		if ( empty( $pending_tasks ) ) {
 			return;
@@ -114,9 +114,8 @@ class Suggested_Tasks {
 		// ID of the 'Core_Update' provider.
 		$update_core_provider_id = 'update-core';
 
-		foreach ( $pending_tasks as $task_id ) {
-			$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
-			$task_data   = $task_object->get_data();
+		foreach ( $pending_tasks as $task_data ) {
+			$task_id = $task_data['task_id'];
 
 			if ( $task_data['type'] === $update_core_provider_id && \gmdate( 'YW' ) === $task_data['year_week'] ) {
 				// Remove from local (pending tasks).

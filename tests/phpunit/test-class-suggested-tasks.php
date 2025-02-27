@@ -128,6 +128,6 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 
 		$this->suggested_tasks->get_local()->cleanup_pending_tasks();
 
-		$this->assertEquals( count( $tasks_to_keep ), \count( $this->suggested_tasks->get_local()->get_pending_tasks() ) );
+		$this->assertEquals( count( $tasks_to_keep ), \count( \progress_planner()->get_settings()->get( 'local_tasks', [] ) ) );
 	}
 }
