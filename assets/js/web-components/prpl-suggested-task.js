@@ -308,7 +308,7 @@ customElements.define(
 						// Update the global var.
 						window.prplSuggestedTasks.tasks.forEach(
 							( task, index ) => {
-								if ( task.id === taskId ) {
+								if ( task.task_id === taskId ) {
 									window.prplSuggestedTasks.tasks[
 										index
 									].status = 'snoozed';
@@ -321,7 +321,7 @@ customElements.define(
 						// Add the task to the pending celebration.
 						window.prplSuggestedTasks.tasks.forEach(
 							( task, index ) => {
-								if ( task.id === taskId ) {
+								if ( task.task_id === taskId ) {
 									window.prplSuggestedTasks.tasks[
 										index
 									].status = 'pending_celebration';
