@@ -226,7 +226,6 @@ const prplTriggerConfetti = () => {
 						},
 					],
 				},
-				origin,
 			},
 		];
 
@@ -244,6 +243,9 @@ const prplTriggerConfetti = () => {
 		}
 
 		for ( const value of confettiOptions ) {
+			// Set confetti options, we do it here so it's applied even if we pass the options from the PHP side (ie hearts confetti).
+			value.origin = origin;
+
 			confetti( {
 				...prplConfettiDefaults,
 				...value,
