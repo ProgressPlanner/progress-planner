@@ -25,7 +25,7 @@ const progressPlannerCountItems = ( type ) => {
  * @return {Array} The items.
  */
 const progressPlannerGetItemsOfType = ( type ) => {
-	return progressPlannerSuggestedTasks.finalTasks.filter(
+	return progressPlannerSuggestedTasks.tasks.filter(
 		( task ) => type === task.type
 	);
 };
@@ -37,7 +37,7 @@ const progressPlannerGetItemsOfType = ( type ) => {
  * @return {Array} The items.
  */
 const progressPlannerGetItemsWithStatus = ( status ) => {
-	return progressPlannerSuggestedTasks.finalTasks.filter(
+	return progressPlannerSuggestedTasks.tasks.filter(
 		( task ) => status === task.status
 	);
 };
@@ -240,21 +240,21 @@ const prplStrikeCompletedTasks = () => {
 					el.parentElement.remove();
 				}
 
-				// Remove the task from the pending celebration.
-				window.progressPlannerSuggestedTasks.tasks.pending_celebration =
-					window.progressPlannerSuggestedTasks.tasks.pending_celebration.filter(
-						( id ) => id !== taskId
-					);
+				// Get the task index.
+				let taskIndex = false;
+				window.progressPlannerSuggestedTasks.tasks.forEach(
+					( taskItem, index ) => {
+						if ( taskItem.task_id === taskId ) {
+							taskIndex = index;
+						}
+					}
+				);
 
-				// Add the task to the completed tasks.
-				if (
-					window.progressPlannerSuggestedTasks.tasks.completed.indexOf(
-						taskId
-					) === -1
-				) {
-					window.progressPlannerSuggestedTasks.tasks.completed.push(
-						taskId
-					);
+				// Mark the task as completed.
+				if ( false !== taskIndex ) {
+					window.progressPlannerSuggestedTasks.tasks[
+						taskIndex
+					].status = 'completed';
 				}
 
 				// Refresh the list.
@@ -272,11 +272,11 @@ const prplStrikeCompletedTasks = () => {
 	}, 2000 );
 };
 
-const prplPendingCelebration =
-	progressPlannerSuggestedTasks.tasks.pending_celebration;
+const prplPendingCelebration = progressPlannerGetItemsWithStatus(
+	'pending_celebration'
+);
 if (
 	! progressPlannerSuggestedTasks.delayCelebration &&
-	prplPendingCelebration &&
 	prplPendingCelebration.length
 ) {
 	setTimeout( () => {
@@ -299,7 +299,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	}
 
 	// Loop through each type and inject items.
-	for ( const type in progressPlannerSuggestedTasks.tasks.details ) {
+	for ( const type in progressPlannerSuggestedTasks.maxItemsPerType ) {
 		// Inject items, until we reach the maximum number of channel items.
 		while (
 			progressPlannerCountItems( type ) <

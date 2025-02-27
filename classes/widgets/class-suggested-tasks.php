@@ -146,34 +146,28 @@ final class Suggested_Tasks extends Widget {
 			}
 		);
 
-		// Get pending tasks.
-		$tasks['details'] = $this->get_pending_tasks();
-
 		// If there are newly added task providers, delay the celebration in order not to get confetti behind the popover.
 		$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
 
 		if ( ! $delay_celebration ) {
 			// Insert the pending celebration tasks as high priority tasks, so they are shown always.
-			foreach ( $tasks['pending_celebration'] as $task_id ) {
+			foreach ( $final_tasks as $key => $task ) {
+				if ( ! isset( $task['status'] ) || 'pending_celebration' !== $task['status'] ) {
+					continue;
+				}
+
+				$task_id = $task['task_id'];
 
 				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
 					( new Local_Task_Factory( $task_id ) )->get_task()->get_provider_id()
 				);
 
 				if ( $task_provider && $task_provider->capability_required() ) {
-					$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task_id );
+					$task['priority'] = 'high'; // Celebrate tasks are always on top.
+					$task['action']   = 'celebrate';
+					$task['type']     = 'pending_celebration';
 
-					if ( $task_details ) {
-						$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
-						$task_details['action']   = 'celebrate';
-						$task_details['type']     = 'pending_celebration';
-
-						if ( ! isset( $tasks['details']['pending_celebration'] ) ) {
-							$tasks['details']['pending_celebration'] = [];
-						}
-
-						$tasks['details']['pending_celebration'][] = $task_details;
-					}
+					$final_tasks[ $key ] = $task;
 
 					// Mark the pending celebration tasks as completed.
 					\progress_planner()->get_suggested_tasks()->transition_task_status( $task_id, 'pending_celebration', 'completed' );
@@ -182,14 +176,15 @@ final class Suggested_Tasks extends Widget {
 		}
 
 		$max_items_per_type = [];
-		foreach ( $tasks['details'] as $type => $items ) {
-			$max_items_per_type[ $type ] = $type === 'content-update' ? 2 : 1;
+		foreach ( $final_tasks as $task ) {
+			$max_items_per_type[ $task['type'] ] = $task['type'] === 'content-update' ? 2 : 1;
 		}
 
 		// We want all pending_celebration' tasks to be shown.
 		if ( isset( $max_items_per_type['pending_celebration'] ) ) {
 			$max_items_per_type['pending_celebration'] = 99;
 		}
+		$max_items_per_type = array_unique( $max_items_per_type );
 
 		// Check if current date is between Feb 12-16 to use hearts confetti.
 		$confetti_options = [];
@@ -222,11 +217,10 @@ final class Suggested_Tasks extends Widget {
 			[
 				'ajaxUrl'          => \admin_url( 'admin-ajax.php' ),
 				'nonce'            => \wp_create_nonce( 'progress_planner' ),
-				'tasks'            => $tasks,
+				'tasks'            => array_values( $final_tasks ),
 				'maxItemsPerType'  => apply_filters( 'progress_planner_suggested_tasks_max_items_per_type', $max_items_per_type ),
 				'confettiOptions'  => $confetti_options,
 				'delayCelebration' => $delay_celebration,
-				'finalTasks'       => array_values( $final_tasks ),
 			]
 		);
 	}
