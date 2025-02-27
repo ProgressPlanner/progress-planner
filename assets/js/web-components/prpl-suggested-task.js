@@ -1,4 +1,4 @@
-/* global customElements, progressPlannerSuggestedTask, HTMLElement */
+/* global customElements, prplSuggestedTask, HTMLElement */
 
 /**
  * Register the custom web component.
@@ -6,7 +6,7 @@
 customElements.define(
 	'prpl-suggested-task',
 	class extends HTMLElement {
-		constructor(
+		constructor( {
 			taskId,
 			taskTitle,
 			taskDescription,
@@ -14,8 +14,8 @@ customElements.define(
 			taskAction = '',
 			taskUrl = '',
 			taskDismissable = false,
-			taskType = ''
-		) {
+			taskType = '',
+		} ) {
 			// Get parent class properties
 			super();
 
@@ -37,10 +37,10 @@ customElements.define(
 							data-task-title="${ taskTitle }"
 							data-action="info"
 							data-target="info"
-							title="${ progressPlannerSuggestedTask.i18n.info }"
+							title="${ prplSuggestedTask.i18n.info }"
 						>
-							<img src="${ progressPlannerSuggestedTask.assets.infoIcon }" alt="${ progressPlannerSuggestedTask.i18n.info }" class="icon">
-							<span class="screen-reader-text">${ progressPlannerSuggestedTask.i18n.info }</span>
+							<img src="${ prplSuggestedTask.assets.infoIcon }" alt="${ prplSuggestedTask.i18n.info }" class="icon">
+							<span class="screen-reader-text">${ prplSuggestedTask.i18n.info }</span>
 						</button>`,
 				snooze: `<button
 							type="button"
@@ -49,10 +49,10 @@ customElements.define(
 							data-task-title="${ taskTitle }"
 							data-action="snooze"
 							data-target="snooze"
-							title="${ progressPlannerSuggestedTask.i18n.snooze }"
+							title="${ prplSuggestedTask.i18n.snooze }"
 						>
-							<img src="${ progressPlannerSuggestedTask.assets.snoozeIcon }" alt="${ progressPlannerSuggestedTask.i18n.snooze }" class="icon">
-							<span class="screen-reader-text">${ progressPlannerSuggestedTask.i18n.snooze }</span>
+							<img src="${ prplSuggestedTask.assets.snoozeIcon }" alt="${ prplSuggestedTask.i18n.snooze }" class="icon">
+							<span class="screen-reader-text">${ prplSuggestedTask.i18n.snooze }</span>
 						</button>`,
 				complete: isDismissable
 					? `<button
@@ -62,10 +62,10 @@ customElements.define(
 							data-task-title="${ taskTitle }"
 							data-action="complete"
 							data-target="complete"
-							title="${ progressPlannerSuggestedTask.i18n.markAsComplete }"
+							title="${ prplSuggestedTask.i18n.markAsComplete }"
 						>
 							<span class="dashicons dashicons-saved"></span>
-							<span class="screen-reader-text">${ progressPlannerSuggestedTask.i18n.markAsComplete }</span>
+							<span class="screen-reader-text">${ prplSuggestedTask.i18n.markAsComplete }</span>
 						</button>`
 					: '',
 			};
@@ -84,11 +84,11 @@ customElements.define(
 							<fieldset>
 								<legend>
 									<span>
-										${ progressPlannerSuggestedTask.i18n.snoozeThisTask }
+										${ prplSuggestedTask.i18n.snoozeThisTask }
 									</span>
 									<button type="button" class="prpl-toggle-radio-group">
 										<span class="prpl-toggle-radio-group-text">
-											${ progressPlannerSuggestedTask.i18n.howLong }
+											${ prplSuggestedTask.i18n.howLong }
 										</span>
 										<span class="prpl-toggle-radio-group-arrow">
 											&rsaquo;
@@ -99,41 +99,41 @@ customElements.define(
 								<div class="prpl-snooze-duration-radio-group">
 									<label>
 										<input type="radio" name="snooze-duration-${ taskId }" value="1-week">
-										${ progressPlannerSuggestedTask.i18n.snoozeDuration.oneWeek }
+										${ prplSuggestedTask.i18n.snoozeDuration.oneWeek }
 									</label>
 									<label>
 										<input type="radio" name="snooze-duration-${ taskId }" value="1-month">
-										${ progressPlannerSuggestedTask.i18n.snoozeDuration.oneMonth }
+										${ prplSuggestedTask.i18n.snoozeDuration.oneMonth }
 									</label>
 									<label>
 										<input type="radio" name="snooze-duration-${ taskId }" value="3-months">
-										${ progressPlannerSuggestedTask.i18n.snoozeDuration.threeMonths }
+										${ prplSuggestedTask.i18n.snoozeDuration.threeMonths }
 									</label>
 									<label>
 										<input type="radio" name="snooze-duration-${ taskId }" value="6-months">
-										${ progressPlannerSuggestedTask.i18n.snoozeDuration.sixMonths }
+										${ prplSuggestedTask.i18n.snoozeDuration.sixMonths }
 									</label>
 									<label>
 										<input type="radio" name="snooze-duration-${ taskId }" value="1-year">
-										${ progressPlannerSuggestedTask.i18n.snoozeDuration.oneYear }
+										${ prplSuggestedTask.i18n.snoozeDuration.oneYear }
 									</label>
 									<label>
 										<input type="radio" name="snooze-duration-${ taskId }" value="forever">
-										${ progressPlannerSuggestedTask.i18n.snoozeDuration.forever }
+										${ prplSuggestedTask.i18n.snoozeDuration.forever }
 									</label>
 								</div>
 							</fieldset>
 
 							<button type="button" class="prpl-suggested-task-button prpl-tooltip-close" data-action="close-snooze" data-target="snooze">
 								<span class="dashicons dashicons-no-alt"></span>
-								<span class="screen-reader-text">${ progressPlannerSuggestedTask.i18n.close }</span>
+								<span class="screen-reader-text">${ prplSuggestedTask.i18n.close }</span>
 							</button>
 						</div>
 						<div class="prpl-suggested-task-info prpl-tooltip" data-target="info">
 							${ taskDescription }
 							<button type="button" class="prpl-suggested-task-button prpl-tooltip-close" data-action="close-info" data-target="info">
 								<span class="dashicons dashicons-no-alt"></span>
-								<span class="screen-reader-text">${ progressPlannerSuggestedTask.i18n.close }</span>
+								<span class="screen-reader-text">${ prplSuggestedTask.i18n.close }</span>
 							</button>
 						</div>
 					</div>
@@ -285,7 +285,7 @@ customElements.define(
 
 			const data = {
 				task_id: taskId,
-				nonce: progressPlannerSuggestedTask.nonce,
+				nonce: prplSuggestedTask.nonce,
 				action_type: actionType,
 			};
 			if ( 'snooze' === actionType ) {
@@ -306,23 +306,27 @@ customElements.define(
 					case 'snooze':
 						el.remove();
 						// Update the global var.
-						if (
-							window.progressPlannerSuggestedTasks.tasks.snoozed.indexOf(
-								taskId
-							) === -1
-						) {
-							window.progressPlannerSuggestedTasks.tasks.snoozed.push(
-								{
-									id: taskId,
+						window.prplSuggestedTasks.tasks.forEach(
+							( task, index ) => {
+								if ( task.task_id === taskId ) {
+									window.prplSuggestedTasks.tasks[
+										index
+									].status = 'snoozed';
 								}
-							);
-						}
+							}
+						);
 						break;
 
 					case 'complete':
 						// Add the task to the pending celebration.
-						window.progressPlannerSuggestedTasks.tasks.pending_celebration.push(
-							taskId
+						window.prplSuggestedTasks.tasks.forEach(
+							( task, index ) => {
+								if ( task.task_id === taskId ) {
+									window.prplSuggestedTasks.tasks[
+										index
+									].status = 'pending_celebration';
+								}
+							}
 						);
 						// Set the task action to celebrate.
 						el.setAttribute( 'data-task-action', 'celebrate' );
