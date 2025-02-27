@@ -76,34 +76,22 @@ final class Suggested_Tasks extends Widget {
 		// Enqueue the script.
 		\wp_enqueue_script( $handle );
 
-		// Get all saved tasks (completed, pending celebration, snoozed).
-		$tasks = \progress_planner()->get_suggested_tasks()->get_saved_tasks();
-
-		$final_tasks = [];
-		foreach ( \progress_planner()->get_suggested_tasks()->get_tasks() as $task ) {
-			$task['status']                  = 'pending';
-			$final_tasks[ $task['task_id'] ] = $task;
-		}
-
-		foreach ( $tasks as $type => $tasks_for_type ) {
-			foreach ( $tasks_for_type as $task ) {
-				if ( is_array( $task ) ) {
-					$task = $task['id'];
-				}
-				$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task );
-				if ( empty( $task_details ) ) {
-					continue;
-				}
-				$final_tasks[ $task ] = $task_details;
-				// Add the status to the task.
-				$final_tasks[ $task ]['status'] = $type;
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
+		foreach ( $tasks as $key => $task ) {
+			if ( ! isset( $task['task_id'] ) ) {
+				unset( $tasks[ $key ] );
 			}
+			if ( ! isset( $task['status'] ) ) {
+				$task['status'] = 'pending';
+			}
+			$tasks[ $key ] = $task;
 		}
-		$final_tasks = array_values( $final_tasks );
+
+		$tasks = array_unique( array_values( $tasks ) );
 
 		// Sort the final tasks by priority. The priotity can be "high", "medium", "low", or "none".
 		uasort(
-			$final_tasks,
+			$tasks,
 			function ( $a, $b ) {
 				$priority = [
 					'high'   => 0,
@@ -124,7 +112,7 @@ final class Suggested_Tasks extends Widget {
 
 		if ( ! $delay_celebration ) {
 			// Insert the pending celebration tasks as high priority tasks, so they are shown always.
-			foreach ( $final_tasks as $key => $task ) {
+			foreach ( $tasks as $key => $task ) {
 				if ( ! isset( $task['status'] ) || 'pending_celebration' !== $task['status'] ) {
 					continue;
 				}
@@ -140,7 +128,7 @@ final class Suggested_Tasks extends Widget {
 					$task['action']   = 'celebrate';
 					$task['type']     = 'pending_celebration';
 
-					$final_tasks[ $key ] = $task;
+					$tasks[ $key ] = $task;
 
 					// Mark the pending celebration tasks as completed.
 					\progress_planner()->get_suggested_tasks()->transition_task_status( $task_id, 'pending_celebration', 'completed' );
@@ -149,7 +137,7 @@ final class Suggested_Tasks extends Widget {
 		}
 
 		$max_items_per_type = [];
-		foreach ( $final_tasks as $task ) {
+		foreach ( $tasks as $task ) {
 			$max_items_per_type[ $task['type'] ] = $task['type'] === 'content-update' ? 2 : 1;
 		}
 
@@ -189,7 +177,7 @@ final class Suggested_Tasks extends Widget {
 			[
 				'ajaxUrl'          => \admin_url( 'admin-ajax.php' ),
 				'nonce'            => \wp_create_nonce( 'progress_planner' ),
-				'tasks'            => array_values( $final_tasks ),
+				'tasks'            => array_values( $tasks ),
 				'maxItemsPerType'  => apply_filters( 'progress_planner_suggested_tasks_max_items_per_type', $max_items_per_type ),
 				'confettiOptions'  => $confetti_options,
 				'delayCelebration' => $delay_celebration,

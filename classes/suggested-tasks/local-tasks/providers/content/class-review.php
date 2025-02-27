@@ -256,11 +256,11 @@ class Review extends Content {
 		}
 
 		$this->snoozed_post_ids = [];
-		$snoozed                = \progress_planner()->get_suggested_tasks()->get_snoozed_tasks();
+		$snoozed                = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'snoozed' );
 
 		if ( \is_array( $snoozed ) && ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
-				$data = $this->get_data_from_task_id( $task['id'] );
+				$data = $this->get_data_from_task_id( $task['task_id'] );
 				if ( isset( $data['type'] ) && 'review-post' === $data['type'] ) {
 					$this->snoozed_post_ids[] = $data['post_id'];
 				}

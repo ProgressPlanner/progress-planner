@@ -42,22 +42,6 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test the mark_task_as_completed method.
-	 *
-	 * @return void
-	 */
-	public function test_mark_task_as_completed() {
-	}
-
-	/**
-	 * Test the get_pending_celebration method.
-	 *
-	 * @return void
-	 */
-	public function test_get_pending_celebration() {
-	}
-
-	/**
 	 * Test the mark_task_as_pending_celebration method.
 	 *
 	 * @return void
@@ -79,14 +63,6 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_maybe_celebrate_tasks() {
-	}
-
-	/**
-	 * Test the mark_task_as_snoozed method.
-	 *
-	 * @return void
-	 */
-	public function test_mark_task_as_snoozed() {
 	}
 
 	/**

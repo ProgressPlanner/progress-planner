@@ -112,10 +112,11 @@ class Plugin_Migrations {
 	 * @return void
 	 */
 	private function upgrade_1_1_1() {
+		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+
 		// Migrate the `progress_planner_local_tasks` option.
 		$local_tasks_option = \get_option( 'progress_planner_local_tasks', [] );
 		if ( ! empty( $local_tasks_option ) ) {
-			$tasks = [];
 			foreach ( $local_tasks_option as $task_id ) {
 				$task           = ( new Local_Task_Factory( $task_id ) )->get_task()->get_data();
 				$task['status'] = 'pending';
@@ -124,10 +125,28 @@ class Plugin_Migrations {
 					continue;
 				}
 
-				$tasks[] = $task;
+				$local_tasks[] = $task;
 			}
-			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+			\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
 			\delete_option( 'progress_planner_local_tasks' );
+		}
+
+		// Migrate the `progress_planner_suggested_tasks` option.
+		$suggested_tasks_option = \get_option( 'progress_planner_suggested_tasks', [] );
+		if ( ! empty( $suggested_tasks_option ) ) {
+			foreach ( $suggested_tasks_option as $status => $tasks ) {
+				foreach ( $tasks as $_task ) {
+					$task           = ( new Local_Task_Factory( $_task['id'] ) )->get_task()->get_data();
+					$task['status'] = $status;
+					$task           = array_merge( $task, $_task );
+					if ( isset( $task['id'] ) ) {
+						unset( $task['id'] );
+					}
+					$local_tasks[] = $task;
+				}
+			}
+			\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+			\delete_option( 'progress_planner_suggested_tasks' );
 		}
 	}
 }
