@@ -122,6 +122,9 @@ final class Suggested_Tasks extends Widget {
 
 		foreach ( $tasks as $type => $tasks_for_type ) {
 			foreach ( $tasks_for_type as $task ) {
+				if ( is_array( $task ) ) {
+					$task = $task['id'];
+				}
 				$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task );
 				if ( empty( $task_details ) ) {
 					continue;
