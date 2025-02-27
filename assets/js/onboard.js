@@ -1,4 +1,4 @@
-/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerTriggerScan, prplOnboardTasks */
+/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerTriggerScan, prplOnboardRedirect, prplOnboardTasks */
 /*
  * Onboard
  *
@@ -59,7 +59,7 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 			// Wait for all promises to resolve.
 			Promise.all( [ scanPromise, tasksPromise ] ).then( () => {
 				// All promises resolved, redirect to the next step.
-				// prplOnboardRedirect();
+				prplOnboardRedirect();
 			} );
 		} )
 		.catch( ( error ) => {
