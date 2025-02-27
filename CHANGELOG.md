@@ -3,6 +3,7 @@
 Bugs we fixed:
 
 * Fixed unnecessary display of the upgrade popover.
+* Fixed saving license key from 'Subscribe to weekly' emails popover.
 
 
 = 1.1.0 =
