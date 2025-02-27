@@ -75,7 +75,10 @@ class Plugin_Migrations {
 	 */
 	private function maybe_upgrade() {
 		// If the current version is the same as the plugin version, do nothing.
-		if ( version_compare( $this->db_version, $this->version, '=' ) ) {
+		if ( version_compare( $this->db_version, $this->version, '=' ) &&
+			( ! defined( 'PRPL_DEBUG' ) || ! PRPL_DEBUG ) &&
+			! \get_option( 'prpl_debug' )
+		) {
 			return;
 		}
 
@@ -83,7 +86,8 @@ class Plugin_Migrations {
 		foreach ( self::UPGRADE_METHODS as $version => $upgrade_method ) {
 			if (
 				( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) ||
-				\get_option( 'prpl_debug' ) || version_compare( $version, $this->db_version, '>' )
+				\get_option( 'prpl_debug' ) ||
+				version_compare( $version, $this->db_version, '>' )
 			) {
 				$this->$upgrade_method();
 			}
