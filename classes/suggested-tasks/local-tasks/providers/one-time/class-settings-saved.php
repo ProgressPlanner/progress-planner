@@ -22,6 +22,13 @@ class Settings_Saved extends One_Time {
 	protected const ID = 'settings-saved';
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected const IS_ONBOARDING_TASK = false;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {

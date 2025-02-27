@@ -100,7 +100,7 @@ class Scripts {
 			case 'progress-planner-web-components-prpl-suggested-task':
 				\wp_localize_script(
 					$handle,
-					'progressPlannerSuggestedTask',
+					'prplSuggestedTask',
 					[
 						'nonce'  => \wp_create_nonce( 'progress_planner' ),
 						'assets' => [
