@@ -23,13 +23,6 @@ final class Suggested_Tasks extends Widget {
 	protected $id = 'suggested-tasks';
 
 	/**
-	 * The tasks.
-	 *
-	 * @var array|null
-	 */
-	protected $pending_tasks = null;
-
-	/**
 	 * Get the score.
 	 *
 	 * @return int The score.
