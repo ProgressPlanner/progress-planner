@@ -27,11 +27,14 @@ class Slack_Notification {
 		}
 
 		// Update last used timestamp on progressplanner.com .
-		wp_remote_post( \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner/v1/slack/ping', [
-			'body' => [
-				'site_url' => \site_url(),
-			],
-		] );
+		wp_remote_post(
+			\progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner/v1/slack/ping',
+			[
+				'body' => [
+					'site_url' => \site_url(),
+				],
+			]
+		);
 
 		$response = wp_remote_post(
 			'https://slack.com/api/chat.postMessage',

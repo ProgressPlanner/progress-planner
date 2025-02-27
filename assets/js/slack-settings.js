@@ -1,7 +1,6 @@
 /* global alert, jQuery, progressPlannerSlack */
 
 jQuery( document ).ready( function () {
-	console.log( 'Slack settings ready' );
 	jQuery( '#test-slack-notification' ).on( 'click', function () {
 		const button = jQuery( this );
 		button.prop( 'disabled', true );

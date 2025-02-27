@@ -40,8 +40,8 @@ class Slack_Settings {
 	 */
 	private function get_auth_url() {
 		$site_url = \admin_url( 'admin.php?page=progress-planner-slack' );
-		$params = [
-			'site_url' => \rawurlencode( $site_url ),
+		$params   = [
+			'site_url'  => \rawurlencode( $site_url ),
 			'site_name' => \rawurlencode( \get_bloginfo( 'name' ) ),
 		];
 
@@ -145,8 +145,8 @@ class Slack_Settings {
 						<?php
 						\settings_fields( 'slack_settings' );
 						\do_settings_sections( 'progress-planner-slack' );
-							?>
-						<input type="hidden" name="slack_access_token" value="<?php echo esc_attr( get_option('slack_access_token') ) ?>">
+						?>
+						<input type="hidden" name="slack_access_token" value="<?php echo esc_attr( get_option( 'slack_access_token' ) ); ?>">
 						<table class="form-table">
 							<tr>
 								<th scope="row"><?php esc_html_e( 'Notification Channel', 'progress-planner' ); ?></th>
