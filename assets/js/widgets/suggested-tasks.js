@@ -1,4 +1,4 @@
-/* global customElements, progressPlannerSuggestedTasks, confetti, prplDocumentReady */
+/* global customElements, prplSuggestedTasks, confetti, prplDocumentReady */
 
 /**
  * Count the number of items in the list.
@@ -6,7 +6,7 @@
  * @param {string} type The type of items to count.
  * @return {number} The number of items in the list.
  */
-const progressPlannerCountItems = ( type ) => {
+const prplSuggestedTasksCountItems = ( type ) => {
 	// We want to display all pending celebration tasks on page load.
 	if ( 'pending_celebration' === type ) {
 		return 0;
@@ -24,10 +24,8 @@ const progressPlannerCountItems = ( type ) => {
  * @param {string} type The type of items to get.
  * @return {Array} The items.
  */
-const progressPlannerGetItemsOfType = ( type ) => {
-	return progressPlannerSuggestedTasks.tasks.filter(
-		( task ) => type === task.type
-	);
+const prplSuggestedTasksGetItemsOfType = ( type ) => {
+	return prplSuggestedTasks.tasks.filter( ( task ) => type === task.type );
 };
 
 /**
@@ -36,8 +34,8 @@ const progressPlannerGetItemsOfType = ( type ) => {
  * @param {string} status The status of the items to get.
  * @return {Array} The items.
  */
-const progressPlannerGetItemsWithStatus = ( status ) => {
-	return progressPlannerSuggestedTasks.tasks.filter(
+const prplSuggestedTasksGetItemsWithStatus = ( status ) => {
+	return prplSuggestedTasks.tasks.filter(
 		( task ) => status === task.status
 	);
 };
@@ -48,9 +46,9 @@ const progressPlannerGetItemsWithStatus = ( status ) => {
  * @param {string} type The type of items to get the next item from.
  * @return {Object} The next item to inject.
  */
-const progressPlannerGetNextItemFromType = ( type ) => {
+const prplSuggestedTasksGetNextItemFromType = ( type ) => {
 	// Get items of this type.
-	const itemsOfType = progressPlannerGetItemsOfType( type );
+	const itemsOfType = prplSuggestedTasksGetItemsOfType( type );
 	// If there are no items of this type, return null.
 	if ( 0 === itemsOfType.length ) {
 		return null;
@@ -89,13 +87,13 @@ const progressPlannerGetNextItemFromType = ( type ) => {
  * Inject the next item.
  * @param {string} type The type of items to inject the next item from.
  */
-const progressPlannerInjectNextItem = ( type ) => {
-	const nextItem = progressPlannerGetNextItemFromType( type );
+const prplSuggestedTasksInjectNextItem = ( type ) => {
+	const nextItem = prplSuggestedTasksGetNextItemFromType( type );
 	if ( ! nextItem ) {
 		return;
 	}
 
-	progressPlannerInjectSuggestedTodoItem( nextItem );
+	prplSuggestedTasksInjectItem( nextItem );
 };
 
 /**
@@ -103,7 +101,7 @@ const progressPlannerInjectNextItem = ( type ) => {
  *
  * @param {Object} details The details of the todo item.
  */
-const progressPlannerInjectSuggestedTodoItem = ( details ) => {
+const prplSuggestedTasksInjectItem = ( details ) => {
 	// Clone the template element.
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const item = new Item(
@@ -133,9 +131,8 @@ const progressPlannerInjectSuggestedTodoItem = ( details ) => {
 	}
 
 	// If we could not find the parent item, try again after 500ms.
-	window.progressPlannerRenderAttempts =
-		window.progressPlannerRenderAttempts || 0;
-	if ( window.progressPlannerRenderAttempts > 500 ) {
+	window.prplRenderAttempts = window.prplRenderAttempts || 0;
+	if ( window.prplRenderAttempts > 500 ) {
 		return;
 	}
 	const parentItem = document.querySelector(
@@ -143,8 +140,8 @@ const progressPlannerInjectSuggestedTodoItem = ( details ) => {
 	);
 	if ( ! parentItem ) {
 		setTimeout( () => {
-			progressPlannerInjectSuggestedTodoItem( details );
-			window.progressPlannerRenderAttempts++;
+			prplSuggestedTasksInjectItem( details );
+			window.prplRenderAttempts++;
 		}, 10 );
 		return;
 	}
@@ -173,7 +170,7 @@ const prplTriggerConfetti = () => {
 		colors: [ 'FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8' ],
 	};
 
-	const progressPlannerRenderAttemptshoot = () => {
+	const prplRenderAttemptshoot = () => {
 		let confettiOptions = [
 			{
 				particleCount: 40,
@@ -189,15 +186,11 @@ const prplTriggerConfetti = () => {
 
 		// Tripple check if the confetti options are an array and not undefined.
 		if (
-			'undefined' !==
-				typeof progressPlannerSuggestedTasks.confettiOptions &&
-			true ===
-				Array.isArray(
-					progressPlannerSuggestedTasks.confettiOptions
-				) &&
-			progressPlannerSuggestedTasks.confettiOptions.length
+			'undefined' !== typeof prplSuggestedTasks.confettiOptions &&
+			true === Array.isArray( prplSuggestedTasks.confettiOptions ) &&
+			prplSuggestedTasks.confettiOptions.length
 		) {
-			confettiOptions = progressPlannerSuggestedTasks.confettiOptions;
+			confettiOptions = prplSuggestedTasks.confettiOptions;
 		}
 
 		for ( const value of confettiOptions ) {
@@ -208,9 +201,9 @@ const prplTriggerConfetti = () => {
 		}
 	};
 
-	setTimeout( progressPlannerRenderAttemptshoot, 0 );
-	setTimeout( progressPlannerRenderAttemptshoot, 100 );
-	setTimeout( progressPlannerRenderAttemptshoot, 200 );
+	setTimeout( prplRenderAttemptshoot, 0 );
+	setTimeout( prplRenderAttemptshoot, 100 );
+	setTimeout( prplRenderAttemptshoot, 200 );
 };
 
 /**
@@ -242,7 +235,7 @@ const prplStrikeCompletedTasks = () => {
 
 				// Get the task index.
 				let taskIndex = false;
-				window.progressPlannerSuggestedTasks.tasks.forEach(
+				window.prplSuggestedTasks.tasks.forEach(
 					( taskItem, index ) => {
 						if ( taskItem.task_id === taskId ) {
 							taskIndex = index;
@@ -252,9 +245,8 @@ const prplStrikeCompletedTasks = () => {
 
 				// Mark the task as completed.
 				if ( false !== taskIndex ) {
-					window.progressPlannerSuggestedTasks.tasks[
-						taskIndex
-					].status = 'completed';
+					window.prplSuggestedTasks.tasks[ taskIndex ].status =
+						'completed';
 				}
 
 				// Refresh the list.
@@ -272,13 +264,10 @@ const prplStrikeCompletedTasks = () => {
 	}, 2000 );
 };
 
-const prplPendingCelebration = progressPlannerGetItemsWithStatus(
+const prplPendingCelebration = prplSuggestedTasksGetItemsWithStatus(
 	'pending_celebration'
 );
-if (
-	! progressPlannerSuggestedTasks.delayCelebration &&
-	prplPendingCelebration.length
-) {
+if ( ! prplSuggestedTasks.delayCelebration && prplPendingCelebration.length ) {
 	setTimeout( () => {
 		// Trigger the celebration event.
 		document.dispatchEvent( new Event( 'prplCelebrateTasks' ) );
@@ -299,16 +288,14 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	}
 
 	// Loop through each type and inject items.
-	for ( const type in progressPlannerSuggestedTasks.maxItemsPerType ) {
+	for ( const type in prplSuggestedTasks.maxItemsPerType ) {
 		// Inject items, until we reach the maximum number of channel items.
 		while (
-			progressPlannerCountItems( type ) <
-				parseInt(
-					progressPlannerSuggestedTasks.maxItemsPerType[ type ]
-				) &&
-			progressPlannerGetNextItemFromType( type )
+			prplSuggestedTasksCountItems( type ) <
+				parseInt( prplSuggestedTasks.maxItemsPerType[ type ] ) &&
+			prplSuggestedTasksGetNextItemFromType( type )
 		) {
-			progressPlannerInjectNextItem( type );
+			prplSuggestedTasksInjectNextItem( type );
 		}
 	}
 
@@ -571,13 +558,11 @@ document.addEventListener(
 		}
 
 		while (
-			progressPlannerCountItems( type ) <
-				parseInt(
-					progressPlannerSuggestedTasks.maxItemsPerType[ type ]
-				) &&
-			progressPlannerGetNextItemFromType( type )
+			prplSuggestedTasksCountItems( type ) <
+				parseInt( prplSuggestedTasks.maxItemsPerType[ type ] ) &&
+			prplSuggestedTasksGetNextItemFromType( type )
 		) {
-			progressPlannerInjectNextItem( type );
+			prplSuggestedTasksInjectNextItem( type );
 		}
 
 		const event = new Event( 'prplResizeAllGridItemsEvent' );

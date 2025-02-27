@@ -213,7 +213,7 @@ final class Suggested_Tasks extends Widget {
 		// Localize the script.
 		\wp_localize_script(
 			$handle,
-			'progressPlannerSuggestedTasks',
+			'prplSuggestedTasks',
 			[
 				'ajaxUrl'          => \admin_url( 'admin-ajax.php' ),
 				'nonce'            => \wp_create_nonce( 'progress_planner' ),
