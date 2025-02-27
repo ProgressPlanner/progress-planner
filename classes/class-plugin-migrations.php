@@ -136,6 +136,9 @@ class Plugin_Migrations {
 		if ( ! empty( $suggested_tasks_option ) ) {
 			foreach ( $suggested_tasks_option as $status => $tasks ) {
 				foreach ( $tasks as $_task ) {
+					if ( is_string( $_task ) ) {
+						$_task = [ 'id' => $_task ];
+					}
 					$task           = ( new Local_Task_Factory( $_task['id'] ) )->get_task()->get_data();
 					$task['status'] = $status;
 					$task           = array_merge( $task, $_task );

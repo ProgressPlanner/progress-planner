@@ -399,7 +399,7 @@ class Suggested_Tasks {
 
 				// Get the post lengths of the snoozed tasks.
 				foreach ( $snoozed_tasks as $task ) {
-					$data = $this->local->get_data_from_task_id( $task['id'] ); // @phpstan-ignore-line method.nonObject
+					$data = $this->local->get_data_from_task_id( $task['task_id'] ); // @phpstan-ignore-line method.nonObject
 					if ( isset( $data['type'] ) && 'create-post' === $data['type'] ) {
 						$key = true === $data['long'] ? 'long' : 'short';
 						if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
