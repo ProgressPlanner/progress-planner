@@ -1,4 +1,4 @@
-/* global progressPlanner, progressPlannerAjaxRequest, prplOnboardRedirect */
+/* global progressPlanner, progressPlannerAjaxRequest */
 /*
  * Scan Posts
  *
@@ -32,6 +32,7 @@ const progressPlannerTriggerScan = () => {
 					progressBar.value = response.data.progress;
 				}
 
+				// eslint-disable-next-line no-console
 				console.info(
 					`Progress: ${ response.data.progress }%, (${ response.data.lastScanned }/${ response.data.lastPage })`
 				);
@@ -48,12 +49,15 @@ const progressPlannerTriggerScan = () => {
 				failCount = 0; // Reset fail count on success.
 			} catch ( error ) {
 				failCount++;
+				// eslint-disable-next-line no-console
 				console.warn( 'Failed to scan posts. Retrying...', error );
 			}
 
 			// 200ms delay between retries.
 			if ( ! isComplete && 10 >= failCount ) {
-				await new Promise( ( resolve ) => setTimeout( resolve, 200 ) );
+				await new Promise( ( resolveTimeout ) =>
+					setTimeout( resolveTimeout, 200 )
+				);
 			}
 		}
 
@@ -75,8 +79,13 @@ if ( document.getElementById( 'prpl-scan-button' ) ) {
 					action: 'progress_planner_reset_posts_data',
 					_ajax_nonce: progressPlanner.nonce,
 				},
-				successAction: progressPlannerTriggerScan,
-				failAction: progressPlannerTriggerScan,
-			} );
+			} )
+				.then( () => {
+					progressPlannerTriggerScan();
+				} )
+				.catch( ( error ) => {
+					// eslint-disable-next-line no-console
+					console.warn( error );
+				} );
 		} );
 }

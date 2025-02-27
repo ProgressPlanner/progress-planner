@@ -3,28 +3,16 @@
 /**
  * A helper to make AJAX requests.
  *
- * @param {Object}   params               The callback parameters.
- * @param {string}   params.url           The URL to send the request to.
- * @param {Object}   params.data          The data to send with the request.
- * @param {Function} params.successAction The callback to run on success.
- * @param {Function} params.failAction    The callback to run on failure.
+ * @param {Object} params      The callback parameters.
+ * @param {string} params.url  The URL to send the request to.
+ * @param {Object} params.data The data to send with the request.
  */
 // eslint-disable-next-line no-unused-vars
-const progressPlannerAjaxRequest = ( {
-	url,
-	data,
-	successAction,
-	failAction,
-} ) => {
+const progressPlannerAjaxRequest = ( { url, data } ) => {
 	return new Promise( ( resolve, reject ) => {
 		const http = new XMLHttpRequest();
 		http.open( 'POST', url, true );
 		http.onreadystatechange = () => {
-			const defaultCallback = ( response ) => {
-				// eslint-disable-next-line no-console
-				console.info( response );
-			};
-
 			let response;
 			try {
 				response = JSON.parse( http.response );
@@ -38,18 +26,10 @@ const progressPlannerAjaxRequest = ( {
 
 			if ( http.readyState === 4 ) {
 				if ( http.status === 200 ) {
-					successAction
-						? successAction( response )
-						: defaultCallback( response );
-
 					resolve( response );
 				}
 
 				// Request is completed, but the status is not 200.
-				failAction
-					? failAction( response )
-					: defaultCallback( response );
-
 				reject( response );
 			}
 		};

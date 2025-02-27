@@ -34,7 +34,8 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 	progressPlannerAjaxRequest( {
 		url: progressPlanner.onboardAPIUrl,
 		data,
-		successAction: ( response ) => {
+	} )
+		.then( ( response ) => {
 			// Show success message.
 			document.getElementById(
 				'no-license' === response.license_key
@@ -58,14 +59,13 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 			// Wait for all promises to resolve.
 			Promise.all( [ scanPromise, tasksPromise ] ).then( () => {
 				// All promises resolved, redirect to the next step.
-				prplOnboardRedirect();
+				// prplOnboardRedirect();
 			} );
-		},
-		failAction: ( response ) => {
+		} )
+		.catch( ( error ) => {
 			// eslint-disable-next-line no-console
-			console.warn( response );
-		},
-	} );
+			console.warn( error );
+		} );
 };
 
 /**
@@ -80,15 +80,14 @@ const progressPlannerOnboardCall = ( data ) => {
 	progressPlannerAjaxRequest( {
 		url: progressPlanner.onboardNonceURL,
 		data,
-		successAction: ( response ) => {
-			if ( 'ok' === response.status ) {
-				// Add the nonce to our data object.
-				data.nonce = response.nonce;
+	} ).then( ( response ) => {
+		if ( 'ok' === response.status ) {
+			// Add the nonce to our data object.
+			data.nonce = response.nonce;
 
-				// Make the request to the API.
-				progressPlannerAjaxAPIRequest( data );
-			}
-		},
+			// Make the request to the API.
+			progressPlannerAjaxAPIRequest( data );
+		}
 	} );
 };
 

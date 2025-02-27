@@ -13,7 +13,7 @@
  * @return {Promise} The promise of the tasks.
  */
 async function prplOnboardTasks() {
-	return new Promise( ( resolve, reject ) => {
+	return new Promise( ( resolve ) => {
 		( async () => {
 			const tasksElement = document.getElementById(
 				'prpl-onboarding-tasks'
@@ -31,7 +31,7 @@ async function prplOnboardTasks() {
 
 			// Create an array of Promises
 			const tasks = Array.from( listItems ).map( ( li, index ) => {
-				return new Promise( ( resolve ) => {
+				return new Promise( ( resolveTask ) => {
 					li.classList.add( 'prpl-onboarding-task-loading' );
 
 					setTimeout(
@@ -64,7 +64,7 @@ async function prplOnboardTasks() {
 									totalPoints + taskPoints + 'pt';
 							}
 
-							resolve(); // Mark this task as complete.
+							resolveTask(); // Mark this task as complete.
 						},
 						( index + 1 ) * timeToWait
 					);
@@ -75,8 +75,8 @@ async function prplOnboardTasks() {
 			await Promise.all( tasks );
 
 			// We add a small delay to make sure the user sees if the last task is completed and total points.
-			await new Promise( ( resolve ) =>
-				setTimeout( resolve, timeToWait )
+			await new Promise( ( resolveTimeout ) =>
+				setTimeout( resolveTimeout, timeToWait )
 			);
 
 			// Resolve the promise.
@@ -111,7 +111,7 @@ const prplOnboardRedirect = () => {
 				'.prpl-onboarding-task-completed'
 			).length > 0
 		) {
-			redirectUrl + '&delay-tour=true';
+			redirectUrl = redirectUrl + '&delay-tour=true';
 		}
 
 		window.location.href = redirectUrl;
