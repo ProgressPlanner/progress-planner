@@ -57,10 +57,8 @@ final class Suggested_Tasks extends Widget {
 	 * @return void
 	 */
 	public function register_scripts() {
-		$handle = 'progress-planner-' . $this->id;
-
 		\wp_register_script(
-			$handle,
+			'progress-planner-' . $this->id,
 			PROGRESS_PLANNER_URL . '/assets/js/widgets/suggested-tasks.js',
 			[
 				'progress-planner-todo',
