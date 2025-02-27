@@ -291,7 +291,7 @@ class Local_Tasks_Manager {
 			break;
 		}
 
-		$task           = \progress_planner()->get_settings()->get( 'local_tasks', $tasks );
+		$task           = ( new Local_Task_Factory( $task_id ) )->get_task()->get_data();
 		$task['status'] = 'pending';
 
 		if ( false !== $task_index ) {

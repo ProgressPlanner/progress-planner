@@ -119,7 +119,12 @@ class Plugin_Migrations {
 			foreach ( $local_tasks_option as $task_id ) {
 				$task           = ( new Local_Task_Factory( $task_id ) )->get_task()->get_data();
 				$task['status'] = 'pending';
-				$tasks[]        = $task;
+
+				if ( ! isset( $task['task_id'] ) ) {
+					continue;
+				}
+
+				$tasks[] = $task;
 			}
 			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 			\delete_option( 'progress_planner_local_tasks' );
