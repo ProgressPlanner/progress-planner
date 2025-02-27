@@ -102,7 +102,6 @@ const prplSuggestedTasksInjectNextItem = ( type ) => {
  * @param {Object} details The details of the todo item.
  */
 const prplSuggestedTasksInjectItem = ( details ) => {
-	// Clone the template element.
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const item = new Item( {
 		taskId: details.task_id,
