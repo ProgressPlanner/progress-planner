@@ -16,15 +16,6 @@ use Progress_Planner\Badges\Monthly;
 class Badges_Test extends \WP_UnitTestCase {
 
 	/**
-	 * Setup the test case.
-	 *
-	 * @return void
-	 */
-	public function set_up() {
-		parent::set_up();
-	}
-
-	/**
 	 * Test the content badges.
 	 *
 	 * @return void
