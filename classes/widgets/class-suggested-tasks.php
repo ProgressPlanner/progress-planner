@@ -141,7 +141,12 @@ final class Suggested_Tasks extends Widget {
 					'high'   => 0,
 					'medium' => 1,
 					'low'    => 2,
+					'none'   => 3,
 				];
+
+				$a['priority'] = ! isset( $a['priority'] ) || ! isset( $priority[ $a['priority'] ] ) ? 'none' : $a['priority'];
+				$b['priority'] = ! isset( $b['priority'] ) || ! isset( $priority[ $b['priority'] ] ) ? 'none' : $b['priority'];
+
 				return $priority[ $a['priority'] ] - $priority[ $b['priority'] ];
 			}
 		);
