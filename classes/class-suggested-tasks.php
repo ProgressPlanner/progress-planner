@@ -176,15 +176,6 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Get pending celebration tasks.
-	 *
-	 * @return array
-	 */
-	public function get_pending_celebration() {
-		return $this->get_tasks_by_status( 'pending_celebration' );
-	}
-
-	/**
 	 * Get remote tasks.
 	 *
 	 * @return array
@@ -324,24 +315,6 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Get the snoozed tasks.
-	 *
-	 * @return array
-	 */
-	public function get_snoozed_tasks() {
-		return $this->get_tasks_by_status( 'snoozed' );
-	}
-
-	/**
-	 * Get the completed tasks.
-	 *
-	 * @return array
-	 */
-	public function get_completed_tasks() {
-		return $this->get_tasks_by_status( 'completed' );
-	}
-
-	/**
 	 * Mark a task as snoozed.
 	 *
 	 * @param string $task_id The task ID.
@@ -430,55 +403,41 @@ class Suggested_Tasks {
 			]
 		);
 
-		switch ( $parsed_condition['type'] ) {
-			case 'completed':
-				if ( \in_array( $parsed_condition['task_id'], $this->get_completed_tasks(), true ) ) {
-					return true;
+		if ( 'snoozed-post-length' === $parsed_condition['type'] ) {
+			if ( isset( $parsed_condition['post_lengths'] ) ) {
+				if ( ! \is_array( $parsed_condition['post_lengths'] ) ) {
+					$parsed_condition['post_lengths'] = [ $parsed_condition['post_lengths'] ];
 				}
-				break;
 
-			case 'pending_celebration':
-				if ( \in_array( $parsed_condition['task_id'], $this->get_pending_celebration(), true ) ) {
-					return true;
-				}
-				break;
+				$snoozed_tasks        = $this->get_tasks_by_status( 'snoozed' );
+				$snoozed_post_lengths = [];
 
-			case 'snoozed':
-				if ( \in_array( $parsed_condition['task_id'], $this->get_snoozed_tasks(), true ) ) {
-					return true;
-				}
-				break;
-
-			case 'snoozed-post-length':
-				if ( isset( $parsed_condition['post_lengths'] ) ) {
-					if ( ! \is_array( $parsed_condition['post_lengths'] ) ) {
-						$parsed_condition['post_lengths'] = [ $parsed_condition['post_lengths'] ];
-					}
-
-					$snoozed_tasks        = $this->get_snoozed_tasks();
-					$snoozed_post_lengths = [];
-
-					// Get the post lengths of the snoozed tasks.
-					foreach ( $snoozed_tasks as $task ) {
-						$data = $this->local->get_data_from_task_id( $task['task_id'] ); // @phpstan-ignore-line method.nonObject
-						if ( isset( $data['type'] ) && 'create-post' === $data['type'] ) {
-							$key = true === $data['long'] ? 'long' : 'short';
-							if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
-								$snoozed_post_lengths[ $key ] = true;
-							}
+				// Get the post lengths of the snoozed tasks.
+				foreach ( $snoozed_tasks as $task ) {
+					$data = $this->local->get_data_from_task_id( $task['task_id'] ); // @phpstan-ignore-line method.nonObject
+					if ( isset( $data['type'] ) && 'create-post' === $data['type'] ) {
+						$key = true === $data['long'] ? 'long' : 'short';
+						if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
+							$snoozed_post_lengths[ $key ] = true;
 						}
 					}
-
-					// Check if the snoozed post lengths match the condition.
-					foreach ( $parsed_condition['post_lengths'] as $post_length ) {
-						if ( ! isset( $snoozed_post_lengths[ $post_length ] ) ) {
-							return false;
-						}
-					}
-
-					return true;
 				}
-				break;
+
+				// Check if the snoozed post lengths match the condition.
+				foreach ( $parsed_condition['post_lengths'] as $post_length ) {
+					if ( ! isset( $snoozed_post_lengths[ $post_length ] ) ) {
+						return false;
+					}
+				}
+
+				return true;
+			}
+		}
+
+		foreach ( $this->get_tasks_by_status( $parsed_condition['type'] ) as $task ) {
+			if ( $task['task_id'] === $parsed_condition['task_id'] ) {
+				return true;
+			}
 		}
 
 		return false;
@@ -492,24 +451,15 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function was_task_completed( $task_id ) {
+		foreach ( \progress_planner()->get_settings()->get( 'local_tasks', [] ) as $task ) {
+			if ( ! isset( $task['task_id'] ) || $task['task_id'] !== $task_id ) {
+				continue;
+			}
 
-		return (
-			// Check if the task was pending celebration.
-			true === $this->check_task_condition(
-				[
-					'type'    => 'pending_celebration',
-					'task_id' => $task_id,
-				]
-			)
-			||
-			// Check if the task was completed.
-			true === $this->check_task_condition(
-				[
-					'type'    => 'completed',
-					'task_id' => $task_id,
-				]
-			)
-		);
+			return isset( $task['status'] ) && ( 'completed' === $task['status'] || 'pending_celebration' === $task['status'] );
+		}
+
+		return false;
 	}
 
 	/**
