@@ -289,7 +289,9 @@ class Review extends Content {
 			return;
 		}
 
-		foreach ( \progress_planner()->get_settings()->get( 'local_tasks', [] ) as $task_data ) {
+		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks_changed = false;
+		foreach ( $tasks as $task_key => $task_data ) {
 			if (
 				$this->get_provider_type() === $task_data['type'] &&
 				(
@@ -298,8 +300,13 @@ class Review extends Content {
 				)
 			) {
 				// Remove the task from the pending local tasks list.
-				\progress_planner()->get_suggested_tasks()->get_local()->remove_pending_task( $task_id ); // @phpstan-ignore-line method.nonObject
+				unset( $tasks[ $task_key ] );
+				$tasks_changed = true;
 			}
+		}
+
+		if ( $tasks_changed ) {
+			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 		}
 	}
 }

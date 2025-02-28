@@ -111,9 +111,6 @@ class Suggested_Tasks {
 			$task_id = $task_data['task_id'];
 
 			if ( $task_data['type'] === $update_core_provider_id && \gmdate( 'YW' ) === $task_data['year_week'] ) {
-				// Remove from local (pending tasks).
-				$this->local->remove_pending_task( $task_id ); // @phpstan-ignore-line method.nonObject
-
 				// Change the task status to completed.
 				$this->mark_task_as_completed( $task_id );
 

@@ -303,24 +303,6 @@ class Local_Tasks_Manager {
 	}
 
 	/**
-	 * Remove a pending local task.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool
-	 */
-	public function remove_pending_task( $task_id ) {
-		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		foreach ( $tasks as $key => $task ) {
-			if ( ! isset( $task['task_id'] ) || $task['task_id'] !== $task_id ) {
-				continue;
-			}
-			unset( $tasks[ $key ] );
-		}
-		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
-	}
-
-	/**
 	 * Remove all tasks which have date set to the previous week.
 	 * Tasks for the current week will be added automatically.
 	 *
