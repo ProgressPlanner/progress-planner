@@ -118,7 +118,7 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 		}
 
 		foreach ( $snoozed as $task ) {
-			$task_object = ( new Local_Task_Factory( $task['id'] ) )->get_task();
+			$task_object = ( new Local_Task_Factory( $task['task_id'] ) )->get_task();
 			$provider_id = $task_object->get_provider_id();
 
 			if ( $provider_id === $this->get_provider_id() ) {

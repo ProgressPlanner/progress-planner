@@ -260,7 +260,7 @@ class Review extends Content {
 
 		if ( \is_array( $snoozed ) && ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
-				$data = $this->get_data_from_task_id( $task['id'] );
+				$data = $this->get_data_from_task_id( $task['task_id'] );
 				if ( isset( $data['type'] ) && 'review-post' === $data['type'] ) {
 					$this->snoozed_post_ids[] = $data['post_id'];
 				}

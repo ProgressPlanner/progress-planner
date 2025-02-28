@@ -76,29 +76,15 @@ final class Suggested_Tasks extends Widget {
 		// Enqueue the script.
 		\wp_enqueue_script( $handle );
 
-		// Get all saved tasks (completed, pending celebration, snoozed).
-		$tasks = \progress_planner()->get_suggested_tasks()->get_saved_tasks();
-
+		// Get all saved tasks.
+		$tasks       = \progress_planner()->get_suggested_tasks()->get_tasks();
 		$final_tasks = [];
-		foreach ( \progress_planner()->get_suggested_tasks()->get_tasks() as $task ) {
-			$task['status']                  = 'pending';
+
+		foreach ( $tasks as $task ) {
+			$task['status']                  = $task['status'] ?? 'pending';
 			$final_tasks[ $task['task_id'] ] = $task;
 		}
 
-		foreach ( $tasks as $type => $tasks_for_type ) {
-			foreach ( $tasks_for_type as $task ) {
-				if ( is_array( $task ) ) {
-					$task = $task['id'];
-				}
-				$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task );
-				if ( empty( $task_details ) ) {
-					continue;
-				}
-				$final_tasks[ $task ] = $task_details;
-				// Add the status to the task.
-				$final_tasks[ $task ]['status'] = $type;
-			}
-		}
 		$final_tasks = array_values( $final_tasks );
 
 		// Sort the final tasks by priority. The priotity can be "high", "medium", "low", or "none".

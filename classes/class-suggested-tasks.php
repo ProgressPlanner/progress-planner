@@ -32,13 +32,6 @@ class Suggested_Tasks {
 	private $remote;
 
 	/**
-	 * The name of the settings option.
-	 *
-	 * @var string
-	 */
-	const OPTION_NAME = 'progress_planner_suggested_tasks';
-
-	/**
 	 * Constructor.
 	 *
 	 * @return void
@@ -166,41 +159,20 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Get an array of completed and snoozed tasks.
+	 * Get tasks by status.
+	 *
+	 * @param string $status The status.
 	 *
 	 * @return array
 	 */
-	public function get_saved_tasks() {
-		$option                        = \get_option( self::OPTION_NAME, [] );
-		$option['completed']           = $option['completed'] ?? [];
-		$option['snoozed']             = $option['snoozed'] ?? [];
-		$option['pending_celebration'] = $option['pending_celebration'] ?? [];
-
-		// Convert the task IDs to strings.
-		$option['completed']           = \array_map( 'strval', $option['completed'] );
-		$option['pending_celebration'] = \array_map( 'strval', $option['pending_celebration'] );
-		$option['snoozed']             = \array_map(
-			function ( $task ) {
-				return [
-					'id'   => (string) $task['id'],
-					'time' => (int) $task['time'],
-				];
-			},
-			$option['snoozed']
+	public function get_tasks_by_status( $status ) {
+		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		return array_filter(
+			$tasks,
+			function ( $task ) use ( $status ) {
+				return isset( $task['status'] ) && $task['status'] === $status;
+			}
 		);
-
-		// Remove items with id 0.
-		$option['completed']           = \array_values( \array_filter( $option['completed'] ) );
-		$option['pending_celebration'] = \array_values( \array_filter( $option['pending_celebration'] ) );
-		$option['snoozed']             = \array_values(
-			\array_filter(
-				$option['snoozed'],
-				function ( $task ) {
-					return $task['id'] > 0;
-				}
-			)
-		);
-		return $option;
 	}
 
 	/**
@@ -209,8 +181,7 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_pending_celebration() {
-		$option = \get_option( self::OPTION_NAME, [] );
-		return $option['pending_celebration'] ?? [];
+		return $this->get_tasks_by_status( 'pending_celebration' );
 	}
 
 	/**
@@ -271,44 +242,31 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function mark_task_as( $status, $task_id, $data = [] ) {
-		$option            = \get_option( self::OPTION_NAME, [] );
-		$option[ $status ] = isset( $option[ $status ] )
-			? $option[ $status ]
-			: [];
-
-		// Check if there's already an item with the same ID.
-		if ( 'snoozed' === $status ) {
-			$item_exists = false;
-			foreach ( $option[ $status ] as $key => $snoozed_task ) {
-				if ( $snoozed_task['id'] === $task_id ) {
-
-					// If task is already snoozed, update the time.
-					$option[ $status ][ $key ]['time'] = \time() + $data['time'];
-					$item_exists                       = true;
-					break;
-				}
+		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks_changed = false;
+		foreach ( $tasks as $key => $task ) {
+			if ( $task['task_id'] !== $task_id ) {
+				continue;
 			}
 
-			// If task is not snoozed, add it.
-			if ( ! $item_exists ) {
-				$option[ $status ][] = [
-					'id'   => (string) $task_id,
-					'time' => \time() + $data['time'],
-				];
-			}
-		} else {
-			if ( \in_array( $task_id, $option[ $status ], true ) ) {
-				return false;
+			$tasks[ $key ]['status'] = $status;
+			$tasks_changed           = true;
+
+			if ( 'snoozed' === $status ) {
+				$tasks[ $key ]['time'] = \time() + $data['time'];
 			}
 
-			$option[ $status ][] = (string) $task_id;
+			break;
 		}
 
-		return \update_option( self::OPTION_NAME, $option );
+		if ( ! $tasks_changed ) {
+			return false;
+		}
+		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 	}
 
 	/**
-	 * Mark a task as celebrated.
+	 * Remove a task from a given status (sets it as `pending`).
 	 *
 	 * @param string $status The status.
 	 * @param string $task_id The task ID.
@@ -316,29 +274,27 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function remove_task_from( $status, $task_id ) {
-		$option            = \get_option( self::OPTION_NAME, [] );
-		$option[ $status ] = isset( $option[ $status ] )
-			? $option[ $status ]
-			: [];
-		$remove_index      = false;
+		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks_changed = false;
 
-		if ( 'snoozed' === $status ) {
-			foreach ( $option[ $status ] as $key => $task ) {
-				if ( $task['id'] === $task_id ) {
-					$remove_index = $key;
-					break;
-				}
+		foreach ( $tasks as $key => $task ) {
+			if ( $task['task_id'] !== $task_id ) {
+				continue;
 			}
-		} else {
-			$remove_index = \array_search( $task_id, $option[ $status ], true );
+
+			if ( ! isset( $task['status'] ) || $task['status'] !== $status ) {
+				return false;
+			}
+
+			$tasks[ $key ]['status'] = 'pending';
+			$tasks_changed           = true;
 		}
 
-		if ( false === $remove_index ) {
+		if ( ! $tasks_changed ) {
 			return false;
 		}
 
-		unset( $option[ $status ][ $remove_index ] );
-		return \update_option( self::OPTION_NAME, $option );
+		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 	}
 
 	/**
@@ -373,8 +329,7 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_snoozed_tasks() {
-		$option = \get_option( self::OPTION_NAME, [] );
-		return $option['snoozed'] ?? [];
+		return $this->get_tasks_by_status( 'snoozed' );
 	}
 
 	/**
@@ -383,8 +338,7 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_completed_tasks() {
-		$option = \get_option( self::OPTION_NAME, [] );
-		return $option['completed'] ?? [];
+		return $this->get_tasks_by_status( 'completed' );
 	}
 
 	/**
@@ -435,16 +389,22 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	private function maybe_unsnooze_tasks() {
-		$option = \get_option( self::OPTION_NAME, [] );
-		if ( ! isset( $option['snoozed'] ) ) {
-			return;
-		}
-		$current_time = \time();
-
-		foreach ( $option['snoozed'] as $task ) {
-			if ( $task['time'] < $current_time ) {
-				$this->remove_task_from( 'snoozed', $task['id'] );
+		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks_changed = false;
+		foreach ( $tasks as $key => $task ) {
+			if ( $task['status'] !== 'snoozed' ) {
+				continue;
 			}
+
+			if ( isset( $task['time'] ) && $task['time'] < \time() ) {
+				$tasks[ $key ]['status'] = 'pending';
+				unset( $tasks[ $key ]['time'] );
+				$tasks_changed = true;
+			}
+		}
+
+		if ( $tasks_changed ) {
+			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 		}
 	}
 
@@ -500,7 +460,7 @@ class Suggested_Tasks {
 
 					// Get the post lengths of the snoozed tasks.
 					foreach ( $snoozed_tasks as $task ) {
-						$data = $this->local->get_data_from_task_id( $task['id'] ); // @phpstan-ignore-line method.nonObject
+						$data = $this->local->get_data_from_task_id( $task['task_id'] ); // @phpstan-ignore-line method.nonObject
 						if ( isset( $data['type'] ) && 'create-post' === $data['type'] ) {
 							$key = true === $data['long'] ? 'long' : 'short';
 							if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {

@@ -260,7 +260,7 @@ class Debug_Tools {
 		);
 
 		// Get suggested tasks.
-		$suggested_tasks = get_option( 'progress_planner_suggested_tasks', [] );
+		$suggested_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 
 		$menu_items = [
 			'completed'           => 'Completed',
@@ -277,25 +277,28 @@ class Debug_Tools {
 				]
 			);
 
-			if ( ! empty( $suggested_tasks[ $key ] ) ) {
-				foreach ( $suggested_tasks[ $key ] as $task_key => $task_id ) {
-
-					if ( 'snoozed' === $key ) {
-						$until = is_float( $task_id['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task_id['time'] ) . ')';
-						$title = $task_id['id'] . ' ' . $until;
-					} else {
-						$title = $task_id;
-					}
-
-					$admin_bar->add_node(
-						[
-							'id'     => 'prpl-suggested-' . $key . '-' . $title,
-							'parent' => 'prpl-suggested-' . $key,
-							'title'  => $title,
-						]
-					);
+			foreach ( $suggested_tasks as $task_key => $task ) {
+				if ( ! isset( $task['task_id'] ) ) {
+					continue;
 				}
-			} else {
+
+				if ( isset( $task['status'] ) && 'snoozed' === $task['status'] && isset( $task['time'] ) ) {
+					$until = is_float( $task['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['time'] ) . ')';
+					$title = $task['task_id'] . ' ' . $until;
+				} else {
+					$title = $task['task_id'];
+				}
+
+				$admin_bar->add_node(
+					[
+						'id'     => 'prpl-suggested-' . $key . '-' . $title,
+						'parent' => 'prpl-suggested-' . $key,
+						'title'  => $title,
+					]
+				);
+			}
+
+			if ( empty( $suggested_tasks[ $key ] ) ) {
 				$admin_bar->add_node(
 					[
 						'id'     => 'prpl-no-' . $key . '-tasks',
@@ -473,7 +476,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the option.
-		delete_option( 'progress_planner_suggested_tasks' );
+		\progress_planner()->get_settings()->set( 'local_tasks', [] );
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( 'prpl_delete_suggested_tasks' ) );
