@@ -212,7 +212,7 @@ final class Suggested_Tasks extends Widget {
 	private function get_badge_urls() {
 		// Get the monthly badge URL.
 		$monthly_badge       = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
-		$badge_urls['month'] = 'https://progressplanner.com/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id();
+		$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id();
 
 		// Get the content and maintenance badge URLs.
 		foreach ( [ 'content', 'maintenance' ] as $context ) {
@@ -221,12 +221,12 @@ final class Suggested_Tasks extends Widget {
 			foreach ( $set_badges as $key => $badge ) {
 				$progress = $badge->get_progress();
 				if ( $progress['progress'] > 100 ) {
-					$badge_urls[ $context ] = 'https://progressplanner.com/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge->get_id();
+					$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge->get_id();
 				}
 			}
 			if ( ! isset( $badge_urls[ $context ] ) ) {
 				// Fallback to the first badge in the set if no badge is completed.
-				$badge_urls[ $context ] = 'https://progressplanner.com/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $set_badges[0]->get_id();
+				$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $set_badges[0]->get_id();
 			}
 		}
 
