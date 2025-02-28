@@ -289,9 +289,7 @@ class Review extends Content {
 			return;
 		}
 
-		foreach ( \progress_planner()->get_suggested_tasks()->get_local()->get_pending_tasks() as $task_id ) {
-			$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
-			$task_data   = $task_object->get_data();
+		foreach ( \progress_planner()->get_settings()->get( 'local_tasks', [] ) as $task_data ) {
 			if (
 				$this->get_provider_type() === $task_data['type'] &&
 				(
