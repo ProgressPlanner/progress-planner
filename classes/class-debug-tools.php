@@ -282,11 +282,10 @@ class Debug_Tools {
 					continue;
 				}
 
+				$title = $task['task_id'];
 				if ( isset( $task['status'] ) && 'snoozed' === $task['status'] && isset( $task['time'] ) ) {
-					$until = is_float( $task['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['time'] ) . ')';
-					$title = $task['task_id'] . ' ' . $until;
-				} else {
-					$title = $task['task_id'];
+					$until  = is_float( $task['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['time'] ) . ')';
+					$title .= ' ' . $until;
 				}
 
 				$admin_bar->add_node(
