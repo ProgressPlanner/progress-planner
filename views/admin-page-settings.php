@@ -37,7 +37,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php \progress_planner()->the_view( 'page-settings/settings.php' ); ?>
 		<?php \progress_planner()->the_view( 'page-settings/license.php' ); ?>
 
-		<?php wp_nonce_field( 'prpl-settings' ); ?>
+		<?php wp_nonce_field( 'progress_planner' ); ?>
 
 		<button
 			id="prpl-settings-submit"
