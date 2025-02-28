@@ -115,6 +115,16 @@ class Plugin_Migrations {
 		$local_tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 		$local_tasks_changed = false;
 
+		$add_local_task = function ( $task ) use ( &$local_tasks ) {
+			foreach ( $local_tasks as $key => $local_task ) {
+				if ( $local_task['task_id'] === $task['task_id'] ) {
+					$local_tasks[ $key ] = $task;
+					return;
+				}
+			}
+			$local_tasks[] = $task;
+		};
+
 		// Migrate the `progress_planner_local_tasks` option.
 		$local_tasks_option = \get_option( 'progress_planner_local_tasks', [] );
 		if ( ! empty( $local_tasks_option ) ) {
@@ -126,7 +136,7 @@ class Plugin_Migrations {
 					continue;
 				}
 
-				$local_tasks[]       = $task;
+				$add_local_task( $task );
 				$local_tasks_changed = true;
 			}
 			\delete_option( 'progress_planner_local_tasks' );
@@ -143,8 +153,7 @@ class Plugin_Migrations {
 					if ( 'snoozed' === $status && isset( $_task['time'] ) ) {
 						$task['time'] = $_task['time'];
 					}
-					$local_tasks[] = $task;
-
+					$add_local_task( $task );
 					$local_tasks_changed = true;
 				}
 			}
