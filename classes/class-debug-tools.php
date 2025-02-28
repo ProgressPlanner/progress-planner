@@ -83,8 +83,7 @@ class Debug_Tools {
 
 		$this->add_upgrading_tasks_submenu_item( $admin_bar );
 
-		$this->add_local_tasks_submenu_item( $admin_bar );
-		$this->add_suggestions_submenu_item( $admin_bar );
+		$this->add_suggested_tasks_submenu_item( $admin_bar );
 
 		$this->add_more_info_submenu_item( $admin_bar );
 	}
@@ -196,51 +195,6 @@ class Debug_Tools {
 	}
 
 	/**
-	 * Add Local Tasks submenu to the debug menu.
-	 *
-	 * Displays a list of local tasks or a message if none exist.
-	 *
-	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
-	 * @return void
-	 */
-	protected function add_local_tasks_submenu_item( $admin_bar ) {
-		// Add Local Tasks submenu item.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-local-tasks',
-				'parent' => 'prpl-debug',
-				'title'  => 'Local Tasks',
-			]
-		);
-
-		// Get and display local tasks.
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		if ( ! empty( $local_tasks ) ) {
-			foreach ( $local_tasks as $key => $task ) {
-				if ( ! isset( $task['task_id'] ) ) {
-					continue;
-				}
-
-				$admin_bar->add_node(
-					[
-						'id'     => 'prpl-local-task-' . $key,
-						'parent' => 'prpl-local-tasks',
-						'title'  => $task['task_id'],
-					]
-				);
-			}
-		} else {
-			$admin_bar->add_node(
-				[
-					'id'     => 'prpl-no-local-tasks',
-					'parent' => 'prpl-local-tasks',
-					'title'  => 'No local tasks found',
-				]
-			);
-		}
-	}
-
-	/**
 	 * Add Suggestion Tasks submenu to the debug menu.
 	 *
 	 * Displays lists of completed, snoozed, and pending celebration tasks.
@@ -248,7 +202,7 @@ class Debug_Tools {
 	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
 	 * @return void
 	 */
-	protected function add_suggestions_submenu_item( $admin_bar ) {
+	protected function add_suggested_tasks_submenu_item( $admin_bar ) {
 		// Add Suggested Tasks submenu item.
 		$admin_bar->add_node(
 			[
@@ -263,6 +217,7 @@ class Debug_Tools {
 		$suggested_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 
 		$menu_items = [
+			'pending'             => 'Pending',
 			'completed'           => 'Completed',
 			'snoozed'             => 'Snoozed',
 			'pending_celebration' => 'Pending Celebration',
@@ -278,7 +233,7 @@ class Debug_Tools {
 			);
 
 			foreach ( $suggested_tasks as $task_key => $task ) {
-				if ( ! isset( $task['task_id'] ) ) {
+				if ( ! isset( $task['task_id'] ) || $key !== $task['status'] ) {
 					continue;
 				}
 
@@ -293,16 +248,6 @@ class Debug_Tools {
 						'id'     => 'prpl-suggested-' . $key . '-' . $title,
 						'parent' => 'prpl-suggested-' . $key,
 						'title'  => $title,
-					]
-				);
-			}
-
-			if ( empty( $suggested_tasks[ $key ] ) ) {
-				$admin_bar->add_node(
-					[
-						'id'     => 'prpl-no-' . $key . '-tasks',
-						'parent' => 'prpl-suggested-' . $key,
-						'title'  => 'No ' . $title . ' tasks',
 					]
 				);
 			}
