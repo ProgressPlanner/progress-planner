@@ -350,9 +350,6 @@ class Suggested_Tasks {
 				break;
 		}
 
-		// Remove the task from the pending local tasks list.
-		$this->local->remove_pending_task( $task_id ); // @phpstan-ignore-line method.nonObject
-
 		return $this->mark_task_as_snoozed( $task_id, $time );
 	}
 
@@ -482,11 +479,6 @@ class Suggested_Tasks {
 
 		switch ( $action ) {
 			case 'complete':
-				// It's local task, remove it from pending tasks.
-				if ( false === strpos( $task_id, 'remote-task' ) ) {
-					$this->local->remove_pending_task( $task_id ); // @phpstan-ignore-line method.nonObject
-				}
-
 				// Mark the task as completed.
 				$this->mark_task_as( 'completed', $task_id );
 
