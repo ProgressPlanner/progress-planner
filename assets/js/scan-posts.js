@@ -1,4 +1,4 @@
-/* global progressPlanner, progressPlannerAjaxRequest, prplOnboardRedirect */
+/* global progressPlanner, progressPlannerAjaxRequest */
 /*
  * Scan Posts
  *
@@ -7,83 +7,63 @@
  * Dependencies: progress-planner-ajax-request, progress-planner-upgrade-tasks
  */
 
-// eslint-disable-next-line no-unused-vars
 const progressPlannerTriggerScan = () => {
 	document.getElementById( 'progress-planner-scan-progress' ).style.display =
 		'block';
 
-	/**
-	 * The action to run on a successful AJAX request.
-	 * This function should update the UI and re-trigger the scan if necessary.
-	 *
-	 * @param {Object} response The response from the server.
-	 *                          The response should contain a `progress` property.
-	 */
-	const successAction = ( response ) => {
+	return new Promise( async ( resolve, reject ) => {
 		const progressBar = document.querySelector(
 			'#progress-planner-scan-progress progress'
 		);
-		// Update the progressbar.
-		if ( response.data.progress > progressBar.value ) {
-			progressBar.value = response.data.progress;
+		let failCount = 0;
+		let isComplete = false;
+
+		while ( ! isComplete && 10 >= failCount ) {
+			try {
+				const response = await progressPlannerAjaxRequest( {
+					url: progressPlanner.ajaxUrl,
+					data: {
+						action: 'progress_planner_scan_posts',
+						_ajax_nonce: progressPlanner.nonce,
+					},
+				} );
+
+				if ( response.data.progress > progressBar.value ) {
+					progressBar.value = response.data.progress;
+				}
+
+				// eslint-disable-next-line no-console
+				console.info(
+					`Progress: ${ response.data.progress }%, (${ response.data.lastScanned }/${ response.data.lastPage })`
+				);
+
+				if ( 100 <= response.data.progress ) {
+					document.getElementById(
+						'progress-planner-scan-progress'
+					).style.display = 'none';
+
+					resolve();
+					isComplete = true; // Stops the loop.
+				}
+
+				failCount = 0; // Reset fail count on success.
+			} catch ( error ) {
+				failCount++;
+				// eslint-disable-next-line no-console
+				console.warn( 'Failed to scan posts. Retrying...', error );
+			}
+
+			// 200ms delay between retries.
+			if ( ! isComplete && 10 >= failCount ) {
+				await new Promise( ( resolveTimeout ) =>
+					setTimeout( resolveTimeout, 200 )
+				);
+			}
 		}
 
-		// eslint-disable-next-line no-console
-		console.info(
-			`Progress: ${ response.data.progress }%, (${ response.data.lastScanned }/${ response.data.lastPage })`
-		);
-
-		// Refresh the page when scan has finished.
-		if ( response.data.progress >= 100 ) {
-			const scanProgressElement = document.getElementById(
-				'progress-planner-scan-progress'
-			);
-
-			scanProgressElement.style.display = 'none';
-			scanProgressElement.setAttribute(
-				'data-onboarding-finished',
-				'true'
-			);
-
-			// Redirect if scanning is finished.
-			prplOnboardRedirect( 'scanPosts' );
-
-			return;
+		if ( 10 <= failCount ) {
+			reject( new Error( 'Max scan failures reached' ) );
 		}
-
-		progressPlannerTriggerScan();
-	};
-
-	const failAction = ( response ) => {
-		// If the window.progressPlannerFailScanCount is not defined, set it to 1.
-		if ( ! window.progressPlannerFailScanCount ) {
-			window.progressPlannerFailScanCount = 1;
-		} else {
-			window.progressPlannerFailScanCount++;
-		}
-
-		// If the scan has failed more than 10 times, stop retrying.
-		if ( window.progressPlannerFailScanCount > 10 ) {
-			return;
-		}
-
-		console.warn( 'Failed to scan posts. Retrying...' ); // eslint-disable-line no-console
-		console.log( response ); // eslint-disable-line no-console
-		// Retry after 200ms.
-		setTimeout( progressPlannerTriggerScan, 200 );
-	};
-
-	/**
-	 * The AJAX request to run.
-	 */
-	progressPlannerAjaxRequest( {
-		url: progressPlanner.ajaxUrl,
-		data: {
-			action: 'progress_planner_scan_posts',
-			_ajax_nonce: progressPlanner.nonce,
-		},
-		successAction,
-		failAction,
 	} );
 };
 
@@ -99,8 +79,13 @@ if ( document.getElementById( 'prpl-scan-button' ) ) {
 					action: 'progress_planner_reset_posts_data',
 					_ajax_nonce: progressPlanner.nonce,
 				},
-				successAction: progressPlannerTriggerScan,
-				failAction: progressPlannerTriggerScan,
-			} );
+			} )
+				.then( () => {
+					progressPlannerTriggerScan();
+				} )
+				.catch( ( error ) => {
+					// eslint-disable-next-line no-console
+					console.warn( error );
+				} );
 		} );
 }
