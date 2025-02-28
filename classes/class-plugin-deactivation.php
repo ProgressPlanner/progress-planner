@@ -24,13 +24,6 @@ class Plugin_Deactivation {
 	const PLUGIN_SLUG = 'progress-planner';
 
 	/**
-	 * The remote API URL to send the deactivation reason to.
-	 *
-	 * @var string
-	 */
-	const REMOTE_URL = 'https://progressplanner.com';
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -227,7 +220,7 @@ class Plugin_Deactivation {
 					};
 					deactivatePluginFeedbackAjaxRequest( {
 						// Get a nonce from the remote server.
-						url: '<?php echo \esc_url( self::REMOTE_URL ); ?>/?rest_route=/deactivation-feedback-server/v1/get-nonce',
+						url: '<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() ); ?>/?rest_route=/deactivation-feedback-server/v1/get-nonce',
 						data: requestData,
 						action: ( response ) => {
 							response = response || {};
@@ -240,7 +233,7 @@ class Plugin_Deactivation {
 
 							// Make the request to the remote server to submit the feedback.
 							deactivatePluginFeedbackAjaxRequest( {
-								url: '<?php echo \esc_url( self::REMOTE_URL ); ?>/?rest_route=/deactivation-feedback-server/v1/submit-feedback',
+								url: '<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() ); ?>/?rest_route=/deactivation-feedback-server/v1/submit-feedback',
 								data: requestData,
 								action: ( response ) => {
 									window.location.href = deactivateButton.href;
