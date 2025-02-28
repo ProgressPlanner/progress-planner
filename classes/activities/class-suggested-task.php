@@ -8,6 +8,7 @@
 namespace Progress_Planner\Activities;
 
 use Progress_Planner\Activity;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 
 /**
  * Handler for suggested tasks activities.
@@ -58,8 +59,13 @@ class Suggested_Task extends Activity {
 		$points = 1;
 
 		$data = \progress_planner()->get_suggested_tasks()->get_local()->get_data_from_task_id( $this->data_id );
-		if ( isset( $data['type'] ) && ( 'create-post' === $data['type'] || 'review-post' === $data['type'] ) && isset( $data['long'] ) && true === $data['long'] ) {
-			$points = 2;
+
+		// Award 2 points if last created post was long.
+		if ( isset( $data['type'] ) && ( 'create-post' === $data['type'] ) ) {
+			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
+				( new Local_Task_Factory( $data['task_id'] ) )->get_task()->get_provider_id()
+			);
+			$points        = $task_provider->get_number_of_points();
 		}
 
 		$this->points[ $date_ymd ] = $points;

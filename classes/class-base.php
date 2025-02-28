@@ -23,6 +23,7 @@ use Progress_Planner\Data_Collector\Sample_Page as Sample_Page_Data_Collector;
 use Progress_Planner\Data_Collector\Inactive_Plugins as Inactive_Plugins_Data_Collector;
 use Progress_Planner\Data_Collector\Uncategorized_Category as Uncategorized_Category_Data_Collector;
 use Progress_Planner\Data_Collector\Post_Author as Post_Author_Data_Collector;
+use Progress_Planner\Data_Collector\Create_Post as Create_Post_Data_Collector;
 
 /**
  * Main plugin class.
@@ -120,6 +121,7 @@ class Base {
 		( new Inactive_Plugins_Data_Collector() )->init();
 		( new Uncategorized_Category_Data_Collector() )->init();
 		( new Post_Author_Data_Collector() )->init();
+		( new Create_Post_Data_Collector() )->init();
 
 		// Debug tools.
 		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {
