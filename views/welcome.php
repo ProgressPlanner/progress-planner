@@ -87,9 +87,21 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 				<strong><?php \esc_html_e( 'Choose your preference:', 'progress-planner' ); ?></strong>
 				<div class="prpl-onboard-form-radio-select">
 					<label>
-						<input type="radio" name="with-email" value="yes" checked>
+						<input type="radio" name="with-email" value="weekly" checked>
 						<span class="prpl-label-content">
 							<?php \esc_html_e( 'Yes, send me weekly updates!', 'progress-planner' ); ?>
+						</span>
+					</label>
+					<label>
+						<input type="radio" name="with-email" value="monthly">
+						<span class="prpl-label-content">
+							<?php \esc_html_e( 'Monthly, tell me what to do next month!', 'progress-planner' ); ?>
+						</span>
+					</label>
+					<label>
+						<input type="radio" name="with-email" value="quarterly">
+						<span class="prpl-label-content">
+							<?php \esc_html_e( 'Quarterly, just keep me posted on your plugin updates.', 'progress-planner' ); ?>
 						</span>
 					</label>
 					<label>
@@ -161,7 +173,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 						<span>
 							<input
 								type="submit"
-								value="<?php \esc_attr_e( 'Get going and send me weekly emails', 'progress-planner' ); ?>"
+								value="<?php \esc_attr_e( 'Get going and send me emails', 'progress-planner' ); ?>"
 								class="prpl-button-primary"
 							>
 						</span>

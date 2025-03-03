@@ -103,6 +103,22 @@ if ( document.getElementById( 'prpl-onboarding-form' ) ) {
 						.forEach( ( inputField ) => {
 							inputField.required = false;
 						} );
+
+					// Hide the form fields and the primary button.
+					document
+						.getElementById( 'prpl-onboarding-form' )
+						.querySelectorAll(
+							'.prpl-form-fields, .prpl-button-primary'
+						)
+						.forEach( ( el ) => el.classList.add( 'prpl-hidden' ) );
+
+					// Show the secondary button.
+					document
+						.getElementById( 'prpl-onboarding-form' )
+						.querySelectorAll( '.prpl-button-secondary--no-email' )
+						.forEach( ( el ) =>
+							el.classList.remove( 'prpl-hidden' )
+						);
 				} else {
 					document
 						.getElementById( 'prpl-onboarding-form' )
@@ -115,13 +131,23 @@ if ( document.getElementById( 'prpl-onboarding-form' ) ) {
 								inputField.required = true;
 							}
 						} );
+
+					// Show the form fields and the primary button.
+					document
+						.getElementById( 'prpl-onboarding-form' )
+						.querySelectorAll(
+							'.prpl-form-fields, .prpl-button-primary'
+						)
+						.forEach( ( el ) =>
+							el.classList.remove( 'prpl-hidden' )
+						);
+
+					// Hide the secondary button.
+					document
+						.getElementById( 'prpl-onboarding-form' )
+						.querySelectorAll( '.prpl-button-secondary--no-email' )
+						.forEach( ( el ) => el.classList.add( 'prpl-hidden' ) );
 				}
-				document
-					.getElementById( 'prpl-onboarding-form' )
-					.querySelectorAll(
-						'.prpl-form-fields, .prpl-form-fields, .prpl-button-primary, .prpl-button-secondary--no-email'
-					)
-					.forEach( ( el ) => el.classList.toggle( 'prpl-hidden' ) );
 			} );
 		} );
 
