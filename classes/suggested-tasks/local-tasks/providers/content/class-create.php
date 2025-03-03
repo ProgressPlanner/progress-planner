@@ -102,7 +102,7 @@ class Create extends Repetitive {
 	 *
 	 * @return int
 	 */
-	public function get_number_of_points() {
+	public function get_points() {
 
 		// Get the post that was created last.
 		$last_published_post_data = $this->data_collector->collect();

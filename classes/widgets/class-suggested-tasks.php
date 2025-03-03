@@ -142,7 +142,7 @@ final class Suggested_Tasks extends Widget {
 
 					// Award 2 points if last created post was long.
 					if ( 'create-post' === $task_provider->get_provider_id() ) {
-							$task['points'] = $task_provider->get_number_of_points();
+							$task['points'] = $task_provider->get_points();
 					}
 
 					$final_tasks[ $key ] = $task;

@@ -65,7 +65,7 @@ class Suggested_Task extends Activity {
 			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
 				( new Local_Task_Factory( $data['task_id'] ) )->get_task()->get_provider_id()
 			);
-			$points        = $task_provider->get_number_of_points();
+			$points = $task_provider->get_points();
 		}
 
 		$this->points[ $date_ymd ] = $points;
