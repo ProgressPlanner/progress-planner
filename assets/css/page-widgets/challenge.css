@@ -15,14 +15,13 @@
 		}
 
 		.prpl-challenge-content {
-			position: relative;
 
 			.prpl-challenge-promo-notice {
 				position: absolute;
-				bottom: 0;
-				left: 0;
+				bottom: var(--prpl-padding);
+				left: var(--prpl-padding);
 				z-index: 1;
-				width: calc(100% - (var(--prpl-padding) * 2));
+				width: calc(100% - (var(--prpl-padding) * 4));
 				background-color: #fff;
 				border: 1px solid var(--prpl-color-gray-2);
 				padding: var(--prpl-padding);
