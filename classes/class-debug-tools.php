@@ -83,8 +83,7 @@ class Debug_Tools {
 
 		$this->add_upgrading_tasks_submenu_item( $admin_bar );
 
-		$this->add_local_tasks_submenu_item( $admin_bar );
-		$this->add_suggestions_submenu_item( $admin_bar );
+		$this->add_suggested_tasks_submenu_item( $admin_bar );
 
 		$this->add_more_info_submenu_item( $admin_bar );
 	}
@@ -196,47 +195,6 @@ class Debug_Tools {
 	}
 
 	/**
-	 * Add Local Tasks submenu to the debug menu.
-	 *
-	 * Displays a list of local tasks or a message if none exist.
-	 *
-	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
-	 * @return void
-	 */
-	protected function add_local_tasks_submenu_item( $admin_bar ) {
-		// Add Local Tasks submenu item.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-local-tasks',
-				'parent' => 'prpl-debug',
-				'title'  => 'Local Tasks',
-			]
-		);
-
-		// Get and display local tasks.
-		$local_tasks = get_option( 'progress_planner_local_tasks', [] );
-		if ( ! empty( $local_tasks ) ) {
-			foreach ( $local_tasks as $key => $task ) {
-				$admin_bar->add_node(
-					[
-						'id'     => 'prpl-local-task-' . $key,
-						'parent' => 'prpl-local-tasks',
-						'title'  => $task,
-					]
-				);
-			}
-		} else {
-			$admin_bar->add_node(
-				[
-					'id'     => 'prpl-no-local-tasks',
-					'parent' => 'prpl-local-tasks',
-					'title'  => 'No local tasks found',
-				]
-			);
-		}
-	}
-
-	/**
 	 * Add Suggestion Tasks submenu to the debug menu.
 	 *
 	 * Displays lists of completed, snoozed, and pending celebration tasks.
@@ -244,7 +202,7 @@ class Debug_Tools {
 	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
 	 * @return void
 	 */
-	protected function add_suggestions_submenu_item( $admin_bar ) {
+	protected function add_suggested_tasks_submenu_item( $admin_bar ) {
 		// Add Suggested Tasks submenu item.
 		$admin_bar->add_node(
 			[
@@ -256,9 +214,10 @@ class Debug_Tools {
 		);
 
 		// Get suggested tasks.
-		$suggested_tasks = get_option( 'progress_planner_suggested_tasks', [] );
+		$suggested_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 
 		$menu_items = [
+			'pending'             => 'Pending',
 			'completed'           => 'Completed',
 			'snoozed'             => 'Snoozed',
 			'pending_celebration' => 'Pending Celebration',
@@ -273,30 +232,22 @@ class Debug_Tools {
 				]
 			);
 
-			if ( ! empty( $suggested_tasks[ $key ] ) ) {
-				foreach ( $suggested_tasks[ $key ] as $task_key => $task_id ) {
-
-					if ( 'snoozed' === $key ) {
-						$until = is_float( $task_id['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task_id['time'] ) . ')';
-						$title = $task_id['id'] . ' ' . $until;
-					} else {
-						$title = $task_id;
-					}
-
-					$admin_bar->add_node(
-						[
-							'id'     => 'prpl-suggested-' . $key . '-' . $title,
-							'parent' => 'prpl-suggested-' . $key,
-							'title'  => $title,
-						]
-					);
+			foreach ( $suggested_tasks as $task_key => $task ) {
+				if ( ! isset( $task['task_id'] ) || $key !== $task['status'] ) {
+					continue;
 				}
-			} else {
+
+				$title = $task['task_id'];
+				if ( isset( $task['status'] ) && 'snoozed' === $task['status'] && isset( $task['time'] ) ) {
+					$until  = is_float( $task['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['time'] ) . ')';
+					$title .= ' ' . $until;
+				}
+
 				$admin_bar->add_node(
 					[
-						'id'     => 'prpl-no-' . $key . '-tasks',
+						'id'     => 'prpl-suggested-' . $key . '-' . $title,
 						'parent' => 'prpl-suggested-' . $key,
-						'title'  => 'No ' . $title . ' tasks',
+						'title'  => $title,
 					]
 				);
 			}
@@ -325,7 +276,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the option.
-		delete_option( 'progress_planner_local_tasks' );
+		\progress_planner()->get_settings()->set( 'local_tasks', [] );
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( 'prpl_delete_local_tasks' ) );
@@ -469,7 +420,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the option.
-		delete_option( 'progress_planner_suggested_tasks' );
+		\progress_planner()->get_settings()->set( 'local_tasks', [] );
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( 'prpl_delete_suggested_tasks' ) );
