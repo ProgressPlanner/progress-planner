@@ -162,6 +162,7 @@ class Review extends Content {
 		$post         = \get_post( $data['post_id'] );
 		$task_details = [
 			'task_id'     => $task_id,
+			'provider_id' => $this->get_provider_id(),
 			// translators: %1$s: The post type, %2$s: The post title.
 			'title'       => sprintf(
 				'Review %1$s "%2$s"',
