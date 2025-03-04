@@ -10,7 +10,7 @@ namespace Progress_Planner;
 use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
 use Progress_Planner\Suggested_Tasks\Remote_Tasks;
 use Progress_Planner\Activities\Suggested_Task;
-
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
 /**
  * Suggested_Tasks class.
  */
@@ -103,13 +103,12 @@ class Suggested_Tasks {
 			return;
 		}
 
-		// ID of the 'Core_Update' provider.
-		$update_core_provider_id = 'update-core';
-
 		foreach ( $pending_tasks as $task_data ) {
 			$task_id = $task_data['task_id'];
 
-			if ( $task_data['type'] === $update_core_provider_id && \gmdate( 'YW' ) === $task_data['year_week'] ) {
+			if ( $task_data['type'] === ( new Core_Update() )->get_provider_id() &&
+				\gmdate( 'YW' ) === $task_data['year_week']
+			) {
 				// Change the task status to completed.
 				$this->mark_task_as_completed( $task_id );
 
