@@ -40,7 +40,7 @@ class Local_Task_Factory {
 
 			$last_pos = strrpos( $this->task_id, '-' );
 
-			// Check if the task ID ends with a '-12345' or not.
+			// Check if the task ID ends with a '-12345' or not - one time tasks.
 			if ( $last_pos === false || ! preg_match( '/-\d+$/', $this->task_id ) ) {
 				return new Task_Local(
 					[
@@ -50,20 +50,37 @@ class Local_Task_Factory {
 				);
 			}
 
-			$type        = substr( $this->task_id, 0, $last_pos );
-			$task_suffix = substr( $this->task_id, $last_pos + 1 );
+			// Handle review-post tasks.
+			if ( 0 === strpos( $this->task_id, 'review-post' ) ) {
 
-			$task_suffix_key = 'remote-task' === $type ? 'remote_task_id' : 'year_week';
+				// $data = [ 'review-post', '123', '202449' ] .
+				$data = explode( '-', $this->task_id );
 
-			return new Task_Local(
-				[
-					'task_id'        => $this->task_id,
-					'type'           => $type,
-					$task_suffix_key => $task_suffix,
-				]
-			);
+				return new Task_Local(
+					[
+						'task_id'   => $this->task_id,
+						'type'      => 'review-post',
+						'post_id'   => $data[1],
+						'year_week' => $data[2],
+					]
+				);
+			} else {
+				$type        = substr( $this->task_id, 0, $last_pos );
+				$task_suffix = substr( $this->task_id, $last_pos + 1 );
+
+				$task_suffix_key = 'remote-task' === $type ? 'remote_task_id' : 'year_week';
+
+				return new Task_Local(
+					[
+						'task_id'        => $this->task_id,
+						'type'           => $type,
+						$task_suffix_key => $task_suffix,
+					]
+				);
+			}
 		}
 
+		// Legacy piped format.
 		$data = [ 'task_id' => $this->task_id ];
 
 		// Parse detailed format.
