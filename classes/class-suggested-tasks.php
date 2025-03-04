@@ -364,8 +364,12 @@ class Suggested_Tasks {
 			}
 
 			if ( isset( $task['time'] ) && $task['time'] < \time() ) {
-				$tasks[ $key ]['status'] = 'pending';
-				unset( $tasks[ $key ]['time'] );
+				if ( isset( $task['type'] ) && 'user' === $task['type'] ) {
+					$tasks[ $key ]['status'] = 'pending';
+					unset( $tasks[ $key ]['time'] );
+				} else {
+					unset( $tasks[ $key ] );
+				}
 				$tasks_changed = true;
 			}
 		}
