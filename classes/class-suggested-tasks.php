@@ -10,7 +10,6 @@ namespace Progress_Planner;
 use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
 use Progress_Planner\Suggested_Tasks\Remote_Tasks;
 use Progress_Planner\Activities\Suggested_Task;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 
 /**
  * Suggested_Tasks class.
