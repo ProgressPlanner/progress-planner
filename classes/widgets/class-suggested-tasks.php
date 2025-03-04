@@ -9,6 +9,7 @@ namespace Progress_Planner\Widgets;
 
 use Progress_Planner\Badges\Monthly;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Review;
 
 /**
  * Suggested_Tasks class.
@@ -146,7 +147,7 @@ final class Suggested_Tasks extends Widget {
 
 		$max_items_per_type = [];
 		foreach ( $final_tasks as $task ) {
-			$max_items_per_type[ $task['type'] ] = $task['type'] === 'content-update' ? 2 : 1;
+			$max_items_per_type[ $task['provider_id'] ] = $task['provider_id'] === ( new Review() )->get_provider_id() ? 2 : 1;
 		}
 
 		// We want all pending_celebration' tasks to be shown.
