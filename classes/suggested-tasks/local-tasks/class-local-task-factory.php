@@ -44,8 +44,9 @@ class Local_Task_Factory {
 			if ( $last_pos === false || ! preg_match( '/-\d+$/', $this->task_id ) ) {
 				return new Task_Local(
 					[
-						'task_id' => $this->task_id,
-						'type'    => $this->task_id,
+						'task_id'     => $this->task_id,
+						'type'        => $this->task_id,
+						'provider_id' => $this->task_id,
 					]
 				);
 			}
@@ -59,6 +60,7 @@ class Local_Task_Factory {
 				[
 					'task_id'        => $this->task_id,
 					'type'           => $type,
+					'provider_id'    => $this->task_id,
 					$task_suffix_key => $task_suffix,
 				]
 			);
@@ -83,6 +85,8 @@ class Local_Task_Factory {
 		if ( isset( $data['long'] ) ) {
 			$data['long'] = (bool) $data['long'];
 		}
+
+		$data['provider_id'] = $data['provider_id'] ?? $data['type'];
 
 		return new Task_Local( $data );
 	}
