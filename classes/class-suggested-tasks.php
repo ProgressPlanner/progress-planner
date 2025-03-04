@@ -10,7 +10,6 @@ namespace Progress_Planner;
 use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
 use Progress_Planner\Suggested_Tasks\Remote_Tasks;
 use Progress_Planner\Activities\Suggested_Task;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 
 /**
  * Suggested_Tasks class.
@@ -471,11 +470,11 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
 
-		if ( ! isset( $_POST['task_id'] ) || ! isset( $_POST['action_type'] ) ) {
+		if ( ! isset( $_POST['task_id'] ) || ! isset( $_POST['action'] ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing data.', 'progress-planner' ) ] );
 		}
 
-		$action  = \sanitize_text_field( \wp_unslash( $_POST['action_type'] ) );
+		$action  = \sanitize_text_field( \wp_unslash( $_POST['action'] ) );
 		$task_id = (string) \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) );
 
 		switch ( $action ) {

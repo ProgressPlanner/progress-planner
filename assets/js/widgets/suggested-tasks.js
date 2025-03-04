@@ -3,29 +3,32 @@
 /**
  * Count the number of items in the list.
  *
- * @param {string} type The type of items to count.
+ * @param {string} providerID The provider ID of items to count.
  * @return {number} The number of items in the list.
  */
-const prplSuggestedTasksCountItems = ( type ) => {
+const prplSuggestedTasksCountItems = ( providerID ) => {
 	// We want to display all pending celebration tasks on page load.
-	if ( 'pending_celebration' === type ) {
+	if ( 'pending_celebration' === providerID ) {
+		// TODO: This is a status, not a provider-ID.
 		return 0;
 	}
 
 	const items = document.querySelectorAll(
-		`.prpl-suggested-task[data-task-type="${ type }"]`
+		`.prpl-suggested-task[data-task-provider-id="${ providerID }"]`
 	);
 	return items.length;
 };
 
 /**
- * Get all items of a type.
+ * Get all items of a provider.
  *
- * @param {string} type The type of items to get.
+ * @param {string} providerID The provider ID of items to get.
  * @return {Array} The items.
  */
-const prplSuggestedTasksGetItemsOfType = ( type ) => {
-	return prplSuggestedTasks.tasks.filter( ( task ) => type === task.type );
+const prplSuggestedTasksGetItemsOfProvider = ( providerID ) => {
+	return prplSuggestedTasks.tasks.filter(
+		( task ) => providerID === task.providerID
+	);
 };
 
 /**
@@ -43,14 +46,14 @@ const prplSuggestedTasksGetItemsWithStatus = ( status ) => {
 /**
  * Get the next item to inject.
  *
- * @param {string} type The type of items to get the next item from.
+ * @param {string} providerID The provider ID of items to get the next item from.
  * @return {Object} The next item to inject.
  */
-const prplSuggestedTasksGetNextItemFromType = ( type ) => {
-	// Get items of this type.
-	const itemsOfType = prplSuggestedTasksGetItemsOfType( type );
-	// If there are no items of this type, return null.
-	if ( 0 === itemsOfType.length ) {
+const prplSuggestedTasksGetNextItemFromProvider = ( providerID ) => {
+	// Get items of this category.
+	const itemsOfProvider = prplSuggestedTasksGetItemsOfProvider( providerID );
+	// If there are no items of this category, return null.
+	if ( 0 === itemsOfProvider.length ) {
 		return null;
 	}
 
@@ -62,7 +65,7 @@ const prplSuggestedTasksGetNextItemFromType = ( type ) => {
 			inList.push( item.getAttribute( 'data-task-id' ).toString() );
 		} );
 
-	const items = itemsOfType.filter( function ( item ) {
+	const items = itemsOfProvider.filter( function ( item ) {
 		// Remove items which are completed or snoozed.
 		if ( 'completed' === item.status || 'snoozed' === item.status ) {
 			return false;
@@ -85,10 +88,11 @@ const prplSuggestedTasksGetNextItemFromType = ( type ) => {
 
 /**
  * Inject the next item.
- * @param {string} type The type of items to inject the next item from.
+ *
+ * @param {string} providerID The provider ID of items to inject the next item from.
  */
-const prplSuggestedTasksInjectNextItem = ( type ) => {
-	const nextItem = prplSuggestedTasksGetNextItemFromType( type );
+const prplSuggestedTasksInjectNextItem = ( providerID ) => {
+	const nextItem = prplSuggestedTasksGetNextItemFromProvider( providerID );
 	if ( ! nextItem ) {
 		return;
 	}
@@ -111,7 +115,7 @@ const prplSuggestedTasksInjectItem = ( details ) => {
 		taskAction: details.action ?? '',
 		taskUrl: details.url ?? '',
 		taskDismissable: details.dismissable ?? false,
-		taskType: details.type ?? '',
+		providerID: details.providerID ?? '',
 	} );
 
 	/**
@@ -223,7 +227,7 @@ const prplStrikeCompletedTasks = () => {
 			.querySelectorAll( '.prpl-suggested-task-celebrated' )
 			.forEach( ( item ) => {
 				const taskId = item.getAttribute( 'data-task-id' ),
-					type = item.getAttribute( 'data-task-type' );
+					providerID = item.getAttribute( 'data-task-provider-id' );
 				const el = document.querySelector(
 					`.prpl-suggested-task[data-task-id="${ taskId }"]`
 				);
@@ -254,7 +258,7 @@ const prplStrikeCompletedTasks = () => {
 					{
 						detail: {
 							taskId,
-							type,
+							providerID,
 						},
 					}
 				);
@@ -286,15 +290,15 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		return;
 	}
 
-	// Loop through each type and inject items.
-	for ( const type in prplSuggestedTasks.maxItemsPerType ) {
+	// Loop through each provider and inject items.
+	for ( const providerID in prplSuggestedTasks.maxItemsPerType ) {
 		// Inject items, until we reach the maximum number of channel items.
 		while (
-			prplSuggestedTasksCountItems( type ) <
-				parseInt( prplSuggestedTasks.maxItemsPerType[ type ] ) &&
-			prplSuggestedTasksGetNextItemFromType( type )
+			prplSuggestedTasksCountItems( providerID ) <
+				parseInt( prplSuggestedTasks.maxItemsPerType[ providerID ] ) &&
+			prplSuggestedTasksGetNextItemFromProvider( providerID )
 		) {
-			prplSuggestedTasksInjectNextItem( type );
+			prplSuggestedTasksInjectNextItem( providerID );
 		}
 	}
 
@@ -550,18 +554,19 @@ document.addEventListener(
 document.addEventListener(
 	'prplMaybeInjectSuggestedTaskEvent',
 	( e ) => {
-		const type = e.detail.type;
+		const providerID = e.detail.providerID;
 
-		if ( 'pending_celebration' === type ) {
+		if ( 'pending_celebration' === providerID ) {
+			// TODO: This is a status, not a provider-ID.
 			return;
 		}
 
 		while (
-			prplSuggestedTasksCountItems( type ) <
-				parseInt( prplSuggestedTasks.maxItemsPerType[ type ] ) &&
-			prplSuggestedTasksGetNextItemFromType( type )
+			prplSuggestedTasksCountItems( providerID ) <
+				parseInt( prplSuggestedTasks.maxItemsPerType[ providerID ] ) &&
+			prplSuggestedTasksGetNextItemFromProvider( providerID )
 		) {
-			prplSuggestedTasksInjectNextItem( type );
+			prplSuggestedTasksInjectNextItem( providerID );
 		}
 
 		const event = new Event( 'prplResizeAllGridItemsEvent' );
