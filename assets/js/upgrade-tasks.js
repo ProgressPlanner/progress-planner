@@ -21,6 +21,7 @@ async function prplOnboardTasks() {
 			const timeToWait = 2000;
 
 			if ( ! tasksElement ) {
+				resolve();
 				return;
 			}
 
@@ -107,6 +108,7 @@ const prplOnboardRedirect = () => {
 
 		// Check if there are completed tasks, delay tour so the user can see the celebration.
 		if (
+			onboardingTasksElement &&
 			onboardingTasksElement.querySelectorAll(
 				'.prpl-onboarding-task-completed'
 			).length > 0
