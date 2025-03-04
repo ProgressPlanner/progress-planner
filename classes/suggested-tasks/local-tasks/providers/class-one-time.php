@@ -235,6 +235,7 @@ abstract class One_Time extends Local_Tasks {
 
 		return [
 			'task_id'      => $this->get_task_id(),
+			'provider_id'  => $this->get_provider_id(),
 			'title'        => $this->get_title(),
 			'parent'       => $this->get_parent(),
 			'priority'     => $this->get_priority(),

@@ -160,6 +160,7 @@ class Create extends Content {
 
 		$task_details = [
 			'task_id'     => $task_id,
+			'provider_id' => $this->get_provider_id(),
 			'title'       => isset( $data['long'] ) && $data['long']
 				? esc_html__( 'Create a long post', 'progress-planner' )
 				: esc_html__( 'Create a short post', 'progress-planner' ),

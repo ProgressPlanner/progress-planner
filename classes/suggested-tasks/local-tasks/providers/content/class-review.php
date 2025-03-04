@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
 /**
