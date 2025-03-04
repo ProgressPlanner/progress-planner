@@ -72,10 +72,10 @@ class Plugin_Upgrade_Tasks {
 			];
 		}
 
-		$newly_added_task_provider_ids = [];
+		$newly_added_task_provider_ids = \get_option( 'progress_planner_upgrade_popover_task_provider_ids', [] );
 
 		foreach ( $onboard_task_provider_ids as $task_provider_id ) {
-			if ( ! in_array( $task_provider_id, $old_task_providers, true ) ) {
+			if ( ! in_array( $task_provider_id, $old_task_providers, true ) && ! in_array( $task_provider_id, $newly_added_task_provider_ids, true ) ) {
 				$newly_added_task_provider_ids[] = $task_provider_id;
 			}
 		}
