@@ -129,5 +129,31 @@ class Plugin_Migrations {
 			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 			\delete_option( 'progress_planner_local_tasks' );
 		}
+
+		// Migrate the 'create-post' activities.
+		$activities = \progress_planner()->get_query()->query_activities(
+			[
+				'category' => 'suggested_task',
+				'type'     => 'completed',
+			]
+		);
+
+		if ( ! empty( $activities ) ) {
+			foreach ( $activities as $activity ) {
+				if ( false !== strpos( $activity->data_id, '|type/create-post' ) ) {
+					// TODO: Migrate activity to the new format. We need to save post lenght somehow in order to properly calculate the points.
+				}
+			}
+		}
+
+		// Migrate the 'create-post' completed tasks.
+		$completed_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		if ( ! empty( $completed_tasks ) ) {
+			foreach ( $completed_tasks as $task ) {
+				if ( false !== strpos( $task['task_id'], '|type/create-post' ) ) {
+					// TODO: Migrate task_id to new format.
+				}
+			}
+		}
 	}
 }
