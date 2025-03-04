@@ -23,13 +23,6 @@ final class Suggested_Tasks extends Widget {
 	protected $id = 'suggested-tasks';
 
 	/**
-	 * The tasks.
-	 *
-	 * @var array|null
-	 */
-	protected $pending_tasks = null;
-
-	/**
 	 * Get the score.
 	 *
 	 * @return int The score.
@@ -57,44 +50,16 @@ final class Suggested_Tasks extends Widget {
 	 * @return void
 	 */
 	public function register_scripts() {
-		$handle = 'progress-planner-' . $this->id;
-
-		$pending_celebration = \progress_planner()->get_suggested_tasks()->get_pending_celebration();
-		$pending_tasks       = $this->get_pending_tasks();
-		$deps                = [
-			'progress-planner-todo',
-			'progress-planner-grid-masonry',
-			'progress-planner-web-components-prpl-suggested-task',
-			'progress-planner-document-ready',
-		];
-
-		// Check if need to load confetti for the local tasks.
-		$load_confetti = ! empty( $pending_celebration );
-
-		foreach ( $pending_tasks as $type => $tasks ) {
-			foreach ( $tasks as $task ) {
-				if ( isset( $task['dismissable'] ) && $task['dismissable'] ) {
-					$load_confetti = true;
-					break 2; // Break out of the foreach loops.
-				}
-			}
-		}
-
-		// Check if need to load confetti.
-		if ( $load_confetti ) {
-			$deps[] = 'particles-confetti';
-		} else {
-			// Check if there are remote tasks to inject, checking here as it might involve an API call.
-			$remote_tasks = \progress_planner()->get_suggested_tasks()->get_remote_tasks();
-			if ( ! empty( $remote_tasks ) ) {
-				$deps[] = 'particles-confetti';
-			}
-		}
-
 		\wp_register_script(
-			$handle,
+			'progress-planner-' . $this->id,
 			PROGRESS_PLANNER_URL . '/assets/js/widgets/suggested-tasks.js',
-			$deps,
+			[
+				'progress-planner-todo',
+				'progress-planner-grid-masonry',
+				'progress-planner-web-components-prpl-suggested-task',
+				'progress-planner-document-ready',
+				'particles-confetti',
+			],
 			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/suggested-tasks.js' ),
 			true
 		);
@@ -111,29 +76,50 @@ final class Suggested_Tasks extends Widget {
 		// Enqueue the script.
 		\wp_enqueue_script( $handle );
 
-		// Get all saved tasks (completed, pending celebration, snoozed).
-		$tasks = \progress_planner()->get_suggested_tasks()->get_saved_tasks();
+		// If there are newly added task providers, delay the celebration in order not to get confetti behind the popover.
+		$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
+
+		// Get tasks from task providers and pending_celebration tasks.
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
+
+		// If we're not delaying the celebration, we need to get the pending_celebration tasks.
+		if ( ! $delay_celebration ) {
+			$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending_celebration' );
+
+			// If there are pending_celebration tasks, we need to add them to the tasks array.
+			if ( ! empty( $pending_celebration_tasks ) ) {
+
+				foreach ( $pending_celebration_tasks as $key => $task ) {
+					$task_id = $task['task_id'];
+
+					$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
+						( new Local_Task_Factory( $task_id ) )->get_task()->get_provider_id()
+					);
+
+					if ( $task_provider && $task_provider->capability_required() ) {
+						$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task_id );
+
+						if ( $task_details ) {
+							$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
+							$task_details['action']   = 'celebrate';
+							$task_details['status']   = 'pending_celebration';
+
+							$tasks[] = $task_details;
+						}
+
+						// Mark the pending celebration tasks as completed.
+						\progress_planner()->get_suggested_tasks()->transition_task_status( $task_id, 'pending_celebration', 'completed' );
+					}
+				}
+			}
+		}
 
 		$final_tasks = [];
-		foreach ( \progress_planner()->get_suggested_tasks()->get_tasks() as $task ) {
-			$task['status']                  = 'pending';
+		foreach ( $tasks as $task ) {
+			$task['status']                  = $task['status'] ?? 'pending';
 			$final_tasks[ $task['task_id'] ] = $task;
 		}
 
-		foreach ( $tasks as $type => $tasks_for_type ) {
-			foreach ( $tasks_for_type as $task ) {
-				if ( is_array( $task ) ) {
-					$task = $task['id'];
-				}
-				$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task );
-				if ( empty( $task_details ) ) {
-					continue;
-				}
-				$final_tasks[ $task ] = $task_details;
-				// Add the status to the task.
-				$final_tasks[ $task ]['status'] = $type;
-			}
-		}
 		$final_tasks = array_values( $final_tasks );
 
 		// Sort the final tasks by priority. The priotity can be "high", "medium", "low", or "none".
@@ -153,35 +139,6 @@ final class Suggested_Tasks extends Widget {
 				return $priority[ $a['priority'] ] - $priority[ $b['priority'] ];
 			}
 		);
-
-		// If there are newly added task providers, delay the celebration in order not to get confetti behind the popover.
-		$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
-
-		if ( ! $delay_celebration ) {
-			// Insert the pending celebration tasks as high priority tasks, so they are shown always.
-			foreach ( $final_tasks as $key => $task ) {
-				if ( ! isset( $task['status'] ) || 'pending_celebration' !== $task['status'] ) {
-					continue;
-				}
-
-				$task_id = $task['task_id'];
-
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
-					( new Local_Task_Factory( $task_id ) )->get_task()->get_provider_id()
-				);
-
-				if ( $task_provider && $task_provider->capability_required() ) {
-					$task['priority'] = 'high'; // Celebrate tasks are always on top.
-					$task['action']   = 'celebrate';
-					$task['type']     = 'pending_celebration';
-
-					$final_tasks[ $key ] = $task;
-
-					// Mark the pending celebration tasks as completed.
-					\progress_planner()->get_suggested_tasks()->transition_task_status( $task_id, 'pending_celebration', 'completed' );
-				}
-			}
-		}
 
 		$max_items_per_type = [];
 		foreach ( $final_tasks as $task ) {
@@ -230,32 +187,5 @@ final class Suggested_Tasks extends Widget {
 				'delayCelebration' => $delay_celebration,
 			]
 		);
-	}
-
-	/**
-	 * Get the tasks.
-	 *
-	 * @return array The tasks.
-	 */
-	public function get_pending_tasks() {
-
-		if ( null === $this->pending_tasks ) {
-			$tasks         = [];
-			$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
-
-			// Sort them by type (channel).
-			foreach ( $pending_tasks as $task ) {
-
-				if ( ! isset( $tasks[ $task['type'] ] ) ) {
-					$tasks[ $task['type'] ] = [];
-				}
-
-				$tasks[ $task['type'] ][] = $task;
-			}
-
-			$this->pending_tasks = $tasks;
-		}
-
-		return $this->pending_tasks;
 	}
 }

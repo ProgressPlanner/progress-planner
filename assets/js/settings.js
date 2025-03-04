@@ -4,7 +4,7 @@
  *
  * A script to handle the settings page.
  *
- * Dependencies: progress-planner-ajax-request, wp-util
+ * Dependencies: progress-planner-ajax-request, progress-planner-onboard, wp-util
  */
 document
 	.getElementById( 'prpl-settings-form' )
@@ -45,7 +45,8 @@ if ( !! settingsLicenseForm ) {
 		progressPlannerAjaxRequest( {
 			url: progressPlanner.onboardNonceURL,
 			data,
-			successAction: ( response ) => {
+		} )
+			.then( ( response ) => {
 				if ( 'ok' === response.status ) {
 					// Add the nonce to our data object.
 					data.nonce = response.nonce;
@@ -54,7 +55,8 @@ if ( !! settingsLicenseForm ) {
 					progressPlannerAjaxRequest( {
 						url: progressPlanner.onboardAPIUrl,
 						data,
-						successAction: ( apiResponse ) => {
+					} )
+						.then( ( apiResponse ) => {
 							// Make a local request to save the response data.
 							progressPlannerSaveLicenseKey(
 								apiResponse.license_key
@@ -69,15 +71,17 @@ if ( !! settingsLicenseForm ) {
 								// Reload the page.
 								window.location.reload();
 							}, 500 );
-						},
-						failAction: ( apiResponse ) => {
+						} )
+						.catch( ( error ) => {
 							// eslint-disable-next-line no-console
-							console.warn( apiResponse );
-						},
-					} );
+							console.warn( error );
+						} );
 				}
-			},
-		} );
+			} )
+			.catch( ( error ) => {
+				// eslint-disable-next-line no-console
+				console.warn( error );
+			} );
 
 		document.getElementById( 'submit-license-key' ).disabled = true;
 		document.getElementById( 'submit-license-key' ).innerHTML =
