@@ -45,9 +45,9 @@ class Rename_Uncategorized_Category extends One_Time {
 		$this->title       = \esc_html__( 'Rename Uncategorized category', 'progress-planner' );
 		$this->url         = \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' );
 		$this->description = sprintf(
-			/* translators: %1$s <a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">We recommend</a> link */
+			/* translators: %1$s <a href="https://prpl.fyi/rename-uncategorized-category" target="_blank">We recommend</a> link */
 			\esc_html__( 'The Uncategorized category is used for posts that don\'t have a category. %1$s renaming it to something that fits your site better.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
+			'<a href="https://prpl.fyi/rename-uncategorized-category" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
 		);
 	}
 

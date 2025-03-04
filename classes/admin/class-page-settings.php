@@ -129,7 +129,7 @@ class Page_Settings {
 	 */
 	public function store_settings_form_options() {
 		// Check the nonce.
-		\check_admin_referer( 'prpl-settings' );
+		\check_admin_referer( 'progress_planner' );
 
 		if ( isset( $_POST['pages'] ) ) {
 			foreach ( wp_unslash( $_POST['pages'] ) as $type => $page_args ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized

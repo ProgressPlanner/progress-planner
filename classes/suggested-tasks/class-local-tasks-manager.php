@@ -35,17 +35,6 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface
 class Local_Tasks_Manager {
 
 	/**
-	 * The option name, holding pending local tasks.
-	 *
-	 * We're using an option to store these tasks,
-	 * because otherwise we have no way to keep track of
-	 * what was completed in order to award points.
-	 *
-	 * @var string
-	 */
-	const OPTION_NAME = 'progress_planner_local_tasks';
-
-	/**
 	 * The task providers.
 	 *
 	 * @var array
@@ -215,15 +204,18 @@ class Local_Tasks_Manager {
 	 * @return array
 	 */
 	public function evaluate_tasks() {
-		$tasks           = (array) $this->get_pending_tasks();
+		$tasks           = (array) \progress_planner()->get_settings()->get( 'local_tasks', [] );
 		$completed_tasks = [];
 
-		$tasks = \array_unique( $tasks );
-		foreach ( $tasks as $task_id ) {
+		foreach ( $tasks as $task_data ) {
+			if ( ! isset( $task_data['task_id'] ) ) {
+				continue;
+			}
+
+			$task_id = $task_data['task_id'];
 
 			$task_result = $this->evaluate_task( $task_id );
 			if ( false !== $task_result ) {
-				$this->remove_pending_task( $task_id );
 				$completed_tasks[] = $task_id;
 			}
 		}
@@ -281,41 +273,35 @@ class Local_Tasks_Manager {
 	}
 
 	/**
-	 * Get pending local tasks.
-	 *
-	 * @return array
-	 */
-	public function get_pending_tasks() {
-		return \get_option( self::OPTION_NAME, [] );
-	}
-
-	/**
 	 * Add a pending local task.
 	 *
-	 * @param string $task The task ID.
+	 * @param string $task_id The task ID.
 	 *
 	 * @return bool
 	 */
-	public function add_pending_task( $task ) {
-		$tasks = (array) $this->get_pending_tasks();
-		if ( \in_array( $task, $tasks, true ) ) {
-			return true;
-		}
-		$tasks[] = $task;
-		return \update_option( self::OPTION_NAME, $tasks );
-	}
+	public function add_pending_task( $task_id ) {
+		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 
-	/**
-	 * Remove a pending local task.
-	 *
-	 * @param string $task The task ID.
-	 *
-	 * @return bool
-	 */
-	public function remove_pending_task( $task ) {
-		$tasks = (array) $this->get_pending_tasks();
-		$tasks = \array_diff( $tasks, [ $task ] );
-		return \update_option( self::OPTION_NAME, $tasks );
+		$task_index = false;
+
+		foreach ( $tasks as $key => $task ) {
+			if ( ! isset( $task['task_id'] ) || $task_id !== $task['task_id'] ) {
+				continue;
+			}
+			$task_index = $key;
+			break;
+		}
+
+		$task           = ( new Local_Task_Factory( $task_id ) )->get_task()->get_data();
+		$task['status'] = 'pending';
+
+		if ( false !== $task_index ) {
+			$tasks[ $task_index ] = $task;
+		} else {
+			$tasks[] = $task;
+		}
+
+		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 	}
 
 	/**
@@ -332,7 +318,7 @@ class Local_Tasks_Manager {
 			return;
 		}
 
-		$tasks = (array) $this->get_pending_tasks();
+		$tasks = (array) \progress_planner()->get_settings()->get( 'local_tasks', [] );
 
 		if ( empty( $tasks ) ) {
 			return;
@@ -343,20 +329,17 @@ class Local_Tasks_Manager {
 		$tasks = \array_filter(
 			$tasks,
 			function ( $task ) {
-				$task_object = ( new Local_Task_Factory( $task ) )->get_task();
-				$task_data   = $task_object->get_data();
-
 				// If the task was already completed, remove it.
-				if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_data['task_id'] ) ) {
+				if ( 'completed' === $task['status'] ) {
 					return false;
 				}
 
-				if ( isset( $task_data['year_week'] ) ) {
-					return \gmdate( 'YW' ) === $task_data['year_week'];
+				if ( isset( $task['year_week'] ) ) {
+					return \gmdate( 'YW' ) === $task['year_week'];
 				}
 
 				// We have changed type name, so we need to remove all tasks of the old type.
-				if ( isset( $task_data['type'] ) && 'update-post' === $task_data['type'] ) {
+				if ( isset( $task['type'] ) && 'update-post' === $task['type'] ) {
 					return false;
 				}
 
@@ -365,7 +348,7 @@ class Local_Tasks_Manager {
 		);
 
 		if ( count( $tasks ) !== $task_count ) {
-			\update_option( self::OPTION_NAME, $tasks );
+			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 		}
 
 		\progress_planner()->get_cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );
