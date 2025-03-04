@@ -23,11 +23,11 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	protected const TYPE = '';
 
 	/**
-	 * The ID of the task.
+	 * The ID of the task provider.
 	 *
 	 * @var string
 	 */
-	protected const ID = '';
+	protected const PROVIDER_ID = '';
 
 	/**
 	 * The capability required to perform the task.
@@ -58,7 +58,7 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	 * @return string
 	 */
 	public function get_provider_id() {
-		return static::ID;
+		return static::PROVIDER_ID;
 	}
 
 	/**

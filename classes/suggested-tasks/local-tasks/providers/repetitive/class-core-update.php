@@ -25,7 +25,7 @@ class Core_Update extends Repetitive {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'update-core';
+	protected const PROVIDER_ID = 'update-core';
 
 	/**
 	 * The capability required to perform the task.

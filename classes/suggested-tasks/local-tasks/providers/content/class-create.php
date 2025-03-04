@@ -20,7 +20,7 @@ class Create extends Content {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'create-post';
+	protected const PROVIDER_ID = 'create-post';
 
 	/**
 	 * The provider type.

@@ -20,7 +20,7 @@ class Review extends Content {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'review-post';
+	protected const PROVIDER_ID = 'review-post';
 
 	/**
 	 * The provider type.
