@@ -214,7 +214,6 @@ class Local_Tasks_Manager {
 
 			$task_result = $this->evaluate_task( $task_id );
 			if ( false !== $task_result ) {
-				$this->remove_pending_task( $task_id );
 				$completed_tasks[] = $task_id;
 			}
 		}
@@ -300,24 +299,6 @@ class Local_Tasks_Manager {
 			$tasks[] = $task;
 		}
 
-		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
-	}
-
-	/**
-	 * Remove a pending local task.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool
-	 */
-	public function remove_pending_task( $task_id ) {
-		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		foreach ( $tasks as $key => $task ) {
-			if ( ! isset( $task['task_id'] ) || $task['task_id'] !== $task_id ) {
-				continue;
-			}
-			unset( $tasks[ $key ] );
-		}
 		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 	}
 
