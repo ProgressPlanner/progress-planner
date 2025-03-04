@@ -60,7 +60,7 @@ class Local_Task_Factory {
 				[
 					'task_id'        => $this->task_id,
 					'type'           => $type,
-					'provider_id'    => $this->task_id,
+					'provider_id'    => $type,
 					$task_suffix_key => $task_suffix,
 				]
 			);
