@@ -66,6 +66,7 @@ class Core_Update extends Repetitive {
 			'parent'      => 0,
 			'priority'    => 'high',
 			'type'        => $this->get_provider_type(),
+			'provider_id' => $this->get_provider_id(),
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'update-core.php' ) ) : '',
 			'description' => sprintf(
