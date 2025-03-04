@@ -15,6 +15,12 @@ const progressPlannerTriggerScan = () => {
 		const progressBar = document.querySelector(
 			'#progress-planner-scan-progress progress'
 		);
+
+		if ( ! progressBar ) {
+			resolve();
+			return;
+		}
+
 		let failCount = 0;
 		let isComplete = false;
 
