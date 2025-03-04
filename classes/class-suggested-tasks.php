@@ -106,7 +106,7 @@ class Suggested_Tasks {
 		foreach ( $pending_tasks as $task_data ) {
 			$task_id = $task_data['task_id'];
 
-			if ( $task_data['type'] === ( new Core_Update() )->get_provider_id() &&
+			if ( $task_data['provider_id'] === ( new Core_Update() )->get_provider_id() &&
 				\gmdate( 'YW' ) === $task_data['year_week']
 			) {
 				// Change the task status to completed.
