@@ -15,6 +15,13 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 class Reduce_Autoloaded_Options extends One_Time {
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected const IS_ONBOARDING_TASK = false;
+
+	/**
 	 * The provider type.
 	 *
 	 * @var string
@@ -139,7 +146,14 @@ class Reduce_Autoloaded_Options extends One_Time {
 		global $wpdb;
 
 		if ( null === $this->autoloaded_options_count ) {
-			$this->autoloaded_options_count = $wpdb->get_var( "SELECT COUNT(*) FROM `{$wpdb->options}` WHERE ( autoload = 'yes' OR autoload = 'on' )" );
+			$autoload_values = \wp_autoload_values_to_autoload();
+			$placeholders    = implode( ',', array_fill( 0, count( $autoload_values ), '%s' ) );
+
+			// phpcs:disable WordPress.DB
+			$this->autoloaded_options_count = $wpdb->get_var(
+				$wpdb->prepare( "SELECT COUNT(*) FROM `{$wpdb->options}` WHERE autoload IN ( $placeholders )", $autoload_values )
+			);
+
 		}
 
 		return $this->autoloaded_options_count;
