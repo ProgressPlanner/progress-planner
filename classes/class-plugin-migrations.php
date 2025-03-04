@@ -164,7 +164,7 @@ class Plugin_Migrations {
 		}
 
 		// Migrate the 'create-post' completed tasks.
-		$completed_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$completed_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'completed' );
 		if ( ! empty( $completed_tasks ) ) {
 			foreach ( $completed_tasks as $task ) {
 				if ( false !== strpos( $task['task_id'], '|type/create-post' ) ) {
