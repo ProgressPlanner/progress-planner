@@ -27,6 +27,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Permalink_St
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Php_Version;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engine_Visibility;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\User as User_Tasks;
 
 /**
  * Local_Tasks_Manager class.
@@ -61,6 +62,7 @@ class Local_Tasks_Manager {
 			new Permalink_Structure(),
 			new Php_Version(),
 			new Search_Engine_Visibility(),
+			new User_Tasks(),
 		];
 
 		/**
