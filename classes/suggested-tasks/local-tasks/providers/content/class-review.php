@@ -298,7 +298,7 @@ class Review extends Content {
 				)
 			) {
 				// Remove the task from the pending local tasks list.
-				\progress_planner()->get_suggested_tasks()->get_local()->remove_pending_task( $task_id ); // @phpstan-ignore-line method.nonObject
+				\progress_planner()->get_suggested_tasks()->get_local()->remove_pending_task( $task_data['task_id'] ); // @phpstan-ignore-line method.nonObject
 			}
 		}
 	}
