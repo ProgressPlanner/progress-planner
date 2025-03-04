@@ -68,7 +68,11 @@ class Core_Update extends Repetitive {
 			'type'        => $this->get_provider_type(),
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'update-core.php' ) ) : '',
-			'description' => '<p>' . \esc_html__( 'Perform all updates to ensure your website is secure and up-to-date.', 'progress-planner' ) . '</p>',
+			'description' => sprintf(
+				/* translators: %s:<a href="http://prpl.fyi/perform-all-updates" target="_blank">See why we recommend this</a> link */
+				\esc_html__( 'Regular updates improve security and performance. %s.', 'progress-planner' ),
+				'<a href="http://prpl.fyi/perform-all-updates" target="_blank">' . \esc_html__( 'See why we recommend this', 'progress-planner' ) . '</a>'
+			),
 		];
 	}
 }
