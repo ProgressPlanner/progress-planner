@@ -171,5 +171,18 @@ class Plugin_Migrations {
 		if ( $local_tasks_changed ) {
 			\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
 		}
+
+		// Migrate acgtivities saved in the progress_planner_activities table.
+		$activities = \progress_planner()->get_query()->query_activities(
+			[ 'category' => 'suggested_task' ],
+		);
+
+		foreach ( $activities as $activity ) {
+			$data_id = $activity->data_id;
+			if ( str_contains( $data_id, 'type' ) ) {
+				$activity->data_id = str_replace( 'type', 'category', $data_id );
+				$activity->save();
+			}
+		}
 	}
 }
