@@ -333,7 +333,7 @@ class Local_Tasks_Manager {
 				}
 
 				if ( isset( $task['date'] ) ) {
-					return \gmdate( 'YW' ) === $task['date'];
+					return (string) \gmdate( 'YW' ) === (string) $task['date'];
 				}
 
 				// We have changed category name, so we need to remove all tasks of the old category.
