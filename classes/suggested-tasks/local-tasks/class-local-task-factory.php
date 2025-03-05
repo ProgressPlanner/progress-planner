@@ -35,12 +35,12 @@ class Local_Task_Factory {
 	 */
 	public function get_task(): Task_Local {
 
-		// Parse simple format, e.g. 'update-core-202449'.
+		// Parse simple format, e.g. 'update-core-202449' or "hello-world".
 		if ( ! str_contains( $this->task_id, '|' ) ) {
 
 			$last_pos = strrpos( $this->task_id, '-' );
 
-			// Check if the task ID ends with a '-12345' or not.
+			// Check if the task ID ends with a '-12345' or not, if not that would be mostly one time tasks.
 			if ( $last_pos === false || ! preg_match( '/-\d+$/', $this->task_id ) ) {
 				return new Task_Local(
 					[
@@ -51,6 +51,7 @@ class Local_Task_Factory {
 				);
 			}
 
+			// Remote (remote-12345) or repetitive tasks (update-core-202449).
 			$category    = substr( $this->task_id, 0, $last_pos );
 			$task_suffix = substr( $this->task_id, $last_pos + 1 );
 
@@ -68,7 +69,7 @@ class Local_Task_Factory {
 
 		$data = [ 'task_id' => $this->task_id ];
 
-		// Parse detailed format.
+		// Parse detailed (piped) format (date/202510|long/1|category/create-post).
 		$parts = \explode( '|', $this->task_id );
 		foreach ( $parts as $part ) {
 			$part = \explode( '/', $part );
