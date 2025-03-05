@@ -66,7 +66,7 @@ class Local_Task_Factory {
 			if ( ! $task_provider ) {
 				return new Task_Local(
 					[
-						'task_id'     => $this->task_id,
+						'task_id' => $this->task_id,
 					]
 				);
 			} else {
