@@ -23,11 +23,11 @@ class Create extends Content {
 	protected const PROVIDER_ID = 'create-post';
 
 	/**
-	 * The provider type.
+	 * The provider category.
 	 *
 	 * @var string
 	 */
-	protected const TYPE = 'content-new';
+	protected const CATEGORY = 'content-new';
 
 	/**
 	 * The number of items to inject.
@@ -45,7 +45,7 @@ class Create extends Content {
 		// Early exit if we have both long and short posts snoozed.
 		if ( true === \progress_planner()->get_suggested_tasks()->check_task_condition(
 			[
-				'type'         => 'snoozed-post-length',
+				'status'       => 'snoozed-post-length',
 				'post_lengths' => [ 'long', 'short' ],
 			]
 		) ) {
@@ -70,7 +70,7 @@ class Create extends Content {
 		// If the task with this length is snoozed, don't add a task.
 		if ( true === \progress_planner()->get_suggested_tasks()->check_task_condition(
 			[
-				'type'         => 'snoozed-post-length',
+				'status'       => 'snoozed-post-length',
 				'post_lengths' => [ $is_last_post_long ? 'short' : 'long' ],
 			]
 		) ) {
@@ -79,9 +79,9 @@ class Create extends Content {
 
 		$task_id = $this->get_task_id_from_data(
 			[
-				'type' => 'create-post',
-				'date' => \gmdate( 'YW' ),
-				'long' => $is_last_post_long ? '0' : '1',
+				'category' => 'create-post',
+				'date'     => \gmdate( 'YW' ),
+				'long'     => $is_last_post_long ? '0' : '1',
 			]
 		);
 
@@ -135,10 +135,10 @@ class Create extends Content {
 
 		return $this->get_task_id_from_data(
 			[
-				'type'    => 'create-post',
-				'date'    => \gmdate( 'YW' ),
-				'post_id' => $last_post->ID,
-				'long'    => $is_post_long ? '1' : '0',
+				'category' => 'create-post',
+				'date'     => \gmdate( 'YW' ),
+				'post_id'  => $last_post->ID,
+				'long'     => $is_post_long ? '1' : '0',
 			]
 		);
 	}
@@ -166,7 +166,7 @@ class Create extends Content {
 				: esc_html__( 'Create a short post', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'medium',
-			'type'        => $this->get_provider_type(),
+			'category'    => $this->get_provider_category(),
 			'points'      => isset( $data['long'] ) && $data['long'] ? 2 : 1,
 			'url'         => \esc_url( \admin_url( 'post-new.php?post_type=post' ) ),
 			'description' => isset( $data['long'] ) && $data['long']

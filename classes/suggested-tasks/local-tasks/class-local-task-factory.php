@@ -45,22 +45,22 @@ class Local_Task_Factory {
 				return new Task_Local(
 					[
 						'task_id'     => $this->task_id,
-						'type'        => $this->task_id,
+						'category'    => $this->task_id,
 						'provider_id' => $this->task_id,
 					]
 				);
 			}
 
-			$type        = substr( $this->task_id, 0, $last_pos );
+			$category    = substr( $this->task_id, 0, $last_pos );
 			$task_suffix = substr( $this->task_id, $last_pos + 1 );
 
-			$task_suffix_key = 'remote-task' === $type ? 'remote_task_id' : 'year_week';
+			$task_suffix_key = 'remote-task' === $category ? 'remote_task_id' : 'year_week';
 
 			return new Task_Local(
 				[
 					'task_id'        => $this->task_id,
-					'type'           => $type,
-					'provider_id'    => $type,
+					'category'       => $category,
+					'provider_id'    => $category,
 					$task_suffix_key => $task_suffix,
 				]
 			);
@@ -85,8 +85,8 @@ class Local_Task_Factory {
 		if ( isset( $data['long'] ) ) {
 			$data['long'] = (bool) $data['long'];
 		}
-
-		$data['provider_id'] = $data['provider_id'] ?? $data['type'];
+		$data['category']    = $data['category'] ?? $data['type'];
+		$data['provider_id'] = $data['provider_id'] ?? $data['category'];
 
 		return new Task_Local( $data );
 	}

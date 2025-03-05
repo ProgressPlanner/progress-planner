@@ -291,11 +291,13 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	}
 
 	// Loop through each provider and inject items.
-	for ( const providerID in prplSuggestedTasks.maxItemsPerType ) {
+	for ( const providerID in prplSuggestedTasks.maxItemsPerProviderID ) {
 		// Inject items, until we reach the maximum number of channel items.
 		while (
 			prplSuggestedTasksCountItems( providerID ) <
-				parseInt( prplSuggestedTasks.maxItemsPerType[ providerID ] ) &&
+				parseInt(
+					prplSuggestedTasks.maxItemsPerProviderID[ providerID ]
+				) &&
 			prplSuggestedTasksGetNextItemFromProvider( providerID )
 		) {
 			prplSuggestedTasksInjectNextItem( providerID );
@@ -563,7 +565,9 @@ document.addEventListener(
 
 		while (
 			prplSuggestedTasksCountItems( providerID ) <
-				parseInt( prplSuggestedTasks.maxItemsPerType[ providerID ] ) &&
+				parseInt(
+					prplSuggestedTasks.maxItemsPerProviderID[ providerID ]
+				) &&
 			prplSuggestedTasksGetNextItemFromProvider( providerID )
 		) {
 			prplSuggestedTasksInjectNextItem( providerID );

@@ -40,7 +40,7 @@ abstract class Repetitive extends Local_Tasks {
 		$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
 		$task_data   = $task_object->get_data();
 
-		if ( $task_data['type'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['year_week'] && $this->is_task_completed() ) {
+		if ( $task_data['category'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['year_week'] && $this->is_task_completed() ) {
 			return $task_id;
 		}
 
@@ -83,7 +83,7 @@ abstract class Repetitive extends Local_Tasks {
 		$task_id = $this->get_task_id();
 
 		if (
-			true === $this->is_task_type_snoozed() ||
+			true === $this->is_task_snoozed() ||
 			! $this->should_add_task() || // No need to add the task.
 			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id )
 		) {

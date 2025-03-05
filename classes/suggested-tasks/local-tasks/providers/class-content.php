@@ -21,11 +21,11 @@ abstract class Content extends Local_Tasks {
 	protected const CAPABILITY = 'edit_others_posts';
 
 	/**
-	 * The provider type.
+	 * The provider category.
 	 *
 	 * @var string
 	 */
-	protected const TYPE = 'writing';
+	protected const CATEGORY = 'writing';
 
 	/**
 	 * Get the task ID.

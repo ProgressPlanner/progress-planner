@@ -362,7 +362,7 @@ class Suggested_Tasks {
 			}
 
 			if ( isset( $task['time'] ) && $task['time'] < \time() ) {
-				if ( isset( $task['type'] ) && 'user' === $task['type'] ) {
+				if ( isset( $task['provider_id'] ) && 'user' === $task['provider_id'] ) {
 					$tasks[ $key ]['status'] = 'pending';
 					unset( $tasks[ $key ]['time'] );
 				} else {
@@ -393,13 +393,13 @@ class Suggested_Tasks {
 		$parsed_condition = \wp_parse_args(
 			$condition,
 			[
-				'type'         => '',
+				'status'       => '',
 				'task_id'      => '',
 				'post_lengths' => [],
 			]
 		);
 
-		if ( 'snoozed-post-length' === $parsed_condition['type'] ) {
+		if ( 'snoozed-post-length' === $parsed_condition['status'] ) {
 			if ( isset( $parsed_condition['post_lengths'] ) ) {
 				if ( ! \is_array( $parsed_condition['post_lengths'] ) ) {
 					$parsed_condition['post_lengths'] = [ $parsed_condition['post_lengths'] ];
@@ -411,7 +411,7 @@ class Suggested_Tasks {
 				// Get the post lengths of the snoozed tasks.
 				foreach ( $snoozed_tasks as $task ) {
 					$data = $this->local->get_data_from_task_id( $task['task_id'] ); // @phpstan-ignore-line method.nonObject
-					if ( isset( $data['type'] ) && 'create-post' === $data['type'] ) {
+					if ( isset( $data['category'] ) && 'create-post' === $data['category'] ) {
 						$key = true === $data['long'] ? 'long' : 'short';
 						if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
 							$snoozed_post_lengths[ $key ] = true;
@@ -430,7 +430,7 @@ class Suggested_Tasks {
 			}
 		}
 
-		foreach ( $this->get_tasks_by_status( $parsed_condition['type'] ) as $task ) {
+		foreach ( $this->get_tasks_by_status( $parsed_condition['status'] ) as $task ) {
 			if ( $task['task_id'] === $parsed_condition['task_id'] ) {
 				return true;
 			}

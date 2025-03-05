@@ -58,7 +58,10 @@ class Suggested_Task extends Activity {
 		$points = 1;
 
 		$data = \progress_planner()->get_suggested_tasks()->get_local()->get_data_from_task_id( $this->data_id );
-		if ( isset( $data['type'] ) && ( 'create-post' === $data['type'] || 'review-post' === $data['type'] ) && isset( $data['long'] ) && true === $data['long'] ) {
+		if ( isset( $data['provider_id'] ) &&
+			( 'create-post' === $data['provider_id'] || 'review-post' === $data['provider_id'] ) &&
+			isset( $data['long'] ) && true === $data['long']
+		) {
 			$points = 2;
 		}
 

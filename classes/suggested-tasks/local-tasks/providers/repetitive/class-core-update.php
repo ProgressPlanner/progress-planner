@@ -14,11 +14,11 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 class Core_Update extends Repetitive {
 
 	/**
-	 * The provider type.
+	 * The provider category.
 	 *
 	 * @var string
 	 */
-	protected const TYPE = 'maintenance';
+	protected const CATEGORY = 'maintenance';
 
 	/**
 	 * The provider ID.
@@ -65,7 +65,7 @@ class Core_Update extends Repetitive {
 			'title'       => \esc_html__( 'Perform all updates', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
+			'category'    => $this->get_provider_category(),
 			'provider_id' => $this->get_provider_id(),
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'update-core.php' ) ) : '',
