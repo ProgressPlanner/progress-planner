@@ -174,7 +174,7 @@ class Plugin_Migrations {
 				unset( $local_tasks[ $key ]['type'] );
 				$local_tasks_changed = true;
 			}
-			$local_tasks[ $key ]['task_id'] = $convert_task_id( $task['task_id'] );
+			$local_tasks[ $key ]['task_id'] = $convert_task_id( $local_tasks[ $key ]['task_id'] );
 			if ( ! isset( $task['category'] ) ) {
 				$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task['task_id'] );
 				if ( isset( $task_details['category'] ) ) {
