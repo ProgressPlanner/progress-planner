@@ -159,6 +159,15 @@ class Plugin_Migrations {
 			}
 		}
 
+		$convert_task_id = function ( $task_id ) {
+			if ( ! str_contains( $task_id, '|' ) ) {
+				return $task_id;
+			}
+			$parts = \explode( '|', $task_id );
+			\ksort( $parts );
+			return \implode( '|', $parts );
+		};
+
 		foreach ( $local_tasks as $key => $task ) {
 			if ( isset( $task['type'] ) ) {
 				$local_tasks[ $key ]['category'] = $task['type'];
@@ -166,6 +175,7 @@ class Plugin_Migrations {
 				unset( $local_tasks[ $key ]['type'] );
 				$local_tasks_changed = true;
 			}
+			$local_tasks[ $key ]['task_id'] = $convert_task_id( $task['task_id'] );
 		}
 
 		if ( $local_tasks_changed ) {
@@ -173,14 +183,13 @@ class Plugin_Migrations {
 		}
 
 		// Migrate acgtivities saved in the progress_planner_activities table.
-		$activities = \progress_planner()->get_query()->query_activities(
+		foreach ( \progress_planner()->get_query()->query_activities(
 			[ 'category' => 'suggested_task' ],
-		);
-
-		foreach ( $activities as $activity ) {
-			$data_id = $activity->data_id;
-			if ( str_contains( $data_id, 'type' ) ) {
-				$activity->data_id = str_replace( 'type', 'category', $data_id );
+		) as $activity ) {
+			$data_id     = $activity->data_id;
+			$new_data_id = $convert_task_id( $data_id );
+			if ( $new_data_id !== $data_id ) {
+				$activity->data_id = $new_data_id;
 				$activity->save();
 			}
 		}
