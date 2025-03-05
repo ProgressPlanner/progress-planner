@@ -85,8 +85,13 @@ class Local_Task_Factory {
 		if ( isset( $data['long'] ) ) {
 			$data['long'] = (bool) $data['long'];
 		}
-		$data['category']    = $data['category'] ?? $data['type'];
-		$data['provider_id'] = $data['provider_id'] ?? $data['category'];
+		if ( isset( $data['type'] ) && ! isset( $data['category'] ) ) {
+			$data['category'] = $data['type'];
+			unset( $data['type'] );
+		}
+		if ( isset( $data['category'] ) && ! isset( $data['provider_id'] ) ) {
+			$data['provider_id'] = $data['category'];
+		}
 
 		return new Task_Local( $data );
 	}

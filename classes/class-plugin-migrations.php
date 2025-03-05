@@ -159,6 +159,13 @@ class Plugin_Migrations {
 			}
 		}
 
+		foreach ( $local_tasks as $key => $task ) {
+			if ( isset( $task['type'] ) ) {
+				$local_tasks[ $key ]['category'] = $task['type'];
+				unset( $local_tasks[ $key ]['type'] );
+			}
+		}
+
 		if ( $local_tasks_changed ) {
 			\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
 		}
