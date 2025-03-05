@@ -184,12 +184,12 @@ final class Suggested_Tasks extends Widget {
 			$handle,
 			'prplSuggestedTasks',
 			[
-				'ajaxUrl'               => \admin_url( 'admin-ajax.php' ),
-				'nonce'                 => \wp_create_nonce( 'progress_planner' ),
-				'tasks'                 => array_values( $final_tasks ),
-				'maxItemsPerCategory'   => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
-				'confettiOptions'       => $confetti_options,
-				'delayCelebration'      => $delay_celebration,
+				'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
+				'nonce'               => \wp_create_nonce( 'progress_planner' ),
+				'tasks'               => array_values( $final_tasks ),
+				'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
+				'confettiOptions'     => $confetti_options,
+				'delayCelebration'    => $delay_celebration,
 			]
 		);
 	}
