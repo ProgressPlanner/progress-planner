@@ -50,8 +50,8 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 		// Tasks that should not be removed.
 		$tasks_to_keep = [
 			'remote-task-1234',
-			'post_id/14|category/review-post',
-			'date/' . \gmdate( 'YW' ) . '|long/0|category/create-post',
+			'post_id/14|provider_id/review-post',
+			'date/' . \gmdate( 'YW' ) . '|long/0|provider_id/create-post',
 			'update-core-' . \gmdate( 'YW' ),
 			'settings-saved-' . \gmdate( 'YW' ),
 		];
