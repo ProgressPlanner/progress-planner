@@ -469,11 +469,11 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
 
-		if ( ! isset( $_POST['task_id'] ) || ! isset( $_POST['action'] ) ) {
+		if ( ! isset( $_POST['task_id'] ) || ! isset( $_POST['action_type'] ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing data.', 'progress-planner' ) ] );
 		}
 
-		$action  = \sanitize_text_field( \wp_unslash( $_POST['action'] ) );
+		$action  = \sanitize_text_field( \wp_unslash( $_POST['action_type'] ) );
 		$task_id = (string) \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) );
 
 		switch ( $action ) {

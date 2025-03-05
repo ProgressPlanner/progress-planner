@@ -274,11 +274,11 @@ customElements.define(
 		 * Snooze a task.
 		 *
 		 * @param {string} taskId         The task ID.
-		 * @param {string} action         The action.
+		 * @param {string} actionType     The action type.
 		 * @param {string} snoozeDuration If the action is `snooze`,
 		 *                                the duration to snooze the task for.
 		 */
-		runTaskAction = ( taskId, action, snoozeDuration ) => {
+		runTaskAction = ( taskId, actionType, snoozeDuration ) => {
 			taskId = taskId.toString();
 			const providerID = this.querySelector( 'li' ).getAttribute(
 				'data-task-provider-id'
@@ -287,9 +287,9 @@ customElements.define(
 			const data = {
 				task_id: taskId,
 				nonce: prplSuggestedTask.nonce,
-				action,
+				action_type: actionType,
 			};
-			if ( 'snooze' === action ) {
+			if ( 'snooze' === actionType ) {
 				data.duration = snoozeDuration;
 			}
 
@@ -303,7 +303,7 @@ customElements.define(
 					`.prpl-suggested-task[data-task-id="${ taskId }"]`
 				);
 
-				switch ( action ) {
+				switch ( actionType ) {
 					case 'snooze':
 						el.remove();
 						// Update the global var.
