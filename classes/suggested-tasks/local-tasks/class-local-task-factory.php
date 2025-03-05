@@ -62,14 +62,23 @@ class Local_Task_Factory {
 
 			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id );
 
-			return new Task_Local(
-				[
-					'task_id'        => $this->task_id,
-					'category'       => $task_provider->get_provider_category(),
-					'provider_id'    => $task_provider->get_provider_id(),
-					$task_suffix_key => $task_suffix,
-				]
-			);
+			// Remote tasks don't have provider, yet.
+			if ( ! $task_provider ) {
+				return new Task_Local(
+					[
+						'task_id'     => $this->task_id,
+					]
+				);
+			} else {
+				return new Task_Local(
+					[
+						'task_id'        => $this->task_id,
+						'category'       => $task_provider->get_provider_category(),
+						'provider_id'    => $task_provider->get_provider_id(),
+						$task_suffix_key => $task_suffix,
+					]
+				);
+			}
 		}
 
 		$data = [ 'task_id' => $this->task_id ];
