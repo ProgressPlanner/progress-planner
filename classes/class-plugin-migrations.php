@@ -162,7 +162,7 @@ class Plugin_Migrations {
 		foreach ( $local_tasks as $key => $task ) {
 			if ( isset( $task['type'] ) ) {
 				$local_tasks[ $key ]['category'] = $task['type'];
-				$local_tasks[ $key ]['task_id']  = str_replace( 'type', 'category', $task['id'] );
+				$local_tasks[ $key ]['task_id']  = str_replace( 'type', 'category', $task['task_id'] );
 				unset( $local_tasks[ $key ]['type'] );
 				$local_tasks_changed = true;
 			}
