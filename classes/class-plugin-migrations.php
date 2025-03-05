@@ -170,18 +170,11 @@ class Plugin_Migrations {
 
 		foreach ( $local_tasks as $key => $task ) {
 			if ( isset( $task['type'] ) ) {
-				$local_tasks[ $key ]['task_id'] = str_replace( 'type', 'category', $task['task_id'] );
+				$local_tasks[ $key ]['task_id'] = str_replace( 'type', 'provider_id', $task['task_id'] );
 				unset( $local_tasks[ $key ]['type'] );
 				$local_tasks_changed = true;
 			}
 			$local_tasks[ $key ]['task_id'] = $convert_task_id( $local_tasks[ $key ]['task_id'] );
-			if ( ! isset( $task['category'] ) ) {
-				$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task['task_id'] );
-				if ( isset( $task_details['category'] ) ) {
-					$local_tasks[ $key ]['category'] = $task_details['category'];
-					$local_tasks_changed             = true;
-				}
-			}
 		}
 
 		if ( $local_tasks_changed ) {

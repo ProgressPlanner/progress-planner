@@ -99,8 +99,8 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	 */
 	public function get_data_from_task_id( $task_id ) {
 		$data = [
-			'category' => $this->get_provider_id(),
-			'id'       => $task_id,
+			'provider_id' => $this->get_provider_id(),
+			'id'          => $task_id,
 		];
 
 		return $data;

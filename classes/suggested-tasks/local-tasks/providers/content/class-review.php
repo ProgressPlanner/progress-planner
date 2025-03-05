@@ -129,8 +129,8 @@ class Review extends Content {
 		foreach ( $last_updated_posts as $post ) {
 			$task_id = $this->get_task_id_from_data(
 				[
-					'category' => 'review-post',
-					'post_id'  => $post->ID, // @phpstan-ignore-line property.nonObject
+					'provider_id' => 'review-post',
+					'post_id'     => $post->ID, // @phpstan-ignore-line property.nonObject
 				]
 			);
 
@@ -261,7 +261,7 @@ class Review extends Content {
 		if ( \is_array( $snoozed ) && ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
 				$data = $this->get_data_from_task_id( $task['task_id'] );
-				if ( isset( $data['category'] ) && 'review-post' === $data['category'] ) {
+				if ( isset( $data['provider_id'] ) && 'review-post' === $data['provider_id'] ) {
 					$this->snoozed_post_ids[] = $data['post_id'];
 				}
 			}
@@ -292,7 +292,7 @@ class Review extends Content {
 		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 		$tasks_changed = false;
 		foreach ( $tasks as $task_key => $task_data ) {
-			if ( $this->get_provider_category() === $task_data['category'] &&
+			if ( $this->get_provider_id() === $task_data['provider_id'] &&
 				isset( $task_data['post_id'] ) &&
 				(int) $task_data['post_id'] === (int) $post->ID
 			) {

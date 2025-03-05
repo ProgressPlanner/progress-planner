@@ -125,7 +125,7 @@ final class Suggested_Tasks extends Widget {
 		$final_tasks = array_values( $final_tasks );
 
 		foreach ( $final_tasks as $key => $task ) {
-			$final_tasks[ $key ]['providerID'] = $task['provider_id'] ?? $task['category'];
+			$final_tasks[ $key ]['providerID'] = $task['provider_id'];
 		}
 
 		// Sort the final tasks by priority. The priotity can be "high", "medium", "low", or "none".
