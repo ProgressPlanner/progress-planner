@@ -145,14 +145,14 @@ final class Suggested_Tasks extends Widget {
 			}
 		);
 
-		$max_items_per_provider_id = [];
+		$max_items_per_category = [];
 		foreach ( $final_tasks as $task ) {
-			$max_items_per_provider_id[ $task['provider_id'] ] = $task['provider_id'] === ( new Review() )->get_provider_id() ? 2 : 1;
+			$max_items_per_category[ $task['category'] ] = $task['category'] === ( new Review() )->get_provider_category() ? 2 : 1;
 		}
 
 		// We want all pending_celebration' tasks to be shown.
-		if ( isset( $max_items_per_provider_id['pending_celebration'] ) ) {
-			$max_items_per_provider_id['pending_celebration'] = 99;
+		if ( isset( $max_items_per_category['pending_celebration'] ) ) {
+			$max_items_per_category['pending_celebration'] = 99;
 		}
 
 		// Check if current date is between Feb 12-16 to use hearts confetti.
@@ -187,7 +187,7 @@ final class Suggested_Tasks extends Widget {
 				'ajaxUrl'               => \admin_url( 'admin-ajax.php' ),
 				'nonce'                 => \wp_create_nonce( 'progress_planner' ),
 				'tasks'                 => array_values( $final_tasks ),
-				'maxItemsPerProviderID' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_provider_id', $max_items_per_provider_id ),
+				'maxItemsPerCategory'   => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
 				'confettiOptions'       => $confetti_options,
 				'delayCelebration'      => $delay_celebration,
 			]
