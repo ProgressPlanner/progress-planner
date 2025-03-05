@@ -55,7 +55,7 @@ class Local_Task_Factory {
 			$category    = substr( $this->task_id, 0, $last_pos );
 			$task_suffix = substr( $this->task_id, $last_pos + 1 );
 
-			$task_suffix_key = 'remote-task' === $category ? 'remote_task_id' : 'year_week';
+			$task_suffix_key = 'remote-task' === $category ? 'remote_task_id' : 'date';
 
 			return new Task_Local(
 				[

@@ -107,7 +107,7 @@ class Suggested_Tasks {
 			$task_id = $task_data['task_id'];
 
 			if ( $task_data['provider_id'] === ( new Core_Update() )->get_provider_id() &&
-				\gmdate( 'YW' ) === $task_data['year_week']
+				\gmdate( 'YW' ) === $task_data['date']
 			) {
 				// Change the task status to completed.
 				$this->mark_task_as_completed( $task_id );
