@@ -103,6 +103,7 @@ final class Suggested_Tasks extends Widget {
 							$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
 							$task_details['action']   = 'celebrate';
 							$task_details['status']   = 'pending_celebration';
+							$task_details['type']     = 'pending_celebration';
 
 							// Award 2 points if last created post was long.
 							if ( 'create-post' === $task_provider->get_provider_id() ) {

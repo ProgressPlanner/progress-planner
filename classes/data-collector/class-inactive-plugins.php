@@ -29,6 +29,7 @@ class Inactive_Plugins extends Base_Data_Collector {
 	public function init() {
 		\add_action( 'activated_plugin', [ $this, 'update_inactive_plugins_cache' ], 10 );
 		\add_action( 'deactivated_plugin', [ $this, 'update_inactive_plugins_cache' ], 10 );
+		\add_action( 'deleted_plugin', [ $this, 'update_inactive_plugins_cache' ], 10 );
 	}
 
 	/**
