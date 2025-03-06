@@ -19,7 +19,7 @@ class Hello_World extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'hello-world';
+	protected const PROVIDER_ID = 'hello-world';
 
 	/**
 	 * The capability required to perform the task.

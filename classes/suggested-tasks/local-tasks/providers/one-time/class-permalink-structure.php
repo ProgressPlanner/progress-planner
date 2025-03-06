@@ -19,7 +19,7 @@ class Permalink_Structure extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'core-permalink-structure';
+	protected const PROVIDER_ID = 'core-permalink-structure';
 
 	/**
 	 * Constructor.

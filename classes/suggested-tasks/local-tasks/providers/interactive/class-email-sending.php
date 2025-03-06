@@ -157,7 +157,7 @@ class Email_Sending extends Interactive {
 			'title'       => \esc_html__( 'Check if email sending is working', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
+			'category'    => $this->get_provider_category(),
 			'points'      => 1,
 			'dismissable' => true,
 			'popover_id'  => 'prpl-popover-' . $this->popover_id,

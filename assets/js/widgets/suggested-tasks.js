@@ -3,29 +3,32 @@
 /**
  * Count the number of items in the list.
  *
- * @param {string} type The type of items to count.
+ * @param {string} category The category of items to count.
  * @return {number} The number of items in the list.
  */
-const prplSuggestedTasksCountItems = ( type ) => {
+const prplSuggestedTasksCountItems = ( category ) => {
 	// We want to display all pending celebration tasks on page load.
-	if ( 'pending_celebration' === type ) {
+	if ( 'pending_celebration' === category ) {
+		// TODO: This is a status, not a provider-ID.
 		return 0;
 	}
 
 	const items = document.querySelectorAll(
-		`.prpl-suggested-task[data-task-type="${ type }"]`
+		`.prpl-suggested-task[data-task-category="${ category }"]`
 	);
 	return items.length;
 };
 
 /**
- * Get all items of a type.
+ * Get all items of a category.
  *
- * @param {string} type The type of items to get.
+ * @param {string} category The category of items to get.
  * @return {Array} The items.
  */
-const prplSuggestedTasksGetItemsOfType = ( type ) => {
-	return prplSuggestedTasks.tasks.filter( ( task ) => type === task.type );
+const prplSuggestedTasksGetItemsOfCategory = ( category ) => {
+	return prplSuggestedTasks.tasks.filter(
+		( task ) => category === task.category
+	);
 };
 
 /**
@@ -43,14 +46,14 @@ const prplSuggestedTasksGetItemsWithStatus = ( status ) => {
 /**
  * Get the next item to inject.
  *
- * @param {string} type The type of items to get the next item from.
+ * @param {string} category The category of items to get the next item from.
  * @return {Object} The next item to inject.
  */
-const prplSuggestedTasksGetNextItemFromType = ( type ) => {
-	// Get items of this type.
-	const itemsOfType = prplSuggestedTasksGetItemsOfType( type );
-	// If there are no items of this type, return null.
-	if ( 0 === itemsOfType.length ) {
+const prplSuggestedTasksGetNextItemFromCategory = ( category ) => {
+	// Get items of this category.
+	const itemsOfCategory = prplSuggestedTasksGetItemsOfCategory( category );
+	// If there are no items of this category, return null.
+	if ( 0 === itemsOfCategory.length ) {
 		return null;
 	}
 
@@ -62,7 +65,7 @@ const prplSuggestedTasksGetNextItemFromType = ( type ) => {
 			inList.push( item.getAttribute( 'data-task-id' ).toString() );
 		} );
 
-	const items = itemsOfType.filter( function ( item ) {
+	const items = itemsOfCategory.filter( function ( item ) {
 		// Remove items which are completed or snoozed.
 		if ( 'completed' === item.status || 'snoozed' === item.status ) {
 			return false;
@@ -85,10 +88,11 @@ const prplSuggestedTasksGetNextItemFromType = ( type ) => {
 
 /**
  * Inject the next item.
- * @param {string} type The type of items to inject the next item from.
+ *
+ * @param {string} category The category of items to inject the next item from.
  */
-const prplSuggestedTasksInjectNextItem = ( type ) => {
-	const nextItem = prplSuggestedTasksGetNextItemFromType( type );
+const prplSuggestedTasksInjectNextItem = ( category ) => {
+	const nextItem = prplSuggestedTasksGetNextItemFromCategory( category );
 	if ( ! nextItem ) {
 		return;
 	}
@@ -111,7 +115,8 @@ const prplSuggestedTasksInjectItem = ( details ) => {
 		taskAction: details.action ?? '',
 		taskUrl: details.url ?? '',
 		taskDismissable: details.dismissable ?? false,
-		taskType: details.type ?? '',
+		taskProviderID: details.providerID ?? '',
+		taskCategory: details.category ?? '',
 		taskPopoverId: details.popover_id ?? '',
 	} );
 
@@ -224,7 +229,7 @@ const prplStrikeCompletedTasks = () => {
 			.querySelectorAll( '.prpl-suggested-task-celebrated' )
 			.forEach( ( item ) => {
 				const taskId = item.getAttribute( 'data-task-id' ),
-					type = item.getAttribute( 'data-task-type' );
+					providerID = item.getAttribute( 'data-task-provider-id' );
 				const el = document.querySelector(
 					`.prpl-suggested-task[data-task-id="${ taskId }"]`
 				);
@@ -255,7 +260,7 @@ const prplStrikeCompletedTasks = () => {
 					{
 						detail: {
 							taskId,
-							type,
+							providerID,
 						},
 					}
 				);
@@ -287,15 +292,17 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		return;
 	}
 
-	// Loop through each type and inject items.
-	for ( const type in prplSuggestedTasks.maxItemsPerType ) {
+	// Loop through each provider and inject items.
+	for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
 		// Inject items, until we reach the maximum number of channel items.
 		while (
-			prplSuggestedTasksCountItems( type ) <
-				parseInt( prplSuggestedTasks.maxItemsPerType[ type ] ) &&
-			prplSuggestedTasksGetNextItemFromType( type )
+			prplSuggestedTasksCountItems( category ) <
+				parseInt(
+					prplSuggestedTasks.maxItemsPerCategory[ category ]
+				) &&
+			prplSuggestedTasksGetNextItemFromCategory( category )
 		) {
-			prplSuggestedTasksInjectNextItem( type );
+			prplSuggestedTasksInjectNextItem( category );
 		}
 	}
 
@@ -551,18 +558,21 @@ document.addEventListener(
 document.addEventListener(
 	'prplMaybeInjectSuggestedTaskEvent',
 	( e ) => {
-		const type = e.detail.type;
+		const category = e.detail.category;
 
-		if ( 'pending_celebration' === type ) {
+		if ( 'pending_celebration' === category ) {
+			// TODO: This is a status, not a category.
 			return;
 		}
 
 		while (
-			prplSuggestedTasksCountItems( type ) <
-				parseInt( prplSuggestedTasks.maxItemsPerType[ type ] ) &&
-			prplSuggestedTasksGetNextItemFromType( type )
+			prplSuggestedTasksCountItems( category ) <
+				parseInt(
+					prplSuggestedTasks.maxItemsPerCategory[ category ]
+				) &&
+			prplSuggestedTasksGetNextItemFromCategory( category )
 		) {
-			prplSuggestedTasksInjectNextItem( type );
+			prplSuggestedTasksInjectNextItem( category );
 		}
 
 		const event = new Event( 'prplResizeAllGridItemsEvent' );

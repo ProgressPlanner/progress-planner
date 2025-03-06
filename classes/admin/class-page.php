@@ -164,7 +164,7 @@ class Page {
 		$total_points          = 0;
 		$completed_points      = 0;
 		foreach ( $local_tasks_providers as $provider ) {
-			if ( 'configuration' !== $provider->get_provider_type() ) {
+			if ( 'configuration' !== $provider->get_provider_category() ) {
 				continue;
 			}
 			$details = $provider->get_task_details();
@@ -275,7 +275,9 @@ class Page {
 	 */
 	public function save_cpt_settings() {
 		\check_ajax_referer( 'progress_planner', 'nonce', false );
-		$include_post_types = isset( $_POST['include_post_types'] ) ? \sanitize_text_field( \wp_unslash( $_POST['include_post_types'] ) ) : 'post,page';
+		$include_post_types = isset( $_POST['include_post_types'] )
+			? \sanitize_text_field( \wp_unslash( $_POST['include_post_types'] ) )
+			: 'post,page';
 		$include_post_types = \explode( ',', $include_post_types );
 		\progress_planner()->get_settings()->set( 'include_post_types', $include_post_types );
 
