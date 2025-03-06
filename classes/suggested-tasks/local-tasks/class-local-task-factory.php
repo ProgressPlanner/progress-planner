@@ -42,29 +42,43 @@ class Local_Task_Factory {
 
 			// Check if the task ID ends with a '-12345' or not, if not that would be mostly one time tasks.
 			if ( $last_pos === false || ! preg_match( '/-\d+$/', $this->task_id ) ) {
+
+				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $this->task_id );
+
 				return new Task_Local(
 					[
 						'task_id'     => $this->task_id,
-						'category'    => $this->task_id,
-						'provider_id' => $this->task_id,
+						'category'    => $task_provider ? $task_provider->get_provider_category() : '',
+						'provider_id' => $task_provider ? $task_provider->get_provider_id() : '',
 					]
 				);
 			}
 
 			// Remote (remote-12345) or repetitive tasks (update-core-202449).
-			$category    = substr( $this->task_id, 0, $last_pos );
-			$task_suffix = substr( $this->task_id, $last_pos + 1 );
+			$task_provider_id = substr( $this->task_id, 0, $last_pos );
+			$task_suffix      = substr( $this->task_id, $last_pos + 1 );
 
-			$task_suffix_key = 'remote-task' === $category ? 'remote_task_id' : 'date';
+			$task_suffix_key = 'remote-task' === $task_provider_id ? 'remote_task_id' : 'date';
 
-			return new Task_Local(
-				[
-					'task_id'        => $this->task_id,
-					'category'       => $category,
-					'provider_id'    => $category,
-					$task_suffix_key => $task_suffix,
-				]
-			);
+			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id );
+
+			// Remote tasks don't have provider, yet.
+			if ( ! $task_provider ) {
+				return new Task_Local(
+					[
+						'task_id' => $this->task_id,
+					]
+				);
+			} else {
+				return new Task_Local(
+					[
+						'task_id'        => $this->task_id,
+						'category'       => $task_provider->get_provider_category(),
+						'provider_id'    => $task_provider->get_provider_id(),
+						$task_suffix_key => $task_suffix,
+					]
+				);
+			}
 		}
 
 		$data = [ 'task_id' => $this->task_id ];
@@ -86,13 +100,13 @@ class Local_Task_Factory {
 		if ( isset( $data['long'] ) ) {
 			$data['long'] = (bool) $data['long'];
 		}
-		if ( isset( $data['type'] ) && ! isset( $data['category'] ) ) {
-			$data['category'] = $data['type'];
+		if ( isset( $data['type'] ) && ! isset( $data['provider_id'] ) ) {
+			$data['provider_id'] = $data['type'];
 			unset( $data['type'] );
 		}
-		if ( isset( $data['category'] ) && ! isset( $data['provider_id'] ) ) {
-			$data['provider_id'] = $data['category'];
-		}
+
+		$task_provider    = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $data['provider_id'] );
+		$data['category'] = $task_provider ? $task_provider->get_provider_category() : '';
 
 		return new Task_Local( $data );
 	}

@@ -79,9 +79,9 @@ class Create extends Content {
 
 		$task_id = $this->get_task_id_from_data(
 			[
-				'category' => 'create-post',
-				'date'     => \gmdate( 'YW' ),
-				'long'     => $is_last_post_long ? '0' : '1',
+				'provider_id' => 'create-post',
+				'date'        => \gmdate( 'YW' ),
+				'long'        => $is_last_post_long ? '0' : '1',
 			]
 		);
 
@@ -135,10 +135,10 @@ class Create extends Content {
 
 		return $this->get_task_id_from_data(
 			[
-				'category' => 'create-post',
-				'date'     => \gmdate( 'YW' ),
-				'post_id'  => $last_post->ID,
-				'long'     => $is_post_long ? '1' : '0',
+				'provider_id' => 'create-post',
+				'date'        => \gmdate( 'YW' ),
+				'post_id'     => $last_post->ID,
+				'long'        => $is_post_long ? '1' : '0',
 			]
 		);
 	}

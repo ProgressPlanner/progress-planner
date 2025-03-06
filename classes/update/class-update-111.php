@@ -130,13 +130,6 @@ class Update_111 {
 				$this->local_tasks_changed = true;
 			}
 			$this->local_tasks[ $key ]['task_id'] = $this->convert_task_id( $task['task_id'] );
-			if ( ! isset( $task['category'] ) ) {
-				$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task['task_id'] );
-				if ( isset( $task_details['category'] ) ) {
-					$this->local_tasks[ $key ]['category'] = $task_details['category'];
-					$this->local_tasks_changed             = true;
-				}
-			}
 		}
 	}
 
@@ -170,7 +163,7 @@ class Update_111 {
 		if ( ! str_contains( $task_id, '|' ) ) {
 			return $task_id;
 		}
-		$task_id = str_replace( 'type', 'category', $task_id );
+		$task_id = str_replace( 'type', 'provider_id', $task_id );
 		$parts   = \explode( '|', $task_id );
 		\ksort( $parts );
 		return \implode( '|', $parts );

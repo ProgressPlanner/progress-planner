@@ -42,6 +42,6 @@ class Task_Local {
 	 * @return string
 	 */
 	public function get_provider_id() {
-		return $this->data['provider_id'] ?? $this->data['category'];
+		return $this->data['provider_id'] ?? '';
 	}
 }

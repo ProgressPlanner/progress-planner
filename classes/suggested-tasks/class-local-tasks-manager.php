@@ -336,8 +336,8 @@ class Local_Tasks_Manager {
 					return (string) \gmdate( 'YW' ) === (string) $task['date'];
 				}
 
-				// We have changed category name, so we need to remove all tasks of the old category.
-				if ( isset( $task['category'] ) && 'update-post' === $task['category'] ) {
+				// We have changed provider_id name, so we need to remove all tasks of the old provider_id.
+				if ( isset( $task['provider_id'] ) && 'update-post' === $task['provider_id'] ) {
 					return false;
 				}
 
