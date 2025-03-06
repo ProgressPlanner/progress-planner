@@ -129,7 +129,11 @@ class Update_111 {
 				unset( $this->local_tasks[ $key ]['type'] );
 				$this->local_tasks_changed = true;
 			}
-			$this->local_tasks[ $key ]['task_id'] = $this->convert_task_id( $task['task_id'] );
+			$converted_task_id = $this->convert_task_id( $task['task_id'] );
+			if ( $converted_task_id !== $task['task_id'] ) {
+				$this->local_tasks[ $key ]['task_id'] = $converted_task_id;
+				$this->local_tasks_changed            = true;
+			}
 		}
 	}
 
