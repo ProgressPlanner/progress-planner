@@ -8,6 +8,7 @@
 namespace Progress_Planner\Activities;
 
 use Progress_Planner\Activity;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Review;
 
 /**
  * Handler for suggested tasks activities.
@@ -69,8 +70,12 @@ class Suggested_Task extends Activity {
 
 		$data = \progress_planner()->get_suggested_tasks()->get_local()->get_data_from_task_id( $this->data_id );
 		if ( isset( $data['provider_id'] ) &&
-			( 'create-post' === $data['provider_id'] || 'review-post' === $data['provider_id'] ) &&
-			isset( $data['long'] ) && true === $data['long']
+			isset( $data['long'] ) &&
+			true === $data['long'] &&
+			(
+				'create-post' === $data['provider_id'] ||
+				( new Review() )->get_provider_id() === $data['provider_id']
+			)
 		) {
 			$points = 2;
 		}
