@@ -478,6 +478,11 @@ class Suggested_Tasks {
 
 		switch ( $action ) {
 			case 'complete':
+				// We need to add the task to the pending tasks first, before marking it as completed.
+				if ( false !== strpos( $task_id, 'remote-task' ) ) {
+					\progress_planner()->get_suggested_tasks()->get_local()->add_pending_task( $task_id );
+				}
+
 				// Mark the task as completed.
 				$this->mark_task_as( 'completed', $task_id );
 
