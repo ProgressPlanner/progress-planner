@@ -73,10 +73,10 @@ trait Task_Provider_Test_Trait {
 		parent::tear_down();
 
 		// Delete local tasks.
-		delete_option( Local_Tasks_Manager::OPTION_NAME );
+		\progress_planner()->get_settings()->set( 'local_tasks', [] );
 
 		// Delete suggested tasks.
-		delete_option( Suggested_Tasks::OPTION_NAME );
+		\progress_planner()->get_settings()->set( 'local_tasks', [] );
 	}
 
 	/**
@@ -105,9 +105,16 @@ trait Task_Provider_Test_Trait {
 		}
 
 		// Verify that the task(s) are in the local suggested tasks.
-		$pending_tasks = (array) $this->suggested_tasks->get_local()->get_pending_tasks();
+		$pending_tasks = (array) \progress_planner()->get_settings()->get( 'local_tasks', [] );
 		foreach ( $tasks as $task ) {
-			$this->assertContains( $task['task_id'], $pending_tasks );
+			$item_found = false;
+			foreach ( $pending_tasks as $pending_task ) {
+				if ( $pending_task['task_id'] === $task['task_id'] ) {
+					$item_found = true;
+					break;
+				}
+			}
+			$this->assertTrue( $item_found );
 		}
 
 		// Complete the task.
@@ -126,7 +133,7 @@ trait Task_Provider_Test_Trait {
 			$this->assertTrue(
 				$this->suggested_tasks->check_task_condition(
 					[
-						'type'    => 'pending_celebration',
+						'status'  => 'pending_celebration',
 						'task_id' => $task['task_id'],
 					]
 				)
@@ -139,7 +146,7 @@ trait Task_Provider_Test_Trait {
 			$this->assertTrue(
 				$this->suggested_tasks->check_task_condition(
 					[
-						'type'    => 'completed',
+						'status'  => 'completed',
 						'task_id' => $task['task_id'],
 					]
 				)
