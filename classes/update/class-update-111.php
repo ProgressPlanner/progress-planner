@@ -21,7 +21,7 @@ class Update_111 {
 	 *
 	 * @var array
 	 */
-	private $local_tasks;
+	private $local_tasks = [];
 
 	/**
 	 * Whether local tasks have been changed.
