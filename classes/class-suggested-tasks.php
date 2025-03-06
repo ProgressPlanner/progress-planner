@@ -151,7 +151,7 @@ class Suggested_Tasks {
 		 * @param array $tasks The suggested tasks.
 		 * @return array
 		 */
-		$tasks = \apply_filters( 'progress_planner_suggested_tasks_items', $tasks );
+		$tasks    = \apply_filters( 'progress_planner_suggested_tasks_items', $tasks );
 		$db_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 		foreach ( $tasks as $key => $task ) {
 			if ( isset( $task['status'] ) && ! empty( $task['status'] ) ) {
