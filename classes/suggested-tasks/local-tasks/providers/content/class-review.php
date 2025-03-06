@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
 /**
@@ -20,14 +19,14 @@ class Review extends Content {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'review-post';
+	protected const PROVIDER_ID = 'review-post';
 
 	/**
-	 * The provider type.
+	 * The provider category.
 	 *
 	 * @var string
 	 */
-	protected const TYPE = 'content-update';
+	protected const CATEGORY = 'content-update';
 
 	/**
 	 * The number of items to inject.
@@ -130,8 +129,8 @@ class Review extends Content {
 		foreach ( $last_updated_posts as $post ) {
 			$task_id = $this->get_task_id_from_data(
 				[
-					'type'    => 'review-post',
-					'post_id' => $post->ID, // @phpstan-ignore-line property.nonObject
+					'provider_id' => 'review-post',
+					'post_id'     => $post->ID, // @phpstan-ignore-line property.nonObject
 				]
 			);
 
@@ -163,6 +162,7 @@ class Review extends Content {
 		$post         = \get_post( $data['post_id'] );
 		$task_details = [
 			'task_id'     => $task_id,
+			'provider_id' => $this->get_provider_id(),
 			// translators: %1$s: The post type, %2$s: The post title.
 			'title'       => sprintf(
 				'Review %1$s "%2$s"',
@@ -171,7 +171,7 @@ class Review extends Content {
 			),
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
+			'category'    => $this->get_provider_category(),
 			'points'      => 1,
 			'dismissable' => true,
 			'url'         => $this->capability_required() ? \esc_url( \get_edit_post_link( $post->ID ) ) : '', // @phpstan-ignore-line property.nonObject
@@ -256,12 +256,12 @@ class Review extends Content {
 		}
 
 		$this->snoozed_post_ids = [];
-		$snoozed                = \progress_planner()->get_suggested_tasks()->get_snoozed_tasks();
+		$snoozed                = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'snoozed' );
 
 		if ( \is_array( $snoozed ) && ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
-				$data = $this->get_data_from_task_id( $task['id'] );
-				if ( isset( $data['type'] ) && 'review-post' === $data['type'] ) {
+				$data = $this->get_data_from_task_id( $task['task_id'] );
+				if ( isset( $data['provider_id'] ) && 'review-post' === $data['provider_id'] ) {
 					$this->snoozed_post_ids[] = $data['post_id'];
 				}
 			}
@@ -289,17 +289,21 @@ class Review extends Content {
 			return;
 		}
 
-		foreach ( \progress_planner()->get_settings()->get( 'local_tasks', [] ) as $task_data ) {
-			if (
-				$this->get_provider_type() === $task_data['type'] &&
-				(
-					isset( $task_data['post_id'] ) &&
-					(int) $task_data['post_id'] === (int) $post->ID
-				)
+		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks_changed = false;
+		foreach ( $tasks as $task_key => $task_data ) {
+			if ( $this->get_provider_id() === $task_data['provider_id'] &&
+				isset( $task_data['post_id'] ) &&
+				(int) $task_data['post_id'] === (int) $post->ID
 			) {
 				// Remove the task from the pending local tasks list.
-				\progress_planner()->get_suggested_tasks()->get_local()->remove_pending_task( $task_data['task_id'] ); // @phpstan-ignore-line method.nonObject
+				unset( $tasks[ $task_key ] );
+				$tasks_changed = true;
 			}
+		}
+
+		if ( $tasks_changed ) {
+			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 		}
 	}
 }

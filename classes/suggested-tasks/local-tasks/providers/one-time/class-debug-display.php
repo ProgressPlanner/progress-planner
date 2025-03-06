@@ -19,7 +19,7 @@ class Debug_Display extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'wp-debug-display';
+	protected const PROVIDER_ID = 'wp-debug-display';
 
 	/**
 	 * Constructor.

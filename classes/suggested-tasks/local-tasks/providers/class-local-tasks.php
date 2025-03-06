@@ -16,18 +16,18 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 abstract class Local_Tasks implements Local_Tasks_Interface {
 
 	/**
-	 * The type of the task.
+	 * The category of the task.
 	 *
 	 * @var string
 	 */
-	protected const TYPE = '';
+	protected const CATEGORY = '';
 
 	/**
-	 * The ID of the task.
+	 * The ID of the task provider.
 	 *
 	 * @var string
 	 */
-	protected const ID = '';
+	protected const PROVIDER_ID = '';
 
 	/**
 	 * The capability required to perform the task.
@@ -44,12 +44,12 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
-	 * Get the provider type.
+	 * Get the provider category.
 	 *
 	 * @return string
 	 */
-	public function get_provider_type() {
-		return static::TYPE;
+	public function get_provider_category() {
+		return static::CATEGORY;
 	}
 
 	/**
@@ -58,7 +58,7 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	 * @return string
 	 */
 	public function get_provider_id() {
-		return static::ID;
+		return static::PROVIDER_ID;
 	}
 
 	/**
@@ -99,26 +99,26 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	 */
 	public function get_data_from_task_id( $task_id ) {
 		$data = [
-			'type' => $this->get_provider_id(),
-			'id'   => $task_id,
+			'provider_id' => $this->get_provider_id(),
+			'id'          => $task_id,
 		];
 
 		return $data;
 	}
 
 	/**
-	 * Check if a task type is snoozed.
+	 * Check if a task category is snoozed.
 	 *
 	 * @return bool
 	 */
-	public function is_task_type_snoozed() {
-		$snoozed = \progress_planner()->get_suggested_tasks()->get_snoozed_tasks();
+	public function is_task_snoozed() {
+		$snoozed = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'snoozed' );
 		if ( ! \is_array( $snoozed ) || empty( $snoozed ) ) {
 			return false;
 		}
 
 		foreach ( $snoozed as $task ) {
-			$task_object = ( new Local_Task_Factory( $task['id'] ) )->get_task();
+			$task_object = ( new Local_Task_Factory( $task['task_id'] ) )->get_task();
 			$provider_id = $task_object->get_provider_id();
 
 			if ( $provider_id === $this->get_provider_id() ) {
