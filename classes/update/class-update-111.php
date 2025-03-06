@@ -42,12 +42,12 @@ class Update_111 {
 		// Migrate the `progress_planner_suggested_tasks` option.
 		$this->migrate_suggested_tasks();
 
+		// Migrate the 'create-post' tasks, they are now repetitive tasks.
+		$this->migrate_create_post_tasks();
+
 		if ( $this->local_tasks_changed ) {
 			\progress_planner()->get_settings()->set( 'local_tasks', $this->local_tasks );
 		}
-
-		// Migrate the 'create-post' tasks, they are now repetitive tasks.
-		$this->migrate_create_post_tasks();
 	}
 
 	/**
@@ -120,16 +120,14 @@ class Update_111 {
 	 * @return void
 	 */
 	private function migrate_create_post_tasks() {
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 
 		// Migrate the 'create-post' completed tasks.
-		// $completed_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'completed' );
-		if ( ! empty( $local_tasks ) ) {
-			foreach ( $local_tasks as $task ) {
+		if ( ! empty( $this->local_tasks ) ) {
+			foreach ( $this->local_tasks as $key => $task ) {
 				if ( false !== strpos( $task['task_id'], '|type/create-post' ) ) {
-					// TODO: Migrate task_id to new format.
-
-					$this->local_tasks_changed = true;
+					// TODO: task_id needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
+					$this->local_tasks[ $key ]['task_id'] = $task['type'] . '-' . $task['date'];
+					$this->local_tasks_changed            = true;
 				}
 			}
 		}
@@ -145,11 +143,46 @@ class Update_111 {
 		if ( ! empty( $activities ) ) {
 			foreach ( $activities as $activity ) {
 				if ( false !== strpos( $activity->data_id, '|type/create-post' ) ) {
-					// TODO: Migrate activity to the new format. We need to save post lenght somehow in order to properly calculate the points.
+					$data = $this->get_data_from_task_id( $activity->data_id );
+
+					// TODO: task_id needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
+					$new_data_id = $data['type'] . '-' . $data['date'];
+					if ( $new_data_id !== $activity->data_id ) {
+						$activity->data_id = $new_data_id;
+						$activity->save();
+					}
 				}
 			}
 		}
+	}
 
-		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+	/**
+	 * Get the data from a task-ID.
+	 * This is copied from the Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content class, since we might remove that function in the future.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return array The data.
+	 */
+	private function get_data_from_task_id( $task_id ) {
+		$parts = \explode( '|', $task_id );
+		$data  = [];
+		foreach ( $parts as $part ) {
+			$part = \explode( '/', $part );
+			if ( 2 !== \count( $part ) ) {
+				continue;
+			}
+			$data[ $part[0] ] = ( \is_numeric( $part[1] ) )
+				? (int) $part[1]
+				: $part[1];
+		}
+		\ksort( $data );
+
+		// Convert (int) 1 and (int) 0 to (bool) true and (bool) false.
+		if ( isset( $data['long'] ) ) {
+			$data['long'] = (bool) $data['long'];
+		}
+
+		return $data;
 	}
 }
