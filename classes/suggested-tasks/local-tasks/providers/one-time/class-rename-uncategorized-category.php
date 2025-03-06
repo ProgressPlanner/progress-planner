@@ -20,7 +20,7 @@ class Rename_Uncategorized_Category extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'rename-uncategorized-category';
+	protected const PROVIDER_ID = 'rename-uncategorized-category';
 
 	/**
 	 * The capability required to perform the task.

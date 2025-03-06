@@ -47,11 +47,11 @@ interface Local_Tasks_Interface {
 	public function get_data_from_task_id( $task_id );
 
 	/**
-	 * Get the provider type.
+	 * Get the provider category.
 	 *
 	 * @return string
 	 */
-	public function get_provider_type();
+	public function get_provider_category();
 
 	/**
 	 * Get the provider ID.
