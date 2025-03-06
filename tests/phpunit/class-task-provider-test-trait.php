@@ -76,7 +76,7 @@ trait Task_Provider_Test_Trait {
 		\progress_planner()->get_settings()->set( 'local_tasks', [] );
 
 		// Delete suggested tasks.
-		delete_option( Suggested_Tasks::OPTION_NAME );
+		\progress_planner()->get_settings()->set( 'local_tasks', [] );
 	}
 
 	/**
@@ -133,7 +133,7 @@ trait Task_Provider_Test_Trait {
 			$this->assertTrue(
 				$this->suggested_tasks->check_task_condition(
 					[
-						'type'    => 'pending_celebration',
+						'status'  => 'pending_celebration',
 						'task_id' => $task['task_id'],
 					]
 				)
@@ -146,7 +146,7 @@ trait Task_Provider_Test_Trait {
 			$this->assertTrue(
 				$this->suggested_tasks->check_task_condition(
 					[
-						'type'    => 'completed',
+						'status'  => 'completed',
 						'task_id' => $task['task_id'],
 					]
 				)

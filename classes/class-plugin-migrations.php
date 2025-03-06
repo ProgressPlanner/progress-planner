@@ -9,7 +9,7 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+use Progress_Planner\Update\Update_111;
 
 /**
  * Plugin Upgrade class.
@@ -39,8 +39,8 @@ class Plugin_Migrations {
 	 *
 	 * @var array
 	 */
-	private const UPGRADE_METHODS = [
-		'1.1.1' => 'upgrade_1_1_1',
+	private const UPGRADE_CLASSES = [
+		'1.1.1' => Update_111::class,
 	];
 
 	/**
@@ -85,13 +85,14 @@ class Plugin_Migrations {
 		}
 
 		// Run the upgrades.
-		foreach ( self::UPGRADE_METHODS as $version => $upgrade_method ) {
+		foreach ( self::UPGRADE_CLASSES as $version => $upgrade_class ) {
 			if (
 				( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) ||
 				\get_option( 'prpl_debug' ) ||
 				version_compare( $version, $this->db_version, '>' )
 			) {
-				$this->$upgrade_method();
+				$upgrade_class = new $upgrade_class();
+				$upgrade_class->run();
 			}
 		}
 
@@ -104,30 +105,5 @@ class Plugin_Migrations {
 		 * @param string $db_version The old version of the plugin.
 		 */
 		do_action( 'progress_planner_plugin_updated', $this->version, $this->db_version );
-	}
-
-	/**
-	 * Upgrade the database to version 1.1.1.
-	 *
-	 * @return void
-	 */
-	private function upgrade_1_1_1() {
-		// Migrate the `progress_planner_local_tasks` option.
-		$local_tasks_option = \get_option( 'progress_planner_local_tasks', [] );
-		if ( ! empty( $local_tasks_option ) ) {
-			$tasks = [];
-			foreach ( $local_tasks_option as $task_id ) {
-				$task           = ( new Local_Task_Factory( $task_id ) )->get_task()->get_data();
-				$task['status'] = 'pending';
-
-				if ( ! isset( $task['task_id'] ) ) {
-					continue;
-				}
-
-				$tasks[] = $task;
-			}
-			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
-			\delete_option( 'progress_planner_local_tasks' );
-		}
 	}
 }

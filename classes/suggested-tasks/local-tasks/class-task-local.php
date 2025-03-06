@@ -37,21 +37,11 @@ class Task_Local {
 	}
 
 	/**
-	 * Get the type of the task.
-	 *
-	 * @return string
-	 */
-	public function get_type() {
-		return $this->data['type'];
-	}
-
-	/**
-	 * Alias for get_type().
-	 * For compatibility with the old provider system.
+	 * Get the provider ID.
 	 *
 	 * @return string
 	 */
 	public function get_provider_id() {
-		return $this->get_type();
+		return $this->data['provider_id'] ?? '';
 	}
 }

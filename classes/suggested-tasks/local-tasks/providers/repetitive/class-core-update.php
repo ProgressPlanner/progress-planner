@@ -14,18 +14,18 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 class Core_Update extends Repetitive {
 
 	/**
-	 * The provider type.
+	 * The provider category.
 	 *
 	 * @var string
 	 */
-	protected const TYPE = 'maintenance';
+	protected const CATEGORY = 'maintenance';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	protected const ID = 'update-core';
+	protected const PROVIDER_ID = 'update-core';
 
 	/**
 	 * The capability required to perform the task.
@@ -65,10 +65,15 @@ class Core_Update extends Repetitive {
 			'title'       => \esc_html__( 'Perform all updates', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
-			'type'        => $this->get_provider_type(),
+			'category'    => $this->get_provider_category(),
+			'provider_id' => $this->get_provider_id(),
 			'points'      => 1,
 			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'update-core.php' ) ) : '',
-			'description' => '<p>' . \esc_html__( 'Perform all updates to ensure your website is secure and up-to-date.', 'progress-planner' ) . '</p>',
+			'description' => sprintf(
+				/* translators: %s:<a href="http://prpl.fyi/perform-all-updates" target="_blank">See why we recommend this</a> link */
+				\esc_html__( 'Regular updates improve security and performance. %s.', 'progress-planner' ),
+				'<a href="http://prpl.fyi/perform-all-updates" target="_blank">' . \esc_html__( 'See why we recommend this', 'progress-planner' ) . '</a>'
+			),
 		];
 	}
 }

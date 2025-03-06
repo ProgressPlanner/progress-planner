@@ -20,7 +20,7 @@ class Remove_Inactive_Plugins extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'remove-inactive-plugins';
+	protected const PROVIDER_ID = 'remove-inactive-plugins';
 
 	/**
 	 * Whether the task is dismissable.

@@ -226,7 +226,7 @@ class Query {
 		$result = $wpdb->insert(
 			$wpdb->prefix . static::TABLE_NAME,
 			[
-				'date'     => $activity->date->format( 'Y-m-d H:i:s' ),
+				'date'     => $activity->date ? $activity->date->format( 'Y-m-d H:i:s' ) : ( new \DateTime() )->format( 'Y-m-d H:i:s' ),
 				'category' => $activity->category,
 				'type'     => $activity->type,
 				'data_id'  => (string) $activity->data_id,
@@ -289,7 +289,7 @@ class Query {
 		$wpdb->update(
 			$wpdb->prefix . static::TABLE_NAME,
 			[
-				'date'     => $activity->date->format( 'Y-m-d H:i:s' ),
+				'date'     => $activity->date ? $activity->date->format( 'Y-m-d H:i:s' ) : ( new \DateTime() )->format( 'Y-m-d H:i:s' ),
 				'category' => $activity->category,
 				'type'     => $activity->type,
 				'data_id'  => (string) $activity->data_id,
@@ -300,7 +300,7 @@ class Query {
 				'%s',
 				'%s',
 				'%s',
-				'%d',
+				'%s',
 				'%d',
 			],
 			[ '%d' ]
