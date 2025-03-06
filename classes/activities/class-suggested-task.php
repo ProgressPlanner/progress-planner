@@ -69,15 +69,15 @@ class Suggested_Task extends Activity {
 		$points = 1;
 
 		$data = \progress_planner()->get_suggested_tasks()->get_local()->get_data_from_task_id( $this->data_id );
-		if ( isset( $data['provider_id'] ) &&
-			isset( $data['long'] ) &&
-			true === $data['long'] &&
-			(
-				'create-post' === $data['provider_id'] ||
-				( new Create() )->get_provider_id() === $data['provider_id']
-			)
-		) {
-			$points = 2;
+		if ( isset( $data['provider_id'] ) && ( new Create() )->get_provider_id() === $data['provider_id'] ) {
+
+			// This works for legacy tasks.
+			$task = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $this->data_id );
+			if ( $task ) {
+				$points = isset( $task['long'] ) && $task['long'] ? 2 : 1;
+			}
+
+			// TODO: Get the points from task object or provider.
 		}
 
 		$this->points[ $date_ymd ] = $points;
