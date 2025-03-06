@@ -48,8 +48,8 @@ class Local_Task_Factory {
 				return new Task_Local(
 					[
 						'task_id'     => $this->task_id,
-						'category'    => $task_provider->get_provider_category(),
-						'provider_id' => $task_provider->get_provider_id(),
+						'category'    => $task_provider ? $task_provider->get_provider_category() : '',
+						'provider_id' => $task_provider ? $task_provider->get_provider_id() : '',
 					]
 				);
 			}
@@ -106,7 +106,7 @@ class Local_Task_Factory {
 		}
 
 		$task_provider    = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $data['provider_id'] );
-		$data['category'] = $task_provider->get_provider_category();
+		$data['category'] = $task_provider ? $task_provider->get_provider_category() : '';
 
 		return new Task_Local( $data );
 	}
