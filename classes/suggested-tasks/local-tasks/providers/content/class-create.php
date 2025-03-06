@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
-use Progress_Planner\Activities\Content_Helpers;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 use Progress_Planner\Data_Collector\Create_Post as Create_Post_Data_Collector;
 
@@ -21,14 +20,14 @@ class Create extends Repetitive {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'create-post';
+	protected const PROVIDER_ID = 'create-post';
 
 	/**
-	 * The provider type.
+	 * The provider category.
 	 *
 	 * @var string
 	 */
-	protected const TYPE = 'content-new';
+	protected const CATEGORY = 'content-new';
 
 	/**
 	 * The capability required to perform the task.
@@ -85,10 +84,11 @@ class Create extends Repetitive {
 
 		$task_details = [
 			'task_id'     => $task_id,
+			'provider_id' => $this->get_provider_id(),
 			'title'       => esc_html__( 'Create a post', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'medium',
-			'type'        => $this->get_provider_type(),
+			'category'    => $this->get_provider_category(),
 			'points'      => 1,
 			'url'         => \esc_url( \admin_url( 'post-new.php?post_type=post' ) ),
 			'description' => esc_html__( 'Create a new post.', 'progress-planner' ),

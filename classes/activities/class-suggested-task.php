@@ -8,7 +8,7 @@
 namespace Progress_Planner\Activities;
 
 use Progress_Planner\Activity;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Create;
 
 /**
  * Handler for suggested tasks activities.
@@ -35,8 +35,18 @@ class Suggested_Task extends Activity {
 	 * @return void
 	 */
 	public function save() {
-		$this->date    = new \DateTime();
-		$this->user_id = \get_current_user_id();
+		if ( ! $this->date ) {
+			$this->date = new \DateTime();
+		}
+
+		if ( ! $this->user_id ) {
+			$this->user_id = \get_current_user_id();
+		}
+
+		if ( $this->id ) {
+			\progress_planner()->get_query()->update_activity( $this->id, $this );
+			return;
+		}
 
 		\progress_planner()->get_query()->insert_activity( $this );
 		\do_action( 'progress_planner_activity_saved', $this );
@@ -59,13 +69,15 @@ class Suggested_Task extends Activity {
 		$points = 1;
 
 		$data = \progress_planner()->get_suggested_tasks()->get_local()->get_data_from_task_id( $this->data_id );
-
-		// Award 2 points if last created post was long.
-		if ( isset( $data['type'] ) && ( 'create-post' === $data['type'] ) ) {
-			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
-				( new Local_Task_Factory( $data['task_id'] ) )->get_task()->get_provider_id()
-			);
-			$points        = $task_provider->get_points();
+		if ( isset( $data['provider_id'] ) &&
+			isset( $data['long'] ) &&
+			true === $data['long'] &&
+			(
+				'create-post' === $data['provider_id'] ||
+				( new Create() )->get_provider_id() === $data['provider_id']
+			)
+		) {
+			$points = 2;
 		}
 
 		$this->points[ $date_ymd ] = $points;

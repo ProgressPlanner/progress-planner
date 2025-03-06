@@ -19,7 +19,7 @@ class Disable_Comments extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'disable-comments';
+	protected const PROVIDER_ID = 'disable-comments';
 
 	/**
 	 * Constructor.

@@ -20,7 +20,7 @@ class Sample_Page extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'sample-page';
+	protected const PROVIDER_ID = 'sample-page';
 
 	/**
 	 * The capability required to perform the task.

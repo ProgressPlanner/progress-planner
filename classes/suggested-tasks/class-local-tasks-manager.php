@@ -121,7 +121,7 @@ class Local_Tasks_Manager {
 	}
 
 	/**
-	 * Get a task provider by its type.
+	 * Get a task provider.
 	 *
 	 * @param string $name The method name.
 	 * @param array  $arguments The arguments.
@@ -149,7 +149,7 @@ class Local_Tasks_Manager {
 	}
 
 	/**
-	 * Get a task provider by its type.
+	 * Get a task provider by its ID.
 	 *
 	 * @param string $provider_id The provider ID.
 	 *
@@ -332,12 +332,12 @@ class Local_Tasks_Manager {
 					return false;
 				}
 
-				if ( isset( $task['year_week'] ) ) {
-					return \gmdate( 'YW' ) === $task['year_week'];
+				if ( isset( $task['date'] ) ) {
+					return (string) \gmdate( 'YW' ) === (string) $task['date'];
 				}
 
-				// We have changed type name, so we need to remove all tasks of the old type.
-				if ( isset( $task['type'] ) && 'update-post' === $task['type'] ) {
+				// We have changed provider_id name, so we need to remove all tasks of the old provider_id.
+				if ( isset( $task['provider_id'] ) && 'update-post' === $task['provider_id'] ) {
 					return false;
 				}
 
