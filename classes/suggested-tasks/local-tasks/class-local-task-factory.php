@@ -53,6 +53,11 @@ class Local_Task_Factory {
 			$type        = substr( $this->task_id, 0, $last_pos );
 			$task_suffix = substr( $this->task_id, $last_pos + 1 );
 
+			// Check for legacy create-post task_id, old task_ids were migrated to create-post-short' or 'create-post-long' (since we had 2 such tasks per week).
+			if ( 'create-post-short' === $type || 'create-post-long' === $type ) {
+				$type = 'create-post';
+			}
+
 			$task_suffix_key = 'remote-task' === $type ? 'remote_task_id' : 'year_week';
 
 			return new Task_Local(

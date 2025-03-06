@@ -125,9 +125,22 @@ class Update_111 {
 		if ( ! empty( $this->local_tasks ) ) {
 			foreach ( $this->local_tasks as $key => $task ) {
 				if ( false !== strpos( $task['task_id'], '|type/create-post' ) ) {
-					// TODO: task_id needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
-					$this->local_tasks[ $key ]['task_id'] = $task['type'] . '-' . $task['date'];
-					$this->local_tasks_changed            = true;
+
+					// task_id needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
+					// So for tasks which are completed or pending_celebration we will make the task_id like: create-post-short-202501 .
+					// and for pending tasks task_id will be (how it will be in the future, since we only have 1 type of create-post task per week): create-post-202501 .
+
+					// Only add legacy part of the task_id if the task is not pending.
+					if ( 'completed' === $task['status'] || 'pending_celebration' === $task['status'] ) {
+						$this->local_tasks[ $key ]['task_id'] = $task['type'] . '-' . ( $task['long'] ? 'long' : 'short' ) . '-' . $task['date'];
+					} else {
+						$this->local_tasks[ $key ]['task_id'] = $task['type'] . '-' . $task['date'];
+					}
+
+					// We dont need the "long" or "short" part of the task_id anymore.
+					unset( $this->local_tasks[ $key ]['long'] );
+
+					$this->local_tasks_changed = true;
 				}
 			}
 		}
@@ -146,7 +159,7 @@ class Update_111 {
 					$data = $this->get_data_from_task_id( $activity->data_id );
 
 					// TODO: task_id needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
-					$new_data_id = $data['type'] . '-' . $data['date'];
+					$new_data_id = $data['type'] . '-' . ( $data['long'] ? 'long' : 'short' ) . '-' . $data['date'];
 					if ( $new_data_id !== $activity->data_id ) {
 						$activity->data_id = $new_data_id;
 						$activity->save();
