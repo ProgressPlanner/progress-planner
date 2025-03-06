@@ -7,12 +7,6 @@
  * @return {number} The number of items in the list.
  */
 const prplSuggestedTasksCountItems = ( category ) => {
-	// We want to display all pending celebration tasks on page load.
-	if ( 'pending_celebration' === category ) {
-		// TODO: This is a status, not a provider-ID.
-		return 0;
-	}
-
 	const items = document.querySelectorAll(
 		`.prpl-suggested-task[data-task-category="${ category }"]`
 	);
@@ -268,10 +262,10 @@ const prplStrikeCompletedTasks = () => {
 	}, 2000 );
 };
 
-const prplPendingCelebration = prplSuggestedTasksGetItemsWithStatus(
-	'pending_celebration'
-);
-if ( ! prplSuggestedTasks.delayCelebration && prplPendingCelebration.length ) {
+if (
+	! prplSuggestedTasks.delayCelebration &&
+	prplSuggestedTasksGetItemsWithStatus( 'pending_celebration' ).length
+) {
 	setTimeout( () => {
 		// Trigger the celebration event.
 		document.dispatchEvent( new Event( 'prplCelebrateTasks' ) );
@@ -303,6 +297,13 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		) {
 			prplSuggestedTasksInjectNextItem( category );
 		}
+
+		// Inject ALL pending celebration tasks.
+		prplSuggestedTasksGetItemsWithStatus( 'pending_celebration' ).forEach(
+			( task ) => {
+				prplSuggestedTasksInjectItem( task );
+			}
+		);
 	}
 
 	const event = new CustomEvent( 'prplResizeAllGridItemsEvent' );
@@ -558,11 +559,6 @@ document.addEventListener(
 	'prplMaybeInjectSuggestedTaskEvent',
 	( e ) => {
 		const category = e.detail.category;
-
-		if ( 'pending_celebration' === category ) {
-			// TODO: This is a status, not a category.
-			return;
-		}
 
 		while (
 			prplSuggestedTasksCountItems( category ) <
