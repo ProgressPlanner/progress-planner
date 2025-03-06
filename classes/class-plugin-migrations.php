@@ -9,7 +9,7 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+use Progress_Planner\Update\Update_111;
 
 /**
  * Plugin Upgrade class.
@@ -39,8 +39,8 @@ class Plugin_Migrations {
 	 *
 	 * @var array
 	 */
-	private const UPGRADE_METHODS = [
-		'1.1.1' => 'upgrade_1_1_1',
+	private const UPGRADE_CLASSES = [
+		'1.1.1' => Update_111::class,
 	];
 
 	/**
@@ -85,13 +85,14 @@ class Plugin_Migrations {
 		}
 
 		// Run the upgrades.
-		foreach ( self::UPGRADE_METHODS as $version => $upgrade_method ) {
+		foreach ( self::UPGRADE_CLASSES as $version => $upgrade_class ) {
 			if (
 				( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) ||
 				\get_option( 'prpl_debug' ) ||
 				version_compare( $version, $this->db_version, '>' )
 			) {
-				$this->$upgrade_method();
+				$upgrade_class = new $upgrade_class();
+				$upgrade_class->run();
 			}
 		}
 
@@ -104,89 +105,5 @@ class Plugin_Migrations {
 		 * @param string $db_version The old version of the plugin.
 		 */
 		do_action( 'progress_planner_plugin_updated', $this->version, $this->db_version );
-	}
-
-	/**
-	 * Upgrade the database to version 1.1.1.
-	 *
-	 * @return void
-	 */
-	private function upgrade_1_1_1() {
-		$local_tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		$local_tasks_changed = false;
-
-		$add_local_task = function ( $task ) use ( &$local_tasks ) {
-			foreach ( $local_tasks as $key => $local_task ) {
-				if ( $local_task['task_id'] === $task['task_id'] ) {
-					$local_tasks[ $key ] = $task;
-					return;
-				}
-			}
-			$local_tasks[] = $task;
-		};
-
-		// Migrate the `progress_planner_local_tasks` option.
-		$local_tasks_option = \get_option( 'progress_planner_local_tasks', [] );
-		if ( ! empty( $local_tasks_option ) ) {
-			foreach ( $local_tasks_option as $task_id ) {
-				$task           = ( new Local_Task_Factory( $task_id ) )->get_task()->get_data();
-				$task['status'] = 'pending';
-
-				if ( ! isset( $task['task_id'] ) ) {
-					continue;
-				}
-
-				$add_local_task( $task );
-				$local_tasks_changed = true;
-			}
-			\delete_option( 'progress_planner_local_tasks' );
-		}
-
-		// Migrate the `progress_planner_suggested_tasks` option.
-		$suggested_tasks_option = \get_option( 'progress_planner_suggested_tasks', [] );
-		if ( ! empty( $suggested_tasks_option ) ) {
-			foreach ( $suggested_tasks_option as $status => $tasks ) {
-				foreach ( $tasks as $_task ) {
-					$task_id        = is_string( $_task ) ? $_task : $_task['id'];
-					$task           = ( new Local_Task_Factory( $task_id ) )->get_task()->get_data();
-					$task['status'] = $status;
-					if ( 'snoozed' === $status && isset( $_task['time'] ) ) {
-						$task['time'] = $_task['time'];
-					}
-					$add_local_task( $task );
-					$local_tasks_changed = true;
-				}
-			}
-		}
-
-		if ( $local_tasks_changed ) {
-			\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
-		}
-
-		// Migrate the 'create-post' completed tasks.
-		$completed_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'completed' );
-		if ( ! empty( $completed_tasks ) ) {
-			foreach ( $completed_tasks as $task ) {
-				if ( false !== strpos( $task['task_id'], '|type/create-post' ) ) {
-					// TODO: Migrate task_id to new format.
-				}
-			}
-		}
-
-		// Migrate the 'create-post' activities.
-		$activities = \progress_planner()->get_query()->query_activities(
-			[
-				'category' => 'suggested_task',
-				'type'     => 'completed',
-			]
-		);
-
-		if ( ! empty( $activities ) ) {
-			foreach ( $activities as $activity ) {
-				if ( false !== strpos( $activity->data_id, '|type/create-post' ) ) {
-					// TODO: Migrate activity to the new format. We need to save post lenght somehow in order to properly calculate the points.
-				}
-			}
-		}
 	}
 }
