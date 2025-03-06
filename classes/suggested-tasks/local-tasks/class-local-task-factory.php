@@ -83,7 +83,7 @@ class Local_Task_Factory {
 
 		$data = [ 'task_id' => $this->task_id ];
 
-		// Parse detailed (piped) format (date/202510|long/1|category/create-post).
+		// Parse detailed (piped) format (date/202510|long/1|provider_id/create-post).
 		$parts = \explode( '|', $this->task_id );
 		foreach ( $parts as $part ) {
 			$part = \explode( '/', $part );
