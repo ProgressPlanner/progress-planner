@@ -56,21 +56,19 @@ class Update_111 {
 	 * @return void
 	 */
 	private function migrate_local_tasks() {
-		$suggested_tasks_option = \get_option( 'progress_planner_suggested_tasks', [] );
-		if ( empty( $suggested_tasks_option ) ) {
-			return;
-		}
-		foreach ( $suggested_tasks_option as $status => $tasks ) {
-			foreach ( $tasks as $_task ) {
-				$task_id        = is_string( $_task ) ? $_task : $_task['id'];
+		$local_tasks_option = \get_option( 'progress_planner_local_tasks', [] );
+		if ( ! empty( $local_tasks_option ) ) {
+			foreach ( $local_tasks_option as $task_id ) {
 				$task           = ( new Local_Task_Factory( $task_id ) )->get_task()->get_data();
-				$task['status'] = $status;
-				if ( 'snoozed' === $status && isset( $_task['time'] ) ) {
-					$task['time'] = $_task['time'];
+				$task['status'] = 'pending';
+
+				if ( ! isset( $task['task_id'] ) ) {
+					continue;
 				}
 				$this->add_local_task( $task );
 				$this->local_tasks_changed = true;
 			}
+			\delete_option( 'progress_planner_local_tasks' );
 		}
 	}
 
@@ -96,6 +94,7 @@ class Update_111 {
 				$this->local_tasks_changed = true;
 			}
 		}
+		\delete_option( 'progress_planner_suggested_tasks' );
 	}
 
 	/**
