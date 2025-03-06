@@ -133,7 +133,7 @@ trait Task_Provider_Test_Trait {
 			$this->assertTrue(
 				$this->suggested_tasks->check_task_condition(
 					[
-						'type'    => 'pending_celebration',
+						'status'  => 'pending_celebration',
 						'task_id' => $task['task_id'],
 					]
 				)
@@ -146,7 +146,7 @@ trait Task_Provider_Test_Trait {
 			$this->assertTrue(
 				$this->suggested_tasks->check_task_condition(
 					[
-						'type'    => 'completed',
+						'status'  => 'completed',
 						'task_id' => $task['task_id'],
 					]
 				)
