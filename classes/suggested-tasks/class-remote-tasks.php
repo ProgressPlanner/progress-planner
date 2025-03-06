@@ -46,10 +46,10 @@ class Remote_Tasks {
 				continue;
 			}
 
-			// Task which don't have type defined are added as a 'default' type.
-			$item['type']    = 'remote-' . ( isset( $item['type'] ) ? $item['type'] : 'default' );
-			$item['task_id'] = "remote-task-{$item['task_id']}";
-			$items[]         = $item;
+			// Task which don't have category defined are added as a 'default' category.
+			$item['category'] = 'remote-' . ( isset( $item['category'] ) ? $item['category'] : 'default' );
+			$item['task_id']  = "remote-task-{$item['task_id']}";
+			$items[]          = $item;
 		}
 
 		return \array_merge( $items, $tasks );
