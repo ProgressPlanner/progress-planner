@@ -34,13 +34,29 @@ abstract class Base_Data_Collector {
 	abstract protected function calculate_data();
 
 	/**
+	 * Get the data key.
+	 *
+	 * @return string
+	 */
+	public function get_data_key() {
+		return static::DATA_KEY;
+	}
+
+	/**
+	 * Initialize the data collector.
+	 *
+	 * @return void
+	 */
+	public function init() {}
+
+	/**
 	 * Collect the data.
 	 *
 	 * @return mixed
 	 */
 	public function collect() {
 		// Try to get cached value.
-		$data = $this->get_cached_data( static::DATA_KEY );
+		$data = $this->get_cached_data( $this->get_data_key() );
 		if ( null !== $data ) {
 			return $data;
 		}
@@ -59,8 +75,8 @@ abstract class Base_Data_Collector {
 	 *
 	 * @return void
 	 */
-	protected function update_cache() {
-		$this->set_cached_data( static::DATA_KEY, $this->calculate_data() );
+	public function update_cache() {
+		$this->set_cached_data( $this->get_data_key(), $this->calculate_data() );
 	}
 
 	/**

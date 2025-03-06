@@ -19,7 +19,7 @@ class Site_Icon extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'core-siteicon';
+	protected const PROVIDER_ID = 'core-siteicon';
 
 	/**
 	 * Constructor.

@@ -9,6 +9,7 @@ namespace Progress_Planner\Widgets;
 
 use Progress_Planner\Badges\Monthly;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Review;
 
 /**
  * Suggested_Tasks class.
@@ -103,6 +104,7 @@ final class Suggested_Tasks extends Widget {
 							$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
 							$task_details['action']   = 'celebrate';
 							$task_details['status']   = 'pending_celebration';
+							$task_details['category'] = 'pending_celebration';
 
 							$tasks[] = $task_details;
 						}
@@ -122,6 +124,10 @@ final class Suggested_Tasks extends Widget {
 
 		$final_tasks = array_values( $final_tasks );
 
+		foreach ( $final_tasks as $key => $task ) {
+			$final_tasks[ $key ]['providerID'] = $task['provider_id'] ?? $task['category']; // category is used for remote tasks.
+		}
+
 		// Sort the final tasks by priority. The priotity can be "high", "medium", "low", or "none".
 		uasort(
 			$final_tasks,
@@ -140,14 +146,14 @@ final class Suggested_Tasks extends Widget {
 			}
 		);
 
-		$max_items_per_type = [];
+		$max_items_per_category = [];
 		foreach ( $final_tasks as $task ) {
-			$max_items_per_type[ $task['type'] ] = $task['type'] === 'content-update' ? 2 : 1;
+			$max_items_per_category[ $task['category'] ] = $task['category'] === ( new Review() )->get_provider_category() ? 2 : 1;
 		}
 
 		// We want all pending_celebration' tasks to be shown.
-		if ( isset( $max_items_per_type['pending_celebration'] ) ) {
-			$max_items_per_type['pending_celebration'] = 99;
+		if ( isset( $max_items_per_category['pending_celebration'] ) ) {
+			$max_items_per_category['pending_celebration'] = 99;
 		}
 
 		// Check if current date is between Feb 12-16 to use hearts confetti.
@@ -179,12 +185,12 @@ final class Suggested_Tasks extends Widget {
 			$handle,
 			'prplSuggestedTasks',
 			[
-				'ajaxUrl'          => \admin_url( 'admin-ajax.php' ),
-				'nonce'            => \wp_create_nonce( 'progress_planner' ),
-				'tasks'            => array_values( $final_tasks ),
-				'maxItemsPerType'  => apply_filters( 'progress_planner_suggested_tasks_max_items_per_type', $max_items_per_type ),
-				'confettiOptions'  => $confetti_options,
-				'delayCelebration' => $delay_celebration,
+				'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
+				'nonce'               => \wp_create_nonce( 'progress_planner' ),
+				'tasks'               => array_values( $final_tasks ),
+				'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
+				'confettiOptions'     => $confetti_options,
+				'delayCelebration'    => $delay_celebration,
 			]
 		);
 	}

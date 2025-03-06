@@ -19,7 +19,7 @@ class Search_Engine_Visibility extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'search-engine-visibility';
+	protected const PROVIDER_ID = 'search-engine-visibility';
 
 	/**
 	 * Whether the task is dismissable.

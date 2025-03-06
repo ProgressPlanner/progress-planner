@@ -36,7 +36,7 @@ class Activity {
 	/**
 	 * The date of the activity.
 	 *
-	 * @var \DateTime
+	 * @var \DateTime|null
 	 */
 	public $date;
 
