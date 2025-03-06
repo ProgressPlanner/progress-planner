@@ -11,6 +11,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
 use Progress_Planner\Suggested_Tasks\Remote_Tasks;
 use Progress_Planner\Activities\Suggested_Task;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
+
 /**
  * Suggested_Tasks class.
  */
