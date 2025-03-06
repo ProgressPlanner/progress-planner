@@ -19,7 +19,7 @@ class Settings_Saved extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'settings-saved';
+	protected const PROVIDER_ID = 'settings-saved';
 
 	/**
 	 * Whether the task is an onboarding task.

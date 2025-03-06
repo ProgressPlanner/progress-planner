@@ -19,7 +19,7 @@ class Blog_Description extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'core-blogdescription';
+	protected const PROVIDER_ID = 'core-blogdescription';
 
 	/**
 	 * Constructor.
