@@ -296,7 +296,7 @@ class Local_Tasks_Manager {
 		$task['status'] = 'pending';
 
 		if ( false !== $task_index ) {
-			$tasks[ $task_index ] = $task;
+			$tasks[ $task_index ] = array_merge( $task, $tasks[ $task_index ] );
 		} else {
 			$tasks[] = $task;
 		}
