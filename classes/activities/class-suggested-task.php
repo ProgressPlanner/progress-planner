@@ -69,7 +69,7 @@ class Suggested_Task extends Activity {
 		$points = 1;
 
 		$data = \progress_planner()->get_suggested_tasks()->get_local()->get_data_from_task_id( $this->data_id );
-		if ( isset( $data['provider_id'] ) && ( new Create() )->get_provider_id() === $data['provider_id'] ) {
+		if ( isset( $data['provider_id'] ) && 'create-post' === $data['provider_id'] ) {
 
 			// This works for legacy tasks.
 			$task = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $this->data_id );
