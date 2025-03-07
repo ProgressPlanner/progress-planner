@@ -102,6 +102,11 @@ final class Suggested_Tasks extends Widget {
 						$task_details['action']   = 'celebrate';
 						$task_details['status']   = 'pending_celebration';
 
+						// Award 2 points if last created post was long.
+						if ( 'create-post' === $task_provider->get_provider_id() ) {
+								$task['points'] = $task_provider->get_points(); // TODO: Make this function better (get_points_by_task_id).
+						}
+
 						$tasks[] = $task_details;
 					}
 

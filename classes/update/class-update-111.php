@@ -45,12 +45,18 @@ class Update_111 {
 		// Convert local tasks.
 		$this->convert_local_tasks();
 
+		// Migrate the 'create-post' tasks, they are now repetitive tasks.
+		$this->migrate_create_post_tasks();
+
 		if ( $this->local_tasks_changed ) {
 			\progress_planner()->get_settings()->set( 'local_tasks', $this->local_tasks );
 		}
 
 		// Migrate activities.
 		$this->migrate_activities();
+
+		// Migrate the 'create-post' activities.
+		$this->migrate_create_post_activities();
 	}
 
 	/**
@@ -170,5 +176,98 @@ class Update_111 {
 		$parts   = \explode( '|', $task_id );
 		\ksort( $parts );
 		return \implode( '|', $parts );
+	}
+
+	/**
+	 * Migrate the 'create-post' tasks, they are now repetitive tasks.
+	 * Since the tasks were already migrated, we search for 'provider_id/create-post' (not 'type/create-post').
+	 *
+	 * @return void
+	 */
+	private function migrate_create_post_tasks() {
+
+		// Migrate the 'create-post' completed tasks.
+		if ( ! empty( $this->local_tasks ) ) {
+			foreach ( $this->local_tasks as $key => $task ) {
+				if ( false !== strpos( $task['task_id'], 'provider_id/create-post' ) ) {
+
+					// task_id needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
+					// So for tasks which are completed or pending_celebration we will make the task_id like: create-post-short-202501,
+					// and for pending tasks task_id will be (how it will be in the future, since we only have 1 type of create-post task per week): create-post-202501 .
+
+					// Only add legacy part of the task_id if the task is not pending.
+					if ( 'completed' === $task['status'] || 'pending_celebration' === $task['status'] ) {
+						$this->local_tasks[ $key ]['task_id'] = $task['provider_id'] . '-' . ( $task['long'] ? 'long' : 'short' ) . '-' . $task['date'];
+					} else {
+						$this->local_tasks[ $key ]['task_id'] = $task['provider_id'] . '-' . $task['date'];
+					}
+
+					// We need to keep $task['long'] because it's used to calculate the points (and we don't know which post was created).
+
+					$this->local_tasks_changed = true;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Migrate the 'create-post' tasks, they are now repetitive tasks.
+	 * Since the activities were already migrated, we search for 'provider_id/create-post' (not 'type/create-post').
+	 *
+	 * @return void
+	 */
+	private function migrate_create_post_activities() {
+		// Migrate the 'create-post' activities.
+		$activities = \progress_planner()->get_query()->query_activities(
+			[
+				'category' => 'suggested_task',
+				'type'     => 'completed',
+			]
+		);
+
+		if ( ! empty( $activities ) ) {
+			foreach ( $activities as $activity ) {
+				if ( false !== strpos( $activity->data_id, 'provider_id/create-post' ) ) {
+					$data = $this->get_data_from_task_id( $activity->data_id );
+
+					// TODO: task_id needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
+					$new_data_id = $data['provider_id'] . '-' . ( $data['long'] ? 'long' : 'short' ) . '-' . $data['date'];
+					if ( $new_data_id !== $activity->data_id ) {
+						$activity->data_id = $new_data_id;
+						$activity->save();
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get the data from a task-ID.
+	 * Copied from the Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content class, since we might remove that function in the future.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return array The data.
+	 */
+	private function get_data_from_task_id( $task_id ) {
+		$parts = \explode( '|', $task_id );
+		$data  = [];
+		foreach ( $parts as $part ) {
+			$part = \explode( '/', $part );
+			if ( 2 !== \count( $part ) ) {
+				continue;
+			}
+			$data[ $part[0] ] = ( \is_numeric( $part[1] ) )
+				? (int) $part[1]
+				: $part[1];
+		}
+		\ksort( $data );
+
+		// Convert (int) 1 and (int) 0 to (bool) true and (bool) false.
+		if ( isset( $data['long'] ) ) {
+			$data['long'] = (bool) $data['long'];
+		}
+
+		return $data;
 	}
 }

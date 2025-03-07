@@ -7,13 +7,13 @@
 
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
 
-use Progress_Planner\Activities\Content_Helpers;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
+use Progress_Planner\Data_Collector\Create_Post as Create_Post_Data_Collector;
 
 /**
  * Add tasks for content creation.
  */
-class Create extends Content {
+class Create extends Repetitive {
 
 	/**
 	 * The provider ID.
@@ -30,117 +30,64 @@ class Create extends Content {
 	protected const CATEGORY = 'content-new';
 
 	/**
-	 * The number of items to inject.
+	 * The capability required to perform the task.
 	 *
-	 * @var int
+	 * @var string
 	 */
-	protected const ITEMS_TO_INJECT = 2;
+	protected const CAPABILITY = 'edit_others_posts';
 
 	/**
-	 * Get an array of tasks to inject.
+	 * The data collector.
 	 *
-	 * @return array
+	 * @var \Progress_Planner\Data_Collector\Create_Post
 	 */
-	public function get_tasks_to_inject() {
-		// Early exit if we have both long and short posts snoozed.
-		if ( true === \progress_planner()->get_suggested_tasks()->check_task_condition(
-			[
-				'status'       => 'snoozed-post-length',
-				'post_lengths' => [ 'long', 'short' ],
-			]
-		) ) {
-			return [];
-		}
+	protected $data_collector;
 
-		// Get the post that was created last.
-		$last_created_posts = \get_posts(
-			[
-				'posts_per_page' => 1,
-				'post_status'    => 'publish',
-				'orderby'        => 'date',
-				'order'          => 'DESC',
-			]
-		);
-
-		$is_last_post_long = (
-			! empty( $last_created_posts )
-			&& \progress_planner()->get_activities__content_helpers()->is_post_long( $last_created_posts[0]->ID )
-		);
-
-		// If the task with this length is snoozed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->check_task_condition(
-			[
-				'status'       => 'snoozed-post-length',
-				'post_lengths' => [ $is_last_post_long ? 'short' : 'long' ],
-			]
-		) ) {
-			return [];
-		}
-
-		$task_id = $this->get_task_id_from_data(
-			[
-				'provider_id' => 'create-post',
-				'date'        => \gmdate( 'YW' ),
-				'long'        => $is_last_post_long ? '0' : '1',
-			]
-		);
-
-		// If the task with this length and id is completed, don't add a task.
-		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
-			return [];
-		}
-
-		return [ $this->get_task_details( $task_id ) ];
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$this->data_collector = new Create_Post_Data_Collector();
 	}
 
 	/**
-	 * Evaluate a task.
+	 * Add task data.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
-	 * @return bool|string
+	 * @return array
 	 */
-	public function evaluate_task( $task_id ) {
-		$data = $this->get_data_from_task_id( $task_id );
+	public function modify_task_data( $task_data ) {
+		$last_published_post_data = $this->data_collector->collect();
 
-		$last_posts = \get_posts(
-			[
-				'posts_per_page' => 1,
-				'post_status'    => 'publish',
-				'orderby'        => 'date',
-				'order'          => 'DESC',
-			]
-		);
-
-		$last_post = $last_posts ? $last_posts[0] : null;
-		if ( ! $last_post ) {
-			return false;
+		if ( ! $last_published_post_data || empty( $last_published_post_data['post_id'] ) ) {
+			return $task_data;
 		}
 
-		// Check if the post was created this week.
-		if ( \gmdate( 'YW', strtotime( $last_post->post_date ) ) !== \gmdate( 'YW' ) ) { // @phpstan-ignore-line argument.type
-			return false;
+		// Add the post ID and post length to the task data.
+		$task_data['post_id'] = $last_published_post_data['post_id'];
+		$task_data['long']    = 'long' === $last_published_post_data['post_length'];
+
+		return $task_data;
+	}
+
+	/**
+	 * Check if the task should be added.
+	 *
+	 * @return bool
+	 */
+	public function should_add_task() {
+
+		// Get the post that was created last.
+		$last_published_post_data = $this->data_collector->collect();
+
+		// There are no published posts, add task.
+		if ( ! $last_published_post_data || empty( $last_published_post_data['post_id'] ) ) {
+			return true;
 		}
 
-		// Check if the task is for this week.
-		if ( ! isset( $data['date'] ) || (string) $data['date'] !== (string) \gmdate( 'YW' ) ) {
-			return false;
-		}
-
-		// Check if the task is for a long post.
-		$is_post_long = \progress_planner()->get_activities__content_helpers()->is_post_long( $last_post->ID );
-		if ( ! isset( $data['long'] ) || $data['long'] !== $is_post_long ) {
-			return false;
-		}
-
-		return $this->get_task_id_from_data(
-			[
-				'provider_id' => 'create-post',
-				'date'        => \gmdate( 'YW' ),
-				'post_id'     => $last_post->ID,
-				'long'        => $is_post_long ? '1' : '0',
-			]
-		);
+		// Add tasks if there are no posts published this week.
+		return \gmdate( 'YW' ) !== \gmdate( 'YW', strtotime( $last_published_post_data['post_date'] ) );
 	}
 
 	/**
@@ -156,32 +103,36 @@ class Create extends Content {
 			return [];
 		}
 
-		$data = $this->get_data_from_task_id( $task_id );
-
 		$task_details = [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
-			'title'       => isset( $data['long'] ) && $data['long']
-				? esc_html__( 'Create a long post', 'progress-planner' )
-				: esc_html__( 'Create a short post', 'progress-planner' ),
+			'title'       => esc_html__( 'Create a post', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'medium',
 			'category'    => $this->get_provider_category(),
-			'points'      => isset( $data['long'] ) && $data['long'] ? 2 : 1,
+			'points'      => 1,
 			'url'         => \esc_url( \admin_url( 'post-new.php?post_type=post' ) ),
-			'description' => isset( $data['long'] ) && $data['long']
-				? sprintf(
-					/* translators: %d: The threshold (number, words count) for a long post. */
-					esc_html__( 'Create a new long post (longer than %d words).', 'progress-planner' ),
-					Content_Helpers::LONG_POST_THRESHOLD
-				)
-				: sprintf(
-					/* translators: %d: The threshold (number, words count) for a long post. */
-					esc_html__( 'Create a new short post (no longer than %d words).', 'progress-planner' ),
-					Content_Helpers::LONG_POST_THRESHOLD
-				),
+			'description' => esc_html__( 'Create a new post.', 'progress-planner' ),
 		];
 
 		return $task_details;
+	}
+
+	/**
+	 * Get the number of points for the task.
+	 *
+	 * @return int
+	 */
+	public function get_points() {
+
+		// Get the post that was created last.
+		$last_published_post_data = $this->data_collector->collect();
+
+		// Post was created, but then deleted?
+		if ( ! $last_published_post_data || empty( $last_published_post_data['post_id'] ) ) {
+			return 1;
+		}
+
+		return 'long' === $last_published_post_data['post_length'] ? 2 : 1;
 	}
 }

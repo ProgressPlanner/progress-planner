@@ -214,7 +214,7 @@ class Local_Tasks_Manager {
 
 			$task_result = $this->evaluate_task( $task_id );
 			if ( false !== $task_result ) {
-				$completed_tasks[] = $task_id;
+				$completed_tasks[] = $task_result;
 			}
 		}
 
