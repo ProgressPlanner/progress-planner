@@ -45,7 +45,7 @@ class Local_Task_Factory {
 
 		/*
 		We're here in following cases:
-		 * - Legacy tasks, which is somehow not migrated, where we parsed task data from the task_id.
+		 * - Legacy tasks, happens during v1.1.1 update, where we parsed task data from the task_id.
 		 * - When adding new pending task (which is not yet saved in the database).
 		 * - Remote tasks.
 		*/
