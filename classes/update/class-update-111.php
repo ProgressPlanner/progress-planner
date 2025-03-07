@@ -45,6 +45,9 @@ class Update_111 {
 		// Convert local tasks.
 		$this->convert_local_tasks();
 
+		// Migrate to-do items.
+		$this->migrate_todo_items();
+
 		if ( $this->local_tasks_changed ) {
 			\progress_planner()->get_settings()->set( 'local_tasks', $this->local_tasks );
 		}
@@ -153,6 +156,33 @@ class Update_111 {
 				$activity->save();
 			}
 		}
+	}
+
+	/**
+	 * Migrate to-do items.
+	 *
+	 * @return void
+	 */
+	private function migrate_todo_items() {
+		$todo_items = \get_option( 'progress_planner_todo', [] );
+		if ( empty( $todo_items ) ) {
+			return;
+		}
+		foreach ( $todo_items as $todo_item ) {
+			$this->add_local_task(
+				[
+					'task_id'     => 'user-task-' . md5( $todo_item['content'] ),
+					'status'      => $todo_item['done'] ? 'completed' : 'pending',
+					'provider_id' => 'user',
+					'category'    => 'user',
+					'title'       => $todo_item['content'],
+				]
+			);
+		}
+
+		$this->local_tasks_changed = true;
+
+		\delete_option( 'progress_planner_todo' );
 	}
 
 	/**
