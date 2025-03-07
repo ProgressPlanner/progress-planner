@@ -74,7 +74,7 @@ class Suggested_Task extends Activity {
 			true === $data['long'] &&
 			(
 				'create-post' === $data['provider_id'] ||
-				( new Review() )->get_provider_id() === $data['provider_id']
+				'review-post' === $data['provider_id']
 			)
 		) {
 			$points = 2;

@@ -13,6 +13,13 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 interface Local_Tasks_Interface {
 
 	/**
+	 * Initialize the task provider.
+	 *
+	 * @return void
+	 */
+	public function init();
+
+	/**
 	 * Get tasks to inject.
 	 *
 	 * @return array
