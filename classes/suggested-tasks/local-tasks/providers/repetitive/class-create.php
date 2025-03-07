@@ -5,7 +5,7 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 use Progress_Planner\Data_Collector\Create_Post as Create_Post_Data_Collector;
