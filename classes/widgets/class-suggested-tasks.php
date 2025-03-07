@@ -9,7 +9,7 @@ namespace Progress_Planner\Widgets;
 
 use Progress_Planner\Badges\Monthly;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Review;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Review;
 
 /**
  * Suggested_Tasks class.

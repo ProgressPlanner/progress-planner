@@ -5,14 +5,21 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 
 /**
  * Add tasks for content updates.
  */
-class Review extends Content {
+class Review extends Repetitive {
+
+	/**
+	 * The capability required to perform the task.
+	 *
+	 * @var string
+	 */
+	protected const CAPABILITY = 'edit_others_posts';
 
 	/**
 	 * The provider ID.
@@ -43,30 +50,100 @@ class Review extends Content {
 	protected $snoozed_post_ids = null;
 
 	/**
+	 * The post to update IDs.
+	 *
+	 * @var array|null
+	 */
+	protected $task_post_mappings = null;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		\add_filter( 'progress_planner_update_posts_tasks_args', [ $this, 'filter_update_posts_args' ] );
-
 		\add_action( 'transition_post_status', [ $this, 'transition_post_status' ], 10, 3 );
 	}
 
 	/**
-	 * Evaluate a task.
+	 * Check if the task should be added.
 	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool|string
+	 * @return bool
 	 */
-	public function evaluate_task( $task_id ) {
-		$data = $this->get_data_from_task_id( $task_id );
+	public function should_add_task() {
 
-		if ( isset( $data['post_id'] ) && (int) \get_post_modified_time( 'U', false, (int) $data['post_id'] ) > strtotime( '-6 months' ) ) {
-			$data['date'] = \gmdate( 'YW' );
-			return $this->get_task_id_from_data( $data );
+		if ( null === $this->task_post_mappings ) {
+			$this->task_post_mappings = [];
+
+			$number_of_posts_to_inject = static::ITEMS_TO_INJECT;
+			$last_updated_posts        = [];
+
+			// Check if there are any important pages to update.
+			$important_page_ids = [];
+			foreach ( \progress_planner()->get_admin__page_settings()->get_settings() as $important_page ) {
+				if ( 0 !== (int) $important_page['value'] ) {
+					$important_page_ids[] = (int) $important_page['value'];
+				}
+			}
+
+			// Add the privacy policy page ID if it exists. Not 'publish' page will not be fetched by get_posts().
+			$privacy_policy_page_id = \get_option( 'wp_page_for_privacy_policy' );
+			if ( $privacy_policy_page_id ) {
+				$important_page_ids[] = (int) $privacy_policy_page_id;
+			}
+
+			/**
+			 * Filters the pages we deem more important for content updates.
+			 *
+			 * @param int[] $important_page_ids Post & page IDs of the important pages.
+			 */
+			$important_page_ids = \apply_filters( 'progress_planner_update_posts_important_page_ids', $important_page_ids );
+
+			if ( ! empty( $important_page_ids ) ) {
+				$last_updated_posts = $this->get_old_posts(
+					[
+						'post__in' => $important_page_ids,
+					]
+				);
+			}
+
+			// Lets check for other posts to update.
+			$number_of_posts_to_inject = $number_of_posts_to_inject - count( $last_updated_posts );
+
+			if ( 0 < $number_of_posts_to_inject ) {
+				// Get the post that was updated last.
+				$last_updated_posts = array_merge(
+					$last_updated_posts,
+					$this->get_old_posts(
+						[
+							'post__not_in' => $important_page_ids, // This can be an empty array.
+						]
+					)
+				);
+			}
+
+			if ( ! $last_updated_posts ) {
+				$this->task_post_mappings = [];
+				return false;
+			}
+
+			foreach ( $last_updated_posts as $post ) {
+				$task_id = 'review-post-' . $post->ID . '-' . \gmdate( 'YW' ); // TODO: WIP code.
+
+				// Don't add the task if it was completed.
+				if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
+					continue;
+				}
+
+				$this->task_post_mappings[ $task_id ] = [
+					'task_id' => $task_id,
+					'post_id' => $post->ID,
+				];
+			}
 		}
-		return false;
+
+		return 0 < count( $this->task_post_mappings );
 	}
+
 
 	/**
 	 * Get an array of tasks to inject.
@@ -74,74 +151,26 @@ class Review extends Content {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-		$number_of_posts_to_inject = static::ITEMS_TO_INJECT;
-		$last_updated_posts        = [];
 
-		// Check if there are any important pages to update.
-		$important_page_ids = [];
-		foreach ( \progress_planner()->get_admin__page_settings()->get_settings() as $important_page ) {
-			if ( 0 !== (int) $important_page['value'] ) {
-				$important_page_ids[] = (int) $important_page['value'];
-			}
-		}
-
-		// Add the privacy policy page ID if it exists. Not 'publish' page will not be fetched by get_posts().
-		$privacy_policy_page_id = \get_option( 'wp_page_for_privacy_policy' );
-		if ( $privacy_policy_page_id ) {
-			$important_page_ids[] = (int) $privacy_policy_page_id;
-		}
-
-		/**
-		 * Filters the pages we deem more important for content updates.
-		 *
-		 * @param int[] $important_page_ids Post & page IDs of the important pages.
-		 */
-		$important_page_ids = \apply_filters( 'progress_planner_update_posts_important_page_ids', $important_page_ids );
-
-		if ( ! empty( $important_page_ids ) ) {
-			$last_updated_posts = $this->get_old_posts(
-				[
-					'post__in' => $important_page_ids,
-				]
-			);
-		}
-
-		// Lets check for other posts to update.
-		$number_of_posts_to_inject = $number_of_posts_to_inject - count( $last_updated_posts );
-
-		if ( 0 < $number_of_posts_to_inject ) {
-			// Get the post that was updated last.
-			$last_updated_posts = array_merge(
-				$last_updated_posts,
-				$this->get_old_posts(
-					[
-						'post__not_in' => $important_page_ids, // This can be an empty array.
-					]
-				)
-			);
-		}
-
-		if ( ! $last_updated_posts ) {
+		if (
+			true === $this->is_task_snoozed() ||
+			! $this->should_add_task() // No need to add the task.
+		) {
 			return [];
 		}
 
-		$items = [];
-		foreach ( $last_updated_posts as $post ) {
-			$task_id = $this->get_task_id_from_data(
-				[
-					'provider_id' => 'review-post',
-					'post_id'     => $post->ID, // @phpstan-ignore-line property.nonObject
-				]
-			);
+		$task_details = [];
+		if ( ! empty( $this->task_post_mappings ) ) {
+			foreach ( $this->task_post_mappings as $task_data ) {
+				if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_data['task_id'] ) ) {
+					continue;
+				}
 
-			// Don't add the task if it was completed.
-			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
-				continue;
+				$task_details[] = $this->get_task_details( $task_data['task_id'] );
 			}
-
-			$items[] = $this->get_task_details( $task_id );
 		}
-		return $items;
+
+		return $task_details;
 	}
 
 	/**
@@ -153,11 +182,11 @@ class Review extends Content {
 	 */
 	public function get_task_details( $task_id ) {
 
-		if ( ! $task_id ) {
+		if ( ! $task_id || ! isset( $this->task_post_mappings[ $task_id ] ) ) {
 			return [];
 		}
 
-		$data = $this->get_data_from_task_id( $task_id );
+		$data = $this->task_post_mappings[ $task_id ];
 
 		$post         = \get_post( $data['post_id'] );
 		$task_details = [
