@@ -19,7 +19,7 @@ class Php_Version extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'php-version';
+	protected const PROVIDER_ID = 'php-version';
 
 	/**
 	 * Constructor.

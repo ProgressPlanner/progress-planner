@@ -14,8 +14,9 @@ customElements.define(
 			taskAction = '',
 			taskUrl = '',
 			taskDismissable = false,
+			taskProviderID = '',
+			taskCategory = '',
 			taskSnoozable = true,
-			taskType = '',
 		} ) {
 			// Get parent class properties
 			super();
@@ -74,7 +75,7 @@ customElements.define(
 			};
 
 			this.innerHTML = `
-			<li class="prpl-suggested-task" data-task-id="${ taskId }" data-task-action="${ taskAction }" data-task-url="${ taskUrl }" data-task-type="${ taskType }" data-task-points="${ taskPoints }">
+			<li class="prpl-suggested-task" data-task-id="${ taskId }" data-task-action="${ taskAction }" data-task-url="${ taskUrl }" data-task-provider-id="${ taskProviderID }" data-task-points="${ taskPoints }" data-task-category="${ taskCategory }">
 				<h3><span>${ taskHeading }</span></h3>
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
@@ -283,8 +284,9 @@ customElements.define(
 		 */
 		runTaskAction = ( taskId, actionType, snoozeDuration ) => {
 			taskId = taskId.toString();
-			const type =
-				this.querySelector( 'li' ).getAttribute( 'data-task-type' );
+			const providerID = this.querySelector( 'li' ).getAttribute(
+				'data-task-provider-id'
+			);
 
 			const data = {
 				task_id: taskId,
@@ -361,7 +363,7 @@ customElements.define(
 					{
 						detail: {
 							taskId,
-							type,
+							providerID,
 						},
 					}
 				);

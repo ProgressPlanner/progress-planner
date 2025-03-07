@@ -47,7 +47,7 @@ class Debug_Tools {
 		\add_action( 'init', [ $this, 'check_delete_badges' ] );
 
 		// Add filter to modify the maximum number of suggested tasks to display.
-		\add_filter( 'progress_planner_suggested_tasks_max_items_per_type', [ $this, 'check_show_all_suggested_tasks' ] );
+		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_suggested_tasks' ] );
 	}
 
 	/**
@@ -323,24 +323,24 @@ class Debug_Tools {
 	/**
 	 * Modify the maximum number of suggested tasks to display.
 	 *
-	 * @param array $max_items_per_type Array of maximum items per task type.
-	 * @return array Modified array of maximum items per task type.
+	 * @param array $max_items_per_category Array of maximum items per category.
+	 * @return array Modified array of maximum items per category.
 	 */
-	public function check_show_all_suggested_tasks( $max_items_per_type ) {
+	public function check_show_all_suggested_tasks( $max_items_per_category ) {
 		if (
 			! isset( $_GET['prpl_show_all_suggested_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			! current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		) {
-			return $max_items_per_type;
+			return $max_items_per_category;
 		}
 
 		$max_items = \absint( \wp_unslash( $_GET['prpl_show_all_suggested_tasks'] ) );  // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		foreach ( $max_items_per_type as $key => $value ) {
-			$max_items_per_type[ $key ] = $max_items;
+		foreach ( $max_items_per_category as $key => $value ) {
+			$max_items_per_category[ $key ] = $max_items;
 		}
 
-		return $max_items_per_type;
+		return $max_items_per_category;
 	}
 
 	/**
