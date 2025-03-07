@@ -46,7 +46,6 @@ class Update_111 {
 		$this->convert_local_tasks();
 
 		// Migrate the 'create-post' tasks, they are now repetitive tasks.
-		// It will also migrate related activities.
 		$this->migrate_create_post_tasks();
 
 		if ( $this->local_tasks_changed ) {
@@ -55,6 +54,9 @@ class Update_111 {
 
 		// Migrate activities.
 		$this->migrate_activities();
+
+		// Migrate the 'create-post' activities.
+		$this->migrate_create_post_activities();
 	}
 
 	/**
@@ -178,6 +180,7 @@ class Update_111 {
 
 	/**
 	 * Migrate the 'create-post' tasks, they are now repetitive tasks.
+	 * Since the tasks were already migrated, we search for 'provider_id/create-post' (not 'type/create-post').
 	 *
 	 * @return void
 	 */
@@ -205,7 +208,15 @@ class Update_111 {
 				}
 			}
 		}
+	}
 
+	/**
+	 * Migrate the 'create-post' tasks, they are now repetitive tasks.
+	 * Since the activities were already migrated, we search for 'provider_id/create-post' (not 'type/create-post').
+	 *
+	 * @return void
+	 */
+	private function migrate_create_post_activities() {
 		// Migrate the 'create-post' activities.
 		$activities = \progress_planner()->get_query()->query_activities(
 			[
@@ -216,11 +227,11 @@ class Update_111 {
 
 		if ( ! empty( $activities ) ) {
 			foreach ( $activities as $activity ) {
-				if ( false !== strpos( $activity->data_id, '|type/create-post' ) ) {
+				if ( false !== strpos( $activity->data_id, 'provider_id/create-post' ) ) {
 					$data = $this->get_data_from_task_id( $activity->data_id );
 
 					// TODO: task_id needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
-					$new_data_id = $data['type'] . '-' . ( $data['long'] ? 'long' : 'short' ) . '-' . $data['date'];
+					$new_data_id = $data['provider_id'] . '-' . ( $data['long'] ? 'long' : 'short' ) . '-' . $data['date'];
 					if ( $new_data_id !== $activity->data_id ) {
 						$activity->data_id = $new_data_id;
 						$activity->save();
@@ -232,7 +243,7 @@ class Update_111 {
 
 	/**
 	 * Get the data from a task-ID.
-	 * This is copied from the Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content class, since we might remove that function in the future.
+	 * Copied from the Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content class, since we might remove that function in the future.
 	 *
 	 * @param string $task_id The task ID.
 	 *
