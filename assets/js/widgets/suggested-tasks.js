@@ -43,7 +43,7 @@ const prplSuggestedTasksGetItemsWithStatus = ( status ) => {
  * @param {string} category The category of items to get the next item from.
  * @return {Object} The next item to inject.
  */
-const prplSuggestedTasksGetNextItemFromCategory = ( category ) => {
+const prplSuggestedTasksGetNextPendingItemFromCategory = ( category ) => {
 	// Get items of this category.
 	const itemsOfCategory = prplSuggestedTasksGetItemsOfCategory( category );
 	// If there are no items of this category, return null.
@@ -60,8 +60,8 @@ const prplSuggestedTasksGetNextItemFromCategory = ( category ) => {
 		} );
 
 	const items = itemsOfCategory.filter( function ( item ) {
-		// Remove items which are completed or snoozed.
-		if ( 'completed' === item.status || 'snoozed' === item.status ) {
+		// Skip items which are not pending.
+		if ( 'pending' !== item.status ) {
 			return false;
 		}
 		// Remove items which are already in the list.
@@ -86,7 +86,8 @@ const prplSuggestedTasksGetNextItemFromCategory = ( category ) => {
  * @param {string} category The category of items to inject the next item from.
  */
 const prplSuggestedTasksInjectNextItem = ( category ) => {
-	const nextItem = prplSuggestedTasksGetNextItemFromCategory( category );
+	const nextItem =
+		prplSuggestedTasksGetNextPendingItemFromCategory( category );
 	if ( ! nextItem ) {
 		return;
 	}
@@ -293,7 +294,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 				parseInt(
 					prplSuggestedTasks.maxItemsPerCategory[ category ]
 				) &&
-			prplSuggestedTasksGetNextItemFromCategory( category )
+			prplSuggestedTasksGetNextPendingItemFromCategory( category )
 		) {
 			prplSuggestedTasksInjectNextItem( category );
 		}
@@ -565,7 +566,7 @@ document.addEventListener(
 				parseInt(
 					prplSuggestedTasks.maxItemsPerCategory[ category ]
 				) &&
-			prplSuggestedTasksGetNextItemFromCategory( category )
+			prplSuggestedTasksGetNextPendingItemFromCategory( category )
 		) {
 			prplSuggestedTasksInjectNextItem( category );
 		}
