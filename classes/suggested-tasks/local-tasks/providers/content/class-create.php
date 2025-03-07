@@ -44,10 +44,55 @@ class Create extends Repetitive {
 	protected $data_collector;
 
 	/**
+	 * Whether the task is initialized.
+	 *
+	 * @var bool
+	 */
+	private static bool $initialized = false;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->data_collector = new Create_Post_Data_Collector();
+
+		$this->init();
+	}
+
+	/**
+	 * Add hooks.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		if ( self::$initialized ) {
+			return;
+		}
+
+		add_filter( 'progress_planner_task_data_create-post', [ $this, 'add_task_data' ] );
+
+		self::$initialized = true;
+	}
+
+	/**
+	 * Add task data.
+	 *
+	 * @param array $task_data The task data.
+	 *
+	 * @return array
+	 */
+	public function add_task_data( $task_data ) {
+		$last_published_post_data = $this->data_collector->collect();
+
+		if ( ! $last_published_post_data || empty( $last_published_post_data['post_id'] ) ) {
+			return $task_data;
+		}
+
+		// Add the post ID and post length to the task data.
+		$task_data['post_id'] = $last_published_post_data['post_id'];
+		$task_data['long']    = 'long' === $last_published_post_data['post_length'];
+
+		return $task_data;
 	}
 
 	/**

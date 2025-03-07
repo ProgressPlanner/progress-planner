@@ -35,6 +35,22 @@ class Local_Task_Factory {
 	 */
 	public function get_task(): Task_Local {
 
+		// We should have all the data saved in the database.
+		$data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $this->task_id );
+
+		// If we have the task data, return it.
+		if ( $data ) {
+			return new Task_Local( $data );
+		}
+
+		/*
+		We're here in following cases:
+		 * - Legacy tasks, which is somehow not migrated, where we parsed task data from the task_id.
+		 * - When adding new pending task (which is not yet saved in the database).
+		 * - Remote tasks.
+		*/
+		$data = [];
+
 		// Parse simple format, e.g. 'update-core-202449' or "hello-world".
 		if ( ! str_contains( $this->task_id, '|' ) ) {
 

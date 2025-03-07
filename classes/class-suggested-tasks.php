@@ -62,12 +62,19 @@ class Suggested_Tasks {
 		// Check for completed tasks.
 		$completed_tasks = $this->local->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
 
-		foreach ( $completed_tasks as $task_id ) {
+		foreach ( $completed_tasks as $task ) {
+
+			// Get the task data.
+			$task_data = $task->get_data();
+
+			// Update the task data.
+			$this->update_pending_task( $task_data['task_id'], $task_data );
+
 			// Change the task status to pending celebration.
-			$this->mark_task_as_pending_celebration( $task_id );
+			$this->mark_task_as_pending_celebration( $task_data['task_id'] );
 
 			// Insert an activity.
-			$this->insert_activity( $task_id );
+			$this->insert_activity( $task_data['task_id'] );
 		}
 	}
 
@@ -492,6 +499,40 @@ class Suggested_Tasks {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Update a task.
+	 *
+	 * @param string $task_id The task ID.
+	 * @param array  $data The data.
+	 *
+	 * @return bool
+	 */
+	public function update_pending_task( $task_id, $data ) {
+		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks_changed = false;
+		foreach ( $tasks as $key => $task ) {
+			if ( 'pending' !== $task['status'] || $task['task_id'] !== $task_id ) {
+				continue;
+			}
+
+			// Don't update the task_id.
+			if ( isset( $data['task_id'] ) ) {
+				unset( $data['task_id'] );
+			}
+
+			// Update the task data except the 'task_id' key.
+			$tasks[ $key ] = array_merge( $tasks[ $key ], $data );
+			$tasks_changed = true;
+
+			break;
+		}
+
+		if ( ! $tasks_changed ) {
+			return false;
+		}
+		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 	}
 
 	/**
