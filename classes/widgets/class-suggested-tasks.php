@@ -55,7 +55,6 @@ final class Suggested_Tasks extends Widget {
 			'progress-planner-' . $this->id,
 			PROGRESS_PLANNER_URL . '/assets/js/widgets/suggested-tasks.js',
 			[
-				'progress-planner-todo',
 				'progress-planner-grid-masonry',
 				'progress-planner-web-components-prpl-suggested-task',
 				'progress-planner-document-ready',

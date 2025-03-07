@@ -157,14 +157,7 @@ class Rest_API_Stats {
 		// Timezone offset.
 		$data['timezone_offset'] = \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600;
 
-		$todo_items         = \progress_planner()->get_todo()->get_items();
-		$pending_todo_items = [];
-		foreach ( $todo_items as $item ) {
-			if ( ! $item['done'] ) {
-				$pending_todo_items[] = $item['content'];
-			}
-		}
-		$data['todo'] = $pending_todo_items;
+		$data['todo'] = [];
 
 		$ravis_recommendations   = \progress_planner()->get_suggested_tasks()->get_tasks();
 		$data['recommendations'] = [];

@@ -144,7 +144,6 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 			'scores',
 			'website',
 			'timezone_offset',
-			'todo',
 			'plugin_url',
 		];
 

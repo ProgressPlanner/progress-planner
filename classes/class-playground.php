@@ -31,19 +31,6 @@ class Playground {
 			$this->generate_data();
 			\update_option( 'progress_planner_license_key', str_replace( ' ', '-', $this->create_random_string( 20 ) ) );
 			\update_option( 'progress_planner_force_show_onboarding', false );
-			\update_option(
-				'progress_planner_todo',
-				[
-					[
-						'content' => 'Update a post to see that the plugin tracks that',
-						'done'    => false,
-					],
-					[
-						'content' => 'Try out Progress Planner',
-						'done'    => false,
-					],
-				]
-			);
 			\update_option( 'progress_planner_demo_data_generated', true );
 		}
 		\add_action( 'progress_planner_admin_page_header_before', [ $this, 'show_header_notice' ] );

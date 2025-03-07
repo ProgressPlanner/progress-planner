@@ -1,4 +1,4 @@
-<?php // phpcs:disable Generic.Commenting.Todo
+<?php
 /**
  * Progress Planner main plugin class.
  *
@@ -10,7 +10,6 @@ namespace Progress_Planner;
 use Progress_Planner\Admin\Page as Admin_Page;
 use Progress_Planner\Admin\Tour as Admin_Tour;
 use Progress_Planner\Admin\Dashboard_Widget_Score as Admin_Dashboard_Widget_Score;
-use Progress_Planner\Admin\Dashboard_Widget_Todo as Admin_Dashboard_Widget_Todo;
 use Progress_Planner\Admin\Editor as Admin_Editor;
 use Progress_Planner\Actions\Content as Actions_Content;
 use Progress_Planner\Actions\Content_Scan as Actions_Content_Scan;
@@ -71,7 +70,6 @@ class Base {
 			// Dont add the widget if the privacy policy is not accepted.
 			if ( true === $this->is_privacy_policy_accepted() ) {
 				$this->cached['admin__dashboard_widget_score'] = new Admin_Dashboard_Widget_Score();
-				$this->cached['admin__dashboard_widget_todo']  = new Admin_Dashboard_Widget_Todo();
 			}
 		}
 		$this->cached['admin__editor'] = new Admin_Editor();
@@ -85,9 +83,6 @@ class Base {
 
 		// Onboarding.
 		$this->cached['onboard'] = new Onboard();
-
-		// To-do.
-		$this->cached['todo'] = new Todo();
 
 		// Post-meta.
 		if ( $this->is_pro_site() ) {
@@ -424,4 +419,3 @@ class Base {
 		exit;
 	}
 }
-// phpcs:enable Generic.Commenting.Todo
