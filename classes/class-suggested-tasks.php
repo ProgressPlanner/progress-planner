@@ -151,7 +151,23 @@ class Suggested_Tasks {
 		 * @param array $tasks The suggested tasks.
 		 * @return array
 		 */
-		return \apply_filters( 'progress_planner_suggested_tasks_items', $tasks );
+		$tasks    = \apply_filters( 'progress_planner_suggested_tasks_items', $tasks );
+		$db_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		foreach ( $tasks as $key => $task ) {
+			if ( isset( $task['status'] ) && ! empty( $task['status'] ) ) {
+				continue;
+			}
+
+			foreach ( $db_tasks as $db_task_key => $db_task ) {
+				if ( $db_task['task_id'] === $task['task_id'] ) {
+					$tasks[ $key ]['status'] = $db_task['status'];
+					unset( $db_tasks[ $db_task_key ] );
+					break;
+				}
+			}
+		}
+
+		return $tasks;
 	}
 
 	/**
@@ -453,7 +469,7 @@ class Suggested_Tasks {
 				continue;
 			}
 
-			return isset( $task['status'] ) && ( 'completed' === $task['status'] || 'pending_celebration' === $task['status'] );
+			return isset( $task['status'] ) && in_array( $task['status'], [ 'completed', 'pending_celebration' ], true );
 		}
 
 		return false;
