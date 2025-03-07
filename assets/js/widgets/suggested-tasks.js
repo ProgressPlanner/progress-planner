@@ -298,14 +298,14 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		) {
 			prplSuggestedTasksInjectNextItem( category );
 		}
-
-		// Inject ALL pending celebration tasks.
-		prplSuggestedTasksGetItemsWithStatus( 'pending_celebration' ).forEach(
-			( task ) => {
-				prplSuggestedTasksInjectItem( task );
-			}
-		);
 	}
+
+	// Inject ALL pending celebration tasks.
+	prplSuggestedTasksGetItemsWithStatus( 'pending_celebration' ).forEach(
+		( task ) => {
+			prplSuggestedTasksInjectItem( task );
+		}
+	);
 
 	const event = new CustomEvent( 'prplResizeAllGridItemsEvent' );
 	document.dispatchEvent( event );
