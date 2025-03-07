@@ -32,7 +32,8 @@ customElements.define(
 			const isDismissable = taskDismissable || isRemoteTask;
 
 			const actionButtons = {
-				info: `<button
+				info: taskDescription
+					? `<button
 							type="button"
 							class="prpl-suggested-task-button"
 							data-task-id="${ taskId }"
@@ -43,7 +44,8 @@ customElements.define(
 						>
 							<img src="${ prplSuggestedTask.assets.infoIcon }" alt="${ prplSuggestedTask.i18n.info }" class="icon">
 							<span class="screen-reader-text">${ prplSuggestedTask.i18n.info }</span>
-						</button>`,
+						</button>`
+					: '',
 				snooze: taskSnoozable
 					? `<button
 							type="button"
