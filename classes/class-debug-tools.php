@@ -235,7 +235,7 @@ class Debug_Tools {
 				]
 			);
 
-			foreach ( $suggested_tasks as $task_key => $task ) {
+			foreach ( $suggested_tasks as $task ) {
 				if ( ! isset( $task['task_id'] ) || $key !== $task['status'] ) {
 					continue;
 				}
