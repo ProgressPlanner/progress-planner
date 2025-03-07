@@ -13,11 +13,18 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 class User extends One_Time {
 
 	/**
-	 * The provider type.
+	 * The provider category.
 	 *
 	 * @var string
 	 */
-	protected const TYPE = 'user';
+	protected const CATEGORY = 'user';
+
+	/**
+	 * The provider ID.
+	 *
+	 * @var string
+	 */
+	protected const PROVIDER_ID = 'user';
 
 	/**
 	 * Check if the task should be added.
@@ -38,7 +45,7 @@ class User extends One_Time {
 		$tasks       = [];
 		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 		foreach ( $local_tasks as $task_data ) {
-			if ( 'user' === $task_data['type'] ) {
+			if ( isset( $task_data['provider_id'] ) && self::PROVIDER_ID === $task_data['provider_id'] ) {
 				$tasks[] = $this->get_task_details( $task_data['task_id'] );
 			}
 		}
@@ -69,7 +76,7 @@ class User extends One_Time {
 					'task_id'      => '',
 					'title'        => '',
 					'parent'       => 0,
-					'type'         => 'user',
+					'provider_id'  => 'user',
 					'priority'     => 'medium',
 					'points'       => 0,
 					'url'          => '',
