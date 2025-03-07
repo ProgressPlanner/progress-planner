@@ -346,7 +346,7 @@ class Local_Tasks_Manager {
 		);
 
 		if ( count( $tasks ) !== $task_count ) {
-			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+			\progress_planner()->get_settings()->set( 'local_tasks', array_values( $tasks ) );
 		}
 
 		\progress_planner()->get_cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );
