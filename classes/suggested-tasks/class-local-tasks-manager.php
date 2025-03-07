@@ -225,7 +225,7 @@ class Local_Tasks_Manager {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return bool|string
+	 * @return bool|\Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local
 	 */
 	public function evaluate_task( $task_id ) {
 		$task_object   = ( new Local_Task_Factory( $task_id ) )->get_task();

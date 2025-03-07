@@ -13,19 +13,19 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks;
 class Local_Task_Factory {
 
 	/**
-	 * The task ID.
+	 * The task ID or task data.
 	 *
-	 * @var string
+	 * @var mixed
 	 */
-	private $task_id;
+	private $task;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param mixed $task The task ID or task data.
 	 */
-	public function __construct( string $task_id ) {
-		$this->task_id = $task_id;
+	public function __construct( $task ) {
+		$this->task = $task;
 	}
 
 	/**
@@ -35,8 +35,13 @@ class Local_Task_Factory {
 	 */
 	public function get_task(): Task_Local {
 
+		// If we have task data, return it.
+		if ( is_array( $this->task ) ) {
+			return new Task_Local( $this->task );
+		}
+
 		// We should have all the data saved in the database.
-		$data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $this->task_id );
+		$data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $this->task );
 
 		// If we have the task data, return it.
 		if ( $data ) {
@@ -51,19 +56,32 @@ class Local_Task_Factory {
 		*/
 		$data = [];
 
-		// Parse simple format, e.g. 'update-core-202449' or "hello-world".
-		if ( ! str_contains( $this->task_id, '|' ) ) {
+		// TODO: Remove this before Review is implemented.
+		if ( 0 === strpos( $this->task, 'review-post-' ) ) {
+			// review-post-12345-202501 .
+			$parts = explode( '-', $this->task );
+			$data['task_id']     = $this->task;
+			$data['provider_id'] = 'review-post';
+			$data['category']    = 'content-update';
+			$data['post_id']     = $parts[2];
+			$data['date']        = $parts[3];
 
-			$last_pos = strrpos( $this->task_id, '-' );
+			return new Task_Local( $data );
+		}
+
+		// Parse simple format, e.g. 'update-core-202449' or "hello-world".
+		if ( ! str_contains( $this->task, '|' ) ) {
+
+			$last_pos = strrpos( $this->task, '-' );
 
 			// Check if the task ID ends with a '-12345' or not, if not that would be mostly one time tasks.
-			if ( $last_pos === false || ! preg_match( '/-\d+$/', $this->task_id ) ) {
+			if ( $last_pos === false || ! preg_match( '/-\d+$/', $this->task ) ) {
 
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $this->task_id );
+				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $this->task );
 
 				return new Task_Local(
 					[
-						'task_id'     => $this->task_id,
+						'task_id'     => $this->task,
 						'category'    => $task_provider ? $task_provider->get_provider_category() : '',
 						'provider_id' => $task_provider ? $task_provider->get_provider_id() : '',
 					]
@@ -71,8 +89,8 @@ class Local_Task_Factory {
 			}
 
 			// Remote (remote-12345) or repetitive tasks (update-core-202449).
-			$task_provider_id = substr( $this->task_id, 0, $last_pos );
-			$task_suffix      = substr( $this->task_id, $last_pos + 1 );
+			$task_provider_id = substr( $this->task, 0, $last_pos );
+			$task_suffix      = substr( $this->task, $last_pos + 1 );
 
 			// Check for legacy create-post task_id, old task_ids were migrated to create-post-short' or 'create-post-long' (since we had 2 such tasks per week).
 			if ( 'create-post-short' === $task_provider_id || 'create-post-long' === $task_provider_id ) {
@@ -87,13 +105,13 @@ class Local_Task_Factory {
 			if ( ! $task_provider ) {
 				return new Task_Local(
 					[
-						'task_id' => $this->task_id,
+						'task_id' => $this->task,
 					]
 				);
 			} else {
 				return new Task_Local(
 					[
-						'task_id'        => $this->task_id,
+						'task_id'        => $this->task,
 						'category'       => $task_provider->get_provider_category(),
 						'provider_id'    => $task_provider->get_provider_id(),
 						$task_suffix_key => $task_suffix,
@@ -103,10 +121,10 @@ class Local_Task_Factory {
 		}
 
 		// Legacy piped format.
-		$data = [ 'task_id' => $this->task_id ];
+		$data = [ 'task_id' => $this->task ];
 
 		// Parse detailed (piped) format (date/202510|long/1|provider_id/create-post).
-		$parts = \explode( '|', $this->task_id );
+		$parts = \explode( '|', $this->task );
 		foreach ( $parts as $part ) {
 			$part = \explode( '/', $part );
 			if ( 2 !== \count( $part ) ) {

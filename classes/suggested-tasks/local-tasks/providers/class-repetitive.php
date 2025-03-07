@@ -42,7 +42,7 @@ abstract class Repetitive extends Local_Tasks {
 		$task_data   = $task_object->get_data();
 
 		if ( $task_data['provider_id'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['date'] && $this->is_task_completed() ) {
-			// Allow adding more data, for example in case of 'create-post' or 'review-content' tasks we are adding the post_id.
+			// Allow adding more data, for example in case of 'create-post' tasks we are adding the post_id.
 			$task_data = $this->modify_task_data( $task_data );
 			$task_object->set_data( $task_data );
 
