@@ -110,8 +110,10 @@ class Local_Task_Factory {
 			unset( $data['type'] );
 		}
 
-		$task_provider    = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $data['provider_id'] );
-		$data['category'] = $task_provider ? $task_provider->get_provider_category() : '';
+		if ( isset( $data['provider_id'] ) ) {
+			$task_provider    = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $data['provider_id'] );
+			$data['category'] = $task_provider ? $task_provider->get_provider_category() : '';
+		}
 
 		return new Task_Local( $data );
 	}
