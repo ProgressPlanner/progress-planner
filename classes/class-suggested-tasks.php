@@ -180,12 +180,14 @@ class Suggested_Tasks {
 	 */
 	public function get_tasks_by_status( $status ) {
 		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		return array_filter(
+		$tasks = array_filter(
 			$tasks,
 			function ( $task ) use ( $status ) {
 				return isset( $task['status'] ) && $task['status'] === $status;
 			}
 		);
+
+		return array_values( $tasks );
 	}
 
 	/**

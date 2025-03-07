@@ -41,8 +41,8 @@ class Debug_Tools {
 
 		\add_action( 'admin_bar_menu', [ $this, 'add_toolbar_items' ], 100 );
 		\add_action( 'init', [ $this, 'check_clear_cache' ] );
+		\add_action( 'init', [ $this, 'check_delete_pending_tasks' ] );
 		\add_action( 'init', [ $this, 'check_delete_suggested_tasks' ] );
-		\add_action( 'init', [ $this, 'check_delete_local_tasks' ] );
 		\add_action( 'init', [ $this, 'check_delete_licenses' ] );
 		\add_action( 'init', [ $this, 'check_delete_badges' ] );
 
@@ -119,13 +119,13 @@ class Debug_Tools {
 			]
 		);
 
-		// Add Delete Local Tasks submenu item.
+		// Add Delete Pending Tasks submenu item.
 		$admin_bar->add_node(
 			[
-				'id'     => 'prpl-delete-local-tasks',
+				'id'     => 'prpl-delete-pending-tasks',
 				'parent' => 'prpl-debug-delete',
-				'title'  => 'Delete Local Tasks',
-				'href'   => add_query_arg( 'prpl_delete_local_tasks', '1', $this->current_url ),
+				'title'  => 'Delete Pending Tasks',
+				'href'   => add_query_arg( 'prpl_delete_pending_tasks', '1', $this->current_url ),
 			]
 		);
 
@@ -265,11 +265,11 @@ class Debug_Tools {
 	 *
 	 * @return void
 	 */
-	public function check_delete_local_tasks() {
+	public function check_delete_pending_tasks() {
 
 		if (
-			! isset( $_GET['prpl_delete_local_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$_GET['prpl_delete_local_tasks'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			! isset( $_GET['prpl_delete_pending_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$_GET['prpl_delete_pending_tasks'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			! current_user_can( 'manage_options' )
 		) {
 			return;
@@ -278,11 +278,22 @@ class Debug_Tools {
 		// Verify nonce for security.
 		$this->verify_nonce();
 
-		// Delete the option.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
+		// Get all local tasks.
+		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+
+		// Filter out pending tasks.
+		$local_tasks = array_filter(
+			$local_tasks,
+			function ( $task ) {
+				return 'pending' !== $task['status'];
+			}
+		);
+
+		// Update the local tasks.
+		\progress_planner()->get_settings()->set( 'local_tasks', array_values( $local_tasks ) );
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( 'prpl_delete_local_tasks' ) );
+		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_pending_tasks', '_wpnonce' ] ) );
 		exit;
 	}
 
@@ -316,7 +327,7 @@ class Debug_Tools {
 		\update_option( \Progress_Planner\Settings::OPTION_NAME, $progress_planner_settings );
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( 'prpl_delete_badges' ) );
+		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_badges', '_wpnonce' ] ) );
 		exit;
 	}
 
@@ -426,7 +437,7 @@ class Debug_Tools {
 		\progress_planner()->get_settings()->set( 'local_tasks', [] );
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( 'prpl_delete_suggested_tasks' ) );
+		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_suggested_tasks', '_wpnonce' ] ) );
 		exit;
 	}
 
@@ -455,7 +466,7 @@ class Debug_Tools {
 		\progress_planner()->get_cache()->delete_all();
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( 'prpl_clear_cache' ) );
+		wp_safe_redirect( remove_query_arg( [ 'prpl_clear_cache', '_wpnonce' ] ) );
 		exit;
 	}
 
@@ -485,7 +496,7 @@ class Debug_Tools {
 		delete_option( 'progress_planner_pro_license_status' );
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( 'prpl_delete_licenses' ) );
+		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_licenses', '_wpnonce' ] ) );
 		exit;
 	}
 
