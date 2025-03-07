@@ -43,8 +43,7 @@ abstract class Repetitive extends Local_Tasks {
 
 		if ( $task_data['provider_id'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['date'] && $this->is_task_completed() ) {
 			// Allow adding more data, for example in case of 'create-post' or 'review-content' tasks we are adding the post_id.
-			$task_data = apply_filters( "progress_planner_task_data_{$task_data['provider_id']}", $task_data );
-
+			$task_data = $this->modify_task_data( $task_data );
 			$task_object->set_data( $task_data );
 
 			return $task_object;
@@ -77,6 +76,18 @@ abstract class Repetitive extends Local_Tasks {
 	 */
 	protected function check_task_condition() {
 		return ! $this->should_add_task();
+	}
+
+	/**
+	 * Modify task data before setting it.
+	 * Child classes can override this method to add extra data.
+	 *
+	 * @param array $task_data The task data.
+	 *
+	 * @return array
+	 */
+	protected function modify_task_data( $task_data ) {
+		return $task_data;
 	}
 
 	/**
