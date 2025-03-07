@@ -78,7 +78,11 @@ customElements.define(
 
 			this.innerHTML = `
 			<li class="prpl-suggested-task" data-task-id="${ taskId }" data-task-action="${ taskAction }" data-task-url="${ taskUrl }" data-task-provider-id="${ taskProviderID }" data-task-points="${ taskPoints }" data-task-category="${ taskCategory }">
-				<h3><span>${ taskHeading }</span></h3>
+				<h3><span${
+					'user' === taskCategory
+						? ` contenteditable="plaintext-only"`
+						: ''
+				}>${ taskHeading }</span></h3>
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
 						${ actionButtons.info }
@@ -272,6 +276,21 @@ customElements.define(
 						'snooze',
 						this.value
 					);
+				} );
+			} );
+
+			// When an item's contenteditable element is edited,
+			// save the new content to the database
+			this.querySelector( 'h3 span' ).addEventListener( 'input', () => {
+				wp.ajax.post( 'progress_planner_save_user_suggested_task', {
+					task: {
+						task_id: item.getAttribute( 'data-task-id' ),
+						title: this.querySelector( 'h3 span' ).textContent,
+						provider_id: 'user',
+						category: 'user',
+						dismissable: true,
+					},
+					nonce: prplSuggestedTask.nonce,
 				} );
 			} );
 		};
