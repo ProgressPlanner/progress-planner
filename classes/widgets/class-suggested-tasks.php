@@ -87,36 +87,31 @@ final class Suggested_Tasks extends Widget {
 		if ( ! $delay_celebration ) {
 			$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending_celebration' );
 
-			// If there are pending_celebration tasks, we need to add them to the tasks array.
-			if ( ! empty( $pending_celebration_tasks ) ) {
+			foreach ( $pending_celebration_tasks as $key => $task ) {
+				$task_id = $task['task_id'];
 
-				foreach ( $pending_celebration_tasks as $key => $task ) {
-					$task_id = $task['task_id'];
+				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
+					( new Local_Task_Factory( $task_id ) )->get_task()->get_provider_id()
+				);
 
-					$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
-						( new Local_Task_Factory( $task_id ) )->get_task()->get_provider_id()
-					);
+				if ( $task_provider && $task_provider->capability_required() ) {
+					$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task_id );
 
-					if ( $task_provider && $task_provider->capability_required() ) {
-						$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task_id );
+					if ( $task_details ) {
+						$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
+						$task_details['action']   = 'celebrate';
+						$task_details['status']   = 'pending_celebration';
 
-						if ( $task_details ) {
-							$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
-							$task_details['action']   = 'celebrate';
-							$task_details['status']   = 'pending_celebration';
-							$task_details['category'] = 'pending_celebration';
-
-							// Award 2 points if last created post was long.
-							if ( 'create-post' === $task_provider->get_provider_id() ) {
-									$task['points'] = $task_provider->get_points();
-							}
-
-							$tasks[] = $task_details;
+						// Award 2 points if last created post was long.
+						if ( 'create-post' === $task_provider->get_provider_id() ) {
+								$task['points'] = $task_provider->get_points(); // TODO: Make this function better (get_points_by_task_id).
 						}
 
-						// Mark the pending celebration tasks as completed.
-						\progress_planner()->get_suggested_tasks()->transition_task_status( $task_id, 'pending_celebration', 'completed' );
+						$tasks[] = $task_details;
 					}
+
+					// Mark the pending celebration tasks as completed.
+					\progress_planner()->get_suggested_tasks()->transition_task_status( $task_id, 'pending_celebration', 'completed' );
 				}
 			}
 		}
