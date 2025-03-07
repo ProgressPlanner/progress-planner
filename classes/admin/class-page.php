@@ -136,6 +136,7 @@ class Page {
 				\wp_enqueue_script( 'progress-planner-web-components-prpl-chart-bar' );
 				\wp_enqueue_script( 'progress-planner-web-components-prpl-chart-line' );
 				\wp_enqueue_script( 'progress-planner-web-components-prpl-big-counter' );
+				\wp_enqueue_script( 'progress-planner-web-components-prpl-popover-post-content' );
 				\wp_enqueue_script( 'progress-planner-header-filters' );
 				\wp_enqueue_script( 'progress-planner-settings' );
 				\wp_enqueue_script( 'progress-planner-grid-masonry' );
