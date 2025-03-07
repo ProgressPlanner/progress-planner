@@ -77,6 +77,7 @@ class User extends One_Time {
 					'title'        => '',
 					'parent'       => 0,
 					'provider_id'  => 'user',
+					'category'     => 'user',
 					'priority'     => 'medium',
 					'points'       => 0,
 					'url'          => '',

@@ -538,10 +538,11 @@ class Suggested_Tasks {
 
 		if ( false === $task_index ) {
 			$local_tasks[] = [
-				'task_id' => $task_id,
-				'type'    => 'user',
-				'status'  => 'pending',
-				'title'   => $title,
+				'task_id'     => $task_id,
+				'provider_id' => 'user',
+				'category'    => 'user',
+				'status'      => 'pending',
+				'title'       => $title,
 			];
 		} else {
 			$local_tasks[ $task_index ]['title'] = $title;
