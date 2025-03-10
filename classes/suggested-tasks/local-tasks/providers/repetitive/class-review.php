@@ -175,6 +175,7 @@ class Review extends Repetitive {
 					'provider_id' => $this->get_provider_id(),
 					'category'    => $this->get_provider_category(),
 					'post_id'     => $task_data['post_id'],
+					'date'        => \gmdate( 'YW' ),
 				];
 			}
 		}

@@ -66,19 +66,6 @@ class Local_Task_Factory {
 	private function parse_task_data_from_task_id( $task_id ) {
 		$data = [];
 
-		// TODO: Remove this before Review is implemented.
-		if ( 0 === strpos( $this->task, 'review-post-' ) ) {
-			// review-post-12345-202501 .
-			$parts               = explode( '-', $task_id );
-			$data['task_id']     = $task_id;
-			$data['provider_id'] = 'review-post';
-			$data['category']    = 'content-update';
-			$data['post_id']     = $parts[2];
-			$data['date']        = $parts[3];
-
-			return new Task_Local( $data );
-		}
-
 		// Parse simple format, e.g. 'update-core-202449' or "hello-world".
 		if ( ! str_contains( $task_id, '|' ) ) {
 
