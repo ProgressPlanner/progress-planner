@@ -44,6 +44,14 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
+	 * Initialize the task provider.
+	 *
+	 * @return void
+	 */
+	public function init() {
+	}
+
+	/**
 	 * Get the provider category.
 	 *
 	 * @return string

@@ -43,9 +43,11 @@ class Review extends Content {
 	protected $snoozed_post_ids = null;
 
 	/**
-	 * Constructor.
+	 * Initialize the task.
+	 *
+	 * @return void
 	 */
-	public function __construct() {
+	public function init() {
 		\add_filter( 'progress_planner_update_posts_tasks_args', [ $this, 'filter_update_posts_args' ] );
 
 		\add_action( 'transition_post_status', [ $this, 'transition_post_status' ], 10, 3 );
