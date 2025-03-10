@@ -1,4 +1,4 @@
-/* global progressPlannerTodo, customElements, prplDocumentReady */
+/* global progressPlannerTodo, customElements, prplDocumentReady, prplSuggestedTasks */
 /*
  * Widget: Todo
  *
@@ -72,7 +72,6 @@ document
 		const userTask = prplCreateUserSuggestedTask(
 			document.getElementById( 'new-suggested-item-content' ).value
 		);
-		prplSuggestedTasksInjectItem( userTask );
 		prplSubmitUserSuggestedTask( userTask );
 
 		document.getElementById( 'new-suggested-item-content' ).value = '';
