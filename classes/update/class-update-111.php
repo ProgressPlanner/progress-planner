@@ -96,6 +96,12 @@ class Update_111 {
 				if ( 'snoozed' === $status && isset( $_task['time'] ) ) {
 					$task['time'] = $_task['time'];
 				}
+
+				// Update the provider_id for update-post tasks.
+				if ( 'update-post' === $task['provider_id'] ) {
+					$task['provider_id'] = 'review-post';
+				}
+
 				$this->add_local_task( $task );
 				$this->local_tasks_changed = true;
 			}
@@ -197,6 +203,7 @@ class Update_111 {
 			return $task_id;
 		}
 		$task_id = str_replace( 'type', 'provider_id', $task_id );
+		$task_id = str_replace( 'provider_id/update-post', 'provider_id/review-post', $task_id ); // Update the provider_id for update-post tasks.
 		$parts   = \explode( '|', $task_id );
 		\ksort( $parts );
 		return \implode( '|', $parts );
