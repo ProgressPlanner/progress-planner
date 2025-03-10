@@ -54,9 +54,9 @@ class Create_Post extends Base_Data_Collector {
 
 		// Default data.
 		$data = [
-			'post_id'     => 0,
-			'post_length' => '',
-			'post_date'   => '',
+			'post_id'   => 0,
+			'long'      => false,
+			'post_date' => '',
 		];
 
 		// Get the post that was created last.
@@ -71,9 +71,9 @@ class Create_Post extends Base_Data_Collector {
 
 		if ( ! empty( $last_created_posts ) ) {
 			$data = [
-				'post_id'     => $last_created_posts[0]->ID,
-				'post_length' => \progress_planner()->get_activities__content_helpers()->is_post_long( $last_created_posts[0]->ID ) ? 'long' : 'short',
-				'post_date'   => $last_created_posts[0]->post_date,
+				'post_id'   => $last_created_posts[0]->ID,
+				'long'      => \progress_planner()->get_activities__content_helpers()->is_post_long( $last_created_posts[0]->ID ) ? true : false,
+				'post_date' => $last_created_posts[0]->post_date,
 			];
 		}
 
