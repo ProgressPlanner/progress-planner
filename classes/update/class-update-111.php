@@ -237,7 +237,7 @@ class Update_111 {
 				if ( false !== strpos( $activity->data_id, 'provider_id/create-post' ) ) {
 					$data = $this->get_data_from_task_id( $activity->data_id );
 
-					// TODO: task_id needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
+					// NOTE: task_id needs to be unique, before we had 2 'create-post' tasks in the same week (short and long).
 					$new_data_id = $data['provider_id'] . '-' . ( $data['long'] ? 'long' : 'short' ) . '-' . $data['date'];
 					if ( $new_data_id !== $activity->data_id ) {
 						$activity->data_id = $new_data_id;
