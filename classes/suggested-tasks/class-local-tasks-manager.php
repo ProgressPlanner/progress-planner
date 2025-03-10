@@ -192,7 +192,7 @@ class Local_Tasks_Manager {
 			}
 
 			$tasks_to_inject[] = $task;
-			$this->add_pending_task( $task['task_id'] );
+			$this->add_pending_task( $task );
 		}
 
 		return \array_merge( $tasks, $tasks_to_inject );
@@ -275,24 +275,23 @@ class Local_Tasks_Manager {
 	/**
 	 * Add a pending local task.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task The task data.
 	 *
 	 * @return bool
 	 */
-	public function add_pending_task( $task_id ) {
+	public function add_pending_task( $task ) {
 		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 
 		$task_index = false;
 
-		foreach ( $tasks as $key => $task ) {
-			if ( ! isset( $task['task_id'] ) || $task_id !== $task['task_id'] ) {
+		foreach ( $tasks as $key => $_task ) {
+			if ( ! isset( $_task['task_id'] ) || $task['task_id'] !== $_task['task_id'] ) {
 				continue;
 			}
 			$task_index = $key;
 			break;
 		}
 
-		$task           = ( new Local_Task_Factory( $task_id ) )->get_task()->get_data();
 		$task['status'] = 'pending';
 
 		if ( false !== $task_index ) {

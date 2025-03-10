@@ -11,6 +11,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
 use Progress_Planner\Suggested_Tasks\Remote_Tasks;
 use Progress_Planner\Activities\Suggested_Task;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local;
 
 /**
  * Suggested_Tasks class.
@@ -178,6 +179,26 @@ class Suggested_Tasks {
 	}
 
 	/**
+	 * Get pending tasks with details.
+	 *
+	 * @return array
+	 */
+	public function get_pending_tasks_with_details() {
+		$tasks = $this->get_tasks();
+		foreach ( $tasks as $key => $task ) {
+
+			// Note that remote tasks don't have a provider_id, but they already have set details set.
+			if ( ! isset( $task['provider_id'] ) ) {
+				continue;
+			}
+
+			$tasks[ $key ] = ( new Task_Local( $task ) )->get_task_details();
+		}
+
+		return $tasks;
+	}
+
+	/**
 	 * Get tasks by status.
 	 *
 	 * @param string $status The status.
@@ -210,6 +231,24 @@ class Suggested_Tasks {
 				return $task;
 			}
 		}
+		return null;
+	}
+
+	/**
+	 * Get remote task by id.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return array|null
+	 */
+	public function get_remote_task_by_id( $task_id ) {
+		$tasks = $this->get_remote_tasks();
+		foreach ( $tasks as $task ) {
+			if ( 'remote-task-' . $task['task_id'] === $task_id ) {
+				return $task;
+			}
+		}
+
 		return null;
 	}
 
@@ -557,7 +596,14 @@ class Suggested_Tasks {
 			case 'complete':
 				// We need to add the task to the pending tasks first, before marking it as completed.
 				if ( false !== strpos( $task_id, 'remote-task' ) ) {
-					\progress_planner()->get_suggested_tasks()->get_local()->add_pending_task( $task_id );
+					$remote_task_data = $this->get_remote_task_by_id( $task_id );
+					\progress_planner()->get_suggested_tasks()->get_local()->add_pending_task(
+						[
+							'task_id'     => $task_id,
+							'provider_id' => $remote_task_data['category'] ?? '', // Remote tasks use the category as provider_id.
+							'category'    => $remote_task_data['category'] ?? '',
+						]
+					);
 				}
 
 				// Mark the task as completed.

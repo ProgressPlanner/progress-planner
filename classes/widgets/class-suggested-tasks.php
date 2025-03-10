@@ -10,7 +10,6 @@ namespace Progress_Planner\Widgets;
 use Progress_Planner\Badges\Monthly;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Review;
-
 /**
  * Suggested_Tasks class.
  */
@@ -81,22 +80,7 @@ final class Suggested_Tasks extends Widget {
 		$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
 
 		// Get tasks from task providers and pending_celebration tasks.
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
-
-		// TODO: WIP code - we need tasks with details.
-		foreach ( $tasks as $key => $task ) {
-			if ( ! isset( $task['provider_id'] ) ) {
-				continue;
-			}
-
-			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task['provider_id'] );
-			if ( ! $task_provider ) {
-				continue;
-			}
-
-			$task_details = $task_provider->get_task_details( $task['task_id'] );
-			$tasks[ $key ] = $task_details;
-		}
+		$tasks = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
 
 		// If we're not delaying the celebration, we need to get the pending_celebration tasks.
 		if ( ! $delay_celebration ) {
