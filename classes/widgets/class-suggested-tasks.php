@@ -195,18 +195,54 @@ final class Suggested_Tasks extends Widget {
 			];
 		}
 
+		$localize_data = [
+			'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
+			'nonce'               => \wp_create_nonce( 'progress_planner' ),
+			'tasks'               => array_values( $final_tasks ),
+			'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
+			'confettiOptions'     => $confetti_options,
+			'delayCelebration'    => $delay_celebration,
+			'raviIconUrl'         => PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg',
+		];
+
+		foreach ( $this->get_badge_urls() as $context => $url ) {
+			$localize_data[ $context . 'IconUrl' ] = $url;
+		}
+
 		// Localize the script.
 		\wp_localize_script(
 			$handle,
 			'prplSuggestedTasks',
-			[
-				'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
-				'nonce'               => \wp_create_nonce( 'progress_planner' ),
-				'tasks'               => array_values( $final_tasks ),
-				'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
-				'confettiOptions'     => $confetti_options,
-				'delayCelebration'    => $delay_celebration,
-			]
+			$localize_data
 		);
+	}
+
+	/**
+	 * Get the badge URLs.
+	 *
+	 * @return string[] The badge URLs.
+	 */
+	private function get_badge_urls() {
+		// Get the monthly badge URL.
+		$monthly_badge       = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
+		$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id();
+
+		// Get the content and maintenance badge URLs.
+		foreach ( [ 'content', 'maintenance' ] as $context ) {
+			$set_badges        = \progress_planner()->get_badges()->get_badges( $context );
+			$badge_url_context = '';
+			foreach ( $set_badges as $key => $badge ) {
+				$progress = $badge->get_progress();
+				if ( $progress['progress'] > 100 ) {
+					$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge->get_id();
+				}
+			}
+			if ( ! isset( $badge_urls[ $context ] ) ) {
+				// Fallback to the first badge in the set if no badge is completed.
+				$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $set_badges[0]->get_id();
+			}
+		}
+
+		return $badge_urls;
 	}
 }
