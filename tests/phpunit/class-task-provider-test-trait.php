@@ -121,9 +121,9 @@ trait Task_Provider_Test_Trait {
 		$this->complete_task();
 
 		// Change the task status to pending celebration for all completed tasks.
-		foreach ( $this->suggested_tasks->get_local()->evaluate_tasks() as $task_id ) {
+		foreach ( $this->suggested_tasks->get_local()->evaluate_tasks() as $task ) {
 			// Change the task status to pending celebration.
-			$this->suggested_tasks->mark_task_as_pending_celebration( $task_id );
+			$this->suggested_tasks->mark_task_as_pending_celebration( $task->get_data()['task_id'] );
 
 			// In production we insert an activity here.
 		}
