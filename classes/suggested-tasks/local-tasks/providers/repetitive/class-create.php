@@ -66,7 +66,7 @@ class Create extends Repetitive {
 
 		// Add the post ID and post length to the task data.
 		$task_data['post_id'] = $last_published_post_data['post_id'];
-		$task_data['long']    = 'long' === $last_published_post_data['post_length'];
+		$task_data['long']    = $last_published_post_data['long'];
 
 		return $task_data;
 	}
@@ -121,18 +121,24 @@ class Create extends Repetitive {
 	/**
 	 * Get the number of points for the task.
 	 *
+	 * @param string $task_id The task ID.
+	 *
 	 * @return int
 	 */
-	public function get_points() {
+	public function get_points( $task_id = '' ) {
 
-		// Get the post that was created last.
-		$last_published_post_data = $this->data_collector->collect();
+		if ( ! $task_id ) {
+			// Get the post that was created last.
+			$post_data = $this->data_collector->collect();
+		} else {
+			$post_data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $task_id );
+		}
 
 		// Post was created, but then deleted?
-		if ( ! $last_published_post_data || empty( $last_published_post_data['post_id'] ) ) {
+		if ( ! $post_data || empty( $post_data['post_id'] ) ) {
 			return 1;
 		}
 
-		return 'long' === $last_published_post_data['post_length'] ? 2 : 1;
+		return true === $post_data['long'] ? 2 : 1;
 	}
 }
