@@ -80,6 +80,9 @@ class Local_Tasks_Manager {
 				);
 				unset( $this->task_providers[ $key ] );
 			}
+
+			// Initialize the task provider (add hooks, etc.).
+			$task_provider->init();
 		}
 
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
