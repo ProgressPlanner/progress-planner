@@ -43,7 +43,7 @@ abstract class Repetitive extends Local_Tasks {
 
 		if ( $task_data['provider_id'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['date'] && $this->is_task_completed() ) {
 			// Allow adding more data, for example in case of 'create-post' tasks we are adding the post_id.
-			$task_data = $this->modify_task_data( $task_data );
+			$task_data = $this->modify_evaluated_task_data( $task_data );
 			$task_object->set_data( $task_data );
 
 			return $task_object;
@@ -79,14 +79,26 @@ abstract class Repetitive extends Local_Tasks {
 	}
 
 	/**
-	 * Modify task data before setting it.
+	 * Modify task data after task was evaluated.
 	 * Child classes can override this method to add extra data.
 	 *
 	 * @param array $task_data The task data.
 	 *
 	 * @return array
 	 */
-	protected function modify_task_data( $task_data ) {
+	protected function modify_evaluated_task_data( $task_data ) {
+		return $task_data;
+	}
+
+	/**
+	 * Modify task data before injecting it.
+	 * Child classes can override this method to add extra data.
+	 *
+	 * @param array $task_data The task data.
+	 *
+	 * @return array
+	 */
+	protected function modify_injection_task_data( $task_data ) {
 		return $task_data;
 	}
 
@@ -107,8 +119,16 @@ abstract class Repetitive extends Local_Tasks {
 			return [];
 		}
 
+		$task_data = [
+			'task_id'     => $task_id,
+			'provider_id' => $this->get_provider_id(),
+			'category'    => $this->get_provider_category(),
+		];
+
+		$task_data = $this->modify_injection_task_data( $task_data );
+
 		return [
-			$this->get_task_details( $task_id ),
+			$task_data,
 		];
 	}
 }

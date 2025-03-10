@@ -159,18 +159,24 @@ class Review extends Repetitive {
 			return [];
 		}
 
-		$task_details = [];
+		$task_to_inject = [];
 		if ( ! empty( $this->task_post_mappings ) ) {
 			foreach ( $this->task_post_mappings as $task_data ) {
 				if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_data['task_id'] ) ) {
 					continue;
 				}
 
-				$task_details[] = $this->get_task_details( $task_data['task_id'] );
+				// $task_to_inject[] = $this->get_task_details( $task_data['task_id'] );
+				$task_to_inject[] = [
+					'task_id'     => $task_data['task_id'],
+					'provider_id' => $this->get_provider_id(),
+					'category'    => $this->get_provider_category(),
+					'post_id'     => $task_data['post_id'],
+				];
 			}
 		}
 
-		return $task_details;
+		return $task_to_inject;
 	}
 
 	/**

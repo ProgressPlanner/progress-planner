@@ -83,6 +83,21 @@ final class Suggested_Tasks extends Widget {
 		// Get tasks from task providers and pending_celebration tasks.
 		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
 
+		// TODO: WIP code - we need tasks with details.
+		foreach ( $tasks as $key => $task ) {
+			if ( ! isset( $task['provider_id'] ) ) {
+				continue;
+			}
+
+			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task['provider_id'] );
+			if ( ! $task_provider ) {
+				continue;
+			}
+
+			$task_details = $task_provider->get_task_details( $task['task_id'] );
+			$tasks[ $key ] = $task_details;
+		}
+
 		// If we're not delaying the celebration, we need to get the pending_celebration tasks.
 		if ( ! $delay_celebration ) {
 			$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending_celebration' );
