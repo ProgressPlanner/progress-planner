@@ -8,6 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 
 /**
  * Add tasks for content updates.
@@ -64,7 +65,6 @@ class Review extends Repetitive {
 	 */
 	public function init() {
 		\add_filter( 'progress_planner_update_posts_tasks_args', [ $this, 'filter_update_posts_args' ] );
-		\add_action( 'transition_post_status', [ $this, 'transition_post_status' ], 10, 3 );
 	}
 
 	/**
@@ -130,7 +130,7 @@ class Review extends Repetitive {
 			}
 
 			foreach ( $last_updated_posts as $post ) {
-				$task_id = 'review-post-' . $post->ID . '-' . \gmdate( 'YW' ); // TODO: WIP code.
+				$task_id = $this->get_task_id( [ 'post_id' => $post->ID ] );
 
 				// Don't add the task if it was completed.
 				if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
@@ -169,9 +169,8 @@ class Review extends Repetitive {
 					continue;
 				}
 
-				// $task_to_inject[] = $this->get_task_details( $task_data['task_id'] );
 				$task_to_inject[] = [
-					'task_id'     => $task_data['task_id'],
+					'task_id'     => $this->get_task_id( [ 'post_id' => $task_data['post_id'] ] ),
 					'provider_id' => $this->get_provider_id(),
 					'category'    => $this->get_provider_category(),
 					'post_id'     => $task_data['post_id'],
@@ -192,11 +191,11 @@ class Review extends Repetitive {
 	 */
 	public function get_task_details( $task_id ) {
 
-		if ( ! $task_id || ! isset( $this->task_post_mappings[ $task_id ] ) ) {
+		if ( ! $task_id ) {
 			return [];
 		}
 
-		$data = $this->task_post_mappings[ $task_id ];
+		$data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $task_id );
 
 		$post         = \get_post( $data['post_id'] );
 		$task_details = [
@@ -310,39 +309,20 @@ class Review extends Repetitive {
 	}
 
 	/**
-	 * Run actions when transitioning a post status.
+	 * Check if a specific task is completed.
 	 *
-	 * @param string   $new_status The new status.
-	 * @param string   $old_status The old status.
-	 * @param \WP_Post $post       The post object.
-	 *
-	 * @return void
+	 * @param string $task_id The task ID to check.
+	 * @return bool
 	 */
-	public function transition_post_status( $new_status, $old_status, $post ) {
-		$include_post_types = \progress_planner()->get_settings()->get( [ 'include_post_types' ], [ 'post', 'page' ] );
+	protected function is_specific_task_completed( $task_id ) {
 
-		// Bail if we should skip saving.
-		if ( ( 'trash' !== $new_status )
-			|| ! \in_array( $post->post_type, $include_post_types, true )
-		) {
-			return;
+		$task = ( new Local_Task_Factory( $task_id ) )->get_task();
+		$data = $task->get_data();
+
+		if ( isset( $data['post_id'] ) && (int) \get_post_modified_time( 'U', false, (int) $data['post_id'] ) > strtotime( '-6 months' ) ) {
+			return true;
 		}
 
-		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		$tasks_changed = false;
-		foreach ( $tasks as $task_key => $task_data ) {
-			if ( $this->get_provider_id() === $task_data['provider_id'] &&
-				isset( $task_data['post_id'] ) &&
-				(int) $task_data['post_id'] === (int) $post->ID
-			) {
-				// Remove the task from the pending local tasks list.
-				unset( $tasks[ $task_key ] );
-				$tasks_changed = true;
-			}
-		}
-
-		if ( $tasks_changed ) {
-			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
-		}
+		return false;
 	}
 }
