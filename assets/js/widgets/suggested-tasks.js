@@ -163,7 +163,7 @@ const prplTriggerConfetti = () => {
 	const prplConfettiDefaults = {
 		spread: 360,
 		ticks: 50,
-		gravity: 0,
+		gravity: 1,
 		decay: 0.94,
 		startVelocity: 30,
 		shapes: [ 'star' ],
@@ -171,16 +171,49 @@ const prplTriggerConfetti = () => {
 	};
 
 	const prplRenderAttemptshoot = () => {
+		// Get the tasks list position
+		const tasksList = document.querySelector(
+			'.prpl-suggested-tasks-list'
+		);
+		const origin = tasksList
+			? {
+					x:
+						( tasksList.getBoundingClientRect().left +
+							tasksList.offsetWidth / 2 ) /
+						window.innerWidth,
+					y:
+						( tasksList.getBoundingClientRect().top + 50 ) /
+						window.innerHeight,
+			  }
+			: { x: 0.5, y: 0.3 }; // fallback if list not found
+
 		let confettiOptions = [
 			{
-				particleCount: 40,
-				scalar: 1.2,
-				shapes: [ 'star' ],
-			},
-			{
-				particleCount: 10,
-				scalar: 0.75,
-				shapes: [ 'circle' ],
+				particleCount: 30,
+				scalar: 4,
+				shapes: [ 'image' ],
+				shapeOptions: {
+					image: [
+						{
+							src: prplSuggestedTasks.raviIconUrl,
+						},
+						{
+							src: prplSuggestedTasks.raviIconUrl,
+						},
+						{
+							src: prplSuggestedTasks.raviIconUrl,
+						},
+						{
+							src: prplSuggestedTasks.monthIconUrl,
+						},
+						{
+							src: prplSuggestedTasks.contentIconUrl,
+						},
+						{
+							src: prplSuggestedTasks.maintenanceIconUrl,
+						},
+					],
+				},
 			},
 		];
 
@@ -194,6 +227,9 @@ const prplTriggerConfetti = () => {
 		}
 
 		for ( const value of confettiOptions ) {
+			// Set confetti options, we do it here so it's applied even if we pass the options from the PHP side (ie hearts confetti).
+			value.origin = origin;
+
 			confetti( {
 				...prplConfettiDefaults,
 				...value,
