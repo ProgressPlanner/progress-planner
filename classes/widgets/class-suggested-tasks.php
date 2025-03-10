@@ -145,9 +145,9 @@ final class Suggested_Tasks extends Widget {
 			$max_items_per_category[ $task['category'] ] = $task['category'] === ( new Review() )->get_provider_category() ? 2 : 1;
 		}
 
-		// We want all `user` tasks to be shown.
+		// We want to hide user tasks.
 		if ( isset( $max_items_per_category['user'] ) ) {
-			$max_items_per_category['user'] = 99;
+			$max_items_per_category['user'] = 0;
 		}
 
 		// Check if current date is between Feb 12-16 to use hearts confetti.
