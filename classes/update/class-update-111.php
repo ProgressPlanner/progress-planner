@@ -48,6 +48,9 @@ class Update_111 {
 		// Migrate the 'create-post' tasks, they are now repetitive tasks.
 		$this->migrate_create_post_tasks();
 
+		// Migrate the 'review-post' tasks, they are now repetitive tasks.
+		$this->migrate_review_post_tasks();
+
 		if ( $this->local_tasks_changed ) {
 			\progress_planner()->get_settings()->set( 'local_tasks', $this->local_tasks );
 		}
@@ -57,6 +60,9 @@ class Update_111 {
 
 		// Migrate the 'create-post' activities.
 		$this->migrate_create_post_activities();
+
+		// Migrate the 'update-post' activities.
+		$this->migrate_review_post_activities();
 	}
 
 	/**
@@ -218,7 +224,7 @@ class Update_111 {
 	}
 
 	/**
-	 * Migrate the 'create-post' tasks, they are now repetitive tasks.
+	 * Migrate the 'create-post' activities, they are now repetitive tasks.
 	 * Since the activities were already migrated, we search for 'provider_id/create-post' (not 'type/create-post').
 	 *
 	 * @return void
@@ -239,6 +245,62 @@ class Update_111 {
 
 					// NOTE: task_id needs to be unique, before we had 2 'create-post' tasks in the same week (short and long).
 					$new_data_id = $data['provider_id'] . '-' . ( $data['long'] ? 'long' : 'short' ) . '-' . $data['date'];
+					if ( $new_data_id !== $activity->data_id ) {
+						$activity->data_id = $new_data_id;
+						$activity->save();
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Migrate the 'review-post' tasks, they are now repetitive tasks.
+	 * Since the tasks were already migrated, we search for 'provider_id/review-post' (not 'type/review-post').
+	 *
+	 * @return void
+	 */
+	private function migrate_review_post_tasks() {
+
+		// Migrate the 'create-post' completed tasks.
+		if ( ! empty( $this->local_tasks ) ) {
+			foreach ( $this->local_tasks as $key => $task ) {
+				if ( false !== strpos( $task['task_id'], 'provider_id/review-post' ) ) {
+
+					$data = $this->get_data_from_task_id( $task['task_id'] );
+
+					// TODO: Check this one, since we dont have the date.
+					$this->local_tasks[ $key ]['task_id'] = $data['provider_id'] . '-' . $data['post_id'] . '-' . \gmdate( 'YW' );
+					$this->local_tasks[ $key ]['date']    = \gmdate( 'YW' );
+
+					$this->local_tasks_changed = true;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Migrate the 'review-post' tasks, they are now repetitive tasks.
+	 * Since the activities were already migrated, we search for 'provider_id/create-post' (not 'type/create-post').
+	 *
+	 * @return void
+	 */
+	private function migrate_review_post_activities() {
+		// Migrate the 'create-post' activities.
+		$activities = \progress_planner()->get_query()->query_activities(
+			[
+				'category' => 'suggested_task',
+				'type'     => 'completed',
+			]
+		);
+
+		if ( ! empty( $activities ) ) {
+			foreach ( $activities as $activity ) {
+				if ( false !== strpos( $activity->data_id, 'provider_id/review-post' ) ) {
+					$data = $this->get_data_from_task_id( $activity->data_id );
+
+					// TODO: Check this one, since we dont have the date.
+					$new_data_id = $data['provider_id'] . '-' . $data['post_id'] . '-' . \gmdate( 'YW' );
 					if ( $new_data_id !== $activity->data_id ) {
 						$activity->data_id = $new_data_id;
 						$activity->save();
