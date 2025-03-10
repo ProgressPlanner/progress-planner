@@ -72,6 +72,15 @@ class Tour {
 				],
 			],
 			[
+				'element' => '.prpl-widget-wrapper.prpl-todo',
+				'popover' => [
+					'title'       => \esc_html__( 'Your to-do list', 'progress-planner' ),
+					'description' => \esc_html__( 'This is where you can see your to-do list. You can add tasks to your to-do list by clicking the "Add to do" button. You can also see these to-do items on your dashboard.', 'progress-planner' ),
+					'side'        => 'top',
+					'align'       => 'center',
+				],
+			],
+			[
 				'element' => '#prpl-popover-monthly-badges-trigger',
 				'popover' => [
 					'title'       => \esc_html__( 'Monthly badges', 'progress-planner' ),
