@@ -241,7 +241,7 @@ class Suggested_Tasks {
 	 *
 	 * @return array|null
 	 */
-	public function get_remote_task_by_id( $task_id ) {
+	public function get_remote_task_by_task_id( $task_id ) {
 		$tasks = $this->get_remote_tasks();
 		foreach ( $tasks as $task ) {
 			if ( 'remote-task-' . $task['task_id'] === $task_id ) {
@@ -596,7 +596,7 @@ class Suggested_Tasks {
 			case 'complete':
 				// We need to add the task to the pending tasks first, before marking it as completed.
 				if ( false !== strpos( $task_id, 'remote-task' ) ) {
-					$remote_task_data = $this->get_remote_task_by_id( $task_id );
+					$remote_task_data = $this->get_remote_task_by_task_id( $task_id );
 					\progress_planner()->get_suggested_tasks()->get_local()->add_pending_task(
 						[
 							'task_id'     => $task_id,
