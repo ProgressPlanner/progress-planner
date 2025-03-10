@@ -52,6 +52,19 @@ class Scripts {
 			);
 			$this->localize_script( $handle );
 		}
+
+		// Register widget scripts.
+		foreach ( $this->get_files_in_directory( 'assets/js/widgets' ) as $file ) {
+			$handle = 'progress-planner-widget-' . $file;
+			\wp_register_script(
+				$handle,
+				PROGRESS_PLANNER_URL . '/assets/js/widgets/' . $file . '.js',
+				$this->get_dependencies( 'widgets/' . $file ),
+				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/' . $file . '.js' ),
+				true
+			);
+			$this->localize_script( $handle );
+		}
 	}
 
 	/**
@@ -122,29 +135,6 @@ class Scripts {
 							],
 							'close'          => \esc_html__( 'Close', 'progress-planner' ),
 							'markAsComplete' => \esc_html__( 'Mark as completed', 'progress-planner' ),
-						],
-					]
-				);
-				break;
-
-			case 'progress-planner-web-components-prpl-todo-item':
-				\wp_localize_script(
-					$handle,
-					'progressPlannerTodoItem',
-					[
-						'i18n' => [
-							/* translators: %s: The task content. */
-							'taskDelete'       => \esc_html__( "Delete task '%s'", 'progress-planner' ),
-							/* translators: %s: The task content. */
-							'taskMoveUp'       => \esc_html__( "Move task '%s' up", 'progress-planner' ),
-							/* translators: %s: The task content. */
-							'taskMoveDown'     => \esc_html__( "Move task '%s' down", 'progress-planner' ),
-							'taskMovedUp'      => \esc_html__( 'Task moved up', 'progress-planner' ),
-							'taskMovedDown'    => \esc_html__( 'Task moved down', 'progress-planner' ),
-							/* translators: %s: The task content. */
-							'taskCompleted'    => \esc_html__( "Task '%s' completed and moved to the bottom", 'progress-planner' ),
-							/* translators: %s: The task content. */
-							'taskNotCompleted' => \esc_html__( "Task '%s' marked as not completed and moved to the top", 'progress-planner' ),
 						],
 					]
 				);

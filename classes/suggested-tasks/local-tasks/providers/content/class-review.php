@@ -256,7 +256,7 @@ class Review extends Content {
 		}
 
 		$this->snoozed_post_ids = [];
-		$snoozed                = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'snoozed' );
+		$snoozed                = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'snoozed' );
 
 		if ( \is_array( $snoozed ) && ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {

@@ -112,7 +112,7 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	 * @return bool
 	 */
 	public function is_task_snoozed() {
-		$snoozed = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'snoozed' );
+		$snoozed = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'snoozed' );
 		if ( ! \is_array( $snoozed ) || empty( $snoozed ) ) {
 			return false;
 		}

@@ -171,18 +171,19 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Get tasks by status.
+	 * Get tasks by.
 	 *
-	 * @param string $status The status.
+	 * @param string $param The parameter.
+	 * @param string $value The value.
 	 *
 	 * @return array
 	 */
-	public function get_tasks_by_status( $status ) {
+	public function get_tasks_by( $param, $value ) {
 		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 		$tasks = array_filter(
 			$tasks,
-			function ( $task ) use ( $status ) {
-				return isset( $task['status'] ) && $task['status'] === $status;
+			function ( $task ) use ( $param, $value ) {
+				return isset( $task[ $param ] ) && $task[ $param ] === $value;
 			}
 		);
 
@@ -424,7 +425,7 @@ class Suggested_Tasks {
 					$parsed_condition['post_lengths'] = [ $parsed_condition['post_lengths'] ];
 				}
 
-				$snoozed_tasks        = $this->get_tasks_by_status( 'snoozed' );
+				$snoozed_tasks        = $this->get_tasks_by( 'status', 'snoozed' );
 				$snoozed_post_lengths = [];
 
 				// Get the post lengths of the snoozed tasks.
@@ -449,7 +450,7 @@ class Suggested_Tasks {
 			}
 		}
 
-		foreach ( $this->get_tasks_by_status( $parsed_condition['status'] ) as $task ) {
+		foreach ( $this->get_tasks_by( 'status', $parsed_condition['status'] ) as $task ) {
 			if ( $task['task_id'] === $parsed_condition['task_id'] ) {
 				return true;
 			}

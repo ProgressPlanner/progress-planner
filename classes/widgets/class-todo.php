@@ -65,7 +65,7 @@ final class ToDo extends Widget {
 				'wp-a11y',
 				'progress-planner-ajax-request',
 				'progress-planner-grid-masonry',
-				'progress-planner-web-components-prpl-todo-item',
+				'progress-planner-web-components-prpl-suggested-task',
 				'progress-planner-document-ready',
 			],
 			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/todo.js' ),
