@@ -34,6 +34,35 @@ customElements.define(
 			const isDismissable = taskDismissable || isRemoteTask;
 
 			const actionButtons = {
+				move:
+					false !== taskOrder
+						? `<span class="prpl-move-buttons">
+							<button
+								type="button"
+								class="prpl-suggested-task-button move-up"
+								data-task-id="${ taskId }"
+								data-task-title="${ taskTitle }"
+								data-action="move-up"
+								data-target="move-up"
+								title="${ prplSuggestedTask.i18n.moveUp }"
+							>
+								<span class="dashicons dashicons-arrow-up-alt2"></span>
+								<span class="screen-reader-text">${ prplSuggestedTask.i18n.moveUp }</span>
+							</button>
+							<button
+								type="button"
+								class="prpl-suggested-task-button move-down"
+								data-task-id="${ taskId }"
+								data-task-title="${ taskTitle }"
+								data-action="move-down"
+								data-target="move-down"
+								title="${ prplSuggestedTask.i18n.moveDown }"
+							>
+								<span class="dashicons dashicons-arrow-down-alt2"></span>
+								<span class="screen-reader-text">${ prplSuggestedTask.i18n.moveUp }</span>
+							</button>
+						</span>`
+						: '',
 				info: taskDescription
 					? `<button
 							type="button"
@@ -117,6 +146,7 @@ customElements.define(
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
 						${ actionButtons.info }
+						${ actionButtons.move }
 						${ actionButtons.snooze }
 						${ actionButtons.complete }
 						${ actionButtons.delete }
@@ -274,6 +304,36 @@ customElements.define(
 										'.prpl-suggested-task-' + target
 									)
 									.removeAttribute( 'data-tooltip-visible' );
+								break;
+
+							case 'move-up':
+							case 'move-down':
+								// Move `thisObj` before or after the previous or next sibling.
+								const previousSibling =
+									thisObj.previousElementSibling;
+								const nextSibling = thisObj.nextElementSibling;
+								if ( 'move-up' === action && previousSibling ) {
+									thisObj.parentNode.insertBefore(
+										thisObj,
+										previousSibling
+									);
+								} else if (
+									'move-down' === action &&
+									nextSibling
+								) {
+									thisObj.parentNode.insertBefore(
+										nextSibling,
+										thisObj
+									);
+								}
+								// Trigger a custom event.
+								const event = new CustomEvent(
+									'prplMoveSuggestedTaskEvent',
+									{
+										detail: { node: thisObj },
+									}
+								);
+								document.dispatchEvent( event );
 								break;
 
 							default:

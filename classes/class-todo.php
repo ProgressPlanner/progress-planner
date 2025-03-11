@@ -28,9 +28,22 @@ class Todo {
 	 * @return array
 	 */
 	public function get_items() {
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', 'user' );
-		$items = [];
+		$tasks     = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', 'user' );
+		$items     = [];
+		$max_order = 0;
+
+		// Get the maximum order value from the $tasks array.
 		foreach ( $tasks as $task ) {
+			if ( isset( $task['order'] ) && $task['order'] > $max_order ) {
+				$max_order = $task['order'];
+			}
+		}
+
+		foreach ( $tasks as $task ) {
+			if ( ! isset( $task['order'] ) ) {
+				$task['order'] = $max_order + 1;
+				++$max_order;
+			}
 			$items[] = array_merge(
 				$task,
 				[
@@ -39,6 +52,14 @@ class Todo {
 				]
 			);
 		}
+
+		// Order the items by the order value.
+		usort(
+			$items,
+			function ( $a, $b ) {
+				return $a['order'] - $b['order'];
+			}
+		);
 
 		return $items;
 	}

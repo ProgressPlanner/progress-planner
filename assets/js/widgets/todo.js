@@ -126,3 +126,9 @@ prplDocumentReady( () => {
 			document.getElementById( 'new-todo-content' ).focus();
 		} );
 } );
+
+// When the 'prplMoveSuggestedTaskEvent' event is triggered,
+// update the order of the todo items.
+document.addEventListener( 'prplMoveSuggestedTaskEvent', () => {
+	prplSaveSuggestedUserTasksOrder();
+} );
