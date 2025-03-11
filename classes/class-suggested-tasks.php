@@ -11,8 +11,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
 use Progress_Planner\Suggested_Tasks\Remote_Tasks;
 use Progress_Planner\Activities\Suggested_Task;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local;
-
+use Progress_Planner\Suggested_Tasks\Task_Factory;
 /**
  * Suggested_Tasks class.
  */
@@ -186,13 +185,7 @@ class Suggested_Tasks {
 	public function get_pending_tasks_with_details() {
 		$tasks = $this->get_tasks();
 		foreach ( $tasks as $key => $task ) {
-
-			// Note that remote tasks don't have a provider_id, but they already have details set.
-			if ( ! isset( $task['provider_id'] ) ) {
-				continue;
-			}
-
-			$tasks[ $key ] = ( new Task_Local( $task ) )->get_task_details();
+			$tasks[ $key ] = Task_Factory::get_task( $task['task_id'] )->get_task_details();
 		}
 
 		return $tasks;
@@ -244,7 +237,7 @@ class Suggested_Tasks {
 	public function get_remote_task_by_task_id( $task_id ) {
 		$tasks = $this->get_remote_tasks();
 		foreach ( $tasks as $task ) {
-			if ( 'remote-task-' . $task['task_id'] === $task_id ) {
+			if ( $task['task_id'] === $task_id ) {
 				return $task;
 			}
 		}
