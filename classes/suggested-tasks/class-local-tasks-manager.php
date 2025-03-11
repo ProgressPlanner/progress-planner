@@ -11,7 +11,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 // Repetitive tasks.
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
 // Content tasks.
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Create as Content_Create;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create as Content_Create;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Review as Content_Review;
 // One-time tasks.
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Blog_Description;
@@ -80,6 +80,9 @@ class Local_Tasks_Manager {
 				);
 				unset( $this->task_providers[ $key ] );
 			}
+
+			// Initialize the task provider (add hooks, etc.).
+			$task_provider->init();
 		}
 
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
@@ -214,7 +217,7 @@ class Local_Tasks_Manager {
 
 			$task_result = $this->evaluate_task( $task_id );
 			if ( false !== $task_result ) {
-				$completed_tasks[] = $task_id;
+				$completed_tasks[] = $task_result;
 			}
 		}
 
@@ -346,7 +349,7 @@ class Local_Tasks_Manager {
 		);
 
 		if ( count( $tasks ) !== $task_count ) {
-			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+			\progress_planner()->get_settings()->set( 'local_tasks', array_values( $tasks ) );
 		}
 
 		\progress_planner()->get_cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );
