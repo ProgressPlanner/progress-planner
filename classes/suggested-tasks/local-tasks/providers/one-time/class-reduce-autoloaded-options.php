@@ -26,14 +26,14 @@ class Reduce_Autoloaded_Options extends One_Time {
 	 *
 	 * @var string
 	 */
-	const TYPE = 'maintenance';
+	const CATEGORY = 'maintenance';
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'reduce-autoloaded-options';
+	const PROVIDER_ID = 'reduce-autoloaded-options';
 
 	/**
 	 * The number of autoloaded options.
@@ -65,6 +65,21 @@ class Reduce_Autoloaded_Options extends One_Time {
 	private $plugin_path = 'aaa-option-optimizer/aaa-option-optimizer.php';
 
 	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+
+		$this->title       = \esc_html__( 'Reduce number of autoloaded options', 'progress-planner' );
+		$this->description = sprintf(
+			// translators: %d is the number of autoloaded options.
+			\esc_html__( 'There are %d autoloaded options. If you don\'t need them, consider disabling them by installing the "AAA Option Optimizer" plugin.', 'progress-planner' ),
+			$this->get_autoloaded_options_count(),
+		);
+		$this->url            = \admin_url( '/plugin-install.php?tab=search&s=aaa+option+optimizer' );
+		$this->is_dismissable = true;
+	}
+
+	/**
 	 * Check if the task condition is satisfied.
 	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *
@@ -86,36 +101,6 @@ class Reduce_Autoloaded_Options extends One_Time {
 	 */
 	public function is_task_completed() {
 		return $this->is_plugin_active() || $this->get_autoloaded_options_count() <= $this->autoloaded_options_threshold;
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-
-		if ( ! $task_id ) {
-			$task_id = $this->get_provider_id();
-		}
-
-		return [
-			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Reduce number of autoloaded options', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'medium',
-			'type'        => $this->get_provider_type(),
-			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( \admin_url( '/plugin-install.php?tab=search&s=aaa+option+optimizer' ) ) : '',
-			'dismissable' => true,
-			'description' => '<p>' . sprintf(
-				// translators: %d is the number of autoloaded options.
-				\esc_html__( 'There are %d autoloaded options. If you don\'t need them, consider disabling them by installing the "AAA Option Optimizer" plugin.', 'progress-planner' ),
-				$this->get_autoloaded_options_count(),
-			) . '</p>',
-		];
 	}
 
 	/**
