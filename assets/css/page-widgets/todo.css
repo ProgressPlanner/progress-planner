@@ -57,7 +57,8 @@
 	padding: 0;
 	max-height: 30em;
 	overflow-y: auto;
-	margin: 0 0 0.5em calc(var(--prpl-padding) * -1);
+
+	/* margin: 0 0 0.5em calc(var(--prpl-padding) * -1); */
 
 	> *:first-child .move-up,
 	> *:last-child .move-down {

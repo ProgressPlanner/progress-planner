@@ -471,6 +471,10 @@ customElements.define(
 
 					case 'delete':
 						el.remove();
+						const resizeGridEvent = new Event(
+							'prplResizeAllGridItemsEvent'
+						);
+						document.dispatchEvent( resizeGridEvent );
 						break;
 				}
 

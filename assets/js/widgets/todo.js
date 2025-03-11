@@ -120,6 +120,11 @@ prplDocumentReady( () => {
 			progressPlannerInjectTodoItem( newTask );
 			prplSubmitUserSuggestedTask( newTask );
 
+			const resizeGridAfterInsert = new Event(
+				'prplResizeAllGridItemsEvent'
+			);
+			document.dispatchEvent( resizeGridAfterInsert );
+
 			document.getElementById( 'new-todo-content' ).value = '';
 
 			// Focus the new task input element.
