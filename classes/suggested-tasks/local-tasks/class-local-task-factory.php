@@ -35,6 +35,22 @@ class Local_Task_Factory {
 	 */
 	public function get_task(): Task_Local {
 
+		// We should have all the data saved in the database.
+		$data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $this->task_id );
+
+		// If we have the task data, return it.
+		if ( $data ) {
+			return new Task_Local( $data );
+		}
+
+		/*
+		We're here in following cases:
+		 * - Legacy tasks, happens during v1.1.1 update, where we parsed task data from the task_id.
+		 * - When adding new pending task (which is not yet saved in the database).
+		 * - Remote tasks.
+		*/
+		$data = [];
+
 		// Parse simple format, e.g. 'update-core-202449' or "hello-world".
 		if ( ! str_contains( $this->task_id, '|' ) ) {
 
@@ -57,6 +73,11 @@ class Local_Task_Factory {
 			// Remote (remote-12345) or repetitive tasks (update-core-202449).
 			$task_provider_id = substr( $this->task_id, 0, $last_pos );
 			$task_suffix      = substr( $this->task_id, $last_pos + 1 );
+
+			// Check for legacy create-post task_id, old task_ids were migrated to create-post-short' or 'create-post-long' (since we had 2 such tasks per week).
+			if ( 'create-post-short' === $task_provider_id || 'create-post-long' === $task_provider_id ) {
+				$task_provider_id = 'create-post';
+			}
 
 			$task_suffix_key = 'remote-task' === $task_provider_id ? 'remote_task_id' : 'date';
 
@@ -105,8 +126,10 @@ class Local_Task_Factory {
 			unset( $data['type'] );
 		}
 
-		$task_provider    = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $data['provider_id'] );
-		$data['category'] = $task_provider ? $task_provider->get_provider_category() : '';
+		if ( isset( $data['provider_id'] ) ) {
+			$task_provider    = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $data['provider_id'] );
+			$data['category'] = $task_provider ? $task_provider->get_provider_category() : '';
+		}
 
 		return new Task_Local( $data );
 	}

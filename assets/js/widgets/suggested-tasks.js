@@ -7,12 +7,6 @@
  * @return {number} The number of items in the list.
  */
 const prplSuggestedTasksCountItems = ( category ) => {
-	// We want to display all pending celebration tasks on page load.
-	if ( 'pending_celebration' === category ) {
-		// TODO: This is a status, not a provider-ID.
-		return 0;
-	}
-
 	const items = document.querySelectorAll(
 		`.prpl-suggested-task[data-task-category="${ category }"]`
 	);
@@ -49,7 +43,7 @@ const prplSuggestedTasksGetItemsWithStatus = ( status ) => {
  * @param {string} category The category of items to get the next item from.
  * @return {Object} The next item to inject.
  */
-const prplSuggestedTasksGetNextItemFromCategory = ( category ) => {
+const prplSuggestedTasksGetNextPendingItemFromCategory = ( category ) => {
 	// Get items of this category.
 	const itemsOfCategory = prplSuggestedTasksGetItemsOfCategory( category );
 	// If there are no items of this category, return null.
@@ -66,8 +60,8 @@ const prplSuggestedTasksGetNextItemFromCategory = ( category ) => {
 		} );
 
 	const items = itemsOfCategory.filter( function ( item ) {
-		// Remove items which are completed or snoozed.
-		if ( 'completed' === item.status || 'snoozed' === item.status ) {
+		// Skip items which are not pending.
+		if ( 'pending' !== item.status ) {
 			return false;
 		}
 		// Remove items which are already in the list.
@@ -92,7 +86,8 @@ const prplSuggestedTasksGetNextItemFromCategory = ( category ) => {
  * @param {string} category The category of items to inject the next item from.
  */
 const prplSuggestedTasksInjectNextItem = ( category ) => {
-	const nextItem = prplSuggestedTasksGetNextItemFromCategory( category );
+	const nextItem =
+		prplSuggestedTasksGetNextPendingItemFromCategory( category );
 	if ( ! nextItem ) {
 		return;
 	}
@@ -167,7 +162,7 @@ const prplTriggerConfetti = () => {
 	const prplConfettiDefaults = {
 		spread: 360,
 		ticks: 50,
-		gravity: 0,
+		gravity: 1,
 		decay: 0.94,
 		startVelocity: 30,
 		shapes: [ 'star' ],
@@ -175,16 +170,49 @@ const prplTriggerConfetti = () => {
 	};
 
 	const prplRenderAttemptshoot = () => {
+		// Get the tasks list position
+		const tasksList = document.querySelector(
+			'.prpl-suggested-tasks-list'
+		);
+		const origin = tasksList
+			? {
+					x:
+						( tasksList.getBoundingClientRect().left +
+							tasksList.offsetWidth / 2 ) /
+						window.innerWidth,
+					y:
+						( tasksList.getBoundingClientRect().top + 50 ) /
+						window.innerHeight,
+			  }
+			: { x: 0.5, y: 0.3 }; // fallback if list not found
+
 		let confettiOptions = [
 			{
-				particleCount: 40,
-				scalar: 1.2,
-				shapes: [ 'star' ],
-			},
-			{
-				particleCount: 10,
-				scalar: 0.75,
-				shapes: [ 'circle' ],
+				particleCount: 30,
+				scalar: 4,
+				shapes: [ 'image' ],
+				shapeOptions: {
+					image: [
+						{
+							src: prplSuggestedTasks.raviIconUrl,
+						},
+						{
+							src: prplSuggestedTasks.raviIconUrl,
+						},
+						{
+							src: prplSuggestedTasks.raviIconUrl,
+						},
+						{
+							src: prplSuggestedTasks.monthIconUrl,
+						},
+						{
+							src: prplSuggestedTasks.contentIconUrl,
+						},
+						{
+							src: prplSuggestedTasks.maintenanceIconUrl,
+						},
+					],
+				},
 			},
 		];
 
@@ -198,6 +226,9 @@ const prplTriggerConfetti = () => {
 		}
 
 		for ( const value of confettiOptions ) {
+			// Set confetti options, we do it here so it's applied even if we pass the options from the PHP side (ie hearts confetti).
+			value.origin = origin;
+
 			confetti( {
 				...prplConfettiDefaults,
 				...value,
@@ -268,10 +299,10 @@ const prplStrikeCompletedTasks = () => {
 	}, 2000 );
 };
 
-const prplPendingCelebration = prplSuggestedTasksGetItemsWithStatus(
-	'pending_celebration'
-);
-if ( ! prplSuggestedTasks.delayCelebration && prplPendingCelebration.length ) {
+if (
+	! prplSuggestedTasks.delayCelebration &&
+	prplSuggestedTasksGetItemsWithStatus( 'pending_celebration' ).length
+) {
 	setTimeout( () => {
 		// Trigger the celebration event.
 		document.dispatchEvent( new Event( 'prplCelebrateTasks' ) );
@@ -299,11 +330,18 @@ document.addEventListener( 'DOMContentLoaded', () => {
 				parseInt(
 					prplSuggestedTasks.maxItemsPerCategory[ category ]
 				) &&
-			prplSuggestedTasksGetNextItemFromCategory( category )
+			prplSuggestedTasksGetNextPendingItemFromCategory( category )
 		) {
 			prplSuggestedTasksInjectNextItem( category );
 		}
 	}
+
+	// Inject ALL pending celebration tasks.
+	prplSuggestedTasksGetItemsWithStatus( 'pending_celebration' ).forEach(
+		( task ) => {
+			prplSuggestedTasksInjectItem( task );
+		}
+	);
 
 	const event = new CustomEvent( 'prplResizeAllGridItemsEvent' );
 	document.dispatchEvent( event );
@@ -559,17 +597,12 @@ document.addEventListener(
 	( e ) => {
 		const category = e.detail.category;
 
-		if ( 'pending_celebration' === category ) {
-			// TODO: This is a status, not a category.
-			return;
-		}
-
 		while (
 			prplSuggestedTasksCountItems( category ) <
 				parseInt(
 					prplSuggestedTasks.maxItemsPerCategory[ category ]
 				) &&
-			prplSuggestedTasksGetNextItemFromCategory( category )
+			prplSuggestedTasksGetNextPendingItemFromCategory( category )
 		) {
 			prplSuggestedTasksInjectNextItem( category );
 		}
