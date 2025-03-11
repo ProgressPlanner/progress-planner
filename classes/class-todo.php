@@ -29,7 +29,19 @@ class Todo {
 	 * @return array
 	 */
 	public function get_items() {
-		return \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', 'user' );
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', 'user' );
+		$items = [];
+		foreach ( $tasks as $task ) {
+			$items[] = array_merge(
+				$task,
+				[
+					'dismissable' => true,
+					'snoozable'   => false,
+				]
+			);
+		}
+
+		return $items;
 	}
 
 	/**

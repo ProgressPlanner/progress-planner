@@ -53,6 +53,7 @@ const prplCreateUserSuggestedTask = ( content ) => {
 		category: 'user',
 		url: '',
 		dismissable: true,
+		snoozable: false,
 	};
 };
 
@@ -62,23 +63,6 @@ const prplSubmitUserSuggestedTask = ( task ) => {
 		nonce: prplSuggestedTasks.nonce,
 	} );
 };
-
-// When the '#create-suggested-item' form is submitted,
-// add a new todo item to the list
-document
-	.getElementById( 'create-suggested-item' )
-	.addEventListener( 'submit', ( event ) => {
-		event.preventDefault();
-		const userTask = prplCreateUserSuggestedTask(
-			document.getElementById( 'new-suggested-item-content' ).value
-		);
-		prplSubmitUserSuggestedTask( userTask );
-
-		document.getElementById( 'new-suggested-item-content' ).value = '';
-
-		// Focus the new task input element.
-		document.getElementById( 'new-suggested-item-content' ).focus();
-	} );
 
 prplDocumentReady( () => {
 	// Inject the existing todo list items into the DOM
