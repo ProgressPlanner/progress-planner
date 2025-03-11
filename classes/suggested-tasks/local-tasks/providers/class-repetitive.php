@@ -151,6 +151,7 @@ abstract class Repetitive extends Local_Tasks {
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
 			'category'    => $this->get_provider_category(),
+			'date'        => \gmdate( 'YW' ),
 		];
 
 		$task_data = $this->modify_injection_task_data( $task_data );
