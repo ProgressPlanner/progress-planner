@@ -80,6 +80,9 @@ class Local_Tasks_Manager {
 				);
 				unset( $this->task_providers[ $key ] );
 			}
+
+			// Initialize the task provider (add hooks, etc.).
+			$task_provider->init();
 		}
 
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
@@ -121,7 +124,7 @@ class Local_Tasks_Manager {
 	}
 
 	/**
-	 * Get a task provider by its type.
+	 * Get a task provider.
 	 *
 	 * @param string $name The method name.
 	 * @param array  $arguments The arguments.
@@ -149,7 +152,7 @@ class Local_Tasks_Manager {
 	}
 
 	/**
-	 * Get a task provider by its type.
+	 * Get a task provider by its ID.
 	 *
 	 * @param string $provider_id The provider ID.
 	 *
@@ -332,12 +335,12 @@ class Local_Tasks_Manager {
 					return false;
 				}
 
-				if ( isset( $task['year_week'] ) ) {
-					return \gmdate( 'YW' ) === $task['year_week'];
+				if ( isset( $task['date'] ) ) {
+					return (string) \gmdate( 'YW' ) === (string) $task['date'];
 				}
 
-				// We have changed type name, so we need to remove all tasks of the old type.
-				if ( isset( $task['type'] ) && 'update-post' === $task['type'] ) {
+				// We have changed provider_id name, so we need to remove all tasks of the old provider_id.
+				if ( isset( $task['provider_id'] ) && 'update-post' === $task['provider_id'] ) {
 					return false;
 				}
 
@@ -346,7 +349,7 @@ class Local_Tasks_Manager {
 		);
 
 		if ( count( $tasks ) !== $task_count ) {
-			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+			\progress_planner()->get_settings()->set( 'local_tasks', array_values( $tasks ) );
 		}
 
 		\progress_planner()->get_cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );

@@ -22,11 +22,11 @@ abstract class One_Time extends Local_Tasks {
 	protected const IS_ONBOARDING_TASK = true;
 
 	/**
-	 * The provider type.
+	 * The provider category.
 	 *
 	 * @var string
 	 */
-	protected const TYPE = 'configuration';
+	protected const CATEGORY = 'configuration';
 
 	/**
 	 * The task description.
@@ -212,7 +212,7 @@ abstract class One_Time extends Local_Tasks {
 	 */
 	public function get_tasks_to_inject() {
 		if (
-			true === $this->is_task_type_snoozed() ||
+			true === $this->is_task_snoozed() ||
 			! $this->should_add_task() || // No need to add the task.
 			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() )
 		) {
@@ -235,10 +235,11 @@ abstract class One_Time extends Local_Tasks {
 
 		return [
 			'task_id'      => $this->get_task_id(),
+			'provider_id'  => $this->get_provider_id(),
 			'title'        => $this->get_title(),
 			'parent'       => $this->get_parent(),
 			'priority'     => $this->get_priority(),
-			'type'         => $this->get_provider_type(),
+			'category'     => $this->get_provider_category(),
 			'points'       => $this->get_points(),
 			'url'          => $this->capability_required() ? \esc_url( $this->get_url() ) : '',
 			'description'  => $this->get_description(),

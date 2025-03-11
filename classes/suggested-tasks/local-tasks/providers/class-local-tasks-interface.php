@@ -13,6 +13,13 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 interface Local_Tasks_Interface {
 
 	/**
+	 * Initialize the task provider.
+	 *
+	 * @return void
+	 */
+	public function init();
+
+	/**
 	 * Get tasks to inject.
 	 *
 	 * @return array
@@ -47,11 +54,11 @@ interface Local_Tasks_Interface {
 	public function get_data_from_task_id( $task_id );
 
 	/**
-	 * Get the provider type.
+	 * Get the provider category.
 	 *
 	 * @return string
 	 */
-	public function get_provider_type();
+	public function get_provider_category();
 
 	/**
 	 * Get the provider ID.
