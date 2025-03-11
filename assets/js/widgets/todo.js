@@ -20,7 +20,7 @@ const progressPlannerInjectTodoItem = ( details, addToStart ) => {
 		taskId: details.task_id,
 		taskTitle: details.title,
 		taskDescription: details.description,
-		taskPoints: details.points ?? 1,
+		taskPoints: details.points ?? 0,
 		taskAction: details.action ?? '',
 		taskUrl: details.url ?? '',
 		taskDismissable: details.dismissable ?? false,
@@ -28,6 +28,7 @@ const progressPlannerInjectTodoItem = ( details, addToStart ) => {
 		taskCategory: details.category ?? '',
 		taskSnoozable: details.snoozable ?? true,
 		taskOrder: details.order ?? false,
+		taskDeletable: true,
 	} );
 
 	if ( addToStart ) {

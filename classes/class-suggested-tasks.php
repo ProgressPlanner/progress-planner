@@ -200,6 +200,29 @@ class Suggested_Tasks {
 	}
 
 	/**
+	 * Delete a task.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function delete_task( $task_id ) {
+		$tasks    = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$modified = false;
+		foreach ( $tasks as $key => $task ) {
+			if ( $task['task_id'] === $task_id ) {
+				unset( $tasks[ $key ] );
+				$modified = true;
+				break;
+			}
+		}
+
+		return $modified
+			? \progress_planner()->get_settings()->set( 'local_tasks', $tasks )
+			: false;
+	}
+
+	/**
 	 * Mark a task as completed.
 	 *
 	 * @param string $task_id The task ID.
@@ -514,6 +537,10 @@ class Suggested_Tasks {
 			case 'snooze':
 				$duration = isset( $_POST['duration'] ) ? \sanitize_text_field( \wp_unslash( $_POST['duration'] ) ) : '';
 				$updated  = $this->snooze_task( $task_id, $duration );
+				break;
+
+			case 'delete':
+				$updated = $this->delete_task( $task_id );
 				break;
 
 			default:

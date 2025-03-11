@@ -135,6 +135,7 @@ class Scripts {
 							],
 							'close'          => \esc_html__( 'Close', 'progress-planner' ),
 							'markAsComplete' => \esc_html__( 'Mark as completed', 'progress-planner' ),
+							'delete'         => \esc_html__( 'Delete', 'progress-planner' ),
 						],
 					]
 				);
