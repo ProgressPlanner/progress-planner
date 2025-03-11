@@ -38,7 +38,7 @@ final class ToDo extends Widget {
 		?>
 		<div id="todo-aria-live-region" aria-live="polite" style="position: absolute; left: -9999px;"></div>
 
-		<ul id="todo-list" class="prpl-todo-list"></ul>
+		<ul id="todo-list" class="prpl-todo-list prpl-suggested-tasks-list"></ul>
 
 		<form id="create-todo-item">
 			<input type="text" id="new-todo-content" placeholder="<?php \esc_attr_e( 'Add a new task', 'progress-planner' ); ?>" aria-label="<?php \esc_attr_e( 'Add a new task', 'progress-planner' ); ?>" required />

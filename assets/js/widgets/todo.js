@@ -1,4 +1,4 @@
-/* global progressPlannerTodo, customElements, prplDocumentReady, prplSuggestedTasks */
+/* global progressPlannerTodo, customElements, prplDocumentReady */
 /*
  * Widget: Todo
  *
@@ -12,9 +12,8 @@
  *
  * @param {string}  details    The details of the todo item.
  * @param {boolean} addToStart Whether to add the todo item to the start of the list.
- * @param {boolean} save       Whether to save the todo list to the database.
  */
-const progressPlannerInjectTodoItem = ( details, addToStart, save ) => {
+const progressPlannerInjectTodoItem = ( details, addToStart ) => {
 	// TODO: Inject the todo item into the DOM.
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const todoItemElement = new Item( {
@@ -28,6 +27,7 @@ const progressPlannerInjectTodoItem = ( details, addToStart, save ) => {
 		taskProviderID: details.providerID ?? '',
 		taskCategory: details.category ?? '',
 		taskSnoozable: details.snoozable ?? true,
+		taskOrder: details.order ?? false,
 	} );
 
 	if ( addToStart ) {
@@ -35,10 +35,25 @@ const progressPlannerInjectTodoItem = ( details, addToStart, save ) => {
 	} else {
 		document.getElementById( 'todo-list' ).appendChild( todoItemElement );
 	}
+};
 
-	if ( save ) {
-		// TODO: Save the todo item to the database.
-	}
+/**
+ * Get the highest `order` value from the todo items.
+ *
+ * @return {number} The highest `order` value.
+ */
+const prplGetHighestTodoItemOrder = () => {
+	const todoItems = document.querySelectorAll(
+		'#todo-list .prpl-suggested-task'
+	);
+	let highestOrder = 0;
+	todoItems.forEach( ( todoItem ) => {
+		const order = parseInt( todoItem.getAttribute( 'data-task-order' ) );
+		if ( order > highestOrder ) {
+			highestOrder = order;
+		}
+	} );
+	return highestOrder;
 };
 
 const prplCreateUserSuggestedTask = ( content ) => {
@@ -53,32 +68,32 @@ const prplCreateUserSuggestedTask = ( content ) => {
 		category: 'user',
 		url: '',
 		dismissable: true,
+		snoozable: false,
+		order: prplGetHighestTodoItemOrder() + 1,
 	};
 };
 
 const prplSubmitUserSuggestedTask = ( task ) => {
 	wp.ajax.post( 'progress_planner_save_user_suggested_task', {
 		task,
-		nonce: prplSuggestedTasks.nonce,
+		nonce: progressPlannerTodo.nonce,
 	} );
 };
 
-// When the '#create-suggested-item' form is submitted,
-// add a new todo item to the list
-document
-	.getElementById( 'create-suggested-item' )
-	.addEventListener( 'submit', ( event ) => {
-		event.preventDefault();
-		const userTask = prplCreateUserSuggestedTask(
-			document.getElementById( 'new-suggested-item-content' ).value
-		);
-		prplSubmitUserSuggestedTask( userTask );
-
-		document.getElementById( 'new-suggested-item-content' ).value = '';
-
-		// Focus the new task input element.
-		document.getElementById( 'new-suggested-item-content' ).focus();
+const prplSaveSuggestedUserTasksOrder = () => {
+	const todoItemsIDs = [];
+	// Get all the todo items.
+	const todoItems = document.querySelectorAll(
+		'#todo-list .prpl-suggested-task'
+	);
+	todoItems.forEach( ( todoItem ) => {
+		todoItemsIDs.push( todoItem.getAttribute( 'data-task-id' ) );
 	} );
+	wp.ajax.post( 'progress_planner_save_suggested_user_tasks_order', {
+		tasks: todoItemsIDs.toString(),
+		nonce: progressPlannerTodo.nonce,
+	} );
+};
 
 prplDocumentReady( () => {
 	// Inject the existing todo list items into the DOM

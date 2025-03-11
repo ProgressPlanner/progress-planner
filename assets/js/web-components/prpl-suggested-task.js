@@ -17,6 +17,7 @@ customElements.define(
 			taskProviderID = '',
 			taskCategory = '',
 			taskSnoozable = true,
+			taskOrder = false,
 		} ) {
 			// Get parent class properties
 			super();
@@ -77,7 +78,16 @@ customElements.define(
 			};
 
 			this.innerHTML = `
-			<li class="prpl-suggested-task" data-task-id="${ taskId }" data-task-action="${ taskAction }" data-task-url="${ taskUrl }" data-task-provider-id="${ taskProviderID }" data-task-points="${ taskPoints }" data-task-category="${ taskCategory }">
+			<li
+				class="prpl-suggested-task"
+				data-task-id="${ taskId }"
+				data-task-action="${ taskAction }"
+				data-task-url="${ taskUrl }"
+				data-task-provider-id="${ taskProviderID }"
+				data-task-points="${ taskPoints }"
+				data-task-category="${ taskCategory }"
+				data-task-order="${ taskOrder }"
+			>
 				<h3><span${
 					'user' === taskCategory
 						? ` contenteditable="plaintext-only"`

@@ -9,7 +9,7 @@ namespace Progress_Planner;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
 use Progress_Planner\Suggested_Tasks\Remote_Tasks;
-use Progress_Planner\Activities\Suggested_Task;
+use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
 
 /**
@@ -80,7 +80,7 @@ class Suggested_Tasks {
 	 */
 	public function insert_activity( $task_id ) {
 		// Insert an activity.
-		$activity          = new Suggested_Task();
+		$activity          = new Suggested_Task_Activity();
 		$activity->type    = 'completed';
 		$activity->data_id = (string) $task_id;
 		$activity->date    = new \DateTime();
