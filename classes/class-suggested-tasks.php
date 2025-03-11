@@ -187,7 +187,7 @@ class Suggested_Tasks {
 		$tasks = $this->get_tasks();
 		foreach ( $tasks as $key => $task ) {
 
-			// Note that remote tasks don't have a provider_id, but they already have set details set.
+			// Note that remote tasks don't have a provider_id, but they already have details set.
 			if ( ! isset( $task['provider_id'] ) ) {
 				continue;
 			}
