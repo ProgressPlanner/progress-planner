@@ -12,7 +12,7 @@ use Progress_Planner\Data_Collector\Base_Data_Collector;
 /**
  * Post author data collector class.
  */
-class Create_Post extends Base_Data_Collector {
+class Last_Published_Post extends Base_Data_Collector {
 
 	/**
 	 * The data key.

@@ -8,7 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
-use Progress_Planner\Data_Collector\Create_Post as Create_Post_Data_Collector;
+use Progress_Planner\Data_Collector\Last_Published_Post as Last_Published_Post_Data_Collector;
 
 /**
  * Add tasks for content creation.
@@ -39,7 +39,7 @@ class Create extends Repetitive {
 	/**
 	 * The data collector.
 	 *
-	 * @var \Progress_Planner\Data_Collector\Create_Post
+	 * @var \Progress_Planner\Data_Collector\Last_Published_Post
 	 */
 	protected $data_collector;
 
@@ -47,7 +47,7 @@ class Create extends Repetitive {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->data_collector = new Create_Post_Data_Collector();
+		$this->data_collector = new Last_Published_Post_Data_Collector();
 	}
 
 	/**
