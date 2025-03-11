@@ -8,7 +8,7 @@
 namespace Progress_Planner\Activities;
 
 use Progress_Planner\Activity;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Create;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create;
 
 /**
  * Handler for suggested tasks activities.
@@ -66,15 +66,12 @@ class Suggested_Task extends Activity {
 		}
 
 		// Default points for a suggested task.
-		$points = 1;
+		$points               = 1;
+		$create_post_provider = new Create();
 
 		$data = \progress_planner()->get_suggested_tasks()->get_local()->get_data_from_task_id( $this->data_id );
-		if ( isset( $data['provider_id'] ) &&
-			isset( $data['long'] ) &&
-			true === $data['long'] &&
-			( new Create() )->get_provider_id() === $data['provider_id']
-		) {
-			$points = 2;
+		if ( isset( $data['provider_id'] ) && $create_post_provider->get_provider_id() === $data['provider_id'] ) {
+			$points = $create_post_provider->get_points( $this->data_id );
 		}
 
 		$this->points[ $date_ymd ] = $points;
