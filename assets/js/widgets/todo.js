@@ -40,10 +40,12 @@ const progressPlannerInjectTodoItem = ( details, addToStart ) => {
 /**
  * Get the highest `order` value from the todo items.
  *
- * @returns {number} The highest `order` value.
+ * @return {number} The highest `order` value.
  */
 const prplGetHighestTodoItemOrder = () => {
-	const todoItems = document.querySelectorAll( '#todo-list .prpl-suggested-task' );
+	const todoItems = document.querySelectorAll(
+		'#todo-list .prpl-suggested-task'
+	);
 	let highestOrder = 0;
 	todoItems.forEach( ( todoItem ) => {
 		const order = parseInt( todoItem.getAttribute( 'data-task-order' ) );
@@ -81,7 +83,9 @@ const prplSubmitUserSuggestedTask = ( task ) => {
 const prplSaveSuggestedUserTasksOrder = () => {
 	const todoItemsIDs = [];
 	// Get all the todo items.
-	const todoItems = document.querySelectorAll( '#todo-list .prpl-suggested-task' );
+	const todoItems = document.querySelectorAll(
+		'#todo-list .prpl-suggested-task'
+	);
 	todoItems.forEach( ( todoItem ) => {
 		todoItemsIDs.push( todoItem.getAttribute( 'data-task-id' ) );
 	} );
