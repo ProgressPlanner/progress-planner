@@ -125,7 +125,6 @@ class Review extends Repetitive {
 			}
 
 			if ( ! $last_updated_posts ) {
-				$this->task_post_mappings = [];
 				return false;
 			}
 
