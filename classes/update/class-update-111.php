@@ -269,9 +269,10 @@ class Update_111 {
 
 					$data = $this->get_data_from_task_id( $task['task_id'] );
 
-					// TODO: Check this one, since we dont have the date.
-					$this->local_tasks[ $key ]['task_id'] = $data['provider_id'] . '-' . $data['post_id'] . '-' . \gmdate( 'YW' );
-					$this->local_tasks[ $key ]['date']    = \gmdate( 'YW' );
+					// Get the date from the activity.
+					$date = $this->get_date_from_activity( $task['task_id'] );
+					$this->local_tasks[ $key ]['task_id'] = $data['provider_id'] . '-' . $data['post_id'] . '-' . $date;
+					$this->local_tasks[ $key ]['date']    = $date;
 
 					$this->local_tasks_changed = true;
 				}
@@ -299,8 +300,7 @@ class Update_111 {
 				if ( false !== strpos( $activity->data_id, 'provider_id/review-post' ) ) {
 					$data = $this->get_data_from_task_id( $activity->data_id );
 
-					// TODO: Check this one, since we dont have the date.
-					$new_data_id = $data['provider_id'] . '-' . $data['post_id'] . '-' . \gmdate( 'YW' );
+					$new_data_id = $data['provider_id'] . '-' . $data['post_id'] . '-' . $activity->date->format( 'YW' );
 					if ( $new_data_id !== $activity->data_id ) {
 						$activity->data_id = $new_data_id;
 						$activity->save();
@@ -308,6 +308,29 @@ class Update_111 {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Get the date from an activity.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return string
+	 */
+	private function get_date_from_activity( $task_id ) {
+		$activity = \progress_planner()->get_query()->query_activities(
+			[
+				'data_id' => $task_id,
+				'type'    => 'completed',
+				'category' => 'suggested_task',
+			]
+		);
+
+		if ( ! empty( $activity ) ) {
+			return $activity[0]->date->format( 'YW' );
+		}
+
+		return \gmdate( 'YW' );
 	}
 
 	/**
