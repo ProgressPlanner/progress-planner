@@ -127,7 +127,8 @@ class Local_Task_Factory {
 			if ( 2 !== \count( $part ) ) {
 				continue;
 			}
-			$data[ $part[0] ] = ( \is_numeric( $part[1] ) )
+			// Date should be a string, not a number.
+			$data[ $part[0] ] = ( 'date' !== $part[0] && \is_numeric( $part[1] ) )
 				? (int) $part[1]
 				: $part[1];
 		}
