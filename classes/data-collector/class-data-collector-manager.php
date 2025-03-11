@@ -12,6 +12,7 @@ use Progress_Planner\Data_Collector\Sample_Page;
 use Progress_Planner\Data_Collector\Inactive_Plugins;
 use Progress_Planner\Data_Collector\Uncategorized_Category;
 use Progress_Planner\Data_Collector\Post_Author;
+use Progress_Planner\Data_Collector\Last_Published_Post;
 
 /**
  * Base data collector.
@@ -37,6 +38,7 @@ class Data_Collector_Manager {
 			new Inactive_Plugins(),
 			new Uncategorized_Category(),
 			new Post_Author(),
+			new Last_Published_Post(),
 		];
 
 		// Initialize (add hooks) the data collectors.

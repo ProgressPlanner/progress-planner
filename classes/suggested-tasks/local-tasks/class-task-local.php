@@ -37,6 +37,17 @@ class Task_Local {
 	}
 
 	/**
+	 * Set the task data.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return void
+	 */
+	public function set_data( array $data ) {
+		$this->data = $data;
+	}
+
+	/**
 	 * Get the provider ID.
 	 *
 	 * @return string
