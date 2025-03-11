@@ -270,7 +270,7 @@ class Update_111 {
 					$data = $this->get_data_from_task_id( $task['task_id'] );
 
 					// Get the date from the activity.
-					$date = $this->get_date_from_activity( $task['task_id'] );
+					$date                                 = $this->get_date_from_activity( $task['task_id'] );
 					$this->local_tasks[ $key ]['task_id'] = $data['provider_id'] . '-' . $data['post_id'] . '-' . $date;
 					$this->local_tasks[ $key ]['date']    = $date;
 
@@ -320,8 +320,8 @@ class Update_111 {
 	private function get_date_from_activity( $task_id ) {
 		$activity = \progress_planner()->get_query()->query_activities(
 			[
-				'data_id' => $task_id,
-				'type'    => 'completed',
+				'data_id'  => $task_id,
+				'type'     => 'completed',
 				'category' => 'suggested_task',
 			]
 		);
