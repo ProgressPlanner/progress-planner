@@ -7,8 +7,6 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Activities\Todo as Activities_Todo;
-
 /**
  * Todo class.
  */
@@ -21,6 +19,7 @@ class Todo {
 	 */
 	public function __construct() {
 		\add_action( 'wp_ajax_progress_planner_save_user_suggested_task', [ $this, 'save_user_suggested_task' ] );
+		\add_action( 'wp_ajax_progress_planner_save_suggested_user_tasks_order', [ $this, 'save_suggested_user_tasks_order' ] );
 	}
 
 	/**
@@ -85,6 +84,36 @@ class Todo {
 
 		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Save the order of suggested user tasks.
+	 *
+	 * @return void
+	 */
+	public function save_suggested_user_tasks_order() {
+		// Check the nonce.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
+
+		$tasks = isset( $_POST['tasks'] ) ? \sanitize_text_field( \wp_unslash( $_POST['tasks'] ) ) : '';
+		if ( ! $tasks ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing tasks.', 'progress-planner' ) ] );
+		}
+
+		$tasks = \explode( ',', $tasks );
+
+		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		error_log( print_r( $local_tasks, true ) );
+
+		foreach ( $local_tasks as $key => $task ) {
+			if ( in_array( $task['task_id'], $tasks, true ) ) {
+				$local_tasks[ $key ]['order'] = array_search( $task['task_id'], $tasks, true );
+			}
+		}
+
+		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo
