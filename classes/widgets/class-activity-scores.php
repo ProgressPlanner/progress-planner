@@ -166,6 +166,10 @@ final class Activity_Scores extends Widget {
 	 * @return array
 	 */
 	public function personal_record_callback() {
+		$activation_date = \progress_planner()->get_base()->get_activation_date();
+		$two_years_ago   = new \DateTime( '-2 years' );
+		$start_date      = $activation_date < $two_years_ago ? $two_years_ago : $activation_date;  // If the activation date is more than 2 years ago, set it to 2 years ago.
+
 		$goal = Goal_Recurring::get_instance(
 			'weekly_post_record',
 			[
@@ -190,7 +194,7 @@ final class Activity_Scores extends Widget {
 			],
 			[
 				'frequency'     => 'weekly',
-				'start_date'    => new \DateTime( '-2 years' ),
+				'start_date'    => $start_date,
 				'end_date'      => new \DateTime(), // Today.
 				'allowed_break' => 0, // Do not allow breaks in the streak.
 			]
