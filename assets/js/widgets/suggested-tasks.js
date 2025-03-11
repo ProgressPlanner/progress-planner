@@ -583,46 +583,6 @@ const prplUpdateRaviGauge = ( pointsDiff = 0 ) => {
 	}
 };
 
-const prplCreateUserSuggestedTask = ( content ) => {
-	return {
-		description: '',
-		parent: 0,
-		points: 0,
-		priority: 'medium',
-		task_id: 'user-task-' + crypto.randomUUID(),
-		title: content,
-		provider_id: 'user',
-		category: 'user',
-		url: '',
-		dismissable: true,
-	};
-};
-
-const prplSubmitUserSuggestedTask = ( task ) => {
-	wp.ajax.post( 'progress_planner_save_user_suggested_task', {
-		task,
-		nonce: prplSuggestedTasks.nonce,
-	} );
-};
-
-// When the '#create-suggested-item' form is submitted,
-// add a new todo item to the list
-document
-	.getElementById( 'create-suggested-item' )
-	.addEventListener( 'submit', ( event ) => {
-		event.preventDefault();
-		const userTask = prplCreateUserSuggestedTask(
-			document.getElementById( 'new-suggested-item-content' ).value
-		);
-		prplSuggestedTasksInjectItem( userTask );
-		prplSubmitUserSuggestedTask( userTask );
-
-		document.getElementById( 'new-suggested-item-content' ).value = '';
-
-		// Focus the new task input element.
-		document.getElementById( 'new-suggested-item-content' ).focus();
-	} );
-
 // Listen for the event.
 document.addEventListener(
 	'prplUpdateRaviGaugeEvent',

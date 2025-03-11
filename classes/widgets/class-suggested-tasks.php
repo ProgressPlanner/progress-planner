@@ -84,7 +84,7 @@ final class Suggested_Tasks extends Widget {
 
 		// If we're not delaying the celebration, we need to get the pending_celebration tasks.
 		if ( ! $delay_celebration ) {
-			$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending_celebration' );
+			$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' );
 
 			foreach ( $pending_celebration_tasks as $key => $task ) {
 				$task_id = $task['task_id'];
@@ -145,9 +145,9 @@ final class Suggested_Tasks extends Widget {
 			$max_items_per_category[ $task['category'] ] = $task['category'] === ( new Review() )->get_provider_category() ? 2 : 1;
 		}
 
-		// We want all `user` tasks to be shown.
+		// We want to hide user tasks.
 		if ( isset( $max_items_per_category['user'] ) ) {
-			$max_items_per_category['user'] = 99;
+			$max_items_per_category['user'] = 0;
 		}
 
 		// Check if current date is between Feb 12-16 to use hearts confetti.
