@@ -11,7 +11,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 // Repetitive tasks.
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
 // Content tasks.
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Create as Content_Create;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create as Content_Create;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Review as Content_Review;
 // One-time tasks.
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Blog_Description;
@@ -219,7 +219,7 @@ class Local_Tasks_Manager {
 
 			$task_result = $this->evaluate_task( $task_id );
 			if ( false !== $task_result ) {
-				$completed_tasks[] = $task_id;
+				$completed_tasks[] = $task_result;
 			}
 		}
 

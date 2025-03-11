@@ -10,6 +10,7 @@ namespace Progress_Planner\Widgets;
 use Progress_Planner\Badges\Monthly;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Review;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create;
 
 /**
  * Suggested_Tasks class.
@@ -100,6 +101,11 @@ final class Suggested_Tasks extends Widget {
 						$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
 						$task_details['action']   = 'celebrate';
 						$task_details['status']   = 'pending_celebration';
+
+						// Award 2 points if last created post was long.
+						if ( ( new Create() )->get_provider_id() === $task_provider->get_provider_id() ) {
+							$task_details['points'] = $task_provider->get_points( $task_id );
+						}
 
 						$tasks[] = $task_details;
 					}

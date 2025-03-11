@@ -9,6 +9,7 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local;
 /**
  * Add tasks for content updates.
  */
@@ -28,7 +29,7 @@ abstract class Repetitive extends Local_Tasks {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return bool|string
+	 * @return bool|Task_Local The task data or false if the task is not completed.
 	 */
 	public function evaluate_task( $task_id ) {
 
@@ -41,7 +42,11 @@ abstract class Repetitive extends Local_Tasks {
 		$task_data   = $task_object->get_data();
 
 		if ( $task_data['provider_id'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['date'] && $this->is_task_completed() ) {
-			return $task_id;
+			// Allow adding more data, for example in case of 'create-post' or 'review-content' tasks we are adding the post_id.
+			$task_data = $this->modify_task_data( $task_data );
+			$task_object->set_data( $task_data );
+
+			return $task_object;
 		}
 
 		return false;
@@ -71,6 +76,18 @@ abstract class Repetitive extends Local_Tasks {
 	 */
 	protected function check_task_condition() {
 		return ! $this->should_add_task();
+	}
+
+	/**
+	 * Modify task data before setting it.
+	 * Child classes can override this method to add extra data.
+	 *
+	 * @param array $task_data The task data.
+	 *
+	 * @return array
+	 */
+	protected function modify_task_data( $task_data ) {
+		return $task_data;
 	}
 
 	/**
