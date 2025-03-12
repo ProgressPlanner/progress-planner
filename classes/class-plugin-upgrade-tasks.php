@@ -17,8 +17,6 @@ class Plugin_Upgrade_Tasks {
 	 */
 	public function __construct() {
 
-		\delete_option( 'progress_planner_previous_version_task_providers' );
-
 		// Plugin activated.
 		\add_action( 'activated_plugin', [ $this, 'plugin_activated' ], 10 );
 
