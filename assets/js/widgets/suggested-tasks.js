@@ -286,15 +286,14 @@ const prplStrikeCompletedTasks = () => {
 				}
 
 				// Refresh the list.
-				document.dispatchEvent( new CustomEvent(
-					'prplMaybeInjectSuggestedTaskEvent',
-					{
+				document.dispatchEvent(
+					new CustomEvent( 'prplMaybeInjectSuggestedTaskEvent', {
 						detail: {
 							taskId,
 							providerID,
 						},
-					}
-				) );
+					} )
+				);
 			} );
 	}, 2000 );
 };

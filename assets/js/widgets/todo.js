@@ -8,6 +8,24 @@
  */
 
 /**
+ * Get a random UUID.
+ *
+ * @return {string} The random UUID.
+ */
+const prplGetRandomUUID = () => {
+	if (
+		typeof crypto !== 'undefined' &&
+		typeof crypto.randomUUID === 'function'
+	) {
+		return crypto.randomUUID();
+	}
+	return (
+		Math.random().toString( 36 ).substring( 2, 15 ) +
+		Math.random().toString( 36 ).substring( 2, 15 )
+	);
+};
+
+/**
  * Inject a todo item into the DOM.
  *
  * @param {string}  details    The details of the todo item.
@@ -63,7 +81,7 @@ const prplCreateUserSuggestedTask = ( content ) => {
 		parent: 0,
 		points: 0,
 		priority: 'medium',
-		task_id: 'user-task-' + crypto.randomUUID(),
+		task_id: 'user-task-' + prplGetRandomUUID(),
 		title: content,
 		provider_id: 'user',
 		category: 'user',
@@ -103,7 +121,9 @@ prplDocumentReady( () => {
 
 		// If this is the last item in the array, resize the grid items.
 		if ( index === array.length - 1 ) {
-			document.dispatchEvent( new Event( 'prplResizeAllGridItemsEvent' ) );
+			document.dispatchEvent(
+				new Event( 'prplResizeAllGridItemsEvent' )
+			);
 		}
 	} );
 
@@ -119,9 +139,9 @@ prplDocumentReady( () => {
 			progressPlannerInjectTodoItem( newTask );
 			prplSubmitUserSuggestedTask( newTask );
 
-			document.dispatchEvent( new Event(
-				'prplResizeAllGridItemsEvent'
-			) );
+			document.dispatchEvent(
+				new Event( 'prplResizeAllGridItemsEvent' )
+			);
 
 			document.getElementById( 'new-todo-content' ).value = '';
 
