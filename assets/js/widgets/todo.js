@@ -164,20 +164,22 @@ document.addEventListener( 'prplMoveSuggestedTaskEvent', () => {
 } );
 
 document.addEventListener( 'prplMaybeInjectSuggestedTaskEvent', ( event ) => {
-	// Get the todo item.
-	progressPlannerTodo.listItems.forEach( ( todoItem, index ) => {
-		if (
-			todoItem.task_id === event.detail.taskId &&
-			'complete' === event.detail.actionType
-		) {
-			progressPlannerTodo.listItems[ index ].status = 'completed';
-			progressPlannerInjectTodoItem(
-				todoItem,
-				false,
-				'todo-list-completed'
-			);
-		}
-	} );
+	setTimeout( () => {
+		// Get the todo item.
+		progressPlannerTodo.listItems.forEach( ( todoItem, index ) => {
+			if (
+				todoItem.task_id === event.detail.taskId &&
+				'complete' === event.detail.actionType
+			) {
+				progressPlannerTodo.listItems[ index ].status = 'completed';
+				progressPlannerInjectTodoItem(
+					todoItem,
+					false,
+					'todo-list-completed'
+				);
+			}
+		} );
+	}, 1500 );
 } );
 
 document
