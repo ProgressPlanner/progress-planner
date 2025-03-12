@@ -159,7 +159,12 @@ const prplSuggestedTasksInjectItem = ( details ) => {
 		.insertAdjacentElement( 'beforeend', item );
 };
 
-const prplTriggerConfetti = () => {
+/**
+ * Trigger confetti.
+ *
+ * @param {Element} containerElement The container element.
+ */
+const prplTriggerConfetti = ( containerElement ) => {
 	const prplConfettiDefaults = {
 		spread: 360,
 		ticks: 50,
@@ -172,17 +177,14 @@ const prplTriggerConfetti = () => {
 
 	const prplRenderAttemptshoot = () => {
 		// Get the tasks list position
-		const tasksList = document.querySelector(
-			'.prpl-suggested-tasks-list'
-		);
-		const origin = tasksList
+		const origin = containerElement
 			? {
 					x:
-						( tasksList.getBoundingClientRect().left +
-							tasksList.offsetWidth / 2 ) /
+						( containerElement.getBoundingClientRect().left +
+							containerElement.offsetWidth / 2 ) /
 						window.innerWidth,
 					y:
-						( tasksList.getBoundingClientRect().top + 50 ) /
+						( containerElement.getBoundingClientRect().top + 50 ) /
 						window.innerHeight,
 			  }
 			: { x: 0.5, y: 0.3 }; // fallback if list not found
@@ -194,24 +196,12 @@ const prplTriggerConfetti = () => {
 				shapes: [ 'image' ],
 				shapeOptions: {
 					image: [
-						{
-							src: prplSuggestedTasks.raviIconUrl,
-						},
-						{
-							src: prplSuggestedTasks.raviIconUrl,
-						},
-						{
-							src: prplSuggestedTasks.raviIconUrl,
-						},
-						{
-							src: prplSuggestedTasks.monthIconUrl,
-						},
-						{
-							src: prplSuggestedTasks.contentIconUrl,
-						},
-						{
-							src: prplSuggestedTasks.maintenanceIconUrl,
-						},
+						{ src: prplSuggestedTasks.raviIconUrl },
+						{ src: prplSuggestedTasks.raviIconUrl },
+						{ src: prplSuggestedTasks.raviIconUrl },
+						{ src: prplSuggestedTasks.monthIconUrl },
+						{ src: prplSuggestedTasks.contentIconUrl },
+						{ src: prplSuggestedTasks.maintenanceIconUrl },
 					],
 				},
 			},
@@ -309,8 +299,10 @@ if (
 }
 
 // Create a new custom event to trigger the celebration.
-document.addEventListener( 'prplCelebrateTasks', () => {
-	prplTriggerConfetti();
+document.addEventListener( 'prplCelebrateTasks', ( event ) => {
+	prplTriggerConfetti(
+		event.detail.element.closest( '.prpl-suggested-tasks-list' )
+	);
 	prplStrikeCompletedTasks();
 } );
 

@@ -463,7 +463,11 @@ customElements.define(
 
 						// Trigger the celebration event.
 						document.dispatchEvent(
-							new CustomEvent( 'prplCelebrateTasks' )
+							new CustomEvent( 'prplCelebrateTasks', {
+								detail: {
+									element: el,
+								},
+							} )
 						);
 
 						break;
