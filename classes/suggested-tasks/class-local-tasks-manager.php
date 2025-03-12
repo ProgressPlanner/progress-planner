@@ -231,7 +231,7 @@ class Local_Tasks_Manager {
 	 * @return bool|\Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local
 	 */
 	public function evaluate_task( $task_id ) {
-		$task_object   = ( new Local_Task_Factory( $task_id ) )->get_task();
+		$task_object   = Local_Task_Factory::create_task_from( 'id', $task_id );
 		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
 
 		if ( ! $task_provider ) {
@@ -249,7 +249,7 @@ class Local_Tasks_Manager {
 	 * @return array|false
 	 */
 	public function get_task_details( $task_id ) {
-		$task_object   = ( new Local_Task_Factory( $task_id ) )->get_task();
+		$task_object   = Local_Task_Factory::create_task_from( 'id', $task_id );
 		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
 
 		if ( ! $task_provider ) {
@@ -267,7 +267,7 @@ class Local_Tasks_Manager {
 	 * @return array
 	 */
 	public function get_data_from_task_id( $task_id ) {
-		$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
+		$task_object = Local_Task_Factory::create_task_from( 'id', $task_id );
 
 		return $task_object->get_data();
 	}

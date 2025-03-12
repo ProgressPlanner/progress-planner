@@ -315,7 +315,7 @@ class Review extends Repetitive {
 	 */
 	protected function is_specific_task_completed( $task_id ) {
 
-		$task = ( new Local_Task_Factory( $task_id ) )->get_task();
+		$task = Local_Task_Factory::create_task_from( 'id', $task_id );
 		$data = $task->get_data();
 
 		if ( isset( $data['post_id'] ) && (int) \get_post_modified_time( 'U', false, (int) $data['post_id'] ) > strtotime( '-6 months' ) ) {
