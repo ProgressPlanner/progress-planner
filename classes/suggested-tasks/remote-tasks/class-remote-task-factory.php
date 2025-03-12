@@ -15,34 +15,26 @@ use Progress_Planner\Suggested_Tasks\Remote_Tasks\Remote_Task;
 class Remote_Task_Factory {
 
 	/**
-	 * The task ID or task data.
+	 * Create a task from a parameter and value.
 	 *
-	 * @var mixed
-	 */
-	private $task;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param mixed $task The task data.
-	 */
-	public function __construct( $task ) {
-		$this->task = $task;
-	}
-
-	/**
-	 * Get a remote task.
+	 * @param string $param The parameter, 'id' or 'data'.
+	 * @param mixed  $value The task ID or task data.
 	 *
 	 * @return Remote_Task
 	 */
-	public function get_task() {
-
+	public static function create_task_from( $param, $value = null ): Remote_Task {
 		// If we have task data, return it.
-		if ( is_array( $this->task ) ) {
-			return new Remote_Task( $this->task );
+		if ( 'data' === $param && is_array( $value ) ) {
+			return new Remote_Task( $value );
 		}
 
-		$task_data = \progress_planner()->get_suggested_tasks()->get_remote_task_by_task_id( $this->task );
-		return new Remote_Task( $task_data );
+		if ( 'id' === $param && is_string( $value ) ) {
+			$task_data = \progress_planner()->get_suggested_tasks()->get_remote_task_by_task_id( $value );
+			if ( $task_data ) {
+				return new Remote_Task( $task_data );
+			}
+		}
+
+		return new Remote_Task( [] );
 	}
 }

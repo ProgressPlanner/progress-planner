@@ -93,11 +93,10 @@ class Remote_Tasks {
 					$valid_tasks = [];
 					foreach ( $tasks as $task ) {
 						if ( isset( $task['task_id'] ) ) {
-
-							// We prefix all remote tasks with "remote-task-".
-							if ( false === str_starts_with( $task['task_id'], 'remote-task-' ) ) {
-								$task['task_id'] = "remote-task-{$task['task_id']}";
-							}
+							// Ensure remote task ID has proper prefix.
+							$task['task_id'] = str_starts_with( $task['task_id'], 'remote-task-' )
+								? $task['task_id']
+								: "remote-task-{$task['task_id']}";
 
 							$valid_tasks[] = $task;
 						}
