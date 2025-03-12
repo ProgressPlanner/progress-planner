@@ -126,7 +126,6 @@ class Todo {
 		$tasks = \explode( ',', $tasks );
 
 		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		error_log( print_r( $local_tasks, true ) );
 
 		foreach ( $local_tasks as $key => $task ) {
 			if ( in_array( $task['task_id'], $tasks, true ) ) {
