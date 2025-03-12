@@ -214,7 +214,7 @@ final class Activity_Scores extends Widget {
 			],
 			[
 				'frequency'     => 'weekly',
-				'start_date'    => \progress_planner()->get_base()->get_activation_date(),
+				'start_date'    => \progress_planner()->get_activation_date(),
 				'end_date'      => new \DateTime(), // Today.
 				'allowed_break' => 0, // Do not allow breaks in the streak.
 			]
