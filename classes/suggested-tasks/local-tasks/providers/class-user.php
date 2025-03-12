@@ -13,6 +13,13 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 class User extends One_Time {
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected const IS_ONBOARDING_TASK = false;
+
+	/**
 	 * The provider category.
 	 *
 	 * @var string
