@@ -1,4 +1,4 @@
-/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerTriggerScan, prplOnboardRedirect, prplOnboardTasks */
+/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerTriggerScan, prplOnboardTasks */
 /*
  * Onboard
  *
@@ -58,8 +58,10 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 
 			// Wait for all promises to resolve.
 			Promise.all( [ scanPromise, tasksPromise ] ).then( () => {
-				// All promises resolved, redirect to the next step.
-				prplOnboardRedirect();
+				// All promises resolved, enable the continue button.
+				document
+					.getElementById( 'prpl-onboarding-continue-button' )
+					.classList.remove( 'prpl-disabled' );
 			} );
 		} )
 		.catch( ( error ) => {
