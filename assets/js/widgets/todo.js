@@ -117,7 +117,9 @@ const prplSaveSuggestedUserTasksOrder = () => {
 prplDocumentReady( () => {
 	// Inject the existing todo list items into the DOM
 	progressPlannerTodo.listItems.forEach( ( todoItem, index, array ) => {
-		progressPlannerInjectTodoItem( todoItem );
+		if ( todoItem.status !== 'completed' ) {
+			progressPlannerInjectTodoItem( todoItem );
+		}
 
 		// If this is the last item in the array, resize the grid items.
 		if ( index === array.length - 1 ) {
