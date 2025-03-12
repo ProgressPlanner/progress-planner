@@ -304,7 +304,7 @@ if (
 ) {
 	setTimeout( () => {
 		// Trigger the celebration event.
-		document.dispatchEvent( new Event( 'prplCelebrateTasks' ) );
+		document.dispatchEvent( new CustomEvent( 'prplCelebrateTasks' ) );
 	}, 3000 );
 }
 
@@ -593,6 +593,7 @@ document.addEventListener(
 document.addEventListener(
 	'prplMaybeInjectSuggestedTaskEvent',
 	( e ) => {
+		// TODO: Something seems off here, take a look at this.
 		const category = e.detail.category;
 
 		while (
@@ -605,7 +606,9 @@ document.addEventListener(
 			prplSuggestedTasksInjectNextItem( category );
 		}
 
-		document.dispatchEvent( new Event( 'prplResizeAllGridItemsEvent' ) );
+		document.dispatchEvent(
+			new CustomEvent( 'prplResizeAllGridItemsEvent' )
+		);
 	},
 	false
 );

@@ -46,6 +46,10 @@ final class ToDo extends Widget {
 				<span class="dashicons dashicons-plus-alt2"></span>
 			</button>
 		</form>
+		<details id="todo-list-completed-details">
+			<summary><?php \esc_html_e( 'Completed tasks', 'progress-planner' ); ?></summary>
+			<ul id="todo-list-completed" class="prpl-todo-list prpl-suggested-tasks-list"></ul>
+		</details>
 		<?php
 	}
 

@@ -30,8 +30,9 @@ const prplGetRandomUUID = () => {
  *
  * @param {string}  details    The details of the todo item.
  * @param {boolean} addToStart Whether to add the todo item to the start of the list.
+ * @param {string}  listId     The ID of the list to inject the todo item into.
  */
-const progressPlannerInjectTodoItem = ( details, addToStart ) => {
+const progressPlannerInjectTodoItem = ( details, addToStart, listId ) => {
 	// TODO: Inject the todo item into the DOM.
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const todoItemElement = new Item( {
@@ -50,9 +51,9 @@ const progressPlannerInjectTodoItem = ( details, addToStart ) => {
 	} );
 
 	if ( addToStart ) {
-		document.getElementById( 'todo-list' ).prepend( todoItemElement );
+		document.getElementById( listId ).prepend( todoItemElement );
 	} else {
-		document.getElementById( 'todo-list' ).appendChild( todoItemElement );
+		document.getElementById( listId ).appendChild( todoItemElement );
 	}
 };
 
@@ -117,14 +118,18 @@ const prplSaveSuggestedUserTasksOrder = () => {
 prplDocumentReady( () => {
 	// Inject the existing todo list items into the DOM
 	progressPlannerTodo.listItems.forEach( ( todoItem, index, array ) => {
-		if ( todoItem.status !== 'completed' ) {
-			progressPlannerInjectTodoItem( todoItem );
-		}
+		progressPlannerInjectTodoItem(
+			todoItem,
+			false,
+			todoItem.status === 'completed'
+				? 'todo-list-completed'
+				: 'todo-list'
+		);
 
 		// If this is the last item in the array, resize the grid items.
 		if ( index === array.length - 1 ) {
 			document.dispatchEvent(
-				new Event( 'prplResizeAllGridItemsEvent' )
+				new CustomEvent( 'prplResizeAllGridItemsEvent' )
 			);
 		}
 	} );
@@ -138,11 +143,11 @@ prplDocumentReady( () => {
 			const newTask = prplCreateUserSuggestedTask(
 				document.getElementById( 'new-todo-content' ).value
 			);
-			progressPlannerInjectTodoItem( newTask );
+			progressPlannerInjectTodoItem( newTask, false, 'todo-list' );
 			prplSubmitUserSuggestedTask( newTask );
 
 			document.dispatchEvent(
-				new Event( 'prplResizeAllGridItemsEvent' )
+				new CustomEvent( 'prplResizeAllGridItemsEvent' )
 			);
 
 			document.getElementById( 'new-todo-content' ).value = '';
@@ -157,3 +162,30 @@ prplDocumentReady( () => {
 document.addEventListener( 'prplMoveSuggestedTaskEvent', () => {
 	prplSaveSuggestedUserTasksOrder();
 } );
+
+document.addEventListener( 'prplMaybeInjectSuggestedTaskEvent', ( event ) => {
+	setTimeout( () => {
+		// Get the todo item.
+		progressPlannerTodo.listItems.forEach( ( todoItem, index ) => {
+			if (
+				todoItem.task_id === event.detail.taskId &&
+				'complete' === event.detail.actionType
+			) {
+				progressPlannerTodo.listItems[ index ].status = 'completed';
+				progressPlannerInjectTodoItem(
+					todoItem,
+					false,
+					'todo-list-completed'
+				);
+			}
+		} );
+	}, 1500 );
+} );
+
+document
+	.getElementById( 'todo-list-completed-details' )
+	.addEventListener( 'toggle', () => {
+		document.dispatchEvent(
+			new CustomEvent( 'prplResizeAllGridItemsEvent' )
+		);
+	} );

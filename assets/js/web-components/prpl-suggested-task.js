@@ -463,7 +463,7 @@ customElements.define(
 
 						// Trigger the celebration event.
 						document.dispatchEvent(
-							new Event( 'prplCelebrateTasks' )
+							new CustomEvent( 'prplCelebrateTasks' )
 						);
 
 						break;
@@ -471,7 +471,7 @@ customElements.define(
 					case 'delete':
 						el.remove();
 						document.dispatchEvent(
-							new Event( 'prplResizeAllGridItemsEvent' )
+							new CustomEvent( 'prplResizeAllGridItemsEvent' )
 						);
 						break;
 				}
@@ -481,6 +481,7 @@ customElements.define(
 						detail: {
 							taskId,
 							providerID,
+							actionType,
 						},
 					} )
 				);

@@ -52,7 +52,8 @@
 	min-width: 0;
 }
 
-#todo-list {
+#todo-list,
+#todo-list-completed {
 	list-style: none;
 	padding: 0;
 
@@ -73,7 +74,8 @@
 \*------------------------------------*/
 #progress_planner_dashboard_widget_todo {
 
-	#todo-list {
+	#todo-list,
+	#todo-list-completed {
 		margin-left: -5px;
 	}
 
@@ -242,5 +244,31 @@
 				margin-top: 0;
 			}
 		}
+	}
+}
+
+#todo-list-completed {
+
+	.prpl-suggested-task {
+
+		h3 {
+			text-decoration: line-through;
+		}
+
+		.prpl-move-buttons,
+		button[data-action="complete"] {
+			display: none;
+		}
+	}
+}
+
+#todo-list-completed-details {
+	margin-top: 1rem;
+	border: 1px solid var(--prpl-color-gray-3);
+	border-radius: 0.5rem;
+
+	summary {
+		padding: 0.5rem;
+		font-weight: 500;
 	}
 }
