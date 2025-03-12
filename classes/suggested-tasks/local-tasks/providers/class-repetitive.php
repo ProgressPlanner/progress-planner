@@ -48,7 +48,7 @@ abstract class Repetitive extends Local_Tasks {
 			return false;
 		}
 
-		$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
+		$task_object = Local_Task_Factory::create_task_from( 'id', $task_id );
 		$task_data   = $task_object->get_data();
 
 		if ( $task_data['provider_id'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['date'] && $this->is_task_completed( $task_id ) ) {

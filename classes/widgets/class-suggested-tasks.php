@@ -92,7 +92,7 @@ final class Suggested_Tasks extends Widget {
 				$task_id = $task['task_id'];
 
 				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
-					( new Local_Task_Factory( $task_id ) )->get_task()->get_provider_id()
+					Local_Task_Factory::create_task_from( 'id', $task_id )->get_provider_id()
 				);
 
 				if ( $task_provider && $task_provider->capability_required() ) {

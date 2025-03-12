@@ -13,57 +13,48 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks;
 class Local_Task_Factory {
 
 	/**
-	 * The task ID or task data.
-	 *
-	 * @var mixed
-	 */
-	private $task;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param mixed $task The task ID or task data.
-	 */
-	public function __construct( $task ) {
-		$this->task = $task;
-	}
-
-	/**
 	 * Get the task.
+	 *
+	 * @param string $param The parameter, 'id' or 'data'.
+	 * @param mixed  $value The task ID or task data.
 	 *
 	 * @return \Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local
 	 */
-	public function get_task(): Task_Local {
+	public static function create_task_from( $param, $value = null ): Task_Local {
 
 		// If we have task data, return it.
-		if ( is_array( $this->task ) ) {
-			return new Task_Local( $this->task );
+		if ( 'data' === $param && is_array( $value ) ) {
+			return new Task_Local( $value );
 		}
 
-		// We should have all the data saved in the database.
-		$data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $this->task );
+		if ( 'id' === $param && is_string( $value ) ) {
+			// We should have all the data saved in the database.
+			$data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $value );
 
-		// If we have the task data, return it.
-		if ( $data ) {
-			return new Task_Local( $data );
+			// If we have the task data, return it.
+			if ( $data ) {
+				return new Task_Local( $data );
+			}
+
+			/*
+			We're here in following cases:
+			 * - Legacy tasks, happens during v1.1.1 update, where we parsed task data from the task_id.
+			 * - Remote tasks, we passed only the task_id.
+			*/
+			return self::parse_task_data_from_task_id( $value );
 		}
 
-		/*
-		We're here in following cases:
-		 * - Legacy tasks, happens during v1.1.1 update, where we parsed task data from the task_id.
-		 * - Remote tasks, we passed only the task_id.
-		*/
-		return $this->parse_task_data_from_task_id( $this->task );
+		return new Task_Local( [] );
 	}
 
 	/**
-	 * Parse task data from task ID.
+	 * Legacy function for parsing task data from task ID.
 	 *
 	 * @param string $task_id The task ID.
 	 *
 	 * @return \Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local
 	 */
-	private function parse_task_data_from_task_id( $task_id ) {
+	public static function parse_task_data_from_task_id( $task_id ) {
 		$data = [];
 
 		// Parse simple format, e.g. 'update-core-202449' or "hello-world".
