@@ -23,6 +23,13 @@ final class Activity_Scores extends Widget {
 	protected $id = 'activity-scores';
 
 	/**
+	 * The cache key.
+	 *
+	 * @var string
+	 */
+	protected $cache_key = 'activities_weekly_post_record';
+
+	/**
 	 * The color callback.
 	 *
 	 * @param int       $number The number to calculate the color for.
@@ -166,10 +173,6 @@ final class Activity_Scores extends Widget {
 	 * @return array
 	 */
 	public function personal_record_callback() {
-		$activation_date = \progress_planner()->get_base()->get_activation_date();
-		$two_years_ago   = new \DateTime( '-2 years' );
-		$start_date      = $activation_date < $two_years_ago ? $two_years_ago : $activation_date;  // If the activation date is more than 2 years ago, set it to 2 years ago.
-
 		$goal = Goal_Recurring::get_instance(
 			'weekly_post_record',
 			[
@@ -180,26 +183,52 @@ final class Activity_Scores extends Widget {
 				'status'      => 'active',
 				'priority'    => 'low',
 				'evaluate'    => function ( $goal_object ) {
-					return (bool) count(
-						\progress_planner()->get_query()->query_activities(
-							[
-								'category'   => 'content',
-								'type'       => 'publish',
-								'start_date' => $goal_object->get_details()['start_date'],
-								'end_date'   => $goal_object->get_details()['end_date'],
-							]
-						)
+					// Get the cached activities.
+					$cached_activities = \progress_planner()->get_settings()->get( $this->cache_key, [] );
+
+					// Get the weekly cache key.
+					$weekly_cache_key  = $goal_object->get_details()['start_date']->format( 'Y-m-d' ) . '_' . $goal_object->get_details()['end_date']->format( 'Y-m-d' );
+
+					// If the cache is set, return the cached value.
+					if ( isset( $cached_activities[ $weekly_cache_key ] ) ) {
+						return (bool) $cached_activities[ $weekly_cache_key ];
+					}
+
+					// Get the activities.
+					$activities = \progress_planner()->get_query()->query_activities(
+						[
+							'category'   => 'content',
+							'type'       => 'publish',
+							'start_date' => $goal_object->get_details()['start_date'],
+							'end_date'   => $goal_object->get_details()['end_date'],
+						]
 					);
+
+					// Cache the activities.
+					$cached_activities[ $weekly_cache_key ] = (bool) count( $activities );
+					\progress_planner()->get_settings()->set( $this->cache_key, $cached_activities );
+
+					// Return the cached value.
+					return $cached_activities[ $weekly_cache_key ];
 				},
 			],
 			[
 				'frequency'     => 'weekly',
-				'start_date'    => $start_date,
+				'start_date'    => \progress_planner()->get_base()->get_activation_date(),
 				'end_date'      => new \DateTime(), // Today.
 				'allowed_break' => 0, // Do not allow breaks in the streak.
 			]
 		);
 
 		return $goal->get_streak();
+	}
+
+	/**
+	 * Get the cache key.
+	 *
+	 * @return string The cache key.
+	 */
+	public function get_cache_key() {
+		return $this->cache_key;
 	}
 }
