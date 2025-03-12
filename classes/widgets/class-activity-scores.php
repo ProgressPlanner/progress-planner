@@ -187,7 +187,7 @@ final class Activity_Scores extends Widget {
 					$cached_activities = \progress_planner()->get_settings()->get( $this->cache_key, [] );
 
 					// Get the weekly cache key.
-					$weekly_cache_key  = $goal_object->get_details()['start_date']->format( 'Y-m-d' ) . '_' . $goal_object->get_details()['end_date']->format( 'Y-m-d' );
+					$weekly_cache_key = $goal_object->get_details()['start_date']->format( 'Y-m-d' ) . '_' . $goal_object->get_details()['end_date']->format( 'Y-m-d' );
 
 					// If the cache is set, return the cached value.
 					if ( isset( $cached_activities[ $weekly_cache_key ] ) ) {
