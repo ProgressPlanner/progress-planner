@@ -286,7 +286,7 @@ const prplStrikeCompletedTasks = () => {
 				}
 
 				// Refresh the list.
-				const event = new CustomEvent(
+				document.dispatchEvent( new CustomEvent(
 					'prplMaybeInjectSuggestedTaskEvent',
 					{
 						detail: {
@@ -294,8 +294,7 @@ const prplStrikeCompletedTasks = () => {
 							providerID,
 						},
 					}
-				);
-				document.dispatchEvent( event );
+				) );
 			} );
 	}, 2000 );
 };
@@ -344,8 +343,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		}
 	);
 
-	const event = new CustomEvent( 'prplResizeAllGridItemsEvent' );
-	document.dispatchEvent( event );
+	document.dispatchEvent( new CustomEvent( 'prplResizeAllGridItemsEvent' ) );
 } );
 
 // Handle the monthly badges scrolling.
@@ -608,8 +606,7 @@ document.addEventListener(
 			prplSuggestedTasksInjectNextItem( category );
 		}
 
-		const event = new Event( 'prplResizeAllGridItemsEvent' );
-		document.dispatchEvent( event );
+		document.dispatchEvent( new Event( 'prplResizeAllGridItemsEvent' ) );
 	},
 	false
 );

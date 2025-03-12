@@ -327,13 +327,14 @@ customElements.define(
 									);
 								}
 								// Trigger a custom event.
-								const event = new CustomEvent(
-									'prplMoveSuggestedTaskEvent',
-									{
-										detail: { node: thisObj },
-									}
+								document.dispatchEvent(
+									new CustomEvent(
+										'prplMoveSuggestedTaskEvent',
+										{
+											detail: { node: thisObj },
+										}
+									)
 								);
-								document.dispatchEvent( event );
 								break;
 
 							default:
@@ -448,9 +449,8 @@ customElements.define(
 						// Set the task action to celebrate.
 						el.setAttribute( 'data-task-action', 'celebrate' );
 
-						const event = new CustomEvent(
-							'prplUpdateRaviGaugeEvent',
-							{
+						document.dispatchEvent(
+							new CustomEvent( 'prplUpdateRaviGaugeEvent', {
 								detail: {
 									pointsDiff: parseInt(
 										this.querySelector( 'li' ).getAttribute(
@@ -458,9 +458,8 @@ customElements.define(
 										)
 									),
 								},
-							}
+							} )
 						);
-						document.dispatchEvent( event );
 
 						// Trigger the celebration event.
 						document.dispatchEvent(
@@ -471,23 +470,20 @@ customElements.define(
 
 					case 'delete':
 						el.remove();
-						const resizeGridEvent = new Event(
-							'prplResizeAllGridItemsEvent'
+						document.dispatchEvent(
+							new Event( 'prplResizeAllGridItemsEvent' )
 						);
-						document.dispatchEvent( resizeGridEvent );
 						break;
 				}
 
-				const event = new CustomEvent(
-					'prplMaybeInjectSuggestedTaskEvent',
-					{
+				document.dispatchEvent(
+					new CustomEvent( 'prplMaybeInjectSuggestedTaskEvent', {
 						detail: {
 							taskId,
 							providerID,
 						},
-					}
+					} )
 				);
-				document.dispatchEvent( event );
 			} );
 		};
 	}

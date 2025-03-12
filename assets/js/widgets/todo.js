@@ -103,8 +103,7 @@ prplDocumentReady( () => {
 
 		// If this is the last item in the array, resize the grid items.
 		if ( index === array.length - 1 ) {
-			const event = new Event( 'prplResizeAllGridItemsEvent' );
-			document.dispatchEvent( event );
+			document.dispatchEvent( new Event( 'prplResizeAllGridItemsEvent' ) );
 		}
 	} );
 
@@ -120,10 +119,9 @@ prplDocumentReady( () => {
 			progressPlannerInjectTodoItem( newTask );
 			prplSubmitUserSuggestedTask( newTask );
 
-			const resizeGridAfterInsert = new Event(
+			document.dispatchEvent( new Event(
 				'prplResizeAllGridItemsEvent'
-			);
-			document.dispatchEvent( resizeGridAfterInsert );
+			) );
 
 			document.getElementById( 'new-todo-content' ).value = '';
 
