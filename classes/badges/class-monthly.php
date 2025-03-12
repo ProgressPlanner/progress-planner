@@ -200,21 +200,7 @@ final class Monthly extends Badge {
 			return $saved_progress;
 		}
 
-		$month     = self::get_months()[ 'm' . $this->get_month() ];
-		$year      = $this->get_year();
-		$month_num = (int) $this->get_month();
-
-		$start_date = \DateTime::createFromFormat( 'Y-m-d', "{$year}-{$month_num}-01" );
-		$end_date   = \DateTime::createFromFormat( 'Y-m-d', "{$year}-{$month_num}-" . gmdate( 't', strtotime( $month ) ) );
-
-		// Get the activities for the month.
-		$activities = \progress_planner()->get_query()->query_activities(
-			[
-				'category'   => 'suggested_task',
-				'start_date' => $start_date,
-				'end_date'   => $end_date,
-			],
-		);
+		$activities = $this->get_monthly_activities();
 
 		$points = 0;
 		foreach ( $activities as $activity ) {
@@ -233,5 +219,51 @@ final class Monthly extends Badge {
 		$this->save_progress( $return_progress );
 
 		return $return_progress;
+	}
+
+	/**
+	 * Get the monthly activities.
+	 *
+	 * @return array
+	 */
+	protected function get_monthly_activities() {
+
+		$month     = self::get_months()[ 'm' . $this->get_month() ];
+		$year      = $this->get_year();
+		$month_num = (int) $this->get_month();
+
+		$start_date = \DateTime::createFromFormat( 'Y-m-d', "{$year}-{$month_num}-01" );
+		$end_date   = \DateTime::createFromFormat( 'Y-m-d', "{$year}-{$month_num}-" . gmdate( 't', strtotime( $month ) ) );
+
+		// Get the activities for the month.
+		$activities = \progress_planner()->get_query()->query_activities(
+			[
+				'category'   => 'suggested_task',
+				'start_date' => $start_date,
+				'end_date'   => $end_date,
+			],
+		);
+
+		return $activities;
+	}
+
+	/**
+	 * Get the tasks for the badge.
+	 *
+	 * @return array
+	 */
+	public function get_monthly_tasks() {
+		$activities = $this->get_monthly_activities();
+
+		$tasks = [];
+		foreach ( $activities as $activity ) {
+			$task = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $activity->data_id );
+
+			if ( $task && isset( $task['provider_id'] ) ) {
+				$tasks[] = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task['task_id'] );
+			}
+		}
+
+		return $tasks;
 	}
 }
