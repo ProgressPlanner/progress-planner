@@ -271,4 +271,8 @@
 		padding: 0.5rem;
 		font-weight: 500;
 	}
+
+	&:not(:has(.prpl-suggested-task)) {
+		display: none;
+	}
 }

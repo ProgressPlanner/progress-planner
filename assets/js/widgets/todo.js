@@ -177,9 +177,12 @@ document.addEventListener( 'prplMaybeInjectSuggestedTaskEvent', ( event ) => {
 					false,
 					'todo-list-completed'
 				);
+				document.dispatchEvent(
+					new CustomEvent( 'prplResizeAllGridItemsEvent' )
+				);
 			}
 		} );
-	}, 1500 );
+	}, 2010 );
 } );
 
 document
