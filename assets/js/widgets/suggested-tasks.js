@@ -1,4 +1,5 @@
 /* global customElements, prplSuggestedTasks, confetti, prplDocumentReady */
+/* eslint-disable camelcase */
 
 /**
  * Count the number of items in the list.
@@ -102,18 +103,7 @@ const prplSuggestedTasksInjectNextItem = ( category ) => {
  */
 const prplSuggestedTasksInjectItem = ( details ) => {
 	const Item = customElements.get( 'prpl-suggested-task' );
-	const item = new Item( {
-		taskId: details.task_id,
-		taskTitle: details.title,
-		taskDescription: details.description,
-		taskPoints: details.points ?? 1,
-		taskAction: details.action ?? '',
-		taskUrl: details.url ?? '',
-		taskDismissable: details.dismissable ?? false,
-		taskProviderID: details.providerID ?? '',
-		taskCategory: details.category ?? '',
-		taskSnoozable: details.snoozable ?? true,
-	} );
+	const item = new Item( details );
 
 	/**
 	 * @todo Implement the parent task functionality.
@@ -249,10 +239,10 @@ const prplStrikeCompletedTasks = () => {
 		document
 			.querySelectorAll( '.prpl-suggested-task-celebrated' )
 			.forEach( ( item ) => {
-				const taskId = item.getAttribute( 'data-task-id' ),
-					providerID = item.getAttribute( 'data-task-provider-id' );
+				const task_id = item.getAttribute( 'data-task-id' );
+				const providerID = item.getAttribute( 'data-task-provider-id' );
 				const el = document.querySelector(
-					`.prpl-suggested-task[data-task-id="${ taskId }"]`
+					`.prpl-suggested-task[data-task-id="${ task_id }"]`
 				);
 
 				if ( el ) {
@@ -263,7 +253,7 @@ const prplStrikeCompletedTasks = () => {
 				let taskIndex = false;
 				window.prplSuggestedTasks.tasks.forEach(
 					( taskItem, index ) => {
-						if ( taskItem.task_id === taskId ) {
+						if ( taskItem.task_id === task_id ) {
 							taskIndex = index;
 						}
 					}
@@ -279,7 +269,7 @@ const prplStrikeCompletedTasks = () => {
 				document.dispatchEvent(
 					new CustomEvent( 'prplMaybeInjectSuggestedTaskEvent', {
 						detail: {
-							taskId,
+							task_id,
 							providerID,
 						},
 					} )

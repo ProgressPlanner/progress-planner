@@ -51,18 +51,8 @@ document.addEventListener( 'progressPlannerInjectTodoItem', ( event ) => {
 
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const todoItemElement = new Item( {
-		taskId: details.task_id,
-		taskTitle: details.title,
-		taskDescription: details.description,
-		taskPoints: details.points ?? 0,
-		taskAction: details.action ?? '',
-		taskUrl: details.url ?? '',
-		taskDismissable: details.dismissable ?? false,
-		taskProviderID: details.providerID ?? '',
-		taskCategory: details.category ?? '',
-		taskSnoozable: details.snoozable ?? true,
-		taskOrder: details.order ?? false,
-		taskDeletable: true,
+		...details,
+		deletable: true,
 	} );
 
 	if ( addToStart ) {
@@ -169,7 +159,7 @@ document.addEventListener( 'prplMaybeInjectSuggestedTaskEvent', ( event ) => {
 		// Get the todo item.
 		progressPlannerTodo.listItems.forEach( ( todoItem, index ) => {
 			if (
-				todoItem.task_id === event.detail.taskId &&
+				todoItem.task_id === event.detail.task_id &&
 				'complete' === event.detail.actionType
 			) {
 				progressPlannerTodo.listItems[ index ].status = 'completed';

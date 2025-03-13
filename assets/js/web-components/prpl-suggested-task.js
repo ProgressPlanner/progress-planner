@@ -1,4 +1,5 @@
 /* global customElements, prplSuggestedTask, HTMLElement */
+/* eslint-disable camelcase */
 
 /**
  * Register the custom web component.
@@ -7,41 +8,41 @@ customElements.define(
 	'prpl-suggested-task',
 	class extends HTMLElement {
 		constructor( {
-			taskId,
-			taskTitle,
-			taskDescription,
-			taskPoints,
-			taskAction = '',
-			taskUrl = '',
-			taskDismissable = false,
-			taskProviderID = '',
-			taskCategory = '',
-			taskSnoozable = true,
-			taskOrder = false,
-			taskDeletable = false,
+			task_id,
+			title,
+			description,
+			points,
+			action = '',
+			url = '',
+			dismissable = false,
+			providerID = '',
+			category = '',
+			snoozable = true,
+			order = false,
+			deletable = false,
 		} ) {
 			// Get parent class properties
 			super();
 
 			this.setAttribute( 'role', 'listitem' );
 
-			let taskHeading = taskTitle;
-			if ( taskUrl ) {
-				taskHeading = `<a href="${ taskUrl }">${ taskTitle }</a>`;
+			let taskHeading = title;
+			if ( url ) {
+				taskHeading = `<a href="${ url }">${ title }</a>`;
 			}
 
-			const isRemoteTask = taskId.startsWith( 'remote-task-' );
-			const isDismissable = taskDismissable || isRemoteTask;
+			const isRemoteTask = task_id.startsWith( 'remote-task-' );
+			const isDismissable = dismissable || isRemoteTask;
 
 			const actionButtons = {
 				move:
-					false !== taskOrder
+					false !== order
 						? `<span class="prpl-move-buttons">
 							<button
 								type="button"
 								class="prpl-suggested-task-button move-up"
-								data-task-id="${ taskId }"
-								data-task-title="${ taskTitle }"
+								data-task-id="${ task_id }"
+								data-task-title="${ title }"
 								data-action="move-up"
 								data-target="move-up"
 								title="${ prplSuggestedTask.i18n.moveUp }"
@@ -52,8 +53,8 @@ customElements.define(
 							<button
 								type="button"
 								class="prpl-suggested-task-button move-down"
-								data-task-id="${ taskId }"
-								data-task-title="${ taskTitle }"
+								data-task-id="${ task_id }"
+								data-task-title="${ title }"
 								data-action="move-down"
 								data-target="move-down"
 								title="${ prplSuggestedTask.i18n.moveDown }"
@@ -63,12 +64,12 @@ customElements.define(
 							</button>
 						</span>`
 						: '',
-				info: taskDescription
+				info: description
 					? `<button
 							type="button"
 							class="prpl-suggested-task-button"
-							data-task-id="${ taskId }"
-							data-task-title="${ taskTitle }"
+							data-task-id="${ task_id }"
+							data-task-title="${ title }"
 							data-action="info"
 							data-target="info"
 							title="${ prplSuggestedTask.i18n.info }"
@@ -77,12 +78,12 @@ customElements.define(
 							<span class="screen-reader-text">${ prplSuggestedTask.i18n.info }</span>
 						</button>`
 					: '',
-				snooze: taskSnoozable
+				snooze: snoozable
 					? `<button
 							type="button"
 							class="prpl-suggested-task-button"
-							data-task-id="${ taskId }"
-							data-task-title="${ taskTitle }"
+							data-task-id="${ task_id }"
+							data-task-title="${ title }"
 							data-action="snooze"
 							data-target="snooze"
 							title="${ prplSuggestedTask.i18n.snooze }"
@@ -95,8 +96,8 @@ customElements.define(
 					? `<button
 							type="button"
 							class="prpl-suggested-task-button"
-							data-task-id="${ taskId }"
-							data-task-title="${ taskTitle }"
+							data-task-id="${ task_id }"
+							data-task-title="${ title }"
 							data-action="complete"
 							data-target="complete"
 							title="${ prplSuggestedTask.i18n.markAsComplete }"
@@ -105,12 +106,12 @@ customElements.define(
 							<span class="screen-reader-text">${ prplSuggestedTask.i18n.markAsComplete }</span>
 						</button>`
 					: '',
-				delete: taskDeletable
+				delete: deletable
 					? `<button
 							type="button"
 							class="prpl-suggested-task-button trash"
-							data-task-id="${ taskId }"
-							data-task-title="${ taskTitle }"
+							data-task-id="${ task_id }"
+							data-task-title="${ title }"
 							data-action="delete"
 							data-target="delete"
 							title="${ prplSuggestedTask.i18n.delete }"
@@ -121,25 +122,25 @@ customElements.define(
 					: '',
 			};
 
-			const taskPointsElement = taskPoints
+			const taskPointsElement = points
 				? `<span class="prpl-suggested-task-points">
-						+${ taskPoints }
+						+${ points }
 					</span>`
 				: '';
 
 			this.innerHTML = `
 			<li
 				class="prpl-suggested-task"
-				data-task-id="${ taskId }"
-				data-task-action="${ taskAction }"
-				data-task-url="${ taskUrl }"
-				data-task-provider-id="${ taskProviderID }"
-				data-task-points="${ taskPoints }"
-				data-task-category="${ taskCategory }"
-				data-task-order="${ taskOrder }"
+				data-task-id="${ task_id }"
+				data-task-action="${ action }"
+				data-task-url="${ url }"
+				data-task-provider-id="${ providerID }"
+				data-task-points="${ points }"
+				data-task-category="${ category }"
+				data-task-order="${ order }"
 			>
 				<h3><span${
-					'user' === taskCategory
+					'user' === category
 						? ` contenteditable="plaintext-only"`
 						: ''
 				}>${ taskHeading }</span></h3>
@@ -170,27 +171,27 @@ customElements.define(
 
 								<div class="prpl-snooze-duration-radio-group">
 									<label>
-										<input type="radio" name="snooze-duration-${ taskId }" value="1-week">
+										<input type="radio" name="snooze-duration-${ task_id }" value="1-week">
 										${ prplSuggestedTask.i18n.snoozeDuration.oneWeek }
 									</label>
 									<label>
-										<input type="radio" name="snooze-duration-${ taskId }" value="1-month">
+										<input type="radio" name="snooze-duration-${ task_id }" value="1-month">
 										${ prplSuggestedTask.i18n.snoozeDuration.oneMonth }
 									</label>
 									<label>
-										<input type="radio" name="snooze-duration-${ taskId }" value="3-months">
+										<input type="radio" name="snooze-duration-${ task_id }" value="3-months">
 										${ prplSuggestedTask.i18n.snoozeDuration.threeMonths }
 									</label>
 									<label>
-										<input type="radio" name="snooze-duration-${ taskId }" value="6-months">
+										<input type="radio" name="snooze-duration-${ task_id }" value="6-months">
 										${ prplSuggestedTask.i18n.snoozeDuration.sixMonths }
 									</label>
 									<label>
-										<input type="radio" name="snooze-duration-${ taskId }" value="1-year">
+										<input type="radio" name="snooze-duration-${ task_id }" value="1-year">
 										${ prplSuggestedTask.i18n.snoozeDuration.oneYear }
 									</label>
 									<label>
-										<input type="radio" name="snooze-duration-${ taskId }" value="forever">
+										<input type="radio" name="snooze-duration-${ task_id }" value="forever">
 										${ prplSuggestedTask.i18n.snoozeDuration.forever }
 									</label>
 								</div>
@@ -202,7 +203,7 @@ customElements.define(
 							</button>
 						</div>
 						<div class="prpl-suggested-task-info prpl-tooltip" data-target="info">
-							${ taskDescription }
+							${ description }
 							<button type="button" class="prpl-suggested-task-button prpl-tooltip-close" data-action="close-info" data-target="info">
 								<span class="dashicons dashicons-no-alt"></span>
 								<span class="screen-reader-text">${ prplSuggestedTask.i18n.close }</span>
@@ -390,19 +391,19 @@ customElements.define(
 		/**
 		 * Snooze a task.
 		 *
-		 * @param {string} taskId         The task ID.
+		 * @param {string} task_id        The task ID.
 		 * @param {string} actionType     The action type.
 		 * @param {string} snoozeDuration If the action is `snooze`,
 		 *                                the duration to snooze the task for.
 		 */
-		runTaskAction = ( taskId, actionType, snoozeDuration ) => {
-			taskId = taskId.toString();
+		runTaskAction = ( task_id, actionType, snoozeDuration ) => {
+			task_id = task_id.toString();
 			const providerID = this.querySelector( 'li' ).getAttribute(
 				'data-task-provider-id'
 			);
 
 			const data = {
-				task_id: taskId,
+				task_id,
 				nonce: prplSuggestedTask.nonce,
 				action_type: actionType,
 			};
@@ -417,7 +418,7 @@ customElements.define(
 			);
 			request.done( () => {
 				const el = document.querySelector(
-					`.prpl-suggested-task[data-task-id="${ taskId }"]`
+					`.prpl-suggested-task[data-task-id="${ task_id }"]`
 				);
 
 				switch ( actionType ) {
@@ -426,7 +427,7 @@ customElements.define(
 						// Update the global var.
 						window.prplSuggestedTasks.tasks.forEach(
 							( task, index ) => {
-								if ( task.task_id === taskId ) {
+								if ( task.task_id === task_id ) {
 									window.prplSuggestedTasks.tasks[
 										index
 									].status = 'snoozed';
@@ -439,7 +440,7 @@ customElements.define(
 						// Add the task to the pending celebration.
 						window.prplSuggestedTasks.tasks.forEach(
 							( task, index ) => {
-								if ( task.task_id === taskId ) {
+								if ( task.task_id === task_id ) {
 									window.prplSuggestedTasks.tasks[
 										index
 									].status = 'pending_celebration';
@@ -483,7 +484,7 @@ customElements.define(
 				document.dispatchEvent(
 					new CustomEvent( 'prplMaybeInjectSuggestedTaskEvent', {
 						detail: {
-							taskId,
+							task_id,
 							providerID,
 							actionType,
 						},
