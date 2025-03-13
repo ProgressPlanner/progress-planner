@@ -4,6 +4,7 @@ Bugs we fixed:
 
 * Fixed unnecessary display of the upgrade popover.
 * Fixed saving license key from 'Subscribe to weekly' emails popover.
+* Reduced number of database queries when checking for user activity scores.
 
 
 = 1.1.0 =

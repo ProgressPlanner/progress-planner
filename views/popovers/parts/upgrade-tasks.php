@@ -89,6 +89,10 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 		</span>
 		<span class="prpl-onboarding-tasks-total-points">0pt</span>
 	</div>
+
+	<button id="prpl-onboarding-continue-button" class="prpl-button-primary prpl-disabled" onclick="prplOnboardRedirect()">
+		<?php \esc_html_e( 'Continue', 'progress-planner' ); ?>
+	</button>
 </div>
 
 <?php
