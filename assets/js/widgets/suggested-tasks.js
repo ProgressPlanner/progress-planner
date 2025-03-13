@@ -47,7 +47,7 @@ const prplSuggestedTasksGetNextPendingItemFromCategory = ( category ) => {
 	// Get items of this category.
 	const itemsOfCategory = prplSuggestedTasksGetItemsOfCategory( category );
 	// If there are no items of this category, return null.
-	if ( 0 === itemsOfCategory.length ) {
+	if ( 0 === itemsOfCategory.length || 'user' === category ) {
 		return null;
 	}
 
