@@ -81,7 +81,7 @@ class Plugin_Upgrade_Tasks {
 		}
 
 		// Update 'progress_planner_previous_version_task_providers' option.
-		\update_option( 'progress_planner_previous_version_task_providers', $onboard_task_provider_ids );
+		\update_option( 'progress_planner_previous_version_task_providers', array_unique( array_merge( $old_task_providers, $onboard_task_provider_ids ), SORT_REGULAR ) );
 
 		// Update 'progress_planner_upgrade_popover_task_providers' option.
 		\update_option( 'progress_planner_upgrade_popover_task_provider_ids', $newly_added_task_provider_ids );
