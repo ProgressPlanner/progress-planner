@@ -2,43 +2,6 @@
 /* eslint-disable camelcase */
 
 /**
- * Count the number of items in the list.
- *
- * @param {string} category The category of items to count.
- * @return {number} The number of items in the list.
- */
-const prplSuggestedTasksCountItems = ( category ) => {
-	const items = document.querySelectorAll(
-		`.prpl-suggested-task[data-task-category="${ category }"]`
-	);
-	return items.length;
-};
-
-/**
- * Get all items of a category.
- *
- * @param {string} category The category of items to get.
- * @return {Array} The items.
- */
-const prplSuggestedTasksGetItemsOfCategory = ( category ) => {
-	return prplSuggestedTasks.tasks.filter(
-		( task ) => category === task.category
-	);
-};
-
-/**
- * Get items that have a specific status.
- *
- * @param {string} status The status of the items to get.
- * @return {Array} The items.
- */
-const prplSuggestedTasksGetItemsWithStatus = ( status ) => {
-	return prplSuggestedTasks.tasks.filter(
-		( task ) => status === task.status
-	);
-};
-
-/**
  * Get the next item to inject.
  *
  * @param {string} category The category of items to get the next item from.
@@ -46,7 +9,10 @@ const prplSuggestedTasksGetItemsWithStatus = ( status ) => {
  */
 const prplSuggestedTasksGetNextPendingItemFromCategory = ( category ) => {
 	// Get items of this category.
-	const itemsOfCategory = prplSuggestedTasksGetItemsOfCategory( category );
+	const itemsOfCategory = prplSuggestedTasks.tasks.filter(
+		( task ) => category === task.category
+	);
+
 	// If there are no items of this category, return null.
 	if ( 0 === itemsOfCategory.length || 'user' === category ) {
 		return null;
@@ -82,32 +48,36 @@ const prplSuggestedTasksGetNextPendingItemFromCategory = ( category ) => {
 };
 
 /**
- * Inject the next item.
- *
- * @param {string} category The category of items to inject the next item from.
+ * Inject the next item from a category.
  */
-const prplSuggestedTasksInjectNextItem = ( category ) => {
-	const nextItem =
-		prplSuggestedTasksGetNextPendingItemFromCategory( category );
-	if ( ! nextItem ) {
-		return;
-	}
+document.addEventListener(
+	'prpl/suggestedTask/injectCategoryItem',
+	( event ) => {
+		const nextItem = prplSuggestedTasksGetNextPendingItemFromCategory(
+			event.detail.category
+		);
+		if ( ! nextItem ) {
+			return;
+		}
 
-	prplSuggestedTasksInjectItem( nextItem );
-};
+		document.dispatchEvent(
+			new CustomEvent( 'prpl/suggestedTask/injectItem', {
+				detail: nextItem,
+			} )
+		);
+	}
+);
 
 /**
  * Inject a todo item.
- *
- * @param {Object} details The details of the todo item.
  */
-const prplSuggestedTasksInjectItem = ( details ) => {
+document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 	const Item = customElements.get( 'prpl-suggested-task' );
-	const item = new Item( details );
+	const item = new Item( event.detail );
 
 	/**
 	 * @todo Implement the parent task functionality.
-	 * Use this code: `const parent = details.parent && '' !== details.parent ? details.parent : null;
+	 * Use this code: `const parent = event.detail.parent && '' !== event.detail.parent ? event.detail.parent : null;
 	 */
 	const parent = false;
 
@@ -130,7 +100,11 @@ const prplSuggestedTasksInjectItem = ( details ) => {
 	);
 	if ( ! parentItem ) {
 		setTimeout( () => {
-			prplSuggestedTasksInjectItem( details );
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/injectItem', {
+					detail: event.detail,
+				} )
+			);
 			window.prplRenderAttempts++;
 		}, 10 );
 		return;
@@ -147,14 +121,28 @@ const prplSuggestedTasksInjectItem = ( details ) => {
 	parentItem
 		.querySelector( '.prpl-suggested-task-children' )
 		.insertAdjacentElement( 'beforeend', item );
-};
+} );
 
-/**
- * Trigger confetti.
- *
- * @param {Element} containerElement The container element.
- */
-const prplTriggerConfetti = ( containerElement ) => {
+if (
+	! prplSuggestedTasks.delayCelebration &&
+	prplSuggestedTasks.tasks.filter(
+		( task ) => 'pending_celebration' === task.status
+	).length
+) {
+	setTimeout( () => {
+		// Trigger the celebration event.
+		document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
+	}, 3000 );
+}
+
+// Create a new custom event to trigger the celebration.
+document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
+	/**
+	 * Trigger the confetti on the container element.
+	 */
+	const containerElement = event.detail.element.closest(
+		'.prpl-suggested-tasks-list'
+	);
 	const prplConfettiDefaults = {
 		spread: 360,
 		ticks: 50,
@@ -220,12 +208,10 @@ const prplTriggerConfetti = ( containerElement ) => {
 	setTimeout( prplRenderAttemptshoot, 0 );
 	setTimeout( prplRenderAttemptshoot, 100 );
 	setTimeout( prplRenderAttemptshoot, 200 );
-};
 
-/**
- * Strike completed tasks.
- */
-const prplStrikeCompletedTasks = () => {
+	/**
+	 * Strike completed tasks.
+	 */
 	document
 		.querySelectorAll(
 			'.prpl-suggested-task[data-task-action="celebrate"]'
@@ -276,29 +262,9 @@ const prplStrikeCompletedTasks = () => {
 				);
 			} );
 	}, 2000 );
-};
-
-if (
-	! prplSuggestedTasks.delayCelebration &&
-	prplSuggestedTasksGetItemsWithStatus( 'pending_celebration' ).length
-) {
-	setTimeout( () => {
-		// Trigger the celebration event.
-		document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
-	}, 3000 );
-}
-
-// Create a new custom event to trigger the celebration.
-document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
-	prplTriggerConfetti(
-		event.detail.element.closest( '.prpl-suggested-tasks-list' )
-	);
-	prplStrikeCompletedTasks();
 } );
 
-// Populate the list on load.
-document.addEventListener( 'DOMContentLoaded', () => {
-	// Do nothing if the list does not exist.
+prplDocumentReady( () => {
 	if ( ! document.querySelector( '.prpl-suggested-tasks-list' ) ) {
 		return;
 	}
@@ -307,24 +273,43 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
 		// Inject items, until we reach the maximum number of channel items.
 		while (
-			prplSuggestedTasksCountItems( category ) <
+			document.querySelectorAll(
+				`.prpl-suggested-task[data-task-category="${ category }"]`
+			).length <
 				parseInt(
 					prplSuggestedTasks.maxItemsPerCategory[ category ]
 				) &&
 			prplSuggestedTasksGetNextPendingItemFromCategory( category )
 		) {
-			prplSuggestedTasksInjectNextItem( category );
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/injectCategoryItem', {
+					detail: { category },
+				} )
+			);
 		}
 	}
 
 	// Inject ALL pending celebration tasks.
-	prplSuggestedTasksGetItemsWithStatus( 'pending_celebration' ).forEach(
-		( task ) => {
-			prplSuggestedTasksInjectItem( task );
-		}
-	);
+	prplSuggestedTasks.tasks
+		.filter( ( task ) => 'pending_celebration' === task.status )
+		.forEach( ( task ) => {
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/injectItem', {
+					detail: task,
+				} )
+			);
+		} );
 
 	document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+
+	// Initialize the badge scroller.
+	document
+		.querySelectorAll(
+			'.prpl-widget-wrapper:not(.in-popover) > .badge-group-monthly'
+		)
+		.forEach( ( element ) => {
+			new BadgeScroller( element );
+		} );
 } );
 
 // Handle the monthly badges scrolling.
@@ -461,17 +446,6 @@ class BadgeScroller {
 	}
 }
 
-// Initialize on DOM load
-prplDocumentReady( () => {
-	document
-		.querySelectorAll(
-			'.prpl-widget-wrapper:not(.in-popover) > .badge-group-monthly'
-		)
-		.forEach( ( element ) => {
-			new BadgeScroller( element );
-		} );
-} );
-
 /**
  * Update the Ravi gauge.
  */
@@ -569,13 +543,19 @@ document.addEventListener(
 		const category = e.detail.category;
 
 		while (
-			prplSuggestedTasksCountItems( category ) <
+			document.querySelectorAll(
+				`.prpl-suggested-task[data-task-category="${ category }"]`
+			).length <
 				parseInt(
 					prplSuggestedTasks.maxItemsPerCategory[ category ]
 				) &&
 			prplSuggestedTasksGetNextPendingItemFromCategory( category )
 		) {
-			prplSuggestedTasksInjectNextItem( category );
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/injectCategoryItem', {
+					detail: { category },
+				} )
+			);
 		}
 
 		document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
