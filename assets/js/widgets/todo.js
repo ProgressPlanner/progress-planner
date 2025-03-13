@@ -26,14 +26,29 @@ const prplGetRandomUUID = () => {
 };
 
 /**
- * Inject a todo item into the DOM.
+ * Get the highest `order` value from the todo items.
  *
- * @param {string}  details    The details of the todo item.
- * @param {boolean} addToStart Whether to add the todo item to the start of the list.
- * @param {string}  listId     The ID of the list to inject the todo item into.
+ * @return {number} The highest `order` value.
  */
-const progressPlannerInjectTodoItem = ( details, addToStart, listId ) => {
-	// TODO: Inject the todo item into the DOM.
+const prplGetHighestTodoItemOrder = () => {
+	const todoItems = document.querySelectorAll(
+		'#todo-list .prpl-suggested-task'
+	);
+	let highestOrder = 0;
+	todoItems.forEach( ( todoItem ) => {
+		const order = parseInt( todoItem.getAttribute( 'data-task-order' ) );
+		if ( order > highestOrder ) {
+			highestOrder = order;
+		}
+	} );
+	return highestOrder;
+};
+
+document.addEventListener( 'progressPlannerInjectTodoItem', ( event ) => {
+	const details = event.detail.item;
+	const addToStart = event.detail.addToStart;
+	const listId = event.detail.listId;
+
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const todoItemElement = new Item( {
 		taskId: details.task_id,
@@ -55,75 +70,22 @@ const progressPlannerInjectTodoItem = ( details, addToStart, listId ) => {
 	} else {
 		document.getElementById( listId ).appendChild( todoItemElement );
 	}
-};
-
-/**
- * Get the highest `order` value from the todo items.
- *
- * @return {number} The highest `order` value.
- */
-const prplGetHighestTodoItemOrder = () => {
-	const todoItems = document.querySelectorAll(
-		'#todo-list .prpl-suggested-task'
-	);
-	let highestOrder = 0;
-	todoItems.forEach( ( todoItem ) => {
-		const order = parseInt( todoItem.getAttribute( 'data-task-order' ) );
-		if ( order > highestOrder ) {
-			highestOrder = order;
-		}
-	} );
-	return highestOrder;
-};
-
-const prplCreateUserSuggestedTask = ( content ) => {
-	return {
-		description: '',
-		parent: 0,
-		points: 0,
-		priority: 'medium',
-		task_id: 'user-task-' + prplGetRandomUUID(),
-		title: content,
-		provider_id: 'user',
-		category: 'user',
-		url: '',
-		dismissable: true,
-		snoozable: false,
-		order: prplGetHighestTodoItemOrder() + 1,
-	};
-};
-
-const prplSubmitUserSuggestedTask = ( task ) => {
-	wp.ajax.post( 'progress_planner_save_user_suggested_task', {
-		task,
-		nonce: progressPlannerTodo.nonce,
-	} );
-};
-
-const prplSaveSuggestedUserTasksOrder = () => {
-	const todoItemsIDs = [];
-	// Get all the todo items.
-	const todoItems = document.querySelectorAll(
-		'#todo-list .prpl-suggested-task'
-	);
-	todoItems.forEach( ( todoItem ) => {
-		todoItemsIDs.push( todoItem.getAttribute( 'data-task-id' ) );
-	} );
-	wp.ajax.post( 'progress_planner_save_suggested_user_tasks_order', {
-		tasks: todoItemsIDs.toString(),
-		nonce: progressPlannerTodo.nonce,
-	} );
-};
+} );
 
 prplDocumentReady( () => {
 	// Inject the existing todo list items into the DOM
 	progressPlannerTodo.listItems.forEach( ( todoItem, index, array ) => {
-		progressPlannerInjectTodoItem(
-			todoItem,
-			false,
-			todoItem.status === 'completed'
-				? 'todo-list-completed'
-				: 'todo-list'
+		document.dispatchEvent(
+			new CustomEvent( 'progressPlannerInjectTodoItem', {
+				detail: {
+					item: todoItem,
+					addToStart: false,
+					listId:
+						todoItem.status === 'completed'
+							? 'todo-list-completed'
+							: 'todo-list',
+				},
+			} )
 		);
 
 		// If this is the last item in the array, resize the grid items.
@@ -140,16 +102,44 @@ prplDocumentReady( () => {
 		.getElementById( 'create-todo-item' )
 		.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
-			const newTask = prplCreateUserSuggestedTask(
-				document.getElementById( 'new-todo-content' ).value
-			);
-			progressPlannerInjectTodoItem( newTask, false, 'todo-list' );
-			prplSubmitUserSuggestedTask( newTask );
+			const newTask = {
+				description: '',
+				parent: 0,
+				points: 0,
+				priority: 'medium',
+				task_id: 'user-task-' + prplGetRandomUUID(),
+				title: document.getElementById( 'new-todo-content' ).value,
+				provider_id: 'user',
+				category: 'user',
+				url: '',
+				dismissable: true,
+				snoozable: false,
+				order: prplGetHighestTodoItemOrder() + 1,
+			};
 
+			// Inject the new task into the DOM.
+			document.dispatchEvent(
+				new CustomEvent( 'progressPlannerInjectTodoItem', {
+					detail: {
+						item: newTask,
+						addToStart: false,
+						listId: 'todo-list',
+					},
+				} )
+			);
+
+			// Save the new task.
+			wp.ajax.post( 'progress_planner_save_user_suggested_task', {
+				task: newTask,
+				nonce: progressPlannerTodo.nonce,
+			} );
+
+			// Resize the grid items.
 			document.dispatchEvent(
 				new CustomEvent( 'prplResizeAllGridItemsEvent' )
 			);
 
+			// Clear the new task input element.
 			document.getElementById( 'new-todo-content' ).value = '';
 
 			// Focus the new task input element.
@@ -160,7 +150,18 @@ prplDocumentReady( () => {
 // When the 'prplMoveSuggestedTaskEvent' event is triggered,
 // update the order of the todo items.
 document.addEventListener( 'prplMoveSuggestedTaskEvent', () => {
-	prplSaveSuggestedUserTasksOrder();
+	const todoItemsIDs = [];
+	// Get all the todo items.
+	const todoItems = document.querySelectorAll(
+		'#todo-list .prpl-suggested-task'
+	);
+	todoItems.forEach( ( todoItem ) => {
+		todoItemsIDs.push( todoItem.getAttribute( 'data-task-id' ) );
+	} );
+	wp.ajax.post( 'progress_planner_save_suggested_user_tasks_order', {
+		tasks: todoItemsIDs.toString(),
+		nonce: progressPlannerTodo.nonce,
+	} );
 } );
 
 document.addEventListener( 'prplMaybeInjectSuggestedTaskEvent', ( event ) => {
@@ -172,10 +173,14 @@ document.addEventListener( 'prplMaybeInjectSuggestedTaskEvent', ( event ) => {
 				'complete' === event.detail.actionType
 			) {
 				progressPlannerTodo.listItems[ index ].status = 'completed';
-				progressPlannerInjectTodoItem(
-					todoItem,
-					false,
-					'todo-list-completed'
+				document.dispatchEvent(
+					new CustomEvent( 'progressPlannerInjectTodoItem', {
+						detail: {
+							item: todoItem,
+							addToStart: false,
+							listId: 'todo-list-completed',
+						},
+					} )
 				);
 				document.dispatchEvent(
 					new CustomEvent( 'prplResizeAllGridItemsEvent' )
