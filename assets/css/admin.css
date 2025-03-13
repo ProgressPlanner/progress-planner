@@ -144,6 +144,11 @@
 	display: none !important;
 }
 
+.prpl-disabled {
+	opacity: 0.5;
+	pointer-events: none;
+}
+
 /*------------------------------------*\
 	Info buttons.
 \*------------------------------------*/
