@@ -267,7 +267,7 @@ const prplStrikeCompletedTasks = () => {
 
 				// Refresh the list.
 				document.dispatchEvent(
-					new CustomEvent( 'prplMaybeInjectSuggestedTaskEvent', {
+					new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
 						detail: {
 							task_id,
 							providerID,
@@ -284,12 +284,12 @@ if (
 ) {
 	setTimeout( () => {
 		// Trigger the celebration event.
-		document.dispatchEvent( new CustomEvent( 'prplCelebrateTasks' ) );
+		document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
 	}, 3000 );
 }
 
 // Create a new custom event to trigger the celebration.
-document.addEventListener( 'prplCelebrateTasks', ( event ) => {
+document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 	prplTriggerConfetti(
 		event.detail.element.closest( '.prpl-suggested-tasks-list' )
 	);
@@ -324,7 +324,7 @@ document.addEventListener( 'DOMContentLoaded', () => {
 		}
 	);
 
-	document.dispatchEvent( new CustomEvent( 'prplResizeAllGridItemsEvent' ) );
+	document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 } );
 
 // Handle the monthly badges scrolling.
@@ -476,7 +476,7 @@ prplDocumentReady( () => {
  * Update the Ravi gauge.
  */
 document.addEventListener(
-	'prplUpdateRaviGaugeEvent',
+	'prpl/updateRaviGauge',
 	( e ) => {
 		if ( ! e.detail.pointsDiff ) {
 			return;
@@ -563,7 +563,7 @@ document.addEventListener(
 
 // Listen for the event.
 document.addEventListener(
-	'prplMaybeInjectSuggestedTaskEvent',
+	'prpl/suggestedTask/maybeInjectItem',
 	( e ) => {
 		// TODO: Something seems off here, take a look at this.
 		const category = e.detail.category;
@@ -578,9 +578,7 @@ document.addEventListener(
 			prplSuggestedTasksInjectNextItem( category );
 		}
 
-		document.dispatchEvent(
-			new CustomEvent( 'prplResizeAllGridItemsEvent' )
-		);
+		document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	},
 	false
 );

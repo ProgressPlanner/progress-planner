@@ -44,7 +44,7 @@ const prplGetHighestTodoItemOrder = () => {
 	return highestOrder;
 };
 
-document.addEventListener( 'progressPlannerInjectTodoItem', ( event ) => {
+document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
 	const details = event.detail.item;
 	const addToStart = event.detail.addToStart;
 	const listId = event.detail.listId;
@@ -66,7 +66,7 @@ prplDocumentReady( () => {
 	// Inject the existing todo list items into the DOM
 	progressPlannerTodo.listItems.forEach( ( todoItem, index, array ) => {
 		document.dispatchEvent(
-			new CustomEvent( 'progressPlannerInjectTodoItem', {
+			new CustomEvent( 'prpl/todo/injectItem', {
 				detail: {
 					item: todoItem,
 					addToStart: false,
@@ -80,9 +80,7 @@ prplDocumentReady( () => {
 
 		// If this is the last item in the array, resize the grid items.
 		if ( index === array.length - 1 ) {
-			document.dispatchEvent(
-				new CustomEvent( 'prplResizeAllGridItemsEvent' )
-			);
+			document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 		}
 	} );
 
@@ -109,7 +107,7 @@ prplDocumentReady( () => {
 
 			// Inject the new task into the DOM.
 			document.dispatchEvent(
-				new CustomEvent( 'progressPlannerInjectTodoItem', {
+				new CustomEvent( 'prpl/todo/injectItem', {
 					detail: {
 						item: newTask,
 						addToStart: false,
@@ -125,9 +123,7 @@ prplDocumentReady( () => {
 			} );
 
 			// Resize the grid items.
-			document.dispatchEvent(
-				new CustomEvent( 'prplResizeAllGridItemsEvent' )
-			);
+			document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 
 			// Clear the new task input element.
 			document.getElementById( 'new-todo-content' ).value = '';
@@ -137,9 +133,9 @@ prplDocumentReady( () => {
 		} );
 } );
 
-// When the 'prplMoveSuggestedTaskEvent' event is triggered,
+// When the 'prpl/suggestedTask/move' event is triggered,
 // update the order of the todo items.
-document.addEventListener( 'prplMoveSuggestedTaskEvent', () => {
+document.addEventListener( 'prpl/suggestedTask/move', () => {
 	const todoItemsIDs = [];
 	// Get all the todo items.
 	const todoItems = document.querySelectorAll(
@@ -154,7 +150,7 @@ document.addEventListener( 'prplMoveSuggestedTaskEvent', () => {
 	} );
 } );
 
-document.addEventListener( 'prplMaybeInjectSuggestedTaskEvent', ( event ) => {
+document.addEventListener( 'prpl/suggestedTask/maybeInjectItem', ( event ) => {
 	setTimeout( () => {
 		// Get the todo item.
 		progressPlannerTodo.listItems.forEach( ( todoItem, index ) => {
@@ -164,7 +160,7 @@ document.addEventListener( 'prplMaybeInjectSuggestedTaskEvent', ( event ) => {
 			) {
 				progressPlannerTodo.listItems[ index ].status = 'completed';
 				document.dispatchEvent(
-					new CustomEvent( 'progressPlannerInjectTodoItem', {
+					new CustomEvent( 'prpl/todo/injectItem', {
 						detail: {
 							item: todoItem,
 							addToStart: false,
@@ -172,9 +168,7 @@ document.addEventListener( 'prplMaybeInjectSuggestedTaskEvent', ( event ) => {
 						},
 					} )
 				);
-				document.dispatchEvent(
-					new CustomEvent( 'prplResizeAllGridItemsEvent' )
-				);
+				document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 			}
 		} );
 	}, 2010 );
@@ -183,7 +177,5 @@ document.addEventListener( 'prplMaybeInjectSuggestedTaskEvent', ( event ) => {
 document
 	.getElementById( 'todo-list-completed-details' )
 	.addEventListener( 'toggle', () => {
-		document.dispatchEvent(
-			new CustomEvent( 'prplResizeAllGridItemsEvent' )
-		);
+		document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	} );

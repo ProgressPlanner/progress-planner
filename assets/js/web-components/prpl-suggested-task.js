@@ -330,7 +330,7 @@ customElements.define(
 								// Trigger a custom event.
 								document.dispatchEvent(
 									new CustomEvent(
-										'prplMoveSuggestedTaskEvent',
+										'prpl/suggestedTask/move',
 										{
 											detail: { node: thisObj },
 										}
@@ -451,7 +451,7 @@ customElements.define(
 						el.setAttribute( 'data-task-action', 'celebrate' );
 
 						document.dispatchEvent(
-							new CustomEvent( 'prplUpdateRaviGaugeEvent', {
+							new CustomEvent( 'prpl/updateRaviGauge', {
 								detail: {
 									pointsDiff: parseInt(
 										this.querySelector( 'li' ).getAttribute(
@@ -464,7 +464,7 @@ customElements.define(
 
 						// Trigger the celebration event.
 						document.dispatchEvent(
-							new CustomEvent( 'prplCelebrateTasks', {
+							new CustomEvent( 'prpl/celebrateTasks', {
 								detail: {
 									element: el,
 								},
@@ -476,13 +476,13 @@ customElements.define(
 					case 'delete':
 						el.remove();
 						document.dispatchEvent(
-							new CustomEvent( 'prplResizeAllGridItemsEvent' )
+							new CustomEvent( 'prpl/grid/resize' )
 						);
 						break;
 				}
 
 				document.dispatchEvent(
-					new CustomEvent( 'prplMaybeInjectSuggestedTaskEvent', {
+					new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
 						detail: {
 							task_id,
 							providerID,
