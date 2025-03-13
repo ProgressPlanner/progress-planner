@@ -57,9 +57,7 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	 * @return string
 	 */
 	public function get_provider_type() {
-		error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			'Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks::get_provider_type() is deprecated. Use get_provider_category() instead.'
-		);
+		_deprecated_function( 'Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks::get_provider_type()', '1.1.1', 'get_provider_category' );
 		return $this->get_provider_category();
 	}
 
