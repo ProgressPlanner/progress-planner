@@ -52,6 +52,16 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	}
 
 	/**
+	 * Alias for get_provider_category(), to provide backwards compatibility.
+	 *
+	 * @return string
+	 */
+	public function get_provider_type() {
+		_deprecated_function( 'Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks::get_provider_type()', '1.1.1', 'get_provider_category' );
+		return $this->get_provider_category();
+	}
+
+	/**
 	 * Get the provider category.
 	 *
 	 * @return string
