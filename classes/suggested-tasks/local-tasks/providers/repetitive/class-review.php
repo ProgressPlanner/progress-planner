@@ -58,8 +58,7 @@ class Review extends Repetitive {
 	protected $task_post_mappings = null;
 
 	/**
-	 * Constructor.
-	 * Initialize the task.
+	 * Initialize the task provider.
 	 *
 	 * @return void
 	 */
