@@ -12,24 +12,24 @@ async function globalSetup() {
         console.log('JS Error:', err.message);
     });
 
-    // Go to WordPress dashboard
-    const baseURL = process.env.WORDPRESS_URL || 'http://localhost:8080';
-    console.log('Navigating to WordPress dashboard...');
-    await page.goto(`${baseURL}/wp-login.php`);
 
-    // Log in
-    console.log('Logging in...');
-    await page.fill('#user_login', process.env.WORDPRESS_ADMIN_USER || 'admin');
-    await page.fill('#user_pass', process.env.WORDPRESS_ADMIN_PASSWORD || 'password');
-    await page.click('#wp-submit');
-
-    // Wait for login to complete and verify we're on the dashboard
-    await page.waitForURL(`${baseURL}/wp-admin/`);
-    await page.waitForSelector('#wpadminbar');
-    console.log('Login successful');
-
-    // Complete onboarding process
     try {
+		 // Go to WordPress dashboard
+		const baseURL = process.env.WORDPRESS_URL || 'http://localhost:8080';
+		console.log('Navigating to WordPress dashboard...');
+		await page.goto(`${baseURL}/wp-login.php`);
+
+		// Log in
+		console.log('Logging in...');
+		await page.fill('#user_login', process.env.WORDPRESS_ADMIN_USER || 'admin');
+		await page.fill('#user_pass', process.env.WORDPRESS_ADMIN_PASSWORD || 'password');
+		await page.click('#wp-submit');
+
+		// Wait for login to complete and verify we're on the dashboard
+		await page.waitForURL(`${baseURL}/wp-admin/`);
+		await page.waitForSelector('#wpadminbar');
+		console.log('Login successful');
+
         // Go to Progress Planner page
         console.log('Navigating to Progress Planner...');
         await page.goto(`${baseURL}/wp-admin/admin.php?page=progress-planner`);
@@ -90,7 +90,7 @@ async function globalSetup() {
             console.error('\n❌ Failed to verify task loading:', error.message);
             console.error('Current page URL:', page.url());
             // console.error('Current page content:', await page.content());
-            await page.screenshot({ path: 'onboarding-verification-failed.png' });
+            await page.screenshot({ path: 'onboarding-failed.png' });
             await browser.close();
             process.exit(1);
         }
