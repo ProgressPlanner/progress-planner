@@ -183,7 +183,7 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_pending_tasks_with_details() {
-		$tasks = $this->get_tasks();
+		$tasks              = $this->get_tasks();
 		$tasks_with_details = [];
 
 		foreach ( $tasks as $key => $task ) {
