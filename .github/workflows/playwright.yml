@@ -45,7 +45,7 @@ jobs:
         ports:
           - 8080:80
         options: >-
-          --health-cmd="curl --silent --fail http://localhost:8080/wp-login.php || exit 0" # For some reason we can't use constant WP_BASE_URL here.
+          --health-cmd="curl --silent --fail http://localhost:8080/wp-login.php || exit 0"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
