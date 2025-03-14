@@ -70,12 +70,15 @@ jobs:
           -d "admin_password=$WP_ADMIN_PASSWORD" \
           -d "admin_password2=$WP_ADMIN_PASSWORD" \
           -d "admin_email=$WP_ADMIN_EMAIL" \
-          -d "public=1"
+          -d "public=1"r
 
       - name: Install and activate plugin
         run: |
+          # Create the plugins directory in the WordPress container
+          docker exec $(docker ps -qf "name=wordpress") mkdir -p /var/www/html/wp-content/plugins
+
           # Copy plugin files to WordPress plugins directory
-          sudo cp -r . /var/www/html/wp-content/plugins/progress-planner
+          docker cp . $(docker ps -qf "name=wordpress"):/var/www/html/wp-content/plugins/progress-planner
 
           # Activate the plugin using WP-CLI
           docker exec $(docker ps -qf "name=wordpress") wp plugin activate progress-planner --allow-root
