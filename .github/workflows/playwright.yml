@@ -7,7 +7,7 @@ on:
   pull_request:
 
 jobs:
-  progress-planner-tests:
+  e2e-tests:
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -34,7 +34,7 @@ jobs:
         ports:
           - 8080:80
         options: >-
-          --health-cmd="curl --silent --fail http://localhost:80/wp-admin/install.php || exit 0"
+          --health-cmd="curl --silent --fail http://localhost:8080/wp-login.php || exit 0"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -49,6 +49,11 @@ jobs:
           node-version: 18
       - run: npm install -D @playwright/test
       - run: npx playwright install --with-deps
+
+      - name: Wait for WordPress to be ready
+        run: |
+          echo "Waiting for WordPress to be ready..."
+          sleep 30  # Adjust if necessary based on the container startup time
 
       - name: Run Playwright Tests
         run: npx playwright test tests/e2e/
