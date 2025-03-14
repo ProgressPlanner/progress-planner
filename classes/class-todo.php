@@ -20,6 +20,8 @@ class Todo {
 	public function __construct() {
 		\add_action( 'wp_ajax_progress_planner_save_user_suggested_task', [ $this, 'save_user_suggested_task' ] );
 		\add_action( 'wp_ajax_progress_planner_save_suggested_user_tasks_order', [ $this, 'save_suggested_user_tasks_order' ] );
+
+		$this->maybe_change_points_of_first_item();
 	}
 
 	/**
@@ -133,6 +135,68 @@ class Todo {
 			}
 		}
 
+		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+	}
+
+	/**
+	 * Maybe change the points of the first item in the todo list.
+	 *
+	 * @return void
+	 */
+	public function maybe_change_points_of_first_item() {
+		$items = $this->get_items();
+
+		// Bail if there are no items.
+		if ( ! count( $items ) ) {
+			return;
+		}
+
+		// Get the task IDs from the todos.
+		$task_ids = array_column( $items, 'task_id' );
+
+		// Get the completed activities that are in the todos.
+		$activities = array_filter(
+			\progress_planner()->get_query()->query_activities(
+				[
+					'start_date' => new \DateTime( 'monday this week' ),
+					'end_date'   => new \DateTime( 'sunday this week' ),
+					'category'   => 'suggested_task',
+					'type'       => 'completed',
+				]
+			),
+			function ( $activity ) use ( $task_ids ) {
+				return in_array( $activity->data_id, $task_ids, true );
+			}
+		);
+
+		// Bail if there are no completed todos this week.
+		if ( ! count( $activities ) ) {
+			return;
+		}
+
+		// Check if there is an item with a points value other than 0.
+		foreach ( $items as $item ) {
+			// Skip completed items.
+			if ( 'completed' === $item['status'] ) {
+				continue;
+			}
+
+			// Bail if the item has a points value other than 0.
+			if ( isset( $item['points'] ) && $item['points'] !== 0 ) {
+				return;
+			}
+		}
+
+		// Change the points of the first item to 1.
+		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		foreach ( $local_tasks as $key => $task ) {
+			if ( $task['task_id'] === $items[0]['task_id'] ) {
+				$local_tasks[ $key ]['points'] = 1;
+				break;
+			}
+		}
+
+		// Save the local tasks.
 		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
 	}
 }
