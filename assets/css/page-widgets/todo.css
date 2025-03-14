@@ -276,3 +276,20 @@
 		display: none;
 	}
 }
+
+#todo-list {
+
+	&:not(:has(li[data-task-points="1"])) {
+
+		> *:first-child {
+
+			.prpl-suggested-task {
+				background-color: var(--prpl-background-purple);
+
+				h3 {
+					color: var(--prpl-color-accent-purple);
+				}
+			}
+		}
+	}
+}
