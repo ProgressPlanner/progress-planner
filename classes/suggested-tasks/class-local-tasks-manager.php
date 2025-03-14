@@ -78,6 +78,8 @@ class Local_Tasks_Manager {
 					)
 				);
 				unset( $this->task_providers[ $key ] );
+
+				continue;
 			}
 
 			// Initialize the task provider (add hooks, etc.).
