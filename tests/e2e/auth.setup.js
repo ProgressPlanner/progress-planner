@@ -98,7 +98,7 @@ async function globalSetup() {
         console.error('\n❌ Onboarding completion failed:', error.message);
         console.error('Current page URL:', page.url());
         // console.error('Current page content:', await page.content());
-        // await page.screenshot({ path: 'onboarding-failed.png' });
+        await page.screenshot({ path: 'onboarding-failed.png' });
         await browser.close();
         process.exit(1);
     }
