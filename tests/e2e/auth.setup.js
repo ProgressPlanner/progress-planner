@@ -15,7 +15,7 @@ async function globalSetup() {
     // Go to WordPress dashboard
     const baseURL = process.env.WORDPRESS_URL || 'http://localhost:8080';
     console.log('Navigating to WordPress dashboard...');
-    await page.goto(`${baseURL}/wp-admin/`);
+    await page.goto(`${baseURL}/wp-login.php`);
 
     // Log in
     console.log('Logging in...');

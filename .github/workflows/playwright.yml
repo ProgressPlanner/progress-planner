@@ -51,10 +51,10 @@ jobs:
       - run: npm install -D @playwright/test
       - run: npx playwright install --with-deps
 
-      - name: Wait for WordPress to be ready
-        run: |
-          echo "Waiting for WordPress to be ready..."
-          sleep 30  # Adjust if necessary based on the container startup time
+      # - name: Wait for WordPress to be ready
+      #   run: |
+      #     echo "Waiting for WordPress to be ready..."
+      #     sleep 30  # Adjust if necessary based on the container startup time
 
       - name: Run Playwright Tests
         run: npx playwright test tests/e2e/
