@@ -13,14 +13,14 @@ async function globalSetup() {
     });
 
     // Go to WordPress dashboard
-    const baseURL = process.env.WP_URL || 'http://localhost:8888';
+    const baseURL = process.env.WORDPRESS_URL || 'http://localhost:8080';
     console.log('Navigating to WordPress dashboard...');
     await page.goto(`${baseURL}/wp-admin/`);
 
     // Log in
     console.log('Logging in...');
-    await page.fill('#user_login', process.env.WP_USER || 'admin');
-    await page.fill('#user_pass', process.env.WP_PASS || 'password');
+    await page.fill('#user_login', process.env.WORDPRESS_ADMIN_USER || 'admin');
+    await page.fill('#user_pass', process.env.WORDPRESS_ADMIN_PASSWORD || 'password');
     await page.click('#wp-submit');
 
     // Wait for login to complete and verify we're on the dashboard
