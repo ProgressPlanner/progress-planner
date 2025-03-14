@@ -154,7 +154,6 @@ class Review extends Repetitive {
 	public function get_tasks_to_inject() {
 
 		if (
-			true === $this->is_task_snoozed() ||
 			! $this->should_add_task() // No need to add the task.
 		) {
 			return [];
