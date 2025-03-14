@@ -141,8 +141,14 @@ document.addEventListener( 'prpl/suggestedTask/move', () => {
 	const todoItems = document.querySelectorAll(
 		'#todo-list .prpl-suggested-task'
 	);
+	let order = 0;
 	todoItems.forEach( ( todoItem ) => {
 		todoItemsIDs.push( todoItem.getAttribute( 'data-task-id' ) );
+		todoItem.setAttribute( 'data-task-order', order );
+		progressPlannerTodo.listItems.find(
+			( item ) => item.task_id === todoItem.getAttribute( 'data-task-id' )
+		).order = order;
+		order++;
 	} );
 	wp.ajax.post( 'progress_planner_save_suggested_user_tasks_order', {
 		tasks: todoItemsIDs.toString(),
