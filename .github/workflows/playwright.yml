@@ -1,5 +1,14 @@
 name: Progress Planner Playwright Tests
 
+env:
+  WP_BASE_URL: http://localhost:8080
+  WP_ADMIN_USER: admin
+  WP_ADMIN_PASSWORD: password
+  WP_ADMIN_EMAIL: admin@example.com
+  WP_DB_USER: wpuser
+  WP_DB_PASSWORD: wppass
+  WP_DB_NAME: wordpress
+
 on:
   push:
     branches:
@@ -9,33 +18,34 @@ on:
 jobs:
   e2e-tests:
     runs-on: ubuntu-latest
+
     services:
       mysql:
         image: mariadb:10.6
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: wordpress
-          MYSQL_USER: wpuser
-          MYSQL_PASSWORD: wppass
+          MYSQL_DATABASE: ${{ env.WP_DB_NAME }}
+          MYSQL_USER: ${{ env.WP_DB_USER }}
+          MYSQL_PASSWORD: ${{ env.WP_DB_PASSWORD }}
         ports:
           - 3306:3306
       wordpress:
         image: wordpress:latest
         env:
           WORDPRESS_DB_HOST: mysql
-          WORDPRESS_DB_USER: wpuser
-          WORDPRESS_DB_PASSWORD: wppass
-          WORDPRESS_DB_NAME: wordpress
+          WORDPRESS_DB_USER: ${{ env.WP_DB_USER }}
+          WORDPRESS_DB_PASSWORD: ${{ env.WP_DB_PASSWORD }}
+          WORDPRESS_DB_NAME: ${{ env.WP_DB_NAME }}
           WORDPRESS_TABLE_PREFIX: wp_
           WORDPRESS_DEBUG: 1
-          WORDPRESS_URL: http://localhost:8080
-          WORDPRESS_ADMIN_USER: admin
-          WORDPRESS_ADMIN_PASSWORD: password
-          WORDPRESS_ADMIN_EMAIL: admin@example.com
+          WORDPRESS_URL: ${{ env.WP_BASE_URL }}
+          WORDPRESS_ADMIN_USER: ${{ env.WP_ADMIN_USER }}
+          WORDPRESS_ADMIN_PASSWORD: ${{ env.WP_ADMIN_PASSWORD }}
+          WORDPRESS_ADMIN_EMAIL: ${{ env.WP_ADMIN_EMAIL }}
         ports:
           - 8080:80
         options: >-
-          --health-cmd="curl --silent --fail ${WORDPRESS_URL}/wp-login.php || exit 0"
+          --health-cmd="curl --silent --fail http://localhost:8080/wp-login.php || exit 0"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -51,16 +61,15 @@ jobs:
       - run: npm install -D @playwright/test
       - run: npx playwright install --with-deps
 
-       # Run WordPress installation if needed
       - name: Complete WordPress installation
         run: |
-          echo "${WORDPRESS_URL}"
-          curl --silent -X POST "${WORDPRESS_URL}/wp-admin/install.php?step=2" \
+          echo "Installing WordPress at: $WP_URL"
+          curl --silent -X POST "$WP_BASE_URL/wp-admin/install.php?step=2" \
           -d "weblog_title=My%20WordPress%20Site" \
-          -d "user_name=${WORDPRESS_ADMIN_USER}" \
-          -d "admin_password=${WORDPRESS_ADMIN_PASSWORD}" \
-          -d "admin_password2=${WORDPRESS_ADMIN_PASSWORD}" \
-          -d "admin_email=${WORDPRESS_ADMIN_EMAIL}" \
+          -d "user_name=$WP_ADMIN_USER" \
+          -d "admin_password=$WP_ADMIN_PASSWORD" \
+          -d "admin_password2=$WP_ADMIN_PASSWORD" \
+          -d "admin_email=$WP_ADMIN_EMAIL" \
           -d "public=1"
 
       # - name: Wait for WordPress to be ready
@@ -70,10 +79,6 @@ jobs:
 
       - name: Run Playwright Tests
         run: npx playwright test tests/e2e/
-        env:
-          WP_ADMIN_USER: admin
-          WP_ADMIN_PASSWORD: password
-          WP_BASE_URL: http://localhost:8080
 
       - name: Upload Playwright Report
         if: always()
