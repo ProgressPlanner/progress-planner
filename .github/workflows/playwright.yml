@@ -54,13 +54,13 @@ jobs:
        # Run WordPress installation if needed
       - name: Complete WordPress installation
         run: |
-          echo "${{env.WORDPRESS_URL}}"
-          curl --silent -X POST "${{env.WORDPRESS_URL}}/wp-admin/install.php?step=2" \
+          echo "${WORDPRESS_URL}"
+          curl --silent -X POST "${WORDPRESS_URL}/wp-admin/install.php?step=2" \
           -d "weblog_title=My%20WordPress%20Site" \
-          -d "user_name=${{env.WORDPRESS_ADMIN_USER}}" \
-          -d "admin_password=${{env.WORDPRESS_ADMIN_PASSWORD}}" \
-          -d "admin_password2=${{env.WORDPRESS_ADMIN_PASSWORD}}" \
-          -d "admin_email=${{env.WORDPRESS_ADMIN_EMAIL}}" \
+          -d "user_name=${WORDPRESS_ADMIN_USER}" \
+          -d "admin_password=${WORDPRESS_ADMIN_PASSWORD}" \
+          -d "admin_password2=${WORDPRESS_ADMIN_PASSWORD}" \
+          -d "admin_email=${WORDPRESS_ADMIN_EMAIL}" \
           -d "public=1"
 
       # - name: Wait for WordPress to be ready
