@@ -1,0 +1,65 @@
+name: Progress Planner Playwright Tests
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  progress-planner-tests:
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mariadb:10.6
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress
+          MYSQL_USER: wpuser
+          MYSQL_PASSWORD: wppass
+        ports:
+          - 3306:3306
+      wordpress:
+        image: wordpress:latest
+        env:
+          WORDPRESS_DB_HOST: mysql
+          WORDPRESS_DB_USER: wpuser
+          WORDPRESS_DB_PASSWORD: wppass
+          WORDPRESS_DB_NAME: wordpress
+          WORDPRESS_TABLE_PREFIX: wp_
+          WORDPRESS_DEBUG: 1
+          WORDPRESS_ADMIN_USER: admin
+          WORDPRESS_ADMIN_PASSWORD: password
+          WORDPRESS_ADMIN_EMAIL: admin@example.com
+        ports:
+          - 8080:80
+        options: >-
+          --health-cmd="curl --silent --fail http://localhost:80/wp-admin/install.php || exit 0"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install Node.js & Playwright
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+      - run: npm install -D @playwright/test
+      - run: npx playwright install --with-deps
+
+      - name: Run Playwright Tests
+        run: npx playwright test tests/e2e/
+        env:
+          WP_ADMIN_USER: admin
+          WP_ADMIN_PASSWORD: password
+          WP_BASE_URL: http://localhost:8080
+
+      - name: Upload Playwright Report
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: playwright-report
+          path: playwright-report/
