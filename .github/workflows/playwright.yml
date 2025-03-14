@@ -74,6 +74,11 @@ jobs:
 
       - name: Install and activate plugin
         run: |
+          # Install WP-CLI
+          docker exec $(docker ps -qf "name=wordpress") curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          docker exec $(docker ps -qf "name=wordpress") chmod +x wp-cli.phar
+          docker exec $(docker ps -qf "name=wordpress") mv wp-cli.phar /usr/local/bin/wp
+
           # Create the plugins directory in the WordPress container
           docker exec $(docker ps -qf "name=wordpress") mkdir -p /var/www/html/wp-content/plugins
 
