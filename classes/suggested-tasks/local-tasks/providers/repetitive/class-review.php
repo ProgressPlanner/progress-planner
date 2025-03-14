@@ -297,9 +297,8 @@ class Review extends Repetitive {
 
 		if ( \is_array( $snoozed ) && ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
-				$data = $this->get_data_from_task_id( $task['task_id'] );
-				if ( isset( $data['provider_id'] ) && 'review-post' === $data['provider_id'] ) {
-					$this->snoozed_post_ids[] = $data['post_id'];
+				if ( isset( $task['provider_id'] ) && 'review-post' === $task['provider_id'] ) {
+					$this->snoozed_post_ids[] = $task['post_id'];
 				}
 			}
 		}
