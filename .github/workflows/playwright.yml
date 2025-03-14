@@ -72,6 +72,14 @@ jobs:
           -d "admin_email=$WP_ADMIN_EMAIL" \
           -d "public=1"
 
+      - name: Install and activate plugin
+        run: |
+          # Copy plugin files to WordPress plugins directory
+          sudo cp -r . /var/www/html/wp-content/plugins/progress-planner
+
+          # Activate the plugin using WP-CLI
+          docker exec $(docker ps -qf "name=wordpress") wp plugin activate progress-planner --allow-root
+
       # - name: Wait for WordPress to be ready
       #   run: |
       #     echo "Waiting for WordPress to be ready..."
