@@ -45,12 +45,6 @@ class Update_111 {
 		// Convert local tasks.
 		$this->convert_local_tasks();
 
-		// Migrate the 'create-post' tasks, they are now repetitive tasks.
-		$this->migrate_create_post_tasks();
-
-		// Migrate the 'review-post' tasks, they are now repetitive tasks.
-		$this->migrate_review_post_tasks();
-
 		if ( $this->local_tasks_changed ) {
 			\progress_planner()->get_settings()->set( 'local_tasks', $this->local_tasks );
 		}
@@ -58,10 +52,19 @@ class Update_111 {
 		// Migrate activities.
 		$this->migrate_activities();
 
-		// Migrate the 'create-post' activities.
-		$this->migrate_create_post_activities();
+		// Now migrate 'create-post' and 'review-post' tasks.
+		$this->local_tasks_changed = false;
 
-		// Migrate the 'update-post' activities.
+		$this->migrate_create_post_tasks();
+		$this->migrate_review_post_tasks();
+
+		// Save the local tasks if they have been changed.
+		if ( $this->local_tasks_changed ) {
+			\progress_planner()->get_settings()->set( 'local_tasks', $this->local_tasks );
+		}
+
+		// Migrate the 'create-post' activities and 'review-post' activities.
+		$this->migrate_create_post_activities();
 		$this->migrate_review_post_activities();
 	}
 
