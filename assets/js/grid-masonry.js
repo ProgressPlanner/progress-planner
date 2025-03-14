@@ -9,56 +9,66 @@
  */
 
 /**
- * Resize all grid items.
+ * Trigger a resize event on the grid.
  */
-const prplResizeAllGridItems = () => {
-	document.querySelectorAll( '.prpl-widget-wrapper' ).forEach( ( item ) => {
-		if ( ! item || item.classList.contains( 'in-popover' ) ) {
-			return;
-		}
-		const innerContainer = item.querySelector( '.widget-inner-container' );
-		if ( ! innerContainer ) {
-			return;
-		}
-		const rowSpan = Math.ceil(
-			( innerContainer.getBoundingClientRect().height +
-				parseInt(
-					window
-						.getComputedStyle( item )
-						.getPropertyValue( 'padding-top' )
-				) +
-				parseInt(
-					window
-						.getComputedStyle( item )
-						.getPropertyValue( 'padding-bottom' )
-				) ) /
-				parseInt(
-					window
-						.getComputedStyle(
-							document.querySelector( '.prpl-widgets-container' )
-						)
-						.getPropertyValue( 'grid-auto-rows' )
-				)
+const prplTriggerGridResize = () => {
+	setTimeout( () => {
+		window.dispatchEvent(
+			new CustomEvent( 'prplResizeAllGridItemsEvent' )
 		);
-		item.style.gridRowEnd = 'span ' + ( rowSpan + 1 );
 	} );
 };
 
 prplDocumentReady( () => {
-	prplResizeAllGridItems();
-	setTimeout( prplResizeAllGridItems, 1000 );
+	prplTriggerGridResize();
+	setTimeout( prplTriggerGridResize, 1000 );
 } );
 
-window.addEventListener( 'resize', prplResizeAllGridItems );
+window.addEventListener( 'resize', prplTriggerGridResize );
 
 // Fire event after all images are loaded.
-window.addEventListener( 'load', prplResizeAllGridItems );
+window.addEventListener( 'load', prplTriggerGridResize );
 
 // Listen for the event.
-document.addEventListener(
+window.addEventListener(
 	'prplResizeAllGridItemsEvent',
 	() => {
-		prplResizeAllGridItems();
+		document
+			.querySelectorAll( '.prpl-widget-wrapper' )
+			.forEach( ( item ) => {
+				if ( ! item || item.classList.contains( 'in-popover' ) ) {
+					return;
+				}
+				const innerContainer = item.querySelector(
+					'.widget-inner-container'
+				);
+				if ( ! innerContainer ) {
+					return;
+				}
+				const rowSpan = Math.ceil(
+					( innerContainer.getBoundingClientRect().height +
+						parseInt(
+							window
+								.getComputedStyle( item )
+								.getPropertyValue( 'padding-top' )
+						) +
+						parseInt(
+							window
+								.getComputedStyle( item )
+								.getPropertyValue( 'padding-bottom' )
+						) ) /
+						parseInt(
+							window
+								.getComputedStyle(
+									document.querySelector(
+										'.prpl-widgets-container'
+									)
+								)
+								.getPropertyValue( 'grid-auto-rows' )
+						)
+				);
+				item.style.gridRowEnd = 'span ' + ( rowSpan + 1 );
+			} );
 	},
 	false
 );
