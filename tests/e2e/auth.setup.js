@@ -89,7 +89,7 @@ async function globalSetup() {
         } catch (error) {
             console.error('\n❌ Failed to verify task loading:', error.message);
             console.error('Current page URL:', page.url());
-            // console.error('Current page content:', await page.content());
+            console.error('Current page content:', await page.content());
             await page.screenshot({ path: 'onboarding-failed.png' });
             await browser.close();
             process.exit(1);
@@ -97,7 +97,7 @@ async function globalSetup() {
     } catch (error) {
         console.error('\n❌ Onboarding completion failed:', error.message);
         console.error('Current page URL:', page.url());
-        // console.error('Current page content:', await page.content());
+        console.error('Current page content:', await page.content());
         await page.screenshot({ path: 'onboarding-failed.png' });
         await browser.close();
         process.exit(1);
