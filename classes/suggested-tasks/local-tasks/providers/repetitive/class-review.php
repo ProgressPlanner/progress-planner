@@ -222,6 +222,17 @@ class Review extends Repetitive {
 	}
 
 	/**
+	 * This method is added just to override the parent method.
+	 * For this task provider we can't check if it is snoozed like for other as we snooze the task for specific post.
+	 * Check for that is included in the should_add_task method.
+	 *
+	 * @return bool
+	 */
+	public function is_task_snoozed() {
+		return false;
+	}
+
+	/**
 	 * Get the old posts.
 	 *
 	 * @param array $args The args.
