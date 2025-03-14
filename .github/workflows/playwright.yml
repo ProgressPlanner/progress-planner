@@ -35,7 +35,7 @@ jobs:
         ports:
           - 8080:80
         options: >-
-          --health-cmd="curl --silent --fail http://localhost:8080/wp-login.php || exit 0"
+          --health-cmd="curl --silent --fail ${WORDPRESS_URL}/wp-login.php || exit 0"
           --health-interval=10s
           --health-timeout=5s
           --health-retries=5
@@ -54,8 +54,8 @@ jobs:
        # Run WordPress installation if needed
       - name: Complete WordPress installation
         run: |
-          if ! curl --silent --fail http://localhost:8888/wp-login.php; then
-            curl --silent --data "weblog_title=My%20WordPress%20Site&user_name=${{ secrets.WP_ADMIN_USER }}&admin_password=${{ secrets.WP_ADMIN_PASSWORD }}&admin_password2=${{ secrets.WP_ADMIN_PASSWORD }}&admin_email=${{ secrets.WP_ADMIN_EMAIL }}&submit=Install%20WordPress" http://localhost:8888/wp-admin/install.php
+          if ! curl --silent --fail ${WORDPRESS_URL}/wp-login.php; then
+            curl --silent --data "weblog_title=My%20WordPress%20Site&user_name=${{ secrets.WP_ADMIN_USER }}&admin_password=${{ secrets.WP_ADMIN_PASSWORD }}&admin_password2=${{ secrets.WP_ADMIN_PASSWORD }}&admin_email=${{ secrets.WP_ADMIN_EMAIL }}&submit=Install%20WordPress" ${WORDPRESS_URL}/wp-admin/install.php
           fi
 
       # - name: Wait for WordPress to be ready
