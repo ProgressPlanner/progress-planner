@@ -20,7 +20,6 @@ class Task_Factory {
 	 * @param string $param The parameter, 'id' or 'data'.
 	 * @param mixed  $value The task ID or task data.
 	 * @return \Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local|\Progress_Planner\Suggested_Tasks\Remote_Tasks\Remote_Task
-	 * @throws \InvalidArgumentException If the parameter or value type is invalid.
 	 */
 	public static function create_task_from( $param, $value = null ) {
 		if ( 'data' === $param && is_array( $value ) ) {
@@ -31,7 +30,7 @@ class Task_Factory {
 			return self::create_from_id( $value );
 		}
 
-		throw new \InvalidArgumentException( 'Invalid parameter or value type' );
+		return Local_Task_Factory::create_task_from( 'data', [] );
 	}
 
 	/**
@@ -39,11 +38,10 @@ class Task_Factory {
 	 *
 	 * @param array $data The task data.
 	 * @return \Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local|\Progress_Planner\Suggested_Tasks\Remote_Tasks\Remote_Task
-	 * @throws \InvalidArgumentException If the task data does not contain a task_id.
 	 */
 	private static function create_from_data( array $data ) {
 		if ( ! isset( $data['task_id'] ) ) {
-			throw new \InvalidArgumentException( 'Task data must contain task_id' );
+			return Local_Task_Factory::create_task_from( 'data', [] );
 		}
 
 		if ( 0 === strpos( $data['task_id'], 'remote-task-' ) ) {

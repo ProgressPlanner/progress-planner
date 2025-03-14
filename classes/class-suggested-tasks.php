@@ -184,11 +184,17 @@ class Suggested_Tasks {
 	 */
 	public function get_pending_tasks_with_details() {
 		$tasks = $this->get_tasks();
+		$tasks_with_details = [];
+
 		foreach ( $tasks as $key => $task ) {
-			$tasks[ $key ] = Task_Factory::create_task_from( 'id', $task['task_id'] )->get_task_details();
+			$task_details = Task_Factory::create_task_from( 'id', $task['task_id'] )->get_task_details();
+
+			if ( $task_details ) {
+				$tasks_with_details[] = $task_details;
+			}
 		}
 
-		return $tasks;
+		return $tasks_with_details;
 	}
 
 	/**
