@@ -7,8 +7,8 @@ test.describe('PRPL Task Snooze', () => {
         await page.waitForLoadState('networkidle');
 
         // Get initial tasks
-        const response = await request.get(`${process.env.WORDPRESS_URL}/wp-json/progress-planner/v1/tasks`);
-		console.log( `${process.env.WORDPRESS_URL}/wp-json/progress-planner/v1/tasks` );
+        const response = await request.get(`${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks`);
+		console.log( `${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks` );
 		console.log( response );
         const initialTasks = await response.json();
 
@@ -46,7 +46,7 @@ test.describe('PRPL Task Snooze', () => {
             await page.waitForTimeout(1000);
 
             // Verify task status via REST API
-            const updatedResponse = await request.get(`${process.env.WORDPRESS_URL}/wp-json/progress-planner/v1/tasks`);
+            const updatedResponse = await request.get(`${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks`);
             const updatedTasks = await updatedResponse.json();
             const updatedTask = updatedTasks.find(task => task.task_id === taskToSnooze.task_id);
             expect(updatedTask.status).toBe('snoozed');
