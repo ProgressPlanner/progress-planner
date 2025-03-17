@@ -47,7 +47,14 @@ class Rest_API_Tasks {
 	 *
 	 * @return \WP_REST_Response The REST response object containing the recommendations.
 	 */
-	public function get_tasks( \WP_REST_Request $request ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
+	public function get_tasks( \WP_REST_Request $request ) {
+
+		$nonce = $request->get_header( 'X-WP-Nonce' ) ?? '';
+
+		if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+			return new \WP_REST_Response( 'Invalid nonce', 403 );
+		}
+
 		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 
 		return new \WP_REST_Response( $tasks );

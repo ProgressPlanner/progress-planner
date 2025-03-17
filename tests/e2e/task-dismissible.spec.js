@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { makeAuthenticatedRequest } = require('./utils');
 
 test.describe('PRPL Dismissible Tasks', () => {
     test('Complete dismissible task if present', async ({ page, request }) => {
@@ -7,8 +8,8 @@ test.describe('PRPL Dismissible Tasks', () => {
         await page.waitForLoadState('networkidle');
 
         // Check if complete button exists
-        const completeButton = page.locator('button.prpl-suggested-task-button[data-action="complete"]');
-        const initialCount = await completeButton.count();
+        const completeButton = page.locator('button.prpl-suggested-task-button[data-action="complete"]').first();
+        const initialCount = await page.locator('button.prpl-suggested-task-button[data-action="complete"]').count();
 
         if (initialCount > 0) {
             // Get the task ID from the button
@@ -25,11 +26,11 @@ test.describe('PRPL Dismissible Tasks', () => {
             await page.waitForTimeout(3000);
 
             // Verify the task count decreased by 1
-            const finalCount = await completeButton.count();
+            const finalCount = await page.locator('button.prpl-suggested-task-button[data-action="complete"]').count();
             expect(finalCount).toBe(initialCount - 1);
 
             // Check the final task status via REST API
-            const completedResponse = await request.get('/?rest_route=/prpl-testing/v1/tasks');
+            const completedResponse = await makeAuthenticatedRequest(page, request, `${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks`);
             const completedTasks = await completedResponse.json();
 
             // Find the completed task

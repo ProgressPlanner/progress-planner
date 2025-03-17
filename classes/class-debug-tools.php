@@ -48,6 +48,8 @@ class Debug_Tools {
 
 		// Add filter to modify the maximum number of suggested tasks to display.
 		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_suggested_tasks' ] );
+
+		\add_action( 'admin_footer', [ $this, 'add_admin_footer' ] );
 	}
 
 	/**
@@ -506,5 +508,20 @@ class Debug_Tools {
 		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( \wp_unslash( $_GET['_wpnonce'] ), 'prpl_debug_tools' ) ) { //  phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			wp_die( esc_html__( 'Security check failed', 'progress-planner' ) );
 		}
+	}
+
+	/**
+	 * Add nonce to the admin footer.
+	 *
+	 * @return void
+	 */
+	public function add_admin_footer() {
+		?>
+		<script>
+		var prplDebug = {
+				nonce: '<?php echo esc_js( wp_create_nonce( 'wp_rest' ) ); ?>'
+			};
+		</script>
+		<?php
 	}
 }

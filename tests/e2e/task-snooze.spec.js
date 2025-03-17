@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { makeAuthenticatedRequest } = require('./utils');
 
 test.describe('PRPL Task Snooze', () => {
     test('Snooze a task for one week', async ({ page, request }) => {
@@ -7,7 +8,7 @@ test.describe('PRPL Task Snooze', () => {
         await page.waitForLoadState('networkidle');
 
         // Get initial tasks
-        const response = await request.get(`${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks`);
+        const response = await makeAuthenticatedRequest(page, request, `${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks`);
         const initialTasks = await response.json();
 
         // Find a task that's not completed or snoozed
@@ -44,7 +45,7 @@ test.describe('PRPL Task Snooze', () => {
             await page.waitForTimeout(1000);
 
             // Verify task status via REST API
-            const updatedResponse = await request.get(`${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks`);
+            const updatedResponse = await makeAuthenticatedRequest(page, request, `${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks`);
             const updatedTasks = await updatedResponse.json();
             const updatedTask = updatedTasks.find(task => task.task_id === taskToSnooze.task_id);
             expect(updatedTask.status).toBe('snoozed');

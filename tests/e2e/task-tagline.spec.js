@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const { makeAuthenticatedRequest } = require('./utils');
 
 test.describe('PRPL Tasks', () => {
     test('Complete blog description task', async ({ page, request }) => {
@@ -7,7 +8,7 @@ test.describe('PRPL Tasks', () => {
         await page.waitForLoadState('networkidle');
 
         // Get initial tasks
-        const response = await request.get(`${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks`);
+		const response = await makeAuthenticatedRequest(page, request, `${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks`);
         const initialTasks = await response.json();
 
         // Find the blog description task
@@ -30,7 +31,7 @@ test.describe('PRPL Tasks', () => {
         await page.waitForTimeout(1000);
 
         // Check the task status again via REST API
-        const finalResponse = await request.get(`${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks`);
+        const finalResponse = await makeAuthenticatedRequest(page, request, `${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks`);
         const finalTasks = await finalResponse.json();
 
         // Find the blog description task again
@@ -62,7 +63,7 @@ test.describe('PRPL Tasks', () => {
         await expect(taskElement).toHaveCount(0);
 
         // Check the final task status via REST API
-        const completedResponse = await request.get(`${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks`);
+        const completedResponse = await makeAuthenticatedRequest(page, request, `${process.env.WORDPRESS_URL}/?rest_route=/progress-planner/v1/tasks`);
         const completedTasks = await completedResponse.json();
 
         // Find the blog description task one last time
