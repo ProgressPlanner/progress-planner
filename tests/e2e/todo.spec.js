@@ -6,7 +6,7 @@ test.describe('PRPL Todo', () => {
 	test('Add new todo item', async ({ page }) => {
 		try {
 			// Navigate to Progress Planner dashboard
-			await page.goto(`${WORDPRESS_URL}/wp-admin/admin.php?page=progress-planner`);
+			await page.goto(`${process.env.WORDPRESS_URL}/wp-admin/admin.php?page=progress-planner`);
 			await page.waitForLoadState('networkidle');
 
 			// Fill in the new todo input
