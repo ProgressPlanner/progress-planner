@@ -8,7 +8,8 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks;
-
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local;
 /**
  * Add tasks for content updates.
  */
@@ -167,7 +168,7 @@ abstract class One_Time extends Local_Tasks {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return bool|string
+	 * @return bool|Task_Local
 	 */
 	public function evaluate_task( $task_id ) {
 
@@ -176,7 +177,7 @@ abstract class One_Time extends Local_Tasks {
 			return false;
 		}
 
-		return $this->is_task_completed() ? $task_id : false;
+		return $this->is_task_completed() ? ( new Local_Task_Factory( $task_id ) )->get_task() : false;
 	}
 
 	/**

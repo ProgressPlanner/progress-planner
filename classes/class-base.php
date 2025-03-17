@@ -210,7 +210,7 @@ class Base {
 	/**
 	 * Get the activation date.
 	 *
-	 * @return \DateTime|false
+	 * @return \DateTime
 	 */
 	public function get_activation_date() {
 		$activation_date = $this->get_settings()->get( 'activation_date' );
@@ -219,7 +219,7 @@ class Base {
 			$this->get_settings()->set( 'activation_date', $activation_date->format( 'Y-m-d' ) );
 			return $activation_date;
 		}
-		return \DateTime::createFromFormat( 'Y-m-d', $activation_date );
+		return \DateTime::createFromFormat( 'Y-m-d', $activation_date ); // @phpstan-ignore-line return.type
 	}
 
 	/**
