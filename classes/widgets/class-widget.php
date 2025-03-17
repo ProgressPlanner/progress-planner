@@ -18,7 +18,6 @@ abstract class Widget {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->register_scripts();
 	}
 
 	/**
@@ -69,6 +68,7 @@ abstract class Widget {
 	 * @return void
 	 */
 	public function render() {
+		\progress_planner()->get_admin__scripts()->register_scripts();
 		$this->enqueue_styles();
 		$this->enqueue_scripts();
 		?>
@@ -98,25 +98,6 @@ abstract class Widget {
 	}
 
 	/**
-	 * Register scripts.
-	 *
-	 * @return void
-	 */
-	public function register_scripts() {
-		if ( ! file_exists( PROGRESS_PLANNER_DIR . '/assets/js/widgets/' . $this->id . '.js' ) ) {
-			return;
-		}
-
-		\wp_register_script(
-			'progress-planner-' . $this->id,
-			PROGRESS_PLANNER_URL . '/assets/js/widgets/' . $this->id . '.js',
-			[],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/' . $this->id . '.js' ),
-			true
-		);
-	}
-
-	/**
 	 * Enqueue scripts.
 	 *
 	 * @return void
@@ -126,7 +107,20 @@ abstract class Widget {
 			return;
 		}
 
-		\wp_enqueue_script( 'progress-planner-' . $this->id );
+		\wp_enqueue_script( 'progress-planner-widget-' . $this->id );
+		$localized_data = $this->get_localized_data();
+		if ( ! empty( $localized_data ) &&
+			isset( $localized_data['handle'] ) &&
+			isset( $localized_data['data'] ) &&
+			is_string( $localized_data['handle'] ) &&
+			is_array( $localized_data['data'] )
+		) {
+			\wp_localize_script(
+				'progress-planner-widget-' . $this->id,
+				$localized_data['handle'],
+				$localized_data['data']
+			);
+		}
 	}
 
 	/**
@@ -135,6 +129,16 @@ abstract class Widget {
 	 * @return array
 	 */
 	public function get_stylesheet_dependencies() {
+		return [];
+	}
+
+	/**
+	 * Get the localized data.
+	 *
+	 * @return array<string, array|string>
+	 */
+	public function get_localized_data() {
+		// Return an array with the `handle` and the `data`.
 		return [];
 	}
 }

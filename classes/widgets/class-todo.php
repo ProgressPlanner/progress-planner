@@ -54,50 +54,19 @@ final class ToDo extends Widget {
 	}
 
 	/**
-	 * Register scripts.
+	 * Get the localized data for the script.
 	 *
-	 * @return void
+	 * @return array<string, array|string>
 	 */
-	public function register_scripts() {
-		$handle = 'progress-planner-' . $this->id;
-
-		\wp_register_script(
-			$handle,
-			PROGRESS_PLANNER_URL . '/assets/js/widgets/todo.js',
-			[
-				'wp-util',
-				'wp-a11y',
-				'progress-planner-ajax-request',
-				'progress-planner-grid-masonry',
-				'progress-planner-web-components-prpl-suggested-task',
-				'progress-planner-document-ready',
-			],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/todo.js' ),
-			true
-		);
-	}
-
-	/**
-	 * Enqueue scripts.
-	 *
-	 * @return void
-	 */
-	public function enqueue_scripts() {
-		$handle = 'progress-planner-' . $this->id;
-
-		// Enqueue the script.
-		\wp_enqueue_script( $handle );
-
-		// Localize the script.
-		\wp_localize_script(
-			$handle,
-			'progressPlannerTodo',
-			[
+	public function get_localized_data() {
+		return [
+			'handle' => 'progressPlannerTodo',
+			'data'   => [
 				'ajaxUrl' => \admin_url( 'admin-ajax.php' ),
 				'nonce'   => \wp_create_nonce( 'progress_planner' ),
 				'tasks'   => \progress_planner()->get_todo()->get_items(),
-			]
-		);
+			],
+		];
 	}
 
 	/**

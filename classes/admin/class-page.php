@@ -115,6 +115,7 @@ class Page {
 		if ( 'toplevel_page_progress-planner' !== $hook && 'progress-planner_page_progress-planner-settings' !== $hook ) {
 			return;
 		}
+		\progress_planner()->get_admin__scripts()->register_scripts();
 
 		$this->enqueue_scripts();
 		$this->enqueue_styles();
@@ -130,8 +131,6 @@ class Page {
 		if ( ! $current_screen ) {
 			return;
 		}
-
-		\progress_planner()->get_admin__scripts()->register_scripts();
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
 

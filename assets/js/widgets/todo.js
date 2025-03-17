@@ -4,7 +4,7 @@
  *
  * A widget that displays a todo list.
  *
- * Dependencies: progress-planner-web-components-prpl-suggested-task, progress-planner-widgets-suggested-tasks
+ * Dependencies: progress-planner-web-components-prpl-suggested-task, wp-util, wp-a11y, progress-planner-ajax-request, progress-planner-grid-masonry, progress-planner-document-ready
  */
 
 /**

@@ -47,36 +47,11 @@ final class Suggested_Tasks extends Widget {
 	}
 
 	/**
-	 * Register scripts.
+	 * Get the localized data for the script.
 	 *
-	 * @return void
+	 * @return array<string, array|string>
 	 */
-	public function register_scripts() {
-		\wp_register_script(
-			'progress-planner-' . $this->id,
-			PROGRESS_PLANNER_URL . '/assets/js/widgets/suggested-tasks.js',
-			[
-				'progress-planner-grid-masonry',
-				'progress-planner-web-components-prpl-suggested-task',
-				'progress-planner-document-ready',
-				'particles-confetti',
-			],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/suggested-tasks.js' ),
-			true
-		);
-	}
-
-	/**
-	 * Enqueue scripts.
-	 *
-	 * @return void
-	 */
-	public function enqueue_scripts() {
-		$handle = 'progress-planner-' . $this->id;
-
-		// Enqueue the script.
-		\wp_enqueue_script( $handle );
-
+	public function get_localized_data() {
 		// If there are newly added task providers, delay the celebration in order not to get confetti behind the popover.
 		$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
 
@@ -194,12 +169,10 @@ final class Suggested_Tasks extends Widget {
 			$localize_data[ $context . 'IconUrl' ] = $url;
 		}
 
-		// Localize the script.
-		\wp_localize_script(
-			$handle,
-			'prplSuggestedTasks',
-			$localize_data
-		);
+		return [
+			'handle' => 'prplSuggestedTasks',
+			'data'   => $localize_data,
+		];
 	}
 
 	/**
