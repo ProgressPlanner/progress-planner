@@ -30,7 +30,7 @@ jobs:
           MYSQL_USER: ${{ env.WORDPRESS_DB_USER }}
           MYSQL_PASSWORD: ${{ env.WORDPRESS_DB_PASSWORD }}
         ports:
-          - 3307:3306
+          - 3307:3306 # GitHub Actions doesn't support environment variables in the ports section.
       wordpress:
         image: wordpress:latest
         env:
