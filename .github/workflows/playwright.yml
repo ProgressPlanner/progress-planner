@@ -67,10 +67,10 @@ jobs:
           echo "Installing WordPress at: $WORDPRESS_URL"
           curl --silent -X POST "$WORDPRESS_URL/wp-admin/install.php?step=2" \
           -d "weblog_title=My%20WordPress%20Site" \
-          -d "user_name=$WP_ADMIN_USER" \
-          -d "admin_password=$WP_ADMIN_PASSWORD" \
-          -d "admin_password2=$WP_ADMIN_PASSWORD" \
-          -d "admin_email=$WP_ADMIN_EMAIL" \
+          -d "user_name=$WORDPRESS_ADMIN_USER" \
+          -d "admin_password=$WORDPRESS_ADMIN_PASSWORD" \
+          -d "admin_password2=$WORDPRESS_ADMIN_PASSWORD" \
+          -d "admin_email=$WORDPRESS_ADMIN_EMAIL" \
           -d "public=1"r
 
       # - name: Install necessary dependencies in WordPress container
