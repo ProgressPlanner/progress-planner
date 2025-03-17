@@ -89,46 +89,53 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 
 	// Remove celebrated tasks and add them to the completed tasks.
 	setTimeout( () => {
-		document
-			.querySelectorAll( '.prpl-suggested-task-celebrated' )
-			.forEach( ( item ) => {
-				const task_id = item.getAttribute( 'data-task-id' );
-				const providerID = item.getAttribute( 'data-task-provider-id' );
-				const el = document.querySelector(
-					`.prpl-suggested-task[data-task-id="${ task_id }"]`
-				);
-
-				if ( el ) {
-					el.parentElement.remove();
-				}
-
-				// Get the task index.
-				let taskIndex = false;
-				window.prplSuggestedTasks.tasks.forEach(
-					( taskItem, index ) => {
-						if ( taskItem.task_id === task_id ) {
-							taskIndex = index;
-						}
-					}
-				);
-
-				// Mark the task as completed.
-				if ( false !== taskIndex ) {
-					window.prplSuggestedTasks.tasks[ taskIndex ].status =
-						'completed';
-				}
-
-				// Refresh the list.
-				document.dispatchEvent(
-					new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
-						detail: {
-							task_id,
-							providerID,
-						},
-					} )
-				);
-			} );
+		document.dispatchEvent(
+			new CustomEvent( 'prpl/markTasksAsCompleted' )
+		);
 	}, 2000 );
+} );
+
+/**
+ * Mark tasks as completed.
+ */
+document.addEventListener( 'prpl/markTasksAsCompleted', () => {
+	document
+		.querySelectorAll( '.prpl-suggested-task-celebrated' )
+		.forEach( ( item ) => {
+			const task_id = item.getAttribute( 'data-task-id' );
+			const providerID = item.getAttribute( 'data-task-provider-id' );
+			const el = document.querySelector(
+				`.prpl-suggested-task[data-task-id="${ task_id }"]`
+			);
+
+			if ( el ) {
+				el.parentElement.remove();
+			}
+
+			// Get the task index.
+			let taskIndex = false;
+			window.prplSuggestedTasks.tasks.forEach( ( taskItem, index ) => {
+				if ( taskItem.task_id === task_id ) {
+					taskIndex = index;
+				}
+			} );
+
+			// Mark the task as completed.
+			if ( false !== taskIndex ) {
+				window.prplSuggestedTasks.tasks[ taskIndex ].status =
+					'completed';
+			}
+
+			// Refresh the list.
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
+					detail: {
+						task_id,
+						providerID,
+					},
+				} )
+			);
+		} );
 } );
 
 /**

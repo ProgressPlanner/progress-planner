@@ -494,19 +494,24 @@ customElements.define(
 							} )
 						);
 
-						// Trigger the celebration event.
-						document.dispatchEvent(
-							new CustomEvent(
-								0 < taskPoints
-									? 'prpl/celebrateTasks'
-									: 'prpl/strikeCelebratedTasks',
-								{
+						const celebrateEvents =
+							0 < taskPoints
+								? [ 'prpl/celebrateTasks' ]
+								: [
+										'prpl/strikeCelebratedTasks',
+										'prpl/markTasksAsCompleted',
+								  ];
+
+						// Trigger the celebration events.
+						celebrateEvents.forEach( ( event ) => {
+							document.dispatchEvent(
+								new CustomEvent( event, {
 									detail: {
 										element: el,
 									},
-								}
-							)
-						);
+								} )
+							);
+						} );
 
 						break;
 
