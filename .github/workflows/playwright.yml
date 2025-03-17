@@ -5,9 +5,11 @@ env:
   WORDPRESS_ADMIN_USER: admin
   WORDPRESS_ADMIN_PASSWORD: password
   WORDPRESS_ADMIN_EMAIL: admin@example.com
+  WORDPRESS_TABLE_PREFIX: wp_
   WORDPRESS_DB_USER: wpuser
   WORDPRESS_DB_PASSWORD: wppass
   WORDPRESS_DB_NAME: wordpress
+  WORDPRESS_DB_PORT: 3307 # So it can run locally (hopefully).
 
 on:
   push:
@@ -36,8 +38,8 @@ jobs:
           WORDPRESS_DB_USER: ${{ env.WORDPRESS_DB_USER }}
           WORDPRESS_DB_PASSWORD: ${{ env.WORDPRESS_DB_PASSWORD }}
           WORDPRESS_DB_NAME: ${{ env.WORDPRESS_DB_NAME }}
-          WORDPRESS_DB_PORT: 3307
-          WORDPRESS_TABLE_PREFIX: wp_
+          WORDPRESS_DB_PORT: ${{ env.WORDPRESS_DB_PORT }}
+          WORDPRESS_TABLE_PREFIX: ${{ env.WORDPRESS_TABLE_PREFIX }}
           WORDPRESS_DEBUG: 1
           WORDPRESS_URL: ${{ env.WORDPRESS_URL }}
           WORDPRESS_ADMIN_USER: ${{ env.WORDPRESS_ADMIN_USER }}
