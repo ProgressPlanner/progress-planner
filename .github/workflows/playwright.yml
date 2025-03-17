@@ -64,8 +64,8 @@ jobs:
 
       - name: Complete WordPress installation
         run: |
-          echo "Installing WordPress at: $WP_URL"
-          curl --silent -X POST "$WP_BASE_URL/wp-admin/install.php?step=2" \
+          echo "Installing WordPress at: $WORDPRESS_URL"
+          curl --silent -X POST "$WORDPRESS_URL/wp-admin/install.php?step=2" \
           -d "weblog_title=My%20WordPress%20Site" \
           -d "user_name=$WP_ADMIN_USER" \
           -d "admin_password=$WP_ADMIN_PASSWORD" \
