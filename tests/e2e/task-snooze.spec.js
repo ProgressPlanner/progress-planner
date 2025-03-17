@@ -3,11 +3,12 @@ const { test, expect } = require('@playwright/test');
 test.describe('PRPL Task Snooze', () => {
     test('Snooze a task for one week', async ({ page, request }) => {
         // Navigate to Progress Planner dashboard with show all tasks parameter
-        await page.goto('/wp-admin/admin.php?page=progress-planner&prpl_show_all_suggested_tasks=99');
+        await page.goto(`${process.env.WORDPRESS_URL}/wp-admin/admin.php?page=progress-planner&prpl_show_all_suggested_tasks=99`);
         await page.waitForLoadState('networkidle');
 
         // Get initial tasks
-        const response = await request.get('/wp-json/progress-planner/v1/tasks');
+        const response = await request.get(`${process.env.WORDPRESS_URL}/wp-json/progress-planner/v1/tasks`);
+		console.log(response);
         const initialTasks = await response.json();
 
         // Find a task that's not completed or snoozed
@@ -44,7 +45,7 @@ test.describe('PRPL Task Snooze', () => {
             await page.waitForTimeout(1000);
 
             // Verify task status via REST API
-            const updatedResponse = await request.get('/wp-json/progress-planner/v1/tasks');
+            const updatedResponse = await request.get(`${process.env.WORDPRESS_URL}/wp-json/progress-planner/v1/tasks`);
             const updatedTasks = await updatedResponse.json();
             const updatedTask = updatedTasks.find(task => task.task_id === taskToSnooze.task_id);
             expect(updatedTask.status).toBe('snoozed');

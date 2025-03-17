@@ -3,11 +3,11 @@ const { test, expect } = require('@playwright/test');
 test.describe('PRPL Tasks', () => {
     test('Complete blog description task', async ({ page, request }) => {
         // First, navigate to Progress Planner dashboard (to init everything)
-        await page.goto('/wp-admin/admin.php?page=progress-planner');
+        await page.goto(`${process.env.WORDPRESS_URL}/wp-admin/admin.php?page=progress-planner`);
         await page.waitForLoadState('networkidle');
 
         // Get initial tasks
-        const response = await request.get('/wp-json/progress-planner/v1/tasks');
+        const response = await request.get(`${process.env.WORDPRESS_URL}/wp-json/progress-planner/v1/tasks`);
         const initialTasks = await response.json();
 
         // Find the blog description task
@@ -15,8 +15,8 @@ test.describe('PRPL Tasks', () => {
         expect(blogDescriptionTask).toBeDefined();
         expect(blogDescriptionTask.status).toBe('pending');
 
-                // Navigate to WordPress settings
-        await page.goto('/wp-admin/options-general.php');
+        // Navigate to WordPress settings
+        await page.goto(`${process.env.WORDPRESS_URL}/wp-admin/options-general.php`);
         await page.waitForLoadState('networkidle');
 
         // Fill in the tagline
@@ -30,7 +30,7 @@ test.describe('PRPL Tasks', () => {
         await page.waitForTimeout(1000);
 
         // Check the task status again via REST API
-        const finalResponse = await request.get('/wp-json/progress-planner/v1/tasks');
+        const finalResponse = await request.get(`${process.env.WORDPRESS_URL}/wp-json/progress-planner/v1/tasks`);
         const finalTasks = await finalResponse.json();
 
         // Find the blog description task again
@@ -39,7 +39,7 @@ test.describe('PRPL Tasks', () => {
         expect(updatedTask.status).toBe('pending_celebration');
 
         // Go to Progress Planner dashboard
-        await page.goto('/wp-admin/admin.php?page=progress-planner');
+        await page.goto(`${process.env.WORDPRESS_URL}/wp-admin/admin.php?page=progress-planner`);
         await page.waitForLoadState('networkidle');
 
         // Wait for the widget container to be visible first
@@ -62,7 +62,7 @@ test.describe('PRPL Tasks', () => {
         await expect(taskElement).toHaveCount(0);
 
         // Check the final task status via REST API
-        const completedResponse = await request.get('/wp-json/progress-planner/v1/tasks');
+        const completedResponse = await request.get(`${process.env.WORDPRESS_URL}/wp-json/progress-planner/v1/tasks`);
         const completedTasks = await completedResponse.json();
 
         // Find the blog description task one last time
