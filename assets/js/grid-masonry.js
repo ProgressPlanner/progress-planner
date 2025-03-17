@@ -13,9 +13,7 @@
  */
 const prplTriggerGridResize = () => {
 	setTimeout( () => {
-		window.dispatchEvent(
-			new CustomEvent( 'prplResizeAllGridItemsEvent' )
-		);
+		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	} );
 };
 
