@@ -1,9 +1,5 @@
 import { test, expect } from '@playwright/test';
 
-const WP_ADMIN_USER = process.env.WP_ADMIN_USER || 'admin';
-const WP_ADMIN_PASSWORD = process.env.WP_ADMIN_PASSWORD || 'password';
-const WP_BASE_URL = process.env.WP_BASE_URL || 'http://localhost:8080';
-
 test('Login and open Progress Planner in WordPress Admin', async ({ page }) => {
   // Navigate to WP Login Page
   await page.goto(`${WP_BASE_URL}/wp-login.php`);
