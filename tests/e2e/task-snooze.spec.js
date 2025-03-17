@@ -8,7 +8,8 @@ test.describe('PRPL Task Snooze', () => {
 
         // Get initial tasks
         const response = await request.get(`${process.env.WORDPRESS_URL}/wp-json/progress-planner/v1/tasks`);
-		console.log(response);
+		console.log( `${process.env.WORDPRESS_URL}/wp-json/progress-planner/v1/tasks` );
+		console.log( response );
         const initialTasks = await response.json();
 
         // Find a task that's not completed or snoozed
