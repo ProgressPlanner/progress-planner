@@ -230,4 +230,23 @@ final class Suggested_Tasks extends Widget {
 
 		return $badge_urls;
 	}
+
+	/**
+	 * Get the stylesheet dependencies.
+	 *
+	 * @return array
+	 */
+	public function get_stylesheet_dependencies() {
+		// Register styles for the web-component.
+		\wp_register_style(
+			'progress-planner-web-components-prpl-suggested-task',
+			PROGRESS_PLANNER_URL . '/assets/css/web-components/prpl-suggested-task.css',
+			[],
+			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/web-components/prpl-suggested-task.css' )
+		);
+
+		return [
+			'progress-planner-web-components-prpl-suggested-task',
+		];
+	}
 }

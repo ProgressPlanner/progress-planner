@@ -91,7 +91,7 @@ abstract class Widget {
 			\wp_enqueue_style(
 				'prpl-widget-' . $this->id,
 				PROGRESS_PLANNER_URL . $stylesheet,
-				[],
+				$this->get_stylesheet_dependencies(),
 				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . $stylesheet )
 			);
 		}
@@ -127,5 +127,14 @@ abstract class Widget {
 		}
 
 		\wp_enqueue_script( 'progress-planner-' . $this->id );
+	}
+
+	/**
+	 * Get the stylesheet dependencies.
+	 *
+	 * @return array
+	 */
+	public function get_stylesheet_dependencies() {
+		return [];
 	}
 }
