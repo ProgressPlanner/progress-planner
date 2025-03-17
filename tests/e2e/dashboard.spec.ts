@@ -2,22 +2,22 @@ import { test, expect } from '@playwright/test';
 
 test('Login and open Progress Planner in WordPress Admin', async ({ page }) => {
   // Navigate to WP Login Page
-  await page.goto(`${WP_BASE_URL}/wp-login.php`);
+  await page.goto(`${WORDPRESS_URL}/wp-login.php`);
 
   // Fill in login form
-  await page.fill('#user_login', WP_ADMIN_USER);
-  await page.fill('#user_pass', WP_ADMIN_PASSWORD);
+  await page.fill('#user_login', WORDPRESS_ADMIN_USER);
+  await page.fill('#user_pass', WORDPRESS_ADMIN_PASSWORD);
   await page.click('#wp-submit');
 
   // Check if Dashboard loaded
-  await expect(page).toHaveURL(`${WP_BASE_URL}/wp-admin/`);
+  await expect(page).toHaveURL(`${WORDPRESS_URL}/wp-admin/`);
   await expect(page.locator('#wpbody-content')).toBeVisible();
 
   // Navigate to Progress Planner Page
-  await page.goto(`${WP_BASE_URL}/wp-admin/admin.php?page=progress-planner`);
+  await page.goto(`${WORDPRESS_URL}/wp-admin/admin.php?page=progress-planner`);
 
   // Ensure the Progress Planner Page loads
-  await expect(page).toHaveURL(`${WP_BASE_URL}/wp-admin/admin.php?page=progress-planner`);
+  await expect(page).toHaveURL(`${WORDPRESS_URL}/wp-admin/admin.php?page=progress-planner`);
   await expect(page.locator('#wpbody-content')).toBeVisible();
 
   // Ensure there are no JS errors
