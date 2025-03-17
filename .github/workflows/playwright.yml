@@ -1,13 +1,13 @@
 name: Progress Planner Playwright Tests
 
 env:
-  WP_BASE_URL: http://localhost:8080
-  WP_ADMIN_USER: admin
-  WP_ADMIN_PASSWORD: password
-  WP_ADMIN_EMAIL: admin@example.com
-  WP_DB_USER: wpuser
-  WP_DB_PASSWORD: wppass
-  WP_DB_NAME: wordpress
+  WORDPRESS_URL: http://localhost:8080
+  WORDPRESS_ADMIN_USER: admin
+  WORDPRESS_ADMIN_PASSWORD: password
+  WORDPRESS_ADMIN_EMAIL: admin@example.com
+  WORDPRESS_DB_USER: wpuser
+  WORDPRESS_DB_PASSWORD: wppass
+  WORDPRESS_DB_NAME: wordpress
 
 on:
   push:
@@ -24,24 +24,25 @@ jobs:
         image: mariadb:10.6
         env:
           MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: ${{ env.WP_DB_NAME }}
-          MYSQL_USER: ${{ env.WP_DB_USER }}
-          MYSQL_PASSWORD: ${{ env.WP_DB_PASSWORD }}
+          MYSQL_DATABASE: ${{ env.WORDPRESS_DB_NAME }}
+          MYSQL_USER: ${{ env.WORDPRESS_DB_USER }}
+          MYSQL_PASSWORD: ${{ env.WORDPRESS_DB_PASSWORD }}
         ports:
-          - 3306:3306
+          - 3307:3306
       wordpress:
         image: wordpress:latest
         env:
           WORDPRESS_DB_HOST: mysql
-          WORDPRESS_DB_USER: ${{ env.WP_DB_USER }}
-          WORDPRESS_DB_PASSWORD: ${{ env.WP_DB_PASSWORD }}
-          WORDPRESS_DB_NAME: ${{ env.WP_DB_NAME }}
+          WORDPRESS_DB_USER: ${{ env.WORDPRESS_DB_USER }}
+          WORDPRESS_DB_PASSWORD: ${{ env.WORDPRESS_DB_PASSWORD }}
+          WORDPRESS_DB_NAME: ${{ env.WORDPRESS_DB_NAME }}
+          WORDPRESS_DB_PORT: 3307
           WORDPRESS_TABLE_PREFIX: wp_
           WORDPRESS_DEBUG: 1
-          WORDPRESS_URL: ${{ env.WP_BASE_URL }}
-          WORDPRESS_ADMIN_USER: ${{ env.WP_ADMIN_USER }}
-          WORDPRESS_ADMIN_PASSWORD: ${{ env.WP_ADMIN_PASSWORD }}
-          WORDPRESS_ADMIN_EMAIL: ${{ env.WP_ADMIN_EMAIL }}
+          WORDPRESS_URL: ${{ env.WORDPRESS_URL }}
+          WORDPRESS_ADMIN_USER: ${{ env.WORDPRESS_ADMIN_USER }}
+          WORDPRESS_ADMIN_PASSWORD: ${{ env.WORDPRESS_ADMIN_PASSWORD }}
+          WORDPRESS_ADMIN_EMAIL: ${{ env.WORDPRESS_ADMIN_EMAIL }}
         ports:
           - 8080:80
         options: >-
@@ -71,6 +72,13 @@ jobs:
           -d "admin_password2=$WP_ADMIN_PASSWORD" \
           -d "admin_email=$WP_ADMIN_EMAIL" \
           -d "public=1"r
+
+      # - name: Install necessary dependencies in WordPress container
+      #   run: |
+      #     docker exec $(docker ps -qf "name=wordpress") apt-get update
+      #     docker exec $(docker ps -qf "name=wordpress") apt-get install -y \
+      #       php php-cli php-mysql php-curl php-xml php-mbstring php-zip curl \
+      #       libnss3 libxss1 libasound2 libatk-bridge2.0-0 libgtk-3-0 libgbm-dev libwoff1
 
       - name: Install and activate plugin
         run: |

@@ -10,7 +10,7 @@ module.exports = defineConfig({
   reporter: 'html',
   globalSetup: require.resolve('./tests/e2e/auth.setup.js'),
   use: {
-    baseURL: process.env.WP_URL || 'http://localhost:8888',
+    baseURL: process.env.WORDPRESS_URL || 'http://localhost:8080',
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',
     storageState: 'auth.json',
