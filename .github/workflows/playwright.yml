@@ -98,6 +98,10 @@ jobs:
           # Activate the plugin using WP-CLI
           docker exec $(docker ps -qf "name=wordpress") wp plugin activate progress-planner --allow-root
 
+          # Enable Debug Tools
+          docker exec $(docker ps -qf "name=wordpress") wp option update prpl_debug_tools true
+          docker exec $(docker ps -qf "name=wordpress") wp option update prpl_debug_tools true
+
       # - name: Wait for WordPress to be ready
       #   run: |
       #     echo "Waiting for WordPress to be ready..."
