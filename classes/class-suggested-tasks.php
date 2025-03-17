@@ -575,6 +575,11 @@ class Suggested_Tasks {
 				$updated = true;
 				break;
 
+			case 'pending':
+				$this->mark_task_as( 'pending', $task_id );
+				$updated = true;
+				break;
+
 			case 'snooze':
 				$duration = isset( $_POST['duration'] ) ? \sanitize_text_field( \wp_unslash( $_POST['duration'] ) ) : '';
 				$updated  = $this->snooze_task( $task_id, $duration );

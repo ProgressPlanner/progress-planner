@@ -164,6 +164,10 @@
 
 		}
 
+		input[type="checkbox"].disabled {
+			opacity: 0.5;
+		}
+
 		&.prpl-suggested-task-celebrated h3 span {
 			background-size: 100% 1px;
 			color: inherit;

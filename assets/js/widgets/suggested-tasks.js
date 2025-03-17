@@ -73,7 +73,10 @@ document.addEventListener(
  */
 document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 	const Item = customElements.get( 'prpl-suggested-task' );
-	const item = new Item( event.detail );
+	const item = new Item( {
+		...event.detail,
+		taskList: 'prplSuggestedTasks',
+	} );
 
 	/**
 	 * @todo Implement the parent task functionality.
@@ -300,7 +303,7 @@ prplDocumentReady( () => {
 			);
 		} );
 
-	document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+	window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 
 	// Initialize the badge scroller.
 	document
@@ -558,7 +561,7 @@ document.addEventListener(
 			);
 		}
 
-		document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	},
 	false
 );
