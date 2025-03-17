@@ -12,7 +12,6 @@ async function globalSetup() {
         console.log('JS Error:', err.message);
     });
 
-
     try {
 		 // Go to WordPress dashboard
 		const baseURL = process.env.WORDPRESS_URL || 'http://localhost:8080';
