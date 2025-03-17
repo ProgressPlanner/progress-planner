@@ -17,7 +17,7 @@ $prpl_redirect_on_login = \get_user_meta( \get_current_user_id(), 'prpl_redirect
 	<div class="prpl-widget-wrapper">
 		<h2 class="prpl-settings-section-title">
 			<span class="icon">
-				<?php \progress_planner()->the_asset( 'images/icon_settings.svg' ); ?>
+				<?php \progress_planner()->the_asset( 'images/icon_forward.svg' ); ?>
 			</span>
 			<span>
 				<?php \esc_html_e( 'Default login destination', 'progress-planner' ); ?>
