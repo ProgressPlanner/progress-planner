@@ -29,6 +29,10 @@ class Page {
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		\add_action( 'wp_ajax_progress_planner_save_cpt_settings', [ $this, 'save_cpt_settings' ] );
 		\add_action( 'in_admin_header', [ $this, 'remove_admin_notices' ], PHP_INT_MAX );
+
+		// Clear the cache for the activity scores widget.
+		\add_action( 'progress_planner_activity_saved', [ $this, 'clear_activity_scores_cache' ] );
+		\add_action( 'progress_planner_activity_deleted', [ $this, 'clear_activity_scores_cache' ] );
 	}
 
 	/**
@@ -310,5 +314,21 @@ class Page {
 		}
 
 		\remove_all_actions( 'admin_notices' );
+	}
+
+	/**
+	 * Clear the cache.
+	 *
+	 * @param \Progress_Planner\Activity $activity The activity.
+	 *
+	 * @return void
+	 */
+	public function clear_activity_scores_cache( $activity ) {
+		if ( 'content' !== $activity->category ) {
+			return;
+		}
+
+		// Clear the cache for the activity scores widget.
+		\progress_planner()->get_settings()->set( \progress_planner()->get_widgets__activity_scores()->get_cache_key(), [] );
 	}
 }
