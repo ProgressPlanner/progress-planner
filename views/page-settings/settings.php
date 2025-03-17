@@ -20,7 +20,7 @@ $prpl_redirect_on_login = \get_user_meta( \get_current_user_id(), 'prpl_redirect
 				<?php \progress_planner()->the_asset( 'images/icon_settings.svg' ); ?>
 			</span>
 			<span>
-				<?php \esc_html_e( 'Settings', 'progress-planner' ); ?>
+				<?php \esc_html_e( 'Default login destination', 'progress-planner' ); ?>
 			</span>
 		</h2>
 		<div class="prpl-settings-wrapper">
@@ -31,7 +31,7 @@ $prpl_redirect_on_login = \get_user_meta( \get_current_user_id(), 'prpl_redirect
 					type="checkbox"
 					<?php checked( $prpl_redirect_on_login ); ?>
 				/>
-				<span><?php \esc_html_e( 'Redirect me to the Progress Planner stats page after login.', 'progress-planner' ); ?></span>
+				<span><?php \esc_html_e( 'Show the Progress Planner dashboard after login.', 'progress-planner' ); ?></span>
 			</label>
 		</div>
 	</div>
