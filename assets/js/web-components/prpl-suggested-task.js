@@ -434,6 +434,9 @@ customElements.define(
 			const providerID = this.querySelector( 'li' ).getAttribute(
 				'data-task-provider-id'
 			);
+			const taskPoints = parseInt(
+				this.querySelector( 'li' ).getAttribute( 'data-task-points' )
+			);
 			const taskList =
 				this.querySelector( 'li' ).getAttribute( 'data-task-list' );
 
@@ -493,11 +496,16 @@ customElements.define(
 
 						// Trigger the celebration event.
 						document.dispatchEvent(
-							new CustomEvent( 'prpl/celebrateTasks', {
-								detail: {
-									element: el,
-								},
-							} )
+							new CustomEvent(
+								0 < taskPoints
+									? 'prpl/celebrateTasks'
+									: 'prpl/strikeCelebratedTasks',
+								{
+									detail: {
+										element: el,
+									},
+								}
+							)
 						);
 
 						break;

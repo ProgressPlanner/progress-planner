@@ -4,7 +4,7 @@
  *
  * A widget that displays a todo list.
  *
- * Dependencies: progress-planner-web-components-prpl-suggested-task, wp-util, wp-a11y, progress-planner-ajax-request, progress-planner-grid-masonry, progress-planner-document-ready
+ * Dependencies: progress-planner-web-components-prpl-suggested-task, wp-util, wp-a11y, progress-planner-ajax-request, progress-planner-grid-masonry, progress-planner-document-ready, progress-planner-celebrate
  */
 
 /**
@@ -202,7 +202,7 @@ document.addEventListener( 'prpl/suggestedTask/maybeInjectItem', ( event ) => {
 				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 			}
 		} );
-	}, 2010 );
+	}, 10 );
 } );
 
 document

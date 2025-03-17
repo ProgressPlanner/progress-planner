@@ -85,13 +85,7 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 	/**
 	 * Strike completed tasks.
 	 */
-	document
-		.querySelectorAll(
-			'.prpl-suggested-task[data-task-action="celebrate"]'
-		)
-		.forEach( ( item ) => {
-			item.classList.add( 'prpl-suggested-task-celebrated' );
-		} );
+	document.dispatchEvent( new CustomEvent( 'prpl/strikeCelebratedTasks' ) );
 
 	// Remove celebrated tasks and add them to the completed tasks.
 	setTimeout( () => {
@@ -135,4 +129,17 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 				);
 			} );
 	}, 2000 );
+} );
+
+/**
+ * Strike completed tasks.
+ */
+document.addEventListener( 'prpl/strikeCelebratedTasks', () => {
+	document
+		.querySelectorAll(
+			'.prpl-suggested-task[data-task-action="celebrate"]'
+		)
+		.forEach( ( item ) => {
+			item.classList.add( 'prpl-suggested-task-celebrated' );
+		} );
 } );

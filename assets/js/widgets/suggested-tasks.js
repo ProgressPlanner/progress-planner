@@ -4,7 +4,7 @@
  *
  * A widget that displays a list of suggested tasks.
  *
- * Dependencies: progress-planner-web-components-prpl-suggested-task, progress-planner-confetti, progress-planner-grid-masonry, progress-planner-web-components-prpl-suggested-task, progress-planner-document-ready
+ * Dependencies: progress-planner-web-components-prpl-suggested-task, progress-planner-celebrate, progress-planner-grid-masonry, progress-planner-web-components-prpl-suggested-task, progress-planner-document-ready
  */
 /* eslint-disable camelcase */
 
