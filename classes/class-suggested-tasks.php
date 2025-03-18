@@ -306,7 +306,7 @@ class Suggested_Tasks {
 				continue;
 			}
 
-			if ( 'completed' === $task['task_id'] && 'pending_celebration' === $status ) {
+			if ( 'completed' === $task['status'] && 'pending_celebration' === $status ) {
 				break;
 			}
 

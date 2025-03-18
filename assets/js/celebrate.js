@@ -13,9 +13,11 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 	/**
 	 * Trigger the confetti on the container element.
 	 */
-	const containerElement = event.detail.element.closest(
-		'.prpl-suggested-tasks-list'
-	);
+	const containerElement = event.detail?.element
+		? event.detail.element.closest( '.prpl-suggested-tasks-list' )
+		: document.querySelector(
+				'.prpl-widget-wrapper.prpl-suggested-tasks .prpl-suggested-tasks-list'
+		  ); // If element is not provided, use the default container.
 	const prplConfettiDefaults = {
 		spread: 360,
 		ticks: 50,
