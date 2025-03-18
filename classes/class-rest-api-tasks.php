@@ -34,26 +34,35 @@ class Rest_API_Tasks {
 				[
 					'methods'             => 'GET',
 					'callback'            => [ $this, 'get_tasks' ],
-					'permission_callback' => '__return_true',
+					'permission_callback' => [ $this, 'permission_callback' ],
 				],
 			]
 		);
 	}
 
 	/**
-	 * Get task recommendations.
+	 * Permission callback.
 	 *
 	 * @param \WP_REST_Request $request The REST request object.
 	 *
-	 * @return \WP_REST_Response The REST response object containing the recommendations.
+	 * @return bool
 	 */
-	public function get_tasks( \WP_REST_Request $request ) {
-
+	public function permission_callback( \WP_REST_Request $request ) {
 		$nonce = $request->get_header( 'X-WP-Nonce' ) ?? '';
 
-		if ( ! wp_verify_nonce( $nonce, 'wp_rest' ) ) {
-			return new \WP_REST_Response( 'Invalid nonce', 403 );
+		if ( ! \wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+			return false;
 		}
+
+		return true;
+	}
+
+	/**
+	 * Get task recommendations.
+	 *
+	 * @return \WP_REST_Response The REST response object containing the recommendations.
+	 */
+	public function get_tasks() {
 
 		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 

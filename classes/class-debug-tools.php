@@ -516,6 +516,9 @@ class Debug_Tools {
 	 * @return void
 	 */
 	public function add_admin_footer() {
+		if ( ! isset( $_GET['page'] ) || 'progress-planner' !== $_GET['page'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
 		?>
 		<script>
 		var prplDebug = {
