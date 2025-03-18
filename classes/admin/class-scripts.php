@@ -30,7 +30,6 @@ class Scripts {
 		// Register web components.
 		foreach ( $this->get_files_in_directory( 'assets/js/web-components' ) as $file ) {
 			$handle = 'progress-planner-web-components-' . $file;
-			error_log( print_r( [ $handle, $this->get_dependencies( 'web-components/' . $file ) ], true ) );
 
 			\wp_register_script(
 				$handle,
@@ -45,7 +44,7 @@ class Scripts {
 		// Register main scripts.
 		foreach ( $this->get_files_in_directory( 'assets/js' ) as $file ) {
 			$handle = 'progress-planner-' . $file;
-			error_log( print_r( [ $handle, $this->get_dependencies( $file ) ], true ) );
+
 			\wp_register_script(
 				$handle,
 				PROGRESS_PLANNER_URL . '/assets/js/' . $file . '.js',
@@ -59,7 +58,6 @@ class Scripts {
 		// Register widget scripts.
 		foreach ( $this->get_files_in_directory( 'assets/js/widgets' ) as $file ) {
 			$handle = 'progress-planner-widget-' . $file;
-			error_log( print_r( [ $handle, $this->get_dependencies( 'widgets/' . $file ) ], true ) );
 
 			\wp_register_script(
 				$handle,
