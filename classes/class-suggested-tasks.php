@@ -71,7 +71,7 @@ class Suggested_Tasks {
 			$this->update_pending_task( $task_data['task_id'], $task_data );
 
 			// Change the task status to pending celebration.
-			$this->mark_task_as_pending_celebration( $task_data['task_id'] );
+			$this->mark_task_as( 'pending_celebration', $task_data['task_id'] );
 
 			// Insert an activity.
 			$this->insert_activity( $task_data['task_id'] );
@@ -140,7 +140,7 @@ class Suggested_Tasks {
 				\gmdate( 'YW' ) === $task_data['date']
 			) {
 				// Change the task status to completed.
-				$this->mark_task_as_completed( $task_id );
+				$this->mark_task_as( 'completed', $task_id );
 
 				// Insert an activity.
 				$this->insert_activity( $task_id );
@@ -252,45 +252,6 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Mark a task as completed.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool
-	 */
-	public function mark_task_as_completed( $task_id ) {
-		return $this->mark_task_as( 'completed', $task_id );
-	}
-
-	/**
-	 * Mark a task as pending celebration.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool
-	 */
-	public function mark_task_as_pending_celebration( $task_id ) {
-		// Don't mark the task as pending celebration if it's already completed.
-		if ( $this->was_task_completed( $task_id ) ) {
-			return false;
-		}
-
-		return $this->mark_task_as( 'pending_celebration', $task_id );
-	}
-
-	/**
-	 * Mark a task as snoozed.
-	 *
-	 * @param string $task_id The task ID.
-	 * @param int    $time The time.
-	 *
-	 * @return bool
-	 */
-	public function mark_task_as_snoozed( $task_id, $time ) {
-		return $this->mark_task_as( 'snoozed', $task_id, [ 'time' => $time ] );
-	}
-
-	/**
 	 * Mark a task as a given status.
 	 *
 	 * @param string $status The status.
@@ -305,6 +266,10 @@ class Suggested_Tasks {
 		foreach ( $tasks as $key => $task ) {
 			if ( $task['task_id'] !== $task_id ) {
 				continue;
+			}
+
+			if ( 'completed' === $task['task_id'] && 'pending_celebration' === $status ) {
+				break;
 			}
 
 			$tasks[ $key ]['status'] = $status;
@@ -417,7 +382,7 @@ class Suggested_Tasks {
 				break;
 		}
 
-		return $this->mark_task_as_snoozed( $task_id, $time );
+		return $this->mark_task_as( 'snoozed', $task_id, [ 'time' => $time ] );
 	}
 
 	/**
