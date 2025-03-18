@@ -117,6 +117,9 @@ prplDocumentReady( () => {
 				} )
 			);
 
+			// Add the new task to the local tasks array.
+			progressPlannerTodo.tasks.push( newTask );
+
 			// Save the new task.
 			wp.ajax.post( 'progress_planner_save_user_suggested_task', {
 				task: newTask,
