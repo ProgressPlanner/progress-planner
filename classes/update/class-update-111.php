@@ -339,14 +339,14 @@ class Update_111 {
 
 		if ( ! empty( $activities ) ) {
 			foreach ( $activities as $activity ) {
-				if ( ! isset( $activity->data_id ) ) {
+				if ( ! isset( $activity->data_id ) || ! isset( $activity->date ) ) {
 					continue;
 				}
 				if ( false !== strpos( $activity->data_id, 'provider_id/review-post' ) ) {
 					$data = $this->get_data_from_task_id( $activity->data_id );
 
 					$new_data_id = $data['provider_id'] . '-' . $data['post_id'] . '-' . $activity->date->format( 'YW' );
-					if ( $new_data_id !== $activity->data_id ) {
+					if ( $new_data_id !== $activity->data_id && \is_callable( [ $activity, 'save' ] ) ) {
 						$activity->data_id = $new_data_id;
 						$activity->save();
 					}
