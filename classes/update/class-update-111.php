@@ -238,6 +238,9 @@ class Update_111 {
 		// Migrate the 'create-post' completed tasks.
 		if ( ! empty( $this->local_tasks ) ) {
 			foreach ( $this->local_tasks as $key => $task ) {
+				if ( ! isset( $task['task_id'] ) ) {
+					continue;
+				}
 				if ( false !== strpos( $task['task_id'], 'provider_id/create-post' ) ) {
 
 					// task_id needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
