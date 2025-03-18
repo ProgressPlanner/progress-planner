@@ -45,9 +45,6 @@ class Update_111 {
 		// Convert local tasks.
 		$this->convert_local_tasks();
 
-		// Migrate the 'create-post' tasks, they are now repetitive tasks.
-		$this->migrate_create_post_tasks();
-
 		if ( $this->local_tasks_changed ) {
 			\progress_planner()->get_settings()->set( 'local_tasks', $this->local_tasks );
 		}
@@ -55,8 +52,20 @@ class Update_111 {
 		// Migrate activities.
 		$this->migrate_activities();
 
-		// Migrate the 'create-post' activities.
+		// Now migrate 'create-post' and 'review-post' tasks.
+		$this->local_tasks_changed = false;
+
+		$this->migrate_create_post_tasks();
+		$this->migrate_review_post_tasks();
+
+		// Save the local tasks if they have been changed.
+		if ( $this->local_tasks_changed ) {
+			\progress_planner()->get_settings()->set( 'local_tasks', $this->local_tasks );
+		}
+
+		// Migrate the 'create-post' activities and 'review-post' activities.
 		$this->migrate_create_post_activities();
+		$this->migrate_review_post_activities();
 	}
 
 	/**
@@ -68,7 +77,7 @@ class Update_111 {
 		$local_tasks_option = \get_option( 'progress_planner_local_tasks', [] );
 		if ( ! empty( $local_tasks_option ) ) {
 			foreach ( $local_tasks_option as $task_id ) {
-				$task           = ( new Local_Task_Factory( $task_id ) )->get_task()->get_data();
+				$task           = Local_Task_Factory::create_task_from( 'id', $task_id )->get_data();
 				$task['status'] = 'pending';
 
 				if ( ! isset( $task['task_id'] ) ) {
@@ -94,7 +103,7 @@ class Update_111 {
 		foreach ( $suggested_tasks_option as $status => $tasks ) {
 			foreach ( $tasks as $_task ) {
 				$task_id        = is_string( $_task ) ? $_task : $_task['id'];
-				$task           = ( new Local_Task_Factory( $task_id ) )->get_task()->get_data();
+				$task           = Local_Task_Factory::create_task_from( 'id', $task_id )->get_data();
 				$task['status'] = $status;
 				if ( 'snoozed' === $status && isset( $_task['time'] ) ) {
 					$task['time'] = $_task['time'];
@@ -218,7 +227,7 @@ class Update_111 {
 	}
 
 	/**
-	 * Migrate the 'create-post' tasks, they are now repetitive tasks.
+	 * Migrate the 'create-post' activities, they are now repetitive tasks.
 	 * Since the activities were already migrated, we search for 'provider_id/create-post' (not 'type/create-post').
 	 *
 	 * @return void
@@ -246,6 +255,85 @@ class Update_111 {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Migrate the 'review-post' tasks, they are now repetitive tasks.
+	 * Since the tasks were already migrated, we search for 'provider_id/review-post' (not 'type/review-post').
+	 *
+	 * @return void
+	 */
+	private function migrate_review_post_tasks() {
+
+		// Migrate the 'create-post' completed tasks.
+		if ( ! empty( $this->local_tasks ) ) {
+			foreach ( $this->local_tasks as $key => $task ) {
+				if ( false !== strpos( $task['task_id'], 'provider_id/review-post' ) ) {
+
+					$data = $this->get_data_from_task_id( $task['task_id'] );
+
+					// Get the date from the activity.
+					$date                                 = $this->get_date_from_activity( $task['task_id'] );
+					$this->local_tasks[ $key ]['task_id'] = $data['provider_id'] . '-' . $data['post_id'] . '-' . $date;
+					$this->local_tasks[ $key ]['date']    = $date;
+
+					$this->local_tasks_changed = true;
+				}
+			}
+		}
+	}
+
+	/**
+	 * Migrate the 'review-post' tasks, they are now repetitive tasks.
+	 * Since the activities were already migrated, we search for 'provider_id/create-post' (not 'type/create-post').
+	 *
+	 * @return void
+	 */
+	private function migrate_review_post_activities() {
+		// Migrate the 'create-post' activities.
+		$activities = \progress_planner()->get_query()->query_activities(
+			[
+				'category' => 'suggested_task',
+				'type'     => 'completed',
+			]
+		);
+
+		if ( ! empty( $activities ) ) {
+			foreach ( $activities as $activity ) {
+				if ( false !== strpos( $activity->data_id, 'provider_id/review-post' ) ) {
+					$data = $this->get_data_from_task_id( $activity->data_id );
+
+					$new_data_id = $data['provider_id'] . '-' . $data['post_id'] . '-' . $activity->date->format( 'YW' );
+					if ( $new_data_id !== $activity->data_id ) {
+						$activity->data_id = $new_data_id;
+						$activity->save();
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Get the date from an activity.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return string
+	 */
+	private function get_date_from_activity( $task_id ) {
+		$activity = \progress_planner()->get_query()->query_activities(
+			[
+				'data_id'  => $task_id,
+				'type'     => 'completed',
+				'category' => 'suggested_task',
+			]
+		);
+
+		if ( ! empty( $activity ) ) {
+			return $activity[0]->date->format( 'YW' );
+		}
+
+		return \gmdate( 'YW' );
 	}
 
 	/**
