@@ -113,7 +113,7 @@ class Update_111 {
 				}
 
 				// Update the provider_id for update-post tasks.
-				if ( 'update-post' === $task['provider_id'] ) {
+				if ( isset( $task['provider_id'] ) && 'update-post' === $task['provider_id'] ) {
 					$task['provider_id'] = 'review-post';
 				}
 
