@@ -304,6 +304,9 @@ class Update_111 {
 		// Migrate the 'create-post' completed tasks.
 		if ( ! empty( $this->local_tasks ) ) {
 			foreach ( $this->local_tasks as $key => $task ) {
+				if ( ! isset( $task['task_id'] ) ) {
+					continue;
+				}
 				if ( false !== strpos( $task['task_id'], 'provider_id/review-post' ) ) {
 
 					$data = $this->get_data_from_task_id( $task['task_id'] );
@@ -336,6 +339,9 @@ class Update_111 {
 
 		if ( ! empty( $activities ) ) {
 			foreach ( $activities as $activity ) {
+				if ( ! isset( $activity->data_id ) ) {
+					continue;
+				}
 				if ( false !== strpos( $activity->data_id, 'provider_id/review-post' ) ) {
 					$data = $this->get_data_from_task_id( $activity->data_id );
 
