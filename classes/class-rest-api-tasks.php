@@ -56,7 +56,9 @@ class Rest_API_Tasks {
 	public function validate_token( $token ) {
 		$token = str_replace( 'token/', '', $token );
 
-		if ( $token === \get_option( 'progress_planner_test_token' ) ) {
+		echo 'token: ' . $token;
+		echo 'option: ' . \get_option( 'progress_planner_test_token', '' );
+		if ( $token === \get_option( 'progress_planner_test_token', '' ) ) {
 			return true;
 		}
 

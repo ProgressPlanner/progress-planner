@@ -46,6 +46,7 @@ jobs:
           WORDPRESS_ADMIN_USER: ${{ env.WORDPRESS_ADMIN_USER }}
           WORDPRESS_ADMIN_PASSWORD: ${{ env.WORDPRESS_ADMIN_PASSWORD }}
           WORDPRESS_ADMIN_EMAIL: ${{ env.WORDPRESS_ADMIN_EMAIL }}
+          PRPL_TEST_TOKEN: ${{ env.PRPL_TEST_TOKEN }}
         ports:
           - 8080:80
         options: >-
