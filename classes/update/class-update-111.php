@@ -133,7 +133,7 @@ class Update_111 {
 	 */
 	private function add_local_task( $task ) {
 		foreach ( $this->local_tasks as $key => $local_task ) {
-			if ( $local_task['task_id'] === $task['task_id'] ) {
+			if ( isset( $local_task['task_id'] ) && $local_task['task_id'] === $task['task_id'] ) {
 				$this->local_tasks[ $key ] = $task;
 				return;
 			}
