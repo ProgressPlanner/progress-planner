@@ -20,8 +20,6 @@
 			background-position: center left;
 			background-size: 0% 1px;
 			transition: background-size 500ms ease-in-out;
-			width: 100%;
-			display: inline-block;
 		}
 	}
 
