@@ -29,7 +29,13 @@ class Local_Task_Factory {
 
 		if ( 'id' === $param && is_string( $value ) ) {
 			// We should have all the data saved in the database.
-			$data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $value );
+			$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $value );
+
+			if ( empty( $tasks ) ) {
+				return new Task_Local( [] );
+			}
+
+			$data = $tasks[0];
 
 			// If we have the task data, return it.
 			if ( $data ) {
