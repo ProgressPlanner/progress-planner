@@ -16,7 +16,7 @@ test.describe('PRPL Todo', () => {
 			await page.keyboard.press('Enter');
 
 			// Wait for the new todo item to appear
-			const todoItem = page.locator('ul#todo-list > prpl-todo-item .content');
+			const todoItem = page.locator('ul#todo-list > prpl-suggested-task span');
 			await expect(todoItem).toBeVisible();
 
 			// Verify the content
@@ -26,17 +26,17 @@ test.describe('PRPL Todo', () => {
 			await page.reload();
 
 			// Re-query and verify the todo item after reload
-			const reloadedTodoItem = page.locator('ul#todo-list > prpl-todo-item .content');
+			const reloadedTodoItem = page.locator('ul#todo-list > prpl-suggested-task span');
 			await expect(reloadedTodoItem).toBeVisible();
 			await expect(reloadedTodoItem).toHaveText(TEST_TASK_TEXT);
 
 			// Click the trash button and wait for network idle
-			const trashButton = page.locator('ul#todo-list > prpl-todo-item .trash');
+			const trashButton = page.locator('ul#todo-list > prpl-suggested-task .trash');
 			await trashButton.click();
 			await page.waitForLoadState('networkidle');
 
 			// Wait for the item to be removed and verify
-			const todoItemsAfterDelete = page.locator('ul#todo-list > prpl-todo-item .content');
+			const todoItemsAfterDelete = page.locator('ul#todo-list > prpl-suggested-task span');
 
 			// Add a small delay to ensure the UI updates
 			await page.waitForTimeout(1000);
@@ -49,7 +49,7 @@ test.describe('PRPL Todo', () => {
 			await page.waitForLoadState('networkidle');
 
 			// Re-query and verify the todo item is still removed after reload
-			const removedTodoItem = page.locator('ul#todo-list > prpl-todo-item .content');
+			const removedTodoItem = page.locator('ul#todo-list > prpl-suggested-task span');
 			await expect(removedTodoItem).toHaveCount(0);
 		} catch (error) {
 			console.error('Error in Add new todo item test:', error);
