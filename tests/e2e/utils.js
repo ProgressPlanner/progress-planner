@@ -8,15 +8,16 @@
  */
 async function makeAuthenticatedRequest(page, request, endpoint, options = {}) {
     const cookies = await page.context().cookies();
-    const nonce = await page.evaluate(() => window.prplDebug.nonce);
 
     return request.get(endpoint, {
         ...options,
         headers: {
-            'X-WP-Nonce': nonce,
             ...options.headers
         },
-        cookies: cookies
+        cookies: cookies,
+        params: {
+            token: process.env.PRPL_TEST_TOKEN
+        }
     });
 }
 

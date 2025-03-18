@@ -10,6 +10,7 @@ env:
   WORDPRESS_DB_PASSWORD: wppass
   WORDPRESS_DB_NAME: wordpress
   WORDPRESS_DB_PORT: 3307 # So it can run locally (hopefully).
+  PRPL_TEST_TOKEN: 0220a2de67fc29094281088395939f58
 
 on:
   push:
@@ -98,8 +99,8 @@ jobs:
           # Activate the plugin using WP-CLI
           docker exec $(docker ps -qf "name=wordpress") wp plugin activate progress-planner --allow-root
 
-          # Enable Debug Tools
-          docker exec $(docker ps -qf "name=wordpress") wp option update prpl_debug true --allow-root
+          # Insert test token
+          docker exec $(docker ps -qf "name=wordpress") wp option update prpl_test_token $PRPL_TEST_TOKEN --allow-root
 
       # - name: Wait for WordPress to be ready
       #   run: |

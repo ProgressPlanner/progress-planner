@@ -34,7 +34,13 @@ class Rest_API_Tasks {
 				[
 					'methods'             => 'GET',
 					'callback'            => [ $this, 'get_tasks' ],
-					'permission_callback' => [ $this, 'permission_callback' ],
+					'permission_callback' => '__return_true',
+					'args'                => [
+						'token' => [
+							'required'          => true,
+							'validate_callback' => [ $this, 'validate_token' ],
+						],
+					],
 				],
 			]
 		);
@@ -43,18 +49,26 @@ class Rest_API_Tasks {
 	/**
 	 * Permission callback.
 	 *
-	 * @param \WP_REST_Request $request The REST request object.
+	 * @param string $token The token.
 	 *
 	 * @return bool
 	 */
-	public function permission_callback( \WP_REST_Request $request ) {
-		$nonce = $request->get_header( 'X-WP-Nonce' ) ?? '';
+	public function validate_token( $token ) {
+		$token = str_replace( 'token/', '', $token );
 
-		if ( ! \wp_verify_nonce( $nonce, 'wp_rest' ) ) {
+		if ( $token === \get_option( 'progress_planner_test_token' ) ) {
+			return true;
+		}
+
+		if ( \progress_planner()->is_pro_site() && $token === \get_option( 'progress_planner_pro_license_key' ) ) {
+			return true;
+		}
+		$license_key = \get_option( 'progress_planner_license_key', false );
+		if ( ! $license_key || 'no-license' === $license_key ) {
 			return false;
 		}
 
-		return true;
+		return $token === $license_key;
 	}
 
 	/**
