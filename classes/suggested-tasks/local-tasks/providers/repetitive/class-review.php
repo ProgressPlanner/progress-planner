@@ -192,7 +192,13 @@ class Review extends Repetitive {
 			return [];
 		}
 
-		$data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $task_id );
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
+
+		if ( empty( $tasks ) ) {
+			return [];
+		}
+
+		$data = $tasks[0];
 
 		$post         = \get_post( $data['post_id'] );
 		$task_details = [

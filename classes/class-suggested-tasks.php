@@ -240,23 +240,6 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Get tasks by task_id.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array|null
-	 */
-	public function get_task_by_task_id( $task_id ) {
-		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		foreach ( $tasks as $task ) {
-			if ( $task['task_id'] === $task_id ) {
-				return $task;
-			}
-		}
-		return null;
-	}
-
-	/**
 	 * Get remote task by id.
 	 *
 	 * @param string $task_id The task ID.
