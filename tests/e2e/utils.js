@@ -8,7 +8,7 @@
  */
 async function makeAuthenticatedRequest(page, request, endpoint, options = {}) {
     const cookies = await page.context().cookies();
-console.log ('request' + process.env.PRPL_TEST_TOKEN );
+
     return request.get(endpoint, {
         ...options,
         headers: {
