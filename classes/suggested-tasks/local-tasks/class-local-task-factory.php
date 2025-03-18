@@ -31,15 +31,9 @@ class Local_Task_Factory {
 			// We should have all the data saved in the database.
 			$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $value );
 
-			if ( empty( $tasks ) ) {
-				return new Task_Local( [] );
-			}
-
-			$data = $tasks[0];
-
 			// If we have the task data, return it.
-			if ( $data ) {
-				return new Task_Local( $data );
+			if ( isset( $tasks[0] ) ) {
+				return new Task_Local( $tasks[0] );
 			}
 
 			/*
