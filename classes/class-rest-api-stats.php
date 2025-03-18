@@ -161,7 +161,7 @@ class Rest_API_Stats {
 		$pending_todo_items = [];
 		foreach ( $todo_items as $item ) {
 			if ( ! isset( $item['status'] ) || 'completed' !== $item['status'] ) {
-				$pending_todo_items[] = $item['content'];
+				$pending_todo_items[] = $item['title'];
 			}
 		}
 		$data['todo'] = $pending_todo_items;
