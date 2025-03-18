@@ -101,7 +101,7 @@ jobs:
           docker exec $(docker ps -qf "name=wordpress") wp plugin activate progress-planner --allow-root
 
           # Insert test token
-          docker exec $(docker ps -qf "name=wordpress") wp option update prpl_test_token $PRPL_TEST_TOKEN --allow-root
+          docker exec $(docker ps -qf "name=wordpress") wp option update progress_planner_test_token $PRPL_TEST_TOKEN --allow-root
 
       # - name: Wait for WordPress to be ready
       #   run: |
