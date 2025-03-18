@@ -99,6 +99,28 @@ class Suggested_Tasks {
 	}
 
 	/**
+	 * Delete an activity.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return void
+	 */
+	public function delete_activity( $task_id ) {
+		$activity = \progress_planner()->get_query()->query_activities(
+			[
+				'data_id' => $task_id,
+				'type'    => 'completed',
+			]
+		);
+
+		if ( empty( $activity ) ) {
+			return;
+		}
+
+		\progress_planner()->get_query()->delete_activity( $activity[0] );
+	}
+
+	/**
 	 * If done via automatic updates, the "core update" task should be marked as "completed" (and skip "pending celebration" status).
 	 *
 	 * @return void
@@ -578,6 +600,7 @@ class Suggested_Tasks {
 			case 'pending':
 				$this->mark_task_as( 'pending', $task_id );
 				$updated = true;
+				$this->delete_activity( $task_id );
 				break;
 
 			case 'snooze':
