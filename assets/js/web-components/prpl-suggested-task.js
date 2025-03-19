@@ -1,4 +1,4 @@
-/* global customElements, prplSuggestedTask, HTMLElement */
+/* global customElements, prplSuggestedTask, HTMLElement, progressPlannerTodo */
 /* eslint-disable camelcase */
 
 /**
@@ -408,16 +408,37 @@ customElements.define(
 			// When an item's contenteditable element is edited,
 			// save the new content to the database
 			this.querySelector( 'h3 span' ).addEventListener( 'input', () => {
-				wp.ajax.post( 'progress_planner_save_user_suggested_task', {
-					task: {
-						task_id: item.getAttribute( 'data-task-id' ),
-						title: this.querySelector( 'h3 span' ).textContent,
-						provider_id: 'user',
-						category: 'user',
-						dismissable: true,
-					},
-					nonce: prplSuggestedTask.nonce,
-				} );
+				// Add debounce to the input event.
+				clearTimeout( this.debounceTimeout );
+				this.debounceTimeout = setTimeout( () => {
+					const title = this.querySelector( 'h3 span' ).textContent;
+					wp.ajax
+						.post( 'progress_planner_save_user_suggested_task', {
+							task: {
+								task_id: item.getAttribute( 'data-task-id' ),
+								title,
+								provider_id: 'user',
+								category: 'user',
+								dismissable: true,
+							},
+							nonce: prplSuggestedTask.nonce,
+						} )
+						.done( () => {
+							// Update the task title.
+							progressPlannerTodo.tasks.forEach(
+								( todoItem, index ) => {
+									if (
+										todoItem.task_id ===
+										item.getAttribute( 'data-task-id' )
+									) {
+										progressPlannerTodo.tasks[
+											index
+										].title = title;
+									}
+								}
+							);
+						} );
+				}, 1000 );
 			} );
 		};
 
