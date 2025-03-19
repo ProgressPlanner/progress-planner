@@ -20,6 +20,12 @@
 			background-position: center left;
 			background-size: 0% 1px;
 			transition: background-size 500ms ease-in-out;
+
+			/* Give the span a width so the user can edit the task title */
+			&:empty {
+				display: inline-block;
+				width: 100%;
+			}
 		}
 	}
 
