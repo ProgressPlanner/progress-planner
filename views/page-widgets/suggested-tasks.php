@@ -108,3 +108,4 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 	\progress_planner()->get_popover()->the_popover( 'monthly-badges' )->render();
 	?>
 </div>
+<prpl-popover-post-content post-id="3771" button-content="Read more"></prpl-popover-post-content>
