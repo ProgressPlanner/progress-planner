@@ -444,3 +444,4 @@ document.addEventListener(
 	false
 );
 
+/* eslint-enable camelcase */

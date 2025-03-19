@@ -152,3 +152,5 @@ document.addEventListener( 'prpl/strikeCelebratedTasks', () => {
 			item.classList.add( 'prpl-suggested-task-celebrated' );
 		} );
 } );
+
+/* eslint-enable camelcase */

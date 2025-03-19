@@ -564,3 +564,5 @@ customElements.define(
 		};
 	}
 );
+
+/* eslint-enable camelcase */

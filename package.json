@@ -18,7 +18,8 @@
 		"@wordpress/stylelint-config": "^22.2.0",
 		"husky": "^9.0.11",
 		"@playwright/test": "^1.42.1",
-		"dotenv": "^16.4.5"
+		"dotenv": "^16.4.5",
+		"eslint-plugin-eslint-comments": "3.1.2"
 	},
 	"scripts": {
 		"format": "wp-scripts format ./assets",
