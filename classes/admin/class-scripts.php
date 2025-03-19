@@ -29,35 +29,71 @@ class Scripts {
 			\wp_register_script( $handle, PROGRESS_PLANNER_URL . "/assets/js/vendor/{$file[0]}", [], (string) $file[1], true );
 		}
 
-		$register_scripts_in_directory = function ( $directory ) {
-			if ( 'vendor' === $directory ) {
-				return;
-			}
-			foreach ( $this->get_files_in_directory( trim( 'assets/js/' . $directory, '/' ) ) as $file ) {
-				$handle       = str_replace( '--', '-', "progress-planner-{$directory}-{$file}" );
-				$file_path    = str_replace( '//', '/', \PROGRESS_PLANNER_DIR . "/assets/js/{$directory}/{$file}.js" );
-				$file_headers = \get_file_data( $file_path, [ 'dependencies' => 'Dependencies' ] );
-				$dependencies = isset( $file_headers['dependencies'] )
-					? \array_filter( \array_map( 'trim', \explode( ',', $file_headers['dependencies'] ) ) )
-					: [];
-				\wp_register_script(
-					$handle,
-					PROGRESS_PLANNER_URL . \str_replace( '//', '/', "/assets/js/{$directory}/{$file}.js" ),
-					$dependencies,
-					\progress_planner()->get_file_version( $file_path ),
-					true
-				);
-				$this->localize_script( $handle );
-			}
-		};
+		// Register web components.
+		foreach ( $this->get_files_in_directory( 'assets/js/web-components' ) as $file ) {
+			$handle = 'progress-planner-web-components-' . $file;
 
-		// Get an array of folders in the assets/js directory.
-		$folders = \glob( PROGRESS_PLANNER_DIR . '/assets/js/*', \GLOB_ONLYDIR );
-		$folders = \array_merge( [ '' ], \array_map( 'basename', $folders ) ); // @phpstan-ignore-line array_map.nonIterable
-
-		foreach ( $folders as $folder ) {
-			$register_scripts_in_directory( $folder );
+			\wp_register_script(
+				$handle,
+				PROGRESS_PLANNER_URL . "/assets/js/web-components/{$file}.js",
+				$this->get_dependencies( 'web-components/' . $file ),
+				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/web-components/' . $file . '.js' ),
+				true
+			);
+			$this->localize_script( $handle );
 		}
+
+		// Register main scripts.
+		foreach ( $this->get_files_in_directory( 'assets/js' ) as $file ) {
+			$handle = 'progress-planner-' . $file;
+
+			\wp_register_script(
+				$handle,
+				PROGRESS_PLANNER_URL . '/assets/js/' . $file . '.js',
+				$this->get_dependencies( $file ),
+				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/' . $file . '.js' ),
+				true
+			);
+			$this->localize_script( $handle );
+		}
+
+		// Register widget scripts.
+		foreach ( $this->get_files_in_directory( 'assets/js/widgets' ) as $file ) {
+			$handle = 'progress-planner-widget-' . $file;
+
+			\wp_register_script(
+				$handle,
+				PROGRESS_PLANNER_URL . '/assets/js/widgets/' . $file . '.js',
+				$this->get_dependencies( 'widgets/' . $file ),
+				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/' . $file . '.js' ),
+				true
+			);
+			$this->localize_script( $handle );
+		}
+	}
+
+	/**
+	 * Get dependencies for a script.
+	 *
+	 * @param string $file The file name.
+	 * @return array
+	 */
+	public function get_dependencies( $file ) {
+		$path = PROGRESS_PLANNER_DIR . '/assets/js/' . $file . '.js';
+		if ( ! \file_exists( $path ) ) {
+			return [];
+		}
+		$headers = \get_file_data(
+			$path,
+			[
+				'dependencies' => 'Dependencies',
+			]
+		);
+		if ( ! isset( $headers['dependencies'] ) ) {
+			return [];
+		}
+
+		return \array_filter( \array_map( 'trim', \explode( ',', $headers['dependencies'] ) ) );
 	}
 
 	/**
@@ -178,8 +214,8 @@ class Scripts {
 				}
 				$localized_handle = 'prplCelebrate';
 				$localized_data   = [
-					'raviIconUrl'     => PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg',
-					'confettiOptions' => $confetti_options,
+					'raviIconUrl'         => PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg',
+					'confettiOptions'     => $confetti_options,
 				];
 
 				foreach ( $this->get_badge_urls() as $context => $url ) {
