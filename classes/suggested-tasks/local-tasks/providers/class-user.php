@@ -53,11 +53,15 @@ class User extends One_Time {
 		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 		foreach ( $local_tasks as $task_data ) {
 			if ( isset( $task_data['provider_id'] ) && self::PROVIDER_ID === $task_data['provider_id'] ) {
-				$tasks[] = $this->get_task_details( $task_data['task_id'] );
+				$tasks[] = [
+					'task_id'     => $task_data['task_id'],
+					'provider_id' => $this->get_provider_id(),
+					'category'    => $this->get_provider_category(),
+				];
 			}
 		}
 
-		return array_filter( $tasks );
+		return $tasks;
 	}
 
 	/**
