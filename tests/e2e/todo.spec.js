@@ -1,19 +1,21 @@
-const { test, expect } = require('@playwright/test');
+const { test, expect } = require( '@playwright/test' );
 
 const TEST_TASK_TEXT = 'My test task';
 
-test.describe('PRPL Todo', () => {
-	test('Add new todo item', async ({ page }) => {
+test.describe( 'PRPL Todo', () => {
+	test( 'Add new todo item', async ( { page } ) => {
 		try {
 			// Navigate to Progress Planner dashboard
-			await page.goto(`${process.env.WORDPRESS_URL}/wp-admin/admin.php?page=progress-planner`);
-			await page.waitForLoadState('networkidle');
+			await page.goto(
+				`${ process.env.WORDPRESS_URL }/wp-admin/admin.php?page=progress-planner`
+			);
+			await page.waitForLoadState( 'networkidle' );
 
 			// Fill in the new todo input
-			await page.fill('#new-todo-content', TEST_TASK_TEXT);
+			await page.fill( '#new-todo-content', TEST_TASK_TEXT );
 
 			// Submit the form (press Enter)
-			await page.keyboard.press('Enter');
+			await page.keyboard.press( 'Enter' );
 
 			// Add a small delay to ensure the UI updates
 			await page.waitForTimeout(500);
@@ -43,20 +45,20 @@ test.describe('PRPL Todo', () => {
 			// Click the trash button and wait for network idle
 			const trashButton = page.locator(`${taskSelector} .trash`);
 			await trashButton.click();
-			await page.waitForLoadState('networkidle');
+			await page.waitForLoadState( 'networkidle' );
 
 			// Wait for the item to be removed and verify
 			const todoItemsAfterDelete = page.locator(`${taskSelector} h3 > span`);
 
 			// Add a small delay to ensure the UI updates
-			await page.waitForTimeout(1000);
+			await page.waitForTimeout( 1000 );
 
 			// Verify the item is removed
-			await expect(todoItemsAfterDelete).toHaveCount(0);
+			await expect( todoItemsAfterDelete ).toHaveCount( 0 );
 
 			// Reload the page
 			await page.reload();
-			await page.waitForLoadState('networkidle');
+			await page.waitForLoadState( 'networkidle' );
 
 			// Re-query and verify the todo item is still removed after reload
 			const removedTodoItem = page.locator(`${taskSelector} h3 > span`);
@@ -67,5 +69,5 @@ test.describe('PRPL Todo', () => {
 			console.error('Current page content:', await page.content());
 			throw error;
 		}
-	});
-});
+	} );
+} );
