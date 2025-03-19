@@ -2,8 +2,8 @@ const { test, expect } = require( '@playwright/test' );
 
 const TEST_TASK_TEXT = 'My test task';
 
-test.describe( 'PRPL Todo', () => {
-	test( 'Add new todo item', async ( { page } ) => {
+test.describe( 'PRPL Add / Remove User Task', () => {
+	test( 'Add new user task', async ( { page } ) => {
 		try {
 			// Navigate to Progress Planner dashboard
 			await page.goto(

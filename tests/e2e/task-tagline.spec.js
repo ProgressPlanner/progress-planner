@@ -1,7 +1,7 @@
 const { test, expect } = require( '@playwright/test' );
 const { makeAuthenticatedRequest } = require( './utils' );
 
-test.describe( 'PRPL Tasks', () => {
+test.describe( 'PRPL Complete Task', () => {
 	test( 'Complete blog description task', async ( { page, request } ) => {
 		// First, navigate to Progress Planner dashboard (to init everything)
 		await page.goto(
