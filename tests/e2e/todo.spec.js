@@ -58,7 +58,7 @@ test.describe( 'PRPL Add / Remove User Task', () => {
 			);
 
 			// Add a small delay to ensure the UI updates
-			await page.waitForTimeout( 1000 );
+			await page.waitForTimeout( 500 );
 
 			// Verify the item is removed
 			await expect( todoItemsAfterDelete ).toHaveCount( 0 );
