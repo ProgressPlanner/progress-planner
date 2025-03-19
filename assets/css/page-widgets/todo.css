@@ -74,10 +74,13 @@
 \*------------------------------------*/
 #progress_planner_dashboard_widget_todo {
 
-	#todo-list,
-	#todo-list-completed {
-		margin-left: -5px;
+	.prpl-suggested-task {
+
+		h3 {
+			margin-bottom: 0;
+		}
 	}
+
 
 	#create-todo-item {
 		padding: 0 16px;
