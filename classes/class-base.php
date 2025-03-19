@@ -82,6 +82,7 @@ class Base {
 
 		// REST API.
 		$this->cached['rest_api_stats'] = new Rest_API_Stats();
+		$this->cached['rest_api_tasks'] = new Rest_API_Tasks();
 
 		// Onboarding.
 		$this->cached['onboard'] = new Onboard();

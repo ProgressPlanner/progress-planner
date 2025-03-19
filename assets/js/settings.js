@@ -73,13 +73,11 @@ if ( !! settingsLicenseForm ) {
 							}, 500 );
 						} )
 						.catch( ( error ) => {
-							// eslint-disable-next-line no-console
 							console.warn( error );
 						} );
 				}
 			} )
 			.catch( ( error ) => {
-				// eslint-disable-next-line no-console
 				console.warn( error );
 			} );
 
