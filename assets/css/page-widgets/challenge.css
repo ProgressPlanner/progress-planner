@@ -27,7 +27,11 @@
 				padding: var(--prpl-padding);
 				border-radius: var(--prpl-border-radius);
 
-				p:last-child {
+				.prpl-button-primary {
+					margin-bottom: 0;
+				}
+
+				*:last-child {
 					margin-bottom: 0;
 				}
 			}
