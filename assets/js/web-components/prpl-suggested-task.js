@@ -545,7 +545,8 @@ customElements.define(
 						break;
 
 					case 'delete':
-						el.remove();
+						// Remove the task from the todo list.
+						el.closest( 'prpl-suggested-task' ).remove();
 						document.dispatchEvent(
 							new CustomEvent( 'prpl/grid/resize' )
 						);
