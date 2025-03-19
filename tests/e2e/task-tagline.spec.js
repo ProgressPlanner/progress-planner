@@ -83,6 +83,14 @@ test.describe( 'PRPL Tasks', () => {
         // Verify that the task is removed from the DOM
         await expect(taskElement).toHaveCount(0);
 
+		// Check the final task status via REST API
+		const completedResponse = await makeAuthenticatedRequest(
+			page,
+			request,
+			`${ process.env.WORDPRESS_URL }/?rest_route=/progress-planner/v1/tasks`
+		);
+		const completedTasks = await completedResponse.json();
+
 		// Find the blog description task one last time
 		const completedTask = completedTasks.find(
 			( task ) => task.task_id === 'core-blogdescription'
