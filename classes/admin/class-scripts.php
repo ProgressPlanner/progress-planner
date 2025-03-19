@@ -214,8 +214,8 @@ class Scripts {
 				}
 				$localized_handle = 'prplCelebrate';
 				$localized_data   = [
-					'raviIconUrl'         => PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg',
-					'confettiOptions'     => $confetti_options,
+					'raviIconUrl'     => PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg',
+					'confettiOptions' => $confetti_options,
 				];
 
 				foreach ( $this->get_badge_urls() as $context => $url ) {
