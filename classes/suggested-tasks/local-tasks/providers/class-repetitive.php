@@ -18,10 +18,21 @@ abstract class Repetitive extends Local_Tasks {
 	/**
 	 * Get the task ID.
 	 *
+	 * @param array $data Optional data to include in the task ID.
 	 * @return string
 	 */
-	public function get_task_id() {
-		return $this->get_provider_id() . '-' . \gmdate( 'YW' );
+	public function get_task_id( $data = [] ) {
+		$parts = [ $this->get_provider_id() ];
+
+		// Add optional data parts if provided.
+		if ( ! empty( $data['post_id'] ) ) {
+			$parts[] = $data['post_id'];
+		}
+
+		// Always add the date as the last part.
+		$parts[] = \gmdate( 'YW' );
+
+		return implode( '-', $parts );
 	}
 
 	/**
@@ -32,18 +43,17 @@ abstract class Repetitive extends Local_Tasks {
 	 * @return bool|Task_Local The task data or false if the task is not completed.
 	 */
 	public function evaluate_task( $task_id ) {
-
 		// Early bail if the user does not have the capability to manage options.
-		if ( ! $this->capability_required() || 0 !== strpos( $task_id, $this->get_task_id() ) ) {
+		if ( ! $this->capability_required() ) {
 			return false;
 		}
 
-		$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
+		$task_object = Local_Task_Factory::create_task_from( 'id', $task_id );
 		$task_data   = $task_object->get_data();
 
-		if ( $task_data['provider_id'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['date'] && $this->is_task_completed() ) {
-			// Allow adding more data, for example in case of 'create-post' or 'review-content' tasks we are adding the post_id.
-			$task_data = $this->modify_task_data( $task_data );
+		if ( $task_data['provider_id'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['date'] && $this->is_task_completed( $task_id ) ) {
+			// Allow adding more data, for example in case of 'create-post' tasks we are adding the post_id.
+			$task_data = $this->modify_evaluated_task_data( $task_data );
 			$task_object->set_data( $task_data );
 
 			return $task_object;
@@ -63,9 +73,27 @@ abstract class Repetitive extends Local_Tasks {
 	/**
 	 * Alias for should_add_task(), for better readability when using in the evaluate_task() method.
 	 *
+	 * @param string $task_id Optional task ID to check completion for.
 	 * @return bool
 	 */
-	public function is_task_completed() {
+	public function is_task_completed( $task_id = '' ) {
+		// If no specific task ID provided, use the default behavior.
+		if ( empty( $task_id ) ) {
+			return ! $this->should_add_task();
+		}
+
+		// For specific task IDs, child classes can override this method.
+		return $this->is_specific_task_completed( $task_id );
+	}
+
+	/**
+	 * Check if a specific task is completed.
+	 * Child classes can override this method to handle specific task IDs.
+	 *
+	 * @param string $task_id The task ID to check.
+	 * @return bool
+	 */
+	protected function is_specific_task_completed( $task_id ) {
 		return ! $this->should_add_task();
 	}
 
@@ -79,14 +107,26 @@ abstract class Repetitive extends Local_Tasks {
 	}
 
 	/**
-	 * Modify task data before setting it.
+	 * Modify task data after task was evaluated.
 	 * Child classes can override this method to add extra data.
 	 *
 	 * @param array $task_data The task data.
 	 *
 	 * @return array
 	 */
-	protected function modify_task_data( $task_data ) {
+	protected function modify_evaluated_task_data( $task_data ) {
+		return $task_data;
+	}
+
+	/**
+	 * Modify task data before injecting it.
+	 * Child classes can override this method to add extra data.
+	 *
+	 * @param array $task_data The task data.
+	 *
+	 * @return array
+	 */
+	protected function modify_injection_task_data( $task_data ) {
 		return $task_data;
 	}
 
@@ -107,8 +147,17 @@ abstract class Repetitive extends Local_Tasks {
 			return [];
 		}
 
+		$task_data = [
+			'task_id'     => $task_id,
+			'provider_id' => $this->get_provider_id(),
+			'category'    => $this->get_provider_category(),
+			'date'        => \gmdate( 'YW' ),
+		];
+
+		$task_data = $this->modify_injection_task_data( $task_data );
+
 		return [
-			$this->get_task_details( $task_id ),
+			$task_data,
 		];
 	}
 }
