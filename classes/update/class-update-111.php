@@ -190,6 +190,7 @@ class Update_111 {
 	private function migrate_todo_items() {
 		$todo_items = \get_option( 'progress_planner_todo', [] );
 		if ( empty( $todo_items ) ) {
+			\delete_option( 'progress_planner_todo' );
 			return;
 		}
 		foreach ( $todo_items as $todo_item ) {
