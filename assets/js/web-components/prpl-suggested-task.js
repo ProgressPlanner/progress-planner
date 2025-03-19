@@ -1,4 +1,4 @@
-/* global customElements, prplSuggestedTask, HTMLElement, progressPlannerTodo */
+/* global customElements, prplSuggestedTask, HTMLElement */
 /* eslint-disable camelcase */
 
 /**
@@ -425,17 +425,10 @@ customElements.define(
 						} )
 						.done( () => {
 							// Update the task title.
-							progressPlannerTodo.tasks.forEach(
-								( todoItem, index ) => {
-									if (
-										todoItem.task_id ===
-										item.getAttribute( 'data-task-id' )
-									) {
-										progressPlannerTodo.tasks[
-											index
-										].title = title;
-									}
-								}
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/suggestedTask/update', {
+									detail: { node: thisObj },
+								} )
 							);
 						} );
 				}, 1000 );
