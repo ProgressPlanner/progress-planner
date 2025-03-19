@@ -73,7 +73,7 @@ final class Suggested_Tasks extends Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		$handle = 'progress-planner/' . $this->id;
+		$handle = 'progress-planner/widgets/' . $this->id;
 
 		// Enqueue the script.
 		\wp_enqueue_script( $handle );

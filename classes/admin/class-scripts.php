@@ -52,6 +52,19 @@ class Scripts {
 			);
 			$this->localize_script( $handle );
 		}
+
+		// Register widgets scripts.
+		foreach ( $this->get_files_in_directory( 'assets/js/widgets' ) as $file ) {
+			$handle = 'progress-planner/widgets/' . $file;
+			\wp_register_script(
+				$handle,
+				PROGRESS_PLANNER_URL . '/assets/js/widgets/' . $file . '.js',
+				$this->get_dependencies( 'widgets/' . $file ),
+				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/' . $file . '.js' ),
+				true
+			);
+			$this->localize_script( $handle );
+		}
 	}
 
 	/**
@@ -61,7 +74,10 @@ class Scripts {
 	 * @return array
 	 */
 	public function get_dependencies( $file ) {
-		$path    = PROGRESS_PLANNER_DIR . '/assets/js/' . $file . '.js';
+		$path = PROGRESS_PLANNER_DIR . '/assets/js/' . $file . '.js';
+		if ( ! \file_exists( $path ) ) {
+			return [];
+		}
 		$headers = \get_file_data(
 			$path,
 			[
