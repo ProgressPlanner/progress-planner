@@ -1,82 +1,94 @@
-const { test, expect } = require( '@playwright/test' );
+const { test: base, expect } = require( '@playwright/test' );
 
 const TEST_TASK_TEXT = 'Task to be completed';
 
-test.describe( 'PRPL Complete User Task', () => {
-	test( 'Mark task as completed and verify', async ( { page } ) => {
-		try {
-			// Navigate to Progress Planner dashboard
+// Create a custom fixture to share data between tests
+const test = base.extend( {
+	taskSelector: [
+		async ( { page }, use ) => {
+			// Navigate and create the task
 			await page.goto(
 				`${ process.env.WORDPRESS_URL }/wp-admin/admin.php?page=progress-planner`
 			);
 			await page.waitForLoadState( 'networkidle' );
 
-			// Create a new task
 			await page.fill( '#new-todo-content', TEST_TASK_TEXT );
 			await page.keyboard.press( 'Enter' );
 			await page.waitForTimeout( 500 );
 
-			// Get the new task
+			// Get the task selector
 			const todoItem = page.locator(
 				'ul#todo-list > prpl-suggested-task li'
 			);
 			const taskId = await todoItem.getAttribute( 'data-task-id' );
 			const taskSelector = `li[data-task-id="${ taskId }"]`;
 
-			// Verify task was created
-			await expect( todoItem.locator( 'h3 > span' ) ).toHaveText(
-				TEST_TASK_TEXT
-			);
+			// Share the selector with the test
+			await use( taskSelector );
+		},
+		{ auto: true },
+	], // auto: true means this fixture runs before each test
+} );
 
-			// Click the checkbox to complete the task
-			await todoItem.locator( '.prpl-suggested-task-checkbox' ).click();
-			await page.waitForTimeout( 500 );
+test.describe( 'PRPL Complete User Task', () => {
+	test( 'Mark as completed', async ( { page, taskSelector } ) => {
+		// Verify task was created
+		const todoItem = page.locator( `ul#todo-list ${ taskSelector }` );
+		await expect( todoItem.locator( 'h3 > span' ) ).toHaveText(
+			TEST_TASK_TEXT
+		);
 
-			// Verify task disappeared from active list
-			await expect(
-				page.locator( `ul#todo-list ${ taskSelector }` )
-			).toHaveCount( 0 );
+		// Click the checkbox to complete the task
+		await todoItem.locator( '.prpl-suggested-task-checkbox' ).click();
+		await page.waitForTimeout( 1000 );
 
-			// Open completed tasks if not already open
-			await page.locator( 'details#todo-list-completed-details' ).click();
+		// Verify task disappeared from active list
+		await expect(
+			page.locator( `ul#todo-list ${ taskSelector }` )
+		).toHaveCount( 0 );
 
-			// Verify task appears in completed list
-			const completedTask = page.locator(
-				`ul#todo-list-completed ${ taskSelector }`
-			);
-			await expect( completedTask ).toBeVisible();
-			await expect( completedTask.locator( 'h3 > span' ) ).toHaveText(
-				TEST_TASK_TEXT
-			);
+		// Open completed tasks if not already open
+		await page.locator( 'details#todo-list-completed-details' ).click();
 
-			// Verify checkbox is checked
-			await expect(
-				completedTask.locator( '.prpl-suggested-task-checkbox' )
-			).toBeChecked();
+		// Verify task appears in completed list
+		const completedTask = page.locator(
+			`ul#todo-list-completed ${ taskSelector }`
+		);
+		await expect( completedTask ).toBeVisible();
+		await expect( completedTask.locator( 'h3 > span' ) ).toHaveText(
+			TEST_TASK_TEXT
+		);
+		await expect(
+			completedTask.locator( '.prpl-suggested-task-checkbox' )
+		).toBeChecked();
+	} );
 
-			// Reload page and verify persistence
-			await page.reload();
-			await page.waitForLoadState( 'networkidle' );
+	test( 'Verify completed task persists after reload', async ( {
+		page,
+		taskSelector,
+	} ) => {
+		// Reload page
+		await page.reload();
+		await page.waitForLoadState( 'networkidle' );
 
-			// Open completed tasks again
-			await page.locator( 'details#todo-list-completed-details' ).click();
+		// Verify task is not in active list
+		await expect(
+			page.locator( `ul#todo-list ${ taskSelector }` )
+		).toHaveCount( 0 );
 
-			// Verify task is still in completed list
-			const reloadedCompletedTask = page.locator(
-				`ul#todo-list-completed ${ taskSelector }`
-			);
-			await expect( reloadedCompletedTask ).toBeVisible();
-			await expect(
-				reloadedCompletedTask.locator( 'h3 > span' )
-			).toHaveText( TEST_TASK_TEXT );
-			await expect(
-				reloadedCompletedTask.locator( '.prpl-suggested-task-checkbox' )
-			).toBeChecked();
-		} catch ( error ) {
-			console.error( 'Error in Complete task test:', error );
-			console.error( 'Current page URL:', page.url() );
-			console.error( 'Current page content:', await page.content() );
-			throw error;
-		}
+		// Open completed tasks
+		await page.locator( 'details#todo-list-completed-details' ).click();
+
+		// Verify task is still in completed list with correct state
+		const completedTask = page.locator(
+			`ul#todo-list-completed ${ taskSelector }`
+		);
+		await expect( completedTask ).toBeVisible();
+		await expect( completedTask.locator( 'h3 > span' ) ).toHaveText(
+			TEST_TASK_TEXT
+		);
+		await expect(
+			completedTask.locator( '.prpl-suggested-task-checkbox' )
+		).toBeChecked();
 	} );
 } );
