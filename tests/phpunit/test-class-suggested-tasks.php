@@ -49,25 +49,46 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 	public function test_task_cleanup() {
 		// Tasks that should not be removed.
 		$tasks_to_keep = [
-			'remote-task-1234',
-			'post_id/14|provider_id/review-post',
-			'date/' . \gmdate( 'YW' ) . '|long/0|provider_id/create-post',
-			'update-core-' . \gmdate( 'YW' ),
-			'settings-saved-' . \gmdate( 'YW' ),
+			[
+				'task_id' => 'remote-task-1234',
+				'date'    => \gmdate( 'YW' ),
+			],
+			[
+				'task_id' => 'review-post-14-' . \gmdate( 'YW' ),
+				'date'    => \gmdate( 'YW' ),
+			],
+			[
+				'task_id' => 'create-post-' . \gmdate( 'YW' ),
+				'date'    => \gmdate( 'YW' ),
+			],
+			[
+				'task_id' => 'update-core-' . \gmdate( 'YW' ),
+				'date'    => \gmdate( 'YW' ),
+			],
+			[
+				'task_id' => 'settings-saved-' . \gmdate( 'YW' ),
+				'date'    => \gmdate( 'YW' ),
+			],
 		];
 
-		foreach ( $tasks_to_keep as $task_id ) {
-			$this->suggested_tasks->get_local()->add_pending_task( $task_id );
+		foreach ( $tasks_to_keep as $task ) {
+			$this->suggested_tasks->get_local()->add_pending_task( $task );
 		}
 
 		// Tasks that should be removed.
 		$tasks_to_remove = [
-			'update-core-202451',
-			'settings-saved-202451',
+			[
+				'task_id' => 'update-core-202451',
+				'date'    => '202451',
+			],
+			[
+				'task_id' => 'settings-saved-202451',
+				'date'    => '202451',
+			],
 		];
 
-		foreach ( $tasks_to_remove as $task_id ) {
-			$this->suggested_tasks->get_local()->add_pending_task( $task_id );
+		foreach ( $tasks_to_remove as $task ) {
+			$this->suggested_tasks->get_local()->add_pending_task( $task );
 		}
 
 		$this->suggested_tasks->get_local()->cleanup_pending_tasks();

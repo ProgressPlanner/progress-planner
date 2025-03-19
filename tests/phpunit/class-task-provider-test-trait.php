@@ -101,7 +101,7 @@ trait Task_Provider_Test_Trait {
 
 		// Add the task(s) to the local suggested tasks.
 		foreach ( $tasks as $task ) {
-			$this->suggested_tasks->get_local()->add_pending_task( $task['task_id'] );
+			$this->suggested_tasks->get_local()->add_pending_task( $task );
 		}
 
 		// Verify that the task(s) are in the local suggested tasks.
