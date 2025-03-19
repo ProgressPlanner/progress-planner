@@ -55,7 +55,7 @@ final class ToDo extends Widget {
 	 * @return void
 	 */
 	public function register_scripts() {
-		$handle = 'progress-planner-' . $this->id;
+		$handle = 'progress-planner/' . $this->id;
 
 		\wp_register_script(
 			$handle,
@@ -63,10 +63,10 @@ final class ToDo extends Widget {
 			[
 				'wp-util',
 				'wp-a11y',
-				'progress-planner-ajax-request',
-				'progress-planner-grid-masonry',
-				'progress-planner-web-components-prpl-todo-item',
-				'progress-planner-document-ready',
+				'progress-planner/ajax-request',
+				'progress-planner/grid-masonry',
+				'progress-planner/web-components/prpl-todo-item',
+				'progress-planner/document-ready',
 			],
 			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/todo.js' ),
 			true
@@ -79,7 +79,7 @@ final class ToDo extends Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		$handle = 'progress-planner-' . $this->id;
+		$handle = 'progress-planner/' . $this->id;
 
 		// Enqueue the script.
 		\wp_enqueue_script( $handle );

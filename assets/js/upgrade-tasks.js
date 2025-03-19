@@ -4,7 +4,7 @@
  *
  * A script to process the onboarding task checklist.
  *
- * Dependencies: progress-planner-document-ready
+ * Dependencies: progress-planner/document-ready
  */
 
 /**

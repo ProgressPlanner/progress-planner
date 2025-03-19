@@ -136,21 +136,21 @@ class Page {
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
 
 			if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
-				\wp_enqueue_script( 'progress-planner-web-components-prpl-gauge' );
-				\wp_enqueue_script( 'progress-planner-web-components-prpl-chart-bar' );
-				\wp_enqueue_script( 'progress-planner-web-components-prpl-chart-line' );
-				\wp_enqueue_script( 'progress-planner-web-components-prpl-big-counter' );
-				\wp_enqueue_script( 'progress-planner-header-filters' );
-				\wp_enqueue_script( 'progress-planner-settings' );
-				\wp_enqueue_script( 'progress-planner-grid-masonry' );
-				\wp_enqueue_script( 'progress-planner-upgrade-tasks' );
+				\wp_enqueue_script( 'progress-planner/web-components/prpl-gauge' );
+				\wp_enqueue_script( 'progress-planner/web-components/prpl-chart-bar' );
+				\wp_enqueue_script( 'progress-planner/web-components/prpl-chart-line' );
+				\wp_enqueue_script( 'progress-planner/web-components/prpl-big-counter' );
+				\wp_enqueue_script( 'progress-planner/header-filters' );
+				\wp_enqueue_script( 'progress-planner/settings' );
+				\wp_enqueue_script( 'progress-planner/grid-masonry' );
+				\wp_enqueue_script( 'progress-planner/upgrade-tasks' );
 			} else {
-				\wp_enqueue_script( 'progress-planner-onboard' );
+				\wp_enqueue_script( 'progress-planner/onboard' );
 			}
 		}
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
-			\wp_enqueue_script( 'progress-planner-settings-page' );
+			\wp_enqueue_script( 'progress-planner/settings-page' );
 		}
 	}
 
@@ -192,9 +192,9 @@ class Page {
 		// Register the scripts.
 		\progress_planner()->get_admin__scripts()->register_scripts();
 
-		\wp_enqueue_script( 'progress-planner-focus-element' );
+		\wp_enqueue_script( 'progress-planner/focus-element' );
 		\wp_localize_script(
-			'progress-planner-focus-element',
+			'progress-planner/focus-element',
 			'progressPlannerFocusElement',
 			[
 				'tasks'           => $tasks_details,

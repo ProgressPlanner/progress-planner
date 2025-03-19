@@ -108,7 +108,7 @@ abstract class Widget {
 		}
 
 		\wp_register_script(
-			'progress-planner-' . $this->id,
+			'progress-planner/' . $this->id,
 			PROGRESS_PLANNER_URL . '/assets/js/widgets/' . $this->id . '.js',
 			[],
 			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/' . $this->id . '.js' ),
@@ -126,6 +126,6 @@ abstract class Widget {
 			return;
 		}
 
-		\wp_enqueue_script( 'progress-planner-' . $this->id );
+		\wp_enqueue_script( 'progress-planner/' . $this->id );
 	}
 }

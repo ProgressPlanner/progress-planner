@@ -53,13 +53,13 @@ final class Suggested_Tasks extends Widget {
 	 */
 	public function register_scripts() {
 		\wp_register_script(
-			'progress-planner-' . $this->id,
+			'progress-planner/' . $this->id,
 			PROGRESS_PLANNER_URL . '/assets/js/widgets/suggested-tasks.js',
 			[
-				'progress-planner-todo',
-				'progress-planner-grid-masonry',
-				'progress-planner-web-components-prpl-suggested-task',
-				'progress-planner-document-ready',
+				'progress-planner/todo',
+				'progress-planner/grid-masonry',
+				'progress-planner/web-components/prpl-suggested-task',
+				'progress-planner/document-ready',
 				'particles-confetti',
 			],
 			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/suggested-tasks.js' ),
@@ -73,7 +73,7 @@ final class Suggested_Tasks extends Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		$handle = 'progress-planner-' . $this->id;
+		$handle = 'progress-planner/' . $this->id;
 
 		// Enqueue the script.
 		\wp_enqueue_script( $handle );

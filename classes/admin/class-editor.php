@@ -49,7 +49,7 @@ class Editor {
 		}
 
 		\wp_enqueue_script(
-			'progress-planner-editor',
+			'progress-planner/editor',
 			\plugins_url( '/assets/js/editor.js', PROGRESS_PLANNER_FILE ),
 			[ 'wp-plugins', 'wp-edit-post', 'wp-element' ],
 			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/editor.js' ),
@@ -57,7 +57,7 @@ class Editor {
 		);
 
 		\wp_localize_script(
-			'progress-planner-editor',
+			'progress-planner/editor',
 			'progressPlannerEditor',
 			[
 				'lessons'         => \progress_planner()->get_lessons()->get_items(),

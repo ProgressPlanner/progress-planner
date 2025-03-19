@@ -29,7 +29,7 @@ class Scripts {
 
 		// Register web components.
 		foreach ( $this->get_files_in_directory( 'assets/js/web-components' ) as $file ) {
-			$handle = 'progress-planner-web-components-' . $file;
+			$handle = 'progress-planner/web-components/' . $file;
 			\wp_register_script(
 				$handle,
 				PROGRESS_PLANNER_URL . "/assets/js/web-components/{$file}.js",
@@ -42,7 +42,7 @@ class Scripts {
 
 		// Register main scripts.
 		foreach ( $this->get_files_in_directory( 'assets/js' ) as $file ) {
-			$handle = 'progress-planner-' . $file;
+			$handle = 'progress-planner/' . $file;
 			\wp_register_script(
 				$handle,
 				PROGRESS_PLANNER_URL . '/assets/js/' . $file . '.js',
@@ -83,7 +83,7 @@ class Scripts {
 	 */
 	public function localize_script( $handle ) {
 		switch ( $handle ) {
-			case 'progress-planner-web-components-prpl-badge':
+			case 'progress-planner/web-components/prpl-badge':
 				\wp_localize_script(
 					$handle,
 					'progressPlannerBadge',
@@ -97,7 +97,7 @@ class Scripts {
 				);
 				break;
 
-			case 'progress-planner-web-components-prpl-suggested-task':
+			case 'progress-planner/web-components/prpl-suggested-task':
 				\wp_localize_script(
 					$handle,
 					'prplSuggestedTask',
@@ -127,7 +127,7 @@ class Scripts {
 				);
 				break;
 
-			case 'progress-planner-web-components-prpl-todo-item':
+			case 'progress-planner/web-components/prpl-todo-item':
 				\wp_localize_script(
 					$handle,
 					'progressPlannerTodoItem',
@@ -150,7 +150,7 @@ class Scripts {
 				);
 				break;
 
-			case 'progress-planner-tour':
+			case 'progress-planner/tour':
 				\wp_localize_script(
 					$handle,
 					'progressPlannerTour',
@@ -169,16 +169,16 @@ class Scripts {
 				);
 				break;
 
-			case 'progress-planner-onboard':
-			case 'progress-planner-header-filters':
-			case 'progress-planner-settings':
+			case 'progress-planner/onboard':
+			case 'progress-planner/header-filters':
+			case 'progress-planner/settings':
 				$data = [
 					'onboardNonceURL' => \progress_planner()->get_onboard()->get_remote_nonce_url(),
 					'onboardAPIUrl'   => \progress_planner()->get_onboard()->get_remote_url(),
 					'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
 					'nonce'           => \wp_create_nonce( 'progress_planner' ),
 				];
-				if ( 'progress-planner-settings' === $handle ) {
+				if ( 'progress-planner/settings' === $handle ) {
 					$data['l10n'] = [
 						'saving'      => \esc_html__( 'Saving...', 'progress-planner' ),
 						'subscribing' => \esc_html__( 'Subscribing...', 'progress-planner' ),
@@ -188,7 +188,7 @@ class Scripts {
 				\wp_localize_script( $handle, 'progressPlanner', $data );
 				break;
 
-			case 'progress-planner-settings-page':
+			case 'progress-planner/settings-page':
 				\wp_localize_script(
 					$handle,
 					'progressPlannerSettingsPage',
