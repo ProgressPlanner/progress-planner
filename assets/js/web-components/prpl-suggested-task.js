@@ -508,6 +508,7 @@ customElements.define(
 								new CustomEvent( event, {
 									detail: {
 										element: el,
+										taskList,
 									},
 								} )
 							);

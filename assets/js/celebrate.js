@@ -1,4 +1,4 @@
-/* global prplSuggestedTasks, confetti */
+/* global confetti, prplCelebrate */
 /*
  * Confetti.
  *
@@ -49,12 +49,12 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 				shapes: [ 'image' ],
 				shapeOptions: {
 					image: [
-						{ src: prplSuggestedTasks.raviIconUrl },
-						{ src: prplSuggestedTasks.raviIconUrl },
-						{ src: prplSuggestedTasks.raviIconUrl },
-						{ src: prplSuggestedTasks.monthIconUrl },
-						{ src: prplSuggestedTasks.contentIconUrl },
-						{ src: prplSuggestedTasks.maintenanceIconUrl },
+						{ src: prplCelebrate.raviIconUrl },
+						{ src: prplCelebrate.raviIconUrl },
+						{ src: prplCelebrate.raviIconUrl },
+						{ src: prplCelebrate.monthIconUrl },
+						{ src: prplCelebrate.contentIconUrl },
+						{ src: prplCelebrate.maintenanceIconUrl },
 					],
 				},
 			},
@@ -62,11 +62,11 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 
 		// Tripple check if the confetti options are an array and not undefined.
 		if (
-			'undefined' !== typeof prplSuggestedTasks.confettiOptions &&
-			true === Array.isArray( prplSuggestedTasks.confettiOptions ) &&
-			prplSuggestedTasks.confettiOptions.length
+			'undefined' !== typeof prplCelebrate.confettiOptions &&
+			true === Array.isArray( prplCelebrate.confettiOptions ) &&
+			prplCelebrate.confettiOptions.length
 		) {
-			confettiOptions = prplSuggestedTasks.confettiOptions;
+			confettiOptions = prplCelebrate.confettiOptions;
 		}
 
 		for ( const value of confettiOptions ) {
@@ -100,7 +100,8 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 /**
  * Mark tasks as completed.
  */
-document.addEventListener( 'prpl/markTasksAsCompleted', () => {
+document.addEventListener( 'prpl/markTasksAsCompleted', ( event ) => {
+	const taskList = event.detail?.taskList || 'prplSuggestedTasks';
 	document
 		.querySelectorAll( '.prpl-suggested-task-celebrated' )
 		.forEach( ( item ) => {
@@ -116,7 +117,7 @@ document.addEventListener( 'prpl/markTasksAsCompleted', () => {
 
 			// Get the task index.
 			let taskIndex = false;
-			window.prplSuggestedTasks.tasks.forEach( ( taskItem, index ) => {
+			window[ taskList ].tasks.forEach( ( taskItem, index ) => {
 				if ( taskItem.task_id === task_id ) {
 					taskIndex = index;
 				}
@@ -124,8 +125,7 @@ document.addEventListener( 'prpl/markTasksAsCompleted', () => {
 
 			// Mark the task as completed.
 			if ( false !== taskIndex ) {
-				window.prplSuggestedTasks.tasks[ taskIndex ].status =
-					'completed';
+				window[ taskList ].tasks[ taskIndex ].status = 'completed';
 			}
 
 			// Refresh the list.
