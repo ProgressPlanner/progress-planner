@@ -67,9 +67,11 @@ test.describe( 'PRPL Tasks', () => {
 		);
 		await expect( widgetContainer ).toBeVisible();
 
-        // Then wait for the tasks to be loaded in the widget
-        const tasksList = page.locator('.prpl-widget-wrapper.prpl-suggested-tasks .prpl-suggested-tasks-list');
-        await expect(tasksList).toBeVisible();
+		// Then wait for the tasks to be loaded in the widget
+		const tasksList = page.locator(
+			'.prpl-widget-wrapper.prpl-suggested-tasks .prpl-suggested-tasks-list'
+		);
+		await expect( tasksList ).toBeVisible();
 
 		// Wait for the specific task to appear and verify its content
 		const taskElement = page.locator(
@@ -80,8 +82,8 @@ test.describe( 'PRPL Tasks', () => {
 		// Wait for the celebration animation and task removal (3s delay + 1s buffer)
 		await page.waitForTimeout( 4000 );
 
-        // Verify that the task is removed from the DOM
-        await expect(taskElement).toHaveCount(0);
+		// Verify that the task is removed from the DOM
+		await expect( taskElement ).toHaveCount( 0 );
 
 		// Check the final task status via REST API
 		const completedResponse = await makeAuthenticatedRequest(
