@@ -1,5 +1,43 @@
 .prpl-widget-wrapper.prpl-challenge {
 
+	&:has(.prpl-challenge-promo-notice) {
+		position: relative;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: var(--prpl-color-gray-2);
+			opacity: 0.4;
+		}
+
+		.prpl-challenge-content {
+
+			.prpl-challenge-promo-notice {
+				position: absolute;
+				bottom: var(--prpl-padding);
+				left: var(--prpl-padding);
+				z-index: 1;
+				width: calc(100% - (var(--prpl-padding) * 4));
+				background-color: #fff;
+				border: 1px solid var(--prpl-color-gray-2);
+				padding: var(--prpl-padding);
+				border-radius: var(--prpl-border-radius);
+
+				.prpl-button-primary {
+					margin-bottom: 0;
+				}
+
+				*:last-child {
+					margin-bottom: 0;
+				}
+			}
+		}
+	}
+
 	h2.prpl-widget-title {
 		background: var(--prpl-background-purple);
 		padding: 0.75rem 1rem;

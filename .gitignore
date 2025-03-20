@@ -3,3 +3,12 @@
 .phpunit.result.cache
 node_modules
 .DS_Store
+
+# Playwright
+test-results/
+playwright-report/
+playwright/.cache/
+auth.json
+
+# Environment variables
+.env

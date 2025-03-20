@@ -10,9 +10,8 @@ namespace Progress_Planner\Suggested_Tasks;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 // Repetitive tasks.
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
-// Content tasks.
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create as Content_Create;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Review as Content_Review;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Review as Content_Review;
 // One-time tasks.
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Blog_Description;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Settings_Saved;
@@ -79,6 +78,8 @@ class Local_Tasks_Manager {
 					)
 				);
 				unset( $this->task_providers[ $key ] );
+
+				continue;
 			}
 
 			// Initialize the task provider (add hooks, etc.).
@@ -193,7 +194,7 @@ class Local_Tasks_Manager {
 			}
 
 			$tasks_to_inject[] = $task;
-			$this->add_pending_task( $task['task_id'] );
+			$this->add_pending_task( $task );
 		}
 
 		return \array_merge( $tasks, $tasks_to_inject );
@@ -229,10 +230,10 @@ class Local_Tasks_Manager {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return bool|string
+	 * @return bool|\Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local
 	 */
 	public function evaluate_task( $task_id ) {
-		$task_object   = ( new Local_Task_Factory( $task_id ) )->get_task();
+		$task_object   = Local_Task_Factory::create_task_from( 'id', $task_id );
 		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
 
 		if ( ! $task_provider ) {
@@ -250,7 +251,7 @@ class Local_Tasks_Manager {
 	 * @return array|false
 	 */
 	public function get_task_details( $task_id ) {
-		$task_object   = ( new Local_Task_Factory( $task_id ) )->get_task();
+		$task_object   = Local_Task_Factory::create_task_from( 'id', $task_id );
 		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
 
 		if ( ! $task_provider ) {
@@ -268,7 +269,7 @@ class Local_Tasks_Manager {
 	 * @return array
 	 */
 	public function get_data_from_task_id( $task_id ) {
-		$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
+		$task_object = Local_Task_Factory::create_task_from( 'id', $task_id );
 
 		return $task_object->get_data();
 	}
@@ -276,24 +277,23 @@ class Local_Tasks_Manager {
 	/**
 	 * Add a pending local task.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task The task data.
 	 *
 	 * @return bool
 	 */
-	public function add_pending_task( $task_id ) {
+	public function add_pending_task( $task ) {
 		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 
 		$task_index = false;
 
-		foreach ( $tasks as $key => $task ) {
-			if ( ! isset( $task['task_id'] ) || $task_id !== $task['task_id'] ) {
+		foreach ( $tasks as $key => $_task ) {
+			if ( ! isset( $_task['task_id'] ) || $task['task_id'] !== $_task['task_id'] ) {
 				continue;
 			}
 			$task_index = $key;
 			break;
 		}
 
-		$task           = ( new Local_Task_Factory( $task_id ) )->get_task()->get_data();
 		$task['status'] = 'pending';
 
 		if ( false !== $task_index ) {

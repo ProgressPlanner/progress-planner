@@ -8,71 +8,79 @@
 namespace Progress_Planner\Admin;
 
 /**
- * Assets class.
+ * Enqueue class.
  */
-class Scripts {
+class Enqueue {
 
 	/**
-	 * Register scripts.
+	 * Have the scripts been registered?
+	 *
+	 * @var boolean
+	 */
+	protected static $scripts_registered = false;
+
+	/**
+	 * Vendor scripts.
+	 *
+	 * @var array
+	 */
+	const VENDOR_SCRIPTS = [
+		'vendor/tsparticles.confetti.bundle.min' => [
+			'handle'  => 'particles-confetti',
+			'version' => '2.11.0',
+		],
+		'vendor/driver.js.iife'                  => [
+			'handle'  => 'driver',
+			'version' => '1.3.1',
+		],
+	];
+
+	/**
+	 * Enqueue script.
+	 *
+	 * @param string $handle The handle of the script to enqueue.
 	 *
 	 * @return void
 	 */
-	public function register_scripts() {
-		// Register vendor scripts.
-		$vendor_scripts = [
-			'driver'             => [ 'driver.js.iife.js', '1.3.1' ],
-			'particles-confetti' => [ 'tsparticles.confetti.bundle.min.js', '2.11.0' ],
-		];
-		foreach ( $vendor_scripts as $handle => $file ) {
-			\wp_register_script( $handle, PROGRESS_PLANNER_URL . "/assets/js/vendor/{$file[0]}", [], (string) $file[1], true );
+	public function enqueue_script( $handle ) {
+		if ( str_starts_with( $handle, 'progress-planner/' ) ) {
+			$handle = str_replace( 'progress-planner/', '', $handle );
 		}
-
-		// Register web components.
-		foreach ( $this->get_files_in_directory( 'assets/js/web-components' ) as $file ) {
-			$handle = 'progress-planner-web-components-' . $file;
-			\wp_register_script(
-				$handle,
-				PROGRESS_PLANNER_URL . "/assets/js/web-components/{$file}.js",
-				$this->get_dependencies( 'web-components/' . $file ),
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/web-components/' . $file . '.js' ),
-				true
-			);
-			$this->localize_script( $handle );
+		foreach ( self::VENDOR_SCRIPTS as $vendor_script_handle => $vendor_script ) {
+			if ( $vendor_script['handle'] === $handle ) {
+				$handle = $vendor_script_handle;
+				break;
+			}
 		}
-
-		// Register main scripts.
-		foreach ( $this->get_files_in_directory( 'assets/js' ) as $file ) {
-			$handle = 'progress-planner-' . $file;
-			\wp_register_script(
-				$handle,
-				PROGRESS_PLANNER_URL . '/assets/js/' . $file . '.js',
-				$this->get_dependencies( $file ),
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/' . $file . '.js' ),
-				true
-			);
-			$this->localize_script( $handle );
+		// The file path.
+		$file_path = PROGRESS_PLANNER_DIR . "/assets/js/{$handle}.js";
+		// If the file does not exist, bail early.
+		if ( ! \file_exists( $file_path ) ) {
+			return;
 		}
-	}
-
-	/**
-	 * Get dependencies for a script.
-	 *
-	 * @param string $file The file name.
-	 * @return array
-	 */
-	public function get_dependencies( $file ) {
-		$path    = PROGRESS_PLANNER_DIR . '/assets/js/' . $file . '.js';
-		$headers = \get_file_data(
-			$path,
-			[
-				'dependencies' => 'Dependencies',
-			]
-		);
-		if ( ! isset( $headers['dependencies'] ) ) {
-			return [];
+		// The file URL.
+		$file_url = PROGRESS_PLANNER_URL . "/assets/js/{$handle}.js";
+		// The handle.
+		$handle = isset( self::VENDOR_SCRIPTS[ $handle ] )
+			? self::VENDOR_SCRIPTS[ $handle ]['handle']
+			: 'progress-planner/' . $handle;
+		// The version.
+		$version = isset( self::VENDOR_SCRIPTS[ $handle ] )
+			? self::VENDOR_SCRIPTS[ $handle ]['version']
+			: \progress_planner()->get_file_version( $file_path );
+		// The dependencies.
+		$headers      = \get_file_data( $file_path, [ 'dependencies' => 'Dependencies' ] );
+		$dependencies = isset( $headers['dependencies'] )
+			? \array_filter( \array_map( 'trim', \explode( ',', $headers['dependencies'] ) ) )
+			: [];
+		// Enqueue the script dependencies.
+		foreach ( $dependencies as $dependency ) {
+			$this->enqueue_script( $dependency );
 		}
-
-		return \array_filter( \array_map( 'trim', \explode( ',', $headers['dependencies'] ) ) );
+		// Enqueue the script.
+		\wp_enqueue_script( $handle, $file_url, $dependencies, $version, true );
+		// Localize the script.
+		$this->localize_script( $handle );
 	}
 
 	/**
@@ -83,7 +91,7 @@ class Scripts {
 	 */
 	public function localize_script( $handle ) {
 		switch ( $handle ) {
-			case 'progress-planner-web-components-prpl-badge':
+			case 'progress-planner/web-components/prpl-badge':
 				\wp_localize_script(
 					$handle,
 					'progressPlannerBadge',
@@ -97,7 +105,7 @@ class Scripts {
 				);
 				break;
 
-			case 'progress-planner-web-components-prpl-suggested-task':
+			case 'progress-planner/web-components/prpl-suggested-task':
 				\wp_localize_script(
 					$handle,
 					'prplSuggestedTask',
@@ -127,7 +135,7 @@ class Scripts {
 				);
 				break;
 
-			case 'progress-planner-web-components-prpl-todo-item':
+			case 'progress-planner/web-components/prpl-todo-item':
 				\wp_localize_script(
 					$handle,
 					'progressPlannerTodoItem',
@@ -150,7 +158,7 @@ class Scripts {
 				);
 				break;
 
-			case 'progress-planner-tour':
+			case 'progress-planner/tour':
 				\wp_localize_script(
 					$handle,
 					'progressPlannerTour',
@@ -169,16 +177,16 @@ class Scripts {
 				);
 				break;
 
-			case 'progress-planner-onboard':
-			case 'progress-planner-header-filters':
-			case 'progress-planner-settings':
+			case 'progress-planner/onboard':
+			case 'progress-planner/header-filters':
+			case 'progress-planner/settings':
 				$data = [
 					'onboardNonceURL' => \progress_planner()->get_onboard()->get_remote_nonce_url(),
 					'onboardAPIUrl'   => \progress_planner()->get_onboard()->get_remote_url(),
 					'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
 					'nonce'           => \wp_create_nonce( 'progress_planner' ),
 				];
-				if ( 'progress-planner-settings' === $handle ) {
+				if ( 'progress-planner/settings' === $handle ) {
 					$data['l10n'] = [
 						'saving'      => \esc_html__( 'Saving...', 'progress-planner' ),
 						'subscribing' => \esc_html__( 'Subscribing...', 'progress-planner' ),
@@ -188,7 +196,7 @@ class Scripts {
 				\wp_localize_script( $handle, 'progressPlanner', $data );
 				break;
 
-			case 'progress-planner-settings-page':
+			case 'progress-planner/settings-page':
 				\wp_localize_script(
 					$handle,
 					'progressPlannerSettingsPage',
@@ -202,22 +210,5 @@ class Scripts {
 			default:
 				return;
 		}
-	}
-
-	/**
-	 * Get files in the assets directory.
-	 *
-	 * @param string $directory The directory to get files from.
-	 * @param string $trim The extension to trim from the files.
-	 *
-	 * @return array
-	 */
-	public function get_files_in_directory( $directory, $trim = '.js' ) {
-		$files = \glob( PROGRESS_PLANNER_DIR . '/' . $directory . '/*.js' );
-		foreach ( $files as $index => $file ) { // @phpstan-ignore-line foreach.nonIterable
-			$files[ $index ] = \str_replace( $trim, '', \basename( $file ) ); // @phpstan-ignore-line offsetAccess.nonOffsetAccessible
-		}
-
-		return $files;
 	}
 }

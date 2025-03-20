@@ -16,15 +16,20 @@
 	"devDependencies": {
 		"@wordpress/scripts": "*",
 		"@wordpress/stylelint-config": "^22.2.0",
-		"husky": "^9.0.11"
+		"husky": "^9.0.11",
+		"@playwright/test": "^1.42.1",
+		"dotenv": "^16.4.5"
 	},
 	"scripts": {
 		"format": "wp-scripts format ./assets",
 		"lint:css": "wp-scripts lint-style \"**/*.css\"",
 		"lint:css:fix": "npm run lint:css -- --fix",
-		"lint:js": "wp-scripts lint-js ./assets/js/*.js && wp-scripts lint-js ./assets/js/web-components/*.js && wp-scripts lint-js ./assets/js/widgets/*.js",
-		"lint:js:fix": "wp-scripts lint-js ./assets/js/*.js --fix && wp-scripts lint-js ./assets/js/web-components/*.js --fix && wp-scripts lint-js ./assets/js/widgets/*.js --fix",
-		"prepare": "husky"
+		"lint:js": "wp-scripts lint-js ./assets/js/*.js && wp-scripts lint-js ./assets/js/web-components/*.js && wp-scripts lint-js ./assets/js/widgets/*.js && wp-scripts lint-js ./tests/e2e/*.js",
+		"lint:js:fix": "wp-scripts lint-js ./assets/js/*.js --fix && wp-scripts lint-js ./assets/js/web-components/*.js --fix && wp-scripts lint-js ./assets/js/widgets/*.js --fix && wp-scripts lint-js ./tests/e2e/*.js --fix",
+		"prepare": "husky",
+		"test:e2e": "playwright test",
+		"test:e2e:ui": "playwright test --ui",
+		"test:e2e:debug": "playwright test --debug"
 	},
 	"dependencies": {
 		"driver.js": "^1.3.1"

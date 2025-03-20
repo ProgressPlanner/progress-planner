@@ -41,20 +41,26 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 	<ul class="prpl-onboarding-tasks-list">
 		<?php foreach ( $prpl_task_providers as $prpl_task_provider ) : ?>
 			<?php
+			$prpl_task_data = [
+				'task_id'     => $prpl_task_provider->get_task_id(),
+				'provider_id' => $prpl_task_provider->get_provider_id(),
+				'category'    => $prpl_task_provider->get_provider_category(),
+			];
+
+			$prpl_task_completed = $prpl_task_provider->evaluate_task( $prpl_task_data['task_id'] );
 			$prpl_task_details   = $prpl_task_provider->get_task_details();
-			$prpl_task_completed = $prpl_task_provider->evaluate_task( $prpl_task_details['task_id'] );
 
 			// If the task is completed, mark it as pending celebration.
 			if ( $prpl_task_completed ) {
 
 				// Add the task to the pending tasks.
-				\progress_planner()->get_suggested_tasks()->get_local()->add_pending_task( $prpl_task_details['task_id'] );
+				\progress_planner()->get_suggested_tasks()->get_local()->add_pending_task( $prpl_task_data );
 
 				// Change the task status to pending celebration.
-				\progress_planner()->get_suggested_tasks()->mark_task_as_pending_celebration( $prpl_task_details['task_id'] );
+				\progress_planner()->get_suggested_tasks()->mark_task_as_pending_celebration( $prpl_task_data['task_id'] );
 
 				// Insert an activity.
-				\progress_planner()->get_suggested_tasks()->insert_activity( $prpl_task_details['task_id'] );
+				\progress_planner()->get_suggested_tasks()->insert_activity( $prpl_task_data['task_id'] );
 			}
 			?>
 				<li class="prpl-onboarding-task" data-prpl-task-completed="<?php echo $prpl_task_completed ? 'true' : 'false'; ?>">

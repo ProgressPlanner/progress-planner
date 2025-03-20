@@ -4,7 +4,7 @@
  *
  * A script to scan posts for the Progress Planner.
  *
- * Dependencies: progress-planner-ajax-request, progress-planner-upgrade-tasks
+ * Dependencies: progress-planner/ajax-request, progress-planner/upgrade-tasks
  */
 
 const progressPlannerTriggerScan = () => {
@@ -38,7 +38,6 @@ const progressPlannerTriggerScan = () => {
 					progressBar.value = response.data.progress;
 				}
 
-				// eslint-disable-next-line no-console
 				console.info(
 					`Progress: ${ response.data.progress }%, (${ response.data.lastScanned }/${ response.data.lastPage })`
 				);
@@ -55,7 +54,6 @@ const progressPlannerTriggerScan = () => {
 				failCount = 0; // Reset fail count on success.
 			} catch ( error ) {
 				failCount++;
-				// eslint-disable-next-line no-console
 				console.warn( 'Failed to scan posts. Retrying...', error );
 			}
 
@@ -90,7 +88,6 @@ if ( document.getElementById( 'prpl-scan-button' ) ) {
 					progressPlannerTriggerScan();
 				} )
 				.catch( ( error ) => {
-					// eslint-disable-next-line no-console
 					console.warn( error );
 				} );
 		} );
