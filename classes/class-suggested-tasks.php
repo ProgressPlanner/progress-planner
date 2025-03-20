@@ -56,6 +56,9 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function init() {
+		// Init the remote tasks.
+		$this->remote->init();  // @phpstan-ignore-line method.nonObject
+
 		// Unsnooze tasks.
 		$this->maybe_unsnooze_tasks();
 
