@@ -38,7 +38,8 @@ class Scripts {
 				continue;
 			}
 			// Get the file name without the extension.
-			$name = \rtrim( \str_replace( $scripts_dir . '/', '', $file->getPathname() ), '.js' );
+			$name = \str_replace( $scripts_dir . '/', '', $file->getPathname() );
+			$name = \substr( $name, 0, \strlen( $name ) - 3 );
 			// Get the URL of the file.
 			$url = PROGRESS_PLANNER_URL . "/assets/js/{$name}.js";
 			// Get the handle of the script.
