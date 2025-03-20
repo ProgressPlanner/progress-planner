@@ -1,4 +1,9 @@
 /* global progressPlannerTodo, customElements, prplDocumentReady */
+/**
+ * Todo widget.
+ *
+ * Dependencies: wp-util, wp-a11y, progress-planner/ajax-request, progress-planner/grid-masonry, progress-planner/web-components/prpl-todo-item, progress-planner/document-ready
+ */
 
 /**
  * Save the todo list to the database.

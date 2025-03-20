@@ -4,7 +4,7 @@
  *
  * A script to handle the onboarding process.
  *
- * Dependencies: progress-planner-ajax-request, progress-planner-scan-posts, progress-planner-upgrade-tasks
+ * Dependencies: progress-planner/ajax-request, progress-planner/scan-posts, progress-planner/upgrade-tasks
  */
 
 /**
