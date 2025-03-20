@@ -48,8 +48,7 @@ class Editor {
 			$prpl_preselected_page_type = \progress_planner()->get_page_types()->get_default_page_type( (string) \get_post_type(), (int) \get_the_ID() );
 		}
 
-		\progress_planner()->get_admin__scripts()->register_scripts();
-		\wp_enqueue_script( 'progress-planner/editor' );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/editor' );
 
 		\wp_localize_script(
 			'progress-planner/editor',

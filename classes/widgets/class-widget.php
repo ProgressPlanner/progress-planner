@@ -102,7 +102,6 @@ abstract class Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		\progress_planner()->get_admin__scripts()->register_scripts();
-		\wp_enqueue_script( 'progress-planner/widgets/' . $this->id );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/widgets/' . $this->id );
 	}
 }
