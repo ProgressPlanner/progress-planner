@@ -18,7 +18,6 @@ abstract class Widget {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->register_scripts();
 	}
 
 	/**
@@ -98,34 +97,11 @@ abstract class Widget {
 	}
 
 	/**
-	 * Register scripts.
-	 *
-	 * @return void
-	 */
-	public function register_scripts() {
-		if ( ! file_exists( PROGRESS_PLANNER_DIR . '/assets/js/widgets/' . $this->id . '.js' ) ) {
-			return;
-		}
-
-		\wp_register_script(
-			'progress-planner-' . $this->id,
-			PROGRESS_PLANNER_URL . '/assets/js/widgets/' . $this->id . '.js',
-			[],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/' . $this->id . '.js' ),
-			true
-		);
-	}
-
-	/**
 	 * Enqueue scripts.
 	 *
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		if ( ! file_exists( PROGRESS_PLANNER_DIR . '/assets/js/widgets/' . $this->id . '.js' ) ) {
-			return;
-		}
-
-		\wp_enqueue_script( 'progress-planner-' . $this->id );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/' . $this->id );
 	}
 }
