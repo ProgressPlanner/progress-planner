@@ -1,4 +1,4 @@
-/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerSaveLicenseKey */
+/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerSaveLicenseKey, prplL10n */
 /*
  * Settings
  *

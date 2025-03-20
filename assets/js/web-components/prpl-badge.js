@@ -1,4 +1,4 @@
-/* global customElements, HTMLElement, progressPlannerBadge */
+/* global customElements, HTMLElement, progressPlannerBadge, prplL10n */
 /*
  * Badge
  *

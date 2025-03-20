@@ -1,4 +1,4 @@
-/* global customElements, HTMLElement, progressPlannerTodoItem, progressPlannerInjectTodoItem, progressPlannerSaveTodoList */
+/* global customElements, HTMLElement, progressPlannerTodoItem, progressPlannerInjectTodoItem, progressPlannerSaveTodoList, prplL10n */
 /**
  * Todo Item
  *

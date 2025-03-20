@@ -1,4 +1,4 @@
-/* global progressPlannerTour */
+/* global progressPlannerTour, prplL10n */
 /*
  * Tour
  *

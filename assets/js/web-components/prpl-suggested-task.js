@@ -1,4 +1,4 @@
-/* global customElements, prplSuggestedTask, HTMLElement */
+/* global customElements, HTMLElement, prplSuggestedTask, prplL10n */
 /*
  * Suggested Task
  *

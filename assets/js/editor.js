@@ -1,4 +1,4 @@
-/* global progressPlannerEditor */
+/* global progressPlannerEditor, prplL10n */
 /**
  * Editor script.
  *
