@@ -15,7 +15,6 @@ const prplSuggestedTasksCountItems = ( category ) => {
 	const items = document.querySelectorAll(
 		`.prpl-suggested-task[data-task-category="${ category }"]`
 	);
-	console.log( category + ': ' + items.length );
 	return items.length;
 };
 
@@ -604,7 +603,6 @@ document.addEventListener(
 	'prplMaybeInjectSuggestedTaskEvent',
 	( e ) => {
 		const category = e.detail.category;
-		console.log( e.detail );
 		while (
 			prplSuggestedTasksCountItems( category ) <
 				parseInt(
