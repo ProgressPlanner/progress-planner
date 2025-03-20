@@ -126,6 +126,14 @@ prplDocumentReady( function () {
 			document
 				.getElementById( 'prpl-onboarding-continue-button' )
 				.classList.remove( 'prpl-disabled' );
+		} ).then( () => {
+			// Click on the close popover button should also redirect to the stats page.
+			const closePopoverButton = document.querySelector( '#prpl-popover-upgrade-tasks .prpl-popover-close' );
+			if ( closePopoverButton ) {
+				closePopoverButton.addEventListener( 'click', () => {
+					prplOnboardRedirect();
+				} );
+			}
 		} );
 	}
 } );
