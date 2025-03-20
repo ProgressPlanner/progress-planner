@@ -4,7 +4,7 @@
  *
  * A script to handle the settings page.
  *
- * Dependencies: progress-planner-ajax-request, progress-planner-onboard, wp-util
+ * Dependencies: progress-planner/ajax-request, progress-planner/onboard, wp-util
  */
 document
 	.getElementById( 'prpl-settings-form' )
