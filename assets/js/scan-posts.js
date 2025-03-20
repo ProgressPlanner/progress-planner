@@ -4,7 +4,7 @@
  *
  * A script to scan posts for the Progress Planner.
  *
- * Dependencies: progress-planner-ajax-request, progress-planner-upgrade-tasks
+ * Dependencies: progress-planner/ajax-request, progress-planner/upgrade-tasks
  */
 
 const progressPlannerTriggerScan = () => {
