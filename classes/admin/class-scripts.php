@@ -24,7 +24,7 @@ class Scripts {
 				'handle'  => 'particles-confetti',
 				'version' => '2.11.0',
 			],
-			'vendor/driver.js.iife'                     => [
+			'vendor/driver.js.iife'                  => [
 				'handle'  => 'driver',
 				'version' => '1.3.1',
 			],
