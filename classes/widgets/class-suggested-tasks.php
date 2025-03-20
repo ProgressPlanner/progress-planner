@@ -47,42 +47,13 @@ final class Suggested_Tasks extends Widget {
 	}
 
 	/**
-	 * Register scripts.
-	 *
-	 * @return void
-	 */
-	public function register_scripts() {
-
-		$dependencies = [
-			'progress-planner-todo',
-			'progress-planner-grid-masonry',
-			'progress-planner-web-components-prpl-suggested-task',
-			'progress-planner-document-ready',
-		];
-
-		if ( \progress_planner()->is_on_progress_planner_dashboard_page() ) {
-			$dependencies[] = 'particles-confetti';
-		}
-
-		\wp_register_script(
-			'progress-planner-' . $this->id,
-			PROGRESS_PLANNER_URL . '/assets/js/widgets/suggested-tasks.js',
-			$dependencies,
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/suggested-tasks.js' ),
-			true
-		);
-	}
-
-	/**
 	 * Enqueue scripts.
 	 *
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		$handle = 'progress-planner-' . $this->id;
-
 		// Enqueue the script.
-		\wp_enqueue_script( $handle );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/suggested-tasks' );
 
 		// Get tasks from task providers and pending_celebration tasks.
 		$tasks             = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
@@ -208,7 +179,7 @@ final class Suggested_Tasks extends Widget {
 
 		// Localize the script.
 		\wp_localize_script(
-			$handle,
+			'progress-planner/widgets/suggested-tasks',
 			'prplSuggestedTasks',
 			$localize_data
 		);
