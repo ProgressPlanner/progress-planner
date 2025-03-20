@@ -85,8 +85,8 @@ class Page {
 	 */
 	public function add_page() {
 		\add_menu_page(
-			\esc_html__( 'Progress Planner', 'progress-planner' ),
-			\esc_html__( 'Progress Planner', 'progress-planner' ),
+			'Progress Planner',
+			'Progress Planner',
 			'manage_options',
 			'progress-planner',
 			[ $this, 'render_page' ],
