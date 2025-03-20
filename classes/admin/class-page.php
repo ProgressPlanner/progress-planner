@@ -134,21 +134,21 @@ class Page {
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
 
 			if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/web-components/prpl-gauge' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/web-components/prpl-chart-bar' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/web-components/prpl-chart-line' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/web-components/prpl-big-counter' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/header-filters' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/settings' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/grid-masonry' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/upgrade-tasks' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-gauge' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-bar' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-line' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-big-counter' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'header-filters' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'grid-masonry' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'upgrade-tasks' );
 			} else {
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/onboard' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboard' );
 			}
 		}
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
-			\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/settings-page' );
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings-page' );
 		}
 	}
 
@@ -188,7 +188,7 @@ class Page {
 		}
 
 		// Register the scripts.
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/focus-element' );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'focus-element' );
 		\wp_localize_script(
 			'progress-planner/focus-element',
 			'progressPlannerFocusElement',

@@ -53,7 +53,7 @@ final class Suggested_Tasks extends Widget {
 	 */
 	public function enqueue_scripts() {
 		// Enqueue the script.
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/widgets/suggested-tasks' );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/suggested-tasks' );
 
 		// If there are newly added task providers, delay the celebration in order not to get confetti behind the popover.
 		$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();

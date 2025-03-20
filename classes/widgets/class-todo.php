@@ -56,7 +56,7 @@ final class ToDo extends Widget {
 	 */
 	public function enqueue_scripts() {
 		// Enqueue the script.
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'progress-planner/widgets/todo' );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/todo' );
 
 		// Localize the script.
 		\wp_localize_script(
