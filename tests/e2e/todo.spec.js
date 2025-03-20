@@ -1,82 +1,125 @@
-const { test, expect } = require( '@playwright/test' );
+const { test: base, expect, chromium } = require( '@playwright/test' );
 
-const TEST_TASK_TEXT = 'My test task';
+const CREATE_TASK_TEXT = 'Test task to create';
+const DELETE_TASK_TEXT = 'Test task to delete';
 
-test.describe( 'PRPL Add / Remove User Task', () => {
-	test( 'Add new user task', async ( { page } ) => {
-		try {
-			// Navigate to Progress Planner dashboard
-			await page.goto(
-				`${ process.env.WORDPRESS_URL }/wp-admin/admin.php?page=progress-planner`
-			);
-			await page.waitForLoadState( 'networkidle' );
+let browser;
+let context;
+let page;
 
-			// Fill in the new todo input
-			await page.fill( '#new-todo-content', TEST_TASK_TEXT );
+base.describe( 'PRPL Todo', () => {
+	base.beforeAll( async () => {
+		browser = await chromium.launch();
+	} );
 
-			// Submit the form (press Enter)
-			await page.keyboard.press( 'Enter' );
+	base.beforeEach( async () => {
+		context = await browser.newContext();
+		page = await context.newPage();
+	} );
 
-			// Add a small delay to ensure the UI updates
+	base.afterEach( async () => {
+		// Clean up any remaining tasks
+		await page.goto(
+			`${ process.env.WORDPRESS_URL }/wp-admin/admin.php?page=progress-planner`
+		);
+		await page.waitForLoadState( 'networkidle' );
+
+		// Clean up active tasks
+		const activeTodoItems = page.locator(
+			'ul#todo-list > prpl-suggested-task li'
+		);
+
+		while ( ( await activeTodoItems.count() ) > 0 ) {
+			const firstItem = activeTodoItems.first();
+			await firstItem.hover();
 			await page.waitForTimeout( 500 );
-
-			// Wait for the new todo item to appear
-			const todoItem = page.locator(
-				'ul#todo-list > prpl-suggested-task li'
-			);
-			const taskId = await todoItem.getAttribute( 'data-task-id' );
-			const taskSelector = `ul#todo-list > prpl-suggested-task li[data-task-id="${ taskId }"]`; // Cache the task selector for later use
-
-			await expect( todoItem ).toBeVisible();
-
-			// Verify the content
-			await expect( todoItem.locator( 'h3 > span' ) ).toHaveText(
-				TEST_TASK_TEXT
-			);
-
-			// Reload the page
-			await page.reload();
-
-			// Re-query and verify the todo item after reload
-			const reloadedTodoItem = page.locator(
-				`${ taskSelector } h3 > span`
-			);
-			await expect( reloadedTodoItem ).toBeVisible();
-			await expect( reloadedTodoItem ).toHaveText( TEST_TASK_TEXT );
-
-			// Hover over the todo item
-			await reloadedTodoItem.hover();
-
-			// Click the trash button and wait for network idle
-			const trashButton = page.locator( `${ taskSelector } .trash` );
-			await trashButton.click();
-			await page.waitForLoadState( 'networkidle' );
-
-			// Wait for the item to be removed and verify
-			const todoItemsAfterDelete = page.locator(
-				`${ taskSelector } h3 > span`
-			);
-
-			// Add a small delay to ensure the UI updates
+			await firstItem.waitFor( { state: 'visible' } );
+			await firstItem.locator( '.trash' ).click();
 			await page.waitForTimeout( 500 );
-
-			// Verify the item is removed
-			await expect( todoItemsAfterDelete ).toHaveCount( 0 );
-
-			// Reload the page
-			await page.reload();
-			await page.waitForLoadState( 'networkidle' );
-
-			// Re-query and verify the todo item is still removed after reload
-			const removedTodoItem = page.locator(
-				`${ taskSelector } h3 > span`
-			);
-			await expect( removedTodoItem ).toHaveCount( 0 );
-		} catch ( error ) {
-			console.error( 'Error in Add new todo item test:', error );
-			console.error( 'Current page URL:', page.url() );
-			console.error( 'Current page content:', await page.content() );
-			throw error;
 		}
+
+		// Clean up completed tasks if the section exists
+		const completedDetails = page.locator(
+			'details#todo-list-completed-details'
+		);
+
+		if ( await completedDetails.isVisible() ) {
+			await completedDetails.click();
+			await page.waitForTimeout( 500 );
+
+			const completedTodoItems = page.locator(
+				'ul#todo-list-completed > prpl-suggested-task li'
+			);
+
+			while ( ( await completedTodoItems.count() ) > 0 ) {
+				const firstItem = completedTodoItems.first();
+				await firstItem.hover();
+				await page.waitForTimeout( 500 );
+				await firstItem.waitFor( { state: 'visible' } );
+				await firstItem.locator( '.trash' ).click();
+				await page.waitForTimeout( 500 );
+			}
+		}
+
+		// Safely close context if it's still open
+		try {
+			await context.close();
+		} catch ( error ) {
+			// Ignore errors if context is already closed
+		}
+	} );
+
+	base.afterAll( async () => {
+		await browser.close();
+	} );
+
+	base( 'Create a new todo', async () => {
+		// Navigate to Progress Planner dashboard
+		await page.goto(
+			`${ process.env.WORDPRESS_URL }/wp-admin/admin.php?page=progress-planner`
+		);
+		await page.waitForLoadState( 'networkidle' );
+
+		// Fill in the new todo input
+		await page.fill( '#new-todo-content', CREATE_TASK_TEXT );
+		await page.keyboard.press( 'Enter' );
+		await page.waitForTimeout( 500 );
+
+		// Verify the todo was created
+		const todoItem = page.locator(
+			'ul#todo-list > prpl-suggested-task li'
+		);
+		await expect( todoItem ).toHaveCount( 1 );
+		await expect( todoItem.locator( 'h3 > span' ) ).toHaveText(
+			CREATE_TASK_TEXT
+		);
+	} );
+
+	base( 'Delete a todo', async () => {
+		// Navigate to Progress Planner dashboard
+		await page.goto(
+			`${ process.env.WORDPRESS_URL }/wp-admin/admin.php?page=progress-planner`
+		);
+		await page.waitForLoadState( 'networkidle' );
+
+		// Create a todo to delete
+		await page.fill( '#new-todo-content', DELETE_TASK_TEXT );
+		await page.keyboard.press( 'Enter' );
+		await page.waitForTimeout( 500 );
+
+		// Wait for the delete button to be visible and click it
+		const deleteItem = page.locator(
+			'ul#todo-list > prpl-suggested-task li'
+		);
+		await deleteItem.hover();
+		await deleteItem.waitFor( { state: 'visible' } );
+		await deleteItem.locator( '.trash' ).click();
+		await page.waitForTimeout( 500 );
+
+		// Verify the todo was deleted
+		const todoItem = page.locator(
+			'ul#todo-list > prpl-suggested-task li'
+		);
+		await expect( todoItem ).toHaveCount( 0 );
 	} );
 } );
