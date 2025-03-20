@@ -1,4 +1,9 @@
 /* global progressPlannerEditor */
+/**
+ * Editor script.
+ *
+ * Dependencies: wp-plugins, wp-edit-post, wp-element
+ */
 const { createElement: el, Fragment, useState } = wp.element;
 const { registerPlugin } = wp.plugins;
 const { PluginSidebar, PluginPostStatusInfo, PluginSidebarMoreMenuItem } =

@@ -5,7 +5,7 @@
  * A script to allow a grid to behave like a masonry layout.
  * Inspired by https://medium.com/@andybarefoot/a-masonry-style-layout-using-css-grid-8c663d355ebb
  *
- * Dependencies: progress-planner-document-ready
+ * Dependencies: progress-planner/document-ready
  */
 
 /**

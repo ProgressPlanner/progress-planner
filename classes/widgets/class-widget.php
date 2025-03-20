@@ -68,7 +68,6 @@ abstract class Widget {
 	 * @return void
 	 */
 	public function render() {
-		\progress_planner()->get_admin__scripts()->register_scripts();
 		$this->enqueue_styles();
 		$this->enqueue_scripts();
 		?>
@@ -103,11 +102,7 @@ abstract class Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		if ( ! file_exists( PROGRESS_PLANNER_DIR . '/assets/js/widgets/' . $this->id . '.js' ) ) {
-			return;
-		}
-
-		\wp_enqueue_script( 'progress-planner-widget-' . $this->id );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/' . $this->id );
 		$localized_data = $this->get_localized_data();
 		if ( ! empty( $localized_data ) &&
 			isset( $localized_data['handle'] ) &&
@@ -116,7 +111,7 @@ abstract class Widget {
 			is_array( $localized_data['data'] )
 		) {
 			\wp_localize_script(
-				'progress-planner-widget-' . $this->id,
+				'progress-planner/widgets/' . $this->id,
 				$localized_data['handle'],
 				$localized_data['data']
 			);

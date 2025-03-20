@@ -4,7 +4,7 @@
  *
  * A script to handle the settings page.
  *
- * Dependencies: progress-planner-document-ready, wp-util
+ * Dependencies: progress-planner/document-ready, wp-util
  */
 const prplTogglePageSelectorSettingVisibility = function ( page, value ) {
 	const itemRadiosWrapperEl = document.querySelector(
