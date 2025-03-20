@@ -42,14 +42,22 @@ class Remote_Tasks {
 			}
 
 			// If the task with this id is completed, don't add a task.
-			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( "remote-task-{$item['task_id']}" ) ) {
+			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( "{$item['task_id']}" ) ) {
 				continue;
 			}
 
-			// Task which don't have category defined are added as a 'default' category.
-			$item['category'] = 'remote-' . ( isset( $item['category'] ) ? $item['category'] : 'default' );
-			$item['task_id']  = "remote-task-{$item['task_id']}";
-			$items[]          = $item;
+			$task_data = [
+				'task_id'     => $item['task_id'],
+				'provider_id' => 'remote-' . ( isset( $item['category'] ) ? $item['category'] : 'default' ),
+				'category'    => 'remote-' . ( isset( $item['category'] ) ? $item['category'] : 'default' ),
+				'title'       => $item['title'] ?? '',
+				'description' => $item['description'] ?? '',
+				'priority'    => $item['priority'] ?? 'medium',
+				'points'      => $item['points'] ?? 1,
+				'url'         => $item['url'] ?? '',
+				'dismissable' => $item['dismissable'] ?? true,
+			];
+			$items[]   = $task_data;
 		}
 
 		return \array_merge( $items, $tasks );
@@ -85,6 +93,11 @@ class Remote_Tasks {
 					$valid_tasks = [];
 					foreach ( $tasks as $task ) {
 						if ( isset( $task['task_id'] ) ) {
+							// Ensure remote task ID has proper prefix.
+							$task['task_id'] = str_starts_with( $task['task_id'], 'remote-task-' )
+								? $task['task_id']
+								: "remote-task-{$task['task_id']}";
+
 							$valid_tasks[] = $task;
 						}
 					}

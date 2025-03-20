@@ -4,7 +4,7 @@
  *
  * A script to handle the onboarding process.
  *
- * Dependencies: progress-planner-ajax-request, progress-planner-scan-posts, progress-planner-upgrade-tasks
+ * Dependencies: progress-planner/ajax-request, progress-planner/scan-posts, progress-planner/upgrade-tasks
  */
 
 /**
@@ -13,7 +13,6 @@
  * @param {string} licenseKey The license key.
  */
 const progressPlannerSaveLicenseKey = ( licenseKey ) => {
-	// eslint-disable-next-line no-console
 	console.log( 'License key: ' + licenseKey );
 	progressPlannerAjaxRequest( {
 		url: progressPlanner.ajaxUrl,
@@ -65,7 +64,6 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 			} );
 		} )
 		.catch( ( error ) => {
-			// eslint-disable-next-line no-console
 			console.warn( error );
 		} );
 };

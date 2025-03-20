@@ -177,7 +177,7 @@ abstract class One_Time extends Local_Tasks {
 			return false;
 		}
 
-		return $this->is_task_completed() ? ( new Local_Task_Factory( $task_id ) )->get_task() : false;
+		return $this->is_task_completed() ? Local_Task_Factory::create_task_from( 'id', $task_id ) : false;
 	}
 
 	/**
@@ -221,7 +221,11 @@ abstract class One_Time extends Local_Tasks {
 		}
 
 		return [
-			$this->get_task_details( $this->get_task_id() ),
+			[
+				'task_id'     => $this->get_task_id(),
+				'provider_id' => $this->get_provider_id(),
+				'category'    => $this->get_provider_category(),
+			],
 		];
 	}
 

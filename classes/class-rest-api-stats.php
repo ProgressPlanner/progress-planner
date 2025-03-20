@@ -166,7 +166,8 @@ class Rest_API_Stats {
 		}
 		$data['todo'] = $pending_todo_items;
 
-		$ravis_recommendations   = \progress_planner()->get_suggested_tasks()->get_tasks();
+		// Pending tasks include remote tasks.
+		$ravis_recommendations   = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
 		$data['recommendations'] = [];
 		foreach ( $ravis_recommendations as $recommendation ) {
 			$data['recommendations'][] = [

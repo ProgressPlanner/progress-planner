@@ -9,8 +9,8 @@ namespace Progress_Planner\Widgets;
 
 use Progress_Planner\Badges\Monthly;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Review;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Review;
 
 /**
  * Suggested_Tasks class.
@@ -47,42 +47,19 @@ final class Suggested_Tasks extends Widget {
 	}
 
 	/**
-	 * Register scripts.
-	 *
-	 * @return void
-	 */
-	public function register_scripts() {
-		\wp_register_script(
-			'progress-planner-' . $this->id,
-			PROGRESS_PLANNER_URL . '/assets/js/widgets/suggested-tasks.js',
-			[
-				'progress-planner-todo',
-				'progress-planner-grid-masonry',
-				'progress-planner-web-components-prpl-suggested-task',
-				'progress-planner-document-ready',
-				'particles-confetti',
-			],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/suggested-tasks.js' ),
-			true
-		);
-	}
-
-	/**
 	 * Enqueue scripts.
 	 *
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		$handle = 'progress-planner-' . $this->id;
-
 		// Enqueue the script.
-		\wp_enqueue_script( $handle );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/suggested-tasks' );
 
 		// If there are newly added task providers, delay the celebration in order not to get confetti behind the popover.
 		$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
 
 		// Get tasks from task providers and pending_celebration tasks.
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
+		$tasks = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
 
 		// If we're not delaying the celebration, we need to get the pending_celebration tasks.
 		if ( ! $delay_celebration ) {
@@ -92,7 +69,7 @@ final class Suggested_Tasks extends Widget {
 				$task_id = $task['task_id'];
 
 				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
-					( new Local_Task_Factory( $task_id ) )->get_task()->get_provider_id()
+					Local_Task_Factory::create_task_from( 'id', $task_id )->get_provider_id()
 				);
 
 				if ( $task_provider && $task_provider->capability_required() ) {
@@ -197,7 +174,7 @@ final class Suggested_Tasks extends Widget {
 
 		// Localize the script.
 		\wp_localize_script(
-			$handle,
+			'progress-planner/widgets/suggested-tasks',
 			'prplSuggestedTasks',
 			$localize_data
 		);

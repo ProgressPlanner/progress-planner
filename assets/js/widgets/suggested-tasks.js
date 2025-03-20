@@ -1,4 +1,9 @@
 /* global customElements, prplSuggestedTasks, confetti, prplDocumentReady */
+/**
+ * Suggested tasks widget.
+ *
+ * Dependencies: progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, particles-confetti
+ */
 
 /**
  * Count the number of items in the list.
