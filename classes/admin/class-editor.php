@@ -48,13 +48,8 @@ class Editor {
 			$prpl_preselected_page_type = \progress_planner()->get_page_types()->get_default_page_type( (string) \get_post_type(), (int) \get_the_ID() );
 		}
 
-		\wp_enqueue_script(
-			'progress-planner/editor',
-			\plugins_url( '/assets/js/editor.js', PROGRESS_PLANNER_FILE ),
-			[ 'wp-plugins', 'wp-edit-post', 'wp-element' ],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/editor.js' ),
-			true
-		);
+		\progress_planner()->get_admin__scripts()->register_scripts();
+		\wp_enqueue_script( 'progress-planner/editor' );
 
 		\wp_localize_script(
 			'progress-planner/editor',

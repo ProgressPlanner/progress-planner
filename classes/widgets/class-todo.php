@@ -55,14 +55,12 @@ final class ToDo extends Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		$handle = 'progress-planner/widgets/' . $this->id;
-
 		// Enqueue the script.
-		\wp_enqueue_script( $handle );
+		\wp_enqueue_script( 'progress-planner/widgets/todo' );
 
 		// Localize the script.
 		\wp_localize_script(
-			$handle,
+			'progress-planner/widgets/todo',
 			'progressPlannerTodo',
 			[
 				'ajaxUrl'   => \admin_url( 'admin-ajax.php' ),
