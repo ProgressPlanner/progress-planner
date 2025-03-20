@@ -62,10 +62,10 @@ window.addEventListener(
 								.getComputedStyle(
 									document.querySelector(
 										'.prpl-widgets-container'
-									)
+									),
 								)
 								.getPropertyValue( 'grid-auto-rows' )
-						)
+						),
 				);
 				item.style.gridRowEnd = 'span ' + ( rowSpan + 1 );
 			} );
