@@ -199,6 +199,8 @@ class Enqueue {
 						'subscribed'  => \esc_html__( 'Subscribed...', 'progress-planner' ),
 					];
 				}
+
+				\wp_localize_script( $handle, 'progressPlannerL10n', $data );
 				break;
 
 			case 'progress-planner/settings-page':
@@ -245,11 +247,7 @@ class Enqueue {
 					$localized_data[ $context . 'IconUrl' ] = $url;
 				}
 
-				\wp_localize_script(
-					$handle,
-					'prplCelebrate',
-					$localized_data
-				);
+				\wp_localize_script( $handle, 'prplCelebrate', $localized_data );
 				break;
 
 			default:
