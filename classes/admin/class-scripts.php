@@ -20,49 +20,33 @@ class Scripts {
 	public function register_scripts() {
 		// Register vendor scripts.
 		$vendor_scripts = [
-			'driver'             => [ 'driver.js.iife.js', '1.3.1' ],
-			'particles-confetti' => [ 'tsparticles.confetti.bundle.min.js', '2.11.0' ],
+			'vendor/tsparticles.confetti.bundle.min' => [
+				'handle'  => 'particles-confetti',
+				'version' => '2.11.0',
+			],
+			'vendor/driver.js.iife'                     => [
+				'handle'  => 'driver',
+				'version' => '1.3.1',
+			],
 		];
-		foreach ( $vendor_scripts as $handle => $file ) {
-			\wp_register_script( $handle, PROGRESS_PLANNER_URL . "/assets/js/vendor/{$file[0]}", [], (string) $file[1], true );
-		}
 
-		// Register web components.
-		foreach ( $this->get_files_in_directory( 'assets/js/web-components' ) as $file ) {
-			$handle = 'progress-planner/web-components/' . $file;
-			\wp_register_script(
-				$handle,
-				PROGRESS_PLANNER_URL . "/assets/js/web-components/{$file}.js",
-				$this->get_dependencies( 'web-components/' . $file ),
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/web-components/' . $file . '.js' ),
-				true
-			);
-			$this->localize_script( $handle );
-		}
+		$scripts_dir = PROGRESS_PLANNER_DIR . '/assets/js';
 
-		// Register main scripts.
-		foreach ( $this->get_files_in_directory( 'assets/js' ) as $file ) {
-			$handle = 'progress-planner/' . $file;
-			\wp_register_script(
-				$handle,
-				PROGRESS_PLANNER_URL . '/assets/js/' . $file . '.js',
-				$this->get_dependencies( $file ),
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/' . $file . '.js' ),
-				true
-			);
-			$this->localize_script( $handle );
-		}
+		// Recursively get all files in the assets/js/ directory.
+		foreach ( new \RecursiveIteratorIterator( new \RecursiveDirectoryIterator( PROGRESS_PLANNER_DIR . '/assets/js' ) ) as $file ) {
+			if ( ! $file->isFile() || $file->getExtension() !== 'js' ) {
+				continue;
+			}
+			$name    = \rtrim( \str_replace( $scripts_dir . '/', '', $file->getPathname() ), '.js' );
+			$url     = PROGRESS_PLANNER_URL . "/assets/js/{$name}.js";
+			$handle  = isset( $vendor_scripts[ $name ] )
+				? $vendor_scripts[ $name ]['handle']
+				: 'progress-planner/' . $name;
+			$version = isset( $vendor_scripts[ $name ] )
+				? $vendor_scripts[ $name ]['version']
+				: \progress_planner()->get_file_version( $file->getPathname() );
 
-		// Register widgets scripts.
-		foreach ( $this->get_files_in_directory( 'assets/js/widgets' ) as $file ) {
-			$handle = 'progress-planner/widgets/' . $file;
-			\wp_register_script(
-				$handle,
-				PROGRESS_PLANNER_URL . '/assets/js/widgets/' . $file . '.js',
-				$this->get_dependencies( 'widgets/' . $file ),
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/' . $file . '.js' ),
-				true
-			);
+			\wp_register_script( $handle, $url, $this->get_dependencies( $name ), $version, true );
 			$this->localize_script( $handle );
 		}
 	}
