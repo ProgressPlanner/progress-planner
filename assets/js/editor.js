@@ -138,9 +138,9 @@ const PrplSectionVideo = ( lessonSection ) => {
 								__html: lessonSection.video,
 							},
 						} )
-					),
+					)
 				)
-		),
+		)
 	);
 };
 
@@ -237,7 +237,7 @@ const PrplLessonItemsHTML = () => {
 							: el( 'div', {}, '' ),
 						PrplTodoProgress( lesson.checklist, pageTodos ),
 						PrplCheckList( lesson.checklist, pageTodos )
-				)
+					)
 			  )
 			: el( 'div', {}, '' ),
 
@@ -283,7 +283,7 @@ const PrplProgressPlannerSidebar = () =>
 				},
 				PrplRenderPageTypeSelector(),
 				PrplLessonItemsHTML()
-			),
+			)
 		)
 	);
 
@@ -358,7 +358,7 @@ const PrplTodoProgress = ( lessonSection, pageTodos ) => {
 					},
 				},
 				`${ percentageComplete }%`
-			),
+			)
 		),
 		el( 'div', {
 			dangerouslySetInnerHTML: {
@@ -432,9 +432,9 @@ const PrplCheckList = ( lessonSection, pageTodos ) =>
 				},
 				toDoGroup.group_todos.map( ( item ) =>
 					PrplCheckListItem( item, pageTodos )
-				),
+				)
 			)
-		),
+		)
 	);
 
 // Register the sidebar.
