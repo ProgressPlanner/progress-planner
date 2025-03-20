@@ -59,9 +59,9 @@ class Enqueue {
 			return;
 		}
 		// The file URL.
-		$file_url  = PROGRESS_PLANNER_URL . "/assets/js/{$handle}.js";
+		$file_url = PROGRESS_PLANNER_URL . "/assets/js/{$handle}.js";
 		// The handle.
-		$handle    = isset( self::VENDOR_SCRIPTS[ $handle ] )
+		$handle = isset( self::VENDOR_SCRIPTS[ $handle ] )
 			? self::VENDOR_SCRIPTS[ $handle ]['handle']
 			: 'progress-planner/' . $handle;
 		// The version.
