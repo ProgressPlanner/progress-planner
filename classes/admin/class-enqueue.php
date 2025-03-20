@@ -183,7 +183,6 @@ class Enqueue {
 			'nextBtnText'                  => \esc_html__( 'Next &rarr;', 'progress-planner' ),
 			'prevBtnText'                  => \esc_html__( '&larr; Previous', 'progress-planner' ),
 			'pageType'                     => \esc_html__( 'Page type', 'progress-planner' ),
-			'progressPlanner'              => \esc_html__( 'Progress Planner', 'progress-planner' ),
 			'progressPlannerSidebar'       => \esc_html__( 'Progress Planner Sidebar', 'progress-planner' ),
 			'progressText'                 => sprintf(
 				/* translators: %1$s: The current step number. %2$s: The total number of steps. */

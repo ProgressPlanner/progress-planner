@@ -512,7 +512,7 @@ const PrplPostStatus = () =>
 								'progress-planner-sidebar/progress-planner-sidebar'
 							),
 				},
-				prplL10n( 'progressPlanner' )
+				'Progress Planner'
 			)
 		),
 		el( PluginPostStatusInfo, {} )
