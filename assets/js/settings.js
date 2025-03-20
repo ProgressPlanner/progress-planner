@@ -4,7 +4,7 @@
  *
  * A script to handle the settings page.
  *
- * Dependencies: progress-planner/ajax-request, progress-planner/onboard, wp-util
+ * Dependencies: progress-planner/ajax-request, progress-planner/onboard, wp-util, progress-planner/l10n
  */
 document
 	.getElementById( 'prpl-settings-form' )
@@ -24,7 +24,7 @@ document
 
 		document.getElementById( 'submit-include-post-types' ).disabled = true;
 		document.getElementById( 'submit-include-post-types' ).innerHTML =
-			progressPlanner.l10n.saving;
+			prplL10n( 'saving' );
 	} );
 
 // Submit the email.
@@ -64,7 +64,7 @@ if ( !! settingsLicenseForm ) {
 
 							document.getElementById(
 								'submit-license-key'
-							).innerHTML = progressPlanner.l10n.subscribed;
+							).innerHTML = prplL10n( 'subscribed' );
 
 							// Timeout so the license key is saved.
 							setTimeout( () => {
@@ -83,6 +83,6 @@ if ( !! settingsLicenseForm ) {
 
 		document.getElementById( 'submit-license-key' ).disabled = true;
 		document.getElementById( 'submit-license-key' ).innerHTML =
-			progressPlanner.l10n.subscribing;
+			prplL10n( 'subscribing' );
 	} );
 }
