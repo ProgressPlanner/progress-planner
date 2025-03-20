@@ -37,42 +37,28 @@ class Scripts {
 			if ( ! $file->isFile() || $file->getExtension() !== 'js' ) {
 				continue;
 			}
-			$name    = \rtrim( \str_replace( $scripts_dir . '/', '', $file->getPathname() ), '.js' );
-			$url     = PROGRESS_PLANNER_URL . "/assets/js/{$name}.js";
-			$handle  = isset( $vendor_scripts[ $name ] )
+			// Get the file name without the extension.
+			$name = \rtrim( \str_replace( $scripts_dir . '/', '', $file->getPathname() ), '.js' );
+			// Get the URL of the file.
+			$url = PROGRESS_PLANNER_URL . "/assets/js/{$name}.js";
+			// Get the handle of the script.
+			$handle = isset( $vendor_scripts[ $name ] )
 				? $vendor_scripts[ $name ]['handle']
 				: 'progress-planner/' . $name;
+			// Get the version of the script.
 			$version = isset( $vendor_scripts[ $name ] )
 				? $vendor_scripts[ $name ]['version']
 				: \progress_planner()->get_file_version( $file->getPathname() );
-
-			\wp_register_script( $handle, $url, $this->get_dependencies( $name ), $version, true );
+			// Get the dependencies of the script.
+			$headers      = \get_file_data( $file->getPathname(), [ 'dependencies' => 'Dependencies' ] );
+			$dependencies = isset( $headers['dependencies'] )
+				? \array_filter( \array_map( 'trim', \explode( ',', $headers['dependencies'] ) ) )
+				: [];
+			// Register the script.
+			\wp_register_script( $handle, $url, $dependencies, $version, true );
+			// Localize the script.
 			$this->localize_script( $handle );
 		}
-	}
-
-	/**
-	 * Get dependencies for a script.
-	 *
-	 * @param string $file The file name.
-	 * @return array
-	 */
-	public function get_dependencies( $file ) {
-		$path = PROGRESS_PLANNER_DIR . '/assets/js/' . $file . '.js';
-		if ( ! \file_exists( $path ) ) {
-			return [];
-		}
-		$headers = \get_file_data(
-			$path,
-			[
-				'dependencies' => 'Dependencies',
-			]
-		);
-		if ( ! isset( $headers['dependencies'] ) ) {
-			return [];
-		}
-
-		return \array_filter( \array_map( 'trim', \explode( ',', $headers['dependencies'] ) ) );
 	}
 
 	/**
