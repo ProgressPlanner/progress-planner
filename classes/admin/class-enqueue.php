@@ -200,7 +200,7 @@ class Enqueue {
 					];
 				}
 
-				\wp_localize_script( $handle, 'progressPlannerL10n', $data );
+				\wp_localize_script( $handle, 'progressPlanner', $data );
 				break;
 
 			case 'progress-planner/settings-page':
