@@ -9,7 +9,8 @@ namespace Progress_Planner\Widgets;
 
 use Progress_Planner\Badges\Monthly;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Review;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Review;
 
 /**
  * Suggested_Tasks class.
@@ -46,72 +47,49 @@ final class Suggested_Tasks extends Widget {
 	}
 
 	/**
-	 * Register scripts.
-	 *
-	 * @return void
-	 */
-	public function register_scripts() {
-		\wp_register_script(
-			'progress-planner-' . $this->id,
-			PROGRESS_PLANNER_URL . '/assets/js/widgets/suggested-tasks.js',
-			[
-				'progress-planner-todo',
-				'progress-planner-grid-masonry',
-				'progress-planner-web-components-prpl-suggested-task',
-				'progress-planner-document-ready',
-				'particles-confetti',
-			],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/suggested-tasks.js' ),
-			true
-		);
-	}
-
-	/**
 	 * Enqueue scripts.
 	 *
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		$handle = 'progress-planner-' . $this->id;
-
 		// Enqueue the script.
-		\wp_enqueue_script( $handle );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/suggested-tasks' );
 
 		// If there are newly added task providers, delay the celebration in order not to get confetti behind the popover.
 		$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
 
 		// Get tasks from task providers and pending_celebration tasks.
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
+		$tasks = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
 
 		// If we're not delaying the celebration, we need to get the pending_celebration tasks.
 		if ( ! $delay_celebration ) {
 			$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending_celebration' );
 
-			// If there are pending_celebration tasks, we need to add them to the tasks array.
-			if ( ! empty( $pending_celebration_tasks ) ) {
+			foreach ( $pending_celebration_tasks as $key => $task ) {
+				$task_id = $task['task_id'];
 
-				foreach ( $pending_celebration_tasks as $key => $task ) {
-					$task_id = $task['task_id'];
+				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
+					Local_Task_Factory::create_task_from( 'id', $task_id )->get_provider_id()
+				);
 
-					$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
-						( new Local_Task_Factory( $task_id ) )->get_task()->get_provider_id()
-					);
+				if ( $task_provider && $task_provider->capability_required() ) {
+					$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task_id );
 
-					if ( $task_provider && $task_provider->capability_required() ) {
-						$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task_id );
+					if ( $task_details ) {
+						$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
+						$task_details['action']   = 'celebrate';
+						$task_details['status']   = 'pending_celebration';
 
-						if ( $task_details ) {
-							$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
-							$task_details['action']   = 'celebrate';
-							$task_details['status']   = 'pending_celebration';
-							$task_details['category'] = 'pending_celebration';
-
-							$tasks[] = $task_details;
+						// Award 2 points if last created post was long.
+						if ( ( new Create() )->get_provider_id() === $task_provider->get_provider_id() ) {
+							$task_details['points'] = $task_provider->get_points( $task_id );
 						}
 
-						// Mark the pending celebration tasks as completed.
-						\progress_planner()->get_suggested_tasks()->transition_task_status( $task_id, 'pending_celebration', 'completed' );
+						$tasks[] = $task_details;
 					}
+
+					// Mark the pending celebration tasks as completed.
+					\progress_planner()->get_suggested_tasks()->transition_task_status( $task_id, 'pending_celebration', 'completed' );
 				}
 			}
 		}
@@ -180,18 +158,54 @@ final class Suggested_Tasks extends Widget {
 			];
 		}
 
+		$localize_data = [
+			'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
+			'nonce'               => \wp_create_nonce( 'progress_planner' ),
+			'tasks'               => array_values( $final_tasks ),
+			'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
+			'confettiOptions'     => $confetti_options,
+			'delayCelebration'    => $delay_celebration,
+			'raviIconUrl'         => PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg',
+		];
+
+		foreach ( $this->get_badge_urls() as $context => $url ) {
+			$localize_data[ $context . 'IconUrl' ] = $url;
+		}
+
 		// Localize the script.
 		\wp_localize_script(
-			$handle,
+			'progress-planner/widgets/suggested-tasks',
 			'prplSuggestedTasks',
-			[
-				'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
-				'nonce'               => \wp_create_nonce( 'progress_planner' ),
-				'tasks'               => array_values( $final_tasks ),
-				'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
-				'confettiOptions'     => $confetti_options,
-				'delayCelebration'    => $delay_celebration,
-			]
+			$localize_data
 		);
+	}
+
+	/**
+	 * Get the badge URLs.
+	 *
+	 * @return string[] The badge URLs.
+	 */
+	private function get_badge_urls() {
+		// Get the monthly badge URL.
+		$monthly_badge       = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
+		$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id();
+
+		// Get the content and maintenance badge URLs.
+		foreach ( [ 'content', 'maintenance' ] as $context ) {
+			$set_badges        = \progress_planner()->get_badges()->get_badges( $context );
+			$badge_url_context = '';
+			foreach ( $set_badges as $key => $badge ) {
+				$progress = $badge->get_progress();
+				if ( $progress['progress'] > 100 ) {
+					$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge->get_id();
+				}
+			}
+			if ( ! isset( $badge_urls[ $context ] ) ) {
+				// Fallback to the first badge in the set if no badge is completed.
+				$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $set_badges[0]->get_id();
+			}
+		}
+
+		return $badge_urls;
 	}
 }

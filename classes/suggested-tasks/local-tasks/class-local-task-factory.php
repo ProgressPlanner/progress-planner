@@ -13,41 +13,63 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks;
 class Local_Task_Factory {
 
 	/**
-	 * The task ID.
-	 *
-	 * @var string
-	 */
-	private $task_id;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param string $task_id The task ID.
-	 */
-	public function __construct( string $task_id ) {
-		$this->task_id = $task_id;
-	}
-
-	/**
 	 * Get the task.
+	 *
+	 * @param string $param The parameter, 'id' or 'data'.
+	 * @param mixed  $value The task ID or task data.
 	 *
 	 * @return \Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local
 	 */
-	public function get_task(): Task_Local {
+	public static function create_task_from( $param, $value = null ): Task_Local {
+
+		// If we have task data, return it.
+		if ( 'data' === $param && is_array( $value ) ) {
+			return new Task_Local( $value );
+		}
+
+		if ( 'id' === $param && is_string( $value ) ) {
+			// We should have all the data saved in the database.
+			$data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $value );
+
+			// If we have the task data, return it.
+			if ( $data ) {
+				return new Task_Local( $data );
+			}
+
+			/*
+			We're here in following cases:
+			 * - Legacy tasks, happens during v1.1.1 update, where we parsed task data from the task_id.
+			 * - Remote tasks, we passed only the task_id.
+			*/
+			return self::parse_task_data_from_task_id( $value );
+		}
+
+		return new Task_Local( [] );
+	}
+
+	/**
+	 * Legacy function for parsing task data from task ID.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return \Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local
+	 */
+	public static function parse_task_data_from_task_id( $task_id ) {
+		$data = [];
 
 		// Parse simple format, e.g. 'update-core-202449' or "hello-world".
-		if ( ! str_contains( $this->task_id, '|' ) ) {
+		if ( ! str_contains( $task_id, '|' ) ) {
 
-			$last_pos = strrpos( $this->task_id, '-' );
+			$last_pos = strrpos( $task_id, '-' );
 
 			// Check if the task ID ends with a '-12345' or not, if not that would be mostly one time tasks.
-			if ( $last_pos === false || ! preg_match( '/-\d+$/', $this->task_id ) ) {
+			if ( $last_pos === false || ! preg_match( '/-\d+$/', $task_id ) ) {
 
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $this->task_id );
+				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_id );
 
 				return new Task_Local(
 					[
-						'task_id'     => $this->task_id,
+						'task_id'     => $task_id,
 						'category'    => $task_provider ? $task_provider->get_provider_category() : '',
 						'provider_id' => $task_provider ? $task_provider->get_provider_id() : '',
 					]
@@ -55,8 +77,13 @@ class Local_Task_Factory {
 			}
 
 			// Remote (remote-12345) or repetitive tasks (update-core-202449).
-			$task_provider_id = substr( $this->task_id, 0, $last_pos );
-			$task_suffix      = substr( $this->task_id, $last_pos + 1 );
+			$task_provider_id = substr( $task_id, 0, $last_pos );
+			$task_suffix      = substr( $task_id, $last_pos + 1 );
+
+			// Check for legacy create-post task_id, old task_ids were migrated to create-post-short' or 'create-post-long' (since we had 2 such tasks per week).
+			if ( 'create-post-short' === $task_provider_id || 'create-post-long' === $task_provider_id ) {
+				$task_provider_id = 'create-post';
+			}
 
 			$task_suffix_key = 'remote-task' === $task_provider_id ? 'remote_task_id' : 'date';
 
@@ -66,13 +93,13 @@ class Local_Task_Factory {
 			if ( ! $task_provider ) {
 				return new Task_Local(
 					[
-						'task_id' => $this->task_id,
+						'task_id' => $task_id,
 					]
 				);
 			} else {
 				return new Task_Local(
 					[
-						'task_id'        => $this->task_id,
+						'task_id'        => $task_id,
 						'category'       => $task_provider->get_provider_category(),
 						'provider_id'    => $task_provider->get_provider_id(),
 						$task_suffix_key => $task_suffix,
@@ -81,16 +108,18 @@ class Local_Task_Factory {
 			}
 		}
 
-		$data = [ 'task_id' => $this->task_id ];
+		// Legacy piped format.
+		$data = [ 'task_id' => $task_id ];
 
 		// Parse detailed (piped) format (date/202510|long/1|provider_id/create-post).
-		$parts = \explode( '|', $this->task_id );
+		$parts = \explode( '|', $task_id );
 		foreach ( $parts as $part ) {
 			$part = \explode( '/', $part );
 			if ( 2 !== \count( $part ) ) {
 				continue;
 			}
-			$data[ $part[0] ] = ( \is_numeric( $part[1] ) )
+			// Date should be a string, not a number.
+			$data[ $part[0] ] = ( 'date' !== $part[0] && \is_numeric( $part[1] ) )
 				? (int) $part[1]
 				: $part[1];
 		}
@@ -105,8 +134,10 @@ class Local_Task_Factory {
 			unset( $data['type'] );
 		}
 
-		$task_provider    = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $data['provider_id'] );
-		$data['category'] = $task_provider ? $task_provider->get_provider_category() : '';
+		if ( isset( $data['provider_id'] ) ) {
+			$task_provider    = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $data['provider_id'] );
+			$data['category'] = $task_provider ? $task_provider->get_provider_category() : '';
+		}
 
 		return new Task_Local( $data );
 	}

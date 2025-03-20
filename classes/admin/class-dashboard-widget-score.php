@@ -37,9 +37,8 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 	 */
 	public function render_widget() {
 		// Enqueue stylesheets.
-		\progress_planner()->get_admin__scripts()->register_scripts();
 		\progress_planner()->get_admin__page()->enqueue_styles();
-		\wp_enqueue_script( 'progress-planner-web-components-prpl-gauge' );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-gauge' );
 
 		$suggested_tasks_widget = \progress_planner()->get_admin__page()->get_widget( 'suggested-tasks' );
 		if ( $suggested_tasks_widget ) {

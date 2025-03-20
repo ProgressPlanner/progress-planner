@@ -4,7 +4,7 @@
  *
  * A web component that displays a gauge.
  *
- * Dependencies: progress-planner-web-components-prpl-interactive-task
+ * Dependencies: progress-planner/web-components/prpl-interactive-task
  */
 /**
  * Register the custom web component.

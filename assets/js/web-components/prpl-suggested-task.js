@@ -18,7 +18,7 @@ customElements.define(
 			taskCategory = '',
 			taskPopoverId,
 		} ) {
-			// Get parent class properties.
+			// Get parent class properties
 			super();
 
 			this.setAttribute( 'role', 'listitem' );

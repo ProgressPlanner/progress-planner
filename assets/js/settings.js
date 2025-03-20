@@ -4,7 +4,7 @@
  *
  * A script to handle the settings page.
  *
- * Dependencies: progress-planner-ajax-request, progress-planner-onboard, wp-util
+ * Dependencies: progress-planner/ajax-request, progress-planner/onboard, wp-util
  */
 document
 	.getElementById( 'prpl-settings-form' )
@@ -73,13 +73,11 @@ if ( !! settingsLicenseForm ) {
 							}, 500 );
 						} )
 						.catch( ( error ) => {
-							// eslint-disable-next-line no-console
 							console.warn( error );
 						} );
 				}
 			} )
 			.catch( ( error ) => {
-				// eslint-disable-next-line no-console
 				console.warn( error );
 			} );
 

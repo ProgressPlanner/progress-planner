@@ -82,6 +82,7 @@ class Base {
 
 		// REST API.
 		$this->cached['rest_api_stats'] = new Rest_API_Stats();
+		$this->cached['rest_api_tasks'] = new Rest_API_Tasks();
 
 		// Onboarding.
 		$this->cached['onboard'] = new Onboard();
@@ -184,7 +185,7 @@ class Base {
 	/**
 	 * Get the activation date.
 	 *
-	 * @return \DateTime|false
+	 * @return \DateTime
 	 */
 	public function get_activation_date() {
 		$activation_date = $this->get_settings()->get( 'activation_date' );
@@ -193,7 +194,7 @@ class Base {
 			$this->get_settings()->set( 'activation_date', $activation_date->format( 'Y-m-d' ) );
 			return $activation_date;
 		}
-		return \DateTime::createFromFormat( 'Y-m-d', $activation_date );
+		return \DateTime::createFromFormat( 'Y-m-d', $activation_date ); // @phpstan-ignore-line return.type
 	}
 
 	/**

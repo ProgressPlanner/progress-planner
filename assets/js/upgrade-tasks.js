@@ -4,7 +4,7 @@
  *
  * A script to process the onboarding task checklist.
  *
- * Dependencies: progress-planner-document-ready
+ * Dependencies: progress-planner/document-ready
  */
 
 /**
@@ -18,7 +18,7 @@ async function prplOnboardTasks() {
 			const tasksElement = document.getElementById(
 				'prpl-onboarding-tasks'
 			);
-			const timeToWait = 2000;
+			const timeToWait = 1000;
 
 			if ( ! tasksElement ) {
 				resolve();
@@ -75,11 +75,6 @@ async function prplOnboardTasks() {
 			// Wait for all tasks to complete.
 			await Promise.all( tasks );
 
-			// We add a small delay to make sure the user sees if the last task is completed and total points.
-			await new Promise( ( resolveTimeout ) =>
-				setTimeout( resolveTimeout, timeToWait )
-			);
-
 			// Resolve the promise.
 			resolve();
 		} )();
@@ -89,6 +84,7 @@ async function prplOnboardTasks() {
 /**
  * Redirect user to the stats page after onboarding or plugin upgrade.
  */
+// eslint-disable-next-line no-unused-vars
 const prplOnboardRedirect = () => {
 	const onboardingTasksElement = document.getElementById(
 		'prpl-onboarding-tasks'
@@ -127,7 +123,9 @@ prplDocumentReady( function () {
 		popover.showPopover();
 
 		prplOnboardTasks().then( () => {
-			prplOnboardRedirect();
+			document
+				.getElementById( 'prpl-onboarding-continue-button' )
+				.classList.remove( 'prpl-disabled' );
 		} );
 	}
 } );

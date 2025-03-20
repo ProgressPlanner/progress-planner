@@ -15,18 +15,25 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Interactive;
 class Email_Sending extends Interactive {
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected const IS_ONBOARDING_TASK = false;
+
+	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	const ID = 'sending-email';
+	const PROVIDER_ID = 'sending-email';
 
 	/**
 	 * The provider type.
 	 *
 	 * @var string
 	 */
-	const TYPE = 'configuration';
+	const CATEGORY = 'configuration';
 
 	/**
 	 * The popover ID.
@@ -42,6 +49,14 @@ class Email_Sending extends Interactive {
 	 */
 	public function __construct() {
 		parent::__construct();
+	}
+
+	/**
+	 * Initialize the task provider.
+	 *
+	 * @return void
+	 */
+	public function init() {
 
 		// Enqueue the scripts.
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
@@ -62,19 +77,10 @@ class Email_Sending extends Interactive {
 			return;
 		}
 
-		$handle = 'progress-planner-web-components-prpl-task-' . $this->get_provider_id();
+		$handle = 'progress-planner/web-components/prpl-task-' . $this->get_provider_id();
 
 		// Enqueue the web component.
-		wp_enqueue_script( $handle );
-
-		// Localize the script.
-		wp_localize_script(
-			$handle,
-			'prplEmailSending',
-			[
-				'ajax_url' => \admin_url( 'admin-ajax.php' ),
-			]
-		);
+		\progress_planner()->get_admin__enqueue()->enqueue_script( $handle );
 	}
 
 	/**

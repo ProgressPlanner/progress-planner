@@ -29,6 +29,10 @@ class Page {
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		\add_action( 'wp_ajax_progress_planner_save_cpt_settings', [ $this, 'save_cpt_settings' ] );
 		\add_action( 'in_admin_header', [ $this, 'remove_admin_notices' ], PHP_INT_MAX );
+
+		// Clear the cache for the activity scores widget.
+		\add_action( 'progress_planner_activity_saved', [ $this, 'clear_activity_scores_cache' ] );
+		\add_action( 'progress_planner_activity_deleted', [ $this, 'clear_activity_scores_cache' ] );
 	}
 
 	/**
@@ -81,8 +85,8 @@ class Page {
 	 */
 	public function add_page() {
 		\add_menu_page(
-			\esc_html__( 'Progress Planner', 'progress-planner' ),
-			\esc_html__( 'Progress Planner', 'progress-planner' ),
+			'Progress Planner',
+			'Progress Planner',
 			'manage_options',
 			'progress-planner',
 			[ $this, 'render_page' ],
@@ -127,26 +131,24 @@ class Page {
 			return;
 		}
 
-		\progress_planner()->get_admin__scripts()->register_scripts();
-
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
 
 			if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
-				\wp_enqueue_script( 'progress-planner-web-components-prpl-gauge' );
-				\wp_enqueue_script( 'progress-planner-web-components-prpl-chart-bar' );
-				\wp_enqueue_script( 'progress-planner-web-components-prpl-chart-line' );
-				\wp_enqueue_script( 'progress-planner-web-components-prpl-big-counter' );
-				\wp_enqueue_script( 'progress-planner-header-filters' );
-				\wp_enqueue_script( 'progress-planner-settings' );
-				\wp_enqueue_script( 'progress-planner-grid-masonry' );
-				\wp_enqueue_script( 'progress-planner-upgrade-tasks' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-gauge' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-bar' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-line' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-big-counter' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'header-filters' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'grid-masonry' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'upgrade-tasks' );
 			} else {
-				\wp_enqueue_script( 'progress-planner-onboard' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboard' );
 			}
 		}
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
-			\wp_enqueue_script( 'progress-planner-settings-page' );
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings-page' );
 		}
 	}
 
@@ -186,11 +188,9 @@ class Page {
 		}
 
 		// Register the scripts.
-		\progress_planner()->get_admin__scripts()->register_scripts();
-
-		\wp_enqueue_script( 'progress-planner-focus-element' );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'focus-element' );
 		\wp_localize_script(
-			'progress-planner-focus-element',
+			'progress-planner/focus-element',
 			'progressPlannerFocusElement',
 			[
 				'tasks'           => $tasks_details,
@@ -310,5 +310,21 @@ class Page {
 		}
 
 		\remove_all_actions( 'admin_notices' );
+	}
+
+	/**
+	 * Clear the cache.
+	 *
+	 * @param \Progress_Planner\Activity $activity The activity.
+	 *
+	 * @return void
+	 */
+	public function clear_activity_scores_cache( $activity ) {
+		if ( 'content' !== $activity->category ) {
+			return;
+		}
+
+		// Clear the cache for the activity scores widget.
+		\progress_planner()->get_settings()->set( \progress_planner()->get_widgets__activity_scores()->get_cache_key(), [] );
 	}
 }

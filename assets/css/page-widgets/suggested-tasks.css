@@ -1,8 +1,16 @@
 .prpl-widget-wrapper.prpl-suggested-tasks {
 
+	/* Remove styling from the widget wrapper (but not in popover view). */
+	& > .widget-inner-container .prpl-widget-content > .prpl-widget-wrapper:has(.badge-group-monthly) {
+		padding: 0;
+		border: none;
+		box-shadow: none;
+		margin-bottom: 0;
+	}
+
 	.badge-group-monthly {
 		padding: calc(var(--prpl-padding) / 2);
-		border-radius: var(--prpl-border-radius);
+		border-radius: var(--prpl-border-radius-big);
 		background-color: var(--prpl-background-orange);
 
 		.prpl-badge-row-wrapper {
@@ -177,10 +185,6 @@
 			display: flex;
 			gap: 0.5rem;
 			flex-shrink: 0; /* Prevent the actions from shrinking when the task title is too long */
-
-			.prpl-suggested-task-button {
-				line-height: 0;
-			}
 		}
 
 		.prpl-suggested-task-points {
@@ -219,6 +223,7 @@
 
 		button {
 			padding: 0.1rem;
+			line-height: 0;
 			margin: 0;
 			background: none;
 			border: none;
@@ -436,12 +441,5 @@
 	font-size: var(--prpl-font-size-base);
 	color: var(--prpl-color-link);
 	text-decoration: underline;
-	margin-top: var(--prpl-padding);
-}
-
-/*------------------------------------*\
-	Interactive task popover styles.
-\*------------------------------------*/
-.prpl-popover-interactive {
-	width: 800px;
+	margin-top: 0.75rem;
 }
