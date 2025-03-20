@@ -92,8 +92,8 @@ class Page {
 		$page_identifier = 'progress-planner';
 
 		\add_menu_page(
-			\esc_html__( 'Progress Planner', 'progress-planner' ),
-			\esc_html__( 'Progress Planner', 'progress-planner' ) . $this->get_notification_counter(),
+			'Progress Planner',
+			'Progress Planner' . $this->get_notification_counter(),
 			'manage_options',
 			$page_identifier,
 			[ $this, 'render_page' ],
