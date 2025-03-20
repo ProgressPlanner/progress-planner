@@ -21,7 +21,7 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 		<?php \esc_html_e( 'Ravi\'s Recommendations', 'progress-planner' ); ?>
 	</h2>
 	<p>
-		<?php \esc_html_e( 'Collect 10 points by completing the tasks to earn this month\'s badge!', 'progress-planner' ); ?>
+		<?php \esc_html_e( 'Complete a task from Ravi’s Recommendations to improve your site and earn points toward this month’s badge!', 'progress-planner' ); ?>
 	</p>
 
 	<ul style="display:none"></ul>
