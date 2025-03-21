@@ -55,41 +55,46 @@ final class Suggested_Tasks extends Widget {
 		// Enqueue the script.
 		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/suggested-tasks' );
 
-		// If there are newly added task providers, delay the celebration in order not to get confetti behind the popover.
-		$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
-
 		// Get tasks from task providers and pending_celebration tasks.
-		$tasks = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
+		$tasks             = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
+		$delay_celebration = false;
 
-		// If we're not delaying the celebration, we need to get the pending_celebration tasks.
-		if ( ! $delay_celebration ) {
-			$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending_celebration' );
+		// Celebrate only on the Progress Planner Dashboard page.
+		if ( \progress_planner()->is_on_progress_planner_dashboard_page() ) {
 
-			foreach ( $pending_celebration_tasks as $key => $task ) {
-				$task_id = $task['task_id'];
+			// If there are newly added task providers, delay the celebration in order not to get confetti behind the popover.
+			$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
 
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
-					Local_Task_Factory::create_task_from( 'id', $task_id )->get_provider_id()
-				);
+			// If we're not delaying the celebration, we need to get the pending_celebration tasks.
+			if ( ! $delay_celebration ) {
+				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending_celebration' );
 
-				if ( $task_provider && $task_provider->capability_required() ) {
-					$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task_id );
+				foreach ( $pending_celebration_tasks as $key => $task ) {
+					$task_id = $task['task_id'];
 
-					if ( $task_details ) {
-						$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
-						$task_details['action']   = 'celebrate';
-						$task_details['status']   = 'pending_celebration';
+					$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
+						Local_Task_Factory::create_task_from( 'id', $task_id )->get_provider_id()
+					);
 
-						// Award 2 points if last created post was long.
-						if ( ( new Create() )->get_provider_id() === $task_provider->get_provider_id() ) {
-							$task_details['points'] = $task_provider->get_points( $task_id );
+					if ( $task_provider && $task_provider->capability_required() ) {
+						$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task_id );
+
+						if ( $task_details ) {
+							$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
+							$task_details['action']   = 'celebrate';
+							$task_details['status']   = 'pending_celebration';
+
+							// Award 2 points if last created post was long.
+							if ( ( new Create() )->get_provider_id() === $task_provider->get_provider_id() ) {
+								$task_details['points'] = $task_provider->get_points( $task_id );
+							}
+
+							$tasks[] = $task_details;
 						}
 
-						$tasks[] = $task_details;
+						// Mark the pending celebration tasks as completed.
+						\progress_planner()->get_suggested_tasks()->transition_task_status( $task_id, 'pending_celebration', 'completed' );
 					}
-
-					// Mark the pending celebration tasks as completed.
-					\progress_planner()->get_suggested_tasks()->transition_task_status( $task_id, 'pending_celebration', 'completed' );
 				}
 			}
 		}
