@@ -47,14 +47,11 @@ final class Suggested_Tasks extends Widget {
 	}
 
 	/**
-	 * Get the localized data for the script.
+	 * Enqueue the scripts.
 	 *
-	 * @return array<string, array|string>
+	 * @return void
 	 */
 	public function enqueue_scripts() {
-		// Enqueue the script.
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/suggested-tasks' );
-
 		// Get tasks from task providers and pending_celebration tasks.
 		$tasks             = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
 		$delay_celebration = false;
@@ -67,7 +64,7 @@ final class Suggested_Tasks extends Widget {
 
 			// If we're not delaying the celebration, we need to get the pending_celebration tasks.
 			if ( ! $delay_celebration ) {
-				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending_celebration' );
+				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' );
 
 				foreach ( $pending_celebration_tasks as $key => $task ) {
 					$task_id = $task['task_id'];
@@ -139,18 +136,20 @@ final class Suggested_Tasks extends Widget {
 			$max_items_per_category['user'] = 0;
 		}
 
-		$localize_data = [
-			'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
-			'nonce'               => \wp_create_nonce( 'progress_planner' ),
-			'tasks'               => array_values( $final_tasks ),
-			'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
-			'delayCelebration'    => $delay_celebration,
-		];
-
-		return [
-			'handle' => 'prplSuggestedTasks',
-			'data'   => $localize_data,
-		];
+		// Enqueue the script.
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'widgets/suggested-tasks',
+			[
+				'name' => 'prplSuggestedTasks',
+				'data' => [
+					'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
+					'nonce'               => \wp_create_nonce( 'progress_planner' ),
+					'tasks'               => array_values( $final_tasks ),
+					'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
+					'delayCelebration'    => $delay_celebration,
+				],
+			]
+		);
 	}
 
 	/**

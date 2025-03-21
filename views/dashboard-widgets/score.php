@@ -42,7 +42,7 @@ use Progress_Planner\Badges\Monthly;
 		<img src="<?php echo \esc_attr( PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg' ); ?>" style="width:1.85em;" alt="" />
 		<a href="<?php echo \esc_url( \get_admin_url( null, 'admin.php?page=progress-planner' ) ); ?>">
 			<?php
-			$prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending_celebration' );
+			$prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' );
 			if ( $prpl_pending_celebration_tasks ) {
 
 				$prpl_notification_count = \count( $prpl_pending_celebration_tasks );

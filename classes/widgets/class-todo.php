@@ -54,19 +54,22 @@ final class ToDo extends Widget {
 	}
 
 	/**
-	 * Get the localized data for the script.
+	 * Enqueue the scripts.
 	 *
-	 * @return array<string, array|string>
+	 * @return void
 	 */
-	public function get_localized_data() {
-		return [
-			'handle' => 'progressPlannerTodo',
-			'data'   => [
-				'ajaxUrl' => \admin_url( 'admin-ajax.php' ),
-				'nonce'   => \wp_create_nonce( 'progress_planner' ),
-				'tasks'   => \progress_planner()->get_todo()->get_items(),
-			],
-		];
+	public function enqueue_scripts() {
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'widgets/todo',
+			[
+				'name' => 'progressPlannerTodo',
+				'data' => [
+					'ajaxUrl' => \admin_url( 'admin-ajax.php' ),
+					'nonce'   => \wp_create_nonce( 'progress_planner' ),
+					'tasks'   => \progress_planner()->get_todo()->get_items(),
+				],
+			]
+		);
 	}
 
 	/**

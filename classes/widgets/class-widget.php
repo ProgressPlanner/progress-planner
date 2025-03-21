@@ -103,19 +103,6 @@ abstract class Widget {
 	 */
 	public function enqueue_scripts() {
 		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/' . $this->id );
-		$localized_data = $this->get_localized_data();
-		if ( ! empty( $localized_data ) &&
-			isset( $localized_data['handle'] ) &&
-			isset( $localized_data['data'] ) &&
-			is_string( $localized_data['handle'] ) &&
-			is_array( $localized_data['data'] )
-		) {
-			\wp_localize_script(
-				'progress-planner/widgets/' . $this->id,
-				$localized_data['handle'],
-				$localized_data['data']
-			);
-		}
 	}
 
 	/**
@@ -124,16 +111,6 @@ abstract class Widget {
 	 * @return array
 	 */
 	public function get_stylesheet_dependencies() {
-		return [];
-	}
-
-	/**
-	 * Get the localized data.
-	 *
-	 * @return array<string, array|string>
-	 */
-	public function get_localized_data() {
-		// Return an array with the `handle` and the `data`.
 		return [];
 	}
 }
