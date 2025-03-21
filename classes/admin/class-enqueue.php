@@ -36,6 +36,16 @@ class Enqueue {
 	];
 
 	/**
+	 * Enqueued assets.
+	 *
+	 * @var array
+	 */
+	protected $enqueued_assets = [
+		'js'  => [],
+		'css' => [],
+	];
+
+	/**
 	 * Enqueue script.
 	 *
 	 * @param string $handle The handle of the script to enqueue.
@@ -43,44 +53,110 @@ class Enqueue {
 	 * @return void
 	 */
 	public function enqueue_script( $handle ) {
+		$file_details = $this->get_file_details( 'js', $handle );
+		if ( empty( $file_details ) ) {
+			return;
+		}
+
+		$this->enqueued_assets['js'][] = $file_details['handle'];
+		$final_dependencies            = [];
+
+		// Enqueue the script dependencies.
+		foreach ( $file_details['dependencies'] as $dependency ) {
+			if ( ! in_array( $dependency, $this->enqueued_assets['js'], true ) ) {
+				$this->enqueue_script( $dependency );
+				$final_dependencies[] = $dependency;
+			}
+		}
+
+		// Enqueue the stylesheet.
+		\wp_enqueue_script( $file_details['handle'], $file_details['file_url'], $final_dependencies, $file_details['version'], true );
+
+		// Localize the script.
+		$this->localize_script( $file_details['handle'] );
+	}
+
+	/**
+	 * Enqueue a style.
+	 *
+	 * @param string $handle The handle of the style to enqueue.
+	 *
+	 * @return void
+	 */
+	public function enqueue_style( $handle ) {
+		$file_details = $this->get_file_details( 'css', $handle );
+		if ( empty( $file_details ) ) {
+			return;
+		}
+
+		$this->enqueued_assets['css'][] = $file_details['handle'];
+		$final_dependencies             = [];
+
+		// Enqueue the script dependencies.
+		foreach ( $file_details['dependencies'] as $dependency ) {
+			if ( ! in_array( $dependency, $this->enqueued_assets['css'], true ) ) {
+				$this->enqueue_style( $dependency );
+			}
+		}
+		// Enqueue the stylesheet.
+		\wp_enqueue_style( $file_details['handle'], $file_details['file_url'], $final_dependencies, $file_details['version'] );
+	}
+
+	/**
+	 * Get file details.
+	 *
+	 * @param string $context The context of the file ( `css` or `js` ).
+	 * @param string $handle The handle of the file.
+	 *
+	 * @return array
+	 */
+	public function get_file_details( $context, $handle ) {
 		if ( str_starts_with( $handle, 'progress-planner/' ) ) {
 			$handle = str_replace( 'progress-planner/', '', $handle );
 		}
-		foreach ( self::VENDOR_SCRIPTS as $vendor_script_handle => $vendor_script ) {
-			if ( $vendor_script['handle'] === $handle ) {
-				$handle = $vendor_script_handle;
-				break;
+
+		if ( 'js' === $context ) {
+			foreach ( self::VENDOR_SCRIPTS as $vendor_script_handle => $vendor_script ) {
+				if ( $vendor_script['handle'] === $handle ) {
+					$handle = $vendor_script_handle;
+					break;
+				}
 			}
 		}
 		// The file path.
-		$file_path = PROGRESS_PLANNER_DIR . "/assets/js/{$handle}.js";
+		$file_path = PROGRESS_PLANNER_DIR . "/assets/{$context}/{$handle}.{$context}";
+
 		// If the file does not exist, bail early.
 		if ( ! \file_exists( $file_path ) ) {
-			return;
+			return [];
 		}
+
 		// The file URL.
-		$file_url = PROGRESS_PLANNER_URL . "/assets/js/{$handle}.js";
+		$file_url = PROGRESS_PLANNER_URL . "/assets/{$context}/{$handle}.{$context}";
+
 		// The handle.
-		$handle = isset( self::VENDOR_SCRIPTS[ $handle ] )
+		$handle = 'js' === $context && isset( self::VENDOR_SCRIPTS[ $handle ] )
 			? self::VENDOR_SCRIPTS[ $handle ]['handle']
 			: 'progress-planner/' . $handle;
+
 		// The version.
-		$version = isset( self::VENDOR_SCRIPTS[ $handle ] )
+		$version = 'js' === $context && isset( self::VENDOR_SCRIPTS[ $handle ] )
 			? self::VENDOR_SCRIPTS[ $handle ]['version']
 			: \progress_planner()->get_file_version( $file_path );
+
 		// The dependencies.
 		$headers      = \get_file_data( $file_path, [ 'dependencies' => 'Dependencies' ] );
 		$dependencies = isset( $headers['dependencies'] )
 			? \array_filter( \array_map( 'trim', \explode( ',', $headers['dependencies'] ) ) )
 			: [];
-		// Enqueue the script dependencies.
-		foreach ( $dependencies as $dependency ) {
-			$this->enqueue_script( $dependency );
-		}
-		// Enqueue the script.
-		\wp_enqueue_script( $handle, $file_url, $dependencies, $version, true );
-		// Localize the script.
-		$this->localize_script( $handle );
+
+		return [
+			'file_path'    => $file_path,
+			'file_url'     => $file_url,
+			'handle'       => $handle,
+			'version'      => $version,
+			'dependencies' => $dependencies,
+		];
 	}
 
 	/**
