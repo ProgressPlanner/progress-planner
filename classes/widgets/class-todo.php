@@ -59,6 +59,7 @@ final class ToDo extends Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
+		// Enqueue the script.
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
 			'widgets/todo',
 			[
