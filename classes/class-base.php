@@ -411,5 +411,15 @@ class Base {
 		\wp_safe_redirect( \admin_url( 'admin.php?page=progress-planner' ) );
 		exit;
 	}
+
+	/**
+	 * Check if we're on the Progress Planner dashboard page.
+	 *
+	 * @return bool
+	 */
+	public function is_on_progress_planner_dashboard_page() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- We're not processing any data.
+		return \is_admin() && isset( $_GET['page'] ) && $_GET['page'] === 'progress-planner';
+	}
 }
 // phpcs:enable Generic.Commenting.Todo
