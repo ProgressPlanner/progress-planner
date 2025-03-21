@@ -7,19 +7,6 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Admin\Page as Admin_Page;
-use Progress_Planner\Admin\Tour as Admin_Tour;
-use Progress_Planner\Admin\Dashboard_Widget_Score as Admin_Dashboard_Widget_Score;
-use Progress_Planner\Admin\Dashboard_Widget_Todo as Admin_Dashboard_Widget_Todo;
-use Progress_Planner\Admin\Editor as Admin_Editor;
-use Progress_Planner\Actions\Content as Actions_Content;
-use Progress_Planner\Actions\Content_Scan as Actions_Content_Scan;
-use Progress_Planner\Actions\Maintenance as Actions_Maintenance;
-use Progress_Planner\Admin\Page_Settings as Admin_Page_Settings;
-use Progress_Planner\Plugin_Upgrade_Tasks;
-use Progress_Planner\Debug_Tools;
-use Progress_Planner\Data_Collector\Data_Collector_Manager;
-
 /**
  * Main plugin class.
  */
@@ -65,54 +52,54 @@ class Base {
 
 		// Basic classes.
 		if ( \is_admin() && \current_user_can( 'edit_others_posts' ) ) {
-			$this->cached['admin__page'] = new Admin_Page();
-			$this->cached['admin__tour'] = new Admin_Tour();
+			$this->get_admin__page();
+			$this->get_admin__tour();
 
 			// Dont add the widget if the privacy policy is not accepted.
 			if ( true === $this->is_privacy_policy_accepted() ) {
-				$this->cached['admin__dashboard_widget_score'] = new Admin_Dashboard_Widget_Score();
-				$this->cached['admin__dashboard_widget_todo']  = new Admin_Dashboard_Widget_Todo();
+				$this->get_admin__dashboard_widget_score();
+				$this->get_admin__dashboard_widget_todo();
 			}
 		}
-		$this->cached['admin__editor'] = new Admin_Editor();
+		$this->get_admin__editor();
 
-		$this->cached['actions__content']      = new Actions_Content();
-		$this->cached['actions__content_scan'] = new Actions_Content_Scan();
-		$this->cached['actions__maintenance']  = new Actions_Maintenance();
+		$this->get_actions__content();
+		$this->get_actions__content_scan();
+		$this->get_actions__maintenance();
 
 		// REST API.
-		$this->cached['rest_api_stats'] = new Rest_API_Stats();
-		$this->cached['rest_api_tasks'] = new Rest_API_Tasks();
+		$this->get_rest_api_stats();
+		$this->get_rest_api_tasks();
 
 		// Onboarding.
-		$this->cached['onboard'] = new Onboard();
+		$this->get_onboard();
 
 		// To-do.
-		$this->cached['todo'] = new Todo();
+		$this->get_todo();
 
 		// Post-meta.
 		if ( $this->is_pro_site() ) {
-			$this->cached['page_todos'] = new Page_Todos();
+			$this->get_page_todos();
 		}
 
 		\add_filter( 'plugin_action_links_' . plugin_basename( PROGRESS_PLANNER_FILE ), [ $this, 'add_action_links' ] );
 
 		// We need to initialize some classes early.
-		$this->cached['page_types']      = new Page_Types();
-		$this->cached['settings']        = new Settings();
-		$this->cached['suggested_tasks'] = new Suggested_Tasks();
-		$this->cached['badges']          = new Badges();
+		$this->get_page_types();
+		$this->get_settings();
+		$this->get_suggested_tasks();
+		$this->get_badges();
 
 		if ( true === $this->is_privacy_policy_accepted() ) {
-			$this->cached['settings_page'] = new Admin_Page_Settings();
+			$this->get_admin__page_settings();
 
 			new Plugin_Deactivation();
 		}
 
-		$this->cached['plugin_upgrade_tasks'] = new Plugin_Upgrade_Tasks();
+		$this->get_plugin_upgrade_tasks();
 
 		// Add hooks for data collectors.
-		$this->cached['data_collector_manager'] = new Data_Collector_Manager();
+		$this->get_data_collector__data_collector_manager();
 
 		// Debug tools.
 		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {
@@ -120,7 +107,7 @@ class Base {
 		}
 
 		// Plugin upgrade.
-		$this->cached['plugin_migrations'] = new Plugin_Migrations();
+		$this->get_plugin_migrations();
 
 		/**
 		 * Redirect on login.
