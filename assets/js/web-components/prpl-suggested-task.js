@@ -1,4 +1,11 @@
-/* global customElements, prplSuggestedTask, HTMLElement */
+/* global customElements, HTMLElement, prplSuggestedTask, prplL10n */
+/*
+ * Suggested Task
+ *
+ * A web component to display a suggested task.
+ *
+ * Dependencies: progress-planner/l10n
+ */
 /* eslint-disable camelcase */
 
 /**
@@ -57,10 +64,10 @@ customElements.define(
 								data-task-title="${ title }"
 								data-action="move-up"
 								data-target="move-up"
-								title="${ prplSuggestedTask.i18n.moveUp }"
+								title="${ prplL10n( 'moveUp' ) }"
 							>
 								<span class="dashicons dashicons-arrow-up-alt2"></span>
-								<span class="screen-reader-text">${ prplSuggestedTask.i18n.moveUp }</span>
+								<span class="screen-reader-text">${ prplL10n( 'moveUp' ) }</span>
 							</button>
 							<button
 								type="button"
@@ -69,10 +76,10 @@ customElements.define(
 								data-task-title="${ title }"
 								data-action="move-down"
 								data-target="move-down"
-								title="${ prplSuggestedTask.i18n.moveDown }"
+								title="${ prplL10n( 'moveDown' ) }"
 							>
 								<span class="dashicons dashicons-arrow-down-alt2"></span>
-								<span class="screen-reader-text">${ prplSuggestedTask.i18n.moveUp }</span>
+								<span class="screen-reader-text">${ prplL10n( 'moveDown' ) }</span>
 							</button>
 						</span>`
 						: '',
@@ -84,10 +91,12 @@ customElements.define(
 							data-task-title="${ title }"
 							data-action="info"
 							data-target="info"
-							title="${ prplSuggestedTask.i18n.info }"
+							title="${ prplL10n( 'info' ) }"
 						>
-							<img src="${ prplSuggestedTask.assets.infoIcon }" alt="${ prplSuggestedTask.i18n.info }" class="icon">
-							<span class="screen-reader-text">${ prplSuggestedTask.i18n.info }</span>
+							<img src="${ prplSuggestedTask.assets.infoIcon }" alt="${ prplL10n(
+								'info'
+							) }" class="icon">
+							<span class="screen-reader-text">${ prplL10n( 'info' ) }</span>
 						</button>`
 					: '',
 				snooze: snoozable
@@ -98,10 +107,12 @@ customElements.define(
 							data-task-title="${ title }"
 							data-action="snooze"
 							data-target="snooze"
-							title="${ prplSuggestedTask.i18n.snooze }"
+							title="${ prplL10n( 'snooze' ) }"
 						>
-							<img src="${ prplSuggestedTask.assets.snoozeIcon }" alt="${ prplSuggestedTask.i18n.snooze }" class="icon">
-							<span class="screen-reader-text">${ prplSuggestedTask.i18n.snooze }</span>
+							<img src="${ prplSuggestedTask.assets.snoozeIcon }" alt="${ prplL10n(
+								'snooze'
+							) }" class="icon">
+							<span class="screen-reader-text">${ prplL10n( 'snooze' ) }</span>
 						</button>`
 					: '',
 				complete:
@@ -113,10 +124,10 @@ customElements.define(
 							data-task-title="${ title }"
 							data-action="complete"
 							data-target="complete"
-							title="${ prplSuggestedTask.i18n.markAsComplete }"
+							title="${ prplL10n( 'markAsComplete' ) }"
 						>
 							<span class="dashicons dashicons-saved"></span>
-							<span class="screen-reader-text">${ prplSuggestedTask.i18n.markAsComplete }</span>
+							<span class="screen-reader-text">${ prplL10n( 'markAsComplete' ) }</span>
 						</button>`
 						: '',
 				delete: deletable
@@ -127,10 +138,10 @@ customElements.define(
 							data-task-title="${ title }"
 							data-action="delete"
 							data-target="delete"
-							title="${ prplSuggestedTask.i18n.delete }"
+							title="${ prplL10n( 'delete' ) }"
 						>
 							<svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48"><path fill="#9ca3af" d="M32.99 47.88H15.01c-3.46 0-6.38-2.7-6.64-6.15L6.04 11.49l-.72.12c-.82.14-1.59-.41-1.73-1.22-.14-.82.41-1.59 1.22-1.73.79-.14 1.57-.26 2.37-.38h.02c2.21-.33 4.46-.6 6.69-.81v-.72c0-3.56 2.74-6.44 6.25-6.55 2.56-.08 5.15-.08 7.71 0 3.5.11 6.25 2.99 6.25 6.55v.72c2.24.2 4.48.47 6.7.81.79.12 1.59.25 2.38.39.82.14 1.36.92 1.22 1.73-.14.82-.92 1.36-1.73 1.22l-.72-.12-2.33 30.24c-.27 3.45-3.18 6.15-6.64 6.15Zm-17.98-3h17.97c1.9 0 3.51-1.48 3.65-3.38l2.34-30.46c-2.15-.3-4.33-.53-6.48-.7h-.03c-5.62-.43-11.32-.43-16.95 0h-.03c-2.15.17-4.33.4-6.48.7l2.34 30.46c.15 1.9 1.75 3.38 3.65 3.38ZM24 7.01c2.37 0 4.74.07 7.11.22v-.49c0-1.93-1.47-3.49-3.34-3.55-2.5-.08-5.03-.08-7.52 0-1.88.06-3.34 1.62-3.34 3.55v.49c2.36-.15 4.73-.22 7.11-.22Zm5.49 32.26h-.06c-.83-.03-1.47-.73-1.44-1.56l.79-20.65c.03-.83.75-1.45 1.56-1.44.83.03 1.47.73 1.44 1.56l-.79 20.65c-.03.81-.7 1.44-1.5 1.44Zm-10.98 0c-.8 0-1.47-.63-1.5-1.44l-.79-20.65c-.03-.83.61-1.52 1.44-1.56.84 0 1.52.61 1.56 1.44l.79 20.65c.03.83-.61 1.52-1.44 1.56h-.06Z"></path></svg>
-							<span class="screen-reader-text">${ prplSuggestedTask.i18n.delete }</span>
+							<span class="screen-reader-text">${ prplL10n( 'delete' ) }</span>
 						</button>`
 					: '',
 				completeCheckbox: useCheckbox
@@ -181,11 +192,11 @@ customElements.define(
 							<fieldset>
 								<legend>
 									<span>
-										${ prplSuggestedTask.i18n.snoozeThisTask }
+										${ prplL10n( 'snoozeThisTask' ) }
 									</span>
 									<button type="button" class="prpl-toggle-radio-group">
 										<span class="prpl-toggle-radio-group-text">
-											${ prplSuggestedTask.i18n.howLong }
+											${ prplL10n( 'howLong' ) }
 										</span>
 										<span class="prpl-toggle-radio-group-arrow">
 											&rsaquo;
@@ -196,41 +207,41 @@ customElements.define(
 								<div class="prpl-snooze-duration-radio-group">
 									<label>
 										<input type="radio" name="snooze-duration-${ task_id }" value="1-week">
-										${ prplSuggestedTask.i18n.snoozeDuration.oneWeek }
+										${ prplL10n( 'snoozeDurationOneWeek' ) }
 									</label>
 									<label>
 										<input type="radio" name="snooze-duration-${ task_id }" value="1-month">
-										${ prplSuggestedTask.i18n.snoozeDuration.oneMonth }
+										${ prplL10n( 'snoozeDurationOneMonth' ) }
 									</label>
 									<label>
 										<input type="radio" name="snooze-duration-${ task_id }" value="3-months">
-										${ prplSuggestedTask.i18n.snoozeDuration.threeMonths }
+										${ prplL10n( 'snoozeDurationThreeMonths' ) }
 									</label>
 									<label>
 										<input type="radio" name="snooze-duration-${ task_id }" value="6-months">
-										${ prplSuggestedTask.i18n.snoozeDuration.sixMonths }
+										${ prplL10n( 'snoozeDurationSixMonths' ) }
 									</label>
 									<label>
 										<input type="radio" name="snooze-duration-${ task_id }" value="1-year">
-										${ prplSuggestedTask.i18n.snoozeDuration.oneYear }
+										${ prplL10n( 'snoozeDurationOneYear' ) }
 									</label>
 									<label>
 										<input type="radio" name="snooze-duration-${ task_id }" value="forever">
-										${ prplSuggestedTask.i18n.snoozeDuration.forever }
+										${ prplL10n( 'snoozeDurationForever' ) }
 									</label>
 								</div>
 							</fieldset>
 
 							<button type="button" class="prpl-suggested-task-button prpl-tooltip-close" data-action="close-snooze" data-target="snooze">
 								<span class="dashicons dashicons-no-alt"></span>
-								<span class="screen-reader-text">${ prplSuggestedTask.i18n.close }</span>
+								<span class="screen-reader-text">${ prplL10n( 'close' ) }</span>
 							</button>
 						</div>
 						<div class="prpl-suggested-task-info prpl-tooltip" data-target="info">
 							${ description }
 							<button type="button" class="prpl-suggested-task-button prpl-tooltip-close" data-action="close-info" data-target="info">
 								<span class="dashicons dashicons-no-alt"></span>
-								<span class="screen-reader-text">${ prplSuggestedTask.i18n.close }</span>
+								<span class="screen-reader-text">${ prplL10n( 'close' ) }</span>
 							</button>
 						</div>
 					</div>
@@ -446,8 +457,12 @@ customElements.define(
 		runTaskAction = ( task_id, actionType, snoozeDuration ) => {
 			task_id = task_id.toString();
 			const providerID = this.querySelector( 'li' ).getAttribute(
-				'data-task-provider-id'
-			);
+					'data-task-provider-id'
+				),
+				category =
+					this.querySelector( 'li' ).getAttribute(
+						'data-task-category'
+					);
 			const taskPoints = parseInt(
 				this.querySelector( 'li' ).getAttribute( 'data-task-points' )
 			);
@@ -573,6 +588,7 @@ customElements.define(
 							task_id,
 							providerID,
 							actionType,
+							category,
 						},
 					} )
 				);

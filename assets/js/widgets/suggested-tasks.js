@@ -422,7 +422,6 @@ document.addEventListener(
 	( e ) => {
 		// TODO: Something seems off here, take a look at this.
 		const category = e.detail.category;
-
 		while (
 			document.querySelectorAll(
 				`.prpl-suggested-task[data-task-category="${ category }"]`

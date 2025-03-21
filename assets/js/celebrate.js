@@ -107,6 +107,7 @@ document.addEventListener( 'prpl/markTasksAsCompleted', ( event ) => {
 		.forEach( ( item ) => {
 			const task_id = item.getAttribute( 'data-task-id' );
 			const providerID = item.getAttribute( 'data-task-provider-id' );
+			const category = item.getAttribute( 'data-task-category' );
 			const el = document.querySelector(
 				`.prpl-suggested-task[data-task-id="${ task_id }"]`
 			);
@@ -134,6 +135,7 @@ document.addEventListener( 'prpl/markTasksAsCompleted', ( event ) => {
 					detail: {
 						task_id,
 						providerID,
+						category,
 					},
 				} )
 			);
