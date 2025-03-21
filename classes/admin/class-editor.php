@@ -60,11 +60,6 @@ class Editor {
 			]
 		);
 
-		\wp_enqueue_style(
-			'progress-planner-editor',
-			\plugins_url( '/assets/css/editor.css', PROGRESS_PLANNER_FILE ),
-			[],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/editor.css' )
-		);
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/editor' );
 	}
 }

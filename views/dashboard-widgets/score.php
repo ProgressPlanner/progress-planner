@@ -41,7 +41,23 @@ use Progress_Planner\Badges\Monthly;
 	<div class="prpl-dashboard-widget-footer">
 		<img src="<?php echo \esc_attr( PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg' ); ?>" style="width:1.85em;" alt="" />
 		<a href="<?php echo \esc_url( \get_admin_url( null, 'admin.php?page=progress-planner' ) ); ?>">
-			<?php \esc_html_e( 'Check out all your stats and recommendations', 'progress-planner' ); ?>
+			<?php
+			$prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending_celebration' );
+			if ( $prpl_pending_celebration_tasks ) {
+
+				$prpl_notification_count = \count( $prpl_pending_celebration_tasks );
+
+				printf(
+					/* translators: %s: Number of pending celebration tasks. */
+					esc_html( _n( 'You have successfully completed %s task!', 'You have successfully completed %s tasks!', $prpl_notification_count, 'progress-planner' ) ),
+					esc_html( number_format_i18n( $prpl_notification_count ) )
+				);
+
+			} else {
+				\esc_html_e( 'Check out all your stats and recommendations', 'progress-planner' );
+			}
+
+			?>
 		</a>
 	</div>
 <?php endif; ?>
