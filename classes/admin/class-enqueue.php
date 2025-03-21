@@ -84,6 +84,43 @@ class Enqueue {
 	}
 
 	/**
+	 * Enqueue a style.
+	 *
+	 * @param string $handle The handle of the style to enqueue.
+	 *
+	 * @return void
+	 */
+	public function enqueue_style( $handle ) {
+		if ( str_starts_with( $handle, 'progress-planner/' ) ) {
+			$handle = str_replace( 'progress-planner/', '', $handle );
+		}
+		// The file path.
+		$file_path = PROGRESS_PLANNER_DIR . "/assets/css/{$handle}.css";
+		// If the file does not exist, bail early.
+		if ( ! \file_exists( $file_path ) ) {
+			error_log( 'File does not exist: ' . $file_path );
+			return;
+		}
+		// The file URL.
+		$file_url = PROGRESS_PLANNER_URL . "/assets/css/{$handle}.css";
+		// The handle.
+		$handle = 'progress-planner/' . $handle;
+		// The version.
+		$version = \progress_planner()->get_file_version( $file_path );
+		// The dependencies.
+		$headers      = \get_file_data( $file_path, [ 'dependencies' => 'Dependencies' ] );
+		$dependencies = isset( $headers['dependencies'] )
+			? \array_filter( \array_map( 'trim', \explode( ',', $headers['dependencies'] ) ) )
+			: [];
+		// Enqueue the script dependencies.
+		foreach ( $dependencies as $dependency ) {
+			$this->enqueue_script( $dependency );
+		}
+		// Enqueue the script.
+		\wp_enqueue_style( $handle, $file_url, $dependencies, $version );
+	}
+
+	/**
 	 * Localize a script
 	 *
 	 * @param string $handle The script handle.

@@ -203,12 +203,7 @@ class Page {
 				],
 			]
 		);
-		\wp_enqueue_style(
-			'progress-planner-focus-element',
-			PROGRESS_PLANNER_URL . '/assets/css/focus-element.css',
-			[],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/focus-element.css' )
-		);
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/focus-element' );
 	}
 
 	/**
@@ -222,49 +217,24 @@ class Page {
 			return;
 		}
 
-		\wp_enqueue_style(
-			'progress-planner-header-filters',
-			PROGRESS_PLANNER_URL . '/assets/css/admin.css',
-			[],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/admin.css' )
-		);
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/admin' );
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
-			\wp_enqueue_style(
-				'progress-planner-settings-page',
-				PROGRESS_PLANNER_URL . '/assets/css/settings-page.css',
-				[],
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/settings-page.css' )
-			);
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/settings-page' );
 		}
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
 			// Enqueue ugprading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
-			\wp_enqueue_style(
-				'progress-planner-upgrade-tasks',
-				PROGRESS_PLANNER_URL . '/assets/css/upgrade-tasks.css',
-				[],
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/upgrade-tasks.css' )
-			);
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
 		}
 
 		$prpl_privacy_policy_accepted = \progress_planner()->is_privacy_policy_accepted();
 		if ( ! $prpl_privacy_policy_accepted ) {
 			// Enqueue welcome styles.
-			\wp_enqueue_style(
-				'progress-planner-welcome',
-				PROGRESS_PLANNER_URL . '/assets/css/welcome.css',
-				[],
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/welcome.css' )
-			);
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/welcome' );
 
 			// Enqueue onboarding styles.
-			\wp_enqueue_style(
-				'progress-planner-onboard',
-				PROGRESS_PLANNER_URL . '/assets/css/onboard.css',
-				[],
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/onboard.css' )
-			);
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/onboard' );
 		}
 	}
 
