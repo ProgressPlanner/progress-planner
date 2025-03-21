@@ -59,7 +59,12 @@ class Core_Update extends Repetitive {
 		if ( $pending_tasks && $this->is_task_completed() ) {
 			foreach ( $pending_tasks as $task ) {
 				if ( $this->get_task_id() === $task['task_id'] ) {
-					$update_actions['prpl_core_update'] = '<a href="' . \esc_url( \admin_url( 'admin.php?page=progress-planner' ) ) . '" target="_parent">' . \esc_html__( 'Task completed! Cross it out in the Progress Planner Dashboard.', 'progress-planner' ) . '</a>';
+					$update_actions['prpl_core_update'] = sprintf(
+						/* translators: %1$s: The Progress Planner icon. %2$s: <a href="#" target="_blank">Click here to celebrate!</a> link */
+						\esc_html__( 'You\'ve completed a task in %1$s! %2$s', 'progress-planner' ),
+						'<img src="' . \esc_attr( PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg' ) . '" style="width:1rem;padding-left:0.25rem;padding-right:0.25rem;" alt="" />',
+						'<a href="' . \esc_url( \admin_url( 'admin.php?page=progress-planner' ) ) . '" target="_parent">' . \esc_html__( 'Click here to celebrate!', 'progress-planner' ) . '</a>'
+					);
 					break;
 				}
 			}
