@@ -21,7 +21,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 	<div class="tooltip-actions">
 		<button
 			class="prpl-info-icon"
-			onclick="this.closest( '.tooltip-actions' ).querySelector( '.prpl-tooltip' ).toggleAttribute( 'data-tooltip-visible' )"
+			onclick="this.closest( '.tooltip-actions' ).querySelector( '.prpl-tooltip' ).setAttribute( 'data-tooltip-visible', 'true' )"
 		>
 			<span class="icon prpl-info-icon">
 				<?php \progress_planner()->the_asset( 'images/icon_info.svg' ); ?>

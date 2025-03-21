@@ -494,8 +494,9 @@ button.prpl-info-icon {
 	font-weight: 400;
 	color: var(--prpl-color-text);
 
-	&[data-tooltip-visible] {
+	&[data-tooltip-visible="true"] {
 		visibility: visible;
+		z-index: 10;
 	}
 
 	.close,
@@ -525,4 +526,19 @@ button.prpl-info-icon {
 		border-width: 7.5px 10px 7.5px 0;
 		border-color: transparent var(--prpl-background-green) transparent transparent;
 	}
+}
+
+.prpl-overlay {
+	display: none;
+}
+
+body:has(.prpl-tooltip[data-tooltip-visible="true"]) .prpl-overlay {
+	display: block !important;
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	z-index: 9;
+	background-color: rgba(0, 0, 0, 0.5);
 }
