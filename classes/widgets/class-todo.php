@@ -56,16 +56,15 @@ final class ToDo extends Widget {
 	 */
 	public function enqueue_scripts() {
 		// Enqueue the script.
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/todo' );
-
-		// Localize the script.
-		\wp_localize_script(
-			'progress-planner/widgets/todo',
-			'progressPlannerTodo',
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'widgets/todo',
 			[
-				'ajaxUrl'   => \admin_url( 'admin-ajax.php' ),
-				'nonce'     => \wp_create_nonce( 'progress_planner' ),
-				'listItems' => \progress_planner()->get_todo()->get_items(),
+				'name' => 'progressPlannerTodo',
+				'data' => [
+					'ajaxUrl'   => \admin_url( 'admin-ajax.php' ),
+					'nonce'     => \wp_create_nonce( 'progress_planner' ),
+					'listItems' => \progress_planner()->get_todo()->get_items(),
+				],
 			]
 		);
 	}

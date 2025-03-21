@@ -52,8 +52,6 @@ final class Suggested_Tasks extends Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		// Enqueue the script.
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/suggested-tasks' );
 
 		// If there are newly added task providers, delay the celebration in order not to get confetti behind the popover.
 		$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
@@ -172,11 +170,13 @@ final class Suggested_Tasks extends Widget {
 			$localize_data[ $context . 'IconUrl' ] = $url;
 		}
 
-		// Localize the script.
-		\wp_localize_script(
-			'progress-planner/widgets/suggested-tasks',
-			'prplSuggestedTasks',
-			$localize_data
+		// Enqueue the script.
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'widgets/suggested-tasks',
+			[
+				'name' => 'prplSuggestedTasks',
+				'data' => $localize_data,
+			]
 		);
 	}
 

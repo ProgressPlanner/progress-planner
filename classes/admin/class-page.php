@@ -206,18 +206,19 @@ class Page {
 		}
 
 		// Register the scripts.
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'focus-element' );
-		\wp_localize_script(
-			'progress-planner/focus-element',
-			'progressPlannerFocusElement',
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'focus-element',
 			[
-				'tasks'           => $tasks_details,
-				'totalPoints'     => $total_points,
-				'completedPoints' => $completed_points,
-				'base_url'        => PROGRESS_PLANNER_URL,
-				'l10n'            => [
-					/* translators: %d: The number of points. */
-					'fixThisIssue' => \esc_html__( 'Fix this issue to get %d point(s) in Progress Planner', 'progress-planner' ),
+				'name' => 'progressPlannerFocusElement',
+				'data' => [
+					'tasks'           => $tasks_details,
+					'totalPoints'     => $total_points,
+					'completedPoints' => $completed_points,
+					'base_url'        => PROGRESS_PLANNER_URL,
+					'l10n'            => [
+						/* translators: %d: The number of points. */
+						'fixThisIssue' => \esc_html__( 'Fix this issue to get %d point(s) in Progress Planner', 'progress-planner' ),
+					],
 				],
 			]
 		);
