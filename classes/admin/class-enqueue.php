@@ -98,7 +98,6 @@ class Enqueue {
 		$file_path = PROGRESS_PLANNER_DIR . "/assets/css/{$handle}.css";
 		// If the file does not exist, bail early.
 		if ( ! \file_exists( $file_path ) ) {
-			error_log( 'File does not exist: ' . $file_path );
 			return;
 		}
 		// The file URL.
