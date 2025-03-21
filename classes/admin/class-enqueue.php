@@ -43,44 +43,20 @@ class Enqueue {
 	 * @return void
 	 */
 	public function enqueue_script( $handle ) {
-		if ( str_starts_with( $handle, 'progress-planner/' ) ) {
-			$handle = str_replace( 'progress-planner/', '', $handle );
-		}
-		foreach ( self::VENDOR_SCRIPTS as $vendor_script_handle => $vendor_script ) {
-			if ( $vendor_script['handle'] === $handle ) {
-				$handle = $vendor_script_handle;
-				break;
-			}
-		}
-		// The file path.
-		$file_path = PROGRESS_PLANNER_DIR . "/assets/js/{$handle}.js";
-		// If the file does not exist, bail early.
-		if ( ! \file_exists( $file_path ) ) {
+		$file_details = $this->get_file_details( 'js', $handle );
+		if ( empty( $file_details ) ) {
 			return;
 		}
-		// The file URL.
-		$file_url = PROGRESS_PLANNER_URL . "/assets/js/{$handle}.js";
-		// The handle.
-		$handle = isset( self::VENDOR_SCRIPTS[ $handle ] )
-			? self::VENDOR_SCRIPTS[ $handle ]['handle']
-			: 'progress-planner/' . $handle;
-		// The version.
-		$version = isset( self::VENDOR_SCRIPTS[ $handle ] )
-			? self::VENDOR_SCRIPTS[ $handle ]['version']
-			: \progress_planner()->get_file_version( $file_path );
-		// The dependencies.
-		$headers      = \get_file_data( $file_path, [ 'dependencies' => 'Dependencies' ] );
-		$dependencies = isset( $headers['dependencies'] )
-			? \array_filter( \array_map( 'trim', \explode( ',', $headers['dependencies'] ) ) )
-			: [];
+
 		// Enqueue the script dependencies.
-		foreach ( $dependencies as $dependency ) {
+		foreach ( $file_details['dependencies'] as $dependency ) {
 			$this->enqueue_script( $dependency );
 		}
-		// Enqueue the script.
-		\wp_enqueue_script( $handle, $file_url, $dependencies, $version, true );
+		// Enqueue the stylesheet.
+		\wp_enqueue_script( $file_details['handle'], $file_details['file_url'], $file_details['dependencies'], $file_details['version'], true );
+
 		// Localize the script.
-		$this->localize_script( $handle );
+		$this->localize_script( $file_details['handle'] );
 	}
 
 	/**
@@ -91,32 +67,74 @@ class Enqueue {
 	 * @return void
 	 */
 	public function enqueue_style( $handle ) {
+		$file_details = $this->get_file_details( 'css', $handle );
+		if ( empty( $file_details ) ) {
+			return;
+		}
+
+		// Enqueue the script dependencies.
+		foreach ( $file_details['dependencies'] as $dependency ) {
+			$this->enqueue_style( $dependency );
+		}
+		// Enqueue the stylesheet.
+		\wp_enqueue_style( $file_details['handle'], $file_details['file_url'], $file_details['dependencies'], $file_details['version'] );
+	}
+
+	/**
+	 * Get file details.
+	 *
+	 * @param string $context The context of the file ( `css` or `js` ).
+	 * @param string $handle The handle of the file.
+	 *
+	 * @return array
+	 */
+	public function get_file_details( $context, $handle ) {
 		if ( str_starts_with( $handle, 'progress-planner/' ) ) {
 			$handle = str_replace( 'progress-planner/', '', $handle );
 		}
+
+		if ( 'js' === $context ) {
+			foreach ( self::VENDOR_SCRIPTS as $vendor_script_handle => $vendor_script ) {
+				if ( $vendor_script['handle'] === $handle ) {
+					$handle = $vendor_script_handle;
+					break;
+				}
+			}
+		}
 		// The file path.
-		$file_path = PROGRESS_PLANNER_DIR . "/assets/css/{$handle}.css";
+		$file_path = PROGRESS_PLANNER_DIR . "/assets/{$context}/{$handle}.{$context}";
+
 		// If the file does not exist, bail early.
 		if ( ! \file_exists( $file_path ) ) {
-			return;
+			return [];
 		}
+
 		// The file URL.
-		$file_url = PROGRESS_PLANNER_URL . "/assets/css/{$handle}.css";
+		$file_url = PROGRESS_PLANNER_URL . "/assets/{$context}/{$handle}.{$context}";
+
 		// The handle.
-		$handle = 'progress-planner/' . $handle;
+		$handle = 'js' === $context && isset( self::VENDOR_SCRIPTS[ $handle ] )
+			? self::VENDOR_SCRIPTS[ $handle ]['handle']
+			: 'progress-planner/' . $handle;
+
 		// The version.
-		$version = \progress_planner()->get_file_version( $file_path );
+		$version = 'js' === $context && isset( self::VENDOR_SCRIPTS[ $handle ] )
+			? self::VENDOR_SCRIPTS[ $handle ]['version']
+			: \progress_planner()->get_file_version( $file_path );
+
 		// The dependencies.
 		$headers      = \get_file_data( $file_path, [ 'dependencies' => 'Dependencies' ] );
 		$dependencies = isset( $headers['dependencies'] )
 			? \array_filter( \array_map( 'trim', \explode( ',', $headers['dependencies'] ) ) )
 			: [];
-		// Enqueue the script dependencies.
-		foreach ( $dependencies as $dependency ) {
-			$this->enqueue_script( $dependency );
-		}
-		// Enqueue the script.
-		\wp_enqueue_style( $handle, $file_url, $dependencies, $version );
+
+		return [
+			'file_path'    => $file_path,
+			'file_url'     => $file_url,
+			'handle'       => $handle,
+			'version'      => $version,
+			'dependencies' => $dependencies,
+		];
 	}
 
 	/**
