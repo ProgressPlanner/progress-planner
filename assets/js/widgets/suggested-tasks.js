@@ -145,7 +145,9 @@ if (
 	}, 3000 );
 }
 
+// Populate the list on load.
 prplDocumentReady( () => {
+	// Do nothing if the list does not exist.
 	if ( ! document.querySelector( '.prpl-suggested-tasks-list' ) ) {
 		return;
 	}

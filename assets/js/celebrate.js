@@ -155,4 +155,18 @@ document.addEventListener( 'prpl/strikeCelebratedTasks', () => {
 		} );
 } );
 
+/**
+ * Remove the points (count) from the menu.
+ */
+document.addEventListener( 'prpl/CelebrateTasks', () => {
+	const points = document.querySelectorAll(
+		'#adminmenu #toplevel_page_progress-planner .update-plugins'
+	);
+	if ( points ) {
+		points.forEach( ( point ) => {
+			point.remove();
+		} );
+	}
+} );
+
 /* eslint-enable camelcase */
