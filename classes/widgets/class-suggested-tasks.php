@@ -52,8 +52,6 @@ final class Suggested_Tasks extends Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		// Enqueue the script.
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/suggested-tasks' );
 
 		// Get tasks from task providers and pending_celebration tasks.
 		$tasks             = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
@@ -177,11 +175,13 @@ final class Suggested_Tasks extends Widget {
 			$localize_data[ $context . 'IconUrl' ] = $url;
 		}
 
-		// Localize the script.
-		\wp_localize_script(
-			'progress-planner/widgets/suggested-tasks',
-			'prplSuggestedTasks',
-			$localize_data
+		// Enqueue the script.
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'widgets/suggested-tasks',
+			[
+				'name' => 'prplSuggestedTasks',
+				'data' => $localize_data,
+			]
 		);
 	}
 

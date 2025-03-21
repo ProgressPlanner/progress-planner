@@ -164,22 +164,40 @@ class Page {
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
 
+			$default_localization_data = [
+				'name' => 'progressPlanner',
+				'data' => [
+					'onboardNonceURL' => \progress_planner()->get_onboard()->get_remote_nonce_url(),
+					'onboardAPIUrl'   => \progress_planner()->get_onboard()->get_remote_url(),
+					'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
+					'nonce'           => \wp_create_nonce( 'progress_planner' ),
+				],
+			];
+
 			if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-gauge' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-bar' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-line' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-big-counter' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'header-filters' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'header-filters', $default_localization_data );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'grid-masonry' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'upgrade-tasks' );
 			} else {
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboard' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboard', $default_localization_data );
 			}
 		}
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
-			\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings-page' );
+			\progress_planner()->get_admin__enqueue()->enqueue_script(
+				'settings-page',
+				[
+					'name' => 'progressPlannerSettingsPage',
+					'data' => [
+						'siteUrl' => \get_site_url(),
+					],
+				]
+			);
 		}
 	}
 
@@ -219,18 +237,19 @@ class Page {
 		}
 
 		// Register the scripts.
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'focus-element' );
-		\wp_localize_script(
-			'progress-planner/focus-element',
-			'progressPlannerFocusElement',
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'focus-element',
 			[
-				'tasks'           => $tasks_details,
-				'totalPoints'     => $total_points,
-				'completedPoints' => $completed_points,
-				'base_url'        => PROGRESS_PLANNER_URL,
-				'l10n'            => [
-					/* translators: %d: The number of points. */
-					'fixThisIssue' => \esc_html__( 'Fix this issue to get %d point(s) in Progress Planner', 'progress-planner' ),
+				'name' => 'progressPlannerFocusElement',
+				'data' => [
+					'tasks'           => $tasks_details,
+					'totalPoints'     => $total_points,
+					'completedPoints' => $completed_points,
+					'base_url'        => PROGRESS_PLANNER_URL,
+					'l10n'            => [
+						/* translators: %d: The number of points. */
+						'fixThisIssue' => \esc_html__( 'Fix this issue to get %d point(s) in Progress Planner', 'progress-planner' ),
+					],
 				],
 			]
 		);
