@@ -36,6 +36,16 @@ class Enqueue {
 	];
 
 	/**
+	 * Enqueued assets.
+	 *
+	 * @var array
+	 */
+	protected $enqueued_assets = [
+		'js'  => [],
+		'css' => [],
+	];
+
+	/**
 	 * Enqueue script.
 	 *
 	 * @param string $handle The handle of the script to enqueue.
@@ -48,12 +58,19 @@ class Enqueue {
 			return;
 		}
 
+		$this->enqueued_assets['js'][] = $file_details['handle'];
+		$final_dependencies            = [];
+
 		// Enqueue the script dependencies.
 		foreach ( $file_details['dependencies'] as $dependency ) {
-			$this->enqueue_script( $dependency );
+			if ( ! in_array( $dependency, $this->enqueued_assets['js'], true ) ) {
+				$this->enqueue_script( $dependency );
+				$final_dependencies[] = $dependency;
+			}
 		}
+
 		// Enqueue the stylesheet.
-		\wp_enqueue_script( $file_details['handle'], $file_details['file_url'], $file_details['dependencies'], $file_details['version'], true );
+		\wp_enqueue_script( $file_details['handle'], $file_details['file_url'], $final_dependencies, $file_details['version'], true );
 
 		// Localize the script.
 		$this->localize_script( $file_details['handle'] );
@@ -72,12 +89,17 @@ class Enqueue {
 			return;
 		}
 
+		$this->enqueued_assets['css'][] = $file_details['handle'];
+		$final_dependencies             = [];
+
 		// Enqueue the script dependencies.
 		foreach ( $file_details['dependencies'] as $dependency ) {
-			$this->enqueue_style( $dependency );
+			if ( ! in_array( $dependency, $this->enqueued_assets['css'], true ) ) {
+				$this->enqueue_style( $dependency );
+			}
 		}
 		// Enqueue the stylesheet.
-		\wp_enqueue_style( $file_details['handle'], $file_details['file_url'], $file_details['dependencies'], $file_details['version'] );
+		\wp_enqueue_style( $file_details['handle'], $file_details['file_url'], $final_dependencies, $file_details['version'] );
 	}
 
 	/**
