@@ -49,7 +49,7 @@ use Progress_Planner\Badges\Monthly;
 
 				printf(
 					/* translators: %s: Number of pending celebration tasks. */
-					esc_html( _n( 'You have successfully completed %s task!', 'You have successfully completed %s tasks!', $prpl_notification_count, 'progress-planner' ) ),
+					esc_html( _n( 'Good job! You\'ve successfully finished %s task! Click here to celebrate your achievement!', 'Good job! You\'ve successfully finished %s tasks! Click here to celebrate your achievement!', $prpl_notification_count, 'progress-planner' ) ),
 					esc_html( number_format_i18n( $prpl_notification_count ) )
 				);
 
