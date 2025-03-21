@@ -532,7 +532,7 @@ button.prpl-info-icon {
 	display: none;
 }
 
-body:has(.prpl-tooltip[data-tooltip-visible="true"]) .prpl-overlay {
+body:has([data-tooltip-visible="true"]) .prpl-overlay {
 	display: block !important;
 	position: fixed;
 	top: 0;

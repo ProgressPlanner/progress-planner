@@ -179,6 +179,7 @@ class Page {
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-bar' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-line' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-big-counter' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-tooltip' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'header-filters', $default_localization_data );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'grid-masonry' );
