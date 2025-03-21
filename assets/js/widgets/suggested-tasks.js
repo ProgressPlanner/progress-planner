@@ -316,10 +316,23 @@ if (
 	}, 3000 );
 }
 
+/**
+ * Remove the points (count) from the menu.
+ */
+const removePointsFromWPMenu = () => {
+	const points = document.querySelectorAll( '#adminmenu #toplevel_page_progress-planner .update-plugins' );
+	if ( points ) {
+		points.forEach( ( point ) => {
+			point.remove();
+		} );
+	}
+};
+
 // Create a new custom event to trigger the celebration.
 document.addEventListener( 'prplCelebrateTasks', () => {
 	prplTriggerConfetti();
 	prplStrikeCompletedTasks();
+	removePointsFromWPMenu();
 } );
 
 // Populate the list on load.
