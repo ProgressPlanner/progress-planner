@@ -38,11 +38,17 @@ class Enqueue {
 	/**
 	 * Enqueue script.
 	 *
-	 * @param string $handle The handle of the script to enqueue.
-	 *
+	 * @param string $handle        The handle of the script to enqueue.
+	 * @param array  $localize_data The data to localize.
+	 *                                 [
+	 *                                     'name' => 'varName',
+	 *                                     'data' => [
+	 *                                         'foo' => 'bar',
+	 *                                     ],
+	 *                                 ].
 	 * @return void
 	 */
-	public function enqueue_script( $handle ) {
+	public function enqueue_script( $handle, $localize_data = [] ) {
 		if ( str_starts_with( $handle, 'progress-planner/' ) ) {
 			$handle = str_replace( 'progress-planner/', '', $handle );
 		}
@@ -80,85 +86,58 @@ class Enqueue {
 		// Enqueue the script.
 		\wp_enqueue_script( $handle, $file_url, $dependencies, $version, true );
 		// Localize the script.
-		$this->localize_script( $handle );
+		$this->localize_script( $handle, $localize_data );
 	}
 
 	/**
 	 * Localize a script
 	 *
-	 * @param string $handle The script handle.
+	 * @param string $handle        The script handle.
+	 * @param array  $localize_data The data to localize.
 	 * @return void
 	 */
-	public function localize_script( $handle ) {
+	public function localize_script( $handle, $localize_data = [] ) {
+		$localize_data = [
+			'name' => $localize_data['name'] ?? false,
+			'data' => $localize_data['data'] ?? [],
+		];
 		switch ( $handle ) {
 			case 'progress-planner/l10n':
-				\wp_localize_script(
-					$handle,
-					'prplL10nStrings',
-					$this->get_localized_strings()
-				);
+				$localize_data = [
+					'name' => 'prplL10nStrings',
+					'data' => $this->get_localized_strings(),
+				];
 				break;
 
 			case 'progress-planner/web-components/prpl-badge':
-				\wp_localize_script(
-					$handle,
-					'progressPlannerBadge',
-					[
+				$localize_data = [
+					'name' => 'progressPlannerBadge',
+					'data' => [
 						'remoteServerRootUrl' => \progress_planner()->get_remote_server_root_url(),
 						'placeholderImageUrl' => \progress_planner()->get_placeholder_svg(),
-					]
-				);
+					],
+				];
 				break;
 
 			case 'progress-planner/web-components/prpl-suggested-task':
-				\wp_localize_script(
-					$handle,
-					'prplSuggestedTask',
-					[
+				$localize_data = [
+					'name' => 'prplSuggestedTask',
+					'data' => [
 						'nonce'  => \wp_create_nonce( 'progress_planner' ),
 						'assets' => [
 							'infoIcon'   => PROGRESS_PLANNER_URL . '/assets/images/icon_info.svg',
 							'snoozeIcon' => PROGRESS_PLANNER_URL . '/assets/images/icon_snooze.svg',
 						],
-					]
-				);
-				break;
-
-			case 'progress-planner/tour':
-				\wp_localize_script(
-					$handle,
-					'progressPlannerTour',
-					[
-						'steps' => \progress_planner()->get_admin__tour()->get_steps(),
-					]
-				);
-				break;
-
-			case 'progress-planner/onboard':
-			case 'progress-planner/header-filters':
-			case 'progress-planner/settings':
-				$data = [
-					'onboardNonceURL' => \progress_planner()->get_onboard()->get_remote_nonce_url(),
-					'onboardAPIUrl'   => \progress_planner()->get_onboard()->get_remote_url(),
-					'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
-					'nonce'           => \wp_create_nonce( 'progress_planner' ),
+					],
 				];
-				\wp_localize_script( $handle, 'progressPlanner', $data );
 				break;
-
-			case 'progress-planner/settings-page':
-				\wp_localize_script(
-					$handle,
-					'progressPlannerSettingsPage',
-					[
-						'siteUrl' => \get_site_url(),
-					]
-				);
-				break;
-
-			default:
-				return;
 		}
+
+		if ( ! $localize_data['name'] ) {
+			return;
+		}
+
+		\wp_localize_script( $handle, $localize_data['name'], $localize_data['data'] );
 	}
 
 	/**

@@ -131,7 +131,15 @@ class Tour {
 			return;
 		}
 
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'tour' );
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'tour',
+			[
+				'name' => 'progressPlannerTour',
+				'data' => [
+					'steps' => \progress_planner()->get_admin__tour()->get_steps(),
+				],
+			]
+		);
 
 		\wp_enqueue_style(
 			'progress-planner-driver-js-css',
