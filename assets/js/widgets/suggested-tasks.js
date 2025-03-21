@@ -264,7 +264,8 @@ const prplStrikeCompletedTasks = () => {
 			.querySelectorAll( '.prpl-suggested-task-celebrated' )
 			.forEach( ( item ) => {
 				const taskId = item.getAttribute( 'data-task-id' ),
-					providerID = item.getAttribute( 'data-task-provider-id' );
+					providerID = item.getAttribute( 'data-task-provider-id' ),
+					category = item.getAttribute( 'data-task-category' );
 				const el = document.querySelector(
 					`.prpl-suggested-task[data-task-id="${ taskId }"]`
 				);
@@ -296,6 +297,7 @@ const prplStrikeCompletedTasks = () => {
 						detail: {
 							taskId,
 							providerID,
+							category,
 						},
 					}
 				);
@@ -601,7 +603,6 @@ document.addEventListener(
 	'prplMaybeInjectSuggestedTaskEvent',
 	( e ) => {
 		const category = e.detail.category;
-
 		while (
 			prplSuggestedTasksCountItems( category ) <
 				parseInt(

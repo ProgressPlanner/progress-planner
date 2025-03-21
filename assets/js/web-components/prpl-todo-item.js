@@ -1,4 +1,11 @@
-/* global customElements, HTMLElement, progressPlannerTodoItem, progressPlannerInjectTodoItem, progressPlannerSaveTodoList */
+/* global customElements, HTMLElement, progressPlannerTodoItem, progressPlannerInjectTodoItem, progressPlannerSaveTodoList, prplL10n */
+/**
+ * Todo Item
+ *
+ * A web component to display a todo item.
+ *
+ * Dependencies: progress-planner/l10n
+ */
 
 /**
  * Register the custom web component.
@@ -17,17 +24,17 @@ customElements.define(
 				.replace( '"', '&quot;' );
 
 			const deleteTaskAriaLabel =
-				progressPlannerTodoItem.i18n.taskDelete.replace(
+				prplL10n( 'taskDelete' ).replace(
 					'%s',
 					content
 				);
 			const moveUpTaskAriaLabel =
-				progressPlannerTodoItem.i18n.taskMoveUp.replace(
+				prplL10n( 'taskMoveUp' ).replace(
 					'%s',
 					content
 				);
 			const moveDownTaskAriaLabel =
-				progressPlannerTodoItem.i18n.taskMoveDown.replace(
+				prplL10n( 'taskMoveDown' ).replace(
 					'%s',
 					content
 				);
@@ -67,11 +74,11 @@ customElements.define(
 
 					// Announce the status change and move focus to the moved item
 					const announcement = todoItemDone
-						? progressPlannerTodoItem.i18n.taskCompleted.replace(
+						? prplL10n( 'taskCompleted' ).replace(
 								'%s',
 								thisObject.innerText
 						  )
-						: progressPlannerTodoItem.i18n.taskNotCompleted.replace(
+						: prplL10n( 'taskNotCompleted' ).replace(
 								'%s',
 								thisObject.innerText
 						  );
@@ -88,7 +95,7 @@ customElements.define(
 					thisObject.previousElementSibling
 				);
 				progressPlannerSaveTodoList();
-				wp.a11y.speak( progressPlannerTodoItem.i18n.taskMovedUp );
+				wp.a11y.speak( prplL10n( 'taskMovedUp' ) );
 			} );
 
 			// When the move down button is clicked, move the todo item down the list
@@ -100,7 +107,7 @@ customElements.define(
 						thisObject
 					);
 					progressPlannerSaveTodoList();
-					wp.a11y.speak( progressPlannerTodoItem.i18n.taskMovedDown );
+					wp.a11y.speak( prplL10n( 'taskMovedDown' ) );
 				}
 			);
 
