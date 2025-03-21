@@ -528,6 +528,23 @@ button.prpl-info-icon {
 	}
 }
 
+prpl-tooltip {
+	display: inline-flex;
+	align-items: center;
+	position: relative;
+
+	.prpl-tooltip {
+
+		p {
+			margin-bottom: 0;
+		}
+
+		p:first-child {
+			margin-top: 0;
+		}
+	}
+}
+
 .prpl-overlay {
 	display: none;
 }

@@ -181,69 +181,70 @@ customElements.define(
 				}>${ taskHeading }</span></h3>
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
-						${ actionButtons.info }
+						<prpl-tooltip>
+							<slot name="open-icon">
+								${ actionButtons.info }
+							</slot>
+							<slot name="content">
+								${ description }
+							</slot>
+						</prpl-tooltip>
+
 						${ actionButtons.move }
-						${ actionButtons.snooze }
+
+						<prpl-tooltip class="prpl-suggested-task-snooze">
+							<slot name="open-icon">
+								${ actionButtons.snooze }
+							</slot>
+							<slot name="content">
+								<fieldset>
+									<legend>
+										<span>
+											${ prplL10n( 'snoozeThisTask' ) }
+										</span>
+										<button type="button" class="prpl-toggle-radio-group">
+											<span class="prpl-toggle-radio-group-text">
+												${ prplL10n( 'howLong' ) }
+											</span>
+											<span class="prpl-toggle-radio-group-arrow">
+												&rsaquo;
+											</span>
+										</button>
+									</legend>
+
+									<div class="prpl-snooze-duration-radio-group">
+										<label>
+											<input type="radio" name="snooze-duration-${ task_id }" value="1-week">
+											${ prplL10n( 'snoozeDurationOneWeek' ) }
+										</label>
+										<label>
+											<input type="radio" name="snooze-duration-${ task_id }" value="1-month">
+											${ prplL10n( 'snoozeDurationOneMonth' ) }
+										</label>
+										<label>
+											<input type="radio" name="snooze-duration-${ task_id }" value="3-months">
+											${ prplL10n( 'snoozeDurationThreeMonths' ) }
+										</label>
+										<label>
+											<input type="radio" name="snooze-duration-${ task_id }" value="6-months">
+											${ prplL10n( 'snoozeDurationSixMonths' ) }
+										</label>
+										<label>
+											<input type="radio" name="snooze-duration-${ task_id }" value="1-year">
+											${ prplL10n( 'snoozeDurationOneYear' ) }
+										</label>
+										<label>
+											<input type="radio" name="snooze-duration-${ task_id }" value="forever">
+											${ prplL10n( 'snoozeDurationForever' ) }
+										</label>
+									</div>
+								</fieldset>
+							</slot>
+						</prpl-tooltip>
+
 						${ actionButtons.complete }
 						${ actionButtons.delete }
 
-						<div class="prpl-suggested-task-snooze prpl-tooltip">
-
-							<fieldset>
-								<legend>
-									<span>
-										${ prplL10n( 'snoozeThisTask' ) }
-									</span>
-									<button type="button" class="prpl-toggle-radio-group">
-										<span class="prpl-toggle-radio-group-text">
-											${ prplL10n( 'howLong' ) }
-										</span>
-										<span class="prpl-toggle-radio-group-arrow">
-											&rsaquo;
-										</span>
-									</button>
-								</legend>
-
-								<div class="prpl-snooze-duration-radio-group">
-									<label>
-										<input type="radio" name="snooze-duration-${ task_id }" value="1-week">
-										${ prplL10n( 'snoozeDurationOneWeek' ) }
-									</label>
-									<label>
-										<input type="radio" name="snooze-duration-${ task_id }" value="1-month">
-										${ prplL10n( 'snoozeDurationOneMonth' ) }
-									</label>
-									<label>
-										<input type="radio" name="snooze-duration-${ task_id }" value="3-months">
-										${ prplL10n( 'snoozeDurationThreeMonths' ) }
-									</label>
-									<label>
-										<input type="radio" name="snooze-duration-${ task_id }" value="6-months">
-										${ prplL10n( 'snoozeDurationSixMonths' ) }
-									</label>
-									<label>
-										<input type="radio" name="snooze-duration-${ task_id }" value="1-year">
-										${ prplL10n( 'snoozeDurationOneYear' ) }
-									</label>
-									<label>
-										<input type="radio" name="snooze-duration-${ task_id }" value="forever">
-										${ prplL10n( 'snoozeDurationForever' ) }
-									</label>
-								</div>
-							</fieldset>
-
-							<button type="button" class="prpl-suggested-task-button prpl-tooltip-close" data-action="close-snooze" data-target="snooze">
-								<span class="dashicons dashicons-no-alt"></span>
-								<span class="screen-reader-text">${ prplL10n( 'close' ) }</span>
-							</button>
-						</div>
-						<div class="prpl-suggested-task-info prpl-tooltip" data-target="info">
-							${ description }
-							<button type="button" class="prpl-suggested-task-button prpl-tooltip-close" data-action="close-info" data-target="info">
-								<span class="dashicons dashicons-no-alt"></span>
-								<span class="screen-reader-text">${ prplL10n( 'close' ) }</span>
-							</button>
-						</div>
 					</div>
 
 					${ taskPointsElement }
