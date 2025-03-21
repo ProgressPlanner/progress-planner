@@ -1,3 +1,9 @@
+/**
+ * TODOs widget.
+ *
+ * Dependencies: progress-planner/web-components/prpl-suggested-task
+ */
+
 .prpl-widget-wrapper.prpl-todo {
 	padding-left: 0;
 

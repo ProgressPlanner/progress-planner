@@ -1,3 +1,9 @@
+/**
+ * Suggested tasks widget.
+ *
+ * Dependencies: progress-planner/web-components/prpl-suggested-task
+ */
+
 .prpl-widget-wrapper.prpl-suggested-tasks {
 
 	/* Remove styling from the widget wrapper (but not in popover view). */
