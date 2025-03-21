@@ -290,6 +290,9 @@ customElements.define(
 			taskId = taskId.toString();
 			const providerID = this.querySelector( 'li' ).getAttribute(
 				'data-task-provider-id'
+			),
+			category = this.querySelector( 'li' ).getAttribute(
+				'data-task-category'
 			);
 
 			const data = {
@@ -368,6 +371,7 @@ customElements.define(
 						detail: {
 							taskId,
 							providerID,
+							category,
 						},
 					}
 				);
