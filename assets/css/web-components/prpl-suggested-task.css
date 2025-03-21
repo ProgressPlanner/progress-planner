@@ -29,10 +29,8 @@
 		}
 	}
 
-	input[type="checkbox"][disabled] {
+	input[type="checkbox"].disabled {
 		opacity: 0.5;
-		border-color: #0773bf;
-		background-color: #effbfe;
 	}
 
 	&.prpl-suggested-task-celebrated h3 span {
