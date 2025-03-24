@@ -108,7 +108,6 @@ customElements.define(
 
 			// Open the tooltip.
 			openTooltipButton?.addEventListener( 'click', () => {
-				console.log( 'openTooltipButton' );
 				thisObj
 					.querySelector( '[data-tooltip-content]' )
 					.setAttribute( 'data-tooltip-visible', 'true' );
