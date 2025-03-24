@@ -70,7 +70,7 @@ prplDocumentReady( () => {
 			new CustomEvent( 'prpl/todo/injectItem', {
 				detail: {
 					item: todoItem,
-					addToStart: false,
+					addToStart: 1 === todoItem.points, // Add golden task to the start of the list.
 					listId:
 						todoItem.status === 'completed'
 							? 'todo-list-completed'
@@ -122,7 +122,7 @@ prplDocumentReady( () => {
 						new CustomEvent( 'prpl/todo/injectItem', {
 							detail: {
 								item: newTask,
-								addToStart: false,
+								addToStart: 1 === newTask.points, // Add golden task to the start of the list.
 								listId: 'todo-list',
 							},
 						} )
@@ -202,7 +202,7 @@ document.addEventListener( 'prpl/suggestedTask/maybeInjectItem', ( event ) => {
 					new CustomEvent( 'prpl/todo/injectItem', {
 						detail: {
 							item: todoItem,
-							addToStart: false,
+							addToStart: 1 === todoItem.points, // Add golden task to the start of the list.
 							listId:
 								'complete' === event.detail.actionType
 									? 'todo-list-completed'
