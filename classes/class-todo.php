@@ -7,6 +7,8 @@
 
 namespace Progress_Planner;
 
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+
 /**
  * Todo class.
  */
@@ -21,27 +23,99 @@ class Todo {
 		\add_action( 'wp_ajax_progress_planner_save_user_suggested_task', [ $this, 'save_user_suggested_task' ] );
 		\add_action( 'wp_ajax_progress_planner_save_suggested_user_tasks_order', [ $this, 'save_suggested_user_tasks_order' ] );
 
-		$this->maybe_change_points_of_first_item();
+		\add_action( 'progress_planner_task_status_changed', [ $this, 'remove_order_from_completed_user_task' ], 10, 2 );
+
+		$this->maybe_change_first_item_points_on_monday();
 	}
 
 	/**
-	 * Get the todo list items.
+	 * Maybe remove the order from a completed user task.
+	 *
+	 * @param string $task_id The task ID.
+	 * @param string $status The status.
+	 *
+	 * @return void
+	 */
+	public function remove_order_from_completed_user_task( $task_id, $status ) {
+
+		// Bail if the task is not completed.
+		if ( 'completed' !== $status ) {
+			return;
+		}
+
+		$task = Local_Task_Factory::create_task_from( 'id', $task_id );
+
+		// Bail if the task is not a user task.
+		if ( 'user' !== $task->get_provider_id() ) {
+			return;
+		}
+
+		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		foreach ( $local_tasks as $key => $task ) {
+			if ( $task['task_id'] === $task_id ) {
+				unset( $local_tasks[ $key ]['order'] );
+				break;
+			}
+		}
+		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+	}
+
+	/**
+	 * Get the pending todo list items.
 	 *
 	 * @return array
 	 */
 	public function get_items() {
+		return array_merge( $this->get_pending_items(), $this->get_completed_items() );
+	}
+
+	/**
+	 * Get the completed todo list items.
+	 *
+	 * @return array
+	 */
+	public function get_completed_items() {
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', 'user' );
+
+		$items = [];
+		foreach ( $tasks as $task ) {
+			if ( 'completed' === $task['status'] ) {
+				$items[] = array_merge(
+					$task,
+					[
+						'dismissable' => true,
+						'snoozable'   => false,
+					]
+				);
+			}
+		}
+
+		return $items;
+	}
+
+	/**
+	 * Get the pending todo list items.
+	 *
+	 * @return array
+	 */
+	public function get_pending_items() {
 		$tasks     = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', 'user' );
 		$items     = [];
 		$max_order = 0;
 
 		// Get the maximum order value from the $tasks array.
 		foreach ( $tasks as $task ) {
-			if ( isset( $task['order'] ) && $task['order'] > $max_order ) {
+			if ( 'pending' === $task['status'] && isset( $task['order'] ) && $task['order'] > $max_order ) {
 				$max_order = $task['order'];
 			}
 		}
 
 		foreach ( $tasks as $task ) {
+			// Skip non-pending tasks.
+			if ( 'pending' !== $task['status'] ) {
+				continue;
+			}
+
 			if ( ! isset( $task['order'] ) ) {
 				$task['order'] = $max_order + 1;
 				++$max_order;
@@ -85,6 +159,7 @@ class Todo {
 		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 		$title       = isset( $_POST['task']['title'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['title'] ) ) : '';
 
+		// Check if the task already exists (this is the update case).
 		$task_index = false;
 		foreach ( $local_tasks as $key => $task ) {
 			if ( $task['task_id'] === $task_id ) {
@@ -93,20 +168,31 @@ class Todo {
 			}
 		}
 
+		// Default value.
+		$task_points = 0;
+
+		// We're creating a new task.
 		if ( false === $task_index ) {
+			$task_points   = $this->calc_points_for_new_task();
 			$local_tasks[] = [
 				'task_id'     => $task_id,
 				'provider_id' => 'user',
 				'category'    => 'user',
 				'status'      => 'pending',
 				'title'       => $title,
+				'points'      => $task_points,
 			];
 		} else {
 			$local_tasks[ $task_index ]['title'] = $title;
 		}
 
 		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
-		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
+		\wp_send_json_success(
+			[
+				'message' => \esc_html__( 'Saved.', 'progress-planner' ),
+				'points'  => $task_points, // We're using it when adding the new task to the todo list.
+			]
+		);
 	}
 
 	/**
@@ -139,22 +225,22 @@ class Todo {
 	}
 
 	/**
-	 * Maybe change the points of the first item in the todo list.
+	 * Get the points for a new task.
 	 *
-	 * @return void
+	 * @return int
 	 */
-	public function maybe_change_points_of_first_item() {
+	public function calc_points_for_new_task() {
 		$items = $this->get_items();
 
-		// Bail if there are no items.
+		// If this is the first user task ever, return 1.
 		if ( ! count( $items ) ) {
-			return;
+			return 1;
 		}
 
 		// Get the task IDs from the todos.
 		$task_ids = array_column( $items, 'task_id' );
 
-		// Get the completed activities that are in the todos.
+		// Get the completed activities for this week that are in the todos.
 		$activities = array_filter(
 			\progress_planner()->get_query()->query_activities(
 				[
@@ -169,35 +255,61 @@ class Todo {
 			}
 		);
 
-		// Bail if there are no completed todos this week.
-		if ( ! count( $activities ) ) {
+		// If there are completed todos this week, we already have set the golden task and it was completed.
+		if ( count( $activities ) ) {
+			return 0;
+		}
+
+		// Check if there are already pending user tasks with a points value other than 0.
+		foreach ( $items as $item ) {
+			if ( 'pending' === $item['status'] && isset( $item['points'] ) && $item['points'] !== 0 ) {
+				return 0;
+			}
+		}
+
+		return 1;
+	}
+
+	/**
+	 * Maybe change the points of the first item in the todo list on Monday.
+	 *
+	 * @return void
+	 */
+	public function maybe_change_first_item_points_on_monday() {
+		$items = $this->get_items();
+
+		// Bail if there are no items.
+		if ( ! count( $items ) ) {
+			return;
+		}
+		$next_monday = new \DateTime( 'monday next week' );
+
+		$transient_name = 'todo_points_change_on_monday';
+		$next_update    = \progress_planner()->get_cache()->get( $transient_name );
+
+		if ( false !== $next_update && $next_update > time() ) {
 			return;
 		}
 
-		// Check if there is an item with a points value other than 0.
-		foreach ( $items as $item ) {
-			// Skip completed items.
-			if ( 'completed' === $item['status'] ) {
-				continue;
-			}
+		$next_monday = new \DateTime( 'monday next week' );
 
-			// Bail if the item has a points value other than 0.
-			if ( isset( $item['points'] ) && $item['points'] !== 0 ) {
-				return;
-			}
-		}
+		// Get the task IDs from the todos.
+		$task_ids = array_column( $items, 'task_id' );
 
-		// Change the points of the first item to 1.
+		// Get the local tasks.
 		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+
+		// Reset the points of all the tasks, except for the first one in the todo list.
 		foreach ( $local_tasks as $key => $task ) {
-			if ( $task['task_id'] === $items[0]['task_id'] ) {
-				$local_tasks[ $key ]['points'] = 1;
-				break;
+			if ( 'user' === $task['provider_id'] && 'pending' === $task['status'] ) {
+				$local_tasks[ $key ]['points'] = $local_tasks[ $key ]['task_id'] === $task_ids[0] ? 1 : 0;
 			}
 		}
 
 		// Save the local tasks.
 		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+
+		\progress_planner()->get_cache()->set( $transient_name, $next_monday->getTimestamp(), $next_monday->getTimestamp() );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

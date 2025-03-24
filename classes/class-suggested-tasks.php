@@ -326,7 +326,15 @@ class Suggested_Tasks {
 		if ( ! $tasks_changed ) {
 			return false;
 		}
-		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+
+		$result = \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+
+		// Fire an action when the task status is changed.
+		if ( true === $result ) {
+			do_action( 'progress_planner_task_status_changed', $task_id, $status );
+		}
+
+		return $result;
 	}
 
 	/**
