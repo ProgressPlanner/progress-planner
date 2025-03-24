@@ -226,7 +226,7 @@ customElements.define(
 						output += `
 							</slot>
 							<slot name="content">
-								Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam, quos.
+								${ prplL10n( 'disabledRRCheckboxTooltip' ) }
 							</slot>
 						</prpl-tooltip>
 						`;
