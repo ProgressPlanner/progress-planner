@@ -598,6 +598,21 @@ customElements.define(
 						break;
 
 					case 'delete':
+						// Update the Ravi gauge.
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/updateRaviGauge', {
+								detail: {
+									pointsDiff:
+										0 -
+										parseInt(
+											this.querySelector(
+												'li'
+											).getAttribute( 'data-task-points' )
+										),
+								},
+							} )
+						);
+
 						// Remove the task from the todo list.
 						el.closest( 'prpl-suggested-task' ).remove();
 						document.dispatchEvent(
