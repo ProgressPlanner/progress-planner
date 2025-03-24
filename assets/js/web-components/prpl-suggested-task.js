@@ -217,7 +217,6 @@ customElements.define(
 					output += `<input
 						type="checkbox"
 						class="prpl-suggested-task-checkbox"
-						${ isDismissable ? '' : ' disabled' }
 						style="${ checkboxStyle }"
 						${ getTaskStatus() === 'completed' ? 'checked' : '' }
 					>`;
