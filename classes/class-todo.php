@@ -29,7 +29,7 @@ class Todo {
 	}
 
 	/**
-	 * Maybe remove the order from a completed user task.
+	 * Remove the order from a completed user task.
 	 *
 	 * @param string $task_id The task ID.
 	 * @param string $status The status.
@@ -276,13 +276,12 @@ class Todo {
 	 * @return void
 	 */
 	public function maybe_change_first_item_points_on_monday() {
-		$items = $this->get_items();
+		$pending_items = $this->get_pending_items();
 
 		// Bail if there are no items.
-		if ( ! count( $items ) ) {
+		if ( ! count( $pending_items ) ) {
 			return;
 		}
-		$next_monday = new \DateTime( 'monday next week' );
 
 		$transient_name = 'todo_points_change_on_monday';
 		$next_update    = \progress_planner()->get_cache()->get( $transient_name );
@@ -294,7 +293,7 @@ class Todo {
 		$next_monday = new \DateTime( 'monday next week' );
 
 		// Get the task IDs from the todos.
-		$task_ids = array_column( $items, 'task_id' );
+		$task_ids = array_column( $pending_items, 'task_id' );
 
 		// Get the local tasks.
 		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
