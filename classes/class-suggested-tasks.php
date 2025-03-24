@@ -623,6 +623,7 @@ class Suggested_Tasks {
 
 			case 'delete':
 				$updated = $this->delete_task( $task_id );
+				$this->delete_activity( $task_id );
 				break;
 
 			default:
