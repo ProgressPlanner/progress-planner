@@ -25,6 +25,33 @@
 			height: 1.25em;
 		}
 	}
+
+	.prpl-todo-golden-task-description,
+	.prpl-todo-silver-task-description {
+		display: none;
+	}
+
+	&:not(:has(#todo-list li[data-task-points="1"])) {
+
+		.prpl-todo-golden-task-description {
+			display: none;
+		}
+
+		.prpl-todo-silver-task-description {
+			display: block;
+		}
+	}
+
+	&:has(#todo-list li[data-task-points="1"]) {
+
+		.prpl-todo-silver-task-description {
+			display: none;
+		}
+
+		.prpl-todo-golden-task-description {
+			display: block;
+		}
+	}
 }
 
 #create-todo-item {
