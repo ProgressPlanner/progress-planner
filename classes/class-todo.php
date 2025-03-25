@@ -50,14 +50,19 @@ class Todo {
 			return;
 		}
 
+		$task_changed = false;
 		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 		foreach ( $local_tasks as $key => $task ) {
 			if ( $task['task_id'] === $task_id ) {
 				unset( $local_tasks[ $key ]['order'] );
+				$task_changed = true;
 				break;
 			}
 		}
-		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+
+		if ( $task_changed ) {
+			\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+		}
 	}
 
 	/**
