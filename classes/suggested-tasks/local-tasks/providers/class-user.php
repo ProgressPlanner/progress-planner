@@ -57,6 +57,7 @@ class User extends One_Time {
 					'task_id'     => $task_data['task_id'],
 					'provider_id' => $this->get_provider_id(),
 					'category'    => $this->get_provider_category(),
+					'points'      => 0,
 				];
 			}
 		}

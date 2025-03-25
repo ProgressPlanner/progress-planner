@@ -18,7 +18,7 @@ customElements.define(
 			task_id,
 			title,
 			description,
-			points,
+			points = 0,
 			action = '',
 			url = '',
 			dismissable = false,
