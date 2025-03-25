@@ -313,7 +313,7 @@ class Todo {
 		// Save the local tasks.
 		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
 
-		\progress_planner()->get_cache()->set( $transient_name, $next_monday->getTimestamp(), $next_monday->getTimestamp() );
+		\progress_planner()->get_cache()->set( $transient_name, $next_monday->getTimestamp(), WEEK_IN_SECONDS );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo
