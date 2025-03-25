@@ -291,7 +291,8 @@ button.prpl-info-icon {
 .prpl-wrap button.prpl-button-primary,
 .prpl-wrap button.prpl-button-secondary,
 .prpl-wrap a.prpl-button-primary,
-.prpl-wrap a.prpl-button-secondary {
+.prpl-wrap a.prpl-button-secondary,
+#progress_planner_dashboard_widget_score a.prpl-button-primary { /* To be used in WP Dashboard widget */
 	display: block;
 	margin: 1rem 0;
 	padding: 0.75rem 1.25rem;
