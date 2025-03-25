@@ -1,4 +1,4 @@
-<?php // phpcs:disable Generic.Commenting.Todo
+<?php
 /**
  * Handle TODO list items.
  *
@@ -316,4 +316,3 @@ class Todo {
 		\progress_planner()->get_cache()->set( $transient_name, $next_monday->getTimestamp(), $next_monday->getTimestamp() );
 	}
 }
-// phpcs:enable Generic.Commenting.Todo
