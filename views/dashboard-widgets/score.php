@@ -44,10 +44,11 @@ use Progress_Planner\Badges\Monthly;
 			<?php $prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' ); ?>
 			<?php if ( $prpl_pending_celebration_tasks ) : ?>
 				<?php
+				$prpl_notification_count = \count( $prpl_pending_celebration_tasks );
 				printf(
 					/* translators: %s: Number of pending celebration tasks. */
-					esc_html__( 'Good job! You have successfully finished %s task(s)!', 'progress-planner' ),
-					\count( $prpl_pending_celebration_tasks )
+					esc_html( _n( 'Good job! You have successfully finished %s task!', 'Good job! You have successfully finished %s tasks!', $prpl_notification_count, 'progress-planner' ) ),
+					esc_html( number_format_i18n( $prpl_notification_count ) )
 				);
 				?>
 				<a class="prpl-button-primary" href="<?php echo \esc_url( \get_admin_url( null, 'admin.php?page=progress-planner' ) ); ?>">
