@@ -3,6 +3,12 @@
 	gap: 0.5em;
 	display: flex;
 	position: relative;
+
+	.icon {
+		width: 1.25rem;
+		height: 1.25rem;
+		display: inline-block;
+	}
 }
 
 .prpl-tooltip {

@@ -35,7 +35,7 @@
 	&:not(:has(#todo-list li[data-task-points="1"])) {
 
 		.prpl-todo-silver-task-description {
-			display: block;
+			display: initial;
 		}
 
 		.prpl-todo-golden-task-description {
@@ -59,7 +59,7 @@
 		}
 
 		.prpl-todo-golden-task-description {
-			display: block;
+			display: initial;
 		}
 
 		#todo-list {
