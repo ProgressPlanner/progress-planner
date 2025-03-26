@@ -85,6 +85,8 @@ class Debug_Tools {
 
 		$this->add_suggested_tasks_submenu_item( $admin_bar );
 
+		$this->add_activities_submenu_item( $admin_bar );
+
 		$this->add_more_info_submenu_item( $admin_bar );
 	}
 
@@ -251,6 +253,43 @@ class Debug_Tools {
 					]
 				);
 			}
+		}
+	}
+
+	/**
+	 * Add Activities submenu to the debug menu.
+	 *
+	 * Displays lists of completed, snoozed, and pending celebration tasks.
+	 *
+	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
+	 * @return void
+	 */
+	protected function add_activities_submenu_item( $admin_bar ) {
+		// Add Suggested Tasks submenu item.
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-activities',
+				'parent' => 'prpl-debug',
+				'title'  => 'Activities',
+				'href'   => '#',
+			]
+		);
+
+		// Get suggested tasks.
+		$activities = \progress_planner()->get_query()->query_activities(
+			[
+				'category' => 'suggested_task',
+			]
+		);
+
+		foreach ( $activities as $activity ) {
+			$admin_bar->add_node(
+				[
+					'id'     => 'prpl-activity-' . $activity->id,
+					'parent' => 'prpl-activities',
+					'title'  => $activity->data_id . ' - ' . $activity->category,
+				]
+			);
 		}
 	}
 
