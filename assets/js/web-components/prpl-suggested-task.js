@@ -210,7 +210,7 @@ customElements.define(
 					// If the task is not dismissable, checkbox is disabled and we want to show a tooltip.
 					if ( ! isDismissable ) {
 						checkboxStyle += 'pointer-events: none;';
-						output += `<prpl-tooltip class="prpl-suggested-task-disabked-checkbox-tooltip">
+						output += `<prpl-tooltip class="prpl-suggested-task-disabled-checkbox-tooltip">
 							<slot name="open-icon">`;
 					}
 

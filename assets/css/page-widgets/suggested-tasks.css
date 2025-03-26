@@ -155,7 +155,7 @@
 	}
 
 	/* Disabled checkbox styles. */
-	.prpl-suggested-task-disabked-checkbox-tooltip {
+	.prpl-suggested-task-disabled-checkbox-tooltip {
 
 		.prpl-tooltip {
 			transform: translate(-20%, calc(100% + 10px));
