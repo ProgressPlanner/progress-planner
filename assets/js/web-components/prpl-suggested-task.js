@@ -84,36 +84,92 @@ customElements.define(
 						</span>`
 						: '',
 				info: description
-					? `<button
-							type="button"
-							class="prpl-suggested-task-button"
-							data-task-id="${ task_id }"
-							data-task-title="${ title }"
-							data-action="info"
-							data-target="info"
-							title="${ prplL10n( 'info' ) }"
-						>
-							<img src="${ prplSuggestedTask.assets.infoIcon }" alt="${ prplL10n(
-								'info'
-							) }" class="icon">
-							<span class="screen-reader-text">${ prplL10n( 'info' ) }</span>
-						</button>`
+					? `<prpl-tooltip>
+							<slot name="open-icon">
+								<button
+									type="button"
+									class="prpl-suggested-task-button"
+									data-task-id="${ task_id }"
+									data-task-title="${ title }"
+									data-action="info"
+									data-target="info"
+									title="${ prplL10n( 'info' ) }"
+								>
+									<img src="${ prplSuggestedTask.assets.infoIcon }" alt="${ prplL10n(
+										'info'
+									) }" class="icon">
+									<span class="screen-reader-text">${ prplL10n( 'info' ) }</span>
+								</button>
+							</slot>
+							<slot name="content">
+								${ description }
+							</slot>
+						</prpl-tooltip>`
 					: '',
 				snooze: snoozable
-					? `<button
-							type="button"
-							class="prpl-suggested-task-button"
-							data-task-id="${ task_id }"
-							data-task-title="${ title }"
-							data-action="snooze"
-							data-target="snooze"
-							title="${ prplL10n( 'snooze' ) }"
-						>
-							<img src="${ prplSuggestedTask.assets.snoozeIcon }" alt="${ prplL10n(
-								'snooze'
-							) }" class="icon">
-							<span class="screen-reader-text">${ prplL10n( 'snooze' ) }</span>
-						</button>`
+					? `<prpl-tooltip class="prpl-suggested-task-snooze">
+							<slot name="open-icon">
+							<button
+								type="button"
+								class="prpl-suggested-task-button"
+								data-task-id="${ task_id }"
+								data-task-title="${ title }"
+								data-action="snooze"
+								data-target="snooze"
+								title="${ prplL10n( 'snooze' ) }"
+							>
+								<img src="${ prplSuggestedTask.assets.snoozeIcon }" alt="${ prplL10n(
+									'snooze'
+								) }" class="icon">
+								<span class="screen-reader-text">${ prplL10n( 'snooze' ) }</span>
+							</button>
+
+							</slot>
+							<slot name="content">
+								<fieldset>
+									<legend>
+										<span>
+											${ prplL10n( 'snoozeThisTask' ) }
+										</span>
+										<button type="button" class="prpl-toggle-radio-group">
+											<span class="prpl-toggle-radio-group-text">
+												${ prplL10n( 'howLong' ) }
+											</span>
+											<span class="prpl-toggle-radio-group-arrow">
+												&rsaquo;
+											</span>
+										</button>
+									</legend>
+
+									<div class="prpl-snooze-duration-radio-group">
+										<label>
+											<input type="radio" name="snooze-duration-${ task_id }" value="1-week">
+											${ prplL10n( 'snoozeDurationOneWeek' ) }
+										</label>
+										<label>
+											<input type="radio" name="snooze-duration-${ task_id }" value="1-month">
+											${ prplL10n( 'snoozeDurationOneMonth' ) }
+										</label>
+										<label>
+											<input type="radio" name="snooze-duration-${ task_id }" value="3-months">
+											${ prplL10n( 'snoozeDurationThreeMonths' ) }
+										</label>
+										<label>
+											<input type="radio" name="snooze-duration-${ task_id }" value="6-months">
+											${ prplL10n( 'snoozeDurationSixMonths' ) }
+										</label>
+										<label>
+											<input type="radio" name="snooze-duration-${ task_id }" value="1-year">
+											${ prplL10n( 'snoozeDurationOneYear' ) }
+										</label>
+										<label>
+											<input type="radio" name="snooze-duration-${ task_id }" value="forever">
+											${ prplL10n( 'snoozeDurationForever' ) }
+										</label>
+									</div>
+								</fieldset>
+							</slot>
+						</prpl-tooltip>`
 					: '',
 				complete:
 					isDismissable && ! useCheckbox
@@ -144,15 +200,39 @@ customElements.define(
 							<span class="screen-reader-text">${ prplL10n( 'delete' ) }</span>
 						</button>`
 					: '',
-				completeCheckbox: useCheckbox
-					? `<input
-							type="checkbox"
-							class="prpl-suggested-task-checkbox"
-							${ isDismissable ? '' : ' disabled' }
-							style="margin-top: 2px;"
-							${ getTaskStatus() === 'completed' ? 'checked' : '' }
-						>`
-					: '',
+				completeCheckbox: ( () => {
+					if ( ! useCheckbox ) {
+						return '';
+					}
+					let output = '';
+					let checkboxStyle = 'margin-top: 2px;';
+
+					// If the task is not dismissable, checkbox is disabled and we want to show a tooltip.
+					if ( ! isDismissable ) {
+						checkboxStyle += 'pointer-events: none;';
+						output += `<prpl-tooltip class="prpl-suggested-task-disabked-checkbox-tooltip">
+							<slot name="open-icon">`;
+					}
+
+					output += `<input
+						type="checkbox"
+						class="prpl-suggested-task-checkbox"
+						style="${ checkboxStyle }"
+						${ getTaskStatus() === 'completed' ? 'checked' : '' }
+					>`;
+
+					if ( ! isDismissable ) {
+						output += `
+							</slot>
+							<slot name="content">
+								${ prplL10n( 'disabledRRCheckboxTooltip' ) }
+							</slot>
+						</prpl-tooltip>
+						`;
+					}
+
+					return output;
+				} )(),
 			};
 
 			const taskPointsElement = points
@@ -187,63 +267,6 @@ customElements.define(
 						${ actionButtons.complete }
 						${ actionButtons.delete }
 
-						<div class="prpl-suggested-task-snooze prpl-tooltip">
-
-							<fieldset>
-								<legend>
-									<span>
-										${ prplL10n( 'snoozeThisTask' ) }
-									</span>
-									<button type="button" class="prpl-toggle-radio-group">
-										<span class="prpl-toggle-radio-group-text">
-											${ prplL10n( 'howLong' ) }
-										</span>
-										<span class="prpl-toggle-radio-group-arrow">
-											&rsaquo;
-										</span>
-									</button>
-								</legend>
-
-								<div class="prpl-snooze-duration-radio-group">
-									<label>
-										<input type="radio" name="snooze-duration-${ task_id }" value="1-week">
-										${ prplL10n( 'snoozeDurationOneWeek' ) }
-									</label>
-									<label>
-										<input type="radio" name="snooze-duration-${ task_id }" value="1-month">
-										${ prplL10n( 'snoozeDurationOneMonth' ) }
-									</label>
-									<label>
-										<input type="radio" name="snooze-duration-${ task_id }" value="3-months">
-										${ prplL10n( 'snoozeDurationThreeMonths' ) }
-									</label>
-									<label>
-										<input type="radio" name="snooze-duration-${ task_id }" value="6-months">
-										${ prplL10n( 'snoozeDurationSixMonths' ) }
-									</label>
-									<label>
-										<input type="radio" name="snooze-duration-${ task_id }" value="1-year">
-										${ prplL10n( 'snoozeDurationOneYear' ) }
-									</label>
-									<label>
-										<input type="radio" name="snooze-duration-${ task_id }" value="forever">
-										${ prplL10n( 'snoozeDurationForever' ) }
-									</label>
-								</div>
-							</fieldset>
-
-							<button type="button" class="prpl-suggested-task-button prpl-tooltip-close" data-action="close-snooze" data-target="snooze">
-								<span class="dashicons dashicons-no-alt"></span>
-								<span class="screen-reader-text">${ prplL10n( 'close' ) }</span>
-							</button>
-						</div>
-						<div class="prpl-suggested-task-info prpl-tooltip" data-target="info">
-							${ description }
-							<button type="button" class="prpl-suggested-task-button prpl-tooltip-close" data-action="close-info" data-target="info">
-								<span class="dashicons dashicons-no-alt"></span>
-								<span class="screen-reader-text">${ prplL10n( 'close' ) }</span>
-							</button>
-						</div>
 					</div>
 
 					${ taskPointsElement }
@@ -394,7 +417,7 @@ customElements.define(
 			);
 
 			// Toggle snooze duration radio group.
-			item.querySelector( '.prpl-toggle-radio-group' ).addEventListener(
+			item.querySelector( '.prpl-toggle-radio-group' )?.addEventListener(
 				'click',
 				function () {
 					this.closest(

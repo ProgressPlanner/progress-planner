@@ -179,6 +179,7 @@ class Page {
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-bar' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-line' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-big-counter' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-tooltip' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'header-filters', $default_localization_data );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'grid-masonry' );
@@ -268,6 +269,7 @@ class Page {
 		}
 
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/admin' );
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-tooltip' );
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
 			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/settings-page' );
