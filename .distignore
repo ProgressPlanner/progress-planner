@@ -6,6 +6,8 @@
 /vendor
 .distignore
 .editorconfig
+.eslintrc.js
+.env.example
 .gitignore
 .gitattributes
 composer.json
