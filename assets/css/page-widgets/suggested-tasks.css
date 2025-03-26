@@ -153,6 +153,19 @@
 			background-color: #f9fafb;
 		}
 	}
+
+	/* Disabled checkbox styles. */
+	.prpl-suggested-task-disabked-checkbox-tooltip {
+
+		.prpl-tooltip {
+			transform: translate(-20%, calc(100% + 10px));
+
+			&::after {
+				left: 25px;
+				right: auto;
+			}
+		}
+	}
 }
 
 /*------------------------------------*\

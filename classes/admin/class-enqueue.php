@@ -338,6 +338,7 @@ class Enqueue {
 			'taskNotCompleted'             => \esc_html__( "Task '%s' marked as not completed and moved to the top", 'progress-planner' ),
 			'video'                        => \esc_html__( 'Video', 'progress-planner' ),
 			'watchVideo'                   => \esc_html__( 'Watch video', 'progress-planner' ),
+			'disabledRRCheckboxTooltip'    => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),
 		];
 	}
 }
