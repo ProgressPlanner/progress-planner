@@ -25,6 +25,51 @@
 			height: 1.25em;
 		}
 	}
+
+	.prpl-todo-golden-task-description,
+	.prpl-todo-silver-task-description {
+		display: none;
+	}
+
+	/* Silver task */
+	&:not(:has(#todo-list li[data-task-points="1"])) {
+
+		.prpl-todo-silver-task-description {
+			display: block;
+		}
+
+		.prpl-todo-golden-task-description {
+			display: none;
+		}
+
+		#todo-list > *:first-child {
+
+			.prpl-suggested-task {
+				border: 1px solid #796da2;
+				background-color: #f9fafb;
+			}
+		}
+	}
+
+	/* Golden task */
+	&:has(#todo-list li[data-task-points="1"]) {
+
+		.prpl-todo-silver-task-description {
+			display: none;
+		}
+
+		.prpl-todo-golden-task-description {
+			display: block;
+		}
+
+		#todo-list {
+
+			.prpl-suggested-task[data-task-points="1"] {
+				border: 1px solid var(--prpl-color-accent-orange);
+				background-color: var(--prpl-background-orange);
+			}
+		}
+	}
 }
 
 #create-todo-item {
@@ -132,22 +177,5 @@
 
 	&:not(:has(.prpl-suggested-task)) {
 		display: none;
-	}
-}
-
-#todo-list {
-
-	&:not(:has(li[data-task-points="1"])) {
-
-		> *:first-child {
-
-			.prpl-suggested-task {
-				background-color: var(--prpl-background-purple);
-
-				h3 {
-					color: var(--prpl-color-accent-purple);
-				}
-			}
-		}
 	}
 }

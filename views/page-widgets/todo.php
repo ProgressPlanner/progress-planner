@@ -17,5 +17,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<span><?php \esc_html_e( 'My to-do list', 'progress-planner' ); ?></span>
 </h2>
 
-<p><?php \esc_html_e( 'Write down all your website maintenance tasks you want to get done!', 'progress-planner' ); ?></p>
+<p class="prpl-todo-golden-task-description">
+	<?php \esc_html_e( 'Write down all your tasks you want to get done on your website! You’ll earn points for your ‘golden task’. ', 'progress-planner' ); ?>
+</p>
+<p class="prpl-todo-silver-task-description">
+	<?php \esc_html_e( 'Write down all your tasks you want to get done on your website! The top task will become your ‘golden task’ next week. ', 'progress-planner' ); ?>
+</p>
 <?php \progress_planner()->get_widgets__todo()->the_todo_list(); ?>

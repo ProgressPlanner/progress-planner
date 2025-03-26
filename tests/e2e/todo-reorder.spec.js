@@ -2,6 +2,7 @@ const { test: base, expect, chromium } = require( '@playwright/test' );
 
 const FIRST_TASK_TEXT = 'First task to reorder';
 const SECOND_TASK_TEXT = 'Second task to reorder';
+const THIRD_TASK_TEXT = 'Third task to reorder';
 
 let browser;
 let context;
@@ -67,6 +68,11 @@ base.describe( 'PRPL Todo Reorder', () => {
 		await page.keyboard.press( 'Enter' );
 		await page.waitForTimeout( 500 );
 
+		// Create third task
+		await page.fill( '#new-todo-content', THIRD_TASK_TEXT );
+		await page.keyboard.press( 'Enter' );
+		await page.waitForTimeout( 500 );
+
 		// Get all todo items
 		const todoItems = page.locator(
 			'ul#todo-list > prpl-suggested-task li'
@@ -80,10 +86,13 @@ base.describe( 'PRPL Todo Reorder', () => {
 		await expect( items[ 1 ].locator( 'h3 > span' ) ).toHaveText(
 			SECOND_TASK_TEXT
 		);
+		await expect( items[ 2 ].locator( 'h3 > span' ) ).toHaveText(
+			THIRD_TASK_TEXT
+		);
 
-		// Hover over first item and click move down button
-		await items[ 0 ].hover();
-		await items[ 0 ]
+		// Hover over second item and click move down button
+		await items[ 1 ].hover();
+		await items[ 1 ]
 			.locator( '.prpl-suggested-task-button.move-down' )
 			.click();
 		await page.waitForTimeout( 500 );
@@ -91,10 +100,13 @@ base.describe( 'PRPL Todo Reorder', () => {
 		// Verify new order
 		const reorderedItems = await todoItems.all();
 		await expect( reorderedItems[ 0 ].locator( 'h3 > span' ) ).toHaveText(
-			SECOND_TASK_TEXT
+			FIRST_TASK_TEXT
 		);
 		await expect( reorderedItems[ 1 ].locator( 'h3 > span' ) ).toHaveText(
-			FIRST_TASK_TEXT
+			THIRD_TASK_TEXT
+		);
+		await expect( reorderedItems[ 2 ].locator( 'h3 > span' ) ).toHaveText(
+			SECOND_TASK_TEXT
 		);
 
 		// Reload page
@@ -104,10 +116,13 @@ base.describe( 'PRPL Todo Reorder', () => {
 		// Verify order persists after reload
 		const persistedItems = await todoItems.all();
 		await expect( persistedItems[ 0 ].locator( 'h3 > span' ) ).toHaveText(
-			SECOND_TASK_TEXT
+			FIRST_TASK_TEXT
 		);
 		await expect( persistedItems[ 1 ].locator( 'h3 > span' ) ).toHaveText(
-			FIRST_TASK_TEXT
+			THIRD_TASK_TEXT
+		);
+		await expect( persistedItems[ 2 ].locator( 'h3 > span' ) ).toHaveText(
+			SECOND_TASK_TEXT
 		);
 	} );
 } );

@@ -70,7 +70,7 @@ prplDocumentReady( () => {
 			new CustomEvent( 'prpl/todo/injectItem', {
 				detail: {
 					item: todoItem,
-					addToStart: false,
+					addToStart: 1 === todoItem.points, // Add golden task to the start of the list.
 					listId:
 						todoItem.status === 'completed'
 							? 'todo-list-completed'
@@ -106,28 +106,36 @@ prplDocumentReady( () => {
 				order: prplGetHighestTodoItemOrder() + 1,
 			};
 
-			// Inject the new task into the DOM.
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/todo/injectItem', {
-					detail: {
-						item: newTask,
-						addToStart: false,
-						listId: 'todo-list',
-					},
-				} )
-			);
-
-			// Add the new task to the local tasks array.
-			progressPlannerTodo.tasks.push( newTask );
-
 			// Save the new task.
-			wp.ajax.post( 'progress_planner_save_user_suggested_task', {
-				task: newTask,
-				nonce: progressPlannerTodo.nonce,
-			} );
+			wp.ajax
+				.post( 'progress_planner_save_user_suggested_task', {
+					task: newTask,
+					nonce: progressPlannerTodo.nonce,
+				} )
+				.then( ( response ) => {
+					if ( 'undefined' !== typeof response.points ) {
+						newTask.points = response.points;
+					}
 
-			// Resize the grid items.
-			window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+					// Inject the new task into the DOM.
+					document.dispatchEvent(
+						new CustomEvent( 'prpl/todo/injectItem', {
+							detail: {
+								item: newTask,
+								addToStart: 1 === newTask.points, // Add golden task to the start of the list.
+								listId: 'todo-list',
+							},
+						} )
+					);
+
+					// Add the new task to the local tasks array.
+					progressPlannerTodo.tasks.push( newTask );
+
+					// Resize the grid items.
+					window.dispatchEvent(
+						new CustomEvent( 'prpl/grid/resize' )
+					);
+				} );
 
 			// Clear the new task input element.
 			document.getElementById( 'new-todo-content' ).value = '';
@@ -194,7 +202,7 @@ document.addEventListener( 'prpl/suggestedTask/maybeInjectItem', ( event ) => {
 					new CustomEvent( 'prpl/todo/injectItem', {
 						detail: {
 							item: todoItem,
-							addToStart: false,
+							addToStart: 1 === todoItem.points, // Add golden task to the start of the list.
 							listId:
 								'complete' === event.detail.actionType
 									? 'todo-list-completed'
