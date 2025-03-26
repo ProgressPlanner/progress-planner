@@ -1,7 +1,9 @@
+/* stylelint-disable max-line-length */
+
 /**
  * Suggested tasks widget.
  *
- * Dependencies: progress-planner/web-components/prpl-suggested-task
+ * Dependencies: progress-planner/web-components/prpl-suggested-task, progress-planner/web-components/prpl-badge
  */
 
 .prpl-widget-wrapper.prpl-suggested-tasks {
@@ -62,33 +64,6 @@
 			border: none;
 			background: none;
 			cursor: pointer;
-		}
-
-		.prpl-badge {
-			display: grid;
-			grid-template-columns: 1fr;
-
-			min-width: 0;
-			gap: 10px;
-
-			> * {
-				align-self: center;
-			}
-
-			prpl-badge {
-
-				img {
-					transition: opacity 0.3s ease-in-out, filter 0.3s ease-in-out;
-				}
-
-				&[complete="false"] {
-
-					img {
-						opacity: 0.25;
-						filter: grayscale(1);
-					}
-				}
-			}
 		}
 
 		p {
@@ -256,11 +231,6 @@
 			font-size: var(--prpl-font-size-xs);
 			text-align: center;
 			line-height: 1.2;
-		}
-
-		prpl-badge {
-			width: 100%;
-			margin-bottom: 1rem;
 		}
 	}
 

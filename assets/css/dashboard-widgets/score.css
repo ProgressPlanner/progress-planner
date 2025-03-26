@@ -1,3 +1,10 @@
+/* stylelint-disable max-line-length */
+
+/**
+ * Admin widget.
+ *
+ * Dependencies: progress-planner/web-components/prpl-suggested-task, progress-planner/web-components/prpl-badge
+ */
 #progress_planner_dashboard_widget_score {
 
 	.prpl-dashboard-widget {
