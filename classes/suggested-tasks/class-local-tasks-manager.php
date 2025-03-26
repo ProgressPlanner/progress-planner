@@ -208,7 +208,7 @@ class Local_Tasks_Manager {
 	 * @return array
 	 */
 	public function evaluate_tasks() {
-		$tasks           = (array) \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending' );
+		$tasks           = (array) \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending' );
 		$completed_tasks = [];
 
 		foreach ( $tasks as $task_data ) {
