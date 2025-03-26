@@ -41,9 +41,9 @@ use Progress_Planner\Badges\Monthly;
 	<div class="prpl-dashboard-widget-footer">
 		<img src="<?php echo \esc_attr( PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg' ); ?>" style="width:1.85em;" alt="" />
 		<div>
-			<?php
-			$prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending_celebration' );
-			if ( $prpl_pending_celebration_tasks ) :
+			<?php $prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' ); ?>
+			<?php if ( $prpl_pending_celebration_tasks ) : ?>
+				<?php
 				printf(
 					/* translators: %s: Number of pending celebration tasks. */
 					esc_html__( 'Good job! You have successfully finished %s task(s)!', 'progress-planner' ),

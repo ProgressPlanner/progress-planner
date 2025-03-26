@@ -1,46 +1,12 @@
-/* global customElements, prplSuggestedTasks, confetti, prplDocumentReady */
-/**
- * Suggested tasks widget.
+/* global customElements, prplSuggestedTasks, prplDocumentReady */
+/*
+ * Widget: Suggested Tasks
  *
- * Dependencies: progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, particles-confetti
- */
-
-/**
- * Count the number of items in the list.
+ * A widget that displays a list of suggested tasks.
  *
- * @param {string} category The category of items to count.
- * @return {number} The number of items in the list.
+ * Dependencies: progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip
  */
-const prplSuggestedTasksCountItems = ( category ) => {
-	const items = document.querySelectorAll(
-		`.prpl-suggested-task[data-task-category="${ category }"]`
-	);
-	return items.length;
-};
-
-/**
- * Get all items of a category.
- *
- * @param {string} category The category of items to get.
- * @return {Array} The items.
- */
-const prplSuggestedTasksGetItemsOfCategory = ( category ) => {
-	return prplSuggestedTasks.tasks.filter(
-		( task ) => category === task.category
-	);
-};
-
-/**
- * Get items that have a specific status.
- *
- * @param {string} status The status of the items to get.
- * @return {Array} The items.
- */
-const prplSuggestedTasksGetItemsWithStatus = ( status ) => {
-	return prplSuggestedTasks.tasks.filter(
-		( task ) => status === task.status
-	);
-};
+/* eslint-disable camelcase */
 
 /**
  * Get the next item to inject.
@@ -50,9 +16,12 @@ const prplSuggestedTasksGetItemsWithStatus = ( status ) => {
  */
 const prplSuggestedTasksGetNextPendingItemFromCategory = ( category ) => {
 	// Get items of this category.
-	const itemsOfCategory = prplSuggestedTasksGetItemsOfCategory( category );
+	const itemsOfCategory = prplSuggestedTasks.tasks.filter(
+		( task ) => category === task.category
+	);
+
 	// If there are no items of this category, return null.
-	if ( 0 === itemsOfCategory.length ) {
+	if ( 0 === itemsOfCategory.length || 'user' === category ) {
 		return null;
 	}
 
@@ -86,42 +55,39 @@ const prplSuggestedTasksGetNextPendingItemFromCategory = ( category ) => {
 };
 
 /**
- * Inject the next item.
- *
- * @param {string} category The category of items to inject the next item from.
+ * Inject the next item from a category.
  */
-const prplSuggestedTasksInjectNextItem = ( category ) => {
-	const nextItem =
-		prplSuggestedTasksGetNextPendingItemFromCategory( category );
-	if ( ! nextItem ) {
-		return;
-	}
+document.addEventListener(
+	'prpl/suggestedTask/injectCategoryItem',
+	( event ) => {
+		const nextItem = prplSuggestedTasksGetNextPendingItemFromCategory(
+			event.detail.category
+		);
+		if ( ! nextItem ) {
+			return;
+		}
 
-	prplSuggestedTasksInjectItem( nextItem );
-};
+		document.dispatchEvent(
+			new CustomEvent( 'prpl/suggestedTask/injectItem', {
+				detail: nextItem,
+			} )
+		);
+	}
+);
 
 /**
  * Inject a todo item.
- *
- * @param {Object} details The details of the todo item.
  */
-const prplSuggestedTasksInjectItem = ( details ) => {
+document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const item = new Item( {
-		taskId: details.task_id,
-		taskTitle: details.title,
-		taskDescription: details.description,
-		taskPoints: details.points ?? 1,
-		taskAction: details.action ?? '',
-		taskUrl: details.url ?? '',
-		taskDismissable: details.dismissable ?? false,
-		taskProviderID: details.providerID ?? '',
-		taskCategory: details.category ?? '',
+		...event.detail,
+		taskList: 'prplSuggestedTasks',
 	} );
 
 	/**
 	 * @todo Implement the parent task functionality.
-	 * Use this code: `const parent = details.parent && '' !== details.parent ? details.parent : null;
+	 * Use this code: `const parent = event.detail.parent && '' !== event.detail.parent ? event.detail.parent : null;
 	 */
 	const parent = false;
 
@@ -144,7 +110,11 @@ const prplSuggestedTasksInjectItem = ( details ) => {
 	);
 	if ( ! parentItem ) {
 		setTimeout( () => {
-			prplSuggestedTasksInjectItem( details );
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/injectItem', {
+					detail: event.detail,
+				} )
+			);
 			window.prplRenderAttempts++;
 		}, 10 );
 		return;
@@ -161,182 +131,22 @@ const prplSuggestedTasksInjectItem = ( details ) => {
 	parentItem
 		.querySelector( '.prpl-suggested-task-children' )
 		.insertAdjacentElement( 'beforeend', item );
-};
-
-const prplTriggerConfetti = () => {
-	const prplConfettiDefaults = {
-		spread: 360,
-		ticks: 50,
-		gravity: 1,
-		decay: 0.94,
-		startVelocity: 30,
-		shapes: [ 'star' ],
-		colors: [ 'FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8' ],
-	};
-
-	const prplRenderAttemptshoot = () => {
-		// Get the tasks list position
-		const tasksList = document.querySelector(
-			'.prpl-suggested-tasks-list'
-		);
-		const origin = tasksList
-			? {
-					x:
-						( tasksList.getBoundingClientRect().left +
-							tasksList.offsetWidth / 2 ) /
-						window.innerWidth,
-					y:
-						( tasksList.getBoundingClientRect().top + 50 ) /
-						window.innerHeight,
-			  }
-			: { x: 0.5, y: 0.3 }; // fallback if list not found
-
-		let confettiOptions = [
-			{
-				particleCount: 30,
-				scalar: 4,
-				shapes: [ 'image' ],
-				shapeOptions: {
-					image: [
-						{
-							src: prplSuggestedTasks.raviIconUrl,
-						},
-						{
-							src: prplSuggestedTasks.raviIconUrl,
-						},
-						{
-							src: prplSuggestedTasks.raviIconUrl,
-						},
-						{
-							src: prplSuggestedTasks.monthIconUrl,
-						},
-						{
-							src: prplSuggestedTasks.contentIconUrl,
-						},
-						{
-							src: prplSuggestedTasks.maintenanceIconUrl,
-						},
-					],
-				},
-			},
-		];
-
-		// Tripple check if the confetti options are an array and not undefined.
-		if (
-			'undefined' !== typeof prplSuggestedTasks.confettiOptions &&
-			true === Array.isArray( prplSuggestedTasks.confettiOptions ) &&
-			prplSuggestedTasks.confettiOptions.length
-		) {
-			confettiOptions = prplSuggestedTasks.confettiOptions;
-		}
-
-		for ( const value of confettiOptions ) {
-			// Set confetti options, we do it here so it's applied even if we pass the options from the PHP side (ie hearts confetti).
-			value.origin = origin;
-
-			confetti( {
-				...prplConfettiDefaults,
-				...value,
-			} );
-		}
-	};
-
-	setTimeout( prplRenderAttemptshoot, 0 );
-	setTimeout( prplRenderAttemptshoot, 100 );
-	setTimeout( prplRenderAttemptshoot, 200 );
-};
-
-/**
- * Strike completed tasks.
- */
-const prplStrikeCompletedTasks = () => {
-	document
-		.querySelectorAll(
-			'.prpl-suggested-task[data-task-action="celebrate"]'
-		)
-		.forEach( ( item ) => {
-			item.classList.add( 'prpl-suggested-task-celebrated' );
-		} );
-
-	// Remove celebrated tasks and add them to the completed tasks.
-	setTimeout( () => {
-		document
-			.querySelectorAll( '.prpl-suggested-task-celebrated' )
-			.forEach( ( item ) => {
-				const taskId = item.getAttribute( 'data-task-id' ),
-					providerID = item.getAttribute( 'data-task-provider-id' ),
-					category = item.getAttribute( 'data-task-category' );
-				const el = document.querySelector(
-					`.prpl-suggested-task[data-task-id="${ taskId }"]`
-				);
-
-				if ( el ) {
-					el.parentElement.remove();
-				}
-
-				// Get the task index.
-				let taskIndex = false;
-				window.prplSuggestedTasks.tasks.forEach(
-					( taskItem, index ) => {
-						if ( taskItem.task_id === taskId ) {
-							taskIndex = index;
-						}
-					}
-				);
-
-				// Mark the task as completed.
-				if ( false !== taskIndex ) {
-					window.prplSuggestedTasks.tasks[ taskIndex ].status =
-						'completed';
-				}
-
-				// Refresh the list.
-				const event = new CustomEvent(
-					'prplMaybeInjectSuggestedTaskEvent',
-					{
-						detail: {
-							taskId,
-							providerID,
-							category,
-						},
-					}
-				);
-				document.dispatchEvent( event );
-			} );
-	}, 2000 );
-};
+} );
 
 if (
 	! prplSuggestedTasks.delayCelebration &&
-	prplSuggestedTasksGetItemsWithStatus( 'pending_celebration' ).length
+	prplSuggestedTasks.tasks.filter(
+		( task ) => 'pending_celebration' === task.status
+	).length
 ) {
 	setTimeout( () => {
 		// Trigger the celebration event.
-		document.dispatchEvent( new Event( 'prplCelebrateTasks' ) );
+		document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
 	}, 3000 );
 }
 
-/**
- * Remove the points (count) from the menu.
- */
-const removePointsFromWPMenu = () => {
-	const points = document.querySelectorAll( '#adminmenu #toplevel_page_progress-planner .update-plugins' );
-	if ( points ) {
-		points.forEach( ( point ) => {
-			point.remove();
-		} );
-	}
-};
-
-// Create a new custom event to trigger the celebration.
-document.addEventListener( 'prplCelebrateTasks', () => {
-	prplTriggerConfetti();
-	prplStrikeCompletedTasks();
-	removePointsFromWPMenu();
-} );
-
 // Populate the list on load.
-document.addEventListener( 'DOMContentLoaded', () => {
+prplDocumentReady( () => {
 	// Do nothing if the list does not exist.
 	if ( ! document.querySelector( '.prpl-suggested-tasks-list' ) ) {
 		return;
@@ -346,25 +156,43 @@ document.addEventListener( 'DOMContentLoaded', () => {
 	for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
 		// Inject items, until we reach the maximum number of channel items.
 		while (
-			prplSuggestedTasksCountItems( category ) <
+			document.querySelectorAll(
+				`.prpl-suggested-task[data-task-category="${ category }"]`
+			).length <
 				parseInt(
 					prplSuggestedTasks.maxItemsPerCategory[ category ]
 				) &&
 			prplSuggestedTasksGetNextPendingItemFromCategory( category )
 		) {
-			prplSuggestedTasksInjectNextItem( category );
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/injectCategoryItem', {
+					detail: { category },
+				} )
+			);
 		}
 	}
 
 	// Inject ALL pending celebration tasks.
-	prplSuggestedTasksGetItemsWithStatus( 'pending_celebration' ).forEach(
-		( task ) => {
-			prplSuggestedTasksInjectItem( task );
-		}
-	);
+	prplSuggestedTasks.tasks
+		.filter( ( task ) => 'pending_celebration' === task.status )
+		.forEach( ( task ) => {
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/injectItem', {
+					detail: task,
+				} )
+			);
+		} );
 
-	const event = new CustomEvent( 'prplResizeAllGridItemsEvent' );
-	document.dispatchEvent( event );
+	window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+
+	// Initialize the badge scroller.
+	document
+		.querySelectorAll(
+			'.prpl-widget-wrapper:not(.in-popover) > .badge-group-monthly'
+		)
+		.forEach( ( element ) => {
+			new BadgeScroller( element );
+		} );
 } );
 
 // Handle the monthly badges scrolling.
@@ -501,133 +329,120 @@ class BadgeScroller {
 	}
 }
 
-// Initialize on DOM load
-prplDocumentReady( () => {
-	document
-		.querySelectorAll(
-			'.prpl-widget-wrapper:not(.in-popover) > .badge-group-monthly'
-		)
-		.forEach( ( element ) => {
-			new BadgeScroller( element );
-		} );
-} );
-
-const prplMaybeInjectSuggestedTaskEvent = new Event( // eslint-disable-line no-unused-vars
-	'prplMaybeInjectSuggestedTaskEvent'
-);
-
-const prplGetRaviGaugeProps = () => {
-	const gauge = document.getElementById( 'prpl-gauge-ravi' );
-	if ( ! gauge ) {
-		return;
-	}
-
-	return {
-		id: gauge.id,
-		background: gauge.getAttribute( 'background' ),
-		color: gauge.getAttribute( 'color' ),
-		max: gauge.getAttribute( 'data-max' ),
-		value: gauge.getAttribute( 'data-value' ),
-		badgeId: gauge.getAttribute( 'data-badge-id' ),
-	};
-};
-
-const prplUpdateRaviGauge = ( pointsDiff = 0 ) => {
-	if ( ! pointsDiff ) {
-		return;
-	}
-
-	const gaugeProps = prplGetRaviGaugeProps();
-
-	if ( ! gaugeProps ) {
-		return;
-	}
-
-	let newValue = parseInt( gaugeProps.value ) + pointsDiff;
-	newValue = Math.round( newValue );
-	newValue = Math.max( 0, newValue );
-	newValue = Math.min( newValue, parseInt( gaugeProps.max ) );
-
-	const Gauge = customElements.get( 'prpl-gauge' );
-	const gauge = new Gauge(
-		{
-			max: parseInt( gaugeProps.max ),
-			value: parseFloat( newValue / parseInt( gaugeProps.max ) ),
-			background: gaugeProps.background,
-			color: gaugeProps.color,
-			maxDeg: '180deg',
-			start: '270deg',
-			cutout: '57%',
-			contentFontSize: 'var(--prpl-font-size-6xl)',
-			contentPadding:
-				'var(--prpl-padding) var(--prpl-padding) calc(var(--prpl-padding) * 2) var(--prpl-padding)',
-			marginBottom: 'var(--prpl-padding)',
-		},
-		`<prpl-badge complete="true" badge-id="${ gaugeProps.badgeId }"></prpl-badge>`
-	);
-	gauge.id = gaugeProps.id;
-	gauge.setAttribute( 'background', gaugeProps.background );
-	gauge.setAttribute( 'color', gaugeProps.color );
-	gauge.setAttribute( 'data-max', gaugeProps.max );
-	gauge.setAttribute( 'data-value', newValue );
-	gauge.setAttribute( 'data-badge-id', gaugeProps.badgeId );
-
-	// Replace the old gauge with the new one.
-	const oldGauge = document.getElementById( gaugeProps.id );
-	if ( oldGauge ) {
-		oldGauge.replaceWith( gauge );
-	}
-
-	const oldCounter = document.getElementById(
-		'prpl-widget-content-ravi-points-number'
-	);
-	if ( oldCounter ) {
-		oldCounter.textContent = newValue + 'pt';
-	}
-
-	// Mark badge as completed, in the a Monthly badges widgets, if we reached the max points.
-	if ( newValue >= parseInt( gaugeProps.max ) ) {
-		// We have multiple badges, one in widget and the other in the popover.
-		const badges = document.querySelectorAll(
-			'.prpl-badge-row-wrapper-inner .prpl-badge prpl-badge[complete="false"][badge-id="' +
-				gaugeProps.badgeId +
-				'"]'
-		);
-
-		if ( badges ) {
-			badges.forEach( ( badge ) => {
-				badge.setAttribute( 'complete', 'true' );
-			} );
-		}
-	}
-};
-
-// Listen for the event.
+/**
+ * Update the Ravi gauge.
+ */
 document.addEventListener(
-	'prplUpdateRaviGaugeEvent',
+	'prpl/updateRaviGauge',
 	( e ) => {
-		prplUpdateRaviGauge( e.detail.pointsDiff );
+		if ( ! e.detail.pointsDiff ) {
+			return;
+		}
+
+		const gaugeElement = document.getElementById( 'prpl-gauge-ravi' );
+		if ( ! gaugeElement ) {
+			return;
+		}
+
+		const gaugeProps = {
+			id: gaugeElement.id,
+			background: gaugeElement.getAttribute( 'background' ),
+			color: gaugeElement.getAttribute( 'color' ),
+			max: gaugeElement.getAttribute( 'data-max' ),
+			value: gaugeElement.getAttribute( 'data-value' ),
+			badgeId: gaugeElement.getAttribute( 'data-badge-id' ),
+		};
+
+		if ( ! gaugeProps ) {
+			return;
+		}
+
+		let newValue = parseInt( gaugeProps.value ) + e.detail.pointsDiff;
+		newValue = Math.round( newValue );
+		newValue = Math.max( 0, newValue );
+		newValue = Math.min( newValue, parseInt( gaugeProps.max ) );
+
+		const Gauge = customElements.get( 'prpl-gauge' );
+		const gauge = new Gauge(
+			{
+				max: parseInt( gaugeProps.max ),
+				value: parseFloat( newValue / parseInt( gaugeProps.max ) ),
+				background: gaugeProps.background,
+				color: gaugeProps.color,
+				maxDeg: '180deg',
+				start: '270deg',
+				cutout: '57%',
+				contentFontSize: 'var(--prpl-font-size-6xl)',
+				contentPadding:
+					'var(--prpl-padding) var(--prpl-padding) calc(var(--prpl-padding) * 2) var(--prpl-padding)',
+				marginBottom: 'var(--prpl-padding)',
+			},
+			`<prpl-badge complete="true" badge-id="${ gaugeProps.badgeId }"></prpl-badge>`
+		);
+		gauge.id = gaugeProps.id;
+		gauge.setAttribute( 'background', gaugeProps.background );
+		gauge.setAttribute( 'color', gaugeProps.color );
+		gauge.setAttribute( 'data-max', gaugeProps.max );
+		gauge.setAttribute( 'data-value', newValue );
+		gauge.setAttribute( 'data-badge-id', gaugeProps.badgeId );
+
+		// Replace the old gauge with the new one.
+		const oldGauge = document.getElementById( gaugeProps.id );
+		if ( oldGauge ) {
+			oldGauge.replaceWith( gauge );
+		}
+
+		const oldCounter = document.getElementById(
+			'prpl-widget-content-ravi-points-number'
+		);
+		if ( oldCounter ) {
+			oldCounter.textContent = newValue + 'pt';
+		}
+
+		// Mark badge as completed, in the a Monthly badges widgets, if we reached the max points.
+		if ( newValue >= parseInt( gaugeProps.max ) ) {
+			// We have multiple badges, one in widget and the other in the popover.
+			const badges = document.querySelectorAll(
+				'.prpl-badge-row-wrapper-inner .prpl-badge prpl-badge[complete="false"][badge-id="' +
+					gaugeProps.badgeId +
+					'"]'
+			);
+
+			if ( badges ) {
+				badges.forEach( ( badge ) => {
+					badge.setAttribute( 'complete', 'true' );
+				} );
+			}
+		}
 	},
 	false
 );
 
 // Listen for the event.
 document.addEventListener(
-	'prplMaybeInjectSuggestedTaskEvent',
+	'prpl/suggestedTask/maybeInjectItem',
 	( e ) => {
+		// TODO: Something seems off here, take a look at this.
 		const category = e.detail.category;
 		while (
-			prplSuggestedTasksCountItems( category ) <
+			document.querySelectorAll(
+				`.prpl-suggested-task[data-task-category="${ category }"]`
+			).length <
 				parseInt(
 					prplSuggestedTasks.maxItemsPerCategory[ category ]
 				) &&
 			prplSuggestedTasksGetNextPendingItemFromCategory( category )
 		) {
-			prplSuggestedTasksInjectNextItem( category );
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/injectCategoryItem', {
+					detail: { category },
+				} )
+			);
 		}
 
-		const event = new Event( 'prplResizeAllGridItemsEvent' );
-		document.dispatchEvent( event );
+		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	},
 	false
 );
+
+/* eslint-enable camelcase */

@@ -26,6 +26,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Permalink_St
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Php_Version;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engine_Visibility;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\User as User_Tasks;
 
 /**
  * Local_Tasks_Manager class.
@@ -60,6 +61,7 @@ class Local_Tasks_Manager {
 			new Permalink_Structure(),
 			new Php_Version(),
 			new Search_Engine_Visibility(),
+			new User_Tasks(),
 		];
 
 		/**
@@ -206,7 +208,7 @@ class Local_Tasks_Manager {
 	 * @return array
 	 */
 	public function evaluate_tasks() {
-		$tasks           = (array) \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending' );
+		$tasks           = (array) \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending' );
 		$completed_tasks = [];
 
 		foreach ( $tasks as $task_data ) {
@@ -297,7 +299,7 @@ class Local_Tasks_Manager {
 		$task['status'] = 'pending';
 
 		if ( false !== $task_index ) {
-			$tasks[ $task_index ] = $task;
+			$tasks[ $task_index ] = array_merge( $task, $tasks[ $task_index ] );
 		} else {
 			$tasks[] = $task;
 		}

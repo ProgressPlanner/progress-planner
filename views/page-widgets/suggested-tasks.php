@@ -26,7 +26,6 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 
 	<ul style="display:none"></ul>
 	<ul class="prpl-suggested-tasks-list"></ul>
-
 	<hr>
 </div>
 

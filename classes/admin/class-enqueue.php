@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Admin;
 
+use Progress_Planner\Badges\Monthly;
+
 /**
  * Enqueue class.
  */
@@ -166,7 +168,7 @@ class Enqueue {
 	}
 
 	/**
-	 * Localize a script
+	 * Localize a script.
 	 *
 	 * @param string $handle        The script handle.
 	 * @param array  $localize_data The data to localize.
@@ -207,6 +209,43 @@ class Enqueue {
 					],
 				];
 				break;
+
+			case 'progress-planner/celebrate':
+				// Check if current date is between Feb 12-16 to use hearts confetti.
+				$confetti_options = [];
+				// February 12 will be (string) '0212', and when converted to int it will be 212.
+				// February 16 will be (string) '0216', and when converted to int it will be 216.
+				// The integer conversion makes it easier and faster to compare the dates.
+				$date_md = (int) \gmdate( 'md' );
+
+				if ( 212 <= $date_md && $date_md <= 216 ) {
+					$confetti_options = [
+						[
+							'particleCount' => 50,
+							'scalar'        => 2.2,
+							'shapes'        => [ 'heart' ],
+							'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
+						],
+						[
+							'particleCount' => 20,
+							'scalar'        => 3.2,
+							'shapes'        => [ 'heart' ],
+							'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
+						],
+					];
+				}
+				$localize_data = [
+					'name' => 'prplCelebrate',
+					'data' => [
+						'raviIconUrl'     => PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg',
+						'confettiOptions' => $confetti_options,
+					],
+				];
+
+				foreach ( $this->get_badge_urls() as $context => $url ) {
+					$localize_data['data'][ $context . 'IconUrl' ] = $url;
+				}
+				break;
 		}
 
 		if ( ! $localize_data['name'] ) {
@@ -214,6 +253,35 @@ class Enqueue {
 		}
 
 		\wp_localize_script( $handle, $localize_data['name'], $localize_data['data'] );
+	}
+
+	/**
+	 * Get the badge URLs.
+	 *
+	 * @return string[] The badge URLs.
+	 */
+	private function get_badge_urls() {
+		// Get the monthly badge URL.
+		$monthly_badge       = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
+		$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id();
+
+		// Get the content and maintenance badge URLs.
+		foreach ( [ 'content', 'maintenance' ] as $context ) {
+			$set_badges        = \progress_planner()->get_badges()->get_badges( $context );
+			$badge_url_context = '';
+			foreach ( $set_badges as $key => $badge ) {
+				$progress = $badge->get_progress();
+				if ( $progress['progress'] > 100 ) {
+					$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge->get_id();
+				}
+			}
+			if ( ! isset( $badge_urls[ $context ] ) ) {
+				// Fallback to the first badge in the set if no badge is completed.
+				$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $set_badges[0]->get_id();
+			}
+		}
+
+		return $badge_urls;
 	}
 
 	/**
@@ -270,6 +338,7 @@ class Enqueue {
 			'taskNotCompleted'             => \esc_html__( "Task '%s' marked as not completed and moved to the top", 'progress-planner' ),
 			'video'                        => \esc_html__( 'Video', 'progress-planner' ),
 			'watchVideo'                   => \esc_html__( 'Watch video', 'progress-planner' ),
+			'disabledRRCheckboxTooltip'    => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),
 		];
 	}
 }
