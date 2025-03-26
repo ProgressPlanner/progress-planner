@@ -62,9 +62,9 @@
 			display: block;
 		}
 
-		#todo-list > *:first-child {
+		#todo-list {
 
-			.prpl-suggested-task {
+			.prpl-suggested-task[data-task-points="1"] {
 				border: 1px solid var(--prpl-color-accent-orange);
 				background-color: var(--prpl-background-orange);
 			}
