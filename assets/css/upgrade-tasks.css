@@ -137,6 +137,10 @@
 			display: none;
 		}
 	}
+
+	#prpl-onboarding-continue-button {
+		margin-inline-start: auto;
+	}
 }
 
 .prpl-onboarding-tasks-footer {
@@ -161,7 +165,6 @@
 		font-weight: 600;
 		color: var(--prpl-color-gray-5);
 	}
-
 }
 
 @keyframes loaderAnimation {
