@@ -248,7 +248,9 @@ class Upgrade_Migrations_111_Test extends \WP_UnitTestCase {
 			$matching_tasks = array_filter(
 				$local_tasks,
 				function ( $task ) use ( $item ) {
-					return $task['task_id'] === $item['task_id'];
+					return isset( $task['task_id'] ) &&
+						isset( $item['task_id'] ) &&
+						$task['task_id'] === $item['task_id'];
 				}
 			);
 

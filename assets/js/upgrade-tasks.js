@@ -129,7 +129,9 @@ prplDocumentReady( function () {
 		} );
 
 		// Click on the close popover button should also redirect to the PP Dashboard page.
-		const closePopoverButton = document.querySelector( '#prpl-popover-upgrade-tasks .prpl-popover-close' );
+		const closePopoverButton = document.querySelector(
+			'#prpl-popover-upgrade-tasks .prpl-popover-close'
+		);
 		if ( closePopoverButton ) {
 			closePopoverButton.addEventListener( 'click', () => {
 				prplOnboardRedirect();
