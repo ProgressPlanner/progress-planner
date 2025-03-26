@@ -132,12 +132,17 @@
 	/* Disabled checkbox styles. */
 	.prpl-suggested-task-disabled-checkbox-tooltip {
 
+		& > button {
+			padding: 0;
+		}
+
 		.prpl-tooltip {
 			transform: translate(-20%, calc(100% + 10px));
 
 			&::after {
 				left: 25px;
 				right: auto;
+				transform: translate(-5px, -10px) rotate(90deg);
 			}
 		}
 	}
