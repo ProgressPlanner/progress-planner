@@ -23,13 +23,6 @@ class Remove_Inactive_Plugins extends One_Time {
 	protected const PROVIDER_ID = 'remove-inactive-plugins';
 
 	/**
-	 * Whether the task is dismissable.
-	 *
-	 * @var bool
-	 */
-	protected $is_dismissable = true;
-
-	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
