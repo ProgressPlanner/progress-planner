@@ -53,7 +53,7 @@ class Core_Update extends Repetitive {
 	 * @return array
 	 */
 	public function add_core_update_link( $update_actions ) {
-		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending' );
+		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending' );
 
 		// All updates are completed and there is a 'update-core' task in the pending tasks.
 		if ( $pending_tasks && $this->is_task_completed() ) {
