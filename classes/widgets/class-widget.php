@@ -96,4 +96,13 @@ abstract class Widget {
 	public function enqueue_scripts() {
 		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/' . $this->id );
 	}
+
+	/**
+	 * Get the stylesheet dependencies.
+	 *
+	 * @return array
+	 */
+	public function get_stylesheet_dependencies() {
+		return [];
+	}
 }

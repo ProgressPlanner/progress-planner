@@ -47,12 +47,11 @@ final class Suggested_Tasks extends Widget {
 	}
 
 	/**
-	 * Enqueue scripts.
+	 * Enqueue the scripts.
 	 *
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-
 		// Get tasks from task providers and pending_celebration tasks.
 		$tasks             = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
 		$delay_celebration = false;
@@ -65,7 +64,7 @@ final class Suggested_Tasks extends Widget {
 
 			// If we're not delaying the celebration, we need to get the pending_celebration tasks.
 			if ( ! $delay_celebration ) {
-				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending_celebration' );
+				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' );
 
 				foreach ( $pending_celebration_tasks as $key => $task ) {
 					$task_id = $task['task_id'];
@@ -132,47 +131,9 @@ final class Suggested_Tasks extends Widget {
 			$max_items_per_category[ $task['category'] ] = $task['category'] === ( new Review() )->get_provider_category() ? 2 : 1;
 		}
 
-		// We want all pending_celebration' tasks to be shown.
-		if ( isset( $max_items_per_category['pending_celebration'] ) ) {
-			$max_items_per_category['pending_celebration'] = 99;
-		}
-
-		// Check if current date is between Feb 12-16 to use hearts confetti.
-		$confetti_options = [];
-		// February 12 will be (string) '0212', and when converted to int it will be 212.
-		// February 16 will be (string) '0216', and when converted to int it will be 216.
-		// The integer conversion makes it easier and faster to compare the dates.
-		$date_md = (int) \gmdate( 'md' );
-
-		if ( 212 <= $date_md && $date_md <= 216 ) {
-			$confetti_options = [
-				[
-					'particleCount' => 50,
-					'scalar'        => 2.2,
-					'shapes'        => [ 'heart' ],
-					'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
-				],
-				[
-					'particleCount' => 20,
-					'scalar'        => 3.2,
-					'shapes'        => [ 'heart' ],
-					'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
-				],
-			];
-		}
-
-		$localize_data = [
-			'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
-			'nonce'               => \wp_create_nonce( 'progress_planner' ),
-			'tasks'               => array_values( $final_tasks ),
-			'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
-			'confettiOptions'     => $confetti_options,
-			'delayCelebration'    => $delay_celebration,
-			'raviIconUrl'         => PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg',
-		];
-
-		foreach ( $this->get_badge_urls() as $context => $url ) {
-			$localize_data[ $context . 'IconUrl' ] = $url;
+		// We want to hide user tasks.
+		if ( isset( $max_items_per_category['user'] ) ) {
+			$max_items_per_category['user'] = 0;
 		}
 
 		// Enqueue the script.
@@ -180,37 +141,33 @@ final class Suggested_Tasks extends Widget {
 			'widgets/suggested-tasks',
 			[
 				'name' => 'prplSuggestedTasks',
-				'data' => $localize_data,
+				'data' => [
+					'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
+					'nonce'               => \wp_create_nonce( 'progress_planner' ),
+					'tasks'               => array_values( $final_tasks ),
+					'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
+					'delayCelebration'    => $delay_celebration,
+				],
 			]
 		);
 	}
 
 	/**
-	 * Get the badge URLs.
+	 * Get the stylesheet dependencies.
 	 *
-	 * @return string[] The badge URLs.
+	 * @return array
 	 */
-	private function get_badge_urls() {
-		// Get the monthly badge URL.
-		$monthly_badge       = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
-		$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id();
+	public function get_stylesheet_dependencies() {
+		// Register styles for the web-component.
+		\wp_register_style(
+			'progress-planner-web-components-prpl-suggested-task',
+			PROGRESS_PLANNER_URL . '/assets/css/web-components/prpl-suggested-task.css',
+			[],
+			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/web-components/prpl-suggested-task.css' )
+		);
 
-		// Get the content and maintenance badge URLs.
-		foreach ( [ 'content', 'maintenance' ] as $context ) {
-			$set_badges        = \progress_planner()->get_badges()->get_badges( $context );
-			$badge_url_context = '';
-			foreach ( $set_badges as $key => $badge ) {
-				$progress = $badge->get_progress();
-				if ( $progress['progress'] > 100 ) {
-					$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge->get_id();
-				}
-			}
-			if ( ! isset( $badge_urls[ $context ] ) ) {
-				// Fallback to the first badge in the set if no badge is completed.
-				$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $set_badges[0]->get_id();
-			}
-		}
-
-		return $badge_urls;
+		return [
+			'progress-planner-web-components-prpl-suggested-task',
+		];
 	}
 }

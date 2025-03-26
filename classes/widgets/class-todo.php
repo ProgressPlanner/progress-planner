@@ -38,7 +38,7 @@ final class ToDo extends Widget {
 		?>
 		<div id="todo-aria-live-region" aria-live="polite" style="position: absolute; left: -9999px;"></div>
 
-		<ul id="todo-list" class="prpl-todo-list"></ul>
+		<ul id="todo-list" class="prpl-todo-list prpl-suggested-tasks-list"></ul>
 
 		<form id="create-todo-item">
 			<input type="text" id="new-todo-content" placeholder="<?php \esc_attr_e( 'Add a new task', 'progress-planner' ); ?>" aria-label="<?php \esc_attr_e( 'Add a new task', 'progress-planner' ); ?>" required />
@@ -46,11 +46,15 @@ final class ToDo extends Widget {
 				<span class="dashicons dashicons-plus-alt2"></span>
 			</button>
 		</form>
+		<details id="todo-list-completed-details">
+			<summary><?php \esc_html_e( 'Completed tasks', 'progress-planner' ); ?></summary>
+			<ul id="todo-list-completed" class="prpl-todo-list prpl-suggested-tasks-list"></ul>
+		</details>
 		<?php
 	}
 
 	/**
-	 * Enqueue scripts.
+	 * Enqueue the scripts.
 	 *
 	 * @return void
 	 */
@@ -61,12 +65,31 @@ final class ToDo extends Widget {
 			[
 				'name' => 'progressPlannerTodo',
 				'data' => [
-					'ajaxUrl'   => \admin_url( 'admin-ajax.php' ),
-					'nonce'     => \wp_create_nonce( 'progress_planner' ),
-					'listItems' => \progress_planner()->get_todo()->get_items(),
+					'ajaxUrl' => \admin_url( 'admin-ajax.php' ),
+					'nonce'   => \wp_create_nonce( 'progress_planner' ),
+					'tasks'   => \progress_planner()->get_todo()->get_items(),
 				],
 			]
 		);
+	}
+
+	/**
+	 * Get the stylesheet dependencies.
+	 *
+	 * @return array
+	 */
+	public function get_stylesheet_dependencies() {
+		// Register styles for the web-component.
+		\wp_register_style(
+			'progress-planner-web-components-prpl-suggested-task',
+			PROGRESS_PLANNER_URL . '/assets/css/web-components/prpl-suggested-task.css',
+			[],
+			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/web-components/prpl-suggested-task.css' )
+		);
+
+		return [
+			'progress-planner-web-components-prpl-suggested-task',
+		];
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

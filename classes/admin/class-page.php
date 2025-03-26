@@ -112,7 +112,7 @@ class Page {
 	 */
 	protected function get_notification_counter() {
 
-		$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by_status( 'pending_celebration' );
+		$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' );
 		$notification_count        = count( $pending_celebration_tasks );
 
 		if ( 0 === $notification_count ) {
@@ -179,6 +179,7 @@ class Page {
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-bar' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-line' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-big-counter' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-tooltip' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'header-filters', $default_localization_data );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'grid-masonry' );
@@ -268,6 +269,7 @@ class Page {
 		}
 
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/admin' );
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-tooltip' );
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
 			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/settings-page' );

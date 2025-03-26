@@ -131,7 +131,8 @@ class Create extends Repetitive {
 			// Get the post that was created last.
 			$post_data = $this->data_collector->collect();
 		} else {
-			$post_data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $task_id );
+			$post_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
+			$post_data = $post_data[0] ?? false;
 		}
 
 		// Post was created, but then deleted?
