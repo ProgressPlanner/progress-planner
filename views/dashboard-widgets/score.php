@@ -46,7 +46,7 @@ use Progress_Planner\Badges\Monthly;
 			if ( $prpl_pending_celebration_tasks ) :
 				printf(
 					/* translators: %s: Number of pending celebration tasks. */
-					esc_html__( 'Good job! You\'ve successfully finished %s task(s)!', 'progress-planner' ),
+					esc_html__( 'Good job! You have successfully finished %s task(s)!', 'progress-planner' ),
 					\count( $prpl_pending_celebration_tasks )
 				);
 				?>
