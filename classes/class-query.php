@@ -491,11 +491,10 @@ class Query {
 
 		$table_name = $wpdb->prefix . static::TABLE_NAME;
 
-		if ( \str_contains( \strtolower( $wpdb->get_row( "DESCRIBE $table_name data_id" )->Type ), 'int' ) ) {
-			error_log( print_r( $wpdb->get_row( "DESCRIBE $table_name data_id" ), true ) );
-			$wpdb->query( "ALTER TABLE $table_name CHANGE COLUMN data_id data_id VARCHAR(255)" );
-			error_log( print_r( $wpdb->get_row( "DESCRIBE $table_name data_id" ), true ) );
-			error_log( '--------------------------------' );
+		foreach ( $wpdb->get_results( "DESCRIBE $table_name" ) as $column ) {
+			if ( 'data_id' === $column->Field && \str_contains( \strtolower( $column->Type ), 'int' ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+				$wpdb->query( "ALTER TABLE $table_name CHANGE COLUMN data_id data_id VARCHAR(255)" );
+			}
 		}
 	}
 }
