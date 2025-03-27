@@ -175,7 +175,6 @@ class Page {
 			];
 
 			if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-gauge' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-tooltip' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'header-filters', $default_localization_data );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );

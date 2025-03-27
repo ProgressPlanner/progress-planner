@@ -10,6 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 new \Progress_Planner\Web_Components\Badge();
+new \Progress_Planner\Web_Components\Gauge();
 
 $prpl_widget                 = \progress_planner()->get_widgets__badge_streak();
 $prpl_widget_context_details = [];

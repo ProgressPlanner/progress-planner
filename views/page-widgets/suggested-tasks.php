@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 new \Progress_Planner\Web_Components\Badge();
-
+new \Progress_Planner\Web_Components\Gauge();
 $prpl_widget = \progress_planner()->get_widgets__suggested_tasks();
 $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 ?>
