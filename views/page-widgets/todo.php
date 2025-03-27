@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+new \Progress_Planner\Web_Components\Suggested_Task();
+
 ?>
 <h2 class="prpl-widget-title">
 	<span class="icon">

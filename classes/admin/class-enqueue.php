@@ -187,19 +187,6 @@ class Enqueue {
 				];
 				break;
 
-			case 'progress-planner/web-components/prpl-suggested-task':
-				$localize_data = [
-					'name' => 'prplSuggestedTask',
-					'data' => [
-						'nonce'  => \wp_create_nonce( 'progress_planner' ),
-						'assets' => [
-							'infoIcon'   => PROGRESS_PLANNER_URL . '/assets/images/icon_info.svg',
-							'snoozeIcon' => PROGRESS_PLANNER_URL . '/assets/images/icon_snooze.svg',
-						],
-					],
-				];
-				break;
-
 			case 'progress-planner/celebrate':
 				// Check if current date is between Feb 12-16 to use hearts confetti.
 				$confetti_options = [];
