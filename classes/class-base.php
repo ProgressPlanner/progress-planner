@@ -9,6 +9,16 @@ namespace Progress_Planner;
 
 /**
  * Main plugin class.
+ *
+ * @method \Progress_Planner\Suggested_Tasks get_suggested_tasks()
+ * @method \Progress_Planner\Settings get_settings()
+ * @method \Progress_Planner\Query get_query()
+ * @method \Progress_Planner\Cache get_cache()
+ * @method \Progress_Planner\Page_Types get_page_types()
+ * @method \Progress_Planner\Rest_API_Stats get_rest_api_stats()
+ * @method \Progress_Planner\Rest_API_Tasks get_rest_api_tasks()
+ * @method \Progress_Planner\Todo get_todo()
+ * @method \Progress_Planner\Onboard get_onboard()
  */
 class Base {
 

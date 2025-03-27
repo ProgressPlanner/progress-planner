@@ -158,7 +158,7 @@ document.addEventListener( 'prpl/strikeCelebratedTasks', () => {
 /**
  * Remove the points (count) from the menu.
  */
-document.addEventListener( 'prpl/CelebrateTasks', () => {
+document.addEventListener( 'prpl/celebrateTasks', () => {
 	const points = document.querySelectorAll(
 		'#adminmenu #toplevel_page_progress-planner .update-plugins'
 	);
