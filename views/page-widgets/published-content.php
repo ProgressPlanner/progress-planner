@@ -9,6 +9,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+new \Progress_Planner\Web_Components\Big_Counter();
+
 $prpl_widget     = \progress_planner()->get_widgets__published_content();
 $prpl_stats      = $prpl_widget->get_stats();
 $prpl_sum_weekly = array_sum( $prpl_stats['weekly'] );
