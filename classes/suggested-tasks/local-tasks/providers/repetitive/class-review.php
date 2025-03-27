@@ -186,7 +186,7 @@ class Review extends Repetitive {
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id ) {
+	public function get_task_details( $task_id = '' ) {
 
 		if ( ! $task_id ) {
 			return [];
@@ -213,7 +213,7 @@ class Review extends Repetitive {
 			'parent'      => 0,
 			'priority'    => 'high',
 			'category'    => $this->get_provider_category(),
-			'points'      => 1,
+			'points'      => $this->get_points(),
 			'dismissable' => true,
 			'url'         => $this->capability_required() ? \esc_url( \get_edit_post_link( $post->ID ) ) : '', // @phpstan-ignore-line property.nonObject
 			'description' => '<p>' . sprintf(
@@ -310,7 +310,7 @@ class Review extends Repetitive {
 		$this->snoozed_post_ids = [];
 		$snoozed                = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'snoozed' );
 
-		if ( \is_array( $snoozed ) && ! empty( $snoozed ) ) {
+		if ( ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
 				if ( isset( $task['provider_id'] ) && 'review-post' === $task['provider_id'] ) {
 					$this->snoozed_post_ids[] = $task['post_id'];

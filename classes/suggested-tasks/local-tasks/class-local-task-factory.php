@@ -135,7 +135,7 @@ class Local_Task_Factory {
 		}
 
 		if ( isset( $data['provider_id'] ) ) {
-			$task_provider    = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $data['provider_id'] );
+			$task_provider    = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $data['provider_id'] ); // @phpstan-ignore-line
 			$data['category'] = $task_provider ? $task_provider->get_provider_category() : '';
 		}
 
