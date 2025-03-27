@@ -10,6 +10,9 @@ use Progress_Planner\Badges\Monthly;
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+new \Progress_Planner\Web_Components\Badge();
+
 $prpl_location  = '';
 $prpl_css_class = '';
 

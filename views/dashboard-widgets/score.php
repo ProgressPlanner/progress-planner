@@ -7,6 +7,8 @@
 
 use Progress_Planner\Badges\Monthly;
 
+new \Progress_Planner\Web_Components\Badge();
+
 ?>
 <div class="prpl-dashboard-widget">
 	<div>

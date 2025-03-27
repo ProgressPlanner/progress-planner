@@ -187,16 +187,6 @@ class Enqueue {
 				];
 				break;
 
-			case 'progress-planner/web-components/prpl-badge':
-				$localize_data = [
-					'name' => 'progressPlannerBadge',
-					'data' => [
-						'remoteServerRootUrl' => \progress_planner()->get_remote_server_root_url(),
-						'placeholderImageUrl' => \progress_planner()->get_placeholder_svg(),
-					],
-				];
-				break;
-
 			case 'progress-planner/web-components/prpl-suggested-task':
 				$localize_data = [
 					'name' => 'prplSuggestedTask',

@@ -9,6 +9,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+new \Progress_Planner\Web_Components\Badge();
 ?>
 <h2><?php \esc_html_e( 'Your badges', 'progress-planner' ); ?></h2>
 <div class="prpl-widgets-container in-popover">

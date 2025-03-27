@@ -1,11 +1,4 @@
 /* global customElements, HTMLElement */
-/*
- * Web Component: prpl-gauge
- *
- * A web component that displays a gauge.
- *
- * Dependencies: progress-planner/web-components/prpl-badge
- */
 
 /**
  * Register the custom web component.
