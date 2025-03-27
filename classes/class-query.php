@@ -492,16 +492,7 @@ class Query {
 		$table_name = $wpdb->prefix . static::TABLE_NAME;
 
 		if ( \str_contains( \strtolower( $wpdb->get_row( "DESCRIBE $table_name data_id" )->Type ), 'int' ) ) {
-			// Create a new column with the data-type VARCHAR(255).
-			$wpdb->query( "ALTER TABLE $table_name ADD COLUMN data_id_new VARCHAR(255)" );
-			// Loop through all rows and update the new column with the data from the old column.
-			foreach ( $wpdb->get_results( "SELECT * FROM $table_name" ) as $row ) {
-				$wpdb->update( $table_name, [ 'data_id_new' => $row->data_id ], [ 'id' => $row->id ] );
-			}
-			// Drop the old column.
-			$wpdb->query( "ALTER TABLE $table_name DROP COLUMN data_id" );
-			// Rename the new column to the old column name.
-			$wpdb->query( "ALTER TABLE $table_name CHANGE data_id_new data_id VARCHAR(255)" );
+
 		}
 	}
 }
