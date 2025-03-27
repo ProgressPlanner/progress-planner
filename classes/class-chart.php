@@ -152,9 +152,9 @@ class Chart {
 	 * @return void
 	 */
 	public function render_chart( $type, $data ) {
-		new \Progress_Planner\Web_Components\Chart_Bar();
-		new \Progress_Planner\Web_Components\Chart_Line();
 		$type = $type ? $type : 'line';
+		new \Progress_Planner\Web_Component( 'prpl-chart-' . $type );
+
 		echo '<prpl-chart-' . esc_attr( $type ) . ' data="' . \esc_attr( (string) \wp_json_encode( $data ) ) . '"></prpl-chart-' . esc_attr( $type ) . '>';
 	}
 }

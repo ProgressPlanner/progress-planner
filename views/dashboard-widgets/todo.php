@@ -5,6 +5,8 @@
  * @package Progress_Planner
  */
 
+new \Progress_Planner\Web_Component( 'prpl-suggested-task' );
+
 ?>
 <div id="prpl-dashboard-widget-todo-header">
 	<img src="<?php echo \esc_attr( PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg' ); ?>" style="width:2.5em;" alt="" />

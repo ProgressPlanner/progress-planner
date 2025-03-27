@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-new \Progress_Planner\Web_Components\Big_Counter();
+new \Progress_Planner\Web_Component( 'prpl-big-counter' );
 
 $prpl_widget     = \progress_planner()->get_widgets__published_content();
 $prpl_stats      = $prpl_widget->get_stats();

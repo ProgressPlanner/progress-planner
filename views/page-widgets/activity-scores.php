@@ -11,8 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-new \Progress_Planner\Web_Components\Big_Counter();
-new \Progress_Planner\Web_Components\Gauge();
+new \Progress_Planner\Web_Component( 'prpl-big-counter' );
+new \Progress_Planner\Web_Component( 'prpl-gauge' );
 
 $prpl_widget = \progress_planner()->get_widgets__activity_scores();
 $prpl_record = $prpl_widget->personal_record_callback();

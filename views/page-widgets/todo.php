@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-new \Progress_Planner\Web_Components\Suggested_Task();
+new \Progress_Planner\Web_Component( 'prpl-suggested-task' );
 
 ?>
 <h2 class="prpl-widget-title">

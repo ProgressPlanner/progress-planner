@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-new \Progress_Planner\Web_Components\Badge();
+new \Progress_Planner\Web_Component( 'prpl-badge' );
 
 $prpl_location  = '';
 $prpl_css_class = '';

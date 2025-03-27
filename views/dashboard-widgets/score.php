@@ -7,8 +7,9 @@
 
 use Progress_Planner\Badges\Monthly;
 
-new \Progress_Planner\Web_Components\Badge();
-new \Progress_Planner\Web_Components\Gauge();
+new \Progress_Planner\Web_Component( 'prpl-badge' );
+new \Progress_Planner\Web_Component( 'prpl-gauge' );
+new \Progress_Planner\Web_Component( 'prpl-suggested-task' );
 
 ?>
 <div class="prpl-dashboard-widget">
