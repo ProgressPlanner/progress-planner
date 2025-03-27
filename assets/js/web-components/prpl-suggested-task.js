@@ -267,9 +267,7 @@ customElements.define(
 						${ actionButtons.snooze }
 						${ actionButtons.complete }
 						${ actionButtons.delete }
-
 					</div>
-
 					${ taskPointsElement }
 				</div>
 			</li>`;
@@ -294,12 +292,12 @@ customElements.define(
 			} );
 
 			item.querySelectorAll( '.prpl-suggested-task-button' ).forEach(
-				function ( button ) {
+				( button ) => {
 					button.addEventListener( 'click', function () {
 						let action = button.getAttribute( 'data-action' );
-						const target = button.getAttribute( 'data-target' ),
-							tooltipActions =
-								item.querySelector( '.tooltip-actions' );
+						const target = button.getAttribute( 'data-target' );
+						const tooltipActions =
+							item.querySelector( '.tooltip-actions' );
 
 						// If the tooltip was already open, close it.
 						if (
@@ -311,16 +309,17 @@ customElements.define(
 						) {
 							action = 'close-' + target;
 						} else {
+							const closestTaskListVisible = item
+								.closest( '.prpl-suggested-tasks-list' )
+								.querySelector( `[data-tooltip-visible]` );
 							// Close the any opened radio group.
-							item.closest( '.prpl-suggested-tasks-list' )
-								.querySelector( `[data-tooltip-visible]` )
-								?.classList.remove(
-									'prpl-toggle-radio-group-open'
-								);
+							closestTaskListVisible?.classList.remove(
+								'prpl-toggle-radio-group-open'
+							);
 							// Remove any existing tooltip visible attribute, in the entire list.
-							item.closest( '.prpl-suggested-tasks-list' )
-								.querySelector( `[data-tooltip-visible]` )
-								?.removeAttribute( 'data-tooltip-visible' );
+							closestTaskListVisible?.removeAttribute(
+								'data-tooltip-visible'
+							);
 						}
 
 						switch ( action ) {
@@ -378,20 +377,20 @@ customElements.define(
 							case 'move-up':
 							case 'move-down':
 								// Move `thisObj` before or after the previous or next sibling.
-								const previousSibling =
-									thisObj.previousElementSibling;
-								const nextSibling = thisObj.nextElementSibling;
-								if ( 'move-up' === action && previousSibling ) {
+								if (
+									'move-up' === action &&
+									thisObj.previousElementSibling
+								) {
 									thisObj.parentNode.insertBefore(
 										thisObj,
-										previousSibling
+										thisObj.previousElementSibling
 									);
 								} else if (
 									'move-down' === action &&
-									nextSibling
+									thisObj.nextElementSibling
 								) {
 									thisObj.parentNode.insertBefore(
-										nextSibling,
+										thisObj.nextElementSibling,
 										thisObj
 									);
 								}
@@ -487,12 +486,10 @@ customElements.define(
 		runTaskAction = ( task_id, actionType, snoozeDuration ) => {
 			task_id = task_id.toString();
 			const providerID = this.querySelector( 'li' ).getAttribute(
-					'data-task-provider-id'
-				),
-				category =
-					this.querySelector( 'li' ).getAttribute(
-						'data-task-category'
-					);
+				'data-task-provider-id'
+			);
+			const category =
+				this.querySelector( 'li' ).getAttribute( 'data-task-category' );
 			const taskPoints = parseInt(
 				this.querySelector( 'li' ).getAttribute( 'data-task-points' )
 			);
