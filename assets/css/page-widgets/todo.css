@@ -47,6 +47,19 @@
 			.prpl-suggested-task {
 				border: 1px solid #796da2;
 				background-color: #f9fafb;
+
+				.prpl-suggested-task-actions {
+
+					&::after {
+						content: "";
+						display: inline-block;
+						width: 24px;
+						height: 24px;
+						background-image: url("../../images/icon_progress_planner.svg");
+						background-size: contain;
+						background-repeat: no-repeat;
+					}
+				}
 			}
 		}
 	}
