@@ -492,7 +492,10 @@ class Query {
 		$table_name = $wpdb->prefix . static::TABLE_NAME;
 
 		if ( \str_contains( \strtolower( $wpdb->get_row( "DESCRIBE $table_name data_id" )->Type ), 'int' ) ) {
-
+			error_log( print_r( $wpdb->get_row( "DESCRIBE $table_name data_id" )->Type, true ) );
+			$wpdb->query( "ALTER TABLE $table_name CHANGE COLUMN data_id data_id VARCHAR(255)" );
+			error_log( print_r( $wpdb->get_row( "DESCRIBE $table_name data_id" )->Type, true ) );
+			error_log( '--------------------------------' );
 		}
 	}
 }
