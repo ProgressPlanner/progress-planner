@@ -29,6 +29,10 @@
 	.prpl-todo-golden-task-description,
 	.prpl-todo-silver-task-description {
 		display: none;
+
+		.tooltip-actions {
+			vertical-align: text-top;
+		}
 	}
 
 	/* Silver task */
