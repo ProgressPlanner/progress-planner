@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<?php \esc_html_e( 'Write down all your tasks you want to get done on your website! The top task will become your ‘golden task’ next week. ', 'progress-planner' ); ?>
 	</span>
 
-	<span class="tooltip-actions" style="display: inline-flex;">
+	<span class="tooltip-actions" style="display: inline-flex;vertical-align: text-top;">
 		<prpl-tooltip>
 			<slot name="open-icon">
 				<span class="icon prpl-info-icon">
