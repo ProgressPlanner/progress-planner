@@ -442,48 +442,38 @@ customElements.define(
 
 			// When an item's contenteditable element is edited,
 			// save the new content to the database
-			this.querySelector( 'h3 span' ).addEventListener(
-				'keydown',
-				( event ) => {
-					// Prevent insering newlines (this catches both Enter and Return).
-					if ( event.key === 'Enter' ) {
-						event.preventDefault();
-					}
-
-					// Add debounce to the input event.
-					clearTimeout( this.debounceTimeout );
-					this.debounceTimeout = setTimeout( () => {
-						const title =
-							this.querySelector( 'h3 span' ).textContent;
-						wp.ajax
-							.post(
-								'progress_planner_save_user_suggested_task',
-								{
-									task: {
-										task_id:
-											item.getAttribute( 'data-task-id' ),
-										title,
-										provider_id: 'user',
-										category: 'user',
-										dismissable: true,
-									},
-									nonce: prplSuggestedTask.nonce,
-								}
-							)
-							.done( () => {
-								// Update the task title.
-								document.dispatchEvent(
-									new CustomEvent(
-										'prpl/suggestedTask/update',
-										{
-											detail: { node: thisObj },
-										}
-									)
-								);
-							} );
-					}, 300 );
+			const h3Span = this.querySelector( 'h3 span' );
+			h3Span.addEventListener( 'keydown', ( event ) => {
+				// Prevent insering newlines (this catches both Enter and Return).
+				if ( event.key === 'Enter' ) {
+					event.preventDefault();
 				}
-			);
+
+				// Add debounce to the input event.
+				clearTimeout( this.debounceTimeout );
+				this.debounceTimeout = setTimeout( () => {
+					const title = h3Span.textContent;
+					wp.ajax
+						.post( 'progress_planner_save_user_suggested_task', {
+							task: {
+								task_id: item.getAttribute( 'data-task-id' ),
+								title,
+								provider_id: 'user',
+								category: 'user',
+								dismissable: true,
+							},
+							nonce: prplSuggestedTask.nonce,
+						} )
+						.done( () => {
+							// Update the task title.
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/suggestedTask/update', {
+									detail: { node: thisObj },
+								} )
+							);
+						} );
+				}, 300 );
+			} );
 		};
 
 		/**
