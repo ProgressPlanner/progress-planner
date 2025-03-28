@@ -18,7 +18,7 @@ namespace Progress_Planner;
  * @method \Progress_Planner\Rest_API_Stats get_rest_api_stats()
  * @method \Progress_Planner\Rest_API_Tasks get_rest_api_tasks()
  * @method \Progress_Planner\Todo get_todo()
- * @method \Progress_Planner\Onboard get_onboard()
+ * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
  */
 class Base {
 
@@ -82,7 +82,7 @@ class Base {
 		$this->get_rest_api_tasks();
 
 		// Onboarding.
-		$this->get_onboard();
+		$this->get_utils__onboard();
 
 		// To-do.
 		$this->get_todo();

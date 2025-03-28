@@ -167,8 +167,8 @@ class Page {
 			$default_localization_data = [
 				'name' => 'progressPlanner',
 				'data' => [
-					'onboardNonceURL' => \progress_planner()->get_onboard()->get_remote_nonce_url(),
-					'onboardAPIUrl'   => \progress_planner()->get_onboard()->get_remote_url(),
+					'onboardNonceURL' => \progress_planner()->get_utils__onboard()->get_remote_nonce_url(),
+					'onboardAPIUrl'   => \progress_planner()->get_utils__onboard()->get_remote_url(),
 					'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
 					'nonce'           => \wp_create_nonce( 'progress_planner' ),
 				],
