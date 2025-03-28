@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_widget     = \progress_planner()->get_widgets__published_content();
+$prpl_widget     = \progress_planner()->get_admin__widgets__published_content();
 $prpl_stats      = $prpl_widget->get_stats();
 $prpl_sum_weekly = array_sum( $prpl_stats['weekly'] );
 ?>

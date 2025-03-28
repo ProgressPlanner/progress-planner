@@ -33,7 +33,7 @@ $prpl_latest_badge = \progress_planner()->get_badges()->get_latest_completed_bad
 		<?php endif; ?>
 	</p>
 	<img
-		src="<?php echo \esc_url( \progress_planner()->get_widgets__latest_badge()->endpoint . $prpl_latest_badge->get_id() ); ?>"
+		src="<?php echo \esc_url( \progress_planner()->get_admin__widgets__latest_badge()->endpoint . $prpl_latest_badge->get_id() ); ?>"
 		alt="<?php echo \esc_attr( $prpl_latest_badge->get_name() ); ?>"
 		width="1200"
 		height="675"

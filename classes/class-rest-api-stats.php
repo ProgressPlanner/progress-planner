@@ -12,7 +12,7 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Widgets\Activity_Scores;
+use Progress_Planner\Admin\Widgets\Activity_Scores;
 
 /**
  * Rest_API_Stats class.

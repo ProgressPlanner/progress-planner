@@ -5,7 +5,7 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Widgets;
+namespace Progress_Planner\Admin\Widgets;
 
 use Progress_Planner\Goals\Goal_Recurring;
 use Progress_Planner\Goals\Goal;
