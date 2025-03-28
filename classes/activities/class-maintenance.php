@@ -74,7 +74,7 @@ class Maintenance extends Activity {
 			return $this->points[ $date_ymd ];
 		}
 		$this->points[ $date_ymd ] = self::$points_config;
-		$days                      = abs( \progress_planner()->get_date()->get_days_between_dates( $date, $this->date ) );
+		$days                      = abs( \progress_planner()->get_utils__date()->get_days_between_dates( $date, $this->date ) );
 
 		$this->points[ $date_ymd ] = ( $days < 7 ) ? $this->points[ $date_ymd ] : 0;
 

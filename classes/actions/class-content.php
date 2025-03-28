@@ -214,8 +214,8 @@ class Content {
 
 		// If it's an update add the start and end date. We don't want to add multiple update activities for the same post on the same day.
 		if ( 'update' === $type ) {
-			$query_args['start_date'] = \progress_planner()->get_date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '-12 hours' );
-			$query_args['end_date']   = \progress_planner()->get_date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '+12 hours' );
+			$query_args['start_date'] = \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '-12 hours' );
+			$query_args['end_date']   = \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '+12 hours' );
 		}
 
 		// Check if there is an activity for this post.
@@ -265,8 +265,8 @@ class Content {
 				[
 					'category'   => 'content',
 					'data_id'    => (string) $post->ID,
-					'start_date' => \progress_planner()->get_date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '-12 hours' ),
-					'end_date'   => \progress_planner()->get_date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '+12 hours' ),
+					'start_date' => \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '-12 hours' ),
+					'end_date'   => \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '+12 hours' ),
 				],
 				'RAW'
 			);

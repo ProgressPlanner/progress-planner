@@ -67,7 +67,7 @@ class Chart {
 		);
 
 		// Get the periods for the chart.
-		$periods = \progress_planner()->get_date()->get_periods(
+		$periods = \progress_planner()->get_utils__date()->get_periods(
 			$args['dates_params']['start_date'],
 			$args['dates_params']['end_date'],
 			$args['dates_params']['frequency']
