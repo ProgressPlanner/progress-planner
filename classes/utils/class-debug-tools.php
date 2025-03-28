@@ -502,7 +502,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Clear cache.
-		\progress_planner()->get_cache()->delete_all();
+		\progress_planner()->get_utils__cache()->delete_all();
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_clear_cache', '_wpnonce' ] ) );

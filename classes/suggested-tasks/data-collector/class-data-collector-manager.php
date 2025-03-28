@@ -57,7 +57,7 @@ class Data_Collector_Manager {
 	 */
 	public function update_data_collectors_cache() {
 
-		$update_recently_performed = \progress_planner()->get_cache()->get( 'update_data_collectors_cache' );
+		$update_recently_performed = \progress_planner()->get_utils__cache()->get( 'update_data_collectors_cache' );
 
 		if ( $update_recently_performed ) {
 			return;
@@ -67,6 +67,6 @@ class Data_Collector_Manager {
 			$data_collector->update_cache();
 		}
 
-		\progress_planner()->get_cache()->set( 'update_data_collectors_cache', true, DAY_IN_SECONDS );
+		\progress_planner()->get_utils__cache()->set( 'update_data_collectors_cache', true, DAY_IN_SECONDS );
 	}
 }

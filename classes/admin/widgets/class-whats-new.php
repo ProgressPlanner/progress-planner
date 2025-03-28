@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Admin\Widgets;
 
-use Progress_Planner\Cache;
+use Progress_Planner\Utils\Cache;
 
 /**
  * Whats_New class.
@@ -34,7 +34,7 @@ final class Whats_New extends Widget {
 	 * @return array
 	 */
 	public function get_blog_feed() {
-		$feed_data = \progress_planner()->get_cache()->get( self::CACHE_KEY );
+		$feed_data = \progress_planner()->get_utils__cache()->get( self::CACHE_KEY );
 
 		// Migrate old feed to new format.
 		if ( is_array( $feed_data ) && ! isset( $feed_data['expires'] ) && ! isset( $feed_data['feed'] ) ) {
@@ -82,7 +82,7 @@ final class Whats_New extends Widget {
 			}
 
 			// Transient uses 'expires' key to determine if it's expired.
-			\progress_planner()->get_cache()->set( self::CACHE_KEY, $feed_data, 0 );
+			\progress_planner()->get_utils__cache()->set( self::CACHE_KEY, $feed_data, 0 );
 		}
 
 		return $feed_data['feed'];

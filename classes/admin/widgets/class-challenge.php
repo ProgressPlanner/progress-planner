@@ -28,7 +28,7 @@ final class Challenge extends Widget {
 	 */
 	public function get_challenge( $force_free = false ) {
 		$cache_key = $this->get_cache_key( $force_free );
-		$feed_data = \progress_planner()->get_cache()->get( $cache_key );
+		$feed_data = \progress_planner()->get_utils__cache()->get( $cache_key );
 
 		// Transient not set.
 		if ( false === $feed_data ) {
@@ -62,7 +62,7 @@ final class Challenge extends Widget {
 			}
 
 			// Transient uses 'expires' key to determine if it's expired.
-			\progress_planner()->get_cache()->set( $cache_key, $feed_data, 0 );
+			\progress_planner()->get_utils__cache()->set( $cache_key, $feed_data, 0 );
 		}
 
 		return $feed_data['feed'];

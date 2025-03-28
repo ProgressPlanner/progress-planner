@@ -289,7 +289,7 @@ class Todo {
 		}
 
 		$transient_name = 'todo_points_change_on_monday';
-		$next_update    = \progress_planner()->get_cache()->get( $transient_name );
+		$next_update    = \progress_planner()->get_utils__cache()->get( $transient_name );
 
 		if ( false !== $next_update && $next_update > time() ) {
 			return;
@@ -313,7 +313,7 @@ class Todo {
 		// Save the local tasks.
 		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
 
-		\progress_planner()->get_cache()->set( $transient_name, $next_monday->getTimestamp(), WEEK_IN_SECONDS );
+		\progress_planner()->get_utils__cache()->set( $transient_name, $next_monday->getTimestamp(), WEEK_IN_SECONDS );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo
