@@ -60,7 +60,7 @@ $prpl_latest_badge = \progress_planner()->get_badges()->get_latest_completed_bad
 		</div>
 	<?php elseif ( ! \progress_planner()->is_local_site() ) : ?>
 		<?php
-		\progress_planner()->get_popover()->the_popover( 'subscribe-form' )->render_button(
+		\progress_planner()->get_ui__popover()->the_popover( 'subscribe-form' )->render_button(
 			'',
 			\esc_html__( 'Subscribe to share your badge!', 'progress-planner' )
 		);
