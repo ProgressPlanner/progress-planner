@@ -57,7 +57,7 @@ class Base {
 		}
 
 		if ( defined( '\IS_PLAYGROUND_PREVIEW' ) && constant( '\IS_PLAYGROUND_PREVIEW' ) === true ) {
-			new Playground();
+			$this->get_utils__playground();
 		}
 
 		// Basic classes.
