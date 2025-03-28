@@ -169,7 +169,7 @@ class Rest_API_Stats {
 		$data['recommendations'] = [];
 		foreach ( $ravis_recommendations as $recommendation ) {
 
-			// Skip user (todo) tasks.
+			// Skip user tasks.
 			if ( 'user' === $recommendation['provider_id'] ) {
 				continue;
 			}
