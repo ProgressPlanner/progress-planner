@@ -109,7 +109,7 @@ class Base {
 		$this->get_plugin_upgrade_tasks();
 
 		// Add hooks for data collectors.
-		$this->get_data_collector__data_collector_manager();
+		$this->get_suggested_tasks__data_collector__data_collector_manager();
 
 		// Debug tools.
 		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {
