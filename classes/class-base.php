@@ -15,8 +15,8 @@ namespace Progress_Planner;
  * @method \Progress_Planner\Activities\Query get_activities__query()
  * @method \Progress_Planner\Utils\Cache get_utils__cache()
  * @method \Progress_Planner\Page_Types get_page_types()
- * @method \Progress_Planner\Rest_API_Stats get_rest_api_stats()
- * @method \Progress_Planner\Rest_API_Tasks get_rest_api_tasks()
+ * @method \Progress_Planner\Rest\Stats get_rest__stats()
+ * @method \Progress_Planner\Rest\Tasks get_rest__tasks()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
  */
@@ -78,8 +78,8 @@ class Base {
 		$this->get_actions__maintenance();
 
 		// REST API.
-		$this->get_rest_api_stats();
-		$this->get_rest_api_tasks();
+		$this->get_rest__stats();
+		$this->get_rest__tasks();
 
 		// Onboarding.
 		$this->get_utils__onboard();
