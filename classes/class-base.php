@@ -183,8 +183,6 @@ class Base {
 			\_deprecated_function( \esc_html( $name ), \esc_html( $deprecated[ $name ][1] ), \esc_html( $deprecated[ $name ][0] ) );
 			return $this->{$deprecated[ $name ][0]}();
 		}
-
-		return null;
 	}
 
 	/**
