@@ -50,7 +50,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 		[
 			'type'           => 'bar',
 			'items_callback' => function ( $start_date, $end_date ) {
-				return \progress_planner()->get_query()->query_activities(
+				return \progress_planner()->get_activities__query()->query_activities(
 					[
 						'start_date' => $start_date,
 						'end_date'   => $end_date,

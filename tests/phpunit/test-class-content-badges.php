@@ -29,7 +29,7 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		parent::set_up();
 
 		// Remove all content activities.
-		\progress_planner()->get_query()->delete_category_activities( 'content' );
+		\progress_planner()->get_activities__query()->delete_category_activities( 'content' );
 	}
 
 	/**

@@ -279,7 +279,7 @@ class Debug_Tools {
 		);
 
 		// Get suggested tasks.
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'suggested_task',
 			]
@@ -358,7 +358,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete activities.
-		\progress_planner()->get_query()->delete_category_activities( 'suggested_task' );
+		\progress_planner()->get_activities__query()->delete_category_activities( 'suggested_task' );
 
 		// Delete the badges.
 		$progress_planner_settings           = \get_option( \Progress_Planner\Settings::OPTION_NAME, [] );

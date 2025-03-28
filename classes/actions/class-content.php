@@ -219,7 +219,7 @@ class Content {
 		}
 
 		// Check if there is an activity for this post.
-		$existing = \progress_planner()->get_query()->query_activities(
+		$existing = \progress_planner()->get_activities__query()->query_activities(
 			$query_args,
 			'RAW'
 		);
@@ -241,7 +241,7 @@ class Content {
 		// Post was updated to publish for the first time, ie draft was published.
 		if ( 'update' === $type && 'publish' === $post->post_status ) {
 			// Check if there is a publish activity for this post.
-			$existing = \progress_planner()->get_query()->query_activities(
+			$existing = \progress_planner()->get_activities__query()->query_activities(
 				[
 					'category' => 'content',
 					'type'     => 'publish',
@@ -261,7 +261,7 @@ class Content {
 		if ( 'update' === $type ) {
 
 			// Check if there are any activities for this post, on this date.
-			$existing = \progress_planner()->get_query()->query_activities(
+			$existing = \progress_planner()->get_activities__query()->query_activities(
 				[
 					'category'   => 'content',
 					'data_id'    => (string) $post->ID,
@@ -287,7 +287,7 @@ class Content {
 		if ( 'publish' === $type ) {
 
 			// Check if there is a publish activity for this post.
-			$existing = \progress_planner()->get_query()->query_activities(
+			$existing = \progress_planner()->get_activities__query()->query_activities(
 				[
 					'category' => 'content',
 					'type'     => 'publish',

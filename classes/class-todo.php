@@ -247,7 +247,7 @@ class Todo {
 
 		// Get the completed activities for this week that are in the todos.
 		$activities = array_filter(
-			\progress_planner()->get_query()->query_activities(
+			\progress_planner()->get_activities__query()->query_activities(
 				[
 					'start_date' => new \DateTime( 'monday this week' ),
 					'end_date'   => new \DateTime( 'sunday this week' ),

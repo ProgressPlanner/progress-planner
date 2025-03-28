@@ -98,7 +98,7 @@ final class Published_Content extends Widget {
 		return [
 			'type'           => 'line',
 			'items_callback' => function ( $start_date, $end_date ) {
-				return \progress_planner()->get_query()->query_activities(
+				return \progress_planner()->get_activities__query()->query_activities(
 					[
 						'category'   => 'content',
 						'type'       => 'publish',
@@ -181,7 +181,7 @@ final class Published_Content extends Widget {
 		static $density;
 		if ( null === $density ) {
 			$activities = $this->filter_activities(
-				\progress_planner()->get_query()->query_activities(
+				\progress_planner()->get_activities__query()->query_activities(
 					[
 						'category' => 'content',
 						'type'     => 'publish',
@@ -203,7 +203,7 @@ final class Published_Content extends Widget {
 		if ( null === $density ) {
 			// Get the weekly average.
 			$density = $this->count_density(
-				\progress_planner()->get_query()->query_activities(
+				\progress_planner()->get_activities__query()->query_activities(
 					[
 						'category'   => 'content',
 						'type'       => 'publish',
@@ -224,7 +224,7 @@ final class Published_Content extends Widget {
 		static $weekly_words;
 		if ( null === $weekly_words ) {
 			$weekly_words = $this->count_words(
-				\progress_planner()->get_query()->query_activities(
+				\progress_planner()->get_activities__query()->query_activities(
 					[
 						'category'   => 'content',
 						'type'       => 'publish',
