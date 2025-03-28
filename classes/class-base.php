@@ -113,7 +113,7 @@ class Base {
 
 		// Debug tools.
 		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {
-			new Debug_Tools();
+			$this->get_utils__debug_tools();
 		}
 
 		// Plugin upgrade.

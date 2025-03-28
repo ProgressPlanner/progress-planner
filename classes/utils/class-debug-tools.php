@@ -9,7 +9,7 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner;
+namespace Progress_Planner\Utils;
 
 /**
  * Class Debug_Tools
