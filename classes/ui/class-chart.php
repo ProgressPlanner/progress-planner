@@ -5,7 +5,7 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner;
+namespace Progress_Planner\UI;
 
 /**
  * Render a chart.

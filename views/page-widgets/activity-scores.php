@@ -46,7 +46,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 <p><?php \esc_html_e( 'Check out your website activity in the past months:', 'progress-planner' ); ?></p>
 <div class="prpl-graph-wrapper">
 	<?php
-	\progress_planner()->get_chart()->the_chart(
+	\progress_planner()->get_ui__chart()->the_chart(
 		[
 			'type'           => 'bar',
 			'items_callback' => function ( $start_date, $end_date ) {

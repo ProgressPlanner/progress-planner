@@ -43,7 +43,7 @@ $prpl_sum_weekly = array_sum( $prpl_stats['weekly'] );
 	</p>
 </div>
 <div class="prpl-graph-wrapper">
-	<?php \progress_planner()->get_chart()->the_chart( $prpl_widget->get_chart_args_content_count() ); ?>
+	<?php \progress_planner()->get_ui__chart()->the_chart( $prpl_widget->get_chart_args_content_count() ); ?>
 </div>
 <table>
 	<thead>
@@ -112,5 +112,5 @@ $prpl_sum_weekly = array_sum( $prpl_stats['weekly'] );
 	?>
 </p>
 <div class="prpl-graph-wrapper">
-	<?php \progress_planner()->get_chart()->the_chart( $prpl_widget->get_chart_args_content_density() ); ?>
+	<?php \progress_planner()->get_ui__chart()->the_chart( $prpl_widget->get_chart_args_content_density() ); ?>
 </div>

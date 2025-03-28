@@ -115,7 +115,7 @@ class Rest_API_Stats {
 
 		$data['latest_badge'] = \progress_planner()->get_badges()->get_latest_completed_badge();
 
-		$scores = \progress_planner()->get_chart()->get_chart_data(
+		$scores = \progress_planner()->get_ui__chart()->get_chart_data(
 			[
 				'items_callback' => function ( $start_date, $end_date ) {
 					return \progress_planner()->get_query()->query_activities(
