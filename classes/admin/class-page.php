@@ -337,7 +337,7 @@ class Page {
 	/**
 	 * Clear the cache.
 	 *
-	 * @param \Progress_Planner\Activity $activity The activity.
+	 * @param \Progress_Planner\Activities\Activity $activity The activity.
 	 *
 	 * @return void
 	 */

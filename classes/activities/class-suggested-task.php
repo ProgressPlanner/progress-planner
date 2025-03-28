@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Activities;
 
-use Progress_Planner\Activity;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create;
 
 /**

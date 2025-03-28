@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Activities;
 
-use Progress_Planner\Activity;
-
 /**
  * Handle activities for maintenance activities.
  */
