@@ -5,7 +5,31 @@ Bugs we fixed:
 * Fixed unnecessary display of the upgrade popover.
 * Fixed saving license key from 'Subscribe to weekly' emails popover.
 * Reduced number of database queries when checking for user activity scores.
+* Fixed database queries when getting activities by type.
 
+Enhancements:
+
+* Simplified the Dashboard widget.
+* Styling improvements.
+* Improved some translation strings.
+* Improved suggestions for writing new posts.
+* UI improvements in the plugin settings page.
+* TODO tasks can now award 1 point per week, counting toward the monthly badges.
+
+Under the hood:
+
+* Completely refactored the TODOs system.
+* Refactored the suggested-tasks system.
+* Refactored our AJAX calls.
+* Performance & caching improvements.
+* Refactored popovers implementation.
+* Added implementation to migrate plugin data on updates.
+* Improved debugging suite.
+* Added new hooks for integration with 3rd-party plugins.
+* Added a data collector system for tasks providers.
+* Refactored the way tasks are saved in the database for consistency.
+* Improved `one_time` and `repetitive` task type abstractions.
+* Refactored the celebrations system.
 
 = 1.1.0 =
 

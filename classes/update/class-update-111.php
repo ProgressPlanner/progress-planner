@@ -45,6 +45,9 @@ class Update_111 {
 		// Convert local tasks.
 		$this->convert_local_tasks();
 
+		// Migrate to-do items.
+		$this->migrate_todo_items();
+
 		if ( $this->local_tasks_changed ) {
 			\progress_planner()->get_settings()->set( 'local_tasks', $this->local_tasks );
 		}
@@ -110,7 +113,7 @@ class Update_111 {
 				}
 
 				// Update the provider_id for update-post tasks.
-				if ( 'update-post' === $task['provider_id'] ) {
+				if ( isset( $task['provider_id'] ) && 'update-post' === $task['provider_id'] ) {
 					$task['provider_id'] = 'review-post';
 				}
 
@@ -130,7 +133,7 @@ class Update_111 {
 	 */
 	private function add_local_task( $task ) {
 		foreach ( $this->local_tasks as $key => $local_task ) {
-			if ( $local_task['task_id'] === $task['task_id'] ) {
+			if ( isset( $local_task['task_id'] ) && $local_task['task_id'] === $task['task_id'] ) {
 				$this->local_tasks[ $key ] = $task;
 				return;
 			}
@@ -148,6 +151,9 @@ class Update_111 {
 			if ( isset( $task['type'] ) ) {
 				unset( $this->local_tasks[ $key ]['type'] );
 				$this->local_tasks_changed = true;
+			}
+			if ( ! isset( $task['task_id'] ) ) {
+				continue;
 			}
 			$converted_task_id = $this->convert_task_id( $task['task_id'] );
 			if ( $converted_task_id !== $task['task_id'] ) {
@@ -174,6 +180,34 @@ class Update_111 {
 				$activity->save();
 			}
 		}
+	}
+
+	/**
+	 * Migrate to-do items.
+	 *
+	 * @return void
+	 */
+	private function migrate_todo_items() {
+		$todo_items = \get_option( 'progress_planner_todo', [] );
+		if ( empty( $todo_items ) ) {
+			\delete_option( 'progress_planner_todo' );
+			return;
+		}
+		foreach ( $todo_items as $todo_item ) {
+			$this->add_local_task(
+				[
+					'task_id'     => 'user-task-' . md5( $todo_item['content'] ),
+					'status'      => $todo_item['done'] ? 'completed' : 'pending',
+					'provider_id' => 'user',
+					'category'    => 'user',
+					'title'       => $todo_item['content'],
+				]
+			);
+		}
+
+		$this->local_tasks_changed = true;
+
+		\delete_option( 'progress_planner_todo' );
 	}
 
 	/**
@@ -205,6 +239,9 @@ class Update_111 {
 		// Migrate the 'create-post' completed tasks.
 		if ( ! empty( $this->local_tasks ) ) {
 			foreach ( $this->local_tasks as $key => $task ) {
+				if ( ! isset( $task['task_id'] ) ) {
+					continue;
+				}
 				if ( false !== strpos( $task['task_id'], 'provider_id/create-post' ) ) {
 
 					// task_id needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
@@ -268,6 +305,9 @@ class Update_111 {
 		// Migrate the 'create-post' completed tasks.
 		if ( ! empty( $this->local_tasks ) ) {
 			foreach ( $this->local_tasks as $key => $task ) {
+				if ( ! isset( $task['task_id'] ) ) {
+					continue;
+				}
 				if ( false !== strpos( $task['task_id'], 'provider_id/review-post' ) ) {
 
 					$data = $this->get_data_from_task_id( $task['task_id'] );
@@ -300,11 +340,14 @@ class Update_111 {
 
 		if ( ! empty( $activities ) ) {
 			foreach ( $activities as $activity ) {
+				if ( ! isset( $activity->data_id ) || ! isset( $activity->date ) ) {
+					continue;
+				}
 				if ( false !== strpos( $activity->data_id, 'provider_id/review-post' ) ) {
 					$data = $this->get_data_from_task_id( $activity->data_id );
 
 					$new_data_id = $data['provider_id'] . '-' . $data['post_id'] . '-' . $activity->date->format( 'YW' );
-					if ( $new_data_id !== $activity->data_id ) {
+					if ( $new_data_id !== $activity->data_id && \is_callable( [ $activity, 'save' ] ) ) {
 						$activity->data_id = $new_data_id;
 						$activity->save();
 					}

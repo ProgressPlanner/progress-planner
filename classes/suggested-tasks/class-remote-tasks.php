@@ -20,9 +20,11 @@ class Remote_Tasks {
 	const CACHE_KEY = 'suggested_tasks_remote';
 
 	/**
-	 * Constructor.
+	 * Initialize the remote tasks.
+	 *
+	 * @return void
 	 */
-	public function __construct() {
+	public function init() {
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
 	}
 
@@ -46,18 +48,7 @@ class Remote_Tasks {
 				continue;
 			}
 
-			$task_data = [
-				'task_id'     => $item['task_id'],
-				'provider_id' => 'remote-' . ( isset( $item['category'] ) ? $item['category'] : 'default' ),
-				'category'    => 'remote-' . ( isset( $item['category'] ) ? $item['category'] : 'default' ),
-				'title'       => $item['title'] ?? '',
-				'description' => $item['description'] ?? '',
-				'priority'    => $item['priority'] ?? 'medium',
-				'points'      => $item['points'] ?? 1,
-				'url'         => $item['url'] ?? '',
-				'dismissable' => $item['dismissable'] ?? true,
-			];
-			$items[]   = $task_data;
+			$items[] = $item;
 		}
 
 		return \array_merge( $items, $tasks );
@@ -93,12 +84,20 @@ class Remote_Tasks {
 					$valid_tasks = [];
 					foreach ( $tasks as $task ) {
 						if ( isset( $task['task_id'] ) ) {
-							// Ensure remote task ID has proper prefix.
-							$task['task_id'] = str_starts_with( $task['task_id'], 'remote-task-' )
-								? $task['task_id']
-								: "remote-task-{$task['task_id']}";
 
-							$valid_tasks[] = $task;
+							$valid_tasks[] = [
+								'task_id'     => str_starts_with( $task['task_id'], 'remote-task-' ) ? $task['task_id'] : "remote-task-{$task['task_id']}",
+								'provider_id' => 'remote-' . ( isset( $task['category'] ) ? $task['category'] : 'default' ),
+								'category'    => 'remote-' . ( isset( $task['category'] ) ? $task['category'] : 'default' ),
+								'title'       => $task['title'] ?? '',
+								'description' => $task['description'] ?? '',
+								'priority'    => $task['priority'] ?? 'medium',
+								'points'      => $task['points'] ?? 1,
+								'url'         => $task['url'] ?? '',
+								'dismissable' => $task['dismissable'] ?? true,
+								'type'        => $task['type'] ?? '', // Not using any more.
+								'challenge'   => $task['challenge'] ?? '', // Not using any more.
+							];
 						}
 					}
 					// Cache the response for 1 day.

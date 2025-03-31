@@ -46,12 +46,7 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 			$suggested_tasks_widget->enqueue_scripts();
 		}
 
-		\wp_enqueue_style(
-			'prpl-dashboard-widget-' . $this->id,
-			PROGRESS_PLANNER_URL . "/assets/css/dashboard-widgets/{$this->id}.css",
-			[],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . "/assets/css/dashboard-widgets/{$this->id}.css" )
-		);
+		\progress_planner()->get_admin__enqueue()->enqueue_style( "progress-planner/dashboard-widgets/{$this->id}" );
 
 		\progress_planner()->the_view( "dashboard-widgets/{$this->id}.php" );
 	}

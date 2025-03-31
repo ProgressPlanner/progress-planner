@@ -1,4 +1,11 @@
-/* global customElements, HTMLElement, progressPlannerBadge */
+/* global customElements, HTMLElement, progressPlannerBadge, prplL10n */
+/*
+ * Badge
+ *
+ * A web component to display a badge.
+ *
+ * Dependencies: progress-planner/l10n
+ */
 
 /**
  * Register the custom web component.
@@ -13,9 +20,13 @@ customElements.define(
 			badgeId = badgeId || this.getAttribute( 'badge-id' );
 			this.innerHTML = `
 				<img
-					src="${ progressPlannerBadge.remoteServerRootUrl }/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ badgeId }"
-					alt="${ progressPlannerBadge.l10n.badge }"
-					onerror="this.onerror=null;this.src='${ progressPlannerBadge.placeholderImageUrl }';"
+					src="${
+						progressPlannerBadge.remoteServerRootUrl
+					}/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ badgeId }"
+					alt="${ prplL10n( 'badge' ) }"
+					onerror="this.onerror=null;this.src='${
+						progressPlannerBadge.placeholderImageUrl
+					}';"
 				/>
 			`;
 		}

@@ -85,15 +85,7 @@ abstract class Widget {
 	 * @return void
 	 */
 	public function enqueue_styles() {
-		$stylesheet = "/assets/css/page-widgets/{$this->id}.css";
-		if ( \file_exists( PROGRESS_PLANNER_DIR . $stylesheet ) ) {
-			\wp_enqueue_style(
-				'prpl-widget-' . $this->id,
-				PROGRESS_PLANNER_URL . $stylesheet,
-				[],
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . $stylesheet )
-			);
-		}
+		\progress_planner()->get_admin__enqueue()->enqueue_style( "progress-planner/page-widgets/{$this->id}" );
 	}
 
 	/**
@@ -103,5 +95,14 @@ abstract class Widget {
 	 */
 	public function enqueue_scripts() {
 		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/' . $this->id );
+	}
+
+	/**
+	 * Get the stylesheet dependencies.
+	 *
+	 * @return array
+	 */
+	public function get_stylesheet_dependencies() {
+		return [];
 	}
 }

@@ -40,8 +40,25 @@ use Progress_Planner\Badges\Monthly;
 <?php if ( \current_user_can( 'manage_options' ) ) : ?>
 	<div class="prpl-dashboard-widget-footer">
 		<img src="<?php echo \esc_attr( PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg' ); ?>" style="width:1.85em;" alt="" />
-		<a href="<?php echo \esc_url( \get_admin_url( null, 'admin.php?page=progress-planner' ) ); ?>">
-			<?php \esc_html_e( 'Check out all your stats and recommendations', 'progress-planner' ); ?>
-		</a>
+		<div>
+			<?php $prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' ); ?>
+			<?php if ( $prpl_pending_celebration_tasks ) : ?>
+				<?php
+				$prpl_notification_count = \count( $prpl_pending_celebration_tasks );
+				printf(
+					/* translators: %s: Number of pending celebration tasks. */
+					esc_html( _n( 'Good job! You have successfully finished %s task!', 'Good job! You have successfully finished %s tasks!', $prpl_notification_count, 'progress-planner' ) ),
+					esc_html( number_format_i18n( $prpl_notification_count ) )
+				);
+				?>
+				<a class="prpl-button-primary" href="<?php echo \esc_url( \get_admin_url( null, 'admin.php?page=progress-planner' ) ); ?>">
+					<?php \esc_html_e( 'Celebrate your achievement!', 'progress-planner' ); ?>
+				</a>
+			<?php else : ?>
+				<a href="<?php echo \esc_url( \get_admin_url( null, 'admin.php?page=progress-planner' ) ); ?>">
+					<?php \esc_html_e( 'Check out all your stats and recommendations', 'progress-planner' ); ?>
+				</a>
+			<?php endif; ?>
+		</div>
 	</div>
 <?php endif; ?>
