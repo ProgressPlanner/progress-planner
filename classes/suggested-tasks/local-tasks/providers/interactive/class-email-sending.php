@@ -163,6 +163,7 @@ class Email_Sending extends Interactive {
 			'parent'      => 0,
 			'priority'    => 'high',
 			'category'    => $this->get_provider_category(),
+			'provider_id' => $this->get_provider_id(),
 			'points'      => 1,
 			'dismissable' => true,
 			'popover_id'  => 'prpl-popover-' . $this->popover_id,
