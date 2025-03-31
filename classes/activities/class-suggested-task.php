@@ -71,7 +71,7 @@ class Suggested_Task extends Activity {
 
 		$data = \progress_planner()->get_suggested_tasks()->get_local()->get_data_from_task_id( $this->data_id );
 		if ( isset( $data['provider_id'] ) && $create_post_provider->get_provider_id() === $data['provider_id'] ) {
-			$points = $create_post_provider->get_points( $this->data_id );
+			$points = $create_post_provider->get_points_for_task( $this->data_id );
 		}
 
 		$this->points[ $date_ymd ] = $points;

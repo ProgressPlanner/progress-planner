@@ -1,0 +1,236 @@
+.prpl-suggested-task {
+	margin: 0;
+	padding: 0.5rem;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	position: relative;
+	gap: 1rem;
+	line-height: 1.5;
+
+	h3 {
+		font-size: 1rem;
+		margin: 0;
+		font-weight: 500;
+
+		span {
+			text-decoration: none;
+			background-image: linear-gradient(#000, #000);
+			background-repeat: no-repeat;
+			background-position: center left;
+			background-size: 0% 1px;
+			transition: background-size 500ms ease-in-out;
+
+			/* Give the span a width so the user can edit the task title */
+			&:empty {
+				display: inline-block;
+				width: 100%;
+			}
+		}
+	}
+
+	input[type="checkbox"][disabled] {
+		opacity: 0.5;
+		border-color: #0773bf;
+		background-color: #effbfe;
+	}
+
+	&.prpl-suggested-task-celebrated h3 span {
+		background-size: 100% 1px;
+		color: inherit;
+
+		/* Accessibility */
+		text-decoration: line-through;
+		text-decoration-color: transparent;
+	}
+
+	.prpl-suggested-task-actions {
+		display: flex;
+		gap: 0.5rem;
+		flex-shrink: 0; /* Prevent the actions from shrinking when the task title is too long */
+	}
+
+	.prpl-suggested-task-points {
+		font-size: var(--prpl-font-size-xs);
+		font-weight: 700;
+		color: var(--prpl-color-headings);
+		background-color: var(--prpl-color-400-orange);
+		width: 1.5rem;
+		height: 1.5rem;
+		border-radius: 50%;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.tooltip-actions {
+		visibility: hidden;
+	}
+
+	&:hover {
+
+		.tooltip-actions {
+			visibility: visible;
+		}
+	}
+
+	.tooltip-actions:has([data-tooltip-visible]) {
+		visibility: visible;
+	}
+
+	.prpl-suggested-task-description {
+		font-size: 0.825rem;
+		color: var(--prpl-color-gray-6);
+		margin: 0;
+	}
+
+	button {
+		padding: 0.1rem;
+		line-height: 0;
+		margin: 0;
+		background: none;
+		border: none;
+		cursor: pointer;
+	}
+
+	.icon {
+		width: 1rem;
+		height: 1rem;
+		display: inline-block;
+	}
+
+	.trash,
+	.move-up,
+	.move-down {
+		padding: 0;
+		border: 0;
+		background: none;
+		color: var(--prpl-color-gray-3);
+		cursor: pointer;
+		box-shadow: none;
+		transition: all 0.1s;
+		margin-top: 1px;
+	}
+
+	.trash {
+		width: 1.25rem;
+		height: 1.25rem;
+
+		&:hover svg path {
+			fill: var(--prpl-color-accent-red);
+		}
+	}
+
+	.prpl-move-buttons {
+		padding: 0 0.5em;
+		display: flex;
+		gap: 0;
+		flex-direction: column;
+	}
+
+	.move-up,
+	.move-down {
+		height: 0.75rem;
+
+		.dashicons {
+			font-size: 0.875rem;
+			width: 1em;
+			height: 1em;
+		}
+
+		&:hover {
+			color: var(--prpl-color-gray-6);
+		}
+	}
+
+	.prpl-suggested-task-snooze {
+
+		&.prpl-toggle-radio-group-open {
+
+			.prpl-snooze-duration-radio-group {
+				display: block;
+			}
+
+			.prpl-toggle-radio-group-arrow {
+				transform: rotate(270deg);
+			}
+		}
+
+		legend {
+			display: block;
+			width: 100%;
+
+			.prpl-toggle-radio-group {
+				display: flex;
+				justify-content: space-between;
+				width: 100%;
+				margin-top: 0.5rem;
+				padding: 0.5rem;
+				background-color: #fff;
+				border-radius: var(--prpl-border-radius);
+				line-height: 1;
+				text-align: start;
+
+				.prpl-toggle-radio-group-arrow {
+					transform: rotate(90deg);
+				}
+			}
+		}
+
+		label {
+			display: block;
+			background-color: #fff;
+			padding: 0.5rem;
+
+			&:hover {
+				background-color: var(--prpl-color-gray-1);
+			}
+
+			input[type="radio"] {
+				display: none;
+			}
+		}
+
+		.prpl-snooze-duration-radio-group {
+			display: none;
+			margin-top: 0.75rem;
+
+			label {
+				border-top: 1px solid #dcdcde;
+
+				&:first-child {
+					border-top-left-radius: var(--prpl-border-radius);
+					border-top-right-radius: var(--prpl-border-radius);
+					border-top: none;
+				}
+
+				&:last-child {
+					border-bottom-left-radius: var(--prpl-border-radius);
+					border-bottom-right-radius: var(--prpl-border-radius);
+				}
+			}
+
+		}
+
+
+	}
+
+	&[data-task-action="celebrate"] {
+
+		.prpl-suggested-task-button[data-action="snooze"] {
+			display: none;
+		}
+	}
+
+	.prpl-suggested-task-info {
+		margin-left: -30px;
+
+		p {
+			margin-bottom: 0;
+		}
+
+		p:first-child {
+			margin-top: 0;
+		}
+	}
+}

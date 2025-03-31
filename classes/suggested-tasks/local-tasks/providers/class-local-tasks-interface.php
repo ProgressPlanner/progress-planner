@@ -20,6 +20,13 @@ interface Local_Tasks_Interface {
 	public function init();
 
 	/**
+	 * Get the points.
+	 *
+	 * @return int
+	 */
+	public function get_points();
+
+	/**
 	 * Get tasks to inject.
 	 *
 	 * @return array
@@ -42,7 +49,7 @@ interface Local_Tasks_Interface {
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id );
+	public function get_task_details( $task_id = '' );
 
 	/**
 	 * Get the task details.

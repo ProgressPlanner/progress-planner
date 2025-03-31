@@ -36,3 +36,4 @@ if ( ! $prpl_privacy_policy_accepted ) {
 		<?php \progress_planner()->the_view( 'welcome.php' ); ?>
 	<?php endif; ?>
 </div>
+<div class="prpl-overlay" style="display: none;" onclick="document.querySelector('[data-tooltip-visible=true]').removeAttribute('data-tooltip-visible')"></div>

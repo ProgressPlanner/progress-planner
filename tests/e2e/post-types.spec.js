@@ -1,7 +1,7 @@
 const { test, expect } = require( '@playwright/test' );
 
-test.describe( 'PRPL Settings', () => {
-	test( 'should save post types settings', async ( { page } ) => {
+test.describe( 'PRPL Post Types', () => {
+	test( 'Should save post types settings', async ( { page } ) => {
 		// Navigate to Progress Planner dashboard
 		await page.goto( '/wp-admin/admin.php?page=progress-planner' );
 		await page.waitForLoadState( 'networkidle' );

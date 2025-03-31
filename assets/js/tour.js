@@ -1,20 +1,20 @@
-/* global progressPlannerTour */
+/* global progressPlannerTour, prplL10n */
 /*
  * Tour
  *
  * A tour for the Progress Planner.
  *
- * Dependencies: driver
+ * Dependencies: driver, progress-planner/l10n
  */
 const prplDriver = window.driver.js.driver;
 
 const prplDriverObj = prplDriver( {
 	showProgress: true,
 	popoverClass: 'prpl-driverjs-theme',
-	progressText: progressPlannerTour.progressText,
-	nextBtnText: progressPlannerTour.nextBtnText,
-	prevBtnText: progressPlannerTour.prevBtnText,
-	doneBtnText: progressPlannerTour.doneBtnText,
+	progressText: prplL10n( 'progressText' ),
+	nextBtnText: prplL10n( 'nextBtnText' ),
+	prevBtnText: prplL10n( 'prevBtnText' ),
+	doneBtnText: prplL10n( 'doneBtnText' ),
 	steps: progressPlannerTour.steps,
 	onDestroyStarted: () => {
 		if ( ! prplDriverObj.hasNextStep() ) {
