@@ -80,7 +80,15 @@ class Email_Sending extends Interactive {
 		$handle = 'progress-planner/web-components/prpl-task-' . $this->get_provider_id();
 
 		// Enqueue the web component.
-		\progress_planner()->get_admin__enqueue()->enqueue_script( $handle );
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			$handle,
+			[
+				'name' => 'prplEmailSending',
+				'data' => [
+					'ajax_url' => \admin_url( 'admin-ajax.php' ),
+				],
+			]
+		);
 	}
 
 	/**

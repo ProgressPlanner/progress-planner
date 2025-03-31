@@ -1,7 +1,7 @@
 const { test, expect } = require( '@playwright/test' );
 const { makeAuthenticatedRequest } = require( './utils' );
 
-test.describe( 'PRPL Tasks', () => {
+test.describe( 'PRPL Complete Task', () => {
 	test( 'Complete blog description task', async ( { page, request } ) => {
 		// First, navigate to Progress Planner dashboard (to init everything)
 		await page.goto(
@@ -68,7 +68,9 @@ test.describe( 'PRPL Tasks', () => {
 		await expect( widgetContainer ).toBeVisible();
 
 		// Then wait for the tasks to be loaded in the widget
-		const tasksList = page.locator( '.prpl-suggested-tasks-list' );
+		const tasksList = page.locator(
+			'.prpl-widget-wrapper.prpl-suggested-tasks .prpl-suggested-tasks-list'
+		);
 		await expect( tasksList ).toBeVisible();
 
 		// Wait for the specific task to appear and verify its content

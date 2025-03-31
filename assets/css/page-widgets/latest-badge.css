@@ -1,6 +1,7 @@
 .prpl-widget-wrapper.prpl-latest-badge {
 
 	img {
+		margin-top: 0.5rem;
 		border: 1px solid var(--prpl-color-gray-2);
 		border-radius: var(--prpl-border-radius);
 	}

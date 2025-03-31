@@ -110,7 +110,7 @@ class Create extends Repetitive {
 			'parent'      => 0,
 			'priority'    => 'medium',
 			'category'    => $this->get_provider_category(),
-			'points'      => 1,
+			'points'      => $this->get_points(), // We use $this->get_points() here on purpose, get_points_for_task() calcs the points for the last published post.
 			'url'         => \esc_url( \admin_url( 'post-new.php?post_type=post' ) ),
 			'description' => esc_html__( 'Create a new post.', 'progress-planner' ),
 		];
@@ -120,23 +120,25 @@ class Create extends Repetitive {
 
 	/**
 	 * Get the number of points for the task.
+	 * This is used to calculate points in the RR widget, so user can see if he earned 1 or 2 points when celebrating.
 	 *
 	 * @param string $task_id The task ID.
 	 *
 	 * @return int
 	 */
-	public function get_points( $task_id = '' ) {
+	public function get_points_for_task( $task_id = '' ) {
 
 		if ( ! $task_id ) {
 			// Get the post that was created last.
 			$post_data = $this->data_collector->collect();
 		} else {
-			$post_data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $task_id );
+			$post_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
+			$post_data = $post_data[0] ?? false;
 		}
 
 		// Post was created, but then deleted?
 		if ( ! $post_data || empty( $post_data['post_id'] ) ) {
-			return 1;
+			return $this->points;
 		}
 
 		return true === $post_data['long'] ? 2 : 1;

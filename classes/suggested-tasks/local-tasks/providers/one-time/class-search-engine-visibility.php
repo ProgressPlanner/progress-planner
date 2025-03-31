@@ -22,13 +22,6 @@ class Search_Engine_Visibility extends One_Time {
 	protected const PROVIDER_ID = 'search-engine-visibility';
 
 	/**
-	 * Whether the task is dismissable.
-	 *
-	 * @var bool
-	 */
-	protected $is_dismissable = true;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {

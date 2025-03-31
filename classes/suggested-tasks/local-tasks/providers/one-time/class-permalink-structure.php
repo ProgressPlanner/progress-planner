@@ -32,9 +32,25 @@ class Permalink_Structure extends One_Time {
 			\esc_html__( 'On install, WordPress sets the permalink structure to a format that is not SEO-friendly. %1$s changing it.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
 		);
+
+		$icon_el = 'label[for="permalink-input-month-name"], label[for="permalink-input-post-name"]';
+
+		// If the task is completed, we want to add icon element only to the selected option (not both).
+		if ( $this->is_task_completed() ) {
+			$permalink_structure = \get_option( 'permalink_structure' );
+
+			if ( '/%year%/%monthnum%/%postname%/' === $permalink_structure || '/index.php/%year%/%monthnum%/%postname%/' === $permalink_structure ) {
+				$icon_el = 'label[for="permalink-input-month-name"]';
+			}
+
+			if ( '/%postname%/' === $permalink_structure || '/index.php/%postname%/' === $permalink_structure ) {
+				$icon_el = 'label[for="permalink-input-post-name"]';
+			}
+		}
+
 		$this->link_setting = [
 			'hook'   => 'options-permalink.php',
-			'iconEl' => 'label[for="permalink-input-month-name"], label[for="permalink-input-post-name"]',
+			'iconEl' => $icon_el,
 		];
 	}
 

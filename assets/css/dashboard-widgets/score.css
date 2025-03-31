@@ -1,3 +1,10 @@
+/* stylelint-disable max-line-length */
+
+/**
+ * Admin widget.
+ *
+ * Dependencies: progress-planner/web-components/prpl-suggested-task, progress-planner/web-components/prpl-badge
+ */
 #progress_planner_dashboard_widget_score {
 
 	.prpl-dashboard-widget {
@@ -42,7 +49,12 @@
 		border-top: 1px solid #c3c4c7; /* same color as the one WP-Core uses */
 		font-size: var(--prpl-font-size-base);
 		display: flex;
-		gap: 0.5rem;
+		gap: 1rem;
 		align-items: center;
+
+		.prpl-button-primary {
+			display: inline-block;
+			margin: 0.5rem 0 0 0;
+		}
 	}
 }
