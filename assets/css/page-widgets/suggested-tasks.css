@@ -139,6 +139,14 @@
 		}
 	}
 
+	/* If task has disabled checkbox it's title should be italic. */
+	.prpl-suggested-task:has(.prpl-suggested-task-disabled-checkbox-tooltip) {
+
+		h3 {
+			font-style: italic;
+		}
+	}
+
 	/* Disabled checkbox styles. */
 	.prpl-suggested-task-disabled-checkbox-tooltip {
 
