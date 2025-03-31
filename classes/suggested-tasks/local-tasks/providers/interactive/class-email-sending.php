@@ -43,15 +43,6 @@ class Email_Sending extends Interactive {
 	protected $popover_id = 'sending-email';
 
 	/**
-	 * Constructor.
-	 *
-	 * @return void
-	 */
-	public function __construct() {
-		parent::__construct();
-	}
-
-	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
