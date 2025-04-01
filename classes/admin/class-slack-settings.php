@@ -70,7 +70,7 @@ class Slack_Settings {
 	 * @return void
 	 */
 	public function handle_oauth_callback() {
-		if ( ! isset( $_GET['slack_token'] ) ) {
+		if ( ! isset( $_GET['slack_token'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return;
 		}
 
