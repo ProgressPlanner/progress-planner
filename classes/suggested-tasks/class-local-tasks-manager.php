@@ -44,8 +44,17 @@ class Local_Tasks_Manager {
 	 * Constructor.
 	 */
 	public function __construct() {
-
+		// Initialize the task providers.
 		\add_action( 'init', [ $this, 'init' ], 0 );
+
+		// Inject tasks.
+		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
+
+		// Add the cleanup action.
+		\add_action( 'admin_init', [ $this, 'cleanup_pending_tasks' ] );
+
+		// Add the onboarding task providers.
+		\add_filter( 'prpl_onboarding_task_providers', [ $this, 'add_onboarding_task_providers' ] );
 	}
 
 	/**
@@ -96,24 +105,6 @@ class Local_Tasks_Manager {
 			// Initialize the task provider (add hooks, etc.).
 			$task_provider->init();
 		}
-
-		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
-		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
-
-		// Add the cleanup action.
-		\add_action( 'admin_init', [ $this, 'cleanup_pending_tasks' ] );
-
-		// Add the onboarding task providers.
-		\add_filter( 'prpl_onboarding_task_providers', [ $this, 'add_onboarding_task_providers' ] );
-	}
-
-	/**
-	 * Add the Yoast task if the plugin is active.
-	 *
-	 * @return void
-	 */
-	public function add_plugin_integration() {
-		// Add the plugin integration here.
 	}
 
 	/**

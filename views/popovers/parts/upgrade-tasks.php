@@ -13,6 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $prpl_task_providers = \progress_planner()->get_plugin_upgrade_tasks()->get_newly_added_task_providers();
 
+// We have the task providers, clean them up since we don't need them anymore before the early return.
+\progress_planner()->get_plugin_upgrade_tasks()->delete_upgrade_popover_task_providers();
+
 // If there are no task providers, don't show anything.
 if ( empty( $prpl_task_providers ) ) {
 	return;
@@ -101,6 +104,4 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 	</button>
 </div>
 
-<?php
-// We have displayed the upgrade popover tasks, so delete them.
-\progress_planner()->get_plugin_upgrade_tasks()->delete_upgrade_popover_task_providers();
+
