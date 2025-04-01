@@ -48,22 +48,18 @@ class Editor {
 			$prpl_preselected_page_type = \progress_planner()->get_page_types()->get_default_page_type( (string) \get_post_type(), (int) \get_the_ID() );
 		}
 
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'editor' );
-
-		\wp_localize_script(
-			'progress-planner/editor',
-			'progressPlannerEditor',
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'editor',
 			[
-				'lessons'         => \progress_planner()->get_lessons()->get_items(),
-				'pageTypes'       => $page_types,
-				'defaultPageType' => $prpl_preselected_page_type,
+				'name' => 'progressPlannerEditor',
+				'data' => [
+					'lessons'         => \progress_planner()->get_lessons()->get_items(),
+					'pageTypes'       => $page_types,
+					'defaultPageType' => $prpl_preselected_page_type,
+				],
 			]
 		);
-		\wp_enqueue_style(
-			'progress-planner-editor',
-			\plugins_url( '/assets/css/editor.css', PROGRESS_PLANNER_FILE ),
-			[],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/editor.css' )
-		);
+
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/editor' );
 	}
 }

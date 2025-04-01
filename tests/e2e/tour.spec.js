@@ -1,7 +1,7 @@
 const { test, expect } = require( '@playwright/test' );
 
 test.describe( 'PRPL Tour', () => {
-	test( 'should start the tour when clicking the tour button', async ( {
+	test( 'Should start the tour when clicking the tour button', async ( {
 		page,
 	} ) => {
 		// Navigate to Progress Planner dashboard

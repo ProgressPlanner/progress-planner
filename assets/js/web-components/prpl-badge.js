@@ -20,9 +20,13 @@ customElements.define(
 			badgeId = badgeId || this.getAttribute( 'badge-id' );
 			this.innerHTML = `
 				<img
-					src="${ progressPlannerBadge.remoteServerRootUrl }/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ badgeId }"
+					src="${
+						progressPlannerBadge.remoteServerRootUrl
+					}/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ badgeId }"
 					alt="${ prplL10n( 'badge' ) }"
-					onerror="this.onerror=null;this.src='${ progressPlannerBadge.placeholderImageUrl }';"
+					onerror="this.onerror=null;this.src='${
+						progressPlannerBadge.placeholderImageUrl
+					}';"
 				/>
 			`;
 		}
