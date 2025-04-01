@@ -257,10 +257,10 @@ final class Monthly extends Badge {
 
 		$tasks = [];
 		foreach ( $activities as $activity ) {
-			$task = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $activity->data_id );
+			$task = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $activity->data_id );
 
-			if ( $task && isset( $task['provider_id'] ) ) {
-				$tasks[] = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task['task_id'] );
+			if ( isset( $task[0] ) && isset( $task[0]['provider_id'] ) ) {
+				$tasks[] = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task[0]['task_id'] );
 			}
 		}
 
