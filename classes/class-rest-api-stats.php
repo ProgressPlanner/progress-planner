@@ -67,18 +67,6 @@ class Rest_API_Stats {
 		// Get the number of pending updates.
 		$data['pending_updates'] = \wp_get_update_data()['counts']['total'];
 
-		// Get number of content from any public post-type, published in the past week.
-		$data['weekly_posts'] = count(
-			\get_posts(
-				[
-					'post_status'    => 'publish',
-					'post_type'      => 'post',
-					'date_query'     => [ [ 'after' => '1 week ago' ] ],
-					'posts_per_page' => 10,
-				]
-			)
-		);
-
 		// Get the number of activities in the past week.
 		$data['activities'] = count(
 			\progress_planner()->get_query()->query_activities(
@@ -97,7 +85,6 @@ class Rest_API_Stats {
 
 		// Get the badges.
 		$badges = array_merge(
-			\progress_planner()->get_badges()->get_badges( 'content' ),
 			\progress_planner()->get_badges()->get_badges( 'maintenance' ),
 			\progress_planner()->get_badges()->get_badges( 'monthly_flat' )
 		);

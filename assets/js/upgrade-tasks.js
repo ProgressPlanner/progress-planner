@@ -90,17 +90,14 @@ const prplOnboardRedirect = () => {
 		'prpl-onboarding-tasks'
 	);
 
-	let redirectUrl = window.location.href
-		.replace( '&content-scan-finished=true', '' )
-		.replace( '&content-scan', '' )
-		.replace( '&delay-tour=true', '' );
+	let redirectUrl = window.location.href.replace( '&delay-tour=true', '' );
 
 	// If plugin is upgraded, we dont show the tour.
 	if ( document.getElementById( 'prpl-popover-upgrade-tasks' ) ) {
 		window.location.href = redirectUrl;
 	} else {
 		// We show the tour.
-		redirectUrl = redirectUrl + '&content-scan-finished=true';
+		redirectUrl = redirectUrl + '&show-tour=true';
 
 		// Check if there are completed tasks, delay tour so the user can see the celebration.
 		if (

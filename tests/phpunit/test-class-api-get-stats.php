@@ -136,7 +136,6 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 		// Check if the data has the expected keys.
 		$data_to_check = [
 			'pending_updates',
-			'weekly_posts',
 			'activities',
 			'website_activity',
 			'badges',

@@ -10,7 +10,6 @@ namespace Progress_Planner\Suggested_Tasks;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 // Repetitive tasks.
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create as Content_Create;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Review as Content_Review;
 // One-time tasks.
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Blog_Description;
@@ -46,7 +45,6 @@ class Local_Tasks_Manager {
 	public function __construct() {
 
 		$this->task_providers = [
-			new Content_Create(),
 			new Content_Review(),
 			new Core_Update(),
 			new Blog_Description(),

@@ -73,8 +73,6 @@ class Base {
 		}
 		$this->get_admin__editor();
 
-		$this->get_actions__content();
-		$this->get_actions__content_scan();
 		$this->get_actions__maintenance();
 
 		// REST API.
