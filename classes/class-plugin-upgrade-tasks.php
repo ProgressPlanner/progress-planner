@@ -17,14 +17,14 @@ class Plugin_Upgrade_Tasks {
 	 */
 	public function __construct() {
 
-		// Plugin activated.
+		// Plugin (possibly 3rd party) activated.
 		\add_action( 'activated_plugin', [ $this, 'plugin_activated_or_updated' ], 10 );
 
 		// Progress Planner plugin updated.
 		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_activated_or_updated' ], 10 );
 
 		// Check if the plugin was upgraded or new plugin was activated.
-		\add_action( 'init', [ $this, 'check_plugin_upgrade' ], 10 );
+		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 10 );
 	}
 
 	/**
@@ -41,7 +41,7 @@ class Plugin_Upgrade_Tasks {
 	 *
 	 * @return void
 	 */
-	public function check_plugin_upgrade() {
+	public function handle_activation_or_upgrade() {
 		if ( ! \get_option( 'progress_planner_plugin_was_activated', false ) ) {
 			return;
 		}
