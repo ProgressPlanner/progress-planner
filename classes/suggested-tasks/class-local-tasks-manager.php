@@ -45,6 +45,15 @@ class Local_Tasks_Manager {
 	 */
 	public function __construct() {
 
+		\add_action( 'init', [ $this, 'init' ], 0 );
+	}
+
+	/**
+	 * Initialize the task providers.
+	 *
+	 * @return void
+	 */
+	public function init() {
 		$this->task_providers = [
 			new Content_Create(),
 			new Content_Review(),
