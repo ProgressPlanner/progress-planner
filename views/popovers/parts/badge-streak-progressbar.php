@@ -26,26 +26,17 @@ $prpl_badges = \progress_planner()->get_badges()->get_badges( $prpl_context ); /
 					<?php else : ?>
 						<?php
 						printf(
-							'content' === $prpl_context // @phpstan-ignore-line variable.undefined
-								? \esc_html(
-									/* translators: The number of weeks remaining to complete the badge. */
-									_n(
-										'%s post to go',
-										'%s posts to go',
-										(int) $prpl_badge_progress['remaining'],
-										'progress-planner'
-									)
-								) : \esc_html(
-									/* translators: The number of weeks remaining to complete the badge. */
-									_n(
-										'%s week to go',
-										'%s weeks to go',
-										(int) $prpl_badge_progress['remaining'],
-										'progress-planner'
-									)
-								),
+							\esc_html(
+								/* translators: The number of weeks remaining to complete the badge. */
+								_n(
+									'%s week to go',
+									'%s weeks to go',
+									(int) $prpl_badge_progress['remaining'],
+									'progress-planner'
+								)
+							),
 							'<span class="number">' . \esc_html( \number_format_i18n( $prpl_badge_progress['remaining'] ) ) . '</span>'
-						)
+						);
 						?>
 					<?php endif; ?>
 				</span>

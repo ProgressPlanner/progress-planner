@@ -89,7 +89,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 <div class="prpl-widget-content">
 	<?php
 	if ( (int) $prpl_record['max_streak'] === 0 ) {
-		\esc_html_e( 'This is the start of your first streak! Add content to your site every week and set a personal record!', 'progress-planner' );
+		\esc_html_e( 'This is the start of your first streak!', 'progress-planner' );
 	} elseif ( (int) $prpl_record['max_streak'] <= (int) $prpl_record['current_streak'] ) {
 		printf(
 			\esc_html(

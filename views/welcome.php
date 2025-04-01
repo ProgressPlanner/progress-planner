@@ -174,10 +174,6 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 				</p>
 
 				<?php \progress_planner()->the_view( 'popovers/parts/upgrade-tasks.php', [ 'context' => 'onboarding' ] ); ?>
-
-				<div id="progress-planner-scan-progress" style="display:none;">
-					<progress value="0" max="100"></progress>
-				</div>
 			</div>
 		</div>
 		<div class="right">

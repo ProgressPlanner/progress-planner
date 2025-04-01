@@ -265,10 +265,9 @@ class Enqueue {
 		$monthly_badge       = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 		$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id();
 
-		// Get the content and maintenance badge URLs.
-		foreach ( [ 'content', 'maintenance' ] as $context ) {
-			$set_badges        = \progress_planner()->get_badges()->get_badges( $context );
-			$badge_url_context = '';
+		// Get the badge URLs.
+		foreach ( [ 'maintenance' ] as $context ) {
+			$set_badges = \progress_planner()->get_badges()->get_badges( $context );
 			foreach ( $set_badges as $key => $badge ) {
 				$progress = $badge->get_progress();
 				if ( $progress['progress'] > 100 ) {

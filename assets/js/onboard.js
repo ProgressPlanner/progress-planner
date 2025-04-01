@@ -1,10 +1,10 @@
-/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerTriggerScan, prplOnboardTasks */
+/* global progressPlanner, progressPlannerAjaxRequest, prplOnboardTasks */
 /*
  * Onboard
  *
  * A script to handle the onboarding process.
  *
- * Dependencies: progress-planner/ajax-request, progress-planner/scan-posts, progress-planner/upgrade-tasks
+ * Dependencies: progress-planner/ajax-request, progress-planner/upgrade-tasks
  */
 
 /**
@@ -49,14 +49,11 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 			// Make a local request to save the response data.
 			progressPlannerSaveLicenseKey( response.license_key );
 
-			// Start scanning posts.
-			const scanPromise = progressPlannerTriggerScan();
-
 			// Start the tasks.
 			const tasksPromise = prplOnboardTasks();
 
 			// Wait for all promises to resolve.
-			Promise.all( [ scanPromise, tasksPromise ] ).then( () => {
+			Promise.all( [ tasksPromise ] ).then( () => {
 				// All promises resolved, enable the continue button.
 				document
 					.getElementById( 'prpl-onboarding-continue-button' )

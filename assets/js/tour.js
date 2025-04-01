@@ -17,15 +17,6 @@ const prplDriverObj = prplDriver( {
 	doneBtnText: prplL10n( 'doneBtnText' ),
 	steps: progressPlannerTour.steps,
 	onDestroyStarted: () => {
-		if ( ! prplDriverObj.hasNextStep() ) {
-			const scanFinishedNotice = document.getElementById(
-				'prpl-content-scan-finished-notice'
-			);
-			if ( scanFinishedNotice ) {
-				scanFinishedNotice.remove();
-			}
-		}
-
 		// Remove tour_step from URL when tour is destroyed.
 		const newUrl = new URL( window.location );
 		newUrl.searchParams.delete( 'tour_step' );
@@ -118,20 +109,18 @@ function prplStartTour() {
 			: 0 // Start from beginning.
 	);
 
-	// Remove `content-scan-finished=true` from the URL, without refreshing the page.
+	// Remove `delay-tour=true` from the URL, without refreshing the page.
 	window.history.replaceState(
 		{},
 		document.title,
 		window.location.href
-			.replace( '&content-scan-finished=true', '' )
-			.replace( 'content-scan-finished=true', '' )
 			.replace( '&delay-tour=true', '' )
 			.replace( 'delay-tour=true', '' )
 	);
 }
 
 // Start the tour if the URL contains the query parameter.
-if ( window.location.href.includes( 'content-scan-finished=true' ) ) {
+if ( window.location.href.includes( 'show-tour=true' ) ) {
 	// If there are pending celebration tasks, delay the tour until celebration is done.
 	const delay = window.location.href.includes( 'delay-tour=true' ) ? 5000 : 0;
 
