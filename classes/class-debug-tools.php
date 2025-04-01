@@ -306,9 +306,9 @@ class Debug_Tools {
 	 * @return void
 	 */
 	protected function add_toggle_migrations_submenu_item( $admin_bar ) {
-		$debug_enabled = \get_option( 'prpl_debug', false );
-		$title = $debug_enabled ? 'Upgrade Migrations Enabled' : 'Upgrade Migrations Disabled';
-		$href = add_query_arg( 'prpl_toggle_migrations', '1', $this->current_url );
+		$debug_enabled = \get_option( 'prpl_debug_migrations', false );
+		$title         = $debug_enabled ? '<span style="color: green;">Upgrade Migrations Enabled</span>' : '<span style="color: red;">Upgrade Migrations Disabled</span>';
+		$href          = add_query_arg( 'prpl_toggle_migrations', '1', $this->current_url );
 
 		$admin_bar->add_node(
 			[
@@ -341,11 +341,11 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Toggle the debug option.
-		$current_value = \get_option( 'prpl_debug', false );
+		$current_value = \get_option( 'prpl_debug_migrations', false );
 		if ( $current_value ) {
-			\delete_option( 'prpl_debug' );
+			\delete_option( 'prpl_debug_migrations' );
 		} else {
-			\update_option( 'prpl_debug', true );
+			\update_option( 'prpl_debug_migrations', true );
 		}
 
 		// Redirect to the same page without the parameter.
