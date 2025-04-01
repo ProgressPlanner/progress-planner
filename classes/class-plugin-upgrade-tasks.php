@@ -123,7 +123,7 @@ class Plugin_Upgrade_Tasks {
 	 * @return bool
 	 */
 	public function should_show_upgrade_popover() {
-		return $this->is_on_progress_planner_page() && ! empty( $this->get_upgrade_popover_task_provider_ids() );
+		return \progress_planner()->is_on_progress_planner_dashboard_page() && ! empty( $this->get_upgrade_popover_task_provider_ids() );
 	}
 
 	/**
@@ -142,15 +142,5 @@ class Plugin_Upgrade_Tasks {
 	 */
 	public function delete_upgrade_popover_task_providers() {
 		\delete_option( 'progress_planner_upgrade_popover_task_provider_ids' );
-	}
-
-	/**
-	 * Check if we're on the Progress Planner page.
-	 *
-	 * @return bool
-	 */
-	protected function is_on_progress_planner_page() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- We're not processing any data.
-		return \is_admin() && isset( $_GET['page'] ) && $_GET['page'] === 'progress-planner';
 	}
 }

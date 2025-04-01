@@ -22,7 +22,14 @@ class Slack_Notification {
 		$access_token = get_option( 'slack_access_token' );
 		$channel      = get_option( 'slack_channel' );
 
-		if ( empty( $access_token ) || empty( $channel ) ) {
+		$request_body = wp_json_encode(
+			[
+				'channel' => $channel,
+				'text'    => $message,
+			]
+		);
+
+		if ( empty( $access_token ) || empty( $channel ) || empty( $request_body ) ) {
 			return false;
 		}
 
@@ -43,12 +50,7 @@ class Slack_Notification {
 					'Authorization' => 'Bearer ' . $access_token,
 					'Content-Type'  => 'application/json',
 				],
-				'body'    => wp_json_encode(
-					[
-						'channel' => $channel,
-						'text'    => $message,
-					]
-				),
+				'body'    => $request_body,
 			]
 		);
 

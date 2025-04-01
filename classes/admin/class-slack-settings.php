@@ -66,6 +66,8 @@ class Slack_Settings {
 
 	/**
 	 * Handle the OAuth callback from Slack.
+	 *
+	 * @return void
 	 */
 	public function handle_oauth_callback() {
 		if ( ! isset( $_GET['slack_token'] ) ) {
@@ -81,6 +83,8 @@ class Slack_Settings {
 
 	/**
 	 * Handle disconnecting from Slack.
+	 *
+	 * @return void
 	 */
 	public function handle_disconnect() {
 		if ( ! isset( $_GET['slack_disconnect'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -96,6 +100,8 @@ class Slack_Settings {
 
 	/**
 	 * Render the Slack settings page.
+	 *
+	 * @return void
 	 */
 	public function render_page() {
 		$access_token     = get_option( 'slack_access_token' );
@@ -217,6 +223,8 @@ class Slack_Settings {
 
 	/**
 	 * Register settings.
+	 *
+	 * @return void
 	 */
 	public function register_settings() {
 		\register_setting(
@@ -253,6 +261,8 @@ class Slack_Settings {
 	 * Enqueue scripts and styles.Fv
 	 *
 	 * @param string $hook The current admin page.
+	 *
+	 * @return void
 	 */
 	public function enqueue_scripts( $hook ) {
 		if ( 'progress-planner_page_progress-planner-slack' !== $hook ) {
@@ -286,6 +296,8 @@ class Slack_Settings {
 
 	/**
 	 * Handle test message AJAX request.
+	 *
+	 * @return void
 	 */
 	public function handle_test_message() {
 		\check_ajax_referer( 'progress_planner_slack', 'nonce' );

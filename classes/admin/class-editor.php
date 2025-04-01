@@ -48,34 +48,18 @@ class Editor {
 			$prpl_preselected_page_type = \progress_planner()->get_page_types()->get_default_page_type( (string) \get_post_type(), (int) \get_the_ID() );
 		}
 
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'editor' );
-
-		\wp_localize_script(
-			'progress-planner/editor',
-			'progressPlannerEditor',
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'editor',
 			[
-				'lessons'         => \progress_planner()->get_lessons()->get_items(),
-				'pageTypes'       => $page_types,
-				'defaultPageType' => $prpl_preselected_page_type,
-				'i18n'            => [
-					'pageType'                     => \esc_html__( 'Page type', 'progress-planner' ),
-					'progressPlannerSidebar'       => \esc_html__( 'Progress Planner Sidebar', 'progress-planner' ),
-					'progressPlanner'              => \esc_html__( 'Progress Planner', 'progress-planner' ),
-					'watchVideo'                   => \esc_html__( 'Watch video', 'progress-planner' ),
-					'video'                        => \esc_html__( 'Video', 'progress-planner' ),
-					'checklistProgressDescription' => sprintf(
-						/* translators: %s: the checkmark icon. */
-						\esc_html__( 'Check off all required elements %s in the element checks below', 'progress-planner' ),
-						'<span style="background-color:#14b8a6;padding:0.35em;margin:0 0.25em;border-radius:50%;display:inline-block;"></span>'
-					),
+				'name' => 'progressPlannerEditor',
+				'data' => [
+					'lessons'         => \progress_planner()->get_lessons()->get_items(),
+					'pageTypes'       => $page_types,
+					'defaultPageType' => $prpl_preselected_page_type,
 				],
 			]
 		);
-		\wp_enqueue_style(
-			'progress-planner-editor',
-			\plugins_url( '/assets/css/editor.css', PROGRESS_PLANNER_FILE ),
-			[],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/editor.css' )
-		);
+
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/editor' );
 	}
 }

@@ -3,6 +3,13 @@
 [![PHPStan](https://github.com/ProgressPlanner/progress-planner/actions/workflows/phpstan.yml/badge.svg)](https://github.com/ProgressPlanner/progress-planner/actions/workflows/phpstan.yml)
 [![Lint](https://github.com/ProgressPlanner/progress-planner/actions/workflows/lint.yml/badge.svg)](https://github.com/ProgressPlanner/progress-planner/actions/workflows/lint.yml)
 
+[![WordPress Plugin Version](https://img.shields.io/wordpress/plugin/v/progress-planner.svg)](https://wordpress.org/plugins/progress-planner/)
+![WordPress Plugin: Tested WP Version](https://img.shields.io/wordpress/plugin/tested/progress-planner.svg)
+[![WordPress Plugin Active Installs](https://img.shields.io/wordpress/plugin/installs/progress-planner.svg)](https://wordpress.org/plugins/progress-planner/advanced/)
+[![WordPress Plugin Downloads](https://img.shields.io/wordpress/plugin/dt/progress-planner.svg)](https://wordpress.org/plugins/progress-planner/advanced/)
+[![WordPress Plugin Rating](https://img.shields.io/wordpress/plugin/stars/progress-planner.svg)](https://wordpress.org/support/plugin/progress-planner/reviews/)
+[![GitHub](https://img.shields.io/github/license/ProgressPlanner/progress-planner.svg)](https://github.com/ProgressPlanner/progress-planner/blob/main/LICENSE)
+
 [![Try Progress Planner on the WordPress playground](https://img.shields.io/badge/Try%20Progress%20Planner%20on%20the%20WordPress%20Playground-%23117AC9.svg?style=for-the-badge&logo=WordPress&logoColor=ddd)](https://playground.wordpress.net/#{"landingPage":"/wp-admin/admin.php?page=progress-planner","features":{"networking":true},"login":true,"plugins":["https://github-proxy.com/proxy/?repo=ProgressPlanner/progress-planner"],"steps":[{"step":"defineWpConfigConsts","consts":{"IS_PLAYGROUND_PREVIEW":true}}]})
 
 # Progress Planner

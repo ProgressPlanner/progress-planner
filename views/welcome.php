@@ -16,29 +16,10 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 	return;
 }
 
-// Enqueue welcome styles.
-\wp_enqueue_style(
-	'progress-planner-welcome',
-	PROGRESS_PLANNER_URL . '/assets/css/welcome.css',
-	[],
-	\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/welcome.css' )
-);
-
-// Enqueue onboarding styles.
-\wp_enqueue_style(
-	'progress-planner-onboard',
-	PROGRESS_PLANNER_URL . '/assets/css/onboard.css',
-	[],
-	\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/onboard.css' )
-);
-
-// Enqueue upgrade styles.
-\wp_enqueue_style(
-	'progress-planner-upgrade-tasks',
-	PROGRESS_PLANNER_URL . '/assets/css/upgrade-tasks.css',
-	[],
-	\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/upgrade-tasks.css' )
-);
+// Enqueue styles.
+\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/welcome' );
+\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/onboard' );
+\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
 
 
 ?>
