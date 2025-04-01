@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
+
 /**
  * Add tasks for Core blogdescription.
  */
@@ -17,21 +19,24 @@ class Blog_Description extends One_Time {
 	 *
 	 * @var string
 	 */
-	const ID = 'core-blogdescription';
+	protected const PROVIDER_ID = 'core-blogdescription';
 
 	/**
-	 * The provider type.
-	 *
-	 * @var string
+	 * Constructor.
 	 */
-	const TYPE = 'configuration';
-
-	/**
-	 * Whether the task is an onboarding task.
-	 *
-	 * @var bool
-	 */
-	protected $is_onboarding_task = true;
+	public function __construct() {
+		$this->url         = \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() );
+		$this->title       = \esc_html__( 'Set tagline', 'progress-planner' );
+		$this->description = sprintf(
+			/* translators: %s:<a href="https://prpl.fyi/set-tagline" target="_blank">tagline</a> link */
+			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/set-tagline" target="_blank">' . \esc_html__( 'tagline', 'progress-planner' ) . '</a>'
+		);
+		$this->link_setting = [
+			'hook'   => 'options-general.php',
+			'iconEl' => 'th:has(+td #tagline-description)',
+		];
+	}
 
 	/**
 	 * Check if the task should be added.
@@ -40,38 +45,5 @@ class Blog_Description extends One_Time {
 	 */
 	public function should_add_task() {
 		return '' === \get_bloginfo( 'description' );
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-
-		if ( ! $task_id ) {
-			$task_id = $this->get_provider_id();
-		}
-
-		return [
-			'task_id'      => $task_id,
-			'title'        => \esc_html__( 'Set tagline', 'progress-planner' ),
-			'parent'       => 0,
-			'priority'     => 'high',
-			'type'         => $this->get_provider_type(),
-			'points'       => 1,
-			'url'          => $this->capability_required() ? \esc_url( \admin_url( 'options-general.php?pp-focus-el=' . $task_id ) ) : '',
-			'description'  => '<p>' . sprintf(
-				/* translators: %s:<a href="https://prpl.fyi/set-tagline" target="_blank">tagline</a> link */
-				\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
-				'<a href="https://prpl.fyi/set-tagline" target="_blank">' . \esc_html__( 'tagline', 'progress-planner' ) . '</a>'
-			) . '</p>',
-			'link_setting' => [
-				'hook'   => 'options-general.php',
-				'iconEl' => 'th:has(+td #tagline-description)',
-			],
-		];
 	}
 }

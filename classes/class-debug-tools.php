@@ -18,6 +18,14 @@ namespace Progress_Planner;
  * Only accessible to users with 'manage_options' capability.
  */
 class Debug_Tools {
+
+	/**
+	 * Current URL.
+	 *
+	 * @var string
+	 */
+	protected $current_url;
+
 	/**
 	 * Constructor.
 	 *
@@ -25,14 +33,21 @@ class Debug_Tools {
 	 * and various debugging functions.
 	 */
 	public function __construct() {
-		add_action( 'admin_bar_menu', [ $this, 'add_toolbar_items' ], 100 );
-		add_action( 'init', [ $this, 'check_clear_cache' ] );
-		add_action( 'init', [ $this, 'check_delete_suggested_tasks' ] );
-		add_action( 'init', [ $this, 'check_delete_local_tasks' ] );
-		add_action( 'init', [ $this, 'check_delete_licenses' ] );
+		if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
+			return;
+		}
+
+		$this->current_url = wp_nonce_url( esc_url_raw( \wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'prpl_debug_tools' );
+
+		\add_action( 'admin_bar_menu', [ $this, 'add_toolbar_items' ], 100 );
+		\add_action( 'init', [ $this, 'check_clear_cache' ] );
+		\add_action( 'init', [ $this, 'check_delete_pending_tasks' ] );
+		\add_action( 'init', [ $this, 'check_delete_suggested_tasks' ] );
+		\add_action( 'init', [ $this, 'check_delete_licenses' ] );
+		\add_action( 'init', [ $this, 'check_delete_badges' ] );
 
 		// Add filter to modify the maximum number of suggested tasks to display.
-		add_filter( 'progress_planner_suggested_tasks_max_items_per_type', [ $this, 'check_show_all_suggested_tasks' ] );
+		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_suggested_tasks' ] );
 	}
 
 	/**
@@ -46,12 +61,6 @@ class Debug_Tools {
 			return;
 		}
 
-		if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
-			return;
-		}
-
-		$current_url = wp_nonce_url( esc_url_raw( \wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'prpl_debug_tools' );
-
 		// Add top level menu item.
 		$admin_bar->add_node(
 			[
@@ -60,45 +69,7 @@ class Debug_Tools {
 			]
 		);
 
-		// Add submenu item.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-clear-cache',
-				'parent' => 'prpl-debug',
-				'title'  => 'Delete Cache',
-				'href'   => add_query_arg( 'prpl_clear_cache', '1', $current_url ),
-			]
-		);
-
-		// Add Delete Local Tasks submenu item.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-delete-local-tasks',
-				'parent' => 'prpl-debug',
-				'title'  => 'Delete Local Tasks',
-				'href'   => add_query_arg( 'prpl_delete_local_tasks', '1', $current_url ),
-			]
-		);
-
-		// Add Delete Suggested Tasks submenu item.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-delete-suggested-tasks',
-				'parent' => 'prpl-debug',
-				'title'  => 'Delete Suggested Tasks',
-				'href'   => add_query_arg( 'prpl_delete_suggested_tasks', '1', $current_url ),
-			]
-		);
-
-		// Add Delete License submenu item.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-delete-licenses',
-				'parent' => 'prpl-debug',
-				'title'  => 'Delete Licenses',
-				'href'   => add_query_arg( 'prpl_delete_licenses', '1', $current_url ),
-			]
-		);
+		$this->add_delete_submenu_item( $admin_bar );
 
 		// Show all suggested tasks.
 		$admin_bar->add_node(
@@ -106,86 +77,126 @@ class Debug_Tools {
 				'id'     => 'prpl-show-all-suggested-tasks',
 				'parent' => 'prpl-debug',
 				'title'  => 'Show All Suggested Tasks',
-				'href'   => add_query_arg( 'prpl_show_all_suggested_tasks', '99', $current_url ),
+				'href'   => add_query_arg( 'prpl_show_all_suggested_tasks', '99', $this->current_url ),
 			]
 		);
 
-		$this->add_local_tasks_submenu_item( $admin_bar );
-		$this->add_suggestions_submenu_item( $admin_bar );
+		$this->add_upgrading_tasks_submenu_item( $admin_bar );
+
+		$this->add_suggested_tasks_submenu_item( $admin_bar );
+
+		$this->add_activities_submenu_item( $admin_bar );
 
 		$this->add_more_info_submenu_item( $admin_bar );
 	}
 
 	/**
-	 * Add Local Tasks submenu to the debug menu.
-	 *
-	 * Displays a list of local tasks or a message if none exist.
+	 * Add delete submenu item.
 	 *
 	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
 	 * @return void
 	 */
-	public function add_local_tasks_submenu_item( $admin_bar ) {
-		// Add Local Tasks submenu item.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-local-tasks',
-				'parent' => 'prpl-debug',
-				'title'  => 'Local Tasks',
-			]
-		);
+	protected function add_delete_submenu_item( $admin_bar ) {
 
-		// Get and display local tasks.
-		$local_tasks = get_option( 'progress_planner_local_tasks', [] );
-		if ( ! empty( $local_tasks ) ) {
-			foreach ( $local_tasks as $key => $task ) {
-				$admin_bar->add_node(
-					[
-						'id'     => 'prpl-local-task-' . $key,
-						'parent' => 'prpl-local-tasks',
-						'title'  => $task,
-						'href'   => '#',
-					]
-				);
-			}
-		} else {
-			$admin_bar->add_node(
-				[
-					'id'     => 'prpl-no-local-tasks',
-					'parent' => 'prpl-local-tasks',
-					'title'  => 'No local tasks found',
-					'href'   => '#',
-				]
-			);
-		}
-	}
-
-	/**
-	 * Check and process the delete local tasks action.
-	 *
-	 * Deletes all local tasks if the appropriate query parameter is set
-	 * and user has required capabilities.
-	 *
-	 * @return void
-	 */
-	public function check_delete_local_tasks() {
-
-		if (
-			! isset( $_GET['prpl_delete_local_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$_GET['prpl_delete_local_tasks'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! current_user_can( 'manage_options' )
-		) {
+		if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
 			return;
 		}
 
-		// Verify nonce for security.
-		$this->verify_nonce();
+		// Add delete submenu item.
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-debug-delete',
+				'parent' => 'prpl-debug',
+				'title'  => 'Delete',
+			]
+		);
 
-		// Delete the option.
-		delete_option( 'progress_planner_local_tasks' );
+		// Add submenu item.
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-clear-cache',
+				'parent' => 'prpl-debug-delete',
+				'title'  => 'Delete Cache',
+				'href'   => add_query_arg( 'prpl_clear_cache', '1', $this->current_url ),
+			]
+		);
 
-		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( 'prpl_delete_local_tasks' ) );
-		exit;
+		// Add Delete Pending Tasks submenu item.
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-delete-pending-tasks',
+				'parent' => 'prpl-debug-delete',
+				'title'  => 'Delete Pending Tasks',
+				'href'   => add_query_arg( 'prpl_delete_pending_tasks', '1', $this->current_url ),
+			]
+		);
+
+		// Add Delete Suggested Tasks submenu item.
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-delete-suggested-tasks',
+				'parent' => 'prpl-debug-delete',
+				'title'  => 'Delete Suggested Tasks',
+				'href'   => add_query_arg( 'prpl_delete_suggested_tasks', '1', $this->current_url ),
+			]
+		);
+
+		// Add Delete License submenu item.
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-delete-licenses',
+				'parent' => 'prpl-debug-delete',
+				'title'  => 'Delete Licenses',
+				'href'   => add_query_arg( 'prpl_delete_licenses', '1', $this->current_url ),
+			]
+		);
+
+		// Add Delete License submenu item.
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-delete-badges',
+				'parent' => 'prpl-debug-delete',
+				'title'  => 'Delete Badges',
+				'href'   => add_query_arg( 'prpl_delete_badges', '1', $this->current_url ),
+			]
+		);
+	}
+
+	/**
+	 * Add Upgrading Tasks submenu to the debug menu.
+	 *
+	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
+	 * @return void
+	 */
+	protected function add_upgrading_tasks_submenu_item( $admin_bar ) {
+
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-upgrading-tasks',
+				'parent' => 'prpl-debug',
+				'title'  => 'Onboarding / Upgrade Tasks',
+			]
+		);
+
+		$onboard_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', [] );
+
+		foreach ( $onboard_task_provider_ids as $task_provider_id ) {
+			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
+			if ( $task_provider ) { // @phpstan-ignore-line
+				$task_provider_details = $task_provider->get_task_details();
+				if ( empty( $task_provider_details ) ) {
+					continue;
+				}
+
+				$admin_bar->add_node(
+					[
+						'id'     => 'prpl-upgrading-task-' . $task_provider_id,
+						'parent' => 'prpl-upgrading-tasks',
+						'title'  => $task_provider_details['title'],
+					]
+				);
+			}
+		}
 	}
 
 	/**
@@ -196,7 +207,7 @@ class Debug_Tools {
 	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
 	 * @return void
 	 */
-	public function add_suggestions_submenu_item( $admin_bar ) {
+	protected function add_suggested_tasks_submenu_item( $admin_bar ) {
 		// Add Suggested Tasks submenu item.
 		$admin_bar->add_node(
 			[
@@ -208,9 +219,10 @@ class Debug_Tools {
 		);
 
 		// Get suggested tasks.
-		$suggested_tasks = get_option( 'progress_planner_suggested_tasks', [] );
+		$suggested_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 
 		$menu_items = [
+			'pending'             => 'Pending',
 			'completed'           => 'Completed',
 			'snoozed'             => 'Snoozed',
 			'pending_celebration' => 'Pending Celebration',
@@ -225,30 +237,22 @@ class Debug_Tools {
 				]
 			);
 
-			if ( ! empty( $suggested_tasks[ $key ] ) ) {
-				foreach ( $suggested_tasks[ $key ] as $task_key => $task_id ) {
-
-					if ( 'snoozed' === $key ) {
-						$until = is_float( $task_id['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task_id['time'] ) . ')';
-						$title = $task_id['id'] . ' ' . $until;
-					} else {
-						$title = $task_id;
-					}
-
-					$admin_bar->add_node(
-						[
-							'id'     => 'prpl-suggested-' . $key . '-' . $title,
-							'parent' => 'prpl-suggested-' . $key,
-							'title'  => $title,
-						]
-					);
+			foreach ( $suggested_tasks as $task ) {
+				if ( ! isset( $task['task_id'] ) || $key !== $task['status'] ) {
+					continue;
 				}
-			} else {
+
+				$title = $task['task_id'];
+				if ( isset( $task['status'] ) && 'snoozed' === $task['status'] && isset( $task['time'] ) ) {
+					$until  = is_float( $task['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['time'] ) . ')';
+					$title .= ' ' . $until;
+				}
+
 				$admin_bar->add_node(
 					[
-						'id'     => 'prpl-no-' . $key . '-tasks',
+						'id'     => 'prpl-suggested-' . $key . '-' . $title,
 						'parent' => 'prpl-suggested-' . $key,
-						'title'  => 'No ' . $title . ' tasks',
+						'title'  => $title,
 					]
 				);
 			}
@@ -256,26 +260,137 @@ class Debug_Tools {
 	}
 
 	/**
+	 * Add Activities submenu to the debug menu.
+	 *
+	 * Displays lists of completed, snoozed, and pending celebration tasks.
+	 *
+	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
+	 * @return void
+	 */
+	protected function add_activities_submenu_item( $admin_bar ) {
+		// Add Suggested Tasks submenu item.
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-activities',
+				'parent' => 'prpl-debug',
+				'title'  => 'Activities',
+				'href'   => '#',
+			]
+		);
+
+		// Get suggested tasks.
+		$activities = \progress_planner()->get_query()->query_activities(
+			[
+				'category' => 'suggested_task',
+			]
+		);
+
+		foreach ( $activities as $activity ) {
+			$admin_bar->add_node(
+				[
+					'id'     => 'prpl-activity-' . $activity->id,
+					'parent' => 'prpl-activities',
+					'title'  => $activity->data_id . ' - ' . $activity->category,
+				]
+			);
+		}
+	}
+
+	/**
+	 * Check and process the delete local tasks action.
+	 *
+	 * Deletes all local tasks if the appropriate query parameter is set
+	 * and user has required capabilities.
+	 *
+	 * @return void
+	 */
+	public function check_delete_pending_tasks() {
+
+		if (
+			! isset( $_GET['prpl_delete_pending_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$_GET['prpl_delete_pending_tasks'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			! current_user_can( 'manage_options' )
+		) {
+			return;
+		}
+
+		// Verify nonce for security.
+		$this->verify_nonce();
+
+		// Get all local tasks.
+		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+
+		// Filter out pending tasks.
+		$local_tasks = array_filter(
+			$local_tasks,
+			function ( $task ) {
+				return 'pending' !== $task['status'];
+			}
+		);
+
+		// Update the local tasks.
+		\progress_planner()->get_settings()->set( 'local_tasks', array_values( $local_tasks ) );
+
+		// Redirect to the same page without the parameter.
+		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_pending_tasks', '_wpnonce' ] ) );
+		exit;
+	}
+
+	/**
+	 * Check and process the delete badges action.
+	 *
+	 * Deletes all badges and related activities if the appropriate query parameter is set
+	 * and user has required capabilities.
+	 *
+	 * @return void
+	 */
+	public function check_delete_badges() {
+
+		if (
+			! isset( $_GET['prpl_delete_badges'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$_GET['prpl_delete_badges'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			! current_user_can( 'manage_options' )
+		) {
+			return;
+		}
+
+		// Verify nonce for security.
+		$this->verify_nonce();
+
+		// Delete activities.
+		\progress_planner()->get_query()->delete_category_activities( 'suggested_task' );
+
+		// Delete the badges.
+		$progress_planner_settings           = \get_option( \Progress_Planner\Settings::OPTION_NAME, [] );
+		$progress_planner_settings['badges'] = [];
+		\update_option( \Progress_Planner\Settings::OPTION_NAME, $progress_planner_settings );
+
+		// Redirect to the same page without the parameter.
+		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_badges', '_wpnonce' ] ) );
+		exit;
+	}
+
+	/**
 	 * Modify the maximum number of suggested tasks to display.
 	 *
-	 * @param array $max_items_per_type Array of maximum items per task type.
-	 * @return array Modified array of maximum items per task type.
+	 * @param array $max_items_per_category Array of maximum items per category.
+	 * @return array Modified array of maximum items per category.
 	 */
-	public function check_show_all_suggested_tasks( $max_items_per_type ) {
+	public function check_show_all_suggested_tasks( $max_items_per_category ) {
 		if (
 			! isset( $_GET['prpl_show_all_suggested_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			! current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		) {
-			return $max_items_per_type;
+			return $max_items_per_category;
 		}
 
 		$max_items = \absint( \wp_unslash( $_GET['prpl_show_all_suggested_tasks'] ) );  // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
-		foreach ( $max_items_per_type as $key => $value ) {
-			$max_items_per_type[ $key ] = $max_items;
+		foreach ( $max_items_per_category as $key => $value ) {
+			$max_items_per_category[ $key ] = $max_items;
 		}
 
-		return $max_items_per_type;
+		return $max_items_per_category;
 	}
 
 	/**
@@ -286,7 +401,7 @@ class Debug_Tools {
 	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
 	 * @return void
 	 */
-	public function add_more_info_submenu_item( $admin_bar ) {
+	protected function add_more_info_submenu_item( $admin_bar ) {
 		// Add More Info submenu item.
 		$admin_bar->add_node(
 			[
@@ -358,10 +473,10 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the option.
-		delete_option( 'progress_planner_suggested_tasks' );
+		\progress_planner()->get_settings()->set( 'local_tasks', [] );
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( 'prpl_delete_suggested_tasks' ) );
+		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_suggested_tasks', '_wpnonce' ] ) );
 		exit;
 	}
 
@@ -390,7 +505,7 @@ class Debug_Tools {
 		\progress_planner()->get_cache()->delete_all();
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( 'prpl_clear_cache' ) );
+		wp_safe_redirect( remove_query_arg( [ 'prpl_clear_cache', '_wpnonce' ] ) );
 		exit;
 	}
 
@@ -420,7 +535,7 @@ class Debug_Tools {
 		delete_option( 'progress_planner_pro_license_status' );
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( 'prpl_delete_licenses' ) );
+		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_licenses', '_wpnonce' ] ) );
 		exit;
 	}
 

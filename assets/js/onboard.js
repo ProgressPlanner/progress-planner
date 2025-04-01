@@ -4,7 +4,7 @@
  *
  * A script to handle the onboarding process.
  *
- * Dependencies: progress-planner-ajax-request, progress-planner-scan-posts, progress-planner-upgrade-tasks
+ * Dependencies: progress-planner/ajax-request, progress-planner/scan-posts, progress-planner/upgrade-tasks
  */
 
 /**
@@ -13,7 +13,6 @@
  * @param {string} licenseKey The license key.
  */
 const progressPlannerSaveLicenseKey = ( licenseKey ) => {
-	// eslint-disable-next-line no-console
 	console.log( 'License key: ' + licenseKey );
 	progressPlannerAjaxRequest( {
 		url: progressPlanner.ajaxUrl,
@@ -34,7 +33,8 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 	progressPlannerAjaxRequest( {
 		url: progressPlanner.onboardAPIUrl,
 		data,
-		successAction: ( response ) => {
+	} )
+		.then( ( response ) => {
 			// Show success message.
 			document.getElementById(
 				'no-license' === response.license_key
@@ -50,16 +50,22 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 			progressPlannerSaveLicenseKey( response.license_key );
 
 			// Start scanning posts.
-			progressPlannerTriggerScan();
+			const scanPromise = progressPlannerTriggerScan();
 
 			// Start the tasks.
-			prplOnboardTasks();
-		},
-		failAction: ( response ) => {
-			// eslint-disable-next-line no-console
-			console.warn( response );
-		},
-	} );
+			const tasksPromise = prplOnboardTasks();
+
+			// Wait for all promises to resolve.
+			Promise.all( [ scanPromise, tasksPromise ] ).then( () => {
+				// All promises resolved, enable the continue button.
+				document
+					.getElementById( 'prpl-onboarding-continue-button' )
+					.classList.remove( 'prpl-disabled' );
+			} );
+		} )
+		.catch( ( error ) => {
+			console.warn( error );
+		} );
 };
 
 /**
@@ -74,15 +80,14 @@ const progressPlannerOnboardCall = ( data ) => {
 	progressPlannerAjaxRequest( {
 		url: progressPlanner.onboardNonceURL,
 		data,
-		successAction: ( response ) => {
-			if ( 'ok' === response.status ) {
-				// Add the nonce to our data object.
-				data.nonce = response.nonce;
+	} ).then( ( response ) => {
+		if ( 'ok' === response.status ) {
+			// Add the nonce to our data object.
+			data.nonce = response.nonce;
 
-				// Make the request to the API.
-				progressPlannerAjaxAPIRequest( data );
-			}
-		},
+			// Make the request to the API.
+			progressPlannerAjaxAPIRequest( data );
+		}
 	} );
 };
 

@@ -157,22 +157,15 @@ class Rest_API_Stats {
 		// Timezone offset.
 		$data['timezone_offset'] = \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600;
 
-		$todo_items         = \progress_planner()->get_todo()->get_items();
-		$pending_todo_items = [];
-		foreach ( $todo_items as $item ) {
-			if ( ! $item['done'] ) {
-				$pending_todo_items[] = $item['content'];
-			}
-		}
-		$data['todo'] = $pending_todo_items;
-
-		$ravis_recommendations   = \progress_planner()->get_suggested_tasks()->get_tasks();
+		// Pending tasks include remote tasks.
+		$ravis_recommendations   = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
 		$data['recommendations'] = [];
 		foreach ( $ravis_recommendations as $recommendation ) {
 			$data['recommendations'][] = [
-				'id'    => $recommendation['task_id'],
-				'title' => $recommendation['title'],
-				'url'   => isset( $recommendation['url'] ) ? $recommendation['url'] : '',
+				'id'          => $recommendation['task_id'],
+				'title'       => $recommendation['title'],
+				'url'         => isset( $recommendation['url'] ) ? $recommendation['url'] : '',
+				'provider_id' => $recommendation['provider_id'],
 			];
 		}
 

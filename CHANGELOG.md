@@ -1,17 +1,60 @@
-= 1.0.5 =
+= 1.1.1 =
+
+Bugs we fixed:
+
+* Fixed unnecessary display of the upgrade popover.
+* Fixed saving license key from 'Subscribe to weekly' emails popover.
+* Reduced number of database queries when checking for user activity scores.
+* Fixed database queries when getting activities by type.
+
+Enhancements:
+
+* Simplified the Dashboard widget.
+* Styling improvements.
+* Improved some translation strings.
+* Improved suggestions for writing new posts.
+* UI improvements in the plugin settings page.
+* TODO tasks can now award 1 point per week, counting toward the monthly badges.
 
 Under the hood:
 
-* Improved suggested tasks completion conditions.
-* Improved checks for suggested 'review post' tasks.
+* Completely refactored the TODOs system.
+* Refactored the suggested-tasks system.
+* Refactored our AJAX calls.
+* Performance & caching improvements.
+* Refactored popovers implementation.
+* Added implementation to migrate plugin data on updates.
+* Improved debugging suite.
+* Added new hooks for integration with 3rd-party plugins.
+* Added a data collector system for tasks providers.
+* Refactored the way tasks are saved in the database for consistency.
+* Improved `one_time` and `repetitive` task type abstractions.
+* Refactored the celebrations system.
 
-We've added the following Recommendations from Ravi:
+= 1.1.0 =
 
-* [Setting the permalink structure](TBD).
-* [Update PHP version](TBD).
-* [Disable comments on your site](TBD).
-* [Remove inactive plugins](TBD).
-* [Search engine visibility](TBD).
+In this release, we've added more recommendations from Ravi on how to improve your site. We've also made these recommendations more visible on your WordPress
+settings pages, by showing on settings pages exactly which things we think you should change. Also, if you're just now starting to use Progress Planner,
+we've made the onboarding experience a lot more fun: we show you immediately which of Ravi's recommended tasks you've already completed and we give
+you points for those!
+
+Added these recommendations from Ravi:
+
+* Properly set your [permalink structure](https://progressplanner.com/recommendations/change-default-permalink-structure/).
+* Fix it if your site is [set to not be shown in search engines](https://progressplanner.com/recommendations/blog-indexing-settings/).
+* Rename and change the slug of your [Uncategorized category](https://progressplanner.com/recommendations/rename-uncategorized-category/).
+* Remove [inactive plugins](https://progressplanner.com/recommendations/remove-inactive-plugins/).
+* [Upgrade your PHP version](https://progressplanner.com/recommendations/update-php-version/) if needed.
+* [Fully disable comments](https://progressplanner.com/recommendations/disable-comments/) if they're not needed on your site.
+
+Bugs we fixed:
+
+* If you had `WP_DEBUG` set to false, the plugin would still tell you to disable `WP_DEBUG_DISPLAY`. We think Ravi was a bit overzealous in his recommendation, so we've fixed that.
+
+Under the hood:
+
+* We've added our set of debug tools straight into the plugin. If you define `PRPL_DEBUG` as `true` in your `wp-config.php` file, you'll get a PRPL Debug admin bar menu item.
+* Improved suggested tasks completion conditions so they don't trigger at the wrong moment.
 
 = 1.0.4 =
 

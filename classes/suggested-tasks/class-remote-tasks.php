@@ -20,9 +20,11 @@ class Remote_Tasks {
 	const CACHE_KEY = 'suggested_tasks_remote';
 
 	/**
-	 * Constructor.
+	 * Initialize the remote tasks.
+	 *
+	 * @return void
 	 */
-	public function __construct() {
+	public function init() {
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
 	}
 
@@ -42,14 +44,11 @@ class Remote_Tasks {
 			}
 
 			// If the task with this id is completed, don't add a task.
-			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( "remote-task-{$item['task_id']}" ) ) {
+			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( "{$item['task_id']}" ) ) {
 				continue;
 			}
 
-			// TODO: Maybe skip task which don't have type defined (to not allow wrongly defined 3rd party tasks to override default type).
-			$item['type']    = 'remote-' . ( isset( $item['type'] ) ? $item['type'] : 'default' );
-			$item['task_id'] = "remote-task-{$item['task_id']}";
-			$items[]         = $item;
+			$items[] = $item;
 		}
 
 		return \array_merge( $items, $tasks );
@@ -85,7 +84,20 @@ class Remote_Tasks {
 					$valid_tasks = [];
 					foreach ( $tasks as $task ) {
 						if ( isset( $task['task_id'] ) ) {
-							$valid_tasks[] = $task;
+
+							$valid_tasks[] = [
+								'task_id'     => str_starts_with( $task['task_id'], 'remote-task-' ) ? $task['task_id'] : "remote-task-{$task['task_id']}",
+								'provider_id' => 'remote-' . ( isset( $task['category'] ) ? $task['category'] : 'default' ),
+								'category'    => 'remote-' . ( isset( $task['category'] ) ? $task['category'] : 'default' ),
+								'title'       => $task['title'] ?? '',
+								'description' => $task['description'] ?? '',
+								'priority'    => $task['priority'] ?? 'medium',
+								'points'      => $task['points'] ?? 1,
+								'url'         => $task['url'] ?? '',
+								'dismissable' => $task['dismissable'] ?? true,
+								'type'        => $task['type'] ?? '', // Not using any more.
+								'challenge'   => $task['challenge'] ?? '', // Not using any more.
+							];
 						}
 					}
 					// Cache the response for 1 day.

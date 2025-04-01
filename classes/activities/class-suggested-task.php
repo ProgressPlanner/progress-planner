@@ -8,6 +8,7 @@
 namespace Progress_Planner\Activities;
 
 use Progress_Planner\Activity;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create;
 
 /**
  * Handler for suggested tasks activities.
@@ -34,8 +35,18 @@ class Suggested_Task extends Activity {
 	 * @return void
 	 */
 	public function save() {
-		$this->date    = new \DateTime();
-		$this->user_id = \get_current_user_id();
+		if ( ! $this->date ) {
+			$this->date = new \DateTime();
+		}
+
+		if ( ! $this->user_id ) {
+			$this->user_id = \get_current_user_id();
+		}
+
+		if ( $this->id ) {
+			\progress_planner()->get_query()->update_activity( $this->id, $this );
+			return;
+		}
 
 		\progress_planner()->get_query()->insert_activity( $this );
 		\do_action( 'progress_planner_activity_saved', $this );
@@ -55,11 +66,12 @@ class Suggested_Task extends Activity {
 		}
 
 		// Default points for a suggested task.
-		$points = 1;
+		$points               = 1;
+		$create_post_provider = new Create();
 
 		$data = \progress_planner()->get_suggested_tasks()->get_local()->get_data_from_task_id( $this->data_id );
-		if ( isset( $data['type'] ) && ( 'create-post' === $data['type'] || 'review-post' === $data['type'] ) && isset( $data['long'] ) && true === $data['long'] ) {
-			$points = 2;
+		if ( isset( $data['provider_id'] ) && $create_post_provider->get_provider_id() === $data['provider_id'] ) {
+			$points = $create_post_provider->get_points_for_task( $this->data_id );
 		}
 
 		$this->points[ $date_ymd ] = $points;

@@ -37,21 +37,48 @@ class Task_Local {
 	}
 
 	/**
-	 * Get the type of the task.
+	 * Set the task data.
 	 *
-	 * @return string
+	 * @param array $data The task data.
+	 *
+	 * @return void
 	 */
-	public function get_type() {
-		return $this->data['type'];
+	public function set_data( array $data ) {
+		$this->data = $data;
 	}
 
 	/**
-	 * Alias for get_type().
-	 * For compatibility with the old provider system.
+	 * Get the provider ID.
 	 *
 	 * @return string
 	 */
 	public function get_provider_id() {
-		return $this->get_type();
+		return $this->data['provider_id'] ?? '';
+	}
+
+	/**
+	 * Get the provider ID.
+	 *
+	 * @return string
+	 */
+	public function get_task_id() {
+		return $this->data['task_id'] ?? '';
+	}
+
+	/**
+	 * Get the provider ID.
+	 *
+	 * @return array
+	 */
+	public function get_task_details() {
+		$task_provider_id = $this->get_provider_id();
+		$task_id          = $this->get_task_id();
+
+		$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id );
+		if ( ! $task_provider ) {
+			return [];
+		}
+
+		return $task_provider->get_task_details( $task_id );
 	}
 }

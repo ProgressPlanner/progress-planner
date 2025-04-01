@@ -1,4 +1,9 @@
-/* global progressPlannerFocusElement */
+/* global progressPlannerFocusElement, prplL10n */
+/**
+ * focus-element script.
+ *
+ * Dependencies: progress-planner/l10n
+ */
 
 const prplGetIndicatorElement = ( content, taskId, points ) => {
 	// Create an <img> element.
@@ -7,7 +12,7 @@ const prplGetIndicatorElement = ( content, taskId, points ) => {
 		progressPlannerFocusElement.base_url +
 		'/assets/images/icon_progress_planner.svg';
 	imgEl.alt = points
-		? progressPlannerFocusElement.l10n.fixThisIssue.replace( '%d', points )
+		? prplL10n( 'fixThisIssue' ).replace( '%d', points )
 		: '';
 
 	// Create a span element for the points.

@@ -9,6 +9,8 @@ namespace Progress_Planner\Widgets;
 
 use Progress_Planner\Badges\Monthly;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Review;
 
 /**
  * Suggested_Tasks class.
@@ -21,13 +23,6 @@ final class Suggested_Tasks extends Widget {
 	 * @var string
 	 */
 	protected $id = 'suggested-tasks';
-
-	/**
-	 * The tasks.
-	 *
-	 * @var array|null
-	 */
-	protected $pending_tasks = null;
 
 	/**
 	 * Get the score.
@@ -52,177 +47,128 @@ final class Suggested_Tasks extends Widget {
 	}
 
 	/**
-	 * Register scripts.
-	 *
-	 * @return void
-	 */
-	public function register_scripts() {
-		$handle = 'progress-planner-' . $this->id;
-
-		$pending_celebration = \progress_planner()->get_suggested_tasks()->get_pending_celebration();
-		$pending_tasks       = $this->get_pending_tasks();
-		$deps                = [
-			'progress-planner-todo',
-			'progress-planner-grid-masonry',
-			'progress-planner-web-components-prpl-suggested-task',
-			'progress-planner-document-ready',
-		];
-
-		// Check if need to load confetti for the local tasks.
-		$load_confetti = ! empty( $pending_celebration );
-
-		foreach ( $pending_tasks as $type => $tasks ) {
-			foreach ( $tasks as $task ) {
-				if ( isset( $task['dismissable'] ) && $task['dismissable'] ) {
-					$load_confetti = true;
-					break 2; // Break out of the foreach loops.
-				}
-			}
-		}
-
-		// Check if need to load confetti.
-		if ( $load_confetti ) {
-			$deps[] = 'particles-confetti';
-		} else {
-			// Check if there are remote tasks to inject, checking here as it might involve an API call.
-			$remote_tasks = \progress_planner()->get_suggested_tasks()->get_remote_tasks();
-			if ( ! empty( $remote_tasks ) ) {
-				$deps[] = 'particles-confetti';
-			}
-		}
-
-		\wp_register_script(
-			$handle,
-			PROGRESS_PLANNER_URL . '/assets/js/widgets/suggested-tasks.js',
-			$deps,
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/js/widgets/suggested-tasks.js' ),
-			true
-		);
-	}
-
-	/**
-	 * Enqueue scripts.
+	 * Enqueue the scripts.
 	 *
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		$handle = 'progress-planner-' . $this->id;
+		// Get tasks from task providers and pending_celebration tasks.
+		$tasks             = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
+		$delay_celebration = false;
 
-		// Enqueue the script.
-		\wp_enqueue_script( $handle );
+		// Celebrate only on the Progress Planner Dashboard page.
+		if ( \progress_planner()->is_on_progress_planner_dashboard_page() ) {
 
-		// Get all saved tasks (completed, pending celebration, snoozed).
-		$tasks = \progress_planner()->get_suggested_tasks()->get_saved_tasks();
+			// If there are newly added task providers, delay the celebration in order not to get confetti behind the popover.
+			$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
 
-		// Get pending tasks.
-		$tasks['details'] = $this->get_pending_tasks();
+			// If we're not delaying the celebration, we need to get the pending_celebration tasks.
+			if ( ! $delay_celebration ) {
+				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' );
 
-		// If there are newly added task providers, delay the celebration in order not to get confetti behind the popover.
-		$delay_celebration = \progress_planner()->get_plugin_upgrade_handler()->get_newly_added_task_providers() ? true : false;
+				foreach ( $pending_celebration_tasks as $key => $task ) {
+					$task_id = $task['task_id'];
 
-		if ( ! $delay_celebration ) {
-			// Insert the pending celebration tasks as high priority tasks, so they are shown always.
-			foreach ( $tasks['pending_celebration'] as $task_id ) {
+					$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
+						Local_Task_Factory::create_task_from( 'id', $task_id )->get_provider_id()
+					);
 
-				$task_object   = ( new Local_Task_Factory( $task_id ) )->get_task();
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_object->get_provider_id() );
+					if ( $task_provider && $task_provider->capability_required() ) {
+						$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task_id );
 
-				if ( $task_provider && $task_provider->capability_required() ) {
-					$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task_id );
+						if ( $task_details ) {
+							$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
+							$task_details['action']   = 'celebrate';
+							$task_details['status']   = 'pending_celebration';
 
-					if ( $task_details ) {
-						$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
-						$task_details['action']   = 'celebrate';
-						$task_details['type']     = 'pending_celebration';
+							// Award 2 points if last created post was long.
+							$create_provider = new Create();
+							if ( $create_provider->get_provider_id() === $task_provider->get_provider_id() ) {
+								$task_details['points'] = $create_provider->get_points_for_task( $task_id );
+							}
 
-						if ( ! isset( $tasks['details']['pending_celebration'] ) ) {
-							$tasks['details']['pending_celebration'] = [];
+							$tasks[] = $task_details;
 						}
 
-						$tasks['details']['pending_celebration'][] = $task_details;
+						// Mark the pending celebration tasks as completed.
+						\progress_planner()->get_suggested_tasks()->transition_task_status( $task_id, 'pending_celebration', 'completed' );
 					}
-
-					// Mark the pending celebration tasks as completed.
-					\progress_planner()->get_suggested_tasks()->transition_task_status( $task_id, 'pending_celebration', 'completed' );
 				}
 			}
 		}
 
-		$max_items_per_type = [];
-		foreach ( $tasks['details'] as $type => $items ) {
-			$max_items_per_type[ $type ] = $type === 'content-update' ? 2 : 1;
+		$final_tasks = [];
+		foreach ( $tasks as $task ) {
+			$task['status']                  = $task['status'] ?? 'pending';
+			$final_tasks[ $task['task_id'] ] = $task;
 		}
 
-		// We want all pending_celebration' tasks to be shown.
-		if ( isset( $max_items_per_type['pending_celebration'] ) ) {
-			$max_items_per_type['pending_celebration'] = 99;
+		$final_tasks = array_values( $final_tasks );
+
+		foreach ( $final_tasks as $key => $task ) {
+			$final_tasks[ $key ]['providerID'] = $task['provider_id'] ?? $task['category']; // category is used for remote tasks.
 		}
 
-		// Check if current date is between Feb 12-16.
-		$confetti_options = [];
-		$year             = \gmdate( 'Y' );
-		$current_date     = $year . '-' . \gmdate( 'm-d' );
+		// Sort the final tasks by priority. The priotity can be "high", "medium", "low", or "none".
+		uasort(
+			$final_tasks,
+			function ( $a, $b ) {
+				$priority = [
+					'high'   => 0,
+					'medium' => 1,
+					'low'    => 2,
+					'none'   => 3,
+				];
 
-		// TODO: GET params just for testing.
-		$start_date = $year . '-' . ( isset( $_GET['start_date'] ) ? \sanitize_text_field( \wp_unslash( $_GET['start_date'] ) ) : '02-12' );
-		$end_date   = $year . '-' . ( isset( $_GET['end_date'] ) ? \sanitize_text_field( \wp_unslash( $_GET['end_date'] ) ) : '02-16' );
+				$a['priority'] = ! isset( $a['priority'] ) || ! isset( $priority[ $a['priority'] ] ) ? 'none' : $a['priority'];
+				$b['priority'] = ! isset( $b['priority'] ) || ! isset( $priority[ $b['priority'] ] ) ? 'none' : $b['priority'];
 
-		if ( $current_date >= $start_date && $current_date <= $end_date ) {
-			$confetti_options = [
-				[
-					'particleCount' => 50,
-					'scalar'        => 2.2,
-					'shapes'        => [ 'heart' ],
-					'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
-				],
-				[
-					'particleCount' => 20,
-					'scalar'        => 3.2,
-					'shapes'        => [ 'heart' ],
-					'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
-				],
-			];
+				return $priority[ $a['priority'] ] - $priority[ $b['priority'] ];
+			}
+		);
+
+		$max_items_per_category = [];
+		foreach ( $final_tasks as $task ) {
+			$max_items_per_category[ $task['category'] ] = $task['category'] === ( new Review() )->get_provider_category() ? 2 : 1;
 		}
 
-		// Localize the script.
-		\wp_localize_script(
-			$handle,
-			'progressPlannerSuggestedTasks',
+		// We want to hide user tasks.
+		if ( isset( $max_items_per_category['user'] ) ) {
+			$max_items_per_category['user'] = 0;
+		}
+
+		// Enqueue the script.
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'widgets/suggested-tasks',
 			[
-				'ajaxUrl'          => \admin_url( 'admin-ajax.php' ),
-				'nonce'            => \wp_create_nonce( 'progress_planner' ),
-				'tasks'            => $tasks,
-				'maxItemsPerType'  => apply_filters( 'progress_planner_suggested_tasks_max_items_per_type', $max_items_per_type ),
-				'confettiOptions'  => $confetti_options,
-				'delayCelebration' => $delay_celebration,
+				'name' => 'prplSuggestedTasks',
+				'data' => [
+					'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
+					'nonce'               => \wp_create_nonce( 'progress_planner' ),
+					'tasks'               => array_values( $final_tasks ),
+					'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
+					'delayCelebration'    => $delay_celebration,
+				],
 			]
 		);
 	}
 
 	/**
-	 * Get the tasks.
+	 * Get the stylesheet dependencies.
 	 *
-	 * @return array The tasks.
+	 * @return array
 	 */
-	public function get_pending_tasks() {
+	public function get_stylesheet_dependencies() {
+		// Register styles for the web-component.
+		\wp_register_style(
+			'progress-planner-web-components-prpl-suggested-task',
+			PROGRESS_PLANNER_URL . '/assets/css/web-components/prpl-suggested-task.css',
+			[],
+			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/web-components/prpl-suggested-task.css' )
+		);
 
-		if ( null === $this->pending_tasks ) {
-			$tasks         = [];
-			$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks();
-
-			// Sort them by type (channel).
-			foreach ( $pending_tasks as $task ) {
-
-				if ( ! isset( $tasks[ $task['type'] ] ) ) {
-					$tasks[ $task['type'] ] = [];
-				}
-
-				$tasks[ $task['type'] ][] = $task;
-			}
-
-			$this->pending_tasks = $tasks;
-		}
-
-		return $this->pending_tasks;
+		return [
+			'progress-planner-web-components-prpl-suggested-task',
+		];
 	}
 }

@@ -13,43 +13,61 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 /**
  * Add tasks for content updates.
  */
-abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
+abstract class Local_Tasks implements Local_Tasks_Interface {
 
 	/**
-	 * The type of the task.
+	 * The category of the task.
 	 *
 	 * @var string
 	 */
-	const TYPE = '';
+	protected const CATEGORY = '';
 
 	/**
-	 * The ID of the task.
+	 * The ID of the task provider.
 	 *
 	 * @var string
 	 */
-	const ID = '';
+	protected const PROVIDER_ID = '';
 
 	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
 	 */
-	protected $capability = 'manage_options';
+	protected const CAPABILITY = 'manage_options';
 
 	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
-	protected $is_onboarding_task = false;
+	protected const IS_ONBOARDING_TASK = false;
 
 	/**
-	 * Get the provider type.
+	 * Initialize the task provider.
+	 *
+	 * @return void
+	 */
+	public function init() {
+	}
+
+	/**
+	 * Alias for get_provider_category(), to provide backwards compatibility.
 	 *
 	 * @return string
 	 */
 	public function get_provider_type() {
-		return static::TYPE;
+		_deprecated_function( 'Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks::get_provider_type()', '1.1.1', 'get_provider_category' );
+		return $this->get_provider_category();
+	}
+
+	/**
+	 * Get the provider category.
+	 *
+	 * @return string
+	 */
+	public function get_provider_category() {
+		return static::CATEGORY;
 	}
 
 	/**
@@ -58,7 +76,16 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 	 * @return string
 	 */
 	public function get_provider_id() {
-		return static::ID;
+		return static::PROVIDER_ID;
+	}
+
+	/**
+	 * Get the task ID.
+	 *
+	 * @return string
+	 */
+	public function get_task_id() {
+		return $this->get_provider_id();
 	}
 
 	/**
@@ -67,8 +94,8 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 	 * @return bool
 	 */
 	public function capability_required() {
-		return $this->capability
-			? \current_user_can( $this->capability )
+		return static::CAPABILITY
+			? \current_user_can( static::CAPABILITY )
 			: true;
 	}
 
@@ -78,7 +105,7 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 	 * @return bool
 	 */
 	public function is_onboarding_task() {
-		return $this->is_onboarding_task;
+		return static::IS_ONBOARDING_TASK;
 	}
 
 	/**
@@ -90,26 +117,26 @@ abstract class Local_Tasks_Abstract implements Local_Tasks_Interface {
 	 */
 	public function get_data_from_task_id( $task_id ) {
 		$data = [
-			'type' => $this->get_provider_id(),
-			'id'   => $task_id,
+			'provider_id' => $this->get_provider_id(),
+			'id'          => $task_id,
 		];
 
 		return $data;
 	}
 
 	/**
-	 * Check if a task type is snoozed.
+	 * Check if a task category is snoozed.
 	 *
 	 * @return bool
 	 */
-	public function is_task_type_snoozed() {
-		$snoozed = \progress_planner()->get_suggested_tasks()->get_snoozed_tasks();
-		if ( ! \is_array( $snoozed ) || empty( $snoozed ) ) {
+	public function is_task_snoozed() {
+		$snoozed = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'snoozed' );
+		if ( empty( $snoozed ) ) {
 			return false;
 		}
 
 		foreach ( $snoozed as $task ) {
-			$task_object = ( new Local_Task_Factory( $task['id'] ) )->get_task();
+			$task_object = Local_Task_Factory::create_task_from( 'id', $task['task_id'] );
 			$provider_id = $task_object->get_provider_id();
 
 			if ( $provider_id === $this->get_provider_id() ) {

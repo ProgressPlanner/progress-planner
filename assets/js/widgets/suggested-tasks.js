@@ -1,43 +1,29 @@
-/* global customElements, progressPlannerSuggestedTasks, confetti, prplDocumentReady */
-
-/**
- * Count the number of items in the list.
+/* global customElements, prplSuggestedTasks, prplDocumentReady */
+/*
+ * Widget: Suggested Tasks
  *
- * @param {string} type The type of items to count.
- * @return {number} The number of items in the list.
+ * A widget that displays a list of suggested tasks.
+ *
+ * Dependencies: progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip
  */
-const progressPlannerCountItems = ( type ) => {
-	// We want to display all pending celebration tasks on page load.
-	if ( 'pending_celebration' === type ) {
-		return 0;
-	}
-
-	const items = document.querySelectorAll(
-		`.prpl-suggested-task[data-task-type="${ type }"]`
-	);
-	return items.length;
-};
+/* eslint-disable camelcase */
 
 /**
  * Get the next item to inject.
  *
- * @param {string} type The type of items to get the next item from.
+ * @param {string} category The category of items to get the next item from.
  * @return {Object} The next item to inject.
  */
-const progressPlannerGetNextItemFromType = ( type ) => {
-	// If the are no items of this type, return null.
-	if (
-		'undefined' ===
-		typeof progressPlannerSuggestedTasks.tasks.details[ type ]
-	) {
+const prplSuggestedTasksGetNextPendingItemFromCategory = ( category ) => {
+	// Get items of this category.
+	const itemsOfCategory = prplSuggestedTasks.tasks.filter(
+		( task ) => category === task.category
+	);
+
+	// If there are no items of this category, return null.
+	if ( 0 === itemsOfCategory.length || 'user' === category ) {
 		return null;
 	}
-
-	// Remove completed and snoozed items.
-	const tasks = progressPlannerSuggestedTasks.tasks;
-	let items = tasks.details[ type ];
-	const completed = tasks.completed;
-	const snoozed = tasks.snoozed;
 
 	// Create an array of items that are in the list.
 	const inList = [];
@@ -47,20 +33,14 @@ const progressPlannerGetNextItemFromType = ( type ) => {
 			inList.push( item.getAttribute( 'data-task-id' ).toString() );
 		} );
 
-	// Remove items which are completed or already in the list.
-	items = items.filter( function ( item ) {
-		return (
-			! completed.includes( item.task_id.toString() ) &&
-			! inList.includes( item.task_id.toString() )
-		);
-	} );
-
-	// Remove items which are snoozed.
-	items = items.filter( function ( item ) {
-		for ( let i = 0; i < snoozed.length; i++ ) {
-			if ( item.task_id.toString() === snoozed[ i ].id.toString() ) {
-				return false;
-			}
+	const items = itemsOfCategory.filter( function ( item ) {
+		// Skip items which are not pending.
+		if ( 'pending' !== item.status ) {
+			return false;
+		}
+		// Remove items which are already in the list.
+		if ( inList.includes( item.task_id.toString() ) ) {
+			return false;
 		}
 		return true;
 	} );
@@ -70,65 +50,44 @@ const progressPlannerGetNextItemFromType = ( type ) => {
 		return null;
 	}
 
-	// Get items with a priority set to `high`.
-	const highPriorityItems = items.filter( function ( item ) {
-		return 'high' === item.priority;
-	} );
-
-	// If there are high priority items, return the first one.
-	if ( highPriorityItems.length ) {
-		return highPriorityItems[ 0 ];
-	}
-
-	// Get items with a priority set to `medium`.
-	const mediumPriorityItems = items.filter( function ( item ) {
-		return 'medium' === item.priority;
-	} );
-
-	// If there are medium priority items, return the first one.
-	if ( mediumPriorityItems.length ) {
-		return mediumPriorityItems[ 0 ];
-	}
-
 	// Return the first item.
 	return items[ 0 ];
 };
 
 /**
- * Inject the next item.
- * @param {string} type The type of items to inject the next item from.
+ * Inject the next item from a category.
  */
-const progressPlannerInjectNextItem = ( type ) => {
-	const nextItem = progressPlannerGetNextItemFromType( type );
-	if ( ! nextItem ) {
-		return;
-	}
+document.addEventListener(
+	'prpl/suggestedTask/injectCategoryItem',
+	( event ) => {
+		const nextItem = prplSuggestedTasksGetNextPendingItemFromCategory(
+			event.detail.category
+		);
+		if ( ! nextItem ) {
+			return;
+		}
 
-	progressPlannerInjectSuggestedTodoItem( nextItem );
-};
+		document.dispatchEvent(
+			new CustomEvent( 'prpl/suggestedTask/injectItem', {
+				detail: nextItem,
+			} )
+		);
+	}
+);
 
 /**
  * Inject a todo item.
- *
- * @param {Object} details The details of the todo item.
  */
-const progressPlannerInjectSuggestedTodoItem = ( details ) => {
-	// Clone the template element.
+document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 	const Item = customElements.get( 'prpl-suggested-task' );
-	const item = new Item(
-		details.task_id,
-		details.title,
-		details.description,
-		details.points ?? 1,
-		details.action ?? '',
-		details.url ?? '',
-		details.dismissable ?? false,
-		details.type ?? ''
-	);
+	const item = new Item( {
+		...event.detail,
+		taskList: 'prplSuggestedTasks',
+	} );
 
 	/**
 	 * @todo Implement the parent task functionality.
-	 * Use this code: `const parent = details.parent && '' !== details.parent ? details.parent : null;
+	 * Use this code: `const parent = event.detail.parent && '' !== event.detail.parent ? event.detail.parent : null;
 	 */
 	const parent = false;
 
@@ -142,9 +101,8 @@ const progressPlannerInjectSuggestedTodoItem = ( details ) => {
 	}
 
 	// If we could not find the parent item, try again after 500ms.
-	window.progressPlannerRenderAttempts =
-		window.progressPlannerRenderAttempts || 0;
-	if ( window.progressPlannerRenderAttempts > 500 ) {
+	window.prplRenderAttempts = window.prplRenderAttempts || 0;
+	if ( window.prplRenderAttempts > 500 ) {
 		return;
 	}
 	const parentItem = document.querySelector(
@@ -152,8 +110,12 @@ const progressPlannerInjectSuggestedTodoItem = ( details ) => {
 	);
 	if ( ! parentItem ) {
 		setTimeout( () => {
-			progressPlannerInjectSuggestedTodoItem( details );
-			window.progressPlannerRenderAttempts++;
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/injectItem', {
+					detail: event.detail,
+				} )
+			);
+			window.prplRenderAttempts++;
 		}, 10 );
 		return;
 	}
@@ -169,160 +131,68 @@ const progressPlannerInjectSuggestedTodoItem = ( details ) => {
 	parentItem
 		.querySelector( '.prpl-suggested-task-children' )
 		.insertAdjacentElement( 'beforeend', item );
-};
+} );
 
-const prplTriggerConfetti = () => {
-	const prplConfettiDefaults = {
-		spread: 360,
-		ticks: 50,
-		gravity: 0,
-		decay: 0.94,
-		startVelocity: 30,
-		shapes: [ 'star' ],
-		colors: [ 'FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8' ],
-	};
-
-	const progressPlannerRenderAttemptshoot = () => {
-		let confettiOptions = [
-			{
-				particleCount: 40,
-				scalar: 1.2,
-				shapes: [ 'star' ],
-			},
-			{
-				particleCount: 10,
-				scalar: 0.75,
-				shapes: [ 'circle' ],
-			},
-		];
-
-		// Tripple check if the confetti options are an array and not undefined.
-		if (
-			'undefined' !==
-				typeof progressPlannerSuggestedTasks.confettiOptions &&
-			true ===
-				Array.isArray(
-					progressPlannerSuggestedTasks.confettiOptions
-				) &&
-			progressPlannerSuggestedTasks.confettiOptions.length
-		) {
-			confettiOptions = progressPlannerSuggestedTasks.confettiOptions;
-		}
-
-		for ( const value of confettiOptions ) {
-			confetti( {
-				...prplConfettiDefaults,
-				...value,
-			} );
-		}
-	};
-
-	setTimeout( progressPlannerRenderAttemptshoot, 0 );
-	setTimeout( progressPlannerRenderAttemptshoot, 100 );
-	setTimeout( progressPlannerRenderAttemptshoot, 200 );
-};
-
-/**
- * Strike completed tasks.
- */
-const prplStrikeCompletedTasks = () => {
-	document
-		.querySelectorAll(
-			'.prpl-suggested-task[data-task-action="celebrate"]'
-		)
-		.forEach( ( item ) => {
-			item.classList.add( 'prpl-suggested-task-celebrated' );
-		} );
-
-	// Remove celebrated tasks and add them to the completed tasks.
-	setTimeout( () => {
-		document
-			.querySelectorAll( '.prpl-suggested-task-celebrated' )
-			.forEach( ( item ) => {
-				const taskId = item.getAttribute( 'data-task-id' ),
-					type = item.getAttribute( 'data-task-type' );
-				const el = document.querySelector(
-					`.prpl-suggested-task[data-task-id="${ taskId }"]`
-				);
-
-				if ( el ) {
-					el.parentElement.remove();
-				}
-
-				// Remove the task from the pending celebration.
-				window.progressPlannerSuggestedTasks.tasks.pending_celebration =
-					window.progressPlannerSuggestedTasks.tasks.pending_celebration.filter(
-						( id ) => id !== taskId
-					);
-
-				// Add the task to the completed tasks.
-				if (
-					window.progressPlannerSuggestedTasks.tasks.completed.indexOf(
-						taskId
-					) === -1
-				) {
-					window.progressPlannerSuggestedTasks.tasks.completed.push(
-						taskId
-					);
-				}
-
-				// Refresh the list.
-				const event = new CustomEvent(
-					'prplMaybeInjectSuggestedTaskEvent',
-					{
-						detail: {
-							taskId,
-							type,
-						},
-					}
-				);
-				document.dispatchEvent( event );
-			} );
-	}, 2000 );
-};
-
-const prplPendingCelebration =
-	progressPlannerSuggestedTasks.tasks.pending_celebration;
 if (
-	! progressPlannerSuggestedTasks.delayCelebration &&
-	prplPendingCelebration &&
-	prplPendingCelebration.length
+	! prplSuggestedTasks.delayCelebration &&
+	prplSuggestedTasks.tasks.filter(
+		( task ) => 'pending_celebration' === task.status
+	).length
 ) {
 	setTimeout( () => {
 		// Trigger the celebration event.
-		document.dispatchEvent( new Event( 'prplCelebrateTasks' ) );
+		document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
 	}, 3000 );
 }
 
-// Create a new custom event to trigger the celebration.
-document.addEventListener( 'prplCelebrateTasks', () => {
-	prplTriggerConfetti();
-	prplStrikeCompletedTasks();
-} );
-
 // Populate the list on load.
-document.addEventListener( 'DOMContentLoaded', () => {
+prplDocumentReady( () => {
 	// Do nothing if the list does not exist.
 	if ( ! document.querySelector( '.prpl-suggested-tasks-list' ) ) {
 		return;
 	}
 
-	// Loop through each type and inject items.
-	for ( const type in progressPlannerSuggestedTasks.tasks.details ) {
+	// Loop through each provider and inject items.
+	for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
 		// Inject items, until we reach the maximum number of channel items.
 		while (
-			progressPlannerCountItems( type ) <
+			document.querySelectorAll(
+				`.prpl-suggested-task[data-task-category="${ category }"]`
+			).length <
 				parseInt(
-					progressPlannerSuggestedTasks.maxItemsPerType[ type ]
+					prplSuggestedTasks.maxItemsPerCategory[ category ]
 				) &&
-			progressPlannerGetNextItemFromType( type )
+			prplSuggestedTasksGetNextPendingItemFromCategory( category )
 		) {
-			progressPlannerInjectNextItem( type );
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/injectCategoryItem', {
+					detail: { category },
+				} )
+			);
 		}
 	}
 
-	const event = new CustomEvent( 'prplResizeAllGridItemsEvent' );
-	document.dispatchEvent( event );
+	// Inject ALL pending celebration tasks.
+	prplSuggestedTasks.tasks
+		.filter( ( task ) => 'pending_celebration' === task.status )
+		.forEach( ( task ) => {
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/injectItem', {
+					detail: task,
+				} )
+			);
+		} );
+
+	window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+
+	// Initialize the badge scroller.
+	document
+		.querySelectorAll(
+			'.prpl-widget-wrapper:not(.in-popover) > .badge-group-monthly'
+		)
+		.forEach( ( element ) => {
+			new BadgeScroller( element );
+		} );
 } );
 
 // Handle the monthly badges scrolling.
@@ -459,122 +329,120 @@ class BadgeScroller {
 	}
 }
 
-// Initialize on DOM load
-prplDocumentReady( () => {
-	document
-		.querySelectorAll(
-			'.prpl-widget-wrapper:not(.in-popover) > .badge-group-monthly'
-		)
-		.forEach( ( element ) => {
-			new BadgeScroller( element );
-		} );
-} );
-
-const prplMaybeInjectSuggestedTaskEvent = new Event( // eslint-disable-line no-unused-vars
-	'prplMaybeInjectSuggestedTaskEvent'
-);
-
-const prplGetRaviGaugeProps = () => {
-	const gauge = document.getElementById( 'prpl-gauge-ravi' );
-	if ( ! gauge ) {
-		return;
-	}
-
-	return {
-		id: gauge.id,
-		background: gauge.getAttribute( 'background' ),
-		color: gauge.getAttribute( 'color' ),
-		max: gauge.getAttribute( 'data-max' ),
-		value: gauge.getAttribute( 'data-value' ),
-		badgeId: gauge.getAttribute( 'data-badge-id' ),
-	};
-};
-
-const prplUpdateRaviGauge = ( pointsDiff = 0 ) => {
-	if ( ! pointsDiff ) {
-		return;
-	}
-
-	const gaugeProps = prplGetRaviGaugeProps();
-
-	if ( ! gaugeProps ) {
-		return;
-	}
-
-	let newValue = parseInt( gaugeProps.value ) + pointsDiff;
-	newValue = Math.round( newValue );
-	newValue = Math.max( 0, newValue );
-	newValue = Math.min( newValue, parseInt( gaugeProps.max ) );
-
-	const Gauge = customElements.get( 'prpl-gauge' );
-	const gauge = new Gauge(
-		{
-			max: parseInt( gaugeProps.max ),
-			value: parseFloat( newValue / parseInt( gaugeProps.max ) ),
-			background: gaugeProps.background,
-			color: gaugeProps.color,
-			maxDeg: '180deg',
-			start: '270deg',
-			cutout: '57%',
-			contentFontSize: 'var(--prpl-font-size-6xl)',
-			contentPadding:
-				'var(--prpl-padding) var(--prpl-padding) calc(var(--prpl-padding) * 2) var(--prpl-padding)',
-			marginBottom: 'var(--prpl-padding)',
-		},
-		`<prpl-badge complete="true" badge-id="${ gaugeProps.badgeId }"></prpl-badge>`
-	);
-	gauge.id = gaugeProps.id;
-	gauge.setAttribute( 'background', gaugeProps.background );
-	gauge.setAttribute( 'color', gaugeProps.color );
-	gauge.setAttribute( 'data-max', gaugeProps.max );
-	gauge.setAttribute( 'data-value', newValue );
-	gauge.setAttribute( 'data-badge-id', gaugeProps.badgeId );
-
-	// Replace the old gauge with the new one.
-	const oldGauge = document.getElementById( gaugeProps.id );
-	if ( oldGauge ) {
-		oldGauge.replaceWith( gauge );
-	}
-
-	const oldCounter = document.getElementById(
-		'prpl-widget-content-ravi-points-number'
-	);
-	if ( oldCounter ) {
-		oldCounter.textContent = newValue + 'pt';
-	}
-};
-
-// Listen for the event.
+/**
+ * Update the Ravi gauge.
+ */
 document.addEventListener(
-	'prplUpdateRaviGaugeEvent',
+	'prpl/updateRaviGauge',
 	( e ) => {
-		prplUpdateRaviGauge( e.detail.pointsDiff );
-	},
-	false
-);
-
-// Listen for the event.
-document.addEventListener(
-	'prplMaybeInjectSuggestedTaskEvent',
-	( e ) => {
-		const type = e.detail.type;
-
-		if ( 'pending_celebration' === type ) {
+		if ( ! e.detail.pointsDiff ) {
 			return;
 		}
 
-		while (
-			progressPlannerCountItems( type ) <
-				parseInt(
-					progressPlannerSuggestedTasks.maxItemsPerType[ type ]
-				) &&
-			progressPlannerGetNextItemFromType( type )
-		) {
-			progressPlannerInjectNextItem( type );
+		const gaugeElement = document.getElementById( 'prpl-gauge-ravi' );
+		if ( ! gaugeElement ) {
+			return;
 		}
 
-		const event = new Event( 'prplResizeAllGridItemsEvent' );
-		document.dispatchEvent( event );
+		const gaugeProps = {
+			id: gaugeElement.id,
+			background: gaugeElement.getAttribute( 'background' ),
+			color: gaugeElement.getAttribute( 'color' ),
+			max: gaugeElement.getAttribute( 'data-max' ),
+			value: gaugeElement.getAttribute( 'data-value' ),
+			badgeId: gaugeElement.getAttribute( 'data-badge-id' ),
+		};
+
+		if ( ! gaugeProps ) {
+			return;
+		}
+
+		let newValue = parseInt( gaugeProps.value ) + e.detail.pointsDiff;
+		newValue = Math.round( newValue );
+		newValue = Math.max( 0, newValue );
+		newValue = Math.min( newValue, parseInt( gaugeProps.max ) );
+
+		const Gauge = customElements.get( 'prpl-gauge' );
+		const gauge = new Gauge(
+			{
+				max: parseInt( gaugeProps.max ),
+				value: parseFloat( newValue / parseInt( gaugeProps.max ) ),
+				background: gaugeProps.background,
+				color: gaugeProps.color,
+				maxDeg: '180deg',
+				start: '270deg',
+				cutout: '57%',
+				contentFontSize: 'var(--prpl-font-size-6xl)',
+				contentPadding:
+					'var(--prpl-padding) var(--prpl-padding) calc(var(--prpl-padding) * 2) var(--prpl-padding)',
+				marginBottom: 'var(--prpl-padding)',
+			},
+			`<prpl-badge complete="true" badge-id="${ gaugeProps.badgeId }"></prpl-badge>`
+		);
+		gauge.id = gaugeProps.id;
+		gauge.setAttribute( 'background', gaugeProps.background );
+		gauge.setAttribute( 'color', gaugeProps.color );
+		gauge.setAttribute( 'data-max', gaugeProps.max );
+		gauge.setAttribute( 'data-value', newValue );
+		gauge.setAttribute( 'data-badge-id', gaugeProps.badgeId );
+
+		// Replace the old gauge with the new one.
+		const oldGauge = document.getElementById( gaugeProps.id );
+		if ( oldGauge ) {
+			oldGauge.replaceWith( gauge );
+		}
+
+		const oldCounter = document.getElementById(
+			'prpl-widget-content-ravi-points-number'
+		);
+		if ( oldCounter ) {
+			oldCounter.textContent = newValue + 'pt';
+		}
+
+		// Mark badge as completed, in the a Monthly badges widgets, if we reached the max points.
+		if ( newValue >= parseInt( gaugeProps.max ) ) {
+			// We have multiple badges, one in widget and the other in the popover.
+			const badges = document.querySelectorAll(
+				'.prpl-badge-row-wrapper-inner .prpl-badge prpl-badge[complete="false"][badge-id="' +
+					gaugeProps.badgeId +
+					'"]'
+			);
+
+			if ( badges ) {
+				badges.forEach( ( badge ) => {
+					badge.setAttribute( 'complete', 'true' );
+				} );
+			}
+		}
 	},
 	false
 );
+
+// Listen for the event.
+document.addEventListener(
+	'prpl/suggestedTask/maybeInjectItem',
+	( e ) => {
+		// TODO: Something seems off here, take a look at this.
+		const category = e.detail.category;
+		while (
+			document.querySelectorAll(
+				`.prpl-suggested-task[data-task-category="${ category }"]`
+			).length <
+				parseInt(
+					prplSuggestedTasks.maxItemsPerCategory[ category ]
+				) &&
+			prplSuggestedTasksGetNextPendingItemFromCategory( category )
+		) {
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/injectCategoryItem', {
+					detail: { category },
+				} )
+			);
+		}
+
+		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+	},
+	false
+);
+
+/* eslint-enable camelcase */

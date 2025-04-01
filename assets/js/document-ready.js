@@ -11,3 +11,5 @@ const prplDocumentReady = function ( fn ) {
 	}
 	document.addEventListener( 'DOMContentLoaded', fn );
 };
+
+/* eslint-enable no-unused-vars */

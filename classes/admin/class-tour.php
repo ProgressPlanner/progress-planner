@@ -131,13 +131,16 @@ class Tour {
 			return;
 		}
 
-		\wp_enqueue_script( 'progress-planner-tour' );
-
-		\wp_enqueue_style(
-			'progress-planner-driver-js-css',
-			PROGRESS_PLANNER_URL . '/assets/css/vendor/driver.css',
-			[],
-			'1.3.1'
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'tour',
+			[
+				'name' => 'progressPlannerTour',
+				'data' => [
+					'steps' => \progress_planner()->get_admin__tour()->get_steps(),
+				],
+			]
 		);
+
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/vendor/driver' );
 	}
 }

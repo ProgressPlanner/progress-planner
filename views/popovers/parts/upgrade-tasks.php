@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_task_providers = \progress_planner()->get_plugin_upgrade_handler()->get_newly_added_task_providers();
+$prpl_task_providers = \progress_planner()->get_plugin_upgrade_tasks()->get_newly_added_task_providers();
 
 // If there are no task providers, don't show anything.
 if ( empty( $prpl_task_providers ) ) {
@@ -27,7 +27,7 @@ $prpl_title = 'onboarding' === $prpl_context
 
 $prpl_subtitle = 'onboarding' === $prpl_context
 	? ''
-	: \__( "Let's check if you've already don those tasks, this will take only a minute...", 'progress-planner' );
+	: \__( "Let's check if you've already done those tasks, this will take only a minute...", 'progress-planner' );
 
 $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 ?>
@@ -41,16 +41,26 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 	<ul class="prpl-onboarding-tasks-list">
 		<?php foreach ( $prpl_task_providers as $prpl_task_provider ) : ?>
 			<?php
+			$prpl_task_data = [
+				'task_id'     => $prpl_task_provider->get_task_id(),
+				'provider_id' => $prpl_task_provider->get_provider_id(),
+				'category'    => $prpl_task_provider->get_provider_category(),
+			];
+
+			$prpl_task_completed = $prpl_task_provider->evaluate_task( $prpl_task_data['task_id'] );
 			$prpl_task_details   = $prpl_task_provider->get_task_details();
-			$prpl_task_completed = $prpl_task_provider->evaluate_task( $prpl_task_details['task_id'] );
 
 			// If the task is completed, mark it as pending celebration.
 			if ( $prpl_task_completed ) {
+
+				// Add the task to the pending tasks.
+				\progress_planner()->get_suggested_tasks()->get_local()->add_pending_task( $prpl_task_data );
+
 				// Change the task status to pending celebration.
-				\progress_planner()->get_suggested_tasks()->mark_task_as_pending_celebration( $prpl_task_details['task_id'] );
+				\progress_planner()->get_suggested_tasks()->mark_task_as( 'pending_celebration', $prpl_task_data['task_id'] );
 
 				// Insert an activity.
-				\progress_planner()->get_suggested_tasks()->insert_activity( $prpl_task_details['task_id'] );
+				\progress_planner()->get_suggested_tasks()->insert_activity( $prpl_task_data['task_id'] );
 			}
 			?>
 				<li class="prpl-onboarding-task" data-prpl-task-completed="<?php echo $prpl_task_completed ? 'true' : 'false'; ?>">
@@ -85,4 +95,12 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 		</span>
 		<span class="prpl-onboarding-tasks-total-points">0pt</span>
 	</div>
+
+	<button id="prpl-onboarding-continue-button" class="prpl-button-primary prpl-disabled" onclick="prplOnboardRedirect()">
+		<?php \esc_html_e( 'Continue', 'progress-planner' ); ?>
+	</button>
 </div>
+
+<?php
+// We have displayed the upgrade popover tasks, so delete them.
+\progress_planner()->get_plugin_upgrade_tasks()->delete_upgrade_popover_task_providers();
