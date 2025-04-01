@@ -29,11 +29,11 @@ class Local_Task_Factory {
 
 		if ( 'id' === $param && is_string( $value ) ) {
 			// We should have all the data saved in the database.
-			$data = \progress_planner()->get_suggested_tasks()->get_task_by_task_id( $value );
+			$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $value );
 
 			// If we have the task data, return it.
-			if ( $data ) {
-				return new Task_Local( $data );
+			if ( isset( $tasks[0] ) ) {
+				return new Task_Local( $tasks[0] );
 			}
 
 			/*
@@ -135,7 +135,7 @@ class Local_Task_Factory {
 		}
 
 		if ( isset( $data['provider_id'] ) ) {
-			$task_provider    = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $data['provider_id'] );
+			$task_provider    = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $data['provider_id'] ); // @phpstan-ignore-line
 			$data['category'] = $task_provider ? $task_provider->get_provider_category() : '';
 		}
 

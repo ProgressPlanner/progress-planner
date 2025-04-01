@@ -79,7 +79,8 @@
 }
 
 .prpl-wrap h2 + p {
-	margin-top: 0.5em;
+	margin-top: 0.75rem;
+	margin-bottom: 0.75rem;
 }
 
 .prpl-wrap h1,
@@ -290,7 +291,8 @@ button.prpl-info-icon {
 .prpl-wrap button.prpl-button-primary,
 .prpl-wrap button.prpl-button-secondary,
 .prpl-wrap a.prpl-button-primary,
-.prpl-wrap a.prpl-button-secondary {
+.prpl-wrap a.prpl-button-secondary,
+#progress_planner_dashboard_widget_score a.prpl-button-primary { /* To be used in WP Dashboard widget */
 	display: block;
 	margin: 1rem 0;
 	padding: 0.75rem 1.25rem;
@@ -465,63 +467,3 @@ button.prpl-info-icon {
 	}
 }
 
-
-/*------------------------------------*\
-	Tooltip.
-\*------------------------------------*/
-.tooltip-actions {
-	justify-content: flex-end;
-	gap: 0.5em;
-	display: flex;
-	position: relative;
-}
-
-.prpl-tooltip {
-	position: absolute;
-	bottom: 0;
-	left: 100%;
-	transform: translate(-100%, calc(100% + 10px));
-
-	padding: 0.75rem 1.5rem 0.75rem 0.75rem;
-	width: 150px;
-	background: var(--prpl-background-green);
-	border-radius: var(--prpl-border-radius);
-	z-index: 2; /* above the gauges */
-	visibility: hidden; /* hidden by default */
-
-	font-size: 1rem;
-	font-weight: 400;
-	color: var(--prpl-color-text);
-
-	&[data-tooltip-visible] {
-		visibility: visible;
-	}
-
-	.close,
-	.prpl-tooltip-close {
-		position: absolute;
-		top: 0.75rem;
-		right: 0;
-		padding: 0.1rem;
-		line-height: 0;
-		margin: 0;
-		background: none;
-		border: none;
-		cursor: pointer;
-	}
-
-	/* Arrow */
-	&::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		right: 0;
-		transform: translate(-10px, -10px) rotate(90deg);
-
-		width: 0;
-		height: 0;
-		border-style: solid;
-		border-width: 7.5px 10px 7.5px 0;
-		border-color: transparent var(--prpl-background-green) transparent transparent;
-	}
-}

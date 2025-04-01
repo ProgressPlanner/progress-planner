@@ -35,6 +35,41 @@ class Core_Update extends Repetitive {
 	protected const CAPABILITY = 'update_core';
 
 	/**
+	 * Initialize the task provider.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		\add_filter( 'update_bulk_plugins_complete_actions', [ $this, 'add_core_update_link' ] );
+		\add_filter( 'update_bulk_theme_complete_actions', [ $this, 'add_core_update_link' ] );
+		\add_filter( 'update_translations_complete_actions', [ $this, 'add_core_update_link' ] );
+	}
+
+	/**
+	 * Add the link to the Progress Planner Dashboard to the update complete actions.
+	 *
+	 * @param array $update_actions The update actions.
+	 *
+	 * @return array
+	 */
+	public function add_core_update_link( $update_actions ) {
+		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending' );
+
+		// All updates are completed and there is a 'update-core' task in the pending tasks.
+		if ( $pending_tasks && $this->is_task_completed() ) {
+			foreach ( $pending_tasks as $task ) {
+				if ( $this->get_task_id() === $task['task_id'] ) {
+					$update_actions['prpl_core_update'] =
+						'<img src="' . \esc_attr( PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg' ) . '" style="width:1rem;padding-left:0.25rem;padding-right:0.25rem;vertical-align:middle;" alt="Progress Planner" />' .
+						'<a href="' . \esc_url( \admin_url( 'admin.php?page=progress-planner' ) ) . '" target="_parent">' . \esc_html__( 'Click here to celebrate your completed task!', 'progress-planner' ) . '</a>';
+					break;
+				}
+			}
+		}
+
+		return $update_actions;
+	}
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
@@ -54,7 +89,7 @@ class Core_Update extends Repetitive {
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id ) {
+	public function get_task_details( $task_id = '' ) {
 
 		if ( ! $task_id ) {
 			$task_id = $this->get_task_id();
