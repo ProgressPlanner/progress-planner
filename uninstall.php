@@ -41,6 +41,6 @@ $wpdb->query(
 	$wpdb->prepare(
 		// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder, WordPress.DB.DirectDatabaseQuery.SchemaChange
 		'DROP TABLE IF EXISTS %i',
-		$wpdb->prefix . \Progress_Planner\Query::TABLE_NAME
+		$wpdb->prefix . \Progress_Planner\Activities\Query::TABLE_NAME
 	)
 );

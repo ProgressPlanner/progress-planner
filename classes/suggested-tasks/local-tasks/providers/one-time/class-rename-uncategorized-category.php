@@ -8,7 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
-use Progress_Planner\Data_Collector\Uncategorized_Category as Uncategorized_Category_Data_Collector;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Uncategorized_Category as Uncategorized_Category_Data_Collector;
 
 /**
  * Add task to rename the Uncategorized category.
@@ -32,7 +32,7 @@ class Rename_Uncategorized_Category extends One_Time {
 	/**
 	 * The data collector.
 	 *
-	 * @var \Progress_Planner\Data_Collector\Uncategorized_Category
+	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Uncategorized_Category
 	 */
 	protected $data_collector;
 

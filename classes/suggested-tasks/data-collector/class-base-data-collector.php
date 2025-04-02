@@ -5,7 +5,7 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Data_Collector;
+namespace Progress_Planner\Suggested_Tasks\Data_Collector;
 
 /**
  * Base data collector.
