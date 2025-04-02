@@ -22,7 +22,7 @@ customElements.define(
 			action = '',
 			url = '',
 			dismissable = false,
-			providerID = '',
+			provider_id = '',
 			category = '',
 			snoozable = true,
 			order = false,
@@ -253,7 +253,7 @@ customElements.define(
 				data-task-id="${ task_id }"
 				data-task-action="${ action }"
 				data-task-url="${ url }"
-				data-task-provider-id="${ providerID }"
+				data-task-provider-id="${ provider_id }"
 				data-task-points="${ points }"
 				data-task-category="${ category }"
 				data-task-order="${ order }"

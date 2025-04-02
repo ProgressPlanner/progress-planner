@@ -8,7 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
-use Progress_Planner\Data_Collector\Inactive_Plugins as Inactive_Plugins_Data_Collector;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Inactive_Plugins as Inactive_Plugins_Data_Collector;
 
 /**
  * Add tasks to remove inactive plugins.
@@ -32,7 +32,7 @@ class Remove_Inactive_Plugins extends One_Time {
 	/**
 	 * The data collector.
 	 *
-	 * @var \Progress_Planner\Data_Collector\Inactive_Plugins
+	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Inactive_Plugins
 	 */
 	protected $data_collector;
 

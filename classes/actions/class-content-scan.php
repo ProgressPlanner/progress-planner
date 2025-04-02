@@ -80,8 +80,8 @@ class Content_Scan extends Content {
 		\progress_planner()->get_settings()->set( static::LAST_SCANNED_PAGE_OPTION, 0 );
 
 		// Reset the activities.
-		$activities = \progress_planner()->get_query()->query_activities( [ 'category' => 'content' ] );
-		\progress_planner()->get_query()->delete_activities( $activities );
+		$activities = \progress_planner()->get_activities__query()->query_activities( [ 'category' => 'content' ] );
+		\progress_planner()->get_activities__query()->delete_activities( $activities );
 
 		// Reset the word count.
 		\progress_planner()->get_settings()->set( 'word_count', [] );
@@ -177,6 +177,6 @@ class Content_Scan extends Content {
 			\progress_planner()->get_activities__content_helpers()->get_word_count( $post->post_content, $post->ID );
 		}
 
-		\progress_planner()->get_query()->insert_activities( $activities );
+		\progress_planner()->get_activities__query()->insert_activities( $activities );
 	}
 }
