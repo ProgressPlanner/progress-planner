@@ -65,7 +65,6 @@ class Local_Tasks_Manager {
 			new User_Tasks(),
 		];
 
-		// \add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
 		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
 
 		// Add the cleanup action.
@@ -78,7 +77,6 @@ class Local_Tasks_Manager {
 	 * @return void
 	 */
 	public function add_plugin_integration() {
-		// Add the plugin integration here.
 
 		/**
 		 * Filter the task providers.
