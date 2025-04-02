@@ -315,7 +315,7 @@ class Local_Tasks_Manager {
 	 */
 	public function cleanup_pending_tasks() {
 
-		$cleanup_recently_performed = \progress_planner()->get_cache()->get( 'cleanup_pending_tasks' );
+		$cleanup_recently_performed = \progress_planner()->get_utils__cache()->get( 'cleanup_pending_tasks' );
 
 		if ( $cleanup_recently_performed ) {
 			return;
@@ -354,6 +354,6 @@ class Local_Tasks_Manager {
 			\progress_planner()->get_settings()->set( 'local_tasks', array_values( $tasks ) );
 		}
 
-		\progress_planner()->get_cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );
+		\progress_planner()->get_utils__cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );
 	}
 }

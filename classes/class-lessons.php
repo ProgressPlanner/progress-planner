@@ -49,7 +49,7 @@ class Lessons {
 
 		$cache_key = md5( $url );
 
-		$cached = \progress_planner()->get_cache()->get( $cache_key );
+		$cached = \progress_planner()->get_utils__cache()->get( $cache_key );
 		if ( is_array( $cached ) ) {
 			return $cached;
 		}
@@ -57,22 +57,22 @@ class Lessons {
 		$response = \wp_remote_get( $url );
 
 		if ( \is_wp_error( $response ) ) {
-			\progress_planner()->get_cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
+			\progress_planner()->get_utils__cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
 			return [];
 		}
 
 		if ( 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
-			\progress_planner()->get_cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
+			\progress_planner()->get_utils__cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
 			return [];
 		}
 
 		$json = json_decode( \wp_remote_retrieve_body( $response ), true );
 		if ( ! is_array( $json ) ) {
-			\progress_planner()->get_cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
+			\progress_planner()->get_utils__cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
 			return [];
 		}
 
-		\progress_planner()->get_cache()->set( $cache_key, $json, WEEK_IN_SECONDS );
+		\progress_planner()->get_utils__cache()->set( $cache_key, $json, WEEK_IN_SECONDS );
 
 		return $json;
 	}
