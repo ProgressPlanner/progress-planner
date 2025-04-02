@@ -45,6 +45,7 @@ class Debug_Tools {
 		\add_action( 'init', [ $this, 'check_delete_suggested_tasks' ] );
 		\add_action( 'init', [ $this, 'check_delete_licenses' ] );
 		\add_action( 'init', [ $this, 'check_delete_badges' ] );
+		\add_action( 'init', [ $this, 'check_toggle_migrations' ] );
 
 		// Add filter to modify the maximum number of suggested tasks to display.
 		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_suggested_tasks' ] );
@@ -88,6 +89,8 @@ class Debug_Tools {
 		$this->add_activities_submenu_item( $admin_bar );
 
 		$this->add_more_info_submenu_item( $admin_bar );
+
+		$this->add_toggle_migrations_submenu_item( $admin_bar );
 	}
 
 	/**
@@ -294,6 +297,60 @@ class Debug_Tools {
 				]
 			);
 		}
+	}
+
+	/**
+	 * Add Toggle Migrations submenu to the debug menu.
+	 *
+	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
+	 * @return void
+	 */
+	protected function add_toggle_migrations_submenu_item( $admin_bar ) {
+		$debug_enabled = \get_option( 'prpl_debug_migrations', false );
+		$title         = $debug_enabled ? '<span style="color: green;">Upgrade Migrations Enabled</span>' : '<span style="color: red;">Upgrade Migrations Disabled</span>';
+		$href          = add_query_arg( 'prpl_toggle_migrations', '1', $this->current_url );
+
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-toggle-migrations',
+				'parent' => 'prpl-debug',
+				'title'  => $title,
+				'href'   => $href,
+			]
+		);
+	}
+
+	/**
+	 * Check and process the toggle migrations action.
+	 *
+	 * Toggles the debug option if the appropriate query parameter is set
+	 * and user has required capabilities.
+	 *
+	 * @return void
+	 */
+	public function check_toggle_migrations() {
+		if (
+			! isset( $_GET['prpl_toggle_migrations'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$_GET['prpl_toggle_migrations'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			! current_user_can( 'manage_options' )
+		) {
+			return;
+		}
+
+		// Verify nonce for security.
+		$this->verify_nonce();
+
+		// Toggle the debug option.
+		$current_value = \get_option( 'prpl_debug_migrations', false );
+		if ( $current_value ) {
+			\delete_option( 'prpl_debug_migrations' );
+		} else {
+			\update_option( 'prpl_debug_migrations', true );
+		}
+
+		// Redirect to the same page without the parameter.
+		wp_safe_redirect( remove_query_arg( [ 'prpl_toggle_migrations', '_wpnonce' ] ) );
+		exit;
 	}
 
 	/**

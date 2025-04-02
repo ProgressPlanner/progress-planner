@@ -112,7 +112,7 @@ class Create extends Repetitive {
 			'category'    => $this->get_provider_category(),
 			'points'      => $this->get_points(), // We use $this->get_points() here on purpose, get_points_for_task() calcs the points for the last published post.
 			'url'         => \esc_url( \admin_url( 'post-new.php?post_type=post' ) ),
-			'description' => esc_html__( 'Create a new post.', 'progress-planner' ),
+			'description' => esc_html__( 'Create a new, relevant post. If you write an in-depth post you may earn an extra point.', 'progress-planner' ),
 		];
 
 		return $task_details;
