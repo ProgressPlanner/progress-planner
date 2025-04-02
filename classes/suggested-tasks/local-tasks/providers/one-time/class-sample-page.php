@@ -8,7 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
-use Progress_Planner\Data_Collector\Sample_Page as Sample_Page_Data_Collector;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page as Sample_Page_Data_Collector;
 
 /**
  * Add task to delete the Sample Page.
@@ -32,7 +32,7 @@ class Sample_Page extends One_Time {
 	/**
 	 * The data collector.
 	 *
-	 * @var \Progress_Planner\Data_Collector\Sample_Page
+	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page
 	 */
 	protected $data_collector;
 

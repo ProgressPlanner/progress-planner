@@ -55,7 +55,7 @@ final class Bold_Blogger extends Badge_Content {
 
 		// Get the number of new posts published.
 		$new_count = count(
-			\progress_planner()->get_query()->query_activities(
+			\progress_planner()->get_activities__query()->query_activities(
 				[
 					'category'   => 'content',
 					'type'       => 'publish',

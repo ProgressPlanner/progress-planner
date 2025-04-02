@@ -10,14 +10,15 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner;
+namespace Progress_Planner\Rest;
 
-use Progress_Planner\Widgets\Activity_Scores;
+use Progress_Planner\Base;
+use Progress_Planner\Admin\Widgets\Activity_Scores;
 
 /**
  * Rest_API_Stats class.
  */
-class Rest_API_Stats {
+class Stats {
 	/**
 	 * Constructor.
 	 */
@@ -81,7 +82,7 @@ class Rest_API_Stats {
 
 		// Get the number of activities in the past week.
 		$data['activities'] = count(
-			\progress_planner()->get_query()->query_activities(
+			\progress_planner()->get_activities__query()->query_activities(
 				[
 					'start_date' => new \DateTime( '-7 days' ),
 				]
@@ -115,10 +116,10 @@ class Rest_API_Stats {
 
 		$data['latest_badge'] = \progress_planner()->get_badges()->get_latest_completed_badge();
 
-		$scores = \progress_planner()->get_chart()->get_chart_data(
+		$scores = \progress_planner()->get_ui__chart()->get_chart_data(
 			[
 				'items_callback' => function ( $start_date, $end_date ) {
-					return \progress_planner()->get_query()->query_activities(
+					return \progress_planner()->get_activities__query()->query_activities(
 						[
 							'start_date' => $start_date,
 							'end_date'   => $end_date,

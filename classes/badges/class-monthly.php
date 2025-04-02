@@ -236,7 +236,7 @@ final class Monthly extends Badge {
 		$end_date   = \DateTime::createFromFormat( 'Y-m-d', "{$year}-{$month_num}-" . gmdate( 't', strtotime( $month ) ) );
 
 		// Get the activities for the month.
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category'   => 'suggested_task',
 				'start_date' => $start_date,

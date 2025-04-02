@@ -5,7 +5,7 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Widgets;
+namespace Progress_Planner\Admin\Widgets;
 
 use Progress_Planner\Badges\Monthly;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
@@ -30,7 +30,7 @@ final class Suggested_Tasks extends Widget {
 	 * @return int The score.
 	 */
 	public function get_score() {
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category'   => 'suggested_task',
 				'start_date' => \DateTime::createFromFormat( 'Y-m-d', \gmdate( 'Y-m-01' ) ),
@@ -106,7 +106,7 @@ final class Suggested_Tasks extends Widget {
 		$final_tasks = array_values( $final_tasks );
 
 		foreach ( $final_tasks as $key => $task ) {
-			$final_tasks[ $key ]['providerID'] = $task['provider_id'] ?? $task['category']; // category is used for remote tasks.
+			$final_tasks[ $key ]['provider_id'] = $task['provider_id'] ?? $task['category']; // category is used for remote tasks.
 		}
 
 		// Sort the final tasks by priority. The priotity can be "high", "medium", "low", or "none".

@@ -61,7 +61,7 @@ class Remote_Tasks {
 	 */
 	public function get_tasks_to_inject() {
 		// Check if we have a cached response.
-		$tasks = \progress_planner()->get_cache()->get( self::CACHE_KEY );
+		$tasks = \progress_planner()->get_utils__cache()->get( self::CACHE_KEY );
 
 		// If we have a cached response, return it.
 		if ( \is_array( $tasks ) ) {
@@ -101,14 +101,14 @@ class Remote_Tasks {
 						}
 					}
 					// Cache the response for 1 day.
-					\progress_planner()->get_cache()->set( self::CACHE_KEY, $valid_tasks, DAY_IN_SECONDS );
+					\progress_planner()->get_utils__cache()->set( self::CACHE_KEY, $valid_tasks, DAY_IN_SECONDS );
 					return $valid_tasks;
 				}
 			}
 		}
 
 		// If we don't have a valid response, cache an empty array for 5 minutes. This will prevent the API from being called too often.
-		\progress_planner()->get_cache()->set( self::CACHE_KEY, [], 5 * MINUTE_IN_SECONDS );
+		\progress_planner()->get_utils__cache()->set( self::CACHE_KEY, [], 5 * MINUTE_IN_SECONDS );
 
 		return [];
 	}
