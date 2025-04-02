@@ -79,6 +79,13 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	protected $url = '';
 
 	/**
+	 * The task link setting.
+	 *
+	 * @var array
+	 */
+	protected $link_setting;
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -151,6 +158,15 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Get the task link setting.
+	 *
+	 * @return array
+	 */
+	public function get_link_setting() {
+		return $this->link_setting;
 	}
 
 	/**

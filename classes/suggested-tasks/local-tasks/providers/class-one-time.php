@@ -30,22 +30,6 @@ abstract class One_Time extends Local_Tasks {
 	protected const CATEGORY = 'configuration';
 
 	/**
-	 * The task link setting.
-	 *
-	 * @var array
-	 */
-	protected $link_setting;
-
-	/**
-	 * Get the task link setting.
-	 *
-	 * @return array
-	 */
-	public function get_link_setting() {
-		return $this->link_setting;
-	}
-
-	/**
 	 * Evaluate a task.
 	 *
 	 * @param string $task_id The task ID.
