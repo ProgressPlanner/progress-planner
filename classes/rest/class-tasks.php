@@ -8,12 +8,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner;
+namespace Progress_Planner\Rest;
 
 /**
  * Rest_API_Tasks class.
  */
-class Rest_API_Tasks {
+class Tasks {
 	/**
 	 * Constructor.
 	 */

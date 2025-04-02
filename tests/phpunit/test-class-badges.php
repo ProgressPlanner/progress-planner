@@ -7,9 +7,6 @@
 
 namespace Progress_Planner\Tests;
 
-use Progress_Planner\Activity;
-use Progress_Planner\Badges\Monthly;
-
 /**
  * Badges test case.
  */

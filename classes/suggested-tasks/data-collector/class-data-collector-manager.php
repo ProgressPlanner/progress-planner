@@ -5,14 +5,14 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Data_Collector;
+namespace Progress_Planner\Suggested_Tasks\Data_Collector;
 
-use Progress_Planner\Data_Collector\Hello_World;
-use Progress_Planner\Data_Collector\Sample_Page;
-use Progress_Planner\Data_Collector\Inactive_Plugins;
-use Progress_Planner\Data_Collector\Uncategorized_Category;
-use Progress_Planner\Data_Collector\Post_Author;
-use Progress_Planner\Data_Collector\Last_Published_Post;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Hello_World;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Inactive_Plugins;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Uncategorized_Category;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post;
 
 /**
  * Base data collector.
@@ -57,7 +57,7 @@ class Data_Collector_Manager {
 	 */
 	public function update_data_collectors_cache() {
 
-		$update_recently_performed = \progress_planner()->get_cache()->get( 'update_data_collectors_cache' );
+		$update_recently_performed = \progress_planner()->get_utils__cache()->get( 'update_data_collectors_cache' );
 
 		if ( $update_recently_performed ) {
 			return;
@@ -67,6 +67,6 @@ class Data_Collector_Manager {
 			$data_collector->update_cache();
 		}
 
-		\progress_planner()->get_cache()->set( 'update_data_collectors_cache', true, DAY_IN_SECONDS );
+		\progress_planner()->get_utils__cache()->set( 'update_data_collectors_cache', true, DAY_IN_SECONDS );
 	}
 }
