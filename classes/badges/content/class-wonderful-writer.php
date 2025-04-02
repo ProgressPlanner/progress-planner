@@ -78,7 +78,7 @@ final class Wonderful_Writer extends Badge_Content {
 
 		// Get the new posts count.
 		$new_count = count(
-			\progress_planner()->get_query()->query_activities(
+			\progress_planner()->get_activities__query()->query_activities(
 				[
 					'category'   => 'content',
 					'type'       => 'publish',
