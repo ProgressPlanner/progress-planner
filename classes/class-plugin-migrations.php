@@ -49,7 +49,7 @@ class Plugin_Migrations {
 	public function __construct() {
 		$this->db_version = $this->get_db_version();
 		$this->version    = $this->get_plugin_version();
-		$this->maybe_upgrade();
+		\add_action( 'init', [ $this, 'maybe_upgrade' ], 1 );
 	}
 
 	/**
@@ -75,7 +75,7 @@ class Plugin_Migrations {
 	 *
 	 * @return void
 	 */
-	private function maybe_upgrade() {
+	public function maybe_upgrade() {
 		// If the current version is the same as the plugin version, do nothing.
 		if ( version_compare( $this->db_version, $this->version, '=' ) &&
 			! \get_option( 'prpl_debug_migrations' )

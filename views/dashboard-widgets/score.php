@@ -11,7 +11,7 @@ use Progress_Planner\Badges\Monthly;
 <div class="prpl-dashboard-widget">
 	<div>
 		<prpl-gauge background="#fff" color="var(--prpl-color-accent-orange)" contentFontSize="var(--prpl-font-size-4xl)" contentPadding="var(--prpl-padding)" marginBottom="0">
-			<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) \progress_planner()->get_widgets__suggested_tasks()->get_score(); ?>">
+			<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) \progress_planner()->get_admin__widgets__suggested_tasks()->get_score(); ?>">
 				<prpl-badge
 					complete="true"
 					badge-id="<?php echo esc_attr( Monthly::get_badge_id_from_date( new \DateTime() ) ); ?>"
@@ -22,9 +22,9 @@ use Progress_Planner\Badges\Monthly;
 	</div>
 
 	<div>
-		<prpl-gauge background="#fff" color="<?php echo esc_attr( \progress_planner()->get_widgets__activity_scores()->get_gauge_color( \progress_planner()->get_widgets__activity_scores()->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-5xl)" contentPadding="var(--prpl-padding)" marginBottom="0">
-			<progress max="100" value="<?php echo (float) \progress_planner()->get_widgets__activity_scores()->get_score(); ?>">
-				<?php echo \esc_html( \progress_planner()->get_widgets__activity_scores()->get_score() ); ?>
+		<prpl-gauge background="#fff" color="<?php echo esc_attr( \progress_planner()->get_admin__widgets__activity_scores()->get_gauge_color( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-5xl)" contentPadding="var(--prpl-padding)" marginBottom="0">
+			<progress max="100" value="<?php echo (float) \progress_planner()->get_admin__widgets__activity_scores()->get_score(); ?>">
+				<?php echo \esc_html( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ); ?>
 			</progress>
 		</prpl-gauge>
 		<?php \esc_html_e( 'Website activity score', 'progress-planner' ); ?>
