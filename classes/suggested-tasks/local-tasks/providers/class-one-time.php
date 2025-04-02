@@ -30,71 +30,11 @@ abstract class One_Time extends Local_Tasks {
 	protected const CATEGORY = 'configuration';
 
 	/**
-	 * The task description.
-	 *
-	 * @var string
-	 */
-	protected $description;
-
-	/**
-	 * Whether the task is dismissable.
-	 *
-	 * @var bool
-	 */
-	protected $is_dismissable = false;
-
-	/**
 	 * The task link setting.
 	 *
 	 * @var array
 	 */
 	protected $link_setting;
-
-	/**
-	 * The task parent.
-	 *
-	 * @var int
-	 */
-	protected $parent = 0;
-
-	/**
-	 * The task points.
-	 *
-	 * @var int
-	 */
-	protected $points = 1;
-
-	/**
-	 * The task priority.
-	 *
-	 * @var string
-	 */
-	protected $priority = 'medium';
-
-	/**
-	 * The task title.
-	 *
-	 * @var string
-	 */
-	protected $title;
-
-	/**
-	 * The task URL.
-	 *
-	 * @var string
-	 */
-	protected $url = '';
-
-	/**
-	 * Get the task description.
-	 *
-	 * @param bool $wrap_in_p Whether to wrap the description in a <p> tag.
-	 *
-	 * @return string
-	 */
-	public function get_description( $wrap_in_p = true ) {
-		return $wrap_in_p ? '<p>' . $this->description . '</p>' : $this->description;
-	}
 
 	/**
 	 * Get the task link setting.
@@ -103,64 +43,6 @@ abstract class One_Time extends Local_Tasks {
 	 */
 	public function get_link_setting() {
 		return $this->link_setting;
-	}
-
-	/**
-	 * Get the task parent.
-	 *
-	 * @return int
-	 */
-	public function get_parent() {
-		return $this->parent;
-	}
-
-	/**
-	 * Get the task points.
-	 *
-	 * @return int
-	 */
-	public function get_points() {
-		return $this->points;
-	}
-
-	/**
-	 * Get the task priority.
-	 *
-	 * @return string
-	 */
-	public function get_priority() {
-		return $this->priority;
-	}
-
-	/**
-	 * Get the task title.
-	 *
-	 * @return string
-	 */
-	public function get_title() {
-		return $this->title;
-	}
-
-	/**
-	 * Get the task URL.
-	 *
-	 * @return string
-	 */
-	public function get_url() {
-		if ( $this->url ) {
-			return \esc_url( $this->url );
-		}
-
-		return '';
-	}
-
-	/**
-	 * Get the task dismissable setting.
-	 *
-	 * @return bool
-	 */
-	public function is_dismissable() {
-		return $this->is_dismissable;
 	}
 
 	/**

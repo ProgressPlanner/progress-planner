@@ -44,11 +44,113 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
+	 * The task points.
+	 *
+	 * @var int
+	 */
+	protected $points = 1;
+
+	/**
+	 * The task parent.
+	 *
+	 * @var int
+	 */
+	protected $parent = 0;
+
+	/**
+	 * The task priority.
+	 *
+	 * @var string
+	 */
+	protected $priority = 'medium';
+
+	/**
+	 * Whether the task is dismissable.
+	 *
+	 * @var bool
+	 */
+	protected $is_dismissable = false;
+
+	/**
+	 * The task URL.
+	 *
+	 * @var string
+	 */
+	protected $url = '';
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
 	 */
 	public function init() {
+	}
+
+	/**
+	 * Get the task title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return '';
+	}
+
+	/**
+	 * Get the task description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return '';
+	}
+
+	/**
+	 * Get the task points.
+	 *
+	 * @return int
+	 */
+	public function get_points() {
+		return $this->points;
+	}
+
+	/**
+	 * Get the task parent.
+	 *
+	 * @return int
+	 */
+	public function get_parent() {
+		return $this->parent;
+	}
+
+	/**
+	 * Get the task priority.
+	 *
+	 * @return string
+	 */
+	public function get_priority() {
+		return $this->priority;
+	}
+
+	/**
+	 * Get whether the task is dismissable.
+	 *
+	 * @return bool
+	 */
+	public function is_dismissable() {
+		return $this->is_dismissable;
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	public function get_url() {
+		if ( $this->url ) {
+			return \esc_url( $this->url );
+		}
+
+		return '';
 	}
 
 	/**
