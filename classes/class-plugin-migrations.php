@@ -49,7 +49,7 @@ class Plugin_Migrations {
 	public function __construct() {
 		$this->db_version = $this->get_db_version();
 		$this->version    = $this->get_plugin_version();
-		\add_action( 'init', [ $this, 'maybe_upgrade' ] );
+		\add_action( 'init', [ $this, 'maybe_upgrade' ], 1 );
 	}
 
 	/**
