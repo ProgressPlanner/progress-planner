@@ -113,7 +113,7 @@ class Badges {
 	 */
 	public function clear_monthly_progress( $activity_id ) {
 
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'suggested_task',
 				'type'     => 'completed',

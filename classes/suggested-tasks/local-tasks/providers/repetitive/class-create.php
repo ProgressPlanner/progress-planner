@@ -8,7 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
-use Progress_Planner\Data_Collector\Last_Published_Post as Last_Published_Post_Data_Collector;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post as Last_Published_Post_Data_Collector;
 
 /**
  * Add tasks for content creation.
@@ -39,7 +39,7 @@ class Create extends Repetitive {
 	/**
 	 * The data collector.
 	 *
-	 * @var \Progress_Planner\Data_Collector\Last_Published_Post
+	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post
 	 */
 	protected $data_collector;
 
@@ -112,7 +112,7 @@ class Create extends Repetitive {
 			'category'    => $this->get_provider_category(),
 			'points'      => $this->get_points(), // We use $this->get_points() here on purpose, get_points_for_task() calcs the points for the last published post.
 			'url'         => \esc_url( \admin_url( 'post-new.php?post_type=post' ) ),
-			'description' => esc_html__( 'Create a new post.', 'progress-planner' ),
+			'description' => esc_html__( 'Create a new, relevant post. If you write an in-depth post you may earn an extra point.', 'progress-planner' ),
 		];
 
 		return $task_details;

@@ -12,4 +12,4 @@
 </div>
 <?php
 
-\progress_planner()->get_widgets__todo()->the_todo_list();
+\progress_planner()->get_admin__widgets__todo()->the_todo_list();

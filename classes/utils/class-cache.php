@@ -5,7 +5,7 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner;
+namespace Progress_Planner\Utils;
 
 /**
  * Cache class.

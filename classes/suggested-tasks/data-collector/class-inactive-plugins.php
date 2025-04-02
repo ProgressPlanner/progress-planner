@@ -5,9 +5,9 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Data_Collector;
+namespace Progress_Planner\Suggested_Tasks\Data_Collector;
 
-use Progress_Planner\Data_Collector\Base_Data_Collector;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector;
 
 /**
  * Inactive plugins data collector class.
@@ -27,9 +27,8 @@ class Inactive_Plugins extends Base_Data_Collector {
 	 * @return void
 	 */
 	public function init() {
-		\add_action( 'activated_plugin', [ $this, 'update_inactive_plugins_cache' ], 10 );
-		\add_action( 'deactivated_plugin', [ $this, 'update_inactive_plugins_cache' ], 10 );
 		\add_action( 'deleted_plugin', [ $this, 'update_inactive_plugins_cache' ], 10 );
+		\add_action( 'update_option_active_plugins', [ $this, 'update_inactive_plugins_cache' ], 10 );
 	}
 
 	/**
