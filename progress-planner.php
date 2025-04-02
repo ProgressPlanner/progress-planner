@@ -69,11 +69,17 @@ spl_autoload_register(
 		];
 
 		if ( isset( $deprecated[ $class_name ] ) ) {
-			if ( ! function_exists( '_deprecated_class' ) ) {
-				require_once ABSPATH . 'wp-includes/functions.php'; // @phpstan-ignore-line
-			}
-			\_deprecated_class( $class_name, $deprecated[ $class_name ][1], $deprecated[ $class_name ][0] );
-			$class_name = $deprecated[ $class_name ][0];
+			\wp_trigger_error(
+				'', // @phpstan-ignore-line
+				sprintf(
+					'Class %1$s is <strong>deprecated</strong> since version %2$s! Use %3$s instead.',
+					$class_name,
+					$deprecated[ $class_name ][1],
+					$deprecated[ $class_name ][0]
+				),
+				E_USER_DEPRECATED
+			);
+			class_alias( $deprecated[ $class_name ][0], $class_name );
 		}
 
 		$class_name = \str_replace( $prefix, '', $class_name );
