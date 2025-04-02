@@ -69,13 +69,12 @@ spl_autoload_register(
 		];
 
 		if ( isset( $deprecated[ $class_name ] ) ) {
-			\wp_trigger_error(
-				'', // @phpstan-ignore-line
+			\trigger_error( // phpcs:ignore
 				sprintf(
 					'Class %1$s is <strong>deprecated</strong> since version %2$s! Use %3$s instead.',
-					$class_name,
-					$deprecated[ $class_name ][1],
-					$deprecated[ $class_name ][0]
+					\esc_html( $class_name ),
+					\esc_html( $deprecated[ $class_name ][1] ),
+					\esc_html( $deprecated[ $class_name ][0] )
 				),
 				E_USER_DEPRECATED
 			);
