@@ -97,7 +97,7 @@ class Plugin_Migrations {
 		\update_option( 'progress_planner_version', $this->version );
 
 		// Clear cache.
-		\progress_planner()->get_cache()->delete_all();
+		\progress_planner()->get_utils__cache()->delete_all();
 
 		/**
 		 * Fires when the plugin is updated.

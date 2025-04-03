@@ -35,6 +35,23 @@ class Core_Update extends Repetitive {
 	protected const CAPABILITY = 'update_core';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var string
+	 */
+	protected $priority = 'high';
+
+
+	/**
+	 * Constructor.
+	 *
+	 * @return void
+	 */
+	public function __construct() {
+		$this->url = \admin_url( 'update-core.php' );
+	}
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -43,6 +60,28 @@ class Core_Update extends Repetitive {
 		\add_filter( 'update_bulk_plugins_complete_actions', [ $this, 'add_core_update_link' ] );
 		\add_filter( 'update_bulk_theme_complete_actions', [ $this, 'add_core_update_link' ] );
 		\add_filter( 'update_translations_complete_actions', [ $this, 'add_core_update_link' ] );
+	}
+
+	/**
+	 * Get the task title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Perform all updates', 'progress-planner' );
+	}
+
+	/**
+	 * Get the task description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return sprintf(
+			/* translators: %s:<a href="http://prpl.fyi/perform-all-updates" target="_blank">See why we recommend this</a> link */
+			\esc_html__( 'Regular updates improve security and performance. %s.', 'progress-planner' ),
+			'<a href="http://prpl.fyi/perform-all-updates" target="_blank">' . \esc_html__( 'See why we recommend this', 'progress-planner' ) . '</a>'
+		);
 	}
 
 	/**
@@ -97,18 +136,15 @@ class Core_Update extends Repetitive {
 
 		return [
 			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Perform all updates', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'high',
+			'title'       => $this->get_title(),
+			'parent'      => $this->get_parent(),
+			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
 			'provider_id' => $this->get_provider_id(),
-			'points'      => 1,
-			'url'         => $this->capability_required() ? \esc_url( \admin_url( 'update-core.php' ) ) : '',
-			'description' => sprintf(
-				/* translators: %s:<a href="http://prpl.fyi/perform-all-updates" target="_blank">See why we recommend this</a> link */
-				\esc_html__( 'Regular updates improve security and performance. %s.', 'progress-planner' ),
-				'<a href="http://prpl.fyi/perform-all-updates" target="_blank">' . \esc_html__( 'See why we recommend this', 'progress-planner' ) . '</a>'
-			),
+			'points'      => $this->get_points(),
+			'dismissable' => $this->is_dismissable(),
+			'url'         => $this->get_url(),
+			'description' => $this->get_description(),
 		];
 	}
 }

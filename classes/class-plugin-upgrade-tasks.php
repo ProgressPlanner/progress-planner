@@ -17,36 +17,40 @@ class Plugin_Upgrade_Tasks {
 	 */
 	public function __construct() {
 
-		// Plugin activated.
-		\add_action( 'activated_plugin', [ $this, 'plugin_activated' ], 10 );
+		// Plugin (possibly 3rd party) activated.
+		\add_action( 'activated_plugin', [ $this, 'plugin_activated_or_updated' ], 10 );
 
-		// Plugin updated.
-		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_updated' ], 10 );
+		// Progress Planner plugin updated.
+		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_activated_or_updated' ], 10 );
+
+		// Check if the plugin was upgraded or new plugin was activated.
+		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 10 );
 
 		// Add the action to add the upgrade tasks popover.
 		\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_upgrade_tasks_popover' ] );
 	}
 
 	/**
-	 * Plugin activated.
+	 * Plugin upgraded or (3rd party) plugin was activated.
 	 *
-	 * @param string $plugin The plugin file.
 	 * @return void
 	 */
-	public function plugin_activated( $plugin ) {
-		if ( 'progress-planner/progress-planner.php' !== $plugin ) {
-			return;
-		}
-
-		$this->maybe_add_onboarding_tasks();
+	public function plugin_activated_or_updated() {
+		update_option( 'progress_planner_plugin_was_activated', true );
 	}
 
 	/**
-	 * Plugin updated.
+	 * If the plugin was upgraded or new plugin was activated, check if we need to add onboarding tasks.
 	 *
 	 * @return void
 	 */
-	public function plugin_updated() {
+	public function handle_activation_or_upgrade() {
+		if ( ! \get_option( 'progress_planner_plugin_was_activated', false ) ) {
+			return;
+		}
+
+		\delete_option( 'progress_planner_plugin_was_activated' );
+
 		$this->maybe_add_onboarding_tasks();
 	}
 
