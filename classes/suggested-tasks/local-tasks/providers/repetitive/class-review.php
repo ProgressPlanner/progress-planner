@@ -37,6 +37,20 @@ class Review extends Repetitive {
 	protected const CATEGORY = 'content-update';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var string
+	 */
+	protected $priority = 'high';
+
+	/**
+	 * Whether the task is dismissable.
+	 *
+	 * @var bool
+	 */
+	protected $is_dismissable = true;
+
+	/**
 	 * The number of items to inject.
 	 *
 	 * @var int
@@ -64,6 +78,67 @@ class Review extends Repetitive {
 	 */
 	public function init() {
 		\add_filter( 'progress_planner_update_posts_tasks_args', [ $this, 'filter_update_posts_args' ] );
+	}
+
+	/**
+	 * Get the task title.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return string
+	 */
+	public function get_title( $task_id = '' ) {
+		$post = $this->get_post_from_task_id( $task_id );
+
+		if ( ! $post ) {
+			return '';
+		}
+
+		return sprintf(
+			// translators: %1$s: The post type, %2$s: The post title.
+			\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
+			strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
+			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
+		);
+	}
+
+	/**
+	 * Get the task description.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return string
+	 */
+	public function get_description( $task_id = '' ) {
+		$post = $this->get_post_from_task_id( $task_id );
+
+		if ( ! $post ) {
+			return '';
+		}
+
+		return '<p>' . sprintf(
+			/* translators: %1$s <a href="https://prpl.fyi/review-post" target="_blank">Review</a> link, %2$s: The post title. */
+			\esc_html__( '%1$s the post "%2$s" as it was last updated more than 6 months ago.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/review-post" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
+			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
+		) . '</p>' . ( $this->capability_required() ? '<p><a href="' . \esc_url( \get_edit_post_link( $post->ID ) ) . '">' . \esc_html__( 'Edit the post', 'progress-planner' ) . '</a>.</p>' : '' ); // @phpstan-ignore-line property.nonObject
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return string
+	 */
+	public function get_url( $task_id = '' ) {
+		$post = $this->get_post_from_task_id( $task_id );
+
+		if ( ! $post ) {
+			return '';
+		}
+
+		return $this->capability_required() ? \esc_url( \get_edit_post_link( $post->ID ) ) : ''; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**
@@ -192,39 +267,39 @@ class Review extends Repetitive {
 			return [];
 		}
 
+		$task_details = [
+			'task_id'     => $task_id,
+			'provider_id' => $this->get_provider_id(),
+			'title'       => $this->get_title( $task_id ),
+			'parent'      => $this->get_parent(),
+			'priority'    => $this->get_priority(),
+			'category'    => $this->get_provider_category(),
+			'points'      => $this->get_points(),
+			'dismissable' => $this->is_dismissable(),
+			'url'         => $this->get_url( $task_id ),
+			'description' => $this->get_description( $task_id ),
+		];
+
+		return $task_details;
+	}
+
+	/**
+	 * Get the post ID from the task ID.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return \WP_Post|null
+	 */
+	public function get_post_from_task_id( $task_id ) {
 		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
 
 		if ( empty( $tasks ) ) {
-			return [];
+			return null;
 		}
 
 		$data = $tasks[0];
 
-		$post         = \get_post( $data['post_id'] );
-		$task_details = [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			// translators: %1$s: The post type, %2$s: The post title.
-			'title'       => sprintf(
-				'Review %1$s "%2$s"',
-				strtolower( get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
-				\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
-			),
-			'parent'      => 0,
-			'priority'    => 'high',
-			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(),
-			'dismissable' => true,
-			'url'         => $this->capability_required() ? \esc_url( \get_edit_post_link( $post->ID ) ) : '', // @phpstan-ignore-line property.nonObject
-			'description' => '<p>' . sprintf(
-				/* translators: %1$s <a href="https://prpl.fyi/review-post" target="_blank">Review</a> link, %2$s: The post title. */
-				\esc_html__( '%1$s the post "%2$s" as it was last updated more than 6 months ago.', 'progress-planner' ),
-				'<a href="https://prpl.fyi/review-post" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
-				\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
-			) . '</p>' . ( $this->capability_required() ? '<p><a href="' . \esc_url( \get_edit_post_link( $post->ID ) ) . '">' . \esc_html__( 'Edit the post', 'progress-planner' ) . '</a>.</p>' : '' ), // @phpstan-ignore-line property.nonObject
-		];
-
-		return $task_details;
+		return isset( $data['post_id'] ) && $data['post_id'] ? \get_post( $data['post_id'] ) : null;
 	}
 
 	/**
