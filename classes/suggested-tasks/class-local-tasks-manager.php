@@ -27,6 +27,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Php_Version;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engine_Visibility;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\User as User_Tasks;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Interactive\Email_Sending;
 
 /**
  * Local_Tasks_Manager class.
@@ -63,6 +64,7 @@ class Local_Tasks_Manager {
 			new Php_Version(),
 			new Search_Engine_Visibility(),
 			new User_Tasks(),
+			new Email_Sending(),
 		];
 
 		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
