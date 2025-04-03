@@ -78,7 +78,7 @@ spl_autoload_register(
 				),
 				E_USER_DEPRECATED
 			);
-			$class_name = $deprecated[ $class_name ][0];
+			class_alias( $deprecated[ $class_name ][0], $class_name );
 		}
 
 		$class_name = \str_replace( $prefix, '', $class_name );
