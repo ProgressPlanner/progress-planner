@@ -192,7 +192,7 @@ class Base {
 	 */
 	public function get_remote_server_root_url() {
 		return defined( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
-			? \PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL
+			? \constant( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
 			: 'https://progressplanner.com';
 	}
 
@@ -337,7 +337,7 @@ class Base {
 	 */
 	public function get_file_version( $file ) {
 		// If we're in debug mode, use filemtime.
-		if ( defined( 'WP_SCRIPT_DEBUG' ) && \WP_SCRIPT_DEBUG ) {
+		if ( defined( 'WP_SCRIPT_DEBUG' ) && constant( 'WP_SCRIPT_DEBUG' ) ) {
 			return (string) filemtime( $file );
 		}
 

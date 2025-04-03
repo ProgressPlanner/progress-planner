@@ -132,7 +132,7 @@ class Enqueue {
 			}
 		}
 		// The file path.
-		$file_path = PROGRESS_PLANNER_DIR . "/assets/{$context}/{$handle}.{$context}";
+		$file_path = constant( 'PROGRESS_PLANNER_DIR' ) . "/assets/{$context}/{$handle}.{$context}";
 
 		// If the file does not exist, bail early.
 		if ( ! \file_exists( $file_path ) ) {
@@ -140,7 +140,7 @@ class Enqueue {
 		}
 
 		// The file URL.
-		$file_url = PROGRESS_PLANNER_URL . "/assets/{$context}/{$handle}.{$context}";
+		$file_url = constant( 'PROGRESS_PLANNER_URL' ) . "/assets/{$context}/{$handle}.{$context}";
 
 		// The handle.
 		$handle = 'js' === $context && isset( self::VENDOR_SCRIPTS[ $handle ] )
@@ -203,8 +203,8 @@ class Enqueue {
 					'data' => [
 						'nonce'  => \wp_create_nonce( 'progress_planner' ),
 						'assets' => [
-							'infoIcon'   => PROGRESS_PLANNER_URL . '/assets/images/icon_info.svg',
-							'snoozeIcon' => PROGRESS_PLANNER_URL . '/assets/images/icon_snooze.svg',
+							'infoIcon'   => constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_info.svg',
+							'snoozeIcon' => constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_snooze.svg',
 						],
 					],
 				];
@@ -237,7 +237,7 @@ class Enqueue {
 				$localize_data = [
 					'name' => 'prplCelebrate',
 					'data' => [
-						'raviIconUrl'     => PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg',
+						'raviIconUrl'     => constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg',
 						'confettiOptions' => $confetti_options,
 					],
 				];
@@ -267,9 +267,8 @@ class Enqueue {
 
 		// Get the content and maintenance badge URLs.
 		foreach ( [ 'content', 'maintenance' ] as $context ) {
-			$set_badges        = \progress_planner()->get_badges()->get_badges( $context );
-			$badge_url_context = '';
-			foreach ( $set_badges as $key => $badge ) {
+			$set_badges = \progress_planner()->get_badges()->get_badges( $context );
+			foreach ( $set_badges as $badge ) {
 				$progress = $badge->get_progress();
 				if ( $progress['progress'] > 100 ) {
 					$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge->get_id();
