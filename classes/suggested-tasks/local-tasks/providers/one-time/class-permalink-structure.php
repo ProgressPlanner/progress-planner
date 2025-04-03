@@ -25,13 +25,7 @@ class Permalink_Structure extends One_Time {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->url         = \admin_url( 'options-permalink.php' );
-		$this->title       = \esc_html__( 'Set permalink structure', 'progress-planner' );
-		$this->description = sprintf(
-			/* translators: %1$s <a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">We recommend</a> link */
-			\esc_html__( 'On install, WordPress sets the permalink structure to a format that is not SEO-friendly. %1$s changing it.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
-		);
+		$this->url = \admin_url( 'options-permalink.php' );
 
 		$icon_el = 'label[for="permalink-input-month-name"], label[for="permalink-input-post-name"]';
 
@@ -52,6 +46,28 @@ class Permalink_Structure extends One_Time {
 			'hook'   => 'options-permalink.php',
 			'iconEl' => $icon_el,
 		];
+	}
+
+	/**
+	 * Get the title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Set permalink structure', 'progress-planner' );
+	}
+
+	/**
+	 * Get the description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return sprintf(
+			/* translators: %1$s <a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">We recommend</a> link */
+			\esc_html__( 'On install, WordPress sets the permalink structure to a format that is not SEO-friendly. %1$s changing it.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
+		);
 	}
 
 	/**

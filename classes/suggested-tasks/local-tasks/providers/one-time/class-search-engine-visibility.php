@@ -25,17 +25,33 @@ class Search_Engine_Visibility extends One_Time {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->title       = \esc_html__( 'Allow your site to be indexed by search engines', 'progress-planner' );
-		$this->description = sprintf(
-			/* translators: %1$s <a href="https://prpl.fyi/blog-indexing-settings" target="_blank">allowing search engines</a> link */
-			\esc_html__( 'Your site is not currently visible to search engines. Consider %1$s to index your site.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/blog-indexing-settings" target="_blank">' . \esc_html__( 'allowing search engines', 'progress-planner' ) . '</a>',
-		);
 		$this->url          = \admin_url( 'options-reading.php' );
 		$this->link_setting = [
 			'hook'   => 'options-reading.php',
 			'iconEl' => 'label[for="blog_public"]',
 		];
+	}
+
+	/**
+	 * Get the title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Allow your site to be indexed by search engines', 'progress-planner' );
+	}
+
+	/**
+	 * Get the description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return sprintf(
+			/* translators: %1$s <a href="https://prpl.fyi/blog-indexing-settings" target="_blank">allowing search engines</a> link */
+			\esc_html__( 'Your site is not currently visible to search engines. Consider %1$s to index your site.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/blog-indexing-settings" target="_blank">' . \esc_html__( 'allowing search engines', 'progress-planner' ) . '</a>',
+		);
 	}
 
 	/**

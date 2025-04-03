@@ -170,7 +170,7 @@ class Update_111 {
 	 */
 	private function migrate_activities() {
 		// Migrate acgtivities saved in the progress_planner_activities table.
-		foreach ( \progress_planner()->get_query()->query_activities(
+		foreach ( \progress_planner()->get_activities__query()->query_activities(
 			[ 'category' => 'suggested_task' ],
 		) as $activity ) {
 			$data_id     = $activity->data_id;
@@ -271,7 +271,7 @@ class Update_111 {
 	 */
 	private function migrate_create_post_activities() {
 		// Migrate the 'create-post' activities.
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'suggested_task',
 				'type'     => 'completed',
@@ -331,7 +331,7 @@ class Update_111 {
 	 */
 	private function migrate_review_post_activities() {
 		// Migrate the 'create-post' activities.
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'suggested_task',
 				'type'     => 'completed',
@@ -364,7 +364,7 @@ class Update_111 {
 	 * @return string
 	 */
 	private function get_date_from_activity( $task_id ) {
-		$activity = \progress_planner()->get_query()->query_activities(
+		$activity = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'data_id'  => $task_id,
 				'type'     => 'completed',

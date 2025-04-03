@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_widget = \progress_planner()->get_widgets__activity_scores();
+$prpl_widget = \progress_planner()->get_admin__widgets__activity_scores();
 $prpl_record = $prpl_widget->personal_record_callback();
 
 ?>
@@ -46,11 +46,11 @@ $prpl_record = $prpl_widget->personal_record_callback();
 <p><?php \esc_html_e( 'Check out your website activity in the past months:', 'progress-planner' ); ?></p>
 <div class="prpl-graph-wrapper">
 	<?php
-	\progress_planner()->get_chart()->the_chart(
+	\progress_planner()->get_ui__chart()->the_chart(
 		[
 			'type'           => 'bar',
 			'items_callback' => function ( $start_date, $end_date ) {
-				return \progress_planner()->get_query()->query_activities(
+				return \progress_planner()->get_activities__query()->query_activities(
 					[
 						'start_date' => $start_date,
 						'end_date'   => $end_date,

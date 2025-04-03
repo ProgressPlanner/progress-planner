@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Activities;
 
-use Progress_Planner\Activity;
-
 /**
  * Handler for content activities.
  */
@@ -61,7 +59,7 @@ class Content extends Activity {
 		}
 
 		// Get the number of days between the activity date and the given date.
-		$days = absint( \progress_planner()->get_date()->get_days_between_dates( $date, $this->date ) );
+		$days = absint( \progress_planner()->get_utils__date()->get_days_between_dates( $date, $this->date ) );
 
 		// Maximum range for awarded points is 30 days.
 		if ( $days >= 30 ) {

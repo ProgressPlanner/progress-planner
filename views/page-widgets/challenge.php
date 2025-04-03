@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_challenge = \progress_planner()->get_widgets__challenge()->get_challenge();
+$prpl_challenge = \progress_planner()->get_admin__widgets__challenge()->get_challenge();
 ?>
 <h2 class="prpl-widget-title">
 	<?php if ( $prpl_challenge['icon'] ) : ?>

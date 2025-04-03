@@ -18,7 +18,7 @@ class Date_Test extends \WP_UnitTestCase {
 	public function test_get_range() {
 		$start_date = new \DateTime( '2020-01-01' );
 		$end_date   = new \DateTime( '2020-01-31' );
-		$range      = \progress_planner()->get_date()->get_range( $start_date, $end_date );
+		$range      = \progress_planner()->get_utils__date()->get_range( $start_date, $end_date );
 		$this->assertEquals( '2020-01-01', $range['start_date']->format( 'Y-m-d' ) );
 		$this->assertEquals( '2020-01-30', $range['end_date']->format( 'Y-m-d' ) ); // Excludes end date.
 	}
@@ -33,7 +33,7 @@ class Date_Test extends \WP_UnitTestCase {
 	 * @param string    $frequency  The frequency.
 	 */
 	public function test_get_periods( $start_date, $end_date, $frequency ) {
-		$periods = \progress_planner()->get_date()->get_periods( $start_date, $end_date, $frequency );
+		$periods = \progress_planner()->get_utils__date()->get_periods( $start_date, $end_date, $frequency );
 		$this->assertEquals( $start_date, $periods[0]['start_date'] );
 		$this->assertEquals( $end_date, end( $periods )['end_date']->modify( '+1 day' ) );
 	}
@@ -64,7 +64,7 @@ class Date_Test extends \WP_UnitTestCase {
 	public function test_get_days_between_dates( $start_date, $end_date, $expected ) {
 		$this->assertEquals(
 			$expected,
-			\progress_planner()->get_date()->get_days_between_dates( $start_date, $end_date )
+			\progress_planner()->get_utils__date()->get_days_between_dates( $start_date, $end_date )
 		);
 	}
 

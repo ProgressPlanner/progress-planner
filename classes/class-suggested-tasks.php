@@ -109,7 +109,7 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function delete_activity( $task_id ) {
-		$activity = \progress_planner()->get_query()->query_activities(
+		$activity = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'data_id' => $task_id,
 				'type'    => 'completed',
@@ -120,7 +120,7 @@ class Suggested_Tasks {
 			return;
 		}
 
-		\progress_planner()->get_query()->delete_activity( $activity[0] );
+		\progress_planner()->get_activities__query()->delete_activity( $activity[0] );
 	}
 
 	/**

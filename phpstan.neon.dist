@@ -7,7 +7,6 @@ parameters:
     - ./progress-planner.php
     - ./uninstall.php
   ignoreErrors:
-    - identifier: constant.notFound
     - identifier: missingType.iterableValue
     - identifier: missingType.generics
     - '#Variable \$prpl_[a-zA-Z0-9_]+ might not be defined.#'

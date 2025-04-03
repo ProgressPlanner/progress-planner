@@ -11,6 +11,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $prpl_badges = \progress_planner()->get_badges()->get_badges( $prpl_context ); // @phpstan-ignore-line variable.undefined
+
+if ( empty( $prpl_badges ) ) {
+	return;
+}
 ?>
 <div class="progress-badges">
 	<span class="badges-popover-progress-total">

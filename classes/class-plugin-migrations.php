@@ -49,7 +49,7 @@ class Plugin_Migrations {
 	public function __construct() {
 		$this->db_version = $this->get_db_version();
 		$this->version    = $this->get_plugin_version();
-		$this->maybe_upgrade();
+		\add_action( 'init', [ $this, 'maybe_upgrade' ], 1 );
 	}
 
 	/**
@@ -75,11 +75,10 @@ class Plugin_Migrations {
 	 *
 	 * @return void
 	 */
-	private function maybe_upgrade() {
+	public function maybe_upgrade() {
 		// If the current version is the same as the plugin version, do nothing.
 		if ( version_compare( $this->db_version, $this->version, '=' ) &&
-			( ! defined( 'PRPL_DEBUG' ) || ! PRPL_DEBUG ) &&
-			! \get_option( 'prpl_debug' )
+			! \get_option( 'prpl_debug_migrations' )
 		) {
 			return;
 		}
@@ -87,8 +86,7 @@ class Plugin_Migrations {
 		// Run the upgrades.
 		foreach ( self::UPGRADE_CLASSES as $version => $upgrade_class ) {
 			if (
-				( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) ||
-				\get_option( 'prpl_debug' ) ||
+				\get_option( 'prpl_debug_migrations' ) ||
 				version_compare( $version, $this->db_version, '>' )
 			) {
 				$upgrade_class = new $upgrade_class();
@@ -97,6 +95,9 @@ class Plugin_Migrations {
 		}
 
 		\update_option( 'progress_planner_version', $this->version );
+
+		// Clear cache.
+		\progress_planner()->get_utils__cache()->delete_all();
 
 		/**
 		 * Fires when the plugin is updated.

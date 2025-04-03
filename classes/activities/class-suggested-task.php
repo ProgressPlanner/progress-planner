@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Activities;
 
-use Progress_Planner\Activity;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create;
 
 /**
@@ -44,11 +43,11 @@ class Suggested_Task extends Activity {
 		}
 
 		if ( $this->id ) {
-			\progress_planner()->get_query()->update_activity( $this->id, $this );
+			\progress_planner()->get_activities__query()->update_activity( $this->id, $this );
 			return;
 		}
 
-		\progress_planner()->get_query()->insert_activity( $this );
+		\progress_planner()->get_activities__query()->insert_activity( $this );
 		\do_action( 'progress_planner_activity_saved', $this );
 	}
 

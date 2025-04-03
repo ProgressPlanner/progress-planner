@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Activities;
 
-use Progress_Planner\Activity;
-
 /**
  * Handle activities for maintenance activities.
  */
@@ -46,7 +44,7 @@ class Maintenance extends Activity {
 		$this->date    = new \DateTime();
 		$this->user_id = \get_current_user_id();
 
-		$existing = \progress_planner()->get_query()->query_activities(
+		$existing = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category'   => $this->category,
 				'type'       => $this->type,
@@ -56,10 +54,10 @@ class Maintenance extends Activity {
 			'RAW'
 		);
 		if ( ! empty( $existing ) ) {
-			\progress_planner()->get_query()->update_activity( $existing[0]->id, $this );
+			\progress_planner()->get_activities__query()->update_activity( $existing[0]->id, $this );
 			return;
 		}
-		\progress_planner()->get_query()->insert_activity( $this );
+		\progress_planner()->get_activities__query()->insert_activity( $this );
 		\do_action( 'progress_planner_activity_saved', $this );
 	}
 
@@ -76,7 +74,7 @@ class Maintenance extends Activity {
 			return $this->points[ $date_ymd ];
 		}
 		$this->points[ $date_ymd ] = self::$points_config;
-		$days                      = abs( \progress_planner()->get_date()->get_days_between_dates( $date, $this->date ) );
+		$days                      = abs( \progress_planner()->get_utils__date()->get_days_between_dates( $date, $this->date ) );
 
 		$this->points[ $date_ymd ] = ( $days < 7 ) ? $this->points[ $date_ymd ] : 0;
 

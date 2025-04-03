@@ -1,3 +1,8 @@
+= 1.1.2 =
+
+Under the hood:
+* Changed how the titles and descriptions of one_time and repetitive tasks are defined to be compatible with WP 6.8.
+
 = 1.1.1 =
 
 Bugs we fixed:

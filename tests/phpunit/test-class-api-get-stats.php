@@ -83,7 +83,7 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 
 		$cache_key = md5( $url );
 
-		\progress_planner()->get_cache()->set( $cache_key, self::get_lessons(), WEEK_IN_SECONDS );
+		\progress_planner()->get_utils__cache()->set( $cache_key, self::get_lessons(), WEEK_IN_SECONDS );
 	}
 
 	/**
