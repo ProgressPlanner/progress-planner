@@ -362,8 +362,8 @@ class Page {
 				position: relative;
 				.update-plugins {
 					position: absolute;
-					left: 22px;
-					top: 0px;
+					left: 18px;
+					bottom: 0px;
 					min-width: 15px;
 					height: 15px;
 					line-height: 1.5;
