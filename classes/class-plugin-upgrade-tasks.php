@@ -158,7 +158,7 @@ class Plugin_Upgrade_Tasks {
 	 */
 	public function add_upgrade_tasks_popover() {
 		if ( $this->should_show_upgrade_popover() ) {
-			\progress_planner()->get_popover()->the_popover( 'upgrade-tasks' )->render();
+			\progress_planner()->get_ui__popover()->the_popover( 'upgrade-tasks' )->render();
 		}
 	}
 }
