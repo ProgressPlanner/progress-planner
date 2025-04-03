@@ -19,6 +19,23 @@ namespace Progress_Planner;
  * @method \Progress_Planner\Rest\Tasks get_rest__tasks()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
+ * @method \Progress_Planner\Utils\Playground get_utils__playground()
+ * @method \Progress_Planner\Admin\Page get_admin__page()
+ * @method \Progress_Planner\Admin\Tour get_admin__tour()
+ * @method \Progress_Planner\Admin\Dashboard_Widget_Score get_admin__dashboard_widget_score()
+ * @method \Progress_Planner\Admin\Dashboard_Widget_Todo get_admin__dashboard_widget_todo()
+ * @method \Progress_Planner\Admin\Editor get_admin__editor()
+ * @method \Progress_Planner\Actions\Content get_actions__content()
+ * @method \Progress_Planner\Actions\Content_Scan get_actions__content_scan()
+ * @method \Progress_Planner\Actions\Maintenance get_actions__maintenance()
+ * @method \Progress_Planner\Admin\Page_Settings get_admin__page_settings()
+ * @method \Progress_Planner\Plugin_Deactivation get_plugin_deactivation()
+ * @method \Progress_Planner\Plugin_Upgrade_Tasks get_plugin_upgrade_tasks()
+ * @method \Progress_Planner\Page_Todos get_page_todos()
+ * @method \Progress_Planner\Suggested_Tasks\Data_Collector\Data_Collector_Manager get_suggested_tasks__data_collector__data_collector_manager()
+ * @method \Progress_Planner\Utils\Debug_Tools get_utils__debug_tools()
+ * @method \Progress_Planner\Badges get_badges()
+ * @method \Progress_Planner\Plugin_Migrations get_plugin_migrations()
  */
 class Base {
 
