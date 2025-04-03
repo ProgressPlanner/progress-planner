@@ -99,7 +99,7 @@ class Core_Update extends Repetitive {
 			foreach ( $pending_tasks as $task ) {
 				if ( $this->get_task_id() === $task['task_id'] ) {
 					$update_actions['prpl_core_update'] =
-						'<img src="' . \esc_attr( PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg' ) . '" style="width:1rem;padding-left:0.25rem;padding-right:0.25rem;vertical-align:middle;" alt="Progress Planner" />' .
+						'<img src="' . \esc_attr( constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg' ) . '" style="width:1rem;padding-left:0.25rem;padding-right:0.25rem;vertical-align:middle;" alt="Progress Planner" />' .
 						'<a href="' . \esc_url( \admin_url( 'admin.php?page=progress-planner' ) ) . '" target="_parent">' . \esc_html__( 'Click here to celebrate your completed task!', 'progress-planner' ) . '</a>';
 					break;
 				}
