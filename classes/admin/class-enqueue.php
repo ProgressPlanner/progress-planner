@@ -292,53 +292,57 @@ class Enqueue {
 	public function get_localized_strings() {
 		// Strings alphabetically ordered.
 		return [
-			'badge'                        => \esc_html__( 'Badge', 'progress-planner' ),
-			'checklistProgressDescription' => sprintf(
+			'badge'                          => \esc_html__( 'Badge', 'progress-planner' ),
+			'checklistProgressDescription'   => sprintf(
 				/* translators: %s: the checkmark icon. */
 				\esc_html__( 'Check off all required elements %s in the element checks below', 'progress-planner' ),
 				'<span style="background-color:#14b8a6;padding:0.35em;margin:0 0.25em;border-radius:50%;display:inline-block;"></span>'
 			),
-			'close'                        => \esc_html__( 'Close', 'progress-planner' ),
-			'doneBtnText'                  => \esc_html__( 'Finish', 'progress-planner' ),
-			'howLong'                      => \esc_html__( 'How long?', 'progress-planner' ),
-			'info'                         => \esc_html__( 'Info', 'progress-planner' ),
-			'markAsComplete'               => \esc_html__( 'Mark as completed', 'progress-planner' ),
-			'nextBtnText'                  => \esc_html__( 'Next &rarr;', 'progress-planner' ),
-			'prevBtnText'                  => \esc_html__( '&larr; Previous', 'progress-planner' ),
-			'pageType'                     => \esc_html__( 'Page type', 'progress-planner' ),
-			'progressPlannerSidebar'       => \esc_html__( 'Progress Planner Sidebar', 'progress-planner' ),
-			'progressText'                 => sprintf(
+			'close'                          => \esc_html__( 'Close', 'progress-planner' ),
+			'doneBtnText'                    => \esc_html__( 'Finish', 'progress-planner' ),
+			'howLong'                        => \esc_html__( 'How long?', 'progress-planner' ),
+			'info'                           => \esc_html__( 'Info', 'progress-planner' ),
+			'markAsComplete'                 => \esc_html__( 'Mark as completed', 'progress-planner' ),
+			'nextBtnText'                    => \esc_html__( 'Next &rarr;', 'progress-planner' ),
+			'prevBtnText'                    => \esc_html__( '&larr; Previous', 'progress-planner' ),
+			'pageType'                       => \esc_html__( 'Page type', 'progress-planner' ),
+			'progressPlannerSidebar'         => \esc_html__( 'Progress Planner Sidebar', 'progress-planner' ),
+			'progressText'                   => sprintf(
 				/* translators: %1$s: The current step number. %2$s: The total number of steps. */
 				\esc_html__( 'Step %1$s of %2$s', 'progress-planner' ),
 				'{{current}}',
 				'{{total}}'
 			),
-			'saving'                       => \esc_html__( 'Saving...', 'progress-planner' ),
-			'snooze'                       => \esc_html__( 'Snooze', 'progress-planner' ),
-			'snoozeDurationOneWeek'        => \esc_html__( '1 week', 'progress-planner' ),
-			'snoozeDurationOneMonth'       => \esc_html__( '1 month', 'progress-planner' ),
-			'snoozeDurationThreeMonths'    => \esc_html__( '3 months', 'progress-planner' ),
-			'snoozeDurationSixMonths'      => \esc_html__( '6 months', 'progress-planner' ),
-			'snoozeDurationOneYear'        => \esc_html__( '1 year', 'progress-planner' ),
-			'snoozeDurationForever'        => \esc_html__( 'forever', 'progress-planner' ),
-			'snoozeThisTask'               => \esc_html__( 'Snooze this task?', 'progress-planner' ),
-			'subscribed'                   => \esc_html__( 'Subscribed...', 'progress-planner' ),
-			'subscribing'                  => \esc_html__( 'Subscribing...', 'progress-planner' ),
+			'saving'                         => \esc_html__( 'Saving...', 'progress-planner' ),
+			'snooze'                         => \esc_html__( 'Snooze', 'progress-planner' ),
+			'snoozeDurationOneWeek'          => \esc_html__( '1 week', 'progress-planner' ),
+			'snoozeDurationOneMonth'         => \esc_html__( '1 month', 'progress-planner' ),
+			'snoozeDurationThreeMonths'      => \esc_html__( '3 months', 'progress-planner' ),
+			'snoozeDurationSixMonths'        => \esc_html__( '6 months', 'progress-planner' ),
+			'snoozeDurationOneYear'          => \esc_html__( '1 year', 'progress-planner' ),
+			'snoozeDurationForever'          => \esc_html__( 'forever', 'progress-planner' ),
+			'snoozeThisTask'                 => \esc_html__( 'Snooze this task?', 'progress-planner' ),
+			'subscribed'                     => \esc_html__( 'Subscribed...', 'progress-planner' ),
+			'subscribing'                    => \esc_html__( 'Subscribing...', 'progress-planner' ),
 			/* translators: %s: The task content. */
-			'taskCompleted'                => \esc_html__( "Task '%s' completed and moved to the bottom", 'progress-planner' ),
+			'taskCompleted'                  => \esc_html__( "Task '%s' completed and moved to the bottom", 'progress-planner' ),
 			/* translators: %s: The task content. */
-			'taskDelete'                   => \esc_html__( "Delete task '%s'", 'progress-planner' ),
-			'taskMovedDown'                => \esc_html__( 'Task moved down', 'progress-planner' ),
-			'taskMovedUp'                  => \esc_html__( 'Task moved up', 'progress-planner' ),
+			'taskDelete'                     => \esc_html__( "Delete task '%s'", 'progress-planner' ),
+			'taskMovedDown'                  => \esc_html__( 'Task moved down', 'progress-planner' ),
+			'taskMovedUp'                    => \esc_html__( 'Task moved up', 'progress-planner' ),
 			/* translators: %s: The task content. */
-			'taskMoveDown'                 => \esc_html__( "Move task '%s' down", 'progress-planner' ),
+			'taskMoveDown'                   => \esc_html__( "Move task '%s' down", 'progress-planner' ),
 			/* translators: %s: The task content. */
-			'taskMoveUp'                   => \esc_html__( "Move task '%s' up", 'progress-planner' ),
+			'taskMoveUp'                     => \esc_html__( "Move task '%s' up", 'progress-planner' ),
 			/* translators: %s: The task content. */
-			'taskNotCompleted'             => \esc_html__( "Task '%s' marked as not completed and moved to the top", 'progress-planner' ),
-			'video'                        => \esc_html__( 'Video', 'progress-planner' ),
-			'watchVideo'                   => \esc_html__( 'Watch video', 'progress-planner' ),
-			'disabledRRCheckboxTooltip'    => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),
+			'taskNotCompleted'               => \esc_html__( "Task '%s' marked as not completed and moved to the top", 'progress-planner' ),
+			'video'                          => \esc_html__( 'Video', 'progress-planner' ),
+			'watchVideo'                     => \esc_html__( 'Watch video', 'progress-planner' ),
+			'disabledRRCheckboxTooltip'      => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),
+			'remindMeToReviewContent'        => \esc_html__( 'Remind me to review content in 30 days', 'progress-planner' ),
+			'remindMeToReviewContentSuccess' => \esc_html__( 'Reminder set for:', 'progress-planner' ),
+			'remindMeToReviewContentError'   => \esc_html__( 'Failed to set reminder. Please try again.', 'progress-planner' ),
+			'remindMeToReviewContentSetting' => \esc_html__( 'Setting reminder...', 'progress-planner' ),
 		];
 	}
 }

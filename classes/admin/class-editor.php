@@ -56,6 +56,8 @@ class Editor {
 					'lessons'         => \progress_planner()->get_lessons()->get_items(),
 					'pageTypes'       => $page_types,
 					'defaultPageType' => $prpl_preselected_page_type,
+					'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
+					'nonce'           => \wp_create_nonce( 'progress_planner' ),
 				],
 			]
 		);
