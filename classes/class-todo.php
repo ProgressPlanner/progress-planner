@@ -23,6 +23,9 @@ class Todo {
 		\add_action( 'wp_ajax_progress_planner_save_user_suggested_task', [ $this, 'save_user_suggested_task' ] );
 		\add_action( 'wp_ajax_progress_planner_save_suggested_user_tasks_order', [ $this, 'save_suggested_user_tasks_order' ] );
 
+		// Set a reminder for the current post.
+		\add_action( 'wp_ajax_progress_planner_set_reminder', [ $this, 'set_reminder' ] );
+
 		\add_action( 'progress_planner_task_status_changed', [ $this, 'remove_order_from_completed_user_task' ], 10, 2 );
 
 		$this->maybe_change_first_item_points_on_monday();
@@ -118,6 +121,11 @@ class Todo {
 		foreach ( $tasks as $task ) {
 			// Skip non-pending tasks.
 			if ( 'pending' !== $task['status'] ) {
+				continue;
+			}
+
+			// Skip tasks that are not available yet.
+			if ( isset( $task['available_at'] ) && $task['available_at'] > time() ) {
 				continue;
 			}
 
@@ -227,6 +235,43 @@ class Todo {
 		}
 
 		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+	}
+
+	/**
+	 * Set a reminder for the current post.
+	 *
+	 * @return void
+	 */
+	public function set_reminder() {
+		// Check the nonce.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
+
+		$post_id = isset( $_POST['post_id'] ) ? \sanitize_text_field( \wp_unslash( $_POST['post_id'] ) ) : '';
+		if ( ! $post_id ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing post ID.', 'progress-planner' ) ] );
+		}
+
+		$post_title = isset( $_POST['post_title'] ) ? \sanitize_text_field( \wp_unslash( $_POST['post_title'] ) ) : '';
+		if ( ! $post_title ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing post title.', 'progress-planner' ) ] );
+		}
+
+		$task = [
+			'task_id'      => 'user-task-' . md5( $post_id ),
+			'provider_id'  => 'user',
+			'status'       => 'pending',
+			/* translators: %s: The post title. */
+			'title'        => sprintf( __( 'Review %s', 'progress-planner' ), $post_title ),
+			'available_at' => time() + 30 * DAY_IN_SECONDS,
+			'post_id'      => $post_id,
+		];
+
+		// Add the task to the local tasks.
+		progress_planner()->get_suggested_tasks()->get_local()->add_pending_task( $task );
+
+		\wp_send_json_success( [ 'message' => \esc_html__( 'Reminder set.', 'progress-planner' ) ] );
 	}
 
 	/**
