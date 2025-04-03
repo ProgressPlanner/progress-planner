@@ -112,5 +112,4 @@ function progress_planner() {
 	return $progress_planner;
 }
 
-// Initialize the plugin.
-add_action( 'plugins_loaded', 'progress_planner', -10 ); // @phpstan-ignore-line -- Action callback returns Progress_Planner\Base but should not return anything.
+progress_planner();
