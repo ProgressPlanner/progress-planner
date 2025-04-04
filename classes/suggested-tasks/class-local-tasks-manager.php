@@ -90,6 +90,7 @@ class Local_Tasks_Manager {
 	 * @return void
 	 */
 	public function add_plugin_integration() {
+		new Add_Yoast_Providers();
 
 		/**
 		 * Filter the task providers.

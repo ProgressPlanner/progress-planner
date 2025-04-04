@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Integrations\Yoast;
 
-use Progress_Planner\Data_Collector\Post_Author;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author;
 
 /**
  * Add task for Yoast SEO: disable the author archive.
@@ -31,7 +31,7 @@ class Archive_Author extends Yoast_Provider {
 	/**
 	 * The data collector.
 	 *
-	 * @var \Progress_Planner\Data_Collector\Post_Author
+	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author
 	 */
 	protected $data_collector;
 

@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Integrations\Yoast;
 
-use Progress_Planner\Data_Collector\Archive_Format as Archive_Format_Data_Collector;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Archive_Format as Archive_Format_Data_Collector;
 
 /**
  * Add task for Yoast SEO: disable the format archives.
@@ -31,7 +31,7 @@ class Archive_Format extends Yoast_Provider {
 	/**
 	 * The data collector.
 	 *
-	 * @var \Progress_Planner\Data_Collector\Archive_Format
+	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Archive_Format
 	 */
 	protected $data_collector;
 

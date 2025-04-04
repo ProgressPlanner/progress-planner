@@ -5,9 +5,7 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Data_Collector;
-
-use Progress_Planner\Data_Collector\Base_Data_Collector;
+namespace Progress_Planner\Suggested_Tasks\Data_Collector;
 
 /**
  * Archive format data collector class.
