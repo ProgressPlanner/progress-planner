@@ -23,10 +23,26 @@ class Crawl_Settings extends Yoast_Provider {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->title       = \esc_html__( 'Yoast SEO: optimize your crawl settings', 'progress-planner' );
-		$this->url         = admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization' );
-		$this->description = \esc_html__( 'Yoast SEO can block search engines from crawling unnecessary pages.', 'progress-planner' ) .
-			' <a href="https://prpl.fyi/yoast-crawl-optimization" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
+		$this->url = admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization' );
+	}
+
+	/**
+	 * Get the title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Yoast SEO: optimize your crawl settings', 'progress-planner' );
+	}
+
+	/**
+	 * Get the description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return \esc_html__( 'Yoast SEO can block search engines from crawling unnecessary pages.', 'progress-planner' ) .
+		' <a href="https://prpl.fyi/yoast-crawl-optimization" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
 	}
 
 	/**

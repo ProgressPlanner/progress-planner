@@ -23,10 +23,26 @@ class Archive_Date extends Yoast_Provider {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->title       = \esc_html__( 'Yoast SEO: disable the date archive', 'progress-planner' );
-		$this->url         = admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' );
-		$this->description = \esc_html__( 'Yoast SEO can disable the date archive, which is really only useful for news sites and blogs.', 'progress-planner' ) .
-			' <a href="https://prpl.fyi/yoast-date-archive" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
+		$this->url = admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' );
+	}
+
+	/**
+	 * Get the title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Yoast SEO: disable the date archive', 'progress-planner' );
+	}
+
+	/**
+	 * Get the description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return \esc_html__( 'Yoast SEO can disable the date archive, which is really only useful for news sites and blogs.', 'progress-planner' ) .
+		' <a href="https://prpl.fyi/yoast-date-archive" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
 	}
 
 	/**
