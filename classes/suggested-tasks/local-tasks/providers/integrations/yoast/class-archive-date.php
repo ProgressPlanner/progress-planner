@@ -17,7 +17,7 @@ class Archive_Date extends Yoast_Provider {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'yoast-date-archive';
+	protected const PROVIDER_ID = 'yoast-date-archive';
 
 	/**
 	 * Constructor.

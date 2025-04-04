@@ -19,7 +19,7 @@ class Archive_Format extends Yoast_Provider {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'yoast-format-archive';
+	protected const PROVIDER_ID = 'yoast-format-archive';
 
 	/**
 	 * The minimum number of posts with a post format to add the task.

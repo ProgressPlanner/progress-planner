@@ -19,7 +19,7 @@ abstract class Yoast_Provider extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const TYPE = 'configuration';
+	protected const CATEGORY = 'configuration';
 
 	/**
 	 * Whether the task is an onboarding task.

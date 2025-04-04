@@ -26,7 +26,7 @@ class Archive_Author extends Yoast_Provider {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'yoast-author-archive';
+	protected const PROVIDER_ID = 'yoast-author-archive';
 
 	/**
 	 * The data collector.

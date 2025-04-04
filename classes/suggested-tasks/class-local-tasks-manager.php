@@ -45,25 +45,8 @@ class Local_Tasks_Manager {
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
-		\add_action( 'plugins_loaded', [ $this, 'init' ], 11 );
 
-		// Inject tasks.
-		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
-
-		// Add the cleanup action.
-		\add_action( 'admin_init', [ $this, 'cleanup_pending_tasks' ] );
-
-		// Add the onboarding task providers.
-		\add_filter( 'prpl_onboarding_task_providers', [ $this, 'add_onboarding_task_providers' ] );
-	}
-
-	/**
-	 * Initialize the task providers.
-	 *
-	 * @return void
-	 */
-	public function init() {
+		// Instantiate local task providers.
 		$this->task_providers = [
 			new Content_Create(),
 			new Content_Review(),
@@ -82,18 +65,26 @@ class Local_Tasks_Manager {
 			new Search_Engine_Visibility(),
 			new User_Tasks(),
 		];
+
+		// Add the plugin integration.
+		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
+
+		// At this point both local and task providers for the plugins we integrate with are instantiated, so initialize them.
+		\add_action( 'plugins_loaded', [ $this, 'init' ], 11 );
+
+		// Add the cleanup action.
+		\add_action( 'admin_init', [ $this, 'cleanup_pending_tasks' ] );
 	}
 
 	/**
-	 * Add the Yoast task if the plugin is active.
+	 * Initialize the task providers.
 	 *
 	 * @return void
 	 */
-	public function add_plugin_integration() {
-		new Add_Yoast_Providers();
+	public function init() {
 
 		/**
-		 * Filter the task providers.
+		 * Filter the task providers, 3rd party providers are added here as well.
 		 *
 		 * @param array $task_providers The task providers.
 		 */
@@ -117,6 +108,23 @@ class Local_Tasks_Manager {
 			// Initialize the task provider (add hooks, etc.).
 			$task_provider->init();
 		}
+
+		// Inject tasks.
+		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
+
+		// Add the onboarding task providers.
+		\add_filter( 'prpl_onboarding_task_providers', [ $this, 'add_onboarding_task_providers' ] );
+	}
+
+	/**
+	 * Add the Yoast task if the plugin is active.
+	 *
+	 * @return void
+	 */
+	public function add_plugin_integration() {
+
+		// Yoast SEO integration.
+		new Add_Yoast_Providers();
 	}
 
 	/**

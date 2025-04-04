@@ -17,7 +17,7 @@ class Organization_Logo extends Yoast_Provider {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'yoast-organization-logo';
+	protected const PROVIDER_ID = 'yoast-organization-logo';
 
 	/**
 	 * Yoast SEO instance.

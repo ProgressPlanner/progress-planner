@@ -17,7 +17,7 @@ class Media_Pages extends Yoast_Provider {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'yoast-media-pages';
+	protected const PROVIDER_ID = 'yoast-media-pages';
 
 	/**
 	 * Constructor.

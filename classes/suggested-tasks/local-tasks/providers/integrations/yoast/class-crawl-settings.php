@@ -17,7 +17,7 @@ class Crawl_Settings extends Yoast_Provider {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'yoast-crawl-settings';
+	protected const PROVIDER_ID = 'yoast-crawl-settings';
 
 	/**
 	 * Constructor.
