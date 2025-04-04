@@ -77,6 +77,17 @@ class Local_Tasks_Manager {
 	}
 
 	/**
+	 * Add the Yoast task if the plugin is active.
+	 *
+	 * @return void
+	 */
+	public function add_plugin_integration() {
+
+		// Yoast SEO integration.
+		new Add_Yoast_Providers();
+	}
+
+	/**
 	 * Initialize the task providers.
 	 *
 	 * @return void
@@ -114,17 +125,6 @@ class Local_Tasks_Manager {
 
 		// Add the onboarding task providers.
 		\add_filter( 'prpl_onboarding_task_providers', [ $this, 'add_onboarding_task_providers' ] );
-	}
-
-	/**
-	 * Add the Yoast task if the plugin is active.
-	 *
-	 * @return void
-	 */
-	public function add_plugin_integration() {
-
-		// Yoast SEO integration.
-		new Add_Yoast_Providers();
 	}
 
 	/**
