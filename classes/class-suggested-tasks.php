@@ -48,6 +48,9 @@ class Suggested_Tasks {
 
 		// Add the automatic updates complete action.
 		\add_action( 'automatic_updates_complete', [ $this, 'on_automatic_updates_complete' ] );
+
+		// Register the custom post type.
+		\add_action( 'init', [ $this, 'register_suggested_tasks_post_type' ] );
 	}
 
 	/**
@@ -643,5 +646,31 @@ class Suggested_Tasks {
 		}
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Register a custom post type for suggested tasks.
+	 *
+	 * @return void
+	 */
+	public function register_suggested_tasks_post_type() {
+		register_post_type(
+			'prpl_suggested_task',
+			[
+				'label'             => \__( 'Suggested Tasks', 'progress-planner' ),
+				'public'            => false,
+				'show_ui'           => true,
+				'show_in_menu'      => true,
+				'show_in_nav_menus' => false,
+				'show_in_admin_bar' => false,
+				'show_in_rest'      => false,
+				'supports'          => [ 'title', 'editor', 'author' ],
+				'rewrite'           => false,
+				'menu_icon'         => 'dashicons-admin-tools',
+				'menu_position'     => 5,
+				'capability_type'   => 'post',
+				'capabilities'      => [ 'create_posts' => 'do_not_allow' ],
+			]
+		);
 	}
 }
