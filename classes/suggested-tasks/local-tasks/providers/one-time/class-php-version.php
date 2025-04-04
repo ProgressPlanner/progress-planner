@@ -19,19 +19,29 @@ class Php_Version extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'php-version';
+	protected const PROVIDER_ID = 'php-version';
 
 	/**
-	 * Constructor.
+	 * Get the title.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->description = sprintf(
+	public function get_title() {
+		return \esc_html__( 'Update PHP version', 'progress-planner' );
+	}
+
+	/**
+	 * Get the description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return sprintf(
 			/* translators: %1$s: php version, %2$s: <a href="https://prpl.fyi/update-php-version" target="_blank">We recommend</a> link */
 			\esc_html__( 'Your site is running on PHP version %1$s. %2$s updating to PHP version 8.0 or higher.', 'progress-planner' ),
 			phpversion(),
 			'<a href="https://prpl.fyi/update-php-version" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
 		);
-		$this->title = \esc_html__( 'Update PHP version', 'progress-planner' );
 	}
 
 	/**

@@ -29,31 +29,38 @@ class Page {
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		\add_action( 'wp_ajax_progress_planner_save_cpt_settings', [ $this, 'save_cpt_settings' ] );
 		\add_action( 'in_admin_header', [ $this, 'remove_admin_notices' ], PHP_INT_MAX );
+
+		// Clear the cache for the activity scores widget.
+		\add_action( 'progress_planner_activity_saved', [ $this, 'clear_activity_scores_cache' ] );
+		\add_action( 'progress_planner_activity_deleted', [ $this, 'clear_activity_scores_cache' ] );
+
+		// Add a custom admin footer.
+		\add_action( 'admin_footer', [ $this, 'admin_footer' ] );
 	}
 
 	/**
 	 * Get the widgets objects
 	 *
-	 * @return array<\Progress_Planner\Widgets\Widget>
+	 * @return array<\Progress_Planner\Admin\Widgets\Widget>
 	 */
 	public function get_widgets() {
 		$widgets = [
-			\progress_planner()->get_widgets__suggested_tasks(),
-			\progress_planner()->get_widgets__activity_scores(),
-			\progress_planner()->get_widgets__todo(),
-			\progress_planner()->get_widgets__challenge(),
-			\progress_planner()->get_widgets__latest_badge(),
-			\progress_planner()->get_widgets__badge_streak(),
-			\progress_planner()->get_widgets__published_content(),
-			\progress_planner()->get_widgets__whats_new(),
+			\progress_planner()->get_admin__widgets__suggested_tasks(),
+			\progress_planner()->get_admin__widgets__activity_scores(),
+			\progress_planner()->get_admin__widgets__todo(),
+			\progress_planner()->get_admin__widgets__challenge(),
+			\progress_planner()->get_admin__widgets__latest_badge(),
+			\progress_planner()->get_admin__widgets__badge_streak(),
+			\progress_planner()->get_admin__widgets__published_content(),
+			\progress_planner()->get_admin__widgets__whats_new(),
 		];
 
 		/**
 		 * Filter the widgets.
 		 *
-		 * @param array<\Progress_Planner\Widgets\Widget> $widgets The widgets.
+		 * @param array<\Progress_Planner\Admin\Widgets\Widget> $widgets The widgets.
 		 *
-		 * @return array<\Progress_Planner\Widgets\Widget>
+		 * @return array<\Progress_Planner\Admin\Widgets\Widget>
 		 */
 		return \apply_filters( 'progress_planner_admin_widgets', $widgets );
 	}
@@ -63,7 +70,7 @@ class Page {
 	 *
 	 * @param string $id The widget ID.
 	 *
-	 * @return \Progress_Planner\Widgets\Widget|void
+	 * @return \Progress_Planner\Admin\Widgets\Widget|void
 	 */
 	public function get_widget( $id ) {
 		$widgets = $this->get_widgets();
@@ -80,14 +87,42 @@ class Page {
 	 * @return void
 	 */
 	public function add_page() {
+		global $admin_page_hooks;
+
+		$page_identifier = 'progress-planner';
+
 		\add_menu_page(
-			\esc_html__( 'Progress Planner', 'progress-planner' ),
-			\esc_html__( 'Progress Planner', 'progress-planner' ),
+			'Progress Planner',
+			'Progress Planner' . $this->get_notification_counter(),
 			'manage_options',
-			'progress-planner',
+			$page_identifier,
 			[ $this, 'render_page' ],
 			'data:image/svg+xml;base64,PHN2ZyByb2xlPSJpbWciIGFyaWEtaGlkZGVuPSJ0cnVlIiBmb2N1c2FibGU9ImZhbHNlIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzNjggNTAwIj48cGF0aCBmaWxsPSIjMzgyOTZkIiBkPSJNMjE3LjQ2IDE3Mi45YzMuMjEuMTIgNS45NyAxLjc0IDcuNzMgNC4xNS0xLjg3LTEwLjI0LTEwLjY0LTE4LjE3LTIxLjQ4LTE4LjU2LTEyLjUyLS40NS0yMy4wMyA5LjMzLTIzLjQ4IDIxLjg1LS40NSAxMi41MiA5LjMzIDIzLjAzIDIxLjg1IDIzLjQ4IDkuNC4zNCAxNy42Ny01LjEgMjEuNC0xMy4xMy0xLjgzIDEuNTEtNC4xOCAyLjQyLTYuNzQgMi4zMy01LjU1LS4yLTkuODktNC44Ni05LjY5LTEwLjQxLjItNS41NSA0Ljg2LTkuODkgMTAuNDEtOS42OVpNMjQxLjUxIDMwNS44NGMuNTggMS45MiAxLjEzIDMuODYgMS43MyA1Ljc3IDE0LjA0IDQ0Ljk3IDMzLjk0IDg4Ljc1IDU2LjQyIDEyNC4yN2w2Ny43NS0xMzAuMDRoLTEyNS45Wk0yOTcuOTYgMjA1Ljk3YzEyLjEyLTQuNSAyMy41NC03LjE4IDMzLjY0LTguOTYtMjIuNTEtMjIuMjctNjEuMjQtMjcuMDYtNjEuNDctMjcuMDkgMS4yNyA2LjE3LjU4IDE1LjgtMi40NCAyNi40Ni0zLjMgMTEuNjYtOS4zOCAyNC41NC0xOC43IDM1LjQ4LTMuNDUgNC4wNi03LjM2IDcuODMtMTEuNzMgMTEuMTloLjA3di0uMDFjLjE2LjYyLjM4IDEuMi41OCAxLjc5IDIuNzQgOC4yNyA4LjYxIDEzLjc0IDE0LjkzIDE3LjE0IDYuNDggMy40OSAxMy4zNyA0LjgzIDE3LjY4IDQuODMgNi40IDAgMTEuODgtMy43OSAxNC40My05LjIyLjk3LTIuMDYgMS41NS00LjMzIDEuNTUtNi43NiAwLTMuODUtMS40Mi03LjM0LTMuNjktMTAuMS0xLjkyLTIuMzMtNC40Ni00LjA4LTcuMzktNS4wM2w0NC44Mi04LjY1Yy02LjYzLTYuMTItMTQuNzItMTEuNTktMjIuNzMtMTYuMjMtMS45Ny0xLjE0LTEuNjktNC4wNS40NS00Ljg0WiIvPjxwYXRoIGZpbGw9IiNmYWEzMTAiIGQ9Ik0yODEuMzcgNDU4LjM3Yy0yNS43OS0zOC44NC00OC42OC04OC4wNC02NC40NS0xMzguNTQtMS40NS00LjYzLTIuODMtOS4zMS00LjE3LTEzLjk5LTEuMTItMy45NC0yLjIyLTcuODgtMy4yNS0xMS44LTIuMDktNy45Mi05LjI4LTEzLjQ2LTE3LjQ4LTEzLjQ2aC0yNy45NWMtOC4yIDAtMTUuMzkgNS41My0xNy40OCAxMy40NS0yLjI4IDguNjUtNC43OCAxNy4zMi03LjQyIDI1Ljc5LTE1Ljc3IDUwLjUtMzguNjUgOTkuNy02NC40NSAxMzguNTQtNC4wMSA2LjAzLTEuNzggMTEuNjMtLjY0IDEzLjc2IDIuNCA0LjQ3IDYuODYgNy4xNCAxMS45NCA3LjE0aDY2LjAxbDMuOTcgNi45MmM0LjU0IDcuOSAxMi45OSAxMi44MSAyMi4wNSAxMi44MXMxNy41MS00LjkxIDIyLjA2LTEyLjgxbDMuOTgtNi45Mmg2NmMzLjIyIDAgNi4xOS0xLjA4IDguNTUtMy4wMiAxLjM1LTEuMTEgMi41MS0yLjQ5IDMuMzgtNC4xMy41Ny0xLjA3IDEuNDItMy4wMiAxLjYxLTUuNDYuMTktMi40MS0uMjYtNS4zMS0yLjI1LTguMzFaIi8+PHBhdGggZmlsbD0iIzM4Mjk2ZCIgZD0iTTI5NS43IDc2LjA2Yy03LjU0LTEyLjA1LTMyLjM4IDEtNTkuNTQgMi44Ni0xNS4wNCAxLjAzLTM3LjA1LTExMC42My03MS43Ny01Ni45OS0zOS41NiA2MS4xLTc5LjEyLTQ0LjY4LTg4LjY2LTE1LjgzLTIxLjExIDQzLjI3IDI1LjE1IDg0LjYxIDI1LjE1IDg0LjYxcy0xMi44NCA3LjkyLTIwLjYzIDEzLjkzYy01LjQ3IDQuMTctMTAuODIgOC42NS0xNi4wMyAxMy41MS0yMC40NSAxOS4wMy0zNi4wNCA0MC4zMi00Ni43NyA2My44NkM2LjcyIDIwNS41NSAxLjExIDIyOS41OS42MiAyNTQuMTVjLS40OSAyNC41NiA0LjAxIDQ5LjEgMTMuNTQgNzMuNjMgOS41MiAyNC41MyAyNC4xNyA0Ny40MiA0My45NSA2OC42OCA0LjAyIDQuMzIgOC4xMiA4LjQxIDEyLjMxIDEyLjMgNC4xLTYuMzEgNy45Ny0xMi43NCAxMS42NC0xOS4yNiA0LjM5LTcuOCA4LjUtMTUuNzIgMTIuMjUtMjMuNzgtLjMzLS4zNS0uNjYtLjY5LS45OS0xLjAzLS4xNy0uMTgtLjM0LS4zNS0uNTEtLjUzLTE1LjUzLTE2LjY5LTI3LjE3LTM0LjU5LTM0LjkzLTUzLjcyLTcuNzctMTkuMTMtMTEuNS0zOC4yNS0xMS4yLTU3LjM2LjI5LTE5LjEgNC40Ny0zNy42OCAxMi41My01NS43MiA4LjA2LTE4LjA1IDIwLjAyLTM0LjQ1IDM1LjktNDkuMjIgMTMuOTktMTMuMDIgMjguODQtMjIuODMgNDQuNTUtMjkuNDEgMTUuNy02LjU5IDMxLjYzLTkuOTggNDcuNzYtMTAuMTggOS4wNS0uMTEgMTkuMTEgMS4xNSAyOS41MSA0LjUgMTAuMzIgNC4yNyAxOS4yMiA5LjQ0IDI2LjYzIDE1LjM1IDEwLjE5IDguMTMgMTcuNjEgMTcuNjUgMjIuMjIgMjguMSAxLjkxIDQuMzIgMy4zNyA4LjggNC4zMiAxMy40MSAxNi4yNy0yOC4yNyAzNi43NS03NS45NiAyNS41Ny05My44M1oiLz48L3N2Zz4='
 		);
+
+		// Wipe notification bits from hooks.
+		// phpcs:ignore WordPress.WP.GlobalVariablesOverride -- This is a deliberate action.
+		$admin_page_hooks[ $page_identifier ] = $page_identifier;
+	}
+
+	/**
+	 * Returns the notification count in HTML format.
+	 *
+	 * @return string The notification count in HTML format.
+	 */
+	protected function get_notification_counter() {
+
+		$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' );
+		$notification_count        = count( $pending_celebration_tasks );
+
+		if ( 0 === $notification_count ) {
+			return '';
+		}
+
+		/* translators: Hidden accessibility text; %s: number of notifications. */
+		$notifications = sprintf( _n( '%s pending celebration', '%s pending celebrations', $notification_count, 'progress-planner' ), number_format_i18n( $notification_count ) );
+
+		return sprintf( '<span class="update-plugins count-%1$d" style="background-color:#f9b23c;color:#38296d;"><span class="plugin-count" aria-hidden="true">%1$d</span><span class="screen-reader-text">%2$s</span></span>', $notification_count, $notifications );
 	}
 
 	/**
@@ -127,26 +162,43 @@ class Page {
 			return;
 		}
 
-		\progress_planner()->get_admin__scripts()->register_scripts();
-
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
 
+			$default_localization_data = [
+				'name' => 'progressPlanner',
+				'data' => [
+					'onboardNonceURL' => \progress_planner()->get_utils__onboard()->get_remote_nonce_url(),
+					'onboardAPIUrl'   => \progress_planner()->get_utils__onboard()->get_remote_url(),
+					'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
+					'nonce'           => \wp_create_nonce( 'progress_planner' ),
+				],
+			];
+
 			if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
-				\wp_enqueue_script( 'progress-planner-web-components-prpl-gauge' );
-				\wp_enqueue_script( 'progress-planner-web-components-prpl-chart-bar' );
-				\wp_enqueue_script( 'progress-planner-web-components-prpl-chart-line' );
-				\wp_enqueue_script( 'progress-planner-web-components-prpl-big-counter' );
-				\wp_enqueue_script( 'progress-planner-header-filters' );
-				\wp_enqueue_script( 'progress-planner-settings' );
-				\wp_enqueue_script( 'progress-planner-grid-masonry' );
-				\wp_enqueue_script( 'progress-planner-upgrade-tasks' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-gauge' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-bar' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-line' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-big-counter' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-tooltip' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'header-filters', $default_localization_data );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'grid-masonry' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'upgrade-tasks' );
 			} else {
-				\wp_enqueue_script( 'progress-planner-onboard' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboard', $default_localization_data );
 			}
 		}
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
-			\wp_enqueue_script( 'progress-planner-settings-page' );
+			\progress_planner()->get_admin__enqueue()->enqueue_script(
+				'settings-page',
+				[
+					'name' => 'progressPlannerSettingsPage',
+					'data' => [
+						'siteUrl' => \get_site_url(),
+					],
+				]
+			);
 		}
 	}
 
@@ -164,7 +216,7 @@ class Page {
 		$total_points          = 0;
 		$completed_points      = 0;
 		foreach ( $local_tasks_providers as $provider ) {
-			if ( 'configuration' !== $provider->get_provider_type() ) {
+			if ( 'configuration' !== $provider->get_provider_category() ) {
 				continue;
 			}
 			$details = $provider->get_task_details();
@@ -186,29 +238,23 @@ class Page {
 		}
 
 		// Register the scripts.
-		\progress_planner()->get_admin__scripts()->register_scripts();
-
-		\wp_enqueue_script( 'progress-planner-focus-element' );
-		\wp_localize_script(
-			'progress-planner-focus-element',
-			'progressPlannerFocusElement',
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'focus-element',
 			[
-				'tasks'           => $tasks_details,
-				'totalPoints'     => $total_points,
-				'completedPoints' => $completed_points,
-				'base_url'        => PROGRESS_PLANNER_URL,
-				'l10n'            => [
-					/* translators: %d: The number of points. */
-					'fixThisIssue' => \esc_html__( 'Fix this issue to get %d point(s) in Progress Planner', 'progress-planner' ),
+				'name' => 'progressPlannerFocusElement',
+				'data' => [
+					'tasks'           => $tasks_details,
+					'totalPoints'     => $total_points,
+					'completedPoints' => $completed_points,
+					'base_url'        => constant( 'PROGRESS_PLANNER_URL' ),
+					'l10n'            => [
+						/* translators: %d: The number of points. */
+						'fixThisIssue' => \esc_html__( 'Fix this issue to get %d point(s) in Progress Planner', 'progress-planner' ),
+					],
 				],
 			]
 		);
-		\wp_enqueue_style(
-			'progress-planner-focus-element',
-			PROGRESS_PLANNER_URL . '/assets/css/focus-element.css',
-			[],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/focus-element.css' )
-		);
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/focus-element' );
 	}
 
 	/**
@@ -222,49 +268,25 @@ class Page {
 			return;
 		}
 
-		\wp_enqueue_style(
-			'progress-planner-header-filters',
-			PROGRESS_PLANNER_URL . '/assets/css/admin.css',
-			[],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/admin.css' )
-		);
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/admin' );
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-tooltip' );
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
-			\wp_enqueue_style(
-				'progress-planner-settings-page',
-				PROGRESS_PLANNER_URL . '/assets/css/settings-page.css',
-				[],
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/settings-page.css' )
-			);
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/settings-page' );
 		}
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
 			// Enqueue ugprading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
-			\wp_enqueue_style(
-				'progress-planner-upgrade-tasks',
-				PROGRESS_PLANNER_URL . '/assets/css/upgrade-tasks.css',
-				[],
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/upgrade-tasks.css' )
-			);
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
 		}
 
 		$prpl_privacy_policy_accepted = \progress_planner()->is_privacy_policy_accepted();
 		if ( ! $prpl_privacy_policy_accepted ) {
 			// Enqueue welcome styles.
-			\wp_enqueue_style(
-				'progress-planner-welcome',
-				PROGRESS_PLANNER_URL . '/assets/css/welcome.css',
-				[],
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/welcome.css' )
-			);
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/welcome' );
 
 			// Enqueue onboarding styles.
-			\wp_enqueue_style(
-				'progress-planner-onboard',
-				PROGRESS_PLANNER_URL . '/assets/css/onboard.css',
-				[],
-				\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/onboard.css' )
-			);
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/onboard' );
 		}
 	}
 
@@ -275,7 +297,9 @@ class Page {
 	 */
 	public function save_cpt_settings() {
 		\check_ajax_referer( 'progress_planner', 'nonce', false );
-		$include_post_types = isset( $_POST['include_post_types'] ) ? \sanitize_text_field( \wp_unslash( $_POST['include_post_types'] ) ) : 'post,page';
+		$include_post_types = isset( $_POST['include_post_types'] )
+			? \sanitize_text_field( \wp_unslash( $_POST['include_post_types'] ) )
+			: 'post,page';
 		$include_post_types = \explode( ',', $include_post_types );
 		\progress_planner()->get_settings()->set( 'include_post_types', $include_post_types );
 
@@ -308,5 +332,50 @@ class Page {
 		}
 
 		\remove_all_actions( 'admin_notices' );
+	}
+
+	/**
+	 * Clear the cache.
+	 *
+	 * @param \Progress_Planner\Activities\Activity $activity The activity.
+	 *
+	 * @return void
+	 */
+	public function clear_activity_scores_cache( $activity ) {
+		if ( 'content' !== $activity->category ) {
+			return;
+		}
+
+		// Clear the cache for the activity scores widget.
+		\progress_planner()->get_settings()->set( \progress_planner()->get_admin__widgets__activity_scores()->get_cache_key(), [] );
+	}
+
+	/**
+	 * Add a custom admin footer.
+	 *
+	 * @return void
+	 */
+	public function admin_footer() {
+		?>
+		<style>
+			#toplevel_page_progress-planner {
+				position: relative;
+				.update-plugins {
+					position: absolute;
+					left: 22px;
+					top: 0px;
+					min-width: 15px;
+					height: 15px;
+					line-height: 1.5;
+				}
+
+				.wp-submenu {
+					.update-plugins {
+						display: none;
+					}
+				}
+			}
+		</style>
+		<?php
 	}
 }

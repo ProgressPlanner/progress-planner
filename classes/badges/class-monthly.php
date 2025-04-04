@@ -53,7 +53,7 @@ final class Monthly extends Badge {
 			return self::$instances;
 		}
 
-		$activation_date = \progress_planner()->get_base()->get_activation_date();
+		$activation_date = \progress_planner()->get_activation_date();
 		if ( $activation_date < new \DateTime( 'first day of November 2024' ) ) { // When badges were introduced.
 			$start_date = $activation_date->modify( 'first day of November 2024' );
 		} else {
@@ -208,7 +208,7 @@ final class Monthly extends Badge {
 		$end_date   = \DateTime::createFromFormat( 'Y-m-d', "{$year}-{$month_num}-" . gmdate( 't', strtotime( $month ) ) );
 
 		// Get the activities for the month.
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category'   => 'suggested_task',
 				'start_date' => $start_date,

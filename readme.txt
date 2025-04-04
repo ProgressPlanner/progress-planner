@@ -2,9 +2,9 @@
 Contributors: joostdevalk, aristath, mariekerakt, irisguelen, samalderson
 Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -110,11 +110,44 @@ https://youtu.be/e1bmxZYyXFY
 
 == Changelog ==
 
+= 1.1.1 =
+
+Bugs we fixed:
+
+* Fixed unnecessary display of the upgrade popover.
+* Fixed saving license key from 'Subscribe to weekly' emails popover.
+* Reduced number of database queries when checking for user activity scores.
+* Fixed database queries when getting activities by type.
+
+Enhancements:
+
+* Simplified the Dashboard widget.
+* Styling improvements.
+* Improved some translation strings.
+* Improved suggestions for writing new posts.
+* UI improvements in the plugin settings page.
+* TODO tasks can now award 1 point per week, counting toward the monthly badges.
+
+Under the hood:
+
+* Completely refactored the TODOs system.
+* Refactored the suggested-tasks system.
+* Refactored our AJAX calls.
+* Performance & caching improvements.
+* Refactored popovers implementation.
+* Added implementation to migrate plugin data on updates.
+* Improved debugging suite.
+* Added new hooks for integration with 3rd-party plugins.
+* Added a data collector system for tasks providers.
+* Refactored the way tasks are saved in the database for consistency.
+* Improved `one_time` and `repetitive` task type abstractions.
+* Refactored the celebrations system.
+
 = 1.1.0 =
 
-In this release, we've added more recommendations from Ravi on how to improve your site. We've also made these recommendations more visible on your WordPress 
-settings pages, by showing on settings pages exactly which things we think you should change. Also, if you're just now starting to use Progress Planner, 
-we've made the onboarding experience a lot more fun: we show you immediately which of Ravi's recommended tasks you've already completed and we give 
+In this release, we've added more recommendations from Ravi on how to improve your site. We've also made these recommendations more visible on your WordPress
+settings pages, by showing on settings pages exactly which things we think you should change. Also, if you're just now starting to use Progress Planner,
+we've made the onboarding experience a lot more fun: we show you immediately which of Ravi's recommended tasks you've already completed and we give
 you points for those!
 
 Added these recommendations from Ravi:

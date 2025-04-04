@@ -9,9 +9,9 @@ namespace Progress_Planner;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
 use Progress_Planner\Suggested_Tasks\Remote_Tasks;
-use Progress_Planner\Activities\Suggested_Task;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
-
+use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
+use Progress_Planner\Suggested_Tasks\Task_Factory;
 /**
  * Suggested_Tasks class.
  */
@@ -56,18 +56,28 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function init() {
+		// Init the remote tasks.
+		$this->remote->init();  // @phpstan-ignore-line method.nonObject
+
 		// Unsnooze tasks.
 		$this->maybe_unsnooze_tasks();
 
 		// Check for completed tasks.
 		$completed_tasks = $this->local->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
 
-		foreach ( $completed_tasks as $task_id ) {
+		foreach ( $completed_tasks as $task ) {
+
+			// Get the task data.
+			$task_data = $task->get_data();
+
+			// Update the task data.
+			$this->update_pending_task( $task_data['task_id'], $task_data );
+
 			// Change the task status to pending celebration.
-			$this->mark_task_as_pending_celebration( $task_id );
+			$this->mark_task_as( 'pending_celebration', $task_data['task_id'] );
 
 			// Insert an activity.
-			$this->insert_activity( $task_id );
+			$this->insert_activity( $task_data['task_id'] );
 		}
 	}
 
@@ -80,7 +90,7 @@ class Suggested_Tasks {
 	 */
 	public function insert_activity( $task_id ) {
 		// Insert an activity.
-		$activity          = new Suggested_Task();
+		$activity          = new Suggested_Task_Activity();
 		$activity->type    = 'completed';
 		$activity->data_id = (string) $task_id;
 		$activity->date    = new \DateTime();
@@ -89,6 +99,28 @@ class Suggested_Tasks {
 
 		// Allow other classes to react to the completion of a suggested task.
 		do_action( 'progress_planner_suggested_task_completed', $task_id );
+	}
+
+	/**
+	 * Delete an activity.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return void
+	 */
+	public function delete_activity( $task_id ) {
+		$activity = \progress_planner()->get_activities__query()->query_activities(
+			[
+				'data_id' => $task_id,
+				'type'    => 'completed',
+			]
+		);
+
+		if ( empty( $activity ) ) {
+			return;
+		}
+
+		\progress_planner()->get_activities__query()->delete_activity( $activity[0] );
 	}
 
 	/**
@@ -104,15 +136,14 @@ class Suggested_Tasks {
 			return;
 		}
 
-		// ID of the 'Core_Update' provider.
-		$update_core_provider_id = 'update-core';
-
 		foreach ( $pending_tasks as $task_data ) {
 			$task_id = $task_data['task_id'];
 
-			if ( $task_data['type'] === $update_core_provider_id && \gmdate( 'YW' ) === $task_data['year_week'] ) {
+			if ( $task_data['provider_id'] === ( new Core_Update() )->get_provider_id() &&
+				\gmdate( 'YW' ) === $task_data['date']
+			) {
 				// Change the task status to completed.
-				$this->mark_task_as_completed( $task_id );
+				$this->mark_task_as( 'completed', $task_id );
 
 				// Insert an activity.
 				$this->insert_activity( $task_id );
@@ -152,24 +183,81 @@ class Suggested_Tasks {
 		 * @param array $tasks The suggested tasks.
 		 * @return array
 		 */
-		return \apply_filters( 'progress_planner_suggested_tasks_items', $tasks );
+		$tasks    = \apply_filters( 'progress_planner_suggested_tasks_items', $tasks );
+		$db_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		foreach ( $tasks as $key => $task ) {
+			if ( isset( $task['status'] ) && ! empty( $task['status'] ) ) {
+				continue;
+			}
+
+			foreach ( $db_tasks as $db_task_key => $db_task ) {
+				if ( $db_task['task_id'] === $task['task_id'] ) {
+					$tasks[ $key ]['status'] = $db_task['status'];
+					unset( $db_tasks[ $db_task_key ] );
+					break;
+				}
+			}
+		}
+
+		return $tasks;
 	}
 
 	/**
-	 * Get tasks by status.
-	 *
-	 * @param string $status The status.
+	 * Get pending tasks with details.
 	 *
 	 * @return array
 	 */
-	public function get_tasks_by_status( $status ) {
+	public function get_pending_tasks_with_details() {
+		$tasks              = $this->get_tasks();
+		$tasks_with_details = [];
+
+		foreach ( $tasks as $key => $task ) {
+			$task_details = Task_Factory::create_task_from( 'id', $task['task_id'] )->get_task_details();
+
+			if ( $task_details ) {
+				$tasks_with_details[] = $task_details;
+			}
+		}
+
+		return $tasks_with_details;
+	}
+
+	/**
+	 * Get tasks by.
+	 *
+	 * @param string $param The parameter.
+	 * @param string $value The value.
+	 *
+	 * @return array
+	 */
+	public function get_tasks_by( $param, $value ) {
 		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		return array_filter(
+		$tasks = array_filter(
 			$tasks,
-			function ( $task ) use ( $status ) {
-				return isset( $task['status'] ) && $task['status'] === $status;
+			function ( $task ) use ( $param, $value ) {
+				return isset( $task[ $param ] ) && $task[ $param ] === $value;
 			}
 		);
+
+		return array_values( $tasks );
+	}
+
+	/**
+	 * Get remote task by id.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return array|null
+	 */
+	public function get_remote_task_by_task_id( $task_id ) {
+		$tasks = $this->get_remote_tasks();
+		foreach ( $tasks as $task ) {
+			if ( $task['task_id'] === $task_id ) {
+				return $task;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -182,42 +270,26 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Mark a task as completed.
+	 * Delete a task.
 	 *
 	 * @param string $task_id The task ID.
 	 *
 	 * @return bool
 	 */
-	public function mark_task_as_completed( $task_id ) {
-		return $this->mark_task_as( 'completed', $task_id );
-	}
-
-	/**
-	 * Mark a task as pending celebration.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool
-	 */
-	public function mark_task_as_pending_celebration( $task_id ) {
-		// Don't mark the task as pending celebration if it's already completed.
-		if ( $this->was_task_completed( $task_id ) ) {
-			return false;
+	public function delete_task( $task_id ) {
+		$tasks    = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$modified = false;
+		foreach ( $tasks as $key => $task ) {
+			if ( $task['task_id'] === $task_id ) {
+				unset( $tasks[ $key ] );
+				$modified = true;
+				break;
+			}
 		}
 
-		return $this->mark_task_as( 'pending_celebration', $task_id );
-	}
-
-	/**
-	 * Mark a task as snoozed.
-	 *
-	 * @param string $task_id The task ID.
-	 * @param int    $time The time.
-	 *
-	 * @return bool
-	 */
-	public function mark_task_as_snoozed( $task_id, $time ) {
-		return $this->mark_task_as( 'snoozed', $task_id, [ 'time' => $time ] );
+		return $modified
+			? \progress_planner()->get_settings()->set( 'local_tasks', $tasks )
+			: false;
 	}
 
 	/**
@@ -237,6 +309,10 @@ class Suggested_Tasks {
 				continue;
 			}
 
+			if ( 'completed' === $task['status'] && 'pending_celebration' === $status ) {
+				break;
+			}
+
 			$tasks[ $key ]['status'] = $status;
 			$tasks_changed           = true;
 
@@ -250,7 +326,15 @@ class Suggested_Tasks {
 		if ( ! $tasks_changed ) {
 			return false;
 		}
-		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+
+		$result = \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+
+		// Fire an action when the task status is changed.
+		if ( true === $result ) {
+			do_action( 'progress_planner_task_status_changed', $task_id, $status );
+		}
+
+		return $result;
 	}
 
 	/**
@@ -347,7 +431,7 @@ class Suggested_Tasks {
 				break;
 		}
 
-		return $this->mark_task_as_snoozed( $task_id, $time );
+		return $this->mark_task_as( 'snoozed', $task_id, [ 'time' => $time ] );
 	}
 
 	/**
@@ -364,7 +448,7 @@ class Suggested_Tasks {
 			}
 
 			if ( isset( $task['time'] ) && $task['time'] < \time() ) {
-				if ( isset( $task['type'] ) && 'user' === $task['type'] ) {
+				if ( isset( $task['provider_id'] ) && 'user' === $task['provider_id'] ) {
 					$tasks[ $key ]['status'] = 'pending';
 					unset( $tasks[ $key ]['time'] );
 				} else {
@@ -395,25 +479,25 @@ class Suggested_Tasks {
 		$parsed_condition = \wp_parse_args(
 			$condition,
 			[
-				'type'         => '',
+				'status'       => '',
 				'task_id'      => '',
 				'post_lengths' => [],
 			]
 		);
 
-		if ( 'snoozed-post-length' === $parsed_condition['type'] ) {
+		if ( 'snoozed-post-length' === $parsed_condition['status'] ) {
 			if ( isset( $parsed_condition['post_lengths'] ) ) {
 				if ( ! \is_array( $parsed_condition['post_lengths'] ) ) {
 					$parsed_condition['post_lengths'] = [ $parsed_condition['post_lengths'] ];
 				}
 
-				$snoozed_tasks        = $this->get_tasks_by_status( 'snoozed' );
+				$snoozed_tasks        = $this->get_tasks_by( 'status', 'snoozed' );
 				$snoozed_post_lengths = [];
 
 				// Get the post lengths of the snoozed tasks.
 				foreach ( $snoozed_tasks as $task ) {
 					$data = $this->local->get_data_from_task_id( $task['task_id'] ); // @phpstan-ignore-line method.nonObject
-					if ( isset( $data['type'] ) && 'create-post' === $data['type'] ) {
+					if ( isset( $data['category'] ) && 'create-post' === $data['category'] ) {
 						$key = true === $data['long'] ? 'long' : 'short';
 						if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
 							$snoozed_post_lengths[ $key ] = true;
@@ -432,7 +516,7 @@ class Suggested_Tasks {
 			}
 		}
 
-		foreach ( $this->get_tasks_by_status( $parsed_condition['type'] ) as $task ) {
+		foreach ( $this->get_tasks_by( 'status', $parsed_condition['status'] ) as $task ) {
 			if ( $task['task_id'] === $parsed_condition['task_id'] ) {
 				return true;
 			}
@@ -454,10 +538,44 @@ class Suggested_Tasks {
 				continue;
 			}
 
-			return isset( $task['status'] ) && ( 'completed' === $task['status'] || 'pending_celebration' === $task['status'] );
+			return isset( $task['status'] ) && in_array( $task['status'], [ 'completed', 'pending_celebration' ], true );
 		}
 
 		return false;
+	}
+
+	/**
+	 * Update a task.
+	 *
+	 * @param string $task_id The task ID.
+	 * @param array  $data The data.
+	 *
+	 * @return bool
+	 */
+	public function update_pending_task( $task_id, $data ) {
+		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks_changed = false;
+		foreach ( $tasks as $key => $task ) {
+			if ( 'pending' !== $task['status'] || $task['task_id'] !== $task_id ) {
+				continue;
+			}
+
+			// Don't update the task_id.
+			if ( isset( $data['task_id'] ) ) {
+				unset( $data['task_id'] );
+			}
+
+			// Update the task data except the 'task_id' key.
+			$tasks[ $key ] = array_merge( $tasks[ $key ], $data );
+			$tasks_changed = true;
+
+			break;
+		}
+
+		if ( ! $tasks_changed ) {
+			return false;
+		}
+		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
 	}
 
 	/**
@@ -482,7 +600,14 @@ class Suggested_Tasks {
 			case 'complete':
 				// We need to add the task to the pending tasks first, before marking it as completed.
 				if ( false !== strpos( $task_id, 'remote-task' ) ) {
-					\progress_planner()->get_suggested_tasks()->get_local()->add_pending_task( $task_id );
+					$remote_task_data = $this->get_remote_task_by_task_id( $task_id );
+					\progress_planner()->get_suggested_tasks()->get_local()->add_pending_task(
+						[
+							'task_id'     => $task_id,
+							'provider_id' => $remote_task_data['category'] ?? '', // Remote tasks use the category as provider_id.
+							'category'    => $remote_task_data['category'] ?? '',
+						]
+					);
 				}
 
 				// Mark the task as completed.
@@ -493,9 +618,20 @@ class Suggested_Tasks {
 				$updated = true;
 				break;
 
+			case 'pending':
+				$this->mark_task_as( 'pending', $task_id );
+				$updated = true;
+				$this->delete_activity( $task_id );
+				break;
+
 			case 'snooze':
 				$duration = isset( $_POST['duration'] ) ? \sanitize_text_field( \wp_unslash( $_POST['duration'] ) ) : '';
 				$updated  = $this->snooze_task( $task_id, $duration );
+				break;
+
+			case 'delete':
+				$updated = $this->delete_task( $task_id );
+				$this->delete_activity( $task_id );
 				break;
 
 			default:

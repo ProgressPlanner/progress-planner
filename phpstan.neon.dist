@@ -7,7 +7,6 @@ parameters:
     - ./progress-planner.php
     - ./uninstall.php
   ignoreErrors:
-    - identifier: constant.notFound
     - identifier: missingType.iterableValue
     - identifier: missingType.generics
     - '#Function YoastSEO not found.#'

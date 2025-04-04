@@ -17,33 +17,37 @@ class Plugin_Upgrade_Tasks {
 	 */
 	public function __construct() {
 
-		// Plugin activated.
-		\add_action( 'activated_plugin', [ $this, 'plugin_activated' ], 10 );
+		// Plugin (possibly 3rd party) activated.
+		\add_action( 'activated_plugin', [ $this, 'plugin_activated_or_updated' ], 10 );
 
-		// Plugin updated.
-		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_updated' ], 10 );
+		// Progress Planner plugin updated.
+		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_activated_or_updated' ], 10 );
+
+		// Check if the plugin was upgraded or new plugin was activated.
+		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 10 );
 	}
 
 	/**
-	 * Plugin activated.
+	 * Plugin upgraded or (3rd party) plugin was activated.
 	 *
-	 * @param string $plugin The plugin file.
 	 * @return void
 	 */
-	public function plugin_activated( $plugin ) {
-		if ( 'progress-planner/progress-planner.php' !== $plugin ) {
+	public function plugin_activated_or_updated() {
+		update_option( 'progress_planner_plugin_was_activated', true );
+	}
+
+	/**
+	 * If the plugin was upgraded or new plugin was activated, check if we need to add onboarding tasks.
+	 *
+	 * @return void
+	 */
+	public function handle_activation_or_upgrade() {
+		if ( ! \get_option( 'progress_planner_plugin_was_activated', false ) ) {
 			return;
 		}
 
-		$this->maybe_add_onboarding_tasks();
-	}
+		\delete_option( 'progress_planner_plugin_was_activated' );
 
-	/**
-	 * Plugin updated.
-	 *
-	 * @return void
-	 */
-	public function plugin_updated() {
 		$this->maybe_add_onboarding_tasks();
 	}
 
@@ -75,13 +79,13 @@ class Plugin_Upgrade_Tasks {
 		$newly_added_task_provider_ids = \get_option( 'progress_planner_upgrade_popover_task_provider_ids', [] );
 
 		foreach ( $onboard_task_provider_ids as $task_provider_id ) {
-			if ( ! in_array( $task_provider_id, $old_task_providers, true ) && ! in_array( $task_provider_id, $newly_added_task_provider_ids, true ) ) {
+			if ( ! empty( $task_provider_id ) && ! in_array( $task_provider_id, $old_task_providers, true ) && ! in_array( $task_provider_id, $newly_added_task_provider_ids, true ) ) {
 				$newly_added_task_provider_ids[] = $task_provider_id;
 			}
 		}
 
 		// Update 'progress_planner_previous_version_task_providers' option.
-		\update_option( 'progress_planner_previous_version_task_providers', $onboard_task_provider_ids );
+		\update_option( 'progress_planner_previous_version_task_providers', array_unique( array_merge( $old_task_providers, $onboard_task_provider_ids ), SORT_REGULAR ) );
 
 		// Update 'progress_planner_upgrade_popover_task_providers' option.
 		\update_option( 'progress_planner_upgrade_popover_task_provider_ids', $newly_added_task_provider_ids );
@@ -123,7 +127,7 @@ class Plugin_Upgrade_Tasks {
 	 * @return bool
 	 */
 	public function should_show_upgrade_popover() {
-		return $this->is_on_progress_planner_page() && ! empty( $this->get_upgrade_popover_task_provider_ids() );
+		return \progress_planner()->is_on_progress_planner_dashboard_page() && ! empty( $this->get_upgrade_popover_task_provider_ids() );
 	}
 
 	/**
@@ -142,15 +146,5 @@ class Plugin_Upgrade_Tasks {
 	 */
 	public function delete_upgrade_popover_task_providers() {
 		\delete_option( 'progress_planner_upgrade_popover_task_provider_ids' );
-	}
-
-	/**
-	 * Check if we're on the Progress Planner page.
-	 *
-	 * @return bool
-	 */
-	protected function is_on_progress_planner_page() {
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- We're not processing any data.
-		return \is_admin() && isset( $_GET['page'] ) && $_GET['page'] === 'progress-planner';
 	}
 }

@@ -30,9 +30,10 @@ if ( ! $prpl_privacy_policy_accepted ) {
 
 		<?php // Display the upgrade tasks popover if needed. ?>
 		<?php if ( \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover() ) : ?>
-			<?php \progress_planner()->get_popover()->the_popover( 'upgrade-tasks' )->render(); ?>
+			<?php \progress_planner()->get_ui__popover()->the_popover( 'upgrade-tasks' )->render(); ?>
 		<?php endif; ?>
 	<?php else : ?>
 		<?php \progress_planner()->the_view( 'welcome.php' ); ?>
 	<?php endif; ?>
 </div>
+<div class="prpl-overlay" style="display: none;" onclick="document.querySelector('[data-tooltip-visible=true]').removeAttribute('data-tooltip-visible')"></div>

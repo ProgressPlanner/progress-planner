@@ -7,21 +7,35 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Admin\Page as Admin_Page;
-use Progress_Planner\Admin\Tour as Admin_Tour;
-use Progress_Planner\Admin\Dashboard_Widget_Score as Admin_Dashboard_Widget_Score;
-use Progress_Planner\Admin\Dashboard_Widget_Todo as Admin_Dashboard_Widget_Todo;
-use Progress_Planner\Admin\Editor as Admin_Editor;
-use Progress_Planner\Actions\Content as Actions_Content;
-use Progress_Planner\Actions\Content_Scan as Actions_Content_Scan;
-use Progress_Planner\Actions\Maintenance as Actions_Maintenance;
-use Progress_Planner\Admin\Page_Settings as Admin_Page_Settings;
-use Progress_Planner\Plugin_Upgrade_Tasks;
-use Progress_Planner\Debug_Tools;
-use Progress_Planner\Data_Collector\Data_Collector_Manager;
-
 /**
  * Main plugin class.
+ *
+ * @method \Progress_Planner\Suggested_Tasks get_suggested_tasks()
+ * @method \Progress_Planner\Settings get_settings()
+ * @method \Progress_Planner\Activities\Query get_activities__query()
+ * @method \Progress_Planner\Utils\Cache get_utils__cache()
+ * @method \Progress_Planner\Page_Types get_page_types()
+ * @method \Progress_Planner\Rest\Stats get_rest__stats()
+ * @method \Progress_Planner\Rest\Tasks get_rest__tasks()
+ * @method \Progress_Planner\Todo get_todo()
+ * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
+ * @method \Progress_Planner\Utils\Playground get_utils__playground()
+ * @method \Progress_Planner\Admin\Page get_admin__page()
+ * @method \Progress_Planner\Admin\Tour get_admin__tour()
+ * @method \Progress_Planner\Admin\Dashboard_Widget_Score get_admin__dashboard_widget_score()
+ * @method \Progress_Planner\Admin\Dashboard_Widget_Todo get_admin__dashboard_widget_todo()
+ * @method \Progress_Planner\Admin\Editor get_admin__editor()
+ * @method \Progress_Planner\Actions\Content get_actions__content()
+ * @method \Progress_Planner\Actions\Content_Scan get_actions__content_scan()
+ * @method \Progress_Planner\Actions\Maintenance get_actions__maintenance()
+ * @method \Progress_Planner\Admin\Page_Settings get_admin__page_settings()
+ * @method \Progress_Planner\Plugin_Deactivation get_plugin_deactivation()
+ * @method \Progress_Planner\Plugin_Upgrade_Tasks get_plugin_upgrade_tasks()
+ * @method \Progress_Planner\Page_Todos get_page_todos()
+ * @method \Progress_Planner\Suggested_Tasks\Data_Collector\Data_Collector_Manager get_suggested_tasks__data_collector__data_collector_manager()
+ * @method \Progress_Planner\Utils\Debug_Tools get_utils__debug_tools()
+ * @method \Progress_Planner\Badges get_badges()
+ * @method \Progress_Planner\Plugin_Migrations get_plugin_migrations()
  */
 class Base {
 
@@ -60,66 +74,67 @@ class Base {
 		}
 
 		if ( defined( '\IS_PLAYGROUND_PREVIEW' ) && constant( '\IS_PLAYGROUND_PREVIEW' ) === true ) {
-			new Playground();
+			$this->get_utils__playground();
 		}
 
 		// Basic classes.
 		if ( \is_admin() && \current_user_can( 'edit_others_posts' ) ) {
-			$this->cached['admin__page'] = new Admin_Page();
-			$this->cached['admin__tour'] = new Admin_Tour();
+			$this->get_admin__page();
+			$this->get_admin__tour();
 
 			// Dont add the widget if the privacy policy is not accepted.
 			if ( true === $this->is_privacy_policy_accepted() ) {
-				$this->cached['admin__dashboard_widget_score'] = new Admin_Dashboard_Widget_Score();
-				$this->cached['admin__dashboard_widget_todo']  = new Admin_Dashboard_Widget_Todo();
+				$this->get_admin__dashboard_widget_score();
+				$this->get_admin__dashboard_widget_todo();
 			}
 		}
-		$this->cached['admin__editor'] = new Admin_Editor();
+		$this->get_admin__editor();
 
-		$this->cached['actions__content']      = new Actions_Content();
-		$this->cached['actions__content_scan'] = new Actions_Content_Scan();
-		$this->cached['actions__maintenance']  = new Actions_Maintenance();
+		$this->get_actions__content();
+		$this->get_actions__content_scan();
+		$this->get_actions__maintenance();
 
 		// REST API.
-		$this->cached['rest_api_stats'] = new Rest_API_Stats();
+		$this->get_rest__stats();
+		$this->get_rest__tasks();
 
 		// Onboarding.
-		$this->cached['onboard'] = new Onboard();
+		$this->get_utils__onboard();
 
 		// To-do.
-		$this->cached['todo'] = new Todo();
+		$this->get_todo();
 
 		// Post-meta.
 		if ( $this->is_pro_site() ) {
-			$this->cached['page_todos'] = new Page_Todos();
+			$this->get_page_todos();
 		}
 
 		\add_filter( 'plugin_action_links_' . plugin_basename( PROGRESS_PLANNER_FILE ), [ $this, 'add_action_links' ] );
 
 		// We need to initialize some classes early.
-		$this->cached['page_types']      = new Page_Types();
-		$this->cached['settings']        = new Settings();
-		$this->cached['suggested_tasks'] = new Suggested_Tasks();
-		$this->cached['badges']          = new Badges();
+		$this->get_page_types();
+		$this->get_settings();
+		$this->get_suggested_tasks();
+		$this->get_badges();
 
 		if ( true === $this->is_privacy_policy_accepted() ) {
-			$this->cached['settings_page'] = new Admin_Page_Settings();
+			$this->get_admin__page_settings();
 
 			new Plugin_Deactivation();
 		}
 
-		$this->cached['plugin_upgrade_tasks'] = new Plugin_Upgrade_Tasks();
+		$this->get_plugin_upgrade_tasks();
 
 		// Add hooks for data collectors.
-		$this->cached['data_collector_manager'] = new Data_Collector_Manager();
+		$this->get_suggested_tasks__data_collector__data_collector_manager();
 
 		// Debug tools.
 		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {
-			new Debug_Tools();
+			$this->get_utils__debug_tools();
 		}
 
 		// Plugin upgrade.
-		$this->cached['plugin_migrations'] = new Plugin_Migrations();
+		$this->get_plugin_migrations();
 
 		/**
 		 * Redirect on login.
@@ -156,6 +171,35 @@ class Base {
 			$this->cached[ $cache_name ] = new $class_name( $arguments );
 			return $this->cached[ $cache_name ];
 		}
+
+		// Backwards-compatibility.
+		$deprecated = [
+			'get_query'                                  => [ 'get_activities__query', '1.1.1' ],
+			'get_date'                                   => [ 'get_utils__date', '1.1.1' ],
+			'get_widgets__suggested_tasks'               => [ 'get_admin__widgets__suggested_tasks', '1.1.1' ],
+			'get_widgets__activity_scores'               => [ 'get_admin__widgets__activity_scores', '1.1.1' ],
+			'get_widgets__todo'                          => [ 'get_admin__widgets__todo', '1.1.1' ],
+			'get_widgets__challenge'                     => [ 'get_admin__widgets__challenge', '1.1.1' ],
+			'get_widgets__latest_badge'                  => [ 'get_admin__widgets__latest_badge', '1.1.1' ],
+			'get_widgets__badge_streak'                  => [ 'get_admin__widgets__badge_streak', '1.1.1' ],
+			'get_widgets__published_content'             => [ 'get_admin__widgets__published_content', '1.1.1' ],
+			'get_widgets__whats_new'                     => [ 'get_admin__widgets__whats_new', '1.1.1' ],
+			'get_onboard'                                => [ 'get_utils__onboard', '1.1.1' ],
+			'get_cache'                                  => [ 'get_utils__cache', '1.1.1' ],
+			'get_rest_api_stats'                         => [ 'get_rest__stats', '1.1.1' ],
+			'get_rest_api_tasks'                         => [ 'get_rest__tasks', '1.1.1' ],
+			'get_data_collector__data_collector_manager' => [ 'get_suggested_tasks__data_collector__data_collector_manager', '1.1.1' ],
+			'get_debug_tools'                            => [ 'get_utils__debug_tools', '1.1.1' ],
+			'get_playground'                             => [ 'get_utils__playground', '1.1.1' ],
+			'get_chart'                                  => [ 'get_ui__chart', '1.1.1' ],
+			'get_popover'                                => [ 'get_ui__popover', '1.1.1' ],
+		];
+
+		if ( isset( $deprecated[ $name ] ) ) {
+			// Deprecated method.
+			\_deprecated_function( \esc_html( $name ), \esc_html( $deprecated[ $name ][1] ), \esc_html( $deprecated[ $name ][0] ) );
+			return $this->{$deprecated[ $name ][0]}();
+		}
 	}
 
 	/**
@@ -165,7 +209,7 @@ class Base {
 	 */
 	public function get_remote_server_root_url() {
 		return defined( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
-			? \PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL
+			? \constant( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
 			: 'https://progressplanner.com';
 	}
 
@@ -184,7 +228,7 @@ class Base {
 	/**
 	 * Get the activation date.
 	 *
-	 * @return \DateTime|false
+	 * @return \DateTime
 	 */
 	public function get_activation_date() {
 		$activation_date = $this->get_settings()->get( 'activation_date' );
@@ -193,7 +237,7 @@ class Base {
 			$this->get_settings()->set( 'activation_date', $activation_date->format( 'Y-m-d' ) );
 			return $activation_date;
 		}
-		return \DateTime::createFromFormat( 'Y-m-d', $activation_date );
+		return \DateTime::createFromFormat( 'Y-m-d', $activation_date ); // @phpstan-ignore-line return.type
 	}
 
 	/**
@@ -310,7 +354,7 @@ class Base {
 	 */
 	public function get_file_version( $file ) {
 		// If we're in debug mode, use filemtime.
-		if ( defined( 'WP_SCRIPT_DEBUG' ) && \WP_SCRIPT_DEBUG ) {
+		if ( defined( 'WP_SCRIPT_DEBUG' ) && constant( 'WP_SCRIPT_DEBUG' ) ) {
 			return (string) filemtime( $file );
 		}
 
@@ -422,6 +466,16 @@ class Base {
 		// Redirect to the Progress Planner dashboard.
 		\wp_safe_redirect( \admin_url( 'admin.php?page=progress-planner' ) );
 		exit;
+	}
+
+	/**
+	 * Check if we're on the Progress Planner dashboard page.
+	 *
+	 * @return bool
+	 */
+	public function is_on_progress_planner_dashboard_page() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- We're not processing any data.
+		return \is_admin() && isset( $_GET['page'] ) && $_GET['page'] === 'progress-planner';
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

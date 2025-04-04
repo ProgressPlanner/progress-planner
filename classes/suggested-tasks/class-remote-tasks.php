@@ -20,9 +20,11 @@ class Remote_Tasks {
 	const CACHE_KEY = 'suggested_tasks_remote';
 
 	/**
-	 * Constructor.
+	 * Initialize the remote tasks.
+	 *
+	 * @return void
 	 */
-	public function __construct() {
+	public function init() {
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
 	}
 
@@ -42,14 +44,11 @@ class Remote_Tasks {
 			}
 
 			// If the task with this id is completed, don't add a task.
-			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( "remote-task-{$item['task_id']}" ) ) {
+			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( "{$item['task_id']}" ) ) {
 				continue;
 			}
 
-			// Task which don't have type defined are added as a 'default' type.
-			$item['type']    = 'remote-' . ( isset( $item['type'] ) ? $item['type'] : 'default' );
-			$item['task_id'] = "remote-task-{$item['task_id']}";
-			$items[]         = $item;
+			$items[] = $item;
 		}
 
 		return \array_merge( $items, $tasks );
@@ -62,7 +61,7 @@ class Remote_Tasks {
 	 */
 	public function get_tasks_to_inject() {
 		// Check if we have a cached response.
-		$tasks = \progress_planner()->get_cache()->get( self::CACHE_KEY );
+		$tasks = \progress_planner()->get_utils__cache()->get( self::CACHE_KEY );
 
 		// If we have a cached response, return it.
 		if ( \is_array( $tasks ) ) {
@@ -85,18 +84,31 @@ class Remote_Tasks {
 					$valid_tasks = [];
 					foreach ( $tasks as $task ) {
 						if ( isset( $task['task_id'] ) ) {
-							$valid_tasks[] = $task;
+
+							$valid_tasks[] = [
+								'task_id'     => str_starts_with( $task['task_id'], 'remote-task-' ) ? $task['task_id'] : "remote-task-{$task['task_id']}",
+								'provider_id' => 'remote-' . ( isset( $task['category'] ) ? $task['category'] : 'default' ),
+								'category'    => 'remote-' . ( isset( $task['category'] ) ? $task['category'] : 'default' ),
+								'title'       => $task['title'] ?? '',
+								'description' => $task['description'] ?? '',
+								'priority'    => $task['priority'] ?? 'medium',
+								'points'      => $task['points'] ?? 1,
+								'url'         => $task['url'] ?? '',
+								'dismissable' => $task['dismissable'] ?? true,
+								'type'        => $task['type'] ?? '', // Not using any more.
+								'challenge'   => $task['challenge'] ?? '', // Not using any more.
+							];
 						}
 					}
 					// Cache the response for 1 day.
-					\progress_planner()->get_cache()->set( self::CACHE_KEY, $valid_tasks, DAY_IN_SECONDS );
+					\progress_planner()->get_utils__cache()->set( self::CACHE_KEY, $valid_tasks, DAY_IN_SECONDS );
 					return $valid_tasks;
 				}
 			}
 		}
 
 		// If we don't have a valid response, cache an empty array for 5 minutes. This will prevent the API from being called too often.
-		\progress_planner()->get_cache()->set( self::CACHE_KEY, [], 5 * MINUTE_IN_SECONDS );
+		\progress_planner()->get_utils__cache()->set( self::CACHE_KEY, [], 5 * MINUTE_IN_SECONDS );
 
 		return [];
 	}

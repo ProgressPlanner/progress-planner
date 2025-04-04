@@ -8,7 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time;
-use Progress_Planner\Data_Collector\Hello_World as Hello_World_Data_Collector;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Hello_World as Hello_World_Data_Collector;
 /**
  * Add tasks for hello world post.
  */
@@ -19,7 +19,7 @@ class Hello_World extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'hello-world';
+	protected const PROVIDER_ID = 'hello-world';
 
 	/**
 	 * The capability required to perform the task.
@@ -31,7 +31,7 @@ class Hello_World extends One_Time {
 	/**
 	 * The data collector.
 	 *
-	 * @var \Progress_Planner\Data_Collector\Hello_World
+	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Hello_World
 	 */
 	protected $data_collector;
 
@@ -46,9 +46,24 @@ class Hello_World extends One_Time {
 		if ( 0 !== $hello_world_post_id ) {
 			$this->url = (string) \get_edit_post_link( $hello_world_post_id );
 		}
+	}
 
-		$this->title       = \esc_html__( 'Delete the "Hello World!" post.', 'progress-planner' );
-		$this->description = sprintf(
+	/**
+	 * Get the title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Delete the "Hello World!" post.', 'progress-planner' );
+	}
+
+	/**
+	 * Get the description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">Hello World!</a> link */
 			\esc_html__( 'On install, WordPress creates a %s post. This post is not needed and should be deleted.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">' . \esc_html__( '"Hello World!"', 'progress-planner' ) . '</a>'
@@ -57,7 +72,6 @@ class Hello_World extends One_Time {
 
 	/**
 	 * Check if the task condition is satisfied.
-	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *
 	 * @return bool
 	 */

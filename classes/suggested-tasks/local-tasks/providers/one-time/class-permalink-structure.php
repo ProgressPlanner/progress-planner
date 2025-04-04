@@ -19,23 +19,55 @@ class Permalink_Structure extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'core-permalink-structure';
+	protected const PROVIDER_ID = 'core-permalink-structure';
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->url         = \admin_url( 'options-permalink.php' );
-		$this->title       = \esc_html__( 'Set permalink structure', 'progress-planner' );
-		$this->description = sprintf(
+		$this->url = \admin_url( 'options-permalink.php' );
+
+		$icon_el = 'label[for="permalink-input-month-name"], label[for="permalink-input-post-name"]';
+
+		// If the task is completed, we want to add icon element only to the selected option (not both).
+		if ( $this->is_task_completed() ) {
+			$permalink_structure = \get_option( 'permalink_structure' );
+
+			if ( '/%year%/%monthnum%/%postname%/' === $permalink_structure || '/index.php/%year%/%monthnum%/%postname%/' === $permalink_structure ) {
+				$icon_el = 'label[for="permalink-input-month-name"]';
+			}
+
+			if ( '/%postname%/' === $permalink_structure || '/index.php/%postname%/' === $permalink_structure ) {
+				$icon_el = 'label[for="permalink-input-post-name"]';
+			}
+		}
+
+		$this->link_setting = [
+			'hook'   => 'options-permalink.php',
+			'iconEl' => $icon_el,
+		];
+	}
+
+	/**
+	 * Get the title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Set permalink structure', 'progress-planner' );
+	}
+
+	/**
+	 * Get the description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return sprintf(
 			/* translators: %1$s <a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">We recommend</a> link */
 			\esc_html__( 'On install, WordPress sets the permalink structure to a format that is not SEO-friendly. %1$s changing it.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
 		);
-		$this->link_setting = [
-			'hook'   => 'options-permalink.php',
-			'iconEl' => 'label[for="permalink-input-month-name"], label[for="permalink-input-post-name"]',
-		];
 	}
 
 	/**

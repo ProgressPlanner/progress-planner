@@ -19,15 +19,35 @@ class Disable_Comments extends One_Time {
 	 *
 	 * @var string
 	 */
-	protected const ID = 'disable-comments';
+	protected const PROVIDER_ID = 'disable-comments';
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->url         = \admin_url( 'options-discussion.php' );
-		$this->title       = \esc_html__( 'Disable comments', 'progress-planner' );
-		$this->description = sprintf(
+		$this->url          = \admin_url( 'options-discussion.php' );
+		$this->link_setting = [
+			'hook'   => 'options-discussion.php',
+			'iconEl' => 'label[for="default_comment_status"]',
+		];
+	}
+
+	/**
+	 * Get the title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Disable comments', 'progress-planner' );
+	}
+
+	/**
+	 * Get the title.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return sprintf(
 			\esc_html(
 					// translators: %d is the number of approved comments, %s is the <a href="https://prpl.fyi/disable-comments" target="_blank">disabling them</a> link.
 				\_n(
@@ -40,10 +60,6 @@ class Disable_Comments extends One_Time {
 			(int) \wp_count_comments()->approved,
 			'<a href="https://prpl.fyi/disable-comments" target="_blank">' . \esc_html__( 'disabling them', 'progress-planner' ) . '</a>',
 		);
-		$this->link_setting = [
-			'hook'   => 'options-discussion.php',
-			'iconEl' => 'label[for="default_comment_status"]',
-		];
 	}
 
 	/**

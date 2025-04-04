@@ -10,9 +10,8 @@ namespace Progress_Planner\Suggested_Tasks;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 // Repetitive tasks.
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
-// Content tasks.
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Create as Content_Create;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content\Review as Content_Review;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create as Content_Create;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Review as Content_Review;
 // One-time tasks.
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Blog_Description;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Settings_Saved;
@@ -28,6 +27,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Php_Version;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engine_Visibility;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\User as User_Tasks;
 
 /**
  * Local_Tasks_Manager class.
@@ -45,10 +45,10 @@ class Local_Tasks_Manager {
 	 * Constructor.
 	 */
 	public function __construct() {
-
 		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
 		\add_action( 'plugins_loaded', [ $this, 'init' ], 11 );
 
+		// Inject tasks.
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
 
 		// Add the cleanup action.
@@ -80,7 +80,16 @@ class Local_Tasks_Manager {
 			new Permalink_Structure(),
 			new Php_Version(),
 			new Search_Engine_Visibility(),
+			new User_Tasks(),
 		];
+	}
+
+	/**
+	 * Add the Yoast task if the plugin is active.
+	 *
+	 * @return void
+	 */
+	public function add_plugin_integration() {
 
 		/**
 		 * Filter the task providers.
@@ -89,6 +98,7 @@ class Local_Tasks_Manager {
 		 */
 		$this->task_providers = \apply_filters( 'progress_planner_suggested_tasks_providers', $this->task_providers );
 
+		// Now when all are instantiated, initialize them.
 		foreach ( $this->task_providers as $key => $task_provider ) {
 			if ( ! $task_provider instanceof Local_Tasks_Interface ) {
 				error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
@@ -99,17 +109,13 @@ class Local_Tasks_Manager {
 					)
 				);
 				unset( $this->task_providers[ $key ] );
-			}
-		}
-	}
 
-	/**
-	 * Add the Yoast task if the plugin is active.
-	 *
-	 * @return void
-	 */
-	public function add_plugin_integration() {
-		new Add_Yoast_Providers();
+				continue;
+			}
+
+			// Initialize the task provider (add hooks, etc.).
+			$task_provider->init();
+		}
 	}
 
 	/**
@@ -132,7 +138,7 @@ class Local_Tasks_Manager {
 	}
 
 	/**
-	 * Get a task provider by its type.
+	 * Get a task provider.
 	 *
 	 * @param string $name The method name.
 	 * @param array  $arguments The arguments.
@@ -160,7 +166,7 @@ class Local_Tasks_Manager {
 	}
 
 	/**
-	 * Get a task provider by its type.
+	 * Get a task provider by its ID.
 	 *
 	 * @param string $provider_id The provider ID.
 	 *
@@ -201,7 +207,7 @@ class Local_Tasks_Manager {
 			}
 
 			$tasks_to_inject[] = $task;
-			$this->add_pending_task( $task['task_id'] );
+			$this->add_pending_task( $task );
 		}
 
 		return \array_merge( $tasks, $tasks_to_inject );
@@ -213,7 +219,7 @@ class Local_Tasks_Manager {
 	 * @return array
 	 */
 	public function evaluate_tasks() {
-		$tasks           = (array) \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks           = (array) \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending' );
 		$completed_tasks = [];
 
 		foreach ( $tasks as $task_data ) {
@@ -225,7 +231,7 @@ class Local_Tasks_Manager {
 
 			$task_result = $this->evaluate_task( $task_id );
 			if ( false !== $task_result ) {
-				$completed_tasks[] = $task_id;
+				$completed_tasks[] = $task_result;
 			}
 		}
 
@@ -237,10 +243,10 @@ class Local_Tasks_Manager {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return bool|string
+	 * @return bool|\Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local
 	 */
 	public function evaluate_task( $task_id ) {
-		$task_object   = ( new Local_Task_Factory( $task_id ) )->get_task();
+		$task_object   = Local_Task_Factory::create_task_from( 'id', $task_id );
 		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
 
 		if ( ! $task_provider ) {
@@ -258,7 +264,7 @@ class Local_Tasks_Manager {
 	 * @return array|false
 	 */
 	public function get_task_details( $task_id ) {
-		$task_object   = ( new Local_Task_Factory( $task_id ) )->get_task();
+		$task_object   = Local_Task_Factory::create_task_from( 'id', $task_id );
 		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
 
 		if ( ! $task_provider ) {
@@ -276,7 +282,7 @@ class Local_Tasks_Manager {
 	 * @return array
 	 */
 	public function get_data_from_task_id( $task_id ) {
-		$task_object = ( new Local_Task_Factory( $task_id ) )->get_task();
+		$task_object = Local_Task_Factory::create_task_from( 'id', $task_id );
 
 		return $task_object->get_data();
 	}
@@ -284,28 +290,27 @@ class Local_Tasks_Manager {
 	/**
 	 * Add a pending local task.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task The task data.
 	 *
 	 * @return bool
 	 */
-	public function add_pending_task( $task_id ) {
+	public function add_pending_task( $task ) {
 		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 
 		$task_index = false;
 
-		foreach ( $tasks as $key => $task ) {
-			if ( ! isset( $task['task_id'] ) || $task_id !== $task['task_id'] ) {
+		foreach ( $tasks as $key => $_task ) {
+			if ( ! isset( $_task['task_id'] ) || $task['task_id'] !== $_task['task_id'] ) {
 				continue;
 			}
 			$task_index = $key;
 			break;
 		}
 
-		$task           = ( new Local_Task_Factory( $task_id ) )->get_task()->get_data();
 		$task['status'] = 'pending';
 
 		if ( false !== $task_index ) {
-			$tasks[ $task_index ] = $task;
+			$tasks[ $task_index ] = array_merge( $task, $tasks[ $task_index ] );
 		} else {
 			$tasks[] = $task;
 		}
@@ -321,7 +326,7 @@ class Local_Tasks_Manager {
 	 */
 	public function cleanup_pending_tasks() {
 
-		$cleanup_recently_performed = \progress_planner()->get_cache()->get( 'cleanup_pending_tasks' );
+		$cleanup_recently_performed = \progress_planner()->get_utils__cache()->get( 'cleanup_pending_tasks' );
 
 		if ( $cleanup_recently_performed ) {
 			return;
@@ -343,12 +348,12 @@ class Local_Tasks_Manager {
 					return false;
 				}
 
-				if ( isset( $task['year_week'] ) ) {
-					return \gmdate( 'YW' ) === $task['year_week'];
+				if ( isset( $task['date'] ) ) {
+					return (string) \gmdate( 'YW' ) === (string) $task['date'];
 				}
 
-				// We have changed type name, so we need to remove all tasks of the old type.
-				if ( isset( $task['type'] ) && 'update-post' === $task['type'] ) {
+				// We have changed provider_id name, so we need to remove all tasks of the old provider_id.
+				if ( isset( $task['provider_id'] ) && 'update-post' === $task['provider_id'] ) {
 					return false;
 				}
 
@@ -357,9 +362,9 @@ class Local_Tasks_Manager {
 		);
 
 		if ( count( $tasks ) !== $task_count ) {
-			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+			\progress_planner()->get_settings()->set( 'local_tasks', array_values( $tasks ) );
 		}
 
-		\progress_planner()->get_cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );
+		\progress_planner()->get_utils__cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );
 	}
 }
