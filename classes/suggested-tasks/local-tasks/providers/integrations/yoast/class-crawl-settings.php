@@ -54,9 +54,7 @@ class Crawl_Settings extends Yoast_Provider {
 		$yoast_options = \WPSEO_Options::get_instance()->get_all();
 		foreach ( [
 			'remove_feed_global',
-			'remove_feed_global_comments',
 			'remove_feed_post_comments',
-			'remove_feed_authors',
 			'remove_feed_categories',
 			'remove_feed_tags',
 			'remove_feed_custom_taxonomies',
@@ -68,7 +66,6 @@ class Crawl_Settings extends Yoast_Provider {
 			'remove_rsd_wlw_links',
 			'remove_oembed_links',
 			'remove_generator',
-			'remove_emoji_scripts',
 			'remove_powered_by_header',
 			'remove_pingback_header',
 			'clean_campaign_tracking_urls',

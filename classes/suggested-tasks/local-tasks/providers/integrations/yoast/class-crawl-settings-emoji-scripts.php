@@ -1,0 +1,66 @@
+<?php
+/**
+ * Add task for Yoast SEO: Remove emoji scripts.
+ *
+ * @package Progress_Planner
+ */
+
+namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Integrations\Yoast;
+
+/**
+ * Add task for Yoast SEO: Remove emoji scripts.
+ */
+class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
+
+	/**
+	 * The provider ID.
+	 *
+	 * @var string
+	 */
+	protected const PROVIDER_ID = 'yoast-crawl-settings-emoji-scripts';
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$this->url = admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization' );
+	}
+
+	/**
+	 * Get the title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Yoast SEO: Remove emoji scripts', 'progress-planner' );
+	}
+
+	/**
+	 * Get the description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return \esc_html__( 'Remove JavaScript used for converting emoji characters in older browsers.', 'progress-planner' ) .
+		' <a href="https://prpl.fyi/yoast-crawl-optimization-emoji-scripts" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
+	}
+
+	/**
+	 * Determine if the task should be added.
+	 *
+	 * @return bool
+	 */
+	public function should_add_task() {
+		$yoast_options = \WPSEO_Options::get_instance()->get_all();
+		foreach ( [
+			'remove_emoji_scripts',
+		] as $option ) {
+			// If the crawl settings are already optimized, we don't need to add the task.
+			if ( $yoast_options[ $option ] ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+}
