@@ -130,7 +130,7 @@ class Suggested_Tasks {
 	 */
 	public function on_automatic_updates_complete() {
 
-		$pending_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] ); // @phpstan-ignore-line method.nonObject
+		$pending_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
 
 		if ( empty( $pending_tasks ) ) {
 			return;

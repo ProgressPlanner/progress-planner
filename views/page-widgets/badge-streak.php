@@ -44,13 +44,19 @@ if ( $prpl_widget->get_details( 'maintenance' ) ) {
 
 <div class="prpl-latest-badges-wrapper">
 	<?php foreach ( $prpl_widget_context_details as $prpl_context => $prpl_details ) : ?>
-		<prpl-gauge background="<?php echo \esc_attr( $prpl_widget->get_details( $prpl_context )->get_background() ); ?>" color="var(--prpl-color-accent-orange)">
-			<progress max="100" value="<?php echo (float) $prpl_widget->get_details( $prpl_context )->get_progress()['progress']; ?>">
-				<prpl-badge complete="true" badge-id="<?php echo esc_attr( $prpl_widget->get_details( $prpl_context )->get_id() ); ?>"></prpl-badge>
+		<?php
+		$prpl_widget_details_context_badge = $prpl_widget->get_details( $prpl_context );
+		if ( ! $prpl_widget_details_context_badge ) {
+			continue;
+		}
+		?>
+		<prpl-gauge background="<?php echo \esc_attr( $prpl_widget_details_context_badge->get_background() ); ?>" color="var(--prpl-color-accent-orange)">
+			<progress max="100" value="<?php echo (float) $prpl_widget_details_context_badge->get_progress()['progress']; ?>">
+				<prpl-badge complete="true" badge-id="<?php echo esc_attr( $prpl_widget_details_context_badge->get_id() ); ?>"></prpl-badge>
 			</progress>
 		</prpl-gauge>
 		<div class="prpl-badge-content-wrapper">
-			<h3><?php echo \esc_html( $prpl_widget->get_details( $prpl_context )->get_name() ); ?></h3>
+			<h3><?php echo \esc_html( $prpl_widget_details_context_badge->get_name() ); ?></h3>
 			<p><?php echo \esc_html( $prpl_details['text'] ); ?></p>
 		</div>
 	<?php endforeach; ?>

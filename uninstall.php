@@ -25,9 +25,9 @@ require_once __DIR__ . '/classes/class-query.php';
 function progress_planner_cleanup_options() {
 	$value = get_option( \Progress_Planner\Settings::OPTION_NAME, [] );
 	$keep  = [ 'badges', 'activation_date' ];
-	foreach ( array_keys( $value ) as $key ) { // @phpstan-ignore-line argument.type
+	foreach ( array_keys( $value ) as $key ) {
 		if ( ! in_array( $key, $keep, true ) ) {
-			unset( $value[ $key ] ); // @phpstan-ignore-line offsetAccess.nonOffsetAccessible
+			unset( $value[ $key ] );
 		}
 	}
 	update_option( \Progress_Planner\Settings::OPTION_NAME, $value );

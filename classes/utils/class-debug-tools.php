@@ -184,8 +184,8 @@ class Debug_Tools {
 		$onboard_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', [] );
 
 		foreach ( $onboard_task_provider_ids as $task_provider_id ) {
-			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
-			if ( $task_provider ) { // @phpstan-ignore-line
+			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id );
+			if ( $task_provider ) {
 				$task_provider_details = $task_provider->get_task_details();
 				if ( empty( $task_provider_details ) ) {
 					continue;

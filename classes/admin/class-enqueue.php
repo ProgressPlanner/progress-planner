@@ -268,7 +268,7 @@ class Enqueue {
 			$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id();
 		}
 
-		// Get the content and maintenance badge URLs.
+		// Get the maintenance badge URLs.
 		foreach ( [ 'maintenance' ] as $context ) {
 			$set_badges = \progress_planner()->get_badges()->get_badges( $context );
 			foreach ( $set_badges as $badge ) {

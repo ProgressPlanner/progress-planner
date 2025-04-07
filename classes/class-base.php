@@ -25,6 +25,14 @@ namespace Progress_Planner;
  * @method \Progress_Planner\Admin\Dashboard_Widget_Score get_admin__dashboard_widget_score()
  * @method \Progress_Planner\Admin\Dashboard_Widget_Todo get_admin__dashboard_widget_todo()
  * @method \Progress_Planner\Admin\Editor get_admin__editor()
+ * @method \Progress_Planner\Admin\Enqueue get_admin__enqueue()
+ * @method \Progress_Planner\Admin\Widgets\Todo get_admin__widgets__todo()
+ * @method \Progress_Planner\Admin\Widgets\Whats_New get_admin__widgets__whats_new()
+ * @method \Progress_Planner\Admin\Widgets\Suggested_Tasks get_admin__widgets__suggested_tasks()
+ * @method \Progress_Planner\Admin\Widgets\Latest_Badge get_admin__widgets__latest_badge()
+ * @method \Progress_Planner\Admin\Widgets\Badge_Streak get_admin__widgets__badge_streak()
+ * @method \Progress_Planner\Admin\Widgets\Content_Managed get_admin__widgets__content_managed()
+ * @method \Progress_Planner\Admin\Widgets\Challenge get_admin__widgets__challenge()
  * @method \Progress_Planner\Actions\Content get_actions__content()
  * @method \Progress_Planner\Actions\Content_Scan get_actions__content_scan()
  * @method \Progress_Planner\Actions\Maintenance get_actions__maintenance()
@@ -36,6 +44,8 @@ namespace Progress_Planner;
  * @method \Progress_Planner\Utils\Debug_Tools get_utils__debug_tools()
  * @method \Progress_Planner\Badges get_badges()
  * @method \Progress_Planner\Plugin_Migrations get_plugin_migrations()
+ * @method \Progress_Planner\UI\Popover get_ui__popover()
+ * @method \Progress_Planner\UI\Chart get_ui__chart()
  */
 class Base {
 
