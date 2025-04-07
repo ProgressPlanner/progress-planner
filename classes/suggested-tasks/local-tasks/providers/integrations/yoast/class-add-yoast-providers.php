@@ -18,9 +18,64 @@ class Add_Yoast_Providers {
 	public function __construct() {
 		if ( function_exists( 'YoastSEO' ) ) {
 			add_filter( 'progress_planner_suggested_tasks_providers', [ $this, 'add_providers' ], 11, 1 );
+
+			\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		}
 	}
 
+	/**
+	 * Enqueue the assets.
+	 *
+	 * @param string $hook The hook.
+	 *
+	 * @return void
+	 */
+	public function enqueue_assets( $hook ) {
+		if ( 'seo_page_wpseo_page_settings' !== $hook ) {
+			return;
+		}
+
+		// Enqueue the script.
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'yoast-focus-element',
+			[
+				'name' => 'progressPlannerYoastFocusElement',
+				'data' => [
+					'tasks'    => [
+						[
+							'element' => 'input-wpseo-remove_feed_global_comments', // Global comment feeds.
+							'checked' => 'true',
+						],
+						[
+							'element' => 'input-wpseo-remove_feed_authors', // Post author feeds.
+							'checked' => 'true',
+						],
+						[
+							'element' => 'input-wpseo-remove_emoji_scripts', // Emoji scripts.
+							'checked' => 'true',
+						],
+						[
+							'element' => 'input-wpseo_titles-disable-author', // Author archive.
+							'checked' => 'false',
+						],
+						[
+							'element' => 'input-wpseo_titles-disable-post_format', // Post format archive.
+							'checked' => 'false',
+						],
+						[
+							'element' => 'input-wpseo_titles-disable-date', // Date archive.
+							'checked' => 'false',
+						],
+						[
+							'element' => 'input-wpseo_titles-disable-attachment', // Media pages.
+							'checked' => 'false',
+						],
+					],
+					'base_url' => constant( 'PROGRESS_PLANNER_URL' ),
+				],
+			]
+		);
+	}
 	/**
 	 * Add the providers.
 	 *
