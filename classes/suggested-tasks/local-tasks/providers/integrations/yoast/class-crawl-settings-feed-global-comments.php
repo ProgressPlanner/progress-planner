@@ -23,7 +23,7 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->url = admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization' );
+		$this->url = admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_global_comments' );
 	}
 
 	/**
@@ -42,7 +42,7 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 */
 	public function get_description() {
 		return \esc_html__( 'Remove URLs which provide an overview of recent comments on your site.', 'progress-planner' ) .
-		' <a href="https://prpl.fyi/yoast-crawl-optimization-feed-global-comments" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
+		' <a href="https://prpl.fyi/yoast-crawl-optimization-feed-global-comments`" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
 	}
 
 	/**
