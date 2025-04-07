@@ -46,6 +46,23 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the focus tasks.
+	 *
+	 * @return array
+	 */
+	public function get_focus_tasks() {
+		return [
+			'iconElement'  => '.yst-toggle-field__header',
+			'valueElement' => [
+				'elementSelector' => 'button[data-id="input-wpseo-remove_feed_authors"]',
+				'attributeName'   => 'aria-checked',
+				'attributeValue'  => 'true',
+				'operator'        => '=',
+			],
+		];
+	}
+
+	/**
 	 * Determine if the task should be added.
 	 *
 	 * @return bool

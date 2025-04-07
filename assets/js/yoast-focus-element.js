@@ -4,6 +4,35 @@
  *
  */
 
+/**
+ * Check if the value of the element matches the value specified in the task.
+ *
+ * @param {Element} element The element to check.
+ * @param {Object}  task    The task to check.
+ * @return {boolean} True if the value matches, false otherwise.
+ */
+function checkTaskValue( element, task ) {
+	if ( ! task.valueElement ) {
+		return true;
+	}
+
+	const attributeName = task.valueElement.attributeName || 'value';
+	const attributeValue = task.valueElement.attributeValue;
+	const operator = task.valueElement.operator || '=';
+	const currentValue = element.getAttribute( attributeName ) || '';
+
+	switch ( operator ) {
+		case '!=':
+			return currentValue !== attributeValue;
+		case '=':
+		default:
+			return currentValue === attributeValue;
+	}
+}
+
+/**
+ * Observe the Yoast sidebar clicks.
+ */
 function observeYoastSidebarClicks() {
 	const container = document.querySelector( '#yoast-seo-settings' );
 
@@ -33,6 +62,9 @@ function observeYoastSidebarClicks() {
 	} );
 }
 
+/**
+ * Wait for the main content to load and observe the content.
+ */
 function waitForMainAndObserveContent() {
 	const container = document.querySelector( '#yoast-seo-settings' );
 	if ( ! container ) return;
@@ -60,22 +92,37 @@ function waitForMainAndObserveContent() {
 							// Loop through the tasks and add the focus element.
 							for ( const task of progressPlannerYoastFocusElement.tasks ) {
 								// Try to find the toggleButton.
-								const toggleButton = el.querySelector(
-									task.element
+								const valueElement = el.querySelector(
+									task.valueElement.elementSelector
 								);
-								if ( toggleButton ) {
-									// Get option header.
-									const optionHeader = toggleButton.closest(
-										'.yst-toggle-field__header'
+								if ( valueElement ) {
+									// We usually add icon to the option header.
+									let addIconElement = valueElement.closest(
+										task.iconElement
 									);
 
-									// Append next to the toggleButton, only if it's not already there.
+									// Exception is the upload input field.
 									if (
-										! optionHeader.querySelector(
+										! addIconElement &&
+										valueElement.type === 'hidden'
+									) {
+										addIconElement = valueElement
+											.closest( 'fieldset' )
+											.querySelector( task.iconElement );
+									}
+
+									// Upload input field.
+									if ( ! addIconElement ) {
+										continue;
+									}
+
+									// Append next to the valueElemen, only if it's not already there.
+									if (
+										! addIconElement.querySelector(
 											'.prpl-form-row-ravi'
 										)
 									) {
-										optionHeader.style.position =
+										addIconElement.style.position =
 											'relative';
 
 										// Create a new span with the class prpl-form-row-ravi.
@@ -89,11 +136,11 @@ function waitForMainAndObserveContent() {
 										raviIconWrapper.style.right = '-1.5rem';
 										raviIconWrapper.style.top = '0';
 
-										// Check if the toggleButton is checked or not.
-										const isChecked =
-											toggleButton.getAttribute(
-												'aria-checked'
-											);
+										// Check for value if specified in task.
+										const valueMatches = checkTaskValue(
+											valueElement,
+											task
+										);
 
 										raviIconWrapper.appendChild(
 											document.createElement( 'span' )
@@ -110,10 +157,9 @@ function waitForMainAndObserveContent() {
 										iconImg.height = 16;
 
 										// Apply grayscale if state doesn't match
-										iconImg.style.filter =
-											isChecked !== task.checked
-												? 'grayscale(100%)'
-												: 'none';
+										iconImg.style.filter = ! valueMatches
+											? 'grayscale(100%)'
+											: 'none';
 
 										// Append the icon image to the raviIconWrapper.
 										raviIconWrapper
@@ -121,26 +167,33 @@ function waitForMainAndObserveContent() {
 											.appendChild( iconImg );
 
 										// Watch for changes in aria-checked to update the icon dynamically
-										const toggleObserver =
+										const valueElementObserver =
 											new MutationObserver( () => {
-												const currentState =
-													toggleButton.getAttribute(
-														'aria-checked'
+												// Check value again if specified
+												const currentValueMatches =
+													checkTaskValue(
+														valueElement,
+														task
 													);
 												iconImg.style.filter =
-													currentState !==
-													task.checked
+													! currentValueMatches
 														? 'grayscale(100%)'
 														: 'none';
 											} );
 
-										toggleObserver.observe( toggleButton, {
-											attributes: true,
-											attributeFilter: [ 'aria-checked' ],
-										} );
+										valueElementObserver.observe(
+											valueElement,
+											{
+												attributes: true,
+												attributeFilter: [
+													task.valueElement
+														.attributeName,
+												],
+											}
+										);
 
 										// Finally add the raviIconWrapper to the DOM.
-										optionHeader.appendChild(
+										addIconElement.appendChild(
 											raviIconWrapper
 										);
 									}
@@ -167,6 +220,6 @@ function waitForMainAndObserveContent() {
 	} );
 }
 
-// Run once on initial page load
+// Run once on initial page load.
 waitForMainAndObserveContent();
 observeYoastSidebarClicks();

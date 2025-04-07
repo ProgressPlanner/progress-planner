@@ -13,6 +13,13 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Integrations\Yo
 class Add_Yoast_Providers {
 
 	/**
+	 * Providers.
+	 *
+	 * @var array
+	 */
+	protected $providers = [];
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -35,42 +42,23 @@ class Add_Yoast_Providers {
 			return;
 		}
 
+		$focus_tasks = [];
+
+		foreach ( $this->providers as $provider ) {
+			$focus_task = $provider->get_focus_tasks();
+
+			if ( $focus_task ) {
+				$focus_tasks[] = $focus_task;
+			}
+		}
+
 		// Enqueue the script.
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
 			'yoast-focus-element',
 			[
 				'name' => 'progressPlannerYoastFocusElement',
 				'data' => [
-					'tasks'    => [
-						[
-							'element' => 'button[data-id="input-wpseo-remove_feed_global_comments"]', // Global comment feeds.
-							'checked' => 'true',
-						],
-						[
-							'element' => 'button[data-id="input-wpseo-remove_feed_authors"]', // Post author feeds.
-							'checked' => 'true',
-						],
-						[
-							'element' => 'button[data-id="input-wpseo-remove_emoji_scripts"]', // Emoji scripts.
-							'checked' => 'true',
-						],
-						[
-							'element' => 'button[data-id="input-wpseo_titles-disable-author"]', // Author archive.
-							'checked' => 'false',
-						],
-						[
-							'element' => 'button[data-id="input-wpseo_titles-disable-post_format"]', // Post format archive.
-							'checked' => 'false',
-						],
-						[
-							'element' => 'button[data-id="input-wpseo_titles-disable-date"]', // Date archive.
-							'checked' => 'false',
-						],
-						[
-							'element' => 'button[data-id="input-wpseo_titles-disable-attachment"]', // Media pages.
-							'checked' => 'false',
-						],
-					],
+					'tasks'    => $focus_tasks,
 					'base_url' => constant( 'PROGRESS_PLANNER_URL' ),
 				],
 			]
@@ -83,18 +71,20 @@ class Add_Yoast_Providers {
 	 * @return array
 	 */
 	public function add_providers( $providers ) {
+
+		$this->providers = [
+			new Archive_Author(),
+			new Archive_Date(),
+			new Archive_Format(),
+			new Crawl_Settings_Feed_Global_Comments(),
+			new Crawl_Settings_Feed_Authors(),
+			new Crawl_Settings_Emoji_Scripts(),
+			new Media_Pages(),
+			new Organization_Logo(),
+		];
 		return array_merge(
 			$providers,
-			[
-				new Archive_Author(),
-				new Archive_Date(),
-				new Archive_Format(),
-				new Crawl_Settings_Feed_Global_Comments(),
-				new Crawl_Settings_Feed_Authors(),
-				new Crawl_Settings_Emoji_Scripts(),
-				new Media_Pages(),
-				new Organization_Logo(),
-			]
+			$this->providers
 		);
 	}
 }
