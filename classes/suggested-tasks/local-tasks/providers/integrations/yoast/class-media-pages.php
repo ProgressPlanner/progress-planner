@@ -46,6 +46,23 @@ class Media_Pages extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the focus tasks.
+	 *
+	 * @return array
+	 */
+	public function get_focus_tasks() {
+		return [
+			'iconElement'  => '.yst-toggle-field__header',
+			'valueElement' => [
+				'elementSelector' => 'button[data-id="input-wpseo_titles-disable-attachment"]',
+				'attributeName'   => 'aria-checked',
+				'attributeValue'  => 'false',
+				'operator'        => '=',
+			],
+		];
+	}
+
+	/**
 	 * Determine if the task should be added.
 	 *
 	 * @return bool

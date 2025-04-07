@@ -59,6 +59,23 @@ class Organization_Logo extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the focus tasks.
+	 *
+	 * @return array
+	 */
+	public function get_focus_tasks() {
+		return [
+			'iconElement'  => 'legend.yst-label',
+			'valueElement' => [
+				'elementSelector' => $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person' ? 'input[name="wpseo_titles.company_logo_id"]' : 'input[name="wpseo_titles.person_logo_id"]',
+				'attributeName'   => 'value',
+				'attributeValue'  => '0',
+				'operator'        => '!=',
+			],
+		];
+	}
+
+	/**
 	 * Determine if the task should be added.
 	 *
 	 * @return bool

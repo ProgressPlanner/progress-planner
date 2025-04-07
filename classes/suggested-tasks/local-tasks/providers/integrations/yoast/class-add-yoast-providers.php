@@ -13,14 +13,57 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Integrations\Yo
 class Add_Yoast_Providers {
 
 	/**
+	 * Providers.
+	 *
+	 * @var array
+	 */
+	protected $providers = [];
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		if ( function_exists( 'YoastSEO' ) ) {
 			add_filter( 'progress_planner_suggested_tasks_providers', [ $this, 'add_providers' ], 11, 1 );
+
+			\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		}
 	}
 
+	/**
+	 * Enqueue the assets.
+	 *
+	 * @param string $hook The hook.
+	 *
+	 * @return void
+	 */
+	public function enqueue_assets( $hook ) {
+		if ( 'seo_page_wpseo_page_settings' !== $hook ) {
+			return;
+		}
+
+		$focus_tasks = [];
+
+		foreach ( $this->providers as $provider ) {
+			$focus_task = $provider->get_focus_tasks();
+
+			if ( $focus_task ) {
+				$focus_tasks[] = $focus_task;
+			}
+		}
+
+		// Enqueue the script.
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'yoast-focus-element',
+			[
+				'name' => 'progressPlannerYoastFocusElement',
+				'data' => [
+					'tasks'    => $focus_tasks,
+					'base_url' => constant( 'PROGRESS_PLANNER_URL' ),
+				],
+			]
+		);
+	}
 	/**
 	 * Add the providers.
 	 *
@@ -28,18 +71,20 @@ class Add_Yoast_Providers {
 	 * @return array
 	 */
 	public function add_providers( $providers ) {
+
+		$this->providers = [
+			new Archive_Author(),
+			new Archive_Date(),
+			new Archive_Format(),
+			new Crawl_Settings_Feed_Global_Comments(),
+			new Crawl_Settings_Feed_Authors(),
+			new Crawl_Settings_Emoji_Scripts(),
+			new Media_Pages(),
+			new Organization_Logo(),
+		];
 		return array_merge(
 			$providers,
-			[
-				new Archive_Author(),
-				new Archive_Date(),
-				new Archive_Format(),
-				new Crawl_Settings_Feed_Global_Comments(),
-				new Crawl_Settings_Feed_Authors(),
-				new Crawl_Settings_Emoji_Scripts(),
-				new Media_Pages(),
-				new Organization_Logo(),
-			]
+			$this->providers
 		);
 	}
 }
