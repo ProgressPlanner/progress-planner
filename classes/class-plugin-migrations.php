@@ -10,7 +10,7 @@
 namespace Progress_Planner;
 
 use Progress_Planner\Update\Update_111;
-
+use Progress_Planner\Update\Update_120;
 /**
  * Plugin Upgrade class.
  *
@@ -41,6 +41,7 @@ class Plugin_Migrations {
 	 */
 	private const UPGRADE_CLASSES = [
 		'1.1.1' => Update_111::class,
+		'1.2.0' => Update_120::class,
 	];
 
 	/**
@@ -49,7 +50,7 @@ class Plugin_Migrations {
 	public function __construct() {
 		$this->db_version = $this->get_db_version();
 		$this->version    = $this->get_plugin_version();
-		\add_action( 'init', [ $this, 'maybe_upgrade' ], 1 );
+		\add_action( 'init', [ $this, 'maybe_upgrade' ], 100 );
 	}
 
 	/**

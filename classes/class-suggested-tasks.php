@@ -51,6 +51,9 @@ class Suggested_Tasks {
 
 		// Register the custom post type.
 		\add_action( 'init', [ $this, 'register_suggested_tasks_post_type' ] );
+
+		// Register the custom taxonomies.
+		\add_action( 'init', [ $this, 'register_suggested_tasks_taxonomy' ] );
 	}
 
 	/**
@@ -179,30 +182,7 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_tasks() {
-		$tasks = [];
-		/**
-		 * Filter the suggested tasks.
-		 *
-		 * @param array $tasks The suggested tasks.
-		 * @return array
-		 */
-		$tasks    = \apply_filters( 'progress_planner_suggested_tasks_items', $tasks );
-		$db_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		foreach ( $tasks as $key => $task ) {
-			if ( isset( $task['status'] ) && ! empty( $task['status'] ) ) {
-				continue;
-			}
-
-			foreach ( $db_tasks as $db_task_key => $db_task ) {
-				if ( $db_task['task_id'] === $task['task_id'] ) {
-					$tasks[ $key ]['status'] = $db_task['status'];
-					unset( $db_tasks[ $db_task_key ] );
-					break;
-				}
-			}
-		}
-
-		return $tasks;
+		return \get_posts( [ 'post_type' => 'prpl_suggested_task' ] );
 	}
 
 	/**
@@ -672,5 +652,15 @@ class Suggested_Tasks {
 				'capabilities'      => [ 'create_posts' => 'do_not_allow' ],
 			]
 		);
+	}
+
+	/**
+	 * Register a custom taxonomies for suggested tasks.
+	 *
+	 * @return void
+	 */
+	public function register_suggested_tasks_taxonomy() {
+		register_taxonomy( 'prpl_suggested_task_category', 'prpl_suggested_task', [ 'label' => \__( 'Categories', 'progress-planner' ) ] );
+		register_taxonomy( 'prpl_suggested_task_provider', 'prpl_suggested_task', [ 'label' => \__( 'Providers', 'progress-planner' ) ] );
 	}
 }
