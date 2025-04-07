@@ -2,7 +2,6 @@
 /**
  * yoast-focus-element script.
  *
- * Dependencies: progress-planner/l10n
  */
 
 function observeYoastSidebarClicks() {
