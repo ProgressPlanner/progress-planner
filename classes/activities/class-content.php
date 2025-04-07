@@ -26,14 +26,9 @@ class Content extends Activity {
 	 * @var array
 	 */
 	public static $points_config = [
-		'publish'          => 50,
-		'update'           => 10,
-		'delete'           => 5,
-		'word-multipliers' => [
-			100  => 1.1,
-			350  => 1.25,
-			1000 => 0.8,
-		],
+		'publish' => 50,
+		'update'  => 10,
+		'delete'  => 5,
 	];
 
 	/**
@@ -89,29 +84,8 @@ class Content extends Activity {
 	 * @return int
 	 */
 	public function get_points_on_publish_date() {
-		$points = self::$points_config['publish'];
-		if ( isset( self::$points_config[ $this->type ] ) ) {
-			$points = self::$points_config[ $this->type ];
-		}
-		$post = $this->get_post();
-
-		if ( ! $post ) {
-			return 0;
-		}
-
-		// Modify the score based on the words count.
-		$words       = \progress_planner()->get_activities__content_helpers()->get_word_count( $post->post_content, $post->ID );
-		$multipliers = self::$points_config['word-multipliers'];
-		if ( $words > 1000 ) {
-			return (int) ( $points * $multipliers[1000] );
-		}
-		if ( $words > 350 ) {
-			return (int) ( $points * $multipliers[350] );
-		}
-		if ( $words > 100 ) {
-			return (int) ( $points * $multipliers[100] );
-		}
-
-		return (int) $points;
+		return isset( self::$points_config[ $this->type ] )
+			? (int) self::$points_config[ $this->type ]
+			: (int) self::$points_config['publish'];
 	}
 }

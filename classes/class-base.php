@@ -174,6 +174,7 @@ class Base {
 
 		// Backwards-compatibility.
 		$deprecated = [
+			// v1.1.1.
 			'get_query'                                  => [ 'get_activities__query', '1.1.1' ],
 			'get_date'                                   => [ 'get_utils__date', '1.1.1' ],
 			'get_widgets__suggested_tasks'               => [ 'get_admin__widgets__suggested_tasks', '1.1.1' ],
@@ -193,6 +194,9 @@ class Base {
 			'get_playground'                             => [ 'get_utils__playground', '1.1.1' ],
 			'get_chart'                                  => [ 'get_ui__chart', '1.1.1' ],
 			'get_popover'                                => [ 'get_ui__popover', '1.1.1' ],
+
+			// v1.2.0.
+			'get_admin__widgets__published_content'      => [ 'get_admin__widgets__content_managed', '1.2.0' ],
 		];
 
 		if ( isset( $deprecated[ $name ] ) ) {
