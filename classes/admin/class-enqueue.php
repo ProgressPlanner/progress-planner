@@ -269,7 +269,7 @@ class Enqueue {
 		}
 
 		// Get the content and maintenance badge URLs.
-		foreach ( [ 'content', 'maintenance' ] as $context ) {
+		foreach ( [ 'maintenance' ] as $context ) {
 			$set_badges = \progress_planner()->get_badges()->get_badges( $context );
 			foreach ( $set_badges as $badge ) {
 				$progress = $badge->get_progress();

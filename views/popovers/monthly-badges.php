@@ -39,7 +39,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="prpl-popover-column">
 		<?php
 		$prpl_badges_groups = [
-			'content'     => __( 'Writing badges', 'progress-planner' ),
 			'maintenance' => __( 'Streak badges', 'progress-planner' ),
 		];
 		?>

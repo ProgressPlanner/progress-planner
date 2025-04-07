@@ -98,7 +98,6 @@ class Stats {
 
 		// Get the badges.
 		$badges = array_merge(
-			\progress_planner()->get_badges()->get_badges( 'content' ),
 			\progress_planner()->get_badges()->get_badges( 'maintenance' ),
 			\progress_planner()->get_badges()->get_badges( 'monthly_flat' )
 		);

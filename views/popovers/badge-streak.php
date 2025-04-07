@@ -23,15 +23,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</div>
 		<?php \progress_planner()->the_view( 'popovers/parts/badge-streak-progressbar.php', [ 'prpl_context' => 'maintenance' ] ); ?>
 	</div>
-
-	<div class="prpl-widget-wrapper in-popover">
-		<h3><?php \esc_html_e( 'Keep adding posts and pages', 'progress-planner' ); ?></h3>
-		<p><?php \esc_html_e( 'The more you write, the sooner you unlock new badges. You can earn level 1 of this badge immediately after installing the plugin if you have written 20 or more blog posts.', 'progress-planner' ); ?></p>
-		<div id="popover-badge-streak-maintenance">
-		<?php \progress_planner()->the_view( 'popovers/parts/badge-streak-badge.php', [ 'prpl_category' => 'content' ] ); ?>
-		</div>
-		<?php \progress_planner()->the_view( 'popovers/parts/badge-streak-progressbar.php', [ 'prpl_context' => 'maintenance' ] ); ?>
-	</div>
 </div>
 <div class="footer">
 	<div class="string-freeze-explain">

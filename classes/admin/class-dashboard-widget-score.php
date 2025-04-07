@@ -58,11 +58,11 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 	 *
 	 * @return array
 	 */
-	public function get_badge_details( $category = 'content' ) {
-		static $cached = [
-			'content'     => false,
-			'maintenance' => false,
-		];
+	public function get_badge_details( $category = 'maintenance' ) {
+		static $cached = [];
+		if ( ! isset( $cached[ $category ] ) ) {
+			$cached[ $category ] = false;
+		}
 
 		if ( $cached[ $category ] ) {
 			return $cached[ $category ];

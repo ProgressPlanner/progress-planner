@@ -13,18 +13,6 @@ namespace Progress_Planner\Tests;
 class Badges_Test extends \WP_UnitTestCase {
 
 	/**
-	 * Test the content badges.
-	 *
-	 * @return void
-	 */
-	public function test_content_badges() {
-
-		$badges = \progress_planner()->get_badges()->get_badges( 'content' );
-
-		$this->assertCount( 3, $badges );
-	}
-
-	/**
 	 * Test the maintenance badges.
 	 *
 	 * @return void
