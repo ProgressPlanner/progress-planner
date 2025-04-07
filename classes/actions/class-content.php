@@ -276,7 +276,7 @@ class Content {
 			}
 		}
 
-		$activity       = \progress_planner()->get_activities__content_helpers()->get_activity_from_post( $post );
+		$activity       = \progress_planner()->get_activities__content()->get_activity_from_post( $post );
 		$activity->type = $type;
 
 		// Update the badges.

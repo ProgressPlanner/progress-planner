@@ -172,7 +172,7 @@ class Content_Scan extends Content {
 		// Loop through the posts and update the stats.
 		foreach ( $posts as $post ) {
 			// Set the activity.
-			$activities[ $post->ID ] = \progress_planner()->get_activities__content_helpers()->get_activity_from_post( $post );
+			$activities[ $post->ID ] = \progress_planner()->get_activities__content()->get_activity_from_post( $post );
 		}
 
 		\progress_planner()->get_activities__query()->insert_activities( $activities );
