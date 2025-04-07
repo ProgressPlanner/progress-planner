@@ -29,10 +29,9 @@ final class Content_Managed extends Widget {
 		if ( null !== $stats ) {
 			return $stats;
 		}
-		$post_types = \progress_planner()->get_activities__content_helpers()->get_post_types_names();
-		$weekly     = [];
-		$all        = [];
-		foreach ( $post_types as $post_type ) {
+		$weekly = [];
+		$all    = [];
+		foreach ( [ 'post', 'page' ] as $post_type ) {
 			// Get the content published this week.
 			$weekly[ $post_type ] = count(
 				\get_posts(
@@ -115,7 +114,7 @@ final class Content_Managed extends Widget {
 			function ( $activity ) {
 				$post = $activity->get_post();
 				return is_object( $post )
-					&& \in_array( $post->post_type, \progress_planner()->get_activities__content_helpers()->get_post_types_names(), true );
+					&& \in_array( $post->post_type, [ 'post', 'page' ], true );
 			}
 		);
 	}

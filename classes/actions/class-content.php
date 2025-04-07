@@ -170,11 +170,7 @@ class Content {
 	 */
 	private function should_skip_saving( $post ) {
 		// Bail if the post is not included in the post-types we're tracking.
-		if ( ! \in_array(
-			$post->post_type,
-			\progress_planner()->get_activities__content_helpers()->get_post_types_names(),
-			true
-		) ) {
+		if ( ! \in_array( $post->post_type, [ 'post', 'page' ], true ) ) {
 			return true;
 		}
 

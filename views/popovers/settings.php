@@ -10,8 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_saved_settings = \progress_planner()->get_activities__content_helpers()->get_post_types_names();
-$prpl_post_types     = \array_filter( \get_post_types( [ 'public' => true ] ), 'is_post_type_viewable' );
+$prpl_post_types = \array_filter( \get_post_types( [ 'public' => true ] ), 'is_post_type_viewable' );
 unset( $prpl_post_types['attachment'] );
 unset( $prpl_post_types['elementor_library'] ); // Elementor templates are not a post type we want to track.
 ?>
@@ -28,7 +27,7 @@ unset( $prpl_post_types['elementor_library'] ); // Elementor templates are not a
 					type="checkbox"
 					name="prpl-settings-post-types-include[]"
 					value="<?php echo \esc_attr( $prpl_post_type ); ?>"
-					<?php checked( \in_array( $prpl_post_type, $prpl_saved_settings, true ) ); ?>
+					<?php checked( \in_array( $prpl_post_type, [ 'post', 'page' ], true ) ); ?>
 				/>
 				<?php echo \esc_html( \get_post_type_object( $prpl_post_type )->labels->name ); // @phpstan-ignore-line property.nonObject ?>
 			</label>
