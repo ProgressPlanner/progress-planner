@@ -34,6 +34,7 @@ class Add_Yoast_Providers {
 				new Archive_Author(),
 				new Archive_Date(),
 				new Archive_Format(),
+				new Crawl_Settings(),
 				new Crawl_Settings_Feed_Global_Comments(),
 				new Crawl_Settings_Feed_Authors(),
 				new Crawl_Settings_Emoji_Scripts(),
