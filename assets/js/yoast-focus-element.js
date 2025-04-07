@@ -60,32 +60,35 @@ function waitForMainAndObserveContent() {
 
 							// Loop through the tasks and add the focus element.
 							for ( const task of progressPlannerYoastFocusElement.tasks ) {
+								// Try to find the toggleButton.
 								const toggleButton = el.querySelector(
-									`button[data-id="${ task.element }"]`
+									task.element
 								);
 								if ( toggleButton ) {
+									// Get option header.
+									const optionHeader = toggleButton.closest(
+										'.yst-toggle-field__header'
+									);
+
 									// Append next to the toggleButton, only if it's not already there.
 									if (
-										! toggleButton
-											.closest(
-												'.yst-toggle-field__header'
-											)
-											.querySelector(
-												'.prpl-form-row__description'
-											)
+										! optionHeader.querySelector(
+											'.prpl-form-row-ravi'
+										)
 									) {
-										toggleButton.closest(
-											'.yst-toggle-field__header'
-										).style.position = 'relative';
-										// Create a new div with the class prpl-form-row__description.
-										const next =
+										optionHeader.style.position =
+											'relative';
+
+										// Create a new span with the class prpl-form-row-ravi.
+										const raviIconWrapper =
 											document.createElement( 'span' );
-										next.classList.add(
+										raviIconWrapper.classList.add(
 											'prpl-form-row-ravi'
 										);
-										next.style.position = 'absolute';
-										next.style.right = '-1.5rem';
-										next.style.top = '0';
+										raviIconWrapper.style.position =
+											'absolute';
+										raviIconWrapper.style.right = '-1.5rem';
+										raviIconWrapper.style.top = '0';
 
 										// Check if the toggleButton is checked or not.
 										const isChecked =
@@ -93,10 +96,11 @@ function waitForMainAndObserveContent() {
 												'aria-checked'
 											);
 
-										next.appendChild(
+										raviIconWrapper.appendChild(
 											document.createElement( 'span' )
 										);
 
+										// Create an icon image.
 										const iconImg =
 											document.createElement( 'img' );
 										iconImg.src =
@@ -112,9 +116,10 @@ function waitForMainAndObserveContent() {
 												? 'grayscale(100%)'
 												: 'none';
 
-										next.querySelector(
-											'span'
-										).appendChild( iconImg );
+										// Append the icon image to the raviIconWrapper.
+										raviIconWrapper
+											.querySelector( 'span' )
+											.appendChild( iconImg );
 
 										// Watch for changes in aria-checked to update the icon dynamically
 										const toggleObserver =
@@ -135,11 +140,10 @@ function waitForMainAndObserveContent() {
 											attributeFilter: [ 'aria-checked' ],
 										} );
 
-										toggleButton
-											.closest(
-												'.yst-toggle-field__header'
-											)
-											.appendChild( next );
+										// Finally add the raviIconWrapper to the DOM.
+										optionHeader.appendChild(
+											raviIconWrapper
+										);
 									}
 								}
 							}

@@ -43,31 +43,31 @@ class Add_Yoast_Providers {
 				'data' => [
 					'tasks'    => [
 						[
-							'element' => 'input-wpseo-remove_feed_global_comments', // Global comment feeds.
+							'element' => 'button[data-id="input-wpseo-remove_feed_global_comments"]', // Global comment feeds.
 							'checked' => 'true',
 						],
 						[
-							'element' => 'input-wpseo-remove_feed_authors', // Post author feeds.
+							'element' => 'button[data-id="input-wpseo-remove_feed_authors"]', // Post author feeds.
 							'checked' => 'true',
 						],
 						[
-							'element' => 'input-wpseo-remove_emoji_scripts', // Emoji scripts.
+							'element' => 'button[data-id="input-wpseo-remove_emoji_scripts"]', // Emoji scripts.
 							'checked' => 'true',
 						],
 						[
-							'element' => 'input-wpseo_titles-disable-author', // Author archive.
+							'element' => 'button[data-id="input-wpseo_titles-disable-author"]', // Author archive.
 							'checked' => 'false',
 						],
 						[
-							'element' => 'input-wpseo_titles-disable-post_format', // Post format archive.
+							'element' => 'button[data-id="input-wpseo_titles-disable-post_format"]', // Post format archive.
 							'checked' => 'false',
 						],
 						[
-							'element' => 'input-wpseo_titles-disable-date', // Date archive.
+							'element' => 'button[data-id="input-wpseo_titles-disable-date"]', // Date archive.
 							'checked' => 'false',
 						],
 						[
-							'element' => 'input-wpseo_titles-disable-attachment', // Media pages.
+							'element' => 'button[data-id="input-wpseo_titles-disable-attachment"]', // Media pages.
 							'checked' => 'false',
 						],
 					],
