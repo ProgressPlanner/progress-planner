@@ -95,6 +95,8 @@ function waitForMainAndObserveContent() {
 								const valueElement = el.querySelector(
 									task.valueElement.elementSelector
 								);
+								let raviIconPositionAbsolute = true;
+
 								if ( valueElement ) {
 									// We usually add icon to the option header.
 									let addIconElement = valueElement.closest(
@@ -109,6 +111,8 @@ function waitForMainAndObserveContent() {
 										addIconElement = valueElement
 											.closest( 'fieldset' )
 											.querySelector( task.iconElement );
+
+										raviIconPositionAbsolute = false;
 									}
 
 									// Upload input field.
@@ -122,25 +126,37 @@ function waitForMainAndObserveContent() {
 											'.prpl-form-row-ravi'
 										)
 									) {
-										addIconElement.style.position =
-											'relative';
-
-										// Create a new span with the class prpl-form-row-ravi.
-										const raviIconWrapper =
-											document.createElement( 'span' );
-										raviIconWrapper.classList.add(
-											'prpl-form-row-ravi'
-										);
-										raviIconWrapper.style.position =
-											'absolute';
-										raviIconWrapper.style.right = '-1.5rem';
-										raviIconWrapper.style.top = '0';
-
 										// Check for value if specified in task.
 										const valueMatches = checkTaskValue(
 											valueElement,
 											task
 										);
+
+										// Create a new span with the class prpl-form-row-ravi.
+										const raviIconWrapper =
+											document.createElement( 'span' );
+										raviIconWrapper.classList.add(
+											'prpl-form-row-ravi',
+											'prpl-element-awards-points-icon-wrapper'
+										);
+
+										if ( valueMatches ) {
+											raviIconWrapper.classList.add(
+												'complete'
+											);
+										}
+
+										// Styling for absolute positioning.
+										if ( raviIconPositionAbsolute ) {
+											addIconElement.style.position =
+												'relative';
+
+											raviIconWrapper.style.position =
+												'absolute';
+											raviIconWrapper.style.right =
+												'3.5rem';
+											raviIconWrapper.style.top = '-7px';
+										}
 
 										raviIconWrapper.appendChild(
 											document.createElement( 'span' )
@@ -156,15 +172,28 @@ function waitForMainAndObserveContent() {
 										iconImg.width = 16;
 										iconImg.height = 16;
 
-										// Apply grayscale if state doesn't match
-										iconImg.style.filter = ! valueMatches
-											? 'grayscale(100%)'
-											: 'none';
-
 										// Append the icon image to the raviIconWrapper.
 										raviIconWrapper
 											.querySelector( 'span' )
 											.appendChild( iconImg );
+
+										// Add the points to the raviIconWrapper.
+										const pointsWrapper =
+											document.createElement( 'span' );
+										pointsWrapper.classList.add(
+											'prpl-form-row-points'
+										);
+										pointsWrapper.textContent = valueMatches
+											? '✓'
+											: '+1';
+										raviIconWrapper.appendChild(
+											pointsWrapper
+										);
+
+										// Finally add the raviIconWrapper to the DOM.
+										addIconElement.appendChild(
+											raviIconWrapper
+										);
 
 										// Watch for changes in aria-checked to update the icon dynamically
 										const valueElementObserver =
@@ -175,10 +204,22 @@ function waitForMainAndObserveContent() {
 														valueElement,
 														task
 													);
-												iconImg.style.filter =
-													! currentValueMatches
-														? 'grayscale(100%)'
-														: 'none';
+
+												if ( currentValueMatches ) {
+													raviIconWrapper.classList.add(
+														'complete'
+													);
+
+													pointsWrapper.textContent =
+														'✓';
+												} else {
+													raviIconWrapper.classList.remove(
+														'complete'
+													);
+
+													pointsWrapper.textContent =
+														'+1';
+												}
 											} );
 
 										valueElementObserver.observe(
@@ -190,11 +231,6 @@ function waitForMainAndObserveContent() {
 														.attributeName,
 												],
 											}
-										);
-
-										// Finally add the raviIconWrapper to the DOM.
-										addIconElement.appendChild(
-											raviIconWrapper
 										);
 									}
 								}
