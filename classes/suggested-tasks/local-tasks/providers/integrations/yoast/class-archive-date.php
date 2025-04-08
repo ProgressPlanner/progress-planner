@@ -78,6 +78,6 @@ class Archive_Date extends Yoast_Provider {
 		}
 
 		// If the date archive is already disabled, we don't need to add the task.
-		return ( YoastSEO()->helpers->options->get( 'disable-date' ) !== true );
+		return YoastSEO()->helpers->options->get( 'disable-date' ) !== true;
 	}
 }
