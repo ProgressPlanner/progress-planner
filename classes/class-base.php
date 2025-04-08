@@ -246,7 +246,7 @@ class Base {
 	 * @return bool
 	 */
 	public function is_privacy_policy_accepted() {
-		return false !== get_option( 'progress_planner_license_key', false );
+		return false !== \get_option( 'progress_planner_license_key', false );
 	}
 
 	/**
