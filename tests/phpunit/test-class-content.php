@@ -46,7 +46,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		$post_id = wp_insert_post( $post_data );
 
 		// Assert that activities were created.
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'content',
 				'type'     => 'publish',
@@ -75,7 +75,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		wp_publish_post( $post_id );
 
 		// Assert that publish activity was created.
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'content',
 				'data_id'  => $post_id,
@@ -104,7 +104,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		wp_trash_post( $post_id );
 
 		// Assert that trash activity was created.
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'content',
 				'type'     => 'trash',
@@ -133,7 +133,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		wp_delete_post( $post_id, true );
 
 		// Assert that delete activity was created.
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'content',
 				'type'     => 'delete',
@@ -161,7 +161,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		);
 
 		// Check if there is any activity for this post (there should be none).
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'content',
 				'data_id'  => $post_id,
@@ -180,7 +180,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		);
 
 		// Check if there is any activity for this post (there should be none).
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'content',
 				'data_id'  => $post_id,
@@ -216,7 +216,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		);
 
 		// Assert activities were created in correct order.
-		$activities = \progress_planner()->get_query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'content',
 				'data_id'  => $post_id,

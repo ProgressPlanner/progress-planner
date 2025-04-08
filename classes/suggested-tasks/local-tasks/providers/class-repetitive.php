@@ -16,22 +16,6 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local;
 abstract class Repetitive extends Local_Tasks {
 
 	/**
-	 * The task points.
-	 *
-	 * @var int
-	 */
-	protected $points = 1;
-
-	/**
-	 * Get the task points.
-	 *
-	 * @return int
-	 */
-	public function get_points() {
-		return $this->points;
-	}
-
-	/**
 	 * Get the task ID.
 	 *
 	 * @param array $data Optional data to include in the task ID.

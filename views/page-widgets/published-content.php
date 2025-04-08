@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_widget     = \progress_planner()->get_widgets__published_content();
+$prpl_widget     = \progress_planner()->get_admin__widgets__published_content();
 $prpl_stats      = $prpl_widget->get_stats();
 $prpl_sum_weekly = array_sum( $prpl_stats['weekly'] );
 ?>
@@ -43,7 +43,7 @@ $prpl_sum_weekly = array_sum( $prpl_stats['weekly'] );
 	</p>
 </div>
 <div class="prpl-graph-wrapper">
-	<?php \progress_planner()->get_chart()->the_chart( $prpl_widget->get_chart_args_content_count() ); ?>
+	<?php \progress_planner()->get_ui__chart()->the_chart( $prpl_widget->get_chart_args_content_count() ); ?>
 </div>
 <table>
 	<thead>
@@ -112,5 +112,5 @@ $prpl_sum_weekly = array_sum( $prpl_stats['weekly'] );
 	?>
 </p>
 <div class="prpl-graph-wrapper">
-	<?php \progress_planner()->get_chart()->the_chart( $prpl_widget->get_chart_args_content_density() ); ?>
+	<?php \progress_planner()->get_ui__chart()->the_chart( $prpl_widget->get_chart_args_content_density() ); ?>
 </div>
