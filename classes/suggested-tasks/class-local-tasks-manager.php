@@ -26,6 +26,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Permalink_St
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Php_Version;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engine_Visibility;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\User as User_Tasks;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Interactive\Email_Sending;
 
@@ -67,7 +68,11 @@ class Local_Tasks_Manager {
 			new Email_Sending(),
 		];
 
+		// Add the plugin integration.
 		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
+
+		// At this point both local and task providers for the plugins we integrate with are instantiated, so initialize them.
+		\add_action( 'plugins_loaded', [ $this, 'init' ], 11 );
 
 		// Add the cleanup action.
 		\add_action( 'admin_init', [ $this, 'cleanup_pending_tasks' ] );
@@ -80,8 +85,19 @@ class Local_Tasks_Manager {
 	 */
 	public function add_plugin_integration() {
 
+		// Yoast SEO integration.
+		new Add_Yoast_Providers();
+	}
+
+	/**
+	 * Initialize the task providers.
+	 *
+	 * @return void
+	 */
+	public function init() {
+
 		/**
-		 * Filter the task providers.
+		 * Filter the task providers, 3rd party providers are added here as well.
 		 *
 		 * @param array $task_providers The task providers.
 		 */
