@@ -29,28 +29,29 @@ test.describe( 'Yoast Focus Element', () => {
 		);
 
 		// Verify the Ravi icon exists within the toggle header
-		const raviIcon = toggleHeader.locator( 'span.prpl-form-row-ravi' );
-		await expect( raviIcon ).toBeVisible();
-
-		// Verify the icon has the correct styling
-		await expect( raviIcon ).toHaveCSS( 'position', 'absolute' );
-		await expect( raviIcon ).toHaveCSS( 'right', '-24px' ); // -1.5rem
-		await expect( raviIcon ).toHaveCSS( 'top', '0px' );
+		const raviIconWrapper = toggleHeader.locator(
+			'[data-prpl-element="ravi-icon"]'
+		);
+		await expect( raviIconWrapper ).toBeVisible();
 
 		// Verify the icon image exists and has correct attributes
-		const iconImg = raviIcon.locator( 'img' );
+		const iconImg = raviIconWrapper.locator( 'img' );
 		await expect( iconImg ).toBeVisible();
 		await expect( iconImg ).toHaveAttribute( 'alt', 'Ravi' );
 		await expect( iconImg ).toHaveAttribute( 'width', '16' );
 		await expect( iconImg ).toHaveAttribute( 'height', '16' );
 
-		// Verify that image has this style
-		await expect( iconImg ).toHaveCSS( 'filter', 'grayscale(1)' );
+		// Verify that the icon is not checked
+		await expect(
+			raviIconWrapper.locator( '.prpl-form-row-points' )
+		).toHaveText( '+1' );
 
 		// Now click the toggle
 		await toggleInput.click();
 
-		// Verify that the image has no filter
-		await expect( iconImg ).toHaveCSS( 'filter', 'none' );
+		// Verify that the icon is now checked
+		await expect(
+			raviIconWrapper.locator( '.prpl-form-row-points' )
+		).toHaveText( '✓' );
 	} );
 } );
