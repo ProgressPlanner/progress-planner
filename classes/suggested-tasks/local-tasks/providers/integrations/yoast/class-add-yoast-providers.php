@@ -48,7 +48,7 @@ class Add_Yoast_Providers {
 			$focus_task = $provider->get_focus_tasks();
 
 			if ( $focus_task ) {
-				$focus_tasks[] = $focus_task;
+				$focus_tasks = array_merge( $focus_tasks, $focus_task );
 			}
 		}
 

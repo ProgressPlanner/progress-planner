@@ -55,12 +55,14 @@ class Archive_Date extends Yoast_Provider {
 	 */
 	public function get_focus_tasks() {
 		return [
-			'iconElement'  => '.yst-toggle-field__header',
-			'valueElement' => [
-				'elementSelector' => 'button[data-id="input-wpseo_titles-disable-date"]',
-				'attributeName'   => 'aria-checked',
-				'attributeValue'  => 'false',
-				'operator'        => '=',
+			[
+				'iconElement'  => '.yst-toggle-field__header',
+				'valueElement' => [
+					'elementSelector' => 'button[data-id="input-wpseo_titles-disable-date"]',
+					'attributeName'   => 'aria-checked',
+					'attributeValue'  => 'false',
+					'operator'        => '=',
+				],
 			],
 		];
 	}
