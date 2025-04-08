@@ -124,33 +124,6 @@
 	<!-- Enforce short arrays: -->
 	<rule ref="Generic.Arrays.DisallowLongArraySyntax"/>
 
-	<!-- Other rules -->
-	<rule ref="Universal.Files.SeparateFunctionsFromOO"/>
-	<rule ref="Universal.FunctionDeclarations.RequireFinalMethodsInTraits"/>
-	<rule ref="Modernize.FunctionCalls.Dirname"/>
-	<rule ref="NormalizedArrays.Arrays.ArrayBraceSpacing"/>
-	<rule ref="NormalizedArrays.Arrays.CommaAfterLast"/>
-	<rule ref="Universal.Arrays.DuplicateArrayKey"/>
-	<rule ref="Universal.Arrays.MixedArrayKeyTypes"/>
-	<rule ref="Universal.Arrays.MixedKeyedUnkeyedArray"/>
-	<rule ref="Universal.CodeAnalysis.ForeachUniqueAssignment" />
-	<rule ref="Universal.CodeAnalysis.NoEchoSprintf" />
-	<rule ref="Universal.CodeAnalysis.StaticInFinalClass" />
-	<rule ref="Universal.Constants.LowercaseClassResolutionKeyword" />
-	<rule ref="Universal.Constants.UppercaseMagicConstants" />
-	<rule ref="Universal.ControlStructures.DisallowLonelyIf" />
-	<rule ref="Universal.Namespaces.DisallowDeclarationWithoutName" />
-	<rule ref="Universal.Namespaces.OneDeclarationPerFile" />
-	<rule ref="Universal.NamingConventions.NoReservedKeywordParameterNames" />
-	<rele ref="Universal.Operators.DisallowLogicalAndOr" />
-	<rule ref="Universal.PHP.LowercasePHPTag" />
-	<rule ref="Universal.PHP.OneStatementInShortEchoTag" />
-	<rule ref="Universal.UseStatements.NoUselessAliases" />
-	<rule ref="Universal.WhiteSpace.DisallowInlineTabs">
-		<arg name="tab-width" value="4"/>
-	</rule>
-	<rule ref="Native.FunctionInvocation.NativeFunctionInvocation" />
-
 	<!--
 	#############################################################################
 	SELECTIVE EXCLUSIONS

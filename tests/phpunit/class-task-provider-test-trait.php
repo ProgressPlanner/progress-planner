@@ -34,7 +34,7 @@ trait Task_Provider_Test_Trait {
 	 *
 	 * @return void
 	 */
-	final public static function setUpBeforeClass(): void { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
+	public static function setUpBeforeClass(): void { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
 		// Set the current user to the admin user.
 		wp_set_current_user( 1 );
 	}
@@ -44,7 +44,7 @@ trait Task_Provider_Test_Trait {
 	 *
 	 * @return void
 	 */
-	final public static function tearDownAfterClass(): void { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
+	public static function tearDownAfterClass(): void { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
 		// Reset the current user.
 		wp_set_current_user( 0 );
 	}
@@ -54,7 +54,7 @@ trait Task_Provider_Test_Trait {
 	 *
 	 * @return void
 	 */
-	final public function set_up() {
+	public function set_up() {
 		parent::set_up();
 
 		// Get the task provider.
@@ -69,7 +69,7 @@ trait Task_Provider_Test_Trait {
 	 *
 	 * @return void
 	 */
-	final public function tear_down() {
+	public function tear_down() {
 		parent::tear_down();
 
 		// Delete local tasks.
@@ -91,7 +91,7 @@ trait Task_Provider_Test_Trait {
 	 *
 	 * @return void
 	 */
-	final public function test_task_provider() {
+	public function test_task_provider() {
 
 		// Test that the blog description is empty.
 		$this->assertTrue( $this->task_provider->should_add_task() );
