@@ -45,14 +45,12 @@ class Add_Yoast_Providers {
 		$focus_tasks = [];
 
 		foreach ( $this->providers as $provider ) {
+			$focus_task = $provider->get_focus_tasks();
 
-			// Add Ravi icon if the task is pending or completed.
-			if ( $provider->should_add_task() ) {
-				$focus_task = $provider->get_focus_tasks();
+			if ( $focus_task ) {
+				$focus_tasks = array_merge( $focus_tasks, $focus_task );
+				// $focus_tasks[] = $focus_task;
 
-				if ( $focus_task ) {
-					$focus_tasks[] = $focus_task;
-				}
 			}
 		}
 

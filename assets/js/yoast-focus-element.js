@@ -7,7 +7,7 @@
 /**
  * Yoast Focus Element class.
  */
-class YoastFocusElement {
+class ProgressPlannerYoastFocus {
 	/**
 	 * Constructor.
 	 */
@@ -260,4 +260,4 @@ class YoastFocusElement {
 }
 
 // Initialize the Yoast Focus Element.
-new YoastFocusElement();
+new ProgressPlannerYoastFocus();
