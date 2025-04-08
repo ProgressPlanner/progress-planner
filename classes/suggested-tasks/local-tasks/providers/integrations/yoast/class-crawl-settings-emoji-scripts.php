@@ -72,9 +72,7 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		$yoast_options = \WPSEO_Options::get_instance()->get_all();
-		foreach ( [
-			'remove_emoji_scripts',
-		] as $option ) {
+		foreach ( [ 'remove_emoji_scripts' ] as $option ) {
 			// If the crawl settings are already optimized, we don't need to add the task.
 			if ( $yoast_options[ $option ] ) {
 				return false;
