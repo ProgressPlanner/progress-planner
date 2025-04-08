@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Tests;
 
-use Progress_Planner\Activity;
+use Progress_Planner\Activities\Activity;
 
 /**
  * Date test case.
@@ -45,7 +45,7 @@ class Activity_Test extends \WP_UnitTestCase {
 	public function test_save() {
 		$this->activity->save();
 
-		$activity = \progress_planner()->get_query()->query_activities(
+		$activity = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => $this->activity->category,
 				'type'     => $this->activity->type,

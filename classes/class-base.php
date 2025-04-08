@@ -12,13 +12,30 @@ namespace Progress_Planner;
  *
  * @method \Progress_Planner\Suggested_Tasks get_suggested_tasks()
  * @method \Progress_Planner\Settings get_settings()
- * @method \Progress_Planner\Query get_query()
- * @method \Progress_Planner\Cache get_cache()
+ * @method \Progress_Planner\Activities\Query get_activities__query()
+ * @method \Progress_Planner\Utils\Cache get_utils__cache()
  * @method \Progress_Planner\Page_Types get_page_types()
- * @method \Progress_Planner\Rest_API_Stats get_rest_api_stats()
- * @method \Progress_Planner\Rest_API_Tasks get_rest_api_tasks()
+ * @method \Progress_Planner\Rest\Stats get_rest__stats()
+ * @method \Progress_Planner\Rest\Tasks get_rest__tasks()
  * @method \Progress_Planner\Todo get_todo()
- * @method \Progress_Planner\Onboard get_onboard()
+ * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
+ * @method \Progress_Planner\Utils\Playground get_utils__playground()
+ * @method \Progress_Planner\Admin\Page get_admin__page()
+ * @method \Progress_Planner\Admin\Tour get_admin__tour()
+ * @method \Progress_Planner\Admin\Dashboard_Widget_Score get_admin__dashboard_widget_score()
+ * @method \Progress_Planner\Admin\Dashboard_Widget_Todo get_admin__dashboard_widget_todo()
+ * @method \Progress_Planner\Admin\Editor get_admin__editor()
+ * @method \Progress_Planner\Actions\Content get_actions__content()
+ * @method \Progress_Planner\Actions\Content_Scan get_actions__content_scan()
+ * @method \Progress_Planner\Actions\Maintenance get_actions__maintenance()
+ * @method \Progress_Planner\Admin\Page_Settings get_admin__page_settings()
+ * @method \Progress_Planner\Plugin_Deactivation get_plugin_deactivation()
+ * @method \Progress_Planner\Plugin_Upgrade_Tasks get_plugin_upgrade_tasks()
+ * @method \Progress_Planner\Page_Todos get_page_todos()
+ * @method \Progress_Planner\Suggested_Tasks\Data_Collector\Data_Collector_Manager get_suggested_tasks__data_collector__data_collector_manager()
+ * @method \Progress_Planner\Utils\Debug_Tools get_utils__debug_tools()
+ * @method \Progress_Planner\Badges get_badges()
+ * @method \Progress_Planner\Plugin_Migrations get_plugin_migrations()
  */
 class Base {
 
@@ -57,7 +74,7 @@ class Base {
 		}
 
 		if ( defined( '\IS_PLAYGROUND_PREVIEW' ) && constant( '\IS_PLAYGROUND_PREVIEW' ) === true ) {
-			new Playground();
+			$this->get_utils__playground();
 		}
 
 		// Basic classes.
@@ -104,11 +121,11 @@ class Base {
 		$this->get_page_types();
 
 		// REST API.
-		$this->get_rest_api_stats();
-		$this->get_rest_api_tasks();
+		$this->get_rest__stats();
+		$this->get_rest__tasks();
 
 		// Onboarding.
-		$this->get_onboard();
+		$this->get_utils__onboard();
 
 		// To-do.
 		$this->get_todo();
@@ -135,11 +152,11 @@ class Base {
 		$this->get_plugin_upgrade_tasks();
 
 		// Add hooks for data collectors.
-		$this->get_data_collector__data_collector_manager();
+		$this->get_suggested_tasks__data_collector__data_collector_manager();
 
 		// Debug tools.
 		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {
-			new Debug_Tools();
+			$this->get_utils__debug_tools();
 		}
 
 		// Plugin upgrade.
@@ -180,6 +197,35 @@ class Base {
 			$this->cached[ $cache_name ] = new $class_name( $arguments );
 			return $this->cached[ $cache_name ];
 		}
+
+		// Backwards-compatibility.
+		$deprecated = [
+			'get_query'                                  => [ 'get_activities__query', '1.1.1' ],
+			'get_date'                                   => [ 'get_utils__date', '1.1.1' ],
+			'get_widgets__suggested_tasks'               => [ 'get_admin__widgets__suggested_tasks', '1.1.1' ],
+			'get_widgets__activity_scores'               => [ 'get_admin__widgets__activity_scores', '1.1.1' ],
+			'get_widgets__todo'                          => [ 'get_admin__widgets__todo', '1.1.1' ],
+			'get_widgets__challenge'                     => [ 'get_admin__widgets__challenge', '1.1.1' ],
+			'get_widgets__latest_badge'                  => [ 'get_admin__widgets__latest_badge', '1.1.1' ],
+			'get_widgets__badge_streak'                  => [ 'get_admin__widgets__badge_streak', '1.1.1' ],
+			'get_widgets__published_content'             => [ 'get_admin__widgets__published_content', '1.1.1' ],
+			'get_widgets__whats_new'                     => [ 'get_admin__widgets__whats_new', '1.1.1' ],
+			'get_onboard'                                => [ 'get_utils__onboard', '1.1.1' ],
+			'get_cache'                                  => [ 'get_utils__cache', '1.1.1' ],
+			'get_rest_api_stats'                         => [ 'get_rest__stats', '1.1.1' ],
+			'get_rest_api_tasks'                         => [ 'get_rest__tasks', '1.1.1' ],
+			'get_data_collector__data_collector_manager' => [ 'get_suggested_tasks__data_collector__data_collector_manager', '1.1.1' ],
+			'get_debug_tools'                            => [ 'get_utils__debug_tools', '1.1.1' ],
+			'get_playground'                             => [ 'get_utils__playground', '1.1.1' ],
+			'get_chart'                                  => [ 'get_ui__chart', '1.1.1' ],
+			'get_popover'                                => [ 'get_ui__popover', '1.1.1' ],
+		];
+
+		if ( isset( $deprecated[ $name ] ) ) {
+			// Deprecated method.
+			\_deprecated_function( \esc_html( $name ), \esc_html( $deprecated[ $name ][1] ), \esc_html( $deprecated[ $name ][0] ) );
+			return $this->{$deprecated[ $name ][0]}();
+		}
 	}
 
 	/**
@@ -189,7 +235,7 @@ class Base {
 	 */
 	public function get_remote_server_root_url() {
 		return defined( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
-			? \PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL
+			? \constant( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
 			: 'https://progressplanner.com';
 	}
 
@@ -226,7 +272,7 @@ class Base {
 	 * @return bool
 	 */
 	public function is_privacy_policy_accepted() {
-		return false !== get_option( 'progress_planner_license_key', false );
+		return false !== \get_option( 'progress_planner_license_key', false );
 	}
 
 	/**
@@ -241,7 +287,7 @@ class Base {
 			[
 				sprintf(
 					'<a href="%1$s">%2$s</a>',
-					admin_url( 'admin.php?page=progress-planner' ),
+					\admin_url( 'admin.php?page=progress-planner' ),
 					__( 'Dashboard', 'progress-planner' )
 				),
 			],
@@ -334,7 +380,7 @@ class Base {
 	 */
 	public function get_file_version( $file ) {
 		// If we're in debug mode, use filemtime.
-		if ( defined( 'WP_SCRIPT_DEBUG' ) && \WP_SCRIPT_DEBUG ) {
+		if ( defined( 'WP_SCRIPT_DEBUG' ) && constant( 'WP_SCRIPT_DEBUG' ) ) {
 			return (string) filemtime( $file );
 		}
 

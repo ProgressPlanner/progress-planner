@@ -13,6 +13,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $prpl_task_providers = \progress_planner()->get_plugin_upgrade_tasks()->get_newly_added_task_providers();
 
+// We have the task providers, clean them up since we don't need them anymore before the early return.
+\progress_planner()->get_plugin_upgrade_tasks()->delete_upgrade_popover_task_providers();
+
 // If there are no task providers, don't show anything.
 if ( empty( $prpl_task_providers ) ) {
 	return;
@@ -82,25 +85,24 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 	</ul>
 
 	<?php // Display badge and the points. ?>
-	<div class="prpl-onboarding-tasks-footer">
-		<span class="prpl-onboarding-tasks-montly-badge">
-			<span class="prpl-onboarding-tasks-montly-badge-image">
-				<img
-					src="<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . \esc_attr( $prpl_badge->get_id() ) ); ?>"
-					alt="<?php \esc_attr_e( 'Badge', 'progress-planner' ); ?>"
-					onerror="this.onerror=null;this.src='<?php echo esc_url( \progress_planner()->get_placeholder_svg() ); ?>';"
-				/>
+	<?php if ( $prpl_badge ) : ?>
+		<div class="prpl-onboarding-tasks-footer">
+			<span class="prpl-onboarding-tasks-montly-badge">
+				<span class="prpl-onboarding-tasks-montly-badge-image">
+					<img
+						src="<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . \esc_attr( $prpl_badge->get_id() ) ); ?>"
+						alt="<?php \esc_attr_e( 'Badge', 'progress-planner' ); ?>"
+						onerror="this.onerror=null;this.src='<?php echo esc_url( \progress_planner()->get_placeholder_svg() ); ?>';"
+					/>
+				</span>
+				<?php \esc_html_e( 'These tasks contribute to your monthly badge—every check completed brings you closer!', 'progress-planner' ); ?>
 			</span>
-			<?php \esc_html_e( 'These tasks contribute to your monthly badge—every check completed brings you closer!', 'progress-planner' ); ?>
-		</span>
-		<span class="prpl-onboarding-tasks-total-points">0pt</span>
-	</div>
+			<span class="prpl-onboarding-tasks-total-points">0pt</span>
+		</div>
+	<?php endif; ?>
 
 	<button id="prpl-onboarding-continue-button" class="prpl-button-primary prpl-disabled" onclick="prplOnboardRedirect()">
 		<?php \esc_html_e( 'Continue', 'progress-planner' ); ?>
 	</button>
 </div>
 
-<?php
-// We have displayed the upgrade popover tasks, so delete them.
-\progress_planner()->get_plugin_upgrade_tasks()->delete_upgrade_popover_task_providers();
