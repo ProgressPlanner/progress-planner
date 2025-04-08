@@ -52,10 +52,15 @@ class Organization_Logo extends Yoast_Provider {
 	 */
 	public function get_description() {
 		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
-			? \esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your organization logo in the Yoast SEO settings.', 'progress-planner' ) .
-			' <a href="https://prpl.fyi/yoast-person-logo" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.'
-			: \esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your person logo in the Yoast SEO settings.', 'progress-planner' ) .
-			' <a href="https://prpl.fyi/yoast-organization-logo" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
+			? sprintf(
+				/* translators: %s: "Read more" link. */
+				\esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your organization logo in the Yoast SEO settings. %s.', 'progress-planner' ),
+				'<a href="https://prpl.fyi/yoast-person-logo" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			) : sprintf(
+				/* translators: %s: "Read more" link. */
+				\esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your person logo in the Yoast SEO settings. %s.', 'progress-planner' ),
+				'<a href="https://prpl.fyi/yoast-organization-logo" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			);
 	}
 
 	/**
@@ -67,7 +72,9 @@ class Organization_Logo extends Yoast_Provider {
 		return [
 			'iconElement'  => 'legend.yst-label',
 			'valueElement' => [
-				'elementSelector' => $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person' ? 'input[name="wpseo_titles.company_logo_id"]' : 'input[name="wpseo_titles.person_logo_id"]',
+				'elementSelector' => $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
+					? 'input[name="wpseo_titles.company_logo_id"]'
+					: 'input[name="wpseo_titles.person_logo_id"]',
 				'attributeName'   => 'value',
 				'attributeValue'  => '0',
 				'operator'        => '!=',

@@ -41,8 +41,11 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 * @return string
 	 */
 	public function get_description() {
-		return \esc_html__( 'Remove URLs which provide an overview of recent comments on your site.', 'progress-planner' ) .
-		' <a href="https://prpl.fyi/yoast-crawl-optimization-feed-global-comments`" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
+		return sprintf(
+			/* translators: %s: "Read more" link. */
+			\esc_html__( 'Remove URLs which provide an overview of recent comments on your site. %s.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/yoast-crawl-optimization-feed-global-comments" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+		);
 	}
 
 	/**

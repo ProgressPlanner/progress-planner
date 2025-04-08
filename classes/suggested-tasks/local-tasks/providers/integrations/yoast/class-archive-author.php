@@ -58,8 +58,11 @@ class Archive_Author extends Yoast_Provider {
 	 * @return string
 	 */
 	public function get_description() {
-		return \esc_html__( 'Yoast SEO can disable the author archive when you have only one author, as it is the same as the homepage.', 'progress-planner' ) .
-		' <a href="https://prpl.fyi/yoast-author-archive" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
+		return sprintf(
+			/* translators: %s: "Read more" link. */
+			\esc_html__( 'Yoast SEO can disable the author archive when you have only one author, as it is the same as the homepage. %s.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/yoast-author-archive" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+		);
 	}
 
 	/**

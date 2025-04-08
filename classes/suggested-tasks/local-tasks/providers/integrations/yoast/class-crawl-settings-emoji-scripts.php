@@ -41,8 +41,11 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	 * @return string
 	 */
 	public function get_description() {
-		return \esc_html__( 'Remove JavaScript used for converting emoji characters in older browsers.', 'progress-planner' ) .
-		' <a href="https://prpl.fyi/yoast-crawl-optimization-emoji-scripts" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>.';
+		return sprintf(
+			/* translators: %s: "Read more" link. */
+			\esc_html__( 'Remove JavaScript used for converting emoji characters in older browsers. %s.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/yoast-crawl-optimization-emoji-scripts" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+		);
 	}
 
 	/**
