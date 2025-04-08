@@ -82,9 +82,9 @@ final class ToDo extends Widget {
 		// Register styles for the web-component.
 		\wp_register_style(
 			'progress-planner-web-components-prpl-suggested-task',
-			PROGRESS_PLANNER_URL . '/assets/css/web-components/prpl-suggested-task.css',
+			constant( 'PROGRESS_PLANNER_URL' ) . '/assets/css/web-components/prpl-suggested-task.css',
 			[],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/web-components/prpl-suggested-task.css' )
+			\progress_planner()->get_file_version( constant( 'PROGRESS_PLANNER_DIR' ) . '/assets/css/web-components/prpl-suggested-task.css' )
 		);
 
 		return [
