@@ -72,12 +72,14 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	 */
 	public function get_focus_tasks() {
 		return [
-			'iconElement'  => '.yst-toggle-field__header',
-			'valueElement' => [
-				'elementSelector' => 'button[data-id="input-wpseo-remove_feed_authors"]',
-				'attributeName'   => 'aria-checked',
-				'attributeValue'  => 'true',
-				'operator'        => '=',
+			[
+				'iconElement'  => '.yst-toggle-field__header',
+				'valueElement' => [
+					'elementSelector' => 'button[data-id="input-wpseo-remove_feed_authors"]',
+					'attributeName'   => 'aria-checked',
+					'attributeValue'  => 'true',
+					'operator'        => '=',
+				],
 			],
 		];
 	}
