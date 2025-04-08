@@ -1,6 +1,6 @@
 = 1.2.0 =
 
-In this release we've added integration with the **Yoast SEO** plugin, so you’ll now see personalized suggestions based on your current SEO configuration.
+In this release we've [added an integration with the **Yoast SEO** plugin](https://prpl.fyi/v12), so you’ll now see personalized suggestions based on your current SEO configuration.
 
 Added these recommendations from Ravi:
 
