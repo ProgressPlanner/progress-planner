@@ -23,7 +23,7 @@ class Archive_Date extends Yoast_Provider {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->url = admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' );
+		$this->url = \admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' );
 	}
 
 	/**

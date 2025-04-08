@@ -40,7 +40,7 @@ class Archive_Format extends Yoast_Provider {
 	 */
 	public function __construct() {
 		$this->data_collector = new Archive_Format_Data_Collector();
-		$this->url            = admin_url( 'admin.php?page=wpseo_page_settings#/format-archives' );
+		$this->url            = \admin_url( 'admin.php?page=wpseo_page_settings#/format-archives' );
 	}
 
 	/**

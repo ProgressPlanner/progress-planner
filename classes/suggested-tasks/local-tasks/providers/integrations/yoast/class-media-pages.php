@@ -23,7 +23,7 @@ class Media_Pages extends Yoast_Provider {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->url = admin_url( 'admin.php?page=wpseo_page_settings#/media-pages' );
+		$this->url = \admin_url( 'admin.php?page=wpseo_page_settings#/media-pages' );
 	}
 
 	/**

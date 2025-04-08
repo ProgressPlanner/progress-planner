@@ -40,7 +40,7 @@ class Archive_Author extends Yoast_Provider {
 	 */
 	public function __construct() {
 		$this->data_collector = new Post_Author();
-		$this->url            = admin_url( 'admin.php?page=wpseo_page_settings#/author-archives' );
+		$this->url            = \admin_url( 'admin.php?page=wpseo_page_settings#/author-archives' );
 	}
 
 	/**

@@ -261,7 +261,7 @@ class Base {
 			[
 				sprintf(
 					'<a href="%1$s">%2$s</a>',
-					admin_url( 'admin.php?page=progress-planner' ),
+					\admin_url( 'admin.php?page=progress-planner' ),
 					__( 'Dashboard', 'progress-planner' )
 				),
 			],

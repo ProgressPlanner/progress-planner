@@ -23,7 +23,7 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->url = admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_emoji_scripts' );
+		$this->url = \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_emoji_scripts' );
 	}
 
 	/**
