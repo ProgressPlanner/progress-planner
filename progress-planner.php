@@ -9,7 +9,7 @@
  * Description:       A plugin to help you fight procrastination and get things done.
  * Requires at least: 6.3
  * Requires PHP:      7.4
- * Version:           1.1.1
+ * Version:           1.2.0
  * Author:            Team Emilia Projects
  * Author URI:        https://prpl.fyi/about
  * License:           GPL-3.0+
@@ -78,7 +78,7 @@ spl_autoload_register(
 				),
 				E_USER_DEPRECATED
 			);
-			$class_name = $deprecated[ $class_name ][0];
+			class_alias( $deprecated[ $class_name ][0], $class_name );
 		}
 
 		$class_name = \str_replace( $prefix, '', $class_name );
@@ -111,4 +111,5 @@ function progress_planner() {
 	}
 	return $progress_planner;
 }
-\progress_planner();
+
+progress_planner();
