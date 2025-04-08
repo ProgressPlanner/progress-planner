@@ -246,7 +246,7 @@ class Base {
 	 * @return bool
 	 */
 	public function is_privacy_policy_accepted() {
-		return false !== get_option( 'progress_planner_license_key', false );
+		return false !== \get_option( 'progress_planner_license_key', false );
 	}
 
 	/**
@@ -261,7 +261,7 @@ class Base {
 			[
 				sprintf(
 					'<a href="%1$s">%2$s</a>',
-					admin_url( 'admin.php?page=progress-planner' ),
+					\admin_url( 'admin.php?page=progress-planner' ),
 					__( 'Dashboard', 'progress-planner' )
 				),
 			],
