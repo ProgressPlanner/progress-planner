@@ -63,6 +63,9 @@ class Add_Yoast_Providers {
 				],
 			]
 		);
+
+		// Enqueue the style.
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/focus-element' );
 	}
 	/**
 	 * Add the providers.
