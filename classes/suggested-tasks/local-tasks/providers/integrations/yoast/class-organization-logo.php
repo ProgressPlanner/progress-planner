@@ -73,10 +73,10 @@ class Organization_Logo extends Yoast_Provider {
 			'iconElement'  => 'legend.yst-label',
 			'valueElement' => [
 				'elementSelector' => $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
-					? 'input[name="wpseo_titles.company_logo_id"]'
-					: 'input[name="wpseo_titles.person_logo_id"]',
+					? 'input[name="wpseo_titles.company_logo"]'
+					: 'input[name="wpseo_titles.person_logo"]',
 				'attributeName'   => 'value',
-				'attributeValue'  => '0',
+				'attributeValue'  => '',
 				'operator'        => '!=',
 			],
 		];
