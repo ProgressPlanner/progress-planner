@@ -72,9 +72,7 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		$yoast_options = \WPSEO_Options::get_instance()->get_all();
-		foreach ( [
-			'remove_feed_global_comments',
-		] as $option ) {
+		foreach ( [ 'remove_feed_global_comments' ] as $option ) {
 			// If the crawl settings are already optimized, we don't need to add the task.
 			if ( $yoast_options[ $option ] ) {
 				return false;
