@@ -54,4 +54,33 @@ test.describe( 'Yoast Focus Element', () => {
 			raviIconWrapper.locator( '.prpl-form-row-points' )
 		).toHaveText( '✓' );
 	} );
+
+	test( 'should add Ravi icon to the company logo upload field', async ( {
+		page,
+	} ) => {
+		await page.goto(
+			'/wp-admin/admin.php?page=wpseo_page_settings#/site-representation'
+		);
+
+		// Wait for the company logo label to be visible
+		await page.waitForSelector(
+			'#wpseo_titles-company_logo label.yst-label'
+		);
+
+		// Find the label element
+		const logoLabel = page.locator(
+			'#wpseo_titles-company_logo label.yst-label'
+		);
+
+		// Verify the Ravi icon exists within the label
+		const raviIcon = logoLabel.locator( '[data-prpl-element="ravi-icon"]' );
+		await expect( raviIcon ).toBeVisible();
+
+		// Verify the icon image exists and has correct attributes
+		const iconImg = raviIcon.locator( 'img' );
+		await expect( iconImg ).toBeVisible();
+		await expect( iconImg ).toHaveAttribute( 'alt', 'Ravi' );
+		await expect( iconImg ).toHaveAttribute( 'width', '16' );
+		await expect( iconImg ).toHaveAttribute( 'height', '16' );
+	} );
 } );
