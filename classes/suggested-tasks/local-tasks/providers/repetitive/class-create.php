@@ -48,6 +48,25 @@ class Create extends Repetitive {
 	 */
 	public function __construct() {
 		$this->data_collector = new Last_Published_Post_Data_Collector();
+		$this->url            = \admin_url( 'post-new.php?post_type=post' );
+	}
+
+	/**
+	 * Get the task title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return esc_html__( 'Create a post', 'progress-planner' );
+	}
+
+	/**
+	 * Get the task description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return esc_html__( 'Create a new, relevant post. If you write an in-depth post you may earn an extra point.', 'progress-planner' );
 	}
 
 	/**
@@ -106,13 +125,14 @@ class Create extends Repetitive {
 		$task_details = [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
-			'title'       => esc_html__( 'Create a post', 'progress-planner' ),
-			'parent'      => 0,
-			'priority'    => 'medium',
+			'title'       => $this->get_title(),
+			'parent'      => $this->get_parent(),
+			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
 			'points'      => $this->get_points(), // We use $this->get_points() here on purpose, get_points_for_task() calcs the points for the last published post.
-			'url'         => \esc_url( \admin_url( 'post-new.php?post_type=post' ) ),
-			'description' => esc_html__( 'Create a new, relevant post. If you write an in-depth post you may earn an extra point.', 'progress-planner' ),
+			'dismissable' => $this->is_dismissable(),
+			'url'         => $this->get_url(),
+			'description' => $this->get_description(),
 		];
 
 		return $task_details;
