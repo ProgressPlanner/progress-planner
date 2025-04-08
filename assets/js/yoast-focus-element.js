@@ -21,13 +21,9 @@ function checkTaskValue( element, task ) {
 	const operator = task.valueElement.operator || '=';
 	const currentValue = element.getAttribute( attributeName ) || '';
 
-	switch ( operator ) {
-		case '!=':
-			return currentValue !== attributeValue;
-		case '=':
-		default:
-			return currentValue === attributeValue;
-	}
+	return '!=' === operator
+		? currentValue !== attributeValue
+		: currentValue === attributeValue;
 }
 
 /**
@@ -36,7 +32,9 @@ function checkTaskValue( element, task ) {
 function observeYoastSidebarClicks() {
 	const container = document.querySelector( '#yoast-seo-settings' );
 
-	if ( ! container ) return;
+	if ( ! container ) {
+		return;
+	}
 
 	const waitForNav = new MutationObserver( ( mutationsList, observer ) => {
 		const nav = container.querySelector(
@@ -67,7 +65,9 @@ function observeYoastSidebarClicks() {
  */
 function waitForMainAndObserveContent() {
 	const container = document.querySelector( '#yoast-seo-settings' );
-	if ( ! container ) return;
+	if ( ! container ) {
+		return;
+	}
 
 	const waitForMain = new MutationObserver( ( mutationsList, observer ) => {
 		const main = container.querySelector( 'main.yst-paper' );
