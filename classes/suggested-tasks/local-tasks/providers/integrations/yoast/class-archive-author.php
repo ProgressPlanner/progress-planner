@@ -90,11 +90,27 @@ class Archive_Author extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
+
+		if ( ! $this->is_task_relevant() ) {
+			return false;
+		}
+
 		// If the author archive is already disabled, we don't need to add the task.
 		if ( YoastSEO()->helpers->options->get( 'disable-author' ) === true ) {
 			return false;
 		}
 
+		return true;
+	}
+
+	/**
+	 * Check if the task is still relevant.
+	 * For example, we have a task to disable author archives if there is only one author.
+	 * If in the meantime more authors are added, the task is no longer relevant and the task should be removed.
+	 *
+	 * @return bool
+	 */
+	public function is_task_relevant() {
 		// If there is more than one author, we don't need to add the task.
 		if ( $this->data_collector->collect() > self::MINIMUM_AUTHOR_WITH_POSTS ) {
 			return false;
