@@ -4,15 +4,13 @@
 import { test, expect } from '@playwright/test';
 
 test.describe( 'Yoast Focus Element', () => {
-	test.beforeEach( async ( { page } ) => {
-		await page.goto(
-			'/wp-admin/admin.php?page=wpseo_page_settings#/crawl-optimization'
-		);
-	} );
-
 	test( 'should add Ravi icon to the feed comments toggle', async ( {
 		page,
 	} ) => {
+		await page.goto(
+			'/wp-admin/admin.php?page=wpseo_page_settings#/crawl-optimization'
+		);
+
 		// Wait for the page to load and the toggle to be visible
 		await page.waitForSelector(
 			'button[data-id="input-wpseo-remove_feed_global_comments"]'
@@ -64,12 +62,12 @@ test.describe( 'Yoast Focus Element', () => {
 
 		// Wait for the company logo label to be visible
 		await page.waitForSelector(
-			'#wpseo_titles-company_logo label.yst-label'
+			'#wpseo_titles-company_logo legend.yst-label'
 		);
 
 		// Find the label element
 		const logoLabel = page.locator(
-			'#wpseo_titles-company_logo label.yst-label'
+			'#wpseo_titles-company_logo legend.yst-label'
 		);
 
 		// Verify the Ravi icon exists within the label
