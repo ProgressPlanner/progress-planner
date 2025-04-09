@@ -3,10 +3,8 @@ const { defineConfig, devices } = require( '@playwright/test' );
 module.exports = defineConfig( {
 	testDir: './tests/e2e',
 	timeout: 30000,
-	fullyParallel: false,
 	forbidOnly: !! process.env.CI,
 	retries: process.env.CI ? 2 : 0,
-	workers: 1,
 	reporter: 'html',
 	globalSetup: require.resolve( './tests/e2e/auth.setup.js' ),
 	use: {
@@ -19,14 +17,20 @@ module.exports = defineConfig( {
 		{
 			name: 'sequential',
 			use: { ...devices[ 'Desktop Chrome' ] },
-			testMatch: 'task-tagline.spec.js',
+			testMatch: 'sequential.spec.js',
+			fullyParallel: false,
+			workers: 1,
 		},
 		{
 			name: 'parallel',
 			use: { ...devices[ 'Desktop Chrome' ] },
-			testIgnore: 'task-tagline.spec.js',
+			testIgnore: [
+				'onboarding.spec.js',
+				'task-tagline.spec.js',
+				'sequential.spec.js',
+			],
 			fullyParallel: true,
-			workers: process.env.CI ? 1 : undefined,
+			workers: 4,
 		},
 	],
 } );
