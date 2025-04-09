@@ -74,4 +74,34 @@ class Recommendations {
 			register_taxonomy( $taxonomy, 'prpl_recommendations', [ 'label' => $label ] );
 		}
 	}
+
+	/**
+	 * Get all recommendations.
+	 *
+	 * @return array
+	 */
+	public function get_all() {
+		return get_posts(
+			[
+				'post_type'   => 'prpl_recommendations',
+				'numberposts' => -1,
+				'post_status' => 'any',
+			]
+		);
+	}
+
+	/**
+	 * Get pending recommendations.
+	 *
+	 * @return array
+	 */
+	public function get_pending() {
+		return get_posts(
+			[
+				'post_type'   => 'prpl_recommendations',
+				'numberposts' => -1,
+				'post_status' => 'publish',
+			]
+		);
+	}
 }

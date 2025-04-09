@@ -48,6 +48,10 @@ class Update_130 {
 	 * @return void
 	 */
 	private function migrate_task( $task ) {
+		foreach ( \get_posts( [ 'post_type' => 'prpl_recommendations', 'post_status' => 'any' ] ) as $post ) {
+			\wp_delete_post( $post->ID );
+		}
+
 		// Get the task details.
 		$task_details = Local_Task_Factory::create_task_from( 'id', $task['task_id'] )->get_task_details();
 
@@ -97,10 +101,11 @@ class Update_130 {
 		);
 
 		// Add terms if they don't exist.
-		foreach ( [ 'category', 'provider' ] as $tax ) {
-			$term = \get_term_by( 'name', $task_details[ $tax ], "prpl_recommendations_$tax" );
+		foreach ( [ 'category', 'provider_id' ] as $context ) {
+			$taxonomy_name = str_replace( '_id', '', $context );
+			$term          = \get_term_by( 'name', $task_details[ $context ], "prpl_recommendations_$taxonomy_name" );
 			if ( ! $term ) {
-				\wp_insert_term( $task_details[ $tax ], "prpl_recommendations_$tax" );
+				\wp_insert_term( $task_details[ $context ], "prpl_recommendations_$taxonomy_name" );
 			}
 		}
 
@@ -110,8 +115,30 @@ class Update_130 {
 		// Set the task provider.
 		\wp_set_post_terms( $post_id, $task_details['provider_id'], 'prpl_recommendations_provider' );
 
+		// Set the task parent.
+		if ( ! empty( $task_details['parent'] ) ) {
+			$parent = \get_post( $task_details['parent'] );
+			if ( $parent ) {
+				\wp_update_post( [ 'ID' => $post_id, 'post_parent' => $parent->ID ] );
+			}
+		}
+
 		// Set other meta.
+		$default_keys = [
+			'task_id',
+			'title',
+			'description',
+			'status',
+			'category',
+			'provider_id',
+			'parent',
+		];
 		foreach ( $task_details as $key => $value ) {
+			if ( in_array( $key, $default_keys, true ) ) {
+				continue;
+			}
+
+			error_log( 'Setting meta: ' . $key . ' - ' . \json_encode( $value ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			\update_post_meta( $post_id, "prpl_$key", $value );
 		}
 	}
