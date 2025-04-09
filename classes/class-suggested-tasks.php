@@ -182,7 +182,30 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_tasks() {
-		return \get_posts( [ 'post_type' => 'prpl_suggested_task' ] );
+		$tasks = [];
+		/**
+		 * Filter the suggested tasks.
+		 *
+		 * @param array $tasks The suggested tasks.
+		 * @return array
+		 */
+		$tasks    = \apply_filters( 'progress_planner_suggested_tasks_items', $tasks );
+		$db_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		foreach ( $tasks as $key => $task ) {
+			if ( isset( $task['status'] ) && ! empty( $task['status'] ) ) {
+				continue;
+			}
+
+			foreach ( $db_tasks as $db_task_key => $db_task ) {
+				if ( $db_task['task_id'] === $task['task_id'] ) {
+					$tasks[ $key ]['status'] = $db_task['status'];
+					unset( $db_tasks[ $db_task_key ] );
+					break;
+				}
+			}
+		}
+
+		return $tasks;
 	}
 
 	/**
