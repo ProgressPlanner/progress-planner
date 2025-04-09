@@ -683,7 +683,11 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function register_suggested_tasks_taxonomy() {
-		register_taxonomy( 'prpl_suggested_task_category', 'prpl_suggested_task', [ 'label' => \__( 'Categories', 'progress-planner' ) ] );
-		register_taxonomy( 'prpl_suggested_task_provider', 'prpl_suggested_task', [ 'label' => \__( 'Providers', 'progress-planner' ) ] );
+		foreach ( [
+			'prpl_suggested_task_category' => \__( 'Categories', 'progress-planner' ),
+			'prpl_suggested_task_provider' => \__( 'Providers', 'progress-planner' ),
+		] as $taxonomy => $label ) {
+			register_taxonomy( $taxonomy, 'prpl_suggested_task', [ 'label' => $label ] );
+		}
 	}
 }
