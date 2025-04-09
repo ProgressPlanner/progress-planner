@@ -196,8 +196,8 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	public function test_transition_post_status_updates_options() {
 
 		// Check if the options are set to default values.
-		$this->assertEquals( 0, get_option( 'page_on_front' ) );
-		$this->assertEquals( 'posts', get_option( 'show_on_front' ) );
+		$this->assertEquals( 0, \get_option( 'page_on_front' ) );
+		$this->assertEquals( 'posts', \get_option( 'show_on_front' ) );
 
 		// Update homepage page to draft.
 		wp_update_post(
@@ -221,7 +221,7 @@ class Page_Types_Test extends \WP_UnitTestCase {
 		);
 
 		// Check if the options are updated.
-		$this->assertEquals( self::$homepage_post_id, get_option( 'page_on_front' ) );
-		$this->assertEquals( 'page', get_option( 'show_on_front' ) );
+		$this->assertEquals( self::$homepage_post_id, \get_option( 'page_on_front' ) );
+		$this->assertEquals( 'page', \get_option( 'show_on_front' ) );
 	}
 }

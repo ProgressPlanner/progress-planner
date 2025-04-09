@@ -16,4 +16,4 @@ jobs:
         with:
           message: |
             **Test merged PR on Playground**
-            [Test this pull request on the Playground](https://playground.wordpress.net/#{"landingPage":"/wp-admin/admin.php?page=progress-planner","features":{"networking":true},"login":true,"plugins":["https://github-proxy.com/proxy/?repo=${{ github.repository }}"],"steps":[{"step":"defineWpConfigConsts","consts":{"IS_PLAYGROUND_PREVIEW":true}}]}) or [download the zip](${{ github.server_url }}/${{ github.repository }}/archive/refs/heads/develop.zip). 
+            [Test this pull request on the Playground](https://playground.wordpress.net/?blueprint-url=https%3A%2F%2Fprogressplanner.com%2Fresearch%2Fblueprint-pp.php%3Frepo%3D${{ github.repository }}) or [download the zip](${{ github.server_url }}/${{ github.repository }}/archive/refs/heads/develop.zip).
