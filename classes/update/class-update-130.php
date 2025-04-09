@@ -48,7 +48,12 @@ class Update_130 {
 	 * @return void
 	 */
 	private function migrate_task( $task ) {
-		foreach ( \get_posts( [ 'post_type' => 'prpl_recommendations', 'post_status' => 'any' ] ) as $post ) {
+		foreach ( \get_posts(
+			[
+				'post_type'   => 'prpl_recommendations',
+				'post_status' => 'any',
+			]
+		) as $post ) {
 			\wp_delete_post( $post->ID );
 		}
 
@@ -119,7 +124,12 @@ class Update_130 {
 		if ( ! empty( $task_details['parent'] ) ) {
 			$parent = \get_post( $task_details['parent'] );
 			if ( $parent ) {
-				\wp_update_post( [ 'ID' => $post_id, 'post_parent' => $parent->ID ] );
+				\wp_update_post(
+					[
+						'ID'          => $post_id,
+						'post_parent' => $parent->ID,
+					]
+				);
 			}
 		}
 

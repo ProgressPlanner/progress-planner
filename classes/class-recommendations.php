@@ -81,12 +81,14 @@ class Recommendations {
 	 * @return array
 	 */
 	public function get_all() {
-		return get_posts(
-			[
-				'post_type'   => 'prpl_recommendations',
-				'numberposts' => -1,
-				'post_status' => 'any',
-			]
+		return $this->format_recommendations(
+			get_posts(
+				[
+					'post_type'   => 'prpl_recommendations',
+					'numberposts' => -1,
+					'post_status' => 'any',
+				]
+			)
 		);
 	}
 
@@ -96,12 +98,37 @@ class Recommendations {
 	 * @return array
 	 */
 	public function get_pending() {
-		return get_posts(
-			[
-				'post_type'   => 'prpl_recommendations',
-				'numberposts' => -1,
-				'post_status' => 'publish',
-			]
+		return $this->format_recommendations(
+			get_posts(
+				[
+					'post_type'   => 'prpl_recommendations',
+					'numberposts' => -1,
+					'post_status' => 'publish',
+				]
+			)
 		);
+	}
+
+	/**
+	 * Format recommendations results.
+	 *
+	 * @param array $recommendations The recommendations.
+	 *
+	 * @return array
+	 */
+	private function format_recommendations( $recommendations ) {
+		$result = [];
+		foreach ( $recommendations as $recommendation ) {
+			$recommendation = (array) $recommendation;
+			$post_meta      = \get_post_meta( $recommendation['ID'] );
+			foreach ( $post_meta as $key => $value ) {
+				$recommendation[ str_replace( 'prpl_', '', $key ) ] = $value;
+			}
+			$recommendation['category'] = \wp_get_post_terms( $recommendation['ID'], 'prpl_recommendations_category' );
+			$recommendation['provider'] = \wp_get_post_terms( $recommendation['ID'], 'prpl_recommendations_provider' );
+			$result[]                   = $recommendation;
+		}
+
+		return $result;
 	}
 }

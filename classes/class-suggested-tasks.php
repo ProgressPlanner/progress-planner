@@ -222,11 +222,6 @@ class Suggested_Tasks {
 		error_log( print_r( $tasks_with_details, true ) );
 		$recommendations = \progress_planner()->get_recommendations()->get_pending();
 		foreach ( $recommendations as $recommendation ) {
-			$recommendation = (array) $recommendation;
-			$recommendation['post_meta'] = \get_post_meta( $recommendation['ID'] );
-			$recommendation['prpl_recommendations_category'] = \wp_get_post_terms( $recommendation['ID'], 'prpl_recommendations_category' );
-			$recommendation['prpl_recommendations_provider'] = \wp_get_post_terms( $recommendation['ID'], 'prpl_recommendations_provider' );
-
 			error_log( print_r( $recommendation, true ) );
 		}
 
