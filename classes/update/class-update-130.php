@@ -1,6 +1,6 @@
 <?php
 /**
- * Update class for version 1.2.0
+ * Update class for version 1.3.0
  *
  * @package Progress_Planner
  */
@@ -14,7 +14,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
  *
  * @package Progress_Planner
  */
-class Update_120 {
+class Update_130 {
 
 	/**
 	 * Run the update.
@@ -52,6 +52,7 @@ class Update_120 {
 		$task_details = Local_Task_Factory::create_task_from( 'id', $task['task_id'] )->get_task_details();
 
 		if ( empty( $task_details['title'] ) ) {
+			error_log( 'Task not migrated - missing title: ' . wp_json_encode( $task ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			return;
 		}
 
@@ -76,8 +77,12 @@ class Update_120 {
 				$status = 'trash';
 				break;
 
+			case 'completed':
+				$status = 'draft';
+				break;
+
 			default:
-				$status = 'published';
+				$status = 'publish';
 				break;
 		}
 
@@ -96,5 +101,10 @@ class Update_120 {
 
 		// Set the task provider.
 		\wp_set_post_terms( $post_id, $task_details['provider_id'], 'prpl_suggested_task_provider' );
+
+		// Set other meta.
+		foreach ( $task_details as $key => $value ) {
+			\update_post_meta( $post_id, "prpl_$key", $value );
+		}
 	}
 }
