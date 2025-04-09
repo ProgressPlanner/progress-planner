@@ -104,6 +104,9 @@ class Base {
 		// To-do.
 		$this->get_todo();
 
+		// Recommendations.
+		$this->get_recommendations();
+
 		// Post-meta.
 		if ( $this->is_pro_site() ) {
 			$this->get_page_todos();

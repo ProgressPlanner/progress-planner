@@ -59,7 +59,7 @@ class Update_130 {
 		// Check if we have an existing task with the same title.
 		$posts = \get_posts(
 			[
-				'post_type'   => 'prpl_suggested_task',
+				'post_type'   => 'prpl_recommendations',
 				'title'       => $task_details['title'],
 				'post_status' => 'all',
 				'numberposts' => 1,
@@ -89,7 +89,7 @@ class Update_130 {
 		// Create a new task in the CPT.
 		$post_id = \wp_insert_post(
 			[
-				'post_type'    => 'prpl_suggested_task',
+				'post_type'    => 'prpl_recommendations',
 				'post_title'   => $task_details['title'],
 				'post_content' => $task_details['description'] ?? '',
 				'post_status'  => $status,
@@ -97,10 +97,10 @@ class Update_130 {
 		);
 
 		// Set the task category.
-		\wp_set_post_terms( $post_id, $task_details['category'], 'prpl_suggested_task_category' );
+		\wp_set_post_terms( $post_id, $task_details['category'], 'prpl_recommendations_category' );
 
 		// Set the task provider.
-		\wp_set_post_terms( $post_id, $task_details['provider_id'], 'prpl_suggested_task_provider' );
+		\wp_set_post_terms( $post_id, $task_details['provider_id'], 'prpl_recommendations_provider' );
 
 		// Set other meta.
 		foreach ( $task_details as $key => $value ) {
