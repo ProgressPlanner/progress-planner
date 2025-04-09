@@ -96,6 +96,14 @@ class Update_130 {
 			]
 		);
 
+		// Add terms if they don't exist.
+		foreach ( [ 'category', 'provider' ] as $tax ) {
+			$term = \get_term_by( 'name', $task_details[ $tax ], "prpl_recommendations_$tax" );
+			if ( ! $term ) {
+				\wp_insert_term( $task_details[ $tax ], "prpl_recommendations_$tax" );
+			}
+		}
+
 		// Set the task category.
 		\wp_set_post_terms( $post_id, $task_details['category'], 'prpl_recommendations_category' );
 
