@@ -50,10 +50,10 @@ class Suggested_Tasks {
 		\add_action( 'automatic_updates_complete', [ $this, 'on_automatic_updates_complete' ] );
 
 		// Register the custom post type.
-		\add_action( 'init', [ $this, 'register_suggested_tasks_post_type' ] );
+		\add_action( 'init', [ $this, 'register_suggested_tasks_post_type' ], 0 );
 
 		// Register the custom taxonomies.
-		\add_action( 'init', [ $this, 'register_suggested_tasks_taxonomy' ] );
+		\add_action( 'init', [ $this, 'register_suggested_tasks_taxonomy' ], 0 );
 	}
 
 	/**
@@ -660,19 +660,20 @@ class Suggested_Tasks {
 		register_post_type(
 			'prpl_suggested_task',
 			[
-				'label'             => \__( 'Suggested Tasks', 'progress-planner' ),
-				'public'            => false,
-				'show_ui'           => true,
-				'show_in_menu'      => true,
-				'show_in_nav_menus' => false,
-				'show_in_admin_bar' => false,
-				'show_in_rest'      => false,
-				'supports'          => [ 'title', 'editor', 'author' ],
-				'rewrite'           => false,
-				'menu_icon'         => 'dashicons-admin-tools',
-				'menu_position'     => 5,
-				'capability_type'   => 'post',
-				'capabilities'      => [ 'create_posts' => 'do_not_allow' ],
+				'label'               => \__( 'Suggested Tasks', 'progress-planner' ),
+				'public'              => true,
+				'show_ui'             => true,
+				'show_in_menu'        => true,
+				'show_in_nav_menus'   => true,
+				'show_in_admin_bar'   => true,
+				'show_in_rest'        => true,
+				'supports'            => [ 'title', 'editor', 'author', 'custom-fields' ],
+				'rewrite'             => false,
+				'menu_icon'           => 'dashicons-admin-tools',
+				'menu_position'       => 5,
+				'hierarchical'        => true,
+				'exclude_from_search' => true,
+				'publicly_queryable'  => true,
 			]
 		);
 	}
