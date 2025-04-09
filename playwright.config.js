@@ -17,8 +17,16 @@ module.exports = defineConfig( {
 	},
 	projects: [
 		{
-			name: 'chromium',
+			name: 'sequential',
 			use: { ...devices[ 'Desktop Chrome' ] },
+			testMatch: 'task-tagline.spec.js',
+		},
+		{
+			name: 'parallel',
+			use: { ...devices[ 'Desktop Chrome' ] },
+			testIgnore: 'task-tagline.spec.js',
+			fullyParallel: true,
+			workers: process.env.CI ? 1 : undefined,
 		},
 	],
 } );
