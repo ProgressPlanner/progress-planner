@@ -39,7 +39,7 @@ use Progress_Planner\Badges\Monthly;
 
 <?php if ( \current_user_can( 'manage_options' ) ) : ?>
 	<div class="prpl-dashboard-widget-footer">
-		<img src="<?php echo \esc_attr( PROGRESS_PLANNER_URL . '/assets/images/icon_progress_planner.svg' ); ?>" style="width:1.85em;" alt="" />
+		<img src="<?php echo \esc_attr( constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg' ); ?>" style="width:1.85em;" alt="" />
 		<div>
 			<?php $prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' ); ?>
 			<?php if ( $prpl_pending_celebration_tasks ) : ?>

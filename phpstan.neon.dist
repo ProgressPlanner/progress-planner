@@ -7,9 +7,11 @@ parameters:
     - ./progress-planner.php
     - ./uninstall.php
   ignoreErrors:
-    - identifier: constant.notFound
     - identifier: missingType.iterableValue
     - identifier: missingType.generics
+    - '#Function YoastSEO not found.#'
+    - '#.*unknown class YoastSEO.*#'
+    - '#Call to static method get_instance\(\) on an unknown class WPSEO_Options.#'
     - '#Variable \$prpl_[a-zA-Z0-9_]+ might not be defined.#'
     - '#Call to an undefined method Progress_Planner\\Base\:\:get_[a-zA-Z0-9\\_]+\(\).#'
     - '#Cannot call method modify\(\) on DateTime\|false.#'
