@@ -20,9 +20,12 @@ function taglineTests( testContext = test ) {
 				);
 				const initialTasks = await response.json();
 
+				// Snooze task ID, Save Settings should be always available.
+				const completedTaskId = 'core-blogdescription';
+
 				// Find the blog description task
 				const blogDescriptionTask = initialTasks.find(
-					( task ) => task.task_id === 'core-blogdescription'
+					( task ) => task.task_id === completedTaskId
 				);
 				expect( blogDescriptionTask ).toBeDefined();
 				expect( blogDescriptionTask.status ).toBe( 'pending' );
@@ -56,7 +59,7 @@ function taglineTests( testContext = test ) {
 
 				// Find the blog description task again
 				const updatedTask = finalTasks.find(
-					( task ) => task.task_id === 'core-blogdescription'
+					( task ) => task.task_id === completedTaskId
 				);
 				expect( updatedTask ).toBeDefined();
 				expect( updatedTask.status ).toBe( 'pending_celebration' );
@@ -81,7 +84,7 @@ function taglineTests( testContext = test ) {
 
 				// Wait for the specific task to appear and verify its content
 				const taskElement = page.locator(
-					`li[data-task-id="core-blogdescription"]`
+					`li[data-task-id="${ completedTaskId }"]`
 				);
 				await expect( taskElement ).toBeVisible();
 
@@ -101,7 +104,7 @@ function taglineTests( testContext = test ) {
 
 				// Find the blog description task one last time
 				const completedTask = completedTasks.find(
-					( task ) => task.task_id === 'core-blogdescription'
+					( task ) => task.task_id === completedTaskId
 				);
 				expect( completedTask ).toBeDefined();
 				expect( completedTask.status ).toBe( 'completed' );
