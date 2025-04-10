@@ -120,13 +120,25 @@ class Recommendations {
 		$result = [];
 		foreach ( $recommendations as $recommendation ) {
 			$recommendation = (array) $recommendation;
-			$post_meta      = \get_post_meta( $recommendation['ID'] );
+
+			// Format the post meta.
+			$post_meta = \get_post_meta( $recommendation['ID'] );
 			foreach ( $post_meta as $key => $value ) {
-				$recommendation[ str_replace( 'prpl_', '', $key ) ] = $value;
+				$recommendation[ str_replace( 'prpl_', '', (string) $key ) ] =
+					is_array( $value ) && isset( $value[0] ) && 1 === count( $value )
+						? $value[0]
+						: $value;
 			}
-			$recommendation['category'] = \wp_get_post_terms( $recommendation['ID'], 'prpl_recommendations_category' );
-			$recommendation['provider'] = \wp_get_post_terms( $recommendation['ID'], 'prpl_recommendations_provider' );
-			$result[]                   = $recommendation;
+
+			// Category terms.
+			$category                   = \wp_get_post_terms( $recommendation['ID'], 'prpl_recommendations_category' );
+			$recommendation['category'] = is_array( $category ) && isset( $category[0] ) ? $category[0] : null;
+
+			// Provider terms.
+			$provider                   = \wp_get_post_terms( $recommendation['ID'], 'prpl_recommendations_provider' );
+			$recommendation['provider'] = is_array( $provider ) && isset( $provider[0] ) ? $provider[0] : null;
+
+			$result[] = $recommendation;
 		}
 
 		return $result;

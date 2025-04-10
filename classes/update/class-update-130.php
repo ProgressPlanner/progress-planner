@@ -148,7 +148,6 @@ class Update_130 {
 				continue;
 			}
 
-			error_log( 'Setting meta: ' . $key . ' - ' . \json_encode( $value ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			\update_post_meta( $post_id, "prpl_$key", $value );
 		}
 	}
