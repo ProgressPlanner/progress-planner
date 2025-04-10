@@ -238,6 +238,14 @@ class Local_Tasks_Manager {
 
 			$task_id = $task_data['task_id'];
 
+			// Check if the task is no longer relevant.
+			$task_object   = Local_Task_Factory::create_task_from( 'id', $task_id );
+			$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
+			if ( $task_provider && ! $task_provider->is_task_relevant() ) {
+				// Remove the task from the pending tasks.
+				\progress_planner()->get_suggested_tasks()->delete_task( $task_id );
+			}
+
 			$task_result = $this->evaluate_task( $task_id );
 			if ( false !== $task_result ) {
 				$completed_tasks[] = $task_result;

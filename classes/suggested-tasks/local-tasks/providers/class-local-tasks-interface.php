@@ -80,4 +80,13 @@ interface Local_Tasks_Interface {
 	 * @return bool
 	 */
 	public function capability_required();
+
+	/**
+	 * Check if the task is still relevant.
+	 * For example, we have a task to disable author archives if there is only one author.
+	 * If in the meantime more authors are added, the task is no longer relevant and the task should be removed.
+	 *
+	 * @return bool
+	 */
+	public function is_task_relevant();
 }
