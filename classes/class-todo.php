@@ -29,8 +29,8 @@ class Todo {
 	/**
 	 * Remove the order from a completed user task.
 	 *
-	 * @param string $task_id The task ID.
-	 * @param string $status The status.
+	 * @param string|int $task_id The task ID.
+	 * @param string     $status The status.
 	 *
 	 * @return void
 	 */
@@ -40,6 +40,8 @@ class Todo {
 		if ( 'completed' !== $status && 'published' !== $status ) {
 			return;
 		}
+
+		$task_id = (int) $task_id;
 
 		// Get the task.
 		$post = \get_post( $task_id );
@@ -158,7 +160,7 @@ class Todo {
 		}
 
 		$task_id = \wp_insert_post( $args );
-		if ( \is_wp_error( $task_id ) ) {
+		if ( ! $task_id ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to save the task.', 'progress-planner' ) ] );
 		}
 

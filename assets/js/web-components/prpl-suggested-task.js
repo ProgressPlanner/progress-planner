@@ -40,7 +40,9 @@ customElements.define(
 				taskHeading = `<a href="${ url }">${ title }</a>`;
 			}
 
-			const isRemoteTask = 'string' === typeof task_id && task_id.startsWith( 'remote-task-' );
+			const isRemoteTask =
+				'string' === typeof task_id &&
+				task_id.startsWith( 'remote-task-' );
 			const isDismissable = dismissable || isRemoteTask;
 
 			const getTaskStatus = () => {

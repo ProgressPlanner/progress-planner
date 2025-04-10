@@ -48,17 +48,6 @@ class Update_130 {
 	 * @return void
 	 */
 	private function migrate_task( $task ) {
-		// TODO: REMOVE THIS!!!
-		// It's only here for debugging, testing the migration.
-		foreach ( \get_posts(
-			[
-				'post_type'   => 'prpl_recommendations',
-				'post_status' => 'any',
-			]
-		) as $post ) {
-			// \wp_delete_post( $post->ID );
-		}
-
 		// Get the task details.
 		$task_details = Local_Task_Factory::create_task_from( 'id', $task['task_id'] )->get_task_details();
 

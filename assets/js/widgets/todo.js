@@ -166,7 +166,9 @@ document.addEventListener( 'prpl/suggestedTask/move', () => {
 		todoItemsIDs.push( todoItem.getAttribute( 'data-task-id' ) );
 		todoItem.setAttribute( 'data-task-order', order );
 		progressPlannerTodo.tasks.find(
-			( item ) => parseInt( item.ID ) === parseInt( todoItem.getAttribute( 'data-task-id' ) )
+			( item ) =>
+				parseInt( item.ID ) ===
+				parseInt( todoItem.getAttribute( 'data-task-id' ) )
 		).order = order;
 		order++;
 	} );
