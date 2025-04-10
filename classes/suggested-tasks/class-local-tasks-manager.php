@@ -28,6 +28,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engin
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\User as User_Tasks;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Interactive\Email_Sending;
 
 /**
  * Local_Tasks_Manager class.
@@ -64,6 +65,7 @@ class Local_Tasks_Manager {
 			new Php_Version(),
 			new Search_Engine_Visibility(),
 			new User_Tasks(),
+			new Email_Sending(),
 		];
 
 		// Add the plugin integration.

@@ -29,6 +29,7 @@ customElements.define(
 			deletable = false,
 			useCheckbox = true,
 			taskList = '', // prplSuggestedTasks or progressPlannerTodo.
+			popover_id,
 		} ) {
 			// Get parent class properties
 			super();
@@ -38,6 +39,10 @@ customElements.define(
 			let taskHeading = title;
 			if ( url ) {
 				taskHeading = `<a href="${ url }">${ title }</a>`;
+			}
+
+			if ( popover_id ) {
+				taskHeading = `<button popovertarget="${ popover_id }">${ title }</button>`;
 			}
 
 			const isRemoteTask = task_id.startsWith( 'remote-task-' );
