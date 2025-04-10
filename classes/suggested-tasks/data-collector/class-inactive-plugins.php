@@ -50,6 +50,9 @@ class Inactive_Plugins extends Base_Data_Collector {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
 
+		// Clear the plugins cache, so get_plugins() returns the latest plugins.
+		wp_cache_delete( 'plugins', 'plugins' );
+
 		$plugins        = get_plugins();
 		$plugins_active = 0;
 		$plugins_total  = 0;
