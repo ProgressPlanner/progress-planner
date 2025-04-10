@@ -40,14 +40,14 @@ customElements.define(
 				taskHeading = `<a href="${ url }">${ title }</a>`;
 			}
 
-			const isRemoteTask = task_id.startsWith( 'remote-task-' );
+			const isRemoteTask = 'string' === typeof task_id && task_id.startsWith( 'remote-task-' );
 			const isDismissable = dismissable || isRemoteTask;
 
 			const getTaskStatus = () => {
 				let status = 'pending';
 				window[ taskList ].tasks.forEach( ( task ) => {
 					if ( task.task_id === task_id ) {
-						status = task.status;
+						status = task.post_status || task.status;
 					}
 				} );
 				return status;

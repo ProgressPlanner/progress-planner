@@ -60,6 +60,13 @@ final class ToDo extends Widget {
 	 */
 	public function enqueue_scripts() {
 		// Enqueue the script.
+		$tasks = \progress_planner()->get_recommendations()->get_by_provider( 'user' );
+		usort(
+			$tasks,
+			function ( $a, $b ) {
+				return $a['order'] - $b['order'];
+			}
+		);
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
 			'widgets/todo',
 			[
@@ -67,7 +74,7 @@ final class ToDo extends Widget {
 				'data' => [
 					'ajaxUrl' => \admin_url( 'admin-ajax.php' ),
 					'nonce'   => \wp_create_nonce( 'progress_planner' ),
-					'tasks'   => \progress_planner()->get_todo()->get_items(),
+					'tasks'   => $tasks,
 				],
 			]
 		);

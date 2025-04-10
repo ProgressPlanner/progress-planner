@@ -7,8 +7,6 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
-
 /**
  * Todo class.
  */
@@ -39,30 +37,17 @@ class Todo {
 	public function remove_order_from_completed_user_task( $task_id, $status ) {
 
 		// Bail if the task is not completed.
-		if ( 'completed' !== $status ) {
+		if ( 'completed' !== $status && 'published' !== $status ) {
 			return;
 		}
 
-		$task = Local_Task_Factory::create_task_from( 'id', $task_id );
-
-		// Bail if the task is not a user task.
-		if ( 'user' !== $task->get_provider_id() ) {
+		// Get the task.
+		$post = \get_post( $task_id );
+		if ( ! $post ) {
 			return;
 		}
-
-		$task_changed = false;
-		$local_tasks  = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		foreach ( $local_tasks as $key => $task ) {
-			if ( $task['task_id'] === $task_id ) {
-				unset( $local_tasks[ $key ]['order'] );
-				$task_changed = true;
-				break;
-			}
-		}
-
-		if ( $task_changed ) {
-			\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
-		}
+		// Delete the `prpl_order` meta.
+		\delete_post_meta( $task_id, 'prpl_order' );
 	}
 
 	/**
@@ -156,42 +141,36 @@ class Todo {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
 
-		$task_id = isset( $_POST['task']['task_id'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['task_id'] ) ) : '';
-		if ( ! $task_id ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing task ID.', 'progress-planner' ) ] );
+		$task_id = isset( $_POST['task']['task_id'] ) ? (int) \sanitize_text_field( \wp_unslash( $_POST['task']['task_id'] ) ) : 0;
+		$title   = isset( $_POST['task']['title'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['title'] ) ) : '';
+
+		$args = [
+			'post_title' => $title,
+			'post_type'  => 'prpl_suggested_task',
+		];
+
+		$task_exists = false;
+		if ( $task_id ) {
+			$args['ID'] = $task_id;
+			$task_exists = true;
+		} else {
+			$args['post_status'] = 'publish';
 		}
 
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		$title       = isset( $_POST['task']['title'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['title'] ) ) : '';
-
-		// Check if the task already exists (this is the update case).
-		$task_index = false;
-		foreach ( $local_tasks as $key => $task ) {
-			if ( $task['task_id'] === $task_id ) {
-				$task_index = $key;
-				break;
-			}
+		$task_id = \wp_insert_post( $args );
+		if ( \is_wp_error( $task_id ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to save the task.', 'progress-planner' ) ] );
 		}
 
 		// Default value.
 		$task_points = 0;
 
 		// We're creating a new task.
-		if ( false === $task_index ) {
-			$task_points   = $this->calc_points_for_new_task();
-			$local_tasks[] = [
-				'task_id'     => $task_id,
-				'provider_id' => 'user',
-				'category'    => 'user',
-				'status'      => 'pending',
-				'title'       => $title,
-				'points'      => $task_points,
-			];
-		} else {
-			$local_tasks[ $task_index ]['title'] = $title;
+		if ( ! $task_exists ) {
+			$task_points = $this->calc_points_for_new_task();
+			\update_post_meta( $task_id, 'prpl_points', $task_points );
 		}
 
-		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
 		\wp_send_json_success(
 			[
 				'message' => \esc_html__( 'Saved.', 'progress-planner' ),
@@ -216,17 +195,16 @@ class Todo {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing tasks.', 'progress-planner' ) ] );
 		}
 
-		$tasks = \explode( ',', $tasks );
+		$tasks = \array_map( 'intval', \explode( ',', $tasks ) );
 
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		// Get tasks from the `prpl_suggested_task` post type, that have a `prpl_recommendations_provider` of `user`.
+		$user_tasks = \progress_planner()->get_recommendations()->get_by_provider( 'user' );
 
-		foreach ( $local_tasks as $key => $task ) {
-			if ( in_array( $task['task_id'], $tasks, true ) ) {
-				$local_tasks[ $key ]['order'] = array_search( $task['task_id'], $tasks, true );
+		foreach ( $user_tasks as $task ) {
+			if ( in_array( $task['ID'], $tasks, true ) ) {
+				\update_post_meta( $task['ID'], 'prpl_order', array_search( $task['ID'], $tasks, true ) );
 			}
 		}
-
-		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
 	}
 
 	/**
@@ -301,17 +279,23 @@ class Todo {
 		$task_ids = array_column( $pending_items, 'task_id' );
 
 		// Get the local tasks.
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$user_tasks = \progress_planner()->get_recommendations()->get_by_provider( 'user' );
+
+		// Order the tasks by the order value.
+		usort(
+			$user_tasks,
+			function ( $a, $b ) {
+				return $a['order'] - $b['order'];
+			}
+		);
 
 		// Reset the points of all the tasks, except for the first one in the todo list.
-		foreach ( $local_tasks as $key => $task ) {
-			if ( 'user' === $task['provider_id'] && 'pending' === $task['status'] ) {
-				$local_tasks[ $key ]['points'] = $local_tasks[ $key ]['task_id'] === $task_ids[0] ? 1 : 0;
+		foreach ( $user_tasks as $key => $task ) {
+			if ( 'publish' !== $task['post_status'] ) {
+				continue;
 			}
+			\update_post_meta( $task['ID'], 'prpl_points', 0 === $key ? 1 : 0 );
 		}
-
-		// Save the local tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
 
 		\progress_planner()->get_utils__cache()->set( $transient_name, $next_monday->getTimestamp(), WEEK_IN_SECONDS );
 	}

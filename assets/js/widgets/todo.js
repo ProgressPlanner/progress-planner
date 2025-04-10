@@ -51,8 +51,16 @@ document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
 
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const todoItemElement = new Item( {
-		...details,
+		task_id: details.ID,
+		title: details.post_title,
+		points: details.points,
+		dismissable: true,
+		provider_id: 'user',
+		category: 'user',
+		snoozable: true,
+		order: details.order,
 		deletable: true,
+		useCheckbox: true,
 		taskList: 'progressPlannerTodo',
 	} );
 
@@ -158,7 +166,7 @@ document.addEventListener( 'prpl/suggestedTask/move', () => {
 		todoItemsIDs.push( todoItem.getAttribute( 'data-task-id' ) );
 		todoItem.setAttribute( 'data-task-order', order );
 		progressPlannerTodo.tasks.find(
-			( item ) => item.task_id === todoItem.getAttribute( 'data-task-id' )
+			( item ) => parseInt( item.ID ) === parseInt( todoItem.getAttribute( 'data-task-id' ) )
 		).order = order;
 		order++;
 	} );
