@@ -119,28 +119,39 @@ class Recommendations {
 	private function format_recommendations( $recommendations ) {
 		$result = [];
 		foreach ( $recommendations as $recommendation ) {
-			$recommendation = (array) $recommendation;
-
-			// Format the post meta.
-			$post_meta = \get_post_meta( $recommendation['ID'] );
-			foreach ( $post_meta as $key => $value ) {
-				$recommendation[ str_replace( 'prpl_', '', (string) $key ) ] =
-					is_array( $value ) && isset( $value[0] ) && 1 === count( $value )
-						? $value[0]
-						: $value;
-			}
-
-			// Category terms.
-			$category                   = \wp_get_post_terms( $recommendation['ID'], 'prpl_recommendations_category' );
-			$recommendation['category'] = is_array( $category ) && isset( $category[0] ) ? $category[0] : null;
-
-			// Provider terms.
-			$provider                   = \wp_get_post_terms( $recommendation['ID'], 'prpl_recommendations_provider' );
-			$recommendation['provider'] = is_array( $provider ) && isset( $provider[0] ) ? $provider[0] : null;
-
-			$result[] = $recommendation;
+			$result[] = $this->format_recommendation( $recommendation );
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Format a recommendation.
+	 *
+	 * @param \WP_Post $post The recommendation post.
+	 *
+	 * @return array
+	 */
+	private function format_recommendation( $post ) {
+		$post = (array) $post;
+
+		// Format the post meta.
+		$post_meta = \get_post_meta( $post['ID'] );
+		foreach ( $post_meta as $key => $value ) {
+			$post[ str_replace( 'prpl_', '', (string) $key ) ] =
+				is_array( $value ) && isset( $value[0] ) && 1 === count( $value )
+					? $value[0]
+					: $value;
+		}
+
+		// Category terms.
+		$category         = \wp_get_post_terms( $post['ID'], 'prpl_recommendations_category' );
+		$post['category'] = is_array( $category ) && isset( $category[0] ) ? $category[0] : null;
+
+		// Provider terms.
+		$provider         = \wp_get_post_terms( $post['ID'], 'prpl_recommendations_provider' );
+		$post['provider'] = is_array( $provider ) && isset( $provider[0] ) ? $provider[0] : null;
+
+		return $post;
 	}
 }
