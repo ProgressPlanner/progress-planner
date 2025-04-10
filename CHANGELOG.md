@@ -1,3 +1,8 @@
+= 1.2.1 =
+
+Bugs we fixed:
+* Ensure fresh plugin list by clearing plugin cache before checking for inactive plugins after deletion.
+
 = 1.2.0 =
 
 In this release we've [added an integration with the **Yoast SEO** plugin](https://prpl.fyi/v12), so you’ll now see personalized suggestions based on your current SEO configuration.
