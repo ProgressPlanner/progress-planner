@@ -219,11 +219,6 @@ class Suggested_Tasks {
 			}
 		}
 
-		$recommendations = \progress_planner()->get_recommendations()->get_pending();
-		foreach ( $recommendations as $recommendation ) {
-			error_log( print_r( $recommendation, true ) );
-		}
-
 		return $tasks_with_details;
 	}
 
