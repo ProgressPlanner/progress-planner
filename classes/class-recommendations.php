@@ -110,6 +110,32 @@ class Recommendations {
 	}
 
 	/**
+	 * Get recommendations by provider.
+	 *
+	 * @param string $provider The provider.
+	 *
+	 * @return array
+	 */
+	public function get_by_provider( $provider ) {
+		return $this->format_recommendations(
+			get_posts(
+				[
+					'post_type'   => 'prpl_recommendations',
+					'numberposts' => -1,
+					'post_status' => 'any',
+					'tax_query'   => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+						[
+							'taxonomy' => 'prpl_recommendations_provider',
+							'field'    => 'slug',
+							'terms'    => (array) $provider,
+						],
+					],
+				]
+			)
+		);
+	}
+
+	/**
 	 * Format recommendations results.
 	 *
 	 * @param array $recommendations The recommendations.
