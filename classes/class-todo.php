@@ -21,35 +21,7 @@ class Todo {
 		\add_action( 'wp_ajax_progress_planner_save_user_suggested_task', [ $this, 'save_user_suggested_task' ] );
 		\add_action( 'wp_ajax_progress_planner_save_suggested_user_tasks_order', [ $this, 'save_suggested_user_tasks_order' ] );
 
-		\add_action( 'progress_planner_task_status_changed', [ $this, 'remove_order_from_completed_user_task' ], 10, 2 );
-
 		$this->maybe_change_first_item_points_on_monday();
-	}
-
-	/**
-	 * Remove the order from a completed user task.
-	 *
-	 * @param string|int $task_id The task ID.
-	 * @param string     $status The status.
-	 *
-	 * @return void
-	 */
-	public function remove_order_from_completed_user_task( $task_id, $status ) {
-
-		// Bail if the task is not completed.
-		if ( 'completed' !== $status && 'published' !== $status ) {
-			return;
-		}
-
-		$task_id = (int) $task_id;
-
-		// Get the task.
-		$post = \get_post( $task_id );
-		if ( ! $post ) {
-			return;
-		}
-		// Delete the `prpl_order` meta.
-		\delete_post_meta( $task_id, 'prpl_order' );
 	}
 
 	/**
@@ -72,13 +44,11 @@ class Todo {
 		$items = [];
 		foreach ( $tasks as $task ) {
 			if ( 'completed' === $task['status'] ) {
-				$items[] = array_merge(
-					$task,
-					[
-						'dismissable' => true,
-						'snoozable'   => false,
-					]
-				);
+				$items[] = [
+					...$task,
+					'dismissable' => true,
+					'snoozable'   => false,
+				];
 			}
 		}
 
@@ -91,27 +61,15 @@ class Todo {
 	 * @return array
 	 */
 	public function get_pending_items() {
-		$tasks     = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', 'user' );
-		$items     = [];
-		$max_order = 0;
-
-		// Get the maximum order value from the $tasks array.
-		foreach ( $tasks as $task ) {
-			if ( 'pending' === $task['status'] && isset( $task['order'] ) && $task['order'] > $max_order ) {
-				$max_order = $task['order'];
-			}
-		}
+		$tasks = \progress_planner()->get_recommendations()->get_by_provider( 'user' );
+		$items = [];
 
 		foreach ( $tasks as $task ) {
 			// Skip non-pending tasks.
-			if ( 'pending' !== $task['status'] ) {
+			if ( 'publish' !== $task->post_status ) {
 				continue;
 			}
 
-			if ( ! isset( $task['order'] ) ) {
-				$task['order'] = $max_order + 1;
-				++$max_order;
-			}
 			$items[] = array_merge(
 				$task,
 				[
@@ -120,14 +78,6 @@ class Todo {
 				]
 			);
 		}
-
-		// Order the items by the order value.
-		usort(
-			$items,
-			function ( $a, $b ) {
-				return $a['order'] - $b['order'];
-			}
-		);
 
 		return $items;
 	}
@@ -153,11 +103,8 @@ class Todo {
 			'post_title'   => (string) $title,
 			'post_content' => '',
 			'post_status'  => $task_exists ? $task->post_status : 'publish',
+			'post_type'    => 'prpl_recommendations',
 		];
-
-		if ( ! $task_exists ) {
-			$args['post_type'] = 'prpl_recommendations';
-		}
 
 		$post_id = ( $task_exists )
 			? \wp_update_post( $args )
@@ -173,6 +120,18 @@ class Todo {
 
 		// We're creating a new task.
 		if ( ! $task_exists ) {
+			// Get the highest order.
+			$tasks = \progress_planner()->get_recommendations()->get_by_provider( 'user' );
+			$order = 0;
+			foreach ( $tasks as $task ) {
+				$order = max( $order, $task['order'] );
+			}
+			\wp_update_post(
+				[
+					'ID'         => $post_id,
+					'menu_order' => $order + 1,
+				]
+			);
 			\update_post_meta( $post_id, 'prpl_points', $task_points );
 			\wp_set_post_terms( $post_id, 'user', 'prpl_recommendations_provider' );
 			\wp_set_post_terms( $post_id, 'user', 'prpl_recommendations_category' );
@@ -209,8 +168,13 @@ class Todo {
 		$user_tasks = \progress_planner()->get_recommendations()->get_by_provider( 'user' );
 
 		foreach ( $user_tasks as $task ) {
-			if ( in_array( $task['ID'], $tasks, true ) ) {
-				\update_post_meta( $task['ID'], 'prpl_order', array_search( $task['ID'], $tasks, true ) );
+			if ( in_array( (int) $task['ID'], $tasks, true ) ) {
+				\wp_update_post(
+					[
+						'ID'         => $task['ID'],
+						'menu_order' => (int) array_search( $task['ID'], $tasks, true ),
+					]
+				);
 			}
 		}
 	}
@@ -288,14 +252,6 @@ class Todo {
 
 		// Get the local tasks.
 		$user_tasks = \progress_planner()->get_recommendations()->get_by_provider( 'user' );
-
-		// Order the tasks by the order value.
-		usort(
-			$user_tasks,
-			function ( $a, $b ) {
-				return $a['order'] - $b['order'];
-			}
-		);
 
 		// Reset the points of all the tasks, except for the first one in the todo list.
 		foreach ( $user_tasks as $key => $task ) {

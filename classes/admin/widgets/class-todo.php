@@ -61,14 +61,7 @@ final class ToDo extends Widget {
 	public function enqueue_scripts() {
 		// Enqueue the script.
 		$tasks = \progress_planner()->get_recommendations()->get_by_provider( 'user' );
-		usort(
-			$tasks,
-			function ( $a, $b ) {
-				$a['order'] = $a['order'] ?? 100;
-				$b['order'] = $b['order'] ?? 100;
-				return $a['order'] - $b['order'];
-			}
-		);
+
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
 			'widgets/todo',
 			[

@@ -50,7 +50,7 @@ class Recommendations {
 				'show_in_nav_menus'   => true,
 				'show_in_admin_bar'   => true,
 				'show_in_rest'        => true,
-				'supports'            => [ 'title', 'editor', 'author', 'custom-fields' ],
+				'supports'            => [ 'title', 'editor', 'author', 'custom-fields', 'page-attributes' ],
 				'rewrite'             => false,
 				'menu_icon'           => 'dashicons-admin-tools',
 				'menu_position'       => 5,
@@ -87,6 +87,8 @@ class Recommendations {
 					'post_type'   => 'prpl_recommendations',
 					'numberposts' => -1,
 					'post_status' => 'any',
+					'orderby'     => 'menu_order',
+					'order'       => 'ASC',
 				]
 			)
 		);
@@ -104,6 +106,8 @@ class Recommendations {
 					'post_type'   => 'prpl_recommendations',
 					'numberposts' => -1,
 					'post_status' => 'publish',
+					'orderby'     => 'menu_order',
+					'order'       => 'ASC',
 				]
 			)
 		);
@@ -123,6 +127,8 @@ class Recommendations {
 					'post_type'   => 'prpl_recommendations',
 					'numberposts' => -1,
 					'post_status' => 'any',
+					'orderby'     => 'menu_order',
+					'order'       => 'ASC',
 					'tax_query'   => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 						[
 							'taxonomy' => 'prpl_recommendations_provider',

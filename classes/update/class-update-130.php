@@ -93,6 +93,7 @@ class Update_130 {
 				'post_title'   => $task_details['title'],
 				'post_content' => $task_details['description'] ?? '',
 				'post_status'  => $status,
+				'menu_order'   => $task_details['order'] ?? 0,
 			]
 		);
 
@@ -133,6 +134,7 @@ class Update_130 {
 			'category',
 			'provider_id',
 			'parent',
+			'order',
 		];
 		foreach ( $task_details as $key => $value ) {
 			if ( in_array( $key, $default_keys, true ) ) {
