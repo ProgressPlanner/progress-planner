@@ -630,7 +630,7 @@ class Suggested_Tasks {
 				break;
 
 			case 'delete':
-				$updated = $this->delete_task( $task_id );
+				$updated = (bool) \wp_delete_post( (int) $task_id );
 				$this->delete_activity( $task_id );
 				break;
 
