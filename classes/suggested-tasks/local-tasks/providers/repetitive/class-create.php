@@ -37,6 +37,13 @@ class Create extends Repetitive {
 	protected const CAPABILITY = 'edit_others_posts';
 
 	/**
+	 * The task points.
+	 *
+	 * @var int
+	 */
+	protected $points = 2;
+
+	/**
 	 * The data collector.
 	 *
 	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post
@@ -70,13 +77,30 @@ class Create extends Repetitive {
 	}
 
 	/**
+	 * Check if a specific task is completed.
+	 * Child classes can override this method to handle specific task IDs.
+	 *
+	 * @param string $task_id The task ID to check.
+	 * @return bool
+	 */
+	protected function is_specific_task_completed( $task_id ) {
+		$last_published_post_data = $this->data_collector->collect();
+
+		if ( ! $last_published_post_data || ! isset( $last_published_post_data['long'] ) ) {
+			return false;
+		}
+
+		return $last_published_post_data['long'];
+	}
+
+	/**
 	 * Add task data.
 	 *
 	 * @param array $task_data The task data.
 	 *
 	 * @return array
 	 */
-	public function modify_task_data( $task_data ) {
+	public function modify_evaluated_task_data( $task_data ) {
 		$last_published_post_data = $this->data_collector->collect();
 
 		if ( ! $last_published_post_data || empty( $last_published_post_data['post_id'] ) ) {
@@ -105,8 +129,9 @@ class Create extends Repetitive {
 			return true;
 		}
 
-		// Add tasks if there are no posts published this week.
-		return \gmdate( 'YW' ) !== \gmdate( 'YW', strtotime( $last_published_post_data['post_date'] ) );
+		// Add tasks if there are no long posts published this week.
+		return ( \gmdate( 'YW' ) === \gmdate( 'YW', strtotime( $last_published_post_data['post_date'] ) ) && false === $last_published_post_data['long'] )
+			|| ( \gmdate( 'YW' ) < \gmdate( 'YW', strtotime( $last_published_post_data['post_date'] ) ) );
 	}
 
 	/**
@@ -129,7 +154,7 @@ class Create extends Repetitive {
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(), // We use $this->get_points() here on purpose, get_points_for_task() calcs the points for the last published post.
+			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
 			'url'         => $this->get_url(),
 			'description' => $this->get_description(),
@@ -157,10 +182,10 @@ class Create extends Repetitive {
 		}
 
 		// Post was created, but then deleted?
-		if ( ! $post_data || empty( $post_data['post_id'] ) ) {
-			return $this->points;
+		if ( ! $post_data || empty( $post_data['post_id'] ) || ! isset( $post_data['long'] ) ) {
+			return 1;
 		}
 
-		return true === $post_data['long'] ? 2 : 1;
+		return true === $post_data['long'] ? $this->points : 1;
 	}
 }
