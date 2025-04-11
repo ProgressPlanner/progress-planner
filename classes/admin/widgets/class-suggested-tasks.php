@@ -81,12 +81,6 @@ final class Suggested_Tasks extends Widget {
 							$task_details['action']   = 'celebrate';
 							$task_details['status']   = 'pending_celebration';
 
-							// Award 2 points if last created post was long.
-							$create_provider = new Create();
-							if ( $create_provider->get_provider_id() === $task_provider->get_provider_id() ) {
-								$task_details['points'] = $create_provider->get_points_for_task( $task_id );
-							}
-
 							$tasks[] = $task_details;
 						}
 
@@ -99,7 +93,13 @@ final class Suggested_Tasks extends Widget {
 
 		$final_tasks = [];
 		foreach ( $tasks as $task ) {
-			$task['status']                  = $task['status'] ?? 'pending';
+			$task['status'] = $task['status'] ?? 'pending';
+
+			// Don't add Create post tasks which are not pending celebration.
+			if ( ( new Create() )->get_provider_id() === $task['provider_id'] && 'pending_celebration' !== $task['status'] ) {
+				continue;
+			}
+
 			$final_tasks[ $task['task_id'] ] = $task;
 		}
 
