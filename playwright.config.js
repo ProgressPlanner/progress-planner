@@ -6,7 +6,8 @@ module.exports = defineConfig( {
 	forbidOnly: !! process.env.CI,
 	retries: process.env.CI ? 2 : 0,
 	reporter: 'html',
-	globalSetup: require.resolve( './tests/e2e/auth.setup.js' ),
+	globalSetup: './tests/e2e/auth.setup.js',
+	globalTeardown: './tests/e2e/auth.setup.js',
 	use: {
 		baseURL: process.env.WORDPRESS_URL || 'http://localhost:8080',
 		trace: 'on-first-retry',

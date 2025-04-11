@@ -1,8 +1,32 @@
 const { chromium } = require( '@playwright/test' );
+const fs = require( 'fs' );
+const path = require( 'path' );
 require( 'dotenv' ).config();
 
+// Add cleanup function
+async function cleanup() {
+	const authFile = path.join( process.cwd(), 'auth.json' );
+	if ( fs.existsSync( authFile ) ) {
+		console.log( 'Cleaning up auth.json...' );
+		fs.unlinkSync( authFile );
+	}
+}
+
+// Register cleanup on process exit
+// process.on( 'exit', cleanup ); // it gets triggered between sequential & parallel tests
+process.on( 'SIGINT', cleanup );
+process.on( 'SIGTERM', cleanup );
+
 async function globalSetup() {
-	console.log( 'Starting loging in process...' );
+	const authFile = path.join( process.cwd(), 'auth.json' );
+
+	// Check if auth.json exists
+	if ( fs.existsSync( authFile ) ) {
+		console.log( 'Using existing auth.json...' );
+		return;
+	}
+
+	console.log( 'Starting login process...' );
 	const browser = await chromium.launch();
 	const context = await browser.newContext();
 	const page = await context.newPage();
@@ -50,4 +74,6 @@ async function globalSetup() {
 	console.log( 'Global setup completed' );
 }
 
+// Export both functions
 module.exports = globalSetup;
+module.exports.globalTeardown = cleanup;
