@@ -17,12 +17,12 @@ test.describe( 'PRPL Task Snooze', () => {
 		);
 		const initialTasks = await response.json();
 
-		// Snooze task ID, Save Settings should be always available.
-		const snoozeTaskId = 'settings-saved';
-
 		// Find a task that's not completed or snoozed
 		const taskToSnooze = initialTasks.find(
-			( task ) => task.task_id === snoozeTaskId
+			( task ) =>
+				task.status === 'pending' &&
+				task.task_id !== 'core-blogdescription' &&
+				! task.task_id.startsWith( 'remote-task-' )
 		);
 
 		if ( taskToSnooze ) {
@@ -45,13 +45,13 @@ test.describe( 'PRPL Task Snooze', () => {
 			await radioGroup.click();
 
 			// Select 1 week duration by clicking the label
-			await page.evaluate( ( taskToBeSnoozed ) => {
+			await taskElement.evaluate( () => {
 				const radio = document.querySelector(
-					`li[data-task-id="${ taskToBeSnoozed.task_id }"] .prpl-snooze-duration-radio-group input[type="radio"][value="1-week"]`
+					'.prpl-snooze-duration-radio-group input[type="radio"][value="1-week"]'
 				);
 				const label = radio.closest( 'label' );
 				label.click();
-			}, taskToSnooze );
+			} );
 
 			// Wait for the API call to complete
 			await page.waitForLoadState( 'networkidle' );
