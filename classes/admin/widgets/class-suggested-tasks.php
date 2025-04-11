@@ -93,7 +93,13 @@ final class Suggested_Tasks extends Widget {
 
 		$final_tasks = [];
 		foreach ( $tasks as $task ) {
-			$task['status']                  = $task['status'] ?? 'pending';
+			$task['status'] = $task['status'] ?? 'pending';
+
+			// Don't add Create post tasks which are not pending celebration.
+			if ( ( new Create() )->get_provider_id() === $task['provider_id'] && 'pending_celebration' !== $task['status'] ) {
+				continue;
+			}
+
 			$final_tasks[ $task['task_id'] ] = $task;
 		}
 
