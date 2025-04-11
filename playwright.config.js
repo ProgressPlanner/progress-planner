@@ -27,6 +27,9 @@ module.exports = defineConfig( {
 			testIgnore: [
 				'onboarding.spec.js',
 				'task-tagline.spec.js',
+				'todo.spec.js',
+				'todo-reorder.spec.js',
+				'todo-complete.spec.js',
 				'sequential.spec.js',
 			],
 			fullyParallel: true,
