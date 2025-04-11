@@ -8,24 +8,6 @@
  */
 
 /**
- * Get a random UUID.
- *
- * @return {string} The random UUID.
- */
-const prplGetRandomUUID = () => {
-	if (
-		typeof crypto !== 'undefined' &&
-		typeof crypto.randomUUID === 'function'
-	) {
-		return crypto.randomUUID();
-	}
-	return (
-		Math.random().toString( 36 ).substring( 2, 15 ) +
-		Math.random().toString( 36 ).substring( 2, 15 )
-	);
-};
-
-/**
  * Get the highest `order` value from the todo items.
  *
  * @return {number} The highest `order` value.
