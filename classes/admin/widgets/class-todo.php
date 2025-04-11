@@ -64,6 +64,8 @@ final class ToDo extends Widget {
 		usort(
 			$tasks,
 			function ( $a, $b ) {
+				$a['order'] = $a['order'] ?? 100;
+				$b['order'] = $b['order'] ?? 100;
 				return $a['order'] - $b['order'];
 			}
 		);
