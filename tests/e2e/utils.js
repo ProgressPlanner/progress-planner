@@ -1,4 +1,4 @@
-const { test } = require( '@playwright/test' );
+// const { test } = require( '@playwright/test' );
 
 /**
  * Makes an authenticated request to WordPress REST API
@@ -29,6 +29,7 @@ async function makeAuthenticatedRequest(
 }
 
 // Add timing utility
+/*
 const startTime = Date.now();
 const getElapsedTime = () => {
 	const elapsed = Date.now() - startTime;
@@ -43,6 +44,7 @@ test.beforeEach( async ( {}, testInfo ) => {
 test.afterEach( async ( {}, testInfo ) => {
 	console.log( `[${ getElapsedTime() }] Finished test: ${ testInfo.title }` );
 } );
+*/
 
 module.exports = {
 	makeAuthenticatedRequest,

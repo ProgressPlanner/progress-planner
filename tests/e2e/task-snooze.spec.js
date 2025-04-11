@@ -26,7 +26,6 @@ test.describe( 'PRPL Task Snooze', () => {
 		);
 
 		if ( taskToSnooze ) {
-			console.log( 'Snoozing task:', taskToSnooze.task_id );
 			// Hover over the task to show actions
 			const taskElement = page.locator(
 				`li[data-task-id="${ taskToSnooze.task_id }"]`
