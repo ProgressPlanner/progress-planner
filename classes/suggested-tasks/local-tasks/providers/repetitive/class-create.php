@@ -165,7 +165,7 @@ class Create extends Repetitive {
 
 	/**
 	 * Get the number of points for the task.
-	 * This is used to calculate points in the RR widget, so user can see if he earned 1 or 2 points when celebrating.
+	 * This is only used for calculating points from activities, to handle backwards compatibility.
 	 *
 	 * @param string $task_id The task ID.
 	 *
