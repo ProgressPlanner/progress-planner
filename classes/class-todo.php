@@ -143,43 +143,46 @@ class Todo {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
 
-		$task_id = isset( $_POST['task']['task_id'] ) ? (int) \sanitize_text_field( \wp_unslash( $_POST['task']['task_id'] ) ) : 0;
-		$title   = isset( $_POST['task']['title'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['title'] ) ) : '';
+		$task_id     = isset( $_POST['task']['task_id'] ) ? (int) \sanitize_text_field( \wp_unslash( $_POST['task']['task_id'] ) ) : 0;
+		$title       = isset( $_POST['task']['title'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['title'] ) ) : '';
+		$task        = \get_post( $task_id );
+		$task_exists = $task_id && $task;
 
 		$args = [
-			'post_title' => $title,
-			'post_type'  => 'prpl_recommendations',
+			'ID'           => $task_exists ? (int) $task_id : 0,
+			'post_title'   => (string) $title,
+			'post_content' => '',
+			'post_status'  => $task_exists ? $task->post_status : 'publish',
 		];
 
-		$task_exists = false;
-		if ( $task_id ) {
-			$args['ID']  = $task_id;
-			$task_exists = true;
-		} else {
-			$args['post_status'] = 'publish';
+		if ( ! $task_exists ) {
+			$args['post_type'] = 'prpl_recommendations';
 		}
 
-		$task_id = \wp_insert_post( $args );
-		if ( ! $task_id ) {
+		$post_id = ( $task_exists )
+			? \wp_update_post( $args )
+			: \wp_insert_post( $args );
+
+		if ( ! $post_id ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to save the task.', 'progress-planner' ) ] );
 		}
 
-		// Default value.
-		$task_points = 0;
+		$task_points = $task_exists
+			? \get_post_meta( $post_id, 'prpl_points', true )
+			: $this->calc_points_for_new_task();
 
 		// We're creating a new task.
 		if ( ! $task_exists ) {
-			$task_points = $this->calc_points_for_new_task();
-			\update_post_meta( $task_id, 'prpl_points', $task_points );
-			\wp_set_post_terms( $task_id, 'user', 'prpl_recommendations_provider' );
-			\wp_set_post_terms( $task_id, 'user', 'prpl_recommendations_category' );
+			\update_post_meta( $post_id, 'prpl_points', $task_points );
+			\wp_set_post_terms( $post_id, 'user', 'prpl_recommendations_provider' );
+			\wp_set_post_terms( $post_id, 'user', 'prpl_recommendations_category' );
 		}
 
 		\wp_send_json_success(
 			[
 				'message' => \esc_html__( 'Saved.', 'progress-planner' ),
 				'points'  => $task_points, // We're using it when adding the new task to the todo list.
-				'ID'      => $task_id,
+				'ID'      => $post_id,
 			]
 		);
 	}
