@@ -27,4 +27,13 @@ abstract class Yoast_Provider extends One_Time {
 	 * @var bool
 	 */
 	protected const IS_ONBOARDING_TASK = false;
+
+	/**
+	 * Get the focus tasks.
+	 *
+	 * @return array
+	 */
+	public function get_focus_tasks() {
+		return [];
+	}
 }
