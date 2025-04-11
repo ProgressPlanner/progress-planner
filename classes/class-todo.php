@@ -148,12 +148,12 @@ class Todo {
 
 		$args = [
 			'post_title' => $title,
-			'post_type'  => 'prpl_suggested_task',
+			'post_type'  => 'prpl_recommendations',
 		];
 
 		$task_exists = false;
 		if ( $task_id ) {
-			$args['ID'] = $task_id;
+			$args['ID']  = $task_id;
 			$task_exists = true;
 		} else {
 			$args['post_status'] = 'publish';
@@ -171,12 +171,15 @@ class Todo {
 		if ( ! $task_exists ) {
 			$task_points = $this->calc_points_for_new_task();
 			\update_post_meta( $task_id, 'prpl_points', $task_points );
+			\wp_set_post_terms( $task_id, 'user', 'prpl_recommendations_provider' );
+			\wp_set_post_terms( $task_id, 'user', 'prpl_recommendations_category' );
 		}
 
 		\wp_send_json_success(
 			[
 				'message' => \esc_html__( 'Saved.', 'progress-planner' ),
 				'points'  => $task_points, // We're using it when adding the new task to the todo list.
+				'ID'      => $task_id,
 			]
 		);
 	}

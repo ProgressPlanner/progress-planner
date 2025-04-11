@@ -51,14 +51,14 @@ document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
 
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const todoItemElement = new Item( {
-		task_id: details.ID,
-		title: details.post_title,
-		points: details.points,
+		task_id: details?.ID,
+		title: details?.post_title || details?.title,
+		points: details?.points,
 		dismissable: true,
 		provider_id: 'user',
 		category: 'user',
 		snoozable: true,
-		order: details.order,
+		order: details?.order,
 		deletable: true,
 		useCheckbox: true,
 		taskList: 'progressPlannerTodo',
@@ -104,7 +104,6 @@ prplDocumentReady( () => {
 				parent: 0,
 				points: 0,
 				priority: 'medium',
-				task_id: 'user-task-' + prplGetRandomUUID(),
 				title: document.getElementById( 'new-todo-content' ).value,
 				provider_id: 'user',
 				category: 'user',
@@ -129,7 +128,7 @@ prplDocumentReady( () => {
 					document.dispatchEvent(
 						new CustomEvent( 'prpl/todo/injectItem', {
 							detail: {
-								item: newTask,
+								item: { ...newTask, ID: response.ID },
 								addToStart: 1 === newTask.points, // Add golden task to the start of the list.
 								listId: 'todo-list',
 							},
