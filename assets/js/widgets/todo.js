@@ -8,24 +8,6 @@
  */
 
 /**
- * Get a random UUID.
- *
- * @return {string} The random UUID.
- */
-const prplGetRandomUUID = () => {
-	if (
-		typeof crypto !== 'undefined' &&
-		typeof crypto.randomUUID === 'function'
-	) {
-		return crypto.randomUUID();
-	}
-	return (
-		Math.random().toString( 36 ).substring( 2, 15 ) +
-		Math.random().toString( 36 ).substring( 2, 15 )
-	);
-};
-
-/**
  * Get the highest `order` value from the todo items.
  *
  * @return {number} The highest `order` value.
@@ -51,8 +33,16 @@ document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
 
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const todoItemElement = new Item( {
-		...details,
+		task_id: details?.ID,
+		title: details?.post_title || details?.title,
+		points: details?.points,
+		dismissable: true,
+		provider_id: 'user',
+		category: 'user',
+		snoozable: true,
+		order: details?.order,
 		deletable: true,
+		useCheckbox: true,
 		taskList: 'progressPlannerTodo',
 	} );
 
@@ -96,7 +86,6 @@ prplDocumentReady( () => {
 				parent: 0,
 				points: 0,
 				priority: 'medium',
-				task_id: 'user-task-' + prplGetRandomUUID(),
 				title: document.getElementById( 'new-todo-content' ).value,
 				provider_id: 'user',
 				category: 'user',
@@ -121,7 +110,7 @@ prplDocumentReady( () => {
 					document.dispatchEvent(
 						new CustomEvent( 'prpl/todo/injectItem', {
 							detail: {
-								item: newTask,
+								item: { ...newTask, ID: response.ID },
 								addToStart: 1 === newTask.points, // Add golden task to the start of the list.
 								listId: 'todo-list',
 							},
@@ -158,7 +147,9 @@ document.addEventListener( 'prpl/suggestedTask/move', () => {
 		todoItemsIDs.push( todoItem.getAttribute( 'data-task-id' ) );
 		todoItem.setAttribute( 'data-task-order', order );
 		progressPlannerTodo.tasks.find(
-			( item ) => item.task_id === todoItem.getAttribute( 'data-task-id' )
+			( item ) =>
+				parseInt( item.ID ) ===
+				parseInt( todoItem.getAttribute( 'data-task-id' ) )
 		).order = order;
 		order++;
 	} );
