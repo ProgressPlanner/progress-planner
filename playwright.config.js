@@ -3,12 +3,11 @@ const { defineConfig, devices } = require( '@playwright/test' );
 module.exports = defineConfig( {
 	testDir: './tests/e2e',
 	timeout: 30000,
-	fullyParallel: false,
 	forbidOnly: !! process.env.CI,
 	retries: process.env.CI ? 2 : 0,
-	workers: 1,
 	reporter: 'html',
-	globalSetup: require.resolve( './tests/e2e/auth.setup.js' ),
+	globalSetup: './tests/e2e/auth.setup.js',
+	globalTeardown: './tests/e2e/auth.setup.js',
 	use: {
 		baseURL: process.env.WORDPRESS_URL || 'http://localhost:8080',
 		trace: 'on-first-retry',
@@ -17,8 +16,25 @@ module.exports = defineConfig( {
 	},
 	projects: [
 		{
-			name: 'chromium',
+			name: 'sequential',
 			use: { ...devices[ 'Desktop Chrome' ] },
+			testMatch: 'sequential.spec.js',
+			fullyParallel: false,
+			workers: 1,
+		},
+		{
+			name: 'parallel',
+			use: { ...devices[ 'Desktop Chrome' ] },
+			testIgnore: [
+				'onboarding.spec.js',
+				'task-tagline.spec.js',
+				'todo.spec.js',
+				'todo-reorder.spec.js',
+				'todo-complete.spec.js',
+				'sequential.spec.js',
+			],
+			fullyParallel: true,
+			workers: 4,
 		},
 	],
 } );
