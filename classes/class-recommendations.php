@@ -186,4 +186,15 @@ class Recommendations {
 
 		return $post;
 	}
+
+	/**
+	 * Delete a recommendation.
+	 *
+	 * @param int $id The recommendation ID.
+	 *
+	 * @return bool
+	 */
+	public function delete_recommendation( int $id ) {
+		return (bool) \wp_delete_post( $id, true );
+	}
 }

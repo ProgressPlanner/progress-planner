@@ -143,5 +143,7 @@ class Update_130 {
 
 			\update_post_meta( $post_id, "prpl_$key", $value );
 		}
+
+		\progress_planner()->get_settings()->set( 'local_tasks', [] );
 	}
 }
