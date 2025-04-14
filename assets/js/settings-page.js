@@ -1,10 +1,10 @@
-/* global alert, prplDocumentReady */
+/* global alert, prplDocumentReady, progressPlannerSettingsPage, progressPlannerAjaxRequest, prplL10n */
 /*
  * Settings Page
  *
  * A script to handle the settings page.
  *
- * Dependencies: progress-planner/document-ready, wp-util
+ * Dependencies: progress-planner/document-ready, wp-util, progress-planner/ajax-request, progress-planner/l10n
  */
 const prplTogglePageSelectorSettingVisibility = function ( page, value ) {
 	const itemRadiosWrapperEl = document.querySelector(
@@ -82,4 +82,109 @@ prplDocumentReady( function () {
 	document
 		.getElementById( 'prpl-settings' )
 		.addEventListener( 'submit', prplFormSubmit );
+} );
+
+/**
+ * API Status Manager
+ * Handles the display and state of the API status check
+ */
+class APIStatusManager {
+	/**
+	 * @param {string} wrapperSelector - The selector for the status wrapper element
+	 */
+	constructor( wrapperSelector ) {
+		this.wrapper = document.querySelector( wrapperSelector );
+	}
+
+	/**
+	 * Update the status text content
+	 * @param {string} text - The text to display
+	 */
+	updateStatusText( text ) {
+		const textElement = this.wrapper?.querySelector(
+			'.prpl-api-status-text'
+		);
+		if ( textElement ) {
+			textElement.textContent = text;
+		}
+	}
+
+	/**
+	 * Update the status classes
+	 * @param {string} status - The status class to add ('ok', 'error', 'checking')
+	 */
+	updateStatusClasses( status ) {
+		if ( ! this.wrapper ) {
+			return;
+		}
+
+		this.wrapper.classList.remove(
+			'prpl-api-status-ok',
+			'prpl-api-status-error',
+			'prpl-api-status-checking'
+		);
+		this.wrapper.classList.add( `prpl-api-status-${ status }` );
+	}
+
+	/**
+	 * Handle API response
+	 * @param {Object} response - The API response
+	 */
+	handleResponse( response ) {
+		if ( response.status === 'ok' && response.nonce ) {
+			this.updateStatusText( prplL10n( 'remoteAPIStatusOk' ) );
+			this.updateStatusClasses( 'ok' );
+		} else {
+			this.updateStatusText(
+				response?.message || prplL10n( 'remoteAPIStatusError' )
+			);
+			this.updateStatusClasses( 'error' );
+		}
+	}
+
+	/**
+	 * Handle API error
+	 * @param {Error} error - The error object
+	 */
+	handleError( error ) {
+		this.updateStatusText(
+			error?.message || prplL10n( 'remoteAPIStatusError' )
+		);
+		this.updateStatusClasses( 'error' );
+	}
+
+	/**
+	 * Check the API status
+	 */
+	checkStatus() {
+		if ( ! this.wrapper ) {
+			return;
+		}
+
+		this.updateStatusClasses( 'checking' );
+
+		progressPlannerAjaxRequest( {
+			url: progressPlannerSettingsPage.onboardNonceURL,
+			data: {
+				site: progressPlannerSettingsPage.siteUrl,
+			},
+		} )
+			.then( ( response ) => this.handleResponse( response ) )
+			.catch( ( error ) => this.handleError( error ) );
+	}
+}
+
+// Add click handler for API status check button
+prplDocumentReady( () => {
+	// Initialize the API status manager
+	const apiStatusManager = new APIStatusManager(
+		'.prpl-api-status-response-wrapper'
+	);
+
+	const statusButton = document.getElementById( 'prpl-setting-api-status' );
+	if ( statusButton ) {
+		statusButton.addEventListener( 'click', () =>
+			apiStatusManager.checkStatus()
+		);
+	}
 } );

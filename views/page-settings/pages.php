@@ -9,6 +9,8 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+$prpl_pages = progress_planner()->get_admin__page_settings()->get_settings();
 ?>
 
 <div class="prpl-column">
@@ -21,15 +23,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<?php esc_html_e( 'Your pages', 'progress-planner' ); ?>
 			</span>
 		</h2>
-		<p>
-			<?php esc_html_e( 'Let us know if you have following pages.', 'progress-planner' ); ?>
-		</p>
-		<div class="prpl-pages-list">
-			<?php
-			foreach ( \progress_planner()->get_admin__page_settings()->get_settings() as $prpl_setting ) {
-				\progress_planner()->the_view( "setting/{$prpl_setting['type']}.php", [ 'prpl_setting' => $prpl_setting ] );
-			}
-			?>
-		</div>
+
+		<?php if ( ! empty( $prpl_pages ) ) : ?>
+			<p>
+				<?php esc_html_e( 'Let us know if you have following pages.', 'progress-planner' ); ?>
+			</p>
+			<div class="prpl-pages-list">
+				<?php
+				foreach ( \progress_planner()->get_admin__page_settings()->get_settings() as $prpl_setting ) {
+					\progress_planner()->the_view( "setting/{$prpl_setting['type']}.php", [ 'prpl_setting' => $prpl_setting ] );
+				}
+				?>
+			</div>
+		<?php else : ?>
+			<p>
+				<?php esc_html_e( 'There might be a problem with loading your pages. Please try again later.', 'progress-planner' ); ?>
+			</p>
+		<?php endif; ?>
 	</div>
 </div>

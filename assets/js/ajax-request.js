@@ -14,12 +14,14 @@ const progressPlannerAjaxRequest = ( { url, data } ) => {
 		http.open( 'POST', url, true );
 		http.onreadystatechange = () => {
 			let response;
+
 			try {
 				response = JSON.parse( http.response );
 			} catch ( e ) {
 				if ( http.readyState === 4 && http.status !== 200 ) {
 					console.warn( http, e );
-					return http.response;
+					// Reject the promise with the response.
+					reject( response );
 				}
 			}
 

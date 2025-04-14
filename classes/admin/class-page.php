@@ -195,7 +195,10 @@ class Page {
 				[
 					'name' => 'progressPlannerSettingsPage',
 					'data' => [
-						'siteUrl' => \get_site_url(),
+						'siteUrl'         => \get_site_url(),
+						'onboardNonceURL' => \progress_planner()->get_utils__onboard()->get_remote_nonce_url(),
+						'onboardAPIUrl'   => \progress_planner()->get_utils__onboard()->get_remote_url(),
+						'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
 					],
 				]
 			);

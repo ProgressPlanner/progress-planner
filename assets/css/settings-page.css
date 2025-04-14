@@ -245,3 +245,69 @@
 		max-width: calc(100% - 2rem);
 	}
 }
+
+.prpl-api-status-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 1rem;
+
+	.prpl-api-status-controls {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+	}
+
+	.prpl-api-status-response-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+
+		svg {
+			width: 1rem;
+			height: 1rem;
+		}
+
+		.prpl-api-status-icon-ok,
+		.prpl-api-status-icon-error,
+		.prpl-api-status-icon-spinner,
+		.prpl-api-status-text {
+			display: none;
+		}
+
+		&.prpl-api-status-checking {
+
+			.prpl-api-status-icon-spinner {
+				display: inline-block;
+			}
+		}
+
+		&.prpl-api-status-ok {
+
+			.prpl-api-status-icon-spinner {
+				display: none;
+			}
+
+			.prpl-api-status-icon-ok,
+			.prpl-api-status-text {
+				display: inline-block;
+			}
+		}
+
+		&.prpl-api-status-error {
+
+			.prpl-api-status-icon-spinner {
+				display: none;
+			}
+
+			.prpl-api-status-icon-error,
+			.prpl-api-status-text {
+				display: inline-block;
+			}
+		}
+	}
+
+	input {
+		width: 20rem;
+		max-width: calc(100% - 2rem);
+	}
+}
