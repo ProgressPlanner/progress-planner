@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_pages = progress_planner()->get_admin__page_settings()->get_settings();
+$prpl_pages = \progress_planner()->get_admin__page_settings()->get_settings();
 ?>
 
 <div class="prpl-column">
@@ -30,7 +30,7 @@ $prpl_pages = progress_planner()->get_admin__page_settings()->get_settings();
 			</p>
 			<div class="prpl-pages-list">
 				<?php
-				foreach ( \progress_planner()->get_admin__page_settings()->get_settings() as $prpl_setting ) {
+				foreach ( $prpl_pages as $prpl_setting ) {
 					\progress_planner()->the_view( "setting/{$prpl_setting['type']}.php", [ 'prpl_setting' => $prpl_setting ] );
 				}
 				?>
