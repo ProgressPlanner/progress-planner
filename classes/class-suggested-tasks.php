@@ -626,7 +626,7 @@ class Suggested_Tasks {
 
 			case 'snooze':
 				$duration = isset( $_POST['duration'] ) ? \sanitize_text_field( \wp_unslash( $_POST['duration'] ) ) : '';
-				$updated  = $this->snooze_task( $task_id, $duration );
+				$updated  = \progress_planner()->get_recommendations()->snooze_recommendation( (int) $task_id, $duration );
 				break;
 
 			case 'delete':

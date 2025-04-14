@@ -197,4 +197,48 @@ class Recommendations {
 	public function delete_recommendation( int $id ) {
 		return (bool) \wp_delete_post( $id, true );
 	}
+
+	/**
+	 * Snooze a recommendation.
+	 *
+	 * @param int    $id       The recommendation ID.
+	 * @param string $duration The duration to snooze the recommendation.
+	 *
+	 * @return bool
+	 */
+	public function snooze_recommendation( int $id, string $duration ) {
+		switch ( $duration ) {
+			case '1-month':
+				$new_date = \strtotime( '+1 month' );
+				break;
+
+			case '3-months':
+				$new_date = \strtotime( '+3 months' );
+				break;
+
+			case '6-months':
+				$new_date = \strtotime( '+6 months' );
+				break;
+
+			case '1-year':
+				$new_date = \strtotime( '+1 year' );
+				break;
+
+			case 'forever':
+				$new_date = \strtotime( '+10 years' );
+				break;
+
+			default:
+				$new_date = \strtotime( '+1 week' );
+				break;
+		}
+
+		return (bool) \wp_update_post(
+			[
+				'ID'          => $id,
+				'post_status' => 'future',
+				'post_date'   => \gmdate( 'Y-m-d H:i:s', $new_date ),
+			]
+		);
+	}
 }
