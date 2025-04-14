@@ -63,6 +63,7 @@ class Settings_Saved extends One_Time {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return false === \get_option( 'progress_planner_pro_license_key', false );
+		$prpl_pages = \progress_planner()->get_admin__page_settings()->get_settings();
+		return false === \get_option( 'progress_planner_pro_license_key', false ) && ! empty( $prpl_pages );
 	}
 }
