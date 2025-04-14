@@ -55,7 +55,7 @@ body:
     id: capability
     attributes:
       label: Required Capability
-      description: If you know: the WordPress capability required to perform this recommendation (e.g., manage_options, edit_others_posts)
+      description: "If you know: the WordPress capability required to perform this recommendation, e.g., manage_options, edit_others_posts"
       placeholder: "e.g., manage_options"
     validations:
       required: false
@@ -75,7 +75,7 @@ body:
     id: points
     attributes:
       label: Points to Award
-      description: How many points should be awarded for completing this recommendation? (Default is 1)
+      description: How many points should be awarded for completing this recommendation? The default is 1.
       placeholder: "1"
     validations:
       required: true
@@ -118,5 +118,7 @@ body:
     id: additional_info
     attributes:
       label: Additional Information
-      description: Any other relevant information about this recommendation (optional)
+      description: Any other relevant information about this recommendation - optional -
       placeholder: "Add any additional context or requirements here..." 
+    validations:
+      required: false
