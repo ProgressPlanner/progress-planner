@@ -1,7 +1,7 @@
-name: New Task Recommendation
+name: New recommendation
 description: Suggest a new recommendation to be added to the Progress Planner
 title: "[Recommendation] "
-labels: ["enhancement", "task"]
+labels: ["enhancement", "recommendation"]
 body:
   - type: markdown
     attributes:
@@ -13,7 +13,7 @@ body:
   - type: input
     id: title
     attributes:
-      label: Recommendation Title
+      label: Recommendation title
       description: A clear, concise title for the recommendation
       placeholder: "e.g., Update WordPress Core"
     validations:
@@ -22,7 +22,7 @@ body:
   - type: textarea
     id: description
     attributes:
-      label: Recommendation Description
+      label: Recommendation description
       description: A detailed description of what the recommendation entails
       placeholder: "Describe what needs to be done to complete this recommendation..."
     validations:
@@ -31,7 +31,7 @@ body:
   - type: dropdown
     id: category
     attributes:
-      label: Recommendation Category
+      label: Recommendation category
       description: Select the most appropriate category for this recommendation
       options:
         - content-update
@@ -45,7 +45,7 @@ body:
   - type: input
     id: other_category
     attributes:
-      label: Other Category
+      label: Other category
       description: If you selected "other", please specify the category
       placeholder: "Specify the category"
     validations:
@@ -54,7 +54,7 @@ body:
   - type: input
     id: capability
     attributes:
-      label: Required Capability
+      label: Required capability
       description: "If you know: the WordPress capability required to perform this recommendation, e.g., manage_options, edit_others_posts"
       placeholder: "e.g., manage_options"
     validations:
@@ -63,27 +63,27 @@ body:
   - type: dropdown
     id: onboarding
     attributes:
-      label: Onboarding Recommendation
+      label: Onboarding recommendation
       description: Is this recommendation part of the initial setup/onboarding process?
       options:
-        - "true"
         - "false"
+        - "true"
     validations:
       required: true
 
   - type: input
     id: points
     attributes:
-      label: Points to Award
+      label: Points to award
       description: How many points should be awarded for completing this recommendation? The default is 1.
-      placeholder: "1"
+      value: "1"
     validations:
       required: true
 
   - type: dropdown
     id: priority
     attributes:
-      label: Recommendation Priority
+      label: Recommendation priority
       description: How important is this recommendation?
       options:
         - low
