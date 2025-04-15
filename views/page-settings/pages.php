@@ -37,7 +37,7 @@ $prpl_pages = \progress_planner()->get_admin__page_settings()->get_settings();
 			</div>
 		<?php else : ?>
 			<p>
-				<?php esc_html_e( 'There might be a problem with loading your pages. Please try again later.', 'progress-planner' ); ?>
+				<?php esc_html_e( 'There seems to be a problem with loading page types from our server. Please try again later.', 'progress-planner' ); ?>
 			</p>
 		<?php endif; ?>
 	</div>
