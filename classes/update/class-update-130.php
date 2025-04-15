@@ -20,15 +20,15 @@ class Update_130 {
 	 * @return void
 	 */
 	public function run() {
-		$this->add_upgraded_from_v1_2_option();
+		$this->add_set_valuable_post_types_option();
 	}
 
 	/**
-	 * Add the upgraded from v1.2 option.
+	 * Add the set valuable post types option.
 	 *
 	 * @return void
 	 */
-	private function add_upgraded_from_v1_2_option() {
-		\update_option( 'progress_planner_upgraded_from_v1_2', true );
+	private function add_set_valuable_post_types_option() {
+		\update_option( 'progress_planner_set_valuable_post_types', true );
 	}
 }

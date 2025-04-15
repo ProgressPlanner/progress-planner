@@ -50,8 +50,8 @@ class Set_Valuable_Post_Types extends One_Time {
 	 * @return void
 	 */
 	public function remove_upgrade_option() {
-		if ( true === (bool) \get_option( 'progress_planner_upgraded_from_v1_2', false ) ) {
-			\delete_option( 'progress_planner_upgraded_from_v1_2' );
+		if ( true === (bool) \get_option( 'progress_planner_set_valuable_post_types', false ) ) {
+			\delete_option( 'progress_planner_set_valuable_post_types' );
 		}
 	}
 
@@ -86,7 +86,7 @@ class Set_Valuable_Post_Types extends One_Time {
 	public function should_add_task() {
 
 		// Upgraded?
-		$upgraded = (bool) \get_option( 'progress_planner_upgraded_from_v1_2', false );
+		$upgraded = (bool) \get_option( 'progress_planner_set_valuable_post_types', false );
 
 		// If the user has not upgraded, don't add the task.
 		if ( false === $upgraded ) {
@@ -111,6 +111,6 @@ class Set_Valuable_Post_Types extends One_Time {
 	 * @return bool
 	 */
 	public function is_task_completed() {
-		return false === \get_option( 'progress_planner_upgraded_from_v1_2', false );
+		return false === \get_option( 'progress_planner_set_valuable_post_types', false );
 	}
 }
