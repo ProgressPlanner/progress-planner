@@ -23,7 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</h2>
 		<div class="prpl-api-status-wrapper">
 			<label for="prpl-setting-api-status">
-				<?php \esc_html_e( 'Ping our server and check the status API status.', 'progress-planner' ); ?>
+				<?php \esc_html_e( 'Ping our server and check the API status.', 'progress-planner' ); ?>
 			</label>
 			<div class="prpl-api-status-controls">
 				<input
