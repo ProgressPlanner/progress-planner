@@ -110,4 +110,24 @@ class Settings {
 		self::$settings = [];
 		return $this->save_settings();
 	}
+
+	/**
+	 * Get an array of post-types names for the stats.
+	 *
+	 * @return string[]
+	 */
+	public function get_post_types_names() {
+		static $include_post_types;
+		if ( isset( $include_post_types ) && ! empty( $include_post_types ) ) {
+			return $include_post_types;
+		}
+		$default            = [ 'post', 'page' ];
+		$include_post_types = \array_filter(
+			\progress_planner()->get_settings()->get( [ 'include_post_types' ], $default ),
+			function ( $post_type ) {
+				return $post_type && \post_type_exists( $post_type ) && \is_post_type_viewable( $post_type );
+			}
+		);
+		return empty( $include_post_types ) ? $default : \array_values( $include_post_types );
+	}
 }
