@@ -94,8 +94,6 @@ if ( is_numeric( $prpl_setting_value ) && 0 < $prpl_setting_value ) {
 								</a>
 							</div>
 						<?php endif; ?>
-
-
 					</div>
 				<?php endforeach; ?>
 			</div>
