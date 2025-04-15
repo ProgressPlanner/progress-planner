@@ -81,7 +81,6 @@ class Last_Published_Post extends Base_Data_Collector {
 		if ( ! empty( $last_created_posts ) ) {
 			$data = [
 				'post_id'   => $last_created_posts[0]->ID,
-				'long'      => \progress_planner()->get_activities__content_helpers()->is_post_long( $last_created_posts[0]->ID ) ? true : false,
 				'post_date' => $last_created_posts[0]->post_date,
 			];
 		}
