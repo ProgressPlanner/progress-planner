@@ -36,6 +36,26 @@ class Set_Valuable_Post_Types extends One_Time {
 	}
 
 	/**
+	 * Initialize the task provider.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		\add_action( 'progress_planner_settings_form_options_stored', [ $this, 'remove_upgrade_option' ] );
+	}
+
+	/**
+	 * Remove the upgrade option.
+	 *
+	 * @return void
+	 */
+	public function remove_upgrade_option() {
+		if ( true === (bool) \get_option( 'progress_planner_upgraded_from_v1_2', false ) ) {
+			\delete_option( 'progress_planner_upgraded_from_v1_2' );
+		}
+	}
+
+	/**
 	 * Get the title.
 	 *
 	 * @return string
@@ -66,7 +86,7 @@ class Set_Valuable_Post_Types extends One_Time {
 	public function should_add_task() {
 
 		// Upgraded?
-		$upgraded = \get_option( 'progress_planner_upgraded_from_v1_2', false );
+		$upgraded = (bool) \get_option( 'progress_planner_upgraded_from_v1_2', false );
 
 		// If the user has not upgraded, don't add the task.
 		if ( false === $upgraded ) {
@@ -80,6 +100,17 @@ class Set_Valuable_Post_Types extends One_Time {
 		}
 
 		// Add the task only to users who have completed the "Settings saved" task and have upgraded from v1.2.
-		return 'completed' === $settings_saved_task[0]['status'] && true === $upgraded;
+		return 'completed' === $settings_saved_task[0]['status'];
+	}
+
+	/**
+	 * Check if the task is completed.
+	 * We are checking the 'is_task_completed' method only if the task was added previously.
+	 * If it was and the option is not set it means that user has completed the task.
+	 *
+	 * @return bool
+	 */
+	public function is_task_completed() {
+		return false === \get_option( 'progress_planner_upgraded_from_v1_2', false );
 	}
 }
