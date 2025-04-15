@@ -324,15 +324,16 @@ class Review extends Repetitive {
 		$args = wp_parse_args(
 			$args,
 			[
-				'posts_per_page' => static::ITEMS_TO_INJECT,
-				'post_type'      => [ 'page', 'post' ],
-				'post_status'    => 'publish',
-				'orderby'        => 'modified',
-				'order'          => 'ASC',
-				'date_query'     => [
+				'posts_per_page'      => static::ITEMS_TO_INJECT,
+				'post_type'           => [ 'page', 'post' ],
+				'post_status'         => 'publish',
+				'orderby'             => 'modified',
+				'order'               => 'ASC',
+				'ignore_sticky_posts' => true,
+				'date_query'          => [
 					[
 						'column' => 'post_modified',
-						'before' => '-6 months',
+						'before' => '-12 months',
 					],
 				],
 			]
@@ -348,6 +349,27 @@ class Review extends Repetitive {
 		// Get the post that was updated last.
 		$posts = \get_posts( $args );
 
+		// Get the pages saved in the settings that have not been updated in the last 6 months.
+		$pages_to_update = \get_posts(
+			[
+				'post_type'           => 'any',
+				'post_status'         => 'publish',
+				'orderby'             => 'modified',
+				'order'               => 'ASC',
+				'ignore_sticky_posts' => true,
+				'date_query'          => [
+					[
+						'column' => 'post_modified',
+						'before' => '-6 months',
+					],
+				],
+				'post__in'            => $this->get_saved_page_types(),
+			]
+		);
+
+		// Merge the posts & pages to update. Put the pages first.
+		$posts = array_merge( $pages_to_update, $posts );
+
 		return $posts ? $posts : [];
 	}
 
@@ -359,14 +381,17 @@ class Review extends Repetitive {
 	 * @return array
 	 */
 	public function filter_update_posts_args( $args ) {
-		$snoozed_post_ids = $this->get_snoozed_post_ids();
-
-		if ( ! empty( $snoozed_post_ids ) ) {
-			if ( ! isset( $args['post__not_in'] ) ) {
-				$args['post__not_in'] = [];
-			}
-			$args['post__not_in'] = array_merge( $args['post__not_in'], $snoozed_post_ids );
+		if ( ! isset( $args['post__not_in'] ) ) {
+			$args['post__not_in'] = [];
 		}
+
+		$args['post__not_in'] = array_merge(
+			$args['post__not_in'],
+			// Add the snoozed post IDs to the post__not_in array.
+			$this->get_snoozed_post_ids(),
+			// Add the saved page-types to the post__not_in array.
+			$this->get_saved_page_types()
+		);
 
 		return $args;
 	}
@@ -394,6 +419,23 @@ class Review extends Repetitive {
 		}
 
 		return $this->snoozed_post_ids;
+	}
+
+	/**
+	 * Get the saved page-types.
+	 *
+	 * @return int[]
+	 */
+	protected function get_saved_page_types() {
+		$ids = [];
+		// Add the saved page-types to the post__not_in array.
+		$page_types = \progress_planner()->get_admin__page_settings()->get_settings();
+		foreach ( $page_types as $page_type ) {
+			if ( isset( $page_type['value'] ) && 0 !== (int) $page_type['value'] ) {
+				$ids[] = (int) $page_type['value'];
+			}
+		}
+		return $ids;
 	}
 
 	/**
