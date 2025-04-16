@@ -20,7 +20,7 @@ unset( $prpl_post_types['elementor_library'] ); // Elementor templates are not a
 	<div class="prpl-widget-wrapper">
 		<h2 class="prpl-settings-section-title">
 			<span class="icon">
-				<?php \progress_planner()->the_asset( 'images/icon_pages.svg' ); ?>
+				<?php \progress_planner()->the_asset( 'images/icon_copywriting.svg' ); ?>
 			</span>
 			<span>
 				<?php esc_html_e( 'Valuable post types', 'progress-planner' ); ?>
