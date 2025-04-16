@@ -349,26 +349,30 @@ class Review extends Repetitive {
 		// Get the post that was updated last.
 		$posts = \get_posts( $args );
 
-		// Get the pages saved in the settings that have not been updated in the last 6 months.
-		$pages_to_update = \get_posts(
-			[
-				'post_type'           => 'any',
-				'post_status'         => 'publish',
-				'orderby'             => 'modified',
-				'order'               => 'ASC',
-				'ignore_sticky_posts' => true,
-				'date_query'          => [
-					[
-						'column' => 'post_modified',
-						'before' => '-6 months',
-					],
-				],
-				'post__in'            => $this->get_saved_page_types(),
-			]
-		);
+		$saved_page_type_ids = $this->get_saved_page_types();
 
-		// Merge the posts & pages to update. Put the pages first.
-		$posts = array_merge( $pages_to_update, $posts );
+		if ( ! empty( $saved_page_type_ids ) ) {
+			// Get the pages saved in the settings that have not been updated in the last 6 months.
+			$pages_to_update = \get_posts(
+				[
+					'post_type'           => 'any',
+					'post_status'         => 'publish',
+					'orderby'             => 'modified',
+					'order'               => 'ASC',
+					'ignore_sticky_posts' => true,
+					'date_query'          => [
+						[
+							'column' => 'post_modified',
+							'before' => '-6 months',
+						],
+					],
+					'post__in'            => $saved_page_type_ids,
+				]
+			);
+
+			// Merge the posts & pages to update. Put the pages first.
+			$posts = array_merge( $pages_to_update, $posts );
+		}
 
 		return $posts ? $posts : [];
 	}
