@@ -363,9 +363,9 @@ class Review extends Repetitive {
 		$posts = \get_posts( $args );
 
 		// Get the pages saved in the settings that have not been updated in the last 6 months.
-		$saved_page_types = $this->get_saved_page_types();
+		$saved_page_type_ids = $this->get_saved_page_types();
 
-		if ( ! empty( $saved_page_types ) ) {
+		if ( ! empty( $saved_page_type_ids ) ) {
 			$pages_to_update = \get_posts(
 				[
 					'post_type'           => 'any',
@@ -379,7 +379,7 @@ class Review extends Repetitive {
 							'before' => '-6 months',
 						],
 					],
-					'post__in'            => $saved_page_types,
+					'post__in'            => $saved_page_type_ids,
 				]
 			);
 
