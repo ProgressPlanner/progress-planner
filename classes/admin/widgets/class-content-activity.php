@@ -8,16 +8,16 @@
 namespace Progress_Planner\Admin\Widgets;
 
 /**
- * Published_Content class.
+ * Content_Activity class.
  */
-final class Published_Content extends Widget {
+final class Content_Activity extends Widget {
 
 	/**
 	 * The widget ID.
 	 *
 	 * @var string
 	 */
-	protected $id = 'published-content';
+	protected $id = 'content-activity';
 
 	/**
 	 * Get the chart args.

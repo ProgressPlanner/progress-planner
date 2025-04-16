@@ -9,7 +9,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_widget = \progress_planner()->get_admin__widgets__published_content();
+$prpl_widget = \progress_planner()->get_admin__widgets__content_activity();
 
 $prpl_activities_count = [
 	'publish' => count(
