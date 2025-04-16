@@ -62,11 +62,13 @@ final class Published_Content extends Widget {
 	/**
 	 * Get the chart args.
 	 *
+	 * @param string $type The type of content activity for the query.
+	 *
 	 * @return array The chart args.
 	 */
-	public function get_chart_args_content_count() {
+	public function get_chart_args_content_count( $type = 'publish' ) {
 		return array_merge(
-			$this->get_chart_args(),
+			$this->get_chart_args( $type ),
 			[
 				'count_callback' => function ( $activities, $date = null ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 					return count( $activities );
@@ -78,16 +80,18 @@ final class Published_Content extends Widget {
 	/**
 	 * Get the chart args.
 	 *
+	 * @param string $type The type of content activity for the query.
+	 *
 	 * @return array The chart args.
 	 */
-	public function get_chart_args() {
+	public function get_chart_args( $type = 'publish' ) {
 		return [
 			'type'           => 'line',
-			'items_callback' => function ( $start_date, $end_date ) {
+			'items_callback' => function ( $start_date, $end_date ) use ( $type ) {
 				return \progress_planner()->get_activities__query()->query_activities(
 					[
 						'category'   => 'content',
-						'type'       => 'publish',
+						'type'       => $type,
 						'start_date' => $start_date,
 						'end_date'   => $end_date,
 					]

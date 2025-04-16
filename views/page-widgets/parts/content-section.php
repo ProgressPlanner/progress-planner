@@ -10,7 +10,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 <prpl-big-counter
-	number="<?php echo \esc_html( \number_format_i18n( (int) array_sum( $prpl_big_counter_args['number'] ) ) ); ?>"
+	number="<?php echo \esc_html( \number_format_i18n( (int) $prpl_big_counter_args['number'] ) ); ?>"
 	content="<?php echo \esc_attr( $prpl_big_counter_args['content'] ); ?>"
 	background-color="<?php echo \esc_attr( $prpl_big_counter_args['background-color'] ); ?>"
 ></prpl-big-counter>
