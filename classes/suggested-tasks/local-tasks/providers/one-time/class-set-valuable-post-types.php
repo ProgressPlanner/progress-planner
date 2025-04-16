@@ -80,6 +80,7 @@ class Set_Valuable_Post_Types extends One_Time {
 	/**
 	 * Check if the task should be added.
 	 * We add tasks only to users who have upgraded from v1.2 and have completed the settings saved task.
+	 * Reason being that this option was migrated, but it could be missed, and post type selection should be revisited.
 	 *
 	 * @return bool
 	 */
@@ -93,7 +94,7 @@ class Set_Valuable_Post_Types extends One_Time {
 			return false;
 		}
 
-		// Check the "Settings saved" task, if the has not been added don't add the task.
+		// Check the "Settings saved" task, if the has not been added as 'pending' don't add the task.
 		$settings_saved_task = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', 'settings-saved' );
 		if ( empty( $settings_saved_task ) ) {
 			return false;
