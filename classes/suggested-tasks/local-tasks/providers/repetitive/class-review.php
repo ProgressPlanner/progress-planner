@@ -72,6 +72,20 @@ class Review extends Repetitive {
 	protected $task_post_mappings = null;
 
 	/**
+	 * The include post types.
+	 *
+	 * @var string[]
+	 */
+	protected $include_post_types;
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		$this->include_post_types = \progress_planner()->get_settings()->get( 'include_post_types', [ 'post', 'page' ] ); // TODO: We might add helper for default values.
+	}
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -325,7 +339,7 @@ class Review extends Repetitive {
 			$args,
 			[
 				'posts_per_page' => static::ITEMS_TO_INJECT,
-				'post_type'      => [ 'page', 'post' ],
+				'post_type'      => $this->include_post_types,
 				'post_status'    => 'publish',
 				'orderby'        => 'modified',
 				'order'          => 'ASC',
@@ -347,6 +361,31 @@ class Review extends Repetitive {
 
 		// Get the post that was updated last.
 		$posts = \get_posts( $args );
+
+		// Get the pages saved in the settings that have not been updated in the last 6 months.
+		$saved_page_types = $this->get_saved_page_types();
+
+		if ( ! empty( $saved_page_types ) ) {
+			$pages_to_update = \get_posts(
+				[
+					'post_type'           => 'any',
+					'post_status'         => 'publish',
+					'orderby'             => 'modified',
+					'order'               => 'ASC',
+					'ignore_sticky_posts' => true,
+					'date_query'          => [
+						[
+							'column' => 'post_modified',
+							'before' => '-6 months',
+						],
+					],
+					'post__in'            => $saved_page_types,
+				]
+			);
+
+			// Merge the posts & pages to update. Put the pages first.
+			$posts = array_merge( $pages_to_update, $posts );
+		}
 
 		return $posts ? $posts : [];
 	}
@@ -394,6 +433,23 @@ class Review extends Repetitive {
 		}
 
 		return $this->snoozed_post_ids;
+	}
+
+	/**
+	 * Get the saved page-types.
+	 *
+	 * @return int[]
+	 */
+	protected function get_saved_page_types() {
+		$ids = [];
+		// Add the saved page-types to the post__not_in array.
+		$page_types = \progress_planner()->get_admin__page_settings()->get_settings();
+		foreach ( $page_types as $page_type ) {
+			if ( isset( $page_type['value'] ) && 0 !== (int) $page_type['value'] ) {
+				$ids[] = (int) $page_type['value'];
+			}
+		}
+		return $ids;
 	}
 
 	/**
