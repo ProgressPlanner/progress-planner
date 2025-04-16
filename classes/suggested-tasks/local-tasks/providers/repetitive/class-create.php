@@ -66,7 +66,7 @@ class Create extends Repetitive {
 	 * @return string
 	 */
 	public function get_description() {
-		return esc_html__( 'Create a new, relevant content.', 'progress-planner' );
+		return esc_html__( 'Time to add more valuable content to your site! Check our blog for inspiration.', 'progress-planner' );
 	}
 
 	/**
