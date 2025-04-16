@@ -20,46 +20,6 @@ final class Published_Content extends Widget {
 	protected $id = 'published-content';
 
 	/**
-	 * Get stats for posts, by post-type.
-	 *
-	 * @return array The stats.
-	 */
-	public function get_stats() {
-		static $stats;
-		if ( null !== $stats ) {
-			return $stats;
-		}
-		$post_types = \progress_planner()->get_activities__content_helpers()->get_post_types_names();
-		$weekly     = [];
-		$all        = [];
-		foreach ( $post_types as $post_type ) {
-			// Get the content published this week.
-			$weekly[ $post_type ] = count(
-				\get_posts(
-					[
-						'post_status'    => 'publish',
-						'post_type'      => $post_type,
-						'date_query'     => [
-							[
-								'after' => '1 week ago',
-							],
-						],
-						'posts_per_page' => 100,
-					]
-				)
-			);
-			// Get the total number of posts for this post-type.
-			$all[ $post_type ] = \wp_count_posts( $post_type )->publish;
-		}
-
-		$stats = [
-			'weekly' => $weekly,
-			'all'    => $all,
-		];
-		return $stats;
-	}
-
-	/**
 	 * Get the chart args.
 	 *
 	 * @return array The chart args.
@@ -118,26 +78,5 @@ final class Published_Content extends Widget {
 					&& \in_array( $post->post_type, \progress_planner()->get_activities__content_helpers()->get_post_types_names(), true );
 			}
 		);
-	}
-
-	/**
-	 * Callback to count the words in the activities.
-	 *
-	 * @param \Progress_Planner\Activities\Content[] $activities The activities array.
-	 *
-	 * @return int
-	 */
-	public function count_words( $activities ) {
-		$words = 0;
-		foreach ( $activities as $activity ) {
-			if ( null === $activity->get_post() ) {
-				continue;
-			}
-			$words += \progress_planner()->get_activities__content_helpers()->get_word_count(
-				$activity->get_post()->post_content,
-				(int) $activity->data_id
-			);
-		}
-		return $words;
 	}
 }
