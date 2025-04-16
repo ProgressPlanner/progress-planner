@@ -11,115 +11,138 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $prpl_widget = \progress_planner()->get_admin__widgets__published_content();
 
-\progress_planner()->the_view(
-	'page-widgets/parts/content-section.php',
-	[
-		'prpl_big_counter_args' => [
-			'number'           => $prpl_widget->get_stats()['weekly'],
-			'content'          => __( 'content published', 'progress-planner' ),
-			'background-color' => 'var(--prpl-background-purple)',
-		],
-		'prpl_sum_weekly'       => [
-			'number'  => array_sum( $prpl_widget->get_stats()['weekly'] ),
-			'content' => [
-				__( 'You didn\'t publish new content last week. You can do better!', 'progress-planner' ),
-				sprintf(
-					\esc_html(
-						/* translators: %1$s: number of posts/pages published this week + "pieces". %2$s: Total number of posts. */
-						\_n(
-							'Nice! You published %1$s piece of new content last week. You now have %2$s in total. Keep up the good work!',
-							'Nice! You published %1$s pieces of new content last week. You now have %2$s in total. Keep up the good work!',
-							array_sum( $prpl_widget->get_stats()['weekly'] ),
-							'progress-planner'
-						)
-					),
-					\esc_html( \number_format_i18n( array_sum( $prpl_widget->get_stats()['weekly'] ) ) ),
-					\esc_html( \number_format_i18n( array_sum( $prpl_widget->get_stats()['all'] ) ) )
+$prpl_activities_count = [
+	'publish' => count(
+		\progress_planner()->get_activities__query()->query_activities(
+			[
+				'category'   => 'content',
+				'type'       => 'publish',
+				'start_date' => \gmdate( 'Y-m-d', \strtotime( '-1 week' ) ),
+				'end_date'   => \gmdate( 'Y-m-d' ),
+			]
+		)
+	),
+	'update'  => count(
+		\progress_planner()->get_activities__query()->query_activities(
+			[
+				'category'   => 'content',
+				'type'       => 'update',
+				'start_date' => \gmdate( 'Y-m-d', \strtotime( '-1 week' ) ),
+				'end_date'   => \gmdate( 'Y-m-d' ),
+			]
+		)
+	),
+	'delete'  => count(
+		\progress_planner()->get_activities__query()->query_activities(
+			[
+				'category'   => 'content',
+				'type'       => 'delete',
+				'start_date' => \gmdate( 'Y-m-d', \strtotime( '-1 week' ) ),
+				'end_date'   => \gmdate( 'Y-m-d' ),
+			]
+		)
+	),
+];
+
+?>
+
+<h2 class="prpl-widget-title">
+	<?php \esc_html_e( 'Content activity', 'progress-planner' ); ?>
+</h2>
+
+<div class="prpl-graph-wrapper">
+	<?php \progress_planner()->get_ui__chart()->the_chart( $prpl_widget->get_chart_args_content_count() ); ?>
+</div>
+
+<p><?php \esc_html_e( 'Overall content activity', 'progress-planner' ); ?></p>
+
+<!-- Published content. -->
+<prpl-big-counter
+	number="<?php echo \esc_html( \number_format_i18n( (int) $prpl_activities_count['publish'] ) ); ?>"
+	content="<?php \esc_attr_e( 'content published', 'progress-planner' ); ?>"
+	background-color="var(--prpl-background-purple)"
+></prpl-big-counter>
+
+<div class="prpl-widget-content">
+	<p>
+		<?php if ( 0 === $prpl_activities_count['publish'] ) : ?>
+			<?php \esc_html_e( 'You didn\'t publish new content last week. You can do better!', 'progress-planner' ); ?>
+		<?php else : ?>
+			<?php
+			printf(
+				\esc_html(
+					/* translators: %1$s: number of posts/pages published this week + "pieces". */
+					\_n(
+						'Nice! You published %1$s piece of new content last week. Keep up the good work!',
+						'Nice! You published %1$s pieces of new content last week. Keep up the good work!',
+						(int) $prpl_activities_count['publish'],
+						'progress-planner'
+					)
 				),
-			],
-		],
-		'prpl_chart_args'       => $prpl_widget->get_chart_args_content_count( 'publish' ),
-	]
-);
+				\esc_html( \number_format_i18n( (int) $prpl_activities_count['publish'] ) ),
+			);
+			?>
+		<?php endif; ?>
+	</p>
+</div>
 
-$prpl_updated_content_count = count(
-	\progress_planner()->get_activities__query()->query_activities(
-		[
-			'category'   => 'content',
-			'type'       => 'update',
-			'start_date' => \gmdate( 'Y-m-d', \strtotime( '-1 week' ) ),
-			'end_date'   => \gmdate( 'Y-m-d' ),
-		]
-	)
-);
+<!-- Updated content. -->
+<prpl-big-counter
+	number="<?php echo \esc_html( \number_format_i18n( (int) $prpl_activities_count['update'] ) ); ?>"
+	content="<?php \esc_attr_e( 'content updated', 'progress-planner' ); ?>"
+	background-color="var(--prpl-background-purple)"
+></prpl-big-counter>
 
-\progress_planner()->the_view(
-	'page-widgets/parts/content-section.php',
-	[
-		'prpl_big_counter_args' => [
-			'number'           => $prpl_updated_content_count,
-			'content'          => __( 'content updated', 'progress-planner' ),
-			'background-color' => 'var(--prpl-background-purple)',
-		],
-		'prpl_sum_weekly'       => [
-			'number'  => $prpl_updated_content_count,
-			'content' => [
-				__( 'You did not update any content last week. You can do better!', 'progress-planner' ),
-				sprintf(
-					\esc_html(
-						/* translators: %1$s: number of posts/pages updated this week. */
-						\_n(
-							'Nice! You updated %1$d piece of content last week. Keep up the good work!',
-							'Nice! You updated %1$d pieces of content last week. Keep up the good work!',
-							$prpl_updated_content_count,
-							'progress-planner'
-						)
-					),
-					\esc_html( \number_format_i18n( $prpl_updated_content_count ) )
+<div class="prpl-widget-content">
+	<p>
+		<?php if ( 0 === $prpl_activities_count['update'] ) : ?>
+			<?php \esc_html_e( 'You didn\'t update any content last week. You can do better!', 'progress-planner' ); ?>
+		<?php else : ?>
+			<?php
+			printf(
+				\esc_html(
+					/* translators: %1$s: number of posts/pages updated this week. */
+					\_n(
+						'Nice! You updated %1$d piece of content last week. Keep up the good work!',
+						'Nice! You updated %1$d pieces of content last week. Keep up the good work!',
+						(int) $prpl_activities_count['update'],
+						'progress-planner'
+					)
 				),
-			],
-		],
-		'prpl_chart_args'       => $prpl_widget->get_chart_args_content_count( 'update' ),
-	]
-);
+				\esc_html( \number_format_i18n( (int) $prpl_activities_count['update'] ) ),
+			);
+			?>
+		<?php endif; ?>
+	</p>
+</div>
 
-$prpl_deleted_content_count = count(
-	\progress_planner()->get_activities__query()->query_activities(
-		[
-			'category'   => 'content',
-			'type'       => 'delete',
-			'start_date' => \gmdate( 'Y-m-d', \strtotime( '-1 week' ) ),
-			'end_date'   => \gmdate( 'Y-m-d' ),
-		]
-	)
-);
+<!-- Deleted content. -->
+<prpl-big-counter
+	number="<?php echo \esc_html( \number_format_i18n( (int) $prpl_activities_count['delete'] ) ); ?>"
+	content="<?php \esc_attr_e( 'content deleted', 'progress-planner' ); ?>"
+	background-color="var(--prpl-background-purple)"
+></prpl-big-counter>
 
-\progress_planner()->the_view(
-	'page-widgets/parts/content-section.php',
-	[
-		'prpl_big_counter_args' => [
-			'number'           => $prpl_deleted_content_count,
-			'content'          => __( 'content deleted', 'progress-planner' ),
-			'background-color' => 'var(--prpl-background-purple)',
-		],
-		'prpl_sum_weekly'       => [
-			'number'  => $prpl_deleted_content_count,
-			'content' => [
-				__( 'You did not delete any content last week. You can do better!', 'progress-planner' ),
-				sprintf(
-					\esc_html(
-						/* translators: %1$s: number of posts/pages updated this week. */
-						\_n(
-							'Nice! You deleted %1$d piece of content last week. Keep up the good work!',
-							'Nice! You deleted %1$d pieces of content last week. Keep up the good work!',
-							$prpl_deleted_content_count,
-							'progress-planner'
-						)
-					),
-					\esc_html( \number_format_i18n( $prpl_deleted_content_count ) )
+<div class="prpl-widget-content">
+	<p>
+		<?php if ( 0 === $prpl_activities_count['delete'] ) : ?>
+			<?php \esc_html_e( 'You didn\'t delete any content last week. You can do better!', 'progress-planner' ); ?>
+		<?php else : ?>
+			<?php
+			printf(
+				\esc_html(
+					/* translators: %1$s: number of posts/pages updated this week. */
+					\_n(
+						'Nice! You deleted %1$d piece of content last week. Keep up the good work!',
+						'Nice! You deleted %1$d pieces of content last week. Keep up the good work!',
+						(int) $prpl_activities_count['delete'],
+						'progress-planner'
+					)
 				),
-			],
-		],
-		'prpl_chart_args'       => $prpl_widget->get_chart_args_content_count( 'delete' ),
-	]
-);
+				\esc_html( \number_format_i18n( (int) $prpl_activities_count['delete'] ) ),
+			);
+			?>
+		<?php endif; ?>
+	</p>
+</div>
+
