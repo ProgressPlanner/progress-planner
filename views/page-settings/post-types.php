@@ -11,9 +11,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $prpl_saved_settings = \progress_planner()->get_settings()->get_post_types_names();
-$prpl_post_types     = \array_filter( \get_post_types( [ 'public' => true ] ), 'is_post_type_viewable' );
-unset( $prpl_post_types['attachment'] );
-unset( $prpl_post_types['elementor_library'] ); // Elementor templates are not a post type we want to track.
+$prpl_post_types     = \progress_planner()->get_settings()->get_public_post_types();
+
+// Early exit if there are no public post types.
+if ( empty( $prpl_post_types ) ) {
+	return;
+}
 
 // We use it in order to change grid layout when there are more than 5 valuable post types.
 $prpl_data_attributes = 5 < count( $prpl_post_types ) ? 'data-has-many-valuable-post-types' : '';

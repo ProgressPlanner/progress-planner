@@ -122,13 +122,41 @@ class Settings {
 		if ( isset( $include_post_types ) && ! empty( $include_post_types ) ) {
 			return $include_post_types;
 		}
-		$default            = [ 'post', 'page' ];
-		$include_post_types = \array_filter(
-			\progress_planner()->get_settings()->get( [ 'include_post_types' ], $default ),
-			function ( $post_type ) {
-				return $post_type && \post_type_exists( $post_type ) && \is_post_type_viewable( $post_type );
-			}
-		);
+
+		$public_post_types = \progress_planner()->get_settings()->get_public_post_types();
+
+		// Post or pages can be deregistered.
+		$default = array_intersect( [ 'post', 'page' ], $public_post_types );
+
+		// Edge case:Check if both post and page are deregistered, to prevent empty array (since this is passed to WP_Query).
+		if ( empty( $default ) ) {
+			$default = [ 'post', 'page' ];
+		}
+
+		// Filter the saved post types.
+		$include_post_types = array_intersect( \progress_planner()->get_settings()->get( [ 'include_post_types' ], $default ), $public_post_types );
+
 		return empty( $include_post_types ) ? $default : \array_values( $include_post_types );
+	}
+
+	/**
+	 * Get the public post types.
+	 *
+	 * @return string[]
+	 */
+	public function get_public_post_types() {
+		$public_post_types = \array_filter( \get_post_types( [ 'public' => true ] ), 'is_post_type_viewable' );
+
+		unset( $public_post_types['attachment'] );
+		unset( $public_post_types['elementor_library'] ); // Elementor templates are not a post type we want to track.
+
+		/**
+		 * Filter the public post types.
+		 *
+		 * @param string[] $public_post_types The public post types.
+		 *
+		 * @return string[]
+		 */
+		return \apply_filters( 'progress_planner_public_post_types', $public_post_types );
 	}
 }
