@@ -316,7 +316,7 @@
 }
 
 /* Valuable post types */
-#prpl-post-types-include {
+#prpl-post-types-include-wrapper {
 
 	label {
 		display: block;

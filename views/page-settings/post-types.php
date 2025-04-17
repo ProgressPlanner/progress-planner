@@ -35,7 +35,7 @@ $prpl_data_attributes = 5 < count( $prpl_post_types ) ? 'data-has-many-valuable-
 		<p>
 			<?php esc_html_e( 'Let us know which post types are valuable to you.', 'progress-planner' ); ?>
 		</p>
-		<div id="prpl-post-types-include">
+		<div id="prpl-post-types-include-wrapper">
 		<?php foreach ( $prpl_post_types as $prpl_post_type ) : ?>
 			<label>
 				<input
