@@ -11,39 +11,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 $prpl_widget = \progress_planner()->get_admin__widgets__content_activity();
 
-$prpl_activities_count = [
-	'publish' => count(
+$prpl_activities_count = [];
+foreach ( [ 'publish', 'update', 'delete' ] as $prpl_activity_type ) {
+	$prpl_activities_count[ $prpl_activity_type ] = count(
 		\progress_planner()->get_activities__query()->query_activities(
 			[
 				'category'   => 'content',
-				'type'       => 'publish',
 				'start_date' => \gmdate( 'Y-m-d', \strtotime( '-1 week' ) ),
 				'end_date'   => \gmdate( 'Y-m-d' ),
+				'type'       => $prpl_activity_type,
 			]
 		)
-	),
-	'update'  => count(
-		\progress_planner()->get_activities__query()->query_activities(
-			[
-				'category'   => 'content',
-				'type'       => 'update',
-				'start_date' => \gmdate( 'Y-m-d', \strtotime( '-1 week' ) ),
-				'end_date'   => \gmdate( 'Y-m-d' ),
-			]
-		)
-	),
-	'delete'  => count(
-		\progress_planner()->get_activities__query()->query_activities(
-			[
-				'category'   => 'content',
-				'type'       => 'delete',
-				'start_date' => \gmdate( 'Y-m-d', \strtotime( '-1 week' ) ),
-				'end_date'   => \gmdate( 'Y-m-d' ),
-			]
-		)
-	),
-];
-
+	);
+}
 ?>
 
 <h2 class="prpl-widget-title">
