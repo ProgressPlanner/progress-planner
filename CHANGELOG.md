@@ -1,3 +1,9 @@
+= 1.3.0 =
+
+Bugs we fixed:
+
+* Fixed error during plugin uninstall.
+
 = 1.2.1 =
 
 Enhancements:
