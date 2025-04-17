@@ -66,7 +66,16 @@ prplDocumentReady( function () {
 			action: 'prpl_settings_form',
 		};
 		formData.forEach( function ( value, key ) {
-			data[ key ] = value;
+			// Handle array notation in keys
+			if ( key.endsWith( '[]' ) ) {
+				const baseKey = key.slice( 0, -2 );
+				if ( ! data[ baseKey ] ) {
+					data[ baseKey ] = [];
+				}
+				data[ baseKey ].push( value );
+			} else {
+				data[ key ] = value;
+			}
 		} );
 		const request = wp.ajax.post( 'prpl_settings_form', data );
 		request.done( function () {
