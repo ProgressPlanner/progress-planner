@@ -29,6 +29,13 @@ class Set_Valuable_Post_Types extends One_Time {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
+	 * The task priority.
+	 *
+	 * @var string
+	 */
+	protected $priority = 'low';
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
