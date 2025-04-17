@@ -61,7 +61,7 @@ class Set_Valuable_Post_Types extends One_Time {
 	 * @return string
 	 */
 	public function get_title() {
-		return \esc_html__( 'Set valuable post types', 'progress-planner' );
+		return \esc_html__( 'Set valuable content types', 'progress-planner' );
 	}
 
 	/**
@@ -70,7 +70,11 @@ class Set_Valuable_Post_Types extends One_Time {
 	 * @return string
 	 */
 	public function get_description() {
-		return \esc_html__( 'Head over to the settings page and set the valuable post types.', 'progress-planner' );
+		return sprintf(
+			/* translators: %s:<a href="https://prpl.fyi/valuable-content" target="_blank">Read more</a> link */
+			\esc_html__( 'Tell us which post types matter most for your site. Go to your settings and select your valuable content types. %s', 'progress-planner' ),
+			'<a href="https://prpl.fyi/valuable-content" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+		);
 	}
 
 	/**
