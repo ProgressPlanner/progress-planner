@@ -118,7 +118,9 @@ class Settings {
 	 */
 	public function get_post_types_names() {
 		static $include_post_types;
-		if ( isset( $include_post_types ) && ! empty( $include_post_types ) ) {
+
+		// Since we're working with CPTs, dont cache until init.
+		if ( did_action( 'init' ) && isset( $include_post_types ) && ! empty( $include_post_types ) ) {
 			return $include_post_types;
 		}
 
