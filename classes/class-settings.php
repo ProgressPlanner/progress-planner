@@ -113,7 +113,6 @@ class Settings {
 
 	/**
 	 * Get an array of post-types names for the stats.
-	 * TODO: We need to decide if need this function and where to put it if we do.
 	 *
 	 * @return string[]
 	 */
