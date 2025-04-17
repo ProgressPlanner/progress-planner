@@ -13,7 +13,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 require_once __DIR__ . '/classes/class-settings.php';
-require_once __DIR__ . '/classes/class-query.php';
+require_once __DIR__ . '/classes/activities/class-query.php';
 
 /**
  * Delete the plugin options.
