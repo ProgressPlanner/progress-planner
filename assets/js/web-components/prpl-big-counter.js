@@ -6,7 +6,7 @@
 customElements.define(
 	'prpl-big-counter',
 	class extends HTMLElement {
-		constructor( number, content, backgroundColor ) {
+		constructor( number, content, backgroundColor, inline = false ) {
 			// Get parent class properties
 			super();
 			number = number || this.getAttribute( 'number' );
@@ -15,6 +15,8 @@ customElements.define(
 				backgroundColor || this.getAttribute( 'background-color' );
 			backgroundColor =
 				backgroundColor || 'var(--prpl-background-purple)';
+			inline = inline || this.getAttribute( 'inline' );
+			inline = true === inline || 'true' === inline;
 
 			this.innerHTML = `
 				<div style="
@@ -22,13 +24,18 @@ customElements.define(
 					padding: var(--prpl-padding);
 					border-radius: var(--prpl-border-radius-big);
 					display: flex;
-					flex-direction: column;
+					flex-direction: ${ inline ? 'row' : 'column' };
 					align-items: center;
 					text-align: center;
 					align-content: center;
-					justify-content: center;
-					height: calc(var(--prpl-font-size-5xl) + var(--prpl-font-size-2xl) + var(--prpl-padding) * 2);
+					justify-content: ${ inline ? 'flex-start' : 'center' };
+					height: ${
+						inline
+							? 'auto'
+							: 'calc(var(--prpl-font-size-5xl) + var(--prpl-font-size-2xl) + var(--prpl-padding) * 2)'
+					};
 					margin-bottom: var(--prpl-padding);
+					gap: ${ inline ? '1rem' : '0' };
 				">
 					<span style="
 						font-size: var(--prpl-font-size-5xl);

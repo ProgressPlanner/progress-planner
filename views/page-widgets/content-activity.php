@@ -54,13 +54,14 @@ $prpl_activities_count = [
 	<?php \progress_planner()->get_ui__chart()->the_chart( $prpl_widget->get_chart_args_content_count() ); ?>
 </div>
 
-<p><?php \esc_html_e( 'Overall content activity', 'progress-planner' ); ?></p>
+<p><?php \esc_html_e( 'Overall content activity, including published, updated and deleted content.', 'progress-planner' ); ?></p>
 
 <!-- Published content. -->
 <prpl-big-counter
 	number="<?php echo \esc_html( \number_format_i18n( (int) $prpl_activities_count['publish'] ) ); ?>"
 	content="<?php \esc_attr_e( 'content published', 'progress-planner' ); ?>"
-	background-color="var(--prpl-background-purple)"
+	background-color="var(--prpl-background-blue)"
+	inline="true"
 ></prpl-big-counter>
 
 <div class="prpl-widget-content">
@@ -90,7 +91,8 @@ $prpl_activities_count = [
 <prpl-big-counter
 	number="<?php echo \esc_html( \number_format_i18n( (int) $prpl_activities_count['update'] ) ); ?>"
 	content="<?php \esc_attr_e( 'content updated', 'progress-planner' ); ?>"
-	background-color="var(--prpl-background-purple)"
+	background-color="var(--prpl-background-blue)"
+	inline="true"
 ></prpl-big-counter>
 
 <div class="prpl-widget-content">
@@ -120,7 +122,8 @@ $prpl_activities_count = [
 <prpl-big-counter
 	number="<?php echo \esc_html( \number_format_i18n( (int) $prpl_activities_count['delete'] ) ); ?>"
 	content="<?php \esc_attr_e( 'content deleted', 'progress-planner' ); ?>"
-	background-color="var(--prpl-background-purple)"
+	background-color="var(--prpl-background-blue)"
+	inline="true"
 ></prpl-big-counter>
 
 <div class="prpl-widget-content">
