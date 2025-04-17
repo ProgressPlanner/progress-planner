@@ -119,8 +119,18 @@ class Settings {
 	public function get_post_types_names() {
 		static $include_post_types;
 
+		if ( ! doing_action( 'init' ) && ! did_action( 'init' ) ) {
+			\trigger_error( // phpcs:ignore
+				sprintf(
+					'%1$s was called too early. Wait for init hook to be called to have access to the post types.',
+					\esc_html( get_class() . '::' . __FUNCTION__ )
+				),
+				E_USER_WARNING
+			);
+		}
+
 		// Since we're working with CPTs, dont cache until init.
-		if ( did_action( 'init' ) && isset( $include_post_types ) && ! empty( $include_post_types ) ) {
+		if ( isset( $include_post_types ) && ! empty( $include_post_types ) ) {
 			return $include_post_types;
 		}
 
