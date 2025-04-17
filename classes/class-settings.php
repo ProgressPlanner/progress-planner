@@ -134,7 +134,7 @@ class Settings {
 			return $include_post_types;
 		}
 
-		$public_post_types = \progress_planner()->get_settings()->get_public_post_types();
+		$public_post_types = $this->get_public_post_types();
 
 		// Post or pages can be deregistered.
 		$default = array_intersect( [ 'post', 'page' ], $public_post_types );
@@ -145,7 +145,7 @@ class Settings {
 		}
 
 		// Filter the saved post types.
-		$include_post_types = array_intersect( \progress_planner()->get_settings()->get( [ 'include_post_types' ], $default ), $public_post_types );
+		$include_post_types = array_intersect( $this->get( [ 'include_post_types' ], $default ), $public_post_types );
 
 		return empty( $include_post_types ) ? $default : \array_values( $include_post_types );
 	}
