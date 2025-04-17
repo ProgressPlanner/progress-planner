@@ -76,14 +76,7 @@ class Review extends Repetitive {
 	 *
 	 * @var string[]
 	 */
-	protected $include_post_types;
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->include_post_types = \progress_planner()->get_settings()->get( 'include_post_types', [ 'post', 'page' ] ); // TODO: We might add helper for default values.
-	}
+	protected $include_post_types = [];
 
 	/**
 	 * Initialize the task provider.
@@ -91,6 +84,8 @@ class Review extends Repetitive {
 	 * @return void
 	 */
 	public function init() {
+		$this->include_post_types = \progress_planner()->get_settings()->get_post_types_names(); // Wait for the post types to be initialized.
+
 		\add_filter( 'progress_planner_update_posts_tasks_args', [ $this, 'filter_update_posts_args' ] );
 	}
 
@@ -192,7 +187,8 @@ class Review extends Repetitive {
 			if ( ! empty( $important_page_ids ) ) {
 				$last_updated_posts = $this->get_old_posts(
 					[
-						'post__in' => $important_page_ids,
+						'post__in'  => $important_page_ids,
+						'post_type' => 'any',
 					]
 				);
 			}
@@ -335,32 +331,36 @@ class Review extends Repetitive {
 	 * @return array
 	 */
 	public function get_old_posts( $args = [] ) {
-		$args = wp_parse_args(
-			$args,
-			[
-				'posts_per_page' => static::ITEMS_TO_INJECT,
-				'post_type'      => $this->include_post_types,
-				'post_status'    => 'publish',
-				'orderby'        => 'modified',
-				'order'          => 'ASC',
-				'date_query'     => [
-					[
-						'column' => 'post_modified',
-						'before' => '-6 months',
+		$posts = [];
+
+		if ( ! empty( $this->include_post_types ) ) {
+			$args = wp_parse_args(
+				$args,
+				[
+					'posts_per_page' => static::ITEMS_TO_INJECT,
+					'post_type'      => $this->include_post_types,
+					'post_status'    => 'publish',
+					'orderby'        => 'modified',
+					'order'          => 'ASC',
+					'date_query'     => [
+						[
+							'column' => 'post_modified',
+							'before' => '-6 months',
+						],
 					],
-				],
-			]
-		);
+				]
+			);
 
-		/**
-		 * Filters the args for the posts & pages we want user to review.
-		 *
-		 * @param array $args The get_postsargs.
-		 */
-		$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
+			/**
+			 * Filters the args for the posts & pages we want user to review.
+			 *
+			 * @param array $args The get_postsargs.
+			 */
+			$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
 
-		// Get the post that was updated last.
-		$posts = \get_posts( $args );
+			// Get the post that was updated last.
+			$posts = \get_posts( $args );
+		}
 
 		// Get the pages saved in the settings that have not been updated in the last 6 months.
 		$saved_page_type_ids = $this->get_saved_page_types();
