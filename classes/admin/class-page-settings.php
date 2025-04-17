@@ -198,11 +198,10 @@ class Page_Settings {
 	 * @return void
 	 */
 	public function save_post_types() {
-		$include_post_types = isset( $_POST['prpl-post-types-include'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			? \wp_unslash( $_POST['prpl-post-types-include'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			: [ 'post', 'page' ];
 
-		array_map( 'sanitize_text_field', $include_post_types );
+		$include_post_types = isset( $_POST['prpl-post-types-include'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			? array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			: array_intersect( [ 'post', 'page' ], \progress_planner()->get_settings()->get_public_post_types() ); // If no post types are selected, use the default post types (post and page can be deregistered).
 
 		\progress_planner()->get_settings()->set( 'include_post_types', $include_post_types );
 	}

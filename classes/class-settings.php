@@ -139,11 +139,6 @@ class Settings {
 		// Post or pages can be deregistered.
 		$default = array_intersect( [ 'post', 'page' ], $public_post_types );
 
-		// Edge case:Check if both post and page are deregistered, to prevent empty array (since this is passed to WP_Query).
-		if ( empty( $default ) ) {
-			$default = [ 'post', 'page' ];
-		}
-
 		// Filter the saved post types.
 		$include_post_types = array_intersect( $this->get( [ 'include_post_types' ], $default ), $public_post_types );
 
