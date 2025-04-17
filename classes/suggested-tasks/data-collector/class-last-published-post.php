@@ -26,7 +26,7 @@ class Last_Published_Post extends Base_Data_Collector {
 	 *
 	 * @var string[]
 	 */
-	protected $include_post_types;
+	protected $include_post_types = [];
 
 	/**
 	 * Initialize the data collector.
@@ -34,8 +34,17 @@ class Last_Published_Post extends Base_Data_Collector {
 	 * @return void
 	 */
 	public function init() {
-		$this->include_post_types = \progress_planner()->get_settings()->get( 'include_post_types', [ 'post', 'page' ] ); // TODO: We might add helper for default values.
+		\add_action( 'init', [ $this, 'set_include_post_types' ], 99 ); // Wait for all CPTs to be registered.
 		\add_action( 'transition_post_status', [ $this, 'update_last_published_post_cache' ], 10, 3 );
+	}
+
+	/**
+	 * Set the include post types.
+	 *
+	 * @return void
+	 */
+	public function set_include_post_types() {
+		$this->include_post_types = \progress_planner()->get_settings()->get_post_types_names();
 	}
 
 	/**
