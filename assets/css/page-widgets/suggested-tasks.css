@@ -102,6 +102,10 @@
 			display: flex;
 		}
 
+		.prpl-no-suggested-tasks {
+			display: none;
+		}
+
 		hr {
 			display: block;
 		}
@@ -110,6 +114,12 @@
 	.prpl-widget-title,
 	hr {
 		display: none;
+	}
+
+	.prpl-no-suggested-tasks {
+		display: block;
+		background-color: var(--prpl-background-green);
+		padding: calc(var(--prpl-padding) / 2);
 	}
 }
 

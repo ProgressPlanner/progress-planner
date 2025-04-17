@@ -1,0 +1,124 @@
+name: New recommendation
+description: Suggest a new recommendation to be added to the Progress Planner
+title: "[Recommendation] "
+labels: ["enhancement", "recommendation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for suggesting a new recommendation! Please fill out the following information to help us evaluate and implement your suggestion.
+        
+        **Note:** All fields are required unless marked as optional.
+
+  - type: input
+    id: title
+    attributes:
+      label: Recommendation title
+      description: A clear, concise title for the recommendation
+      placeholder: "e.g., Update WordPress Core"
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Recommendation description
+      description: A detailed description of what the recommendation entails
+      placeholder: "Describe what needs to be done to complete this recommendation..."
+    validations:
+      required: true
+
+  - type: dropdown
+    id: category
+    attributes:
+      label: Recommendation category
+      description: Select the most appropriate category for this recommendation
+      options:
+        - content-update
+        - configuration
+        - remote
+        - user
+        - other
+    validations:
+      required: true
+
+  - type: input
+    id: other_category
+    attributes:
+      label: Other category
+      description: If you selected "other", please specify the category
+      placeholder: "Specify the category"
+    validations:
+      required: false
+
+  - type: input
+    id: capability
+    attributes:
+      label: Required capability
+      description: "If you know: the WordPress capability required to perform this recommendation, e.g., manage_options, edit_others_posts"
+      placeholder: "e.g., manage_options"
+    validations:
+      required: false
+
+  - type: dropdown
+    id: onboarding
+    attributes:
+      label: Onboarding recommendation
+      description: Is this recommendation part of the initial setup/onboarding process?
+      options:
+        - "false"
+        - "true"
+    validations:
+      required: true
+
+  - type: input
+    id: points
+    attributes:
+      label: Points to award
+      description: How many points should be awarded for completing this recommendation? The default is 1.
+      value: "1"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Recommendation priority
+      description: How important is this recommendation?
+      options:
+        - low
+        - medium
+        - high
+    validations:
+      required: true
+
+  - type: dropdown
+    id: dismissable
+    attributes:
+      label: Dismissable
+      description: Can users dismiss this recommendation if they don't want to complete it?
+      options:
+        - "true"
+        - "false"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: snoozable
+    attributes:
+      label: Snoozable
+      description: Can users temporarily postpone this recommendation?
+      options:
+        - "true"
+        - "false"
+    validations:
+      required: true
+
+  - type: textarea
+    id: additional_info
+    attributes:
+      label: Additional Information
+      description: Any other relevant information about this recommendation - optional -
+      placeholder: "Add any additional context or requirements here..." 
+    validations:
+      required: false

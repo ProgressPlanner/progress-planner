@@ -264,4 +264,15 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 
 		return false;
 	}
+
+	/**
+	 * Check if the task is still relevant.
+	 * For example, we have a task to disable author archives if there is only one author.
+	 * If in the meantime more authors are added, the task is no longer relevant and the task should be removed.
+	 *
+	 * @return bool
+	 */
+	public function is_task_relevant() {
+		return true;
+	}
 }
