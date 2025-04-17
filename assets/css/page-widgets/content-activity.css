@@ -17,7 +17,28 @@
 
 	th {
 		text-align: start;
-		border-bottom: 1px solid var(--prpl-color-gray-3);
+	}
+
+	tbody th {
+		font-weight: 400;
+	}
+
+	thead {
+
+		th,
+		td {
+			border-bottom: 1px solid var(--prpl-color-gray-3);
+			text-align: start;
+		}
+	}
+
+	tfoot {
+
+		th,
+		td {
+			border-top: 1px solid var(--prpl-color-gray-3);
+			text-align: start;
+		}
 	}
 
 	tr:nth-child(even) {

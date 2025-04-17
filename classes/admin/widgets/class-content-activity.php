@@ -22,11 +22,14 @@ final class Content_Activity extends Widget {
 	/**
 	 * Get the chart args.
 	 *
+	 * @param string $type The type of activity.
+	 * @param string $color The color of the chart.
+	 *
 	 * @return array The chart args.
 	 */
-	public function get_chart_args_content_count() {
+	public function get_chart_args_content_count( $type = 'publish', $color = '#534786' ) {
 		return array_merge(
-			$this->get_chart_args(),
+			$this->get_chart_args( $type, $color ),
 			[
 				'count_callback' => function ( $activities, $date = null ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 					return count( $activities );
@@ -38,17 +41,21 @@ final class Content_Activity extends Widget {
 	/**
 	 * Get the chart args.
 	 *
+	 * @param string $type The type of activity.
+	 * @param string $color The color of the chart.
+	 *
 	 * @return array The chart args.
 	 */
-	public function get_chart_args() {
+	public function get_chart_args( $type = 'publish', $color = '#534786' ) {
 		return [
 			'type'           => 'line',
-			'items_callback' => function ( $start_date, $end_date ) {
+			'items_callback' => function ( $start_date, $end_date ) use ( $type ) {
 				return \progress_planner()->get_activities__query()->query_activities(
 					[
 						'category'   => 'content',
 						'start_date' => $start_date,
 						'end_date'   => $end_date,
+						'type'       => $type,
 					]
 				);
 			},
@@ -59,6 +66,9 @@ final class Content_Activity extends Widget {
 				'format'     => 'M',
 			],
 			'filter_results' => [ $this, 'filter_activities' ],
+			'color'          => function () use ( $color ) {
+				return $color;
+			},
 		];
 	}
 
