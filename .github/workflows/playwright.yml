@@ -106,6 +106,9 @@ jobs:
           # Insert test token
           docker exec $(docker ps -qf "name=wordpress") wp option update progress_planner_test_token $PRPL_TEST_TOKEN --allow-root
 
+          # Install Yoast SEO
+          docker exec $(docker ps -qf "name=wordpress") wp plugin install wordpress-seo --activate --allow-root
+
       # - name: Wait for WordPress to be ready
       #   run: |
       #     echo "Waiting for WordPress to be ready..."

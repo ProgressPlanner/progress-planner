@@ -47,9 +47,24 @@ class Sample_Page extends One_Time {
 		if ( 0 !== $sample_page_id ) {
 			$this->url = (string) \get_edit_post_link( $sample_page_id );
 		}
+	}
 
-		$this->title       = \esc_html__( 'Delete "Sample Page"', 'progress-planner' );
-		$this->description = sprintf(
+	/**
+	 * Get the title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Delete "Sample Page"', 'progress-planner' );
+	}
+
+	/**
+	 * Get the description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/delete-sample-page" target="_blank">Sample Page</a> link */
 			\esc_html__( 'On install, WordPress creates a %s page. This page is not needed and should be deleted.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/delete-sample-page" target="_blank">' . \esc_html__( '"Sample Page"', 'progress-planner' ) . '</a>'

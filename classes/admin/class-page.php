@@ -246,7 +246,7 @@ class Page {
 					'tasks'           => $tasks_details,
 					'totalPoints'     => $total_points,
 					'completedPoints' => $completed_points,
-					'base_url'        => PROGRESS_PLANNER_URL,
+					'base_url'        => constant( 'PROGRESS_PLANNER_URL' ),
 					'l10n'            => [
 						/* translators: %d: The number of points. */
 						'fixThisIssue' => \esc_html__( 'Fix this issue to get %d point(s) in Progress Planner', 'progress-planner' ),
@@ -362,8 +362,8 @@ class Page {
 				position: relative;
 				.update-plugins {
 					position: absolute;
-					left: 22px;
-					top: 0px;
+					left: 18px;
+					bottom: 0px;
 					min-width: 15px;
 					height: 15px;
 					line-height: 1.5;
