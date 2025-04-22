@@ -41,26 +41,26 @@ class Page {
 	/**
 	 * Get the widgets objects
 	 *
-	 * @return array<\Progress_Planner\Widgets\Widget>
+	 * @return array<\Progress_Planner\Admin\Widgets\Widget>
 	 */
 	public function get_widgets() {
 		$widgets = [
-			\progress_planner()->get_widgets__suggested_tasks(),
-			\progress_planner()->get_widgets__activity_scores(),
-			\progress_planner()->get_widgets__todo(),
-			\progress_planner()->get_widgets__challenge(),
-			\progress_planner()->get_widgets__latest_badge(),
-			\progress_planner()->get_widgets__badge_streak(),
-			\progress_planner()->get_widgets__published_content(),
-			\progress_planner()->get_widgets__whats_new(),
+			\progress_planner()->get_admin__widgets__suggested_tasks(),
+			\progress_planner()->get_admin__widgets__activity_scores(),
+			\progress_planner()->get_admin__widgets__todo(),
+			\progress_planner()->get_admin__widgets__challenge(),
+			\progress_planner()->get_admin__widgets__latest_badge(),
+			\progress_planner()->get_admin__widgets__badge_streak(),
+			\progress_planner()->get_admin__widgets__published_content(),
+			\progress_planner()->get_admin__widgets__whats_new(),
 		];
 
 		/**
 		 * Filter the widgets.
 		 *
-		 * @param array<\Progress_Planner\Widgets\Widget> $widgets The widgets.
+		 * @param array<\Progress_Planner\Admin\Widgets\Widget> $widgets The widgets.
 		 *
-		 * @return array<\Progress_Planner\Widgets\Widget>
+		 * @return array<\Progress_Planner\Admin\Widgets\Widget>
 		 */
 		return \apply_filters( 'progress_planner_admin_widgets', $widgets );
 	}
@@ -70,7 +70,7 @@ class Page {
 	 *
 	 * @param string $id The widget ID.
 	 *
-	 * @return \Progress_Planner\Widgets\Widget|void
+	 * @return \Progress_Planner\Admin\Widgets\Widget|void
 	 */
 	public function get_widget( $id ) {
 		$widgets = $this->get_widgets();
@@ -167,8 +167,8 @@ class Page {
 			$default_localization_data = [
 				'name' => 'progressPlanner',
 				'data' => [
-					'onboardNonceURL' => \progress_planner()->get_onboard()->get_remote_nonce_url(),
-					'onboardAPIUrl'   => \progress_planner()->get_onboard()->get_remote_url(),
+					'onboardNonceURL' => \progress_planner()->get_utils__onboard()->get_remote_nonce_url(),
+					'onboardAPIUrl'   => \progress_planner()->get_utils__onboard()->get_remote_url(),
 					'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
 					'nonce'           => \wp_create_nonce( 'progress_planner' ),
 				],
@@ -246,7 +246,7 @@ class Page {
 					'tasks'           => $tasks_details,
 					'totalPoints'     => $total_points,
 					'completedPoints' => $completed_points,
-					'base_url'        => PROGRESS_PLANNER_URL,
+					'base_url'        => constant( 'PROGRESS_PLANNER_URL' ),
 					'l10n'            => [
 						/* translators: %d: The number of points. */
 						'fixThisIssue' => \esc_html__( 'Fix this issue to get %d point(s) in Progress Planner', 'progress-planner' ),
@@ -337,7 +337,7 @@ class Page {
 	/**
 	 * Clear the cache.
 	 *
-	 * @param \Progress_Planner\Activity $activity The activity.
+	 * @param \Progress_Planner\Activities\Activity $activity The activity.
 	 *
 	 * @return void
 	 */
@@ -347,7 +347,7 @@ class Page {
 		}
 
 		// Clear the cache for the activity scores widget.
-		\progress_planner()->get_settings()->set( \progress_planner()->get_widgets__activity_scores()->get_cache_key(), [] );
+		\progress_planner()->get_settings()->set( \progress_planner()->get_admin__widgets__activity_scores()->get_cache_key(), [] );
 	}
 
 	/**
@@ -362,8 +362,8 @@ class Page {
 				position: relative;
 				.update-plugins {
 					position: absolute;
-					left: 22px;
-					top: 0px;
+					left: 18px;
+					bottom: 0px;
 					min-width: 15px;
 					height: 15px;
 					line-height: 1.5;

@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_widget = \progress_planner()->get_widgets__suggested_tasks();
+$prpl_widget = \progress_planner()->get_admin__widgets__suggested_tasks();
 $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 ?>
 
@@ -26,6 +26,11 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 
 	<ul style="display:none"></ul>
 	<ul class="prpl-suggested-tasks-list"></ul>
+	<p class="prpl-no-suggested-tasks">
+		<?php \esc_html_e( 'You have completed all recommended tasks.', 'progress-planner' ); ?>
+		<br>
+		<?php \esc_html_e( 'Check back later for new tasks!', 'progress-planner' ); ?>
+	</p>
 	<hr>
 </div>
 
@@ -79,10 +84,10 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 		?>
 	<?php endif; ?>
 	<?php
-	\progress_planner()->get_popover()->the_popover( 'monthly-badges' )->render_button(
+	\progress_planner()->get_ui__popover()->the_popover( 'monthly-badges' )->render_button(
 		'',
 		\esc_html__( 'Show all my badges!', 'progress-planner' )
 	);
-	\progress_planner()->get_popover()->the_popover( 'monthly-badges' )->render();
+	\progress_planner()->get_ui__popover()->the_popover( 'monthly-badges' )->render();
 	?>
 </div>

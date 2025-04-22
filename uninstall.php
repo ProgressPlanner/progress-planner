@@ -13,7 +13,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 require_once __DIR__ . '/classes/class-settings.php';
-require_once __DIR__ . '/classes/class-query.php';
+require_once __DIR__ . '/classes/activities/class-query.php';
 
 /**
  * Delete the plugin options.
@@ -41,6 +41,6 @@ $wpdb->query(
 	$wpdb->prepare(
 		// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.UnsupportedIdentifierPlaceholder, WordPress.DB.DirectDatabaseQuery.SchemaChange
 		'DROP TABLE IF EXISTS %i',
-		$wpdb->prefix . \Progress_Planner\Query::TABLE_NAME
+		$wpdb->prefix . \Progress_Planner\Activities\Query::TABLE_NAME
 	)
 );

@@ -109,7 +109,7 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function delete_activity( $task_id ) {
-		$activity = \progress_planner()->get_query()->query_activities(
+		$activity = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'data_id' => $task_id,
 				'type'    => 'completed',
@@ -120,7 +120,7 @@ class Suggested_Tasks {
 			return;
 		}
 
-		\progress_planner()->get_query()->delete_activity( $activity[0] );
+		\progress_planner()->get_activities__query()->delete_activity( $activity[0] );
 	}
 
 	/**
@@ -579,6 +579,30 @@ class Suggested_Tasks {
 	}
 
 	/**
+	 * Add a remote task to the pending tasks.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function add_remote_task_to_pending_tasks( $task_id ) {
+		$remote_task_data = $this->get_remote_task_by_task_id( $task_id );
+
+		if ( ! $remote_task_data ) {
+			return false;
+		}
+
+		return \progress_planner()->get_suggested_tasks()->get_local()->add_pending_task(
+			[
+				'task_id'     => $task_id,
+				'provider_id' => $remote_task_data['category'] ?? '', // Remote tasks use the category as provider_id.
+				'category'    => $remote_task_data['category'] ?? '',
+			]
+		);
+	}
+
+
+	/**
 	 * Handle the suggested task action.
 	 *
 	 * @return void
@@ -600,14 +624,7 @@ class Suggested_Tasks {
 			case 'complete':
 				// We need to add the task to the pending tasks first, before marking it as completed.
 				if ( false !== strpos( $task_id, 'remote-task' ) ) {
-					$remote_task_data = $this->get_remote_task_by_task_id( $task_id );
-					\progress_planner()->get_suggested_tasks()->get_local()->add_pending_task(
-						[
-							'task_id'     => $task_id,
-							'provider_id' => $remote_task_data['category'] ?? '', // Remote tasks use the category as provider_id.
-							'category'    => $remote_task_data['category'] ?? '',
-						]
-					);
+					$this->add_remote_task_to_pending_tasks( $task_id );
 				}
 
 				// Mark the task as completed.
@@ -626,7 +643,13 @@ class Suggested_Tasks {
 
 			case 'snooze':
 				$duration = isset( $_POST['duration'] ) ? \sanitize_text_field( \wp_unslash( $_POST['duration'] ) ) : '';
-				$updated  = $this->snooze_task( $task_id, $duration );
+
+				// We need to add the task to the pending tasks first, before marking it as snoozed.
+				if ( false !== strpos( $task_id, 'remote-task' ) ) {
+					$this->add_remote_task_to_pending_tasks( $task_id );
+				}
+
+				$updated = $this->snooze_task( $task_id, $duration );
 				break;
 
 			case 'delete':

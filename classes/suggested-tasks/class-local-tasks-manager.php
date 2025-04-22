@@ -26,7 +26,9 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Permalink_St
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Php_Version;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engine_Visibility;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\User as User_Tasks;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Set_Valuable_Post_Types;
 
 /**
  * Local_Tasks_Manager class.
@@ -45,6 +47,7 @@ class Local_Tasks_Manager {
 	 */
 	public function __construct() {
 
+		// Instantiate local task providers.
 		$this->task_providers = [
 			new Content_Create(),
 			new Content_Review(),
@@ -62,14 +65,45 @@ class Local_Tasks_Manager {
 			new Php_Version(),
 			new Search_Engine_Visibility(),
 			new User_Tasks(),
+			new Set_Valuable_Post_Types(),
 		];
 
+		// Add the plugin integration.
+		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
+
+		// At this point both local and task providers for the plugins we integrate with are instantiated, so initialize them.
+		\add_action( 'plugins_loaded', [ $this, 'init' ], 11 );
+
+		// Add the cleanup action.
+		\add_action( 'admin_init', [ $this, 'cleanup_pending_tasks' ] );
+	}
+
+	/**
+	 * Add the Yoast task if the plugin is active.
+	 *
+	 * @return void
+	 */
+	public function add_plugin_integration() {
+
+		// Yoast SEO integration.
+		new Add_Yoast_Providers();
+	}
+
+	/**
+	 * Initialize the task providers.
+	 *
+	 * @return void
+	 */
+	public function init() {
+
 		/**
-		 * Filter the task providers.
+		 * Filter the task providers, 3rd party providers are added here as well.
 		 *
 		 * @param array $task_providers The task providers.
 		 */
 		$this->task_providers = \apply_filters( 'progress_planner_suggested_tasks_providers', $this->task_providers );
+
+		// Now when all are instantiated, initialize them.
 		foreach ( $this->task_providers as $key => $task_provider ) {
 			if ( ! $task_provider instanceof Local_Tasks_Interface ) {
 				error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
@@ -88,23 +122,11 @@ class Local_Tasks_Manager {
 			$task_provider->init();
 		}
 
+		// Inject tasks.
 		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
-		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
-
-		// Add the cleanup action.
-		\add_action( 'admin_init', [ $this, 'cleanup_pending_tasks' ] );
 
 		// Add the onboarding task providers.
 		\add_filter( 'prpl_onboarding_task_providers', [ $this, 'add_onboarding_task_providers' ] );
-	}
-
-	/**
-	 * Add the Yoast task if the plugin is active.
-	 *
-	 * @return void
-	 */
-	public function add_plugin_integration() {
-		// Add the plugin integration here.
 	}
 
 	/**
@@ -218,6 +240,14 @@ class Local_Tasks_Manager {
 
 			$task_id = $task_data['task_id'];
 
+			// Check if the task is no longer relevant.
+			$task_object   = Local_Task_Factory::create_task_from( 'id', $task_id );
+			$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
+			if ( $task_provider && ! $task_provider->is_task_relevant() ) {
+				// Remove the task from the pending tasks.
+				\progress_planner()->get_suggested_tasks()->delete_task( $task_id );
+			}
+
 			$task_result = $this->evaluate_task( $task_id );
 			if ( false !== $task_result ) {
 				$completed_tasks[] = $task_result;
@@ -315,7 +345,7 @@ class Local_Tasks_Manager {
 	 */
 	public function cleanup_pending_tasks() {
 
-		$cleanup_recently_performed = \progress_planner()->get_cache()->get( 'cleanup_pending_tasks' );
+		$cleanup_recently_performed = \progress_planner()->get_utils__cache()->get( 'cleanup_pending_tasks' );
 
 		if ( $cleanup_recently_performed ) {
 			return;
@@ -354,6 +384,6 @@ class Local_Tasks_Manager {
 			\progress_planner()->get_settings()->set( 'local_tasks', array_values( $tasks ) );
 		}
 
-		\progress_planner()->get_cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );
+		\progress_planner()->get_utils__cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );
 	}
 }
