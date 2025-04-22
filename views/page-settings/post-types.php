@@ -22,7 +22,7 @@ if ( empty( $prpl_post_types ) ) {
 $prpl_data_attributes = 5 < count( $prpl_post_types ) ? 'data-has-many-valuable-post-types' : '';
 ?>
 
-<div class="prpl-column" <?php echo \esc_attr( $prpl_data_attributes ); ?>>
+<div class="prpl-column prpl-column-post-types" <?php echo \esc_attr( $prpl_data_attributes ); ?>>
 	<div class="prpl-widget-wrapper">
 		<h2 class="prpl-settings-section-title">
 			<span class="icon">
@@ -33,7 +33,7 @@ $prpl_data_attributes = 5 < count( $prpl_post_types ) ? 'data-has-many-valuable-
 			</span>
 		</h2>
 		<p>
-			<?php esc_html_e( 'Let us know which post types are valuable to you.', 'progress-planner' ); ?>
+			<?php esc_html_e( 'You\'re in control of what counts as valuable content. We\'ll track and reward activity only for the post types you select here.', 'progress-planner' ); ?>
 		</p>
 		<div id="prpl-post-types-include-wrapper">
 		<?php foreach ( $prpl_post_types as $prpl_post_type ) : ?>
