@@ -173,7 +173,7 @@ class Page_Settings {
 		$this->save_settings();
 		$this->save_license();
 
-		do_action( 'progress_planner_settings_form_options_stored' );
+		\do_action( 'progress_planner_settings_form_options_stored' );
 
 		\wp_send_json_success( \esc_html__( 'Options stored successfully', 'progress-planner' ) );
 	}
