@@ -37,6 +37,13 @@ class Create extends Repetitive {
 	protected const CAPABILITY = 'edit_others_posts';
 
 	/**
+	 * The task URL target.
+	 *
+	 * @var string
+	 */
+	protected $url_target = '_blank';
+
+	/**
 	 * The data collector.
 	 *
 	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post
@@ -48,7 +55,7 @@ class Create extends Repetitive {
 	 */
 	public function __construct() {
 		$this->data_collector = new Last_Published_Post_Data_Collector();
-		$this->url            = \admin_url( 'post-new.php?post_type=post' );
+		$this->url            = 'https://prpl.fyi/valuable-content';
 	}
 
 	/**
@@ -131,6 +138,7 @@ class Create extends Repetitive {
 			'points'      => $this->get_points(), // We use $this->get_points() here on purpose, get_points_for_task() calcs the points for the last published post.
 			'dismissable' => $this->is_dismissable(),
 			'url'         => $this->get_url(),
+			'url_target'  => $this->get_url_target(),
 			'description' => $this->get_description(),
 		];
 
