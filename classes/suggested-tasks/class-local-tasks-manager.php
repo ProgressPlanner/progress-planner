@@ -29,6 +29,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Reduce_Autol
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\User as User_Tasks;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Set_Valuable_Post_Types;
 
 /**
  * Local_Tasks_Manager class.
@@ -66,6 +67,7 @@ class Local_Tasks_Manager {
 			new Search_Engine_Visibility(),
 			new Reduce_Autoloaded_Options(),
 			new User_Tasks(),
+			new Set_Valuable_Post_Types(),
 		];
 
 		// Add the plugin integration.
@@ -239,6 +241,14 @@ class Local_Tasks_Manager {
 			}
 
 			$task_id = $task_data['task_id'];
+
+			// Check if the task is no longer relevant.
+			$task_object   = Local_Task_Factory::create_task_from( 'id', $task_id );
+			$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
+			if ( $task_provider && ! $task_provider->is_task_relevant() ) {
+				// Remove the task from the pending tasks.
+				\progress_planner()->get_suggested_tasks()->delete_task( $task_id );
+			}
 
 			$task_result = $this->evaluate_task( $task_id );
 			if ( false !== $task_result ) {
