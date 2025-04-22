@@ -280,8 +280,7 @@ class Content {
 			}
 		}
 
-		$activity       = \progress_planner()->get_activities__content_helpers()->get_activity_from_post( $post );
-		$activity->type = $type;
+		$activity = \progress_planner()->get_activities__content_helpers()->get_activity_from_post( $post, $type );
 
 		// Update the badges.
 		if ( 'publish' === $type ) {
