@@ -53,7 +53,7 @@ foreach ( array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
 
 <prpl-big-counter
 	number="<?php echo \esc_html( \number_format_i18n( (int) $prpl_activities_count['all'] ) ); ?>"
-	content="<?php \esc_attr_e( 'content managed', 'progress-planner' ); ?>"
+	content="<?php \esc_attr_e( 'pieces of content managed', 'progress-planner' ); ?>"
 	background-color="var(--prpl-background-blue)"
 ></prpl-big-counter>
 
