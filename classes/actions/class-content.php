@@ -304,6 +304,11 @@ class Content {
 			}
 		}
 
+		// We need to set the date explicitly since post_date & post_modified dates are not changed when the post is trashed.
+		if ( 'trash' === $type ) {
+			$activity->date = new \DateTime();
+		}
+
 		$activity->save();
 
 		// Reset the words count.
