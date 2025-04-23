@@ -1,3 +1,20 @@
+= 1.3.0 =
+
+Bugs we fixed:
+
+* Fixed error during plugin uninstall.
+
+= 1.2.1 =
+
+Enhancements:
+
+* Improved checks when adding Ravi icon to the Yoast SEO settings page.
+
+Bugs we fixed:
+
+* Archive_Format data collector hooks weren't registered early enough.
+* Ensure fresh plugin list by clearing plugin cache before checking for inactive plugins after deletion.
+
 = 1.2.0 =
 
 In this release we've [added an integration with the **Yoast SEO** plugin](https://prpl.fyi/v12), so you’ll now see personalized suggestions based on your current SEO configuration.

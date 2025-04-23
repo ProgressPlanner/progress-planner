@@ -171,8 +171,8 @@ class Content_Scan extends Content {
 		$activities = [];
 		// Loop through the posts and update the stats.
 		foreach ( $posts as $post ) {
-			// Set the activity.
-			$activities[ $post->ID ] = \progress_planner()->get_activities__content_helpers()->get_activity_from_post( $post );
+			// Set the activity, we're dealing only with published posts (but just in case).
+			$activities[ $post->ID ] = \progress_planner()->get_activities__content_helpers()->get_activity_from_post( $post, 'publish' === $post->post_status ? 'publish' : 'update' );
 			// Set the word count.
 			\progress_planner()->get_activities__content_helpers()->get_word_count( $post->post_content, $post->ID );
 		}
