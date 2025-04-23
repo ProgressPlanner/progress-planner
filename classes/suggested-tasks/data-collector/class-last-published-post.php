@@ -22,12 +22,29 @@ class Last_Published_Post extends Base_Data_Collector {
 	protected const DATA_KEY = 'last_published_post_id';
 
 	/**
+	 * The include post types.
+	 *
+	 * @var string[]
+	 */
+	protected $include_post_types = [];
+
+	/**
 	 * Initialize the data collector.
 	 *
 	 * @return void
 	 */
 	public function init() {
+		\add_action( 'init', [ $this, 'set_include_post_types' ], 99 ); // Wait for all CPTs to be registered.
 		\add_action( 'transition_post_status', [ $this, 'update_last_published_post_cache' ], 10, 3 );
+	}
+
+	/**
+	 * Set the include post types.
+	 *
+	 * @return void
+	 */
+	public function set_include_post_types() {
+		$this->include_post_types = \progress_planner()->get_settings()->get_post_types_names();
 	}
 
 	/**
@@ -40,7 +57,7 @@ class Last_Published_Post extends Base_Data_Collector {
 	 * @return void
 	 */
 	public function update_last_published_post_cache( $new_status, $old_status, $post ) {
-		if ( $new_status === 'publish' || $old_status === 'publish' ) {
+		if ( true === \in_array( get_post_type( $post ), $this->include_post_types, true ) && ( $new_status === 'publish' || $old_status === 'publish' ) ) {
 			$this->update_cache();
 		}
 	}
@@ -66,13 +83,13 @@ class Last_Published_Post extends Base_Data_Collector {
 				'post_status'    => 'publish',
 				'orderby'        => 'date',
 				'order'          => 'DESC',
+				'post_type'      => $this->include_post_types,
 			]
 		);
 
 		if ( ! empty( $last_created_posts ) ) {
 			$data = [
 				'post_id'   => $last_created_posts[0]->ID,
-				'long'      => \progress_planner()->get_activities__content_helpers()->is_post_long( $last_created_posts[0]->ID ) ? true : false,
 				'post_date' => $last_created_posts[0]->post_date,
 			];
 		}

@@ -287,6 +287,7 @@ class Review extends Repetitive {
 			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
 			'url'         => $this->get_url( $task_id ),
+			'url_target'  => $this->get_url_target(),
 			'description' => $this->get_description( $task_id ),
 		];
 
