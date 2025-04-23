@@ -1,17 +1,12 @@
 = 1.3.0 =
 
-Bugs we fixed:
-
-* Fixed error during plugin uninstall.
-
-= 1.2.1 =
-
 Enhancements:
 
 * Improved checks when adding Ravi icon to the Yoast SEO settings page.
 
 Bugs we fixed:
 
+* Fixed error during plugin uninstall.
 * Archive_Format data collector hooks weren't registered early enough.
 * Ensure fresh plugin list by clearing plugin cache before checking for inactive plugins after deletion.
 
