@@ -127,7 +127,7 @@ class Review extends Repetitive {
 
 		return '<p>' . sprintf(
 			/* translators: %1$s <a href="https://prpl.fyi/review-post" target="_blank">Review</a> link, %2$s: The post title. */
-			\esc_html__( '%1$s the post "%2$s" as it was last updated more than 6 months ago.', 'progress-planner' ),
+			\esc_html__( '%1$s the post "%2$s" as it was last updated more than 12 months ago.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/review-post" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
 			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
 		) . '</p>' . ( $this->capability_required() ? '<p><a href="' . \esc_url( \get_edit_post_link( $post->ID ) ) . '">' . \esc_html__( 'Edit the post', 'progress-planner' ) . '</a>.</p>' : '' ); // @phpstan-ignore-line property.nonObject
@@ -338,15 +338,16 @@ class Review extends Repetitive {
 			$args = wp_parse_args(
 				$args,
 				[
-					'posts_per_page' => static::ITEMS_TO_INJECT,
-					'post_type'      => $this->include_post_types,
-					'post_status'    => 'publish',
-					'orderby'        => 'modified',
-					'order'          => 'ASC',
-					'date_query'     => [
+					'posts_per_page'      => static::ITEMS_TO_INJECT,
+					'post_type'           => $this->include_post_types,
+					'post_status'         => 'publish',
+					'orderby'             => 'modified',
+					'order'               => 'ASC',
+					'ignore_sticky_posts' => true,
+					'date_query'          => [
 						[
 							'column' => 'post_modified',
-							'before' => '-6 months',
+							'before' => '-12 months',
 						],
 					],
 				]
@@ -355,7 +356,7 @@ class Review extends Repetitive {
 			/**
 			 * Filters the args for the posts & pages we want user to review.
 			 *
-			 * @param array $args The get_postsargs.
+			 * @param array $args The get_posts args.
 			 */
 			$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
 
@@ -363,7 +364,7 @@ class Review extends Repetitive {
 			$posts = \get_posts( $args );
 		}
 
-		// Get the pages saved in the settings that have not been updated in the last 6 months.
+		// Get the pages saved in the settings that have not been updated in the last 12 months.
 		$saved_page_type_ids = $this->get_saved_page_types();
 
 		if ( ! empty( $saved_page_type_ids ) ) {
@@ -374,13 +375,13 @@ class Review extends Repetitive {
 					'orderby'             => 'modified',
 					'order'               => 'ASC',
 					'ignore_sticky_posts' => true,
+					'post__in'            => $saved_page_type_ids,
 					'date_query'          => [
 						[
 							'column' => 'post_modified',
-							'before' => '-6 months',
+							'before' => '-12 months',
 						],
 					],
-					'post__in'            => $saved_page_type_ids,
 				]
 			);
 
@@ -399,17 +400,14 @@ class Review extends Repetitive {
 	 * @return array
 	 */
 	public function filter_update_posts_args( $args ) {
-		if ( ! isset( $args['post__not_in'] ) ) {
-			$args['post__not_in'] = [];
-		}
+		$snoozed_post_ids = $this->get_snoozed_post_ids();
 
-		$args['post__not_in'] = array_merge(
-			$args['post__not_in'],
-			// Add the snoozed post IDs to the post__not_in array.
-			$this->get_snoozed_post_ids(),
-			// Add the saved page-types to the post__not_in array.
-			$this->get_saved_page_types()
-		);
+		if ( ! empty( $snoozed_post_ids ) ) {
+			if ( ! isset( $args['post__not_in'] ) ) {
+				$args['post__not_in'] = [];
+			}
+			$args['post__not_in'] = array_merge( $args['post__not_in'], $snoozed_post_ids );
+		}
 
 		return $args;
 	}
@@ -467,7 +465,7 @@ class Review extends Repetitive {
 		$task = Local_Task_Factory::create_task_from( 'id', $task_id );
 		$data = $task->get_data();
 
-		if ( isset( $data['post_id'] ) && (int) \get_post_modified_time( 'U', false, (int) $data['post_id'] ) > strtotime( '-6 months' ) ) {
+		if ( isset( $data['post_id'] ) && (int) \get_post_modified_time( 'U', false, (int) $data['post_id'] ) > strtotime( '-12 months' ) ) {
 			return true;
 		}
 
