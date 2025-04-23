@@ -20,11 +20,21 @@ class Update_130 {
 	 * @return void
 	 */
 	public function run() {
+		$this->add_set_valuable_post_types_option();
 		$this->migrate_badges();
 	}
 
 	/**
-	 * Migrate the content curator badge.
+	 * Add the set valuable post types option.
+	 *
+	 * @return void
+	 */
+	private function add_set_valuable_post_types_option() {
+		\update_option( 'progress_planner_set_valuable_post_types', true );
+	}
+
+	/**
+	 * Migrate the content badges.
 	 *
 	 * @return void
 	 */
