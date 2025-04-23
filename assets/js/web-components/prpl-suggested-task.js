@@ -21,6 +21,7 @@ customElements.define(
 			points = 0,
 			action = '',
 			url = '',
+			url_target = '_self',
 			dismissable = false,
 			provider_id = '',
 			category = '',
@@ -37,7 +38,7 @@ customElements.define(
 
 			let taskHeading = title;
 			if ( url ) {
-				taskHeading = `<a href="${ url }">${ title }</a>`;
+				taskHeading = `<a href="${ url }" target="${ url_target }">${ title }</a>`;
 			}
 
 			const isRemoteTask = task_id.startsWith( 'remote-task-' );
