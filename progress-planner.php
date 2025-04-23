@@ -66,6 +66,8 @@ spl_autoload_register(
 			'Progress_Planner\Debug_Tools'                => [ 'Progress_Planner\Utils\Debug_Tools', '1.1.1' ],
 			'Progress_Planner\Onboard'                    => [ 'Progress_Planner\Utils\Onboard', '1.1.1' ],
 			'Progress_Planner\Playground'                 => [ 'Progress_Planner\Utils\Playground', '1.1.1' ],
+
+			'Progress_Planner\Admin\Widgets\Published_Content' => [ 'Progress_Planner\Admin\Widgets\Content_Activity', '1.3.0' ],
 		];
 
 		if ( isset( $deprecated[ $class_name ] ) ) {
