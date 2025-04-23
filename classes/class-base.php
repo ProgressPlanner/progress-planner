@@ -219,6 +219,8 @@ class Base {
 			'get_playground'                             => [ 'get_utils__playground', '1.1.1' ],
 			'get_chart'                                  => [ 'get_ui__chart', '1.1.1' ],
 			'get_popover'                                => [ 'get_ui__popover', '1.1.1' ],
+
+			'get_admin__widgets__published_content'      => [ 'get_admin__widgets__content_activity', '1.3.0' ],
 		];
 
 		if ( isset( $deprecated[ $name ] ) ) {
