@@ -219,30 +219,167 @@
 	}
 }
 
-.prpl-license-keys-wrapper {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
+/* Post types */
+.prpl-column-post-types {
 
-	.prpl-license-key-wrapper {
+	.prpl-settings-section-title {
+
+		svg {
+			color: #038d88;
+
+			path {
+				fill: currentcolor;
+			}
+		}
+
+		background-color: #f3faf9;
+	}
+
+}
+
+/* Login destination */
+.prpl-column-login-destination {
+
+	.prpl-settings-section-title {
+
+		svg {
+			color: var(--prpl-color-accent-red);
+		}
+
+		background-color: var(--prpl-background-red);
+	}
+
+}
+
+
+/* License */
+.prpl-column-license {
+
+	.prpl-settings-section-title {
+
+		svg {
+			color: #0773b4;
+		}
+		background-color: #effbfe;
+	}
+
+	.prpl-license-keys-wrapper {
 		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+		flex-direction: column;
+		gap: 1rem;
+		max-width: 40rem;
 
-		.prpl-license-status {
-			width: 1rem;
-			height: 1rem;
+		& > p:first-child {
+			margin-top: 0;
+		}
 
-			svg {
+		.prpl-license-key-wrapper {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+
+			.prpl-license-status {
 				width: 1rem;
 				height: 1rem;
+
+				svg {
+					width: 1rem;
+					height: 1rem;
+				}
 			}
+		}
+
+		input {
+			width: 30rem;
+			max-width: calc(100% - 2rem);
+			border: 1px solid var(--prpl-color-gray-2);
+			box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.05);
 		}
 	}
 
-	input {
-		width: 20rem;
-		max-width: calc(100% - 2rem);
+}
+
+
+/* Grid layout for wrapper for:
+- Valuable post types
+- Default login destination
+- License keys
+*/
+#prpl-grid-column-wrapper {
+	display: grid;
+	margin-bottom: var(--prpl-gap);
+
+	/* There are 5 or less valuable post types */
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: auto auto;
+	gap: var(--prpl-settings-page-gap);
+
+	.prpl-column {
+		align-self: stretch;
+		display: flex;
+		flex-direction: column;
+
+		.prpl-widget-wrapper {
+			flex: 1;
+			margin-bottom: 0;
+		}
+	}
+
+	/* Valuable post types */
+	.prpl-column:nth-child(1) {
+		grid-column: 1;
+		grid-row: 1;
+	}
+
+	/* Default login destination */
+	.prpl-column:nth-child(2) {
+		grid-column: 2;
+		grid-row: 1;
+	}
+
+	/* License keys */
+	.prpl-column:nth-child(3) {
+		grid-column: 1 / span 2;
+		grid-row: 2;
+	}
+
+	/* We have more than 5 valuable post types */
+	&:has([data-has-many-valuable-post-types]) {
+		grid-template-rows: auto auto;
+
+		/* Valuable post types */
+		.prpl-column:nth-child(1) {
+			grid-column: 1;
+			grid-row: 1 / span 2;
+
+			/* Span 2 rows on the left */
+		}
+
+		/* Default login destination */
+		.prpl-column:nth-child(2) {
+			grid-column: 2;
+			grid-row: 1;
+		}
+
+		/* License keys */
+		.prpl-column:nth-child(3) {
+			grid-column: 2;
+			grid-row: 2;
+		}
+	}
+}
+
+/* Valuable post types */
+#prpl-post-types-include-wrapper {
+	padding-top: 0.75rem;
+
+	label {
+		display: block;
+		margin-top: 0.75rem;
+
+		&:first-child {
+			margin-top: 0;
+		}
 	}
 }
 

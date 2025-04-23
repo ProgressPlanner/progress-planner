@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 $prpl_pages = \progress_planner()->get_admin__page_settings()->get_settings();
 ?>
 
-<div class="prpl-column">
+<div class="prpl-column prpl-column-pages">
 	<div class="prpl-widget-wrapper">
 		<h2 class="prpl-settings-section-title">
 			<span class="icon">

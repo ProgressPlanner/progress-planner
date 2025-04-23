@@ -10,6 +10,7 @@
 namespace Progress_Planner;
 
 use Progress_Planner\Update\Update_111;
+use Progress_Planner\Update\Update_130;
 
 /**
  * Plugin Upgrade class.
@@ -41,6 +42,7 @@ class Plugin_Migrations {
 	 */
 	private const UPGRADE_CLASSES = [
 		'1.1.1' => Update_111::class,
+		'1.3.0' => Update_130::class,
 	];
 
 	/**

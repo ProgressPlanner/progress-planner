@@ -15,7 +15,7 @@ $prpl_pro_license_status = \get_option( 'progress_planner_pro_license_status', '
 
 ?>
 
-<div class="prpl-column">
+<div class="prpl-column prpl-column-license">
 	<div class="prpl-widget-wrapper">
 		<h2 class="prpl-settings-section-title prpl-settings-section-license">
 			<span class="icon">
