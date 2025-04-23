@@ -280,8 +280,7 @@ class Content {
 			}
 		}
 
-		$activity       = \progress_planner()->get_activities__content_helpers()->get_activity_from_post( $post );
-		$activity->type = $type;
+		$activity = \progress_planner()->get_activities__content_helpers()->get_activity_from_post( $post, $type );
 
 		// Update the badges.
 		if ( 'publish' === $type ) {
@@ -303,6 +302,11 @@ class Content {
 				\do_action( 'progress_planner_activity_content_publish_saved', $activity->data_id );
 				return;
 			}
+		}
+
+		// We need to set the date explicitly since post_date & post_modified dates are not changed when the post is trashed.
+		if ( 'trash' === $type ) {
+			$activity->date = new \DateTime();
 		}
 
 		$activity->save();

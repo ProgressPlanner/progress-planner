@@ -37,6 +37,13 @@ class Create extends Repetitive {
 	protected const CAPABILITY = 'edit_others_posts';
 
 	/**
+	 * The task URL target.
+	 *
+	 * @var string
+	 */
+	protected $url_target = '_blank';
+
+	/**
 	 * The data collector.
 	 *
 	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post
@@ -48,7 +55,7 @@ class Create extends Repetitive {
 	 */
 	public function __construct() {
 		$this->data_collector = new Last_Published_Post_Data_Collector();
-		$this->url            = \admin_url( 'post-new.php?post_type=post' );
+		$this->url            = 'https://prpl.fyi/valuable-content';
 	}
 
 	/**
@@ -57,7 +64,7 @@ class Create extends Repetitive {
 	 * @return string
 	 */
 	public function get_title() {
-		return esc_html__( 'Create a post', 'progress-planner' );
+		return esc_html__( 'Create valuable content', 'progress-planner' );
 	}
 
 	/**
@@ -66,7 +73,7 @@ class Create extends Repetitive {
 	 * @return string
 	 */
 	public function get_description() {
-		return esc_html__( 'Create a new, relevant post. If you write an in-depth post you may earn an extra point.', 'progress-planner' );
+		return esc_html__( 'Time to add more valuable content to your site! Check our blog for inspiration.', 'progress-planner' );
 	}
 
 	/**
@@ -76,7 +83,7 @@ class Create extends Repetitive {
 	 *
 	 * @return array
 	 */
-	public function modify_task_data( $task_data ) {
+	public function modify_evaluated_task_data( $task_data ) {
 		$last_published_post_data = $this->data_collector->collect();
 
 		if ( ! $last_published_post_data || empty( $last_published_post_data['post_id'] ) ) {
@@ -85,7 +92,6 @@ class Create extends Repetitive {
 
 		// Add the post ID and post length to the task data.
 		$task_data['post_id'] = $last_published_post_data['post_id'];
-		$task_data['long']    = $last_published_post_data['long'];
 
 		return $task_data;
 	}
@@ -132,6 +138,7 @@ class Create extends Repetitive {
 			'points'      => $this->get_points(), // We use $this->get_points() here on purpose, get_points_for_task() calcs the points for the last published post.
 			'dismissable' => $this->is_dismissable(),
 			'url'         => $this->get_url(),
+			'url_target'  => $this->get_url_target(),
 			'description' => $this->get_description(),
 		];
 
@@ -146,21 +153,20 @@ class Create extends Repetitive {
 	 *
 	 * @return int
 	 */
-	public function get_points_for_task( $task_id = '' ) {
+	public function get_points( $task_id = '' ) {
 
 		if ( ! $task_id ) {
-			// Get the post that was created last.
-			$post_data = $this->data_collector->collect();
-		} else {
-			$post_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
-			$post_data = $post_data[0] ?? false;
-		}
-
-		// Post was created, but then deleted?
-		if ( ! $post_data || empty( $post_data['post_id'] ) ) {
 			return $this->points;
 		}
 
-		return true === $post_data['long'] ? 2 : 1;
+		$post_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
+		$post_data = $post_data[0] ?? false;
+
+		// Backwards compatibility.
+		if ( $post_data && isset( $post_data['long'] ) ) {
+			return true === $post_data['long'] ? 2 : 1;
+		}
+
+		return $this->points;
 	}
 }
