@@ -185,8 +185,12 @@ class Page_Settings {
 	 * @return void
 	 */
 	public function save_settings() {
-		$redirect_on_login = isset( $_POST['prpl-redirect-on-login'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			? \sanitize_text_field( \wp_unslash( $_POST['prpl-redirect-on-login'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		// Check the nonce.
+		\check_admin_referer( 'progress_planner' );
+
+		$redirect_on_login = isset( $_POST['prpl-redirect-on-login'] )
+			? \sanitize_text_field( \wp_unslash( $_POST['prpl-redirect-on-login'] ) )
 			: false;
 
 		\update_user_meta( \get_current_user_id(), 'prpl_redirect_on_login', (bool) $redirect_on_login );
@@ -216,8 +220,12 @@ class Page_Settings {
 	 * @return void
 	 */
 	public function save_license() {
-		$license = isset( $_POST['prpl-pro-license-key'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			? \sanitize_text_field( \wp_unslash( $_POST['prpl-pro-license-key'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
+
+		// Check the nonce.
+		\check_admin_referer( 'progress_planner' );
+
+		$license = isset( $_POST['prpl-pro-license-key'] )
+			? \sanitize_text_field( \wp_unslash( $_POST['prpl-pro-license-key'] ) )
 			: '';
 
 		$previous = \get_option( 'progress_planner_pro_license_key' );
