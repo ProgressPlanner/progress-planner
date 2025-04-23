@@ -99,16 +99,13 @@ class Review extends Repetitive {
 	public function get_title( $task_id = '' ) {
 		$post = $this->get_post_from_task_id( $task_id );
 
-		if ( ! $post ) {
-			return '';
-		}
-
-		return sprintf(
-			// translators: %1$s: The post type, %2$s: The post title.
-			\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
-			strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
-			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
-		);
+		return $post
+			? sprintf(
+				// translators: %1$s: The post type, %2$s: The post title.
+				\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
+				strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
+				\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
+			) : '';
 	}
 
 	/**
@@ -125,11 +122,14 @@ class Review extends Repetitive {
 			return '';
 		}
 
+		$months = in_array( (int) $post->ID, $this->get_saved_page_types(), true ) ? '12' : '6';
+
 		return '<p>' . sprintf(
-			/* translators: %1$s <a href="https://prpl.fyi/review-post" target="_blank">Review</a> link, %2$s: The post title. */
-			\esc_html__( '%1$s the post "%2$s" as it was last updated more than 12 months ago.', 'progress-planner' ),
+			/* translators: %1$s <a href="https://prpl.fyi/review-post" target="_blank">Review</a> link, %2$s: The post title, %3$s: The number of months. */
+			\esc_html__( '%1$s the post "%2$s" as it was last updated more than %3$s months ago.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/review-post" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
-			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
+			\esc_html( $post->post_title ), // @phpstan-ignore-line property.nonObject
+			\esc_html( $months )
 		) . '</p>' . ( $this->capability_required() ? '<p><a href="' . \esc_url( \get_edit_post_link( $post->ID ) ) . '">' . \esc_html__( 'Edit the post', 'progress-planner' ) . '</a>.</p>' : '' ); // @phpstan-ignore-line property.nonObject
 	}
 
@@ -143,11 +143,9 @@ class Review extends Repetitive {
 	public function get_url( $task_id = '' ) {
 		$post = $this->get_post_from_task_id( $task_id );
 
-		if ( ! $post ) {
-			return '';
-		}
-
-		return $this->capability_required() ? \esc_url( \get_edit_post_link( $post->ID ) ) : ''; // @phpstan-ignore-line property.nonObject
+		return $post && $this->capability_required()
+			? \esc_url( (string) \get_edit_post_link( $post->ID ) )
+			: '';
 	}
 
 	/**
@@ -364,7 +362,7 @@ class Review extends Repetitive {
 			$posts = \get_posts( $args );
 		}
 
-		// Get the pages saved in the settings that have not been updated in the last 12 months.
+		// Get the pages saved in the settings that have not been updated in the last 6 months.
 		$saved_page_type_ids = $this->get_saved_page_types();
 
 		if ( ! empty( $saved_page_type_ids ) ) {
@@ -379,7 +377,7 @@ class Review extends Repetitive {
 					'date_query'          => [
 						[
 							'column' => 'post_modified',
-							'before' => '-12 months',
+							'before' => '-6 months',
 						],
 					],
 				]
@@ -400,14 +398,15 @@ class Review extends Repetitive {
 	 * @return array
 	 */
 	public function filter_update_posts_args( $args ) {
-		$snoozed_post_ids = $this->get_snoozed_post_ids();
+		$args['post__not_in'] = isset( $args['post__not_in'] )
+			? $args['post__not_in']
+			: [];
 
-		if ( ! empty( $snoozed_post_ids ) ) {
-			if ( ! isset( $args['post__not_in'] ) ) {
-				$args['post__not_in'] = [];
-			}
-			$args['post__not_in'] = array_merge( $args['post__not_in'], $snoozed_post_ids );
-		}
+		$args['post__not_in'] = array_merge(
+			$args['post__not_in'],
+			// Add the snoozed post IDs to the post__not_in array.
+			$this->get_snoozed_post_ids(),
+		);
 
 		return $args;
 	}
