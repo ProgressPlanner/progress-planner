@@ -50,7 +50,7 @@ class Page {
 			\progress_planner()->get_admin__widgets__challenge(),
 			\progress_planner()->get_admin__widgets__latest_badge(),
 			\progress_planner()->get_admin__widgets__badge_streak(),
-			\progress_planner()->get_admin__widgets__published_content(),
+			\progress_planner()->get_admin__widgets__content_activity(),
 			\progress_planner()->get_admin__widgets__whats_new(),
 		];
 
