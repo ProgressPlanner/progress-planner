@@ -79,6 +79,13 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	protected $url = '';
 
 	/**
+	 * The task URL target.
+	 *
+	 * @var string
+	 */
+	protected $url_target = '_self';
+
+	/**
 	 * The task link setting.
 	 *
 	 * @var array
@@ -158,6 +165,15 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	public function get_url_target() {
+		return $this->url_target ? $this->url_target : '_self';
 	}
 
 	/**

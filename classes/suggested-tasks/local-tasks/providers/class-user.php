@@ -93,6 +93,7 @@ class User extends One_Time {
 					'priority'     => 'medium',
 					'points'       => 0,
 					'url'          => '',
+					'url_target'   => '_self',
 					'description'  => '',
 					'link_setting' => [],
 					'dismissable'  => true,
