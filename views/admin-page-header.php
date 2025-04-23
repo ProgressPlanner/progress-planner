@@ -34,13 +34,6 @@ $progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_tex
 			<span class="screen-reader-text"><?php \esc_html_e( 'Start tour', 'progress-planner' ); ?>
 		</button>
 		<?php
-		// Render the settings button.
-		\progress_planner()->get_ui__popover()->the_popover( 'settings' )->render_button(
-			'',
-			\progress_planner()->get_asset( 'images/icon_settings.svg' ) . '<span class="screen-reader-text">' . \esc_html__( 'Settings', 'progress-planner' ) . '</span>'
-		);
-		// Render the settings popover.
-		\progress_planner()->get_ui__popover()->the_popover( 'settings' )->render();
 
 		// Render the subscribe form button and popover if the license key is not set.
 		if ( 'no-license' === \get_option( 'progress_planner_license_key', 'no-license' ) ) {
