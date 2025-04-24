@@ -44,7 +44,7 @@ class Remote_Tasks {
 			}
 
 			// If the task with this id is completed, don't add a task.
-			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( "{$item['task_id']}" ) ) {
+			if ( true === \progress_planner()->get_recommendations()->is_completed( (int) $item['task_id'] ) ) {
 				continue;
 			}
 

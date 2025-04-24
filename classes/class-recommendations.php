@@ -241,4 +241,17 @@ class Recommendations {
 			]
 		);
 	}
+
+	/**
+	 * Check if a recommendation is completed.
+	 *
+	 * @param int $id The recommendation ID.
+	 *
+	 * @return bool
+	 */
+	public function is_completed( int $id ) {
+		// Get the post status.
+		$post_status = \get_post_status( $id );
+		return 'draft' === $post_status || 'trash' === $post_status;
+	}
 }

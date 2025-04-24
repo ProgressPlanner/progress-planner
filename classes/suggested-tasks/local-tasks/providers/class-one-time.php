@@ -81,7 +81,7 @@ abstract class One_Time extends Local_Tasks {
 		if (
 			true === $this->is_task_snoozed() ||
 			! $this->should_add_task() || // No need to add the task.
-			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() )
+			true === \progress_planner()->get_recommendations()->is_completed( (int) $this->get_task_id() )
 		) {
 			return [];
 		}

@@ -213,7 +213,7 @@ class Local_Tasks_Manager {
 		foreach ( $provider_tasks as $task ) {
 
 			// Skip the task if it was completed.
-			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task['task_id'] ) ) {
+			if ( true === \progress_planner()->get_recommendations()->is_completed( (int) $task['task_id'] ) ) {
 				continue;
 			}
 

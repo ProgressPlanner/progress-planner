@@ -455,25 +455,6 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Check if a task was completed. Task is considered completed if it was completed or pending celebration.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool
-	 */
-	public function was_task_completed( $task_id ) {
-		foreach ( \progress_planner()->get_settings()->get( 'local_tasks', [] ) as $task ) {
-			if ( ! isset( $task['task_id'] ) || $task['task_id'] !== $task_id ) {
-				continue;
-			}
-
-			return isset( $task['status'] ) && in_array( $task['status'], [ 'completed', 'pending_celebration' ], true );
-		}
-
-		return false;
-	}
-
-	/**
 	 * Update a task.
 	 *
 	 * @param string $task_id The task ID.
