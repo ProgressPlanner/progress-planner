@@ -106,7 +106,6 @@ const externalLinkHelper = new ExternalLinkAccessibilityHelper( {
 } );
 
 prplDocumentReady( () => {
-	console.log( 'externalLinkHelper ready ' );
 	externalLinkHelper.applyAccessibility();
 } );
 
