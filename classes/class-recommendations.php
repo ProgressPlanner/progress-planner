@@ -32,6 +32,8 @@ class Recommendations {
 
 		// Add the automatic updates complete action.
 		\add_action( 'automatic_updates_complete', [ $this, 'on_automatic_updates_complete' ] );
+
+		\add_action( 'wp_ajax_progress_planner_suggested_task_action', [ $this, 'suggested_task_action' ] );
 	}
 
 	/**
@@ -325,5 +327,65 @@ class Recommendations {
 		}
 
 		\progress_planner()->get_activities__query()->delete_activity( $activity[0] );
+	}
+
+	/**
+	 * Handle the suggested task action.
+	 *
+	 * @return void
+	 */
+	public function suggested_task_action() {
+		// Check the nonce.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
+
+		if ( ! isset( $_POST['task_id'] ) || ! isset( $_POST['action_type'] ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing data.', 'progress-planner' ) ] );
+		}
+
+		$action  = \sanitize_text_field( \wp_unslash( $_POST['action_type'] ) );
+		$task_id = (string) \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) );
+
+		switch ( $action ) {
+			case 'complete':
+				// We need to add the task to the pending tasks first, before marking it as completed.
+				if ( false !== strpos( $task_id, 'remote-task' ) ) {
+					\progress_planner()->get_suggested_tasks()->add_remote_task_to_pending_tasks( $task_id );
+				}
+
+				// Mark the task as completed.
+				\progress_planner()->get_suggested_tasks()->mark_task_as( 'completed', $task_id );
+
+				// Insert an activity.
+				\progress_planner()->get_recommendations()->insert_activity( $task_id );
+				$updated = true;
+				break;
+
+			case 'pending':
+				\progress_planner()->get_suggested_tasks()->mark_task_as( 'pending', $task_id );
+				$updated = true;
+				\progress_planner()->get_recommendations()->delete_activity( $task_id );
+				break;
+
+			case 'snooze':
+				$duration = isset( $_POST['duration'] ) ? \sanitize_text_field( \wp_unslash( $_POST['duration'] ) ) : '';
+				$updated  = \progress_planner()->get_recommendations()->snooze_recommendation( (int) $task_id, $duration );
+				break;
+
+			case 'delete':
+				$updated = \progress_planner()->get_recommendations()->delete_recommendation( (int) $task_id );
+				\progress_planner()->get_recommendations()->delete_activity( $task_id );
+				break;
+
+			default:
+				\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid action.', 'progress-planner' ) ] );
+		}
+
+		if ( ! $updated ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to save.', 'progress-planner' ) ] );
+		}
+
+		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
 	}
 }
