@@ -186,6 +186,8 @@ class Page {
 			} else {
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboard', $default_localization_data );
 			}
+
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
 		}
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
@@ -198,6 +200,8 @@ class Page {
 					],
 				]
 			);
+
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
 		}
 	}
 
