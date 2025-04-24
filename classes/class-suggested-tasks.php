@@ -393,45 +393,6 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Mark a task as snoozed.
-	 *
-	 * @param string $task_id The task ID.
-	 * @param string $duration The duration.
-	 *
-	 * @return bool
-	 */
-	public function snooze_task( $task_id, $duration ) {
-
-		switch ( $duration ) {
-			case '1-month':
-				$time = \MONTH_IN_SECONDS;
-				break;
-
-			case '3-months':
-				$time = 3 * \MONTH_IN_SECONDS;
-				break;
-
-			case '6-months':
-				$time = 6 * \MONTH_IN_SECONDS;
-				break;
-
-			case '1-year':
-				$time = \YEAR_IN_SECONDS;
-				break;
-
-			case 'forever':
-				$time = \PHP_INT_MAX;
-				break;
-
-			default:
-				$time = \WEEK_IN_SECONDS;
-				break;
-		}
-
-		return $this->mark_task_as( 'snoozed', $task_id, [ 'time' => $time ] );
-	}
-
-	/**
 	 * Check if a task meets a condition.
 	 *
 	 * @param array $condition The condition.
