@@ -27,7 +27,6 @@ class Page {
 	private function register_hooks() {
 		\add_action( 'admin_menu', [ $this, 'add_page' ] );
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
-		\add_action( 'wp_ajax_progress_planner_save_cpt_settings', [ $this, 'save_cpt_settings' ] );
 		\add_action( 'in_admin_header', [ $this, 'remove_admin_notices' ], PHP_INT_MAX );
 
 		// Clear the cache for the activity scores widget.
@@ -51,7 +50,7 @@ class Page {
 			\progress_planner()->get_admin__widgets__challenge(),
 			\progress_planner()->get_admin__widgets__latest_badge(),
 			\progress_planner()->get_admin__widgets__badge_streak(),
-			\progress_planner()->get_admin__widgets__published_content(),
+			\progress_planner()->get_admin__widgets__content_activity(),
 			\progress_planner()->get_admin__widgets__whats_new(),
 		];
 
@@ -291,26 +290,6 @@ class Page {
 	}
 
 	/**
-	 * Save the post types settings.
-	 *
-	 * @return void
-	 */
-	public function save_cpt_settings() {
-		\check_ajax_referer( 'progress_planner', 'nonce', false );
-		$include_post_types = isset( $_POST['include_post_types'] )
-			? \sanitize_text_field( \wp_unslash( $_POST['include_post_types'] ) )
-			: 'post,page';
-		$include_post_types = \explode( ',', $include_post_types );
-		\progress_planner()->get_settings()->set( 'include_post_types', $include_post_types );
-
-		\wp_send_json_success(
-			[
-				'message' => \esc_html__( 'Settings saved.', 'progress-planner' ),
-			]
-		);
-	}
-
-	/**
 	 * Remove all admin notices when the user is on the Progress Planner page.
 	 *
 	 * @return void
@@ -362,8 +341,8 @@ class Page {
 				position: relative;
 				.update-plugins {
 					position: absolute;
-					left: 22px;
-					top: 0px;
+					left: 18px;
+					bottom: 0px;
 					min-width: 15px;
 					height: 15px;
 					line-height: 1.5;

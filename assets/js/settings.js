@@ -6,26 +6,6 @@
  *
  * Dependencies: progress-planner/ajax-request, progress-planner/onboard, wp-util, progress-planner/l10n
  */
-document
-	.getElementById( 'prpl-settings-form' )
-	.addEventListener( 'submit', function ( event ) {
-		event.preventDefault();
-		const form = new FormData( this );
-		const data = form.getAll( 'prpl-settings-post-types-include[]' );
-
-		// Save the options.
-		const request = wp.ajax.post( 'progress_planner_save_cpt_settings', {
-			_ajax_nonce: progressPlanner.nonce,
-			include_post_types: data.join( ',' ),
-		} );
-		request.done( () => {
-			window.location.reload();
-		} );
-
-		document.getElementById( 'submit-include-post-types' ).disabled = true;
-		document.getElementById( 'submit-include-post-types' ).innerHTML =
-			prplL10n( 'saving' );
-	} );
 
 // Submit the email.
 const settingsLicenseForm = document.getElementById(

@@ -162,12 +162,17 @@ class Stats {
 		$ravis_recommendations   = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
 		$data['recommendations'] = [];
 		foreach ( $ravis_recommendations as $recommendation ) {
-			$data['recommendations'][] = [
+			$r = [
 				'id'          => $recommendation['task_id'],
 				'title'       => $recommendation['title'],
 				'url'         => isset( $recommendation['url'] ) ? $recommendation['url'] : '',
 				'provider_id' => $recommendation['provider_id'],
 			];
+
+			if ( 'user' === $recommendation['provider_id'] ) {
+				$r['points'] = isset( $recommendation['points'] ) ? $recommendation['points'] : 0;
+			}
+			$data['recommendations'][] = $r;
 		}
 
 		$data['plugin_url'] = \esc_url( \get_admin_url( null, 'admin.php?page=progress-planner' ) );

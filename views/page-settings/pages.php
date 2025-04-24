@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 ?>
 
-<div class="prpl-column">
+<div class="prpl-column prpl-column-pages">
 	<div class="prpl-widget-wrapper">
 		<h2 class="prpl-settings-section-title">
 			<span class="icon">

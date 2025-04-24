@@ -1,4 +1,4 @@
-= 1.2.1 =
+= 1.3.0 =
 
 Enhancements:
 
@@ -6,6 +6,7 @@ Enhancements:
 
 Bugs we fixed:
 
+* Fixed error during plugin uninstall.
 * Archive_Format data collector hooks weren't registered early enough.
 * Ensure fresh plugin list by clearing plugin cache before checking for inactive plugins after deletion.
 
