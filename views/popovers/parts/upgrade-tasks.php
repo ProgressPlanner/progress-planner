@@ -63,7 +63,7 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 				\progress_planner()->get_suggested_tasks()->mark_task_as( 'pending_celebration', $prpl_task_data['task_id'] );
 
 				// Insert an activity.
-				\progress_planner()->get_suggested_tasks()->insert_activity( $prpl_task_data['task_id'] );
+				\progress_planner()->get_recommendations()->insert_activity( $prpl_task_data['task_id'] );
 			}
 			?>
 				<li class="prpl-onboarding-task" data-prpl-task-completed="<?php echo $prpl_task_completed ? 'true' : 'false'; ?>">

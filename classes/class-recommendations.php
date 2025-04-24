@@ -8,6 +8,7 @@
 namespace Progress_Planner;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
+use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
 
 /**
  * Recommendations class.
@@ -278,9 +279,29 @@ class Recommendations {
 				);
 
 				// Insert an activity.
-				\progress_planner()->get_suggested_tasks()->insert_activity( $task_id );
+				$this->insert_activity( $task_id );
 				break;
 			}
 		}
+	}
+
+	/**
+	 * Insert an activity.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return void
+	 */
+	public function insert_activity( $task_id ) {
+		// Insert an activity.
+		$activity          = new Suggested_Task_Activity();
+		$activity->type    = 'completed';
+		$activity->data_id = (string) $task_id;
+		$activity->date    = new \DateTime();
+		$activity->user_id = \get_current_user_id();
+		$activity->save();
+
+		// Allow other classes to react to the completion of a suggested task.
+		do_action( 'progress_planner_suggested_task_completed', $task_id );
 	}
 }

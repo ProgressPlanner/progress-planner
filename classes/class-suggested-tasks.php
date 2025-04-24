@@ -9,7 +9,6 @@ namespace Progress_Planner;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
 use Progress_Planner\Suggested_Tasks\Remote_Tasks;
-use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
 /**
  * Suggested_Tasks class.
@@ -70,28 +69,8 @@ class Suggested_Tasks {
 			$this->mark_task_as( 'pending_celebration', $task_data['task_id'] );
 
 			// Insert an activity.
-			$this->insert_activity( $task_data['task_id'] );
+			\progress_planner()->get_recommendations()->insert_activity( $task_data['task_id'] );
 		}
-	}
-
-	/**
-	 * Insert an activity.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return void
-	 */
-	public function insert_activity( $task_id ) {
-		// Insert an activity.
-		$activity          = new Suggested_Task_Activity();
-		$activity->type    = 'completed';
-		$activity->data_id = (string) $task_id;
-		$activity->date    = new \DateTime();
-		$activity->user_id = \get_current_user_id();
-		$activity->save();
-
-		// Allow other classes to react to the completion of a suggested task.
-		do_action( 'progress_planner_suggested_task_completed', $task_id );
 	}
 
 	/**
@@ -508,7 +487,7 @@ class Suggested_Tasks {
 				$this->mark_task_as( 'completed', $task_id );
 
 				// Insert an activity.
-				$this->insert_activity( $task_id );
+				\progress_planner()->get_recommendations()->insert_activity( $task_id );
 				$updated = true;
 				break;
 
