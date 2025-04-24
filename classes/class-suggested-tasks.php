@@ -59,9 +59,6 @@ class Suggested_Tasks {
 		// Init the remote tasks.
 		$this->remote->init();  // @phpstan-ignore-line method.nonObject
 
-		// Unsnooze tasks.
-		$this->maybe_unsnooze_tasks();
-
 		// Check for completed tasks.
 		$completed_tasks = $this->local->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
 
@@ -432,35 +429,6 @@ class Suggested_Tasks {
 		}
 
 		return $this->mark_task_as( 'snoozed', $task_id, [ 'time' => $time ] );
-	}
-
-	/**
-	 * Maybe unsnooze tasks.
-	 *
-	 * @return void
-	 */
-	private function maybe_unsnooze_tasks() {
-		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		$tasks_changed = false;
-		foreach ( $tasks as $key => $task ) {
-			if ( $task['status'] !== 'snoozed' ) {
-				continue;
-			}
-
-			if ( isset( $task['time'] ) && $task['time'] < \time() ) {
-				if ( isset( $task['provider_id'] ) && 'user' === $task['provider_id'] ) {
-					$tasks[ $key ]['status'] = 'pending';
-					unset( $tasks[ $key ]['time'] );
-				} else {
-					unset( $tasks[ $key ] );
-				}
-				$tasks_changed = true;
-			}
-		}
-
-		if ( $tasks_changed ) {
-			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
-		}
 	}
 
 	/**
