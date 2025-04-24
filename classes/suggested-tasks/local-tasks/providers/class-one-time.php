@@ -43,7 +43,7 @@ abstract class One_Time extends Local_Tasks {
 			return false;
 		}
 
-		return $this->is_task_completed() ? Local_Task_Factory::create_task_from( 'id', $task_id ) : false;
+		return $this->is_task_completed( $task_id ) ? Local_Task_Factory::create_task_from( 'id', $task_id ) : false;
 	}
 
 	/**
@@ -57,9 +57,28 @@ abstract class One_Time extends Local_Tasks {
 	/**
 	 * Alias for should_add_task(), for better readability when using in the evaluate_task() method.
 	 *
+	 * @param string $task_id Optional task ID to check completion for.
+	 *
 	 * @return bool
 	 */
-	public function is_task_completed() {
+	public function is_task_completed( $task_id = '' ) {
+		// If no specific task ID provided, use the default behavior.
+		if ( empty( $task_id ) ) {
+			return ! $this->should_add_task();
+		}
+
+		// For specific task IDs, child classes can override this method.
+		return $this->is_specific_task_completed( $task_id );
+	}
+
+	/**
+	 * Check if a specific task is completed.
+	 * Child classes can override this method to handle specific task IDs.
+	 *
+	 * @param string $task_id The task ID to check.
+	 * @return bool
+	 */
+	protected function is_specific_task_completed( $task_id ) {
 		return ! $this->should_add_task();
 	}
 

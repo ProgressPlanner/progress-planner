@@ -25,8 +25,10 @@ abstract class Repetitive extends Local_Tasks {
 		$parts = [ $this->get_provider_id() ];
 
 		// Add optional data parts if provided.
-		if ( ! empty( $data['post_id'] ) ) {
-			$parts[] = $data['post_id'];
+		if ( ! empty( $data ) ) {
+			foreach ( $data as $value ) {
+				$parts[] = $value;
+			}
 		}
 
 		// Always add the date as the last part.
