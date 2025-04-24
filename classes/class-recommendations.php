@@ -304,4 +304,26 @@ class Recommendations {
 		// Allow other classes to react to the completion of a suggested task.
 		do_action( 'progress_planner_suggested_task_completed', $task_id );
 	}
+
+	/**
+	 * Delete an activity.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return void
+	 */
+	public function delete_activity( $task_id ) {
+		$activity = \progress_planner()->get_activities__query()->query_activities(
+			[
+				'data_id' => $task_id,
+				'type'    => 'completed',
+			]
+		);
+
+		if ( empty( $activity ) ) {
+			return;
+		}
+
+		\progress_planner()->get_activities__query()->delete_activity( $activity[0] );
+	}
 }

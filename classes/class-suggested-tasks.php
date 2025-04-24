@@ -74,28 +74,6 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Delete an activity.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return void
-	 */
-	public function delete_activity( $task_id ) {
-		$activity = \progress_planner()->get_activities__query()->query_activities(
-			[
-				'data_id' => $task_id,
-				'type'    => 'completed',
-			]
-		);
-
-		if ( empty( $activity ) ) {
-			return;
-		}
-
-		\progress_planner()->get_activities__query()->delete_activity( $activity[0] );
-	}
-
-	/**
 	 * Get the API object.
 	 *
 	 * @return \Progress_Planner\Suggested_Tasks\Remote_Tasks
@@ -494,7 +472,7 @@ class Suggested_Tasks {
 			case 'pending':
 				$this->mark_task_as( 'pending', $task_id );
 				$updated = true;
-				$this->delete_activity( $task_id );
+				\progress_planner()->get_recommendations()->delete_activity( $task_id );
 				break;
 
 			case 'snooze':
@@ -504,7 +482,7 @@ class Suggested_Tasks {
 
 			case 'delete':
 				$updated = \progress_planner()->get_recommendations()->delete_recommendation( (int) $task_id );
-				$this->delete_activity( $task_id );
+				\progress_planner()->get_recommendations()->delete_activity( $task_id );
 				break;
 
 			default:
