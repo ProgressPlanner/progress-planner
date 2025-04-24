@@ -10,7 +10,6 @@ namespace Progress_Planner;
 use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
 use Progress_Planner\Suggested_Tasks\Remote_Tasks;
 use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
 /**
  * Suggested_Tasks class.
@@ -118,35 +117,6 @@ class Suggested_Tasks {
 		}
 
 		\progress_planner()->get_activities__query()->delete_activity( $activity[0] );
-	}
-
-	/**
-	 * If done via automatic updates, the "core update" task should be marked as "completed" (and skip "pending celebration" status).
-	 *
-	 * @return void
-	 */
-	public function on_automatic_updates_complete() {
-
-		$pending_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] ); // @phpstan-ignore-line method.nonObject
-
-		if ( empty( $pending_tasks ) ) {
-			return;
-		}
-
-		foreach ( $pending_tasks as $task_data ) {
-			$task_id = $task_data['task_id'];
-
-			if ( $task_data['provider_id'] === ( new Core_Update() )->get_provider_id() &&
-				\gmdate( 'YW' ) === $task_data['date']
-			) {
-				// Change the task status to completed.
-				$this->mark_task_as( 'completed', $task_id );
-
-				// Insert an activity.
-				$this->insert_activity( $task_id );
-				break;
-			}
-		}
 	}
 
 	/**

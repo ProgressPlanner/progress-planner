@@ -7,12 +7,21 @@
 
 namespace Progress_Planner;
 
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
+
 /**
  * Recommendations class.
  *
  * @package Progress_Planner
  */
 class Recommendations {
+
+	const QUERY_ARGS = [
+		'post_type'   => 'prpl_recommendations',
+		'numberposts' => -1,
+		'orderby'     => 'menu_order',
+		'order'       => 'ASC',
+	];
 
 	/**
 	 * Constructor.
@@ -82,15 +91,7 @@ class Recommendations {
 	 */
 	public function get_all() {
 		return $this->format_recommendations(
-			get_posts(
-				[
-					'post_type'   => 'prpl_recommendations',
-					'numberposts' => -1,
-					'post_status' => 'any',
-					'orderby'     => 'menu_order',
-					'order'       => 'ASC',
-				]
-			)
+			get_posts( \wp_parse_args( [ 'post_status' => 'any' ], self::QUERY_ARGS ) )
 		);
 	}
 
@@ -101,15 +102,7 @@ class Recommendations {
 	 */
 	public function get_pending() {
 		return $this->format_recommendations(
-			get_posts(
-				[
-					'post_type'   => 'prpl_recommendations',
-					'numberposts' => -1,
-					'post_status' => 'publish',
-					'orderby'     => 'menu_order',
-					'order'       => 'ASC',
-				]
-			)
+			get_posts( \wp_parse_args( [ 'post_status' => 'publish' ], self::QUERY_ARGS ) )
 		);
 	}
 
@@ -123,20 +116,19 @@ class Recommendations {
 	public function get_by_provider( $provider ) {
 		return $this->format_recommendations(
 			get_posts(
-				[
-					'post_type'   => 'prpl_recommendations',
-					'numberposts' => -1,
-					'post_status' => 'any',
-					'orderby'     => 'menu_order',
-					'order'       => 'ASC',
-					'tax_query'   => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-						[
-							'taxonomy' => 'prpl_recommendations_provider',
-							'field'    => 'slug',
-							'terms'    => (array) $provider,
+				\wp_parse_args(
+					[
+						'post_status' => 'any',
+						'tax_query'   => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+							[
+								'taxonomy' => 'prpl_recommendations_provider',
+								'field'    => 'slug',
+								'terms'    => (array) $provider,
+							],
 						],
 					],
-				]
+					self::QUERY_ARGS
+				)
 			)
 		);
 	}
@@ -253,5 +245,39 @@ class Recommendations {
 		// Get the post status.
 		$post_status = \get_post_status( $id );
 		return 'draft' === $post_status || 'trash' === $post_status;
+	}
+
+	/**
+	 * If done via automatic updates, the "core update" task should be marked as "completed" (and skip "pending celebration" status).
+	 *
+	 * @return void
+	 */
+	public function on_automatic_updates_complete() {
+
+		$pending_tasks = $this->get_pending();
+
+		if ( empty( $pending_tasks ) ) {
+			return;
+		}
+
+		foreach ( $pending_tasks as $task_data ) {
+			$task_id = $task_data['ID'];
+
+			if ( $task_data['provider'] === ( new Core_Update() )->get_provider_id() &&
+				\gmdate( 'YW' ) === $task_data['date']
+			) {
+				// Change the task status to completed.
+				\wp_update_post(
+					[
+						'ID'          => (int) $task_data['ID'],
+						'post_status' => 'trash',
+					]
+				);
+
+				// Insert an activity.
+				\progress_planner()->get_suggested_tasks()->insert_activity( $task_id );
+				break;
+			}
+		}
 	}
 }
