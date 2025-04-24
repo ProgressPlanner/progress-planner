@@ -28,6 +28,9 @@ class Recommendations {
 	 */
 	public function __construct() {
 		add_action( 'init', [ $this, 'init' ], -1 );
+
+		// Add the automatic updates complete action.
+		\add_action( 'automatic_updates_complete', [ $this, 'on_automatic_updates_complete' ] );
 	}
 
 	/**
