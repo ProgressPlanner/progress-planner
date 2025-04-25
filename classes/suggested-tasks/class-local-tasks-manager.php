@@ -29,7 +29,7 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\User as User_Tasks;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Set_Valuable_Post_Types;
-
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Update_Term_Description;
 /**
  * Local_Tasks_Manager class.
  */
@@ -66,6 +66,7 @@ class Local_Tasks_Manager {
 			new Search_Engine_Visibility(),
 			new User_Tasks(),
 			new Set_Valuable_Post_Types(),
+			new Update_Term_Description(),
 		];
 
 		// Add the plugin integration.

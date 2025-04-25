@@ -50,13 +50,7 @@ class Terms_Without_Description extends Base_Data_Collector {
 			return;
 		}
 
-		// Get the old term.
-		$old_term = get_term( $term_id, $taxonomy );
-
-		// Check if the term has a description.
-		if ( \is_wp_error( $old_term ) || ! $old_term || $old_term->description === $args['description'] ) {
-			return;
-		}
+		// TODO: Check if this can be more performant, by checking specifically if the description has changed.
 
 		$this->update_cache();
 	}
