@@ -14,7 +14,7 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Uncategorized_Category;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Archive_Format;
-
+use Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Description;
 /**
  * Base data collector.
  */
@@ -41,6 +41,7 @@ class Data_Collector_Manager {
 			new Post_Author(),
 			new Last_Published_Post(),
 			new Archive_Format(),
+			new Terms_Without_Description(),
 		];
 
 		// Initialize (add hooks) the data collectors.
