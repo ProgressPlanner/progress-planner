@@ -174,7 +174,7 @@ class Recommendations {
 	 *
 	 * @return array
 	 */
-	private function format_recommendations( $recommendations ) {
+	public function format_recommendations( $recommendations ) {
 		$result = [];
 		foreach ( $recommendations as $recommendation ) {
 			$result[] = $this->format_recommendation( $recommendation );
@@ -190,7 +190,7 @@ class Recommendations {
 	 *
 	 * @return array
 	 */
-	private function format_recommendation( $post ) {
+	public function format_recommendation( $post ) {
 		$post = (array) $post;
 
 		// Format the post meta.

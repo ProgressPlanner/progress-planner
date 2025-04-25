@@ -314,27 +314,25 @@ class Local_Tasks_Manager {
 	 * @return bool
 	 */
 	public function add_pending_task( $task ) {
-		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		// Check if we already have a post with the same title.
+		$posts = \get_posts(
+			[
+				'title'       => $task['title'],
+				'post_type'   => 'prpl_recommendations',
+				'numberposts' => 1,
+			]
+		);
 
-		$task_index = false;
-
-		foreach ( $tasks as $key => $_task ) {
-			if ( ! isset( $_task['task_id'] ) || $task['task_id'] !== $_task['task_id'] ) {
-				continue;
-			}
-			$task_index = $key;
-			break;
+		if ( $posts && 'publish' !== $posts[0]->post_status ) {
+			return (bool) \wp_update_post(
+				[
+					'ID'          => $posts[0]->ID,
+					'post_status' => 'publish',
+				]
+			);
 		}
 
-		$task['status'] = 'pending';
-
-		if ( false !== $task_index ) {
-			$tasks[ $task_index ] = array_merge( $task, $tasks[ $task_index ] );
-		} else {
-			$tasks[] = $task;
-		}
-
-		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+		return false;
 	}
 
 	/**

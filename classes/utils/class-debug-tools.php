@@ -374,18 +374,9 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Get all local tasks.
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-
-		// Filter out pending tasks.
-		$local_tasks = array_filter(
-			$local_tasks,
-			function ( $task ) {
-				return 'pending' !== $task['status'];
-			}
-		);
-
-		// Update the local tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', array_values( $local_tasks ) );
+		foreach ( \progress_planner()->get_recommendations()->get( [ 'post_status' => 'publish' ] ) as $task ) {
+			wp_delete_post( $task['ID'], true );
+		}
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_pending_tasks', '_wpnonce' ] ) );
@@ -528,8 +519,10 @@ class Debug_Tools {
 		// Verify nonce for security.
 		$this->verify_nonce();
 
-		// Delete the option.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
+		// Delete all suggested tasks.
+		foreach ( \progress_planner()->get_recommendations()->get( [ 'post_status' => 'any' ] ) as $task ) {
+			wp_delete_post( $task['ID'], true );
+		}
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_suggested_tasks', '_wpnonce' ] ) );
