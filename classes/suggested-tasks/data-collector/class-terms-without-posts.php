@@ -105,7 +105,7 @@ class Terms_Without_Posts extends Base_Data_Collector {
 				SELECT t.term_id, t.name, tt.count, tt.taxonomy
 				FROM {$wpdb->terms} AS t
 				INNER JOIN {$wpdb->term_taxonomy} AS tt ON t.term_id = tt.term_id
-				WHERE tt.taxonomy = %s AND tt.count < %d LIMIT %d
+				WHERE tt.taxonomy = %s AND tt.count <= %d LIMIT %d
 			",
 					$taxonomy,
 					self::MIN_POSTS,
