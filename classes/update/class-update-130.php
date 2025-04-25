@@ -82,9 +82,23 @@ class Update_130 {
 			],
 		) as $activity ) {
 
-			// Check if the tasks with the same task_id exists, ie user skipped v1.2 update.
-			$existing_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $activity->data_id );
-			if ( ! empty( $existing_tasks ) ) {
+			$continue_main_loop = false;
+
+			// Check if the task with the same task_id exists, it means that task was recreated (and has pending status now).
+			foreach ( $local_tasks as $key => $local_task ) {
+				if ( $local_task['task_id'] === $activity->data_id ) {
+					// Set the status to completed.
+					$local_tasks[ $key ]['status'] = 'completed';
+					$local_tasks_changed = true;
+					$continue_main_loop = true;
+
+					// Break the inner loop.
+					break;
+				}
+			}
+
+			// Continue the main loop.
+			if ( $continue_main_loop ) {
 				continue;
 			}
 
