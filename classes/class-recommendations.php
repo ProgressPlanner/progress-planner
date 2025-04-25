@@ -142,7 +142,7 @@ class Recommendations {
 	 * @return array
 	 */
 	public function get( $args = [] ) {
-		return $this->format_recommendations( get_posts( \wp_parse_args( $args, self::QUERY_ARGS ) ) );
+		return $this->format_recommendations( \get_posts( \wp_parse_args( $args, self::QUERY_ARGS ) ) );
 	}
 
 	/**
