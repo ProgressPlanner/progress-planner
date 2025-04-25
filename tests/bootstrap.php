@@ -28,7 +28,7 @@ require_once "{$_tests_dir}/includes/functions.php";
 // Include Core.
 $_core_dir = getenv( 'WP_CORE_DIR' );
 if ( ! $_core_dir ) {
-	$_core_dir = $_tests_dir;
+	$_core_dir = dirname( $_core_dir ) . '/wordpress';
 }
 require_once "{$_core_dir}/wp-load.php";
 require_once "{$_core_dir}/wp-settings.php";
