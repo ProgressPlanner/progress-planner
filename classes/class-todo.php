@@ -21,7 +21,7 @@ class Todo {
 		\add_action( 'wp_ajax_progress_planner_save_user_suggested_task', [ $this, 'save_user_suggested_task' ] );
 		\add_action( 'wp_ajax_progress_planner_save_suggested_user_tasks_order', [ $this, 'save_suggested_user_tasks_order' ] );
 
-		$this->maybe_change_first_item_points_on_monday();
+		\add_action( 'init', [ $this, 'maybe_change_first_item_points_on_monday' ] );
 	}
 
 	/**
