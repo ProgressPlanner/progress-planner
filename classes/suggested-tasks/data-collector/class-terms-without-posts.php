@@ -36,7 +36,7 @@ class Terms_Without_Posts extends Base_Data_Collector {
 	public function init() {
 		\add_action( 'delete_term', [ $this, 'update_terms_without_posts_cache' ], 10 );
 
-		// TODO: Test this hooks - we need to update the cache when a post is term is added or removed from the term.
+		// We need to update the cache when a term is added or removed from a post.
 		\add_action( 'set_object_terms', [ $this, 'on_terms_changed' ], 10, 6 );
 	}
 
