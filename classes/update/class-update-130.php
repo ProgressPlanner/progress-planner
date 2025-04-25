@@ -89,8 +89,8 @@ class Update_130 {
 				if ( $local_task['task_id'] === $activity->data_id ) {
 					// Set the status to completed.
 					$local_tasks[ $key ]['status'] = 'completed';
-					$local_tasks_changed = true;
-					$continue_main_loop = true;
+					$local_tasks_changed           = true;
+					$continue_main_loop            = true;
 
 					// Break the inner loop.
 					break;
