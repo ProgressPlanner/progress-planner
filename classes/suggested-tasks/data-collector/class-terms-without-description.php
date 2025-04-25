@@ -85,11 +85,6 @@ class Terms_Without_Description extends Base_Data_Collector {
 		$result = [];
 
 		foreach ( $public_taxonomies as $taxonomy ) {
-			// Term which cannot be removed.
-			$default_taxonomy_term_id = (int) \get_option( 'default_' . $taxonomy, 0 );
-
-			// If the default taxonomy term (which cannot be removed) is set, we need to query 2 terms.
-			$query_limit = $default_taxonomy_term_id ? 2 : 1;
 
 			$terms = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
@@ -99,21 +94,17 @@ class Terms_Without_Description extends Base_Data_Collector {
 				INNER JOIN {$wpdb->term_taxonomy} AS tt ON t.term_id = tt.term_id
 				WHERE tt.taxonomy = %s
 				AND (tt.description = '' OR tt.description IS NULL)
-				LIMIT %d
+				LIMIT 1
 			",
-					$taxonomy,
-					$query_limit
+					$taxonomy
 				)
 			);
 
 			// Check if we have terms without posts.
 			if ( ! empty( $terms ) ) {
 				foreach ( $terms as $term ) {
-					// Default categories can not be removed.
-					if ( $default_taxonomy_term_id !== (int) $term->term_id ) {
-						$result = (array) $term;
-						break;
-					}
+					$result = (array) $term;
+					break;
 				}
 			}
 		}
