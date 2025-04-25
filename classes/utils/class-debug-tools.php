@@ -222,39 +222,38 @@ class Debug_Tools {
 		);
 
 		// Get suggested tasks.
-		$suggested_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$suggested_tasks = \progress_planner()->get_recommendations()->get( [ 'post_status' => 'any' ] );
 
 		$menu_items = [
-			'pending'             => 'Pending',
-			'completed'           => 'Completed',
-			'snoozed'             => 'Snoozed',
-			'pending_celebration' => 'Pending Celebration',
+			'publish' => 'Pending (publish)',
+			'trash'   => 'Completed (trash)',
+			'future'  => 'Snoozed (future)',
+			'draft'   => 'Pending Celebration (draft)',
 		];
 
-		foreach ( $menu_items as $key => $title ) {
+		foreach ( $menu_items as $post_status => $title ) {
 			$admin_bar->add_node(
 				[
-					'id'     => 'prpl-suggested-' . $key,
+					'id'     => 'prpl-suggested-' . $post_status,
 					'parent' => 'prpl-suggested-tasks',
 					'title'  => $title,
 				]
 			);
 
 			foreach ( $suggested_tasks as $task ) {
-				if ( ! isset( $task['task_id'] ) || $key !== $task['status'] ) {
+				if ( ! isset( $task['ID'] ) || $post_status !== $task['post_status'] ) {
 					continue;
 				}
 
-				$title = $task['task_id'];
-				if ( isset( $task['status'] ) && 'snoozed' === $task['status'] && isset( $task['time'] ) ) {
-					$until  = is_float( $task['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['time'] ) . ')';
-					$title .= ' ' . $until;
+				$title = $task['post_title'];
+				if ( isset( $task['post_status'] ) && 'future' === $task['post_status'] ) {
+					$title .= ' (until ' . \gmdate( 'Y-m-d H:i', $task['post_date'] ) . ')';
 				}
 
 				$admin_bar->add_node(
 					[
-						'id'     => 'prpl-suggested-' . $key . '-' . $title,
-						'parent' => 'prpl-suggested-' . $key,
+						'id'     => 'prpl-suggested-' . $post_status . '-' . $title,
+						'parent' => 'prpl-suggested-' . $post_status,
 						'title'  => $title,
 					]
 				);

@@ -48,18 +48,14 @@ class User extends One_Time {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-
-		$tasks       = [];
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$local_tasks = \progress_planner()->get_recommendations()->get_by_provider( self::PROVIDER_ID );
 		foreach ( $local_tasks as $task_data ) {
-			if ( isset( $task_data['provider_id'] ) && self::PROVIDER_ID === $task_data['provider_id'] ) {
-				$tasks[] = [
-					'task_id'     => $task_data['task_id'],
-					'provider_id' => $this->get_provider_id(),
-					'category'    => $this->get_provider_category(),
-					'points'      => 0,
-				];
-			}
+			$tasks[] = [
+				'task_id'     => $task_data['ID'],
+				'provider_id' => $this->get_provider_id(),
+				'category'    => $this->get_provider_category(),
+				'points'      => 0,
+			];
 		}
 
 		return $tasks;

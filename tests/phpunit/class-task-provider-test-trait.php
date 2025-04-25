@@ -71,11 +71,15 @@ trait Task_Provider_Test_Trait {
 	public function tear_down() {
 		parent::tear_down();
 
-		// Delete local tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
-
-		// Delete suggested tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
+		// Delete all posts in the 'prpl_recommendations' post type.
+		foreach ( get_posts(
+			[
+				'post_type'      => 'prpl_recommendations',
+				'posts_per_page' => -1,
+			]
+		) as $post ) {
+			wp_delete_post( $post->ID, true );
+		}
 	}
 
 	/**

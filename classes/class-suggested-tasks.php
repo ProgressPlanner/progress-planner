@@ -154,29 +154,6 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Delete a task.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool
-	 */
-	public function delete_task( $task_id ) {
-		$tasks    = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		$modified = false;
-		foreach ( $tasks as $key => $task ) {
-			if ( $task['task_id'] === $task_id ) {
-				unset( $tasks[ $key ] );
-				$modified = true;
-				break;
-			}
-		}
-
-		return $modified
-			? \progress_planner()->get_settings()->set( 'local_tasks', $tasks )
-			: false;
-	}
-
-	/**
 	 * Update a task.
 	 *
 	 * @param string $task_id The task ID.
