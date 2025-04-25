@@ -37,7 +37,7 @@ class Terms_Without_Posts extends Base_Data_Collector {
 		\add_action( 'delete_term', [ $this, 'update_terms_without_posts_cache' ], 10 );
 
 		// TODO: Test this hooks - we need to update the cache when a post is term is added or removed from the term.
-		\add_action( 'set_object_terms', [ $this, 'on_terms_changed_for_post' ], 10, 6 );
+		\add_action( 'set_object_terms', [ $this, 'on_terms_changed' ], 10, 6 );
 	}
 
 	/**
@@ -51,7 +51,7 @@ class Terms_Without_Posts extends Base_Data_Collector {
 	 * @param array  $old_tt_ids The old term taxonomy IDs.
 	 * @return void
 	 */
-	public function on_terms_changed_for_post( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
+	public function on_terms_changed( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
 
 		// Check if the taxonomy is public.
 		$taxonomy_object = \get_taxonomy( $taxonomy );

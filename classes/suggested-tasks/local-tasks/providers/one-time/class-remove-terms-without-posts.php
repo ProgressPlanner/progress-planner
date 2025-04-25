@@ -79,6 +79,43 @@ class Remove_Terms_Without_Posts extends One_Time {
 	}
 
 	/**
+	 * Initialize the task.
+	 */
+	public function init() {
+		\add_action( 'set_object_terms', [ $this, 'maybe_remove_irrelevant_tasks' ], 10, 6 );
+	}
+
+	/**
+	 * Maybe remove irrelevant tasks.
+	 *
+	 * @param int    $object_id The object ID.
+	 * @param array  $terms The terms.
+	 * @param array  $tt_ids The term taxonomy IDs.
+	 * @param string $taxonomy The taxonomy.
+	 * @param bool   $append Whether to append the terms.
+	 * @param array  $old_tt_ids The old term taxonomy IDs.
+	 *
+	 * @return void
+	 */
+	public function maybe_remove_irrelevant_tasks( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
+		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', $this->get_provider_id() );
+
+		if ( ! $pending_tasks ) {
+			return;
+		}
+
+		foreach ( $pending_tasks as $task ) {
+			if ( isset( $task['term_id'] ) && isset( $task['taxonomy'] ) ) {
+				$term = \get_term( $task['term_id'], $task['taxonomy'] );
+
+				if ( \is_wp_error( $term ) || ! $term || $term->count > self::MIN_POSTS ) {
+					\progress_planner()->get_suggested_tasks()->delete_task( $task['task_id'] );
+				}
+			}
+		}
+	}
+
+	/**
 	 * Get the task ID.
 	 *
 	 * @param array $data Optional data to include in the task ID.
