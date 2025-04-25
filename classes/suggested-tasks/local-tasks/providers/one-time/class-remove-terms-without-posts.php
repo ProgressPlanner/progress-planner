@@ -20,7 +20,7 @@ class Remove_Terms_Without_Posts extends One_Time {
 	 *
 	 * @var bool
 	 */
-	protected const IS_ONBOARDING_TASK = true;
+	protected const IS_ONBOARDING_TASK = false;
 
 	/**
 	 * The provider ID.
