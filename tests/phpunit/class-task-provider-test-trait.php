@@ -123,34 +123,20 @@ trait Task_Provider_Test_Trait {
 		// Change the task status to pending celebration for all completed tasks.
 		foreach ( $this->suggested_tasks->get_local()->evaluate_tasks() as $task ) {
 			// Change the task status to pending celebration.
-			$this->suggested_tasks->mark_task_as( 'pending_celebration', $task->get_data()['task_id'] );
+			\progress_planner()->get_recommendations()->mark_task_as( 'pending_celebration', $task->get_data()['task_id'] );
 
 			// In production we insert an activity here.
 		}
 
 		// Verify that the task(s) we're testing is pending celebration.
 		foreach ( $tasks as $task ) {
-			$this->assertTrue(
-				$this->suggested_tasks->check_task_condition(
-					[
-						'status'  => 'pending_celebration',
-						'task_id' => $task['task_id'],
-					]
-				)
-			);
+			$this->assertEquals( 'draft', get_post_status( $task['task_id'] ) );
 		}
 
 		// Verify that the task(s) we're testing is completed.
 		foreach ( $tasks as $task ) {
 			$this->suggested_tasks->transition_task_status( $task['task_id'], 'pending_celebration', 'completed' );
-			$this->assertTrue(
-				$this->suggested_tasks->check_task_condition(
-					[
-						'status'  => 'completed',
-						'task_id' => $task['task_id'],
-					]
-				)
-			);
+			$this->assertEquals( 'trash', get_post_status( $task['task_id'] ) );
 		}
 	}
 }

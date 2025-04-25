@@ -91,25 +91,14 @@ class Recommendations {
 	}
 
 	/**
-	 * Get all recommendations.
+	 * Get recommendations.
+	 *
+	 * @param array $args The arguments.
 	 *
 	 * @return array
 	 */
-	public function get_all() {
-		return $this->format_recommendations(
-			get_posts( \wp_parse_args( [ 'post_status' => 'any' ], self::QUERY_ARGS ) )
-		);
-	}
-
-	/**
-	 * Get pending recommendations.
-	 *
-	 * @return array
-	 */
-	public function get_pending() {
-		return $this->format_recommendations(
-			get_posts( \wp_parse_args( [ 'post_status' => 'publish' ], self::QUERY_ARGS ) )
-		);
+	public function get( $args = [] ) {
+		return $this->format_recommendations( get_posts( \wp_parse_args( $args, self::QUERY_ARGS ) ) );
 	}
 
 	/**
@@ -120,22 +109,17 @@ class Recommendations {
 	 * @return array
 	 */
 	public function get_by_provider( $provider ) {
-		return $this->format_recommendations(
-			get_posts(
-				\wp_parse_args(
+		return $this->get(
+			[
+				'post_status' => 'any',
+				'tax_query'   => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 					[
-						'post_status' => 'any',
-						'tax_query'   => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-							[
-								'taxonomy' => 'prpl_recommendations_provider',
-								'field'    => 'slug',
-								'terms'    => (array) $provider,
-							],
-						],
+						'taxonomy' => 'prpl_recommendations_provider',
+						'field'    => 'slug',
+						'terms'    => (array) $provider,
 					],
-					self::QUERY_ARGS
-				)
-			)
+				],
+			]
 		);
 	}
 
@@ -260,7 +244,7 @@ class Recommendations {
 	 */
 	public function on_automatic_updates_complete() {
 
-		$pending_tasks = $this->get_pending();
+		$pending_tasks = $this->get( [ 'post_status' => 'publish' ] );
 
 		if ( empty( $pending_tasks ) ) {
 			return;
@@ -355,7 +339,7 @@ class Recommendations {
 				}
 
 				// Mark the task as completed.
-				\progress_planner()->get_suggested_tasks()->mark_task_as( 'completed', $task_id );
+				$this->mark_task_as( 'completed', $task_id );
 
 				// Insert an activity.
 				\progress_planner()->get_recommendations()->insert_activity( $task_id );
@@ -363,19 +347,19 @@ class Recommendations {
 				break;
 
 			case 'pending':
-				\progress_planner()->get_suggested_tasks()->mark_task_as( 'pending', $task_id );
+				$this->mark_task_as( 'pending', $task_id );
 				$updated = true;
-				\progress_planner()->get_recommendations()->delete_activity( $task_id );
+				$this->delete_activity( $task_id );
 				break;
 
 			case 'snooze':
 				$duration = isset( $_POST['duration'] ) ? \sanitize_text_field( \wp_unslash( $_POST['duration'] ) ) : '';
-				$updated  = \progress_planner()->get_recommendations()->snooze_recommendation( (int) $task_id, $duration );
+				$updated  = $this->snooze_recommendation( (int) $task_id, $duration );
 				break;
 
 			case 'delete':
-				$updated = \progress_planner()->get_recommendations()->delete_recommendation( (int) $task_id );
-				\progress_planner()->get_recommendations()->delete_activity( $task_id );
+				$updated = $this->delete_recommendation( (int) $task_id );
+				$this->delete_activity( $task_id );
 				break;
 
 			default:
@@ -387,5 +371,59 @@ class Recommendations {
 		}
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Mark a task as a given status.
+	 *
+	 * @param string $status The status.
+	 * @param string $task_id The task ID.
+	 * @param array  $data The data.
+	 *
+	 * @return bool
+	 */
+	public function mark_task_as( $status, $task_id, $data = [] ) {
+		$default_args = [
+			'ID' => (int) $task_id,
+		];
+
+		$result = false;
+
+		switch ( $status ) {
+			case 'completed':
+				$result = (bool) \wp_update_post( \wp_parse_args( [ 'post_status' => 'trash' ], $default_args ) );
+				break;
+
+			case 'pending_celebration':
+				$result = (bool) \wp_update_post( \wp_parse_args( [ 'post_status' => 'draft' ], $default_args ) );
+				break;
+
+			case 'pending':
+				$result = (bool) \wp_update_post( \wp_parse_args( [ 'post_status' => 'publish' ], $default_args ) );
+				break;
+
+			case 'snoozed':
+				$result = (bool) \wp_update_post(
+					\wp_parse_args(
+						[
+							'post_status' => 'future',
+							'post_date'   => \gmdate( 'Y-m-d H:i:s', \time() + $data['time'] ),
+						],
+						$default_args
+					)
+				);
+				break;
+
+			case 'deleted':
+				$result = (bool) \wp_delete_post( (int) $task_id, true );
+				break;
+		}
+
+		// Fire an action when the task status is changed.
+		if ( true === $result ) {
+			do_action( 'progress_planner_task_status_changed', (int) $task_id, $status );
+		}
+
+		return $result;
 	}
 }

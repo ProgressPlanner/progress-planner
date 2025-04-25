@@ -64,7 +64,7 @@ class Suggested_Tasks {
 			$this->update_pending_task( $task_data['task_id'], $task_data );
 
 			// Change the task status to pending celebration.
-			$this->mark_task_as( 'pending_celebration', $task_data['task_id'] );
+			\progress_planner()->get_recommendations()->mark_task_as( 'pending_celebration', $task_data['task_id'] );
 
 			// Insert an activity.
 			\progress_planner()->get_recommendations()->insert_activity( $task_data['task_id'] );
@@ -212,51 +212,6 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Mark a task as a given status.
-	 *
-	 * @param string $status The status.
-	 * @param string $task_id The task ID.
-	 * @param array  $data The data.
-	 *
-	 * @return bool
-	 */
-	public function mark_task_as( $status, $task_id, $data = [] ) {
-		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		$tasks_changed = false;
-		foreach ( $tasks as $key => $task ) {
-			if ( $task['task_id'] !== $task_id ) {
-				continue;
-			}
-
-			if ( 'completed' === $task['status'] && 'pending_celebration' === $status ) {
-				break;
-			}
-
-			$tasks[ $key ]['status'] = $status;
-			$tasks_changed           = true;
-
-			if ( 'snoozed' === $status ) {
-				$tasks[ $key ]['time'] = \time() + $data['time'];
-			}
-
-			break;
-		}
-
-		if ( ! $tasks_changed ) {
-			return false;
-		}
-
-		$result = \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
-
-		// Fire an action when the task status is changed.
-		if ( true === $result ) {
-			do_action( 'progress_planner_task_status_changed', $task_id, $status );
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Remove a task from a given status (sets it as `pending`).
 	 *
 	 * @param string $status The status.
@@ -308,72 +263,10 @@ class Suggested_Tasks {
 		}
 
 		if ( $new_status ) {
-			$return_new_status = $this->mark_task_as( $new_status, $task_id, $data );
+			$return_new_status = \progress_planner()->get_recommendations()->mark_task_as( $new_status, $task_id, $data );
 		}
 
 		return $return_old_status && $return_new_status;
-	}
-
-	/**
-	 * Check if a task meets a condition.
-	 *
-	 * @param array $condition The condition.
-	 *                         [
-	 *                           string  'type'         The condition type.
-	 *                           string  'task_id'      The task id (optional, used for completed and snoozed conditions).
-	 *                           array   'post_lengths' The post lengths (optional, used for snoozed-post-length condition).
-	 *                         ].
-	 *
-	 * @return bool
-	 */
-	public function check_task_condition( $condition ) {
-		$parsed_condition = \wp_parse_args(
-			$condition,
-			[
-				'status'       => '',
-				'task_id'      => '',
-				'post_lengths' => [],
-			]
-		);
-
-		if ( 'snoozed-post-length' === $parsed_condition['status'] ) {
-			if ( isset( $parsed_condition['post_lengths'] ) ) {
-				if ( ! \is_array( $parsed_condition['post_lengths'] ) ) {
-					$parsed_condition['post_lengths'] = [ $parsed_condition['post_lengths'] ];
-				}
-
-				$snoozed_tasks        = $this->get_tasks_by( 'status', 'snoozed' );
-				$snoozed_post_lengths = [];
-
-				// Get the post lengths of the snoozed tasks.
-				foreach ( $snoozed_tasks as $task ) {
-					$data = $this->local->get_data_from_task_id( $task['task_id'] ); // @phpstan-ignore-line method.nonObject
-					if ( isset( $data['category'] ) && 'create-post' === $data['category'] ) {
-						$key = true === $data['long'] ? 'long' : 'short';
-						if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
-							$snoozed_post_lengths[ $key ] = true;
-						}
-					}
-				}
-
-				// Check if the snoozed post lengths match the condition.
-				foreach ( $parsed_condition['post_lengths'] as $post_length ) {
-					if ( ! isset( $snoozed_post_lengths[ $post_length ] ) ) {
-						return false;
-					}
-				}
-
-				return true;
-			}
-		}
-
-		foreach ( $this->get_tasks_by( 'status', $parsed_condition['status'] ) as $task ) {
-			if ( $task['task_id'] === $parsed_condition['task_id'] ) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
