@@ -7,6 +7,8 @@
 
 namespace Progress_Planner;
 
+use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
+use Progress_Planner\Suggested_Tasks\Remote_Tasks;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
 use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
 
@@ -24,10 +26,34 @@ class Recommendations {
 		'order'       => 'ASC',
 	];
 
+	const STATUS_MAP = [
+		'completed'           => 'trash',
+		'pending_celebration' => 'draft',
+		'pending'             => 'publish',
+		'snoozed'             => 'future',
+	];
+
+	/**
+	 * An object containing local tasks.
+	 *
+	 * @var \Progress_Planner\Suggested_Tasks\Local_Tasks_Manager|null
+	 */
+	private $local;
+
+	/**
+	 * The API object.
+	 *
+	 * @var \Progress_Planner\Suggested_Tasks\Remote_Tasks|null
+	 */
+	private $remote;
+
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
+		$this->local  = new Local_Tasks_Manager();
+		$this->remote = new Remote_Tasks();
+
 		add_action( 'init', [ $this, 'init' ], -1 );
 
 		// Add the automatic updates complete action.
@@ -88,6 +114,24 @@ class Recommendations {
 		] as $taxonomy => $label ) {
 			register_taxonomy( $taxonomy, 'prpl_recommendations', [ 'label' => $label ] );
 		}
+	}
+
+	/**
+	 * Get the local tasks object.
+	 *
+	 * @return \Progress_Planner\Suggested_Tasks\Local_Tasks_Manager
+	 */
+	public function get_local() {
+		return $this->local; // @phpstan-ignore-line return.type
+	}
+
+	/**
+	 * Get the API object.
+	 *
+	 * @return \Progress_Planner\Suggested_Tasks\Remote_Tasks
+	 */
+	public function get_remote() {
+		return $this->remote; // @phpstan-ignore-line return.type
 	}
 
 	/**
@@ -425,5 +469,43 @@ class Recommendations {
 		}
 
 		return $result;
+	}
+
+	/**
+	 * Transition a task from one status to another.
+	 *
+	 * @param int    $task_id The task ID.
+	 * @param string $old_status The old status.
+	 * @param string $new_status The new status.
+	 *
+	 * @return bool
+	 */
+	public function transition_task_status( $task_id, $old_status, $new_status ) {
+
+		$tasks = $this->get( [ 'ID' => (int) $task_id ] );
+
+		if ( empty( $tasks ) ) {
+			return false;
+		}
+
+		$task = $tasks[0];
+
+		$old_post_status = isset( self::STATUS_MAP[ $old_status ] )
+			? self::STATUS_MAP[ $old_status ]
+			: $old_status;
+		$new_post_status = isset( self::STATUS_MAP[ $new_status ] )
+			? self::STATUS_MAP[ $new_status ]
+			: $new_status;
+
+		if ( $old_post_status !== $task['post_status'] || $new_post_status === $task['post_status'] ) {
+			return false;
+		}
+
+		return (bool) \wp_update_post(
+			[
+				'post_status' => $new_post_status,
+				'ID'          => (int) $task_id,
+			]
+		);
 	}
 }

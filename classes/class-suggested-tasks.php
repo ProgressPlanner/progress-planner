@@ -7,27 +7,13 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
-use Progress_Planner\Suggested_Tasks\Remote_Tasks;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
 /**
  * Suggested_Tasks class.
  */
 class Suggested_Tasks {
 
-	/**
-	 * An object containing local tasks.
-	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Local_Tasks_Manager|null
-	 */
-	private $local;
 
-	/**
-	 * The API object.
-	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Remote_Tasks|null
-	 */
-	private $remote;
 
 	/**
 	 * Constructor.
@@ -35,9 +21,6 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function __construct() {
-		$this->local  = new Local_Tasks_Manager();
-		$this->remote = new Remote_Tasks();
-
 		if ( \is_admin() ) {
 			\add_action( 'init', [ $this, 'init' ], 1 );
 		}
@@ -50,10 +33,10 @@ class Suggested_Tasks {
 	 */
 	public function init() {
 		// Init the remote tasks.
-		$this->remote->init();  // @phpstan-ignore-line method.nonObject
+		\progress_planner()->get_recommendations()->get_remote()->init();  // @phpstan-ignore-line method.nonObject
 
 		// Check for completed tasks.
-		$completed_tasks = $this->local->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
+		$completed_tasks = \progress_planner()->get_recommendations()->get_local()->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
 
 		foreach ( $completed_tasks as $task ) {
 
@@ -69,24 +52,6 @@ class Suggested_Tasks {
 			// Insert an activity.
 			\progress_planner()->get_recommendations()->insert_activity( $task_data['task_id'] );
 		}
-	}
-
-	/**
-	 * Get the API object.
-	 *
-	 * @return \Progress_Planner\Suggested_Tasks\Remote_Tasks
-	 */
-	public function get_remote() {
-		return $this->remote; // @phpstan-ignore-line return.type
-	}
-
-	/**
-	 * Get the local tasks object.
-	 *
-	 * @return \Progress_Planner\Suggested_Tasks\Local_Tasks_Manager
-	 */
-	public function get_local() {
-		return $this->local; // @phpstan-ignore-line return.type
 	}
 
 	/**
@@ -185,7 +150,7 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_remote_tasks() {
-		return $this->remote->get_tasks_to_inject(); // @phpstan-ignore-line method.nonObject
+		return \progress_planner()->get_recommendations()->get_remote()->get_tasks_to_inject(); // @phpstan-ignore-line method.nonObject
 	}
 
 	/**
@@ -209,64 +174,6 @@ class Suggested_Tasks {
 		return $modified
 			? \progress_planner()->get_settings()->set( 'local_tasks', $tasks )
 			: false;
-	}
-
-	/**
-	 * Remove a task from a given status (sets it as `pending`).
-	 *
-	 * @param string $status The status.
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool
-	 */
-	public function remove_task_from( $status, $task_id ) {
-		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		$tasks_changed = false;
-
-		foreach ( $tasks as $key => $task ) {
-			if ( $task['task_id'] !== $task_id ) {
-				continue;
-			}
-
-			if ( ! isset( $task['status'] ) || $task['status'] !== $status ) {
-				return false;
-			}
-
-			$tasks[ $key ]['status'] = 'pending';
-			$tasks_changed           = true;
-		}
-
-		if ( ! $tasks_changed ) {
-			return false;
-		}
-
-		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
-	}
-
-	/**
-	 * Transition a task from one status to another.
-	 *
-	 * @param string $task_id The task ID.
-	 * @param string $old_status The old status.
-	 * @param string $new_status The new status.
-	 * @param array  $data The data.
-	 *
-	 * @return bool
-	 */
-	public function transition_task_status( $task_id, $old_status, $new_status, $data = [] ) {
-
-		$return_old_status = false;
-		$return_new_status = false;
-
-		if ( $old_status ) {
-			$return_old_status = $this->remove_task_from( $old_status, $task_id );
-		}
-
-		if ( $new_status ) {
-			$return_new_status = \progress_planner()->get_recommendations()->mark_task_as( $new_status, $task_id, $data );
-		}
-
-		return $return_old_status && $return_new_status;
 	}
 
 	/**
@@ -317,7 +224,7 @@ class Suggested_Tasks {
 			return false;
 		}
 
-		return \progress_planner()->get_suggested_tasks()->get_local()->add_pending_task(
+		return \progress_planner()->get_recommendations()->get_local()->add_pending_task(
 			[
 				'task_id'     => $task_id,
 				'provider_id' => $remote_task_data['category'] ?? '', // Remote tasks use the category as provider_id.
