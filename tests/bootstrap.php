@@ -25,6 +25,14 @@ if ( ! file_exists( "{$_tests_dir}/includes/functions.php" ) ) {
 // Give access to tests_add_filter() function.
 require_once "{$_tests_dir}/includes/functions.php";
 
+// Include Core.
+$_core_dir = getenv( 'WP_CORE_DIR' );
+if ( ! $_core_dir ) {
+	$_core_dir = "{$_tests_dir}/includes/core";
+}
+require_once "{$_core_dir}/wp-load.php";
+require_once "{$_core_dir}/wp-settings.php";
+
 /**
  * Load PHPUnit Polyfills.
  */
