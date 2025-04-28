@@ -72,7 +72,7 @@ class Local_Tasks_Manager {
 		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
 
 		// At this point both local and task providers for the plugins we integrate with are instantiated, so initialize them.
-		\add_action( 'plugins_loaded', [ $this, 'init' ], 11 );
+		\add_action( 'init', [ $this, 'init' ], 99 ); // Wait for the post types to be initialized.
 
 		// Add the cleanup action.
 		\add_action( 'admin_init', [ $this, 'cleanup_pending_tasks' ] );
@@ -362,12 +362,8 @@ class Local_Tasks_Manager {
 		$tasks = \array_filter(
 			$tasks,
 			function ( $task ) {
-				// If the task was already completed, remove it.
-				if ( 'completed' === $task['status'] ) {
-					return false;
-				}
 
-				if ( isset( $task['date'] ) ) {
+				if ( 'pending' === $task['status'] && isset( $task['date'] ) ) {
 					return (string) \gmdate( 'YW' ) === (string) $task['date'];
 				}
 

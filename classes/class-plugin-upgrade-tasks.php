@@ -24,7 +24,7 @@ class Plugin_Upgrade_Tasks {
 		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_activated_or_updated' ], 10 );
 
 		// Check if the plugin was upgraded or new plugin was activated.
-		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 10 );
+		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 100 ); // We need to run this after the Local_Tasks_Manager::init() is called.
 	}
 
 	/**
