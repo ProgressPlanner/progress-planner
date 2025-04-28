@@ -381,7 +381,7 @@ class Update_111 {
 
 	/**
 	 * Get the data from a task-ID.
-	 * Copied from the Progress_Planner\Suggested_Tasks\Tasks\Providers\Content class, since we might remove that function in the future.
+	 * Copied from the Progress_Planner\Suggested_Tasks\Providers\Content class, since we might remove that function in the future.
 	 *
 	 * @param string $task_id The task ID.
 	 *

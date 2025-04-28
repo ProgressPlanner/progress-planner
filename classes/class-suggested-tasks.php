@@ -9,7 +9,7 @@ namespace Progress_Planner;
 
 use Progress_Planner\Suggested_Tasks\Tasks_Manager;
 use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
-use Progress_Planner\Suggested_Tasks\Tasks\Providers\Repetitive\Core_Update;
+use Progress_Planner\Suggested_Tasks\Providers\Repetitive\Core_Update;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
 /**
  * Suggested_Tasks class.
