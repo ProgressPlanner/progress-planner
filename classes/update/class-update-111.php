@@ -17,7 +17,7 @@ use Progress_Planner\Suggested_Tasks\Task_Factory;
 class Update_111 {
 
 	/**
-	 * Local tasks.
+	 * Tasks.
 	 *
 	 * @var array
 	 */

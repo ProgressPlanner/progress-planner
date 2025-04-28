@@ -1,6 +1,6 @@
 <?php
 /**
- * Local task factory.
+ * Task factory.
  *
  * @package Progress_Planner
  */
@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks;
 use Progress_Planner\Suggested_Tasks\Task;
 
 /**
- * Local task factory.
+ * Task factory.
  */
 class Task_Factory {
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Local task abstract class.
+ * Task abstract class.
  *
  * @package Progress_Planner
  */
@@ -8,7 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks;
 
 /**
- * Local task abstract class.
+ * Task abstract class.
  */
 class Task {
 	/**
