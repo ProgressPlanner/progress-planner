@@ -22,7 +22,7 @@ class Suggested_Tasks {
 	 */
 	public function __construct() {
 		if ( \is_admin() ) {
-			\add_action( 'init', [ $this, 'init' ], 1 );
+			\add_action( 'init', [ $this, 'init' ], 100 ); // Wait for the post types to be initialized.
 		}
 	}
 
