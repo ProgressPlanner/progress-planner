@@ -55,12 +55,14 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 */
 	public function get_focus_tasks() {
 		return [
-			'iconElement'  => '.yst-toggle-field__header',
-			'valueElement' => [
-				'elementSelector' => 'button[data-id="input-wpseo-remove_feed_global_comments"]',
-				'attributeName'   => 'aria-checked',
-				'attributeValue'  => 'true',
-				'operator'        => '=',
+			[
+				'iconElement'  => '.yst-toggle-field__header',
+				'valueElement' => [
+					'elementSelector' => 'button[data-id="input-wpseo-remove_feed_global_comments"]',
+					'attributeName'   => 'aria-checked',
+					'attributeValue'  => 'true',
+					'operator'        => '=',
+				],
 			],
 		];
 	}

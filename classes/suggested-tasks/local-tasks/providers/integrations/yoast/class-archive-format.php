@@ -72,12 +72,14 @@ class Archive_Format extends Yoast_Provider {
 	 */
 	public function get_focus_tasks() {
 		return [
-			'iconElement'  => '.yst-toggle-field__header',
-			'valueElement' => [
-				'elementSelector' => 'button[data-id="input-wpseo_titles-disable-post_format"]',
-				'attributeName'   => 'aria-checked',
-				'attributeValue'  => 'false',
-				'operator'        => '=',
+			[
+				'iconElement'  => '.yst-toggle-field__header',
+				'valueElement' => [
+					'elementSelector' => 'button[data-id="input-wpseo_titles-disable-post_format"]',
+					'attributeName'   => 'aria-checked',
+					'attributeValue'  => 'false',
+					'operator'        => '=',
+				],
 			],
 		];
 	}
@@ -88,15 +90,30 @@ class Archive_Format extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		$archive_format_count = $this->data_collector->collect();
-
-		// If there are more than X posts with a post format, we don't need to add the task. X is set in the class.
-		if ( $archive_format_count > static::MINIMUM_POSTS_WITH_FORMAT ) {
+		if ( ! $this->is_task_relevant() ) {
 			return false;
 		}
 
 		// If the post format archive is already disabled, we don't need to add the task.
 		if ( YoastSEO()->helpers->options->get( 'disable-post_format' ) === true ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check if the task is still relevant.
+	 * For example, we have a task to disable author archives if there is only one author.
+	 * If in the meantime more authors are added, the task is no longer relevant and the task should be removed.
+	 *
+	 * @return bool
+	 */
+	public function is_task_relevant() {
+		$archive_format_count = $this->data_collector->collect();
+
+		// If there are more than X posts with a post format, we don't need to add the task. X is set in the class.
+		if ( $archive_format_count > static::MINIMUM_POSTS_WITH_FORMAT ) {
 			return false;
 		}
 

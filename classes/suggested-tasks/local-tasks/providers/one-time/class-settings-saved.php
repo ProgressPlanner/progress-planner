@@ -22,6 +22,13 @@ class Settings_Saved extends One_Time {
 	protected const PROVIDER_ID = 'settings-saved';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var string
+	 */
+	protected $priority = 'high';
+
+	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
@@ -50,11 +57,7 @@ class Settings_Saved extends One_Time {
 	 * @return string
 	 */
 	public function get_description() {
-		return sprintf(
-			/* translators: %s:<a href="https://prpl.fyi/fill-settings-page" target="_blank">settings page</a> link */
-			\esc_html__( 'Head over to the settings page and fill in the required information. %s', 'progress-planner' ),
-			'<a href="https://prpl.fyi/fill-settings-page" target="_blank">' . \esc_html__( 'settings page', 'progress-planner' ) . '</a>'
-		);
+		return \esc_html__( 'Head over to the settings page and fill in the required information.', 'progress-planner' );
 	}
 
 	/**

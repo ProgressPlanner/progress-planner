@@ -1,3 +1,26 @@
+= 1.3.0 =
+
+Enhancements:
+
+* Improved checks when adding Ravi icon to the Yoast SEO settings page.
+* Add "golden" tasks to weekly emails.
+* Add text to clarify when the user has completed all tasks.
+* Improve the content widget & stats to show more accurate data. It now shows content _activity_ instead of content _published_.
+* Implemented "valuable post-types" and added settings for them.
+* Changed the "create a post" task to "create valuable content".
+* Renamed & migrated content badges.
+* Added a link to the 'Create valuable content' task description.
+* Improve accessibility of Recommendations (and other links) linking to external resources
+
+Bugs we fixed:
+
+* Fixed error during plugin uninstall.
+* Archive_Format data collector hooks weren't registered early enough.
+* Ensure fresh plugin list by clearing plugin cache before checking for inactive plugins after deletion.
+* Clear plugin cache when checking for inactive plugins.
+* Delete no-longer relevant pending tasks.
+* Fixed timing issue for tasks added by 3rd-party plugins.
+
 = 1.2.0 =
 
 In this release we've [added an integration with the **Yoast SEO** plugin](https://prpl.fyi/v12), so you’ll now see personalized suggestions based on your current SEO configuration.

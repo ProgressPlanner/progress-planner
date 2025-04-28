@@ -54,9 +54,9 @@ class Badges {
 	 */
 	public function __construct() {
 		$this->content = [
-			\progress_planner()->get_badges__content__wonderful_writer(),
-			\progress_planner()->get_badges__content__bold_blogger(),
-			\progress_planner()->get_badges__content__awesome_author(),
+			\progress_planner()->get_badges__content__content_curator(),
+			\progress_planner()->get_badges__content__revision_ranger(),
+			\progress_planner()->get_badges__content__purposeful_publisher(),
 		];
 
 		$this->maintenance = [

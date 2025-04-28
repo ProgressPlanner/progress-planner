@@ -55,12 +55,14 @@ class Archive_Date extends Yoast_Provider {
 	 */
 	public function get_focus_tasks() {
 		return [
-			'iconElement'  => '.yst-toggle-field__header',
-			'valueElement' => [
-				'elementSelector' => 'button[data-id="input-wpseo_titles-disable-date"]',
-				'attributeName'   => 'aria-checked',
-				'attributeValue'  => 'false',
-				'operator'        => '=',
+			[
+				'iconElement'  => '.yst-toggle-field__header',
+				'valueElement' => [
+					'elementSelector' => 'button[data-id="input-wpseo_titles-disable-date"]',
+					'attributeName'   => 'aria-checked',
+					'attributeValue'  => 'false',
+					'operator'        => '=',
+				],
 			],
 		];
 	}
@@ -71,13 +73,29 @@ class Archive_Date extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
+
+		if ( ! $this->is_task_relevant() ) {
+			return false;
+		}
+
+		// If the date archive is already disabled, we don't need to add the task.
+		return YoastSEO()->helpers->options->get( 'disable-date' ) !== true;
+	}
+
+	/**
+	 * Check if the task is still relevant.
+	 * For example, we have a task to disable author archives if there is only one author.
+	 * If in the meantime more authors are added, the task is no longer relevant and the task should be removed.
+	 *
+	 * @return bool
+	 */
+	public function is_task_relevant() {
 		// If the permalink structure includes %year%, %monthnum%, or %day%, we don't need to add the task.
 		$permalink_structure = \get_option( 'permalink_structure' );
 		if ( strpos( $permalink_structure, '%year%' ) !== false || strpos( $permalink_structure, '%monthnum%' ) !== false || strpos( $permalink_structure, '%day%' ) !== false ) {
 			return false;
 		}
 
-		// If the date archive is already disabled, we don't need to add the task.
-		return YoastSEO()->helpers->options->get( 'disable-date' ) !== true;
+		return true;
 	}
 }

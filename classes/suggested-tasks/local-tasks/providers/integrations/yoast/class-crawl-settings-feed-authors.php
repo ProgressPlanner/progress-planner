@@ -72,12 +72,14 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	 */
 	public function get_focus_tasks() {
 		return [
-			'iconElement'  => '.yst-toggle-field__header',
-			'valueElement' => [
-				'elementSelector' => 'button[data-id="input-wpseo-remove_feed_authors"]',
-				'attributeName'   => 'aria-checked',
-				'attributeValue'  => 'true',
-				'operator'        => '=',
+			[
+				'iconElement'  => '.yst-toggle-field__header',
+				'valueElement' => [
+					'elementSelector' => 'button[data-id="input-wpseo-remove_feed_authors"]',
+					'attributeName'   => 'aria-checked',
+					'attributeValue'  => 'true',
+					'operator'        => '=',
+				],
 			],
 		];
 	}
@@ -88,8 +90,8 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		// If there is more than one author, we don't need to add the task.
-		if ( $this->data_collector->collect() > self::MINIMUM_AUTHOR_WITH_POSTS ) {
+
+		if ( ! $this->is_task_relevant() ) {
 			return false;
 		}
 
@@ -99,6 +101,22 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 			if ( $yoast_options[ $option ] ) {
 				return false;
 			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check if the task is still relevant.
+	 * For example, we have a task to disable author archives if there is only one author.
+	 * If in the meantime more authors are added, the task is no longer relevant and the task should be removed.
+	 *
+	 * @return bool
+	 */
+	public function is_task_relevant() {
+		// If there is more than one author, we don't need to add the task.
+		if ( $this->data_collector->collect() > self::MINIMUM_AUTHOR_WITH_POSTS ) {
+			return false;
 		}
 
 		return true;
