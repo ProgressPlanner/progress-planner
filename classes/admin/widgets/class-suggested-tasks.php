@@ -8,7 +8,7 @@
 namespace Progress_Planner\Admin\Widgets;
 
 use Progress_Planner\Badges\Monthly;
-use Progress_Planner\Suggested_Tasks\Tasks\Task_Factory;
+use Progress_Planner\Suggested_Tasks\Task_Factory;
 use Progress_Planner\Suggested_Tasks\Tasks\Providers\Repetitive\Review;
 
 /**

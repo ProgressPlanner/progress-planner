@@ -8,7 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Tasks\Providers\Tasks;
-use Progress_Planner\Suggested_Tasks\Tasks\Task_Factory;
+use Progress_Planner\Suggested_Tasks\Task_Factory;
 use Progress_Planner\Suggested_Tasks\Tasks\Task_Local;
 /**
  * Add tasks for content updates.

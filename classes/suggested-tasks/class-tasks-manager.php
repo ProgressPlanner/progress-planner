@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Suggested_Tasks;
 
-use Progress_Planner\Suggested_Tasks\Tasks\Task_Factory;
+use Progress_Planner\Suggested_Tasks\Task_Factory;
 // Repetitive tasks.
 use Progress_Planner\Suggested_Tasks\Tasks\Providers\Repetitive\Core_Update;
 use Progress_Planner\Suggested_Tasks\Tasks\Providers\Repetitive\Create as Content_Create;

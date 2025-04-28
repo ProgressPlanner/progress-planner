@@ -7,7 +7,7 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Suggested_Tasks\Tasks\Task_Factory;
+use Progress_Planner\Suggested_Tasks\Task_Factory;
 
 /**
  * Todo class.

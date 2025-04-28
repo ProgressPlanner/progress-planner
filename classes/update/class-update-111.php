@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Update;
 
-use Progress_Planner\Suggested_Tasks\Tasks\Task_Factory;
+use Progress_Planner\Suggested_Tasks\Task_Factory;
 
 /**
  * Update class for version 1.1.1.

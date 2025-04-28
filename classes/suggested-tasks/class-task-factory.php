@@ -5,7 +5,9 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Tasks;
+namespace Progress_Planner\Suggested_Tasks;
+
+use Progress_Planner\Suggested_Tasks\Tasks\Task_Local;
 
 /**
  * Local task factory.
