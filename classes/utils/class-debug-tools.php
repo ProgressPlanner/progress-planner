@@ -225,10 +225,10 @@ class Debug_Tools {
 		$suggested_tasks = \progress_planner()->get_recommendations()->get( [ 'post_status' => 'any' ] );
 
 		$menu_items = [
-			'publish' => 'Pending (publish)',
-			'trash'   => 'Completed (trash)',
-			'future'  => 'Snoozed (future)',
-			'pending_celebration'   => 'Pending Celebration (pending_celebration)',
+			'publish'             => 'Pending (publish)',
+			'trash'               => 'Completed (trash)',
+			'future'              => 'Snoozed (future)',
+			'pending_celebration' => 'Pending Celebration (pending_celebration)',
 		];
 
 		foreach ( $menu_items as $post_status => $title ) {
