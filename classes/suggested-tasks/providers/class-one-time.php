@@ -9,7 +9,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Providers\Tasks;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
-use Progress_Planner\Suggested_Tasks\Tasks\Task_Local;
+use Progress_Planner\Suggested_Tasks\Task;
 /**
  * Add tasks for content updates.
  */
@@ -34,7 +34,7 @@ abstract class One_Time extends Tasks {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return bool|Task_Local
+	 * @return bool|Task
 	 */
 	public function evaluate_task( $task_id ) {
 

@@ -5,12 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Tasks;
+namespace Progress_Planner\Suggested_Tasks;
 
 /**
  * Local task abstract class.
  */
-class Task_Local {
+class Task {
 	/**
 	 * The task data.
 	 *

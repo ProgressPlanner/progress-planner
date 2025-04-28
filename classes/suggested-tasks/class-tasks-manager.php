@@ -262,7 +262,7 @@ class Tasks_Manager {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return bool|\Progress_Planner\Suggested_Tasks\Tasks\Task_Local
+	 * @return bool|\Progress_Planner\Suggested_Tasks\Task
 	 */
 	public function evaluate_task( $task_id ) {
 		$task_object   = Task_Factory::create_task_from( 'id', $task_id );

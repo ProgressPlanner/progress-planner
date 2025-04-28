@@ -8,7 +8,7 @@
 namespace Progress_Planner\Update;
 
 use Progress_Planner\Suggested_Tasks\Task_Factory;
-use Progress_Planner\Suggested_Tasks\Tasks\Task_Local;
+use Progress_Planner\Suggested_Tasks\Task;
 
 /**
  * Update class for version 1.3.0.
@@ -156,9 +156,9 @@ class Update_130 {
 	/**
 	 * Handle legacy post tasks.
 	 *
-	 * @param Task_Local $task_object The task object.
+	 * @param Task $task_object The task object.
 	 *
-	 * @return Task_Local The task object.
+	 * @return Task The task object.
 	 */
 	private function handle_legacy_post_tasks( $task_object ) {
 		// Handle legacy long post tasks, here we just need to set 'long' flag to true.
@@ -181,9 +181,9 @@ class Update_130 {
 	/**
 	 * Handle legacy review post tasks.
 	 *
-	 * @param Task_Local $task_object The task object.
+	 * @param Task $task_object The task object.
 	 *
-	 * @return Task_Local The task object.
+	 * @return Task The task object.
 	 */
 	private function handle_legacy_review_post_tasks( $task_object ) {
 		// Review provider.
@@ -208,9 +208,9 @@ class Update_130 {
 	/**
 	 * Handle legacy Yoast SEO tasks.
 	 *
-	 * @param Task_Local $task_object The task object.
+	 * @param Task $task_object The task object.
 	 *
-	 * @return Task_Local The task object.
+	 * @return Task The task object.
 	 */
 	private function handle_legacy_yoast_and_comment_hacks_tasks( $task_object ) {
 

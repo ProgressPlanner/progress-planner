@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Suggested_Tasks;
 
-use Progress_Planner\Suggested_Tasks\Tasks\Task_Local;
+use Progress_Planner\Suggested_Tasks\Task;
 
 /**
  * Local task factory.
@@ -20,13 +20,13 @@ class Task_Factory {
 	 * @param string $param The parameter, 'id' or 'data'.
 	 * @param mixed  $value The task ID or task data.
 	 *
-	 * @return \Progress_Planner\Suggested_Tasks\Tasks\Task_Local
+	 * @return \Progress_Planner\Suggested_Tasks\Task
 	 */
-	public static function create_task_from( $param, $value = null ): Task_Local {
+	public static function create_task_from( $param, $value = null ): Task {
 
 		// If we have task data, return it.
 		if ( 'data' === $param && is_array( $value ) ) {
-			return new Task_Local( $value );
+			return new Task( $value );
 		}
 
 		if ( 'id' === $param && is_string( $value ) ) {
@@ -35,7 +35,7 @@ class Task_Factory {
 
 			// If we have the task data, return it.
 			if ( isset( $tasks[0] ) ) {
-				return new Task_Local( $tasks[0] );
+				return new Task( $tasks[0] );
 			}
 
 			/*
@@ -45,7 +45,7 @@ class Task_Factory {
 			return self::parse_task_data_from_task_id( $value );
 		}
 
-		return new Task_Local( [] );
+		return new Task( [] );
 	}
 
 	/**
@@ -53,7 +53,7 @@ class Task_Factory {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return \Progress_Planner\Suggested_Tasks\Tasks\Task_Local
+	 * @return \Progress_Planner\Suggested_Tasks\Task
 	 */
 	public static function parse_task_data_from_task_id( $task_id ) {
 		$data = [];
@@ -68,7 +68,7 @@ class Task_Factory {
 
 				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_id );
 
-				return new Task_Local(
+				return new Task(
 					[
 						'task_id'     => $task_id,
 						'category'    => $task_provider ? $task_provider->get_provider_category() : '',
@@ -87,7 +87,7 @@ class Task_Factory {
 
 			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id );
 
-			return new Task_Local(
+			return new Task(
 				[
 					'task_id'     => $task_id,
 					'category'    => $task_provider ? $task_provider->get_provider_category() : '',
@@ -128,6 +128,6 @@ class Task_Factory {
 			$data['category'] = $task_provider ? $task_provider->get_provider_category() : '';
 		}
 
-		return new Task_Local( $data );
+		return new Task( $data );
 	}
 }

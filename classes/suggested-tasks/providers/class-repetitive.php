@@ -9,7 +9,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Providers\Tasks;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
-use Progress_Planner\Suggested_Tasks\Tasks\Task_Local;
+use Progress_Planner\Suggested_Tasks\Task;
 /**
  * Add tasks for content updates.
  */
@@ -40,7 +40,7 @@ abstract class Repetitive extends Tasks {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return bool|Task_Local The task data or false if the task is not completed.
+	 * @return bool|Task The task data or false if the task is not completed.
 	 */
 	public function evaluate_task( $task_id ) {
 		// Early bail if the user does not have the capability to manage options.
