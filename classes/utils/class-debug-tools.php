@@ -228,7 +228,7 @@ class Debug_Tools {
 			'publish' => 'Pending (publish)',
 			'trash'   => 'Completed (trash)',
 			'future'  => 'Snoozed (future)',
-			'draft'   => 'Pending Celebration (draft)',
+			'pending_celebration'   => 'Pending Celebration (pending_celebration)',
 		];
 
 		foreach ( $menu_items as $post_status => $title ) {

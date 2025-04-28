@@ -74,11 +74,11 @@ class Update_140 {
 		$task_details['status'] = $task_details['status'] ?? 'published';
 		switch ( $task_details['status'] ) {
 			case 'pending_celebration':
-				$status = 'trash';
+				$status = 'pending_celebration';
 				break;
 
 			case 'completed':
-				$status = 'draft';
+				$status = 'trash';
 				break;
 
 			default:

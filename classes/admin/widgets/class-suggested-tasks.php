@@ -85,7 +85,7 @@ final class Suggested_Tasks extends Widget {
 						}
 
 						// Mark the pending celebration tasks as completed.
-						\progress_planner()->get_recommendations()->transition_task_status( (int) $task_id, 'draft', 'trash' );
+						\progress_planner()->get_recommendations()->transition_task_status( (int) $task_id, 'pending_celebration', 'trash' );
 					}
 				}
 			}

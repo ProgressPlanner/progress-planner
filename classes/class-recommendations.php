@@ -28,7 +28,7 @@ class Recommendations {
 
 	const STATUS_MAP = [
 		'completed'           => 'trash',
-		'pending_celebration' => 'draft',
+		'pending_celebration' => 'pending_celebration',
 		'pending'             => 'publish',
 		'snoozed'             => 'future',
 	];
@@ -73,6 +73,9 @@ class Recommendations {
 
 		// Register the custom taxonomies.
 		\add_action( 'init', [ $this, 'register_taxonomy' ], 0 );
+
+		// Add the custom post status.
+		\add_action( 'init', [ $this, 'register_post_status' ], 1 );
 	}
 
 	/**
@@ -114,6 +117,28 @@ class Recommendations {
 		] as $taxonomy => $label ) {
 			register_taxonomy( $taxonomy, 'prpl_recommendations', [ 'label' => $label ] );
 		}
+	}
+
+	/**
+	 * Register a custom post status.
+	 *
+	 * @return void
+	 */
+	public function register_post_status() {
+		register_post_status(
+			'pending_celebration',
+			[
+				'label'               => _x( 'Pending Celebration', 'post', 'progress-planner' ),
+				'public'              => false,
+				'exclude_from_search' => true,
+				'show_in_admin_bar'   => false,
+				'show_in_menu'        => false,
+				'show_in_nav_menus'   => false,
+				'show_in_rest'        => true,
+				'show_in_quick_edit'  => false,
+				'show_in_table'       => false,
+			]
+		);
 	}
 
 	/**
@@ -278,7 +303,7 @@ class Recommendations {
 	public function is_completed( int $id ) {
 		// Get the post status.
 		$post_status = \get_post_status( $id );
-		return 'draft' === $post_status || 'trash' === $post_status;
+		return 'pending_celebration' === $post_status || 'trash' === $post_status;
 	}
 
 	/**
@@ -439,7 +464,7 @@ class Recommendations {
 				break;
 
 			case 'pending_celebration':
-				$result = (bool) \wp_update_post( \wp_parse_args( [ 'post_status' => 'draft' ], $default_args ) );
+				$result = (bool) \wp_update_post( \wp_parse_args( [ 'post_status' => 'pending_celebration' ], $default_args ) );
 				break;
 
 			case 'pending':

@@ -133,12 +133,12 @@ trait Task_Provider_Test_Trait {
 
 		// Verify that the task(s) we're testing is pending celebration.
 		foreach ( $tasks as $task ) {
-			$this->assertEquals( 'draft', get_post_status( $task['task_id'] ) );
+			$this->assertEquals( 'pending_celebration', get_post_status( $task['task_id'] ) );
 		}
 
 		// Verify that the task(s) we're testing is completed.
 		foreach ( $tasks as $task ) {
-			$this->recommendations->transition_task_status( (int) $task['task_id'], 'draft', 'trash' );
+			$this->recommendations->transition_task_status( (int) $task['task_id'], 'pending_celebration', 'trash' );
 			$this->assertEquals( 'trash', get_post_status( $task['task_id'] ) );
 		}
 	}
