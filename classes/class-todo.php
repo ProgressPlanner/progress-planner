@@ -66,7 +66,7 @@ class Todo {
 
 		foreach ( $tasks as $task ) {
 			// Skip non-pending tasks.
-			if ( 'publish' !== $task->post_status ) {
+			if ( 'publish' !== $task['post_status'] ) {
 				continue;
 			}
 

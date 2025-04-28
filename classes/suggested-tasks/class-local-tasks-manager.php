@@ -317,7 +317,7 @@ class Local_Tasks_Manager {
 		// Check if we already have a post with the same title.
 		$posts = \get_posts(
 			[
-				'title'       => $task['title'],
+				'title'       => isset( $task['title'] ) ? $task['title'] : $task['task_id'],
 				'post_type'   => 'prpl_recommendations',
 				'numberposts' => 1,
 			]
