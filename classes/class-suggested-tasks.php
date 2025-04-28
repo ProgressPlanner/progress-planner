@@ -43,7 +43,7 @@ class Suggested_Tasks {
 		\add_action( 'wp_ajax_progress_planner_suggested_task_action', [ $this, 'suggested_task_action' ] );
 
 		if ( \is_admin() ) {
-			\add_action( 'init', [ $this, 'init' ], 99 ); // Wait for custom post types and taxonomies to be registered.
+			\add_action( 'init', [ $this, 'init' ], 100 ); // Wait for the post types to be initialized.
 		}
 
 		// Add the automatic updates complete action.
