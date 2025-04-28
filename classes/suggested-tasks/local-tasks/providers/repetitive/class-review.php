@@ -221,8 +221,9 @@ class Review extends Repetitive {
 				}
 
 				$this->task_post_mappings[ $task_id ] = [
-					'task_id' => $task_id,
-					'post_id' => $post->ID,
+					'task_id'   => $task_id,
+					'post_id'   => $post->ID,
+					'post_type' => $post->post_type,
 				];
 			}
 		}
@@ -256,6 +257,7 @@ class Review extends Repetitive {
 					'provider_id' => $this->get_provider_id(),
 					'category'    => $this->get_provider_category(),
 					'post_id'     => $task_data['post_id'],
+					'post_type'   => $task_data['post_type'],
 					'date'        => \gmdate( 'YW' ),
 				];
 			}

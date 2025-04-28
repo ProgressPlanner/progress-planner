@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.2.0
+Stable tag: 1.3.0
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -109,6 +109,29 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.3.0 =
+
+Enhancements:
+
+* Improved checks when adding Ravi icon to the Yoast SEO settings page.
+* Add "golden" tasks to weekly emails.
+* Add text to clarify when the user has completed all tasks.
+* Improve the content widget & stats to show more accurate data. It now shows content _activity_ instead of content _published_.
+* Implemented "valuable post-types" and added settings for them.
+* Changed the "create a post" task to "create valuable content".
+* Renamed & migrated content badges.
+* Added a link to the 'Create valuable content' task description.
+* Improve accessibility of Recommendations (and other links) linking to external resources
+
+Bugs we fixed:
+
+* Fixed error during plugin uninstall.
+* Archive_Format data collector hooks weren't registered early enough.
+* Ensure fresh plugin list by clearing plugin cache before checking for inactive plugins after deletion.
+* Clear plugin cache when checking for inactive plugins.
+* Delete no-longer relevant pending tasks.
+* Fixed timing issue for tasks added by 3rd-party plugins.
 
 = 1.2.0 =
 

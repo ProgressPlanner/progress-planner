@@ -26,21 +26,43 @@ $prpl_activity_types = [
 	],
 ];
 
-$prpl_activities_count = [
+$prpl_tracked_post_types = \progress_planner()->get_activities__content_helpers()->get_post_types_names();
+$prpl_activities_count   = [
 	'all' => 0,
 ];
+
 foreach ( array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
-	$prpl_activities_count[ $prpl_activity_type ] = count(
-		\progress_planner()->get_activities__query()->query_activities(
-			[
-				'category'   => 'content',
-				'start_date' => \gmdate( 'Y-m-d', \strtotime( '-1 week' ) ),
-				'end_date'   => \gmdate( 'Y-m-d' ),
-				'type'       => $prpl_activity_type,
-			]
-		)
+
+	// Default count.
+	$prpl_activities_count[ $prpl_activity_type ] = 0;
+
+	// Get the activities.
+	$prpl_activities = \progress_planner()->get_activities__query()->query_activities(
+		[
+			'category'   => 'content',
+			'start_date' => \gmdate( 'Y-m-d', \strtotime( '-1 week' ) ),
+			'end_date'   => \gmdate( 'Y-m-d' ),
+			'type'       => $prpl_activity_type,
+		]
 	);
-	$prpl_activities_count['all']                += $prpl_activities_count[ $prpl_activity_type ];
+
+	if ( $prpl_activities ) {
+
+		if ( 'delete' !== $prpl_activity_type ) {
+			// Filter the activities to only include the tracked post types.
+			$prpl_activities = array_filter(
+				$prpl_activities,
+				function ( $activity ) use ( $prpl_tracked_post_types ) {
+					return in_array( get_post_type( $activity->data_id ), $prpl_tracked_post_types, true );
+				}
+			);
+		}
+
+		// Update the count.
+		$prpl_activities_count[ $prpl_activity_type ] = count( $prpl_activities );
+	}
+
+	$prpl_activities_count['all'] += $prpl_activities_count[ $prpl_activity_type ];
 }
 ?>
 
