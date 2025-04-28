@@ -39,7 +39,6 @@ class Local_Task_Factory {
 			/*
 			We're here in following cases:
 			 * - Legacy tasks, happens during v1.1.1 update, where we parsed task data from the task_id.
-			 * - Remote tasks, we passed only the task_id.
 			*/
 			return self::parse_task_data_from_task_id( $value );
 		}
@@ -76,36 +75,24 @@ class Local_Task_Factory {
 				);
 			}
 
-			// Remote (remote-12345) or repetitive tasks (update-core-202449).
+			// Repetitive tasks (update-core-202449).
 			$task_provider_id = substr( $task_id, 0, $last_pos );
-			$task_suffix      = substr( $task_id, $last_pos + 1 );
 
 			// Check for legacy create-post task_id, old task_ids were migrated to create-post-short' or 'create-post-long' (since we had 2 such tasks per week).
 			if ( 'create-post-short' === $task_provider_id || 'create-post-long' === $task_provider_id ) {
 				$task_provider_id = 'create-post';
 			}
 
-			$task_suffix_key = 'remote-task' === $task_provider_id ? 'remote_task_id' : 'date';
-
 			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id );
 
-			// Remote tasks don't have provider, yet.
-			if ( ! $task_provider ) {
-				return new Task_Local(
-					[
-						'task_id' => $task_id,
-					]
-				);
-			} else {
-				return new Task_Local(
-					[
-						'task_id'        => $task_id,
-						'category'       => $task_provider->get_provider_category(),
-						'provider_id'    => $task_provider->get_provider_id(),
-						$task_suffix_key => $task_suffix,
-					]
-				);
-			}
+			return new Task_Local(
+				[
+					'task_id'     => $task_id,
+					'category'    => $task_provider ? $task_provider->get_provider_category() : '',
+					'provider_id' => $task_provider ? $task_provider->get_provider_id() : '',
+					'date'        => substr( $task_id, $last_pos + 1 ),
+				]
+			);
 		}
 
 		// Legacy piped format.
