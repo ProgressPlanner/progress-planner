@@ -72,11 +72,20 @@ class Review extends Repetitive {
 	protected $task_post_mappings = null;
 
 	/**
+	 * The include post types.
+	 *
+	 * @var string[]
+	 */
+	protected $include_post_types = [];
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
 	 */
 	public function init() {
+		$this->include_post_types = \progress_planner()->get_settings()->get_post_types_names(); // Wait for the post types to be initialized.
+
 		\add_filter( 'progress_planner_update_posts_tasks_args', [ $this, 'filter_update_posts_args' ] );
 	}
 
@@ -178,7 +187,8 @@ class Review extends Repetitive {
 			if ( ! empty( $important_page_ids ) ) {
 				$last_updated_posts = $this->get_old_posts(
 					[
-						'post__in' => $important_page_ids,
+						'post__in'  => $important_page_ids,
+						'post_type' => 'any',
 					]
 				);
 			}
@@ -211,8 +221,9 @@ class Review extends Repetitive {
 				}
 
 				$this->task_post_mappings[ $task_id ] = [
-					'task_id' => $task_id,
-					'post_id' => $post->ID,
+					'task_id'   => $task_id,
+					'post_id'   => $post->ID,
+					'post_type' => $post->post_type,
 				];
 			}
 		}
@@ -246,6 +257,7 @@ class Review extends Repetitive {
 					'provider_id' => $this->get_provider_id(),
 					'category'    => $this->get_provider_category(),
 					'post_id'     => $task_data['post_id'],
+					'post_type'   => $task_data['post_type'],
 					'date'        => \gmdate( 'YW' ),
 				];
 			}
@@ -277,6 +289,7 @@ class Review extends Repetitive {
 			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
 			'url'         => $this->get_url( $task_id ),
+			'url_target'  => $this->get_url_target(),
 			'description' => $this->get_description( $task_id ),
 		];
 
@@ -321,32 +334,61 @@ class Review extends Repetitive {
 	 * @return array
 	 */
 	public function get_old_posts( $args = [] ) {
-		$args = wp_parse_args(
-			$args,
-			[
-				'posts_per_page' => static::ITEMS_TO_INJECT,
-				'post_type'      => [ 'page', 'post' ],
-				'post_status'    => 'publish',
-				'orderby'        => 'modified',
-				'order'          => 'ASC',
-				'date_query'     => [
-					[
-						'column' => 'post_modified',
-						'before' => '-6 months',
+		$posts = [];
+
+		if ( ! empty( $this->include_post_types ) ) {
+			$args = wp_parse_args(
+				$args,
+				[
+					'posts_per_page' => static::ITEMS_TO_INJECT,
+					'post_type'      => $this->include_post_types,
+					'post_status'    => 'publish',
+					'orderby'        => 'modified',
+					'order'          => 'ASC',
+					'date_query'     => [
+						[
+							'column' => 'post_modified',
+							'before' => '-6 months',
+						],
 					],
-				],
-			]
-		);
+				]
+			);
 
-		/**
-		 * Filters the args for the posts & pages we want user to review.
-		 *
-		 * @param array $args The get_postsargs.
-		 */
-		$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
+			/**
+			 * Filters the args for the posts & pages we want user to review.
+			 *
+			 * @param array $args The get_postsargs.
+			 */
+			$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
 
-		// Get the post that was updated last.
-		$posts = \get_posts( $args );
+			// Get the post that was updated last.
+			$posts = \get_posts( $args );
+		}
+
+		// Get the pages saved in the settings that have not been updated in the last 6 months.
+		$saved_page_type_ids = $this->get_saved_page_types();
+
+		if ( ! empty( $saved_page_type_ids ) ) {
+			$pages_to_update = \get_posts(
+				[
+					'post_type'           => 'any',
+					'post_status'         => 'publish',
+					'orderby'             => 'modified',
+					'order'               => 'ASC',
+					'ignore_sticky_posts' => true,
+					'date_query'          => [
+						[
+							'column' => 'post_modified',
+							'before' => '-6 months',
+						],
+					],
+					'post__in'            => $saved_page_type_ids,
+				]
+			);
+
+			// Merge the posts & pages to update. Put the pages first.
+			$posts = array_merge( $pages_to_update, $posts );
+		}
 
 		return $posts ? $posts : [];
 	}
@@ -394,6 +436,23 @@ class Review extends Repetitive {
 		}
 
 		return $this->snoozed_post_ids;
+	}
+
+	/**
+	 * Get the saved page-types.
+	 *
+	 * @return int[]
+	 */
+	protected function get_saved_page_types() {
+		$ids = [];
+		// Add the saved page-types to the post__not_in array.
+		$page_types = \progress_planner()->get_admin__page_settings()->get_settings();
+		foreach ( $page_types as $page_type ) {
+			if ( isset( $page_type['value'] ) && 0 !== (int) $page_type['value'] ) {
+				$ids[] = (int) $page_type['value'];
+			}
+		}
+		return $ids;
 	}
 
 	/**

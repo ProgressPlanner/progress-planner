@@ -22,6 +22,13 @@ class Settings_Saved extends One_Time {
 	protected const PROVIDER_ID = 'settings-saved';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var string
+	 */
+	protected $priority = 'high';
+
+	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
