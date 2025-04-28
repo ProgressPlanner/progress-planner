@@ -71,8 +71,8 @@ class Update_130 {
 	 * @return void
 	 */
 	private function restore_completed_tasks() {
-		$local_tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
-		$local_tasks_changed = false;
+		$tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
+		$tasks_changed = false;
 
 		// Migrate acgtivities saved in the progress_planner_activities table.
 		foreach ( \progress_planner()->get_activities__query()->query_activities(
@@ -85,12 +85,12 @@ class Update_130 {
 			$continue_main_loop = false;
 
 			// Check if the task with the same task_id exists, it means that task was recreated (and has pending status now).
-			foreach ( $local_tasks as $key => $local_task ) {
-				if ( $local_task['task_id'] === $activity->data_id ) {
+			foreach ( $tasks as $key => $task ) {
+				if ( $task['task_id'] === $activity->data_id ) {
 					// Set the status to completed.
-					$local_tasks[ $key ]['status'] = 'completed';
-					$local_tasks_changed           = true;
-					$continue_main_loop            = true;
+					$tasks[ $key ]['status'] = 'completed';
+					$tasks_changed           = true;
+					$continue_main_loop      = true;
 
 					// Break the inner loop.
 					break;
@@ -114,13 +114,13 @@ class Update_130 {
 			$data['status'] = 'completed';
 
 			// Insert the task.
-			$local_tasks[] = $data;
+			$tasks[] = $data;
 
-			$local_tasks_changed = true;
+			$tasks_changed = true;
 		}
 
-		if ( $local_tasks_changed ) {
-			\progress_planner()->get_settings()->set( 'tasks', $local_tasks );
+		if ( $tasks_changed ) {
+			\progress_planner()->get_settings()->set( 'tasks', $tasks );
 		}
 	}
 

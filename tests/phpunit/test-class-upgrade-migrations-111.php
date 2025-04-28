@@ -241,12 +241,12 @@ class Upgrade_Migrations_111_Test extends \WP_UnitTestCase {
 		( new \Progress_Planner\Update\Update_111() )->run();
 
 		// Verify the data was migrated.
-		$local_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
+		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
-		// Verify that every value in the $items array is present in the $local_tasks array and has completed status.
+		// Verify that every value in the $items array is present in the $tasks array and has completed status.
 		foreach ( $migration_map as $item ) {
 			$matching_tasks = array_filter(
-				$local_tasks,
+				$tasks,
 				function ( $task ) use ( $item ) {
 					return isset( $task['task_id'] ) &&
 						isset( $item['task_id'] ) &&

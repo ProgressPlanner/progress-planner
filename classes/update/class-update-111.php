@@ -37,13 +37,13 @@ class Update_111 {
 	 */
 	public function run() {
 		// Migrate the `progress_planner_local_tasks` option.
-		$this->migrate_local_tasks();
+		$this->migrate_tasks();
 
 		// Migrate the `progress_planner_suggested_tasks` option.
 		$this->migrate_suggested_tasks();
 
-		// Convert local tasks.
-		$this->convert_local_tasks();
+		// Convert tasks.
+		$this->convert_tasks();
 
 		// Migrate to-do items.
 		$this->migrate_todo_items();
@@ -76,17 +76,17 @@ class Update_111 {
 	 *
 	 * @return void
 	 */
-	private function migrate_local_tasks() {
-		$local_tasks_option = \get_option( 'progress_planner_local_tasks', [] );
-		if ( ! empty( $local_tasks_option ) ) {
-			foreach ( $local_tasks_option as $task_id ) {
+	private function migrate_tasks() {
+		$tasks_option = \get_option( 'progress_planner_local_tasks', [] );
+		if ( ! empty( $tasks_option ) ) {
+			foreach ( $tasks_option as $task_id ) {
 				$task           = Task_Factory::create_task_from( 'id', $task_id )->get_data();
 				$task['status'] = 'pending';
 
 				if ( ! isset( $task['task_id'] ) ) {
 					continue;
 				}
-				$this->add_local_task( $task );
+				$this->add_task( $task );
 				$this->tasks_changed = true;
 			}
 			\delete_option( 'progress_planner_local_tasks' );
@@ -117,7 +117,7 @@ class Update_111 {
 					$task['provider_id'] = 'review-post';
 				}
 
-				$this->add_local_task( $task );
+				$this->add_task( $task );
 				$this->tasks_changed = true;
 			}
 		}
@@ -131,9 +131,9 @@ class Update_111 {
 	 *
 	 * @return void
 	 */
-	private function add_local_task( $task ) {
-		foreach ( $this->tasks as $key => $local_task ) {
-			if ( isset( $local_task['task_id'] ) && $local_task['task_id'] === $task['task_id'] ) {
+	private function add_task( $task ) {
+		foreach ( $this->tasks as $key => $_task ) {
+			if ( isset( $_task['task_id'] ) && $_task['task_id'] === $task['task_id'] ) {
 				$this->tasks[ $key ] = $task;
 				return;
 			}
@@ -146,7 +146,7 @@ class Update_111 {
 	 *
 	 * @return void
 	 */
-	private function convert_local_tasks() {
+	private function convert_tasks() {
 		foreach ( $this->tasks as $key => $task ) {
 			if ( isset( $task['type'] ) ) {
 				unset( $this->tasks[ $key ]['type'] );
@@ -194,7 +194,7 @@ class Update_111 {
 			return;
 		}
 		foreach ( $todo_items as $todo_item ) {
-			$this->add_local_task(
+			$this->add_task(
 				[
 					'task_id'     => 'user-task-' . md5( $todo_item['content'] ),
 					'status'      => $todo_item['done'] ? 'completed' : 'pending',

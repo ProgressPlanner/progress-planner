@@ -374,19 +374,18 @@ class Debug_Tools {
 		// Verify nonce for security.
 		$this->verify_nonce();
 
-		// Get all local tasks.
-		$local_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-
-		// Filter out pending tasks.
-		$local_tasks = array_filter(
-			$local_tasks,
-			function ( $task ) {
-				return 'pending' !== $task['status'];
-			}
-		);
-
 		// Update the local tasks.
-		\progress_planner()->get_settings()->set( 'tasks', array_values( $local_tasks ) );
+		\progress_planner()->get_settings()->set(
+			'tasks',
+			array_values(
+				array_filter( // Filter out pending tasks.
+					\progress_planner()->get_settings()->get( 'tasks', [] ), // Get all local tasks.
+					function ( $task ) {
+						return 'pending' !== $task['status'];
+					}
+				)
+			)
+		);
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_pending_tasks', '_wpnonce' ] ) );
