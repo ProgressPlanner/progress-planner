@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Suggested_Tasks\Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Tasks\Providers\Tasks_Interface;
+use Progress_Planner\Suggested_Tasks\Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
 
 /**

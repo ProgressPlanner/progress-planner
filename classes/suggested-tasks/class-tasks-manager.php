@@ -25,7 +25,7 @@ use Progress_Planner\Suggested_Tasks\Tasks\Providers\One_Time\Rename_Uncategoriz
 use Progress_Planner\Suggested_Tasks\Tasks\Providers\One_Time\Permalink_Structure;
 use Progress_Planner\Suggested_Tasks\Tasks\Providers\One_Time\Php_Version;
 use Progress_Planner\Suggested_Tasks\Tasks\Providers\One_Time\Search_Engine_Visibility;
-use Progress_Planner\Suggested_Tasks\Tasks\Providers\Tasks_Interface;
+use Progress_Planner\Suggested_Tasks\Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
 use Progress_Planner\Suggested_Tasks\Tasks\Providers\User as User_Tasks;
 use Progress_Planner\Suggested_Tasks\Tasks\Providers\One_Time\Set_Valuable_Post_Types;
@@ -154,7 +154,7 @@ class Tasks_Manager {
 	 * @param string $name The method name.
 	 * @param array  $arguments The arguments.
 	 *
-	 * @return \Progress_Planner\Suggested_Tasks\Tasks\Providers\Tasks_Interface|null
+	 * @return \Progress_Planner\Suggested_Tasks\Tasks_Interface|null
 	 */
 	public function __call( $name, $arguments ) {
 		if ( 0 === strpos( $name, 'get_' ) ) {
@@ -181,7 +181,7 @@ class Tasks_Manager {
 	 *
 	 * @param string $provider_id The provider ID.
 	 *
-	 * @return \Progress_Planner\Suggested_Tasks\Tasks\Providers\Tasks_Interface|null
+	 * @return \Progress_Planner\Suggested_Tasks\Tasks_Interface|null
 	 */
 	public function get_task_provider( $provider_id ) {
 		foreach ( $this->task_providers as $provider_instance ) {

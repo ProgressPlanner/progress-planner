@@ -5,7 +5,7 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Tasks\Providers;
+namespace Progress_Planner\Suggested_Tasks;
 
 /**
  * Tasks interface.
