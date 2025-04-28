@@ -44,13 +44,11 @@ class Terms_Without_Description extends Base_Data_Collector {
 	 */
 	public function on_term_edited( $term_id, $tt_id, $taxonomy, $args ) {
 
-		// Check if the taxonomy is public.
+		// Check if the taxonomy is public and that description is not empty.
 		$taxonomy_object = \get_taxonomy( $taxonomy );
-		if ( ! $taxonomy_object || ! $taxonomy_object->public ) {
+		if ( ! $taxonomy_object || ! $taxonomy_object->public || ! isset( $args['description'] ) || '' === trim( $args['description'] ) ) {
 			return;
 		}
-
-		// TODO: Check if this can be more performant, by checking specifically if the description has changed.
 
 		$this->update_cache();
 	}
