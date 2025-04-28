@@ -119,6 +119,15 @@ class Fewer_Tags extends One_Time {
 			return false;
 		}
 
+		return $this->is_task_relevant();
+	}
+
+	/**
+	 * Check if the task is relevant.
+	 *
+	 * @return bool
+	 */
+	public function is_task_relevant() {
 		return $this->post_tag_count_data_collector->collect() > $this->published_post_count_data_collector->collect();
 	}
 
