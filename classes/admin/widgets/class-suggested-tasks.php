@@ -8,9 +8,8 @@
 namespace Progress_Planner\Admin\Widgets;
 
 use Progress_Planner\Badges\Monthly;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Review;
+use Progress_Planner\Suggested_Tasks\Tasks\Task_Factory;
+use Progress_Planner\Suggested_Tasks\Tasks\Providers\Repetitive\Review;
 
 /**
  * Suggested_Tasks class.
@@ -70,7 +69,7 @@ final class Suggested_Tasks extends Widget {
 					$task_id = $task['task_id'];
 
 					$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
-						Local_Task_Factory::create_task_from( 'id', $task_id )->get_provider_id()
+						Task_Factory::create_task_from( 'id', $task_id )->get_provider_id()
 					);
 
 					if ( $task_provider && $task_provider->capability_required() ) {

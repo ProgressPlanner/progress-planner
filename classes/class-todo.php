@@ -7,7 +7,7 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+use Progress_Planner\Suggested_Tasks\Tasks\Task_Factory;
 
 /**
  * Todo class.
@@ -43,7 +43,7 @@ class Todo {
 			return;
 		}
 
-		$task = Local_Task_Factory::create_task_from( 'id', $task_id );
+		$task = Task_Factory::create_task_from( 'id', $task_id );
 
 		// Bail if the task is not a user task.
 		if ( 'user' !== $task->get_provider_id() ) {

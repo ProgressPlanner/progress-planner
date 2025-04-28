@@ -7,8 +7,8 @@
 
 namespace Progress_Planner\Update;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local;
+use Progress_Planner\Suggested_Tasks\Tasks\Task_Factory;
+use Progress_Planner\Suggested_Tasks\Tasks\Task_Local;
 
 /**
  * Update class for version 1.3.0.
@@ -126,7 +126,7 @@ class Update_130 {
 
 	/**
 	 * Get the data from a task-ID.
-	 * Copied from the Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Content class, since we might remove that function in the future.
+	 * Copied from the Progress_Planner\Suggested_Tasks\Tasks\Providers\Content class, since we might remove that function in the future.
 	 *
 	 * @param string $task_id The task ID.
 	 *
@@ -134,18 +134,18 @@ class Update_130 {
 	 */
 	private function get_data_from_task_id( $task_id ) {
 
-		$task_object = Local_Task_Factory::create_task_from( 'id', $task_id );
+		$task_object = Task_Factory::create_task_from( 'id', $task_id );
 
 		if ( 0 === strpos( $task_object->get_task_id(), 'create-post-' ) || 0 === strpos( $task_object->get_task_id(), 'create-post-short-' ) ) {
 			$task_object = $this->handle_legacy_post_tasks( $task_object );
 		}
 
-		// Review post task is not recognized by the Local_Task_Factory (because it changed from piped format: post_id/2949|type/update-post -> review-post-2949-202415).
+		// Review post task is not recognized by the Task_Factory (because it changed from piped format: post_id/2949|type/update-post -> review-post-2949-202415).
 		if ( 0 === strpos( $task_object->get_task_id(), 'review-post-' ) ) {
 			$task_object = $this->handle_legacy_review_post_tasks( $task_object );
 		}
 
-		// Yoast SEO tasks and Comment Hacks tasks are not recognized by the Local_Task_Factory, since they are added recently.
+		// Yoast SEO tasks and Comment Hacks tasks are not recognized by the Task_Factory, since they are added recently.
 		if ( 0 === strpos( $task_object->get_task_id(), 'yoast-' ) || 0 === strpos( $task_object->get_task_id(), 'ch-comment' ) ) {
 			$task_object = $this->handle_legacy_yoast_and_comment_hacks_tasks( $task_object );
 		}

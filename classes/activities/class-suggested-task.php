@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Activities;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create;
+use Progress_Planner\Suggested_Tasks\Tasks\Providers\Repetitive\Create;
 
 /**
  * Handler for suggested tasks activities.

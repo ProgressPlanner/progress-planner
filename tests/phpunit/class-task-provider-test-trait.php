@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Tests;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
 use Progress_Planner\Suggested_Tasks;
 
 /**

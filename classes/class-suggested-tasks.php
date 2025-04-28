@@ -7,9 +7,9 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
+use Progress_Planner\Suggested_Tasks\Tasks_Manager;
 use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update;
+use Progress_Planner\Suggested_Tasks\Tasks\Providers\Repetitive\Core_Update;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
 /**
  * Suggested_Tasks class.
@@ -19,7 +19,7 @@ class Suggested_Tasks {
 	/**
 	 * An object containing local tasks.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Local_Tasks_Manager|null
+	 * @var \Progress_Planner\Suggested_Tasks\Tasks_Manager|null
 	 */
 	private $local;
 
@@ -29,7 +29,7 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function __construct() {
-		$this->local = new Local_Tasks_Manager();
+		$this->local = new Tasks_Manager();
 
 		\add_action( 'wp_ajax_progress_planner_suggested_task_action', [ $this, 'suggested_task_action' ] );
 
@@ -143,7 +143,7 @@ class Suggested_Tasks {
 	/**
 	 * Get the local tasks object.
 	 *
-	 * @return \Progress_Planner\Suggested_Tasks\Local_Tasks_Manager
+	 * @return \Progress_Planner\Suggested_Tasks\Tasks_Manager
 	 */
 	public function get_local() {
 		return $this->local; // @phpstan-ignore-line return.type
