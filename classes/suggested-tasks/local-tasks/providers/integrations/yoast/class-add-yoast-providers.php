@@ -88,6 +88,7 @@ class Add_Yoast_Providers {
 			new Crawl_Settings_Emoji_Scripts(),
 			new Media_Pages(),
 			new Organization_Logo(),
+			new Fix_Orphaned_Content(),
 		];
 		return array_merge(
 			$providers,

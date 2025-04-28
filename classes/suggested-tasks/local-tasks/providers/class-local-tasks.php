@@ -291,4 +291,39 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	public function is_task_relevant() {
 		return true;
 	}
+
+	/**
+	 * Check if the task condition is satisfied.
+	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
+	 *
+	 * @return bool
+	 */
+	abstract protected function should_add_task();
+
+	/**
+	 * Alias for should_add_task(), for better readability when using in the evaluate_task() method.
+	 *
+	 * @param string $task_id Optional task ID to check completion for.
+	 * @return bool
+	 */
+	public function is_task_completed( $task_id = '' ) {
+		// If no specific task ID provided, use the default behavior.
+		if ( empty( $task_id ) ) {
+			return ! $this->should_add_task();
+		}
+
+		// For specific task IDs, child classes can override this method.
+		return $this->is_specific_task_completed( $task_id );
+	}
+
+	/**
+	 * Check if a specific task is completed.
+	 * Child classes can override this method to handle specific task IDs.
+	 *
+	 * @param string $task_id The task ID to check.
+	 * @return bool
+	 */
+	protected function is_specific_task_completed( $task_id ) {
+		return ! $this->should_add_task();
+	}
 }

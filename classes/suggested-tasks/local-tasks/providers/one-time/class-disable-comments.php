@@ -75,9 +75,11 @@ class Disable_Comments extends One_Time {
 	/**
 	 * Check if the task is completed.
 	 *
+	 * @param string $task_id The task ID.
+	 *
 	 * @return bool
 	 */
-	public function is_task_completed() {
+	public function is_task_completed( $task_id = '' ) {
 		return 'open' !== \get_default_comment_status();
 	}
 }

@@ -43,24 +43,7 @@ abstract class One_Time extends Local_Tasks {
 			return false;
 		}
 
-		return $this->is_task_completed() ? Local_Task_Factory::create_task_from( 'id', $task_id ) : false;
-	}
-
-	/**
-	 * Check if the task condition is satisfied.
-	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
-	 *
-	 * @return bool
-	 */
-	abstract protected function should_add_task();
-
-	/**
-	 * Alias for should_add_task(), for better readability when using in the evaluate_task() method.
-	 *
-	 * @return bool
-	 */
-	public function is_task_completed() {
-		return ! $this->should_add_task();
+		return $this->is_task_completed( $task_id ) ? Local_Task_Factory::create_task_from( 'id', $task_id ) : false;
 	}
 
 	/**
