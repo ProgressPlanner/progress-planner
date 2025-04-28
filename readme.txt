@@ -1,10 +1,10 @@
 === Progress Planner ===
-Contributors: joostdevalk, aristath, mariekerakt, irisguelen, samalderson
+Contributors: joostdevalk, aristath, filipi, jonoaldersonwp, mariekerakt, irisguelen, samalderson, tacoverdo
 Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.1.1
+Stable tag: 1.3.0
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -109,6 +109,47 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.3.0 =
+
+Enhancements:
+
+* Improved checks when adding Ravi icon to the Yoast SEO settings page.
+* Add "golden" tasks to weekly emails.
+* Add text to clarify when the user has completed all tasks.
+* Improve the content widget & stats to show more accurate data. It now shows content _activity_ instead of content _published_.
+* Implemented "valuable post-types" and added settings for them.
+* Changed the "create a post" task to "create valuable content".
+* Renamed & migrated content badges.
+* Added a link to the 'Create valuable content' task description.
+* Improve accessibility of Recommendations (and other links) linking to external resources
+
+Bugs we fixed:
+
+* Fixed error during plugin uninstall.
+* Archive_Format data collector hooks weren't registered early enough.
+* Ensure fresh plugin list by clearing plugin cache before checking for inactive plugins after deletion.
+* Clear plugin cache when checking for inactive plugins.
+* Delete no-longer relevant pending tasks.
+* Fixed timing issue for tasks added by 3rd-party plugins.
+
+= 1.2.0 =
+
+In this release we've [added an integration with the **Yoast SEO** plugin](https://prpl.fyi/v12), so you’ll now see personalized suggestions based on your current SEO configuration.
+
+Added these recommendations from Ravi:
+
+* Yoast SEO: [disable the author archive](https://prpl.fyi/yoast-author-archive)
+* Yoast SEO: [disable the date archive](https://prpl.fyi/yoast-date-archive)
+* Yoast SEO: [disable the format archives](https://prpl.fyi/yoast-format-archive)
+* Yoast SEO: [Remove emoji scripts](https://prpl.fyi/yoast-crawl-optimization-emoji-scripts)
+* Yoast SEO: [Remove post authors feeds](https://prpl.fyi/yoast-crawl-optimization-feed-authors)
+* Yoast SEO: [Remove global comment feeds](https://prpl.fyi/yoast-crawl-optimization-feed-global-comments)
+* Yoast SEO: [disable the media pages](https://prpl.fyi/yoast-media-pages)
+* Yoast SEO: set your [organization](https://prpl.fyi/yoast-organization-logo) or [person](https://prpl.fyi/yoast-person-logo) logo
+
+Under the hood:
+* Changed how the titles and descriptions of one_time and repetitive tasks are defined to be compatible with WP 6.8.
 
 = 1.1.1 =
 

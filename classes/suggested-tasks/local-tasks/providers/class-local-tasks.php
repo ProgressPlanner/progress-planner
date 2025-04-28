@@ -79,6 +79,13 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 	protected $url = '';
 
 	/**
+	 * The task URL target.
+	 *
+	 * @var string
+	 */
+	protected $url_target = '_self';
+
+	/**
 	 * The task link setting.
 	 *
 	 * @var array
@@ -158,6 +165,15 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 		}
 
 		return '';
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	public function get_url_target() {
+		return $this->url_target ? $this->url_target : '_self';
 	}
 
 	/**
@@ -263,5 +279,16 @@ abstract class Local_Tasks implements Local_Tasks_Interface {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Check if the task is still relevant.
+	 * For example, we have a task to disable author archives if there is only one author.
+	 * If in the meantime more authors are added, the task is no longer relevant and the task should be removed.
+	 *
+	 * @return bool
+	 */
+	public function is_task_relevant() {
+		return true;
 	}
 }

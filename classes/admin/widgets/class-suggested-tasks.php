@@ -81,12 +81,6 @@ final class Suggested_Tasks extends Widget {
 							$task_details['action']   = 'celebrate';
 							$task_details['status']   = 'pending_celebration';
 
-							// Award 2 points if last created post was long.
-							$create_provider = new Create();
-							if ( $create_provider->get_provider_id() === $task_provider->get_provider_id() ) {
-								$task_details['points'] = $create_provider->get_points_for_task( $task_id );
-							}
-
 							$tasks[] = $task_details;
 						}
 
@@ -162,9 +156,9 @@ final class Suggested_Tasks extends Widget {
 		// Register styles for the web-component.
 		\wp_register_style(
 			'progress-planner-web-components-prpl-suggested-task',
-			PROGRESS_PLANNER_URL . '/assets/css/web-components/prpl-suggested-task.css',
+			constant( 'PROGRESS_PLANNER_URL' ) . '/assets/css/web-components/prpl-suggested-task.css',
 			[],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . '/assets/css/web-components/prpl-suggested-task.css' )
+			\progress_planner()->get_file_version( constant( 'PROGRESS_PLANNER_DIR' ) . '/assets/css/web-components/prpl-suggested-task.css' )
 		);
 
 		return [

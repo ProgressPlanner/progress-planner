@@ -26,7 +26,9 @@ use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Permalink_St
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Php_Version;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engine_Visibility;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\User as User_Tasks;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Set_Valuable_Post_Types;
 
 /**
  * Local_Tasks_Manager class.
@@ -63,9 +65,14 @@ class Local_Tasks_Manager {
 			new Php_Version(),
 			new Search_Engine_Visibility(),
 			new User_Tasks(),
+			new Set_Valuable_Post_Types(),
 		];
 
+		// Add the plugin integration.
 		\add_action( 'plugins_loaded', [ $this, 'add_plugin_integration' ] );
+
+		// At this point both local and task providers for the plugins we integrate with are instantiated, so initialize them.
+		\add_action( 'init', [ $this, 'init' ], 99 ); // Wait for the post types to be initialized.
 
 		// Add the cleanup action.
 		\add_action( 'admin_init', [ $this, 'cleanup_pending_tasks' ] );
@@ -78,8 +85,19 @@ class Local_Tasks_Manager {
 	 */
 	public function add_plugin_integration() {
 
+		// Yoast SEO integration.
+		new Add_Yoast_Providers();
+	}
+
+	/**
+	 * Initialize the task providers.
+	 *
+	 * @return void
+	 */
+	public function init() {
+
 		/**
-		 * Filter the task providers.
+		 * Filter the task providers, 3rd party providers are added here as well.
 		 *
 		 * @param array $task_providers The task providers.
 		 */
@@ -222,6 +240,14 @@ class Local_Tasks_Manager {
 
 			$task_id = $task_data['task_id'];
 
+			// Check if the task is no longer relevant.
+			$task_object   = Local_Task_Factory::create_task_from( 'id', $task_id );
+			$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
+			if ( $task_provider && ! $task_provider->is_task_relevant() ) {
+				// Remove the task from the pending tasks.
+				\progress_planner()->get_suggested_tasks()->delete_task( $task_id );
+			}
+
 			$task_result = $this->evaluate_task( $task_id );
 			if ( false !== $task_result ) {
 				$completed_tasks[] = $task_result;
@@ -336,12 +362,8 @@ class Local_Tasks_Manager {
 		$tasks = \array_filter(
 			$tasks,
 			function ( $task ) {
-				// If the task was already completed, remove it.
-				if ( 'completed' === $task['status'] ) {
-					return false;
-				}
 
-				if ( isset( $task['date'] ) ) {
+				if ( 'pending' === $task['status'] && isset( $task['date'] ) ) {
 					return (string) \gmdate( 'YW' ) === (string) $task['date'];
 				}
 

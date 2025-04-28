@@ -171,13 +171,17 @@ document.addEventListener( 'prpl/suggestedTask/move', () => {
 // When the 'prpl/suggestedTask/update' event is triggered,
 // update the task title in the local tasks array.
 document.addEventListener( 'prpl/suggestedTask/update', ( event ) => {
-	progressPlannerTodo.tasks.find(
+	const task = progressPlannerTodo.tasks.find(
 		( item ) =>
 			item.task_id ===
 			event.detail.node
 				.querySelector( 'li' )
 				.getAttribute( 'data-task-id' )
-	).title = event.detail.node.querySelector( 'h3 span' ).textContent;
+	);
+
+	if ( task ) {
+		task.title = event.detail.node.querySelector( 'h3 span' ).textContent;
+	}
 } );
 
 document.addEventListener( 'prpl/suggestedTask/maybeInjectItem', ( event ) => {
