@@ -1,6 +1,6 @@
 <?php
 /**
- * Interface for local tasks.
+ * Interface for tasks.
  *
  * @package Progress_Planner
  */

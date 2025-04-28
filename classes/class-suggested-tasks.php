@@ -17,7 +17,7 @@ use Progress_Planner\Suggested_Tasks\Task_Factory;
 class Suggested_Tasks {
 
 	/**
-	 * An object containing local tasks.
+	 * An object containing tasks.
 	 *
 	 * @var \Progress_Planner\Suggested_Tasks\Tasks_Manager|null
 	 */
@@ -42,7 +42,7 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Run the local tasks.
+	 * Run the tasks.
 	 *
 	 * @return void
 	 */

@@ -24,7 +24,7 @@ class Update_111 {
 	private $tasks = [];
 
 	/**
-	 * Whether local tasks have been changed.
+	 * Whether tasks have been changed.
 	 *
 	 * @var boolean
 	 */
@@ -61,7 +61,7 @@ class Update_111 {
 		$this->migrate_create_post_tasks();
 		$this->migrate_review_post_tasks();
 
-		// Save the local tasks if they have been changed.
+		// Save the tasks if they have been changed.
 		if ( $this->tasks_changed ) {
 			\progress_planner()->get_settings()->set( 'tasks', $this->tasks );
 		}
@@ -125,7 +125,7 @@ class Update_111 {
 	}
 
 	/**
-	 * Add a local task.
+	 * Add a task.
 	 *
 	 * @param array $task The task to add.
 	 *

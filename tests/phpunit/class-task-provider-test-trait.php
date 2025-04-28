@@ -71,10 +71,7 @@ trait Task_Provider_Test_Trait {
 	public function tear_down() {
 		parent::tear_down();
 
-		// Delete local tasks.
-		\progress_planner()->get_settings()->set( 'tasks', [] );
-
-		// Delete suggested tasks.
+		// Delete tasks.
 		\progress_planner()->get_settings()->set( 'tasks', [] );
 	}
 
@@ -98,12 +95,12 @@ trait Task_Provider_Test_Trait {
 		// Get all tasks to inject.
 		$tasks = $this->task_provider->get_tasks_to_inject();
 
-		// Add the task(s) to the local suggested tasks.
+		// Add the task(s) to the suggested tasks.
 		foreach ( $tasks as $task ) {
 			$this->suggested_tasks->get_tasks_manager()->add_pending_task( $task );
 		}
 
-		// Verify that the task(s) are in the local suggested tasks.
+		// Verify that the task(s) are in the suggested tasks.
 		$pending_tasks = (array) \progress_planner()->get_settings()->get( 'tasks', [] );
 		foreach ( $tasks as $task ) {
 			$item_found = false;

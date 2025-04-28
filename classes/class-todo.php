@@ -299,7 +299,7 @@ class Todo {
 		// Get the task IDs from the todos.
 		$task_ids = array_column( $pending_items, 'task_id' );
 
-		// Get the local tasks.
+		// Get the tasks.
 		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		// Reset the points of all the tasks, except for the first one in the todo list.
@@ -309,7 +309,7 @@ class Todo {
 			}
 		}
 
-		// Save the local tasks.
+		// Save the tasks.
 		\progress_planner()->get_settings()->set( 'tasks', $tasks );
 
 		\progress_planner()->get_utils__cache()->set( $transient_name, $next_monday->getTimestamp(), WEEK_IN_SECONDS );

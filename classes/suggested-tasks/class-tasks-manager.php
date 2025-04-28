@@ -1,6 +1,6 @@
 <?php
 /**
- * Handle suggested local tasks.
+ * Handle suggested tasks.
  *
  * @package Progress_Planner
  */
@@ -47,7 +47,7 @@ class Tasks_Manager {
 	 */
 	public function __construct() {
 
-		// Instantiate local task providers.
+		// Instantiate task providers.
 		$this->task_providers = [
 			new Content_Create(),
 			new Content_Review(),
@@ -307,7 +307,7 @@ class Tasks_Manager {
 	}
 
 	/**
-	 * Add a pending local task.
+	 * Add a pending task.
 	 *
 	 * @param array $task The task data.
 	 *

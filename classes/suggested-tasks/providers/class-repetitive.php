@@ -1,6 +1,6 @@
 <?php
 /**
- * Abstract class for a local task provider.
+ * Abstract class for a repetitive task provider.
  *
  * @package Progress_Planner
  */

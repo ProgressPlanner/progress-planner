@@ -354,9 +354,9 @@ class Debug_Tools {
 	}
 
 	/**
-	 * Check and process the delete local tasks action.
+	 * Check and process the delete tasks action.
 	 *
-	 * Deletes all local tasks if the appropriate query parameter is set
+	 * Deletes all tasks if the appropriate query parameter is set
 	 * and user has required capabilities.
 	 *
 	 * @return void
@@ -374,12 +374,12 @@ class Debug_Tools {
 		// Verify nonce for security.
 		$this->verify_nonce();
 
-		// Update the local tasks.
+		// Update the tasks.
 		\progress_planner()->get_settings()->set(
 			'tasks',
 			array_values(
 				array_filter( // Filter out pending tasks.
-					\progress_planner()->get_settings()->get( 'tasks', [] ), // Get all local tasks.
+					\progress_planner()->get_settings()->get( 'tasks', [] ), // Get all tasks.
 					function ( $task ) {
 						return 'pending' !== $task['status'];
 					}

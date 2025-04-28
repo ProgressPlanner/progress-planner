@@ -29,7 +29,7 @@ class Upgrade_Migrations_130_Test extends \WP_UnitTestCase {
 			)
 		);
 
-		// Delete all local tasks.
+		// Delete all tasks.
 		\progress_planner()->get_settings()->set( 'tasks', [] );
 
 		// activity ids, we want to create task with the same ids (and populate task data).
@@ -119,7 +119,7 @@ class Upgrade_Migrations_130_Test extends \WP_UnitTestCase {
 
 			$this->assertNotEmpty(
 				$matching_tasks,
-				sprintf( 'Task ID "%s" not found in local tasks', $activity_id )
+				sprintf( 'Task ID "%s" not found in tasks', $activity_id )
 			);
 
 			$task = reset( $matching_tasks );
