@@ -216,7 +216,9 @@ class Update_Term_Description extends One_Time {
 			return true;
 		}
 
-		return true;
+		$term_description = trim( $term->description );
+
+		return '' !== $term_description && '&nbsp;' !== $term_description;
 	}
 
 	/**

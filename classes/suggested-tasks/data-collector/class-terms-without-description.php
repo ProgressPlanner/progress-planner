@@ -87,7 +87,7 @@ class Terms_Without_Description extends Base_Data_Collector {
 				FROM {$wpdb->terms} AS t
 				INNER JOIN {$wpdb->term_taxonomy} AS tt ON t.term_id = tt.term_id
 				WHERE tt.taxonomy = %s
-				AND (tt.description = '' OR tt.description IS NULL)
+				AND (tt.description = '' OR tt.description IS NULL OR tt.description = '&nbsp;')
 				ORDER BY tt.count DESC
 				LIMIT 1
 			",
