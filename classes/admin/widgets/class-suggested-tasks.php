@@ -68,12 +68,12 @@ final class Suggested_Tasks extends Widget {
 				foreach ( $pending_celebration_tasks as $key => $task ) {
 					$task_id = $task['task_id'];
 
-					$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
+					$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider(
 						Task_Factory::create_task_from( 'id', $task_id )->get_provider_id()
 					);
 
 					if ( $task_provider && $task_provider->capability_required() ) {
-						$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task_id );
+						$task_details = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_details( $task_id );
 
 						if ( $task_details ) {
 							$task_details['priority'] = 'high'; // Celebrate tasks are always on top.

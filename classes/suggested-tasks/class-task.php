@@ -74,7 +74,7 @@ class Task {
 		$task_provider_id = $this->get_provider_id();
 		$task_id          = $this->get_task_id();
 
-		$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id );
+		$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_provider_id );
 		if ( ! $task_provider ) {
 			return [];
 		}

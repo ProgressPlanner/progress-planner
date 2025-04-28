@@ -214,7 +214,7 @@ class Page {
 	 */
 	public function maybe_enqueue_focus_el_script( $hook ) {
 		$suggested_tasks       = \progress_planner()->get_suggested_tasks();
-		$local_tasks_providers = $suggested_tasks->get_local()->get_task_providers();
+		$local_tasks_providers = $suggested_tasks->get_tasks_manager()->get_task_providers();
 		$tasks_details         = [];
 		$total_points          = 0;
 		$completed_points      = 0;

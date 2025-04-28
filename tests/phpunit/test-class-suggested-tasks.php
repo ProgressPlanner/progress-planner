@@ -57,7 +57,7 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 		];
 
 		foreach ( $tasks_to_keep as $task ) {
-			$this->suggested_tasks->get_local()->add_pending_task( $task );
+			$this->suggested_tasks->get_tasks_manager()->add_pending_task( $task );
 		}
 
 		// Tasks that should be removed.
@@ -73,10 +73,10 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 		];
 
 		foreach ( $tasks_to_remove as $task ) {
-			$this->suggested_tasks->get_local()->add_pending_task( $task );
+			$this->suggested_tasks->get_tasks_manager()->add_pending_task( $task );
 		}
 
-		$this->suggested_tasks->get_local()->cleanup_pending_tasks();
+		$this->suggested_tasks->get_tasks_manager()->cleanup_pending_tasks();
 
 		$this->assertEquals( count( $tasks_to_keep ), \count( \progress_planner()->get_settings()->get( 'local_tasks', [] ) ) );
 	}

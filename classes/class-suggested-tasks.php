@@ -21,7 +21,7 @@ class Suggested_Tasks {
 	 *
 	 * @var \Progress_Planner\Suggested_Tasks\Tasks_Manager|null
 	 */
-	private $local;
+	private $tasks_manager;
 
 	/**
 	 * Constructor.
@@ -29,7 +29,7 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function __construct() {
-		$this->local = new Tasks_Manager();
+		$this->tasks_manager = new Tasks_Manager();
 
 		\add_action( 'wp_ajax_progress_planner_suggested_task_action', [ $this, 'suggested_task_action' ] );
 
@@ -51,7 +51,7 @@ class Suggested_Tasks {
 		$this->maybe_unsnooze_tasks();
 
 		// Check for completed tasks.
-		$completed_tasks = $this->local->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
+		$completed_tasks = $this->tasks_manager->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
 
 		foreach ( $completed_tasks as $task ) {
 
@@ -141,12 +141,12 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Get the local tasks object.
+	 * Get the tasks manager object.
 	 *
 	 * @return \Progress_Planner\Suggested_Tasks\Tasks_Manager
 	 */
-	public function get_local() {
-		return $this->local; // @phpstan-ignore-line return.type
+	public function get_tasks_manager() {
+		return $this->tasks_manager; // @phpstan-ignore-line return.type
 	}
 
 	/**
@@ -448,7 +448,7 @@ class Suggested_Tasks {
 
 				// Get the post lengths of the snoozed tasks.
 				foreach ( $snoozed_tasks as $task ) {
-					$data = $this->local->get_data_from_task_id( $task['task_id'] ); // @phpstan-ignore-line method.nonObject
+					$data = $this->tasks_manager->get_data_from_task_id( $task['task_id'] ); // @phpstan-ignore-line method.nonObject
 					if ( isset( $data['category'] ) && 'create-post' === $data['category'] ) {
 						$key = true === $data['long'] ? 'long' : 'short';
 						if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
