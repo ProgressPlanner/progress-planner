@@ -51,7 +51,7 @@ class Todo {
 		}
 
 		$task_changed = false;
-		$local_tasks  = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$local_tasks  = \progress_planner()->get_settings()->get( 'tasks', [] );
 		foreach ( $local_tasks as $key => $task ) {
 			if ( $task['task_id'] === $task_id ) {
 				unset( $local_tasks[ $key ]['order'] );
@@ -61,7 +61,7 @@ class Todo {
 		}
 
 		if ( $task_changed ) {
-			\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+			\progress_planner()->get_settings()->set( 'tasks', $local_tasks );
 		}
 	}
 
@@ -161,7 +161,7 @@ class Todo {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing task ID.', 'progress-planner' ) ] );
 		}
 
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$local_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 		$title       = isset( $_POST['task']['title'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['title'] ) ) : '';
 
 		// Check if the task already exists (this is the update case).
@@ -191,7 +191,7 @@ class Todo {
 			$local_tasks[ $task_index ]['title'] = $title;
 		}
 
-		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+		\progress_planner()->get_settings()->set( 'tasks', $local_tasks );
 		\wp_send_json_success(
 			[
 				'message' => \esc_html__( 'Saved.', 'progress-planner' ),
@@ -218,7 +218,7 @@ class Todo {
 
 		$tasks = \explode( ',', $tasks );
 
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$local_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		foreach ( $local_tasks as $key => $task ) {
 			if ( in_array( $task['task_id'], $tasks, true ) ) {
@@ -226,7 +226,7 @@ class Todo {
 			}
 		}
 
-		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+		\progress_planner()->get_settings()->set( 'tasks', $local_tasks );
 	}
 
 	/**
@@ -301,7 +301,7 @@ class Todo {
 		$task_ids = array_column( $pending_items, 'task_id' );
 
 		// Get the local tasks.
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$local_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		// Reset the points of all the tasks, except for the first one in the todo list.
 		foreach ( $local_tasks as $key => $task ) {
@@ -311,7 +311,7 @@ class Todo {
 		}
 
 		// Save the local tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+		\progress_planner()->get_settings()->set( 'tasks', $local_tasks );
 
 		\progress_planner()->get_utils__cache()->set( $transient_name, $next_monday->getTimestamp(), WEEK_IN_SECONDS );
 	}

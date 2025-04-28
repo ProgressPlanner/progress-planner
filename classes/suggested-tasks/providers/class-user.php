@@ -50,7 +50,7 @@ class User extends One_Time {
 	public function get_tasks_to_inject() {
 
 		$tasks       = [];
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$local_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 		foreach ( $local_tasks as $task_data ) {
 			if ( isset( $task_data['provider_id'] ) && self::PROVIDER_ID === $task_data['provider_id'] ) {
 				$tasks[] = [
@@ -75,7 +75,7 @@ class User extends One_Time {
 	public function get_task_details( $task_id = '' ) {
 
 		// Get the user tasks from the database.
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$local_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		foreach ( $local_tasks as $task ) {
 			if ( $task['task_id'] !== $task_id ) {

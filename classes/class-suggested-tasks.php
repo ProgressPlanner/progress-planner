@@ -118,7 +118,7 @@ class Suggested_Tasks {
 	 */
 	public function on_automatic_updates_complete() {
 
-		$pending_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] ); // @phpstan-ignore-line method.nonObject
+		$pending_tasks = \progress_planner()->get_settings()->get( 'tasks', [] ); // @phpstan-ignore-line method.nonObject
 
 		if ( empty( $pending_tasks ) ) {
 			return;
@@ -163,7 +163,7 @@ class Suggested_Tasks {
 		 * @return array
 		 */
 		$tasks    = \apply_filters( 'progress_planner_suggested_tasks_items', $tasks );
-		$db_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$db_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 		foreach ( $tasks as $key => $task ) {
 			if ( isset( $task['status'] ) && ! empty( $task['status'] ) ) {
 				continue;
@@ -210,7 +210,7 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_tasks_by( $param, $value ) {
-		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 		$tasks = array_filter(
 			$tasks,
 			function ( $task ) use ( $param, $value ) {
@@ -229,7 +229,7 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function delete_task( $task_id ) {
-		$tasks    = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks    = \progress_planner()->get_settings()->get( 'tasks', [] );
 		$modified = false;
 		foreach ( $tasks as $key => $task ) {
 			if ( $task['task_id'] === $task_id ) {
@@ -240,7 +240,7 @@ class Suggested_Tasks {
 		}
 
 		return $modified
-			? \progress_planner()->get_settings()->set( 'local_tasks', $tasks )
+			? \progress_planner()->get_settings()->set( 'tasks', $tasks )
 			: false;
 	}
 
@@ -254,7 +254,7 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function mark_task_as( $status, $task_id, $data = [] ) {
-		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
 		$tasks_changed = false;
 		foreach ( $tasks as $key => $task ) {
 			if ( $task['task_id'] !== $task_id ) {
@@ -279,7 +279,7 @@ class Suggested_Tasks {
 			return false;
 		}
 
-		$result = \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+		$result = \progress_planner()->get_settings()->set( 'tasks', $tasks );
 
 		// Fire an action when the task status is changed.
 		if ( true === $result ) {
@@ -298,7 +298,7 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function remove_task_from( $status, $task_id ) {
-		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
 		$tasks_changed = false;
 
 		foreach ( $tasks as $key => $task ) {
@@ -318,7 +318,7 @@ class Suggested_Tasks {
 			return false;
 		}
 
-		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+		return \progress_planner()->get_settings()->set( 'tasks', $tasks );
 	}
 
 	/**
@@ -392,7 +392,7 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	private function maybe_unsnooze_tasks() {
-		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
 		$tasks_changed = false;
 		foreach ( $tasks as $key => $task ) {
 			if ( $task['status'] !== 'snoozed' ) {
@@ -411,7 +411,7 @@ class Suggested_Tasks {
 		}
 
 		if ( $tasks_changed ) {
-			\progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+			\progress_planner()->get_settings()->set( 'tasks', $tasks );
 		}
 	}
 
@@ -485,7 +485,7 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function was_task_completed( $task_id ) {
-		foreach ( \progress_planner()->get_settings()->get( 'local_tasks', [] ) as $task ) {
+		foreach ( \progress_planner()->get_settings()->get( 'tasks', [] ) as $task ) {
 			if ( ! isset( $task['task_id'] ) || $task['task_id'] !== $task_id ) {
 				continue;
 			}
@@ -505,7 +505,7 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function update_pending_task( $task_id, $data ) {
-		$tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
 		$tasks_changed = false;
 		foreach ( $tasks as $key => $task ) {
 			if ( 'pending' !== $task['status'] || $task['task_id'] !== $task_id ) {
@@ -527,7 +527,7 @@ class Suggested_Tasks {
 		if ( ! $tasks_changed ) {
 			return false;
 		}
-		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+		return \progress_planner()->get_settings()->set( 'tasks', $tasks );
 	}
 
 	/**

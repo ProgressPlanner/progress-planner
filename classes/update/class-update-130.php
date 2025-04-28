@@ -71,7 +71,7 @@ class Update_130 {
 	 * @return void
 	 */
 	private function restore_completed_tasks() {
-		$local_tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$local_tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
 		$local_tasks_changed = false;
 
 		// Migrate acgtivities saved in the progress_planner_activities table.
@@ -120,7 +120,7 @@ class Update_130 {
 		}
 
 		if ( $local_tasks_changed ) {
-			\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+			\progress_planner()->get_settings()->set( 'tasks', $local_tasks );
 		}
 	}
 

@@ -72,10 +72,10 @@ trait Task_Provider_Test_Trait {
 		parent::tear_down();
 
 		// Delete local tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
+		\progress_planner()->get_settings()->set( 'tasks', [] );
 
 		// Delete suggested tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
+		\progress_planner()->get_settings()->set( 'tasks', [] );
 	}
 
 	/**
@@ -104,7 +104,7 @@ trait Task_Provider_Test_Trait {
 		}
 
 		// Verify that the task(s) are in the local suggested tasks.
-		$pending_tasks = (array) \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$pending_tasks = (array) \progress_planner()->get_settings()->get( 'tasks', [] );
 		foreach ( $tasks as $task ) {
 			$item_found = false;
 			foreach ( $pending_tasks as $pending_task ) {

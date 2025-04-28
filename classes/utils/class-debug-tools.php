@@ -222,7 +222,7 @@ class Debug_Tools {
 		);
 
 		// Get suggested tasks.
-		$suggested_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$suggested_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		$menu_items = [
 			'pending'             => 'Pending',
@@ -375,7 +375,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Get all local tasks.
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$local_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		// Filter out pending tasks.
 		$local_tasks = array_filter(
@@ -386,7 +386,7 @@ class Debug_Tools {
 		);
 
 		// Update the local tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', array_values( $local_tasks ) );
+		\progress_planner()->get_settings()->set( 'tasks', array_values( $local_tasks ) );
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_pending_tasks', '_wpnonce' ] ) );
@@ -530,7 +530,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the option.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
+		\progress_planner()->get_settings()->set( 'tasks', [] );
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_suggested_tasks', '_wpnonce' ] ) );

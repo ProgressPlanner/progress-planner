@@ -314,7 +314,7 @@ class Tasks_Manager {
 	 * @return bool
 	 */
 	public function add_pending_task( $task ) {
-		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		$task_index = false;
 
@@ -334,7 +334,7 @@ class Tasks_Manager {
 			$tasks[] = $task;
 		}
 
-		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+		return \progress_planner()->get_settings()->set( 'tasks', $tasks );
 	}
 
 	/**
@@ -351,7 +351,7 @@ class Tasks_Manager {
 			return;
 		}
 
-		$tasks = (array) \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks = (array) \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		if ( empty( $tasks ) ) {
 			return;
@@ -377,7 +377,7 @@ class Tasks_Manager {
 		);
 
 		if ( count( $tasks ) !== $task_count ) {
-			\progress_planner()->get_settings()->set( 'local_tasks', array_values( $tasks ) );
+			\progress_planner()->get_settings()->set( 'tasks', array_values( $tasks ) );
 		}
 
 		\progress_planner()->get_utils__cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );

@@ -30,7 +30,7 @@ class Upgrade_Migrations_130_Test extends \WP_UnitTestCase {
 		);
 
 		// Delete all local tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
+		\progress_planner()->get_settings()->set( 'tasks', [] );
 
 		// activity ids, we want to create task with the same ids (and populate task data).
 		$activity_ids = [
@@ -105,7 +105,7 @@ class Upgrade_Migrations_130_Test extends \WP_UnitTestCase {
 		( new \Progress_Planner\Update\Update_130() )->run();
 
 		// Verify the data was migrated.
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$local_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		// Verify that every value in the $activity_ids array is present in the $local_tasks array and has completed status.
 		foreach ( $activity_ids as $activity_id ) {
