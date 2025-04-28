@@ -10,7 +10,7 @@ namespace Progress_Planner;
 use Progress_Planner\Suggested_Tasks\Tasks_Manager;
 use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
 use Progress_Planner\Suggested_Tasks\Tasks\Providers\Repetitive\Core_Update;
-use Progress_Planner\Suggested_Tasks\Task_Factory;
+use Progress_Planner\Suggested_Tasks\Tasks\Task_Factory;
 /**
  * Suggested_Tasks class.
  */
@@ -190,7 +190,7 @@ class Suggested_Tasks {
 		$tasks              = $this->get_tasks();
 		$tasks_with_details = [];
 
-		foreach ( $tasks as $key => $task ) {
+		foreach ( $tasks as $task ) {
 			$task_details = Task_Factory::create_task_from( 'id', $task['task_id'] )->get_task_details();
 
 			if ( $task_details ) {
