@@ -21,6 +21,14 @@ trait Dismissable_Task {
 	protected $dismissed_tasks_option = 'dismissed_tasks';
 
 	/**
+	 * The expiration period in seconds.
+	 * Default is 6 months.
+	 *
+	 * @var int
+	 */
+	protected $dismissal_expiration_period = 6 * MONTH_IN_SECONDS;
+
+	/**
 	 * Initialize the dismissable task functionality.
 	 *
 	 * @return void
@@ -139,8 +147,8 @@ trait Dismissable_Task {
 			return true;
 		}
 
-		// If the task was dismissed more than 6 months ago, we can show it again.
-		if ( ( time() - $dismissal_data['timestamp'] ) > ( 6 * MONTH_IN_SECONDS ) ) {
+		// If the task was dismissed more than the expiration period ago, we can show it again.
+		if ( ( time() - $dismissal_data['timestamp'] ) > $this->dismissal_expiration_period ) {
 			unset( $dismissed_tasks[ $provider_key ][ $task_identifier ] );
 			\progress_planner()->get_settings()->set( $this->dismissed_tasks_option, $dismissed_tasks );
 			return false;
@@ -182,7 +190,7 @@ trait Dismissable_Task {
 
 		$has_changes = false;
 		foreach ( $dismissed_tasks[ $provider_key ] as $identifier => $data ) {
-			if ( ( time() - $data['timestamp'] ) > ( 6 * MONTH_IN_SECONDS ) ) {
+			if ( ( time() - $data['timestamp'] ) > $this->dismissal_expiration_period ) {
 				unset( $dismissed_tasks[ $provider_key ][ $identifier ] );
 				$has_changes = true;
 			}
