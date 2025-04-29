@@ -23,7 +23,7 @@ class Task {
 	 *
 	 * @param array $data The task data.
 	 */
-	public function __construct( array $data ) {
+	public function __construct( array $data = [] ) {
 		$this->data = $data;
 	}
 
