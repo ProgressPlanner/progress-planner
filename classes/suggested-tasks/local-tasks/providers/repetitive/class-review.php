@@ -96,6 +96,12 @@ class Review extends Repetitive {
 		$this->include_post_types = \progress_planner()->get_settings()->get_post_types_names(); // Wait for the post types to be initialized.
 
 		\add_filter( 'progress_planner_update_posts_tasks_args', [ $this, 'filter_update_posts_args' ] );
+
+		// Add the Yoast cornerstone pages to the important page IDs.
+		if ( function_exists( 'YoastSEO' ) ) {
+			\add_filter( 'progress_planner_update_posts_important_page_ids', [ $this, 'add_yoast_cornerstone_pages' ] );
+		}
+
 		$this->init_dismissable_task();
 	}
 
@@ -194,8 +200,14 @@ class Review extends Repetitive {
 			if ( ! empty( $important_page_ids ) ) {
 				$last_updated_posts = $this->get_old_posts(
 					[
-						'post__in'  => $important_page_ids,
-						'post_type' => 'any',
+						'post__in'   => $important_page_ids,
+						'post_type'  => 'any',
+						'date_query' => [
+							[
+								'column' => 'post_modified',
+								'before' => '-6 months', // Important pages are updated more often.
+							],
+						],
 					]
 				);
 			}
@@ -210,6 +222,7 @@ class Review extends Repetitive {
 					$this->get_old_posts(
 						[
 							'post__not_in' => $important_page_ids, // This can be an empty array.
+							'post_type'    => $this->include_post_types,
 						]
 					)
 				);
@@ -353,60 +366,33 @@ class Review extends Repetitive {
 	public function get_old_posts( $args = [] ) {
 		$posts = [];
 
-		if ( ! empty( $this->include_post_types ) ) {
-			$args = wp_parse_args(
-				$args,
-				[
-					'posts_per_page'      => static::ITEMS_TO_INJECT,
-					'post_type'           => $this->include_post_types,
-					'post_status'         => 'publish',
-					'orderby'             => 'modified',
-					'order'               => 'ASC',
-					'ignore_sticky_posts' => true,
-					'date_query'          => [
-						[
-							'column' => 'post_modified',
-							'before' => '-12 months',
-						],
+		// Parse default args.
+		$args = wp_parse_args(
+			$args,
+			[
+				'posts_per_page'      => static::ITEMS_TO_INJECT,
+				'post_status'         => 'publish',
+				'orderby'             => 'modified',
+				'order'               => 'ASC',
+				'ignore_sticky_posts' => true,
+				'date_query'          => [
+					[
+						'column' => 'post_modified',
+						'before' => '-12 months',
 					],
-				]
-			);
+				],
+			]
+		);
 
-			/**
-			 * Filters the args for the posts & pages we want user to review.
-			 *
-			 * @param array $args The get_posts args.
-			 */
-			$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
+		/**
+		 * Filters the args for the posts & pages we want user to review.
+		 *
+		 * @param array $args The get_posts args.
+		 */
+		$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
 
-			// Get the post that was updated last.
-			$posts = \get_posts( $args );
-		}
-
-		// Get the pages saved in the settings that have not been updated in the last 6 months.
-		$saved_page_type_ids = $this->get_saved_page_types();
-
-		if ( ! empty( $saved_page_type_ids ) ) {
-			$pages_to_update = \get_posts(
-				[
-					'post_type'           => 'any',
-					'post_status'         => 'publish',
-					'orderby'             => 'modified',
-					'order'               => 'ASC',
-					'ignore_sticky_posts' => true,
-					'post__in'            => $saved_page_type_ids,
-					'date_query'          => [
-						[
-							'column' => 'post_modified',
-							'before' => '-6 months',
-						],
-					],
-				]
-			);
-
-			// Merge the posts & pages to update. Put the pages first.
-			$posts = array_merge( $pages_to_update, $posts );
-		}
+		// Get the post that was updated last.
+		$posts = \get_posts( $args );
 
 		return $posts ? $posts : [];
 	}
@@ -432,9 +418,6 @@ class Review extends Repetitive {
 		$dismissed_post_ids = $this->get_dismissed_post_ids();
 
 		if ( ! empty( $dismissed_post_ids ) ) {
-			if ( ! isset( $args['post__not_in'] ) ) {
-				$args['post__not_in'] = [];
-			}
 			$args['post__not_in'] = array_merge( $args['post__not_in'], $dismissed_post_ids );
 		}
 
@@ -532,5 +515,28 @@ class Review extends Repetitive {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Add the Yoast cornerstone pages to the important page IDs.
+	 *
+	 * @param int[] $important_page_ids The important page IDs.
+	 * @return int[]
+	 */
+	public function add_yoast_cornerstone_pages( $important_page_ids ) {
+		if ( function_exists( 'YoastSEO' ) ) {
+			$cornerstone_page_ids = \get_posts(
+				[
+					'post_type'  => 'any',
+					'meta_key'   => '_yoast_wpseo_is_cornerstone',
+					'meta_value' => '1',
+					'fields'     => 'ids',
+				]
+			);
+			if ( ! empty( $cornerstone_page_ids ) ) {
+				$important_page_ids = array_merge( $important_page_ids, $cornerstone_page_ids );
+			}
+		}
+		return $important_page_ids;
 	}
 }
