@@ -120,7 +120,7 @@ trait Dismissable_Task {
 	 *
 	 * @return int The expiration period in seconds.
 	 */
-	protected function get_expiration_period( $dismissal_data = [] ) {
+	protected function get_expiration_period( $dismissal_data = [] ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 		return 6 * MONTH_IN_SECONDS;
 	}
 
