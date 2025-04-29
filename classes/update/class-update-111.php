@@ -17,7 +17,7 @@ use Progress_Planner\Suggested_Tasks\Task_Factory;
 class Update_111 {
 
 	/**
-	 * Local Tasks.
+	 * Local tasks.
 	 *
 	 * @var array
 	 */
@@ -42,7 +42,7 @@ class Update_111 {
 		// Migrate the `progress_planner_suggested_tasks` option.
 		$this->migrate_suggested_tasks();
 
-		// Convert tasks.
+		// Convert local tasks.
 		$this->convert_local_tasks();
 
 		// Migrate to-do items.
@@ -61,7 +61,7 @@ class Update_111 {
 		$this->migrate_create_post_tasks();
 		$this->migrate_review_post_tasks();
 
-		// Save the tasks if they have been changed.
+		// Save the local tasks if they have been changed.
 		if ( $this->local_tasks_changed ) {
 			\progress_planner()->get_settings()->set( 'local_tasks', $this->local_tasks );
 		}
@@ -125,15 +125,15 @@ class Update_111 {
 	}
 
 	/**
-	 * Add a task.
+	 * Add a local task.
 	 *
 	 * @param array $task The task to add.
 	 *
 	 * @return void
 	 */
 	private function add_local_task( $task ) {
-		foreach ( $this->local_tasks as $key => $_task ) {
-			if ( isset( $_task['task_id'] ) && $_task['task_id'] === $task['task_id'] ) {
+		foreach ( $this->local_tasks as $key => $local_task ) {
+			if ( isset( $local_task['task_id'] ) && $local_task['task_id'] === $task['task_id'] ) {
 				$this->local_tasks[ $key ] = $task;
 				return;
 			}
@@ -313,7 +313,7 @@ class Update_111 {
 					$data = $this->get_data_from_task_id( $task['task_id'] );
 
 					// Get the date from the activity.
-					$date                           = $this->get_date_from_activity( $task['task_id'] );
+					$date                                 = $this->get_date_from_activity( $task['task_id'] );
 					$this->local_tasks[ $key ]['task_id'] = $data['provider_id'] . '-' . $data['post_id'] . '-' . $date;
 					$this->local_tasks[ $key ]['date']    = $date;
 
