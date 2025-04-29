@@ -438,6 +438,24 @@ class Review extends Repetitive {
 			$args['post__not_in'] = array_merge( $args['post__not_in'], $dismissed_post_ids );
 		}
 
+		if ( function_exists( 'YoastSEO' ) ) {
+			// Handle the case when the meta key doesn't exist.
+			$args['meta_query'] = [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				'relation' => 'OR',
+				[
+					'key'     => '_yoast_wpseo_content_score',
+					'compare' => 'EXISTS',
+				],
+				[
+					'key'     => '_yoast_wpseo_content_score',
+					'compare' => 'NOT EXISTS',
+				],
+			];
+
+			$args['orderby'] = 'meta_value_num';
+			$args['order']   = 'ASC';
+		}
+
 		return $args;
 	}
 
