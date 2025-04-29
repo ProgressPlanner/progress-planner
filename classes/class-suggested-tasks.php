@@ -633,6 +633,9 @@ class Suggested_Tasks {
 				// Insert an activity.
 				$this->insert_activity( $task_id );
 				$updated = true;
+
+				// Allow other classes to react to the completion of a suggested task.
+				\do_action( 'progress_planner_task_dismissed', $task_id );
 				break;
 
 			case 'pending':

@@ -1,8 +1,8 @@
 const { test, expect } = require( '@playwright/test' );
 const { makeAuthenticatedRequest } = require( './utils' );
 
-test.describe( 'PRPL Dismissible Tasks', () => {
-	test( 'Complete dismissible task if present', async ( {
+test.describe( 'PRPL Dismissable Tasks', () => {
+	test( 'Complete dismissable task if present', async ( {
 		page,
 		request,
 	} ) => {
