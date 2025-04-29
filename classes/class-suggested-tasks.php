@@ -633,9 +633,6 @@ class Suggested_Tasks {
 				// Insert an activity.
 				$this->insert_activity( $task_id );
 				$updated = true;
-
-				// Allow other classes to react to the completion of a suggested task.
-				\do_action( 'progress_planner_task_dismissed', $task_id );
 				break;
 
 			case 'pending':
@@ -663,6 +660,14 @@ class Suggested_Tasks {
 			default:
 				\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid action.', 'progress-planner' ) ] );
 		}
+
+		/**
+		 * Allow other classes to react to the completion of a suggested task.
+		 *
+		 * @param string $task_id The task ID.
+		 * @param bool   $updated Whether the action was successful.
+		 */
+		\do_action( "progress_planner_ajax_task_{$action}", $task_id, $updated );
 
 		if ( ! $updated ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to save.', 'progress-planner' ) ] );

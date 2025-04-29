@@ -26,7 +26,7 @@ trait Dismissable_Task {
 	 * @return void
 	 */
 	protected function init_dismissable_task() {
-		\add_action( 'progress_planner_task_dismissed', [ $this, 'handle_task_dismissal' ], 10, 1 );
+		\add_action( 'progress_planner_ajax_task_complete', [ $this, 'handle_task_dismissal' ], 10, 2 );
 		\add_action( 'admin_init', [ $this, 'cleanup_old_dismissals' ] );
 		\add_filter( 'progress_planner_task_dismissal_data', [ $this, 'add_post_id_to_dismissal_data' ], 10, 3 );
 	}
@@ -35,10 +35,11 @@ trait Dismissable_Task {
 	 * Handle task dismissal by storing the task data and dismissal date.
 	 *
 	 * @param string $task_id The task ID.
+	 * @param bool   $action_successful Whether the action was successful.
 	 *
 	 * @return void
 	 */
-	public function handle_task_dismissal( $task_id ) {
+	public function handle_task_dismissal( $task_id, $action_successful ) {
 
 		// If no task ID is provided, return.
 		if ( ! $task_id ) {
