@@ -65,17 +65,14 @@ class Suggested_Task extends Activity {
 		}
 
 		// Default points for a suggested task.
-		$points = 1;
-		$tasks  = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $this->data_id );
+		$points        = 1;
+		$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $this->data_id );
 
-		if ( ! empty( $tasks ) && isset( $tasks[0]['provider_id'] ) ) {
-			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $tasks[0]['provider_id'] );
-
-			if ( $task_provider ) {
-				// Create post task provider had a different points system, this is for backwards compatibility.
-				$points = $task_provider instanceof Create ? $task_provider->get_points( $this->data_id ) : $task_provider->get_points();
-			}
+		if ( $task_provider ) {
+			// Create post task provider had a different points system, this is for backwards compatibility.
+			$points = $task_provider instanceof Create ? $task_provider->get_points( $this->data_id ) : $task_provider->get_points();
 		}
+
 		$this->points[ $date_ymd ] = $points;
 
 		return (int) $this->points[ $date_ymd ];
