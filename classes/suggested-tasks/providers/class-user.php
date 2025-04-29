@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 /**
  * Add tasks for content updates.
  */
-class User extends One_Time {
+class User extends Tasks {
 
 	/**
 	 * Whether the task is an onboarding task.

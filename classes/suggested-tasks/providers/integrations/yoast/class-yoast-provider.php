@@ -7,12 +7,12 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
+use Progress_Planner\Suggested_Tasks\Providers\Tasks;
 
 /**
  * Add tasks for Yoast SEO configuration.
  */
-abstract class Yoast_Provider extends One_Time {
+abstract class Yoast_Provider extends Tasks {
 
 	/**
 	 * The provider type.

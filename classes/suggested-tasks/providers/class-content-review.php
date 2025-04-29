@@ -5,15 +5,14 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\Repetitive;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Providers\Repetitive;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
 
 /**
  * Add tasks for content updates.
  */
-class Review extends Repetitive {
+class Content_Review extends Tasks {
 
 	/**
 	 * The capability required to perform the task.
@@ -35,6 +34,13 @@ class Review extends Repetitive {
 	 * @var string
 	 */
 	protected const CATEGORY = 'content-update';
+
+	/**
+	 * Whether the task is repetitive.
+	 *
+	 * @var bool
+	 */
+	protected $is_repetitive = true;
 
 	/**
 	 * The task priority.
