@@ -84,8 +84,8 @@ final class Content_Activity extends Widget {
 			$activities,
 			function ( $activity ) {
 				$post = $activity->get_post();
-				return is_object( $post )
-					&& \in_array( $post->post_type, \progress_planner()->get_activities__content_helpers()->get_post_types_names(), true );
+				return 'delete' === $activity->type || ( is_object( $post )
+					&& \in_array( $post->post_type, \progress_planner()->get_activities__content_helpers()->get_post_types_names(), true ) );
 			}
 		);
 	}

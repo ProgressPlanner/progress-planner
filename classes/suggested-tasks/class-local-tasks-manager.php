@@ -364,12 +364,8 @@ class Local_Tasks_Manager {
 		$tasks = \array_filter(
 			$tasks,
 			function ( $task ) {
-				// If the task was already completed, remove it.
-				if ( 'completed' === $task['status'] ) {
-					return false;
-				}
 
-				if ( isset( $task['date'] ) ) {
+				if ( 'pending' === $task['status'] && isset( $task['date'] ) ) {
 					return (string) \gmdate( 'YW' ) === (string) $task['date'];
 				}
 

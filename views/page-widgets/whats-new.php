@@ -24,12 +24,16 @@ $prpl_widget = \progress_planner()->get_admin__widgets__whats_new();
 			: false;
 		?>
 		<li>
-			<a href="<?php echo \esc_url( $prpl_blog_post['link'] ); ?>" target="_blank">
-				<h3><?php echo \esc_html( $prpl_blog_post['title']['rendered'] ); ?></h3>
-				<?php if ( $prpl_blog_post_image_url ) : ?>
+			<h3>
+				<a href="<?php echo \esc_url( $prpl_blog_post['link'] ); ?>" target="_blank">
+					<?php echo \esc_html( $prpl_blog_post['title']['rendered'] ); ?>
+				</a>
+			</h3>
+			<?php if ( $prpl_blog_post_image_url ) : ?>
+				<a href="<?php echo \esc_url( $prpl_blog_post['link'] ); ?>" target="_blank">
 					<div class="prpl-blog-post-image" style="background-image:url(<?php echo \esc_url( $prpl_blog_post_image_url ); ?>)"></div>
-				<?php endif; ?>
-			</a>
+				</a>
+			<?php endif; ?>
 			<p><?php echo \esc_html( \wp_trim_words( \wp_strip_all_tags( $prpl_blog_post['content']['rendered'] ), 55 ) ); ?></p>
 			<hr />
 		</li>
