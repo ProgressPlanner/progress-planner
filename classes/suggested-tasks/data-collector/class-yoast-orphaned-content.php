@@ -64,10 +64,23 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 		}
 
 		global $wpdb;
+		$where_clause = "1=1 AND p.post_status = 'publish'";
 
 		// Get the public post types.
-		$public_post_types = get_post_types( [ 'public' => true ], 'names' );
-		$post_types_in     = "'" . implode( "','", esc_sql( $public_post_types ) ) . "'";
+		$public_post_types = \progress_planner()->get_settings()->get_public_post_types();
+		$post_types_in     = '';
+
+		if ( ! empty( $public_post_types ) ) {
+			$post_types_in = array_map(
+				function ( $type ) {
+					return (string) esc_sql( $type );
+				},
+				array_values( $public_post_types )
+			);
+			$post_types_in = "p.post_type IN ('" . implode( "','", $post_types_in ) . "')";
+
+			$where_clause .= " AND $post_types_in";
+		}
 
 		// Exclude "Hello World" and "Sample Page" posts, array_filter() to remove empty values.
 		$exclude_post_ids = array_filter(
@@ -77,18 +90,12 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 			]
 		);
 
-		// Build the where clause.
-		$where_clause = "p.post_type IN ($post_types_in)
-			AND p.post_status = 'publish'
-			AND l.target_post_id IS NULL";
-
 		if ( ! empty( $exclude_post_ids ) ) {
-			$where_clause .= ' AND p.ID NOT IN (' . implode( ',', $exclude_post_ids ) . ')';
+			$exclude_post_ids = array_map( 'intval', $exclude_post_ids );
+			$where_clause    .= ' AND p.ID NOT IN (' . implode( ',', $exclude_post_ids ) . ')';
 		}
 
-		$post_to_update = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				"
+		$query = "
 			SELECT p.ID AS post_id, p.post_title AS post_title
 			FROM {$wpdb->posts} p
 			LEFT JOIN (
@@ -97,12 +104,14 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 				WHERE type = 'internal'
 				AND target_post_id IS NOT NULL
 			) l ON p.ID = l.target_post_id
-			WHERE %s
+			WHERE {$where_clause}
+			AND l.target_post_id IS NULL
 			ORDER BY p.post_date DESC
 			LIMIT 1
-		",
-				$where_clause
-			),
+		";
+
+		$post_to_update = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$query, // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The query is prepared in the $where_clause variable.
 			ARRAY_A
 		);
 
