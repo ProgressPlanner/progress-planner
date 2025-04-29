@@ -43,7 +43,7 @@ class Suggested_Tasks {
 		\add_action( 'wp_ajax_progress_planner_suggested_task_action', [ $this, 'suggested_task_action' ] );
 
 		if ( \is_admin() ) {
-			\add_action( 'init', [ $this, 'init' ], 1 );
+			\add_action( 'init', [ $this, 'init' ], 100 ); // Wait for the post types to be initialized.
 		}
 
 		// Add the automatic updates complete action.
@@ -660,6 +660,14 @@ class Suggested_Tasks {
 			default:
 				\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid action.', 'progress-planner' ) ] );
 		}
+
+		/**
+		 * Allow other classes to react to the completion of a suggested task.
+		 *
+		 * @param string $task_id The task ID.
+		 * @param bool   $updated Whether the action was successful.
+		 */
+		\do_action( "progress_planner_ajax_task_{$action}", $task_id, $updated );
 
 		if ( ! $updated ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to save.', 'progress-planner' ) ] );
