@@ -2,6 +2,8 @@
 
 Enhancements:
 
+* Review Content task takes into account Yoast SEO readibility score when suggesting posts to update.
+
 
 Bugs we fixed:
 
