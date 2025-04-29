@@ -17,18 +17,18 @@ use Progress_Planner\Suggested_Tasks\Task_Factory;
 class Update_111 {
 
 	/**
-	 * Tasks.
+	 * Local Tasks.
 	 *
 	 * @var array
 	 */
-	private $tasks = [];
+	private $local_tasks = [];
 
 	/**
-	 * Whether tasks have been changed.
+	 * Whether local tasks have been changed.
 	 *
 	 * @var boolean
 	 */
-	private $tasks_changed = false;
+	private $local_tasks_changed = false;
 
 	/**
 	 * Run the update.
@@ -37,33 +37,33 @@ class Update_111 {
 	 */
 	public function run() {
 		// Migrate the `progress_planner_local_tasks` option.
-		$this->migrate_tasks();
+		$this->migrate_local_tasks();
 
 		// Migrate the `progress_planner_suggested_tasks` option.
 		$this->migrate_suggested_tasks();
 
 		// Convert tasks.
-		$this->convert_tasks();
+		$this->convert_local_tasks();
 
 		// Migrate to-do items.
 		$this->migrate_todo_items();
 
-		if ( $this->tasks_changed ) {
-			\progress_planner()->get_settings()->set( 'tasks', $this->tasks );
+		if ( $this->local_tasks_changed ) {
+			\progress_planner()->get_settings()->set( 'local_tasks', $this->local_tasks );
 		}
 
 		// Migrate activities.
 		$this->migrate_activities();
 
 		// Now migrate 'create-post' and 'review-post' tasks.
-		$this->tasks_changed = false;
+		$this->local_tasks_changed = false;
 
 		$this->migrate_create_post_tasks();
 		$this->migrate_review_post_tasks();
 
 		// Save the tasks if they have been changed.
-		if ( $this->tasks_changed ) {
-			\progress_planner()->get_settings()->set( 'tasks', $this->tasks );
+		if ( $this->local_tasks_changed ) {
+			\progress_planner()->get_settings()->set( 'local_tasks', $this->local_tasks );
 		}
 
 		// Migrate the 'create-post' activities and 'review-post' activities.
@@ -76,18 +76,18 @@ class Update_111 {
 	 *
 	 * @return void
 	 */
-	private function migrate_tasks() {
-		$tasks_option = \get_option( 'progress_planner_local_tasks', [] );
-		if ( ! empty( $tasks_option ) ) {
-			foreach ( $tasks_option as $task_id ) {
+	private function migrate_local_tasks() {
+		$local_tasks_option = \get_option( 'progress_planner_local_tasks', [] );
+		if ( ! empty( $local_tasks_option ) ) {
+			foreach ( $local_tasks_option as $task_id ) {
 				$task           = Task_Factory::create_task_from( 'id', $task_id )->get_data();
 				$task['status'] = 'pending';
 
 				if ( ! isset( $task['task_id'] ) ) {
 					continue;
 				}
-				$this->add_task( $task );
-				$this->tasks_changed = true;
+				$this->add_local_task( $task );
+				$this->local_tasks_changed = true;
 			}
 			\delete_option( 'progress_planner_local_tasks' );
 		}
@@ -117,8 +117,8 @@ class Update_111 {
 					$task['provider_id'] = 'review-post';
 				}
 
-				$this->add_task( $task );
-				$this->tasks_changed = true;
+				$this->add_local_task( $task );
+				$this->local_tasks_changed = true;
 			}
 		}
 		\delete_option( 'progress_planner_suggested_tasks' );
@@ -131,14 +131,14 @@ class Update_111 {
 	 *
 	 * @return void
 	 */
-	private function add_task( $task ) {
-		foreach ( $this->tasks as $key => $_task ) {
+	private function add_local_task( $task ) {
+		foreach ( $this->local_tasks as $key => $_task ) {
 			if ( isset( $_task['task_id'] ) && $_task['task_id'] === $task['task_id'] ) {
-				$this->tasks[ $key ] = $task;
+				$this->local_tasks[ $key ] = $task;
 				return;
 			}
 		}
-		$this->tasks[] = $task;
+		$this->local_tasks[] = $task;
 	}
 
 	/**
@@ -146,19 +146,19 @@ class Update_111 {
 	 *
 	 * @return void
 	 */
-	private function convert_tasks() {
-		foreach ( $this->tasks as $key => $task ) {
+	private function convert_local_tasks() {
+		foreach ( $this->local_tasks as $key => $task ) {
 			if ( isset( $task['type'] ) ) {
-				unset( $this->tasks[ $key ]['type'] );
-				$this->tasks_changed = true;
+				unset( $this->local_tasks[ $key ]['type'] );
+				$this->local_tasks_changed = true;
 			}
 			if ( ! isset( $task['task_id'] ) ) {
 				continue;
 			}
 			$converted_task_id = $this->convert_task_id( $task['task_id'] );
 			if ( $converted_task_id !== $task['task_id'] ) {
-				$this->tasks[ $key ]['task_id'] = $converted_task_id;
-				$this->tasks_changed            = true;
+				$this->local_tasks[ $key ]['task_id'] = $converted_task_id;
+				$this->local_tasks_changed            = true;
 			}
 		}
 	}
@@ -194,7 +194,7 @@ class Update_111 {
 			return;
 		}
 		foreach ( $todo_items as $todo_item ) {
-			$this->add_task(
+			$this->add_local_task(
 				[
 					'task_id'     => 'user-task-' . md5( $todo_item['content'] ),
 					'status'      => $todo_item['done'] ? 'completed' : 'pending',
@@ -205,7 +205,7 @@ class Update_111 {
 			);
 		}
 
-		$this->tasks_changed = true;
+		$this->local_tasks_changed = true;
 
 		\delete_option( 'progress_planner_todo' );
 	}
@@ -237,8 +237,8 @@ class Update_111 {
 	private function migrate_create_post_tasks() {
 
 		// Migrate the 'create-post' completed tasks.
-		if ( ! empty( $this->tasks ) ) {
-			foreach ( $this->tasks as $key => $task ) {
+		if ( ! empty( $this->local_tasks ) ) {
+			foreach ( $this->local_tasks as $key => $task ) {
 				if ( ! isset( $task['task_id'] ) ) {
 					continue;
 				}
@@ -250,14 +250,14 @@ class Update_111 {
 
 					// Only add legacy part of the task_id if the task is not pending.
 					if ( 'completed' === $task['status'] || 'pending_celebration' === $task['status'] ) {
-						$this->tasks[ $key ]['task_id'] = $task['provider_id'] . '-' . ( $task['long'] ? 'long' : 'short' ) . '-' . $task['date'];
+						$this->local_tasks[ $key ]['task_id'] = $task['provider_id'] . '-' . ( $task['long'] ? 'long' : 'short' ) . '-' . $task['date'];
 					} else {
-						$this->tasks[ $key ]['task_id'] = $task['provider_id'] . '-' . $task['date'];
+						$this->local_tasks[ $key ]['task_id'] = $task['provider_id'] . '-' . $task['date'];
 					}
 
 					// We need to keep $task['long'] because it's used to calculate the points (and we don't know which post was created).
 
-					$this->tasks_changed = true;
+					$this->local_tasks_changed = true;
 				}
 			}
 		}
@@ -303,8 +303,8 @@ class Update_111 {
 	private function migrate_review_post_tasks() {
 
 		// Migrate the 'create-post' completed tasks.
-		if ( ! empty( $this->tasks ) ) {
-			foreach ( $this->tasks as $key => $task ) {
+		if ( ! empty( $this->local_tasks ) ) {
+			foreach ( $this->local_tasks as $key => $task ) {
 				if ( ! isset( $task['task_id'] ) ) {
 					continue;
 				}
@@ -314,10 +314,10 @@ class Update_111 {
 
 					// Get the date from the activity.
 					$date                           = $this->get_date_from_activity( $task['task_id'] );
-					$this->tasks[ $key ]['task_id'] = $data['provider_id'] . '-' . $data['post_id'] . '-' . $date;
-					$this->tasks[ $key ]['date']    = $date;
+					$this->local_tasks[ $key ]['task_id'] = $data['provider_id'] . '-' . $data['post_id'] . '-' . $date;
+					$this->local_tasks[ $key ]['date']    = $date;
 
-					$this->tasks_changed = true;
+					$this->local_tasks_changed = true;
 				}
 			}
 		}
