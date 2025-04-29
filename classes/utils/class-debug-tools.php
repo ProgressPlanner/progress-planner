@@ -184,7 +184,7 @@ class Debug_Tools {
 		$onboard_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', [] );
 
 		foreach ( $onboard_task_provider_ids as $task_provider_id ) {
-			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
+			$task_provider = \progress_planner()->get_recommendations()->get_local()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
 			if ( $task_provider ) { // @phpstan-ignore-line
 				$task_provider_details = $task_provider->get_task_details();
 				if ( empty( $task_provider_details ) ) {
@@ -222,39 +222,38 @@ class Debug_Tools {
 		);
 
 		// Get suggested tasks.
-		$suggested_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$suggested_tasks = \progress_planner()->get_recommendations()->get( [ 'post_status' => 'any' ] );
 
 		$menu_items = [
-			'pending'             => 'Pending',
-			'completed'           => 'Completed',
-			'snoozed'             => 'Snoozed',
-			'pending_celebration' => 'Pending Celebration',
+			'publish'             => 'Pending (publish)',
+			'trash'               => 'Completed (trash)',
+			'future'              => 'Snoozed (future)',
+			'pending_celebration' => 'Pending Celebration (pending_celebration)',
 		];
 
-		foreach ( $menu_items as $key => $title ) {
+		foreach ( $menu_items as $post_status => $title ) {
 			$admin_bar->add_node(
 				[
-					'id'     => 'prpl-suggested-' . $key,
+					'id'     => 'prpl-suggested-' . $post_status,
 					'parent' => 'prpl-suggested-tasks',
 					'title'  => $title,
 				]
 			);
 
 			foreach ( $suggested_tasks as $task ) {
-				if ( ! isset( $task['task_id'] ) || $key !== $task['status'] ) {
+				if ( ! isset( $task['ID'] ) || $post_status !== $task['post_status'] ) {
 					continue;
 				}
 
-				$title = $task['task_id'];
-				if ( isset( $task['status'] ) && 'snoozed' === $task['status'] && isset( $task['time'] ) ) {
-					$until  = is_float( $task['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['time'] ) . ')';
-					$title .= ' ' . $until;
+				$title = $task['post_title'];
+				if ( isset( $task['post_status'] ) && 'future' === $task['post_status'] ) {
+					$title .= ' (until ' . \gmdate( 'Y-m-d H:i', $task['post_date'] ) . ')';
 				}
 
 				$admin_bar->add_node(
 					[
-						'id'     => 'prpl-suggested-' . $key . '-' . $title,
-						'parent' => 'prpl-suggested-' . $key,
+						'id'     => 'prpl-suggested-' . $post_status . '-' . $title,
+						'parent' => 'prpl-suggested-' . $post_status,
 						'title'  => $title,
 					]
 				);
@@ -375,18 +374,9 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Get all local tasks.
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-
-		// Filter out pending tasks.
-		$local_tasks = array_filter(
-			$local_tasks,
-			function ( $task ) {
-				return 'pending' !== $task['status'];
-			}
-		);
-
-		// Update the local tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', array_values( $local_tasks ) );
+		foreach ( \progress_planner()->get_recommendations()->get( [ 'post_status' => 'publish' ] ) as $task ) {
+			wp_delete_post( $task['ID'], true );
+		}
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_pending_tasks', '_wpnonce' ] ) );
@@ -529,8 +519,10 @@ class Debug_Tools {
 		// Verify nonce for security.
 		$this->verify_nonce();
 
-		// Delete the option.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
+		// Delete all suggested tasks.
+		foreach ( \progress_planner()->get_recommendations()->get( [ 'post_status' => 'any' ] ) as $task ) {
+			wp_delete_post( $task['ID'], true );
+		}
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_suggested_tasks', '_wpnonce' ] ) );

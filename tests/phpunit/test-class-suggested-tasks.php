@@ -8,6 +8,7 @@
 namespace Progress_Planner\Tests;
 
 use Progress_Planner\Suggested_Tasks;
+use Progress_Planner\Recommendations;
 use Progress_Planner\Suggested_Tasks\Remote_Tasks;
 
 /**
@@ -23,12 +24,20 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 	protected $suggested_tasks;
 
 	/**
+	 * Recommendations object.
+	 *
+	 * @var Recommendations
+	 */
+	protected $recommendations;
+
+	/**
 	 * Setup the test case.
 	 *
 	 * @return void
 	 */
 	public function set_up() {
 		$this->suggested_tasks = \progress_planner()->get_suggested_tasks();
+		$this->recommendations = \progress_planner()->get_recommendations();
 	}
 
 	/**
@@ -37,7 +46,7 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_get_remote_tasks() {
-		$remote_tasks = $this->suggested_tasks->get_remote();
+		$remote_tasks = $this->recommendations->get_remote();
 		$this->assertInstanceOf( Remote_Tasks::class, $remote_tasks );
 	}
 
@@ -72,7 +81,7 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 		];
 
 		foreach ( $tasks_to_keep as $task ) {
-			$this->suggested_tasks->get_local()->add_pending_task( $task );
+			$this->recommendations->get_local()->add_pending_task( $task );
 		}
 
 		// Tasks that should be removed.
@@ -88,10 +97,10 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 		];
 
 		foreach ( $tasks_to_remove as $task ) {
-			$this->suggested_tasks->get_local()->add_pending_task( $task );
+			$this->recommendations->get_local()->add_pending_task( $task );
 		}
 
-		$this->suggested_tasks->get_local()->cleanup_pending_tasks();
+		$this->recommendations->get_local()->cleanup_pending_tasks();
 
 		$this->assertEquals( count( $tasks_to_keep ), \count( \progress_planner()->get_settings()->get( 'local_tasks', [] ) ) );
 	}

@@ -213,7 +213,7 @@ class Local_Tasks_Manager {
 		foreach ( $provider_tasks as $task ) {
 
 			// Skip the task if it was completed.
-			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task['task_id'] ) ) {
+			if ( true === \progress_planner()->get_recommendations()->is_completed( (int) $task['task_id'] ) ) {
 				continue;
 			}
 
@@ -245,7 +245,7 @@ class Local_Tasks_Manager {
 			$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
 			if ( $task_provider && ! $task_provider->is_task_relevant() ) {
 				// Remove the task from the pending tasks.
-				\progress_planner()->get_suggested_tasks()->delete_task( $task_id );
+				\wp_delete_post( (int) $task_id );
 			}
 
 			$task_result = $this->evaluate_task( $task_id );
@@ -314,27 +314,25 @@ class Local_Tasks_Manager {
 	 * @return bool
 	 */
 	public function add_pending_task( $task ) {
-		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		// Check if we already have a post with the same title.
+		$posts = \get_posts(
+			[
+				'title'       => isset( $task['title'] ) ? $task['title'] : $task['task_id'],
+				'post_type'   => 'prpl_recommendations',
+				'numberposts' => 1,
+			]
+		);
 
-		$task_index = false;
-
-		foreach ( $tasks as $key => $_task ) {
-			if ( ! isset( $_task['task_id'] ) || $task['task_id'] !== $_task['task_id'] ) {
-				continue;
-			}
-			$task_index = $key;
-			break;
+		if ( $posts && 'publish' !== $posts[0]->post_status ) {
+			return (bool) \wp_update_post(
+				[
+					'ID'          => $posts[0]->ID,
+					'post_status' => 'publish',
+				]
+			);
 		}
 
-		$task['status'] = 'pending';
-
-		if ( false !== $task_index ) {
-			$tasks[ $task_index ] = array_merge( $task, $tasks[ $task_index ] );
-		} else {
-			$tasks[] = $task;
-		}
-
-		return \progress_planner()->get_settings()->set( 'local_tasks', $tasks );
+		return false;
 	}
 
 	/**
