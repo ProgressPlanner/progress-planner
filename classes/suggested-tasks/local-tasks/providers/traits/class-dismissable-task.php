@@ -14,10 +14,11 @@ trait Dismissable_Task {
 
 	/**
 	 * The option name for storing dismissed tasks.
+	 * Note: Prior to PHP 8.2 traits cannot have constants.
 	 *
 	 * @var string
 	 */
-	protected const DISMISSED_TASKS_OPTION = 'dismissed_tasks';
+	protected $dismissed_tasks_option = 'dismissed_tasks';
 
 	/**
 	 * Initialize the dismissable task functionality.
@@ -60,7 +61,7 @@ trait Dismissable_Task {
 		}
 
 		// Get the dismissed tasks.
-		$dismissed_tasks = \progress_planner()->get_settings()->get( self::DISMISSED_TASKS_OPTION, [] );
+		$dismissed_tasks = \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
 
 		// Get the provider key.
 		$provider_id = $this->get_provider_id();
@@ -96,7 +97,7 @@ trait Dismissable_Task {
 		$dismissed_tasks[ $provider_id ][ $task_identifier ] = $dismissal_data;
 
 		// Store the dismissed tasks.
-		\progress_planner()->get_settings()->set( self::DISMISSED_TASKS_OPTION, $dismissed_tasks );
+		\progress_planner()->get_settings()->set( $this->dismissed_tasks_option, $dismissed_tasks );
 	}
 
 	/**
@@ -119,7 +120,7 @@ trait Dismissable_Task {
 	 * @return bool
 	 */
 	protected function is_task_dismissed( $task_data ) {
-		$dismissed_tasks = \progress_planner()->get_settings()->get( self::DISMISSED_TASKS_OPTION, [] );
+		$dismissed_tasks = \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
 		$provider_key    = $this->get_provider_id();
 
 		if ( ! isset( $dismissed_tasks[ $provider_key ] ) ) {
@@ -141,7 +142,7 @@ trait Dismissable_Task {
 		// If the task was dismissed more than 6 months ago, we can show it again.
 		if ( ( time() - $dismissal_data['timestamp'] ) > ( 6 * MONTH_IN_SECONDS ) ) {
 			unset( $dismissed_tasks[ $provider_key ][ $task_identifier ] );
-			\progress_planner()->get_settings()->set( self::DISMISSED_TASKS_OPTION, $dismissed_tasks );
+			\progress_planner()->get_settings()->set( $this->dismissed_tasks_option, $dismissed_tasks );
 			return false;
 		}
 
@@ -154,7 +155,7 @@ trait Dismissable_Task {
 	 * @return array
 	 */
 	public function get_dismissed_tasks() {
-		$dismissed_tasks = \progress_planner()->get_settings()->get( self::DISMISSED_TASKS_OPTION, [] );
+		$dismissed_tasks = \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
 		$provider_key    = $this->get_provider_id();
 
 		return $dismissed_tasks[ $provider_key ] ?? [];
@@ -172,7 +173,7 @@ trait Dismissable_Task {
 			return;
 		}
 
-		$dismissed_tasks = \progress_planner()->get_settings()->get( self::DISMISSED_TASKS_OPTION, [] );
+		$dismissed_tasks = \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
 		$provider_key    = $this->get_provider_id();
 
 		if ( ! isset( $dismissed_tasks[ $provider_key ] ) ) {
@@ -188,7 +189,7 @@ trait Dismissable_Task {
 		}
 
 		if ( $has_changes ) {
-			\progress_planner()->get_settings()->set( self::DISMISSED_TASKS_OPTION, $dismissed_tasks );
+			\progress_planner()->get_settings()->set( $this->dismissed_tasks_option, $dismissed_tasks );
 		}
 
 		// Set transient to prevent running cleanup again today.
