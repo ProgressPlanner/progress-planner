@@ -9,11 +9,13 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Traits\Dismissable_Task;
 
 /**
  * Add tasks for content updates.
  */
 class Review extends Repetitive {
+	use Dismissable_Task;
 
 	/**
 	 * The capability required to perform the task.
@@ -65,6 +67,13 @@ class Review extends Repetitive {
 	protected $snoozed_post_ids = null;
 
 	/**
+	 * The dismissed post IDs.
+	 *
+	 * @var array|null
+	 */
+	protected $dismissed_post_ids = null;
+
+	/**
 	 * The post to update IDs.
 	 *
 	 * @var array|null
@@ -87,6 +96,7 @@ class Review extends Repetitive {
 		$this->include_post_types = \progress_planner()->get_settings()->get_post_types_names(); // Wait for the post types to be initialized.
 
 		\add_filter( 'progress_planner_update_posts_tasks_args', [ $this, 'filter_update_posts_args' ] );
+		$this->init_dismissable_task();
 	}
 
 	/**
@@ -156,7 +166,6 @@ class Review extends Repetitive {
 	 * @return bool
 	 */
 	public function should_add_task() {
-
 		if ( null === $this->task_post_mappings ) {
 			$this->task_post_mappings = [];
 
@@ -213,6 +222,16 @@ class Review extends Repetitive {
 			}
 
 			foreach ( $last_updated_posts as $post ) {
+				$task_data = [
+					'post_id'     => $post->ID,
+					'provider_id' => $this->get_provider_id(),
+				];
+
+				// Skip if the task has been dismissed.
+				if ( $this->is_task_dismissed( $task_data ) ) {
+					continue;
+				}
+
 				$task_id = $this->get_task_id( [ 'post_id' => $post->ID ] );
 
 				// Don't add the task if it was completed.
@@ -410,6 +429,15 @@ class Review extends Repetitive {
 			$args['post__not_in'] = array_merge( $args['post__not_in'], $snoozed_post_ids );
 		}
 
+		$dismissed_post_ids = $this->get_dismissed_post_ids();
+
+		if ( ! empty( $dismissed_post_ids ) ) {
+			if ( ! isset( $args['post__not_in'] ) ) {
+				$args['post__not_in'] = [];
+			}
+			$args['post__not_in'] = array_merge( $args['post__not_in'], $dismissed_post_ids );
+		}
+
 		return $args;
 	}
 
@@ -436,6 +464,39 @@ class Review extends Repetitive {
 		}
 
 		return $this->snoozed_post_ids;
+	}
+
+	/**
+	 * Get the dismissed post IDs.
+	 *
+	 * @return array
+	 */
+	protected function get_dismissed_post_ids() {
+
+		if ( null !== $this->dismissed_post_ids ) {
+			return $this->dismissed_post_ids;
+		}
+
+		$this->dismissed_post_ids = [];
+		$dismissed                = $this->get_dismissed_tasks();
+
+		if ( ! empty( $dismissed ) ) {
+			$this->dismissed_post_ids = array_values( wp_list_pluck( $dismissed, 'post_id' ) );
+		}
+
+		return $this->dismissed_post_ids;
+	}
+
+	/**
+	 * Get the task identifier for storing dismissal data.
+	 * Override this method in the implementing class to provide task-specific identification.
+	 *
+	 * @param array $task_data The task data.
+	 *
+	 * @return string|false The task identifier or false if not applicable.
+	 */
+	protected function get_task_identifier( $task_data ) {
+		return $this->get_provider_id() . '-' . $task_data['post_id'];
 	}
 
 	/**
