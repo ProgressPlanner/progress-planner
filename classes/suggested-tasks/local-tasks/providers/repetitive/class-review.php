@@ -10,6 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Traits\Dismissable_Task;
+use Progress_Planner\Page_Types;
 
 /**
  * Add tasks for content updates.
@@ -528,8 +529,8 @@ class Review extends Repetitive {
 			$cornerstone_page_ids = \get_posts(
 				[
 					'post_type'  => 'any',
-					'meta_key'   => '_yoast_wpseo_is_cornerstone',
-					'meta_value' => '1',
+					'meta_key'   => '_yoast_wpseo_is_cornerstone', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+					'meta_value' => '1', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
 					'fields'     => 'ids',
 				]
 			);
@@ -538,5 +539,34 @@ class Review extends Repetitive {
 			}
 		}
 		return $important_page_ids;
+	}
+
+	/**
+	 * Get the expiration period in seconds.
+	 *
+	 * @param array $dismissal_data The dismissal data.
+	 *
+	 * @return int The expiration period in seconds.
+	 */
+	protected function get_expiration_period( $dismissal_data ) {
+		if ( ! isset( $dismissal_data['post_id'] ) ) {
+			return 6 * MONTH_IN_SECONDS;
+		}
+
+		// Important pages have term from 'progress_planner_page_types' taxonomy assigned.
+		$has_term = \has_term( '', Page_Types::TAXONOMY_NAME, $dismissal_data['post_id'] );
+		if ( $has_term ) {
+			return 6 * MONTH_IN_SECONDS;
+		}
+
+		// Check if it his cornerstone content.
+		if ( function_exists( 'YoastSEO' ) ) {
+			$is_cornerstone = \get_post_meta( $dismissal_data['post_id'], '_yoast_wpseo_is_cornerstone', true );
+			if ( '1' === $is_cornerstone ) {
+				return 6 * MONTH_IN_SECONDS;
+			}
+		}
+
+		return 12 * MONTH_IN_SECONDS;
 	}
 }
