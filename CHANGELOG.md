@@ -1,3 +1,12 @@
+= 1.4.0 =
+
+Enhancements:
+
+
+Bugs we fixed:
+
+* Fixed a bug where dismissed review content tasks would reappear in the following week.
+
 = 1.3.0 =
 
 Enhancements:
