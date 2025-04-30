@@ -10,6 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
 use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Traits\Dismissable_Task;
+use Progress_Planner\Page_Types;
 
 /**
  * Add tasks for content updates.
@@ -96,6 +97,12 @@ class Review extends Repetitive {
 		$this->include_post_types = \progress_planner()->get_settings()->get_post_types_names(); // Wait for the post types to be initialized.
 
 		\add_filter( 'progress_planner_update_posts_tasks_args', [ $this, 'filter_update_posts_args' ] );
+
+		// Add the Yoast cornerstone pages to the important page IDs.
+		if ( function_exists( 'YoastSEO' ) ) {
+			\add_filter( 'progress_planner_update_posts_important_page_ids', [ $this, 'add_yoast_cornerstone_pages' ] );
+		}
+
 		$this->init_dismissable_task();
 	}
 
@@ -109,16 +116,13 @@ class Review extends Repetitive {
 	public function get_title( $task_id = '' ) {
 		$post = $this->get_post_from_task_id( $task_id );
 
-		if ( ! $post ) {
-			return '';
-		}
-
-		return sprintf(
-			// translators: %1$s: The post type, %2$s: The post title.
-			\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
-			strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
-			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
-		);
+		return $post
+			? sprintf(
+				// translators: %1$s: The post type, %2$s: The post title.
+				\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
+				strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
+				\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
+			) : '';
 	}
 
 	/**
@@ -135,11 +139,14 @@ class Review extends Repetitive {
 			return '';
 		}
 
+		$months = in_array( (int) $post->ID, $this->get_saved_page_types(), true ) ? '12' : '6';
+
 		return '<p>' . sprintf(
-			/* translators: %1$s <a href="https://prpl.fyi/review-post" target="_blank">Review</a> link, %2$s: The post title. */
-			\esc_html__( '%1$s the post "%2$s" as it was last updated more than 6 months ago.', 'progress-planner' ),
+			/* translators: %1$s <a href="https://prpl.fyi/review-post" target="_blank">Review</a> link, %2$s: The post title, %3$s: The number of months. */
+			\esc_html__( '%1$s the post "%2$s" as it was last updated more than %3$s months ago.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/review-post" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
-			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
+			\esc_html( $post->post_title ), // @phpstan-ignore-line property.nonObject
+			\esc_html( $months )
 		) . '</p>' . ( $this->capability_required() ? '<p><a href="' . \esc_url( \get_edit_post_link( $post->ID ) ) . '">' . \esc_html__( 'Edit the post', 'progress-planner' ) . '</a>.</p>' : '' ); // @phpstan-ignore-line property.nonObject
 	}
 
@@ -153,11 +160,9 @@ class Review extends Repetitive {
 	public function get_url( $task_id = '' ) {
 		$post = $this->get_post_from_task_id( $task_id );
 
-		if ( ! $post ) {
-			return '';
-		}
-
-		return $this->capability_required() ? \esc_url( \get_edit_post_link( $post->ID ) ) : ''; // @phpstan-ignore-line property.nonObject
+		return $post && $this->capability_required()
+			? \esc_url( (string) \get_edit_post_link( $post->ID ) )
+			: '';
 	}
 
 	/**
@@ -196,8 +201,14 @@ class Review extends Repetitive {
 			if ( ! empty( $important_page_ids ) ) {
 				$last_updated_posts = $this->get_old_posts(
 					[
-						'post__in'  => $important_page_ids,
-						'post_type' => 'any',
+						'post__in'   => $important_page_ids,
+						'post_type'  => 'any',
+						'date_query' => [
+							[
+								'column' => 'post_modified',
+								'before' => '-6 months', // Important pages are updated more often.
+							],
+						],
 					]
 				);
 			}
@@ -212,6 +223,7 @@ class Review extends Repetitive {
 					$this->get_old_posts(
 						[
 							'post__not_in' => $important_page_ids, // This can be an empty array.
+							'post_type'    => $this->include_post_types,
 						]
 					)
 				);
@@ -355,59 +367,33 @@ class Review extends Repetitive {
 	public function get_old_posts( $args = [] ) {
 		$posts = [];
 
-		if ( ! empty( $this->include_post_types ) ) {
-			$args = wp_parse_args(
-				$args,
-				[
-					'posts_per_page' => static::ITEMS_TO_INJECT,
-					'post_type'      => $this->include_post_types,
-					'post_status'    => 'publish',
-					'orderby'        => 'modified',
-					'order'          => 'ASC',
-					'date_query'     => [
-						[
-							'column' => 'post_modified',
-							'before' => '-6 months',
-						],
+		// Parse default args.
+		$args = wp_parse_args(
+			$args,
+			[
+				'posts_per_page'      => static::ITEMS_TO_INJECT,
+				'post_status'         => 'publish',
+				'orderby'             => 'modified',
+				'order'               => 'ASC',
+				'ignore_sticky_posts' => true,
+				'date_query'          => [
+					[
+						'column' => 'post_modified',
+						'before' => '-12 months',
 					],
-				]
-			);
+				],
+			]
+		);
 
-			/**
-			 * Filters the args for the posts & pages we want user to review.
-			 *
-			 * @param array $args The get_postsargs.
-			 */
-			$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
+		/**
+		 * Filters the args for the posts & pages we want user to review.
+		 *
+		 * @param array $args The get_posts args.
+		 */
+		$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
 
-			// Get the post that was updated last.
-			$posts = \get_posts( $args );
-		}
-
-		// Get the pages saved in the settings that have not been updated in the last 6 months.
-		$saved_page_type_ids = $this->get_saved_page_types();
-
-		if ( ! empty( $saved_page_type_ids ) ) {
-			$pages_to_update = \get_posts(
-				[
-					'post_type'           => 'any',
-					'post_status'         => 'publish',
-					'orderby'             => 'modified',
-					'order'               => 'ASC',
-					'ignore_sticky_posts' => true,
-					'date_query'          => [
-						[
-							'column' => 'post_modified',
-							'before' => '-6 months',
-						],
-					],
-					'post__in'            => $saved_page_type_ids,
-				]
-			);
-
-			// Merge the posts & pages to update. Put the pages first.
-			$posts = array_merge( $pages_to_update, $posts );
-		}
+		// Get the post that was updated last.
+		$posts = \get_posts( $args );
 
 		return $posts ? $posts : [];
 	}
@@ -420,21 +406,19 @@ class Review extends Repetitive {
 	 * @return array
 	 */
 	public function filter_update_posts_args( $args ) {
-		$snoozed_post_ids = $this->get_snoozed_post_ids();
+		$args['post__not_in'] = isset( $args['post__not_in'] )
+			? $args['post__not_in']
+			: [];
 
-		if ( ! empty( $snoozed_post_ids ) ) {
-			if ( ! isset( $args['post__not_in'] ) ) {
-				$args['post__not_in'] = [];
-			}
-			$args['post__not_in'] = array_merge( $args['post__not_in'], $snoozed_post_ids );
-		}
+		$args['post__not_in'] = array_merge(
+			$args['post__not_in'],
+			// Add the snoozed post IDs to the post__not_in array.
+			$this->get_snoozed_post_ids(),
+		);
 
 		$dismissed_post_ids = $this->get_dismissed_post_ids();
 
 		if ( ! empty( $dismissed_post_ids ) ) {
-			if ( ! isset( $args['post__not_in'] ) ) {
-				$args['post__not_in'] = [];
-			}
 			$args['post__not_in'] = array_merge( $args['post__not_in'], $dismissed_post_ids );
 		}
 
@@ -527,10 +511,62 @@ class Review extends Repetitive {
 		$task = Local_Task_Factory::create_task_from( 'id', $task_id );
 		$data = $task->get_data();
 
-		if ( isset( $data['post_id'] ) && (int) \get_post_modified_time( 'U', false, (int) $data['post_id'] ) > strtotime( '-6 months' ) ) {
+		if ( isset( $data['post_id'] ) && (int) \get_post_modified_time( 'U', false, (int) $data['post_id'] ) > strtotime( '-12 months' ) ) {
 			return true;
 		}
 
 		return false;
+	}
+
+	/**
+	 * Add the Yoast cornerstone pages to the important page IDs.
+	 *
+	 * @param int[] $important_page_ids The important page IDs.
+	 * @return int[]
+	 */
+	public function add_yoast_cornerstone_pages( $important_page_ids ) {
+		if ( function_exists( 'YoastSEO' ) ) {
+			$cornerstone_page_ids = \get_posts(
+				[
+					'post_type'  => 'any',
+					'meta_key'   => '_yoast_wpseo_is_cornerstone', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+					'meta_value' => '1', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+					'fields'     => 'ids',
+				]
+			);
+			if ( ! empty( $cornerstone_page_ids ) ) {
+				$important_page_ids = array_merge( $important_page_ids, $cornerstone_page_ids );
+			}
+		}
+		return $important_page_ids;
+	}
+
+	/**
+	 * Get the expiration period in seconds.
+	 *
+	 * @param array $dismissal_data The dismissal data.
+	 *
+	 * @return int The expiration period in seconds.
+	 */
+	protected function get_expiration_period( $dismissal_data ) {
+		if ( ! isset( $dismissal_data['post_id'] ) ) {
+			return 6 * MONTH_IN_SECONDS;
+		}
+
+		// Important pages have term from 'progress_planner_page_types' taxonomy assigned.
+		$has_term = \has_term( '', Page_Types::TAXONOMY_NAME, $dismissal_data['post_id'] );
+		if ( $has_term ) {
+			return 6 * MONTH_IN_SECONDS;
+		}
+
+		// Check if it his cornerstone content.
+		if ( function_exists( 'YoastSEO' ) ) {
+			$is_cornerstone = \get_post_meta( $dismissal_data['post_id'], '_yoast_wpseo_is_cornerstone', true );
+			if ( '1' === $is_cornerstone ) {
+				return 6 * MONTH_IN_SECONDS;
+			}
+		}
+
+		return 12 * MONTH_IN_SECONDS;
 	}
 }
