@@ -9,9 +9,6 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Update\Update_111;
-use Progress_Planner\Update\Update_130;
-use Progress_Planner\Update\Update_140;
 /**
  * Plugin Upgrade class.
  *
