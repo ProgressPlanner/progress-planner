@@ -117,42 +117,40 @@ class Todo {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
 
-		$task_id = isset( $_POST['task']['task_id'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['task_id'] ) ) : '';
-		if ( ! $task_id ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing task ID.', 'progress-planner' ) ] );
-		}
+		$task_id = isset( $_POST['task']['task_id'] ) ? (int) \sanitize_text_field( \wp_unslash( $_POST['task']['task_id'] ) ) : 0;
 
-		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 		$title = isset( $_POST['task']['title'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['title'] ) ) : '';
 
-		// Check if the task already exists (this is the update case).
-		$task_index = false;
-		foreach ( $tasks as $key => $task ) {
-			if ( $task['task_id'] === $task_id ) {
-				$task_index = $key;
-				break;
+		// If the task ID is set, we're updating an existing task.
+		if ( $task_id ) {
+			$task = \progress_planner()->get_cpt_recommendations()->get( [ 'ID' => $task_id ] );
+			if ( ! $task ) {
+				\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
 			}
+
+			\progress_planner()->get_cpt_recommendations()->update_recommendation( $task_id, [ 'post_title' => $title ] );
+			return;
 		}
 
-		// Default value.
-		$task_points = 0;
+		$task_id = \wp_insert_post(
+			[
+				'post_title'  => $title,
+				'post_status' => 'publish',
+				'post_type'   => 'prpl_recommendations',
+				'post_author' => \get_current_user_id(),
+			]
+		);
 
-		// We're creating a new task.
-		if ( false === $task_index ) {
-			$task_points = $this->calc_points_for_new_task();
-			$tasks[]     = [
-				'task_id'     => $task_id,
-				'provider_id' => 'user',
-				'category'    => 'user',
-				'status'      => 'pending',
-				'title'       => $title,
-				'points'      => $task_points,
-			];
-		} else {
-			$tasks[ $task_index ]['title'] = $title;
+		if ( ! (bool) $task_id ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to create task.', 'progress-planner' ) ] );
 		}
 
-		\progress_planner()->get_settings()->set( 'tasks', $tasks );
+		$task_points = $this->calc_points_for_new_task();
+
+		\wp_set_post_terms( $task_id, 'user', 'prpl_recommendations_provider' );
+		\wp_set_post_terms( $task_id, 'user', 'prpl_recommendations_category' );
+		\update_post_meta( $task_id, 'prpl_points', $task_points );
+
 		\wp_send_json_success(
 			[
 				'message' => \esc_html__( 'Saved.', 'progress-planner' ),
@@ -177,16 +175,20 @@ class Todo {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing tasks.', 'progress-planner' ) ] );
 		}
 
-		$tasks       = \explode( ',', $tasks );
-		$saved_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
+		$tasks = \array_map( 'intval', \explode( ',', $tasks ) );
 
-		foreach ( $saved_tasks as $key => $task ) {
-			if ( in_array( $task['task_id'], $tasks, true ) ) {
-				$saved_tasks[ $key ]['order'] = array_search( $task['task_id'], $tasks, true );
+		// Get tasks from the `prpl_suggested_task` post type, that have a `prpl_recommendations_provider` of `user`.
+		$user_tasks = \progress_planner()->get_cpt_recommendations()->get_by_param( [ 'provider' => 'user' ] );
+		foreach ( $user_tasks as $task ) {
+			if ( in_array( (int) $task['ID'], $tasks, true ) ) {
+				\wp_update_post(
+					[
+						'ID'         => $task['ID'],
+						'menu_order' => (int) array_search( $task['ID'], $tasks, true ),
+					]
+				);
 			}
 		}
-
-		\progress_planner()->get_settings()->set( 'tasks', $saved_tasks );
 	}
 
 	/**
@@ -258,20 +260,20 @@ class Todo {
 		$next_monday = new \DateTime( 'monday next week' );
 
 		// Get the task IDs from the todos.
-		$task_ids = array_column( $pending_items, 'task_id' );
-
-		// Get the tasks.
-		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
+		$task_ids = array_column( $pending_items, 'ID' );
 
 		// Reset the points of all the tasks, except for the first one in the todo list.
-		foreach ( $tasks as $key => $task ) {
-			if ( 'user' === $task['provider_id'] && 'pending' === $task['status'] ) {
-				$tasks[ $key ]['points'] = $tasks[ $key ]['task_id'] === $task_ids[0] ? 1 : 0;
-			}
+		foreach ( \progress_planner()->get_cpt_recommendations()->get_by_param(
+			[
+				'provider' => 'user',
+				'status'   => 'publish',
+			]
+		) as $task ) {
+			\progress_planner()->get_cpt_recommendations()->update_recommendation(
+				$task['ID'],
+				[ 'points' => $task['ID'] === $task_ids[0] ? 1 : 0 ]
+			);
 		}
-
-		// Save the tasks.
-		\progress_planner()->get_settings()->set( 'tasks', $tasks );
 
 		\progress_planner()->get_utils__cache()->set( $transient_name, $next_monday->getTimestamp(), WEEK_IN_SECONDS );
 	}

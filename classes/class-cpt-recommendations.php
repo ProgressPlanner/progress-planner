@@ -122,6 +122,8 @@ class CPT_Recommendations {
 						'field'    => 'slug',
 						'terms'    => (array) $value,
 					];
+
+					unset( $params[ $param ] );
 					break;
 			}
 		}
@@ -328,14 +330,44 @@ class CPT_Recommendations {
 	 * @return bool
 	 */
 	public function update_recommendation( $id, $data ) {
-		$update_data = [];
+		$update_data    = [];
+		$update_meta    = [];
+		$update_terms   = [];
+		$update_results = [];
 		foreach ( $data as $key => $value ) {
 			switch ( $key ) {
+				case 'points':
+				case 'prpl_points':
+					$update_meta[ 'prpl_' . str_replace( 'prpl_', '', (string) $key ) ] = $value;
+					break;
+
+				case 'category':
+				case 'provider':
+					$update_terms[ "prpl_recommendations_$key" ] = $value;
+					break;
+
 				default:
 					$update_data[ $key ] = $value;
+					break;
 			}
 		}
 
-		return empty( $update_data ) ? false : (bool) \wp_update_post( $update_data );
+		if ( ! empty( $update_data ) ) {
+			$update_results[] = (bool) \wp_update_post( $update_data );
+		}
+
+		if ( ! empty( $update_meta ) ) {
+			foreach ( $update_meta as $key => $value ) {
+				$update_results[] = (bool) \update_post_meta( $id, $key, $value );
+			}
+		}
+
+		if ( ! empty( $update_terms ) ) {
+			foreach ( $update_terms as $taxonomy => $term ) {
+				$update_results[] = (bool) \wp_set_post_terms( $id, $term, $taxonomy );
+			}
+		}
+
+		return ! in_array( false, $update_results, true );
 	}
 }

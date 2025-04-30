@@ -138,7 +138,7 @@ trait Task_Provider_Test_Trait {
 
 		// Verify that the task(s) we're testing is completed.
 		foreach ( $tasks as $task ) {
-			$this->suggested_tasks->transition_task_status( $task['task_id'], 'pending_celebration', 'completed' );
+			\progress_planner()->get_cpt_recommendations()->transition_task_status( $task['task_id'], 'pending_celebration', 'completed' );
 			$this->assertTrue(
 				$this->suggested_tasks->check_task_condition(
 					[
