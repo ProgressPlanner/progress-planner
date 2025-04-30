@@ -199,6 +199,21 @@ class CPT_Recommendations {
 	}
 
 	/**
+	 * Delete all recommendations.
+	 *
+	 * @return void
+	 */
+	public function delete_all_recommendations() {
+		// Get all recommendations.
+		$recommendations = $this->get();
+
+		// Delete each recommendation.
+		foreach ( $recommendations as $recommendation ) {
+			$this->delete_recommendation( $recommendation['ID'] );
+		}
+	}
+
+	/**
 	 * Delete a recommendation.
 	 *
 	 * @param int $id The recommendation ID.
@@ -264,28 +279,6 @@ class CPT_Recommendations {
 		// Get the post status.
 		$post_status = \get_post_status( $id );
 		return 'pending_celebration' === $post_status || 'trash' === $post_status;
-	}
-
-	/**
-	 * Delete an activity.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return void
-	 */
-	public function delete( $task_id ) {
-		$activity = \progress_planner()->get_activities__query()->query_activities(
-			[
-				'data_id' => $task_id,
-				'type'    => 'completed',
-			]
-		);
-
-		if ( empty( $activity ) ) {
-			return;
-		}
-
-		\progress_planner()->get_activities__query()->delete_activity( $activity[0] );
 	}
 
 	/**

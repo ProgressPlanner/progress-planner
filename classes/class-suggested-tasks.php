@@ -592,4 +592,13 @@ class Suggested_Tasks {
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
 	}
+
+	/**
+	 * Delete all tasks.
+	 *
+	 * @return void
+	 */
+	public function delete_all_tasks() {
+		\progress_planner()->get_cpt_recommendations()->delete_all_recommendations();
+	}
 }
