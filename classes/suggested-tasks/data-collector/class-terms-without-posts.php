@@ -87,7 +87,20 @@ class Terms_Without_Posts extends Base_Data_Collector {
 		global $wpdb;
 
 		// Get registered and public taxonomies.
+		/**
+		 * Array of public taxonomy names where both keys and values are taxonomy names.
+		 *
+		 * @var array<string, string> $public_taxonomies
+		 */
 		$public_taxonomies = get_taxonomies( [ 'public' => true ], 'names' );
+
+		if ( isset( $public_taxonomies['post_format'] ) ) {
+			unset( $public_taxonomies['post_format'] );
+		}
+
+		if ( isset( $public_taxonomies['product_shipping_class'] ) ) {
+			unset( $public_taxonomies['product_shipping_class'] );
+		}
 
 		// We only want to return the first found term.
 		$result = [];
@@ -119,7 +132,7 @@ class Terms_Without_Posts extends Base_Data_Collector {
 					// Default categories can not be removed.
 					if ( $default_taxonomy_term_id !== (int) $term->term_id ) {
 						$result = (array) $term;
-						break;
+						break 2; // We have found the term, break out of both foreach loops.
 					}
 				}
 			}
