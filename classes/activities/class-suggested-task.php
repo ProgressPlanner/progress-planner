@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Activities;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create;
+use Progress_Planner\Suggested_Tasks\Providers\Repetitive\Create;
 
 /**
  * Handler for suggested tasks activities.
@@ -66,7 +66,7 @@ class Suggested_Task extends Activity {
 
 		// Default points for a suggested task.
 		$points        = 1;
-		$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $this->data_id );
+		$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $this->data_id );
 
 		if ( $task_provider ) {
 			// Create post task provider had a different points system, this is for backwards compatibility.
