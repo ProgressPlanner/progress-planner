@@ -86,11 +86,11 @@ class Orphaned_Content_Workout extends Repetitive {
 	 * @return string
 	 */
 	public function get_description( $task_id = '' ) {
-		return '<p>' . sprintf(
+		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Run the Yoast SEO Orphaned Content Workout to improve your site\'s SEO. %s.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/yoast-orphaned-content" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		) . '</p>';
+		);
 	}
 
 	/**
