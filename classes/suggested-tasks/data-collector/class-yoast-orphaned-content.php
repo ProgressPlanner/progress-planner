@@ -33,8 +33,6 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 			return;
 		}
 
-		$this->update_cache();
-
 		\add_action( 'transition_post_status', [ $this, 'update_orphaned_content_cache' ], 10, 3 );
 	}
 
@@ -82,13 +80,20 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 			$where_clause .= " AND $post_types_in";
 		}
 
-		// Exclude "Hello World" and "Sample Page" posts, array_filter() to remove empty values.
+		// Exclude "Hello World" and "Sample Page" posts, use array_filter() to remove empty values.
 		$exclude_post_ids = array_filter(
 			[
 				( new Hello_World() )->collect(),
 				( new Sample_Page() )->collect(),
 			]
 		);
+
+		/**
+		 * Array of post IDs to exclude from the orphaned content query.
+		 *
+		 * @var array<int> $exclude_post_ids
+		 */
+		$exclude_post_ids = \apply_filters( 'progress_planner_yoast_orphaned_content_exclude_post_ids', $exclude_post_ids );
 
 		if ( ! empty( $exclude_post_ids ) ) {
 			$exclude_post_ids = array_map( 'intval', $exclude_post_ids );

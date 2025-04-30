@@ -43,12 +43,34 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 */
 	protected $data_collector;
 
+	/**
+	 * Whether the task is dismissable.
+	 *
+	 * @var bool
+	 */
+	protected $is_dismissable = true;
+
+	/**
+	 * The completed post IDs.
+	 *
+	 * @var array|null
+	 */
+	protected $completed_post_ids = null;
 
 	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->data_collector = new Yoast_Orphaned_Content();
+	}
+
+	/**
+	 * Initialize the task provider.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		\add_filter( 'progress_planner_yoast_orphaned_content_exclude_post_ids', [ $this, 'exclude_completed_posts' ] );
 	}
 
 	/**
@@ -244,5 +266,40 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		$data = $tasks[0];
 
 		return isset( $data['post_id'] ) && $data['post_id'] ? \get_post( $data['post_id'] ) : null;
+	}
+
+	/**
+	 * Get the dismissed post IDs.
+	 *
+	 * @return array
+	 */
+	protected function get_completed_post_ids() {
+
+		if ( null !== $this->completed_post_ids ) {
+			return $this->completed_post_ids;
+		}
+
+		$this->completed_post_ids = [];
+		$tasks                    = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', $this->get_provider_id() );
+
+		if ( ! empty( $tasks ) ) {
+			foreach ( $tasks as $task ) {
+				if ( isset( $task['status'] ) && 'completed' === $task['status'] ) {
+					$this->completed_post_ids[] = $task['post_id'];
+				}
+			}
+		}
+
+		return $this->completed_post_ids;
+	}
+
+	/**
+	 * Exclude completed posts.
+	 *
+	 * @param array $exclude_post_ids The excluded post IDs.
+	 * @return array
+	 */
+	public function exclude_completed_posts( $exclude_post_ids ) {
+		return array_merge( $exclude_post_ids, $this->get_completed_post_ids() );
 	}
 }
