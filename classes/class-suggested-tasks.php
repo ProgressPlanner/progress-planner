@@ -47,9 +47,6 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function init() {
-		// Unsnooze tasks.
-		$this->maybe_unsnooze_tasks();
-
 		// Check for completed tasks.
 		$completed_tasks = $this->tasks_manager->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
 
@@ -118,26 +115,23 @@ class Suggested_Tasks {
 	 */
 	public function on_automatic_updates_complete() {
 
-		$pending_tasks = \progress_planner()->get_settings()->get( 'tasks', [] ); // @phpstan-ignore-line method.nonObject
+		$pending_tasks = \progress_planner()->get_cpt_recommendations()->get(
+			[
+				'numberposts' => 1,
+				'status'      => 'publish',
+				'provider_id' => 'update-core',
+				'date_query'  => [ [ 'after' => 'this Monday' ] ],
+			]
+		);
 
 		if ( empty( $pending_tasks ) ) {
 			return;
 		}
 
-		foreach ( $pending_tasks as $task_data ) {
-			$task_id = $task_data['task_id'];
+		$this->mark_task_as( 'completed', $pending_tasks[0]['ID'] );
 
-			if ( $task_data['provider_id'] === ( new Core_Update() )->get_provider_id() &&
-				\gmdate( 'YW' ) === $task_data['date']
-			) {
-				// Change the task status to completed.
-				$this->mark_task_as( 'completed', $task_id );
-
-				// Insert an activity.
-				$this->insert_activity( $task_id );
-				break;
-			}
-		}
+		// Insert an activity.
+		$this->insert_activity( $pending_tasks[0]['ID'] );
 	}
 
 	/**
@@ -322,32 +316,6 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Transition a task from one status to another.
-	 *
-	 * @param string $task_id The task ID.
-	 * @param string $old_status The old status.
-	 * @param string $new_status The new status.
-	 * @param array  $data The data.
-	 *
-	 * @return bool
-	 */
-	public function transition_task_status( $task_id, $old_status, $new_status, $data = [] ) {
-
-		$return_old_status = false;
-		$return_new_status = false;
-
-		if ( $old_status ) {
-			$return_old_status = $this->remove_task_from( $old_status, $task_id );
-		}
-
-		if ( $new_status ) {
-			$return_new_status = $this->mark_task_as( $new_status, $task_id, $data );
-		}
-
-		return $return_old_status && $return_new_status;
-	}
-
-	/**
 	 * Mark a task as snoozed.
 	 *
 	 * @param string $task_id The task ID.
@@ -384,35 +352,6 @@ class Suggested_Tasks {
 		}
 
 		return $this->mark_task_as( 'snoozed', $task_id, [ 'time' => $time ] );
-	}
-
-	/**
-	 * Maybe unsnooze tasks.
-	 *
-	 * @return void
-	 */
-	private function maybe_unsnooze_tasks() {
-		$tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
-		$tasks_changed = false;
-		foreach ( $tasks as $key => $task ) {
-			if ( $task['status'] !== 'snoozed' ) {
-				continue;
-			}
-
-			if ( isset( $task['time'] ) && $task['time'] < \time() ) {
-				if ( isset( $task['provider_id'] ) && 'user' === $task['provider_id'] ) {
-					$tasks[ $key ]['status'] = 'pending';
-					unset( $tasks[ $key ]['time'] );
-				} else {
-					unset( $tasks[ $key ] );
-				}
-				$tasks_changed = true;
-			}
-		}
-
-		if ( $tasks_changed ) {
-			\progress_planner()->get_settings()->set( 'tasks', $tasks );
-		}
 	}
 
 	/**
@@ -485,15 +424,9 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function was_task_completed( $task_id ) {
-		foreach ( \progress_planner()->get_settings()->get( 'tasks', [] ) as $task ) {
-			if ( ! isset( $task['task_id'] ) || $task['task_id'] !== $task_id ) {
-				continue;
-			}
-
-			return isset( $task['status'] ) && in_array( $task['status'], [ 'completed', 'pending_celebration' ], true );
-		}
-
-		return false;
+		$task = \progress_planner()->get_cpt_recommendations()->get( [ 'ID' => $task_id ] );
+		return isset( $task['post_status'] ) &&
+			in_array( $task['post_status'], [ 'trash', 'pending_celebration' ], true );
 	}
 
 	/**
@@ -505,29 +438,11 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function update_pending_task( $task_id, $data ) {
-		$tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
-		$tasks_changed = false;
-		foreach ( $tasks as $key => $task ) {
-			if ( 'pending' !== $task['status'] || $task['task_id'] !== $task_id ) {
-				continue;
-			}
-
-			// Don't update the task_id.
-			if ( isset( $data['task_id'] ) ) {
-				unset( $data['task_id'] );
-			}
-
-			// Update the task data except the 'task_id' key.
-			$tasks[ $key ] = array_merge( $tasks[ $key ], $data );
-			$tasks_changed = true;
-
-			break;
-		}
-
-		if ( ! $tasks_changed ) {
-			return false;
-		}
-		return \progress_planner()->get_settings()->set( 'tasks', $tasks );
+		$tasks = \progress_planner()->get_cpt_recommendations()->get( [ 'ID' => $task_id ] );
+		$task  = isset( $tasks[0] ) ? $tasks[0] : null;
+		return $task
+			? \progress_planner()->get_cpt_recommendations()->update_recommendation( (int) $task_id, $data )
+			: false;
 	}
 
 	/**

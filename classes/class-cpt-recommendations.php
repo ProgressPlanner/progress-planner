@@ -318,4 +318,24 @@ class CPT_Recommendations {
 			]
 		);
 	}
+
+	/**
+	 * Update a recommendation.
+	 *
+	 * @param int   $id The recommendation ID.
+	 * @param array $data The data to update.
+	 *
+	 * @return bool
+	 */
+	public function update_recommendation( $id, $data ) {
+		$update_data = [];
+		foreach ( $data as $key => $value ) {
+			switch ( $key ) {
+				default:
+					$update_data[ $key ] = $value;
+			}
+		}
+
+		return empty( $update_data ) ? false : (bool) \wp_update_post( $update_data );
+	}
 }

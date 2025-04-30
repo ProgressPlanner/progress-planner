@@ -23,46 +23,7 @@ class Todo {
 		\add_action( 'wp_ajax_progress_planner_save_user_suggested_task', [ $this, 'save_user_suggested_task' ] );
 		\add_action( 'wp_ajax_progress_planner_save_suggested_user_tasks_order', [ $this, 'save_suggested_user_tasks_order' ] );
 
-		\add_action( 'progress_planner_task_status_changed', [ $this, 'remove_order_from_completed_user_task' ], 10, 2 );
-
 		$this->maybe_change_first_item_points_on_monday();
-	}
-
-	/**
-	 * Remove the order from a completed user task.
-	 *
-	 * @param string $task_id The task ID.
-	 * @param string $status The status.
-	 *
-	 * @return void
-	 */
-	public function remove_order_from_completed_user_task( $task_id, $status ) {
-
-		// Bail if the task is not completed.
-		if ( 'completed' !== $status ) {
-			return;
-		}
-
-		$task = Task_Factory::create_task_from( 'id', $task_id );
-
-		// Bail if the task is not a user task.
-		if ( 'user' !== $task->get_provider_id() ) {
-			return;
-		}
-
-		$task_changed = false;
-		$tasks        = \progress_planner()->get_settings()->get( 'tasks', [] );
-		foreach ( $tasks as $key => $task ) {
-			if ( $task['task_id'] === $task_id ) {
-				unset( $tasks[ $key ]['order'] );
-				$task_changed = true;
-				break;
-			}
-		}
-
-		if ( $task_changed ) {
-			\progress_planner()->get_settings()->set( 'tasks', $tasks );
-		}
 	}
 
 	/**
