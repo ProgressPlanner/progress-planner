@@ -177,7 +177,7 @@ class Update_Term_Description extends One_Time {
 
 		return sprintf(
 			/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/update-term-description" target="_blank">Read more</a> link */
-			\esc_html__( 'Your%1$s archives probably show the description of that specific term. %2$s', 'progress-planner' ),
+			\esc_html__( 'Your %1$s archives probably show the description of that specific term. %2$s', 'progress-planner' ),
 			$term->name,
 			'<a href="https://prpl.fyi/update-term-description" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		);
