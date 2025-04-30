@@ -145,7 +145,7 @@ class Content_Create extends Tasks {
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(), // We use $this->get_points() here on purpose, get_points_for_task() calcs the points for the last published post.
+			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
 			'url'         => $this->get_url(),
 			'url_target'  => $this->get_url_target(),
