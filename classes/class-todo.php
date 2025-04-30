@@ -7,7 +7,7 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
+use Progress_Planner\Suggested_Tasks\Task_Factory;
 
 /**
  * Todo class.
@@ -46,7 +46,7 @@ class Todo {
 			return;
 		}
 
-		$task = Local_Task_Factory::create_task_from( 'id', $task_id );
+		$task = Task_Factory::create_task_from( 'id', $task_id );
 
 		// Bail if the task is not a user task.
 		if ( 'user' !== $task->get_provider_id() ) {
@@ -54,17 +54,17 @@ class Todo {
 		}
 
 		$task_changed = false;
-		$local_tasks  = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		foreach ( $local_tasks as $key => $task ) {
+		$tasks        = \progress_planner()->get_settings()->get( 'tasks', [] );
+		foreach ( $tasks as $key => $task ) {
 			if ( $task['task_id'] === $task_id ) {
-				unset( $local_tasks[ $key ]['order'] );
+				unset( $tasks[ $key ]['order'] );
 				$task_changed = true;
 				break;
 			}
 		}
 
 		if ( $task_changed ) {
-			\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+			\progress_planner()->get_settings()->set( 'tasks', $tasks );
 		}
 	}
 
@@ -169,12 +169,12 @@ class Todo {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing task ID.', 'progress-planner' ) ] );
 		}
 
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		$title       = isset( $_POST['task']['title'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['title'] ) ) : '';
+		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
+		$title = isset( $_POST['task']['title'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['title'] ) ) : '';
 
 		// Check if the task already exists (this is the update case).
 		$task_index = false;
-		foreach ( $local_tasks as $key => $task ) {
+		foreach ( $tasks as $key => $task ) {
 			if ( $task['task_id'] === $task_id ) {
 				$task_index = $key;
 				break;
@@ -186,8 +186,8 @@ class Todo {
 
 		// We're creating a new task.
 		if ( false === $task_index ) {
-			$task_points   = $this->calc_points_for_new_task();
-			$local_tasks[] = [
+			$task_points = $this->calc_points_for_new_task();
+			$tasks[]     = [
 				'task_id'     => $task_id,
 				'provider_id' => 'user',
 				'category'    => 'user',
@@ -196,10 +196,10 @@ class Todo {
 				'points'      => $task_points,
 			];
 		} else {
-			$local_tasks[ $task_index ]['title'] = $title;
+			$tasks[ $task_index ]['title'] = $title;
 		}
 
-		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+		\progress_planner()->get_settings()->set( 'tasks', $tasks );
 		\wp_send_json_success(
 			[
 				'message' => \esc_html__( 'Saved.', 'progress-planner' ),
@@ -224,17 +224,16 @@ class Todo {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing tasks.', 'progress-planner' ) ] );
 		}
 
-		$tasks = \explode( ',', $tasks );
+		$tasks       = \explode( ',', $tasks );
+		$saved_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-
-		foreach ( $local_tasks as $key => $task ) {
+		foreach ( $saved_tasks as $key => $task ) {
 			if ( in_array( $task['task_id'], $tasks, true ) ) {
-				$local_tasks[ $key ]['order'] = array_search( $task['task_id'], $tasks, true );
+				$saved_tasks[ $key ]['order'] = array_search( $task['task_id'], $tasks, true );
 			}
 		}
 
-		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+		\progress_planner()->get_settings()->set( 'tasks', $saved_tasks );
 	}
 
 	/**
@@ -345,18 +344,18 @@ class Todo {
 		// Get the task IDs from the todos.
 		$task_ids = array_column( $pending_items, 'task_id' );
 
-		// Get the local tasks.
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		// Get the tasks.
+		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		// Reset the points of all the tasks, except for the first one in the todo list.
-		foreach ( $local_tasks as $key => $task ) {
+		foreach ( $tasks as $key => $task ) {
 			if ( 'user' === $task['provider_id'] && 'pending' === $task['status'] ) {
-				$local_tasks[ $key ]['points'] = $local_tasks[ $key ]['task_id'] === $task_ids[0] ? 1 : 0;
+				$tasks[ $key ]['points'] = $tasks[ $key ]['task_id'] === $task_ids[0] ? 1 : 0;
 			}
 		}
 
-		// Save the local tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', $local_tasks );
+		// Save the tasks.
+		\progress_planner()->get_settings()->set( 'tasks', $tasks );
 
 		\progress_planner()->get_utils__cache()->set( $transient_name, $next_monday->getTimestamp(), WEEK_IN_SECONDS );
 	}
