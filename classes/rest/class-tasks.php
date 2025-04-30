@@ -78,7 +78,7 @@ class Tasks {
 	 */
 	public function get_tasks() {
 
-		$tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		return new \WP_REST_Response( $tasks );
 	}
