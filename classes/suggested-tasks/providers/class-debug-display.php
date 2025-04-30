@@ -5,14 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
-
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
  * Add tasks to check if WP debug display is enabled.
  */
-class Debug_Display extends One_Time {
+class Debug_Display extends Tasks {
 
 	/**
 	 * The provider ID.

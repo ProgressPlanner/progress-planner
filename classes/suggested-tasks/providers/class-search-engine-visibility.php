@@ -5,14 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
-
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
  * Add task to allow search engines to index the site.
  */
-class Search_Engine_Visibility extends One_Time {
+class Search_Engine_Visibility extends Tasks {
 
 	/**
 	 * The provider ID.
