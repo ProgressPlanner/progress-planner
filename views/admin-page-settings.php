@@ -41,6 +41,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php \progress_planner()->the_view( 'page-settings/license.php' ); ?>
 		</div>
 
+		<?php \progress_planner()->the_view( 'page-settings/api-status.php' ); ?>
+
 		<?php wp_nonce_field( 'progress_planner' ); ?>
 
 		<button
