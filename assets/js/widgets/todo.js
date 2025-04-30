@@ -128,7 +128,7 @@ prplDocumentReady( () => {
 						} )
 					);
 
-					// Add the new task to the local tasks array.
+					// Add the new task to the tasks array.
 					progressPlannerTodo.tasks.push( newTask );
 
 					// Resize the grid items.
@@ -169,7 +169,7 @@ document.addEventListener( 'prpl/suggestedTask/move', () => {
 } );
 
 // When the 'prpl/suggestedTask/update' event is triggered,
-// update the task title in the local tasks array.
+// update the task title in the tasks array.
 document.addEventListener( 'prpl/suggestedTask/update', ( event ) => {
 	const task = progressPlannerTodo.tasks.find(
 		( item ) =>
