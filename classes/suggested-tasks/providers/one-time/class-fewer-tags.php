@@ -101,7 +101,7 @@ class Fewer_Tags extends One_Time {
 	public function get_description() {
 		return sprintf(
 			// translators: %1$s is the number of tags, %2$s is the number of published posts.
-			\esc_html__( 'We detected that you have %1$s tags and %2$s published posts. Consinder installing the "Fewer Tags" plugin.', 'progress-planner' ),
+			\esc_html__( 'We detected that you have %1$s tags and %2$s published posts. Consider installing the "Fewer Tags" plugin.', 'progress-planner' ),
 			$this->post_tag_count_data_collector->collect(),
 			$this->published_post_count_data_collector->collect(),
 		);
