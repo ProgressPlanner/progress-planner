@@ -49,7 +49,7 @@ class Update_111 {
 		$this->migrate_todo_items();
 
 		if ( $this->tasks_changed ) {
-			\progress_planner()->get_settings()->set( 'tasks', $this->tasks );
+			\progress_planner()->get_settings()->set( 'local_tasks', $this->tasks );
 		}
 
 		// Migrate activities.
@@ -63,7 +63,7 @@ class Update_111 {
 
 		// Save the tasks if they have been changed.
 		if ( $this->tasks_changed ) {
-			\progress_planner()->get_settings()->set( 'tasks', $this->tasks );
+			\progress_planner()->get_settings()->set( 'local_tasks', $this->tasks );
 		}
 
 		// Migrate the 'create-post' activities and 'review-post' activities.
