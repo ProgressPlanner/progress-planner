@@ -373,7 +373,7 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function is_task_completed( $task_id = '' ) {
 		// If no specific task ID provided, use the default behavior.
-		return ! $this->is_repetitive() || ! empty( $task_id )
+		return ! $this->is_repetitive() || empty( $task_id )
 			? ! $this->should_add_task()
 			: $this->is_specific_task_completed( $task_id );
 	}
