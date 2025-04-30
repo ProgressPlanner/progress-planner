@@ -7,7 +7,7 @@ body:
     attributes:
       value: |
         Thank you for suggesting a new recommendation! Please fill out the following information to help us evaluate and implement your suggestion.
-        
+
         **Note:** All fields are required unless marked as optional.
 
   - type: input
@@ -36,7 +36,6 @@ body:
       options:
         - content-update
         - configuration
-        - remote
         - user
         - other
     validations:
@@ -119,6 +118,6 @@ body:
     attributes:
       label: Additional Information
       description: Any other relevant information about this recommendation - optional -
-      placeholder: "Add any additional context or requirements here..." 
+      placeholder: "Add any additional context or requirements here..."
     validations:
       required: false
