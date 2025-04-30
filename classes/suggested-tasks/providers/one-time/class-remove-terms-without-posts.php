@@ -72,10 +72,19 @@ class Remove_Terms_Without_Posts extends One_Time {
 	protected const MIN_POSTS = 1;
 
 	/**
+	 * The completed term IDs.
+	 *
+	 * @var array|null
+	 */
+	protected $completed_term_ids = null;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->data_collector = new Terms_Without_Posts_Data_Collector();
+
+		\add_filter( 'progress_planner_terms_without_posts_exclude_term_ids', [ $this, 'exclude_completed_terms' ] );
 	}
 
 	/**
@@ -318,5 +327,42 @@ class Remove_Terms_Without_Posts extends One_Time {
 		}
 
 		return $term;
+	}
+
+	/**
+	 * Get the dismissed term IDs.
+	 *
+	 * @return array
+	 */
+	protected function get_completed_term_ids() {
+
+		if ( null !== $this->completed_term_ids ) {
+			return $this->completed_term_ids;
+		}
+
+		$this->completed_term_ids = [];
+		$tasks                    = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', $this->get_provider_id() );
+
+		if ( ! empty( $tasks ) ) {
+			foreach ( $tasks as $task ) {
+				if ( isset( $task['status'] ) && 'completed' === $task['status'] ) {
+					$this->completed_term_ids[] = $task['term_id'];
+				}
+			}
+		}
+
+		return $this->completed_term_ids;
+	}
+
+	/**
+	 * Exclude completed terms.
+	 *
+	 * @param array $exclude_term_ids The excluded term IDs.
+	 * @return array
+	 */
+	public function exclude_completed_terms( $exclude_term_ids ) {
+		$exclude_term_ids = array_merge( $exclude_term_ids, $this->get_completed_term_ids() );
+
+		return $exclude_term_ids;
 	}
 }

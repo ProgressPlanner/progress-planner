@@ -102,6 +102,13 @@ class Terms_Without_Posts extends Base_Data_Collector {
 			unset( $public_taxonomies['product_shipping_class'] );
 		}
 
+		/**
+		 * Array of term IDs to exclude from the terms without description query.
+		 *
+		 * @var array<int> $exclude_term_ids
+		 */
+		$exclude_term_ids = \apply_filters( 'progress_planner_terms_without_posts_exclude_term_ids', [] );
+
 		// We only want to return the first found term.
 		$result = [];
 
@@ -112,18 +119,21 @@ class Terms_Without_Posts extends Base_Data_Collector {
 			// If the default taxonomy term (which cannot be removed) is set, we need to query 2 terms.
 			$query_limit = $default_taxonomy_term_id ? 2 : 1;
 
-			$terms = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->prepare(
-					"
+			$query = "
 				SELECT t.term_id, t.name, tt.count, tt.taxonomy
 				FROM {$wpdb->terms} AS t
 				INNER JOIN {$wpdb->term_taxonomy} AS tt ON t.term_id = tt.term_id
-				WHERE tt.taxonomy = %s AND tt.count <= %d LIMIT %d
-			",
-					$taxonomy,
-					self::MIN_POSTS,
-					$query_limit
-				)
+				WHERE tt.taxonomy = %s AND tt.count <= %d
+			";
+
+			if ( ! empty( $exclude_term_ids ) ) {
+				$query .= ' AND t.term_id NOT IN (' . implode( ',', array_map( 'intval', $exclude_term_ids ) ) . ')';
+			}
+
+			$query .= ' LIMIT %d';
+
+			$terms = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->prepare( $query, $taxonomy, self::MIN_POSTS, $query_limit ) // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- We are using array_map to ensure the values are integers.
 			);
 
 			// Check if we have terms without posts.
