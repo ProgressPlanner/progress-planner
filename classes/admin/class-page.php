@@ -186,6 +186,8 @@ class Page {
 			} else {
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboard', $default_localization_data );
 			}
+
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
 		}
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
@@ -198,6 +200,8 @@ class Page {
 					],
 				]
 			);
+
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
 		}
 	}
 
@@ -209,12 +213,12 @@ class Page {
 	 * @return void
 	 */
 	public function maybe_enqueue_focus_el_script( $hook ) {
-		$suggested_tasks       = \progress_planner()->get_suggested_tasks();
-		$local_tasks_providers = $suggested_tasks->get_local()->get_task_providers();
-		$tasks_details         = [];
-		$total_points          = 0;
-		$completed_points      = 0;
-		foreach ( $local_tasks_providers as $provider ) {
+		$suggested_tasks  = \progress_planner()->get_suggested_tasks();
+		$tasks_providers  = $suggested_tasks->get_tasks_manager()->get_task_providers();
+		$tasks_details    = [];
+		$total_points     = 0;
+		$completed_points = 0;
+		foreach ( $tasks_providers as $provider ) {
 			if ( 'configuration' !== $provider->get_provider_category() ) {
 				continue;
 			}
