@@ -65,6 +65,13 @@ class Update_Term_Description extends One_Time {
 	protected $data_collector;
 
 	/**
+	 * The completed term IDs.
+	 *
+	 * @var array|null
+	 */
+	protected $completed_term_ids = null;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -77,6 +84,8 @@ class Update_Term_Description extends One_Time {
 	public function init() {
 		// Maybe remove tasks when term is deleted.
 		\add_action( 'delete_term', [ $this, 'maybe_remove_irrelevant_tasks' ], 10, 5 );
+
+		\add_filter( 'progress_planner_terms_without_description_exclude_term_ids', [ $this, 'exclude_completed_terms' ] );
 	}
 
 	/**
@@ -311,5 +320,42 @@ class Update_Term_Description extends One_Time {
 		}
 
 		return $term;
+	}
+
+	/**
+	 * Get the dismissed term IDs.
+	 *
+	 * @return array
+	 */
+	protected function get_completed_term_ids() {
+
+		if ( null !== $this->completed_term_ids ) {
+			return $this->completed_term_ids;
+		}
+
+		$this->completed_term_ids = [];
+		$tasks                    = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', $this->get_provider_id() );
+
+		if ( ! empty( $tasks ) ) {
+			foreach ( $tasks as $task ) {
+				if ( isset( $task['status'] ) && 'completed' === $task['status'] ) {
+					$this->completed_term_ids[] = $task['term_id'];
+				}
+			}
+		}
+
+		return $this->completed_term_ids;
+	}
+
+	/**
+	 * Exclude completed terms.
+	 *
+	 * @param array $exclude_term_ids The excluded term IDs.
+	 * @return array
+	 */
+	public function exclude_completed_terms( $exclude_term_ids ) {
+		$exclude_term_ids = array_merge( $exclude_term_ids, $this->get_completed_term_ids() );
+
+		return $exclude_term_ids;
 	}
 }

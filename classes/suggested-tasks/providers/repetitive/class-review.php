@@ -9,7 +9,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers\Repetitive;
 
 use Progress_Planner\Suggested_Tasks\Providers\Repetitive;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Traits\Dismissable_Task;
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Dismissable_Task;
 use Progress_Planner\Page_Types;
 
 /**
