@@ -15,6 +15,9 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Archive_Format;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Description;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Tag_Count;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Published_Post_Count;
+
 /**
  * Base data collector.
  */
@@ -42,6 +45,8 @@ class Data_Collector_Manager {
 			new Last_Published_Post(),
 			new Archive_Format(),
 			new Terms_Without_Description(),
+			new Post_Tag_Count(),
+			new Published_Post_Count(),
 		];
 
 		// Initialize (add hooks) the data collectors.
