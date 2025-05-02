@@ -14,6 +14,8 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Uncategorized_Category;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Archive_Format;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Tag_Count;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Published_Post_Count;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content;
 
 /**
@@ -42,6 +44,8 @@ class Data_Collector_Manager {
 			new Post_Author(),
 			new Last_Published_Post(),
 			new Archive_Format(),
+			new Post_Tag_Count(),
+			new Published_Post_Count(),
 		];
 
 		// Add the plugin integration.
