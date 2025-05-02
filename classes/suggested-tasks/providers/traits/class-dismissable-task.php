@@ -37,6 +37,7 @@ trait Dismissable_Task {
 		\add_action( 'progress_planner_ajax_task_complete', [ $this, 'handle_task_dismissal' ], 10, 1 );
 		\add_action( 'admin_init', [ $this, 'cleanup_old_dismissals' ] );
 		\add_filter( 'progress_planner_task_dismissal_data', [ $this, 'add_post_id_to_dismissal_data' ], 10, 3 );
+		\add_filter( 'progress_planner_task_dismissal_data', [ $this, 'add_term_id_to_dismissal_data' ], 10, 3 );
 	}
 
 	/**
@@ -117,7 +118,17 @@ trait Dismissable_Task {
 	 * @return string|false The task identifier or false if not applicable.
 	 */
 	protected function get_task_identifier( $task_data ) {
-		return isset( $task_data['post_id'] ) ? $this->get_provider_id() . '-' . $task_data['post_id'] : $this->get_provider_id();
+		$task_identifier = $this->get_provider_id();
+
+		if ( isset( $task_data['post_id'] ) ) {
+			$task_identifier .= '-' . $task_data['post_id'];
+		}
+
+		if ( isset( $task_data['term_id'] ) ) {
+			$task_identifier .= '-' . $task_data['term_id'];
+		}
+
+		return $task_identifier;
 	}
 
 	/**
@@ -228,6 +239,22 @@ trait Dismissable_Task {
 	public function add_post_id_to_dismissal_data( $dismissal_data, $task_data, $provider_id ) {
 		if ( $this->get_provider_id() === $provider_id && isset( $task_data['post_id'] ) ) {
 			$dismissal_data['post_id'] = $task_data['post_id'];
+		}
+		return $dismissal_data;
+	}
+
+	/**
+	 * Add term ID to dismissal data.
+	 *
+	 * @param array  $dismissal_data The dismissal data.
+	 * @param array  $task_data      The task data.
+	 * @param string $provider_id    The provider ID.
+	 *
+	 * @return array
+	 */
+	public function add_term_id_to_dismissal_data( $dismissal_data, $task_data, $provider_id ) {
+		if ( $this->get_provider_id() === $provider_id && isset( $task_data['term_id'] ) ) {
+			$dismissal_data['term_id'] = $task_data['term_id'];
 		}
 		return $dismissal_data;
 	}
