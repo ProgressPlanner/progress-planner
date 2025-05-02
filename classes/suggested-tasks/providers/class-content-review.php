@@ -5,17 +5,16 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\Repetitive;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Providers\Repetitive;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Traits\Dismissable_Task;
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Dismissable_Task;
 use Progress_Planner\Page_Types;
 
 /**
  * Add tasks for content updates.
  */
-class Review extends Repetitive {
+class Content_Review extends Tasks {
 	use Dismissable_Task;
 
 	/**
@@ -38,6 +37,13 @@ class Review extends Repetitive {
 	 * @var string
 	 */
 	protected const CATEGORY = 'content-update';
+
+	/**
+	 * Whether the task is repetitive.
+	 *
+	 * @var bool
+	 */
+	protected $is_repetitive = true;
 
 	/**
 	 * The task priority.
@@ -420,6 +426,24 @@ class Review extends Repetitive {
 
 		if ( ! empty( $dismissed_post_ids ) ) {
 			$args['post__not_in'] = array_merge( $args['post__not_in'], $dismissed_post_ids );
+		}
+
+		if ( function_exists( 'YoastSEO' ) ) {
+			// Handle the case when the meta key doesn't exist.
+			$args['meta_query'] = [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+				'relation' => 'OR',
+				[
+					'key'     => '_yoast_wpseo_content_score',
+					'compare' => 'EXISTS',
+				],
+				[
+					'key'     => '_yoast_wpseo_content_score',
+					'compare' => 'NOT EXISTS',
+				],
+			];
+
+			$args['orderby'] = 'meta_value_num';
+			$args['order']   = 'ASC';
 		}
 
 		return $args;
