@@ -5,15 +5,15 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
+use Progress_Planner\Suggested_Tasks\Providers\Tasks;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Description as Terms_Without_Description_Data_Collector;
 
 /**
  * Add task to update term description.
  */
-class Update_Term_Description extends One_Time {
+class Update_Term_Description extends Tasks {
 
 	/**
 	 * Whether the task is an onboarding task.

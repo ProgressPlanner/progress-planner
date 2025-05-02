@@ -16,6 +16,8 @@ use Progress_Planner\Suggested_Tasks\Task_Factory;
  */
 class Update_111 {
 
+	const VERSION = '1.1.1';
+
 	/**
 	 * Local tasks.
 	 *
