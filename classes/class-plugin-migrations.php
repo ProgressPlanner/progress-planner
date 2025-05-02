@@ -9,9 +9,6 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Update\Update_111;
-use Progress_Planner\Update\Update_130;
-use Progress_Planner\Update\Update_140;
 /**
  * Plugin Upgrade class.
  *
@@ -34,17 +31,6 @@ class Plugin_Migrations {
 	 * @var string
 	 */
 	private $version;
-
-	/**
-	 * An array of upgrade methods.
-	 *
-	 * @var array
-	 */
-	private const UPGRADE_CLASSES = [
-		'1.1.1' => Update_111::class,
-		'1.3.0' => Update_130::class,
-		'1.4.0' => Update_140::class,
-	];
 
 	/**
 	 * Constructor.
@@ -86,14 +72,31 @@ class Plugin_Migrations {
 			return;
 		}
 
+		// Get all available updates, as an array of integers.
+		$updates_files = glob( PROGRESS_PLANNER_DIR . '/classes/update/*.php' );
+		if ( ! is_array( $updates_files ) ) {
+			return;
+		}
+		$updates = array_map(
+			function ( $file ) {
+				return str_replace( 'class-update-', '', basename( $file, '.php' ) );
+			},
+			$updates_files
+		);
+		sort( $updates );
+
 		// Run the upgrades.
-		foreach ( self::UPGRADE_CLASSES as $version => $upgrade_class ) {
+		foreach ( $updates as $version_int ) {
+			$upgrade_class = 'Progress_Planner\Update\Update_' . $version_int;
+			$version       = $upgrade_class::VERSION;
 			if (
 				\get_option( 'prpl_debug_migrations' ) ||
 				version_compare( $version, $this->db_version, '>' )
 			) {
 				$upgrade_class = new $upgrade_class();
-				$upgrade_class->run();
+				if ( method_exists( $upgrade_class, 'run' ) ) {
+					$upgrade_class->run();
+				}
 			}
 		}
 

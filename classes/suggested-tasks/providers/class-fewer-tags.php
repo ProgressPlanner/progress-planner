@@ -5,16 +5,16 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
+use Progress_Planner\Suggested_Tasks\Providers\Tasks;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Tag_Count;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Published_Post_Count;
 
 /**
  * Add tasks to check if Fewer Tags plugin is installed.
  */
-class Fewer_Tags extends One_Time {
+class Fewer_Tags extends Tasks {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -134,9 +134,11 @@ class Fewer_Tags extends One_Time {
 	/**
 	 * Check if the task is completed.
 	 *
+	 * @param string $task_id The task ID.
+	 *
 	 * @return bool
 	 */
-	public function is_task_completed() {
+	public function is_task_completed( $task_id = '' ) {
 		return $this->is_plugin_active();
 	}
 

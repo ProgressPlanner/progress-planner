@@ -5,7 +5,7 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Traits;
+namespace Progress_Planner\Suggested_Tasks\Providers\Traits;
 
 /**
  * Trait for handling dismissable tasks with time-based expiration.

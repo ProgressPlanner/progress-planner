@@ -9,7 +9,7 @@ namespace Progress_Planner\Admin\Widgets;
 
 use Progress_Planner\Badges\Monthly;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
-use Progress_Planner\Suggested_Tasks\Providers\Repetitive\Review;
+use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
 
 /**
  * Suggested_Tasks class.
@@ -118,7 +118,7 @@ final class Suggested_Tasks extends Widget {
 
 		$max_items_per_category = [];
 		foreach ( $final_tasks as $task ) {
-			$max_items_per_category[ $task['category'] ] = $task['category'] === ( new Review() )->get_provider_category() ? 2 : 1;
+			$max_items_per_category[ $task['category'] ] = $task['category'] === ( new Content_Review() )->get_provider_category() ? 2 : 1;
 		}
 
 		// We want to hide user tasks.

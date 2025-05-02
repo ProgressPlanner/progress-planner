@@ -9,27 +9,27 @@ namespace Progress_Planner\Suggested_Tasks;
 
 use Progress_Planner\Suggested_Tasks\Task_Factory;
 // Repetitive tasks.
-use Progress_Planner\Suggested_Tasks\Providers\Repetitive\Core_Update;
-use Progress_Planner\Suggested_Tasks\Providers\Repetitive\Create as Content_Create;
-use Progress_Planner\Suggested_Tasks\Providers\Repetitive\Review as Content_Review;
+use Progress_Planner\Suggested_Tasks\Providers\Core_Update;
+use Progress_Planner\Suggested_Tasks\Providers\Content_Create;
+use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
 // One-time tasks.
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Blog_Description;
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Settings_Saved;
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Debug_Display;
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Disable_Comments;
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Sample_Page;
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Hello_World;
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Remove_Inactive_Plugins;
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Site_Icon;
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Rename_Uncategorized_Category;
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Permalink_Structure;
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Php_Version;
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Search_Engine_Visibility;
+use Progress_Planner\Suggested_Tasks\Providers\Blog_Description;
+use Progress_Planner\Suggested_Tasks\Providers\Settings_Saved;
+use Progress_Planner\Suggested_Tasks\Providers\Debug_Display;
+use Progress_Planner\Suggested_Tasks\Providers\Disable_Comments;
+use Progress_Planner\Suggested_Tasks\Providers\Sample_Page;
+use Progress_Planner\Suggested_Tasks\Providers\Hello_World;
+use Progress_Planner\Suggested_Tasks\Providers\Remove_Inactive_Plugins;
+use Progress_Planner\Suggested_Tasks\Providers\Site_Icon;
+use Progress_Planner\Suggested_Tasks\Providers\Rename_Uncategorized_Category;
+use Progress_Planner\Suggested_Tasks\Providers\Permalink_Structure;
+use Progress_Planner\Suggested_Tasks\Providers\Php_Version;
+use Progress_Planner\Suggested_Tasks\Providers\Search_Engine_Visibility;
 use Progress_Planner\Suggested_Tasks\Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
 use Progress_Planner\Suggested_Tasks\Providers\User as User_Tasks;
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Set_Valuable_Post_Types;
-use Progress_Planner\Suggested_Tasks\Providers\One_Time\Fewer_Tags;
+use Progress_Planner\Suggested_Tasks\Providers\Set_Valuable_Post_Types;
+use Progress_Planner\Suggested_Tasks\Providers\Fewer_Tags;
 
 /**
  * Tasks_Manager class.
