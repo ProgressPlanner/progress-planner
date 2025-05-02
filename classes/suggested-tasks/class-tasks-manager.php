@@ -8,11 +8,10 @@
 namespace Progress_Planner\Suggested_Tasks;
 
 use Progress_Planner\Suggested_Tasks\Task_Factory;
-// Repetitive tasks.
+
 use Progress_Planner\Suggested_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Create;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
-// One-time tasks.
 use Progress_Planner\Suggested_Tasks\Providers\Blog_Description;
 use Progress_Planner\Suggested_Tasks\Providers\Settings_Saved;
 use Progress_Planner\Suggested_Tasks\Providers\Debug_Display;
