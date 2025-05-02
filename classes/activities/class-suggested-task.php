@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Activities;
 
-use Progress_Planner\Suggested_Tasks\Providers\Repetitive\Create;
+use Progress_Planner\Suggested_Tasks\Providers\Content_Create;
 
 /**
  * Handler for suggested tasks activities.
@@ -73,7 +73,7 @@ class Suggested_Task extends Activity {
 
 			if ( $task_provider ) {
 				// Create post task provider had a different points system, this is for backwards compatibility.
-				$points = $task_provider instanceof Create ? $task_provider->get_points( $this->data_id ) : $task_provider->get_points();
+				$points = $task_provider instanceof Content_Create ? $task_provider->get_points( $this->data_id ) : $task_provider->get_points();
 			}
 		}
 		$this->points[ $date_ymd ] = $points;

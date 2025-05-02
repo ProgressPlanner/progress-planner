@@ -5,14 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
-
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
  * Add tasks for settings saved.
  */
-class Set_Valuable_Post_Types extends One_Time {
+class Set_Valuable_Post_Types extends Tasks {
 
 	/**
 	 * The provider ID.
@@ -117,9 +115,11 @@ class Set_Valuable_Post_Types extends One_Time {
 	 * We are checking the 'is_task_completed' method only if the task was added previously.
 	 * If it was and the option is not set it means that user has completed the task.
 	 *
+	 * @param string $task_id The task ID.
+	 *
 	 * @return bool
 	 */
-	public function is_task_completed() {
+	public function is_task_completed( $task_id = '' ) {
 		return false === \get_option( 'progress_planner_set_valuable_post_types', false );
 	}
 }

@@ -7,13 +7,13 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
-use Progress_Planner\Suggested_Tasks\Providers\Repetitive;
+use Progress_Planner\Suggested_Tasks\Providers\Tasks;
 use Progress_Planner\Suggested_Tasks\Providers\Traits\Dismissable_Task;
 
 /**
  * Add tasks for Yoast SEO cornerstone content.
  */
-class Orphaned_Content_Workout extends Repetitive {
+class Orphaned_Content_Workout extends Tasks {
 	use Dismissable_Task;
 
 	/**
