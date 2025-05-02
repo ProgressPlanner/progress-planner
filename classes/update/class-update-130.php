@@ -17,6 +17,8 @@ use Progress_Planner\Suggested_Tasks\Task;
  */
 class Update_130 {
 
+	const VERSION = '1.3.0';
+
 	/**
 	 * Run the update.
 	 *

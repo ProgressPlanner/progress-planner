@@ -14,6 +14,8 @@ namespace Progress_Planner\Update;
  */
 class Update_140 {
 
+	const VERSION = '1.4.0';
+
 	/**
 	 * Run the update.
 	 *
