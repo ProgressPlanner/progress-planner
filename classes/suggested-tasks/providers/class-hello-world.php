@@ -5,14 +5,14 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Hello_World as Hello_World_Data_Collector;
+
 /**
  * Add tasks for hello world post.
  */
-class Hello_World extends One_Time {
+class Hello_World extends Tasks {
 
 	/**
 	 * The provider ID.

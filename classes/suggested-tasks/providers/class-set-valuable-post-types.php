@@ -5,14 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
-
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
  * Add tasks for settings saved.
  */
-class Set_Valuable_Post_Types extends One_Time {
+class Set_Valuable_Post_Types extends Tasks {
 
 	/**
 	 * The provider ID.

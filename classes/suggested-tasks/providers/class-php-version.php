@@ -5,14 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
-
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
  * Add tasks for PHP version.
  */
-class Php_Version extends One_Time {
+class Php_Version extends Tasks {
 
 	/**
 	 * The provider ID.

@@ -5,14 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
-
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
  * Add tasks for permalink structure.
  */
-class Permalink_Structure extends One_Time {
+class Permalink_Structure extends Tasks {
 
 	/**
 	 * The provider ID.

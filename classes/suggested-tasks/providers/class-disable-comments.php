@@ -5,14 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
-
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
  * Add tasks to disable comments.
  */
-class Disable_Comments extends One_Time {
+class Disable_Comments extends Tasks {
 
 	/**
 	 * The provider ID.
