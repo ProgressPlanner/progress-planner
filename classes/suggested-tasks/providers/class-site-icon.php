@@ -1,25 +1,23 @@
 <?php
 /**
- * Add tasks for Core blogdescription.
+ * Add tasks for Core siteicon.
  *
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
-
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
- * Add tasks for Core blogdescription.
+ * Add tasks for Core siteicon.
  */
-class Blog_Description extends One_Time {
+class Site_Icon extends Tasks {
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	protected const PROVIDER_ID = 'core-blogdescription';
+	protected const PROVIDER_ID = 'core-siteicon';
 
 	/**
 	 * Constructor.
@@ -28,7 +26,7 @@ class Blog_Description extends One_Time {
 		$this->url          = \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() );
 		$this->link_setting = [
 			'hook'   => 'options-general.php',
-			'iconEl' => 'th:has(+td #tagline-description)',
+			'iconEl' => '.site-icon-section th',
 		];
 	}
 
@@ -38,7 +36,7 @@ class Blog_Description extends One_Time {
 	 * @return string
 	 */
 	public function get_title() {
-		return \esc_html__( 'Set tagline', 'progress-planner' );
+		return \esc_html__( 'Set site icon', 'progress-planner' );
 	}
 
 	/**
@@ -48,9 +46,9 @@ class Blog_Description extends One_Time {
 	 */
 	public function get_description() {
 		return sprintf(
-			/* translators: %s:<a href="https://prpl.fyi/set-tagline" target="_blank">tagline</a> link */
+			/* translators: %s:<a href="https://prpl.fyi/set-site-icon" target="_blank">site icon</a> link */
 			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/set-tagline" target="_blank">' . \esc_html__( 'tagline', 'progress-planner' ) . '</a>'
+			'<a href="https://prpl.fyi/set-site-icon" target="_blank">' . \esc_html__( 'site icon', 'progress-planner' ) . '</a>'
 		);
 	}
 
@@ -60,6 +58,7 @@ class Blog_Description extends One_Time {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return '' === \get_bloginfo( 'description' );
+		$site_icon = \get_option( 'site_icon' );
+		return '' === $site_icon || '0' === $site_icon;
 	}
 }
