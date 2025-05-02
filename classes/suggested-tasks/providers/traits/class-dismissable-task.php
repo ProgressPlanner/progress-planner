@@ -21,6 +21,14 @@ trait Dismissable_Task {
 	protected $dismissed_tasks_option = 'dismissed_tasks';
 
 	/**
+	 * The expiration period in seconds.
+	 * Default is 6 months.
+	 *
+	 * @var int
+	 */
+	protected $dismissal_expiration_period = 6 * MONTH_IN_SECONDS;
+
+	/**
 	 * Initialize the dismissable task functionality.
 	 *
 	 * @return void

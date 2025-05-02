@@ -90,6 +90,13 @@ class Add_Yoast_Providers {
 			new Organization_Logo(),
 			new Fix_Orphaned_Content(),
 		];
+
+		// Yoast SEO Premium.
+		if ( defined( 'WPSEO_PREMIUM_VERSION' ) ) {
+			$this->providers[] = new Cornerstone_Workout();
+			$this->providers[] = new Orphaned_Content_Workout();
+		}
+
 		return array_merge(
 			$providers,
 			$this->providers
