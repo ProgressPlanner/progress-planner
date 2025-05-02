@@ -5,15 +5,15 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
+use Progress_Planner\Suggested_Tasks\Providers\Tasks;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Posts as Terms_Without_Posts_Data_Collector;
 
 /**
  * Add task to remove terms without posts.
  */
-class Remove_Terms_Without_Posts extends One_Time {
+class Remove_Terms_Without_Posts extends Tasks {
 
 	/**
 	 * Whether the task is an onboarding task.

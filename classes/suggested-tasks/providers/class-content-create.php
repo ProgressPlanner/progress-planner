@@ -5,15 +5,14 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\Repetitive;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Providers\Repetitive;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post as Last_Published_Post_Data_Collector;
 
 /**
  * Add tasks for content creation.
  */
-class Create extends Repetitive {
+class Content_Create extends Tasks {
 
 	/**
 	 * The provider ID.
@@ -35,6 +34,13 @@ class Create extends Repetitive {
 	 * @var string
 	 */
 	protected const CAPABILITY = 'edit_others_posts';
+
+	/**
+	 * Whether the task is repetitive.
+	 *
+	 * @var bool
+	 */
+	protected $is_repetitive = true;
 
 	/**
 	 * The task URL target.
@@ -139,7 +145,7 @@ class Create extends Repetitive {
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(), // We use $this->get_points() here on purpose, get_points_for_task() calcs the points for the last published post.
+			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
 			'url'         => $this->get_url(),
 			'url_target'  => $this->get_url_target(),
