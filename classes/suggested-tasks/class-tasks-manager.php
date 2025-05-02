@@ -29,6 +29,7 @@ use Progress_Planner\Suggested_Tasks\Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
 use Progress_Planner\Suggested_Tasks\Providers\User as User_Tasks;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Valuable_Post_Types;
+use Progress_Planner\Suggested_Tasks\Providers\Fewer_Tags;
 
 /**
  * Tasks_Manager class.
@@ -66,6 +67,7 @@ class Tasks_Manager {
 			new Search_Engine_Visibility(),
 			new User_Tasks(),
 			new Set_Valuable_Post_Types(),
+			new Fewer_Tags(),
 		];
 
 		// Add the plugin integration.
