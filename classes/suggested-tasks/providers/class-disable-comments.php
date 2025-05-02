@@ -5,14 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
-
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
  * Add tasks to disable comments.
  */
-class Disable_Comments extends One_Time {
+class Disable_Comments extends Tasks {
 
 	/**
 	 * The provider ID.
@@ -75,9 +73,11 @@ class Disable_Comments extends One_Time {
 	/**
 	 * Check if the task is completed.
 	 *
+	 * @param string $task_id The task ID.
+	 *
 	 * @return bool
 	 */
-	public function is_task_completed() {
+	public function is_task_completed( $task_id = '' ) {
 		return 'open' !== \get_default_comment_status();
 	}
 }

@@ -5,15 +5,14 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Uncategorized_Category as Uncategorized_Category_Data_Collector;
 
 /**
  * Add task to rename the Uncategorized category.
  */
-class Rename_Uncategorized_Category extends One_Time {
+class Rename_Uncategorized_Category extends Tasks {
 
 	/**
 	 * The provider ID.
