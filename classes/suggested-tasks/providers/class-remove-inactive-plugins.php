@@ -5,15 +5,14 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\One_Time;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Providers\One_Time;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Inactive_Plugins as Inactive_Plugins_Data_Collector;
 
 /**
  * Add tasks to remove inactive plugins.
  */
-class Remove_Inactive_Plugins extends One_Time {
+class Remove_Inactive_Plugins extends Tasks {
 
 	/**
 	 * The provider ID.

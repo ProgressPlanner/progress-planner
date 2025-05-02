@@ -5,13 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\Repetitive;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Providers\Repetitive;
 /**
  * Add tasks for Core updates.
  */
-class Core_Update extends Repetitive {
+class Core_Update extends Tasks {
 
 	/**
 	 * The provider category.
@@ -33,6 +32,13 @@ class Core_Update extends Repetitive {
 	 * @var string
 	 */
 	protected const CAPABILITY = 'update_core';
+
+	/**
+	 * Whether the task is repetitive.
+	 *
+	 * @var bool
+	 */
+	protected $is_repetitive = true;
 
 	/**
 	 * The task priority.
