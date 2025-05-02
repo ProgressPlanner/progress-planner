@@ -8,11 +8,10 @@
 namespace Progress_Planner\Suggested_Tasks;
 
 use Progress_Planner\Suggested_Tasks\Task_Factory;
-// Repetitive tasks.
+
 use Progress_Planner\Suggested_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Create;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
-// One-time tasks.
 use Progress_Planner\Suggested_Tasks\Providers\Blog_Description;
 use Progress_Planner\Suggested_Tasks\Providers\Settings_Saved;
 use Progress_Planner\Suggested_Tasks\Providers\Debug_Display;
@@ -30,6 +29,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Add_Yoast_Prov
 use Progress_Planner\Suggested_Tasks\Providers\User as User_Tasks;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Valuable_Post_Types;
 use Progress_Planner\Suggested_Tasks\Providers\Fewer_Tags;
+use Progress_Planner\Suggested_Tasks\Providers\Remove_Terms_Without_Posts;
 
 /**
  * Tasks_Manager class.
@@ -67,6 +67,7 @@ class Tasks_Manager {
 			new Search_Engine_Visibility(),
 			new User_Tasks(),
 			new Set_Valuable_Post_Types(),
+			new Remove_Terms_Without_Posts(),
 			new Fewer_Tags(),
 		];
 
