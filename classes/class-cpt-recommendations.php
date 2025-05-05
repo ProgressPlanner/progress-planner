@@ -125,6 +125,10 @@ class CPT_Recommendations {
 
 					unset( $params[ $param ] );
 					break;
+
+				default:
+					$args[ $param ] = $value;
+					break;
 			}
 		}
 

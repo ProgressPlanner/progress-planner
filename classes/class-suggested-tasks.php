@@ -118,7 +118,7 @@ class Suggested_Tasks {
 		$pending_tasks = \progress_planner()->get_cpt_recommendations()->get(
 			[
 				'numberposts' => 1,
-				'status'      => 'publish',
+				'post_status' => 'publish',
 				'provider_id' => 'update-core',
 				'date_query'  => [ [ 'after' => 'this Monday' ] ],
 			]
