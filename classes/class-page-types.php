@@ -506,6 +506,14 @@ class Page_Types {
 	 */
 	private function get_posts_by_title( $title ) {
 		global $wpdb;
+		// Check if we have a cached result.
+		$cache_key = 'pp_posts_by_title_' . sanitize_title( $title );
+		$posts_ids = \wp_cache_get( $cache_key );
+		if ( false !== $posts_ids ) {
+			return $posts_ids;
+		}
+
+		// Cache the query.
 		$posts     = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->prepare(
 				"SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s",
@@ -516,6 +524,7 @@ class Page_Types {
 		foreach ( $posts as $post ) {
 			$posts_ids[] = (int) $post->ID;
 		}
+		\wp_cache_set( $cache_key, $posts_ids );
 		return $posts_ids;
 	}
 }
