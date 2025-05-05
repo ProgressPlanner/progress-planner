@@ -76,7 +76,7 @@ class Cornerstone_Workout extends Tasks {
 	 * @return string
 	 */
 	public function get_title( $task_id = '' ) {
-		return \esc_html__( 'Run Yoast SEO Cornerstone Content Workout', 'progress-planner' );
+		return \esc_html__( 'Do Yoast SEO\'s Cornerstone Content Workout', 'progress-planner' );
 	}
 
 	/**
@@ -89,8 +89,8 @@ class Cornerstone_Workout extends Tasks {
 	public function get_description( $task_id = '' ) {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Run the Yoast SEO Cornerstone Content Workout to improve your site\'s SEO. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-cornerstone" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			\esc_html__( 'Improve your most important pages with Yoast SEO\'s Cornerstone Content Workout. %s.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/yoast-cornerstone" target="_blank">' . \esc_html__( 'Learn more', 'progress-planner' ) . '</a>'
 		);
 	}
 
