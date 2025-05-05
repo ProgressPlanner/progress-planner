@@ -8,11 +8,13 @@
 namespace Progress_Planner\Update;
 
 /**
- * Update class for version 1.3.0.
+ * Update class for version 1.5.0.
  *
  * @package Progress_Planner
  */
 class Update_150 {
+
+	const VERSION = '1.5.0';
 
 	/**
 	 * Run the update.
@@ -73,30 +75,33 @@ class Update_150 {
 		}
 
 		$task_details['status'] = $task_details['status'] ?? 'published';
+
+		$args = [
+			'post_type'    => 'prpl_recommendations',
+			'post_title'   => $task_details['title'],
+			'post_content' => $task_details['description'] ?? '',
+			'menu_order'   => $task_details['order'] ?? 0,
+		];
 		switch ( $task_details['status'] ) {
 			case 'pending_celebration':
-				$status = 'pending_celebration';
+				$args['post_status'] = 'pending_celebration';
 				break;
 
 			case 'completed':
-				$status = 'trash';
+				$args['post_status'] = 'trash';
+				break;
+
+			case 'snoozed':
+				$args['post_status'] = 'future';
+				$args['post_date']   = \DateTime::createFromFormat( 'U', $task_details['time'] )->format( 'Y-m-d H:i:s' );
 				break;
 
 			default:
-				$status = 'publish';
+				$args['post_status'] = 'publish';
 				break;
 		}
 
-		// Create a new task in the CPT.
-		$post_id = \wp_insert_post(
-			[
-				'post_type'    => 'prpl_recommendations',
-				'post_title'   => $task_details['title'],
-				'post_content' => $task_details['description'] ?? '',
-				'post_status'  => $status,
-				'menu_order'   => $task_details['order'] ?? 0,
-			]
-		);
+		$post_id = \wp_insert_post( $args );
 
 		// Add terms if they don't exist.
 		foreach ( [ 'category', 'provider_id' ] as $context ) {
