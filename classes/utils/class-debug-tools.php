@@ -222,12 +222,12 @@ class Debug_Tools {
 		);
 
 		// Get suggested tasks.
-		$suggested_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
+		$suggested_tasks = \progress_planner()->get_cpt_recommendations()->get( [ 'post_status' => 'any' ] );
 
 		$menu_items = [
-			'pending'             => 'Pending',
-			'completed'           => 'Completed',
-			'snoozed'             => 'Snoozed',
+			'publish'             => 'Pending',
+			'trash'               => 'Completed',
+			'future'              => 'Snoozed',
 			'pending_celebration' => 'Pending Celebration',
 		];
 
@@ -241,13 +241,13 @@ class Debug_Tools {
 			);
 
 			foreach ( $suggested_tasks as $task ) {
-				if ( ! isset( $task['task_id'] ) || $key !== $task['status'] ) {
+				if ( $key !== $task['post_status'] ) {
 					continue;
 				}
 
-				$title = $task['task_id'];
-				if ( isset( $task['status'] ) && 'snoozed' === $task['status'] && isset( $task['time'] ) ) {
-					$until  = is_float( $task['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['time'] ) . ')';
+				$title = $task['post_title'];
+				if ( isset( $task['post_status'] ) && 'future' === $task['post_status'] && isset( $task['post_date'] ) ) {
+					$until  = is_float( $task['post_date'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['post_date'] ) . ')';
 					$title .= ' ' . $until;
 				}
 
@@ -374,18 +374,13 @@ class Debug_Tools {
 		// Verify nonce for security.
 		$this->verify_nonce();
 
-		// Update the tasks.
-		\progress_planner()->get_settings()->set(
-			'tasks',
-			array_values(
-				array_filter( // Filter out pending tasks.
-					\progress_planner()->get_settings()->get( 'tasks', [] ), // Get all tasks.
-					function ( $task ) {
-						return 'pending' !== $task['status'];
-					}
-				)
-			)
-		);
+		// Get pending tasks.
+		$pending_tasks = \progress_planner()->get_cpt_recommendations()->get_by_param( [ 'post_status' => 'publish' ] );
+
+		// Delete the pending tasks.
+		foreach ( $pending_tasks as $task ) {
+			\progress_planner()->get_cpt_recommendations()->delete_recommendation( (int) $task['ID'] );
+		}
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_pending_tasks', '_wpnonce' ] ) );
