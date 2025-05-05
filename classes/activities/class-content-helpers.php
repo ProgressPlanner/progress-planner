@@ -15,13 +15,6 @@ use Progress_Planner\Activities\Content as Activities_Content;
 class Content_Helpers {
 
 	/**
-	 * The threshold for a post to be considered long.
-	 *
-	 * @var int
-	 */
-	const LONG_POST_THRESHOLD = 350;
-
-	/**
 	 * Get an array of post-types names for the stats.
 	 *
 	 * @return string[]
