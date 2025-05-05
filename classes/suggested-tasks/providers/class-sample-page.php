@@ -15,6 +15,13 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page as Sample_Page_D
 class Sample_Page extends Tasks {
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected const IS_ONBOARDING_TASK = true;
+
+	/**
 	 * The provider ID.
 	 *
 	 * @var string
