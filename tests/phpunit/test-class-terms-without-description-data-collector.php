@@ -70,19 +70,6 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$this->assertNotWPError( $term_result );
 		$term_id = $term_result['term_id'];
 
-		// Create a post and assign it to our test category.
-		$post_id = wp_insert_post(
-			[
-				'post_title'  => 'Test Post',
-				'post_status' => 'publish',
-				'post_type'   => 'post',
-			]
-		);
-		$this->assertNotWPError( $post_id );
-
-		$set_terms = wp_set_object_terms( $post_id, $term_id, 'category' );
-		$this->assertNotWPError( $set_terms );
-
 		// Get the data.
 		$this->data_collector->update_cache();
 		$result = $this->data_collector->collect();
@@ -102,19 +89,6 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$term_result = wp_insert_term( 'Test Category', 'category', [ 'description' => 'Test Description' ] );
 		$this->assertNotWPError( $term_result );
 
-		// Create a post and assign it to the category.
-		$post_id = wp_insert_post(
-			[
-				'post_title'  => 'Test Post',
-				'post_status' => 'publish',
-				'post_type'   => 'post',
-			]
-		);
-		$this->assertNotWPError( $post_id );
-
-		$set_terms = wp_set_object_terms( $post_id, $term_result['term_id'], 'category' );
-		$this->assertNotWPError( $set_terms );
-
 		// Get the data.
 		$this->data_collector->update_cache();
 		$result = $this->data_collector->collect();
@@ -131,19 +105,6 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$term_result = wp_insert_term( 'Test Category', 'category' );
 		$this->assertNotWPError( $term_result );
 		$term_id = $term_result['term_id'];
-
-		// Create a post and assign it to the category.
-		$post_id = wp_insert_post(
-			[
-				'post_title'  => 'Test Post',
-				'post_status' => 'publish',
-				'post_type'   => 'post',
-			]
-		);
-		$this->assertNotWPError( $post_id );
-
-		$set_terms = wp_set_object_terms( $post_id, $term_id, 'category' );
-		$this->assertNotWPError( $set_terms );
 
 		// Add filter to exclude the term.
 		add_filter(
@@ -169,19 +130,6 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$term_result = wp_insert_term( 'Test Category', 'category' );
 		$this->assertNotWPError( $term_result );
 		$term_id = $term_result['term_id'];
-
-		// Create a post and assign it to the category.
-		$post_id = wp_insert_post(
-			[
-				'post_title'  => 'Test Post',
-				'post_status' => 'publish',
-				'post_type'   => 'post',
-			]
-		);
-		$this->assertNotWPError( $post_id );
-
-		$set_terms = wp_set_object_terms( $post_id, $term_id, 'category' );
-		$this->assertNotWPError( $set_terms );
 
 		// Get initial data.
 		$this->data_collector->update_cache();
@@ -213,19 +161,6 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$term_result = wp_insert_term( 'Test Category', 'category' );
 		$this->assertNotWPError( $term_result );
 		$term_id = $term_result['term_id'];
-
-		// Create a post and assign it to the category.
-		$post_id = wp_insert_post(
-			[
-				'post_title'  => 'Test Post',
-				'post_status' => 'publish',
-				'post_type'   => 'post',
-			]
-		);
-		$this->assertNotWPError( $post_id );
-
-		$set_terms = wp_set_object_terms( $post_id, $term_id, 'category' );
-		$this->assertNotWPError( $set_terms );
 
 		// Get initial data.
 		$this->data_collector->update_cache();
@@ -259,19 +194,6 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		// Create a term in the non-public taxonomy.
 		$term_result = wp_insert_term( 'Test Term', 'test_taxonomy' );
 		$this->assertNotWPError( $term_result );
-
-		// Create a post and assign it to the term.
-		$post_id = wp_insert_post(
-			[
-				'post_title'  => 'Test Post',
-				'post_status' => 'publish',
-				'post_type'   => 'post',
-			]
-		);
-		$this->assertNotWPError( $post_id );
-
-		$set_terms = wp_set_object_terms( $post_id, $term_result['term_id'], 'test_taxonomy' );
-		$this->assertNotWPError( $set_terms );
 
 		// Get the data.
 		$this->data_collector->update_cache();
