@@ -507,8 +507,9 @@ class Page_Types {
 	private function get_posts_by_title( $title ) {
 		global $wpdb;
 		// Check if we have a cached result.
-		$cache_key = 'pp_posts_by_title_' . sanitize_title( $title );
-		$posts_ids = \wp_cache_get( $cache_key );
+		$cache_key   = 'pp_posts_by_title_' . sanitize_title( $title );
+		$cache_group = \Progress_Planner\Activities\Query::CACHE_GROUP;
+		$posts_ids   = \wp_cache_get( $cache_key, $cache_group );
 		if ( false !== $posts_ids ) {
 			return $posts_ids;
 		}
@@ -524,7 +525,7 @@ class Page_Types {
 		foreach ( $posts as $post ) {
 			$posts_ids[] = (int) $post->ID;
 		}
-		\wp_cache_set( $cache_key, $posts_ids );
+		\wp_cache_set( $cache_key, $posts_ids, $cache_group );
 		return $posts_ids;
 	}
 }
