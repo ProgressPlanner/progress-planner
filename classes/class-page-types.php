@@ -517,7 +517,7 @@ class Page_Types {
 		// Cache the query.
 		$posts     = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s",
+				"SELECT ID FROM $wpdb->posts WHERE post_type = 'page' AND post_status != 'trash' AND post_title LIKE %s",
 				'%' . $wpdb->esc_like( $title ) . '%'
 			)
 		);
