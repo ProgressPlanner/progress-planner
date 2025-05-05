@@ -83,9 +83,6 @@ class Content_Scan extends Content {
 		$activities = \progress_planner()->get_activities__query()->query_activities( [ 'category' => 'content' ] );
 		\progress_planner()->get_activities__query()->delete_activities( $activities );
 
-		// Reset the word count.
-		\progress_planner()->get_settings()->set( 'word_count', [] );
-
 		\wp_send_json_success(
 			[
 				'messages' => [
@@ -132,7 +129,7 @@ class Content_Scan extends Content {
 			];
 		}
 
-		// Insert the activities and the word-count for posts in the db.
+		// Insert the activities for posts in the db.
 		$this->insert_activities( $posts );
 
 		// Update the last scanned page.
@@ -161,9 +158,9 @@ class Content_Scan extends Content {
 	}
 
 	/**
-	 * Insert the activities and the word-count for posts in the db.
+	 * Insert the activities for posts in the db.
 	 *
-	 * @param \WP_Post[] $posts The posts to set the word count for.
+	 * @param \WP_Post[] $posts The posts to insert the activities for.
 	 *
 	 * @return void
 	 */
