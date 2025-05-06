@@ -80,7 +80,7 @@ class Orphaned_Content_Workout extends Tasks {
 	 * @return void
 	 */
 	public function maybe_update_workout_status( $old_value, $value, $option ) {
-		if ( 'wpseo_premium' !== $option || ! isset( $value['workouts']['orphaned'] ) ) {
+		if ( 'wpseo_premium' !== $option || ! isset( $value['workouts']['orphaned'] ) || ! isset( $old_value['workouts']['orphaned'] ) ) {
 			return;
 		}
 
@@ -97,10 +97,12 @@ class Orphaned_Content_Workout extends Tasks {
 			return;
 		}
 
-		$workout_completed = count( $value['workouts']['orphaned']['finishedSteps'] ) === 3; // There should be 3 steps in the workout.
+		// There should be 3 steps in the workout.
+		$workout_was_completed = 3 === count( $old_value['workouts']['orphaned']['finishedSteps'] );
+		$workout_completed     = 3 === count( $value['workouts']['orphaned']['finishedSteps'] );
 
-		// Dismiss the task if it's completed.
-		if ( true === $workout_completed ) {
+		// Dismiss the task if workout wasn't completed before and now is.
+		if ( ! $workout_was_completed && $workout_completed ) {
 			$this->handle_task_dismissal( $this->get_task_id() );
 		}
 	}
