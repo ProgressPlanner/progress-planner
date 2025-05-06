@@ -57,7 +57,7 @@ class Plugin_Upgrade_Tasks {
 	 * @return void
 	 */
 	public function maybe_add_onboarding_tasks() {
-		$onboard_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', [] );
+		$onboard_task_provider_ids = \apply_filters( 'prpl_onboarding_task_providers', [] );
 
 		// Privacy policy is not accepted, so it's a fresh install.
 		$fresh_install = ! \progress_planner()->is_privacy_policy_accepted();
