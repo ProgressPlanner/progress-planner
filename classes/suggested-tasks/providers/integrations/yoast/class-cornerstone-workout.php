@@ -66,6 +66,44 @@ class Cornerstone_Workout extends Tasks {
 	 */
 	public function init() {
 		$this->init_dismissable_task();
+
+		// Hook into update_option.
+		\add_action( 'update_option_wpseo_premium', [ $this, 'maybe_update_workout_status' ], 10, 3 );
+	}
+
+	/**
+	 * Maybe update the workout status.
+	 *
+	 * @param mixed  $old_value The old value.
+	 * @param mixed  $value The new value.
+	 * @param string $option The option name.
+	 *
+	 * @return void
+	 */
+	public function maybe_update_workout_status( $old_value, $value, $option ) {
+		if ( 'wpseo_premium' !== $option || ! isset( $value['workouts']['cornerstone'] ) ) {
+			return;
+		}
+
+		// Check if there is pending task.
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $this->get_task_id() );
+
+		// If there is no pending task, return.
+		if ( empty( $tasks ) || 'pending' !== $tasks[0]['status'] ) {
+			return;
+		}
+
+		// For this type of task only the provider ID is needed, but just in case.
+		if ( $this->is_task_dismissed( $tasks[0] ) ) {
+			return;
+		}
+
+		$workout_completed = count( $value['workouts']['cornerstone']['finishedSteps'] ) === 3; // There should be 3 steps in the workout.
+
+		// Dismiss the task if it's completed.
+		if ( true === $workout_completed ) {
+			$this->handle_task_dismissal( $this->get_task_id() );
+		}
 	}
 
 	/**
