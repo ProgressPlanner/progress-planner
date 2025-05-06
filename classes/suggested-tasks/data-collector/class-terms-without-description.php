@@ -88,7 +88,7 @@ class Terms_Without_Description extends Base_Data_Collector {
 
 		// Exclude the Uncategorized category.
 		$uncategorized_category_id = ( new Uncategorized_Category() )->collect();
-		$exclude_term_ids = $uncategorized_category_id ? [ $uncategorized_category_id ] : [];
+		$exclude_term_ids          = $uncategorized_category_id ? [ $uncategorized_category_id ] : [];
 
 		/**
 		 * Array of term IDs to exclude from the terms without description query.
