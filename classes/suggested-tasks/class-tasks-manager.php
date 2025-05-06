@@ -324,7 +324,7 @@ class Tasks_Manager {
 		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'publish' ] );
 
 		foreach ( $tasks as $task ) {
-			if ( \gmdate( 'YW' ) === (string) $task['date'] ) {
+			if ( ! isset( $task['date'] ) || \gmdate( 'YW' ) !== (string) $task['date'] ) {
 				continue;
 			}
 
