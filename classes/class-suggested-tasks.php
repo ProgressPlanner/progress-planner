@@ -8,8 +8,6 @@
 namespace Progress_Planner;
 
 use Progress_Planner\Suggested_Tasks\Tasks_Manager;
-use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
-use Progress_Planner\Suggested_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
 /**
  * Suggested_Tasks class.
@@ -62,50 +60,8 @@ class Suggested_Tasks {
 			\progress_planner()->get_cpt_recommendations()->update_recommendation( $task_data['ID'], [ 'post_status' => 'pending_celebration' ] );
 
 			// Insert an activity.
-			$this->insert_activity( $task_data['task_id'] );
+			\progress_planner()->get_cpt_recommendations()->insert_activity( $task_data['task_id'] );
 		}
-	}
-
-	/**
-	 * Insert an activity.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return void
-	 */
-	public function insert_activity( $task_id ) {
-		// Insert an activity.
-		$activity          = new Suggested_Task_Activity();
-		$activity->type    = 'completed';
-		$activity->data_id = (string) $task_id;
-		$activity->date    = new \DateTime();
-		$activity->user_id = \get_current_user_id();
-		$activity->save();
-
-		// Allow other classes to react to the completion of a suggested task.
-		do_action( 'progress_planner_suggested_task_completed', $task_id );
-	}
-
-	/**
-	 * Delete an activity.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return void
-	 */
-	public function delete_activity( $task_id ) {
-		$activity = \progress_planner()->get_activities__query()->query_activities(
-			[
-				'data_id' => $task_id,
-				'type'    => 'completed',
-			]
-		);
-
-		if ( empty( $activity ) ) {
-			return;
-		}
-
-		\progress_planner()->get_activities__query()->delete_activity( $activity[0] );
 	}
 
 	/**
@@ -131,7 +87,7 @@ class Suggested_Tasks {
 		\progress_planner()->get_cpt_recommendations()->update_recommendation( $pending_tasks[0]['ID'], [ 'post_status' => 'trash' ] );
 
 		// Insert an activity.
-		$this->insert_activity( $pending_tasks[0]['ID'] );
+		\progress_planner()->get_cpt_recommendations()->insert_activity( $pending_tasks[0]['ID'] );
 	}
 
 	/**
@@ -417,14 +373,14 @@ class Suggested_Tasks {
 				\progress_planner()->get_cpt_recommendations()->update_recommendation( $task['ID'], [ 'post_status' => 'trash' ] );
 
 				// Insert an activity.
-				$this->insert_activity( $task['ID'] );
+				\progress_planner()->get_cpt_recommendations()->insert_activity( $task['ID'] );
 				$updated = true;
 				break;
 
 			case 'pending':
 				\progress_planner()->get_cpt_recommendations()->update_recommendation( $task['ID'], [ 'post_status' => 'publish' ] );
 				$updated = true;
-				$this->delete_activity( $task['ID'] );
+				\progress_planner()->get_cpt_recommendations()->delete_activity( $task['ID'] );
 				break;
 
 			case 'snooze':
@@ -434,7 +390,7 @@ class Suggested_Tasks {
 
 			case 'delete':
 				$updated = $this->delete_task( $task['ID'] );
-				$this->delete_activity( $task['ID'] );
+				\progress_planner()->get_cpt_recommendations()->delete_activity( $task['ID'] );
 				break;
 
 			default:

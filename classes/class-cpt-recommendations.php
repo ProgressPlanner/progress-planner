@@ -7,6 +7,8 @@
 
 namespace Progress_Planner;
 
+use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
+
 /**
  * Recommendations class.
  *
@@ -488,5 +490,47 @@ class CPT_Recommendations {
 		}
 
 		return ! in_array( false, $update_results, true );
+	}
+
+	/**
+	 * Insert an activity.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return void
+	 */
+	public function insert_activity( $task_id ) {
+		// Insert an activity.
+		$activity          = new Suggested_Task_Activity();
+		$activity->type    = 'completed';
+		$activity->data_id = (string) $task_id;
+		$activity->date    = new \DateTime();
+		$activity->user_id = \get_current_user_id();
+		$activity->save();
+
+		// Allow other classes to react to the completion of a suggested task.
+		do_action( 'progress_planner_suggested_task_completed', $task_id );
+	}
+
+	/**
+	 * Delete an activity.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return void
+	 */
+	public function delete_activity( $task_id ) {
+		$activity = \progress_planner()->get_activities__query()->query_activities(
+			[
+				'data_id' => $task_id,
+				'type'    => 'completed',
+			]
+		);
+
+		if ( empty( $activity ) ) {
+			return;
+		}
+
+		\progress_planner()->get_activities__query()->delete_activity( $activity[0] );
 	}
 }
