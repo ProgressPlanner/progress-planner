@@ -178,7 +178,7 @@ class Todo {
 		$tasks = \array_map( 'intval', \explode( ',', $tasks ) );
 
 		// Get tasks from the `prpl_suggested_task` post type, that have a `prpl_recommendations_provider` of `user`.
-		$user_tasks = \progress_planner()->get_cpt_recommendations()->get_by_param( [ 'provider' => 'user' ] );
+		$user_tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'provider' => 'user' ] );
 		foreach ( $user_tasks as $task ) {
 			if ( in_array( (int) $task['ID'], $tasks, true ) ) {
 				\wp_update_post(
@@ -263,7 +263,7 @@ class Todo {
 		$task_ids = array_column( $pending_items, 'ID' );
 
 		// Reset the points of all the tasks, except for the first one in the todo list.
-		foreach ( \progress_planner()->get_cpt_recommendations()->get_by_param(
+		foreach ( \progress_planner()->get_cpt_recommendations()->get_by_params(
 			[
 				'provider' => 'user',
 				'status'   => 'publish',

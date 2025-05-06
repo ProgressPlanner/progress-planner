@@ -100,13 +100,118 @@ class CPT_Recommendations {
 	}
 
 	/**
+	 * Add a recommendation.
+	 *
+	 * @param array $data The data to add.
+	 *
+	 * @return int
+	 */
+	public function add( $data ) {
+		if ( empty( $data['title'] ) ) {
+			error_log( 'Task not added - missing title: ' . wp_json_encode( $data ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			return 0;
+		}
+
+		// Check if we have an existing task with the same title.
+		$posts = $this->get_by_params(
+			[
+				'post_status' => 'all',
+				'numberposts' => 1,
+				'task_id'     => $data['task_id'],
+			]
+		);
+
+		// If we have an existing task, skip.
+		if ( ! empty( $posts ) ) {
+			return $posts[0]['ID'];
+		}
+
+		$data['status'] = $data['status'] ?? 'published';
+
+		$args = [
+			'post_type'    => 'prpl_recommendations',
+			'post_title'   => $data['title'],
+			'post_content' => $data['description'] ?? '',
+			'menu_order'   => $data['order'] ?? 0,
+		];
+		switch ( $data['status'] ) {
+			case 'pending_celebration':
+				$args['post_status'] = 'pending_celebration';
+				break;
+
+			case 'completed':
+				$args['post_status'] = 'trash';
+				break;
+
+			case 'snoozed':
+				$args['post_status'] = 'future';
+				$args['post_date']   = \DateTime::createFromFormat( 'U', $data['time'] )->format( 'Y-m-d H:i:s' );
+				break;
+
+			default:
+				$args['post_status'] = 'publish';
+				break;
+		}
+
+		$post_id = \wp_insert_post( $args );
+
+		// Add terms if they don't exist.
+		foreach ( [ 'category', 'provider_id' ] as $context ) {
+			$taxonomy_name = str_replace( '_id', '', $context );
+			$term          = \get_term_by( 'name', $data[ $context ], "prpl_recommendations_$taxonomy_name" );
+			if ( ! $term ) {
+				\wp_insert_term( $data[ $context ], "prpl_recommendations_$taxonomy_name" );
+			}
+		}
+
+		// Set the task category.
+		\wp_set_post_terms( $post_id, $data['category'], 'prpl_recommendations_category' );
+
+		// Set the task provider.
+		\wp_set_post_terms( $post_id, $data['provider_id'], 'prpl_recommendations_provider' );
+
+		// Set the task parent.
+		if ( ! empty( $data['parent'] ) ) {
+			$parent = \get_post( $data['parent'] );
+			if ( $parent ) {
+				\wp_update_post(
+					[
+						'ID'          => $post_id,
+						'post_parent' => $parent->ID,
+					]
+				);
+			}
+		}
+
+		// Set other meta.
+		$default_keys = [
+			'title',
+			'description',
+			'status',
+			'category',
+			'provider_id',
+			'parent',
+			'order',
+		];
+		foreach ( $data as $key => $value ) {
+			if ( in_array( $key, $default_keys, true ) ) {
+				continue;
+			}
+
+			\update_post_meta( $post_id, "prpl_$key", $value );
+		}
+
+		return $post_id;
+	}
+
+	/**
 	 * Get recommendations, filtered by a parameter.
 	 *
 	 * @param array $params The parameters to filter by ([ 'provider' => 'provider_id' ] etc).
 	 *
 	 * @return array
 	 */
-	public function get_by_param( $params ) {
+	public function get_by_params( $params ) {
 		$args = [];
 
 		foreach ( $params as $param => $value ) {

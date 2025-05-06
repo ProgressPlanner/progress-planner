@@ -97,7 +97,7 @@ trait Task_Provider_Test_Trait {
 
 		// Add the task(s) to the suggested tasks.
 		foreach ( $tasks as $task ) {
-			$this->suggested_tasks->get_tasks_manager()->add_pending_task( $task );
+			\progress_planner()->get_cpt_recommendations()->add( $task );
 		}
 
 		// Verify that the task(s) are in the suggested tasks.

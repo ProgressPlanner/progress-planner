@@ -57,7 +57,7 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 		];
 
 		foreach ( $tasks_to_keep as $task ) {
-			$this->suggested_tasks->get_tasks_manager()->add_pending_task( $task );
+			\progress_planner()->get_cpt_recommendations()->add( $task );
 		}
 
 		// Tasks that should be removed.
@@ -73,7 +73,7 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 		];
 
 		foreach ( $tasks_to_remove as $task ) {
-			$this->suggested_tasks->get_tasks_manager()->add_pending_task( $task );
+			\progress_planner()->get_cpt_recommendations()->add( $task );
 		}
 
 		$this->suggested_tasks->get_tasks_manager()->cleanup_pending_tasks();

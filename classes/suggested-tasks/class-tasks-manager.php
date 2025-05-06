@@ -128,7 +128,7 @@ class Tasks_Manager {
 		}
 
 		// Inject tasks.
-		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
+		\add_action( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
 
 		// Add the onboarding task providers.
 		\add_filter( 'prpl_onboarding_task_providers', [ $this, 'add_onboarding_task_providers' ] );
@@ -201,13 +201,10 @@ class Tasks_Manager {
 	/**
 	 * Inject tasks.
 	 *
-	 * @param array $tasks The tasks.
-	 *
-	 * @return array
+	 * @return void
 	 */
-	public function inject_tasks( $tasks ) {
-		$provider_tasks  = [];
-		$tasks_to_inject = [];
+	public function inject_tasks() {
+		$provider_tasks = [];
 
 		// Loop through all registered task providers and inject their tasks.
 		foreach ( $this->task_providers as $provider_instance ) {
@@ -216,17 +213,16 @@ class Tasks_Manager {
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.
 		foreach ( $provider_tasks as $task ) {
-
+			// Get the task.
+			$tasks_from_db = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'task_id' => $task['task_id'] ] );
 			// Skip the task if it was completed.
-			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task['task_id'] ) ) {
+			if ( ! empty( $tasks_from_db ) && in_array( $tasks_from_db[0]['post_status'], [ 'pending_celebration', 'trash' ], true ) ) {
 				continue;
 			}
 
 			$tasks_to_inject[] = $task;
-			$this->add_pending_task( $task );
+			\progress_planner()->get_cpt_recommendations()->add( $task );
 		}
-
-		return \array_merge( $tasks, $tasks_to_inject );
 	}
 
 	/**
@@ -309,37 +305,6 @@ class Tasks_Manager {
 		$task_object = Task_Factory::create_task_from( 'id', $task_id );
 
 		return $task_object->get_data();
-	}
-
-	/**
-	 * Add a pending task.
-	 *
-	 * @param array $task The task data.
-	 *
-	 * @return bool
-	 */
-	public function add_pending_task( $task ) {
-		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-
-		$task_index = false;
-
-		foreach ( $tasks as $key => $_task ) {
-			if ( ! isset( $_task['task_id'] ) || $task['task_id'] !== $_task['task_id'] ) {
-				continue;
-			}
-			$task_index = $key;
-			break;
-		}
-
-		$task['status'] = 'pending';
-
-		if ( false !== $task_index ) {
-			$tasks[ $task_index ] = array_merge( $task, $tasks[ $task_index ] );
-		} else {
-			$tasks[] = $task;
-		}
-
-		return \progress_planner()->get_settings()->set( 'tasks', $tasks );
 	}
 
 	/**
