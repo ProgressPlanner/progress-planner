@@ -133,7 +133,6 @@ class Update_150 {
 
 		// Set other meta.
 		$default_keys = [
-			'task_id',
 			'title',
 			'description',
 			'status',

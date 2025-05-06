@@ -126,6 +126,16 @@ class CPT_Recommendations {
 					unset( $params[ $param ] );
 					break;
 
+				case 'task_id':
+					$args['meta_query']   = isset( $args['meta_query'] ) ? $args['meta_query'] : []; // phpcs:ignore WordPress.DB.SlowDBQuery
+					$args['meta_query'][] = [
+						'key'   => 'prpl_task_id',
+						'value' => $value,
+					];
+
+					unset( $params[ $param ] );
+					break;
+
 				default:
 					$args[ $param ] = $value;
 					break;
