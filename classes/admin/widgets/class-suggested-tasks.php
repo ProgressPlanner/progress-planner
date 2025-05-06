@@ -52,7 +52,7 @@ final class Suggested_Tasks extends Widget {
 	 */
 	public function enqueue_scripts() {
 		// Get tasks from task providers and pending_celebration tasks.
-		$tasks             = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
+		$tasks             = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'publish' ] );
 		$delay_celebration = false;
 
 		// Celebrate only on the Progress Planner Dashboard page.
@@ -92,7 +92,6 @@ final class Suggested_Tasks extends Widget {
 
 		$final_tasks = [];
 		foreach ( $tasks as $task ) {
-			$task['status']                  = $task['status'] ?? 'pending';
 			$final_tasks[ $task['task_id'] ] = $task;
 		}
 
@@ -118,7 +117,7 @@ final class Suggested_Tasks extends Widget {
 
 		$max_items_per_category = [];
 		foreach ( $final_tasks as $task ) {
-			$max_items_per_category[ $task['category'] ] = $task['category'] === ( new Content_Review() )->get_provider_category() ? 2 : 1;
+			$max_items_per_category[ $task['category']->term_id ] = $task['category'] === ( new Content_Review() )->get_provider_category() ? 2 : 1;
 		}
 
 		// We want to hide user tasks.
