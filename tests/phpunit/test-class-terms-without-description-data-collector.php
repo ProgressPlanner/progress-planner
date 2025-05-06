@@ -70,6 +70,18 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$this->assertNotWPError( $term_result );
 		$term_id = $term_result['term_id'];
 
+		// Create a post and assign the term to it.
+		$post_id = wp_insert_post(
+			[
+				'post_title'   => 'Test Post',
+				'post_content' => 'Test content',
+				'post_status'  => 'publish',
+				'post_type'    => 'post',
+			]
+		);
+		$this->assertNotWPError( $post_id );
+		wp_set_object_terms( $post_id, $term_id, 'category' );
+
 		// Get the data.
 		$this->data_collector->update_cache();
 		$result = $this->data_collector->collect();
@@ -79,6 +91,9 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$this->assertEquals( $term_id, $result['term_id'] );
 		$this->assertEquals( 'Test Category', $result['name'] );
 		$this->assertEquals( 'category', $result['taxonomy'] );
+
+		// Clean up.
+		wp_delete_post( $post_id );
 	}
 
 	/**
@@ -131,6 +146,18 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$this->assertNotWPError( $term_result );
 		$term_id = $term_result['term_id'];
 
+		// Create a post and assign the term to it.
+		$post_id = wp_insert_post(
+			[
+				'post_title'   => 'Test Post',
+				'post_content' => 'Test content',
+				'post_status'  => 'publish',
+				'post_type'    => 'post',
+			]
+		);
+		$this->assertNotWPError( $post_id );
+		wp_set_object_terms( $post_id, $term_id, 'category' );
+
 		// Get initial data.
 		$this->data_collector->update_cache();
 		$initial_result = $this->data_collector->collect();
@@ -151,6 +178,9 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 
 		// Assert that we got no results after update.
 		$this->assertNull( $updated_result );
+
+		// Clean up.
+		wp_delete_post( $post_id );
 	}
 
 	/**
@@ -161,6 +191,18 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$term_result = wp_insert_term( 'Test Category', 'category' );
 		$this->assertNotWPError( $term_result );
 		$term_id = $term_result['term_id'];
+
+		// Create a post and assign the term to it.
+		$post_id = wp_insert_post(
+			[
+				'post_title'   => 'Test Post',
+				'post_content' => 'Test content',
+				'post_status'  => 'publish',
+				'post_type'    => 'post',
+			]
+		);
+		$this->assertNotWPError( $post_id );
+		wp_set_object_terms( $post_id, $term_id, 'category' );
 
 		// Get initial data.
 		$this->data_collector->update_cache();
@@ -176,6 +218,9 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 
 		// Assert that we got no results after deletion.
 		$this->assertNull( $updated_result );
+
+		// Clean up.
+		wp_delete_post( $post_id );
 	}
 
 	/**
