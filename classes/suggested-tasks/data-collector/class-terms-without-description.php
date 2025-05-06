@@ -86,12 +86,16 @@ class Terms_Without_Description extends Base_Data_Collector {
 			unset( $public_taxonomies['product_shipping_class'] );
 		}
 
+		// Exclude the Uncategorized category.
+		$uncategorized_category_id = ( new Uncategorized_Category() )->collect();
+		$exclude_term_ids = $uncategorized_category_id ? [ $uncategorized_category_id ] : [];
+
 		/**
 		 * Array of term IDs to exclude from the terms without description query.
 		 *
 		 * @var array<int> $exclude_term_ids
 		 */
-		$exclude_term_ids = \apply_filters( 'progress_planner_terms_without_description_exclude_term_ids', [] );
+		$exclude_term_ids = \apply_filters( 'progress_planner_terms_without_description_exclude_term_ids', $exclude_term_ids );
 
 		// We only want to return the first found term.
 		$result = [];
