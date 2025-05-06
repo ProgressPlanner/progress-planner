@@ -44,7 +44,7 @@ class Archive_Date extends Yoast_Provider {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Yoast SEO can disable the date archive, which is really only useful for news sites and blogs. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-date-archive" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			'<a href="https://prpl.fyi/yoast-date-archive" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Date Archive', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		);
 	}
 
