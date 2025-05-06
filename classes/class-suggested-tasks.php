@@ -59,7 +59,7 @@ class Suggested_Tasks {
 			$this->update_pending_task( $task_data['task_id'], $task_data );
 
 			// Change the task status to pending celebration.
-			$this->mark_task_as( 'pending_celebration', $task_data['task_id'] );
+			\progress_planner()->get_cpt_recommendations()->update_recommendation( $task_data['ID'], [ 'post_status' => 'pending_celebration' ] );
 
 			// Insert an activity.
 			$this->insert_activity( $task_data['task_id'] );
@@ -128,7 +128,7 @@ class Suggested_Tasks {
 			return;
 		}
 
-		$this->mark_task_as( 'completed', $pending_tasks[0]['ID'] );
+		\progress_planner()->get_cpt_recommendations()->update_recommendation( $pending_tasks[0]['ID'], [ 'post_status' => 'trash' ] );
 
 		// Insert an activity.
 		$this->insert_activity( $pending_tasks[0]['ID'] );
@@ -185,15 +185,7 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_tasks_by( $param, $value ) {
-		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-		$tasks = array_filter(
-			$tasks,
-			function ( $task ) use ( $param, $value ) {
-				return isset( $task[ $param ] ) && $task[ $param ] === $value;
-			}
-		);
-
-		return array_values( $tasks );
+		return \progress_planner()->get_cpt_recommendations()->get_by_params( [ $param => $value ] );
 	}
 
 	/**
@@ -204,19 +196,13 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function delete_task( $task_id ) {
-		$tasks    = \progress_planner()->get_settings()->get( 'tasks', [] );
-		$modified = false;
-		foreach ( $tasks as $key => $task ) {
-			if ( $task['task_id'] === $task_id ) {
-				unset( $tasks[ $key ] );
-				$modified = true;
-				break;
-			}
+		$tasks   = \progress_planner()->get_cpt_recommendations()->get( [ 'task_id' => $task_id ] );
+		$deleted = false;
+		foreach ( $tasks as $task ) {
+			$deleted = \progress_planner()->get_cpt_recommendations()->delete_recommendation( $task['ID'] );
 		}
 
-		return $modified
-			? \progress_planner()->get_settings()->set( 'tasks', $tasks )
-			: false;
+		return $deleted;
 	}
 
 	/**
@@ -265,41 +251,9 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Remove a task from a given status (sets it as `pending`).
-	 *
-	 * @param string $status The status.
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool
-	 */
-	public function remove_task_from( $status, $task_id ) {
-		$tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
-		$tasks_changed = false;
-
-		foreach ( $tasks as $key => $task ) {
-			if ( $task['task_id'] !== $task_id ) {
-				continue;
-			}
-
-			if ( ! isset( $task['status'] ) || $task['status'] !== $status ) {
-				return false;
-			}
-
-			$tasks[ $key ]['status'] = 'pending';
-			$tasks_changed           = true;
-		}
-
-		if ( ! $tasks_changed ) {
-			return false;
-		}
-
-		return \progress_planner()->get_settings()->set( 'tasks', $tasks );
-	}
-
-	/**
 	 * Mark a task as snoozed.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param int    $task_id  The task post-ID.
 	 * @param string $duration The duration.
 	 *
 	 * @return bool
@@ -332,7 +286,13 @@ class Suggested_Tasks {
 				break;
 		}
 
-		return $this->mark_task_as( 'snoozed', $task_id, [ 'time' => $time ] );
+		return \progress_planner()->get_cpt_recommendations()->update_recommendation(
+			$task_id,
+			[
+				'post_status' => 'future',
+				'post_date'   => \DateTime::createFromFormat( 'U', strval( \time() + $time ) )->format( 'Y-m-d H:i:s' ),
+			]
+		);
 	}
 
 	/**
@@ -444,30 +404,37 @@ class Suggested_Tasks {
 		$action  = \sanitize_text_field( \wp_unslash( $_POST['action_type'] ) );
 		$task_id = (string) \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) );
 
+		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'task_id' => $task_id ] );
+		$task  = $tasks[0] ?? null;
+
+		if ( ! $task ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
+		}
+
 		switch ( $action ) {
 			case 'complete':
 				// Mark the task as completed.
-				$this->mark_task_as( 'completed', $task_id );
+				\progress_planner()->get_cpt_recommendations()->update_recommendation( $task['ID'], [ 'post_status' => 'trash' ] );
 
 				// Insert an activity.
-				$this->insert_activity( $task_id );
+				$this->insert_activity( $task['ID'] );
 				$updated = true;
 				break;
 
 			case 'pending':
-				$this->mark_task_as( 'pending', $task_id );
+				\progress_planner()->get_cpt_recommendations()->update_recommendation( $task['ID'], [ 'post_status' => 'publish' ] );
 				$updated = true;
-				$this->delete_activity( $task_id );
+				$this->delete_activity( $task['ID'] );
 				break;
 
 			case 'snooze':
 				$duration = isset( $_POST['duration'] ) ? \sanitize_text_field( \wp_unslash( $_POST['duration'] ) ) : '';
-				$updated  = $this->snooze_task( $task_id, $duration );
+				$updated  = $this->snooze_task( $task['ID'], $duration );
 				break;
 
 			case 'delete':
-				$updated = $this->delete_task( $task_id );
-				$this->delete_activity( $task_id );
+				$updated = $this->delete_task( $task['ID'] );
+				$this->delete_activity( $task['ID'] );
 				break;
 
 			default:

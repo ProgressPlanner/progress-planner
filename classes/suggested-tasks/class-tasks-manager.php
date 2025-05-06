@@ -321,33 +321,14 @@ class Tasks_Manager {
 			return;
 		}
 
-		$tasks = (array) \progress_planner()->get_settings()->get( 'tasks', [] );
+		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'publish' ] );
 
-		if ( empty( $tasks ) ) {
-			return;
-		}
-
-		$task_count = count( $tasks );
-
-		$tasks = \array_filter(
-			$tasks,
-			function ( $task ) {
-
-				if ( 'pending' === $task['status'] && isset( $task['date'] ) ) {
-					return (string) \gmdate( 'YW' ) === (string) $task['date'];
-				}
-
-				// We have changed provider_id name, so we need to remove all tasks of the old provider_id.
-				if ( isset( $task['provider_id'] ) && 'update-post' === $task['provider_id'] ) {
-					return false;
-				}
-
-				return true;
+		foreach ( $tasks as $task ) {
+			if ( \gmdate( 'YW' ) === (string) $task['date'] ) {
+				continue;
 			}
-		);
 
-		if ( count( $tasks ) !== $task_count ) {
-			\progress_planner()->get_settings()->set( 'tasks', array_values( $tasks ) );
+			\progress_planner()->get_cpt_recommendations()->delete_recommendation( $task['ID'] );
 		}
 
 		\progress_planner()->get_utils__cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );

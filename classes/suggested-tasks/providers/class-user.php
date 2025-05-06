@@ -48,21 +48,7 @@ class User extends Tasks {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-
-		$tasks       = [];
-		$saved_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-		foreach ( $saved_tasks as $task_data ) {
-			if ( isset( $task_data['provider_id'] ) && self::PROVIDER_ID === $task_data['provider_id'] ) {
-				$tasks[] = [
-					'task_id'     => $task_data['task_id'],
-					'provider_id' => $this->get_provider_id(),
-					'category'    => $this->get_provider_category(),
-					'points'      => 0,
-				];
-			}
-		}
-
-		return $tasks;
+		return \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'provider_id' => self::PROVIDER_ID ] );
 	}
 
 	/**
@@ -74,33 +60,7 @@ class User extends Tasks {
 	 */
 	public function get_task_details( $task_id = '' ) {
 		// Get the user tasks from the database.
-		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-
-		foreach ( $tasks as $task ) {
-			if ( $task['task_id'] !== $task_id ) {
-				continue;
-			}
-
-			return wp_parse_args(
-				$task,
-				[
-					'task_id'      => '',
-					'title'        => '',
-					'parent'       => 0,
-					'provider_id'  => 'user',
-					'category'     => 'user',
-					'priority'     => 'medium',
-					'points'       => 0,
-					'url'          => '',
-					'url_target'   => '_self',
-					'description'  => '',
-					'link_setting' => [],
-					'dismissable'  => true,
-					'snoozable'    => false,
-				]
-			);
-		}
-
-		return [];
+		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'task_id' => $task_id ] );
+		return empty( $tasks ) ? [] : $tasks[0];
 	}
 }
