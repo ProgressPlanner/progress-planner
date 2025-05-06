@@ -75,7 +75,7 @@ class Orphaned_Content_Workout extends Tasks {
 	 * @return string
 	 */
 	public function get_title( $task_id = '' ) {
-		return \esc_html__( 'Do Yoast SEO\'s Orphaned Content Workout', 'progress-planner' );
+		return \esc_html__( 'Yoast SEO: do Yoast SEO\'s Orphaned Content Workout', 'progress-planner' );
 	}
 
 	/**
