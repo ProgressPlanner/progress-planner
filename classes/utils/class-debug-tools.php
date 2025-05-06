@@ -181,7 +181,7 @@ class Debug_Tools {
 			]
 		);
 
-		$onboard_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', [] );
+		$onboard_task_provider_ids = \apply_filters( 'prpl_onboarding_task_providers', [] );
 
 		foreach ( $onboard_task_provider_ids as $task_provider_id ) {
 			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject

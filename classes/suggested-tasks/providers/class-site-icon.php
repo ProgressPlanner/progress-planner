@@ -13,6 +13,13 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 class Site_Icon extends Tasks {
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected const IS_ONBOARDING_TASK = true;
+
+	/**
 	 * The provider ID.
 	 *
 	 * @var string

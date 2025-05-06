@@ -15,6 +15,13 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Hello_World as Hello_World_D
 class Hello_World extends Tasks {
 
 	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected const IS_ONBOARDING_TASK = true;
+
+	/**
 	 * The provider ID.
 	 *
 	 * @var string
