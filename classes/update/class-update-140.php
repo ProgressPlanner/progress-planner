@@ -23,6 +23,7 @@ class Update_140 {
 	 */
 	public function run() {
 		$this->rename_tasks_option();
+		$this->delete_word_count_option();
 	}
 
 	/**
@@ -51,5 +52,14 @@ class Update_140 {
 
 		// Delete the old tasks option.
 		\progress_planner()->get_settings()->delete( 'local_tasks' );
+	}
+
+	/**
+	 * Delete the word count option.
+	 *
+	 * @return void
+	 */
+	private function delete_word_count_option() {
+		\progress_planner()->get_settings()->delete( 'word_count' );
 	}
 }
