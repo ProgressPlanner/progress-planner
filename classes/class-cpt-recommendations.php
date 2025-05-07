@@ -533,4 +533,21 @@ class CPT_Recommendations {
 
 		\progress_planner()->get_activities__query()->delete_activity( $activity[0] );
 	}
+
+	/**
+	 * Check if a task was completed. Task is considered completed if it was completed or pending celebration.
+	 *
+	 * @param string|int $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function was_task_completed( $task_id ) {
+		$task = \progress_planner()->get_cpt_recommendations()->get(
+			\is_numeric( $task_id )
+				? [ 'ID' => $task_id ]
+				: [ 'task_id' => $task_id ]
+		);
+		return isset( $task['post_status'] ) &&
+			in_array( $task['post_status'], [ 'trash', 'pending_celebration' ], true );
+	}
 }

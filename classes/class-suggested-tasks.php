@@ -314,19 +314,6 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Check if a task was completed. Task is considered completed if it was completed or pending celebration.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool
-	 */
-	public function was_task_completed( $task_id ) {
-		$task = \progress_planner()->get_cpt_recommendations()->get( [ 'ID' => $task_id ] );
-		return isset( $task['post_status'] ) &&
-			in_array( $task['post_status'], [ 'trash', 'pending_celebration' ], true );
-	}
-
-	/**
 	 * Update a task.
 	 *
 	 * @param string $task_id The task ID.
@@ -410,14 +397,5 @@ class Suggested_Tasks {
 		}
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
-	}
-
-	/**
-	 * Delete all tasks.
-	 *
-	 * @return void
-	 */
-	public function delete_all_tasks() {
-		\progress_planner()->get_cpt_recommendations()->delete_all_recommendations();
 	}
 }
