@@ -81,15 +81,15 @@ function todoReorderTests( testContext = test ) {
 
 			// Verify initial order
 			const items = await todoItems.all();
-			await expect( items[ 0 ].locator( 'h3 > span' ) ).toHaveText(
-				FIRST_TASK_TEXT
-			);
-			await expect( items[ 1 ].locator( 'h3 > span' ) ).toHaveText(
-				SECOND_TASK_TEXT
-			);
-			await expect( items[ 2 ].locator( 'h3 > span' ) ).toHaveText(
-				THIRD_TASK_TEXT
-			);
+			await expect(
+				items[ 0 ].locator( 'h3 > label > span' )
+			).toHaveText( FIRST_TASK_TEXT );
+			await expect(
+				items[ 1 ].locator( 'h3 > label > span' )
+			).toHaveText( SECOND_TASK_TEXT );
+			await expect(
+				items[ 2 ].locator( 'h3 > label > span' )
+			).toHaveText( THIRD_TASK_TEXT );
 
 			// Hover over second item and click move down button
 			await items[ 1 ].hover();
@@ -101,13 +101,13 @@ function todoReorderTests( testContext = test ) {
 			// Verify new order
 			const reorderedItems = await todoItems.all();
 			await expect(
-				reorderedItems[ 0 ].locator( 'h3 > span' )
+				reorderedItems[ 0 ].locator( 'h3 > label > span' )
 			).toHaveText( FIRST_TASK_TEXT );
 			await expect(
-				reorderedItems[ 1 ].locator( 'h3 > span' )
+				reorderedItems[ 1 ].locator( 'h3 > label > span' )
 			).toHaveText( THIRD_TASK_TEXT );
 			await expect(
-				reorderedItems[ 2 ].locator( 'h3 > span' )
+				reorderedItems[ 2 ].locator( 'h3 > label > span' )
 			).toHaveText( SECOND_TASK_TEXT );
 
 			// Reload page
@@ -117,13 +117,13 @@ function todoReorderTests( testContext = test ) {
 			// Verify order persists after reload
 			const persistedItems = await todoItems.all();
 			await expect(
-				persistedItems[ 0 ].locator( 'h3 > span' )
+				persistedItems[ 0 ].locator( 'h3 > label > span' )
 			).toHaveText( FIRST_TASK_TEXT );
 			await expect(
-				persistedItems[ 1 ].locator( 'h3 > span' )
+				persistedItems[ 1 ].locator( 'h3 > label > span' )
 			).toHaveText( THIRD_TASK_TEXT );
 			await expect(
-				persistedItems[ 2 ].locator( 'h3 > span' )
+				persistedItems[ 2 ].locator( 'h3 > label > span' )
 			).toHaveText( SECOND_TASK_TEXT );
 		} );
 	} );
