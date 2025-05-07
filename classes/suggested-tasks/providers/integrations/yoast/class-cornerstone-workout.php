@@ -66,6 +66,46 @@ class Cornerstone_Workout extends Tasks {
 	 */
 	public function init() {
 		$this->init_dismissable_task();
+
+		// Hook into update_option.
+		\add_action( 'update_option_wpseo_premium', [ $this, 'maybe_update_workout_status' ], 10, 3 );
+	}
+
+	/**
+	 * Maybe update the workout status.
+	 *
+	 * @param mixed  $old_value The old value.
+	 * @param mixed  $value The new value.
+	 * @param string $option The option name.
+	 *
+	 * @return void
+	 */
+	public function maybe_update_workout_status( $old_value, $value, $option ) {
+		if ( 'wpseo_premium' !== $option || ! isset( $value['workouts']['cornerstone'] ) || ! isset( $old_value['workouts']['cornerstone'] ) ) {
+			return;
+		}
+
+		// Check if there is pending task.
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $this->get_task_id() );
+
+		// If there is no pending task, return.
+		if ( empty( $tasks ) || 'pending' !== $tasks[0]['status'] ) {
+			return;
+		}
+
+		// For this type of task only the provider ID is needed, but just in case.
+		if ( $this->is_task_dismissed( $tasks[0] ) ) {
+			return;
+		}
+
+		// There should be 3 steps in the workout.
+		$workout_was_completed = 3 === count( $old_value['workouts']['cornerstone']['finishedSteps'] );
+		$workout_completed     = 3 === count( $value['workouts']['cornerstone']['finishedSteps'] );
+
+		// Dismiss the task if workout wasn't completed before and now is.
+		if ( ! $workout_was_completed && $workout_completed ) {
+			$this->handle_task_dismissal( $this->get_task_id() );
+		}
 	}
 
 	/**
@@ -90,7 +130,7 @@ class Cornerstone_Workout extends Tasks {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Run the Yoast SEO Cornerstone Content Workout to improve your site\'s SEO. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-cornerstone" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			'<a href="https://prpl.fyi/yoast-cornerstone" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Cornerstone Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		);
 	}
 
