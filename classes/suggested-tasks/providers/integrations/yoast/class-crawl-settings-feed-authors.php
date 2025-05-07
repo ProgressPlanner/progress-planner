@@ -49,7 +49,7 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	 * @return string
 	 */
 	public function get_title() {
-		return \esc_html__( 'Yoast SEO: Remove post authors feeds', 'progress-planner' );
+		return \esc_html__( 'Yoast SEO: remove post authors feeds', 'progress-planner' );
 	}
 
 	/**
