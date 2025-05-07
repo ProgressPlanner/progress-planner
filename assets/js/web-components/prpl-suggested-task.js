@@ -256,7 +256,7 @@ customElements.define(
 				${ actionButtons.completeCheckbox }
 				<h3 style="width: 100%;">
 					${
-						useCheckbox && dismissable
+						useCheckbox
 							? `<label for="prpl-suggested-task-checkbox-${ task_id }">`
 							: ''
 					}
