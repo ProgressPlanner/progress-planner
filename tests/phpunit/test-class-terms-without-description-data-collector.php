@@ -70,17 +70,28 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$this->assertNotWPError( $term_result );
 		$term_id = $term_result['term_id'];
 
-		// Create a post and assign the term to it.
-		$post_id = wp_insert_post(
+		// Create two posts and assign the term to them.
+		$post_id1 = wp_insert_post(
 			[
-				'post_title'   => 'Test Post',
-				'post_content' => 'Test content',
+				'post_title'   => 'Test Post 1',
+				'post_content' => 'Test content 1',
 				'post_status'  => 'publish',
 				'post_type'    => 'post',
 			]
 		);
-		$this->assertNotWPError( $post_id );
-		wp_set_object_terms( $post_id, $term_id, 'category' );
+		$this->assertNotWPError( $post_id1 );
+		wp_set_object_terms( $post_id1, $term_id, 'category' );
+
+		$post_id2 = wp_insert_post(
+			[
+				'post_title'   => 'Test Post 2',
+				'post_content' => 'Test content 2',
+				'post_status'  => 'publish',
+				'post_type'    => 'post',
+			]
+		);
+		$this->assertNotWPError( $post_id2 );
+		wp_set_object_terms( $post_id2, $term_id, 'category' );
 
 		// Get the data.
 		$this->data_collector->update_cache();
@@ -93,7 +104,8 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$this->assertEquals( 'category', $result['taxonomy'] );
 
 		// Clean up.
-		wp_delete_post( $post_id );
+		wp_delete_post( $post_id1 );
+		wp_delete_post( $post_id2 );
 	}
 
 	/**
@@ -147,16 +159,27 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$term_id = $term_result['term_id'];
 
 		// Create a post and assign the term to it.
-		$post_id = wp_insert_post(
+		$post_id1 = wp_insert_post(
 			[
-				'post_title'   => 'Test Post',
-				'post_content' => 'Test content',
+				'post_title'   => 'Test Post 1',
+				'post_content' => 'Test content 1',
 				'post_status'  => 'publish',
 				'post_type'    => 'post',
 			]
 		);
-		$this->assertNotWPError( $post_id );
-		wp_set_object_terms( $post_id, $term_id, 'category' );
+		$this->assertNotWPError( $post_id1 );
+		wp_set_object_terms( $post_id1, $term_id, 'category' );
+
+		$post_id2 = wp_insert_post(
+			[
+				'post_title'   => 'Test Post 2',
+				'post_content' => 'Test content 2',
+				'post_status'  => 'publish',
+				'post_type'    => 'post',
+			]
+		);
+		$this->assertNotWPError( $post_id2 );
+		wp_set_object_terms( $post_id2, $term_id, 'category' );
 
 		// Get initial data.
 		$this->data_collector->update_cache();
@@ -180,7 +203,8 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$this->assertNull( $updated_result );
 
 		// Clean up.
-		wp_delete_post( $post_id );
+		wp_delete_post( $post_id1 );
+		wp_delete_post( $post_id2 );
 	}
 
 	/**
@@ -193,16 +217,27 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$term_id = $term_result['term_id'];
 
 		// Create a post and assign the term to it.
-		$post_id = wp_insert_post(
+		$post_id1 = wp_insert_post(
 			[
-				'post_title'   => 'Test Post',
-				'post_content' => 'Test content',
+				'post_title'   => 'Test Post 1',
+				'post_content' => 'Test content 1',
 				'post_status'  => 'publish',
 				'post_type'    => 'post',
 			]
 		);
-		$this->assertNotWPError( $post_id );
-		wp_set_object_terms( $post_id, $term_id, 'category' );
+		$this->assertNotWPError( $post_id1 );
+		wp_set_object_terms( $post_id1, $term_id, 'category' );
+
+		$post_id2 = wp_insert_post(
+			[
+				'post_title'   => 'Test Post 2',
+				'post_content' => 'Test content 2',
+				'post_status'  => 'publish',
+				'post_type'    => 'post',
+			]
+		);
+		$this->assertNotWPError( $post_id2 );
+		wp_set_object_terms( $post_id2, $term_id, 'category' );
 
 		// Get initial data.
 		$this->data_collector->update_cache();
@@ -220,7 +255,8 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$this->assertNull( $updated_result );
 
 		// Clean up.
-		wp_delete_post( $post_id );
+		wp_delete_post( $post_id1 );
+		wp_delete_post( $post_id2 );
 	}
 
 	/**
