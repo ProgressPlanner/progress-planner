@@ -142,7 +142,7 @@ class Cornerstone_Workout extends Tasks {
 	 * @return string
 	 */
 	public function get_url( $task_id = '' ) {
-		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts' ) ) : '';
+		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) ) : '';
 	}
 
 	/**
@@ -151,7 +151,7 @@ class Cornerstone_Workout extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( ! function_exists( 'YoastSEO' ) ) {
+		if ( ! defined( 'WPSEO_PREMIUM_VERSION' ) ) {
 			return false;
 		}
 
