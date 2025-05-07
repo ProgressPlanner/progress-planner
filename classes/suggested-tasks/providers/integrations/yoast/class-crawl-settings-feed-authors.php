@@ -61,7 +61,7 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Remove URLs which provide information about recent posts by specific authors. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-crawl-optimization-feed-authors" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			'<a href="https://prpl.fyi/yoast-crawl-optimization-feed-authors" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Crawl Optimization Feed Authors', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		);
 	}
 
