@@ -165,7 +165,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 
 		return \sprintf(
 			/* translators: %s: The term name */
-			\esc_html__( 'Remove %s term', 'progress-planner' ),
+			\esc_html__( 'Remove term named "%s"', 'progress-planner' ),
 			\esc_html( $task_data[0]['term_name'] )
 		);
 	}
@@ -185,10 +185,10 @@ class Remove_Terms_Without_Posts extends Tasks {
 		}
 
 		return sprintf(
-			/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/remove-term" target="_blank">Read more</a> link */
-			\esc_html__( 'The %1$s term has one or less posts associated with it, we recommend removing it. %2$s', 'progress-planner' ),
+			/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/remove-empty-taxonomy/" target="_blank">Read more</a> link */
+			\esc_html__( 'The "%1$s" term has one or less posts associated with it, we recommend removing it. %2$s', 'progress-planner' ),
 			$term->name,
-			'<a href="https://prpl.fyi/remove-term" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			'<a href="https://prpl.fyi/remove-empty-taxonomy/" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the removing the empty terms', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		);
 	}
 
