@@ -83,8 +83,16 @@ final class Suggested_Tasks extends Widget {
 							$tasks[] = $task_details;
 						}
 
+						$task_post = \progress_planner()->get_cpt_recommendations()->get_post( $task_id );
+						if ( ! $task_post ) {
+							continue;
+						}
+
 						// Mark the pending celebration tasks as completed.
-						\progress_planner()->get_cpt_recommendations()->update_recommendation( (int) $task_id, [ 'post_status' => 'trash' ] );
+						\progress_planner()->get_cpt_recommendations()->update_recommendation(
+							$task_post['ID'],
+							[ 'post_status' => 'trash' ]
+						);
 					}
 				}
 			}

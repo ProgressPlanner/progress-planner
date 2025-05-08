@@ -542,12 +542,24 @@ class CPT_Recommendations {
 	 * @return bool
 	 */
 	public function was_task_completed( $task_id ) {
-		$task = \progress_planner()->get_cpt_recommendations()->get(
-			\is_numeric( $task_id )
-				? [ 'ID' => $task_id ]
-				: [ 'task_id' => $task_id ]
+		$task = $this->get_post( $task_id );
+		return $task && in_array( $task['post_status'], [ 'trash', 'pending_celebration' ], true );
+	}
+
+	/**
+	 * Get the post-ID of a recommendation.
+	 *
+	 * @param string|int $id The recommendation ID. Can be a task-ID or a post-ID.
+	 *
+	 * @return array|false The recommendation post or false if not found.
+	 */
+	public function get_post( $id ) {
+		$posts = $this->get_by_params(
+			is_numeric( $id )
+				? [ 'ID' => $id ]
+				: [ 'task_id' => $id ]
 		);
-		return isset( $task['post_status'] ) &&
-			in_array( $task['post_status'], [ 'trash', 'pending_celebration' ], true );
+
+		return isset( $posts[0] ) ? $posts[0] : false;
 	}
 }

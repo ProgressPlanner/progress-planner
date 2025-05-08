@@ -57,7 +57,11 @@ class Suggested_Tasks {
 			$this->update_pending_task( $task_data['task_id'], $task_data );
 
 			// Change the task status to pending celebration.
-			\progress_planner()->get_cpt_recommendations()->update_recommendation( $task_data['ID'], [ 'post_status' => 'pending_celebration' ] );
+			$task_post = \progress_planner()->get_cpt_recommendations()->get_post( $task_data['task_id'] );
+			if ( ! $task_post ) {
+				continue;
+			}
+			\progress_planner()->get_cpt_recommendations()->update_recommendation( $task_post['ID'], [ 'post_status' => 'pending_celebration' ] );
 
 			// Insert an activity.
 			\progress_planner()->get_cpt_recommendations()->insert_activity( $task_data['task_id'] );
@@ -105,8 +109,6 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_tasks() {
-		$tasks = [];
-
 		\do_action( 'progress_planner_suggested_tasks_items' );
 
 		return \progress_planner()->get_cpt_recommendations()->get( [ 'post_status' => 'any' ] );
@@ -152,13 +154,11 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function delete_task( $task_id ) {
-		$tasks   = \progress_planner()->get_cpt_recommendations()->get( [ 'task_id' => $task_id ] );
-		$deleted = false;
-		foreach ( $tasks as $task ) {
-			$deleted = \progress_planner()->get_cpt_recommendations()->delete_recommendation( $task['ID'] );
+		$task_post = \progress_planner()->get_cpt_recommendations()->get_post( $task_id );
+		if ( ! $task_post ) {
+			return false;
 		}
-
-		return $deleted;
+		return \progress_planner()->get_cpt_recommendations()->delete_recommendation( $task_post['ID'] );
 	}
 
 	/**
@@ -215,6 +215,10 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function snooze_task( $task_id, $duration ) {
+		$task_post = \progress_planner()->get_cpt_recommendations()->get_post( $task_id );
+		if ( ! $task_post ) {
+			return false;
+		}
 
 		switch ( $duration ) {
 			case '1-month':
@@ -243,7 +247,7 @@ class Suggested_Tasks {
 		}
 
 		return \progress_planner()->get_cpt_recommendations()->update_recommendation(
-			$task_id,
+			$task_post['ID'],
 			[
 				'post_status' => 'future',
 				'post_date'   => \DateTime::createFromFormat( 'U', strval( \time() + $time ) )->format( 'Y-m-d H:i:s' ),
@@ -322,11 +326,11 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function update_pending_task( $task_id, $data ) {
-		$tasks = \progress_planner()->get_cpt_recommendations()->get( [ 'ID' => $task_id ] );
-		$task  = isset( $tasks[0] ) ? $tasks[0] : null;
-		return $task
-			? \progress_planner()->get_cpt_recommendations()->update_recommendation( (int) $task_id, $data )
-			: false;
+		$task_post = \progress_planner()->get_cpt_recommendations()->get_post( $task_id );
+		if ( ! $task_post ) {
+			return false;
+		}
+		return \progress_planner()->get_cpt_recommendations()->update_recommendation( $task_post['ID'], $data );
 	}
 
 	/**
@@ -346,9 +350,7 @@ class Suggested_Tasks {
 
 		$action  = \sanitize_text_field( \wp_unslash( $_POST['action_type'] ) );
 		$task_id = (string) \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) );
-
-		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'task_id' => $task_id ] );
-		$task  = $tasks[0] ?? null;
+		$task    = \progress_planner()->get_cpt_recommendations()->get_post( $task_id );
 
 		if ( ! $task ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );

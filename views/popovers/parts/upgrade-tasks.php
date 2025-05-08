@@ -50,8 +50,7 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 				'category'    => $prpl_task_provider->get_provider_category(),
 			];
 
-			$prpl_tasks          = \progress_planner()->get_cpt_recommendations()->get( [ 'task_id' => $prpl_task_data['task_id'] ] );
-			$prpl_task           = $prpl_tasks[0] ?? null;
+			$prpl_task           = \progress_planner()->get_cpt_recommendations()->get_post( $prpl_task_data['task_id'] );
 			$prpl_task_completed = $prpl_task_provider->evaluate_task( $prpl_task_data['task_id'] );
 			$prpl_task_details   = $prpl_task_provider->get_task_details();
 

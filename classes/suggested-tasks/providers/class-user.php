@@ -60,7 +60,7 @@ class User extends Tasks {
 	 */
 	public function get_task_details( $task_id = '' ) {
 		// Get the user tasks from the database.
-		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'task_id' => $task_id ] );
-		return empty( $tasks ) ? [] : $tasks[0];
+		$task_post = \progress_planner()->get_cpt_recommendations()->get_post( $task_id );
+		return $task_post ? $task_post : [];
 	}
 }

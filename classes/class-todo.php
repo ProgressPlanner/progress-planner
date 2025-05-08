@@ -123,12 +123,12 @@ class Todo {
 
 		// If the task ID is set, we're updating an existing task.
 		if ( $task_id ) {
-			$task = \progress_planner()->get_cpt_recommendations()->get( [ 'ID' => $task_id ] );
+			$task = \progress_planner()->get_cpt_recommendations()->get_post( $task_id );
 			if ( ! $task ) {
 				\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
 			}
 
-			\progress_planner()->get_cpt_recommendations()->update_recommendation( $task_id, [ 'post_title' => $title ] );
+			\progress_planner()->get_cpt_recommendations()->update_recommendation( $task['ID'], [ 'post_title' => $title ] );
 			return;
 		}
 

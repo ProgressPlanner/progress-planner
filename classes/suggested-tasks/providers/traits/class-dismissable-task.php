@@ -55,14 +55,12 @@ trait Dismissable_Task {
 		}
 
 		// Get the task data.
-		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'task_id' => $task_id ] );
+		$task_data = \progress_planner()->get_cpt_recommendations()->get_post( $task_id );
 
 		// If no task data is found, return.
-		if ( empty( $tasks ) ) {
+		if ( ! $task_data ) {
 			return;
 		}
-
-		$task_data = $tasks[0];
 
 		// If the task provider ID does not match, return.
 		if ( ! isset( $task_data['provider_id'] ) || $this->get_provider_id() !== $task_data['provider_id'] ) {
