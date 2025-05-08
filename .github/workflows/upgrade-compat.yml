@@ -60,13 +60,6 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Node.js & Playwright
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-      - run: npm install -D @playwright/test
-      - run: npx playwright install --with-deps
-
       - name: Complete WordPress installation
         run: |
           echo "Installing WordPress at: $WORDPRESS_URL"
