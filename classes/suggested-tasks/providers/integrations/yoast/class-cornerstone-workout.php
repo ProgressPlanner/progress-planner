@@ -130,7 +130,7 @@ class Cornerstone_Workout extends Tasks {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Improve your most important pages with Yoast SEO\'s Cornerstone Content Workout. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-cornerstone" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Cornerstone Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Learn more', 'progress-planner' ) . '</a>'
+			'<a href="https://prpl.fyi/yoast-cornerstone" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Learn more about the Yoast SEO Cornerstone Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Learn more', 'progress-planner' ) . '</a>'
 		);
 	}
 

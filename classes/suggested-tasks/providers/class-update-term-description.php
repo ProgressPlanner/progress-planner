@@ -176,10 +176,10 @@ class Update_Term_Description extends Tasks {
 		}
 
 		return sprintf(
-			/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/update-term-description" target="_blank">Read more</a> link */
+			/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/taxonomy-terms-description/" target="_blank">Read more</a> link */
 			\esc_html__( 'Your "%1$s" archives probably show the description of that specific term. %2$s', 'progress-planner' ),
 			$term->name,
-			'<a href="https://prpl.fyi/update-term-description" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			'<a href="https://prpl.fyi/taxonomy-terms-description/" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the writing a description for taxonomy terms.', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		);
 	}
 
