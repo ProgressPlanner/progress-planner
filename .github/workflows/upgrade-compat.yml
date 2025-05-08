@@ -1,4 +1,4 @@
-name: Progress Planner Playwright Tests
+name: Progress Planner Update & Compatibility Tests
 
 env:
   WORDPRESS_URL: http://localhost:8080
@@ -10,7 +10,8 @@ env:
   WORDPRESS_DB_PASSWORD: wppass
   WORDPRESS_DB_NAME: wordpress
   WORDPRESS_DB_PORT: 3307 # So it can run locally (hopefully).
-  PRPL_TEST_TOKEN: 0220a2de67fc29094281088395939f58
+  PLUGIN_REPO: ProgressPlanner/progress-planner
+
 
 on:
   push:
@@ -77,13 +78,6 @@ jobs:
           -d "admin_email=$WORDPRESS_ADMIN_EMAIL" \
           -d "public=1"
 
-      # - name: Install necessary dependencies in WordPress container
-      #   run: |
-      #     docker exec $(docker ps -qf "name=wordpress") apt-get update
-      #     docker exec $(docker ps -qf "name=wordpress") apt-get install -y \
-      #       php php-cli php-mysql php-curl php-xml php-mbstring php-zip curl \
-      #       libnss3 libxss1 libasound2 libatk-bridge2.0-0 libgtk-3-0 libgbm-dev libwoff1
-
       - name: Install and activate plugin
         run: |
           # Install WP-CLI
@@ -94,40 +88,23 @@ jobs:
           # Create the plugins directory in the WordPress container
           docker exec $(docker ps -qf "name=wordpress") mkdir -p /var/www/html/wp-content/plugins
 
-          # Copy plugin files to WordPress plugins directory
-          docker cp . $(docker ps -qf "name=wordpress"):/var/www/html/wp-content/plugins/progress-planner
+          # Clone the plugin's repository (old version) directly into the WordPress plugins directory
+          docker exec $(docker ps -qf "name=wordpress") git clone --branch v1.1.0 https://github.com/${{ env.PLUGIN_REPO }}.git /var/www/html/wp-content/plugins/progress-planner
 
           # Activate the plugin using WP-CLI
           docker exec $(docker ps -qf "name=wordpress") wp plugin activate progress-planner --allow-root
 
-          # Enable debug mode
-          docker exec $(docker ps -qf "name=wordpress") wp option update prpl_debug true --allow-root
+          # Echo version of the plugin
+          docker exec $(docker ps -qf "name=wordpress") wp option get progress_planner_settings --allow-root
 
-          # Insert test token
-          docker exec $(docker ps -qf "name=wordpress") wp option update progress_planner_test_token $PRPL_TEST_TOKEN --allow-root
+          # Overwrite the plugin files with the latest version
+          docker cp . $(docker ps -qf "name=wordpress"):/var/www/html/wp-content/plugins/progress-planner
+
+          # Echo version of the updated plugin
+          docker exec $(docker ps -qf "name=wordpress") wp option get progress_planner_settings --allow-root
 
           # Install Yoast SEO
           docker exec $(docker ps -qf "name=wordpress") wp plugin install wordpress-seo --activate --allow-root
 
-      # - name: Wait for WordPress to be ready
-      #   run: |
-      #     echo "Waiting for WordPress to be ready..."
-      #     sleep 30  # Adjust if necessary based on the container startup time
-
-      - name: Run Playwright Tests
-        run: npx playwright test tests/e2e/
-
-      - name: Upload Playwright Report
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report/
-
-      - name: Upload Playwright screenshots as artifacts
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-screenshots
-          path: |
-            onboarding-failed.png  # Specify the path of the screenshot you want to upload
+          # Install Comment Experience
+          docker exec $(docker ps -qf "name=wordpress") wp plugin install yoast-comment-experience --activate --allow-root
