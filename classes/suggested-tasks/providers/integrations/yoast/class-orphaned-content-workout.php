@@ -129,7 +129,7 @@ class Orphaned_Content_Workout extends Tasks {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Improve your internal linking structure with Yoast SEO\'s Orphaned Content Workout. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/run-orphaned-content-workout/" target="_blank"  data-prpl_accessibility_text="' . \esc_attr__( 'Learn more about the Yoast SEO Orphaned Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Lean more', 'progress-planner' ) . '</a>'
+			'<a href="https://prpl.fyi/run-orphaned-content-workout" target="_blank"  data-prpl_accessibility_text="' . \esc_attr__( 'Learn more about the Yoast SEO Orphaned Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Lean more', 'progress-planner' ) . '</a>'
 		);
 	}
 
