@@ -24,7 +24,7 @@ class Plugin_Upgrade_Tasks {
 		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_activated_or_updated' ], 10 );
 
 		// Check if the plugin was upgraded or new plugin was activated.
-		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 100 ); // We need to run this after the Local_Tasks_Manager::init() is called.
+		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 100 ); // We need to run this after the Tasks_Manager::init() is called.
 	}
 
 	/**
@@ -57,7 +57,7 @@ class Plugin_Upgrade_Tasks {
 	 * @return void
 	 */
 	public function maybe_add_onboarding_tasks() {
-		$onboard_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', [] );
+		$onboard_task_provider_ids = \apply_filters( 'prpl_onboarding_task_providers', [] );
 
 		// Privacy policy is not accepted, so it's a fresh install.
 		$fresh_install = ! \progress_planner()->is_privacy_policy_accepted();
@@ -109,7 +109,7 @@ class Plugin_Upgrade_Tasks {
 			$task_providers = [];
 
 			foreach ( $task_provider_ids as $task_provider_id ) {
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
+				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
 				if ( $task_provider ) { // @phpstan-ignore-line
 					$task_providers[] = $task_provider;
 				}

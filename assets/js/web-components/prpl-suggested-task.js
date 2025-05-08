@@ -41,9 +41,6 @@ customElements.define(
 				taskHeading = `<a href="${ url }" target="${ url_target }">${ title }</a>`;
 			}
 
-			const isRemoteTask = task_id.startsWith( 'remote-task-' );
-			const isDismissable = dismissable || isRemoteTask;
-
 			const getTaskStatus = () => {
 				let status = 'pending';
 				window[ taskList ].tasks.forEach( ( task ) => {
@@ -173,7 +170,7 @@ customElements.define(
 						</prpl-tooltip>`
 					: '',
 				complete:
-					isDismissable && ! useCheckbox
+					dismissable && ! useCheckbox
 						? `<button
 							type="button"
 							class="prpl-suggested-task-button"
@@ -209,7 +206,7 @@ customElements.define(
 					let checkboxStyle = 'margin-top: 2px;';
 
 					// If the task is not dismissable, checkbox is disabled and we want to show a tooltip.
-					if ( ! isDismissable ) {
+					if ( ! dismissable ) {
 						checkboxStyle += 'pointer-events: none;';
 						output += `<prpl-tooltip class="prpl-suggested-task-disabled-checkbox-tooltip">
 							<slot name="open-icon">`;
@@ -217,13 +214,14 @@ customElements.define(
 
 					output += `<input
 						type="checkbox"
+						id="prpl-suggested-task-checkbox-${ task_id }"
 						class="prpl-suggested-task-checkbox"
 						style="${ checkboxStyle }"
-						${ ! isDismissable ? 'disabled' : '' }
+						${ ! dismissable ? 'disabled' : '' }
 						${ getTaskStatus() === 'completed' ? 'checked' : '' }
 					>`;
 
-					if ( ! isDismissable ) {
+					if ( ! dismissable ) {
 						output += `
 							</slot>
 							<slot name="content">
@@ -256,11 +254,19 @@ customElements.define(
 				data-task-list="${ taskList }"
 			>
 				${ actionButtons.completeCheckbox }
-				<h3 style="width: 100%;"><span${
-					'user' === category
-						? ` contenteditable="plaintext-only"`
-						: ''
-				}>${ taskHeading }</span></h3>
+				<h3 style="width: 100%;">
+					${
+						useCheckbox
+							? `<label for="prpl-suggested-task-checkbox-${ task_id }">`
+							: ''
+					}
+					<span${
+						'user' === category
+							? ` contenteditable="plaintext-only"`
+							: ''
+					}>${ taskHeading }</span>
+					${ useCheckbox && dismissable ? `</label>` : '' }
+				</h3>
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
 						${ actionButtons.info }

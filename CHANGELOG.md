@@ -1,3 +1,24 @@
+= 1.4.0 =
+
+Enhancements:
+
+* Review Content task takes into account Yoast SEO readibility score when suggesting posts to update.
+* Change update frequency for articles which are not selected in "Your page" section or as Yoast SEO Cornerstone content to 12 months.
+* Factor in Yoast SEO readibility score when suggesting which articles should be updated.
+
+Bugs we fixed:
+
+* Fixed a bug where dismissed review content tasks would reappear in the following week.
+
+Added these recommendations from Ravi:
+
+* [Remove terms](http://prpl.fyi/remove-empty-taxonomy) which have less than 2 posts.
+* [Give description](http://prpl.fyi/taxonomy-terms-description) to terms which have more than 2 posts.
+* Suggest to install [Fewer Tags plugin](https://prpl.fyi/install-fewer-tags).
+* Yoast SEO: [do Yoast SEO's Cornerstone Content Workout](http://prpl.fyi/run-orphaned-content-workout).
+* Yoast SEO: [do Yoast SEO's Orphaned Content Workout](https://prpl.fyi/run-cornerstone-content-workout).
+* Yoast SEO: [add internal links](https://prpl.fyi/fix-orphaned-content) to articles which don't have them.
+
 = 1.3.0 =
 
 Enhancements:

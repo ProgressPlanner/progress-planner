@@ -8,9 +8,8 @@
 namespace Progress_Planner\Admin\Widgets;
 
 use Progress_Planner\Badges\Monthly;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Local_Task_Factory;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create;
-use Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Review;
+use Progress_Planner\Suggested_Tasks\Task_Factory;
+use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
 
 /**
  * Suggested_Tasks class.
@@ -69,12 +68,12 @@ final class Suggested_Tasks extends Widget {
 				foreach ( $pending_celebration_tasks as $key => $task ) {
 					$task_id = $task['task_id'];
 
-					$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider(
-						Local_Task_Factory::create_task_from( 'id', $task_id )->get_provider_id()
+					$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider(
+						Task_Factory::create_task_from( 'id', $task_id )->get_provider_id()
 					);
 
 					if ( $task_provider && $task_provider->capability_required() ) {
-						$task_details = \progress_planner()->get_suggested_tasks()->get_local()->get_task_details( $task_id );
+						$task_details = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_details( $task_id );
 
 						if ( $task_details ) {
 							$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
@@ -99,10 +98,6 @@ final class Suggested_Tasks extends Widget {
 
 		$final_tasks = array_values( $final_tasks );
 
-		foreach ( $final_tasks as $key => $task ) {
-			$final_tasks[ $key ]['provider_id'] = $task['provider_id'] ?? $task['category']; // category is used for remote tasks.
-		}
-
 		// Sort the final tasks by priority. The priotity can be "high", "medium", "low", or "none".
 		uasort(
 			$final_tasks,
@@ -123,7 +118,7 @@ final class Suggested_Tasks extends Widget {
 
 		$max_items_per_category = [];
 		foreach ( $final_tasks as $task ) {
-			$max_items_per_category[ $task['category'] ] = $task['category'] === ( new Review() )->get_provider_category() ? 2 : 1;
+			$max_items_per_category[ $task['category'] ] = $task['category'] === ( new Content_Review() )->get_provider_category() ? 2 : 1;
 		}
 
 		// We want to hide user tasks.
