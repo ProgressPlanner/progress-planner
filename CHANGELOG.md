@@ -12,12 +12,12 @@ Bugs we fixed:
 
 Added these recommendations from Ravi:
 
-* Remove terms which have less than 2 posts.
-* Give description to terms which have more than 2 posts.
-* Suggest to install [Fewer Tags plugin](https://wordpress.org/plugins/fewer-tags/).
-* Yoast SEO: do Yoast SEO's Cornerstone Content Workout.
-* Yoast SEO: do Yoast SEO's Orphaned Content Workout.
-* Yoast SEO: add internal links to articles which don't have them.
+* [Remove terms](http://prpl.fyi/remove-empty-taxonomy) which have less than 2 posts.
+* [Give description](http://prpl.fyi/taxonomy-terms-description) to terms which have more than 2 posts.
+* Suggest to install [Fewer Tags plugin](https://prpl.fyi/install-fewer-tags).
+* Yoast SEO: [do Yoast SEO's Cornerstone Content Workout](http://prpl.fyi/run-orphaned-content-workout).
+* Yoast SEO: [do Yoast SEO's Orphaned Content Workout](https://prpl.fyi/run-cornerstone-content-workout).
+* Yoast SEO: [add internal links](https://prpl.fyi/fix-orphaned-content) to articles which don't have them.
 
 = 1.3.0 =
 
