@@ -260,9 +260,11 @@ customElements.define(
 							? `<label for="prpl-suggested-task-checkbox-${ task_id }">`
 							: ''
 					}
-					<span${ 'user' === category ? ` contenteditable="plaintext-only"` : '' }>
-						${ taskHeading }
-					</span>
+					<span${
+						'user' === category
+							? ` contenteditable="plaintext-only"`
+							: ''
+					}>${ taskHeading }</span>
 					${ useCheckbox && dismissable ? `</label>` : '' }
 				</h3>
 				<div class="prpl-suggested-task-actions">
