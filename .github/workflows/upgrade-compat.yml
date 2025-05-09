@@ -112,3 +112,6 @@ jobs:
 
           # Install Yoast Comment Experience
           docker exec $WP_CONTAINER wp plugin install yoast-comment-hacks --activate --allow-root
+
+          # Show plugin version
+          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
