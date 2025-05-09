@@ -1,5 +1,5 @@
 const { test, expect, chromium } = require( '@playwright/test' );
-const { SELECTORS } = require( '../constants/selectors' );
+const SELECTORS = require( '../constants/selectors' );
 
 const CREATE_TASK_TEXT = 'Test task to create';
 const DELETE_TASK_TEXT = 'Test task to delete';

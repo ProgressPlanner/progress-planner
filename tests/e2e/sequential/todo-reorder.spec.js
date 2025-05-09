@@ -1,5 +1,5 @@
 const { test, expect, chromium } = require( '@playwright/test' );
-const { SELECTORS } = require( '../constants/selectors' );
+const SELECTORS = require( '../constants/selectors' );
 
 const FIRST_TASK_TEXT = 'First task to reorder';
 const SECOND_TASK_TEXT = 'Second task to reorder';
