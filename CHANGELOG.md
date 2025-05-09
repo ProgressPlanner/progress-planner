@@ -1,3 +1,9 @@
+= 1.4.1 =
+
+Bugs we fixed:
+
+* Fixed a conflict with the premium version of Yoast SEO.
+
 = 1.4.0 =
 
 Enhancements:
