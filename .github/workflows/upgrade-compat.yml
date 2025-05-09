@@ -102,7 +102,7 @@ jobs:
           docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
 
           # Overwrite plugin files with the latest version
-          docker cp . $WP_CONTAINER:/var/www/html/wp-content/plugins/progress-planner
+          # docker cp . $WP_CONTAINER:/var/www/html/wp-content/plugins/progress-planner
 
           # Show updated plugin version
           docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
