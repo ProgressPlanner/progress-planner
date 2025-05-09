@@ -4,40 +4,7 @@
 import { test, expect } from '@playwright/test';
 
 function onboardingTests( testContext = test ) {
-	testContext.describe.serial( 'Progress Planner Onboarding', () => {
-		testContext(
-			'should handle onboarding errors gracefully',
-			async ( { page } ) => {
-				// Navigate to Progress Planner page
-				await page.goto( '/wp-admin/admin.php?page=progress-planner' );
-				await page.waitForLoadState( 'networkidle' );
-
-				// Verify onboarding element is present
-				const onboardingElement = page.locator( '.prpl-welcome' );
-				await expect( onboardingElement ).toBeVisible();
-
-				// Try to submit form without accepting privacy policy
-				const form = page.locator( '#prpl-onboarding-form' );
-				await form
-					.locator( 'input[name="with-email"][value="no"]' )
-					.click();
-
-				// Submit button should be disabled
-				const submitButtonWrapper = form.locator(
-					'#prpl-onboarding-submit-wrapper'
-				);
-				await expect( submitButtonWrapper ).toHaveClass(
-					'prpl-disabled'
-				);
-
-				// Accept privacy policy and verify button becomes enabled
-				await form.locator( 'input[name="privacy-policy"]' ).check();
-				await expect( submitButtonWrapper ).not.toHaveClass(
-					'prpl-disabled'
-				);
-			}
-		);
-
+	testContext.describe( 'Progress Planner Onboarding', () => {
 		testContext(
 			'should complete onboarding process successfully',
 			async ( { page } ) => {
@@ -53,11 +20,27 @@ function onboardingTests( testContext = test ) {
 				const form = page.locator( '#prpl-onboarding-form' );
 				await expect( form ).toBeVisible();
 
+				// Submit button should be disabled
+				const submitButtonWrapper = form.locator(
+					'#prpl-onboarding-submit-wrapper'
+				);
+
 				// Select "no" for email and accept privacy policy
 				await form
 					.locator( 'input[name="with-email"][value="no"]' )
 					.click();
+
+				// Verify submit button is stilldisabled
+				await expect( submitButtonWrapper ).toHaveClass(
+					'prpl-disabled'
+				);
+
 				await form.locator( 'input[name="privacy-policy"]' ).check();
+
+				// Accept privacy policy and verify button becomes enabled
+				await expect( submitButtonWrapper ).not.toHaveClass(
+					'prpl-disabled'
+				);
 
 				// Submit the form
 				await form
@@ -87,27 +70,15 @@ function onboardingTests( testContext = test ) {
 				).toBeVisible( {
 					timeout: 5000,
 				} );
-			}
-		);
-
-		testContext(
-			'should not show upgrade popover if user has completed onboarding',
-			async ( { page } ) => {
-				// Navigate to Progress Planner page
-				await page.goto( '/wp-admin/admin.php?page=progress-planner' );
-				await page.waitForLoadState( 'networkidle' );
-
-				const onboardingTasks = page.locator(
-					'#prpl-onboarding-tasks'
-				);
-				await expect( onboardingTasks ).toHaveCount( 0 );
 
 				// Visit the WP Dashboard page and back to the Progress Planner page.
 				await page.goto( '/wp-admin/' );
 				await page.goto( '/wp-admin/admin.php?page=progress-planner' );
 				await page.waitForLoadState( 'networkidle' );
 
-				await expect( onboardingTasks ).toHaveCount( 0 );
+				await expect(
+					page.locator( '#prpl-onboarding-tasks' )
+				).toHaveCount( 0 );
 			}
 		);
 	} );
