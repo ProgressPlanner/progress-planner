@@ -23,14 +23,18 @@ function onboardingTests( testContext = test ) {
 					.click();
 
 				// Submit button should be disabled
-				const submitButton = form.locator(
-					'input[type="submit"].prpl-button-secondary--no-email'
+				const submitButtonWrapper = form.locator(
+					'#prpl-onboarding-submit-wrapper'
 				);
-				await expect( submitButton ).toBeDisabled();
+				await expect( submitButtonWrapper ).toHaveClass(
+					'prpl-disabled'
+				);
 
 				// Accept privacy policy and verify button becomes enabled
 				await form.locator( 'input[name="privacy-policy"]' ).check();
-				await expect( submitButton ).toBeEnabled();
+				await expect( submitButtonWrapper ).not.toHaveClass(
+					'prpl-disabled'
+				);
 			}
 		);
 
