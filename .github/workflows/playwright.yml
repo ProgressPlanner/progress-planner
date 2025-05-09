@@ -75,7 +75,7 @@ jobs:
           -d "admin_password=$WORDPRESS_ADMIN_PASSWORD" \
           -d "admin_password2=$WORDPRESS_ADMIN_PASSWORD" \
           -d "admin_email=$WORDPRESS_ADMIN_EMAIL" \
-          -d "public=1"r
+          -d "public=1"
 
       # - name: Install necessary dependencies in WordPress container
       #   run: |
