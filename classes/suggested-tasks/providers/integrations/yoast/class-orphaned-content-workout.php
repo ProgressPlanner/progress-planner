@@ -7,13 +7,13 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
-use Progress_Planner\Suggested_Tasks\Providers\Tasks;
+use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Yoast_Provider;
 use Progress_Planner\Suggested_Tasks\Providers\Traits\Dismissable_Task;
 
 /**
  * Add tasks for Yoast SEO cornerstone content.
  */
-class Orphaned_Content_Workout extends Tasks {
+class Orphaned_Content_Workout extends Yoast_Provider {
 	use Dismissable_Task;
 
 	/**
@@ -29,13 +29,6 @@ class Orphaned_Content_Workout extends Tasks {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'yoast-orphaned-content-workout';
-
-	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'configuration';
 
 	/**
 	 * The task priority.
