@@ -128,7 +128,7 @@ class Tasks_Manager {
 		}
 
 		// Inject tasks.
-		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
+		\add_action( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
 
 		// Add the onboarding task providers.
 		\add_filter( 'prpl_onboarding_task_providers', [ $this, 'add_onboarding_task_providers' ] );
@@ -201,13 +201,10 @@ class Tasks_Manager {
 	/**
 	 * Inject tasks.
 	 *
-	 * @param array $tasks The tasks.
-	 *
-	 * @return array
+	 * @return void
 	 */
-	public function inject_tasks( $tasks ) {
-		$provider_tasks  = [];
-		$tasks_to_inject = [];
+	public function inject_tasks() {
+		$provider_tasks = [];
 
 		// Loop through all registered task providers and inject their tasks.
 		foreach ( $this->task_providers as $provider_instance ) {
@@ -216,17 +213,16 @@ class Tasks_Manager {
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.
 		foreach ( $provider_tasks as $task ) {
-
+			// Get the task.
+			$task_post = \progress_planner()->get_cpt_recommendations()->get_post( $task['task_id'] );
 			// Skip the task if it was completed.
-			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task['task_id'] ) ) {
+			if ( ! $task_post || in_array( $task_post['post_status'], [ 'pending_celebration', 'trash' ], true ) ) {
 				continue;
 			}
 
 			$tasks_to_inject[] = $task;
-			$this->add_pending_task( $task );
+			\progress_planner()->get_cpt_recommendations()->add( $task );
 		}
-
-		return \array_merge( $tasks, $tasks_to_inject );
 	}
 
 	/**
@@ -312,37 +308,6 @@ class Tasks_Manager {
 	}
 
 	/**
-	 * Add a pending task.
-	 *
-	 * @param array $task The task data.
-	 *
-	 * @return bool
-	 */
-	public function add_pending_task( $task ) {
-		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-
-		$task_index = false;
-
-		foreach ( $tasks as $key => $_task ) {
-			if ( ! isset( $_task['task_id'] ) || $task['task_id'] !== $_task['task_id'] ) {
-				continue;
-			}
-			$task_index = $key;
-			break;
-		}
-
-		$task['status'] = 'pending';
-
-		if ( false !== $task_index ) {
-			$tasks[ $task_index ] = array_merge( $task, $tasks[ $task_index ] );
-		} else {
-			$tasks[] = $task;
-		}
-
-		return \progress_planner()->get_settings()->set( 'tasks', $tasks );
-	}
-
-	/**
 	 * Remove all tasks which have date set to the previous week.
 	 * Tasks for the current week will be added automatically.
 	 *
@@ -356,33 +321,14 @@ class Tasks_Manager {
 			return;
 		}
 
-		$tasks = (array) \progress_planner()->get_settings()->get( 'tasks', [] );
+		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'publish' ] );
 
-		if ( empty( $tasks ) ) {
-			return;
-		}
-
-		$task_count = count( $tasks );
-
-		$tasks = \array_filter(
-			$tasks,
-			function ( $task ) {
-
-				if ( 'pending' === $task['status'] && isset( $task['date'] ) ) {
-					return (string) \gmdate( 'YW' ) === (string) $task['date'];
-				}
-
-				// We have changed provider_id name, so we need to remove all tasks of the old provider_id.
-				if ( isset( $task['provider_id'] ) && 'update-post' === $task['provider_id'] ) {
-					return false;
-				}
-
-				return true;
+		foreach ( $tasks as $task ) {
+			if ( ! isset( $task['date'] ) || \gmdate( 'YW' ) !== (string) $task['date'] ) {
+				continue;
 			}
-		);
 
-		if ( count( $tasks ) !== $task_count ) {
-			\progress_planner()->get_settings()->set( 'tasks', array_values( $tasks ) );
+			\progress_planner()->get_cpt_recommendations()->delete_recommendation( $task['ID'] );
 		}
 
 		\progress_planner()->get_utils__cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );

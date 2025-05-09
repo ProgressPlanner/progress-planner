@@ -36,6 +36,7 @@ namespace Progress_Planner;
  * @method \Progress_Planner\Utils\Debug_Tools get_utils__debug_tools()
  * @method \Progress_Planner\Badges get_badges()
  * @method \Progress_Planner\Plugin_Migrations get_plugin_migrations()
+ * @method \Progress_Planner\CPT_Recommendations get_cpt_recommendations()
  */
 class Base {
 
@@ -88,6 +89,9 @@ class Base {
 				$this->get_admin__dashboard_widget_todo();
 			}
 		}
+
+		$this->get_cpt_recommendations();
+
 		$this->get_admin__editor();
 
 		$this->get_actions__content();

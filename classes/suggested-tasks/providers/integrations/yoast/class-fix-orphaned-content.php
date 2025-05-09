@@ -211,7 +211,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		);
 
 		// When we have data, check if task was completed.
-		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
+		if ( true === \progress_planner()->get_cpt_recommendations()->was_task_completed( $task_id ) ) {
 			return [];
 		}
 

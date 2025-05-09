@@ -67,7 +67,7 @@ final class ToDo extends Widget {
 				'data' => [
 					'ajaxUrl' => \admin_url( 'admin-ajax.php' ),
 					'nonce'   => \wp_create_nonce( 'progress_planner' ),
-					'tasks'   => \progress_planner()->get_todo()->get_items(),
+					'tasks'   => \progress_planner()->get_cpt_recommendations()->get(),
 				],
 			]
 		);

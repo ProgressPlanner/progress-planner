@@ -72,7 +72,7 @@ trait Task_Provider_Test_Trait {
 		parent::tear_down();
 
 		// Delete tasks.
-		\progress_planner()->get_settings()->set( 'tasks', [] );
+		\progress_planner()->get_cpt_recommendations()->delete_all_recommendations();
 	}
 
 	/**
@@ -97,7 +97,7 @@ trait Task_Provider_Test_Trait {
 
 		// Add the task(s) to the suggested tasks.
 		foreach ( $tasks as $task ) {
-			$this->suggested_tasks->get_tasks_manager()->add_pending_task( $task );
+			\progress_planner()->get_cpt_recommendations()->add( $task );
 		}
 
 		// Verify that the task(s) are in the suggested tasks.
@@ -119,7 +119,10 @@ trait Task_Provider_Test_Trait {
 		// Change the task status to pending celebration for all completed tasks.
 		foreach ( $this->suggested_tasks->get_tasks_manager()->evaluate_tasks() as $task ) {
 			// Change the task status to pending celebration.
-			$this->suggested_tasks->mark_task_as( 'pending_celebration', $task->get_data()['task_id'] );
+			\progress_planner()->get_cpt_recommendations()->update_recommendation(
+				$task->get_data()['ID'],
+				[ 'post_status' => 'pending_celebration' ]
+			);
 
 			// In production we insert an activity here.
 		}
@@ -138,7 +141,7 @@ trait Task_Provider_Test_Trait {
 
 		// Verify that the task(s) we're testing is completed.
 		foreach ( $tasks as $task ) {
-			$this->suggested_tasks->transition_task_status( $task['task_id'], 'pending_celebration', 'completed' );
+			\progress_planner()->get_cpt_recommendations()->transition_task_status( $task['task_id'], 'pending_celebration', 'completed' );
 			$this->assertTrue(
 				$this->suggested_tasks->check_task_condition(
 					[

@@ -253,7 +253,7 @@ class Content_Review extends Tasks {
 				$task_id = $this->get_task_id( [ 'post_id' => $post->ID ] );
 
 				// Don't add the task if it was completed.
-				if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
+				if ( true === \progress_planner()->get_cpt_recommendations()->was_task_completed( $task_id ) ) {
 					continue;
 				}
 
@@ -285,7 +285,7 @@ class Content_Review extends Tasks {
 		$task_to_inject = [];
 		if ( ! empty( $this->task_post_mappings ) ) {
 			foreach ( $this->task_post_mappings as $task_data ) {
-				if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_data['task_id'] ) ) {
+				if ( true === \progress_planner()->get_cpt_recommendations()->was_task_completed( $task_data['task_id'] ) ) {
 					continue;
 				}
 

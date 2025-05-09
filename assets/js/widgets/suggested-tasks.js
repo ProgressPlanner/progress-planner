@@ -11,19 +11,14 @@
 /**
  * Get the next item to inject.
  *
- * @param {string} category The category of items to get the next item from.
+ * @param {number} categoryId The category of items to get the next item from.
  * @return {Object} The next item to inject.
  */
-const prplSuggestedTasksGetNextPendingItemFromCategory = ( category ) => {
-	// Get items of this category.
+const prplSuggestedTasksGetNextPendingItemFromCategory = ( categoryId ) => {
+	// Get items of this categoryId.
 	const itemsOfCategory = prplSuggestedTasks.tasks.filter(
-		( task ) => category === task.category
+		( task ) => parseInt( categoryId ) === parseInt( task.category.term_id )
 	);
-
-	// If there are no items of this category, return null.
-	if ( 0 === itemsOfCategory.length || 'user' === category ) {
-		return null;
-	}
 
 	// Create an array of items that are in the list.
 	const inList = [];
@@ -35,7 +30,7 @@ const prplSuggestedTasksGetNextPendingItemFromCategory = ( category ) => {
 
 	const items = itemsOfCategory.filter( function ( item ) {
 		// Skip items which are not pending.
-		if ( 'pending' !== item.status ) {
+		if ( 'publish' !== item.post_status ) {
 			return false;
 		}
 		// Remove items which are already in the list.
