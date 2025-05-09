@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.0
+Stable tag: 1.4.1
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -109,6 +109,12 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.4.1 =
+
+Bugs we fixed:
+
+* Fixed a conflict with the premium version of Yoast SEO.
 
 = 1.4.0 =
 
