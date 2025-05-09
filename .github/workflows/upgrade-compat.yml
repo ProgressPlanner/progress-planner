@@ -82,6 +82,7 @@ jobs:
         run: |
           WP_CONTAINER=$(docker ps -qf "name=wordpress")
           PLUGIN_REPO=$PLUGIN_REPO
+          PLUGIN_OLD_VERSION=$PLUGIN_OLD_VERSION
 
           # Install git inside the WordPress container
           docker exec $WP_CONTAINER apt-get update
@@ -102,7 +103,7 @@ jobs:
           docker exec $WP_CONTAINER wp plugin activate progress-planner --allow-root
 
           # Show plugin version
-          docker exec $WP_CONTAINER wp option get progress_planner_version --allow-root
+          docker exec $WP_CONTAINER wp option get progress_planner_version --allow-root | echo $PLUGIN_OLD_VERSION
 
           # Overwrite plugin files with the latest version from this branch
           docker cp . $WP_CONTAINER:/var/www/html/wp-content/plugins/progress-planner
