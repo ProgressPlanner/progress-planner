@@ -4,39 +4,39 @@
 import { test, expect } from '@playwright/test';
 
 function onboardingTests( testContext = test ) {
-	testContext.describe( 'Progress Planner Onboarding', () => {
-		// testContext(
-		// 	'should handle onboarding errors gracefully',
-		// 	async ( { page } ) => {
-		// 		// Navigate to Progress Planner page
-		// 		await page.goto( '/wp-admin/admin.php?page=progress-planner' );
-		// 		await page.waitForLoadState( 'networkidle' );
+	testContext.describe.serial( 'Progress Planner Onboarding', () => {
+		testContext(
+			'should handle onboarding errors gracefully',
+			async ( { page } ) => {
+				// Navigate to Progress Planner page
+				await page.goto( '/wp-admin/admin.php?page=progress-planner' );
+				await page.waitForLoadState( 'networkidle' );
 
-		// 		// Verify onboarding element is present
-		// 		const onboardingElement = page.locator( '.prpl-welcome' );
-		// 		await expect( onboardingElement ).toBeVisible();
+				// Verify onboarding element is present
+				const onboardingElement = page.locator( '.prpl-welcome' );
+				await expect( onboardingElement ).toBeVisible();
 
-		// 		// Try to submit form without accepting privacy policy
-		// 		const form = page.locator( '#prpl-onboarding-form' );
-		// 		await form
-		// 			.locator( 'input[name="with-email"][value="no"]' )
-		// 			.click();
+				// Try to submit form without accepting privacy policy
+				const form = page.locator( '#prpl-onboarding-form' );
+				await form
+					.locator( 'input[name="with-email"][value="no"]' )
+					.click();
 
-		// 		// Submit button should be disabled
-		// 		const submitButtonWrapper = form.locator(
-		// 			'#prpl-onboarding-submit-wrapper'
-		// 		);
-		// 		await expect( submitButtonWrapper ).toHaveClass(
-		// 			'prpl-disabled'
-		// 		);
+				// Submit button should be disabled
+				const submitButtonWrapper = form.locator(
+					'#prpl-onboarding-submit-wrapper'
+				);
+				await expect( submitButtonWrapper ).toHaveClass(
+					'prpl-disabled'
+				);
 
-		// 		// Accept privacy policy and verify button becomes enabled
-		// 		await form.locator( 'input[name="privacy-policy"]' ).check();
-		// 		await expect( submitButtonWrapper ).not.toHaveClass(
-		// 			'prpl-disabled'
-		// 		);
-		// 	}
-		// );
+				// Accept privacy policy and verify button becomes enabled
+				await form.locator( 'input[name="privacy-policy"]' ).check();
+				await expect( submitButtonWrapper ).not.toHaveClass(
+					'prpl-disabled'
+				);
+			}
+		);
 
 		testContext(
 			'should complete onboarding process successfully',
