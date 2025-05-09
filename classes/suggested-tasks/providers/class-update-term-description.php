@@ -238,21 +238,27 @@ class Update_Term_Description extends Tasks {
 	public function get_tasks_to_inject() {
 
 		if (
+			true === $this->is_task_snoozed() ||
 			! $this->should_add_task() // No need to add the task.
 		) {
 			return [];
 		}
 
-		$data = $this->data_collector->collect();
+		$data    = $this->data_collector->collect();
+		$task_id = $this->get_task_id(
+			[
+				'term_id'  => $data['term_id'],
+				'taxonomy' => $data['taxonomy'],
+			]
+		);
+
+		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
+			return [];
+		}
 
 		return [
 			[
-				'task_id'     => $this->get_task_id(
-					[
-						'term_id'  => $data['term_id'],
-						'taxonomy' => $data['taxonomy'],
-					]
-				),
+				'task_id'     => $task_id,
 				'provider_id' => $this->get_provider_id(),
 				'category'    => $this->get_provider_category(),
 				'term_id'     => $data['term_id'],
