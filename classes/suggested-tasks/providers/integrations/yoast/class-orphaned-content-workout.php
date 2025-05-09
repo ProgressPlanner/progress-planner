@@ -52,6 +52,13 @@ class Orphaned_Content_Workout extends Tasks {
 	protected $is_dismissable = true;
 
 	/**
+	 * Whether the task is repetitive.
+	 *
+	 * @var bool
+	 */
+	protected $is_repetitive = true;
+
+	/**
 	 * The task points.
 	 *
 	 * @var int
@@ -164,26 +171,6 @@ class Orphaned_Content_Workout extends Tasks {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Get an array of tasks to inject.
-	 *
-	 * @return array
-	 */
-	public function get_tasks_to_inject() {
-		if ( ! $this->should_add_task() ) {
-			return [];
-		}
-
-		return [
-			[
-				'task_id'     => $this->get_task_id(),
-				'provider_id' => $this->get_provider_id(),
-				'category'    => $this->get_provider_category(),
-				'date'        => \gmdate( 'YW' ),
-			],
-		];
 	}
 
 	/**
