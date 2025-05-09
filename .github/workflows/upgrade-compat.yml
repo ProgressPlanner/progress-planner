@@ -9,9 +9,8 @@ env:
   WORDPRESS_DB_USER: wpuser
   WORDPRESS_DB_PASSWORD: wppass
   WORDPRESS_DB_NAME: wordpress
-  WORDPRESS_DB_PORT: 3307 # So it can run locally (hopefully).
+  WORDPRESS_DB_PORT: 3307
   PLUGIN_REPO: ProgressPlanner/progress-planner
-
 
 on:
   push:
@@ -32,7 +31,8 @@ jobs:
           MYSQL_USER: ${{ env.WORDPRESS_DB_USER }}
           MYSQL_PASSWORD: ${{ env.WORDPRESS_DB_PASSWORD }}
         ports:
-          - 3307:3306 # GitHub Actions doesn't support environment variables in the ports section.
+          - 3307:3306
+
       wordpress:
         image: wordpress:latest
         env:
@@ -60,7 +60,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install system dependencies
+      - name: Install system dependencies (host)
         run: |
           sudo apt-get update
           sudo apt-get install -y git curl unzip
@@ -78,31 +78,37 @@ jobs:
 
       - name: Install and activate plugin
         run: |
+          WP_CONTAINER=$(docker ps -qf "name=wordpress")
+
+          # Install git inside the WordPress container
+          docker exec $WP_CONTAINER apt-get update
+          docker exec $WP_CONTAINER apt-get install -y git
+
           # Install WP-CLI
-          docker exec $(docker ps -qf "name=wordpress") curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-          docker exec $(docker ps -qf "name=wordpress") chmod +x wp-cli.phar
-          docker exec $(docker ps -qf "name=wordpress") mv wp-cli.phar /usr/local/bin/wp
+          docker exec $WP_CONTAINER curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          docker exec $WP_CONTAINER chmod +x wp-cli.phar
+          docker exec $WP_CONTAINER mv wp-cli.phar /usr/local/bin/wp
 
-          # Create the plugins directory in the WordPress container
-          docker exec $(docker ps -qf "name=wordpress") mkdir -p /var/www/html/wp-content/plugins
+          # Create the plugins directory
+          docker exec $WP_CONTAINER mkdir -p /var/www/html/wp-content/plugins
 
-          # Clone the plugin's repository (old version) directly into the WordPress plugins directory
-          docker exec $(docker ps -qf "name=wordpress") git clone --branch v1.1.0 https://github.com/${{ env.PLUGIN_REPO }}.git /var/www/html/wp-content/plugins/progress-planner
+          # Clone plugin repository (old version)
+          docker exec $WP_CONTAINER git clone --branch v1.1.0 https://github.com/${{ env.PLUGIN_REPO }}.git /var/www/html/wp-content/plugins/progress-planner
 
-          # Activate the plugin using WP-CLI
-          docker exec $(docker ps -qf "name=wordpress") wp plugin activate progress-planner --allow-root
+          # Activate plugin using WP-CLI
+          docker exec $WP_CONTAINER wp plugin activate progress-planner --allow-root
 
-          # Echo version of the plugin
-          docker exec $(docker ps -qf "name=wordpress") wp option get progress_planner_settings --allow-root
+          # Show plugin version
+          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
 
-          # Overwrite the plugin files with the latest version
-          docker cp . $(docker ps -qf "name=wordpress"):/var/www/html/wp-content/plugins/progress-planner
+          # Overwrite plugin files with the latest version
+          docker cp . $WP_CONTAINER:/var/www/html/wp-content/plugins/progress-planner
 
-          # Echo version of the updated plugin
-          docker exec $(docker ps -qf "name=wordpress") wp option get progress_planner_settings --allow-root
+          # Show updated plugin version
+          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
 
           # Install Yoast SEO
-          docker exec $(docker ps -qf "name=wordpress") wp plugin install wordpress-seo --activate --allow-root
+          docker exec $WP_CONTAINER wp plugin install wordpress-seo --activate --allow-root
 
-          # Install Comment Experience
-          docker exec $(docker ps -qf "name=wordpress") wp plugin install yoast-comment-experience --activate --allow-root
+          # Install Yoast Comment Experience
+          docker exec $WP_CONTAINER wp plugin install yoast-comment-experience --activate --allow-root
