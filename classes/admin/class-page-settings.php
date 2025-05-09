@@ -209,7 +209,7 @@ class Page_Settings {
 		$include_post_types = isset( $_POST['prpl-post-types-include'] )
 			? array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			// If no post types are selected, use the default post types (post and page can be deregistered).
-			: array_intersect( [ 'post', 'page' ], \progress_planner()->get_settings()->get_public_post_types() );
+			: array_intersect( [ 'post', 'page' ], \progress_planner()->get_activities__content_helpers()->get_public_post_types() );
 
 		\progress_planner()->get_settings()->set( 'include_post_types', $include_post_types );
 	}
