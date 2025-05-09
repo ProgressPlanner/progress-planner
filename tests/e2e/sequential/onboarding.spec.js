@@ -89,6 +89,20 @@ function onboardingTests( testContext = test ) {
 				} );
 			}
 		);
+
+		testContext(
+			'should not show upgrade popover if user has completed onboarding',
+			async ( { page } ) => {
+				// Navigate to Progress Planner page
+				await page.goto( '/wp-admin/admin.php?page=progress-planner' );
+				await page.waitForLoadState( 'networkidle' );
+
+				const onboardingTasks = page.locator(
+					'#prpl-onboarding-tasks'
+				);
+				await expect( onboardingTasks ).toHaveCount( 0 );
+			}
+		);
 	} );
 }
 
