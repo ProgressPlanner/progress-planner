@@ -19,7 +19,7 @@ on:
   pull_request:
 
 jobs:
-  e2e-tests:
+  upgrade-compat:
     runs-on: ubuntu-latest
 
     services:
@@ -111,4 +111,4 @@ jobs:
           docker exec $WP_CONTAINER wp plugin install wordpress-seo --activate --allow-root
 
           # Install Yoast Comment Experience
-          docker exec $WP_CONTAINER wp plugin install yoast-comment-experience --activate --allow-root
+          docker exec $WP_CONTAINER wp plugin install yoast-comment-hacks --activate --allow-root
