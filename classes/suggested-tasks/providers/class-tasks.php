@@ -410,7 +410,7 @@ abstract class Tasks implements Tasks_Interface {
 		if (
 			true === $this->is_task_snoozed() ||
 			! $this->should_add_task() || // No need to add the task.
-			true === \progress_planner()->get_cpt_recommendations()->was_task_completed( $this->get_task_id() )
+			true === \progress_planner()->get_cpt_recommendations()->was_task_completed( $task_id )
 		) {
 			return [];
 		}
