@@ -1,3 +1,9 @@
+= 1.4.2 =
+
+Bugs we fixed:
+
+* Fixed snoozing some of Yoast SEO Recommendations.
+
 = 1.4.1 =
 
 Bugs we fixed:
