@@ -1,4 +1,5 @@
 const { test, expect, chromium } = require( '@playwright/test' );
+const { SELECTORS } = require( '../constants/selectors' );
 
 const TEST_TASK_TEXT = 'Task to be completed';
 
@@ -97,7 +98,7 @@ function todoCompleteTests( testContext = test ) {
 				`ul#todo-list ${ taskSelector }`
 			);
 			await expect(
-				todoItemElement.locator( 'h3 > label > span' )
+				todoItemElement.locator( SELECTORS.RR_ITEM_TEXT )
 			).toHaveText( TEST_TASK_TEXT );
 
 			// Click the checkbox to complete the task
@@ -120,7 +121,7 @@ function todoCompleteTests( testContext = test ) {
 			);
 			await expect( completedTask ).toBeVisible();
 			await expect(
-				completedTask.locator( 'h3 > label > span' )
+				completedTask.locator( SELECTORS.RR_ITEM_TEXT )
 			).toHaveText( TEST_TASK_TEXT );
 			await expect(
 				completedTask.locator( '.prpl-suggested-task-checkbox' )
@@ -173,7 +174,7 @@ function todoCompleteTests( testContext = test ) {
 				);
 				await expect( completedTask ).toBeVisible();
 				await expect(
-					completedTask.locator( 'h3 > label > span' )
+					completedTask.locator( SELECTORS.RR_ITEM_TEXT )
 				).toHaveText( TEST_TASK_TEXT );
 				await expect(
 					completedTask.locator( '.prpl-suggested-task-checkbox' )

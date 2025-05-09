@@ -1,4 +1,5 @@
 const { test, expect, chromium } = require( '@playwright/test' );
+const { SELECTORS } = require( '../constants/selectors' );
 
 const CREATE_TASK_TEXT = 'Test task to create';
 const DELETE_TASK_TEXT = 'Test task to delete';
@@ -91,9 +92,9 @@ function todoTests( testContext = test ) {
 				'ul#todo-list > prpl-suggested-task li'
 			);
 			await expect( todoItem ).toHaveCount( 1 );
-			await expect( todoItem.locator( 'h3 > label > span' ) ).toHaveText(
-				CREATE_TASK_TEXT
-			);
+			await expect(
+				todoItem.locator( SELECTORS.RR_ITEM_TEXT )
+			).toHaveText( CREATE_TASK_TEXT );
 		} );
 
 		testContext( 'Delete a todo', async () => {
