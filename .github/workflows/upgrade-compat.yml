@@ -102,14 +102,14 @@ jobs:
           # Activate plugin using WP-CLI
           docker exec $WP_CONTAINER wp plugin activate progress-planner --allow-root
 
-          # Show plugin version
-          docker exec $WP_CONTAINER wp option get progress_planner_version --allow-root | echo $PLUGIN_OLD_VERSION
+          # Show plugin settings (before 1.1.1 there was no version set)
+          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
 
           # Overwrite plugin files with the latest version from this branch
           docker cp . $WP_CONTAINER:/var/www/html/wp-content/plugins/progress-planner
 
-          # Show updated plugin version
-          docker exec $WP_CONTAINER wp option get progress_planner_version --allow-root
+          # Show updated plugin settings
+          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
 
           # Install Yoast SEO
           docker exec $WP_CONTAINER wp plugin install wordpress-seo --activate --allow-root
@@ -119,3 +119,5 @@ jobs:
 
           # Final plugin version check
           docker exec $WP_CONTAINER wp option get progress_planner_version --allow-root
+          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
+
