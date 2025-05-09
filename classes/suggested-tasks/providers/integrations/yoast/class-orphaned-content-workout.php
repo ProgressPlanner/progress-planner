@@ -115,7 +115,7 @@ class Orphaned_Content_Workout extends Tasks {
 	 * @return string
 	 */
 	public function get_title( $task_id = '' ) {
-		return \esc_html__( 'Run Yoast SEO Orphaned Content Workout', 'progress-planner' );
+		return \esc_html__( 'Yoast SEO: do Yoast SEO\'s Orphaned Content Workout', 'progress-planner' );
 	}
 
 	/**
@@ -128,8 +128,8 @@ class Orphaned_Content_Workout extends Tasks {
 	public function get_description( $task_id = '' ) {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Run the Yoast SEO Orphaned Content Workout to improve your site\'s SEO. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-orphaned-content" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Orphaned Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			\esc_html__( 'Improve your internal linking structure with Yoast SEO\'s Orphaned Content Workout. %s.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/run-orphaned-content-workout" target="_blank"  data-prpl_accessibility_text="' . \esc_attr__( 'Learn more about the Yoast SEO Orphaned Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Lean more', 'progress-planner' ) . '</a>'
 		);
 	}
 
@@ -141,7 +141,7 @@ class Orphaned_Content_Workout extends Tasks {
 	 * @return string
 	 */
 	public function get_url( $task_id = '' ) {
-		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts' ) ) : '';
+		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts#orphaned' ) ) : '';
 	}
 
 	/**
@@ -150,7 +150,7 @@ class Orphaned_Content_Workout extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( ! function_exists( 'YoastSEO' ) ) {
+		if ( ! defined( 'WPSEO_PREMIUM_VERSION' ) ) {
 			return false;
 		}
 

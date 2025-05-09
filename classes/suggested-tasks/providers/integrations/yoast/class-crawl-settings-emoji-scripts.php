@@ -32,7 +32,7 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	 * @return string
 	 */
 	public function get_title() {
-		return \esc_html__( 'Yoast SEO: Remove emoji scripts', 'progress-planner' );
+		return \esc_html__( 'Yoast SEO: remove emoji scripts', 'progress-planner' );
 	}
 
 	/**
