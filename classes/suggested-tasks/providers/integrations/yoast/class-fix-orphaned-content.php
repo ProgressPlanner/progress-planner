@@ -197,20 +197,27 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	public function get_tasks_to_inject() {
 
 		if (
+			true === $this->is_task_snoozed() ||
 			! $this->should_add_task() // No need to add the task.
 		) {
 			return [];
 		}
 
-		$data = $this->data_collector->collect();
+		$data    = $this->data_collector->collect();
+		$task_id = $this->get_task_id(
+			[
+				'post_id' => $data['post_id'],
+			]
+		);
+
+		// When we have data, check if task was completed.
+		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
+			return [];
+		}
 
 		return [
 			[
-				'task_id'     => $this->get_task_id(
-					[
-						'post_id' => $data['post_id'],
-					]
-				),
+				'task_id'     => $task_id,
 				'provider_id' => $this->get_provider_id(),
 				'category'    => $this->get_provider_category(),
 				'post_id'     => $data['post_id'],
