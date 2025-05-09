@@ -28,9 +28,7 @@ function todoReorderTests( testContext = test ) {
 			await page.waitForLoadState( 'networkidle' );
 
 			// Clean up active tasks
-			const activeTodoItems = page.locator(
-				'ul#todo-list > prpl-suggested-task li'
-			);
+			const activeTodoItems = page.locator( SELECTORS.TODO_ITEM );
 
 			while ( ( await activeTodoItems.count() ) > 0 ) {
 				const firstItem = activeTodoItems.first();
@@ -76,9 +74,7 @@ function todoReorderTests( testContext = test ) {
 			await page.waitForTimeout( 500 );
 
 			// Get all todo items
-			const todoItems = page.locator(
-				'ul#todo-list > prpl-suggested-task li'
-			);
+			const todoItems = page.locator( SELECTORS.TODO_ITEM );
 
 			// Verify initial order
 			const items = await todoItems.all();
