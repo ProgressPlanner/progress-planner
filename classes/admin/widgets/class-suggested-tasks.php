@@ -76,9 +76,9 @@ final class Suggested_Tasks extends Widget {
 						$task_details = \progress_planner()->get_cpt_recommendations()->get_tasks_manager()->get_task_details( $task_id );
 
 						if ( $task_details ) {
-							$task_details['priority'] = 'high'; // Celebrate tasks are always on top.
-							$task_details['action']   = 'celebrate';
-							$task_details['status']   = 'pending_celebration';
+							$task_details['priority']    = 'high'; // Celebrate tasks are always on top.
+							$task_details['action']      = 'celebrate';
+							$task_details['post_status'] = 'pending_celebration';
 
 							$tasks[] = $task_details;
 						}

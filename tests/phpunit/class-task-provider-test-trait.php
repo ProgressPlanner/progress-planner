@@ -133,8 +133,8 @@ trait Task_Provider_Test_Trait {
 			$this->assertTrue(
 				\progress_planner()->get_cpt_recommendations()->check_task_condition(
 					[
-						'status'  => 'completed',
-						'task_id' => $task['task_id'],
+						'post_status' => 'trash',
+						'task_id'     => $task['task_id'],
 					]
 				)
 			);

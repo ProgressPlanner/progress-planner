@@ -291,7 +291,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 
 		if ( ! empty( $tasks ) ) {
 			foreach ( $tasks as $task ) {
-				if ( isset( $task['status'] ) && 'completed' === $task['status'] ) {
+				if ( 'trash' === $task['post_status'] ) {
 					$this->completed_post_ids[] = $task['post_id'];
 				}
 			}

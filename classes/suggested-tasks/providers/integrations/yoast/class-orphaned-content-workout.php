@@ -95,7 +95,7 @@ class Orphaned_Content_Workout extends Tasks {
 		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'task_id' => $this->get_task_id() ] );
 
 		// If there is no pending task, return.
-		if ( empty( $tasks ) || 'pending' !== $tasks[0]['status'] ) {
+		if ( empty( $tasks ) || 'publish' !== $tasks[0]['post_status'] ) {
 			return;
 		}
 

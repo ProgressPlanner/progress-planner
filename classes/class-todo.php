@@ -45,7 +45,7 @@ class Todo {
 
 		$items = [];
 		foreach ( $tasks as $task ) {
-			if ( 'completed' === $task['status'] ) {
+			if ( 'trash' === $task['post_status'] ) {
 				$items[] = array_merge(
 					$task,
 					[
@@ -71,19 +71,19 @@ class Todo {
 
 		// Get the maximum order value from the $tasks array.
 		foreach ( $tasks as $task ) {
-			if ( 'pending' === $task['status'] && isset( $task['order'] ) && $task['order'] > $max_order ) {
-				$max_order = $task['order'];
+			if ( 'publish' === $task['post_status'] && $task['menu_order'] > $max_order ) {
+				$max_order = $task['menu_order'];
 			}
 		}
 
 		foreach ( $tasks as $task ) {
 			// Skip non-pending tasks.
-			if ( 'pending' !== $task['status'] ) {
+			if ( 'publish' !== $task['post_status'] ) {
 				continue;
 			}
 
-			if ( ! isset( $task['order'] ) ) {
-				$task['order'] = $max_order + 1;
+			if ( ! isset( $task['menu_order'] ) ) {
+				$task['menu_order'] = $max_order + 1;
 				++$max_order;
 			}
 			$items[] = array_merge(
@@ -99,7 +99,7 @@ class Todo {
 		usort(
 			$items,
 			function ( $a, $b ) {
-				return $a['order'] - $b['order'];
+				return $a['menu_order'] - $b['menu_order'];
 			}
 		);
 
@@ -229,7 +229,7 @@ class Todo {
 
 		// Check if there are already pending user tasks with a points value other than 0.
 		foreach ( $items as $item ) {
-			if ( 'pending' === $item['status'] && isset( $item['points'] ) && $item['points'] !== 0 ) {
+			if ( 'publish' === $item['post_status'] && isset( $item['points'] ) && $item['points'] !== 0 ) {
 				return 0;
 			}
 		}
@@ -265,8 +265,8 @@ class Todo {
 		// Reset the points of all the tasks, except for the first one in the todo list.
 		foreach ( \progress_planner()->get_cpt_recommendations()->get_by_params(
 			[
-				'provider' => 'user',
-				'status'   => 'publish',
+				'provider'    => 'user',
+				'post_status' => 'publish',
 			]
 		) as $task ) {
 			\progress_planner()->get_cpt_recommendations()->update_recommendation(

@@ -344,7 +344,7 @@ class Update_Term_Description extends Tasks {
 
 		if ( ! empty( $tasks ) ) {
 			foreach ( $tasks as $task ) {
-				if ( isset( $task['status'] ) && 'completed' === $task['status'] ) {
+				if ( 'trash' === $task['post_status'] ) {
 					$this->completed_term_ids[] = $task['term_id'];
 				}
 			}

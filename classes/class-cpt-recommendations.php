@@ -178,7 +178,7 @@ class CPT_Recommendations {
 			return $posts[0]['ID'];
 		}
 
-		$data['status'] = $data['status'] ?? 'published';
+		$data['post_status'] = $data['post_status'] ?? 'publish';
 
 		$args = [
 			'post_type'    => 'prpl_recommendations',
@@ -186,7 +186,7 @@ class CPT_Recommendations {
 			'post_content' => $data['description'] ?? '',
 			'menu_order'   => $data['order'] ?? 0,
 		];
-		switch ( $data['status'] ) {
+		switch ( $data['post_status'] ) {
 			case 'pending_celebration':
 				$args['post_status'] = 'pending_celebration';
 				break;
@@ -756,44 +756,13 @@ class CPT_Recommendations {
 		$parsed_condition = \wp_parse_args(
 			$condition,
 			[
-				'status'       => '',
+				'post_status'  => 'any',
 				'task_id'      => '',
 				'post_lengths' => [],
 			]
 		);
 
-		if ( 'snoozed-post-length' === $parsed_condition['status'] ) {
-			if ( isset( $parsed_condition['post_lengths'] ) ) {
-				if ( ! \is_array( $parsed_condition['post_lengths'] ) ) {
-					$parsed_condition['post_lengths'] = [ $parsed_condition['post_lengths'] ];
-				}
-
-				$snoozed_tasks        = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'future' ] );
-				$snoozed_post_lengths = [];
-
-				// Get the post lengths of the snoozed tasks.
-				foreach ( $snoozed_tasks as $task ) {
-					$data = \progress_planner()->get_cpt_recommendations()->get_tasks_manager()->get_data_from_task_id( $task['task_id'] ); // @phpstan-ignore-line method.nonObject
-					if ( isset( $data['category'] ) && 'create-post' === $data['category'] ) {
-						$key = true === $data['long'] ? 'long' : 'short';
-						if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
-							$snoozed_post_lengths[ $key ] = true;
-						}
-					}
-				}
-
-				// Check if the snoozed post lengths match the condition.
-				foreach ( $parsed_condition['post_lengths'] as $post_length ) {
-					if ( ! isset( $snoozed_post_lengths[ $post_length ] ) ) {
-						return false;
-					}
-				}
-
-				return true;
-			}
-		}
-
-		foreach ( \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => $parsed_condition['status'] ] ) as $task ) {
+		foreach ( \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => $parsed_condition['post_status'] ] ) as $task ) {
 			if ( $task['task_id'] === $parsed_condition['task_id'] ) {
 				return true;
 			}
