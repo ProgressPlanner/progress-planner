@@ -99,7 +99,7 @@ class Update_Term_Description extends Tasks {
 	 * @return void
 	 */
 	public function maybe_remove_irrelevant_tasks( $term, $tt_id, $taxonomy, $deleted_term, $object_ids ) {
-		$pending_tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'provider_id' => $this->get_provider_id() ] );
+		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! $pending_tasks ) {
 			return;
@@ -109,7 +109,7 @@ class Update_Term_Description extends Tasks {
 			if ( isset( $task['term_id'] ) && isset( $task['taxonomy'] ) ) {
 
 				if ( (int) $task['term_id'] === (int) $deleted_term->term_id ) {
-					\progress_planner()->get_cpt_recommendations()->delete_recommendation( $task['ID'] );
+					\progress_planner()->get_suggested_tasks()->delete_recommendation( $task['ID'] );
 				}
 			}
 		}
@@ -147,7 +147,7 @@ class Update_Term_Description extends Tasks {
 		}
 
 		// Get the task data.
-		$task_data = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'task_id' => $task_id ] );
+		$task_data = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'task_id' => $task_id ] );
 
 		// We don't want to link if the term was deleted.
 		if ( empty( $task_data ) || ! $task_data[0] ) {
@@ -252,7 +252,7 @@ class Update_Term_Description extends Tasks {
 			]
 		);
 
-		if ( true === \progress_planner()->get_cpt_recommendations()->was_task_completed( $task_id ) ) {
+		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
 			return [];
 		}
 
@@ -307,7 +307,7 @@ class Update_Term_Description extends Tasks {
 	 * @return \WP_Term|null
 	 */
 	public function get_term_from_task_id( $task_id ) {
-		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'task_id' => $task_id ] );
+		$tasks = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'task_id' => $task_id ] );
 
 		if ( empty( $tasks ) ) {
 			return null;
@@ -340,7 +340,7 @@ class Update_Term_Description extends Tasks {
 		}
 
 		$this->completed_term_ids = [];
-		$tasks                    = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'provider_id' => $this->get_provider_id() ] );
+		$tasks                    = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! empty( $tasks ) ) {
 			foreach ( $tasks as $task ) {

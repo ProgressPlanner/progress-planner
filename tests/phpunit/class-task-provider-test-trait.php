@@ -48,7 +48,7 @@ trait Task_Provider_Test_Trait {
 		parent::set_up();
 
 		// Get the task provider.
-		$this->task_provider = \progress_planner()->get_cpt_recommendations()->get_tasks_manager()->get_task_provider( $this->task_provider_id );
+		$this->task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $this->task_provider_id );
 	}
 
 	/**
@@ -60,7 +60,7 @@ trait Task_Provider_Test_Trait {
 		parent::tear_down();
 
 		// Delete tasks.
-		\progress_planner()->get_cpt_recommendations()->delete_all_recommendations();
+		\progress_planner()->get_suggested_tasks()->delete_all_recommendations();
 	}
 
 	/**
@@ -85,7 +85,7 @@ trait Task_Provider_Test_Trait {
 
 		// Add the task(s) to the suggested tasks.
 		foreach ( $tasks as $task ) {
-			\progress_planner()->get_cpt_recommendations()->add( $task );
+			\progress_planner()->get_suggested_tasks()->add( $task );
 		}
 
 		// Verify that the task(s) are in the suggested tasks.
@@ -105,9 +105,9 @@ trait Task_Provider_Test_Trait {
 		$this->complete_task();
 
 		// Change the task status to pending celebration for all completed tasks.
-		foreach ( \progress_planner()->get_cpt_recommendations()->get_tasks_manager()->evaluate_tasks() as $task ) {
+		foreach ( \progress_planner()->get_suggested_tasks()->get_tasks_manager()->evaluate_tasks() as $task ) {
 			// Change the task status to pending celebration.
-			\progress_planner()->get_cpt_recommendations()->update_recommendation(
+			\progress_planner()->get_suggested_tasks()->update_recommendation(
 				$task->get_data()['ID'],
 				[ 'post_status' => 'pending_celebration' ]
 			);
@@ -118,7 +118,7 @@ trait Task_Provider_Test_Trait {
 		// Verify that the task(s) we're testing is pending celebration.
 		foreach ( $tasks as $task ) {
 			$this->assertTrue(
-				\progress_planner()->get_cpt_recommendations()->check_task_condition(
+				\progress_planner()->get_suggested_tasks()->check_task_condition(
 					[
 						'status'  => 'pending_celebration',
 						'task_id' => $task['task_id'],
@@ -129,9 +129,9 @@ trait Task_Provider_Test_Trait {
 
 		// Verify that the task(s) we're testing is completed.
 		foreach ( $tasks as $task ) {
-			\progress_planner()->get_cpt_recommendations()->transition_task_status( $task['task_id'], 'pending_celebration', 'completed' );
+			\progress_planner()->get_suggested_tasks()->transition_task_status( $task['task_id'], 'pending_celebration', 'completed' );
 			$this->assertTrue(
-				\progress_planner()->get_cpt_recommendations()->check_task_condition(
+				\progress_planner()->get_suggested_tasks()->check_task_condition(
 					[
 						'post_status' => 'trash',
 						'task_id'     => $task['task_id'],

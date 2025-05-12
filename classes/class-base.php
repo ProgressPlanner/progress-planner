@@ -35,7 +35,7 @@ namespace Progress_Planner;
  * @method \Progress_Planner\Utils\Debug_Tools get_utils__debug_tools()
  * @method \Progress_Planner\Badges get_badges()
  * @method \Progress_Planner\Plugin_Migrations get_plugin_migrations()
- * @method \Progress_Planner\CPT_Recommendations get_cpt_recommendations()
+ * @method \Progress_Planner\Suggested_Tasks get_suggested_tasks()
  */
 class Base {
 
@@ -89,7 +89,7 @@ class Base {
 			}
 		}
 
-		$this->get_cpt_recommendations();
+		$this->get_suggested_tasks();
 
 		$this->get_admin__editor();
 

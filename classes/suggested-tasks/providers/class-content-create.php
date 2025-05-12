@@ -169,7 +169,7 @@ class Content_Create extends Tasks {
 			return $this->points;
 		}
 
-		$post_data = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'task_id' => $task_id ] );
+		$post_data = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'task_id' => $task_id ] );
 		$post_data = $post_data[0] ?? false;
 
 		// Backwards compatibility.

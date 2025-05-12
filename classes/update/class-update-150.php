@@ -52,7 +52,7 @@ class Update_150 {
 	 */
 	private function migrate_task( $task ) {
 		// Get the task details.
-		\progress_planner()->get_cpt_recommendations()->add(
+		\progress_planner()->get_suggested_tasks()->add(
 			\Progress_Planner\Suggested_Tasks\Task_Factory::create_task_from_id( $task['task_id'] )->get_task_details()
 		);
 	}

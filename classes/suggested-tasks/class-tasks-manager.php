@@ -213,14 +213,14 @@ class Tasks_Manager {
 		// Add the tasks to the pending tasks option, it will not add duplicates.
 		foreach ( $provider_tasks as $task ) {
 			// Get the task.
-			$task_post = \progress_planner()->get_cpt_recommendations()->get_post( $task['task_id'] );
+			$task_post = \progress_planner()->get_suggested_tasks()->get_post( $task['task_id'] );
 			// Skip the task if it was completed.
 			if ( ! $task_post || in_array( $task_post['post_status'], [ 'pending_celebration', 'trash' ], true ) ) {
 				continue;
 			}
 
 			$tasks_to_inject[] = $task;
-			\progress_planner()->get_cpt_recommendations()->add( $task );
+			\progress_planner()->get_suggested_tasks()->add( $task );
 		}
 	}
 
@@ -230,7 +230,7 @@ class Tasks_Manager {
 	 * @return array
 	 */
 	public function evaluate_tasks() {
-		$tasks           = (array) \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'publish' ] );
+		$tasks           = (array) \progress_planner()->get_suggested_tasks()->get_by_params( [ 'post_status' => 'publish' ] );
 		$completed_tasks = [];
 
 		foreach ( $tasks as $task_data ) {
@@ -259,7 +259,7 @@ class Tasks_Manager {
 		// Check if the task is no longer relevant.
 		if ( ! $task_provider->is_task_relevant() ) {
 			// Remove the task from the pending tasks.
-			\progress_planner()->get_cpt_recommendations()->delete_recommendation( $task['ID'] );
+			\progress_planner()->get_suggested_tasks()->delete_recommendation( $task['ID'] );
 		}
 
 		return $task_provider->evaluate_task( $task );
@@ -310,14 +310,14 @@ class Tasks_Manager {
 			return;
 		}
 
-		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'publish' ] );
+		$tasks = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'post_status' => 'publish' ] );
 
 		foreach ( $tasks as $task ) {
 			if ( ! isset( $task['date'] ) || \gmdate( 'YW' ) !== (string) $task['date'] ) {
 				continue;
 			}
 
-			\progress_planner()->get_cpt_recommendations()->delete_recommendation( $task['ID'] );
+			\progress_planner()->get_suggested_tasks()->delete_recommendation( $task['ID'] );
 		}
 
 		\progress_planner()->get_utils__cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );

@@ -52,7 +52,7 @@ final class Suggested_Tasks extends Widget {
 	 */
 	public function enqueue_scripts() {
 		// Get tasks from task providers and pending_celebration tasks.
-		$tasks             = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'publish' ] );
+		$tasks             = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'post_status' => 'publish' ] );
 		$delay_celebration = false;
 
 		// Celebrate only on the Progress Planner Dashboard page.
@@ -63,17 +63,17 @@ final class Suggested_Tasks extends Widget {
 
 			// If we're not delaying the celebration, we need to get the pending_celebration tasks.
 			if ( ! $delay_celebration ) {
-				$pending_celebration_tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'pending_celebration' ] );
+				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'post_status' => 'pending_celebration' ] );
 
 				foreach ( $pending_celebration_tasks as $key => $task ) {
 					$task_id = $task['task_id'];
 
-					$task_provider = \progress_planner()->get_cpt_recommendations()->get_tasks_manager()->get_task_provider(
+					$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider(
 						Task_Factory::create_task_from_id( $task_id )->get_provider_id()
 					);
 
 					if ( $task_provider && $task_provider->capability_required() ) {
-						$task_details = \progress_planner()->get_cpt_recommendations()->get_tasks_manager()->get_task_details( $task_id );
+						$task_details = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_details( $task_id );
 
 						if ( $task_details ) {
 							$task_details['priority']    = 'high'; // Celebrate tasks are always on top.
@@ -83,13 +83,13 @@ final class Suggested_Tasks extends Widget {
 							$tasks[] = $task_details;
 						}
 
-						$task_post = \progress_planner()->get_cpt_recommendations()->get_post( $task_id );
+						$task_post = \progress_planner()->get_suggested_tasks()->get_post( $task_id );
 						if ( ! $task_post ) {
 							continue;
 						}
 
 						// Mark the pending celebration tasks as completed.
-						\progress_planner()->get_cpt_recommendations()->update_recommendation(
+						\progress_planner()->get_suggested_tasks()->update_recommendation(
 							$task_post['ID'],
 							[ 'post_status' => 'trash' ]
 						);

@@ -295,7 +295,7 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return bool
 	 */
 	public function is_task_snoozed() {
-		$snoozed = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'future' ] );
+		$snoozed = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'post_status' => 'future' ] );
 		if ( empty( $snoozed ) ) {
 			return false;
 		}
@@ -415,7 +415,7 @@ abstract class Tasks implements Tasks_Interface {
 		if (
 			true === $this->is_task_snoozed() ||
 			! $this->should_add_task() || // No need to add the task.
-			true === \progress_planner()->get_cpt_recommendations()->was_task_completed( $task_id )
+			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id )
 		) {
 			return [];
 		}

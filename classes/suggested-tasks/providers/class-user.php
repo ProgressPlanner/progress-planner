@@ -48,7 +48,7 @@ class User extends Tasks {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-		return \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'provider_id' => self::PROVIDER_ID ] );
+		return \progress_planner()->get_suggested_tasks()->get_by_params( [ 'provider_id' => self::PROVIDER_ID ] );
 	}
 
 	/**
@@ -60,7 +60,7 @@ class User extends Tasks {
 	 */
 	public function get_task_details( $task_id = '' ) {
 		// Get the user tasks from the database.
-		$task_post = \progress_planner()->get_cpt_recommendations()->get_post( $task_id );
+		$task_post = \progress_planner()->get_suggested_tasks()->get_post( $task_id );
 		return $task_post ? $task_post : [];
 	}
 }

@@ -41,7 +41,7 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 		];
 
 		foreach ( $tasks_to_keep as $task ) {
-			\progress_planner()->get_cpt_recommendations()->add( $task );
+			\progress_planner()->get_suggested_tasks()->add( $task );
 		}
 
 		// Tasks that should be removed.
@@ -57,10 +57,10 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 		];
 
 		foreach ( $tasks_to_remove as $task ) {
-			\progress_planner()->get_cpt_recommendations()->add( $task );
+			\progress_planner()->get_suggested_tasks()->add( $task );
 		}
 
-		\progress_planner()->get_cpt_recommendations()->get_tasks_manager()->cleanup_pending_tasks();
+		\progress_planner()->get_suggested_tasks()->get_tasks_manager()->cleanup_pending_tasks();
 
 		$this->assertEquals( count( $tasks_to_keep ), \count( \progress_planner()->get_settings()->get( 'tasks', [] ) ) );
 	}

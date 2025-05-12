@@ -41,7 +41,7 @@ class Todo {
 	 * @return array
 	 */
 	public function get_completed_items() {
-		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'provider_id' => 'user' ] );
+		$tasks = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'provider_id' => 'user' ] );
 
 		$items = [];
 		foreach ( $tasks as $task ) {
@@ -65,7 +65,7 @@ class Todo {
 	 * @return array
 	 */
 	public function get_pending_items() {
-		$tasks     = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'provider_id' => 'user' ] );
+		$tasks     = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'provider_id' => 'user' ] );
 		$items     = [];
 		$max_order = 0;
 
@@ -123,12 +123,12 @@ class Todo {
 
 		// If the task ID is set, we're updating an existing task.
 		if ( $task_id ) {
-			$task = \progress_planner()->get_cpt_recommendations()->get_post( $task_id );
+			$task = \progress_planner()->get_suggested_tasks()->get_post( $task_id );
 			if ( ! $task ) {
 				\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
 			}
 
-			\progress_planner()->get_cpt_recommendations()->update_recommendation( $task['ID'], [ 'post_title' => $title ] );
+			\progress_planner()->get_suggested_tasks()->update_recommendation( $task['ID'], [ 'post_title' => $title ] );
 			return;
 		}
 
@@ -178,7 +178,7 @@ class Todo {
 		$tasks = \array_map( 'intval', \explode( ',', $tasks ) );
 
 		// Get tasks from the `prpl_suggested_task` post type, that have a `prpl_recommendations_provider` of `user`.
-		$user_tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'provider' => 'user' ] );
+		$user_tasks = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'provider' => 'user' ] );
 		foreach ( $user_tasks as $task ) {
 			if ( in_array( (int) $task['ID'], $tasks, true ) ) {
 				\wp_update_post(
@@ -263,13 +263,13 @@ class Todo {
 		$task_ids = array_column( $pending_items, 'ID' );
 
 		// Reset the points of all the tasks, except for the first one in the todo list.
-		foreach ( \progress_planner()->get_cpt_recommendations()->get_by_params(
+		foreach ( \progress_planner()->get_suggested_tasks()->get_by_params(
 			[
 				'provider'    => 'user',
 				'post_status' => 'publish',
 			]
 		) as $task ) {
-			\progress_planner()->get_cpt_recommendations()->update_recommendation(
+			\progress_planner()->get_suggested_tasks()->update_recommendation(
 				$task['ID'],
 				[ 'points' => $task['ID'] === $task_ids[0] ? 1 : 0 ]
 			);

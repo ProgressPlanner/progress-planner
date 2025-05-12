@@ -184,7 +184,7 @@ class Debug_Tools {
 		$onboard_task_provider_ids = \apply_filters( 'prpl_onboarding_task_providers', [] );
 
 		foreach ( $onboard_task_provider_ids as $task_provider_id ) {
-			$task_provider = \progress_planner()->get_cpt_recommendations()->get_tasks_manager()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
+			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
 			if ( $task_provider ) { // @phpstan-ignore-line
 				$task_provider_details = $task_provider->get_task_details();
 				if ( empty( $task_provider_details ) ) {
@@ -222,7 +222,7 @@ class Debug_Tools {
 		);
 
 		// Get suggested tasks.
-		$suggested_tasks = \progress_planner()->get_cpt_recommendations()->get( [ 'post_status' => 'any' ] );
+		$suggested_tasks = \progress_planner()->get_suggested_tasks()->get( [ 'post_status' => 'any' ] );
 
 		$menu_items = [
 			'publish'             => 'Pending',
@@ -375,11 +375,11 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Get pending tasks.
-		$pending_tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'publish' ] );
+		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'post_status' => 'publish' ] );
 
 		// Delete the pending tasks.
 		foreach ( $pending_tasks as $task ) {
-			\progress_planner()->get_cpt_recommendations()->delete_recommendation( (int) $task['ID'] );
+			\progress_planner()->get_suggested_tasks()->delete_recommendation( (int) $task['ID'] );
 		}
 
 		// Redirect to the same page without the parameter.
@@ -524,7 +524,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the option.
-		\progress_planner()->get_cpt_recommendations()->delete_all_recommendations();
+		\progress_planner()->get_suggested_tasks()->delete_all_recommendations();
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_suggested_tasks', '_wpnonce' ] ) );
