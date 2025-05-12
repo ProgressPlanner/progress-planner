@@ -77,6 +77,7 @@ class Todo {
 		\wp_set_post_terms( $task_id, 'user', 'prpl_recommendations_provider' );
 		\wp_set_post_terms( $task_id, 'user', 'prpl_recommendations_category' );
 		\update_post_meta( $task_id, 'prpl_points', $task_points );
+		\update_post_meta( $task_id, 'prpl_task_id', $task_id );
 
 		\wp_send_json_success(
 			[
