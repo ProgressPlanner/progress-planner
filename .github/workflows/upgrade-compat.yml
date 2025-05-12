@@ -62,10 +62,18 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install system dependencies (host)
+      - name: Install PHP & Composer on host
         run: |
           sudo apt-get update
-          sudo apt-get install -y git curl unzip
+          sudo apt-get install -y git curl unzip php-cli php-curl php-mbstring php-xml php-zip
+          curl -sS https://getcomposer.org/installer | php
+          sudo mv composer.phar /usr/local/bin/composer
+
+      - name: Install plugin dependencies (Composer)
+        run: |
+          composer config -g http-basic.my.yoast.com token $YOAST_TOKEN
+          composer config repositories.my-yoast composer https://my.yoast.com/packages/
+          composer install --working-dir=./
 
       - name: Complete WordPress installation
         run: |
@@ -78,41 +86,23 @@ jobs:
           -d "admin_email=$WORDPRESS_ADMIN_EMAIL" \
           -d "public=1"
 
-      - name: Setup WordPress container (tools + plugin)
+      - name: Install and activate plugins in WordPress container
         run: |
           WP_CONTAINER=$(docker ps -qf "name=wordpress")
-
-          echo "Installing tools in WordPress container..."
-
-          docker exec $WP_CONTAINER apt-get update
-          docker exec $WP_CONTAINER apt-get install -y curl unzip git php-cli php-curl php-mbstring php-xml php-zip
 
           # Install WP-CLI
           docker exec $WP_CONTAINER curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
           docker exec $WP_CONTAINER chmod +x wp-cli.phar
           docker exec $WP_CONTAINER mv wp-cli.phar /usr/local/bin/wp
 
-          # Setup plugin
-          docker exec $WP_CONTAINER mkdir -p /var/www/html/wp-content/plugins
-          docker exec $WP_CONTAINER git clone --branch v1.1.0 https://github.com/${PLUGIN_REPO}.git /var/www/html/wp-content/plugins/progress-planner
-
-          docker exec $WP_CONTAINER wp plugin activate progress-planner --allow-root
-          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
-
+          # Copy plugin
+          docker exec $WP_CONTAINER mkdir -p /var/www/html/wp-content/plugins/progress-planner
           docker cp . $WP_CONTAINER:/var/www/html/wp-content/plugins/progress-planner
-          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
 
+          # Activate plugins
+          docker exec $WP_CONTAINER wp plugin activate progress-planner --allow-root
           docker exec $WP_CONTAINER wp plugin install wordpress-seo --activate --allow-root
           docker exec $WP_CONTAINER wp plugin install yoast-comment-hacks --activate --allow-root
-
-          # Composer & Yoast Premium setup
-          docker exec $WP_CONTAINER curl -sS https://getcomposer.org/installer -o composer-setup.php
-          docker exec $WP_CONTAINER php composer-setup.php --install-dir=/usr/local/bin --filename=composer
-
-          docker exec $WP_CONTAINER composer config -g http-basic.my.yoast.com token $YOAST_TOKEN
-          docker exec $WP_CONTAINER composer config repositories.my-yoast composer https://my.yoast.com/packages/
-          docker exec $WP_CONTAINER composer require yoast/wordpress-seo-premium
-
           docker exec $WP_CONTAINER wp plugin activate wordpress-seo-premium --allow-root
 
           docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
