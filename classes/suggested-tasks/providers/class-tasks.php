@@ -301,7 +301,7 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		foreach ( $snoozed as $task ) {
-			$task_object = Task_Factory::create_task_from( 'id', $task['task_id'] );
+			$task_object = Task_Factory::create_task_from_id( $task['task_id'] );
 			$provider_id = $task_object->get_provider_id();
 
 			if ( $provider_id === $this->get_provider_id() ) {
@@ -340,10 +340,10 @@ abstract class Tasks implements Tasks_Interface {
 			if ( 0 !== strpos( $task_id, $this->get_task_id() ) ) {
 				return false;
 			}
-			return $this->is_task_completed( $task_id ) ? Task_Factory::create_task_from( 'id', $task_id ) : false;
+			return $this->is_task_completed( $task_id ) ? Task_Factory::create_task_from_id( $task_id ) : false;
 		}
 
-		$task_object = Task_Factory::create_task_from( 'id', $task_id );
+		$task_object = Task_Factory::create_task_from_id( $task_id );
 		$task_data   = $task_object->get_data();
 
 		if ( $task_data['provider_id'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['date'] && $this->is_task_completed( $task_id ) ) {

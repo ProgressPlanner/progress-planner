@@ -17,32 +17,16 @@ class Task_Factory {
 	/**
 	 * Get the task.
 	 *
-	 * @param string $param The parameter, 'id' or 'data'.
-	 * @param mixed  $value The task ID or task data.
+	 * @param mixed $value The task ID or task data.
 	 *
 	 * @return \Progress_Planner\Suggested_Tasks\Task
 	 */
-	public static function create_task_from( $param, $value = null ): Task {
+	public static function create_task_from_id( $value = null ): Task {
+		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ is_numeric( $value ) ? 'ID' : 'task_id' => $value ] );
 
-		// If we have task data, return it.
-		if ( 'data' === $param && is_array( $value ) ) {
-			return new Task( $value );
-		}
-
-		if ( 'id' === $param && is_string( $value ) ) {
-			// We should have all the data saved in the database.
-			$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'task_id' => $value ] );
-
-			// If we have the task data, return it.
-			if ( isset( $tasks[0] ) ) {
-				return new Task( $tasks[0] );
-			}
-
-			/*
-			We're here in following cases:
-			 * - Legacy tasks, happens during v1.1.1 update, where we parsed task data from the task_id.
-			*/
-			return self::parse_task_data_from_task_id( $value );
+		// If we have the task data, return it.
+		if ( isset( $tasks[0] ) ) {
+			return new Task( $tasks[0] );
 		}
 
 		return new Task( [] );

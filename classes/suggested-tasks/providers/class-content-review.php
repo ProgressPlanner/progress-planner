@@ -532,7 +532,7 @@ class Content_Review extends Tasks {
 	 */
 	protected function is_specific_task_completed( $task_id ) {
 
-		$task = Task_Factory::create_task_from( 'id', $task_id );
+		$task = Task_Factory::create_task_from_id( $task_id );
 		$data = $task->get_data();
 
 		if ( isset( $data['post_id'] ) && (int) \get_post_modified_time( 'U', false, (int) $data['post_id'] ) > strtotime( '-12 months' ) ) {

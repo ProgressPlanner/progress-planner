@@ -234,14 +234,11 @@ class Tasks_Manager {
 		$completed_tasks = [];
 
 		foreach ( $tasks as $task_data ) {
-			if ( ! isset( $task_data['task_id'] ) ) {
-				continue;
-			}
 
 			$task_id = $task_data['task_id'];
 
 			// Check if the task is no longer relevant.
-			$task_object   = Task_Factory::create_task_from( 'id', $task_id );
+			$task_object   = Task_Factory::create_task_from_id( $task_id );
 			$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
 			if ( $task_provider && ! $task_provider->is_task_relevant() ) {
 				// Remove the task from the pending tasks.
@@ -265,7 +262,7 @@ class Tasks_Manager {
 	 * @return bool|\Progress_Planner\Suggested_Tasks\Task
 	 */
 	public function evaluate_task( $task_id ) {
-		$task_object   = Task_Factory::create_task_from( 'id', $task_id );
+		$task_object   = Task_Factory::create_task_from_id( $task_id );
 		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
 
 		if ( ! $task_provider ) {
@@ -283,7 +280,7 @@ class Tasks_Manager {
 	 * @return array|false
 	 */
 	public function get_task_details( $task_id ) {
-		$task_object   = Task_Factory::create_task_from( 'id', $task_id );
+		$task_object   = Task_Factory::create_task_from_id( $task_id );
 		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
 
 		if ( ! $task_provider ) {
@@ -301,7 +298,7 @@ class Tasks_Manager {
 	 * @return array
 	 */
 	public function get_data_from_task_id( $task_id ) {
-		$task_object = Task_Factory::create_task_from( 'id', $task_id );
+		$task_object = Task_Factory::create_task_from_id( $task_id );
 
 		return $task_object->get_data();
 	}
