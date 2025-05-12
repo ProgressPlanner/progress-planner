@@ -76,7 +76,7 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 			\progress_planner()->get_cpt_recommendations()->add( $task );
 		}
 
-		$this->suggested_tasks->get_tasks_manager()->cleanup_pending_tasks();
+		\progress_planner()->get_cpt_recommendations()->get_tasks_manager()->cleanup_pending_tasks();
 
 		$this->assertEquals( count( $tasks_to_keep ), \count( \progress_planner()->get_settings()->get( 'tasks', [] ) ) );
 	}

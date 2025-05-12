@@ -7,7 +7,6 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Suggested_Tasks\Tasks_Manager;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
 /**
  * Suggested_Tasks class.
@@ -15,57 +14,15 @@ use Progress_Planner\Suggested_Tasks\Task_Factory;
 class Suggested_Tasks {
 
 	/**
-	 * An object containing tasks.
-	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Tasks_Manager|null
-	 */
-	private $tasks_manager;
-
-	/**
 	 * Constructor.
 	 *
 	 * @return void
 	 */
 	public function __construct() {
-		$this->tasks_manager = new Tasks_Manager();
-
 		\add_action( 'wp_ajax_progress_planner_suggested_task_action', [ $this, 'suggested_task_action' ] );
-
-		if ( \is_admin() ) {
-			\add_action( 'init', [ $this, 'init' ], 100 ); // Wait for the post types to be initialized.
-		}
 
 		// Add the automatic updates complete action.
 		\add_action( 'automatic_updates_complete', [ $this, 'on_automatic_updates_complete' ] );
-	}
-
-	/**
-	 * Run the tasks.
-	 *
-	 * @return void
-	 */
-	public function init() {
-		// Check for completed tasks.
-		$completed_tasks = $this->tasks_manager->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
-
-		foreach ( $completed_tasks as $task ) {
-
-			// Get the task data.
-			$task_data = $task->get_data();
-
-			// Update the task data.
-			$this->update_pending_task( $task_data['task_id'], $task_data );
-
-			// Change the task status to pending celebration.
-			$task_post = \progress_planner()->get_cpt_recommendations()->get_post( $task_data['task_id'] );
-			if ( ! $task_post ) {
-				continue;
-			}
-			\progress_planner()->get_cpt_recommendations()->update_recommendation( $task_post['ID'], [ 'post_status' => 'pending_celebration' ] );
-
-			// Insert an activity.
-			\progress_planner()->get_cpt_recommendations()->insert_activity( $task_data['task_id'] );
-		}
 	}
 
 	/**
@@ -92,15 +49,6 @@ class Suggested_Tasks {
 
 		// Insert an activity.
 		\progress_planner()->get_cpt_recommendations()->insert_activity( $pending_tasks[0]['ID'] );
-	}
-
-	/**
-	 * Get the tasks manager object.
-	 *
-	 * @return \Progress_Planner\Suggested_Tasks\Tasks_Manager
-	 */
-	public function get_tasks_manager() {
-		return $this->tasks_manager; // @phpstan-ignore-line return.type
 	}
 
 	/**
@@ -276,7 +224,7 @@ class Suggested_Tasks {
 
 				// Get the post lengths of the snoozed tasks.
 				foreach ( $snoozed_tasks as $task ) {
-					$data = $this->tasks_manager->get_data_from_task_id( $task['task_id'] ); // @phpstan-ignore-line method.nonObject
+					$data = \progress_planner()->get_cpt_recommendations()->get_tasks_manager()->get_data_from_task_id( $task['task_id'] ); // @phpstan-ignore-line method.nonObject
 					if ( isset( $data['category'] ) && 'create-post' === $data['category'] ) {
 						$key = true === $data['long'] ? 'long' : 'short';
 						if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
@@ -303,22 +251,6 @@ class Suggested_Tasks {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Update a task.
-	 *
-	 * @param string $task_id The task ID.
-	 * @param array  $data The data.
-	 *
-	 * @return bool
-	 */
-	public function update_pending_task( $task_id, $data ) {
-		$task_post = \progress_planner()->get_cpt_recommendations()->get_post( $task_id );
-		if ( ! $task_post ) {
-			return false;
-		}
-		return \progress_planner()->get_cpt_recommendations()->update_recommendation( $task_post['ID'], $data );
 	}
 
 	/**

@@ -8,6 +8,7 @@
 namespace Progress_Planner;
 
 use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
+use Progress_Planner\Suggested_Tasks\Tasks_Manager;
 
 /**
  * Recommendations class.
@@ -24,9 +25,21 @@ class CPT_Recommendations {
 	];
 
 	/**
+	 * An object containing tasks.
+	 *
+	 * @var \Progress_Planner\Suggested_Tasks\Tasks_Manager|null
+	 */
+	private $tasks_manager;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
+		$this->tasks_manager = new Tasks_Manager();
+
+		if ( \is_admin() ) {
+			\add_action( 'init', [ $this, 'init' ], 100 ); // Wait for the post types to be initialized.
+		}
 
 		// Register the custom post type.
 		\add_action( 'init', [ $this, 'register_post_type' ], 0 );
@@ -36,6 +49,39 @@ class CPT_Recommendations {
 
 		// Add the custom post status.
 		\add_action( 'init', [ $this, 'register_post_status' ], 1 );
+	}
+
+	/**
+	 * Run the tasks.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		// Check for completed tasks.
+		$completed_tasks = $this->tasks_manager->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
+
+		foreach ( $completed_tasks as $task ) {
+
+			// Get the task data.
+			$task_data = $task->get_data();
+
+			// Update the task data.
+			$task_post = $this->get_post( $task_data['task_id'] );
+			if ( ! $task_post ) {
+				continue;
+			}
+			$this->update_recommendation( $task_post['ID'], $task_data );
+
+			// Change the task status to pending celebration.
+			$task_post = \progress_planner()->get_cpt_recommendations()->get_post( $task_data['task_id'] );
+			if ( ! $task_post ) {
+				continue;
+			}
+			\progress_planner()->get_cpt_recommendations()->update_recommendation( $task_post['ID'], [ 'post_status' => 'pending_celebration' ] );
+
+			// Insert an activity.
+			\progress_planner()->get_cpt_recommendations()->insert_activity( $task_data['task_id'] );
+		}
 	}
 
 	/**
@@ -561,5 +607,14 @@ class CPT_Recommendations {
 		);
 
 		return isset( $posts[0] ) ? $posts[0] : false;
+	}
+
+	/**
+	 * Get the tasks manager object.
+	 *
+	 * @return \Progress_Planner\Suggested_Tasks\Tasks_Manager
+	 */
+	public function get_tasks_manager() {
+		return $this->tasks_manager; // @phpstan-ignore-line return.type
 	}
 }

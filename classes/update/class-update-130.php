@@ -189,7 +189,7 @@ class Update_130 {
 	 */
 	private function handle_legacy_review_post_tasks( $task_object ) {
 		// Review provider.
-		$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( 'review-post' );
+		$task_provider = \progress_planner()->get_cpt_recommendations()->get_tasks_manager()->get_task_provider( 'review-post' );
 
 		// Get the post ID and date from the task ID.
 		$parts = explode( '-', $task_object->get_task_id() );
