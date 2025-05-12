@@ -272,6 +272,11 @@ class Remove_Terms_Without_Posts extends Tasks {
 				'taxonomy'    => $data['taxonomy'],
 				'term_name'   => $data['name'],
 				'date'        => \gmdate( 'YW' ),
+				'post_title'  => \sprintf( // TODO: WIP.
+						/* translators: %s: The term name */
+					\esc_html__( 'Remove term named "%s"', 'progress-planner' ),
+					\esc_html( $data['name'] )
+				),
 			],
 		];
 	}

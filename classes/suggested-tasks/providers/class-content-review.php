@@ -296,6 +296,7 @@ class Content_Review extends Tasks {
 					'post_id'     => $task_data['post_id'],
 					'post_type'   => $task_data['post_type'],
 					'date'        => \gmdate( 'YW' ),
+					'post_title'  => $this->get_title( $task_data['task_id'] ),
 				];
 			}
 		}

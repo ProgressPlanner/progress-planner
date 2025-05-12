@@ -599,7 +599,7 @@ class Suggested_Tasks {
 	 * @return int
 	 */
 	public function add( $data ) {
-		if ( empty( $data['title'] ) ) {
+		if ( empty( $data['post_title'] ) ) {
 			error_log( 'Task not added - missing title: ' . wp_json_encode( $data ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			return 0;
 		}
@@ -622,7 +622,7 @@ class Suggested_Tasks {
 
 		$args = [
 			'post_type'    => 'prpl_recommendations',
-			'post_title'   => $data['title'],
+			'post_title'   => $data['post_title'],
 			'post_content' => $data['description'] ?? '',
 			'menu_order'   => $data['order'] ?? 0,
 		];

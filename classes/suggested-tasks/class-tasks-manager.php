@@ -215,8 +215,8 @@ class Tasks_Manager {
 			$id = isset( $task['ID'] ) ? $task['ID'] : $task['task_id'];
 			// Get the task.
 			$task_post = \progress_planner()->get_suggested_tasks()->get_post( $id );
-			// Skip the task if it was completed.
-			if ( ! $task_post || in_array( $task_post['post_status'], [ 'pending_celebration', 'trash' ], true ) ) {
+			// Skip the task if it was already injected.
+			if ( $task_post ) {
 				continue;
 			}
 
