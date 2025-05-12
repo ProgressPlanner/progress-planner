@@ -82,16 +82,10 @@ jobs:
         run: |
           WP_CONTAINER=$(docker ps -qf "name=wordpress")
 
-          echo "Installing packages in WordPress container..."
+          echo "Installing tools in WordPress container..."
 
           docker exec $WP_CONTAINER apt-get update
-          docker exec $WP_CONTAINER apt-get install -y lsb-release apt-transport-https ca-certificates gnupg wget curl unzip git
-
-          docker exec $WP_CONTAINER bash -c "curl -fsSL https://packages.sury.org/php/apt.gpg | gpg --dearmor -o /usr/share/keyrings/sury.gpg"
-          docker exec $WP_CONTAINER bash -c "echo 'deb [signed-by=/usr/share/keyrings/sury.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main' > /etc/apt/sources.list.d/sury.list"
-
-          docker exec $WP_CONTAINER apt-get update
-          docker exec $WP_CONTAINER apt-get install -y php8.2-cli php8.2-curl php8.2-mbstring php8.2-xml php8.2-zip
+          docker exec $WP_CONTAINER apt-get install -y curl unzip git php-cli php-curl php-mbstring php-xml php-zip
 
           # Install WP-CLI
           docker exec $WP_CONTAINER curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
