@@ -127,8 +127,7 @@ class Tasks_Manager {
 			$task_provider->init();
 		}
 
-		// Inject tasks.
-		\add_action( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
+		$this->inject_tasks();
 
 		// Add the onboarding task providers.
 		\add_filter( 'prpl_onboarding_task_providers', [ $this, 'add_onboarding_task_providers' ] );

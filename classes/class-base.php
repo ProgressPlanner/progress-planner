@@ -10,7 +10,6 @@ namespace Progress_Planner;
 /**
  * Main plugin class.
  *
- * @method \Progress_Planner\Suggested_Tasks get_suggested_tasks()
  * @method \Progress_Planner\Settings get_settings()
  * @method \Progress_Planner\Activities\Query get_activities__query()
  * @method \Progress_Planner\Utils\Cache get_utils__cache()
@@ -118,7 +117,6 @@ class Base {
 		// We need to initialize some classes early.
 		$this->get_page_types();
 		$this->get_settings();
-		$this->get_suggested_tasks();
 		$this->get_badges();
 
 		if ( true === $this->is_privacy_policy_accepted() ) {

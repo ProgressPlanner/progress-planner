@@ -58,9 +58,6 @@ trait Task_Provider_Test_Trait {
 
 		// Get the task provider.
 		$this->task_provider = \progress_planner()->get_cpt_recommendations()->get_tasks_manager()->get_task_provider( $this->task_provider_id );
-
-		// Get the suggested tasks instance.
-		$this->suggested_tasks = \progress_planner()->get_suggested_tasks();
 	}
 
 	/**
@@ -130,7 +127,7 @@ trait Task_Provider_Test_Trait {
 		// Verify that the task(s) we're testing is pending celebration.
 		foreach ( $tasks as $task ) {
 			$this->assertTrue(
-				$this->suggested_tasks->check_task_condition(
+				\progress_planner()->get_cpt_recommendations()->check_task_condition(
 					[
 						'status'  => 'pending_celebration',
 						'task_id' => $task['task_id'],
@@ -143,7 +140,7 @@ trait Task_Provider_Test_Trait {
 		foreach ( $tasks as $task ) {
 			\progress_planner()->get_cpt_recommendations()->transition_task_status( $task['task_id'], 'pending_celebration', 'completed' );
 			$this->assertTrue(
-				$this->suggested_tasks->check_task_condition(
+				\progress_planner()->get_cpt_recommendations()->check_task_condition(
 					[
 						'status'  => 'completed',
 						'task_id' => $task['task_id'],

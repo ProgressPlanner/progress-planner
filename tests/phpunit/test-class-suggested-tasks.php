@@ -15,22 +15,6 @@ use Progress_Planner\Suggested_Tasks;
 class Suggested_Tasks_Test extends \WP_UnitTestCase {
 
 	/**
-	 * Suggested_Tasks object.
-	 *
-	 * @var Suggested_Tasks
-	 */
-	protected $suggested_tasks;
-
-	/**
-	 * Setup the test case.
-	 *
-	 * @return void
-	 */
-	public function set_up() {
-		$this->suggested_tasks = \progress_planner()->get_suggested_tasks();
-	}
-
-	/**
 	 * Test the task_cleanup method.
 	 *
 	 * @return void
