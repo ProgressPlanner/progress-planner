@@ -465,7 +465,7 @@ class Base {
 			return;
 		}
 
-		if ( ( isset( $_POST['redirect_to'] ) && '' !== $_POST['redirect_to'] ) || ( isset( $_GET['redirect_to'] ) && '' !== $_GET['redirect_to'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- We're not processing any data.
+		if ( ( isset( $_POST['redirect_to'] ) && '' !== $_POST['redirect_to'] ) || ( isset( $_GET['redirect_to'] ) && '' !== $_GET['redirect_to'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing -- We're not processing any data.
 			return;
 		}
 
