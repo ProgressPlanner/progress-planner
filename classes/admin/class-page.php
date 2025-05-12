@@ -111,7 +111,7 @@ class Page {
 	 */
 	protected function get_notification_counter() {
 
-		$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' );
+		$pending_celebration_tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'pending_celebration' ] );
 		$notification_count        = count( $pending_celebration_tasks );
 
 		if ( 0 === $notification_count ) {

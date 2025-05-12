@@ -231,7 +231,7 @@ class Tasks_Manager {
 	 * @return array
 	 */
 	public function evaluate_tasks() {
-		$tasks           = (array) \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending' );
+		$tasks           = (array) \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'publish' ] );
 		$completed_tasks = [];
 
 		foreach ( $tasks as $task_data ) {
@@ -246,7 +246,7 @@ class Tasks_Manager {
 			$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
 			if ( $task_provider && ! $task_provider->is_task_relevant() ) {
 				// Remove the task from the pending tasks.
-				\progress_planner()->get_suggested_tasks()->delete_task( $task_id );
+				\progress_planner()->get_cpt_recommendations()->delete_recommendation( $task_data['ID'] );
 			}
 
 			$task_result = $this->evaluate_task( $task_id );

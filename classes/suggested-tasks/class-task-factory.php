@@ -31,7 +31,7 @@ class Task_Factory {
 
 		if ( 'id' === $param && is_string( $value ) ) {
 			// We should have all the data saved in the database.
-			$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $value );
+			$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'task_id' => $value ] );
 
 			// If we have the task data, return it.
 			if ( isset( $tasks[0] ) ) {

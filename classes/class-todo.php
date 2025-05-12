@@ -41,7 +41,7 @@ class Todo {
 	 * @return array
 	 */
 	public function get_completed_items() {
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', 'user' );
+		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'provider_id' => 'user' ] );
 
 		$items = [];
 		foreach ( $tasks as $task ) {
@@ -65,7 +65,7 @@ class Todo {
 	 * @return array
 	 */
 	public function get_pending_items() {
-		$tasks     = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', 'user' );
+		$tasks     = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'provider_id' => 'user' ] );
 		$items     = [];
 		$max_order = 0;
 

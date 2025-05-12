@@ -341,7 +341,7 @@ class Content_Review extends Tasks {
 	 * @return \WP_Post|null
 	 */
 	public function get_post_from_task_id( $task_id ) {
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
+		$tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'task_id' => $task_id ] );
 
 		if ( empty( $tasks ) ) {
 			return null;
@@ -461,7 +461,7 @@ class Content_Review extends Tasks {
 		}
 
 		$this->snoozed_post_ids = [];
-		$snoozed                = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'snoozed' );
+		$snoozed                = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'future' ] );
 
 		if ( ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {

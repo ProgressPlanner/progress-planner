@@ -63,7 +63,7 @@ final class Suggested_Tasks extends Widget {
 
 			// If we're not delaying the celebration, we need to get the pending_celebration tasks.
 			if ( ! $delay_celebration ) {
-				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' );
+				$pending_celebration_tasks = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'pending_celebration' ] );
 
 				foreach ( $pending_celebration_tasks as $key => $task ) {
 					$task_id = $task['task_id'];

@@ -295,7 +295,7 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return bool
 	 */
 	public function is_task_snoozed() {
-		$snoozed = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'snoozed' );
+		$snoozed = \progress_planner()->get_cpt_recommendations()->get_by_params( [ 'post_status' => 'future' ] );
 		if ( empty( $snoozed ) ) {
 			return false;
 		}
