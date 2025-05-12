@@ -219,20 +219,28 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get( $args = [] ) {
-		return $this->format_recommendations(
-			\get_posts(
-				\wp_parse_args(
-					$args,
-					[
-						'post_type'   => 'prpl_recommendations',
-						'post_status' => 'any',
-						'numberposts' => -1,
-						'orderby'     => 'menu_order',
-						'order'       => 'ASC',
-					]
-				)
-			)
+		static $cached = [];
+		$args          = \wp_parse_args(
+			$args,
+			[
+				'post_type'   => 'prpl_recommendations',
+				'post_status' => 'any',
+				'numberposts' => -1,
+				'orderby'     => 'menu_order',
+				'order'       => 'ASC',
+			]
 		);
+
+		$cache_key = md5( (string) \wp_json_encode( $args ) );
+		if ( isset( $cached[ $cache_key ] ) ) {
+			return $cached[ $cache_key ];
+		}
+
+		$cached[ $cache_key ] = $this->format_recommendations(
+			\get_posts( $args )
+		);
+
+		return $cached[ $cache_key ];
 	}
 
 	/**
@@ -696,23 +704,29 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function format_recommendation( $post ) {
-		$post = (array) $post;
+		static $cached = [];
+		if ( isset( $cached[ $post->ID ] ) ) {
+			return $cached[ $post->ID ];
+		}
+
+		$post_data = (array) $post;
 
 		// Format the post meta.
-		$post_meta = \get_post_meta( $post['ID'] );
+		$post_meta = \get_post_meta( $post_data['ID'] );
 		foreach ( $post_meta as $key => $value ) {
-			$post[ str_replace( 'prpl_', '', (string) $key ) ] =
+			$post_data[ str_replace( 'prpl_', '', (string) $key ) ] =
 				is_array( $value ) && isset( $value[0] ) && 1 === count( $value )
 					? $value[0]
 					: $value;
 		}
 
 		foreach ( [ 'category', 'provider' ] as $context ) {
-			$terms            = \wp_get_post_terms( $post['ID'], "prpl_recommendations_$context" );
-			$post[ $context ] = is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
+			$terms                 = \wp_get_post_terms( $post_data['ID'], "prpl_recommendations_$context" );
+			$post_data[ $context ] = is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
 		}
 
-		return $post;
+		$cached[ $post_data['ID'] ] = $post_data;
+		return $post_data;
 	}
 
 	/**
