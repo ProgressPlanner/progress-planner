@@ -128,7 +128,7 @@ jobs:
 
           # Require Yoast SEO Premium & copy files
           composer require yoast/wordpress-seo-premium
-          # docker cp ./wp-content/plugins/wordpress-seo-premium $WP_CONTAINER:/var/www/html/wp-content/plugins/wordpress-seo-premium
+          docker cp ./wp-content/plugins/wordpress-seo-premium $WP_CONTAINER:/var/www/html/wp-content/plugins/wordpress-seo-premium
 
           # Activate Yoast SEO Premium
           docker exec $WP_CONTAINER wp plugin activate wordpress-seo-premium --allow-root
