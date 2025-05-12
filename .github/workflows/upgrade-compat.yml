@@ -97,12 +97,36 @@ jobs:
 
           # Copy plugin
           docker exec $WP_CONTAINER mkdir -p /var/www/html/wp-content/plugins/progress-planner
+
+          # Clone plugin repository (v1.1.0)
+          docker exec $WP_CONTAINER git clone --branch v1.1.0 https://github.com/$PLUGIN_REPO.git /var/www/html/wp-content/plugins/progress-planner
+
+          # Activate plugin using WP-CLI
+          docker exec $WP_CONTAINER wp plugin activate progress-planner --allow-root
+
+          # Show plugin settings (before 1.1.1 there was no version set)
+          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
+
+          # Overwrite plugin files with the latest version from this branch
           docker cp . $WP_CONTAINER:/var/www/html/wp-content/plugins/progress-planner
 
+          # Show updated plugin settings
+          docker exec $WP_CONTAINER wp option get progress_planner_version --allow-root
+          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
+
           # Activate plugins
-          docker exec $WP_CONTAINER wp plugin activate progress-planner --allow-root
           docker exec $WP_CONTAINER wp plugin install wordpress-seo --activate --allow-root
           docker exec $WP_CONTAINER wp plugin install yoast-comment-hacks --activate --allow-root
+
+          # Show plugin settings
+          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
+
+          # Require Yoast SEO Premium & copy files
+          composer require yoast/wordpress-seo-premium
+          docker cp ./vendor/yoast/wordpress-seo-premium $WP_CONTAINER:/var/www/html/wp-content/plugins/wordpress-seo-premium
+
+          # Activate Yoast SEO Premium
           docker exec $WP_CONTAINER wp plugin activate wordpress-seo-premium --allow-root
 
+          # Show plugin settings
           docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
