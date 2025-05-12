@@ -12,6 +12,7 @@ env:
   WORDPRESS_DB_PORT: 3307
   PLUGIN_REPO: ProgressPlanner/progress-planner
   YOAST_TOKEN: ${{ secrets.YOAST_TOKEN }}
+
 on:
   push:
     branches:
@@ -77,68 +78,47 @@ jobs:
           -d "admin_email=$WORDPRESS_ADMIN_EMAIL" \
           -d "public=1"
 
-      - name: Install and activate plugin
+      - name: Setup WordPress container (tools + plugin)
         run: |
           WP_CONTAINER=$(docker ps -qf "name=wordpress")
-          PLUGIN_REPO=$PLUGIN_REPO
-          PLUGIN_OLD_VERSION=$PLUGIN_OLD_VERSION
 
-          # Install git inside the WordPress container
+          echo "Installing packages in WordPress container..."
+
           docker exec $WP_CONTAINER apt-get update
-          docker exec $WP_CONTAINER apt-get install -y git
+          docker exec $WP_CONTAINER apt-get install -y lsb-release apt-transport-https ca-certificates gnupg wget curl unzip git
+
+          docker exec $WP_CONTAINER wget -qO - https://packages.sury.org/php/apt.gpg | gpg --dearmor | tee /usr/share/keyrings/sury.gpg >/dev/null
+          docker exec $WP_CONTAINER sh -c 'echo "deb [signed-by=/usr/share/keyrings/sury.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/sury.list'
+
+          docker exec $WP_CONTAINER apt-get update
+          docker exec $WP_CONTAINER apt-get install -y php8.2-cli php8.2-curl php8.2-mbstring php8.2-xml php8.2-zip
 
           # Install WP-CLI
           docker exec $WP_CONTAINER curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
           docker exec $WP_CONTAINER chmod +x wp-cli.phar
           docker exec $WP_CONTAINER mv wp-cli.phar /usr/local/bin/wp
 
-          # Create the plugins directory
+          # Setup plugin
           docker exec $WP_CONTAINER mkdir -p /var/www/html/wp-content/plugins
+          docker exec $WP_CONTAINER git clone --branch v1.1.0 https://github.com/${PLUGIN_REPO}.git /var/www/html/wp-content/plugins/progress-planner
 
-          # Clone plugin repository (v1.1.0)
-          docker exec $WP_CONTAINER git clone --branch v1.1.0 https://github.com/$PLUGIN_REPO.git /var/www/html/wp-content/plugins/progress-planner
-
-          # Activate plugin using WP-CLI
           docker exec $WP_CONTAINER wp plugin activate progress-planner --allow-root
-
-          # Show plugin settings (before 1.1.1 there was no version set)
           docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
 
-          # Overwrite plugin files with the latest version from this branch
           docker cp . $WP_CONTAINER:/var/www/html/wp-content/plugins/progress-planner
-
-          # Show updated plugin settings
           docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
 
-          # Install Yoast SEO
           docker exec $WP_CONTAINER wp plugin install wordpress-seo --activate --allow-root
-
-          # Install Yoast Comment Experience
           docker exec $WP_CONTAINER wp plugin install yoast-comment-hacks --activate --allow-root
 
-          # Final plugin version check
-          docker exec $WP_CONTAINER wp option get progress_planner_version --allow-root
-          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
-
-          # Install Composer inside the WordPress container
-          docker exec $WP_CONTAINER apt-get install -y php unzip curl git
+          # Composer & Yoast Premium setup
           docker exec $WP_CONTAINER curl -sS https://getcomposer.org/installer -o composer-setup.php
           docker exec $WP_CONTAINER php composer-setup.php --install-dir=/usr/local/bin --filename=composer
-          docker exec $WP_CONTAINER composer --version
 
-          # Configure Composer with Yoast token
           docker exec $WP_CONTAINER composer config -g http-basic.my.yoast.com token $YOAST_TOKEN
-
-          # Add Yoast repository
           docker exec $WP_CONTAINER composer config repositories.my-yoast composer https://my.yoast.com/packages/
-
-          # Require Yoast SEO Premium
           docker exec $WP_CONTAINER composer require yoast/wordpress-seo-premium
 
-          # Activate the premium plugin
           docker exec $WP_CONTAINER wp plugin activate wordpress-seo-premium --allow-root
 
-          # Show the plugin version again after the Yoast SEO Premium is activated
           docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
-
-
