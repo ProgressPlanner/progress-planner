@@ -707,13 +707,10 @@ class Suggested_Tasks {
 					: $value;
 		}
 
-		// Category terms.
-		$category         = \wp_get_post_terms( $post['ID'], 'prpl_recommendations_category' );
-		$post['category'] = is_array( $category ) && isset( $category[0] ) ? $category[0] : null;
-
-		// Provider terms.
-		$provider         = \wp_get_post_terms( $post['ID'], 'prpl_recommendations_provider' );
-		$post['provider'] = is_array( $provider ) && isset( $provider[0] ) ? $provider[0] : null;
+		foreach ( [ 'category', 'provider' ] as $context ) {
+			$terms            = \wp_get_post_terms( $post['ID'], "prpl_recommendations_$context" );
+			$post[ $context ] = is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
+		}
 
 		return $post;
 	}
