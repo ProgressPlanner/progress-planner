@@ -92,7 +92,7 @@ class Set_Valuable_Post_Types extends Tasks {
 	public function should_add_task() {
 
 		// Check the "Settings saved" task, if the has not been added as 'pending' don't add the task.
-		$settings_saved_task = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'provider_id' => 'settings-saved' ] );
+		$settings_saved_task = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'provider_id' => 'settings-saved' ] );
 		if ( empty( $settings_saved_task ) ) {
 			return false;
 		}

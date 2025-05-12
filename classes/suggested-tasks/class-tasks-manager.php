@@ -230,7 +230,7 @@ class Tasks_Manager {
 	 * @return array
 	 */
 	public function evaluate_tasks() {
-		$tasks           = (array) \progress_planner()->get_suggested_tasks()->get_by_params( [ 'post_status' => 'publish' ] );
+		$tasks           = (array) \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] );
 		$completed_tasks = [];
 
 		foreach ( $tasks as $task_data ) {
@@ -310,7 +310,7 @@ class Tasks_Manager {
 			return;
 		}
 
-		$tasks = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'post_status' => 'publish' ] );
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] );
 
 		foreach ( $tasks as $task ) {
 			if ( ! isset( $task['date'] ) || \gmdate( 'YW' ) !== (string) $task['date'] ) {

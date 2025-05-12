@@ -101,7 +101,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 */
 	public function get_title( $task_id = '' ) {
 		// Get the task data.
-		$task_data = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'task_id' => $task_id ] );
+		$task_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		// We don't want to link if the term was deleted.
 		if ( empty( $task_data ) || ! $task_data[0] ) {
@@ -264,7 +264,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return \WP_Post|null
 	 */
 	public function get_post_from_task_id( $task_id ) {
-		$tasks = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'task_id' => $task_id ] );
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		if ( empty( $tasks ) ) {
 			return null;
@@ -287,7 +287,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		}
 
 		$this->completed_post_ids = [];
-		$tasks                    = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'provider_id' => $this->get_provider_id() ] );
+		$tasks                    = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! empty( $tasks ) ) {
 			foreach ( $tasks as $task ) {

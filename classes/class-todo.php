@@ -41,7 +41,7 @@ class Todo {
 	 * @return array
 	 */
 	public function get_completed_items() {
-		$tasks = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'provider_id' => 'user' ] );
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'provider_id' => 'user' ] );
 
 		$items = [];
 		foreach ( $tasks as $task ) {
@@ -65,7 +65,7 @@ class Todo {
 	 * @return array
 	 */
 	public function get_pending_items() {
-		$tasks     = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'provider_id' => 'user' ] );
+		$tasks     = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'provider_id' => 'user' ] );
 		$items     = [];
 		$max_order = 0;
 
@@ -178,7 +178,7 @@ class Todo {
 		$tasks = \array_map( 'intval', \explode( ',', $tasks ) );
 
 		// Get tasks from the `prpl_suggested_task` post type, that have a `prpl_recommendations_provider` of `user`.
-		$user_tasks = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'provider' => 'user' ] );
+		$user_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'provider' => 'user' ] );
 		foreach ( $user_tasks as $task ) {
 			if ( in_array( (int) $task['ID'], $tasks, true ) ) {
 				\wp_update_post(
@@ -263,7 +263,7 @@ class Todo {
 		$task_ids = array_column( $pending_items, 'ID' );
 
 		// Reset the points of all the tasks, except for the first one in the todo list.
-		foreach ( \progress_planner()->get_suggested_tasks()->get_by_params(
+		foreach ( \progress_planner()->get_suggested_tasks()->get_tasks_by(
 			[
 				'provider'    => 'user',
 				'post_status' => 'publish',

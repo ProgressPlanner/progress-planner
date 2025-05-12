@@ -66,7 +66,7 @@ class Suggested_Task extends Activity {
 
 		// Default points for a suggested task.
 		$points = 1;
-		$tasks  = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'task_id' => $this->data_id ] );
+		$tasks  = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'task_id' => $this->data_id ] );
 
 		if ( ! empty( $tasks ) && isset( $tasks[0]['provider_id'] ) ) {
 			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $tasks[0]['provider_id'] );

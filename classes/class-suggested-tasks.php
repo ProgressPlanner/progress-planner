@@ -172,7 +172,7 @@ class Suggested_Tasks {
 	 *
 	 * @return array
 	 */
-	public function get_by_params( $params ) {
+	public function get_tasks_by( $params ) {
 		$args = [];
 
 		foreach ( $params as $param => $value ) {
@@ -381,7 +381,7 @@ class Suggested_Tasks {
 			]
 		);
 
-		foreach ( \progress_planner()->get_suggested_tasks()->get_by_params( [ 'post_status' => $parsed_condition['post_status'] ] ) as $task ) {
+		foreach ( \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => $parsed_condition['post_status'] ] ) as $task ) {
 			if ( $task['task_id'] === $parsed_condition['task_id'] ) {
 				return true;
 			}
@@ -597,7 +597,7 @@ class Suggested_Tasks {
 		}
 
 		// Check if we have an existing task with the same title.
-		$posts = $this->get_by_params(
+		$posts = $this->get_tasks_by(
 			[
 				'post_status' => 'all',
 				'numberposts' => 1,
@@ -739,7 +739,7 @@ class Suggested_Tasks {
 	 * @return array|false The recommendation post or false if not found.
 	 */
 	public function get_post( $id ) {
-		$posts = $this->get_by_params(
+		$posts = $this->get_tasks_by(
 			is_numeric( $id )
 				? [ 'ID' => $id ]
 				: [ 'task_id' => $id ]

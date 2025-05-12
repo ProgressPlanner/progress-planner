@@ -375,7 +375,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Get pending tasks.
-		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'post_status' => 'publish' ] );
+		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] );
 
 		// Delete the pending tasks.
 		foreach ( $pending_tasks as $task ) {

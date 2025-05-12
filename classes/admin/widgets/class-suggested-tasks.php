@@ -52,7 +52,7 @@ final class Suggested_Tasks extends Widget {
 	 */
 	public function enqueue_scripts() {
 		// Get tasks from task providers and pending_celebration tasks.
-		$tasks             = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'post_status' => 'publish' ] );
+		$tasks             = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] );
 		$delay_celebration = false;
 
 		// Celebrate only on the Progress Planner Dashboard page.
@@ -63,7 +63,7 @@ final class Suggested_Tasks extends Widget {
 
 			// If we're not delaying the celebration, we need to get the pending_celebration tasks.
 			if ( ! $delay_celebration ) {
-				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_by_params( [ 'post_status' => 'pending_celebration' ] );
+				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'pending_celebration' ] );
 
 				foreach ( $pending_celebration_tasks as $key => $task ) {
 					$task_id = $task['task_id'];

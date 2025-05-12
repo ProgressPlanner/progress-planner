@@ -78,7 +78,7 @@ class Tasks {
 	 */
 	public function get_tasks() {
 		return new \WP_REST_Response(
-			\progress_planner()->get_suggested_tasks()->get_by_params( [ 'post_status' => 'publish' ] )
+			\progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] )
 		);
 	}
 }
