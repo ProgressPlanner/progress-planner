@@ -90,12 +90,16 @@ jobs:
         run: |
           WP_CONTAINER=$(docker ps -qf "name=wordpress")
 
+          # Install git inside the WordPress container
+          docker exec $WP_CONTAINER apt-get update
+          docker exec $WP_CONTAINER apt-get install -y git
+
           # Install WP-CLI
           docker exec $WP_CONTAINER curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
           docker exec $WP_CONTAINER chmod +x wp-cli.phar
           docker exec $WP_CONTAINER mv wp-cli.phar /usr/local/bin/wp
 
-          # Copy plugin
+          # Create plugin directory
           docker exec $WP_CONTAINER mkdir -p /var/www/html/wp-content/plugins/progress-planner
 
           # Clone plugin repository (v1.1.0)
@@ -114,7 +118,7 @@ jobs:
           docker exec $WP_CONTAINER wp option get progress_planner_version --allow-root
           docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
 
-          # Activate plugins
+          # Activate 3rd party plugins
           docker exec $WP_CONTAINER wp plugin install wordpress-seo --activate --allow-root
           docker exec $WP_CONTAINER wp plugin install yoast-comment-hacks --activate --allow-root
 
