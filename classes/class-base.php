@@ -465,6 +465,10 @@ class Base {
 			return;
 		}
 
+		if ( ( isset( $_POST['redirect_to'] ) && '' !== $_POST['redirect_to'] ) || ( isset( $_GET['redirect_to'] ) && '' !== $_GET['redirect_to'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- We're not processing any data.
+			return;
+		}
+
 		// Redirect to the Progress Planner dashboard.
 		\wp_safe_redirect( \admin_url( 'admin.php?page=progress-planner' ) );
 		exit;
