@@ -7,12 +7,12 @@
 
 namespace Progress_Planner\Tests;
 
-use Progress_Planner\Suggested_Tasks;
+use Progress_Planner\CPT_Recommendations;
 
 /**
- * Suggested_Tasks test case.
+ * CPT_Recommendations test case.
  */
-class Suggested_Tasks_Test extends \WP_UnitTestCase {
+class CPT_Recommendations_Test extends \WP_UnitTestCase {
 
 	/**
 	 * Test the task_cleanup method.

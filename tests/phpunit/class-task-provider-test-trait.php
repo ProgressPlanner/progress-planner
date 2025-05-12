@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Tests;
 
-use Progress_Planner\Suggested_Tasks;
-
 /**
  * Task provider test case.
  */
@@ -20,13 +18,6 @@ trait Task_Provider_Test_Trait {
 	 * @var Task_Provider
 	 */
 	protected $task_provider;
-
-	/**
-	 * The suggested tasks instance.
-	 *
-	 * @var Suggested_Tasks
-	 */
-	protected $suggested_tasks;
 
 	/**
 	 * Setup the test.
