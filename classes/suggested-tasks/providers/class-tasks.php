@@ -326,27 +326,32 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Evaluate a task.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task The task data.
 	 *
 	 * @return false|\Progress_Planner\Suggested_Tasks\Task The task data or false if the task is not completed.
 	 */
-	public function evaluate_task( $task_id ) {
+	public function evaluate_task( $task ) {
 		// Early bail if the user does not have the capability to manage options.
 		if ( ! $this->capability_required() ) {
 			return false;
 		}
 
 		if ( ! $this->is_repetitive() ) {
-			if ( 0 !== strpos( $task_id, $this->get_task_id() ) ) {
+			if ( 0 !== strpos( $task['task_id'], $this->get_task_id() ) ) {
 				return false;
 			}
-			return $this->is_task_completed( $task_id ) ? Task_Factory::create_task_from_id( $task_id ) : false;
+			return $this->is_task_completed( $task['task_id'] ) ? Task_Factory::create_task_from_id( $task['task_id'] ) : false;
 		}
 
-		$task_object = Task_Factory::create_task_from_id( $task_id );
+		$task_object = Task_Factory::create_task_from_id( $task['task_id'] );
 		$task_data   = $task_object->get_data();
 
-		if ( $task_data['provider_id'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['date'] && $this->is_task_completed( $task_id ) ) {
+		if (
+			$task_data['provider']->slug === $this->get_provider_id() &&
+			\DateTime::createFromFormat( 'Y-m-d H:i:s', $task_data['post_date'] ) &&
+			\gmdate( 'YW' ) === \gmdate( 'YW', \DateTime::createFromFormat( 'Y-m-d H:i:s', $task_data['post_date'] )->getTimestamp() ) && // @phpstan-ignore-line
+			$this->is_task_completed( $task['task_id'] )
+		) {
 			// Allow adding more data, for example in case of 'create-post' tasks we are adding the post_id.
 			$task_data = $this->modify_evaluated_task_data( $task_data );
 			$task_object->set_data( $task_data );

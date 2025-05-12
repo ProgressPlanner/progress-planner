@@ -465,7 +465,7 @@ class Content_Review extends Tasks {
 
 		if ( ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
-				if ( isset( $task['provider_id'] ) && 'review-post' === $task['provider_id'] ) {
+				if ( isset( $task['provider']->slug ) && 'review-post' === $task['provider']->slug ) {
 					$this->snoozed_post_ids[] = $task['post_id'];
 				}
 			}

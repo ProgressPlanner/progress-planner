@@ -36,7 +36,7 @@ interface Tasks_Interface {
 	/**
 	 * Evaluate a task.
 	 *
-	 * @param string $task The task ID.
+	 * @param array $task The task data.
 	 *
 	 * @return bool
 	 */

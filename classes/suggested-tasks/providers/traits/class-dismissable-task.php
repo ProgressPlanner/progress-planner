@@ -63,7 +63,7 @@ trait Dismissable_Task {
 		}
 
 		// If the task provider ID does not match, return.
-		if ( ! isset( $task_data['provider_id'] ) || $this->get_provider_id() !== $task_data['provider_id'] ) {
+		if ( ! isset( $task_data['provider']->slug ) || $this->get_provider_id() !== $task_data['provider']->slug ) {
 			return;
 		}
 

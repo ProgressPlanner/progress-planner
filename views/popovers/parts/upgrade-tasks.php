@@ -51,7 +51,7 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 			];
 
 			$prpl_task           = \progress_planner()->get_cpt_recommendations()->get_post( $prpl_task_data['task_id'] );
-			$prpl_task_completed = $prpl_task_provider->evaluate_task( $prpl_task_data['task_id'] );
+			$prpl_task_completed = $prpl_task_provider->evaluate_task( $prpl_task_data );
 			$prpl_task_details   = $prpl_task_provider->get_task_details();
 
 			// If the task is completed, mark it as pending celebration.

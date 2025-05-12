@@ -234,18 +234,7 @@ class Tasks_Manager {
 		$completed_tasks = [];
 
 		foreach ( $tasks as $task_data ) {
-
-			$task_id = $task_data['task_id'];
-
-			// Check if the task is no longer relevant.
-			$task_object   = Task_Factory::create_task_from_id( $task_id );
-			$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
-			if ( $task_provider && ! $task_provider->is_task_relevant() ) {
-				// Remove the task from the pending tasks.
-				\progress_planner()->get_cpt_recommendations()->delete_recommendation( $task_data['ID'] );
-			}
-
-			$task_result = $this->evaluate_task( $task_id );
+			$task_result = $this->evaluate_task( $task_data );
 			if ( false !== $task_result ) {
 				$completed_tasks[] = $task_result;
 			}
@@ -257,19 +246,23 @@ class Tasks_Manager {
 	/**
 	 * Wrapper function for evaluating tasks.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task The task data.
 	 *
 	 * @return bool|\Progress_Planner\Suggested_Tasks\Task
 	 */
-	public function evaluate_task( $task_id ) {
-		$task_object   = Task_Factory::create_task_from_id( $task_id );
-		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
-
+	public function evaluate_task( $task ) {
+		$task_provider = $this->get_task_provider( $task['provider']->slug );
 		if ( ! $task_provider ) {
 			return false;
 		}
 
-		return $task_provider->evaluate_task( $task_id );
+		// Check if the task is no longer relevant.
+		if ( ! $task_provider->is_task_relevant() ) {
+			// Remove the task from the pending tasks.
+			\progress_planner()->get_cpt_recommendations()->delete_recommendation( $task['ID'] );
+		}
+
+		return $task_provider->evaluate_task( $task );
 	}
 
 	/**
