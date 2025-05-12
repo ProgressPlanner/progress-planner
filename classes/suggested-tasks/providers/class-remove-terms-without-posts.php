@@ -277,6 +277,9 @@ class Remove_Terms_Without_Posts extends Tasks {
 					\esc_html__( 'Remove term named "%s"', 'progress-planner' ),
 					\esc_html( $data['name'] )
 				),
+				'url'         => \admin_url( 'term.php?taxonomy=' . $data['taxonomy'] . '&tag_ID=' . $data['term_id'] ),
+				'url_target'  => '_blank',
+				'dismissable' => $this->is_dismissable(),
 			],
 		];
 	}

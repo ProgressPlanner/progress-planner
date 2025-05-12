@@ -270,6 +270,9 @@ class Update_Term_Description extends Tasks {
 					\esc_html__( 'Write a description for term named "%s"', 'progress-planner' ),
 					\esc_html( $data['name'] )
 				),
+				'url'         => \admin_url( 'term.php?taxonomy=' . $data['taxonomy'] . '&tag_ID=' . $data['term_id'] ),
+				'url_target'  => '_blank',
+				'dismissable' => $this->is_dismissable(),
 			],
 		];
 	}

@@ -222,6 +222,9 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 				'category'    => $this->get_provider_category(),
 				'post_id'     => $data['post_id'],
 				'post_title'  => $data['post_title'],
+				'url'         => $this->get_url( $task_id ),
+				'url_target'  => $this->get_url_target(),
+				'dismissable' => $this->is_dismissable(),
 			],
 		];
 	}

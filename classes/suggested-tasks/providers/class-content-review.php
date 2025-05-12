@@ -296,7 +296,15 @@ class Content_Review extends Tasks {
 					'post_id'     => $task_data['post_id'],
 					'post_type'   => $task_data['post_type'],
 					'date'        => \gmdate( 'YW' ),
-					'post_title'  => $this->get_title( $task_data['task_id'] ),
+					'post_title'  => sprintf(
+						// translators: %1$s: The post type, %2$s: The post title.
+						\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
+						strtolower( \get_post_type_object( \esc_html( $task_data['post_type'] ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
+						\esc_html( \get_the_title( $task_data['post_id'] ) ) // @phpstan-ignore-line property.nonObject
+					),
+					'url'         => \esc_url( (string) \get_edit_post_link( $task_data['post_id'] ) ),
+					'url_target'  => '_blank',
+					'dismissable' => $this->is_dismissable(),
 				];
 			}
 		}

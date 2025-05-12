@@ -453,7 +453,7 @@ class Suggested_Tasks {
 
 		if ( ! empty( $update_terms ) ) {
 			foreach ( $update_terms as $taxonomy => $term ) {
-				$update_results[] = (bool) \wp_set_post_terms( $id, $term, $taxonomy );
+				$update_results[] = (bool) \wp_set_post_terms( $id, $term->term_id, $taxonomy );
 			}
 		}
 

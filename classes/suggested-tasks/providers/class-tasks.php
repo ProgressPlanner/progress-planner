@@ -347,6 +347,7 @@ abstract class Tasks implements Tasks_Interface {
 		$task_data   = $task_object->get_data();
 
 		if (
+			$task_data &&
 			$task_data['provider']->slug === $this->get_provider_id() &&
 			\DateTime::createFromFormat( 'Y-m-d H:i:s', $task_data['post_date'] ) &&
 			\gmdate( 'YW' ) === \gmdate( 'YW', \DateTime::createFromFormat( 'Y-m-d H:i:s', $task_data['post_date'] )->getTimestamp() ) && // @phpstan-ignore-line
@@ -365,7 +366,7 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Check if the task condition is satisfied.
 	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
-	 *
+
 	 * @return bool
 	 */
 	abstract protected function should_add_task();
@@ -421,11 +422,15 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		$task_data = [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'category'    => $this->get_provider_category(),
-			'date'        => \gmdate( 'YW' ),
-			'post_title'  => $this->get_title(),
+			'task_id'      => $task_id,
+			'provider_id'  => $this->get_provider_id(),
+			'category'     => $this->get_provider_category(),
+			'date'         => \gmdate( 'YW' ),
+			'post_title'   => $this->get_title(),
+			'url'          => $this->get_url(),
+			'url_target'   => $this->get_url_target(),
+			'link_setting' => $this->get_link_setting(),
+			'dismissable'  => $this->is_dismissable(),
 		];
 
 		$task_data = $this->modify_injection_task_data( $task_data );
