@@ -87,8 +87,8 @@ jobs:
           docker exec $WP_CONTAINER apt-get update
           docker exec $WP_CONTAINER apt-get install -y lsb-release apt-transport-https ca-certificates gnupg wget curl unzip git
 
-          docker exec $WP_CONTAINER wget -qO - https://packages.sury.org/php/apt.gpg | gpg --dearmor | tee /usr/share/keyrings/sury.gpg >/dev/null
-          docker exec $WP_CONTAINER sh -c 'echo "deb [signed-by=/usr/share/keyrings/sury.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main" > /etc/apt/sources.list.d/sury.list'
+          docker exec $WP_CONTAINER bash -c "curl -fsSL https://packages.sury.org/php/apt.gpg | gpg --dearmor -o /usr/share/keyrings/sury.gpg"
+          docker exec $WP_CONTAINER bash -c "echo 'deb [signed-by=/usr/share/keyrings/sury.gpg] https://packages.sury.org/php/ $(lsb_release -sc) main' > /etc/apt/sources.list.d/sury.list"
 
           docker exec $WP_CONTAINER apt-get update
           docker exec $WP_CONTAINER apt-get install -y php8.2-cli php8.2-curl php8.2-mbstring php8.2-xml php8.2-zip
