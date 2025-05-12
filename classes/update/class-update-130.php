@@ -113,7 +113,7 @@ class Update_130 {
 			}
 
 			// Add the status to the data.
-			$data['post_status'] = 'trash';
+			$data['status'] = 'completed';
 
 			// Insert the task.
 			$local_tasks[] = $data;
