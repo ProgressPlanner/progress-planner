@@ -146,41 +146,35 @@ class Remove_Terms_Without_Posts extends Tasks {
 	/**
 	 * Get the title.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_title( $task_id = '' ) {
-		if ( ! $task_id ) {
-			return '';
-		}
+	protected function get_title( $task_data = [] ) {
+		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
 
-		// Get the task data.
-		$task_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'task_id' => $task_id ] );
-
-		// We don't want to link if the term was deleted.
-		if ( empty( $task_data ) || ! $task_data[0] ) {
+		if ( ! $term || \is_wp_error( $term ) ) {
 			return '';
 		}
 
 		return \sprintf(
 			/* translators: %s: The term name */
 			\esc_html__( 'Remove term named "%s"', 'progress-planner' ),
-			\esc_html( $task_data[0]['term_name'] )
+			\esc_html( $term->name )
 		);
 	}
 
 	/**
 	 * Get the description.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_description( $task_id = '' ) {
-		$term = $this->get_term_from_task_id( $task_id );
+	protected function get_description( $task_data = [] ) {
+		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
 
-		if ( ! $term ) {
+		if ( ! $term || \is_wp_error( $term ) ) {
 			return '';
 		}
 
@@ -195,15 +189,14 @@ class Remove_Terms_Without_Posts extends Tasks {
 	/**
 	 * Get the URL.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_url( $task_id = '' ) {
-		$term = $this->get_term_from_task_id( $task_id );
+	protected function get_url( $task_data = [] ) {
+		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
 
-		// We don't want to link if the term was deleted.
-		if ( ! $term ) {
+		if ( ! $term || \is_wp_error( $term ) ) {
 			return '';
 		}
 
@@ -272,12 +265,8 @@ class Remove_Terms_Without_Posts extends Tasks {
 				'taxonomy'    => $data['taxonomy'],
 				'term_name'   => $data['name'],
 				'date'        => \gmdate( 'YW' ),
-				'post_title'  => \sprintf( // TODO: WIP.
-						/* translators: %s: The term name */
-					\esc_html__( 'Remove term named "%s"', 'progress-planner' ),
-					\esc_html( $data['name'] )
-				),
-				'url'         => \admin_url( 'term.php?taxonomy=' . $data['taxonomy'] . '&tag_ID=' . $data['term_id'] ),
+				'post_title'  => $this->get_title( $data ),
+				'url'         => $this->get_url( $data ),
 				'url_target'  => '_blank',
 				'dismissable' => $this->is_dismissable(),
 			],

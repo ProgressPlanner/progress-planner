@@ -112,7 +112,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return '';
 	}
 
@@ -121,7 +121,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return '';
 	}
 
@@ -166,7 +166,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return string
 	 */
-	public function get_url() {
+	protected function get_url() {
 		if ( $this->url ) {
 			return \esc_url( $this->url );
 		}
@@ -179,7 +179,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return string
 	 */
-	public function get_url_target() {
+	protected function get_url_target() {
 		return $this->url_target ? $this->url_target : '_self';
 	}
 

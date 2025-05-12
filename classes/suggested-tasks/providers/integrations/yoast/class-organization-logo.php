@@ -39,7 +39,7 @@ class Organization_Logo extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
 			? \esc_html__( 'Yoast SEO: set your organization logo', 'progress-planner' )
 			: \esc_html__( 'Yoast SEO: set your person logo', 'progress-planner' );
@@ -50,7 +50,7 @@ class Organization_Logo extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
 			? sprintf(
 				/* translators: %s: "Read more" link. */

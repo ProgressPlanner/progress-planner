@@ -48,7 +48,7 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: remove post authors feeds', 'progress-planner' );
 	}
 
@@ -57,7 +57,7 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Remove URLs which provide information about recent posts by specific authors. %s.', 'progress-planner' ),

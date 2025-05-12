@@ -65,7 +65,7 @@ class Set_Valuable_Post_Types extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Set valuable content types', 'progress-planner' );
 	}
 
@@ -74,7 +74,7 @@ class Set_Valuable_Post_Types extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/valuable-content" target="_blank">Read more</a> link */
 			\esc_html__( 'Tell us which post types matter most for your site. Go to your settings and select your valuable content types. %s', 'progress-planner' ),

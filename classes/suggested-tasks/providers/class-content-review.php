@@ -163,7 +163,7 @@ class Content_Review extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_url( $task_id = '' ) {
+	protected function get_url( $task_id = '' ) {
 		$post = $this->get_post_from_task_id( $task_id );
 
 		return $post && $this->capability_required()
