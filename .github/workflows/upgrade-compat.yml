@@ -131,7 +131,8 @@ jobs:
           pwd
           ls -la
           cd vendor/ && ls -la
-          composer show -p yoast/wordpress-seo-premium
+          cd yoast/ && ls -la
+          # composer show -p yoast/wordpress-seo-premium
           # docker cp ./vendor/yoast/wordpress-seo-premium $WP_CONTAINER:/var/www/html/wp-content/plugins/wordpress-seo-premium
 
           # Activate Yoast SEO Premium
