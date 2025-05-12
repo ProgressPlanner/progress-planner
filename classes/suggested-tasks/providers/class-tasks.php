@@ -337,7 +337,7 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		if ( ! $this->is_repetitive() ) {
-			if ( 0 !== strpos( $task['task_id'], $this->get_task_id() ) ) {
+			if ( ! isset( $task['task_id'] ) || 0 !== strpos( $task['task_id'], $this->get_task_id() ) ) {
 				return false;
 			}
 			return $this->is_task_completed( $task['task_id'] ) ? Task_Factory::create_task_from_id( $task['task_id'] ) : false;

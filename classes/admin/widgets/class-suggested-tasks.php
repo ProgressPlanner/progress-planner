@@ -98,12 +98,7 @@ final class Suggested_Tasks extends Widget {
 			}
 		}
 
-		$final_tasks = [];
-		foreach ( $tasks as $task ) {
-			$final_tasks[ $task['task_id'] ] = $task;
-		}
-
-		$final_tasks = array_values( $final_tasks );
+		$final_tasks = array_values( $tasks );
 
 		// Sort the final tasks by priority. The priotity can be "high", "medium", "low", or "none".
 		uasort(

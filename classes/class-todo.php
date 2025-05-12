@@ -7,8 +7,6 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Suggested_Tasks\Task_Factory;
-
 /**
  * Todo class.
  */
@@ -32,78 +30,7 @@ class Todo {
 	 * @return array
 	 */
 	public function get_items() {
-		return array_merge( $this->get_pending_items(), $this->get_completed_items() );
-	}
-
-	/**
-	 * Get the completed todo list items.
-	 *
-	 * @return array
-	 */
-	public function get_completed_items() {
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'provider_id' => 'user' ] );
-
-		$items = [];
-		foreach ( $tasks as $task ) {
-			if ( 'trash' === $task['post_status'] ) {
-				$items[] = array_merge(
-					$task,
-					[
-						'dismissable' => true,
-						'snoozable'   => false,
-					]
-				);
-			}
-		}
-
-		return $items;
-	}
-
-	/**
-	 * Get the pending todo list items.
-	 *
-	 * @return array
-	 */
-	public function get_pending_items() {
-		$tasks     = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'provider_id' => 'user' ] );
-		$items     = [];
-		$max_order = 0;
-
-		// Get the maximum order value from the $tasks array.
-		foreach ( $tasks as $task ) {
-			if ( 'publish' === $task['post_status'] && $task['menu_order'] > $max_order ) {
-				$max_order = $task['menu_order'];
-			}
-		}
-
-		foreach ( $tasks as $task ) {
-			// Skip non-pending tasks.
-			if ( 'publish' !== $task['post_status'] ) {
-				continue;
-			}
-
-			if ( ! isset( $task['menu_order'] ) ) {
-				$task['menu_order'] = $max_order + 1;
-				++$max_order;
-			}
-			$items[] = array_merge(
-				$task,
-				[
-					'dismissable' => true,
-					'snoozable'   => false,
-				]
-			);
-		}
-
-		// Order the items by the order value.
-		usort(
-			$items,
-			function ( $a, $b ) {
-				return $a['menu_order'] - $b['menu_order'];
-			}
-		);
-
-		return $items;
+		return \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'provider_id' => 'user' ] );
 	}
 
 	/**
@@ -243,7 +170,12 @@ class Todo {
 	 * @return void
 	 */
 	public function maybe_change_first_item_points_on_monday() {
-		$pending_items = $this->get_pending_items();
+		$pending_items = \progress_planner()->get_suggested_tasks()->get_tasks_by(
+			[
+				'provider_id' => 'user',
+				'post_status' => 'publish',
+			]
+		);
 
 		// Bail if there are no items.
 		if ( ! count( $pending_items ) ) {

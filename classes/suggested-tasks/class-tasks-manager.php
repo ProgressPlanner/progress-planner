@@ -212,8 +212,9 @@ class Tasks_Manager {
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.
 		foreach ( $provider_tasks as $task ) {
+			$id = isset( $task['ID'] ) ? $task['ID'] : $task['task_id'];
 			// Get the task.
-			$task_post = \progress_planner()->get_suggested_tasks()->get_post( $task['task_id'] );
+			$task_post = \progress_planner()->get_suggested_tasks()->get_post( $id );
 			// Skip the task if it was completed.
 			if ( ! $task_post || in_array( $task_post['post_status'], [ 'pending_celebration', 'trash' ], true ) ) {
 				continue;
