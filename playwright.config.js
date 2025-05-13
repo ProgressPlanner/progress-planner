@@ -25,14 +25,7 @@ module.exports = defineConfig( {
 		{
 			name: 'parallel',
 			use: { ...devices[ 'Desktop Chrome' ] },
-			testIgnore: [
-				'onboarding.spec.js',
-				'task-tagline.spec.js',
-				'todo.spec.js',
-				'todo-reorder.spec.js',
-				'todo-complete.spec.js',
-				'sequential.spec.js',
-			],
+			testIgnore: [ 'sequential.spec.js', '**/sequential/**' ],
 			fullyParallel: true,
 			workers: 4,
 		},
