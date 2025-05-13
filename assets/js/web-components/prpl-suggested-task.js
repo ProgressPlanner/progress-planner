@@ -23,8 +23,8 @@ customElements.define(
 			url = '',
 			url_target = '_self',
 			dismissable = false,
-			provider_id = '',
-			category = '',
+			provider = {},
+			category = {},
 			snoozable = true,
 			order = false,
 			deletable = false,
@@ -247,9 +247,9 @@ customElements.define(
 				data-task-id="${ task_id }"
 				data-task-action="${ action }"
 				data-task-url="${ url }"
-				data-task-provider-id="${ provider_id }"
+				data-task-provider-id="${ provider.term_id }"
 				data-task-points="${ points }"
-				data-task-category="${ category }"
+				data-task-category="${ category.term_id }"
 				data-task-order="${ order }"
 				data-task-list="${ taskList }"
 			>
@@ -261,7 +261,7 @@ customElements.define(
 							: ''
 					}
 					<span${
-						'user' === category
+						'user' === category.slug
 							? ` contenteditable="plaintext-only"`
 							: ''
 					}>${ taskHeading }</span>
@@ -464,8 +464,6 @@ customElements.define(
 							task: {
 								task_id: item.getAttribute( 'data-task-id' ),
 								title,
-								provider_id: 'user',
-								category: 'user',
 								dismissable: true,
 							},
 							nonce: prplSuggestedTask.nonce,

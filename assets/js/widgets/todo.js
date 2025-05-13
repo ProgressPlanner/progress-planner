@@ -91,14 +91,21 @@ prplDocumentReady( () => {
 		.getElementById( 'create-todo-item' )
 		.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
+			const getUserTerm = ( taxonomy ) => {
+				// Use `categories` or `providers`.
+				return progressPlannerTodo[ taxonomy ].find(
+					( term ) => 'user' === term.slug
+				);
+			};
+
 			const newTask = {
 				description: '',
 				parent: 0,
 				points: 0,
 				task_id: 'user-task-' + prplGetRandomUUID(),
 				post_title: document.getElementById( 'new-todo-content' ).value,
-				provider_id: 'user',
-				category: 'user',
+				provider: getUserTerm( 'providers' ),
+				category: getUserTerm( 'categories' ),
 				url: '',
 				dismissable: true,
 				snoozable: false,
