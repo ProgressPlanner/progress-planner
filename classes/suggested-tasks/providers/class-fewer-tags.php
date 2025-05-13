@@ -89,7 +89,7 @@ class Fewer_Tags extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Install Fewer Tags and clean up your tags', 'progress-planner' );
 	}
 
@@ -98,7 +98,7 @@ class Fewer_Tags extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return sprintf(
 			// translators: %1$s is the number of tags, %2$s is the number of published posts, %3$s <a href="https://prpl.fyi/install-fewer-tags" target="_blank">Read more</a> link.
 			\esc_html__( 'We detected that you have %1$s tags and %2$s published posts. Consider installing the "Fewer Tags" plugin. %3$s', 'progress-planner' ),

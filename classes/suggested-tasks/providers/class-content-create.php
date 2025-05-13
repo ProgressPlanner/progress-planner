@@ -69,7 +69,7 @@ class Content_Create extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return esc_html__( 'Create valuable content', 'progress-planner' );
 	}
 
@@ -78,7 +78,7 @@ class Content_Create extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Time to add more valuable content to your site! Check our blog for inspiration. %s.', 'progress-planner' ),
@@ -141,7 +141,7 @@ class Content_Create extends Tasks {
 		$task_details = [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
-			'title'       => $this->get_title(),
+			'post_title'  => $this->get_title(),
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),

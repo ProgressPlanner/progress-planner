@@ -31,7 +31,7 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: remove global comment feeds', 'progress-planner' );
 	}
 
@@ -40,7 +40,7 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Remove URLs which provide an overview of recent comments on your site. %s.', 'progress-planner' ),

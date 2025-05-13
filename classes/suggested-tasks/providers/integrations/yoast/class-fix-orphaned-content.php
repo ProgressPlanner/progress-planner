@@ -95,33 +95,25 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	/**
 	 * Get the title.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_title( $task_id = '' ) {
-		// Get the task data.
-		$task_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'task_id' => $task_id ] );
-
-		// We don't want to link if the term was deleted.
-		if ( empty( $task_data ) || ! $task_data[0] ) {
-			return '';
-		}
-
+	protected function get_title( $task_data = [] ) {
 		return sprintf(
 			/* translators: %s: Post title. */
 			\esc_html__( 'Yoast SEO: add internal links to article "%s"!', 'progress-planner' ),
-			\esc_html( $task_data[0]['post_title'] )
+			\esc_html( $task_data['post_title'] )
 		);
 	}
 
 	/**
 	 * Get the description.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 * @return string
 	 */
-	public function get_description( $task_id = '' ) {
+	protected function get_description( $task_data = [] ) {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Yoast SEO detected that this article has no links pointing to it. %s.', 'progress-planner' ),
@@ -132,12 +124,12 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	/**
 	 * Get the URL.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_url( $task_id = '' ) {
-		$post = $this->get_post_from_task_id( $task_id );
+	protected function get_url( $task_data = [] ) {
+		$post = \get_post( $task_data['post_id'] );
 
 		// We don't want to link if the post was deleted.
 		if ( ! $post ) {
@@ -222,7 +214,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 				'category'    => $this->get_provider_category(),
 				'post_id'     => $data['post_id'],
 				'post_title'  => $data['post_title'],
-				'url'         => $this->get_url( $task_id ),
+				'url'         => $this->get_url( $data ),
 				'url_target'  => $this->get_url_target(),
 				'dismissable' => $this->is_dismissable(),
 			],
@@ -242,18 +234,25 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return [];
 		}
 
+		$task_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'task_id' => $task_id ] );
+
+		// If the task data is empty, return an empty array.
+		if ( empty( $task_data ) ) {
+			return [];
+		}
+
 		$task_details = [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
-			'title'       => $this->get_title( $task_id ),
+			'post_title'  => $this->get_title( $task_data[0] ),
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
 			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
-			'url'         => $this->get_url( $task_id ),
+			'url'         => $this->get_url( $task_data[0] ),
 			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description( $task_id ),
+			'description' => $this->get_description( $task_data[0] ),
 		];
 
 		return $task_details;

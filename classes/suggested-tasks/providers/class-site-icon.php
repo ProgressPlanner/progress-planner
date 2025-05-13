@@ -42,7 +42,7 @@ class Site_Icon extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Set site icon', 'progress-planner' );
 	}
 
@@ -51,7 +51,7 @@ class Site_Icon extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/set-site-icon" target="_blank">site icon</a> link */
 			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),

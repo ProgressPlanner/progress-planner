@@ -48,7 +48,7 @@ class Archive_Format extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: disable the format archives', 'progress-planner' );
 	}
 
@@ -57,7 +57,7 @@ class Archive_Format extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'WordPress creates an archive for each post format. This is not useful and can be disabled in the Yoast SEO settings. %s.', 'progress-planner' ),
