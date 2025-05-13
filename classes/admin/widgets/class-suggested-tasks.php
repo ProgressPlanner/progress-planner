@@ -120,6 +120,7 @@ final class Suggested_Tasks extends Widget {
 
 		$max_items_per_category = [];
 		foreach ( $final_tasks as $task ) {
+			error_log( print_r( $task['category'], true ) );
 			$max_items_per_category[ $task['category']->slug ] = $task['category'] === ( new Content_Review() )->get_provider_category() ? 2 : 1;
 		}
 

@@ -51,6 +51,7 @@ wp.api.loadPromise.done( () => {
 			item.points = item.meta.prpl_points;
 			item.url = item.meta.prpl_url;
 			item.url_target = item.meta.prpl_url_target;
+			item.dismissable = item.meta.prpl_dismissable;
 
 			// Remove unwanted fields
 			delete item.author;
