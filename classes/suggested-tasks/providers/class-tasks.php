@@ -427,6 +427,7 @@ abstract class Tasks implements Tasks_Interface {
 			'category'     => $this->get_provider_category(),
 			'date'         => \gmdate( 'YW' ),
 			'post_title'   => $this->get_title(),
+			'description'  => $this->get_description(),
 			'url'          => $this->get_url(),
 			'url_target'   => $this->get_url_target(),
 			'link_setting' => $this->get_link_setting(),

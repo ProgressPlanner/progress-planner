@@ -134,12 +134,12 @@ class Content_Review extends Tasks {
 	/**
 	 * Get the task description.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_description( $task_id = '' ) {
-		$post = $this->get_post_from_task_id( $task_id );
+	public function get_description( $task_data = [] ) {
+		$post = $this->get_post_from_task_id( $task_data['task_id'] );
 
 		if ( ! $post ) {
 			return '';
@@ -302,6 +302,7 @@ class Content_Review extends Tasks {
 						strtolower( \get_post_type_object( \esc_html( $task_data['post_type'] ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
 						\esc_html( \get_the_title( $task_data['post_id'] ) ) // @phpstan-ignore-line property.nonObject
 					),
+					'description' => $this->get_description( $task_data ),
 					'url'         => \esc_url( (string) \get_edit_post_link( $task_data['post_id'] ) ),
 					'url_target'  => '_blank',
 					'dismissable' => $this->is_dismissable(),
