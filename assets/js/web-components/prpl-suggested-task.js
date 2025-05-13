@@ -4,7 +4,7 @@
  *
  * A web component to display a suggested task.
  *
- * Dependencies: progress-planner/l10n
+ * Dependencies: wp-api, progress-planner/l10n
  */
 /* eslint-disable camelcase */
 
