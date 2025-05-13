@@ -41,7 +41,7 @@ class Uncategorized_Category extends Base_Data_Collector {
 	}
 
 	/**
-	 * Query the hello world post.
+	 * Query the uncategorized category.
 	 *
 	 * @return int
 	 */

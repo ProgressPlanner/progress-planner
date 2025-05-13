@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.4.2
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -109,6 +109,39 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.4.2 =
+
+Bugs we fixed:
+
+* Fixed snoozing some of Yoast SEO Recommendations.
+
+= 1.4.1 =
+
+Bugs we fixed:
+
+* Fixed a conflict with the premium version of Yoast SEO.
+
+= 1.4.0 =
+
+Enhancements:
+
+* Review Content task takes into account Yoast SEO readibility score when suggesting posts to update.
+* Change update frequency for articles which are not selected in "Your page" section or as Yoast SEO Cornerstone content to 12 months.
+* Factor in Yoast SEO readibility score when suggesting which articles should be updated.
+
+Bugs we fixed:
+
+* Fixed a bug where dismissed review content tasks would reappear in the following week.
+
+Added these recommendations from Ravi:
+
+* Remove terms which have less than 2 posts.
+* Give description to terms which have more than 2 posts.
+* Suggest to install [Fewer Tags plugin](https://wordpress.org/plugins/fewer-tags/).
+* Yoast SEO: do Yoast SEO's Cornerstone Content Workout.
+* Yoast SEO: do Yoast SEO's Orphaned Content Workout.
+* Yoast SEO: add internal links to articles which don't have them.
 
 = 1.3.0 =
 
