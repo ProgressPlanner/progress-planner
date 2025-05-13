@@ -51,6 +51,12 @@ class Cornerstone_Workout extends Tasks {
 	 */
 	protected $is_dismissable = true;
 
+	/**
+	 * Whether the task is repetitive.
+	 *
+	 * @var bool
+	 */
+	protected $is_repetitive = true;
 
 	/**
 	 * The task points.
@@ -116,7 +122,7 @@ class Cornerstone_Workout extends Tasks {
 	 * @return string
 	 */
 	public function get_title( $task_id = '' ) {
-		return \esc_html__( 'Run Yoast SEO Cornerstone Content Workout', 'progress-planner' );
+		return \esc_html__( 'Yoast SEO: do Yoast SEO\'s Cornerstone Content Workout', 'progress-planner' );
 	}
 
 	/**
@@ -129,8 +135,8 @@ class Cornerstone_Workout extends Tasks {
 	public function get_description( $task_id = '' ) {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Run the Yoast SEO Cornerstone Content Workout to improve your site\'s SEO. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-cornerstone" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Cornerstone Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			\esc_html__( 'Improve your most important pages with Yoast SEO\'s Cornerstone Content Workout. %s.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/run-cornerstone-content-workout" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Learn more about the Yoast SEO Cornerstone Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Learn more', 'progress-planner' ) . '</a>'
 		);
 	}
 
@@ -142,7 +148,7 @@ class Cornerstone_Workout extends Tasks {
 	 * @return string
 	 */
 	public function get_url( $task_id = '' ) {
-		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts' ) ) : '';
+		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) ) : '';
 	}
 
 	/**
@@ -151,7 +157,7 @@ class Cornerstone_Workout extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( ! function_exists( 'YoastSEO' ) ) {
+		if ( ! defined( 'WPSEO_PREMIUM_VERSION' ) ) {
 			return false;
 		}
 
@@ -165,26 +171,6 @@ class Cornerstone_Workout extends Tasks {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Get an array of tasks to inject.
-	 *
-	 * @return array
-	 */
-	public function get_tasks_to_inject() {
-		if ( ! $this->should_add_task() ) {
-			return [];
-		}
-
-		return [
-			[
-				'task_id'     => $this->get_task_id(),
-				'provider_id' => $this->get_provider_id(),
-				'category'    => $this->get_provider_category(),
-				'date'        => \gmdate( 'YW' ),
-			],
-		];
 	}
 
 	/**

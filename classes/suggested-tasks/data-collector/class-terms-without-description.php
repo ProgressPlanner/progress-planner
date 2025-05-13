@@ -26,7 +26,7 @@ class Terms_Without_Description extends Base_Data_Collector {
 	 *
 	 * @var int
 	 */
-	protected const MIN_POSTS = 1;
+	protected const MIN_POSTS = 2;
 
 	/**
 	 * Initialize the data collector.

@@ -32,7 +32,7 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 * @return string
 	 */
 	public function get_title() {
-		return \esc_html__( 'Yoast SEO: Remove global comment feeds', 'progress-planner' );
+		return \esc_html__( 'Yoast SEO: remove global comment feeds', 'progress-planner' );
 	}
 
 	/**

@@ -156,7 +156,7 @@ class Update_Term_Description extends Tasks {
 
 		return \sprintf(
 			/* translators: %s: The term name */
-			\esc_html__( 'Write a description for %s', 'progress-planner' ),
+			\esc_html__( 'Write a description for term named "%s"', 'progress-planner' ),
 			\esc_html( $task_data[0]['term_name'] )
 		);
 	}
@@ -176,10 +176,10 @@ class Update_Term_Description extends Tasks {
 		}
 
 		return sprintf(
-			/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/update-term-description" target="_blank">Read more</a> link */
-			\esc_html__( 'Your %1$s archives probably show the description of that specific term. %2$s', 'progress-planner' ),
+			/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/taxonomy-terms-description" target="_blank">Read more</a> link */
+			\esc_html__( 'Your "%1$s" archives probably show the description of that specific term. %2$s', 'progress-planner' ),
 			$term->name,
-			'<a href="https://prpl.fyi/update-term-description" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			'<a href="https://prpl.fyi/taxonomy-terms-description" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the writing a description for taxonomy terms.', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		);
 	}
 
@@ -238,21 +238,27 @@ class Update_Term_Description extends Tasks {
 	public function get_tasks_to_inject() {
 
 		if (
+			true === $this->is_task_snoozed() ||
 			! $this->should_add_task() // No need to add the task.
 		) {
 			return [];
 		}
 
-		$data = $this->data_collector->collect();
+		$data    = $this->data_collector->collect();
+		$task_id = $this->get_task_id(
+			[
+				'term_id'  => $data['term_id'],
+				'taxonomy' => $data['taxonomy'],
+			]
+		);
+
+		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
+			return [];
+		}
 
 		return [
 			[
-				'task_id'     => $this->get_task_id(
-					[
-						'term_id'  => $data['term_id'],
-						'taxonomy' => $data['taxonomy'],
-					]
-				),
+				'task_id'     => $task_id,
 				'provider_id' => $this->get_provider_id(),
 				'category'    => $this->get_provider_category(),
 				'term_id'     => $data['term_id'],

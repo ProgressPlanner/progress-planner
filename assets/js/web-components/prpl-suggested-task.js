@@ -214,6 +214,7 @@ customElements.define(
 
 					output += `<input
 						type="checkbox"
+						id="prpl-suggested-task-checkbox-${ task_id }"
 						class="prpl-suggested-task-checkbox"
 						style="${ checkboxStyle }"
 						${ ! dismissable ? 'disabled' : '' }
@@ -253,11 +254,19 @@ customElements.define(
 				data-task-list="${ taskList }"
 			>
 				${ actionButtons.completeCheckbox }
-				<h3 style="width: 100%;"><span${
-					'user' === category
-						? ` contenteditable="plaintext-only"`
-						: ''
-				}>${ taskHeading }</span></h3>
+				<h3 style="width: 100%;">
+					${
+						useCheckbox
+							? `<label for="prpl-suggested-task-checkbox-${ task_id }">`
+							: ''
+					}
+					<span${
+						'user' === category
+							? ` contenteditable="plaintext-only"`
+							: ''
+					}>${ taskHeading }</span>
+					${ useCheckbox && dismissable ? `</label>` : '' }
+				</h3>
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
 						${ actionButtons.info }
