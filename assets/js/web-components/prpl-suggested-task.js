@@ -459,16 +459,13 @@ customElements.define(
 				clearTimeout( this.debounceTimeout );
 				this.debounceTimeout = setTimeout( () => {
 					const title = h3Span.textContent;
-					wp.ajax
-						.post( 'progress_planner_save_user_suggested_task', {
-							task: {
-								task_id: item.getAttribute( 'data-task-id' ),
-								title,
-								dismissable: true,
-							},
-							nonce: prplSuggestedTask.nonce,
-						} )
-						.done( () => {
+					wp.api.loadPromise.done( () => {
+						// Update an existing post.
+						const post = new wp.api.models.Prpl_recommendations( {
+							id: parseInt( item.getAttribute( 'data-task-id' ) ),
+							title,
+						} );
+						post.save().then( () => {
 							// Update the task title.
 							document.dispatchEvent(
 								new CustomEvent( 'prpl/suggestedTask/update', {
@@ -476,6 +473,7 @@ customElements.define(
 								} )
 							);
 						} );
+					} );
 				}, 300 );
 			} );
 		};

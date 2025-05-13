@@ -8,24 +8,6 @@
  */
 
 /**
- * Get a random UUID.
- *
- * @return {string} The random UUID.
- */
-const prplGetRandomUUID = () => {
-	if (
-		typeof crypto !== 'undefined' &&
-		typeof crypto.randomUUID === 'function'
-	) {
-		return crypto.randomUUID();
-	}
-	return (
-		Math.random().toString( 36 ).substring( 2, 15 ) +
-		Math.random().toString( 36 ).substring( 2, 15 )
-	);
-};
-
-/**
  * Get the `user` term in the `prpl_recommendations_category` and `prpl_recommendations_provider` taxonomies.
  *
  * @param {string} taxonomy The taxonomy to get the term for.
@@ -126,7 +108,7 @@ prplDocumentReady( () => {
 						description: '',
 						parent: 0,
 						points: 0,
-						task_id: 'user-task-' + prplGetRandomUUID(),
+						task_id: response.id,
 						post_title: response.title.rendered,
 						provider: prplGetUserTerm(
 							'prpl_recommendations_provider'
