@@ -286,18 +286,25 @@ class Remove_Terms_Without_Posts extends Tasks {
 			return [];
 		}
 
+		$task_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'task_id' => $task_id ] );
+
+		// If the task data is empty, return an empty array.
+		if ( empty( $task_data ) ) {
+			return [];
+		}
+
 		$task_details = [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
-			'title'       => $this->get_title( $task_id ),
+			'title'       => $this->get_title( $task_data[0] ),
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
 			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
-			'url'         => $this->get_url( $task_id ),
+			'url'         => $this->get_url( $task_data[0] ),
 			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description( $task_id ),
+			'description' => $this->get_description( $task_data[0] ),
 		];
 
 		return $task_details;

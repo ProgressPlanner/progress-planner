@@ -69,8 +69,12 @@ class Suggested_Tasks {
 			// Get the task data.
 			$task_data = $task->get_data();
 
+			if ( ! isset( $task_data['task_id'] ) && ! isset( $task_data['ID'] ) ) {
+				continue;
+			}
+
 			// Update the task data.
-			$task_post = $this->get_post( $task_data['task_id'] );
+			$task_post = $this->get_post( $task_data['task_id'] ?? $task_data['ID'] );
 			if ( ! $task_post ) {
 				continue;
 			}
@@ -419,7 +423,11 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function update_recommendation( $id, $data ) {
-		$update_data    = [];
+		if ( ! $id ) {
+			return false;
+		}
+
+		$update_data    = [ 'ID' => $id ];
 		$update_meta    = [];
 		$update_terms   = [];
 		$update_results = [];
@@ -441,7 +449,7 @@ class Suggested_Tasks {
 			}
 		}
 
-		if ( ! empty( $update_data ) ) {
+		if ( 1 < count( $update_data ) ) {
 			$update_results[] = (bool) \wp_update_post( $update_data );
 		}
 

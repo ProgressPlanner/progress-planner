@@ -4,7 +4,7 @@
  *
  * A widget that displays a todo list.
  *
- * Dependencies: progress-planner/web-components/prpl-suggested-task, wp-util, wp-a11y, progress-planner/ajax-request, progress-planner/grid-masonry, progress-planner/document-ready, progress-planner/celebrate
+ * Dependencies: wp-api, progress-planner/web-components/prpl-suggested-task, wp-util, wp-a11y, progress-planner/ajax-request, progress-planner/grid-masonry, progress-planner/document-ready, progress-planner/celebrate
  */
 
 /**
@@ -91,15 +91,21 @@ prplDocumentReady( () => {
 		.getElementById( 'create-todo-item' )
 		.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
+			const getUserTerm = ( taxonomy ) => {
+				// Use `categories` or `providers`.
+				return progressPlannerTodo[ taxonomy ].find(
+					( term ) => 'user' === term.slug
+				);
+			};
+
 			const newTask = {
 				description: '',
 				parent: 0,
 				points: 0,
-				priority: 'medium',
 				task_id: 'user-task-' + prplGetRandomUUID(),
-				title: document.getElementById( 'new-todo-content' ).value,
-				provider_id: 'user',
-				category: 'user',
+				post_title: document.getElementById( 'new-todo-content' ).value,
+				provider: getUserTerm( 'providers' ),
+				category: getUserTerm( 'categories' ),
 				url: '',
 				dismissable: true,
 				snoozable: false,

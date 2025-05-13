@@ -117,7 +117,7 @@ class Cornerstone_Workout extends Tasks {
 	/**
 	 * Get the task title.
 	 *
-	 * @param string $task_data The task data.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
@@ -128,7 +128,7 @@ class Cornerstone_Workout extends Tasks {
 	/**
 	 * Get the task description.
 	 *
-	 * @param string $task_data The task data.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
@@ -143,11 +143,11 @@ class Cornerstone_Workout extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	protected function get_url( $task_id = '' ) {
+	protected function get_url( $task_data = [] ) {
 		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) ) : '';
 	}
 
@@ -188,7 +188,7 @@ class Cornerstone_Workout extends Tasks {
 		return [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
-			'title'       => $this->get_title(),
+			'post_title'  => $this->get_title(),
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
