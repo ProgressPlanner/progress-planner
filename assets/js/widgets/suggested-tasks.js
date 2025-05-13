@@ -128,18 +128,6 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 		.insertAdjacentElement( 'beforeend', item );
 } );
 
-if (
-	! prplSuggestedTasks.delayCelebration &&
-	prplSuggestedTasks.tasks.filter(
-		( task ) => 'pending_celebration' === task.status
-	).length
-) {
-	setTimeout( () => {
-		// Trigger the celebration event.
-		document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
-	}, 3000 );
-}
-
 // Populate the list on load.
 prplDocumentReady( () => {
 	// Do nothing if the list does not exist.
@@ -153,7 +141,9 @@ prplDocumentReady( () => {
 		postsCollection
 			.fetch( {
 				data: {
-					status: 'publish',
+					status: prplSuggestedTasks.delayCelebration
+						? [ 'publish' ]
+						: [ 'publish', 'pending_celebration' ],
 					per_page: 100,
 					_embed: true,
 					tax_query: [
@@ -214,6 +204,21 @@ prplDocumentReady( () => {
 					} );
 
 				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+
+				// Trigger the celebration event if needed.
+				if (
+					! prplSuggestedTasks.delayCelebration &&
+					prplSuggestedTasks.tasks.filter(
+						( task ) => 'pending_celebration' === task.status
+					).length
+				) {
+					setTimeout( () => {
+						// Trigger the celebration event.
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/celebrateTasks' )
+						);
+					}, 3000 );
+				}
 			} )
 			.fail( ( jqXHR, textStatus, errorThrown ) => {
 				console.error( 'Fetch failed:', {

@@ -54,6 +54,10 @@ wp.api.loadPromise.done( () => {
 			item.url_target = item.meta.prpl_url_target;
 			item.dismissable = item.meta.prpl_dismissable;
 
+			if ( 'pending_celebration' === item.status ) {
+				item.action = 'celebrate';
+			}
+
 			// Remove unwanted fields
 			delete item.author;
 			delete item.class_list;
