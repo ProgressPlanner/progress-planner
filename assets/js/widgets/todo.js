@@ -8,20 +8,14 @@
  */
 
 /**
- * Get a random UUID.
+ * Get the `user` term in the `prpl_recommendations_category` and `prpl_recommendations_provider` taxonomies.
  *
- * @return {string} The random UUID.
+ * @param {string} taxonomy The taxonomy to get the term for.
+ * @return {Object} The `user` term.
  */
-const prplGetRandomUUID = () => {
-	if (
-		typeof crypto !== 'undefined' &&
-		typeof crypto.randomUUID === 'function'
-	) {
-		return crypto.randomUUID();
-	}
-	return (
-		Math.random().toString( 36 ).substring( 2, 15 ) +
-		Math.random().toString( 36 ).substring( 2, 15 )
+const prplGetUserTerm = ( taxonomy ) => {
+	return progressPlannerTodo[ taxonomy ].find(
+		( term ) => 'user' === term.slug
 	);
 };
 
@@ -91,37 +85,42 @@ prplDocumentReady( () => {
 		.getElementById( 'create-todo-item' )
 		.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
-			const getUserTerm = ( taxonomy ) => {
-				// Use `categories` or `providers`.
-				return progressPlannerTodo[ taxonomy ].find(
-					( term ) => 'user' === term.slug
-				);
-			};
 
-			const newTask = {
-				description: '',
-				parent: 0,
-				points: 0,
-				task_id: 'user-task-' + prplGetRandomUUID(),
-				post_title: document.getElementById( 'new-todo-content' ).value,
-				provider: getUserTerm( 'providers' ),
-				category: getUserTerm( 'categories' ),
-				url: '',
-				dismissable: true,
-				snoozable: false,
-				order: prplGetHighestTodoItemOrder() + 1,
-			};
-
-			// Save the new task.
-			wp.ajax
-				.post( 'progress_planner_save_user_suggested_task', {
-					task: newTask,
-					nonce: progressPlannerTodo.nonce,
-				} )
-				.then( ( response ) => {
-					if ( 'undefined' !== typeof response.points ) {
-						newTask.points = response.points;
+			wp.api.loadPromise.done( () => {
+				// Create a new post
+				const post = new wp.api.models.Prpl_recommendations( {
+					// Set the post title.
+					title: document.getElementById( 'new-todo-content' ).value,
+					// Set the `prpl_recommendations_category` term.
+					prpl_recommendations_category: prplGetUserTerm(
+						'prpl_recommendations_category'
+					).term_id,
+					// Set the `prpl_recommendations_provider` term.
+					prpl_recommendations_provider: prplGetUserTerm(
+						'prpl_recommendations_provider'
+					).term_id,
+				} );
+				post.save().then( ( response ) => {
+					if ( ! response.id ) {
+						return;
 					}
+					const newTask = {
+						description: '',
+						parent: 0,
+						points: 0,
+						task_id: response.id,
+						post_title: response.title.rendered,
+						provider: prplGetUserTerm(
+							'prpl_recommendations_provider'
+						),
+						category: prplGetUserTerm(
+							'prpl_recommendations_category'
+						),
+						url: '',
+						dismissable: true,
+						snoozable: false,
+						order: prplGetHighestTodoItemOrder() + 1,
+					};
 
 					// Inject the new task into the DOM.
 					document.dispatchEvent(
@@ -134,14 +133,12 @@ prplDocumentReady( () => {
 						} )
 					);
 
-					// Add the new task to the tasks array.
-					progressPlannerTodo.tasks.push( newTask );
-
 					// Resize the grid items.
 					window.dispatchEvent(
 						new CustomEvent( 'prpl/grid/resize' )
 					);
 				} );
+			} );
 
 			// Clear the new task input element.
 			document.getElementById( 'new-todo-content' ).value = '';

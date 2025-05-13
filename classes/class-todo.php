@@ -58,33 +58,6 @@ class Todo {
 			\progress_planner()->get_suggested_tasks()->update_recommendation( $task['ID'], [ 'post_title' => $title ] );
 			return;
 		}
-
-		$task_id = \wp_insert_post(
-			[
-				'post_title'  => $title,
-				'post_status' => 'publish',
-				'post_type'   => 'prpl_recommendations',
-				'post_author' => \get_current_user_id(),
-			]
-		);
-
-		if ( ! (bool) $task_id ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to create task.', 'progress-planner' ) ] );
-		}
-
-		$task_points = $this->calc_points_for_new_task();
-
-		\wp_set_post_terms( $task_id, 'user', 'prpl_recommendations_provider' );
-		\wp_set_post_terms( $task_id, 'user', 'prpl_recommendations_category' );
-		\update_post_meta( $task_id, 'prpl_points', $task_points );
-		\update_post_meta( $task_id, 'prpl_task_id', $task_id );
-
-		\wp_send_json_success(
-			[
-				'message' => \esc_html__( 'Saved.', 'progress-planner' ),
-				'points'  => $task_points, // We're using it when adding the new task to the todo list.
-			]
-		);
 	}
 
 	/**
