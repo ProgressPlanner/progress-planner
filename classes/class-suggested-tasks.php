@@ -613,17 +613,17 @@ class Suggested_Tasks {
 				$taxonomy,
 				[ 'prpl_recommendations' ],
 				[
-					'public'            => false,
+					'public'            => defined( 'PRPL_DEBUG' ) && PRPL_DEBUG,
 					'hierarchical'      => false,
 					'labels'            => [
 						'name' => $label,
 					],
-					'show_ui'           => false,
+					'show_ui'           => defined( 'PRPL_DEBUG' ) && PRPL_DEBUG,
 					'show_admin_column' => false,
 					'query_var'         => true,
 					'rewrite'           => [ 'slug' => $taxonomy ],
 					'show_in_rest'      => true,
-					'show_in_menu'      => false,
+					'show_in_menu'      => defined( 'PRPL_DEBUG' ) && PRPL_DEBUG,
 				]
 			);
 		}
