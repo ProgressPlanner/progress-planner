@@ -561,6 +561,42 @@ class Suggested_Tasks {
 				'publicly_queryable'  => true,
 			]
 		);
+
+		$rest_meta_fields = [
+			'prpl_points' => [
+				'type' => 'number',
+				'single' => true,
+				'show_in_rest' => true,
+			],
+			'prpl_task_id' => [
+				'type' => 'string',
+				'single' => true,
+				'show_in_rest' => true,
+			],
+			'prpl_url' => [
+				'type' => 'string',
+				'single' => true,
+				'show_in_rest' => true,
+			],
+			'prpl_url_target' => [
+				'type' => 'string',
+				'single' => true,
+				'show_in_rest' => true,
+			],
+			'prpl_dismissable' => [
+				'type' => 'boolean',
+				'single' => true,
+				'show_in_rest' => true,
+			],
+		];
+
+		foreach ( $rest_meta_fields as $key => $field ) {
+			register_post_meta(
+				'prpl_recommendations',
+				$key,
+				$field
+			);
+		}
 	}
 
 	/**

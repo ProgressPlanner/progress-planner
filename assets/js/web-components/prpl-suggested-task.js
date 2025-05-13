@@ -16,7 +16,7 @@ customElements.define(
 	class extends HTMLElement {
 		constructor( {
 			task_id,
-			post_title,
+			title,
 			description,
 			points = 0,
 			action = '',
@@ -36,9 +36,9 @@ customElements.define(
 
 			this.setAttribute( 'role', 'listitem' );
 
-			let taskHeading = post_title;
+			let taskHeading = title;
 			if ( url ) {
-				taskHeading = `<a href="${ url }" target="${ url_target }">${ post_title }</a>`;
+				taskHeading = `<a href="${ url }" target="${ url_target }">${ title }</a>`;
 			}
 
 			const getTaskStatus = () => {
@@ -59,7 +59,7 @@ customElements.define(
 								type="button"
 								class="prpl-suggested-task-button move-up"
 								data-task-id="${ task_id }"
-								data-task-title="${ post_title }"
+								data-task-title="${ title }"
 								data-action="move-up"
 								data-target="move-up"
 								title="${ prplL10n( 'moveUp' ) }"
@@ -71,7 +71,7 @@ customElements.define(
 								type="button"
 								class="prpl-suggested-task-button move-down"
 								data-task-id="${ task_id }"
-								data-task-title="${ post_title }"
+								data-task-title="${ title }"
 								data-action="move-down"
 								data-target="move-down"
 								title="${ prplL10n( 'moveDown' ) }"
@@ -88,7 +88,7 @@ customElements.define(
 									type="button"
 									class="prpl-suggested-task-button"
 									data-task-id="${ task_id }"
-									data-task-title="${ post_title }"
+									data-task-title="${ title }"
 									data-action="info"
 									data-target="info"
 									title="${ prplL10n( 'info' ) }"
@@ -111,7 +111,7 @@ customElements.define(
 								type="button"
 								class="prpl-suggested-task-button"
 								data-task-id="${ task_id }"
-								data-task-title="${ post_title }"
+								data-task-title="${ title }"
 								data-action="snooze"
 								data-target="snooze"
 								title="${ prplL10n( 'snooze' ) }"
@@ -175,7 +175,7 @@ customElements.define(
 							type="button"
 							class="prpl-suggested-task-button"
 							data-task-id="${ task_id }"
-							data-task-title="${ post_title }"
+							data-task-title="${ title }"
 							data-action="complete"
 							data-target="complete"
 							title="${ prplL10n( 'markAsComplete' ) }"
@@ -189,7 +189,7 @@ customElements.define(
 							type="button"
 							class="prpl-suggested-task-button trash"
 							data-task-id="${ task_id }"
-							data-task-title="${ post_title }"
+							data-task-title="${ title }"
 							data-action="delete"
 							data-target="delete"
 							title="${ prplL10n( 'delete' ) }"
@@ -247,9 +247,9 @@ customElements.define(
 				data-task-id="${ task_id }"
 				data-task-action="${ action }"
 				data-task-url="${ url }"
-				data-task-provider-id="${ provider.term_id }"
+				data-task-provider-id="${ provider.slug }"
 				data-task-points="${ points }"
-				data-task-category="${ category.term_id }"
+				data-task-category="${ category.slug }"
 				data-task-order="${ order }"
 				data-task-list="${ taskList }"
 			>
