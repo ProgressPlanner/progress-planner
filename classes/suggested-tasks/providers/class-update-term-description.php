@@ -259,6 +259,7 @@ class Update_Term_Description extends Tasks {
 				'term_name'   => $data['name'],
 				'date'        => \gmdate( 'YW' ),
 				'post_title'  => $this->get_title( $data ),
+				'description' => $this->get_description( $data ),
 				'url'         => $this->get_url( $data ),
 				'url_target'  => '_blank',
 				'dismissable' => $this->is_dismissable(),

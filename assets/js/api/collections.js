@@ -47,6 +47,7 @@ wp.api.loadPromise.done( () => {
 			// TODO: Temporary fixes.
 			item.task_id = item.meta.prpl_task_id;
 			item.title = item.title.rendered;
+			item.description = item.content.rendered;
 
 			item.points = item.meta.prpl_points;
 			item.url = item.meta.prpl_url;
