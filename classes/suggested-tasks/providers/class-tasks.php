@@ -431,6 +431,7 @@ abstract class Tasks implements Tasks_Interface {
 			'url_target'   => $this->get_url_target(),
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
+			'points'       => $this->get_points(),
 		];
 
 		$task_data = $this->modify_injection_task_data( $task_data );

@@ -217,6 +217,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 				'url'         => $this->get_url( $data ),
 				'url_target'  => $this->get_url_target(),
 				'dismissable' => $this->is_dismissable(),
+				'points'      => $this->get_points(),
 			],
 		];
 	}

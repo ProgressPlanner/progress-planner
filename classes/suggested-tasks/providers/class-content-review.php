@@ -305,6 +305,7 @@ class Content_Review extends Tasks {
 					'url'         => \esc_url( (string) \get_edit_post_link( $task_data['post_id'] ) ),
 					'url_target'  => '_blank',
 					'dismissable' => $this->is_dismissable(),
+					'points'      => $this->get_points(),
 				];
 			}
 		}

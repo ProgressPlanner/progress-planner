@@ -563,29 +563,29 @@ class Suggested_Tasks {
 		);
 
 		$rest_meta_fields = [
-			'prpl_points' => [
-				'type' => 'number',
-				'single' => true,
+			'prpl_points'      => [
+				'type'         => 'number',
+				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_task_id' => [
-				'type' => 'string',
-				'single' => true,
+			'prpl_task_id'     => [
+				'type'         => 'string',
+				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_url' => [
-				'type' => 'string',
-				'single' => true,
+			'prpl_url'         => [
+				'type'         => 'string',
+				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_url_target' => [
-				'type' => 'string',
-				'single' => true,
+			'prpl_url_target'  => [
+				'type'         => 'string',
+				'single'       => true,
 				'show_in_rest' => true,
 			],
 			'prpl_dismissable' => [
-				'type' => 'boolean',
-				'single' => true,
+				'type'         => 'boolean',
+				'single'       => true,
 				'show_in_rest' => true,
 			],
 		];
