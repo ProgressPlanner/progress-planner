@@ -44,7 +44,7 @@ class Last_Published_Post extends Base_Data_Collector {
 	 * @return void
 	 */
 	public function set_include_post_types() {
-		$this->include_post_types = \progress_planner()->get_settings()->get_post_types_names();
+		$this->include_post_types = \progress_planner()->get_activities__content_helpers()->get_post_types_names();
 	}
 
 	/**
