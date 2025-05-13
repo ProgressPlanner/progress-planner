@@ -269,6 +269,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 				'url'         => $this->get_url( $data ),
 				'url_target'  => '_blank',
 				'dismissable' => $this->is_dismissable(),
+				'points'      => $this->get_points(),
 			],
 		];
 	}

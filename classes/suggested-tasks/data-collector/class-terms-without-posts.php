@@ -94,12 +94,18 @@ class Terms_Without_Posts extends Base_Data_Collector {
 		 */
 		$public_taxonomies = get_taxonomies( [ 'public' => true ], 'names' );
 
-		if ( isset( $public_taxonomies['post_format'] ) ) {
-			unset( $public_taxonomies['post_format'] );
-		}
+		// Remove public taxonomies that are not relevant for this data collector.
+		$remove_taxonomies = [
+			'post_format',
+			'product_shipping_class',
+			'prpl_recommendations_category',
+			'prpl_recommendations_provider',
+		];
 
-		if ( isset( $public_taxonomies['product_shipping_class'] ) ) {
-			unset( $public_taxonomies['product_shipping_class'] );
+		foreach ( $remove_taxonomies as $taxonomy ) {
+			if ( isset( $public_taxonomies[ $taxonomy ] ) ) {
+				unset( $public_taxonomies[ $taxonomy ] );
+			}
 		}
 
 		/**
