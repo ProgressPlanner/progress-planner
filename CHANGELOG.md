@@ -1,19 +1,58 @@
-= 1.3.0 =
+= 1.4.2 =
 
 Bugs we fixed:
 
-* Fixed error during plugin uninstall.
+* Fixed snoozing some of Yoast SEO Recommendations.
 
-= 1.2.1 =
+= 1.4.1 =
+
+Bugs we fixed:
+
+* Fixed a conflict with the premium version of Yoast SEO.
+
+= 1.4.0 =
+
+Enhancements:
+
+* Review Content task takes into account Yoast SEO readibility score when suggesting posts to update.
+* Change update frequency for articles which are not selected in "Your page" section or as Yoast SEO Cornerstone content to 12 months.
+* Factor in Yoast SEO readibility score when suggesting which articles should be updated.
+
+Bugs we fixed:
+
+* Fixed a bug where dismissed review content tasks would reappear in the following week.
+
+Added these recommendations from Ravi:
+
+* [Remove terms](http://prpl.fyi/remove-empty-taxonomy) which have less than 2 posts.
+* [Give description](http://prpl.fyi/taxonomy-terms-description) to terms which have more than 2 posts.
+* Suggest to install [Fewer Tags plugin](https://prpl.fyi/install-fewer-tags).
+* Yoast SEO: [do Yoast SEO's Cornerstone Content Workout](http://prpl.fyi/run-orphaned-content-workout).
+* Yoast SEO: [do Yoast SEO's Orphaned Content Workout](https://prpl.fyi/run-cornerstone-content-workout).
+* Yoast SEO: [add internal links](https://prpl.fyi/fix-orphaned-content) to articles which don't have them.
+
+= 1.3.0 =
 
 Enhancements:
 
 * Improved checks when adding Ravi icon to the Yoast SEO settings page.
+* Add "golden" tasks to weekly emails.
+* Add text to clarify when the user has completed all tasks.
+* Improve the content widget & stats to show more accurate data. It now shows content _activity_ instead of content _published_.
+* Implemented "valuable post-types" and added settings for them.
+* Changed the "create a post" task to "create valuable content".
+* Renamed & migrated content badges.
+* Added a link to the 'Create valuable content' task description.
+* Improve accessibility of Recommendations (and other links) linking to external resources
 
 Bugs we fixed:
 
+* Fixed error during plugin uninstall.
 * Archive_Format data collector hooks weren't registered early enough.
 * Ensure fresh plugin list by clearing plugin cache before checking for inactive plugins after deletion.
+* Clear plugin cache when checking for inactive plugins.
+* Delete no-longer relevant pending tasks.
+* Fixed timing issue for tasks added by 3rd-party plugins.
 
 = 1.2.0 =
 

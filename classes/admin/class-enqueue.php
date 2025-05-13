@@ -343,6 +343,7 @@ class Enqueue {
 			'disabledRRCheckboxTooltip'    => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),
 			'remoteAPIStatusOk'            => \esc_html__( 'API is accessible', 'progress-planner' ),
 			'remoteAPIStatusError'         => \esc_html__( 'API is not accessible', 'progress-planner' ),
+			'opensInNewWindow'             => \esc_html__( 'Opens in new window', 'progress-planner' ),
 		];
 	}
 }

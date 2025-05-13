@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Tests;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
 use Progress_Planner\Suggested_Tasks;
 
 /**
@@ -58,7 +57,7 @@ trait Task_Provider_Test_Trait {
 		parent::set_up();
 
 		// Get the task provider.
-		$this->task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $this->task_provider_id );
+		$this->task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $this->task_provider_id );
 
 		// Get the suggested tasks instance.
 		$this->suggested_tasks = \progress_planner()->get_suggested_tasks();
@@ -72,11 +71,8 @@ trait Task_Provider_Test_Trait {
 	public function tear_down() {
 		parent::tear_down();
 
-		// Delete local tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
-
-		// Delete suggested tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
+		// Delete tasks.
+		\progress_planner()->get_settings()->set( 'tasks', [] );
 	}
 
 	/**
@@ -99,13 +95,13 @@ trait Task_Provider_Test_Trait {
 		// Get all tasks to inject.
 		$tasks = $this->task_provider->get_tasks_to_inject();
 
-		// Add the task(s) to the local suggested tasks.
+		// Add the task(s) to the suggested tasks.
 		foreach ( $tasks as $task ) {
-			$this->suggested_tasks->get_local()->add_pending_task( $task );
+			$this->suggested_tasks->get_tasks_manager()->add_pending_task( $task );
 		}
 
-		// Verify that the task(s) are in the local suggested tasks.
-		$pending_tasks = (array) \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		// Verify that the task(s) are in the suggested tasks.
+		$pending_tasks = (array) \progress_planner()->get_settings()->get( 'tasks', [] );
 		foreach ( $tasks as $task ) {
 			$item_found = false;
 			foreach ( $pending_tasks as $pending_task ) {
@@ -121,7 +117,7 @@ trait Task_Provider_Test_Trait {
 		$this->complete_task();
 
 		// Change the task status to pending celebration for all completed tasks.
-		foreach ( $this->suggested_tasks->get_local()->evaluate_tasks() as $task ) {
+		foreach ( $this->suggested_tasks->get_tasks_manager()->evaluate_tasks() as $task ) {
 			// Change the task status to pending celebration.
 			$this->suggested_tasks->mark_task_as( 'pending_celebration', $task->get_data()['task_id'] );
 

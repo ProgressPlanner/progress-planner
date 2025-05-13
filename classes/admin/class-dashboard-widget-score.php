@@ -48,6 +48,8 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 
 		\progress_planner()->get_admin__enqueue()->enqueue_style( "progress-planner/dashboard-widgets/{$this->id}" );
 
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
+
 		\progress_planner()->the_view( "dashboard-widgets/{$this->id}.php" );
 	}
 

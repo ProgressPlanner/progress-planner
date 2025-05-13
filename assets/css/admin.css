@@ -420,11 +420,13 @@ button.prpl-info-icon {
 /*------------------------------------*\
 	Settings popover.
 \*------------------------------------*/
-#prpl-settings-license-form,
-#prpl-settings-form {
+#prpl-settings-license-form {
 
 	label {
-		display: block;
+		display: grid;
+		grid-template-columns: 1fr 3fr;
+		margin-bottom: 0.5em;
+		gap: var(--prpl-padding);
 	}
 
 	p {
@@ -457,13 +459,16 @@ button.prpl-info-icon {
 	}
 }
 
-#prpl-settings-license-form {
+/*------------------------------------*\
+	External link accessibility helper.
+\*------------------------------------*/
+.prpl-external-link-icon {
+	display: inline-flex;
+	margin-inline-start: 0.25em;
+	vertical-align: middle;
 
-	label {
-		display: grid;
-		grid-template-columns: 1fr 3fr;
-		margin-bottom: 0.5em;
-		gap: var(--prpl-padding);
+	svg {
+		width: 1em;
+		height: 1em;
 	}
 }
-

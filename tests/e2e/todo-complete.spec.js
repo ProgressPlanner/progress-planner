@@ -96,9 +96,9 @@ function todoCompleteTests( testContext = test ) {
 			const todoItemElement = page.locator(
 				`ul#todo-list ${ taskSelector }`
 			);
-			await expect( todoItemElement.locator( 'h3 > span' ) ).toHaveText(
-				TEST_TASK_TEXT
-			);
+			await expect(
+				todoItemElement.locator( 'h3 > label > span' )
+			).toHaveText( TEST_TASK_TEXT );
 
 			// Click the checkbox to complete the task
 			await todoItemElement
@@ -119,9 +119,9 @@ function todoCompleteTests( testContext = test ) {
 				`ul#todo-list-completed ${ taskSelector }`
 			);
 			await expect( completedTask ).toBeVisible();
-			await expect( completedTask.locator( 'h3 > span' ) ).toHaveText(
-				TEST_TASK_TEXT
-			);
+			await expect(
+				completedTask.locator( 'h3 > label > span' )
+			).toHaveText( TEST_TASK_TEXT );
 			await expect(
 				completedTask.locator( '.prpl-suggested-task-checkbox' )
 			).toBeChecked();
@@ -172,9 +172,9 @@ function todoCompleteTests( testContext = test ) {
 					`ul#todo-list-completed ${ taskSelector }`
 				);
 				await expect( completedTask ).toBeVisible();
-				await expect( completedTask.locator( 'h3 > span' ) ).toHaveText(
-					TEST_TASK_TEXT
-				);
+				await expect(
+					completedTask.locator( 'h3 > label > span' )
+				).toHaveText( TEST_TASK_TEXT );
 				await expect(
 					completedTask.locator( '.prpl-suggested-task-checkbox' )
 				).toBeChecked();
