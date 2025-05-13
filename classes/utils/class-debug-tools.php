@@ -221,9 +221,6 @@ class Debug_Tools {
 			]
 		);
 
-		// Get suggested tasks.
-		$suggested_tasks = \progress_planner()->get_suggested_tasks()->get( [ 'post_status' => 'any' ] );
-
 		$menu_items = [
 			'publish'             => 'Pending',
 			'trash'               => 'Completed',
@@ -240,24 +237,26 @@ class Debug_Tools {
 				]
 			);
 
-			foreach ( $suggested_tasks as $task ) {
-				if ( $key !== $task['post_status'] ) {
-					continue;
-				}
+			// Get suggested tasks.
+			$suggested_tasks = \progress_planner()->get_suggested_tasks()->get( [ 'post_status' => $key ] );
 
-				$title = $task['post_title'];
-				if ( isset( $task['post_status'] ) && 'future' === $task['post_status'] && isset( $task['post_date'] ) ) {
-					$until  = is_float( $task['post_date'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['post_date'] ) . ')';
-					$title .= ' ' . $until;
-				}
+			if ( ! empty( $suggested_tasks ) ) {
+				foreach ( $suggested_tasks as $task ) {
 
-				$admin_bar->add_node(
-					[
-						'id'     => 'prpl-suggested-' . $key . '-' . $title,
-						'parent' => 'prpl-suggested-' . $key,
-						'title'  => $title,
-					]
-				);
+					$title = $task['post_title'];
+					if ( isset( $task['post_status'] ) && 'future' === $task['post_status'] && isset( $task['post_date'] ) ) {
+						$until  = is_float( $task['post_date'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['post_date'] ) . ')';
+						$title .= ' ' . $until;
+					}
+
+					$admin_bar->add_node(
+						[
+							'id'     => 'prpl-suggested-' . $key . '-' . $title,
+							'parent' => 'prpl-suggested-' . $key,
+							'title'  => $title,
+						]
+					);
+				}
 			}
 		}
 	}

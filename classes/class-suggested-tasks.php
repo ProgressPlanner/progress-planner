@@ -744,6 +744,7 @@ class Suggested_Tasks {
 			'provider_id',
 			'parent',
 			'order',
+			'post_status',
 		];
 		foreach ( $data as $key => $value ) {
 			if ( in_array( $key, $default_keys, true ) ) {
