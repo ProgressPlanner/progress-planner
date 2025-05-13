@@ -48,6 +48,10 @@ wp.api.loadPromise.done( () => {
 			item.task_id = item.id;
 			item.title = item.title.rendered;
 
+			item.points = item.meta.prpl_points;
+			item.url = item.meta.prpl_url;
+			item.url_target = item.meta.prpl_url_target;
+
 			// Remove unwanted fields
 			delete item.author;
 			delete item.class_list;
