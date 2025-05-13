@@ -4,7 +4,7 @@
  *
  * A widget that displays a list of suggested tasks.
  *
- * Dependencies: wp-api, progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip
+ * Dependencies: wp-api, progress-planner/api/collections, progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip
  */
 /* eslint-disable camelcase */
 
@@ -17,7 +17,7 @@
 const prplSuggestedTasksGetNextPendingItemFromCategory = ( categoryId ) => {
 	// Get items of this categoryId.
 	const itemsOfCategory = prplSuggestedTasks.tasks.filter(
-		( task ) => parseInt( categoryId ) === parseInt( task.category.term_id )
+		( task ) => parseInt( categoryId ) === parseInt( task.category )
 	);
 
 	// Create an array of items that are in the list.
@@ -30,7 +30,7 @@ const prplSuggestedTasksGetNextPendingItemFromCategory = ( categoryId ) => {
 
 	const items = itemsOfCategory.filter( function ( item ) {
 		// Skip items which are not pending.
-		if ( 'publish' !== item.post_status ) {
+		if ( 'publish' !== item.status ) {
 			return false;
 		}
 		// Remove items which are already in the list.
@@ -147,38 +147,76 @@ prplDocumentReady( () => {
 		return;
 	}
 
-	// Loop through each provider and inject items.
-	for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
-		// Inject items, until we reach the maximum number of channel items.
-		while (
-			document.querySelectorAll(
-				`.prpl-suggested-task[data-task-category="${ category }"]`
-			).length <
-				parseInt(
-					prplSuggestedTasks.maxItemsPerCategory[ category ]
-				) &&
-			prplSuggestedTasksGetNextPendingItemFromCategory( category )
-		) {
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/injectCategoryItem', {
-					detail: { category },
-				} )
-			);
-		}
-	}
+	wp.api.loadPromise.done( () => {
+		console.log( 'Attempting to fetch recommendations...' );
+		const postsCollection = new wp.api.collections.Prpl_recommendations();
+		postsCollection
+			.fetch( {
+				data: {
+					status: 'publish',
+					per_page: 100,
+					_embed: true,
+					filter: {
+						orderby: 'menu_order',
+						order: 'ASC',
+					},
+				},
+			} )
+			.done( ( data ) => {
+				console.log( 'Fetch successful:', data );
 
-	// Inject ALL pending celebration tasks.
-	prplSuggestedTasks.tasks
-		.filter( ( task ) => 'pending_celebration' === task.status )
-		.forEach( ( task ) => {
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/injectItem', {
-					detail: task,
-				} )
-			);
-		} );
+				prplSuggestedTasks.tasks = data;
 
-	window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+				// Loop through each provider and inject items.
+				for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
+					// Inject items, until we reach the maximum number of channel items.
+					while (
+						document.querySelectorAll(
+							`.prpl-suggested-task[data-task-category="${ category }"]`
+						).length <
+							parseInt(
+								prplSuggestedTasks.maxItemsPerCategory[
+									category
+								]
+							) &&
+						prplSuggestedTasksGetNextPendingItemFromCategory(
+							category
+						)
+					) {
+						document.dispatchEvent(
+							new CustomEvent(
+								'prpl/suggestedTask/injectCategoryItem',
+								{
+									detail: { category },
+								}
+							)
+						);
+					}
+				}
+
+				// Inject ALL pending celebration tasks.
+				prplSuggestedTasks.tasks
+					.filter( ( task ) => 'pending_celebration' === task.status )
+					.forEach( ( task ) => {
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/suggestedTask/injectItem', {
+								detail: task,
+							} )
+						);
+					} );
+
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+			} )
+			.fail( ( jqXHR, textStatus, errorThrown ) => {
+				console.error( 'Fetch failed:', {
+					status: jqXHR.status,
+					statusText: jqXHR.statusText,
+					responseText: jqXHR.responseText,
+					textStatus,
+					errorThrown,
+				} );
+			} );
+	} );
 
 	// Initialize the badge scroller.
 	document

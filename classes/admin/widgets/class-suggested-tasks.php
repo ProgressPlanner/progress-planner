@@ -136,7 +136,7 @@ final class Suggested_Tasks extends Widget {
 				'data' => [
 					'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
 					'nonce'               => \wp_create_nonce( 'progress_planner' ),
-					'tasks'               => array_values( $final_tasks ),
+					'tasks'               => [], // array_values( $final_tasks ),
 					'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
 					'delayCelebration'    => $delay_celebration,
 				],

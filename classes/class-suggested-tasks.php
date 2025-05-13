@@ -573,7 +573,11 @@ class Suggested_Tasks {
 			'prpl_recommendations_category' => \__( 'Categories', 'progress-planner' ),
 			'prpl_recommendations_provider' => \__( 'Providers', 'progress-planner' ),
 		] as $taxonomy => $label ) {
-			register_taxonomy( $taxonomy, 'prpl_recommendations', [ 'label' => $label ] );
+			register_taxonomy( $taxonomy, 'prpl_recommendations', [
+				'label' => $label,
+				'show_in_rest' => true,
+				'rest_base' => str_replace( 'prpl_recommendations_', '', $taxonomy ),
+			] );
 		}
 	}
 
