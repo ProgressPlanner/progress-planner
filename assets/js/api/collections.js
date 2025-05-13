@@ -31,9 +31,6 @@ wp.api.loadPromise.done( () => {
 		 * @return {void}
 		 */
 		parseItem( item ) {
-			// Get taxonomies from the item
-			const taxonomies = {};
-
 			// Add taxonomies if they exist in the response
 			if ( item._embedded && item._embedded[ 'wp:term' ] ) {
 				item._embedded[ 'wp:term' ].forEach( ( terms ) => {
@@ -50,9 +47,6 @@ wp.api.loadPromise.done( () => {
 			// TODO: Temporary fixes.
 			item.task_id = item.id;
 			item.title = item.title.rendered;
-
-			// Add taxonomies to the existing object
-			// item.taxonomies = taxonomies;
 
 			// Remove unwanted fields
 			delete item.author;
