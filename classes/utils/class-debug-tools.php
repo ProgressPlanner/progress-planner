@@ -181,10 +181,10 @@ class Debug_Tools {
 			]
 		);
 
-		$onboard_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', [] );
+		$onboard_task_provider_ids = \apply_filters( 'prpl_onboarding_task_providers', [] );
 
 		foreach ( $onboard_task_provider_ids as $task_provider_id ) {
-			$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
+			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
 			if ( $task_provider ) { // @phpstan-ignore-line
 				$task_provider_details = $task_provider->get_task_details();
 				if ( empty( $task_provider_details ) ) {
@@ -222,7 +222,7 @@ class Debug_Tools {
 		);
 
 		// Get suggested tasks.
-		$suggested_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$suggested_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		$menu_items = [
 			'pending'             => 'Pending',
@@ -354,9 +354,9 @@ class Debug_Tools {
 	}
 
 	/**
-	 * Check and process the delete local tasks action.
+	 * Check and process the delete tasks action.
 	 *
-	 * Deletes all local tasks if the appropriate query parameter is set
+	 * Deletes all tasks if the appropriate query parameter is set
 	 * and user has required capabilities.
 	 *
 	 * @return void
@@ -374,19 +374,18 @@ class Debug_Tools {
 		// Verify nonce for security.
 		$this->verify_nonce();
 
-		// Get all local tasks.
-		$local_tasks = \progress_planner()->get_settings()->get( 'local_tasks', [] );
-
-		// Filter out pending tasks.
-		$local_tasks = array_filter(
-			$local_tasks,
-			function ( $task ) {
-				return 'pending' !== $task['status'];
-			}
+		// Update the tasks.
+		\progress_planner()->get_settings()->set(
+			'tasks',
+			array_values(
+				array_filter( // Filter out pending tasks.
+					\progress_planner()->get_settings()->get( 'tasks', [] ), // Get all tasks.
+					function ( $task ) {
+						return 'pending' !== $task['status'];
+					}
+				)
+			)
 		);
-
-		// Update the local tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', array_values( $local_tasks ) );
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_pending_tasks', '_wpnonce' ] ) );
@@ -530,7 +529,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the option.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
+		\progress_planner()->get_settings()->set( 'tasks', [] );
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_suggested_tasks', '_wpnonce' ] ) );

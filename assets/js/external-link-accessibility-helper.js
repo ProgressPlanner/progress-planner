@@ -1,10 +1,10 @@
-/* global prplDocumentReady */
+/* global prplDocumentReady, prplL10n */
 
 /**
  * External Link Accessibility Helper script.
  * A script to add accessibility improvements to external links.
  *
- * Dependencies: progress-planner/document-ready
+ * Dependencies: progress-planner/document-ready, progress-planner/l10n
  */
 
 /**
@@ -58,9 +58,15 @@ class ExternalLinkAccessibilityHelper {
 
 	// Private: inject icon and screen-reader text
 	_addAccessibilityMarkup( link ) {
+		const accessibilityText = link.getAttribute(
+			'data-prpl_accessibility_text'
+		);
+
 		const srText = document.createElement( 'span' );
 		srText.className = 'screen-reader-text';
-		srText.textContent = '(Opens in new window)';
+		srText.textContent = accessibilityText
+			? accessibilityText + ' (' + prplL10n( 'opensInNewWindow' ) + ')'
+			: prplL10n( 'opensInNewWindow' );
 		link.appendChild( srText );
 
 		const iconWrapper = document.createElement( 'span' );
