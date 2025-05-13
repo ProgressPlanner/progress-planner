@@ -364,9 +364,10 @@ class Suggested_Tasks {
 
 		return (bool) \wp_update_post(
 			[
-				'ID'          => $id,
-				'post_status' => 'future',
-				'post_date'   => \gmdate( 'Y-m-d H:i:s', $new_date ),
+				'ID'            => $id,
+				'post_status'   => 'future',
+				'post_date'     => \gmdate( 'Y-m-d H:i:s', $new_date ),
+				'post_date_gmt' => \gmdate( 'Y-m-d H:i:s', $new_date ), // Note: necessary in order to update 'post_status' to 'future'.
 			]
 		);
 	}

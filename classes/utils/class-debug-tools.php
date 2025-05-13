@@ -245,7 +245,7 @@ class Debug_Tools {
 
 					$title = $task['post_title'];
 					if ( isset( $task['post_status'] ) && 'future' === $task['post_status'] && isset( $task['post_date'] ) ) {
-						$until  = is_float( $task['post_date'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['post_date'] ) . ')';
+						$until  = is_float( $task['post_date'] ) ? '(forever)' : '(until ' . $task['post_date'] . ')';
 						$title .= ' ' . $until;
 					}
 
