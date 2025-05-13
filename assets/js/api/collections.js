@@ -28,7 +28,7 @@ wp.api.loadPromise.done( () => {
 		 * Parse a single item from the response.
 		 *
 		 * @param {Object} item The item to parse.
-		 * @return {Object} The modified item.
+		 * @return {void}
 		 */
 		parseItem( item ) {
 			// Get taxonomies from the item
@@ -38,11 +38,11 @@ wp.api.loadPromise.done( () => {
 			if ( item._embedded && item._embedded[ 'wp:term' ] ) {
 				item._embedded[ 'wp:term' ].forEach( ( terms ) => {
 					if ( terms.length > 0 ) {
-						// Get the taxonomy name from the first term
+						// We only have 1 term per taxonomy.
 						const taxonomyName = terms[ 0 ].taxonomy;
-						// Store the terms under their full taxonomy name
-						taxonomies[ `prpl_recommendations_${ taxonomyName }` ] =
-							terms;
+						item[
+							taxonomyName.replace( 'prpl_recommendations_', '' )
+						] = terms[ 0 ];
 					}
 				} );
 			}
@@ -51,10 +51,17 @@ wp.api.loadPromise.done( () => {
 			item.task_id = item.id;
 			item.title = item.title.rendered;
 
-			return {
-				...item,
-				taxonomies,
-			};
+			// Add taxonomies to the existing object
+			// item.taxonomies = taxonomies;
+
+			// Remove unwanted fields
+			delete item.author;
+			delete item.class_list;
+			delete item.guid;
+			delete item.progress_planner_page_types;
+			delete item.template;
+			delete item.yoast_head;
+			delete item.yoast_head_json;
 		},
 	} );
 } );

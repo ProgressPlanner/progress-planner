@@ -11,13 +11,13 @@
 /**
  * Get the next item to inject.
  *
- * @param {number} categoryId The category of items to get the next item from.
+ * @param {string} categorySlug The category of items to get the next item from.
  * @return {Object} The next item to inject.
  */
-const prplSuggestedTasksGetNextPendingItemFromCategory = ( categoryId ) => {
+const prplSuggestedTasksGetNextPendingItemFromCategory = ( categorySlug ) => {
 	// Get items of this categoryId.
 	const itemsOfCategory = prplSuggestedTasks.tasks.filter(
-		( task ) => parseInt( categoryId ) === parseInt( task.category )
+		( task ) => categorySlug === task.category.slug
 	);
 
 	// Create an array of items that are in the list.

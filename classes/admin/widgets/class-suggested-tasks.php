@@ -120,7 +120,7 @@ final class Suggested_Tasks extends Widget {
 
 		$max_items_per_category = [];
 		foreach ( $final_tasks as $task ) {
-			$max_items_per_category[ $task['category']->term_id ] = $task['category'] === ( new Content_Review() )->get_provider_category() ? 2 : 1;
+			$max_items_per_category[ $task['category']->slug ] = $task['category'] === ( new Content_Review() )->get_provider_category() ? 2 : 1;
 		}
 
 		// We want to hide user tasks.
@@ -136,7 +136,7 @@ final class Suggested_Tasks extends Widget {
 				'data' => [
 					'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
 					'nonce'               => \wp_create_nonce( 'progress_planner' ),
-					'tasks'               => [], // array_values( $final_tasks ),
+					'tasks'               => [],
 					'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
 					'delayCelebration'    => $delay_celebration,
 				],

@@ -247,9 +247,9 @@ customElements.define(
 				data-task-id="${ task_id }"
 				data-task-action="${ action }"
 				data-task-url="${ url }"
-				data-task-provider-id="${ provider.term_id }"
+				data-task-provider-id="${ provider.slug }"
 				data-task-points="${ points }"
-				data-task-category="${ category.term_id }"
+				data-task-category="${ category.slug }"
 				data-task-order="${ order }"
 				data-task-list="${ taskList }"
 			>
