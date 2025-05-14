@@ -456,7 +456,7 @@ customElements.define(
 					wp.api.loadPromise.done( () => {
 						// Update an existing post.
 						const post = new wp.api.models.Prpl_recommendations( {
-							id: parseInt( item.getAttribute( 'data-task-id' ) ),
+							id: parseInt( item.getAttribute( 'data-post-id' ) ),
 							title,
 						} );
 						post.save().then( () => {
