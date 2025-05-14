@@ -51,6 +51,9 @@ class Suggested_Tasks {
 		// Register the custom taxonomies.
 		\add_action( 'init', [ $this, 'register_taxonomy' ], 0 );
 
+		// Filter the REST API tax query.
+		\add_filter( 'rest_prpl_recommendations_query', [ $this, 'rest_api_tax_query' ], 10, 2 );
+
 		// Add the custom post status.
 		\add_action( 'init', [ $this, 'register_post_status' ], 1 );
 	}
@@ -628,6 +631,44 @@ class Suggested_Tasks {
 				]
 			);
 		}
+	}
+
+	/**
+	 * Filter the REST API tax query.
+	 *
+	 * @param array            $args The arguments.
+	 * @param \WP_REST_Request $request The request.
+	 *
+	 * @return array
+	 */
+	public function rest_api_tax_query( $args, $request ) {
+		$tax_query = [];
+
+		// Include terms (matches any term in list).
+		if ( isset( $request['provider'] ) ) {
+			$tax_query[] = [
+				'taxonomy' => 'prpl_recommendations_provider',
+				'field'    => 'slug',
+				'terms'    => explode( ',', $request['provider'] ),
+				'operator' => 'IN',
+			];
+		}
+
+		// Exclude terms.
+		if ( isset( $request['exclude_provider'] ) ) {
+			$tax_query[] = [
+				'taxonomy' => 'prpl_recommendations_provider',
+				'field'    => 'slug',
+				'terms'    => explode( ',', $request['exclude_provider'] ),
+				'operator' => 'NOT IN',
+			];
+		}
+
+		if ( ! empty( $tax_query ) ) {
+			$args['tax_query'] = $tax_query;
+		}
+
+		return $args;
 	}
 
 	/**

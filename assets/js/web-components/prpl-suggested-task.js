@@ -16,6 +16,7 @@ customElements.define(
 	class extends HTMLElement {
 		constructor( {
 			task_id,
+			id,
 			title,
 			description,
 			points = 0,
@@ -214,7 +215,6 @@ customElements.define(
 
 					output += `<input
 						type="checkbox"
-						id="prpl-suggested-task-checkbox-${ task_id }"
 						class="prpl-suggested-task-checkbox"
 						style="${ checkboxStyle }"
 						${ ! dismissable ? 'disabled' : '' }
@@ -244,7 +244,8 @@ customElements.define(
 			this.innerHTML = `
 			<li
 				class="prpl-suggested-task"
-				data-task-id="${ task_id }"
+				data-task-id="${ task_id ?? id }"
+				data-post-id="${ id }"
 				data-task-action="${ action }"
 				data-task-url="${ url }"
 				data-task-provider-id="${ provider.slug }"
@@ -254,19 +255,11 @@ customElements.define(
 				data-task-list="${ taskList }"
 			>
 				${ actionButtons.completeCheckbox }
-				<h3 style="width: 100%;">
-					${
-						useCheckbox
-							? `<label for="prpl-suggested-task-checkbox-${ task_id }">`
-							: ''
-					}
-					<span${
-						'user' === category.slug
-							? ` contenteditable="plaintext-only"`
-							: ''
-					}>${ taskHeading }</span>
-					${ useCheckbox && dismissable ? `</label>` : '' }
-				</h3>
+				<h3 style="width: 100%;"><span${
+					'user' === category.slug
+						? ` contenteditable="plaintext-only"`
+						: ''
+				}>${ taskHeading }</span></h3>
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
 						${ actionButtons.info }

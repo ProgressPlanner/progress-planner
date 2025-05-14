@@ -146,14 +146,7 @@ prplDocumentReady( () => {
 						: [ 'publish', 'pending_celebration' ],
 					per_page: 100,
 					_embed: true,
-					tax_query: [
-						{
-							taxonomy: 'prpl_recommendations_provider',
-							field: 'slug',
-							terms: 'user',
-							operator: 'NOT IN',
-						},
-					],
+					exclude_provider: 'user',
 					filter: {
 						orderby: 'menu_order',
 						order: 'ASC',
