@@ -127,7 +127,7 @@ jobs:
           docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
 
           # Download Yoast SEO Premium zip using Composer
-          composer require yoast/wordpress-seo-premium:dev-master#zipball
+          composer require yoast/wordpress-seo-premium:24.9#zipball
 
           # Copy the zip file to the container
           docker cp ./vendor/yoast/wordpress-seo-premium.zip $WP_CONTAINER:/tmp/wordpress-seo-premium.zip
