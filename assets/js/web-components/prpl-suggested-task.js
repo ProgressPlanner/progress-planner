@@ -16,6 +16,7 @@ customElements.define(
 	class extends HTMLElement {
 		constructor( {
 			task_id,
+			id,
 			title,
 			description,
 			points = 0,
@@ -243,7 +244,8 @@ customElements.define(
 			this.innerHTML = `
 			<li
 				class="prpl-suggested-task"
-				data-task-id="${ task_id }"
+				data-task-id="${ task_id ?? id }"
+				data-post-id="${ id }"
 				data-task-action="${ action }"
 				data-task-url="${ url }"
 				data-task-provider-id="${ provider.slug }"
