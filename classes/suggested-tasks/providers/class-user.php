@@ -13,6 +13,13 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 class User extends Tasks {
 
 	/**
+	 * Whether the task is dismissable.
+	 *
+	 * @var bool
+	 */
+	protected $is_dismissable = true;
+
+	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool

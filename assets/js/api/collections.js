@@ -49,9 +49,15 @@ wp.api.loadPromise.done( () => {
 			item.url = item.meta.prpl_url;
 			item.url_target = item.meta.prpl_url_target;
 			item.dismissable = item.meta.prpl_dismissable;
+			item.snoozable = item.meta.prpl_snoozable;
 
 			if ( 'pending_celebration' === item.status ) {
 				item.action = 'celebrate';
+			}
+
+			// WIP: Temporary fix for user provider.
+			if ( 'user' === item.prpl_recommendations_provider ) {
+				item.snoozable = false;
 			}
 
 			// Remove unwanted fields
