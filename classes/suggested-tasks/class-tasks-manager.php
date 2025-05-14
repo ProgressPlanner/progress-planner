@@ -252,6 +252,9 @@ class Tasks_Manager {
 	 * @return bool|\Progress_Planner\Suggested_Tasks\Task
 	 */
 	public function evaluate_task( $task ) {
+		if ( ! $task['provider'] ) {
+			return false;
+		}
 		$task_provider = $this->get_task_provider( $task['provider']->slug );
 		if ( ! $task_provider ) {
 			return false;

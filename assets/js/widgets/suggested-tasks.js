@@ -17,7 +17,7 @@
 const prplSuggestedTasksGetNextPendingItemFromCategory = ( categorySlug ) => {
 	// Get items of this categoryId.
 	const itemsOfCategory = prplSuggestedTasks.tasks.filter(
-		( task ) => categorySlug === task.category.slug
+		( task ) => categorySlug === task?.category?.slug
 	);
 
 	// Create an array of items that are in the list.
@@ -34,7 +34,7 @@ const prplSuggestedTasksGetNextPendingItemFromCategory = ( categorySlug ) => {
 			return false;
 		}
 		// Remove items which are already in the list.
-		if ( inList.includes( item.task_id.toString() ) ) {
+		if ( inList.includes( item?.meta?.prpl_task_id.toString() ) ) {
 			return false;
 		}
 		return true;

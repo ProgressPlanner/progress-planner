@@ -13,6 +13,13 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 class User extends Tasks {
 
 	/**
+	 * Whether the task is dismissable.
+	 *
+	 * @var bool
+	 */
+	protected $is_dismissable = true;
+
+	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
@@ -32,6 +39,19 @@ class User extends Tasks {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'user';
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		// Add terms for `user` provider and category if they don't exist.
+		$taxonomies = [ 'prpl_recommendations_category', 'prpl_recommendations_provider' ];
+		foreach ( $taxonomies as $taxonomy ) {
+			if ( ! \get_term_by( 'name', 'user', $taxonomy ) ) {
+				\wp_insert_term( 'user', $taxonomy );
+			}
+		}
+	}
 
 	/**
 	 * Check if the task should be added.

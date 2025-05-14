@@ -45,17 +45,19 @@ wp.api.loadPromise.done( () => {
 			}
 
 			// TODO: Temporary fixes.
-			item.task_id = item.meta.prpl_task_id;
-			item.title = item.title.rendered;
-			item.description = item.content.rendered;
-
 			item.points = item.meta.prpl_points;
 			item.url = item.meta.prpl_url;
 			item.url_target = item.meta.prpl_url_target;
 			item.dismissable = item.meta.prpl_dismissable;
+			item.snoozable = item.meta.prpl_snoozable;
 
 			if ( 'pending_celebration' === item.status ) {
 				item.action = 'celebrate';
+			}
+
+			// WIP: Temporary fix for user provider.
+			if ( 'user' === item.prpl_recommendations_provider ) {
+				item.snoozable = false;
 			}
 
 			// Remove unwanted fields
