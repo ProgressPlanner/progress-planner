@@ -59,7 +59,7 @@ document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
 
 prplDocumentReady( () => {
 	wp.api.loadPromise.done( () => {
-		console.log( 'Attempting to fetch recommendations...' );
+		console.log( 'Attempting to fetch user tasks...' );
 		const todosCollection = new wp.api.collections.Prpl_recommendations();
 		todosCollection
 			.fetch( {
@@ -67,13 +67,7 @@ prplDocumentReady( () => {
 					status: [ 'publish' ],
 					per_page: 100,
 					_embed: true,
-					tax_query: [
-						{
-							taxonomy: 'prpl_recommendations_provider',
-							field: 'slug',
-							terms: [ 'user' ],
-						},
-					],
+					provider: 'user',
 					filter: {
 						orderby: 'menu_order',
 						order: 'ASC',
@@ -81,7 +75,7 @@ prplDocumentReady( () => {
 				},
 			} )
 			.done( ( data ) => {
-				console.log( 'Fetch successful:', data );
+				console.log( 'Fetching user tasks successful:', data );
 
 				progressPlannerTodo.tasks = data;
 
