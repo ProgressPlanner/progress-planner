@@ -231,7 +231,7 @@ class Suggested_Tasks {
 			$args,
 			[
 				'post_type'   => 'prpl_recommendations',
-				'post_status' => 'any',
+				'post_status' => [ 'any', 'pending_celebration' ], // 'any' wont return posts with (custom) post status 'pending_celebration'.
 				'numberposts' => -1,
 				'orderby'     => 'menu_order',
 				'order'       => 'ASC',
