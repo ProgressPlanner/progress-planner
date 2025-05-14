@@ -51,6 +51,8 @@ final class Suggested_Tasks extends Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
+
+		// Set max items per category.
 		$max_items_per_category = [];
 		$provider_categories    = \get_terms(
 			[
@@ -60,12 +62,13 @@ final class Suggested_Tasks extends Widget {
 		);
 
 		if ( ! empty( $provider_categories ) && ! is_wp_error( $provider_categories ) ) {
+			$content_review_category = ( new Content_Review() )->get_provider_category();
 			foreach ( $provider_categories as $provider_category ) {
-				$max_items_per_category[ $provider_category->slug ] = $provider_category->slug === ( new Content_Review() )->get_provider_category() ? 2 : 1;
+				$max_items_per_category[ $provider_category->slug ] = $provider_category->slug === $content_review_category ? 2 : 1;
 			}
 		}
 
-		// This should never happen, but just in case - we want to hide user tasks.
+		// This should never happen, but just in case - user tasks are displayed in different widget.
 		if ( isset( $max_items_per_category['user'] ) ) {
 			$max_items_per_category['user'] = 0;
 		}
@@ -90,6 +93,11 @@ final class Suggested_Tasks extends Widget {
 					'delayCelebration'    => $delay_celebration,
 				],
 			]
+		);
+
+		// Enqueue the badge scroller script.
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'widgets/suggested-tasks-badge-scroller',
 		);
 	}
 
