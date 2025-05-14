@@ -43,6 +43,7 @@ document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
 	const todoItemElement = new Item( {
 		...event.detail.item,
 		deletable: true,
+		allowReorder: true,
 		taskList: 'progressPlannerTodo',
 	} );
 
@@ -187,25 +188,31 @@ prplDocumentReady( () => {
 } );
 
 // When the 'prpl/suggestedTask/move' event is triggered,
-// update the order of the todo items.
+// update the menu_order of the todo items.
 document.addEventListener( 'prpl/suggestedTask/move', () => {
 	const todoItemsIDs = [];
 	// Get all the todo items.
 	const todoItems = document.querySelectorAll(
 		'#todo-list .prpl-suggested-task'
 	);
-	let order = 0;
+	let menuOrder = 0;
 	todoItems.forEach( ( todoItem ) => {
-		todoItemsIDs.push( todoItem.getAttribute( 'data-task-id' ) );
-		todoItem.setAttribute( 'data-task-order', order );
+		const itemID = parseInt( todoItem.getAttribute( 'data-post-id' ) );
+		todoItemsIDs.push( itemID );
+		todoItem.setAttribute( 'data-task-order', menuOrder );
 		progressPlannerTodo.tasks.find(
-			( item ) => item.task_id === todoItem.getAttribute( 'data-task-id' )
-		).order = order;
-		order++;
-	} );
-	wp.ajax.post( 'progress_planner_save_suggested_user_tasks_order', {
-		tasks: todoItemsIDs.toString(),
-		nonce: progressPlannerTodo.nonce,
+			( item ) => item.id === itemID
+		).menu_order = menuOrder;
+		menuOrder++;
+
+		wp.api.loadPromise.done( () => {
+			// Update an existing post.
+			const post = new wp.api.models.Prpl_recommendations( {
+				id: itemID,
+				menu_order: menuOrder,
+			} );
+			post.save();
+		} );
 	} );
 } );
 

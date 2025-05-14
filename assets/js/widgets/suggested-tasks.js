@@ -78,6 +78,7 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 	const item = new Item( {
 		...event.detail,
 		taskList: 'prplSuggestedTasks',
+		allowReorder: false,
 	} );
 
 	/**
