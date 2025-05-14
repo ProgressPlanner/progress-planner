@@ -132,11 +132,11 @@ prplDocumentReady( () => {
 					// Set the `prpl_recommendations_category` term.
 					prpl_recommendations_category: prplGetUserTerm(
 						'prpl_recommendations_category'
-					).term_id,
+					)?.term_id,
 					// Set the `prpl_recommendations_provider` term.
 					prpl_recommendations_provider: prplGetUserTerm(
 						'prpl_recommendations_provider'
-					).term_id,
+					)?.term_id,
 				} );
 				post.save().then( ( response ) => {
 					if ( ! response.id ) {
