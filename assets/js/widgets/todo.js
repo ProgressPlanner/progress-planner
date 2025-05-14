@@ -143,12 +143,10 @@ prplDocumentReady( () => {
 						return;
 					}
 					const newTask = {
-						description: '',
 						parent: 0,
 						points: 0,
-						task_id: response.id,
 						id: response.id,
-						title: response.title.rendered,
+						title: { rendered: response.title.rendered },
 						provider: prplGetUserTerm(
 							'prpl_recommendations_provider'
 						),
@@ -221,14 +219,16 @@ document.addEventListener( 'prpl/suggestedTask/move', () => {
 document.addEventListener( 'prpl/suggestedTask/update', ( event ) => {
 	const task = progressPlannerTodo.tasks.find(
 		( item ) =>
-			item.task_id ===
+			item?.meta?.prpl_task_id ===
 			event.detail.node
 				.querySelector( 'li' )
 				.getAttribute( 'data-task-id' )
 	);
 
 	if ( task ) {
-		task.title = event.detail.node.querySelector( 'h3 span' ).textContent;
+		task.title = {
+			rendered: event.detail.node.querySelector( 'h3 span' ).textContent,
+		};
 	}
 } );
 
@@ -242,7 +242,10 @@ document.addEventListener( 'prpl/suggestedTask/maybeInjectItem', ( event ) => {
 
 	setTimeout( () => {
 		progressPlannerTodo.tasks.forEach( ( todoItem, index ) => {
-			if ( todoItem.task_id === event.detail.task_id ) {
+			if (
+				todoItem?.meta?.prpl_task_id ===
+				event.detail?.meta?.prpl_task_id
+			) {
 				// Change the status.
 				progressPlannerTodo.tasks[ index ].status =
 					'complete' === event.detail.actionType
@@ -266,7 +269,7 @@ document.addEventListener( 'prpl/suggestedTask/maybeInjectItem', ( event ) => {
 				// Remove item from completed-todos list if necessary.
 				if ( 'pending' === event.detail.actionType ) {
 					const el = document.querySelector(
-						`#todo-list-completed .prpl-suggested-task[data-task-id="${ todoItem.task_id }"]`
+						`#todo-list-completed .prpl-suggested-task[data-task-id="${ todoItem?.meta?.prpl_task_id }"]`
 					);
 					if ( el ) {
 						el.parentNode.remove();
