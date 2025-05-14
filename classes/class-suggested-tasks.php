@@ -508,7 +508,7 @@ class Suggested_Tasks {
 			case 'pending':
 				\progress_planner()->get_suggested_tasks()->update_recommendation( $task['ID'], [ 'post_status' => 'publish' ] );
 				$updated = true;
-				\progress_planner()->get_suggested_tasks()->delete_activity( $task['ID'] );
+				\progress_planner()->get_suggested_tasks()->delete_activity( $task_id );
 				break;
 
 			case 'snooze':
