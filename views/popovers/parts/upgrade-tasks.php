@@ -64,7 +64,7 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 			}
 			?>
 				<li class="prpl-onboarding-task" data-prpl-task-completed="<?php echo $prpl_task_completed ? 'true' : 'false'; ?>">
-					<h3><?php echo \esc_html( $prpl_task_details['title'] ); ?></h3>
+					<h3><?php echo \esc_html( $prpl_task_details['post_title'] ); ?></h3>
 					<span class="prpl-onboarding-task-status">
 						<span class="prpl-suggested-task-points">
 							+<?php echo \esc_html( $prpl_task_details['points'] ); ?>

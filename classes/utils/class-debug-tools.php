@@ -195,7 +195,7 @@ class Debug_Tools {
 					[
 						'id'     => 'prpl-upgrading-task-' . $task_provider_id,
 						'parent' => 'prpl-upgrading-tasks',
-						'title'  => $task_provider_details['title'],
+						'title'  => $task_provider_details['post_title'],
 					]
 				);
 			}

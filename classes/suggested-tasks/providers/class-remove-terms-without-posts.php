@@ -298,7 +298,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 		$task_details = [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
-			'title'       => $this->get_title( $task_data[0] ),
+			'post_title'  => $this->get_title( $task_data[0] ),
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
