@@ -127,6 +127,7 @@ prplDocumentReady( () => {
 				const post = new wp.api.models.Prpl_recommendations( {
 					// Set the post title.
 					title: document.getElementById( 'new-todo-content' ).value,
+					status: 'publish',
 					// Set the `prpl_recommendations_category` term.
 					prpl_recommendations_category: prplGetUserTerm(
 						'prpl_recommendations_category'
@@ -146,7 +147,7 @@ prplDocumentReady( () => {
 						points: 0,
 						task_id: response.id,
 						id: response.id,
-						post_title: response.title.rendered,
+						title: response.title.rendered,
 						provider: prplGetUserTerm(
 							'prpl_recommendations_provider'
 						),
