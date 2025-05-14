@@ -1,4 +1,4 @@
-/* global confetti, prplCelebrate */
+/* global confetti, prplCelebrate, prplSuggestedTasks */
 /*
  * Confetti.
  *
@@ -10,6 +10,22 @@
 
 // Create a new custom event to trigger the celebration.
 document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
+	console.log( event );
+	// Mark 'pending_celebration' task as completed.
+	prplSuggestedTasks.tasks.forEach( ( task ) => {
+		if ( 'pending_celebration' === task.status ) {
+			wp.ajax
+				.post( 'progress_planner_suggested_task_action', {
+					nonce: prplSuggestedTasks.nonce,
+					action_type: 'complete',
+					task_id: task.task_id,
+				} )
+				.done( ( response ) => {
+					console.log( response );
+				} );
+		}
+	} );
+
 	/**
 	 * Trigger the confetti on the container element.
 	 */
