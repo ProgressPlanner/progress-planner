@@ -18,9 +18,6 @@ class Todo {
 	 * @return void
 	 */
 	public function __construct() {
-		\add_action( 'wp_ajax_progress_planner_save_user_suggested_task', [ $this, 'save_user_suggested_task' ] );
-		\add_action( 'wp_ajax_progress_planner_save_suggested_user_tasks_order', [ $this, 'save_suggested_user_tasks_order' ] );
-
 		$this->maybe_change_first_item_points_on_monday();
 	}
 
@@ -31,65 +28,6 @@ class Todo {
 	 */
 	public function get_items() {
 		return \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'provider_id' => 'user' ] );
-	}
-
-	/**
-	 * Save a user suggested task.
-	 *
-	 * @return void
-	 */
-	public function save_user_suggested_task() {
-		// Check the nonce.
-		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
-		}
-
-		$task_id = isset( $_POST['task']['task_id'] ) ? (int) \sanitize_text_field( \wp_unslash( $_POST['task']['task_id'] ) ) : 0;
-
-		$title = isset( $_POST['task']['title'] ) ? \sanitize_text_field( \wp_unslash( $_POST['task']['title'] ) ) : '';
-
-		// If the task ID is set, we're updating an existing task.
-		if ( $task_id ) {
-			$task = \progress_planner()->get_suggested_tasks()->get_post( $task_id );
-			if ( ! $task ) {
-				\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
-			}
-
-			\progress_planner()->get_suggested_tasks()->update_recommendation( $task['ID'], [ 'post_title' => $title ] );
-			return;
-		}
-	}
-
-	/**
-	 * Save the order of suggested user tasks.
-	 *
-	 * @return void
-	 */
-	public function save_suggested_user_tasks_order() {
-		// Check the nonce.
-		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
-		}
-
-		$tasks = isset( $_POST['tasks'] ) ? \sanitize_text_field( \wp_unslash( $_POST['tasks'] ) ) : '';
-		if ( ! $tasks ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing tasks.', 'progress-planner' ) ] );
-		}
-
-		$tasks = \array_map( 'intval', \explode( ',', $tasks ) );
-
-		// Get tasks from the `prpl_suggested_task` post type, that have a `prpl_recommendations_provider` of `user`.
-		$user_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'provider' => 'user' ] );
-		foreach ( $user_tasks as $task ) {
-			if ( in_array( (int) $task['ID'], $tasks, true ) ) {
-				\wp_update_post(
-					[
-						'ID'         => $task['ID'],
-						'menu_order' => (int) array_search( $task['ID'], $tasks, true ),
-					]
-				);
-			}
-		}
 	}
 
 	/**
