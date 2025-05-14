@@ -27,7 +27,8 @@ customElements.define(
 			provider = {},
 			category = {},
 			snoozable = true,
-			order = false,
+			menu_order = false,
+			allowReorder = false,
 			deletable = false,
 			useCheckbox = true,
 			taskList = '', // prplSuggestedTasks or progressPlannerTodo.
@@ -54,7 +55,7 @@ customElements.define(
 
 			const actionButtons = {
 				move:
-					false !== order
+					false !== allowReorder
 						? `<span class="prpl-move-buttons">
 							<button
 								type="button"
@@ -251,7 +252,7 @@ customElements.define(
 				data-task-provider-id="${ provider.slug }"
 				data-task-points="${ points }"
 				data-task-category="${ category.slug }"
-				data-task-order="${ order }"
+				data-task-order="${ menu_order }"
 				data-task-list="${ taskList }"
 			>
 				${ actionButtons.completeCheckbox }
