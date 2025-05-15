@@ -1,4 +1,4 @@
-/* global progressPlannerTodo, customElements, prplDocumentReady */
+/* global customElements, prplDocumentReady */
 /*
  * Widget: Todo
  *
@@ -8,16 +8,40 @@
  */
 
 /**
- * Get the `user` term in the `prpl_recommendations_category` and `prpl_recommendations_provider` taxonomies.
+ * The user terms for the todo list.
  *
- * @param {string} taxonomy The taxonomy to get the term for.
- * @return {Object} The `user` term.
+ * @type {Object}
  */
-const prplGetUserTerm = ( taxonomy ) => {
-	return progressPlannerTodo[ taxonomy ].find(
-		( term ) => 'user' === term.slug
-	);
+window.progressPlannerTodo = {
+	userTerms: {},
+	tasks: [],
 };
+
+/**
+ * Get the user term for the taxonomies we use.
+ */
+wp.api.loadPromise.done( () => {
+	[ 'category', 'provider' ].forEach( ( type ) => {
+		const TermsCollection = new wp.api.collections[
+			`Prpl_recommendations_${ type }`
+		]();
+		TermsCollection.fetch( { data: { slug: 'user' } } ).done( ( data ) => {
+			if ( data[ 0 ] ) {
+				window.progressPlannerTodo.userTerms[ type ] = data[ 0 ];
+				return;
+			}
+			const newTermModel = new wp.api.models[
+				`Prpl_recommendations_${ type }`
+			]( {
+				slug: 'user',
+				name: 'user',
+			} );
+			newTermModel.save().then( ( response ) => {
+				window.progressPlannerTodo.userTerms[ type ] = response;
+			} );
+		} );
+	} );
+} );
 
 /**
  * Get the highest `order` value from the todo items.
@@ -78,32 +102,30 @@ prplDocumentReady( () => {
 			.done( ( data ) => {
 				console.log( 'Fetching user tasks successful:', data );
 
-				progressPlannerTodo.tasks = data;
+				window.progressPlannerTodo.tasks = data;
 
 				// Inject the existing todo list items into the DOM
-				progressPlannerTodo.tasks.forEach(
-					( todoItem, index, array ) => {
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/todo/injectItem', {
-								detail: {
-									item: todoItem,
-									addToStart: 1 === todoItem.points, // Add golden task to the start of the list.
-									listId:
-										todoItem.status === 'completed'
-											? 'todo-list-completed'
-											: 'todo-list',
-								},
-							} )
-						);
+				data.forEach( ( todoItem, index, array ) => {
+					document.dispatchEvent(
+						new CustomEvent( 'prpl/todo/injectItem', {
+							detail: {
+								item: todoItem,
+								addToStart: 1 === todoItem.points, // Add golden task to the start of the list.
+								listId:
+									todoItem.status === 'completed'
+										? 'todo-list-completed'
+										: 'todo-list',
+							},
+						} )
+					);
 
-						// If this is the last item in the array, resize the grid items.
-						if ( index === array.length - 1 ) {
-							window.dispatchEvent(
-								new CustomEvent( 'prpl/grid/resize' )
-							);
-						}
+					// If this is the last item in the array, resize the grid items.
+					if ( index === array.length - 1 ) {
+						window.dispatchEvent(
+							new CustomEvent( 'prpl/grid/resize' )
+						);
 					}
-				);
+				} );
 			} )
 			.fail( ( jqXHR, textStatus, errorThrown ) => {
 				console.error( 'Fetch failed:', {
@@ -130,13 +152,11 @@ prplDocumentReady( () => {
 					title: document.getElementById( 'new-todo-content' ).value,
 					status: 'publish',
 					// Set the `prpl_recommendations_category` term.
-					prpl_recommendations_category: prplGetUserTerm(
-						'prpl_recommendations_category'
-					)?.term_id,
+					prpl_recommendations_category:
+						window.progressPlannerTodo.userTerms.category.id,
 					// Set the `prpl_recommendations_provider` term.
-					prpl_recommendations_provider: prplGetUserTerm(
-						'prpl_recommendations_provider'
-					)?.term_id,
+					prpl_recommendations_provider:
+						window.progressPlannerTodo.userTerms.provider.id,
 				} );
 				post.save().then( ( response ) => {
 					if ( ! response.id ) {
@@ -147,12 +167,8 @@ prplDocumentReady( () => {
 						points: 0,
 						id: response.id,
 						title: { rendered: response.title.rendered },
-						provider: prplGetUserTerm(
-							'prpl_recommendations_provider'
-						),
-						category: prplGetUserTerm(
-							'prpl_recommendations_category'
-						),
+						provider: 'user',
+						category: 'user',
 						url: '',
 						dismissable: true,
 						snoozable: false,
@@ -198,7 +214,7 @@ document.addEventListener( 'prpl/suggestedTask/move', () => {
 		const itemID = parseInt( todoItem.getAttribute( 'data-post-id' ) );
 		todoItemsIDs.push( itemID );
 		todoItem.setAttribute( 'data-task-order', menuOrder );
-		progressPlannerTodo.tasks.find(
+		window.progressPlannerTodo.tasks.find(
 			( item ) => item.id === itemID
 		).menu_order = menuOrder;
 		menuOrder++;
@@ -217,7 +233,7 @@ document.addEventListener( 'prpl/suggestedTask/move', () => {
 // When the 'prpl/suggestedTask/update' event is triggered,
 // update the task title in the tasks array.
 document.addEventListener( 'prpl/suggestedTask/update', ( event ) => {
-	const task = progressPlannerTodo.tasks.find(
+	const task = window.progressPlannerTodo.tasks.find(
 		( item ) =>
 			item?.meta?.prpl_task_id ===
 			event.detail.node
@@ -241,13 +257,13 @@ document.addEventListener( 'prpl/suggestedTask/maybeInjectItem', ( event ) => {
 	}
 
 	setTimeout( () => {
-		progressPlannerTodo.tasks.forEach( ( todoItem, index ) => {
+		window.progressPlannerTodo.tasks.forEach( ( todoItem, index ) => {
 			if (
 				todoItem?.meta?.prpl_task_id ===
 				event.detail?.meta?.prpl_task_id
 			) {
 				// Change the status.
-				progressPlannerTodo.tasks[ index ].status =
+				window.progressPlannerTodo.tasks[ index ].status =
 					'complete' === event.detail.actionType
 						? 'completed'
 						: 'pending';

@@ -54,38 +54,6 @@ final class ToDo extends Widget {
 	}
 
 	/**
-	 * Enqueue the scripts.
-	 *
-	 * @return void
-	 */
-	public function enqueue_scripts() {
-		// Enqueue the script.
-		\progress_planner()->get_admin__enqueue()->enqueue_script(
-			'widgets/todo',
-			[
-				'name' => 'progressPlannerTodo',
-				'data' => [
-					'ajaxUrl'                       => \admin_url( 'admin-ajax.php' ),
-					'nonce'                         => \wp_create_nonce( 'progress_planner' ),
-					'tasks'                         => \progress_planner()->get_todo()->get_items(),
-					'prpl_recommendations_category' => \get_terms(
-						[
-							'taxonomy'   => 'prpl_recommendations_category',
-							'hide_empty' => false,
-						]
-					),
-					'prpl_recommendations_provider' => \get_terms(
-						[
-							'taxonomy'   => 'prpl_recommendations_provider',
-							'hide_empty' => false,
-						]
-					),
-				],
-			]
-		);
-	}
-
-	/**
 	 * Get the stylesheet dependencies.
 	 *
 	 * @return array
