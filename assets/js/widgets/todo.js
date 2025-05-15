@@ -8,16 +8,37 @@
  */
 
 /**
- * Get the `user` term in the `prpl_recommendations_category` and `prpl_recommendations_provider` taxonomies.
+ * The user terms for the todo list.
  *
- * @param {string} taxonomy The taxonomy to get the term for.
- * @return {Object} The `user` term.
+ * @type {Object}
  */
-const prplGetUserTerm = ( taxonomy ) => {
-	return progressPlannerTodo[ taxonomy ].find(
-		( term ) => 'user' === term.slug
-	);
-};
+progressPlannerTodo.userTerms = {};
+
+/**
+ * Get the user term for the taxonomies we use.
+ */
+wp.api.loadPromise.done( () => {
+	[ 'category', 'provider' ].forEach( ( type ) => {
+		const TermsCollection = new wp.api.collections[
+			`Prpl_recommendations_${ type }`
+		]();
+		TermsCollection.fetch( { data: { slug: 'user' } } ).done( ( data ) => {
+			if ( data[ 0 ] ) {
+				progressPlannerTodo.userTerms[ type ] = data[ 0 ];
+				return;
+			}
+			const newTermModel = new wp.api.models[
+				`Prpl_recommendations_${ type }`
+			]( {
+				slug: 'user',
+				name: 'user',
+			} );
+			newTermModel.save().then( ( response ) => {
+				progressPlannerTodo.userTerms[ type ] = response;
+			} );
+		} );
+	} );
+} );
 
 /**
  * Get the highest `order` value from the todo items.
@@ -130,13 +151,11 @@ prplDocumentReady( () => {
 					title: document.getElementById( 'new-todo-content' ).value,
 					status: 'publish',
 					// Set the `prpl_recommendations_category` term.
-					prpl_recommendations_category: prplGetUserTerm(
-						'prpl_recommendations_category'
-					)?.term_id,
+					prpl_recommendations_category:
+						progressPlannerTodo.userTerms.category.id,
 					// Set the `prpl_recommendations_provider` term.
-					prpl_recommendations_provider: prplGetUserTerm(
-						'prpl_recommendations_provider'
-					)?.term_id,
+					prpl_recommendations_provider:
+						progressPlannerTodo.userTerms.provider.id,
 				} );
 				post.save().then( ( response ) => {
 					if ( ! response.id ) {
@@ -147,12 +166,8 @@ prplDocumentReady( () => {
 						points: 0,
 						id: response.id,
 						title: { rendered: response.title.rendered },
-						provider: prplGetUserTerm(
-							'prpl_recommendations_provider'
-						),
-						category: prplGetUserTerm(
-							'prpl_recommendations_category'
-						),
+						provider: 'user',
+						category: 'user',
 						url: '',
 						dismissable: true,
 						snoozable: false,

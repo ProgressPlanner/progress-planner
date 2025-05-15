@@ -41,19 +41,6 @@ class User extends Tasks {
 	protected const PROVIDER_ID = 'user';
 
 	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		// Add terms for `user` provider and category if they don't exist.
-		$taxonomies = [ 'prpl_recommendations_category', 'prpl_recommendations_provider' ];
-		foreach ( $taxonomies as $taxonomy ) {
-			if ( ! \get_term_by( 'name', 'user', $taxonomy ) ) {
-				\wp_insert_term( 'user', $taxonomy );
-			}
-		}
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
