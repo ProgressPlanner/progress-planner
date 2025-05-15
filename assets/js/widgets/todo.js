@@ -13,35 +13,8 @@
  * @type {Object}
  */
 window.progressPlannerTodo = {
-	userTerms: {},
 	tasks: [],
 };
-
-/**
- * Get the user term for the taxonomies we use.
- */
-wp.api.loadPromise.done( () => {
-	[ 'category', 'provider' ].forEach( ( type ) => {
-		const TermsCollection = new wp.api.collections[
-			`Prpl_recommendations_${ type }`
-		]();
-		TermsCollection.fetch( { data: { slug: 'user' } } ).done( ( data ) => {
-			if ( data[ 0 ] ) {
-				window.progressPlannerTodo.userTerms[ type ] = data[ 0 ];
-				return;
-			}
-			const newTermModel = new wp.api.models[
-				`Prpl_recommendations_${ type }`
-			]( {
-				slug: 'user',
-				name: 'user',
-			} );
-			newTermModel.save().then( ( response ) => {
-				window.progressPlannerTodo.userTerms[ type ] = response;
-			} );
-		} );
-	} );
-} );
 
 /**
  * Get the highest `order` value from the todo items.
@@ -66,9 +39,15 @@ document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const todoItemElement = new Item( {
 		...event.detail.item,
+		meta: {
+			...event.detail.item.meta,
+			prpl_snoozable: false,
+			prpl_dismissable: true,
+		},
 		deletable: true,
 		allowReorder: true,
 		taskList: 'progressPlannerTodo',
+		content: { rendered: '' },
 	} );
 
 	if ( event.detail.addToStart ) {
@@ -110,7 +89,7 @@ prplDocumentReady( () => {
 						new CustomEvent( 'prpl/todo/injectItem', {
 							detail: {
 								item: todoItem,
-								addToStart: 1 === todoItem.points, // Add golden task to the start of the list.
+								addToStart: 1 === todoItem?.meta?.prpl_points, // Add golden task to the start of the list.
 								listId:
 									todoItem.status === 'completed'
 										? 'todo-list-completed'
@@ -153,25 +132,30 @@ prplDocumentReady( () => {
 					status: 'publish',
 					// Set the `prpl_recommendations_category` term.
 					prpl_recommendations_category:
-						window.progressPlannerTodo.userTerms.category.id,
+						window.progressPlannerSuggestedTasksTerms
+							.prpl_recommendations_category.id,
 					// Set the `prpl_recommendations_provider` term.
 					prpl_recommendations_provider:
-						window.progressPlannerTodo.userTerms.provider.id,
+						window.progressPlannerSuggestedTasksTerms
+							.prpl_recommendations_provider.id,
 				} );
 				post.save().then( ( response ) => {
 					if ( ! response.id ) {
 						return;
 					}
+					console.log( 'response', response );
 					const newTask = {
-						parent: 0,
-						points: 0,
-						id: response.id,
-						title: { rendered: response.title.rendered },
+						...response,
+						meta: {
+							...response.meta,
+							prpl_points: 0,
+							prpl_snoozable: false,
+							prpl_dismissable: true,
+							prpl_url: '',
+							prpl_url_target: '_self',
+						},
 						provider: 'user',
 						category: 'user',
-						url: '',
-						dismissable: true,
-						snoozable: false,
 						order: prplGetHighestTodoItemOrder() + 1,
 					};
 
