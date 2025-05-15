@@ -9,6 +9,44 @@
 /* eslint-disable camelcase */
 
 /**
+ * Get the terms for the taxonomies we use.
+ */
+window.progressPlannerSuggestedTasksTerms = {};
+wp.api.loadPromise.done( () => {
+	[
+		'prpl_recommendations_category',
+		'prpl_recommendations_provider',
+	].forEach( ( type ) => {
+		const typeName = type.replace( 'prpl_', 'Prpl_' );
+		window.progressPlannerSuggestedTasksTerms[ type ] = {};
+		const TermsCollection = new wp.api.collections[ typeName ]();
+		TermsCollection.fetch().done( ( data ) => {
+			data.forEach( ( term ) => {
+				window.progressPlannerSuggestedTasksTerms[ type ][ term.slug ] =
+					term;
+			} );
+		} );
+
+		// If the `user` term doesn't exist, create it.
+		const UserTermsCollection = new wp.api.collections[ typeName ]();
+		UserTermsCollection.fetch( { data: { slug: 'user' } } ).done(
+			( data ) => {
+				if ( 0 === data.length ) {
+					const newTermModel = new wp.api.models[ typeName ]( {
+						slug: 'user',
+						name: 'user',
+					} );
+					newTermModel.save().then( ( response ) => {
+						window.progressPlannerSuggestedTasksTerms[ type ].user =
+							response;
+					} );
+				}
+			}
+		);
+	} );
+} );
+
+/**
  * Register the custom web component.
  */
 customElements.define(
@@ -19,14 +57,9 @@ customElements.define(
 			title = { rendered: '' },
 			content = { rendered: '' },
 			meta = {},
-			points = 0,
-			action = '',
-			url = '',
-			url_target = '_self',
-			dismissable = false,
-			provider = {},
-			category = {},
-			snoozable = true,
+			status,
+			prpl_recommendations_provider,
+			prpl_recommendations_category,
 			menu_order = false,
 			allowReorder = false,
 			deletable = false,
@@ -36,22 +69,34 @@ customElements.define(
 			// Get parent class properties
 			super();
 
+			const terms = {
+				prpl_recommendations_provider,
+				prpl_recommendations_category,
+			};
+			// Modify provider and category to be an object.
+			Object.keys( window.progressPlannerSuggestedTasksTerms ).forEach(
+				( type ) => {
+					if (
+						typeof terms[ type ] === 'object' &&
+						typeof terms[ type ][ 0 ] !== 'undefined'
+					) {
+						Object.values(
+							window.progressPlannerSuggestedTasksTerms[ type ]
+						).forEach( ( term ) => {
+							if ( term.id === terms[ type ][ 0 ] ) {
+								terms[ type ] = term;
+							}
+						} );
+					}
+				}
+			);
+
 			this.setAttribute( 'role', 'listitem' );
 
 			let taskHeading = title.rendered;
-			if ( url ) {
-				taskHeading = `<a href="${ url }" target="${ url_target }">${ title.rendered }</a>`;
+			if ( meta?.prpl_url ) {
+				taskHeading = `<a href="${ meta?.prpl_url }" target="${ meta?.prpl_url_target }">${ title.rendered }</a>`;
 			}
-
-			const getTaskStatus = () => {
-				let status = 'pending';
-				window[ taskList ].tasks.forEach( ( task ) => {
-					if ( task?.meta?.prpl_task_id === meta?.prpl_task_id ) {
-						status = task.status;
-					}
-				} );
-				return status;
-			};
 
 			const actionButtons = {
 				move:
@@ -107,7 +152,7 @@ customElements.define(
 							</slot>
 						</prpl-tooltip>`
 						: '',
-				snooze: snoozable
+				snooze: meta?.prpl_snoozable
 					? `<prpl-tooltip class="prpl-suggested-task-snooze">
 							<slot name="open-icon">
 							<button
@@ -185,7 +230,7 @@ customElements.define(
 						</prpl-tooltip>`
 					: '',
 				complete:
-					dismissable && ! useCheckbox
+					meta?.prpl_dismissable && ! useCheckbox
 						? `<button
 							type="button"
 							class="prpl-suggested-task-button"
@@ -221,7 +266,7 @@ customElements.define(
 					let checkboxStyle = 'margin-top: 2px;';
 
 					// If the task is not dismissable, checkbox is disabled and we want to show a tooltip.
-					if ( ! dismissable ) {
+					if ( ! meta?.prpl_dismissable ) {
 						checkboxStyle += 'pointer-events: none;';
 						output += `<prpl-tooltip class="prpl-suggested-task-disabled-checkbox-tooltip">
 							<slot name="open-icon">`;
@@ -231,11 +276,11 @@ customElements.define(
 						type="checkbox"
 						class="prpl-suggested-task-checkbox"
 						style="${ checkboxStyle }"
-						${ ! dismissable ? 'disabled' : '' }
-						${ getTaskStatus() === 'completed' ? 'checked' : '' }
+						${ ! meta?.prpl_dismissable ? 'disabled' : '' }
+						${ 'trash' === status ? 'checked' : '' }
 					>`;
 
-					if ( ! dismissable ) {
+					if ( ! meta?.prpl_dismissable ) {
 						output += `
 							</slot>
 							<slot name="content">
@@ -249,9 +294,9 @@ customElements.define(
 				} )(),
 			};
 
-			const taskPointsElement = points
+			const taskPointsElement = meta?.prpl_points
 				? `<span class="prpl-suggested-task-points">
-						+${ points }
+						+${ meta?.prpl_points }
 					</span>`
 				: '';
 
@@ -260,17 +305,17 @@ customElements.define(
 				class="prpl-suggested-task"
 				data-task-id="${ meta?.prpl_task_id ?? id }"
 				data-post-id="${ id }"
-				data-task-action="${ action }"
-				data-task-url="${ url }"
-				data-task-provider-id="${ provider.slug }"
-				data-task-points="${ points }"
-				data-task-category="${ category.slug }"
+				data-task-action="${ 'pending_celebration' === status ? 'celebrate' : '' }"
+				data-task-url="${ meta?.prpl_url }"
+				data-task-provider-id="${ terms?.prpl_recommendations_provider?.slug }"
+				data-task-points="${ meta?.prpl_points }"
+				data-task-category="${ terms?.prpl_recommendations_category?.slug }"
 				data-task-order="${ menu_order }"
 				data-task-list="${ taskList }"
 			>
 				${ actionButtons.completeCheckbox }
 				<h3 style="width: 100%;"><span${
-					'user' === category.slug
+					'user' === terms?.prpl_recommendations_category?.slug
 						? ` contenteditable="plaintext-only"`
 						: ''
 				}>${ taskHeading }</span></h3>

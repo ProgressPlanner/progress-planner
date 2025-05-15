@@ -4,7 +4,7 @@
  *
  * A widget that displays a list of suggested tasks.
  *
- * Dependencies: wp-api, progress-planner/api/collections, progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip
+ * Dependencies: wp-api, progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip
  */
 /* eslint-disable camelcase */
 
@@ -16,9 +16,23 @@
  */
 const prplSuggestedTasksGetNextPendingItemFromCategory = ( categorySlug ) => {
 	// Get items of this categoryId.
-	const itemsOfCategory = prplSuggestedTasks.tasks.filter(
-		( task ) => categorySlug === task?.category?.slug
-	);
+	const itemsOfCategory = prplSuggestedTasks.tasks.filter( ( task ) => {
+		const categoryID = task.prpl_recommendations_category[ 0 ];
+		if ( ! categoryID ) {
+			return false;
+		}
+
+		const category = { slug: false };
+		Object.values(
+			window.progressPlannerSuggestedTasksTerms
+				.prpl_recommendations_category
+		).forEach( ( term ) => {
+			if ( categoryID === term.id ) {
+				category.slug = term.slug;
+			}
+		} );
+		return categorySlug === category?.slug;
+	} );
 
 	// Create an array of items that are in the list.
 	const inList = [];
