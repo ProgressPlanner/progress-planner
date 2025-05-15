@@ -69,6 +69,9 @@ document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
 		deletable: true,
 		allowReorder: true,
 		taskList: 'progressPlannerTodo',
+		dismissable: true,
+		snoozable: false,
+		content: { rendered: '' },
 	} );
 
 	if ( event.detail.addToStart ) {
