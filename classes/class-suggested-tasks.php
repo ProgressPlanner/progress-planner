@@ -861,7 +861,7 @@ class Suggested_Tasks {
 	public function get_post( $id ) {
 		$posts = $this->get_tasks_by(
 			is_numeric( $id )
-				? [ 'ID' => $id ]
+				? [ 'p' => $id ]
 				: [ 'task_id' => $id ]
 		);
 
