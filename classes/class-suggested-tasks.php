@@ -676,7 +676,6 @@ class Suggested_Tasks {
 
 	/**
 	 * Filter the REST API response.
-	 * WIP: Add the URL to the review-post provider, we should do the same for all providers.
 	 *
 	 * @param \WP_REST_Response $response The response.
 	 * @param \WP_Post          $post The post.
@@ -686,10 +685,11 @@ class Suggested_Tasks {
 	public function rest_prepare_recommendation( $response, $post ) {
 
 		$provider_term = wp_get_object_terms( $post->ID, 'prpl_recommendations_provider' );
-		if ( $provider_term && ! is_wp_error( $provider_term ) && 'review-post' === $provider_term[0]->slug ) {
+		if ( $provider_term && ! is_wp_error( $provider_term ) ) {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
 
 			if ( $provider ) {
+				// Link should be added during run time, since it is not added for users without required capability.
 				$response->data['meta']['prpl_url'] = $provider->capability_required()
 				? \esc_url( (string) \get_edit_post_link( $post->ID ) )
 				: '';
