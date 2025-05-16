@@ -311,7 +311,21 @@ class Content_Review extends Tasks {
 			}
 		}
 
-		return $task_to_inject;
+		$added_tasks = [];
+
+		foreach ( $task_to_inject as $task_data ) {
+			// Add the tasks to the pending tasks option, it will not add duplicates.
+				$task_post = \progress_planner()->get_suggested_tasks()->get_post( $task_data['task_id'] );
+
+			// Skip the task if it was already injected.
+			if ( $task_post ) {
+				continue;
+			}
+
+			$added_tasks[] = \progress_planner()->get_suggested_tasks()->add( $task_data );
+		}
+
+		return $added_tasks;
 	}
 
 	/**

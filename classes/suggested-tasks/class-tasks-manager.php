@@ -207,21 +207,9 @@ class Tasks_Manager {
 
 		// Loop through all registered task providers and inject their tasks.
 		foreach ( $this->task_providers as $provider_instance ) {
-			$provider_tasks = \array_merge( $provider_tasks, $provider_instance->get_tasks_to_inject() );
-		}
 
-		// Add the tasks to the pending tasks option, it will not add duplicates.
-		foreach ( $provider_tasks as $task ) {
-			$id = isset( $task['ID'] ) ? $task['ID'] : $task['task_id'];
-			// Get the task.
-			$task_post = \progress_planner()->get_suggested_tasks()->get_post( $id );
-			// Skip the task if it was already injected.
-			if ( $task_post ) {
-				continue;
-			}
-
-			$tasks_to_inject[] = $task;
-			\progress_planner()->get_suggested_tasks()->add( $task );
+			// WIP, get_tasks_to_inject() is injecting tasks.
+			$provider_instance->get_tasks_to_inject();
 		}
 	}
 
@@ -267,24 +255,6 @@ class Tasks_Manager {
 		}
 
 		return $task_provider->evaluate_task( $task['task_id'] );
-	}
-
-	/**
-	 * Wrapper function for getting task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array|false
-	 */
-	public function get_task_details( $task_id ) {
-		$task_object   = Task_Factory::create_task_from_id( $task_id );
-		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
-
-		if ( ! $task_provider ) {
-			return false;
-		}
-
-		return $task_provider->get_task_details( $task_id );
 	}
 
 	/**

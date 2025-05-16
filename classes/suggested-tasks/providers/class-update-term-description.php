@@ -249,23 +249,33 @@ class Update_Term_Description extends Tasks {
 			return [];
 		}
 
-		return [
-			[
-				'task_id'     => $task_id,
-				'provider_id' => $this->get_provider_id(),
-				'category'    => $this->get_provider_category(),
-				'term_id'     => $data['term_id'],
-				'taxonomy'    => $data['taxonomy'],
-				'term_name'   => $data['name'],
-				'date'        => \gmdate( 'YW' ),
-				'post_title'  => $this->get_title( $data ),
-				'description' => $this->get_description( $data ),
-				'url'         => $this->get_url( $data ),
-				'url_target'  => '_blank',
-				'dismissable' => $this->is_dismissable(),
-				'points'      => $this->get_points(),
-			],
+		$task_data = [
+			'task_id'     => $task_id,
+			'provider_id' => $this->get_provider_id(),
+			'category'    => $this->get_provider_category(),
+			'term_id'     => $data['term_id'],
+			'taxonomy'    => $data['taxonomy'],
+			'term_name'   => $data['name'],
+			'date'        => \gmdate( 'YW' ),
+			'post_title'  => $this->get_title( $data ),
+			'description' => $this->get_description( $data ),
+			'url'         => $this->get_url( $data ),
+			'url_target'  => '_blank',
+			'dismissable' => $this->is_dismissable(),
+			'points'      => $this->get_points(),
 		];
+
+		$task_data = $this->modify_injection_task_data( $task_data );
+
+		// Add the tasks to the pending tasks option, it will not add duplicates.
+		$task_post = \progress_planner()->get_suggested_tasks()->get_post( $task_data['task_id'] );
+
+		// Skip the task if it was already injected.
+		if ( $task_post ) {
+			return [];
+		}
+
+		return [ \progress_planner()->get_suggested_tasks()->add( $task_data ) ];
 	}
 
 	/**

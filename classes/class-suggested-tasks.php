@@ -54,6 +54,9 @@ class Suggested_Tasks {
 		// Filter the REST API tax query.
 		\add_filter( 'rest_prpl_recommendations_query', [ $this, 'rest_api_tax_query' ], 10, 2 );
 
+		// Filter the REST API response.
+		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'rest_prepare_recommendation' ], 10, 2 );
+
 		// Add the custom post status.
 		\add_action( 'init', [ $this, 'register_post_status' ], 1 );
 	}
@@ -672,6 +675,31 @@ class Suggested_Tasks {
 	}
 
 	/**
+	 * Filter the REST API response.
+	 *
+	 * @param \WP_REST_Response $response The response.
+	 * @param \WP_Post          $post The post.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function rest_prepare_recommendation( $response, $post ) {
+
+		$provider_term = wp_get_object_terms( $post->ID, 'prpl_recommendations_provider' );
+		if ( $provider_term && ! is_wp_error( $provider_term ) ) {
+			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
+
+			if ( $provider ) {
+				// Link should be added during run time, since it is not added for users without required capability.
+				$response->data['meta']['prpl_url'] = $provider->capability_required()
+				? \esc_url( (string) \get_edit_post_link( $post->ID ) )
+				: '';
+			}
+		}
+
+		return $response;
+	}
+
+	/**
 	 * Register a custom post status.
 	 *
 	 * @return void
@@ -711,7 +739,7 @@ class Suggested_Tasks {
 			[
 				'post_status' => [ 'any', 'pending_celebration' ], // 'any' wont return posts with (custom) post status 'pending_celebration'.
 				'numberposts' => 1,
-				'meta_query'  => [
+				'meta_query'  => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					[
 						'key'     => 'prpl_task_id',
 						'value'   => $data['task_id'],

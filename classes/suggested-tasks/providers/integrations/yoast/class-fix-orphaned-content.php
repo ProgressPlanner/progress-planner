@@ -207,19 +207,29 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return [];
 		}
 
-		return [
-			[
-				'task_id'     => $task_id,
-				'provider_id' => $this->get_provider_id(),
-				'category'    => $this->get_provider_category(),
-				'post_id'     => $data['post_id'],
-				'post_title'  => $this->get_title( $data ),
-				'url'         => $this->get_url( $data ),
-				'url_target'  => $this->get_url_target(),
-				'dismissable' => $this->is_dismissable(),
-				'points'      => $this->get_points(),
-			],
+		$task_data = [
+			'task_id'     => $task_id,
+			'provider_id' => $this->get_provider_id(),
+			'category'    => $this->get_provider_category(),
+			'post_id'     => $data['post_id'],
+			'post_title'  => $this->get_title( $data ),
+			'url'         => $this->get_url( $data ),
+			'url_target'  => $this->get_url_target(),
+			'dismissable' => $this->is_dismissable(),
+			'points'      => $this->get_points(),
 		];
+
+		$task_data = $this->modify_injection_task_data( $task_data );
+
+		// Add the tasks to the pending tasks option, it will not add duplicates.
+		$task_post = \progress_planner()->get_suggested_tasks()->get_post( $task_data['task_id'] );
+
+		// Skip the task if it was already injected.
+		if ( $task_post ) {
+			return [];
+		}
+
+		return [ \progress_planner()->get_suggested_tasks()->add( $task_data ) ];
 	}
 
 	/**
