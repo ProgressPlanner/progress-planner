@@ -195,7 +195,7 @@ class Debug_Tools {
 					[
 						'id'     => 'prpl-upgrading-task-' . $task_provider_id,
 						'parent' => 'prpl-upgrading-tasks',
-						'title'  => $task_provider_details['title'],
+						'title'  => $task_provider_details['post_title'],
 					]
 				);
 			}
@@ -221,13 +221,10 @@ class Debug_Tools {
 			]
 		);
 
-		// Get suggested tasks.
-		$suggested_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-
 		$menu_items = [
-			'pending'             => 'Pending',
-			'completed'           => 'Completed',
-			'snoozed'             => 'Snoozed',
+			'publish'             => 'Pending',
+			'trash'               => 'Completed',
+			'future'              => 'Snoozed',
 			'pending_celebration' => 'Pending Celebration',
 		];
 
@@ -240,24 +237,26 @@ class Debug_Tools {
 				]
 			);
 
-			foreach ( $suggested_tasks as $task ) {
-				if ( ! isset( $task['task_id'] ) || $key !== $task['status'] ) {
-					continue;
-				}
+			// Get suggested tasks.
+			$suggested_tasks = \progress_planner()->get_suggested_tasks()->get( [ 'post_status' => $key ] );
 
-				$title = $task['task_id'];
-				if ( isset( $task['status'] ) && 'snoozed' === $task['status'] && isset( $task['time'] ) ) {
-					$until  = is_float( $task['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['time'] ) . ')';
-					$title .= ' ' . $until;
-				}
+			if ( ! empty( $suggested_tasks ) ) {
+				foreach ( $suggested_tasks as $task ) {
 
-				$admin_bar->add_node(
-					[
-						'id'     => 'prpl-suggested-' . $key . '-' . $title,
-						'parent' => 'prpl-suggested-' . $key,
-						'title'  => $title,
-					]
-				);
+					$title = $task['post_title'];
+					if ( isset( $task['post_status'] ) && 'future' === $task['post_status'] && isset( $task['post_date'] ) ) {
+						$until  = is_float( $task['post_date'] ) ? '(forever)' : '(until ' . $task['post_date'] . ')';
+						$title .= ' ' . $until;
+					}
+
+					$admin_bar->add_node(
+						[
+							'id'     => 'prpl-suggested-' . $key . '-' . $title,
+							'parent' => 'prpl-suggested-' . $key,
+							'title'  => $title,
+						]
+					);
+				}
 			}
 		}
 	}
@@ -374,18 +373,13 @@ class Debug_Tools {
 		// Verify nonce for security.
 		$this->verify_nonce();
 
-		// Update the tasks.
-		\progress_planner()->get_settings()->set(
-			'tasks',
-			array_values(
-				array_filter( // Filter out pending tasks.
-					\progress_planner()->get_settings()->get( 'tasks', [] ), // Get all tasks.
-					function ( $task ) {
-						return 'pending' !== $task['status'];
-					}
-				)
-			)
-		);
+		// Get pending tasks.
+		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] );
+
+		// Delete the pending tasks.
+		foreach ( $pending_tasks as $task ) {
+			\progress_planner()->get_suggested_tasks()->delete_recommendation( (int) $task['ID'] );
+		}
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_pending_tasks', '_wpnonce' ] ) );
@@ -529,7 +523,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the option.
-		\progress_planner()->get_settings()->set( 'tasks', [] );
+		\progress_planner()->get_suggested_tasks()->delete_all_recommendations();
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_suggested_tasks', '_wpnonce' ] ) );

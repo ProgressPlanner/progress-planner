@@ -127,8 +127,7 @@ class Tasks_Manager {
 			$task_provider->init();
 		}
 
-		// Inject tasks.
-		\add_filter( 'progress_planner_suggested_tasks_items', [ $this, 'inject_tasks' ] );
+		$this->inject_tasks();
 
 		// Add the onboarding task providers.
 		\add_filter( 'prpl_onboarding_task_providers', [ $this, 'add_onboarding_task_providers' ] );
@@ -201,32 +200,17 @@ class Tasks_Manager {
 	/**
 	 * Inject tasks.
 	 *
-	 * @param array $tasks The tasks.
-	 *
-	 * @return array
+	 * @return void
 	 */
-	public function inject_tasks( $tasks ) {
-		$provider_tasks  = [];
-		$tasks_to_inject = [];
+	public function inject_tasks() {
+		$provider_tasks = [];
 
 		// Loop through all registered task providers and inject their tasks.
 		foreach ( $this->task_providers as $provider_instance ) {
-			$provider_tasks = \array_merge( $provider_tasks, $provider_instance->get_tasks_to_inject() );
+
+			// WIP, get_tasks_to_inject() is injecting tasks.
+			$provider_instance->get_tasks_to_inject();
 		}
-
-		// Add the tasks to the pending tasks option, it will not add duplicates.
-		foreach ( $provider_tasks as $task ) {
-
-			// Skip the task if it was completed.
-			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task['task_id'] ) ) {
-				continue;
-			}
-
-			$tasks_to_inject[] = $task;
-			$this->add_pending_task( $task );
-		}
-
-		return \array_merge( $tasks, $tasks_to_inject );
 	}
 
 	/**
@@ -235,25 +219,11 @@ class Tasks_Manager {
 	 * @return array
 	 */
 	public function evaluate_tasks() {
-		$tasks           = (array) \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending' );
+		$tasks           = (array) \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] );
 		$completed_tasks = [];
 
 		foreach ( $tasks as $task_data ) {
-			if ( ! isset( $task_data['task_id'] ) ) {
-				continue;
-			}
-
-			$task_id = $task_data['task_id'];
-
-			// Check if the task is no longer relevant.
-			$task_object   = Task_Factory::create_task_from( 'id', $task_id );
-			$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
-			if ( $task_provider && ! $task_provider->is_task_relevant() ) {
-				// Remove the task from the pending tasks.
-				\progress_planner()->get_suggested_tasks()->delete_task( $task_id );
-			}
-
-			$task_result = $this->evaluate_task( $task_id );
+			$task_result = $this->evaluate_task( $task_data );
 			if ( false !== $task_result ) {
 				$completed_tasks[] = $task_result;
 			}
@@ -265,37 +235,26 @@ class Tasks_Manager {
 	/**
 	 * Wrapper function for evaluating tasks.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task The task data.
 	 *
 	 * @return bool|\Progress_Planner\Suggested_Tasks\Task
 	 */
-	public function evaluate_task( $task_id ) {
-		$task_object   = Task_Factory::create_task_from( 'id', $task_id );
-		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
-
+	public function evaluate_task( $task ) {
+		if ( ! $task['provider'] ) {
+			return false;
+		}
+		$task_provider = $this->get_task_provider( $task['provider']->slug );
 		if ( ! $task_provider ) {
 			return false;
 		}
 
-		return $task_provider->evaluate_task( $task_id );
-	}
-
-	/**
-	 * Wrapper function for getting task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array|false
-	 */
-	public function get_task_details( $task_id ) {
-		$task_object   = Task_Factory::create_task_from( 'id', $task_id );
-		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
-
-		if ( ! $task_provider ) {
-			return false;
+		// Check if the task is no longer relevant.
+		if ( ! $task_provider->is_task_relevant() ) {
+			// Remove the task from the pending tasks.
+			\progress_planner()->get_suggested_tasks()->delete_recommendation( $task['ID'] );
 		}
 
-		return $task_provider->get_task_details( $task_id );
+		return $task_provider->evaluate_task( $task['task_id'] );
 	}
 
 	/**
@@ -306,40 +265,9 @@ class Tasks_Manager {
 	 * @return array
 	 */
 	public function get_data_from_task_id( $task_id ) {
-		$task_object = Task_Factory::create_task_from( 'id', $task_id );
+		$task_object = Task_Factory::create_task_from_id( $task_id );
 
 		return $task_object->get_data();
-	}
-
-	/**
-	 * Add a pending task.
-	 *
-	 * @param array $task The task data.
-	 *
-	 * @return bool
-	 */
-	public function add_pending_task( $task ) {
-		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-
-		$task_index = false;
-
-		foreach ( $tasks as $key => $_task ) {
-			if ( ! isset( $_task['task_id'] ) || $task['task_id'] !== $_task['task_id'] ) {
-				continue;
-			}
-			$task_index = $key;
-			break;
-		}
-
-		$task['status'] = 'pending';
-
-		if ( false !== $task_index ) {
-			$tasks[ $task_index ] = array_merge( $task, $tasks[ $task_index ] );
-		} else {
-			$tasks[] = $task;
-		}
-
-		return \progress_planner()->get_settings()->set( 'tasks', $tasks );
 	}
 
 	/**
@@ -356,33 +284,14 @@ class Tasks_Manager {
 			return;
 		}
 
-		$tasks = (array) \progress_planner()->get_settings()->get( 'tasks', [] );
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] );
 
-		if ( empty( $tasks ) ) {
-			return;
-		}
-
-		$task_count = count( $tasks );
-
-		$tasks = \array_filter(
-			$tasks,
-			function ( $task ) {
-
-				if ( 'pending' === $task['status'] && isset( $task['date'] ) ) {
-					return (string) \gmdate( 'YW' ) === (string) $task['date'];
-				}
-
-				// We have changed provider_id name, so we need to remove all tasks of the old provider_id.
-				if ( isset( $task['provider_id'] ) && 'update-post' === $task['provider_id'] ) {
-					return false;
-				}
-
-				return true;
+		foreach ( $tasks as $task ) {
+			if ( ! isset( $task['date'] ) || \gmdate( 'YW' ) !== (string) $task['date'] ) {
+				continue;
 			}
-		);
 
-		if ( count( $tasks ) !== $task_count ) {
-			\progress_planner()->get_settings()->set( 'tasks', array_values( $tasks ) );
+			\progress_planner()->get_suggested_tasks()->delete_recommendation( $task['ID'] );
 		}
 
 		\progress_planner()->get_utils__cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );

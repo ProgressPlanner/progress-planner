@@ -7,28 +7,12 @@
 
 namespace Progress_Planner\Tests;
 
-use Progress_Planner\Suggested_Tasks;
+use Progress_Planner\CPT_Recommendations;
 
 /**
- * Suggested_Tasks test case.
+ * CPT_Recommendations test case.
  */
-class Suggested_Tasks_Test extends \WP_UnitTestCase {
-
-	/**
-	 * Suggested_Tasks object.
-	 *
-	 * @var Suggested_Tasks
-	 */
-	protected $suggested_tasks;
-
-	/**
-	 * Setup the test case.
-	 *
-	 * @return void
-	 */
-	public function set_up() {
-		$this->suggested_tasks = \progress_planner()->get_suggested_tasks();
-	}
+class CPT_Recommendations_Test extends \WP_UnitTestCase {
 
 	/**
 	 * Test the task_cleanup method.
@@ -57,7 +41,7 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 		];
 
 		foreach ( $tasks_to_keep as $task ) {
-			$this->suggested_tasks->get_tasks_manager()->add_pending_task( $task );
+			\progress_planner()->get_suggested_tasks()->add( $task );
 		}
 
 		// Tasks that should be removed.
@@ -73,10 +57,10 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 		];
 
 		foreach ( $tasks_to_remove as $task ) {
-			$this->suggested_tasks->get_tasks_manager()->add_pending_task( $task );
+			\progress_planner()->get_suggested_tasks()->add( $task );
 		}
 
-		$this->suggested_tasks->get_tasks_manager()->cleanup_pending_tasks();
+		\progress_planner()->get_suggested_tasks()->get_tasks_manager()->cleanup_pending_tasks();
 
 		$this->assertEquals( count( $tasks_to_keep ), \count( \progress_planner()->get_settings()->get( 'tasks', [] ) ) );
 	}

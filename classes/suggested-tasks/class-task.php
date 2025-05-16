@@ -53,7 +53,7 @@ class Task {
 	 * @return string
 	 */
 	public function get_provider_id() {
-		return $this->data['provider_id'] ?? '';
+		return $this->data['provider']->slug ?? '';
 	}
 
 	/**

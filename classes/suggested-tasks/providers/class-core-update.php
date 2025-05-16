@@ -73,7 +73,7 @@ class Core_Update extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Perform all updates', 'progress-planner' );
 	}
 
@@ -82,7 +82,7 @@ class Core_Update extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s:<a href="http://prpl.fyi/perform-all-updates" target="_blank">See why we recommend this</a> link */
 			\esc_html__( 'Regular updates improve security and performance. %s.', 'progress-planner' ),
@@ -98,7 +98,7 @@ class Core_Update extends Tasks {
 	 * @return array
 	 */
 	public function add_core_update_link( $update_actions ) {
-		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending' );
+		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] );
 
 		// All updates are completed and there is a 'update-core' task in the pending tasks.
 		if ( $pending_tasks && $this->is_task_completed() ) {
@@ -142,7 +142,7 @@ class Core_Update extends Tasks {
 
 		return [
 			'task_id'     => $task_id,
-			'title'       => $this->get_title(),
+			'post_title'  => $this->get_title(),
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),

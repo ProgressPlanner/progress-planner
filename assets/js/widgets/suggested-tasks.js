@@ -4,26 +4,35 @@
  *
  * A widget that displays a list of suggested tasks.
  *
- * Dependencies: progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip
+ * Dependencies: wp-api, progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip
  */
 /* eslint-disable camelcase */
 
 /**
  * Get the next item to inject.
  *
- * @param {string} category The category of items to get the next item from.
+ * @param {string} categorySlug The category of items to get the next item from.
  * @return {Object} The next item to inject.
  */
-const prplSuggestedTasksGetNextPendingItemFromCategory = ( category ) => {
-	// Get items of this category.
-	const itemsOfCategory = prplSuggestedTasks.tasks.filter(
-		( task ) => category === task.category
-	);
+const prplSuggestedTasksGetNextPendingItemFromCategory = ( categorySlug ) => {
+	// Get items of this categoryId.
+	const itemsOfCategory = prplSuggestedTasks.tasks.filter( ( task ) => {
+		const categoryID = task.prpl_recommendations_category[ 0 ];
+		if ( ! categoryID ) {
+			return false;
+		}
 
-	// If there are no items of this category, return null.
-	if ( 0 === itemsOfCategory.length || 'user' === category ) {
-		return null;
-	}
+		const category = { slug: false };
+		Object.values(
+			window.progressPlannerSuggestedTasksTerms
+				.prpl_recommendations_category
+		).forEach( ( term ) => {
+			if ( categoryID === term.id ) {
+				category.slug = term.slug;
+			}
+		} );
+		return categorySlug === category?.slug;
+	} );
 
 	// Create an array of items that are in the list.
 	const inList = [];
@@ -35,11 +44,11 @@ const prplSuggestedTasksGetNextPendingItemFromCategory = ( category ) => {
 
 	const items = itemsOfCategory.filter( function ( item ) {
 		// Skip items which are not pending.
-		if ( 'pending' !== item.status ) {
+		if ( 'publish' !== item.status ) {
 			return false;
 		}
 		// Remove items which are already in the list.
-		if ( inList.includes( item.task_id.toString() ) ) {
+		if ( inList.includes( item?.meta?.prpl_task_id.toString() ) ) {
 			return false;
 		}
 		return true;
@@ -83,6 +92,7 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 	const item = new Item( {
 		...event.detail,
 		taskList: 'prplSuggestedTasks',
+		allowReorder: false,
 	} );
 
 	/**
@@ -133,18 +143,6 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 		.insertAdjacentElement( 'beforeend', item );
 } );
 
-if (
-	! prplSuggestedTasks.delayCelebration &&
-	prplSuggestedTasks.tasks.filter(
-		( task ) => 'pending_celebration' === task.status
-	).length
-) {
-	setTimeout( () => {
-		// Trigger the celebration event.
-		document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
-	}, 3000 );
-}
-
 // Populate the list on load.
 prplDocumentReady( () => {
 	// Do nothing if the list does not exist.
@@ -152,182 +150,95 @@ prplDocumentReady( () => {
 		return;
 	}
 
-	// Loop through each provider and inject items.
-	for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
-		// Inject items, until we reach the maximum number of channel items.
-		while (
-			document.querySelectorAll(
-				`.prpl-suggested-task[data-task-category="${ category }"]`
-			).length <
-				parseInt(
-					prplSuggestedTasks.maxItemsPerCategory[ category ]
-				) &&
-			prplSuggestedTasksGetNextPendingItemFromCategory( category )
-		) {
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/injectCategoryItem', {
-					detail: { category },
-				} )
-			);
-		}
-	}
+	wp.api.loadPromise.done( () => {
+		console.log( 'Attempting to fetch recommendations...' );
+		const postsCollection = new wp.api.collections.Prpl_recommendations();
+		postsCollection
+			.fetch( {
+				data: {
+					status: prplSuggestedTasks.delayCelebration
+						? [ 'publish' ]
+						: [ 'publish', 'pending_celebration' ],
+					per_page: 100,
+					_embed: true,
+					exclude_provider: 'user',
+					filter: {
+						orderby: 'menu_order',
+						order: 'ASC',
+					},
+				},
+			} )
+			.done( ( data ) => {
+				console.log( 'Fetch successful:', data );
 
-	// Inject ALL pending celebration tasks.
-	prplSuggestedTasks.tasks
-		.filter( ( task ) => 'pending_celebration' === task.status )
-		.forEach( ( task ) => {
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/injectItem', {
-					detail: task,
-				} )
-			);
-		} );
+				prplSuggestedTasks.tasks = data;
 
-	window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-
-	// Initialize the badge scroller.
-	document
-		.querySelectorAll(
-			'.prpl-widget-wrapper:not(.in-popover) > .badge-group-monthly'
-		)
-		.forEach( ( element ) => {
-			new BadgeScroller( element );
-		} );
-} );
-
-// Handle the monthly badges scrolling.
-class BadgeScroller {
-	constructor( element ) {
-		this.element = element;
-
-		this.badgeButtonUp = this.element.querySelector(
-			'.prpl-badge-row-button-up'
-		);
-		this.badgeButtonDown = this.element.querySelector(
-			'.prpl-badge-row-button-down'
-		);
-		this.badgeRowWrapper = this.element.querySelector(
-			'.prpl-badge-row-wrapper'
-		);
-		this.badgeRowWrapperInner = this.element.querySelector(
-			'.prpl-badge-row-wrapper-inner'
-		);
-		this.badges =
-			this.badgeRowWrapperInner.querySelectorAll( '.prpl-badge' );
-		this.totalRows = this.badges.length / 3;
-
-		this.init();
-	}
-
-	init() {
-		this.addEventListeners();
-
-		// On page load, when all images are loaded.
-		const images = [ ...this.element.querySelectorAll( 'img' ) ];
-		if ( images.length ) {
-			Promise.all(
-				images.map(
-					( im ) =>
-						new Promise( ( resolve ) => ( im.onload = resolve ) )
-				)
-			).then( () => {
-				this.setWrapperHeight();
-			} );
-		}
-
-		// When popover is opened.
-		document
-			.querySelector( '#prpl-popover-monthly-badges' )
-			.addEventListener( 'toggle', ( event ) => {
-				if ( 'open' === event.newState ) {
-					this.setWrapperHeight();
+				// Loop through each provider and inject items.
+				for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
+					// Inject items, until we reach the maximum number of channel items.
+					while (
+						document.querySelectorAll(
+							`.prpl-suggested-task[data-task-category="${ category }"]`
+						).length <
+							parseInt(
+								prplSuggestedTasks.maxItemsPerCategory[
+									category
+								]
+							) &&
+						prplSuggestedTasksGetNextPendingItemFromCategory(
+							category
+						)
+					) {
+						document.dispatchEvent(
+							new CustomEvent(
+								'prpl/suggestedTask/injectCategoryItem',
+								{
+									detail: { category },
+								}
+							)
+						);
+					}
 				}
+
+				// Inject ALL pending celebration tasks.
+				prplSuggestedTasks.tasks
+					.filter( ( task ) => 'pending_celebration' === task.status )
+					.forEach( ( task ) => {
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/suggestedTask/injectItem', {
+								detail: task,
+							} )
+						);
+					} );
+
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+
+				// Trigger the celebration event if needed.
+				if (
+					! prplSuggestedTasks.delayCelebration &&
+					prplSuggestedTasks.tasks.filter(
+						( task ) => 'pending_celebration' === task.status
+					).length
+				) {
+					setTimeout( () => {
+						// Trigger the celebration event.
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/celebrateTasks' )
+						);
+					}, 3000 );
+				}
+			} )
+			.fail( ( jqXHR, textStatus, errorThrown ) => {
+				console.error( 'Fetch failed:', {
+					status: jqXHR.status,
+					statusText: jqXHR.statusText,
+					responseText: jqXHR.responseText,
+					textStatus,
+					errorThrown,
+				} );
 			} );
-
-		// Handle window resize.
-		window.addEventListener( 'resize', () => {
-			this.setWrapperHeight();
-		} );
-	}
-
-	setWrapperHeight() {
-		const computedStyle = window.getComputedStyle(
-			this.badgeRowWrapperInner
-		);
-		const gridGap = parseInt( computedStyle.gap );
-
-		// Set CSS variables for the transform calculation.
-		this.badgeRowWrapper.style.setProperty(
-			'--row-height',
-			`${ this.badges[ 0 ].offsetHeight }px`
-		);
-		this.badgeRowWrapper.style.setProperty(
-			'--grid-gap',
-			`${ gridGap }px`
-		);
-
-		// Set wrapper height to show 2 rows.
-		const twoRowsHeight = this.badges[ 0 ].offsetHeight * 2 + gridGap;
-		this.badgeRowWrapperInner.style.height = twoRowsHeight + 'px';
-	}
-
-	addEventListeners() {
-		this.badgeButtonUp.addEventListener( 'click', () =>
-			this.handleUpClick()
-		);
-		this.badgeButtonDown.addEventListener( 'click', () =>
-			this.handleDownClick()
-		);
-	}
-
-	handleUpClick() {
-		const computedStyle = window.getComputedStyle(
-			this.badgeRowWrapperInner
-		);
-		const currentRow =
-			computedStyle.getPropertyValue( '--prpl-current-row' );
-		const nextRow = parseInt( currentRow ) - 1;
-
-		this.badgeButtonDown
-			.closest( '.prpl-badge-row-button-wrapper' )
-			.classList.remove( 'prpl-badge-row-button-disabled' );
-
-		this.badgeRowWrapperInner.style.setProperty(
-			'--prpl-current-row',
-			nextRow
-		);
-
-		if ( nextRow <= 1 ) {
-			this.badgeButtonUp
-				.closest( '.prpl-badge-row-button-wrapper' )
-				.classList.add( 'prpl-badge-row-button-disabled' );
-		}
-	}
-
-	handleDownClick() {
-		const computedStyle = window.getComputedStyle(
-			this.badgeRowWrapperInner
-		);
-		const currentRow =
-			computedStyle.getPropertyValue( '--prpl-current-row' );
-		const nextRow = parseInt( currentRow ) + 1;
-
-		this.badgeButtonUp
-			.closest( '.prpl-badge-row-button-wrapper' )
-			.classList.remove( 'prpl-badge-row-button-disabled' );
-
-		this.badgeRowWrapperInner.style.setProperty(
-			'--prpl-current-row',
-			nextRow
-		);
-
-		if ( nextRow >= this.totalRows - 1 ) {
-			this.badgeButtonDown
-				.closest( '.prpl-badge-row-button-wrapper' )
-				.classList.add( 'prpl-badge-row-button-disabled' );
-		}
-	}
-}
+	} );
+} );
 
 /**
  * Update the Ravi gauge.

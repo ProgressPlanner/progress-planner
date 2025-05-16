@@ -136,7 +136,7 @@ class Update_130 {
 	 */
 	private function get_data_from_task_id( $task_id ) {
 
-		$task_object = Task_Factory::create_task_from( 'id', $task_id );
+		$task_object = Task_Factory::create_task_from_id( $task_id );
 
 		if ( 0 === strpos( $task_object->get_task_id(), 'create-post-' ) || 0 === strpos( $task_object->get_task_id(), 'create-post-short-' ) ) {
 			$task_object = $this->handle_legacy_post_tasks( $task_object );

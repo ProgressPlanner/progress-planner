@@ -107,7 +107,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * @return void
 	 */
 	public function maybe_remove_irrelevant_tasks( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
-		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', $this->get_provider_id() );
+		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! $pending_tasks ) {
 			return;
@@ -118,7 +118,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 				$term = \get_term( $task['term_id'], $task['taxonomy'] );
 
 				if ( \is_wp_error( $term ) || ! $term || $term->count > self::MIN_POSTS ) {
-					\progress_planner()->get_suggested_tasks()->delete_task( $task['task_id'] );
+					\progress_planner()->get_suggested_tasks()->delete_recommendation( $task['ID'] );
 				}
 			}
 		}
@@ -146,41 +146,35 @@ class Remove_Terms_Without_Posts extends Tasks {
 	/**
 	 * Get the title.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_title( $task_id = '' ) {
-		if ( ! $task_id ) {
-			return '';
-		}
+	protected function get_title( $task_data = [] ) {
+		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
 
-		// Get the task data.
-		$task_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
-
-		// We don't want to link if the term was deleted.
-		if ( empty( $task_data ) || ! $task_data[0] ) {
+		if ( ! $term || \is_wp_error( $term ) ) {
 			return '';
 		}
 
 		return \sprintf(
 			/* translators: %s: The term name */
 			\esc_html__( 'Remove term named "%s"', 'progress-planner' ),
-			\esc_html( $task_data[0]['term_name'] )
+			\esc_html( $term->name )
 		);
 	}
 
 	/**
 	 * Get the description.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_description( $task_id = '' ) {
-		$term = $this->get_term_from_task_id( $task_id );
+	protected function get_description( $task_data = [] ) {
+		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
 
-		if ( ! $term ) {
+		if ( ! $term || \is_wp_error( $term ) ) {
 			return '';
 		}
 
@@ -195,15 +189,14 @@ class Remove_Terms_Without_Posts extends Tasks {
 	/**
 	 * Get the URL.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_url( $task_id = '' ) {
-		$term = $this->get_term_from_task_id( $task_id );
+	protected function get_url( $task_data = [] ) {
+		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
 
-		// We don't want to link if the term was deleted.
-		if ( ! $term ) {
+		if ( ! $term || \is_wp_error( $term ) ) {
 			return '';
 		}
 
@@ -263,17 +256,33 @@ class Remove_Terms_Without_Posts extends Tasks {
 			return [];
 		}
 
-		return [
-			[
-				'task_id'     => $task_id,
-				'provider_id' => $this->get_provider_id(),
-				'category'    => $this->get_provider_category(),
-				'term_id'     => $data['term_id'],
-				'taxonomy'    => $data['taxonomy'],
-				'term_name'   => $data['name'],
-				'date'        => \gmdate( 'YW' ),
-			],
+		$task_data = [
+			'task_id'     => $task_id,
+			'provider_id' => $this->get_provider_id(),
+			'category'    => $this->get_provider_category(),
+			'term_id'     => $data['term_id'],
+			'taxonomy'    => $data['taxonomy'],
+			'term_name'   => $data['name'],
+			'date'        => \gmdate( 'YW' ),
+			'post_title'  => $this->get_title( $data ),
+			'description' => $this->get_description( $data ),
+			'url'         => $this->get_url( $data ),
+			'url_target'  => '_blank',
+			'dismissable' => $this->is_dismissable(),
+			'points'      => $this->get_points(),
 		];
+
+		$task_data = $this->modify_injection_task_data( $task_data );
+
+		// Add the tasks to the pending tasks option, it will not add duplicates.
+		$task_post = \progress_planner()->get_suggested_tasks()->get_post( $task_data['task_id'] );
+
+		// Skip the task if it was already injected.
+		if ( $task_post ) {
+			return [];
+		}
+
+		return [ \progress_planner()->get_suggested_tasks()->add( $task_data ) ];
 	}
 
 	/**
@@ -289,18 +298,25 @@ class Remove_Terms_Without_Posts extends Tasks {
 			return [];
 		}
 
+		$task_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'task_id' => $task_id ] );
+
+		// If the task data is empty, return an empty array.
+		if ( empty( $task_data ) ) {
+			return [];
+		}
+
 		$task_details = [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
-			'title'       => $this->get_title( $task_id ),
+			'post_title'  => $this->get_title( $task_data[0] ),
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
 			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
-			'url'         => $this->get_url( $task_id ),
+			'url'         => $this->get_url( $task_data[0] ),
 			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description( $task_id ),
+			'description' => $this->get_description( $task_data[0] ),
 		];
 
 		return $task_details;
@@ -314,7 +330,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * @return \WP_Term|null
 	 */
 	public function get_term_from_task_id( $task_id ) {
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		if ( empty( $tasks ) ) {
 			return null;
@@ -347,11 +363,11 @@ class Remove_Terms_Without_Posts extends Tasks {
 		}
 
 		$this->completed_term_ids = [];
-		$tasks                    = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', $this->get_provider_id() );
+		$tasks                    = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! empty( $tasks ) ) {
 			foreach ( $tasks as $task ) {
-				if ( isset( $task['status'] ) && 'completed' === $task['status'] ) {
+				if ( 'trash' === $task['post_status'] ) {
 					$this->completed_term_ids[] = $task['term_id'];
 				}
 			}

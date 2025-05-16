@@ -42,7 +42,7 @@ class Disable_Comments extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Disable comments', 'progress-planner' );
 	}
 
@@ -51,7 +51,7 @@ class Disable_Comments extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return sprintf(
 			\esc_html(
 					// translators: %d is the number of approved comments, %s is the <a href="https://prpl.fyi/disable-comments" target="_blank">disabling them</a> link.

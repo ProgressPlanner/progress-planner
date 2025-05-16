@@ -1,20 +1,28 @@
 <?php
 /**
- * Handle suggested tasks.
+ * Recommendations class.
  *
  * @package Progress_Planner
  */
 
 namespace Progress_Planner;
 
-use Progress_Planner\Suggested_Tasks\Tasks_Manager;
 use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
-use Progress_Planner\Suggested_Tasks\Providers\Core_Update;
-use Progress_Planner\Suggested_Tasks\Task_Factory;
+use Progress_Planner\Suggested_Tasks\Tasks_Manager;
+
 /**
- * Suggested_Tasks class.
+ * Recommendations class.
+ *
+ * @package Progress_Planner
  */
 class Suggested_Tasks {
+
+	const STATUS_MAP = [
+		'completed'           => 'trash',
+		'pending_celebration' => 'pending_celebration',
+		'pending'             => 'publish',
+		'snoozed'             => 'future',
+	];
 
 	/**
 	 * An object containing tasks.
@@ -25,20 +33,32 @@ class Suggested_Tasks {
 
 	/**
 	 * Constructor.
-	 *
-	 * @return void
 	 */
 	public function __construct() {
 		$this->tasks_manager = new Tasks_Manager();
 
-		\add_action( 'wp_ajax_progress_planner_suggested_task_action', [ $this, 'suggested_task_action' ] );
-
 		if ( \is_admin() ) {
 			\add_action( 'init', [ $this, 'init' ], 100 ); // Wait for the post types to be initialized.
 		}
+		\add_action( 'wp_ajax_progress_planner_suggested_task_action', [ $this, 'suggested_task_action' ] );
 
 		// Add the automatic updates complete action.
 		\add_action( 'automatic_updates_complete', [ $this, 'on_automatic_updates_complete' ] );
+
+		// Register the custom post type.
+		\add_action( 'init', [ $this, 'register_post_type' ], 0 );
+
+		// Register the custom taxonomies.
+		\add_action( 'init', [ $this, 'register_taxonomy' ], 0 );
+
+		// Filter the REST API tax query.
+		\add_filter( 'rest_prpl_recommendations_query', [ $this, 'rest_api_tax_query' ], 10, 2 );
+
+		// Filter the REST API response.
+		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'rest_prepare_recommendation' ], 10, 2 );
+
+		// Add the custom post status.
+		\add_action( 'init', [ $this, 'register_post_status' ], 1 );
 	}
 
 	/**
@@ -47,9 +67,6 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function init() {
-		// Unsnooze tasks.
-		$this->maybe_unsnooze_tasks();
-
 		// Check for completed tasks.
 		$completed_tasks = $this->tasks_manager->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
 
@@ -58,14 +75,26 @@ class Suggested_Tasks {
 			// Get the task data.
 			$task_data = $task->get_data();
 
+			if ( ! isset( $task_data['task_id'] ) && ! isset( $task_data['ID'] ) ) {
+				continue;
+			}
+
 			// Update the task data.
-			$this->update_pending_task( $task_data['task_id'], $task_data );
+			$task_post = $this->get_post( $task_data['task_id'] ?? $task_data['ID'] );
+			if ( ! $task_post ) {
+				continue;
+			}
+			$this->update_recommendation( $task_post['ID'], $task_data );
 
 			// Change the task status to pending celebration.
-			$this->mark_task_as( 'pending_celebration', $task_data['task_id'] );
+			$task_post = \progress_planner()->get_suggested_tasks()->get_post( $task_data['task_id'] );
+			if ( ! $task_post ) {
+				continue;
+			}
+			\progress_planner()->get_suggested_tasks()->update_recommendation( $task_post['ID'], [ 'post_status' => 'pending_celebration' ] );
 
 			// Insert an activity.
-			$this->insert_activity( $task_data['task_id'] );
+			\progress_planner()->get_suggested_tasks()->insert_activity( $task_data['task_id'] );
 		}
 	}
 
@@ -118,26 +147,23 @@ class Suggested_Tasks {
 	 */
 	public function on_automatic_updates_complete() {
 
-		$pending_tasks = \progress_planner()->get_settings()->get( 'tasks', [] ); // @phpstan-ignore-line method.nonObject
+		$pending_tasks = \progress_planner()->get_suggested_tasks()->get(
+			[
+				'numberposts' => 1,
+				'post_status' => 'publish',
+				'provider_id' => 'update-core',
+				'date_query'  => [ [ 'after' => 'this Monday' ] ],
+			]
+		);
 
 		if ( empty( $pending_tasks ) ) {
 			return;
 		}
 
-		foreach ( $pending_tasks as $task_data ) {
-			$task_id = $task_data['task_id'];
+		\progress_planner()->get_suggested_tasks()->update_recommendation( $pending_tasks[0]['ID'], [ 'post_status' => 'trash' ] );
 
-			if ( $task_data['provider_id'] === ( new Core_Update() )->get_provider_id() &&
-				\gmdate( 'YW' ) === $task_data['date']
-			) {
-				// Change the task status to completed.
-				$this->mark_task_as( 'completed', $task_id );
-
-				// Insert an activity.
-				$this->insert_activity( $task_id );
-				break;
-			}
-		}
+		// Insert an activity.
+		\progress_planner()->get_suggested_tasks()->insert_activity( $pending_tasks[0]['ID'] );
 	}
 
 	/**
@@ -150,269 +176,206 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Return filtered items.
+	 * Get recommendations, filtered by a parameter.
+	 *
+	 * @param array $params The parameters to filter by ([ 'provider' => 'provider_id' ] etc).
 	 *
 	 * @return array
 	 */
-	public function get_tasks() {
-		$tasks = [];
-		/**
-		 * Filter the suggested tasks.
-		 *
-		 * @param array $tasks The suggested tasks.
-		 * @return array
-		 */
-		$tasks    = \apply_filters( 'progress_planner_suggested_tasks_items', $tasks );
-		$db_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-		foreach ( $tasks as $key => $task ) {
-			if ( isset( $task['status'] ) && ! empty( $task['status'] ) ) {
-				continue;
-			}
+	public function get_tasks_by( $params ) {
+		$args = [];
 
-			foreach ( $db_tasks as $db_task_key => $db_task ) {
-				if ( $db_task['task_id'] === $task['task_id'] ) {
-					$tasks[ $key ]['status'] = $db_task['status'];
-					unset( $db_tasks[ $db_task_key ] );
+		foreach ( $params as $param => $value ) {
+			switch ( $param ) {
+				case 'provider':
+				case 'provider_id':
+				case 'category':
+					$args['tax_query']   = isset( $args['tax_query'] ) ? $args['tax_query'] : []; // phpcs:ignore WordPress.DB.SlowDBQuery
+					$args['tax_query'][] = [
+						'taxonomy' => 'category' === $param
+							? 'prpl_recommendations_category'
+							: 'prpl_recommendations_provider',
+						'field'    => 'slug',
+						'terms'    => (array) $value,
+					];
+
+					unset( $params[ $param ] );
 					break;
-				}
+
+				case 'task_id':
+					$args['meta_query']   = isset( $args['meta_query'] ) ? $args['meta_query'] : []; // phpcs:ignore WordPress.DB.SlowDBQuery
+					$args['meta_query'][] = [
+						'key'   => 'prpl_task_id',
+						'value' => $value,
+					];
+
+					unset( $params[ $param ] );
+					break;
+
+				default:
+					$args[ $param ] = $value;
+					break;
 			}
 		}
 
-		return $tasks;
+		return $this->get( $args );
 	}
 
 	/**
-	 * Get pending tasks with details.
+	 * Get recommendations.
+	 *
+	 * @param array $args The arguments.
 	 *
 	 * @return array
 	 */
-	public function get_pending_tasks_with_details() {
-		$tasks              = $this->get_tasks();
-		$tasks_with_details = [];
-
-		foreach ( $tasks as $task ) {
-			$task_details = Task_Factory::create_task_from( 'id', $task['task_id'] )->get_task_details();
-
-			if ( $task_details ) {
-				$tasks_with_details[] = $task_details;
-			}
-		}
-
-		return $tasks_with_details;
-	}
-
-	/**
-	 * Get tasks by.
-	 *
-	 * @param string $param The parameter.
-	 * @param string $value The value.
-	 *
-	 * @return array
-	 */
-	public function get_tasks_by( $param, $value ) {
-		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-		$tasks = array_filter(
-			$tasks,
-			function ( $task ) use ( $param, $value ) {
-				return isset( $task[ $param ] ) && $task[ $param ] === $value;
-			}
+	public function get( $args = [] ) {
+		static $cached = [];
+		$args          = \wp_parse_args(
+			$args,
+			[
+				'post_type'   => 'prpl_recommendations',
+				'post_status' => [ 'any', 'pending_celebration' ], // 'any' wont return posts with (custom) post status 'pending_celebration'.
+				'numberposts' => -1,
+				'orderby'     => 'menu_order',
+				'order'       => 'ASC',
+			]
 		);
 
-		return array_values( $tasks );
+		$cache_key = md5( (string) \wp_json_encode( $args ) );
+		if ( isset( $cached[ $cache_key ] ) ) {
+			return $cached[ $cache_key ];
+		}
+
+		$cached[ $cache_key ] = $this->format_recommendations(
+			\get_posts( $args )
+		);
+
+		return $cached[ $cache_key ];
 	}
 
 	/**
-	 * Delete a task.
+	 * Format recommendations results.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $recommendations The recommendations.
 	 *
-	 * @return bool
+	 * @return array
 	 */
-	public function delete_task( $task_id ) {
-		$tasks    = \progress_planner()->get_settings()->get( 'tasks', [] );
-		$modified = false;
-		foreach ( $tasks as $key => $task ) {
-			if ( $task['task_id'] === $task_id ) {
-				unset( $tasks[ $key ] );
-				$modified = true;
-				break;
-			}
-		}
-
-		return $modified
-			? \progress_planner()->get_settings()->set( 'tasks', $tasks )
-			: false;
-	}
-
-	/**
-	 * Mark a task as a given status.
-	 *
-	 * @param string $status The status.
-	 * @param string $task_id The task ID.
-	 * @param array  $data The data.
-	 *
-	 * @return bool
-	 */
-	public function mark_task_as( $status, $task_id, $data = [] ) {
-		$tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
-		$tasks_changed = false;
-		foreach ( $tasks as $key => $task ) {
-			if ( $task['task_id'] !== $task_id ) {
-				continue;
-			}
-
-			if ( 'completed' === $task['status'] && 'pending_celebration' === $status ) {
-				break;
-			}
-
-			$tasks[ $key ]['status'] = $status;
-			$tasks_changed           = true;
-
-			if ( 'snoozed' === $status ) {
-				$tasks[ $key ]['time'] = \time() + $data['time'];
-			}
-
-			break;
-		}
-
-		if ( ! $tasks_changed ) {
-			return false;
-		}
-
-		$result = \progress_planner()->get_settings()->set( 'tasks', $tasks );
-
-		// Fire an action when the task status is changed.
-		if ( true === $result ) {
-			do_action( 'progress_planner_task_status_changed', $task_id, $status );
+	public function format_recommendations( $recommendations ) {
+		$result = [];
+		foreach ( $recommendations as $recommendation ) {
+			$result[] = $this->format_recommendation( $recommendation );
 		}
 
 		return $result;
 	}
 
 	/**
-	 * Remove a task from a given status (sets it as `pending`).
+	 * Delete all recommendations.
 	 *
-	 * @param string $status The status.
-	 * @param string $task_id The task ID.
+	 * @return void
+	 */
+	public function delete_all_recommendations() {
+		// Get all recommendations.
+		$recommendations = $this->get();
+
+		// Delete each recommendation.
+		foreach ( $recommendations as $recommendation ) {
+			$this->delete_recommendation( $recommendation['ID'] );
+		}
+	}
+
+	/**
+	 * Delete a recommendation.
+	 *
+	 * @param int $id The recommendation ID.
 	 *
 	 * @return bool
 	 */
-	public function remove_task_from( $status, $task_id ) {
-		$tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
-		$tasks_changed = false;
-
-		foreach ( $tasks as $key => $task ) {
-			if ( $task['task_id'] !== $task_id ) {
-				continue;
-			}
-
-			if ( ! isset( $task['status'] ) || $task['status'] !== $status ) {
-				return false;
-			}
-
-			$tasks[ $key ]['status'] = 'pending';
-			$tasks_changed           = true;
-		}
-
-		if ( ! $tasks_changed ) {
-			return false;
-		}
-
-		return \progress_planner()->get_settings()->set( 'tasks', $tasks );
+	public function delete_recommendation( int $id ) {
+		return (bool) \wp_delete_post( $id, true );
 	}
 
 	/**
 	 * Transition a task from one status to another.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param int    $task_id The task ID.
 	 * @param string $old_status The old status.
 	 * @param string $new_status The new status.
-	 * @param array  $data The data.
 	 *
 	 * @return bool
 	 */
-	public function transition_task_status( $task_id, $old_status, $new_status, $data = [] ) {
+	public function transition_task_status( $task_id, $old_status, $new_status ) {
 
-		$return_old_status = false;
-		$return_new_status = false;
+		$tasks = $this->get( [ 'ID' => (int) $task_id ] );
 
-		if ( $old_status ) {
-			$return_old_status = $this->remove_task_from( $old_status, $task_id );
+		if ( empty( $tasks ) ) {
+			return false;
 		}
 
-		if ( $new_status ) {
-			$return_new_status = $this->mark_task_as( $new_status, $task_id, $data );
+		$task = $tasks[0];
+
+		$old_post_status = isset( self::STATUS_MAP[ $old_status ] )
+			? self::STATUS_MAP[ $old_status ]
+			: $old_status;
+		$new_post_status = isset( self::STATUS_MAP[ $new_status ] )
+			? self::STATUS_MAP[ $new_status ]
+			: $new_status;
+
+		if ( $old_post_status !== $task['post_status'] || $new_post_status === $task['post_status'] ) {
+			return false;
 		}
 
-		return $return_old_status && $return_new_status;
+		return (bool) \wp_update_post(
+			[
+				'post_status' => $new_post_status,
+				'ID'          => (int) $task_id,
+			]
+		);
 	}
 
 	/**
-	 * Mark a task as snoozed.
+	 * Snooze a recommendation.
 	 *
-	 * @param string $task_id The task ID.
-	 * @param string $duration The duration.
+	 * @param int    $id       The recommendation ID.
+	 * @param string $duration The duration to snooze the recommendation.
 	 *
 	 * @return bool
 	 */
-	public function snooze_task( $task_id, $duration ) {
-
+	public function snooze( int $id, string $duration ) {
 		switch ( $duration ) {
 			case '1-month':
-				$time = \MONTH_IN_SECONDS;
+				$new_date = \strtotime( '+1 month' );
 				break;
 
 			case '3-months':
-				$time = 3 * \MONTH_IN_SECONDS;
+				$new_date = \strtotime( '+3 months' );
 				break;
 
 			case '6-months':
-				$time = 6 * \MONTH_IN_SECONDS;
+				$new_date = \strtotime( '+6 months' );
 				break;
 
 			case '1-year':
-				$time = \YEAR_IN_SECONDS;
+				$new_date = \strtotime( '+1 year' );
 				break;
 
 			case 'forever':
-				$time = \PHP_INT_MAX;
+				$new_date = \strtotime( '+10 years' );
 				break;
 
 			default:
-				$time = \WEEK_IN_SECONDS;
+				$new_date = \strtotime( '+1 week' );
 				break;
 		}
 
-		return $this->mark_task_as( 'snoozed', $task_id, [ 'time' => $time ] );
-	}
-
-	/**
-	 * Maybe unsnooze tasks.
-	 *
-	 * @return void
-	 */
-	private function maybe_unsnooze_tasks() {
-		$tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
-		$tasks_changed = false;
-		foreach ( $tasks as $key => $task ) {
-			if ( $task['status'] !== 'snoozed' ) {
-				continue;
-			}
-
-			if ( isset( $task['time'] ) && $task['time'] < \time() ) {
-				if ( isset( $task['provider_id'] ) && 'user' === $task['provider_id'] ) {
-					$tasks[ $key ]['status'] = 'pending';
-					unset( $tasks[ $key ]['time'] );
-				} else {
-					unset( $tasks[ $key ] );
-				}
-				$tasks_changed = true;
-			}
-		}
-
-		if ( $tasks_changed ) {
-			\progress_planner()->get_settings()->set( 'tasks', $tasks );
-		}
+		return (bool) \wp_update_post(
+			[
+				'ID'            => $id,
+				'post_status'   => 'future',
+				'post_date'     => \gmdate( 'Y-m-d H:i:s', $new_date ),
+				'post_date_gmt' => \gmdate( 'Y-m-d H:i:s', $new_date ), // Note: necessary in order to update 'post_status' to 'future'.
+			]
+		);
 	}
 
 	/**
@@ -431,44 +394,13 @@ class Suggested_Tasks {
 		$parsed_condition = \wp_parse_args(
 			$condition,
 			[
-				'status'       => '',
+				'post_status'  => 'any',
 				'task_id'      => '',
 				'post_lengths' => [],
 			]
 		);
 
-		if ( 'snoozed-post-length' === $parsed_condition['status'] ) {
-			if ( isset( $parsed_condition['post_lengths'] ) ) {
-				if ( ! \is_array( $parsed_condition['post_lengths'] ) ) {
-					$parsed_condition['post_lengths'] = [ $parsed_condition['post_lengths'] ];
-				}
-
-				$snoozed_tasks        = $this->get_tasks_by( 'status', 'snoozed' );
-				$snoozed_post_lengths = [];
-
-				// Get the post lengths of the snoozed tasks.
-				foreach ( $snoozed_tasks as $task ) {
-					$data = $this->tasks_manager->get_data_from_task_id( $task['task_id'] ); // @phpstan-ignore-line method.nonObject
-					if ( isset( $data['category'] ) && 'create-post' === $data['category'] ) {
-						$key = true === $data['long'] ? 'long' : 'short';
-						if ( ! isset( $snoozed_post_lengths[ $key ] ) ) {
-							$snoozed_post_lengths[ $key ] = true;
-						}
-					}
-				}
-
-				// Check if the snoozed post lengths match the condition.
-				foreach ( $parsed_condition['post_lengths'] as $post_length ) {
-					if ( ! isset( $snoozed_post_lengths[ $post_length ] ) ) {
-						return false;
-					}
-				}
-
-				return true;
-			}
-		}
-
-		foreach ( $this->get_tasks_by( 'status', $parsed_condition['status'] ) as $task ) {
+		foreach ( \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => $parsed_condition['post_status'] ] ) as $task ) {
 			if ( $task['task_id'] === $parsed_condition['task_id'] ) {
 				return true;
 			}
@@ -480,54 +412,67 @@ class Suggested_Tasks {
 	/**
 	 * Check if a task was completed. Task is considered completed if it was completed or pending celebration.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param string|int $task_id The task ID.
 	 *
 	 * @return bool
 	 */
 	public function was_task_completed( $task_id ) {
-		foreach ( \progress_planner()->get_settings()->get( 'tasks', [] ) as $task ) {
-			if ( ! isset( $task['task_id'] ) || $task['task_id'] !== $task_id ) {
-				continue;
-			}
-
-			return isset( $task['status'] ) && in_array( $task['status'], [ 'completed', 'pending_celebration' ], true );
-		}
-
-		return false;
+		$task = $this->get_post( $task_id );
+		return $task && in_array( $task['post_status'], [ 'trash', 'pending_celebration' ], true );
 	}
 
 	/**
-	 * Update a task.
+	 * Update a recommendation.
 	 *
-	 * @param string $task_id The task ID.
-	 * @param array  $data The data.
+	 * @param int   $id The recommendation ID.
+	 * @param array $data The data to update.
 	 *
 	 * @return bool
 	 */
-	public function update_pending_task( $task_id, $data ) {
-		$tasks         = \progress_planner()->get_settings()->get( 'tasks', [] );
-		$tasks_changed = false;
-		foreach ( $tasks as $key => $task ) {
-			if ( 'pending' !== $task['status'] || $task['task_id'] !== $task_id ) {
-				continue;
-			}
-
-			// Don't update the task_id.
-			if ( isset( $data['task_id'] ) ) {
-				unset( $data['task_id'] );
-			}
-
-			// Update the task data except the 'task_id' key.
-			$tasks[ $key ] = array_merge( $tasks[ $key ], $data );
-			$tasks_changed = true;
-
-			break;
-		}
-
-		if ( ! $tasks_changed ) {
+	public function update_recommendation( $id, $data ) {
+		if ( ! $id ) {
 			return false;
 		}
-		return \progress_planner()->get_settings()->set( 'tasks', $tasks );
+
+		$update_data    = [ 'ID' => $id ];
+		$update_meta    = [];
+		$update_terms   = [];
+		$update_results = [];
+		foreach ( $data as $key => $value ) {
+			switch ( $key ) {
+				case 'points':
+				case 'prpl_points':
+					$update_meta[ 'prpl_' . str_replace( 'prpl_', '', (string) $key ) ] = $value;
+					break;
+
+				case 'category':
+				case 'provider':
+					$update_terms[ "prpl_recommendations_$key" ] = $value;
+					break;
+
+				default:
+					$update_data[ $key ] = $value;
+					break;
+			}
+		}
+
+		if ( 1 < count( $update_data ) ) {
+			$update_results[] = (bool) \wp_update_post( $update_data );
+		}
+
+		if ( ! empty( $update_meta ) ) {
+			foreach ( $update_meta as $key => $value ) {
+				$update_results[] = (bool) \update_post_meta( $id, $key, $value );
+			}
+		}
+
+		if ( ! empty( $update_terms ) ) {
+			foreach ( $update_terms as $taxonomy => $term ) {
+				$update_results[] = (bool) \wp_set_object_terms( $id, $term->slug, $taxonomy );
+			}
+		}
+
+		return ! in_array( false, $update_results, true );
 	}
 
 	/**
@@ -547,31 +492,36 @@ class Suggested_Tasks {
 
 		$action  = \sanitize_text_field( \wp_unslash( $_POST['action_type'] ) );
 		$task_id = (string) \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) );
+		$task    = \progress_planner()->get_suggested_tasks()->get_post( $task_id );
+
+		if ( ! $task ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
+		}
 
 		switch ( $action ) {
 			case 'complete':
 				// Mark the task as completed.
-				$this->mark_task_as( 'completed', $task_id );
+				\progress_planner()->get_suggested_tasks()->update_recommendation( $task['ID'], [ 'post_status' => 'trash' ] );
 
 				// Insert an activity.
-				$this->insert_activity( $task_id );
+				\progress_planner()->get_suggested_tasks()->insert_activity( $task['ID'] );
 				$updated = true;
 				break;
 
 			case 'pending':
-				$this->mark_task_as( 'pending', $task_id );
+				\progress_planner()->get_suggested_tasks()->update_recommendation( $task['ID'], [ 'post_status' => 'publish' ] );
 				$updated = true;
-				$this->delete_activity( $task_id );
+				\progress_planner()->get_suggested_tasks()->delete_activity( $task_id );
 				break;
 
 			case 'snooze':
 				$duration = isset( $_POST['duration'] ) ? \sanitize_text_field( \wp_unslash( $_POST['duration'] ) ) : '';
-				$updated  = $this->snooze_task( $task_id, $duration );
+				$updated  = $this->snooze( $task['ID'], $duration );
 				break;
 
 			case 'delete':
-				$updated = $this->delete_task( $task_id );
-				$this->delete_activity( $task_id );
+				$updated = $this->delete_recommendation( $task['ID'] );
+				\progress_planner()->get_suggested_tasks()->delete_activity( $task['ID'] );
 				break;
 
 			default:
@@ -591,5 +541,358 @@ class Suggested_Tasks {
 		}
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Register a custom post type for suggested tasks.
+	 *
+	 * @return void
+	 */
+	public function register_post_type() {
+		register_post_type(
+			'prpl_recommendations',
+			[
+				'label'               => \__( 'Recommendations', 'progress-planner' ),
+				'public'              => true,
+				'show_ui'             => true,
+				'show_in_menu'        => true,
+				'show_in_nav_menus'   => true,
+				'show_in_admin_bar'   => true,
+				'show_in_rest'        => true,
+				'supports'            => [ 'title', 'editor', 'author', 'custom-fields', 'page-attributes' ],
+				'rewrite'             => false,
+				'menu_icon'           => 'dashicons-admin-tools',
+				'menu_position'       => 5,
+				'hierarchical'        => true,
+				'exclude_from_search' => true,
+				'publicly_queryable'  => true,
+			]
+		);
+
+		$rest_meta_fields = [
+			'prpl_points'      => [
+				'type'         => 'number',
+				'single'       => true,
+				'show_in_rest' => true,
+			],
+			'prpl_task_id'     => [
+				'type'         => 'string',
+				'single'       => true,
+				'show_in_rest' => true,
+			],
+			'prpl_url'         => [
+				'type'         => 'string',
+				'single'       => true,
+				'show_in_rest' => true,
+			],
+			'prpl_url_target'  => [
+				'type'         => 'string',
+				'single'       => true,
+				'show_in_rest' => true,
+			],
+			'prpl_dismissable' => [
+				'type'         => 'boolean',
+				'single'       => true,
+				'show_in_rest' => true,
+			],
+		];
+
+		foreach ( $rest_meta_fields as $key => $field ) {
+			register_post_meta(
+				'prpl_recommendations',
+				$key,
+				$field
+			);
+		}
+	}
+
+	/**
+	 * Register a custom taxonomies for suggested tasks.
+	 *
+	 * @return void
+	 */
+	public function register_taxonomy() {
+		foreach ( [
+			'prpl_recommendations_category' => \__( 'Categories', 'progress-planner' ),
+			'prpl_recommendations_provider' => \__( 'Providers', 'progress-planner' ),
+		] as $taxonomy => $label ) {
+			\register_taxonomy(
+				$taxonomy,
+				[ 'prpl_recommendations' ],
+				[
+					'public'            => defined( 'PRPL_DEBUG' ) && PRPL_DEBUG,
+					'hierarchical'      => false,
+					'labels'            => [
+						'name' => $label,
+					],
+					'show_ui'           => defined( 'PRPL_DEBUG' ) && PRPL_DEBUG,
+					'show_admin_column' => false,
+					'query_var'         => true,
+					'rewrite'           => [ 'slug' => $taxonomy ],
+					'show_in_rest'      => true,
+					'show_in_menu'      => defined( 'PRPL_DEBUG' ) && PRPL_DEBUG,
+				]
+			);
+		}
+	}
+
+	/**
+	 * Filter the REST API tax query.
+	 *
+	 * @param array            $args The arguments.
+	 * @param \WP_REST_Request $request The request.
+	 *
+	 * @return array
+	 */
+	public function rest_api_tax_query( $args, $request ) {
+		$tax_query = [];
+
+		// Include terms (matches any term in list).
+		if ( isset( $request['provider'] ) ) {
+			$tax_query[] = [
+				'taxonomy' => 'prpl_recommendations_provider',
+				'field'    => 'slug',
+				'terms'    => explode( ',', $request['provider'] ),
+				'operator' => 'IN',
+			];
+		}
+
+		// Exclude terms.
+		if ( isset( $request['exclude_provider'] ) ) {
+			$tax_query[] = [
+				'taxonomy' => 'prpl_recommendations_provider',
+				'field'    => 'slug',
+				'terms'    => explode( ',', $request['exclude_provider'] ),
+				'operator' => 'NOT IN',
+			];
+		}
+
+		if ( ! empty( $tax_query ) ) {
+			$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		}
+
+		return $args;
+	}
+
+	/**
+	 * Filter the REST API response.
+	 *
+	 * @param \WP_REST_Response $response The response.
+	 * @param \WP_Post          $post The post.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function rest_prepare_recommendation( $response, $post ) {
+
+		$provider_term = wp_get_object_terms( $post->ID, 'prpl_recommendations_provider' );
+		if ( $provider_term && ! is_wp_error( $provider_term ) ) {
+			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
+
+			if ( $provider ) {
+				// Link should be added during run time, since it is not added for users without required capability.
+				$response->data['meta']['prpl_url'] = $provider->capability_required()
+				? \esc_url( (string) \get_edit_post_link( $post->ID ) )
+				: '';
+			}
+		}
+
+		return $response;
+	}
+
+	/**
+	 * Register a custom post status.
+	 *
+	 * @return void
+	 */
+	public function register_post_status() {
+		register_post_status(
+			'pending_celebration',
+			[
+				'label'               => _x( 'Pending Celebration', 'post', 'progress-planner' ),
+				'public'              => false,
+				'exclude_from_search' => true,
+				'show_in_admin_bar'   => false,
+				'show_in_menu'        => false,
+				'show_in_nav_menus'   => false,
+				'show_in_rest'        => true,
+				'show_in_quick_edit'  => false,
+				'show_in_table'       => false,
+			]
+		);
+	}
+
+	/**
+	 * Add a recommendation.
+	 *
+	 * @param array $data The data to add.
+	 *
+	 * @return int
+	 */
+	public function add( $data ) {
+		if ( empty( $data['post_title'] ) ) {
+			error_log( 'Task not added - missing title: ' . wp_json_encode( $data ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			return 0;
+		}
+
+		// Check if we have an existing task with the same title.
+		$posts = $this->get_tasks_by(
+			[
+				'post_status' => [ 'any', 'pending_celebration' ], // 'any' wont return posts with (custom) post status 'pending_celebration'.
+				'numberposts' => 1,
+				'meta_query'  => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					[
+						'key'     => 'prpl_task_id',
+						'value'   => $data['task_id'],
+						'compare' => '=',
+					],
+				],
+			]
+		);
+
+		// If we have an existing task, skip.
+		if ( ! empty( $posts ) ) {
+			return $posts[0]['ID'];
+		}
+
+		$data['post_status'] = $data['post_status'] ?? 'publish';
+
+		$args = [
+			'post_type'    => 'prpl_recommendations',
+			'post_title'   => $data['post_title'],
+			'post_content' => $data['description'] ?? '',
+			'menu_order'   => $data['order'] ?? 0,
+		];
+		switch ( $data['post_status'] ) {
+			case 'pending_celebration':
+				$args['post_status'] = 'pending_celebration';
+				break;
+
+			case 'completed':
+				$args['post_status'] = 'trash';
+				break;
+
+			case 'snoozed':
+				$args['post_status'] = 'future';
+				$args['post_date']   = \DateTime::createFromFormat( 'U', $data['time'] )->format( 'Y-m-d H:i:s' );
+				break;
+
+			default:
+				$args['post_status'] = 'publish';
+				break;
+		}
+
+		$post_id = \wp_insert_post( $args );
+
+		// Add terms if they don't exist.
+		foreach ( [ 'category', 'provider_id' ] as $context ) {
+			$taxonomy_name = str_replace( '_id', '', $context );
+			$term          = \get_term_by( 'name', $data[ $context ], "prpl_recommendations_$taxonomy_name" );
+			if ( ! $term ) {
+				\wp_insert_term( $data[ $context ], "prpl_recommendations_$taxonomy_name" );
+			}
+		}
+
+		// Set the task category.
+		\wp_set_post_terms( $post_id, $data['category'], 'prpl_recommendations_category' );
+
+		// Set the task provider.
+		\wp_set_post_terms( $post_id, $data['provider_id'], 'prpl_recommendations_provider' );
+
+		// Set the task parent.
+		if ( ! empty( $data['parent'] ) ) {
+			$parent = \get_post( $data['parent'] );
+			if ( $parent ) {
+				\wp_update_post(
+					[
+						'ID'          => $post_id,
+						'post_parent' => $parent->ID,
+					]
+				);
+			}
+		}
+
+		// Set other meta.
+		$default_keys = [
+			'title',
+			'description',
+			'status',
+			'category',
+			'provider_id',
+			'parent',
+			'order',
+			'post_status',
+		];
+		foreach ( $data as $key => $value ) {
+			if ( in_array( $key, $default_keys, true ) ) {
+				continue;
+			}
+
+			\update_post_meta( $post_id, "prpl_$key", $value );
+		}
+
+		return $post_id;
+	}
+
+	/**
+	 * Format a recommendation.
+	 *
+	 * @param \WP_Post $post The recommendation post.
+	 *
+	 * @return array
+	 */
+	public function format_recommendation( $post ) {
+		static $cached = [];
+		if ( isset( $cached[ $post->ID ] ) ) {
+			return $cached[ $post->ID ];
+		}
+
+		$post_data = (array) $post;
+
+		// Format the post meta.
+		$post_meta = \get_post_meta( $post_data['ID'] );
+		foreach ( $post_meta as $key => $value ) {
+			$post_data[ str_replace( 'prpl_', '', (string) $key ) ] =
+				is_array( $value ) && isset( $value[0] ) && 1 === count( $value )
+					? $value[0]
+					: $value;
+		}
+
+		foreach ( [ 'category', 'provider' ] as $context ) {
+			$terms                 = \wp_get_post_terms( $post_data['ID'], "prpl_recommendations_$context" );
+			$post_data[ $context ] = is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
+		}
+
+		$cached[ $post_data['ID'] ] = $post_data;
+		return $post_data;
+	}
+
+	/**
+	 * Check if a recommendation is completed.
+	 *
+	 * @param int $id The recommendation ID.
+	 *
+	 * @return bool
+	 */
+	public function is_completed( int $id ) {
+		// Get the post status.
+		$post_status = \get_post_status( $id );
+		return 'pending_celebration' === $post_status || 'trash' === $post_status;
+	}
+
+	/**
+	 * Get the post-ID of a recommendation.
+	 *
+	 * @param string|int $id The recommendation ID. Can be a task-ID or a post-ID.
+	 *
+	 * @return array|false The recommendation post or false if not found.
+	 */
+	public function get_post( $id ) {
+		$posts = $this->get_tasks_by(
+			is_numeric( $id )
+				? [ 'p' => $id ]
+				: [ 'task_id' => $id ]
+		);
+
+		return isset( $posts[0] ) ? $posts[0] : false;
 	}
 }

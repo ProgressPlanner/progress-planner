@@ -91,7 +91,7 @@ function todoTests( testContext = test ) {
 				'ul#todo-list > prpl-suggested-task li'
 			);
 			await expect( todoItem ).toHaveCount( 1 );
-			await expect( todoItem.locator( 'h3 > label > span' ) ).toHaveText(
+			await expect( todoItem.locator( 'h3 > span' ) ).toHaveText(
 				CREATE_TASK_TEXT
 			);
 		} );

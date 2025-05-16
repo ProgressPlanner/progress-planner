@@ -92,10 +92,10 @@ class Orphaned_Content_Workout extends Tasks {
 		}
 
 		// Check if there is pending task.
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $this->get_task_id() );
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'task_id' => $this->get_task_id() ] );
 
 		// If there is no pending task, return.
-		if ( empty( $tasks ) || 'pending' !== $tasks[0]['status'] ) {
+		if ( empty( $tasks ) || 'publish' !== $tasks[0]['post_status'] ) {
 			return;
 		}
 
@@ -117,22 +117,22 @@ class Orphaned_Content_Workout extends Tasks {
 	/**
 	 * Get the task title.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_title( $task_id = '' ) {
+	protected function get_title( $task_data = [] ) {
 		return \esc_html__( 'Yoast SEO: do Yoast SEO\'s Orphaned Content Workout', 'progress-planner' );
 	}
 
 	/**
 	 * Get the task description.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_description( $task_id = '' ) {
+	protected function get_description( $task_data = [] ) {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Improve your internal linking structure with Yoast SEO\'s Orphaned Content Workout. %s.', 'progress-planner' ),
@@ -147,7 +147,7 @@ class Orphaned_Content_Workout extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_url( $task_id = '' ) {
+	protected function get_url( $task_id = '' ) {
 		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts#orphaned' ) ) : '';
 	}
 
@@ -188,15 +188,15 @@ class Orphaned_Content_Workout extends Tasks {
 		return [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
-			'title'       => $this->get_title( $task_id ),
+			'post_title'  => $this->get_title(),
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
 			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable,
-			'url'         => $this->get_url( $task_id ),
+			'url'         => $this->get_url(),
 			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description( $task_id ),
+			'description' => $this->get_description(),
 		];
 	}
 }

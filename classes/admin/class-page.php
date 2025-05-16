@@ -111,7 +111,7 @@ class Page {
 	 */
 	protected function get_notification_counter() {
 
-		$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' );
+		$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'pending_celebration' ] );
 		$notification_count        = count( $pending_celebration_tasks );
 
 		if ( 0 === $notification_count ) {
@@ -213,8 +213,7 @@ class Page {
 	 * @return void
 	 */
 	public function maybe_enqueue_focus_el_script( $hook ) {
-		$suggested_tasks  = \progress_planner()->get_suggested_tasks();
-		$tasks_providers  = $suggested_tasks->get_tasks_manager()->get_task_providers();
+		$tasks_providers  = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers();
 		$tasks_details    = [];
 		$total_points     = 0;
 		$completed_points = 0;
@@ -315,6 +314,7 @@ class Page {
 		}
 
 		\remove_all_actions( 'admin_notices' );
+		\remove_all_actions( 'all_admin_notices' );
 	}
 
 	/**

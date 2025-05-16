@@ -36,11 +36,11 @@ interface Tasks_Interface {
 	/**
 	 * Evaluate a task.
 	 *
-	 * @param string $task The task ID.
+	 * @param string $task_id The task ID.
 	 *
 	 * @return bool
 	 */
-	public function evaluate_task( $task );
+	public function evaluate_task( $task_id );
 
 	/**
 	 * Get the task details.

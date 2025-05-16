@@ -45,7 +45,7 @@ class Settings_Saved extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Fill settings page', 'progress-planner' );
 	}
 
@@ -54,7 +54,7 @@ class Settings_Saved extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return \esc_html__( 'Head over to the settings page and fill in the required information.', 'progress-planner' );
 	}
 
