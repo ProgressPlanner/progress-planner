@@ -314,6 +314,7 @@ class Page {
 		}
 
 		\remove_all_actions( 'admin_notices' );
+		\remove_all_actions( 'all_admin_notices' );
 	}
 
 	/**
