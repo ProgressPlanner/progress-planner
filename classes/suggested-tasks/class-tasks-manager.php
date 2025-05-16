@@ -274,24 +274,6 @@ class Tasks_Manager {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return array|false
-	 */
-	public function get_task_details( $task_id ) {
-		$task_object   = Task_Factory::create_task_from_id( $task_id );
-		$task_provider = $this->get_task_provider( $task_object->get_provider_id() );
-
-		if ( ! $task_provider ) {
-			return false;
-		}
-
-		return $task_provider->get_task_details( $task_id );
-	}
-
-	/**
-	 * Wrapper function for getting task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
 	 * @return array
 	 */
 	public function get_data_from_task_id( $task_id ) {
