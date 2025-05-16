@@ -326,24 +326,24 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Evaluate a task.
 	 *
-	 * @param array $task The task data.
+	 * @param string $task_id The task ID.
 	 *
 	 * @return false|\Progress_Planner\Suggested_Tasks\Task The task data or false if the task is not completed.
 	 */
-	public function evaluate_task( $task ) {
+	public function evaluate_task( $task_id ) {
 		// Early bail if the user does not have the capability to manage options.
 		if ( ! $this->capability_required() ) {
 			return false;
 		}
 
 		if ( ! $this->is_repetitive() ) {
-			if ( ! isset( $task['task_id'] ) || 0 !== strpos( $task['task_id'], $this->get_task_id() ) ) {
+			if ( ! $task_id || 0 !== strpos( $task_id, $this->get_task_id() ) ) {
 				return false;
 			}
-			return $this->is_task_completed( $task['task_id'] ) ? Task_Factory::create_task_from_id( $task['task_id'] ) : false;
+			return $this->is_task_completed( $task_id ) ? Task_Factory::create_task_from_id( $task_id ) : false;
 		}
 
-		$task_object = Task_Factory::create_task_from_id( $task['task_id'] );
+		$task_object = Task_Factory::create_task_from_id( $task_id );
 		$task_data   = $task_object->get_data();
 
 		if (
@@ -351,7 +351,7 @@ abstract class Tasks implements Tasks_Interface {
 			$task_data['provider']->slug === $this->get_provider_id() &&
 			\DateTime::createFromFormat( 'Y-m-d H:i:s', $task_data['post_date'] ) &&
 			\gmdate( 'YW' ) === \gmdate( 'YW', \DateTime::createFromFormat( 'Y-m-d H:i:s', $task_data['post_date'] )->getTimestamp() ) && // @phpstan-ignore-line
-			$this->is_task_completed( $task['task_id'] )
+			$this->is_task_completed( $task_id )
 		) {
 			// Allow adding more data, for example in case of 'create-post' tasks we are adding the post_id.
 			$task_data = $this->modify_evaluated_task_data( $task_data );
@@ -478,7 +478,7 @@ abstract class Tasks implements Tasks_Interface {
 		return [
 			'task_id'      => $this->get_task_id(),
 			'provider_id'  => $this->get_provider_id(),
-			'title'        => $this->get_title(),
+			'post_title'   => $this->get_title(),
 			'parent'       => $this->get_parent(),
 			'priority'     => $this->get_priority(),
 			'category'     => $this->get_provider_category(),

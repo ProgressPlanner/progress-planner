@@ -18,7 +18,7 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 				.post( 'progress_planner_suggested_task_action', {
 					nonce: prplSuggestedTasks.nonce,
 					action_type: 'complete',
-					task_id: task.task_id,
+					task_id: task.meta?.prpl_task_id,
 				} )
 				.done( ( response ) => {
 					console.log( response );

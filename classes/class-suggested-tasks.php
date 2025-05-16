@@ -465,7 +465,7 @@ class Suggested_Tasks {
 
 		if ( ! empty( $update_terms ) ) {
 			foreach ( $update_terms as $taxonomy => $term ) {
-				$update_results[] = (bool) \wp_set_post_terms( $id, $term->term_id, $taxonomy );
+				$update_results[] = (bool) \wp_set_object_terms( $id, $term->slug, $taxonomy );
 			}
 		}
 
@@ -508,7 +508,7 @@ class Suggested_Tasks {
 			case 'pending':
 				\progress_planner()->get_suggested_tasks()->update_recommendation( $task['ID'], [ 'post_status' => 'publish' ] );
 				$updated = true;
-				\progress_planner()->get_suggested_tasks()->delete_activity( $task['ID'] );
+				\progress_planner()->get_suggested_tasks()->delete_activity( $task_id );
 				break;
 
 			case 'snooze':
@@ -709,9 +709,15 @@ class Suggested_Tasks {
 		// Check if we have an existing task with the same title.
 		$posts = $this->get_tasks_by(
 			[
-				'post_status' => 'all',
+				'post_status' => [ 'any', 'pending_celebration' ], // 'any' wont return posts with (custom) post status 'pending_celebration'.
 				'numberposts' => 1,
-				'task_id'     => $data['task_id'],
+				'meta_query'  => [
+					[
+						'key'     => 'prpl_task_id',
+						'value'   => $data['task_id'],
+						'compare' => '=',
+					],
+				],
 			]
 		);
 
@@ -855,7 +861,7 @@ class Suggested_Tasks {
 	public function get_post( $id ) {
 		$posts = $this->get_tasks_by(
 			is_numeric( $id )
-				? [ 'ID' => $id ]
+				? [ 'p' => $id ]
 				: [ 'task_id' => $id ]
 		);
 

@@ -266,7 +266,7 @@ class Tasks_Manager {
 			\progress_planner()->get_suggested_tasks()->delete_recommendation( $task['ID'] );
 		}
 
-		return $task_provider->evaluate_task( $task );
+		return $task_provider->evaluate_task( $task['task_id'] );
 	}
 
 	/**
