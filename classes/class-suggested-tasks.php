@@ -709,9 +709,15 @@ class Suggested_Tasks {
 		// Check if we have an existing task with the same title.
 		$posts = $this->get_tasks_by(
 			[
-				'post_status' => 'all',
+				'post_status' => [ 'any', 'pending_celebration' ], // 'any' wont return posts with (custom) post status 'pending_celebration'.
 				'numberposts' => 1,
-				'task_id'     => $data['task_id'],
+				'meta_query'  => [
+					[
+						'key'     => 'prpl_task_id',
+						'value'   => $data['task_id'],
+						'compare' => '=',
+					],
+				],
 			]
 		);
 
