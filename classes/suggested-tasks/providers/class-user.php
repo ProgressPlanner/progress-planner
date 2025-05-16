@@ -55,7 +55,7 @@ class User extends Tasks {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-		return \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'provider_id' => self::PROVIDER_ID ] );
+		return [];
 	}
 
 	/**
