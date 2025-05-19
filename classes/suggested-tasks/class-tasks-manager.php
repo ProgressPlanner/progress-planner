@@ -223,6 +223,10 @@ class Tasks_Manager {
 		$completed_tasks = [];
 
 		foreach ( $tasks as $task_data ) {
+			// Skip user tasks.
+			if ( has_term( 'user', 'prpl_recommendations_provider', $task_data['ID'] ) ) {
+				continue;
+			}
 			$task_result = $this->evaluate_task( $task_data );
 			if ( false !== $task_result ) {
 				$completed_tasks[] = $task_result;

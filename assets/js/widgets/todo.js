@@ -133,11 +133,11 @@ prplDocumentReady( () => {
 					// Set the `prpl_recommendations_category` term.
 					prpl_recommendations_category:
 						window.progressPlannerSuggestedTasksTerms
-							.prpl_recommendations_category.id,
+							.prpl_recommendations_category.user.id,
 					// Set the `prpl_recommendations_provider` term.
 					prpl_recommendations_provider:
 						window.progressPlannerSuggestedTasksTerms
-							.prpl_recommendations_provider.id,
+							.prpl_recommendations_provider.user.id,
 				} );
 				post.save().then( ( response ) => {
 					if ( ! response.id ) {

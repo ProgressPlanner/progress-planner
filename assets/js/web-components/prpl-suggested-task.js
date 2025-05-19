@@ -20,7 +20,8 @@ wp.api.loadPromise.done( () => {
 		const typeName = type.replace( 'prpl_', 'Prpl_' );
 		window.progressPlannerSuggestedTasksTerms[ type ] = {};
 		const TermsCollection = new wp.api.collections[ typeName ]();
-		TermsCollection.fetch().done( ( data ) => {
+		TermsCollection.fetch( { data: { per_page: 100 } } ).done( ( data ) => {
+			// 100 is the maximum number of terms that can be fetched in one request.
 			data.forEach( ( term ) => {
 				window.progressPlannerSuggestedTasksTerms[ type ][ term.slug ] =
 					term;
