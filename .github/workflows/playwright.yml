@@ -135,6 +135,16 @@ jobs:
           WP_CONTAINER=$(docker ps -qf "name=wordpress")
           docker exec $WP_CONTAINER wp plugin activate wordpress-seo-premium --allow-root
 
+      - name: Update Yoast Premium settings
+        run: |
+          WP_CONTAINER=$(docker ps -qf "name=wordpress")
+          # Get current option value
+          CURRENT_OPTION=$(docker exec $WP_CONTAINER wp option get wpseo_premium --format=json --allow-root)
+          # Update the option with should_redirect_after_install set to false
+          UPDATED_OPTION=$(echo $CURRENT_OPTION | jq '.should_redirect_after_install = false')
+          # Save the updated option
+          docker exec $WP_CONTAINER wp option update wpseo_premium "$UPDATED_OPTION" --format=json --allow-root
+
       - name: Run Yoast Focus Element Test Again
         run: npx playwright test tests/e2e/yoast-focus-element.spec.js
       # End Yoast SEO Premium tests
