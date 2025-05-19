@@ -138,6 +138,7 @@ prplDocumentReady( () => {
 					prpl_recommendations_provider:
 						window.progressPlannerSuggestedTasksTerms
 							.prpl_recommendations_provider.user.id,
+					menu_order: prplGetHighestTodoItemOrder() + 1,
 				} );
 				post.save().then( ( response ) => {
 					if ( ! response.id ) {
@@ -201,7 +202,12 @@ document.addEventListener( 'prpl/suggestedTask/move', () => {
 		window.progressPlannerTodo.tasks.find(
 			( item ) => item.id === itemID
 		).menu_order = menuOrder;
-		menuOrder++;
+
+		document
+			.querySelector(
+				`#todo-list .prpl-suggested-task[data-post-id="${ itemID }"]`
+			)
+			.setAttribute( 'data-task-order', menuOrder );
 
 		wp.api.loadPromise.done( () => {
 			// Update an existing post.
@@ -211,6 +217,7 @@ document.addEventListener( 'prpl/suggestedTask/move', () => {
 			} );
 			post.save();
 		} );
+		menuOrder++;
 	} );
 } );
 

@@ -595,6 +595,12 @@ class Suggested_Tasks {
 				'single'       => true,
 				'show_in_rest' => true,
 			],
+			'menu_order'       => [
+				'type'         => 'number',
+				'single'       => true,
+				'show_in_rest' => true,
+				'default'      => 0,
+			],
 		];
 
 		foreach ( $rest_meta_fields as $key => $field ) {
@@ -669,6 +675,16 @@ class Suggested_Tasks {
 
 		if ( ! empty( $tax_query ) ) {
 			$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		}
+
+		// Handle sorting parameters.
+		if ( isset( $request['filter']['orderby'] ) ) {
+			$args['orderby'] = sanitize_sql_orderby( $request['filter']['orderby'] );
+		}
+		if ( isset( $request['filter']['order'] ) ) {
+			$args['order'] = in_array( strtoupper( $request['filter']['order'] ), [ 'ASC', 'DESC' ], true )
+				? strtoupper( $request['filter']['order'] )
+				: 'ASC';
 		}
 
 		return $args;
