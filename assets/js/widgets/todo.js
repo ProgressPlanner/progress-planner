@@ -201,7 +201,12 @@ document.addEventListener( 'prpl/suggestedTask/move', () => {
 		window.progressPlannerTodo.tasks.find(
 			( item ) => item.id === itemID
 		).menu_order = menuOrder;
-		menuOrder++;
+
+		document
+			.querySelector(
+				`#todo-list .prpl-suggested-task[data-post-id="${ itemID }"]`
+			)
+			.setAttribute( 'data-task-order', menuOrder );
 
 		wp.api.loadPromise.done( () => {
 			// Update an existing post.
@@ -211,6 +216,7 @@ document.addEventListener( 'prpl/suggestedTask/move', () => {
 			} );
 			post.save();
 		} );
+		menuOrder++;
 	} );
 } );
 
