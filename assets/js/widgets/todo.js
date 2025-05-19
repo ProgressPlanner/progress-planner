@@ -138,6 +138,7 @@ prplDocumentReady( () => {
 					prpl_recommendations_provider:
 						window.progressPlannerSuggestedTasksTerms
 							.prpl_recommendations_provider.user.id,
+					menu_order: prplGetHighestTodoItemOrder() + 1,
 				} );
 				post.save().then( ( response ) => {
 					if ( ! response.id ) {
