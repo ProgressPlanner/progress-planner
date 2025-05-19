@@ -867,19 +867,6 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Check if a recommendation is completed.
-	 *
-	 * @param int $id The recommendation ID.
-	 *
-	 * @return bool
-	 */
-	public function is_completed( int $id ) {
-		// Get the post status.
-		$post_status = \get_post_status( $id );
-		return 'pending_celebration' === $post_status || 'trash' === $post_status;
-	}
-
-	/**
 	 * Get the post-ID of a recommendation.
 	 *
 	 * @param string|int $id The recommendation ID. Can be a task-ID or a post-ID.
