@@ -262,19 +262,6 @@ class Tasks_Manager {
 	}
 
 	/**
-	 * Wrapper function for getting task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_data_from_task_id( $task_id ) {
-		$task_object = Task_Factory::create_task_from_id( $task_id );
-
-		return $task_object->get_data();
-	}
-
-	/**
 	 * Remove all tasks which have date set to the previous week.
 	 * Tasks for the current week will be added automatically.
 	 *
