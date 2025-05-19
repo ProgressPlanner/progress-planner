@@ -23,20 +23,32 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 		// Tasks that should not be removed.
 		$tasks_to_keep = [
 			[
-				'task_id' => 'review-post-14-' . \gmdate( 'YW' ),
-				'date'    => \gmdate( 'YW' ),
+				'post_title'  => 'review-post-14-' . \gmdate( 'YW' ),
+				'task_id'     => 'review-post-14-' . \gmdate( 'YW' ),
+				'date'        => \gmdate( 'YW' ),
+				'category'    => 'content-update',
+				'provider_id' => 'review-post',
 			],
 			[
-				'task_id' => 'create-post-' . \gmdate( 'YW' ),
-				'date'    => \gmdate( 'YW' ),
+				'post_title'  => 'create-post-' . \gmdate( 'YW' ),
+				'task_id'     => 'create-post-' . \gmdate( 'YW' ),
+				'date'        => \gmdate( 'YW' ),
+				'category'    => 'content-new',
+				'provider_id' => 'create-post',
 			],
 			[
-				'task_id' => 'update-core-' . \gmdate( 'YW' ),
-				'date'    => \gmdate( 'YW' ),
+				'post_title'  => 'update-core-' . \gmdate( 'YW' ),
+				'task_id'     => 'update-core-' . \gmdate( 'YW' ),
+				'date'        => \gmdate( 'YW' ),
+				'category'    => 'maintenance',
+				'provider_id' => 'update-core',
 			],
 			[
-				'task_id' => 'settings-saved-' . \gmdate( 'YW' ),
-				'date'    => \gmdate( 'YW' ),
+				'post_title'  => 'settings-saved-' . \gmdate( 'YW' ),
+				'task_id'     => 'settings-saved-' . \gmdate( 'YW' ),
+				'date'        => \gmdate( 'YW' ),
+				'provider_id' => 'settings-saved',
+				'category'    => 'configuration',
 			],
 		];
 
@@ -47,12 +59,18 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 		// Tasks that should be removed.
 		$tasks_to_remove = [
 			[
-				'task_id' => 'update-core-202451',
-				'date'    => '202451',
+				'post_title'  => 'update-core-202451',
+				'task_id'     => 'update-core-202451',
+				'date'        => '202451',
+				'category'    => 'maintenance',
+				'provider_id' => 'update-core',
 			],
 			[
-				'task_id' => 'settings-saved-202451',
-				'date'    => '202451',
+				'post_title'  => 'settings-saved-202451',
+				'task_id'     => 'settings-saved-202451',
+				'date'        => '202451',
+				'provider_id' => 'settings-saved',
+				'category'    => 'configuration',
 			],
 		];
 
@@ -62,6 +80,6 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 
 		\progress_planner()->get_suggested_tasks()->get_tasks_manager()->cleanup_pending_tasks();
 
-		$this->assertEquals( count( $tasks_to_keep ), \count( \progress_planner()->get_settings()->get( 'tasks', [] ) ) );
+		$this->assertEquals( count( $tasks_to_keep ), \count( \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] ) ) );
 	}
 }

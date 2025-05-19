@@ -278,11 +278,9 @@ class Tasks_Manager {
 		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] );
 
 		foreach ( $tasks as $task ) {
-			if ( ! isset( $task['date'] ) || \gmdate( 'YW' ) !== (string) $task['date'] ) {
-				continue;
+			if ( ! isset( $task['date'] ) || \gmdate( 'YW' ) !== (string) $task['date'] ) { // TODO: Finalize cleanup once refactor is done.
+				\progress_planner()->get_suggested_tasks()->delete_recommendation( $task['ID'] );
 			}
-
-			\progress_planner()->get_suggested_tasks()->delete_recommendation( $task['ID'] );
 		}
 
 		\progress_planner()->get_utils__cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );

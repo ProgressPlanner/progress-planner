@@ -242,7 +242,7 @@ class Suggested_Tasks {
 		);
 
 		$cache_key = md5( (string) \wp_json_encode( $args ) );
-		if ( isset( $cached[ $cache_key ] ) ) {
+		if ( isset( $cached[ $cache_key ] ) ) { // TODO: This cache breaks tests.
 			return $cached[ $cache_key ];
 		}
 
