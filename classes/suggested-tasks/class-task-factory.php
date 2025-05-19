@@ -22,11 +22,11 @@ class Task_Factory {
 	 * @return \Progress_Planner\Suggested_Tasks\Task
 	 */
 	public static function create_task_from_id( $value = null ): Task {
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ is_numeric( $value ) ? 'ID' : 'task_id' => $value ] );
+		$task = \progress_planner()->get_suggested_tasks()->get_post( $value );
 
 		// If we have the task data, return it.
-		if ( isset( $tasks[0] ) ) {
-			return new Task( $tasks[0] );
+		if ( $task ) {
+			return new Task( $task );
 		}
 
 		return new Task( [] );

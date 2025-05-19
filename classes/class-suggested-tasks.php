@@ -242,7 +242,7 @@ class Suggested_Tasks {
 		);
 
 		$cache_key = md5( (string) \wp_json_encode( $args ) );
-		if ( isset( $cached[ $cache_key ] ) ) {
+		if ( isset( $cached[ $cache_key ] ) ) { // TODO: This cache breaks tests.
 			return $cached[ $cache_key ];
 		}
 
@@ -690,8 +690,8 @@ class Suggested_Tasks {
 
 			if ( $provider ) {
 				// Link should be added during run time, since it is not added for users without required capability.
-				$response->data['meta']['prpl_url'] = $provider->capability_required()
-				? \esc_url( (string) \get_edit_post_link( $post->ID ) )
+				$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
+				? \esc_url( (string) $response->data['meta']['prpl_url'] )
 				: '';
 			}
 		}
@@ -864,19 +864,6 @@ class Suggested_Tasks {
 
 		$cached[ $post_data['ID'] ] = $post_data;
 		return $post_data;
-	}
-
-	/**
-	 * Check if a recommendation is completed.
-	 *
-	 * @param int $id The recommendation ID.
-	 *
-	 * @return bool
-	 */
-	public function is_completed( int $id ) {
-		// Get the post status.
-		$post_status = \get_post_status( $id );
-		return 'pending_celebration' === $post_status || 'trash' === $post_status;
 	}
 
 	/**

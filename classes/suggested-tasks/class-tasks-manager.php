@@ -262,19 +262,6 @@ class Tasks_Manager {
 	}
 
 	/**
-	 * Wrapper function for getting task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_data_from_task_id( $task_id ) {
-		$task_object = Task_Factory::create_task_from_id( $task_id );
-
-		return $task_object->get_data();
-	}
-
-	/**
 	 * Remove all tasks which have date set to the previous week.
 	 * Tasks for the current week will be added automatically.
 	 *
@@ -291,11 +278,9 @@ class Tasks_Manager {
 		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] );
 
 		foreach ( $tasks as $task ) {
-			if ( ! isset( $task['date'] ) || \gmdate( 'YW' ) !== (string) $task['date'] ) {
-				continue;
+			if ( ! isset( $task['date'] ) || \gmdate( 'YW' ) !== (string) $task['date'] ) { // TODO: Finalize cleanup once refactor is done.
+				\progress_planner()->get_suggested_tasks()->delete_recommendation( $task['ID'] );
 			}
-
-			\progress_planner()->get_suggested_tasks()->delete_recommendation( $task['ID'] );
 		}
 
 		\progress_planner()->get_utils__cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );
