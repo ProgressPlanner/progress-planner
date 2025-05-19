@@ -60,7 +60,7 @@ class Plugin_Upgrade_Tasks {
 	 * @return void
 	 */
 	public function maybe_add_onboarding_tasks() {
-		$onboard_task_provider_ids = apply_filters( 'prpl_onboarding_task_providers', [] );
+		$onboard_task_provider_ids = \apply_filters( 'prpl_onboarding_task_providers', [] );
 
 		// Privacy policy is not accepted, so it's a fresh install.
 		$fresh_install = ! \progress_planner()->is_privacy_policy_accepted();
@@ -112,7 +112,7 @@ class Plugin_Upgrade_Tasks {
 			$task_providers = [];
 
 			foreach ( $task_provider_ids as $task_provider_id ) {
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
+				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
 				if ( $task_provider ) { // @phpstan-ignore-line
 					$task_providers[] = $task_provider;
 				}
