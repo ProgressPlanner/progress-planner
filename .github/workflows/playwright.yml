@@ -108,7 +108,7 @@ jobs:
       - name: Run Playwright Tests
         run: npx playwright test tests/e2e/
 
-      # Begin Yoast SEO Premium tests.
+      # Begin Yoast SEO Premium tests
       - name: Install PHP & Composer on host
         run: |
           sudo apt-get update
@@ -125,18 +125,19 @@ jobs:
 
       - name: Require Yoast SEO Premium & copy files
         run: |
+          WP_CONTAINER=$(docker ps -qf "name=wordpress")
           composer require yoast/wordpress-seo-premium
           composer dump-autoload --working-dir=./wp-content/plugins/wordpress-seo-premium
           docker cp ./wp-content/plugins/wordpress-seo-premium $WP_CONTAINER:/var/www/html/wp-content/plugins/wordpress-seo-premium
 
-      # Activate Yoast SEO Premium
       - name: Activate Yoast SEO Premium
         run: |
+          WP_CONTAINER=$(docker ps -qf "name=wordpress")
           docker exec $WP_CONTAINER wp plugin activate wordpress-seo-premium --allow-root
 
       - name: Run Yoast Focus Element Test Again
         run: npx playwright test tests/e2e/yoast-focus-element.spec.js
-      # End Yoast SEO Premium tests.
+      # End Yoast SEO Premium tests
 
       - name: Upload Playwright Report
         if: always()
