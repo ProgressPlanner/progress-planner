@@ -690,8 +690,8 @@ class Suggested_Tasks {
 
 			if ( $provider ) {
 				// Link should be added during run time, since it is not added for users without required capability.
-				$response->data['meta']['prpl_url'] = $provider->capability_required()
-				? \esc_url( (string) \get_edit_post_link( $post->ID ) )
+				$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
+				? \esc_url( (string) $response->data['meta']['prpl_url'] )
 				: '';
 			}
 		}
