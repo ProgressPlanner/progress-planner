@@ -153,7 +153,7 @@ class Content_Review extends Tasks {
 			'<a href="https://prpl.fyi/review-post" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
 			\esc_html( $post->post_title ), // @phpstan-ignore-line property.nonObject
 			\esc_html( $months )
-		) . '</p>' . ( $this->capability_required() ? '<p><a href="' . \esc_url( \get_edit_post_link( $post->ID ) ) . '">' . \esc_html__( 'Edit the post', 'progress-planner' ) . '</a>.</p>' : '' ); // @phpstan-ignore-line property.nonObject
+		) . '</p>';
 	}
 
 	/**
@@ -166,9 +166,20 @@ class Content_Review extends Tasks {
 	protected function get_url( $task_id = '' ) {
 		$post = $this->get_post_from_task_id( $task_id );
 
-		return $post && $this->capability_required()
-			? \esc_url( (string) \get_edit_post_link( $post->ID ) )
-			: '';
+		if ( ! $post ) {
+			return '';
+		}
+
+		// We don't use the edit_post_link() function because we need to bypass it's current_user_can() check.
+		return \esc_url(
+			\add_query_arg(
+				[
+					'post'   => $post->ID,
+					'action' => 'edit',
+				],
+				\admin_url( 'post.php' )
+			)
+		);
 	}
 
 	/**

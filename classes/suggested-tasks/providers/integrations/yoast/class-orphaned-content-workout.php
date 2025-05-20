@@ -148,7 +148,7 @@ class Orphaned_Content_Workout extends Tasks {
 	 * @return string
 	 */
 	protected function get_url( $task_id = '' ) {
-		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts#orphaned' ) ) : '';
+		return \esc_url( admin_url( 'admin.php?page=wpseo_workouts#orphaned' ) );
 	}
 
 	/**

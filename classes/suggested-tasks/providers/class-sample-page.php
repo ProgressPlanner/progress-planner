@@ -51,7 +51,16 @@ class Sample_Page extends Tasks {
 		$sample_page_id = $this->data_collector->collect();
 
 		if ( 0 !== $sample_page_id ) {
-			$this->url = (string) \get_edit_post_link( $sample_page_id );
+			// We don't use the edit_post_link() function because we need to bypass it's current_user_can() check.
+			$this->url = \esc_url(
+				\add_query_arg(
+					[
+						'post'   => $sample_page_id,
+						'action' => 'edit',
+					],
+					\admin_url( 'post.php' )
+				)
+			);
 		}
 	}
 
