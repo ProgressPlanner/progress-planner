@@ -59,9 +59,6 @@ class Suggested_Tasks {
 
 		// Add the custom post status.
 		\add_action( 'init', [ $this, 'register_post_status' ], 1 );
-
-		// Add the custom orderby parameter.
-		\add_action( 'rest_api_init', [ $this, 'add_menu_order_to_rest_api' ] );
 	}
 
 	/**
@@ -886,25 +883,5 @@ class Suggested_Tasks {
 		);
 
 		return isset( $posts[0] ) ? $posts[0] : false;
-	}
-
-	/**
-	 * Add the menu order to the REST API.
-	 *
-	 * @return void
-	 */
-	public function add_menu_order_to_rest_api() {
-		register_rest_field(
-			'prpl_recommendations',
-			'menu_order',
-			[
-				'get_callback' => function ( $item ) {
-					return ( isset( $item['menu_order'] ) )
-						? (int) $item['menu_order']
-						: 0;
-				},
-				'schema'       => [ 'type' => 'integer' ],
-			]
-		);
 	}
 }
