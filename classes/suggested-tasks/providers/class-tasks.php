@@ -274,22 +274,6 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Get the data from a task-ID.
-	 *
-	 * @param string $task_id The task ID (unused here).
-	 *
-	 * @return array The data.
-	 */
-	public function get_data_from_task_id( $task_id ) {
-		$data = [
-			'provider_id' => $this->get_provider_id(),
-			'id'          => $task_id,
-		];
-
-		return $data;
-	}
-
-	/**
 	 * Check if a task category is snoozed.
 	 *
 	 * @return bool

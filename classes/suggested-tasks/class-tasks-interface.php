@@ -52,15 +52,6 @@ interface Tasks_Interface {
 	public function get_task_details( $task_id = '' );
 
 	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_data_from_task_id( $task_id );
-
-	/**
 	 * Get the provider category.
 	 *
 	 * @return string
