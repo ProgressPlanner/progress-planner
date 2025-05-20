@@ -104,22 +104,17 @@ trait Task_Provider_Test_Trait {
 				$task->get_data()['ID'],
 				[ 'post_status' => 'pending_celebration' ]
 			);
-
-			// In production we insert an activity here.
-		}
-
-		// Verify that the task(s) we're testing is pending celebration.
-		foreach ( $tasks as $post_id ) {
-			$this->assertTrue( 'pending_celebration' === \get_post_status( $post_id ) );
+			// Verify that the task(s) we're testing is pending celebration.
+			$this->assertTrue( 'pending_celebration' === \get_post_status( $task->get_data()['ID'] ) );
 		}
 
 		// Verify that the task(s) we're testing is completed.
-		foreach ( $tasks as $post_id ) {
+		foreach ( $tasks as $post_data ) {
 			\progress_planner()->get_suggested_tasks()->update_recommendation(
-				$post_id,
+				$post_data['post_id'],
 				[ 'post_status' => 'trash' ]
 			);
-			$this->assertTrue( 'trash' === \get_post_status( $post_id ) );
+			$this->assertTrue( 'trash' === \get_post_status( $post_data['post_id'] ) );
 		}
 	}
 }
