@@ -299,44 +299,6 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Transition a task from one status to another.
-	 *
-	 * @param int    $task_id The task ID.
-	 * @param string $old_status The old status.
-	 * @param string $new_status The new status.
-	 *
-	 * @return bool
-	 */
-	public function transition_task_status( $task_id, $old_status, $new_status ) {
-
-		$tasks = $this->get( [ 'ID' => (int) $task_id ] );
-
-		if ( empty( $tasks ) ) {
-			return false;
-		}
-
-		$task = $tasks[0];
-
-		$old_post_status = isset( self::STATUS_MAP[ $old_status ] )
-			? self::STATUS_MAP[ $old_status ]
-			: $old_status;
-		$new_post_status = isset( self::STATUS_MAP[ $new_status ] )
-			? self::STATUS_MAP[ $new_status ]
-			: $new_status;
-
-		if ( $old_post_status !== $task['post_status'] || $new_post_status === $task['post_status'] ) {
-			return false;
-		}
-
-		return (bool) \wp_update_post(
-			[
-				'post_status' => $new_post_status,
-				'ID'          => (int) $task_id,
-			]
-		);
-	}
-
-	/**
 	 * Snooze a recommendation.
 	 *
 	 * @param int    $id       The recommendation ID.
@@ -379,37 +341,6 @@ class Suggested_Tasks {
 				'post_date_gmt' => \gmdate( 'Y-m-d H:i:s', $new_date ), // Note: necessary in order to update 'post_status' to 'future'.
 			]
 		);
-	}
-
-	/**
-	 * Check if a task meets a condition.
-	 *
-	 * @param array $condition The condition.
-	 *                         [
-	 *                           string  'type'         The condition type.
-	 *                           string  'task_id'      The task id (optional, used for completed and snoozed conditions).
-	 *                           array   'post_lengths' The post lengths (optional, used for snoozed-post-length condition).
-	 *                         ].
-	 *
-	 * @return bool
-	 */
-	public function check_task_condition( $condition ) {
-		$parsed_condition = \wp_parse_args(
-			$condition,
-			[
-				'post_status'  => 'any',
-				'task_id'      => '',
-				'post_lengths' => [],
-			]
-		);
-
-		foreach ( \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => $parsed_condition['post_status'] ] ) as $task ) {
-			if ( $task['task_id'] === $parsed_condition['task_id'] ) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 
 	/**
