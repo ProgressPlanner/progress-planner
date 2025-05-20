@@ -59,6 +59,9 @@ class Suggested_Tasks {
 
 		// Add the custom post status.
 		\add_action( 'init', [ $this, 'register_post_status' ], 1 );
+
+		// Add the custom orderby parameter.
+		\add_action( 'rest_api_init', [ $this, 'add_menu_order_to_rest_api' ] );
 	}
 
 	/**
@@ -498,34 +501,20 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
 		}
 
+		$updated = false;
+
 		switch ( $action ) {
 			case 'complete':
-				// Mark the task as completed.
-				\progress_planner()->get_suggested_tasks()->update_recommendation( $task['ID'], [ 'post_status' => 'trash' ] );
-
 				// Insert an activity.
 				\progress_planner()->get_suggested_tasks()->insert_activity( $task['ID'] );
 				$updated = true;
 				break;
 
 			case 'pending':
-				\progress_planner()->get_suggested_tasks()->update_recommendation( $task['ID'], [ 'post_status' => 'publish' ] );
-				$updated = true;
-				\progress_planner()->get_suggested_tasks()->delete_activity( $task_id );
-				break;
-
-			case 'snooze':
-				$duration = isset( $_POST['duration'] ) ? \sanitize_text_field( \wp_unslash( $_POST['duration'] ) ) : '';
-				$updated  = $this->snooze( $task['ID'], $duration );
-				break;
-
 			case 'delete':
-				$updated = $this->delete_recommendation( $task['ID'] );
 				\progress_planner()->get_suggested_tasks()->delete_activity( $task['ID'] );
+				$updated = true;
 				break;
-
-			default:
-				\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid action.', 'progress-planner' ) ] );
 		}
 
 		/**
@@ -537,7 +526,7 @@ class Suggested_Tasks {
 		\do_action( "progress_planner_ajax_task_{$action}", $task_id, $updated );
 
 		if ( ! $updated ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to save.', 'progress-planner' ) ] );
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Not saved.', 'progress-planner' ) ] );
 		}
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
@@ -897,5 +886,25 @@ class Suggested_Tasks {
 		);
 
 		return isset( $posts[0] ) ? $posts[0] : false;
+	}
+
+	/**
+	 * Add the menu order to the REST API.
+	 *
+	 * @return void
+	 */
+	public function add_menu_order_to_rest_api() {
+		register_rest_field(
+			'prpl_recommendations',
+			'menu_order',
+			[
+				'get_callback' => function ( $item ) {
+					return ( isset( $item['menu_order'] ) )
+						? (int) $item['menu_order']
+						: 0;
+				},
+				'schema'       => [ 'type' => 'integer' ],
+			]
+		);
 	}
 }

@@ -346,7 +346,7 @@ customElements.define(
 				'.prpl-suggested-task-checkbox'
 			).addEventListener( 'change', function ( e ) {
 				thisObj.runTaskAction(
-					item.getAttribute( 'data-task-id' ),
+					item.getAttribute( 'data-post-id' ),
 					e.target.checked ? 'complete' : 'pending'
 				);
 			} );
@@ -467,7 +467,7 @@ customElements.define(
 
 							default:
 								thisObj.runTaskAction(
-									item.getAttribute( 'data-task-id' ),
+									item.getAttribute( 'data-post-id' ),
 									action
 								);
 								break;
@@ -492,7 +492,7 @@ customElements.define(
 			).forEach( ( radioElement ) => {
 				radioElement.addEventListener( 'change', function () {
 					thisObj.runTaskAction(
-						item.getAttribute( 'data-task-id' ),
+						item.getAttribute( 'data-post-id' ),
 						'snooze',
 						this.value
 					);
@@ -534,32 +534,209 @@ customElements.define(
 		/**
 		 * Snooze a task.
 		 *
-		 * @param {string} task_id        The task ID.
+		 * @param {number} post_id        The post ID.
 		 * @param {string} actionType     The action type.
 		 * @param {string} snoozeDuration If the action is `snooze`,
 		 *                                the duration to snooze the task for.
 		 */
-		runTaskAction = ( task_id, actionType, snoozeDuration ) => {
-			task_id = task_id.toString();
-			const providerID = this.querySelector( 'li' ).getAttribute(
-				'data-task-provider-id'
-			);
-			const category =
-				this.querySelector( 'li' ).getAttribute( 'data-task-category' );
-			const taskPoints = parseInt(
-				this.querySelector( 'li' ).getAttribute( 'data-task-points' )
-			);
+		runTaskAction = ( post_id, actionType, snoozeDuration ) => {
 			const taskList =
 				this.querySelector( 'li' ).getAttribute( 'data-task-list' );
 
+			switch ( actionType ) {
+				case 'snooze':
+					wp.api.loadPromise.done( () => {
+						if ( '1-week' === snoozeDuration ) {
+							snoozeDuration = 7;
+						} else if ( '2-weeks' === snoozeDuration ) {
+							snoozeDuration = 14;
+						} else if ( '1-month' === snoozeDuration ) {
+							snoozeDuration = 30;
+						} else if ( '3-months' === snoozeDuration ) {
+							snoozeDuration = 90;
+						} else if ( '6-months' === snoozeDuration ) {
+							snoozeDuration = 180;
+						} else if ( '1-year' === snoozeDuration ) {
+							snoozeDuration = 365;
+						} else if ( 'forever' === snoozeDuration ) {
+							snoozeDuration = 3650;
+						}
+						const date = new Date(
+							Date.now() + snoozeDuration * 24 * 60 * 60 * 1000
+						)
+							.toISOString()
+							.split( '.' )[ 0 ];
+						const post = new wp.api.models.Prpl_recommendations( {
+							id: post_id,
+							status: 'future',
+							date,
+							date_gmt: date,
+						} );
+						post.save().then( () => {
+							this.querySelector( 'li' ).remove();
+							// Update the global var.
+							window[ taskList ].tasks.forEach(
+								( task, index ) => {
+									if ( task.id === post_id ) {
+										window[ taskList ].tasks[
+											index
+										].status = 'snoozed';
+									}
+								}
+							);
+						} );
+					} );
+					break;
+
+				case 'complete':
+					wp.api.loadPromise.done( () => {
+						const post = new wp.api.models.Prpl_recommendations( {
+							id: post_id,
+							status: 'pending_celebration',
+						} );
+						post.save().then( () => {
+							// Add the task to the pending celebration.
+							window[ taskList ].tasks.forEach(
+								( task, index ) => {
+									if ( task.id === post_id ) {
+										window[ taskList ].tasks[
+											index
+										].status = 'pending_celebration';
+									}
+								}
+							);
+							// Set the task action to celebrate.
+							this.querySelector( 'li' ).setAttribute(
+								'data-task-action',
+								'celebrate'
+							);
+
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/updateRaviGauge', {
+									detail: {
+										pointsDiff: parseInt(
+											this.querySelector(
+												'li'
+											).getAttribute( 'data-task-points' )
+										),
+									},
+								} )
+							);
+
+							const celebrateEvents =
+								0 <
+								parseInt(
+									this.querySelector( 'li' ).getAttribute(
+										'data-task-points'
+									)
+								)
+									? [ 'prpl/celebrateTasks' ]
+									: [
+											'prpl/strikeCelebratedTasks',
+											'prpl/markTasksAsCompleted',
+									  ];
+
+							// Trigger the celebration events.
+							celebrateEvents.forEach( ( event ) => {
+								document.dispatchEvent(
+									new CustomEvent( event, {
+										detail: {
+											element: this.querySelector( 'li' ),
+											taskList,
+										},
+									} )
+								);
+							} );
+						} );
+					} );
+					break;
+
+				case 'pending':
+					wp.api.loadPromise.done( () => {
+						const post = new wp.api.models.Prpl_recommendations( {
+							id: post_id,
+							status: 'publish',
+						} );
+						post.save().then( () => {
+							// Change the task status to pending.
+							window[ taskList ].tasks.forEach(
+								( task, index ) => {
+									if ( task.id === post_id ) {
+										window[ taskList ].tasks[
+											index
+										].status = 'publish';
+									}
+								}
+							);
+							// Set the task action to pending.
+							this.querySelector( 'li' ).setAttribute(
+								'data-task-action',
+								'pending'
+							);
+
+							// Update the Ravi gauge.
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/updateRaviGauge', {
+									detail: {
+										pointsDiff:
+											0 -
+											parseInt(
+												this.querySelector(
+													'li'
+												).getAttribute(
+													'data-task-points'
+												)
+											),
+									},
+								} )
+							);
+						} );
+					} );
+					break;
+
+				case 'delete':
+					wp.api.loadPromise.done( () => {
+						const post = new wp.api.models.Prpl_recommendations( {
+							id: post_id,
+							status: 'trash',
+						} );
+						post.save().then( () => {
+							// Update the Ravi gauge.
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/updateRaviGauge', {
+									detail: {
+										pointsDiff:
+											0 -
+											parseInt(
+												this.querySelector(
+													'li'
+												).getAttribute(
+													'data-task-points'
+												)
+											),
+									},
+								} )
+							);
+
+							// Remove the task from the todo list.
+							document
+								.querySelector(
+									`.prpl-suggested-task[data-post-id="${ post_id }"]`
+								)
+								.remove();
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/grid/resize' )
+							);
+						} );
+					} );
+					break;
+			}
+
 			const data = {
-				task_id,
+				id: post_id,
 				nonce: prplSuggestedTask.nonce,
 				action_type: actionType,
 			};
-			if ( 'snooze' === actionType ) {
-				data.duration = snoozeDuration;
-			}
 
 			// Save the todo list to the database.
 			const request = wp.ajax.post(
@@ -567,126 +744,19 @@ customElements.define(
 				data
 			);
 			request.done( () => {
-				const el = document.querySelector(
-					`.prpl-suggested-task[data-task-id="${ task_id }"]`
-				);
-
-				switch ( actionType ) {
-					case 'snooze':
-						el.remove();
-						// Update the global var.
-						window[ taskList ].tasks.forEach( ( task, index ) => {
-							if ( task.task_id === task_id ) {
-								window[ taskList ].tasks[ index ].status =
-									'snoozed';
-							}
-						} );
-						break;
-
-					case 'complete':
-						// Add the task to the pending celebration.
-						window[ taskList ].tasks.forEach( ( task, index ) => {
-							if ( task.task_id === task_id ) {
-								window[ taskList ].tasks[ index ].status =
-									'pending_celebration';
-							}
-						} );
-						// Set the task action to celebrate.
-						el.setAttribute( 'data-task-action', 'celebrate' );
-
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/updateRaviGauge', {
-								detail: {
-									pointsDiff: parseInt(
-										this.querySelector( 'li' ).getAttribute(
-											'data-task-points'
-										)
-									),
-								},
-							} )
-						);
-
-						const celebrateEvents =
-							0 < taskPoints
-								? [ 'prpl/celebrateTasks' ]
-								: [
-										'prpl/strikeCelebratedTasks',
-										'prpl/markTasksAsCompleted',
-								  ];
-
-						// Trigger the celebration events.
-						celebrateEvents.forEach( ( event ) => {
-							document.dispatchEvent(
-								new CustomEvent( event, {
-									detail: {
-										element: el,
-										taskList,
-									},
-								} )
-							);
-						} );
-
-						break;
-
-					case 'pending':
-						// Change the task status to pending.
-						window[ taskList ].tasks.forEach( ( task, index ) => {
-							if ( task.task_id === task_id ) {
-								window[ taskList ].tasks[ index ].status =
-									'pending';
-							}
-						} );
-						// Set the task action to pending.
-						el.setAttribute( 'data-task-action', 'pending' );
-
-						// Update the Ravi gauge.
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/updateRaviGauge', {
-								detail: {
-									pointsDiff:
-										0 -
-										parseInt(
-											this.querySelector(
-												'li'
-											).getAttribute( 'data-task-points' )
-										),
-								},
-							} )
-						);
-
-						break;
-
-					case 'delete':
-						// Update the Ravi gauge.
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/updateRaviGauge', {
-								detail: {
-									pointsDiff:
-										0 -
-										parseInt(
-											this.querySelector(
-												'li'
-											).getAttribute( 'data-task-points' )
-										),
-								},
-							} )
-						);
-
-						// Remove the task from the todo list.
-						el.closest( 'prpl-suggested-task' ).remove();
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/grid/resize' )
-						);
-						break;
-				}
-
 				document.dispatchEvent(
 					new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
 						detail: {
-							task_id,
-							providerID,
+							task_id: document
+								.querySelector(
+									`.prpl-suggested-task[data-post-id="${ post_id }"]`
+								)
+								.getAttribute( 'data-task-id' ),
 							actionType,
-							category,
+							category:
+								this.querySelector( 'li' ).getAttribute(
+									'data-task-category'
+								),
 						},
 					} )
 				);
