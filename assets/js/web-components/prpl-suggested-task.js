@@ -700,7 +700,7 @@ customElements.define(
 							id: post_id,
 							status: 'trash',
 						} );
-						post.save().then( () => {
+						post.destroy().then( () => {
 							// Update the Ravi gauge.
 							document.dispatchEvent(
 								new CustomEvent( 'prpl/updateRaviGauge', {
