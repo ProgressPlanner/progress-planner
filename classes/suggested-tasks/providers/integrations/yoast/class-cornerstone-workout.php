@@ -148,7 +148,7 @@ class Cornerstone_Workout extends Tasks {
 	 * @return string
 	 */
 	protected function get_url( $task_data = [] ) {
-		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) ) : '';
+		return \esc_url( admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) );
 	}
 
 	/**

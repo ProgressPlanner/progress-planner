@@ -153,7 +153,7 @@ class Content_Review extends Tasks {
 			'<a href="https://prpl.fyi/review-post" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
 			\esc_html( $post->post_title ), // @phpstan-ignore-line property.nonObject
 			\esc_html( $months )
-		) . '</p>' . ( $this->capability_required() ? '<p><a href="' . \esc_url( \get_edit_post_link( $post->ID ) ) . '">' . \esc_html__( 'Edit the post', 'progress-planner' ) . '</a>.</p>' : '' ); // @phpstan-ignore-line property.nonObject
+		) . '</p>';
 	}
 
 	/**
@@ -166,9 +166,20 @@ class Content_Review extends Tasks {
 	protected function get_url( $task_id = '' ) {
 		$post = $this->get_post_from_task_id( $task_id );
 
-		return $post && $this->capability_required()
-			? \esc_url( (string) \get_edit_post_link( $post->ID ) )
-			: '';
+		if ( ! $post ) {
+			return '';
+		}
+
+		// We don't use the edit_post_link() function because we need to bypass it's current_user_can() check.
+		return \esc_url(
+			\add_query_arg(
+				[
+					'post'   => $post->ID,
+					'action' => 'edit',
+				],
+				\admin_url( 'post.php' )
+			)
+		);
 	}
 
 	/**
@@ -241,8 +252,8 @@ class Content_Review extends Tasks {
 
 			foreach ( $last_updated_posts as $post ) {
 				$task_data = [
-					'post_id'     => $post->ID,
-					'provider_id' => $this->get_provider_id(),
+					'target_post_id' => $post->ID,
+					'provider_id'    => $this->get_provider_id(),
 				];
 
 				// Skip if the task has been dismissed.
@@ -258,9 +269,9 @@ class Content_Review extends Tasks {
 				}
 
 				$this->task_post_mappings[ $task_id ] = [
-					'task_id'   => $task_id,
-					'post_id'   => $post->ID,
-					'post_type' => $post->post_type,
+					'task_id'          => $task_id,
+					'target_post_id'   => $post->ID,
+					'target_post_type' => $post->post_type,
 				];
 			}
 		}
@@ -290,23 +301,23 @@ class Content_Review extends Tasks {
 				}
 
 				$task_to_inject[] = [
-					'task_id'     => $this->get_task_id( [ 'post_id' => $task_data['post_id'] ] ),
-					'provider_id' => $this->get_provider_id(),
-					'category'    => $this->get_provider_category(),
-					'post_id'     => $task_data['post_id'],
-					'post_type'   => $task_data['post_type'],
-					'date'        => \gmdate( 'YW' ),
-					'post_title'  => sprintf(
+					'task_id'          => $this->get_task_id( [ 'post_id' => $task_data['target_post_id'] ] ),
+					'provider_id'      => $this->get_provider_id(),
+					'category'         => $this->get_provider_category(),
+					'target_post_id'   => $task_data['target_post_id'],
+					'target_post_type' => $task_data['target_post_type'],
+					'date'             => \gmdate( 'YW' ),
+					'post_title'       => sprintf(
 						// translators: %1$s: The post type, %2$s: The post title.
 						\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
-						strtolower( \get_post_type_object( \esc_html( $task_data['post_type'] ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
-						\esc_html( \get_the_title( $task_data['post_id'] ) ) // @phpstan-ignore-line property.nonObject
+						strtolower( \get_post_type_object( \esc_html( $task_data['target_post_type'] ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
+						\esc_html( \get_the_title( $task_data['target_post_id'] ) ) // @phpstan-ignore-line property.nonObject
 					),
-					'description' => $this->get_description( $task_data ),
-					'url'         => \esc_url( (string) \get_edit_post_link( $task_data['post_id'] ) ),
-					'url_target'  => '_blank',
-					'dismissable' => $this->is_dismissable(),
-					'points'      => $this->get_points(),
+					'description'      => $this->get_description( $task_data ),
+					'url'              => \esc_url( (string) \get_edit_post_link( $task_data['target_post_id'] ) ),
+					'url_target'       => '_blank',
+					'dismissable'      => $this->is_dismissable(),
+					'points'           => $this->get_points(),
 				];
 			}
 		}
@@ -381,7 +392,7 @@ class Content_Review extends Tasks {
 
 		$data = $tasks[0];
 
-		return isset( $data['post_id'] ) && $data['post_id'] ? \get_post( $data['post_id'] ) : null;
+		return isset( $data['target_post_id'] ) && $data['target_post_id'] ? \get_post( $data['target_post_id'] ) : null;
 	}
 
 	/**
@@ -498,7 +509,7 @@ class Content_Review extends Tasks {
 		if ( ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
 				if ( isset( $task['provider']->slug ) && 'review-post' === $task['provider']->slug ) {
-					$this->snoozed_post_ids[] = $task['post_id'];
+					$this->snoozed_post_ids[] = $task['target_post_id'];
 				}
 			}
 		}
@@ -536,7 +547,7 @@ class Content_Review extends Tasks {
 	 * @return string|false The task identifier or false if not applicable.
 	 */
 	protected function get_task_identifier( $task_data ) {
-		return $this->get_provider_id() . '-' . $task_data['post_id'];
+		return $this->get_provider_id() . '-' . $task_data['target_post_id'];
 	}
 
 	/**
@@ -567,7 +578,7 @@ class Content_Review extends Tasks {
 		$task = Task_Factory::create_task_from_id( $task_id );
 		$data = $task->get_data();
 
-		if ( isset( $data['post_id'] ) && (int) \get_post_modified_time( 'U', false, (int) $data['post_id'] ) > strtotime( '-12 months' ) ) {
+		if ( isset( $data['target_post_id'] ) && (int) \get_post_modified_time( 'U', false, (int) $data['target_post_id'] ) > strtotime( '-12 months' ) ) {
 			return true;
 		}
 

@@ -14,15 +14,11 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 	// Mark 'pending_celebration' task as completed.
 	prplSuggestedTasks.tasks.forEach( ( task ) => {
 		if ( 'pending_celebration' === task.status ) {
-			wp.ajax
-				.post( 'progress_planner_suggested_task_action', {
-					nonce: prplSuggestedTasks.nonce,
-					action_type: 'complete',
-					task_id: task.meta?.prpl_task_id,
-				} )
-				.done( ( response ) => {
-					console.log( response );
-				} );
+			const post = new wp.api.models.Prpl_recommendations( {
+				id: task.id,
+				status: 'trash',
+			} );
+			post.save();
 		}
 	} );
 
