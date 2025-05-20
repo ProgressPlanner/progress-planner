@@ -27,11 +27,20 @@ class Permalink_Structure extends Tasks {
 	protected const PROVIDER_ID = 'core-permalink-structure';
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url = \admin_url( 'options-permalink.php' );
+	protected function get_url() {
+		return \admin_url( 'options-permalink.php' );
+	}
 
+	/**
+	 * Get the link setting.
+	 *
+	 * @return array
+	 */
+	public function get_link_setting() {
 		$icon_el = 'label[for="permalink-input-month-name"], label[for="permalink-input-post-name"]';
 
 		// If the task is completed, we want to add icon element only to the selected option (not both).
@@ -47,7 +56,7 @@ class Permalink_Structure extends Tasks {
 			}
 		}
 
-		$this->link_setting = [
+		return [
 			'hook'   => 'options-permalink.php',
 			'iconEl' => $icon_el,
 		];

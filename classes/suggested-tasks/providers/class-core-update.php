@@ -47,14 +47,13 @@ class Core_Update extends Tasks {
 	 */
 	protected $priority = 'high';
 
-
 	/**
-	 * Constructor.
+	 * Get the task URL.
 	 *
-	 * @return void
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url = \admin_url( 'update-core.php' );
+	protected function get_url() {
+		return \admin_url( 'update-core.php' );
 	}
 
 	/**

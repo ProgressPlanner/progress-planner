@@ -47,12 +47,16 @@ class Hello_World extends Tasks {
 	 */
 	public function __construct() {
 		$this->data_collector = new Hello_World_Data_Collector();
+	}
 
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
 		$hello_world_post_id = $this->data_collector->collect();
-
-		if ( 0 !== $hello_world_post_id ) {
-			$this->url = (string) \get_edit_post_link( $hello_world_post_id );
-		}
+		return ( 0 !== $hello_world_post_id ) ? (string) \get_edit_post_link( $hello_world_post_id ) : '';
 	}
 
 	/**

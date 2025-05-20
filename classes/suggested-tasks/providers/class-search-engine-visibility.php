@@ -27,11 +27,21 @@ class Search_Engine_Visibility extends Tasks {
 	protected const PROVIDER_ID = 'search-engine-visibility';
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url          = \admin_url( 'options-reading.php' );
-		$this->link_setting = [
+	protected function get_url() {
+		return \admin_url( 'options-reading.php' );
+	}
+
+	/**
+	 * Get the link setting.
+	 *
+	 * @return array
+	 */
+	public function get_link_setting() {
+		return [
 			'hook'   => 'options-reading.php',
 			'iconEl' => 'label[for="blog_public"]',
 		];

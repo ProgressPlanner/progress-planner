@@ -20,10 +20,12 @@ class Archive_Date extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-date-archive';
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url = \admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' );
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' );
 	}
 
 	/**

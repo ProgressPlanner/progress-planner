@@ -34,10 +34,12 @@ class Set_Valuable_Post_Types extends Tasks {
 	protected $priority = 'low';
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url = \admin_url( 'admin.php?page=progress-planner-settings' );
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=progress-planner-settings' );
 	}
 
 	/**

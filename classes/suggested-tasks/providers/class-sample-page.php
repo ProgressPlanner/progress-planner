@@ -47,12 +47,16 @@ class Sample_Page extends Tasks {
 	 */
 	public function __construct() {
 		$this->data_collector = new Sample_Page_Data_Collector();
+	}
 
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
 		$sample_page_id = $this->data_collector->collect();
-
-		if ( 0 !== $sample_page_id ) {
-			$this->url = (string) \get_edit_post_link( $sample_page_id );
-		}
+		return ( 0 !== $sample_page_id ) ? (string) \get_edit_post_link( $sample_page_id ) : '';
 	}
 
 	/**

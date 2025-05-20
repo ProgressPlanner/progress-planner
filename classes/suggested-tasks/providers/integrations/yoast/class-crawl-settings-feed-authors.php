@@ -40,7 +40,15 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	 */
 	public function __construct() {
 		$this->data_collector = new Post_Author();
-		$this->url            = \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_authors' );
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_authors' );
 	}
 
 	/**

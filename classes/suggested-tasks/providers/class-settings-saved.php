@@ -34,10 +34,12 @@ class Settings_Saved extends Tasks {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url = \admin_url( 'admin.php?page=progress-planner-settings' );
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=progress-planner-settings' );
 	}
 
 	/**

@@ -40,7 +40,15 @@ class Remove_Inactive_Plugins extends Tasks {
 	 */
 	public function __construct() {
 		$this->data_collector = new Inactive_Plugins_Data_Collector();
-		$this->url            = \admin_url( 'plugins.php' );
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return \admin_url( 'plugins.php' );
 	}
 
 	/**

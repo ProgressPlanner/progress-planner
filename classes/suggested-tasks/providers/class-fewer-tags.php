@@ -73,15 +73,28 @@ class Fewer_Tags extends Tasks {
 	private $plugin_path = 'fewer-tags/fewer-tags.php';
 
 	/**
+	 * Whether the task is dismissable.
+	 *
+	 * @var bool
+	 */
+	protected $is_dismissable = true;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		// Data collectors.
 		$this->post_tag_count_data_collector       = new Post_Tag_Count();
 		$this->published_post_count_data_collector = new Published_Post_Count();
+	}
 
-		$this->url            = \admin_url( '/plugin-install.php?tab=search&s=fewer+tags' );
-		$this->is_dismissable = true;
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return \admin_url( '/plugin-install.php?tab=search&s=fewer+tags' );
 	}
 
 	/**

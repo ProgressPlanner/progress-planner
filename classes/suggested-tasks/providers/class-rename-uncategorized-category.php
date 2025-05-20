@@ -47,7 +47,15 @@ class Rename_Uncategorized_Category extends Tasks {
 	 */
 	public function __construct() {
 		$this->data_collector = new Uncategorized_Category_Data_Collector();
-		$this->url            = \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' );
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' );
 	}
 
 	/**

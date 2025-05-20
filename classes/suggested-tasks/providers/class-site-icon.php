@@ -27,14 +27,24 @@ class Site_Icon extends Tasks {
 	protected const PROVIDER_ID = 'core-siteicon';
 
 	/**
-	 * Constructor.
+	 * Get the link setting.
+	 *
+	 * @return array
 	 */
-	public function __construct() {
-		$this->url          = \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() );
-		$this->link_setting = [
+	protected function get_link_setting() {
+		return [
 			'hook'   => 'options-general.php',
 			'iconEl' => '.site-icon-section th',
 		];
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() );
 	}
 
 	/**

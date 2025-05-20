@@ -61,7 +61,15 @@ class Content_Create extends Tasks {
 	 */
 	public function __construct() {
 		$this->data_collector = new Last_Published_Post_Data_Collector();
-		$this->url            = 'https://prpl.fyi/valuable-content';
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return 'https://prpl.fyi/valuable-content';
 	}
 
 	/**
