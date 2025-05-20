@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Update;
 
-use Progress_Planner\Suggested_Tasks\Task_Factory;
+use Progress_Planner\Utils\Plugin_Migration_Helpers;
 use Progress_Planner\Suggested_Tasks\Task;
 
 /**
@@ -136,7 +136,7 @@ class Update_130 {
 	 */
 	private function get_data_from_task_id( $task_id ) {
 
-		$task_object = Task_Factory::create_task_from_id( $task_id );
+		$task_object = Plugin_Migration_Helpers::parse_task_data_from_task_id( $task_id );
 
 		if ( 0 === strpos( $task_object->get_task_id(), 'create-post-' ) || 0 === strpos( $task_object->get_task_id(), 'create-post-short-' ) ) {
 			$task_object = $this->handle_legacy_post_tasks( $task_object );
