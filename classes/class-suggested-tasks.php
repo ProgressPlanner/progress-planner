@@ -501,34 +501,20 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
 		}
 
+		$updated = false;
+
 		switch ( $action ) {
 			case 'complete':
-				// Mark the task as completed.
-				\progress_planner()->get_suggested_tasks()->update_recommendation( $task['ID'], [ 'post_status' => 'trash' ] );
-
 				// Insert an activity.
 				\progress_planner()->get_suggested_tasks()->insert_activity( $task['ID'] );
 				$updated = true;
 				break;
 
 			case 'pending':
-				\progress_planner()->get_suggested_tasks()->update_recommendation( $task['ID'], [ 'post_status' => 'publish' ] );
-				$updated = true;
-				\progress_planner()->get_suggested_tasks()->delete_activity( $task_id );
-				break;
-
-			case 'snooze':
-				$duration = isset( $_POST['duration'] ) ? \sanitize_text_field( \wp_unslash( $_POST['duration'] ) ) : '';
-				$updated  = $this->snooze( $task['ID'], $duration );
-				break;
-
 			case 'delete':
-				$updated = $this->delete_recommendation( $task['ID'] );
 				\progress_planner()->get_suggested_tasks()->delete_activity( $task['ID'] );
+				$updated = true;
 				break;
-
-			default:
-				\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid action.', 'progress-planner' ) ] );
 		}
 
 		/**
@@ -540,7 +526,7 @@ class Suggested_Tasks {
 		\do_action( "progress_planner_ajax_task_{$action}", $task_id, $updated );
 
 		if ( ! $updated ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to save.', 'progress-planner' ) ] );
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Not saved.', 'progress-planner' ) ] );
 		}
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
