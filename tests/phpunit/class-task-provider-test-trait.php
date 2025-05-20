@@ -111,10 +111,10 @@ trait Task_Provider_Test_Trait {
 		// Verify that the task(s) we're testing is completed.
 		foreach ( $tasks as $post_data ) {
 			\progress_planner()->get_suggested_tasks()->update_recommendation(
-				$post_data['post_id'],
+				is_array( $post_data ) ? $post_data['post_id'] : $post_data,
 				[ 'post_status' => 'trash' ]
 			);
-			$this->assertTrue( 'trash' === \get_post_status( $post_data['post_id'] ) );
+			$this->assertTrue( 'trash' === \get_post_status( is_array( $post_data ) ? $post_data['post_id'] : $post_data ) );
 		}
 	}
 }
