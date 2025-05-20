@@ -4,7 +4,7 @@
  *
  * A widget that displays a list of suggested tasks.
  *
- * Dependencies: wp-api, progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip
+ * Dependencies: wp-api, progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip, progress-planner/suggested-task-terms
  */
 /* eslint-disable camelcase */
 
