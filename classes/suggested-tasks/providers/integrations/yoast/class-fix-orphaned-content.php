@@ -37,13 +37,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-fix-orphaned-content';
 
 	/**
-	 * The data collector.
-	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content
-	 */
-	protected $data_collector;
-
-	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -58,11 +51,11 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	protected $completed_post_ids = null;
 
 	/**
-	 * Constructor.
+	 * The data collector class name.
+	 *
+	 * @var string
 	 */
-	public function __construct() {
-		$this->data_collector = new Yoast_Orphaned_Content();
-	}
+	protected const DATA_COLLECTOR_CLASS = Yoast_Orphaned_Content::class;
 
 	/**
 	 * Initialize the task provider.
@@ -145,7 +138,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return ! empty( $this->data_collector->collect() );
+		return ! empty( $this->get_data_collector()->collect() );
 	}
 
 	/**
@@ -195,7 +188,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return [];
 		}
 
-		$data    = $this->data_collector->collect();
+		$data    = $this->get_data_collector()->collect();
 		$task_id = $this->get_task_id(
 			[
 				'post_id' => $data['post_id'],

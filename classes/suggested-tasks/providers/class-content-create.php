@@ -36,6 +36,13 @@ class Content_Create extends Tasks {
 	protected const CAPABILITY = 'edit_others_posts';
 
 	/**
+	 * The data collector class name.
+	 *
+	 * @var string
+	 */
+	protected const DATA_COLLECTOR_CLASS = Last_Published_Post_Data_Collector::class;
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -48,20 +55,6 @@ class Content_Create extends Tasks {
 	 * @var string
 	 */
 	protected $url_target = '_blank';
-
-	/**
-	 * The data collector.
-	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post
-	 */
-	protected $data_collector;
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->data_collector = new Last_Published_Post_Data_Collector();
-	}
 
 	/**
 	 * Get the task URL.
@@ -102,7 +95,7 @@ class Content_Create extends Tasks {
 	 * @return array
 	 */
 	public function modify_evaluated_task_data( $task_data ) {
-		$last_published_post_data = $this->data_collector->collect();
+		$last_published_post_data = $this->get_data_collector()->collect();
 
 		if ( ! $last_published_post_data || empty( $last_published_post_data['post_id'] ) ) {
 			return $task_data;
@@ -122,7 +115,7 @@ class Content_Create extends Tasks {
 	public function should_add_task() {
 
 		// Get the post that was created last.
-		$last_published_post_data = $this->data_collector->collect();
+		$last_published_post_data = $this->get_data_collector()->collect();
 
 		// There are no published posts, add task.
 		if ( ! $last_published_post_data || empty( $last_published_post_data['post_id'] ) ) {

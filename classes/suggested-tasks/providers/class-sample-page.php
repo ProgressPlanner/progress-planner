@@ -36,18 +36,11 @@ class Sample_Page extends Tasks {
 	protected const CAPABILITY = 'edit_pages';
 
 	/**
-	 * The data collector.
+	 * The data collector class name.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page
+	 * @var string
 	 */
-	protected $data_collector;
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->data_collector = new Sample_Page_Data_Collector();
-	}
+	protected const DATA_COLLECTOR_CLASS = Sample_Page_Data_Collector::class;
 
 	/**
 	 * Get the task URL.
@@ -55,7 +48,7 @@ class Sample_Page extends Tasks {
 	 * @return string
 	 */
 	protected function get_url() {
-		$sample_page_id = $this->data_collector->collect();
+		$sample_page_id = $this->get_data_collector()->collect();
 		return ( 0 !== $sample_page_id ) ? (string) \get_edit_post_link( $sample_page_id ) : '';
 	}
 
@@ -87,6 +80,6 @@ class Sample_Page extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return 0 !== $this->data_collector->collect();
+		return 0 !== $this->get_data_collector()->collect();
 	}
 }

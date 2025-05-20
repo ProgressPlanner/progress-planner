@@ -25,7 +25,6 @@ class Add_Yoast_Providers {
 	public function __construct() {
 		if ( function_exists( 'YoastSEO' ) ) {
 			\add_filter( 'progress_planner_suggested_tasks_providers', [ $this, 'add_providers' ], 11, 1 );
-
 			\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		}
 	}

@@ -29,18 +29,11 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-crawl-settings-feed-authors';
 
 	/**
-	 * The data collector.
+	 * The data collector class name.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author
+	 * @var string
 	 */
-	protected $data_collector;
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->data_collector = new Post_Author();
-	}
+	protected const DATA_COLLECTOR_CLASS = Post_Author::class;
 
 	/**
 	 * Get the task URL.
@@ -123,7 +116,7 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	 */
 	public function is_task_relevant() {
 		// If there is more than one author, we don't need to add the task.
-		if ( $this->data_collector->collect() > self::MINIMUM_AUTHOR_WITH_POSTS ) {
+		if ( $this->get_data_collector()->collect() > self::MINIMUM_AUTHOR_WITH_POSTS ) {
 			return false;
 		}
 

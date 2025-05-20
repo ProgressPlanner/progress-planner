@@ -36,18 +36,11 @@ class Hello_World extends Tasks {
 	protected const CAPABILITY = 'edit_posts';
 
 	/**
-	 * The data collector.
+	 * The data collector class name.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Hello_World
+	 * @var string
 	 */
-	protected $data_collector;
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->data_collector = new Hello_World_Data_Collector();
-	}
+	protected const DATA_COLLECTOR_CLASS = Hello_World_Data_Collector::class;
 
 	/**
 	 * Get the task URL.
@@ -55,7 +48,7 @@ class Hello_World extends Tasks {
 	 * @return string
 	 */
 	protected function get_url() {
-		$hello_world_post_id = $this->data_collector->collect();
+		$hello_world_post_id = $this->get_data_collector()->collect();
 		return ( 0 !== $hello_world_post_id ) ? (string) \get_edit_post_link( $hello_world_post_id ) : '';
 	}
 
@@ -87,6 +80,6 @@ class Hello_World extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return 0 !== $this->data_collector->collect();
+		return 0 !== $this->get_data_collector()->collect();
 	}
 }

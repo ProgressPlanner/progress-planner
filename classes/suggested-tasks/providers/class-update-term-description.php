@@ -44,6 +44,13 @@ class Update_Term_Description extends Tasks {
 	protected const CAPABILITY = 'edit_others_posts';
 
 	/**
+	 * The data collector class name.
+	 *
+	 * @var string
+	 */
+	protected const DATA_COLLECTOR_CLASS = Terms_Without_Description_Data_Collector::class;
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -58,25 +65,11 @@ class Update_Term_Description extends Tasks {
 	protected $priority = 'low';
 
 	/**
-	 * The data collector.
-	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Description
-	 */
-	protected $data_collector;
-
-	/**
 	 * The completed term IDs.
 	 *
 	 * @var array|null
 	 */
 	protected $completed_term_ids = null;
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->data_collector = new Terms_Without_Description_Data_Collector();
-	}
 
 	/**
 	 * Initialize the task.
@@ -200,7 +193,7 @@ class Update_Term_Description extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return ! empty( $this->data_collector->collect() );
+		return ! empty( $this->get_data_collector()->collect() );
 	}
 
 	/**
@@ -237,7 +230,7 @@ class Update_Term_Description extends Tasks {
 			return [];
 		}
 
-		$data    = $this->data_collector->collect();
+		$data    = $this->get_data_collector()->collect();
 		$task_id = $this->get_task_id(
 			[
 				'term_id'  => $data['term_id'],

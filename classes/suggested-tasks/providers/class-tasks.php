@@ -44,6 +44,13 @@ abstract class Tasks implements Tasks_Interface {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
+	 * The data collector class name.
+	 *
+	 * @var string
+	 */
+	protected const DATA_COLLECTOR_CLASS = \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector::class;
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -98,6 +105,13 @@ abstract class Tasks implements Tasks_Interface {
 	 * @var array
 	 */
 	protected $link_setting;
+
+	/**
+	 * The data collector.
+	 *
+	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector|null
+	 */
+	protected $data_collector = null;
 
 	/**
 	 * Initialize the task provider.
@@ -242,6 +256,20 @@ abstract class Tasks implements Tasks_Interface {
 		$parts[] = \gmdate( 'YW' );
 
 		return implode( '-', $parts );
+	}
+
+	/**
+	 * Get the data collector.
+	 *
+	 * @return \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector
+	 */
+	public function get_data_collector() {
+		if ( ! $this->data_collector ) {
+			$class_name           = static::DATA_COLLECTOR_CLASS;
+			$this->data_collector = new $class_name(); // @phpstan-ignore-line assign.propertyType
+		}
+
+		return $this->data_collector; // @phpstan-ignore-line return.type
 	}
 
 	/**

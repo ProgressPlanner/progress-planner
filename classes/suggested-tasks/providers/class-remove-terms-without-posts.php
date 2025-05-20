@@ -58,18 +58,18 @@ class Remove_Terms_Without_Posts extends Tasks {
 	protected $priority = 'medium';
 
 	/**
-	 * The data collector.
-	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Posts
-	 */
-	protected $data_collector;
-
-	/**
 	 * The minimum number of posts.
 	 *
 	 * @var int
 	 */
 	protected const MIN_POSTS = 1;
+
+	/**
+	 * The data collector class name.
+	 *
+	 * @var string
+	 */
+	protected const DATA_COLLECTOR_CLASS = Terms_Without_Posts_Data_Collector::class;
 
 	/**
 	 * The completed term IDs.
@@ -82,8 +82,6 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->data_collector = new Terms_Without_Posts_Data_Collector();
-
 		\add_filter( 'progress_planner_terms_without_posts_exclude_term_ids', [ $this, 'exclude_completed_terms' ] );
 	}
 
@@ -209,7 +207,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return ! empty( $this->data_collector->collect() );
+		return ! empty( $this->get_data_collector()->collect() );
 	}
 
 	/**
@@ -244,7 +242,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 			return [];
 		}
 
-		$data    = $this->data_collector->collect();
+		$data    = $this->get_data_collector()->collect();
 		$task_id = $this->get_task_id(
 			[
 				'term_id'  => $data['term_id'],

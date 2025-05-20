@@ -29,18 +29,12 @@ class Archive_Format extends Yoast_Provider {
 	protected const MINIMUM_POSTS_WITH_FORMAT = 3;
 
 	/**
-	 * The data collector.
+	 * The data collector class name.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Archive_Format
+	 * @var string
 	 */
-	protected $data_collector;
+	protected const DATA_COLLECTOR_CLASS = Archive_Format_Data_Collector::class;
 
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->data_collector = new Archive_Format_Data_Collector();
-	}
 
 	/**
 	 * Get the task URL.
@@ -118,7 +112,7 @@ class Archive_Format extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function is_task_relevant() {
-		$archive_format_count = $this->data_collector->collect();
+		$archive_format_count = $this->get_data_collector()->collect();
 
 		// If there are more than X posts with a post format, we don't need to add the task. X is set in the class.
 		if ( $archive_format_count > static::MINIMUM_POSTS_WITH_FORMAT ) {
