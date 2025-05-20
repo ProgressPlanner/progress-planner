@@ -25,6 +25,13 @@ class Suggested_Tasks {
 	];
 
 	/**
+	 * The get tasks cache group.
+	 *
+	 * @var string
+	 */
+	const GET_TASKS_CACHE_GROUP = 'progress_planner_get_tasks';
+
+	/**
 	 * An object containing tasks.
 	 *
 	 * @var \Progress_Planner\Suggested_Tasks\Tasks_Manager|null
@@ -229,8 +236,7 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get( $args = [] ) {
-		static $cached = [];
-		$args          = \wp_parse_args(
+		$args = \wp_parse_args(
 			$args,
 			[
 				'post_type'   => 'prpl_recommendations',
@@ -241,16 +247,19 @@ class Suggested_Tasks {
 			]
 		);
 
-		$cache_key = md5( (string) \wp_json_encode( $args ) );
-		if ( isset( $cached[ $cache_key ] ) ) { // TODO: This cache breaks tests.
-			return $cached[ $cache_key ];
+		$cache_key = 'progress-planner-get-tasks-' . md5( (string) \wp_json_encode( $args ) );
+		$results   = \wp_cache_get( $cache_key, static::GET_TASKS_CACHE_GROUP );
+		if ( $results ) {
+			return $results;
 		}
 
-		$cached[ $cache_key ] = $this->format_recommendations(
+		$results = $this->format_recommendations(
 			\get_posts( $args )
 		);
 
-		return $cached[ $cache_key ];
+		\wp_cache_set( $cache_key, $results, static::GET_TASKS_CACHE_GROUP );
+
+		return $results;
 	}
 
 	/**
@@ -292,7 +301,9 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function delete_recommendation( int $id ) {
-		return (bool) \wp_delete_post( $id, true );
+		$result = (bool) \wp_delete_post( $id, true );
+		\wp_cache_flush_group( static::GET_TASKS_CACHE_GROUP );
+		return $result;
 	}
 
 	/**
