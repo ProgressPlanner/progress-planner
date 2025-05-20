@@ -85,15 +85,22 @@ class Terms_Without_Description extends Base_Data_Collector {
 		 */
 		$public_taxonomies = get_taxonomies( [ 'public' => true ], 'names' );
 
-		// Remove public taxonomies that are not relevant for this data collector.
-		$remove_taxonomies = [
-			'post_format',
-			'product_shipping_class',
-			'prpl_recommendations_category',
-			'prpl_recommendations_provider',
-		];
+		/**
+		 * Array of public taxonomies to exclude from the terms without description query.
+		 *
+		 * @var array<string> $exclude_public_taxonomies
+		 */
+		$exclude_public_taxonomies = \apply_filters(
+			'progress_planner_exclude_public_taxonomies',
+			[
+				'post_format',
+				'product_shipping_class',
+				'prpl_recommendations_category',
+				'prpl_recommendations_provider',
+			]
+		);
 
-		foreach ( $remove_taxonomies as $taxonomy ) {
+		foreach ( $exclude_public_taxonomies as $taxonomy ) {
 			if ( isset( $public_taxonomies[ $taxonomy ] ) ) {
 				unset( $public_taxonomies[ $taxonomy ] );
 			}
