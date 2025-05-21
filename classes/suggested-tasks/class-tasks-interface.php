@@ -38,7 +38,7 @@ interface Tasks_Interface {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return bool
+	 * @return \Progress_Planner\Suggested_Tasks\Task|false
 	 */
 	public function evaluate_task( $task_id );
 

@@ -337,7 +337,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return false|\Progress_Planner\Suggested_Tasks\Task The task data or false if the task is not completed.
+	 * @return \Progress_Planner\Suggested_Tasks\Task|false The task data or false if the task is not completed.
 	 */
 	public function evaluate_task( $task_id ) {
 		// Early bail if the user does not have the capability to manage options.

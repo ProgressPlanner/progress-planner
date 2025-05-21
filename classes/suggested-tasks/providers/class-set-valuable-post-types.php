@@ -101,7 +101,7 @@ class Set_Valuable_Post_Types extends Tasks {
 		}
 
 		// Save settings task completed?
-		$save_settings_task_completed = 'trash' === $settings_saved_task[0]['post_status'];
+		$save_settings_task_completed = 'trash' === $settings_saved_task[0]->post_status;
 
 		// Upgraded from <= 1.2?
 		$upgraded = (bool) \get_option( 'progress_planner_set_valuable_post_types', false );

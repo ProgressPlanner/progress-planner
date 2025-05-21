@@ -209,15 +209,15 @@ class Tasks_Manager {
 	/**
 	 * Evaluate tasks stored in the option.
 	 *
-	 * @return array
+	 * @return array<\Progress_Planner\Suggested_Tasks\Task>
 	 */
-	public function evaluate_tasks() {
+	public function evaluate_tasks(): array {
 		$tasks           = (array) Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] );
 		$completed_tasks = [];
 
 		foreach ( $tasks as $task_data ) {
 			// Skip user tasks.
-			if ( has_term( 'user', 'prpl_recommendations_provider', $task_data['ID'] ) ) {
+			if ( has_term( 'user', 'prpl_recommendations_provider', $task_data->ID ) ) {
 				continue;
 			}
 			$task_result = $this->evaluate_task( $task_data );
@@ -230,17 +230,17 @@ class Tasks_Manager {
 	}
 
 	/**
-	 * Wrapper function for evaluating tasks.
+	 * Evaluate a task.
 	 *
-	 * @param array $task The task data.
+	 * @param \Progress_Planner\Suggested_Tasks\Task $task The task to evaluate.
 	 *
-	 * @return bool|\Progress_Planner\Suggested_Tasks\Task
+	 * @return \Progress_Planner\Suggested_Tasks\Task|false
 	 */
-	public function evaluate_task( $task ) {
-		if ( ! $task['provider'] ) {
+	public function evaluate_task( Task $task ) {
+		if ( ! $task->provider ) {
 			return false;
 		}
-		$task_provider = $this->get_task_provider( $task['provider']->slug );
+		$task_provider = $this->get_task_provider( $task->provider->slug );
 		if ( ! $task_provider ) {
 			return false;
 		}
@@ -248,10 +248,10 @@ class Tasks_Manager {
 		// Check if the task is no longer relevant.
 		if ( ! $task_provider->is_task_relevant() ) {
 			// Remove the task from the pending tasks.
-			Suggested_Tasks_DB::delete_recommendation( $task['ID'] );
+			Suggested_Tasks_DB::delete_recommendation( $task->ID );
 		}
 
-		return $task_provider->evaluate_task( $task['task_id'] );
+		return $task_provider->evaluate_task( $task->task_id );
 	}
 
 	/**

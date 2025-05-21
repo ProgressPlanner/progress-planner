@@ -70,6 +70,6 @@ class User extends Tasks {
 	public function get_task_details( $task_id = '' ) {
 		// Get the user tasks from the database.
 		$task_post = Suggested_Tasks_DB::get_post( $task_id );
-		return $task_post ? $task_post : [];
+		return $task_post ? $task_post->get_data() : [];
 	}
 }

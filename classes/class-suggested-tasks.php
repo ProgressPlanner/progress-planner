@@ -18,6 +18,11 @@ use Progress_Planner\Suggested_Tasks_DB;
  */
 class Suggested_Tasks {
 
+	/**
+	 * Status map for task statuses.
+	 *
+	 * @var array<string, string>
+	 */
 	const STATUS_MAP = [
 		'completed'           => 'trash',
 		'pending_celebration' => 'pending_celebration',
@@ -28,9 +33,9 @@ class Suggested_Tasks {
 	/**
 	 * An object containing tasks.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Tasks_Manager|null
+	 * @var \Progress_Planner\Suggested_Tasks\Tasks_Manager
 	 */
-	private $tasks_manager;
+	private Tasks_Manager $tasks_manager;
 
 	/**
 	 * Constructor.
@@ -67,35 +72,28 @@ class Suggested_Tasks {
 	 *
 	 * @return void
 	 */
-	public function init() {
+	public function init(): void {
 		// Check for completed tasks.
-		$completed_tasks = $this->tasks_manager->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
+		$completed_tasks = $this->tasks_manager->evaluate_tasks();
 
 		foreach ( $completed_tasks as $task ) {
-
-			// Get the task data.
-			$task_data = $task->get_data();
-
-			if ( ! isset( $task_data['task_id'] ) && ! isset( $task_data['ID'] ) ) {
+			if ( ! isset( $task->task_id ) && ! isset( $task->ID ) ) {
 				continue;
 			}
 
-			// Update the task data.
-			$task_post = Suggested_Tasks_DB::get_post( $task_data['task_id'] ?? $task_data['ID'] );
+			// TODO: This is not working properly, the idea was to get fresh data from the task provider (for example ID of the post which was just created).
+			// Not to pull data from the database again, but post_id might not be needed anymore.
+			$task_post = Suggested_Tasks_DB::get_post( $task->task_id ?? $task->ID );
 			if ( ! $task_post ) {
 				continue;
 			}
-			Suggested_Tasks_DB::update_recommendation( $task_post['ID'], $task_data );
 
 			// Change the task status to pending celebration.
-			$task_post = Suggested_Tasks_DB::get_post( $task_data['task_id'] );
-			if ( ! $task_post ) {
-				continue;
-			}
-			Suggested_Tasks_DB::update_recommendation( $task_post['ID'], [ 'post_status' => 'pending_celebration' ] );
+			$task_data['post_status'] = 'pending_celebration';
+			Suggested_Tasks_DB::update_recommendation( $task_post->ID, $task_data );
 
 			// Insert an activity.
-			\progress_planner()->get_suggested_tasks()->insert_activity( $task_data['task_id'] );
+			$this->insert_activity( $task->task_id );
 		}
 	}
 
@@ -106,7 +104,7 @@ class Suggested_Tasks {
 	 *
 	 * @return void
 	 */
-	public function insert_activity( $task_id ) {
+	public function insert_activity( string $task_id ): void {
 		// Insert an activity.
 		$activity          = new Suggested_Task_Activity();
 		$activity->type    = 'completed';
@@ -126,7 +124,7 @@ class Suggested_Tasks {
 	 *
 	 * @return void
 	 */
-	public function delete_activity( $task_id ) {
+	public function delete_activity( string $task_id ): void {
 		$activity = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'data_id' => $task_id,
@@ -146,7 +144,7 @@ class Suggested_Tasks {
 	 *
 	 * @return void
 	 */
-	public function on_automatic_updates_complete() {
+	public function on_automatic_updates_complete(): void {
 
 		$pending_tasks = Suggested_Tasks_DB::get(
 			[
@@ -164,16 +162,16 @@ class Suggested_Tasks {
 		Suggested_Tasks_DB::update_recommendation( $pending_tasks[0]['ID'], [ 'post_status' => 'trash' ] );
 
 		// Insert an activity.
-		\progress_planner()->get_suggested_tasks()->insert_activity( $pending_tasks[0]['ID'] );
+		$this->insert_activity( $pending_tasks[0]['ID'] );
 	}
 
 	/**
-	 * Get the tasks manager object.
+	 * Get the tasks manager.
 	 *
 	 * @return \Progress_Planner\Suggested_Tasks\Tasks_Manager
 	 */
-	public function get_tasks_manager() {
-		return $this->tasks_manager; // @phpstan-ignore-line return.type
+	public function get_tasks_manager(): Tasks_Manager {
+		return $this->tasks_manager;
 	}
 
 	/**
@@ -228,9 +226,9 @@ class Suggested_Tasks {
 	 *
 	 * @return bool
 	 */
-	public function was_task_completed( $task_id ) {
+	public function was_task_completed( $task_id ): bool {
 		$task = Suggested_Tasks_DB::get_post( $task_id );
-		return $task && in_array( $task['post_status'], [ 'trash', 'pending_celebration' ], true );
+		return $task && in_array( $task->post_status, [ 'trash', 'pending_celebration' ], true );
 	}
 
 	/**
@@ -261,13 +259,13 @@ class Suggested_Tasks {
 		switch ( $action ) {
 			case 'complete':
 				// Insert an activity.
-				\progress_planner()->get_suggested_tasks()->insert_activity( $task['ID'] );
+				$this->insert_activity( $task->task_id );
 				$updated = true;
 				break;
 
 			case 'pending':
 			case 'delete':
-				\progress_planner()->get_suggested_tasks()->delete_activity( $task['ID'] );
+				$this->delete_activity( $task->task_id );
 				$updated = true;
 				break;
 		}

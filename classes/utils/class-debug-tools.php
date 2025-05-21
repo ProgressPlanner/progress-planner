@@ -245,9 +245,9 @@ class Debug_Tools {
 			if ( ! empty( $suggested_tasks ) ) {
 				foreach ( $suggested_tasks as $task ) {
 
-					$title = $task['post_title'];
-					if ( isset( $task['post_status'] ) && 'future' === $task['post_status'] && isset( $task['post_date'] ) ) {
-						$until  = is_float( $task['post_date'] ) ? '(forever)' : '(until ' . $task['post_date'] . ')';
+					$title = $task->post_title;
+					if ( $task->post_status && 'future' === $task->post_status && $task->post_date ) {
+						$until  = is_float( $task->post_date ) ? '(forever)' : '(until ' . $task->post_date . ')';
 						$title .= ' ' . $until;
 					}
 

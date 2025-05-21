@@ -26,7 +26,7 @@ class Task_Factory {
 		$task = Suggested_Tasks_DB::get_post( $value );
 
 		// If we have the task data, return it.
-		return $task ? new Task( $task ) : new Task( [] );
+		return $task ? $task : new Task( [] );
 	}
 
 	/**

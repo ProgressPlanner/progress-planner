@@ -7,6 +7,8 @@
 
 namespace Progress_Planner;
 
+use Progress_Planner\Suggested_Tasks\Task;
+
 /**
  * Recommendations class.
  *
@@ -220,7 +222,7 @@ class Suggested_Tasks_DB {
 	 *
 	 * @param array $recommendations The recommendations.
 	 *
-	 * @return array
+	 * @return \Progress_Planner\Suggested_Tasks\Task[]
 	 */
 	public static function format_recommendations( $recommendations ) {
 		$result = [];
@@ -236,7 +238,7 @@ class Suggested_Tasks_DB {
 	 *
 	 * @param \WP_Post $post The recommendation post.
 	 *
-	 * @return array
+	 * @return \Progress_Planner\Suggested_Tasks\Task
 	 */
 	public static function format_recommendation( $post ) {
 		static $cached = [];
@@ -260,8 +262,8 @@ class Suggested_Tasks_DB {
 			$post_data[ $context ] = is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
 		}
 
-		$cached[ $post_data['ID'] ] = $post_data;
-		return $post_data;
+		$cached[ $post_data['ID'] ] = new Task( $post_data );
+		return $cached[ $post_data['ID'] ];
 	}
 
 	/**
@@ -269,7 +271,7 @@ class Suggested_Tasks_DB {
 	 *
 	 * @param string|int $id The recommendation ID. Can be a task-ID or a post-ID.
 	 *
-	 * @return array|false The recommendation post or false if not found.
+	 * @return \Progress_Planner\Suggested_Tasks\Task|false The recommendation post or false if not found.
 	 */
 	public static function get_post( $id ) {
 		$posts = self::get_tasks_by(
