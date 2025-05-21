@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Suggested_Tasks;
 
+use Progress_Planner\Suggested_Tasks_DB;
+
 /**
  * Task abstract class.
  *
@@ -61,6 +63,11 @@ class Task {
 	 */
 	public function set_data( array $data ): void {
 		$this->data = $data;
+
+		// TODO: WIP, update the task in the database - we need to handle the case when task is created from array which does not have ID.
+		if ( $this->ID ) {
+			Suggested_Tasks_DB::update_recommendation( $this->ID, $this->data );
+		}
 	}
 
 	/**

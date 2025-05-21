@@ -215,12 +215,8 @@ class Tasks_Manager {
 		$tasks           = (array) Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] );
 		$completed_tasks = [];
 
-		foreach ( $tasks as $task_data ) {
-			// Skip user tasks.
-			if ( has_term( 'user', 'prpl_recommendations_provider', $task_data->ID ) ) {
-				continue;
-			}
-			$task_result = $this->evaluate_task( $task_data );
+		foreach ( $tasks as $task ) {
+			$task_result = $this->evaluate_task( $task );
 			if ( false !== $task_result ) {
 				$completed_tasks[] = $task_result;
 			}
@@ -237,6 +233,11 @@ class Tasks_Manager {
 	 * @return \Progress_Planner\Suggested_Tasks\Task|false
 	 */
 	public function evaluate_task( Task $task ) {
+		// User tasks are not evaluated.
+		if ( has_term( 'user', 'prpl_recommendations_provider', $task->ID ) ) {
+			return false;
+		}
+
 		if ( ! $task->provider ) {
 			return false;
 		}

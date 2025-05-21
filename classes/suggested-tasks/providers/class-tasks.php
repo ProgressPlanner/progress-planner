@@ -345,28 +345,31 @@ abstract class Tasks implements Tasks_Interface {
 			return false;
 		}
 
-		if ( ! $this->is_repetitive() ) {
-			if ( ! $task_id || 0 !== strpos( $task_id, $this->get_task_id() ) ) {
-				return false;
-			}
-			return $this->is_task_completed( $task_id ) ? Task_Factory::create_task_from_id( $task_id ) : false;
+		$task = Suggested_Tasks_DB::get_post( $task_id );
+
+		if ( ! $task ) {
+			return false;
 		}
 
-		$task_object = Task_Factory::create_task_from_id( $task_id );
-		$task_data   = $task_object->get_data();
+		if ( ! $this->is_repetitive() ) {
+			if ( ! $task->task_id || 0 !== strpos( $task->task_id, $this->get_task_id() ) ) {
+				return false;
+			}
+			return $this->is_task_completed( $task->task_id ) ? $task : false;
+		}
 
 		if (
-			$task_data &&
-			$task_data['provider']->slug === $this->get_provider_id() &&
-			\DateTime::createFromFormat( 'Y-m-d H:i:s', $task_data['post_date'] ) &&
-			\gmdate( 'YW' ) === \gmdate( 'YW', \DateTime::createFromFormat( 'Y-m-d H:i:s', $task_data['post_date'] )->getTimestamp() ) && // @phpstan-ignore-line
-			$this->is_task_completed( $task_id )
+			$task->provider &&
+			$task->provider->slug === $this->get_provider_id() &&
+			\DateTime::createFromFormat( 'Y-m-d H:i:s', $task->post_date ) &&
+			\gmdate( 'YW' ) === \gmdate( 'YW', \DateTime::createFromFormat( 'Y-m-d H:i:s', $task->post_date )->getTimestamp() ) && // @phpstan-ignore-line
+			$this->is_task_completed( $task->task_id )
 		) {
 			// Allow adding more data, for example in case of 'create-post' tasks we are adding the post_id.
-			$task_data = $this->modify_evaluated_task_data( $task_data );
-			$task_object->set_data( $task_data );
+			$task_data = $this->modify_evaluated_task_data( $task->get_data() );
+			$task->set_data( $task_data );
 
-			return $task_object;
+			return $task;
 		}
 
 		return false;

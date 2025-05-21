@@ -36,7 +36,7 @@ interface Tasks_Interface {
 	/**
 	 * Evaluate a task.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param string $task_id The task id.
 	 *
 	 * @return \Progress_Planner\Suggested_Tasks\Task|false
 	 */

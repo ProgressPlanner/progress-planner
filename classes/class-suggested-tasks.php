@@ -81,16 +81,8 @@ class Suggested_Tasks {
 				continue;
 			}
 
-			// TODO: This is not working properly, the idea was to get fresh data from the task provider (for example ID of the post which was just created).
-			// Not to pull data from the database again, but post_id might not be needed anymore.
-			$task_post = Suggested_Tasks_DB::get_post( $task->task_id ?? $task->ID );
-			if ( ! $task_post ) {
-				continue;
-			}
-
 			// Change the task status to pending celebration.
-			$task_data['post_status'] = 'pending_celebration';
-			Suggested_Tasks_DB::update_recommendation( $task_post->ID, $task_data );
+			Suggested_Tasks_DB::update_recommendation( $task->ID, [ 'post_status' => 'pending_celebration' ] );
 
 			// Insert an activity.
 			$this->insert_activity( $task->task_id );
