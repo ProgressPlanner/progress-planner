@@ -8,7 +8,6 @@
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post as Last_Published_Post_Data_Collector;
-use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Add tasks for content creation.
