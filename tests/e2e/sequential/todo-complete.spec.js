@@ -1,4 +1,5 @@
 const { test, expect, chromium } = require( '@playwright/test' );
+const SELECTORS = require( '../constants/selectors' );
 
 const TEST_TASK_TEXT = 'Task to be completed';
 
@@ -26,9 +27,7 @@ function todoCompleteTests( testContext = test ) {
 			await page.waitForLoadState( 'networkidle' );
 
 			// Clean up active tasks
-			const activeTodoItems = page.locator(
-				'ul#todo-list > prpl-suggested-task li'
-			);
+			const activeTodoItems = page.locator( SELECTORS.TODO_ITEM );
 
 			while ( ( await activeTodoItems.count() ) > 0 ) {
 				const firstItem = activeTodoItems.first();
@@ -49,7 +48,7 @@ function todoCompleteTests( testContext = test ) {
 				await page.waitForTimeout( 500 );
 
 				const completedTodoItems = page.locator(
-					'ul#todo-list-completed > prpl-suggested-task li'
+					SELECTORS.TODO_COMPLETED_ITEM
 				);
 
 				while ( ( await completedTodoItems.count() ) > 0 ) {
@@ -86,42 +85,38 @@ function todoCompleteTests( testContext = test ) {
 			await page.waitForTimeout( 500 );
 
 			// Get the task selector
-			const todoItem = page.locator(
-				'ul#todo-list > prpl-suggested-task li'
-			);
+			const todoItem = page.locator( SELECTORS.TODO_ITEM );
 			const taskId = await todoItem.getAttribute( 'data-task-id' );
 			taskSelector = `li[data-task-id="${ taskId }"]`;
 
-			// Verify task was created
+			// Complete the task
 			const todoItemElement = page.locator(
-				`ul#todo-list ${ taskSelector }`
+				`${ SELECTORS.TODO_LIST } ${ taskSelector }`
 			);
-			await expect( todoItemElement.locator( 'h3 > span' ) ).toHaveText(
-				TEST_TASK_TEXT
-			);
-
-			// Click the checkbox to complete the task
 			await todoItemElement
 				.locator( '.prpl-suggested-task-checkbox' )
 				.click();
 			await page.waitForTimeout( 1000 );
 
-			// Verify task disappeared from active list
+			// Verify task is not in active list
 			await expect(
-				page.locator( `ul#todo-list ${ taskSelector }` )
+				page.locator( `${ SELECTORS.TODO_LIST } ${ taskSelector }` )
 			).toHaveCount( 0 );
 
-			// Open completed tasks if not already open
+			// Open completed tasks
 			await page.locator( 'details#todo-list-completed-details' ).click();
 
-			// Verify task appears in completed list
+			// Verify task is still in completed list with correct state
 			const completedTask = page.locator(
-				`ul#todo-list-completed ${ taskSelector }`
+				`${ SELECTORS.TODO_LIST_COMPLETED } ${ taskSelector }`
 			);
 			await expect( completedTask ).toBeVisible();
 			await expect( completedTask.locator( 'h3 > span' ) ).toHaveText(
 				TEST_TASK_TEXT
 			);
+			await expect(
+				completedTask.locator( SELECTORS.RR_ITEM_TEXT )
+			).toHaveText( TEST_TASK_TEXT );
 			await expect(
 				completedTask.locator( '.prpl-suggested-task-checkbox' )
 			).toBeChecked();
@@ -142,15 +137,13 @@ function todoCompleteTests( testContext = test ) {
 				await page.waitForTimeout( 500 );
 
 				// Get the task selector
-				const todoItem = page.locator(
-					'ul#todo-list > prpl-suggested-task li'
-				);
+				const todoItem = page.locator( SELECTORS.TODO_ITEM );
 				const taskId = await todoItem.getAttribute( 'data-task-id' );
 				taskSelector = `li[data-task-id="${ taskId }"]`;
 
 				// Complete the task
 				const todoItemElement = page.locator(
-					`ul#todo-list ${ taskSelector }`
+					`${ SELECTORS.TODO_LIST } ${ taskSelector }`
 				);
 				await todoItemElement
 					.locator( '.prpl-suggested-task-checkbox' )
@@ -159,7 +152,7 @@ function todoCompleteTests( testContext = test ) {
 
 				// Verify task is not in active list
 				await expect(
-					page.locator( `ul#todo-list ${ taskSelector }` )
+					page.locator( `${ SELECTORS.TODO_LIST } ${ taskSelector }` )
 				).toHaveCount( 0 );
 
 				// Open completed tasks
@@ -169,12 +162,15 @@ function todoCompleteTests( testContext = test ) {
 
 				// Verify task is still in completed list with correct state
 				const completedTask = page.locator(
-					`ul#todo-list-completed ${ taskSelector }`
+					`${ SELECTORS.TODO_LIST_COMPLETED } ${ taskSelector }`
 				);
 				await expect( completedTask ).toBeVisible();
 				await expect( completedTask.locator( 'h3 > span' ) ).toHaveText(
 					TEST_TASK_TEXT
 				);
+				await expect(
+					completedTask.locator( SELECTORS.RR_ITEM_TEXT )
+				).toHaveText( TEST_TASK_TEXT );
 				await expect(
 					completedTask.locator( '.prpl-suggested-task-checkbox' )
 				).toBeChecked();

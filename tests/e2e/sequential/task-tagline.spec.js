@@ -1,5 +1,5 @@
 const { test, expect } = require( '@playwright/test' );
-const { makeAuthenticatedRequest } = require( './utils' );
+const { makeAuthenticatedRequest } = require( '../utils' );
 
 function taglineTests( testContext = test ) {
 	testContext.describe( 'PRPL Complete Task', () => {
