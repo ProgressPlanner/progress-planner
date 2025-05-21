@@ -36,10 +36,10 @@ class Tasks {
 					'callback'            => [ $this, 'get_tasks' ],
 					'permission_callback' => '__return_true',
 					'args'                => [
-						// 'token' => [
-						// 	'required'          => true,
-						// 	'validate_callback' => [ $this, 'validate_token' ],
-						// ],
+						'token' => [
+							'required'          => true,
+							'validate_callback' => [ $this, 'validate_token' ],
+						],
 					],
 				],
 			]
