@@ -129,11 +129,7 @@ class Fewer_Tags extends Tasks {
 	 */
 	public function should_add_task() {
 		// If the plugin is  active, we don't need to add the task.
-		if ( $this->is_plugin_active() ) {
-			return false;
-		}
-
-		return $this->is_task_relevant();
+		return $this->is_plugin_active() ? false : $this->is_task_relevant();
 	}
 
 	/**
@@ -162,7 +158,6 @@ class Fewer_Tags extends Tasks {
 	 * @return bool
 	 */
 	protected function is_plugin_active() {
-
 		if ( null === $this->is_plugin_active ) {
 			if ( ! function_exists( 'get_plugins' ) ) {
 				require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore requireOnce.fileNotFound

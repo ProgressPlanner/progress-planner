@@ -92,16 +92,8 @@ class Archive_Format extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( ! $this->is_task_relevant() ) {
-			return false;
-		}
-
-		// If the post format archive is already disabled, we don't need to add the task.
-		if ( YoastSEO()->helpers->options->get( 'disable-post_format' ) === true ) {
-			return false;
-		}
-
-		return true;
+		return $this->is_task_relevant()
+			&& YoastSEO()->helpers->options->get( 'disable-post_format' ) !== true;
 	}
 
 	/**
@@ -112,13 +104,7 @@ class Archive_Format extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function is_task_relevant() {
-		$archive_format_count = $this->get_data_collector()->collect();
-
 		// If there are more than X posts with a post format, we don't need to add the task. X is set in the class.
-		if ( $archive_format_count > static::MINIMUM_POSTS_WITH_FORMAT ) {
-			return false;
-		}
-
-		return true;
+		return $this->get_data_collector()->collect() <= static::MINIMUM_POSTS_WITH_FORMAT;
 	}
 }

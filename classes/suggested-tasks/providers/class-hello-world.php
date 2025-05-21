@@ -50,18 +50,19 @@ class Hello_World extends Tasks {
 	protected function get_url() {
 		$hello_world_post_id = $this->get_data_collector()->collect();
 
-		if ( 0 !== $hello_world_post_id ) {
-			// We don't use the edit_post_link() function because we need to bypass it's current_user_can() check.
-			$this->url = \esc_url(
-				\add_query_arg(
-					[
-						'post'   => $hello_world_post_id,
-						'action' => 'edit',
-					],
-					\admin_url( 'post.php' )
-				)
-			);
+		if ( 0 === $hello_world_post_id ) {
+			return '';
 		}
+		// We don't use the edit_post_link() function because we need to bypass it's current_user_can() check.
+		$this->url = \esc_url(
+			\add_query_arg(
+				[
+					'post'   => $hello_world_post_id,
+					'action' => 'edit',
+				],
+				\admin_url( 'post.php' )
+			)
+		);
 
 		return $this->url;
 	}

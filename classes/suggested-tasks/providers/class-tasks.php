@@ -181,11 +181,7 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return string
 	 */
 	protected function get_url() {
-		if ( $this->url ) {
-			return \esc_url( $this->url );
-		}
-
-		return '';
+		return $this->url ? \esc_url( $this->url ) : '';
 	}
 
 	/**
@@ -422,7 +418,6 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-
 		$task_id = $this->get_task_id();
 
 		if (
@@ -453,11 +448,7 @@ abstract class Tasks implements Tasks_Interface {
 		$task_post = \progress_planner()->get_suggested_tasks()->get_post( $task_data['task_id'] );
 
 		// Skip the task if it was already injected.
-		if ( $task_post ) {
-			return [];
-		}
-
-		return [ \progress_planner()->get_suggested_tasks()->add( $task_data ) ];
+		return $task_post ? [] : [ \progress_planner()->get_suggested_tasks()->add( $task_data ) ];
 	}
 
 	/**

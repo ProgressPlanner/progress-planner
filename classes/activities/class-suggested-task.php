@@ -72,8 +72,7 @@ class Suggested_Task extends Activity {
 			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $tasks[0]['provider_id'] );
 
 			if ( $task_provider ) {
-				// Create post task provider had a different points system, this is for backwards compatibility.
-				$points = $task_provider instanceof Content_Create ? $task_provider->get_points( $this->data_id ) : $task_provider->get_points();
+				$points = $task_provider->get_points();
 			}
 		}
 		$this->points[ $date_ymd ] = $points;

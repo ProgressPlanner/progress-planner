@@ -134,7 +134,6 @@ class Core_Update extends Tasks {
 	 * @return array
 	 */
 	public function get_task_details( $task_id = '' ) {
-
 		if ( ! $task_id ) {
 			$task_id = $this->get_task_id();
 		}

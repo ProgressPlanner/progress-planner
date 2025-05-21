@@ -75,13 +75,8 @@ class Archive_Date extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-
-		if ( ! $this->is_task_relevant() ) {
-			return false;
-		}
-
 		// If the date archive is already disabled, we don't need to add the task.
-		return YoastSEO()->helpers->options->get( 'disable-date' ) !== true;
+		return $this->is_task_relevant() && YoastSEO()->helpers->options->get( 'disable-date' ) !== true;
 	}
 
 	/**
@@ -94,10 +89,8 @@ class Archive_Date extends Yoast_Provider {
 	public function is_task_relevant() {
 		// If the permalink structure includes %year%, %monthnum%, or %day%, we don't need to add the task.
 		$permalink_structure = \get_option( 'permalink_structure' );
-		if ( strpos( $permalink_structure, '%year%' ) !== false || strpos( $permalink_structure, '%monthnum%' ) !== false || strpos( $permalink_structure, '%day%' ) !== false ) {
-			return false;
-		}
-
-		return true;
+		return strpos( $permalink_structure, '%year%' ) === false
+			&& strpos( $permalink_structure, '%monthnum%' ) === false
+			&& strpos( $permalink_structure, '%day%' ) === false;
 	}
 }

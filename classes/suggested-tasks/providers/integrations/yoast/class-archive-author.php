@@ -91,7 +91,6 @@ class Archive_Author extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-
 		if ( ! $this->is_task_relevant() ) {
 			return false;
 		}
@@ -113,10 +112,6 @@ class Archive_Author extends Yoast_Provider {
 	 */
 	public function is_task_relevant() {
 		// If there is more than one author, we don't need to add the task.
-		if ( $this->get_data_collector()->collect() > self::MINIMUM_AUTHOR_WITH_POSTS ) {
-			return false;
-		}
-
-		return true;
+		return $this->get_data_collector()->collect() <= self::MINIMUM_AUTHOR_WITH_POSTS;
 	}
 }

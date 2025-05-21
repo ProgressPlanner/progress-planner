@@ -25,11 +25,7 @@ class Task_Factory {
 		$task = \progress_planner()->get_suggested_tasks()->get_post( $value );
 
 		// If we have the task data, return it.
-		if ( $task ) {
-			return new Task( $task );
-		}
-
-		return new Task( [] );
+		return $task ? new Task( $task ) : new Task( [] );
 	}
 
 	/**

@@ -124,12 +124,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	protected function get_url( $task_data = [] ) {
 		$post = \get_post( $task_data['post_id'] );
 
-		// We don't want to link if the post was deleted.
-		if ( ! $post ) {
-			return '';
-		}
-
-		return 'https://prpl.fyi/fix-orphaned-content';
+		return $post ? 'https://prpl.fyi/fix-orphaned-content' : '';
 	}
 
 	/**
@@ -181,10 +176,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 */
 	public function get_tasks_to_inject() {
 
-		if (
-			true === $this->is_task_snoozed() ||
-			! $this->should_add_task() // No need to add the task.
-		) {
+		if ( true === $this->is_task_snoozed() || ! $this->should_add_task() ) {
 			return [];
 		}
 
@@ -217,12 +209,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		// Add the tasks to the pending tasks option, it will not add duplicates.
 		$task_post = \progress_planner()->get_suggested_tasks()->get_post( $task_data['task_id'] );
 
-		// Skip the task if it was already injected.
-		if ( $task_post ) {
-			return [];
-		}
-
-		return [ \progress_planner()->get_suggested_tasks()->add( $task_data ) ];
+		return $task_post ? [] : [ \progress_planner()->get_suggested_tasks()->add( $task_data ) ];
 	}
 
 	/**
@@ -233,7 +220,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return array
 	 */
 	public function get_task_details( $task_id = '' ) {
-
 		if ( ! $task_id ) {
 			return [];
 		}
@@ -245,7 +231,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return [];
 		}
 
-		$task_details = [
+		return [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
 			'post_title'  => $this->get_title( $task_data[0] ),
@@ -258,8 +244,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			'url_target'  => $this->get_url_target(),
 			'description' => $this->get_description( $task_data[0] ),
 		];
-
-		return $task_details;
 	}
 
 	/**
@@ -287,7 +271,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return array
 	 */
 	protected function get_completed_post_ids() {
-
 		if ( null !== $this->completed_post_ids ) {
 			return $this->completed_post_ids;
 		}

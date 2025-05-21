@@ -79,7 +79,6 @@ class Add_Yoast_Providers {
 	 * @return array
 	 */
 	public function add_providers( $providers ) {
-
 		$this->providers = [
 			new Archive_Author(),
 			new Archive_Date(),

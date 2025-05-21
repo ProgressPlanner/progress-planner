@@ -165,12 +165,7 @@ class Cornerstone_Workout extends Tasks {
 			'provider_id' => $this->get_provider_id(),
 		];
 
-		// Skip if the task has been dismissed.
-		if ( $this->is_task_dismissed( $task_data ) ) {
-			return false;
-		}
-
-		return true;
+		return ! $this->is_task_dismissed( $task_data );
 	}
 
 	/**
