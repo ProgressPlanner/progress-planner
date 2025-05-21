@@ -472,3 +472,12 @@ button.prpl-info-icon {
 		height: 1em;
 	}
 }
+
+/*------------------------------------*\
+	Layout for columns.
+\*------------------------------------*/
+.prpl-columns-wrapper {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: var(--prpl-padding);
+}

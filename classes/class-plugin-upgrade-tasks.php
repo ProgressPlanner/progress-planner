@@ -24,7 +24,10 @@ class Plugin_Upgrade_Tasks {
 		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_activated_or_updated' ], 10 );
 
 		// Check if the plugin was upgraded or new plugin was activated.
-		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 100 ); // We need to run this after the Tasks_Manager::init() is called.
+		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 100 ); // We need to run this after the Local_Tasks_Manager::init() is called.
+
+		// Add the action to add the upgrade tasks popover.
+		\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_upgrade_tasks_popover' ] );
 	}
 
 	/**
@@ -146,5 +149,16 @@ class Plugin_Upgrade_Tasks {
 	 */
 	public function delete_upgrade_popover_task_providers() {
 		\delete_option( 'progress_planner_upgrade_popover_task_provider_ids' );
+	}
+
+	/**
+	 * Add the upgrade tasks popover.
+	 *
+	 * @return void
+	 */
+	public function add_upgrade_tasks_popover() {
+		if ( $this->should_show_upgrade_popover() ) {
+			\progress_planner()->get_ui__popover()->the_popover( 'upgrade-tasks' )->render();
+		}
 	}
 }
