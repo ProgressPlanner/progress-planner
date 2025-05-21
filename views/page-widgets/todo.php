@@ -40,4 +40,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</prpl-tooltip>
 	</span>
 </p>
+
+<p id="prpl-todo-list-loading"><?php \esc_html_e( 'Loading items...', 'progress-planner' ); ?></p>
 <?php \progress_planner()->get_admin__widgets__todo()->the_todo_list(); ?>

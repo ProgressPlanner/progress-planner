@@ -102,10 +102,6 @@
 			display: flex;
 		}
 
-		.prpl-no-suggested-tasks {
-			display: none;
-		}
-
 		hr {
 			display: block;
 		}
@@ -116,10 +112,15 @@
 		display: none;
 	}
 
-	.prpl-no-suggested-tasks {
-		display: block;
+	.prpl-no-suggested-tasks,
+	.prpl-suggested-tasks-loading {
+		display: none;
 		background-color: var(--prpl-background-green);
 		padding: calc(var(--prpl-padding) / 2);
+	}
+
+	.prpl-suggested-tasks-loading {
+		display: block;
 	}
 }
 

@@ -300,8 +300,8 @@ customElements.define(
 		 * Add listeners to the item.
 		 */
 		taskListeners = () => {
-			const thisObj = this,
-				item = thisObj.querySelector( 'li' );
+			const thisObj = this;
+			const item = thisObj.querySelector( 'li' );
 
 			item.querySelector(
 				'.prpl-suggested-task-checkbox'
