@@ -20,11 +20,27 @@ function onboardingTests( testContext = test ) {
 				const form = page.locator( '#prpl-onboarding-form' );
 				await expect( form ).toBeVisible();
 
+				// Submit button should be disabled
+				const submitButtonWrapper = form.locator(
+					'#prpl-onboarding-submit-wrapper'
+				);
+
 				// Select "no" for email and accept privacy policy
 				await form
 					.locator( 'input[name="with-email"][value="no"]' )
 					.click();
+
+				// Verify submit button is stilldisabled
+				await expect( submitButtonWrapper ).toHaveClass(
+					'prpl-disabled'
+				);
+
 				await form.locator( 'input[name="privacy-policy"]' ).check();
+
+				// Accept privacy policy and verify button becomes enabled
+				await expect( submitButtonWrapper ).not.toHaveClass(
+					'prpl-disabled'
+				);
 
 				// Submit the form
 				await form
@@ -54,32 +70,17 @@ function onboardingTests( testContext = test ) {
 				).toBeVisible( {
 					timeout: 5000,
 				} );
+
+				// Visit the WP Dashboard page and back to the Progress Planner page.
+				await page.goto( '/wp-admin/' );
+				await page.goto( '/wp-admin/admin.php?page=progress-planner' );
+				await page.waitForLoadState( 'networkidle' );
+
+				await expect(
+					page.locator( '#prpl-onboarding-tasks' )
+				).toHaveCount( 0 );
 			}
 		);
-
-		// testContext( 'should handle onboarding errors gracefully', async ( { page } ) => {
-		// 	// Navigate to Progress Planner page
-		// 	await page.goto( '/wp-admin/admin.php?page=progress-planner' );
-		// 	await page.waitForLoadState( 'networkidle' );
-
-		// 	// Verify onboarding element is present
-		// 	const onboardingElement = page.locator( '.prpl-welcome' );
-		// 	await expect( onboardingElement ).toBeVisible();
-
-		// 	// Try to submit form without accepting privacy policy
-		// 	const form = page.locator( '#prpl-onboarding-form' );
-		// 	await form.locator( 'input[name="with-email"][value="no"]' ).click();
-
-		// 	// Submit button should be disabled
-		// 	const submitButton = form.locator(
-		// 		'input[type="submit"].prpl-button-secondary--no-email'
-		// 	);
-		// 	await expect( submitButton ).toBeDisabled();
-
-		// 	// Accept privacy policy and verify button becomes enabled
-		// 	await form.locator( 'input[name="privacy-policy"]' ).check();
-		// 	await expect( submitButton ).toBeEnabled();
-		// } );
 	} );
 }
 

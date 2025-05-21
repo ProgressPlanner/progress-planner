@@ -20,10 +20,12 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-crawl-settings-feed-global-comments';
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url = \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_global_comments' );
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_global_comments' );
 	}
 
 	/**

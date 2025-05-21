@@ -36,19 +36,19 @@ class Sample_Page extends Tasks {
 	protected const CAPABILITY = 'edit_pages';
 
 	/**
-	 * The data collector.
+	 * The data collector class name.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page
+	 * @var string
 	 */
-	protected $data_collector;
+	protected const DATA_COLLECTOR_CLASS = Sample_Page_Data_Collector::class;
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->data_collector = new Sample_Page_Data_Collector();
-
-		$sample_page_id = $this->data_collector->collect();
+	protected function get_url() {
+		$sample_page_id = $this->get_data_collector()->collect();
 
 		if ( 0 !== $sample_page_id ) {
 			// We don't use the edit_post_link() function because we need to bypass it's current_user_can() check.
@@ -62,6 +62,8 @@ class Sample_Page extends Tasks {
 				)
 			);
 		}
+
+		return $this->url;
 	}
 
 	/**
@@ -92,6 +94,6 @@ class Sample_Page extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return 0 !== $this->data_collector->collect();
+		return 0 !== $this->get_data_collector()->collect();
 	}
 }

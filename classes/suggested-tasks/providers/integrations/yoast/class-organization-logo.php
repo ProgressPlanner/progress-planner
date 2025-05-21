@@ -31,7 +31,15 @@ class Organization_Logo extends Yoast_Provider {
 	 */
 	public function __construct() {
 		$this->yoast_seo = YoastSEO();
-		$this->url       = \admin_url( 'admin.php?page=wpseo_page_settings#/site-representation' );
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/site-representation' );
 	}
 
 	/**

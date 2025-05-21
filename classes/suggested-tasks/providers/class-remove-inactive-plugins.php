@@ -29,18 +29,19 @@ class Remove_Inactive_Plugins extends Tasks {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
-	 * The data collector.
+	 * The data collector class name.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Inactive_Plugins
+	 * @var string
 	 */
-	protected $data_collector;
+	protected const DATA_COLLECTOR_CLASS = Inactive_Plugins_Data_Collector::class;
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->data_collector = new Inactive_Plugins_Data_Collector();
-		$this->url            = \admin_url( 'plugins.php' );
+	protected function get_url() {
+		return \admin_url( 'plugins.php' );
 	}
 
 	/**
@@ -71,6 +72,6 @@ class Remove_Inactive_Plugins extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return $this->data_collector->collect() > 0;
+		return $this->get_data_collector()->collect() > 0;
 	}
 }

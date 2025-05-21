@@ -20,10 +20,12 @@ class Media_Pages extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-media-pages';
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url = \admin_url( 'admin.php?page=wpseo_page_settings#/media-pages' );
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/media-pages' );
 	}
 
 	/**

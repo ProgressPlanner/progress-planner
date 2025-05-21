@@ -29,18 +29,19 @@ class Archive_Author extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-author-archive';
 
 	/**
-	 * The data collector.
+	 * The data collector class name.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author
+	 * @var string
 	 */
-	protected $data_collector;
+	protected const DATA_COLLECTOR_CLASS = Post_Author::class;
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->data_collector = new Post_Author();
-		$this->url            = \admin_url( 'admin.php?page=wpseo_page_settings#/author-archives' );
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/author-archives' );
 	}
 
 	/**
@@ -90,7 +91,6 @@ class Archive_Author extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-
 		if ( ! $this->is_task_relevant() ) {
 			return false;
 		}
@@ -112,10 +112,6 @@ class Archive_Author extends Yoast_Provider {
 	 */
 	public function is_task_relevant() {
 		// If there is more than one author, we don't need to add the task.
-		if ( $this->data_collector->collect() > self::MINIMUM_AUTHOR_WITH_POSTS ) {
-			return false;
-		}
-
-		return true;
+		return $this->get_data_collector()->collect() <= self::MINIMUM_AUTHOR_WITH_POSTS;
 	}
 }

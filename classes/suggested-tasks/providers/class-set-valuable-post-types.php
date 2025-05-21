@@ -36,10 +36,12 @@ class Set_Valuable_Post_Types extends Tasks {
 	protected $priority = 'low';
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url = \admin_url( 'admin.php?page=progress-planner-settings' );
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=progress-planner-settings' );
 	}
 
 	/**
@@ -92,7 +94,6 @@ class Set_Valuable_Post_Types extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-
 		// Check the "Settings saved" task, if the has not been added as 'pending' don't add the task.
 		$settings_saved_task = Suggested_Tasks_DB::get_tasks_by( [ 'provider_id' => 'settings-saved' ] );
 		if ( empty( $settings_saved_task ) ) {

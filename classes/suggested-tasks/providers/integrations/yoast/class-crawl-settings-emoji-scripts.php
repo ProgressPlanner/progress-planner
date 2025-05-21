@@ -20,10 +20,12 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-crawl-settings-emoji-scripts';
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url = \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_emoji_scripts' );
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_emoji_scripts' );
 	}
 
 	/**

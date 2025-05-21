@@ -36,32 +36,35 @@ class Hello_World extends Tasks {
 	protected const CAPABILITY = 'edit_posts';
 
 	/**
-	 * The data collector.
+	 * The data collector class name.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Hello_World
+	 * @var string
 	 */
-	protected $data_collector;
+	protected const DATA_COLLECTOR_CLASS = Hello_World_Data_Collector::class;
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->data_collector = new Hello_World_Data_Collector();
+	protected function get_url() {
+		$hello_world_post_id = $this->get_data_collector()->collect();
 
-		$hello_world_post_id = $this->data_collector->collect();
-
-		if ( 0 !== $hello_world_post_id ) {
-			// We don't use the edit_post_link() function because we need to bypass it's current_user_can() check.
-			$this->url = \esc_url(
-				\add_query_arg(
-					[
-						'post'   => $hello_world_post_id,
-						'action' => 'edit',
-					],
-					\admin_url( 'post.php' )
-				)
-			);
+		if ( 0 === $hello_world_post_id ) {
+			return '';
 		}
+		// We don't use the edit_post_link() function because we need to bypass it's current_user_can() check.
+		$this->url = \esc_url(
+			\add_query_arg(
+				[
+					'post'   => $hello_world_post_id,
+					'action' => 'edit',
+				],
+				\admin_url( 'post.php' )
+			)
+		);
+
+		return $this->url;
 	}
 
 	/**
@@ -92,6 +95,6 @@ class Hello_World extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return 0 !== $this->data_collector->collect();
+		return 0 !== $this->get_data_collector()->collect();
 	}
 }

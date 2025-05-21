@@ -45,6 +45,13 @@ abstract class Tasks implements Tasks_Interface {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
+	 * The data collector class name.
+	 *
+	 * @var string
+	 */
+	protected const DATA_COLLECTOR_CLASS = \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector::class;
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -99,6 +106,13 @@ abstract class Tasks implements Tasks_Interface {
 	 * @var array
 	 */
 	protected $link_setting;
+
+	/**
+	 * The data collector.
+	 *
+	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector|null
+	 */
+	protected $data_collector = null;
 
 	/**
 	 * Initialize the task provider.
@@ -168,11 +182,7 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return string
 	 */
 	protected function get_url() {
-		if ( $this->url ) {
-			return \esc_url( $this->url );
-		}
-
-		return '';
+		return $this->url ? \esc_url( $this->url ) : '';
 	}
 
 	/**
@@ -189,7 +199,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return array
 	 */
-	public function get_link_setting() {
+	protected function get_link_setting() {
 		return $this->link_setting;
 	}
 
@@ -243,6 +253,20 @@ abstract class Tasks implements Tasks_Interface {
 		$parts[] = \gmdate( 'YW' );
 
 		return implode( '-', $parts );
+	}
+
+	/**
+	 * Get the data collector.
+	 *
+	 * @return \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector
+	 */
+	public function get_data_collector() {
+		if ( ! $this->data_collector ) {
+			$class_name           = static::DATA_COLLECTOR_CLASS;
+			$this->data_collector = new $class_name(); // @phpstan-ignore-line assign.propertyType
+		}
+
+		return $this->data_collector; // @phpstan-ignore-line return.type
 	}
 
 	/**
@@ -395,7 +419,6 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-
 		$task_id = $this->get_task_id();
 
 		if (
@@ -426,11 +449,7 @@ abstract class Tasks implements Tasks_Interface {
 		$task_post = Suggested_Tasks_DB::get_post( $task_data['task_id'] );
 
 		// Skip the task if it was already injected.
-		if ( $task_post ) {
-			return [];
-		}
-
-		return [ Suggested_Tasks_DB::add( $task_data ) ];
+		return $task_post ? [] : [ Suggested_Tasks_DB::add( $task_data ) ];
 	}
 
 	/**

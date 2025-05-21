@@ -1,5 +1,5 @@
 const { test, expect } = require( '@playwright/test' );
-const { makeAuthenticatedRequest } = require( './utils' );
+const { makeAuthenticatedRequest } = require( '../utils' );
 
 function taglineTests( testContext = test ) {
 	testContext.describe( 'PRPL Complete Task', () => {
@@ -25,7 +25,7 @@ function taglineTests( testContext = test ) {
 					( task ) => task.task_id === 'core-blogdescription'
 				);
 				expect( blogDescriptionTask ).toBeDefined();
-				expect( blogDescriptionTask.status ).toBe( 'pending' );
+				expect( blogDescriptionTask.post_status ).toBe( 'publish' );
 
 				// Navigate to WordPress settings
 				await page.goto(

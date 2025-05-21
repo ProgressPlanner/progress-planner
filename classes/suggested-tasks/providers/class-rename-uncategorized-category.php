@@ -36,18 +36,19 @@ class Rename_Uncategorized_Category extends Tasks {
 	protected const CAPABILITY = 'manage_categories';
 
 	/**
-	 * The data collector.
+	 * The data collector class name.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Uncategorized_Category
+	 * @var string
 	 */
-	protected $data_collector;
+	protected const DATA_COLLECTOR_CLASS = Uncategorized_Category_Data_Collector::class;
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->data_collector = new Uncategorized_Category_Data_Collector();
-		$this->url            = \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' );
+	protected function get_url() {
+		return \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' );
 	}
 
 	/**
@@ -78,7 +79,7 @@ class Rename_Uncategorized_Category extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return 0 !== $this->data_collector->collect();
+		return 0 !== $this->get_data_collector()->collect();
 	}
 
 	/**
@@ -87,6 +88,6 @@ class Rename_Uncategorized_Category extends Tasks {
 	 * @return void
 	 */
 	public function update_uncategorized_category_cache() {
-		$this->data_collector->update_uncategorized_category_cache();
+		$this->get_data_collector()->update_uncategorized_category_cache(); // @phpstan-ignore-line method.notFound
 	}
 }

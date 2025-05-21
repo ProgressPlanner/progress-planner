@@ -50,7 +50,6 @@ trait Dismissable_Task {
 	 * @return void
 	 */
 	public function handle_task_dismissal( $task_id ) {
-
 		// If no task ID is provided, return.
 		if ( ! $task_id ) {
 			return;
@@ -187,9 +186,7 @@ trait Dismissable_Task {
 	 */
 	public function get_dismissed_tasks() {
 		$dismissed_tasks = \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
-		$provider_key    = $this->get_provider_id();
-
-		return $dismissed_tasks[ $provider_key ] ?? [];
+		return $dismissed_tasks[ $this->get_provider_id() ] ?? [];
 	}
 
 	/**

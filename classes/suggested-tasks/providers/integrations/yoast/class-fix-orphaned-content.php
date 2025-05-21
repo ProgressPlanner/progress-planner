@@ -38,13 +38,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-fix-orphaned-content';
 
 	/**
-	 * The data collector.
-	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content
-	 */
-	protected $data_collector;
-
-	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -59,11 +52,11 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	protected $completed_post_ids = null;
 
 	/**
-	 * Constructor.
+	 * The data collector class name.
+	 *
+	 * @var string
 	 */
-	public function __construct() {
-		$this->data_collector = new Yoast_Orphaned_Content();
-	}
+	protected const DATA_COLLECTOR_CLASS = Yoast_Orphaned_Content::class;
 
 	/**
 	 * Initialize the task provider.
@@ -132,12 +125,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	protected function get_url( $task_data = [] ) {
 		$post = \get_post( $task_data['post_id'] );
 
-		// We don't want to link if the post was deleted.
-		if ( ! $post ) {
-			return '';
-		}
-
-		return 'https://prpl.fyi/fix-orphaned-content';
+		return $post ? 'https://prpl.fyi/fix-orphaned-content' : '';
 	}
 
 	/**
@@ -146,7 +134,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return ! empty( $this->data_collector->collect() );
+		return ! empty( $this->get_data_collector()->collect() );
 	}
 
 	/**
@@ -189,14 +177,11 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 */
 	public function get_tasks_to_inject() {
 
-		if (
-			true === $this->is_task_snoozed() ||
-			! $this->should_add_task() // No need to add the task.
-		) {
+		if ( true === $this->is_task_snoozed() || ! $this->should_add_task() ) {
 			return [];
 		}
 
-		$data    = $this->data_collector->collect();
+		$data    = $this->get_data_collector()->collect();
 		$task_id = $this->get_task_id(
 			[
 				'post_id' => $data['post_id'],
@@ -225,12 +210,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		// Add the tasks to the pending tasks option, it will not add duplicates.
 		$task_post = Suggested_Tasks_DB::get_post( $task_data['task_id'] );
 
-		// Skip the task if it was already injected.
-		if ( $task_post ) {
-			return [];
-		}
-
-		return [ Suggested_Tasks_DB::add( $task_data ) ];
+		return $task_post ? [] : [ Suggested_Tasks_DB::add( $task_data ) ];
 	}
 
 	/**
@@ -241,7 +221,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return array
 	 */
 	public function get_task_details( $task_id = '' ) {
-
 		if ( ! $task_id ) {
 			return [];
 		}
@@ -253,7 +232,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return [];
 		}
 
-		$task_details = [
+		return [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
 			'post_title'  => $this->get_title( $task_data[0] ),
@@ -266,8 +245,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			'url_target'  => $this->get_url_target(),
 			'description' => $this->get_description( $task_data[0] ),
 		];
-
-		return $task_details;
 	}
 
 	/**
@@ -295,7 +272,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return array
 	 */
 	protected function get_completed_post_ids() {
-
 		if ( null !== $this->completed_post_ids ) {
 			return $this->completed_post_ids;
 		}

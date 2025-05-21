@@ -45,6 +45,13 @@ class Update_Term_Description extends Tasks {
 	protected const CAPABILITY = 'edit_others_posts';
 
 	/**
+	 * The data collector class name.
+	 *
+	 * @var string
+	 */
+	protected const DATA_COLLECTOR_CLASS = Terms_Without_Description_Data_Collector::class;
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -59,25 +66,11 @@ class Update_Term_Description extends Tasks {
 	protected $priority = 'low';
 
 	/**
-	 * The data collector.
-	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Description
-	 */
-	protected $data_collector;
-
-	/**
 	 * The completed term IDs.
 	 *
 	 * @var array|null
 	 */
 	protected $completed_term_ids = null;
-
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->data_collector = new Terms_Without_Description_Data_Collector();
-	}
 
 	/**
 	 * Initialize the task.
@@ -144,16 +137,11 @@ class Update_Term_Description extends Tasks {
 	 */
 	protected function get_title( $task_data = [] ) {
 		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
-
-		if ( ! $term || \is_wp_error( $term ) ) {
-			return '';
-		}
-
-		return \sprintf(
+		return $term && ! \is_wp_error( $term ) ? \sprintf(
 			/* translators: %s: The term name */
 			\esc_html__( 'Write a description for term named "%s"', 'progress-planner' ),
 			\esc_html( $term->name )
-		);
+		) : '';
 	}
 
 	/**
@@ -166,16 +154,12 @@ class Update_Term_Description extends Tasks {
 	public function get_description( $task_data = [] ) {
 		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
 
-		if ( ! $term || \is_wp_error( $term ) ) {
-			return '';
-		}
-
-		return sprintf(
+		return $term && ! \is_wp_error( $term ) ? sprintf(
 			/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/taxonomy-terms-description" target="_blank">Read more</a> link */
 			\esc_html__( 'Your "%1$s" archives probably show the description of that specific term. %2$s', 'progress-planner' ),
 			$term->name,
 			'<a href="https://prpl.fyi/taxonomy-terms-description" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the writing a description for taxonomy terms.', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
+		) : '';
 	}
 
 	/**
@@ -187,12 +171,9 @@ class Update_Term_Description extends Tasks {
 	 */
 	protected function get_url( $task_data = [] ) {
 		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
-
-		if ( ! $term || \is_wp_error( $term ) ) {
-			return '';
-		}
-
-		return \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id );
+		return $term && ! \is_wp_error( $term )
+			? \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id )
+			: '';
 	}
 
 	/**
@@ -201,7 +182,7 @@ class Update_Term_Description extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return ! empty( $this->data_collector->collect() );
+		return ! empty( $this->get_data_collector()->collect() );
 	}
 
 	/**
@@ -230,15 +211,11 @@ class Update_Term_Description extends Tasks {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-
-		if (
-			true === $this->is_task_snoozed() ||
-			! $this->should_add_task() // No need to add the task.
-		) {
+		if ( true === $this->is_task_snoozed() || ! $this->should_add_task() ) {
 			return [];
 		}
 
-		$data    = $this->data_collector->collect();
+		$data    = $this->get_data_collector()->collect();
 		$task_id = $this->get_task_id(
 			[
 				'term_id'  => $data['term_id'],
@@ -287,7 +264,6 @@ class Update_Term_Description extends Tasks {
 	 * @return array
 	 */
 	public function get_task_details( $task_id = '' ) {
-
 		if ( ! $task_id ) {
 			return [];
 		}
@@ -298,7 +274,7 @@ class Update_Term_Description extends Tasks {
 			return [];
 		}
 
-		$task_details = [
+		return [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
 			'post_title'  => $this->get_title( $task_data[0] ),
@@ -311,8 +287,6 @@ class Update_Term_Description extends Tasks {
 			'url_target'  => $this->get_url_target(),
 			'description' => $this->get_description( $task_data[0] ),
 		];
-
-		return $task_details;
 	}
 
 	/**
@@ -336,12 +310,7 @@ class Update_Term_Description extends Tasks {
 		}
 
 		$term = \get_term( $data['term_id'], $data['taxonomy'] );
-
-		if ( is_wp_error( $term ) ) {
-			return null;
-		}
-
-		return $term;
+		return $term && ! \is_wp_error( $term ) ? $term : null;
 	}
 
 	/**
@@ -350,7 +319,6 @@ class Update_Term_Description extends Tasks {
 	 * @return array
 	 */
 	protected function get_completed_term_ids() {
-
 		if ( null !== $this->completed_term_ids ) {
 			return $this->completed_term_ids;
 		}
@@ -376,8 +344,6 @@ class Update_Term_Description extends Tasks {
 	 * @return array
 	 */
 	public function exclude_completed_terms( $exclude_term_ids ) {
-		$exclude_term_ids = array_merge( $exclude_term_ids, $this->get_completed_term_ids() );
-
-		return $exclude_term_ids;
+		return array_merge( $exclude_term_ids, $this->get_completed_term_ids() );
 	}
 }

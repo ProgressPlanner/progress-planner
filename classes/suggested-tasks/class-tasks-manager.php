@@ -48,7 +48,6 @@ class Tasks_Manager {
 	 * Constructor.
 	 */
 	public function __construct() {
-
 		// Instantiate task providers.
 		$this->task_providers = [
 			new Content_Create(),
@@ -89,7 +88,6 @@ class Tasks_Manager {
 	 * @return void
 	 */
 	public function add_plugin_integration() {
-
 		// Yoast SEO integration.
 		new Add_Yoast_Providers();
 	}
@@ -100,7 +98,6 @@ class Tasks_Manager {
 	 * @return void
 	 */
 	public function init() {
-
 		/**
 		 * Filter the task providers, 3rd party providers are added here as well.
 		 *
@@ -141,9 +138,7 @@ class Tasks_Manager {
 	 * @return array
 	 */
 	public function add_onboarding_task_providers( $task_providers ) {
-
 		foreach ( $this->task_providers as $task_provider ) {
-
 			if ( $task_provider->is_onboarding_task() ) {
 				$task_providers[] = $task_provider->get_provider_id();
 			}
@@ -203,8 +198,6 @@ class Tasks_Manager {
 	 * @return void
 	 */
 	public function inject_tasks() {
-		$provider_tasks = [];
-
 		// Loop through all registered task providers and inject their tasks.
 		foreach ( $this->task_providers as $provider_instance ) {
 
@@ -268,10 +261,7 @@ class Tasks_Manager {
 	 * @return void
 	 */
 	public function cleanup_pending_tasks() {
-
-		$cleanup_recently_performed = \progress_planner()->get_utils__cache()->get( 'cleanup_pending_tasks' );
-
-		if ( $cleanup_recently_performed ) {
+		if ( \progress_planner()->get_utils__cache()->get( 'cleanup_pending_tasks' ) ) {
 			return;
 		}
 

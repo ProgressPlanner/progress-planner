@@ -73,15 +73,28 @@ class Fewer_Tags extends Tasks {
 	private $plugin_path = 'fewer-tags/fewer-tags.php';
 
 	/**
+	 * Whether the task is dismissable.
+	 *
+	 * @var bool
+	 */
+	protected $is_dismissable = true;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		// Data collectors.
 		$this->post_tag_count_data_collector       = new Post_Tag_Count();
 		$this->published_post_count_data_collector = new Published_Post_Count();
+	}
 
-		$this->url            = \admin_url( '/plugin-install.php?tab=search&s=fewer+tags' );
-		$this->is_dismissable = true;
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return \admin_url( '/plugin-install.php?tab=search&s=fewer+tags' );
 	}
 
 	/**
@@ -116,11 +129,7 @@ class Fewer_Tags extends Tasks {
 	 */
 	public function should_add_task() {
 		// If the plugin is  active, we don't need to add the task.
-		if ( $this->is_plugin_active() ) {
-			return false;
-		}
-
-		return $this->is_task_relevant();
+		return $this->is_plugin_active() ? false : $this->is_task_relevant();
 	}
 
 	/**
@@ -149,7 +158,6 @@ class Fewer_Tags extends Tasks {
 	 * @return bool
 	 */
 	protected function is_plugin_active() {
-
 		if ( null === $this->is_plugin_active ) {
 			if ( ! function_exists( 'get_plugins' ) ) {
 				require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore requireOnce.fileNotFound
