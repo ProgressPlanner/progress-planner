@@ -50,7 +50,7 @@ class Suggested_Tasks_DB {
 			\get_posts( $args )
 		);
 
-		// \wp_cache_set( $cache_key, $results, static::GET_TASKS_CACHE_GROUP );
+		\wp_cache_set( $cache_key, $results, static::GET_TASKS_CACHE_GROUP );
 
 		return $results;
 	}
@@ -79,7 +79,7 @@ class Suggested_Tasks_DB {
 	 */
 	public static function delete_recommendation( int $id ) {
 		$result = (bool) \wp_delete_post( $id, true );
-		// \wp_cache_flush_group( static::GET_TASKS_CACHE_GROUP );
+		\wp_cache_flush_group( static::GET_TASKS_CACHE_GROUP );
 		return $result;
 	}
 
