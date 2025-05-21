@@ -170,8 +170,17 @@ prplDocumentReady( () => {
 			} )
 			.done( ( data ) => {
 				console.log( 'Fetch successful:', data );
-
+				document
+					.querySelector( '.prpl-suggested-tasks-loading' )
+					.remove();
 				prplSuggestedTasks.tasks = data;
+
+				if ( 0 === prplSuggestedTasks.tasks.length ) {
+					document.querySelector(
+						'.prpl-no-suggested-tasks'
+					).style.display = 'block';
+					return;
+				}
 
 				// Loop through each provider and inject items.
 				for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
