@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
+use Progress_Planner\Suggested_Tasks_DB;
+
 /**
  * Add tasks for content updates.
  */
@@ -67,7 +69,7 @@ class User extends Tasks {
 	 */
 	public function get_task_details( $task_id = '' ) {
 		// Get the user tasks from the database.
-		$task_post = \progress_planner()->get_suggested_tasks()->get_post( $task_id );
+		$task_post = Suggested_Tasks_DB::get_post( $task_id );
 		return $task_post ? $task_post : [];
 	}
 }

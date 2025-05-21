@@ -84,7 +84,7 @@ trait Task_Provider_Test_Trait {
 		$tasks = $this->task_provider->get_tasks_to_inject();
 
 		// Verify that the task(s) are in the suggested tasks.
-		$pending_tasks = (array) \progress_planner()->get_suggested_tasks()->get_tasks_by(
+		$pending_tasks = (array) Suggested_Tasks_DB::get_tasks_by(
 			[
 				'post_status' => 'publish',
 				'provider'    => $this->task_provider_id,

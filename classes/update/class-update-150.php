@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Update;
 
+use Progress_Planner\Suggested_Tasks_DB;
+
 /**
  * Update class for version 1.5.0.
  *
@@ -52,7 +54,7 @@ class Update_150 {
 	 */
 	private function migrate_task( $task ) {
 		// Get the task details.
-		\progress_planner()->get_suggested_tasks()->add(
+		Suggested_Tasks_DB::add(
 			\Progress_Planner\Suggested_Tasks\Task_Factory::create_task_from_id( $task['task_id'] )->get_task_details() // TODO: get_task_details() has changed, migration needs to be re-checked.
 		);
 	}

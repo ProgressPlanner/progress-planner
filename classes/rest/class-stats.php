@@ -14,6 +14,7 @@ namespace Progress_Planner\Rest;
 
 use Progress_Planner\Base;
 use Progress_Planner\Admin\Widgets\Activity_Scores;
+use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Rest_API_Stats class.
@@ -157,7 +158,7 @@ class Stats {
 
 		// Timezone offset.
 		$data['timezone_offset'] = \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600;
-		$ravis_recommendations   = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] );
+		$ravis_recommendations   = Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] );
 		$data['recommendations'] = [];
 		foreach ( $ravis_recommendations as $recommendation ) {
 			$r = [
