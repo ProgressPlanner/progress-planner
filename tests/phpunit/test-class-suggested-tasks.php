@@ -53,7 +53,7 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 		];
 
 		foreach ( $tasks_to_keep as $task ) {
-			\progress_planner()->get_suggested_tasks()->add( $task );
+			Suggested_Tasks_DB::add( $task );
 		}
 
 		// Tasks that should be removed.
@@ -75,11 +75,11 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 		];
 
 		foreach ( $tasks_to_remove as $task ) {
-			\progress_planner()->get_suggested_tasks()->add( $task );
+			Suggested_Tasks_DB::add( $task );
 		}
 
 		\progress_planner()->get_suggested_tasks()->get_tasks_manager()->cleanup_pending_tasks();
 		\wp_cache_flush_group( \Progress_Planner\Suggested_Tasks::GET_TASKS_CACHE_GROUP ); // Clear the cache.
-		$this->assertEquals( count( $tasks_to_keep ), \count( \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] ) ) );
+		$this->assertEquals( count( $tasks_to_keep ), \count( Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] ) ) );
 	}
 }

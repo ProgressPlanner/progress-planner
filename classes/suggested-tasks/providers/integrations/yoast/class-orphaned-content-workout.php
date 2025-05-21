@@ -9,6 +9,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
 use Progress_Planner\Suggested_Tasks\Providers\Tasks;
 use Progress_Planner\Suggested_Tasks\Providers\Traits\Dismissable_Task;
+use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Add tasks for Yoast SEO cornerstone content.
@@ -92,7 +93,7 @@ class Orphaned_Content_Workout extends Tasks {
 		}
 
 		// Check if there is pending task.
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'task_id' => $this->get_task_id() ] );
+		$tasks = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $this->get_task_id() ] );
 
 		// If there is no pending task, return.
 		if ( empty( $tasks ) || 'publish' !== $tasks[0]['post_status'] ) {

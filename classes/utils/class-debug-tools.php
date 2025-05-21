@@ -11,6 +11,8 @@
 
 namespace Progress_Planner\Utils;
 
+use Progress_Planner\Suggested_Tasks_DB;
+
 /**
  * Class Debug_Tools
  *
@@ -238,7 +240,7 @@ class Debug_Tools {
 			);
 
 			// Get suggested tasks.
-			$suggested_tasks = \progress_planner()->get_suggested_tasks()->get( [ 'post_status' => $key ] );
+			$suggested_tasks = Suggested_Tasks_DB::get( [ 'post_status' => $key ] );
 
 			if ( ! empty( $suggested_tasks ) ) {
 				foreach ( $suggested_tasks as $task ) {
@@ -374,11 +376,11 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Get pending tasks.
-		$pending_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] );
+		$pending_tasks = Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] );
 
 		// Delete the pending tasks.
 		foreach ( $pending_tasks as $task ) {
-			\progress_planner()->get_suggested_tasks()->delete_recommendation( (int) $task['ID'] );
+			Suggested_Tasks_DB::delete_recommendation( (int) $task['ID'] );
 		}
 
 		// Redirect to the same page without the parameter.
@@ -523,7 +525,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the option.
-		\progress_planner()->get_suggested_tasks()->delete_all_recommendations();
+		Suggested_Tasks_DB::delete_all_recommendations();
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_suggested_tasks', '_wpnonce' ] ) );

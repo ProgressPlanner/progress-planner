@@ -8,6 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post as Last_Published_Post_Data_Collector;
+use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Add tasks for content creation.
@@ -169,7 +170,7 @@ class Content_Create extends Tasks {
 			return $this->points;
 		}
 
-		$post_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'task_id' => $task_id ] );
+		$post_data = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
 		$post_data = $post_data[0] ?? false;
 
 		// Backwards compatibility.

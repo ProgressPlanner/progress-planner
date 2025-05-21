@@ -10,6 +10,8 @@
 
 namespace Progress_Planner\Rest;
 
+use Progress_Planner\Suggested_Tasks_DB;
+
 /**
  * Rest_API_Tasks class.
  */
@@ -78,7 +80,7 @@ class Tasks {
 	 */
 	public function get_tasks() {
 		return new \WP_REST_Response(
-			\progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] )
+			Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] )
 		);
 	}
 }

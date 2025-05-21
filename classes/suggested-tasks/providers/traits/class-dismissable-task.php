@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Traits;
 
+use Progress_Planner\Suggested_Tasks_DB;
+
 /**
  * Trait for handling dismissable tasks with time-based expiration.
  */
@@ -55,7 +57,7 @@ trait Dismissable_Task {
 		}
 
 		// Get the task data.
-		$task_data = \progress_planner()->get_suggested_tasks()->get_post( $task_id );
+		$task_data = Suggested_Tasks_DB::get_post( $task_id );
 
 		// If no task data is found, return.
 		if ( ! $task_data ) {
