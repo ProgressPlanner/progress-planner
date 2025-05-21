@@ -36,10 +36,10 @@ class Tasks {
 					'callback'            => [ $this, 'get_tasks' ],
 					'permission_callback' => '__return_true',
 					'args'                => [
-						'token' => [
-							'required'          => true,
-							'validate_callback' => [ $this, 'validate_token' ],
-						],
+						// 'token' => [
+						// 	'required'          => true,
+						// 	'validate_callback' => [ $this, 'validate_token' ],
+						// ],
 					],
 				],
 			]
@@ -77,10 +77,6 @@ class Tasks {
 	 * @return \WP_REST_Response The REST response object containing the recommendations.
 	 */
 	public function get_tasks() {
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] );
-		foreach ( array_keys( $tasks ) as $key ) {
-			$tasks[ $key ]['status'] = 'pending';
-		}
 		return new \WP_REST_Response(
 			\progress_planner()->get_suggested_tasks()->get_tasks_by( [ 'post_status' => 'publish' ] )
 		);
