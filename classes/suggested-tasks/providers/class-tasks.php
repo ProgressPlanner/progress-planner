@@ -367,7 +367,7 @@ abstract class Tasks implements Tasks_Interface {
 		) {
 			// Allow adding more data, for example in case of 'create-post' tasks we are adding the post_id.
 			$task_data = $this->modify_evaluated_task_data( $task->get_data() );
-			$task->set_data( $task_data );
+			$task->update( $task_data );
 
 			return $task;
 		}

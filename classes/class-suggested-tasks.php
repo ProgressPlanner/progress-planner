@@ -82,7 +82,7 @@ class Suggested_Tasks {
 			}
 
 			// Change the task status to pending celebration.
-			Suggested_Tasks_DB::update_recommendation( $task->ID, [ 'post_status' => 'pending_celebration' ] );
+			$task->celebrate();
 
 			// Insert an activity.
 			$this->insert_activity( $task->task_id );
@@ -175,40 +175,12 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function snooze( int $id, string $duration ) {
-		switch ( $duration ) {
-			case '1-month':
-				$new_date = \strtotime( '+1 month' );
-				break;
-
-			case '3-months':
-				$new_date = \strtotime( '+3 months' );
-				break;
-
-			case '6-months':
-				$new_date = \strtotime( '+6 months' );
-				break;
-
-			case '1-year':
-				$new_date = \strtotime( '+1 year' );
-				break;
-
-			case 'forever':
-				$new_date = \strtotime( '+10 years' );
-				break;
-
-			default:
-				$new_date = \strtotime( '+1 week' );
-				break;
+		$task = Suggested_Tasks_DB::get_post( $id );
+		if ( ! $task ) {
+			return false;
 		}
 
-		return (bool) \wp_update_post(
-			[
-				'ID'            => $id,
-				'post_status'   => 'future',
-				'post_date'     => \gmdate( 'Y-m-d H:i:s', $new_date ),
-				'post_date_gmt' => \gmdate( 'Y-m-d H:i:s', $new_date ), // Note: necessary in order to update 'post_status' to 'future'.
-			]
-		);
+		return $task->snooze( $duration );
 	}
 
 	/**
@@ -220,7 +192,7 @@ class Suggested_Tasks {
 	 */
 	public function was_task_completed( $task_id ): bool {
 		$task = Suggested_Tasks_DB::get_post( $task_id );
-		return $task && in_array( $task->post_status, [ 'trash', 'pending_celebration' ], true );
+		return $task && $task->is_completed();
 	}
 
 	/**

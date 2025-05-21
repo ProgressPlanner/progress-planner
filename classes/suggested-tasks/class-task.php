@@ -63,11 +63,130 @@ class Task {
 	 */
 	public function set_data( array $data ): void {
 		$this->data = $data;
+	}
 
-		// TODO: WIP, update the task in the database - we need to handle the case when task is created from array which does not have ID.
+	/**
+	 * Update the task data.
+	 *
+	 * @param array<string, mixed> $data The task data.
+	 *
+	 * @return void
+	 */
+	public function update( array $data ): void {
+		$this->data = $data;
+
+		// Update only if the task is already saved in the database.
 		if ( $this->ID ) {
 			Suggested_Tasks_DB::update_recommendation( $this->ID, $this->data );
 		}
+	}
+
+	/**
+	 * Delete the task.
+	 *
+	 * @return void
+	 */
+	public function delete(): void {
+		$this->data = [];
+		// Delete only if the task is already saved in the database.
+		if ( $this->ID ) {
+			Suggested_Tasks_DB::delete_recommendation( $this->ID );
+		}
+	}
+
+	/**
+	 * Snooze the task.
+	 *
+	 * @param string $duration The duration.
+	 *
+	 * @return bool
+	 */
+	public function snooze( string $duration ): bool {
+		if ( ! $this->ID ) {
+			return false;
+		}
+
+		switch ( $duration ) {
+			case '1-month':
+				$new_date = \strtotime( '+1 month' );
+				break;
+
+			case '3-months':
+				$new_date = \strtotime( '+3 months' );
+				break;
+
+			case '6-months':
+				$new_date = \strtotime( '+6 months' );
+				break;
+
+			case '1-year':
+				$new_date = \strtotime( '+1 year' );
+				break;
+
+			case 'forever':
+				$new_date = \strtotime( '+10 years' );
+				break;
+
+			default:
+				$new_date = \strtotime( '+1 week' );
+				break;
+		}
+
+		$updated = (bool) \wp_update_post(
+			[
+				'ID'            => $this->ID,
+				'post_status'   => 'future',
+				'post_date'     => \gmdate( 'Y-m-d H:i:s', $new_date ),
+				'post_date_gmt' => \gmdate( 'Y-m-d H:i:s', $new_date ), // Note: necessary in order to update 'post_status' to 'future'.
+			]
+		);
+
+		if ( $updated ) {
+			$this->data['post_status'] = 'future';
+			$this->data['post_date']   = \gmdate( 'Y-m-d H:i:s', $new_date );
+		}
+
+		return $updated;
+	}
+
+	/**
+	 * Check if the task is snoozed.
+	 *
+	 * @return bool
+	 */
+	public function is_snoozed(): bool {
+		return isset( $this->data['post_status'] ) && 'future' === $this->data['post_status'];
+	}
+
+	/**
+	 * Get the snoozed until date.
+	 *
+	 * @return \DateTime|null|false
+	 */
+	public function snoozed_until() {
+		return isset( $this->data['post_date'] ) ? \DateTime::createFromFormat( 'Y-m-d H:i:s', $this->data['post_date'] ) : null;
+	}
+
+	/**
+	 * Check if the task is completed.
+	 *
+	 * @return bool
+	 */
+	public function is_completed(): bool {
+		return isset( $this->data['post_status'] ) && in_array( $this->data['post_status'], [ 'trash', 'pending_celebration' ], true );
+	}
+
+	/**
+	 * Set the task to pending celebration.
+	 *
+	 * @return bool
+	 */
+	public function celebrate(): bool {
+		if ( ! $this->ID ) {
+			return false;
+		}
+
+		return Suggested_Tasks_DB::update_recommendation( $this->ID, [ 'post_status' => 'pending_celebration' ] );
 	}
 
 	/**
