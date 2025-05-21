@@ -1,4 +1,4 @@
-/* global confetti, prplCelebrate, prplSuggestedTasks */
+/* global confetti, prplCelebrate */
 /*
  * Confetti.
  *
@@ -11,15 +11,26 @@
 // Create a new custom event to trigger the celebration.
 document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 	console.log( event );
-	// Mark 'pending_celebration' task as completed.
-	prplSuggestedTasks.tasks.forEach( ( task ) => {
-		if ( 'pending_celebration' === task.status ) {
-			const post = new wp.api.models.Prpl_recommendations( {
-				id: task.id,
-				status: 'trash',
+	wp.api.loadPromise.done( () => {
+		const postsCollection = new wp.api.collections.Prpl_recommendations();
+		postsCollection
+			.fetch( {
+				data: {
+					status: [ 'pending_celebration' ],
+					per_page: 100,
+					_embed: true,
+					exclude_provider: 'user',
+				},
+			} )
+			.done( ( data ) => {
+				data.forEach( ( task ) => {
+					const post = new wp.api.models.Prpl_recommendations( {
+						id: task.id,
+						status: 'trash',
+					} );
+					post.save();
+				} );
 			} );
-			post.save();
-		}
 	} );
 
 	/**
