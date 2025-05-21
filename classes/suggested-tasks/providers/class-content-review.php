@@ -317,6 +317,7 @@ class Content_Review extends Tasks {
 					'url'              => \esc_url( (string) \get_edit_post_link( $task_data['target_post_id'] ) ),
 					'url_target'       => '_blank',
 					'dismissable'      => $this->is_dismissable(),
+					'snoozable'        => $this->is_snoozable,
 					'points'           => $this->get_points(),
 				];
 			}
@@ -365,6 +366,7 @@ class Content_Review extends Tasks {
 			'category'    => $this->get_provider_category(),
 			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
+			'snoozable'   => $this->is_snoozable,
 			'url'         => $this->get_url( $task_data[0] ),
 			'url_target'  => $this->get_url_target(),
 			'description' => $this->get_description( $task_data[0] ),
@@ -385,8 +387,8 @@ class Content_Review extends Tasks {
 			return null;
 		}
 
-		return isset( $tasks[0]['target_post_id'] ) && $tasks[0]['target_post_id']
-			? \get_post( $tasks[0]['target_post_id'] )
+		return isset( $tasks[0]->target_post_id ) && $tasks[0]->target_post_id
+			? \get_post( $tasks[0]->target_post_id )
 			: null;
 	}
 
@@ -502,8 +504,13 @@ class Content_Review extends Tasks {
 
 		if ( ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
-				if ( isset( $task['provider']->slug ) && 'review-post' === $task['provider']->slug ) {
-					$this->snoozed_post_ids[] = $task['target_post_id'];
+				/**
+				 * The task object.
+				 *
+				 * @var \Progress_Planner\Suggested_Tasks\Task $task
+				 */
+				if ( isset( $task->provider->slug ) && 'review-post' === $task->provider->slug ) {
+					$this->snoozed_post_ids[] = $task->target_post_id;
 				}
 			}
 		}

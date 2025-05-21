@@ -87,6 +87,13 @@ abstract class Tasks implements Tasks_Interface {
 	protected $is_dismissable = false;
 
 	/**
+	 * Whether the task is snoozable.
+	 *
+	 * @var bool
+	 */
+	protected $is_snoozable = true;
+
+	/**
 	 * The task URL.
 	 *
 	 * @var string
@@ -174,6 +181,15 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function is_dismissable() {
 		return $this->is_dismissable;
+	}
+
+	/**
+	 * Get whether the task is snoozable.
+	 *
+	 * @return bool
+	 */
+	public function is_snoozable() {
+		return $this->is_snoozable;
 	}
 
 	/**
@@ -310,8 +326,8 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		foreach ( $snoozed as $task ) {
-			$task_object = Task_Factory::create_task_from_id( $task['task_id'] );
-			$provider_id = $task_object->get_provider_id();
+			$task        = Suggested_Tasks_DB::get_post( $task->task_id );
+			$provider_id = $task ? $task->get_provider_id() : '';
 
 			if ( $provider_id === $this->get_provider_id() ) {
 				return true;
@@ -443,6 +459,7 @@ abstract class Tasks implements Tasks_Interface {
 			'url_target'   => $this->get_url_target(),
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
+			'snoozable'    => $this->is_snoozable(),
 			'points'       => $this->get_points(),
 		];
 
@@ -500,6 +517,7 @@ abstract class Tasks implements Tasks_Interface {
 			'description'  => $this->get_description(),
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
+			'snoozable'    => $this->is_snoozable(),
 		];
 	}
 }

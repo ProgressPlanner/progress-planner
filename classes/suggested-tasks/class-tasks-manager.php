@@ -269,8 +269,8 @@ class Tasks_Manager {
 		$tasks = Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] );
 
 		foreach ( $tasks as $task ) {
-			if ( ! isset( $task['date'] ) || \gmdate( 'YW' ) !== (string) $task['date'] ) { // TODO: Finalize cleanup once refactor is done.
-				Suggested_Tasks_DB::delete_recommendation( $task['ID'] );
+			if ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) { // TODO: Finalize cleanup once refactor is done.
+				Suggested_Tasks_DB::delete_recommendation( $task->ID );
 			}
 		}
 

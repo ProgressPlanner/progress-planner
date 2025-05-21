@@ -27,6 +27,7 @@ use Progress_Planner\Suggested_Tasks_DB;
  * @property string $url_target The task URL target
  * @property string $description The task description
  * @property array $data The task data array
+ * @property int|null $target_post_id The target post ID for the task
  */
 class Task {
 	/**

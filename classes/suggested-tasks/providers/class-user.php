@@ -22,6 +22,13 @@ class User extends Tasks {
 	protected $is_dismissable = true;
 
 	/**
+	 * Whether the task is snoozable.
+	 *
+	 * @var bool
+	 */
+	protected $is_snoozable = false;
+
+	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool

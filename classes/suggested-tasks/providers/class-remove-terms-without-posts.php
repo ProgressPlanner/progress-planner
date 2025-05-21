@@ -113,11 +113,16 @@ class Remove_Terms_Without_Posts extends Tasks {
 		}
 
 		foreach ( $pending_tasks as $task ) {
-			if ( isset( $task['term_id'] ) && isset( $task['taxonomy'] ) ) {
-				$term = \get_term( $task['term_id'], $task['taxonomy'] );
+			/**
+			 * The task post object.
+			 *
+			 * @var \Progress_Planner\Suggested_Tasks\Task $task
+			 */
+			if ( isset( $task->term_id ) && isset( $task->taxonomy ) ) {
+				$term = \get_term( $task->term_id, $task->taxonomy );
 
 				if ( \is_wp_error( $term ) || ! $term || $term->count > self::MIN_POSTS ) {
-					Suggested_Tasks_DB::delete_recommendation( $task['ID'] );
+					Suggested_Tasks_DB::delete_recommendation( $task->ID );
 				}
 			}
 		}
@@ -252,6 +257,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 			'url'         => $this->get_url( $data ),
 			'url_target'  => '_blank',
 			'dismissable' => $this->is_dismissable(),
+			'snoozable'   => $this->is_snoozable,
 			'points'      => $this->get_points(),
 		];
 
@@ -280,25 +286,26 @@ class Remove_Terms_Without_Posts extends Tasks {
 			return [];
 		}
 
-		$task_data = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
+		$tasks = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
 
 		// If the task data is empty, return an empty array.
-		if ( empty( $task_data ) ) {
+		if ( empty( $tasks ) ) {
 			return [];
 		}
 
 		return [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
-			'post_title'  => $this->get_title( $task_data[0] ),
+			'post_title'  => $this->get_title( $tasks[0]->get_data() ),
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
 			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
-			'url'         => $this->get_url( $task_data[0] ),
+			'snoozable'   => $this->is_snoozable,
+			'url'         => $this->get_url( $tasks[0]->get_data() ),
 			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description( $task_data[0] ),
+			'description' => $this->get_description( $tasks[0]->get_data() ),
 		];
 	}
 
@@ -316,13 +323,13 @@ class Remove_Terms_Without_Posts extends Tasks {
 			return null;
 		}
 
-		$data = $tasks[0];
+		$task = $tasks[0];
 
-		if ( ! isset( $data['term_id'] ) || ! $data['term_id'] || ! isset( $data['taxonomy'] ) || ! $data['taxonomy'] ) {
+		if ( ! isset( $task->term_id ) || ! $task->term_id || ! isset( $task->taxonomy ) || ! $task->taxonomy ) {
 			return null;
 		}
 
-		$term = \get_term( $data['term_id'], $data['taxonomy'] );
+		$term = \get_term( $task->term_id, $task->taxonomy );
 		return $term && ! \is_wp_error( $term ) ? $term : null;
 	}
 
@@ -341,8 +348,8 @@ class Remove_Terms_Without_Posts extends Tasks {
 
 		if ( ! empty( $tasks ) ) {
 			foreach ( $tasks as $task ) {
-				if ( 'trash' === $task['post_status'] ) {
-					$this->completed_term_ids[] = $task['term_id'];
+				if ( 'trash' === $task->post_status ) {
+					$this->completed_term_ids[] = $task->term_id;
 				}
 			}
 		}

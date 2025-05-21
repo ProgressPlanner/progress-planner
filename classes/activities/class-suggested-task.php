@@ -69,8 +69,8 @@ class Suggested_Task extends Activity {
 		$points = 1;
 		$tasks  = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $this->data_id ] );
 
-		if ( ! empty( $tasks ) && isset( $tasks[0]['provider_id'] ) ) {
-			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $tasks[0]['provider_id'] );
+		if ( ! empty( $tasks ) && $tasks[0]->get_provider_id() ) {
+			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $tasks[0]->get_provider_id() );
 
 			if ( $task_provider ) {
 				$points = $task_provider->get_points();
