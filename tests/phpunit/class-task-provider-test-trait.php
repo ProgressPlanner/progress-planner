@@ -62,7 +62,7 @@ trait Task_Provider_Test_Trait {
 		parent::tear_down();
 
 		// Delete tasks.
-		\progress_planner()->get_suggested_tasks()->delete_all_recommendations();
+		Suggested_Tasks_DB::delete_all_recommendations();
 	}
 
 	/**
