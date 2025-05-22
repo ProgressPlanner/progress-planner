@@ -76,7 +76,7 @@ class Suggested_Tasks {
 		$completed_tasks = $this->tasks_manager->evaluate_tasks();
 
 		foreach ( $completed_tasks as $task ) {
-			if ( ! isset( $task->task_id ) && ! isset( $task->ID ) ) {
+			if ( ! $task->task_id && $task->ID ) {
 				continue;
 			}
 
