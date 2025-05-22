@@ -171,7 +171,7 @@ prplDocumentReady( () => {
 				console.log( 'Fetch successful:', data );
 				document
 					.querySelector( '.prpl-suggested-tasks-loading' )
-					.remove();
+					?.remove();
 				prplSuggestedTasks.tasks = data;
 
 				if ( 0 === prplSuggestedTasks.tasks.length ) {
