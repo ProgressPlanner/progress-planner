@@ -10,7 +10,6 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
 use Progress_Planner\Suggested_Tasks\Providers\Traits\Dismissable_Task;
 use Progress_Planner\Page_Types;
-use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Add tasks for content updates.
@@ -339,11 +338,11 @@ class Content_Review extends Tasks {
 		foreach ( $task_to_inject as $task_data ) {
 
 			// Skip the task if it was already injected.
-			if ( Suggested_Tasks_DB::get_post( $task_data['task_id'] ) ) {
+			if ( \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] ) ) {
 				continue;
 			}
 
-			$added_tasks[] = Suggested_Tasks_DB::add( $task_data );
+			$added_tasks[] = \progress_planner()->get_suggested_tasks_db()->add( $task_data );
 		}
 
 		return $added_tasks;
@@ -361,7 +360,7 @@ class Content_Review extends Tasks {
 			return [];
 		}
 
-		$task_data = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
+		$task_data = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		// If the task data is empty, return an empty array.
 		if ( empty( $task_data ) ) {
@@ -392,7 +391,7 @@ class Content_Review extends Tasks {
 	 * @return \WP_Post|null
 	 */
 	public function get_post_from_task_id( $task_id ) {
-		$tasks = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		if ( empty( $tasks ) ) {
 			return null;
@@ -511,7 +510,7 @@ class Content_Review extends Tasks {
 		}
 
 		$this->snoozed_post_ids = [];
-		$snoozed                = Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'future' ] );
+		$snoozed                = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] );
 
 		if ( ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {

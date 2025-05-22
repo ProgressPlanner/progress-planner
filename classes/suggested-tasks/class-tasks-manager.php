@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Suggested_Tasks;
 
-use Progress_Planner\Suggested_Tasks_DB;
-
 use Progress_Planner\Suggested_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Create;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
@@ -212,7 +210,7 @@ class Tasks_Manager {
 	 * @return array<\Progress_Planner\Suggested_Tasks\Task>
 	 */
 	public function evaluate_tasks(): array {
-		$tasks           = (array) Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] );
+		$tasks           = (array) \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
 		$completed_tasks = [];
 
 		foreach ( $tasks as $task ) {
@@ -249,7 +247,7 @@ class Tasks_Manager {
 		// Check if the task is no longer relevant.
 		if ( ! $task_provider->is_task_relevant() ) {
 			// Remove the task from the pending tasks.
-			Suggested_Tasks_DB::delete_recommendation( $task->ID );
+			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 		}
 
 		return $task_provider->evaluate_task( $task->task_id );
@@ -266,11 +264,11 @@ class Tasks_Manager {
 			return;
 		}
 
-		$tasks = Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
 
 		foreach ( $tasks as $task ) {
 			if ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) { // TODO: Finalize cleanup once refactor is done.
-				Suggested_Tasks_DB::delete_recommendation( $task->ID );
+				\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 			}
 		}
 

@@ -9,7 +9,6 @@ namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Yoast_Provider;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content;
-use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Add task for Yoast SEO: disable the author archive.
@@ -227,9 +226,9 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		$task_data = $this->modify_injection_task_data( $task_data );
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.
-		$task_post = Suggested_Tasks_DB::get_post( $task_data['task_id'] );
+		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
 
-		return $task_post ? [] : [ Suggested_Tasks_DB::add( $task_data ) ];
+		return $task_post ? [] : [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
 	}
 
 	/**
@@ -244,7 +243,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return [];
 		}
 
-		$tasks = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		// If the task data is empty, return an empty array.
 		if ( empty( $tasks ) ) {
@@ -276,7 +275,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return \WP_Post|null
 	 */
 	public function get_post_from_task_id( $task_id ) {
-		$tasks = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		if ( empty( $tasks ) ) {
 			return null;
@@ -298,7 +297,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		}
 
 		$this->completed_post_ids = [];
-		$tasks                    = Suggested_Tasks_DB::get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
+		$tasks                    = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! empty( $tasks ) ) {
 			foreach ( $tasks as $task ) {

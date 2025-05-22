@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks_DB;
-
 /**
  * Add tasks for Core updates.
  */
@@ -99,7 +97,7 @@ class Core_Update extends Tasks {
 	 * @return array
 	 */
 	public function add_core_update_link( $update_actions ) {
-		$pending_tasks = Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] );
+		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
 
 		// All updates are completed and there is a 'update-core' task in the pending tasks.
 		if ( $pending_tasks && $this->is_task_completed() ) {

@@ -9,7 +9,6 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Providers\Tasks;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Posts as Terms_Without_Posts_Data_Collector;
-use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Add task to remove terms without posts.
@@ -106,7 +105,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * @return void
 	 */
 	public function maybe_remove_irrelevant_tasks( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
-		$pending_tasks = Suggested_Tasks_DB::get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
+		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! $pending_tasks ) {
 			return;
@@ -122,7 +121,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 				$term = \get_term( $task->term_id, $task->taxonomy );
 
 				if ( \is_wp_error( $term ) || ! $term || $term->count > self::MIN_POSTS ) {
-					Suggested_Tasks_DB::delete_recommendation( $task->ID );
+					\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 				}
 			}
 		}
@@ -284,14 +283,14 @@ class Remove_Terms_Without_Posts extends Tasks {
 		$task_data = $this->modify_injection_task_data( $task_data );
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.
-		$task_post = Suggested_Tasks_DB::get_post( $task_data['task_id'] );
+		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
 
 		// Skip the task if it was already injected.
 		if ( $task_post ) {
 			return [];
 		}
 
-		return [ Suggested_Tasks_DB::add( $task_data ) ];
+		return [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
 	}
 
 	/**
@@ -306,7 +305,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 			return [];
 		}
 
-		$tasks = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		// If the task data is empty, return an empty array.
 		if ( empty( $tasks ) ) {
@@ -337,7 +336,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * @return \WP_Term|null
 	 */
 	public function get_term_from_task_id( $task_id ) {
-		$tasks = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		if ( empty( $tasks ) ) {
 			return null;
@@ -364,7 +363,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 		}
 
 		$this->completed_term_ids = [];
-		$tasks                    = Suggested_Tasks_DB::get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
+		$tasks                    = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! empty( $tasks ) ) {
 			foreach ( $tasks as $task ) {

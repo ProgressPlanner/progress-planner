@@ -8,7 +8,6 @@
 namespace Progress_Planner\Suggested_Tasks;
 
 use Progress_Planner\Suggested_Tasks\Task;
-use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Task factory.
@@ -23,7 +22,7 @@ class Task_Factory {
 	 * @return \Progress_Planner\Suggested_Tasks\Task
 	 */
 	public static function create_task_from_id( $value = null ): Task {
-		$task = Suggested_Tasks_DB::get_post( $value );
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $value );
 
 		// If we have the task data, return it.
 		return $task ? $task : new Task( [] );

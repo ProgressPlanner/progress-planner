@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Suggested_Tasks;
 
-use Progress_Planner\Suggested_Tasks_DB;
-
 /**
  * Task abstract class.
  *
@@ -78,7 +76,7 @@ class Task {
 
 		// Update only if the task is already saved in the database.
 		if ( $this->ID ) {
-			Suggested_Tasks_DB::update_recommendation( $this->ID, $this->data );
+			\progress_planner()->get_suggested_tasks_db()->update_recommendation( $this->ID, $this->data );
 		}
 	}
 
@@ -91,7 +89,7 @@ class Task {
 		$this->data = [];
 		// Delete only if the task is already saved in the database.
 		if ( $this->ID ) {
-			Suggested_Tasks_DB::delete_recommendation( $this->ID );
+			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $this->ID );
 		}
 	}
 
@@ -187,7 +185,7 @@ class Task {
 			return false;
 		}
 
-		return Suggested_Tasks_DB::update_recommendation( $this->ID, [ 'post_status' => 'pending_celebration' ] );
+		return \progress_planner()->get_suggested_tasks_db()->update_recommendation( $this->ID, [ 'post_status' => 'pending_celebration' ] );
 	}
 
 	/**

@@ -7,9 +7,6 @@
 
 namespace Progress_Planner\Activities;
 
-use Progress_Planner\Suggested_Tasks\Providers\Content_Create;
-use Progress_Planner\Suggested_Tasks_DB;
-
 /**
  * Handler for suggested tasks activities.
  */
@@ -67,7 +64,7 @@ class Suggested_Task extends Activity {
 
 		// Default points for a suggested task.
 		$points = 1;
-		$tasks  = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $this->data_id ] );
+		$tasks  = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $this->data_id ] );
 
 		if ( ! empty( $tasks ) && $tasks[0]->get_provider_id() ) {
 			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $tasks[0]->get_provider_id() );

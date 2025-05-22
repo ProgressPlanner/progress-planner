@@ -137,7 +137,7 @@ class Suggested_Tasks {
 	 */
 	public function on_automatic_updates_complete(): void {
 
-		$pending_tasks = Suggested_Tasks_DB::get(
+		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get(
 			[
 				'numberposts' => 1,
 				'post_status' => 'publish',
@@ -150,7 +150,7 @@ class Suggested_Tasks {
 			return;
 		}
 
-		Suggested_Tasks_DB::update_recommendation( $pending_tasks[0]->ID, [ 'post_status' => 'trash' ] );
+		\progress_planner()->get_suggested_tasks_db()->update_recommendation( $pending_tasks[0]->ID, [ 'post_status' => 'trash' ] );
 
 		// Insert an activity.
 		$this->insert_activity( $pending_tasks[0]->ID );
@@ -174,7 +174,7 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function snooze( int $id, string $duration ) {
-		$task = Suggested_Tasks_DB::get_post( $id );
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $id );
 		if ( ! $task ) {
 			return false;
 		}
@@ -190,7 +190,7 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function was_task_completed( $task_id ): bool {
-		$task = Suggested_Tasks_DB::get_post( $task_id );
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 		return $task && $task->is_completed();
 	}
 
@@ -211,7 +211,7 @@ class Suggested_Tasks {
 
 		$action  = \sanitize_text_field( \wp_unslash( $_POST['action_type'] ) );
 		$task_id = (string) \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) );
-		$task    = Suggested_Tasks_DB::get_post( $task_id );
+		$task    = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
 		if ( ! $task ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );

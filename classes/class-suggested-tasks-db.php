@@ -30,14 +30,14 @@ class Suggested_Tasks_DB {
 	 *
 	 * @return int
 	 */
-	public static function add( $data ) {
+	public function add( $data ) {
 		if ( empty( $data['post_title'] ) ) {
 			error_log( 'Task not added - missing title: ' . wp_json_encode( $data ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			return 0;
 		}
 
 		// Check if we have an existing task with the same title.
-		$posts = self::get_tasks_by(
+		$posts = $this->get_tasks_by(
 			[
 				'post_status' => [ 'any', 'pending_celebration' ], // 'any' wont return posts with (custom) post status 'pending_celebration'.
 				'numberposts' => 1,
@@ -143,7 +143,7 @@ class Suggested_Tasks_DB {
 	 *
 	 * @return bool
 	 */
-	public static function update_recommendation( $id, $data ) {
+	public function update_recommendation( $id, $data ) {
 		if ( ! $id ) {
 			return false;
 		}
@@ -194,13 +194,13 @@ class Suggested_Tasks_DB {
 	 *
 	 * @return void
 	 */
-	public static function delete_all_recommendations() {
+	public function delete_all_recommendations() {
 		// Get all recommendations.
-		$recommendations = self::get();
+		$recommendations = $this->get();
 
 		// Delete each recommendation.
 		foreach ( $recommendations as $recommendation ) {
-			self::delete_recommendation( $recommendation['ID'] );
+			$this->delete_recommendation( $recommendation['ID'] );
 		}
 	}
 
@@ -211,7 +211,7 @@ class Suggested_Tasks_DB {
 	 *
 	 * @return bool
 	 */
-	public static function delete_recommendation( int $id ) {
+	public function delete_recommendation( int $id ) {
 		$result = (bool) \wp_delete_post( $id, true );
 		\wp_cache_flush_group( static::GET_TASKS_CACHE_GROUP );
 		return $result;
@@ -224,10 +224,10 @@ class Suggested_Tasks_DB {
 	 *
 	 * @return \Progress_Planner\Suggested_Tasks\Task[]
 	 */
-	public static function format_recommendations( $recommendations ) {
+	public function format_recommendations( $recommendations ) {
 		$result = [];
 		foreach ( $recommendations as $recommendation ) {
-			$result[] = self::format_recommendation( $recommendation );
+			$result[] = $this->format_recommendation( $recommendation );
 		}
 
 		return $result;
@@ -240,7 +240,7 @@ class Suggested_Tasks_DB {
 	 *
 	 * @return \Progress_Planner\Suggested_Tasks\Task
 	 */
-	public static function format_recommendation( $post ) {
+	public function format_recommendation( $post ) {
 		static $cached = [];
 		if ( isset( $cached[ $post->ID ] ) ) {
 			return $cached[ $post->ID ];
@@ -273,8 +273,8 @@ class Suggested_Tasks_DB {
 	 *
 	 * @return \Progress_Planner\Suggested_Tasks\Task|false The recommendation post or false if not found.
 	 */
-	public static function get_post( $id ) {
-		$posts = self::get_tasks_by(
+	public function get_post( $id ) {
+		$posts = $this->get_tasks_by(
 			is_numeric( $id )
 				? [ 'p' => $id ]
 				: [ 'task_id' => $id ]
@@ -290,7 +290,7 @@ class Suggested_Tasks_DB {
 	 *
 	 * @return array
 	 */
-	public static function get_tasks_by( $params ) {
+	public function get_tasks_by( $params ) {
 		$args = [];
 
 		foreach ( $params as $param => $value ) {
@@ -326,7 +326,7 @@ class Suggested_Tasks_DB {
 			}
 		}
 
-		return self::get( $args );
+		return $this->get( $args );
 	}
 
 	/**
@@ -336,7 +336,7 @@ class Suggested_Tasks_DB {
 	 *
 	 * @return array
 	 */
-	public static function get( $args = [] ) {
+	public function get( $args = [] ) {
 		$args = \wp_parse_args(
 			$args,
 			[
@@ -354,7 +354,7 @@ class Suggested_Tasks_DB {
 			return $results;
 		}
 
-		$results = self::format_recommendations(
+		$results = $this->format_recommendations(
 			\get_posts( $args )
 		);
 

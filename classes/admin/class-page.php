@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Admin;
 
-use Progress_Planner\Suggested_Tasks_DB;
-
 /**
  * Admin page class.
  */

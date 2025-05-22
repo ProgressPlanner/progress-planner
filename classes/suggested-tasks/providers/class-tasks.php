@@ -8,8 +8,6 @@
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Tasks_Interface;
-use Progress_Planner\Suggested_Tasks\Task_Factory;
-use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Add tasks for content updates.
@@ -320,13 +318,13 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return bool
 	 */
 	public function is_task_snoozed() {
-		$snoozed = Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'future' ] );
+		$snoozed = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] );
 		if ( empty( $snoozed ) ) {
 			return false;
 		}
 
 		foreach ( $snoozed as $task ) {
-			$task        = Suggested_Tasks_DB::get_post( $task->task_id );
+			$task        = \progress_planner()->get_suggested_tasks_db()->get_post( $task->task_id );
 			$provider_id = $task ? $task->get_provider_id() : '';
 
 			if ( $provider_id === $this->get_provider_id() ) {
@@ -361,7 +359,7 @@ abstract class Tasks implements Tasks_Interface {
 			return false;
 		}
 
-		$task = Suggested_Tasks_DB::get_post( $task_id );
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
 		if ( ! $task ) {
 			return false;
@@ -466,10 +464,10 @@ abstract class Tasks implements Tasks_Interface {
 		$task_data = $this->modify_injection_task_data( $task_data );
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.
-		$task_post = Suggested_Tasks_DB::get_post( $task_data['task_id'] );
+		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
 
 		// Skip the task if it was already injected.
-		return $task_post ? [] : [ Suggested_Tasks_DB::add( $task_data ) ];
+		return $task_post ? [] : [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
 	}
 
 	/**

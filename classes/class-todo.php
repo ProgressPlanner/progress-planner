@@ -29,7 +29,7 @@ class Todo {
 	 * @return array
 	 */
 	public function get_items() {
-		return Suggested_Tasks_DB::get_tasks_by( [ 'provider_id' => 'user' ] );
+		return \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => 'user' ] );
 	}
 
 	/**
@@ -84,7 +84,7 @@ class Todo {
 	 * @return void
 	 */
 	public function maybe_change_first_item_points_on_monday() {
-		$pending_items = Suggested_Tasks_DB::get_tasks_by(
+		$pending_items = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
 			[
 				'provider_id' => 'user',
 				'post_status' => 'publish',
@@ -109,13 +109,13 @@ class Todo {
 		$task_ids = array_column( $pending_items, 'ID' );
 
 		// Reset the points of all the tasks, except for the first one in the todo list.
-		foreach ( Suggested_Tasks_DB::get_tasks_by(
+		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
 			[
 				'provider'    => 'user',
 				'post_status' => 'publish',
 			]
 		) as $task ) {
-			Suggested_Tasks_DB::update_recommendation(
+			\progress_planner()->get_suggested_tasks_db()->update_recommendation(
 				$task->ID,
 				[ 'points' => $task->ID === $task_ids[0] ? 1 : 0 ]
 			);
