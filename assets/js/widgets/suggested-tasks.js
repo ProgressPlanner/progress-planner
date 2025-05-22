@@ -10,14 +10,17 @@
 
 const prplSuggestedTasksToggleUIitems = () => {
 	document.querySelector( '.prpl-suggested-tasks-loading' )?.remove();
-	const items = document.querySelectorAll(
-		'.prpl-suggested-tasks-list .prpl-suggested-task'
-	);
+	setTimeout( () => {
+		const items = document.querySelectorAll(
+			'.prpl-suggested-tasks-list .prpl-suggested-task'
+		);
 
-	if ( 0 === items.length ) {
-		document.querySelector( '.prpl-no-suggested-tasks' ).style.display =
-			'block';
-	}
+		if ( 0 === items.length ) {
+			document.querySelector( '.prpl-no-suggested-tasks' ).style.display =
+				'block';
+		}
+		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+	}, 2000 );
 };
 
 /**

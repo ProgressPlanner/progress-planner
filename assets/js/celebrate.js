@@ -10,7 +10,6 @@
 
 // Create a new custom event to trigger the celebration.
 document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
-	console.log( event );
 	wp.api.loadPromise.done( () => {
 		const postsCollection = new wp.api.collections.Prpl_recommendations();
 		postsCollection

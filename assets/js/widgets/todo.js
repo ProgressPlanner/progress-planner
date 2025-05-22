@@ -81,6 +81,10 @@ prplDocumentReady( () => {
 					document
 						.querySelector( '#prpl-todo-list-loading' )
 						.remove();
+					// Resize the grid items.
+					window.dispatchEvent(
+						new CustomEvent( 'prpl/grid/resize' )
+					);
 				},
 			},
 		} )
@@ -113,7 +117,6 @@ prplDocumentReady( () => {
 					if ( ! response.id ) {
 						return;
 					}
-					console.log( 'response', response );
 					const newTask = {
 						...response,
 						meta: {
