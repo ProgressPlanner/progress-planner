@@ -61,60 +61,25 @@ document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
 } );
 
 prplDocumentReady( () => {
-	wp.api.loadPromise.done( () => {
-		console.log( 'Attempting to fetch user tasks...' );
-		const todosCollection = new wp.api.collections.Prpl_recommendations();
-		todosCollection
-			.fetch( {
-				data: {
-					status: [ 'publish' ],
-					per_page: 100,
-					_embed: true,
-					provider: 'user',
-					filter: {
-						orderby: 'menu_order',
-						order: 'ASC',
-					},
+	document.dispatchEvent(
+		new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
+			detail: {
+				category: 'user',
+				status: 'publish',
+				injectTrigger: 'prpl/todo/injectItem',
+				injectTriggerArgsCallback: ( todoItem ) => {
+					return {
+						item: todoItem,
+						addToStart: 1 === todoItem?.meta?.prpl_points, // Add golden task to the start of the list.
+						listId:
+							todoItem.status === 'completed'
+								? 'todo-list-completed'
+								: 'todo-list',
+					};
 				},
-			} )
-			.done( ( data ) => {
-				console.log( 'Fetching user tasks successful:', data );
-				document.querySelector( '#prpl-todo-list-loading' )?.remove();
-				window.progressPlannerTodo.tasks = data;
-
-				// Inject the existing todo list items into the DOM
-				data.forEach( ( todoItem, index, array ) => {
-					document.dispatchEvent(
-						new CustomEvent( 'prpl/todo/injectItem', {
-							detail: {
-								item: todoItem,
-								addToStart: 1 === todoItem?.meta?.prpl_points, // Add golden task to the start of the list.
-								listId:
-									todoItem.status === 'completed'
-										? 'todo-list-completed'
-										: 'todo-list',
-							},
-						} )
-					);
-
-					// If this is the last item in the array, resize the grid items.
-					if ( index === array.length - 1 ) {
-						window.dispatchEvent(
-							new CustomEvent( 'prpl/grid/resize' )
-						);
-					}
-				} );
-			} )
-			.fail( ( jqXHR, textStatus, errorThrown ) => {
-				console.error( 'Fetch failed:', {
-					status: jqXHR.status,
-					statusText: jqXHR.statusText,
-					responseText: jqXHR.responseText,
-					textStatus,
-					errorThrown,
-				} );
-			} );
-	} );
+			},
+		} )
+	);
 
 	// When the '#create-todo-item' form is submitted,
 	// add a new todo item to the list
