@@ -136,7 +136,7 @@ class Update_Term_Description extends Tasks {
 	 * @return string
 	 */
 	protected function get_title( $task_data = [] ) {
-		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
+		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return $term && ! \is_wp_error( $term ) ? \sprintf(
 			/* translators: %s: The term name */
 			\esc_html__( 'Write a description for term named "%s"', 'progress-planner' ),
@@ -152,7 +152,7 @@ class Update_Term_Description extends Tasks {
 	 * @return string
 	 */
 	public function get_description( $task_data = [] ) {
-		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
+		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 
 		return $term && ! \is_wp_error( $term ) ? sprintf(
 			/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/taxonomy-terms-description" target="_blank">Read more</a> link */
@@ -170,7 +170,7 @@ class Update_Term_Description extends Tasks {
 	 * @return string
 	 */
 	protected function get_url( $task_data = [] ) {
-		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
+		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return $term && ! \is_wp_error( $term )
 			? \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id )
 			: '';
@@ -228,20 +228,20 @@ class Update_Term_Description extends Tasks {
 		}
 
 		$task_data = [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'category'    => $this->get_provider_category(),
-			'term_id'     => $data['term_id'],
-			'taxonomy'    => $data['taxonomy'],
-			'term_name'   => $data['name'],
-			'date'        => \gmdate( 'YW' ),
-			'post_title'  => $this->get_title( $data ),
-			'description' => $this->get_description( $data ),
-			'url'         => $this->get_url( $data ),
-			'url_target'  => '_blank',
-			'dismissable' => $this->is_dismissable(),
-			'snoozable'   => $this->is_snoozable,
-			'points'      => $this->get_points(),
+			'task_id'          => $task_id,
+			'provider_id'      => $this->get_provider_id(),
+			'category'         => $this->get_provider_category(),
+			'target_term_id'   => $data['term_id'],
+			'target_taxonomy'  => $data['taxonomy'],
+			'target_term_name' => $data['name'],
+			'date'             => \gmdate( 'YW' ),
+			'post_title'       => $this->get_title( $data ),
+			'description'      => $this->get_description( $data ),
+			'url'              => $this->get_url( $data ),
+			'url_target'       => '_blank',
+			'dismissable'      => $this->is_dismissable(),
+			'snoozable'        => $this->is_snoozable,
+			'points'           => $this->get_points(),
 		];
 
 		$task_data = $this->modify_injection_task_data( $task_data );
