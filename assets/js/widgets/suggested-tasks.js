@@ -8,79 +8,94 @@
  */
 /* eslint-disable camelcase */
 
-/**
- * Get the next item to inject.
- *
- * @param {string} categorySlug The category of items to get the next item from.
- * @return {Object} The next item to inject.
- */
-const prplSuggestedTasksGetNextPendingItemFromCategory = ( categorySlug ) => {
-	// Get items of this categoryId.
-	const itemsOfCategory = prplSuggestedTasks.tasks.filter( ( task ) => {
-		const categoryID = task.prpl_recommendations_category[ 0 ];
-		if ( ! categoryID ) {
-			return false;
-		}
+const prplSuggestedTasksToggleUIitems = () => {
+	document.querySelector( '.prpl-suggested-tasks-loading' )?.remove();
+	const items = document.querySelectorAll(
+		'.prpl-suggested-tasks-list .prpl-suggested-task'
+	);
 
-		const category = { slug: false };
-		Object.values(
-			window.progressPlannerSuggestedTasksTerms
-				.prpl_recommendations_category
-		).forEach( ( term ) => {
-			if ( categoryID === term.id ) {
-				category.slug = term.slug;
-			}
-		} );
-		return categorySlug === category?.slug;
-	} );
-
-	// Create an array of items that are in the list.
-	const inList = [];
-	document
-		.querySelectorAll( '.prpl-suggested-task' )
-		.forEach( function ( item ) {
-			inList.push( item.getAttribute( 'data-task-id' ).toString() );
-		} );
-
-	const items = itemsOfCategory.filter( function ( item ) {
-		// Skip items which are not pending.
-		if ( 'publish' !== item.status ) {
-			return false;
-		}
-		// Remove items which are already in the list.
-		if ( inList.includes( item?.meta?.prpl_task_id.toString() ) ) {
-			return false;
-		}
-		return true;
-	} );
-
-	// Do nothing if there are no items left.
 	if ( 0 === items.length ) {
-		return null;
+		document.querySelector( '.prpl-no-suggested-tasks' ).style.display =
+			'block';
 	}
-
-	// Return the first item.
-	return items[ 0 ];
 };
 
 /**
- * Inject the next item from a category.
+ * Inject items from a category.
  */
 document.addEventListener(
-	'prpl/suggestedTask/injectCategoryItem',
+	'prpl/suggestedTask/injectCategoryItems',
 	( event ) => {
-		const nextItem = prplSuggestedTasksGetNextPendingItemFromCategory(
-			event.detail.category
-		);
-		if ( ! nextItem ) {
+		// If window.progressPlannerSuggestedTasksTerms is not loaded, try again after 100ms, for up to 10 times.
+		if (
+			! window?.progressPlannerSuggestedTasksTerms
+				?.prpl_recommendations_category[ event.detail.category ]?.id
+		) {
+			window.prplSuggestedTasksInjectCategoryItemsAttempts =
+				window.prplSuggestedTasksInjectCategoryItemsAttempts || 0;
+			if ( window.prplSuggestedTasksInjectCategoryItemsAttempts > 10 ) {
+				return;
+			}
+			setTimeout( () => {
+				document.dispatchEvent( event );
+			}, 100 );
 			return;
 		}
-
-		document.dispatchEvent(
-			new CustomEvent( 'prpl/suggestedTask/injectItem', {
-				detail: nextItem,
-			} )
+		console.info(
+			`Attempting to fetch recommendations for category: ${ event.detail.category }`
 		);
+		wp.api.loadPromise.done( () => {
+			const postsCollection =
+				new wp.api.collections.Prpl_recommendations();
+			const excludeIds = [];
+			document
+				.querySelectorAll( '.prpl-suggested-task' )
+				.forEach( ( item ) => {
+					excludeIds.push( item.getAttribute( 'data-post-id' ) );
+				} );
+
+			postsCollection
+				.fetch( {
+					data: {
+						status: [ 'publish' ],
+						per_page: Math.max(
+							Math.min(
+								prplSuggestedTasks.maxItemsPerCategory[
+									event.detail.category
+								],
+								100
+							),
+							1
+						),
+						_embed: true,
+						exclude_provider: 'user',
+						exclude: excludeIds,
+						prpl_recommendations_category:
+							window.progressPlannerSuggestedTasksTerms
+								.prpl_recommendations_category[
+								event.detail.category
+							].id,
+						filter: {
+							orderby: 'menu_order',
+							order: 'ASC',
+						},
+					},
+				} )
+				.done( ( data ) => {
+					console.info(
+						`Fetched ${ data.length } recommendations for category: ${ event.detail.category }`
+					);
+					console.info( data );
+					data.forEach( ( item ) => {
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/suggestedTask/injectItem', {
+								detail: item,
+							} )
+						);
+					} );
+					prplSuggestedTasksToggleUIitems();
+				} );
+		} );
 	}
 );
 
@@ -149,75 +164,40 @@ prplDocumentReady( () => {
 		return;
 	}
 
+	// Loop through each provider and inject items.
+	for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
+		document.dispatchEvent(
+			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
+				detail: { category },
+			} )
+		);
+	}
+
 	wp.api.loadPromise.done( () => {
-		console.log( 'Attempting to fetch recommendations...' );
+		console.info(
+			'Attempting to fetch recommendations pending celebration...'
+		);
 		const postsCollection = new wp.api.collections.Prpl_recommendations();
 		postsCollection
 			.fetch( {
 				data: {
-					status: prplSuggestedTasks.delayCelebration
-						? [ 'publish' ]
-						: [ 'publish', 'pending_celebration' ],
+					status: [ 'pending_celebration' ],
 					per_page: 100,
 					_embed: true,
 					exclude_provider: 'user',
-					filter: {
-						orderby: 'menu_order',
-						order: 'ASC',
-					},
 				},
 			} )
 			.done( ( data ) => {
-				console.log( 'Fetch successful:', data );
-				document
-					.querySelector( '.prpl-suggested-tasks-loading' )
-					?.remove();
-				prplSuggestedTasks.tasks = data;
-
-				if ( 0 === prplSuggestedTasks.tasks.length ) {
-					document.querySelector(
-						'.prpl-no-suggested-tasks'
-					).style.display = 'block';
-					return;
-				}
-
-				// Loop through each provider and inject items.
-				for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
-					// Inject items, until we reach the maximum number of channel items.
-					while (
-						document.querySelectorAll(
-							`.prpl-suggested-task[data-task-category="${ category }"]`
-						).length <
-							parseInt(
-								prplSuggestedTasks.maxItemsPerCategory[
-									category
-								]
-							) &&
-						prplSuggestedTasksGetNextPendingItemFromCategory(
-							category
-						)
-					) {
-						document.dispatchEvent(
-							new CustomEvent(
-								'prpl/suggestedTask/injectCategoryItem',
-								{
-									detail: { category },
-								}
-							)
-						);
-					}
-				}
+				console.info( 'Fetch successful:', data );
 
 				// Inject ALL pending celebration tasks.
-				prplSuggestedTasks.tasks
-					.filter( ( task ) => 'pending_celebration' === task.status )
-					.forEach( ( task ) => {
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/suggestedTask/injectItem', {
-								detail: task,
-							} )
-						);
-					} );
+				prplSuggestedTasks.tasks.forEach( ( task ) => {
+					document.dispatchEvent(
+						new CustomEvent( 'prpl/suggestedTask/injectItem', {
+							detail: task,
+						} )
+					);
+				} );
 
 				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 
@@ -343,21 +323,11 @@ document.addEventListener(
 	( e ) => {
 		// TODO: Something seems off here, take a look at this.
 		const category = e.detail.category;
-		while (
-			document.querySelectorAll(
-				`.prpl-suggested-task[data-task-category="${ category }"]`
-			).length <
-				parseInt(
-					prplSuggestedTasks.maxItemsPerCategory[ category ]
-				) &&
-			prplSuggestedTasksGetNextPendingItemFromCategory( category )
-		) {
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/injectCategoryItem', {
-					detail: { category },
-				} )
-			);
-		}
+		document.dispatchEvent(
+			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
+				detail: { category },
+			} )
+		);
 
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	},
