@@ -123,14 +123,11 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 /**
  * Mark tasks as completed.
  */
-document.addEventListener( 'prpl/markTasksAsCompleted', ( event ) => {
-	const taskList = event.detail?.taskList || 'prplSuggestedTasks';
+document.addEventListener( 'prpl/markTasksAsCompleted', () => {
 	document
 		.querySelectorAll( '.prpl-suggested-task-celebrated' )
 		.forEach( ( item ) => {
 			const task_id = item.getAttribute( 'data-task-id' );
-			const providerID = item.getAttribute( 'data-task-provider-id' );
-			const category = item.getAttribute( 'data-task-category' );
 			const el = document.querySelector(
 				`.prpl-suggested-task[data-task-id="${ task_id }"]`
 			);
@@ -138,30 +135,6 @@ document.addEventListener( 'prpl/markTasksAsCompleted', ( event ) => {
 			if ( el ) {
 				el.parentElement.remove();
 			}
-
-			// Get the task index.
-			let taskIndex = false;
-			window[ taskList ].tasks.forEach( ( taskItem, index ) => {
-				if ( taskItem.task_id === task_id ) {
-					taskIndex = index;
-				}
-			} );
-
-			// Mark the task as completed.
-			if ( false !== taskIndex ) {
-				window[ taskList ].tasks[ taskIndex ].status = 'completed';
-			}
-
-			// Refresh the list.
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
-					detail: {
-						task_id,
-						providerID,
-						category,
-					},
-				} )
-			);
 		} );
 } );
 

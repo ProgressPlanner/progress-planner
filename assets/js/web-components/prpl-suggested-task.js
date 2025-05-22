@@ -584,30 +584,56 @@ customElements.define(
 								} )
 							);
 
-							const celebrateEvents =
-								0 <
-								parseInt(
-									this.querySelector( 'li' ).getAttribute(
-										'data-task-points'
-									)
+							const eventDetail = {
+								element: this.querySelector( 'li' ),
+								taskList,
+							};
+							const eventPoints = parseInt(
+								this.querySelector( 'li' ).getAttribute(
+									'data-task-points'
 								)
-									? [ 'prpl/celebrateTasks' ]
-									: [
-											'prpl/strikeCelebratedTasks',
-											'prpl/markTasksAsCompleted',
-									  ];
+							);
+							const celebrateEvents =
+								0 < eventPoints
+									? { 'prpl/celebrateTasks': eventDetail }
+									: {
+											'prpl/strikeCelebratedTasks':
+												eventDetail,
+											'prpl/markTasksAsCompleted':
+												eventDetail,
+											'prpl/suggestedTask/maybeInjectItem':
+												{
+													task_id:
+														this.querySelector(
+															'li'
+														).getAttribute(
+															'data-task-id'
+														),
+													providerID:
+														this.querySelector(
+															'li'
+														).getAttribute(
+															'data-task-provider'
+														),
+													category:
+														this.querySelector(
+															'li'
+														).getAttribute(
+															'data-task-category'
+														),
+												},
+									  };
 
 							// Trigger the celebration events.
-							celebrateEvents.forEach( ( event ) => {
-								document.dispatchEvent(
-									new CustomEvent( event, {
-										detail: {
-											element: this.querySelector( 'li' ),
-											taskList,
-										},
-									} )
-								);
-							} );
+							Object.keys( celebrateEvents ).forEach(
+								( event ) => {
+									document.dispatchEvent(
+										new CustomEvent( event, {
+											detail: celebrateEvents[ event ],
+										} )
+									);
+								}
+							);
 						} );
 					} );
 					break;
