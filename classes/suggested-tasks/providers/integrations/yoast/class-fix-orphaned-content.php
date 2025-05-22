@@ -97,7 +97,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		return sprintf(
 			/* translators: %s: Post title. */
 			\esc_html__( 'Yoast SEO: add internal links to article "%s"!', 'progress-planner' ),
-			\esc_html( $task_data['post_title'] )
+			\esc_html( $task_data['target_post_title'] )
 		);
 	}
 
@@ -171,12 +171,27 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	}
 
 	/**
+	 * Transform data collector data into task data format.
+	 *
+	 * @param array $data The data from data collector.
+	 * @return array The transformed data with original data merged.
+	 */
+	protected function transform_collector_data( array $data ): array {
+		return array_merge(
+			$data,
+			[
+				'target_post_id'    => $data['post_id'],
+				'target_post_title' => $data['post_title'],
+			]
+		);
+	}
+
+	/**
 	 * Get an array of tasks to inject.
 	 *
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-
 		if ( true === $this->is_task_snoozed() || ! $this->should_add_task() ) {
 			return [];
 		}
@@ -184,7 +199,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		$data    = $this->get_data_collector()->collect();
 		$task_id = $this->get_task_id(
 			[
-				'post_id' => $data['target_post_id'],
+				'post_id' => $data['post_id'],
 			]
 		);
 
@@ -192,6 +207,9 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
 			return [];
 		}
+
+		// Transform the data to match the task data structure.
+		$data = $this->transform_collector_data( $data );
 
 		$task_data = [
 			'task_id'        => $task_id,

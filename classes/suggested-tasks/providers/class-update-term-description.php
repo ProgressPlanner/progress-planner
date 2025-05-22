@@ -206,6 +206,23 @@ class Update_Term_Description extends Tasks {
 	}
 
 	/**
+	 * Transform data collector data into task data format.
+	 *
+	 * @param array $data The data from data collector.
+	 * @return array The transformed data with original data merged.
+	 */
+	protected function transform_collector_data( array $data ): array {
+		return array_merge(
+			$data,
+			[
+				'target_term_id'   => $data['term_id'],
+				'target_taxonomy'  => $data['taxonomy'],
+				'target_term_name' => $data['name'],
+			]
+		);
+	}
+
+	/**
 	 * Get an array of tasks to inject.
 	 *
 	 * @return array
@@ -227,13 +244,16 @@ class Update_Term_Description extends Tasks {
 			return [];
 		}
 
+		// Transform the data to match the task data structure.
+		$data = $this->transform_collector_data( $data );
+
 		$task_data = [
 			'task_id'          => $task_id,
 			'provider_id'      => $this->get_provider_id(),
 			'category'         => $this->get_provider_category(),
-			'target_term_id'   => $data['term_id'],
-			'target_taxonomy'  => $data['taxonomy'],
-			'target_term_name' => $data['name'],
+			'target_term_id'   => $data['target_term_id'],
+			'target_taxonomy'  => $data['target_taxonomy'],
+			'target_term_name' => $data['target_term_name'],
 			'date'             => \gmdate( 'YW' ),
 			'post_title'       => $this->get_title( $data ),
 			'description'      => $this->get_description( $data ),

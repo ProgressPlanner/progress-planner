@@ -101,7 +101,7 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 		}
 
 		$query = "
-			SELECT p.ID AS target_post_id, p.post_title AS post_title
+			SELECT p.ID AS post_id, p.post_title AS post_title
 			FROM {$wpdb->posts} p
 			LEFT JOIN (
 				SELECT DISTINCT l.target_post_id
