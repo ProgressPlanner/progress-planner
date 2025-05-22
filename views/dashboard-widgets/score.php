@@ -36,6 +36,9 @@ use Progress_Planner\Suggested_Tasks_DB;
 
 <h3><?php \esc_html_e( 'Ravi\'s Recommendations', 'progress-planner' ); ?></h3>
 <ul style="display:none"></ul>
+<p class="prpl-suggested-tasks-loading">
+	<?php \esc_html_e( 'Loading tasks...', 'progress-planner' ); ?>
+</p>
 <ul class="prpl-suggested-tasks-list"></ul>
 
 <?php if ( \current_user_can( 'manage_options' ) ) : ?>

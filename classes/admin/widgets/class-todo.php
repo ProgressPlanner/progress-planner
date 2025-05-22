@@ -36,6 +36,7 @@ final class ToDo extends Widget {
 	 */
 	public function the_todo_list() {
 		?>
+		<p id="prpl-todo-list-loading"><?php \esc_html_e( 'Loading items...', 'progress-planner' ); ?></p>
 		<div id="todo-aria-live-region" aria-live="polite" style="position: absolute; left: -9999px;"></div>
 
 		<ul id="todo-list" class="prpl-todo-list prpl-suggested-tasks-list"></ul>
