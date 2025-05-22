@@ -116,20 +116,27 @@ class Content_Review extends Tasks {
 	/**
 	 * Get the task title.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_title( $task_id = '' ) {
-		$post = $this->get_post_from_task_id( $task_id );
+	public function get_title( $task_data = [] ) {
+		if ( ! isset( $task_data['target_post_id'] ) ) {
+			return '';
+		}
 
-		return $post
-			? sprintf(
+		$post = \get_post( $task_data['target_post_id'] );
+
+		if ( ! $post ) {
+			return '';
+		}
+
+		return sprintf(
 				// translators: %1$s: The post type, %2$s: The post title.
-				\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
-				strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
-				\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
-			) : '';
+			\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
+			strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
+			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
+		);
 	}
 
 	/**
@@ -140,7 +147,11 @@ class Content_Review extends Tasks {
 	 * @return string
 	 */
 	public function get_description( $task_data = [] ) {
-		$post = $this->get_post_from_task_id( $task_data['task_id'] );
+		if ( ! isset( $task_data['target_post_id'] ) ) {
+			return '';
+		}
+
+		$post = \get_post( $task_data['target_post_id'] );
 
 		if ( ! $post ) {
 			return '';
@@ -160,12 +171,17 @@ class Content_Review extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	protected function get_url( $task_id = '' ) {
-		$post = $this->get_post_from_task_id( $task_id );
+	protected function get_url( $task_data = [] ) {
+
+		if ( ! isset( $task_data['target_post_id'] ) ) {
+			return '';
+		}
+
+		$post = \get_post( $task_data['target_post_id'] );
 
 		if ( ! $post ) {
 			return '';
@@ -307,14 +323,9 @@ class Content_Review extends Tasks {
 					'target_post_id'   => $task_data['target_post_id'],
 					'target_post_type' => $task_data['target_post_type'],
 					'date'             => \gmdate( 'YW' ),
-					'post_title'       => sprintf(
-						// translators: %1$s: The post type, %2$s: The post title.
-						\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
-						strtolower( \get_post_type_object( \esc_html( $task_data['target_post_type'] ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
-						\esc_html( \get_the_title( $task_data['target_post_id'] ) ) // @phpstan-ignore-line property.nonObject
-					),
+					'post_title'       => $this->get_title( $task_data ),
 					'description'      => $this->get_description( $task_data ),
-					'url'              => \esc_url( (string) \get_edit_post_link( $task_data['target_post_id'] ) ),
+					'url'              => $this->get_url( $task_data ),
 					'url_target'       => '_blank',
 					'dismissable'      => $this->is_dismissable(),
 					'snoozable'        => $this->is_snoozable,
