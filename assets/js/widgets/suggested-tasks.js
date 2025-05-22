@@ -31,6 +31,8 @@ document.addEventListener(
 	( event ) => {
 		// If window.progressPlannerSuggestedTasksTerms is not loaded, try again after 100ms, for up to 10 times.
 		if (
+			Object.keys( window.progressPlannerSuggestedTasksTerms ).length ===
+				0 ||
 			! window?.progressPlannerSuggestedTasksTerms
 				?.prpl_recommendations_category[ event.detail.category ]?.id
 		) {
