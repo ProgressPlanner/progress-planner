@@ -54,23 +54,16 @@ document.addEventListener(
 					excludeIds.push( item.getAttribute( 'data-post-id' ) );
 				} );
 
+			const maxCategoryItems =
+				prplSuggestedTasks.maxItemsPerCategory[ event.detail.category ];
+			const perPage = Math.max( Math.min( maxCategoryItems, 100 ), 1 );
+
 			postsCollection
 				.fetch( {
 					data: {
 						status: [ event.detail.status ],
 						per_page:
-							'publish' === event.detail.status
-								? Math.max(
-										Math.min(
-											prplSuggestedTasks
-												.maxItemsPerCategory[
-												event.detail.category
-											],
-											100
-										),
-										1
-								  )
-								: 100,
+							'publish' === event.detail.status ? perPage : 100,
 						_embed: true,
 						exclude: excludeIds,
 						prpl_recommendations_category:
