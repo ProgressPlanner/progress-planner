@@ -18,7 +18,6 @@ class Todo {
 	 * @return void
 	 */
 	public function __construct() {
-
 		// Wait for the CPT to be registered.
 		add_action( 'init', [ $this, 'maybe_change_first_item_points_on_monday' ] );
 	}

@@ -100,7 +100,6 @@ class Debug_Tools {
 	 * @return void
 	 */
 	protected function add_delete_submenu_item( $admin_bar ) {
-
 		if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
 			return;
 		}
@@ -172,7 +171,6 @@ class Debug_Tools {
 	 * @return void
 	 */
 	protected function add_upgrading_tasks_submenu_item( $admin_bar ) {
-
 		$admin_bar->add_node(
 			[
 				'id'     => 'prpl-upgrading-tasks',
@@ -242,7 +240,6 @@ class Debug_Tools {
 
 			if ( ! empty( $suggested_tasks ) ) {
 				foreach ( $suggested_tasks as $task ) {
-
 					$title = $task->post_title;
 					if ( $task->post_status && 'future' === $task->post_status && $task->post_date ) {
 						$until  = is_float( $task->post_date ) ? '(forever)' : '(until ' . $task->post_date . ')';
@@ -361,7 +358,6 @@ class Debug_Tools {
 	 * @return void
 	 */
 	public function check_delete_pending_tasks() {
-
 		if (
 			! isset( $_GET['prpl_delete_pending_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$_GET['prpl_delete_pending_tasks'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -395,7 +391,6 @@ class Debug_Tools {
 	 * @return void
 	 */
 	public function check_delete_badges() {
-
 		if (
 			! isset( $_GET['prpl_delete_badges'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$_GET['prpl_delete_badges'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended

@@ -18,9 +18,7 @@ class Badges_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_content_badges() {
-
 		$badges = \progress_planner()->get_badges()->get_badges( 'content' );
-
 		$this->assertCount( 3, $badges );
 	}
 
@@ -30,9 +28,7 @@ class Badges_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_maintenance_badges() {
-
 		$badges = \progress_planner()->get_badges()->get_badges( 'maintenance' );
-
 		$this->assertCount( 3, $badges );
 	}
 
@@ -42,9 +38,7 @@ class Badges_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_monthly_badges() {
-
 		$badges = \progress_planner()->get_badges()->get_badges( 'monthly' );
-
 		$this->assertNotEmpty( $badges[ \gmdate( 'Y' ) ] );
 	}
 
@@ -54,9 +48,7 @@ class Badges_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_monthly_flat_badges() {
-
-		$badges = \progress_planner()->get_badges()->get_badges( 'monthly_flat' );
-
+		$badges         = \progress_planner()->get_badges()->get_badges( 'monthly_flat' );
 		$data['badges'] = [];
 		foreach ( $badges as $badge ) {
 			$data['badges'][ $badge->get_id() ] = array_merge(

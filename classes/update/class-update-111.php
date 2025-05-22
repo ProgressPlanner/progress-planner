@@ -237,7 +237,6 @@ class Update_111 {
 	 * @return void
 	 */
 	private function migrate_create_post_tasks() {
-
 		// Migrate the 'create-post' completed tasks.
 		if ( ! empty( $this->local_tasks ) ) {
 			foreach ( $this->local_tasks as $key => $task ) {
@@ -245,11 +244,11 @@ class Update_111 {
 					continue;
 				}
 				if ( false !== strpos( $task['task_id'], 'provider_id/create-post' ) ) {
-
-					// task_id needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
-					// So for tasks which are completed or pending_celebration we will make the task_id like: create-post-short-202501,
-					// and for pending tasks task_id will be (how it will be in the future, since we only have 1 type of create-post task per week): create-post-202501 .
-
+					/*
+					 * `task_id` needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
+					 * For tasks which are completed or pending_celebration we will make the task_id like: create-post-short-202501
+					 * and for pending tasks, task_id will be (how it will be in the future, since we only have 1 type of create-post task per week): create-post-202501 .
+					 */
 					// Only add legacy part of the task_id if the task is not pending.
 					if ( 'completed' === $task['status'] || 'pending_celebration' === $task['status'] ) {
 						$this->local_tasks[ $key ]['task_id'] = $task['provider_id'] . '-' . ( $task['long'] ? 'long' : 'short' ) . '-' . $task['date'];
@@ -303,7 +302,6 @@ class Update_111 {
 	 * @return void
 	 */
 	private function migrate_review_post_tasks() {
-
 		// Migrate the 'create-post' completed tasks.
 		if ( ! empty( $this->local_tasks ) ) {
 			foreach ( $this->local_tasks as $key => $task ) {
@@ -311,7 +309,6 @@ class Update_111 {
 					continue;
 				}
 				if ( false !== strpos( $task['task_id'], 'provider_id/review-post' ) ) {
-
 					$data = $this->get_data_from_task_id( $task['task_id'] );
 
 					// Get the date from the activity.

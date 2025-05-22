@@ -26,14 +26,11 @@ class Plugin_Migration_Helpers {
 
 		// Parse simple format, e.g. 'update-core-202449' or "hello-world".
 		if ( ! str_contains( $task_id, '|' ) ) {
-
 			$last_pos = strrpos( $task_id, '-' );
 
 			// Check if the task ID ends with a '-12345' or not, if not that would be mostly one time tasks.
 			if ( $last_pos === false || ! preg_match( '/-\d+$/', $task_id ) ) {
-
 				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id );
-
 				return new Task(
 					[
 						'task_id'     => $task_id,

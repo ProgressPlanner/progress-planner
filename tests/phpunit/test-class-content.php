@@ -150,7 +150,6 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 	 * Test multiple status transitions.
 	 */
 	public function test_multiple_status_transitions() {
-
 		// Create a draft post.
 		$post_id = wp_insert_post(
 			[

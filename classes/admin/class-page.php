@@ -160,7 +160,6 @@ class Page {
 		}
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
-
 			$default_localization_data = [
 				'name' => 'progressPlanner',
 				'data' => [

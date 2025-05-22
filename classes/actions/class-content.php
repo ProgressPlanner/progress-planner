@@ -27,7 +27,6 @@ class Content {
 	 * @return void
 	 */
 	public function register_hooks() {
-
 		// Add activity when a post is added or updated.
 		\add_action( 'wp_insert_post', [ $this, 'insert_post' ], 10, 3 );
 		\add_action( 'transition_post_status', [ $this, 'transition_post_status' ], 10, 3 );
@@ -226,7 +225,6 @@ class Content {
 	 * @return void
 	 */
 	private function add_post_activity( $post, $type ) {
-
 		// Post was updated to publish for the first time, ie draft was published.
 		if ( 'update' === $type && 'publish' === $post->post_status ) {
 			// Check if there is a publish activity for this post.
@@ -248,7 +246,6 @@ class Content {
 
 		// Post was updated, but it was published previously.
 		if ( 'update' === $type ) {
-
 			// Check if there are any activities for this post, on this date.
 			$existing = \progress_planner()->get_activities__query()->query_activities(
 				[
@@ -270,7 +267,6 @@ class Content {
 
 		// Update the badges.
 		if ( 'publish' === $type ) {
-
 			// Check if there is a publish activity for this post.
 			$existing = \progress_planner()->get_activities__query()->query_activities(
 				[

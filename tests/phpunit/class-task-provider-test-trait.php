@@ -76,7 +76,6 @@ trait Task_Provider_Test_Trait {
 	 * @return void
 	 */
 	public function test_task_provider() {
-
 		// Test that the blog description is empty.
 		$this->assertTrue( $this->task_provider->should_add_task() );
 

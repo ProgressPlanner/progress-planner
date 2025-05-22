@@ -198,7 +198,6 @@ class Tasks_Manager {
 	public function inject_tasks() {
 		// Loop through all registered task providers and inject their tasks.
 		foreach ( $this->task_providers as $provider_instance ) {
-
 			// WIP, get_tasks_to_inject() is injecting tasks.
 			$provider_instance->get_tasks_to_inject();
 		}

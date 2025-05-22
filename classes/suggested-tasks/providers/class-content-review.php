@@ -175,7 +175,6 @@ class Content_Review extends Tasks {
 	 * @return string
 	 */
 	protected function get_url( $task_data = [] ) {
-
 		if ( ! isset( $task_data['target_post_id'] ) ) {
 			return '';
 		}
@@ -336,7 +335,6 @@ class Content_Review extends Tasks {
 		$added_tasks = [];
 
 		foreach ( $task_to_inject as $task_data ) {
-
 			// Skip the task if it was already injected.
 			if ( \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] ) ) {
 				continue;

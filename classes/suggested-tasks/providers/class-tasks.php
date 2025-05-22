@@ -502,7 +502,6 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return array
 	 */
 	public function get_task_details( $task_id = '' ) {
-
 		return [
 			'task_id'      => $this->get_task_id(),
 			'provider_id'  => $this->get_provider_id(),

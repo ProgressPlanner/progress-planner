@@ -136,7 +136,6 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function on_automatic_updates_complete(): void {
-
 		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get(
 			[
 				'numberposts' => 1,
@@ -410,7 +409,6 @@ class Suggested_Tasks {
 	 * @return \WP_REST_Response
 	 */
 	public function rest_prepare_recommendation( $response, $post ) {
-
 		$provider_term = wp_get_object_terms( $post->ID, 'prpl_recommendations_provider' );
 		if ( $provider_term && ! is_wp_error( $provider_term ) ) {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );

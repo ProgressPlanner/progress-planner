@@ -51,7 +51,6 @@ final class Suggested_Tasks extends Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-
 		// Set max items per category.
 		$max_items_per_category = [];
 		$provider_categories    = \get_terms(

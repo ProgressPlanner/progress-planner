@@ -83,7 +83,6 @@ class Update_130 {
 				'type'     => 'completed',
 			],
 		) as $activity ) {
-
 			$continue_main_loop = false;
 
 			// Check if the task with the same task_id exists, it means that task was recreated (and has pending status now).
@@ -135,7 +134,6 @@ class Update_130 {
 	 * @return array The data.
 	 */
 	private function get_data_from_task_id( $task_id ) {
-
 		$task_object = Plugin_Migration_Helpers::parse_task_data_from_task_id( $task_id );
 
 		if ( 0 === strpos( $task_object->get_task_id(), 'create-post-' ) || 0 === strpos( $task_object->get_task_id(), 'create-post-short-' ) ) {
@@ -215,7 +213,6 @@ class Update_130 {
 	 * @return Task The task object.
 	 */
 	private function handle_legacy_yoast_and_comment_hacks_tasks( $task_object ) {
-
 		$data = [
 			'task_id'     => $task_object->get_task_id(),
 			'provider_id' => $task_object->get_task_id(),

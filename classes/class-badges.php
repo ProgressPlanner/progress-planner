@@ -112,7 +112,6 @@ class Badges {
 	 * @return void
 	 */
 	public function clear_monthly_progress( $activity_id ) {
-
 		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'suggested_task',
@@ -146,10 +145,8 @@ class Badges {
 	 * @return void
 	 */
 	public function clear_content_progress() {
-
 		// Clear content saved progress.
 		foreach ( $this->content as $badge ) {
-
 			// If the badge is already complete, skip it.
 			if ( 100 <= $badge->progress_callback()['progress'] ) {
 				continue;

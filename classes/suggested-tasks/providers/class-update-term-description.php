@@ -99,11 +99,8 @@ class Update_Term_Description extends Tasks {
 		}
 
 		foreach ( $pending_tasks as $task ) {
-			if ( $task->term_id && $task->taxonomy ) {
-
-				if ( (int) $task->term_id === (int) $deleted_term->term_id ) {
-					\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
-				}
+			if ( $task->term_id && $task->taxonomy && (int) $task->term_id === (int) $deleted_term->term_id ) {
+				\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 			}
 		}
 	}
