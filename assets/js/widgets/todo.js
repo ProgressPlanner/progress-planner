@@ -79,7 +79,7 @@ prplDocumentReady( () => {
 			} )
 			.done( ( data ) => {
 				console.log( 'Fetching user tasks successful:', data );
-				document.querySelector( '#prpl-todo-list-loading' ).remove();
+				document.querySelector( '#prpl-todo-list-loading' )?.remove();
 				window.progressPlannerTodo.tasks = data;
 
 				// Inject the existing todo list items into the DOM
