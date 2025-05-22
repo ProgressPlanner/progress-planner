@@ -12,10 +12,16 @@ async function cleanup() {
 	}
 }
 
+// Handle async cleanup properly
+async function handleCleanup() {
+	await cleanup();
+	process.exit( 0 );
+}
+
 // Register cleanup on process exit
-// process.on( 'exit', cleanup ); // it gets triggered between sequential & parallel tests
-process.on( 'SIGINT', cleanup );
-process.on( 'SIGTERM', cleanup );
+process.on( 'exit', () => cleanup() ); // exit event doesn't support async, it gets triggered between sequential & parallel tests
+process.on( 'SIGINT', () => handleCleanup() );
+process.on( 'SIGTERM', () => handleCleanup() );
 
 async function globalSetup() {
 	const authFile = path.join( process.cwd(), 'auth.json' );
