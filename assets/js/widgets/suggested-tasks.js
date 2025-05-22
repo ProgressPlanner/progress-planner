@@ -87,6 +87,12 @@ document.addEventListener(
 						`Fetched ${ data.length } recommendations for category: ${ event.detail.category }`,
 						data
 					);
+
+					// WIP.
+					if ( 'user' === event.detail.category ) {
+						window.progressPlannerTodo.tasks = data;
+					}
+
 					const injectTriggerArgsCallback =
 						event?.detail?.injectTriggerArgsCallback ||
 						( ( item ) => item );
