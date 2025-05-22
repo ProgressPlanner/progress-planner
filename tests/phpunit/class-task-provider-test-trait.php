@@ -102,7 +102,7 @@ trait Task_Provider_Test_Trait {
 		// Change the task status to pending celebration for all completed tasks.
 		foreach ( \progress_planner()->get_suggested_tasks()->get_tasks_manager()->evaluate_tasks() as $task ) {
 			// Change the task status to pending celebration.
-			\progress_planner()->get_suggested_tasks()->update_recommendation(
+			Suggested_Tasks_DB::update_recommendation(
 				$task->get_data()['ID'],
 				[ 'post_status' => 'pending_celebration' ]
 			);
@@ -112,7 +112,7 @@ trait Task_Provider_Test_Trait {
 
 		// Verify that the task(s) we're testing is completed.
 		foreach ( $tasks as $post_data ) {
-			\progress_planner()->get_suggested_tasks()->update_recommendation(
+			Suggested_Tasks_DB::update_recommendation(
 				is_array( $post_data ) ? $post_data['post_id'] : $post_data,
 				[ 'post_status' => 'trash' ]
 			);
