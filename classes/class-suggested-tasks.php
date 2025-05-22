@@ -150,10 +150,10 @@ class Suggested_Tasks {
 			return;
 		}
 
-		Suggested_Tasks_DB::update_recommendation( $pending_tasks[0]['ID'], [ 'post_status' => 'trash' ] );
+		Suggested_Tasks_DB::update_recommendation( $pending_tasks[0]->ID, [ 'post_status' => 'trash' ] );
 
 		// Insert an activity.
-		$this->insert_activity( $pending_tasks[0]['ID'] );
+		$this->insert_activity( $pending_tasks[0]->ID );
 	}
 
 	/**

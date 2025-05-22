@@ -380,7 +380,7 @@ class Debug_Tools {
 
 		// Delete the pending tasks.
 		foreach ( $pending_tasks as $task ) {
-			Suggested_Tasks_DB::delete_recommendation( (int) $task['ID'] );
+			Suggested_Tasks_DB::delete_recommendation( (int) $task->ID );
 		}
 
 		// Redirect to the same page without the parameter.

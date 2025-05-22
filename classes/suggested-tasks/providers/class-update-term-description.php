@@ -100,10 +100,10 @@ class Update_Term_Description extends Tasks {
 		}
 
 		foreach ( $pending_tasks as $task ) {
-			if ( isset( $task['term_id'] ) && isset( $task['taxonomy'] ) ) {
+			if ( $task->term_id && $task->taxonomy ) {
 
-				if ( (int) $task['term_id'] === (int) $deleted_term->term_id ) {
-					Suggested_Tasks_DB::delete_recommendation( $task['ID'] );
+				if ( (int) $task->term_id === (int) $deleted_term->term_id ) {
+					Suggested_Tasks_DB::delete_recommendation( $task->ID );
 				}
 			}
 		}

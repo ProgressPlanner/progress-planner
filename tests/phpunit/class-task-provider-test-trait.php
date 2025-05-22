@@ -94,7 +94,7 @@ trait Task_Provider_Test_Trait {
 		);
 
 		// Assert that task is in the pending tasks.
-		$this->assertTrue( has_term( $this->task_provider_id, 'prpl_recommendations_provider', $pending_tasks[0]['ID'] ) );
+		$this->assertTrue( has_term( $this->task_provider_id, 'prpl_recommendations_provider', $pending_tasks[0]->ID ) );
 
 		// Complete the task.
 		$this->complete_task();
@@ -111,12 +111,12 @@ trait Task_Provider_Test_Trait {
 		}
 
 		// Verify that the task(s) we're testing is completed.
-		foreach ( $tasks as $post_data ) {
+		foreach ( $tasks as $post_id ) {
 			Suggested_Tasks_DB::update_recommendation(
-				is_array( $post_data ) ? $post_data['post_id'] : $post_data,
+				$post_id,
 				[ 'post_status' => 'trash' ]
 			);
-			$this->assertTrue( 'trash' === \get_post_status( is_array( $post_data ) ? $post_data['post_id'] : $post_data ) );
+			$this->assertTrue( 'trash' === \get_post_status( $post_id ) );
 		}
 	}
 }

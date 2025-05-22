@@ -116,8 +116,8 @@ class Todo {
 			]
 		) as $task ) {
 			Suggested_Tasks_DB::update_recommendation(
-				$task['ID'],
-				[ 'points' => $task['ID'] === $task_ids[0] ? 1 : 0 ]
+				$task->ID,
+				[ 'points' => $task->ID === $task_ids[0] ? 1 : 0 ]
 			);
 		}
 

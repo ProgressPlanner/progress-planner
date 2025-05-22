@@ -53,7 +53,7 @@ class Suggested_Tasks_DB {
 
 		// If we have an existing task, skip.
 		if ( ! empty( $posts ) ) {
-			return $posts[0]['ID'];
+			return $posts[0]->ID;
 		}
 
 		$data['post_status'] = $data['post_status'] ?? 'publish';
