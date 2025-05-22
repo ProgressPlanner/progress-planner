@@ -83,6 +83,7 @@ class Todo {
 	 * @return void
 	 */
 	public function maybe_change_first_item_points_on_monday() {
+		// Ordered by menu_order ASC, by default.
 		$pending_items = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
 			[
 				'provider_id' => 'user',
@@ -104,19 +105,11 @@ class Todo {
 
 		$next_monday = new \DateTime( 'monday next week' );
 
-		// Get the task IDs from the todos.
-		$task_ids = array_column( $pending_items, 'ID' );
-
 		// Reset the points of all the tasks, except for the first one in the todo list.
-		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
-			[
-				'provider'    => 'user',
-				'post_status' => 'publish',
-			]
-		) as $task ) {
+		foreach ( $pending_items as $task ) {
 			\progress_planner()->get_suggested_tasks_db()->update_recommendation(
 				$task->ID,
-				[ 'points' => $task->ID === $task_ids[0] ? 1 : 0 ]
+				[ 'points' => $task->ID === $pending_items[0]->ID ? 1 : 0 ]
 			);
 		}
 
