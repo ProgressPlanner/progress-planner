@@ -79,17 +79,23 @@ document.addEventListener(
 				} )
 				.done( ( data ) => {
 					console.info(
-						`Fetched ${ data.length } recommendations for category: ${ event.detail.category }`
+						`Fetched ${ data.length } recommendations for category: ${ event.detail.category }`,
+						data
 					);
-					console.info( data );
+					const injectTriggerArgsCallback =
+						event?.detail?.injectTriggerArgsCallback ||
+						( ( item ) => item );
 					data.forEach( ( item ) => {
 						document.dispatchEvent(
-							new CustomEvent( 'prpl/suggestedTask/injectItem', {
-								detail: item,
+							new CustomEvent( event.detail.injectTrigger, {
+								detail: injectTriggerArgsCallback( item ),
 							} )
 						);
 					} );
-					prplSuggestedTasksToggleUIitems();
+
+					if ( event?.detail?.afterInject ) {
+						event.detail.afterInject( data );
+					}
 				} );
 		} );
 	}
@@ -167,12 +173,22 @@ prplDocumentReady( () => {
 		}
 		document.dispatchEvent(
 			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
-				detail: { category, status: 'publish' },
+				detail: {
+					category,
+					status: 'publish',
+					injectTrigger: 'prpl/suggestedTask/injectItem',
+					afterInject: prplSuggestedTasksToggleUIitems,
+				},
 			} )
 		);
 		document.dispatchEvent(
 			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
-				detail: { category, status: 'pending_celebration' },
+				detail: {
+					category,
+					status: 'pending_celebration',
+					injectTrigger: 'prpl/suggestedTask/injectItem',
+					afterInject: prplSuggestedTasksToggleUIitems,
+				},
 			} )
 		);
 		setTimeout( () => {
@@ -279,7 +295,11 @@ document.addEventListener(
 		const category = e.detail.category;
 		document.dispatchEvent(
 			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
-				detail: { category },
+				detail: {
+					category,
+					injectTrigger: 'prpl/suggestedTask/maybeInjectItem',
+					afterInject: prplSuggestedTasksToggleUIitems,
+				},
 			} )
 		);
 

@@ -70,7 +70,7 @@ final class Suggested_Tasks extends Widget {
 
 		// This should never happen, but just in case - user tasks are displayed in different widget.
 		if ( isset( $max_items_per_category['user'] ) ) {
-			$max_items_per_category['user'] = 0;
+			$max_items_per_category['user'] = 100;
 		}
 
 		// Celebrate only on the Progress Planner Dashboard page.
