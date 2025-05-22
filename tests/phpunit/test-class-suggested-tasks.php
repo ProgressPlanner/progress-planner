@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Tests;
 
-use Progress_Planner\CPT_Recommendations;
+use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * CPT_Recommendations test case.
@@ -79,7 +79,7 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 		}
 
 		\progress_planner()->get_suggested_tasks()->get_tasks_manager()->cleanup_pending_tasks();
-		\wp_cache_flush_group( \Progress_Planner\Suggested_Tasks::GET_TASKS_CACHE_GROUP ); // Clear the cache.
+		\wp_cache_flush_group( \Progress_Planner\Suggested_Tasks_DB::GET_TASKS_CACHE_GROUP ); // Clear the cache.
 		$this->assertEquals( count( $tasks_to_keep ), \count( Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] ) ) );
 	}
 }

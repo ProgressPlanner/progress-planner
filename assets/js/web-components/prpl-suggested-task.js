@@ -26,7 +26,6 @@ customElements.define(
 			allowReorder = false,
 			deletable = false,
 			useCheckbox = true,
-			taskList = '', // prplSuggestedTasks or progressPlannerTodo.
 		} ) {
 			// Get parent class properties
 			super();
@@ -273,7 +272,6 @@ customElements.define(
 				data-task-points="${ meta?.prpl_points }"
 				data-task-category="${ terms?.prpl_recommendations_category?.slug }"
 				data-task-order="${ menu_order }"
-				data-task-list="${ taskList }"
 			>
 				${ actionButtons.completeCheckbox }
 				<h3 style="width: 100%;"><span${
@@ -501,9 +499,6 @@ customElements.define(
 		 *                                the duration to snooze the task for.
 		 */
 		runTaskAction = ( post_id, actionType, snoozeDuration ) => {
-			const taskList =
-				this.querySelector( 'li' ).getAttribute( 'data-task-list' );
-
 			switch ( actionType ) {
 				case 'snooze':
 					wp.api.loadPromise.done( () => {
@@ -535,16 +530,6 @@ customElements.define(
 						} );
 						post.save().then( () => {
 							this.querySelector( 'li' ).remove();
-							// Update the global var.
-							window[ taskList ].tasks.forEach(
-								( task, index ) => {
-									if ( task.id === post_id ) {
-										window[ taskList ].tasks[
-											index
-										].status = 'snoozed';
-									}
-								}
-							);
 						} );
 					} );
 					break;
@@ -556,16 +541,6 @@ customElements.define(
 							status: 'pending_celebration',
 						} );
 						post.save().then( () => {
-							// Add the task to the pending celebration.
-							window[ taskList ].tasks.forEach(
-								( task, index ) => {
-									if ( task.id === post_id ) {
-										window[ taskList ].tasks[
-											index
-										].status = 'pending_celebration';
-									}
-								}
-							);
 							// Set the task action to celebrate.
 							this.querySelector( 'li' ).setAttribute(
 								'data-task-action',
@@ -584,30 +559,55 @@ customElements.define(
 								} )
 							);
 
-							const celebrateEvents =
-								0 <
-								parseInt(
-									this.querySelector( 'li' ).getAttribute(
-										'data-task-points'
-									)
+							const eventDetail = {
+								element: this.querySelector( 'li' ),
+							};
+							const eventPoints = parseInt(
+								this.querySelector( 'li' ).getAttribute(
+									'data-task-points'
 								)
-									? [ 'prpl/celebrateTasks' ]
-									: [
-											'prpl/strikeCelebratedTasks',
-											'prpl/markTasksAsCompleted',
-									  ];
+							);
+							const celebrateEvents =
+								0 < eventPoints
+									? { 'prpl/celebrateTasks': eventDetail }
+									: {
+											'prpl/strikeCelebratedTasks':
+												eventDetail,
+											'prpl/markTasksAsCompleted':
+												eventDetail,
+											'prpl/suggestedTask/maybeInjectItem':
+												{
+													task_id:
+														this.querySelector(
+															'li'
+														).getAttribute(
+															'data-task-id'
+														),
+													providerID:
+														this.querySelector(
+															'li'
+														).getAttribute(
+															'data-task-provider'
+														),
+													category:
+														this.querySelector(
+															'li'
+														).getAttribute(
+															'data-task-category'
+														),
+												},
+									  };
 
 							// Trigger the celebration events.
-							celebrateEvents.forEach( ( event ) => {
-								document.dispatchEvent(
-									new CustomEvent( event, {
-										detail: {
-											element: this.querySelector( 'li' ),
-											taskList,
-										},
-									} )
-								);
-							} );
+							Object.keys( celebrateEvents ).forEach(
+								( event ) => {
+									document.dispatchEvent(
+										new CustomEvent( event, {
+											detail: celebrateEvents[ event ],
+										} )
+									);
+								}
+							);
 						} );
 					} );
 					break;
@@ -619,16 +619,6 @@ customElements.define(
 							status: 'publish',
 						} );
 						post.save().then( () => {
-							// Change the task status to pending.
-							window[ taskList ].tasks.forEach(
-								( task, index ) => {
-									if ( task.id === post_id ) {
-										window[ taskList ].tasks[
-											index
-										].status = 'publish';
-									}
-								}
-							);
 							// Set the task action to pending.
 							this.querySelector( 'li' ).setAttribute(
 								'data-task-action',
