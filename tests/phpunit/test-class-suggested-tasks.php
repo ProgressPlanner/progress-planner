@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Tests;
 
-use Progress_Planner\CPT_Recommendations;
+use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * CPT_Recommendations test case.

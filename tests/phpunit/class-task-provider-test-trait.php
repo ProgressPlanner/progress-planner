@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Tests;
 
+use Progress_Planner\Suggested_Tasks_DB;
+
 /**
  * Task provider test case.
  */

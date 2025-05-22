@@ -9,7 +9,6 @@ namespace Progress_Planner;
 
 use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
 use Progress_Planner\Suggested_Tasks\Tasks_Manager;
-use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Recommendations class.
