@@ -68,7 +68,6 @@ document.addEventListener(
 							1
 						),
 						_embed: true,
-						exclude_provider: 'user',
 						exclude: excludeIds,
 						prpl_recommendations_category:
 							window.progressPlannerSuggestedTasksTerms
@@ -166,6 +165,9 @@ prplDocumentReady( () => {
 
 	// Loop through each provider and inject items.
 	for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
+		if ( 'user' === category ) {
+			continue;
+		}
 		document.dispatchEvent(
 			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
 				detail: { category },
