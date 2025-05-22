@@ -46,7 +46,6 @@ document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
 		},
 		deletable: true,
 		allowReorder: true,
-		taskList: 'progressPlannerTodo',
 		content: { rendered: '' },
 	} );
 
