@@ -57,16 +57,20 @@ document.addEventListener(
 			postsCollection
 				.fetch( {
 					data: {
-						status: [ 'publish' ],
-						per_page: Math.max(
-							Math.min(
-								prplSuggestedTasks.maxItemsPerCategory[
-									event.detail.category
-								],
-								100
-							),
-							1
-						),
+						status: [ event.detail.status ],
+						per_page:
+							'publish' === event.detail.status
+								? Math.max(
+										Math.min(
+											prplSuggestedTasks
+												.maxItemsPerCategory[
+												event.detail.category
+											],
+											100
+										),
+										1
+								  )
+								: 100,
 						_embed: true,
 						exclude: excludeIds,
 						prpl_recommendations_category:
@@ -170,64 +174,19 @@ prplDocumentReady( () => {
 		}
 		document.dispatchEvent(
 			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
-				detail: { category },
+				detail: { category, status: 'publish' },
 			} )
 		);
+		document.dispatchEvent(
+			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
+				detail: { category, status: 'pending_celebration' },
+			} )
+		);
+		setTimeout( () => {
+			// Trigger the celebration event.
+			document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
+		}, 3000 );
 	}
-
-	wp.api.loadPromise.done( () => {
-		console.info(
-			'Attempting to fetch recommendations pending celebration...'
-		);
-		const postsCollection = new wp.api.collections.Prpl_recommendations();
-		postsCollection
-			.fetch( {
-				data: {
-					status: [ 'pending_celebration' ],
-					per_page: 100,
-					_embed: true,
-					exclude_provider: 'user',
-				},
-			} )
-			.done( ( data ) => {
-				console.info( 'Fetch successful:', data );
-
-				// Inject ALL pending celebration tasks.
-				prplSuggestedTasks.tasks.forEach( ( task ) => {
-					document.dispatchEvent(
-						new CustomEvent( 'prpl/suggestedTask/injectItem', {
-							detail: task,
-						} )
-					);
-				} );
-
-				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-
-				// Trigger the celebration event if needed.
-				if (
-					! prplSuggestedTasks.delayCelebration &&
-					prplSuggestedTasks.tasks.filter(
-						( task ) => 'pending_celebration' === task.status
-					).length
-				) {
-					setTimeout( () => {
-						// Trigger the celebration event.
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/celebrateTasks' )
-						);
-					}, 3000 );
-				}
-			} )
-			.fail( ( jqXHR, textStatus, errorThrown ) => {
-				console.error( 'Fetch failed:', {
-					status: jqXHR.status,
-					statusText: jqXHR.statusText,
-					responseText: jqXHR.responseText,
-					textStatus,
-					errorThrown,
-				} );
-			} );
-	} );
 } );
 
 /**
