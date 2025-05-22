@@ -36,6 +36,7 @@ namespace Progress_Planner;
  * @method \Progress_Planner\Badges get_badges()
  * @method \Progress_Planner\Plugin_Migrations get_plugin_migrations()
  * @method \Progress_Planner\Suggested_Tasks get_suggested_tasks()
+ * @method \Progress_Planner\Suggested_Tasks_DB get_suggested_tasks_db()
  */
 class Base {
 

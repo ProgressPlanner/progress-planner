@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Suggested_Tasks;
 
-use Progress_Planner\Suggested_Tasks_DB;
-
 use Progress_Planner\Suggested_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Create;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
@@ -200,7 +198,6 @@ class Tasks_Manager {
 	public function inject_tasks() {
 		// Loop through all registered task providers and inject their tasks.
 		foreach ( $this->task_providers as $provider_instance ) {
-
 			// WIP, get_tasks_to_inject() is injecting tasks.
 			$provider_instance->get_tasks_to_inject();
 		}
@@ -209,18 +206,14 @@ class Tasks_Manager {
 	/**
 	 * Evaluate tasks stored in the option.
 	 *
-	 * @return array
+	 * @return array<\Progress_Planner\Suggested_Tasks\Task>
 	 */
-	public function evaluate_tasks() {
-		$tasks           = (array) Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] );
+	public function evaluate_tasks(): array {
+		$tasks           = (array) \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
 		$completed_tasks = [];
 
-		foreach ( $tasks as $task_data ) {
-			// Skip user tasks.
-			if ( has_term( 'user', 'prpl_recommendations_provider', $task_data['ID'] ) ) {
-				continue;
-			}
-			$task_result = $this->evaluate_task( $task_data );
+		foreach ( $tasks as $task ) {
+			$task_result = $this->evaluate_task( $task );
 			if ( false !== $task_result ) {
 				$completed_tasks[] = $task_result;
 			}
@@ -230,17 +223,22 @@ class Tasks_Manager {
 	}
 
 	/**
-	 * Wrapper function for evaluating tasks.
+	 * Evaluate a task.
 	 *
-	 * @param array $task The task data.
+	 * @param \Progress_Planner\Suggested_Tasks\Task $task The task to evaluate.
 	 *
-	 * @return bool|\Progress_Planner\Suggested_Tasks\Task
+	 * @return \Progress_Planner\Suggested_Tasks\Task|false
 	 */
-	public function evaluate_task( $task ) {
-		if ( ! $task['provider'] ) {
+	public function evaluate_task( Task $task ) {
+		// User tasks are not evaluated.
+		if ( has_term( 'user', 'prpl_recommendations_provider', $task->ID ) ) {
 			return false;
 		}
-		$task_provider = $this->get_task_provider( $task['provider']->slug );
+
+		if ( ! $task->provider ) {
+			return false;
+		}
+		$task_provider = $this->get_task_provider( $task->provider->slug );
 		if ( ! $task_provider ) {
 			return false;
 		}
@@ -248,10 +246,10 @@ class Tasks_Manager {
 		// Check if the task is no longer relevant.
 		if ( ! $task_provider->is_task_relevant() ) {
 			// Remove the task from the pending tasks.
-			Suggested_Tasks_DB::delete_recommendation( $task['ID'] );
+			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 		}
 
-		return $task_provider->evaluate_task( $task['task_id'] );
+		return $task_provider->evaluate_task( $task->task_id );
 	}
 
 	/**
@@ -265,11 +263,11 @@ class Tasks_Manager {
 			return;
 		}
 
-		$tasks = Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
 
 		foreach ( $tasks as $task ) {
-			if ( ! isset( $task['date'] ) || \gmdate( 'YW' ) !== (string) $task['date'] ) { // TODO: Finalize cleanup once refactor is done.
-				Suggested_Tasks_DB::delete_recommendation( $task['ID'] );
+			if ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) { // TODO: Finalize cleanup once refactor is done.
+				\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 			}
 		}
 

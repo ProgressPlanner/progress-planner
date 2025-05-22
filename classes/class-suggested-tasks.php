@@ -17,6 +17,11 @@ use Progress_Planner\Suggested_Tasks\Tasks_Manager;
  */
 class Suggested_Tasks {
 
+	/**
+	 * Status map for task statuses.
+	 *
+	 * @var array<string, string>
+	 */
 	const STATUS_MAP = [
 		'completed'           => 'trash',
 		'pending_celebration' => 'pending_celebration',
@@ -27,9 +32,9 @@ class Suggested_Tasks {
 	/**
 	 * An object containing tasks.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Tasks_Manager|null
+	 * @var \Progress_Planner\Suggested_Tasks\Tasks_Manager
 	 */
-	private $tasks_manager;
+	private Tasks_Manager $tasks_manager;
 
 	/**
 	 * Constructor.
@@ -66,35 +71,20 @@ class Suggested_Tasks {
 	 *
 	 * @return void
 	 */
-	public function init() {
+	public function init(): void {
 		// Check for completed tasks.
-		$completed_tasks = $this->tasks_manager->evaluate_tasks(); // @phpstan-ignore-line method.nonObject
+		$completed_tasks = $this->tasks_manager->evaluate_tasks();
 
 		foreach ( $completed_tasks as $task ) {
-
-			// Get the task data.
-			$task_data = $task->get_data();
-
-			if ( ! isset( $task_data['task_id'] ) && ! isset( $task_data['ID'] ) ) {
+			if ( ! $task->task_id && $task->ID ) {
 				continue;
 			}
-
-			// Update the task data.
-			$task_post = Suggested_Tasks_DB::get_post( $task_data['task_id'] ?? $task_data['ID'] );
-			if ( ! $task_post ) {
-				continue;
-			}
-			Suggested_Tasks_DB::update_recommendation( $task_post['ID'], $task_data );
 
 			// Change the task status to pending celebration.
-			$task_post = Suggested_Tasks_DB::get_post( $task_data['task_id'] );
-			if ( ! $task_post ) {
-				continue;
-			}
-			Suggested_Tasks_DB::update_recommendation( $task_post['ID'], [ 'post_status' => 'pending_celebration' ] );
+			$task->celebrate();
 
 			// Insert an activity.
-			\progress_planner()->get_suggested_tasks()->insert_activity( $task_data['task_id'] );
+			$this->insert_activity( $task->task_id );
 		}
 	}
 
@@ -105,7 +95,7 @@ class Suggested_Tasks {
 	 *
 	 * @return void
 	 */
-	public function insert_activity( $task_id ) {
+	public function insert_activity( string $task_id ): void {
 		// Insert an activity.
 		$activity          = new Suggested_Task_Activity();
 		$activity->type    = 'completed';
@@ -125,7 +115,7 @@ class Suggested_Tasks {
 	 *
 	 * @return void
 	 */
-	public function delete_activity( $task_id ) {
+	public function delete_activity( string $task_id ): void {
 		$activity = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'data_id' => $task_id,
@@ -145,9 +135,8 @@ class Suggested_Tasks {
 	 *
 	 * @return void
 	 */
-	public function on_automatic_updates_complete() {
-
-		$pending_tasks = Suggested_Tasks_DB::get(
+	public function on_automatic_updates_complete(): void {
+		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get(
 			[
 				'numberposts' => 1,
 				'post_status' => 'publish',
@@ -160,19 +149,19 @@ class Suggested_Tasks {
 			return;
 		}
 
-		Suggested_Tasks_DB::update_recommendation( $pending_tasks[0]['ID'], [ 'post_status' => 'trash' ] );
+		\progress_planner()->get_suggested_tasks_db()->update_recommendation( $pending_tasks[0]->ID, [ 'post_status' => 'trash' ] );
 
 		// Insert an activity.
-		\progress_planner()->get_suggested_tasks()->insert_activity( $pending_tasks[0]['ID'] );
+		$this->insert_activity( $pending_tasks[0]->ID );
 	}
 
 	/**
-	 * Get the tasks manager object.
+	 * Get the tasks manager.
 	 *
 	 * @return \Progress_Planner\Suggested_Tasks\Tasks_Manager
 	 */
-	public function get_tasks_manager() {
-		return $this->tasks_manager; // @phpstan-ignore-line return.type
+	public function get_tasks_manager(): Tasks_Manager {
+		return $this->tasks_manager;
 	}
 
 	/**
@@ -184,40 +173,12 @@ class Suggested_Tasks {
 	 * @return bool
 	 */
 	public function snooze( int $id, string $duration ) {
-		switch ( $duration ) {
-			case '1-month':
-				$new_date = \strtotime( '+1 month' );
-				break;
-
-			case '3-months':
-				$new_date = \strtotime( '+3 months' );
-				break;
-
-			case '6-months':
-				$new_date = \strtotime( '+6 months' );
-				break;
-
-			case '1-year':
-				$new_date = \strtotime( '+1 year' );
-				break;
-
-			case 'forever':
-				$new_date = \strtotime( '+10 years' );
-				break;
-
-			default:
-				$new_date = \strtotime( '+1 week' );
-				break;
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $id );
+		if ( ! $task ) {
+			return false;
 		}
 
-		return (bool) \wp_update_post(
-			[
-				'ID'            => $id,
-				'post_status'   => 'future',
-				'post_date'     => \gmdate( 'Y-m-d H:i:s', $new_date ),
-				'post_date_gmt' => \gmdate( 'Y-m-d H:i:s', $new_date ), // Note: necessary in order to update 'post_status' to 'future'.
-			]
-		);
+		return $task->snooze( $duration );
 	}
 
 	/**
@@ -227,9 +188,9 @@ class Suggested_Tasks {
 	 *
 	 * @return bool
 	 */
-	public function was_task_completed( $task_id ) {
-		$task = Suggested_Tasks_DB::get_post( $task_id );
-		return $task && in_array( $task['post_status'], [ 'trash', 'pending_celebration' ], true );
+	public function was_task_completed( $task_id ): bool {
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
+		return $task && $task->is_completed();
 	}
 
 	/**
@@ -249,7 +210,7 @@ class Suggested_Tasks {
 
 		$action  = \sanitize_text_field( \wp_unslash( $_POST['action_type'] ) );
 		$task_id = (string) \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) );
-		$task    = Suggested_Tasks_DB::get_post( $task_id );
+		$task    = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
 		if ( ! $task ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
@@ -260,13 +221,13 @@ class Suggested_Tasks {
 		switch ( $action ) {
 			case 'complete':
 				// Insert an activity.
-				\progress_planner()->get_suggested_tasks()->insert_activity( $task['ID'] );
+				$this->insert_activity( $task->task_id );
 				$updated = true;
 				break;
 
 			case 'pending':
 			case 'delete':
-				\progress_planner()->get_suggested_tasks()->delete_activity( $task['ID'] );
+				$this->delete_activity( $task->task_id );
 				$updated = true;
 				break;
 		}
@@ -335,6 +296,11 @@ class Suggested_Tasks {
 				'show_in_rest' => true,
 			],
 			'prpl_dismissable' => [
+				'type'         => 'boolean',
+				'single'       => true,
+				'show_in_rest' => true,
+			],
+			'prpl_snoozable'   => [
 				'type'         => 'boolean',
 				'single'       => true,
 				'show_in_rest' => true,
@@ -443,7 +409,6 @@ class Suggested_Tasks {
 	 * @return \WP_REST_Response
 	 */
 	public function rest_prepare_recommendation( $response, $post ) {
-
 		$provider_term = wp_get_object_terms( $post->ID, 'prpl_recommendations_provider' );
 		if ( $provider_term && ! is_wp_error( $provider_term ) ) {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );

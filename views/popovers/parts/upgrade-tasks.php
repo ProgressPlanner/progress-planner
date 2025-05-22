@@ -6,7 +6,6 @@
  */
 
 use Progress_Planner\Badges\Monthly;
-use Progress_Planner\Suggested_Tasks_DB;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -52,14 +51,14 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 			];
 
 			// Note: get_post() returns a formatted array (details), not an object.
-			$prpl_task = Suggested_Tasks_DB::get_post( $prpl_task_data['task_id'] );
+			$prpl_task = \progress_planner()->get_suggested_tasks_db()->get_post( $prpl_task_data['task_id'] );
 
 			/**
 			 * Most tasks are already added, but the "completed" tasks are not - since Tasks::should_add_task() returns false for them.
 			 * We need to add them manually.
 			 */
 			if ( ! $prpl_task ) {
-				$prpl_task_post_id = Suggested_Tasks_DB::add( $prpl_task_provider->get_task_details( $prpl_task_data['task_id'] ) );
+				$prpl_task_post_id = \progress_planner()->get_suggested_tasks_db()->add( $prpl_task_provider->get_task_details( $prpl_task_data['task_id'] ) );
 
 				// Something went wrong, skip this task.
 				if ( ! $prpl_task_post_id ) {
@@ -67,7 +66,7 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 				}
 
 				// Note: get_post() returns a formatted array (details), not an object.
-				$prpl_task = Suggested_Tasks_DB::get_post( $prpl_task_post_id );
+				$prpl_task = \progress_planner()->get_suggested_tasks_db()->get_post( $prpl_task_post_id );
 			}
 
 			// Something went wrong, skip this task.
@@ -80,17 +79,17 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 			// If the task is completed, mark it as pending celebration.
 			if ( $prpl_task_completed ) {
 				// Change the task status to pending celebration.
-				Suggested_Tasks_DB::update_recommendation( $prpl_task['ID'], [ 'post_status' => 'pending_celebration' ] );
+				\progress_planner()->get_suggested_tasks_db()->update_recommendation( $prpl_task->ID, [ 'post_status' => 'pending_celebration' ] );
 
 				// Insert an activity.
 				\progress_planner()->get_suggested_tasks()->insert_activity( $prpl_task_data['task_id'] );
 			}
 			?>
 				<li class="prpl-onboarding-task" data-prpl-task-completed="<?php echo $prpl_task_completed ? 'true' : 'false'; ?>">
-					<h3><?php echo \esc_html( $prpl_task['post_title'] ); ?></h3>
+					<h3><?php echo \esc_html( $prpl_task->post_title ); ?></h3>
 					<span class="prpl-onboarding-task-status">
 						<span class="prpl-suggested-task-points">
-							+<?php echo \esc_html( $prpl_task['points'] ); ?>
+							+<?php echo \esc_html( (string) $prpl_task->points ); ?>
 						</span>
 						<span class="prpl-suggested-task-loader"></span>
 						<span class="icon icon-check-circle">

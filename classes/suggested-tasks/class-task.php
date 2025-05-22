@@ -9,19 +9,36 @@ namespace Progress_Planner\Suggested_Tasks;
 
 /**
  * Task abstract class.
+ *
+ * @property int $ID The task ID
+ * @property string $post_status The task status
+ * @property string $post_title The task title
+ * @property string $post_date The task date
+ * @property \stdClass|null $provider The task provider object with slug property
+ * @property string $task_id The task identifier
+ * @property string $provider_id The provider identifier
+ * @property string $category The task category
+ * @property string $priority The task priority
+ * @property int $points The task points
+ * @property bool $dismissable Whether the task is dismissable
+ * @property string $url The task URL
+ * @property string $url_target The task URL target
+ * @property string $description The task description
+ * @property array $data The task data array
+ * @property int|null $target_post_id The target post ID for the task
  */
 class Task {
 	/**
 	 * The task data.
 	 *
-	 * @var array
+	 * @var array<string, mixed>
 	 */
 	protected array $data;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param array $data The task data.
+	 * @param array<string, mixed> $data The task data.
 	 */
 	public function __construct( array $data = [] ) {
 		$this->data = $data;
@@ -30,47 +47,182 @@ class Task {
 	/**
 	 * Get the task data.
 	 *
-	 * @return array
+	 * @return array<string, mixed>
 	 */
-	public function get_data() {
+	public function get_data(): array {
 		return $this->data;
 	}
 
 	/**
 	 * Set the task data.
 	 *
-	 * @param array $data The task data.
+	 * @param array<string, mixed> $data The task data.
 	 *
 	 * @return void
 	 */
-	public function set_data( array $data ) {
+	public function set_data( array $data ): void {
 		$this->data = $data;
 	}
 
 	/**
+	 * Update the task data.
+	 *
+	 * @param array<string, mixed> $data The task data.
+	 *
+	 * @return void
+	 */
+	public function update( array $data ): void {
+		$this->data = $data;
+
+		// Update only if the task is already saved in the database.
+		if ( $this->ID ) {
+			\progress_planner()->get_suggested_tasks_db()->update_recommendation( $this->ID, $this->data );
+		}
+	}
+
+	/**
+	 * Delete the task.
+	 *
+	 * @return void
+	 */
+	public function delete(): void {
+		$this->data = [];
+		// Delete only if the task is already saved in the database.
+		if ( $this->ID ) {
+			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $this->ID );
+		}
+	}
+
+	/**
+	 * Snooze the task.
+	 *
+	 * @param string $duration The duration.
+	 *
+	 * @return bool
+	 */
+	public function snooze( string $duration ): bool {
+		if ( ! $this->ID ) {
+			return false;
+		}
+
+		switch ( $duration ) {
+			case '1-month':
+				$new_date = \strtotime( '+1 month' );
+				break;
+
+			case '3-months':
+				$new_date = \strtotime( '+3 months' );
+				break;
+
+			case '6-months':
+				$new_date = \strtotime( '+6 months' );
+				break;
+
+			case '1-year':
+				$new_date = \strtotime( '+1 year' );
+				break;
+
+			case 'forever':
+				$new_date = \strtotime( '+10 years' );
+				break;
+
+			default:
+				$new_date = \strtotime( '+1 week' );
+				break;
+		}
+
+		$updated = (bool) \wp_update_post(
+			[
+				'ID'            => $this->ID,
+				'post_status'   => 'future',
+				'post_date'     => \gmdate( 'Y-m-d H:i:s', $new_date ),
+				'post_date_gmt' => \gmdate( 'Y-m-d H:i:s', $new_date ), // Note: necessary in order to update 'post_status' to 'future'.
+			]
+		);
+
+		if ( $updated ) {
+			$this->data['post_status'] = 'future';
+			$this->data['post_date']   = \gmdate( 'Y-m-d H:i:s', $new_date );
+		}
+
+		return $updated;
+	}
+
+	/**
+	 * Check if the task is snoozed.
+	 *
+	 * @return bool
+	 */
+	public function is_snoozed(): bool {
+		return isset( $this->data['post_status'] ) && 'future' === $this->data['post_status'];
+	}
+
+	/**
+	 * Get the snoozed until date.
+	 *
+	 * @return \DateTime|null|false
+	 */
+	public function snoozed_until() {
+		return isset( $this->data['post_date'] ) ? \DateTime::createFromFormat( 'Y-m-d H:i:s', $this->data['post_date'] ) : null;
+	}
+
+	/**
+	 * Check if the task is completed.
+	 *
+	 * @return bool
+	 */
+	public function is_completed(): bool {
+		return isset( $this->data['post_status'] ) && in_array( $this->data['post_status'], [ 'trash', 'pending_celebration' ], true );
+	}
+
+	/**
+	 * Set the task to pending celebration.
+	 *
+	 * @return bool
+	 */
+	public function celebrate(): bool {
+		if ( ! $this->ID ) {
+			return false;
+		}
+
+		return \progress_planner()->get_suggested_tasks_db()->update_recommendation( $this->ID, [ 'post_status' => 'pending_celebration' ] );
+	}
+
+	/**
 	 * Get the provider ID.
 	 *
 	 * @return string
 	 */
-	public function get_provider_id() {
+	public function get_provider_id(): string {
 		return $this->data['provider']->slug ?? '';
 	}
 
 	/**
-	 * Get the provider ID.
+	 * Get the task ID.
 	 *
 	 * @return string
 	 */
-	public function get_task_id() {
+	public function get_task_id(): string {
 		return $this->data['task_id'] ?? '';
 	}
 
 	/**
-	 * Get the provider ID.
+	 * Magic getter.
 	 *
-	 * @return array
+	 * @param string $key The key.
+	 *
+	 * @return mixed
 	 */
-	public function get_task_details() {
+	public function __get( string $key ) {
+		return $this->data[ $key ] ?? null;
+	}
+
+	/**
+	 * Get the task details.
+	 *
+	 * @return array<string, mixed>
+	 */
+	public function get_task_details(): array {
 		$task_provider_id = $this->get_provider_id();
 		$task_id          = $this->get_task_id();
 

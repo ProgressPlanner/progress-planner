@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Traits;
 
-use Progress_Planner\Suggested_Tasks_DB;
-
 /**
  * Trait for handling dismissable tasks with time-based expiration.
  */
@@ -56,15 +54,15 @@ trait Dismissable_Task {
 		}
 
 		// Get the task data.
-		$task_data = Suggested_Tasks_DB::get_post( $task_id );
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
 		// If no task data is found, return.
-		if ( ! $task_data ) {
+		if ( ! $task ) {
 			return;
 		}
 
 		// If the task provider ID does not match, return.
-		if ( ! isset( $task_data['provider']->slug ) || $this->get_provider_id() !== $task_data['provider']->slug ) {
+		if ( ! isset( $task->provider->slug ) || $this->get_provider_id() !== $task->provider->slug ) {
 			return;
 		}
 
@@ -80,7 +78,7 @@ trait Dismissable_Task {
 		}
 
 		// Get the task identifier.
-		$task_identifier = $this->get_task_identifier( $task_data );
+		$task_identifier = $this->get_task_identifier( $task->get_data() );
 
 		// If no task identifier is found, return.
 		if ( ! $task_identifier ) {
@@ -100,7 +98,7 @@ trait Dismissable_Task {
 		 * @param array  $task_data      The task data.
 		 * @param string $provider_id    The provider ID.
 		 */
-		$dismissal_data = \apply_filters( 'progress_planner_task_dismissal_data', $dismissal_data, $task_data, $provider_id );
+		$dismissal_data = \apply_filters( 'progress_planner_task_dismissal_data', $dismissal_data, $task->get_data(), $provider_id );
 
 		$dismissed_tasks[ $provider_id ][ $task_identifier ] = $dismissal_data;
 

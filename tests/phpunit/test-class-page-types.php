@@ -36,7 +36,6 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public static function setUpBeforeClass(): void {
-
 		self::set_lessons_cache();
 
 		\progress_planner()->get_page_types()->create_taxonomy();
@@ -145,7 +144,6 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_get_posts_by_type() {
-
 		// Assign the post to the "homepage" page type.
 		\progress_planner()->get_page_types()->set_page_type_by_id(
 			self::$homepage_post_id,
@@ -194,7 +192,6 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_transition_post_status_updates_options() {
-
 		// Check if the options are set to default values.
 		$this->assertEquals( 0, \get_option( 'page_on_front' ) );
 		$this->assertEquals( 'posts', \get_option( 'show_on_front' ) );

@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Admin;
 
-use Progress_Planner\Suggested_Tasks_DB;
-
 /**
  * Admin page class.
  */
@@ -112,9 +110,7 @@ class Page {
 	 * @return string The notification count in HTML format.
 	 */
 	protected function get_notification_counter() {
-
-		$pending_celebration_tasks = Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'pending_celebration' ] );
-		$notification_count        = count( $pending_celebration_tasks );
+		$notification_count = wp_count_posts( 'prpl_recommendations' )->pending_celebration;
 
 		if ( 0 === $notification_count ) {
 			return '';
@@ -164,7 +160,6 @@ class Page {
 		}
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
-
 			$default_localization_data = [
 				'name' => 'progressPlanner',
 				'data' => [

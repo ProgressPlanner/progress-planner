@@ -9,7 +9,6 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Providers\Tasks;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Description as Terms_Without_Description_Data_Collector;
-use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Add task to update term description.
@@ -93,18 +92,15 @@ class Update_Term_Description extends Tasks {
 	 * @return void
 	 */
 	public function maybe_remove_irrelevant_tasks( $term, $tt_id, $taxonomy, $deleted_term, $object_ids ) {
-		$pending_tasks = Suggested_Tasks_DB::get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
+		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! $pending_tasks ) {
 			return;
 		}
 
 		foreach ( $pending_tasks as $task ) {
-			if ( isset( $task['term_id'] ) && isset( $task['taxonomy'] ) ) {
-
-				if ( (int) $task['term_id'] === (int) $deleted_term->term_id ) {
-					Suggested_Tasks_DB::delete_recommendation( $task['ID'] );
-				}
+			if ( $task->term_id && $task->taxonomy && (int) $task->term_id === (int) $deleted_term->term_id ) {
+				\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 			}
 		}
 	}
@@ -136,7 +132,7 @@ class Update_Term_Description extends Tasks {
 	 * @return string
 	 */
 	protected function get_title( $task_data = [] ) {
-		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
+		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return $term && ! \is_wp_error( $term ) ? \sprintf(
 			/* translators: %s: The term name */
 			\esc_html__( 'Write a description for term named "%s"', 'progress-planner' ),
@@ -152,7 +148,7 @@ class Update_Term_Description extends Tasks {
 	 * @return string
 	 */
 	public function get_description( $task_data = [] ) {
-		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
+		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 
 		return $term && ! \is_wp_error( $term ) ? sprintf(
 			/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/taxonomy-terms-description" target="_blank">Read more</a> link */
@@ -170,7 +166,7 @@ class Update_Term_Description extends Tasks {
 	 * @return string
 	 */
 	protected function get_url( $task_data = [] ) {
-		$term = \get_term( $task_data['term_id'], $task_data['taxonomy'] );
+		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return $term && ! \is_wp_error( $term )
 			? \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id )
 			: '';
@@ -206,6 +202,23 @@ class Update_Term_Description extends Tasks {
 	}
 
 	/**
+	 * Transform data collector data into task data format.
+	 *
+	 * @param array $data The data from data collector.
+	 * @return array The transformed data with original data merged.
+	 */
+	protected function transform_collector_data( array $data ): array {
+		return array_merge(
+			$data,
+			[
+				'target_term_id'   => $data['term_id'],
+				'target_taxonomy'  => $data['taxonomy'],
+				'target_term_name' => $data['name'],
+			]
+		);
+	}
+
+	/**
 	 * Get an array of tasks to inject.
 	 *
 	 * @return array
@@ -227,33 +240,37 @@ class Update_Term_Description extends Tasks {
 			return [];
 		}
 
+		// Transform the data to match the task data structure.
+		$data = $this->transform_collector_data( $data );
+
 		$task_data = [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'category'    => $this->get_provider_category(),
-			'term_id'     => $data['term_id'],
-			'taxonomy'    => $data['taxonomy'],
-			'term_name'   => $data['name'],
-			'date'        => \gmdate( 'YW' ),
-			'post_title'  => $this->get_title( $data ),
-			'description' => $this->get_description( $data ),
-			'url'         => $this->get_url( $data ),
-			'url_target'  => '_blank',
-			'dismissable' => $this->is_dismissable(),
-			'points'      => $this->get_points(),
+			'task_id'          => $task_id,
+			'provider_id'      => $this->get_provider_id(),
+			'category'         => $this->get_provider_category(),
+			'target_term_id'   => $data['target_term_id'],
+			'target_taxonomy'  => $data['target_taxonomy'],
+			'target_term_name' => $data['target_term_name'],
+			'date'             => \gmdate( 'YW' ),
+			'post_title'       => $this->get_title( $data ),
+			'description'      => $this->get_description( $data ),
+			'url'              => $this->get_url( $data ),
+			'url_target'       => '_blank',
+			'dismissable'      => $this->is_dismissable(),
+			'snoozable'        => $this->is_snoozable,
+			'points'           => $this->get_points(),
 		];
 
 		$task_data = $this->modify_injection_task_data( $task_data );
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.
-		$task_post = Suggested_Tasks_DB::get_post( $task_data['task_id'] );
+		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
 
 		// Skip the task if it was already injected.
 		if ( $task_post ) {
 			return [];
 		}
 
-		return [ Suggested_Tasks_DB::add( $task_data ) ];
+		return [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
 	}
 
 	/**
@@ -268,24 +285,25 @@ class Update_Term_Description extends Tasks {
 			return [];
 		}
 
-		$task_data = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
-		if ( empty( $task_data ) ) {
+		if ( empty( $tasks ) ) {
 			return [];
 		}
 
 		return [
 			'task_id'     => $task_id,
 			'provider_id' => $this->get_provider_id(),
-			'post_title'  => $this->get_title( $task_data[0] ),
+			'post_title'  => $this->get_title( $tasks[0]->get_data() ),
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
 			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
-			'url'         => $this->get_url( $task_data[0] ),
+			'snoozable'   => $this->is_snoozable,
+			'url'         => $this->get_url( $tasks[0]->get_data() ),
 			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description( $task_data[0] ),
+			'description' => $this->get_description( $tasks[0]->get_data() ),
 		];
 	}
 
@@ -297,19 +315,19 @@ class Update_Term_Description extends Tasks {
 	 * @return \WP_Term|null
 	 */
 	public function get_term_from_task_id( $task_id ) {
-		$tasks = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		if ( empty( $tasks ) ) {
 			return null;
 		}
 
-		$data = $tasks[0];
+		$task = $tasks[0];
 
-		if ( ! isset( $data['term_id'] ) || ! $data['term_id'] || ! isset( $data['taxonomy'] ) || ! $data['taxonomy'] ) {
+		if ( ! isset( $task->term_id ) || ! $task->term_id || ! isset( $task->taxonomy ) || ! $task->taxonomy ) {
 			return null;
 		}
 
-		$term = \get_term( $data['term_id'], $data['taxonomy'] );
+		$term = \get_term( $task->term_id, $task->taxonomy );
 		return $term && ! \is_wp_error( $term ) ? $term : null;
 	}
 
@@ -324,12 +342,12 @@ class Update_Term_Description extends Tasks {
 		}
 
 		$this->completed_term_ids = [];
-		$tasks                    = Suggested_Tasks_DB::get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
+		$tasks                    = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! empty( $tasks ) ) {
 			foreach ( $tasks as $task ) {
-				if ( 'trash' === $task['post_status'] ) {
-					$this->completed_term_ids[] = $task['term_id'];
+				if ( 'trash' === $task->post_status ) {
+					$this->completed_term_ids[] = $task->term_id;
 				}
 			}
 		}

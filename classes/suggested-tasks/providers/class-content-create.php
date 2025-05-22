@@ -146,6 +146,7 @@ class Content_Create extends Tasks {
 			'category'    => $this->get_provider_category(),
 			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
+			'snoozable'   => $this->is_snoozable,
 			'url'         => $this->get_url(),
 			'url_target'  => $this->get_url_target(),
 			'description' => $this->get_description(),

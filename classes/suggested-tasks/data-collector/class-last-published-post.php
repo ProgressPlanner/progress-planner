@@ -68,7 +68,6 @@ class Last_Published_Post extends Base_Data_Collector {
 	 * @return array
 	 */
 	protected function calculate_data() {
-
 		// Default data.
 		$data = [
 			'post_id'   => 0,

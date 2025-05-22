@@ -9,7 +9,6 @@ namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Yoast_Provider;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content;
-use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Add task for Yoast SEO: disable the author archive.
@@ -97,7 +96,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		return sprintf(
 			/* translators: %s: Post title. */
 			\esc_html__( 'Yoast SEO: add internal links to article "%s"!', 'progress-planner' ),
-			\esc_html( $task_data['post_title'] )
+			\esc_html( $task_data['target_post_title'] )
 		);
 	}
 
@@ -123,7 +122,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_url( $task_data = [] ) {
-		$post = \get_post( $task_data['post_id'] );
+		$post = \get_post( $task_data['target_post_id'] );
 
 		return $post ? 'https://prpl.fyi/fix-orphaned-content' : '';
 	}
@@ -171,12 +170,27 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	}
 
 	/**
+	 * Transform data collector data into task data format.
+	 *
+	 * @param array $data The data from data collector.
+	 * @return array The transformed data with original data merged.
+	 */
+	protected function transform_collector_data( array $data ): array {
+		return array_merge(
+			$data,
+			[
+				'target_post_id'    => $data['post_id'],
+				'target_post_title' => $data['post_title'],
+			]
+		);
+	}
+
+	/**
 	 * Get an array of tasks to inject.
 	 *
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-
 		if ( true === $this->is_task_snoozed() || ! $this->should_add_task() ) {
 			return [];
 		}
@@ -193,24 +207,28 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return [];
 		}
 
+		// Transform the data to match the task data structure.
+		$data = $this->transform_collector_data( $data );
+
 		$task_data = [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'category'    => $this->get_provider_category(),
-			'post_id'     => $data['post_id'],
-			'post_title'  => $this->get_title( $data ),
-			'url'         => $this->get_url( $data ),
-			'url_target'  => $this->get_url_target(),
-			'dismissable' => $this->is_dismissable(),
-			'points'      => $this->get_points(),
+			'task_id'        => $task_id,
+			'provider_id'    => $this->get_provider_id(),
+			'category'       => $this->get_provider_category(),
+			'target_post_id' => $data['target_post_id'],
+			'post_title'     => $this->get_title( $data ),
+			'url'            => $this->get_url( $data ),
+			'url_target'     => $this->get_url_target(),
+			'dismissable'    => $this->is_dismissable(),
+			'snoozable'      => $this->is_snoozable,
+			'points'         => $this->get_points(),
 		];
 
 		$task_data = $this->modify_injection_task_data( $task_data );
 
 		// Add the tasks to the pending tasks option, it will not add duplicates.
-		$task_post = Suggested_Tasks_DB::get_post( $task_data['task_id'] );
+		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
 
-		return $task_post ? [] : [ Suggested_Tasks_DB::add( $task_data ) ];
+		return $task_post ? [] : [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
 	}
 
 	/**
@@ -225,25 +243,27 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return [];
 		}
 
-		$task_data = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		// If the task data is empty, return an empty array.
-		if ( empty( $task_data ) ) {
+		if ( empty( $tasks ) ) {
 			return [];
 		}
 
 		return [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'post_title'  => $this->get_title( $task_data[0] ),
-			'parent'      => $this->get_parent(),
-			'priority'    => $this->get_priority(),
-			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(),
-			'dismissable' => $this->is_dismissable(),
-			'url'         => $this->get_url( $task_data[0] ),
-			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description( $task_data[0] ),
+			'task_id'        => $task_id,
+			'provider_id'    => $this->get_provider_id(),
+			'post_title'     => $this->get_title( $tasks[0]->get_data() ),
+			'target_post_id' => $tasks[0]->target_post_id,
+			'parent'         => $this->get_parent(),
+			'priority'       => $this->get_priority(),
+			'category'       => $this->get_provider_category(),
+			'points'         => $this->get_points(),
+			'dismissable'    => $this->is_dismissable(),
+			'snoozable'      => $this->is_snoozable,
+			'url'            => $this->get_url( $tasks[0]->get_data() ),
+			'url_target'     => $this->get_url_target(),
+			'description'    => $this->get_description( $tasks[0]->get_data() ),
 		];
 	}
 
@@ -255,15 +275,15 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return \WP_Post|null
 	 */
 	public function get_post_from_task_id( $task_id ) {
-		$tasks = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		if ( empty( $tasks ) ) {
 			return null;
 		}
 
-		$data = $tasks[0];
+		$task = $tasks[0];
 
-		return isset( $data['post_id'] ) && $data['post_id'] ? \get_post( $data['post_id'] ) : null;
+		return isset( $task->post_id ) && $task->post_id ? \get_post( $task->post_id ) : null;
 	}
 
 	/**
@@ -277,12 +297,12 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		}
 
 		$this->completed_post_ids = [];
-		$tasks                    = Suggested_Tasks_DB::get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
+		$tasks                    = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! empty( $tasks ) ) {
 			foreach ( $tasks as $task ) {
-				if ( 'trash' === $task['post_status'] ) {
-					$this->completed_post_ids[] = $task['post_id'];
+				if ( 'trash' === $task->post_status ) {
+					$this->completed_post_ids[] = $task->target_post_id;
 				}
 			}
 		}

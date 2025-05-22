@@ -23,7 +23,6 @@ class Onboard {
 	 * Constructor.
 	 */
 	public function __construct() {
-
 		// Handle saving data from the onboarding form response.
 		\add_action( 'wp_ajax_progress_planner_save_onboard_data', [ $this, 'save_onboard_response' ] );
 

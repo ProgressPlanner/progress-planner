@@ -52,7 +52,6 @@ class Terms_Without_Posts extends Base_Data_Collector {
 	 * @return void
 	 */
 	public function on_terms_changed( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
-
 		// Check if the taxonomy is public.
 		$taxonomy_object = \get_taxonomy( $taxonomy );
 		if ( ! $taxonomy_object || ! $taxonomy_object->public ) {

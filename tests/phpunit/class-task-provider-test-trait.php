@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Tests;
 
-use Progress_Planner\Suggested_Tasks_DB;
-
 /**
  * Task provider test case.
  */
@@ -62,7 +60,7 @@ trait Task_Provider_Test_Trait {
 		parent::tear_down();
 
 		// Delete tasks.
-		Suggested_Tasks_DB::delete_all_recommendations();
+		\progress_planner()->get_suggested_tasks_db()->delete_all_recommendations();
 	}
 
 	/**
@@ -78,7 +76,6 @@ trait Task_Provider_Test_Trait {
 	 * @return void
 	 */
 	public function test_task_provider() {
-
 		// Test that the blog description is empty.
 		$this->assertTrue( $this->task_provider->should_add_task() );
 
@@ -86,7 +83,7 @@ trait Task_Provider_Test_Trait {
 		$tasks = $this->task_provider->get_tasks_to_inject();
 
 		// Verify that the task(s) are in the suggested tasks.
-		$pending_tasks = (array) Suggested_Tasks_DB::get_tasks_by(
+		$pending_tasks = (array) \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
 			[
 				'post_status' => 'publish',
 				'provider'    => $this->task_provider_id,
@@ -94,7 +91,7 @@ trait Task_Provider_Test_Trait {
 		);
 
 		// Assert that task is in the pending tasks.
-		$this->assertTrue( has_term( $this->task_provider_id, 'prpl_recommendations_provider', $pending_tasks[0]['ID'] ) );
+		$this->assertTrue( has_term( $this->task_provider_id, 'prpl_recommendations_provider', $pending_tasks[0]->ID ) );
 
 		// Complete the task.
 		$this->complete_task();
@@ -102,7 +99,7 @@ trait Task_Provider_Test_Trait {
 		// Change the task status to pending celebration for all completed tasks.
 		foreach ( \progress_planner()->get_suggested_tasks()->get_tasks_manager()->evaluate_tasks() as $task ) {
 			// Change the task status to pending celebration.
-			Suggested_Tasks_DB::update_recommendation(
+			\progress_planner()->get_suggested_tasks_db()->update_recommendation(
 				$task->get_data()['ID'],
 				[ 'post_status' => 'pending_celebration' ]
 			);
@@ -111,12 +108,12 @@ trait Task_Provider_Test_Trait {
 		}
 
 		// Verify that the task(s) we're testing is completed.
-		foreach ( $tasks as $post_data ) {
-			Suggested_Tasks_DB::update_recommendation(
-				is_array( $post_data ) ? $post_data['post_id'] : $post_data,
+		foreach ( $tasks as $post_id ) {
+			\progress_planner()->get_suggested_tasks_db()->update_recommendation(
+				$post_id,
 				[ 'post_status' => 'trash' ]
 			);
-			$this->assertTrue( 'trash' === \get_post_status( is_array( $post_data ) ? $post_data['post_id'] : $post_data ) );
+			$this->assertTrue( 'trash' === \get_post_status( $post_id ) );
 		}
 	}
 }

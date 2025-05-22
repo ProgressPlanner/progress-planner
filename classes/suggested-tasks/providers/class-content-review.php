@@ -10,7 +10,6 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 use Progress_Planner\Suggested_Tasks\Task_Factory;
 use Progress_Planner\Suggested_Tasks\Providers\Traits\Dismissable_Task;
 use Progress_Planner\Page_Types;
-use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Add tasks for content updates.
@@ -116,20 +115,27 @@ class Content_Review extends Tasks {
 	/**
 	 * Get the task title.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_title( $task_id = '' ) {
-		$post = $this->get_post_from_task_id( $task_id );
+	public function get_title( $task_data = [] ) {
+		if ( ! isset( $task_data['target_post_id'] ) ) {
+			return '';
+		}
 
-		return $post
-			? sprintf(
+		$post = \get_post( $task_data['target_post_id'] );
+
+		if ( ! $post ) {
+			return '';
+		}
+
+		return sprintf(
 				// translators: %1$s: The post type, %2$s: The post title.
-				\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
-				strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
-				\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
-			) : '';
+			\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
+			strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
+			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
+		);
 	}
 
 	/**
@@ -140,7 +146,11 @@ class Content_Review extends Tasks {
 	 * @return string
 	 */
 	public function get_description( $task_data = [] ) {
-		$post = $this->get_post_from_task_id( $task_data['task_id'] );
+		if ( ! isset( $task_data['target_post_id'] ) ) {
+			return '';
+		}
+
+		$post = \get_post( $task_data['target_post_id'] );
 
 		if ( ! $post ) {
 			return '';
@@ -160,12 +170,16 @@ class Content_Review extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	protected function get_url( $task_id = '' ) {
-		$post = $this->get_post_from_task_id( $task_id );
+	protected function get_url( $task_data = [] ) {
+		if ( ! isset( $task_data['target_post_id'] ) ) {
+			return '';
+		}
+
+		$post = \get_post( $task_data['target_post_id'] );
 
 		if ( ! $post ) {
 			return '';
@@ -307,16 +321,12 @@ class Content_Review extends Tasks {
 					'target_post_id'   => $task_data['target_post_id'],
 					'target_post_type' => $task_data['target_post_type'],
 					'date'             => \gmdate( 'YW' ),
-					'post_title'       => sprintf(
-						// translators: %1$s: The post type, %2$s: The post title.
-						\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
-						strtolower( \get_post_type_object( \esc_html( $task_data['target_post_type'] ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
-						\esc_html( \get_the_title( $task_data['target_post_id'] ) ) // @phpstan-ignore-line property.nonObject
-					),
+					'post_title'       => $this->get_title( $task_data ),
 					'description'      => $this->get_description( $task_data ),
-					'url'              => \esc_url( (string) \get_edit_post_link( $task_data['target_post_id'] ) ),
+					'url'              => $this->get_url( $task_data ),
 					'url_target'       => '_blank',
 					'dismissable'      => $this->is_dismissable(),
+					'snoozable'        => $this->is_snoozable,
 					'points'           => $this->get_points(),
 				];
 			}
@@ -325,13 +335,12 @@ class Content_Review extends Tasks {
 		$added_tasks = [];
 
 		foreach ( $task_to_inject as $task_data ) {
-
 			// Skip the task if it was already injected.
-			if ( Suggested_Tasks_DB::get_post( $task_data['task_id'] ) ) {
+			if ( \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] ) ) {
 				continue;
 			}
 
-			$added_tasks[] = Suggested_Tasks_DB::add( $task_data );
+			$added_tasks[] = \progress_planner()->get_suggested_tasks_db()->add( $task_data );
 		}
 
 		return $added_tasks;
@@ -349,7 +358,7 @@ class Content_Review extends Tasks {
 			return [];
 		}
 
-		$task_data = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
+		$task_data = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		// If the task data is empty, return an empty array.
 		if ( empty( $task_data ) ) {
@@ -365,6 +374,7 @@ class Content_Review extends Tasks {
 			'category'    => $this->get_provider_category(),
 			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
+			'snoozable'   => $this->is_snoozable,
 			'url'         => $this->get_url( $task_data[0] ),
 			'url_target'  => $this->get_url_target(),
 			'description' => $this->get_description( $task_data[0] ),
@@ -379,14 +389,14 @@ class Content_Review extends Tasks {
 	 * @return \WP_Post|null
 	 */
 	public function get_post_from_task_id( $task_id ) {
-		$tasks = Suggested_Tasks_DB::get_tasks_by( [ 'task_id' => $task_id ] );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		if ( empty( $tasks ) ) {
 			return null;
 		}
 
-		return isset( $tasks[0]['target_post_id'] ) && $tasks[0]['target_post_id']
-			? \get_post( $tasks[0]['target_post_id'] )
+		return isset( $tasks[0]->target_post_id ) && $tasks[0]->target_post_id
+			? \get_post( $tasks[0]->target_post_id )
 			: null;
 	}
 
@@ -498,12 +508,17 @@ class Content_Review extends Tasks {
 		}
 
 		$this->snoozed_post_ids = [];
-		$snoozed                = Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'future' ] );
+		$snoozed                = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] );
 
 		if ( ! empty( $snoozed ) ) {
 			foreach ( $snoozed as $task ) {
-				if ( isset( $task['provider']->slug ) && 'review-post' === $task['provider']->slug ) {
-					$this->snoozed_post_ids[] = $task['target_post_id'];
+				/**
+				 * The task object.
+				 *
+				 * @var \Progress_Planner\Suggested_Tasks\Task $task
+				 */
+				if ( isset( $task->provider->slug ) && 'review-post' === $task->provider->slug ) {
+					$this->snoozed_post_ids[] = $task->target_post_id;
 				}
 			}
 		}

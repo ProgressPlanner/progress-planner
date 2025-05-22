@@ -40,7 +40,6 @@ class Sample_Page extends Base_Data_Collector {
 	 * @return void
 	 */
 	public function update_sample_page_cache( $new_status, $old_status, $post ) {
-
 		// If the status is the same, do nothing.
 		if ( $old_status === $new_status ) {
 			return;

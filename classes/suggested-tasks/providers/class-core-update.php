@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks_DB;
-
 /**
  * Add tasks for Core updates.
  */
@@ -99,12 +97,12 @@ class Core_Update extends Tasks {
 	 * @return array
 	 */
 	public function add_core_update_link( $update_actions ) {
-		$pending_tasks = Suggested_Tasks_DB::get_tasks_by( [ 'post_status' => 'publish' ] );
+		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
 
 		// All updates are completed and there is a 'update-core' task in the pending tasks.
 		if ( $pending_tasks && $this->is_task_completed() ) {
 			foreach ( $pending_tasks as $task ) {
-				if ( $this->get_task_id() === $task['task_id'] ) {
+				if ( $this->get_task_id() === $task->task_id ) {
 					$update_actions['prpl_core_update'] =
 						'<img src="' . \esc_attr( constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg' ) . '" style="width:1rem;padding-left:0.25rem;padding-right:0.25rem;vertical-align:middle;" alt="Progress Planner" />' .
 						'<a href="' . \esc_url( \admin_url( 'admin.php?page=progress-planner' ) ) . '" target="_parent">' . \esc_html__( 'Click here to celebrate your completed task!', 'progress-planner' ) . '</a>';
@@ -149,6 +147,7 @@ class Core_Update extends Tasks {
 			'provider_id' => $this->get_provider_id(),
 			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
+			'snoozable'   => $this->is_snoozable,
 			'url'         => $this->get_url(),
 			'url_target'  => $this->get_url_target(),
 			'description' => $this->get_description(),

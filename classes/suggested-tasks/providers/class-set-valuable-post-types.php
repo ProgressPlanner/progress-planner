@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks_DB;
-
 /**
  * Add tasks for settings saved.
  */
@@ -95,13 +93,13 @@ class Set_Valuable_Post_Types extends Tasks {
 	 */
 	public function should_add_task() {
 		// Check the "Settings saved" task, if the has not been added as 'pending' don't add the task.
-		$settings_saved_task = Suggested_Tasks_DB::get_tasks_by( [ 'provider_id' => 'settings-saved' ] );
+		$settings_saved_task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => 'settings-saved' ] );
 		if ( empty( $settings_saved_task ) ) {
 			return false;
 		}
 
 		// Save settings task completed?
-		$save_settings_task_completed = 'trash' === $settings_saved_task[0]['post_status'];
+		$save_settings_task_completed = 'trash' === $settings_saved_task[0]->post_status;
 
 		// Upgraded from <= 1.2?
 		$upgraded = (bool) \get_option( 'progress_planner_set_valuable_post_types', false );
