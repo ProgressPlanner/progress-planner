@@ -92,7 +92,10 @@ document.addEventListener(
 							} )
 						);
 					} );
-					prplSuggestedTasksToggleUIitems();
+
+					if ( event?.detail?.afterInject ) {
+						event.detail.afterInject( data );
+					}
 				} );
 		} );
 	}
@@ -174,6 +177,7 @@ prplDocumentReady( () => {
 					category,
 					status: 'publish',
 					injectTrigger: 'prpl/suggestedTask/injectItem',
+					afterInject: prplSuggestedTasksToggleUIitems,
 				},
 			} )
 		);
@@ -183,6 +187,7 @@ prplDocumentReady( () => {
 					category,
 					status: 'pending_celebration',
 					injectTrigger: 'prpl/suggestedTask/injectItem',
+					afterInject: prplSuggestedTasksToggleUIitems,
 				},
 			} )
 		);
@@ -293,6 +298,7 @@ document.addEventListener(
 				detail: {
 					category,
 					injectTrigger: 'prpl/suggestedTask/maybeInjectItem',
+					afterInject: prplSuggestedTasksToggleUIitems,
 				},
 			} )
 		);

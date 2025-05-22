@@ -77,6 +77,11 @@ prplDocumentReady( () => {
 								: 'todo-list',
 					};
 				},
+				afterInject: () => {
+					document
+						.querySelector( '#prpl-todo-list-loading' )
+						.remove();
+				},
 			},
 		} )
 	);
