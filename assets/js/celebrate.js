@@ -143,9 +143,9 @@ document.addEventListener( 'prpl/markTasksAsCompleted', () => {
 	document
 		.querySelectorAll( '.prpl-suggested-task-celebrated' )
 		.forEach( ( item ) => {
-			const task_id = item.getAttribute( 'data-task-id' );
+			const post_id = item.getAttribute( 'data-post-id' );
 			const el = document.querySelector(
-				`.prpl-suggested-task[data-task-id="${ task_id }"]`
+				`.prpl-suggested-task[data-post-id="${ post_id }"]`
 			);
 
 			if ( el ) {
