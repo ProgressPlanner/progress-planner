@@ -8,20 +8,11 @@
  */
 /* eslint-disable camelcase */
 wp.api.loadPromise.done( () => {
-	Promise.all( [
-		// window.prplFetchSuggestedTaskPosts(),
-		window.prplFetchSuggestedTaskTerms(),
-	] ).then( () => {
-		console.log( 'Suggested tasks initializing' );
-		// Now it's safe to run other dependent widgets
-		// return Promise.all( [
+	Promise.all( [ window.prplFetchSuggestedTaskTerms() ] ).then( () => {
 		window.initPrplSuggestedTaskComponent();
 		window.prplInitSuggestedTasks();
 		window.prplInitTodo();
 		window.prplInitCelebrate();
-		// ] );
-		// etc.
-		console.log( 'Suggested tasks initialized' );
 	} );
 } );
 
