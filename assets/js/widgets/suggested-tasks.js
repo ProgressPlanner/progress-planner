@@ -215,29 +215,48 @@ window.prplInitSuggestedTasks = () => {
 				.then( () => {
 					prplSuggestedTasksToggleUIitems();
 				} );
-			prplDispatchAsyncEvent( 'prpl/suggestedTask/injectCategoryItems', {
-				category,
-				status: 'pending_celebration',
-			} )
-				.then( ( data ) => {
-					data.forEach( ( item ) => {
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/suggestedTask/injectItem', {
-								detail: item,
-							} )
-						);
-					} );
-				} )
-				.then( () => {
-					prplSuggestedTasksToggleUIitems();
-				} );
-			setTimeout( () => {
-				// Trigger the celebration event.
-				document.dispatchEvent(
-					new CustomEvent( 'prpl/celebrateTasks' )
-				);
-			}, 3000 );
+
+			// Inject pending celebration tasks from this category.
+			celebrationPromises.push(
+				prplDispatchAsyncEvent(
+					'prpl/suggestedTask/injectCategoryItems',
+					{
+						category,
+						status: 'pending_celebration',
+					}
+				)
+					.then( ( data ) => {
+						if ( data.length ) {
+							triggerCelebration = true;
+						}
+						data.forEach( ( item ) => {
+							document.dispatchEvent(
+								new CustomEvent(
+									'prpl/suggestedTask/injectItem',
+									{
+										detail: item,
+									}
+								)
+							);
+						} );
+					} )
+					.then( () => {
+						prplSuggestedTasksToggleUIitems();
+					} )
+			);
 		}
+
+		// When all the promises are resolved, this way is triggered once after all pending_celebration tasks are injected.
+		Promise.all( celebrationPromises ).then( () => {
+			if ( triggerCelebration ) {
+				setTimeout( () => {
+					// Trigger the celebration event.
+					document.dispatchEvent(
+						new CustomEvent( 'prpl/celebrateTasks' )
+					);
+				}, 3000 );
+			}
+		} );
 	} );
 
 	/**
