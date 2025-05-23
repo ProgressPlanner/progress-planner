@@ -233,6 +233,7 @@ window.prplInitSuggestedTasks = () => {
 				return data;
 			} )
 			.then( ( data ) => {
+				// TODO: Maybe re-fetch all 'pending_celebration' tasks, to avoid weirdness.
 				// Mark them as completed.
 				data.forEach( ( task ) => {
 					const post = new wp.api.models.Prpl_recommendations( {
