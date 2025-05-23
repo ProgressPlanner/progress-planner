@@ -1,3 +1,9 @@
+= 1.5.0 =
+
+Bugs we fixed:
+
+* Don't redirect user to Progress Planner dashboard if 'redirect_to' GET or POST parameter is set.
+
 = 1.4.2 =
 
 Bugs we fixed:
