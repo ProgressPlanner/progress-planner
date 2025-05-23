@@ -72,7 +72,6 @@ window.prplInitSuggestedTasks = () => {
 	document.addEventListener(
 		'prpl/suggestedTask/injectCategoryItems',
 		async ( event ) => {
-			console.log( event.detail.category );
 			// window.pr)ogressPlannerSuggestedTasksTerms has been preloaded.
 			console.info(
 				`Attempting to fetch recommendations for category: ${ event.detail.category }`
