@@ -11,158 +11,117 @@
 window.prplInitCelebrate = () => {
 	// Create a new custom event to trigger the celebration.
 	document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
-		const postsCollection = new wp.api.collections.Prpl_recommendations();
-		postsCollection
-			.fetch( {
-				data: {
-					status: [ 'pending_celebration' ],
-					per_page: 100,
-					_embed: true,
-					exclude_provider: 'user',
+		/**
+		 * Trigger the confetti on the container element.
+		 */
+		const containerElement = event.detail?.element
+			? event.detail.element.closest( '.prpl-suggested-tasks-list' )
+			: document.querySelector(
+					'.prpl-widget-wrapper.prpl-suggested-tasks .prpl-suggested-tasks-list'
+			  ); // If element is not provided, use the default container.
+		const prplConfettiDefaults = {
+			spread: 360,
+			ticks: 50,
+			gravity: 1,
+			decay: 0.94,
+			startVelocity: 30,
+			shapes: [ 'star' ],
+			colors: [ 'FFE400', 'FFBD00', 'E89400', 'FFCA6C', 'FDFFB8' ],
+		};
+
+		const prplRenderAttemptshoot = () => {
+			// Get the tasks list position
+			const origin = containerElement
+				? {
+						x:
+							( containerElement.getBoundingClientRect().left +
+								containerElement.offsetWidth / 2 ) /
+							window.innerWidth,
+						y:
+							( containerElement.getBoundingClientRect().top +
+								50 ) /
+							window.innerHeight,
+				  }
+				: { x: 0.5, y: 0.3 }; // fallback if list not found
+
+			let confettiOptions = [
+				{
+					particleCount: 30,
+					scalar: 4,
+					shapes: [ 'image' ],
+					shapeOptions: {
+						image: [
+							{ src: prplCelebrate.raviIconUrl },
+							{ src: prplCelebrate.raviIconUrl },
+							{ src: prplCelebrate.raviIconUrl },
+							{ src: prplCelebrate.monthIconUrl },
+							{ src: prplCelebrate.contentIconUrl },
+							{ src: prplCelebrate.maintenanceIconUrl },
+						],
+					},
 				},
-			} )
-			.done( ( data ) => {
-				if ( ! data.length ) {
-					return;
-				}
-				data.forEach( ( task ) => {
-					const post = new wp.api.models.Prpl_recommendations( {
-						id: task.id,
-						status: 'trash',
-					} );
-					post.save();
+			];
+
+			// Tripple check if the confetti options are an array and not undefined.
+			if (
+				'undefined' !== typeof prplCelebrate.confettiOptions &&
+				true === Array.isArray( prplCelebrate.confettiOptions ) &&
+				prplCelebrate.confettiOptions.length
+			) {
+				confettiOptions = prplCelebrate.confettiOptions;
+			}
+
+			for ( const value of confettiOptions ) {
+				// Set confetti options, we do it here so it's applied even if we pass the options from the PHP side (ie hearts confetti).
+				value.origin = origin;
+
+				confetti( {
+					...prplConfettiDefaults,
+					...value,
 				} );
+			}
+		};
 
-				/**
-				 * Trigger the confetti on the container element.
-				 */
-				const containerElement = event.detail?.element
-					? event.detail.element.closest(
-							'.prpl-suggested-tasks-list'
-					  )
-					: document.querySelector(
-							'.prpl-widget-wrapper.prpl-suggested-tasks .prpl-suggested-tasks-list'
-					  ); // If element is not provided, use the default container.
-				const prplConfettiDefaults = {
-					spread: 360,
-					ticks: 50,
-					gravity: 1,
-					decay: 0.94,
-					startVelocity: 30,
-					shapes: [ 'star' ],
-					colors: [
-						'FFE400',
-						'FFBD00',
-						'E89400',
-						'FFCA6C',
-						'FDFFB8',
-					],
-				};
+		setTimeout( prplRenderAttemptshoot, 0 );
+		setTimeout( prplRenderAttemptshoot, 100 );
+		setTimeout( prplRenderAttemptshoot, 200 );
 
-				const prplRenderAttemptshoot = () => {
-					// Get the tasks list position
-					const origin = containerElement
-						? {
-								x:
-									( containerElement.getBoundingClientRect()
-										.left +
-										containerElement.offsetWidth / 2 ) /
-									window.innerWidth,
-								y:
-									( containerElement.getBoundingClientRect()
-										.top +
-										50 ) /
-									window.innerHeight,
-						  }
-						: { x: 0.5, y: 0.3 }; // fallback if list not found
-
-					let confettiOptions = [
-						{
-							particleCount: 30,
-							scalar: 4,
-							shapes: [ 'image' ],
-							shapeOptions: {
-								image: [
-									{ src: prplCelebrate.raviIconUrl },
-									{ src: prplCelebrate.raviIconUrl },
-									{ src: prplCelebrate.raviIconUrl },
-									{ src: prplCelebrate.monthIconUrl },
-									{ src: prplCelebrate.contentIconUrl },
-									{ src: prplCelebrate.maintenanceIconUrl },
-								],
-							},
-						},
-					];
-
-					// Tripple check if the confetti options are an array and not undefined.
-					if (
-						'undefined' !== typeof prplCelebrate.confettiOptions &&
-						true ===
-							Array.isArray( prplCelebrate.confettiOptions ) &&
-						prplCelebrate.confettiOptions.length
-					) {
-						confettiOptions = prplCelebrate.confettiOptions;
-					}
-
-					for ( const value of confettiOptions ) {
-						// Set confetti options, we do it here so it's applied even if we pass the options from the PHP side (ie hearts confetti).
-						value.origin = origin;
-
-						confetti( {
-							...prplConfettiDefaults,
-							...value,
-						} );
-					}
-				};
-
-				setTimeout( prplRenderAttemptshoot, 0 );
-				setTimeout( prplRenderAttemptshoot, 100 );
-				setTimeout( prplRenderAttemptshoot, 200 );
-
-				/**
-				 * Strike completed tasks.
-				 */
-				document.dispatchEvent(
-					new CustomEvent( 'prpl/strikeCelebratedTasks' )
-				);
-
-				// Remove celebrated tasks and add them to the completed tasks.
-				setTimeout( () => {
-					document.dispatchEvent(
-						new CustomEvent( 'prpl/markTasksAsCompleted' )
-					);
-				}, 2000 );
-			} );
+		/**
+		 * Strike completed tasks and remove them from the DOM.
+		 */
+		document.dispatchEvent(
+			new CustomEvent( 'prpl/removeCelebratedTasks' )
+		);
 	} );
 
 	/**
-	 * Mark tasks as completed.
+	 * Remove tasks from the DOM.
+	 * The task will be striked through, before removed, if it has points.
 	 */
-	document.addEventListener( 'prpl/markTasksAsCompleted', () => {
-		document
-			.querySelectorAll( '.prpl-suggested-task-celebrated' )
-			.forEach( ( item ) => {
-				const post_id = item.getAttribute( 'data-post-id' );
-				const el = document.querySelector(
-					`.prpl-suggested-task[data-post-id="${ post_id }"]`
-				);
-
-				if ( el ) {
-					el.parentElement.remove();
-				}
-			} );
-	} );
-
-	/**
-	 * Strike completed tasks.
-	 */
-	document.addEventListener( 'prpl/strikeCelebratedTasks', () => {
+	document.addEventListener( 'prpl/removeCelebratedTasks', () => {
 		document
 			.querySelectorAll(
 				'.prpl-suggested-task[data-task-action="celebrate"]'
 			)
 			.forEach( ( item ) => {
-				item.classList.add( 'prpl-suggested-task-celebrated' );
+				let delay = 2000;
+
+				// We remove the task from the DOM immediately if it has no points.
+				if (
+					0 === parseInt( item.getAttribute( 'data-task-points' ) )
+				) {
+					delay = 0;
+				}
+
+				// Triggers the strikethrough animation.
+				if ( delay ) {
+					item.classList.add( 'prpl-suggested-task-celebrated' );
+				}
+
+				// Remove the item from the DOM.
+				setTimeout( () => {
+					item.parentElement.remove();
+				}, delay );
 			} );
 	} );
 

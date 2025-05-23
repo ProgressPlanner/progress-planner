@@ -537,10 +537,14 @@ window.initPrplSuggestedTaskComponent = function () {
 						break;
 
 					case 'complete':
+						const providerID = this.querySelector(
+							'li'
+						).getAttribute( 'data-task-provider-id' );
+
 						const completePost =
 							new wp.api.models.Prpl_recommendations( {
 								id: post_id,
-								status: 'pending_celebration',
+								status: 'trash', // We trash both RR and user tasks.
 							} );
 						completePost.save().then( () => {
 							// Set the task action to celebrate.
@@ -549,56 +553,54 @@ window.initPrplSuggestedTaskComponent = function () {
 								'celebrate'
 							);
 
-							document.dispatchEvent(
-								new CustomEvent( 'prpl/updateRaviGauge', {
-									detail: {
-										pointsDiff: parseInt(
-											this.querySelector(
-												'li'
-											).getAttribute( 'data-task-points' )
-										),
-									},
-								} )
-							);
-
-							const eventDetail = {
-								element: this.querySelector( 'li' ),
-							};
 							const eventPoints = parseInt(
 								this.querySelector( 'li' ).getAttribute(
 									'data-task-points'
 								)
 							);
-							const celebrateEvents =
-								0 < eventPoints
-									? { 'prpl/celebrateTasks': eventDetail }
-									: {
-											'prpl/strikeCelebratedTasks':
-												eventDetail,
-											'prpl/markTasksAsCompleted':
-												eventDetail,
-											'prpl/suggestedTask/maybeInjectItem':
-												{
-													task_id:
-														this.querySelector(
-															'li'
-														).getAttribute(
-															'data-task-id'
-														),
-													providerID:
-														this.querySelector(
-															'li'
-														).getAttribute(
-															'data-task-provider'
-														),
-													category:
-														this.querySelector(
-															'li'
-														).getAttribute(
-															'data-task-category'
-														),
-												},
-									  };
+
+							const eventDetail = {
+								element: this.querySelector( 'li' ),
+							};
+
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/updateRaviGauge', {
+									detail: {
+										pointsDiff: eventPoints,
+									},
+								} )
+							);
+
+							let celebrateEvents = {};
+
+							// We trigger celebration only if the task has points, otherwise just remove it from the DOM.
+							if ( 'user' === providerID && 0 === eventPoints ) {
+								celebrateEvents = {
+									'prpl/removeCelebratedTasks': eventDetail,
+								};
+							} else {
+								celebrateEvents = {
+									'prpl/celebrateTasks': eventDetail,
+									'prpl/suggestedTask/maybeInjectItem': {
+										task_id:
+											this.querySelector(
+												'li'
+											).getAttribute( 'data-task-id' ),
+										providerID:
+											this.querySelector(
+												'li'
+											).getAttribute(
+												'data-task-provider'
+											),
+										category:
+											this.querySelector(
+												'li'
+											).getAttribute(
+												'data-task-category'
+											),
+									},
+								};
+							}
 
 							// Trigger the celebration events.
 							Object.keys( celebrateEvents ).forEach(

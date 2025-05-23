@@ -233,6 +233,16 @@ window.prplInitSuggestedTasks = () => {
 				return data;
 			} )
 			.then( ( data ) => {
+				// Mark them as completed.
+				data.forEach( ( task ) => {
+					const post = new wp.api.models.Prpl_recommendations( {
+						id: task.id,
+						status: 'trash',
+					} );
+					post.save();
+				} );
+			} )
+			.then( ( data ) => {
 				// Trigger the celebration event if there are pending celebration tasks.
 				if ( data && data.length ) {
 					setTimeout( () => {
