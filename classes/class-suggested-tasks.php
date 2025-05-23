@@ -383,6 +383,26 @@ class Suggested_Tasks {
 			];
 		}
 
+		// Include terms (matches any term in list).
+		if ( isset( $request['category'] ) ) {
+			$tax_query[] = [
+				'taxonomy' => 'prpl_recommendations_category',
+				'field'    => 'slug',
+				'terms'    => explode( ',', $request['category'] ),
+				'operator' => 'IN',
+			];
+		}
+
+		// Exclude terms.
+		if ( isset( $request['exclude_category'] ) ) {
+			$tax_query[] = [
+				'taxonomy' => 'prpl_recommendations_category',
+				'field'    => 'slug',
+				'terms'    => explode( ',', $request['exclude_category'] ),
+				'operator' => 'NOT IN',
+			];
+		}
+
 		if ( ! empty( $tax_query ) ) {
 			$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 		}
