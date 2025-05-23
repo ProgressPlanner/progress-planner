@@ -475,7 +475,7 @@ window.initPrplSuggestedTaskComponent = function () {
 					clearTimeout( this.debounceTimeout );
 					this.debounceTimeout = setTimeout( () => {
 						const title = h3Span.textContent;
-						// wp.api.loadPromise.done( () => {
+
 						// Update an existing post.
 						const post = new wp.api.models.Prpl_recommendations( {
 							id: parseInt( item.getAttribute( 'data-post-id' ) ),
@@ -489,7 +489,6 @@ window.initPrplSuggestedTaskComponent = function () {
 								} )
 							);
 						} );
-						// } );
 					}, 300 );
 				} );
 			};
