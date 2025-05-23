@@ -8,9 +8,9 @@
  */
 /* eslint-disable camelcase */
 
-// Create a new custom event to trigger the celebration.
-document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
-	wp.api.loadPromise.done( () => {
+window.prplInitCelebrate = () => {
+	// Create a new custom event to trigger the celebration.
+	document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 		const postsCollection = new wp.api.collections.Prpl_recommendations();
 		postsCollection
 			.fetch( {
@@ -134,51 +134,51 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 				}, 2000 );
 			} );
 	} );
-} );
 
-/**
- * Mark tasks as completed.
- */
-document.addEventListener( 'prpl/markTasksAsCompleted', () => {
-	document
-		.querySelectorAll( '.prpl-suggested-task-celebrated' )
-		.forEach( ( item ) => {
-			const post_id = item.getAttribute( 'data-post-id' );
-			const el = document.querySelector(
-				`.prpl-suggested-task[data-post-id="${ post_id }"]`
-			);
+	/**
+	 * Mark tasks as completed.
+	 */
+	document.addEventListener( 'prpl/markTasksAsCompleted', () => {
+		document
+			.querySelectorAll( '.prpl-suggested-task-celebrated' )
+			.forEach( ( item ) => {
+				const post_id = item.getAttribute( 'data-post-id' );
+				const el = document.querySelector(
+					`.prpl-suggested-task[data-post-id="${ post_id }"]`
+				);
 
-			if ( el ) {
-				el.parentElement.remove();
-			}
-		} );
-} );
+				if ( el ) {
+					el.parentElement.remove();
+				}
+			} );
+	} );
 
-/**
- * Strike completed tasks.
- */
-document.addEventListener( 'prpl/strikeCelebratedTasks', () => {
-	document
-		.querySelectorAll(
-			'.prpl-suggested-task[data-task-action="celebrate"]'
-		)
-		.forEach( ( item ) => {
-			item.classList.add( 'prpl-suggested-task-celebrated' );
-		} );
-} );
+	/**
+	 * Strike completed tasks.
+	 */
+	document.addEventListener( 'prpl/strikeCelebratedTasks', () => {
+		document
+			.querySelectorAll(
+				'.prpl-suggested-task[data-task-action="celebrate"]'
+			)
+			.forEach( ( item ) => {
+				item.classList.add( 'prpl-suggested-task-celebrated' );
+			} );
+	} );
 
-/**
- * Remove the points (count) from the menu.
- */
-document.addEventListener( 'prpl/celebrateTasks', () => {
-	const points = document.querySelectorAll(
-		'#adminmenu #toplevel_page_progress-planner .update-plugins'
-	);
-	if ( points ) {
-		points.forEach( ( point ) => {
-			point.remove();
-		} );
-	}
-} );
+	/**
+	 * Remove the points (count) from the menu.
+	 */
+	document.addEventListener( 'prpl/celebrateTasks', () => {
+		const points = document.querySelectorAll(
+			'#adminmenu #toplevel_page_progress-planner .update-plugins'
+		);
+		if ( points ) {
+			points.forEach( ( point ) => {
+				point.remove();
+			} );
+		}
+	} );
+};
 
 /* eslint-enable camelcase */
