@@ -1,4 +1,4 @@
-/* global customElements, prplDocumentReady */
+/* global customElements, prplDocumentReady, prplDispatchAsyncEvent */
 /*
  * Widget: Todo
  *
@@ -64,34 +64,31 @@ window.prplInitTodo = () => {
 	} );
 
 	prplDocumentReady( () => {
-		document.dispatchEvent(
-			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
-				detail: {
-					category: 'user',
-					status: 'publish',
-					injectTrigger: 'prpl/todo/injectItem',
-					injectTriggerArgsCallback: ( todoItem ) => {
-						return {
-							item: todoItem,
-							addToStart: 1 === todoItem?.meta?.prpl_points, // Add golden task to the start of the list.
-							listId:
-								todoItem.status === 'completed'
-									? 'todo-list-completed'
-									: 'todo-list',
-						};
-					},
-					afterInject: () => {
-						document
-							.querySelector( '#prpl-todo-list-loading' )
-							.remove();
-						// Resize the grid items.
-						window.dispatchEvent(
-							new CustomEvent( 'prpl/grid/resize' )
-						);
-					},
-				},
+		prplDispatchAsyncEvent( 'prpl/suggestedTask/injectCategoryItems', {
+			category: 'user',
+			status: 'publish',
+		} )
+			.then( ( data ) => {
+				data.forEach( ( todoItem ) => {
+					document.dispatchEvent(
+						new CustomEvent( 'prpl/todo/injectItem', {
+							detail: {
+								item: todoItem,
+								addToStart: 1 === todoItem?.meta?.prpl_points, // Add golden task to the start of the list.
+								listId:
+									todoItem.status === 'completed'
+										? 'todo-list-completed'
+										: 'todo-list',
+							},
+						} )
+					);
+				} );
 			} )
-		);
+			.then( () => {
+				document.querySelector( '#prpl-todo-list-loading' ).remove();
+				// Resize the grid items.
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+			} );
 
 		// When the '#create-todo-item' form is submitted,
 		// add a new todo item to the list

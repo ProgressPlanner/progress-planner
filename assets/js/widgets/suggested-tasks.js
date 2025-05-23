@@ -25,6 +25,30 @@ wp.api.loadPromise.done( () => {
 	} );
 } );
 
+/**
+ * Dispatch an async event.
+ * We use it so we don't need to pass callbacks as arguments to the event.
+ *
+ * @param {string} eventName - The name of the event.
+ * @param {Object} data      - The data to pass to the event.
+ * @return {Promise} A promise that resolves when the event is dispatched.
+ */
+function prplDispatchAsyncEvent( eventName, data = {} ) {
+	return new Promise( ( resolve, reject ) => {
+		const event = new CustomEvent( eventName, {
+			detail: {
+				...data,
+				resolve,
+				reject,
+			},
+			bubbles: true,
+			cancelable: false,
+		} );
+
+		document.dispatchEvent( event );
+	} );
+}
+
 window.prplInitSuggestedTasks = () => {
 	const prplSuggestedTasksToggleUIitems = () => {
 		document.querySelector( '.prpl-suggested-tasks-loading' )?.remove();
@@ -47,9 +71,9 @@ window.prplInitSuggestedTasks = () => {
 	 */
 	document.addEventListener(
 		'prpl/suggestedTask/injectCategoryItems',
-		( event ) => {
-			// window.progressPlannerSuggestedTasksTerms has been preloaded.
-
+		async ( event ) => {
+			console.log( event.detail.category );
+			// window.pr)ogressPlannerSuggestedTasksTerms has been preloaded.
 			console.info(
 				`Attempting to fetch recommendations for category: ${ event.detail.category }`
 			);
@@ -66,7 +90,7 @@ window.prplInitSuggestedTasks = () => {
 			const maxCategoryItems =
 				prplSuggestedTasks.maxItemsPerCategory[ event.detail.category ];
 			const perPage = Math.max( Math.min( maxCategoryItems, 100 ), 1 );
-			console.log( event.detail.status );
+
 			postsCollection
 				.fetch( {
 					data: {
@@ -96,21 +120,12 @@ window.prplInitSuggestedTasks = () => {
 					if ( 'user' === event.detail.category ) {
 						window.progressPlannerTodo.tasks = data;
 					}
-
-					const injectTriggerArgsCallback =
-						event?.detail?.injectTriggerArgsCallback ||
-						( ( item ) => item );
-					data.forEach( ( item ) => {
-						document.dispatchEvent(
-							new CustomEvent( event.detail.injectTrigger, {
-								detail: injectTriggerArgsCallback( item ),
-							} )
-						);
-					} );
-
-					if ( event?.detail?.afterInject ) {
-						event.detail.afterInject( data );
-					}
+				} )
+				.then( ( data ) => {
+					event.detail.resolve?.( data );
+				} )
+				.catch( ( error ) => {
+					event.detail.reject?.( error );
 				} );
 		}
 	);
@@ -185,26 +200,38 @@ window.prplInitSuggestedTasks = () => {
 			if ( 'user' === category ) {
 				continue;
 			}
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
-					detail: {
-						category,
-						status: 'publish',
-						injectTrigger: 'prpl/suggestedTask/injectItem',
-						afterInject: prplSuggestedTasksToggleUIitems,
-					},
+			prplDispatchAsyncEvent( 'prpl/suggestedTask/injectCategoryItems', {
+				category,
+				status: 'publish',
+			} )
+				.then( ( data ) => {
+					data.forEach( ( item ) => {
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/suggestedTask/injectItem', {
+								detail: item,
+							} )
+						);
+					} );
 				} )
-			);
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
-					detail: {
-						category,
-						status: 'pending_celebration',
-						injectTrigger: 'prpl/suggestedTask/injectItem',
-						afterInject: prplSuggestedTasksToggleUIitems,
-					},
+				.then( () => {
+					prplSuggestedTasksToggleUIitems();
+				} );
+			prplDispatchAsyncEvent( 'prpl/suggestedTask/injectCategoryItems', {
+				category,
+				status: 'pending_celebration',
+			} )
+				.then( ( data ) => {
+					data.forEach( ( item ) => {
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/suggestedTask/injectItem', {
+								detail: item,
+							} )
+						);
+					} );
 				} )
-			);
+				.then( () => {
+					prplSuggestedTasksToggleUIitems();
+				} );
 			setTimeout( () => {
 				// Trigger the celebration event.
 				document.dispatchEvent(
@@ -309,17 +336,13 @@ window.prplInitSuggestedTasks = () => {
 		( e ) => {
 			// TODO: Something seems off here, take a look at this.
 			const category = e.detail.category;
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
-					detail: {
-						category,
-						injectTrigger: 'prpl/suggestedTask/maybeInjectItem',
-						afterInject: prplSuggestedTasksToggleUIitems,
-					},
-				} )
-			);
-
-			window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+			prplDispatchAsyncEvent( 'prpl/suggestedTask/injectCategoryItems', {
+				category,
+				injectTrigger: 'prpl/suggestedTask/injectItem',
+			} ).then( () => {
+				prplSuggestedTasksToggleUIitems();
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+			} );
 		},
 		false
 	);
