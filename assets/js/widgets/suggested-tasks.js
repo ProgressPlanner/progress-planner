@@ -7,23 +7,21 @@
  * Dependencies: wp-api, progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip, progress-planner/suggested-task-terms
  */
 /* eslint-disable camelcase */
-prplDocumentReady( () => {
-	wp.api.loadPromise.done( () => {
-		Promise.all( [
-			// window.prplFetchSuggestedTaskPosts(),
-			window.prplFetchSuggestedTaskTerms(),
-		] ).then( () => {
-			console.log( 'Suggested tasks initializing' );
-			// Now it's safe to run other dependent widgets
-			// return Promise.all( [
-			window.initPrplSuggestedTaskComponent();
-			window.prplInitSuggestedTasks();
-			window.prplInitTodo();
-			window.prplInitCelebrate();
-			// ] );
-			// etc.
-			console.log( 'Suggested tasks initialized' );
-		} );
+wp.api.loadPromise.done( () => {
+	Promise.all( [
+		// window.prplFetchSuggestedTaskPosts(),
+		window.prplFetchSuggestedTaskTerms(),
+	] ).then( () => {
+		console.log( 'Suggested tasks initializing' );
+		// Now it's safe to run other dependent widgets
+		// return Promise.all( [
+		window.initPrplSuggestedTaskComponent();
+		window.prplInitSuggestedTasks();
+		window.prplInitTodo();
+		window.prplInitCelebrate();
+		// ] );
+		// etc.
+		console.log( 'Suggested tasks initialized' );
 	} );
 } );
 
