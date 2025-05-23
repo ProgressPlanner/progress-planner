@@ -49,6 +49,10 @@ window.prplFetchSuggestedTaskTerms = () => {
 								window.progressPlannerSuggestedTasksTerms[
 									type
 								].user = response;
+
+								// Populate the prplSuggestedTasks.maxItemsPerCategory for the user category.
+								window.prplSuggestedTasks.maxItemsPerCategory.user = 100;
+
 								resolveUser();
 							} );
 						} else {
