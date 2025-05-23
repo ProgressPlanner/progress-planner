@@ -338,7 +338,6 @@ window.prplInitSuggestedTasks = () => {
 			const category = e.detail.category;
 			prplDispatchAsyncEvent( 'prpl/suggestedTask/injectCategoryItems', {
 				category,
-				injectTrigger: 'prpl/suggestedTask/injectItem',
 			} ).then( () => {
 				prplSuggestedTasksToggleUIitems();
 				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
