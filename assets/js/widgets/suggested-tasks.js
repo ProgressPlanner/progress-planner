@@ -74,8 +74,11 @@ window.prplInitSuggestedTasks = () => {
 		async ( event ) => {
 			// window.pr)ogressPlannerSuggestedTasksTerms has been preloaded.
 			console.info(
-				`Attempting to fetch recommendations for category: ${ event.detail.category }`
+				`Attempting to fetch recommendations for category: ${ event.detail.category } & status: ${ event.detail.status }`
 			);
+
+			const tasksCategory = event.detail.category; // It can be an array of categories.
+			const tasksStatus = event.detail.status;
 
 			const postsCollection =
 				new wp.api.collections.Prpl_recommendations();
@@ -87,22 +90,17 @@ window.prplInitSuggestedTasks = () => {
 				} );
 
 			const maxCategoryItems =
-				prplSuggestedTasks.maxItemsPerCategory[ event.detail.category ];
+				prplSuggestedTasks.maxItemsPerCategory[ tasksCategory ];
 			const perPage = Math.max( Math.min( maxCategoryItems, 100 ), 1 );
 
 			postsCollection
 				.fetch( {
 					data: {
-						status: [ event.detail.status ],
-						per_page:
-							'publish' === event.detail.status ? perPage : 100,
+						status: [ tasksStatus ],
+						per_page: 'publish' === tasksStatus ? perPage : 100,
 						_embed: true,
 						exclude: excludeIds,
-						prpl_recommendations_category:
-							window.progressPlannerSuggestedTasksTerms
-								.prpl_recommendations_category[
-								event.detail.category
-							].id,
+						category: tasksCategory,
 						filter: {
 							orderby: 'menu_order',
 							order: 'ASC',
@@ -111,12 +109,12 @@ window.prplInitSuggestedTasks = () => {
 				} )
 				.done( ( data ) => {
 					console.info(
-						`Fetched ${ data.length } recommendations for category: ${ event.detail.category }`,
+						`Fetched ${ data.length } recommendations for category: ${ tasksCategory } & status: ${ tasksStatus }`,
 						data
 					);
 
 					// WIP.
-					if ( 'user' === event.detail.category ) {
+					if ( 'user' === tasksCategory ) {
 						window.progressPlannerTodo.tasks = data;
 					}
 				} )
@@ -194,11 +192,17 @@ window.prplInitSuggestedTasks = () => {
 			return;
 		}
 
+		let triggerCelebration = false;
+		const celebrationPromises = [];
+
 		// Loop through each provider and inject items.
 		for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
+			// Skip user category.
 			if ( 'user' === category ) {
 				continue;
 			}
+
+			// Inject published tasks from this category.
 			prplDispatchAsyncEvent( 'prpl/suggestedTask/injectCategoryItems', {
 				category,
 				status: 'publish',
