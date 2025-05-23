@@ -100,7 +100,7 @@ class Content_Review extends Tasks {
 	 * @return void
 	 */
 	public function init() {
-		$this->include_post_types = \progress_planner()->get_settings()->get_post_types_names(); // Wait for the post types to be initialized.
+		$this->include_post_types = \progress_planner()->get_activities__content_helpers()->get_post_types_names(); // Wait for the post types to be initialized.
 
 		\add_filter( 'progress_planner_update_posts_tasks_args', [ $this, 'filter_update_posts_args' ] );
 
