@@ -78,7 +78,7 @@ window.prplInitSuggestedTasks = () => {
 			);
 
 			const tasksCategory = event.detail.category; // It can be an array of categories.
-			const tasksStatus = event.detail.status;
+			const tasksStatus = event.detail.status ?? 'publish';
 
 			const postsCollection =
 				new wp.api.collections.Prpl_recommendations();
