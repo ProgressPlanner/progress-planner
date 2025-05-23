@@ -192,10 +192,7 @@ window.prplInitSuggestedTasks = () => {
 			return;
 		}
 
-		let triggerCelebration = false;
-		const celebrationPromises = [];
-
-		// Loop through each provider and inject items.
+		// Loop through each provider and inject published items.
 		for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
 			// Skip user category.
 			if ( 'user' === category ) {
@@ -217,50 +214,43 @@ window.prplInitSuggestedTasks = () => {
 					} );
 				} )
 				.then( () => {
+					// Update the UI.
 					prplSuggestedTasksToggleUIitems();
 				} );
-
-			// Inject pending celebration tasks from this category.
-			celebrationPromises.push(
-				prplDispatchAsyncEvent(
-					'prpl/suggestedTask/injectCategoryItems',
-					{
-						category,
-						status: 'pending_celebration',
-					}
-				)
-					.then( ( data ) => {
-						if ( data.length ) {
-							triggerCelebration = true;
-						}
-						data.forEach( ( item ) => {
-							document.dispatchEvent(
-								new CustomEvent(
-									'prpl/suggestedTask/injectItem',
-									{
-										detail: item,
-									}
-								)
-							);
-						} );
-					} )
-					.then( () => {
-						prplSuggestedTasksToggleUIitems();
-					} )
-			);
 		}
 
-		// When all the promises are resolved, this way is triggered once after all pending_celebration tasks are injected.
-		Promise.all( celebrationPromises ).then( () => {
-			if ( triggerCelebration ) {
-				setTimeout( () => {
-					// Trigger the celebration event.
+		// Inject pending celebration tasks from all categories.
+		prplDispatchAsyncEvent( 'prpl/suggestedTask/injectCategoryItems', {
+			category: Object.keys( prplSuggestedTasks.maxItemsPerCategory )
+				.filter( ( category ) => 'user' !== category )
+				.join( ',' ),
+			status: 'pending_celebration',
+		} )
+			.then( ( data ) => {
+				data.forEach( ( item ) => {
 					document.dispatchEvent(
-						new CustomEvent( 'prpl/celebrateTasks' )
+						new CustomEvent( 'prpl/suggestedTask/injectItem', {
+							detail: item,
+						} )
 					);
-				}, 3000 );
-			}
-		} );
+				} );
+				return data;
+			} )
+			.then( ( data ) => {
+				// Update the UI.
+				prplSuggestedTasksToggleUIitems();
+				return data;
+			} )
+			.then( ( data ) => {
+				// Trigger the celebration event if there are pending celebration tasks.
+				if ( data && data.length ) {
+					setTimeout( () => {
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/celebrateTasks' )
+						);
+					}, 3000 );
+				}
+			} );
 	} );
 
 	/**
