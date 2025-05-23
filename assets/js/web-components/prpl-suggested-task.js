@@ -4,7 +4,7 @@
  *
  * A web component to display a suggested task.
  *
- * Dependencies: progress-planner/l10n
+ * Dependencies: wp-api, progress-planner/l10n, progress-planner/suggested-task-terms
  */
 /* eslint-disable camelcase */
 
@@ -15,51 +15,59 @@ customElements.define(
 	'prpl-suggested-task',
 	class extends HTMLElement {
 		constructor( {
-			task_id,
-			title,
-			description,
-			points = 0,
-			action = '',
-			url = '',
-			url_target = '_self',
-			dismissable = false,
-			provider_id = '',
-			category = '',
-			snoozable = true,
-			order = false,
+			id,
+			title = { rendered: '' },
+			content = { rendered: '' },
+			meta = {},
+			status,
+			prpl_recommendations_provider,
+			prpl_recommendations_category,
+			menu_order = false,
+			allowReorder = false,
 			deletable = false,
 			useCheckbox = true,
-			taskList = '', // prplSuggestedTasks or progressPlannerTodo.
 		} ) {
 			// Get parent class properties
 			super();
 
+			const terms = {
+				prpl_recommendations_provider,
+				prpl_recommendations_category,
+			};
+			// Modify provider and category to be an object.
+			Object.keys( window.progressPlannerSuggestedTasksTerms ).forEach(
+				( type ) => {
+					if (
+						typeof terms[ type ] === 'object' &&
+						typeof terms[ type ][ 0 ] !== 'undefined'
+					) {
+						Object.values(
+							window.progressPlannerSuggestedTasksTerms[ type ]
+						).forEach( ( term ) => {
+							if ( term.id === terms[ type ][ 0 ] ) {
+								terms[ type ] = term;
+							}
+						} );
+					}
+				}
+			);
+
 			this.setAttribute( 'role', 'listitem' );
 
-			let taskHeading = title;
-			if ( url ) {
-				taskHeading = `<a href="${ url }" target="${ url_target }">${ title }</a>`;
+			let taskHeading = title.rendered;
+			if ( meta?.prpl_url ) {
+				taskHeading = `<a href="${ meta?.prpl_url }" target="${ meta?.prpl_url_target }">${ title.rendered }</a>`;
 			}
-
-			const getTaskStatus = () => {
-				let status = 'pending';
-				window[ taskList ].tasks.forEach( ( task ) => {
-					if ( task.task_id === task_id ) {
-						status = task.status;
-					}
-				} );
-				return status;
-			};
 
 			const actionButtons = {
 				move:
-					false !== order
+					false !== allowReorder
 						? `<span class="prpl-move-buttons">
 							<button
 								type="button"
 								class="prpl-suggested-task-button move-up"
-								data-task-id="${ task_id }"
-								data-task-title="${ title }"
+								data-task-id="${ meta?.prpl_task_id }"
+								data-task-title="${ title.rendered }"
 								data-action="move-up"
 								data-target="move-up"
 								title="${ prplL10n( 'moveUp' ) }"
@@ -70,8 +78,8 @@ customElements.define(
 							<button
 								type="button"
 								class="prpl-suggested-task-button move-down"
-								data-task-id="${ task_id }"
-								data-task-title="${ title }"
+								data-task-id="${ meta?.prpl_task_id }"
+								data-task-title="${ title.rendered }"
 								data-action="move-down"
 								data-target="move-down"
 								title="${ prplL10n( 'moveDown' ) }"
@@ -81,14 +89,15 @@ customElements.define(
 							</button>
 						</span>`
 						: '',
-				info: description
-					? `<prpl-tooltip>
+				info:
+					content.rendered !== ''
+						? `<prpl-tooltip>
 							<slot name="open-icon">
 								<button
 									type="button"
 									class="prpl-suggested-task-button"
-									data-task-id="${ task_id }"
-									data-task-title="${ title }"
+									data-task-id="${ meta?.prpl_task_id }"
+									data-task-title="${ title.rendered }"
 									data-action="info"
 									data-target="info"
 									title="${ prplL10n( 'info' ) }"
@@ -100,18 +109,18 @@ customElements.define(
 								</button>
 							</slot>
 							<slot name="content">
-								${ description }
+								${ content.rendered }
 							</slot>
 						</prpl-tooltip>`
-					: '',
-				snooze: snoozable
+						: '',
+				snooze: meta?.prpl_snoozable
 					? `<prpl-tooltip class="prpl-suggested-task-snooze">
 							<slot name="open-icon">
 							<button
 								type="button"
 								class="prpl-suggested-task-button"
-								data-task-id="${ task_id }"
-								data-task-title="${ title }"
+								data-task-id="${ meta?.prpl_task_id }"
+								data-task-title="${ title.rendered }"
 								data-action="snooze"
 								data-target="snooze"
 								title="${ prplL10n( 'snooze' ) }"
@@ -141,27 +150,39 @@ customElements.define(
 
 									<div class="prpl-snooze-duration-radio-group">
 										<label>
-											<input type="radio" name="snooze-duration-${ task_id }" value="1-week">
+											<input type="radio" name="snooze-duration-${
+												meta?.prpl_task_id
+											}" value="1-week">
 											${ prplL10n( 'snoozeDurationOneWeek' ) }
 										</label>
 										<label>
-											<input type="radio" name="snooze-duration-${ task_id }" value="1-month">
+											<input type="radio" name="snooze-duration-${
+												meta?.prpl_task_id
+											}" value="1-month">
 											${ prplL10n( 'snoozeDurationOneMonth' ) }
 										</label>
 										<label>
-											<input type="radio" name="snooze-duration-${ task_id }" value="3-months">
+											<input type="radio" name="snooze-duration-${
+												meta?.prpl_task_id
+											}" value="3-months">
 											${ prplL10n( 'snoozeDurationThreeMonths' ) }
 										</label>
 										<label>
-											<input type="radio" name="snooze-duration-${ task_id }" value="6-months">
+											<input type="radio" name="snooze-duration-${
+												meta?.prpl_task_id
+											}" value="6-months">
 											${ prplL10n( 'snoozeDurationSixMonths' ) }
 										</label>
 										<label>
-											<input type="radio" name="snooze-duration-${ task_id }" value="1-year">
+											<input type="radio" name="snooze-duration-${
+												meta?.prpl_task_id
+											}" value="1-year">
 											${ prplL10n( 'snoozeDurationOneYear' ) }
 										</label>
 										<label>
-											<input type="radio" name="snooze-duration-${ task_id }" value="forever">
+											<input type="radio" name="snooze-duration-${
+												meta?.prpl_task_id
+											}" value="forever">
 											${ prplL10n( 'snoozeDurationForever' ) }
 										</label>
 									</div>
@@ -170,12 +191,12 @@ customElements.define(
 						</prpl-tooltip>`
 					: '',
 				complete:
-					dismissable && ! useCheckbox
+					meta?.prpl_dismissable && ! useCheckbox
 						? `<button
 							type="button"
 							class="prpl-suggested-task-button"
-							data-task-id="${ task_id }"
-							data-task-title="${ title }"
+							data-task-id="${ meta?.prpl_task_id }"
+							data-task-title="${ title.rendered }"
 							data-action="complete"
 							data-target="complete"
 							title="${ prplL10n( 'markAsComplete' ) }"
@@ -188,8 +209,8 @@ customElements.define(
 					? `<button
 							type="button"
 							class="prpl-suggested-task-button trash"
-							data-task-id="${ task_id }"
-							data-task-title="${ title }"
+							data-task-id="${ meta?.prpl_task_id }"
+							data-task-title="${ title.rendered }"
 							data-action="delete"
 							data-target="delete"
 							title="${ prplL10n( 'delete' ) }"
@@ -206,7 +227,7 @@ customElements.define(
 					let checkboxStyle = 'margin-top: 2px;';
 
 					// If the task is not dismissable, checkbox is disabled and we want to show a tooltip.
-					if ( ! dismissable ) {
+					if ( ! meta?.prpl_dismissable ) {
 						checkboxStyle += 'pointer-events: none;';
 						output += `<prpl-tooltip class="prpl-suggested-task-disabled-checkbox-tooltip">
 							<slot name="open-icon">`;
@@ -214,14 +235,13 @@ customElements.define(
 
 					output += `<input
 						type="checkbox"
-						id="prpl-suggested-task-checkbox-${ task_id }"
 						class="prpl-suggested-task-checkbox"
 						style="${ checkboxStyle }"
-						${ ! dismissable ? 'disabled' : '' }
-						${ getTaskStatus() === 'completed' ? 'checked' : '' }
+						${ ! meta?.prpl_dismissable ? 'disabled' : '' }
+						${ 'trash' === status ? 'checked' : '' }
 					>`;
 
-					if ( ! dismissable ) {
+					if ( ! meta?.prpl_dismissable ) {
 						output += `
 							</slot>
 							<slot name="content">
@@ -235,38 +255,30 @@ customElements.define(
 				} )(),
 			};
 
-			const taskPointsElement = points
+			const taskPointsElement = meta?.prpl_points
 				? `<span class="prpl-suggested-task-points">
-						+${ points }
+						+${ meta?.prpl_points }
 					</span>`
 				: '';
 
 			this.innerHTML = `
 			<li
 				class="prpl-suggested-task"
-				data-task-id="${ task_id }"
-				data-task-action="${ action }"
-				data-task-url="${ url }"
-				data-task-provider-id="${ provider_id }"
-				data-task-points="${ points }"
-				data-task-category="${ category }"
-				data-task-order="${ order }"
-				data-task-list="${ taskList }"
+				data-task-id="${ meta?.prpl_task_id ?? id }"
+				data-post-id="${ id }"
+				data-task-action="${ 'pending_celebration' === status ? 'celebrate' : '' }"
+				data-task-url="${ meta?.prpl_url }"
+				data-task-provider-id="${ terms?.prpl_recommendations_provider?.slug }"
+				data-task-points="${ meta?.prpl_points }"
+				data-task-category="${ terms?.prpl_recommendations_category?.slug }"
+				data-task-order="${ menu_order }"
 			>
 				${ actionButtons.completeCheckbox }
-				<h3 style="width: 100%;">
-					${
-						useCheckbox
-							? `<label for="prpl-suggested-task-checkbox-${ task_id }">`
-							: ''
-					}
-					<span${
-						'user' === category
-							? ` contenteditable="plaintext-only"`
-							: ''
-					}>${ taskHeading }</span>
-					${ useCheckbox && dismissable ? `</label>` : '' }
-				</h3>
+				<h3 style="width: 100%;"><span${
+					'user' === terms?.prpl_recommendations_category?.slug
+						? ` contenteditable="plaintext-only"`
+						: ''
+				}>${ taskHeading }</span></h3>
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
 						${ actionButtons.info }
@@ -286,14 +298,14 @@ customElements.define(
 		 * Add listeners to the item.
 		 */
 		taskListeners = () => {
-			const thisObj = this,
-				item = thisObj.querySelector( 'li' );
+			const thisObj = this;
+			const item = thisObj.querySelector( 'li' );
 
 			item.querySelector(
 				'.prpl-suggested-task-checkbox'
 			).addEventListener( 'change', function ( e ) {
 				thisObj.runTaskAction(
-					item.getAttribute( 'data-task-id' ),
+					item.getAttribute( 'data-post-id' ),
 					e.target.checked ? 'complete' : 'pending'
 				);
 			} );
@@ -414,7 +426,7 @@ customElements.define(
 
 							default:
 								thisObj.runTaskAction(
-									item.getAttribute( 'data-task-id' ),
+									item.getAttribute( 'data-post-id' ),
 									action
 								);
 								break;
@@ -439,7 +451,7 @@ customElements.define(
 			).forEach( ( radioElement ) => {
 				radioElement.addEventListener( 'change', function () {
 					thisObj.runTaskAction(
-						item.getAttribute( 'data-task-id' ),
+						item.getAttribute( 'data-post-id' ),
 						'snooze',
 						this.value
 					);
@@ -459,18 +471,13 @@ customElements.define(
 				clearTimeout( this.debounceTimeout );
 				this.debounceTimeout = setTimeout( () => {
 					const title = h3Span.textContent;
-					wp.ajax
-						.post( 'progress_planner_save_user_suggested_task', {
-							task: {
-								task_id: item.getAttribute( 'data-task-id' ),
-								title,
-								provider_id: 'user',
-								category: 'user',
-								dismissable: true,
-							},
-							nonce: prplSuggestedTask.nonce,
-						} )
-						.done( () => {
+					wp.api.loadPromise.done( () => {
+						// Update an existing post.
+						const post = new wp.api.models.Prpl_recommendations( {
+							id: parseInt( item.getAttribute( 'data-post-id' ) ),
+							title,
+						} );
+						post.save().then( () => {
 							// Update the task title.
 							document.dispatchEvent(
 								new CustomEvent( 'prpl/suggestedTask/update', {
@@ -478,6 +485,7 @@ customElements.define(
 								} )
 							);
 						} );
+					} );
 				}, 300 );
 			} );
 		};
@@ -485,32 +493,201 @@ customElements.define(
 		/**
 		 * Snooze a task.
 		 *
-		 * @param {string} task_id        The task ID.
+		 * @param {number} post_id        The post ID.
 		 * @param {string} actionType     The action type.
 		 * @param {string} snoozeDuration If the action is `snooze`,
 		 *                                the duration to snooze the task for.
 		 */
-		runTaskAction = ( task_id, actionType, snoozeDuration ) => {
-			task_id = task_id.toString();
-			const providerID = this.querySelector( 'li' ).getAttribute(
-				'data-task-provider-id'
-			);
-			const category =
-				this.querySelector( 'li' ).getAttribute( 'data-task-category' );
-			const taskPoints = parseInt(
-				this.querySelector( 'li' ).getAttribute( 'data-task-points' )
-			);
-			const taskList =
-				this.querySelector( 'li' ).getAttribute( 'data-task-list' );
+		runTaskAction = ( post_id, actionType, snoozeDuration ) => {
+			switch ( actionType ) {
+				case 'snooze':
+					wp.api.loadPromise.done( () => {
+						if ( '1-week' === snoozeDuration ) {
+							snoozeDuration = 7;
+						} else if ( '2-weeks' === snoozeDuration ) {
+							snoozeDuration = 14;
+						} else if ( '1-month' === snoozeDuration ) {
+							snoozeDuration = 30;
+						} else if ( '3-months' === snoozeDuration ) {
+							snoozeDuration = 90;
+						} else if ( '6-months' === snoozeDuration ) {
+							snoozeDuration = 180;
+						} else if ( '1-year' === snoozeDuration ) {
+							snoozeDuration = 365;
+						} else if ( 'forever' === snoozeDuration ) {
+							snoozeDuration = 3650;
+						}
+						const date = new Date(
+							Date.now() + snoozeDuration * 24 * 60 * 60 * 1000
+						)
+							.toISOString()
+							.split( '.' )[ 0 ];
+						const post = new wp.api.models.Prpl_recommendations( {
+							id: post_id,
+							status: 'future',
+							date,
+							date_gmt: date,
+						} );
+						post.save().then( () => {
+							this.querySelector( 'li' ).remove();
+						} );
+					} );
+					break;
+
+				case 'complete':
+					wp.api.loadPromise.done( () => {
+						const post = new wp.api.models.Prpl_recommendations( {
+							id: post_id,
+							status: 'pending_celebration',
+						} );
+						post.save().then( () => {
+							// Set the task action to celebrate.
+							this.querySelector( 'li' ).setAttribute(
+								'data-task-action',
+								'celebrate'
+							);
+
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/updateRaviGauge', {
+									detail: {
+										pointsDiff: parseInt(
+											this.querySelector(
+												'li'
+											).getAttribute( 'data-task-points' )
+										),
+									},
+								} )
+							);
+
+							const eventDetail = {
+								element: this.querySelector( 'li' ),
+							};
+							const eventPoints = parseInt(
+								this.querySelector( 'li' ).getAttribute(
+									'data-task-points'
+								)
+							);
+							const celebrateEvents =
+								0 < eventPoints
+									? { 'prpl/celebrateTasks': eventDetail }
+									: {
+											'prpl/strikeCelebratedTasks':
+												eventDetail,
+											'prpl/markTasksAsCompleted':
+												eventDetail,
+											'prpl/suggestedTask/maybeInjectItem':
+												{
+													task_id:
+														this.querySelector(
+															'li'
+														).getAttribute(
+															'data-task-id'
+														),
+													providerID:
+														this.querySelector(
+															'li'
+														).getAttribute(
+															'data-task-provider'
+														),
+													category:
+														this.querySelector(
+															'li'
+														).getAttribute(
+															'data-task-category'
+														),
+												},
+									  };
+
+							// Trigger the celebration events.
+							Object.keys( celebrateEvents ).forEach(
+								( event ) => {
+									document.dispatchEvent(
+										new CustomEvent( event, {
+											detail: celebrateEvents[ event ],
+										} )
+									);
+								}
+							);
+						} );
+					} );
+					break;
+
+				case 'pending':
+					wp.api.loadPromise.done( () => {
+						const post = new wp.api.models.Prpl_recommendations( {
+							id: post_id,
+							status: 'publish',
+						} );
+						post.save().then( () => {
+							// Set the task action to pending.
+							this.querySelector( 'li' ).setAttribute(
+								'data-task-action',
+								'pending'
+							);
+
+							// Update the Ravi gauge.
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/updateRaviGauge', {
+									detail: {
+										pointsDiff:
+											0 -
+											parseInt(
+												this.querySelector(
+													'li'
+												).getAttribute(
+													'data-task-points'
+												)
+											),
+									},
+								} )
+							);
+						} );
+					} );
+					break;
+
+				case 'delete':
+					wp.api.loadPromise.done( () => {
+						const post = new wp.api.models.Prpl_recommendations( {
+							id: post_id,
+							status: 'trash',
+						} );
+						post.destroy().then( () => {
+							// Update the Ravi gauge.
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/updateRaviGauge', {
+									detail: {
+										pointsDiff:
+											0 -
+											parseInt(
+												this.querySelector(
+													'li'
+												).getAttribute(
+													'data-task-points'
+												)
+											),
+									},
+								} )
+							);
+
+							// Remove the task from the todo list.
+							document
+								.querySelector(
+									`.prpl-suggested-task[data-post-id="${ post_id }"]`
+								)
+								.remove();
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/grid/resize' )
+							);
+						} );
+					} );
+					break;
+			}
 
 			const data = {
-				task_id,
+				id: post_id,
 				nonce: prplSuggestedTask.nonce,
 				action_type: actionType,
 			};
-			if ( 'snooze' === actionType ) {
-				data.duration = snoozeDuration;
-			}
 
 			// Save the todo list to the database.
 			const request = wp.ajax.post(
@@ -518,126 +695,19 @@ customElements.define(
 				data
 			);
 			request.done( () => {
-				const el = document.querySelector(
-					`.prpl-suggested-task[data-task-id="${ task_id }"]`
-				);
-
-				switch ( actionType ) {
-					case 'snooze':
-						el.remove();
-						// Update the global var.
-						window[ taskList ].tasks.forEach( ( task, index ) => {
-							if ( task.task_id === task_id ) {
-								window[ taskList ].tasks[ index ].status =
-									'snoozed';
-							}
-						} );
-						break;
-
-					case 'complete':
-						// Add the task to the pending celebration.
-						window[ taskList ].tasks.forEach( ( task, index ) => {
-							if ( task.task_id === task_id ) {
-								window[ taskList ].tasks[ index ].status =
-									'pending_celebration';
-							}
-						} );
-						// Set the task action to celebrate.
-						el.setAttribute( 'data-task-action', 'celebrate' );
-
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/updateRaviGauge', {
-								detail: {
-									pointsDiff: parseInt(
-										this.querySelector( 'li' ).getAttribute(
-											'data-task-points'
-										)
-									),
-								},
-							} )
-						);
-
-						const celebrateEvents =
-							0 < taskPoints
-								? [ 'prpl/celebrateTasks' ]
-								: [
-										'prpl/strikeCelebratedTasks',
-										'prpl/markTasksAsCompleted',
-								  ];
-
-						// Trigger the celebration events.
-						celebrateEvents.forEach( ( event ) => {
-							document.dispatchEvent(
-								new CustomEvent( event, {
-									detail: {
-										element: el,
-										taskList,
-									},
-								} )
-							);
-						} );
-
-						break;
-
-					case 'pending':
-						// Change the task status to pending.
-						window[ taskList ].tasks.forEach( ( task, index ) => {
-							if ( task.task_id === task_id ) {
-								window[ taskList ].tasks[ index ].status =
-									'pending';
-							}
-						} );
-						// Set the task action to pending.
-						el.setAttribute( 'data-task-action', 'pending' );
-
-						// Update the Ravi gauge.
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/updateRaviGauge', {
-								detail: {
-									pointsDiff:
-										0 -
-										parseInt(
-											this.querySelector(
-												'li'
-											).getAttribute( 'data-task-points' )
-										),
-								},
-							} )
-						);
-
-						break;
-
-					case 'delete':
-						// Update the Ravi gauge.
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/updateRaviGauge', {
-								detail: {
-									pointsDiff:
-										0 -
-										parseInt(
-											this.querySelector(
-												'li'
-											).getAttribute( 'data-task-points' )
-										),
-								},
-							} )
-						);
-
-						// Remove the task from the todo list.
-						el.closest( 'prpl-suggested-task' ).remove();
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/grid/resize' )
-						);
-						break;
-				}
-
 				document.dispatchEvent(
 					new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
 						detail: {
-							task_id,
-							providerID,
+							task_id: document
+								.querySelector(
+									`.prpl-suggested-task[data-post-id="${ post_id }"]`
+								)
+								.getAttribute( 'data-task-id' ),
 							actionType,
-							category,
+							category:
+								this.querySelector( 'li' ).getAttribute(
+									'data-task-category'
+								),
 						},
 					} )
 				);

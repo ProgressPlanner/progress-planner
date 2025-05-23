@@ -4,74 +4,111 @@
  *
  * A widget that displays a list of suggested tasks.
  *
- * Dependencies: progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip
+ * Dependencies: wp-api, progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip, progress-planner/suggested-task-terms
  */
 /* eslint-disable camelcase */
 
-/**
- * Get the next item to inject.
- *
- * @param {string} category The category of items to get the next item from.
- * @return {Object} The next item to inject.
- */
-const prplSuggestedTasksGetNextPendingItemFromCategory = ( category ) => {
-	// Get items of this category.
-	const itemsOfCategory = prplSuggestedTasks.tasks.filter(
-		( task ) => category === task.category
-	);
+const prplSuggestedTasksToggleUIitems = () => {
+	document.querySelector( '.prpl-suggested-tasks-loading' )?.remove();
+	setTimeout( () => {
+		const items = document.querySelectorAll(
+			'.prpl-suggested-tasks-list .prpl-suggested-task'
+		);
 
-	// If there are no items of this category, return null.
-	if ( 0 === itemsOfCategory.length || 'user' === category ) {
-		return null;
-	}
-
-	// Create an array of items that are in the list.
-	const inList = [];
-	document
-		.querySelectorAll( '.prpl-suggested-task' )
-		.forEach( function ( item ) {
-			inList.push( item.getAttribute( 'data-task-id' ).toString() );
-		} );
-
-	const items = itemsOfCategory.filter( function ( item ) {
-		// Skip items which are not pending.
-		if ( 'pending' !== item.status ) {
-			return false;
+		if ( 0 === items.length ) {
+			document.querySelector( '.prpl-no-suggested-tasks' ).style.display =
+				'block';
 		}
-		// Remove items which are already in the list.
-		if ( inList.includes( item.task_id.toString() ) ) {
-			return false;
-		}
-		return true;
-	} );
-
-	// Do nothing if there are no items left.
-	if ( 0 === items.length ) {
-		return null;
-	}
-
-	// Return the first item.
-	return items[ 0 ];
+		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+	}, 2000 );
 };
 
 /**
- * Inject the next item from a category.
+ * Inject items from a category.
  */
 document.addEventListener(
-	'prpl/suggestedTask/injectCategoryItem',
+	'prpl/suggestedTask/injectCategoryItems',
 	( event ) => {
-		const nextItem = prplSuggestedTasksGetNextPendingItemFromCategory(
-			event.detail.category
-		);
-		if ( ! nextItem ) {
+		// If window.progressPlannerSuggestedTasksTerms is not loaded, try again after 100ms, for up to 10 times.
+		if (
+			Object.keys( window.progressPlannerSuggestedTasksTerms ).length ===
+				0 ||
+			! window?.progressPlannerSuggestedTasksTerms
+				?.prpl_recommendations_category[ event.detail.category ]?.id
+		) {
+			window.prplSuggestedTasksInjectCategoryItemsAttempts =
+				window.prplSuggestedTasksInjectCategoryItemsAttempts || 0;
+			if ( window.prplSuggestedTasksInjectCategoryItemsAttempts > 10 ) {
+				return;
+			}
+			setTimeout( () => {
+				document.dispatchEvent( event );
+			}, 100 );
 			return;
 		}
-
-		document.dispatchEvent(
-			new CustomEvent( 'prpl/suggestedTask/injectItem', {
-				detail: nextItem,
-			} )
+		console.info(
+			`Attempting to fetch recommendations for category: ${ event.detail.category }`
 		);
+		wp.api.loadPromise.done( () => {
+			const postsCollection =
+				new wp.api.collections.Prpl_recommendations();
+			const excludeIds = [];
+			document
+				.querySelectorAll( '.prpl-suggested-task' )
+				.forEach( ( item ) => {
+					excludeIds.push( item.getAttribute( 'data-post-id' ) );
+				} );
+
+			const maxCategoryItems =
+				prplSuggestedTasks.maxItemsPerCategory[ event.detail.category ];
+			const perPage = Math.max( Math.min( maxCategoryItems, 100 ), 1 );
+
+			postsCollection
+				.fetch( {
+					data: {
+						status: [ event.detail.status ],
+						per_page:
+							'publish' === event.detail.status ? perPage : 100,
+						_embed: true,
+						exclude: excludeIds,
+						prpl_recommendations_category:
+							window.progressPlannerSuggestedTasksTerms
+								.prpl_recommendations_category[
+								event.detail.category
+							].id,
+						filter: {
+							orderby: 'menu_order',
+							order: 'ASC',
+						},
+					},
+				} )
+				.done( ( data ) => {
+					console.info(
+						`Fetched ${ data.length } recommendations for category: ${ event.detail.category }`,
+						data
+					);
+
+					// WIP.
+					if ( 'user' === event.detail.category ) {
+						window.progressPlannerTodo.tasks = data;
+					}
+
+					const injectTriggerArgsCallback =
+						event?.detail?.injectTriggerArgsCallback ||
+						( ( item ) => item );
+					data.forEach( ( item ) => {
+						document.dispatchEvent(
+							new CustomEvent( event.detail.injectTrigger, {
+								detail: injectTriggerArgsCallback( item ),
+							} )
+						);
+					} );
+
+					if ( event?.detail?.afterInject ) {
+						event.detail.afterInject( data );
+					}
+				} );
+		} );
 	}
 );
 
@@ -82,7 +119,7 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const item = new Item( {
 		...event.detail,
-		taskList: 'prplSuggestedTasks',
+		allowReorder: false,
 	} );
 
 	/**
@@ -133,18 +170,6 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 		.insertAdjacentElement( 'beforeend', item );
 } );
 
-if (
-	! prplSuggestedTasks.delayCelebration &&
-	prplSuggestedTasks.tasks.filter(
-		( task ) => 'pending_celebration' === task.status
-	).length
-) {
-	setTimeout( () => {
-		// Trigger the celebration event.
-		document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
-	}, 3000 );
-}
-
 // Populate the list on load.
 prplDocumentReady( () => {
 	// Do nothing if the list does not exist.
@@ -154,180 +179,35 @@ prplDocumentReady( () => {
 
 	// Loop through each provider and inject items.
 	for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
-		// Inject items, until we reach the maximum number of channel items.
-		while (
-			document.querySelectorAll(
-				`.prpl-suggested-task[data-task-category="${ category }"]`
-			).length <
-				parseInt(
-					prplSuggestedTasks.maxItemsPerCategory[ category ]
-				) &&
-			prplSuggestedTasksGetNextPendingItemFromCategory( category )
-		) {
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/injectCategoryItem', {
-					detail: { category },
-				} )
-			);
+		if ( 'user' === category ) {
+			continue;
 		}
+		document.dispatchEvent(
+			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
+				detail: {
+					category,
+					status: 'publish',
+					injectTrigger: 'prpl/suggestedTask/injectItem',
+					afterInject: prplSuggestedTasksToggleUIitems,
+				},
+			} )
+		);
+		document.dispatchEvent(
+			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
+				detail: {
+					category,
+					status: 'pending_celebration',
+					injectTrigger: 'prpl/suggestedTask/injectItem',
+					afterInject: prplSuggestedTasksToggleUIitems,
+				},
+			} )
+		);
+		setTimeout( () => {
+			// Trigger the celebration event.
+			document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
+		}, 3000 );
 	}
-
-	// Inject ALL pending celebration tasks.
-	prplSuggestedTasks.tasks
-		.filter( ( task ) => 'pending_celebration' === task.status )
-		.forEach( ( task ) => {
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/injectItem', {
-					detail: task,
-				} )
-			);
-		} );
-
-	window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-
-	// Initialize the badge scroller.
-	document
-		.querySelectorAll(
-			'.prpl-widget-wrapper:not(.in-popover) > .badge-group-monthly'
-		)
-		.forEach( ( element ) => {
-			new BadgeScroller( element );
-		} );
 } );
-
-// Handle the monthly badges scrolling.
-class BadgeScroller {
-	constructor( element ) {
-		this.element = element;
-
-		this.badgeButtonUp = this.element.querySelector(
-			'.prpl-badge-row-button-up'
-		);
-		this.badgeButtonDown = this.element.querySelector(
-			'.prpl-badge-row-button-down'
-		);
-		this.badgeRowWrapper = this.element.querySelector(
-			'.prpl-badge-row-wrapper'
-		);
-		this.badgeRowWrapperInner = this.element.querySelector(
-			'.prpl-badge-row-wrapper-inner'
-		);
-		this.badges =
-			this.badgeRowWrapperInner.querySelectorAll( '.prpl-badge' );
-		this.totalRows = this.badges.length / 3;
-
-		this.init();
-	}
-
-	init() {
-		this.addEventListeners();
-
-		// On page load, when all images are loaded.
-		const images = [ ...this.element.querySelectorAll( 'img' ) ];
-		if ( images.length ) {
-			Promise.all(
-				images.map(
-					( im ) =>
-						new Promise( ( resolve ) => ( im.onload = resolve ) )
-				)
-			).then( () => {
-				this.setWrapperHeight();
-			} );
-		}
-
-		// When popover is opened.
-		document
-			.querySelector( '#prpl-popover-monthly-badges' )
-			.addEventListener( 'toggle', ( event ) => {
-				if ( 'open' === event.newState ) {
-					this.setWrapperHeight();
-				}
-			} );
-
-		// Handle window resize.
-		window.addEventListener( 'resize', () => {
-			this.setWrapperHeight();
-		} );
-	}
-
-	setWrapperHeight() {
-		const computedStyle = window.getComputedStyle(
-			this.badgeRowWrapperInner
-		);
-		const gridGap = parseInt( computedStyle.gap );
-
-		// Set CSS variables for the transform calculation.
-		this.badgeRowWrapper.style.setProperty(
-			'--row-height',
-			`${ this.badges[ 0 ].offsetHeight }px`
-		);
-		this.badgeRowWrapper.style.setProperty(
-			'--grid-gap',
-			`${ gridGap }px`
-		);
-
-		// Set wrapper height to show 2 rows.
-		const twoRowsHeight = this.badges[ 0 ].offsetHeight * 2 + gridGap;
-		this.badgeRowWrapperInner.style.height = twoRowsHeight + 'px';
-	}
-
-	addEventListeners() {
-		this.badgeButtonUp.addEventListener( 'click', () =>
-			this.handleUpClick()
-		);
-		this.badgeButtonDown.addEventListener( 'click', () =>
-			this.handleDownClick()
-		);
-	}
-
-	handleUpClick() {
-		const computedStyle = window.getComputedStyle(
-			this.badgeRowWrapperInner
-		);
-		const currentRow =
-			computedStyle.getPropertyValue( '--prpl-current-row' );
-		const nextRow = parseInt( currentRow ) - 1;
-
-		this.badgeButtonDown
-			.closest( '.prpl-badge-row-button-wrapper' )
-			.classList.remove( 'prpl-badge-row-button-disabled' );
-
-		this.badgeRowWrapperInner.style.setProperty(
-			'--prpl-current-row',
-			nextRow
-		);
-
-		if ( nextRow <= 1 ) {
-			this.badgeButtonUp
-				.closest( '.prpl-badge-row-button-wrapper' )
-				.classList.add( 'prpl-badge-row-button-disabled' );
-		}
-	}
-
-	handleDownClick() {
-		const computedStyle = window.getComputedStyle(
-			this.badgeRowWrapperInner
-		);
-		const currentRow =
-			computedStyle.getPropertyValue( '--prpl-current-row' );
-		const nextRow = parseInt( currentRow ) + 1;
-
-		this.badgeButtonUp
-			.closest( '.prpl-badge-row-button-wrapper' )
-			.classList.remove( 'prpl-badge-row-button-disabled' );
-
-		this.badgeRowWrapperInner.style.setProperty(
-			'--prpl-current-row',
-			nextRow
-		);
-
-		if ( nextRow >= this.totalRows - 1 ) {
-			this.badgeButtonDown
-				.closest( '.prpl-badge-row-button-wrapper' )
-				.classList.add( 'prpl-badge-row-button-disabled' );
-		}
-	}
-}
 
 /**
  * Update the Ravi gauge.
@@ -424,21 +304,15 @@ document.addEventListener(
 	( e ) => {
 		// TODO: Something seems off here, take a look at this.
 		const category = e.detail.category;
-		while (
-			document.querySelectorAll(
-				`.prpl-suggested-task[data-task-category="${ category }"]`
-			).length <
-				parseInt(
-					prplSuggestedTasks.maxItemsPerCategory[ category ]
-				) &&
-			prplSuggestedTasksGetNextPendingItemFromCategory( category )
-		) {
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/injectCategoryItem', {
-					detail: { category },
-				} )
-			);
-		}
+		document.dispatchEvent(
+			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
+				detail: {
+					category,
+					injectTrigger: 'prpl/suggestedTask/maybeInjectItem',
+					afterInject: prplSuggestedTasksToggleUIitems,
+				},
+			} )
+		);
 
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	},

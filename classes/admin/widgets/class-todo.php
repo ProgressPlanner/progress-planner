@@ -36,6 +36,7 @@ final class ToDo extends Widget {
 	 */
 	public function the_todo_list() {
 		?>
+		<p id="prpl-todo-list-loading"><?php \esc_html_e( 'Loading items...', 'progress-planner' ); ?></p>
 		<div id="todo-aria-live-region" aria-live="polite" style="position: absolute; left: -9999px;"></div>
 
 		<ul id="todo-list" class="prpl-todo-list prpl-suggested-tasks-list"></ul>
@@ -51,26 +52,6 @@ final class ToDo extends Widget {
 			<ul id="todo-list-completed" class="prpl-todo-list prpl-suggested-tasks-list"></ul>
 		</details>
 		<?php
-	}
-
-	/**
-	 * Enqueue the scripts.
-	 *
-	 * @return void
-	 */
-	public function enqueue_scripts() {
-		// Enqueue the script.
-		\progress_planner()->get_admin__enqueue()->enqueue_script(
-			'widgets/todo',
-			[
-				'name' => 'progressPlannerTodo',
-				'data' => [
-					'ajaxUrl' => \admin_url( 'admin-ajax.php' ),
-					'nonce'   => \wp_create_nonce( 'progress_planner' ),
-					'tasks'   => \progress_planner()->get_todo()->get_items(),
-				],
-			]
-		);
 	}
 
 	/**

@@ -34,10 +34,12 @@ class Set_Valuable_Post_Types extends Tasks {
 	protected $priority = 'low';
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url = \admin_url( 'admin.php?page=progress-planner-settings' );
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=progress-planner-settings' );
 	}
 
 	/**
@@ -65,7 +67,7 @@ class Set_Valuable_Post_Types extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Set valuable content types', 'progress-planner' );
 	}
 
@@ -74,7 +76,7 @@ class Set_Valuable_Post_Types extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/valuable-content" target="_blank">Read more</a> link */
 			\esc_html__( 'Tell us which post types matter most for your site. Go to your settings and select your valuable content types. %s', 'progress-planner' ),
@@ -90,15 +92,14 @@ class Set_Valuable_Post_Types extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-
 		// Check the "Settings saved" task, if the has not been added as 'pending' don't add the task.
-		$settings_saved_task = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', 'settings-saved' );
+		$settings_saved_task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => 'settings-saved' ] );
 		if ( empty( $settings_saved_task ) ) {
 			return false;
 		}
 
 		// Save settings task completed?
-		$save_settings_task_completed = 'completed' === $settings_saved_task[0]['status'];
+		$save_settings_task_completed = 'trash' === $settings_saved_task[0]->post_status;
 
 		// Upgraded from <= 1.2?
 		$upgraded = (bool) \get_option( 'progress_planner_set_valuable_post_types', false );

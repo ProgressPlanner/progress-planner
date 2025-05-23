@@ -100,7 +100,6 @@ class Debug_Tools {
 	 * @return void
 	 */
 	protected function add_delete_submenu_item( $admin_bar ) {
-
 		if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
 			return;
 		}
@@ -172,7 +171,6 @@ class Debug_Tools {
 	 * @return void
 	 */
 	protected function add_upgrading_tasks_submenu_item( $admin_bar ) {
-
 		$admin_bar->add_node(
 			[
 				'id'     => 'prpl-upgrading-tasks',
@@ -195,7 +193,7 @@ class Debug_Tools {
 					[
 						'id'     => 'prpl-upgrading-task-' . $task_provider_id,
 						'parent' => 'prpl-upgrading-tasks',
-						'title'  => $task_provider_details['title'],
+						'title'  => $task_provider_details['post_title'],
 					]
 				);
 			}
@@ -221,13 +219,10 @@ class Debug_Tools {
 			]
 		);
 
-		// Get suggested tasks.
-		$suggested_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-
 		$menu_items = [
-			'pending'             => 'Pending',
-			'completed'           => 'Completed',
-			'snoozed'             => 'Snoozed',
+			'publish'             => 'Pending',
+			'trash'               => 'Completed',
+			'future'              => 'Snoozed',
 			'pending_celebration' => 'Pending Celebration',
 		];
 
@@ -240,24 +235,25 @@ class Debug_Tools {
 				]
 			);
 
-			foreach ( $suggested_tasks as $task ) {
-				if ( ! isset( $task['task_id'] ) || $key !== $task['status'] ) {
-					continue;
-				}
+			// Get suggested tasks.
+			$suggested_tasks = \progress_planner()->get_suggested_tasks_db()->get( [ 'post_status' => $key ] );
 
-				$title = $task['task_id'];
-				if ( isset( $task['status'] ) && 'snoozed' === $task['status'] && isset( $task['time'] ) ) {
-					$until  = is_float( $task['time'] ) ? '(forever)' : '(until ' . \gmdate( 'Y-m-d H:i', $task['time'] ) . ')';
-					$title .= ' ' . $until;
-				}
+			if ( ! empty( $suggested_tasks ) ) {
+				foreach ( $suggested_tasks as $task ) {
+					$title = $task->post_title;
+					if ( $task->post_status && 'future' === $task->post_status && $task->post_date ) {
+						$until  = is_float( $task->post_date ) ? '(forever)' : '(until ' . $task->post_date . ')';
+						$title .= ' ' . $until;
+					}
 
-				$admin_bar->add_node(
-					[
-						'id'     => 'prpl-suggested-' . $key . '-' . $title,
-						'parent' => 'prpl-suggested-' . $key,
-						'title'  => $title,
-					]
-				);
+					$admin_bar->add_node(
+						[
+							'id'     => 'prpl-suggested-' . $key . '-' . $title,
+							'parent' => 'prpl-suggested-' . $key,
+							'title'  => $title,
+						]
+					);
+				}
 			}
 		}
 	}
@@ -362,7 +358,6 @@ class Debug_Tools {
 	 * @return void
 	 */
 	public function check_delete_pending_tasks() {
-
 		if (
 			! isset( $_GET['prpl_delete_pending_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$_GET['prpl_delete_pending_tasks'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -374,18 +369,13 @@ class Debug_Tools {
 		// Verify nonce for security.
 		$this->verify_nonce();
 
-		// Update the tasks.
-		\progress_planner()->get_settings()->set(
-			'tasks',
-			array_values(
-				array_filter( // Filter out pending tasks.
-					\progress_planner()->get_settings()->get( 'tasks', [] ), // Get all tasks.
-					function ( $task ) {
-						return 'pending' !== $task['status'];
-					}
-				)
-			)
-		);
+		// Get pending tasks.
+		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
+
+		// Delete the pending tasks.
+		foreach ( $pending_tasks as $task ) {
+			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( (int) $task->ID );
+		}
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_pending_tasks', '_wpnonce' ] ) );
@@ -401,7 +391,6 @@ class Debug_Tools {
 	 * @return void
 	 */
 	public function check_delete_badges() {
-
 		if (
 			! isset( $_GET['prpl_delete_badges'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$_GET['prpl_delete_badges'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
@@ -539,7 +528,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the option.
-		\progress_planner()->get_settings()->set( 'tasks', [] );
+		\progress_planner()->get_suggested_tasks_db()->delete_all_recommendations();
 
 		// Redirect to the same page without the parameter.
 		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_suggested_tasks', '_wpnonce' ] ) );

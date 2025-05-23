@@ -1,28 +1,19 @@
-/* global progressPlannerTodo, customElements, prplDocumentReady */
+/* global customElements, prplDocumentReady */
 /*
  * Widget: Todo
  *
  * A widget that displays a todo list.
  *
- * Dependencies: progress-planner/web-components/prpl-suggested-task, wp-util, wp-a11y, progress-planner/ajax-request, progress-planner/grid-masonry, progress-planner/document-ready, progress-planner/celebrate
+ * Dependencies: wp-api, progress-planner/web-components/prpl-suggested-task, wp-util, wp-a11y, progress-planner/grid-masonry, progress-planner/document-ready, progress-planner/celebrate, progress-planner/suggested-task-terms
  */
 
 /**
- * Get a random UUID.
+ * The user terms for the todo list.
  *
- * @return {string} The random UUID.
+ * @type {Object}
  */
-const prplGetRandomUUID = () => {
-	if (
-		typeof crypto !== 'undefined' &&
-		typeof crypto.randomUUID === 'function'
-	) {
-		return crypto.randomUUID();
-	}
-	return (
-		Math.random().toString( 36 ).substring( 2, 15 ) +
-		Math.random().toString( 36 ).substring( 2, 15 )
-	);
+window.progressPlannerTodo = {
+	tasks: [],
 };
 
 /**
@@ -45,45 +36,59 @@ const prplGetHighestTodoItemOrder = () => {
 };
 
 document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
-	const details = event.detail.item;
-	const addToStart = event.detail.addToStart;
-	const listId = event.detail.listId;
-
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const todoItemElement = new Item( {
-		...details,
+		...event.detail.item,
+		meta: {
+			...event.detail.item.meta,
+			prpl_snoozable: false,
+			prpl_dismissable: true,
+		},
 		deletable: true,
-		taskList: 'progressPlannerTodo',
+		allowReorder: true,
+		content: { rendered: '' },
 	} );
 
-	if ( addToStart ) {
-		document.getElementById( listId ).prepend( todoItemElement );
+	if ( event.detail.addToStart ) {
+		document
+			.getElementById( event.detail.listId )
+			.prepend( todoItemElement );
 	} else {
-		document.getElementById( listId ).appendChild( todoItemElement );
+		document
+			.getElementById( event.detail.listId )
+			.appendChild( todoItemElement );
 	}
 } );
 
 prplDocumentReady( () => {
-	// Inject the existing todo list items into the DOM
-	progressPlannerTodo.tasks.forEach( ( todoItem, index, array ) => {
-		document.dispatchEvent(
-			new CustomEvent( 'prpl/todo/injectItem', {
-				detail: {
-					item: todoItem,
-					addToStart: 1 === todoItem.points, // Add golden task to the start of the list.
-					listId:
-						todoItem.status === 'completed'
-							? 'todo-list-completed'
-							: 'todo-list',
+	document.dispatchEvent(
+		new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
+			detail: {
+				category: 'user',
+				status: 'publish',
+				injectTrigger: 'prpl/todo/injectItem',
+				injectTriggerArgsCallback: ( todoItem ) => {
+					return {
+						item: todoItem,
+						addToStart: 1 === todoItem?.meta?.prpl_points, // Add golden task to the start of the list.
+						listId:
+							todoItem.status === 'completed'
+								? 'todo-list-completed'
+								: 'todo-list',
+					};
 				},
-			} )
-		);
-
-		// If this is the last item in the array, resize the grid items.
-		if ( index === array.length - 1 ) {
-			window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-		}
-	} );
+				afterInject: () => {
+					document
+						.querySelector( '#prpl-todo-list-loading' )
+						.remove();
+					// Resize the grid items.
+					window.dispatchEvent(
+						new CustomEvent( 'prpl/grid/resize' )
+					);
+				},
+			},
+		} )
+	);
 
 	// When the '#create-todo-item' form is submitted,
 	// add a new todo item to the list
@@ -91,31 +96,41 @@ prplDocumentReady( () => {
 		.getElementById( 'create-todo-item' )
 		.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
-			const newTask = {
-				description: '',
-				parent: 0,
-				points: 0,
-				priority: 'medium',
-				task_id: 'user-task-' + prplGetRandomUUID(),
-				title: document.getElementById( 'new-todo-content' ).value,
-				provider_id: 'user',
-				category: 'user',
-				url: '',
-				dismissable: true,
-				snoozable: false,
-				order: prplGetHighestTodoItemOrder() + 1,
-			};
 
-			// Save the new task.
-			wp.ajax
-				.post( 'progress_planner_save_user_suggested_task', {
-					task: newTask,
-					nonce: progressPlannerTodo.nonce,
-				} )
-				.then( ( response ) => {
-					if ( 'undefined' !== typeof response.points ) {
-						newTask.points = response.points;
+			wp.api.loadPromise.done( () => {
+				// Create a new post
+				const post = new wp.api.models.Prpl_recommendations( {
+					// Set the post title.
+					title: document.getElementById( 'new-todo-content' ).value,
+					status: 'publish',
+					// Set the `prpl_recommendations_category` term.
+					prpl_recommendations_category:
+						window.progressPlannerSuggestedTasksTerms
+							.prpl_recommendations_category.user.id,
+					// Set the `prpl_recommendations_provider` term.
+					prpl_recommendations_provider:
+						window.progressPlannerSuggestedTasksTerms
+							.prpl_recommendations_provider.user.id,
+					menu_order: prplGetHighestTodoItemOrder() + 1,
+				} );
+				post.save().then( ( response ) => {
+					if ( ! response.id ) {
+						return;
 					}
+					const newTask = {
+						...response,
+						meta: {
+							...response.meta,
+							prpl_points: 0,
+							prpl_snoozable: false,
+							prpl_dismissable: true,
+							prpl_url: '',
+							prpl_url_target: '_self',
+						},
+						provider: 'user',
+						category: 'user',
+						order: prplGetHighestTodoItemOrder() + 1,
+					};
 
 					// Inject the new task into the DOM.
 					document.dispatchEvent(
@@ -128,14 +143,12 @@ prplDocumentReady( () => {
 						} )
 					);
 
-					// Add the new task to the tasks array.
-					progressPlannerTodo.tasks.push( newTask );
-
 					// Resize the grid items.
 					window.dispatchEvent(
 						new CustomEvent( 'prpl/grid/resize' )
 					);
 				} );
+			} );
 
 			// Clear the new task input element.
 			document.getElementById( 'new-todo-content' ).value = '';
@@ -146,41 +159,55 @@ prplDocumentReady( () => {
 } );
 
 // When the 'prpl/suggestedTask/move' event is triggered,
-// update the order of the todo items.
+// update the menu_order of the todo items.
 document.addEventListener( 'prpl/suggestedTask/move', () => {
 	const todoItemsIDs = [];
 	// Get all the todo items.
 	const todoItems = document.querySelectorAll(
 		'#todo-list .prpl-suggested-task'
 	);
-	let order = 0;
+	let menuOrder = 0;
 	todoItems.forEach( ( todoItem ) => {
-		todoItemsIDs.push( todoItem.getAttribute( 'data-task-id' ) );
-		todoItem.setAttribute( 'data-task-order', order );
-		progressPlannerTodo.tasks.find(
-			( item ) => item.task_id === todoItem.getAttribute( 'data-task-id' )
-		).order = order;
-		order++;
-	} );
-	wp.ajax.post( 'progress_planner_save_suggested_user_tasks_order', {
-		tasks: todoItemsIDs.toString(),
-		nonce: progressPlannerTodo.nonce,
+		const itemID = parseInt( todoItem.getAttribute( 'data-post-id' ) );
+		todoItemsIDs.push( itemID );
+		todoItem.setAttribute( 'data-task-order', menuOrder );
+		window.progressPlannerTodo.tasks.find(
+			( item ) => item.id === itemID
+		).menu_order = menuOrder;
+
+		document
+			.querySelector(
+				`#todo-list .prpl-suggested-task[data-post-id="${ itemID }"]`
+			)
+			.setAttribute( 'data-task-order', menuOrder );
+
+		wp.api.loadPromise.done( () => {
+			// Update an existing post.
+			const post = new wp.api.models.Prpl_recommendations( {
+				id: itemID,
+				menu_order: menuOrder,
+			} );
+			post.save();
+		} );
+		menuOrder++;
 	} );
 } );
 
 // When the 'prpl/suggestedTask/update' event is triggered,
 // update the task title in the tasks array.
 document.addEventListener( 'prpl/suggestedTask/update', ( event ) => {
-	const task = progressPlannerTodo.tasks.find(
+	const task = window.progressPlannerTodo.tasks.find(
 		( item ) =>
-			item.task_id ===
+			item?.meta?.prpl_task_id ===
 			event.detail.node
 				.querySelector( 'li' )
 				.getAttribute( 'data-task-id' )
 	);
 
 	if ( task ) {
-		task.title = event.detail.node.querySelector( 'h3 span' ).textContent;
+		task.title = {
+			rendered: event.detail.node.querySelector( 'h3 span' ).textContent,
+		};
 	}
 } );
 
@@ -193,10 +220,13 @@ document.addEventListener( 'prpl/suggestedTask/maybeInjectItem', ( event ) => {
 	}
 
 	setTimeout( () => {
-		progressPlannerTodo.tasks.forEach( ( todoItem, index ) => {
-			if ( todoItem.task_id === event.detail.task_id ) {
+		window.progressPlannerTodo.tasks.forEach( ( todoItem, index ) => {
+			if (
+				todoItem?.meta?.prpl_task_id ===
+				event.detail?.meta?.prpl_task_id
+			) {
 				// Change the status.
-				progressPlannerTodo.tasks[ index ].status =
+				window.progressPlannerTodo.tasks[ index ].status =
 					'complete' === event.detail.actionType
 						? 'completed'
 						: 'pending';
@@ -218,7 +248,7 @@ document.addEventListener( 'prpl/suggestedTask/maybeInjectItem', ( event ) => {
 				// Remove item from completed-todos list if necessary.
 				if ( 'pending' === event.detail.actionType ) {
 					const el = document.querySelector(
-						`#todo-list-completed .prpl-suggested-task[data-task-id="${ todoItem.task_id }"]`
+						`#todo-list-completed .prpl-suggested-task[data-task-id="${ todoItem?.meta?.prpl_task_id }"]`
 					);
 					if ( el ) {
 						el.parentNode.remove();

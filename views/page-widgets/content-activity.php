@@ -32,7 +32,6 @@ $prpl_activities_count   = [
 ];
 
 foreach ( array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
-
 	// Default count.
 	$prpl_activities_count[ $prpl_activity_type ] = 0;
 
@@ -47,7 +46,6 @@ foreach ( array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
 	);
 
 	if ( $prpl_activities ) {
-
 		if ( 'delete' !== $prpl_activity_type ) {
 			// Filter the activities to only include the tracked post types.
 			$prpl_activities = array_filter(

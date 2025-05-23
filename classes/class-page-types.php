@@ -257,7 +257,6 @@ class Page_Types {
 	public function get_default_page_type( $post_type, $post_id ) {
 		// Post-type checks.
 		switch ( $post_type ) {
-
 			// Products from WooCommerce & EDD.
 			case 'product':
 			case 'download':
@@ -291,7 +290,6 @@ class Page_Types {
 	 * @return int
 	 */
 	public function get_default_page_id_by_type( $page_type ) {
-
 		$homepage_id = \get_option( 'page_on_front' ) ?? 0;
 
 		// Early return for the homepage.
@@ -326,7 +324,6 @@ class Page_Types {
 
 		// Exclude the homepage and any pages that are already assigned to another page-type.
 		foreach ( $defined_page_types as $defined_page_type ) {
-
 			// Skip the current page-type.
 			if ( $page_type === $defined_page_type ) {
 				continue;

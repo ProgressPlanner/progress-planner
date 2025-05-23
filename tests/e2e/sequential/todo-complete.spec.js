@@ -111,6 +111,9 @@ function todoCompleteTests( testContext = test ) {
 				`${ SELECTORS.TODO_LIST_COMPLETED } ${ taskSelector }`
 			);
 			await expect( completedTask ).toBeVisible();
+			await expect( completedTask.locator( 'h3 > span' ) ).toHaveText(
+				TEST_TASK_TEXT
+			);
 			await expect(
 				completedTask.locator( SELECTORS.RR_ITEM_TEXT )
 			).toHaveText( TEST_TASK_TEXT );
@@ -162,6 +165,9 @@ function todoCompleteTests( testContext = test ) {
 					`${ SELECTORS.TODO_LIST_COMPLETED } ${ taskSelector }`
 				);
 				await expect( completedTask ).toBeVisible();
+				await expect( completedTask.locator( 'h3 > span' ) ).toHaveText(
+					TEST_TASK_TEXT
+				);
 				await expect(
 					completedTask.locator( SELECTORS.RR_ITEM_TEXT )
 				).toHaveText( TEST_TASK_TEXT );

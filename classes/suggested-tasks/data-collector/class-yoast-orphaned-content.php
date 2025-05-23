@@ -104,10 +104,10 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 			SELECT p.ID AS post_id, p.post_title AS post_title
 			FROM {$wpdb->posts} p
 			LEFT JOIN (
-				SELECT DISTINCT target_post_id
-				FROM {$wpdb->prefix}yoast_seo_links
-				WHERE type = 'internal'
-				AND target_post_id IS NOT NULL
+				SELECT DISTINCT l.target_post_id
+				FROM {$wpdb->prefix}yoast_seo_links l
+				WHERE l.type = 'internal'
+				AND l.target_post_id IS NOT NULL
 			) l ON p.ID = l.target_post_id
 			WHERE {$where_clause}
 			AND l.target_post_id IS NULL

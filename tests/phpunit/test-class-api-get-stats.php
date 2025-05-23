@@ -46,7 +46,6 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public static function setUpBeforeClass(): void {
-
 		self::set_lessons_cache();
 
 		\progress_planner()->get_page_types()->create_taxonomy();
@@ -123,7 +122,6 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 	 * @return void.
 	 */
 	public function testEndpoint() {
-
 		$request  = new WP_REST_Request( 'GET', '/progress-planner/v1/get-stats/' . $this->token );
 		$response = $this->server->dispatch( $request );
 

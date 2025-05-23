@@ -39,7 +39,6 @@ $prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] :
 		$prpl_scroll_to_row          = 1;
 		$prpl_current_month_badge_id = Monthly::get_badge_id_from_date( new \DateTime() );
 		if ( 'popover' !== $prpl_location ) {
-
 			$prpl_total_rows = (int) ceil( $prpl_badges_count / $prpl_badges_per_row );
 
 			// We need to know current month badge position.
