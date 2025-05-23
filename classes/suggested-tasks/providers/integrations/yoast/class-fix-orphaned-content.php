@@ -283,7 +283,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 
 		$task = $tasks[0];
 
-		return isset( $task->post_id ) && $task->post_id ? \get_post( $task->post_id ) : null;
+		return $task->target_post_id ? \get_post( $task->target_post_id ) : null;
 	}
 
 	/**

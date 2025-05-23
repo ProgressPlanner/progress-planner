@@ -99,7 +99,7 @@ class Update_Term_Description extends Tasks {
 		}
 
 		foreach ( $pending_tasks as $task ) {
-			if ( $task->term_id && $task->taxonomy && (int) $task->term_id === (int) $deleted_term->term_id ) {
+			if ( $task->target_term_id && $task->target_taxonomy && (int) $task->target_term_id === (int) $deleted_term->term_id ) {
 				\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 			}
 		}
@@ -323,11 +323,11 @@ class Update_Term_Description extends Tasks {
 
 		$task = $tasks[0];
 
-		if ( ! isset( $task->term_id ) || ! $task->term_id || ! isset( $task->taxonomy ) || ! $task->taxonomy ) {
+		if ( ! $task->target_term_id || ! $task->target_taxonomy ) {
 			return null;
 		}
 
-		$term = \get_term( $task->term_id, $task->taxonomy );
+		$term = \get_term( $task->target_term_id, $task->target_taxonomy );
 		return $term && ! \is_wp_error( $term ) ? $term : null;
 	}
 
@@ -347,7 +347,7 @@ class Update_Term_Description extends Tasks {
 		if ( ! empty( $tasks ) ) {
 			foreach ( $tasks as $task ) {
 				if ( 'trash' === $task->post_status ) {
-					$this->completed_term_ids[] = $task->term_id;
+					$this->completed_term_ids[] = $task->target_term_id;
 				}
 			}
 		}

@@ -26,6 +26,9 @@ namespace Progress_Planner\Suggested_Tasks;
  * @property string $description The task description
  * @property array $data The task data array
  * @property int|null $target_post_id The target post ID for the task
+ * @property int|null $target_term_id The target term ID for the task
+ * @property string|null $target_taxonomy The target taxonomy for the task
+ * @property string|null $target_term_name The target term name for the task
  */
 class Task {
 	/**

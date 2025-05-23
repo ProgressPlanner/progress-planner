@@ -117,8 +117,8 @@ class Remove_Terms_Without_Posts extends Tasks {
 			 *
 			 * @var \Progress_Planner\Suggested_Tasks\Task $task
 			 */
-			if ( isset( $task->term_id ) && isset( $task->taxonomy ) ) {
-				$term = \get_term( $task->term_id, $task->taxonomy );
+			if ( $task->target_term_id && $task->target_taxonomy ) {
+				$term = \get_term( $task->target_term_id, $task->target_taxonomy );
 
 				if ( \is_wp_error( $term ) || ! $term || $term->count > self::MIN_POSTS ) {
 					\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
@@ -344,11 +344,11 @@ class Remove_Terms_Without_Posts extends Tasks {
 
 		$task = $tasks[0];
 
-		if ( ! isset( $task->term_id ) || ! $task->term_id || ! isset( $task->taxonomy ) || ! $task->taxonomy ) {
+		if ( ! $task->target_term_id || ! $task->target_taxonomy ) {
 			return null;
 		}
 
-		$term = \get_term( $task->term_id, $task->taxonomy );
+		$term = \get_term( $task->target_term_id, $task->target_taxonomy );
 		return $term && ! \is_wp_error( $term ) ? $term : null;
 	}
 
@@ -368,7 +368,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 		if ( ! empty( $tasks ) ) {
 			foreach ( $tasks as $task ) {
 				if ( 'trash' === $task->post_status ) {
-					$this->completed_term_ids[] = $task->term_id;
+					$this->completed_term_ids[] = $task->target_term_id;
 				}
 			}
 		}
