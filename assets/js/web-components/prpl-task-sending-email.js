@@ -22,7 +22,10 @@ customElements.define(
 		 * Show the results.
 		 */
 		showResults() {
-			const actions = this.querySelector( '#prpl-sending-email-actions' );
+			const nextButton = this.querySelector(
+				'#prpl-sending-email-result .prpl-steps-nav-wrapper .prpl-button'
+			);
+			const form = this.querySelector( '#prpl-sending-email-form' );
 			const results = this.querySelector( '#prpl-sending-email-result' );
 
 			// Make AJAX GET request.
@@ -30,13 +33,26 @@ customElements.define(
 				.then( ( response ) => response.json() )
 				// eslint-disable-next-line no-unused-vars
 				.then( ( data ) => {
-					actions.style.display = 'none';
+					form.style.display = 'none';
 					results.style.display = 'block';
 				} )
 				.catch( ( error ) => {
 					console.error( 'Error testing email:', error ); // eslint-disable-line no-console
 					this.showTroubleshooting();
 				} );
+
+			// Add event listener to radio buttons.
+			this.querySelectorAll(
+				'input[name="prpl-sending-email-result"]'
+			).forEach( ( input ) => {
+				input.addEventListener( 'change', ( event ) => {
+					console.log( event.target.getAttribute( 'data-action' ) );
+					nextButton.setAttribute(
+						'data-action',
+						event.target.getAttribute( 'data-action' )
+					);
+				} );
+			} );
 		}
 
 		/**
@@ -55,15 +71,22 @@ customElements.define(
 		 * Reset the popover.
 		 */
 		resetPopover() {
-			const actions = this.querySelector( '#prpl-sending-email-actions' );
+			const form = this.querySelector( '#prpl-sending-email-form' );
 			const results = this.querySelector( '#prpl-sending-email-result' );
 			const troubleshooting = this.querySelector(
 				'#prpl-sending-email-troubleshooting'
 			);
 
-			actions.style.display = 'block';
+			form.style.display = 'block';
 			results.style.display = 'none';
 			troubleshooting.style.display = 'none';
+
+			// Reset radio buttons.
+			this.querySelectorAll(
+				'input[name="prpl-sending-email-result"]'
+			).forEach( ( input ) => {
+				input.checked = false;
+			} );
 		}
 	}
 );

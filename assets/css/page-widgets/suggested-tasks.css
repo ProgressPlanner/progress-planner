@@ -266,10 +266,99 @@
 	}
 }
 
-
 #prpl-popover-monthly-badges-trigger {
 	font-size: var(--prpl-font-size-base);
 	color: var(--prpl-color-link);
 	text-decoration: underline;
 	margin-top: 0.75rem;
+}
+
+/*------------------------------------*\
+	Interactive tasks, popover.
+\*------------------------------------*/
+.prpl-popover.prpl-popover-interactive {
+	padding: 1.5rem;
+
+	.prpl-columns-wrapper {
+		gap: 40px;
+
+		position: relative;
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 0;
+			left: 50%;
+			width: 1px;
+			height: 100%;
+			background-color: var(--prpl-color-gray-2);
+		}
+	}
+
+	.prpl-column {
+
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6 {
+
+			&:first-child {
+				margin-top: 0;
+			}
+		}
+
+		p {
+			margin-bottom: 1rem;
+
+			&:first-child {
+				margin-top: 0;
+			}
+
+			&:last-child {
+				margin-bottom: 0;
+			}
+		}
+
+		&.prpl-column-content {
+			padding: 20px;
+			border-radius: var(--prpl-border-radius-big);
+			background-color: var(--prpl-background-purple);
+		}
+
+		input[type="text"],
+		input[type="email"],
+		input[type="number"],
+		input[type="url"],
+		input[type="tel"],
+		input[type="search"] {
+			height: 44px;
+			padding: 1rem; /* WIP */
+			width: 100%;
+			min-width: 300px; /* WIP */
+			border-radius: var(--prpl-border-radius);
+			box-shadow: none;
+		}
+
+		.prpl-button {
+			padding: 0.5rem 1rem;
+			border: none;
+			border-radius: var(--prpl-border-radius);
+			background-color: var(--prpl-color-400-orange);
+			color: var(--prpl-color-text);
+
+			&:hover {
+
+				/* background-color: var(--prpl-color-500-orange); */
+			}
+		}
+
+		.prpl-steps-nav-wrapper {
+			margin-top: 1rem;
+			display: flex;
+			justify-content: flex-end;
+			gap: 1rem;
+		}
+	}
 }

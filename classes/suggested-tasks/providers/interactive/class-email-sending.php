@@ -110,21 +110,52 @@ class Email_Sending extends Interactive {
 			provider-id="<?php echo \esc_attr( $this->get_provider_id() ); ?>"
 		>
 			<div class="prpl-columns-wrapper prpl-columns-1-2">
-				<div class="prpl-column">
+				<div class="prpl-column  prpl-column-content">
 					<h2><?php \esc_html_e( 'Test email sending', 'progress-planner' ); ?></h2>
 					<p><?php \esc_html_e( 'Are you ready to test that email from your site works?', 'progress-planner' ); ?></p>
 				</div>
 				<div class="prpl-column">
-					<div id="prpl-sending-email-actions">
-						<button class="prpl-button" data-action="showResults"><?php \esc_html_e( 'Yes', 'progress-planner' ); ?></button>
-						<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'No', 'progress-planner' ); ?></button>
+					<div id="prpl-sending-email-form">
+					<p><?php \esc_html_e( 'What is your contact e-mail address?', 'progress-planner' ); ?></p>
+					<input type="email" id="prpl-sending-email-address" placeholder="<?php \esc_html_e( 'Enter your e-mail address', 'progress-planner' ); ?>" value="<?php echo \esc_attr( \wp_get_current_user()->user_email ); ?>" />
+
+					<div class="prpl-steps-nav-wrapper">
+							<button class="prpl-button" data-action="showResults">
+							<?php
+								/* translators: %s is an arrow icon. */
+								printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
+							?>
+							</button>
+					</div>
 					</div>
 					<div id="prpl-sending-email-result" style="display: none;">
 						<p><?php \esc_html_e( 'Was it successful?', 'progress-planner' ); ?></p>
 						<p>
-							<button class="prpl-button" data-action="completeTask"><?php \esc_html_e( 'Yes', 'progress-planner' ); ?></button>
-							<button class="prpl-button" data-action="showTroubleshooting"><?php \esc_html_e( 'No', 'progress-planner' ); ?></button>
+							<input
+							type="radio"
+							id="prpl-sending-email-result-yes"
+							name="prpl-sending-email-result"
+							data-action="completeTask"
+							>
+							<label for="prpl-sending-email-result-yes"><?php \esc_html_e( 'Yes', 'progress-planner' ); ?></label>
 						</p>
+						<p>
+							<input
+							type="radio"
+							id="prpl-sending-email-result-no"
+							name="prpl-sending-email-result"
+							data-action="showTroubleshooting"
+							>
+							<label for="prpl-sending-email-result-no"><?php \esc_html_e( 'No', 'progress-planner' ); ?></label>
+						</p>
+						<div class="prpl-steps-nav-wrapper">
+							<button class="prpl-button" data-action="">
+							<?php
+								/* translators: %s is an arrow icon. */
+								printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
+							?>
+							</button>
+					</div>
 					</div>
 					<div id="prpl-sending-email-troubleshooting" style="display: none;">
 						<h2><?php \esc_html_e( 'Email Troubleshooting', 'progress-planner' ); ?></h2>
@@ -138,12 +169,12 @@ class Email_Sending extends Interactive {
 						<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></button>
 					</div>
 				</div>
-
-				<button class="prpl-popover-close" data-action="closePopover">
-					<span class="dashicons dashicons-no-alt"></span>
-					<span class="screen-reader-text"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></span>
-				</button>
 			</div>
+
+			<button class="prpl-popover-close" data-action="closePopover">
+				<span class="dashicons dashicons-no-alt"></span>
+				<span class="screen-reader-text"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></span>
+			</button>
 		</prpl-email-test-popup>
 		<?php
 	}
