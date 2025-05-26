@@ -685,7 +685,7 @@ window.initPrplSuggestedTaskComponent = function () {
 				}
 
 				const data = {
-					id: post_id,
+					post_id,
 					nonce: prplSuggestedTask.nonce,
 					action_type: actionType,
 				};
