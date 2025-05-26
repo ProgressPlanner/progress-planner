@@ -21,8 +21,8 @@ class Todo {
 		// Wait for the CPT to be registered.
 		add_action( 'init', [ $this, 'maybe_change_first_item_points_on_monday' ] );
 
-		// Handle the creation of the first user task.
-		\add_action( 'rest_after_insert_prpl_recommendations', [ $this, 'handle_first_user_task' ], 10, 3 );
+		// Handle user tasks creation.
+		\add_action( 'rest_after_insert_prpl_recommendations', [ $this, 'handle_creating_user_task' ], 10, 3 );
 	}
 
 	/**
@@ -130,13 +130,16 @@ class Todo {
 	 *
 	 * @return void
 	 */
-	public function handle_first_user_task( $post, $request, $creating ) {
+	public function handle_creating_user_task( $post, $request, $creating ) {
 
 		if ( ! $creating || ! has_term( 'user', 'prpl_recommendations_provider', $post->ID ) ) {
 			return;
 		}
 
-		// Fetch users tasks.
+		// Add task_id to the post.
+		\update_post_meta( $post->ID, 'prpl_task_id', 'user-' . $post->ID );
+
+		// If it is first task ever created, it should be golden.
 		$pending_items = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
 			[
 				'provider_id' => 'user',
