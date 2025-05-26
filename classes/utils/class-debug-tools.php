@@ -479,6 +479,16 @@ class Debug_Tools {
 			);
 		}
 
+		// Plugin activation date.
+		$progress_planner_settings = \get_option( \Progress_Planner\Settings::OPTION_NAME, [] );
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-plugin-activation-date',
+				'parent' => 'prpl-more-info',
+				'title'  => 'Plugin Activation Date: ' . ( isset( $progress_planner_settings['activation_date'] ) ? $progress_planner_settings['activation_date'] : 'Unknown' ),
+			]
+		);
+
 		// Free license info.
 		$prpl_free_license_key = \get_option( 'progress_planner_license_key', false );
 		$admin_bar->add_node(
