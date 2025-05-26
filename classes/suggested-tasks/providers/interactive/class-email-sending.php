@@ -130,24 +130,30 @@ class Email_Sending extends Interactive {
 					</div>
 					<div id="prpl-sending-email-result" style="display: none;">
 						<p><?php \esc_html_e( 'Was it successful?', 'progress-planner' ); ?></p>
-						<p>
-							<input
-							type="radio"
-							id="prpl-sending-email-result-yes"
-							name="prpl-sending-email-result"
-							data-action="completeTask"
-							>
-							<label for="prpl-sending-email-result-yes"><?php \esc_html_e( 'Yes', 'progress-planner' ); ?></label>
-						</p>
-						<p>
-							<input
-							type="radio"
-							id="prpl-sending-email-result-no"
-							name="prpl-sending-email-result"
-							data-action="showTroubleshooting"
-							>
-							<label for="prpl-sending-email-result-no"><?php \esc_html_e( 'No', 'progress-planner' ); ?></label>
-						</p>
+						<div class="radios">
+							<div class="prpl-radio-wrapper">
+								<label for="prpl-sending-email-result-yes">
+									<input
+									type="radio"
+									id="prpl-sending-email-result-yes"
+									name="prpl-sending-email-result"
+									data-action="completeTask"
+									>
+									<?php \esc_html_e( 'Yes', 'progress-planner' ); ?>
+								</label>
+							</div>
+							<div class="prpl-radio-wrapper">
+								<label for="prpl-sending-email-result-no">
+								<input
+								type="radio"
+								id="prpl-sending-email-result-no"
+								name="prpl-sending-email-result"
+								data-action="showTroubleshooting"
+								>
+								<?php \esc_html_e( 'No', 'progress-planner' ); ?>
+							</label>
+							</div>
+						</div>
 						<div class="prpl-steps-nav-wrapper">
 							<button class="prpl-button" data-action="">
 							<?php
