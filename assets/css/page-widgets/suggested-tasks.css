@@ -346,7 +346,7 @@
 			border: none;
 			border-radius: var(--prpl-border-radius);
 			background-color: var(--prpl-color-400-orange);
-			color: var(--prpl-color-text);
+			color: var(--prpl-color-gray-6);
 
 			&:hover {
 
