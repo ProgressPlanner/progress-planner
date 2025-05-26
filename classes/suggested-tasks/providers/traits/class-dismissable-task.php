@@ -43,18 +43,18 @@ trait Dismissable_Task {
 	/**
 	 * Handle task dismissal by storing the task data and dismissal date.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param string $post_id The post ID.
 	 *
 	 * @return void
 	 */
-	public function handle_task_dismissal( $task_id ) {
+	public function handle_task_dismissal( $post_id ) {
 		// If no task ID is provided, return.
-		if ( ! $task_id ) {
+		if ( ! $post_id ) {
 			return;
 		}
 
 		// Get the task data.
-		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $post_id );
 
 		// If no task data is found, return.
 		if ( ! $task ) {
@@ -117,12 +117,12 @@ trait Dismissable_Task {
 	protected function get_task_identifier( $task_data ) {
 		$task_identifier = $this->get_provider_id();
 
-		if ( isset( $task_data['post_id'] ) ) {
-			$task_identifier .= '-' . $task_data['post_id'];
+		if ( isset( $task_data['target_post_id'] ) ) {
+			$task_identifier .= '-' . $task_data['target_post_id'];
 		}
 
-		if ( isset( $task_data['term_id'] ) ) {
-			$task_identifier .= '-' . $task_data['term_id'];
+		if ( isset( $task_data['target_term_id'] ) ) {
+			$task_identifier .= '-' . $task_data['target_term_id'];
 		}
 
 		return $task_identifier;
@@ -232,8 +232,8 @@ trait Dismissable_Task {
 	 * @return array
 	 */
 	public function add_post_id_to_dismissal_data( $dismissal_data, $task_data, $provider_id ) {
-		if ( $this->get_provider_id() === $provider_id && isset( $task_data['post_id'] ) ) {
-			$dismissal_data['post_id'] = $task_data['post_id'];
+		if ( $this->get_provider_id() === $provider_id && isset( $task_data['target_post_id'] ) ) {
+			$dismissal_data['post_id'] = $task_data['target_post_id'];
 		}
 		return $dismissal_data;
 	}
@@ -248,8 +248,8 @@ trait Dismissable_Task {
 	 * @return array
 	 */
 	public function add_term_id_to_dismissal_data( $dismissal_data, $task_data, $provider_id ) {
-		if ( $this->get_provider_id() === $provider_id && isset( $task_data['term_id'] ) ) {
-			$dismissal_data['term_id'] = $task_data['term_id'];
+		if ( $this->get_provider_id() === $provider_id && isset( $task_data['target_term_id'] ) ) {
+			$dismissal_data['term_id'] = $task_data['target_term_id'];
 		}
 		return $dismissal_data;
 	}

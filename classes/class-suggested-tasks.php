@@ -204,13 +204,13 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
 
-		if ( ! isset( $_POST['task_id'] ) || ! isset( $_POST['action_type'] ) ) {
+		if ( ! isset( $_POST['post_id'] ) || ! isset( $_POST['action_type'] ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing data.', 'progress-planner' ) ] );
 		}
 
 		$action  = \sanitize_text_field( \wp_unslash( $_POST['action_type'] ) );
-		$task_id = (string) \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) );
-		$task    = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
+		$post_id = (string) \sanitize_text_field( \wp_unslash( $_POST['post_id'] ) );
+		$task    = \progress_planner()->get_suggested_tasks_db()->get_post( $post_id );
 
 		if ( ! $task ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
@@ -235,10 +235,10 @@ class Suggested_Tasks {
 		/**
 		 * Allow other classes to react to the completion of a suggested task.
 		 *
-		 * @param string $task_id The task ID.
+		 * @param string $post_id The post ID.
 		 * @param bool   $updated Whether the action was successful.
 		 */
-		\do_action( "progress_planner_ajax_task_{$action}", $task_id, $updated );
+		\do_action( "progress_planner_ajax_task_{$action}", $post_id, $updated );
 
 		if ( ! $updated ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Not saved.', 'progress-planner' ) ] );
