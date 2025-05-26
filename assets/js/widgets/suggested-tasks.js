@@ -242,6 +242,8 @@ window.prplInitSuggestedTasks = () => {
 					} );
 					post.save();
 				} );
+
+				return data;
 			} )
 			.then( ( data ) => {
 				// Trigger the celebration event if there are pending celebration tasks.
