@@ -89,7 +89,7 @@ class Email_Sending extends Interactive {
 	 */
 	public function ajax_test_email_sending() {
 
-		$result = wp_mail( \wp_get_current_user()->user_email, 'Test Email', 'This is a test email.' );
+		$result = wp_mail( \wp_get_current_user()->user_email, 'Test Email', 'This is a test email. Complete the task by clicking the link: ' . \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) );
 
 		if ( $result ) {
 			wp_send_json_success( \esc_html__( 'Email sent successfully.', 'progress-planner' ) );
