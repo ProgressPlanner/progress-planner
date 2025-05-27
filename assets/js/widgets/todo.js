@@ -66,7 +66,7 @@ window.prplInitTodo = () => {
 	prplDocumentReady( () => {
 		prplDispatchAsyncEvent( 'prpl/suggestedTask/fetchCategoryItems', {
 			category: 'user',
-			status: 'publish',
+			status: [ 'publish', 'trash' ],
 		} )
 			.then( ( data ) => {
 				data.forEach( ( todoItem ) => {
@@ -76,7 +76,7 @@ window.prplInitTodo = () => {
 								item: todoItem,
 								addToStart: 1 === todoItem?.meta?.prpl_points, // Add golden task to the start of the list.
 								listId:
-									todoItem.status === 'completed'
+									'trash' === todoItem.status
 										? 'todo-list-completed'
 										: 'todo-list',
 							},

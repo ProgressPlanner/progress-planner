@@ -93,7 +93,10 @@ window.prplInitSuggestedTasks = () => {
 			postsCollection
 				.fetch( {
 					data: {
-						status: [ tasksStatus ],
+						status:
+							'string' === typeof tasksStatus
+								? tasksStatus.split( ',' )
+								: tasksStatus,
 						per_page: 'publish' === tasksStatus ? perPage : 100,
 						_embed: true,
 						exclude: excludeIds,
