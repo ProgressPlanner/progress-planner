@@ -297,6 +297,7 @@
 
 	.prpl-column {
 
+		/* Set margin for headings and paragraphs. */
 		h1,
 		h2,
 		h3,
@@ -321,12 +322,14 @@
 			}
 		}
 
+		/* Set padding and background color for content column (description text). */
 		&.prpl-column-content {
 			padding: 20px;
 			border-radius: var(--prpl-border-radius-big);
 			background-color: var(--prpl-background-purple);
 		}
 
+		/* Inputs. */
 		input[type="text"],
 		input[type="email"],
 		input[type="number"],
@@ -354,6 +357,12 @@
 			}
 		}
 
+		textarea {
+			width: 100%;
+			min-height: 100px;
+		}
+
+		/* Used for radio and checkbox inputs. */
 		.radios {
 			display: flex;
 			flex-direction: column;
@@ -363,8 +372,133 @@
 				display: flex;
 				align-items: center;
 			}
+
+			--prpl-input-green: #3bb3a6;
+			--prpl-input-gray: #8b99a6;
+
+			/* Hide the default input, because WP has it's own styles (which include pseudo-elements). */
+			.prpl-custom-checkbox input[type="checkbox"],
+			.prpl-custom-radio input[type="radio"] {
+				position: absolute;
+				opacity: 0;
+				width: 0;
+				height: 0;
+			}
+
+			/* Shared styles for the custom control */
+			.prpl-custom-control {
+				display: inline-block;
+				vertical-align: middle;
+				margin-right: 12px;
+				width: 20px;
+				height: 20px;
+				box-sizing: border-box;
+				position: relative;
+				transition: border-color 0.2s, background 0.2s;
+			}
+
+			/* Label text styling */
+			.prpl-custom-checkbox,
+			.prpl-custom-radio {
+				display: flex;
+				align-items: center;
+				margin-bottom: 0.5rem;
+				cursor: pointer;
+				user-select: none;
+			}
+
+			/* Checkbox styles */
+			.prpl-custom-checkbox {
+
+				.prpl-custom-control {
+					border: 1px solid var(--prpl-input-gray);
+					border-radius: 6px;
+					background: #fff;
+				}
+
+				input[type="checkbox"] {
+
+					/* Checkbox hover (off) */
+					&:hover + .prpl-custom-control {
+						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+					}
+
+					/* Checkbox checked (on) */
+					&:checked + .prpl-custom-control {
+						background: var(--prpl-input-green);
+						border-color: var(--prpl-input-green);
+						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+					}
+				}
+
+
+				/* Checkmark */
+				.prpl-custom-control::after {
+					content: "";
+					position: absolute;
+					left: 6px;
+					top: 2px;
+					width: 4px;
+					height: 9px;
+					border: solid #fff;
+					border-width: 0 2px 2px 0;
+					opacity: 0;
+					transform: scale(0.8) rotate(45deg);
+					transition: opacity 0.2s, transform 0.2s;
+				}
+
+				input[type="checkbox"]:checked + .prpl-custom-control::after {
+					opacity: 1;
+					transform: scale(1) rotate(45deg);
+				}
+			}
+
+			/* Radio styles */
+			.prpl-custom-radio {
+
+				.prpl-custom-control {
+					border: 1px solid var(--prpl-input-gray);
+					border-radius: 50%;
+					background: #fff;
+				}
+
+				/* Radio hover (off) */
+				input[type="radio"] {
+
+					&:hover + .prpl-custom-control {
+						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+					}
+
+					/* Radio checked (on) */
+					&:checked + .prpl-custom-control {
+						background: var(--prpl-input-green);
+						border-color: var(--prpl-input-green);
+						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+					}
+				}
+
+				/* Radio dot */
+				.prpl-custom-control::after {
+					content: "";
+					position: absolute;
+					top: 5px;
+					left: 5px;
+					width: 8px;
+					height: 8px;
+					background: #fff;
+					border-radius: 50%;
+					opacity: 0;
+					transition: opacity 0.2s;
+				}
+
+				input[type="radio"]:checked + .prpl-custom-control::after {
+					opacity: 1;
+					background: #fff;
+				}
+			}
 		}
 
+		/* Used for next step button. */
 		.prpl-steps-nav-wrapper {
 			margin-top: 1rem;
 			display: flex;

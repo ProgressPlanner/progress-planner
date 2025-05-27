@@ -132,28 +132,62 @@ class Email_Sending extends Interactive {
 						<p><?php \esc_html_e( 'Was it successful?', 'progress-planner' ); ?></p>
 						<div class="radios">
 							<div class="prpl-radio-wrapper">
-								<label for="prpl-sending-email-result-yes">
+								<label for="prpl-sending-email-result-yes" class="prpl-custom-radio">
 									<input
 									type="radio"
 									id="prpl-sending-email-result-yes"
 									name="prpl-sending-email-result"
 									data-action="completeTask"
 									>
+									<span class="prpl-custom-control"></span>
 									<?php \esc_html_e( 'Yes', 'progress-planner' ); ?>
 								</label>
 							</div>
 							<div class="prpl-radio-wrapper">
-								<label for="prpl-sending-email-result-no">
+								<label for="prpl-sending-email-result-no" class="prpl-custom-radio">
 								<input
 								type="radio"
 								id="prpl-sending-email-result-no"
 								name="prpl-sending-email-result"
 								data-action="showTroubleshooting"
 								>
+								<span class="prpl-custom-control"></span>
 								<?php \esc_html_e( 'No', 'progress-planner' ); ?>
 							</label>
 							</div>
 						</div>
+
+						<div class="radios">
+							<div class="prpl-radio-wrapper">
+								<label for="prpl-sending-email-result-yes-checkbox" class="prpl-custom-checkbox">
+									<input
+									type="checkbox"
+									id="prpl-sending-email-result-yes-checkbox"
+									name="prpl-sending-email-result-checkbox"
+									data-action="completeTask"
+									>
+									<span class="prpl-custom-control"></span>
+									<?php \esc_html_e( 'Yes', 'progress-planner' ); ?>
+								</label>
+							</div>
+							<div class="prpl-radio-wrapper">
+								<label for="prpl-sending-email-result-no-checkbox" class="prpl-custom-checkbox">
+								<input
+								type="checkbox"
+								id="prpl-sending-email-result-no-checkbox"
+								name="prpl-sending-email-result-checkbox"
+								data-action="showTroubleshooting"
+								>
+								<span class="prpl-custom-control"></span>
+								<?php \esc_html_e( 'No', 'progress-planner' ); ?>
+							</label>
+							</div>
+						</div>
+
+						<div>
+							<textarea id="prpl-sending-email-result-textarea" placeholder="<?php \esc_html_e( 'Enter your message', 'progress-planner' ); ?>" rows="4"></textarea>
+						</div>
+
 						<div class="prpl-steps-nav-wrapper">
 							<button class="prpl-button" data-action="">
 							<?php
