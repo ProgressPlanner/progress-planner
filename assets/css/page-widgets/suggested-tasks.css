@@ -345,11 +345,13 @@
 		}
 
 		.prpl-button {
-			padding: 0.5rem 1rem;
+			padding: 0.75rem 1.25rem;
 			border: none;
+			color: var(--prpl-color-gray-6);
+			font-weight: 600;
 			border-radius: var(--prpl-border-radius);
 			background-color: var(--prpl-color-400-orange);
-			color: var(--prpl-color-gray-6);
+			transition: all 0.25s ease-in-out;
 
 			&:hover {
 
