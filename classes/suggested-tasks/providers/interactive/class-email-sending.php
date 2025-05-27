@@ -117,6 +117,14 @@ class Email_Sending extends Interactive {
 				<div class="prpl-column">
 					<div id="prpl-sending-email-form">
 					<p><?php \esc_html_e( 'What is your contact e-mail address?', 'progress-planner' ); ?></p>
+					<div class="prpl-note">
+						<span class="prpl-note-icon">
+							<?php \progress_planner()->the_asset( 'images/icon_exclamation_triangle_solid.svg' ); ?>
+						</span>
+						<span class="prpl-note-text">
+							<?php \esc_html_e( 'It could take a couple of hours before you receive the email.', 'progress-planner' ); ?>
+						</span>
+					</div>
 					<input type="email" id="prpl-sending-email-address" placeholder="<?php \esc_html_e( 'Enter your e-mail address', 'progress-planner' ); ?>" value="<?php echo \esc_attr( \wp_get_current_user()->user_email ); ?>" />
 
 					<div class="prpl-steps-nav-wrapper">

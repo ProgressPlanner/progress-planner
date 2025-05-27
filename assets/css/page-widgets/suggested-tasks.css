@@ -329,6 +329,33 @@
 			background-color: var(--prpl-background-purple);
 		}
 
+		.prpl-note {
+			margin-bottom: 1rem;
+			display: flex;
+			align-items: flex-start;
+			gap: 0.5rem;
+			padding: 0.75rem;
+			color: #854d0e;
+			font-size: var(--prpl-font-size-small);
+			border-radius: 6px;
+			background-color: #fefce8;
+
+			.prpl-note-icon {
+				margin-top: 3px; /* Align with the text. */
+				display: flex;
+				flex-shrink: 0;
+				align-items: center;
+				justify-content: center;
+				width: 16px;
+				height: 16px;
+
+				svg {
+					width: 100%;
+					height: 100%;
+				}
+			}
+		}
+
 		/* Inputs. */
 		input[type="text"],
 		input[type="email"],
