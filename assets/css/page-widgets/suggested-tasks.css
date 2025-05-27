@@ -341,13 +341,12 @@
 			background-color: #fefce8;
 
 			.prpl-note-icon {
-				margin-top: 3px; /* Align with the text. */
 				display: flex;
 				flex-shrink: 0;
 				align-items: center;
 				justify-content: center;
-				width: 16px;
-				height: 16px;
+				width: 20px;
+				height: 20px;
 				color: #eab308;
 
 				svg {
