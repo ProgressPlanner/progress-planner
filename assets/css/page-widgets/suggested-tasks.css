@@ -340,8 +340,8 @@
 			padding: 1rem; /* WIP */
 			width: 100%;
 			min-width: 300px; /* WIP */
-			border-radius: var(--prpl-border-radius);
-			box-shadow: none;
+			border-radius: 6px;
+			border: 1px solid var(--prpl-color-gray-2);
 		}
 
 		.prpl-button {
@@ -360,6 +360,9 @@
 		textarea {
 			width: 100%;
 			min-height: 100px;
+			border-radius: 6px;
+			box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.05);
+			border: 1px solid var(--prpl-color-gray-2);
 		}
 
 		/* Used for radio and checkbox inputs. */
