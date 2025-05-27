@@ -64,7 +64,7 @@ window.prplInitTodo = () => {
 	} );
 
 	prplDocumentReady( () => {
-		prplDispatchAsyncEvent( 'prpl/suggestedTask/injectCategoryItems', {
+		prplDispatchAsyncEvent( 'prpl/suggestedTask/fetchCategoryItems', {
 			category: 'user',
 			status: 'publish',
 		} )

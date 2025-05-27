@@ -61,7 +61,7 @@ window.prplInitSuggestedTasks = () => {
 	 * Inject items from a category.
 	 */
 	document.addEventListener(
-		'prpl/suggestedTask/injectCategoryItems',
+		'prpl/suggestedTask/fetchCategoryItems',
 		async ( event ) => {
 			// window.pr)ogressPlannerSuggestedTasksTerms has been preloaded.
 			console.info(
@@ -80,8 +80,14 @@ window.prplInitSuggestedTasks = () => {
 					excludeIds.push( item.getAttribute( 'data-post-id' ) );
 				} );
 
+			// Number of tasks injected from the same category, happens when task is dismissed by the user.
+			const tasksInList = document.querySelectorAll(
+				`.prpl-suggested-task[data-task-category="${ tasksCategory }"]`
+			).length;
+
 			const maxCategoryItems =
-				prplSuggestedTasks.maxItemsPerCategory[ tasksCategory ];
+				prplSuggestedTasks.maxItemsPerCategory[ tasksCategory ] -
+				tasksInList;
 			const perPage = Math.max( Math.min( maxCategoryItems, 100 ), 1 );
 
 			postsCollection
@@ -127,6 +133,18 @@ window.prplInitSuggestedTasks = () => {
 			...event.detail,
 			allowReorder: false,
 		} );
+
+		// WIP: Another check to see if the task is already in the list.
+		if (
+			document.querySelector(
+				`.prpl-suggested-task[data-post-id="${ event.detail.id }"]`
+			)
+		) {
+			console.log(
+				'Task already in the list, data-post-id: ' + event.detail.id
+			);
+			return;
+		}
 
 		/**
 		 * @todo Implement the parent task functionality.
@@ -191,7 +209,7 @@ window.prplInitSuggestedTasks = () => {
 			}
 
 			// Inject published tasks from this category.
-			prplDispatchAsyncEvent( 'prpl/suggestedTask/injectCategoryItems', {
+			prplDispatchAsyncEvent( 'prpl/suggestedTask/fetchCategoryItems', {
 				category,
 				status: 'publish',
 			} )
@@ -211,7 +229,7 @@ window.prplInitSuggestedTasks = () => {
 		}
 
 		// Inject pending celebration tasks from all categories.
-		prplDispatchAsyncEvent( 'prpl/suggestedTask/injectCategoryItems', {
+		prplDispatchAsyncEvent( 'prpl/suggestedTask/fetchCategoryItems', {
 			category: Object.keys( prplSuggestedTasks.maxItemsPerCategory )
 				.filter( ( category ) => 'user' !== category )
 				.join( ',' ),
@@ -352,12 +370,24 @@ window.prplInitSuggestedTasks = () => {
 		( e ) => {
 			// TODO: Something seems off here, take a look at this.
 			const category = e.detail.category;
-			prplDispatchAsyncEvent( 'prpl/suggestedTask/injectCategoryItems', {
+			prplDispatchAsyncEvent( 'prpl/suggestedTask/fetchCategoryItems', {
 				category,
-			} ).then( () => {
-				prplSuggestedTasksToggleUIitems();
-				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-			} );
+			} )
+				.then( ( data ) => {
+					data.forEach( ( item ) => {
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/suggestedTask/injectItem', {
+								detail: item,
+							} )
+						);
+					} );
+				} )
+				.then( () => {
+					prplSuggestedTasksToggleUIitems();
+					window.dispatchEvent(
+						new CustomEvent( 'prpl/grid/resize' )
+					);
+				} );
 		},
 		false
 	);

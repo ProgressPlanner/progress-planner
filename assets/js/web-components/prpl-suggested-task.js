@@ -579,26 +579,9 @@ window.initPrplSuggestedTaskComponent = function () {
 									'prpl/removeCelebratedTasks': eventDetail,
 								};
 							} else {
+								// New task is injected in a different request.
 								celebrateEvents = {
 									'prpl/celebrateTasks': eventDetail,
-									'prpl/suggestedTask/maybeInjectItem': {
-										task_id:
-											this.querySelector(
-												'li'
-											).getAttribute( 'data-task-id' ),
-										providerID:
-											this.querySelector(
-												'li'
-											).getAttribute(
-												'data-task-provider'
-											),
-										category:
-											this.querySelector(
-												'li'
-											).getAttribute(
-												'data-task-category'
-											),
-									},
 								};
 							}
 
@@ -695,6 +678,8 @@ window.initPrplSuggestedTaskComponent = function () {
 					'progress_planner_suggested_task_action',
 					data
 				);
+
+				// TODO: New task should be injected of the action is "complete" or "snooze".
 				request.done( () => {
 					document.dispatchEvent(
 						new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
