@@ -507,6 +507,17 @@
 			display: flex;
 			justify-content: flex-end;
 			gap: 1rem;
+
+			.prpl-button {
+				cursor: pointer;
+
+				/* If the button has empty data-action attribute disable it. */
+				&[data-action=""] {
+					pointer-events: none;
+					opacity: 0.5;
+				}
+			}
+
 		}
 	}
 }
