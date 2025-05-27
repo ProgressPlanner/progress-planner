@@ -674,22 +674,14 @@ window.initPrplSuggestedTaskComponent = function () {
 				};
 
 				// Save the todo list to the database.
-				const request = wp.ajax.post(
-					'progress_planner_suggested_task_action',
-					data
-				);
+				// TODO: Check when this needs to be fired, it looks like when task is completed or user task is deleted or set back to pending.
+				wp.ajax.post( 'progress_planner_suggested_task_action', data );
 
-				// TODO: New task should be injected of the action is "complete" or "snooze".
-				request.done( () => {
+				// TODO: New RR task should be injected of the action is "complete" or "snooze".
+				if ( 'complete' === actionType || 'snooze' === actionType ) {
 					document.dispatchEvent(
 						new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
 							detail: {
-								task_id: document
-									.querySelector(
-										`.prpl-suggested-task[data-post-id="${ post_id }"]`
-									)
-									.getAttribute( 'data-task-id' ),
-								actionType,
 								category:
 									this.querySelector( 'li' ).getAttribute(
 										'data-task-category'
@@ -697,7 +689,7 @@ window.initPrplSuggestedTaskComponent = function () {
 							},
 						} )
 					);
-				} );
+				}
 			};
 		}
 	);
