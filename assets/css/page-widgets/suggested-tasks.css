@@ -277,7 +277,6 @@
 	Interactive tasks, popover.
 \*------------------------------------*/
 .prpl-popover.prpl-popover-interactive {
-	grid-template-columns: repeat(auto-fit, minmax(300px, 1fr) 1px);
 	padding: 1.5rem;
 
 	* {
