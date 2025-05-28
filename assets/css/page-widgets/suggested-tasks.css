@@ -278,6 +278,7 @@
 \*------------------------------------*/
 .prpl-popover.prpl-popover-interactive {
 	padding: 1.5rem;
+	box-sizing: border-box;
 
 	* {
 		max-width: calc(100% - 1px);
