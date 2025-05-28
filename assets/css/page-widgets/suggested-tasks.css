@@ -288,7 +288,10 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 40px;
-		overflow: hidden;
+
+		/* overflow: hidden; */
+
+		/* We need to allow overflow for .prpl-button hover effect. */
 
 		> * {
 			flex-grow: 1;
@@ -410,12 +413,35 @@
 			color: var(--prpl-color-gray-6);
 			font-weight: 600;
 			border-radius: var(--prpl-border-radius);
-			background-color: var(--prpl-color-400-orange);
+			background-color: var(--prpl-color-400-orange); /* WIP: pick exact color */
 			transition: all 0.25s ease-in-out;
+			position: relative;
 
-			&:hover {
+			&::after {
+				content: "";
+				display: block;
+				width: 100%;
+				height: 100%;
+				background: var(--prpl-color-400-orange); /* WIP: pick exact color */
+				position: absolute;
+				top: 0;
+				left: 0;
+				z-index: -1;
+				border-radius: 6px;
+				transition: all 0.25s ease-in-out;
+			}
 
-				/* background-color: var(--prpl-color-500-orange); */
+			&:hover,
+			&:focus {
+				background: var(--prpl-color-400-orange); /* WIP: pick exact color */
+
+				&::after {
+					background: var(--prpl-color-400-orange); /* WIP: pick exact color */
+					box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+					width: calc(100% + 4px);
+					height: calc(100% + 4px);
+					margin: -2px;
+				}
 			}
 		}
 
