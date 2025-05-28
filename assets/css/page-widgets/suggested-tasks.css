@@ -312,12 +312,14 @@
 					background-color: var(--prpl-color-gray-2);
 				}
 
-				&::after {
+				/* WIP: This adds vertical line above the column? */
+
+				/* &::after {
 					top: -20px;
 					left: 0;
 					width: 100%;
 					height: 1px;
-				}
+				} */
 			}
 		}
 	}
