@@ -110,9 +110,9 @@ class Email_Sending extends Interactive {
 			provider-id="<?php echo \esc_attr( $this->get_provider_id() ); ?>"
 		>
 			<div class="prpl-columns-wrapper-flex">
-				<div class="prpl-column  prpl-column-content">
-					<h2><?php \esc_html_e( 'Test email sending', 'progress-planner' ); ?></h2>
-					<p><?php \esc_html_e( 'Are you ready to test that email from your site works?', 'progress-planner' ); ?></p>
+				<div class="prpl-column prpl-column-content">
+					<h2 class="prpl-interactive-task-title"><?php \esc_html_e( 'Test email sending', 'progress-planner' ); ?></h2>
+					<p class="prpl-interactive-task-description"><?php \esc_html_e( 'Are you ready to test that email from your site works?', 'progress-planner' ); ?></p>
 				</div>
 				<div class="prpl-column">
 					<div id="prpl-sending-email-form">

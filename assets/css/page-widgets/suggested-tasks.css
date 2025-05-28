@@ -346,6 +346,15 @@
 			}
 		}
 
+		.prpl-interactive-task-title {
+			font-size: 18px;
+			line-height: 22px;
+
+			& + p {
+				margin-top: 4px;
+			}
+		}
+
 		/* Set padding and background color for content column (description text). */
 		&.prpl-column-content {
 			padding: 20px;
