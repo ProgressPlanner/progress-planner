@@ -214,7 +214,10 @@ class Email_Sending extends Interactive {
 							<li><?php \esc_html_e( 'Verify your email provider credentials', 'progress-planner' ); ?></li>
 							<li><?php \esc_html_e( 'Try sending from a different email address', 'progress-planner' ); ?></li>
 						</ul>
-						<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></button>
+
+						<div class="prpl-steps-nav-wrapper">
+							<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></button>
+						</div>
 					</div>
 				</div>
 			</div>
