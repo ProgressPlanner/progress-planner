@@ -44,6 +44,16 @@ customElements.define(
 			popover.style.position = 'fixed'; // This is the default popover position, but just in case.
 			popover.style.left = `${ rect.left }px`;
 			popover.style.top = `${ Math.round( Math.abs( rect.top ) ) }px`;
+
+			setTimeout( () => {
+				const popoverWidth = popover.offsetWidth;
+				const windowWidth = window.innerWidth;
+				if ( popoverWidth + rect.left - windowWidth > 20 ) {
+					popover.style.left = `${
+						( windowWidth - popoverWidth ) / 2
+					}px`;
+				}
+			}, 10 );
 		}
 
 		/**
