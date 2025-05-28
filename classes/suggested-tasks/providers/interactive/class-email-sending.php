@@ -109,7 +109,7 @@ class Email_Sending extends Interactive {
 			popover-id="<?php echo \esc_attr( 'prpl-popover-' . $this->popover_id ); ?>"
 			provider-id="<?php echo \esc_attr( $this->get_provider_id() ); ?>"
 		>
-			<div class="prpl-columns-wrapper prpl-columns-1-2">
+			<div class="prpl-columns-wrapper-flex">
 				<div class="prpl-column  prpl-column-content">
 					<h2><?php \esc_html_e( 'Test email sending', 'progress-planner' ); ?></h2>
 					<p><?php \esc_html_e( 'Are you ready to test that email from your site works?', 'progress-planner' ); ?></p>
