@@ -17,52 +17,6 @@ window.progressPlannerTodo = {
 };
 
 window.prplInitTodo = () => {
-	/**
-	 * Get the highest `order` value from the todo items.
-	 *
-	 * @return {number} The highest `order` value.
-	 */
-	const prplGetHighestTodoItemOrder = () => {
-		const todoItems = document.querySelectorAll(
-			'#todo-list .prpl-suggested-task'
-		);
-		let highestOrder = 0;
-		todoItems.forEach( ( todoItem ) => {
-			const order = parseInt(
-				todoItem.getAttribute( 'data-task-order' )
-			);
-			if ( order > highestOrder ) {
-				highestOrder = order;
-			}
-		} );
-		return highestOrder;
-	};
-
-	document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
-		const Item = customElements.get( 'prpl-suggested-task' );
-		const todoItemElement = new Item( {
-			...event.detail.item,
-			meta: {
-				...event.detail.item.meta,
-				prpl_snoozable: false,
-				prpl_dismissable: true,
-			},
-			deletable: true,
-			allowReorder: true,
-			content: { rendered: '' },
-		} );
-
-		if ( event.detail.addToStart ) {
-			document
-				.getElementById( event.detail.listId )
-				.prepend( todoItemElement );
-		} else {
-			document
-				.getElementById( event.detail.listId )
-				.appendChild( todoItemElement );
-		}
-	} );
-
 	prplDocumentReady( () => {
 		prplDispatchAsyncEvent( 'prpl/suggestedTask/fetchCategoryItems', {
 			category: 'user',
@@ -155,119 +109,154 @@ window.prplInitTodo = () => {
 				document.getElementById( 'new-todo-content' ).focus();
 			} );
 	} );
-
-	// When the 'prpl/suggestedTask/move' event is triggered,
-	// update the menu_order of the todo items.
-	document.addEventListener( 'prpl/suggestedTask/move', () => {
-		const todoItemsIDs = [];
-		// Get all the todo items.
-		const todoItems = document.querySelectorAll(
-			'#todo-list .prpl-suggested-task'
-		);
-		let menuOrder = 0;
-		todoItems.forEach( ( todoItem ) => {
-			const itemID = parseInt( todoItem.getAttribute( 'data-post-id' ) );
-			todoItemsIDs.push( itemID );
-			todoItem.setAttribute( 'data-task-order', menuOrder );
-			window.progressPlannerTodo.tasks.find(
-				( item ) => item.id === itemID
-			).menu_order = menuOrder;
-
-			document
-				.querySelector(
-					`#todo-list .prpl-suggested-task[data-post-id="${ itemID }"]`
-				)
-				.setAttribute( 'data-task-order', menuOrder );
-
-			// Update an existing post.
-			const post = new wp.api.models.Prpl_recommendations( {
-				id: itemID,
-				menu_order: menuOrder,
-			} );
-			post.save();
-
-			menuOrder++;
-		} );
-	} );
-
-	// When the 'prpl/suggestedTask/update' event is triggered,
-	// update the task title in the tasks array.
-	document.addEventListener( 'prpl/suggestedTask/update', ( event ) => {
-		const task = window.progressPlannerTodo.tasks.find(
-			( item ) =>
-				item?.meta?.prpl_task_id ===
-				event.detail.node
-					.querySelector( 'li' )
-					.getAttribute( 'data-task-id' )
-		);
-
-		if ( task ) {
-			task.title = {
-				rendered:
-					event.detail.node.querySelector( 'h3 span' ).textContent,
-			};
-		}
-	} );
-
-	document.addEventListener(
-		'prpl/suggestedTask/maybeInjectItem',
-		( event ) => {
-			if (
-				'complete' !== event.detail.actionType &&
-				'pending' !== event.detail.actionType
-			) {
-				return;
-			}
-
-			setTimeout( () => {
-				window.progressPlannerTodo.tasks.forEach(
-					( todoItem, index ) => {
-						if (
-							todoItem?.meta?.prpl_task_id ===
-							event.detail?.meta?.prpl_task_id
-						) {
-							// Change the status.
-							window.progressPlannerTodo.tasks[ index ].status =
-								'complete' === event.detail.actionType
-									? 'completed'
-									: 'pending';
-
-							// Inject the todo item into the DOM.
-							document.dispatchEvent(
-								new CustomEvent( 'prpl/todo/injectItem', {
-									detail: {
-										item: todoItem,
-										addToStart: 1 === todoItem.points, // Add golden task to the start of the list.
-										listId:
-											'complete' ===
-											event.detail.actionType
-												? 'todo-list-completed'
-												: 'todo-list',
-									},
-								} )
-							);
-
-							// Remove item from completed-todos list if necessary.
-							if ( 'pending' === event.detail.actionType ) {
-								const el = document.querySelector(
-									`#todo-list-completed .prpl-suggested-task[data-task-id="${ todoItem?.meta?.prpl_task_id }"]`
-								);
-								if ( el ) {
-									el.parentNode.remove();
-								}
-							}
-
-							// Resize the grid items.
-							window.dispatchEvent(
-								new CustomEvent( 'prpl/grid/resize' )
-							);
-						}
-					}
-				);
-			}, 10 );
-		}
-	);
 };
+
+/**
+ * Get the highest `order` value from the todo items.
+ *
+ * @return {number} The highest `order` value.
+ */
+const prplGetHighestTodoItemOrder = () => {
+	const todoItems = document.querySelectorAll(
+		'#todo-list .prpl-suggested-task'
+	);
+	let highestOrder = 0;
+	todoItems.forEach( ( todoItem ) => {
+		const order = parseInt( todoItem.getAttribute( 'data-task-order' ) );
+		if ( order > highestOrder ) {
+			highestOrder = order;
+		}
+	} );
+	return highestOrder;
+};
+
+document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
+	const Item = customElements.get( 'prpl-suggested-task' );
+	const todoItemElement = new Item( {
+		...event.detail.item,
+		meta: {
+			...event.detail.item.meta,
+			prpl_snoozable: false,
+			prpl_dismissable: true,
+		},
+		deletable: true,
+		allowReorder: true,
+		content: { rendered: '' },
+	} );
+
+	if ( event.detail.addToStart ) {
+		document
+			.getElementById( event.detail.listId )
+			.prepend( todoItemElement );
+	} else {
+		document
+			.getElementById( event.detail.listId )
+			.appendChild( todoItemElement );
+	}
+} );
+
+// When the 'prpl/suggestedTask/move' event is triggered,
+// update the menu_order of the todo items.
+document.addEventListener( 'prpl/suggestedTask/move', () => {
+	const todoItemsIDs = [];
+	// Get all the todo items.
+	const todoItems = document.querySelectorAll(
+		'#todo-list .prpl-suggested-task'
+	);
+	let menuOrder = 0;
+	todoItems.forEach( ( todoItem ) => {
+		const itemID = parseInt( todoItem.getAttribute( 'data-post-id' ) );
+		todoItemsIDs.push( itemID );
+		todoItem.setAttribute( 'data-task-order', menuOrder );
+		window.progressPlannerTodo.tasks.find(
+			( item ) => item.id === itemID
+		).menu_order = menuOrder;
+
+		document
+			.querySelector(
+				`#todo-list .prpl-suggested-task[data-post-id="${ itemID }"]`
+			)
+			.setAttribute( 'data-task-order', menuOrder );
+
+		// Update an existing post.
+		const post = new wp.api.models.Prpl_recommendations( {
+			id: itemID,
+			menu_order: menuOrder,
+		} );
+		post.save();
+
+		menuOrder++;
+	} );
+} );
+
+// When the 'prpl/suggestedTask/update' event is triggered,
+// update the task title in the tasks array.
+document.addEventListener( 'prpl/suggestedTask/update', ( event ) => {
+	const task = window.progressPlannerTodo.tasks.find(
+		( item ) =>
+			item?.meta?.prpl_task_id ===
+			event.detail.node
+				.querySelector( 'li' )
+				.getAttribute( 'data-task-id' )
+	);
+
+	if ( task ) {
+		task.title = {
+			rendered: event.detail.node.querySelector( 'h3 span' ).textContent,
+		};
+	}
+} );
+
+document.addEventListener( 'prpl/suggestedTask/maybeInjectItem', ( event ) => {
+	if (
+		'complete' !== event.detail.actionType &&
+		'pending' !== event.detail.actionType
+	) {
+		return;
+	}
+
+	setTimeout( () => {
+		window.progressPlannerTodo.tasks.forEach( ( todoItem, index ) => {
+			if (
+				todoItem?.meta?.prpl_task_id ===
+				event.detail?.meta?.prpl_task_id
+			) {
+				// Change the status.
+				window.progressPlannerTodo.tasks[ index ].status =
+					'complete' === event.detail.actionType
+						? 'completed'
+						: 'pending';
+
+				// Inject the todo item into the DOM.
+				document.dispatchEvent(
+					new CustomEvent( 'prpl/todo/injectItem', {
+						detail: {
+							item: todoItem,
+							addToStart: 1 === todoItem.points, // Add golden task to the start of the list.
+							listId:
+								'complete' === event.detail.actionType
+									? 'todo-list-completed'
+									: 'todo-list',
+						},
+					} )
+				);
+
+				// Remove item from completed-todos list if necessary.
+				if ( 'pending' === event.detail.actionType ) {
+					const el = document.querySelector(
+						`#todo-list-completed .prpl-suggested-task[data-task-id="${ todoItem?.meta?.prpl_task_id }"]`
+					);
+					if ( el ) {
+						el.parentNode.remove();
+					}
+				}
+
+				// Resize the grid items.
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+			}
+		} );
+	}, 10 );
+} );
 
 document
 	.getElementById( 'todo-list-completed-details' )

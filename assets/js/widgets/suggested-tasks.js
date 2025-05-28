@@ -9,10 +9,8 @@
 /* eslint-disable camelcase */
 wp.api.loadPromise.done( () => {
 	Promise.all( [ window.prplFetchSuggestedTaskTerms() ] ).then( () => {
-		window.initPrplSuggestedTaskComponent();
 		window.prplInitSuggestedTasks();
 		window.prplInitTodo();
-		window.prplInitCelebrate();
 	} );
 } );
 
