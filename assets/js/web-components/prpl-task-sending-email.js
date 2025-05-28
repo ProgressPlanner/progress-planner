@@ -24,36 +24,35 @@ customElements.define(
 		 * @private
 		 */
 		repositionPopover() {
-			const target = document.querySelector(
+			const horizontalTarget = document.querySelector( '.prpl-wrap' );
+			const verticalTarget = document.querySelector(
 				'.prpl-widget-wrapper.prpl-suggested-tasks'
 			);
 
 			// Just in case.
-			if ( ! target ) {
+			if ( ! horizontalTarget || ! verticalTarget ) {
 				return;
 			}
 
-			const rect = target.getBoundingClientRect();
+			const horizontalRect = horizontalTarget.getBoundingClientRect();
+			const verticalRect = verticalTarget.getBoundingClientRect();
 			const popoverId = this.getAttribute( 'popover-id' );
 			const popover = document.getElementById( popoverId );
 
 			// Reset default popover styles.
 			popover.style.margin = '0';
 
-			// Apply the position.
-			popover.style.position = 'fixed'; // This is the default popover position, but just in case.
-			popover.style.left = `${ rect.left }px`;
-			popover.style.top = `${ Math.round( Math.abs( rect.top ) ) }px`;
+			// Calculate target's center
+			const horizontalTargetCenter =
+				horizontalRect.left + horizontalRect.width / 2;
 
-			setTimeout( () => {
-				const popoverWidth = popover.offsetWidth;
-				const windowWidth = window.innerWidth;
-				if ( popoverWidth + rect.left - windowWidth > 20 ) {
-					popover.style.left = `${
-						( windowWidth - popoverWidth ) / 2
-					}px`;
-				}
-			}, 10 );
+			// Apply the position.
+			popover.style.position = 'fixed';
+			popover.style.left = `${ horizontalTargetCenter }px`;
+			popover.style.top = `${ Math.round(
+				Math.abs( verticalRect.top )
+			) }px`;
+			popover.style.transform = 'translateX(-50%)';
 		}
 
 		/**
