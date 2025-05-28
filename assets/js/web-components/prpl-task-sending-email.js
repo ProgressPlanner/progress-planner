@@ -88,5 +88,33 @@ customElements.define(
 				input.checked = false;
 			} );
 		}
+
+		/**
+		 * Runs when the popover is opening.
+		 */
+		popoverOpening() {
+			// Calculate and set the position,
+			const target = document.querySelector(
+				'.prpl-widget-wrapper.prpl-suggested-tasks'
+			);
+
+			// Just in case.
+			if ( ! target ) {
+				return;
+			}
+
+			const rect = target.getBoundingClientRect();
+
+			const popoverId = this.getAttribute( 'popover-id' );
+			const popover = document.getElementById( popoverId );
+
+			// Reset default popover styles.
+			popover.style.margin = '0';
+
+			// Apply the position.
+			popover.style.position = 'fixed'; // This is the default popover position, but just in case.
+			popover.style.left = `${ rect.left }px`;
+			popover.style.top = `${ rect.top }px`;
+		}
 	}
 );
