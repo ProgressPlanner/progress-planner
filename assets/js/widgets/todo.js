@@ -274,3 +274,4 @@ document
 	.addEventListener( 'toggle', () => {
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	} );
+
