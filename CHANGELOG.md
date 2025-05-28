@@ -3,6 +3,7 @@
 Bugs we fixed:
 
 * Don't redirect user to Progress Planner dashboard if 'redirect_to' GET or POST parameter is set.
+* Fixed detecting creation of new valuable content posts.
 
 = 1.4.2 =
 
