@@ -16,6 +16,49 @@ customElements.define(
 		constructor() {
 			// Get parent class properties
 			super();
+			this.repositionPopover = this.repositionPopover.bind( this ); // So this is available in the event listener.
+		}
+
+		/**
+		 * Repositions the popover relative to the target element.
+		 * @private
+		 */
+		repositionPopover() {
+			const target = document.querySelector(
+				'.prpl-widget-wrapper.prpl-suggested-tasks'
+			);
+
+			// Just in case.
+			if ( ! target ) {
+				return;
+			}
+
+			const rect = target.getBoundingClientRect();
+			const popoverId = this.getAttribute( 'popover-id' );
+			const popover = document.getElementById( popoverId );
+
+			// Reset default popover styles.
+			popover.style.margin = '0';
+
+			// Apply the position.
+			popover.style.position = 'fixed'; // This is the default popover position, but just in case.
+			popover.style.left = `${ rect.left }px`;
+			popover.style.top = `${ rect.top }px`;
+		}
+
+		/**
+		 * Runs when the popover is opening.
+		 */
+		popoverOpening() {
+			this.repositionPopover();
+			window.addEventListener( 'resize', this.repositionPopover );
+		}
+
+		/**
+		 * Runs when the popover is closing.
+		 */
+		popoverClosing() {
+			window.removeEventListener( 'resize', this.repositionPopover );
 		}
 
 		/**
@@ -87,34 +130,6 @@ customElements.define(
 			).forEach( ( input ) => {
 				input.checked = false;
 			} );
-		}
-
-		/**
-		 * Runs when the popover is opening.
-		 */
-		popoverOpening() {
-			// Calculate and set the position,
-			const target = document.querySelector(
-				'.prpl-widget-wrapper.prpl-suggested-tasks'
-			);
-
-			// Just in case.
-			if ( ! target ) {
-				return;
-			}
-
-			const rect = target.getBoundingClientRect();
-
-			const popoverId = this.getAttribute( 'popover-id' );
-			const popover = document.getElementById( popoverId );
-
-			// Reset default popover styles.
-			popover.style.margin = '0';
-
-			// Apply the position.
-			popover.style.position = 'fixed'; // This is the default popover position, but just in case.
-			popover.style.left = `${ rect.left }px`;
-			popover.style.top = `${ rect.top }px`;
 		}
 	}
 );
