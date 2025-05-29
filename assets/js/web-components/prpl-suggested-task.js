@@ -1,4 +1,4 @@
-/* global customElements, HTMLElement, prplSuggestedTask, prplL10n */
+/* global customElements, HTMLElement, prplSuggestedTask, prplL10n, _, Backbone */
 /*
  * Suggested Task
  *
@@ -305,6 +305,9 @@ customElements.define(
 		 * Add listeners to the item.
 		 */
 		taskListeners = () => {
+			// Extend the post object with Backbone.Events.
+			_.extend( this.post, Backbone.Events );
+
 			const thisObj = this;
 			const item = thisObj.querySelector( 'li' );
 
