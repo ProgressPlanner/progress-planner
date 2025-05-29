@@ -42,6 +42,8 @@ customElements.define(
 				prpl_recommendations_provider,
 				prpl_recommendations_category,
 			};
+			this.terms = terms;
+
 			// Modify provider and category to be an object.
 			Object.keys( window.progressPlannerSuggestedTasksTerms ).forEach(
 				( type ) => {
@@ -329,7 +331,7 @@ customElements.define(
 				'.prpl-suggested-task-checkbox'
 			).addEventListener( 'change', function ( e ) {
 				thisObj.runTaskAction(
-					item.getAttribute( 'data-post-id' ),
+					thisObj.post.id,
 					e.target.checked ? 'complete' : 'pending'
 				);
 			} );
@@ -450,7 +452,7 @@ customElements.define(
 
 							default:
 								thisObj.runTaskAction(
-									item.getAttribute( 'data-post-id' ),
+									thisObj.post.id,
 									action
 								);
 								break;
@@ -475,29 +477,31 @@ customElements.define(
 			).forEach( ( radioElement ) => {
 				radioElement.addEventListener( 'change', function () {
 					thisObj.runTaskAction(
-						item.getAttribute( 'data-post-id' ),
+						thisObj.post.id,
 						'snooze',
 						this.value
 					);
 				} );
 			} );
-
 			// When an item's contenteditable element is edited,
 			// save the new content to the database
+			thisObj.post.on( 'change:title', ( model, value ) => {
+				console.log( 'title changed', value );
+			} );
 			const h3Span = this.querySelector( 'h3 span' );
 			h3Span.addEventListener( 'keydown', ( event ) => {
 				// Prevent insering newlines (this catches both Enter and Return).
 				if ( event.key === 'Enter' ) {
 					event.preventDefault();
 				}
-
 				// Add debounce to the input event.
 				clearTimeout( this.debounceTimeout );
 				this.debounceTimeout = setTimeout( () => {
 					const title = h3Span.textContent;
+					thisObj.post.title.rendered = title;
 					// Update an existing post.
 					const postModel = new wp.api.models.Prpl_recommendations( {
-						id: parseInt( item.getAttribute( 'data-post-id' ) ),
+						id: thisObj.post.id,
 						title,
 					} );
 					postModel.save().then( () => {
@@ -521,6 +525,7 @@ customElements.define(
 		 *                                the duration to snooze the task for.
 		 */
 		runTaskAction = ( post_id, actionType, snoozeDuration ) => {
+			const thisObj = this;
 			switch ( actionType ) {
 				case 'snooze':
 					if ( '1-week' === snoozeDuration ) {
@@ -572,9 +577,7 @@ customElements.define(
 							new CustomEvent( 'prpl/updateRaviGauge', {
 								detail: {
 									pointsDiff: parseInt(
-										this.querySelector( 'li' ).getAttribute(
-											'data-task-points'
-										)
+										thisObj?.post?.meta?.prpl_points
 									),
 								},
 							} )
@@ -584,9 +587,7 @@ customElements.define(
 							element: this.querySelector( 'li' ),
 						};
 						const eventPoints = parseInt(
-							this.querySelector( 'li' ).getAttribute(
-								'data-task-points'
-							)
+							thisObj?.post?.meta?.prpl_points
 						);
 						const celebrateEvents =
 							0 < eventPoints
@@ -597,24 +598,15 @@ customElements.define(
 										'prpl/markTasksAsCompleted':
 											eventDetail,
 										'prpl/suggestedTask/maybeInjectItem': {
-											task_id:
-												this.querySelector(
-													'li'
-												).getAttribute(
-													'data-task-id'
-												),
+											task_id: thisObj?.post?.id,
 											providerID:
-												this.querySelector(
-													'li'
-												).getAttribute(
-													'data-task-provider'
-												),
+												thisObj?.terms
+													?.prpl_recommendations_provider
+													?.slug,
 											category:
-												this.querySelector(
-													'li'
-												).getAttribute(
-													'data-task-category'
-												),
+												thisObj?.terms
+													?.prpl_recommendations_category
+													?.slug,
 										},
 								  };
 
@@ -648,9 +640,7 @@ customElements.define(
 									pointsDiff:
 										0 -
 										parseInt(
-											this.querySelector(
-												'li'
-											).getAttribute( 'data-task-points' )
+											thisObj?.post?.meta?.prpl_points
 										),
 								},
 							} )
@@ -671,9 +661,7 @@ customElements.define(
 									pointsDiff:
 										0 -
 										parseInt(
-											this.querySelector(
-												'li'
-											).getAttribute( 'data-task-points' )
+											thisObj?.post?.meta?.prpl_points
 										),
 								},
 							} )
@@ -707,16 +695,11 @@ customElements.define(
 				document.dispatchEvent(
 					new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
 						detail: {
-							task_id: document
-								.querySelector(
-									`.prpl-suggested-task[data-post-id="${ post_id }"]`
-								)
-								.getAttribute( 'data-task-id' ),
+							task_id: thisObj?.post?.id,
 							actionType,
 							category:
-								this.querySelector( 'li' ).getAttribute(
-									'data-task-category'
-								),
+								thisObj?.terms?.prpl_recommendations_category
+									?.slug,
 						},
 					} )
 				);
