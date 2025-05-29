@@ -214,7 +214,7 @@ document.addEventListener(
 document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 	const Item = customElements.get( 'prpl-suggested-task' );
 	const item = new Item( {
-		...event.detail,
+		post: event.detail,
 		allowReorder: false,
 	} );
 
