@@ -89,6 +89,9 @@ customElements.define(
 					),
 					snoozeDurationOneYear: prplL10n( 'snoozeDurationOneYear' ),
 					snoozeDurationForever: prplL10n( 'snoozeDurationForever' ),
+					disabledRRCheckboxTooltip: prplL10n(
+						'disabledRRCheckboxTooltip'
+					),
 				},
 			};
 

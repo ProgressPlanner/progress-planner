@@ -24,7 +24,7 @@
 						>
 					</slot>
 					<slot name="content">
-						${ prplL10n( 'disabledRRCheckboxTooltip' ) }
+						{{{ data.l10n.disabledRRCheckboxTooltip }}}
 					</slot>
 				</prpl-tooltip>
 			<# } else { #>
@@ -43,9 +43,9 @@
 				<# if ( 'user' === data.terms.prpl_recommendations_category.slug ) { #>contenteditable="plaintext-only"<# } #>
 			>
 				<# if ( data.post.meta.prpl_url ) { #>
-					<a href="{{ data.post.meta.prpl_url }}" target="{{ data.post.meta.prpl_url_target }}">{{ data.post.title.rendered }}</a>
+					<a href="{{ data.post.meta.prpl_url }}" target="{{ data.post.meta.prpl_url_target }}">{{{ data.post.title.rendered }}}</a>
 				<# } else { #>
-					{{ data.post.title.rendered }}
+					{{{ data.post.title.rendered }}}
 				<# } #>
 			</span>
 		</h3>
