@@ -1,4 +1,4 @@
-/* global customElements, HTMLElement, prplSuggestedTask, prplL10n, _, Backbone */
+/* global customElements, HTMLElement, prplSuggestedTask, prplL10n, _, Backbone, MutationObserver */
 /*
  * Suggested Task
  *
@@ -307,6 +307,22 @@ customElements.define(
 		taskListeners = () => {
 			// Extend the post object with Backbone.Events.
 			_.extend( this.post, Backbone.Events );
+
+			const observer = new MutationObserver( function ( mutationsList ) {
+				for ( const mutation of mutationsList ) {
+					if ( mutation.type === 'attributes' ) {
+						const attributeName = mutation.attributeName;
+						const attributeValue =
+							mutation.target.getAttribute( attributeName );
+						console.log(
+							`The ${ attributeName } attribute was modified. New value: ${ attributeValue }`
+						);
+					}
+				}
+			} );
+			observer.observe( this.querySelector( 'li' ), {
+				attributes: true,
+			} );
 
 			const thisObj = this;
 			const item = thisObj.querySelector( 'li' );
