@@ -34,8 +34,9 @@ customElements.define(
 				menu_order = false,
 			} = post;
 
-			// Expose the post object to the instance.
+			// Expose the post object to the instance, and extend it with Backbone.Events.
 			this.post = post;
+			_.extend( this.post, Backbone.Events );
 
 			const terms = {
 				prpl_recommendations_provider,
@@ -305,9 +306,6 @@ customElements.define(
 		 * Add listeners to the item.
 		 */
 		taskListeners = () => {
-			// Extend the post object with Backbone.Events.
-			_.extend( this.post, Backbone.Events );
-
 			const observer = new MutationObserver( function ( mutationsList ) {
 				for ( const mutation of mutationsList ) {
 					if ( mutation.type === 'attributes' ) {
