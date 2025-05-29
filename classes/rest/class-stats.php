@@ -56,11 +56,9 @@ class Stats {
 	 *
 	 * This method handles a REST request and returns a REST response.
 	 *
-	 * @param \WP_REST_Request $request The REST request object.
-	 *
 	 * @return \WP_REST_Response The REST response object containing the stats.
 	 */
-	public function get_stats( \WP_REST_Request $request ) {
+	public function get_stats() {
 		$system_status = new \Progress_Planner\Utils\System_Status();
 
 		return new \WP_REST_Response( $system_status->get_system_status() );
