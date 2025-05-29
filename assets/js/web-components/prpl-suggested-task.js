@@ -497,20 +497,18 @@ customElements.define(
 				clearTimeout( this.debounceTimeout );
 				this.debounceTimeout = setTimeout( () => {
 					const title = h3Span.textContent;
-					wp.api.loadPromise.done( () => {
-						// Update an existing post.
-						const post = new wp.api.models.Prpl_recommendations( {
-							id: parseInt( item.getAttribute( 'data-post-id' ) ),
-							title,
-						} );
-						post.save().then( () => {
-							// Update the task title.
-							document.dispatchEvent(
-								new CustomEvent( 'prpl/suggestedTask/update', {
-									detail: { node: thisObj },
-								} )
-							);
-						} );
+					// Update an existing post.
+					const postModel = new wp.api.models.Prpl_recommendations( {
+						id: parseInt( item.getAttribute( 'data-post-id' ) ),
+						title,
+					} );
+					postModel.save().then( () => {
+						// Update the task title.
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/suggestedTask/update', {
+								detail: { node: thisObj },
+							} )
+						);
 					} );
 				}, 300 );
 			} );
@@ -527,184 +525,171 @@ customElements.define(
 		runTaskAction = ( post_id, actionType, snoozeDuration ) => {
 			switch ( actionType ) {
 				case 'snooze':
-					wp.api.loadPromise.done( () => {
-						if ( '1-week' === snoozeDuration ) {
-							snoozeDuration = 7;
-						} else if ( '2-weeks' === snoozeDuration ) {
-							snoozeDuration = 14;
-						} else if ( '1-month' === snoozeDuration ) {
-							snoozeDuration = 30;
-						} else if ( '3-months' === snoozeDuration ) {
-							snoozeDuration = 90;
-						} else if ( '6-months' === snoozeDuration ) {
-							snoozeDuration = 180;
-						} else if ( '1-year' === snoozeDuration ) {
-							snoozeDuration = 365;
-						} else if ( 'forever' === snoozeDuration ) {
-							snoozeDuration = 3650;
-						}
-						const date = new Date(
-							Date.now() + snoozeDuration * 24 * 60 * 60 * 1000
-						)
-							.toISOString()
-							.split( '.' )[ 0 ];
-						const post = new wp.api.models.Prpl_recommendations( {
+					if ( '1-week' === snoozeDuration ) {
+						snoozeDuration = 7;
+					} else if ( '2-weeks' === snoozeDuration ) {
+						snoozeDuration = 14;
+					} else if ( '1-month' === snoozeDuration ) {
+						snoozeDuration = 30;
+					} else if ( '3-months' === snoozeDuration ) {
+						snoozeDuration = 90;
+					} else if ( '6-months' === snoozeDuration ) {
+						snoozeDuration = 180;
+					} else if ( '1-year' === snoozeDuration ) {
+						snoozeDuration = 365;
+					} else if ( 'forever' === snoozeDuration ) {
+						snoozeDuration = 3650;
+					}
+					const date = new Date(
+						Date.now() + snoozeDuration * 24 * 60 * 60 * 1000
+					)
+						.toISOString()
+						.split( '.' )[ 0 ];
+					const postModelToSave =
+						new wp.api.models.Prpl_recommendations( {
 							id: post_id,
 							status: 'future',
 							date,
 							date_gmt: date,
 						} );
-						post.save().then( () => {
-							this.querySelector( 'li' ).remove();
-						} );
+					postModelToSave.save().then( () => {
+						this.querySelector( 'li' ).remove();
 					} );
 					break;
 
 				case 'complete':
-					wp.api.loadPromise.done( () => {
-						const post = new wp.api.models.Prpl_recommendations( {
+					const postModelPendingCelebration =
+						new wp.api.models.Prpl_recommendations( {
 							id: post_id,
 							status: 'pending_celebration',
 						} );
-						post.save().then( () => {
-							// Set the task action to celebrate.
-							this.querySelector( 'li' ).setAttribute(
-								'data-task-action',
-								'celebrate'
-							);
+					postModelPendingCelebration.save().then( () => {
+						// Set the task action to celebrate.
+						this.querySelector( 'li' ).setAttribute(
+							'data-task-action',
+							'celebrate'
+						);
 
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/updateRaviGauge', {
+								detail: {
+									pointsDiff: parseInt(
+										this.querySelector( 'li' ).getAttribute(
+											'data-task-points'
+										)
+									),
+								},
+							} )
+						);
+
+						const eventDetail = {
+							element: this.querySelector( 'li' ),
+						};
+						const eventPoints = parseInt(
+							this.querySelector( 'li' ).getAttribute(
+								'data-task-points'
+							)
+						);
+						const celebrateEvents =
+							0 < eventPoints
+								? { 'prpl/celebrateTasks': eventDetail }
+								: {
+										'prpl/strikeCelebratedTasks':
+											eventDetail,
+										'prpl/markTasksAsCompleted':
+											eventDetail,
+										'prpl/suggestedTask/maybeInjectItem': {
+											task_id:
+												this.querySelector(
+													'li'
+												).getAttribute(
+													'data-task-id'
+												),
+											providerID:
+												this.querySelector(
+													'li'
+												).getAttribute(
+													'data-task-provider'
+												),
+											category:
+												this.querySelector(
+													'li'
+												).getAttribute(
+													'data-task-category'
+												),
+										},
+								  };
+
+						// Trigger the celebration events.
+						Object.keys( celebrateEvents ).forEach( ( event ) => {
 							document.dispatchEvent(
-								new CustomEvent( 'prpl/updateRaviGauge', {
-									detail: {
-										pointsDiff: parseInt(
-											this.querySelector(
-												'li'
-											).getAttribute( 'data-task-points' )
-										),
-									},
+								new CustomEvent( event, {
+									detail: celebrateEvents[ event ],
 								} )
-							);
-
-							const eventDetail = {
-								element: this.querySelector( 'li' ),
-							};
-							const eventPoints = parseInt(
-								this.querySelector( 'li' ).getAttribute(
-									'data-task-points'
-								)
-							);
-							const celebrateEvents =
-								0 < eventPoints
-									? { 'prpl/celebrateTasks': eventDetail }
-									: {
-											'prpl/strikeCelebratedTasks':
-												eventDetail,
-											'prpl/markTasksAsCompleted':
-												eventDetail,
-											'prpl/suggestedTask/maybeInjectItem':
-												{
-													task_id:
-														this.querySelector(
-															'li'
-														).getAttribute(
-															'data-task-id'
-														),
-													providerID:
-														this.querySelector(
-															'li'
-														).getAttribute(
-															'data-task-provider'
-														),
-													category:
-														this.querySelector(
-															'li'
-														).getAttribute(
-															'data-task-category'
-														),
-												},
-									  };
-
-							// Trigger the celebration events.
-							Object.keys( celebrateEvents ).forEach(
-								( event ) => {
-									document.dispatchEvent(
-										new CustomEvent( event, {
-											detail: celebrateEvents[ event ],
-										} )
-									);
-								}
 							);
 						} );
 					} );
 					break;
 
 				case 'pending':
-					wp.api.loadPromise.done( () => {
-						const post = new wp.api.models.Prpl_recommendations( {
-							id: post_id,
-							status: 'publish',
-						} );
-						post.save().then( () => {
-							// Set the task action to pending.
-							this.querySelector( 'li' ).setAttribute(
-								'data-task-action',
-								'pending'
-							);
+					const postModel = new wp.api.models.Prpl_recommendations( {
+						id: post_id,
+						status: 'publish',
+					} );
+					postModel.save().then( () => {
+						// Set the task action to pending.
+						this.querySelector( 'li' ).setAttribute(
+							'data-task-action',
+							'pending'
+						);
 
-							// Update the Ravi gauge.
-							document.dispatchEvent(
-								new CustomEvent( 'prpl/updateRaviGauge', {
-									detail: {
-										pointsDiff:
-											0 -
-											parseInt(
-												this.querySelector(
-													'li'
-												).getAttribute(
-													'data-task-points'
-												)
-											),
-									},
-								} )
-							);
-						} );
+						// Update the Ravi gauge.
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/updateRaviGauge', {
+								detail: {
+									pointsDiff:
+										0 -
+										parseInt(
+											this.querySelector(
+												'li'
+											).getAttribute( 'data-task-points' )
+										),
+								},
+							} )
+						);
 					} );
 					break;
 
 				case 'delete':
-					wp.api.loadPromise.done( () => {
-						const post = new wp.api.models.Prpl_recommendations( {
-							id: post_id,
-							status: 'trash',
-						} );
-						post.destroy().then( () => {
-							// Update the Ravi gauge.
-							document.dispatchEvent(
-								new CustomEvent( 'prpl/updateRaviGauge', {
-									detail: {
-										pointsDiff:
-											0 -
-											parseInt(
-												this.querySelector(
-													'li'
-												).getAttribute(
-													'data-task-points'
-												)
-											),
-									},
-								} )
-							);
+					const post = new wp.api.models.Prpl_recommendations( {
+						id: post_id,
+						status: 'trash',
+					} );
+					post.destroy().then( () => {
+						// Update the Ravi gauge.
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/updateRaviGauge', {
+								detail: {
+									pointsDiff:
+										0 -
+										parseInt(
+											this.querySelector(
+												'li'
+											).getAttribute( 'data-task-points' )
+										),
+								},
+							} )
+						);
 
-							// Remove the task from the todo list.
-							document
-								.querySelector(
-									`.prpl-suggested-task[data-post-id="${ post_id }"]`
-								)
-								.remove();
-							document.dispatchEvent(
-								new CustomEvent( 'prpl/grid/resize' )
-							);
-						} );
+						// Remove the task from the todo list.
+						document
+							.querySelector(
+								`.prpl-suggested-task[data-post-id="${ post_id }"]`
+							)
+							.remove();
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/grid/resize' )
+						);
 					} );
 					break;
 			}
