@@ -445,37 +445,6 @@ customElements.define(
 						);
 					} );
 					break;
-
-				case 'delete':
-					const post = new wp.api.models.Prpl_recommendations( {
-						id: post_id,
-						status: 'trash',
-					} );
-					post.destroy().then( () => {
-						// Update the Ravi gauge.
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/updateRaviGauge', {
-								detail: {
-									pointsDiff:
-										0 -
-										parseInt(
-											thisObj?.post?.meta?.prpl_points
-										),
-								},
-							} )
-						);
-
-						// Remove the task from the todo list.
-						document
-							.querySelector(
-								`.prpl-suggested-task[data-post-id="${ post_id }"]`
-							)
-							.remove();
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/grid/resize' )
-						);
-					} );
-					break;
 			}
 
 			const data = {
@@ -505,5 +474,26 @@ customElements.define(
 		};
 	}
 );
+
+/**
+ * Trash a task.
+ *
+ * @param {number} post_id The post ID.
+ */
+prplSuggestedTask.trash = ( post_id ) => {
+	const post = new wp.api.models.Prpl_recommendations( {
+		id: post_id,
+		status: 'trash',
+	} );
+	post.destroy().then( () => {
+		// Remove the task from the todo list.
+		document
+			.querySelector(
+				`.prpl-suggested-task[data-post-id="${ post_id }"]`
+			)
+			.remove();
+		document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+	} );
+};
 
 /* eslint-enable camelcase */
