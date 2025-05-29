@@ -15,20 +15,24 @@ customElements.define(
 	'prpl-suggested-task',
 	class extends HTMLElement {
 		constructor( {
-			id,
-			title = { rendered: '' },
-			content = { rendered: '' },
-			meta = {},
-			status,
-			prpl_recommendations_provider,
-			prpl_recommendations_category,
-			menu_order = false,
+			post,
 			allowReorder = false,
 			deletable = false,
 			useCheckbox = true,
 		} ) {
 			// Get parent class properties
 			super();
+
+			const {
+				id,
+				title = { rendered: '' },
+				content = { rendered: '' },
+				meta = {},
+				status,
+				prpl_recommendations_provider,
+				prpl_recommendations_category,
+				menu_order = false,
+			} = post;
 
 			const terms = {
 				prpl_recommendations_provider,
