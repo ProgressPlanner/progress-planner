@@ -277,7 +277,7 @@
 	Interactive tasks, popover.
 \*------------------------------------*/
 .prpl-popover.prpl-popover-interactive {
-	padding: 1.5rem;
+	padding: 24px 24px 14px 24px; /* 14px is needed for the "next" button hover state. */
 	box-sizing: border-box;
 
 	* {
@@ -288,10 +288,8 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: 40px;
-
-		/* overflow: hidden; */
-
-		/* We need to allow overflow for .prpl-button hover effect. */
+		overflow: hidden;
+		padding-bottom: 10px; /* Needed for the "next" button hover state. */
 
 		> * {
 			flex-grow: 1;
@@ -312,14 +310,12 @@
 					background-color: var(--prpl-color-gray-2);
 				}
 
-				/* WIP: This adds vertical line above the column? */
-
-				/* &::after {
+				&::after {
 					top: -20px;
 					left: 0;
 					width: 100%;
 					height: 1px;
-				} */
+				}
 			}
 		}
 	}
