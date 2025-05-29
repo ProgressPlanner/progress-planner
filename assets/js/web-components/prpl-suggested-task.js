@@ -34,6 +34,9 @@ customElements.define(
 				menu_order = false,
 			} = post;
 
+			// Expose the post object to the instance.
+			this.post = post;
+
 			const terms = {
 				prpl_recommendations_provider,
 				prpl_recommendations_category,
