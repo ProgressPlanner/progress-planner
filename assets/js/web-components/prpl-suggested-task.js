@@ -124,144 +124,7 @@ customElements.define(
 			} );
 
 			const thisObj = this;
-			const item = thisObj.querySelector( 'li' );
 
-			item.querySelectorAll( '.prpl-suggested-task-button' ).forEach(
-				( button ) => {
-					button.addEventListener( 'click', function () {
-						let action = button.getAttribute( 'data-action' );
-						const target = button.getAttribute( 'data-target' );
-						const tooltipActions =
-							item.querySelector( '.tooltip-actions' );
-
-						// If the tooltip was already open, close it.
-						if (
-							!! tooltipActions.querySelector(
-								'.prpl-suggested-task-' +
-									target +
-									'[data-tooltip-visible]'
-							)
-						) {
-							action = 'close-' + target;
-						} else {
-							const closestTaskListVisible = item
-								.closest( '.prpl-suggested-tasks-list' )
-								.querySelector( `[data-tooltip-visible]` );
-							// Close the any opened radio group.
-							closestTaskListVisible?.classList.remove(
-								'prpl-toggle-radio-group-open'
-							);
-							// Remove any existing tooltip visible attribute, in the entire list.
-							closestTaskListVisible?.removeAttribute(
-								'data-tooltip-visible'
-							);
-						}
-
-						switch ( action ) {
-							case 'snooze':
-								tooltipActions
-									.querySelector(
-										'.prpl-suggested-task-' + target
-									)
-									.setAttribute(
-										'data-tooltip-visible',
-										'true'
-									);
-								break;
-
-							case 'close-snooze':
-								// Close the radio group.
-								tooltipActions
-									.querySelector(
-										'.prpl-suggested-task-' +
-											target +
-											'.prpl-toggle-radio-group-open'
-									)
-									?.classList.remove(
-										'prpl-toggle-radio-group-open'
-									);
-								// Close the tooltip.
-								tooltipActions
-									.querySelector(
-										'.prpl-suggested-task-' +
-											target +
-											'[data-tooltip-visible]'
-									)
-									?.removeAttribute( 'data-tooltip-visible' );
-								break;
-
-							case 'info':
-								tooltipActions
-									.querySelector(
-										'.prpl-suggested-task-' + target
-									)
-									.setAttribute(
-										'data-tooltip-visible',
-										'true'
-									);
-								break;
-
-							case 'close-info':
-								tooltipActions
-									.querySelector(
-										'.prpl-suggested-task-' + target
-									)
-									.removeAttribute( 'data-tooltip-visible' );
-								break;
-
-							case 'move-up':
-							case 'move-down':
-								// Move `thisObj` before or after the previous or next sibling.
-								if (
-									'move-up' === action &&
-									thisObj.previousElementSibling
-								) {
-									thisObj.parentNode.insertBefore(
-										thisObj,
-										thisObj.previousElementSibling
-									);
-								} else if (
-									'move-down' === action &&
-									thisObj.nextElementSibling
-								) {
-									thisObj.parentNode.insertBefore(
-										thisObj.nextElementSibling,
-										thisObj
-									);
-								}
-								// Trigger a custom event.
-								document.dispatchEvent(
-									new CustomEvent(
-										'prpl/suggestedTask/move',
-										{
-											detail: { node: thisObj },
-										}
-									)
-								);
-								break;
-						}
-					} );
-				}
-			);
-
-			// Toggle snooze duration radio group.
-			item.querySelector( '.prpl-toggle-radio-group' )?.addEventListener(
-				'click',
-				function () {
-					this.closest(
-						'.prpl-suggested-task-snooze'
-					).classList.toggle( 'prpl-toggle-radio-group-open' );
-				}
-			);
-
-			// Handle snooze duration radio group change.
-			item.querySelectorAll(
-				'.prpl-snooze-duration-radio-group input[type="radio"]'
-			).forEach( ( radioElement ) => {
-				radioElement.addEventListener( 'change', function () {
-					prplSuggestedTask.snooze( thisObj.post.id, this.value );
-				} );
-			} );
 			// When an item's contenteditable element is edited,
 			// save the new content to the database
 			thisObj.post.on( 'change:title', ( model, value ) => {
@@ -490,4 +353,96 @@ prplSuggestedTask.snooze = ( postId, snoozeDuration ) => {
 		el.remove();
 	} );
 };
+
+/**
+ * Run a tooltip action.
+ *
+ * @param {HTMLElement} button The button that was clicked.
+ */
+prplSuggestedTask.runButtonAction = ( button ) => {
+	let action = button.getAttribute( 'data-action' );
+	const target = button.getAttribute( 'data-target' );
+	const item = button.closest( 'li.prpl-suggested-task' );
+	const tooltipActions = item.querySelector( '.tooltip-actions' );
+
+	// If the tooltip was already open, close it.
+	if (
+		!! tooltipActions.querySelector(
+			'.prpl-suggested-task-' + target + '[data-tooltip-visible]'
+		)
+	) {
+		action = 'close-' + target;
+	} else {
+		const closestTaskListVisible = item
+			.closest( '.prpl-suggested-tasks-list' )
+			.querySelector( `[data-tooltip-visible]` );
+		// Close the any opened radio group.
+		closestTaskListVisible?.classList.remove(
+			'prpl-toggle-radio-group-open'
+		);
+		// Remove any existing tooltip visible attribute, in the entire list.
+		closestTaskListVisible?.removeAttribute( 'data-tooltip-visible' );
+	}
+
+	switch ( action ) {
+		case 'snooze':
+			tooltipActions
+				.querySelector( '.prpl-suggested-task-' + target )
+				.setAttribute( 'data-tooltip-visible', 'true' );
+			break;
+
+		case 'close-snooze':
+			// Close the radio group.
+			tooltipActions
+				.querySelector(
+					'.prpl-suggested-task-' +
+						target +
+						'.prpl-toggle-radio-group-open'
+				)
+				?.classList.remove( 'prpl-toggle-radio-group-open' );
+			// Close the tooltip.
+			tooltipActions
+				.querySelector(
+					'.prpl-suggested-task-' + target + '[data-tooltip-visible]'
+				)
+				?.removeAttribute( 'data-tooltip-visible' );
+			break;
+
+		case 'info':
+			tooltipActions
+				.querySelector( '.prpl-suggested-task-' + target )
+				.setAttribute( 'data-tooltip-visible', 'true' );
+			break;
+
+		case 'close-info':
+			tooltipActions
+				.querySelector( '.prpl-suggested-task-' + target )
+				.removeAttribute( 'data-tooltip-visible' );
+			break;
+
+		case 'move-up':
+		case 'move-down':
+			const thisObj = item.parentNode;
+			// Move `thisObj` before or after the previous or next sibling.
+			if ( 'move-up' === action && item.previousElementSibling ) {
+				thisObj.parentNode.insertBefore(
+					thisObj,
+					thisObj.previousElementSibling
+				);
+			} else if ( 'move-down' === action && thisObj.nextElementSibling ) {
+				thisObj.parentNode.insertBefore(
+					thisObj.nextElementSibling,
+					thisObj
+				);
+			}
+			// Trigger a custom event.
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/move', {
+					detail: { node: thisObj },
+				} )
+			);
+			break;
+	}
+};
+
 /* eslint-enable camelcase */

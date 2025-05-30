@@ -29,7 +29,7 @@
 				<# if ( data.post.content.rendered !== '' ) { #>
 					<prpl-tooltip>
 						<slot name="open-icon">
-							<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="info" data-target="info" title="{{ data.l10n.info }}">
+							<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="info" data-target="info" title="{{ data.l10n.info }}" onclick="prplSuggestedTask.runButtonAction( this );">
 								<img src="{{ data.assets.infoIcon }}" alt="{{ data.l10n.info }}" class="icon">
 								<span class="screen-reader-text">{{ data.l10n.info }}</span>
 							</button>
@@ -40,11 +40,11 @@
 
 				<# if ( false !== data.allowReorder ) { #>
 					<span class="prpl-move-buttons">
-						<button type="button" class="prpl-suggested-task-button move-up" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="move-up" data-target="move-up" title="{{ data.l10n.moveUp }}">
+						<button type="button" class="prpl-suggested-task-button move-up" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="move-up" data-target="move-up" title="{{ data.l10n.moveUp }}" onclick="prplSuggestedTask.runButtonAction( this );">
 							<span class="dashicons dashicons-arrow-up-alt2"></span>
 							<span class="screen-reader-text">{{ data.l10n.moveUp }}</span>
 						</button>
-						<button type="button" class="prpl-suggested-task-button move-down" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="move-down" data-target="move-down" title="{{ data.l10n.moveDown }}">
+						<button type="button" class="prpl-suggested-task-button move-down" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="move-down" data-target="move-down" title="{{ data.l10n.moveDown }}" onclick="prplSuggestedTask.runButtonAction( this );">
 							<span class="dashicons dashicons-arrow-down-alt2"></span>
 							<span class="screen-reader-text">{{ data.l10n.moveDown }}</span>
 						</button>
@@ -54,7 +54,7 @@
 				<# if ( data.post.meta.prpl_snoozable ) { #>
 					<prpl-tooltip class="prpl-suggested-task-snooze">
 						<slot name="open-icon">
-							<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="snooze" data-target="snooze" title="{{ data.l10n.snooze }}">
+							<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="snooze" data-target="snooze" title="{{ data.l10n.snooze }}" onclick="prplSuggestedTask.runButtonAction( this );">
 								<img src="{{ data.assets.snoozeIcon }}" alt="{{ data.l10n.snooze }}" class="icon">
 								<span class="screen-reader-text">{{ data.l10n.snooze }}</span>
 							</button>
@@ -63,7 +63,7 @@
 							<fieldset>
 								<legend>
 									<span>{{ data.l10n.snoozeThisTask }}</span>
-									<button type="button" class="prpl-toggle-radio-group">
+									<button type="button" class="prpl-toggle-radio-group" onclick="this.closest( '.prpl-suggested-task-snooze' ).classList.toggle( 'prpl-toggle-radio-group-open' );">
 										<span class="prpl-toggle-radio-group-text">{{ data.l10n.howLong }}</span>
 										<span class="prpl-toggle-radio-group-arrow">&rsaquo;</span>
 									</button>
@@ -89,7 +89,7 @@
 				<# } #>
 
 				<# if ( data.post.meta.prpl_dismissable && ! data.useCheckbox ) { #>
-					<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="complete" data-target="complete" title="{{ data.l10n.markAsComplete }}">
+					<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="complete" data-target="complete" title="{{ data.l10n.markAsComplete }}" onclick="prplSuggestedTask.runButtonAction( this );">
 						<span class="dashicons dashicons-saved"></span>
 						<span class="screen-reader-text">{{ data.l10n.markAsComplete }}</span>
 					</button>
