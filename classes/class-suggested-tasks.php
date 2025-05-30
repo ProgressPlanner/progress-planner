@@ -44,6 +44,9 @@ class Suggested_Tasks {
 
 		if ( \is_admin() ) {
 			\add_action( 'init', [ $this, 'init' ], 100 ); // Wait for the post types to be initialized.
+
+			// Check GET parameter and maybe set task as pending celebration.
+			\add_action( 'init', [ $this, 'maybe_complete_task' ] );
 		}
 		\add_action( 'wp_ajax_progress_planner_suggested_task_action', [ $this, 'suggested_task_action' ] );
 
@@ -191,6 +194,32 @@ class Suggested_Tasks {
 	public function was_task_completed( $task_id ): bool {
 		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 		return $task && $task->is_completed();
+	}
+
+	/**
+	 * Maybe complete a task.
+	 * Primarly this is used for deeplinking, ie user is testing if the emails are working
+	 * He gets an email with a link which automatically completes the task.
+	 *
+	 * @return void
+	 */
+	public function maybe_complete_task() {
+		if ( ! \progress_planner()->is_on_progress_planner_dashboard_page() || ! isset( $_GET['prpl_complete_task'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
+
+		$task_id = \sanitize_text_field( \wp_unslash( $_GET['prpl_complete_task'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! $task_id ) {
+			return;
+		}
+
+		if ( ! $this->was_task_completed( $task_id ) ) {
+			$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
+
+			if ( $task ) {
+				\progress_planner()->get_suggested_tasks_db()->update_recommendation( $task->ID, [ 'post_status' => 'pending_celebration' ] );
+			}
+		}
 	}
 
 	/**
