@@ -338,23 +338,18 @@ prplSuggestedTask.runButtonAction = ( button ) => {
 
 		case 'move-up':
 		case 'move-down':
-			const thisObj = item.parentNode;
-			// Move `thisObj` before or after the previous or next sibling.
 			if ( 'move-up' === action && item.previousElementSibling ) {
-				thisObj.parentNode.insertBefore(
-					thisObj,
-					thisObj.previousElementSibling
+				item.parentNode.insertBefore(
+					item,
+					item.previousElementSibling
 				);
-			} else if ( 'move-down' === action && thisObj.nextElementSibling ) {
-				thisObj.parentNode.insertBefore(
-					thisObj.nextElementSibling,
-					thisObj
-				);
+			} else if ( 'move-down' === action && item.nextElementSibling ) {
+				item.parentNode.insertBefore( item.nextElementSibling, item );
 			}
 			// Trigger a custom event.
 			document.dispatchEvent(
 				new CustomEvent( 'prpl/suggestedTask/move', {
-					detail: { node: thisObj },
+					detail: { node: item },
 				} )
 			);
 			break;
@@ -380,7 +375,7 @@ prplSuggestedTask.updateTaskTitle = ( el ) => {
 			document.dispatchEvent(
 				new CustomEvent( 'prpl/suggestedTask/update', {
 					detail: {
-						node: el.closest( 'li.prpl-suggested-task' ).parentNode,
+						node: el.closest( 'li.prpl-suggested-task' ),
 					},
 				} )
 			);
