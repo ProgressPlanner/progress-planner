@@ -18,9 +18,13 @@
 
 		<h3 style="width: 100%;">
 			<span <# if ( 'user' === data.terms.prpl_recommendations_category.slug ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>>
-				<# if ( data.post.meta.prpl_url ) { #><a href="{{ data.post.meta.prpl_url }}" target="{{ data.post.meta.prpl_url_target }}"><# } #>
+				<# if ( data.post.meta.prpl_url ) { #>
+					<a href="{{ data.post.meta.prpl_url }}" target="{{ data.post.meta.prpl_url_target }}">{{{ data.post.title.rendered }}}</a>
+				<# } else if ( data.post.meta.prpl_popover_id ) { #>
+					<button popovertarget="{{ data.post.meta.prpl_popover_id }}">{{{ data.post.title.rendered }}}</button>
+				<# } else { #>
 					{{{ data.post.title.rendered }}}
-				<# if ( data.post.meta.prpl_url ) { #></a><# } #>
+				<# } #>
 			</span>
 		</h3>
 
