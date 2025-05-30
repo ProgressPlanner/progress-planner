@@ -92,6 +92,7 @@ customElements.define(
 					disabledRRCheckboxTooltip: prplL10n(
 						'disabledRRCheckboxTooltip'
 					),
+					markAsComplete: prplL10n( 'markAsComplete' ),
 				},
 			};
 
@@ -124,15 +125,6 @@ customElements.define(
 
 			const thisObj = this;
 			const item = thisObj.querySelector( 'li' );
-
-			item.querySelector(
-				'.prpl-suggested-task-checkbox'
-			).addEventListener( 'change', function ( e ) {
-				thisObj.runTaskAction(
-					thisObj.post.id,
-					e.target.checked ? 'complete' : 'pending'
-				);
-			} );
 
 			item.querySelectorAll( '.prpl-suggested-task-button' ).forEach(
 				( button ) => {
@@ -247,13 +239,6 @@ customElements.define(
 									)
 								);
 								break;
-
-							default:
-								thisObj.runTaskAction(
-									thisObj.post.id,
-									action
-								);
-								break;
 						}
 					} );
 				}
@@ -274,11 +259,7 @@ customElements.define(
 				'.prpl-snooze-duration-radio-group input[type="radio"]'
 			).forEach( ( radioElement ) => {
 				radioElement.addEventListener( 'change', function () {
-					thisObj.runTaskAction(
-						thisObj.post.id,
-						'snooze',
-						this.value
-					);
+					prplSuggestedTask.snooze( thisObj.post.id, this.value );
 				} );
 			} );
 			// When an item's contenteditable element is edited,
@@ -313,187 +294,200 @@ customElements.define(
 				}, 300 );
 			} );
 		};
-
-		/**
-		 * Snooze a task.
-		 *
-		 * @param {number} post_id        The post ID.
-		 * @param {string} actionType     The action type.
-		 * @param {string} snoozeDuration If the action is `snooze`,
-		 *                                the duration to snooze the task for.
-		 */
-		runTaskAction = ( post_id, actionType, snoozeDuration ) => {
-			const thisObj = this;
-			switch ( actionType ) {
-				case 'snooze':
-					if ( '1-week' === snoozeDuration ) {
-						snoozeDuration = 7;
-					} else if ( '2-weeks' === snoozeDuration ) {
-						snoozeDuration = 14;
-					} else if ( '1-month' === snoozeDuration ) {
-						snoozeDuration = 30;
-					} else if ( '3-months' === snoozeDuration ) {
-						snoozeDuration = 90;
-					} else if ( '6-months' === snoozeDuration ) {
-						snoozeDuration = 180;
-					} else if ( '1-year' === snoozeDuration ) {
-						snoozeDuration = 365;
-					} else if ( 'forever' === snoozeDuration ) {
-						snoozeDuration = 3650;
-					}
-					const date = new Date(
-						Date.now() + snoozeDuration * 24 * 60 * 60 * 1000
-					)
-						.toISOString()
-						.split( '.' )[ 0 ];
-					const postModelToSave =
-						new wp.api.models.Prpl_recommendations( {
-							id: post_id,
-							status: 'future',
-							date,
-							date_gmt: date,
-						} );
-					postModelToSave.save().then( () => {
-						this.querySelector( 'li' ).remove();
-					} );
-					break;
-
-				case 'complete':
-					const postModelPendingCelebration =
-						new wp.api.models.Prpl_recommendations( {
-							id: post_id,
-							status: 'pending_celebration',
-						} );
-					postModelPendingCelebration.save().then( () => {
-						// Set the task action to celebrate.
-						this.querySelector( 'li' ).setAttribute(
-							'data-task-action',
-							'celebrate'
-						);
-
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/updateRaviGauge', {
-								detail: {
-									pointsDiff: parseInt(
-										thisObj?.post?.meta?.prpl_points
-									),
-								},
-							} )
-						);
-
-						const eventDetail = {
-							element: this.querySelector( 'li' ),
-						};
-						const eventPoints = parseInt(
-							thisObj?.post?.meta?.prpl_points
-						);
-						const celebrateEvents =
-							0 < eventPoints
-								? { 'prpl/celebrateTasks': eventDetail }
-								: {
-										'prpl/strikeCelebratedTasks':
-											eventDetail,
-										'prpl/markTasksAsCompleted':
-											eventDetail,
-										'prpl/suggestedTask/maybeInjectItem': {
-											task_id: thisObj?.post?.id,
-											providerID:
-												thisObj?.terms
-													?.prpl_recommendations_provider
-													?.slug,
-											category:
-												thisObj?.terms
-													?.prpl_recommendations_category
-													?.slug,
-										},
-								  };
-
-						// Trigger the celebration events.
-						Object.keys( celebrateEvents ).forEach( ( event ) => {
-							document.dispatchEvent(
-								new CustomEvent( event, {
-									detail: celebrateEvents[ event ],
-								} )
-							);
-						} );
-					} );
-					break;
-
-				case 'pending':
-					const postModel = new wp.api.models.Prpl_recommendations( {
-						id: post_id,
-						status: 'publish',
-					} );
-					postModel.save().then( () => {
-						// Set the task action to pending.
-						this.querySelector( 'li' ).setAttribute(
-							'data-task-action',
-							'pending'
-						);
-
-						// Update the Ravi gauge.
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/updateRaviGauge', {
-								detail: {
-									pointsDiff:
-										0 -
-										parseInt(
-											thisObj?.post?.meta?.prpl_points
-										),
-								},
-							} )
-						);
-					} );
-					break;
-			}
-
-			const data = {
-				post_id,
-				nonce: prplSuggestedTask.nonce,
-				action_type: actionType,
-			};
-
-			// Save the todo list to the database.
-			const request = wp.ajax.post(
-				'progress_planner_suggested_task_action',
-				data
-			);
-			request.done( () => {
-				document.dispatchEvent(
-					new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
-						detail: {
-							task_id: thisObj?.post?.id,
-							actionType,
-							category:
-								thisObj?.terms?.prpl_recommendations_category
-									?.slug,
-						},
-					} )
-				);
-			} );
-		};
 	}
 );
 
 /**
- * Trash a task.
+ * Get a term object from the terms array.
  *
- * @param {number} post_id The post ID.
+ * @param {number} termId   The term ID.
+ * @param {string} taxonomy The taxonomy.
+ * @return {Object} The term object.
  */
-prplSuggestedTask.trash = ( post_id ) => {
-	const post = new wp.api.models.Prpl_recommendations( {
-		id: post_id,
-		status: 'trash',
+prplSuggestedTask.getTermObject = ( termId, taxonomy ) => {
+	let termObject = {};
+	Object.values(
+		window.progressPlannerSuggestedTasksTerms[ taxonomy ]
+	).forEach( ( term ) => {
+		if ( term.id === termId ) {
+			termObject = term;
+		}
 	} );
-	post.destroy().then( () => {
-		// Remove the task from the todo list.
-		document
-			.querySelector(
-				`.prpl-suggested-task[data-post-id="${ post_id }"]`
-			)
-			.remove();
-		document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+	return termObject;
+};
+
+/**
+ * Run a task action.
+ *
+ * @param {number} postId       The post ID.
+ * @param {string} actionType   The action type.
+ * @param {string} categorySlug The category slug.
+ */
+prplSuggestedTask.runTaskAction = ( postId, actionType, categorySlug ) => {
+	const request = wp.ajax.post( 'progress_planner_suggested_task_action', {
+		post_id: postId,
+		nonce: prplSuggestedTask.nonce,
+		action_type: actionType,
+	} );
+	request.done( () => {
+		document.dispatchEvent(
+			new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
+				detail: {
+					task_id: postId,
+					actionType,
+					category: categorySlug,
+				},
+			} )
+		);
 	} );
 };
 
+/**
+ * Trash a task.
+ *
+ * @param {number} postId The post ID.
+ */
+prplSuggestedTask.trash = ( postId ) => {
+	const post = new wp.api.models.Prpl_recommendations( { id: postId } );
+	post.fetch().then( ( postData ) => {
+		post.destroy().then( () => {
+			// Remove the task from the todo list.
+			const el = document.querySelector(
+				`.prpl-suggested-task[data-post-id="${ postId }"]`
+			);
+			el.remove();
+			document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+
+			prplSuggestedTask.runTaskAction(
+				postId,
+				'delete',
+				prplSuggestedTask.getTermObject(
+					postData?.prpl_recommendations_category,
+					'prpl_recommendations_category'
+				).slug
+			);
+		} );
+	} );
+};
+
+/**
+ * Maybe complete a task.
+ *
+ * @param {number} postId The post ID.
+ */
+prplSuggestedTask.maybeComplete = ( postId ) => {
+	// Get the task.
+	const post = new wp.api.models.Prpl_recommendations( { id: postId } );
+	post.fetch().then( ( postData ) => {
+		const newStatus =
+			'publish' === postData.status ? 'pending_celebration' : 'publish';
+		post.set( 'status', newStatus );
+		post.save().then( () => {
+			prplSuggestedTask.runTaskAction(
+				postId,
+				'pending_celebration' === newStatus ? 'complete' : 'pending',
+				prplSuggestedTask.getTermObject(
+					postData?.prpl_recommendations_category,
+					'prpl_recommendations_category'
+				).slug
+			);
+			const el = document.querySelector(
+				`.prpl-suggested-task[data-post-id="${ postId }"]`
+			);
+			if ( 'pending_celebration' === newStatus ) {
+				el.setAttribute( 'data-task-action', 'celebrate' );
+
+				document.dispatchEvent(
+					new CustomEvent( 'prpl/updateRaviGauge', {
+						detail: {
+							pointsDiff: parseInt( postData?.meta?.prpl_points ),
+						},
+					} )
+				);
+
+				const eventDetail = { element: el };
+				const eventPoints = parseInt( postData?.meta?.prpl_points );
+				const celebrateEvents =
+					0 < eventPoints
+						? { 'prpl/celebrateTasks': eventDetail }
+						: {
+								'prpl/strikeCelebratedTasks': eventDetail,
+								'prpl/markTasksAsCompleted': eventDetail,
+								'prpl/suggestedTask/maybeInjectItem': {
+									task_id: postId,
+									providerID: prplSuggestedTask.getTermObject(
+										postData?.prpl_recommendations_provider,
+										'prpl_recommendations_provider'
+									).slug,
+									category: prplSuggestedTask.getTermObject(
+										postData?.prpl_recommendations_category,
+										'prpl_recommendations_category'
+									).slug,
+								},
+						  };
+
+				// Trigger the celebration events.
+				Object.keys( celebrateEvents ).forEach( ( event ) => {
+					document.dispatchEvent(
+						new CustomEvent( event, {
+							detail: celebrateEvents[ event ],
+						} )
+					);
+				} );
+			} else {
+				// Set the task action to pending.
+				el.setAttribute( 'data-task-action', 'pending' );
+
+				// Update the Ravi gauge.
+				document.dispatchEvent(
+					new CustomEvent( 'prpl/updateRaviGauge', {
+						detail: {
+							pointsDiff:
+								0 - parseInt( postData?.meta?.prpl_points ),
+						},
+					} )
+				);
+			}
+		} );
+	} );
+};
+
+/**
+ * Snooze a task.
+ *
+ * @param {number} postId         The post ID.
+ * @param {string} snoozeDuration The snooze duration.
+ */
+prplSuggestedTask.snooze = ( postId, snoozeDuration ) => {
+	if ( '1-week' === snoozeDuration ) {
+		snoozeDuration = 7;
+	} else if ( '2-weeks' === snoozeDuration ) {
+		snoozeDuration = 14;
+	} else if ( '1-month' === snoozeDuration ) {
+		snoozeDuration = 30;
+	} else if ( '3-months' === snoozeDuration ) {
+		snoozeDuration = 90;
+	} else if ( '6-months' === snoozeDuration ) {
+		snoozeDuration = 180;
+	} else if ( '1-year' === snoozeDuration ) {
+		snoozeDuration = 365;
+	} else if ( 'forever' === snoozeDuration ) {
+		snoozeDuration = 3650;
+	}
+	const date = new Date( Date.now() + snoozeDuration * 24 * 60 * 60 * 1000 )
+		.toISOString()
+		.split( '.' )[ 0 ];
+	const postModelToSave = new wp.api.models.Prpl_recommendations( {
+		id: postId,
+		status: 'future',
+		date,
+		date_gmt: date,
+	} );
+	postModelToSave.save().then( () => {
+		const el = document.querySelector(
+			`.prpl-suggested-task[data-post-id="${ postId }"]`
+		);
+		el.remove();
+	} );
+};
 /* eslint-enable camelcase */

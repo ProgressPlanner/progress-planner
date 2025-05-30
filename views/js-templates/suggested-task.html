@@ -9,7 +9,10 @@
 					<slot name="content">{{{ data.l10n.disabledRRCheckboxTooltip }}}</slot>
 				</prpl-tooltip>
 			<# } else { #>
-				<input type="checkbox" class="prpl-suggested-task-checkbox" style="margin-top: 2px; pointer-events: none;" <# if ( ! data.post.meta.prpl_dismissable ) { #>disabled<# } #> <# if ( 'trash' === data.status ) { #>checked<# } #>>
+				<label>
+					<input type="checkbox" class="prpl-suggested-task-checkbox" onchange="prplSuggestedTask.maybeComplete( {{ data.post.id }} );" style="margin-top: 2px; pointer-events: none;" <# if ( ! data.post.meta.prpl_dismissable ) { #>disabled<# } #> <# if ( 'trash' === data.status ) { #>checked<# } #>>
+					<span class="screen-reader-text">{{ data.l10n.markAsComplete }}</span>
+				</label>
 			<# } #>
 		<# } #>
 
@@ -75,7 +78,7 @@
 										'forever': data.l10n.snoozeDurationForever,
 									}, function( value, key ) { #>
 										<label>
-											<input type="radio" name="snooze-duration-{{ data.post.meta.prpl_task_id }}" value="{{ key }}">
+											<input type="radio" name="snooze-duration-{{ data.post.meta.prpl_task_id }}" value="{{ key }}" onchange="prplSuggestedTask.snooze( {{ data.post.id }}, '{{ key }}' );">
 											{{ value }}
 										</label>
 									<# }); #>
