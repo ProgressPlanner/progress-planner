@@ -62,14 +62,14 @@ final class ToDo extends Widget {
 	public function get_stylesheet_dependencies() {
 		// Register styles for the web-component.
 		\wp_register_style(
-			'progress-planner-web-components-prpl-suggested-task',
-			constant( 'PROGRESS_PLANNER_URL' ) . '/assets/css/web-components/prpl-suggested-task.css',
+			'progress-planner-prpl-suggested-task',
+			constant( 'PROGRESS_PLANNER_URL' ) . '/assets/css/prpl-suggested-task.css',
 			[],
-			\progress_planner()->get_file_version( constant( 'PROGRESS_PLANNER_DIR' ) . '/assets/css/web-components/prpl-suggested-task.css' )
+			\progress_planner()->get_file_version( constant( 'PROGRESS_PLANNER_DIR' ) . '/assets/css/prpl-suggested-task.css' )
 		);
 
 		return [
-			'progress-planner-web-components-prpl-suggested-task',
+			'progress-planner-prpl-suggested-task',
 		];
 	}
 }

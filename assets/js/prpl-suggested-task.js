@@ -1,8 +1,6 @@
 /* global HTMLElement, prplSuggestedTask, prplL10n */
 /*
- * Suggested Task
- *
- * A web component to display a suggested task.
+ * Suggested Task scripts & helpers.
  *
  * Dependencies: wp-api, progress-planner/l10n, progress-planner/suggested-task-terms
  */

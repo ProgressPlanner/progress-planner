@@ -3,7 +3,7 @@
 /**
  * Suggested tasks widget.
  *
- * Dependencies: progress-planner/web-components/prpl-suggested-task, progress-planner/web-components/prpl-badge
+ * Dependencies: progress-planner/prpl-suggested-task, progress-planner/web-components/prpl-badge
  */
 
 .prpl-widget-wrapper.prpl-suggested-tasks {

@@ -197,7 +197,7 @@ class Enqueue {
 				];
 				break;
 
-			case 'progress-planner/web-components/prpl-suggested-task':
+			case 'progress-planner/prpl-suggested-task':
 				$localize_data = [
 					'name' => 'prplSuggestedTask',
 					'data' => [
