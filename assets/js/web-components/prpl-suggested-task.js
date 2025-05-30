@@ -1,4 +1,4 @@
-/* global customElements, HTMLElement, prplSuggestedTask, prplL10n, _, Backbone, MutationObserver */
+/* global HTMLElement, prplSuggestedTask, prplL10n */
 /*
  * Suggested Task
  *
@@ -6,159 +6,7 @@
  *
  * Dependencies: wp-api, progress-planner/l10n, progress-planner/suggested-task-terms
  */
-/* eslint-disable camelcase */
-
-/**
- * Register the custom web component.
- */
-customElements.define(
-	'prpl-suggested-task',
-	class extends HTMLElement {
-		constructor( {
-			post,
-			allowReorder = false,
-			deletable = false,
-			useCheckbox = true,
-		} ) {
-			// Get parent class properties
-			super();
-
-			const {
-				prpl_recommendations_provider,
-				prpl_recommendations_category,
-			} = post;
-
-			// Expose the post object to the instance, and extend it with Backbone.Events.
-			this.post = post;
-			_.extend( this.post, Backbone.Events );
-
-			const terms = {
-				prpl_recommendations_provider,
-				prpl_recommendations_category,
-			};
-			this.terms = terms;
-
-			// Modify provider and category to be an object.
-			Object.keys( window.progressPlannerSuggestedTasksTerms ).forEach(
-				( type ) => {
-					if (
-						typeof terms[ type ] === 'object' &&
-						typeof terms[ type ][ 0 ] !== 'undefined'
-					) {
-						Object.values(
-							window.progressPlannerSuggestedTasksTerms[ type ]
-						).forEach( ( term ) => {
-							if ( term.id === terms[ type ][ 0 ] ) {
-								terms[ type ] = term;
-							}
-						} );
-					}
-				}
-			);
-
-			this.setAttribute( 'role', 'listitem' );
-
-			const template = wp.template( 'prpl-suggested-task' );
-			const data = {
-				post: this.post,
-				terms: this.terms,
-				allowReorder,
-				deletable,
-				useCheckbox,
-				assets: prplSuggestedTask.assets,
-				action:
-					'pending_celebration' === this.post.status
-						? 'celebrate'
-						: '',
-				l10n: {
-					info: prplL10n( 'info' ),
-					moveUp: prplL10n( 'moveUp' ),
-					moveDown: prplL10n( 'moveDown' ),
-					snooze: prplL10n( 'snooze' ),
-					snoozeThisTask: prplL10n( 'snoozeThisTask' ),
-					howLong: prplL10n( 'howLong' ),
-					snoozeDurationOneWeek: prplL10n( 'snoozeDurationOneWeek' ),
-					snoozeDurationOneMonth: prplL10n(
-						'snoozeDurationOneMonth'
-					),
-					snoozeDurationThreeMonths: prplL10n(
-						'snoozeDurationThreeMonths'
-					),
-					snoozeDurationSixMonths: prplL10n(
-						'snoozeDurationSixMonths'
-					),
-					snoozeDurationOneYear: prplL10n( 'snoozeDurationOneYear' ),
-					snoozeDurationForever: prplL10n( 'snoozeDurationForever' ),
-					disabledRRCheckboxTooltip: prplL10n(
-						'disabledRRCheckboxTooltip'
-					),
-					markAsComplete: prplL10n( 'markAsComplete' ),
-				},
-			};
-
-			this.innerHTML = template( data );
-
-			setTimeout( () => {
-				this.taskListeners();
-			}, 2000 );
-		}
-
-		/**
-		 * Add listeners to the item.
-		 */
-		taskListeners = () => {
-			const observer = new MutationObserver( function ( mutationsList ) {
-				for ( const mutation of mutationsList ) {
-					if ( mutation.type === 'attributes' ) {
-						const attributeName = mutation.attributeName;
-						const attributeValue =
-							mutation.target.getAttribute( attributeName );
-						console.log(
-							`The ${ attributeName } attribute was modified. New value: ${ attributeValue }`
-						);
-					}
-				}
-			} );
-			observer.observe( this.querySelector( 'li' ), {
-				attributes: true,
-			} );
-
-			const thisObj = this;
-
-			// When an item's contenteditable element is edited,
-			// save the new content to the database
-			thisObj.post.on( 'change:title', ( model, value ) => {
-				console.log( 'title changed', value );
-			} );
-			const h3Span = this.querySelector( 'h3 span' );
-			h3Span.addEventListener( 'keydown', ( event ) => {
-				// Prevent insering newlines (this catches both Enter and Return).
-				if ( event.key === 'Enter' ) {
-					event.preventDefault();
-				}
-				// Add debounce to the input event.
-				clearTimeout( this.debounceTimeout );
-				this.debounceTimeout = setTimeout( () => {
-					const title = h3Span.textContent;
-					thisObj.post.title.rendered = title;
-					// Update an existing post.
-					const postModel = new wp.api.models.Prpl_recommendations( {
-						id: thisObj.post.id,
-						title,
-					} );
-					postModel.save().then( () => {
-						// Update the task title.
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/suggestedTask/update', {
-								detail: { node: thisObj },
-							} )
-						);
-					} );
-				}, 300 );
-			} );
-		};
-	}
-);
+/* eslint-disable camelcase, jsdoc/require-param-type, jsdoc/require-param, jsdoc/check-param-names */
 
 /**
  * Get a term object from the terms array.
@@ -177,6 +25,75 @@ prplSuggestedTask.getTermObject = ( termId, taxonomy ) => {
 		}
 	} );
 	return termObject;
+};
+
+/**
+ * Render a new item.
+ *
+ * @param {Object}  post         The post object.
+ * @param {boolean} allowReorder Whether to allow reordering.
+ * @param {boolean} deletable    Whether to allow deleting.
+ * @param {boolean} useCheckbox  Whether to use a checkbox.
+ */
+prplSuggestedTask.getNewItemTemplate = ( {
+	post = {},
+	allowReorder = false,
+	deletable = false,
+	useCheckbox = true,
+} ) => {
+	const { prpl_recommendations_provider, prpl_recommendations_category } =
+		post;
+	const terms = {
+		prpl_recommendations_provider,
+		prpl_recommendations_category,
+	};
+
+	// Modify provider and category to be an object.
+	Object.keys( window.progressPlannerSuggestedTasksTerms ).forEach(
+		( type ) => {
+			if (
+				typeof terms[ type ] === 'object' &&
+				typeof terms[ type ][ 0 ] !== 'undefined'
+			) {
+				Object.values(
+					window.progressPlannerSuggestedTasksTerms[ type ]
+				).forEach( ( term ) => {
+					if ( term.id === terms[ type ][ 0 ] ) {
+						terms[ type ] = term;
+					}
+				} );
+			}
+		}
+	);
+
+	const template = wp.template( 'prpl-suggested-task' );
+	const data = {
+		post,
+		terms,
+		allowReorder,
+		deletable,
+		useCheckbox,
+		assets: prplSuggestedTask.assets,
+		action: 'pending_celebration' === post.status ? 'celebrate' : '',
+		l10n: {
+			info: prplL10n( 'info' ),
+			moveUp: prplL10n( 'moveUp' ),
+			moveDown: prplL10n( 'moveDown' ),
+			snooze: prplL10n( 'snooze' ),
+			snoozeThisTask: prplL10n( 'snoozeThisTask' ),
+			howLong: prplL10n( 'howLong' ),
+			snoozeDurationOneWeek: prplL10n( 'snoozeDurationOneWeek' ),
+			snoozeDurationOneMonth: prplL10n( 'snoozeDurationOneMonth' ),
+			snoozeDurationThreeMonths: prplL10n( 'snoozeDurationThreeMonths' ),
+			snoozeDurationSixMonths: prplL10n( 'snoozeDurationSixMonths' ),
+			snoozeDurationOneYear: prplL10n( 'snoozeDurationOneYear' ),
+			snoozeDurationForever: prplL10n( 'snoozeDurationForever' ),
+			disabledRRCheckboxTooltip: prplL10n( 'disabledRRCheckboxTooltip' ),
+			markAsComplete: prplL10n( 'markAsComplete' ),
+		},
+	};
+
+	return template( data );
 };
 
 /**
@@ -373,6 +290,7 @@ prplSuggestedTask.runButtonAction = ( button ) => {
 	) {
 		action = 'close-' + target;
 	} else {
+		console.log( item.closest( '.prpl-suggested-tasks-list' ) );
 		const closestTaskListVisible = item
 			.closest( '.prpl-suggested-tasks-list' )
 			.querySelector( `[data-tooltip-visible]` );
@@ -445,4 +363,30 @@ prplSuggestedTask.runButtonAction = ( button ) => {
 	}
 };
 
-/* eslint-enable camelcase */
+/**
+ * Update the task title.
+ *
+ * @param {HTMLElement} el The element that was edited.
+ */
+prplSuggestedTask.updateTaskTitle = ( el ) => {
+	// Add debounce to the input event.
+	clearTimeout( this.debounceTimeout );
+	this.debounceTimeout = setTimeout( () => {
+		// Update an existing post.
+		const postModel = new wp.api.models.Prpl_recommendations( {
+			id: parseInt( el.getAttribute( 'data-post-id' ) ),
+			title: el.textContent.replace( /\n/g, '' ),
+		} );
+		postModel.save().then( () => {
+			// Update the task title.
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/update', {
+					detail: {
+						node: el.closest( 'li.prpl-suggested-task' ).parentNode,
+					},
+				} )
+			);
+		} );
+	}, 300 );
+};
+/* eslint-enable camelcase, jsdoc/require-param-type, jsdoc/require-param, jsdoc/check-param-names */

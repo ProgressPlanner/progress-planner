@@ -1,4 +1,4 @@
-/* global customElements, prplDocumentReady */
+/* global prplSuggestedTask, prplDocumentReady */
 /*
  * Widget: Todo
  *
@@ -36,8 +36,7 @@ const prplGetHighestTodoItemOrder = () => {
 };
 
 document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
-	const Item = customElements.get( 'prpl-suggested-task' );
-	const todoItemElement = new Item( {
+	const todoItemHTML = prplSuggestedTask.getNewItemTemplate( {
 		post: {
 			...event.detail.item,
 			meta: {
@@ -50,15 +49,12 @@ document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
 		allowReorder: true,
 	} );
 
-	if ( event.detail.addToStart ) {
-		document
-			.getElementById( event.detail.listId )
-			.prepend( todoItemElement );
-	} else {
-		document
-			.getElementById( event.detail.listId )
-			.appendChild( todoItemElement );
-	}
+	document
+		.getElementById( event.detail.listId )
+		.insertAdjacentHTML(
+			event.detail.addToStart ? 'afterbegin' : 'beforeend',
+			todoItemHTML
+		);
 } );
 
 prplDocumentReady( () => {
