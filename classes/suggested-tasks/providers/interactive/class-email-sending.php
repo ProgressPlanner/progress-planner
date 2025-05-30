@@ -53,7 +53,7 @@ class Email_Sending extends Interactive {
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 
 		// Add the AJAX action.
-		add_action( 'wp_ajax_test_email_sending', [ $this, 'ajax_test_email_sending' ] );
+		add_action( 'wp_ajax_prpl_test_email_sending', [ $this, 'ajax_test_email_sending' ] );
 	}
 
 	/**

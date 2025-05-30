@@ -81,15 +81,23 @@ customElements.define(
 			const results = this.querySelector( '#prpl-sending-email-result' );
 
 			// Make AJAX GET request.
-			fetch( prplEmailSending.ajax_url + '?action=test_email_sending' )
+			fetch(
+				prplEmailSending.ajax_url + '?action=prpl_test_email_sending'
+			)
 				.then( ( response ) => response.json() )
 				// eslint-disable-next-line no-unused-vars
 				.then( ( data ) => {
-					form.style.display = 'none';
-					results.style.display = 'block';
+					if ( true === data.success ) {
+						form.style.display = 'none';
+						results.style.display = 'block';
+					} else {
+						form.style.display = 'none';
+						this.showTroubleshooting();
+					}
 				} )
 				.catch( ( error ) => {
 					console.error( 'Error testing email:', error ); // eslint-disable-line no-console
+					form.style.display = 'none';
 					this.showTroubleshooting();
 				} );
 
