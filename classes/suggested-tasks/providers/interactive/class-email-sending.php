@@ -43,6 +43,27 @@ class Email_Sending extends Interactive {
 	protected $popover_id = 'sending-email';
 
 	/**
+	 * The email title.
+	 *
+	 * @var string
+	 */
+	protected $email_title = '';
+
+	/**
+	 * The email content.
+	 *
+	 * @var string
+	 */
+	protected $email_content = '';
+
+	/**
+	 * The error.
+	 *
+	 * @var string
+	 */
+	protected $email_error = '';
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -54,6 +75,13 @@ class Email_Sending extends Interactive {
 
 		// Add the AJAX action.
 		add_action( 'wp_ajax_prpl_test_email_sending', [ $this, 'ajax_test_email_sending' ] );
+
+		// Set the email error message.
+		add_action( 'wp_mail_failed', [ $this, 'set_email_error' ] );
+
+		$this->email_title = \esc_html__( 'Test email from Progress Planner', 'progress-planner' );
+		// translators: %s is the admin URL.
+		$this->email_content = sprintf( \esc_html__( 'This is a test email. Complete the task by clicking the link: %s', 'progress-planner' ), \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) );
 	}
 
 	/**
@@ -76,7 +104,8 @@ class Email_Sending extends Interactive {
 			[
 				'name' => 'prplEmailSending',
 				'data' => [
-					'ajax_url' => \admin_url( 'admin-ajax.php' ),
+					'ajax_url'      => \admin_url( 'admin-ajax.php' ),
+					'unknown_error' => \esc_html__( 'Unknown error', 'progress-planner' ),
 				],
 			]
 		);
@@ -89,13 +118,24 @@ class Email_Sending extends Interactive {
 	 */
 	public function ajax_test_email_sending() {
 
-		$result = wp_mail( \wp_get_current_user()->user_email, 'Test Email', 'This is a test email. Complete the task by clicking the link: ' . \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) );
+		$result = wp_mail( \wp_get_current_user()->user_email, $this->email_title, $this->email_content );
 
 		if ( $result ) {
 			wp_send_json_success( \esc_html__( 'Email sent successfully.', 'progress-planner' ) );
 		} else {
-			wp_send_json_error( \esc_html__( 'Email not sent.', 'progress-planner' ) );
+			wp_send_json_error( $this->email_error );
 		}
+	}
+
+	/**
+	 * Set the email error.
+	 *
+	 * @param \WP_Error $e The error message.
+	 *
+	 * @return void
+	 */
+	public function set_email_error( $e ) {
+		$this->email_error = $e->get_error_message() ? $e->get_error_message() : \esc_html__( 'Unknown error', 'progress-planner' );
 	}
 
 	/**
@@ -204,6 +244,19 @@ class Email_Sending extends Interactive {
 							?>
 							</button>
 					</div>
+					</div>
+
+					<div id="prpl-sending-email-error-occurred" style="display: none;">
+						<p id="prpl-sending-email-error-occurred-message" data-email-error-message="
+						<?php
+							/* translators: %s is the email title. */
+							printf( \esc_attr__( 'We\'ve just tried to send an email titled "%s" to "[EMAIL_ADDRESS]". Unfortunately this failed with the following error message: [ERROR_MESSAGE]', 'progress-planner' ), \esc_attr( $this->email_title ) );
+						?>
+						"</p>
+
+						<div class="prpl-steps-nav-wrapper">
+							<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></button>
+						</div>
 					</div>
 					<div id="prpl-sending-email-troubleshooting" style="display: none;">
 						<h2><?php \esc_html_e( 'Email Troubleshooting', 'progress-planner' ); ?></h2>

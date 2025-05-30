@@ -86,19 +86,17 @@ customElements.define(
 			)
 				.then( ( response ) => response.json() )
 				// eslint-disable-next-line no-unused-vars
-				.then( ( data ) => {
-					if ( true === data.success ) {
+				.then( ( response ) => {
+					if ( true === response.success ) {
 						form.style.display = 'none';
 						results.style.display = 'block';
 					} else {
-						form.style.display = 'none';
-						this.showTroubleshooting();
+						this.showErrorOccurred( response.data );
 					}
 				} )
 				.catch( ( error ) => {
 					console.error( 'Error testing email:', error ); // eslint-disable-line no-console
-					form.style.display = 'none';
-					this.showTroubleshooting();
+					this.showErrorOccurred( error.message );
 				} );
 
 			// Add event listener to radio buttons.
@@ -113,6 +111,50 @@ customElements.define(
 					);
 				} );
 			} );
+		}
+
+		/**
+		 * Show the error occurred.
+		 * @param {string} errorMessageReason
+		 */
+		showErrorOccurred( errorMessageReason = '' ) {
+			if ( ! errorMessageReason ) {
+				errorMessageReason = prplEmailSending.unknown_error;
+			}
+
+			const form = this.querySelector( '#prpl-sending-email-form' );
+			const errorOccurred = this.querySelector(
+				'#prpl-sending-email-error-occurred'
+			);
+
+			const emailAddress = this.querySelector(
+				'#prpl-sending-email-address'
+			).value;
+
+			// Get the error message text.
+			let errorMessageText = errorOccurred
+				.querySelector( '#prpl-sending-email-error-occurred-message' )
+				.getAttribute( 'data-email-error-message' );
+
+			// Replace the placeholder with the email address.
+			errorMessageText = errorMessageText.replace(
+				'[EMAIL_ADDRESS]',
+				emailAddress
+			);
+
+			// Replace the placeholder with the error message.
+			errorOccurred.querySelector(
+				'#prpl-sending-email-error-occurred-message'
+			).textContent = errorMessageText.replace(
+				'[ERROR_MESSAGE]',
+				errorMessageReason
+			);
+
+			// Hide form step.
+			form.style.display = 'none';
+
+			// Show error occurred step.
+			errorOccurred.style.display = 'block';
 		}
 
 		/**
@@ -136,10 +178,14 @@ customElements.define(
 			const troubleshooting = this.querySelector(
 				'#prpl-sending-email-troubleshooting'
 			);
+			const errorOccurred = this.querySelector(
+				'#prpl-sending-email-error-occurred'
+			);
 
 			form.style.display = 'block';
 			results.style.display = 'none';
 			troubleshooting.style.display = 'none';
+			errorOccurred.style.display = 'none';
 
 			// Reset radio buttons.
 			this.querySelectorAll(
