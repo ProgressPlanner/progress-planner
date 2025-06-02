@@ -117,7 +117,7 @@ document.addEventListener(
  */
 document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 	const itemHTML = prplSuggestedTask.getNewItemTemplate( {
-		post: event.detail,
+		post: event.detail.item,
 		allowReorder: false,
 	} );
 
@@ -148,7 +148,10 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 		setTimeout( () => {
 			document.dispatchEvent(
 				new CustomEvent( 'prpl/suggestedTask/injectItem', {
-					detail: event.detail,
+					detail: {
+						item: event.detail.item,
+						listId: event.detail.listId,
+					},
 				} )
 			);
 			window.prplRenderAttempts++;
@@ -187,6 +190,12 @@ prplDocumentReady( () => {
 					category,
 					status: 'publish',
 					injectTrigger: 'prpl/suggestedTask/injectItem',
+					injectTriggerArgsCallback: ( todoItem ) => {
+						return {
+							item: todoItem,
+							listId: 'prpl-suggested-tasks-list',
+						};
+					},
 					afterInject: prplSuggestedTasksToggleUIitems,
 				},
 			} )
@@ -197,6 +206,12 @@ prplDocumentReady( () => {
 					category,
 					status: 'pending_celebration',
 					injectTrigger: 'prpl/suggestedTask/injectItem',
+					injectTriggerArgsCallback: ( todoItem ) => {
+						return {
+							item: todoItem,
+							listId: 'prpl-suggested-tasks-list',
+						};
+					},
 					afterInject: prplSuggestedTasksToggleUIitems,
 				},
 			} )
