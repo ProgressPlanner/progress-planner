@@ -19,6 +19,7 @@ class Suggested_Tasks {
 
 	/**
 	 * Status map for task statuses.
+	 * This is mostly used for backwards compatibility.
 	 *
 	 * @var array<string, string>
 	 */
@@ -165,23 +166,6 @@ class Suggested_Tasks {
 	 */
 	public function get_tasks_manager(): Tasks_Manager {
 		return $this->tasks_manager;
-	}
-
-	/**
-	 * Snooze a recommendation.
-	 *
-	 * @param int    $id       The recommendation ID.
-	 * @param string $duration The duration to snooze the recommendation.
-	 *
-	 * @return bool
-	 */
-	public function snooze( int $id, string $duration ) {
-		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $id );
-		if ( ! $task ) {
-			return false;
-		}
-
-		return $task->snooze( $duration );
 	}
 
 	/**

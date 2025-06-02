@@ -97,61 +97,6 @@ class Task {
 	}
 
 	/**
-	 * Snooze the task.
-	 *
-	 * @param string $duration The duration.
-	 *
-	 * @return bool
-	 */
-	public function snooze( string $duration ): bool {
-		if ( ! $this->ID ) {
-			return false;
-		}
-
-		switch ( $duration ) {
-			case '1-month':
-				$new_date = \strtotime( '+1 month' );
-				break;
-
-			case '3-months':
-				$new_date = \strtotime( '+3 months' );
-				break;
-
-			case '6-months':
-				$new_date = \strtotime( '+6 months' );
-				break;
-
-			case '1-year':
-				$new_date = \strtotime( '+1 year' );
-				break;
-
-			case 'forever':
-				$new_date = \strtotime( '+10 years' );
-				break;
-
-			default:
-				$new_date = \strtotime( '+1 week' );
-				break;
-		}
-
-		$updated = (bool) \wp_update_post(
-			[
-				'ID'            => $this->ID,
-				'post_status'   => 'future',
-				'post_date'     => \gmdate( 'Y-m-d H:i:s', $new_date ),
-				'post_date_gmt' => \gmdate( 'Y-m-d H:i:s', $new_date ), // Note: necessary in order to update 'post_status' to 'future'.
-			]
-		);
-
-		if ( $updated ) {
-			$this->data['post_status'] = 'future';
-			$this->data['post_date']   = \gmdate( 'Y-m-d H:i:s', $new_date );
-		}
-
-		return $updated;
-	}
-
-	/**
 	 * Check if the task is snoozed.
 	 *
 	 * @return bool
