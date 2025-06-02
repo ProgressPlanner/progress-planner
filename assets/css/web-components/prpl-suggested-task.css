@@ -30,10 +30,10 @@
 
 		/* Button which triggers the popover, interactive tasks. */
 		button[popovertarget] {
-			line-height: 1;
 			text-align: initial;
 			color: var(--prpl-color-link);
 			text-decoration: underline;
+			line-height: 1.5;
 		}
 	}
 
