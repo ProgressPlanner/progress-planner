@@ -42,3 +42,5 @@ if ( ! $prpl_privacy_policy_accepted ) {
 	<?php endif; ?>
 </div>
 <div class="prpl-overlay" style="display: none;" onclick="document.querySelector('[data-tooltip-visible=true]').removeAttribute('data-tooltip-visible')"></div>
+
+<?php \progress_planner()->the_view( 'js-templates/suggested-task.html' ); ?>

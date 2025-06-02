@@ -1,10 +1,10 @@
-/* global customElements, prplSuggestedTasks, prplDocumentReady */
+/* global customElements, prplSuggestedTask, prplSuggestedTasks, prplDocumentReady */
 /*
  * Widget: Suggested Tasks
  *
  * A widget that displays a list of suggested tasks.
  *
- * Dependencies: wp-api, progress-planner/web-components/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-suggested-task, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip, progress-planner/suggested-task-terms
+ * Dependencies: wp-api, progress-planner/prpl-suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip, progress-planner/suggested-task-terms
  */
 /* eslint-disable camelcase */
 
@@ -116,8 +116,7 @@ document.addEventListener(
  * Inject a todo item.
  */
 document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
-	const Item = customElements.get( 'prpl-suggested-task' );
-	const item = new Item( {
+	const itemHTML = prplSuggestedTask.getNewItemTemplate( {
 		post: event.detail,
 		allowReorder: false,
 	} );
@@ -132,7 +131,7 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 		// Inject the item into the list.
 		document
 			.querySelector( '.prpl-suggested-tasks-list' )
-			.insertAdjacentElement( 'beforeend', item );
+			.insertAdjacentHTML( 'beforeend', itemHTML );
 
 		return;
 	}
@@ -167,7 +166,7 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 	// Inject the item into the child list.
 	parentItem
 		.querySelector( '.prpl-suggested-task-children' )
-		.insertAdjacentElement( 'beforeend', item );
+		.insertAdjacentHTML( 'beforeend', itemHTML );
 } );
 
 // Populate the list on load.

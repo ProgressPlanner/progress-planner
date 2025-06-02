@@ -1,10 +1,10 @@
-/* global customElements, prplDocumentReady */
+/* global prplSuggestedTask, prplDocumentReady */
 /*
  * Widget: Todo
  *
  * A widget that displays a todo list.
  *
- * Dependencies: wp-api, progress-planner/web-components/prpl-suggested-task, wp-util, wp-a11y, progress-planner/grid-masonry, progress-planner/document-ready, progress-planner/celebrate, progress-planner/suggested-task-terms
+ * Dependencies: wp-api, progress-planner/prpl-suggested-task, wp-util, wp-a11y, progress-planner/grid-masonry, progress-planner/document-ready, progress-planner/celebrate, progress-planner/suggested-task-terms
  */
 
 /**
@@ -36,22 +36,25 @@ const prplGetHighestTodoItemOrder = () => {
 };
 
 document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
-	const Item = customElements.get( 'prpl-suggested-task' );
-	const todoItemElement = new Item( {
-		post: event.detail.item,
+	const todoItemHTML = prplSuggestedTask.getNewItemTemplate( {
+		post: {
+			...event.detail.item,
+			meta: {
+				...event.detail.item.meta,
+				prpl_snoozable: false,
+				prpl_dismissable: true,
+			},
+		},
 		deletable: true,
 		allowReorder: true,
 	} );
 
-	if ( event.detail.addToStart ) {
-		document
-			.getElementById( event.detail.listId )
-			.prepend( todoItemElement );
-	} else {
-		document
-			.getElementById( event.detail.listId )
-			.appendChild( todoItemElement );
-	}
+	document
+		.getElementById( event.detail.listId )
+		.insertAdjacentHTML(
+			event.detail.addToStart ? 'afterbegin' : 'beforeend',
+			todoItemHTML
+		);
 } );
 
 prplDocumentReady( () => {
