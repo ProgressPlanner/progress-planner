@@ -56,33 +56,70 @@ customElements.define(
 		}
 
 		/**
+		 * Runs when the popover is added to the DOM.
+		 */
+		popoverAddedToDOM() {
+			window.addEventListener( 'resize', this.repositionPopover );
+
+			// Show the results step, add event listener to radio buttons
+			const nextButton = this.querySelector(
+				'#prpl-sending-email-result .prpl-steps-nav-wrapper .prpl-button'
+			);
+
+			this.querySelectorAll(
+				'input[name="prpl-sending-email-result"]'
+			).forEach( ( input ) => {
+				input.addEventListener( 'change', ( event ) => {
+					nextButton.setAttribute(
+						'data-action',
+						event.target.getAttribute( 'data-action' )
+					);
+				} );
+			} );
+		}
+
+		/**
 		 * Runs when the popover is opening.
 		 */
 		popoverOpening() {
 			this.repositionPopover();
-			window.addEventListener( 'resize', this.repositionPopover );
-		}
-
-		/**
-		 * Runs when the popover is closing.
-		 */
-		popoverClosing() {
-			window.removeEventListener( 'resize', this.repositionPopover );
 		}
 
 		/**
 		 * Show the results.
 		 */
 		showResults() {
-			const nextButton = this.querySelector(
-				'#prpl-sending-email-result .prpl-steps-nav-wrapper .prpl-button'
-			);
 			const form = this.querySelector( '#prpl-sending-email-form' );
 			const results = this.querySelector( '#prpl-sending-email-result' );
 
+			const emailAddress = this.querySelector(
+				'#prpl-sending-email-address'
+			);
+
+			// Update result message.
+			// Get the error message text.
+			let resultMessageText = results
+				.querySelector( '#prpl-sending-email-sent-message' )
+				.getAttribute( 'data-email-sent-message' );
+
+			// Replace the placeholder with the email address.
+			resultMessageText = resultMessageText.replace(
+				'[EMAIL_ADDRESS]',
+				emailAddress.value
+			);
+
+			// Replace the placeholder with the error message.
+			results.querySelector(
+				'#prpl-sending-email-sent-message'
+			).textContent = resultMessageText;
+
 			// Make AJAX GET request.
 			fetch(
-				prplEmailSending.ajax_url + '?action=prpl_test_email_sending'
+				prplEmailSending.ajax_url +
+					'?action=prpl_test_email_sending&_wpnonce=' +
+					prplEmailSending.nonce +
+					'&email_address=' +
+					emailAddress.value
 			)
 				.then( ( response ) => response.json() )
 				// eslint-disable-next-line no-unused-vars
@@ -98,19 +135,6 @@ customElements.define(
 					console.error( 'Error testing email:', error ); // eslint-disable-line no-console
 					this.showErrorOccurred( error.message );
 				} );
-
-			// Add event listener to radio buttons.
-			this.querySelectorAll(
-				'input[name="prpl-sending-email-result"]'
-			).forEach( ( input ) => {
-				input.addEventListener( 'change', ( event ) => {
-					console.log( event.target.getAttribute( 'data-action' ) );
-					nextButton.setAttribute(
-						'data-action',
-						event.target.getAttribute( 'data-action' )
-					);
-				} );
-			} );
 		}
 
 		/**
@@ -201,9 +225,9 @@ customElements.define(
 		}
 
 		/**
-		 * Reset the popover.
+		 * Popover closing, reset the layout, values, etc.
 		 */
-		resetPopover() {
+		popoverClosing() {
 			this.querySelectorAll( '.prpl-sending-email-step' ).forEach(
 				( step ) => {
 					step.style.display = 'none';

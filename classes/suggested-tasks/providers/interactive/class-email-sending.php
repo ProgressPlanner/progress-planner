@@ -47,7 +47,7 @@ class Email_Sending extends Interactive {
 	 *
 	 * @var string
 	 */
-	protected $email_title = '';
+	protected $email_subject = '';
 
 	/**
 	 * The email content.
@@ -79,7 +79,7 @@ class Email_Sending extends Interactive {
 		// Set the email error message.
 		add_action( 'wp_mail_failed', [ $this, 'set_email_error' ] );
 
-		$this->email_title = \esc_html__( 'Test email from Progress Planner', 'progress-planner' );
+		$this->email_subject = \esc_html__( 'Test email from Progress Planner', 'progress-planner' );
 		// translators: %s is the admin URL.
 		$this->email_content = sprintf( \esc_html__( 'This is a test email. Complete the task by clicking the link: %s', 'progress-planner' ), \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) );
 	}
@@ -105,6 +105,7 @@ class Email_Sending extends Interactive {
 				'name' => 'prplEmailSending',
 				'data' => [
 					'ajax_url'      => \admin_url( 'admin-ajax.php' ),
+					'nonce'         => \wp_create_nonce( 'progress_planner' ),
 					'unknown_error' => \esc_html__( 'Unknown error', 'progress-planner' ),
 				],
 			]
@@ -118,7 +119,16 @@ class Email_Sending extends Interactive {
 	 */
 	public function ajax_test_email_sending() {
 
-		$result = wp_mail( \wp_get_current_user()->user_email, $this->email_title, $this->email_content );
+		// Check the nonce.
+		\check_admin_referer( 'progress_planner' );
+
+		$email_address = isset( $_GET['email_address'] ) ? \sanitize_email( \wp_unslash( $_GET['email_address'] ) ) : '';
+
+		if ( ! $email_address ) {
+			wp_send_json_error( \esc_html__( 'Invalid email address.', 'progress-planner' ) );
+		}
+
+		$result = wp_mail( $email_address, $this->email_subject, $this->email_content );
 
 		if ( $result ) {
 			wp_send_json_success( \esc_html__( 'Email sent successfully.', 'progress-planner' ) );
@@ -187,10 +197,10 @@ class Email_Sending extends Interactive {
 				<div class="prpl-column">
 					<p id="prpl-sending-email-error-occurred-message" data-email-error-message="
 					<?php
-						/* translators: %s is the email title. */
-						printf( \esc_attr__( 'We\'ve just tried to send an email titled "%s" to "[EMAIL_ADDRESS]". Unfortunately this failed with the following error message: [ERROR_MESSAGE]', 'progress-planner' ), \esc_attr( $this->email_title ) );
+						/* translators: %s is the email subject. */
+						printf( \esc_attr__( 'We\'ve just tried to send an email titled "%s" to "[EMAIL_ADDRESS]". Unfortunately this failed with the following error message: [ERROR_MESSAGE]', 'progress-planner' ), \esc_attr( $this->email_subject ) );
 					?>
-					"</p>
+					"></p>
 
 					<div class="prpl-steps-nav-wrapper">
 						<button class="prpl-button" data-action="showForm"><?php \esc_html_e( 'Retry now', 'progress-planner' ); ?></button>
@@ -202,7 +212,13 @@ class Email_Sending extends Interactive {
 			<?php /* Email sent, asking user if they received it */ ?>
 			<div class="prpl-columns-wrapper-flex prpl-sending-email-step" id="prpl-sending-email-result" style="display: none;">
 				<div class="prpl-column prpl-column-content">
-					WIP: We've just tried to send an email titled [TITLE] to [Email address]. Usually our test email should arrive within a few minutes. In rare cases, it can take up to several hours for our test to arrive in your inbox.
+					<p id="prpl-sending-email-sent-message" data-email-sent-message="
+					<?php
+						/* translators: %s is the email subject. */
+						printf( \esc_attr__( 'We\'ve just tried to send an email titled "%s" to "[EMAIL_ADDRESS]". Usually our test email should arrive within a few minutes. In rare cases, it can take up to several hours for our test to arrive in your inbox.', 'progress-planner' ), \esc_attr( $this->email_subject ) );
+					?>
+					"></p>
+
 				</div>
 
 				<div class="prpl-column">
