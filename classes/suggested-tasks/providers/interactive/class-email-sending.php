@@ -43,6 +43,13 @@ class Email_Sending extends Interactive {
 	protected $popover_id = 'sending-email';
 
 	/**
+	 * Whether the task is dismissable.
+	 *
+	 * @var bool
+	 */
+	protected $is_dismissable = true;
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -228,6 +235,24 @@ class Email_Sending extends Interactive {
 			</button>
 		</prpl-email-test-popup>
 		<?php
+	}
+
+	/**
+	 * Get the task title.
+	 *
+	 * @return string
+	 */
+	public function get_task_title() {
+		return \esc_html__( 'Check if email sending is working', 'progress-planner' );
+	}
+
+	/**
+	 * Get the task description.
+	 *
+	 * @return string
+	 */
+	public function get_task_description() {
+		return \esc_html__( 'Check if email sending is working.', 'progress-planner' );
 	}
 
 	/**
