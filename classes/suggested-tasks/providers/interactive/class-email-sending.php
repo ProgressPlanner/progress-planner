@@ -78,11 +78,18 @@ class Email_Sending extends Interactive {
 	protected $email_error = '';
 
 	/**
-	 * Whether phpmailer is filtered.
+	 * Whether wp_mail is filtered.
 	 *
 	 * @var bool
 	 */
-	protected $is_phpmailer_filtered = false;
+	protected $is_wp_mail_filtered = false;
+
+	/**
+	 * Whether wp_mail is overridden.
+	 *
+	 * @var bool
+	 */
+	protected $is_wp_mail_overridden = false;
 
 	/**
 	 * Initialize the task provider.
@@ -101,7 +108,8 @@ class Email_Sending extends Interactive {
 		add_action( 'wp_mail_failed', [ $this, 'set_email_error' ] );
 
 		// By now all plugins should be loaded and hopefully add actions registered, so we can check if phpmailer is filtered.
-		\add_action( 'init', [ $this, 'check_if_phpmailer_is_filtered' ], PHP_INT_MAX );
+		\add_action( 'init', [ $this, 'check_if_wp_mail_is_filtered' ], PHP_INT_MAX );
+		\add_action( 'init', [ $this, 'check_if_wp_mail_has_override' ], PHP_INT_MAX );
 
 		$this->email_subject = \esc_html__( 'Test email from Progress Planner', 'progress-planner' );
 		// translators: %s is the admin URL.
@@ -155,13 +163,47 @@ class Email_Sending extends Interactive {
 	}
 
 	/**
-	 * Check if phpmailer is filtered.
+	 * Check if wp_mail is filtered.
 	 *
 	 * @return void
 	 */
-	public function check_if_phpmailer_is_filtered() {
+	public function check_if_wp_mail_is_filtered() {
 		global $wp_filter;
-		$this->is_phpmailer_filtered = isset( $wp_filter['phpmailer_init'] ) && ! empty( $wp_filter['phpmailer_init']->callbacks ) ? true : false;
+
+		$filters_to_check = [
+			'phpmailer_init',
+			'pre_wp_mail',
+		];
+
+		foreach ( $filters_to_check as $filter ) {
+			$has_filter = isset( $wp_filter[ $filter ] ) && ! empty( $wp_filter[ $filter ]->callbacks ) ? true : false;
+			$this->is_wp_mail_filtered = $this->is_wp_mail_filtered || $has_filter;
+		}
+	}
+
+	/**
+	 * Check if wp_mail has an override.
+	 *
+	 * @return void
+	 */
+	public function check_if_wp_mail_has_override() {
+
+		// Just in case, since it will trigger PHP fatal error if the function doesn't exist.
+		if ( function_exists( 'wp_mail' ) ) {
+			$ref       = new \ReflectionFunction( 'wp_mail' );
+			$file_path = $ref->getFileName();
+
+			$this->is_wp_mail_overridden = $file_path && $file_path !== ABSPATH . 'wp-includes/pluggable.php';
+		}
+	}
+
+	/**
+	 * Whether there is an email override.
+	 *
+	 * @return bool
+	 */
+	protected function is_there_sending_email_override() {
+		return $this->is_wp_mail_filtered || $this->is_wp_mail_overridden;
 	}
 
 	/**
@@ -367,7 +409,7 @@ class Email_Sending extends Interactive {
 			<?php /* Email not received, showing troubleshooting */ ?>
 			<div class="prpl-columns-wrapper-flex prpl-sending-email-step" id="prpl-sending-email-troubleshooting-step" style="display: none;">
 				<div class="prpl-column prpl-column-content">
-					<?php if ( $this->is_phpmailer_filtered ) : ?>
+					<?php if ( $this->is_there_sending_email_override() ) : ?>
 						<p><?php \esc_html_e( 'Your website is using a plugin that filters emails.', 'progress-planner' ); ?></p>
 					<?php else : ?>
 						<p><?php \esc_html_e( 'Your website is not using a plugin that filters emails.', 'progress-planner' ); ?></p>
