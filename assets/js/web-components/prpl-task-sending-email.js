@@ -17,6 +17,11 @@ customElements.define(
 			// Get parent class properties
 			super();
 			this.repositionPopover = this.repositionPopover.bind( this ); // So this is available in the event listener.
+
+			// First step.
+			this.formStep = this.querySelector(
+				'#prpl-sending-email-form-step'
+			);
 		}
 
 		/**
@@ -61,21 +66,23 @@ customElements.define(
 		popoverAddedToDOM() {
 			window.addEventListener( 'resize', this.repositionPopover );
 
-			// Show the results step, add event listener to radio buttons
+			// For the results step, add event listener to radio buttons.
 			const nextButton = this.querySelector(
-				'#prpl-sending-email-result .prpl-steps-nav-wrapper .prpl-button'
+				'#prpl-sending-email-result-step .prpl-steps-nav-wrapper .prpl-button'
 			);
 
-			this.querySelectorAll(
-				'input[name="prpl-sending-email-result"]'
-			).forEach( ( input ) => {
-				input.addEventListener( 'change', ( event ) => {
-					nextButton.setAttribute(
-						'data-action',
-						event.target.getAttribute( 'data-action' )
-					);
+			if ( nextButton ) {
+				this.querySelectorAll(
+					'input[name="prpl-sending-email-result"]'
+				).forEach( ( input ) => {
+					input.addEventListener( 'change', ( event ) => {
+						nextButton.setAttribute(
+							'data-action',
+							event.target.getAttribute( 'data-action' )
+						);
+					} );
 				} );
-			} );
+			}
 		}
 
 		/**
@@ -86,21 +93,41 @@ customElements.define(
 		}
 
 		/**
+		 * Hide all steps.
+		 */
+		hideAllSteps() {
+			this.querySelectorAll( '.prpl-sending-email-step' ).forEach(
+				( step ) => {
+					step.style.display = 'none';
+				}
+			);
+		}
+
+		/**
+		 * Show the form (first step).
+		 */
+		showForm() {
+			this.hideAllSteps();
+
+			this.formStep.style.display = 'flex';
+		}
+
+		/**
 		 * Show the results.
 		 */
 		showResults() {
-			const form = this.querySelector( '#prpl-sending-email-form' );
-			const results = this.querySelector( '#prpl-sending-email-result' );
+			const resultsStep = this.querySelector(
+				'#prpl-sending-email-result-step'
+			);
 
 			const emailAddress = this.querySelector(
 				'#prpl-sending-email-address'
 			);
 
-			// Update result message.
-			// Get the error message text.
-			let resultMessageText = results
+			// Update result message with the email address.
+			let resultMessageText = resultsStep
 				.querySelector( '#prpl-sending-email-sent-message' )
-				.getAttribute( 'data-email-sent-message' );
+				.getAttribute( 'data-email-message' );
 
 			// Replace the placeholder with the email address.
 			resultMessageText = resultMessageText.replace(
@@ -109,7 +136,7 @@ customElements.define(
 			);
 
 			// Replace the placeholder with the error message.
-			results.querySelector(
+			resultsStep.querySelector(
 				'#prpl-sending-email-sent-message'
 			).textContent = resultMessageText;
 
@@ -125,8 +152,8 @@ customElements.define(
 				// eslint-disable-next-line no-unused-vars
 				.then( ( response ) => {
 					if ( true === response.success ) {
-						form.style.display = 'none';
-						results.style.display = 'flex';
+						this.formStep.style.display = 'none';
+						resultsStep.style.display = 'flex';
 					} else {
 						this.showErrorOccurred( response.data );
 					}
@@ -146,9 +173,8 @@ customElements.define(
 				errorMessageReason = prplEmailSending.unknown_error;
 			}
 
-			const form = this.querySelector( '#prpl-sending-email-form' );
-			const errorOccurred = this.querySelector(
-				'#prpl-sending-email-error-occurred'
+			const errorOccurredStep = this.querySelector(
+				'#prpl-sending-email-error-occurred-step'
 			);
 
 			const emailAddress = this.querySelector(
@@ -156,9 +182,9 @@ customElements.define(
 			).value;
 
 			// Get the error message text.
-			let errorMessageText = errorOccurred
+			let errorMessageText = errorOccurredStep
 				.querySelector( '#prpl-sending-email-error-occurred-message' )
-				.getAttribute( 'data-email-error-message' );
+				.getAttribute( 'data-email-message' );
 
 			// Replace the placeholder with the email address.
 			errorMessageText = errorMessageText.replace(
@@ -167,7 +193,7 @@ customElements.define(
 			);
 
 			// Replace the placeholder with the error message.
-			errorOccurred.querySelector(
+			errorOccurredStep.querySelector(
 				'#prpl-sending-email-error-occurred-message'
 			).textContent = errorMessageText.replace(
 				'[ERROR_MESSAGE]',
@@ -175,52 +201,31 @@ customElements.define(
 			);
 
 			// Hide form step.
-			form.style.display = 'none';
+			this.formStep.style.display = 'none';
 
 			// Show error occurred step.
-			errorOccurred.style.display = 'flex';
-		}
-
-		/**
-		 * Show the form (first step).
-		 */
-		showForm() {
-			this.querySelectorAll( '.prpl-sending-email-step' ).forEach(
-				( step ) => {
-					step.style.display = 'none';
-				}
-			);
-
-			this.querySelector( '#prpl-sending-email-form' ).style.display =
-				'flex';
+			errorOccurredStep.style.display = 'flex';
 		}
 
 		/**
 		 * Show the troubleshooting.
 		 */
 		showSuccess() {
-			this.querySelectorAll( '.prpl-sending-email-step' ).forEach(
-				( step ) => {
-					step.style.display = 'none';
-				}
-			);
+			this.hideAllSteps();
 
-			this.querySelector( '#prpl-sending-email-success' ).style.display =
-				'flex';
+			this.querySelector(
+				'#prpl-sending-email-success-step'
+			).style.display = 'flex';
 		}
 
 		/**
 		 * Show the troubleshooting.
 		 */
 		showTroubleshooting() {
-			this.querySelectorAll( '.prpl-sending-email-step' ).forEach(
-				( step ) => {
-					step.style.display = 'none';
-				}
-			);
+			this.hideAllSteps();
 
 			this.querySelector(
-				'#prpl-sending-email-troubleshooting'
+				'#prpl-sending-email-troubleshooting-step'
 			).style.display = 'flex';
 		}
 
@@ -228,14 +233,8 @@ customElements.define(
 		 * Popover closing, reset the layout, values, etc.
 		 */
 		popoverClosing() {
-			this.querySelectorAll( '.prpl-sending-email-step' ).forEach(
-				( step ) => {
-					step.style.display = 'none';
-				}
-			);
-
-			this.querySelector( '#prpl-sending-email-form' ).style.display =
-				'flex';
+			// Hide all steps and show the first step.
+			this.showForm();
 
 			// Reset radio buttons.
 			this.querySelectorAll(

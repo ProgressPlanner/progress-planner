@@ -32,6 +32,8 @@
 		button[popovertarget] {
 			line-height: 1;
 			text-align: initial;
+			color: var(--prpl-color-link);
+			text-decoration: underline;
 		}
 	}
 
