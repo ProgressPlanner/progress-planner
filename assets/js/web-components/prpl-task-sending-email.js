@@ -89,7 +89,7 @@ customElements.define(
 				.then( ( response ) => {
 					if ( true === response.success ) {
 						form.style.display = 'none';
-						results.style.display = 'block';
+						results.style.display = 'flex';
 					} else {
 						this.showErrorOccurred( response.data );
 					}
@@ -154,38 +154,64 @@ customElements.define(
 			form.style.display = 'none';
 
 			// Show error occurred step.
-			errorOccurred.style.display = 'block';
+			errorOccurred.style.display = 'flex';
+		}
+
+		/**
+		 * Show the form (first step).
+		 */
+		showForm() {
+			this.querySelectorAll( '.prpl-sending-email-step' ).forEach(
+				( step ) => {
+					step.style.display = 'none';
+				}
+			);
+
+			this.querySelector( '#prpl-sending-email-form' ).style.display =
+				'flex';
+		}
+
+		/**
+		 * Show the troubleshooting.
+		 */
+		showSuccess() {
+			this.querySelectorAll( '.prpl-sending-email-step' ).forEach(
+				( step ) => {
+					step.style.display = 'none';
+				}
+			);
+
+			this.querySelector( '#prpl-sending-email-success' ).style.display =
+				'flex';
 		}
 
 		/**
 		 * Show the troubleshooting.
 		 */
 		showTroubleshooting() {
-			const results = this.querySelector( '#prpl-sending-email-result' );
-			const troubleshooting = this.querySelector(
-				'#prpl-sending-email-troubleshooting'
+			this.querySelectorAll( '.prpl-sending-email-step' ).forEach(
+				( step ) => {
+					step.style.display = 'none';
+				}
 			);
-			results.style.display = 'none';
-			troubleshooting.style.display = 'block';
+
+			this.querySelector(
+				'#prpl-sending-email-troubleshooting'
+			).style.display = 'flex';
 		}
 
 		/**
 		 * Reset the popover.
 		 */
 		resetPopover() {
-			const form = this.querySelector( '#prpl-sending-email-form' );
-			const results = this.querySelector( '#prpl-sending-email-result' );
-			const troubleshooting = this.querySelector(
-				'#prpl-sending-email-troubleshooting'
-			);
-			const errorOccurred = this.querySelector(
-				'#prpl-sending-email-error-occurred'
+			this.querySelectorAll( '.prpl-sending-email-step' ).forEach(
+				( step ) => {
+					step.style.display = 'none';
+				}
 			);
 
-			form.style.display = 'block';
-			results.style.display = 'none';
-			troubleshooting.style.display = 'none';
-			errorOccurred.style.display = 'none';
+			this.querySelector( '#prpl-sending-email-form' ).style.display =
+				'flex';
 
 			// Reset radio buttons.
 			this.querySelectorAll(

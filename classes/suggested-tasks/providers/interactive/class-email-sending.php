@@ -149,20 +149,20 @@ class Email_Sending extends Interactive {
 			popover-id="<?php echo \esc_attr( 'prpl-popover-' . $this->popover_id ); ?>"
 			provider-id="<?php echo \esc_attr( $this->get_provider_id() ); ?>"
 		>
-			<div class="prpl-columns-wrapper-flex">
+			<?php /* First step */ ?>
+			<div class="prpl-columns-wrapper-flex prpl-sending-email-step" id="prpl-sending-email-form">
 				<div class="prpl-column prpl-column-content">
-					<h2 class="prpl-interactive-task-title"><?php \esc_html_e( 'Test email sending', 'progress-planner' ); ?></h2>
-					<p class="prpl-interactive-task-description"><?php \esc_html_e( 'Are you ready to test that email from your site works?', 'progress-planner' ); ?></p>
+					<h2 class="prpl-interactive-task-title"><?php \esc_html_e( 'Test if your site can send emails', 'progress-planner' ); ?></h2>
+					<p class="prpl-interactive-task-description"><?php \esc_html_e( 'Your WordPress website sometimes needs to send transactional email. For example, to reset passwords, when a fatal error occurs, or comment notifications. And oftentimes contactforms also try to send email. It is therefore important to verify that those emails are actually sent. Start by filling out your email address to send a test.', 'progress-planner' ); ?></p>
 				</div>
 				<div class="prpl-column">
-					<div id="prpl-sending-email-form">
-					<p><?php \esc_html_e( 'What is your contact e-mail address?', 'progress-planner' ); ?></p>
+					<p><?php \esc_html_e( 'To what email address should we send the test email?', 'progress-planner' ); ?></p>
 					<div class="prpl-note">
 						<span class="prpl-note-icon">
 							<?php \progress_planner()->the_asset( 'images/icon_exclamation_triangle_solid.svg' ); ?>
 						</span>
 						<span class="prpl-note-text">
-							<?php \esc_html_e( 'It could take a couple of hours before you receive the email.', 'progress-planner' ); ?>
+							<?php \esc_html_e( 'Usually our test email should arrive within a few minutes. In rare cases, it can take up to several hours for our test to arrive in your inbox.', 'progress-planner' ); ?>
 						</span>
 					</div>
 					<input type="email" id="prpl-sending-email-address" placeholder="<?php \esc_html_e( 'Enter your e-mail address', 'progress-planner' ); ?>" value="<?php echo \esc_attr( \wp_get_current_user()->user_email ); ?>" />
@@ -175,102 +175,108 @@ class Email_Sending extends Interactive {
 							?>
 							</button>
 					</div>
+				</div>
+			</div>
+
+			<?php /* We detected an error during sending test email, showing error message */ ?>
+			<div class="prpl-columns-wrapper-flex prpl-sending-email-step" id="prpl-sending-email-error-occurred" style="display: none;">
+				<div class="prpl-column prpl-column-content">
+
+				</div>
+
+				<div class="prpl-column">
+					<p id="prpl-sending-email-error-occurred-message" data-email-error-message="
+					<?php
+						/* translators: %s is the email title. */
+						printf( \esc_attr__( 'We\'ve just tried to send an email titled "%s" to "[EMAIL_ADDRESS]". Unfortunately this failed with the following error message: [ERROR_MESSAGE]', 'progress-planner' ), \esc_attr( $this->email_title ) );
+					?>
+					"</p>
+
+					<div class="prpl-steps-nav-wrapper">
+						<button class="prpl-button" data-action="showForm"><?php \esc_html_e( 'Retry now', 'progress-planner' ); ?></button>
+						<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></button>
 					</div>
-					<div id="prpl-sending-email-result" style="display: none;">
-						<p><?php \esc_html_e( 'Was it successful?', 'progress-planner' ); ?></p>
-						<div class="radios">
-							<div class="prpl-radio-wrapper">
-								<label for="prpl-sending-email-result-yes" class="prpl-custom-radio">
-									<input
-									type="radio"
-									id="prpl-sending-email-result-yes"
-									name="prpl-sending-email-result"
-									data-action="completeTask"
-									>
-									<span class="prpl-custom-control"></span>
-									<?php \esc_html_e( 'Yes', 'progress-planner' ); ?>
-								</label>
-							</div>
-							<div class="prpl-radio-wrapper">
-								<label for="prpl-sending-email-result-no" class="prpl-custom-radio">
+				</div>
+			</div>
+
+			<?php /* Email sent, asking user if they received it */ ?>
+			<div class="prpl-columns-wrapper-flex prpl-sending-email-step" id="prpl-sending-email-result" style="display: none;">
+				<div class="prpl-column prpl-column-content">
+					WIP: We've just tried to send an email titled [TITLE] to [Email address]. Usually our test email should arrive within a few minutes. In rare cases, it can take up to several hours for our test to arrive in your inbox.
+				</div>
+
+				<div class="prpl-column">
+					<p><?php \esc_html_e( 'Did you receive our test email?', 'progress-planner' ); ?></p>
+					<div class="radios">
+						<div class="prpl-radio-wrapper">
+							<label for="prpl-sending-email-result-yes" class="prpl-custom-radio">
 								<input
 								type="radio"
-								id="prpl-sending-email-result-no"
+								id="prpl-sending-email-result-yes"
 								name="prpl-sending-email-result"
-								data-action="showTroubleshooting"
+								data-action="showSuccess"
 								>
 								<span class="prpl-custom-control"></span>
-								<?php \esc_html_e( 'No', 'progress-planner' ); ?>
+								<?php \esc_html_e( 'Yes', 'progress-planner' ); ?>
 							</label>
-							</div>
 						</div>
-
-						<div class="radios">
-							<div class="prpl-radio-wrapper">
-								<label for="prpl-sending-email-result-yes-checkbox" class="prpl-custom-checkbox">
-									<input
-									type="checkbox"
-									id="prpl-sending-email-result-yes-checkbox"
-									name="prpl-sending-email-result-checkbox"
-									data-action="completeTask"
-									>
-									<span class="prpl-custom-control"></span>
-									<?php \esc_html_e( 'Yes', 'progress-planner' ); ?>
-								</label>
-							</div>
-							<div class="prpl-radio-wrapper">
-								<label for="prpl-sending-email-result-no-checkbox" class="prpl-custom-checkbox">
-								<input
-								type="checkbox"
-								id="prpl-sending-email-result-no-checkbox"
-								name="prpl-sending-email-result-checkbox"
-								data-action="showTroubleshooting"
-								>
-								<span class="prpl-custom-control"></span>
-								<?php \esc_html_e( 'No', 'progress-planner' ); ?>
-							</label>
-							</div>
+						<div class="prpl-radio-wrapper">
+							<label for="prpl-sending-email-result-no" class="prpl-custom-radio">
+							<input
+							type="radio"
+							id="prpl-sending-email-result-no"
+							name="prpl-sending-email-result"
+							data-action="showTroubleshooting"
+							>
+							<span class="prpl-custom-control"></span>
+							<?php \esc_html_e( 'No', 'progress-planner' ); ?>
+						</label>
 						</div>
-
-						<div>
-							<textarea id="prpl-sending-email-result-textarea" placeholder="<?php \esc_html_e( 'Enter your message', 'progress-planner' ); ?>" rows="4"></textarea>
-						</div>
-
-						<div class="prpl-steps-nav-wrapper">
-							<button class="prpl-button" data-action="">
-							<?php
-								/* translators: %s is an arrow icon. */
-								printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
-							?>
-							</button>
-					</div>
 					</div>
 
-					<div id="prpl-sending-email-error-occurred" style="display: none;">
-						<p id="prpl-sending-email-error-occurred-message" data-email-error-message="
+					<div class="prpl-steps-nav-wrapper">
+						<button class="prpl-button" data-action="">
 						<?php
-							/* translators: %s is the email title. */
-							printf( \esc_attr__( 'We\'ve just tried to send an email titled "%s" to "[EMAIL_ADDRESS]". Unfortunately this failed with the following error message: [ERROR_MESSAGE]', 'progress-planner' ), \esc_attr( $this->email_title ) );
+							/* translators: %s is an arrow icon. */
+							printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
 						?>
-						"</p>
-
-						<div class="prpl-steps-nav-wrapper">
-							<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></button>
-						</div>
+						</button>
 					</div>
-					<div id="prpl-sending-email-troubleshooting" style="display: none;">
-						<h2><?php \esc_html_e( 'Email Troubleshooting', 'progress-planner' ); ?></h2>
-						<p><?php \esc_html_e( 'Here are some steps to fix email sending issues:', 'progress-planner' ); ?></p>
-						<ul>
-							<li><?php \esc_html_e( 'Check your SMTP settings are correct', 'progress-planner' ); ?></li>
-							<li><?php \esc_html_e( 'Ensure your domain\'s SPF records are properly configured', 'progress-planner' ); ?></li>
-							<li><?php \esc_html_e( 'Verify your email provider credentials', 'progress-planner' ); ?></li>
-							<li><?php \esc_html_e( 'Try sending from a different email address', 'progress-planner' ); ?></li>
-						</ul>
+				</div>
+			</div>
 
-						<div class="prpl-steps-nav-wrapper">
-							<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></button>
-						</div>
+			<?php /* Email received, showing success message */ ?>
+			<div class="prpl-columns-wrapper-flex prpl-sending-email-step" id="prpl-sending-email-success" style="display: none;">
+				<div class="prpl-column prpl-column-content">
+					<?php \esc_html_e( 'We\'re happy to hear you\'ve received our test email. This indicates email is set up properly on your website.', 'progress-planner' ); ?>
+				</div>
+
+				<div class="prpl-column">
+
+					<div class="prpl-steps-nav-wrapper">
+						<button class="prpl-button" data-action="completeTask"><?php \esc_html_e( 'Mark as completed', 'progress-planner' ); ?></button>
+					</div>
+				</div>
+			</div>
+
+			<?php /* Email not received, showing troubleshooting */ ?>
+			<div class="prpl-columns-wrapper-flex prpl-sending-email-step" id="prpl-sending-email-troubleshooting" style="display: none;">
+				<div class="prpl-column prpl-column-content">
+
+				</div>
+
+				<div class="prpl-column">
+					<h2><?php \esc_html_e( 'Email Troubleshooting', 'progress-planner' ); ?></h2>
+					<p><?php \esc_html_e( 'Here are some steps to fix email sending issues:', 'progress-planner' ); ?></p>
+					<ul>
+						<li><?php \esc_html_e( 'Check your SMTP settings are correct', 'progress-planner' ); ?></li>
+						<li><?php \esc_html_e( 'Ensure your domain\'s SPF records are properly configured', 'progress-planner' ); ?></li>
+						<li><?php \esc_html_e( 'Verify your email provider credentials', 'progress-planner' ); ?></li>
+						<li><?php \esc_html_e( 'Try sending from a different email address', 'progress-planner' ); ?></li>
+					</ul>
+
+					<div class="prpl-steps-nav-wrapper">
+						<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></button>
 					</div>
 				</div>
 			</div>
@@ -279,6 +285,7 @@ class Email_Sending extends Interactive {
 				<span class="dashicons dashicons-no-alt"></span>
 				<span class="screen-reader-text"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></span>
 			</button>
+
 		</prpl-email-test-popup>
 		<?php
 	}
@@ -298,7 +305,7 @@ class Email_Sending extends Interactive {
 
 		return [
 			'task_id'     => $task_id,
-			'title'       => \esc_html__( 'Check if email sending is working', 'progress-planner' ),
+			'title'       => \esc_html__( 'Test if your site can send emails', 'progress-planner' ),
 			'parent'      => 0,
 			'priority'    => 'high',
 			'category'    => $this->get_provider_category(),
