@@ -266,11 +266,6 @@ class Debug_Tools {
 						'id'     => 'prpl-suggested-' . $key . '-' . $title,
 						'parent' => 'prpl-suggested-' . $key,
 						'title'  => $title . ' <a href="' . esc_url( $delete_url ) . '" style="color: #dc3232; display: inline-block; margin-left: 5px; text-decoration: none;">×</a>',
-						// 'href'   => $delete_url,
-						'meta'   => [
-							'title' => 'Delete this task',
-							'html'  => '',
-						],
 					]
 				);
 			}
