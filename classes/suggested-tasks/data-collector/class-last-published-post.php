@@ -34,7 +34,7 @@ class Last_Published_Post extends Base_Data_Collector {
 	 * @return void
 	 */
 	public function init() {
-		\add_action( 'init', [ $this, 'set_include_post_types' ], 99 ); // Wait for all CPTs to be registered.
+		\add_action( 'init', [ $this, 'set_include_post_types' ], 100 ); // Wait for all CPTs to be registered and collector manager to trigger it's init method (which is done on priority 99).
 		\add_action( 'transition_post_status', [ $this, 'update_last_published_post_cache' ], 10, 3 );
 	}
 
