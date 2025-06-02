@@ -242,7 +242,7 @@ class Email_Sending extends Interactive {
 	 *
 	 * @return string
 	 */
-	public function get_task_title() {
+	public function get_title() {
 		return \esc_html__( 'Check if email sending is working', 'progress-planner' );
 	}
 
@@ -251,7 +251,7 @@ class Email_Sending extends Interactive {
 	 *
 	 * @return string
 	 */
-	public function get_task_description() {
+	public function get_description() {
 		return \esc_html__( 'Check if email sending is working.', 'progress-planner' );
 	}
 
@@ -271,6 +271,7 @@ class Email_Sending extends Interactive {
 		return [
 			'task_id'     => $task_id,
 			'title'       => \esc_html__( 'Check if email sending is working', 'progress-planner' ),
+			'post_title'  => $this->get_title(),
 			'parent'      => 0,
 			'priority'    => 'high',
 			'category'    => $this->get_provider_category(),
