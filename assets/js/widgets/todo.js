@@ -37,14 +37,7 @@ const prplGetHighestTodoItemOrder = () => {
 
 document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
 	const todoItemHTML = prplSuggestedTask.getNewItemTemplate( {
-		post: {
-			...event.detail.item,
-			meta: {
-				...event.detail.item.meta,
-				prpl_snoozable: false,
-				prpl_dismissable: true,
-			},
-		},
+		post: event.detail.item,
 		deletable: true,
 		allowReorder: true,
 	} );
