@@ -43,6 +43,13 @@ class Email_Sending extends Interactive {
 	protected $popover_id = 'sending-email';
 
 	/**
+	 * Whether the task is dismissable.
+	 *
+	 * @var bool
+	 */
+	protected $is_dismissable = true;
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -231,6 +238,24 @@ class Email_Sending extends Interactive {
 	}
 
 	/**
+	 * Get the task title.
+	 *
+	 * @return string
+	 */
+	public function get_title() {
+		return \esc_html__( 'Check if email sending is working', 'progress-planner' );
+	}
+
+	/**
+	 * Get the task description.
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return \esc_html__( 'Check if email sending is working.', 'progress-planner' );
+	}
+
+	/**
 	 * Get the task details.
 	 *
 	 * @param string $task_id The task ID.
@@ -246,6 +271,7 @@ class Email_Sending extends Interactive {
 		return [
 			'task_id'     => $task_id,
 			'title'       => \esc_html__( 'Check if email sending is working', 'progress-planner' ),
+			'post_title'  => $this->get_title(),
 			'parent'      => 0,
 			'priority'    => 'high',
 			'category'    => $this->get_provider_category(),
