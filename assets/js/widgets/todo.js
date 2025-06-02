@@ -109,6 +109,10 @@ prplDocumentReady( () => {
 						window.progressPlannerSuggestedTasksTerms
 							.prpl_recommendations_provider.user.id,
 					menu_order: prplGetHighestTodoItemOrder() + 1,
+					meta: {
+						prpl_snoozable: false,
+						prpl_dismissable: true,
+					},
 				} );
 				post.save().then( ( response ) => {
 					if ( ! response.id ) {
