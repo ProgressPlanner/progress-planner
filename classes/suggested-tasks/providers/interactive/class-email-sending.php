@@ -250,18 +250,39 @@ class Email_Sending extends Interactive {
 					<p class="prpl-interactive-task-description" id="prpl-sending-email-error-occurred-message" data-email-message="
 					<?php
 						/* translators: %s is the email subject. */
-						printf( \esc_attr__( 'We just tried to send the email "%s" to [EMAIL_ADDRESS], but it didn’t work. The error message was: [ERROR_MESSAGE]', 'progress-planner' ), \esc_attr( $this->email_subject ) );
+						printf( \esc_attr__( 'We just tried to send the email "%s" to [EMAIL_ADDRESS], but unfortunately it didn’t work.', 'progress-planner' ), \esc_attr( $this->email_subject ) );
 					?>
 					"></p>
 
 				</div>
 
 				<div class="prpl-column">
-					<p><?php \esc_html_e( 'Please fix the issue and try again.', 'progress-planner' ); ?></p>
+					<div class="prpl-note prpl-note-error">
+						<span class="prpl-note-icon">
+							<?php \progress_planner()->the_asset( 'images/icon_exclamation_circle_solid.svg' ); ?>
+						</span>
+						<span class="prpl-note-text" data-email-message="
+						<?php
+							/* translators: %s is the error message. */
+							printf( \esc_attr__( 'The test email didn’t work. The error message was: [ERROR_MESSAGE]', 'progress-planner' ), \esc_attr( $this->email_error ) );
+						?>
+						">
+						</span>
+					</div>
+
+					<p>
+					<?php
+						printf(
+							/* translators: %s is a link to the troubleshooting guide. */
+							\esc_html__( 'There are a few common reasons why your email might not be sending. Check the %s to find out what’s causing the issue and how to fix it.', 'progress-planner' ),
+							'<a href="#" target="_blank">' . \esc_html__( 'troubleshooting guide', 'progress-planner' ) . '</a>'
+						);
+					?>
+					</p>
 
 					<div class="prpl-steps-nav-wrapper">
-						<button class="prpl-button" data-action="showForm"><?php \esc_html_e( 'Retry now', 'progress-planner' ); ?></button>
-						<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></button>
+						<button class="prpl-button" data-action="showForm"><?php \esc_html_e( 'Try again', 'progress-planner' ); ?></button>
+						<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Retry later', 'progress-planner' ); ?></button>
 					</div>
 				</div>
 			</div>
@@ -273,14 +294,22 @@ class Email_Sending extends Interactive {
 					<p class="prpl-interactive-task-description" id="prpl-sending-email-sent-message" data-email-message="
 					<?php
 						/* translators: %s is the email subject. */
-						printf( \esc_attr__( 'We just sent the email "%s" to [EMAIL_ADDRESS]. It usually arrives within a few minutes. In rare cases, it might take a few hours.', 'progress-planner' ), \esc_attr( $this->email_subject ) );
+						printf( \esc_attr__( 'We just sent the email "%s" to [EMAIL_ADDRESS].', 'progress-planner' ), \esc_attr( $this->email_subject ) );
 					?>
 					"></p>
 
 				</div>
 
 				<div class="prpl-column">
-					<p><?php \esc_html_e( 'Did you receive our test email?', 'progress-planner' ); ?></p>
+					<p><?php \esc_html_e( 'Did you get the test email?', 'progress-planner' ); ?></p>
+					<div class="prpl-note">
+						<span class="prpl-note-icon">
+							<?php \progress_planner()->the_asset( 'images/icon_exclamation_triangle_solid.svg' ); ?>
+						</span>
+						<span class="prpl-note-text">
+							<?php \esc_html_e( 'You should get the email in a few minutes. In rare cases, it might take a few hours.', 'progress-planner' ); ?>
+						</span>
+					</div>
 					<div class="radios">
 						<div class="prpl-radio-wrapper">
 							<label for="prpl-sending-email-result-yes" class="prpl-custom-radio">
@@ -322,13 +351,15 @@ class Email_Sending extends Interactive {
 			<?php /* Email received, showing success message */ ?>
 			<div class="prpl-columns-wrapper-flex prpl-sending-email-step" id="prpl-sending-email-success-step" style="display: none;">
 				<div class="prpl-column prpl-column-content">
-					<?php \esc_html_e( 'Great, you received the test email! That means email is working correctly on your website.', 'progress-planner' ); ?>
+					<h2 class="prpl-interactive-task-title"><?php \esc_html_e( 'Your email is set up properly!', 'progress-planner' ); ?></h2>
+					<?php \esc_html_e( 'Great, you received the test email! This indicates email is set up properly on your website.', 'progress-planner' ); ?>
 				</div>
 
 				<div class="prpl-column">
+					<p><?php \esc_html_e( 'Celebrate this achievement!', 'progress-planner' ); ?></p>
 
 					<div class="prpl-steps-nav-wrapper">
-						<button class="prpl-button" data-action="completeTask"><?php \esc_html_e( 'Mark as completed', 'progress-planner' ); ?></button>
+						<button class="prpl-button" data-action="completeTask"><?php \esc_html_e( 'Collect your point!', 'progress-planner' ); ?></button>
 					</div>
 				</div>
 			</div>

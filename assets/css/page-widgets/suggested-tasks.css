@@ -395,6 +395,16 @@
 					height: 100%;
 				}
 			}
+
+			&.prpl-note-error {
+				color: #9f0712;
+				background-color: var(--prpl-background-red);
+
+				.prpl-note-icon {
+					color: var(--prpl-color-notification-red);
+				}
+
+			}
 		}
 
 		/* To align the buttons to the bottom of the column. */

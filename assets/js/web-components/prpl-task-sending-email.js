@@ -177,28 +177,36 @@ customElements.define(
 				'#prpl-sending-email-error-occurred-step'
 			);
 
+			// Replace the placeholder with the email address (text in the left column).
 			const emailAddress = this.querySelector(
 				'#prpl-sending-email-address'
 			).value;
 
 			// Get the error message text.
-			let errorMessageText = errorOccurredStep
+			const errorMessageText = errorOccurredStep
 				.querySelector( '#prpl-sending-email-error-occurred-message' )
 				.getAttribute( 'data-email-message' );
 
 			// Replace the placeholder with the email address.
-			errorMessageText = errorMessageText.replace(
+			errorOccurredStep.querySelector(
+				'#prpl-sending-email-error-occurred-message'
+			).textContent = errorMessageText.replace(
 				'[EMAIL_ADDRESS]',
 				emailAddress
 			);
 
-			// Replace the placeholder with the error message.
-			errorOccurredStep.querySelector(
-				'#prpl-sending-email-error-occurred-message'
-			).textContent = errorMessageText.replace(
-				'[ERROR_MESSAGE]',
-				errorMessageReason
+			// Replace the placeholder with the error message (text in the right column).
+			const errorMessageNotification = errorOccurredStep.querySelector(
+				'.prpl-note.prpl-note-error .prpl-note-text'
 			);
+			const errorMessageNotificationText =
+				errorMessageNotification.getAttribute( 'data-email-message' );
+
+			errorMessageNotification.textContent =
+				errorMessageNotificationText.replace(
+					'[ERROR_MESSAGE]',
+					errorMessageReason
+				);
 
 			// Hide form step.
 			this.formStep.style.display = 'none';
