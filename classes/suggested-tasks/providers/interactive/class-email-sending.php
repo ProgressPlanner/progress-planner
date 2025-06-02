@@ -43,6 +43,13 @@ class Email_Sending extends Interactive {
 	protected $is_dismissable = true;
 
 	/**
+	 * The task priority.
+	 *
+	 * @var string
+	 */
+	protected $priority = 'high';
+
+	/**
 	 * The popover ID.
 	 *
 	 * @var string
@@ -377,11 +384,11 @@ class Email_Sending extends Interactive {
 		return [
 			'task_id'     => $task_id,
 			'title'       => $this->get_title(),
-			'parent'      => 0,
-			'priority'    => 'high',
+			'parent'      => $this->get_parent(),
+			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),
 			'provider_id' => $this->get_provider_id(),
-			'points'      => 1,
+			'points'      => $this->get_points(),
 			'dismissable' => $this->is_dismissable(),
 			'popover_id'  => 'prpl-popover-' . $this->popover_id,
 			'description' => $this->get_description(),
