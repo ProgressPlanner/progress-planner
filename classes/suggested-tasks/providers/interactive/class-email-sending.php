@@ -71,6 +71,13 @@ class Email_Sending extends Interactive {
 	protected $email_error = '';
 
 	/**
+	 * Whether phpmailer is filtered.
+	 *
+	 * @var bool
+	 */
+	protected $is_phpmailer_filtered = false;
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -85,6 +92,9 @@ class Email_Sending extends Interactive {
 
 		// Set the email error message.
 		add_action( 'wp_mail_failed', [ $this, 'set_email_error' ] );
+
+		// By now all plugins should be loaded and hopefully add actions registered, so we can check if phpmailer is filtered.
+		\add_action( 'init', [ $this, 'check_if_phpmailer_is_filtered' ], PHP_INT_MAX );
 
 		$this->email_subject = \esc_html__( 'Test email from Progress Planner', 'progress-planner' );
 		// translators: %s is the admin URL.
@@ -135,6 +145,16 @@ class Email_Sending extends Interactive {
 				],
 			]
 		);
+	}
+
+	/**
+	 * Check if phpmailer is filtered.
+	 *
+	 * @return void
+	 */
+	public function check_if_phpmailer_is_filtered() {
+		global $wp_filter;
+		$this->is_phpmailer_filtered = isset( $wp_filter['phpmailer_init'] ) && ! empty( $wp_filter['phpmailer_init']->callbacks ) ? true : false;
 	}
 
 	/**
@@ -309,7 +329,11 @@ class Email_Sending extends Interactive {
 			<?php /* Email not received, showing troubleshooting */ ?>
 			<div class="prpl-columns-wrapper-flex prpl-sending-email-step" id="prpl-sending-email-troubleshooting-step" style="display: none;">
 				<div class="prpl-column prpl-column-content">
-
+					<?php if ( $this->is_phpmailer_filtered ) : ?>
+						<p><?php \esc_html_e( 'Your website is using a plugin that filters emails.', 'progress-planner' ); ?></p>
+					<?php else : ?>
+						<p><?php \esc_html_e( 'Your website is not using a plugin that filters emails.', 'progress-planner' ); ?></p>
+					<?php endif; ?>
 				</div>
 
 				<div class="prpl-column">
