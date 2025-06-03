@@ -49,66 +49,61 @@ document.addEventListener(
 		console.info(
 			`Attempting to fetch recommendations for category: ${ event.detail.category }`
 		);
-		wp.api.loadPromise.done( () => {
-			const postsCollection =
-				new wp.api.collections.Prpl_recommendations();
-			const excludeIds = [];
-			document
-				.querySelectorAll( '.prpl-suggested-task' )
-				.forEach( ( item ) => {
-					excludeIds.push( item.getAttribute( 'data-post-id' ) );
-				} );
+		const excludeIds = [];
+		document
+			.querySelectorAll( '.prpl-suggested-task' )
+			.forEach( ( item ) => {
+				excludeIds.push( item.getAttribute( 'data-post-id' ) );
+			} );
 
-			const maxCategoryItems =
-				prplSuggestedTasks.maxItemsPerCategory[ event.detail.category ];
-			const perPage = Math.max( Math.min( maxCategoryItems, 100 ), 1 );
+		const maxCategoryItems =
+			prplSuggestedTasks.maxItemsPerCategory[ event.detail.category ];
+		const perPage = Math.max( Math.min( maxCategoryItems, 100 ), 1 );
 
-			postsCollection
-				.fetch( {
-					data: {
-						status: [ event.detail.status ],
-						per_page:
-							'publish' === event.detail.status ? perPage : 100,
-						_embed: true,
-						exclude: excludeIds,
-						prpl_recommendations_category:
-							window.progressPlannerSuggestedTasksTerms
-								.prpl_recommendations_category[
-								event.detail.category
-							].id,
-						filter: {
-							orderby: 'menu_order',
-							order: 'ASC',
-						},
+		prplSuggestedTask
+			.getPostsCollectionPromise( {
+				data: {
+					status: [ event.detail.status ],
+					per_page: 'publish' === event.detail.status ? perPage : 100,
+					_embed: true,
+					exclude: excludeIds,
+					prpl_recommendations_category:
+						window.progressPlannerSuggestedTasksTerms
+							.prpl_recommendations_category[
+							event.detail.category
+						].id,
+					filter: {
+						orderby: 'menu_order',
+						order: 'ASC',
 					},
-				} )
-				.done( ( data ) => {
-					console.info(
-						`Fetched ${ data.length } recommendations for category: ${ event.detail.category }`,
-						data
+				},
+			} )
+			.then( ( data ) => {
+				console.info(
+					`Fetched ${ data.length } recommendations for category: ${ event.detail.category }`,
+					data
+				);
+
+				// WIP.
+				if ( 'user' === event.detail.category ) {
+					window.progressPlannerTodo.tasks = data;
+				}
+
+				const injectTriggerArgsCallback =
+					event?.detail?.injectTriggerArgsCallback ||
+					( ( item ) => item );
+				data.forEach( ( item ) => {
+					document.dispatchEvent(
+						new CustomEvent( event.detail.injectTrigger, {
+							detail: injectTriggerArgsCallback( item ),
+						} )
 					);
-
-					// WIP.
-					if ( 'user' === event.detail.category ) {
-						window.progressPlannerTodo.tasks = data;
-					}
-
-					const injectTriggerArgsCallback =
-						event?.detail?.injectTriggerArgsCallback ||
-						( ( item ) => item );
-					data.forEach( ( item ) => {
-						document.dispatchEvent(
-							new CustomEvent( event.detail.injectTrigger, {
-								detail: injectTriggerArgsCallback( item ),
-							} )
-						);
-					} );
-
-					if ( event?.detail?.afterInject ) {
-						event.detail.afterInject( data );
-					}
 				} );
-		} );
+
+				if ( event?.detail?.afterInject ) {
+					event.detail.afterInject( data );
+				}
+			} );
 	}
 );
 

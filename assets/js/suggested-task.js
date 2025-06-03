@@ -7,6 +7,26 @@
 /* eslint-disable camelcase, jsdoc/require-param-type, jsdoc/require-param, jsdoc/check-param-names */
 
 /**
+ * Get a collection of posts.
+ *
+ * @param {Object} fetchArgs The arguments to pass to the fetch method.
+ * @return {Promise} A promise that resolves with the collection of posts.
+ */
+prplSuggestedTask.getPostsCollectionPromise = ( fetchArgs ) => {
+	const collectionsPromise = new Promise( ( resolve ) => {
+		wp.api.loadPromise.done( () => {
+			const postsCollection =
+				new wp.api.collections.Prpl_recommendations();
+			postsCollection.fetch( fetchArgs ).done( ( data ) => {
+				resolve( data );
+			} );
+		} );
+	} );
+
+	return collectionsPromise;
+};
+
+/**
  * Render a new item.
  *
  * @param {Object}  post         The post object.
