@@ -38,3 +38,25 @@ wp.api.loadPromise.done( () => {
 		);
 	} );
 } );
+
+/**
+ * Get a term object from the terms array.
+ *
+ * @param {number} termId   The term ID.
+ * @param {string} taxonomy The taxonomy.
+ * @return {Object} The term object.
+ */
+window.progressPlannerSuggestedTasksTerms.getTermObject = (
+	termId,
+	taxonomy
+) => {
+	let termObject = {};
+	Object.values(
+		window.progressPlannerSuggestedTasksTerms[ taxonomy ]
+	).forEach( ( term ) => {
+		if ( term.id === termId ) {
+			termObject = term;
+		}
+	} );
+	return termObject;
+};
