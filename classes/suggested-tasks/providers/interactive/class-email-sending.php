@@ -111,9 +111,9 @@ class Email_Sending extends Interactive {
 		\add_action( 'init', [ $this, 'check_if_wp_mail_is_filtered' ], PHP_INT_MAX );
 		\add_action( 'init', [ $this, 'check_if_wp_mail_has_override' ], PHP_INT_MAX );
 
-		$this->email_subject = \esc_html__( 'Test email from Progress Planner', 'progress-planner' );
-		// translators: %s is the admin URL.
-		$this->email_content = sprintf( \esc_html__( 'This is a test email. Complete the task by clicking the link: %s', 'progress-planner' ), \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) );
+		$this->email_subject = \esc_html__( 'Your Progress Planner test message!', 'progress-planner' );
+		// translators: %s the admin URL.
+		$this->email_content = sprintf( \esc_html__( 'You just used Progress Planner to verify if sending email works on your website. The good news; it does! Click %s to mark Ravi\'s Recommendation as completed.', 'progress-planner' ), '<a href="' . \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) . '" target="_blank">' . \esc_html__( 'here', 'progress-planner' ) . '</a>' );
 	}
 
 	/**
@@ -131,7 +131,7 @@ class Email_Sending extends Interactive {
 	 * @return string
 	 */
 	public function get_description() {
-		return \esc_html__( 'Test if your website can send emails correctly', 'progress-planner' );
+		return \esc_html__( 'Your website tries to send you important email. Test if sending email from your site works well.', 'progress-planner' );
 	}
 
 	/**
@@ -222,7 +222,9 @@ class Email_Sending extends Interactive {
 			wp_send_json_error( \esc_html__( 'Invalid email address.', 'progress-planner' ) );
 		}
 
-		$result = wp_mail( $email_address, $this->email_subject, $this->email_content );
+		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
+
+		$result = wp_mail( $email_address, $this->email_subject, $this->email_content, $headers );
 
 		if ( $result ) {
 			wp_send_json_success( \esc_html__( 'Email sent successfully.', 'progress-planner' ) );
@@ -317,7 +319,7 @@ class Email_Sending extends Interactive {
 						printf(
 							/* translators: %s is a link to the troubleshooting guide. */
 							\esc_html__( 'There are a few common reasons why your email might not be sending. Check the %s to find out what’s causing the issue and how to fix it.', 'progress-planner' ),
-							'<a href="#" target="_blank">' . \esc_html__( 'troubleshooting guide', 'progress-planner' ) . '</a>'
+							'<a href="https://prpl.fyi/troubleshoot-smtp" target="_blank">' . \esc_html__( 'troubleshooting guide', 'progress-planner' ) . '</a>'
 						);
 					?>
 					</p>
