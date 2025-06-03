@@ -200,7 +200,7 @@ class Suggested_Tasks_DB {
 
 		// Delete each recommendation.
 		foreach ( $recommendations as $recommendation ) {
-			$this->delete_recommendation( $recommendation['ID'] );
+			$this->delete_recommendation( $recommendation->ID );
 		}
 	}
 
