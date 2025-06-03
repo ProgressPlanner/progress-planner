@@ -271,7 +271,6 @@ prplSuggestedTask.runButtonAction = ( button ) => {
 	) {
 		action = 'close-' + target;
 	} else {
-		console.log( item.closest( '.prpl-suggested-tasks-list' ) );
 		const closestTaskListVisible = item
 			.closest( '.prpl-suggested-tasks-list' )
 			.querySelector( `[data-tooltip-visible]` );
