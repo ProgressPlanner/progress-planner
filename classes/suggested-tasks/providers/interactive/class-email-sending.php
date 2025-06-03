@@ -176,7 +176,7 @@ class Email_Sending extends Interactive {
 		];
 
 		foreach ( $filters_to_check as $filter ) {
-			$has_filter = isset( $wp_filter[ $filter ] ) && ! empty( $wp_filter[ $filter ]->callbacks ) ? true : false;
+			$has_filter                = isset( $wp_filter[ $filter ] ) && ! empty( $wp_filter[ $filter ]->callbacks ) ? true : false;
 			$this->is_wp_mail_filtered = $this->is_wp_mail_filtered || $has_filter;
 		}
 	}
