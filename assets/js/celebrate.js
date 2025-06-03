@@ -19,7 +19,8 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 				exclude_provider: 'user',
 			},
 		} )
-		.then( ( data ) => {
+		.then( ( response ) => {
+			const data = response.data;
 			if ( ! data.length ) {
 				return;
 			}

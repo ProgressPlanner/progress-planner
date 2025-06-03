@@ -49,24 +49,14 @@ document.addEventListener(
 		console.info(
 			`Attempting to fetch recommendations for category: ${ event.detail.category }`
 		);
-		const excludeIds = [];
-		document
-			.querySelectorAll( '.prpl-suggested-task' )
-			.forEach( ( item ) => {
-				excludeIds.push( item.getAttribute( 'data-post-id' ) );
-			} );
-
-		const maxCategoryItems =
-			prplSuggestedTasks.maxItemsPerCategory[ event.detail.category ];
-		const perPage = Math.max( Math.min( maxCategoryItems, 100 ), 1 );
 
 		prplSuggestedTask
 			.getPostsCollectionPromise( {
 				data: {
 					status: [ event.detail.status ],
-					per_page: 'publish' === event.detail.status ? perPage : 100,
+					per_page: 1,
 					_embed: true,
-					exclude: excludeIds,
+					exclude: prplSuggestedTask.injectedItemIds,
 					prpl_recommendations_category:
 						window.progressPlannerSuggestedTasksTerms
 							.prpl_recommendations_category[
@@ -78,15 +68,11 @@ document.addEventListener(
 					},
 				},
 			} )
-			.then( ( data ) => {
-				console.info(
-					`Fetched ${ data.length } recommendations for category: ${ event.detail.category }`,
-					data
-				);
-
-				// WIP.
-				if ( 'user' === event.detail.category ) {
-					window.progressPlannerTodo.tasks = data;
+			.then( ( response ) => {
+				const data = response.data;
+				const postsCollection = response.postsCollection;
+				if ( ! data.length ) {
+					return;
 				}
 
 				const injectTriggerArgsCallback =
@@ -98,10 +84,28 @@ document.addEventListener(
 							detail: injectTriggerArgsCallback( item ),
 						} )
 					);
+					prplSuggestedTask.injectedItemIds.push( item.id );
 				} );
 
 				if ( event?.detail?.afterInject ) {
 					event.detail.afterInject( data );
+				}
+
+				// If we want to get more items and there are more, repeat the process.
+				if (
+					postsCollection.hasMore() &&
+					prplSuggestedTasks.maxItemsPerCategory[
+						event.detail.category
+					] > prplSuggestedTask.injectedItemIds.length
+				) {
+					document.dispatchEvent(
+						new CustomEvent(
+							'prpl/suggestedTask/injectCategoryItems',
+							{
+								detail: event.detail,
+							}
+						)
+					);
 				}
 			} );
 	}

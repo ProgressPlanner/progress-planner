@@ -6,6 +6,8 @@
  */
 /* eslint-disable camelcase, jsdoc/require-param-type, jsdoc/require-param, jsdoc/check-param-names */
 
+prplSuggestedTask.injectedItemIds = [];
+
 /**
  * Get a collection of posts.
  *
@@ -13,12 +15,12 @@
  * @return {Promise} A promise that resolves with the collection of posts.
  */
 prplSuggestedTask.getPostsCollectionPromise = ( fetchArgs ) => {
+	const api = wp.api;
 	const collectionsPromise = new Promise( ( resolve ) => {
-		wp.api.loadPromise.done( () => {
-			const postsCollection =
-				new wp.api.collections.Prpl_recommendations();
+		api.loadPromise.done( () => {
+			const postsCollection = new api.collections.Prpl_recommendations();
 			postsCollection.fetch( fetchArgs ).done( ( data ) => {
-				resolve( data );
+				resolve( { data, postsCollection } );
 			} );
 		} );
 	} );
