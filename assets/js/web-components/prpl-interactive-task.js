@@ -17,25 +17,24 @@ class PrplInteractiveTask extends HTMLElement {
 	connectedCallback() {
 		const popoverId = this.getAttribute( 'popover-id' );
 
+		// Add default event listeners.
+		this.attachDefaultEventListeners();
+
+		// Allow child components to add event listeners when the popover is added to the DOM.
+		this.popoverAddedToDOM();
+
 		// Add popover close event listener.
 		const popover = document.getElementById( popoverId );
 		popover.addEventListener( 'beforetoggle', ( event ) => {
 			if ( event.newState === 'open' ) {
 				this.popoverOpening();
-				this.attachDefaultEventListeners();
 			}
 
 			if ( event.newState === 'closed' ) {
 				this.popoverClosing();
-				this.resetPopover();
 			}
 		} );
 	}
-
-	/**
-	 * Runs when the popover is opening.
-	 */
-	popoverOpening() {}
 
 	/**
 	 * Attach button event listeners.
@@ -55,15 +54,19 @@ class PrplInteractiveTask extends HTMLElement {
 	}
 
 	/**
+	 * Runs when the popover is added to the DOM.
+	 */
+	popoverAddedToDOM() {}
+
+	/**
+	 * Runs when the popover is opening.
+	 */
+	popoverOpening() {}
+
+	/**
 	 * Runs when the popover is closing.
 	 */
 	popoverClosing() {}
-
-	/**
-	 * Reset the popover.
-	 * For example to reset filled forms.
-	 */
-	resetPopover() {}
 
 	/**
 	 * Complete the task.

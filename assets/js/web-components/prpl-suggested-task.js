@@ -43,7 +43,7 @@ customElements.define(
 			}
 
 			if ( popover_id ) {
-				taskHeading = `<button popovertarget="${ popover_id }">${ title }</button>`;
+				taskHeading = `<a href="#" role="button" onclick="document.getElementById('${ popover_id }')?.showPopover()">${ title }</a>`;
 			}
 
 			const getTaskStatus = () => {
