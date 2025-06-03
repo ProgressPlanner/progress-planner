@@ -581,8 +581,14 @@ class Suggested_Tasks {
 				// Mark the task as completed.
 				$this->mark_task_as( 'completed', $task_id );
 
-				// Insert an activity.
-				$this->insert_activity( $task_id );
+				$task_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
+
+				// Insert an activity if task has points.
+				// User tasks have points saved in the task data (0 or 1). Other tasks don't, but they all award points.
+				if ( isset( $task_data[0] ) && ( ( 'user' !== $task_data[0]['provider_id'] || ( ( isset( $task_data[0]['points'] ) && 0 !== (int) $task_data[0]['points'] ) ) ) ) ) {
+					$this->insert_activity( $task_id );
+				}
+
 				$updated = true;
 				break;
 
