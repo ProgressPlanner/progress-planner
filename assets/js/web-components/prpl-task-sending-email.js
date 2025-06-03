@@ -238,6 +238,17 @@ customElements.define(
 		}
 
 		/**
+		 * Open the troubleshooting guide.
+		 */
+		openTroubleshootingGuide() {
+			// Open the troubleshooting guide in a new tab.
+			window.open( prplEmailSending.troubleshooting_guide_url, '_blank' );
+
+			// Close the popover.
+			this.closePopover();
+		}
+
+		/**
 		 * Popover closing, reset the layout, values, etc.
 		 */
 		popoverClosing() {

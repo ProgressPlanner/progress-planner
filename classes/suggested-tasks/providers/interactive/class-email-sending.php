@@ -92,6 +92,13 @@ class Email_Sending extends Interactive {
 	protected $is_wp_mail_overridden = false;
 
 	/**
+	 * The troubleshooting guide URL.
+	 *
+	 * @var string
+	 */
+	protected $troubleshooting_guide_url = 'https://prpl.fyi/troubleshoot-smtp';
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -112,8 +119,8 @@ class Email_Sending extends Interactive {
 		\add_action( 'init', [ $this, 'check_if_wp_mail_has_override' ], PHP_INT_MAX );
 
 		$this->email_subject = \esc_html__( 'Your Progress Planner test message!', 'progress-planner' );
-		// translators: %s the admin URL.
-		$this->email_content = sprintf( \esc_html__( 'You just used Progress Planner to verify if sending email works on your website. The good news; it does! Click %s to mark Ravi\'s Recommendation as completed.', 'progress-planner' ), '<a href="' . \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) . '" target="_blank">' . \esc_html__( 'here', 'progress-planner' ) . '</a>' );
+		// translators: %1$s <br><br> tags, %2$s the admin URL.
+		$this->email_content = sprintf( \esc_html__( 'You just used Progress Planner to verify if sending email works on your website. %1$s The good news; it does! Click %2$s to mark Ravi\'s Recommendation as completed.', 'progress-planner' ), '<br><br>', '<a href="' . \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) . '" target="_blank">' . \esc_html__( 'here', 'progress-planner' ) . '</a>', '<a href="' . \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) . '" target="_blank">' . \esc_html__( 'here', 'progress-planner' ) . '</a>' );
 	}
 
 	/**
@@ -154,9 +161,10 @@ class Email_Sending extends Interactive {
 			[
 				'name' => 'prplEmailSending',
 				'data' => [
-					'ajax_url'      => \admin_url( 'admin-ajax.php' ),
-					'nonce'         => \wp_create_nonce( 'progress_planner' ),
-					'unknown_error' => \esc_html__( 'Unknown error', 'progress-planner' ),
+					'ajax_url'                  => \admin_url( 'admin-ajax.php' ),
+					'nonce'                     => \wp_create_nonce( 'progress_planner' ),
+					'unknown_error'             => \esc_html__( 'Unknown error', 'progress-planner' ),
+					'troubleshooting_guide_url' => $this->troubleshooting_guide_url,
 				],
 			]
 		);
@@ -319,7 +327,7 @@ class Email_Sending extends Interactive {
 						printf(
 							/* translators: %s is a link to the troubleshooting guide. */
 							\esc_html__( 'There are a few common reasons why your email might not be sending. Check the %s to find out what’s causing the issue and how to fix it.', 'progress-planner' ),
-							'<a href="https://prpl.fyi/troubleshoot-smtp" target="_blank">' . \esc_html__( 'troubleshooting guide', 'progress-planner' ) . '</a>'
+							'<a href="' . \esc_url( $this->troubleshooting_guide_url ) . '" target="_blank">' . \esc_html__( 'troubleshooting guide', 'progress-planner' ) . '</a>'
 						);
 					?>
 					</p>
@@ -411,25 +419,35 @@ class Email_Sending extends Interactive {
 			<?php /* Email not received, showing troubleshooting */ ?>
 			<div class="prpl-columns-wrapper-flex prpl-sending-email-step" id="prpl-sending-email-troubleshooting-step" style="display: none;">
 				<div class="prpl-column prpl-column-content">
+					<p>
+					<?php
+					\esc_html_e( 'We\'re sorry to hear you did not receive our confirmation email yet. On some websites, it make take up to a few hours to send email. That\'s why we strongly advise you to check back in a few hours from now.', 'progress-planner' );
+					?>
+					</p>
+					<p>
+					<?php
+					\esc_html_e( 'If you already waited a couple of hours and you still didn\'t get our email, your email might not be working well. If you haven\'t already, you may need to install a plugin to handle email for you.', 'progress-planner' );
+					?>
+					</p>
 					<?php if ( $this->is_there_sending_email_override() ) : ?>
-						<p><?php \esc_html_e( 'Your website is using a plugin that filters emails.', 'progress-planner' ); ?></p>
+						<p>
+						<?php
+						\esc_html_e( 'We\'ve detected you\'re most likely already running an SMTP plugin. Please check its documentation to help you in troubleshooting.', 'progress-planner' );
+						?>
+						</p>
 					<?php else : ?>
-						<p><?php \esc_html_e( 'Your website is not using a plugin that filters emails.', 'progress-planner' ); ?></p>
+					<p>
+						<?php
+						printf(
+						/* translators: %s is a link to the troubleshooting guide. */
+							\esc_html__( 'We\'ve not detected an SMTP plugin on your site. Installing one may help resolving the email problem. You can read more about this at %s.', 'progress-planner' ),
+							'<a href="' . \esc_url( $this->troubleshooting_guide_url ) . '" target="_blank">' . \esc_html__( 'troubleshooting guide', 'progress-planner' ) . '</a>'
+						);
+						?>
+					</p>
 					<?php endif; ?>
-				</div>
-
-				<div class="prpl-column">
-					<h2><?php \esc_html_e( 'Email Troubleshooting', 'progress-planner' ); ?></h2>
-					<p><?php \esc_html_e( 'Here are some steps to fix email sending issues:', 'progress-planner' ); ?></p>
-					<ul>
-						<li><?php \esc_html_e( 'Check your SMTP settings are correct', 'progress-planner' ); ?></li>
-						<li><?php \esc_html_e( 'Ensure your domain\'s SPF records are properly configured', 'progress-planner' ); ?></li>
-						<li><?php \esc_html_e( 'Verify your email provider credentials', 'progress-planner' ); ?></li>
-						<li><?php \esc_html_e( 'Try sending to a different email address', 'progress-planner' ); ?></li>
-					</ul>
-
 					<div class="prpl-steps-nav-wrapper">
-						<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></button>
+						<button class="prpl-button" data-action="openTroubleshootingGuide"><?php \esc_html_e( 'Take me to your troubleshooting guide', 'progress-planner' ); ?></button>
 					</div>
 				</div>
 			</div>
