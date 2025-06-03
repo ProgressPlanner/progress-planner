@@ -101,14 +101,7 @@ document.addEventListener(
 						event.detail.category
 					] > prplSuggestedTask.injectedItemIds.length
 				) {
-					document.dispatchEvent(
-						new CustomEvent(
-							'prpl/suggestedTask/injectCategoryItems',
-							{
-								detail: event.detail,
-							}
-						)
-					);
+					document.dispatchEvent( event );
 				}
 			} );
 	}
