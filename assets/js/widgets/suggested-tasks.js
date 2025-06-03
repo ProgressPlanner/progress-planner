@@ -9,7 +9,10 @@
 /* eslint-disable camelcase */
 
 const prplSuggestedTasksToggleUIitems = () => {
-	document.querySelector( '.prpl-suggested-tasks-loading' )?.remove();
+	const el = document.querySelector( '.prpl-suggested-tasks-loading' );
+	if ( el ) {
+		el.remove();
+	}
 	setTimeout( () => {
 		const items = document.querySelectorAll(
 			'.prpl-suggested-tasks-list .prpl-suggested-task'

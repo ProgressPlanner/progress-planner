@@ -68,9 +68,12 @@ prplDocumentReady( () => {
 					};
 				},
 				afterInject: () => {
-					document
-						.querySelector( '#prpl-todo-list-loading' )
-						.remove();
+					const el = document.querySelector(
+						'#prpl-todo-list-loading'
+					);
+					if ( el ) {
+						el.remove();
+					}
 					// Resize the grid items.
 					window.dispatchEvent(
 						new CustomEvent( 'prpl/grid/resize' )
