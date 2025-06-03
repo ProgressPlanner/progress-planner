@@ -1,4 +1,4 @@
-/* global customElements, prplSuggestedTask, prplSuggestedTasks, prplDocumentReady */
+/* global customElements, prplSuggestedTask, prplDocumentReady */
 /*
  * Widget: Suggested Tasks
  *
@@ -25,87 +25,6 @@ const prplSuggestedTasksToggleUIitems = () => {
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	}, 2000 );
 };
-
-/**
- * Inject items from a category.
- */
-document.addEventListener(
-	'prpl/suggestedTask/injectCategoryItems',
-	( event ) => {
-		// If window.progressPlannerSuggestedTasksTerms is not loaded, try again after 100ms, for up to 10 times.
-		if (
-			Object.keys( window.progressPlannerSuggestedTasksTerms ).length ===
-				0 ||
-			! window?.progressPlannerSuggestedTasksTerms
-				?.prpl_recommendations_category[ event.detail.category ]?.id
-		) {
-			window.prplSuggestedTasksInjectCategoryItemsAttempts =
-				window.prplSuggestedTasksInjectCategoryItemsAttempts || 0;
-			if ( window.prplSuggestedTasksInjectCategoryItemsAttempts > 10 ) {
-				return;
-			}
-			setTimeout( () => {
-				document.dispatchEvent( event );
-			}, 100 );
-			return;
-		}
-		console.info(
-			`Attempting to fetch recommendations for category: ${ event.detail.category }`
-		);
-
-		prplSuggestedTask
-			.getPostsCollectionPromise( {
-				data: {
-					status: [ event.detail.status ],
-					per_page: 1,
-					_embed: true,
-					exclude: prplSuggestedTask.injectedItemIds,
-					prpl_recommendations_category:
-						window.progressPlannerSuggestedTasksTerms
-							.prpl_recommendations_category[
-							event.detail.category
-						].id,
-					filter: {
-						orderby: 'menu_order',
-						order: 'ASC',
-					},
-				},
-			} )
-			.then( ( response ) => {
-				const data = response.data;
-				const postsCollection = response.postsCollection;
-				if ( ! data.length ) {
-					return;
-				}
-
-				const injectTriggerArgsCallback =
-					event?.detail?.injectTriggerArgsCallback ||
-					( ( item ) => item );
-				data.forEach( ( item ) => {
-					document.dispatchEvent(
-						new CustomEvent( event.detail.injectTrigger, {
-							detail: injectTriggerArgsCallback( item ),
-						} )
-					);
-					prplSuggestedTask.injectedItemIds.push( item.id );
-				} );
-
-				if ( event?.detail?.afterInject ) {
-					event.detail.afterInject( data );
-				}
-
-				// If we want to get more items and there are more, repeat the process.
-				if (
-					postsCollection.hasMore() &&
-					prplSuggestedTasks.maxItemsPerCategory[
-						event.detail.category
-					] > prplSuggestedTask.injectedItemIds.length
-				) {
-					document.dispatchEvent( event );
-				}
-			} );
-	}
-);
 
 /**
  * Inject a todo item.
@@ -175,42 +94,37 @@ prplDocumentReady( () => {
 	}
 
 	// Loop through each provider and inject items.
-	for ( const category in prplSuggestedTasks.maxItemsPerCategory ) {
+	for ( const category in prplSuggestedTask.maxItemsPerCategory ) {
 		if ( 'user' === category ) {
 			continue;
 		}
-		document.dispatchEvent(
-			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
-				detail: {
-					category,
-					status: 'publish',
-					injectTrigger: 'prpl/suggestedTask/injectItem',
-					injectTriggerArgsCallback: ( todoItem ) => {
-						return {
-							item: todoItem,
-							listId: 'prpl-suggested-tasks-list',
-						};
-					},
-					afterInject: prplSuggestedTasksToggleUIitems,
-				},
-			} )
-		);
-		document.dispatchEvent(
-			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
-				detail: {
-					category,
-					status: 'pending_celebration',
-					injectTrigger: 'prpl/suggestedTask/injectItem',
-					injectTriggerArgsCallback: ( todoItem ) => {
-						return {
-							item: todoItem,
-							listId: 'prpl-suggested-tasks-list',
-						};
-					},
-					afterInject: prplSuggestedTasksToggleUIitems,
-				},
-			} )
-		);
+
+		prplSuggestedTask.injectCategoryItems( {
+			category,
+			status: 'publish',
+			injectTrigger: 'prpl/suggestedTask/injectItem',
+			injectTriggerArgsCallback: ( todoItem ) => {
+				return {
+					item: todoItem,
+					listId: 'prpl-suggested-tasks-list',
+				};
+			},
+			afterInject: prplSuggestedTasksToggleUIitems,
+		} );
+
+		prplSuggestedTask.injectCategoryItems( {
+			category,
+			status: 'pending_celebration',
+			injectTrigger: 'prpl/suggestedTask/injectItem',
+			injectTriggerArgsCallback: ( todoItem ) => {
+				return {
+					item: todoItem,
+					listId: 'prpl-suggested-tasks-list',
+				};
+			},
+			afterInject: prplSuggestedTasksToggleUIitems,
+		} );
+
 		setTimeout( () => {
 			// Trigger the celebration event.
 			document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
@@ -312,17 +226,11 @@ document.addEventListener(
 	'prpl/suggestedTask/maybeInjectItem',
 	( e ) => {
 		// TODO: Something seems off here, take a look at this.
-		const category = e.detail.category;
-		document.dispatchEvent(
-			new CustomEvent( 'prpl/suggestedTask/injectCategoryItems', {
-				detail: {
-					category,
-					injectTrigger: 'prpl/suggestedTask/maybeInjectItem',
-					afterInject: prplSuggestedTasksToggleUIitems,
-				},
-			} )
-		);
-
+		prplSuggestedTask.injectCategoryItems( {
+			category: e.detail.category,
+			injectTrigger: 'prpl/suggestedTask/maybeInjectItem',
+			afterInject: prplSuggestedTasksToggleUIitems,
+		} );
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	},
 	false

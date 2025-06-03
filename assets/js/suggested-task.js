@@ -9,6 +9,79 @@
 prplSuggestedTask.injectedItemIds = [];
 
 /**
+ * Inject items from a category.
+ */
+prplSuggestedTask.injectCategoryItems = ( args ) => {
+	// If window.progressPlannerSuggestedTasksTerms is not loaded, try again after 100ms, for up to 10 times.
+	if (
+		Object.keys( window.progressPlannerSuggestedTasksTerms ).length === 0 ||
+		! window?.progressPlannerSuggestedTasksTerms
+			?.prpl_recommendations_category[ args.category ]?.id
+	) {
+		window.prplSuggestedTasksInjectCategoryItemsAttempts =
+			window.prplSuggestedTasksInjectCategoryItemsAttempts || 0;
+		if ( window.prplSuggestedTasksInjectCategoryItemsAttempts > 10 ) {
+			return;
+		}
+		setTimeout( () => {
+			prplSuggestedTask.injectCategoryItems( args );
+		}, 100 );
+		return;
+	}
+	console.info(
+		`Attempting to fetch recommendations for category: ${ args.category }`
+	);
+
+	prplSuggestedTask
+		.getPostsCollectionPromise( {
+			data: {
+				status: [ args.status ],
+				per_page: 1,
+				_embed: true,
+				exclude: prplSuggestedTask.injectedItemIds,
+				prpl_recommendations_category:
+					window.progressPlannerSuggestedTasksTerms
+						.prpl_recommendations_category[ args.category ].id,
+				filter: {
+					orderby: 'menu_order',
+					order: 'ASC',
+				},
+			},
+		} )
+		.then( ( response ) => {
+			const data = response.data;
+			const postsCollection = response.postsCollection;
+			if ( ! data.length ) {
+				return;
+			}
+
+			const injectTriggerArgsCallback =
+				args?.injectTriggerArgsCallback || ( ( item ) => item );
+			data.forEach( ( item ) => {
+				document.dispatchEvent(
+					new CustomEvent( args.injectTrigger, {
+						detail: injectTriggerArgsCallback( item ),
+					} )
+				);
+				prplSuggestedTask.injectedItemIds.push( item.id );
+			} );
+
+			if ( args?.afterInject ) {
+				args.afterInject( data );
+			}
+
+			// If we want to get more items and there are more, repeat the process.
+			if (
+				postsCollection.hasMore() &&
+				prplSuggestedTask.maxItemsPerCategory[ args.category ] >
+					prplSuggestedTask.injectedItemIds.length
+			) {
+				prplSuggestedTask.injectCategoryItems( args );
+			}
+		} );
+};
+
+/**
  * Get a collection of posts.
  *
  * @param {Object} fetchArgs The arguments to pass to the fetch method.
