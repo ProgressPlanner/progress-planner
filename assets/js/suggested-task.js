@@ -7,25 +7,6 @@
 /* eslint-disable camelcase, jsdoc/require-param-type, jsdoc/require-param, jsdoc/check-param-names */
 
 /**
- * Get a term object from the terms array.
- *
- * @param {number} termId   The term ID.
- * @param {string} taxonomy The taxonomy.
- * @return {Object} The term object.
- */
-prplSuggestedTask.getTermObject = ( termId, taxonomy ) => {
-	let termObject = {};
-	Object.values(
-		window.progressPlannerSuggestedTasksTerms[ taxonomy ]
-	).forEach( ( term ) => {
-		if ( term.id === termId ) {
-			termObject = term;
-		}
-	} );
-	return termObject;
-};
-
-/**
  * Render a new item.
  *
  * @param {Object}  post         The post object.
@@ -139,7 +120,7 @@ prplSuggestedTask.trash = ( postId ) => {
 			prplSuggestedTask.runTaskAction(
 				postId,
 				'delete',
-				prplSuggestedTask.getTermObject(
+				window.progressPlannerSuggestedTasksTerms.getTermObject(
 					postData?.prpl_recommendations_category,
 					'prpl_recommendations_category'
 				).slug
@@ -164,7 +145,7 @@ prplSuggestedTask.maybeComplete = ( postId ) => {
 			prplSuggestedTask.runTaskAction(
 				postId,
 				'pending_celebration' === newStatus ? 'complete' : 'pending',
-				prplSuggestedTask.getTermObject(
+				window.progressPlannerSuggestedTasksTerms.getTermObject(
 					postData?.prpl_recommendations_category,
 					'prpl_recommendations_category'
 				).slug
@@ -193,14 +174,16 @@ prplSuggestedTask.maybeComplete = ( postId ) => {
 								'prpl/markTasksAsCompleted': eventDetail,
 								'prpl/suggestedTask/maybeInjectItem': {
 									task_id: postId,
-									providerID: prplSuggestedTask.getTermObject(
-										postData?.prpl_recommendations_provider,
-										'prpl_recommendations_provider'
-									).slug,
-									category: prplSuggestedTask.getTermObject(
-										postData?.prpl_recommendations_category,
-										'prpl_recommendations_category'
-									).slug,
+									providerID:
+										window.progressPlannerSuggestedTasksTerms.getTermObject(
+											postData?.prpl_recommendations_provider,
+											'prpl_recommendations_provider'
+										).slug,
+									category:
+										window.progressPlannerSuggestedTasksTerms.getTermObject(
+											postData?.prpl_recommendations_category,
+											'prpl_recommendations_category'
+										).slug,
 								},
 						  };
 
