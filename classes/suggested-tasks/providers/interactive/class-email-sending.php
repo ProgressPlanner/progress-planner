@@ -286,7 +286,7 @@ class Email_Sending extends Interactive {
 						<div class="prpl-steps-nav-wrapper">
 							<button class="prpl-button" data-action="showResults" type="submit">
 							<?php
-								/* translators: %s is an arrow icon. */
+								/* translators: %s is a forward arrow icon. */
 								printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
 							?>
 							</button>
@@ -333,7 +333,12 @@ class Email_Sending extends Interactive {
 					</p>
 
 					<div class="prpl-steps-nav-wrapper">
-						<button class="prpl-button" data-action="showForm"><?php \esc_html_e( 'Try again', 'progress-planner' ); ?></button>
+						<button class="prpl-button" data-action="showForm">
+							<?php
+								/* translators: %s is a back arrow icon. */
+								printf( \esc_html__( ' %s Try again', 'progress-planner' ), '<span class="dashicons dashicons-arrow-left-alt2"></span>' );
+							?>
+						</button>
 						<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Retry later', 'progress-planner' ); ?></button>
 					</div>
 				</div>
@@ -420,12 +425,12 @@ class Email_Sending extends Interactive {
 			<div class="prpl-columns-wrapper-flex prpl-sending-email-step" id="prpl-sending-email-troubleshooting-step" style="display: none;">
 				<div class="prpl-column prpl-column-content">
 					<h2 class="prpl-interactive-task-title"><?php \esc_html_e( 'Your email might not be working well', 'progress-planner' ); ?></h2>
-					<p>
+					<p class="prpl-interactive-task-description">
 					<?php
 					\esc_html_e( 'We\'re sorry to hear you did not receive our confirmation email yet. On some websites, it make take up to a few hours to send email. That\'s why we strongly advise you to check back in a few hours from now.', 'progress-planner' );
 					?>
 					</p>
-					<p>
+					<p class="prpl-interactive-task-description">
 					<?php
 					\esc_html_e( 'If you already waited a couple of hours and you still didn\'t get our email, your email might not be working well.', 'progress-planner' );
 					?>
