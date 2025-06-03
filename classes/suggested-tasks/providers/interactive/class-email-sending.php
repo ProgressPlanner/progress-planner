@@ -419,6 +419,7 @@ class Email_Sending extends Interactive {
 			<?php /* Email not received, showing troubleshooting */ ?>
 			<div class="prpl-columns-wrapper-flex prpl-sending-email-step" id="prpl-sending-email-troubleshooting-step" style="display: none;">
 				<div class="prpl-column prpl-column-content">
+					<h2 class="prpl-interactive-task-title"><?php \esc_html_e( 'Your email might not be working well', 'progress-planner' ); ?></h2>
 					<p>
 					<?php
 					\esc_html_e( 'We\'re sorry to hear you did not receive our confirmation email yet. On some websites, it make take up to a few hours to send email. That\'s why we strongly advise you to check back in a few hours from now.', 'progress-planner' );
@@ -426,9 +427,14 @@ class Email_Sending extends Interactive {
 					</p>
 					<p>
 					<?php
-					\esc_html_e( 'If you already waited a couple of hours and you still didn\'t get our email, your email might not be working well. If you haven\'t already, you may need to install a plugin to handle email for you.', 'progress-planner' );
+					\esc_html_e( 'If you already waited a couple of hours and you still didn\'t get our email, your email might not be working well.', 'progress-planner' );
 					?>
 					</p>
+				</div>
+
+				<div class="prpl-column">
+					<p><?php \esc_html_e( 'What can you do next?', 'progress-planner' ); ?></p>
+
 					<?php if ( $this->is_there_sending_email_override() ) : ?>
 						<p>
 						<?php
@@ -446,6 +452,7 @@ class Email_Sending extends Interactive {
 						?>
 					</p>
 					<?php endif; ?>
+
 					<div class="prpl-steps-nav-wrapper">
 						<button class="prpl-button" data-action="openTroubleshootingGuide"><?php \esc_html_e( 'Take me to your troubleshooting guide', 'progress-planner' ); ?></button>
 					</div>
