@@ -552,6 +552,9 @@ class Suggested_Tasks {
 
 		if ( ! $this->was_task_completed( $task_id ) ) {
 			$this->mark_task_as( 'pending_celebration', $task_id );
+
+			// Insert an activity.
+			$this->insert_activity( $task_id );
 		}
 	}
 
