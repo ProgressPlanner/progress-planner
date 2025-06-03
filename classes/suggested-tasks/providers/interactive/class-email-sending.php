@@ -433,24 +433,28 @@ class Email_Sending extends Interactive {
 				</div>
 
 				<div class="prpl-column">
-					<p><?php \esc_html_e( 'What can you do next?', 'progress-planner' ); ?></p>
-
 					<?php if ( $this->is_there_sending_email_override() ) : ?>
 						<p>
 						<?php
-						\esc_html_e( 'We\'ve detected you\'re most likely already running an SMTP plugin. Please check its documentation to help you in troubleshooting.', 'progress-planner' );
+						\esc_html_e( 'What can you do next? Well, it looks like you are already running an SMTP plugin on your website, but it might not be configured correctly.', 'progress-planner' );
+						?>
+						</p>
+						<p>
+						<?php
+						\esc_html_e( 'You can find more information about running an SMTP plugin in our troubleshooting guide.', 'progress-planner' );
 						?>
 						</p>
 					<?php else : ?>
-					<p>
+						<p>
 						<?php
-						printf(
-						/* translators: %s is a link to the troubleshooting guide. */
-							\esc_html__( 'We\'ve not detected an SMTP plugin on your site. Installing one may help resolving the email problem. You can read more about this at %s.', 'progress-planner' ),
-							'<a href="' . \esc_url( $this->troubleshooting_guide_url ) . '" target="_blank">' . \esc_html__( 'troubleshooting guide', 'progress-planner' ) . '</a>'
-						);
+						\esc_html_e( 'What can you do next? If you haven\'t already, you may need to install a plugin to handle email for you (an SMTP plugin).', 'progress-planner' );
 						?>
-					</p>
+						</p>
+						<p>
+						<?php
+						\esc_html_e( 'You can find more information about installing an SMTP plugin in our troubleshooting guide.', 'progress-planner' );
+						?>
+						</p>
 					<?php endif; ?>
 
 					<div class="prpl-steps-nav-wrapper">
