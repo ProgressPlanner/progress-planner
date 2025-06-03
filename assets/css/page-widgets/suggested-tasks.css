@@ -148,6 +148,13 @@
 		}
 	}
 
+	.prpl-suggested-task {
+
+		.prpl-suggested-task-checkbox {
+			flex-shrink: 0; /* Prevent shrinking on mobile */
+		}
+	}
+
 	/* Disabled checkbox styles. */
 	.prpl-suggested-task-disabled-checkbox-tooltip {
 
@@ -389,6 +396,22 @@
 					height: 100%;
 				}
 			}
+
+			&.prpl-note-error {
+				color: #9f0712;
+				background-color: var(--prpl-background-red);
+
+				.prpl-note-icon {
+					color: var(--prpl-color-notification-red);
+				}
+
+			}
+		}
+
+		/* To align the buttons to the bottom of the column. */
+		&:not(.prpl-column-content) {
+			display: flex;
+			flex-direction: column;
 		}
 
 		/* Inputs. */
@@ -454,6 +477,7 @@
 
 		/* Used for radio and checkbox inputs. */
 		.radios {
+			padding-left: 3px; /* To prevent custom radio and checkbox from being cut off. */
 			display: flex;
 			flex-direction: column;
 			gap: 0.5rem;
@@ -590,10 +614,13 @@
 
 		/* Used for next step button. */
 		.prpl-steps-nav-wrapper {
-			margin-top: 1rem;
+			margin-top: auto;
+			padding-top: 1rem;
 			display: flex;
 			justify-content: flex-end;
 			gap: 1rem;
+			align-self: flex-end;
+			width: 100%;
 
 			.prpl-button {
 				cursor: pointer;

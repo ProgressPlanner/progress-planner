@@ -27,12 +27,6 @@
 				width: 100%;
 			}
 		}
-
-		/* Button which triggers the popover, interactive tasks. */
-		button[popovertarget] {
-			line-height: 1;
-			text-align: initial;
-		}
 	}
 
 	input[type="checkbox"][disabled] {

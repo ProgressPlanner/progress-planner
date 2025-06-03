@@ -202,6 +202,9 @@ class Suggested_Tasks {
 
 			if ( $task ) {
 				\progress_planner()->get_suggested_tasks_db()->update_recommendation( $task->ID, [ 'post_status' => 'pending_celebration' ] );
+
+				// Insert an activity.
+				$this->insert_activity( $task_id );
 			}
 		}
 	}
