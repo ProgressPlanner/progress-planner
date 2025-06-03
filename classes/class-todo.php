@@ -23,21 +23,12 @@ class Todo {
 	}
 
 	/**
-	 * Get the pending todo list items.
-	 *
-	 * @return array
-	 */
-	public function get_items() {
-		return \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => 'user' ] );
-	}
-
-	/**
 	 * Get the points for a new task.
 	 *
 	 * @return int
 	 */
 	public function calc_points_for_new_task() {
-		$items = $this->get_items();
+		$items = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => 'user' ] );
 
 		// If this is the first user task ever, return 1.
 		if ( ! count( $items ) ) {
