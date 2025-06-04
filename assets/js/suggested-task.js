@@ -19,6 +19,7 @@ prplSuggestedTask.injectCategoryItems = ( args ) => {
 				`Fetching recommendations for category: ${ args.category }...`
 			);
 
+
 			prplSuggestedTask
 				.getPostsCollectionPromise( {
 					data: {
