@@ -3,6 +3,7 @@
 Bugs we fixed:
 
 * Don't redirect user to Progress Planner dashboard if 'redirect_to' GET or POST parameter is set.
+* Removed the Onboard tour steps for the Settings popover which was removed in 1.3.0.
 * Fixed detecting creation of new valuable content posts.
 * Don't award point for all Todo tasks, only for golden.
 
