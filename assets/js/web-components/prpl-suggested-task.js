@@ -217,14 +217,15 @@ customElements.define(
 							<slot name="open-icon">`;
 					}
 
-					output += `<input
+					output += `<label><input
 						type="checkbox"
-						id="prpl-suggested-task-checkbox-${ task_id }"
 						class="prpl-suggested-task-checkbox"
 						style="${ checkboxStyle }"
 						${ ! dismissable ? 'disabled' : '' }
 						${ getTaskStatus() === 'completed' ? 'checked' : '' }
-					>`;
+					><span class="screen-reader-text">${ taskHeading }: ${ prplL10n(
+						'markAsComplete'
+					) }</span></label>`;
 
 					if ( ! dismissable ) {
 						output += `
@@ -260,17 +261,11 @@ customElements.define(
 			>
 				${ actionButtons.completeCheckbox }
 				<h3 style="width: 100%;">
-					${
-						useCheckbox
-							? `<label for="prpl-suggested-task-checkbox-${ task_id }">`
-							: ''
-					}
 					<span${
 						'user' === category
 							? ` contenteditable="plaintext-only"`
 							: ''
 					}>${ taskHeading }</span>
-					${ useCheckbox && dismissable ? `</label>` : '' }
 				</h3>
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
@@ -482,6 +477,12 @@ customElements.define(
 									detail: { node: thisObj },
 								} )
 							);
+
+							h3Span
+								.closest( '.prpl-suggested-task' )
+								.querySelector(
+									'label:has(.prpl-suggested-task-checkbox) .screen-reader-text'
+								).innerHTML = title;
 						} );
 				}, 300 );
 			} );
