@@ -11,13 +11,13 @@
 			<# } else { #>
 				<label>
 					<input type="checkbox" class="prpl-suggested-task-checkbox" onchange="prplSuggestedTask.maybeComplete( {{ data.post.id }} );" style="margin-top: 2px; pointer-events: none;" <# if ( ! data.post.meta.prpl_dismissable ) { #>disabled<# } #> <# if ( 'trash' === data.status ) { #>checked<# } #>>
-					<span class="screen-reader-text">{{ data.l10n.markAsComplete }}</span>
+					<span class="screen-reader-text">{{{ data.post.title.rendered }}}: {{ data.l10n.markAsComplete }}</span>
 				</label>
 			<# } #>
 		<# } #>
 
 		<h3 style="width: 100%;">
-			<span <# if ( 'user' === data.terms.prpl_recommendations_category.slug ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>><# if ( data.post.meta.prpl_url ) { #><a href="{{ data.post.meta.prpl_url }}" target="{{ data.post.meta.prpl_url_target }}">{{{ data.post.title.rendered }}}</a><# } else if ( data.post.meta.prpl_popover_id ) { #><a href="#" role="button" onclick="document.getElementById('{{ data.post.meta.prpl_popover_id }}')?.showPopover()">{{{ data.post.title.rendered }}}</a><# } else { #>{{{ data.post.title.rendered }}}<# } #></span>
+			<span <# if ( 'user' === window.prplGetTermObject( data.post.prpl_recommendations_category[0], 'prpl_recommendations_category' ).slug ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>><# if ( data.post.meta.prpl_url ) { #><a href="{{ data.post.meta.prpl_url }}" target="{{ data.post.meta.prpl_url_target }}">{{{ data.post.title.rendered }}}</a><# } else if ( data.post.meta.prpl_popover_id ) { #><a href="#" role="button" onclick="document.getElementById('{{ data.post.meta.prpl_popover_id }}')?.showPopover()">{{{ data.post.title.rendered }}}</a><# } else { #>{{{ data.post.title.rendered }}}<# } #></span>
 		</h3>
 
 		<div class="prpl-suggested-task-actions">

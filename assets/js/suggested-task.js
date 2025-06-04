@@ -500,9 +500,10 @@ prplSuggestedTask = {
 		clearTimeout( this.debounceTimeout );
 		this.debounceTimeout = setTimeout( () => {
 			// Update an existing post.
+			const title = el.textContent.replace( /\n/g, '' );
 			const postModel = new wp.api.models.Prpl_recommendations( {
 				id: parseInt( el.getAttribute( 'data-post-id' ) ),
-				title: el.textContent.replace( /\n/g, '' ),
+				title,
 			} );
 			postModel.save().then( () => {
 				// Update the task title.
@@ -514,6 +515,11 @@ prplSuggestedTask = {
 					} )
 				);
 			} );
+			el
+				.closest( 'li.prpl-suggested-task' )
+				.querySelector(
+					'label:has(.prpl-suggested-task-checkbox) .screen-reader-text'
+				).innerHTML = `${ title }: ${ prplL10n( 'markAsComplete' ) }`;
 		}, 300 );
 	},
 };
