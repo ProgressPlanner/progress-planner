@@ -3,7 +3,7 @@
  *
  * Dependencies: wp-api
  */
-window.prplSuggestedTasksTerms = {};
+window.prplSuggestedTasksTerms = window.prplSuggestedTasksTerms || {};
 
 window.prplGetTermsCollectionPromise = ( taxonomy ) => {
 	return new Promise( ( resolve ) => {
@@ -12,8 +12,10 @@ window.prplGetTermsCollectionPromise = ( taxonomy ) => {
 		}
 		wp.api.loadPromise.done( () => {
 			console.info( `Fetching terms for taxonomy: ${ taxonomy }` );
+
 			const typeName = taxonomy.replace( 'prpl_', 'Prpl_' );
-			window.prplSuggestedTasksTerms[ taxonomy ] = {};
+			window.prplSuggestedTasksTerms[ taxonomy ] =
+				window.prplSuggestedTasksTerms[ taxonomy ] || {};
 			const TermsCollection = new wp.api.collections[ typeName ]();
 			TermsCollection.fetch( { data: { per_page: 100 } } ).done(
 				( data ) => {
@@ -44,8 +46,8 @@ window.prplGetTermsCollectionPromise = ( taxonomy ) => {
 								].user = response;
 							} );
 						}
+						resolve( window.prplSuggestedTasksTerms[ taxonomy ] );
 					} );
-					resolve( window.prplSuggestedTasksTerms[ taxonomy ] );
 				}
 			);
 		} );
