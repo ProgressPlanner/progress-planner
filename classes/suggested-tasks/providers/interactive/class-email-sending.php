@@ -236,9 +236,8 @@ class Email_Sending extends Interactive {
 
 		if ( $result ) {
 			wp_send_json_success( \esc_html__( 'Email sent successfully.', 'progress-planner' ) );
-		} else {
-			wp_send_json_error( $this->email_error );
 		}
+		wp_send_json_error( $this->email_error );
 	}
 
 	/**
@@ -285,10 +284,10 @@ class Email_Sending extends Interactive {
 
 						<div class="prpl-steps-nav-wrapper">
 							<button class="prpl-button" data-action="showResults" type="submit">
-							<?php
+								<?php
 								/* translators: %s is a forward arrow icon. */
 								printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
-							?>
+								?>
 							</button>
 						</div>
 					</form>
@@ -300,10 +299,13 @@ class Email_Sending extends Interactive {
 				<div class="prpl-column prpl-column-content">
 					<h2 class="prpl-interactive-task-title"><?php \esc_html_e( 'We tried to send a test email', 'progress-planner' ); ?></h2>
 					<p class="prpl-interactive-task-description" id="prpl-sending-email-error-occurred-message" data-email-message="
-					<?php
-						/* translators: %s is the email subject. */
-						printf( \esc_attr__( 'We just tried to send the email "%s" to [EMAIL_ADDRESS], but unfortunately it didn’t work.', 'progress-planner' ), \esc_attr( $this->email_subject ) );
-					?>
+						<?php
+						printf(
+							/* translators: %s is the email subject. */
+							\esc_attr__( 'We just tried to send the email "%s" to [EMAIL_ADDRESS], but unfortunately it didn’t work.', 'progress-planner' ),
+							\esc_attr( $this->email_subject )
+						);
+						?>
 					"></p>
 
 				</div>
@@ -314,22 +316,22 @@ class Email_Sending extends Interactive {
 							<?php \progress_planner()->the_asset( 'images/icon_exclamation_circle_solid.svg' ); ?>
 						</span>
 						<span class="prpl-note-text" data-email-message="
-						<?php
-							/* translators: %s is the error message. */
-							printf( \esc_attr__( 'The test email didn’t work. The error message was: [ERROR_MESSAGE]', 'progress-planner' ), \esc_attr( $this->email_error ) );
-						?>
+							<?php
+								/* translators: %s is the error message. */
+								printf( \esc_attr__( 'The test email didn’t work. The error message was: [ERROR_MESSAGE]', 'progress-planner' ), \esc_attr( $this->email_error ) );
+							?>
 						">
 						</span>
 					</div>
 
 					<p>
-					<?php
+						<?php
 						printf(
 							/* translators: %s is a link to the troubleshooting guide. */
 							\esc_html__( 'There are a few common reasons why your email might not be sending. Check the %s to find out what’s causing the issue and how to fix it.', 'progress-planner' ),
 							'<a href="' . \esc_url( $this->troubleshooting_guide_url ) . '" target="_blank">' . \esc_html__( 'troubleshooting guide', 'progress-planner' ) . '</a>'
 						);
-					?>
+						?>
 					</p>
 
 					<div class="prpl-steps-nav-wrapper">
@@ -349,10 +351,10 @@ class Email_Sending extends Interactive {
 				<div class="prpl-column prpl-column-content">
 					<h2 class="prpl-interactive-task-title"><?php \esc_html_e( 'We sent a test email', 'progress-planner' ); ?></h2>
 					<p class="prpl-interactive-task-description" id="prpl-sending-email-sent-message" data-email-message="
-					<?php
+						<?php
 						/* translators: %s is the email subject. */
 						printf( \esc_attr__( 'We just sent the email "%s" to [EMAIL_ADDRESS].', 'progress-planner' ), \esc_attr( $this->email_subject ) );
-					?>
+						?>
 					"></p>
 
 				</div>
@@ -371,10 +373,10 @@ class Email_Sending extends Interactive {
 						<div class="prpl-radio-wrapper">
 							<label for="prpl-sending-email-result-yes" class="prpl-custom-radio">
 								<input
-								type="radio"
-								id="prpl-sending-email-result-yes"
-								name="prpl-sending-email-result"
-								data-action="showSuccess"
+									type="radio"
+									id="prpl-sending-email-result-yes"
+									name="prpl-sending-email-result"
+									data-action="showSuccess"
 								>
 								<span class="prpl-custom-control"></span>
 								<?php \esc_html_e( 'Yes', 'progress-planner' ); ?>
@@ -383,10 +385,10 @@ class Email_Sending extends Interactive {
 						<div class="prpl-radio-wrapper">
 							<label for="prpl-sending-email-result-no" class="prpl-custom-radio">
 							<input
-							type="radio"
-							id="prpl-sending-email-result-no"
-							name="prpl-sending-email-result"
-							data-action="showTroubleshooting"
+								type="radio"
+								id="prpl-sending-email-result-no"
+								name="prpl-sending-email-result"
+								data-action="showTroubleshooting"
 							>
 							<span class="prpl-custom-control"></span>
 							<?php \esc_html_e( 'No', 'progress-planner' ); ?>
@@ -396,10 +398,10 @@ class Email_Sending extends Interactive {
 
 					<div class="prpl-steps-nav-wrapper">
 						<button class="prpl-button" data-action="">
-						<?php
+							<?php
 							/* translators: %s is an arrow icon. */
 							printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
-						?>
+							?>
 						</button>
 					</div>
 				</div>
@@ -426,40 +428,19 @@ class Email_Sending extends Interactive {
 				<div class="prpl-column prpl-column-content">
 					<h2 class="prpl-interactive-task-title"><?php \esc_html_e( 'Your email might not be working well', 'progress-planner' ); ?></h2>
 					<p class="prpl-interactive-task-description">
-					<?php
-					\esc_html_e( 'We\'re sorry to hear you did not receive our confirmation email yet. On some websites, it make take up to a few hours to send email. That\'s why we strongly advise you to check back in a few hours from now.', 'progress-planner' );
-					?>
+						<?php \esc_html_e( 'We\'re sorry to hear you did not receive our confirmation email yet. On some websites, it make take up to a few hours to send email. That\'s why we strongly advise you to check back in a few hours from now.', 'progress-planner' ); ?>
 					</p>
-					<p class="prpl-interactive-task-description">
-					<?php
-					\esc_html_e( 'If you already waited a couple of hours and you still didn\'t get our email, your email might not be working well.', 'progress-planner' );
-					?>
+					<p class="prpl-interactive-task-description"><?php \esc_html_e( 'If you already waited a couple of hours and you still didn\'t get our email, your email might not be working well.', 'progress-planner' ); ?>
 					</p>
 				</div>
 
 				<div class="prpl-column">
 					<?php if ( $this->is_there_sending_email_override() ) : ?>
-						<p>
-						<?php
-						\esc_html_e( 'What can you do next? Well, it looks like you are already running an SMTP plugin on your website, but it might not be configured correctly.', 'progress-planner' );
-						?>
-						</p>
-						<p>
-						<?php
-						\esc_html_e( 'You can find more information about running an SMTP plugin in our troubleshooting guide.', 'progress-planner' );
-						?>
-						</p>
+						<p><?php \esc_html_e( 'What can you do next? Well, it looks like you are already running an SMTP plugin on your website, but it might not be configured correctly.', 'progress-planner' ); ?></p>
+						<p><?php \esc_html_e( 'You can find more information about running an SMTP plugin in our troubleshooting guide.', 'progress-planner' ); ?></p>
 					<?php else : ?>
-						<p>
-						<?php
-						\esc_html_e( 'What can you do next? If you haven\'t already, you may need to install a plugin to handle email for you (an SMTP plugin).', 'progress-planner' );
-						?>
-						</p>
-						<p>
-						<?php
-						\esc_html_e( 'You can find more information about installing an SMTP plugin in our troubleshooting guide.', 'progress-planner' );
-						?>
-						</p>
+						<p><?php \esc_html_e( 'What can you do next? If you haven\'t already, you may need to install a plugin to handle email for you (an SMTP plugin).', 'progress-planner' ); ?></p>
+						<p><?php \esc_html_e( 'You can find more information about installing an SMTP plugin in our troubleshooting guide.', 'progress-planner' ); ?></p>
 					<?php endif; ?>
 
 					<div class="prpl-steps-nav-wrapper">
