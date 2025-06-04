@@ -13,31 +13,35 @@ prplSuggestedTask = {
 	/**
 	 * Inject items from a category.
 	 *
-	 * @param {Object} args The arguments to pass to the injectCategoryItems method.
+	 * @param {Object} args The arguments to pass to the injectItems method.
 	 */
-	injectCategoryItems: ( args ) => {
+	injectItems: ( args ) => {
 		window
 			.prplGetTermsCollectionPromise( 'prpl_recommendations_category' )
 			.then( ( terms ) => {
 				console.info(
-					`Fetching recommendations for category: ${ args.category }...`
+					`Fetching recommendations with args: ${ JSON.stringify(
+						args
+					) }...`
 				);
 
+				const fetchData = {
+					status: [ args.status ],
+					per_page: 1,
+					_embed: true,
+					exclude: prplSuggestedTask.injectedItemIds,
+					filter: {
+						orderby: 'menu_order',
+						order: 'ASC',
+					},
+				};
+				if ( args.category ) {
+					fetchData.prpl_recommendations_category =
+						terms[ args.category ].id;
+				}
+
 				prplSuggestedTask
-					.getPostsCollectionPromise( {
-						data: {
-							status: [ args.status ],
-							per_page: 1,
-							_embed: true,
-							exclude: prplSuggestedTask.injectedItemIds,
-							prpl_recommendations_category:
-								terms[ args.category ].id,
-							filter: {
-								orderby: 'menu_order',
-								order: 'ASC',
-							},
-						},
-					} )
+					.getPostsCollectionPromise( { data: fetchData } )
 					.then( ( response ) => {
 						const data = response.data;
 						const postsCollection = response.postsCollection;
@@ -62,13 +66,16 @@ prplSuggestedTask = {
 						}
 
 						// If we want to get more items and there are more, repeat the process.
-						if (
-							postsCollection.hasMore() &&
-							prplSuggestedTask.maxItemsPerCategory[
-								args.category
-							] > prplSuggestedTask.injectedItemIds.length
-						) {
-							prplSuggestedTask.injectCategoryItems( args );
+						if ( postsCollection.hasMore() ) {
+							if (
+								args.category &&
+								prplSuggestedTask.maxItemsPerCategory[
+									args.category
+								] <= prplSuggestedTask.injectedItemIds.length
+							) {
+								return;
+							}
+							prplSuggestedTask.injectItems( args );
 						}
 					} );
 			} );

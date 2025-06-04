@@ -105,7 +105,7 @@ prplDocumentReady( () => {
 			continue;
 		}
 
-		prplSuggestedTask.injectCategoryItems( {
+		prplSuggestedTask.injectItems( {
 			category,
 			status: 'publish',
 			injectTrigger: 'prpl/suggestedTask/injectItem',
@@ -118,7 +118,7 @@ prplDocumentReady( () => {
 			afterInject: prplSuggestedTasksToggleUIitems,
 		} );
 
-		prplSuggestedTask.injectCategoryItems( {
+		prplSuggestedTask.injectItems( {
 			category,
 			status: 'pending_celebration',
 			injectTrigger: 'prpl/suggestedTask/injectItem',
@@ -232,7 +232,7 @@ document.addEventListener(
 	'prpl/suggestedTask/maybeInjectItem',
 	( e ) => {
 		// TODO: Something seems off here, take a look at this.
-		prplSuggestedTask.injectCategoryItems( {
+		prplSuggestedTask.injectItems( {
 			category: e.detail.category,
 			injectTrigger: 'prpl/suggestedTask/maybeInjectItem',
 			afterInject: prplSuggestedTasksToggleUIitems,

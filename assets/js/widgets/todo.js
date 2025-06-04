@@ -53,7 +53,7 @@ document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
 } );
 
 prplDocumentReady( () => {
-	prplSuggestedTask.injectCategoryItems( {
+	prplSuggestedTask.injectItems( {
 		category: 'user',
 		status: 'publish',
 		injectTrigger: 'prpl/todo/injectItem',
