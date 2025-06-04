@@ -36,18 +36,20 @@ const prplGetHighestTodoItemOrder = () => {
 };
 
 document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
-	const todoItemHTML = prplSuggestedTask.getNewItemTemplate( {
-		post: event.detail.item,
-		deletable: true,
-		allowReorder: true,
-	} );
-
-	document
-		.getElementById( event.detail.listId )
-		.insertAdjacentHTML(
-			event.detail.addToStart ? 'afterbegin' : 'beforeend',
-			todoItemHTML
-		);
+	prplSuggestedTask
+		.getNewItemTemplatePromise( {
+			post: event.detail.item,
+			deletable: true,
+			allowReorder: true,
+		} )
+		.then( ( todoItemHTML ) => {
+			document
+				.getElementById( event.detail.listId )
+				.insertAdjacentHTML(
+					event.detail.addToStart ? 'afterbegin' : 'beforeend',
+					todoItemHTML
+				);
+		} );
 } );
 
 prplDocumentReady( () => {
@@ -90,11 +92,11 @@ prplDocumentReady( () => {
 					status: 'publish',
 					// Set the `prpl_recommendations_category` term.
 					prpl_recommendations_category:
-						window.progressPlannerSuggestedTasksTerms
+						window.prplSuggestedTasksTerms
 							.prpl_recommendations_category.user.id,
 					// Set the `prpl_recommendations_provider` term.
 					prpl_recommendations_provider:
-						window.progressPlannerSuggestedTasksTerms
+						window.prplSuggestedTasksTerms
 							.prpl_recommendations_provider.user.id,
 					menu_order: prplGetHighestTodoItemOrder() + 1,
 					meta: {

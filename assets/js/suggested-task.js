@@ -12,72 +12,59 @@ prplSuggestedTask.injectedItemIds = [];
  * Inject items from a category.
  */
 prplSuggestedTask.injectCategoryItems = ( args ) => {
-	// If window.progressPlannerSuggestedTasksTerms is not loaded, try again after 100ms, for up to 10 times.
-	if (
-		Object.keys( window.progressPlannerSuggestedTasksTerms ).length === 0 ||
-		! window?.progressPlannerSuggestedTasksTerms
-			?.prpl_recommendations_category[ args.category ]?.id
-	) {
-		window.prplSuggestedTasksInjectCategoryItemsAttempts =
-			window.prplSuggestedTasksInjectCategoryItemsAttempts || 0;
-		if ( window.prplSuggestedTasksInjectCategoryItemsAttempts > 10 ) {
-			return;
-		}
-		setTimeout( () => {
-			prplSuggestedTask.injectCategoryItems( args );
-		}, 100 );
-		return;
-	}
-	console.info(
-		`Attempting to fetch recommendations for category: ${ args.category }`
-	);
+	window
+		.prplGetTermsCollectionPromise( 'prpl_recommendations_category' )
+		.then( ( terms ) => {
+			console.info(
+				`Attempting to fetch recommendations for category: ${ args.category }`
+			);
 
-	prplSuggestedTask
-		.getPostsCollectionPromise( {
-			data: {
-				status: [ args.status ],
-				per_page: 1,
-				_embed: true,
-				exclude: prplSuggestedTask.injectedItemIds,
-				prpl_recommendations_category:
-					window.progressPlannerSuggestedTasksTerms
-						.prpl_recommendations_category[ args.category ].id,
-				filter: {
-					orderby: 'menu_order',
-					order: 'ASC',
-				},
-			},
-		} )
-		.then( ( response ) => {
-			const data = response.data;
-			const postsCollection = response.postsCollection;
-			if ( ! data.length ) {
-				return;
-			}
+			prplSuggestedTask
+				.getPostsCollectionPromise( {
+					data: {
+						status: [ args.status ],
+						per_page: 1,
+						_embed: true,
+						exclude: prplSuggestedTask.injectedItemIds,
+						prpl_recommendations_category:
+							terms[ args.category ].id,
+						filter: {
+							orderby: 'menu_order',
+							order: 'ASC',
+						},
+					},
+				} )
+				.then( ( response ) => {
+					const data = response.data;
+					const postsCollection = response.postsCollection;
+					if ( ! data.length ) {
+						return;
+					}
 
-			const injectTriggerArgsCallback =
-				args?.injectTriggerArgsCallback || ( ( item ) => item );
-			data.forEach( ( item ) => {
-				document.dispatchEvent(
-					new CustomEvent( args.injectTrigger, {
-						detail: injectTriggerArgsCallback( item ),
-					} )
-				);
-				prplSuggestedTask.injectedItemIds.push( item.id );
-			} );
+					const injectTriggerArgsCallback =
+						args?.injectTriggerArgsCallback || ( ( item ) => item );
+					data.forEach( ( item ) => {
+						document.dispatchEvent(
+							new CustomEvent( args.injectTrigger, {
+								detail: injectTriggerArgsCallback( item ),
+							} )
+						);
+						prplSuggestedTask.injectedItemIds.push( item.id );
+					} );
 
-			if ( args?.afterInject ) {
-				args.afterInject( data );
-			}
+					if ( args?.afterInject ) {
+						args.afterInject( data );
+					}
 
-			// If we want to get more items and there are more, repeat the process.
-			if (
-				postsCollection.hasMore() &&
-				prplSuggestedTask.maxItemsPerCategory[ args.category ] >
-					prplSuggestedTask.injectedItemIds.length
-			) {
-				prplSuggestedTask.injectCategoryItems( args );
-			}
+					// If we want to get more items and there are more, repeat the process.
+					if (
+						postsCollection.hasMore() &&
+						prplSuggestedTask.maxItemsPerCategory[ args.category ] >
+							prplSuggestedTask.injectedItemIds.length
+					) {
+						prplSuggestedTask.injectCategoryItems( args );
+					}
+				} );
 		} );
 };
 
@@ -109,65 +96,82 @@ prplSuggestedTask.getPostsCollectionPromise = ( fetchArgs ) => {
  * @param {boolean} deletable    Whether to allow deleting.
  * @param {boolean} useCheckbox  Whether to use a checkbox.
  */
-prplSuggestedTask.getNewItemTemplate = ( {
+prplSuggestedTask.getNewItemTemplatePromise = ( {
 	post = {},
 	allowReorder = false,
 	deletable = false,
 	useCheckbox = true,
 } ) => {
-	const { prpl_recommendations_provider, prpl_recommendations_category } =
-		post;
-	const terms = {
-		prpl_recommendations_provider,
-		prpl_recommendations_category,
-	};
+	return new Promise( ( resolve ) => {
+		const { prpl_recommendations_provider, prpl_recommendations_category } =
+			post;
+		const terms = {
+			prpl_recommendations_provider,
+			prpl_recommendations_category,
+		};
 
-	// Modify provider and category to be an object.
-	Object.keys( window.progressPlannerSuggestedTasksTerms ).forEach(
-		( type ) => {
-			if (
-				typeof terms[ type ] === 'object' &&
-				typeof terms[ type ][ 0 ] !== 'undefined'
-			) {
-				Object.values(
-					window.progressPlannerSuggestedTasksTerms[ type ]
-				).forEach( ( term ) => {
-					if ( term.id === terms[ type ][ 0 ] ) {
-						terms[ type ] = term;
-					}
-				} );
-			}
-		}
-	);
+		Promise.all( [
+			window.prplGetTermsCollectionPromise(
+				'prpl_recommendations_provider'
+			),
+			window.prplGetTermsCollectionPromise(
+				'prpl_recommendations_category'
+			),
+		] ).then( ( [ providerTerms, categoryTerms ] ) => {
+			terms.prpl_recommendations_provider = providerTerms;
+			terms.prpl_recommendations_category = categoryTerms;
 
-	const template = wp.template( 'prpl-suggested-task' );
-	const data = {
-		post,
-		terms,
-		allowReorder,
-		deletable,
-		useCheckbox,
-		assets: prplSuggestedTask.assets,
-		action: 'pending_celebration' === post.status ? 'celebrate' : '',
-		l10n: {
-			info: prplL10n( 'info' ),
-			moveUp: prplL10n( 'moveUp' ),
-			moveDown: prplL10n( 'moveDown' ),
-			snooze: prplL10n( 'snooze' ),
-			snoozeThisTask: prplL10n( 'snoozeThisTask' ),
-			howLong: prplL10n( 'howLong' ),
-			snoozeDurationOneWeek: prplL10n( 'snoozeDurationOneWeek' ),
-			snoozeDurationOneMonth: prplL10n( 'snoozeDurationOneMonth' ),
-			snoozeDurationThreeMonths: prplL10n( 'snoozeDurationThreeMonths' ),
-			snoozeDurationSixMonths: prplL10n( 'snoozeDurationSixMonths' ),
-			snoozeDurationOneYear: prplL10n( 'snoozeDurationOneYear' ),
-			snoozeDurationForever: prplL10n( 'snoozeDurationForever' ),
-			disabledRRCheckboxTooltip: prplL10n( 'disabledRRCheckboxTooltip' ),
-			markAsComplete: prplL10n( 'markAsComplete' ),
-		},
-	};
+			Object.values( providerTerms ).forEach( ( term ) => {
+				if ( term.id === terms.prpl_recommendations_provider[ 0 ] ) {
+					terms.prpl_recommendations_provider = term;
+				}
+			} );
 
-	return template( data );
+			Object.values( categoryTerms ).forEach( ( term ) => {
+				if ( term.id === terms.prpl_recommendations_category[ 0 ] ) {
+					terms.prpl_recommendations_category = term;
+				}
+			} );
+
+			const template = wp.template( 'prpl-suggested-task' );
+			const data = {
+				post,
+				terms,
+				allowReorder,
+				deletable,
+				useCheckbox,
+				assets: prplSuggestedTask.assets,
+				action:
+					'pending_celebration' === post.status ? 'celebrate' : '',
+				l10n: {
+					info: prplL10n( 'info' ),
+					moveUp: prplL10n( 'moveUp' ),
+					moveDown: prplL10n( 'moveDown' ),
+					snooze: prplL10n( 'snooze' ),
+					snoozeThisTask: prplL10n( 'snoozeThisTask' ),
+					howLong: prplL10n( 'howLong' ),
+					snoozeDurationOneWeek: prplL10n( 'snoozeDurationOneWeek' ),
+					snoozeDurationOneMonth: prplL10n(
+						'snoozeDurationOneMonth'
+					),
+					snoozeDurationThreeMonths: prplL10n(
+						'snoozeDurationThreeMonths'
+					),
+					snoozeDurationSixMonths: prplL10n(
+						'snoozeDurationSixMonths'
+					),
+					snoozeDurationOneYear: prplL10n( 'snoozeDurationOneYear' ),
+					snoozeDurationForever: prplL10n( 'snoozeDurationForever' ),
+					disabledRRCheckboxTooltip: prplL10n(
+						'disabledRRCheckboxTooltip'
+					),
+					markAsComplete: prplL10n( 'markAsComplete' ),
+				},
+			};
+
+			resolve( template( data ) );
+		} );
+	} );
 };
 
 /**
@@ -202,26 +206,34 @@ prplSuggestedTask.runTaskAction = ( postId, actionType, categorySlug ) => {
  * @param {number} postId The post ID.
  */
 prplSuggestedTask.trash = ( postId ) => {
-	const post = new wp.api.models.Prpl_recommendations( { id: postId } );
-	post.fetch().then( ( postData ) => {
-		post.destroy().then( () => {
-			// Remove the task from the todo list.
-			const el = document.querySelector(
-				`.prpl-suggested-task[data-post-id="${ postId }"]`
-			);
-			el.remove();
-			document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+	window
+		.prplGetTermsCollectionPromise( 'prpl_recommendations_category' )
+		.then( () => {
+			const post = new wp.api.models.Prpl_recommendations( {
+				id: postId,
+			} );
+			post.fetch().then( ( postData ) => {
+				post.destroy().then( () => {
+					// Remove the task from the todo list.
+					const el = document.querySelector(
+						`.prpl-suggested-task[data-post-id="${ postId }"]`
+					);
+					el.remove();
+					document.dispatchEvent(
+						new CustomEvent( 'prpl/grid/resize' )
+					);
 
-			prplSuggestedTask.runTaskAction(
-				postId,
-				'delete',
-				window.progressPlannerSuggestedTasksTerms.getTermObject(
-					postData?.prpl_recommendations_category,
-					'prpl_recommendations_category'
-				).slug
-			);
+					prplSuggestedTask.runTaskAction(
+						postId,
+						'delete',
+						window.prplGetTermObject(
+							postData?.prpl_recommendations_category,
+							'prpl_recommendations_category'
+						).slug
+					);
+				} );
+			} );
 		} );
-	} );
 };
 
 /**
@@ -240,7 +252,7 @@ prplSuggestedTask.maybeComplete = ( postId ) => {
 			prplSuggestedTask.runTaskAction(
 				postId,
 				'pending_celebration' === newStatus ? 'complete' : 'pending',
-				window.progressPlannerSuggestedTasksTerms.getTermObject(
+				window.prplGetTermObject(
 					postData?.prpl_recommendations_category,
 					'prpl_recommendations_category'
 				).slug
@@ -269,16 +281,14 @@ prplSuggestedTask.maybeComplete = ( postId ) => {
 								'prpl/markTasksAsCompleted': eventDetail,
 								'prpl/suggestedTask/maybeInjectItem': {
 									task_id: postId,
-									providerID:
-										window.progressPlannerSuggestedTasksTerms.getTermObject(
-											postData?.prpl_recommendations_provider,
-											'prpl_recommendations_provider'
-										).slug,
-									category:
-										window.progressPlannerSuggestedTasksTerms.getTermObject(
-											postData?.prpl_recommendations_category,
-											'prpl_recommendations_category'
-										).slug,
+									providerID: window.prplGetTermObject(
+										postData?.prpl_recommendations_provider,
+										'prpl_recommendations_provider'
+									).slug,
+									category: window.prplGetTermObject(
+										postData?.prpl_recommendations_category,
+										'prpl_recommendations_category'
+									).slug,
 								},
 						  };
 

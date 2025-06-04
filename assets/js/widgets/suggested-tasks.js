@@ -30,60 +30,66 @@ const prplSuggestedTasksToggleUIitems = () => {
  * Inject a todo item.
  */
 document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
-	const itemHTML = prplSuggestedTask.getNewItemTemplate( {
-		post: event.detail.item,
-		allowReorder: false,
-	} );
+	prplSuggestedTask
+		.getNewItemTemplatePromise( {
+			post: event.detail.item,
+			allowReorder: false,
+		} )
+		.then( ( itemHTML ) => {
+			/**
+			 * @todo Implement the parent task functionality.
+			 * Use this code: `const parent = event.detail.parent && '' !== event.detail.parent ? event.detail.parent : null;
+			 */
+			const parent = false;
 
-	/**
-	 * @todo Implement the parent task functionality.
-	 * Use this code: `const parent = event.detail.parent && '' !== event.detail.parent ? event.detail.parent : null;
-	 */
-	const parent = false;
+			if ( ! parent ) {
+				// Inject the item into the list.
+				document
+					.querySelector( '.prpl-suggested-tasks-list' )
+					.insertAdjacentHTML( 'beforeend', itemHTML );
 
-	if ( ! parent ) {
-		// Inject the item into the list.
-		document
-			.querySelector( '.prpl-suggested-tasks-list' )
-			.insertAdjacentHTML( 'beforeend', itemHTML );
+				return;
+			}
 
-		return;
-	}
-
-	// If we could not find the parent item, try again after 500ms.
-	window.prplRenderAttempts = window.prplRenderAttempts || 0;
-	if ( window.prplRenderAttempts > 500 ) {
-		return;
-	}
-	const parentItem = document.querySelector(
-		`.prpl-suggested-task[data-task-id="${ parent }"]`
-	);
-	if ( ! parentItem ) {
-		setTimeout( () => {
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/injectItem', {
-					detail: {
-						item: event.detail.item,
-						listId: event.detail.listId,
-					},
-				} )
+			// If we could not find the parent item, try again after 500ms.
+			window.prplRenderAttempts = window.prplRenderAttempts || 0;
+			if ( window.prplRenderAttempts > 500 ) {
+				return;
+			}
+			const parentItem = document.querySelector(
+				`.prpl-suggested-task[data-task-id="${ parent }"]`
 			);
-			window.prplRenderAttempts++;
-		}, 10 );
-		return;
-	}
+			if ( ! parentItem ) {
+				setTimeout( () => {
+					document.dispatchEvent(
+						new CustomEvent( 'prpl/suggestedTask/injectItem', {
+							detail: {
+								item: event.detail.item,
+								listId: event.detail.listId,
+							},
+						} )
+					);
+					window.prplRenderAttempts++;
+				}, 10 );
+				return;
+			}
 
-	// If the child list does not exist, create it.
-	if ( ! parentItem.querySelector( '.prpl-suggested-task-children' ) ) {
-		const childListElement = document.createElement( 'ul' );
-		childListElement.classList.add( 'prpl-suggested-task-children' );
-		parentItem.appendChild( childListElement );
-	}
+			// If the child list does not exist, create it.
+			if (
+				! parentItem.querySelector( '.prpl-suggested-task-children' )
+			) {
+				const childListElement = document.createElement( 'ul' );
+				childListElement.classList.add(
+					'prpl-suggested-task-children'
+				);
+				parentItem.appendChild( childListElement );
+			}
 
-	// Inject the item into the child list.
-	parentItem
-		.querySelector( '.prpl-suggested-task-children' )
-		.insertAdjacentHTML( 'beforeend', itemHTML );
+			// Inject the item into the child list.
+			parentItem
+				.querySelector( '.prpl-suggested-task-children' )
+				.insertAdjacentHTML( 'beforeend', itemHTML );
+		} );
 } );
 
 // Populate the list on load.
