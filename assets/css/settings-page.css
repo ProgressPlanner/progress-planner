@@ -293,7 +293,6 @@
 			width: 30rem;
 			max-width: calc(100% - 2rem);
 			border: 1px solid var(--prpl-color-gray-2);
-			box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.05);
 		}
 	}
 

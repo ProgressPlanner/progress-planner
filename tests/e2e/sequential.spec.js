@@ -1,9 +1,9 @@
 const { test } = require( '@playwright/test' );
-const onboardingTests = require( './onboarding.spec' );
-const taglineTests = require( './task-tagline.spec' );
-const todoTests = require( './todo.spec' );
-const todoReorderTests = require( './todo-reorder.spec' );
-const todoCompleteTests = require( './todo-complete.spec' );
+const onboardingTests = require( './sequential/onboarding.spec' );
+const taglineTests = require( './sequential/task-tagline.spec' );
+const todoTests = require( './sequential/todo.spec' );
+const todoReorderTests = require( './sequential/todo-reorder.spec' );
+const todoCompleteTests = require( './sequential/todo-complete.spec' );
 
 test.describe( 'Sequential Tests', () => {
 	onboardingTests( test );
