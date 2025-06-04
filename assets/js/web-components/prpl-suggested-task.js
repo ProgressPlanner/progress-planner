@@ -30,6 +30,7 @@ customElements.define(
 			deletable = false,
 			useCheckbox = true,
 			taskList = '', // prplSuggestedTasks or progressPlannerTodo.
+			popover_id,
 		} ) {
 			// Get parent class properties
 			super();
@@ -39,6 +40,10 @@ customElements.define(
 			let taskHeading = title;
 			if ( url ) {
 				taskHeading = `<a href="${ url }" target="${ url_target }">${ title }</a>`;
+			}
+
+			if ( popover_id ) {
+				taskHeading = `<a href="#" role="button" onclick="document.getElementById('${ popover_id }')?.showPopover()">${ title }</a>`;
 			}
 
 			const getTaskStatus = () => {

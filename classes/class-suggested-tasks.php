@@ -35,6 +35,9 @@ class Suggested_Tasks {
 
 		if ( \is_admin() ) {
 			\add_action( 'init', [ $this, 'init' ], 100 ); // Wait for the post types to be initialized.
+
+			// Check GET parameter and maybe set task as pending celebration.
+			\add_action( 'init', [ $this, 'maybe_complete_task' ] );
 		}
 
 		// Add the automatic updates complete action.
@@ -531,6 +534,31 @@ class Suggested_Tasks {
 	}
 
 	/**
+	 * Maybe complete a task.
+	 * Primarly this is used for deeplinking, ie user is testing if the emails are working
+	 * He gets an email with a link which automatically completes the task.
+	 *
+	 * @return void
+	 */
+	public function maybe_complete_task() {
+		if ( ! \progress_planner()->is_on_progress_planner_dashboard_page() || ! isset( $_GET['prpl_complete_task'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
+
+		$task_id = \sanitize_text_field( \wp_unslash( $_GET['prpl_complete_task'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		if ( ! $task_id ) {
+			return;
+		}
+
+		if ( ! $this->was_task_completed( $task_id ) ) {
+			$this->mark_task_as( 'pending_celebration', $task_id );
+
+			// Insert an activity.
+			$this->insert_activity( $task_id );
+		}
+	}
+
+	/**
 	 * Handle the suggested task action.
 	 *
 	 * @return void
@@ -555,6 +583,7 @@ class Suggested_Tasks {
 
 				// Insert an activity.
 				$this->insert_activity( $task_id );
+
 				$updated = true;
 				break;
 
