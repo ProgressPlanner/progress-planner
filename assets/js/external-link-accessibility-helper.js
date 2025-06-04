@@ -42,7 +42,9 @@ class ExternalLinkAccessibilityHelper {
 
 	// Private: check and decorate one link
 	_processLink( link ) {
-		if ( link.dataset.prpl_accessibility_enhanced === 'true' ) return;
+		if ( link.dataset.prpl_accessibility_enhanced === 'true' ) {
+			return;
+		}
 
 		const url = new URL( link.href, window.location.href );
 		if (
