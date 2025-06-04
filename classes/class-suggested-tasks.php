@@ -583,6 +583,7 @@ class Suggested_Tasks {
 
 				// Insert an activity.
 				$this->insert_activity( $task_id );
+
 				$updated = true;
 				break;
 

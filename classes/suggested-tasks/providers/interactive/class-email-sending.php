@@ -120,7 +120,7 @@ class Email_Sending extends Interactive {
 
 		$this->email_subject = \esc_html__( 'Your Progress Planner test message!', 'progress-planner' );
 		// translators: %1$s <br><br> tags, %2$s the admin URL.
-		$this->email_content = sprintf( \esc_html__( 'You just used Progress Planner to verify if sending email works on your website. %1$s The good news; it does! Click %2$s to mark Ravi\'s Recommendation as completed.', 'progress-planner' ), '<br><br>', '<a href="' . \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) . '" target="_blank">' . \esc_html__( 'here', 'progress-planner' ) . '</a>', '<a href="' . \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) . '" target="_blank">' . \esc_html__( 'here', 'progress-planner' ) . '</a>' );
+		$this->email_content = sprintf( \esc_html__( 'You just used Progress Planner to verify if sending email works on your website. %1$s The good news; it does! Click here to %2$s.', 'progress-planner' ), '<br><br>', '<a href="' . \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) . '" target="_blank">' . \esc_html__( 'mark Ravi\'s Recommendation as completed', 'progress-planner' ) . '</a>', '<a href="' . \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) . '" target="_blank">' . \esc_html__( 'here', 'progress-planner' ) . '</a>' );
 	}
 
 	/**
@@ -286,7 +286,7 @@ class Email_Sending extends Interactive {
 						<div class="prpl-steps-nav-wrapper">
 							<button class="prpl-button" data-action="showResults" type="submit">
 							<?php
-								/* translators: %s is an arrow icon. */
+								/* translators: %s is a forward arrow icon. */
 								printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
 							?>
 							</button>
@@ -333,7 +333,12 @@ class Email_Sending extends Interactive {
 					</p>
 
 					<div class="prpl-steps-nav-wrapper">
-						<button class="prpl-button" data-action="showForm"><?php \esc_html_e( 'Try again', 'progress-planner' ); ?></button>
+						<button class="prpl-button" data-action="showForm">
+							<?php
+								/* translators: %s is a back arrow icon. */
+								printf( \esc_html__( ' %s Try again', 'progress-planner' ), '<span class="dashicons dashicons-arrow-left-alt2"></span>' );
+							?>
+						</button>
 						<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Retry later', 'progress-planner' ); ?></button>
 					</div>
 				</div>
@@ -419,33 +424,44 @@ class Email_Sending extends Interactive {
 			<?php /* Email not received, showing troubleshooting */ ?>
 			<div class="prpl-columns-wrapper-flex prpl-sending-email-step" id="prpl-sending-email-troubleshooting-step" style="display: none;">
 				<div class="prpl-column prpl-column-content">
-					<p>
+					<h2 class="prpl-interactive-task-title"><?php \esc_html_e( 'Your email might not be working well', 'progress-planner' ); ?></h2>
+					<p class="prpl-interactive-task-description">
 					<?php
 					\esc_html_e( 'We\'re sorry to hear you did not receive our confirmation email yet. On some websites, it make take up to a few hours to send email. That\'s why we strongly advise you to check back in a few hours from now.', 'progress-planner' );
 					?>
 					</p>
-					<p>
+					<p class="prpl-interactive-task-description">
 					<?php
-					\esc_html_e( 'If you already waited a couple of hours and you still didn\'t get our email, your email might not be working well. If you haven\'t already, you may need to install a plugin to handle email for you.', 'progress-planner' );
+					\esc_html_e( 'If you already waited a couple of hours and you still didn\'t get our email, your email might not be working well.', 'progress-planner' );
 					?>
 					</p>
+				</div>
+
+				<div class="prpl-column">
 					<?php if ( $this->is_there_sending_email_override() ) : ?>
 						<p>
 						<?php
-						\esc_html_e( 'We\'ve detected you\'re most likely already running an SMTP plugin. Please check its documentation to help you in troubleshooting.', 'progress-planner' );
+						\esc_html_e( 'What can you do next? Well, it looks like you are already running an SMTP plugin on your website, but it might not be configured correctly.', 'progress-planner' );
+						?>
+						</p>
+						<p>
+						<?php
+						\esc_html_e( 'You can find more information about running an SMTP plugin in our troubleshooting guide.', 'progress-planner' );
 						?>
 						</p>
 					<?php else : ?>
-					<p>
+						<p>
 						<?php
-						printf(
-						/* translators: %s is a link to the troubleshooting guide. */
-							\esc_html__( 'We\'ve not detected an SMTP plugin on your site. Installing one may help resolving the email problem. You can read more about this at %s.', 'progress-planner' ),
-							'<a href="' . \esc_url( $this->troubleshooting_guide_url ) . '" target="_blank">' . \esc_html__( 'troubleshooting guide', 'progress-planner' ) . '</a>'
-						);
+						\esc_html_e( 'What can you do next? If you haven\'t already, you may need to install a plugin to handle email for you (an SMTP plugin).', 'progress-planner' );
 						?>
-					</p>
+						</p>
+						<p>
+						<?php
+						\esc_html_e( 'You can find more information about installing an SMTP plugin in our troubleshooting guide.', 'progress-planner' );
+						?>
+						</p>
 					<?php endif; ?>
+
 					<div class="prpl-steps-nav-wrapper">
 						<button class="prpl-button" data-action="openTroubleshootingGuide"><?php \esc_html_e( 'Take me to your troubleshooting guide', 'progress-planner' ); ?></button>
 					</div>
