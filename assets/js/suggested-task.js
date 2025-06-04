@@ -16,7 +16,7 @@ prplSuggestedTask.injectCategoryItems = ( args ) => {
 		.prplGetTermsCollectionPromise( 'prpl_recommendations_category' )
 		.then( ( terms ) => {
 			console.info(
-				`Attempting to fetch recommendations for category: ${ args.category }`
+				`Fetching recommendations for category: ${ args.category }...`
 			);
 
 			prplSuggestedTask

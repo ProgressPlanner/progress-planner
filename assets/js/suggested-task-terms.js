@@ -12,7 +12,7 @@ window.prplGetTermsCollectionPromise = ( taxonomy ) => {
 			resolve( window.prplSuggestedTasksTerms[ taxonomy ] );
 		}
 		wp.api.loadPromise.done( () => {
-			console.info( `Fetching terms for taxonomy: ${ taxonomy }` );
+			console.info( `Fetching terms for taxonomy: ${ taxonomy }...` );
 
 			const typeName = taxonomy.replace( 'prpl_', 'Prpl_' );
 			window.prplSuggestedTasksTerms[ taxonomy ] =
