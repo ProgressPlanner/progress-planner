@@ -8,6 +8,7 @@ window.prplSuggestedTasksTerms = window.prplSuggestedTasksTerms || {};
 window.prplGetTermsCollectionPromise = ( taxonomy ) => {
 	return new Promise( ( resolve ) => {
 		if ( window.prplSuggestedTasksTerms[ taxonomy ]?.user ) {
+			console.info( `Terms already fetched for taxonomy: ${ taxonomy }` );
 			resolve( window.prplSuggestedTasksTerms[ taxonomy ] );
 		}
 		wp.api.loadPromise.done( () => {
