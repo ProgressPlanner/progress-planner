@@ -41,7 +41,7 @@ window.prplGetTermsCollectionsPromises().then( () => {
 
 		prplSuggestedTask.injectItems( {
 			category,
-			status: 'publish',
+			status: [ 'publish' ],
 			injectTrigger: 'prpl/suggestedTask/injectItem',
 			injectTriggerArgsCallback: ( todoItem ) => {
 				return {
@@ -55,7 +55,7 @@ window.prplGetTermsCollectionsPromises().then( () => {
 
 		prplSuggestedTask.injectItems( {
 			category,
-			status: 'pending_celebration',
+			status: [ 'pending_celebration' ],
 			injectTrigger: 'prpl/suggestedTask/injectItem',
 			injectTriggerArgsCallback: ( todoItem ) => {
 				return {

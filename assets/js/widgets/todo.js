@@ -27,11 +27,13 @@ const prplGetHighestTodoItemOrder = () => {
 };
 
 window.prplGetTermsCollectionsPromises().then( () => {
+	// Add the pending items.
 	prplSuggestedTask.injectItems( {
 		category: 'user',
-		status: 'publish',
+		status: [ 'publish', 'pending_celebration', 'trash' ],
 		injectTrigger: 'prpl/suggestedTask/injectItem',
 		injectTriggerArgsCallback: ( todoItem ) => {
+			console.log( todoItem );
 			return {
 				item: todoItem,
 				insertPosition:
@@ -39,9 +41,9 @@ window.prplGetTermsCollectionsPromises().then( () => {
 						? 'afterbegin' // Add golden task to the start of the list.
 						: 'beforeend',
 				listId:
-					todoItem.status === 'completed'
-						? 'todo-list-completed'
-						: 'todo-list',
+					todoItem.status === 'publish'
+						? 'todo-list'
+						: 'todo-list-completed',
 			};
 		},
 		afterRequestComplete: () => {

@@ -37,7 +37,7 @@ prplSuggestedTask = {
 		);
 
 		const fetchData = {
-			status: [ args.status ],
+			status: args.status,
 			per_page: 1,
 			_embed: true,
 			exclude: prplSuggestedTask.injectedItemIds,
