@@ -61,64 +61,60 @@ window.prplGetTermsCollectionsPromises().then( () => {
 		.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
 
-			wp.api.loadPromise.done( () => {
-				// Create a new post
-				const post = new wp.api.models.Prpl_recommendations( {
-					// Set the post title.
-					title: document.getElementById( 'new-todo-content' ).value,
-					status: 'publish',
-					// Set the `prpl_recommendations_category` term.
-					prpl_recommendations_category:
-						window.prplSuggestedTasksTerms
-							.prpl_recommendations_category.user.id,
-					// Set the `prpl_recommendations_provider` term.
-					prpl_recommendations_provider:
-						window.prplSuggestedTasksTerms
-							.prpl_recommendations_provider.user.id,
-					menu_order: prplGetHighestTodoItemOrder() + 1,
+			// Create a new post
+			const post = new wp.api.models.Prpl_recommendations( {
+				// Set the post title.
+				title: document.getElementById( 'new-todo-content' ).value,
+				status: 'publish',
+				// Set the `prpl_recommendations_category` term.
+				prpl_recommendations_category:
+					window.prplSuggestedTasksTerms.prpl_recommendations_category
+						.user.id,
+				// Set the `prpl_recommendations_provider` term.
+				prpl_recommendations_provider:
+					window.prplSuggestedTasksTerms.prpl_recommendations_provider
+						.user.id,
+				menu_order: prplGetHighestTodoItemOrder() + 1,
+				meta: {
+					prpl_snoozable: false,
+					prpl_dismissable: true,
+				},
+			} );
+			post.save().then( ( response ) => {
+				if ( ! response.id ) {
+					return;
+				}
+				const newTask = {
+					...response,
 					meta: {
+						...response.meta,
+						prpl_points: 0,
 						prpl_snoozable: false,
 						prpl_dismissable: true,
+						prpl_url: '',
+						prpl_url_target: '_self',
 					},
-				} );
-				post.save().then( ( response ) => {
-					if ( ! response.id ) {
-						return;
-					}
-					const newTask = {
-						...response,
-						meta: {
-							...response.meta,
-							prpl_points: 0,
-							prpl_snoozable: false,
-							prpl_dismissable: true,
-							prpl_url: '',
-							prpl_url_target: '_self',
+					provider: 'user',
+					category: 'user',
+					order: prplGetHighestTodoItemOrder() + 1,
+				};
+
+				// Inject the new task into the DOM.
+				document.dispatchEvent(
+					new CustomEvent( 'prpl/suggestedTask/injectItem', {
+						detail: {
+							item: newTask,
+							insertPosition:
+								1 === newTask.points
+									? 'afterbegin'
+									: 'beforeend', // Add golden task to the start of the list.
+							listId: 'todo-list',
 						},
-						provider: 'user',
-						category: 'user',
-						order: prplGetHighestTodoItemOrder() + 1,
-					};
+					} )
+				);
 
-					// Inject the new task into the DOM.
-					document.dispatchEvent(
-						new CustomEvent( 'prpl/suggestedTask/injectItem', {
-							detail: {
-								item: newTask,
-								insertPosition:
-									1 === newTask.points
-										? 'afterbegin'
-										: 'beforeend', // Add golden task to the start of the list.
-								listId: 'todo-list',
-							},
-						} )
-					);
-
-					// Resize the grid items.
-					window.dispatchEvent(
-						new CustomEvent( 'prpl/grid/resize' )
-					);
-				} );
+				// Resize the grid items.
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 			} );
 
 			// Clear the new task input element.
