@@ -32,7 +32,7 @@ const prplGetHighestTodoItemOrder = () => {
 window.prplPopulateTodoList = function () {
 	prplSuggestedTask.injectItems( {
 		category: 'user',
-		status: [ 'publish', 'pending_celebration', 'trash' ],
+		status: [ 'publish', 'trash' ],
 		injectTrigger: 'prpl/suggestedTask/injectItem',
 		injectTriggerArgsCallback: ( todoItem ) => {
 			return {
