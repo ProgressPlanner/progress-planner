@@ -32,7 +32,6 @@ window.prplGetTermsCollectionsPromises().then( () => {
 		status: [ 'publish', 'pending_celebration', 'trash' ],
 		injectTrigger: 'prpl/suggestedTask/injectItem',
 		injectTriggerArgsCallback: ( todoItem ) => {
-			console.log( todoItem );
 			return {
 				item: todoItem,
 				insertPosition:
