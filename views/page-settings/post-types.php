@@ -10,8 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_saved_settings = \progress_planner()->get_settings()->get_post_types_names();
-$prpl_post_types     = \progress_planner()->get_settings()->get_public_post_types();
+$prpl_saved_settings = \progress_planner()->get_activities__content_helpers()->get_post_types_names();
+$prpl_post_types     = \progress_planner()->get_activities__content_helpers()->get_public_post_types();
 
 // Early exit if there are no public post types.
 if ( empty( $prpl_post_types ) ) {

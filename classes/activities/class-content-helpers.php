@@ -21,17 +21,54 @@ class Content_Helpers {
 	 */
 	public function get_post_types_names() {
 		static $include_post_types;
+
+		if ( ! doing_action( 'init' ) && ! did_action( 'init' ) ) {
+			\trigger_error( // phpcs:ignore
+				sprintf(
+					'%1$s was called too early. Wait for init hook to be called to have access to the post types.',
+					\esc_html( get_class() . '::' . __FUNCTION__ )
+				),
+				E_USER_WARNING
+			);
+		}
+
+		// Since we're working with CPTs, dont cache until init.
 		if ( isset( $include_post_types ) && ! empty( $include_post_types ) ) {
 			return $include_post_types;
 		}
-		$default            = [ 'post', 'page' ];
-		$include_post_types = \array_filter(
-			\progress_planner()->get_settings()->get( [ 'include_post_types' ], $default ),
-			function ( $post_type ) {
-				return $post_type && \post_type_exists( $post_type ) && \is_post_type_viewable( $post_type );
-			}
-		);
-		return empty( $include_post_types ) ? $default : \array_values( $include_post_types );
+
+		$public_post_types = $this->get_public_post_types();
+
+		// Post or pages can be deregistered.
+		$default = array_intersect( [ 'post', 'page' ], $public_post_types );
+
+		// Filter the saved post types.
+		$include_post_types = array_intersect( progress_planner()->get_settings()->get( [ 'include_post_types' ], $default ), $public_post_types );
+
+		$include_post_types = ! empty( $include_post_types ) ? $include_post_types : $default;
+
+		return $include_post_types;
+	}
+
+	/**
+	 * Get the public post types.
+	 *
+	 * @return string[]
+	 */
+	public function get_public_post_types() {
+		$public_post_types = \array_filter( \get_post_types( [ 'public' => true ] ), 'is_post_type_viewable' );
+
+		unset( $public_post_types['attachment'] );
+		unset( $public_post_types['elementor_library'] ); // Elementor templates are not a post type we want to track.
+
+		/**
+		 * Filter the public post types.
+		 *
+		 * @param string[] $public_post_types The public post types.
+		 *
+		 * @return string[]
+		 */
+		return \apply_filters( 'progress_planner_public_post_types', $public_post_types );
 	}
 
 	/**

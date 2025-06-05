@@ -65,13 +65,13 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 		$where_clause = "1=1 AND p.post_status = 'publish'";
 
 		// Get the public post types.
-		$public_post_types = \progress_planner()->get_settings()->get_public_post_types();
+		$public_post_types = \progress_planner()->get_activities__content_helpers()->get_public_post_types();
 		$post_types_in     = '';
 
 		if ( ! empty( $public_post_types ) ) {
 			$post_types_in = array_map(
 				function ( $type ) {
-					return (string) esc_sql( $type );
+					return (string) esc_sql( $type ); // @phpstan-ignore-line
 				},
 				array_values( $public_post_types )
 			);
