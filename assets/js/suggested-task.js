@@ -9,6 +9,22 @@
 prplSuggestedTask = {
 	...prplSuggestedTask,
 	injectedItemIds: [],
+	l10n: {
+		info: prplL10n( 'info' ),
+		moveUp: prplL10n( 'moveUp' ),
+		moveDown: prplL10n( 'moveDown' ),
+		snooze: prplL10n( 'snooze' ),
+		snoozeThisTask: prplL10n( 'snoozeThisTask' ),
+		howLong: prplL10n( 'howLong' ),
+		snoozeDurationOneWeek: prplL10n( 'snoozeDurationOneWeek' ),
+		snoozeDurationOneMonth: prplL10n( 'snoozeDurationOneMonth' ),
+		snoozeDurationThreeMonths: prplL10n( 'snoozeDurationThreeMonths' ),
+		snoozeDurationSixMonths: prplL10n( 'snoozeDurationSixMonths' ),
+		snoozeDurationOneYear: prplL10n( 'snoozeDurationOneYear' ),
+		snoozeDurationForever: prplL10n( 'snoozeDurationForever' ),
+		disabledRRCheckboxTooltip: prplL10n( 'disabledRRCheckboxTooltip' ),
+		markAsComplete: prplL10n( 'markAsComplete' ),
+	},
 
 	/**
 	 * Inject items from a category.
@@ -152,30 +168,7 @@ prplSuggestedTask = {
 				assets: prplSuggestedTask.assets,
 				action:
 					'pending_celebration' === post.status ? 'celebrate' : '',
-				l10n: {
-					info: prplL10n( 'info' ),
-					moveUp: prplL10n( 'moveUp' ),
-					moveDown: prplL10n( 'moveDown' ),
-					snooze: prplL10n( 'snooze' ),
-					snoozeThisTask: prplL10n( 'snoozeThisTask' ),
-					howLong: prplL10n( 'howLong' ),
-					snoozeDurationOneWeek: prplL10n( 'snoozeDurationOneWeek' ),
-					snoozeDurationOneMonth: prplL10n(
-						'snoozeDurationOneMonth'
-					),
-					snoozeDurationThreeMonths: prplL10n(
-						'snoozeDurationThreeMonths'
-					),
-					snoozeDurationSixMonths: prplL10n(
-						'snoozeDurationSixMonths'
-					),
-					snoozeDurationOneYear: prplL10n( 'snoozeDurationOneYear' ),
-					snoozeDurationForever: prplL10n( 'snoozeDurationForever' ),
-					disabledRRCheckboxTooltip: prplL10n(
-						'disabledRRCheckboxTooltip'
-					),
-					markAsComplete: prplL10n( 'markAsComplete' ),
-				},
+				l10n: prplSuggestedTask.l10n,
 			};
 
 			resolve( template( data ) );
