@@ -54,24 +54,6 @@ class Tour {
 				],
 			],
 			[
-				'element' => '#prpl-popover-settings-trigger',
-				'popover' => [
-					'title'       => \esc_html__( 'Settings', 'progress-planner' ),
-					'description' => \esc_html__( 'With this button you can open the settings. Here you can determine which post types you want to include in your activity score.', 'progress-planner' ),
-					'side'        => 'top',
-					'align'       => 'center',
-				],
-			],
-			[
-				'element' => '#prpl-popover-settings',
-				'popover' => [
-					'title'       => \esc_html__( 'Post types', 'progress-planner' ),
-					'description' => \esc_html__( 'Simply select the post types you want to include in your activity score and hit save.', 'progress-planner' ),
-					'side'        => 'top',
-					'align'       => 'center',
-				],
-			],
-			[
 				'element' => '.prpl-widget-wrapper.prpl-todo',
 				'popover' => [
 					'title'       => \esc_html__( 'Your to-do list', 'progress-planner' ),

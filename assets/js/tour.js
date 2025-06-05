@@ -37,18 +37,10 @@ const prplDriverObj = prplDriver( {
 		popover, // eslint-disable-line no-unused-vars
 		{ config, state } // eslint-disable-line no-unused-vars
 	) => {
-		const settingsPopover = document.getElementById(
-			'prpl-popover-settings'
-		);
 		const monthlyBadgesPopover = document.getElementById(
 			'prpl-popover-monthly-badges'
 		);
-
-		if ( state.activeIndex === 4 ) {
-			prplTourShowPopover( settingsPopover );
-		}
-
-		if ( state.activeIndex === 7 ) {
+		if ( state.activeIndex === 5 ) {
 			prplTourShowPopover( monthlyBadgesPopover );
 		}
 
@@ -85,25 +77,16 @@ function prplMakePopoverBackdropTransparent( popover ) {
 
 // eslint-disable-next-line no-unused-vars -- This is called on a few buttons.
 function prplStartTour() {
-	const settingsPopover = document.getElementById( 'prpl-popover-settings' );
 	const monthlyBadgesPopover = document.getElementById(
 		'prpl-popover-monthly-badges'
 	);
 	const progressPlannerTourSteps = progressPlannerTour.steps;
-	progressPlannerTourSteps[ 3 ].popover.onNextClick = function () {
-		prplTourShowPopover( settingsPopover );
-		prplDriverObj.moveNext();
-	};
-	progressPlannerTourSteps[ 4 ].popover.onNextClick = function () {
-		prplTourHidePopover( settingsPopover );
-		prplDriverObj.moveNext();
-	};
 
-	progressPlannerTourSteps[ 6 ].popover.onNextClick = function () {
+	progressPlannerTourSteps[ 4 ].popover.onNextClick = function () {
 		prplTourShowPopover( monthlyBadgesPopover );
 		prplDriverObj.moveNext();
 	};
-	progressPlannerTourSteps[ 7 ].popover.onNextClick = function () {
+	progressPlannerTourSteps[ 5 ].popover.onNextClick = function () {
 		prplTourHidePopover( monthlyBadgesPopover );
 		prplDriverObj.moveNext();
 	};

@@ -110,7 +110,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 
 		return sprintf(
 			/* translators: %s: Post title. */
-			\esc_html__( 'Yoast SEO: Article %s has no links - fix it!', 'progress-planner' ),
+			\esc_html__( 'Yoast SEO: add internal links to article "%s"!', 'progress-planner' ),
 			\esc_html( $task_data[0]['post_title'] )
 		);
 	}
@@ -125,7 +125,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Yoast SEO detected that this article has no links pointing to it. %s.', 'progress-planner' ),
-			'<a href="#" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			'<a href="https://prpl.fyi/fix-orphaned-content" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the fixing the orphaned content.', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		);
 	}
 
@@ -144,7 +144,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return '';
 		}
 
-		return \admin_url( 'post.php?post=' . $post->ID . '&action=edit' );
+		return 'https://prpl.fyi/fix-orphaned-content';
 	}
 
 	/**
@@ -197,20 +197,27 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	public function get_tasks_to_inject() {
 
 		if (
+			true === $this->is_task_snoozed() ||
 			! $this->should_add_task() // No need to add the task.
 		) {
 			return [];
 		}
 
-		$data = $this->data_collector->collect();
+		$data    = $this->data_collector->collect();
+		$task_id = $this->get_task_id(
+			[
+				'post_id' => $data['post_id'],
+			]
+		);
+
+		// When we have data, check if task was completed.
+		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
+			return [];
+		}
 
 		return [
 			[
-				'task_id'     => $this->get_task_id(
-					[
-						'post_id' => $data['post_id'],
-					]
-				),
+				'task_id'     => $task_id,
 				'provider_id' => $this->get_provider_id(),
 				'category'    => $this->get_provider_category(),
 				'post_id'     => $data['post_id'],

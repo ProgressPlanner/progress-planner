@@ -7,13 +7,13 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
-use Progress_Planner\Suggested_Tasks\Providers\Tasks;
+use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Yoast_Provider;
 use Progress_Planner\Suggested_Tasks\Providers\Traits\Dismissable_Task;
 
 /**
  * Add tasks for Yoast SEO cornerstone content.
  */
-class Cornerstone_Workout extends Tasks {
+class Cornerstone_Workout extends Yoast_Provider {
 	use Dismissable_Task;
 
 	/**
@@ -31,13 +31,6 @@ class Cornerstone_Workout extends Tasks {
 	protected const PROVIDER_ID = 'yoast-cornerstone-workout';
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'configuration';
-
-	/**
 	 * The task priority.
 	 *
 	 * @var string
@@ -51,6 +44,12 @@ class Cornerstone_Workout extends Tasks {
 	 */
 	protected $is_dismissable = true;
 
+	/**
+	 * Whether the task is repetitive.
+	 *
+	 * @var bool
+	 */
+	protected $is_repetitive = true;
 
 	/**
 	 * The task points.
@@ -66,6 +65,46 @@ class Cornerstone_Workout extends Tasks {
 	 */
 	public function init() {
 		$this->init_dismissable_task();
+
+		// Hook into update_option.
+		\add_action( 'update_option_wpseo_premium', [ $this, 'maybe_update_workout_status' ], 10, 3 );
+	}
+
+	/**
+	 * Maybe update the workout status.
+	 *
+	 * @param mixed  $old_value The old value.
+	 * @param mixed  $value The new value.
+	 * @param string $option The option name.
+	 *
+	 * @return void
+	 */
+	public function maybe_update_workout_status( $old_value, $value, $option ) {
+		if ( 'wpseo_premium' !== $option || ! isset( $value['workouts']['cornerstone'] ) || ! isset( $old_value['workouts']['cornerstone'] ) ) {
+			return;
+		}
+
+		// Check if there is pending task.
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $this->get_task_id() );
+
+		// If there is no pending task, return.
+		if ( empty( $tasks ) || 'pending' !== $tasks[0]['status'] ) {
+			return;
+		}
+
+		// For this type of task only the provider ID is needed, but just in case.
+		if ( $this->is_task_dismissed( $tasks[0] ) ) {
+			return;
+		}
+
+		// There should be 3 steps in the workout.
+		$workout_was_completed = 3 === count( $old_value['workouts']['cornerstone']['finishedSteps'] );
+		$workout_completed     = 3 === count( $value['workouts']['cornerstone']['finishedSteps'] );
+
+		// Dismiss the task if workout wasn't completed before and now is.
+		if ( ! $workout_was_completed && $workout_completed ) {
+			$this->handle_task_dismissal( $this->get_task_id() );
+		}
 	}
 
 	/**
@@ -76,7 +115,7 @@ class Cornerstone_Workout extends Tasks {
 	 * @return string
 	 */
 	public function get_title( $task_id = '' ) {
-		return \esc_html__( 'Run Yoast SEO Cornerstone Content Workout', 'progress-planner' );
+		return \esc_html__( 'Yoast SEO: do Yoast SEO\'s Cornerstone Content Workout', 'progress-planner' );
 	}
 
 	/**
@@ -89,8 +128,8 @@ class Cornerstone_Workout extends Tasks {
 	public function get_description( $task_id = '' ) {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Run the Yoast SEO Cornerstone Content Workout to improve your site\'s SEO. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-cornerstone" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			\esc_html__( 'Improve your most important pages with Yoast SEO\'s Cornerstone Content Workout. %s.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/run-cornerstone-content-workout" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Learn more about the Yoast SEO Cornerstone Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Learn more', 'progress-planner' ) . '</a>'
 		);
 	}
 
@@ -102,7 +141,7 @@ class Cornerstone_Workout extends Tasks {
 	 * @return string
 	 */
 	public function get_url( $task_id = '' ) {
-		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts' ) ) : '';
+		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) ) : '';
 	}
 
 	/**
@@ -111,7 +150,7 @@ class Cornerstone_Workout extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( ! function_exists( 'YoastSEO' ) ) {
+		if ( ! defined( 'WPSEO_PREMIUM_VERSION' ) ) {
 			return false;
 		}
 
@@ -125,26 +164,6 @@ class Cornerstone_Workout extends Tasks {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Get an array of tasks to inject.
-	 *
-	 * @return array
-	 */
-	public function get_tasks_to_inject() {
-		if ( ! $this->should_add_task() ) {
-			return [];
-		}
-
-		return [
-			[
-				'task_id'     => $this->get_task_id(),
-				'provider_id' => $this->get_provider_id(),
-				'category'    => $this->get_provider_category(),
-				'date'        => \gmdate( 'YW' ),
-			],
-		];
 	}
 
 	/**

@@ -1,4 +1,5 @@
 const { test, expect, chromium } = require( '@playwright/test' );
+const SELECTORS = require( '../constants/selectors' );
 
 const FIRST_TASK_TEXT = 'First task to reorder';
 const SECOND_TASK_TEXT = 'Second task to reorder';
@@ -27,9 +28,7 @@ function todoReorderTests( testContext = test ) {
 			await page.waitForLoadState( 'networkidle' );
 
 			// Clean up active tasks
-			const activeTodoItems = page.locator(
-				'ul#todo-list > prpl-suggested-task li'
-			);
+			const activeTodoItems = page.locator( SELECTORS.TODO_ITEM );
 
 			while ( ( await activeTodoItems.count() ) > 0 ) {
 				const firstItem = activeTodoItems.first();
@@ -75,21 +74,19 @@ function todoReorderTests( testContext = test ) {
 			await page.waitForTimeout( 500 );
 
 			// Get all todo items
-			const todoItems = page.locator(
-				'ul#todo-list > prpl-suggested-task li'
-			);
+			const todoItems = page.locator( SELECTORS.TODO_ITEM );
 
 			// Verify initial order
 			const items = await todoItems.all();
-			await expect( items[ 0 ].locator( 'h3 > span' ) ).toHaveText(
-				FIRST_TASK_TEXT
-			);
-			await expect( items[ 1 ].locator( 'h3 > span' ) ).toHaveText(
-				SECOND_TASK_TEXT
-			);
-			await expect( items[ 2 ].locator( 'h3 > span' ) ).toHaveText(
-				THIRD_TASK_TEXT
-			);
+			await expect(
+				items[ 0 ].locator( SELECTORS.RR_ITEM_TEXT )
+			).toHaveText( FIRST_TASK_TEXT );
+			await expect(
+				items[ 1 ].locator( SELECTORS.RR_ITEM_TEXT )
+			).toHaveText( SECOND_TASK_TEXT );
+			await expect(
+				items[ 2 ].locator( SELECTORS.RR_ITEM_TEXT )
+			).toHaveText( THIRD_TASK_TEXT );
 
 			// Hover over second item and click move down button
 			await items[ 1 ].hover();
@@ -101,13 +98,13 @@ function todoReorderTests( testContext = test ) {
 			// Verify new order
 			const reorderedItems = await todoItems.all();
 			await expect(
-				reorderedItems[ 0 ].locator( 'h3 > span' )
+				reorderedItems[ 0 ].locator( SELECTORS.RR_ITEM_TEXT )
 			).toHaveText( FIRST_TASK_TEXT );
 			await expect(
-				reorderedItems[ 1 ].locator( 'h3 > span' )
+				reorderedItems[ 1 ].locator( SELECTORS.RR_ITEM_TEXT )
 			).toHaveText( THIRD_TASK_TEXT );
 			await expect(
-				reorderedItems[ 2 ].locator( 'h3 > span' )
+				reorderedItems[ 2 ].locator( SELECTORS.RR_ITEM_TEXT )
 			).toHaveText( SECOND_TASK_TEXT );
 
 			// Reload page
@@ -117,13 +114,13 @@ function todoReorderTests( testContext = test ) {
 			// Verify order persists after reload
 			const persistedItems = await todoItems.all();
 			await expect(
-				persistedItems[ 0 ].locator( 'h3 > span' )
+				persistedItems[ 0 ].locator( SELECTORS.RR_ITEM_TEXT )
 			).toHaveText( FIRST_TASK_TEXT );
 			await expect(
-				persistedItems[ 1 ].locator( 'h3 > span' )
+				persistedItems[ 1 ].locator( SELECTORS.RR_ITEM_TEXT )
 			).toHaveText( THIRD_TASK_TEXT );
 			await expect(
-				persistedItems[ 2 ].locator( 'h3 > span' )
+				persistedItems[ 2 ].locator( SELECTORS.RR_ITEM_TEXT )
 			).toHaveText( SECOND_TASK_TEXT );
 		} );
 	} );

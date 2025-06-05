@@ -32,7 +32,7 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	 * @return string
 	 */
 	public function get_title() {
-		return \esc_html__( 'Yoast SEO: Remove emoji scripts', 'progress-planner' );
+		return \esc_html__( 'Yoast SEO: remove emoji scripts', 'progress-planner' );
 	}
 
 	/**
@@ -44,7 +44,7 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Remove JavaScript used for converting emoji characters in older browsers. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-crawl-optimization-emoji-scripts" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			'<a href="https://prpl.fyi/yoast-crawl-optimization-emoji-scripts" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Crawl Optimization Emoji Scripts', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		);
 	}
 

@@ -1,4 +1,5 @@
 const { test, expect, chromium } = require( '@playwright/test' );
+const SELECTORS = require( '../constants/selectors' );
 
 const CREATE_TASK_TEXT = 'Test task to create';
 const DELETE_TASK_TEXT = 'Test task to delete';
@@ -26,9 +27,7 @@ function todoTests( testContext = test ) {
 			await page.waitForLoadState( 'networkidle' );
 
 			// Clean up active tasks
-			const activeTodoItems = page.locator(
-				'ul#todo-list > prpl-suggested-task li'
-			);
+			const activeTodoItems = page.locator( SELECTORS.TODO_ITEM );
 
 			while ( ( await activeTodoItems.count() ) > 0 ) {
 				const firstItem = activeTodoItems.first();
@@ -49,7 +48,7 @@ function todoTests( testContext = test ) {
 				await page.waitForTimeout( 500 );
 
 				const completedTodoItems = page.locator(
-					'ul#todo-list-completed > prpl-suggested-task li'
+					SELECTORS.TODO_COMPLETED_ITEM
 				);
 
 				while ( ( await completedTodoItems.count() ) > 0 ) {
@@ -87,13 +86,11 @@ function todoTests( testContext = test ) {
 			await page.waitForTimeout( 500 );
 
 			// Verify the todo was created
-			const todoItem = page.locator(
-				'ul#todo-list > prpl-suggested-task li'
-			);
+			const todoItem = page.locator( SELECTORS.TODO_ITEM );
 			await expect( todoItem ).toHaveCount( 1 );
-			await expect( todoItem.locator( 'h3 > span' ) ).toHaveText(
-				CREATE_TASK_TEXT
-			);
+			await expect(
+				todoItem.locator( SELECTORS.RR_ITEM_TEXT )
+			).toHaveText( CREATE_TASK_TEXT );
 		} );
 
 		testContext( 'Delete a todo', async () => {
@@ -109,18 +106,14 @@ function todoTests( testContext = test ) {
 			await page.waitForTimeout( 500 );
 
 			// Wait for the delete button to be visible and click it
-			const deleteItem = page.locator(
-				'ul#todo-list > prpl-suggested-task li'
-			);
+			const deleteItem = page.locator( SELECTORS.TODO_ITEM );
 			await deleteItem.hover();
 			await deleteItem.waitFor( { state: 'visible' } );
 			await deleteItem.locator( '.trash' ).click();
 			await page.waitForTimeout( 500 );
 
 			// Verify the todo was deleted
-			const todoItem = page.locator(
-				'ul#todo-list > prpl-suggested-task li'
-			);
+			const todoItem = page.locator( SELECTORS.TODO_ITEM );
 			await expect( todoItem ).toHaveCount( 0 );
 		} );
 	} );
