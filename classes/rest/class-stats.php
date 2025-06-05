@@ -157,8 +157,6 @@ class Stats {
 
 		// Timezone offset.
 		$data['timezone_offset'] = \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600;
-
-		// Pending tasks include remote tasks.
 		$ravis_recommendations   = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
 		$data['recommendations'] = [];
 		foreach ( $ravis_recommendations as $recommendation ) {

@@ -30,6 +30,7 @@ customElements.define(
 			deletable = false,
 			useCheckbox = true,
 			taskList = '', // prplSuggestedTasks or progressPlannerTodo.
+			popover_id,
 		} ) {
 			// Get parent class properties
 			super();
@@ -41,8 +42,9 @@ customElements.define(
 				taskHeading = `<a href="${ url }" target="${ url_target }">${ title }</a>`;
 			}
 
-			const isRemoteTask = task_id.startsWith( 'remote-task-' );
-			const isDismissable = dismissable || isRemoteTask;
+			if ( popover_id ) {
+				taskHeading = `<a href="#" role="button" onclick="document.getElementById('${ popover_id }')?.showPopover()">${ title }</a>`;
+			}
 
 			const getTaskStatus = () => {
 				let status = 'pending';
@@ -173,7 +175,7 @@ customElements.define(
 						</prpl-tooltip>`
 					: '',
 				complete:
-					isDismissable && ! useCheckbox
+					dismissable && ! useCheckbox
 						? `<button
 							type="button"
 							class="prpl-suggested-task-button"
@@ -209,21 +211,23 @@ customElements.define(
 					let checkboxStyle = 'margin-top: 2px;';
 
 					// If the task is not dismissable, checkbox is disabled and we want to show a tooltip.
-					if ( ! isDismissable ) {
+					if ( ! dismissable ) {
 						checkboxStyle += 'pointer-events: none;';
 						output += `<prpl-tooltip class="prpl-suggested-task-disabled-checkbox-tooltip">
 							<slot name="open-icon">`;
 					}
 
-					output += `<input
+					output += `<label><input
 						type="checkbox"
 						class="prpl-suggested-task-checkbox"
 						style="${ checkboxStyle }"
-						${ ! isDismissable ? 'disabled' : '' }
+						${ ! dismissable ? 'disabled' : '' }
 						${ getTaskStatus() === 'completed' ? 'checked' : '' }
-					>`;
+					><span class="screen-reader-text">${ taskHeading }: ${ prplL10n(
+						'markAsComplete'
+					) }</span></label>`;
 
-					if ( ! isDismissable ) {
+					if ( ! dismissable ) {
 						output += `
 							</slot>
 							<slot name="content">
@@ -256,11 +260,13 @@ customElements.define(
 				data-task-list="${ taskList }"
 			>
 				${ actionButtons.completeCheckbox }
-				<h3 style="width: 100%;"><span${
-					'user' === category
-						? ` contenteditable="plaintext-only"`
-						: ''
-				}>${ taskHeading }</span></h3>
+				<h3 style="width: 100%;">
+					<span${
+						'user' === category
+							? ` contenteditable="plaintext-only"`
+							: ''
+					}>${ taskHeading }</span>
+				</h3>
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
 						${ actionButtons.info }
@@ -471,6 +477,12 @@ customElements.define(
 									detail: { node: thisObj },
 								} )
 							);
+
+							h3Span
+								.closest( '.prpl-suggested-task' )
+								.querySelector(
+									'label:has(.prpl-suggested-task-checkbox) .screen-reader-text'
+								).innerHTML = title;
 						} );
 				}, 300 );
 			} );

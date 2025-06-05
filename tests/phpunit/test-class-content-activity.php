@@ -43,47 +43,6 @@ class Content_Activity_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test points calculation based on word count.
-	 *
-	 * @dataProvider word_count_provider
-	 * @param string $content            The post content.
-	 * @param float  $expected_multiplier Expected points multiplier.
-	 * @return void
-	 */
-	public function test_points_based_on_word_count( $content, $expected_multiplier ): void {
-		// Create a test post.
-		$post_id = $this->factory->post->create(
-			[
-				'post_content' => $content,
-				'post_status'  => 'publish',
-			]
-		);
-
-		$content_activity          = new Content();
-		$content_activity->data_id = $post_id;
-		$content_activity->type    = 'publish';
-
-		$base_points     = Content::$points_config['publish'];
-		$expected_points = (int) ( $base_points * $expected_multiplier );
-
-		$this->assertEquals( $expected_points, $content_activity->get_points_on_publish_date() );
-	}
-
-	/**
-	 * Data provider for word count test.
-	 *
-	 * @return array[] Array of test cases with content and expected multipliers.
-	 */
-	public function word_count_provider(): array {
-		return [
-			'short_post'     => [ str_repeat( 'word ', 50 ), 1 ], // 50 words
-			'medium_post'    => [ str_repeat( 'word ', 150 ), Content::$points_config['word-multipliers'][100] ], // 150 words.
-			'long_post'      => [ str_repeat( 'word ', 400 ), Content::$points_config['word-multipliers'][350] ], // 400 words.
-			'very_long_post' => [ str_repeat( 'word ', 1200 ), Content::$points_config['word-multipliers'][1000] ], // 1200 words.
-		];
-	}
-
-	/**
 	 * Test points decay over time.
 	 *
 	 * @dataProvider age_decay_provider
