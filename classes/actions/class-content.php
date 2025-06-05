@@ -56,11 +56,6 @@ class Content {
 		// Set the type of activity.
 		$type = $update ? 'update' : 'publish';
 
-		// Reset the words count if it's an update.
-		if ( 'update' === $type ) {
-			\progress_planner()->get_settings()->set( [ 'word_count', $post_id ], false );
-		}
-
 		// Bail if the post is not published.
 		if ( 'publish' !== $post->post_status ) {
 			return;
@@ -123,9 +118,6 @@ class Content {
 		}
 
 		$this->add_post_activity( $post, 'trash' );
-
-		// Reset the words count.
-		\progress_planner()->get_settings()->set( [ 'word_count', $post_id ], false );
 	}
 
 	/**
@@ -147,9 +139,6 @@ class Content {
 		if ( $this->should_skip_saving( $post ) ) {
 			return;
 		}
-
-		// Reset the words count.
-		\progress_planner()->get_settings()->set( [ 'word_count', $post_id ], false );
 
 		// Add activity.
 		$activity           = new Activities_Content();
@@ -273,9 +262,6 @@ class Content {
 
 			// If there are activities for this post, on this date, bail.
 			if ( ! empty( $existing ) ) {
-				// Reset the words count.
-				\progress_planner()->get_settings()->set( [ 'word_count', $post->ID ], false );
-
 				return;
 			}
 		}
@@ -310,8 +296,5 @@ class Content {
 		}
 
 		$activity->save();
-
-		// Reset the words count.
-		\progress_planner()->get_settings()->set( [ 'word_count', $post->ID ], false );
 	}
 }

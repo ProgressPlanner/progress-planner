@@ -15,7 +15,7 @@ class Add_Yoast_Providers {
 	/**
 	 * Providers.
 	 *
-	 * @var array
+	 * @var (\Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Yoast_Provider|\Progress_Planner\Suggested_Tasks\Providers\Tasks)[]
 	 */
 	protected $providers = [];
 
@@ -48,10 +48,12 @@ class Add_Yoast_Providers {
 
 			// Add Ravi icon if the task is pending or is completed.
 			if ( $provider->is_task_relevant() || \progress_planner()->get_suggested_tasks()->was_task_completed( $provider->get_task_id() ) ) {
-				$focus_task = $provider->get_focus_tasks();
+				if ( method_exists( $provider, 'get_focus_tasks' ) ) {
+					$focus_task = $provider->get_focus_tasks();
 
-				if ( $focus_task ) {
-					$focus_tasks = array_merge( $focus_tasks, $focus_task );
+					if ( $focus_task ) {
+						$focus_tasks = array_merge( $focus_tasks, $focus_task );
+					}
 				}
 			}
 		}
@@ -88,7 +90,15 @@ class Add_Yoast_Providers {
 			new Crawl_Settings_Emoji_Scripts(),
 			new Media_Pages(),
 			new Organization_Logo(),
+			new Fix_Orphaned_Content(),
 		];
+
+		// Yoast SEO Premium.
+		if ( defined( 'WPSEO_PREMIUM_VERSION' ) ) {
+			$this->providers[] = new Cornerstone_Workout();
+			$this->providers[] = new Orphaned_Content_Workout();
+		}
+
 		return array_merge(
 			$providers,
 			$this->providers
