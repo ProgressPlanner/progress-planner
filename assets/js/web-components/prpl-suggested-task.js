@@ -30,6 +30,7 @@ customElements.define(
 			deletable = false,
 			useCheckbox = true,
 			taskList = '', // prplSuggestedTasks or progressPlannerTodo.
+			popover_id,
 		} ) {
 			// Get parent class properties
 			super();
@@ -39,6 +40,10 @@ customElements.define(
 			let taskHeading = title;
 			if ( url ) {
 				taskHeading = `<a href="${ url }" target="${ url_target }">${ title }</a>`;
+			}
+
+			if ( popover_id ) {
+				taskHeading = `<a href="#" role="button" onclick="document.getElementById('${ popover_id }')?.showPopover()">${ title }</a>`;
 			}
 
 			const getTaskStatus = () => {
@@ -212,13 +217,15 @@ customElements.define(
 							<slot name="open-icon">`;
 					}
 
-					output += `<input
+					output += `<label><input
 						type="checkbox"
 						class="prpl-suggested-task-checkbox"
 						style="${ checkboxStyle }"
 						${ ! dismissable ? 'disabled' : '' }
 						${ getTaskStatus() === 'completed' ? 'checked' : '' }
-					>`;
+					><span class="screen-reader-text">${ taskHeading }: ${ prplL10n(
+						'markAsComplete'
+					) }</span></label>`;
 
 					if ( ! dismissable ) {
 						output += `
@@ -253,11 +260,13 @@ customElements.define(
 				data-task-list="${ taskList }"
 			>
 				${ actionButtons.completeCheckbox }
-				<h3 style="width: 100%;"><span${
-					'user' === category
-						? ` contenteditable="plaintext-only"`
-						: ''
-				}>${ taskHeading }</span></h3>
+				<h3 style="width: 100%;">
+					<span${
+						'user' === category
+							? ` contenteditable="plaintext-only"`
+							: ''
+					}>${ taskHeading }</span>
+				</h3>
 				<div class="prpl-suggested-task-actions">
 					<div class="tooltip-actions">
 						${ actionButtons.info }
@@ -468,6 +477,12 @@ customElements.define(
 									detail: { node: thisObj },
 								} )
 							);
+
+							h3Span
+								.closest( '.prpl-suggested-task' )
+								.querySelector(
+									'label:has(.prpl-suggested-task-checkbox) .screen-reader-text'
+								).innerHTML = title;
 						} );
 				}, 300 );
 			} );

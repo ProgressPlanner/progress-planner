@@ -268,7 +268,7 @@ class Todo {
 		];
 
 		// Add the task to the local tasks.
-		progress_planner()->get_suggested_tasks()->get_local()->add_pending_task( $task );
+		progress_planner()->get_suggested_tasks()->get_tasks_manager()->add_pending_task( $task );
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Reminder set.', 'progress-planner' ) ] );
 	}

@@ -345,6 +345,7 @@ class Enqueue {
 			'remindMeToReviewContentSuccess' => \esc_html__( 'Reminder set for:', 'progress-planner' ),
 			'remindMeToReviewContentError'   => \esc_html__( 'Failed to set reminder. Please try again.', 'progress-planner' ),
 			'remindMeToReviewContentSetting' => \esc_html__( 'Setting reminder...', 'progress-planner' ),
+			'opensInNewWindow'              => \esc_html__( 'Opens in new window', 'progress-planner' ),
 		];
 	}
 }
