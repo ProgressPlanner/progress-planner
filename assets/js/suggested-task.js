@@ -303,7 +303,7 @@ prplSuggestedTask = {
 							} )
 						);
 					} );
-				} else {
+				} else if ( 'publish' === newStatus ) {
 					// Set the task action to pending.
 					el.setAttribute( 'data-task-action', 'pending' );
 
@@ -316,6 +316,19 @@ prplSuggestedTask = {
 							},
 						} )
 					);
+
+					if (
+						'user' ===
+						window.prplGetTermObject(
+							postData?.prpl_recommendations_category,
+							'prpl_recommendations_category'
+						).slug
+					) {
+						// Move task from completed to pending.
+						document
+							.getElementById( 'todo-list' )
+							.insertAdjacentElement( 'beforeend', el );
+					}
 				}
 			} );
 		} );
