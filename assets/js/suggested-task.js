@@ -523,4 +523,71 @@ prplSuggestedTask = {
 		}, 300 );
 	},
 };
+
+/**
+ * Inject an item.
+ */
+document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
+	prplSuggestedTask
+		.getNewItemTemplatePromise( {
+			post: event.detail.item,
+			allowReorder: false,
+		} )
+		.then( ( itemHTML ) => {
+			/**
+			 * @todo Implement the parent task functionality.
+			 * Use this code: `const parent = event.detail.item.parent && '' !== event.detail.item.parent ? event.detail.item.parent : null;
+			 */
+			const parent = false;
+
+			if ( ! parent ) {
+				// Inject the item into the list.
+				document
+					.getElementById( event.detail.listId )
+					.insertAdjacentHTML( 'beforeend', itemHTML );
+
+				return;
+			}
+
+			// If we could not find the parent item, try again after 500ms.
+			window.prplRenderAttempts = window.prplRenderAttempts || 0;
+			if ( window.prplRenderAttempts > 20 ) {
+				return;
+			}
+			const parentItem = document.querySelector(
+				`.prpl-suggested-task[data-task-id="${ parent }"]`
+			);
+			if ( ! parentItem ) {
+				setTimeout( () => {
+					document.dispatchEvent(
+						new CustomEvent( 'prpl/suggestedTask/injectItem', {
+							detail: {
+								item: event.detail.item,
+								listId: event.detail.listId,
+							},
+						} )
+					);
+					window.prplRenderAttempts++;
+				}, 100 );
+				return;
+			}
+
+			// If the child list does not exist, create it.
+			if (
+				! parentItem.querySelector( '.prpl-suggested-task-children' )
+			) {
+				const childListElement = document.createElement( 'ul' );
+				childListElement.classList.add(
+					'prpl-suggested-task-children'
+				);
+				parentItem.appendChild( childListElement );
+			}
+
+			// Inject the item into the child list.
+			parentItem
+				.querySelector( '.prpl-suggested-task-children' )
+				.insertAdjacentHTML( 'beforeend', itemHTML );
+		} );
+} );
+
 /* eslint-enable camelcase, jsdoc/require-param-type, jsdoc/require-param, jsdoc/check-param-names */
