@@ -138,41 +138,6 @@ prplDocumentReady( () => {
 		} );
 } );
 
-// When the 'prpl/suggestedTask/move' event is triggered,
-// update the menu_order of the todo items.
-document.addEventListener( 'prpl/suggestedTask/move', () => {
-	const todoItemsIDs = [];
-	// Get all the todo items.
-	const todoItems = document.querySelectorAll(
-		'#todo-list .prpl-suggested-task'
-	);
-	let menuOrder = 0;
-	todoItems.forEach( ( todoItem ) => {
-		const itemID = parseInt( todoItem.getAttribute( 'data-post-id' ) );
-		todoItemsIDs.push( itemID );
-		todoItem.setAttribute( 'data-task-order', menuOrder );
-		window.progressPlannerTodo.tasks.find(
-			( item ) => item.id === itemID
-		).menu_order = menuOrder;
-
-		document
-			.querySelector(
-				`#todo-list .prpl-suggested-task[data-post-id="${ itemID }"]`
-			)
-			.setAttribute( 'data-task-order', menuOrder );
-
-		wp.api.loadPromise.done( () => {
-			// Update an existing post.
-			const post = new wp.api.models.Prpl_recommendations( {
-				id: itemID,
-				menu_order: menuOrder,
-			} );
-			post.save();
-		} );
-		menuOrder++;
-	} );
-} );
-
 // When the 'prpl/suggestedTask/update' event is triggered,
 // update the task title in the tasks array.
 document.addEventListener( 'prpl/suggestedTask/update', ( event ) => {

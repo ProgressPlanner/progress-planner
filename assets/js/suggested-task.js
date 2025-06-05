@@ -594,4 +594,31 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 		} );
 } );
 
+// When the 'prpl/suggestedTask/move' event is triggered,
+// update the menu_order of the todo items.
+document.addEventListener( 'prpl/suggestedTask/move', ( event ) => {
+	const listUl = event.detail.node.closest( 'ul' );
+	const todoItemsIDs = [];
+	// Get all the todo items.
+	const todoItems = listUl.querySelectorAll( '.prpl-suggested-task' );
+	let menuOrder = 0;
+	todoItems.forEach( ( todoItem ) => {
+		const itemID = parseInt( todoItem.getAttribute( 'data-post-id' ) );
+		todoItemsIDs.push( itemID );
+		todoItem.setAttribute( 'data-task-order', menuOrder );
+
+		listUl
+			.querySelector( `.prpl-suggested-task[data-post-id="${ itemID }"]` )
+			.setAttribute( 'data-task-order', menuOrder );
+
+		// Update an existing post.
+		const post = new wp.api.models.Prpl_recommendations( {
+			id: itemID,
+			menu_order: menuOrder,
+		} );
+		post.save();
+		menuOrder++;
+	} );
+} );
+
 /* eslint-enable camelcase, jsdoc/require-param-type, jsdoc/require-param, jsdoc/check-param-names */
