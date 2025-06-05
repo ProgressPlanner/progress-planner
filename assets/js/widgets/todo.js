@@ -8,15 +8,6 @@
  */
 
 /**
- * The user terms for the todo list.
- *
- * @type {Object}
- */
-window.progressPlannerTodo = {
-	tasks: [],
-};
-
-/**
  * Get the highest `order` value from the todo items.
  *
  * @return {number} The highest `order` value.
