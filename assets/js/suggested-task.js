@@ -115,6 +115,7 @@ prplSuggestedTask = {
 		allowReorder = false,
 		deletable = false,
 		useCheckbox = true,
+		listId = '',
 	} ) => {
 		return new Promise( ( resolve ) => {
 			const {
@@ -160,6 +161,7 @@ prplSuggestedTask = {
 					allowReorder,
 					deletable,
 					useCheckbox,
+					listId,
 					assets: prplSuggestedTask.assets,
 					action:
 						'pending_celebration' === post.status
@@ -532,6 +534,7 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 		.getNewItemTemplatePromise( {
 			post: event.detail.item,
 			allowReorder: false,
+			listId: event.detail.listId,
 		} )
 		.then( ( itemHTML ) => {
 			/**

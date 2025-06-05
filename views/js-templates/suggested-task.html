@@ -105,5 +105,6 @@
 				</span>
 			<# } #>
 		</div>
+		<# document.dispatchEvent( new CustomEvent( 'prpl/suggestedTask/itemInjected', { detail: data } ) ); #>
 	</li>
 </script>

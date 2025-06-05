@@ -134,3 +134,37 @@ document
 	.addEventListener( 'toggle', () => {
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	} );
+
+document.addEventListener( 'prpl/suggestedTask/itemInjected', ( event ) => {
+	if ( 'todo-list' !== event.detail.listId ) {
+		return;
+	}
+	console.log( event.detail );
+	setTimeout( () => {
+		// Get all items in the list.
+		const items = document.querySelectorAll(
+			`#${ event.detail.listId } .prpl-suggested-task`
+		);
+
+		// Reorder items based on their `data-task-order` attribute.
+		const orderedItems = Array.from( items ).sort( ( a, b ) => {
+			return (
+				parseInt( a.getAttribute( 'data-task-order' ) ) -
+				parseInt( b.getAttribute( 'data-task-order' ) )
+			);
+		} );
+
+		// Remove all items from the list.
+		items.forEach( ( item ) => {
+			item.remove();
+		} );
+
+		// Inject the ordered items back into the list.
+		orderedItems.forEach( ( item ) => {
+			document.getElementById( event.detail.listId ).appendChild( item );
+		} );
+
+		// Resize the grid items.
+		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+	} );
+} );
