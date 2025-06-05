@@ -246,7 +246,8 @@ prplSuggestedTask = {
 					id: postId,
 				} );
 				post.fetch().then( ( postData ) => {
-					post.destroy().then( () => {
+					post.set( 'status', 'trash' );
+					post.save().then( () => {
 						// Remove the task from the todo list.
 						const el = document.querySelector(
 							`.prpl-suggested-task[data-post-id="${ postId }"]`
@@ -290,7 +291,7 @@ prplSuggestedTask = {
 						? 'complete'
 						: 'pending',
 					window.prplGetTermObject(
-						postData?.prpl_recommendations_category,
+						postData?.prpl_recommendations_category?.[ 0 ],
 						'prpl_recommendations_category'
 					).slug
 				);
