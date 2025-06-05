@@ -82,15 +82,16 @@ prplSuggestedTask = {
 
 				// If we want to get more items and there are more, repeat the process.
 				if ( postsCollection.hasMore() ) {
+					// Strict check, fetch more only if everything is properly set (no undefined values).
 					if (
 						args.category &&
-						prplSuggestedTask.maxItemsPerCategory[
-							args.category
-						] <= prplSuggestedTask.injectedItemIds.length
+						prplSuggestedTask.injectedItemIds.length <
+							prplSuggestedTask.maxItemsPerCategory[
+								args.category
+							]
 					) {
-						return;
+						prplSuggestedTask.injectItems( args );
 					}
-					prplSuggestedTask.injectItems( args );
 				}
 			} );
 	},
