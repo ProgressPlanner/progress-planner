@@ -139,7 +139,6 @@ document.addEventListener( 'prpl/suggestedTask/itemInjected', ( event ) => {
 	if ( 'todo-list' !== event.detail.listId ) {
 		return;
 	}
-	console.log( event.detail );
 	setTimeout( () => {
 		// Get all items in the list.
 		const items = document.querySelectorAll(
