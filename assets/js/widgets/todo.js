@@ -27,7 +27,6 @@ const prplGetHighestTodoItemOrder = () => {
 };
 
 window.prplGetTermsCollectionsPromises().then( () => {
-	// Add the pending items.
 	prplSuggestedTask.injectItems( {
 		category: 'user',
 		status: [ 'publish', 'pending_celebration', 'trash' ],
