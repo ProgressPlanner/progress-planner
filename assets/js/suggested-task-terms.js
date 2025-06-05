@@ -84,7 +84,7 @@ window.prplGetTermObject = ( termId, taxonomy ) => {
 	let termObject = {};
 	Object.values( window.prplSuggestedTasksTerms[ taxonomy ] ).forEach(
 		( term ) => {
-			if ( term.id === termId ) {
+			if ( parseInt( term.id ) === parseInt( termId ) ) {
 				termObject = term;
 			}
 		}
