@@ -11,6 +11,7 @@ env:
   WORDPRESS_DB_NAME: wordpress
   WORDPRESS_DB_PORT: 3307 # So it can run locally (hopefully).
   PRPL_TEST_TOKEN: 0220a2de67fc29094281088395939f58
+  YOAST_TOKEN: ${{ secrets.YOAST_TOKEN }}
 
 on:
   push:
@@ -75,47 +76,78 @@ jobs:
           -d "admin_password=$WORDPRESS_ADMIN_PASSWORD" \
           -d "admin_password2=$WORDPRESS_ADMIN_PASSWORD" \
           -d "admin_email=$WORDPRESS_ADMIN_EMAIL" \
-          -d "public=1"r
-
-      # - name: Install necessary dependencies in WordPress container
-      #   run: |
-      #     docker exec $(docker ps -qf "name=wordpress") apt-get update
-      #     docker exec $(docker ps -qf "name=wordpress") apt-get install -y \
-      #       php php-cli php-mysql php-curl php-xml php-mbstring php-zip curl \
-      #       libnss3 libxss1 libasound2 libatk-bridge2.0-0 libgtk-3-0 libgbm-dev libwoff1
+          -d "public=1"
 
       - name: Install and activate plugin
         run: |
+          WP_CONTAINER=$(docker ps -qf "name=wordpress")
+
           # Install WP-CLI
-          docker exec $(docker ps -qf "name=wordpress") curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
-          docker exec $(docker ps -qf "name=wordpress") chmod +x wp-cli.phar
-          docker exec $(docker ps -qf "name=wordpress") mv wp-cli.phar /usr/local/bin/wp
+          docker exec $WP_CONTAINER curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          docker exec $WP_CONTAINER chmod +x wp-cli.phar
+          docker exec $WP_CONTAINER mv wp-cli.phar /usr/local/bin/wp
 
           # Create the plugins directory in the WordPress container
-          docker exec $(docker ps -qf "name=wordpress") mkdir -p /var/www/html/wp-content/plugins
+          docker exec $WP_CONTAINER mkdir -p /var/www/html/wp-content/plugins
 
           # Copy plugin files to WordPress plugins directory
-          docker cp . $(docker ps -qf "name=wordpress"):/var/www/html/wp-content/plugins/progress-planner
+          docker cp . $WP_CONTAINER:/var/www/html/wp-content/plugins/progress-planner
 
           # Activate the plugin using WP-CLI
-          docker exec $(docker ps -qf "name=wordpress") wp plugin activate progress-planner --allow-root
+          docker exec $WP_CONTAINER wp plugin activate progress-planner --allow-root
 
           # Enable debug mode
-          docker exec $(docker ps -qf "name=wordpress") wp option update prpl_debug true --allow-root
+          docker exec $WP_CONTAINER wp option update prpl_debug true --allow-root
 
           # Insert test token
-          docker exec $(docker ps -qf "name=wordpress") wp option update progress_planner_test_token $PRPL_TEST_TOKEN --allow-root
+          docker exec $WP_CONTAINER wp option update progress_planner_test_token $PRPL_TEST_TOKEN --allow-root
 
           # Install Yoast SEO
-          docker exec $(docker ps -qf "name=wordpress") wp plugin install wordpress-seo --activate --allow-root
-
-      # - name: Wait for WordPress to be ready
-      #   run: |
-      #     echo "Waiting for WordPress to be ready..."
-      #     sleep 30  # Adjust if necessary based on the container startup time
+          docker exec $WP_CONTAINER wp plugin install wordpress-seo --activate --allow-root
 
       - name: Run Playwright Tests
         run: npx playwright test tests/e2e/
+
+      # Begin Yoast SEO Premium tests
+      - name: Install PHP & Composer on host
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git curl unzip php-cli php-curl php-mbstring php-xml php-zip
+          curl -sS https://getcomposer.org/installer | php
+          sudo mv composer.phar /usr/local/bin/composer
+
+      - name: Install plugin dependencies (Composer)
+        run: |
+          composer config -g http-basic.my.yoast.com token $YOAST_TOKEN
+          composer config repositories.my-yoast composer https://my.yoast.com/packages/
+          composer config --no-plugins allow-plugins.composer/installers true
+          composer install --working-dir=./
+
+      - name: Require Yoast SEO Premium & copy files
+        run: |
+          WP_CONTAINER=$(docker ps -qf "name=wordpress")
+          composer require yoast/wordpress-seo-premium
+          composer dump-autoload --working-dir=./wp-content/plugins/wordpress-seo-premium
+          docker cp ./wp-content/plugins/wordpress-seo-premium $WP_CONTAINER:/var/www/html/wp-content/plugins/wordpress-seo-premium
+
+      - name: Activate Yoast SEO Premium
+        run: |
+          WP_CONTAINER=$(docker ps -qf "name=wordpress")
+          docker exec $WP_CONTAINER wp plugin activate wordpress-seo-premium --allow-root
+
+      - name: Update Yoast Premium settings
+        run: |
+          WP_CONTAINER=$(docker ps -qf "name=wordpress")
+          # Get current option value
+          CURRENT_OPTION=$(docker exec $WP_CONTAINER wp option get wpseo_premium --format=json --allow-root)
+          # Update the option with should_redirect_after_install set to false
+          UPDATED_OPTION=$(echo $CURRENT_OPTION | jq '.should_redirect_after_install = false')
+          # Save the updated option
+          docker exec $WP_CONTAINER wp option update wpseo_premium "$UPDATED_OPTION" --format=json --allow-root
+
+      - name: Run Yoast Focus Element Test Again
+        run: npx playwright test tests/e2e/yoast-focus-element.spec.js
+      # End Yoast SEO Premium tests
 
       - name: Upload Playwright Report
         if: always()

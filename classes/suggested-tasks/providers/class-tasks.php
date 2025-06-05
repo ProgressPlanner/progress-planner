@@ -340,7 +340,7 @@ abstract class Tasks implements Tasks_Interface {
 			if ( 0 !== strpos( $task_id, $this->get_task_id() ) ) {
 				return false;
 			}
-			return $this->is_task_completed() ? Task_Factory::create_task_from( 'id', $task_id ) : false;
+			return $this->is_task_completed( $task_id ) ? Task_Factory::create_task_from( 'id', $task_id ) : false;
 		}
 
 		$task_object = Task_Factory::create_task_from( 'id', $task_id );
@@ -373,7 +373,7 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function is_task_completed( $task_id = '' ) {
 		// If no specific task ID provided, use the default behavior.
-		return ! $this->is_repetitive() || empty( $task_id )
+		return empty( $task_id )
 			? ! $this->should_add_task()
 			: $this->is_specific_task_completed( $task_id );
 	}
@@ -410,7 +410,7 @@ abstract class Tasks implements Tasks_Interface {
 		if (
 			true === $this->is_task_snoozed() ||
 			! $this->should_add_task() || // No need to add the task.
-			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() )
+			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id )
 		) {
 			return [];
 		}

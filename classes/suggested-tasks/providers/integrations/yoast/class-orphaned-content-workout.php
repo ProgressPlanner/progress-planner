@@ -7,13 +7,13 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
-use Progress_Planner\Suggested_Tasks\Providers\Tasks;
+use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Yoast_Provider;
 use Progress_Planner\Suggested_Tasks\Providers\Traits\Dismissable_Task;
 
 /**
  * Add tasks for Yoast SEO cornerstone content.
  */
-class Orphaned_Content_Workout extends Tasks {
+class Orphaned_Content_Workout extends Yoast_Provider {
 	use Dismissable_Task;
 
 	/**
@@ -31,13 +31,6 @@ class Orphaned_Content_Workout extends Tasks {
 	protected const PROVIDER_ID = 'yoast-orphaned-content-workout';
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'configuration';
-
-	/**
 	 * The task priority.
 	 *
 	 * @var string
@@ -50,6 +43,13 @@ class Orphaned_Content_Workout extends Tasks {
 	 * @var bool
 	 */
 	protected $is_dismissable = true;
+
+	/**
+	 * Whether the task is repetitive.
+	 *
+	 * @var bool
+	 */
+	protected $is_repetitive = true;
 
 	/**
 	 * The task points.
@@ -65,6 +65,46 @@ class Orphaned_Content_Workout extends Tasks {
 	 */
 	public function init() {
 		$this->init_dismissable_task();
+
+		// Hook into update_option.
+		\add_action( 'update_option_wpseo_premium', [ $this, 'maybe_update_workout_status' ], 10, 3 );
+	}
+
+	/**
+	 * Maybe update the workout status.
+	 *
+	 * @param mixed  $old_value The old value.
+	 * @param mixed  $value The new value.
+	 * @param string $option The option name.
+	 *
+	 * @return void
+	 */
+	public function maybe_update_workout_status( $old_value, $value, $option ) {
+		if ( 'wpseo_premium' !== $option || ! isset( $value['workouts']['orphaned'] ) || ! isset( $old_value['workouts']['orphaned'] ) ) {
+			return;
+		}
+
+		// Check if there is pending task.
+		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $this->get_task_id() );
+
+		// If there is no pending task, return.
+		if ( empty( $tasks ) || 'pending' !== $tasks[0]['status'] ) {
+			return;
+		}
+
+		// For this type of task only the provider ID is needed, but just in case.
+		if ( $this->is_task_dismissed( $tasks[0] ) ) {
+			return;
+		}
+
+		// There should be 3 steps in the workout.
+		$workout_was_completed = 3 === count( $old_value['workouts']['orphaned']['finishedSteps'] );
+		$workout_completed     = 3 === count( $value['workouts']['orphaned']['finishedSteps'] );
+
+		// Dismiss the task if workout wasn't completed before and now is.
+		if ( ! $workout_was_completed && $workout_completed ) {
+			$this->handle_task_dismissal( $this->get_task_id() );
+		}
 	}
 
 	/**
@@ -75,7 +115,7 @@ class Orphaned_Content_Workout extends Tasks {
 	 * @return string
 	 */
 	public function get_title( $task_id = '' ) {
-		return \esc_html__( 'Run Yoast SEO Orphaned Content Workout', 'progress-planner' );
+		return \esc_html__( 'Yoast SEO: do Yoast SEO\'s Orphaned Content Workout', 'progress-planner' );
 	}
 
 	/**
@@ -88,8 +128,8 @@ class Orphaned_Content_Workout extends Tasks {
 	public function get_description( $task_id = '' ) {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Run the Yoast SEO Orphaned Content Workout to improve your site\'s SEO. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-orphaned-content" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			\esc_html__( 'Improve your internal linking structure with Yoast SEO\'s Orphaned Content Workout. %s.', 'progress-planner' ),
+			'<a href="https://prpl.fyi/run-orphaned-content-workout" target="_blank"  data-prpl_accessibility_text="' . \esc_attr__( 'Learn more about the Yoast SEO Orphaned Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Lean more', 'progress-planner' ) . '</a>'
 		);
 	}
 
@@ -101,7 +141,7 @@ class Orphaned_Content_Workout extends Tasks {
 	 * @return string
 	 */
 	public function get_url( $task_id = '' ) {
-		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts' ) ) : '';
+		return $this->capability_required() ? \esc_url( admin_url( 'admin.php?page=wpseo_workouts#orphaned' ) ) : '';
 	}
 
 	/**
@@ -110,7 +150,7 @@ class Orphaned_Content_Workout extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( ! function_exists( 'YoastSEO' ) ) {
+		if ( ! defined( 'WPSEO_PREMIUM_VERSION' ) ) {
 			return false;
 		}
 
@@ -124,26 +164,6 @@ class Orphaned_Content_Workout extends Tasks {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Get an array of tasks to inject.
-	 *
-	 * @return array
-	 */
-	public function get_tasks_to_inject() {
-		if ( ! $this->should_add_task() ) {
-			return [];
-		}
-
-		return [
-			[
-				'task_id'     => $this->get_task_id(),
-				'provider_id' => $this->get_provider_id(),
-				'category'    => $this->get_provider_category(),
-				'date'        => \gmdate( 'YW' ),
-			],
-		];
 	}
 
 	/**
