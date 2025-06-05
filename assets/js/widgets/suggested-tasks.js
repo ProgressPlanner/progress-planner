@@ -4,7 +4,7 @@
  *
  * A widget that displays a list of suggested tasks.
  *
- * Dependencies: wp-api, progress-planner/suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-tooltip, progress-planner/suggested-task-terms
+ * Dependencies: wp-api, progress-planner/suggested-task, progress-planner/widgets/todo, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-tooltip, progress-planner/suggested-task-terms
  */
 /* eslint-disable camelcase */
 
@@ -26,8 +26,18 @@ const prplSuggestedTasksToggleUIitems = () => {
 	}, 2000 );
 };
 
-// Populate the list on load.
+/**
+ * Populate the suggested tasks list when the terms are loaded.
+ */
 window.prplGetTermsCollectionsPromises().then( () => {
+	window.prplPopulateSuggestedTasksList();
+	window.prplPopulateTodoList();
+} );
+
+/**
+ * Populate the suggested tasks list.
+ */
+window.prplPopulateSuggestedTasksList = function () {
 	// Do nothing if the list does not exist.
 	if ( ! document.querySelector( '.prpl-suggested-tasks-list' ) ) {
 		return;
@@ -72,7 +82,7 @@ window.prplGetTermsCollectionsPromises().then( () => {
 			document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
 		}, 3000 );
 	}
-} );
+};
 
 /**
  * Update the Ravi gauge.

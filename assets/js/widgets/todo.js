@@ -26,7 +26,10 @@ const prplGetHighestTodoItemOrder = () => {
 	return highestOrder;
 };
 
-window.prplGetTermsCollectionsPromises().then( () => {
+/**
+ * Populate the todo list.
+ */
+window.prplPopulateTodoList = function () {
 	prplSuggestedTask.injectItems( {
 		category: 'user',
 		status: [ 'publish', 'pending_celebration', 'trash' ],
@@ -123,7 +126,7 @@ window.prplGetTermsCollectionsPromises().then( () => {
 			// Focus the new task input element.
 			document.getElementById( 'new-todo-content' ).focus();
 		} );
-} );
+};
 
 document
 	.getElementById( 'todo-list-completed-details' )
