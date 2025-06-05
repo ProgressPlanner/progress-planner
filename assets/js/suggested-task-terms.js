@@ -1,7 +1,8 @@
+/* global prplDocumentReady */
 /*
  * Populate window.prplSuggestedTasksTerms with the terms for the taxonomies we use.
  *
- * Dependencies: wp-api
+ * Dependencies: wp-api, progress-planner/document-ready
  */
 window.prplSuggestedTasksTerms = window.prplSuggestedTasksTerms || {};
 
@@ -51,6 +52,23 @@ window.prplGetTermsCollectionPromise = ( taxonomy ) => {
 					} );
 				}
 			);
+		} );
+	} );
+};
+
+window.prplGetTermsCollectionsPromises = () => {
+	return new Promise( ( resolve ) => {
+		prplDocumentReady( () => {
+			Promise.all( [
+				window.prplGetTermsCollectionPromise(
+					'prpl_recommendations_category'
+				),
+				window.prplGetTermsCollectionPromise(
+					'prpl_recommendations_provider'
+				),
+			] ).then( () => {
+				resolve( window.prplSuggestedTasksTerms );
+			} );
 		} );
 	} );
 };

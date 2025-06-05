@@ -1,10 +1,10 @@
-/* global customElements, prplSuggestedTask, prplDocumentReady */
+/* global customElements, prplSuggestedTask */
 /*
  * Widget: Suggested Tasks
  *
  * A widget that displays a list of suggested tasks.
  *
- * Dependencies: wp-api, progress-planner/suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/document-ready, progress-planner/web-components/prpl-tooltip, progress-planner/suggested-task-terms
+ * Dependencies: wp-api, progress-planner/suggested-task, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-tooltip, progress-planner/suggested-task-terms
  */
 /* eslint-disable camelcase */
 
@@ -27,7 +27,7 @@ const prplSuggestedTasksToggleUIitems = () => {
 };
 
 // Populate the list on load.
-prplDocumentReady( () => {
+window.prplGetTermsCollectionsPromises().then( () => {
 	// Do nothing if the list does not exist.
 	if ( ! document.querySelector( '.prpl-suggested-tasks-list' ) ) {
 		return;
