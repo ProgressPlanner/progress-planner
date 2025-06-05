@@ -137,7 +137,7 @@ document.addEventListener( 'prpl/markTasksAsCompleted', () => {
 			);
 
 			if ( el ) {
-				el.parentElement.remove();
+				el.remove();
 			}
 		} );
 } );
