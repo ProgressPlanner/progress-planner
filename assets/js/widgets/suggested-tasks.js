@@ -170,7 +170,6 @@ document.addEventListener(
 		// TODO: Something seems off here, take a look at this.
 		prplSuggestedTask.injectItems( {
 			category: e.detail.category,
-			injectTrigger: 'prpl/suggestedTask/maybeInjectItem',
 			afterRequestComplete: prplSuggestedTasksToggleUIitems,
 		} );
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
