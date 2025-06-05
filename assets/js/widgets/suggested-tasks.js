@@ -47,6 +47,7 @@ prplDocumentReady( () => {
 				return {
 					item: todoItem,
 					listId: 'prpl-suggested-tasks-list',
+					insertPosition: 'beforeend',
 				};
 			},
 			afterInject: prplSuggestedTasksToggleUIitems,
@@ -60,6 +61,7 @@ prplDocumentReady( () => {
 				return {
 					item: todoItem,
 					listId: 'prpl-suggested-tasks-list',
+					insertPosition: 'beforeend',
 				};
 			},
 			afterInject: prplSuggestedTasksToggleUIitems,

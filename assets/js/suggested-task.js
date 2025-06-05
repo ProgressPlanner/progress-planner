@@ -544,7 +544,10 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 				// Inject the item into the list.
 				document
 					.getElementById( event.detail.listId )
-					.insertAdjacentHTML( 'beforeend', itemHTML );
+					.insertAdjacentHTML(
+						event.detail.insertPosition,
+						itemHTML
+					);
 
 				return;
 			}
@@ -564,6 +567,7 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 							detail: {
 								item: event.detail.item,
 								listId: event.detail.listId,
+								insertPosition: event.detail.insertPosition,
 							},
 						} )
 					);
