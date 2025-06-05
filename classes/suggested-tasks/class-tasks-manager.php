@@ -32,6 +32,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Set_Valuable_Post_Types;
 use Progress_Planner\Suggested_Tasks\Providers\Fewer_Tags;
 use Progress_Planner\Suggested_Tasks\Providers\Remove_Terms_Without_Posts;
 use Progress_Planner\Suggested_Tasks\Providers\Update_Term_Description;
+use Progress_Planner\Suggested_Tasks\Providers\Reduce_Autoloaded_Options;
 
 /**
  * Tasks_Manager class.
@@ -67,6 +68,7 @@ class Tasks_Manager {
 			new Permalink_Structure(),
 			new Php_Version(),
 			new Search_Engine_Visibility(),
+			new Reduce_Autoloaded_Options(),
 			new User_Tasks(),
 			new Email_Sending(),
 			new Set_Valuable_Post_Types(),
