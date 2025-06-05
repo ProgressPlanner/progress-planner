@@ -50,7 +50,7 @@ prplDocumentReady( () => {
 					insertPosition: 'beforeend',
 				};
 			},
-			afterInject: prplSuggestedTasksToggleUIitems,
+			afterRequestComplete: prplSuggestedTasksToggleUIitems,
 		} );
 
 		prplSuggestedTask.injectItems( {
@@ -64,7 +64,7 @@ prplDocumentReady( () => {
 					insertPosition: 'beforeend',
 				};
 			},
-			afterInject: prplSuggestedTasksToggleUIitems,
+			afterRequestComplete: prplSuggestedTasksToggleUIitems,
 		} );
 
 		setTimeout( () => {
@@ -171,7 +171,7 @@ document.addEventListener(
 		prplSuggestedTask.injectItems( {
 			category: e.detail.category,
 			injectTrigger: 'prpl/suggestedTask/maybeInjectItem',
-			afterInject: prplSuggestedTasksToggleUIitems,
+			afterRequestComplete: prplSuggestedTasksToggleUIitems,
 		} );
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	},

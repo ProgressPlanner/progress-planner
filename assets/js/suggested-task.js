@@ -46,6 +46,9 @@ prplSuggestedTask = {
 						const data = response.data;
 						const postsCollection = response.postsCollection;
 						if ( ! data.length ) {
+							if ( args?.afterRequestComplete ) {
+								args.afterRequestComplete( data );
+							}
 							return;
 						}
 
@@ -61,8 +64,8 @@ prplSuggestedTask = {
 							prplSuggestedTask.injectedItemIds.push( item.id );
 						} );
 
-						if ( args?.afterInject ) {
-							args.afterInject( data );
+						if ( args?.afterRequestComplete ) {
+							args.afterRequestComplete( data );
 						}
 
 						// If we want to get more items and there are more, repeat the process.

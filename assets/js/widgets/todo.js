@@ -44,7 +44,7 @@ prplDocumentReady( () => {
 						: 'todo-list',
 			};
 		},
-		afterInject: () => {
+		afterRequestComplete: () => {
 			const el = document.querySelector( '#prpl-todo-list-loading' );
 			if ( el ) {
 				el.remove();
