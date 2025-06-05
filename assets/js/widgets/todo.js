@@ -35,32 +35,18 @@ const prplGetHighestTodoItemOrder = () => {
 	return highestOrder;
 };
 
-document.addEventListener( 'prpl/todo/injectItem', ( event ) => {
-	prplSuggestedTask
-		.getNewItemTemplatePromise( {
-			post: event.detail.item,
-			deletable: true,
-			allowReorder: true,
-		} )
-		.then( ( todoItemHTML ) => {
-			document
-				.getElementById( event.detail.listId )
-				.insertAdjacentHTML(
-					event.detail.addToStart ? 'afterbegin' : 'beforeend',
-					todoItemHTML
-				);
-		} );
-} );
-
 prplDocumentReady( () => {
 	prplSuggestedTask.injectItems( {
 		category: 'user',
 		status: 'publish',
-		injectTrigger: 'prpl/todo/injectItem',
+		injectTrigger: 'prpl/suggestedTask/injectItem',
 		injectTriggerArgsCallback: ( todoItem ) => {
 			return {
 				item: todoItem,
-				addToStart: 1 === todoItem?.meta?.prpl_points, // Add golden task to the start of the list.
+				insertPosition:
+					1 === todoItem?.meta?.prpl_points
+						? 'afterbegin' // Add golden task to the start of the list.
+						: 'beforeend',
 				listId:
 					todoItem.status === 'completed'
 						? 'todo-list-completed'
@@ -125,10 +111,13 @@ prplDocumentReady( () => {
 
 					// Inject the new task into the DOM.
 					document.dispatchEvent(
-						new CustomEvent( 'prpl/todo/injectItem', {
+						new CustomEvent( 'prpl/suggestedTask/injectItem', {
 							detail: {
 								item: newTask,
-								addToStart: 1 === newTask.points, // Add golden task to the start of the list.
+								insertPosition:
+									1 === newTask.points
+										? 'afterbegin'
+										: 'beforeend', // Add golden task to the start of the list.
 								listId: 'todo-list',
 							},
 						} )
@@ -224,10 +213,13 @@ document.addEventListener( 'prpl/suggestedTask/maybeInjectItem', ( event ) => {
 
 				// Inject the todo item into the DOM.
 				document.dispatchEvent(
-					new CustomEvent( 'prpl/todo/injectItem', {
+					new CustomEvent( 'prpl/suggestedTask/injectItem', {
 						detail: {
 							item: todoItem,
-							addToStart: 1 === todoItem.points, // Add golden task to the start of the list.
+							insertPosition:
+								1 === todoItem.points
+									? 'afterbegin' // Add golden task to the start of the list.
+									: 'beforeend',
 							listId:
 								'complete' === event.detail.actionType
 									? 'todo-list-completed'
