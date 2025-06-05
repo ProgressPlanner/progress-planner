@@ -3,7 +3,7 @@
  */
 
 const SELECTORS = {
-	RR_ITEM_TEXT: 'h3 > label > span',
+	RR_ITEM_TEXT: 'h3 > span',
 	TODO_ITEM: 'ul#todo-list > prpl-suggested-task li',
 	TODO_COMPLETED_ITEM: 'ul#todo-list-completed > prpl-suggested-task li',
 	TODO_LIST: 'ul#todo-list',
