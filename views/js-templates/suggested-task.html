@@ -1,4 +1,5 @@
 <script type="text/html" id="tmpl-prpl-suggested-task">
+	<# isUserTask = ( 'user' === window.prplGetTermObject( data.post.prpl_recommendations_category[0], 'prpl_recommendations_category' ).slug ); #>
 	<li class="prpl-suggested-task" data-task-id="{{ data.post.meta.prpl_task_id || data.post.id }}" data-post-id="{{ data.post.id }}" data-task-action="{{ data.action }}" data-task-url="{{ data.post.meta.prpl_url }}" data-task-provider-id="{{ data.terms.prpl_recommendations_provider.slug }}" data-task-points="{{ data.post.meta.prpl_points }}" data-task-category="{{ data.terms.prpl_recommendations_category.slug }}" data-task-order="{{ data.post.menu_order }}">
 		<# if ( data.useCheckbox ) { #>
 			<# if ( ! data.post.meta.prpl_dismissable ) { #>
@@ -17,7 +18,7 @@
 		<# } #>
 
 		<h3 style="width: 100%;">
-			<span <# if ( 'user' === window.prplGetTermObject( data.post.prpl_recommendations_category[0], 'prpl_recommendations_category' ).slug ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>><# if ( data.post.meta.prpl_url ) { #><a href="{{ data.post.meta.prpl_url }}" target="{{ data.post.meta.prpl_url_target }}">{{{ data.post.title.rendered }}}</a><# } else if ( data.post.meta.prpl_popover_id ) { #><a href="#" role="button" onclick="document.getElementById('{{ data.post.meta.prpl_popover_id }}')?.showPopover()">{{{ data.post.title.rendered }}}</a><# } else { #>{{{ data.post.title.rendered }}}<# } #></span>
+			<span <# if ( isUserTask ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>><# if ( data.post.meta.prpl_url ) { #><a href="{{ data.post.meta.prpl_url }}" target="{{ data.post.meta.prpl_url_target }}">{{{ data.post.title.rendered }}}</a><# } else if ( data.post.meta.prpl_popover_id ) { #><a href="#" role="button" onclick="document.getElementById('{{ data.post.meta.prpl_popover_id }}')?.showPopover()">{{{ data.post.title.rendered }}}</a><# } else { #>{{{ data.post.title.rendered }}}<# } #></span>
 		</h3>
 
 		<div class="prpl-suggested-task-actions">
@@ -33,8 +34,7 @@
 						<slot name="content">{{{ data.post.content.rendered }}}</slot>
 					</prpl-tooltip>
 				<# } #>
-
-				<# if ( false !== data.allowReorder ) { #>
+				<# if ( isUserTask ) { #>
 					<span class="prpl-move-buttons">
 						<button type="button" class="prpl-suggested-task-button move-up" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="move-up" data-target="move-up" title="{{ data.l10n.moveUp }}" onclick="prplSuggestedTask.runButtonAction( this );">
 							<span class="dashicons dashicons-arrow-up-alt2"></span>
