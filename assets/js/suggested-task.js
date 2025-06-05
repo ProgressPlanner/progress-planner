@@ -102,14 +102,11 @@ prplSuggestedTask = {
 	 * @return {Promise} A promise that resolves with the collection of posts.
 	 */
 	getPostsCollectionPromise: ( fetchArgs ) => {
-		const api = wp.api;
 		const collectionsPromise = new Promise( ( resolve ) => {
-			api.loadPromise.done( () => {
-				const postsCollection =
-					new api.collections.Prpl_recommendations();
-				postsCollection.fetch( fetchArgs ).done( ( data ) => {
-					resolve( { data, postsCollection } );
-				} );
+			const postsCollection =
+				new wp.api.collections.Prpl_recommendations();
+			postsCollection.fetch( fetchArgs ).done( ( data ) => {
+				resolve( { data, postsCollection } );
 			} );
 		} );
 
