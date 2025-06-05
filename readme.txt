@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.2
+Stable tag: 1.5.0
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -109,6 +109,20 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.5.0 =
+
+Added these recommendations from Ravi:
+
+* [Test if your website can send emails correctly](https://prpl.fyi/troubleshoot-smtp).
+
+Bugs we fixed:
+
+* Don't redirect user to Progress Planner dashboard if 'redirect_to' GET or POST parameter is set.
+* Removed the Onboard tour steps for the Settings popover which was removed in 1.3.0.
+* Fixed detecting creation of new valuable content posts.
+* Don't award point for all Todo tasks, only for golden.
+* Fix Todo task title not being editable.
 
 = 1.4.2 =
 
