@@ -74,13 +74,29 @@ window.prplPopulateSuggestedTasksList = function () {
 					insertPosition: 'beforeend',
 				};
 			},
-			afterRequestComplete: prplSuggestedTasksToggleUIitems,
-		} );
+			afterRequestComplete: ( data ) => {
+				prplSuggestedTasksToggleUIitems();
 
-		setTimeout( () => {
-			// Trigger the celebration event.
-			document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
-		}, 3000 );
+				if ( data.length ) {
+					// Set post status to trash.
+					data.forEach( ( task ) => {
+						const post = new wp.api.models.Prpl_recommendations( {
+							id: task.id,
+							status: 'trash',
+						} );
+						post.save();
+					} );
+
+					// Trigger the celebration event.
+					setTimeout( () => {
+						// Trigger the celebration event.
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/celebrateTasks' )
+						);
+					}, 3000 );
+				}
+			},
+		} );
 	}
 };
 
