@@ -242,15 +242,30 @@ prplSuggestedTask = {
 		// Get the task.
 		const post = new wp.api.models.Prpl_recommendations( { id: postId } );
 		post.fetch().then( ( postData ) => {
-			const newStatus =
-				'publish' === postData.status
-					? 'pending_celebration'
-					: 'publish';
+			let newStatus;
+
+			// User tasks don't have pending celebration status, it's either publish or trash.
+			if (
+				'user' ===
+				window.prplGetTermObject(
+					postData?.prpl_recommendations_provider,
+					'prpl_recommendations_provider'
+				).slug
+			) {
+				newStatus = 'publish' === postData.status ? 'trash' : 'publish';
+			} else {
+				// Ravi tasks have pending celebration status.
+				newStatus =
+					'publish' === postData.status
+						? 'pending_celebration'
+						: 'publish';
+			}
+
 			post.set( 'status', newStatus );
 			post.save().then( () => {
 				prplSuggestedTask.runTaskAction(
 					postId,
-					'pending_celebration' === newStatus
+					'pending_celebration' === newStatus || 'trash' === newStatus
 						? 'complete'
 						: 'pending',
 					window.prplGetTermObject(
@@ -261,7 +276,12 @@ prplSuggestedTask = {
 				const el = document.querySelector(
 					`.prpl-suggested-task[data-post-id="${ postId }"]`
 				);
-				if ( 'pending_celebration' === newStatus ) {
+
+				// Task is completed, check if we need to celebrate.
+				if (
+					'pending_celebration' === newStatus ||
+					'trash' === newStatus
+				) {
 					el.setAttribute( 'data-task-action', 'celebrate' );
 
 					document.dispatchEvent(
@@ -292,6 +312,7 @@ prplSuggestedTask = {
 											postData?.prpl_recommendations_category,
 											'prpl_recommendations_category'
 										).slug,
+										status: [ newStatus ],
 									},
 							  };
 
