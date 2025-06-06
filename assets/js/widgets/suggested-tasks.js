@@ -53,6 +53,7 @@ window.prplPopulateSuggestedTasksList = function () {
 		prplSuggestedTask.injectItems( {
 			category,
 			status: [ 'publish' ],
+			per_page: prplSuggestedTask.maxItemsPerCategory[ category ],
 			injectTrigger: 'prpl/suggestedTask/injectItem',
 			injectTriggerArgsCallback: ( todoItem ) => {
 				return {
