@@ -38,7 +38,7 @@ prplSuggestedTask = {
 
 		const fetchData = {
 			status: args.status,
-			per_page: 1,
+			per_page: args.per_page || 1,
 			_embed: true,
 			exclude: prplSuggestedTask.injectedItemIds,
 			filter: {
@@ -246,7 +246,6 @@ prplSuggestedTask = {
 		// Get the task.
 		const post = new wp.api.models.Prpl_recommendations( { id: postId } );
 		post.fetch().then( ( postData ) => {
-			let newStatus;
 			const taskProviderId = window.prplGetTermObject(
 				postData?.prpl_recommendations_provider,
 				'prpl_recommendations_provider'
@@ -256,24 +255,15 @@ prplSuggestedTask = {
 				'prpl_recommendations_category'
 			).slug;
 
-			// If task is dismissable change it's status to trash.
-			if ( true === postData.meta.prpl_dismissable ) {
-				newStatus = 'publish' === postData.status ? 'trash' : 'publish';
-			} else {
-				// Ravi tasks have pending celebration status.
-				newStatus =
-					'publish' === postData.status
-						? 'pending_celebration'
-						: 'publish';
-			}
+			// Dismissable tasks don't have pending celebration status, it's either publish or trash.
+			const newStatus =
+				'publish' === postData.status ? 'trash' : 'publish';
 
 			post.set( 'status', newStatus );
 			post.save().then( () => {
 				prplSuggestedTask.runTaskAction(
 					postId,
-					'pending_celebration' === newStatus || 'trash' === newStatus
-						? 'complete'
-						: 'pending',
+					'trash' === newStatus ? 'complete' : 'pending',
 					taskCategorySlug
 				);
 				const el = document.querySelector(
@@ -281,10 +271,7 @@ prplSuggestedTask = {
 				);
 
 				// Task is completed, check if we need to celebrate.
-				if (
-					'pending_celebration' === newStatus ||
-					'trash' === newStatus
-				) {
+				if ( 'trash' === newStatus ) {
 					el.setAttribute( 'data-task-action', 'celebrate' );
 
 					document.dispatchEvent(
@@ -319,7 +306,7 @@ prplSuggestedTask = {
 						};
 					}
 
-					// We trigger celebration only if the task has points, otherwise just remove it from the DOM.
+					// We trigger celebration only if the task has points.
 					if ( 0 < eventPoints ) {
 						// New task is injected in a different request.
 						celebrateEvents = {

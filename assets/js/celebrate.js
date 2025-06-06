@@ -88,7 +88,6 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 	 * Strike completed tasks and remove them from the DOM.
 	 */
 	document.dispatchEvent( new CustomEvent( 'prpl/removeCelebratedTasks' ) );
-	// } );
 } );
 
 /**
