@@ -27,11 +27,21 @@ class Search_Engine_Visibility extends Tasks {
 	protected const PROVIDER_ID = 'search-engine-visibility';
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url          = \admin_url( 'options-reading.php' );
-		$this->link_setting = [
+	protected function get_url() {
+		return \admin_url( 'options-reading.php' );
+	}
+
+	/**
+	 * Get the link setting.
+	 *
+	 * @return array
+	 */
+	public function get_link_setting() {
+		return [
 			'hook'   => 'options-reading.php',
 			'iconEl' => 'label[for="blog_public"]',
 		];
@@ -42,7 +52,7 @@ class Search_Engine_Visibility extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Allow your site to be indexed by search engines', 'progress-planner' );
 	}
 
@@ -51,7 +61,7 @@ class Search_Engine_Visibility extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %1$s <a href="https://prpl.fyi/blog-indexing-settings" target="_blank">allowing search engines</a> link */
 			\esc_html__( 'Your site is not currently visible to search engines. Consider %1$s to index your site.', 'progress-planner' ),

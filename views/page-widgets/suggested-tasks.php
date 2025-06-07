@@ -25,7 +25,10 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 	</p>
 
 	<ul style="display:none"></ul>
-	<ul class="prpl-suggested-tasks-list"></ul>
+	<ul id="prpl-suggested-tasks-list" class="prpl-suggested-tasks-list"></ul>
+	<p class="prpl-suggested-tasks-loading">
+		<?php \esc_html_e( 'Loading tasks...', 'progress-planner' ); ?>
+	</p>
 	<p class="prpl-no-suggested-tasks">
 		<?php \esc_html_e( 'You have completed all recommended tasks.', 'progress-planner' ); ?>
 		<br>

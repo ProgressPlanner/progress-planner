@@ -4,7 +4,7 @@
  *
  * A script that triggers confetti on the container element.
  *
- * Dependencies: particles-confetti
+ * Dependencies: particles-confetti, progress-planner/suggested-task
  */
 /* eslint-disable camelcase */
 
@@ -85,60 +85,55 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 	setTimeout( prplRenderAttemptshoot, 200 );
 
 	/**
-	 * Strike completed tasks.
+	 * Strike completed tasks and remove them from the DOM.
 	 */
-	document.dispatchEvent( new CustomEvent( 'prpl/strikeCelebratedTasks' ) );
+	document.dispatchEvent( new CustomEvent( 'prpl/removeCelebratedTasks' ) );
+} );
 
-	// Remove celebrated tasks and add them to the completed tasks.
-	setTimeout( () => {
-		document.dispatchEvent(
-			new CustomEvent( 'prpl/markTasksAsCompleted' )
-		);
-	}, 2000 );
+/**
+ * Remove tasks from the DOM.
+ * The task will be striked through, before removed, if it has points.
+ */
+document.addEventListener( 'prpl/removeCelebratedTasks', () => {
+	document
+		.querySelectorAll(
+			'.prpl-suggested-task[data-task-action="celebrate"]'
+		)
+		.forEach( ( item ) => {
+			let delay = 2000;
+
+			// We remove the task from the DOM immediately if it has no points.
+			if ( 0 === parseInt( item.getAttribute( 'data-task-points' ) ) ) {
+				delay = 0;
+			}
+
+			// Triggers the strikethrough animation.
+			if ( delay ) {
+				item.classList.add( 'prpl-suggested-task-celebrated' );
+			}
+
+			// Remove the item from the DOM.
+			setTimeout( () => {
+				item.remove();
+			}, delay );
+		} );
 } );
 
 /**
  * Mark tasks as completed.
  */
-document.addEventListener( 'prpl/markTasksAsCompleted', ( event ) => {
-	const taskList = event.detail?.taskList || 'prplSuggestedTasks';
+document.addEventListener( 'prpl/markTasksAsCompleted', () => {
 	document
 		.querySelectorAll( '.prpl-suggested-task-celebrated' )
 		.forEach( ( item ) => {
-			const task_id = item.getAttribute( 'data-task-id' );
-			const providerID = item.getAttribute( 'data-task-provider-id' );
-			const category = item.getAttribute( 'data-task-category' );
+			const post_id = item.getAttribute( 'data-post-id' );
 			const el = document.querySelector(
-				`.prpl-suggested-task[data-task-id="${ task_id }"]`
+				`.prpl-suggested-task[data-post-id="${ post_id }"]`
 			);
 
 			if ( el ) {
-				el.parentElement.remove();
+				el.remove();
 			}
-
-			// Get the task index.
-			let taskIndex = false;
-			window[ taskList ].tasks.forEach( ( taskItem, index ) => {
-				if ( taskItem.task_id === task_id ) {
-					taskIndex = index;
-				}
-			} );
-
-			// Mark the task as completed.
-			if ( false !== taskIndex ) {
-				window[ taskList ].tasks[ taskIndex ].status = 'completed';
-			}
-
-			// Refresh the list.
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
-					detail: {
-						task_id,
-						providerID,
-						category,
-					},
-				} )
-			);
 		} );
 } );
 

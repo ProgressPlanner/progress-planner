@@ -473,7 +473,7 @@ class Email_Sending extends Interactive {
 
 		return [
 			'task_id'     => $task_id,
-			'title'       => $this->get_title(),
+			'post_title'  => $this->get_title(),
 			'parent'      => $this->get_parent(),
 			'priority'    => $this->get_priority(),
 			'category'    => $this->get_provider_category(),

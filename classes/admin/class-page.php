@@ -110,9 +110,7 @@ class Page {
 	 * @return string The notification count in HTML format.
 	 */
 	protected function get_notification_counter() {
-
-		$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' );
-		$notification_count        = count( $pending_celebration_tasks );
+		$notification_count = wp_count_posts( 'prpl_recommendations' )->pending_celebration;
 
 		if ( 0 === $notification_count ) {
 			return '';
@@ -162,7 +160,6 @@ class Page {
 		}
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
-
 			$default_localization_data = [
 				'name' => 'progressPlanner',
 				'data' => [
@@ -213,8 +210,7 @@ class Page {
 	 * @return void
 	 */
 	public function maybe_enqueue_focus_el_script( $hook ) {
-		$suggested_tasks  = \progress_planner()->get_suggested_tasks();
-		$tasks_providers  = $suggested_tasks->get_tasks_manager()->get_task_providers();
+		$tasks_providers  = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers();
 		$tasks_details    = [];
 		$total_points     = 0;
 		$completed_points = 0;
@@ -315,6 +311,7 @@ class Page {
 		}
 
 		\remove_all_actions( 'admin_notices' );
+		\remove_all_actions( 'all_admin_notices' );
 	}
 
 	/**

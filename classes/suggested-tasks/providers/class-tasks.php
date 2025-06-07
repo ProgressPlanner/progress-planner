@@ -8,7 +8,6 @@
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Tasks_Interface;
-use Progress_Planner\Suggested_Tasks\Task_Factory;
 
 /**
  * Add tasks for content updates.
@@ -42,6 +41,13 @@ abstract class Tasks implements Tasks_Interface {
 	 * @var bool
 	 */
 	protected const IS_ONBOARDING_TASK = false;
+
+	/**
+	 * The data collector class name.
+	 *
+	 * @var string
+	 */
+	protected const DATA_COLLECTOR_CLASS = \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector::class;
 
 	/**
 	 * Whether the task is repetitive.
@@ -79,6 +85,13 @@ abstract class Tasks implements Tasks_Interface {
 	protected $is_dismissable = false;
 
 	/**
+	 * Whether the task is snoozable.
+	 *
+	 * @var bool
+	 */
+	protected $is_snoozable = true;
+
+	/**
 	 * The task URL.
 	 *
 	 * @var string
@@ -100,6 +113,13 @@ abstract class Tasks implements Tasks_Interface {
 	protected $link_setting;
 
 	/**
+	 * The data collector.
+	 *
+	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector|null
+	 */
+	protected $data_collector = null;
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -112,7 +132,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return '';
 	}
 
@@ -121,7 +141,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return '';
 	}
 
@@ -162,16 +182,12 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Get the task URL.
+	 * Get whether the task is snoozable.
 	 *
-	 * @return string
+	 * @return bool
 	 */
-	public function get_url() {
-		if ( $this->url ) {
-			return \esc_url( $this->url );
-		}
-
-		return '';
+	public function is_snoozable() {
+		return $this->is_snoozable;
 	}
 
 	/**
@@ -179,7 +195,16 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return string
 	 */
-	public function get_url_target() {
+	protected function get_url() {
+		return $this->url ? \esc_url( $this->url ) : '';
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url_target() {
 		return $this->url_target ? $this->url_target : '_self';
 	}
 
@@ -188,7 +213,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return array
 	 */
-	public function get_link_setting() {
+	protected function get_link_setting() {
 		return $this->link_setting;
 	}
 
@@ -245,6 +270,20 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
+	 * Get the data collector.
+	 *
+	 * @return \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector
+	 */
+	public function get_data_collector() {
+		if ( ! $this->data_collector ) {
+			$class_name           = static::DATA_COLLECTOR_CLASS;
+			$this->data_collector = new $class_name(); // @phpstan-ignore-line assign.propertyType
+		}
+
+		return $this->data_collector; // @phpstan-ignore-line return.type
+	}
+
+	/**
 	 * Check if the user has the capability to perform the task.
 	 *
 	 * @return bool
@@ -274,35 +313,19 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Get the data from a task-ID.
-	 *
-	 * @param string $task_id The task ID (unused here).
-	 *
-	 * @return array The data.
-	 */
-	public function get_data_from_task_id( $task_id ) {
-		$data = [
-			'provider_id' => $this->get_provider_id(),
-			'id'          => $task_id,
-		];
-
-		return $data;
-	}
-
-	/**
 	 * Check if a task category is snoozed.
 	 *
 	 * @return bool
 	 */
 	public function is_task_snoozed() {
-		$snoozed = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'snoozed' );
+		$snoozed = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] );
 		if ( empty( $snoozed ) ) {
 			return false;
 		}
 
 		foreach ( $snoozed as $task ) {
-			$task_object = Task_Factory::create_task_from( 'id', $task['task_id'] );
-			$provider_id = $task_object->get_provider_id();
+			$task        = \progress_planner()->get_suggested_tasks_db()->get_post( $task->task_id );
+			$provider_id = $task ? $task->get_provider_id() : '';
 
 			if ( $provider_id === $this->get_provider_id() ) {
 				return true;
@@ -328,7 +351,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return false|\Progress_Planner\Suggested_Tasks\Task The task data or false if the task is not completed.
+	 * @return \Progress_Planner\Suggested_Tasks\Task|false The task data or false if the task is not completed.
 	 */
 	public function evaluate_task( $task_id ) {
 		// Early bail if the user does not have the capability to manage options.
@@ -336,22 +359,31 @@ abstract class Tasks implements Tasks_Interface {
 			return false;
 		}
 
-		if ( ! $this->is_repetitive() ) {
-			if ( 0 !== strpos( $task_id, $this->get_task_id() ) ) {
-				return false;
-			}
-			return $this->is_task_completed( $task_id ) ? Task_Factory::create_task_from( 'id', $task_id ) : false;
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
+
+		if ( ! $task ) {
+			return false;
 		}
 
-		$task_object = Task_Factory::create_task_from( 'id', $task_id );
-		$task_data   = $task_object->get_data();
+		if ( ! $this->is_repetitive() ) {
+			if ( ! $task->task_id || 0 !== strpos( $task->task_id, $this->get_task_id() ) ) {
+				return false;
+			}
+			return $this->is_task_completed( $task->task_id ) ? $task : false;
+		}
 
-		if ( $task_data['provider_id'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['date'] && $this->is_task_completed( $task_id ) ) {
+		if (
+			$task->provider &&
+			$task->provider->slug === $this->get_provider_id() &&
+			\DateTime::createFromFormat( 'Y-m-d H:i:s', $task->post_date ) &&
+			\gmdate( 'YW' ) === \gmdate( 'YW', \DateTime::createFromFormat( 'Y-m-d H:i:s', $task->post_date )->getTimestamp() ) && // @phpstan-ignore-line
+			$this->is_task_completed( $task->task_id )
+		) {
 			// Allow adding more data, for example in case of 'create-post' tasks we are adding the post_id.
-			$task_data = $this->modify_evaluated_task_data( $task_data );
-			$task_object->set_data( $task_data );
+			$task_data = $this->modify_evaluated_task_data( $task->get_data() );
+			$task->update( $task_data );
 
-			return $task_object;
+			return $task;
 		}
 
 		return false;
@@ -360,7 +392,7 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Check if the task condition is satisfied.
 	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
-	 *
+
 	 * @return bool
 	 */
 	abstract protected function should_add_task();
@@ -404,7 +436,6 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-
 		$task_id = $this->get_task_id();
 
 		if (
@@ -416,17 +447,27 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		$task_data = [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'category'    => $this->get_provider_category(),
-			'date'        => \gmdate( 'YW' ),
+			'task_id'      => $task_id,
+			'provider_id'  => $this->get_provider_id(),
+			'category'     => $this->get_provider_category(),
+			'date'         => \gmdate( 'YW' ),
+			'post_title'   => $this->get_title(),
+			'description'  => $this->get_description(),
+			'url'          => $this->get_url(),
+			'url_target'   => $this->get_url_target(),
+			'link_setting' => $this->get_link_setting(),
+			'dismissable'  => $this->is_dismissable(),
+			'snoozable'    => $this->is_snoozable(),
+			'points'       => $this->get_points(),
 		];
 
 		$task_data = $this->modify_injection_task_data( $task_data );
 
-		return [
-			$task_data,
-		];
+		// Add the tasks to the pending tasks option, it will not add duplicates.
+		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
+
+		// Skip the task if it was already injected.
+		return $task_post ? [] : [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
 	}
 
 	/**
@@ -461,11 +502,10 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return array
 	 */
 	public function get_task_details( $task_id = '' ) {
-
 		return [
 			'task_id'      => $this->get_task_id(),
 			'provider_id'  => $this->get_provider_id(),
-			'title'        => $this->get_title(),
+			'post_title'   => $this->get_title(),
 			'parent'       => $this->get_parent(),
 			'priority'     => $this->get_priority(),
 			'category'     => $this->get_provider_category(),
@@ -474,6 +514,7 @@ abstract class Tasks implements Tasks_Interface {
 			'description'  => $this->get_description(),
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
+			'snoozable'    => $this->is_snoozable(),
 		];
 	}
 }

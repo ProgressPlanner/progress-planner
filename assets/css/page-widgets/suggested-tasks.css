@@ -3,7 +3,7 @@
 /**
  * Suggested tasks widget.
  *
- * Dependencies: progress-planner/web-components/prpl-suggested-task, progress-planner/web-components/prpl-badge
+ * Dependencies: progress-planner/suggested-task, progress-planner/web-components/prpl-badge
  */
 
 .prpl-widget-wrapper.prpl-suggested-tasks {
@@ -102,10 +102,6 @@
 			display: flex;
 		}
 
-		.prpl-no-suggested-tasks {
-			display: none;
-		}
-
 		hr {
 			display: block;
 		}
@@ -116,10 +112,15 @@
 		display: none;
 	}
 
-	.prpl-no-suggested-tasks {
-		display: block;
+	.prpl-no-suggested-tasks,
+	.prpl-suggested-tasks-loading {
+		display: none;
 		background-color: var(--prpl-background-green);
 		padding: calc(var(--prpl-padding) / 2);
+	}
+
+	.prpl-suggested-tasks-loading {
+		display: block;
 	}
 }
 
@@ -132,11 +133,8 @@
 		border-bottom: none;
 	}
 
-	prpl-suggested-task:nth-child(odd) {
-
-		.prpl-suggested-task {
-			background-color: #f9fafb;
-		}
+	.prpl-suggested-task:nth-child(odd) {
+		background-color: #f9fafb;
 	}
 
 	/* If task has disabled checkbox it's title should be italic. */

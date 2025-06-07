@@ -35,13 +35,16 @@ use Progress_Planner\Badges\Monthly;
 
 <h3><?php \esc_html_e( 'Ravi\'s Recommendations', 'progress-planner' ); ?></h3>
 <ul style="display:none"></ul>
+<p class="prpl-suggested-tasks-loading">
+	<?php \esc_html_e( 'Loading tasks...', 'progress-planner' ); ?>
+</p>
 <ul class="prpl-suggested-tasks-list"></ul>
 
 <?php if ( \current_user_can( 'manage_options' ) ) : ?>
 	<div class="prpl-dashboard-widget-footer">
 		<img src="<?php echo \esc_attr( constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg' ); ?>" style="width:1.85em;" alt="" />
 		<div>
-			<?php $prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' ); ?>
+			<?php $prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'pending_celebration' ] ); ?>
 			<?php if ( $prpl_pending_celebration_tasks ) : ?>
 				<?php
 				$prpl_notification_count = \count( $prpl_pending_celebration_tasks );
