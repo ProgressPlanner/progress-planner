@@ -38,7 +38,7 @@ prplSuggestedTask = {
 
 		const fetchData = {
 			status: args.status,
-			per_page: 1,
+			per_page: args.per_page || 1,
 			_embed: true,
 			exclude: prplSuggestedTask.injectedItemIds,
 			filter: {
@@ -189,17 +189,21 @@ prplSuggestedTask = {
 				action_type: actionType,
 			}
 		);
-		request.done( () => {
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
-					detail: {
-						task_id: postId,
-						actionType,
-						category: categorySlug,
-					},
-				} )
-			);
-		} );
+
+		// We do not inject user tasks, because they are already in the DOM.
+		if ( 'user' !== categorySlug ) {
+			request.done( () => {
+				document.dispatchEvent(
+					new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
+						detail: {
+							task_id: postId,
+							actionType,
+							category: categorySlug,
+						},
+					} )
+				);
+			} );
+		}
 	},
 
 	/**
@@ -242,46 +246,32 @@ prplSuggestedTask = {
 		// Get the task.
 		const post = new wp.api.models.Prpl_recommendations( { id: postId } );
 		post.fetch().then( ( postData ) => {
-			let newStatus;
+			const taskProviderId = window.prplGetTermObject(
+				postData?.prpl_recommendations_provider,
+				'prpl_recommendations_provider'
+			).slug;
+			const taskCategorySlug = window.prplGetTermObject(
+				postData?.prpl_recommendations_category,
+				'prpl_recommendations_category'
+			).slug;
 
-			// User tasks don't have pending celebration status, it's either publish or trash.
-			if (
-				'user' ===
-				window.prplGetTermObject(
-					postData?.prpl_recommendations_provider,
-					'prpl_recommendations_provider'
-				).slug
-			) {
-				newStatus = 'publish' === postData.status ? 'trash' : 'publish';
-			} else {
-				// Ravi tasks have pending celebration status.
-				newStatus =
-					'publish' === postData.status
-						? 'pending_celebration'
-						: 'publish';
-			}
+			// Dismissable tasks don't have pending celebration status, it's either publish or trash.
+			const newStatus =
+				'publish' === postData.status ? 'trash' : 'publish';
 
 			post.set( 'status', newStatus );
 			post.save().then( () => {
 				prplSuggestedTask.runTaskAction(
 					postId,
-					'pending_celebration' === newStatus || 'trash' === newStatus
-						? 'complete'
-						: 'pending',
-					window.prplGetTermObject(
-						postData?.prpl_recommendations_category?.[ 0 ],
-						'prpl_recommendations_category'
-					).slug
+					'trash' === newStatus ? 'complete' : 'pending',
+					taskCategorySlug
 				);
 				const el = document.querySelector(
 					`.prpl-suggested-task[data-post-id="${ postId }"]`
 				);
 
 				// Task is completed, check if we need to celebrate.
-				if (
-					'pending_celebration' === newStatus ||
-					'trash' === newStatus
-				) {
+				if ( 'trash' === newStatus ) {
 					el.setAttribute( 'data-task-action', 'celebrate' );
 
 					document.dispatchEvent(
@@ -296,27 +286,35 @@ prplSuggestedTask = {
 
 					const eventDetail = { element: el };
 					const eventPoints = parseInt( postData?.meta?.prpl_points );
-					const celebrateEvents =
-						0 < eventPoints
-							? { 'prpl/celebrateTasks': eventDetail }
-							: {
-									'prpl/strikeCelebratedTasks': eventDetail,
-									'prpl/markTasksAsCompleted': eventDetail,
-									'prpl/suggestedTask/maybeInjectItem': {
-										task_id: postId,
-										providerID: window.prplGetTermObject(
-											postData?.prpl_recommendations_provider,
-											'prpl_recommendations_provider'
-										).slug,
-										category: window.prplGetTermObject(
-											postData?.prpl_recommendations_category,
-											'prpl_recommendations_category'
-										).slug,
-										status: [ newStatus ],
-									},
-							  };
 
-					// Trigger the celebration events.
+					let celebrateEvents = {};
+
+					if ( 'user' === taskProviderId ) {
+						// Move task from pending to completed.
+						document
+							.getElementById( 'todo-list-completed' )
+							.insertAdjacentElement( 'beforeend', el );
+					} else {
+						// Inject more tasks from the same category.
+						celebrateEvents[
+							'prpl/suggestedTask/maybeInjectItem'
+						] = {
+							task_id: postId,
+							providerID: taskProviderId,
+							category: taskCategorySlug,
+							status: [ newStatus ],
+						};
+					}
+
+					// We trigger celebration only if the task has points.
+					if ( 0 < eventPoints ) {
+						// New task is injected in a different request.
+						celebrateEvents = {
+							'prpl/celebrateTasks': eventDetail,
+						};
+					}
+
+					// Trigger the events.
 					Object.keys( celebrateEvents ).forEach( ( event ) => {
 						document.dispatchEvent(
 							new CustomEvent( event, {
@@ -338,13 +336,7 @@ prplSuggestedTask = {
 						} )
 					);
 
-					if (
-						'user' ===
-						window.prplGetTermObject(
-							postData?.prpl_recommendations_category,
-							'prpl_recommendations_category'
-						).slug
-					) {
+					if ( 'user' === taskProviderId ) {
 						// Move task from completed to pending.
 						document
 							.getElementById( 'todo-list' )

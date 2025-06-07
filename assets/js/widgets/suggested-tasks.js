@@ -49,9 +49,11 @@ window.prplPopulateSuggestedTasksList = function () {
 			continue;
 		}
 
+		// Inject pending tasks.
 		prplSuggestedTask.injectItems( {
 			category,
 			status: [ 'publish' ],
+			per_page: prplSuggestedTask.maxItemsPerCategory[ category ],
 			injectTrigger: 'prpl/suggestedTask/injectItem',
 			injectTriggerArgsCallback: ( todoItem ) => {
 				return {
@@ -63,9 +65,11 @@ window.prplPopulateSuggestedTasksList = function () {
 			afterRequestComplete: prplSuggestedTasksToggleUIitems,
 		} );
 
+		// Inject pending celebration tasks.
 		prplSuggestedTask.injectItems( {
 			category,
 			status: [ 'pending_celebration' ],
+			per_page: 100, // Inject all pending celebration tasks at once.
 			injectTrigger: 'prpl/suggestedTask/injectItem',
 			injectTriggerArgsCallback: ( todoItem ) => {
 				return {
@@ -74,13 +78,30 @@ window.prplPopulateSuggestedTasksList = function () {
 					insertPosition: 'beforeend',
 				};
 			},
-			afterRequestComplete: prplSuggestedTasksToggleUIitems,
-		} );
+			afterRequestComplete: ( data ) => {
+				prplSuggestedTasksToggleUIitems();
 
-		setTimeout( () => {
-			// Trigger the celebration event.
-			document.dispatchEvent( new CustomEvent( 'prpl/celebrateTasks' ) );
-		}, 3000 );
+				// If  there were pending tasks.
+				if ( data.length ) {
+					// Set post status to trash.
+					data.forEach( ( task ) => {
+						const post = new wp.api.models.Prpl_recommendations( {
+							id: task.id,
+							status: 'trash',
+						} );
+						post.save();
+					} );
+
+					// Trigger the celebration event (trigger confetti, strike through tasks, remove from DOM).
+					setTimeout( () => {
+						// Trigger the celebration event.
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/celebrateTasks' )
+						);
+					}, 3000 );
+				}
+			},
+		} );
 	}
 };
 
