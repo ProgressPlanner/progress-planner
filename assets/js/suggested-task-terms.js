@@ -34,22 +34,29 @@ window.prplGetTermsCollectionPromise = ( taxonomy ) => {
 					]();
 					UserTermsCollection.fetch( {
 						data: { slug: 'user' },
-					} ).done( ( userTerms ) => {
-						if ( 0 === userTerms.length ) {
-							const newTermModel = new wp.api.models[ typeName ](
-								{
+					} )
+						.then( ( userTerms ) => {
+							if ( 0 === userTerms.length ) {
+								const newTermModel = new wp.api.models[
+									typeName
+								]( {
 									slug: 'user',
 									name: 'user',
-								}
-							);
-							newTermModel.save().then( ( response ) => {
-								window.prplSuggestedTasksTerms[
-									taxonomy
-								].user = response;
-							} );
-						}
-						resolve( window.prplSuggestedTasksTerms[ taxonomy ] );
-					} );
+								} );
+								return newTermModel
+									.save()
+									.then( ( response ) => {
+										window.prplSuggestedTasksTerms[
+											taxonomy
+										].user = response;
+										return window.prplSuggestedTasksTerms[
+											taxonomy
+										];
+									} );
+							}
+							return window.prplSuggestedTasksTerms[ taxonomy ];
+						} )
+						.then( resolve ); // Resolve the promise after all requests are complete.
 				}
 			);
 		} );
