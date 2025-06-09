@@ -269,14 +269,30 @@ prplSuggestedTask = {
 					let celebrateEvents = {};
 
 					if ( 'user' === taskProviderId ) {
-						// Move task from published to trash.
-						document
-							.getElementById( 'todo-list-completed' )
-							.insertAdjacentElement( 'beforeend', el );
+						const delay = eventPoints ? 2000 : 0;
 
-						window.dispatchEvent(
-							new CustomEvent( 'prpl/grid/resize' )
-						);
+						// Set class to trigger strike through animation.
+						if ( 0 < eventPoints ) {
+							el.classList.add(
+								'prpl-suggested-task-celebrated'
+							);
+						}
+
+						setTimeout( () => {
+							// Move task from published to trash.
+							document
+								.getElementById( 'todo-list-completed' )
+								.insertAdjacentElement( 'beforeend', el );
+
+							// Remove the class to trigger the strike through animation.
+							el.classList.remove(
+								'prpl-suggested-task-celebrated'
+							);
+
+							window.dispatchEvent(
+								new CustomEvent( 'prpl/grid/resize' )
+							);
+						}, delay );
 					} else {
 						// Inject more tasks from the same category.
 						celebrateEvents[
