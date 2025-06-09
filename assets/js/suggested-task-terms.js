@@ -6,6 +6,12 @@
  */
 window.prplSuggestedTasksTerms = window.prplSuggestedTasksTerms || {};
 
+/**
+ * Get a promise for the terms collection for a given taxonomy.
+ *
+ * @param {string} taxonomy The taxonomy.
+ * @return {Promise} A promise for the terms collection.
+ */
 window.prplGetTermsCollectionPromise = ( taxonomy ) => {
 	return new Promise( ( resolve ) => {
 		if ( window.prplSuggestedTasksTerms[ taxonomy ] ) {
@@ -63,6 +69,11 @@ window.prplGetTermsCollectionPromise = ( taxonomy ) => {
 	} );
 };
 
+/**
+ * Get promises for the terms collections for the taxonomies we use.
+ *
+ * @return {Promise} A promise for the terms collections.
+ */
 window.prplGetTermsCollectionsPromises = () => {
 	return new Promise( ( resolve ) => {
 		prplDocumentReady( () => {
