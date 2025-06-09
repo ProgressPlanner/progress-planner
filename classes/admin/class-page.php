@@ -110,7 +110,7 @@ class Page {
 	 * @return string The notification count in HTML format.
 	 */
 	protected function get_notification_counter() {
-		$notification_count = wp_count_posts( 'prpl_recommendations' )->pending_celebration;
+		$notification_count = wp_count_posts( 'prpl_recommendations' )->pending;
 
 		if ( 0 === $notification_count ) {
 			return '';

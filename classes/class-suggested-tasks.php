@@ -25,7 +25,7 @@ class Suggested_Tasks {
 	 */
 	const STATUS_MAP = [
 		'completed'           => 'trash',
-		'pending_celebration' => 'pending_celebration',
+		'pending_celebration' => 'pending',
 		'pending'             => 'publish',
 		'snoozed'             => 'future',
 	];
@@ -46,7 +46,7 @@ class Suggested_Tasks {
 		if ( \is_admin() ) {
 			\add_action( 'init', [ $this, 'init' ], 100 ); // Wait for the post types to be initialized.
 
-			// Check GET parameter and maybe set task as pending_celebration.
+			// Check GET parameter and maybe set task as pending.
 			\add_action( 'init', [ $this, 'maybe_complete_task' ] );
 		}
 		\add_action( 'wp_ajax_progress_planner_suggested_task_action', [ $this, 'suggested_task_action' ] );
@@ -65,9 +65,6 @@ class Suggested_Tasks {
 
 		// Filter the REST API response.
 		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'rest_prepare_recommendation' ], 10, 2 );
-
-		// Add the custom post status.
-		\add_action( 'init', [ $this, 'register_post_status' ], 1 );
 	}
 
 	/**
@@ -84,7 +81,7 @@ class Suggested_Tasks {
 				continue;
 			}
 
-			// Change the task status to pending_celebration.
+			// Change the task status to pending.
 			$task->celebrate();
 
 			// Insert an activity.
@@ -135,7 +132,7 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * If done via automatic updates, the "core update" task should be marked as "trashed" (and skip "pending_celebration" status).
+	 * If done via automatic updates, the "core update" task should be marked as "trashed" (and skip "pending" status).
 	 *
 	 * @return void
 	 */
@@ -169,7 +166,7 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Check if a task was completed. Task is considered completed if it was trashed or pending_celebration.
+	 * Check if a task was completed. Task is considered completed if it was trashed or pending.
 	 *
 	 * @param string|int $task_id The task ID.
 	 *
@@ -201,7 +198,7 @@ class Suggested_Tasks {
 			$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
 			if ( $task ) {
-				\progress_planner()->get_suggested_tasks_db()->update_recommendation( $task->ID, [ 'post_status' => 'pending_celebration' ] );
+				\progress_planner()->get_suggested_tasks_db()->update_recommendation( $task->ID, [ 'post_status' => 'pending' ] );
 
 				// Insert an activity.
 				$this->insert_activity( $task_id );
@@ -437,27 +434,5 @@ class Suggested_Tasks {
 		}
 
 		return $response;
-	}
-
-	/**
-	 * Register a custom post status.
-	 *
-	 * @return void
-	 */
-	public function register_post_status() {
-		register_post_status(
-			'pending_celebration',
-			[
-				'label'               => _x( 'Pending Celebration', 'post', 'progress-planner' ),
-				'public'              => false,
-				'exclude_from_search' => true,
-				'show_in_admin_bar'   => false,
-				'show_in_menu'        => false,
-				'show_in_nav_menus'   => false,
-				'show_in_rest'        => true,
-				'show_in_quick_edit'  => false,
-				'show_in_table'       => false,
-			]
-		);
 	}
 }

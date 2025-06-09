@@ -164,8 +164,7 @@ prplSuggestedTask = {
 				useCheckbox,
 				listId,
 				assets: prplSuggestedTask.assets,
-				action:
-					'pending_celebration' === post.status ? 'celebrate' : '',
+				action: 'pending' === post.status ? 'celebrate' : '',
 				l10n: prplSuggestedTask.l10n,
 			};
 
@@ -255,7 +254,7 @@ prplSuggestedTask = {
 				'prpl_recommendations_category'
 			).slug;
 
-			// Dismissable tasks don't have pending_celebration status, it's either publish or trash.
+			// Dismissable tasks don't have pending status, it's either publish or trash.
 			const newStatus =
 				'publish' === postData.status ? 'trash' : 'publish';
 

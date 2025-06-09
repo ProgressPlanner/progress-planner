@@ -59,7 +59,7 @@ function taglineTests( testContext = test ) {
 					( task ) => task.task_id === 'core-blogdescription'
 				);
 				expect( updatedTask ).toBeDefined();
-				expect( updatedTask.status ).toBe( 'pending_celebration' );
+				expect( updatedTask.status ).toBe( 'pending' );
 
 				// Go to Progress Planner dashboard
 				await page.goto(

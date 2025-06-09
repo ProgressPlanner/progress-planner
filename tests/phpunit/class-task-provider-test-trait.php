@@ -101,10 +101,10 @@ trait Task_Provider_Test_Trait {
 			// Change the task status to pending celebration.
 			\progress_planner()->get_suggested_tasks_db()->update_recommendation(
 				$task->get_data()['ID'],
-				[ 'post_status' => 'pending_celebration' ]
+				[ 'post_status' => 'pending' ]
 			);
 			// Verify that the task(s) we're testing is pending celebration.
-			$this->assertTrue( 'pending_celebration' === \get_post_status( $task->get_data()['ID'] ) );
+			$this->assertTrue( 'pending' === \get_post_status( $task->get_data()['ID'] ) );
 		}
 
 		// Verify that the task(s) we're testing is completed.

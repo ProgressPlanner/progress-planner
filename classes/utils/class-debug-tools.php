@@ -221,10 +221,10 @@ class Debug_Tools {
 		);
 
 		$menu_items = [
-			'publish'             => 'Pending',
-			'trash'               => 'Completed',
-			'future'              => 'Snoozed',
-			'pending_celebration' => 'Pending Celebration',
+			'publish' => 'Pending',
+			'trash'   => 'Completed',
+			'future'  => 'Snoozed',
+			'pending' => 'Pending Celebration',
 		];
 
 		foreach ( $menu_items as $key => $title ) {

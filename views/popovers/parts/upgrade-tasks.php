@@ -76,10 +76,10 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 
 			$prpl_task_completed = $prpl_task_provider->evaluate_task( $prpl_task_data['task_id'] );
 
-			// If the task is completed, mark it as pending_celebration.
+			// If the task is completed, mark it as pending.
 			if ( $prpl_task_completed ) {
-				// Change the task status to pending_celebration.
-				\progress_planner()->get_suggested_tasks_db()->update_recommendation( $prpl_task->ID, [ 'post_status' => 'pending_celebration' ] );
+				// Change the task status to pending.
+				\progress_planner()->get_suggested_tasks_db()->update_recommendation( $prpl_task->ID, [ 'post_status' => 'pending' ] );
 
 				// Insert an activity.
 				\progress_planner()->get_suggested_tasks()->insert_activity( $prpl_task_data['task_id'] );

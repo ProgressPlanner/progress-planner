@@ -44,7 +44,7 @@ use Progress_Planner\Badges\Monthly;
 	<div class="prpl-dashboard-widget-footer">
 		<img src="<?php echo \esc_attr( constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg' ); ?>" style="width:1.85em;" alt="" />
 		<div>
-			<?php $prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'pending_celebration' ] ); ?>
+			<?php $prpl_pending_celebration_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'pending' ] ); ?>
 			<?php if ( $prpl_pending_celebration_tasks ) : ?>
 				<?php
 				$prpl_notification_count = \count( $prpl_pending_celebration_tasks );
