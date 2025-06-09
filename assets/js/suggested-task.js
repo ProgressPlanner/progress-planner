@@ -531,7 +531,6 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 			const parent = false;
 
 			if ( ! parent ) {
-				console.log( 'injecting item into list', event.detail.listId );
 				// Inject the item into the list.
 				document
 					.getElementById( event.detail.listId )
