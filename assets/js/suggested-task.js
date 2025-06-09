@@ -1,8 +1,8 @@
-/* global HTMLElement, prplSuggestedTask, prplL10n */
+/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge */
 /*
  * Suggested Task scripts & helpers.
  *
- * Dependencies: wp-api, progress-planner/l10n, progress-planner/suggested-task-terms
+ * Dependencies: wp-api, progress-planner/l10n, progress-planner/suggested-task-terms, progress-planner/web-components/prpl-gauge
  */
 /* eslint-disable camelcase, jsdoc/require-param-type, jsdoc/require-param, jsdoc/check-param-names */
 
@@ -266,14 +266,8 @@ prplSuggestedTask = {
 				if ( 'trash' === newStatus ) {
 					el.setAttribute( 'data-task-action', 'celebrate' );
 
-					document.dispatchEvent(
-						new CustomEvent( 'prpl/updateRaviGauge', {
-							detail: {
-								pointsDiff: parseInt(
-									postData?.meta?.prpl_points
-								),
-							},
-						} )
+					prplUpdateRaviGauge(
+						parseInt( postData?.meta?.prpl_points )
 					);
 
 					const eventDetail = { element: el };
@@ -319,13 +313,8 @@ prplSuggestedTask = {
 					el.setAttribute( 'data-task-action', 'publish' );
 
 					// Update the Ravi gauge.
-					document.dispatchEvent(
-						new CustomEvent( 'prpl/updateRaviGauge', {
-							detail: {
-								pointsDiff:
-									0 - parseInt( postData?.meta?.prpl_points ),
-							},
-						} )
+					prplUpdateRaviGauge(
+						0 - parseInt( postData?.meta?.prpl_points )
 					);
 
 					if ( 'user' === taskProviderId ) {
