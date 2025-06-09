@@ -1,4 +1,4 @@
-/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplGetTerms */
+/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplGetTerms, prplSuggestedTasksToggleUIitems */
 /*
  * Suggested Task scripts & helpers.
  *
@@ -95,6 +95,29 @@ prplSuggestedTask = {
 	},
 
 	/**
+	 * Inject items from a category.
+	 *
+	 * @param {string} taskCategorySlug The task category slug.
+	 */
+	injectItemsFromCategory: ( taskCategorySlug ) => {
+		prplSuggestedTask.injectItems( {
+			category: taskCategorySlug,
+			afterRequestComplete: () => {
+				prplSuggestedTasksToggleUIitems();
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+			},
+			injectTrigger: 'prpl/suggestedTask/injectItem',
+			injectTriggerArgsCallback: ( todoItem ) => {
+				return {
+					item: todoItem,
+					listId: 'prpl-suggested-tasks-list',
+					insertPosition: 'beforeend',
+				};
+			},
+		} );
+	},
+
+	/**
 	 * Get a collection of posts.
 	 *
 	 * @param {Object} fetchArgs The arguments to pass to the fetch method.
@@ -163,37 +186,21 @@ prplSuggestedTask = {
 	/**
 	 * Run a task action.
 	 *
-	 * @param {number} postId       The post ID.
-	 * @param {string} actionType   The action type.
-	 * @param {string} categorySlug The category slug.
+	 * @param {number} postId     The post ID.
+	 * @param {string} actionType The action type.
+	 * @return {Promise} A promise that resolves with the response from the server.
 	 */
-	runTaskAction: ( postId, actionType, categorySlug ) => {
-		const request = wp.ajax.post(
-			'progress_planner_suggested_task_action',
-			{
-				post_id: postId,
-				nonce: prplSuggestedTask.nonce,
-				action_type: actionType,
-			}
-		);
-
-		// We do not inject user tasks, because they are already in the DOM.
-		if ( 'user' !== categorySlug ) {
-			request.done( () => {
-				document.dispatchEvent(
-					new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
-						detail: {
-							task_id: postId,
-							category: categorySlug,
-						},
-					} )
-				);
-			} );
-		}
+	runTaskAction: ( postId, actionType ) => {
+		return wp.ajax.post( 'progress_planner_suggested_task_action', {
+			post_id: postId,
+			nonce: prplSuggestedTask.nonce,
+			action_type: actionType,
+		} );
 	},
 
 	/**
-	 * Trash a task.
+	 * Trash (delete) a task.
+	 * Only user tasks can be trashed.
 	 *
 	 * @param {number} postId The post ID.
 	 */
@@ -201,7 +208,7 @@ prplSuggestedTask = {
 		const post = new wp.api.models.Prpl_recommendations( {
 			id: postId,
 		} );
-		post.fetch().then( ( postData ) => {
+		post.fetch().then( () => {
 			post.destroy( { data: { force: true } } ).then( () => {
 				// Remove the task from the todo list.
 				const el = document.querySelector(
@@ -214,14 +221,7 @@ prplSuggestedTask = {
 					);
 				}, 500 );
 
-				prplSuggestedTask.runTaskAction(
-					postId,
-					'delete',
-					window.prplGetTermObject(
-						postData?.prpl_recommendations_category,
-						'prpl_recommendations_category'
-					).slug
-				);
+				prplSuggestedTask.runTaskAction( postId, 'delete' );
 			} );
 		} );
 	},
@@ -252,8 +252,7 @@ prplSuggestedTask = {
 			post.save().then( () => {
 				prplSuggestedTask.runTaskAction(
 					postId,
-					'trash' === newStatus ? 'complete' : 'pending',
-					taskCategorySlug
+					'trash' === newStatus ? 'complete' : 'pending'
 				);
 				const el = document.querySelector(
 					`.prpl-suggested-task[data-post-id="${ postId }"]`
@@ -269,8 +268,6 @@ prplSuggestedTask = {
 
 					const eventDetail = { element: el };
 					const eventPoints = parseInt( postData?.meta?.prpl_points );
-
-					let celebrateEvents = {};
 
 					if ( 'user' === taskProviderId ) {
 						const delay = eventPoints ? 2000 : 0;
@@ -299,23 +296,13 @@ prplSuggestedTask = {
 						}, delay );
 					} else {
 						// Inject more tasks from the same category.
-						celebrateEvents[
-							'prpl/suggestedTask/maybeInjectItem'
-						] = {
-							task_id: postId,
-							providerID: taskProviderId,
-							category: taskCategorySlug,
-							status: [ newStatus ],
-						};
+						prplSuggestedTask.injectItemsFromCategory(
+							taskCategorySlug
+						);
 					}
 
 					// We trigger celebration only if the task has points.
 					if ( 0 < eventPoints ) {
-						// New task is injected in a different request.
-						celebrateEvents = {
-							'prpl/celebrateTasks': eventDetail,
-						};
-
 						if ( 'user' !== taskProviderId ) {
 							/**
 							 * Strike completed tasks and remove them from the DOM.
@@ -324,16 +311,14 @@ prplSuggestedTask = {
 								new CustomEvent( 'prpl/removeCelebratedTasks' )
 							);
 						}
-					}
 
-					// Trigger the events.
-					Object.keys( celebrateEvents ).forEach( ( event ) => {
+						// Trigger the celebration event (confetti).
 						document.dispatchEvent(
-							new CustomEvent( event, {
-								detail: celebrateEvents[ event ],
+							new CustomEvent( 'prpl/celebrateTasks', {
+								detail: eventDetail,
 							} )
 						);
-					} );
+					}
 				} else if ( 'publish' === newStatus ) {
 					// Set the task action to publish.
 					el.setAttribute( 'data-task-action', 'publish' );
@@ -392,10 +377,6 @@ prplSuggestedTask = {
 			date_gmt: date,
 		} );
 		postModelToSave.save().then( ( postData ) => {
-			const taskProviderId = window.prplGetTermObject(
-				postData?.prpl_recommendations_provider,
-				'prpl_recommendations_provider'
-			).slug;
 			const taskCategorySlug = window.prplGetTermObject(
 				postData?.prpl_recommendations_category,
 				'prpl_recommendations_category'
@@ -405,17 +386,9 @@ prplSuggestedTask = {
 				`.prpl-suggested-task[data-post-id="${ postId }"]`
 			);
 			el.remove();
+
 			// Inject more tasks from the same category.
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
-					detail: {
-						task_id: postId,
-						providerID: taskProviderId,
-						category: taskCategorySlug,
-						status: [ postData.status ],
-					},
-				} )
-			);
+			prplSuggestedTask.injectItemsFromCategory( taskCategorySlug );
 		} );
 	},
 
