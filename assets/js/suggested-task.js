@@ -117,15 +117,11 @@ prplSuggestedTask = {
 	/**
 	 * Render a new item.
 	 *
-	 * @param {Object}  post         The post object.
-	 * @param {boolean} allowReorder Whether to allow reordering.
-	 * @param {boolean} deletable    Whether to allow deleting.
-	 * @param {boolean} useCheckbox  Whether to use a checkbox.
+	 * @param {Object}  post        The post object.
+	 * @param {boolean} useCheckbox Whether to use a checkbox.
 	 */
 	getNewItemTemplatePromise: ( {
 		post = {},
-		allowReorder = false,
-		deletable = false,
 		useCheckbox = true,
 		listId = '',
 	} ) => {
@@ -159,8 +155,6 @@ prplSuggestedTask = {
 			const data = {
 				post,
 				terms,
-				allowReorder,
-				deletable,
 				useCheckbox,
 				listId,
 				assets: prplSuggestedTask.assets,
@@ -215,8 +209,7 @@ prplSuggestedTask = {
 			id: postId,
 		} );
 		post.fetch().then( ( postData ) => {
-			post.set( 'status', 'trash' );
-			post.save().then( () => {
+			post.destroy( { data: { force: true } } ).then( () => {
 				// Remove the task from the todo list.
 				const el = document.querySelector(
 					`.prpl-suggested-task[data-post-id="${ postId }"]`
@@ -522,7 +515,6 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 	prplSuggestedTask
 		.getNewItemTemplatePromise( {
 			post: event.detail.item,
-			allowReorder: false,
 			listId: event.detail.listId,
 		} )
 		.then( ( itemHTML ) => {
