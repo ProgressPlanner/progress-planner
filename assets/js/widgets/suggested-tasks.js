@@ -117,10 +117,19 @@ document.addEventListener(
 	'prpl/suggestedTask/maybeInjectItem',
 	( e ) => {
 		// TODO: Something seems off here, take a look at this.
+		// TODO: This is called only for RR tasks.
 		prplSuggestedTask.injectItems( {
 			category: e.detail.category,
 			status: e.detail.status,
 			afterRequestComplete: prplSuggestedTasksToggleUIitems,
+			injectTrigger: 'prpl/suggestedTask/injectItem',
+			injectTriggerArgsCallback: ( todoItem ) => {
+				return {
+					item: todoItem,
+					listId: 'prpl-suggested-tasks-list',
+					insertPosition: 'beforeend',
+				};
+			},
 		} );
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	},

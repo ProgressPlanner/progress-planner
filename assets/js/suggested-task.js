@@ -190,7 +190,6 @@ prplSuggestedTask = {
 					new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
 						detail: {
 							task_id: postId,
-							actionType,
 							category: categorySlug,
 						},
 					} )
@@ -255,7 +254,7 @@ prplSuggestedTask = {
 			post.save().then( () => {
 				prplSuggestedTask.runTaskAction(
 					postId,
-					'trash' === newStatus ? 'trash' : 'publish',
+					'trash' === newStatus ? 'complete' : 'pending',
 					taskCategorySlug
 				);
 				const el = document.querySelector(
