@@ -174,7 +174,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		wp_update_post(
 			[
 				'ID'          => $post_id,
-				'post_status' => 'publish',
+				'post_status' => 'pending',
 			]
 		);
 
