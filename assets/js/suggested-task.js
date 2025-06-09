@@ -208,7 +208,11 @@ prplSuggestedTask = {
 					`.prpl-suggested-task[data-post-id="${ postId }"]`
 				);
 				el.remove();
-				document.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+				setTimeout( () => {
+					window.dispatchEvent(
+						new CustomEvent( 'prpl/grid/resize' )
+					);
+				}, 500 );
 
 				prplSuggestedTask.runTaskAction(
 					postId,
