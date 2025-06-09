@@ -420,7 +420,7 @@ prplSuggestedTask = {
 			case 'snooze':
 				tooltipActions
 					.querySelector( '.prpl-suggested-task-' + target )
-					.setAttribute( 'data-tooltip-visible', 'true' );
+					?.setAttribute( 'data-tooltip-visible', 'true' );
 				break;
 
 			case 'close-snooze':
@@ -445,7 +445,7 @@ prplSuggestedTask = {
 			case 'info':
 				tooltipActions
 					.querySelector( '.prpl-suggested-task-' + target )
-					.setAttribute( 'data-tooltip-visible', 'true' );
+					?.setAttribute( 'data-tooltip-visible', 'true' );
 				break;
 
 			case 'close-info':
@@ -531,6 +531,7 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 			const parent = false;
 
 			if ( ! parent ) {
+				console.log( 'injecting item into list', event.detail.listId );
 				// Inject the item into the list.
 				document
 					.getElementById( event.detail.listId )

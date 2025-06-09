@@ -38,7 +38,7 @@ use Progress_Planner\Badges\Monthly;
 <p class="prpl-suggested-tasks-loading">
 	<?php \esc_html_e( 'Loading tasks...', 'progress-planner' ); ?>
 </p>
-<ul class="prpl-suggested-tasks-list"></ul>
+<ul id="prpl-suggested-tasks-list" class="prpl-suggested-tasks-list"></ul>
 
 <?php if ( \current_user_can( 'manage_options' ) ) : ?>
 	<div class="prpl-dashboard-widget-footer">
