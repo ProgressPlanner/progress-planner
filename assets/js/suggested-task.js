@@ -1,4 +1,4 @@
-/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge */
+/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplGetTerms */
 /*
  * Suggested Task scripts & helpers.
  *
@@ -48,9 +48,7 @@ prplSuggestedTask = {
 		};
 		if ( args.category ) {
 			fetchData.prpl_recommendations_category =
-				window.prplSuggestedTasksTerms.prpl_recommendations_category[
-					args.category
-				].id;
+				prplGetTerms( 'category' )[ args.category ].id;
 		}
 
 		prplSuggestedTask
@@ -135,17 +133,13 @@ prplSuggestedTask = {
 				prpl_recommendations_category,
 			};
 
-			Object.values(
-				window.prplSuggestedTasksTerms.prpl_recommendations_provider
-			).forEach( ( term ) => {
+			Object.values( prplGetTerms( 'provider' ) ).forEach( ( term ) => {
 				if ( term.id === terms.prpl_recommendations_provider[ 0 ] ) {
 					terms.prpl_recommendations_provider = term;
 				}
 			} );
 
-			Object.values(
-				window.prplSuggestedTasksTerms.prpl_recommendations_category
-			).forEach( ( term ) => {
+			Object.values( prplGetTerms( 'category' ) ).forEach( ( term ) => {
 				if ( term.id === terms.prpl_recommendations_category[ 0 ] ) {
 					terms.prpl_recommendations_category = term;
 				}
