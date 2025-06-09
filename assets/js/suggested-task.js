@@ -391,11 +391,31 @@ prplSuggestedTask = {
 			date,
 			date_gmt: date,
 		} );
-		postModelToSave.save().then( () => {
+		postModelToSave.save().then( ( postData ) => {
+			const taskProviderId = window.prplGetTermObject(
+				postData?.prpl_recommendations_provider,
+				'prpl_recommendations_provider'
+			).slug;
+			const taskCategorySlug = window.prplGetTermObject(
+				postData?.prpl_recommendations_category,
+				'prpl_recommendations_category'
+			).slug;
+
 			const el = document.querySelector(
 				`.prpl-suggested-task[data-post-id="${ postId }"]`
 			);
 			el.remove();
+			// Inject more tasks from the same category.
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
+					detail: {
+						task_id: postId,
+						providerID: taskProviderId,
+						category: taskCategorySlug,
+						status: [ postData.status ],
+					},
+				} )
+			);
 		} );
 	},
 
