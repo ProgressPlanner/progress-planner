@@ -120,11 +120,11 @@ class Task {
 	 * @return bool
 	 */
 	public function is_completed(): bool {
-		return isset( $this->data['post_status'] ) && in_array( $this->data['post_status'], [ 'trash', 'pending_celebration' ], true );
+		return isset( $this->data['post_status'] ) && in_array( $this->data['post_status'], [ 'trash', 'pending' ], true );
 	}
 
 	/**
-	 * Set the task to pending celebration.
+	 * Set the task status to pending.
 	 *
 	 * @return bool
 	 */
@@ -133,7 +133,7 @@ class Task {
 			return false;
 		}
 
-		return \progress_planner()->get_suggested_tasks_db()->update_recommendation( $this->ID, [ 'post_status' => 'pending_celebration' ] );
+		return \progress_planner()->get_suggested_tasks_db()->update_recommendation( $this->ID, [ 'post_status' => 'pending' ] );
 	}
 
 	/**

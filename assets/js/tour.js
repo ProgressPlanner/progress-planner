@@ -115,7 +115,7 @@ function prplStartTour() {
 
 // Start the tour if the URL contains the query parameter.
 if ( window.location.href.includes( 'content-scan-finished=true' ) ) {
-	// If there are pending celebration tasks, delay the tour until celebration is done.
+	// If there are pending tasks, delay the tour until celebration is done.
 	const delay = window.location.href.includes( 'delay-tour=true' ) ? 5000 : 0;
 
 	setTimeout( () => {

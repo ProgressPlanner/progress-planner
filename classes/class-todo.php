@@ -20,6 +20,9 @@ class Todo {
 	public function __construct() {
 		// Wait for the CPT to be registered.
 		add_action( 'init', [ $this, 'maybe_change_first_item_points_on_monday' ] );
+
+		// Handle user tasks creation.
+		\add_action( 'rest_after_insert_prpl_recommendations', [ $this, 'handle_creating_user_task' ], 10, 3 );
 	}
 
 	/**
@@ -58,7 +61,7 @@ class Todo {
 			return 0;
 		}
 
-		// Check if there are already pending user tasks with a points value other than 0.
+		// Check if there are already published user tasks with a points value other than 0.
 		foreach ( $items as $item ) {
 			if ( 'publish' === $item['post_status'] && isset( $item['points'] ) && $item['points'] !== 0 ) {
 				return 0;
@@ -105,6 +108,40 @@ class Todo {
 		}
 
 		\progress_planner()->get_utils__cache()->set( $transient_name, $next_monday->getTimestamp(), WEEK_IN_SECONDS );
+	}
+
+	/**
+	 * Handle the creation of the first user task.
+	 * We need separate hook, since at the time 'maybe_change_first_item_points_on_monday' is called there might not be any tasks yet.
+	 * TODO: Revisit when we see how we handle completed user tasks.
+	 *
+	 * @param \WP_Post         $post      Inserted or updated post object.
+	 * @param \WP_REST_Request $request   Request object.
+	 * @param bool             $creating  True when creating a post, false when updating.
+	 *
+	 * @return void
+	 */
+	public function handle_creating_user_task( $post, $request, $creating ) {
+
+		if ( ! $creating || ! has_term( 'user', 'prpl_recommendations_provider', $post->ID ) ) {
+			return;
+		}
+
+		// Add task_id to the post.
+		\update_post_meta( $post->ID, 'prpl_task_id', 'user-' . $post->ID );
+
+		// If it is first task ever created, it should be golden.
+		$pending_items = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'provider_id' => 'user',
+			]
+		);
+
+		// If this is the first task created, it should be golden.
+		if ( 1 === count( $pending_items ) && $pending_items[0]->ID === $post->ID ) {
+			$this->maybe_change_first_item_points_on_monday();
+			return;
+		}
 	}
 }
 // phpcs:enable Generic.Commenting.Todo
