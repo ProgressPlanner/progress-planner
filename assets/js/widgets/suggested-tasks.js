@@ -98,6 +98,13 @@ window.prplPopulateSuggestedTasksList = function () {
 						document.dispatchEvent(
 							new CustomEvent( 'prpl/celebrateTasks' )
 						);
+
+						/**
+						 * Strike completed tasks and remove them from the DOM.
+						 */
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/removeCelebratedTasks' )
+						);
 					}, 3000 );
 				}
 			},

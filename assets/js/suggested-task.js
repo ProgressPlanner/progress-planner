@@ -280,6 +280,10 @@ prplSuggestedTask = {
 						document
 							.getElementById( 'todo-list-completed' )
 							.insertAdjacentElement( 'beforeend', el );
+
+						window.dispatchEvent(
+							new CustomEvent( 'prpl/grid/resize' )
+						);
 					} else {
 						// Inject more tasks from the same category.
 						celebrateEvents[
@@ -298,6 +302,15 @@ prplSuggestedTask = {
 						celebrateEvents = {
 							'prpl/celebrateTasks': eventDetail,
 						};
+
+						if ( 'user' !== taskProviderId ) {
+							/**
+							 * Strike completed tasks and remove them from the DOM.
+							 */
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/removeCelebratedTasks' )
+							);
+						}
 					}
 
 					// Trigger the events.
@@ -322,6 +335,10 @@ prplSuggestedTask = {
 						document
 							.getElementById( 'todo-list' )
 							.insertAdjacentElement( 'beforeend', el );
+
+						window.dispatchEvent(
+							new CustomEvent( 'prpl/grid/resize' )
+						);
 					}
 				}
 			} );

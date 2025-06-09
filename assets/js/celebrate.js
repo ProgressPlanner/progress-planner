@@ -83,11 +83,6 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 	setTimeout( prplRenderAttemptshoot, 0 );
 	setTimeout( prplRenderAttemptshoot, 100 );
 	setTimeout( prplRenderAttemptshoot, 200 );
-
-	/**
-	 * Strike completed tasks and remove them from the DOM.
-	 */
-	document.dispatchEvent( new CustomEvent( 'prpl/removeCelebratedTasks' ) );
 } );
 
 /**
