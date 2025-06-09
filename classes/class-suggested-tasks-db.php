@@ -39,7 +39,7 @@ class Suggested_Tasks_DB {
 		// Check if we have an existing task with the same title.
 		$posts = $this->get_tasks_by(
 			[
-				'post_status' => [ 'publish', 'trash', 'draft', 'pending', 'future', 'pending_celebration' ], // 'any' doesn't include statuses which have 'exclude_from_search' set to true (trash and pending_celebration).
+				'post_status' => [ 'publish', 'trash', 'draft', 'future', 'pending_celebration' ], // 'any' doesn't include statuses which have 'exclude_from_search' set to true (trash and pending_celebration).
 				'numberposts' => 1,
 				'meta_query'  => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 					[
@@ -70,6 +70,7 @@ class Suggested_Tasks_DB {
 				break;
 
 			case 'completed':
+			case 'trash':
 				$args['post_status'] = 'trash';
 				break;
 
@@ -341,7 +342,7 @@ class Suggested_Tasks_DB {
 			$args,
 			[
 				'post_type'   => 'prpl_recommendations',
-				'post_status' => [ 'publish', 'trash', 'draft', 'pending', 'future', 'pending_celebration' ], // 'any' doesn't include statuses which have 'exclude_from_search' set to true (trash and pending_celebration).
+				'post_status' => [ 'publish', 'trash', 'draft', 'future', 'pending_celebration' ], // 'any' doesn't include statuses which have 'exclude_from_search' set to true (trash and pending_celebration).
 				'numberposts' => -1,
 				'orderby'     => 'menu_order',
 				'order'       => 'ASC',

@@ -225,7 +225,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 
 		$task_data = $this->modify_injection_task_data( $task_data );
 
-		// Add the tasks to the pending tasks option, it will not add duplicates.
+		// Get the task post.
 		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
 
 		return $task_post ? [] : [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];

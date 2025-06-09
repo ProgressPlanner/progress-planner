@@ -124,7 +124,7 @@ class Task {
 	}
 
 	/**
-	 * Set the task to pending celebration.
+	 * Set the task status to pending_celebration.
 	 *
 	 * @return bool
 	 */

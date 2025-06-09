@@ -86,20 +86,21 @@ class Set_Valuable_Post_Types extends Tasks {
 
 	/**
 	 * Check if the task should be added.
-	 * We add tasks only to users who have have completed "Fill the settings page" task and have upgraded from v1.2 or have 'include_post_types' option empty.
-	 * Reason being that this option was migrated, but it could be missed, and post type selection should be revisited.
+	 * We add tasks only to users who have have completed "Fill the settings page" task
+	 * and have upgraded from v1.2 or have 'include_post_types' option empty.
+	 * Reason being that this option was migrated,
+	 * but it could be missed, and post type selection should be revisited.
 	 *
 	 * @return bool
 	 */
 	public function should_add_task() {
-		// Check the "Settings saved" task, if the has not been added as 'pending' don't add the task.
-		$settings_saved_task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => 'settings-saved' ] );
-		if ( empty( $settings_saved_task ) ) {
+		$saved_posts = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => 'settings-saved' ] );
+		if ( empty( $saved_posts ) ) {
 			return false;
 		}
 
-		// Save settings task completed?
-		$save_settings_task_completed = 'trash' === $settings_saved_task[0]->post_status;
+		// Is the task trashed?
+		$post_trashed = 'trash' === $saved_posts[0]->post_status;
 
 		// Upgraded from <= 1.2?
 		$upgraded = (bool) \get_option( 'progress_planner_set_valuable_post_types', false );
@@ -108,7 +109,7 @@ class Set_Valuable_Post_Types extends Tasks {
 		$include_post_types = \progress_planner()->get_settings()->get( 'include_post_types', [] );
 
 		// Add the task only to users who have completed the "Settings saved" task and have upgraded from v1.2 or have 'include_post_types' option empty.
-		return $save_settings_task_completed && ( true === $upgraded || empty( $include_post_types ) );
+		return $post_trashed && ( true === $upgraded || empty( $include_post_types ) );
 	}
 
 	/**

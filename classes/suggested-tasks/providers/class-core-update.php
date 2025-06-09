@@ -99,7 +99,7 @@ class Core_Update extends Tasks {
 	public function add_core_update_link( $update_actions ) {
 		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
 
-		// All updates are completed and there is a 'update-core' task in the pending tasks.
+		// All updates are completed and there is a 'update-core' task in the published tasks.
 		if ( $pending_tasks && $this->is_task_completed() ) {
 			foreach ( $pending_tasks as $task ) {
 				if ( $this->get_task_id() === $task->task_id ) {

@@ -46,7 +46,7 @@ class Suggested_Tasks {
 		if ( \is_admin() ) {
 			\add_action( 'init', [ $this, 'init' ], 100 ); // Wait for the post types to be initialized.
 
-			// Check GET parameter and maybe set task as pending celebration.
+			// Check GET parameter and maybe set task as pending_celebration.
 			\add_action( 'init', [ $this, 'maybe_complete_task' ] );
 		}
 		\add_action( 'wp_ajax_progress_planner_suggested_task_action', [ $this, 'suggested_task_action' ] );
@@ -84,7 +84,7 @@ class Suggested_Tasks {
 				continue;
 			}
 
-			// Change the task status to pending celebration.
+			// Change the task status to pending_celebration.
 			$task->celebrate();
 
 			// Insert an activity.
@@ -135,7 +135,7 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * If done via automatic updates, the "core update" task should be marked as "completed" (and skip "pending celebration" status).
+	 * If done via automatic updates, the "core update" task should be marked as "trashed" (and skip "pending_celebration" status).
 	 *
 	 * @return void
 	 */
@@ -169,7 +169,7 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Check if a task was completed. Task is considered completed if it was completed or pending celebration.
+	 * Check if a task was completed. Task is considered completed if it was trashed or pending_celebration.
 	 *
 	 * @param string|int $task_id The task ID.
 	 *
@@ -241,7 +241,6 @@ class Suggested_Tasks {
 				$updated = true;
 				break;
 
-			case 'pending':
 			case 'delete':
 				$this->delete_activity( $task->task_id );
 				$updated = true;

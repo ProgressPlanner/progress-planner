@@ -247,7 +247,7 @@ class Tasks_Manager {
 
 		// Check if the task is no longer relevant.
 		if ( ! $task_provider->is_task_relevant() ) {
-			// Remove the task from the pending tasks.
+			// Remove the task from the published tasks.
 			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 		}
 

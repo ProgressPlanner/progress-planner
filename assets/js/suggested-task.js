@@ -255,7 +255,7 @@ prplSuggestedTask = {
 				'prpl_recommendations_category'
 			).slug;
 
-			// Dismissable tasks don't have pending celebration status, it's either publish or trash.
+			// Dismissable tasks don't have pending_celebration status, it's either publish or trash.
 			const newStatus =
 				'publish' === postData.status ? 'trash' : 'publish';
 
@@ -263,14 +263,14 @@ prplSuggestedTask = {
 			post.save().then( () => {
 				prplSuggestedTask.runTaskAction(
 					postId,
-					'trash' === newStatus ? 'complete' : 'pending',
+					'trash' === newStatus ? 'trash' : 'publish',
 					taskCategorySlug
 				);
 				const el = document.querySelector(
 					`.prpl-suggested-task[data-post-id="${ postId }"]`
 				);
 
-				// Task is completed, check if we need to celebrate.
+				// Task is trashed, check if we need to celebrate.
 				if ( 'trash' === newStatus ) {
 					el.setAttribute( 'data-task-action', 'celebrate' );
 
@@ -290,7 +290,7 @@ prplSuggestedTask = {
 					let celebrateEvents = {};
 
 					if ( 'user' === taskProviderId ) {
-						// Move task from pending to completed.
+						// Move task from published to trash.
 						document
 							.getElementById( 'todo-list-completed' )
 							.insertAdjacentElement( 'beforeend', el );
@@ -323,8 +323,8 @@ prplSuggestedTask = {
 						);
 					} );
 				} else if ( 'publish' === newStatus ) {
-					// Set the task action to pending.
-					el.setAttribute( 'data-task-action', 'pending' );
+					// Set the task action to publish.
+					el.setAttribute( 'data-task-action', 'publish' );
 
 					// Update the Ravi gauge.
 					document.dispatchEvent(
@@ -337,7 +337,7 @@ prplSuggestedTask = {
 					);
 
 					if ( 'user' === taskProviderId ) {
-						// Move task from completed to pending.
+						// Move task from trash to published.
 						document
 							.getElementById( 'todo-list' )
 							.insertAdjacentElement( 'beforeend', el );

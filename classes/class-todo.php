@@ -58,7 +58,7 @@ class Todo {
 			return 0;
 		}
 
-		// Check if there are already pending user tasks with a points value other than 0.
+		// Check if there are already published user tasks with a points value other than 0.
 		foreach ( $items as $item ) {
 			if ( 'publish' === $item['post_status'] && isset( $item['points'] ) && $item['points'] !== 0 ) {
 				return 0;

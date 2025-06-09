@@ -49,7 +49,7 @@ window.prplPopulateSuggestedTasksList = function () {
 			continue;
 		}
 
-		// Inject pending tasks.
+		// Inject published tasks.
 		prplSuggestedTask.injectItems( {
 			category,
 			status: [ 'publish' ],
@@ -65,11 +65,11 @@ window.prplPopulateSuggestedTasksList = function () {
 			afterRequestComplete: prplSuggestedTasksToggleUIitems,
 		} );
 
-		// Inject pending celebration tasks.
+		// Inject pending_celebration tasks.
 		prplSuggestedTask.injectItems( {
 			category,
 			status: [ 'pending_celebration' ],
-			per_page: 100, // Inject all pending celebration tasks at once.
+			per_page: 100, // Inject all pending_celebration tasks at once.
 			injectTrigger: 'prpl/suggestedTask/injectItem',
 			injectTriggerArgsCallback: ( todoItem ) => {
 				return {
@@ -81,7 +81,7 @@ window.prplPopulateSuggestedTasksList = function () {
 			afterRequestComplete: ( data ) => {
 				prplSuggestedTasksToggleUIitems();
 
-				// If  there were pending tasks.
+				// If there were pending_celebration tasks.
 				if ( data.length ) {
 					// Set post status to trash.
 					data.forEach( ( task ) => {
