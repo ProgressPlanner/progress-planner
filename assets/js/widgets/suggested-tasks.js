@@ -50,35 +50,40 @@ window.prplPopulateSuggestedTasksList = function () {
 		}
 
 		// Inject published tasks.
-		prplSuggestedTask.injectItems( {
+		prplSuggestedTask.injectItemsFromCategory(
 			category,
-			status: [ 'publish' ],
-			per_page: prplSuggestedTask.maxItemsPerCategory[ category ],
-			injectTrigger: 'prpl/suggestedTask/injectItem',
-			injectTriggerArgsCallback: ( todoItem ) => {
-				return {
-					item: todoItem,
-					listId: 'prpl-suggested-tasks-list',
-					insertPosition: 'beforeend',
-				};
-			},
-			afterRequestComplete: prplSuggestedTasksToggleUIitems,
-		} );
+			[ 'publish' ],
+			prplSuggestedTask.maxItemsPerCategory[ category ]
+		);
 
 		// Inject pending tasks.
-		prplSuggestedTask.injectItems( {
-			category,
-			status: [ 'pending' ],
-			per_page: 100, // Inject all pending tasks at once.
-			injectTrigger: 'prpl/suggestedTask/injectItem',
-			injectTriggerArgsCallback: ( todoItem ) => {
-				return {
-					item: todoItem,
-					listId: 'prpl-suggested-tasks-list',
-					insertPosition: 'beforeend',
-				};
-			},
-			afterRequestComplete: ( data ) => {
+		prplSuggestedTask
+			.fetchItems( {
+				category,
+				status: [ 'pending' ],
+				per_page: 100, // Inject all pending tasks at once.
+			} )
+			.then( ( data ) => {
+				if ( data.length ) {
+					// Inject the items into the DOM.
+					data.forEach( ( item ) => {
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/suggestedTask/injectItem', {
+								detail: {
+									item,
+									listId: 'prpl-suggested-tasks-list',
+									insertPosition: 'beforeend',
+								},
+							} )
+						);
+						// prplSuggestedTask.injectedItemIds.push( item.id );
+					} );
+				}
+
+				return data;
+			} )
+			.then( ( data ) => {
+				// Toggle the "Loading..." text.
 				prplSuggestedTasksToggleUIitems();
 
 				// If there were pending tasks.
@@ -105,10 +110,14 @@ window.prplPopulateSuggestedTasksList = function () {
 						document.dispatchEvent(
 							new CustomEvent( 'prpl/removeCelebratedTasks' )
 						);
+
+						// Trigger the grid resize event.
+						window.dispatchEvent(
+							new CustomEvent( 'prpl/grid/resize' )
+						);
 					}, 3000 );
 				}
-			},
-		} );
+			} );
 	}
 };
 

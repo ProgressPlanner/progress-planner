@@ -27,11 +27,12 @@ prplSuggestedTask = {
 	},
 
 	/**
-	 * Inject items from a category.
+	 * Fetch items for arguments.
 	 *
 	 * @param {Object} args The arguments to pass to the injectItems method.
+	 * @return {Promise} A promise that resolves with the collection of posts.
 	 */
-	injectItems: ( args ) => {
+	fetchItems: ( args ) => {
 		console.info(
 			`Fetching recommendations with args: ${ JSON.stringify( args ) }...`
 		);
@@ -51,70 +52,60 @@ prplSuggestedTask = {
 				prplGetTerms( 'category' )[ args.category ].id;
 		}
 
-		prplSuggestedTask
+		return prplSuggestedTask
 			.getPostsCollectionPromise( { data: fetchData } )
 			.then( ( response ) => {
-				const data = response.data;
-				const postsCollection = response.postsCollection;
-				if ( ! data.length ) {
-					if ( args?.afterRequestComplete ) {
-						args.afterRequestComplete( data );
-					}
-					return;
-				}
-
-				const injectTriggerArgsCallback =
-					args?.injectTriggerArgsCallback || ( ( item ) => item );
-				data.forEach( ( item ) => {
-					document.dispatchEvent(
-						new CustomEvent( args.injectTrigger, {
-							detail: injectTriggerArgsCallback( item ),
-						} )
-					);
-					prplSuggestedTask.injectedItemIds.push( item.id );
-				} );
-
-				if ( args?.afterRequestComplete ) {
-					args.afterRequestComplete( data );
-				}
-
-				// If we want to get more items and there are more, repeat the process.
-				if ( postsCollection.hasMore() ) {
-					// Strict check, fetch more only if everything is properly set (no undefined values).
-					if (
-						args.category &&
-						prplSuggestedTask.injectedItemIds.length <
-							prplSuggestedTask.maxItemsPerCategory[
-								args.category
-							]
-					) {
-						prplSuggestedTask.injectItems( args );
-					}
-				}
+				return response.data;
 			} );
 	},
 
 	/**
 	 * Inject items from a category.
 	 *
-	 * @param {string} taskCategorySlug The task category slug.
+	 * @param {string}   taskCategorySlug The task category slug.
+	 * @param {string[]} taskStatus       The task status.
 	 */
-	injectItemsFromCategory: ( taskCategorySlug ) => {
-		prplSuggestedTask.injectItems( {
-			category: taskCategorySlug,
-			afterRequestComplete: () => {
+	injectItemsFromCategory: (
+		taskCategorySlug,
+		taskStatus = [ 'publish' ],
+		perPage = 1
+	) => {
+		if ( ! Array.isArray( taskStatus ) ) {
+			taskStatus = [ taskStatus ];
+		}
+
+		prplSuggestedTask
+			.fetchItems( {
+				category: taskCategorySlug,
+				status: taskStatus,
+				per_page: perPage,
+			} )
+			.then( ( data ) => {
+				if ( data.length ) {
+					// Inject the items into the DOM.
+					data.forEach( ( item ) => {
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/suggestedTask/injectItem', {
+								detail: {
+									item,
+									listId: 'prpl-suggested-tasks-list',
+									insertPosition: 'beforeend',
+								},
+							} )
+						);
+						prplSuggestedTask.injectedItemIds.push( item.id );
+					} );
+				}
+
+				return data;
+			} )
+			.then( () => {
+				// Toggle the "Loading..." text.
 				prplSuggestedTasksToggleUIitems();
+
+				// Trigger the grid resize event.
 				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-			},
-			injectTrigger: 'prpl/suggestedTask/injectItem',
-			injectTriggerArgsCallback: ( todoItem ) => {
-				return {
-					item: todoItem,
-					listId: 'prpl-suggested-tasks-list',
-					insertPosition: 'beforeend',
-				};
-			},
-		} );
+			} );
 	},
 
 	/**
