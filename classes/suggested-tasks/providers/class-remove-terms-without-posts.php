@@ -282,41 +282,6 @@ class Remove_Terms_Without_Posts extends Tasks {
 	}
 
 	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-		if ( ! $task_id ) {
-			return [];
-		}
-
-		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
-
-		// If the task data is empty, return an empty array.
-		if ( empty( $tasks ) ) {
-			return [];
-		}
-
-		return [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'post_title'  => $this->get_title( $tasks[0]->get_data() ),
-			'parent'      => $this->get_parent(),
-			'priority'    => $this->get_priority(),
-			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(),
-			'dismissable' => $this->is_dismissable(),
-			'snoozable'   => $this->is_snoozable,
-			'url'         => $this->get_url( $tasks[0]->get_data() ),
-			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description( $tasks[0]->get_data() ),
-		];
-	}
-
-	/**
 	 * Get the term from the task ID.
 	 *
 	 * @param string $task_id The task ID.

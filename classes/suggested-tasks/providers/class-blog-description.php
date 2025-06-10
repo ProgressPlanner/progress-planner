@@ -27,20 +27,22 @@ class Blog_Description extends Tasks {
 	protected const PROVIDER_ID = 'core-blogdescription';
 
 	/**
-	 * Get the title.
+	 * Get the task title.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_title() {
+	protected function get_title( $task_data = [] ) {
 		return \esc_html__( 'Set tagline', 'progress-planner' );
 	}
 
 	/**
-	 * Get the description.
+	 * Get the task description.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description() {
+	protected function get_description( $task_data = [] ) {
 		return sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/set-tagline" target="_blank">tagline</a> link */
 			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
@@ -49,11 +51,12 @@ class Blog_Description extends Tasks {
 	}
 
 	/**
-	 * Get the URL.
+	 * Get the task URL.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url() {
+	protected function get_url( $task_data = [] ) {
 		return \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() );
 	}
 

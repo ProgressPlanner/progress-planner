@@ -45,9 +45,10 @@ class Sample_Page extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url() {
+	protected function get_url( $task_data = [] ) {
 		$sample_page_id = $this->get_data_collector()->collect();
 
 		if ( 0 !== $sample_page_id ) {
@@ -69,18 +70,20 @@ class Sample_Page extends Tasks {
 	/**
 	 * Get the title.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_title() {
+	protected function get_title( $task_data = [] ) {
 		return \esc_html__( 'Delete "Sample Page"', 'progress-planner' );
 	}
 
 	/**
 	 * Get the description.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description() {
+	protected function get_description( $task_data = [] ) {
 		return sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/delete-sample-page" target="_blank">Sample Page</a> link */
 			\esc_html__( 'On install, WordPress creates a %s page. This page is not needed and should be deleted.', 'progress-planner' ),

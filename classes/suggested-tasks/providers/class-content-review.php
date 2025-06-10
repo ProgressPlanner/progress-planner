@@ -125,7 +125,7 @@ class Content_Review extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_title( $task_data = [] ) {
+	protected function get_title( $task_data = [] ) {
 		if ( ! isset( $task_data['target_post_id'] ) ) {
 			return '';
 		}
@@ -151,7 +151,7 @@ class Content_Review extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description( $task_data = [] ) {
+	protected function get_description( $task_data = [] ) {
 		if ( ! isset( $task_data['target_post_id'] ) ) {
 			return '';
 		}
@@ -350,41 +350,6 @@ class Content_Review extends Tasks {
 		}
 
 		return $added_tasks;
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-		if ( ! $task_id ) {
-			return [];
-		}
-
-		$task_data = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
-
-		// If the task data is empty, return an empty array.
-		if ( empty( $task_data ) ) {
-			return [];
-		}
-
-		return [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'post_title'  => $this->get_title( $task_data[0] ),
-			'parent'      => $this->get_parent(),
-			'priority'    => $this->get_priority(),
-			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(),
-			'dismissable' => $this->is_dismissable(),
-			'snoozable'   => $this->is_snoozable,
-			'url'         => $this->get_url( $task_data[0] ),
-			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description( $task_data[0] ),
-		];
 	}
 
 	/**

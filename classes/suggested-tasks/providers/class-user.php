@@ -68,13 +68,13 @@ class User extends Tasks {
 	/**
 	 * Get the task details.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data Optional data to include in the task.
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id = '' ) {
+	public function get_task_details( $task_data = [] ) {
 		// Get the user tasks from the database.
-		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
+		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
 		return $task_post ? $task_post->get_data() : [];
 	}
 }

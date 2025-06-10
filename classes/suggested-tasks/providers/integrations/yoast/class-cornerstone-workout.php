@@ -160,32 +160,4 @@ class Cornerstone_Workout extends Yoast_Provider {
 
 		return ! $this->is_task_dismissed( $task_data );
 	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-		if ( ! $task_id ) {
-			return [];
-		}
-
-		return [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'post_title'  => $this->get_title(),
-			'parent'      => $this->get_parent(),
-			'priority'    => $this->get_priority(),
-			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(),
-			'dismissable' => $this->is_dismissable,
-			'snoozable'   => $this->is_snoozable,
-			'url'         => $this->get_url(),
-			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description(),
-		];
-	}
 }

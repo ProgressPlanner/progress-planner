@@ -36,9 +36,10 @@ class Set_Valuable_Post_Types extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url() {
+	protected function get_url( $task_data = [] ) {
 		return \admin_url( 'admin.php?page=progress-planner-settings' );
 	}
 
@@ -65,18 +66,20 @@ class Set_Valuable_Post_Types extends Tasks {
 	/**
 	 * Get the title.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_title() {
+	protected function get_title( $task_data = [] ) {
 		return \esc_html__( 'Set valuable content types', 'progress-planner' );
 	}
 
 	/**
 	 * Get the description.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description() {
+	protected function get_description( $task_data = [] ) {
 		return sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/valuable-content" target="_blank">Read more</a> link */
 			\esc_html__( 'Tell us which post types matter most for your site. Go to your settings and select your valuable content types. %s', 'progress-planner' ),

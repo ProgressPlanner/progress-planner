@@ -51,9 +51,61 @@ class Update_150 {
 	 * @return void
 	 */
 	private function migrate_task( $task ) {
-		// Get the task details.
-		\progress_planner()->get_suggested_tasks_db()->add(
-			\Progress_Planner\Suggested_Tasks\Task_Factory::create_task_from_id( $task['task_id'] )->get_task_details() // TODO: get_task_details() has changed, migration needs to be re-checked.
-		);
+		// Skip tasks which are not completed or snoozed.
+		if ( ! isset( $task['status'] ) || ( 'snoozed' !== $task['status'] && 'completed' !== $task['status'] ) ) {
+			return;
+		}
+
+		// Skip tasks which don't have a provider ID.
+		if ( ! isset( $task['provider_id'] ) ) {
+			return;
+		}
+
+		$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task['provider_id'] );
+
+		if ( ! $task_provider ) {
+			return;
+		}
+
+		// Migrate the task data, if the key exists.
+		$keys_to_migrate = [
+			'post_id',
+			'post_title',
+			'post_type',
+			'term_id',
+			'taxonomy',
+			'term_name',
+		];
+
+		// Data which is used to build task title, description, url.
+		$target_data = [];
+
+		foreach ( $keys_to_migrate as $key ) {
+			if ( isset( $task[ $key ] ) ) {
+				$target_data[ 'target_' . $key ] = $task[ $key ];
+			}
+		}
+
+		// Get the task details from the task provider, title, description, url, points, etc.
+		$task_details = $task_provider->get_task_details( $target_data );
+
+		// Add status to the task details.
+		$task_details['status'] = $task['status'];
+
+		// Usually repeating tasks have a date.
+		if ( isset( $task['date'] ) ) {
+			$task_details['date'] = $task['date'];
+		}
+
+		// Snoozed tasks have a time.
+		if ( isset( $task['time'] ) ) {
+			$task_details['time'] = $task['time'];
+		}
+
+		// Add target data to the task details.
+		$task_details = array_merge( $task_details, $target_data );
+
+		// Add the task to the database.
+		\progress_planner()->get_suggested_tasks_db()->add( $task_details );
 	}
 }

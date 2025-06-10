@@ -130,18 +130,20 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task title.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_title() {
+	protected function get_title( $task_data = [] ) {
 		return '';
 	}
 
 	/**
 	 * Get the task description.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description() {
+	protected function get_description( $task_data = [] ) {
 		return '';
 	}
 
@@ -193,9 +195,10 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task URL.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url() {
+	protected function get_url( $task_data = [] ) {
 		return $this->url ? \esc_url( $this->url ) : '';
 	}
 
@@ -248,17 +251,22 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task ID.
 	 *
-	 * @param array $data Optional data to include in the task ID.
+	 * @param array $task_data Optional data to include in the task ID.
 	 * @return string
 	 */
-	public function get_task_id( $data = [] ) {
+	public function get_task_id( $task_data = [] ) {
 		$parts = [ $this->get_provider_id() ];
 
-		// Add optional data parts if provided.
-		if ( ! empty( $data ) ) {
-			foreach ( $data as $value ) {
-				$parts[] = $value;
-			}
+		if ( isset( $task_data['target_post_id'] ) ) {
+			$parts[] = $task_data['target_post_id'];
+		}
+
+		if ( isset( $task_data['target_term_id'] ) ) {
+			$parts[] = $task_data['target_term_id'];
+		}
+
+		if ( isset( $task_data['target_taxonomy'] ) ) {
+			$parts[] = $task_data['target_taxonomy'];
 		}
 
 		// If the task is repetitive, add the date as the last part.
@@ -496,24 +504,27 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task details.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id = '' ) {
-		return [
-			'task_id'      => $this->get_task_id(),
+	public function get_task_details( $task_data = [] ) {
+
+		$task_details = [
+			'task_id'      => $this->get_task_id( $task_data ),
 			'provider_id'  => $this->get_provider_id(),
-			'post_title'   => $this->get_title(),
+			'post_title'   => $this->get_title( $task_data ),
 			'parent'       => $this->get_parent(),
 			'priority'     => $this->get_priority(),
 			'category'     => $this->get_provider_category(),
 			'points'       => $this->get_points(),
-			'url'          => $this->capability_required() ? \esc_url( $this->get_url() ) : '',
-			'description'  => $this->get_description(),
+			'url'          => $this->get_url( $task_data ),
+			'description'  => $this->get_description( $task_data ),
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
 			'snoozable'    => $this->is_snoozable(),
 		];
+
+		return $task_details;
 	}
 }

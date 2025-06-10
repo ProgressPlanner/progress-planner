@@ -45,11 +45,11 @@ interface Tasks_Interface {
 	/**
 	 * Get the task details.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data Optional data to include in the task.
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id = '' );
+	public function get_task_details( $task_data = [] );
 
 	/**
 	 * Get the task link setting.

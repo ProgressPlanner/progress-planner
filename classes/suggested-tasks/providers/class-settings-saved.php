@@ -36,27 +36,30 @@ class Settings_Saved extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url() {
+	protected function get_url( $task_data = [] ) {
 		return \admin_url( 'admin.php?page=progress-planner-settings' );
 	}
 
 	/**
 	 * Get the title.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_title() {
+	protected function get_title( $task_data = [] ) {
 		return \esc_html__( 'Fill settings page', 'progress-planner' );
 	}
 
 	/**
 	 * Get the description.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description() {
+	protected function get_description( $task_data = [] ) {
 		return \esc_html__( 'Head over to the settings page and fill in the required information.', 'progress-planner' );
 	}
 

@@ -164,17 +164,4 @@ class Task {
 	public function __get( string $key ) {
 		return $this->data[ $key ] ?? null;
 	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @return array<string, mixed>
-	 */
-	public function get_task_details(): array {
-		$task_provider_id = $this->get_provider_id();
-		$task_id          = $this->get_task_id();
-
-		$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_provider_id );
-		return $task_provider ? $task_provider->get_task_details( $task_id ) : [];
-	}
 }

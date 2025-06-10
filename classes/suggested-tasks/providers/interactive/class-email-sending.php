@@ -126,18 +126,20 @@ class Email_Sending extends Interactive {
 	/**
 	 * Get the title.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title( $task_data = [] ) {
 		return \esc_html__( 'Test if your website can send emails correctly', 'progress-planner' );
 	}
 
 	/**
 	 * Get the description.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description( $task_data = [] ) {
 		return \esc_html__( 'Your website tries to send you important email. Test if sending email from your site works well.', 'progress-planner' );
 	}
 
@@ -469,32 +471,5 @@ class Email_Sending extends Interactive {
 		$task_data['popover_id'] = 'prpl-popover-' . $this->popover_id;
 
 		return $task_data;
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-
-		if ( ! $task_id ) {
-			$task_id = $this->get_provider_id();
-		}
-
-		return [
-			'task_id'     => $task_id,
-			'post_title'  => $this->get_title(),
-			'parent'      => $this->get_parent(),
-			'priority'    => $this->get_priority(),
-			'category'    => $this->get_provider_category(),
-			'provider_id' => $this->get_provider_id(),
-			'points'      => $this->get_points(),
-			'dismissable' => $this->is_dismissable(),
-			'popover_id'  => 'prpl-popover-' . $this->popover_id,
-			'description' => $this->get_description(),
-		];
 	}
 }

@@ -29,9 +29,10 @@ class Search_Engine_Visibility extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url() {
+	protected function get_url( $task_data = [] ) {
 		return \admin_url( 'options-reading.php' );
 	}
 
@@ -48,20 +49,22 @@ class Search_Engine_Visibility extends Tasks {
 	}
 
 	/**
-	 * Get the title.
+	 * Get the task title.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_title() {
+	protected function get_title( $task_data = [] ) {
 		return \esc_html__( 'Allow your site to be indexed by search engines', 'progress-planner' );
 	}
 
 	/**
-	 * Get the description.
+	 * Get the task description.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description() {
+	protected function get_description( $task_data = [] ) {
 		return sprintf(
 			/* translators: %1$s <a href="https://prpl.fyi/blog-indexing-settings" target="_blank">allowing search engines</a> link */
 			\esc_html__( 'Your site is not currently visible to search engines. Consider %1$s to index your site.', 'progress-planner' ),

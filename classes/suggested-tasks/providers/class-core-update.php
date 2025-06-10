@@ -50,9 +50,10 @@ class Core_Update extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url() {
+	protected function get_url( $task_data = [] ) {
 		return \admin_url( 'update-core.php' );
 	}
 
@@ -70,18 +71,20 @@ class Core_Update extends Tasks {
 	/**
 	 * Get the task title.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_title() {
+	protected function get_title( $task_data = [] ) {
 		return \esc_html__( 'Perform all updates', 'progress-planner' );
 	}
 
 	/**
 	 * Get the task description.
 	 *
+	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description() {
+	protected function get_description( $task_data = [] ) {
 		return sprintf(
 			/* translators: %s:<a href="http://prpl.fyi/perform-all-updates" target="_blank">See why we recommend this</a> link */
 			\esc_html__( 'Regular updates improve security and performance. %s.', 'progress-planner' ),
@@ -124,33 +127,5 @@ class Core_Update extends Tasks {
 			require_once ABSPATH . 'wp-admin/includes/update.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
 		return 0 < \wp_get_update_data()['counts']['total'];
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-		if ( ! $task_id ) {
-			$task_id = $this->get_task_id();
-		}
-
-		return [
-			'task_id'     => $task_id,
-			'post_title'  => $this->get_title(),
-			'parent'      => $this->get_parent(),
-			'priority'    => $this->get_priority(),
-			'category'    => $this->get_provider_category(),
-			'provider_id' => $this->get_provider_id(),
-			'points'      => $this->get_points(),
-			'dismissable' => $this->is_dismissable(),
-			'snoozable'   => $this->is_snoozable,
-			'url'         => $this->get_url(),
-			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description(),
-		];
 	}
 }
