@@ -323,6 +323,11 @@ class Suggested_Tasks {
 				'show_in_rest' => true,
 				'default'      => 0,
 			],
+			'prpl_popover_id'  => [
+				'type'         => 'string',
+				'single'       => true,
+				'show_in_rest' => true,
+			],
 		];
 
 		foreach ( $rest_meta_fields as $key => $field ) {
