@@ -202,10 +202,7 @@ prplSuggestedTask = {
 		post.fetch().then( () => {
 			post.destroy( { data: { force: true } } ).then( () => {
 				// Remove the task from the todo list.
-				const el = document.querySelector(
-					`.prpl-suggested-task[data-post-id="${ postId }"]`
-				);
-				el.remove();
+				prplSuggestedTask.removeTaskElement( postId );
 				setTimeout( () => {
 					window.dispatchEvent(
 						new CustomEvent( 'prpl/grid/resize' )
@@ -239,98 +236,90 @@ prplSuggestedTask = {
 			const newStatus =
 				'publish' === postData.status ? 'trash' : 'publish';
 
-			post.set( 'status', newStatus );
-			post.save().then( () => {
-				prplSuggestedTask.runTaskAction(
-					postId,
-					'trash' === newStatus ? 'complete' : 'pending'
-				);
-				const el = document.querySelector(
-					`.prpl-suggested-task[data-post-id="${ postId }"]`
-				);
-
-				// Task is trashed, check if we need to celebrate.
-				if ( 'trash' === newStatus ) {
-					el.setAttribute( 'data-task-action', 'celebrate' );
-
-					prplUpdateRaviGauge(
-						parseInt( postData?.meta?.prpl_points )
+			post.set( 'status', newStatus )
+				.save()
+				.then( () => {
+					prplSuggestedTask.runTaskAction(
+						postId,
+						'trash' === newStatus ? 'complete' : 'pending'
 					);
-
-					const eventDetail = { element: el };
+					const el = prplSuggestedTask.getTaskElement( postId );
 					const eventPoints = parseInt( postData?.meta?.prpl_points );
 
-					if ( 'user' === taskProviderId ) {
-						const delay = eventPoints ? 2000 : 0;
+					// Task is trashed, check if we need to celebrate.
+					if ( 'trash' === newStatus ) {
+						el.setAttribute( 'data-task-action', 'celebrate' );
 
-						// Set class to trigger strike through animation.
-						if ( 0 < eventPoints ) {
-							el.classList.add(
-								'prpl-suggested-task-celebrated'
-							);
-						}
+						if ( 'user' === taskProviderId ) {
+							const delay = eventPoints ? 2000 : 0;
 
-						setTimeout( () => {
-							// Move task from published to trash.
-							document
-								.getElementById( 'todo-list-completed' )
-								.insertAdjacentElement( 'beforeend', el );
+							// Set class to trigger strike through animation.
+							if ( 0 < eventPoints ) {
+								el.classList.add(
+									'prpl-suggested-task-celebrated'
+								);
+							}
 
-							// Remove the class to trigger the strike through animation.
-							el.classList.remove(
-								'prpl-suggested-task-celebrated'
-							);
+							setTimeout( () => {
+								// Move task from published to trash.
+								document
+									.getElementById( 'todo-list-completed' )
+									.insertAdjacentElement( 'beforeend', el );
 
-							window.dispatchEvent(
-								new CustomEvent( 'prpl/grid/resize' )
-							);
-						}, delay );
-					} else {
-						// Inject more tasks from the same category.
-						prplSuggestedTask.injectItemsFromCategory( {
-							category: taskCategorySlug,
-						} );
-					}
+								// Remove the class to trigger the strike through animation.
+								el.classList.remove(
+									'prpl-suggested-task-celebrated'
+								);
 
-					// We trigger celebration only if the task has points.
-					if ( 0 < eventPoints ) {
-						if ( 'user' !== taskProviderId ) {
+								window.dispatchEvent(
+									new CustomEvent( 'prpl/grid/resize' )
+								);
+							}, delay );
+						} else {
 							/**
 							 * Strike completed tasks and remove them from the DOM.
 							 */
 							document.dispatchEvent(
 								new CustomEvent( 'prpl/removeCelebratedTasks' )
 							);
+
+							// Inject more tasks from the same category.
+							prplSuggestedTask.injectItemsFromCategory( {
+								category: taskCategorySlug,
+							} );
 						}
 
-						// Trigger the celebration event (confetti).
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/celebrateTasks', {
-								detail: eventDetail,
-							} )
-						);
+						// We trigger celebration only if the task has points.
+						if ( 0 < eventPoints ) {
+							prplUpdateRaviGauge( eventPoints );
+
+							// Trigger the celebration event (confetti).
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/celebrateTasks', {
+									detail: { element: el },
+								} )
+							);
+						}
+					} else if ( 'publish' === newStatus ) {
+						// This is only possible for user tasks.
+						if ( 'user' === taskProviderId ) {
+							// Set the task action to publish.
+							el.setAttribute( 'data-task-action', 'publish' );
+
+							// Update the Ravi gauge.
+							prplUpdateRaviGauge( 0 - eventPoints );
+
+							// Move task from trash to published.
+							document
+								.getElementById( 'todo-list' )
+								.insertAdjacentElement( 'beforeend', el );
+
+							window.dispatchEvent(
+								new CustomEvent( 'prpl/grid/resize' )
+							);
+						}
 					}
-				} else if ( 'publish' === newStatus ) {
-					// Set the task action to publish.
-					el.setAttribute( 'data-task-action', 'publish' );
-
-					// Update the Ravi gauge.
-					prplUpdateRaviGauge(
-						0 - parseInt( postData?.meta?.prpl_points )
-					);
-
-					if ( 'user' === taskProviderId ) {
-						// Move task from trash to published.
-						document
-							.getElementById( 'todo-list' )
-							.insertAdjacentElement( 'beforeend', el );
-
-						window.dispatchEvent(
-							new CustomEvent( 'prpl/grid/resize' )
-						);
-					}
-				}
-			} );
+				} );
 		} );
 	},
 
@@ -373,10 +362,7 @@ prplSuggestedTask = {
 				'prpl_recommendations_category'
 			).slug;
 
-			const el = document.querySelector(
-				`.prpl-suggested-task[data-post-id="${ postId }"]`
-			);
-			el.remove();
+			prplSuggestedTask.removeTaskElement( postId );
 
 			// Inject more tasks from the same category.
 			prplSuggestedTask.injectItemsFromCategory( {
@@ -510,6 +496,31 @@ prplSuggestedTask = {
 					'label:has(.prpl-suggested-task-checkbox) .screen-reader-text'
 				).innerHTML = `${ title }: ${ prplL10n( 'markAsComplete' ) }`;
 		}, 300 );
+	},
+
+	/**
+	 * Get the task element.
+	 *
+	 * @param {number} postId The post ID.
+	 * @return {HTMLElement} The task element.
+	 */
+	getTaskElement: ( postId ) => {
+		return document.querySelector(
+			`.prpl-suggested-task[data-post-id="${ postId }"]`
+		);
+	},
+
+	/**
+	 * Remove the task element.
+	 *
+	 * @param {number} postId The post ID.
+	 */
+	removeTaskElement: ( postId ) => {
+		const el = prplSuggestedTask.getTaskElement( postId );
+
+		if ( el ) {
+			el.remove();
+		}
 	},
 };
 
