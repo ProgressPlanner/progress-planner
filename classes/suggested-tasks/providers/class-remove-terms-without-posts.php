@@ -51,6 +51,13 @@ class Remove_Terms_Without_Posts extends Tasks {
 	protected $is_dismissable = true;
 
 	/**
+	 * The task URL target.
+	 *
+	 * @var string
+	 */
+	protected $url_target = '_blank';
+
+	/**
 	 * The task priority.
 	 *
 	 * @var string
@@ -274,7 +281,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 			'post_title'       => $this->get_title( $data ),
 			'description'      => $this->get_description( $data ),
 			'url'              => $this->get_url( $data ),
-			'url_target'       => '_blank',
+			'url_target'       => $this->get_url_target(),
 			'dismissable'      => $this->is_dismissable(),
 			'snoozable'        => $this->is_snoozable,
 			'points'           => $this->get_points(),
