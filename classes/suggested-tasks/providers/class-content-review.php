@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Task_Factory;
 use Progress_Planner\Suggested_Tasks\Providers\Traits\Dismissable_Task;
 use Progress_Planner\Page_Types;
 
@@ -582,9 +581,15 @@ class Content_Review extends Tasks {
 	 * @return bool
 	 */
 	protected function is_specific_task_completed( $task_id ) {
-		$data = Task_Factory::create_task_from_id( $task_id )->get_data();
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
-		return isset( $data['target_post_id'] )
+		if ( ! $task ) {
+			return false;
+		}
+
+		$data = $task->get_data();
+
+		return $data && isset( $data['target_post_id'] )
 			&& (int) \get_post_modified_time( 'U', false, (int) $data['target_post_id'] ) > strtotime( '-12 months' );
 	}
 
