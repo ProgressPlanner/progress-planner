@@ -27,11 +27,12 @@ prplSuggestedTask = {
 	},
 
 	/**
-	 * Inject items from a category.
+	 * Fetch items for arguments.
 	 *
 	 * @param {Object} args The arguments to pass to the injectItems method.
+	 * @return {Promise} A promise that resolves with the collection of posts.
 	 */
-	injectItems: ( args ) => {
+	fetchItems: ( args ) => {
 		console.info(
 			`Fetching recommendations with args: ${ JSON.stringify( args ) }...`
 		);
@@ -51,46 +52,59 @@ prplSuggestedTask = {
 				prplTerms.get( 'category' )[ args.category ].id;
 		}
 
-		prplSuggestedTask
+		return prplSuggestedTask
 			.getPostsCollectionPromise( { data: fetchData } )
 			.then( ( response ) => {
-				const data = response.data;
-				const postsCollection = response.postsCollection;
-				if ( ! data.length ) {
-					if ( args?.afterRequestComplete ) {
-						args.afterRequestComplete( data );
-					}
-					return;
+				return response.data;
+			} );
+	},
+
+	/**
+	 * Inject items from a category.
+	 *
+	 * @param {string}   taskCategorySlug The task category slug.
+	 * @param {string[]} taskStatus       The task status.
+	 */
+	injectItemsFromCategory: ( args ) => {
+		let { category, status = [ 'publish' ], per_page = 1 } = args;
+
+		if ( ! Array.isArray( status ) ) {
+			status = [ status ];
+		}
+
+		return prplSuggestedTask
+			.fetchItems( {
+				category,
+				status,
+				per_page,
+			} )
+			.then( ( data ) => {
+				if ( data.length ) {
+					// Inject the items into the DOM.
+					data.forEach( ( item ) => {
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/suggestedTask/injectItem', {
+								detail: {
+									item,
+									listId: 'prpl-suggested-tasks-list',
+									insertPosition: 'beforeend',
+								},
+							} )
+						);
+						prplSuggestedTask.injectedItemIds.push( item.id );
+					} );
 				}
 
-				const injectTriggerArgsCallback =
-					args?.injectTriggerArgsCallback || ( ( item ) => item );
-				data.forEach( ( item ) => {
-					document.dispatchEvent(
-						new CustomEvent( args.injectTrigger, {
-							detail: injectTriggerArgsCallback( item ),
-						} )
-					);
-					prplSuggestedTask.injectedItemIds.push( item.id );
-				} );
+				return data;
+			} )
+			.then( ( data ) => {
+				// Toggle the "Loading..." text.
+				window.prplSuggestedTasksRemoveLoadingItems();
 
-				if ( args?.afterRequestComplete ) {
-					args.afterRequestComplete( data );
-				}
+				// Trigger the grid resize event.
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 
-				// If we want to get more items and there are more, repeat the process.
-				if ( postsCollection.hasMore() ) {
-					// Strict check, fetch more only if everything is properly set (no undefined values).
-					if (
-						args.category &&
-						prplSuggestedTask.injectedItemIds.length <
-							prplSuggestedTask.maxItemsPerCategory[
-								args.category
-							]
-					) {
-						prplSuggestedTask.injectItems( args );
-					}
-				}
+				return data;
 			} );
 	},
 
@@ -163,37 +177,21 @@ prplSuggestedTask = {
 	/**
 	 * Run a task action.
 	 *
-	 * @param {number} postId       The post ID.
-	 * @param {string} actionType   The action type.
-	 * @param {string} categorySlug The category slug.
+	 * @param {number} postId     The post ID.
+	 * @param {string} actionType The action type.
+	 * @return {Promise} A promise that resolves with the response from the server.
 	 */
-	runTaskAction: ( postId, actionType, categorySlug ) => {
-		const request = wp.ajax.post(
-			'progress_planner_suggested_task_action',
-			{
-				post_id: postId,
-				nonce: prplSuggestedTask.nonce,
-				action_type: actionType,
-			}
-		);
-
-		// We do not inject user tasks, because they are already in the DOM.
-		if ( 'user' !== categorySlug ) {
-			request.done( () => {
-				document.dispatchEvent(
-					new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
-						detail: {
-							task_id: postId,
-							category: categorySlug,
-						},
-					} )
-				);
-			} );
-		}
+	runTaskAction: ( postId, actionType ) => {
+		return wp.ajax.post( 'progress_planner_suggested_task_action', {
+			post_id: postId,
+			nonce: prplSuggestedTask.nonce,
+			action_type: actionType,
+		} );
 	},
 
 	/**
-	 * Trash a task.
+	 * Trash (delete) a task.
+	 * Only user tasks can be trashed.
 	 *
 	 * @param {number} postId The post ID.
 	 */
@@ -201,27 +199,17 @@ prplSuggestedTask = {
 		const post = new wp.api.models.Prpl_recommendations( {
 			id: postId,
 		} );
-		post.fetch().then( ( postData ) => {
+		post.fetch().then( () => {
 			post.destroy( { data: { force: true } } ).then( () => {
 				// Remove the task from the todo list.
-				const el = document.querySelector(
-					`.prpl-suggested-task[data-post-id="${ postId }"]`
-				);
-				el.remove();
+				prplSuggestedTask.removeTaskElement( postId );
 				setTimeout( () => {
 					window.dispatchEvent(
 						new CustomEvent( 'prpl/grid/resize' )
 					);
 				}, 500 );
 
-				prplSuggestedTask.runTaskAction(
-					postId,
-					'delete',
-					prplTerms.getTerm(
-						postData?.[ prplTerms.category ],
-						prplTerms.category
-					).slug
-				);
+				prplSuggestedTask.runTaskAction( postId, 'delete' );
 			} );
 		} );
 	},
@@ -248,113 +236,90 @@ prplSuggestedTask = {
 			const newStatus =
 				'publish' === postData.status ? 'trash' : 'publish';
 
-			post.set( 'status', newStatus );
-			post.save().then( () => {
-				prplSuggestedTask.runTaskAction(
-					postId,
-					'trash' === newStatus ? 'complete' : 'pending',
-					taskCategorySlug
-				);
-				const el = document.querySelector(
-					`.prpl-suggested-task[data-post-id="${ postId }"]`
-				);
-
-				// Task is trashed, check if we need to celebrate.
-				if ( 'trash' === newStatus ) {
-					el.setAttribute( 'data-task-action', 'celebrate' );
-
-					prplUpdateRaviGauge(
-						parseInt( postData?.meta?.prpl_points )
+			post.set( 'status', newStatus )
+				.save()
+				.then( () => {
+					prplSuggestedTask.runTaskAction(
+						postId,
+						'trash' === newStatus ? 'complete' : 'pending'
 					);
-
-					const eventDetail = { element: el };
+					const el = prplSuggestedTask.getTaskElement( postId );
 					const eventPoints = parseInt( postData?.meta?.prpl_points );
 
-					let celebrateEvents = {};
+					// Task is trashed, check if we need to celebrate.
+					if ( 'trash' === newStatus ) {
+						el.setAttribute( 'data-task-action', 'celebrate' );
 
-					if ( 'user' === taskProviderId ) {
-						const delay = eventPoints ? 2000 : 0;
+						if ( 'user' === taskProviderId ) {
+							const delay = eventPoints ? 2000 : 0;
 
-						// Set class to trigger strike through animation.
-						if ( 0 < eventPoints ) {
-							el.classList.add(
-								'prpl-suggested-task-celebrated'
-							);
-						}
+							// Set class to trigger strike through animation.
+							if ( 0 < eventPoints ) {
+								el.classList.add(
+									'prpl-suggested-task-celebrated'
+								);
+							}
 
-						setTimeout( () => {
-							// Move task from published to trash.
-							document
-								.getElementById( 'todo-list-completed' )
-								.insertAdjacentElement( 'beforeend', el );
+							setTimeout( () => {
+								// Move task from published to trash.
+								document
+									.getElementById( 'todo-list-completed' )
+									.insertAdjacentElement( 'beforeend', el );
 
-							// Remove the class to trigger the strike through animation.
-							el.classList.remove(
-								'prpl-suggested-task-celebrated'
-							);
+								// Remove the class to trigger the strike through animation.
+								el.classList.remove(
+									'prpl-suggested-task-celebrated'
+								);
 
-							window.dispatchEvent(
-								new CustomEvent( 'prpl/grid/resize' )
-							);
-						}, delay );
-					} else {
-						// Inject more tasks from the same category.
-						celebrateEvents[
-							'prpl/suggestedTask/maybeInjectItem'
-						] = {
-							task_id: postId,
-							providerID: taskProviderId,
-							category: taskCategorySlug,
-							status: [ newStatus ],
-						};
-					}
-
-					// We trigger celebration only if the task has points.
-					if ( 0 < eventPoints ) {
-						// New task is injected in a different request.
-						celebrateEvents = {
-							'prpl/celebrateTasks': eventDetail,
-						};
-
-						if ( 'user' !== taskProviderId ) {
+								window.dispatchEvent(
+									new CustomEvent( 'prpl/grid/resize' )
+								);
+							}, delay );
+						} else {
 							/**
 							 * Strike completed tasks and remove them from the DOM.
 							 */
 							document.dispatchEvent(
 								new CustomEvent( 'prpl/removeCelebratedTasks' )
 							);
+
+							// Inject more tasks from the same category.
+							prplSuggestedTask.injectItemsFromCategory( {
+								category: taskCategorySlug,
+							} );
+						}
+
+						// We trigger celebration only if the task has points.
+						if ( 0 < eventPoints ) {
+							prplUpdateRaviGauge( eventPoints );
+
+							// Trigger the celebration event (confetti).
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/celebrateTasks', {
+									detail: { element: el },
+								} )
+							);
+						}
+					} else if ( 'publish' === newStatus ) {
+						// This is only possible for user tasks.
+						if ( 'user' === taskProviderId ) {
+							// Set the task action to publish.
+							el.setAttribute( 'data-task-action', 'publish' );
+
+							// Update the Ravi gauge.
+							prplUpdateRaviGauge( 0 - eventPoints );
+
+							// Move task from trash to published.
+							document
+								.getElementById( 'todo-list' )
+								.insertAdjacentElement( 'beforeend', el );
+
+							window.dispatchEvent(
+								new CustomEvent( 'prpl/grid/resize' )
+							);
 						}
 					}
-
-					// Trigger the events.
-					Object.keys( celebrateEvents ).forEach( ( event ) => {
-						document.dispatchEvent(
-							new CustomEvent( event, {
-								detail: celebrateEvents[ event ],
-							} )
-						);
-					} );
-				} else if ( 'publish' === newStatus ) {
-					// Set the task action to publish.
-					el.setAttribute( 'data-task-action', 'publish' );
-
-					// Update the Ravi gauge.
-					prplUpdateRaviGauge(
-						0 - parseInt( postData?.meta?.prpl_points )
-					);
-
-					if ( 'user' === taskProviderId ) {
-						// Move task from trash to published.
-						document
-							.getElementById( 'todo-list' )
-							.insertAdjacentElement( 'beforeend', el );
-
-						window.dispatchEvent(
-							new CustomEvent( 'prpl/grid/resize' )
-						);
-					}
-				}
-			} );
+				} );
 		} );
 	},
 
@@ -392,30 +357,17 @@ prplSuggestedTask = {
 			date_gmt: date,
 		} );
 		postModelToSave.save().then( ( postData ) => {
-			const taskProviderId = prplTerms.getTerm(
-				postData?.[ prplTerms.provider ],
-				prplTerms.provider
-			).slug;
-			const taskCategorySlug = prplTerms.getTerm(
+			const taskCategorySlug = window.prplGetTermObject(
 				postData?.[ prplTerms.category ],
 				prplTerms.category
 			).slug;
 
-			const el = document.querySelector(
-				`.prpl-suggested-task[data-post-id="${ postId }"]`
-			);
-			el.remove();
+			prplSuggestedTask.removeTaskElement( postId );
+
 			// Inject more tasks from the same category.
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/suggestedTask/maybeInjectItem', {
-					detail: {
-						task_id: postId,
-						providerID: taskProviderId,
-						category: taskCategorySlug,
-						status: [ postData.status ],
-					},
-				} )
-			);
+			prplSuggestedTask.injectItemsFromCategory( {
+				category: taskCategorySlug,
+			} );
 		} );
 	},
 
@@ -544,6 +496,31 @@ prplSuggestedTask = {
 					'label:has(.prpl-suggested-task-checkbox) .screen-reader-text'
 				).innerHTML = `${ title }: ${ prplL10n( 'markAsComplete' ) }`;
 		}, 300 );
+	},
+
+	/**
+	 * Get the task element.
+	 *
+	 * @param {number} postId The post ID.
+	 * @return {HTMLElement} The task element.
+	 */
+	getTaskElement: ( postId ) => {
+		return document.querySelector(
+			`.prpl-suggested-task[data-post-id="${ postId }"]`
+		);
+	},
+
+	/**
+	 * Remove the task element.
+	 *
+	 * @param {number} postId The post ID.
+	 */
+	removeTaskElement: ( postId ) => {
+		const el = prplSuggestedTask.getTaskElement( postId );
+
+		if ( el ) {
+			el.remove();
+		}
 	},
 };
 

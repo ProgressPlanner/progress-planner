@@ -8,7 +8,10 @@
  */
 /* eslint-disable camelcase */
 
-const prplSuggestedTasksToggleUIitems = () => {
+/**
+ * Remove the "Loading..." text and resize the grid items.
+ */
+window.prplSuggestedTasksRemoveLoadingItems = () => {
 	const el = document.querySelector( '.prpl-suggested-tasks-loading' );
 	if ( el ) {
 		el.remove();
@@ -50,37 +53,20 @@ window.prplPopulateSuggestedTasksList = function () {
 		}
 
 		// Inject published tasks.
-		prplSuggestedTask.injectItems( {
+		prplSuggestedTask.injectItemsFromCategory( {
 			category,
 			status: [ 'publish' ],
 			per_page: prplSuggestedTask.maxItemsPerCategory[ category ],
-			injectTrigger: 'prpl/suggestedTask/injectItem',
-			injectTriggerArgsCallback: ( todoItem ) => {
-				return {
-					item: todoItem,
-					listId: 'prpl-suggested-tasks-list',
-					insertPosition: 'beforeend',
-				};
-			},
-			afterRequestComplete: prplSuggestedTasksToggleUIitems,
 		} );
 
-		// Inject pending tasks.
-		prplSuggestedTask.injectItems( {
-			category,
-			status: [ 'pending' ],
-			per_page: 100, // Inject all pending tasks at once.
-			injectTrigger: 'prpl/suggestedTask/injectItem',
-			injectTriggerArgsCallback: ( todoItem ) => {
-				return {
-					item: todoItem,
-					listId: 'prpl-suggested-tasks-list',
-					insertPosition: 'beforeend',
-				};
-			},
-			afterRequestComplete: ( data ) => {
-				prplSuggestedTasksToggleUIitems();
-
+		// Inject pending celebration tasks.
+		prplSuggestedTask
+			.injectItemsFromCategory( {
+				category,
+				status: [ 'pending' ],
+				per_page: 100,
+			} )
+			.then( ( data ) => {
 				// If there were pending tasks.
 				if ( data.length ) {
 					// Set post status to trash.
@@ -105,35 +91,15 @@ window.prplPopulateSuggestedTasksList = function () {
 						document.dispatchEvent(
 							new CustomEvent( 'prpl/removeCelebratedTasks' )
 						);
+
+						// Trigger the grid resize event.
+						window.dispatchEvent(
+							new CustomEvent( 'prpl/grid/resize' )
+						);
 					}, 3000 );
 				}
-			},
-		} );
+			} );
 	}
 };
-
-// Listen for the event.
-document.addEventListener(
-	'prpl/suggestedTask/maybeInjectItem',
-	( e ) => {
-		// TODO: Something seems off here, take a look at this.
-		// TODO: This is called only for RR tasks.
-		prplSuggestedTask.injectItems( {
-			category: e.detail.category,
-			status: e.detail.status,
-			afterRequestComplete: prplSuggestedTasksToggleUIitems,
-			injectTrigger: 'prpl/suggestedTask/injectItem',
-			injectTriggerArgsCallback: ( todoItem ) => {
-				return {
-					item: todoItem,
-					listId: 'prpl-suggested-tasks-list',
-					insertPosition: 'beforeend',
-				};
-			},
-		} );
-		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-	},
-	false
-);
 
 /* eslint-enable camelcase */

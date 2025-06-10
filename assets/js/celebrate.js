@@ -96,13 +96,7 @@ document.addEventListener( 'prpl/removeCelebratedTasks', () => {
 		)
 		.forEach( ( item ) => {
 			const delay = 2000;
-			/*
-			// TODO: Currently we don't remove user tasks from the DOM.
-			// We remove the task from the DOM immediately if it has no points.
-			if ( 0 === parseInt( item.getAttribute( 'data-task-points' ) ) ) {
-				delay = 0;
-			}
-			*/
+
 			// Triggers the strikethrough animation.
 			if ( delay ) {
 				item.classList.add( 'prpl-suggested-task-celebrated' );
@@ -112,37 +106,6 @@ document.addEventListener( 'prpl/removeCelebratedTasks', () => {
 			setTimeout( () => {
 				item.remove();
 			}, delay );
-		} );
-} );
-
-/**
- * Mark tasks as completed.
- */
-document.addEventListener( 'prpl/markTasksAsCompleted', () => {
-	document
-		.querySelectorAll( '.prpl-suggested-task-celebrated' )
-		.forEach( ( item ) => {
-			const post_id = item.getAttribute( 'data-post-id' );
-			const el = document.querySelector(
-				`.prpl-suggested-task[data-post-id="${ post_id }"]`
-			);
-
-			if ( el ) {
-				el.remove();
-			}
-		} );
-} );
-
-/**
- * Strike through completed tasks.
- */
-document.addEventListener( 'prpl/strikeCelebratedTasks', () => {
-	document
-		.querySelectorAll(
-			'.prpl-suggested-task[data-task-action="celebrate"]'
-		)
-		.forEach( ( item ) => {
-			item.classList.add( 'prpl-suggested-task-celebrated' );
 		} );
 } );
 

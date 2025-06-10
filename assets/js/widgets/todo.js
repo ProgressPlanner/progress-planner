@@ -27,35 +27,56 @@ const prplGetHighestTodoItemOrder = () => {
 };
 
 /**
+ * Remove the "Loading..." text and resize the grid items.
+ */
+window.prplTodoRemoveLoadingItems = () => {
+	// Remove the "Loading..." text.
+	const el = document.querySelector( '#prpl-todo-list-loading' );
+	if ( el ) {
+		el.remove();
+	}
+	// Resize the grid items.
+	window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+};
+
+/**
  * Populate the todo list.
  */
 window.prplPopulateTodoList = function () {
-	prplSuggestedTask.injectItems( {
-		category: 'user',
-		status: [ 'publish', 'trash' ],
-		injectTrigger: 'prpl/suggestedTask/injectItem',
-		injectTriggerArgsCallback: ( todoItem ) => {
-			return {
-				item: todoItem,
-				insertPosition:
-					1 === todoItem?.meta?.prpl_points
-						? 'afterbegin' // Add golden task to the start of the list.
-						: 'beforeend',
-				listId:
-					todoItem.status === 'publish'
-						? 'todo-list'
-						: 'todo-list-completed',
-			};
-		},
-		afterRequestComplete: () => {
-			const el = document.querySelector( '#prpl-todo-list-loading' );
-			if ( el ) {
-				el.remove();
+	prplSuggestedTask
+		.fetchItems( {
+			category: 'user',
+			status: [ 'publish', 'trash' ],
+			per_page: 100,
+		} )
+		.then( ( data ) => {
+			if ( data.length ) {
+				// Inject the items into the DOM.
+				data.forEach( ( item ) => {
+					document.dispatchEvent(
+						new CustomEvent( 'prpl/suggestedTask/injectItem', {
+							detail: {
+								item,
+								insertPosition:
+									1 === item?.meta?.prpl_points
+										? 'afterbegin' // Add golden task to the start of the list.
+										: 'beforeend',
+								listId:
+									item.status === 'publish'
+										? 'todo-list'
+										: 'todo-list-completed',
+							},
+						} )
+					);
+					prplSuggestedTask.injectedItemIds.push( item.id );
+				} );
 			}
-			// Resize the grid items.
-			window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-		},
-	} );
+
+			return data;
+		} )
+		.then( () => {
+			window.prplTodoRemoveLoadingItems();
+		} );
 
 	// When the '#create-todo-item' form is submitted,
 	// add a new todo item to the list
