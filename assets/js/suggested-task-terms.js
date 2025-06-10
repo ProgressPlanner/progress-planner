@@ -102,9 +102,7 @@ const prplTerms = {
 				Promise.all( [
 					prplTerms.getCollectionPromise( prplTerms.category ),
 					prplTerms.getCollectionPromise( prplTerms.provider ),
-				] ).then( () => {
-					resolve( prplSuggestedTasksTerms );
-				} );
+				] ).then( () => resolve( prplSuggestedTasksTerms ) );
 			} );
 		} );
 	},

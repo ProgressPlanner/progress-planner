@@ -13,7 +13,7 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 	/**
 	 * Trigger the confetti on the container element.
 	 */
-	const containerElement = event.detail?.element
+	const containerEl = event.detail?.element
 		? event.detail.element.closest( '.prpl-suggested-tasks-list' )
 		: document.querySelector(
 				'.prpl-widget-wrapper.prpl-suggested-tasks .prpl-suggested-tasks-list'
@@ -30,14 +30,14 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 
 	const prplRenderAttemptshoot = () => {
 		// Get the tasks list position
-		const origin = containerElement
+		const origin = containerEl
 			? {
 					x:
-						( containerElement.getBoundingClientRect().left +
-							containerElement.offsetWidth / 2 ) /
+						( containerEl.getBoundingClientRect().left +
+							containerEl.offsetWidth / 2 ) /
 						window.innerWidth,
 					y:
-						( containerElement.getBoundingClientRect().top + 50 ) /
+						( containerEl.getBoundingClientRect().top + 50 ) /
 						window.innerHeight,
 			  }
 			: { x: 0.5, y: 0.3 }; // fallback if list not found
@@ -95,17 +95,11 @@ document.addEventListener( 'prpl/removeCelebratedTasks', () => {
 			'.prpl-suggested-task[data-task-action="celebrate"]'
 		)
 		.forEach( ( item ) => {
-			const delay = 2000;
-
 			// Triggers the strikethrough animation.
-			if ( delay ) {
-				item.classList.add( 'prpl-suggested-task-celebrated' );
-			}
+			item.classList.add( 'prpl-suggested-task-celebrated' );
 
 			// Remove the item from the DOM.
-			setTimeout( () => {
-				item.remove();
-			}, delay );
+			setTimeout( () => item.remove(), 2000 );
 		} );
 } );
 
@@ -117,9 +111,7 @@ document.addEventListener( 'prpl/celebrateTasks', () => {
 		'#adminmenu #toplevel_page_progress-planner .update-plugins'
 	);
 	if ( points ) {
-		points.forEach( ( point ) => {
-			point.remove();
-		} );
+		points.forEach( ( point ) => point.remove() );
 	}
 } );
 

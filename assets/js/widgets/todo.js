@@ -7,144 +7,148 @@
  * Dependencies: wp-api, progress-planner/suggested-task, wp-util, wp-a11y, progress-planner/grid-masonry, progress-planner/celebrate, progress-planner/suggested-task-terms
  */
 
-/**
- * Get the highest `order` value from the todo items.
- *
- * @return {number} The highest `order` value.
- */
-const prplGetHighestTodoItemOrder = () => {
-	const todoItems = document.querySelectorAll(
-		'#todo-list .prpl-suggested-task'
-	);
-	let highestOrder = 0;
-	todoItems.forEach( ( todoItem ) => {
-		const order = parseInt( todoItem.getAttribute( 'data-task-order' ) );
-		if ( order > highestOrder ) {
-			highestOrder = order;
+const prplTodoWidget = {
+	/**
+	 * Get the highest `order` value from the todo items.
+	 *
+	 * @return {number} The highest `order` value.
+	 */
+	getHighestItemOrder: () => {
+		const items = document.querySelectorAll(
+			'#todo-list .prpl-suggested-task'
+		);
+		let highestOrder = 0;
+		items.forEach( ( item ) => {
+			const order = parseInt( item.getAttribute( 'data-task-order' ) );
+			if ( order > highestOrder ) {
+				highestOrder = order;
+			}
+		} );
+		return highestOrder;
+	},
+
+	/**
+	 * Remove the "Loading..." text and resize the grid items.
+	 */
+	removeLoadingItems: () => {
+		// Remove the "Loading..." text.
+		const el = document.querySelector( '#prpl-todo-list-loading' );
+		if ( el ) {
+			el.remove();
 		}
-	} );
-	return highestOrder;
-};
+		// Resize the grid items.
+		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+	},
 
-/**
- * Remove the "Loading..." text and resize the grid items.
- */
-window.prplTodoRemoveLoadingItems = () => {
-	// Remove the "Loading..." text.
-	const el = document.querySelector( '#prpl-todo-list-loading' );
-	if ( el ) {
-		el.remove();
-	}
-	// Resize the grid items.
-	window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-};
+	/**
+	 * Populate the todo list.
+	 */
+	populateList: () => {
+		prplSuggestedTask
+			.fetchItems( {
+				category: 'user',
+				status: [ 'publish', 'trash' ],
+				per_page: 100,
+			} )
+			.then( ( data ) => {
+				if ( data.length ) {
+					// Inject the items into the DOM.
+					data.forEach( ( item ) => {
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/suggestedTask/injectItem', {
+								detail: {
+									item,
+									insertPosition:
+										1 === item?.meta?.prpl_points
+											? 'afterbegin' // Add golden task to the start of the list.
+											: 'beforeend',
+									listId:
+										item.status === 'publish'
+											? 'todo-list'
+											: 'todo-list-completed',
+								},
+							} )
+						);
+						prplSuggestedTask.injectedItemIds.push( item.id );
+					} );
+				}
 
-/**
- * Populate the todo list.
- */
-window.prplPopulateTodoList = function () {
-	prplSuggestedTask
-		.fetchItems( {
-			category: 'user',
-			status: [ 'publish', 'trash' ],
-			per_page: 100,
-		} )
-		.then( ( data ) => {
-			if ( data.length ) {
-				// Inject the items into the DOM.
-				data.forEach( ( item ) => {
+				return data;
+			} )
+			.then( () => {
+				prplTodoWidget.removeLoadingItems();
+			} );
+
+		// When the '#create-todo-item' form is submitted,
+		// add a new todo item to the list
+		document
+			.getElementById( 'create-todo-item' )
+			.addEventListener( 'submit', ( event ) => {
+				event.preventDefault();
+
+				// Create a new post
+				const post = new wp.api.models.Prpl_recommendations( {
+					// Set the post title.
+					title: document.getElementById( 'new-todo-content' ).value,
+					status: 'publish',
+					// Set the `prpl_recommendations_category` term.
+					prpl_recommendations_category:
+						prplTerms.get( 'category' ).user.id,
+					// Set the `prpl_recommendations_provider` term.
+					prpl_recommendations_provider:
+						prplTerms.get( 'provider' ).user.id,
+					menu_order: prplTodoWidget.getHighestItemOrder() + 1,
+					meta: {
+						prpl_snoozable: false,
+						prpl_dismissable: true,
+					},
+				} );
+				post.save().then( ( response ) => {
+					if ( ! response.id ) {
+						return;
+					}
+					const newTask = {
+						...response,
+						meta: {
+							prpl_points: 0,
+							prpl_snoozable: false,
+							prpl_dismissable: true,
+							prpl_url: '',
+							prpl_url_target: '_self',
+							...( response.meta || {} ),
+						},
+						provider: 'user',
+						category: 'user',
+						order: prplTodoWidget.getHighestItemOrder() + 1,
+					};
+
+					// Inject the new task into the DOM.
 					document.dispatchEvent(
 						new CustomEvent( 'prpl/suggestedTask/injectItem', {
 							detail: {
-								item,
+								item: newTask,
 								insertPosition:
-									1 === item?.meta?.prpl_points
-										? 'afterbegin' // Add golden task to the start of the list.
-										: 'beforeend',
-								listId:
-									item.status === 'publish'
-										? 'todo-list'
-										: 'todo-list-completed',
+									1 === newTask.points
+										? 'afterbegin'
+										: 'beforeend', // Add golden task to the start of the list.
+								listId: 'todo-list',
 							},
 						} )
 					);
-					prplSuggestedTask.injectedItemIds.push( item.id );
+
+					// Resize the grid items.
+					window.dispatchEvent(
+						new CustomEvent( 'prpl/grid/resize' )
+					);
 				} );
-			}
 
-			return data;
-		} )
-		.then( () => {
-			window.prplTodoRemoveLoadingItems();
-		} );
+				// Clear the new task input element.
+				document.getElementById( 'new-todo-content' ).value = '';
 
-	// When the '#create-todo-item' form is submitted,
-	// add a new todo item to the list
-	document
-		.getElementById( 'create-todo-item' )
-		.addEventListener( 'submit', ( event ) => {
-			event.preventDefault();
-
-			// Create a new post
-			const post = new wp.api.models.Prpl_recommendations( {
-				// Set the post title.
-				title: document.getElementById( 'new-todo-content' ).value,
-				status: 'publish',
-				// Set the `prpl_recommendations_category` term.
-				prpl_recommendations_category:
-					prplTerms.get( 'category' ).user.id,
-				// Set the `prpl_recommendations_provider` term.
-				prpl_recommendations_provider:
-					prplTerms.get( 'provider' ).user.id,
-				menu_order: prplGetHighestTodoItemOrder() + 1,
-				meta: {
-					prpl_snoozable: false,
-					prpl_dismissable: true,
-				},
+				// Focus the new task input element.
+				document.getElementById( 'new-todo-content' ).focus();
 			} );
-			post.save().then( ( response ) => {
-				if ( ! response.id ) {
-					return;
-				}
-				const newTask = {
-					...response,
-					meta: {
-						prpl_points: 0,
-						prpl_snoozable: false,
-						prpl_dismissable: true,
-						prpl_url: '',
-						prpl_url_target: '_self',
-						...( response.meta || {} ),
-					},
-					provider: 'user',
-					category: 'user',
-					order: prplGetHighestTodoItemOrder() + 1,
-				};
-
-				// Inject the new task into the DOM.
-				document.dispatchEvent(
-					new CustomEvent( 'prpl/suggestedTask/injectItem', {
-						detail: {
-							item: newTask,
-							insertPosition:
-								1 === newTask.points
-									? 'afterbegin'
-									: 'beforeend', // Add golden task to the start of the list.
-							listId: 'todo-list',
-						},
-					} )
-				);
-
-				// Resize the grid items.
-				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-			} );
-
-			// Clear the new task input element.
-			document.getElementById( 'new-todo-content' ).value = '';
-
-			// Focus the new task input element.
-			document.getElementById( 'new-todo-content' ).focus();
-		} );
+	},
 };
 
 document

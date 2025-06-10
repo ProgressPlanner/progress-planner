@@ -52,9 +52,7 @@ class BadgeScroller {
 					( im ) =>
 						new Promise( ( resolve ) => ( im.onload = resolve ) )
 				)
-			).then( () => {
-				this.setWrapperHeight();
-			} );
+			).then( () => this.setWrapperHeight() );
 		}
 
 		// When popover is opened.
