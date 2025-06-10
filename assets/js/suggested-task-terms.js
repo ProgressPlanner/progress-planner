@@ -116,7 +116,7 @@ const prplTerms = {
 	 * @param {string} taxonomy The taxonomy.
 	 * @return {Object} The term object.
 	 */
-	getTermObject: ( termId, taxonomy ) => {
+	getTerm: ( termId, taxonomy ) => {
 		let termObject = {};
 		Object.values( prplSuggestedTasksTerms[ taxonomy ] ).forEach(
 			( term ) => {

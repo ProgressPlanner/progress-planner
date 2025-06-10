@@ -217,7 +217,7 @@ prplSuggestedTask = {
 				prplSuggestedTask.runTaskAction(
 					postId,
 					'delete',
-					prplTerms.getTermObject(
+					prplTerms.getTerm(
 						postData?.prpl_recommendations_category,
 						'prpl_recommendations_category'
 					).slug
@@ -235,11 +235,11 @@ prplSuggestedTask = {
 		// Get the task.
 		const post = new wp.api.models.Prpl_recommendations( { id: postId } );
 		post.fetch().then( ( postData ) => {
-			const taskProviderId = prplTerms.getTermObject(
+			const taskProviderId = prplTerms.getTerm(
 				postData?.prpl_recommendations_provider,
 				'prpl_recommendations_provider'
 			).slug;
-			const taskCategorySlug = prplTerms.getTermObject(
+			const taskCategorySlug = prplTerms.getTerm(
 				postData?.prpl_recommendations_category,
 				'prpl_recommendations_category'
 			).slug;
@@ -392,11 +392,11 @@ prplSuggestedTask = {
 			date_gmt: date,
 		} );
 		postModelToSave.save().then( ( postData ) => {
-			const taskProviderId = prplTerms.getTermObject(
+			const taskProviderId = prplTerms.getTerm(
 				postData?.prpl_recommendations_provider,
 				'prpl_recommendations_provider'
 			).slug;
-			const taskCategorySlug = prplTerms.getTermObject(
+			const taskCategorySlug = prplTerms.getTerm(
 				postData?.prpl_recommendations_category,
 				'prpl_recommendations_category'
 			).slug;
