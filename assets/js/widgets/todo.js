@@ -27,6 +27,19 @@ const prplGetHighestTodoItemOrder = () => {
 };
 
 /**
+ * Remove the "Loading..." text and resize the grid items.
+ */
+window.prplTodoRemoveLoadingItems = () => {
+	// Remove the "Loading..." text.
+	const el = document.querySelector( '#prpl-todo-list-loading' );
+	if ( el ) {
+		el.remove();
+	}
+	// Resize the grid items.
+	window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+};
+
+/**
  * Populate the todo list.
  */
 window.prplPopulateTodoList = function () {
@@ -62,13 +75,7 @@ window.prplPopulateTodoList = function () {
 			return data;
 		} )
 		.then( () => {
-			// Toggle the "Loading..." text.
-			const el = document.querySelector( '#prpl-todo-list-loading' );
-			if ( el ) {
-				el.remove();
-			}
-			// Resize the grid items.
-			window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+			window.prplTodoRemoveLoadingItems();
 		} );
 
 	// When the '#create-todo-item' form is submitted,

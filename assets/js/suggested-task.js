@@ -1,4 +1,4 @@
-/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplTerms, prplSuggestedTasksToggleUIitems */
+/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplTerms */
 /*
  * Suggested Task scripts & helpers.
  *
@@ -65,20 +65,18 @@ prplSuggestedTask = {
 	 * @param {string}   taskCategorySlug The task category slug.
 	 * @param {string[]} taskStatus       The task status.
 	 */
-	injectItemsFromCategory: (
-		taskCategorySlug,
-		taskStatus = [ 'publish' ],
-		perPage = 1
-	) => {
-		if ( ! Array.isArray( taskStatus ) ) {
-			taskStatus = [ taskStatus ];
+	injectItemsFromCategory: ( args ) => {
+		let { category, status = [ 'publish' ], per_page = 1 } = args;
+
+		if ( ! Array.isArray( status ) ) {
+			status = [ status ];
 		}
 
-		prplSuggestedTask
+		return prplSuggestedTask
 			.fetchItems( {
-				category: taskCategorySlug,
-				status: taskStatus,
-				per_page: perPage,
+				category,
+				status,
+				per_page,
 			} )
 			.then( ( data ) => {
 				if ( data.length ) {
@@ -99,12 +97,14 @@ prplSuggestedTask = {
 
 				return data;
 			} )
-			.then( () => {
+			.then( ( data ) => {
 				// Toggle the "Loading..." text.
-				prplSuggestedTasksToggleUIitems();
+				window.prplSuggestedTasksRemoveLoadingItems();
 
 				// Trigger the grid resize event.
 				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+
+				return data;
 			} );
 	},
 
@@ -287,9 +287,9 @@ prplSuggestedTask = {
 						}, delay );
 					} else {
 						// Inject more tasks from the same category.
-						prplSuggestedTask.injectItemsFromCategory(
-							taskCategorySlug
-						);
+						prplSuggestedTask.injectItemsFromCategory( {
+							category: taskCategorySlug,
+						} );
 					}
 
 					// We trigger celebration only if the task has points.
@@ -379,7 +379,9 @@ prplSuggestedTask = {
 			el.remove();
 
 			// Inject more tasks from the same category.
-			prplSuggestedTask.injectItemsFromCategory( taskCategorySlug );
+			prplSuggestedTask.injectItemsFromCategory( {
+				category: taskCategorySlug,
+			} );
 		} );
 	},
 

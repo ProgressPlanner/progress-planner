@@ -8,7 +8,10 @@
  */
 /* eslint-disable camelcase */
 
-const prplSuggestedTasksToggleUIitems = () => {
+/**
+ * Remove the "Loading..." text and resize the grid items.
+ */
+window.prplSuggestedTasksRemoveLoadingItems = () => {
 	const el = document.querySelector( '.prpl-suggested-tasks-loading' );
 	if ( el ) {
 		el.remove();
@@ -50,42 +53,20 @@ window.prplPopulateSuggestedTasksList = function () {
 		}
 
 		// Inject published tasks.
-		prplSuggestedTask.injectItemsFromCategory(
+		prplSuggestedTask.injectItemsFromCategory( {
 			category,
-			[ 'publish' ],
-			prplSuggestedTask.maxItemsPerCategory[ category ]
-		);
+			status: [ 'publish' ],
+			per_page: prplSuggestedTask.maxItemsPerCategory[ category ],
+		} );
 
-		// Inject pending tasks.
+		// Inject pending celebration tasks.
 		prplSuggestedTask
-			.fetchItems( {
+			.injectItemsFromCategory( {
 				category,
 				status: [ 'pending' ],
-				per_page: 100, // Inject all pending tasks at once.
+				per_page: 100,
 			} )
 			.then( ( data ) => {
-				if ( data.length ) {
-					// Inject the items into the DOM.
-					data.forEach( ( item ) => {
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/suggestedTask/injectItem', {
-								detail: {
-									item,
-									listId: 'prpl-suggested-tasks-list',
-									insertPosition: 'beforeend',
-								},
-							} )
-						);
-						// prplSuggestedTask.injectedItemIds.push( item.id );
-					} );
-				}
-
-				return data;
-			} )
-			.then( ( data ) => {
-				// Toggle the "Loading..." text.
-				prplSuggestedTasksToggleUIitems();
-
 				// If there were pending tasks.
 				if ( data.length ) {
 					// Set post status to trash.
