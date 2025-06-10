@@ -1,4 +1,4 @@
-/* global prplSuggestedTask, prplGetTerms */
+/* global prplSuggestedTask, prplTerms */
 /*
  * Widget: Todo
  *
@@ -85,10 +85,10 @@ window.prplPopulateTodoList = function () {
 				status: 'publish',
 				// Set the `prpl_recommendations_category` term.
 				prpl_recommendations_category:
-					prplGetTerms( 'category' ).user.id,
+					prplTerms.get( 'category' ).user.id,
 				// Set the `prpl_recommendations_provider` term.
 				prpl_recommendations_provider:
-					prplGetTerms( 'provider' ).user.id,
+					prplTerms.get( 'provider' ).user.id,
 				menu_order: prplGetHighestTodoItemOrder() + 1,
 				meta: {
 					prpl_snoozable: false,

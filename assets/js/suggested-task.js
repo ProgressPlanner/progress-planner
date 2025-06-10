@@ -1,4 +1,4 @@
-/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplGetTerms, prplSuggestedTasksToggleUIitems */
+/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplTerms, prplSuggestedTasksToggleUIitems */
 /*
  * Suggested Task scripts & helpers.
  *
@@ -49,7 +49,7 @@ prplSuggestedTask = {
 		};
 		if ( args.category ) {
 			fetchData.prpl_recommendations_category =
-				prplGetTerms( 'category' )[ args.category ].id;
+				prplTerms.get( 'category' )[ args.category ].id;
 		}
 
 		return prplSuggestedTask
@@ -147,13 +147,13 @@ prplSuggestedTask = {
 				prpl_recommendations_category,
 			};
 
-			Object.values( prplGetTerms( 'provider' ) ).forEach( ( term ) => {
+			Object.values( prplTerms.get( 'provider' ) ).forEach( ( term ) => {
 				if ( term.id === terms.prpl_recommendations_provider[ 0 ] ) {
 					terms.prpl_recommendations_provider = term;
 				}
 			} );
 
-			Object.values( prplGetTerms( 'category' ) ).forEach( ( term ) => {
+			Object.values( prplTerms.get( 'category' ) ).forEach( ( term ) => {
 				if ( term.id === terms.prpl_recommendations_category[ 0 ] ) {
 					terms.prpl_recommendations_category = term;
 				}
@@ -226,11 +226,11 @@ prplSuggestedTask = {
 		// Get the task.
 		const post = new wp.api.models.Prpl_recommendations( { id: postId } );
 		post.fetch().then( ( postData ) => {
-			const taskProviderId = window.prplGetTermObject(
+			const taskProviderId = prplTerms.getTerm(
 				postData?.prpl_recommendations_provider,
 				'prpl_recommendations_provider'
 			).slug;
-			const taskCategorySlug = window.prplGetTermObject(
+			const taskCategorySlug = prplTerms.getTerm(
 				postData?.prpl_recommendations_category,
 				'prpl_recommendations_category'
 			).slug;
