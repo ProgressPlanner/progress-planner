@@ -1,4 +1,4 @@
-/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplGetTerms */
+/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplTerms */
 /*
  * Suggested Task scripts & helpers.
  *
@@ -48,7 +48,7 @@ prplSuggestedTask = {
 		};
 		if ( args.category ) {
 			fetchData.prpl_recommendations_category =
-				prplGetTerms( 'category' )[ args.category ].id;
+				prplTerms.get( 'category' )[ args.category ].id;
 		}
 
 		prplSuggestedTask
@@ -133,13 +133,13 @@ prplSuggestedTask = {
 				prpl_recommendations_category,
 			};
 
-			Object.values( prplGetTerms( 'provider' ) ).forEach( ( term ) => {
+			Object.values( prplTerms.get( 'provider' ) ).forEach( ( term ) => {
 				if ( term.id === terms.prpl_recommendations_provider[ 0 ] ) {
 					terms.prpl_recommendations_provider = term;
 				}
 			} );
 
-			Object.values( prplGetTerms( 'category' ) ).forEach( ( term ) => {
+			Object.values( prplTerms.get( 'category' ) ).forEach( ( term ) => {
 				if ( term.id === terms.prpl_recommendations_category[ 0 ] ) {
 					terms.prpl_recommendations_category = term;
 				}
@@ -217,7 +217,7 @@ prplSuggestedTask = {
 				prplSuggestedTask.runTaskAction(
 					postId,
 					'delete',
-					window.prplGetTermObject(
+					prplTerms.getTermObject(
 						postData?.prpl_recommendations_category,
 						'prpl_recommendations_category'
 					).slug
@@ -235,11 +235,11 @@ prplSuggestedTask = {
 		// Get the task.
 		const post = new wp.api.models.Prpl_recommendations( { id: postId } );
 		post.fetch().then( ( postData ) => {
-			const taskProviderId = window.prplGetTermObject(
+			const taskProviderId = prplTerms.getTermObject(
 				postData?.prpl_recommendations_provider,
 				'prpl_recommendations_provider'
 			).slug;
-			const taskCategorySlug = window.prplGetTermObject(
+			const taskCategorySlug = prplTerms.getTermObject(
 				postData?.prpl_recommendations_category,
 				'prpl_recommendations_category'
 			).slug;
@@ -392,11 +392,11 @@ prplSuggestedTask = {
 			date_gmt: date,
 		} );
 		postModelToSave.save().then( ( postData ) => {
-			const taskProviderId = window.prplGetTermObject(
+			const taskProviderId = prplTerms.getTermObject(
 				postData?.prpl_recommendations_provider,
 				'prpl_recommendations_provider'
 			).slug;
-			const taskCategorySlug = window.prplGetTermObject(
+			const taskCategorySlug = prplTerms.getTermObject(
 				postData?.prpl_recommendations_category,
 				'prpl_recommendations_category'
 			).slug;

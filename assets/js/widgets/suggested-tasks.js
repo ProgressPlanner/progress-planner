@@ -1,4 +1,4 @@
-/* global prplSuggestedTask */
+/* global prplSuggestedTask, prplTerms*/
 /*
  * Widget: Suggested Tasks
  *
@@ -29,7 +29,7 @@ const prplSuggestedTasksToggleUIitems = () => {
 /**
  * Populate the suggested tasks list when the terms are loaded.
  */
-window.prplGetTermsCollectionsPromises().then( () => {
+prplTerms.getCollectionsPromises().then( () => {
 	window.prplPopulateSuggestedTasksList();
 	window.prplPopulateTodoList();
 } );

@@ -7,118 +7,124 @@
 
 const prplSuggestedTasksTerms = {};
 
-/**
- * Get the terms for a given taxonomy.
- *
- * @param {string} taxonomy The taxonomy.
- * @return {Object} The terms.
- */
-// eslint-disable-next-line no-unused-vars
-const prplGetTerms = ( taxonomy ) => {
-	if ( 'category' === taxonomy ) {
-		taxonomy = 'prpl_recommendations_category';
-	} else if ( 'provider' === taxonomy ) {
-		taxonomy = 'prpl_recommendations_provider';
-	}
-	return prplSuggestedTasksTerms[ taxonomy ] || {};
-};
+const prplTerms = {
+	category: 'prpl_recommendations_category',
+	provider: 'prpl_recommendations_provider',
 
-/**
- * Get a promise for the terms collection for a given taxonomy.
- *
- * @param {string} taxonomy The taxonomy.
- * @return {Promise} A promise for the terms collection.
- */
-window.prplGetTermsCollectionPromise = ( taxonomy ) => {
-	return new Promise( ( resolve ) => {
-		if ( prplSuggestedTasksTerms[ taxonomy ] ) {
-			console.info( `Terms already fetched for taxonomy: ${ taxonomy }` );
-			resolve( prplSuggestedTasksTerms[ taxonomy ] );
+	/**
+	 * Get the terms for a given taxonomy.
+	 *
+	 * @param {string} taxonomy The taxonomy.
+	 * @return {Object} The terms.
+	 */
+	// eslint-disable-next-line no-unused-vars
+	get: ( taxonomy ) => {
+		if ( 'category' === taxonomy ) {
+			taxonomy = prplTerms.category;
+		} else if ( 'provider' === taxonomy ) {
+			taxonomy = prplTerms.provider;
 		}
-		wp.api.loadPromise.done( () => {
-			console.info( `Fetching terms for taxonomy: ${ taxonomy }...` );
+		return prplSuggestedTasksTerms[ taxonomy ] || {};
+	},
 
-			const typeName = taxonomy.replace( 'prpl_', 'Prpl_' );
-			prplSuggestedTasksTerms[ taxonomy ] =
-				prplSuggestedTasksTerms[ taxonomy ] || {};
-			const TermsCollection = new wp.api.collections[ typeName ]();
-			TermsCollection.fetch( { data: { per_page: 100 } } ).done(
-				( data ) => {
-					// 100 is the maximum number of terms that can be fetched in one request.
-					data.forEach( ( term ) => {
-						prplSuggestedTasksTerms[ taxonomy ][ term.slug ] = term;
-					} );
+	/**
+	 * Get a promise for the terms collection for a given taxonomy.
+	 *
+	 * @param {string} taxonomy The taxonomy.
+	 * @return {Promise} A promise for the terms collection.
+	 */
+	getCollectionPromise: ( taxonomy ) => {
+		return new Promise( ( resolve ) => {
+			if ( prplSuggestedTasksTerms[ taxonomy ] ) {
+				console.info(
+					`Terms already fetched for taxonomy: ${ taxonomy }`
+				);
+				resolve( prplSuggestedTasksTerms[ taxonomy ] );
+			}
+			wp.api.loadPromise.done( () => {
+				console.info( `Fetching terms for taxonomy: ${ taxonomy }...` );
 
-					// If the `user` term doesn't exist, create it.
-					const UserTermsCollection = new wp.api.collections[
-						typeName
-					]();
-					UserTermsCollection.fetch( {
-						data: { slug: 'user' },
-					} )
-						.then( ( userTerms ) => {
-							if ( 0 === userTerms.length ) {
-								const newTermModel = new wp.api.models[
-									typeName
-								]( {
-									slug: 'user',
-									name: 'user',
-								} );
-								return newTermModel
-									.save()
-									.then( ( response ) => {
-										prplSuggestedTasksTerms[
-											taxonomy
-										].user = response;
-										return prplSuggestedTasksTerms[
-											taxonomy
-										];
-									} );
-							}
-							return prplSuggestedTasksTerms[ taxonomy ];
+				const typeName = taxonomy.replace( 'prpl_', 'Prpl_' );
+				prplSuggestedTasksTerms[ taxonomy ] =
+					prplSuggestedTasksTerms[ taxonomy ] || {};
+				const TermsCollection = new wp.api.collections[ typeName ]();
+				TermsCollection.fetch( { data: { per_page: 100 } } ).done(
+					( data ) => {
+						// 100 is the maximum number of terms that can be fetched in one request.
+						data.forEach( ( term ) => {
+							prplSuggestedTasksTerms[ taxonomy ][ term.slug ] =
+								term;
+						} );
+
+						// If the `user` term doesn't exist, create it.
+						const UserTermsCollection = new wp.api.collections[
+							typeName
+						]();
+						UserTermsCollection.fetch( {
+							data: { slug: 'user' },
 						} )
-						.then( resolve ); // Resolve the promise after all requests are complete.
-				}
-			);
-		} );
-	} );
-};
-
-/**
- * Get promises for the terms collections for the taxonomies we use.
- *
- * @return {Promise} A promise for the terms collections.
- */
-window.prplGetTermsCollectionsPromises = () => {
-	return new Promise( ( resolve ) => {
-		prplDocumentReady( () => {
-			Promise.all( [
-				window.prplGetTermsCollectionPromise(
-					'prpl_recommendations_category'
-				),
-				window.prplGetTermsCollectionPromise(
-					'prpl_recommendations_provider'
-				),
-			] ).then( () => {
-				resolve( prplSuggestedTasksTerms );
+							.then( ( userTerms ) => {
+								if ( 0 === userTerms.length ) {
+									const newTermModel = new wp.api.models[
+										typeName
+									]( {
+										slug: 'user',
+										name: 'user',
+									} );
+									return newTermModel
+										.save()
+										.then( ( response ) => {
+											prplSuggestedTasksTerms[
+												taxonomy
+											].user = response;
+											return prplSuggestedTasksTerms[
+												taxonomy
+											];
+										} );
+								}
+								return prplSuggestedTasksTerms[ taxonomy ];
+							} )
+							.then( resolve ); // Resolve the promise after all requests are complete.
+					}
+				);
 			} );
 		} );
-	} );
-};
+	},
 
-/**
- * Get a term object from the terms array.
- *
- * @param {number} termId   The term ID.
- * @param {string} taxonomy The taxonomy.
- * @return {Object} The term object.
- */
-window.prplGetTermObject = ( termId, taxonomy ) => {
-	let termObject = {};
-	Object.values( prplSuggestedTasksTerms[ taxonomy ] ).forEach( ( term ) => {
-		if ( parseInt( term.id ) === parseInt( termId ) ) {
-			termObject = term;
-		}
-	} );
-	return termObject;
+	/**
+	 * Get promises for the terms collections for the taxonomies we use.
+	 *
+	 * @return {Promise} A promise for the terms collections.
+	 */
+	getCollectionsPromises: () => {
+		return new Promise( ( resolve ) => {
+			prplDocumentReady( () => {
+				Promise.all( [
+					prplTerms.getCollectionPromise( prplTerms.category ),
+					prplTerms.getCollectionPromise( prplTerms.provider ),
+				] ).then( () => {
+					resolve( prplSuggestedTasksTerms );
+				} );
+			} );
+		} );
+	},
+
+	/**
+	 * Get a term object from the terms array.
+	 *
+	 * @param {number} termId   The term ID.
+	 * @param {string} taxonomy The taxonomy.
+	 * @return {Object} The term object.
+	 */
+	getTermObject: ( termId, taxonomy ) => {
+		let termObject = {};
+		Object.values( prplSuggestedTasksTerms[ taxonomy ] ).forEach(
+			( term ) => {
+				if ( parseInt( term.id ) === parseInt( termId ) ) {
+					termObject = term;
+				}
+			}
+		);
+		return termObject;
+	},
 };

@@ -1,7 +1,7 @@
 <script type="text/html" id="tmpl-prpl-suggested-task">
 	<#
-	var providerSlug = window.prplGetTermObject( data.post.prpl_recommendations_provider[0], 'prpl_recommendations_provider' ).slug;
-	var categorySlug = window.prplGetTermObject( data.post.prpl_recommendations_category[0], 'prpl_recommendations_category' ).slug;
+	var providerSlug = prplTerms.getTermObject( data.post.prpl_recommendations_provider[0], 'prpl_recommendations_provider' ).slug;
+	var categorySlug = prplTerms.getTermObject( data.post.prpl_recommendations_category[0], 'prpl_recommendations_category' ).slug;
 	#>
 	<li class="prpl-suggested-task" data-task-id="{{ data.post.meta.prpl_task_id || data.post.id }}" data-post-id="{{ data.post.id }}" data-task-action="{{ data.action }}" data-task-url="{{ data.post.meta.prpl_url }}" data-task-provider-id="{{ providerSlug }}" data-task-points="{{ data.post.meta.prpl_points }}" data-task-category="{{ categorySlug }}" data-task-order="{{ data.post.menu_order }}">
 		<# if ( data.useCheckbox ) { #>
