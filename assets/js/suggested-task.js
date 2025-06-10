@@ -47,7 +47,7 @@ prplSuggestedTask = {
 			},
 		};
 		if ( args.category ) {
-			fetchData.prpl_recommendations_category =
+			fetchData[ prplTerms.category ] =
 				prplTerms.get( 'category' )[ args.category ].id;
 		}
 
@@ -134,14 +134,14 @@ prplSuggestedTask = {
 			};
 
 			Object.values( prplTerms.get( 'provider' ) ).forEach( ( term ) => {
-				if ( term.id === terms.prpl_recommendations_provider[ 0 ] ) {
-					terms.prpl_recommendations_provider = term;
+				if ( term.id === terms[ prplTerms.provider ][ 0 ] ) {
+					terms[ prplTerms.provider ] = term;
 				}
 			} );
 
 			Object.values( prplTerms.get( 'category' ) ).forEach( ( term ) => {
-				if ( term.id === terms.prpl_recommendations_category[ 0 ] ) {
-					terms.prpl_recommendations_category = term;
+				if ( term.id === terms[ prplTerms.category ][ 0 ] ) {
+					terms[ prplTerms.category ] = term;
 				}
 			} );
 
@@ -218,8 +218,8 @@ prplSuggestedTask = {
 					postId,
 					'delete',
 					prplTerms.getTerm(
-						postData?.prpl_recommendations_category,
-						'prpl_recommendations_category'
+						postData?.[ prplTerms.category ],
+						prplTerms.category
 					).slug
 				);
 			} );
@@ -236,12 +236,12 @@ prplSuggestedTask = {
 		const post = new wp.api.models.Prpl_recommendations( { id: postId } );
 		post.fetch().then( ( postData ) => {
 			const taskProviderId = prplTerms.getTerm(
-				postData?.prpl_recommendations_provider,
-				'prpl_recommendations_provider'
+				postData?.[ prplTerms.provider ],
+				prplTerms.provider
 			).slug;
 			const taskCategorySlug = prplTerms.getTerm(
-				postData?.prpl_recommendations_category,
-				'prpl_recommendations_category'
+				postData?.[ prplTerms.category ],
+				prplTerms.category
 			).slug;
 
 			// Dismissable tasks don't have pending status, it's either publish or trash.
@@ -393,12 +393,12 @@ prplSuggestedTask = {
 		} );
 		postModelToSave.save().then( ( postData ) => {
 			const taskProviderId = prplTerms.getTerm(
-				postData?.prpl_recommendations_provider,
-				'prpl_recommendations_provider'
+				postData?.[ prplTerms.provider ],
+				prplTerms.provider
 			).slug;
 			const taskCategorySlug = prplTerms.getTerm(
-				postData?.prpl_recommendations_category,
-				'prpl_recommendations_category'
+				postData?.[ prplTerms.category ],
+				prplTerms.category
 			).slug;
 
 			const el = document.querySelector(
