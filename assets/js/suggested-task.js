@@ -1,8 +1,8 @@
-/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplTerms */
+/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplTerms, prplSuggestedTasksWidget */
 /*
  * Suggested Task scripts & helpers.
  *
- * Dependencies: wp-api, progress-planner/l10n, progress-planner/suggested-task-terms, progress-planner/web-components/prpl-gauge
+ * Dependencies: wp-api, progress-planner/l10n, progress-planner/suggested-task-terms, progress-planner/web-components/prpl-gauge, progress-planner/widgets/suggested-tasks
  */
 /* eslint-disable camelcase, jsdoc/require-param-type, jsdoc/require-param, jsdoc/check-param-names */
 
@@ -54,9 +54,7 @@ prplSuggestedTask = {
 
 		return prplSuggestedTask
 			.getPostsCollectionPromise( { data: fetchData } )
-			.then( ( response ) => {
-				return response.data;
-			} );
+			.then( ( response ) => response.data );
 	},
 
 	/**
@@ -99,7 +97,7 @@ prplSuggestedTask = {
 			} )
 			.then( ( data ) => {
 				// Toggle the "Loading..." text.
-				window.prplSuggestedTasksRemoveLoadingItems();
+				prplSuggestedTasksWidget.removeLoadingItems();
 
 				// Trigger the grid resize event.
 				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
@@ -118,9 +116,9 @@ prplSuggestedTask = {
 		const collectionsPromise = new Promise( ( resolve ) => {
 			const postsCollection =
 				new wp.api.collections.Prpl_recommendations();
-			postsCollection.fetch( fetchArgs ).done( ( data ) => {
-				resolve( { data, postsCollection } );
-			} );
+			postsCollection
+				.fetch( fetchArgs )
+				.done( ( data ) => resolve( { data, postsCollection } ) );
 		} );
 
 		return collectionsPromise;
@@ -136,8 +134,8 @@ prplSuggestedTask = {
 		post = {},
 		useCheckbox = true,
 		listId = '',
-	} ) => {
-		return new Promise( ( resolve ) => {
+	} ) =>
+		new Promise( ( resolve ) => {
 			const {
 				prpl_recommendations_provider,
 				prpl_recommendations_category,
@@ -171,8 +169,7 @@ prplSuggestedTask = {
 			};
 
 			resolve( template( data ) );
-		} );
-	},
+		} ),
 
 	/**
 	 * Run a task action.
@@ -181,13 +178,12 @@ prplSuggestedTask = {
 	 * @param {string} actionType The action type.
 	 * @return {Promise} A promise that resolves with the response from the server.
 	 */
-	runTaskAction: ( postId, actionType ) => {
-		return wp.ajax.post( 'progress_planner_suggested_task_action', {
+	runTaskAction: ( postId, actionType ) =>
+		wp.ajax.post( 'progress_planner_suggested_task_action', {
 			post_id: postId,
 			nonce: prplSuggestedTask.nonce,
 			action_type: actionType,
-		} );
-	},
+		} ),
 
 	/**
 	 * Trash (delete) a task.
@@ -203,11 +199,13 @@ prplSuggestedTask = {
 			post.destroy( { data: { force: true } } ).then( () => {
 				// Remove the task from the todo list.
 				prplSuggestedTask.removeTaskElement( postId );
-				setTimeout( () => {
-					window.dispatchEvent(
-						new CustomEvent( 'prpl/grid/resize' )
-					);
-				}, 500 );
+				setTimeout(
+					() =>
+						window.dispatchEvent(
+							new CustomEvent( 'prpl/grid/resize' )
+						),
+					500
+				);
 
 				prplSuggestedTask.runTaskAction( postId, 'delete' );
 			} );
@@ -330,23 +328,19 @@ prplSuggestedTask = {
 	 * @param {string} snoozeDuration The snooze duration.
 	 */
 	snooze: ( postId, snoozeDuration ) => {
-		if ( '1-week' === snoozeDuration ) {
-			snoozeDuration = 7;
-		} else if ( '2-weeks' === snoozeDuration ) {
-			snoozeDuration = 14;
-		} else if ( '1-month' === snoozeDuration ) {
-			snoozeDuration = 30;
-		} else if ( '3-months' === snoozeDuration ) {
-			snoozeDuration = 90;
-		} else if ( '6-months' === snoozeDuration ) {
-			snoozeDuration = 180;
-		} else if ( '1-year' === snoozeDuration ) {
-			snoozeDuration = 365;
-		} else if ( 'forever' === snoozeDuration ) {
-			snoozeDuration = 3650;
-		}
+		const snoozeDurationMap = {
+			'1-week': 7,
+			'2-weeks': 14,
+			'1-month': 30,
+			'3-months': 90,
+			'6-months': 180,
+			'1-year': 365,
+			forever: 3650,
+		};
+
+		const snoozeDurationDays = snoozeDurationMap[ snoozeDuration ];
 		const date = new Date(
-			Date.now() + snoozeDuration * 24 * 60 * 60 * 1000
+			Date.now() + snoozeDurationDays * 24 * 60 * 60 * 1000
 		)
 			.toISOString()
 			.split( '.' )[ 0 ];
@@ -381,11 +375,12 @@ prplSuggestedTask = {
 		const target = button.getAttribute( 'data-target' );
 		const item = button.closest( 'li.prpl-suggested-task' );
 		const tooltipActions = item.querySelector( '.tooltip-actions' );
+		const elClass = '.prpl-suggested-task-' + target;
 
 		// If the tooltip was already open, close it.
 		if (
 			!! tooltipActions.querySelector(
-				'.prpl-suggested-task-' + target + '[data-tooltip-visible]'
+				`${ elClass }[data-tooltip-visible]`
 			)
 		) {
 			action = 'close-' + target;
@@ -404,7 +399,7 @@ prplSuggestedTask = {
 		switch ( action ) {
 			case 'snooze':
 				tooltipActions
-					.querySelector( '.prpl-suggested-task-' + target )
+					.querySelector( elClass )
 					?.setAttribute( 'data-tooltip-visible', 'true' );
 				break;
 
@@ -412,30 +407,24 @@ prplSuggestedTask = {
 				// Close the radio group.
 				tooltipActions
 					.querySelector(
-						'.prpl-suggested-task-' +
-							target +
-							'.prpl-toggle-radio-group-open'
+						`${ elClass }.prpl-toggle-radio-group-open`
 					)
 					?.classList.remove( 'prpl-toggle-radio-group-open' );
 				// Close the tooltip.
 				tooltipActions
-					.querySelector(
-						'.prpl-suggested-task-' +
-							target +
-							'[data-tooltip-visible]'
-					)
+					.querySelector( `${ elClass }[data-tooltip-visible]` )
 					?.removeAttribute( 'data-tooltip-visible' );
 				break;
 
 			case 'info':
 				tooltipActions
-					.querySelector( '.prpl-suggested-task-' + target )
+					.querySelector( elClass )
 					?.setAttribute( 'data-tooltip-visible', 'true' );
 				break;
 
 			case 'close-info':
 				tooltipActions
-					.querySelector( '.prpl-suggested-task-' + target )
+					.querySelector( elClass )
 					.removeAttribute( 'data-tooltip-visible' );
 				break;
 
@@ -480,7 +469,7 @@ prplSuggestedTask = {
 				id: parseInt( el.getAttribute( 'data-post-id' ) ),
 				title,
 			} );
-			postModel.save().then( () => {
+			postModel.save().then( () =>
 				// Update the task title.
 				document.dispatchEvent(
 					new CustomEvent( 'prpl/suggestedTask/update', {
@@ -488,8 +477,8 @@ prplSuggestedTask = {
 							node: el.closest( 'li.prpl-suggested-task' ),
 						},
 					} )
-				);
-			} );
+				)
+			);
 			el
 				.closest( 'li.prpl-suggested-task' )
 				.querySelector(
@@ -504,24 +493,18 @@ prplSuggestedTask = {
 	 * @param {number} postId The post ID.
 	 * @return {HTMLElement} The task element.
 	 */
-	getTaskElement: ( postId ) => {
-		return document.querySelector(
+	getTaskElement: ( postId ) =>
+		document.querySelector(
 			`.prpl-suggested-task[data-post-id="${ postId }"]`
-		);
-	},
+		),
 
 	/**
 	 * Remove the task element.
 	 *
 	 * @param {number} postId The post ID.
 	 */
-	removeTaskElement: ( postId ) => {
-		const el = prplSuggestedTask.getTaskElement( postId );
-
-		if ( el ) {
-			el.remove();
-		}
-	},
+	removeTaskElement: ( postId ) =>
+		prplSuggestedTask.getTaskElement( postId )?.remove(),
 };
 
 /**
