@@ -52,6 +52,13 @@ interface Tasks_Interface {
 	public function get_task_details( $task_id = '' );
 
 	/**
+	 * Get the task link setting.
+	 *
+	 * @return array
+	 */
+	public function get_link_setting();
+
+	/**
 	 * Get the provider category.
 	 *
 	 * @return string

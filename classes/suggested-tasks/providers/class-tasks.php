@@ -213,7 +213,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return array
 	 */
-	protected function get_link_setting() {
+	public function get_link_setting() {
 		return $this->link_setting;
 	}
 

@@ -31,7 +31,7 @@ class Site_Icon extends Tasks {
 	 *
 	 * @return array
 	 */
-	protected function get_link_setting() {
+	public function get_link_setting() {
 		return [
 			'hook'   => 'options-general.php',
 			'iconEl' => '.site-icon-section th',
