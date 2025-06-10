@@ -63,18 +63,12 @@ prplSuggestedTask = {
 	 * @param {string}   taskCategorySlug The task category slug.
 	 * @param {string[]} taskStatus       The task status.
 	 */
-	injectItemsFromCategory: ( args ) => {
-		let { category, status = [ 'publish' ], per_page = 1 } = args;
-
-		if ( ! Array.isArray( status ) ) {
-			status = [ status ];
-		}
-
-		return prplSuggestedTask
+	injectItemsFromCategory: ( args ) =>
+		prplSuggestedTask
 			.fetchItems( {
-				category,
-				status,
-				per_page,
+				category: args.category,
+				status: args.status || [ 'publish' ],
+				per_page: args.per_page || 1,
 			} )
 			.then( ( data ) => {
 				if ( data.length ) {
@@ -103,8 +97,7 @@ prplSuggestedTask = {
 				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 
 				return data;
-			} );
-	},
+			} ),
 
 	/**
 	 * Get a collection of posts.
@@ -284,6 +277,7 @@ prplSuggestedTask = {
 							// Inject more tasks from the same category.
 							prplSuggestedTask.injectItemsFromCategory( {
 								category: taskCategorySlug,
+								status: [ 'publish' ],
 							} );
 						}
 
@@ -361,6 +355,7 @@ prplSuggestedTask = {
 			// Inject more tasks from the same category.
 			prplSuggestedTask.injectItemsFromCategory( {
 				category: taskCategorySlug,
+				status: [ 'publish' ],
 			} );
 		} );
 	},
