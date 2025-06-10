@@ -459,6 +459,19 @@ class Email_Sending extends Interactive {
 	}
 
 	/**
+	 * Modify task data before injecting it.
+	 *
+	 * @param array $task_data The task data.
+	 *
+	 * @return array
+	 */
+	protected function modify_injection_task_data( $task_data ) {
+		$task_data['popover_id'] = 'prpl-popover-' . $this->popover_id;
+
+		return $task_data;
+	}
+
+	/**
 	 * Get the task details.
 	 *
 	 * @param string $task_id The task ID.
