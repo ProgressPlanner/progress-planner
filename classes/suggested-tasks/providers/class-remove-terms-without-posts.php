@@ -135,25 +135,6 @@ class Remove_Terms_Without_Posts extends Tasks {
 	}
 
 	/**
-	 * Get the task ID.
-	 *
-	 * @param array $data Optional data to include in the task ID.
-	 * @return string
-	 */
-	public function get_task_id( $data = [] ) {
-		$parts = [ $this->get_provider_id() ];
-
-		// Add optional data parts if provided.
-		if ( ! empty( $data ) ) {
-			foreach ( $data as $value ) {
-				$parts[] = $value;
-			}
-		}
-
-		return implode( '-', $parts );
-	}
-
-	/**
 	 * Get the title.
 	 *
 	 * @param array $task_data The task data.

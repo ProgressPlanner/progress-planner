@@ -252,19 +252,19 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return string
 	 */
 	public function get_task_id( $data = [] ) {
-		if ( ! $this->is_repetitive() ) {
-			return $this->get_provider_id();
-		}
-
 		$parts = [ $this->get_provider_id() ];
 
 		// Add optional data parts if provided.
-		if ( ! empty( $data['post_id'] ) ) {
-			$parts[] = $data['post_id'];
+		if ( ! empty( $data ) ) {
+			foreach ( $data as $value ) {
+				$parts[] = $value;
+			}
 		}
 
-		// Always add the date as the last part.
-		$parts[] = \gmdate( 'YW' );
+		// If the task is repetitive, add the date as the last part.
+		if ( $this->is_repetitive() ) {
+			$parts[] = \gmdate( 'YW' );
+		}
 
 		return implode( '-', $parts );
 	}
