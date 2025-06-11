@@ -40,9 +40,9 @@ class Fewer_Tags extends Tasks {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'high';
+	protected $priority = 10;
 
 	/**
 	 * The plugin active state.

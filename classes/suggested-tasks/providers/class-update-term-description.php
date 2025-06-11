@@ -67,9 +67,9 @@ class Update_Term_Description extends Tasks {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'low';
+	protected $priority = 80;
 
 	/**
 	 * The completed term IDs.

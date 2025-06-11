@@ -43,9 +43,9 @@ class Core_Update extends Tasks {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'high';
+	protected $priority = 0;
 
 	/**
 	 * Get the task URL.

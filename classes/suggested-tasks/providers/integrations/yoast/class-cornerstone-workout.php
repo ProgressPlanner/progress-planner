@@ -33,9 +33,9 @@ class Cornerstone_Workout extends Yoast_Provider {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'low';
+	protected $priority = 90;
 
 	/**
 	 * Whether the task is dismissable.

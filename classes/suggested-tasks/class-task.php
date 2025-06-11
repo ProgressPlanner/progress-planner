@@ -18,7 +18,7 @@ namespace Progress_Planner\Suggested_Tasks;
  * @property string $task_id The task identifier
  * @property string $provider_id The provider identifier
  * @property string $category The task category
- * @property string $priority The task priority
+ * @property int $priority The task priority (0-100, 0 being highest and 100 being lowest).
  * @property int $points The task points
  * @property bool $dismissable Whether the task is dismissable
  * @property string $url The task URL

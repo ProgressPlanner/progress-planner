@@ -60,9 +60,9 @@ class Remove_Terms_Without_Posts extends Tasks {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'medium';
+	protected $priority = 60;
 
 	/**
 	 * The minimum number of posts.

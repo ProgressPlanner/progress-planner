@@ -45,9 +45,9 @@ class Email_Sending extends Interactive {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'high';
+	protected $priority = 1;
 
 	/**
 	 * The popover ID.

@@ -73,9 +73,9 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'medium';
+	protected $priority = 50;
 
 	/**
 	 * Whether the task is dismissable.
@@ -167,10 +167,10 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task priority.
 	 *
-	 * @return string
+	 * @return int
 	 */
 	public function get_priority() {
-		return $this->priority;
+		return (int) $this->priority;
 	}
 
 	/**

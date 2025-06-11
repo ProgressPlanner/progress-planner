@@ -54,9 +54,9 @@ class Content_Review extends Tasks {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'high';
+	protected $priority = 30;
 
 	/**
 	 * Whether the task is dismissable.
