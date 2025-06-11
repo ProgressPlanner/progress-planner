@@ -87,4 +87,11 @@ interface Tasks_Interface {
 	 * @return bool
 	 */
 	public function is_task_relevant();
+
+	/**
+	 * Check if the task is a repetitive task.
+	 *
+	 * @return bool
+	 */
+	public function is_repetitive();
 }

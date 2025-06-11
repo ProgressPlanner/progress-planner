@@ -273,7 +273,17 @@ class Tasks_Manager {
 				continue;
 			}
 
-			if ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) { // TODO: Finalize cleanup once refactor is done.
+			// Should we delete the task?
+			$delete_task = false;
+
+			$task_provider = $this->get_task_provider( $task->get_provider_id() );
+
+			// Delete tasks which don't have a task provider or repetitive tasks which were created in the previous week.
+			if ( ! $task_provider || ( $task_provider->is_repetitive() && ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) ) ) {
+				$delete_task = true;
+			}
+
+			if ( $delete_task ) {
 				\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 			}
 		}
