@@ -66,10 +66,9 @@ class Permalink_Structure extends Tasks {
 	/**
 	 * Get the title.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_title( $task_data = [] ) {
+	protected function get_title() {
 		return \esc_html__( 'Set permalink structure', 'progress-planner' );
 	}
 

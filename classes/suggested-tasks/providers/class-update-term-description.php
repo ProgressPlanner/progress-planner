@@ -119,7 +119,7 @@ class Update_Term_Description extends Tasks {
 	 *
 	 * @return string
 	 */
-	protected function get_title( $task_data = [] ) {
+	protected function get_title_with_data( $task_data = [] ) {
 		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return $term && ! \is_wp_error( $term ) ? \sprintf(
 			/* translators: %s: The term name */
@@ -239,7 +239,7 @@ class Update_Term_Description extends Tasks {
 			'target_taxonomy'  => $data['target_taxonomy'],
 			'target_term_name' => $data['target_term_name'],
 			'date'             => \gmdate( 'YW' ),
-			'post_title'       => $this->get_title( $data ),
+			'post_title'       => $this->get_title_with_data( $data ),
 			'description'      => $this->get_description( $data ),
 			'url'              => $this->get_url( $data ),
 			'url_target'       => $this->get_url_target(),

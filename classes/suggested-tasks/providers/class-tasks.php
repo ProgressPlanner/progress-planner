@@ -130,10 +130,9 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task title.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_title( $task_data = [] ) {
+	protected function get_title() {
 		return '';
 	}
 
@@ -289,6 +288,16 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		return $this->data_collector; // @phpstan-ignore-line return.type
+	}
+
+	/**
+	 * Get the title with data.
+	 *
+	 * @param array $task_data Optional data to include in the task.
+	 * @return string
+	 */
+	protected function get_title_with_data( $task_data = [] ) {
+		return $this->get_title();
 	}
 
 	/**
@@ -458,7 +467,7 @@ abstract class Tasks implements Tasks_Interface {
 			'provider_id'  => $this->get_provider_id(),
 			'category'     => $this->get_provider_category(),
 			'date'         => \gmdate( 'YW' ),
-			'post_title'   => $this->get_title(),
+			'post_title'   => $this->get_title_with_data(),
 			'description'  => $this->get_description(),
 			'url'          => $this->get_url(),
 			'url_target'   => $this->get_url_target(),
@@ -512,7 +521,7 @@ abstract class Tasks implements Tasks_Interface {
 		return [
 			'task_id'      => $this->get_task_id( $task_data ),
 			'provider_id'  => $this->get_provider_id(),
-			'post_title'   => $this->get_title( $task_data ),
+			'post_title'   => $this->get_title_with_data( $task_data ),
 			'parent'       => $this->get_parent(),
 			'priority'     => $this->get_priority(),
 			'category'     => $this->get_provider_category(),

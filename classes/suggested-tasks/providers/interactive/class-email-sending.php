@@ -126,10 +126,9 @@ class Email_Sending extends Interactive {
 	/**
 	 * Get the title.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_title( $task_data = [] ) {
+	protected function get_title() {
 		return \esc_html__( 'Test if your website can send emails correctly', 'progress-planner' );
 	}
 

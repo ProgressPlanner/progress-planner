@@ -67,13 +67,13 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the title.
+	 * Get the title with data.
 	 *
 	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	protected function get_title( $task_data = [] ) {
+	protected function get_title_with_data( $task_data = [] ) {
 		return sprintf(
 			/* translators: %s: Post title. */
 			\esc_html__( 'Yoast SEO: add internal links to article "%s"!', 'progress-planner' ),
@@ -196,7 +196,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			'provider_id'    => $this->get_provider_id(),
 			'category'       => $this->get_provider_category(),
 			'target_post_id' => $data['target_post_id'],
-			'post_title'     => $this->get_title( $data ),
+			'post_title'     => $this->get_title_with_data( $data ),
 			'url'            => $this->get_url( $data ),
 			'url_target'     => $this->get_url_target(),
 			'dismissable'    => $this->is_dismissable(),

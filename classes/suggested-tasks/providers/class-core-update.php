@@ -71,10 +71,9 @@ class Core_Update extends Tasks {
 	/**
 	 * Get the task title.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_title( $task_data = [] ) {
+	protected function get_title() {
 		return \esc_html__( 'Perform all updates', 'progress-planner' );
 	}
 

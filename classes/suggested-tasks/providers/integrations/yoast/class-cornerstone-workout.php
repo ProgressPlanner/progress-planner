@@ -110,11 +110,9 @@ class Cornerstone_Workout extends Yoast_Provider {
 	/**
 	 * Get the task title.
 	 *
-	 * @param array $task_data The task data.
-	 *
 	 * @return string
 	 */
-	protected function get_title( $task_data = [] ) {
+	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: do Yoast SEO\'s Cornerstone Content Workout', 'progress-planner' );
 	}
 

@@ -259,7 +259,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 			'target_taxonomy'  => $data['target_taxonomy'],
 			'target_term_name' => $data['target_term_name'],
 			'date'             => \gmdate( 'YW' ),
-			'post_title'       => $this->get_title( $data ),
+			'post_title'       => $this->get_title_with_data( $data ),
 			'description'      => $this->get_description( $data ),
 			'url'              => $this->get_url( $data ),
 			'url_target'       => $this->get_url_target(),

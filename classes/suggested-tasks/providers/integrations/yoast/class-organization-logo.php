@@ -46,10 +46,9 @@ class Organization_Logo extends Yoast_Provider {
 	/**
 	 * Get the title.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_title( $task_data = [] ) {
+	protected function get_title() {
 		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
 			? \esc_html__( 'Yoast SEO: set your organization logo', 'progress-planner' )
 			: \esc_html__( 'Yoast SEO: set your person logo', 'progress-planner' );
