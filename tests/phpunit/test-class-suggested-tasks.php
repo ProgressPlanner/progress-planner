@@ -48,6 +48,24 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 				'provider_id' => 'settings-saved',
 				'category'    => 'configuration',
 			],
+
+			// Not repetitive task, but with past date.
+			[
+				'post_title'  => 'settings-saved-202451',
+				'task_id'     => 'settings-saved-202451',
+				'date'        => '202451',
+				'provider_id' => 'settings-saved',
+				'category'    => 'configuration',
+			],
+
+			// User task, with past date.
+			[
+				'post_title'  => 'user-task-1',
+				'task_id'     => 'user-task-1',
+				'provider_id' => 'user',
+				'category'    => 'user',
+				'date'        => '202451',
+			],
 		];
 
 		foreach ( $tasks_to_keep as $task ) {
@@ -56,6 +74,8 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 
 		// Tasks that should be removed.
 		$tasks_to_remove = [
+
+			// Repetitive task with past date.
 			[
 				'post_title'  => 'update-core-202451',
 				'task_id'     => 'update-core-202451',
@@ -63,12 +83,14 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 				'category'    => 'maintenance',
 				'provider_id' => 'update-core',
 			],
+
+			// Task with invalid provider.
 			[
-				'post_title'  => 'settings-saved-202451',
-				'task_id'     => 'settings-saved-202451',
+				'post_title'  => 'invalid-task-1',
+				'task_id'     => 'invalid-task-1',
 				'date'        => '202451',
-				'provider_id' => 'settings-saved',
-				'category'    => 'configuration',
+				'category'    => 'invalid-category',
+				'provider_id' => 'invalid-provider',
 			],
 		];
 
