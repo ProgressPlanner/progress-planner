@@ -92,7 +92,7 @@ class Update_150 {
 		$task_details = $task_provider->get_task_details( $target_data );
 
 		// Add status to the task details.
-		$task_details['status'] = $task['status'];
+		$task_details['post_status'] = $task['status'];
 
 		// Usually repeating tasks have a date.
 		if ( isset( $task['date'] ) ) {
