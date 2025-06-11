@@ -9,9 +9,6 @@ namespace Progress_Planner\WP_CLI;
 
 use WP_CLI, WP_CLI_Command;
 
-use Progress_Planner\Base;
-use Progress_Planner\Admin\Widgets\Activity_Scores;
-
 if ( ! class_exists( 'WP_CLI_Command' ) ) {
 	return;
 }
@@ -251,5 +248,76 @@ class Task_Command extends \WP_CLI_Command {
 	private function delete_task( $task_id, $force ) {
 		\progress_planner()->get_suggested_tasks()->delete_task( $task_id );
 		return true;
+	}
+
+	/**
+	 * Create a task.
+	 *
+	 * ## OPTIONS
+	 *
+	 * [--task_id=<task_id>]
+	 * : The ID of the task. If not provided, one will be generated.
+	 *
+	 * [--title=<title>]
+	 * : The title of the task. Default: "Test task {timestamp}"
+	 *
+	 * [--description=<description>]
+	 * : The description of the task. Default: "Test description {timestamp}"
+	 *
+	 * [--points=<points>]
+	 * : The points value for the task. Default: 1
+	 *
+	 * [--provider_id=<provider_id>]
+	 * : The provider ID. Default: "collaborator"
+	 *
+	 * [--category=<category>]
+	 * : The task category. Default: "collaborator"
+	 *
+	 * [--status=<status>]
+	 * : The task status. Default: "pending"
+	 *
+	 * ## EXAMPLES
+	 *
+	 *     # Create a task with default values
+	 *     $ wp prpl task create
+	 *
+	 *     # Create a task with custom values
+	 *     $ wp prpl task create --title="My Task" --description="Task description" --points=5
+	 *
+	 * @param array $args Command arguments.
+	 * @param array $assoc_args Command associative arguments.
+	 *
+	 * @return void
+	 */
+	public function create( $args, $assoc_args ) {
+		$timestamp = time();
+
+		$task_id     = isset( $assoc_args['task_id'] ) ? $assoc_args['task_id'] : 'test-task-' . $timestamp;
+		$title       = isset( $assoc_args['title'] ) ? $assoc_args['title'] : 'Test task ' . $timestamp;
+		$description = isset( $assoc_args['description'] ) ? $assoc_args['description'] : 'Test description ' . $timestamp;
+		$points      = isset( $assoc_args['points'] ) ? (int) $assoc_args['points'] : 1;
+		$provider_id = isset( $assoc_args['provider_id'] ) ? $assoc_args['provider_id'] : 'collaborator';
+		$category    = isset( $assoc_args['category'] ) ? $assoc_args['category'] : 'collaborator';
+		$status      = isset( $assoc_args['status'] ) ? $assoc_args['status'] : 'pending';
+
+		// Get the user tasks from the database.
+		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
+
+		// We're creating a new task.
+		$tasks[] = [
+			'task_id'     => $task_id,
+			'title'       => $title,
+			'description' => $description,
+			'points'      => $points,
+			'provider_id' => $provider_id,
+			'category'    => $category,
+			'status'      => $status,
+			'dismissable' => true,
+			'snoozable'   => true,
+		];
+
+		\progress_planner()->get_settings()->set( 'tasks', $tasks );
+
+		\WP_CLI::success( "Task {$task_id} created." ); // @phpstan-ignore-line
 	}
 }
