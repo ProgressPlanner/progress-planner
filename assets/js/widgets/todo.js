@@ -86,6 +86,9 @@ const prplTodoWidget = {
 			.addEventListener( 'submit', ( event ) => {
 				event.preventDefault();
 
+				// Add the loader.
+				prplTodoWidget.addLoader();
+
 				// Create a new post
 				const post = new wp.api.models.Prpl_recommendations( {
 					// Set the post title.
@@ -136,6 +139,9 @@ const prplTodoWidget = {
 						} )
 					);
 
+					// Remove the loader.
+					prplTodoWidget.removeLoader();
+
 					// Resize the grid items.
 					window.dispatchEvent(
 						new CustomEvent( 'prpl/grid/resize' )
@@ -148,6 +154,22 @@ const prplTodoWidget = {
 				// Focus the new task input element.
 				document.getElementById( 'new-todo-content' ).focus();
 			} );
+	},
+
+	/**
+	 * Add the loader.
+	 */
+	addLoader: () => {
+		const loader = document.createElement( 'span' );
+		loader.className = 'prpl-loader';
+		document.getElementById( 'todo-list' ).appendChild( loader );
+	},
+
+	/**
+	 * Remove the loader.
+	 */
+	removeLoader: () => {
+		document.querySelector( '#todo-list .prpl-loader' )?.remove();
 	},
 };
 
