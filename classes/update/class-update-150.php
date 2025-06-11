@@ -79,6 +79,8 @@ class Update_150 {
 				'category'    => $task['category'],
 				'task_id'     => $task['task_id'],
 				'post_status' => 'pending' === $task['status'] ? 'publish' : $task['status'],
+				'dismissable' => true,
+				'snoozable'   => false,
 			];
 		} else {
 			// Migrate the legacy task data, if the key exists.
