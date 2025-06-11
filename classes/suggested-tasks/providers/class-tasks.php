@@ -509,8 +509,7 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return array
 	 */
 	public function get_task_details( $task_data = [] ) {
-
-		$task_details = [
+		return [
 			'task_id'      => $this->get_task_id( $task_data ),
 			'provider_id'  => $this->get_provider_id(),
 			'post_title'   => $this->get_title( $task_data ),
@@ -524,7 +523,5 @@ abstract class Tasks implements Tasks_Interface {
 			'dismissable'  => $this->is_dismissable(),
 			'snoozable'    => $this->is_snoozable(),
 		];
-
-		return $task_details;
 	}
 }
