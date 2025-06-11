@@ -251,23 +251,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 		// Transform the data to match the task data structure.
 		$data = $this->transform_collector_data( $data );
 
-		$task_data = [
-			'task_id'          => $task_id,
-			'provider_id'      => $this->get_provider_id(),
-			'category'         => $this->get_provider_category(),
-			'target_term_id'   => $data['target_term_id'],
-			'target_taxonomy'  => $data['target_taxonomy'],
-			'target_term_name' => $data['target_term_name'],
-			'date'             => \gmdate( 'YW' ),
-			'post_title'       => $this->get_title_with_data( $data ),
-			'description'      => $this->get_description( $data ),
-			'url'              => $this->get_url( $data ),
-			'url_target'       => $this->get_url_target(),
-			'dismissable'      => $this->is_dismissable(),
-			'snoozable'        => $this->is_snoozable,
-			'points'           => $this->get_points(),
-		];
-
+		$task_data = $this->get_task_details( $data );
 		$task_data = $this->modify_injection_task_data( $task_data );
 
 		// Get the task post.
@@ -279,6 +263,26 @@ class Remove_Terms_Without_Posts extends Tasks {
 		}
 
 		return [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
+	}
+
+	/**
+	 * Modify task data before injecting it.
+	 *
+	 * @param array $task_data The task data.
+	 *
+	 * @return array
+	 */
+	protected function modify_injection_task_data( $task_data ) {
+		$data = $this->get_data_collector()->collect();
+
+		// Transform the data to match the task data structure.
+		$data = $this->transform_collector_data( $data );
+
+		$task_data['target_term_id']   = $data['target_term_id'];
+		$task_data['target_taxonomy']  = $data['target_taxonomy'];
+		$task_data['target_term_name'] = $data['target_term_name'];
+
+		return $task_data;
 	}
 
 	/**

@@ -105,7 +105,7 @@ class Content_Create extends Tasks {
 		}
 
 		// Add the post ID to the task data.
-		$task_data['post_id'] = $last_published_post_data['post_id'];
+		$task_data['target_post_id'] = $last_published_post_data['post_id'];
 
 		return $task_data;
 	}

@@ -191,25 +191,31 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		// Transform the data to match the task data structure.
 		$data = $this->transform_collector_data( $data );
 
-		$task_data = [
-			'task_id'        => $task_id,
-			'provider_id'    => $this->get_provider_id(),
-			'category'       => $this->get_provider_category(),
-			'target_post_id' => $data['target_post_id'],
-			'post_title'     => $this->get_title_with_data( $data ),
-			'url'            => $this->get_url( $data ),
-			'url_target'     => $this->get_url_target(),
-			'dismissable'    => $this->is_dismissable(),
-			'snoozable'      => $this->is_snoozable,
-			'points'         => $this->get_points(),
-		];
-
+		$task_data = $this->get_task_details( $data );
 		$task_data = $this->modify_injection_task_data( $task_data );
 
 		// Get the task post.
 		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
 
 		return $task_post ? [] : [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
+	}
+
+	/**
+	 * Modify task data before injecting it.
+	 *
+	 * @param array $task_data The task data.
+	 *
+	 * @return array
+	 */
+	protected function modify_injection_task_data( $task_data ) {
+		$data = $this->get_data_collector()->collect();
+
+		// Transform the data to match the task data structure.
+		$data = $this->transform_collector_data( $data );
+
+		$task_data['target_post_id'] = $data['target_post_id'];
+
+		return $task_data;
 	}
 
 	/**

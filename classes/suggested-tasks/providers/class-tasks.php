@@ -256,6 +256,7 @@ abstract class Tasks implements Tasks_Interface {
 	public function get_task_id( $task_data = [] ) {
 		$parts = [ $this->get_provider_id() ];
 
+		// Order is important here, new parameters should be added at the end.
 		if ( isset( $task_data['target_post_id'] ) ) {
 			$parts[] = $task_data['target_post_id'];
 		}
@@ -462,21 +463,7 @@ abstract class Tasks implements Tasks_Interface {
 			return [];
 		}
 
-		$task_data = [
-			'task_id'      => $task_id,
-			'provider_id'  => $this->get_provider_id(),
-			'category'     => $this->get_provider_category(),
-			'date'         => \gmdate( 'YW' ),
-			'post_title'   => $this->get_title_with_data(),
-			'description'  => $this->get_description(),
-			'url'          => $this->get_url(),
-			'url_target'   => $this->get_url_target(),
-			'link_setting' => $this->get_link_setting(),
-			'dismissable'  => $this->is_dismissable(),
-			'snoozable'    => $this->is_snoozable(),
-			'points'       => $this->get_points(),
-		];
-
+		$task_data = $this->get_task_details();
 		$task_data = $this->modify_injection_task_data( $task_data );
 
 		// Get the task post.
@@ -526,7 +513,9 @@ abstract class Tasks implements Tasks_Interface {
 			'priority'     => $this->get_priority(),
 			'category'     => $this->get_provider_category(),
 			'points'       => $this->get_points(),
+			'date'         => \gmdate( 'YW' ),
 			'url'          => $this->get_url( $task_data ),
+			'url_target'   => $this->get_url_target(),
 			'description'  => $this->get_description( $task_data ),
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
