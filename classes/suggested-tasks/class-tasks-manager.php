@@ -269,7 +269,7 @@ class Tasks_Manager {
 
 		foreach ( $tasks as $task ) {
 			// Skip user tasks.
-			if ( 'user' === $task->provider_id ) {
+			if ( 'user' === $task->get_provider_id() ) {
 				continue;
 			}
 
