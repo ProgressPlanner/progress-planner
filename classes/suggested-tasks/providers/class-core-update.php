@@ -116,6 +116,7 @@ class Core_Update extends Tasks {
 
 		return $update_actions;
 	}
+
 	/**
 	 * Check if the task should be added.
 	 *
