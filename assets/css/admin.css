@@ -482,6 +482,10 @@ button.prpl-info-icon {
 	gap: var(--prpl-padding);
 }
 
+/*------------------------------------*\
+	Loader.
+	See https://cssloaders.github.io/ for more.
+\*------------------------------------*/
 .prpl-loader {
 	width: 48px;
 	height: 48px;
