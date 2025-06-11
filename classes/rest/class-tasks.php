@@ -77,8 +77,14 @@ class Tasks {
 	 * @return \WP_REST_Response The REST response object containing the recommendations.
 	 */
 	public function get_tasks() {
-		return new \WP_REST_Response(
-			\progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] )
-		);
+
+		// Collection of task objects.
+		$tasks           = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
+		$tasks_to_return = [];
+
+		foreach ( $tasks as $task ) {
+			$tasks_to_return[] = $task->get_data();
+		}
+		return new \WP_REST_Response( $tasks_to_return );
 	}
 }
