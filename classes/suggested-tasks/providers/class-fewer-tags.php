@@ -91,10 +91,9 @@ class Fewer_Tags extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url() {
 		return \admin_url( '/plugin-install.php?tab=search&s=fewer+tags' );
 	}
 
@@ -110,10 +109,9 @@ class Fewer_Tags extends Tasks {
 	/**
 	 * Get the description.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description() {
 		return sprintf(
 			// translators: %1$s is the number of tags, %2$s is the number of published posts, %3$s <a href="https://prpl.fyi/install-fewer-tags" target="_blank">Read more</a> link.
 			\esc_html__( 'We detected that you have %1$s tags and %2$s published posts. Consider installing the "Fewer Tags" plugin. %3$s', 'progress-planner' ),

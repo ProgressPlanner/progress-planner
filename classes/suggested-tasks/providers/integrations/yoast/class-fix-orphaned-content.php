@@ -84,10 +84,9 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	/**
 	 * Get the description.
 	 *
-	 * @param array $task_data The task data.
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Yoast SEO detected that this article has no links pointing to it. %s.', 'progress-planner' ),
@@ -102,7 +101,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url_with_data( $task_data = [] ) {
 		$post = \get_post( $task_data['target_post_id'] );
 
 		return $post ? 'https://prpl.fyi/fix-orphaned-content' : '';

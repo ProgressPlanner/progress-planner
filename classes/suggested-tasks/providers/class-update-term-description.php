@@ -135,7 +135,7 @@ class Update_Term_Description extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description( $task_data = [] ) {
+	public function get_description_with_data( $task_data = [] ) {
 		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 
 		return $term && ! \is_wp_error( $term ) ? sprintf(
@@ -153,7 +153,7 @@ class Update_Term_Description extends Tasks {
 	 *
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url_with_data( $task_data = [] ) {
 		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return $term && ! \is_wp_error( $term )
 			? \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id )

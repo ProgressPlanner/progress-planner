@@ -139,10 +139,9 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task description.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description() {
 		return '';
 	}
 
@@ -194,10 +193,9 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url() {
 		return $this->url ? \esc_url( $this->url ) : '';
 	}
 
@@ -299,6 +297,26 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	protected function get_title_with_data( $task_data = [] ) {
 		return $this->get_title();
+	}
+
+	/**
+	 * Get the description with data.
+	 *
+	 * @param array $task_data Optional data to include in the task.
+	 * @return string
+	 */
+	protected function get_description_with_data( $task_data = [] ) {
+		return $this->get_description();
+	}
+
+	/**
+	 * Get the URL with data.
+	 *
+	 * @param array $task_data Optional data to include in the task.
+	 * @return string
+	 */
+	protected function get_url_with_data( $task_data = [] ) {
+		return $this->get_url();
 	}
 
 	/**
@@ -509,14 +527,14 @@ abstract class Tasks implements Tasks_Interface {
 			'task_id'      => $this->get_task_id( $task_data ),
 			'provider_id'  => $this->get_provider_id(),
 			'post_title'   => $this->get_title_with_data( $task_data ),
+			'description'  => $this->get_description_with_data( $task_data ),
 			'parent'       => $this->get_parent(),
 			'priority'     => $this->get_priority(),
 			'category'     => $this->get_provider_category(),
 			'points'       => $this->get_points(),
 			'date'         => \gmdate( 'YW' ),
-			'url'          => $this->get_url( $task_data ),
+			'url'          => $this->get_url_with_data( $task_data ),
 			'url_target'   => $this->get_url_target(),
-			'description'  => $this->get_description( $task_data ),
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
 			'snoozable'    => $this->is_snoozable(),

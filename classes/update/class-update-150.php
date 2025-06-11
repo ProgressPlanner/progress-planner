@@ -63,11 +63,13 @@ class Update_150 {
 
 		$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task['provider_id'] );
 
+		// Skip tasks which don't have a task provider.
 		if ( ! $task_provider ) {
 			return;
 		}
 
-		// Migrate the task data, if the key exists.
+		// Migrate the legacy task data, if the key exists.
+		// To avoid conflicts and confusion we have added 'target_' prefix to the keys.
 		$keys_to_migrate = [
 			'post_id',
 			'post_title',
@@ -86,7 +88,7 @@ class Update_150 {
 			}
 		}
 
-		// Get the task details from the task provider, title, description, url, points, etc.
+		// Now when we have target data - get the task details from the task provider, title, description, url, points, etc.
 		$task_details = $task_provider->get_task_details( $target_data );
 
 		// Add status to the task details.
@@ -95,6 +97,9 @@ class Update_150 {
 		// Usually repeating tasks have a date.
 		if ( isset( $task['date'] ) ) {
 			$task_details['date'] = $task['date'];
+		} else {
+			// If not remove it, since get_task_details() method adds a date with \gmdate( 'YW' ) (which will be the date of the migration).
+			unset( $task_details['date'] );
 		}
 
 		// Snoozed tasks have a time.
@@ -102,7 +107,7 @@ class Update_150 {
 			$task_details['time'] = $task['time'];
 		}
 
-		// Add target data to the task details.
+		// Add target data to the task details, we need them in the details as well.
 		$task_details = array_merge( $task_details, $target_data );
 
 		// Add the task to the database.

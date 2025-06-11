@@ -36,10 +36,9 @@ class Organization_Logo extends Yoast_Provider {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url() {
 		return \admin_url( 'admin.php?page=wpseo_page_settings#/site-representation' );
 	}
 
@@ -57,10 +56,9 @@ class Organization_Logo extends Yoast_Provider {
 	/**
 	 * Get the description.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description() {
 		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
 			? sprintf(
 				/* translators: %s: "Read more" link. */
