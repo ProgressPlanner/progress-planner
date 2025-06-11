@@ -22,10 +22,9 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url() {
 		return \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_emoji_scripts' );
 	}
 
@@ -41,10 +40,9 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	/**
 	 * Get the task description.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Remove JavaScript used for converting emoji characters in older browsers. %s.', 'progress-planner' ),

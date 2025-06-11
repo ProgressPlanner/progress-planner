@@ -45,10 +45,9 @@ class Hello_World extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url() {
 		$hello_world_post_id = $this->get_data_collector()->collect();
 
 		if ( 0 === $hello_world_post_id ) {
@@ -80,10 +79,9 @@ class Hello_World extends Tasks {
 	/**
 	 * Get the description.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">Hello World!</a> link */
 			\esc_html__( 'On install, WordPress creates a %s post. This post is not needed and should be deleted.', 'progress-planner' ),

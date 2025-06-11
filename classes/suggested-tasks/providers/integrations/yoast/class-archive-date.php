@@ -22,10 +22,9 @@ class Archive_Date extends Yoast_Provider {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url() {
 		return \admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' );
 	}
 
@@ -41,10 +40,9 @@ class Archive_Date extends Yoast_Provider {
 	/**
 	 * Get the description.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Yoast SEO can disable the date archive, which is really only useful for news sites and blogs. %s.', 'progress-planner' ),

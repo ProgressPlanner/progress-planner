@@ -125,7 +125,7 @@ class Content_Review extends Tasks {
 	 *
 	 * @return string
 	 */
-	protected function get_title( $task_data = [] ) {
+	protected function get_title_with_data( $task_data = [] ) {
 		if ( ! isset( $task_data['target_post_id'] ) ) {
 			return '';
 		}
@@ -151,7 +151,7 @@ class Content_Review extends Tasks {
 	 *
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description_with_data( $task_data = [] ) {
 		if ( ! isset( $task_data['target_post_id'] ) ) {
 			return '';
 		}
@@ -180,7 +180,7 @@ class Content_Review extends Tasks {
 	 *
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url_with_data( $task_data = [] ) {
 		if ( ! isset( $task_data['target_post_id'] ) ) {
 			return '';
 		}
@@ -327,9 +327,9 @@ class Content_Review extends Tasks {
 					'target_post_id'   => $task_data['target_post_id'],
 					'target_post_type' => $task_data['target_post_type'],
 					'date'             => \gmdate( 'YW' ),
-					'post_title'       => $this->get_title( $task_data ),
-					'description'      => $this->get_description( $task_data ),
-					'url'              => $this->get_url( $task_data ),
+					'post_title'       => $this->get_title_with_data( $task_data ),
+					'description'      => $this->get_description_with_data( $task_data ),
+					'url'              => $this->get_url_with_data( $task_data ),
 					'url_target'       => $this->get_url_target(),
 					'dismissable'      => $this->is_dismissable(),
 					'snoozable'        => $this->is_snoozable,

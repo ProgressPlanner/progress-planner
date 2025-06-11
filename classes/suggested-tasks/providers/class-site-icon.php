@@ -41,10 +41,9 @@ class Site_Icon extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url() {
 		return \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() );
 	}
 
@@ -60,10 +59,9 @@ class Site_Icon extends Tasks {
 	/**
 	 * Get the task description.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/set-site-icon" target="_blank">site icon</a> link */
 			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),

@@ -139,10 +139,9 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task description.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description() {
 		return '';
 	}
 
@@ -194,10 +193,9 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url() {
 		return $this->url ? \esc_url( $this->url ) : '';
 	}
 
@@ -256,6 +254,7 @@ abstract class Tasks implements Tasks_Interface {
 	public function get_task_id( $task_data = [] ) {
 		$parts = [ $this->get_provider_id() ];
 
+		// Order is important here, new parameters should be added at the end.
 		if ( isset( $task_data['target_post_id'] ) ) {
 			$parts[] = $task_data['target_post_id'];
 		}
@@ -298,6 +297,26 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	protected function get_title_with_data( $task_data = [] ) {
 		return $this->get_title();
+	}
+
+	/**
+	 * Get the description with data.
+	 *
+	 * @param array $task_data Optional data to include in the task.
+	 * @return string
+	 */
+	protected function get_description_with_data( $task_data = [] ) {
+		return $this->get_description();
+	}
+
+	/**
+	 * Get the URL with data.
+	 *
+	 * @param array $task_data Optional data to include in the task.
+	 * @return string
+	 */
+	protected function get_url_with_data( $task_data = [] ) {
+		return $this->get_url();
 	}
 
 	/**
@@ -462,21 +481,7 @@ abstract class Tasks implements Tasks_Interface {
 			return [];
 		}
 
-		$task_data = [
-			'task_id'      => $task_id,
-			'provider_id'  => $this->get_provider_id(),
-			'category'     => $this->get_provider_category(),
-			'date'         => \gmdate( 'YW' ),
-			'post_title'   => $this->get_title_with_data(),
-			'description'  => $this->get_description(),
-			'url'          => $this->get_url(),
-			'url_target'   => $this->get_url_target(),
-			'link_setting' => $this->get_link_setting(),
-			'dismissable'  => $this->is_dismissable(),
-			'snoozable'    => $this->is_snoozable(),
-			'points'       => $this->get_points(),
-		];
-
+		$task_data = $this->get_task_details();
 		$task_data = $this->modify_injection_task_data( $task_data );
 
 		// Get the task post.
@@ -522,12 +527,14 @@ abstract class Tasks implements Tasks_Interface {
 			'task_id'      => $this->get_task_id( $task_data ),
 			'provider_id'  => $this->get_provider_id(),
 			'post_title'   => $this->get_title_with_data( $task_data ),
+			'description'  => $this->get_description_with_data( $task_data ),
 			'parent'       => $this->get_parent(),
 			'priority'     => $this->get_priority(),
 			'category'     => $this->get_provider_category(),
 			'points'       => $this->get_points(),
-			'url'          => $this->get_url( $task_data ),
-			'description'  => $this->get_description( $task_data ),
+			'date'         => \gmdate( 'YW' ),
+			'url'          => $this->get_url_with_data( $task_data ),
+			'url_target'   => $this->get_url_target(),
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
 			'snoozable'    => $this->is_snoozable(),

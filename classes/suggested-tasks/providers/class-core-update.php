@@ -50,10 +50,9 @@ class Core_Update extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url() {
 		return \admin_url( 'update-core.php' );
 	}
 
@@ -80,10 +79,9 @@ class Core_Update extends Tasks {
 	/**
 	 * Get the task description.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s:<a href="http://prpl.fyi/perform-all-updates" target="_blank">See why we recommend this</a> link */
 			\esc_html__( 'Regular updates improve security and performance. %s.', 'progress-planner' ),

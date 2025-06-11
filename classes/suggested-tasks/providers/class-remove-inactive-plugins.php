@@ -38,10 +38,9 @@ class Remove_Inactive_Plugins extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url() {
 		return \admin_url( 'plugins.php' );
 	}
 
@@ -57,10 +56,9 @@ class Remove_Inactive_Plugins extends Tasks {
 	/**
 	 * Get the description.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %1$s <a href="https://prpl.fyi/remove-inactive-plugins" target="_blank">removing any plugins</a> link */
 			\esc_html__( 'You have inactive plugins. Consider %1$s that are not activated to free up resources, and improve security.', 'progress-planner' ),

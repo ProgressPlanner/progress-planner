@@ -59,30 +59,27 @@ class Content_Create extends Tasks {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url() {
 		return 'https://prpl.fyi/valuable-content';
 	}
 
 	/**
 	 * Get the task title.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_title( $task_data = [] ) {
+	protected function get_title() {
 		return esc_html__( 'Create valuable content', 'progress-planner' );
 	}
 
 	/**
 	 * Get the task description.
 	 *
-	 * @param array $task_data Optional data to include in the task.
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Time to add more valuable content to your site! Check our blog for inspiration. %s.', 'progress-planner' ),
@@ -105,7 +102,7 @@ class Content_Create extends Tasks {
 		}
 
 		// Add the post ID to the task data.
-		$task_data['post_id'] = $last_published_post_data['post_id'];
+		$task_data['target_post_id'] = $last_published_post_data['post_id'];
 
 		return $task_data;
 	}
