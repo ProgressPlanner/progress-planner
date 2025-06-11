@@ -104,7 +104,8 @@ class Update_150 {
 
 		// Snoozed tasks have a time.
 		if ( isset( $task['time'] ) ) {
-			$task_details['time'] = $task['time'];
+			// Checking if task was snoozed forever (PHP_INT_MAX).
+			$task_details['time'] = is_float( $task['time'] ) ? strtotime( '+10 years' ) : $task['time'];
 		}
 
 		// Add target data to the task details, we need them in the details as well.
