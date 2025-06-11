@@ -48,7 +48,7 @@ class Search_Engine_Visibility extends Tasks {
 	}
 
 	/**
-	 * Get the title.
+	 * Get the task title.
 	 *
 	 * @return string
 	 */
@@ -57,7 +57,7 @@ class Search_Engine_Visibility extends Tasks {
 	}
 
 	/**
-	 * Get the description.
+	 * Get the task description.
 	 *
 	 * @return string
 	 */

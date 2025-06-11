@@ -73,9 +73,9 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'medium';
+	protected $priority = 50;
 
 	/**
 	 * Whether the task is dismissable.
@@ -166,10 +166,10 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task priority.
 	 *
-	 * @return string
+	 * @return int
 	 */
 	public function get_priority() {
-		return $this->priority;
+		return (int) $this->priority;
 	}
 
 	/**
@@ -213,7 +213,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return array
 	 */
-	protected function get_link_setting() {
+	public function get_link_setting() {
 		return $this->link_setting;
 	}
 
@@ -248,23 +248,29 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task ID.
 	 *
-	 * @param array $data Optional data to include in the task ID.
+	 * @param array $task_data Optional data to include in the task ID.
 	 * @return string
 	 */
-	public function get_task_id( $data = [] ) {
-		if ( ! $this->is_repetitive() ) {
-			return $this->get_provider_id();
-		}
-
+	public function get_task_id( $task_data = [] ) {
 		$parts = [ $this->get_provider_id() ];
 
-		// Add optional data parts if provided.
-		if ( ! empty( $data['post_id'] ) ) {
-			$parts[] = $data['post_id'];
+		// Order is important here, new parameters should be added at the end.
+		if ( isset( $task_data['target_post_id'] ) ) {
+			$parts[] = $task_data['target_post_id'];
 		}
 
-		// Always add the date as the last part.
-		$parts[] = \gmdate( 'YW' );
+		if ( isset( $task_data['target_term_id'] ) ) {
+			$parts[] = $task_data['target_term_id'];
+		}
+
+		if ( isset( $task_data['target_taxonomy'] ) ) {
+			$parts[] = $task_data['target_taxonomy'];
+		}
+
+		// If the task is repetitive, add the date as the last part.
+		if ( $this->is_repetitive() ) {
+			$parts[] = \gmdate( 'YW' );
+		}
 
 		return implode( '-', $parts );
 	}
@@ -281,6 +287,36 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		return $this->data_collector; // @phpstan-ignore-line return.type
+	}
+
+	/**
+	 * Get the title with data.
+	 *
+	 * @param array $task_data Optional data to include in the task.
+	 * @return string
+	 */
+	protected function get_title_with_data( $task_data = [] ) {
+		return $this->get_title();
+	}
+
+	/**
+	 * Get the description with data.
+	 *
+	 * @param array $task_data Optional data to include in the task.
+	 * @return string
+	 */
+	protected function get_description_with_data( $task_data = [] ) {
+		return $this->get_description();
+	}
+
+	/**
+	 * Get the URL with data.
+	 *
+	 * @param array $task_data Optional data to include in the task.
+	 * @return string
+	 */
+	protected function get_url_with_data( $task_data = [] ) {
+		return $this->get_url();
 	}
 
 	/**
@@ -445,21 +481,7 @@ abstract class Tasks implements Tasks_Interface {
 			return [];
 		}
 
-		$task_data = [
-			'task_id'      => $task_id,
-			'provider_id'  => $this->get_provider_id(),
-			'category'     => $this->get_provider_category(),
-			'date'         => \gmdate( 'YW' ),
-			'post_title'   => $this->get_title(),
-			'description'  => $this->get_description(),
-			'url'          => $this->get_url(),
-			'url_target'   => $this->get_url_target(),
-			'link_setting' => $this->get_link_setting(),
-			'dismissable'  => $this->is_dismissable(),
-			'snoozable'    => $this->is_snoozable(),
-			'points'       => $this->get_points(),
-		];
-
+		$task_data = $this->get_task_details();
 		$task_data = $this->modify_injection_task_data( $task_data );
 
 		// Get the task post.
@@ -496,21 +518,23 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task details.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id = '' ) {
+	public function get_task_details( $task_data = [] ) {
 		return [
-			'task_id'      => $this->get_task_id(),
+			'task_id'      => $this->get_task_id( $task_data ),
 			'provider_id'  => $this->get_provider_id(),
-			'post_title'   => $this->get_title(),
+			'post_title'   => $this->get_title_with_data( $task_data ),
+			'description'  => $this->get_description_with_data( $task_data ),
 			'parent'       => $this->get_parent(),
 			'priority'     => $this->get_priority(),
 			'category'     => $this->get_provider_category(),
 			'points'       => $this->get_points(),
-			'url'          => $this->capability_required() ? \esc_url( $this->get_url() ) : '',
-			'description'  => $this->get_description(),
+			'date'         => \gmdate( 'YW' ),
+			'url'          => $this->get_url_with_data( $task_data ),
+			'url_target'   => $this->get_url_target(),
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
 			'snoozable'    => $this->is_snoozable(),

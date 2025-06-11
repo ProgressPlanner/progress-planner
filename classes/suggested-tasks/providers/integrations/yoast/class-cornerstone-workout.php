@@ -33,9 +33,9 @@ class Cornerstone_Workout extends Yoast_Provider {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'low';
+	protected $priority = 90;
 
 	/**
 	 * Whether the task is dismissable.
@@ -110,22 +110,18 @@ class Cornerstone_Workout extends Yoast_Provider {
 	/**
 	 * Get the task title.
 	 *
-	 * @param array $task_data The task data.
-	 *
 	 * @return string
 	 */
-	protected function get_title( $task_data = [] ) {
+	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: do Yoast SEO\'s Cornerstone Content Workout', 'progress-planner' );
 	}
 
 	/**
 	 * Get the task description.
 	 *
-	 * @param array $task_data The task data.
-	 *
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Improve your most important pages with Yoast SEO\'s Cornerstone Content Workout. %s.', 'progress-planner' ),
@@ -136,11 +132,9 @@ class Cornerstone_Workout extends Yoast_Provider {
 	/**
 	 * Get the task URL.
 	 *
-	 * @param array $task_data The task data.
-	 *
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url() {
 		return \esc_url( admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) );
 	}
 
@@ -159,33 +153,5 @@ class Cornerstone_Workout extends Yoast_Provider {
 		];
 
 		return ! $this->is_task_dismissed( $task_data );
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-		if ( ! $task_id ) {
-			return [];
-		}
-
-		return [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'post_title'  => $this->get_title(),
-			'parent'      => $this->get_parent(),
-			'priority'    => $this->get_priority(),
-			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(),
-			'dismissable' => $this->is_dismissable,
-			'snoozable'   => $this->is_snoozable,
-			'url'         => $this->get_url(),
-			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description(),
-		];
 	}
 }

@@ -51,9 +51,82 @@ class Update_150 {
 	 * @return void
 	 */
 	private function migrate_task( $task ) {
-		// Get the task details.
-		\progress_planner()->get_suggested_tasks_db()->add(
-			\Progress_Planner\Suggested_Tasks\Task_Factory::create_task_from_id( $task['task_id'] )->get_task_details() // TODO: get_task_details() has changed, migration needs to be re-checked.
-		);
+		// Skip tasks which don't have a provider ID or status.
+		if ( ! isset( $task['status'] ) || ! isset( $task['provider_id'] ) ) {
+			return;
+		}
+
+		// Skip suggested tasks which are not completed or snoozed (but all user tasks are migrated).
+		if ( 'snoozed' !== $task['status'] && 'completed' !== $task['status'] && 'user' !== $task['provider_id'] ) {
+			return;
+		}
+
+		$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task['provider_id'] );
+
+		// Skip tasks which don't have a task provider.
+		if ( ! $task_provider ) {
+			return;
+		}
+
+		// Now when we have target data - get the task details from the task provider, title, description, url, points, etc.
+		if ( 'user' === $task['provider_id'] ) {
+			// User tasks have different data structure, so we can copy directly.
+			$task_details = [
+				'post_title'  => $task['title'],
+				'description' => '',
+				'points'      => $task['points'],
+				'provider_id' => 'user',
+				'category'    => 'user',
+				'task_id'     => $task['task_id'],
+				'post_status' => 'pending' === $task['status'] ? 'publish' : $task['status'],
+				'dismissable' => true,
+				'snoozable'   => false,
+			];
+		} else {
+			// Migrate the legacy task data, if the key exists.
+			// To avoid conflicts and confusion we have added 'target_' prefix to the keys.
+			$keys_to_migrate = [
+				'post_id',
+				'post_title',
+				'post_type',
+				'term_id',
+				'taxonomy',
+				'term_name',
+			];
+
+			// Data which is used to build task title, description, url.
+			$target_data = [];
+
+			foreach ( $keys_to_migrate as $key ) {
+				if ( isset( $task[ $key ] ) ) {
+					$target_data[ 'target_' . $key ] = $task[ $key ];
+				}
+			}
+
+			$task_details = $task_provider->get_task_details( $target_data );
+
+			// Usually repeating tasks have a date.
+			if ( isset( $task['date'] ) ) {
+				$task_details['date'] = $task['date'];
+			} else {
+				// If not remove it, since get_task_details() method adds a date with \gmdate( 'YW' ) (which will be the date of the migration).
+				unset( $task_details['date'] );
+			}
+
+			// Snoozed tasks have a time.
+			if ( isset( $task['time'] ) ) {
+				// Checking if task was snoozed forever (PHP_INT_MAX).
+				$task_details['time'] = is_float( $task['time'] ) ? strtotime( '+10 years' ) : $task['time'];
+			}
+
+			// Add target data to the task details, we need them in the details as well.
+			$task_details = array_merge( $task_details, $target_data );
+
+			// Add status to the task details.
+			$task_details['post_status'] = $task['status'];
+		}
+
+		// Add the task to the database.
+		\progress_planner()->get_suggested_tasks_db()->add( $task_details );
 	}
 }

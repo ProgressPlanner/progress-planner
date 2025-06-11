@@ -18,7 +18,7 @@ namespace Progress_Planner\Suggested_Tasks;
  * @property string $task_id The task identifier
  * @property string $provider_id The provider identifier
  * @property string $category The task category
- * @property string $priority The task priority
+ * @property int $priority The task priority (0-100, 0 being highest and 100 being lowest).
  * @property int $points The task points
  * @property bool $dismissable Whether the task is dismissable
  * @property string $url The task URL
@@ -163,18 +163,5 @@ class Task {
 	 */
 	public function __get( string $key ) {
 		return $this->data[ $key ] ?? null;
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @return array<string, mixed>
-	 */
-	public function get_task_details(): array {
-		$task_provider_id = $this->get_provider_id();
-		$task_id          = $this->get_task_id();
-
-		$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_provider_id );
-		return $task_provider ? $task_provider->get_task_details( $task_id ) : [];
 	}
 }

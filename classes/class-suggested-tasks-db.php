@@ -56,6 +56,10 @@ class Suggested_Tasks_DB {
 			return $posts[0]->ID;
 		}
 
+		if ( ! isset( $data['order'] ) && isset( $data['priority'] ) ) {
+			$data['order'] = $data['priority'];
+		}
+
 		$data['post_status'] = $data['post_status'] ?? 'publish';
 
 		$args = [

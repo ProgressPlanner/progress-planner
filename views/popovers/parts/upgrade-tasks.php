@@ -58,7 +58,7 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 			 * We need to add them manually.
 			 */
 			if ( ! $prpl_task ) {
-				$prpl_task_post_id = \progress_planner()->get_suggested_tasks_db()->add( $prpl_task_provider->get_task_details( $prpl_task_data['task_id'] ) );
+				$prpl_task_post_id = \progress_planner()->get_suggested_tasks_db()->add( $prpl_task_provider->get_task_details( $prpl_task_data ) );
 
 				// Something went wrong, skip this task.
 				if ( ! $prpl_task_post_id ) {

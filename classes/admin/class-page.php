@@ -218,15 +218,23 @@ class Page {
 			if ( 'configuration' !== $provider->get_provider_category() ) {
 				continue;
 			}
-			$details = $provider->get_task_details();
-			if ( ! isset( $details['link_setting']['hook'] ) ||
-				$hook !== $details['link_setting']['hook']
+
+			$link_setting = $provider->get_link_setting();
+			if ( ! isset( $link_setting['hook'] ) ||
+				$hook !== $link_setting['hook']
 			) {
 				continue;
 			}
-			$details['is_complete'] = $provider->is_task_completed();
-			$tasks_details[]        = $details;
-			$total_points          += $details['points'];
+
+			$details = [
+				'link_setting' => $link_setting,
+				'task_id'      => $provider->get_task_id(),
+				'points'       => $provider->get_points(),
+				'is_complete'  => $provider->is_task_completed(),
+			];
+
+			$tasks_details[] = $details;
+			$total_points   += $details['points'];
 			if ( $details['is_complete'] ) {
 				$completed_points += $details['points'];
 			}

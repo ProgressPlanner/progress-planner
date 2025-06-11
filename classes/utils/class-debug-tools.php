@@ -185,16 +185,11 @@ class Debug_Tools {
 		foreach ( $onboard_task_provider_ids as $task_provider_id ) {
 			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
 			if ( $task_provider ) { // @phpstan-ignore-line
-				$task_provider_details = $task_provider->get_task_details();
-				if ( empty( $task_provider_details ) ) {
-					continue;
-				}
-
 				$admin_bar->add_node(
 					[
 						'id'     => 'prpl-upgrading-task-' . $task_provider_id,
 						'parent' => 'prpl-upgrading-tasks',
-						'title'  => $task_provider_details['post_title'],
+						'title'  => $task_provider_id,
 					]
 				);
 			}

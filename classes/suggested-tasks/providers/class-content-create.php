@@ -102,7 +102,7 @@ class Content_Create extends Tasks {
 		}
 
 		// Add the post ID to the task data.
-		$task_data['post_id'] = $last_published_post_data['post_id'];
+		$task_data['target_post_id'] = $last_published_post_data['post_id'];
 
 		return $task_data;
 	}
@@ -123,35 +123,5 @@ class Content_Create extends Tasks {
 
 		// Add tasks if there are no posts published this week.
 		return \gmdate( 'YW' ) !== \gmdate( 'YW', strtotime( $last_published_post_data['post_date'] ) );
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-		if ( ! $task_id ) {
-			return [];
-		}
-
-		$task_details = [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'post_title'  => $this->get_title(),
-			'parent'      => $this->get_parent(),
-			'priority'    => $this->get_priority(),
-			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(),
-			'dismissable' => $this->is_dismissable(),
-			'snoozable'   => $this->is_snoozable,
-			'url'         => $this->get_url(),
-			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description(),
-		];
-
-		return $task_details;
 	}
 }

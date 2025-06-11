@@ -22,9 +22,9 @@ class Settings_Saved extends Tasks {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'high';
+	protected $priority = 1;
 
 	/**
 	 * Whether the task is an onboarding task.

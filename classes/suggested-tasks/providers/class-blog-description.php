@@ -27,7 +27,7 @@ class Blog_Description extends Tasks {
 	protected const PROVIDER_ID = 'core-blogdescription';
 
 	/**
-	 * Get the title.
+	 * Get the task title.
 	 *
 	 * @return string
 	 */
@@ -36,7 +36,7 @@ class Blog_Description extends Tasks {
 	}
 
 	/**
-	 * Get the description.
+	 * Get the task description.
 	 *
 	 * @return string
 	 */
@@ -49,7 +49,7 @@ class Blog_Description extends Tasks {
 	}
 
 	/**
-	 * Get the URL.
+	 * Get the task URL.
 	 *
 	 * @return string
 	 */

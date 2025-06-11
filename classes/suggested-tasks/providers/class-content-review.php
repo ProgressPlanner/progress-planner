@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Task_Factory;
 use Progress_Planner\Suggested_Tasks\Providers\Traits\Dismissable_Task;
 use Progress_Planner\Page_Types;
 
@@ -46,11 +45,18 @@ class Content_Review extends Tasks {
 	protected $is_repetitive = true;
 
 	/**
-	 * The task priority.
+	 * The task URL target.
 	 *
 	 * @var string
 	 */
-	protected $priority = 'high';
+	protected $url_target = '_blank';
+
+	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 30;
 
 	/**
 	 * Whether the task is dismissable.
@@ -119,7 +125,7 @@ class Content_Review extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_title( $task_data = [] ) {
+	protected function get_title_with_data( $task_data = [] ) {
 		if ( ! isset( $task_data['target_post_id'] ) ) {
 			return '';
 		}
@@ -145,7 +151,7 @@ class Content_Review extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description( $task_data = [] ) {
+	protected function get_description_with_data( $task_data = [] ) {
 		if ( ! isset( $task_data['target_post_id'] ) ) {
 			return '';
 		}
@@ -174,7 +180,7 @@ class Content_Review extends Tasks {
 	 *
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url_with_data( $task_data = [] ) {
 		if ( ! isset( $task_data['target_post_id'] ) ) {
 			return '';
 		}
@@ -321,10 +327,10 @@ class Content_Review extends Tasks {
 					'target_post_id'   => $task_data['target_post_id'],
 					'target_post_type' => $task_data['target_post_type'],
 					'date'             => \gmdate( 'YW' ),
-					'post_title'       => $this->get_title( $task_data ),
-					'description'      => $this->get_description( $task_data ),
-					'url'              => $this->get_url( $task_data ),
-					'url_target'       => '_blank',
+					'post_title'       => $this->get_title_with_data( $task_data ),
+					'description'      => $this->get_description_with_data( $task_data ),
+					'url'              => $this->get_url_with_data( $task_data ),
+					'url_target'       => $this->get_url_target(),
 					'dismissable'      => $this->is_dismissable(),
 					'snoozable'        => $this->is_snoozable,
 					'points'           => $this->get_points(),
@@ -344,41 +350,6 @@ class Content_Review extends Tasks {
 		}
 
 		return $added_tasks;
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-		if ( ! $task_id ) {
-			return [];
-		}
-
-		$task_data = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
-
-		// If the task data is empty, return an empty array.
-		if ( empty( $task_data ) ) {
-			return [];
-		}
-
-		return [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'post_title'  => $this->get_title( $task_data[0] ),
-			'parent'      => $this->get_parent(),
-			'priority'    => $this->get_priority(),
-			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(),
-			'dismissable' => $this->is_dismissable(),
-			'snoozable'   => $this->is_snoozable,
-			'url'         => $this->get_url( $task_data[0] ),
-			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description( $task_data[0] ),
-		];
 	}
 
 	/**
@@ -582,9 +553,15 @@ class Content_Review extends Tasks {
 	 * @return bool
 	 */
 	protected function is_specific_task_completed( $task_id ) {
-		$data = Task_Factory::create_task_from_id( $task_id )->get_data();
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
-		return isset( $data['target_post_id'] )
+		if ( ! $task ) {
+			return false;
+		}
+
+		$data = $task->get_data();
+
+		return $data && isset( $data['target_post_id'] )
 			&& (int) \get_post_modified_time( 'U', false, (int) $data['target_post_id'] ) > strtotime( '-12 months' );
 	}
 

@@ -268,6 +268,11 @@ class Tasks_Manager {
 		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
 
 		foreach ( $tasks as $task ) {
+			// Skip user tasks.
+			if ( 'user' === $task->get_provider_id() ) {
+				continue;
+			}
+
 			if ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) { // TODO: Finalize cleanup once refactor is done.
 				\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 			}

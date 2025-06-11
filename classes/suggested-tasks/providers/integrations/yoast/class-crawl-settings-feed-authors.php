@@ -45,7 +45,7 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the title.
+	 * Get the task title.
 	 *
 	 * @return string
 	 */
@@ -54,7 +54,7 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the description.
+	 * Get the task description.
 	 *
 	 * @return string
 	 */

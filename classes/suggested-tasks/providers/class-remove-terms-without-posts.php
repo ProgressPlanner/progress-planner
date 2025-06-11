@@ -51,11 +51,18 @@ class Remove_Terms_Without_Posts extends Tasks {
 	protected $is_dismissable = true;
 
 	/**
-	 * The task priority.
+	 * The task URL target.
 	 *
 	 * @var string
 	 */
-	protected $priority = 'medium';
+	protected $url_target = '_blank';
+
+	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 60;
 
 	/**
 	 * The minimum number of posts.
@@ -128,32 +135,13 @@ class Remove_Terms_Without_Posts extends Tasks {
 	}
 
 	/**
-	 * Get the task ID.
-	 *
-	 * @param array $data Optional data to include in the task ID.
-	 * @return string
-	 */
-	public function get_task_id( $data = [] ) {
-		$parts = [ $this->get_provider_id() ];
-
-		// Add optional data parts if provided.
-		if ( ! empty( $data ) ) {
-			foreach ( $data as $value ) {
-				$parts[] = $value;
-			}
-		}
-
-		return implode( '-', $parts );
-	}
-
-	/**
 	 * Get the title.
 	 *
 	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	protected function get_title( $task_data = [] ) {
+	protected function get_title_with_data( $task_data = [] ) {
 		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return ( $term && ! \is_wp_error( $term ) )
 			? \sprintf(
@@ -171,7 +159,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 *
 	 * @return string
 	 */
-	protected function get_description( $task_data = [] ) {
+	protected function get_description_with_data( $task_data = [] ) {
 		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return ( $term && ! \is_wp_error( $term ) )
 			? sprintf(
@@ -190,7 +178,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 *
 	 * @return string
 	 */
-	protected function get_url( $task_data = [] ) {
+	protected function get_url_with_data( $task_data = [] ) {
 		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return ( $term && ! \is_wp_error( $term ) )
 			? \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id )
@@ -263,23 +251,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 		// Transform the data to match the task data structure.
 		$data = $this->transform_collector_data( $data );
 
-		$task_data = [
-			'task_id'          => $task_id,
-			'provider_id'      => $this->get_provider_id(),
-			'category'         => $this->get_provider_category(),
-			'target_term_id'   => $data['target_term_id'],
-			'target_taxonomy'  => $data['target_taxonomy'],
-			'target_term_name' => $data['target_term_name'],
-			'date'             => \gmdate( 'YW' ),
-			'post_title'       => $this->get_title( $data ),
-			'description'      => $this->get_description( $data ),
-			'url'              => $this->get_url( $data ),
-			'url_target'       => '_blank',
-			'dismissable'      => $this->is_dismissable(),
-			'snoozable'        => $this->is_snoozable,
-			'points'           => $this->get_points(),
-		];
-
+		$task_data = $this->get_task_details( $data );
 		$task_data = $this->modify_injection_task_data( $task_data );
 
 		// Get the task post.
@@ -294,38 +266,23 @@ class Remove_Terms_Without_Posts extends Tasks {
 	}
 
 	/**
-	 * Get the task details.
+	 * Modify task data before injecting it.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id = '' ) {
-		if ( ! $task_id ) {
-			return [];
-		}
+	protected function modify_injection_task_data( $task_data ) {
+		$data = $this->get_data_collector()->collect();
 
-		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
+		// Transform the data to match the task data structure.
+		$data = $this->transform_collector_data( $data );
 
-		// If the task data is empty, return an empty array.
-		if ( empty( $tasks ) ) {
-			return [];
-		}
+		$task_data['target_term_id']   = $data['target_term_id'];
+		$task_data['target_taxonomy']  = $data['target_taxonomy'];
+		$task_data['target_term_name'] = $data['target_term_name'];
 
-		return [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'post_title'  => $this->get_title( $tasks[0]->get_data() ),
-			'parent'      => $this->get_parent(),
-			'priority'    => $this->get_priority(),
-			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(),
-			'dismissable' => $this->is_dismissable(),
-			'snoozable'   => $this->is_snoozable,
-			'url'         => $this->get_url( $tasks[0]->get_data() ),
-			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description( $tasks[0]->get_data() ),
-		];
+		return $task_data;
 	}
 
 	/**

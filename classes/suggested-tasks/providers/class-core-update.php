@@ -43,9 +43,9 @@ class Core_Update extends Tasks {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'high';
+	protected $priority = 0;
 
 	/**
 	 * Get the task URL.
@@ -113,6 +113,7 @@ class Core_Update extends Tasks {
 
 		return $update_actions;
 	}
+
 	/**
 	 * Check if the task should be added.
 	 *
@@ -124,33 +125,5 @@ class Core_Update extends Tasks {
 			require_once ABSPATH . 'wp-admin/includes/update.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
 		return 0 < \wp_get_update_data()['counts']['total'];
-	}
-
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
-		if ( ! $task_id ) {
-			$task_id = $this->get_task_id();
-		}
-
-		return [
-			'task_id'     => $task_id,
-			'post_title'  => $this->get_title(),
-			'parent'      => $this->get_parent(),
-			'priority'    => $this->get_priority(),
-			'category'    => $this->get_provider_category(),
-			'provider_id' => $this->get_provider_id(),
-			'points'      => $this->get_points(),
-			'dismissable' => $this->is_dismissable(),
-			'snoozable'   => $this->is_snoozable,
-			'url'         => $this->get_url(),
-			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description(),
-		];
 	}
 }
