@@ -211,7 +211,6 @@ class Query {
 		return $ids;
 	}
 
-
 	/**
 	 * Insert an activity into the database.
 	 *

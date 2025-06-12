@@ -15,7 +15,6 @@ $prpl_widget = \progress_planner()->get_admin__widgets__suggested_tasks();
 $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 ?>
 
-
 <div class="prpl-dashboard-widget-suggested-tasks">
 	<h2 class="prpl-widget-title">
 		<?php \esc_html_e( 'Ravi\'s Recommendations', 'progress-planner' ); ?>

@@ -138,7 +138,6 @@ class Badges {
 		}
 	}
 
-
 	/**
 	 * Clear the progress of all badges.
 	 *
@@ -156,7 +155,6 @@ class Badges {
 			$badge->clear_progress();
 		}
 	}
-
 
 	/**
 	 * Get the latest completed badge.

@@ -302,7 +302,6 @@ class Content_Review extends Tasks {
 		return 0 < count( $this->task_post_mappings );
 	}
 
-
 	/**
 	 * Get an array of tasks to inject.
 	 *

@@ -35,7 +35,6 @@ class Archive_Format extends Yoast_Provider {
 	 */
 	protected const DATA_COLLECTOR_CLASS = Archive_Format_Data_Collector::class;
 
-
 	/**
 	 * Get the task URL.
 	 *

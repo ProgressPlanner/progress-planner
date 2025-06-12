@@ -12,7 +12,6 @@ namespace Progress_Planner\Tests;
  */
 class Content_Badges_Test extends \WP_UnitTestCase {
 
-
 	/**
 	 * Current month.
 	 *

@@ -15,7 +15,6 @@ use Progress_Planner\Badges\Monthly;
  */
 class Monthly_Badge_Test extends \WP_UnitTestCase {
 
-
 	/**
 	 * Current month.
 	 *
@@ -63,7 +62,6 @@ class Monthly_Badge_Test extends \WP_UnitTestCase {
 			}
 		}
 	}
-
 
 	/**
 	 * Test the monthly badge over 100 percent, we should top at 100 percent.
