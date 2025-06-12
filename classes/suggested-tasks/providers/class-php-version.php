@@ -27,6 +27,13 @@ class Php_Version extends Tasks {
 	protected const PROVIDER_ID = 'php-version';
 
 	/**
+	 * The minimum PHP version.
+	 *
+	 * @var string
+	 */
+	protected const RECOMMENDED_PHP_VERSION = '8.2';
+
+	/**
 	 * Get the title.
 	 *
 	 * @return string
@@ -43,10 +50,11 @@ class Php_Version extends Tasks {
 	 */
 	protected function get_description( $task_data = [] ) {
 		return sprintf(
-			/* translators: %1$s: php version, %2$s: <a href="https://prpl.fyi/update-php-version" target="_blank">We recommend</a> link */
-			\esc_html__( 'Your site is running on PHP version %1$s. %2$s updating to PHP version 8.0 or higher.', 'progress-planner' ),
+			/* translators: %1$s: php version, %2$s: <a href="https://prpl.fyi/update-php-version" target="_blank">We recommend</a> link. %3$s: minimum PHP version recommended. */
+			\esc_html__( 'Your site is running on PHP version %1$s. %2$s updating to PHP version %3$s or higher.', 'progress-planner' ),
 			phpversion(),
 			'<a href="https://prpl.fyi/update-php-version" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
+			\esc_html( self::RECOMMENDED_PHP_VERSION )
 		);
 	}
 
@@ -56,6 +64,6 @@ class Php_Version extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return version_compare( phpversion(), '8.0', '<' );
+		return version_compare( phpversion(), self::RECOMMENDED_PHP_VERSION, '<' );
 	}
 }
