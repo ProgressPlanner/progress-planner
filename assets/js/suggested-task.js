@@ -352,7 +352,7 @@ prplSuggestedTask = {
 			date_gmt: date,
 		} );
 		postModelToSave.save().then( ( postData ) => {
-			const taskCategorySlug = window.prplGetTermObject(
+			const taskCategorySlug = prplTerms.getTerm(
 				postData?.[ prplTerms.category ],
 				prplTerms.category
 			).slug;
