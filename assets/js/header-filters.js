@@ -1,7 +1,7 @@
 // Handle changes to the range dropdown.
 document
 	.getElementById( 'prpl-select-range' )
-	.addEventListener( 'change', function () {
+	.addEventListener( 'change', () => {
 		const range = this.value;
 		const url = new URL( window.location.href );
 		url.searchParams.set( 'range', range );
@@ -11,7 +11,7 @@ document
 // Handle changes to the frequency dropdown.
 document
 	.getElementById( 'prpl-select-frequency' )
-	.addEventListener( 'change', function () {
+	.addEventListener( 'change', () => {
 		const frequency = this.value;
 		const url = new URL( window.location.href );
 		url.searchParams.set( 'frequency', frequency );

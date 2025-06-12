@@ -13,20 +13,8 @@ const prplSuggestedTasksWidget = {
 	 * Remove the "Loading..." text and resize the grid items.
 	 */
 	removeLoadingItems: () => {
-		const el = document.querySelector( '.prpl-suggested-tasks-loading' );
-		if ( el ) {
-			el.remove();
-		}
+		document.querySelector( '.prpl-suggested-tasks-loading' )?.remove();
 		setTimeout( () => {
-			const items = document.querySelectorAll(
-				'.prpl-suggested-tasks-list .prpl-suggested-task'
-			);
-
-			if ( 0 === items.length ) {
-				document.querySelector(
-					'.prpl-no-suggested-tasks'
-				).style.display = 'block';
-			}
 			window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 		}, 2000 );
 	},

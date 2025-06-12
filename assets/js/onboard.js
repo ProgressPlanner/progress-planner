@@ -29,7 +29,7 @@ const progressPlannerSaveLicenseKey = ( licenseKey ) => {
  *
  * @param {Object} data The data to send with the request.
  */
-const progressPlannerAjaxAPIRequest = ( data ) => {
+const progressPlannerAjaxAPIRequest = ( data ) =>
 	progressPlannerAjaxRequest( {
 		url: progressPlanner.onboardAPIUrl,
 		data,
@@ -66,7 +66,6 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 		.catch( ( error ) => {
 			console.warn( error );
 		} );
-};
 
 /**
  * Make the AJAX request.
@@ -76,7 +75,7 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
  *
  * @param {Object} data The data to send with the request.
  */
-const progressPlannerOnboardCall = ( data ) => {
+const progressPlannerOnboardCall = ( data ) =>
 	progressPlannerAjaxRequest( {
 		url: progressPlanner.onboardNonceURL,
 		data,
@@ -89,13 +88,12 @@ const progressPlannerOnboardCall = ( data ) => {
 			progressPlannerAjaxAPIRequest( data );
 		}
 	} );
-};
 
 if ( document.getElementById( 'prpl-onboarding-form' ) ) {
 	document
 		.querySelectorAll( 'input[name="with-email"]' )
 		.forEach( ( input ) => {
-			input.addEventListener( 'change', function () {
+			input.addEventListener( 'change', () => {
 				if ( 'no' === this.value ) {
 					document
 						.getElementById( 'prpl-onboarding-form' )
@@ -127,7 +125,7 @@ if ( document.getElementById( 'prpl-onboarding-form' ) ) {
 
 	document
 		.querySelector( '#prpl-onboarding-form input[name="privacy-policy"]' )
-		.addEventListener( 'change', function () {
+		.addEventListener( 'change', () => {
 			const privacyPolicyAccepted = !! this.checked;
 
 			if ( privacyPolicyAccepted ) {
@@ -143,7 +141,7 @@ if ( document.getElementById( 'prpl-onboarding-form' ) ) {
 
 	document
 		.getElementById( 'prpl-onboarding-form' )
-		.addEventListener( 'submit', function ( event ) {
+		.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
 
 			const privacyPolicyAccepted = !! document.querySelector(

@@ -6,7 +6,7 @@
  *
  * Dependencies: progress-planner/document-ready, wp-util
  */
-const prplTogglePageSelectorSettingVisibility = function ( page, value ) {
+const prplTogglePageSelectorSettingVisibility = ( page, value ) => {
 	const itemRadiosWrapperEl = document.querySelector(
 		`.prpl-pages-item-${ page } .radios`
 	);
@@ -32,10 +32,10 @@ const prplTogglePageSelectorSettingVisibility = function ( page, value ) {
 	}
 };
 
-prplDocumentReady( function () {
+prplDocumentReady( () =>
 	document
 		.querySelectorAll( 'input[type="radio"][data-page]' )
-		.forEach( function ( radio ) {
+		.forEach( ( radio ) => {
 			const page = radio.getAttribute( 'data-page' ),
 				value = radio.value;
 
@@ -46,18 +46,18 @@ prplDocumentReady( function () {
 				}
 
 				// Add listeners for all radio buttons.
-				radio.addEventListener( 'change', function () {
+				radio.addEventListener( 'change', () => {
 					prplTogglePageSelectorSettingVisibility( page, value );
 				} );
 			}
-		} );
-} );
+		} )
+);
 
 /**
  * Handle the form submission.
  */
-prplDocumentReady( function () {
-	const prplFormSubmit = function ( event ) {
+prplDocumentReady( () => {
+	const prplFormSubmit = ( event ) => {
 		event.preventDefault();
 		const formData = new FormData(
 			document.getElementById( 'prpl-settings' )
@@ -65,7 +65,7 @@ prplDocumentReady( function () {
 		const data = {
 			action: 'prpl_settings_form',
 		};
-		formData.forEach( function ( value, key ) {
+		formData.forEach( ( value, key ) => {
 			// Handle array notation in keys
 			if ( key.endsWith( '[]' ) ) {
 				const baseKey = key.slice( 0, -2 );
@@ -78,12 +78,12 @@ prplDocumentReady( function () {
 			}
 		} );
 		const request = wp.ajax.post( 'prpl_settings_form', data );
-		request.done( function () {
+		request.done( () => {
 			window.location.reload();
 		} );
-		request.fail( function ( response ) {
-			alert( response.licensingError || response ); // eslint-disable-line no-alert
-		} );
+		request.fail(
+			( response ) => alert( response.licensingError || response ) // eslint-disable-line no-alert
+		);
 	};
 	document
 		.getElementById( 'prpl-settings-submit' )

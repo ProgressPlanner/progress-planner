@@ -8,7 +8,7 @@
  */
 
 // Handle the monthly badges scrolling.
-prplDocumentReady( () => {
+prplDocumentReady( () =>
 	// Initialize the badge scroller.
 	document
 		.querySelectorAll(
@@ -16,8 +16,9 @@ prplDocumentReady( () => {
 		)
 		.forEach( ( element ) => {
 			new BadgeScroller( element );
-		} );
-} );
+		} )
+);
+
 class BadgeScroller {
 	constructor( element ) {
 		this.element = element;

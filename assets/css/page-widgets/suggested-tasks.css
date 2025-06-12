@@ -96,6 +96,13 @@
 
 .prpl-dashboard-widget-suggested-tasks {
 
+	&:not(:has(.prpl-suggested-tasks-loading)):not(:has(.prpl-suggested-tasks-list li)) {
+
+		.prpl-no-suggested-tasks {
+			display: block;
+		}
+	}
+
 	&:has(.prpl-suggested-tasks-list li) {
 
 		.prpl-widget-title {
