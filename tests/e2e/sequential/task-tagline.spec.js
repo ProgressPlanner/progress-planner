@@ -104,7 +104,7 @@ function taglineTests( testContext = test ) {
 					( task ) => task.task_id === 'core-blogdescription'
 				);
 				expect( completedTask ).toBeDefined();
-				expect( completedTask.post_status ).toBe( 'publish' );
+				expect( completedTask.post_status ).toBe( 'trash' );
 			}
 		);
 	} );
