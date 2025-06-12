@@ -95,9 +95,7 @@ function todoCompleteTests( testContext = test ) {
 			const todoItemElement = page.locator(
 				`${ SELECTORS.TODO_LIST } ${ taskSelector }`
 			);
-			await todoItemElement
-				.locator( '.prpl-suggested-task-checkbox' )
-				.click();
+			await todoItemElement.locator( 'label' ).click();
 			await page.waitForTimeout( 1000 );
 
 			// Verify task is not in active list
@@ -147,9 +145,7 @@ function todoCompleteTests( testContext = test ) {
 				const todoItemElement = page.locator(
 					`${ SELECTORS.TODO_LIST } ${ taskSelector }`
 				);
-				await todoItemElement
-					.locator( '.prpl-suggested-task-checkbox' )
-					.click();
+				await todoItemElement.locator( 'label' ).click();
 				await page.waitForTimeout( 1500 );
 
 				// Verify task is not in active list
