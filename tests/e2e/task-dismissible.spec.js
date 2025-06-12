@@ -11,29 +11,26 @@ test.describe( 'PRPL Dismissable Tasks', () => {
 		await page.waitForLoadState( 'networkidle' );
 
 		// Check if complete button exists
-		const completeButton = page
-			.locator(
-				'button.prpl-suggested-task-button[data-action="complete"]'
-			)
-			.first();
 		const initialCount = await page
 			.locator(
-				'button.prpl-suggested-task-button[data-action="complete"]'
+				'#prpl-suggested-tasks-list .prpl-suggested-task-checkbox:not(:disabled)'
 			)
 			.count();
 
 		if ( initialCount > 0 ) {
+			const completeButton = page
+				.locator(
+					'#prpl-suggested-tasks-list .prpl-suggested-task-checkbox:not(:disabled)'
+				)
+				.first();
+
 			// Get the task ID from the button
-			const taskId = await completeButton.getAttribute( 'data-task-id' );
+			const taskId = await completeButton
+				.locator( 'xpath=ancestor::li[1]' ) // .closest("li"), but playwright doesn't support it
+				.getAttribute( 'data-task-id' );
 
-			// Hover over the task to show actions
-			const taskElement = page.locator(
-				`li[data-task-id="${ taskId }"]`
-			);
-			await taskElement.hover();
-
-			// Click the complete button
-			await completeButton.click();
+			// Click the on the parent of the checkbox (label, because it intercepts pointer events)
+			await completeButton.locator( '..' ).click(); // parent(), but playwright doesn't support it
 
 			// Wait for animation
 			await page.waitForTimeout( 3000 );
@@ -41,7 +38,7 @@ test.describe( 'PRPL Dismissable Tasks', () => {
 			// Verify the task count decreased by 1
 			const finalCount = await page
 				.locator(
-					'button.prpl-suggested-task-button[data-action="complete"]'
+					'#prpl-suggested-tasks-list .prpl-suggested-task-checkbox:not(:disabled)'
 				)
 				.count();
 			expect( finalCount ).toBe( initialCount - 1 );
@@ -59,7 +56,7 @@ test.describe( 'PRPL Dismissable Tasks', () => {
 				( task ) => task.task_id === taskId
 			);
 			expect( completedTask ).toBeDefined();
-			expect( completedTask.post_status ).toBe( 'completed' );
+			expect( completedTask.post_status ).toBe( 'trash' );
 		}
 	} );
 } );
