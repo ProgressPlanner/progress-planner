@@ -53,7 +53,7 @@ function todoTests( testContext = test ) {
 
 				while ( ( await completedTodoItems.count() ) > 0 ) {
 					const firstItem = page
-						.locator( SELECTORS.TODO_ITEM )
+						.locator( SELECTORS.TODO_COMPLETED_ITEM )
 						.nth( 0 );
 					await firstItem.hover();
 					await page.waitForTimeout( 500 );
