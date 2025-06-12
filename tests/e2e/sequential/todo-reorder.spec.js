@@ -36,7 +36,8 @@ function todoReorderTests( testContext = test ) {
 				await page.waitForTimeout( 500 );
 				await firstItem.waitFor( { state: 'visible' } );
 				await firstItem.locator( '.trash' ).click();
-				await page.waitForTimeout( 500 );
+				// await page.waitForTimeout( 1500 );
+				await firstItem.waitFor( { state: 'detached' } );
 			}
 
 			// Safely close context if it's still open
@@ -66,12 +67,12 @@ function todoReorderTests( testContext = test ) {
 			// Create second task
 			await page.fill( '#new-todo-content', SECOND_TASK_TEXT );
 			await page.keyboard.press( 'Enter' );
-			await page.waitForTimeout( 500 );
+			await page.waitForTimeout( 1500 );
 
 			// Create third task
 			await page.fill( '#new-todo-content', THIRD_TASK_TEXT );
 			await page.keyboard.press( 'Enter' );
-			await page.waitForTimeout( 500 );
+			await page.waitForTimeout( 1500 );
 
 			// Get all todo items
 			const todoItems = page.locator( SELECTORS.TODO_ITEM );
@@ -93,7 +94,7 @@ function todoReorderTests( testContext = test ) {
 			await items[ 1 ]
 				.locator( '.prpl-suggested-task-button.move-down' )
 				.click();
-			await page.waitForTimeout( 500 );
+			await page.waitForTimeout( 1500 );
 
 			// Verify new order
 			const reorderedItems = await todoItems.all();

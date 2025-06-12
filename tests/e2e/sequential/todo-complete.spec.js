@@ -35,7 +35,8 @@ function todoCompleteTests( testContext = test ) {
 				await page.waitForTimeout( 500 );
 				await firstItem.waitFor( { state: 'visible' } );
 				await firstItem.locator( '.trash' ).click();
-				await page.waitForTimeout( 500 );
+				// await page.waitForTimeout( 1500 );
+				await firstItem.waitFor( { state: 'detached' } );
 			}
 
 			// Clean up completed tasks if the section exists
@@ -57,7 +58,8 @@ function todoCompleteTests( testContext = test ) {
 					await page.waitForTimeout( 500 );
 					await firstItem.waitFor( { state: 'visible' } );
 					await firstItem.locator( '.trash' ).click();
-					await page.waitForTimeout( 500 );
+					// await page.waitForTimeout( 1500 );
+					await firstItem.waitFor( { state: 'detached' } );
 				}
 			}
 
@@ -82,7 +84,7 @@ function todoCompleteTests( testContext = test ) {
 
 			await page.fill( '#new-todo-content', TEST_TASK_TEXT );
 			await page.keyboard.press( 'Enter' );
-			await page.waitForTimeout( 500 );
+			await page.waitForTimeout( 1500 );
 
 			// Get the task selector
 			const todoItem = page.locator( SELECTORS.TODO_ITEM );
@@ -134,7 +136,7 @@ function todoCompleteTests( testContext = test ) {
 				// Create a new task
 				await page.fill( '#new-todo-content', TEST_TASK_TEXT );
 				await page.keyboard.press( 'Enter' );
-				await page.waitForTimeout( 500 );
+				await page.waitForTimeout( 1500 );
 
 				// Get the task selector
 				const todoItem = page.locator( SELECTORS.TODO_ITEM );
@@ -148,7 +150,7 @@ function todoCompleteTests( testContext = test ) {
 				await todoItemElement
 					.locator( '.prpl-suggested-task-checkbox' )
 					.click();
-				await page.waitForTimeout( 1000 );
+				await page.waitForTimeout( 1500 );
 
 				// Verify task is not in active list
 				await expect(
