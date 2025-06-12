@@ -30,13 +30,12 @@ function todoTests( testContext = test ) {
 			const activeTodoItems = page.locator( SELECTORS.TODO_ITEM );
 
 			while ( ( await activeTodoItems.count() ) > 0 ) {
-				const firstItem = activeTodoItems.first();
+				const firstItem = page.locator( SELECTORS.TODO_ITEM ).nth( 0 );
 				await firstItem.hover();
 				await page.waitForTimeout( 500 );
 				await firstItem.waitFor( { state: 'visible' } );
 				await firstItem.locator( '.trash' ).click();
-				// await page.waitForTimeout( 1500 );
-				await firstItem.waitFor( { state: 'detached' } );
+				await page.waitForTimeout( 1500 );
 			}
 
 			// Clean up completed tasks if the section exists
@@ -53,13 +52,14 @@ function todoTests( testContext = test ) {
 				);
 
 				while ( ( await completedTodoItems.count() ) > 0 ) {
-					const firstItem = completedTodoItems.first();
+					const firstItem = page
+						.locator( SELECTORS.TODO_ITEM )
+						.nth( 0 );
 					await firstItem.hover();
 					await page.waitForTimeout( 500 );
 					await firstItem.waitFor( { state: 'visible' } );
 					await firstItem.locator( '.trash' ).click();
-					// await page.waitForTimeout( 1500 );
-					await firstItem.waitFor( { state: 'detached' } );
+					await page.waitForTimeout( 1500 );
 				}
 			}
 
@@ -112,8 +112,7 @@ function todoTests( testContext = test ) {
 			await deleteItem.hover();
 			await deleteItem.waitFor( { state: 'visible' } );
 			await deleteItem.locator( '.trash' ).click();
-			// await page.waitForTimeout( 1500 );
-			await deleteItem.waitFor( { state: 'detached' } );
+			await page.waitForTimeout( 1500 );
 
 			// Verify the todo was deleted
 			const todoItem = page.locator( SELECTORS.TODO_ITEM );
