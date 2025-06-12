@@ -116,7 +116,7 @@ const prplOnboardRedirect = () => {
 };
 
 // Trigger the onboarding tasks popover if it is in the DOM.
-prplDocumentReady( () => {
+prplDocumentReady( function () {
 	const popover = document.getElementById( 'prpl-popover-upgrade-tasks' );
 	if ( popover ) {
 		popover.showPopover();

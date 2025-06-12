@@ -12,7 +12,7 @@ const settingsLicenseForm = document.getElementById(
 	'prpl-settings-license-form'
 );
 if ( !! settingsLicenseForm ) {
-	settingsLicenseForm.addEventListener( 'submit', ( event ) => {
+	settingsLicenseForm.addEventListener( 'submit', function ( event ) {
 		event.preventDefault();
 		const form = new FormData( this );
 		const data = {};

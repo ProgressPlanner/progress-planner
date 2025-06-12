@@ -51,18 +51,18 @@ const prplDriverObj = prplDriver( {
 	},
 } );
 
-const prplTourShowPopover = ( popover ) => {
+function prplTourShowPopover( popover ) {
 	popover.showPopover();
 	prplMakePopoverBackdropTransparent( popover );
-};
+}
 
-const prplTourHidePopover = ( popover ) => {
+function prplTourHidePopover( popover ) {
 	popover.hidePopover();
 	document.getElementById( popover.id + '-backdrop-transparency' ).remove();
-};
+}
 
 // Function to make the backdrop of a popover transparent.
-const prplMakePopoverBackdropTransparent = ( popover ) => {
+function prplMakePopoverBackdropTransparent( popover ) {
 	if ( popover ) {
 		const style = document.createElement( 'style' );
 		style.id = popover.id + '-backdrop-transparency';
@@ -73,20 +73,20 @@ const prplMakePopoverBackdropTransparent = ( popover ) => {
 			`;
 		document.head.appendChild( style );
 	}
-};
+}
 
 // eslint-disable-next-line no-unused-vars -- This is called on a few buttons.
-const prplStartTour = () => {
+function prplStartTour() {
 	const monthlyBadgesPopover = document.getElementById(
 		'prpl-popover-monthly-badges'
 	);
 	const progressPlannerTourSteps = progressPlannerTour.steps;
 
-	progressPlannerTourSteps[ 4 ].popover.onNextClick = () => {
+	progressPlannerTourSteps[ 4 ].popover.onNextClick = function () {
 		prplTourShowPopover( monthlyBadgesPopover );
 		prplDriverObj.moveNext();
 	};
-	progressPlannerTourSteps[ 5 ].popover.onNextClick = () => {
+	progressPlannerTourSteps[ 5 ].popover.onNextClick = function () {
 		prplTourHidePopover( monthlyBadgesPopover );
 		prplDriverObj.moveNext();
 	};
@@ -111,7 +111,7 @@ const prplStartTour = () => {
 			.replace( '&delay-tour=true', '' )
 			.replace( 'delay-tour=true', '' )
 	);
-};
+}
 
 // Start the tour if the URL contains the query parameter.
 if ( window.location.href.includes( 'content-scan-finished=true' ) ) {

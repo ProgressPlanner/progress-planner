@@ -6,7 +6,7 @@
  *
  * Dependencies: progress-planner/document-ready, wp-util
  */
-const prplTogglePageSelectorSettingVisibility = ( page, value ) => {
+const prplTogglePageSelectorSettingVisibility = function ( page, value ) {
 	const itemRadiosWrapperEl = document.querySelector(
 		`.prpl-pages-item-${ page } .radios`
 	);
@@ -32,10 +32,10 @@ const prplTogglePageSelectorSettingVisibility = ( page, value ) => {
 	}
 };
 
-prplDocumentReady( () =>
+prplDocumentReady( function () {
 	document
 		.querySelectorAll( 'input[type="radio"][data-page]' )
-		.forEach( ( radio ) => {
+		.forEach( function ( radio ) {
 			const page = radio.getAttribute( 'data-page' ),
 				value = radio.value;
 
@@ -46,18 +46,18 @@ prplDocumentReady( () =>
 				}
 
 				// Add listeners for all radio buttons.
-				radio.addEventListener( 'change', () => {
+				radio.addEventListener( 'change', function () {
 					prplTogglePageSelectorSettingVisibility( page, value );
 				} );
 			}
-		} )
-);
+		} );
+} );
 
 /**
  * Handle the form submission.
  */
-prplDocumentReady( () => {
-	const prplFormSubmit = ( event ) => {
+prplDocumentReady( function () {
+	const prplFormSubmit = function ( event ) {
 		event.preventDefault();
 		const formData = new FormData(
 			document.getElementById( 'prpl-settings' )
@@ -65,7 +65,7 @@ prplDocumentReady( () => {
 		const data = {
 			action: 'prpl_settings_form',
 		};
-		formData.forEach( ( value, key ) => {
+		formData.forEach( function ( value, key ) {
 			// Handle array notation in keys
 			if ( key.endsWith( '[]' ) ) {
 				const baseKey = key.slice( 0, -2 );
@@ -78,12 +78,12 @@ prplDocumentReady( () => {
 			}
 		} );
 		const request = wp.ajax.post( 'prpl_settings_form', data );
-		request.done( () => {
+		request.done( function () {
 			window.location.reload();
 		} );
-		request.fail(
-			( response ) => alert( response.licensingError || response ) // eslint-disable-line no-alert
-		);
+		request.fail( function ( response ) {
+			alert( response.licensingError || response ); // eslint-disable-line no-alert
+		} );
 	};
 	document
 		.getElementById( 'prpl-settings-submit' )

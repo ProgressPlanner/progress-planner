@@ -42,29 +42,32 @@ document.addEventListener( 'prpl/celebrateTasks', ( event ) => {
 			  }
 			: { x: 0.5, y: 0.3 }; // fallback if list not found
 
+		let confettiOptions = [
+			{
+				particleCount: 30,
+				scalar: 4,
+				shapes: [ 'image' ],
+				shapeOptions: {
+					image: [
+						{ src: prplCelebrate.raviIconUrl },
+						{ src: prplCelebrate.raviIconUrl },
+						{ src: prplCelebrate.raviIconUrl },
+						{ src: prplCelebrate.monthIconUrl },
+						{ src: prplCelebrate.contentIconUrl },
+						{ src: prplCelebrate.maintenanceIconUrl },
+					],
+				},
+			},
+		];
+
 		// Tripple check if the confetti options are an array and not undefined.
-		const confettiOptions =
+		if (
 			'undefined' !== typeof prplCelebrate.confettiOptions &&
 			true === Array.isArray( prplCelebrate.confettiOptions ) &&
 			prplCelebrate.confettiOptions.length
-				? prplCelebrate.confettiOptions
-				: [
-						{
-							particleCount: 30,
-							scalar: 4,
-							shapes: [ 'image' ],
-							shapeOptions: {
-								image: [
-									{ src: prplCelebrate.raviIconUrl },
-									{ src: prplCelebrate.raviIconUrl },
-									{ src: prplCelebrate.raviIconUrl },
-									{ src: prplCelebrate.monthIconUrl },
-									{ src: prplCelebrate.contentIconUrl },
-									{ src: prplCelebrate.maintenanceIconUrl },
-								],
-							},
-						},
-				  ];
+		) {
+			confettiOptions = prplCelebrate.confettiOptions;
+		}
 
 		for ( const value of confettiOptions ) {
 			// Set confetti options, we do it here so it's applied even if we pass the options from the PHP side (ie hearts confetti).

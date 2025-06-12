@@ -4,7 +4,7 @@
  *
  * @param {Function} fn The function to run when the document is ready.
  */
-const prplDocumentReady = ( fn ) => {
+const prplDocumentReady = function ( fn ) {
 	if ( document.readyState !== 'loading' ) {
 		fn();
 		return;
