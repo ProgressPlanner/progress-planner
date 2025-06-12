@@ -59,7 +59,7 @@ function taglineTests( testContext = test ) {
 					( task ) => task.task_id === 'core-blogdescription'
 				);
 				expect( updatedTask ).toBeDefined();
-				expect( updatedTask.status ).toBe( 'pending' );
+				expect( updatedTask.post_status ).toBe( 'pending' );
 
 				// Go to Progress Planner dashboard
 				await page.goto(
@@ -104,7 +104,7 @@ function taglineTests( testContext = test ) {
 					( task ) => task.task_id === 'core-blogdescription'
 				);
 				expect( completedTask ).toBeDefined();
-				expect( completedTask.status ).toBe( 'completed' );
+				expect( completedTask.post_status ).toBe( 'publish' );
 			}
 		);
 	} );

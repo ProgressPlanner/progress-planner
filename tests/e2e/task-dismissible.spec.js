@@ -59,7 +59,7 @@ test.describe( 'PRPL Dismissable Tasks', () => {
 				( task ) => task.task_id === taskId
 			);
 			expect( completedTask ).toBeDefined();
-			expect( completedTask.status ).toBe( 'completed' );
+			expect( completedTask.post_status ).toBe( 'completed' );
 		}
 	} );
 } );
