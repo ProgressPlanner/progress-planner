@@ -223,9 +223,18 @@ prplSuggestedTask = {
 				prplTerms.category
 			).slug;
 
+			const el = prplSuggestedTask.getTaskElement( postId );
+
 			// Dismissable tasks don't have pending status, it's either publish or trash.
 			const newStatus =
 				'publish' === postData.status ? 'trash' : 'publish';
+
+			// Disable the checkbox for RR tasks.
+			if ( 'user' !== taskProviderId && 'trash' === newStatus ) {
+				el.querySelector(
+					'.prpl-suggested-task-checkbox'
+				).setAttribute( 'disabled', 'disabled' );
+			}
 
 			post.set( 'status', newStatus )
 				.save()
@@ -234,13 +243,11 @@ prplSuggestedTask = {
 						postId,
 						'trash' === newStatus ? 'complete' : 'pending'
 					);
-					const el = prplSuggestedTask.getTaskElement( postId );
 					const eventPoints = parseInt( postData?.meta?.prpl_points );
 
 					// Task is trashed, check if we need to celebrate.
 					if ( 'trash' === newStatus ) {
 						el.setAttribute( 'data-task-action', 'celebrate' );
-
 						if ( 'user' === taskProviderId ) {
 							const delay = eventPoints ? 2000 : 0;
 
