@@ -249,20 +249,17 @@ class Remove_Terms_Without_Posts extends Tasks {
 		}
 
 		// Transform the data to match the task data structure.
-		$data = $this->transform_collector_data( $data );
-
-		$task_data = $this->get_task_details( $data );
-		$task_data = $this->modify_injection_task_data( $task_data );
+		$task_data = $this->modify_injection_task_data(
+			$this->get_task_details(
+				$this->transform_collector_data( $data )
+			)
+		);
 
 		// Get the task post.
 		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
 
 		// Skip the task if it was already injected.
-		if ( $task_post ) {
-			return [];
-		}
-
-		return [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
+		return $task_post ? [] : [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
 	}
 
 	/**
@@ -273,10 +270,8 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * @return array
 	 */
 	protected function modify_injection_task_data( $task_data ) {
-		$data = $this->get_data_collector()->collect();
-
 		// Transform the data to match the task data structure.
-		$data = $this->transform_collector_data( $data );
+		$data = $this->transform_collector_data( $this->get_data_collector()->collect() );
 
 		$task_data['target_term_id']   = $data['target_term_id'];
 		$task_data['target_taxonomy']  = $data['target_taxonomy'];

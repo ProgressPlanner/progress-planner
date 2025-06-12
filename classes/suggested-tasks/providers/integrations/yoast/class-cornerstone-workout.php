@@ -148,10 +148,10 @@ class Cornerstone_Workout extends Yoast_Provider {
 			return false;
 		}
 
-		$task_data = [
-			'provider_id' => $this->get_provider_id(),
-		];
-
-		return ! $this->is_task_dismissed( $task_data );
+		return ! $this->is_task_dismissed(
+			[
+				'provider_id' => $this->get_provider_id(),
+			]
+		);
 	}
 }

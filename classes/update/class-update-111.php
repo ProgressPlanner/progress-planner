@@ -371,11 +371,9 @@ class Update_111 {
 			]
 		);
 
-		if ( ! empty( $activity ) ) {
-			return $activity[0]->date->format( 'YW' );
-		}
-
-		return \gmdate( 'YW' );
+		return ( ! empty( $activity ) )
+			? $activity[0]->date->format( 'YW' )
+			: \gmdate( 'YW' );
 	}
 
 	/**

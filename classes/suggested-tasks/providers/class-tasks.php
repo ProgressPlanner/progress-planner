@@ -481,8 +481,7 @@ abstract class Tasks implements Tasks_Interface {
 			return [];
 		}
 
-		$task_data = $this->get_task_details();
-		$task_data = $this->modify_injection_task_data( $task_data );
+		$task_data = $this->modify_injection_task_data( $this->get_task_details() );
 
 		// Get the task post.
 		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );

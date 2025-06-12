@@ -80,7 +80,10 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	 * @return void
 	 */
 	public function maybe_update_workout_status( $old_value, $value, $option ) {
-		if ( 'wpseo_premium' !== $option || ! isset( $value['workouts']['orphaned'] ) || ! isset( $old_value['workouts']['orphaned'] ) ) {
+		if ( 'wpseo_premium' !== $option
+			|| ! isset( $value['workouts']['orphaned'] )
+			|| ! isset( $old_value['workouts']['orphaned'] )
+		) {
 			return;
 		}
 
@@ -148,10 +151,10 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 			return false;
 		}
 
-		$task_data = [
-			'provider_id' => $this->get_provider_id(),
-		];
-
-		return ! $this->is_task_dismissed( $task_data );
+		return ! $this->is_task_dismissed(
+			[
+				'provider_id' => $this->get_provider_id(),
+			]
+		);
 	}
 }

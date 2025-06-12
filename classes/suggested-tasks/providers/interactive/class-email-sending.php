@@ -119,8 +119,11 @@ class Email_Sending extends Interactive {
 		\add_action( 'init', [ $this, 'check_if_wp_mail_has_override' ], PHP_INT_MAX );
 
 		$this->email_subject = \esc_html__( 'Your Progress Planner test message!', 'progress-planner' );
-		// translators: %1$s <br><br> tags, %2$s the admin URL.
-		$this->email_content = sprintf( \esc_html__( 'You just used Progress Planner to verify if sending email works on your website. %1$s The good news; it does! Click here to %2$s.', 'progress-planner' ), '<br><br>', '<a href="' . \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) . '" target="_blank">' . \esc_html__( 'mark Ravi\'s Recommendation as completed', 'progress-planner' ) . '</a>', '<a href="' . \admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ) . '" target="_blank">' . \esc_html__( 'here', 'progress-planner' ) . '</a>' );
+		$this->email_content = sprintf(
+			// translators: %1$s the admin URL.
+			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_blank">Click here to mark Ravi\'s Recommendation as completed</a>.', 'progress-planner' ),
+			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() )
+		);
 	}
 
 	/**
@@ -154,11 +157,9 @@ class Email_Sending extends Interactive {
 			return;
 		}
 
-		$handle = 'progress-planner/web-components/prpl-task-' . $this->get_provider_id();
-
 		// Enqueue the web component.
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
-			$handle,
+			'progress-planner/web-components/prpl-task-' . $this->get_provider_id(),
 			[
 				'name' => 'prplEmailSending',
 				'data' => [
@@ -199,8 +200,7 @@ class Email_Sending extends Interactive {
 
 		// Just in case, since it will trigger PHP fatal error if the function doesn't exist.
 		if ( function_exists( 'wp_mail' ) ) {
-			$ref       = new \ReflectionFunction( 'wp_mail' );
-			$file_path = $ref->getFileName();
+			$file_path = ( new \ReflectionFunction( 'wp_mail' ) )->getFileName();
 
 			$this->is_wp_mail_overridden = $file_path && $file_path !== ABSPATH . 'wp-includes/pluggable.php';
 		}

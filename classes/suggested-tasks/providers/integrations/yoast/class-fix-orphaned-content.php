@@ -102,9 +102,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_url_with_data( $task_data = [] ) {
-		$post = \get_post( $task_data['target_post_id'] );
-
-		return $post ? 'https://prpl.fyi/fix-orphaned-content' : '';
+		return \get_post( $task_data['target_post_id'] ) ? 'https://prpl.fyi/fix-orphaned-content' : '';
 	}
 
 	/**
@@ -188,15 +186,15 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		}
 
 		// Transform the data to match the task data structure.
-		$data = $this->transform_collector_data( $data );
+		$task_data = $this->modify_injection_task_data(
+			$this->get_task_details(
+				$this->transform_collector_data( $data )
+			)
+		);
 
-		$task_data = $this->get_task_details( $data );
-		$task_data = $this->modify_injection_task_data( $task_data );
-
-		// Get the task post.
-		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
-
-		return $task_post ? [] : [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
+		return \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] )
+			? []
+			: [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
 	}
 
 	/**
@@ -207,13 +205,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return array
 	 */
 	protected function modify_injection_task_data( $task_data ) {
-		$data = $this->get_data_collector()->collect();
-
-		// Transform the data to match the task data structure.
-		$data = $this->transform_collector_data( $data );
-
-		$task_data['target_post_id'] = $data['target_post_id'];
-
+		$task_data['target_post_id'] = $this->transform_collector_data( $this->get_data_collector()->collect() )['target_post_id'];
 		return $task_data;
 	}
 

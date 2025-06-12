@@ -106,12 +106,16 @@ class Organization_Logo extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		// If the site is for a person, and the person logo is already set, we don't need to add the task.
-		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'company' && $this->yoast_seo->helpers->options->get( 'company_logo' ) ) {
+		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'company'
+			&& $this->yoast_seo->helpers->options->get( 'company_logo' )
+		) {
 			return false;
 		}
 
 		// If the site is for a person, and the organization logo is already set, we don't need to add the task.
-		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'person' && $this->yoast_seo->helpers->options->get( 'person_logo' ) ) {
+		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'person'
+			&& $this->yoast_seo->helpers->options->get( 'person_logo' )
+		) {
 			return false;
 		}
 
