@@ -353,17 +353,17 @@ class Suggested_Tasks {
 				$taxonomy,
 				[ 'prpl_recommendations' ],
 				[
-					'public'            => defined( 'PRPL_DEBUG' ) && PRPL_DEBUG,
+					'public'            => \progress_planner()->is_debug_mode_enabled(),
 					'hierarchical'      => false,
 					'labels'            => [
 						'name' => $label,
 					],
-					'show_ui'           => defined( 'PRPL_DEBUG' ) && PRPL_DEBUG,
+					'show_ui'           => \progress_planner()->is_debug_mode_enabled(),
 					'show_admin_column' => false,
 					'query_var'         => true,
 					'rewrite'           => [ 'slug' => $taxonomy ],
 					'show_in_rest'      => true,
-					'show_in_menu'      => defined( 'PRPL_DEBUG' ) && PRPL_DEBUG,
+					'show_in_menu'      => \progress_planner()->is_debug_mode_enabled(),
 				]
 			);
 		}

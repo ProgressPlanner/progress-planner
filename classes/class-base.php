@@ -132,7 +132,7 @@ class Base {
 		$this->get_suggested_tasks__data_collector__data_collector_manager();
 
 		// Debug tools.
-		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {
+		if ( $this->is_debug_mode_enabled() ) {
 			$this->get_utils__debug_tools();
 		}
 
@@ -485,6 +485,15 @@ class Base {
 	public function is_on_progress_planner_dashboard_page() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- We're not processing any data.
 		return \is_admin() && isset( $_GET['page'] ) && $_GET['page'] === 'progress-planner';
+	}
+
+	/**
+	 * Check whether debug mode is enabled.
+	 *
+	 * @return bool
+	 */
+	public function is_debug_mode_enabled() {
+		return ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo
