@@ -1,4 +1,3 @@
-const { expect } = require( '@playwright/test' );
 const SELECTORS = require( '../constants/selectors' );
 
 /**
@@ -81,6 +80,12 @@ async function cleanUpPlannerTasks( { page, context, baseUrl } ) {
 		}
 	} catch ( e ) {
 		console.warn( '[Cleanup] Unexpected failure:', e.message );
+	}
+
+	try {
+		await context.close();
+	} catch {
+		// context might already be closed
 	}
 }
 
