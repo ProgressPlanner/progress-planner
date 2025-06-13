@@ -1,77 +1,87 @@
-const { expect } = require("@playwright/test");
-const SELECTORS = require("../constants/selectors");
+const { expect } = require( '@playwright/test' );
+const SELECTORS = require( '../constants/selectors' );
 
-async function cleanUpPlannerTasks({ page, context, baseUrl }) {
-  try {
-    if (page.isClosed?.()) return;
+/**
+ * Cleans up all active and completed tasks in the planner UI.
+ * Requires a Playwright `page`, `context`, and `baseUrl`.
+ * @param root0
+ * @param root0.page
+ * @param root0.context
+ * @param root0.baseUrl
+ */
+async function cleanUpPlannerTasks( { page, context, baseUrl } ) {
+	try {
+		if ( page.isClosed?.() ) return;
 
-    await page.goto(`${baseUrl}/wp-admin/admin.php?page=progress-planner`);
-    await page.waitForLoadState("networkidle");
+		await page.goto(
+			`${ baseUrl }/wp-admin/admin.php?page=progress-planner`
+		);
+		await page.waitForLoadState( 'networkidle' );
 
-    // Active tasks
-    while (true) {
-      const todos = page.locator(SELECTORS.TODO_ITEM);
-      const count = await todos.count();
-      if (count === 0) break;
+		// Clean up ACTIVE tasks
+		const todoItems = page.locator( SELECTORS.TODO_ITEM );
+		while ( ( await todoItems.count() ) > 0 ) {
+			const firstItem = todoItems.first();
+			const trash = firstItem.locator( '.trash' );
 
-      const firstItem = todos.first();
-      const trash = firstItem.locator(".trash");
+			try {
+				console.log(
+					'deleting TODO: ',
+					await firstItem.locator( 'h3 > span' ).textContent()
+				);
+				await firstItem.scrollIntoViewIfNeeded();
+				await firstItem.hover();
+				await trash.waitFor( { state: 'visible', timeout: 3000 } );
+				await trash.click();
+				await page.waitForTimeout( 1500 );
+			} catch ( err ) {
+				console.warn(
+					'[Cleanup] Failed to delete active todo item:',
+					err.message
+				);
+				break;
+			}
+		}
 
-      try {
-        await firstItem.hover();
-        await trash.waitFor({ state: "visible", timeout: 3000 });
-        await trash.click();
+		// Clean up COMPLETED tasks
+		const completedDetails = page.locator(
+			'details#todo-list-completed-details'
+		);
+		if ( await completedDetails.isVisible() ) {
+			await completedDetails.click();
+			await page.waitForTimeout( 500 );
 
-        // Wait until the count goes down
-        await expect(todos).toHaveCount(count - 1, { timeout: 5000 });
-      } catch (error) {
-        console.warn(`[Cleanup] Failed to delete todo item: ${error.message}`);
-        break;
-      }
-    }
+			const completedItems = page.locator(
+				SELECTORS.TODO_COMPLETED_ITEM
+			);
+			while ( ( await completedItems.count() ) > 0 ) {
+				const firstCompleted = completedItems.first();
+				const trash = firstCompleted.locator( '.trash' );
 
-    // Completed tasks
-    const completedDetails = page.locator(
-      "details#todo-list-completed-details"
-    );
-
-    if (await completedDetails.isVisible()) {
-      await completedDetails.click();
-      await page.waitForTimeout(500); // allow DOM to expand
-
-      while (true) {
-        const completedTodos = page.locator(SELECTORS.TODO_COMPLETED_ITEM);
-        const count = await completedTodos.count();
-        if (count === 0) break;
-
-        const firstItem = completedTodos.first();
-        const trash = firstItem.locator(".trash");
-
-        try {
-          await firstItem.hover();
-          await trash.waitFor({ state: "visible", timeout: 3000 });
-          await trash.click();
-
-          await expect(completedTodos).toHaveCount(count - 1, {
-            timeout: 5000,
-          });
-        } catch (error) {
-          console.warn(
-            `[Cleanup] Failed to delete completed item: ${error.message}`
-          );
-          break;
-        }
-      }
-    }
-  } catch (e) {
-    console.warn("[Cleanup] Failed or skipped:", e.message);
-  }
-
-  try {
-    await context.close();
-  } catch {
-    // context might already be closed
-  }
+				try {
+					console.log(
+						'deleting completed TODO: ',
+						await firstCompleted
+							.locator( 'h3 > span' )
+							.textContent()
+					);
+					await firstCompleted.scrollIntoViewIfNeeded();
+					await firstCompleted.hover();
+					await trash.waitFor( { state: 'visible', timeout: 3000 } );
+					await trash.click();
+					await page.waitForTimeout( 1500 );
+				} catch ( err ) {
+					console.warn(
+						'[Cleanup] Failed to delete completed todo item:',
+						err.message
+					);
+					break;
+				}
+			}
+		}
+	} catch ( e ) {
+		console.warn( '[Cleanup] Unexpected failure:', e.message );
+	}
 }
 
 module.exports = { cleanUpPlannerTasks };

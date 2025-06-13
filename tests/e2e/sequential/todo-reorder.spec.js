@@ -43,7 +43,7 @@ function todoReorderTests( testContext = test ) {
 			// Create first task
 			await page.fill( '#new-todo-content', FIRST_TASK_TEXT );
 			await page.keyboard.press( 'Enter' );
-			await page.waitForTimeout( 500 );
+			await page.waitForTimeout( 1500 );
 
 			// Create second task
 			await page.fill( '#new-todo-content', SECOND_TASK_TEXT );
