@@ -21,8 +21,8 @@ function todoReorderTests( testContext = test ) {
 			page = await context.newPage();
 		} );
 
-		testContext.afterEach(async () => {
-			await cleanUpPlannerTasks({
+		testContext.afterEach( async () => {
+			await cleanUpPlannerTasks( {
 				page,
 				context,
 				baseUrl: process.env.WORDPRESS_URL,

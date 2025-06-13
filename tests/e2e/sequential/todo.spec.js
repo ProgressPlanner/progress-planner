@@ -1,6 +1,6 @@
 const { test, expect, chromium } = require( '@playwright/test' );
 const SELECTORS = require( '../constants/selectors' );
-const { cleanUpPlannerTasks } = require("../helpers/cleanup");
+const { cleanUpPlannerTasks } = require( '../helpers/cleanup' );
 
 const CREATE_TASK_TEXT = 'Test task to create';
 const DELETE_TASK_TEXT = 'Test task to delete';
@@ -20,13 +20,13 @@ function todoTests( testContext = test ) {
 			page = await context.newPage();
 		} );
 
-		testContext.afterEach(async () => {
-          await cleanUpPlannerTasks({
-            page,
-            context,
-            baseUrl: process.env.WORDPRESS_URL,
-          });
-        });
+		testContext.afterEach( async () => {
+			await cleanUpPlannerTasks( {
+				page,
+				context,
+				baseUrl: process.env.WORDPRESS_URL,
+			} );
+		} );
 
 		testContext.afterAll( async () => {
 			await browser.close();
