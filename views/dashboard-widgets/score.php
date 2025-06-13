@@ -10,7 +10,17 @@ use Progress_Planner\Badges\Monthly;
 ?>
 <div class="prpl-dashboard-widget">
 	<div>
-		<prpl-gauge background="#fff" color="var(--prpl-color-accent-orange)" contentFontSize="var(--prpl-font-size-4xl)" contentPadding="var(--prpl-padding)" marginBottom="0">
+		<prpl-gauge
+			id="prpl-gauge-ravi"
+			background="#fff"
+			color="var(--prpl-color-accent-orange)"
+			contentFontSize="var(--prpl-font-size-4xl)"
+			contentPadding="var(--prpl-padding)"
+			marginBottom="0"
+			data-max="<?php echo (int) Monthly::TARGET_POINTS; ?>"
+			data-value="<?php echo (float) \progress_planner()->get_admin__widgets__suggested_tasks()->get_score(); ?>"
+			data-badge-id="<?php echo esc_attr( Monthly::get_badge_id_from_date( new \DateTime() ) ); ?>"
+		>
 			<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) \progress_planner()->get_admin__widgets__suggested_tasks()->get_score(); ?>">
 				<prpl-badge
 					complete="true"
