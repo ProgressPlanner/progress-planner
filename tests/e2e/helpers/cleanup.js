@@ -14,22 +14,6 @@ async function cleanUpPlannerTasks( { page, context, baseUrl } ) {
 	try {
 		if ( page.isClosed?.() ) return;
 
-		// Log all browser console output
-		page.on( 'console', ( msg ) => {
-			console.log(
-				`[Browser console] ${ msg
-					.type()
-					.toUpperCase() }: ${ msg.text() }`
-			);
-		} );
-
-		page.on( 'response', async ( response ) => {
-			if ( response.status() === 404 ) {
-				const url = response.url();
-				console.error( `[404 ERROR] ${ url }` );
-			}
-		} );
-
 		await page.goto(
 			`${ baseUrl }/wp-admin/admin.php?page=progress-planner`
 		);
