@@ -19,7 +19,6 @@ class Upgrade_Migrations_130_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_recreating_tasks_from_activities() {
-
 		// Delete all activities.
 		\progress_planner()->get_activities__query()->delete_activities(
 			\progress_planner()->get_activities__query()->query_activities(
@@ -92,7 +91,6 @@ class Upgrade_Migrations_130_Test extends \WP_UnitTestCase {
 
 		// Create a new activity for each item.
 		foreach ( $activity_ids as $activity_id ) {
-
 			$activity          = new \Progress_Planner\Activities\Suggested_Task();
 			$activity->type    = 'completed';
 			$activity->data_id = $activity_id;

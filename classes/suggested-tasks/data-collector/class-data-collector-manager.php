@@ -68,7 +68,6 @@ class Data_Collector_Manager {
 	 * @return void
 	 */
 	public function add_plugin_integration() {
-
 		// Yoast SEO integration.
 		if ( function_exists( 'YoastSEO' ) ) {
 			$this->data_collectors[] = new Yoast_Orphaned_Content();
@@ -81,7 +80,6 @@ class Data_Collector_Manager {
 	 * @return void
 	 */
 	public function init() {
-
 		/**
 		 * Filter the data collectors.
 		 *
@@ -101,10 +99,7 @@ class Data_Collector_Manager {
 	 * @return void
 	 */
 	public function update_data_collectors_cache() {
-
-		$update_recently_performed = \progress_planner()->get_utils__cache()->get( 'update_data_collectors_cache' );
-
-		if ( $update_recently_performed ) {
+		if ( \progress_planner()->get_utils__cache()->get( 'update_data_collectors_cache' ) ) {
 			return;
 		}
 

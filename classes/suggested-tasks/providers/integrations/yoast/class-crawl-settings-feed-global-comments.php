@@ -20,10 +20,12 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-crawl-settings-feed-global-comments';
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url = \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_global_comments' );
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_global_comments' );
 	}
 
 	/**
@@ -31,7 +33,7 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: remove global comment feeds', 'progress-planner' );
 	}
 
@@ -40,7 +42,7 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Remove URLs which provide an overview of recent comments on your site. %s.', 'progress-planner' ),

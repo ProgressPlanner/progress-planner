@@ -185,7 +185,6 @@ class Page_Settings {
 	 * @return void
 	 */
 	public function save_settings() {
-
 		// Check the nonce.
 		\check_admin_referer( 'progress_planner' );
 
@@ -202,7 +201,6 @@ class Page_Settings {
 	 * @return void
 	 */
 	public function save_post_types() {
-
 		// Check the nonce.
 		\check_admin_referer( 'progress_planner' );
 
@@ -220,7 +218,6 @@ class Page_Settings {
 	 * @return void
 	 */
 	public function save_license() {
-
 		// Check the nonce.
 		\check_admin_referer( 'progress_planner' );
 

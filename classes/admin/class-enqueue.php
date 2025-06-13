@@ -8,6 +8,7 @@
 namespace Progress_Planner\Admin;
 
 use Progress_Planner\Badges\Monthly;
+use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
 
 /**
  * Enqueue class.
@@ -197,15 +198,36 @@ class Enqueue {
 				];
 				break;
 
-			case 'progress-planner/web-components/prpl-suggested-task':
+			case 'progress-planner/suggested-task':
+				// Set max items per category.
+				$max_items_per_category = [];
+				$provider_categories    = \get_terms(
+					[
+						'taxonomy'   => 'prpl_recommendations_category',
+						'hide_empty' => false,
+					]
+				);
+
+				if ( ! empty( $provider_categories ) && ! is_wp_error( $provider_categories ) ) {
+					$content_review_category = ( new Content_Review() )->get_provider_category();
+					foreach ( $provider_categories as $provider_category ) {
+						$max_items_per_category[ $provider_category->slug ] = $provider_category->slug === $content_review_category ? 2 : 1;
+					}
+				}
+
+				// This should never happen, but just in case - user tasks are displayed in different widget.
+				if ( isset( $max_items_per_category['user'] ) ) {
+					$max_items_per_category['user'] = 100;
+				}
 				$localize_data = [
 					'name' => 'prplSuggestedTask',
 					'data' => [
-						'nonce'  => \wp_create_nonce( 'progress_planner' ),
-						'assets' => [
+						'nonce'               => \wp_create_nonce( 'progress_planner' ),
+						'assets'              => [
 							'infoIcon'   => constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_info.svg',
 							'snoozeIcon' => constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_snooze.svg',
 						],
+						'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
 					],
 				];
 				break;

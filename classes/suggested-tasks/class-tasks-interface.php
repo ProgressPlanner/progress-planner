@@ -36,29 +36,27 @@ interface Tasks_Interface {
 	/**
 	 * Evaluate a task.
 	 *
-	 * @param string $task The task ID.
+	 * @param string $task_id The task id.
 	 *
-	 * @return bool
+	 * @return \Progress_Planner\Suggested_Tasks\Task|false
 	 */
-	public function evaluate_task( $task );
+	public function evaluate_task( $task_id );
 
 	/**
 	 * Get the task details.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data Optional data to include in the task.
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id = '' );
+	public function get_task_details( $task_data = [] );
 
 	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
+	 * Get the task link setting.
 	 *
 	 * @return array
 	 */
-	public function get_data_from_task_id( $task_id );
+	public function get_link_setting();
 
 	/**
 	 * Get the provider category.
@@ -89,4 +87,11 @@ interface Tasks_Interface {
 	 * @return bool
 	 */
 	public function is_task_relevant();
+
+	/**
+	 * Check if the task is a repetitive task.
+	 *
+	 * @return bool
+	 */
+	public function is_repetitive();
 }
