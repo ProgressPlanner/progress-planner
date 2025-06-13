@@ -23,6 +23,13 @@ async function cleanUpPlannerTasks( { page, context, baseUrl } ) {
 			);
 		} );
 
+		page.on( 'response', async ( response ) => {
+			if ( response.status() === 404 ) {
+				const url = response.url();
+				console.error( `[404 ERROR] ${ url }` );
+			}
+		} );
+
 		await page.goto(
 			`${ baseUrl }/wp-admin/admin.php?page=progress-planner`
 		);
