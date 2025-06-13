@@ -31,18 +31,8 @@ async function cleanUpPlannerTasks( { page, context, baseUrl } ) {
 				await firstItem.scrollIntoViewIfNeeded();
 				await firstItem.hover();
 				await trash.waitFor( { state: 'visible', timeout: 3000 } );
-
-				// Get the element handle BEFORE triggering removal
-				const firstItemHandle = await firstItem.elementHandle();
 				await trash.click();
 				await page.waitForTimeout( 1500 );
-
-				// Wait for item to detach from DOM
-				if ( firstItemHandle ) {
-					await firstItemHandle.waitForElementState( 'detached', {
-						timeout: 5000,
-					} );
-				}
 			} catch ( err ) {
 				console.warn(
 					'[Cleanup] Failed to delete active todo item:',
@@ -77,23 +67,8 @@ async function cleanUpPlannerTasks( { page, context, baseUrl } ) {
 					await firstCompleted.scrollIntoViewIfNeeded();
 					await firstCompleted.hover();
 					await trash.waitFor( { state: 'visible', timeout: 3000 } );
-
-					// Get the element handle BEFORE triggering removal
-					const firstCompletedHandle =
-						await firstCompleted.elementHandle();
-
 					await trash.click();
 					await page.waitForTimeout( 1500 );
-
-					// Wait for item to detach from DOM
-					if ( firstCompletedHandle ) {
-						await firstCompletedHandle.waitForElementState(
-							'detached',
-							{
-								timeout: 5000,
-							}
-						);
-					}
 				} catch ( err ) {
 					console.warn(
 						'[Cleanup] Failed to delete completed todo item:',
