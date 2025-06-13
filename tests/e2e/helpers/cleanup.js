@@ -3,14 +3,25 @@ const SELECTORS = require( '../constants/selectors' );
 /**
  * Cleans up all active and completed tasks in the planner UI.
  * Requires a Playwright `page`, `context`, and `baseUrl`.
- * @param root0
- * @param root0.page
- * @param root0.context
- * @param root0.baseUrl
+ *
+ * @param {Object}                                    root0
+ * @param {import('@playwright/test').Page}           root0.page
+ * @param {import('@playwright/test').BrowserContext} root0.context
+ * @param {string}                                    root0.baseUrl
+ * @return {Promise<void>}
  */
 async function cleanUpPlannerTasks( { page, context, baseUrl } ) {
 	try {
 		if ( page.isClosed?.() ) return;
+
+		// Log all browser console output
+		page.on( 'console', ( msg ) => {
+			console.log(
+				`[Browser console] ${ msg
+					.type()
+					.toUpperCase() }: ${ msg.text() }`
+			);
+		} );
 
 		await page.goto(
 			`${ baseUrl }/wp-admin/admin.php?page=progress-planner`
