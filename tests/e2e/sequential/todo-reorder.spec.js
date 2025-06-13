@@ -1,5 +1,6 @@
 const { test, expect, chromium } = require( '@playwright/test' );
 const SELECTORS = require( '../constants/selectors' );
+const { cleanUpPlannerTasks } = require( '../helpers/cleanup' );
 
 const FIRST_TASK_TEXT = 'First task to reorder';
 const SECOND_TASK_TEXT = 'Second task to reorder';
@@ -20,31 +21,12 @@ function todoReorderTests( testContext = test ) {
 			page = await context.newPage();
 		} );
 
-		testContext.afterEach( async () => {
-			// Clean up any remaining tasks
-			await page.goto(
-				`${ process.env.WORDPRESS_URL }/wp-admin/admin.php?page=progress-planner`
-			);
-			await page.waitForLoadState( 'networkidle' );
-
-			// Clean up active tasks
-			const activeTodoItems = page.locator( SELECTORS.TODO_ITEM );
-
-			while ( ( await activeTodoItems.count() ) > 0 ) {
-				const firstItem = page.locator( SELECTORS.TODO_ITEM ).nth( 0 );
-				await firstItem.hover();
-				await page.waitForTimeout( 500 );
-				await firstItem.waitFor( { state: 'visible' } );
-				await firstItem.locator( '.trash' ).click();
-				await page.waitForTimeout( 1500 );
-			}
-
-			// Safely close context if it's still open
-			try {
-				await context.close();
-			} catch ( error ) {
-				// Ignore errors if context is already closed
-			}
+		testContext.afterEach(async () => {
+			await cleanUpPlannerTasks({
+				page,
+				context,
+				baseUrl: process.env.WORDPRESS_URL,
+			} );
 		} );
 
 		testContext.afterAll( async () => {
