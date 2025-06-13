@@ -189,7 +189,12 @@ prplSuggestedTask = {
 			id: postId,
 		} );
 		post.fetch().then( () => {
-			post.destroy( { data: { force: true } } ).then( () => {
+			// Handle the case when plain URL structure is used, it used to result in invalid URL (404): http://localhost:8080/index.php?rest_route=/wp/v2/prpl_recommendations/35?force=true
+			const url = post.url().includes( 'rest_route=' )
+				? post.url() + '&force=true'
+				: post.url() + '?force=true';
+
+			post.destroy( { url } ).then( () => {
 				// Remove the task from the todo list.
 				prplSuggestedTask.removeTaskElement( postId );
 				setTimeout(
