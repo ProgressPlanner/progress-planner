@@ -19,10 +19,10 @@ const prplTodoWidget = {
 		);
 		let highestOrder = 0;
 		items.forEach( ( item ) => {
-			const order = parseInt( item.getAttribute( 'data-task-order' ) );
-			if ( order > highestOrder ) {
-				highestOrder = order;
-			}
+			highestOrder = Math.max(
+				parseInt( item.getAttribute( 'data-task-order' ) ),
+				highestOrder
+			);
 		} );
 		return highestOrder;
 	},
@@ -32,10 +32,8 @@ const prplTodoWidget = {
 	 */
 	removeLoadingItems: () => {
 		// Remove the "Loading..." text.
-		const el = document.querySelector( '#prpl-todo-list-loading' );
-		if ( el ) {
-			el.remove();
-		}
+		document.querySelector( '#prpl-todo-list-loading' )?.remove();
+
 		// Resize the grid items.
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	},
@@ -51,33 +49,33 @@ const prplTodoWidget = {
 				per_page: 100,
 			} )
 			.then( ( data ) => {
-				if ( data.length ) {
-					// Inject the items into the DOM.
-					data.forEach( ( item ) => {
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/suggestedTask/injectItem', {
-								detail: {
-									item,
-									insertPosition:
-										1 === item?.meta?.prpl_points
-											? 'afterbegin' // Add golden task to the start of the list.
-											: 'beforeend',
-									listId:
-										item.status === 'publish'
-											? 'todo-list'
-											: 'todo-list-completed',
-								},
-							} )
-						);
-						prplSuggestedTask.injectedItemIds.push( item.id );
-					} );
+				if ( ! data.length ) {
+					return data;
 				}
+
+				// Inject the items into the DOM.
+				data.forEach( ( item ) => {
+					document.dispatchEvent(
+						new CustomEvent( 'prpl/suggestedTask/injectItem', {
+							detail: {
+								item,
+								insertPosition:
+									1 === item?.meta?.prpl_points
+										? 'afterbegin' // Add golden task to the start of the list.
+										: 'beforeend',
+								listId:
+									item.status === 'publish'
+										? 'todo-list'
+										: 'todo-list-completed',
+							},
+						} )
+					);
+					prplSuggestedTask.injectedItemIds.push( item.id );
+				} );
 
 				return data;
 			} )
-			.then( () => {
-				prplTodoWidget.removeLoadingItems();
-			} );
+			.then( () => prplTodoWidget.removeLoadingItems() );
 
 		// When the '#create-todo-item' form is submitted,
 		// add a new todo item to the list
@@ -198,14 +196,12 @@ document.addEventListener( 'prpl/suggestedTask/itemInjected', ( event ) => {
 		} );
 
 		// Remove all items from the list.
-		items.forEach( ( item ) => {
-			item.remove();
-		} );
+		items.forEach( ( item ) => item.remove() );
 
 		// Inject the ordered items back into the list.
-		orderedItems.forEach( ( item ) => {
-			document.getElementById( event.detail.listId ).appendChild( item );
-		} );
+		orderedItems.forEach( ( item ) =>
+			document.getElementById( event.detail.listId ).appendChild( item )
+		);
 
 		// Resize the grid items.
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );

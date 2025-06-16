@@ -14,9 +14,10 @@ const prplSuggestedTasksWidget = {
 	 */
 	removeLoadingItems: () => {
 		document.querySelector( '.prpl-suggested-tasks-loading' )?.remove();
-		setTimeout( () => {
-			window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-		}, 2000 );
+		setTimeout(
+			() => window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) ),
+			2000
+		);
 	},
 
 	/**

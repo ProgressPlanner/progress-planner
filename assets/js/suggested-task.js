@@ -304,24 +304,25 @@ prplSuggestedTask = {
 								} )
 							);
 						}
-					} else if ( 'publish' === newStatus ) {
+					} else if (
+						'publish' === newStatus &&
+						'user' === taskProviderId
+					) {
 						// This is only possible for user tasks.
-						if ( 'user' === taskProviderId ) {
-							// Set the task action to publish.
-							el.setAttribute( 'data-task-action', 'publish' );
+						// Set the task action to publish.
+						el.setAttribute( 'data-task-action', 'publish' );
 
-							// Update the Ravi gauge.
-							prplUpdateRaviGauge( 0 - eventPoints );
+						// Update the Ravi gauge.
+						prplUpdateRaviGauge( 0 - eventPoints );
 
-							// Move task from trash to published.
-							document
-								.getElementById( 'todo-list' )
-								.insertAdjacentElement( 'beforeend', el );
+						// Move task from trash to published.
+						document
+							.getElementById( 'todo-list' )
+							.insertAdjacentElement( 'beforeend', el );
 
-							window.dispatchEvent(
-								new CustomEvent( 'prpl/grid/resize' )
-							);
-						}
+						window.dispatchEvent(
+							new CustomEvent( 'prpl/grid/resize' )
+						);
 					}
 				} );
 		} );
