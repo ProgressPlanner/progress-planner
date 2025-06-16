@@ -162,12 +162,12 @@ class Stats {
 		foreach ( $ravis_recommendations as $recommendation ) {
 			$r = [
 				'id'          => $recommendation->task_id,
-				'title'       => $recommendation->title,
+				'title'       => $recommendation->post_title,
 				'url'         => $recommendation->url,
-				'provider_id' => $recommendation->provider_id,
+				'provider_id' => $recommendation->get_provider_id(),
 			];
 
-			if ( 'user' === $recommendation->provider_id ) {
+			if ( 'user' === $recommendation->get_provider_id() ) {
 				$r['points'] = (int) $recommendation->points;
 			}
 			$data['recommendations'][] = $r;
