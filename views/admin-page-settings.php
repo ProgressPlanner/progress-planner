@@ -14,13 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="wrap prpl-wrap prpl-settings-wrap">
 	<div class="prpl-header">
 		<div class="prpl-header-logo">
-			<?php
-			if ( \progress_planner()->is_pro_site() ) {
-				\progress_planner()->the_asset( 'images/logo_progress_planner_pro.svg' );
-			} else {
-				\progress_planner()->the_asset( 'images/logo_progress_planner.svg' );
-			}
-			?>
+			<?php \progress_planner()->get_ui__branding()->the_logo(); ?>
 		</div>
 	</div>
 	<h1>
