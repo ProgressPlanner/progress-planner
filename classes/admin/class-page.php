@@ -276,6 +276,7 @@ class Page {
 		}
 
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/admin' );
+		\wp_add_inline_style( 'progress-planner/admin', \progress_planner()->get_ui__branding()->get_color_palette() );
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-tooltip' );
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
