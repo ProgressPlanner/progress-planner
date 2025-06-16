@@ -61,7 +61,7 @@ const prplSuggestedTasksWidget = {
 									new wp.api.models.Prpl_recommendations( {
 										id: task.id,
 									} );
-								post.destroy();
+								post.set( 'status', 'trash' ).save();
 							} );
 						}
 					} )
