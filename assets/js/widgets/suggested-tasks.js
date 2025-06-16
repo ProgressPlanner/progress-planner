@@ -61,7 +61,8 @@ const prplSuggestedTasksWidget = {
 									new wp.api.models.Prpl_recommendations( {
 										id: task.id,
 									} );
-								post.set( 'status', 'trash' ).save();
+								// Destroy the post, without the force parameter.
+								post.destroy( { url: post.url() } );
 							} );
 						}
 					} )
