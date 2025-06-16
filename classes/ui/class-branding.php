@@ -39,6 +39,12 @@ final class Branding {
 	 * @return string
 	 */
 	public static function get_color_palette(): string {
+		/**
+		 * Filter the color palette.
+		 *
+		 * @param array $palette The palette.
+		 * @return array
+		 */
 		$palette = \apply_filters(
 			'progress_planner_color_palette',
 			[
