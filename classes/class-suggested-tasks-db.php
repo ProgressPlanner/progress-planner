@@ -293,7 +293,7 @@ class Suggested_Tasks_DB {
 	 *
 	 * @param array $params The parameters to filter by ([ 'provider' => 'provider_id' ] etc).
 	 *
-	 * @return array
+	 * @return array<\Progress_Planner\Suggested_Tasks\Task>
 	 */
 	public function get_tasks_by( $params ) {
 		$args = [];
@@ -339,7 +339,7 @@ class Suggested_Tasks_DB {
 	 *
 	 * @param array $args The arguments.
 	 *
-	 * @return array
+	 * @return array<\Progress_Planner\Suggested_Tasks\Task>
 	 */
 	public function get( $args = [] ) {
 		$args = \wp_parse_args(

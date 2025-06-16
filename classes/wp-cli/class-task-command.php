@@ -282,6 +282,9 @@ class Task_Command extends \WP_CLI_Command {
 	 * [--status=<status>]
 	 * : The task status. Default: "pending"
 	 *
+	 * [--is_completed_callback=<is_completed_callback>]
+	 * : The callback to check if the task is completed.
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Create a task with default values
@@ -296,33 +299,33 @@ class Task_Command extends \WP_CLI_Command {
 	 * @return void
 	 */
 	public function create( $args, $assoc_args ) {
-		$timestamp = time();
 
-		$task_id     = isset( $assoc_args['task_id'] ) ? $assoc_args['task_id'] : 'test-task-' . $timestamp;
-		$title       = isset( $assoc_args['title'] ) ? $assoc_args['title'] : 'Test task ' . $timestamp;
-		$description = isset( $assoc_args['description'] ) ? $assoc_args['description'] : 'Test description ' . $timestamp;
-		$points      = isset( $assoc_args['points'] ) ? (int) $assoc_args['points'] : 1;
-		$provider_id = isset( $assoc_args['provider_id'] ) ? $assoc_args['provider_id'] : 'collaborator';
-		$category    = isset( $assoc_args['category'] ) ? $assoc_args['category'] : 'collaborator';
-		$status      = isset( $assoc_args['status'] ) ? $assoc_args['status'] : 'pending';
-
-		// Get the user tasks from the database.
-		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
+		$task_id               = isset( $assoc_args['task_id'] ) ? $assoc_args['task_id'] : 'collaborator-' . uniqid( '', true );
+		$title                 = isset( $assoc_args['title'] ) ? $assoc_args['title'] : 'Test task';
+		$description           = isset( $assoc_args['description'] ) ? $assoc_args['description'] : 'Test description ';
+		$points                = isset( $assoc_args['points'] ) ? (int) $assoc_args['points'] : 1;
+		$provider_id           = isset( $assoc_args['provider_id'] ) ? $assoc_args['provider_id'] : 'collaborator';
+		$category              = isset( $assoc_args['category'] ) ? $assoc_args['category'] : 'collaborator';
+		$status                = isset( $assoc_args['status'] ) ? $assoc_args['status'] : 'pending';
+		$is_completed_callback = isset( $assoc_args['is_completed_callback'] ) ? $assoc_args['is_completed_callback'] : null;
+		$dismissable           = isset( $assoc_args['dismissable'] ) ? $assoc_args['dismissable'] : true;
+		$snoozable             = isset( $assoc_args['snoozable'] ) ? $assoc_args['snoozable'] : true;
 
 		// We're creating a new task.
-		$tasks[] = [
-			'task_id'     => $task_id,
-			'title'       => $title,
-			'description' => $description,
-			'points'      => $points,
-			'provider_id' => $provider_id,
-			'category'    => $category,
-			'status'      => $status,
-			'dismissable' => true,
-			'snoozable'   => true,
-		];
-
-		\progress_planner()->get_settings()->set( 'tasks', $tasks );
+		\progress_planner()->get_suggested_tasks_db()->add(
+			[
+				'task_id'               => $task_id,
+				'post_title'            => $title,
+				'description'           => $description,
+				'points'                => $points,
+				'provider_id'           => $provider_id,
+				'category'              => $category,
+				'status'                => $status,
+				'dismissable'           => $dismissable,
+				'snoozable'             => $snoozable,
+				'is_completed_callback' => $is_completed_callback,
+			]
+		);
 
 		\WP_CLI::success( "Task {$task_id} created." ); // @phpstan-ignore-line
 	}

@@ -48,21 +48,30 @@ class Collaborator extends Tasks {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
+		// We don't need to inject tasks for this provider.
+		return [];
+	}
 
-		$tasks       = [];
-		$saved_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-		foreach ( $saved_tasks as $task_data ) {
-			if ( isset( $task_data['provider_id'] ) && self::PROVIDER_ID === $task_data['provider_id'] ) {
-				$tasks[] = [
-					'task_id'     => $task_data['task_id'],
-					'provider_id' => $this->get_provider_id(),
-					'category'    => $this->get_provider_category(),
-					'points'      => 0,
-				];
-			}
+	/**
+	 * Check if a specific task is completed.
+	 * Child classes can override this method to handle specific task IDs.
+	 *
+	 * @param string $task_id The task ID to check.
+	 * @return bool
+	 */
+	protected function is_specific_task_completed( $task_id ) {
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
+		if ( empty( $tasks ) ) {
+			return false;
 		}
 
-		return $tasks;
+		$task_data = $tasks[0]->get_data();
+
+		if ( isset( $task_data['is_completed_callback'] ) && is_callable( $task_data['is_completed_callback'] ) ) {
+			return call_user_func( $task_data['is_completed_callback'], $task_id );
+		}
+
+		return false;
 	}
 
 	/**

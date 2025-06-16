@@ -65,6 +65,8 @@ class Suggested_Tasks {
 
 		// Filter the REST API response.
 		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'rest_prepare_recommendation' ], 10, 2 );
+
+		\add_filter( 'wp_trash_post_days', [ $this, 'change_trashed_posts_lifetime' ], 10, 2 );
 	}
 
 	/**
@@ -153,7 +155,7 @@ class Suggested_Tasks {
 		\progress_planner()->get_suggested_tasks_db()->update_recommendation( $pending_tasks[0]->ID, [ 'post_status' => 'trash' ] );
 
 		// Insert an activity.
-		$this->insert_activity( $pending_tasks[0]->ID );
+		$this->insert_activity( $pending_tasks[0]->task_id );
 	}
 
 	/**
@@ -337,6 +339,22 @@ class Suggested_Tasks {
 				$field
 			);
 		}
+	}
+
+	/**
+	 * Custom trash lifetime by post type.
+	 *
+	 * @param int      $days The number of days to keep in trash.
+	 * @param \WP_Post $post The post.
+	 *
+	 * @return int
+	 */
+	public function change_trashed_posts_lifetime( $days, $post ) {
+		if ( 'prpl_recommendations' === $post->post_type ) {
+			return 60;
+		}
+
+		return $days;
 	}
 
 	/**
