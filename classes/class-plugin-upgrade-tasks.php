@@ -16,7 +16,6 @@ class Plugin_Upgrade_Tasks {
 	 * Constructor.
 	 */
 	public function __construct() {
-
 		// Plugin (possibly 3rd party) activated.
 		\add_action( 'activated_plugin', [ $this, 'plugin_activated_or_updated' ], 10 );
 

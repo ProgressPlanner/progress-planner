@@ -37,13 +37,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-fix-orphaned-content';
 
 	/**
-	 * The data collector.
-	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content
-	 */
-	protected $data_collector;
-
-	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -58,11 +51,11 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	protected $completed_post_ids = null;
 
 	/**
-	 * Constructor.
+	 * The data collector class name.
+	 *
+	 * @var string
 	 */
-	public function __construct() {
-		$this->data_collector = new Yoast_Orphaned_Content();
-	}
+	protected const DATA_COLLECTOR_CLASS = Yoast_Orphaned_Content::class;
 
 	/**
 	 * Initialize the task provider.
@@ -74,54 +67,26 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task ID.
+	 * Get the title with data.
 	 *
-	 * @param array $data Optional data to include in the task ID.
-	 * @return string
-	 */
-	public function get_task_id( $data = [] ) {
-		$parts = [ $this->get_provider_id() ];
-
-		// Add optional data parts if provided.
-		if ( ! empty( $data ) ) {
-			foreach ( $data as $value ) {
-				$parts[] = $value;
-			}
-		}
-
-		return implode( '-', $parts );
-	}
-
-	/**
-	 * Get the title.
-	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_title( $task_id = '' ) {
-		// Get the task data.
-		$task_data = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
-
-		// We don't want to link if the term was deleted.
-		if ( empty( $task_data ) || ! $task_data[0] ) {
-			return '';
-		}
-
+	protected function get_title_with_data( $task_data = [] ) {
 		return sprintf(
 			/* translators: %s: Post title. */
 			\esc_html__( 'Yoast SEO: add internal links to article "%s"!', 'progress-planner' ),
-			\esc_html( $task_data[0]['post_title'] )
+			\esc_html( $task_data['target_post_title'] )
 		);
 	}
 
 	/**
 	 * Get the description.
 	 *
-	 * @param string $task_id The task ID.
 	 * @return string
 	 */
-	public function get_description( $task_id = '' ) {
+	protected function get_description() {
 		return sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Yoast SEO detected that this article has no links pointing to it. %s.', 'progress-planner' ),
@@ -132,19 +97,12 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	/**
 	 * Get the URL.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_url( $task_id = '' ) {
-		$post = $this->get_post_from_task_id( $task_id );
-
-		// We don't want to link if the post was deleted.
-		if ( ! $post ) {
-			return '';
-		}
-
-		return 'https://prpl.fyi/fix-orphaned-content';
+	protected function get_url_with_data( $task_data = [] ) {
+		return \get_post( $task_data['target_post_id'] ) ? 'https://prpl.fyi/fix-orphaned-content' : '';
 	}
 
 	/**
@@ -153,7 +111,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return ! empty( $this->data_collector->collect() );
+		return ! empty( $this->get_data_collector()->collect() );
 	}
 
 	/**
@@ -190,20 +148,32 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	}
 
 	/**
+	 * Transform data collector data into task data format.
+	 *
+	 * @param array $data The data from data collector.
+	 * @return array The transformed data with original data merged.
+	 */
+	protected function transform_collector_data( array $data ): array {
+		return array_merge(
+			$data,
+			[
+				'target_post_id'    => $data['post_id'],
+				'target_post_title' => $data['post_title'],
+			]
+		);
+	}
+
+	/**
 	 * Get an array of tasks to inject.
 	 *
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-
-		if (
-			true === $this->is_task_snoozed() ||
-			! $this->should_add_task() // No need to add the task.
-		) {
+		if ( true === $this->is_task_snoozed() || ! $this->should_add_task() ) {
 			return [];
 		}
 
-		$data    = $this->data_collector->collect();
+		$data    = $this->get_data_collector()->collect();
 		$task_id = $this->get_task_id(
 			[
 				'post_id' => $data['post_id'],
@@ -215,45 +185,28 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return [];
 		}
 
-		return [
-			[
-				'task_id'     => $task_id,
-				'provider_id' => $this->get_provider_id(),
-				'category'    => $this->get_provider_category(),
-				'post_id'     => $data['post_id'],
-				'post_title'  => $data['post_title'],
-			],
-		];
+		// Transform the data to match the task data structure.
+		$task_data = $this->modify_injection_task_data(
+			$this->get_task_details(
+				$this->transform_collector_data( $data )
+			)
+		);
+
+		return \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] )
+			? []
+			: [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
 	}
 
 	/**
-	 * Get the task details.
+	 * Modify task data before injecting it.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id = '' ) {
-
-		if ( ! $task_id ) {
-			return [];
-		}
-
-		$task_details = [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'title'       => $this->get_title( $task_id ),
-			'parent'      => $this->get_parent(),
-			'priority'    => $this->get_priority(),
-			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(),
-			'dismissable' => $this->is_dismissable(),
-			'url'         => $this->get_url( $task_id ),
-			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description( $task_id ),
-		];
-
-		return $task_details;
+	protected function modify_injection_task_data( $task_data ) {
+		$task_data['target_post_id'] = $this->transform_collector_data( $this->get_data_collector()->collect() )['target_post_id'];
+		return $task_data;
 	}
 
 	/**
@@ -264,15 +217,15 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return \WP_Post|null
 	 */
 	public function get_post_from_task_id( $task_id ) {
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		if ( empty( $tasks ) ) {
 			return null;
 		}
 
-		$data = $tasks[0];
+		$task = $tasks[0];
 
-		return isset( $data['post_id'] ) && $data['post_id'] ? \get_post( $data['post_id'] ) : null;
+		return $task->target_post_id ? \get_post( $task->target_post_id ) : null;
 	}
 
 	/**
@@ -281,18 +234,17 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return array
 	 */
 	protected function get_completed_post_ids() {
-
 		if ( null !== $this->completed_post_ids ) {
 			return $this->completed_post_ids;
 		}
 
 		$this->completed_post_ids = [];
-		$tasks                    = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'provider_id', $this->get_provider_id() );
+		$tasks                    = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! empty( $tasks ) ) {
 			foreach ( $tasks as $task ) {
-				if ( isset( $task['status'] ) && 'completed' === $task['status'] ) {
-					$this->completed_post_ids[] = $task['post_id'];
+				if ( 'trash' === $task->post_status ) {
+					$this->completed_post_ids[] = $task->target_post_id;
 				}
 			}
 		}

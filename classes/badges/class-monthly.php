@@ -48,7 +48,6 @@ final class Monthly extends Badge {
 	 * @return array
 	 */
 	public static function init_badges() {
-
 		if ( ! empty( self::$instances ) ) {
 			return self::$instances;
 		}

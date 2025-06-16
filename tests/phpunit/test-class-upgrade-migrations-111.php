@@ -18,7 +18,6 @@ class Upgrade_Migrations_111_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_dataset_1() {
-
 		// Delete all activities.
 		\progress_planner()->get_activities__query()->delete_activities(
 			\progress_planner()->get_activities__query()->query_activities(

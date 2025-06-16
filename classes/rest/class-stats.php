@@ -157,18 +157,18 @@ class Stats {
 
 		// Timezone offset.
 		$data['timezone_offset'] = \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600;
-		$ravis_recommendations   = \progress_planner()->get_suggested_tasks()->get_pending_tasks_with_details();
+		$ravis_recommendations   = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
 		$data['recommendations'] = [];
 		foreach ( $ravis_recommendations as $recommendation ) {
 			$r = [
-				'id'          => $recommendation['task_id'],
-				'title'       => $recommendation['title'],
-				'url'         => isset( $recommendation['url'] ) ? $recommendation['url'] : '',
-				'provider_id' => $recommendation['provider_id'],
+				'id'          => $recommendation->task_id,
+				'title'       => $recommendation->title,
+				'url'         => $recommendation->url,
+				'provider_id' => $recommendation->provider_id,
 			];
 
-			if ( 'user' === $recommendation['provider_id'] ) {
-				$r['points'] = isset( $recommendation['points'] ) ? $recommendation['points'] : 0;
+			if ( 'user' === $recommendation->provider_id ) {
+				$r['points'] = (int) $recommendation->points;
 			}
 			$data['recommendations'][] = $r;
 		}

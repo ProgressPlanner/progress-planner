@@ -13,6 +13,20 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 class User extends Tasks {
 
 	/**
+	 * Whether the task is dismissable.
+	 *
+	 * @var bool
+	 */
+	protected $is_dismissable = true;
+
+	/**
+	 * Whether the task is snoozable.
+	 *
+	 * @var bool
+	 */
+	protected $is_snoozable = false;
+
+	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
@@ -48,59 +62,19 @@ class User extends Tasks {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-
-		$tasks       = [];
-		$saved_tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-		foreach ( $saved_tasks as $task_data ) {
-			if ( isset( $task_data['provider_id'] ) && self::PROVIDER_ID === $task_data['provider_id'] ) {
-				$tasks[] = [
-					'task_id'     => $task_data['task_id'],
-					'provider_id' => $this->get_provider_id(),
-					'category'    => $this->get_provider_category(),
-					'points'      => 0,
-				];
-			}
-		}
-
-		return $tasks;
+		return [];
 	}
 
 	/**
 	 * Get the task details.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data Optional data to include in the task.
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id = '' ) {
+	public function get_task_details( $task_data = [] ) {
 		// Get the user tasks from the database.
-		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
-
-		foreach ( $tasks as $task ) {
-			if ( $task['task_id'] !== $task_id ) {
-				continue;
-			}
-
-			return wp_parse_args(
-				$task,
-				[
-					'task_id'      => '',
-					'title'        => '',
-					'parent'       => 0,
-					'provider_id'  => 'user',
-					'category'     => 'user',
-					'priority'     => 'medium',
-					'points'       => 0,
-					'url'          => '',
-					'url_target'   => '_self',
-					'description'  => '',
-					'link_setting' => [],
-					'dismissable'  => true,
-					'snoozable'    => false,
-				]
-			);
-		}
-
-		return [];
+		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
+		return $task_post ? $task_post->get_data() : [];
 	}
 }
