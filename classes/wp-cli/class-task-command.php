@@ -208,13 +208,13 @@ class Task_Command extends \WP_CLI_Command {
 	 * Get a single task from the database.
 	 *
 	 * @param string $task_id Task ID.
-	 * @return array|null
+	 * @return \Progress_Planner\Suggested_Tasks\Task|null
 	 */
 	private function get_task( $task_id ) {
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 		if ( empty( $tasks ) ) {
 			\WP_CLI::log( 'Task not found.' ); // @phpstan-ignore-line
-			return [];
+			return null;
 		}
 
 		return $tasks[0];
@@ -234,7 +234,7 @@ class Task_Command extends \WP_CLI_Command {
 			return false;
 		}
 
-		\progress_planner()->get_suggested_tasks()->update_pending_task( $task_id, $data );
+		\progress_planner()->get_suggested_tasks_db()->update_recommendation( $task->ID, $data );
 		return true;
 	}
 
@@ -246,7 +246,13 @@ class Task_Command extends \WP_CLI_Command {
 	 * @return bool
 	 */
 	private function delete_task( $task_id, $force ) {
-		\progress_planner()->get_suggested_tasks()->delete_task( $task_id );
+		$task = $this->get_task( $task_id );
+		if ( ! $task ) {
+			\WP_CLI::log( 'Task not found.' ); // @phpstan-ignore-line
+			return false;
+		}
+
+		\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 		return true;
 	}
 

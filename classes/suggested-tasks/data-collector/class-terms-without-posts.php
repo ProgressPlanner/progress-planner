@@ -52,7 +52,6 @@ class Terms_Without_Posts extends Base_Data_Collector {
 	 * @return void
 	 */
 	public function on_terms_changed( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
-
 		// Check if the taxonomy is public.
 		$taxonomy_object = \get_taxonomy( $taxonomy );
 		if ( ! $taxonomy_object || ! $taxonomy_object->public ) {
@@ -94,12 +93,25 @@ class Terms_Without_Posts extends Base_Data_Collector {
 		 */
 		$public_taxonomies = get_taxonomies( [ 'public' => true ], 'names' );
 
-		if ( isset( $public_taxonomies['post_format'] ) ) {
-			unset( $public_taxonomies['post_format'] );
-		}
+		/**
+		 * Array of public taxonomies to exclude from the terms without posts query.
+		 *
+		 * @var array<string> $exclude_public_taxonomies
+		 */
+		$exclude_public_taxonomies = \apply_filters(
+			'progress_planner_exclude_public_taxonomies',
+			[
+				'post_format',
+				'product_shipping_class',
+				'prpl_recommendations_category',
+				'prpl_recommendations_provider',
+			]
+		);
 
-		if ( isset( $public_taxonomies['product_shipping_class'] ) ) {
-			unset( $public_taxonomies['product_shipping_class'] );
+		foreach ( $exclude_public_taxonomies as $taxonomy ) {
+			if ( isset( $public_taxonomies[ $taxonomy ] ) ) {
+				unset( $public_taxonomies[ $taxonomy ] );
+			}
 		}
 
 		/**

@@ -110,9 +110,7 @@ class Page {
 	 * @return string The notification count in HTML format.
 	 */
 	protected function get_notification_counter() {
-
-		$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' );
-		$notification_count        = count( $pending_celebration_tasks );
+		$notification_count = wp_count_posts( 'prpl_recommendations' )->pending;
 
 		if ( 0 === $notification_count ) {
 			return '';
@@ -162,7 +160,6 @@ class Page {
 		}
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
-
 			$default_localization_data = [
 				'name' => 'progressPlanner',
 				'data' => [
@@ -213,8 +210,7 @@ class Page {
 	 * @return void
 	 */
 	public function maybe_enqueue_focus_el_script( $hook ) {
-		$suggested_tasks  = \progress_planner()->get_suggested_tasks();
-		$tasks_providers  = $suggested_tasks->get_tasks_manager()->get_task_providers();
+		$tasks_providers  = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers();
 		$tasks_details    = [];
 		$total_points     = 0;
 		$completed_points = 0;
@@ -222,15 +218,23 @@ class Page {
 			if ( 'configuration' !== $provider->get_provider_category() ) {
 				continue;
 			}
-			$details = $provider->get_task_details();
-			if ( ! isset( $details['link_setting']['hook'] ) ||
-				$hook !== $details['link_setting']['hook']
+
+			$link_setting = $provider->get_link_setting();
+			if ( ! isset( $link_setting['hook'] ) ||
+				$hook !== $link_setting['hook']
 			) {
 				continue;
 			}
-			$details['is_complete'] = $provider->is_task_completed();
-			$tasks_details[]        = $details;
-			$total_points          += $details['points'];
+
+			$details = [
+				'link_setting' => $link_setting,
+				'task_id'      => $provider->get_task_id(),
+				'points'       => $provider->get_points(),
+				'is_complete'  => $provider->is_task_completed(),
+			];
+
+			$tasks_details[] = $details;
+			$total_points   += $details['points'];
 			if ( $details['is_complete'] ) {
 				$completed_points += $details['points'];
 			}
@@ -315,6 +319,7 @@ class Page {
 		}
 
 		\remove_all_actions( 'admin_notices' );
+		\remove_all_actions( 'all_admin_notices' );
 	}
 
 	/**

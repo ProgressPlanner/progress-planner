@@ -68,16 +68,16 @@ class Collaborator extends Tasks {
 	/**
 	 * Get the task details.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id = '' ) {
-		// Get the user tasks from the database.
+	public function get_task_details( $task_data = [] ) {
+
 		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		foreach ( $tasks as $task ) {
-			if ( $task['task_id'] !== $task_id ) {
+			if ( $task['task_id'] !== $task_data['task_id'] ) {
 				continue;
 			}
 

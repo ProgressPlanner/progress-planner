@@ -25,7 +25,6 @@ class Add_Yoast_Providers {
 	public function __construct() {
 		if ( function_exists( 'YoastSEO' ) ) {
 			\add_filter( 'progress_planner_suggested_tasks_providers', [ $this, 'add_providers' ], 11, 1 );
-
 			\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		}
 	}
@@ -45,8 +44,7 @@ class Add_Yoast_Providers {
 		$focus_tasks = [];
 
 		foreach ( $this->providers as $provider ) {
-
-			// Add Ravi icon if the task is pending or is completed.
+			// Add Ravi icon if the task is published or is completed.
 			if ( $provider->is_task_relevant() || \progress_planner()->get_suggested_tasks()->was_task_completed( $provider->get_task_id() ) ) {
 				if ( method_exists( $provider, 'get_focus_tasks' ) ) {
 					$focus_task = $provider->get_focus_tasks();
@@ -80,7 +78,6 @@ class Add_Yoast_Providers {
 	 * @return array
 	 */
 	public function add_providers( $providers ) {
-
 		$this->providers = [
 			new Archive_Author(),
 			new Archive_Date(),

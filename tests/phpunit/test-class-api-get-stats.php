@@ -39,14 +39,12 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 	 */
 	const REMOTE_API_RESPONSE = '[{"id":1619,"name":"Product page","settings":{"show_in_settings":"no","id":"product-page","title":"Product page","description":"Describes a product you sell"},"content_update_cycle":{"heading":"Content update cycle","update_cycle":"6 months","text":"<p>A {page_type} should be regularly updated. For this type of page, we suggest every {update_cycle}. We will remind you {update_cycle} after you&#8217;ve last saved this page.<\/p>\n","video":"","video_button_text":""}},{"id":1317,"name":"Blog post","settings":{"show_in_settings":"no","id":"blog","title":"Blog","description":"A blog post."},"content_update_cycle":{"heading":"Content update cycle","update_cycle":"6 months","text":"<p>A {page_type} should be regularly updated. For this type of page, we suggest updating them {update_cycle}. We will remind you {update_cycle} after you&#8217;ve last saved this page.<\/p>\n","video":"","video_button_text":""}},{"id":1316,"name":"FAQ page","settings":{"show_in_settings":"yes","id":"faq","title":"FAQ page","description":"Frequently Asked Questions."},"content_update_cycle":{"heading":"Content update cycle","update_cycle":"6 months","text":"<p>A {page_type} should be regularly updated. For this type of page, we suggest updating every {update_cycle}. We will remind you {update_cycle} after you&#8217;ve last saved this page.<\/p>\n","video":"","video_button_text":""}},{"id":1309,"name":"Contact page","settings":{"show_in_settings":"yes","id":"contact","title":"Contact","description":"Create an easy to use contact page."},"content_update_cycle":{"heading":"Content update cycle","update_cycle":"6 months","text":"<p>A {page_type} should be regularly updated. For this type of page, we suggest updating <strong>every {update_cycle}<\/strong>. We will remind you {update_cycle} after you&#8217;ve last saved this page.<\/p>\n","video":"","video_button_text":""}},{"id":1307,"name":"About page","settings":{"show_in_settings":"yes","id":"about","title":"About","description":"Who are you and why are you the person they need."},"content_update_cycle":{"heading":"Content update cycle","update_cycle":"6 months","text":"<p>A {page_type} should be regularly updated. For this type of page, we suggest updating every {update_cycle}. We will remind you {update_cycle} after you&#8217;ve last saved this page.<\/p>\n","video":"","video_button_text":""}},{"id":1269,"name":"Home page","settings":{"show_in_settings":"yes","id":"homepage","title":"Home page","description":"Describe your mission and much more."},"content_update_cycle":{"heading":"Content update cycle","update_cycle":"6 months","text":"<p>A {page_type} should be regularly updated. For this type of page, we suggest updating every {update_cycle}. We will remind you {update_cycle} after you&#8217;ve last saved this page.<\/p>\n","video":"","video_button_text":""}}]';
 
-
 	/**
 	 * Run before the tests.
 	 *
 	 * @return void
 	 */
 	public static function setUpBeforeClass(): void {
-
 		self::set_lessons_cache();
 
 		\progress_planner()->get_page_types()->create_taxonomy();
@@ -123,7 +121,6 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 	 * @return void.
 	 */
 	public function testEndpoint() {
-
 		$request  = new WP_REST_Request( 'GET', '/progress-planner/v1/get-stats/' . $this->token );
 		$response = $this->server->dispatch( $request );
 

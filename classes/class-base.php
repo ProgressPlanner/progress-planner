@@ -10,7 +10,6 @@ namespace Progress_Planner;
 /**
  * Main plugin class.
  *
- * @method \Progress_Planner\Suggested_Tasks get_suggested_tasks()
  * @method \Progress_Planner\Settings get_settings()
  * @method \Progress_Planner\Activities\Query get_activities__query()
  * @method \Progress_Planner\Utils\Cache get_utils__cache()
@@ -36,6 +35,8 @@ namespace Progress_Planner;
  * @method \Progress_Planner\Utils\Debug_Tools get_utils__debug_tools()
  * @method \Progress_Planner\Badges get_badges()
  * @method \Progress_Planner\Plugin_Migrations get_plugin_migrations()
+ * @method \Progress_Planner\Suggested_Tasks get_suggested_tasks()
+ * @method \Progress_Planner\Suggested_Tasks_DB get_suggested_tasks_db()
  */
 class Base {
 
@@ -88,6 +89,9 @@ class Base {
 				$this->get_admin__dashboard_widget_todo();
 			}
 		}
+
+		$this->get_suggested_tasks();
+
 		$this->get_admin__editor();
 
 		$this->get_actions__content();
@@ -114,7 +118,6 @@ class Base {
 		// We need to initialize some classes early.
 		$this->get_page_types();
 		$this->get_settings();
-		$this->get_suggested_tasks();
 		$this->get_badges();
 
 		if ( true === $this->is_privacy_policy_accepted() ) {
@@ -129,7 +132,7 @@ class Base {
 		$this->get_suggested_tasks__data_collector__data_collector_manager();
 
 		// Debug tools.
-		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {
+		if ( $this->is_debug_mode_enabled() ) {
 			$this->get_utils__debug_tools();
 		}
 
@@ -487,6 +490,15 @@ class Base {
 	public function is_on_progress_planner_dashboard_page() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- We're not processing any data.
 		return \is_admin() && isset( $_GET['page'] ) && $_GET['page'] === 'progress-planner';
+	}
+
+	/**
+	 * Check whether debug mode is enabled.
+	 *
+	 * @return bool
+	 */
+	public function is_debug_mode_enabled() {
+		return ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

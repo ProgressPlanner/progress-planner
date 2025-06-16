@@ -27,31 +27,41 @@ class Disable_Comments extends Tasks {
 	protected const PROVIDER_ID = 'disable-comments';
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url          = \admin_url( 'options-discussion.php' );
-		$this->link_setting = [
+	protected function get_url() {
+		return \admin_url( 'options-discussion.php' );
+	}
+
+	/**
+	 * Get the link setting.
+	 *
+	 * @return array
+	 */
+	public function get_link_setting() {
+		return [
 			'hook'   => 'options-discussion.php',
 			'iconEl' => 'label[for="default_comment_status"]',
 		];
 	}
 
 	/**
-	 * Get the title.
+	 * Get the task title.
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Disable comments', 'progress-planner' );
 	}
 
 	/**
-	 * Get the title.
+	 * Get the task description.
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return sprintf(
 			\esc_html(
 					// translators: %d is the number of approved comments, %s is the <a href="https://prpl.fyi/disable-comments" target="_blank">disabling them</a> link.

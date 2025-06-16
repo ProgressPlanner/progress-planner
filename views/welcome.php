@@ -21,7 +21,6 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 \progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/onboard' );
 \progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
 
-
 ?>
 <div class="prpl-welcome">
 	<div class="welcome-header">

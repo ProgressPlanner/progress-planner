@@ -155,6 +155,7 @@ class Settings {
 
 		unset( $public_post_types['attachment'] );
 		unset( $public_post_types['elementor_library'] ); // Elementor templates are not a post type we want to track.
+		unset( $public_post_types['prpl_recommendations'] );
 
 		/**
 		 * Filter the public post types.

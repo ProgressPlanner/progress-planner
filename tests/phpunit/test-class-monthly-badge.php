@@ -15,7 +15,6 @@ use Progress_Planner\Badges\Monthly;
  */
 class Monthly_Badge_Test extends \WP_UnitTestCase {
 
-
 	/**
 	 * Current month.
 	 *
@@ -40,7 +39,6 @@ class Monthly_Badge_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_monthly_badge_0_percent() {
-
 		foreach ( \progress_planner()->get_badges()->get_badges( 'monthly_flat' ) as $badge ) {
 			if ( 'monthly-' . $this->current_month === $badge->get_id() ) {
 				$this->assertEquals( 0, $badge->progress_callback()['progress'] );
@@ -54,7 +52,6 @@ class Monthly_Badge_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_monthly_badge_100_percent() {
-
 		for ( $i = 1; $i <= Monthly::TARGET_POINTS; $i++ ) {
 			$this->insert_activity( 1000 + $i );
 		}
@@ -66,14 +63,12 @@ class Monthly_Badge_Test extends \WP_UnitTestCase {
 		}
 	}
 
-
 	/**
 	 * Test the monthly badge over 100 percent, we should top at 100 percent.
 	 *
 	 * @return void
 	 */
 	public function test_monthly_badge_over_100_percent() {
-
 		for ( $i = 1; $i <= Monthly::TARGET_POINTS + 2; $i++ ) {
 			$this->insert_activity( 1000 + $i );
 		}
