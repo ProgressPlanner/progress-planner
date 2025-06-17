@@ -64,6 +64,7 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 	<?php
 	if (
 		$prpl_widget->get_score()['score'] > $prpl_widget->get_score()['target_score']
+		&& $prpl_widget->get_previous_month_badge()
 		&& $prpl_widget->get_previous_month_badge()->progress_callback()['progress'] < 100
 	) :
 		?>

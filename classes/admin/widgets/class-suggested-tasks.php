@@ -55,7 +55,7 @@ final class Suggested_Tasks extends Widget {
 	 */
 	public function get_previous_month_badge() {
 		return Monthly::get_instance_from_id(
-			Monthly::get_badge_id_from_date( ( new DateTime() )->modify( 'first day of next month' ) )
+			Monthly::get_badge_id_from_date( ( new DateTime() )->modify( 'first day of previous month' ) )
 		);
 	}
 
