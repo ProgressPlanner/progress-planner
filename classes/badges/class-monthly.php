@@ -122,6 +122,30 @@ final class Monthly extends Badge {
 	}
 
 	/**
+	 * Get the badge object from a badge ID.
+	 *
+	 * @param string $badge_id The badge ID.
+	 *
+	 * @return \Progress_Planner\Badges\Monthly|null
+	 */
+	public static function get_instance_from_id( $badge_id ) {
+		$year  = (int) explode( '-', str_replace( 'monthly-', '', $badge_id ) )[0];
+		$month = (int) str_replace( 'm', '', explode( '-', str_replace( 'monthly-', '', $badge_id ) )[1] );
+
+		$instances = self::get_instances();
+
+		if ( isset( $instances[ $year ] ) ) {
+			foreach ( $instances[ $year ] as $instance ) {
+				if ( (int) $instance->get_month() === $month ) {
+					return $instance;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
 	 * Get an array of months.
 	 *
 	 * @return array
@@ -195,7 +219,11 @@ final class Monthly extends Badge {
 		$saved_progress = $this->get_saved();
 
 		// If we have a saved value, return it.
-		if ( isset( $saved_progress['progress'] ) && isset( $saved_progress['remaining'] ) ) {
+		if ( isset( $saved_progress['progress'] )
+			&& isset( $saved_progress['remaining'] )
+			&& isset( $saved_progress['points'] )
+			&& 100 === $saved_progress['progress']
+		) {
 			return $saved_progress;
 		}
 
@@ -220,17 +248,54 @@ final class Monthly extends Badge {
 			$points += $activity->get_points( $activity->date );
 		}
 
-		$return_progress = ( $points > self::TARGET_POINTS )
-			? [
+		if ( $points > self::TARGET_POINTS ) {
+			$return_progress = [
 				'progress'  => 100,
 				'remaining' => 0,
-			] : [
-				'progress'  => (int) max( 0, min( 100, floor( 100 * $points / self::TARGET_POINTS ) ) ),
-				'remaining' => self::TARGET_POINTS - $points,
+				'points'    => $points,
 			];
+			$this->save_progress( $return_progress );
+			return $return_progress;
+		}
+
+		$return_progress = [
+			'progress'  => (int) max( 0, min( 100, floor( 100 * $points / self::TARGET_POINTS ) ) ),
+			'remaining' => (int) max( 0, self::TARGET_POINTS - $points ),
+			'points'    => $points,
+		];
 
 		$this->save_progress( $return_progress );
 
+		$next_badge_id = $this->get_next_badge_id();
+		if ( $next_badge_id ) {
+			$next_badge = self::get_instance_from_id( $next_badge_id );
+			if ( $next_badge ) {
+				$next_badge_progress = $next_badge->progress_callback();
+				$points             += $next_badge_progress['points'] - self::TARGET_POINTS;
+				$return_progress     = [
+					'progress'  => (int) max( 0, min( 100, floor( 100 * $points / self::TARGET_POINTS ) ) ),
+					'remaining' => (int) max( 0, self::TARGET_POINTS - $points ),
+					'points'    => $points,
+				];
+			}
+		}
+
 		return $return_progress;
+	}
+
+	/**
+	 * Get the next badge-ID.
+	 *
+	 * @return string
+	 */
+	public function get_next_badge_id() {
+		$year     = $this->get_year();
+		$month    = $this->get_month();
+		$month    = $month < 10 ? "0$month" : $month;
+		$datetime = \DateTime::createFromFormat( 'Y-m-d', "{$year}-{$month}-10" );
+		if ( ! $datetime ) {
+			return '';
+		}
+		return self::get_badge_id_from_date( $datetime->modify( 'first day of next month' ) );
 	}
 }

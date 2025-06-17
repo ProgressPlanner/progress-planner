@@ -7,6 +7,7 @@
 
 namespace Progress_Planner\Admin\Widgets;
 
+use DateTime;
 use Progress_Planner\Badges\Monthly;
 
 /**
@@ -24,7 +25,7 @@ final class Suggested_Tasks extends Widget {
 	/**
 	 * Get the score.
 	 *
-	 * @return int The score.
+	 * @return array<string, int> The scores.
 	 */
 	public function get_score() {
 		$activities = \progress_planner()->get_activities__query()->query_activities(
@@ -40,7 +41,22 @@ final class Suggested_Tasks extends Widget {
 			$score += $activity->get_points( $activity->date );
 		}
 
-		return (int) min( Monthly::TARGET_POINTS, max( 0, floor( $score ) ) );
+		return [
+			'score'        => (int) $score,
+			'target'       => (int) Monthly::TARGET_POINTS,
+			'target_score' => (int) min( Monthly::TARGET_POINTS, max( 0, floor( $score ) ) ),
+		];
+	}
+
+	/**
+	 * Get previous month badge.
+	 *
+	 * @return \Progress_Planner\Badges\Monthly|null
+	 */
+	public function get_previous_month_badge() {
+		return Monthly::get_instance_from_id(
+			Monthly::get_badge_id_from_date( ( new DateTime() )->modify( 'first day of next month' ) )
+		);
 	}
 
 	/**
