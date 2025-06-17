@@ -61,22 +61,30 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 		</span>
 	</div>
 
-	<?php
-	if (
-		$prpl_widget->get_score()['score'] > $prpl_widget->get_score()['target_score']
-		&& $prpl_widget->get_previous_month_badge()
-		&& $prpl_widget->get_previous_month_badge()->progress_callback()['progress'] < 100
-	) :
-		?>
-		<p>
-			<?php
-			printf(
-				/* translators: %d: The number of points. */
-				\esc_html__( 'Congratulations! You have completed more tasks than the target score. The additional %d points will help you complete the previous monthly badge that you missed.', 'progress-planner' ),
-				(int) ( $prpl_widget->get_score()['score'] - $prpl_widget->get_score()['target_score'] )
-			);
-			?>
-		</p>
+	<?php if ( $prpl_widget->get_previous_month_badge()->progress_callback()['progress'] < 100 ) : ?>
+		<h3><?php \esc_html_e( 'Oh no! You missed the previous monthly badge!', 'progress-planner' ); ?></h3>
+		<p><?php echo \wp_kses( __( 'No worries though! <strong>Collect the surplus of points</strong> you earn, and get your badge!', 'progress-planner' ), [ 'strong' => [] ] ); ?></p>
+		<div style="padding: 1rem 0; background-color: var(--prpl-background-orange); border-radius: 0.5rem; padding: 1rem;">
+			<prpl-badge-progress-bar
+				badge-id="<?php echo esc_attr( $prpl_widget->get_previous_month_badge()->get_id() ); ?>"
+				progress="<?php echo (int) $prpl_widget->get_previous_month_badge()->progress_callback()['progress']; ?>"
+			></prpl-badge-progress-bar>
+
+			<div class="prpl-widget-content-points">
+				<span id="prpl-widget-content-ravi-points-number" class="prpl-widget-content-points-number">
+					<?php echo (int) $prpl_widget->get_previous_month_badge()->progress_callback()['points']; ?>pt
+				</span>
+				<span>
+					<?php
+					printf(
+						/* translators: %d: The number of points. */
+						\esc_html__( 'Only %d more points to go', 'progress-planner' ),
+						(int) $prpl_widget->get_previous_month_badge()->progress_callback()['remaining']
+					);
+					?>
+				</span>
+			</div>
+		</div>
 	<?php endif; ?>
 
 	<hr>
