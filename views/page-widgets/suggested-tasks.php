@@ -61,7 +61,7 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 		</span>
 	</div>
 
-	<?php if ( $prpl_widget->get_previous_month_badge()->progress_callback()['progress'] < 100 ) : ?>
+	<?php if ( $prpl_widget->get_previous_month_badge() && $prpl_widget->get_previous_month_badge()->progress_callback()['progress'] < 100 ) : ?>
 		<h3><?php \esc_html_e( 'Oh no! You missed the previous monthly badge!', 'progress-planner' ); ?></h3>
 		<p><?php echo \wp_kses( __( 'No worries though! <strong>Collect the surplus of points</strong> you earn, and get your badge!', 'progress-planner' ), [ 'strong' => [] ] ); ?></p>
 		<div style="padding: 1rem 0; background-color: var(--prpl-background-orange); border-radius: 0.5rem; padding: 1rem;">
