@@ -45,7 +45,7 @@ const prplSuggestedTasksWidget = {
 			} );
 
 			// We trigger celebration only on Progress Planner dashboard page.
-			if ( 'dashboard' !== window.pagenow ) {
+			if ( ! prplSuggestedTask.delayCelebration ) {
 				// Inject pending celebration tasks.
 				celebrationPromises.push(
 					prplSuggestedTask
