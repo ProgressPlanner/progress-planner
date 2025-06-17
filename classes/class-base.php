@@ -7,6 +7,7 @@
 
 namespace Progress_Planner;
 
+
 /**
  * Main plugin class.
  *
