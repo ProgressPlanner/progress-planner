@@ -146,6 +146,15 @@ class Task {
 	}
 
 	/**
+	 * Get the category.
+	 *
+	 * @return string
+	 */
+	public function get_category(): string {
+		return $this->data['category']->slug ?? '';
+	}
+
+	/**
 	 * Get the task ID.
 	 *
 	 * @return string
@@ -163,5 +172,45 @@ class Task {
 	 */
 	public function __get( string $key ) {
 		return $this->data[ $key ] ?? null;
+	}
+
+	/**
+	 * Get the REST formatted data.
+	 *
+	 * @param int|null $post_id The post ID.
+	 *
+	 * @return array
+	 */
+	public function get_rest_formatted_data( $post_id = null ): array {
+		if ( ! $post_id ) {
+			$post_id = $this->ID;
+		}
+
+		$post = get_post( $post_id );
+		if ( ! $post ) {
+			return [];
+		}
+
+		// Make sure WP_REST_Posts_Controller is loaded.
+		if ( ! class_exists( 'WP_REST_Posts_Controller' ) ) {
+			require_once ABSPATH . 'wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php'; // @phpstan-ignore requireOnce.fileNotFound
+		}
+
+		// Make sure WP_REST_Request is loaded.
+		if ( ! class_exists( 'WP_REST_Request' ) ) {
+			require_once ABSPATH . 'wp-includes/rest-api/class-wp-rest-request.php'; // @phpstan-ignore requireOnce.fileNotFound
+		}
+
+		// Use the appropriate controller for the post type.
+		$controller = new \WP_REST_Posts_Controller( $post->post_type );
+
+		// Build dummy request object.
+		$request = new \WP_REST_Request();
+		$request->set_param( 'context', 'view' );
+
+		// Get formatted response.
+		$response = $controller->prepare_item_for_response( $post, $request );
+
+		return $response->get_data();
 	}
 }
