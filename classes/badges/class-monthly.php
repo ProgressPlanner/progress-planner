@@ -213,9 +213,11 @@ final class Monthly extends Badge {
 	/**
 	 * Progress callback.
 	 *
+	 * @param array $args The arguments for the progress callback.
+	 *
 	 * @return array
 	 */
-	public function progress_callback() {
+	public function progress_callback( $args = [] ) {
 		$saved_progress = $this->get_saved();
 
 		// If we have a saved value, return it.
@@ -267,10 +269,10 @@ final class Monthly extends Badge {
 		$this->save_progress( $return_progress );
 
 		$next_badge_id = $this->get_next_badge_id();
-		if ( $next_badge_id ) {
+		if ( $next_badge_id && ( ! isset( $args['no_next_badge_points'] ) || ! $args['no_next_badge_points'] ) ) {
 			$next_badge = self::get_instance_from_id( $next_badge_id );
 			if ( $next_badge ) {
-				$next_badge_progress = $next_badge->progress_callback();
+				$next_badge_progress = $next_badge->progress_callback( [ 'no_next_badge_points' => true ] );
 				$points             += $next_badge_progress['points'] - self::TARGET_POINTS;
 				$return_progress     = [
 					'progress'  => (int) max( 0, min( 100, floor( 100 * $points / self::TARGET_POINTS ) ) ),
