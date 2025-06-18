@@ -262,7 +262,7 @@ final class Monthly extends Badge {
 
 		$return_progress = [
 			'progress'  => (int) max( 0, min( 100, floor( 100 * $points / self::TARGET_POINTS ) ) ),
-			'remaining' => (int) max( 0, min( self::TARGET_POINTS - $points, 100 ) ),
+			'remaining' => (int) max( 0, min( self::TARGET_POINTS - $points, 10 ) ),
 			'points'    => $points,
 		];
 
@@ -276,7 +276,7 @@ final class Monthly extends Badge {
 				$points             += $next_badge_progress['points'] - self::TARGET_POINTS;
 				$return_progress     = [
 					'progress'  => (int) max( 0, min( 100, floor( 100 * $points / self::TARGET_POINTS ) ) ),
-					'remaining' => (int) max( 0, min( self::TARGET_POINTS - $points, 100 ) ),
+					'remaining' => (int) max( 0, min( self::TARGET_POINTS - $points, 10 ) ),
 					'points'    => $points,
 				];
 			}
