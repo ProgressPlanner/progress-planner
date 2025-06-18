@@ -174,16 +174,70 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 	// Mark badge as completed, in the a Monthly badges widgets, if we reached the max points.
 	if ( newValue >= parseInt( gaugeProps.max ) ) {
 		// We have multiple badges, one in widget and the other in the popover.
-		const badges = document.querySelectorAll(
-			'.prpl-badge-row-wrapper-inner .prpl-badge prpl-badge[complete="false"][badge-id="' +
-				gaugeProps.badgeId +
-				'"]'
-		);
-
-		if ( badges ) {
-			badges.forEach( ( badge ) => {
+		document
+			.querySelectorAll(
+				`.prpl-badge-row-wrapper-inner .prpl-badge prpl-badge[complete="false"][badge-id="${ gaugeProps.badgeId }"]`
+			)
+			?.forEach( ( badge ) => {
 				badge.setAttribute( 'complete', 'true' );
 			} );
+
+		// If the previous month badge progress bar exists, update it.
+		const previousMonthBadgeProgressBar = document
+			.getElementById( 'prpl-previous-month-badge-progress-bar' )
+			.querySelector( 'prpl-badge-progress-bar' );
+		if ( previousMonthBadgeProgressBar ) {
+			const previousMonthBadgeId =
+				previousMonthBadgeProgressBar.getAttribute( 'data-badge-id' );
+			const previousMonthBadgePoints =
+				previousMonthBadgeProgressBar.getAttribute( 'data-points' );
+			const previousMonthBadgeMaxPoints =
+				previousMonthBadgeProgressBar.getAttribute( 'data-max-points' );
+			const PreviousBadgeProgress = customElements.get(
+				'prpl-badge-progress-bar'
+			);
+			const previousBadgeNewPoints =
+				parseInt( previousMonthBadgePoints ) + pointsDiff;
+			const newProgressBar = new PreviousBadgeProgress(
+				previousMonthBadgeId,
+				previousBadgeNewPoints,
+				previousMonthBadgeMaxPoints
+			);
+			previousMonthBadgeProgressBar.replaceWith( newProgressBar );
+
+			// Update the remaining points.
+			const remainingPoints = document.getElementById(
+				'prpl-previous-month-badge-progress-bar-remaining'
+			);
+			remainingPoints.textContent = remainingPoints.textContent.replace(
+				remainingPoints.getAttribute( 'data-remaining' ),
+				previousMonthBadgeMaxPoints - previousBadgeNewPoints
+			);
+			remainingPoints.setAttribute(
+				'data-remaining',
+				previousMonthBadgeMaxPoints - previousBadgeNewPoints
+			);
+
+			// Update the previous month badge points number.
+			const previousMonthBadgePointsNumber = document.getElementById(
+				'prpl-widget-previous-ravi-points-number'
+			);
+			previousMonthBadgePointsNumber.textContent =
+				previousBadgeNewPoints + 'pt';
+
+			// If the previous month badge is completed, update badge elements.
+			if (
+				previousBadgeNewPoints >=
+				parseInt( previousMonthBadgeMaxPoints )
+			) {
+				document
+					.querySelectorAll(
+						`.prpl-badge-row-wrapper-inner .prpl-badge prpl-badge[complete="false"][badge-id="${ previousMonthBadgeId }"]`
+					)
+					?.forEach( ( badge ) => {
+						badge.setAttribute( 'complete', 'true' );
+					} );
+			}
 		}
 	}
 };
