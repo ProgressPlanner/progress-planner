@@ -44,29 +44,34 @@ const prplSuggestedTasksWidget = {
 				per_page: prplSuggestedTask.maxItemsPerCategory[ category ],
 			} );
 
-			// Inject pending celebration tasks.
-			celebrationPromises.push(
-				prplSuggestedTask
-					.injectItemsFromCategory( {
-						category,
-						status: [ 'pending' ],
-						per_page: 100,
-					} )
-					.then( ( data ) => {
-						// If there were pending tasks.
-						if ( data.length ) {
-							// Set post status to trash.
-							data.forEach( ( task ) => {
-								const post =
-									new wp.api.models.Prpl_recommendations( {
-										id: task.id,
-									} );
-								// Destroy the post, without the force parameter.
-								post.destroy( { url: post.url() } );
-							} );
-						}
-					} )
-			);
+			// We trigger celebration only on Progress Planner dashboard page.
+			if ( ! prplSuggestedTask.delayCelebration ) {
+				// Inject pending celebration tasks.
+				celebrationPromises.push(
+					prplSuggestedTask
+						.injectItemsFromCategory( {
+							category,
+							status: [ 'pending' ],
+							per_page: 100,
+						} )
+						.then( ( data ) => {
+							// If there were pending tasks.
+							if ( data.length ) {
+								// Set post status to trash.
+								data.forEach( ( task ) => {
+									const post =
+										new wp.api.models.Prpl_recommendations(
+											{
+												id: task.id,
+											}
+										);
+									// Destroy the post, without the force parameter.
+									post.destroy( { url: post.url() } );
+								} );
+							}
+						} )
+				);
+			}
 		}
 
 		// Trigger celebration once, for all categories.
