@@ -36,6 +36,17 @@ class Suggested_Tasks_DB {
 			return 0;
 		}
 
+		// Set lock transient.
+		$transient_key = 'prpl_task_lock_' . $data['task_id'];
+
+		// Check if the task is already being processed.
+		if ( \get_transient( $transient_key ) ) {
+			return 0;
+		}
+
+		// Set lock transient.
+		\set_transient( $transient_key, true, 5 );
+
 		// Check if we have an existing task with the same title.
 		$posts = $this->get_tasks_by(
 			[
@@ -53,6 +64,7 @@ class Suggested_Tasks_DB {
 
 		// If we have an existing task, skip.
 		if ( ! empty( $posts ) ) {
+			\delete_transient( $transient_key );
 			return $posts[0]->ID;
 		}
 
@@ -136,6 +148,8 @@ class Suggested_Tasks_DB {
 
 			\update_post_meta( $post_id, "prpl_$key", $value );
 		}
+
+		\delete_transient( $transient_key );
 
 		return $post_id;
 	}
