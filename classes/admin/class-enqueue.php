@@ -216,6 +216,7 @@ class Enqueue {
 				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
 					[
 						'post_status'      => 'pending',
+						'posts_per_page'   => 100,
 						'exclude_provider' => [ 'user' ],
 					]
 				);

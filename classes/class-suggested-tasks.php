@@ -456,6 +456,7 @@ class Suggested_Tasks {
 				'post_status'      => 'publish',
 				'exclude_provider' => [],
 				'include_provider' => [],
+				'posts_per_page'   => 0,
 			]
 		);
 
@@ -481,7 +482,7 @@ class Suggested_Tasks {
 			$category_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
 				[
 					'category'       => $category_slug,
-					'posts_per_page' => $max_items,
+					'posts_per_page' => 0 < $args['posts_per_page'] ? $args['posts_per_page'] : $max_items,
 					'post_status'    => $args['post_status'],
 				]
 			);
