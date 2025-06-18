@@ -13,12 +13,14 @@
 customElements.define(
 	'prpl-badge-progress-bar',
 	class extends HTMLElement {
-		constructor( badgeId, progress ) {
+		constructor( badgeId, points, maxPoints ) {
 			// Get parent class properties
 			super();
 
 			badgeId = badgeId || this.getAttribute( 'badge-id' );
-			progress = progress || this.getAttribute( 'progress' );
+			points = points || this.getAttribute( 'data-points' );
+			maxPoints = maxPoints || this.getAttribute( 'data-max-points' );
+			const progress = ( points / maxPoints ) * 100;
 			this.innerHTML = `
 				<div class="prpl-badge-progress-bar-container" style="padding: 1rem 0;">
 					<div
