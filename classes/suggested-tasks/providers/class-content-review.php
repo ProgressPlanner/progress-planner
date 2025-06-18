@@ -285,7 +285,7 @@ class Content_Review extends Tasks {
 				continue;
 			}
 
-			$task_id = $this->get_task_id( [ 'post_id' => $post->ID ] );
+			$task_id = $this->get_task_id( [ 'target_post_id' => $post->ID ] );
 
 			// Don't add the task if it was completed.
 			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
@@ -320,7 +320,7 @@ class Content_Review extends Tasks {
 				}
 
 				$task_to_inject[] = [
-					'task_id'          => $this->get_task_id( [ 'post_id' => $task_data['target_post_id'] ] ),
+					'task_id'          => $this->get_task_id( [ 'target_post_id' => $task_data['target_post_id'] ] ),
 					'provider_id'      => $this->get_provider_id(),
 					'category'         => $this->get_provider_category(),
 					'target_post_id'   => $task_data['target_post_id'],
