@@ -273,7 +273,7 @@ final class Monthly extends Badge {
 			$next_badge = self::get_instance_from_id( $next_badge_id );
 			if ( $next_badge ) {
 				$next_badge_progress = $next_badge->progress_callback( [ 'no_next_badge_points' => true ] );
-				$points             += $next_badge_progress['points'] - self::TARGET_POINTS;
+				$points             += max( 0, $next_badge_progress['points'] - self::TARGET_POINTS );
 				$return_progress     = [
 					'progress'  => (int) max( 0, min( 100, floor( 100 * $points / self::TARGET_POINTS ) ) ),
 					'remaining' => (int) max( 0, min( self::TARGET_POINTS - $points, 10 ) ),
