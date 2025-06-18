@@ -219,6 +219,14 @@ class Enqueue {
 				if ( isset( $max_items_per_category['user'] ) ) {
 					$max_items_per_category['user'] = 100;
 				}
+
+				// Celebrate only on the Progress Planner Dashboard page.
+				$delay_celebration = true;
+				if ( \progress_planner()->is_on_progress_planner_dashboard_page() ) {
+					// should_show_upgrade_popover() also checks if we're on the Progress Planner Dashboard page - but let's be explicit since that method might change in the future.
+					$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
+				}
+
 				$localize_data = [
 					'name' => 'prplSuggestedTask',
 					'data' => [
@@ -228,6 +236,7 @@ class Enqueue {
 							'snoozeIcon' => constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_snooze.svg',
 						],
 						'maxItemsPerCategory' => apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category ),
+						'delayCelebration'    => $delay_celebration,
 					],
 				];
 				break;

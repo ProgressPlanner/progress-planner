@@ -49,27 +49,6 @@ final class Suggested_Tasks extends Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		// Celebrate only on the Progress Planner Dashboard page.
-		$delay_celebration = false;
-		if ( \progress_planner()->is_on_progress_planner_dashboard_page() ) {
-			// should_show_upgrade_popover() also checks if we're on the Progress Planner Dashboard page - but let's be explicit since that method might change in the future.
-			$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
-		}
-
-		// Enqueue the script.
-		\progress_planner()->get_admin__enqueue()->enqueue_script(
-			'widgets/suggested-tasks',
-			[
-				'name' => 'prplSuggestedTasks',
-				'data' => [
-					'ajaxUrl'          => \admin_url( 'admin-ajax.php' ),
-					'nonce'            => \wp_create_nonce( 'progress_planner' ),
-					'tasks'            => [], // This is set in the JS file.
-					'delayCelebration' => $delay_celebration,
-				],
-			]
-		);
-
 		// Enqueue the badge scroller script.
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
 			'widgets/suggested-tasks-badge-scroller',
