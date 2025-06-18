@@ -100,4 +100,24 @@ final class Branding {
 		 */
 		return \apply_filters( 'progress_planner_admin_menu_icon', $icon );
 	}
+
+	/**
+	 * Get an array of strings used for branding purposes.
+	 *
+	 * @return array
+	 */
+	public static function get_strings(): array {
+		/**
+		 * Filter the strings used for branding purposes.
+		 *
+		 * @param array $strings The strings.
+		 * @return array
+		 */
+		return \apply_filters(
+			'progress_planner_branding_strings',
+			[
+				'ravi-recommendations' => __( 'Ravi\'s Recommendations', 'progress-planner' ),
+			]
+		);
+	}
 }
