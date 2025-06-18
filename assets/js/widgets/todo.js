@@ -67,8 +67,8 @@ const prplTodoWidget = {
 						prplSuggestedTask.injectedItemIds.push( item.id );
 					}
 				);
-				prplTodoWidget.removeLoadingItems();
 			}
+			prplTodoWidget.removeLoadingItems();
 		} else {
 			// Otherwise, inject tasks from the API.
 			prplSuggestedTask
