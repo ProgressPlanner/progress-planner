@@ -218,7 +218,6 @@ final class Monthly extends Badge {
 	 * @return array
 	 */
 	public function progress_callback( $args = [] ) {
-		$backtrack_month = isset( $args['backtrack_month'] ) ? (int) $args['backtrack_month'] : 0;
 		$saved_progress  = $this->get_saved();
 
 		// If we have a saved value, return it.
@@ -259,7 +258,7 @@ final class Monthly extends Badge {
 
 		$this->save_progress( $return_progress );
 
-		if ( $points >= self::TARGET_POINTS ) {
+		if ( $points >= self::TARGET_POINTS || ( isset( $args['no_next_badge_points'] ) && $args['no_next_badge_points'] ) ) {
 			return $return_progress;
 		}
 
@@ -293,17 +292,22 @@ final class Monthly extends Badge {
 	 * @return int
 	 */
 	public function get_next_badges_excess_points() {
-		$excess_points = 0;
+		$excess_points       = 0;
+		$next_1_badge_points = 0;
+		$next_2_badge_points = 0;
 		// Get the next badge object.
-		$next_badge = self::get_instance_from_id( $this->get_next_badge_id() );
-		if ( $next_badge ) {
-			$excess_points = max( 0, $next_badge->progress_callback()['points'] - self::TARGET_POINTS );
+		$next_1_badge = self::get_instance_from_id( $this->get_next_badge_id() );
+		if ( $next_1_badge ) {
+			$next_1_badge_points = $next_1_badge->progress_callback( [ 'no_next_badge_points' => true ] )['points'];
 
-			$next_badge = self::get_instance_from_id( $next_badge->get_next_badge_id() );
-			if ( $next_badge ) {
-				$excess_points += max( 0, $next_badge->progress_callback()['points'] / 2 - 2 * self::TARGET_POINTS );
+			$next_2_badge = self::get_instance_from_id( $next_1_badge->get_next_badge_id() );
+			if ( $next_2_badge ) {
+				$next_2_badge_points = $next_2_badge->progress_callback( [ 'no_next_badge_points' => true ] )['points'];
 			}
 		}
+
+		$excess_points  = max( 0, $next_1_badge_points - self::TARGET_POINTS );
+		$excess_points += max( 0, $next_2_badge_points - 2 * self::TARGET_POINTS );
 
 		return (int) $excess_points;
 	}
