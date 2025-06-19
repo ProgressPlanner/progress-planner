@@ -175,7 +175,7 @@ class Stats {
 
 		$data['plugin_url'] = \esc_url( \get_admin_url( null, 'admin.php?page=progress-planner' ) );
 
-		$active_plugins = \get_option( 'active_plugins' );
+		$active_plugins  = \get_option( 'active_plugins' );
 		$data['plugins'] = [];
 		foreach ( $active_plugins as $plugin ) {
 			$plugin_data       = \get_plugin_data( \WP_PLUGIN_DIR . '/' . $plugin );
