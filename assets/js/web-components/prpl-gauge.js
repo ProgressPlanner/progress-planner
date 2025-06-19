@@ -249,10 +249,6 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 					?.forEach( ( badge ) => {
 						badge.setAttribute( 'complete', 'true' );
 					} );
-
-				document
-					.getElementById( 'prpl-previous-month-badge-progress-bar' )
-					?.remove();
 			}
 		}
 	}
