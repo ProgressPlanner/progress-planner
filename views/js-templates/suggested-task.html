@@ -14,7 +14,7 @@
 				</prpl-tooltip>
 			<# } else { #>
 				<label>
-					<input type="checkbox" class="prpl-suggested-task-checkbox" onchange="prplSuggestedTask.maybeComplete( {{ data.post.id }} );" style="margin-top: 2px; pointer-events: none;" <# if ( ! data.post.meta.prpl_dismissable || 'trash' === data.post.status || 'pending' === data.post.status ) { #>disabled<# } #> <# if ( 'trash' === data.post.status || 'pending' === data.post.status ) { #>checked<# } #>>
+					<input type="checkbox" class="prpl-suggested-task-checkbox" onchange="prplSuggestedTask.maybeComplete( {{ data.post.id }} );" style="margin-top: 2px; pointer-events: none;" <# if ( ! data.post.meta.prpl_dismissable || 'user' !== categorySlug && ( 'trash' === data.post.status || 'pending' === data.post.status ) ) { #>disabled<# } #> <# if ( 'trash' === data.post.status || 'pending' === data.post.status ) { #>checked<# } #>>
 					<span class="screen-reader-text">{{{ data.post.title.rendered }}}: {{ data.l10n.markAsComplete }}</span>
 				</label>
 			<# } #>

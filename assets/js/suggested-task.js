@@ -100,6 +100,32 @@ prplSuggestedTask = {
 			} ),
 
 	/**
+	 * Inject items.
+	 *
+	 * @param {Object[]} items The items to inject.
+	 */
+	injectItems: ( items ) => {
+		if ( items.length ) {
+			// Inject the items into the DOM.
+			items.forEach( ( item ) => {
+				document.dispatchEvent(
+					new CustomEvent( 'prpl/suggestedTask/injectItem', {
+						detail: {
+							item,
+							listId: 'prpl-suggested-tasks-list',
+							insertPosition: 'beforeend',
+						},
+					} )
+				);
+				prplSuggestedTask.injectedItemIds.push( item.id );
+			} );
+		}
+
+		// Trigger the grid resize event.
+		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+	},
+
+	/**
 	 * Get a collection of posts.
 	 *
 	 * @param {Object} fetchArgs The arguments to pass to the fetch method.

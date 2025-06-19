@@ -29,59 +29,45 @@ const prplSuggestedTasksWidget = {
 			return;
 		}
 
-		const celebrationPromises = [];
-
-		// Loop through each provider and inject items.
-		for ( const category in prplSuggestedTask.maxItemsPerCategory ) {
-			if ( 'user' === category ) {
-				continue;
-			}
-
-			// Inject published tasks.
-			prplSuggestedTask.injectItemsFromCategory( {
-				category,
-				status: [ 'publish' ],
-				per_page: prplSuggestedTask.maxItemsPerCategory[ category ],
-			} );
-
-			// We trigger celebration only on Progress Planner dashboard page.
-			if ( ! prplSuggestedTask.delayCelebration ) {
-				// Inject pending celebration tasks.
-				celebrationPromises.push(
-					prplSuggestedTask
-						.injectItemsFromCategory( {
-							category,
-							status: [ 'pending' ],
-							per_page: 100,
-						} )
-						.then( ( data ) => {
-							// If there were pending tasks.
-							if ( data.length ) {
-								// Set post status to trash.
-								data.forEach( ( task ) => {
-									const post =
-										new wp.api.models.Prpl_recommendations(
-											{
-												id: task.id,
-											}
-										);
-									// Destroy the post, without the force parameter.
-									post.destroy( { url: post.url() } );
-								} );
-							}
-						} )
+		// If preloaded tasks are available, inject them.
+		if ( 'undefined' !== typeof prplSuggestedTask.tasks ) {
+			// Inject the tasks.
+			if ( Object.keys( prplSuggestedTask.tasks.pendingTasks ).length ) {
+				Object.keys( prplSuggestedTask.tasks.pendingTasks ).forEach(
+					( category ) => {
+						prplSuggestedTask.injectItems(
+							prplSuggestedTask.tasks.pendingTasks[ category ]
+						);
+					}
 				);
 			}
-		}
 
-		// Trigger celebration once, for all categories.
-		Promise.all( celebrationPromises ).then( () => {
+			// Inject the pending celebration tasks.
 			if (
-				0 <
-				document.querySelectorAll(
-					'.prpl-suggested-tasks-list [data-task-action="celebrate"]'
-				).length
+				Object.keys( prplSuggestedTask.tasks.pendingCelebrationTasks )
+					.length
 			) {
+				Object.keys(
+					prplSuggestedTask.tasks.pendingCelebrationTasks
+				).forEach( ( category ) => {
+					prplSuggestedTask.injectItems(
+						prplSuggestedTask.tasks.pendingCelebrationTasks[
+							category
+						]
+					);
+
+					// Set post status to trash.
+					prplSuggestedTask.tasks.pendingCelebrationTasks[
+						category
+					].forEach( ( task ) => {
+						const post = new wp.api.models.Prpl_recommendations( {
+							id: task.id,
+						} );
+						// Destroy the post, without the force parameter.
+						post.destroy( { url: post.url() } );
+					} );
+				} );
+
 				// Trigger the celebration event (trigger confetti, strike through tasks, remove from DOM).
 				setTimeout( () => {
 					// Trigger the celebration event.
@@ -102,7 +88,86 @@ const prplSuggestedTasksWidget = {
 					);
 				}, 3000 );
 			}
-		} );
+
+			// Toggle the "Loading..." text.
+			prplSuggestedTasksWidget.removeLoadingItems();
+		} else {
+			// Otherwise, inject tasks from the API.
+			const celebrationPromises = [];
+
+			// Loop through each provider and inject items.
+			for ( const category in prplSuggestedTask.maxItemsPerCategory ) {
+				if ( 'user' === category ) {
+					continue;
+				}
+
+				// Inject published tasks.
+				prplSuggestedTask.injectItemsFromCategory( {
+					category,
+					status: [ 'publish' ],
+					per_page: prplSuggestedTask.maxItemsPerCategory[ category ],
+				} );
+
+				// We trigger celebration only on Progress Planner dashboard page.
+				if ( ! prplSuggestedTask.delayCelebration ) {
+					// Inject pending celebration tasks.
+					celebrationPromises.push(
+						prplSuggestedTask
+							.injectItemsFromCategory( {
+								category,
+								status: [ 'pending' ],
+								per_page: 100,
+							} )
+							.then( ( data ) => {
+								// If there were pending tasks.
+								if ( data.length ) {
+									// Set post status to trash.
+									data.forEach( ( task ) => {
+										const post =
+											new wp.api.models.Prpl_recommendations(
+												{
+													id: task.id,
+												}
+											);
+										// Destroy the post, without the force parameter.
+										post.destroy( { url: post.url() } );
+									} );
+								}
+							} )
+					);
+				}
+			}
+
+			// Trigger celebration once, for all categories.
+			Promise.all( celebrationPromises ).then( () => {
+				if (
+					0 <
+					document.querySelectorAll(
+						'.prpl-suggested-tasks-list [data-task-action="celebrate"]'
+					).length
+				) {
+					// Trigger the celebration event (trigger confetti, strike through tasks, remove from DOM).
+					setTimeout( () => {
+						// Trigger the celebration event.
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/celebrateTasks' )
+						);
+
+						/**
+						 * Strike completed tasks and remove them from the DOM.
+						 */
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/removeCelebratedTasks' )
+						);
+
+						// Trigger the grid resize event.
+						window.dispatchEvent(
+							new CustomEvent( 'prpl/grid/resize' )
+						);
+					}, 3000 );
+				}
+			} );
+		}
 	},
 };
 
