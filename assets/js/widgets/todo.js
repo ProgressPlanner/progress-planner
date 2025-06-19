@@ -42,40 +42,70 @@ const prplTodoWidget = {
 	 * Populate the todo list.
 	 */
 	populateList: () => {
-		prplSuggestedTask
-			.fetchItems( {
-				category: 'user',
-				status: [ 'publish', 'trash' ],
-				per_page: 100,
-			} )
-			.then( ( data ) => {
-				if ( ! data.length ) {
+		// If preloaded tasks are available, inject them.
+		if ( 'undefined' !== typeof prplSuggestedTask.tasks ) {
+			// Inject the tasks.
+			if ( Object.keys( prplSuggestedTask.tasks.userTasks ).length ) {
+				Object.values( prplSuggestedTask.tasks.userTasks ).forEach(
+					( item ) => {
+						// Inject the items into the DOM.
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/suggestedTask/injectItem', {
+								detail: {
+									item,
+									insertPosition:
+										1 === item?.meta?.prpl_points
+											? 'afterbegin' // Add golden task to the start of the list.
+											: 'beforeend',
+									listId:
+										item.status === 'publish'
+											? 'todo-list'
+											: 'todo-list-completed',
+								},
+							} )
+						);
+						prplSuggestedTask.injectedItemIds.push( item.id );
+					}
+				);
+			}
+			prplTodoWidget.removeLoadingItems();
+		} else {
+			// Otherwise, inject tasks from the API.
+			prplSuggestedTask
+				.fetchItems( {
+					category: 'user',
+					status: [ 'publish', 'trash' ],
+					per_page: 100,
+				} )
+				.then( ( data ) => {
+					if ( ! data.length ) {
+						return data;
+					}
+
+					// Inject the items into the DOM.
+					data.forEach( ( item ) => {
+						document.dispatchEvent(
+							new CustomEvent( 'prpl/suggestedTask/injectItem', {
+								detail: {
+									item,
+									insertPosition:
+										1 === item?.meta?.prpl_points
+											? 'afterbegin' // Add golden task to the start of the list.
+											: 'beforeend',
+									listId:
+										item.status === 'publish'
+											? 'todo-list'
+											: 'todo-list-completed',
+								},
+							} )
+						);
+						prplSuggestedTask.injectedItemIds.push( item.id );
+					} );
+
 					return data;
-				}
-
-				// Inject the items into the DOM.
-				data.forEach( ( item ) => {
-					document.dispatchEvent(
-						new CustomEvent( 'prpl/suggestedTask/injectItem', {
-							detail: {
-								item,
-								insertPosition:
-									1 === item?.meta?.prpl_points
-										? 'afterbegin' // Add golden task to the start of the list.
-										: 'beforeend',
-								listId:
-									item.status === 'publish'
-										? 'todo-list'
-										: 'todo-list-completed',
-							},
-						} )
-					);
-					prplSuggestedTask.injectedItemIds.push( item.id );
-				} );
-
-				return data;
-			} )
-			.then( () => prplTodoWidget.removeLoadingItems() );
+				} )
+				.then( () => prplTodoWidget.removeLoadingItems() );
+		}
 
 		// When the '#create-todo-item' form is submitted,
 		// add a new todo item to the list

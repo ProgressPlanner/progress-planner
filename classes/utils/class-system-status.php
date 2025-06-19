@@ -133,6 +133,17 @@ class System_Status {
 
 		$data['plugin_url'] = \esc_url( \get_admin_url( null, 'admin.php?page=progress-planner' ) );
 
+		$active_plugins  = \get_option( 'active_plugins' );
+		$data['plugins'] = [];
+		foreach ( $active_plugins as $plugin ) {
+			$plugin_data       = \get_plugin_data( \WP_PLUGIN_DIR . '/' . $plugin );
+			$data['plugins'][] = [
+				'plugin'  => $plugin,
+				'name'    => $plugin_data['Name'] ?? 'N/A', // @phpstan-ignore-line nullCoalesce.offset
+				'version' => $plugin_data['Version'] ?? 'N/A', // @phpstan-ignore-line nullCoalesce.offset
+			];
+		}
+
 		return $data;
 	}
 }
