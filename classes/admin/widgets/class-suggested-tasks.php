@@ -75,6 +75,8 @@ final class Suggested_Tasks extends Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
+		parent::enqueue_scripts();
+
 		// Enqueue the badge scroller script.
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
 			'widgets/suggested-tasks-badge-scroller',
