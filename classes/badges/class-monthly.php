@@ -218,7 +218,7 @@ final class Monthly extends Badge {
 	 * @return array
 	 */
 	public function progress_callback( $args = [] ) {
-		$saved_progress  = $this->get_saved();
+		$saved_progress = $this->get_saved();
 
 		// If we have a saved value, return it.
 		if ( isset( $saved_progress['progress'] )
