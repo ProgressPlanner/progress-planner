@@ -203,6 +203,18 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 				previousBadgeNewPoints,
 				previousMonthBadgeMaxPoints
 			);
+			newProgressBar.setAttribute(
+				'data-badge-id',
+				previousMonthBadgeId
+			);
+			newProgressBar.setAttribute(
+				'data-points',
+				previousBadgeNewPoints
+			);
+			newProgressBar.setAttribute(
+				'data-max-points',
+				previousMonthBadgeMaxPoints
+			);
 			previousMonthBadgeProgressBar.replaceWith( newProgressBar );
 
 			// Update the remaining points.
