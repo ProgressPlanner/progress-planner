@@ -26,52 +26,6 @@ class Todo {
 	}
 
 	/**
-	 * Get the points for a new task.
-	 *
-	 * @return int
-	 */
-	public function calc_points_for_new_task() {
-		$items = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => 'user' ] );
-
-		// If this is the first user task ever, return 1.
-		if ( ! count( $items ) ) {
-			return 1;
-		}
-
-		// Get the task IDs from the todos.
-		$task_ids = array_column( $items, 'task_id' );
-
-		// Get the completed activities for this week that are in the todos.
-		$activities = array_filter(
-			\progress_planner()->get_activities__query()->query_activities(
-				[
-					'start_date' => new \DateTime( 'monday this week' ),
-					'end_date'   => new \DateTime( 'sunday this week' ),
-					'category'   => 'suggested_task',
-					'type'       => 'completed',
-				]
-			),
-			function ( $activity ) use ( $task_ids ) {
-				return in_array( $activity->data_id, $task_ids, true );
-			}
-		);
-
-		// If there are completed todos this week, we already have set the golden task and it was completed.
-		if ( count( $activities ) ) {
-			return 0;
-		}
-
-		// Check if there are already published user tasks with a points value other than 0.
-		foreach ( $items as $item ) {
-			if ( 'publish' === $item['post_status'] && isset( $item['points'] ) && $item['points'] !== 0 ) {
-				return 0;
-			}
-		}
-
-		return 1;
-	}
-
-	/**
 	 * Maybe change the points of the first item in the todo list on Monday.
 	 *
 	 * @return void

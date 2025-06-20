@@ -93,7 +93,7 @@ class Cornerstone_Workout extends Yoast_Provider {
 		}
 
 		// For this type of task only the provider ID is needed, but just in case.
-		if ( $this->is_task_dismissed( $tasks[0] ) ) {
+		if ( $this->is_task_dismissed( $tasks[0]->get_data() ) ) {
 			return;
 		}
 
