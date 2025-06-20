@@ -92,6 +92,14 @@
 			font-weight: 600;
 		}
 	}
+
+	.prpl-montly-completed-tasks-list {
+
+		li {
+			display: flex;
+			justify-content: space-between;
+		}
+	}
 }
 
 .prpl-dashboard-widget-suggested-tasks {

@@ -61,6 +61,26 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 		</span>
 	</div>
 
+	<?php $prpl_monthly_tasks = $prpl_badge->get_monthly_tasks(); ?>
+
+	<?php if ( ! empty( $prpl_monthly_tasks ) ) : ?>
+		<hr>
+		<div class="prpl-widget-content-tasks-list">
+			<h2 class="prpl-widget-title">
+				<?php \esc_html_e( 'Completed tasks', 'progress-planner' ); ?>
+		</h2>
+
+		<ul class="prpl-montly-completed-tasks-list">
+			<?php foreach ( $prpl_badge->get_monthly_tasks() as $prpl_monthly_task ) : ?>
+				<li>
+					<span><?php echo esc_html( $prpl_monthly_task['title'] ); ?></span>
+					<span><?php echo esc_html( $prpl_monthly_task['points'] ); ?>pt</span>
+				</li>
+			<?php endforeach; ?>
+			</ul>
+		</div>
+	<?php endif; ?>
+
 	<hr>
 <?php endif; ?>
 
