@@ -7,6 +7,7 @@
 
 namespace Progress_Planner\Admin\Widgets;
 
+use DateTime;
 use Progress_Planner\Badges\Monthly;
 
 /**
@@ -24,7 +25,7 @@ final class Suggested_Tasks extends Widget {
 	/**
 	 * Get the score.
 	 *
-	 * @return int The score.
+	 * @return array<string, int> The scores.
 	 */
 	public function get_score() {
 		$activities = \progress_planner()->get_activities__query()->query_activities(
@@ -40,7 +41,34 @@ final class Suggested_Tasks extends Widget {
 			$score += $activity->get_points( $activity->date );
 		}
 
-		return (int) min( Monthly::TARGET_POINTS, max( 0, floor( $score ) ) );
+		return [
+			'score'        => (int) $score,
+			'target'       => (int) Monthly::TARGET_POINTS,
+			'target_score' => (int) min( Monthly::TARGET_POINTS, max( 0, floor( $score ) ) ),
+		];
+	}
+
+	/**
+	 * Get previous month badge.
+	 *
+	 * @return \Progress_Planner\Badges\Monthly[]
+	 */
+	public function get_previous_incomplete_months_badges() {
+		$previous_incomplete_month_badges = [];
+
+		$minus_one_month       = ( new DateTime() )->modify( 'first day of previous month' );
+		$minus_one_month_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( $minus_one_month ) );
+		if ( $minus_one_month_badge && $minus_one_month_badge->progress_callback()['progress'] < 100 ) {
+			$previous_incomplete_month_badges[] = $minus_one_month_badge;
+		}
+
+		$minus_two_months       = ( new DateTime() )->modify( 'first day of previous month' )->modify( 'first day of previous month' );
+		$minus_two_months_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( $minus_two_months ) );
+		if ( $minus_two_months_badge && $minus_two_months_badge->progress_callback()['progress'] < 100 ) {
+			$previous_incomplete_month_badges[] = $minus_two_months_badge;
+		}
+
+		return $previous_incomplete_month_badges;
 	}
 
 	/**
@@ -49,6 +77,8 @@ final class Suggested_Tasks extends Widget {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
+		parent::enqueue_scripts();
+
 		// Enqueue the badge scroller script.
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
 			'widgets/suggested-tasks-badge-scroller',
