@@ -1,3 +1,9 @@
+= 1.6.0 =
+
+Under the hood:
+
+* Ravi's Recommendations are now a custom post type.
+
 = 1.5.0 =
 
 Added these recommendations from Ravi:
