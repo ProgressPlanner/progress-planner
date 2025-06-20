@@ -270,5 +270,18 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 				`.prpl-previous-month-badge-progress-bar-wrapper[data-badge-id="${ badgeId }"]`
 			)
 			?.remove();
+
+		// If there are no more progress bars, remove the previous month badge progress bar wrapper.
+		if (
+			! document.querySelector(
+				'.prpl-previous-month-badge-progress-bar-wrapper'
+			)
+		) {
+			document
+				.querySelector(
+					'.prpl-previous-month-badge-progress-bars-wrapper'
+				)
+				?.remove();
+		}
 	}
 };
