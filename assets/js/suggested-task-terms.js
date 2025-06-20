@@ -50,41 +50,35 @@ const prplTerms = {
 				const TermsCollection = new wp.api.collections[ typeName ]();
 				TermsCollection.fetch( { data: { per_page: 100 } } ).done(
 					( data ) => {
+						let userTermFound = false;
 						// 100 is the maximum number of terms that can be fetched in one request.
 						data.forEach( ( term ) => {
 							prplSuggestedTasksTerms[ taxonomy ][ term.slug ] =
 								term;
+							if ( 'user' === term.slug ) {
+								userTermFound = true;
+							}
 						} );
 
-						// If the `user` term doesn't exist, create it.
-						const UserTermsCollection = new wp.api.collections[
-							typeName
-						]();
-						UserTermsCollection.fetch( {
-							data: { slug: 'user' },
-						} )
-							.then( ( userTerms ) => {
-								if ( 0 === userTerms.length ) {
-									const newTermModel = new wp.api.models[
-										typeName
-									]( {
-										slug: 'user',
-										name: 'user',
-									} );
-									return newTermModel
-										.save()
-										.then( ( response ) => {
-											prplSuggestedTasksTerms[
-												taxonomy
-											].user = response;
-											return prplSuggestedTasksTerms[
-												taxonomy
-											];
-										} );
+						if ( userTermFound ) {
+							resolve( prplSuggestedTasksTerms[ taxonomy ] );
+						} else {
+							// If the `user` term doesn't exist, create it.
+							const newTermModel = new wp.api.models[ typeName ](
+								{
+									slug: 'user',
+									name: 'user',
 								}
-								return prplSuggestedTasksTerms[ taxonomy ];
-							} )
-							.then( resolve ); // Resolve the promise after all requests are complete.
+							);
+							newTermModel
+								.save()
+								.then( ( response ) => {
+									prplSuggestedTasksTerms[ taxonomy ].user =
+										response;
+									return prplSuggestedTasksTerms[ taxonomy ];
+								} )
+								.then( resolve ); // Resolve the promise after all requests are complete.
+						}
 					}
 				);
 			} );
