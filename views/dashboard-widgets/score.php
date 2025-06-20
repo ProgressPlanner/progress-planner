@@ -18,10 +18,10 @@ use Progress_Planner\Badges\Monthly;
 			contentPadding="var(--prpl-padding)"
 			marginBottom="0"
 			data-max="<?php echo (int) Monthly::TARGET_POINTS; ?>"
-			data-value="<?php echo (float) \progress_planner()->get_admin__widgets__suggested_tasks()->get_score(); ?>"
+			data-value="<?php echo (float) \progress_planner()->get_admin__widgets__suggested_tasks()->get_score()['target_score']; ?>"
 			data-badge-id="<?php echo esc_attr( Monthly::get_badge_id_from_date( new \DateTime() ) ); ?>"
 		>
-			<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) \progress_planner()->get_admin__widgets__suggested_tasks()->get_score(); ?>">
+			<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) \progress_planner()->get_admin__widgets__suggested_tasks()->get_score()['target_score']; ?>">
 				<prpl-badge
 					complete="true"
 					badge-id="<?php echo esc_attr( Monthly::get_badge_id_from_date( new \DateTime() ) ); ?>"
