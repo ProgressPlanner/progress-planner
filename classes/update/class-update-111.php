@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Update;
 
-use Progress_Planner\Suggested_Tasks\Task_Factory;
+use Progress_Planner\Utils\Plugin_Migration_Helpers;
 
 /**
  * Update class for version 1.1.1.
@@ -82,7 +82,7 @@ class Update_111 {
 		$local_tasks_option = \get_option( 'progress_planner_local_tasks', [] );
 		if ( ! empty( $local_tasks_option ) ) {
 			foreach ( $local_tasks_option as $task_id ) {
-				$task           = Task_Factory::create_task_from( 'id', $task_id )->get_data();
+				$task           = Plugin_Migration_Helpers::parse_task_data_from_task_id( $task_id )->get_data();
 				$task['status'] = 'pending';
 
 				if ( ! isset( $task['task_id'] ) ) {
@@ -108,7 +108,7 @@ class Update_111 {
 		foreach ( $suggested_tasks_option as $status => $tasks ) {
 			foreach ( $tasks as $_task ) {
 				$task_id        = is_string( $_task ) ? $_task : $_task['id'];
-				$task           = Task_Factory::create_task_from( 'id', $task_id )->get_data();
+				$task           = Plugin_Migration_Helpers::parse_task_data_from_task_id( $task_id )->get_data();
 				$task['status'] = $status;
 				if ( 'snoozed' === $status && isset( $_task['time'] ) ) {
 					$task['time'] = $_task['time'];
@@ -237,7 +237,6 @@ class Update_111 {
 	 * @return void
 	 */
 	private function migrate_create_post_tasks() {
-
 		// Migrate the 'create-post' completed tasks.
 		if ( ! empty( $this->local_tasks ) ) {
 			foreach ( $this->local_tasks as $key => $task ) {
@@ -245,13 +244,13 @@ class Update_111 {
 					continue;
 				}
 				if ( false !== strpos( $task['task_id'], 'provider_id/create-post' ) ) {
-
-					// task_id needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
-					// So for tasks which are completed or pending_celebration we will make the task_id like: create-post-short-202501,
-					// and for pending tasks task_id will be (how it will be in the future, since we only have 1 type of create-post task per week): create-post-202501 .
-
+					/*
+					 * `task_id` needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
+					 * For tasks which are completed or pending we will make the task_id like: create-post-short-202501
+					 * and for pending tasks, task_id will be (how it will be in the future, since we only have 1 type of create-post task per week): create-post-202501 .
+					 */
 					// Only add legacy part of the task_id if the task is not pending.
-					if ( 'completed' === $task['status'] || 'pending_celebration' === $task['status'] ) {
+					if ( 'completed' === $task['status'] || 'pending' === $task['status'] ) {
 						$this->local_tasks[ $key ]['task_id'] = $task['provider_id'] . '-' . ( $task['long'] ? 'long' : 'short' ) . '-' . $task['date'];
 					} else {
 						$this->local_tasks[ $key ]['task_id'] = $task['provider_id'] . '-' . $task['date'];
@@ -303,7 +302,6 @@ class Update_111 {
 	 * @return void
 	 */
 	private function migrate_review_post_tasks() {
-
 		// Migrate the 'create-post' completed tasks.
 		if ( ! empty( $this->local_tasks ) ) {
 			foreach ( $this->local_tasks as $key => $task ) {
@@ -311,7 +309,6 @@ class Update_111 {
 					continue;
 				}
 				if ( false !== strpos( $task['task_id'], 'provider_id/review-post' ) ) {
-
 					$data = $this->get_data_from_task_id( $task['task_id'] );
 
 					// Get the date from the activity.
@@ -374,11 +371,9 @@ class Update_111 {
 			]
 		);
 
-		if ( ! empty( $activity ) ) {
-			return $activity[0]->date->format( 'YW' );
-		}
-
-		return \gmdate( 'YW' );
+		return ( ! empty( $activity ) )
+			? $activity[0]->date->format( 'YW' )
+			: \gmdate( 'YW' );
 	}
 
 	/**

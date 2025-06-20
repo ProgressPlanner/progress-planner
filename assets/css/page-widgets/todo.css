@@ -1,7 +1,7 @@
 /**
  * TODOs widget.
  *
- * Dependencies: progress-planner/web-components/prpl-suggested-task
+ * Dependencies: progress-planner/suggested-task
  */
 
 .prpl-widget-wrapper.prpl-todo {
@@ -145,7 +145,6 @@
 		}
 	}
 
-
 	#create-todo-item {
 		padding: 0 16px;
 	}
@@ -190,5 +189,24 @@
 
 	&:not(:has(.prpl-suggested-task)) {
 		display: none;
+	}
+}
+
+#todo-list {
+
+	&:has(.prpl-loader) {
+		position: relative;
+
+		&::before {
+			content: "";
+			display: block;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.2);
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 10;
+		}
 	}
 }

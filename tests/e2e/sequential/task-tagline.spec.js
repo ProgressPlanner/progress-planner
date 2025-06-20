@@ -25,7 +25,7 @@ function taglineTests( testContext = test ) {
 					( task ) => task.task_id === 'core-blogdescription'
 				);
 				expect( blogDescriptionTask ).toBeDefined();
-				expect( blogDescriptionTask.status ).toBe( 'pending' );
+				expect( blogDescriptionTask.post_status ).toBe( 'publish' );
 
 				// Navigate to WordPress settings
 				await page.goto(
@@ -59,7 +59,7 @@ function taglineTests( testContext = test ) {
 					( task ) => task.task_id === 'core-blogdescription'
 				);
 				expect( updatedTask ).toBeDefined();
-				expect( updatedTask.status ).toBe( 'pending_celebration' );
+				expect( updatedTask.post_status ).toBe( 'pending' );
 
 				// Go to Progress Planner dashboard
 				await page.goto(
@@ -104,7 +104,7 @@ function taglineTests( testContext = test ) {
 					( task ) => task.task_id === 'core-blogdescription'
 				);
 				expect( completedTask ).toBeDefined();
-				expect( completedTask.status ).toBe( 'completed' );
+				expect( completedTask.post_status ).toBe( 'trash' );
 			}
 		);
 	} );

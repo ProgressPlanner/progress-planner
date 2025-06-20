@@ -197,15 +197,53 @@ class Enqueue {
 				];
 				break;
 
-			case 'progress-planner/web-components/prpl-suggested-task':
+			case 'progress-planner/suggested-task':
+				// Celebrate only on the Progress Planner Dashboard page.
+				$delay_celebration = true;
+				if ( \progress_planner()->is_on_progress_planner_dashboard_page() ) {
+					// should_show_upgrade_popover() also checks if we're on the Progress Planner Dashboard page - but let's be explicit since that method might change in the future.
+					$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
+				}
+
+				// Get tasks from task providers.
+				$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
+					[
+						'post_status'      => 'publish',
+						'exclude_provider' => [ 'user' ],
+					]
+				);
+				// Get pending celebration tasks.
+				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
+					[
+						'post_status'      => 'pending',
+						'posts_per_page'   => 100,
+						'exclude_provider' => [ 'user' ],
+					]
+				);
+
+				// Get user tasks.
+				$user_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
+					[
+						'post_status'      => [ 'publish', 'trash' ],
+						'include_provider' => [ 'user' ],
+					]
+				);
+
 				$localize_data = [
 					'name' => 'prplSuggestedTask',
 					'data' => [
-						'nonce'  => \wp_create_nonce( 'progress_planner' ),
-						'assets' => [
+						'nonce'               => \wp_create_nonce( 'progress_planner' ),
+						'assets'              => [
 							'infoIcon'   => constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_info.svg',
 							'snoozeIcon' => constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_snooze.svg',
 						],
+						'tasks'               => [
+							'pendingTasks'            => $tasks,
+							'pendingCelebrationTasks' => $pending_celebration_tasks,
+							'userTasks'               => isset( $user_tasks['user'] ) ? $user_tasks['user'] : [],
+						],
+						'maxItemsPerCategory' => \progress_planner()->get_suggested_tasks()->get_max_items_per_category(),
+						'delayCelebration'    => $delay_celebration,
 					],
 				];
 				break;

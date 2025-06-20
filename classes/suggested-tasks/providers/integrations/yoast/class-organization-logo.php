@@ -31,7 +31,15 @@ class Organization_Logo extends Yoast_Provider {
 	 */
 	public function __construct() {
 		$this->yoast_seo = YoastSEO();
-		$this->url       = \admin_url( 'admin.php?page=wpseo_page_settings#/site-representation' );
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/site-representation' );
 	}
 
 	/**
@@ -39,7 +47,7 @@ class Organization_Logo extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
 			? \esc_html__( 'Yoast SEO: set your organization logo', 'progress-planner' )
 			: \esc_html__( 'Yoast SEO: set your person logo', 'progress-planner' );
@@ -50,7 +58,7 @@ class Organization_Logo extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
 			? sprintf(
 				/* translators: %s: "Read more" link. */
@@ -97,14 +105,17 @@ class Organization_Logo extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-
 		// If the site is for a person, and the person logo is already set, we don't need to add the task.
-		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'company' && $this->yoast_seo->helpers->options->get( 'company_logo' ) ) {
+		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'company'
+			&& $this->yoast_seo->helpers->options->get( 'company_logo' )
+		) {
 			return false;
 		}
 
 		// If the site is for a person, and the organization logo is already set, we don't need to add the task.
-		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'person' && $this->yoast_seo->helpers->options->get( 'person_logo' ) ) {
+		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'person'
+			&& $this->yoast_seo->helpers->options->get( 'person_logo' )
+		) {
 			return false;
 		}
 

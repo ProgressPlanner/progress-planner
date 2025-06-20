@@ -12,7 +12,6 @@ namespace Progress_Planner\Tests;
  */
 class Content_Badges_Test extends \WP_UnitTestCase {
 
-
 	/**
 	 * Current month.
 	 *
@@ -38,9 +37,7 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_content_curator_0_progress() {
-
 		$group_badges = \progress_planner()->get_badges()->get_badges( 'content' );
-
 		foreach ( $group_badges as $badge ) {
 			if ( 'content-curator' === $badge->get_id() ) {
 				$this->assertEquals( 0, $badge->progress_callback()['progress'] );
@@ -57,7 +54,6 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_content_curator_50_progress() {
-
 		// Insert 5 posts.
 		for ( $i = 0; $i < 5; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -81,7 +77,6 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_content_curator_100_progress() {
-
 		// Insert 10 posts.
 		for ( $i = 0; $i < 10; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -105,7 +100,6 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_revision_ranger_50_progress() {
-
 		// Insert 15 posts.
 		for ( $i = 0; $i < 15; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -129,7 +123,6 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_revision_ranger_100_progress() {
-
 		// Insert 30 posts.
 		for ( $i = 0; $i < 30; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -153,7 +146,6 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_revision_ranger_over_100_progress() {
-
 		// Insert 40 posts.
 		for ( $i = 0; $i < 40; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -177,7 +169,6 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_purposeful_publisher_50_progress() {
-
 		// Insert 25 posts.
 		for ( $i = 0; $i < 25; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -201,7 +192,6 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_purposeful_publisher_100_progress() {
-
 		// Insert 50 posts.
 		for ( $i = 0; $i < 50; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -225,7 +215,6 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_purposeful_publisher_over_100_progress() {
-
 		// Insert 60 posts.
 		for ( $i = 0; $i < 60; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );

@@ -42,9 +42,11 @@ final class Content_Curator extends Badge_Content {
 	/**
 	 * Progress callback.
 	 *
+	 * @param array $args The arguments for the progress callback.
+	 *
 	 * @return array
 	 */
-	public function progress_callback() {
+	public function progress_callback( $args = [] ) {
 		// Get the saved progress.
 		$saved_progress = $this->get_saved();
 

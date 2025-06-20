@@ -59,9 +59,11 @@ abstract class Badge {
 	/**
 	 * Progress callback.
 	 *
+	 * @param array $args The arguments for the progress callback.
+	 *
 	 * @return array
 	 */
-	abstract public function progress_callback();
+	abstract public function progress_callback( $args = [] );
 
 	/**
 	 * Get the saved progress.

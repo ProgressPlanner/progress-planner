@@ -50,27 +50,46 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 				'category'    => $prpl_task_provider->get_provider_category(),
 			];
 
+			// Note: get_post() returns a formatted array (details), not an object.
+			$prpl_task = \progress_planner()->get_suggested_tasks_db()->get_post( $prpl_task_data['task_id'] );
+
+			/**
+			 * Most tasks are already added, but the "completed" tasks are not - since Tasks::should_add_task() returns false for them.
+			 * We need to add them manually.
+			 */
+			if ( ! $prpl_task ) {
+				$prpl_task_post_id = \progress_planner()->get_suggested_tasks_db()->add( $prpl_task_provider->get_task_details( $prpl_task_data ) );
+
+				// Something went wrong, skip this task.
+				if ( ! $prpl_task_post_id ) {
+					continue;
+				}
+
+				// Note: get_post() returns a formatted array (details), not an object.
+				$prpl_task = \progress_planner()->get_suggested_tasks_db()->get_post( $prpl_task_post_id );
+			}
+
+			// Something went wrong, skip this task.
+			if ( ! $prpl_task ) {
+				continue;
+			}
+
 			$prpl_task_completed = $prpl_task_provider->evaluate_task( $prpl_task_data['task_id'] );
-			$prpl_task_details   = $prpl_task_provider->get_task_details();
 
-			// If the task is completed, mark it as pending celebration.
+			// If the task is completed, mark it as pending.
 			if ( $prpl_task_completed ) {
-
-				// Add the task to the pending tasks.
-				\progress_planner()->get_suggested_tasks()->get_tasks_manager()->add_pending_task( $prpl_task_data );
-
-				// Change the task status to pending celebration.
-				\progress_planner()->get_suggested_tasks()->mark_task_as( 'pending_celebration', $prpl_task_data['task_id'] );
+				// Change the task status to pending.
+				\progress_planner()->get_suggested_tasks_db()->update_recommendation( $prpl_task->ID, [ 'post_status' => 'pending' ] );
 
 				// Insert an activity.
 				\progress_planner()->get_suggested_tasks()->insert_activity( $prpl_task_data['task_id'] );
 			}
 			?>
 				<li class="prpl-onboarding-task" data-prpl-task-completed="<?php echo $prpl_task_completed ? 'true' : 'false'; ?>">
-					<h3><?php echo \esc_html( $prpl_task_details['title'] ); ?></h3>
+					<h3><?php echo \esc_html( $prpl_task->post_title ); ?></h3>
 					<span class="prpl-onboarding-task-status">
 						<span class="prpl-suggested-task-points">
-							+<?php echo \esc_html( $prpl_task_details['points'] ); ?>
+							+<?php echo \esc_html( (string) $prpl_task->points ); ?>
 						</span>
 						<span class="prpl-suggested-task-loader"></span>
 						<span class="icon icon-check-circle">
