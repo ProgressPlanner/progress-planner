@@ -37,6 +37,7 @@ namespace Progress_Planner;
  * @method \Progress_Planner\Plugin_Migrations get_plugin_migrations()
  * @method \Progress_Planner\Suggested_Tasks get_suggested_tasks()
  * @method \Progress_Planner\Suggested_Tasks_DB get_suggested_tasks_db()
+ * @method \Progress_Planner\UI\Branding get_ui__branding()
  */
 class Base {
 
