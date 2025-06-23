@@ -146,6 +146,11 @@ class Base {
 		 * Redirect on login.
 		 */
 		\add_action( 'wp_login', [ $this, 'redirect_on_login' ], 10, 2 );
+
+		if ( \defined( 'WP_CLI' ) && \WP_CLI ) {
+			$this->get_wp_cli__get_stats_command();
+			$this->get_wp_cli__task_command();
+		}
 	}
 
 	/**

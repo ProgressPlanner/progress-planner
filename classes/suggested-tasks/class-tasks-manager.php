@@ -30,6 +30,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Set_Valuable_Post_Types;
 use Progress_Planner\Suggested_Tasks\Providers\Fewer_Tags;
 use Progress_Planner\Suggested_Tasks\Providers\Remove_Terms_Without_Posts;
 use Progress_Planner\Suggested_Tasks\Providers\Update_Term_Description;
+use Progress_Planner\Suggested_Tasks\Providers\Collaborator;
 
 /**
  * Tasks_Manager class.
@@ -70,6 +71,7 @@ class Tasks_Manager {
 			new Remove_Terms_Without_Posts(),
 			new Fewer_Tags(),
 			new Update_Term_Description(),
+			new Collaborator(),
 		];
 
 		// Add the plugin integration.
@@ -208,7 +210,7 @@ class Tasks_Manager {
 	/**
 	 * Evaluate tasks stored in the option.
 	 *
-	 * @return array<\Progress_Planner\Suggested_Tasks\Task>
+	 * @return \Progress_Planner\Suggested_Tasks\Task[]
 	 */
 	public function evaluate_tasks(): array {
 		$tasks           = (array) \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
