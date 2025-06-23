@@ -7,6 +7,8 @@
 
 namespace Progress_Planner;
 
+use Progress_Planner\Utils\Deprecations;
+
 /**
  * Main plugin class.
  *
@@ -37,6 +39,7 @@ namespace Progress_Planner;
  * @method \Progress_Planner\Plugin_Migrations get_plugin_migrations()
  * @method \Progress_Planner\Suggested_Tasks get_suggested_tasks()
  * @method \Progress_Planner\Suggested_Tasks_DB get_suggested_tasks_db()
+ * @method \Progress_Planner\Utils\Deprecations get_utils__deprecations()
  */
 class Base {
 
@@ -181,34 +184,14 @@ class Base {
 		}
 
 		// Backwards-compatibility.
-		$deprecated = [
-			'get_query'                                  => [ 'get_activities__query', '1.1.1' ],
-			'get_date'                                   => [ 'get_utils__date', '1.1.1' ],
-			'get_widgets__suggested_tasks'               => [ 'get_admin__widgets__suggested_tasks', '1.1.1' ],
-			'get_widgets__activity_scores'               => [ 'get_admin__widgets__activity_scores', '1.1.1' ],
-			'get_widgets__todo'                          => [ 'get_admin__widgets__todo', '1.1.1' ],
-			'get_widgets__challenge'                     => [ 'get_admin__widgets__challenge', '1.1.1' ],
-			'get_widgets__latest_badge'                  => [ 'get_admin__widgets__latest_badge', '1.1.1' ],
-			'get_widgets__badge_streak'                  => [ 'get_admin__widgets__badge_streak', '1.1.1' ],
-			'get_widgets__published_content'             => [ 'get_admin__widgets__published_content', '1.1.1' ],
-			'get_widgets__whats_new'                     => [ 'get_admin__widgets__whats_new', '1.1.1' ],
-			'get_onboard'                                => [ 'get_utils__onboard', '1.1.1' ],
-			'get_cache'                                  => [ 'get_utils__cache', '1.1.1' ],
-			'get_rest_api_stats'                         => [ 'get_rest__stats', '1.1.1' ],
-			'get_rest_api_tasks'                         => [ 'get_rest__tasks', '1.1.1' ],
-			'get_data_collector__data_collector_manager' => [ 'get_suggested_tasks__data_collector__data_collector_manager', '1.1.1' ],
-			'get_debug_tools'                            => [ 'get_utils__debug_tools', '1.1.1' ],
-			'get_playground'                             => [ 'get_utils__playground', '1.1.1' ],
-			'get_chart'                                  => [ 'get_ui__chart', '1.1.1' ],
-			'get_popover'                                => [ 'get_ui__popover', '1.1.1' ],
-
-			'get_admin__widgets__published_content'      => [ 'get_admin__widgets__content_activity', '1.3.0' ],
-		];
-
-		if ( isset( $deprecated[ $name ] ) ) {
+		if ( isset( Deprecations::BASE_METHODS[ $name ] ) ) {
 			// Deprecated method.
-			\_deprecated_function( \esc_html( $name ), \esc_html( $deprecated[ $name ][1] ), \esc_html( $deprecated[ $name ][0] ) );
-			return $this->{$deprecated[ $name ][0]}();
+			\_deprecated_function(
+				\esc_html( $name ),
+				\esc_html( Deprecations::BASE_METHODS[ $name ][1] ),
+				\esc_html( Deprecations::BASE_METHODS[ $name ][0] )
+			);
+			return $this->{Deprecations::BASE_METHODS[ $name ][0]}();
 		}
 	}
 
@@ -394,8 +377,7 @@ class Base {
 		$host      = ! empty( $url_parts['host'] ) ? $url_parts['host'] : false;
 
 		if ( ! empty( $url ) && ! empty( $host ) ) {
-			if (
-				'localhost' === $host
+			if ( 'localhost' === $host
 				|| (
 					false !== \ip2long( $host )
 					&& ! \filter_var( $host, \FILTER_VALIDATE_IP, \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE )

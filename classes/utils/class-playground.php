@@ -17,7 +17,6 @@ class Playground {
 	 */
 	public function __construct() {
 		\add_action( 'init', [ $this, 'register_hooks' ], 9 );
-
 		\add_action( 'plugins_loaded', [ $this, 'enable_debug_tools' ], 1 );
 	}
 
@@ -79,13 +78,12 @@ class Playground {
 
 		if ( $action === 'hide' ) {
 			\add_option( 'progress_planner_license_key', str_replace( ' ', '-', $this->create_random_string( 20 ) ) );
-			\update_option( 'progress_planner_force_show_onboarding', false );
 			$message = \esc_html__( 'Onboarding hidden successfully', 'progress-planner' );
 		} else {
 			\delete_option( 'progress_planner_license_key' );
-			\update_option( 'progress_planner_force_show_onboarding', true );
 			$message = \esc_html__( 'Onboarding shown successfully', 'progress-planner' );
 		}
+		\update_option( 'progress_planner_force_show_onboarding', $action !== 'hide' );
 
 		\wp_send_json_success( [ 'message' => $message ] );
 	}
@@ -238,7 +236,7 @@ class Playground {
 			$sentence  = '';
 
 			foreach ( (array) $word_keys as $key ) {
-					$sentence .= $words[ $key ] . ' ';
+				$sentence .= $words[ $key ] . ' ';
 			}
 
 			// Capitalize the first word and add a period at the end.
