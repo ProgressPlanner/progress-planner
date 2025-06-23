@@ -18,6 +18,7 @@ class Playground {
 	public function __construct() {
 		\add_action( 'init', [ $this, 'register_hooks' ], 9 );
 		\add_action( 'plugins_loaded', [ $this, 'enable_debug_tools' ], 1 );
+		\add_action( 'admin_footer', [ $this, 'inject_playground_js_patch' ] );
 	}
 
 	/**
@@ -244,5 +245,33 @@ class Playground {
 		}
 
 		return trim( $sentences );
+	}
+
+	/**
+	 * Inject a JS patch to work around the Playground environment.
+	 *
+	 * @return void
+	 */
+	public function inject_playground_js_patch() {
+		?>
+		<script>
+			(function() {
+				if ( ! window.wp || ! wp.apiRequest || ! wp.api?.models ) {
+					return;
+				}
+
+				if ( wp.api.models?.Prpl_recommendations?.prototype ) {
+					wp.api.models.Prpl_recommendations.prototype.save = function(attrs, options) {
+						console.warn('Intercepted save in Playground – using POST workaround');
+						return wp.apiRequest({
+							path: this.url(),
+							method: 'POST',
+							data: attrs,
+						});
+					};
+				}
+			})();
+		</script>
+		<?php
 	}
 }
