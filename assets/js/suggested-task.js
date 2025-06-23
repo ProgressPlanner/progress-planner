@@ -383,18 +383,27 @@ prplSuggestedTask = {
 			date,
 			date_gmt: date,
 		} );
-		postModelToSave.save().then( ( postData ) => {
-			const taskCategorySlug = prplTerms.getTerm(
-				postData?.[ prplTerms.category ],
-				prplTerms.category
-			).slug;
 
-			prplSuggestedTask.removeTaskElement( postId );
+		postModelToSave.fetch().then( () => {
+			postModelToSave.set( {
+				status: 'future',
+				date,
+				date_gmt: date,
+			} );
 
-			// Inject more tasks from the same category.
-			prplSuggestedTask.injectItemsFromCategory( {
-				category: taskCategorySlug,
-				status: [ 'publish' ],
+			postModelToSave.save().then( ( postData ) => {
+				const taskCategorySlug = prplTerms.getTerm(
+					postData?.[ prplTerms.category ],
+					prplTerms.category
+				).slug;
+
+				prplSuggestedTask.removeTaskElement( postId );
+
+				// Inject more tasks from the same category.
+				prplSuggestedTask.injectItemsFromCategory( {
+					category: taskCategorySlug,
+					status: [ 'publish' ],
+				} );
 			} );
 		} );
 	},
