@@ -8,7 +8,7 @@
 use Progress_Planner\Utils\Deprecations;
 
 // Require the Deprecations class.
-require_once PROGRESS_PLANNER_DIR . '/classes/utils/class-deprecations.php';
+require_once __DIR__ . '/classes/utils/class-deprecations.php';
 
 spl_autoload_register(
 	/**
