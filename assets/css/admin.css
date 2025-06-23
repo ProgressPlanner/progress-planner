@@ -416,6 +416,10 @@ button.prpl-info-icon {
 	.prpl-welcome .inner-content .right {
 		display: none !important;
 	}
+
+	.prpl-widget-width-2 {
+		grid-column: span 1;
+	}
 }
 
 /*------------------------------------*\

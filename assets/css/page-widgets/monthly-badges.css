@@ -4,6 +4,14 @@
  * Dependencies: progress-planner/web-components/prpl-badge
  */
 
+@media all and (min-width: 1400px) {
+
+	.prpl-widget-wrapper.prpl-monthly-badges {
+		grid-row-start: 1;
+		grid-column-start: 3;
+	}
+}
+
 .prpl-widget-wrapper.prpl-monthly-badges {
 
 	/* Remove styling from the widget wrapper (but not in popover view). */
