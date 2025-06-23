@@ -238,7 +238,7 @@ class Debug_Tools {
 				foreach ( $suggested_tasks as $task ) {
 					$title = $task->post_title;
 					if ( $task->post_status && 'future' === $task->post_status && $task->post_date ) {
-						$until  = is_float( $task->post_date ) ? '(forever)' : '(until ' . $task->post_date . ')';
+						$until  = '(until ' . $task->post_date . ')';
 						$title .= ' ' . $until;
 					}
 
