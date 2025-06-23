@@ -17,10 +17,22 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 
 <div class="prpl-dashboard-widget-suggested-tasks">
 	<h2 class="prpl-widget-title">
-		<?php echo \esc_html( \progress_planner()->get_ui__branding()->get_strings()['ravi-recommendations'] ); ?>
+		<?php
+		printf(
+			/* translators: %s: "Ravi" */
+			\esc_html__( '%s’s Recommendations', 'progress-planner' ),
+			\esc_html( \progress_planner()->get_ui__branding()->get_strings()['ravi'] )
+		);
+		?>
 	</h2>
 	<p>
-		<?php \esc_html_e( 'Complete a task from Ravi’s Recommendations to improve your site and earn points toward this month’s badge!', 'progress-planner' ); ?>
+		<?php
+		printf(
+			/* translators: %s: "Ravi" */
+			\esc_html__( 'Complete a task from %s’s Recommendations to improve your site and earn points toward this month’s badge!', 'progress-planner' ),
+			\esc_html( \progress_planner()->get_ui__branding()->get_strings()['ravi'] )
+		);
+		?>
 	</p>
 
 	<ul style="display:none"></ul>

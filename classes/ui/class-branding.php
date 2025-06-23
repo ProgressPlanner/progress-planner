@@ -116,7 +116,7 @@ final class Branding {
 		return \apply_filters(
 			'progress_planner_branding_strings',
 			[
-				'ravi-recommendations' => __( 'Ravi\'s Recommendations', 'progress-planner' ),
+				'ravi' => __( 'Ravi', 'progress-planner' ),
 			]
 		);
 	}
