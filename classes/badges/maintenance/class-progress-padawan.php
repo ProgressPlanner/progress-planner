@@ -43,9 +43,11 @@ final class Progress_Padawan extends Badge_Maintenance {
 	/**
 	 * Progress callback.
 	 *
+	 * @param array $args The arguments for the progress callback.
+	 *
 	 * @return array
 	 */
-	public function progress_callback() {
+	public function progress_callback( $args = [] ) {
 		$saved_progress = $this->get_saved();
 
 		// If we have a saved value, return it.

@@ -110,6 +110,16 @@ https://youtu.be/e1bmxZYyXFY
 
 == Changelog ==
 
+= 1.6.0 =
+
+Enhancements:
+
+* Allow users to collect extra points for previous months' badges.
+
+Under the hood:
+
+* Ravi's Recommendations are now a custom post type.
+
 = 1.5.0 =
 
 Added these recommendations from Ravi:

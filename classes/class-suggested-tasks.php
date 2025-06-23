@@ -9,6 +9,7 @@ namespace Progress_Planner;
 
 use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
 use Progress_Planner\Suggested_Tasks\Tasks_Manager;
+use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
 
 /**
  * Recommendations class.
@@ -439,5 +440,92 @@ class Suggested_Tasks {
 		}
 
 		return $response;
+	}
+
+	/**
+	 * Get the pending tasks in REST format.
+	 *
+	 * @param array $args The arguments.
+	 *
+	 * @return array
+	 */
+	public function get_tasks_in_rest_format( array $args = [] ) {
+		$args = wp_parse_args(
+			$args,
+			[
+				'post_status'      => 'publish',
+				'exclude_provider' => [],
+				'include_provider' => [],
+				'posts_per_page'   => 0,
+			]
+		);
+
+		// Get the max items per category.
+		$max_items_per_category = $this->get_max_items_per_category();
+
+		// Initialize the tasks array.
+		$tasks = [];
+
+		// Get the tasks for each category.
+		foreach ( $max_items_per_category as $category_slug => $max_items ) {
+
+			// Skip excluded providers.
+			if ( ! empty( $args['exclude_provider'] ) && in_array( $category_slug, $args['exclude_provider'], true ) ) {
+				continue;
+			}
+
+			// Skip not included providers.
+			if ( ! empty( $args['include_provider'] ) && ! in_array( $category_slug, $args['include_provider'], true ) ) {
+				continue;
+			}
+
+			$category_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+				[
+					'category'       => $category_slug,
+					'posts_per_page' => 0 < $args['posts_per_page'] ? $args['posts_per_page'] : $max_items,
+					'post_status'    => $args['post_status'],
+				]
+			);
+
+			if ( ! empty( $category_tasks ) ) {
+				$tasks[ $category_slug ] = [];
+
+				foreach ( $category_tasks as $task ) {
+					$tasks[ $category_slug ][] = $task->get_rest_formatted_data();
+				}
+			}
+		}
+
+		return $tasks;
+	}
+
+	/**
+	 * Get the max items per category.
+	 *
+	 * @return array
+	 */
+	public function get_max_items_per_category() {
+		// Set max items per category.
+		$max_items_per_category = [];
+		$provider_categories    = \get_terms(
+			[
+				'taxonomy'   => 'prpl_recommendations_category',
+				'hide_empty' => false,
+			]
+		);
+
+		if ( ! empty( $provider_categories ) && ! is_wp_error( $provider_categories ) ) {
+			$content_review_category = ( new Content_Review() )->get_provider_category();
+			foreach ( $provider_categories as $provider_category ) {
+				$max_items_per_category[ $provider_category->slug ] = $provider_category->slug === $content_review_category ? 2 : 1;
+			}
+		}
+
+		// This should never happen, but just in case - user tasks are displayed in different widget.
+		if ( isset( $max_items_per_category['user'] ) ) {
+			$max_items_per_category['user'] = 100;
+		}
+
+		return apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category );
 	}
 }
