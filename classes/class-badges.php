@@ -17,28 +17,28 @@ class Badges {
 	/**
 	 * Content badges.
 	 *
-	 * @var array<\Progress_Planner\Badges\Badge>
+	 * @var \Progress_Planner\Badges\Badge[]
 	 */
 	private $content = [];
 
 	/**
 	 * Maintenance badges.
 	 *
-	 * @var array<\Progress_Planner\Badges\Badge>
+	 * @var \Progress_Planner\Badges\Badge[]
 	 */
 	private $maintenance = [];
 
 	/**
 	 * Monthly badges.
 	 *
-	 * @var array<\Progress_Planner\Badges\Badge>
+	 * @var \Progress_Planner\Badges\Badge[]
 	 */
 	private $monthly = [];
 
 	/**
 	 * Monthly badges flat.
 	 *
-	 * @var array<\Progress_Planner\Badges\Badge>
+	 * @var \Progress_Planner\Badges\Badge[]
 	 */
 	private $monthly_flat = [];
 
@@ -80,7 +80,7 @@ class Badges {
 	 *
 	 * @param string $context The badges context (content|maintenance|monthly).
 	 *
-	 * @return array<\Progress_Planner\Badges\Badge>
+	 * @return \Progress_Planner\Badges\Badge[]
 	 */
 	public function get_badges( $context ) {
 		return isset( $this->$context ) ? $this->$context : [];

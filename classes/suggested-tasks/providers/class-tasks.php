@@ -402,7 +402,8 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		if ( ! $this->is_repetitive() ) {
-			if ( ! $task->task_id || 0 !== strpos( $task->task_id, $this->get_task_id() ) ) {
+			// Collaborator tasks have custom task_ids, so strpos check does not work for them.
+			if ( ! $task->task_id || ( 0 !== strpos( $task->task_id, $this->get_task_id() ) && 'collaborator' !== $this->get_provider_id() ) ) {
 				return false;
 			}
 			return $this->is_task_completed( $task->task_id ) ? $task : false;
