@@ -260,12 +260,11 @@ prplSuggestedTask = {
 			const newStatus =
 				'publish' === postData.status ? 'trash' : 'publish';
 
-			// Disable the checkbox for RR tasks.
-			if ( 'user' !== taskProviderId && 'trash' === newStatus ) {
-				el.querySelector(
-					'.prpl-suggested-task-checkbox'
-				).setAttribute( 'disabled', 'disabled' );
-			}
+			// Disable the checkbox for RR tasks, to prevent multiple clicks.
+			el.querySelector( '.prpl-suggested-task-checkbox' ).setAttribute(
+				'disabled',
+				'disabled'
+			);
 
 			post.set( 'status', newStatus )
 				.save()
@@ -280,14 +279,10 @@ prplSuggestedTask = {
 					if ( 'trash' === newStatus ) {
 						el.setAttribute( 'data-task-action', 'celebrate' );
 						if ( 'user' === taskProviderId ) {
-							const delay = eventPoints ? 2000 : 0;
-
 							// Set class to trigger strike through animation.
-							if ( 0 < eventPoints ) {
-								el.classList.add(
-									'prpl-suggested-task-celebrated'
-								);
-							}
+							el.classList.add(
+								'prpl-suggested-task-celebrated'
+							);
 
 							setTimeout( () => {
 								// Move task from published to trash.
@@ -303,7 +298,12 @@ prplSuggestedTask = {
 								window.dispatchEvent(
 									new CustomEvent( 'prpl/grid/resize' )
 								);
-							}, delay );
+
+								// Remove the disabled attribute for user tasks, so they can be clicked again.
+								el.querySelector(
+									'.prpl-suggested-task-checkbox'
+								).removeAttribute( 'disabled' );
+							}, 2000 );
 						} else {
 							/**
 							 * Strike completed tasks and remove them from the DOM.
@@ -349,6 +349,11 @@ prplSuggestedTask = {
 						window.dispatchEvent(
 							new CustomEvent( 'prpl/grid/resize' )
 						);
+
+						// Remove the disabled attribute for user tasks, so they can be clicked again.
+						el.querySelector(
+							'.prpl-suggested-task-checkbox'
+						).removeAttribute( 'disabled' );
 					}
 				} );
 		} );
