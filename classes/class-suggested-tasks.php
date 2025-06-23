@@ -351,11 +351,7 @@ class Suggested_Tasks {
 	 * @return int
 	 */
 	public function change_trashed_posts_lifetime( $days, $post ) {
-		if ( 'prpl_recommendations' === $post->post_type ) {
-			return 60;
-		}
-
-		return $days;
+		return 'prpl_recommendations' === $post->post_type ? 60 : $days;
 	}
 
 	/**

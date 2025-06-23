@@ -67,11 +67,9 @@ class Collaborator extends Tasks {
 
 		$task_data = $tasks[0]->get_data();
 
-		if ( isset( $task_data['is_completed_callback'] ) && is_callable( $task_data['is_completed_callback'] ) ) {
-			return call_user_func( $task_data['is_completed_callback'], $task_id );
-		}
-
-		return false;
+		return isset( $task_data['is_completed_callback'] ) && is_callable( $task_data['is_completed_callback'] )
+			? call_user_func( $task_data['is_completed_callback'], $task_id )
+			: false;
 	}
 
 	/**
@@ -82,7 +80,6 @@ class Collaborator extends Tasks {
 	 * @return array
 	 */
 	public function get_task_details( $task_data = [] ) {
-
 		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		foreach ( $tasks as $task ) {

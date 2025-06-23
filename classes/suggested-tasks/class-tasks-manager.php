@@ -210,7 +210,7 @@ class Tasks_Manager {
 	/**
 	 * Evaluate tasks stored in the option.
 	 *
-	 * @return array<\Progress_Planner\Suggested_Tasks\Task>
+	 * @return \Progress_Planner\Suggested_Tasks\Task[]
 	 */
 	public function evaluate_tasks(): array {
 		$tasks           = (array) \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
