@@ -249,6 +249,7 @@ class Playground {
 
 	/**
 	 * Inject a JS patch to work around the Playground environment.
+	 * We override PUT requests to POST requests.
 	 *
 	 * @return void
 	 */
