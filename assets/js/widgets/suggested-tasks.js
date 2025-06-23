@@ -42,8 +42,9 @@ const prplSuggestedTasksWidget = {
 				);
 			}
 
-			// Inject the pending celebration tasks.
+			// Inject the pending celebration tasks, but only on Progress Planner dashboard page.
 			if (
+				! prplSuggestedTask.delayCelebration &&
 				Object.keys( prplSuggestedTask.tasks.pendingCelebrationTasks )
 					.length
 			) {
