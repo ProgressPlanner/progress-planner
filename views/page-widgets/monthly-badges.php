@@ -49,6 +49,7 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 			<h3><?php \esc_html_e( 'Oh no! You missed the previous monthly badge!', 'progress-planner' ); ?></h3>
 			<p><?php echo \wp_kses( __( 'No worries though! <strong>Collect the surplus of points</strong> you earn, and get your badge!', 'progress-planner' ), [ 'strong' => [] ] ); ?></p>
 			<?php foreach ( $prpl_widget->get_previous_incomplete_months_badges() as $prpl_previous_incomplete_month_badge ) : ?>
+				<?php $prpl_remaining_points += $prpl_previous_incomplete_month_badge->progress_callback()['remaining']; ?>
 				<div
 					class="prpl-previous-month-badge-progress-bar-wrapper"
 					style="padding: 1rem 0; background-color: var(--prpl-background-orange); border-radius: 0.5rem; padding: 1rem;"
