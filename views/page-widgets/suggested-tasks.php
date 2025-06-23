@@ -62,6 +62,8 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 	</div>
 
 	<?php if ( ! empty( $prpl_widget->get_previous_incomplete_months_badges() ) ) : ?>
+		<hr>
+
 		<?php
 		$prpl_remaining_points = $prpl_widget->get_score()['target'] - $prpl_widget->get_score()['target_score'];
 		$prpl_days_remaining   = (int) \gmdate( 't' ) - (int) \gmdate( 'j' );
