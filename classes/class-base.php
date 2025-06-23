@@ -389,8 +389,7 @@ class Base {
 		$host      = ! empty( $url_parts['host'] ) ? $url_parts['host'] : false;
 
 		if ( ! empty( $url ) && ! empty( $host ) ) {
-			if (
-				'localhost' === $host
+			if ( 'localhost' === $host
 				|| (
 					false !== \ip2long( $host )
 					&& ! \filter_var( $host, \FILTER_VALIDATE_IP, \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE )
