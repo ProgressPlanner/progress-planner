@@ -377,27 +377,26 @@ prplSuggestedTask = {
 		)
 			.toISOString()
 			.split( '.' )[ 0 ];
-		new wp.api.models.Prpl_recommendations( {
+		const postModelToSave = new wp.api.models.Prpl_recommendations( {
 			id: postId,
 			status: 'future',
 			date,
 			date_gmt: date,
-		} )
-			.save()
-			.then( ( postData ) => {
-				const taskCategorySlug = prplTerms.getTerm(
-					postData?.[ prplTerms.category ],
-					prplTerms.category
-				).slug;
+		} );
+		postModelToSave.save().then( ( postData ) => {
+			const taskCategorySlug = prplTerms.getTerm(
+				postData?.[ prplTerms.category ],
+				prplTerms.category
+			).slug;
 
-				prplSuggestedTask.removeTaskElement( postId );
+			prplSuggestedTask.removeTaskElement( postId );
 
-				// Inject more tasks from the same category.
-				prplSuggestedTask.injectItemsFromCategory( {
-					category: taskCategorySlug,
-					status: [ 'publish' ],
-				} );
+			// Inject more tasks from the same category.
+			prplSuggestedTask.injectItemsFromCategory( {
+				category: taskCategorySlug,
+				status: [ 'publish' ],
 			} );
+		} );
 	},
 
 	/**
