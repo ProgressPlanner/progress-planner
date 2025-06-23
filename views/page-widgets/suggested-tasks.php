@@ -8,8 +8,6 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-$prpl_widget = \progress_planner()->get_admin__widgets__suggested_tasks();
 ?>
 
 <div class="prpl-dashboard-widget-suggested-tasks">
