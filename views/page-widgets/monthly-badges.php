@@ -11,7 +11,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_widget = \progress_planner()->get_admin__widgets__suggested_tasks();
+$prpl_widget = \progress_planner()->get_admin__widgets__monthly_badges();
 $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 
 ?>
