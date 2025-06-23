@@ -45,8 +45,9 @@ class Page {
 	public function get_widgets() {
 		$widgets = [
 			\progress_planner()->get_admin__widgets__suggested_tasks(),
-			\progress_planner()->get_admin__widgets__activity_scores(),
+			\progress_planner()->get_admin__widgets__monthly_badges(),
 			\progress_planner()->get_admin__widgets__todo(),
+			\progress_planner()->get_admin__widgets__activity_scores(),
 			\progress_planner()->get_admin__widgets__challenge(),
 			\progress_planner()->get_admin__widgets__latest_badge(),
 			\progress_planner()->get_admin__widgets__badge_streak(),

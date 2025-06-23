@@ -30,5 +30,3 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</p>
 	<hr>
 </div>
-
-<?php \progress_planner()->the_view( 'page-widgets/monthly-badges.php' ); ?>

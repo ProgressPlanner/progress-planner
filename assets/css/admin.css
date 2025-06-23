@@ -96,6 +96,10 @@
 	color: var(--prpl-color-link);
 }
 
+.prpl-widget-width-2 {
+	grid-column: span 2;
+}
+
 .prpl-widget-title {
 	margin-top: 0;
 	font-size: 1.375rem;

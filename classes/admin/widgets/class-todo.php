@@ -20,6 +20,13 @@ final class ToDo extends Widget {
 	protected $id = 'todo';
 
 	/**
+	 * The widget width.
+	 *
+	 * @var int
+	 */
+	protected $width = 2;
+
+	/**
 	 * Print the widget content.
 	 *
 	 * @return void

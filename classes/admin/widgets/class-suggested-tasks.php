@@ -20,6 +20,13 @@ final class Suggested_Tasks extends Widget {
 	protected $id = 'suggested-tasks';
 
 	/**
+	 * The widget width.
+	 *
+	 * @var int
+	 */
+	protected $width = 2;
+
+	/**
 	 * Enqueue the scripts.
 	 *
 	 * @return void
