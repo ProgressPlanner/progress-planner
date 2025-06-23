@@ -255,22 +255,46 @@ class Playground {
 	public function inject_playground_js_patch() {
 		?>
 		<script>
-			(function() {
-				if ( ! window.wp || ! wp.apiRequest || ! wp.api?.models ) {
-					return;
+			( function waitForWp() {
+
+				if ( ! window.wp || ! wp.api?.models?.Prpl_recommendations ) {
+					return setTimeout(waitForWp, 50);
 				}
 
-				if ( wp.api.models?.Prpl_recommendations?.prototype ) {
-					wp.api.models.Prpl_recommendations.prototype.save = function(attrs, options) {
-						console.warn('Intercepted save in Playground – using POST workaround');
-						return wp.apiRequest({
-							path: this.url(),
-							method: 'POST',
-							data: attrs,
-						});
-					};
-				}
-			})();
+				wp.api.models.Prpl_recommendations.prototype.save = function (attrs, options) {
+					// attrs might be undefined or options might be first arg, so normalize:
+					if ( attrs && typeof attrs === 'object' && ! options && ( 'success' in attrs || 'error' in attrs ) ) {
+						options = attrs;
+						attrs = undefined;
+					}
+
+					// Update model if attrs passed
+					if ( attrs ) {
+						this.set( attrs );
+					}
+
+					console.warn( 'Intercepted save in Playground – using POST workaround' );
+					const fullUrl = this.url();
+					const restPath = fullUrl.replace(wpApiSettings.root, '');
+
+					const request = wp.apiRequest({
+						path: restPath,
+						method: 'POST',
+						data: this.toJSON(),
+					});
+
+					if ( options && typeof options === 'object' ) {
+						if ( options.success ) {
+							request.then( options.success );
+						}
+						if ( options.error ) {
+							request.catch( options.error );
+						}
+					}
+
+					return request;
+				};
+			} )();
 		</script>
 		<?php
 	}
