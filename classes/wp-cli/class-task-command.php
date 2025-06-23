@@ -300,8 +300,8 @@ class Task_Command extends \WP_CLI_Command {
 	 */
 	public function create( $args, $assoc_args ) {
 
-		$task_id               = isset( $assoc_args['task_id'] ) ? $assoc_args['task_id'] : 'collaborator-' . uniqid( '', true );
-		$title                 = isset( $assoc_args['title'] ) ? $assoc_args['title'] : 'Test task';
+		$task_id               = isset( $assoc_args['task_id'] ) ? $assoc_args['task_id'] : '';
+		$title                 = isset( $assoc_args['title'] ) ? $assoc_args['title'] : '';
 		$description           = isset( $assoc_args['description'] ) ? $assoc_args['description'] : 'Test description ';
 		$points                = isset( $assoc_args['points'] ) ? (int) $assoc_args['points'] : 1;
 		$provider_id           = isset( $assoc_args['provider_id'] ) ? $assoc_args['provider_id'] : 'collaborator';
@@ -310,6 +310,11 @@ class Task_Command extends \WP_CLI_Command {
 		$is_completed_callback = isset( $assoc_args['is_completed_callback'] ) ? $assoc_args['is_completed_callback'] : null;
 		$dismissable           = isset( $assoc_args['dismissable'] ) ? $assoc_args['dismissable'] : true;
 		$snoozable             = isset( $assoc_args['snoozable'] ) ? $assoc_args['snoozable'] : true;
+
+		if ( empty( $task_id ) || empty( $title ) ) {
+			\WP_CLI::error( 'task_id and title are required.' ); // @phpstan-ignore-line
+			return;
+		}
 
 		// We're creating a new task.
 		\progress_planner()->get_suggested_tasks_db()->add(
