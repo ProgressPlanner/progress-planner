@@ -67,7 +67,7 @@ class Page_Types {
 	 */
 	public function maybe_add_terms() {
 		$lessons = \progress_planner()->get_lessons()->get_items();
-		\error_log( print_r( $lessons, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r
+		\error_log( print_r( $lessons, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r, WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		foreach ( $lessons as $lesson ) {
 			if ( \term_exists( $lesson['settings']['id'], self::TAXONOMY_NAME ) ) {
 				continue;
