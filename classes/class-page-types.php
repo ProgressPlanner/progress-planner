@@ -67,7 +67,7 @@ class Page_Types {
 	 */
 	public function maybe_add_terms() {
 		$lessons = \progress_planner()->get_lessons()->get_items();
-
+\error_log( print_r( $lessons, true ) );
 		foreach ( $lessons as $lesson ) {
 			if ( \term_exists( $lesson['settings']['id'], self::TAXONOMY_NAME ) ) {
 				continue;
