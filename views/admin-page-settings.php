@@ -6,7 +6,7 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
@@ -28,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php \progress_planner()->the_asset( 'images/icon_settings.svg' ); ?>
 		</span>
 		<span>
-			<?php esc_html_e( 'Your Progress Planner settings', 'progress-planner' ); ?>
+			<?php \esc_html_e( 'Your Progress Planner settings', 'progress-planner' ); ?>
 		</span>
 	</h1>
 
@@ -41,7 +41,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<?php \progress_planner()->the_view( 'page-settings/license.php' ); ?>
 		</div>
 
-		<?php wp_nonce_field( 'progress_planner' ); ?>
+		<?php \wp_nonce_field( 'progress_planner' ); ?>
 
 		<button
 			id="prpl-settings-submit"
@@ -49,7 +49,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			type="button"
 			style="display:block;width:min-content;"
 		>
-			<?php esc_attr_e( 'Save', 'progress-planner' ); ?>
+			<?php \esc_attr_e( 'Save', 'progress-planner' ); ?>
 		</button>
 	</form>
 </div>

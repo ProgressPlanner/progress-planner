@@ -41,14 +41,14 @@ class Update_140 {
 		// This is to ensure that we don't lose any tasks, and at the same time we don't have duplicate tasks.
 		$tasks = [];
 		foreach ( $new_tasks as $new_task ) {
-			$tasks[ isset( $new_task['task_id'] ) ? $new_task['task_id'] : md5( maybe_serialize( $new_task ) ) ] = $new_task;
+			$tasks[ isset( $new_task['task_id'] ) ? $new_task['task_id'] : \md5( \maybe_serialize( $new_task ) ) ] = $new_task;
 		}
 		foreach ( $old_tasks as $old_task ) {
-			$tasks[ isset( $old_task['task_id'] ) ? $old_task['task_id'] : md5( maybe_serialize( $old_task ) ) ] = $old_task;
+			$tasks[ isset( $old_task['task_id'] ) ? $old_task['task_id'] : \md5( \maybe_serialize( $old_task ) ) ] = $old_task;
 		}
 
 		// Set the tasks option.
-		\progress_planner()->get_settings()->set( 'tasks', array_values( $tasks ) );
+		\progress_planner()->get_settings()->set( 'tasks', \array_values( $tasks ) );
 
 		// Delete the old tasks option.
 		\progress_planner()->get_settings()->delete( 'local_tasks' );

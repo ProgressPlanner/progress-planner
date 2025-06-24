@@ -29,18 +29,19 @@ class Archive_Format extends Yoast_Provider {
 	protected const MINIMUM_POSTS_WITH_FORMAT = 3;
 
 	/**
-	 * The data collector.
+	 * The data collector class name.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Archive_Format
+	 * @var string
 	 */
-	protected $data_collector;
+	protected const DATA_COLLECTOR_CLASS = Archive_Format_Data_Collector::class;
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->data_collector = new Archive_Format_Data_Collector();
-		$this->url            = \admin_url( 'admin.php?page=wpseo_page_settings#/format-archives' );
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/format-archives' );
 	}
 
 	/**
@@ -48,7 +49,7 @@ class Archive_Format extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: disable the format archives', 'progress-planner' );
 	}
 
@@ -57,8 +58,8 @@ class Archive_Format extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
-		return sprintf(
+	protected function get_description() {
+		return \sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'WordPress creates an archive for each post format. This is not useful and can be disabled in the Yoast SEO settings. %s.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/yoast-format-archive" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Format Archive', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
@@ -90,16 +91,8 @@ class Archive_Format extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( ! $this->is_task_relevant() ) {
-			return false;
-		}
-
-		// If the post format archive is already disabled, we don't need to add the task.
-		if ( YoastSEO()->helpers->options->get( 'disable-post_format' ) === true ) {
-			return false;
-		}
-
-		return true;
+		return $this->is_task_relevant()
+			&& \YoastSEO()->helpers->options->get( 'disable-post_format' ) !== true;
 	}
 
 	/**
@@ -110,13 +103,7 @@ class Archive_Format extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function is_task_relevant() {
-		$archive_format_count = $this->data_collector->collect();
-
 		// If there are more than X posts with a post format, we don't need to add the task. X is set in the class.
-		if ( $archive_format_count > static::MINIMUM_POSTS_WITH_FORMAT ) {
-			return false;
-		}
-
-		return true;
+		return $this->get_data_collector()->collect() <= static::MINIMUM_POSTS_WITH_FORMAT;
 	}
 }

@@ -138,7 +138,7 @@ class Content_Scan extends Content {
 		return [
 			'lastScannedPage' => $current_page,
 			'lastPage'        => $total_pages,
-			'progress'        => round( ( $current_page / max( 1, $total_pages ) ) * 100 ),
+			'progress'        => \round( ( $current_page / \max( 1, $total_pages ) ) * 100 ),
 		];
 	}
 

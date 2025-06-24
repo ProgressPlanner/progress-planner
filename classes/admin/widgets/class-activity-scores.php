@@ -82,14 +82,14 @@ final class Activity_Scores extends Widget {
 		foreach ( $activities as $activity ) {
 			$score += $activity->get_points( $current_date );
 		}
-		$score = min( 100, max( 0, $score ) );
+		$score = \min( 100, \max( 0, $score ) );
 
 		// Get the number of pending updates.
 		$pending_updates = \wp_get_update_data()['counts']['total'];
 
 		// Reduce points for pending updates.
-		$score -= min( min( $score / 2, 25 ), $pending_updates * 5 );
-		return (int) floor( $score );
+		$score -= \min( \min( $score / 2, 25 ), $pending_updates * 5 );
+		return (int) \floor( $score );
 	}
 
 	/**
@@ -123,7 +123,7 @@ final class Activity_Scores extends Widget {
 							'type'       => 'publish',
 						]
 					);
-					return count( $events ) > 0;
+					return \count( $events ) > 0;
 				},
 			],
 			[
@@ -136,7 +136,7 @@ final class Activity_Scores extends Widget {
 							'type'       => 'update',
 						]
 					);
-					return count( $events ) > 0;
+					return \count( $events ) > 0;
 				},
 			],
 			[
@@ -205,7 +205,7 @@ final class Activity_Scores extends Widget {
 					);
 
 					// Cache the activities.
-					$cached_activities[ $weekly_cache_key ] = (bool) count( $activities );
+					$cached_activities[ $weekly_cache_key ] = (bool) \count( $activities );
 					\progress_planner()->get_settings()->set( $this->cache_key, $cached_activities );
 
 					// Return the cached value.

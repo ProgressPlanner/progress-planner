@@ -59,7 +59,7 @@ class Chart {
 				},
 				// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
 				'count_callback' => function ( $activities, $date = null ) {
-					return count( $activities );
+					return \count( $activities );
 				},
 				'max'            => null,
 				'type'           => 'line',
@@ -137,7 +137,7 @@ class Chart {
 			'label'                      => $period['start_date']->format( $args['dates_params']['format'] ),
 			'score'                      => null === $args['max']
 				? $period_score
-				: min( $period_score, $args['max'] ),
+				: \min( $period_score, $args['max'] ),
 			'color'                      => $args['color']( $period_score, $period['start_date'] ),
 			'previous_period_activities' => $previous_period_activities,
 		];
@@ -153,6 +153,6 @@ class Chart {
 	 */
 	public function render_chart( $type, $data ) {
 		$type = $type ? $type : 'line';
-		echo '<prpl-chart-' . esc_attr( $type ) . ' data="' . \esc_attr( (string) \wp_json_encode( $data ) ) . '"></prpl-chart-' . esc_attr( $type ) . '>';
+		echo '<prpl-chart-' . \esc_attr( $type ) . ' data="' . \esc_attr( (string) \wp_json_encode( $data ) ) . '"></prpl-chart-' . \esc_attr( $type ) . '>';
 	}
 }

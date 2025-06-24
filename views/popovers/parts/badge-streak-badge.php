@@ -6,7 +6,7 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<div class="inner">
 			<prpl-badge
 				complete="<?php echo 100 === (int) $prpl_badge_progress['progress'] ? 'true' : 'false'; ?>"
-				badge-id="<?php echo esc_attr( $prpl_badge->get_id() ); ?>"
+				badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
 			></prpl-badge>
 			<?php echo \esc_html( $prpl_badge->get_name() ); ?>
 		</div>

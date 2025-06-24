@@ -40,9 +40,9 @@ class Fewer_Tags extends Tasks {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'high';
+	protected $priority = 10;
 
 	/**
 	 * The plugin active state.
@@ -73,15 +73,28 @@ class Fewer_Tags extends Tasks {
 	private $plugin_path = 'fewer-tags/fewer-tags.php';
 
 	/**
+	 * Whether the task is dismissable.
+	 *
+	 * @var bool
+	 */
+	protected $is_dismissable = true;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		// Data collectors.
 		$this->post_tag_count_data_collector       = new Post_Tag_Count();
 		$this->published_post_count_data_collector = new Published_Post_Count();
+	}
 
-		$this->url            = \admin_url( '/plugin-install.php?tab=search&s=fewer+tags' );
-		$this->is_dismissable = true;
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return \admin_url( '/plugin-install.php?tab=search&s=fewer+tags' );
 	}
 
 	/**
@@ -89,7 +102,7 @@ class Fewer_Tags extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Install Fewer Tags and clean up your tags', 'progress-planner' );
 	}
 
@@ -98,8 +111,8 @@ class Fewer_Tags extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
-		return sprintf(
+	protected function get_description() {
+		return \sprintf(
 			// translators: %1$s is the number of tags, %2$s is the number of published posts, %3$s <a href="https://prpl.fyi/install-fewer-tags" target="_blank">Read more</a> link.
 			\esc_html__( 'We detected that you have %1$s tags and %2$s published posts. Consider installing the "Fewer Tags" plugin. %3$s', 'progress-planner' ),
 			$this->post_tag_count_data_collector->collect(),
@@ -116,11 +129,7 @@ class Fewer_Tags extends Tasks {
 	 */
 	public function should_add_task() {
 		// If the plugin is  active, we don't need to add the task.
-		if ( $this->is_plugin_active() ) {
-			return false;
-		}
-
-		return $this->is_task_relevant();
+		return $this->is_plugin_active() ? false : $this->is_task_relevant();
 	}
 
 	/**
@@ -149,14 +158,13 @@ class Fewer_Tags extends Tasks {
 	 * @return bool
 	 */
 	protected function is_plugin_active() {
-
 		if ( null === $this->is_plugin_active ) {
-			if ( ! function_exists( 'get_plugins' ) ) {
+			if ( ! \function_exists( 'get_plugins' ) ) {
 				require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore requireOnce.fileNotFound
 			}
 
-			$plugins                = get_plugins();
-			$this->is_plugin_active = isset( $plugins[ $this->plugin_path ] ) && is_plugin_active( $this->plugin_path );
+			$plugins                = \get_plugins();
+			$this->is_plugin_active = isset( $plugins[ $this->plugin_path ] ) && \is_plugin_active( $this->plugin_path );
 		}
 
 		return $this->is_plugin_active;
