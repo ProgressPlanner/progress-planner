@@ -23,9 +23,8 @@ class Add_Yoast_Providers {
 	 * Constructor.
 	 */
 	public function __construct() {
-		if ( function_exists( 'YoastSEO' ) ) {
+		if ( \function_exists( 'YoastSEO' ) ) {
 			\add_filter( 'progress_planner_suggested_tasks_providers', [ $this, 'add_providers' ], 11, 1 );
-
 			\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 		}
 	}
@@ -45,14 +44,13 @@ class Add_Yoast_Providers {
 		$focus_tasks = [];
 
 		foreach ( $this->providers as $provider ) {
-
-			// Add Ravi icon if the task is pending or is completed.
+			// Add Ravi icon if the task is published or is completed.
 			if ( $provider->is_task_relevant() || \progress_planner()->get_suggested_tasks()->was_task_completed( $provider->get_task_id() ) ) {
-				if ( method_exists( $provider, 'get_focus_tasks' ) ) {
+				if ( \method_exists( $provider, 'get_focus_tasks' ) ) {
 					$focus_task = $provider->get_focus_tasks();
 
 					if ( $focus_task ) {
-						$focus_tasks = array_merge( $focus_tasks, $focus_task );
+						$focus_tasks = \array_merge( $focus_tasks, $focus_task );
 					}
 				}
 			}
@@ -65,7 +63,7 @@ class Add_Yoast_Providers {
 				'name' => 'progressPlannerYoastFocusElement',
 				'data' => [
 					'tasks'    => $focus_tasks,
-					'base_url' => constant( 'PROGRESS_PLANNER_URL' ),
+					'base_url' => \constant( 'PROGRESS_PLANNER_URL' ),
 				],
 			]
 		);
@@ -80,7 +78,6 @@ class Add_Yoast_Providers {
 	 * @return array
 	 */
 	public function add_providers( $providers ) {
-
 		$this->providers = [
 			new Archive_Author(),
 			new Archive_Date(),
@@ -94,12 +91,12 @@ class Add_Yoast_Providers {
 		];
 
 		// Yoast SEO Premium.
-		if ( defined( 'WPSEO_PREMIUM_VERSION' ) ) {
+		if ( \defined( 'WPSEO_PREMIUM_VERSION' ) ) {
 			$this->providers[] = new Cornerstone_Workout();
 			$this->providers[] = new Orphaned_Content_Workout();
 		}
 
-		return array_merge(
+		return \array_merge(
 			$providers,
 			$this->providers
 		);

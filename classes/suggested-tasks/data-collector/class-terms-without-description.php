@@ -50,10 +50,9 @@ class Terms_Without_Description extends Base_Data_Collector {
 	 * @return void
 	 */
 	public function on_term_edited( $term_id, $tt_id, $taxonomy, $args ) {
-
 		// Check if the taxonomy is public and that description is not empty.
 		$taxonomy_object = \get_taxonomy( $taxonomy );
-		if ( ! $taxonomy_object || ! $taxonomy_object->public || ! isset( $args['description'] ) || '' === trim( $args['description'] ) ) {
+		if ( ! $taxonomy_object || ! $taxonomy_object->public || ! isset( $args['description'] ) || '' === \trim( $args['description'] ) ) {
 			return;
 		}
 
@@ -83,14 +82,27 @@ class Terms_Without_Description extends Base_Data_Collector {
 		 *
 		 * @var array<string, string> $public_taxonomies
 		 */
-		$public_taxonomies = get_taxonomies( [ 'public' => true ], 'names' );
+		$public_taxonomies = \get_taxonomies( [ 'public' => true ], 'names' );
 
-		if ( isset( $public_taxonomies['post_format'] ) ) {
-			unset( $public_taxonomies['post_format'] );
-		}
+		/**
+		 * Array of public taxonomies to exclude from the terms without description query.
+		 *
+		 * @var array<string> $exclude_public_taxonomies
+		 */
+		$exclude_public_taxonomies = \apply_filters(
+			'progress_planner_exclude_public_taxonomies',
+			[
+				'post_format',
+				'product_shipping_class',
+				'prpl_recommendations_category',
+				'prpl_recommendations_provider',
+			]
+		);
 
-		if ( isset( $public_taxonomies['product_shipping_class'] ) ) {
-			unset( $public_taxonomies['product_shipping_class'] );
+		foreach ( $exclude_public_taxonomies as $taxonomy ) {
+			if ( isset( $public_taxonomies[ $taxonomy ] ) ) {
+				unset( $public_taxonomies[ $taxonomy ] );
+			}
 		}
 
 		// Exclude the Uncategorized category.
@@ -108,7 +120,6 @@ class Terms_Without_Description extends Base_Data_Collector {
 		$result = [];
 
 		foreach ( $public_taxonomies as $taxonomy ) {
-
 			$query = "
 				SELECT t.term_id, t.name, tt.count, tt.taxonomy
 				FROM {$wpdb->terms} AS t
@@ -117,7 +128,7 @@ class Terms_Without_Description extends Base_Data_Collector {
 				AND (tt.description = '' OR tt.description IS NULL OR tt.description = '&nbsp;')
 				AND tt.count >= %d";
 			if ( ! empty( $exclude_term_ids ) ) {
-				$query .= ' AND t.term_id NOT IN (' . implode( ',', array_map( 'intval', $exclude_term_ids ) ) . ')';
+				$query .= ' AND t.term_id NOT IN (' . \implode( ',', \array_map( 'intval', $exclude_term_ids ) ) . ')';
 			}
 			$query .= ' ORDER BY tt.count DESC LIMIT 1';
 

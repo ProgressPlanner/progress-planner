@@ -6,7 +6,7 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -18,7 +18,7 @@ if ( empty( $prpl_badges ) ) {
 ?>
 <div class="progress-badges">
 	<span class="badges-popover-progress-total">
-		<span style="width: <?php echo (int) end( $prpl_badges )->get_progress()['progress']; ?>%"></span>
+		<span style="width: <?php echo (int) \end( $prpl_badges )->get_progress()['progress']; ?>%"></span>
 	</span>
 	<div class="indicators">
 		<?php foreach ( $prpl_badges as $prpl_badge ) : ?>
@@ -29,11 +29,11 @@ if ( empty( $prpl_badges ) ) {
 						✔️
 					<?php else : ?>
 						<?php
-						printf(
+						\printf(
 							'content' === $prpl_context // @phpstan-ignore-line variable.undefined
 								? \esc_html(
 									/* translators: The number of weeks remaining to complete the badge. */
-									_n(
+									\_n(
 										'%s post to go',
 										'%s posts to go',
 										(int) $prpl_badge_progress['remaining'],
@@ -41,7 +41,7 @@ if ( empty( $prpl_badges ) ) {
 									)
 								) : \esc_html(
 									/* translators: The number of weeks remaining to complete the badge. */
-									_n(
+									\_n(
 										'%s week to go',
 										'%s weeks to go',
 										(int) $prpl_badge_progress['remaining'],

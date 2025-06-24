@@ -30,8 +30,16 @@ class Organization_Logo extends Yoast_Provider {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->yoast_seo = YoastSEO();
-		$this->url       = \admin_url( 'admin.php?page=wpseo_page_settings#/site-representation' );
+		$this->yoast_seo = \YoastSEO();
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/site-representation' );
 	}
 
 	/**
@@ -39,7 +47,7 @@ class Organization_Logo extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
 			? \esc_html__( 'Yoast SEO: set your organization logo', 'progress-planner' )
 			: \esc_html__( 'Yoast SEO: set your person logo', 'progress-planner' );
@@ -50,13 +58,13 @@ class Organization_Logo extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
-			? sprintf(
+			? \sprintf(
 				/* translators: %s: "Read more" link. */
 				\esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your organization logo in the Yoast SEO settings. %s.', 'progress-planner' ),
 				'<a href="https://prpl.fyi/yoast-person-logo" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Organization Logo', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-			) : sprintf(
+			) : \sprintf(
 				/* translators: %s: "Read more" link. */
 				\esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your person logo in the Yoast SEO settings. %s.', 'progress-planner' ),
 				'<a href="https://prpl.fyi/yoast-organization-logo" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Person Logo', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
@@ -97,14 +105,17 @@ class Organization_Logo extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-
 		// If the site is for a person, and the person logo is already set, we don't need to add the task.
-		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'company' && $this->yoast_seo->helpers->options->get( 'company_logo' ) ) {
+		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'company'
+			&& $this->yoast_seo->helpers->options->get( 'company_logo' )
+		) {
 			return false;
 		}
 
 		// If the site is for a person, and the organization logo is already set, we don't need to add the task.
-		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'person' && $this->yoast_seo->helpers->options->get( 'person_logo' ) ) {
+		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'person'
+			&& $this->yoast_seo->helpers->options->get( 'person_logo' )
+		) {
 			return false;
 		}
 

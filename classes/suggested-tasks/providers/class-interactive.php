@@ -25,7 +25,7 @@ abstract class Interactive extends Tasks {
 	 * @return void
 	 */
 	public function __construct() {
-		add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
+		\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
 	}
 
 	/**

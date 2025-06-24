@@ -81,14 +81,14 @@ class Page_Settings {
 					$settings[ $page_type['slug'] ]['isset'] = 'yes';
 
 					// If there is more than one page, we need to check if the page has a parent with the same page-type assigned.
-					if ( 1 < count( $type_pages ) ) {
+					if ( 1 < \count( $type_pages ) ) {
 						$type_pages_ids = [];
 						foreach ( $type_pages as $type_page ) {
 							$type_pages_ids[] = (int) $type_page->ID;
 						}
 						foreach ( $type_pages as $type_page ) {
 							$parent = \get_post_field( 'post_parent', $type_page->ID );
-							if ( $parent && in_array( (int) $parent, $type_pages_ids, true ) ) {
+							if ( $parent && \in_array( (int) $parent, $type_pages_ids, true ) ) {
 								$settings[ $page_type['slug'] ]['value'] = $parent;
 								break;
 							}
@@ -132,7 +132,7 @@ class Page_Settings {
 		\check_admin_referer( 'progress_planner' );
 
 		if ( isset( $_POST['pages'] ) ) {
-			foreach ( wp_unslash( $_POST['pages'] ) as $type => $page_args ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			foreach ( \wp_unslash( $_POST['pages'] ) as $type => $page_args ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 				$need_page = \sanitize_text_field( \wp_unslash( $page_args['have_page'] ) );
 
@@ -185,7 +185,6 @@ class Page_Settings {
 	 * @return void
 	 */
 	public function save_settings() {
-
 		// Check the nonce.
 		\check_admin_referer( 'progress_planner' );
 
@@ -202,14 +201,13 @@ class Page_Settings {
 	 * @return void
 	 */
 	public function save_post_types() {
-
 		// Check the nonce.
 		\check_admin_referer( 'progress_planner' );
 
 		$include_post_types = isset( $_POST['prpl-post-types-include'] )
-			? array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			? \array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			// If no post types are selected, use the default post types (post and page can be deregistered).
-			: array_intersect( [ 'post', 'page' ], \progress_planner()->get_settings()->get_public_post_types() );
+			: \array_intersect( [ 'post', 'page' ], \progress_planner()->get_settings()->get_public_post_types() );
 
 		\progress_planner()->get_settings()->set( 'include_post_types', $include_post_types );
 	}
@@ -220,7 +218,6 @@ class Page_Settings {
 	 * @return void
 	 */
 	public function save_license() {
-
 		// Check the nonce.
 		\check_admin_referer( 'progress_planner' );
 
@@ -253,9 +250,9 @@ class Page_Settings {
 					'edd_action'  => 'activate_license',
 					'license'     => $license,
 					'item_id'     => 1136,
-					'item_name'   => rawurlencode( 'Progress Planner Pro' ),
+					'item_name'   => \rawurlencode( 'Progress Planner Pro' ),
 					'url'         => \home_url(),
-					'environment' => function_exists( 'wp_get_environment_type' ) ? \wp_get_environment_type() : 'production',
+					'environment' => \function_exists( 'wp_get_environment_type' ) ? \wp_get_environment_type() : 'production',
 				],
 			]
 		);
@@ -304,7 +301,7 @@ class Page_Settings {
 
 			case 'item_name_mismatch':
 				\wp_send_json_error(
-					sprintf(
+					\sprintf(
 						/* translators: the plugin name */
 						\esc_html__( 'This appears to be an invalid license key for %s.', 'progress-planner' ),
 						'Progress Planner Pro'
