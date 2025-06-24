@@ -272,11 +272,9 @@ class Suggested_Tasks {
 			'prpl_recommendations',
 			[
 				'label'                 => \__( 'Recommendations', 'progress-planner' ),
-				'public'                => true,
-				'show_ui'               => true,
-				'show_in_menu'          => true,
-				'show_in_nav_menus'     => true,
-				'show_in_admin_bar'     => true,
+				'public'                => false,
+				'show_ui'               => \apply_filters( 'progress_planner_tasks_show_ui', false ),
+				'show_in_admin_bar'     => \apply_filters( 'progress_planner_tasks_show_ui', false ),
 				'show_in_rest'          => true,
 				'rest_controller_class' => \Progress_Planner\Rest\Recommendations_Controller::class,
 				'supports'              => [ 'title', 'editor', 'author', 'custom-fields', 'page-attributes' ],
@@ -368,17 +366,17 @@ class Suggested_Tasks {
 				$taxonomy,
 				[ 'prpl_recommendations' ],
 				[
-					'public'            => \progress_planner()->is_debug_mode_enabled(),
+					'public'            => false,
 					'hierarchical'      => false,
 					'labels'            => [
 						'name' => $label,
 					],
-					'show_ui'           => \progress_planner()->is_debug_mode_enabled(),
+					'show_ui'           => \apply_filters( 'progress_planner_tasks_show_ui', false ),
 					'show_admin_column' => false,
 					'query_var'         => true,
 					'rewrite'           => [ 'slug' => $taxonomy ],
 					'show_in_rest'      => true,
-					'show_in_menu'      => \progress_planner()->is_debug_mode_enabled(),
+					'show_in_menu'      => \apply_filters( 'progress_planner_tasks_show_ui', false ),
 				]
 			);
 		}
