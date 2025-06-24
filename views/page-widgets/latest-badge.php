@@ -5,7 +5,7 @@
  * @package Progress_Planner
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -20,11 +20,11 @@ $prpl_latest_badge = \progress_planner()->get_badges()->get_latest_completed_bad
 	<p><?php \esc_html_e( 'You haven\'t unlocked any badges yet. Hang on, you\'ll get there!', 'progress-planner' ); ?></p>
 <?php else : ?>
 	<p>
-		<?php if ( str_starts_with( $prpl_latest_badge->get_id(), 'monthly-' ) ) : ?>
+		<?php if ( \str_starts_with( $prpl_latest_badge->get_id(), 'monthly-' ) ) : ?>
 			<?php \esc_html_e( 'Wooohoooo! Congratulations! You have earned a new badge.', 'progress-planner' ); ?>
 		<?php else : ?>
 			<?php
-			printf(
+			\printf(
 				/* translators: %s: The badge name. */
 				\esc_html__( 'Wooohoooo! Congratulations! You have earned a new badge. You are now a %s.', 'progress-planner' ),
 				'<strong>' . \esc_html( $prpl_latest_badge->get_name() ) . '</strong>'

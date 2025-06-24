@@ -35,7 +35,7 @@ class Plugin_Upgrade_Tasks {
 	 * @return void
 	 */
 	public function plugin_activated_or_updated() {
-		update_option( 'progress_planner_plugin_was_activated', true );
+		\update_option( 'progress_planner_plugin_was_activated', true );
 	}
 
 	/**
@@ -81,13 +81,13 @@ class Plugin_Upgrade_Tasks {
 		$newly_added_task_provider_ids = \get_option( 'progress_planner_upgrade_popover_task_provider_ids', [] );
 
 		foreach ( $onboard_task_provider_ids as $task_provider_id ) {
-			if ( ! empty( $task_provider_id ) && ! in_array( $task_provider_id, $old_task_providers, true ) && ! in_array( $task_provider_id, $newly_added_task_provider_ids, true ) ) {
+			if ( ! empty( $task_provider_id ) && ! \in_array( $task_provider_id, $old_task_providers, true ) && ! \in_array( $task_provider_id, $newly_added_task_provider_ids, true ) ) {
 				$newly_added_task_provider_ids[] = $task_provider_id;
 			}
 		}
 
 		// Update 'progress_planner_previous_version_task_providers' option.
-		\update_option( 'progress_planner_previous_version_task_providers', array_unique( array_merge( $old_task_providers, $onboard_task_provider_ids ), SORT_REGULAR ) );
+		\update_option( 'progress_planner_previous_version_task_providers', \array_unique( \array_merge( $old_task_providers, $onboard_task_provider_ids ), SORT_REGULAR ) );
 
 		// Update 'progress_planner_upgrade_popover_task_providers' option.
 		\update_option( 'progress_planner_upgrade_popover_task_provider_ids', $newly_added_task_provider_ids );

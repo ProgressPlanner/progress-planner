@@ -49,9 +49,9 @@ final class Suggested_Tasks extends Widget {
 		// Register styles for the web-component.
 		\wp_register_style(
 			'progress-planner-suggested-task',
-			constant( 'PROGRESS_PLANNER_URL' ) . '/assets/css/suggested-task.css',
+			\constant( 'PROGRESS_PLANNER_URL' ) . '/assets/css/suggested-task.css',
 			[],
-			\progress_planner()->get_file_version( constant( 'PROGRESS_PLANNER_DIR' ) . '/assets/css/suggested-task.css' )
+			\progress_planner()->get_file_version( \constant( 'PROGRESS_PLANNER_DIR' ) . '/assets/css/suggested-task.css' )
 		);
 
 		return [

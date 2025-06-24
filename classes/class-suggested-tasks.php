@@ -109,7 +109,7 @@ class Suggested_Tasks {
 		$activity->save();
 
 		// Allow other classes to react to the completion of a suggested task.
-		do_action( 'progress_planner_suggested_task_completed', $task_id );
+		\do_action( 'progress_planner_suggested_task_completed', $task_id );
 	}
 
 	/**
@@ -268,15 +268,13 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function register_post_type() {
-		register_post_type(
+		\register_post_type(
 			'prpl_recommendations',
 			[
 				'label'                 => \__( 'Recommendations', 'progress-planner' ),
-				'public'                => true,
-				'show_ui'               => true,
-				'show_in_menu'          => true,
-				'show_in_nav_menus'     => true,
-				'show_in_admin_bar'     => true,
+				'public'                => false,
+				'show_ui'               => \apply_filters( 'progress_planner_tasks_show_ui', false ),
+				'show_in_admin_bar'     => \apply_filters( 'progress_planner_tasks_show_ui', false ),
 				'show_in_rest'          => true,
 				'rest_controller_class' => \Progress_Planner\Rest\Recommendations_Controller::class,
 				'supports'              => [ 'title', 'editor', 'author', 'custom-fields', 'page-attributes' ],
@@ -334,7 +332,7 @@ class Suggested_Tasks {
 		];
 
 		foreach ( $rest_meta_fields as $key => $field ) {
-			register_post_meta(
+			\register_post_meta(
 				'prpl_recommendations',
 				$key,
 				$field
@@ -368,17 +366,17 @@ class Suggested_Tasks {
 				$taxonomy,
 				[ 'prpl_recommendations' ],
 				[
-					'public'            => \progress_planner()->is_debug_mode_enabled(),
+					'public'            => false,
 					'hierarchical'      => false,
 					'labels'            => [
 						'name' => $label,
 					],
-					'show_ui'           => \progress_planner()->is_debug_mode_enabled(),
+					'show_ui'           => \apply_filters( 'progress_planner_tasks_show_ui', false ),
 					'show_admin_column' => false,
 					'query_var'         => true,
 					'rewrite'           => [ 'slug' => $taxonomy ],
 					'show_in_rest'      => true,
-					'show_in_menu'      => \progress_planner()->is_debug_mode_enabled(),
+					'show_in_menu'      => \apply_filters( 'progress_planner_tasks_show_ui', false ),
 				]
 			);
 		}
@@ -400,7 +398,7 @@ class Suggested_Tasks {
 			$tax_query[] = [
 				'taxonomy' => 'prpl_recommendations_provider',
 				'field'    => 'slug',
-				'terms'    => explode( ',', $request['provider'] ),
+				'terms'    => \explode( ',', $request['provider'] ),
 				'operator' => 'IN',
 			];
 		}
@@ -410,7 +408,7 @@ class Suggested_Tasks {
 			$tax_query[] = [
 				'taxonomy' => 'prpl_recommendations_provider',
 				'field'    => 'slug',
-				'terms'    => explode( ',', $request['exclude_provider'] ),
+				'terms'    => \explode( ',', $request['exclude_provider'] ),
 				'operator' => 'NOT IN',
 			];
 		}
@@ -421,11 +419,11 @@ class Suggested_Tasks {
 
 		// Handle sorting parameters.
 		if ( isset( $request['filter']['orderby'] ) ) {
-			$args['orderby'] = sanitize_sql_orderby( $request['filter']['orderby'] );
+			$args['orderby'] = \sanitize_sql_orderby( $request['filter']['orderby'] );
 		}
 		if ( isset( $request['filter']['order'] ) ) {
-			$args['order'] = in_array( strtoupper( $request['filter']['order'] ), [ 'ASC', 'DESC' ], true )
-				? strtoupper( $request['filter']['order'] )
+			$args['order'] = \in_array( \strtoupper( $request['filter']['order'] ), [ 'ASC', 'DESC' ], true )
+				? \strtoupper( $request['filter']['order'] )
 				: 'ASC';
 		}
 
@@ -441,8 +439,8 @@ class Suggested_Tasks {
 	 * @return \WP_REST_Response
 	 */
 	public function rest_prepare_recommendation( $response, $post ) {
-		$provider_term = wp_get_object_terms( $post->ID, 'prpl_recommendations_provider' );
-		if ( $provider_term && ! is_wp_error( $provider_term ) ) {
+		$provider_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_provider' );
+		if ( $provider_term && ! \is_wp_error( $provider_term ) ) {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
 
 			if ( $provider ) {
@@ -464,7 +462,7 @@ class Suggested_Tasks {
 	 * @return array
 	 */
 	public function get_tasks_in_rest_format( array $args = [] ) {
-		$args = wp_parse_args(
+		$args = \wp_parse_args(
 			$args,
 			[
 				'post_status'      => 'publish',
@@ -484,12 +482,12 @@ class Suggested_Tasks {
 		foreach ( $max_items_per_category as $category_slug => $max_items ) {
 
 			// Skip excluded providers.
-			if ( ! empty( $args['exclude_provider'] ) && in_array( $category_slug, $args['exclude_provider'], true ) ) {
+			if ( ! empty( $args['exclude_provider'] ) && \in_array( $category_slug, $args['exclude_provider'], true ) ) {
 				continue;
 			}
 
 			// Skip not included providers.
-			if ( ! empty( $args['include_provider'] ) && ! in_array( $category_slug, $args['include_provider'], true ) ) {
+			if ( ! empty( $args['include_provider'] ) && ! \in_array( $category_slug, $args['include_provider'], true ) ) {
 				continue;
 			}
 
@@ -528,7 +526,7 @@ class Suggested_Tasks {
 			]
 		);
 
-		if ( ! empty( $provider_categories ) && ! is_wp_error( $provider_categories ) ) {
+		if ( ! empty( $provider_categories ) && ! \is_wp_error( $provider_categories ) ) {
 			$content_review_category = ( new Content_Review() )->get_provider_category();
 			foreach ( $provider_categories as $provider_category ) {
 				$max_items_per_category[ $provider_category->slug ] = $provider_category->slug === $content_review_category ? 2 : 1;
@@ -540,6 +538,6 @@ class Suggested_Tasks {
 			$max_items_per_category['user'] = 100;
 		}
 
-		return apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category );
+		return \apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category );
 	}
 }

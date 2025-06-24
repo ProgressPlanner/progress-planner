@@ -6,7 +6,7 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -18,7 +18,7 @@ if ( ! $prpl_privacy_policy_accepted ) {
 }
 ?>
 
-<div class="wrap prpl-wrap <?php echo esc_attr( $prpl_wrapper_class ); ?>">
+<div class="wrap prpl-wrap <?php echo \esc_attr( $prpl_wrapper_class ); ?>">
 	<?php if ( true === $prpl_privacy_policy_accepted ) : ?>
 		<h1 class="screen-reader-text"><?php \esc_html_e( 'Progress Planner', 'progress-planner' ); ?></h1>
 		<?php \progress_planner()->the_view( 'admin-page-header.php' ); ?>
@@ -35,7 +35,7 @@ if ( ! $prpl_privacy_policy_accepted ) {
 			 *
 			 * @since 1.1.1
 			 */
-			do_action( 'progress_planner_admin_page_after_widgets' );
+			\do_action( 'progress_planner_admin_page_after_widgets' );
 		?>
 	<?php else : ?>
 		<?php \progress_planner()->the_view( 'welcome.php' ); ?>

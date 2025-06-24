@@ -26,7 +26,7 @@ trait Task_Provider_Test_Trait {
 	 */
 	public static function setUpBeforeClass(): void { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
 		// Set the current user to the admin user.
-		wp_set_current_user( 1 );
+		\wp_set_current_user( 1 );
 	}
 
 	/**
@@ -36,7 +36,7 @@ trait Task_Provider_Test_Trait {
 	 */
 	public static function tearDownAfterClass(): void { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
 		// Reset the current user.
-		wp_set_current_user( 0 );
+		\wp_set_current_user( 0 );
 	}
 
 	/**
@@ -91,7 +91,7 @@ trait Task_Provider_Test_Trait {
 		);
 
 		// Assert that task is in the pending tasks.
-		$this->assertTrue( has_term( $this->task_provider_id, 'prpl_recommendations_provider', $pending_tasks[0]->ID ) );
+		$this->assertTrue( \has_term( $this->task_provider_id, 'prpl_recommendations_provider', $pending_tasks[0]->ID ) );
 
 		// Complete the task.
 		$this->complete_task();

@@ -72,7 +72,7 @@ class Stats {
 	 * @return bool
 	 */
 	public function validate_token( $token ) {
-		$token = str_replace( 'token/', '', $token );
+		$token = \str_replace( 'token/', '', $token );
 		if ( \progress_planner()->is_pro_site() && $token === \get_option( 'progress_planner_pro_license_key' ) ) {
 			return true;
 		}

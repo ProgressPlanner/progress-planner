@@ -7,7 +7,7 @@
 
 use Progress_Planner\Badges\Monthly;
 
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -111,7 +111,7 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 					<img
 						src="<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . \esc_attr( $prpl_badge->get_id() ) ); ?>"
 						alt="<?php \esc_attr_e( 'Badge', 'progress-planner' ); ?>"
-						onerror="this.onerror=null;this.src='<?php echo esc_url( \progress_planner()->get_placeholder_svg() ); ?>';"
+						onerror="this.onerror=null;this.src='<?php echo \esc_url( \progress_planner()->get_placeholder_svg() ); ?>';"
 					/>
 				</span>
 				<?php \esc_html_e( 'These tasks contribute to your monthly badge—every check completed brings you closer!', 'progress-planner' ); ?>

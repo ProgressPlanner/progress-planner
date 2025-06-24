@@ -100,6 +100,6 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 
 		\progress_planner()->get_suggested_tasks()->get_tasks_manager()->cleanup_pending_tasks();
 		\wp_cache_flush_group( \Progress_Planner\Suggested_Tasks_DB::GET_TASKS_CACHE_GROUP ); // Clear the cache.
-		$this->assertEquals( count( $tasks_to_keep ), \count( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] ) ) );
+		$this->assertEquals( \count( $tasks_to_keep ), \count( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] ) ) );
 	}
 }

@@ -42,13 +42,13 @@ class Fewer_Tags_Provider_Test extends \WP_UnitTestCase {
 	 */
 	public function setUp(): void {
 		parent::setUp();
-		$this->original_active_plugins = get_option( 'active_plugins', [] );
+		$this->original_active_plugins = \get_option( 'active_plugins', [] );
 
 		// Initialize filesystem.
 		global $wp_filesystem;
 		if ( ! $wp_filesystem ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
-			WP_Filesystem();
+			\WP_Filesystem();
 		}
 		$this->filesystem = $wp_filesystem;
 	}
@@ -57,7 +57,7 @@ class Fewer_Tags_Provider_Test extends \WP_UnitTestCase {
 	 * Tear down the test.
 	 */
 	public function tearDown(): void {
-		update_option( 'active_plugins', $this->original_active_plugins );
+		\update_option( 'active_plugins', $this->original_active_plugins );
 		parent::tearDown();
 	}
 
@@ -66,9 +66,9 @@ class Fewer_Tags_Provider_Test extends \WP_UnitTestCase {
 	 */
 	public function test_should_add_task_when_plugin_inactive_and_tags_outnumber_posts() {
 		// Create more tags than posts.
-		$tag1 = wp_insert_term( 'Tag 1', 'post_tag' );
+		$tag1 = \wp_insert_term( 'Tag 1', 'post_tag' );
 		$this->assertNotWPError( $tag1 );
-		$tag2 = wp_insert_term( 'Tag 2', 'post_tag' );
+		$tag2 = \wp_insert_term( 'Tag 2', 'post_tag' );
 		$this->assertNotWPError( $tag2 );
 
 		// Create a new Fewer_Tags instance here so it's internal cache is populated with the correct data.
@@ -77,8 +77,8 @@ class Fewer_Tags_Provider_Test extends \WP_UnitTestCase {
 		$this->assertTrue( $this->task_provider->should_add_task() );
 
 		// Clean up.
-		wp_delete_term( $tag1['term_id'], 'post_tag' );
-		wp_delete_term( $tag2['term_id'], 'post_tag' );
+		\wp_delete_term( $tag1['term_id'], 'post_tag' );
+		\wp_delete_term( $tag2['term_id'], 'post_tag' );
 	}
 
 	/**
@@ -86,11 +86,11 @@ class Fewer_Tags_Provider_Test extends \WP_UnitTestCase {
 	 */
 	public function test_should_add_task_when_plugin_inactive_but_tags_dont_outnumber_posts() {
 		// Create one tag.
-		$tag = wp_insert_term( 'Tag 1', 'post_tag' );
+		$tag = \wp_insert_term( 'Tag 1', 'post_tag' );
 		$this->assertNotWPError( $tag );
 
 		// Create two published posts.
-		$post1 = wp_insert_post(
+		$post1 = \wp_insert_post(
 			[
 				'post_title'  => 'Test Post 1',
 				'post_status' => 'publish',
@@ -99,7 +99,7 @@ class Fewer_Tags_Provider_Test extends \WP_UnitTestCase {
 		);
 		$this->assertNotWPError( $post1 );
 
-		$post2 = wp_insert_post(
+		$post2 = \wp_insert_post(
 			[
 				'post_title'  => 'Test Post 2',
 				'post_status' => 'publish',
@@ -114,9 +114,9 @@ class Fewer_Tags_Provider_Test extends \WP_UnitTestCase {
 		$this->assertFalse( $this->task_provider->should_add_task() );
 
 		// Clean up.
-		wp_delete_post( $post1 );
-		wp_delete_post( $post2 );
-		wp_delete_term( $tag['term_id'], 'post_tag' );
+		\wp_delete_post( $post1 );
+		\wp_delete_post( $post2 );
+		\wp_delete_term( $tag['term_id'], 'post_tag' );
 	}
 
 	/**
@@ -133,7 +133,7 @@ class Fewer_Tags_Provider_Test extends \WP_UnitTestCase {
 		$this->filesystem->put_contents( $plugin_dir . '/fewer-tags.php', '<?php /* Plugin Name: Fewer Tags */' );
 
 		// Mock plugin as active in options.
-		update_option( 'active_plugins', [ 'fewer-tags/fewer-tags.php' ] );
+		\update_option( 'active_plugins', [ 'fewer-tags/fewer-tags.php' ] );
 
 		// Create a new Fewer_Tags instance here so it's internal cache is populated with the correct data.
 		$this->task_provider = new Fewer_Tags();

@@ -107,7 +107,7 @@ class Update_111 {
 		}
 		foreach ( $suggested_tasks_option as $status => $tasks ) {
 			foreach ( $tasks as $_task ) {
-				$task_id        = is_string( $_task ) ? $_task : $_task['id'];
+				$task_id        = \is_string( $_task ) ? $_task : $_task['id'];
 				$task           = Plugin_Migration_Helpers::parse_task_data_from_task_id( $task_id )->get_data();
 				$task['status'] = $status;
 				if ( 'snoozed' === $status && isset( $_task['time'] ) ) {
@@ -198,7 +198,7 @@ class Update_111 {
 		foreach ( $todo_items as $todo_item ) {
 			$this->add_local_task(
 				[
-					'task_id'     => 'user-task-' . md5( $todo_item['content'] ),
+					'task_id'     => 'user-task-' . \md5( $todo_item['content'] ),
 					'status'      => $todo_item['done'] ? 'completed' : 'pending',
 					'provider_id' => 'user',
 					'category'    => 'user',
@@ -220,11 +220,11 @@ class Update_111 {
 	 * @return string
 	 */
 	private function convert_task_id( $task_id ) {
-		if ( ! str_contains( $task_id, '|' ) ) {
+		if ( ! \str_contains( $task_id, '|' ) ) {
 			return $task_id;
 		}
-		$task_id = str_replace( 'type', 'provider_id', $task_id );
-		$task_id = str_replace( 'provider_id/update-post', 'provider_id/review-post', $task_id ); // Update the provider_id for update-post tasks.
+		$task_id = \str_replace( 'type', 'provider_id', $task_id );
+		$task_id = \str_replace( 'provider_id/update-post', 'provider_id/review-post', $task_id ); // Update the provider_id for update-post tasks.
 		$parts   = \explode( '|', $task_id );
 		\ksort( $parts );
 		return \implode( '|', $parts );
@@ -243,7 +243,7 @@ class Update_111 {
 				if ( ! isset( $task['task_id'] ) ) {
 					continue;
 				}
-				if ( false !== strpos( $task['task_id'], 'provider_id/create-post' ) ) {
+				if ( false !== \strpos( $task['task_id'], 'provider_id/create-post' ) ) {
 					/*
 					 * `task_id` needs to be unique, before we had 2 'create-post' tasks for the same week (short and long).
 					 * For tasks which are completed or pending we will make the task_id like: create-post-short-202501
@@ -281,7 +281,7 @@ class Update_111 {
 
 		if ( ! empty( $activities ) ) {
 			foreach ( $activities as $activity ) {
-				if ( false !== strpos( $activity->data_id, 'provider_id/create-post' ) ) {
+				if ( false !== \strpos( $activity->data_id, 'provider_id/create-post' ) ) {
 					$data = $this->get_data_from_task_id( $activity->data_id );
 
 					// NOTE: task_id needs to be unique, before we had 2 'create-post' tasks in the same week (short and long).
@@ -308,7 +308,7 @@ class Update_111 {
 				if ( ! isset( $task['task_id'] ) ) {
 					continue;
 				}
-				if ( false !== strpos( $task['task_id'], 'provider_id/review-post' ) ) {
+				if ( false !== \strpos( $task['task_id'], 'provider_id/review-post' ) ) {
 					$data = $this->get_data_from_task_id( $task['task_id'] );
 
 					// Get the date from the activity.
@@ -342,7 +342,7 @@ class Update_111 {
 				if ( ! isset( $activity->data_id ) || ! isset( $activity->date ) ) {
 					continue;
 				}
-				if ( false !== strpos( $activity->data_id, 'provider_id/review-post' ) ) {
+				if ( false !== \strpos( $activity->data_id, 'provider_id/review-post' ) ) {
 					$data = $this->get_data_from_task_id( $activity->data_id );
 
 					$new_data_id = $data['provider_id'] . '-' . $data['post_id'] . '-' . $activity->date->format( 'YW' );

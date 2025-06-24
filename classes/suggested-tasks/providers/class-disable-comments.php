@@ -62,7 +62,7 @@ class Disable_Comments extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return sprintf(
+		return \sprintf(
 			\esc_html(
 					// translators: %d is the number of approved comments, %s is the <a href="https://prpl.fyi/disable-comments" target="_blank">disabling them</a> link.
 				\_n(

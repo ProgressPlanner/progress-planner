@@ -6,7 +6,7 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -29,7 +29,7 @@ $prpl_pro_license_status = \get_option( 'progress_planner_pro_license_status', '
 			<?php if ( empty( $prpl_pro_license ) || 'valid' !== $prpl_pro_license_status ) : ?>
 				<p>
 					<?php
-					printf(
+					\printf(
 						// translators: %s is a link to the Pro page, with the text "Progress Planner Pro".
 						\esc_html__( 'Take part in interactive challenges to solve website problems like broken links and sharpen your skills with in-context mini courses. Upgrade to %s!', 'progress-planner' ),
 						'<a href="https://progressplanner.com/pro/" target="_blank">Progress Planner Pro</a>'
@@ -50,11 +50,11 @@ $prpl_pro_license_status = \get_option( 'progress_planner_pro_license_status', '
 				<?php if ( ! empty( $prpl_pro_license ) ) : ?>
 					<span class="prpl-license-status prpl-license-status-<?php echo ( 'valid' === $prpl_pro_license_status ) ? 'valid' : 'invalid'; ?>">
 						<?php if ( 'valid' === $prpl_pro_license_status ) : ?>
-							<span class="prpl-license-status-valid" title="<?php esc_attr_e( 'Valid', 'progress-planner' ); ?>">
+							<span class="prpl-license-status-valid" title="<?php \esc_attr_e( 'Valid', 'progress-planner' ); ?>">
 								<?php \progress_planner()->the_asset( 'images/icon_check_circle.svg' ); ?>
 							</span>
 						<?php else : ?>
-							<span class="prpl-license-status-invalid" title="<?php esc_attr_e( 'Invalid', 'progress-planner' ); ?>">
+							<span class="prpl-license-status-invalid" title="<?php \esc_attr_e( 'Invalid', 'progress-planner' ); ?>">
 								<?php \progress_planner()->the_asset( 'images/icon_exclamation_circle.svg' ); ?>
 							</span>
 						<?php endif; ?>

@@ -82,7 +82,7 @@ class Hello_World extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return sprintf(
+		return \sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">Hello World!</a> link */
 			\esc_html__( 'On install, WordPress creates a %s post. This post is not needed and should be deleted.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">' . \esc_html__( '"Hello World!"', 'progress-planner' ) . '</a>'

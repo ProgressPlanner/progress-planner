@@ -27,7 +27,7 @@ class System_Status {
 		$data['pending_updates'] = \wp_get_update_data()['counts']['total'];
 
 		// Get number of content from any public post-type, published in the past week.
-		$data['weekly_posts'] = count(
+		$data['weekly_posts'] = \count(
 			\get_posts(
 				[
 					'post_status'    => 'publish',
@@ -39,7 +39,7 @@ class System_Status {
 		);
 
 		// Get the number of activities in the past week.
-		$data['activities'] = count(
+		$data['activities'] = \count(
 			\progress_planner()->get_activities__query()->query_activities(
 				[
 					'start_date' => new \DateTime( '-7 days' ),
@@ -55,7 +55,7 @@ class System_Status {
 		];
 
 		// Get the badges.
-		$badges = array_merge(
+		$badges = \array_merge(
 			\progress_planner()->get_badges()->get_badges( 'content' ),
 			\progress_planner()->get_badges()->get_badges( 'maintenance' ),
 			\progress_planner()->get_badges()->get_badges( 'monthly_flat' )
@@ -63,7 +63,7 @@ class System_Status {
 
 		$data['badges'] = [];
 		foreach ( $badges as $badge ) {
-			$data['badges'][ $badge->get_id() ] = array_merge(
+			$data['badges'][ $badge->get_id() ] = \array_merge(
 				[
 					'id'   => $badge->get_id(),
 					'name' => $badge->get_name(),

@@ -41,7 +41,7 @@ class Blog_Description extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return sprintf(
+		return \sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/set-tagline" target="_blank">tagline</a> link */
 			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/set-tagline" target="_blank">' . \esc_html__( 'tagline', 'progress-planner' ) . '</a>'

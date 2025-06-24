@@ -30,7 +30,7 @@ class Organization_Logo extends Yoast_Provider {
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->yoast_seo = YoastSEO();
+		$this->yoast_seo = \YoastSEO();
 	}
 
 	/**
@@ -60,11 +60,11 @@ class Organization_Logo extends Yoast_Provider {
 	 */
 	protected function get_description() {
 		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
-			? sprintf(
+			? \sprintf(
 				/* translators: %s: "Read more" link. */
 				\esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your organization logo in the Yoast SEO settings. %s.', 'progress-planner' ),
 				'<a href="https://prpl.fyi/yoast-person-logo" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Organization Logo', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-			) : sprintf(
+			) : \sprintf(
 				/* translators: %s: "Read more" link. */
 				\esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your person logo in the Yoast SEO settings. %s.', 'progress-planner' ),
 				'<a href="https://prpl.fyi/yoast-organization-logo" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Person Logo', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'

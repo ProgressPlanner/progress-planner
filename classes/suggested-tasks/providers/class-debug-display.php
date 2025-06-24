@@ -42,7 +42,7 @@ class Debug_Display extends Tasks {
 	 * @return string
 	 */
 	protected function get_description( $task_data = [] ) {
-		return sprintf(
+		return \sprintf(
 			// translators: %1$s is the name of the WP_DEBUG_DISPLAY constant, %2$s <a href="https://prpl.fyi/set-wp-debug" target="_blank">We recommend</a> link.
 			\esc_html__( '%1$s is enabled. This means that errors are shown to users. %2$s disabling it.', 'progress-planner' ),
 			'<code>WP_DEBUG_DISPLAY</code>',
@@ -56,6 +56,6 @@ class Debug_Display extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return defined( 'WP_DEBUG' ) && WP_DEBUG && defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
+		return \defined( 'WP_DEBUG' ) && WP_DEBUG && \defined( 'WP_DEBUG_DISPLAY' ) && WP_DEBUG_DISPLAY;
 	}
 }

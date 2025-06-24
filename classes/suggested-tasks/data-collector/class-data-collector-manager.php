@@ -69,7 +69,7 @@ class Data_Collector_Manager {
 	 */
 	public function add_plugin_integration() {
 		// Yoast SEO integration.
-		if ( function_exists( 'YoastSEO' ) ) {
+		if ( \function_exists( 'YoastSEO' ) ) {
 			$this->data_collectors[] = new Yoast_Orphaned_Content();
 		}
 	}

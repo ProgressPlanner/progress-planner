@@ -49,10 +49,10 @@ class Php_Version extends Tasks {
 	 * @return string
 	 */
 	protected function get_description( $task_data = [] ) {
-		return sprintf(
+		return \sprintf(
 			/* translators: %1$s: php version, %2$s: <a href="https://prpl.fyi/update-php-version" target="_blank">We recommend</a> link. %3$s: minimum PHP version recommended. */
 			\esc_html__( 'Your site is running on PHP version %1$s. %2$s updating to PHP version %3$s or higher.', 'progress-planner' ),
-			phpversion(),
+			\phpversion(),
 			'<a href="https://prpl.fyi/update-php-version" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
 			\esc_html( self::RECOMMENDED_PHP_VERSION )
 		);
@@ -64,6 +64,6 @@ class Php_Version extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return version_compare( phpversion(), self::RECOMMENDED_PHP_VERSION, '<' );
+		return \version_compare( \phpversion(), self::RECOMMENDED_PHP_VERSION, '<' );
 	}
 }

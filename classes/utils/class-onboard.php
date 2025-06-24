@@ -67,7 +67,7 @@ class Onboard {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing data.', 'progress-planner' ) ] );
 		}
 
-		$license_key = \sanitize_text_field( wp_unslash( $_POST['key'] ) );
+		$license_key = \sanitize_text_field( \wp_unslash( $_POST['key'] ) );
 
 		// False also if option value has not changed.
 		if ( \update_option( 'progress_planner_license_key', $license_key, false ) ) {

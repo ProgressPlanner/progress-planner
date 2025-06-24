@@ -74,7 +74,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_title_with_data( $task_data = [] ) {
-		return sprintf(
+		return \sprintf(
 			/* translators: %s: Post title. */
 			\esc_html__( 'Yoast SEO: add internal links to article "%s"!', 'progress-planner' ),
 			\esc_html( $task_data['target_post_title'] )
@@ -87,7 +87,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_description() {
-		return sprintf(
+		return \sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Yoast SEO detected that this article has no links pointing to it. %s.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/fix-orphaned-content" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the fixing the orphaned content.', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
@@ -154,7 +154,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return array The transformed data with original data merged.
 	 */
 	protected function transform_collector_data( array $data ): array {
-		return array_merge(
+		return \array_merge(
 			$data,
 			[
 				'target_post_id'    => $data['post_id'],
@@ -259,6 +259,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return array
 	 */
 	public function exclude_completed_posts( $exclude_post_ids ) {
-		return array_merge( $exclude_post_ids, $this->get_completed_post_ids() );
+		return \array_merge( $exclude_post_ids, $this->get_completed_post_ids() );
 	}
 }

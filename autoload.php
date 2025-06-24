@@ -10,7 +10,7 @@ use Progress_Planner\Utils\Deprecations;
 // Require the Deprecations class.
 require_once __DIR__ . '/classes/utils/class-deprecations.php';
 
-spl_autoload_register(
+\spl_autoload_register(
 	/**
 	 * Autoload classes.
 	 *
@@ -26,7 +26,7 @@ spl_autoload_register(
 		// Deprecated classes.
 		if ( isset( Deprecations::CLASSES[ $class_name ] ) ) {
 			\trigger_error( // phpcs:ignore
-				sprintf(
+				\sprintf(
 					'Class %1$s is <strong>deprecated</strong> since version %2$s! Use %3$s instead.',
 					\esc_html( $class_name ),
 					\esc_html( Deprecations::CLASSES[ $class_name ][1] ),
@@ -34,7 +34,7 @@ spl_autoload_register(
 				),
 				E_USER_DEPRECATED
 			);
-			class_alias( Deprecations::CLASSES[ $class_name ][0], $class_name );
+			\class_alias( Deprecations::CLASSES[ $class_name ][0], $class_name );
 		}
 
 		$class_name = \str_replace( $prefix, '', $class_name );
@@ -44,7 +44,7 @@ spl_autoload_register(
 		$last  = \array_pop( $parts );
 
 		foreach ( $parts as $part ) {
-			$file .= str_replace( '_', '-', strtolower( $part ) ) . '/';
+			$file .= \str_replace( '_', '-', \strtolower( $part ) ) . '/';
 		}
 		$file .= 'class-' . \str_replace( '_', '-', \strtolower( $last ) ) . '.php';
 
