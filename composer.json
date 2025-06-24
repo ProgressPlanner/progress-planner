@@ -25,7 +25,7 @@
 			"@php ./vendor/bin/phpcs -s"
 		],
 		"fix-cs": [
-			"@php ./vendor/bin/phpcbf"
+			"@php ./vendor/bin/phpcbf && ./vendor/bin/php-cs-fixer fix . --allow-risky=yes"
 		],
 		"lint": [
 			"@php ./vendor/php-parallel-lint/php-parallel-lint/parallel-lint . -e php --show-deprecated --exclude vendor --exclude node_modules --exclude .git"
