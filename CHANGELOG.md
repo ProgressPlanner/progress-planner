@@ -3,6 +3,7 @@
 Enhancements:
 
 * Allow users to collect extra points for previous months' badges.
+* Added WP-CLI commands to manage recommendations.
 
 Under the hood:
 
