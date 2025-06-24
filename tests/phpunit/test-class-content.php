@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Tests;
 
-use DateTime;
 use Progress_Planner\Actions\Content;
 use WP_UnitTestCase;
 
