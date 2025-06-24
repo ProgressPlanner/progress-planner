@@ -9,7 +9,7 @@ namespace Progress_Planner\WP_CLI;
 
 use WP_CLI, WP_CLI_Command;
 
-if ( ! class_exists( 'WP_CLI_Command' ) ) {
+if ( ! \class_exists( 'WP_CLI_Command' ) ) {
 	return;
 }
 
@@ -63,7 +63,7 @@ class Task_Command extends \WP_CLI_Command {
 		}
 
 		$format = isset( $assoc_args['format'] ) ? $assoc_args['format'] : 'table';
-		$fields = isset( $assoc_args['fields'] ) ? explode( ',', $assoc_args['fields'] ) : [ 'task_id', 'provider_id', 'category', 'date', 'status' ];
+		$fields = isset( $assoc_args['fields'] ) ? \explode( ',', $assoc_args['fields'] ) : [ 'task_id', 'provider_id', 'category', 'date', 'status' ];
 
 		WP_CLI\Utils\format_items( $format, $tasks, $fields ); // @phpstan-ignore-line
 	}
@@ -99,7 +99,7 @@ class Task_Command extends \WP_CLI_Command {
 		}
 
 		$format = isset( $assoc_args['format'] ) ? $assoc_args['format'] : 'table';
-		\WP_CLI\Utils\format_items( $format, [ $task ], array_keys( $task ) ); // @phpstan-ignore-line
+		\WP_CLI\Utils\format_items( $format, [ $task ], \array_keys( $task ) ); // @phpstan-ignore-line
 	}
 
 	/**

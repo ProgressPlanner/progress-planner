@@ -30,7 +30,7 @@ class Monthly_Badge_Test extends \WP_UnitTestCase {
 	public function set_up() {
 		parent::set_up();
 
-		$this->current_month = strtolower( \gmdate( 'M' ) );
+		$this->current_month = \strtolower( \gmdate( 'M' ) );
 	}
 
 	/**

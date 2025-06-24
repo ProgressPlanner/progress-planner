@@ -43,7 +43,7 @@ class Archive_Date extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_description() {
-		return sprintf(
+		return \sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Yoast SEO can disable the date archive, which is really only useful for news sites and blogs. %s.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/yoast-date-archive" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Date Archive', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
@@ -76,7 +76,7 @@ class Archive_Date extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		// If the date archive is already disabled, we don't need to add the task.
-		return $this->is_task_relevant() && YoastSEO()->helpers->options->get( 'disable-date' ) !== true;
+		return $this->is_task_relevant() && \YoastSEO()->helpers->options->get( 'disable-date' ) !== true;
 	}
 
 	/**
@@ -89,8 +89,8 @@ class Archive_Date extends Yoast_Provider {
 	public function is_task_relevant() {
 		// If the permalink structure includes %year%, %monthnum%, or %day%, we don't need to add the task.
 		$permalink_structure = \get_option( 'permalink_structure' );
-		return strpos( $permalink_structure, '%year%' ) === false
-			&& strpos( $permalink_structure, '%monthnum%' ) === false
-			&& strpos( $permalink_structure, '%day%' ) === false;
+		return \strpos( $permalink_structure, '%year%' ) === false
+			&& \strpos( $permalink_structure, '%monthnum%' ) === false
+			&& \strpos( $permalink_structure, '%day%' ) === false;
 	}
 }

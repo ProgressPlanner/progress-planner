@@ -37,7 +37,7 @@ final class Maintenance_Maniac extends Badge_Maintenance {
 	 */
 	public function get_description() {
 		/* translators: %d: The number of weeks. */
-		return sprintf( \esc_html__( '%d weeks streak', 'progress-planner' ), 26 );
+		return \sprintf( \esc_html__( '%d weeks streak', 'progress-planner' ), 26 );
 	}
 
 	/**
@@ -56,8 +56,8 @@ final class Maintenance_Maniac extends Badge_Maintenance {
 		}
 
 		$max_streak = $this->get_goal()->get_streak()['max_streak'];
-		$percent    = min( 100, floor( 100 * $max_streak / 26 ) );
-		$remaining  = 26 - min( 26, $max_streak );
+		$percent    = \min( 100, \floor( 100 * $max_streak / 26 ) );
+		$remaining  = 26 - \min( 26, $max_streak );
 
 		$this->save_progress(
 			[

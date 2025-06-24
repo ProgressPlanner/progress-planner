@@ -98,8 +98,8 @@ class Cornerstone_Workout extends Yoast_Provider {
 		}
 
 		// There should be 3 steps in the workout.
-		$workout_was_completed = 3 === count( $old_value['workouts']['cornerstone']['finishedSteps'] );
-		$workout_completed     = 3 === count( $value['workouts']['cornerstone']['finishedSteps'] );
+		$workout_was_completed = 3 === \count( $old_value['workouts']['cornerstone']['finishedSteps'] );
+		$workout_completed     = 3 === \count( $value['workouts']['cornerstone']['finishedSteps'] );
 
 		// Dismiss the task if workout wasn't completed before and now is.
 		if ( ! $workout_was_completed && $workout_completed ) {
@@ -122,7 +122,7 @@ class Cornerstone_Workout extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_description() {
-		return sprintf(
+		return \sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Improve your most important pages with Yoast SEO\'s Cornerstone Content Workout. %s.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/run-cornerstone-content-workout" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Learn more about the Yoast SEO Cornerstone Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Learn more', 'progress-planner' ) . '</a>'
@@ -135,7 +135,7 @@ class Cornerstone_Workout extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_url() {
-		return \esc_url( admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) );
+		return \esc_url( \admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) );
 	}
 
 	/**
@@ -144,7 +144,7 @@ class Cornerstone_Workout extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( ! defined( 'WPSEO_PREMIUM_VERSION' ) ) {
+		if ( ! \defined( 'WPSEO_PREMIUM_VERSION' ) ) {
 			return false;
 		}
 

@@ -162,7 +162,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 	protected function get_description_with_data( $task_data = [] ) {
 		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return ( $term && ! \is_wp_error( $term ) )
-			? sprintf(
+			? \sprintf(
 				/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/remove-empty-taxonomy" target="_blank">Read more</a> link */
 				\esc_html__( 'The "%1$s" term has one or less posts associated with it, we recommend removing it. %2$s', 'progress-planner' ),
 				$term->name,
@@ -213,7 +213,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * @return array The transformed data with original data merged.
 	 */
 	protected function transform_collector_data( array $data ): array {
-		return array_merge(
+		return \array_merge(
 			$data,
 			[
 				'target_term_id'   => $data['term_id'],
@@ -335,6 +335,6 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * @return array
 	 */
 	public function exclude_completed_terms( $exclude_term_ids ) {
-		return array_merge( $exclude_term_ids, $this->get_completed_term_ids() );
+		return \array_merge( $exclude_term_ids, $this->get_completed_term_ids() );
 	}
 }

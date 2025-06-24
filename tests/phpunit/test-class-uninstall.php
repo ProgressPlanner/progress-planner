@@ -18,13 +18,13 @@ class Uninstall_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_uninstall_file_runs_without_fatal_error() {
-		$uninstall_file = plugin_dir_path( __DIR__ ) . '../uninstall.php';
+		$uninstall_file = \plugin_dir_path( __DIR__ ) . '../uninstall.php';
 
 		$this->assertFileExists( $uninstall_file, 'Uninstall file does not exist.' );
 
 		// Catch fatal errors.
 		$errors = [];
-		set_error_handler( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
+		\set_error_handler( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
 			function ( $errno, $errstr ) use ( &$errors ) {
 				$errors[] = "$errno: $errstr";
 				return true; // prevent default error handler.
@@ -32,7 +32,7 @@ class Uninstall_Test extends \WP_UnitTestCase {
 		);
 
 		// Needed to simulate WordPress uninstall context.
-		define( 'WP_UNINSTALL_PLUGIN', true );
+		\define( 'WP_UNINSTALL_PLUGIN', true );
 
 		// Include the uninstall script.
 		try {
@@ -41,8 +41,8 @@ class Uninstall_Test extends \WP_UnitTestCase {
 			$this->fail( 'Fatal error during uninstall.php: ' . $e->getMessage() );
 		}
 
-		restore_error_handler();
+		\restore_error_handler();
 
-		$this->assertEmpty( $errors, 'Uninstall file caused PHP warnings or errors: ' . implode( ', ', $errors ) );
+		$this->assertEmpty( $errors, 'Uninstall file caused PHP warnings or errors: ' . \implode( ', ', $errors ) );
 	}
 }

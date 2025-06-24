@@ -30,7 +30,7 @@ class Playground {
 	public function register_hooks() {
 		if ( ! \get_option( 'progress_planner_license_key', false ) && ! \get_option( 'progress_planner_demo_data_generated', false ) ) {
 			$this->generate_data();
-			\update_option( 'progress_planner_license_key', str_replace( ' ', '-', $this->create_random_string( 20 ) ) );
+			\update_option( 'progress_planner_license_key', \str_replace( ' ', '-', $this->create_random_string( 20 ) ) );
 			\update_option( 'progress_planner_force_show_onboarding', false );
 			\update_option(
 				'progress_planner_todo',
@@ -79,7 +79,7 @@ class Playground {
 		}
 
 		if ( $action === 'hide' ) {
-			\add_option( 'progress_planner_license_key', str_replace( ' ', '-', $this->create_random_string( 20 ) ) );
+			\add_option( 'progress_planner_license_key', \str_replace( ' ', '-', $this->create_random_string( 20 ) ) );
 			$message = \esc_html__( 'Onboarding hidden successfully', 'progress-planner' );
 		} else {
 			\delete_option( 'progress_planner_license_key' );
@@ -120,7 +120,7 @@ class Playground {
 		}
 
 		$show_onboarding = \get_option( 'progress_planner_force_show_onboarding', false );
-		$button_text     = $show_onboarding ? __( 'Hide onboarding', 'progress-planner' ) : __( 'Show onboarding', 'progress-planner' );
+		$button_text     = $show_onboarding ? \__( 'Hide onboarding', 'progress-planner' ) : \__( 'Show onboarding', 'progress-planner' );
 		$action          = $show_onboarding ? 'hide' : 'show';
 		$nonce           = \wp_create_nonce( "progress_planner_{$action}_onboarding" );
 		?>
@@ -128,7 +128,7 @@ class Playground {
 		<div class="prpl-widget-wrapper prpl-top-notice" id="prpl-playground-notice">
 			<button class="prpl-close-button" onclick="document.getElementById('prpl-playground-notice').remove();">
 				<span class="dashicons dashicons-no-alt"></span>
-				<span class="screen-reader-text"><?php esc_html_e( 'Close notice', 'progress-planner' ); ?></span>
+				<span class="screen-reader-text"><?php \esc_html_e( 'Close notice', 'progress-planner' ); ?></span>
 			</button>
 
 			<div class="inner-content">
@@ -182,8 +182,8 @@ class Playground {
 	 */
 	private function create_random_post( $random_date = true, $post_type = 'post' ) {
 		$postarr = [
-			'post_title'   => str_replace( '.', '', $this->create_random_string( 5 ) ),
-			'post_content' => $this->create_random_string( wp_rand( 200, 500 ) ),
+			'post_title'   => \str_replace( '.', '', $this->create_random_string( 5 ) ),
+			'post_content' => $this->create_random_string( \wp_rand( 200, 500 ) ),
 			'post_status'  => 'publish',
 			'post_type'    => $post_type,
 			'post_date'    => $this->get_random_date_last_12_months(),
@@ -206,13 +206,13 @@ class Playground {
 		$now = \current_time( 'timestamp' );
 
 		// Timestamp for 12 months ago.
-		$last_year = strtotime( '-12 months', $now );
+		$last_year = \strtotime( '-12 months', $now );
 
 		// Generate a random timestamp between last year and now.
-		$random_timestamp = wp_rand( $last_year, $now );
+		$random_timestamp = \wp_rand( $last_year, $now );
 
 		// Format the random timestamp as a MySQL datetime string.
-		return gmdate( 'Y-m-d H:i:s', $random_timestamp );
+		return \gmdate( 'Y-m-d H:i:s', $random_timestamp );
 	}
 
 	/**
@@ -230,11 +230,11 @@ class Playground {
 
 		while ( $words_remaining > 0 ) {
 			// Randomly decide the length of the current sentence (between 8 and 12 words).
-			$sentence_length  = min( wp_rand( 8, 12 ), $words_remaining );
+			$sentence_length  = \min( \wp_rand( 8, 12 ), $words_remaining );
 			$words_remaining -= $sentence_length;
 
 			// Select random words for the sentence.
-			$word_keys = array_rand( $words, $sentence_length );
+			$word_keys = \array_rand( $words, $sentence_length );
 			$sentence  = '';
 
 			foreach ( (array) $word_keys as $key ) {
@@ -242,10 +242,10 @@ class Playground {
 			}
 
 			// Capitalize the first word and add a period at the end.
-			$sentences .= ucfirst( trim( $sentence ) ) . '. ';
+			$sentences .= \ucfirst( \trim( $sentence ) ) . '. ';
 		}
 
-		return trim( $sentences );
+		return \trim( $sentences );
 	}
 
 	/**

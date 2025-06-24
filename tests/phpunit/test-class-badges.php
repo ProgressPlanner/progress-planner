@@ -51,7 +51,7 @@ class Badges_Test extends \WP_UnitTestCase {
 		$badges         = \progress_planner()->get_badges()->get_badges( 'monthly_flat' );
 		$data['badges'] = [];
 		foreach ( $badges as $badge ) {
-			$data['badges'][ $badge->get_id() ] = array_merge(
+			$data['badges'][ $badge->get_id() ] = \array_merge(
 				[
 					'id'   => $badge->get_id(),
 					'name' => $badge->get_name(),

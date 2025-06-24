@@ -107,7 +107,7 @@ class Upgrade_Migrations_130_Test extends \WP_UnitTestCase {
 
 		// Verify that every value in the $activity_ids array is present in the $tasks array and has completed status.
 		foreach ( $activity_ids as $activity_id ) {
-			$matching_tasks = array_filter(
+			$matching_tasks = \array_filter(
 				$tasks,
 				function ( $task ) use ( $activity_id ) {
 					return isset( $task['task_id'] ) &&
@@ -117,14 +117,14 @@ class Upgrade_Migrations_130_Test extends \WP_UnitTestCase {
 
 			$this->assertNotEmpty(
 				$matching_tasks,
-				sprintf( 'Task ID "%s" not found in tasks', $activity_id )
+				\sprintf( 'Task ID "%s" not found in tasks', $activity_id )
 			);
 
-			$task = reset( $matching_tasks );
+			$task = \reset( $matching_tasks );
 			$this->assertEquals(
 				'completed',
 				$task['status'],
-				sprintf( 'Task ID "%s" status is not "completed"', $activity_id )
+				\sprintf( 'Task ID "%s" status is not "completed"', $activity_id )
 			);
 		}
 	}

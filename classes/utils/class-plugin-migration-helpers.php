@@ -25,11 +25,11 @@ class Plugin_Migration_Helpers {
 		$data = [];
 
 		// Parse simple format, e.g. 'update-core-202449' or "hello-world".
-		if ( ! str_contains( $task_id, '|' ) ) {
-			$last_pos = strrpos( $task_id, '-' );
+		if ( ! \str_contains( $task_id, '|' ) ) {
+			$last_pos = \strrpos( $task_id, '-' );
 
 			// Check if the task ID ends with a '-12345' or not, if not that would be mostly one time tasks.
-			if ( $last_pos === false || ! preg_match( '/-\d+$/', $task_id ) ) {
+			if ( $last_pos === false || ! \preg_match( '/-\d+$/', $task_id ) ) {
 				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id );
 				return new Task(
 					[
@@ -41,7 +41,7 @@ class Plugin_Migration_Helpers {
 			}
 
 			// Repetitive tasks (update-core-202449).
-			$task_provider_id = substr( $task_id, 0, $last_pos );
+			$task_provider_id = \substr( $task_id, 0, $last_pos );
 
 			// Check for legacy create-post task_id, old task_ids were migrated to create-post-short' or 'create-post-long' (since we had 2 such tasks per week).
 			if ( 'create-post-short' === $task_provider_id || 'create-post-long' === $task_provider_id ) {
@@ -55,7 +55,7 @@ class Plugin_Migration_Helpers {
 					'task_id'     => $task_id,
 					'category'    => $task_provider ? $task_provider->get_provider_category() : '',
 					'provider_id' => $task_provider ? $task_provider->get_provider_id() : '',
-					'date'        => substr( $task_id, $last_pos + 1 ),
+					'date'        => \substr( $task_id, $last_pos + 1 ),
 				]
 			);
 		}

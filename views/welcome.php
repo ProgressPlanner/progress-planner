@@ -8,7 +8,7 @@
 namespace Progress_Planner;
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -39,24 +39,24 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 						<li>
 						<?php
 						/* translators: %s: <strong> tag */
-						printf( \esc_html__( '%1$s Personalized to-do’s %2$s to keep your site in great shape.', 'progress-planner' ), '<strong>', '</strong>' );
+						\printf( \esc_html__( '%1$s Personalized to-do’s %2$s to keep your site in great shape.', 'progress-planner' ), '<strong>', '</strong>' );
 						?>
 						</li>
 						<li>
 						<?php
 						/* translators: %s: <strong> tag */
-						printf( \esc_html__( '%1$s Activity stats %2$s so you can track your progress.', 'progress-planner' ), '<strong>', '</strong>' );
+						\printf( \esc_html__( '%1$s Activity stats %2$s so you can track your progress.', 'progress-planner' ), '<strong>', '</strong>' );
 						?>
 						</li>
 						<li>
 						<?php
 						/* translators: %s: <strong> tag */
-						printf( \esc_html__( '%1$s Helpful nudges %2$s to stay consistent with your website goals.', 'progress-planner' ), '<strong>', '</strong>' );
+						\printf( \esc_html__( '%1$s Helpful nudges %2$s to stay consistent with your website goals.', 'progress-planner' ), '<strong>', '</strong>' );
 						?>
 						</li>
 					</ul>
 					<?php
-					printf(
+					\printf(
 						/* translators: %s: progressplanner.com link */
 						\esc_html__( 'To send these updates, we’ll create an account for you on %s.', 'progress-planner' ),
 						'<a href="https://prpl.fyi/home" target="_blank">progressplanner.com</a>'
@@ -127,7 +127,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 							value="1"
 						>
 						<?php
-						printf(
+						\printf(
 						/* translators: %s: progressplanner.com/privacy-policy link */
 							\esc_html__( 'I agree to the %s.', 'progress-planner' ),
 							'<a href="https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy" target="_blank">Privacy policy</a>'
@@ -157,7 +157,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 			<div>
 				<p id="prpl-account-created-message" style="display:none;">
 					<?php
-					printf(
+					\printf(
 						/* translators: %s: progressplanner.com link */
 						\esc_html__( 'Success! We saved your data on %s so we can email you every week.', 'progress-planner' ),
 						'<a href="https://prpl.fyi/home">ProgressPlanner.com</a>'
@@ -166,7 +166,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 				</p>
 				<p id="prpl-account-not-created-message" style="display:none;">
 					<?php
-					printf(
+					\printf(
 						\esc_html__( 'Success! Enjoy using the Progress Planner plugin!', 'progress-planner' ),
 					);
 					?>
@@ -181,7 +181,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 		</div>
 		<div class="right">
 			<img
-				src="<?php echo \esc_url( constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/image_onboaring_block.png' ); ?>"
+				src="<?php echo \esc_url( \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/image_onboaring_block.png' ); ?>"
 				alt=""
 				class="onboarding"
 			/>

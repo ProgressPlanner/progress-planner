@@ -19,7 +19,7 @@ class Todo {
 	 */
 	public function __construct() {
 		// Wait for the CPT to be registered.
-		add_action( 'init', [ $this, 'maybe_change_first_item_points_on_monday' ] );
+		\add_action( 'init', [ $this, 'maybe_change_first_item_points_on_monday' ] );
 
 		// Handle user tasks creation.
 		\add_action( 'rest_after_insert_prpl_recommendations', [ $this, 'handle_creating_user_task' ], 10, 3 );
@@ -40,14 +40,14 @@ class Todo {
 		);
 
 		// Bail if there are no items.
-		if ( ! count( $pending_items ) ) {
+		if ( ! \count( $pending_items ) ) {
 			return;
 		}
 
 		$transient_name = 'todo_points_change_on_monday';
 		$next_update    = \progress_planner()->get_utils__cache()->get( $transient_name );
 
-		if ( false !== $next_update && $next_update > time() ) {
+		if ( false !== $next_update && $next_update > \time() ) {
 			return;
 		}
 
@@ -77,7 +77,7 @@ class Todo {
 	 */
 	public function handle_creating_user_task( $post, $request, $creating ) {
 
-		if ( ! $creating || ! has_term( 'user', 'prpl_recommendations_provider', $post->ID ) ) {
+		if ( ! $creating || ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) ) {
 			return;
 		}
 
@@ -92,7 +92,7 @@ class Todo {
 		);
 
 		// If this is the first task created, it should be golden.
-		if ( 1 === count( $pending_items ) && $pending_items[0]->ID === $post->ID ) {
+		if ( 1 === \count( $pending_items ) && $pending_items[0]->ID === $post->ID ) {
 			$this->maybe_change_first_item_points_on_monday();
 			return;
 		}

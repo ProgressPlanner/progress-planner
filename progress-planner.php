@@ -18,13 +18,13 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'PROGRESS_PLANNER_FILE', __FILE__ );
-define( 'PROGRESS_PLANNER_DIR', __DIR__ );
-define( 'PROGRESS_PLANNER_URL', untrailingslashit( plugin_dir_url( __FILE__ ) ) );
+\define( 'PROGRESS_PLANNER_FILE', __FILE__ );
+\define( 'PROGRESS_PLANNER_DIR', __DIR__ );
+\define( 'PROGRESS_PLANNER_URL', \untrailingslashit( \plugin_dir_url( __FILE__ ) ) );
 
 require_once PROGRESS_PLANNER_DIR . '/autoload.php';
 
@@ -42,4 +42,4 @@ function progress_planner() {
 	return $progress_planner;
 }
 
-progress_planner();
+\progress_planner();

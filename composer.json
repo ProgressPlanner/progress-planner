@@ -17,7 +17,8 @@
 		"phpstan/phpstan": "^2.0",
 		"szepeviktor/phpstan-wordpress": "^2.0",
 		"phpstan/extension-installer": "^1.4",
-		"yoast/yoastcs": "^3.0"
+		"yoast/yoastcs": "^3.0",
+		"friendsofphp/php-cs-fixer": "^3.75"
 	},
 	"scripts": {
 		"check-cs": [

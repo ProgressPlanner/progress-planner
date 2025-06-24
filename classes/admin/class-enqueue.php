@@ -71,7 +71,7 @@ class Enqueue {
 
 		// Enqueue the script dependencies.
 		foreach ( $file_details['dependencies'] as $dependency ) {
-			if ( ! in_array( $dependency, $this->enqueued_assets['js'], true ) ) {
+			if ( ! \in_array( $dependency, $this->enqueued_assets['js'], true ) ) {
 				$this->enqueue_script( $dependency );
 				$final_dependencies[] = $dependency;
 			}
@@ -102,7 +102,7 @@ class Enqueue {
 
 		// Enqueue the script dependencies.
 		foreach ( $file_details['dependencies'] as $dependency ) {
-			if ( ! in_array( $dependency, $this->enqueued_assets['css'], true ) ) {
+			if ( ! \in_array( $dependency, $this->enqueued_assets['css'], true ) ) {
 				$this->enqueue_style( $dependency );
 			}
 		}
@@ -119,8 +119,8 @@ class Enqueue {
 	 * @return array
 	 */
 	public function get_file_details( $context, $handle ) {
-		if ( str_starts_with( $handle, 'progress-planner/' ) ) {
-			$handle = str_replace( 'progress-planner/', '', $handle );
+		if ( \str_starts_with( $handle, 'progress-planner/' ) ) {
+			$handle = \str_replace( 'progress-planner/', '', $handle );
 		}
 
 		if ( 'js' === $context ) {
@@ -132,7 +132,7 @@ class Enqueue {
 			}
 		}
 		// The file path.
-		$file_path = constant( 'PROGRESS_PLANNER_DIR' ) . "/assets/{$context}/{$handle}.{$context}";
+		$file_path = \constant( 'PROGRESS_PLANNER_DIR' ) . "/assets/{$context}/{$handle}.{$context}";
 
 		// If the file does not exist, bail early.
 		if ( ! \file_exists( $file_path ) ) {
@@ -140,7 +140,7 @@ class Enqueue {
 		}
 
 		// The file URL.
-		$file_url = constant( 'PROGRESS_PLANNER_URL' ) . "/assets/{$context}/{$handle}.{$context}";
+		$file_url = \constant( 'PROGRESS_PLANNER_URL' ) . "/assets/{$context}/{$handle}.{$context}";
 
 		// The handle.
 		$handle = 'js' === $context && isset( self::VENDOR_SCRIPTS[ $handle ] )
@@ -234,8 +234,8 @@ class Enqueue {
 					'data' => [
 						'nonce'               => \wp_create_nonce( 'progress_planner' ),
 						'assets'              => [
-							'infoIcon'   => constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_info.svg',
-							'snoozeIcon' => constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_snooze.svg',
+							'infoIcon'   => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_info.svg',
+							'snoozeIcon' => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_snooze.svg',
 						],
 						'tasks'               => [
 							'pendingTasks'            => $tasks,
@@ -275,7 +275,7 @@ class Enqueue {
 				$localize_data = [
 					'name' => 'prplCelebrate',
 					'data' => [
-						'raviIconUrl'     => constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg',
+						'raviIconUrl'     => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg',
 						'confettiOptions' => $confetti_options,
 					],
 				];
@@ -333,7 +333,7 @@ class Enqueue {
 		// Strings alphabetically ordered.
 		return [
 			'badge'                        => \esc_html__( 'Badge', 'progress-planner' ),
-			'checklistProgressDescription' => sprintf(
+			'checklistProgressDescription' => \sprintf(
 				/* translators: %s: the checkmark icon. */
 				\esc_html__( 'Check off all required elements %s in the element checks below', 'progress-planner' ),
 				'<span style="background-color:#14b8a6;padding:0.35em;margin:0 0.25em;border-radius:50%;display:inline-block;"></span>'
@@ -347,7 +347,7 @@ class Enqueue {
 			'prevBtnText'                  => \esc_html__( '&larr; Previous', 'progress-planner' ),
 			'pageType'                     => \esc_html__( 'Page type', 'progress-planner' ),
 			'progressPlannerSidebar'       => \esc_html__( 'Progress Planner Sidebar', 'progress-planner' ),
-			'progressText'                 => sprintf(
+			'progressText'                 => \sprintf(
 				/* translators: %1$s: The current step number. %2$s: The total number of steps. */
 				\esc_html__( 'Step %1$s of %2$s', 'progress-planner' ),
 				'{{current}}',

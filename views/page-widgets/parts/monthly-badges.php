@@ -7,7 +7,7 @@
 
 use Progress_Planner\Badges\Monthly;
 
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 $prpl_location  = '';
@@ -17,13 +17,13 @@ if ( isset( $args['css_class'] ) ) {
 	$prpl_css_class = \esc_attr( $args['css_class'] );
 }
 
-$prpl_location    = false !== strpos( $prpl_css_class, 'in-popover' ) ? 'popover' : 'suggested-tasks';
-$prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] : gmdate( 'Y' );
+$prpl_location    = false !== \strpos( $prpl_css_class, 'in-popover' ) ? 'popover' : 'suggested-tasks';
+$prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] : \gmdate( 'Y' );
 ?>
 <div class="prpl-widget-wrapper <?php echo \esc_attr( $prpl_css_class ); ?>">
 	<h3 class="prpl-widget-title">
 		<?php
-		printf(
+		\printf(
 			/* translators: %d: year */
 			\esc_html__( 'Monthly badges %d', 'progress-planner' ),
 			\esc_html( (string) $prpl_badges_year )
@@ -35,11 +35,11 @@ $prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] :
 	<?php if ( $prpl_badges ) : ?>
 		<?php
 		$prpl_badges_per_row         = 3;
-		$prpl_badges_count           = count( $prpl_badges );
+		$prpl_badges_count           = \count( $prpl_badges );
 		$prpl_scroll_to_row          = 1;
 		$prpl_current_month_badge_id = Monthly::get_badge_id_from_date( new \DateTime() );
 		if ( 'popover' !== $prpl_location ) {
-			$prpl_total_rows = (int) ceil( $prpl_badges_count / $prpl_badges_per_row );
+			$prpl_total_rows = (int) \ceil( $prpl_badges_count / $prpl_badges_per_row );
 
 			// We need to know current month badge position.
 			$prpl_current_month_position = 1;
@@ -51,7 +51,7 @@ $prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] :
 				}
 			}
 
-			$prpl_scroll_to_row = (int) ceil( $prpl_current_month_position / $prpl_badges_per_row );
+			$prpl_scroll_to_row = (int) \ceil( $prpl_current_month_position / $prpl_badges_per_row );
 
 			// Always display the previous row, so user can see already completed badges.
 			if ( 1 < $prpl_scroll_to_row ) {
@@ -84,7 +84,7 @@ $prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] :
 						>
 							<prpl-badge
 								complete="<?php echo 100 === (int) $prpl_badge->progress_callback()['progress'] ? 'true' : 'false'; ?>"
-								badge-id="<?php echo esc_attr( $prpl_badge->get_id() ); ?>"
+								badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
 							></prpl-badge>
 							<p><?php echo \esc_html( $prpl_badge->get_name() ); ?></p>
 						</span>

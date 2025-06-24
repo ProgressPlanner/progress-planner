@@ -223,7 +223,7 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return string
 	 */
 	public function get_provider_type() {
-		_deprecated_function( 'Progress_Planner\Suggested_Tasks\Providers\Tasks::get_provider_type()', '1.1.1', 'get_provider_category' );
+		\_deprecated_function( 'Progress_Planner\Suggested_Tasks\Providers\Tasks::get_provider_type()', '1.1.1', 'get_provider_category' );
 		return $this->get_provider_category();
 	}
 
@@ -272,7 +272,7 @@ abstract class Tasks implements Tasks_Interface {
 			$parts[] = \gmdate( 'YW' );
 		}
 
-		return implode( '-', $parts );
+		return \implode( '-', $parts );
 	}
 
 	/**
@@ -403,7 +403,7 @@ abstract class Tasks implements Tasks_Interface {
 
 		if ( ! $this->is_repetitive() ) {
 			// Collaborator tasks have custom task_ids, so strpos check does not work for them.
-			if ( ! $task->task_id || ( 0 !== strpos( $task->task_id, $this->get_task_id() ) && 'collaborator' !== $this->get_provider_id() ) ) {
+			if ( ! $task->task_id || ( 0 !== \strpos( $task->task_id, $this->get_task_id() ) && 'collaborator' !== $this->get_provider_id() ) ) {
 				return false;
 			}
 			return $this->is_task_completed( $task->task_id ) ? $task : false;

@@ -36,7 +36,7 @@ class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
 	 */
 	public function test_collect_returns_terms_without_posts() {
 		// Create a category.
-		$term_result = wp_insert_term( 'Test Category', 'category' );
+		$term_result = \wp_insert_term( 'Test Category', 'category' );
 		$this->assertNotWPError( $term_result );
 		$term_id = $term_result['term_id'];
 
@@ -56,11 +56,11 @@ class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
 	 */
 	public function test_collect_ignores_terms_with_posts() {
 		// Create a category.
-		$term_result = wp_insert_term( 'Test Category', 'category' );
+		$term_result = \wp_insert_term( 'Test Category', 'category' );
 		$this->assertNotWPError( $term_result );
 
 		// Create two posts and assign them to the category.
-		$post_id1 = wp_insert_post(
+		$post_id1 = \wp_insert_post(
 			[
 				'post_title'  => 'Test Post 1',
 				'post_status' => 'publish',
@@ -69,7 +69,7 @@ class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
 		);
 		$this->assertNotWPError( $post_id1 );
 
-		$post_id2 = wp_insert_post(
+		$post_id2 = \wp_insert_post(
 			[
 				'post_title'  => 'Test Post 2',
 				'post_status' => 'publish',
@@ -78,10 +78,10 @@ class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
 		);
 		$this->assertNotWPError( $post_id2 );
 
-		$set_terms = wp_set_object_terms( $post_id1, $term_result['term_id'], 'category' );
+		$set_terms = \wp_set_object_terms( $post_id1, $term_result['term_id'], 'category' );
 		$this->assertNotWPError( $set_terms );
 
-		$set_terms = wp_set_object_terms( $post_id2, $term_result['term_id'], 'category' );
+		$set_terms = \wp_set_object_terms( $post_id2, $term_result['term_id'], 'category' );
 		$this->assertNotWPError( $set_terms );
 
 		// Get the data.
@@ -97,12 +97,12 @@ class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
 	 */
 	public function test_collect_respects_excluded_terms() {
 		// Create a category.
-		$term_result = wp_insert_term( 'Test Category', 'category' );
+		$term_result = \wp_insert_term( 'Test Category', 'category' );
 		$this->assertNotWPError( $term_result );
 		$term_id = $term_result['term_id'];
 
 		// Add filter to exclude the term.
-		add_filter(
+		\add_filter(
 			'progress_planner_terms_without_posts_exclude_term_ids',
 			function () use ( $term_id ) {
 				return [ $term_id ];
@@ -122,7 +122,7 @@ class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
 	 */
 	public function test_cache_is_updated_when_term_is_deleted() {
 		// Create a category.
-		$term_result = wp_insert_term( 'Test Category', 'category' );
+		$term_result = \wp_insert_term( 'Test Category', 'category' );
 		$this->assertNotWPError( $term_result );
 		$term_id = $term_result['term_id'];
 
@@ -132,7 +132,7 @@ class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
 		$this->assertIsArray( $initial_result );
 
 		// Delete the term.
-		wp_delete_term( $term_id, 'category' );
+		\wp_delete_term( $term_id, 'category' );
 
 		// Get data again.
 		$this->data_collector->update_cache();
@@ -147,7 +147,7 @@ class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
 	 */
 	public function test_collect_ignores_non_public_taxonomies() {
 		// Register a non-public taxonomy.
-		register_taxonomy(
+		\register_taxonomy(
 			'test_taxonomy',
 			'post',
 			[
@@ -156,7 +156,7 @@ class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
 		);
 
 		// Create a term in the non-public taxonomy.
-		$term_result = wp_insert_term( 'Test Term', 'test_taxonomy' );
+		$term_result = \wp_insert_term( 'Test Term', 'test_taxonomy' );
 		$this->assertNotWPError( $term_result );
 
 		// Get the data.
@@ -167,7 +167,7 @@ class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
 		$this->assertNull( $result );
 
 		// Clean up.
-		unregister_taxonomy( 'test_taxonomy' );
+		\unregister_taxonomy( 'test_taxonomy' );
 	}
 
 	/**
@@ -175,12 +175,12 @@ class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
 	 */
 	public function test_cache_is_updated_when_terms_are_changed() {
 		// Create a category.
-		$term_result = wp_insert_term( 'Test Category', 'category' );
+		$term_result = \wp_insert_term( 'Test Category', 'category' );
 		$this->assertNotWPError( $term_result );
 		$term_id = $term_result['term_id'];
 
 		// Create two posts.
-		$post_id1 = wp_insert_post(
+		$post_id1 = \wp_insert_post(
 			[
 				'post_title'  => 'Test Post 1',
 				'post_status' => 'publish',
@@ -189,7 +189,7 @@ class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
 		);
 		$this->assertNotWPError( $post_id1 );
 
-		$post_id2 = wp_insert_post(
+		$post_id2 = \wp_insert_post(
 			[
 				'post_title'  => 'Test Post 2',
 				'post_status' => 'publish',
@@ -204,10 +204,10 @@ class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
 		$this->assertIsArray( $initial_result );
 
 		// Assign both terms to the posts.
-		$set_terms = wp_set_object_terms( $post_id1, $term_id, 'category' );
+		$set_terms = \wp_set_object_terms( $post_id1, $term_id, 'category' );
 		$this->assertNotWPError( $set_terms );
 
-		$set_terms = wp_set_object_terms( $post_id2, $term_id, 'category' );
+		$set_terms = \wp_set_object_terms( $post_id2, $term_id, 'category' );
 		$this->assertNotWPError( $set_terms );
 
 		// Get data again.

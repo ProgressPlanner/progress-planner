@@ -112,7 +112,7 @@ class Fewer_Tags extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return sprintf(
+		return \sprintf(
 			// translators: %1$s is the number of tags, %2$s is the number of published posts, %3$s <a href="https://prpl.fyi/install-fewer-tags" target="_blank">Read more</a> link.
 			\esc_html__( 'We detected that you have %1$s tags and %2$s published posts. Consider installing the "Fewer Tags" plugin. %3$s', 'progress-planner' ),
 			$this->post_tag_count_data_collector->collect(),
@@ -159,12 +159,12 @@ class Fewer_Tags extends Tasks {
 	 */
 	protected function is_plugin_active() {
 		if ( null === $this->is_plugin_active ) {
-			if ( ! function_exists( 'get_plugins' ) ) {
+			if ( ! \function_exists( 'get_plugins' ) ) {
 				require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore requireOnce.fileNotFound
 			}
 
-			$plugins                = get_plugins();
-			$this->is_plugin_active = isset( $plugins[ $this->plugin_path ] ) && is_plugin_active( $this->plugin_path );
+			$plugins                = \get_plugins();
+			$this->is_plugin_active = isset( $plugins[ $this->plugin_path ] ) && \is_plugin_active( $this->plugin_path );
 		}
 
 		return $this->is_plugin_active;

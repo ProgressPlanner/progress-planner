@@ -37,7 +37,7 @@ class Debug_Tools {
 			return;
 		}
 
-		$this->current_url = wp_nonce_url( esc_url_raw( \wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'prpl_debug_tools' );
+		$this->current_url = \wp_nonce_url( \esc_url_raw( \wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'prpl_debug_tools' );
 
 		\add_action( 'admin_bar_menu', [ $this, 'add_toolbar_items' ], 100 );
 		\add_action( 'init', [ $this, 'check_clear_cache' ] );
@@ -59,7 +59,7 @@ class Debug_Tools {
 	 * @return void
 	 */
 	public function add_toolbar_items( $admin_bar ) {
-		if ( ! current_user_can( 'manage_options' ) ) {
+		if ( ! \current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
@@ -79,7 +79,7 @@ class Debug_Tools {
 				'id'     => 'prpl-show-all-suggested-tasks',
 				'parent' => 'prpl-debug',
 				'title'  => 'Show All Suggested Tasks',
-				'href'   => add_query_arg( 'prpl_show_all_suggested_tasks', '99', $this->current_url ),
+				'href'   => \add_query_arg( 'prpl_show_all_suggested_tasks', '99', $this->current_url ),
 			]
 		);
 
@@ -120,7 +120,7 @@ class Debug_Tools {
 				'id'     => 'prpl-clear-cache',
 				'parent' => 'prpl-debug-delete',
 				'title'  => 'Delete Cache',
-				'href'   => add_query_arg( 'prpl_clear_cache', '1', $this->current_url ),
+				'href'   => \add_query_arg( 'prpl_clear_cache', '1', $this->current_url ),
 			]
 		);
 
@@ -130,7 +130,7 @@ class Debug_Tools {
 				'id'     => 'prpl-delete-pending-tasks',
 				'parent' => 'prpl-debug-delete',
 				'title'  => 'Delete Pending Tasks',
-				'href'   => add_query_arg( 'prpl_delete_pending_tasks', '1', $this->current_url ),
+				'href'   => \add_query_arg( 'prpl_delete_pending_tasks', '1', $this->current_url ),
 			]
 		);
 
@@ -140,7 +140,7 @@ class Debug_Tools {
 				'id'     => 'prpl-delete-suggested-tasks',
 				'parent' => 'prpl-debug-delete',
 				'title'  => 'Delete Suggested Tasks',
-				'href'   => add_query_arg( 'prpl_delete_suggested_tasks', '1', $this->current_url ),
+				'href'   => \add_query_arg( 'prpl_delete_suggested_tasks', '1', $this->current_url ),
 			]
 		);
 
@@ -150,7 +150,7 @@ class Debug_Tools {
 				'id'     => 'prpl-delete-licenses',
 				'parent' => 'prpl-debug-delete',
 				'title'  => 'Delete Licenses',
-				'href'   => add_query_arg( 'prpl_delete_licenses', '1', $this->current_url ),
+				'href'   => \add_query_arg( 'prpl_delete_licenses', '1', $this->current_url ),
 			]
 		);
 
@@ -160,7 +160,7 @@ class Debug_Tools {
 				'id'     => 'prpl-delete-badges',
 				'parent' => 'prpl-debug-delete',
 				'title'  => 'Delete Badges',
-				'href'   => add_query_arg( 'prpl_delete_badges', '1', $this->current_url ),
+				'href'   => \add_query_arg( 'prpl_delete_badges', '1', $this->current_url ),
 			]
 		);
 	}
@@ -243,10 +243,10 @@ class Debug_Tools {
 					}
 
 					// Add delete button.
-					$delete_url = add_query_arg(
+					$delete_url = \add_query_arg(
 						[
 							'prpl_delete_single_task' => $task->task_id,
-							'_wpnonce'                => wp_create_nonce( 'prpl_debug_tools' ),
+							'_wpnonce'                => \wp_create_nonce( 'prpl_debug_tools' ),
 						],
 						$this->current_url
 					);
@@ -309,7 +309,7 @@ class Debug_Tools {
 	protected function add_toggle_migrations_submenu_item( $admin_bar ) {
 		$debug_enabled = \get_option( 'prpl_debug_migrations', false );
 		$title         = $debug_enabled ? '<span style="color: green;">Upgrade Migrations Enabled</span>' : '<span style="color: red;">Upgrade Migrations Disabled</span>';
-		$href          = add_query_arg( 'prpl_toggle_migrations', '1', $this->current_url );
+		$href          = \add_query_arg( 'prpl_toggle_migrations', '1', $this->current_url );
 
 		$admin_bar->add_node(
 			[
@@ -333,7 +333,7 @@ class Debug_Tools {
 		if (
 			! isset( $_GET['prpl_toggle_migrations'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$_GET['prpl_toggle_migrations'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! current_user_can( 'manage_options' )
+			! \current_user_can( 'manage_options' )
 		) {
 			return;
 		}
@@ -350,7 +350,7 @@ class Debug_Tools {
 		}
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( [ 'prpl_toggle_migrations', '_wpnonce' ] ) );
+		\wp_safe_redirect( \remove_query_arg( [ 'prpl_toggle_migrations', '_wpnonce' ] ) );
 		exit;
 	}
 
@@ -366,7 +366,7 @@ class Debug_Tools {
 		if (
 			! isset( $_GET['prpl_delete_pending_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$_GET['prpl_delete_pending_tasks'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! current_user_can( 'manage_options' )
+			! \current_user_can( 'manage_options' )
 		) {
 			return;
 		}
@@ -383,7 +383,7 @@ class Debug_Tools {
 		}
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_pending_tasks', '_wpnonce' ] ) );
+		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_pending_tasks', '_wpnonce' ] ) );
 		exit;
 	}
 
@@ -399,7 +399,7 @@ class Debug_Tools {
 		if (
 			! isset( $_GET['prpl_delete_badges'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$_GET['prpl_delete_badges'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! current_user_can( 'manage_options' )
+			! \current_user_can( 'manage_options' )
 		) {
 			return;
 		}
@@ -416,7 +416,7 @@ class Debug_Tools {
 		\update_option( \Progress_Planner\Settings::OPTION_NAME, $progress_planner_settings );
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_badges', '_wpnonce' ] ) );
+		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_badges', '_wpnonce' ] ) );
 		exit;
 	}
 
@@ -429,7 +429,7 @@ class Debug_Tools {
 	public function check_show_all_suggested_tasks( $max_items_per_category ) {
 		if (
 			! isset( $_GET['prpl_show_all_suggested_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			! \current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		) {
 			return $max_items_per_category;
 		}
@@ -462,13 +462,13 @@ class Debug_Tools {
 		);
 
 		// Add Remote Server URL info.
-		if ( function_exists( 'progress_planner' ) ) {
+		if ( \function_exists( 'progress_planner' ) ) {
 			$remote_url = \progress_planner()->get_remote_server_root_url();
 			$admin_bar->add_node(
 				[
 					'id'     => 'prpl-remote-url',
 					'parent' => 'prpl-more-info',
-					'title'  => 'Remote URL: ' . esc_html( $remote_url ),
+					'title'  => 'Remote URL: ' . \esc_html( $remote_url ),
 				]
 			);
 		}
@@ -524,7 +524,7 @@ class Debug_Tools {
 		if (
 			! isset( $_GET['prpl_delete_suggested_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$_GET['prpl_delete_suggested_tasks'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! current_user_can( 'manage_options' )
+			! \current_user_can( 'manage_options' )
 		) {
 			return;
 		}
@@ -536,7 +536,7 @@ class Debug_Tools {
 		\progress_planner()->get_suggested_tasks_db()->delete_all_recommendations();
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_suggested_tasks', '_wpnonce' ] ) );
+		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_suggested_tasks', '_wpnonce' ] ) );
 		exit;
 	}
 
@@ -552,8 +552,8 @@ class Debug_Tools {
 		if (
 			! isset( $_GET['prpl_clear_cache'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$_GET['prpl_clear_cache'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! current_user_can( 'manage_options' ) ||
-			! function_exists( 'progress_planner' )
+			! \current_user_can( 'manage_options' ) ||
+			! \function_exists( 'progress_planner' )
 		) {
 			return;
 		}
@@ -565,7 +565,7 @@ class Debug_Tools {
 		\progress_planner()->get_utils__cache()->delete_all();
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( [ 'prpl_clear_cache', '_wpnonce' ] ) );
+		\wp_safe_redirect( \remove_query_arg( [ 'prpl_clear_cache', '_wpnonce' ] ) );
 		exit;
 	}
 
@@ -581,7 +581,7 @@ class Debug_Tools {
 		if (
 			! isset( $_GET['prpl_delete_licenses'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$_GET['prpl_delete_licenses'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! current_user_can( 'manage_options' )
+			! \current_user_can( 'manage_options' )
 		) {
 			return;
 		}
@@ -590,12 +590,12 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the option.
-		delete_option( 'progress_planner_license_key' );
-		delete_option( 'progress_planner_pro_license_key' );
-		delete_option( 'progress_planner_pro_license_status' );
+		\delete_option( 'progress_planner_license_key' );
+		\delete_option( 'progress_planner_pro_license_key' );
+		\delete_option( 'progress_planner_pro_license_status' );
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_licenses', '_wpnonce' ] ) );
+		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_licenses', '_wpnonce' ] ) );
 		exit;
 	}
 
@@ -605,8 +605,8 @@ class Debug_Tools {
 	 * @return void
 	 */
 	protected function verify_nonce() {
-		if ( ! isset( $_GET['_wpnonce'] ) || ! wp_verify_nonce( \wp_unslash( $_GET['_wpnonce'] ), 'prpl_debug_tools' ) ) { //  phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			wp_die( esc_html__( 'Security check failed', 'progress-planner' ) );
+		if ( ! isset( $_GET['_wpnonce'] ) || ! \wp_verify_nonce( \wp_unslash( $_GET['_wpnonce'] ), 'prpl_debug_tools' ) ) { //  phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			\wp_die( \esc_html__( 'Security check failed', 'progress-planner' ) );
 		}
 	}
 
@@ -621,7 +621,7 @@ class Debug_Tools {
 	public function check_delete_single_task() {
 		if (
 			! isset( $_GET['prpl_delete_single_task'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! current_user_can( 'manage_options' )
+			! \current_user_can( 'manage_options' )
 		) {
 			return;
 		}
@@ -629,7 +629,7 @@ class Debug_Tools {
 		// Verify nonce for security.
 		$this->verify_nonce();
 
-		$task_id = sanitize_text_field( wp_unslash( $_GET['prpl_delete_single_task'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$task_id = \sanitize_text_field( \wp_unslash( $_GET['prpl_delete_single_task'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
@@ -641,7 +641,7 @@ class Debug_Tools {
 		$task->delete();
 
 		// Redirect to the same page without the parameter.
-		wp_safe_redirect( remove_query_arg( [ 'prpl_delete_single_task', '_wpnonce' ] ) );
+		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_single_task', '_wpnonce' ] ) );
 		exit;
 	}
 }

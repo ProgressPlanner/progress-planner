@@ -87,8 +87,8 @@ trait Dismissable_Task {
 
 		// Store the task dismissal data.
 		$dismissal_data = [
-			'date'      => gmdate( 'YW' ),
-			'timestamp' => time(),
+			'date'      => \gmdate( 'YW' ),
+			'timestamp' => \time(),
 		];
 
 		/**
@@ -163,12 +163,12 @@ trait Dismissable_Task {
 		$dismissal_data = $dismissed_tasks[ $provider_key ][ $task_identifier ];
 
 		// If the task was dismissed in the current week, don't show it again.
-		if ( $dismissal_data['date'] === gmdate( 'YW' ) ) {
+		if ( $dismissal_data['date'] === \gmdate( 'YW' ) ) {
 			return true;
 		}
 
 		// If the task was dismissed more than the expiration period ago, we can show it again.
-		if ( ( time() - $dismissal_data['timestamp'] ) > $this->get_expiration_period( $dismissal_data ) ) {
+		if ( ( \time() - $dismissal_data['timestamp'] ) > $this->get_expiration_period( $dismissal_data ) ) {
 			unset( $dismissed_tasks[ $provider_key ][ $task_identifier ] );
 			\progress_planner()->get_settings()->set( $this->dismissed_tasks_option, $dismissed_tasks );
 			return false;
@@ -208,7 +208,7 @@ trait Dismissable_Task {
 
 		$has_changes = false;
 		foreach ( $dismissed_tasks[ $provider_key ] as $identifier => $data ) {
-			if ( ( time() - $data['timestamp'] ) > $this->get_expiration_period( $data ) ) {
+			if ( ( \time() - $data['timestamp'] ) > $this->get_expiration_period( $data ) ) {
 				unset( $dismissed_tasks[ $provider_key ][ $identifier ] );
 				$has_changes = true;
 			}

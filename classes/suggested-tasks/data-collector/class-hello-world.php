@@ -56,12 +56,12 @@ class Hello_World extends Base_Data_Collector {
 	 * @return int
 	 */
 	protected function calculate_data() {
-		$sample_post = get_page_by_path( __( 'hello-world' ), OBJECT, 'post' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+		$sample_post = \get_page_by_path( \__( 'hello-world' ), OBJECT, 'post' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 		if ( null === $sample_post ) {
 			$query = new \WP_Query(
 				[
 					'post_type'      => 'post',
-					'title'          => __( 'Hello world!' ), // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+					'title'          => \__( 'Hello world!' ), // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 					'post_status'    => 'publish',
 					'posts_per_page' => 1,
 				]
@@ -70,6 +70,6 @@ class Hello_World extends Base_Data_Collector {
 			$sample_post = ! empty( $query->post ) ? $query->post : 0;
 		}
 
-		return ( is_object( $sample_post ) && is_a( $sample_post, \WP_Post::class ) ) ? $sample_post->ID : 0;
+		return ( \is_object( $sample_post ) && \is_a( $sample_post, \WP_Post::class ) ) ? $sample_post->ID : 0;
 	}
 }

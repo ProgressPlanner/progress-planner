@@ -32,7 +32,7 @@ class Suggested_Tasks_DB {
 	 */
 	public function add( $data ) {
 		if ( empty( $data['post_title'] ) ) {
-			error_log( 'Task not added - missing title: ' . wp_json_encode( $data ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			\error_log( 'Task not added - missing title: ' . \wp_json_encode( $data ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			return 0;
 		}
 
@@ -104,7 +104,7 @@ class Suggested_Tasks_DB {
 
 		// Add terms if they don't exist.
 		foreach ( [ 'category', 'provider_id' ] as $context ) {
-			$taxonomy_name = str_replace( '_id', '', $context );
+			$taxonomy_name = \str_replace( '_id', '', $context );
 			$term          = \get_term_by( 'name', $data[ $context ], "prpl_recommendations_$taxonomy_name" );
 			if ( ! $term ) {
 				\wp_insert_term( $data[ $context ], "prpl_recommendations_$taxonomy_name" );
@@ -142,7 +142,7 @@ class Suggested_Tasks_DB {
 			'post_status',
 		];
 		foreach ( $data as $key => $value ) {
-			if ( in_array( $key, $default_keys, true ) ) {
+			if ( \in_array( $key, $default_keys, true ) ) {
 				continue;
 			}
 
@@ -175,7 +175,7 @@ class Suggested_Tasks_DB {
 			switch ( $key ) {
 				case 'points':
 				case 'prpl_points':
-					$update_meta[ 'prpl_' . str_replace( 'prpl_', '', (string) $key ) ] = $value;
+					$update_meta[ 'prpl_' . \str_replace( 'prpl_', '', (string) $key ) ] = $value;
 					break;
 
 				case 'category':
@@ -189,7 +189,7 @@ class Suggested_Tasks_DB {
 			}
 		}
 
-		if ( 1 < count( $update_data ) ) {
+		if ( 1 < \count( $update_data ) ) {
 			$update_results[] = (bool) \wp_update_post( $update_data );
 		}
 
@@ -205,7 +205,7 @@ class Suggested_Tasks_DB {
 			}
 		}
 
-		return ! in_array( false, $update_results, true );
+		return ! \in_array( false, $update_results, true );
 	}
 
 	/**
@@ -270,15 +270,15 @@ class Suggested_Tasks_DB {
 		// Format the post meta.
 		$post_meta = \get_post_meta( $post_data['ID'] );
 		foreach ( $post_meta as $key => $value ) {
-			$post_data[ str_replace( 'prpl_', '', (string) $key ) ] =
-				is_array( $value ) && isset( $value[0] ) && 1 === count( $value )
+			$post_data[ \str_replace( 'prpl_', '', (string) $key ) ] =
+				\is_array( $value ) && isset( $value[0] ) && 1 === \count( $value )
 					? $value[0]
 					: $value;
 		}
 
 		foreach ( [ 'category', 'provider' ] as $context ) {
 			$terms                 = \wp_get_post_terms( $post_data['ID'], "prpl_recommendations_$context" );
-			$post_data[ $context ] = is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
+			$post_data[ $context ] = \is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
 		}
 
 		$cached[ $post_data['ID'] ] = new Task( $post_data );
@@ -294,7 +294,7 @@ class Suggested_Tasks_DB {
 	 */
 	public function get_post( $id ) {
 		$posts = $this->get_tasks_by(
-			is_numeric( $id )
+			\is_numeric( $id )
 				? [ 'p' => $id ]
 				: [ 'task_id' => $id ]
 		);
@@ -367,7 +367,7 @@ class Suggested_Tasks_DB {
 			]
 		);
 
-		$cache_key = 'progress-planner-get-tasks-' . md5( (string) \wp_json_encode( $args ) );
+		$cache_key = 'progress-planner-get-tasks-' . \md5( (string) \wp_json_encode( $args ) );
 		$results   = \wp_cache_get( $cache_key, static::GET_TASKS_CACHE_GROUP );
 		if ( $results ) {
 			return $results;

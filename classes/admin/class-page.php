@@ -110,16 +110,16 @@ class Page {
 	 * @return string The notification count in HTML format.
 	 */
 	protected function get_notification_counter() {
-		$notification_count = wp_count_posts( 'prpl_recommendations' )->pending;
+		$notification_count = \wp_count_posts( 'prpl_recommendations' )->pending;
 
 		if ( 0 === $notification_count ) {
 			return '';
 		}
 
 		/* translators: Hidden accessibility text; %s: number of notifications. */
-		$notifications = sprintf( _n( '%s pending celebration', '%s pending celebrations', $notification_count, 'progress-planner' ), number_format_i18n( $notification_count ) );
+		$notifications = \sprintf( \_n( '%s pending celebration', '%s pending celebrations', $notification_count, 'progress-planner' ), \number_format_i18n( $notification_count ) );
 
-		return sprintf( '<span class="update-plugins count-%1$d" style="background-color:#f9b23c;color:#38296d;"><span class="plugin-count" aria-hidden="true">%1$d</span><span class="screen-reader-text">%2$s</span></span>', $notification_count, $notifications );
+		return \sprintf( '<span class="update-plugins count-%1$d" style="background-color:#f9b23c;color:#38296d;"><span class="plugin-count" aria-hidden="true">%1$d</span><span class="screen-reader-text">%2$s</span></span>', $notification_count, $notifications );
 	}
 
 	/**
@@ -254,7 +254,7 @@ class Page {
 					'tasks'           => $tasks_details,
 					'totalPoints'     => $total_points,
 					'completedPoints' => $completed_points,
-					'base_url'        => constant( 'PROGRESS_PLANNER_URL' ),
+					'base_url'        => \constant( 'PROGRESS_PLANNER_URL' ),
 					'l10n'            => [
 						/* translators: %d: The number of points. */
 						'fixThisIssue' => \esc_html__( 'Fix this issue to get %d point(s) in Progress Planner', 'progress-planner' ),
