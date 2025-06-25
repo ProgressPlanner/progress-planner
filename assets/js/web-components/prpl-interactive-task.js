@@ -1,4 +1,4 @@
-/* global HTMLElement */
+/* global HTMLElement, prplSuggestedTask */
 
 /**
  * Register the custom web component.
@@ -73,17 +73,22 @@ class PrplInteractiveTask extends HTMLElement {
 	 */
 	completeTask() {
 		const providerId = this.getAttribute( 'provider-id' );
-		const components = document.querySelectorAll( 'prpl-suggested-task' );
+		const tasks = document.querySelectorAll(
+			'#prpl-suggested-tasks-list .prpl-suggested-task'
+		);
 
-		components.forEach( ( component ) => {
-			const liElement = component.querySelector( 'li' );
-			if ( liElement.dataset.taskId === providerId ) {
+		tasks.forEach( ( taskElement ) => {
+			if ( taskElement.dataset.taskId === providerId ) {
 				// Close popover.
 				document
 					.getElementById( 'prpl-popover-' + providerId )
 					.hidePopover();
-				// Complete task.
-				component.runTaskAction( liElement.dataset.taskId, 'complete' );
+
+				const postId = parseInt( taskElement.dataset.postId );
+
+				if ( postId ) {
+					prplSuggestedTask.maybeComplete( postId );
+				}
 			}
 		} );
 	}
