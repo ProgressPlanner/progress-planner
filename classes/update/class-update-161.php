@@ -12,9 +12,9 @@ namespace Progress_Planner\Update;
  *
  * @package Progress_Planner
  */
-class Update_150 {
+class Update_161 {
 
-	const VERSION = '1.5.0';
+	const VERSION = '1.6.1';
 
 	/**
 	 * Run the update.
