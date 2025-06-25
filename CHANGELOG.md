@@ -1,8 +1,15 @@
+= 1.6.1 =
+
+Bugs we fixed:
+
+* "Collect your point" not closing the "Test if your website can send emails correctly" popover.
+
 = 1.6.0 =
 
 Enhancements:
 
 * Allow users to collect extra points for previous months' badges.
+* Added WP-CLI commands to manage recommendations.
 
 Under the hood:
 
