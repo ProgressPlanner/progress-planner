@@ -4,6 +4,7 @@ Bugs we fixed:
 
 * "Collect your point" not closing the "Test if your website can send emails correctly" popover.
 * Snooze task tooltip overaly not closing properly.
+* Properly trigger migration from v1.5.0.
 
 = 1.6.0 =
 
