@@ -239,8 +239,8 @@ class Remove_Terms_Without_Posts extends Tasks {
 		$data    = $this->get_data_collector()->collect();
 		$task_id = $this->get_task_id(
 			[
-				'term_id'  => $data['term_id'],
-				'taxonomy' => $data['taxonomy'],
+				'target_term_id'  => $data['term_id'],
+				'target_taxonomy' => $data['taxonomy'],
 			]
 		);
 

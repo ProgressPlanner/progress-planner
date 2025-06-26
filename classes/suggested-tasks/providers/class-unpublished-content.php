@@ -8,6 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Providers\Traits\Dismissable_Task;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Unpublished_Content as Unpublished_Content_Data_Collector;
 
 /**
  * Add tasks for unpublished content.
@@ -35,6 +36,13 @@ class Unpublished_Content extends Tasks {
 	 * @var string
 	 */
 	protected const CATEGORY = 'content-publish';
+
+	/**
+	 * The data collector class name.
+	 *
+	 * @var string
+	 */
+	protected const DATA_COLLECTOR_CLASS = Unpublished_Content_Data_Collector::class;
 
 	/**
 	 * Whether the task is repetitive.
@@ -65,13 +73,6 @@ class Unpublished_Content extends Tasks {
 	protected $is_dismissable = true;
 
 	/**
-	 * The number of items to inject.
-	 *
-	 * @var int
-	 */
-	protected const ITEMS_TO_INJECT = 10;
-
-	/**
 	 * The snoozed post IDs.
 	 *
 	 * @var array|null
@@ -93,20 +94,14 @@ class Unpublished_Content extends Tasks {
 	protected $task_post_mappings = null;
 
 	/**
-	 * The include post types.
-	 *
-	 * @var string[]
-	 */
-	protected $include_post_types = [];
-
-	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
 	 */
 	public function init() {
-		$this->include_post_types = \progress_planner()->get_settings()->get_post_types_names(); // Wait for the post types to be initialized.
 		$this->init_dismissable_task();
+
+		\add_filter( 'progress_planner_unpublished_content_exclude_post_ids', [ $this, 'exclude_completed_posts' ] );
 	}
 
 	/**
@@ -200,58 +195,27 @@ class Unpublished_Content extends Tasks {
 	}
 
 	/**
+	 * Transform data collector data into task data format.
+	 *
+	 * @param array $data The data from data collector.
+	 * @return array The transformed data with original data merged.
+	 */
+	protected function transform_collector_data( array $data ): array {
+		return \array_merge(
+			$data,
+			[
+				'target_post_id' => $data['post_id'],
+			]
+		);
+	}
+
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( null !== $this->task_post_mappings ) {
-			return 0 < \count( $this->task_post_mappings );
-		}
-
-		$this->task_post_mappings = [];
-		$last_updated_posts       = [];
-
-		// Get the post that was updated last.
-		$last_updated_posts = \array_merge(
-			$last_updated_posts,
-			$this->get_old_posts(
-				[
-					'post_type' => $this->include_post_types,
-				]
-			)
-		);
-
-		if ( ! $last_updated_posts ) {
-			return false;
-		}
-
-		foreach ( $last_updated_posts as $post ) {
-			// Skip if the task has been dismissed.
-			if ( $this->is_task_dismissed(
-				[
-					'target_post_id' => $post->ID,
-					'provider_id'    => $this->get_provider_id(),
-				]
-			) ) {
-				continue;
-			}
-
-			$task_id = $this->get_task_id( [ 'target_post_id' => $post->ID ] );
-
-			// Don't add the task if it was completed.
-			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
-				continue;
-			}
-
-			$this->task_post_mappings[ $task_id ] = [
-				'task_id'          => $task_id,
-				'target_post_id'   => $post->ID,
-				'target_post_type' => $post->post_type,
-			];
-		}
-
-		return 0 < \count( $this->task_post_mappings );
+		return ! empty( $this->get_data_collector()->collect() );
 	}
 
 	/**
@@ -260,47 +224,37 @@ class Unpublished_Content extends Tasks {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-		if ( ! $this->should_add_task() ) {
+		if ( true === $this->is_task_snoozed() || ! $this->should_add_task() ) {
 			return [];
 		}
 
-		$task_to_inject = [];
-		if ( ! empty( $this->task_post_mappings ) ) {
-			foreach ( $this->task_post_mappings as $task_data ) {
-				if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_data['task_id'] ) ) {
-					continue;
-				}
+		$data    = $this->get_data_collector()->collect();
+		$task_id = $this->get_task_id(
+			[
+				'target_post_id' => $data['post_id'],
+			]
+		);
 
-				$task_to_inject[] = [
-					'task_id'          => $this->get_task_id( [ 'target_post_id' => $task_data['target_post_id'] ] ),
-					'provider_id'      => $this->get_provider_id(),
-					'category'         => $this->get_provider_category(),
-					'target_post_id'   => $task_data['target_post_id'],
-					'target_post_type' => $task_data['target_post_type'],
-					'date'             => \gmdate( 'YW' ),
-					'post_title'       => $this->get_title_with_data( $task_data ),
-					'description'      => $this->get_description_with_data( $task_data ),
-					'url'              => $this->get_url_with_data( $task_data ),
-					'url_target'       => $this->get_url_target(),
-					'dismissable'      => $this->is_dismissable(),
-					'snoozable'        => $this->is_snoozable,
-					'points'           => $this->get_points(),
-				];
-			}
+		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
+			return [];
 		}
 
-		$added_tasks = [];
+		// Transform the data to match the task data structure.
+		$task_data = $this->modify_injection_task_data(
+			$this->get_task_details(
+				$this->transform_collector_data( $data )
+			)
+		);
 
-		foreach ( $task_to_inject as $task_data ) {
-			// Skip the task if it was already injected.
-			if ( \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] ) ) {
-				continue;
-			}
+		// Get the task post.
+		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
 
-			$added_tasks[] = \progress_planner()->get_suggested_tasks_db()->add( $task_data );
+		// Skip the task if it was already injected.
+		if ( $task_post ) {
+			return [];
 		}
 
-		return $added_tasks;
+		return [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
 	}
 
 	/**
@@ -315,52 +269,13 @@ class Unpublished_Content extends Tasks {
 	}
 
 	/**
-	 * Get the old posts.
+	 * Exclude completed posts from the query.
 	 *
-	 * @param array $args The args.
-	 *
+	 * @param array $post_ids The post IDs.
 	 * @return array
 	 */
-	public function get_old_posts( $args = [] ) {
-		$posts = [];
-
-		// Parse default args.
-		$args = \wp_parse_args(
-			$args,
-			[
-				'posts_per_page' => static::ITEMS_TO_INJECT,
-				'post_status'    => [ 'draft', 'pending' ],
-				'orderby'        => 'modified',
-				'order'          => 'ASC',
-				'date_query'     => [
-					[
-						'column' => 'post_modified',
-						'before' => '-1 week',
-					],
-				],
-			]
-		);
-
-		$args['post__not_in'] = isset( $args['post__not_in'] )
-			? $args['post__not_in']
-			: [];
-
-		$args['post__not_in'] = \array_merge(
-			$args['post__not_in'],
-			// Add the snoozed post IDs to the post__not_in array.
-			$this->get_snoozed_post_ids(),
-		);
-
-		$dismissed_post_ids = $this->get_dismissed_post_ids();
-
-		if ( ! empty( $dismissed_post_ids ) ) {
-			$args['post__not_in'] = \array_merge( $args['post__not_in'], $dismissed_post_ids );
-		}
-
-		// Get the post that was updated last.
-		$posts = \get_posts( $args );
-
-		return $posts ? $posts : [];
+	public function exclude_completed_posts( $post_ids ) {
+		return \array_merge( $post_ids, $this->get_snoozed_post_ids(), $this->get_dismissed_post_ids() );
 	}
 
 	/**
