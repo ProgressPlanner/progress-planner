@@ -2,11 +2,22 @@
 	margin: 0;
 	padding: 0.5rem;
 	display: flex;
-	justify-content: space-between;
-	align-items: center;
+	flex-direction: column;
+	gap: 0.5rem;
+
 	position: relative;
-	gap: 1rem;
 	line-height: 1.5;
+
+	.prpl-suggested-task-title-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		justify-content: space-between;
+	}
+
+	.prpl-suggested-task-actions-wrapper {
+		padding-left: 1.5rem;
+	}
 
 	h3 {
 		font-size: 1rem;
@@ -44,7 +55,7 @@
 		text-decoration-color: transparent;
 	}
 
-	.prpl-suggested-task-actions {
+	.prpl-suggested-task-points-wrapper {
 		display: flex;
 		gap: 0.5rem;
 		flex-shrink: 0; /* Prevent the actions from shrinking when the task title is too long */

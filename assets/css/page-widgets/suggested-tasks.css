@@ -53,7 +53,7 @@
 	}
 
 	.prpl-suggested-task:nth-child(odd) {
-		background-color: #f9fafb;
+		background-color: #f6f7f9;
 	}
 
 	/* If task has disabled checkbox it's title should be italic. */
@@ -72,7 +72,8 @@
 	}
 
 	/* Disabled checkbox styles. */
-	.prpl-suggested-task-disabled-checkbox-tooltip {
+	.prpl-suggested-task-disabled-checkbox-tooltip,
+	.tooltip-actions {
 
 		& > button {
 			padding: 0;
@@ -87,6 +88,41 @@
 				transform: translate(-5px, -10px) rotate(90deg);
 			}
 		}
+	}
+
+	/* Style for "hover" links. */
+	.tooltip-actions {
+		gap: 0.4rem;
+
+		.tooltip-action {
+			display: inline-flex;
+			position: relative;
+
+			&:not(:first-child) {
+				padding-left: 0.4rem; /* same as gap */
+
+				&::before {
+				position: absolute;
+				top: 50%;
+				transform: translateY(-50%);
+				left: 0;
+
+				content: "";
+				display: inline-block;
+				width: 1px;
+				background: var(--prpl-color-gray-5);
+				height: 0.75rem;
+			}
+		}
+
+		.prpl-tooltip-action-text {
+			color: var(--prpl-color-link);
+		}
+
+		button {
+			line-height: 1; /* we dont use icons here anymore */
+		}
+
 	}
 }
 
