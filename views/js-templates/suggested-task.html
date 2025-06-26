@@ -27,7 +27,6 @@
 
 
 			<div class="prpl-suggested-task-points-wrapper">
-
 				<# if ( 'user' === categorySlug ) { #>
 				<div class="tooltip-actions">
 					<span class="prpl-move-buttons">
@@ -59,6 +58,15 @@
 		<# if ( 'user' !== categorySlug ) { #>
 		<div class="prpl-suggested-task-actions-wrapper">
 			<div class="tooltip-actions">
+				<# if ( data.post.meta.prpl_dismissable ) { #>
+					<span class="tooltip-action">
+						<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="complete" data-target="complete" title="{{ data.l10n.markAsComplete }}" onclick="prplSuggestedTask.maybeComplete( {{ data.post.id }} );">
+							<span class="prpl-tooltip-action-text">{{ data.l10n.markAsComplete }}</span>
+							<span class="screen-reader-text">{{ data.l10n.markAsComplete }}</span>
+						</button>
+					</span>
+				<# } #>
+
 				<# if ( data.post.content.rendered !== '' ) { #>
 					<span class="tooltip-action">
 						<prpl-tooltip>
@@ -110,13 +118,6 @@
 							</slot>
 						</prpl-tooltip>
 					</span>
-				<# } #>
-
-				<# if ( data.post.meta.prpl_dismissable && ! data.useCheckbox ) { #>
-					<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="complete" data-target="complete" title="{{ data.l10n.markAsComplete }}" onclick="prplSuggestedTask.runButtonAction( this );">
-						<span class="dashicons dashicons-saved"></span>
-						<span class="screen-reader-text">{{ data.l10n.markAsComplete }}</span>
-					</button>
 				<# } #>
 			</div>
 		</div>

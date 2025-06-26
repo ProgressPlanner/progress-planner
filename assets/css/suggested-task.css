@@ -226,8 +226,8 @@
 
 	&[data-task-action="celebrate"] {
 
-		.prpl-suggested-task-button[data-action="snooze"] {
-			display: none;
+		.tooltip-actions {
+			pointer-events: none; /* Prevent clicking on actions while celebrating */
 		}
 	}
 

@@ -67,7 +67,6 @@ customElements.define(
 
 			// Find the close button (or create a default one)
 			let closeButton = closeSlot?.firstElementChild;
-			console.log( closeButton );
 			if ( ! closeButton ) {
 				closeButton = document.createElement( 'button' );
 				closeButton.type = 'button';
