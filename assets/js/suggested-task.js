@@ -436,37 +436,6 @@ prplSuggestedTask = {
 		}
 
 		switch ( action ) {
-			case 'snooze':
-				tooltipActions
-					.querySelector( elClass )
-					?.setAttribute( 'data-tooltip-visible', 'true' );
-				break;
-
-			case 'close-snooze':
-				// Close the radio group.
-				tooltipActions
-					.querySelector(
-						`${ elClass }.prpl-toggle-radio-group-open`
-					)
-					?.classList.remove( 'prpl-toggle-radio-group-open' );
-				// Close the tooltip.
-				tooltipActions
-					.querySelector( `${ elClass }[data-tooltip-visible]` )
-					?.removeAttribute( 'data-tooltip-visible' );
-				break;
-
-			case 'info':
-				tooltipActions
-					.querySelector( elClass )
-					?.setAttribute( 'data-tooltip-visible', 'true' );
-				break;
-
-			case 'close-info':
-				tooltipActions
-					.querySelector( elClass )
-					.removeAttribute( 'data-tooltip-visible' );
-				break;
-
 			case 'move-up':
 			case 'move-down':
 				if ( 'move-up' === action && item.previousElementSibling ) {
