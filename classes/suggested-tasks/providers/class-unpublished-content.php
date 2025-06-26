@@ -258,6 +258,22 @@ class Unpublished_Content extends Tasks {
 	}
 
 	/**
+	 * Modify task data before injecting it.
+	 *
+	 * @param array $task_data The task data.
+	 *
+	 * @return array
+	 */
+	protected function modify_injection_task_data( $task_data ) {
+		// Transform the data to match the task data structure.
+		$data = $this->transform_collector_data( $this->get_data_collector()->collect() );
+
+		$task_data['target_post_id'] = $data['post_id'];
+
+		return $task_data;
+	}
+
+	/**
 	 * This method is added just to override the parent method.
 	 * For this task provider we can't check if it is snoozed like for other as we snooze the task for specific post.
 	 * Check for that is included in the should_add_task method.
