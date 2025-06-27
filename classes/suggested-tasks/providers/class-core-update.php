@@ -124,6 +124,19 @@ class Core_Update extends Tasks {
 		if ( ! \function_exists( 'get_core_updates' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/update.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
+
+		// For wp_get_update_data() to return correct data it needs to be called after the 'admin_init' action (with priority 10).
 		return 0 < \wp_get_update_data()['counts']['total'];
+	}
+
+	/**
+	 * Check if the task is completed.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function is_task_completed( $task_id = '' ) {
+		return \wp_doing_ajax() ? false : ! $this->should_add_task();
 	}
 }
