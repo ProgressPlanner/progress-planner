@@ -158,7 +158,12 @@ class Unpublished_Content extends Tasks {
 		}
 
 		$post_title = \get_the_title( $post );
-		$post_url   = \add_query_arg(
+		$post_title = \trim( $post_title );
+		$post_title = empty( $post_title )
+			? \strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ) . ' ' . (int) $post->ID // @phpstan-ignore-line property.nonObject
+			: '"' . $post_title . '"';
+
+		$post_url = \add_query_arg(
 			[
 				'post'   => $post->ID,
 				'action' => 'edit',
