@@ -540,4 +540,28 @@ abstract class Tasks implements Tasks_Interface {
 			'snoozable'    => $this->is_snoozable(),
 		];
 	}
+
+	/**
+	 * Transform data collector data into task data format.
+	 *
+	 * @param array $data The data from data collector.
+	 * @return array The transformed data with original data merged.
+	 */
+	protected function transform_collector_data( array $data ): array {
+		$transform_keys = [
+			'term_id'    => 'target_term_id',
+			'taxonomy'   => 'target_taxonomy',
+			'name'       => 'target_term_name',
+			'post_id'    => 'target_post_id',
+			'post_title' => 'target_post_title',
+		];
+
+		foreach ( $transform_keys as $key => $value ) {
+			if ( isset( $data[ $key ] ) ) {
+				$data[ $value ] = $data[ $key ];
+			}
+		}
+
+		return $data;
+	}
 }

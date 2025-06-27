@@ -41,7 +41,7 @@ class Update_161 {
 		foreach ( $badges as $badge_id => $badge ) {
 
 			// We are only migrating monthly badges.
-			if ( 0 !== strpos( $badge_id, 'monthly-' ) ) {
+			if ( 0 !== \strpos( $badge_id, 'monthly-' ) ) {
 				continue;
 			}
 
