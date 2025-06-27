@@ -219,11 +219,11 @@ class Remove_Terms_Without_Posts extends Tasks {
 			return [];
 		}
 
-		$data    = $this->get_data_collector()->collect();
+		$data    = $this->transform_collector_data( $this->get_data_collector()->collect() );
 		$task_id = $this->get_task_id(
 			[
-				'term_id'  => $data['term_id'],
-				'taxonomy' => $data['taxonomy'],
+				'target_term_id'   => $data['target_term_id'],
+				'target_taxonomy'  => $data['target_taxonomy'],
 			]
 		);
 
@@ -234,7 +234,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 		// Transform the data to match the task data structure.
 		$task_data = $this->modify_injection_task_data(
 			$this->get_task_details(
-				$this->transform_collector_data( $data )
+				$data
 			)
 		);
 

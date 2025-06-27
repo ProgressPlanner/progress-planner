@@ -157,10 +157,10 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return [];
 		}
 
-		$data    = $this->get_data_collector()->collect();
+		$data    = $this->transform_collector_data( $this->get_data_collector()->collect() );
 		$task_id = $this->get_task_id(
 			[
-				'post_id' => $data['post_id'],
+				'target_post_id' => $data['target_post_id'],
 			]
 		);
 
@@ -172,7 +172,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		// Transform the data to match the task data structure.
 		$task_data = $this->modify_injection_task_data(
 			$this->get_task_details(
-				$this->transform_collector_data( $data )
+				$data
 			)
 		);
 
