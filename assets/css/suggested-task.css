@@ -2,8 +2,7 @@
 	margin: 0;
 	padding: 0.5rem;
 	display: flex;
-	flex-direction: column;
-	gap: 0.5rem;
+	flex-direction: column; /* For RR */
 
 	position: relative;
 	line-height: 1.5;
@@ -16,7 +15,7 @@
 	}
 
 	.prpl-suggested-task-actions-wrapper {
-		padding-left: 1.5rem;
+		padding-left: 1.7rem;
 	}
 
 	h3 {

@@ -92,6 +92,7 @@
 
 	/* Style for "hover" links. */
 	.tooltip-actions {
+		padding-top: 2px;
 		gap: 0.4rem;
 
 		.tooltip-action {
@@ -121,8 +122,10 @@
 				color: var(--prpl-color-link);
 			}
 
+			/* we dont use icons here anymore */
 			button {
-				line-height: 1; /* we dont use icons here anymore */
+				padding: 0;
+				line-height: 1;
 			}
 
 		}
