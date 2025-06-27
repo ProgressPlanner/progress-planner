@@ -190,23 +190,6 @@ class Update_Term_Description extends Tasks {
 	}
 
 	/**
-	 * Transform data collector data into task data format.
-	 *
-	 * @param array $data The data from data collector.
-	 * @return array The transformed data with original data merged.
-	 */
-	protected function transform_collector_data( array $data ): array {
-		return \array_merge(
-			$data,
-			[
-				'target_term_id'   => $data['term_id'],
-				'target_taxonomy'  => $data['taxonomy'],
-				'target_term_name' => $data['name'],
-			]
-		);
-	}
-
-	/**
 	 * Get an array of tasks to inject.
 	 *
 	 * @return array
