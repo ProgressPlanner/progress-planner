@@ -87,13 +87,6 @@ class Unpublished_Content extends Tasks {
 	protected $dismissed_post_ids = null;
 
 	/**
-	 * The post to update IDs.
-	 *
-	 * @var array|null
-	 */
-	protected $task_post_mappings = null;
-
-	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
