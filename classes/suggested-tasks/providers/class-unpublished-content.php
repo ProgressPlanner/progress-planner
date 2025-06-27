@@ -202,21 +202,6 @@ class Unpublished_Content extends Tasks {
 	}
 
 	/**
-	 * Transform data collector data into task data format.
-	 *
-	 * @param array $data The data from data collector.
-	 * @return array The transformed data with original data merged.
-	 */
-	protected function transform_collector_data( array $data ): array {
-		return \array_merge(
-			$data,
-			[
-				'target_post_id' => $data['post_id'],
-			]
-		);
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
@@ -235,10 +220,10 @@ class Unpublished_Content extends Tasks {
 			return [];
 		}
 
-		$data    = $this->get_data_collector()->collect();
+		$data    = $this->transform_collector_data( $this->get_data_collector()->collect() );
 		$task_id = $this->get_task_id(
 			[
-				'target_post_id' => $data['post_id'],
+				'target_post_id' => $data['target_post_id'],
 			]
 		);
 
@@ -249,7 +234,7 @@ class Unpublished_Content extends Tasks {
 		// Transform the data to match the task data structure.
 		$task_data = $this->modify_injection_task_data(
 			$this->get_task_details(
-				$this->transform_collector_data( $data )
+				$data
 			)
 		);
 
