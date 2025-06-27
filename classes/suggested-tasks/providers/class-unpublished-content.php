@@ -260,7 +260,7 @@ class Unpublished_Content extends Tasks {
 		// Transform the data to match the task data structure.
 		$data = $this->transform_collector_data( $this->get_data_collector()->collect() );
 
-		$task_data['target_post_id'] = $data['post_id'];
+		$task_data['target_post_id'] = $data['target_post_id'];
 
 		return $task_data;
 	}
