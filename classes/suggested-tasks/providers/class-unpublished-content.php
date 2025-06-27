@@ -122,6 +122,15 @@ class Unpublished_Content extends Tasks {
 			return '';
 		}
 
+		if ( empty( $post->post_title ) ) {
+			return \sprintf(
+				/* translators: %1$s: post type, %2$d: post ID */
+				\esc_html__( 'Add a title to %1$s %2$d and publish it', 'progress-planner' ),
+				\strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
+				(int) $post->ID
+			);
+		}
+
 		return \sprintf(
 				// translators: %1$s: The post type, %2$s: The post title.
 			\esc_html__( 'Publish %1$s "%2$s"', 'progress-planner' ),
