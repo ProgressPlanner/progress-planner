@@ -207,23 +207,6 @@ class Remove_Terms_Without_Posts extends Tasks {
 	}
 
 	/**
-	 * Transform data collector data into task data format.
-	 *
-	 * @param array $data The data from data collector.
-	 * @return array The transformed data with original data merged.
-	 */
-	protected function transform_collector_data( array $data ): array {
-		return \array_merge(
-			$data,
-			[
-				'target_term_id'   => $data['term_id'],
-				'target_taxonomy'  => $data['taxonomy'],
-				'target_term_name' => $data['name'],
-			]
-		);
-	}
-
-	/**
 	 * Get an array of tasks to inject.
 	 *
 	 * @return array
@@ -236,11 +219,11 @@ class Remove_Terms_Without_Posts extends Tasks {
 			return [];
 		}
 
-		$data    = $this->get_data_collector()->collect();
+		$data    = $this->transform_collector_data( $this->get_data_collector()->collect() );
 		$task_id = $this->get_task_id(
 			[
-				'term_id'  => $data['term_id'],
-				'taxonomy' => $data['taxonomy'],
+				'target_term_id'  => $data['target_term_id'],
+				'target_taxonomy' => $data['target_taxonomy'],
 			]
 		);
 
@@ -251,7 +234,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 		// Transform the data to match the task data structure.
 		$task_data = $this->modify_injection_task_data(
 			$this->get_task_details(
-				$this->transform_collector_data( $data )
+				$data
 			)
 		);
 
