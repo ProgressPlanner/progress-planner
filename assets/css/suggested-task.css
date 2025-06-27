@@ -78,7 +78,8 @@
 		visibility: hidden;
 	}
 
-	&:hover {
+	&:hover,
+	&:focus-within {
 
 		.tooltip-actions {
 			visibility: visible;
