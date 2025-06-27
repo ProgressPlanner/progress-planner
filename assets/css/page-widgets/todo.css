@@ -48,7 +48,7 @@
 				border: 1px solid #796da2;
 				background-color: #f9fafb;
 
-				.prpl-suggested-task-actions {
+				.prpl-suggested-task-points-wrapper {
 
 					&::after {
 						content: "";
