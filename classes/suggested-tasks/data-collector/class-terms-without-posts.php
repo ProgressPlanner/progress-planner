@@ -91,7 +91,7 @@ class Terms_Without_Posts extends Base_Data_Collector {
 		 *
 		 * @var array<string, string> $public_taxonomies
 		 */
-		$public_taxonomies = get_taxonomies( [ 'public' => true ], 'names' );
+		$public_taxonomies = \get_taxonomies( [ 'public' => true ], 'names' );
 
 		/**
 		 * Array of public taxonomies to exclude from the terms without posts query.
@@ -139,7 +139,7 @@ class Terms_Without_Posts extends Base_Data_Collector {
 			";
 
 			if ( ! empty( $exclude_term_ids ) ) {
-				$query .= ' AND t.term_id NOT IN (' . implode( ',', array_map( 'intval', $exclude_term_ids ) ) . ')';
+				$query .= ' AND t.term_id NOT IN (' . \implode( ',', \array_map( 'intval', $exclude_term_ids ) ) . ')';
 			}
 
 			$query .= ' LIMIT %d';

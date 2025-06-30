@@ -67,8 +67,8 @@ class Collaborator extends Tasks {
 
 		$task_data = $tasks[0]->get_data();
 
-		return isset( $task_data['is_completed_callback'] ) && is_callable( $task_data['is_completed_callback'] )
-			? call_user_func( $task_data['is_completed_callback'], $task_id )
+		return isset( $task_data['is_completed_callback'] ) && \is_callable( $task_data['is_completed_callback'] )
+			? \call_user_func( $task_data['is_completed_callback'], $task_id )
 			: false;
 	}
 
@@ -87,7 +87,7 @@ class Collaborator extends Tasks {
 				continue;
 			}
 
-			return wp_parse_args(
+			return \wp_parse_args(
 				$task,
 				[
 					'task_id'      => '',

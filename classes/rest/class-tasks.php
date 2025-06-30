@@ -54,7 +54,7 @@ class Tasks {
 	 * @return bool
 	 */
 	public function validate_token( $token ) {
-		$token = str_replace( 'token/', '', $token );
+		$token = \str_replace( 'token/', '', $token );
 
 		if ( $token === \get_option( 'progress_planner_test_token', '' ) ) {
 			return true;

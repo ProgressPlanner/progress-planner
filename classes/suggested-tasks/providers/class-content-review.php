@@ -111,7 +111,7 @@ class Content_Review extends Tasks {
 		\add_filter( 'progress_planner_update_posts_tasks_args', [ $this, 'filter_update_posts_args' ] );
 
 		// Add the Yoast cornerstone pages to the important page IDs.
-		if ( function_exists( 'YoastSEO' ) ) {
+		if ( \function_exists( 'YoastSEO' ) ) {
 			\add_filter( 'progress_planner_update_posts_important_page_ids', [ $this, 'add_yoast_cornerstone_pages' ] );
 		}
 
@@ -136,10 +136,10 @@ class Content_Review extends Tasks {
 			return '';
 		}
 
-		return sprintf(
+		return \sprintf(
 				// translators: %1$s: The post type, %2$s: The post title.
 			\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
-			strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
+			\strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
 			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
 		);
 	}
@@ -162,9 +162,9 @@ class Content_Review extends Tasks {
 			return '';
 		}
 
-		$months = in_array( (int) $post->ID, $this->get_saved_page_types(), true ) ? '12' : '6';
+		$months = \in_array( (int) $post->ID, $this->get_saved_page_types(), true ) ? '12' : '6';
 
-		return '<p>' . sprintf(
+		return '<p>' . \sprintf(
 			/* translators: %1$s <a href="https://prpl.fyi/review-post" target="_blank">Review</a> link, %2$s: The post title, %3$s: The number of months. */
 			\esc_html__( '%1$s the post "%2$s" as it was last updated more than %3$s months ago.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/review-post" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
@@ -210,7 +210,7 @@ class Content_Review extends Tasks {
 	 */
 	public function should_add_task() {
 		if ( null !== $this->task_post_mappings ) {
-			return 0 < count( $this->task_post_mappings );
+			return 0 < \count( $this->task_post_mappings );
 		}
 
 		$this->task_post_mappings = [];
@@ -255,11 +255,11 @@ class Content_Review extends Tasks {
 		}
 
 		// Lets check for other posts to update.
-		$number_of_posts_to_inject = $number_of_posts_to_inject - count( $last_updated_posts );
+		$number_of_posts_to_inject = $number_of_posts_to_inject - \count( $last_updated_posts );
 
 		if ( 0 < $number_of_posts_to_inject ) {
 			// Get the post that was updated last.
-			$last_updated_posts = array_merge(
+			$last_updated_posts = \array_merge(
 				$last_updated_posts,
 				$this->get_old_posts(
 					[
@@ -299,7 +299,7 @@ class Content_Review extends Tasks {
 			];
 		}
 
-		return 0 < count( $this->task_post_mappings );
+		return 0 < \count( $this->task_post_mappings );
 	}
 
 	/**
@@ -392,7 +392,7 @@ class Content_Review extends Tasks {
 		$posts = [];
 
 		// Parse default args.
-		$args = wp_parse_args(
+		$args = \wp_parse_args(
 			$args,
 			[
 				'posts_per_page'      => static::ITEMS_TO_INJECT,
@@ -414,7 +414,7 @@ class Content_Review extends Tasks {
 		 *
 		 * @param array $args The get_posts args.
 		 */
-		$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
+		$args = \apply_filters( 'progress_planner_update_posts_tasks_args', $args );
 
 		// Get the post that was updated last.
 		$posts = \get_posts( $args );
@@ -434,7 +434,7 @@ class Content_Review extends Tasks {
 			? $args['post__not_in']
 			: [];
 
-		$args['post__not_in'] = array_merge(
+		$args['post__not_in'] = \array_merge(
 			$args['post__not_in'],
 			// Add the snoozed post IDs to the post__not_in array.
 			$this->get_snoozed_post_ids(),
@@ -443,10 +443,10 @@ class Content_Review extends Tasks {
 		$dismissed_post_ids = $this->get_dismissed_post_ids();
 
 		if ( ! empty( $dismissed_post_ids ) ) {
-			$args['post__not_in'] = array_merge( $args['post__not_in'], $dismissed_post_ids );
+			$args['post__not_in'] = \array_merge( $args['post__not_in'], $dismissed_post_ids );
 		}
 
-		if ( function_exists( 'YoastSEO' ) ) {
+		if ( \function_exists( 'YoastSEO' ) ) {
 			// Handle the case when the meta key doesn't exist.
 			$args['meta_query'] = [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 				'relation' => 'OR',
@@ -510,7 +510,7 @@ class Content_Review extends Tasks {
 		$dismissed                = $this->get_dismissed_tasks();
 
 		if ( ! empty( $dismissed ) ) {
-			$this->dismissed_post_ids = array_values( wp_list_pluck( $dismissed, 'post_id' ) );
+			$this->dismissed_post_ids = \array_values( \wp_list_pluck( $dismissed, 'post_id' ) );
 		}
 
 		return $this->dismissed_post_ids;
@@ -561,7 +561,7 @@ class Content_Review extends Tasks {
 		$data = $task->get_data();
 
 		return $data && isset( $data['target_post_id'] )
-			&& (int) \get_post_modified_time( 'U', false, (int) $data['target_post_id'] ) > strtotime( '-12 months' );
+			&& (int) \get_post_modified_time( 'U', false, (int) $data['target_post_id'] ) > \strtotime( '-12 months' );
 	}
 
 	/**
@@ -571,7 +571,7 @@ class Content_Review extends Tasks {
 	 * @return int[]
 	 */
 	public function add_yoast_cornerstone_pages( $important_page_ids ) {
-		if ( ! function_exists( 'YoastSEO' ) ) {
+		if ( ! \function_exists( 'YoastSEO' ) ) {
 			return $important_page_ids;
 		}
 		$cornerstone_page_ids = \get_posts(
@@ -583,7 +583,7 @@ class Content_Review extends Tasks {
 			]
 		);
 		if ( ! empty( $cornerstone_page_ids ) ) {
-			$important_page_ids = array_merge( $important_page_ids, $cornerstone_page_ids );
+			$important_page_ids = \array_merge( $important_page_ids, $cornerstone_page_ids );
 		}
 		return $important_page_ids;
 	}
@@ -607,7 +607,7 @@ class Content_Review extends Tasks {
 		}
 
 		// Check if it his cornerstone content.
-		if ( function_exists( 'YoastSEO' ) ) {
+		if ( \function_exists( 'YoastSEO' ) ) {
 			$is_cornerstone = \get_post_meta( $dismissal_data['post_id'], '_yoast_wpseo_is_cornerstone', true );
 			if ( '1' === $is_cornerstone ) {
 				return 6 * MONTH_IN_SECONDS;

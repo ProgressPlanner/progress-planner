@@ -6,7 +6,7 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -40,7 +40,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<button class="prpl-button" data-action="showResults" type="submit">
 						<?php
 						/* translators: %s is a forward arrow icon. */
-						printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
+						\printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
 						?>
 					</button>
 				</div>
@@ -54,7 +54,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<h2 class="prpl-interactive-task-title"><?php \esc_html_e( 'We tried to send a test email', 'progress-planner' ); ?></h2>
 			<p class="prpl-interactive-task-description" id="prpl-sending-email-error-occurred-message" data-email-message="
 				<?php
-				printf(
+				\printf(
 					/* translators: %s is the email subject. */
 					\esc_attr__( 'We just tried to send the email "%s" to [EMAIL_ADDRESS], but unfortunately it didn’t work.', 'progress-planner' ),
 					\esc_attr( $prpl_email_subject )
@@ -72,7 +72,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<span class="prpl-note-text" data-email-message="
 					<?php
 						/* translators: %s is the error message. */
-						printf( \esc_attr__( 'The test email didn’t work. The error message was: [ERROR_MESSAGE]', 'progress-planner' ), \esc_attr( $prpl_email_error ) );
+						\printf( \esc_attr__( 'The test email didn’t work. The error message was: [ERROR_MESSAGE]', 'progress-planner' ), \esc_attr( $prpl_email_error ) );
 					?>
 				">
 				</span>
@@ -80,7 +80,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 			<p>
 				<?php
-				printf(
+				\printf(
 					/* translators: %s is a link to the troubleshooting guide. */
 					\esc_html__( 'There are a few common reasons why your email might not be sending. Check the %s to find out what’s causing the issue and how to fix it.', 'progress-planner' ),
 					'<a href="' . \esc_url( $prpl_troubleshooting_guide_url ) . '" target="_blank">' . \esc_html__( 'troubleshooting guide', 'progress-planner' ) . '</a>'
@@ -92,7 +92,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<button class="prpl-button" data-action="showForm">
 					<?php
 						/* translators: %s is a back arrow icon. */
-						printf( \esc_html__( ' %s Try again', 'progress-planner' ), '<span class="dashicons dashicons-arrow-left-alt2"></span>' );
+						\printf( \esc_html__( ' %s Try again', 'progress-planner' ), '<span class="dashicons dashicons-arrow-left-alt2"></span>' );
 					?>
 				</button>
 				<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Retry later', 'progress-planner' ); ?></button>
@@ -107,7 +107,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<p class="prpl-interactive-task-description" id="prpl-sending-email-sent-message" data-email-message="
 				<?php
 				/* translators: %s is the email subject. */
-				printf( \esc_attr__( 'We just sent the email "%s" to [EMAIL_ADDRESS].', 'progress-planner' ), \esc_attr( $prpl_email_subject ) );
+				\printf( \esc_attr__( 'We just sent the email "%s" to [EMAIL_ADDRESS].', 'progress-planner' ), \esc_attr( $prpl_email_subject ) );
 				?>
 			"></p>
 
@@ -154,7 +154,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				<button class="prpl-button" data-action="">
 					<?php
 					/* translators: %s is an arrow icon. */
-					printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
+					\printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
 					?>
 				</button>
 			</div>

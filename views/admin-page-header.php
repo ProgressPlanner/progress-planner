@@ -6,7 +6,7 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -52,7 +52,7 @@ $progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_tex
 					'-18 months' => \esc_html__( 'Activity over the past 18 months', 'progress-planner' ),
 					'-24 months' => \esc_html__( 'Activity over the past 24 months', 'progress-planner' ),
 				] as $progress_planner_range => $progress_planner_label ) {
-					printf(
+					\printf(
 						'<option value="%1$s" %2$s>%3$s</option>',
 						\esc_attr( $progress_planner_range ),
 						\selected( $progress_planner_active_range, $progress_planner_range, false ),
@@ -70,7 +70,7 @@ $progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_tex
 					'weekly'  => \esc_html__( 'Weekly', 'progress-planner' ),
 					'monthly' => \esc_html__( 'Monthly', 'progress-planner' ),
 				] as $progress_planner_frequency => $progress_planner_label ) {
-					printf(
+					\printf(
 						'<option value="%1$s" %2$s>%3$s</option>',
 						\esc_attr( $progress_planner_frequency ),
 						\selected( $progress_planner_active_frequency, $progress_planner_frequency, false ),

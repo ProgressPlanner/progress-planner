@@ -71,14 +71,14 @@ class Base {
 	 * @return void
 	 */
 	public function init() {
-		if ( ! function_exists( 'current_user_can' ) ) {
+		if ( ! \function_exists( 'current_user_can' ) ) {
 			require_once ABSPATH . 'wp-includes/capabilities.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
-		if ( ! function_exists( 'wp_get_current_user' ) ) {
+		if ( ! \function_exists( 'wp_get_current_user' ) ) {
 			require_once ABSPATH . 'wp-includes/pluggable.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
 
-		if ( defined( '\IS_PLAYGROUND_PREVIEW' ) && constant( '\IS_PLAYGROUND_PREVIEW' ) === true ) {
+		if ( \defined( '\IS_PLAYGROUND_PREVIEW' ) && \constant( '\IS_PLAYGROUND_PREVIEW' ) === true ) {
 			$this->get_utils__playground();
 		}
 
@@ -117,7 +117,7 @@ class Base {
 			$this->get_page_todos();
 		}
 
-		\add_filter( 'plugin_action_links_' . plugin_basename( PROGRESS_PLANNER_FILE ), [ $this, 'add_action_links' ] );
+		\add_filter( 'plugin_action_links_' . \plugin_basename( PROGRESS_PLANNER_FILE ), [ $this, 'add_action_links' ] );
 
 		// We need to initialize some classes early.
 		$this->get_page_types();
@@ -169,17 +169,17 @@ class Base {
 	 * @return mixed
 	 */
 	public function __call( $name, $arguments ) {
-		if ( 0 !== strpos( $name, 'get_' ) ) {
+		if ( 0 !== \strpos( $name, 'get_' ) ) {
 			return;
 		}
-		$cache_name = substr( $name, 4 );
+		$cache_name = \substr( $name, 4 );
 		if ( isset( $this->cached[ $cache_name ] ) ) {
 			return $this->cached[ $cache_name ];
 		}
 
-		$class_name = implode( '\\', explode( '__', $cache_name ) );
-		$class_name = 'Progress_Planner\\' . implode( '_', array_map( 'ucfirst', explode( '_', $class_name ) ) );
-		if ( class_exists( $class_name ) ) {
+		$class_name = \implode( '\\', \explode( '__', $cache_name ) );
+		$class_name = 'Progress_Planner\\' . \implode( '_', \array_map( 'ucfirst', \explode( '_', $class_name ) ) );
+		if ( \class_exists( $class_name ) ) {
 			$this->cached[ $cache_name ] = new $class_name( $arguments );
 			return $this->cached[ $cache_name ];
 		}
@@ -202,7 +202,7 @@ class Base {
 	 * @return string
 	 */
 	public function get_remote_server_root_url() {
-		return defined( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
+		return \defined( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
 			? \constant( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
 			: 'https://progressplanner.com';
 	}
@@ -216,7 +216,7 @@ class Base {
 	 * @return string
 	 */
 	public function get_placeholder_svg( $width = 1200, $height = 675 ) {
-		return 'data:image/svg+xml;base64,' . base64_encode( sprintf( '<svg width="%1$d" height="%2$d" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="%3$d" height="%4$d" style="fill:#F6F5FB;stroke:#534786;stroke-width:2"/><text x="50%%" y="50%%" font-size="20" text-anchor="middle" alignment-baseline="middle" font-family="monospace" fill="#534786">progressplanner.com</text></svg>', $width, $height, ( $width - 4 ), ( $height - 4 ) ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+		return 'data:image/svg+xml;base64,' . \base64_encode( \sprintf( '<svg width="%1$d" height="%2$d" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="%3$d" height="%4$d" style="fill:#F6F5FB;stroke:#534786;stroke-width:2"/><text x="50%%" y="50%%" font-size="20" text-anchor="middle" alignment-baseline="middle" font-family="monospace" fill="#534786">progressplanner.com</text></svg>', $width, $height, ( $width - 4 ), ( $height - 4 ) ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 	}
 
 	/**
@@ -251,12 +251,12 @@ class Base {
 	 * @return array
 	 */
 	public function add_action_links( $actions ) {
-		return array_merge(
+		return \array_merge(
 			[
-				sprintf(
+				\sprintf(
 					'<a href="%1$s">%2$s</a>',
 					\admin_url( 'admin.php?page=progress-planner' ),
-					__( 'Dashboard', 'progress-planner' )
+					\__( 'Dashboard', 'progress-planner' )
 				),
 			],
 			$actions
@@ -272,7 +272,7 @@ class Base {
 	 * @return void
 	 */
 	public function the_view( $template, $args = [] ) {
-		$templates = ( is_string( $template ) )
+		$templates = ( \is_string( $template ) )
 			? [ $template, "/views/{$template}" ]
 			: $template;
 		$this->the_file( $templates, $args );
@@ -288,7 +288,7 @@ class Base {
 	 * @return void
 	 */
 	public function the_asset( $asset, $args = [] ) {
-		$assets = ( is_string( $asset ) )
+		$assets = ( \is_string( $asset ) )
 			? [ $asset, "/assets/{$asset}" ]
 			: $asset;
 		$this->the_file( $assets, $args );
@@ -304,12 +304,12 @@ class Base {
 	 * @return string|false
 	 */
 	public function get_asset( $asset, $args = [] ) {
-		ob_start();
-		$assets = ( is_string( $asset ) )
+		\ob_start();
+		$assets = ( \is_string( $asset ) )
 			? [ $asset, "/assets/{$asset}" ]
 			: $asset;
 		$this->the_file( $assets, $args );
-		return ob_get_clean();
+		return \ob_get_clean();
 	}
 
 	/**
@@ -333,7 +333,7 @@ class Base {
 				$path = \PROGRESS_PLANNER_DIR . "/{$file}";
 			}
 			if ( \file_exists( $path ) ) {
-				extract( $args ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
+				\extract( $args ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
 				include $path; // phpcs:ignore PEAR.Files.IncludingFile.UseRequire
 				break;
 			}
@@ -348,12 +348,12 @@ class Base {
 	 */
 	public function get_file_version( $file ) {
 		// If we're in debug mode, use filemtime.
-		if ( defined( 'WP_SCRIPT_DEBUG' ) && constant( 'WP_SCRIPT_DEBUG' ) ) {
-			return (string) filemtime( $file );
+		if ( \defined( 'WP_SCRIPT_DEBUG' ) && \constant( 'WP_SCRIPT_DEBUG' ) ) {
+			return (string) \filemtime( $file );
 		}
 
 		// Otherwise, use the plugin header.
-		if ( ! function_exists( 'get_file_data' ) ) {
+		if ( ! \function_exists( 'get_file_data' ) ) {
 			require_once ABSPATH . 'wp-includes/functions.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
 
@@ -481,7 +481,7 @@ class Base {
 	 * @return bool
 	 */
 	public function is_debug_mode_enabled() {
-		return ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' );
+		return ( \defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

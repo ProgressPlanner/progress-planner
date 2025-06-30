@@ -106,20 +106,20 @@ class Email_Sending extends Interactive {
 	public function init() {
 
 		// Enqueue the scripts.
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 
 		// Add the AJAX action.
-		add_action( 'wp_ajax_prpl_test_email_sending', [ $this, 'ajax_test_email_sending' ] );
+		\add_action( 'wp_ajax_prpl_test_email_sending', [ $this, 'ajax_test_email_sending' ] );
 
 		// Set the email error message.
-		add_action( 'wp_mail_failed', [ $this, 'set_email_error' ] );
+		\add_action( 'wp_mail_failed', [ $this, 'set_email_error' ] );
 
 		// By now all plugins should be loaded and hopefully add actions registered, so we can check if phpmailer is filtered.
 		\add_action( 'init', [ $this, 'check_if_wp_mail_is_filtered' ], PHP_INT_MAX );
 		\add_action( 'init', [ $this, 'check_if_wp_mail_has_override' ], PHP_INT_MAX );
 
 		$this->email_subject = \esc_html__( 'Your Progress Planner test message!', 'progress-planner' );
-		$this->email_content = sprintf(
+		$this->email_content = \sprintf(
 			/* translators: %1$s the admin URL. %2$s: "Ravi" */
 			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_blank">Click here to mark %2$s’s Recommendation as completed</a>.', 'progress-planner' ),
 			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ),
@@ -200,7 +200,7 @@ class Email_Sending extends Interactive {
 	public function check_if_wp_mail_has_override() {
 
 		// Just in case, since it will trigger PHP fatal error if the function doesn't exist.
-		if ( function_exists( 'wp_mail' ) ) {
+		if ( \function_exists( 'wp_mail' ) ) {
 			$file_path = ( new \ReflectionFunction( 'wp_mail' ) )->getFileName();
 
 			$this->is_wp_mail_overridden = $file_path && $file_path !== ABSPATH . 'wp-includes/pluggable.php';
@@ -229,17 +229,17 @@ class Email_Sending extends Interactive {
 		$email_address = isset( $_GET['email_address'] ) ? \sanitize_email( \wp_unslash( $_GET['email_address'] ) ) : '';
 
 		if ( ! $email_address ) {
-			wp_send_json_error( \esc_html__( 'Invalid email address.', 'progress-planner' ) );
+			\wp_send_json_error( \esc_html__( 'Invalid email address.', 'progress-planner' ) );
 		}
 
 		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 
-		$result = wp_mail( $email_address, $this->email_subject, $this->email_content, $headers );
+		$result = \wp_mail( $email_address, $this->email_subject, $this->email_content, $headers );
 
 		if ( $result ) {
-			wp_send_json_success( \esc_html__( 'Email sent successfully.', 'progress-planner' ) );
+			\wp_send_json_success( \esc_html__( 'Email sent successfully.', 'progress-planner' ) );
 		}
-		wp_send_json_error( $this->email_error );
+		\wp_send_json_error( $this->email_error );
 	}
 
 	/**

@@ -79,7 +79,7 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 			)
 			: \add_query_arg( [ 'site' => \get_site_url() ], $url );
 
-		$cache_key = md5( $url );
+		$cache_key = \md5( $url );
 
 		\progress_planner()->get_utils__cache()->set( $cache_key, self::get_lessons(), WEEK_IN_SECONDS );
 	}
@@ -93,13 +93,13 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 		$this->token = '123456789';
 
 		// Add a fake license key.
-		update_option( 'progress_planner_license_key', $this->token );
+		\update_option( 'progress_planner_license_key', $this->token );
 
 		// Initiating the REST API.
 		global $wp_rest_server;
 		$wp_rest_server = new WP_REST_Server();
 		$this->server   = $wp_rest_server;
-		do_action( 'rest_api_init' );
+		\do_action( 'rest_api_init' );
 	}
 
 	/**
@@ -109,7 +109,7 @@ class Test_API_Get_Stats extends \WP_UnitTestCase {
 		parent::tearDown();
 
 		// Delete the fake license key.
-		delete_option( 'progress_planner_license_key' );
+		\delete_option( 'progress_planner_license_key' );
 
 		global $wp_rest_server;
 		$wp_rest_server = null;

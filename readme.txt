@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.5.0
+Stable tag: 1.6.1
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -110,11 +110,20 @@ https://youtu.be/e1bmxZYyXFY
 
 == Changelog ==
 
+= 1.6.1 =
+
+Bugs we fixed:
+
+* "Collect your point" not closing the "Test if your website can send emails correctly" popover.
+* Snooze task tooltip overaly not closing properly.
+* Properly trigger migration from v1.5.0.
+
 = 1.6.0 =
 
 Enhancements:
 
 * Allow users to collect extra points for previous months' badges.
+* Added WP-CLI commands to manage recommendations.
 
 Under the hood:
 

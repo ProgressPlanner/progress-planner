@@ -37,7 +37,7 @@ final class Purposeful_Publisher extends Badge_Content {
 	 */
 	public function get_description() {
 		/* translators: %d: The number of new posts to write. */
-		return sprintf( \esc_html__( 'Write %d new posts or pages', 'progress-planner' ), 50 );
+		return \sprintf( \esc_html__( 'Write %d new posts or pages', 'progress-planner' ), 50 );
 	}
 
 	/**
@@ -56,7 +56,7 @@ final class Purposeful_Publisher extends Badge_Content {
 		}
 
 		// Get the number of new posts published.
-		$new_count = count(
+		$new_count = \count(
 			\progress_planner()->get_activities__query()->query_activities(
 				[
 					'category'   => 'content',
@@ -66,8 +66,8 @@ final class Purposeful_Publisher extends Badge_Content {
 			)
 		);
 
-		$percent   = min( 100, floor( 100 * $new_count / 50 ) );
-		$remaining = 50 - min( 50, $new_count );
+		$percent   = \min( 100, \floor( 100 * $new_count / 50 ) );
+		$remaining = 50 - \min( 50, $new_count );
 
 		$this->save_progress(
 			[

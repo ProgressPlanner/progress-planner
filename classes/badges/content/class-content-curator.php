@@ -61,7 +61,7 @@ final class Content_Curator extends Badge_Content {
 			$total_posts_count += \wp_count_posts( $post_type )->publish;
 		}
 
-		$remaining = 20 - min( 20, $total_posts_count );
+		$remaining = 20 - \min( 20, $total_posts_count );
 
 		// If there are 20 existing posts, save the badge as complete and return.
 		if ( 0 === $remaining ) {
@@ -79,7 +79,7 @@ final class Content_Curator extends Badge_Content {
 		}
 
 		// Get the new posts count.
-		$new_count = count(
+		$new_count = \count(
 			\progress_planner()->get_activities__query()->query_activities(
 				[
 					'category'   => 'content',
@@ -89,13 +89,13 @@ final class Content_Curator extends Badge_Content {
 			)
 		);
 
-		$remaining_new = 10 - min( 10, $new_count );
+		$remaining_new = 10 - \min( 10, $new_count );
 
-		$final_percent   = max(
-			min( 100, floor( $total_posts_count / 2 ) ),
-			min( 100, floor( $new_count * 10 ) )
+		$final_percent   = \max(
+			\min( 100, \floor( $total_posts_count / 2 ) ),
+			\min( 100, \floor( $new_count * 10 ) )
 		);
-		$final_remaining = min( $remaining, $remaining_new );
+		$final_remaining = \min( $remaining, $remaining_new );
 
 		$this->save_progress(
 			[

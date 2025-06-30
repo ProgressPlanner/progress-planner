@@ -114,7 +114,7 @@ class Activity {
 		if ( isset( $this->points[ $date_ymd ] ) ) {
 			return $this->points[ $date_ymd ];
 		}
-		$days = abs( \progress_planner()->get_utils__date()->get_days_between_dates( $date, $this->date ) );
+		$days = \abs( \progress_planner()->get_utils__date()->get_days_between_dates( $date, $this->date ) );
 
 		// Default points.
 		$default_points = 10;
@@ -128,7 +128,7 @@ class Activity {
 
 		$this->points[ $date_ymd ] = ( $days < 7 )
 			? $default_points
-			: round( $default_points * max( 0, ( 1 - $days / 30 ) ) );
+			: \round( $default_points * \max( 0, ( 1 - $days / 30 ) ) );
 
 		return $this->points[ $date_ymd ];
 	}

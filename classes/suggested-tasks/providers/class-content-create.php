@@ -71,7 +71,7 @@ class Content_Create extends Tasks {
 	 * @return string
 	 */
 	protected function get_title() {
-		return esc_html__( 'Create valuable content', 'progress-planner' );
+		return \esc_html__( 'Create valuable content', 'progress-planner' );
 	}
 
 	/**
@@ -80,7 +80,7 @@ class Content_Create extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return sprintf(
+		return \sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Time to add more valuable content to your site! Check our blog for inspiration. %s.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/valuable-content" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
@@ -122,6 +122,6 @@ class Content_Create extends Tasks {
 		}
 
 		// Add tasks if there are no posts published this week.
-		return \gmdate( 'YW' ) !== \gmdate( 'YW', strtotime( $last_published_post_data['post_date'] ) );
+		return \gmdate( 'YW' ) !== \gmdate( 'YW', \strtotime( $last_published_post_data['post_date'] ) );
 	}
 }

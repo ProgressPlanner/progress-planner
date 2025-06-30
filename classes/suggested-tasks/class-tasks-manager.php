@@ -110,8 +110,8 @@ class Tasks_Manager {
 		// Now when all are instantiated, initialize them.
 		foreach ( $this->task_providers as $key => $task_provider ) {
 			if ( ! $task_provider instanceof Tasks_Interface ) {
-				error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-					sprintf(
+				\error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+					\sprintf(
 						'Task provider %1$s is not an instance of %2$s',
 						$task_provider->get_provider_id(),
 						Tasks_Interface::class
@@ -158,9 +158,9 @@ class Tasks_Manager {
 	 * @return \Progress_Planner\Suggested_Tasks\Tasks_Interface|null
 	 */
 	public function __call( $name, $arguments ) {
-		if ( 0 === strpos( $name, 'get_' ) ) {
-			$provider_type = substr( $name, 4 ); // Remove 'get_' prefix.
-			$provider_type = str_replace( '_', '-', strtolower( $provider_type ) ); // Transform 'update_core' to 'update-core'.
+		if ( 0 === \strpos( $name, 'get_' ) ) {
+			$provider_type = \substr( $name, 4 ); // Remove 'get_' prefix.
+			$provider_type = \str_replace( '_', '-', \strtolower( $provider_type ) ); // Transform 'update_core' to 'update-core'.
 
 			return $this->get_task_provider( $provider_type );
 		}
@@ -235,7 +235,7 @@ class Tasks_Manager {
 	 */
 	public function evaluate_task( Task $task ) {
 		// User tasks are not evaluated.
-		if ( has_term( 'user', 'prpl_recommendations_provider', $task->ID ) ) {
+		if ( \has_term( 'user', 'prpl_recommendations_provider', $task->ID ) ) {
 			return false;
 		}
 

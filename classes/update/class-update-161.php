@@ -12,9 +12,9 @@ namespace Progress_Planner\Update;
  *
  * @package Progress_Planner
  */
-class Update_150 {
+class Update_161 {
 
-	const VERSION = '1.5.0';
+	const VERSION = '1.6.1';
 
 	/**
 	 * Run the update.
@@ -22,7 +22,37 @@ class Update_150 {
 	 * @return void
 	 */
 	public function run() {
+		// Migrate the badges.
+		$this->migrate_badges();
+
+		// Migrate the tasks.
 		$this->migrate_tasks();
+	}
+
+	/**
+	 * Migrate the badges.
+	 *
+	 * @return void
+	 */
+	private function migrate_badges() {
+		// Get all badges.
+		$badges = \progress_planner()->get_settings()->get( 'badges', [] );
+
+		foreach ( $badges as $badge_id => $badge ) {
+
+			// We are only migrating monthly badges.
+			if ( 0 !== \strpos( $badge_id, 'monthly-' ) ) {
+				continue;
+			}
+
+			if ( ! isset( $badges[ $badge_id ]['points'] ) ) {
+				// We are just adding the points to the badge, for the new data structure - 10 is the max points for a badge.
+				$badges[ $badge_id ]['points'] = 10 - (int) $badge['remaining'];
+			}
+		}
+
+		// Set the badges.
+		\progress_planner()->get_settings()->set( 'badges', $badges );
 	}
 
 	/**
@@ -116,11 +146,11 @@ class Update_150 {
 			// Snoozed tasks have a time.
 			if ( isset( $task['time'] ) ) {
 				// Checking if task was snoozed forever (PHP_INT_MAX).
-				$task_details['time'] = is_float( $task['time'] ) ? strtotime( '+10 years' ) : $task['time'];
+				$task_details['time'] = \is_float( $task['time'] ) ? \strtotime( '+10 years' ) : $task['time'];
 			}
 
 			// Add target data to the task details, we need them in the details as well.
-			$task_details = array_merge( $task_details, $target_data );
+			$task_details = \array_merge( $task_details, $target_data );
 
 			// Add status to the task details.
 			$task_details['post_status'] = $task['status'];

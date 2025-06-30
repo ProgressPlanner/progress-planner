@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Tests;
 
-use DateTime;
 use Progress_Planner\Actions\Content;
 use WP_UnitTestCase;
 
@@ -43,7 +42,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		];
 
 		// Insert a post and verify the hook was called.
-		$post_id = wp_insert_post( $post_data );
+		$post_id = \wp_insert_post( $post_data );
 
 		// Assert that activities were created.
 		$activities = \progress_planner()->get_activities__query()->query_activities(
@@ -63,7 +62,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 	 */
 	public function test_transition_post_status_hook() {
 		// Create a draft post.
-		$post_id = wp_insert_post(
+		$post_id = \wp_insert_post(
 			[
 				'post_title'   => 'Draft Post',
 				'post_content' => 'Draft content',
@@ -72,7 +71,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		);
 
 		// Publish the post.
-		wp_publish_post( $post_id );
+		\wp_publish_post( $post_id );
 
 		// Assert that publish activity was created.
 		$activities = \progress_planner()->get_activities__query()->query_activities(
@@ -93,7 +92,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 	 */
 	public function test_trash_post_hook() {
 		// Create a post.
-		$post_id = wp_insert_post(
+		$post_id = \wp_insert_post(
 			[
 				'post_title'  => 'Test Post',
 				'post_status' => 'publish',
@@ -101,7 +100,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		);
 
 		// Trash the post.
-		wp_trash_post( $post_id );
+		\wp_trash_post( $post_id );
 
 		// Assert that trash activity was created.
 		$activities = \progress_planner()->get_activities__query()->query_activities(
@@ -122,7 +121,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 	 */
 	public function test_delete_post_hook() {
 		// Create a post.
-		$post_id = wp_insert_post(
+		$post_id = \wp_insert_post(
 			[
 				'post_title'  => 'Test Post',
 				'post_status' => 'publish',
@@ -130,7 +129,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		);
 
 		// Delete the post.
-		wp_delete_post( $post_id, true );
+		\wp_delete_post( $post_id, true );
 
 		// Assert that delete activity was created.
 		$activities = \progress_planner()->get_activities__query()->query_activities(
@@ -151,7 +150,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 	 */
 	public function test_multiple_status_transitions() {
 		// Create a draft post.
-		$post_id = wp_insert_post(
+		$post_id = \wp_insert_post(
 			[
 				'post_title'   => 'Test Post',
 				'post_content' => 'Test content',
@@ -171,7 +170,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		$this->assertCount( 0, $activities );
 
 		// Transition to pending.
-		wp_update_post(
+		\wp_update_post(
 			[
 				'ID'          => $post_id,
 				'post_status' => 'pending',
@@ -190,7 +189,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		$this->assertCount( 0, $activities );
 
 		// Transition to publish and update content (insert publish activity).
-		wp_update_post(
+		\wp_update_post(
 			[
 				'ID'           => $post_id,
 				'post_content' => 'Updated content.',
@@ -198,7 +197,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		);
 
 		// Transition back to draft.
-		wp_update_post(
+		\wp_update_post(
 			[
 				'ID'          => $post_id,
 				'post_status' => 'draft',
@@ -206,7 +205,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		);
 
 		// Transition to publish and update content again (since the post is updated less then 12 hours, we should not add an update activity because 'publish' activity is already created).
-		wp_update_post(
+		\wp_update_post(
 			[
 				'ID'           => $post_id,
 				'post_status'  => 'publish',
@@ -224,7 +223,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		);
 
 		// Get the types in order.
-		$types = array_map(
+		$types = \array_map(
 			function ( $activity ) {
 				return $activity->type;
 			},
@@ -243,9 +242,9 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		parent::tearDown();
 
 		// Clean up any posts created during the test.
-		$posts = get_posts( [ 'numberposts' => -1 ] );
+		$posts = \get_posts( [ 'numberposts' => -1 ] );
 		foreach ( $posts as $post ) {
-			wp_delete_post( $post->ID, true );
+			\wp_delete_post( $post->ID, true );
 		}
 	}
 }

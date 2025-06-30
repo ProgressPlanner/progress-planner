@@ -101,8 +101,8 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 		}
 
 		// There should be 3 steps in the workout.
-		$workout_was_completed = 3 === count( $old_value['workouts']['orphaned']['finishedSteps'] );
-		$workout_completed     = 3 === count( $value['workouts']['orphaned']['finishedSteps'] );
+		$workout_was_completed = 3 === \count( $old_value['workouts']['orphaned']['finishedSteps'] );
+		$workout_completed     = 3 === \count( $value['workouts']['orphaned']['finishedSteps'] );
 
 		// Dismiss the task if workout wasn't completed before and now is.
 		if ( ! $workout_was_completed && $workout_completed ) {
@@ -125,7 +125,7 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_description() {
-		return sprintf(
+		return \sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Improve your internal linking structure with Yoast SEO\'s Orphaned Content Workout. %s.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/run-orphaned-content-workout" target="_blank"  data-prpl_accessibility_text="' . \esc_attr__( 'Learn more about the Yoast SEO Orphaned Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Lean more', 'progress-planner' ) . '</a>'
@@ -138,7 +138,7 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_url() {
-		return \esc_url( admin_url( 'admin.php?page=wpseo_workouts#orphaned' ) );
+		return \esc_url( \admin_url( 'admin.php?page=wpseo_workouts#orphaned' ) );
 	}
 
 	/**
@@ -147,7 +147,7 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( ! defined( 'WPSEO_PREMIUM_VERSION' ) ) {
+		if ( ! \defined( 'WPSEO_PREMIUM_VERSION' ) ) {
 			return false;
 		}
 

@@ -138,7 +138,7 @@ class Update_Term_Description extends Tasks {
 	public function get_description_with_data( $task_data = [] ) {
 		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 
-		return $term && ! \is_wp_error( $term ) ? sprintf(
+		return $term && ! \is_wp_error( $term ) ? \sprintf(
 			/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/taxonomy-terms-description" target="_blank">Read more</a> link */
 			\esc_html__( 'Your "%1$s" archives probably show the description of that specific term. %2$s', 'progress-planner' ),
 			$term->name,
@@ -184,26 +184,9 @@ class Update_Term_Description extends Tasks {
 			return true;
 		}
 
-		$term_description = trim( $term->description );
+		$term_description = \trim( $term->description );
 
 		return '' !== $term_description && '&nbsp;' !== $term_description;
-	}
-
-	/**
-	 * Transform data collector data into task data format.
-	 *
-	 * @param array $data The data from data collector.
-	 * @return array The transformed data with original data merged.
-	 */
-	protected function transform_collector_data( array $data ): array {
-		return array_merge(
-			$data,
-			[
-				'target_term_id'   => $data['term_id'],
-				'target_taxonomy'  => $data['taxonomy'],
-				'target_term_name' => $data['name'],
-			]
-		);
 	}
 
 	/**
@@ -319,6 +302,6 @@ class Update_Term_Description extends Tasks {
 	 * @return array
 	 */
 	public function exclude_completed_terms( $exclude_term_ids ) {
-		return array_merge( $exclude_term_ids, $this->get_completed_term_ids() );
+		return \array_merge( $exclude_term_ids, $this->get_completed_term_ids() );
 	}
 }

@@ -64,10 +64,10 @@ final class Monthly extends Badge {
 			? new \DateTime( 'last day of December next year' )
 			: new \DateTime( 'last day of December this year' );
 
-		$dates = iterator_to_array( new \DatePeriod( $start_date, new \DateInterval( 'P1M' ), $end_date ), false );
+		$dates = \iterator_to_array( new \DatePeriod( $start_date, new \DateInterval( 'P1M' ), $end_date ), false );
 
 		// To make sure keys are defined only once and consistent.
-		$self_months = array_keys( self::get_months() );
+		$self_months = \array_keys( self::get_months() );
 
 		foreach ( $dates as $date ) {
 			$year  = (int) $date->format( 'Y' );
@@ -129,8 +129,8 @@ final class Monthly extends Badge {
 	 * @return \Progress_Planner\Badges\Monthly|null
 	 */
 	public static function get_instance_from_id( $badge_id ) {
-		$year  = (int) explode( '-', str_replace( 'monthly-', '', $badge_id ) )[0];
-		$month = (int) str_replace( 'm', '', explode( '-', str_replace( 'monthly-', '', $badge_id ) )[1] );
+		$year  = (int) \explode( '-', \str_replace( 'monthly-', '', $badge_id ) )[0];
+		$month = (int) \str_replace( 'm', '', \explode( '-', \str_replace( 'monthly-', '', $badge_id ) )[1] );
 
 		$instances = self::get_instances();
 
@@ -198,7 +198,7 @@ final class Monthly extends Badge {
 	 * @return string
 	 */
 	public function get_year() {
-		return explode( '-', str_replace( 'monthly-', '', $this->id ) )[0];
+		return \explode( '-', \str_replace( 'monthly-', '', $this->id ) )[0];
 	}
 
 	/**
@@ -207,7 +207,7 @@ final class Monthly extends Badge {
 	 * @return string
 	 */
 	public function get_month() {
-		return str_replace( 'm', '', explode( '-', str_replace( 'monthly-', '', $this->id ) )[1] );
+		return \str_replace( 'm', '', \explode( '-', \str_replace( 'monthly-', '', $this->id ) )[1] );
 	}
 
 	/**
@@ -234,7 +234,7 @@ final class Monthly extends Badge {
 		$month_num = (int) $this->get_month();
 
 		$start_date = \DateTime::createFromFormat( 'Y-m-d', "{$year}-{$month_num}-01" );
-		$end_date   = \DateTime::createFromFormat( 'Y-m-d', "{$year}-{$month_num}-" . gmdate( 't', strtotime( $month ) ) );
+		$end_date   = \DateTime::createFromFormat( 'Y-m-d', "{$year}-{$month_num}-" . \gmdate( 't', \strtotime( $month ) ) );
 
 		// Get the activities for the month.
 		$activities = \progress_planner()->get_activities__query()->query_activities(
@@ -251,8 +251,8 @@ final class Monthly extends Badge {
 		}
 
 		$return_progress = [
-			'progress'  => (int) max( 0, min( 100, floor( 100 * $points / self::TARGET_POINTS ) ) ),
-			'remaining' => (int) max( 0, min( self::TARGET_POINTS - $points, 10 ) ),
+			'progress'  => (int) \max( 0, \min( 100, \floor( 100 * $points / self::TARGET_POINTS ) ) ),
+			'remaining' => (int) \max( 0, \min( self::TARGET_POINTS - $points, 10 ) ),
 			'points'    => $points,
 		];
 
@@ -264,8 +264,8 @@ final class Monthly extends Badge {
 
 		$points += $this->get_next_badges_excess_points();
 		return [
-			'progress'  => (int) max( 0, min( 100, floor( 100 * $points / self::TARGET_POINTS ) ) ),
-			'remaining' => (int) max( 0, min( self::TARGET_POINTS - $points, 10 ) ),
+			'progress'  => (int) \max( 0, \min( 100, \floor( 100 * $points / self::TARGET_POINTS ) ) ),
+			'remaining' => (int) \max( 0, \min( self::TARGET_POINTS - $points, 10 ) ),
 			'points'    => $points,
 		];
 	}
@@ -306,8 +306,8 @@ final class Monthly extends Badge {
 			}
 		}
 
-		$excess_points  = max( 0, $next_1_badge_points - self::TARGET_POINTS );
-		$excess_points += max( 0, $next_2_badge_points - 2 * self::TARGET_POINTS );
+		$excess_points  = \max( 0, $next_1_badge_points - self::TARGET_POINTS );
+		$excess_points += \max( 0, $next_2_badge_points - 2 * self::TARGET_POINTS );
 
 		return (int) $excess_points;
 	}

@@ -121,7 +121,7 @@ class Task {
 	 * @return bool
 	 */
 	public function is_completed(): bool {
-		return isset( $this->data['post_status'] ) && in_array( $this->data['post_status'], [ 'trash', 'pending' ], true );
+		return isset( $this->data['post_status'] ) && \in_array( $this->data['post_status'], [ 'trash', 'pending' ], true );
 	}
 
 	/**
@@ -187,18 +187,18 @@ class Task {
 			$post_id = $this->ID;
 		}
 
-		$post = get_post( $post_id );
+		$post = \get_post( $post_id );
 		if ( ! $post ) {
 			return [];
 		}
 
 		// Make sure WP_REST_Posts_Controller is loaded.
-		if ( ! class_exists( 'WP_REST_Posts_Controller' ) ) {
+		if ( ! \class_exists( 'WP_REST_Posts_Controller' ) ) {
 			require_once ABSPATH . 'wp-includes/rest-api/endpoints/class-wp-rest-posts-controller.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
 
 		// Make sure WP_REST_Request is loaded.
-		if ( ! class_exists( 'WP_REST_Request' ) ) {
+		if ( ! \class_exists( 'WP_REST_Request' ) ) {
 			require_once ABSPATH . 'wp-includes/rest-api/class-wp-rest-request.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
 

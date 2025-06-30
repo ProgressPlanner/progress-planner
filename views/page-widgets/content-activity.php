@@ -5,7 +5,7 @@
  * @package Progress_Planner
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -13,15 +13,15 @@ $prpl_widget = \progress_planner()->get_admin__widgets__content_activity();
 
 $prpl_activity_types = [
 	'publish' => [
-		'label' => __( 'Content published', 'progress-planner' ),
+		'label' => \__( 'Content published', 'progress-planner' ),
 		'color' => 'var(--prpl-color-accent-green)',
 	],
 	'update'  => [
-		'label' => __( 'Content updated', 'progress-planner' ),
+		'label' => \__( 'Content updated', 'progress-planner' ),
 		'color' => 'var(--prpl-color-accent-purple)',
 	],
 	'delete'  => [
-		'label' => __( 'Content deleted', 'progress-planner' ),
+		'label' => \__( 'Content deleted', 'progress-planner' ),
 		'color' => 'var(--prpl-color-accent-red)',
 	],
 ];
@@ -31,7 +31,7 @@ $prpl_activities_count   = [
 	'all' => 0,
 ];
 
-foreach ( array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
+foreach ( \array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
 	// Default count.
 	$prpl_activities_count[ $prpl_activity_type ] = 0;
 
@@ -48,16 +48,16 @@ foreach ( array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
 	if ( $prpl_activities ) {
 		if ( 'delete' !== $prpl_activity_type ) {
 			// Filter the activities to only include the tracked post types.
-			$prpl_activities = array_filter(
+			$prpl_activities = \array_filter(
 				$prpl_activities,
 				function ( $activity ) use ( $prpl_tracked_post_types ) {
-					return in_array( get_post_type( $activity->data_id ), $prpl_tracked_post_types, true );
+					return \in_array( \get_post_type( $activity->data_id ), $prpl_tracked_post_types, true );
 				}
 			);
 		}
 
 		// Update the count.
-		$prpl_activities_count[ $prpl_activity_type ] = count( $prpl_activities );
+		$prpl_activities_count[ $prpl_activity_type ] = \count( $prpl_activities );
 	}
 
 	$prpl_activities_count['all'] += $prpl_activities_count[ $prpl_activity_type ];

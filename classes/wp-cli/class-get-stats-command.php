@@ -12,7 +12,7 @@ use WP_CLI, WP_CLI_Command;
 use Progress_Planner\Base;
 use Progress_Planner\Admin\Widgets\Activity_Scores;
 
-if ( ! class_exists( 'WP_CLI_Command' ) ) {
+if ( ! \class_exists( 'WP_CLI_Command' ) ) {
 	return;
 }
 
@@ -40,6 +40,6 @@ class Get_Stats_Command extends \WP_CLI_Command {
 	 */
 	public function get_stats( $args, $assoc_args ) {
 		$system_status = new \Progress_Planner\Utils\System_Status();
-		\WP_CLI::log( wp_json_encode( $system_status->get_system_status() ) ); // @phpstan-ignore-line
+		\WP_CLI::log( \wp_json_encode( $system_status->get_system_status() ) ); // @phpstan-ignore-line
 	}
 }

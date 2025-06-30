@@ -1,8 +1,24 @@
+= 1.7.0 =
+
+Bugs we fixed:
+
+* Fix issue where "Perform all updates" task was incorrectly marked as completed.
+
+
+= 1.6.1 =
+
+Bugs we fixed:
+
+* "Collect your point" not closing the "Test if your website can send emails correctly" popover.
+* Snooze task tooltip overaly not closing properly.
+* Properly trigger migration from v1.5.0.
+
 = 1.6.0 =
 
 Enhancements:
 
 * Allow users to collect extra points for previous months' badges.
+* Added WP-CLI commands to manage recommendations.
 
 Under the hood:
 

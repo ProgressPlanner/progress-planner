@@ -47,8 +47,8 @@ class Uncategorized_Category extends Base_Data_Collector {
 	 */
 	protected function calculate_data() {
 		global $wpdb;
-		$default_category_name = __( 'Uncategorized' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
-		$default_category_slug = sanitize_title( _x( 'Uncategorized', 'Default category slug' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+		$default_category_name = \__( 'Uncategorized' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+		$default_category_slug = \sanitize_title( \_x( 'Uncategorized', 'Default category slug' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 
 		// Get the Uncategorized category by name or slug.
 		$uncategorized_category = (int) $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching

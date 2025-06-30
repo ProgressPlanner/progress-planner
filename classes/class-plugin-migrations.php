@@ -66,24 +66,24 @@ class Plugin_Migrations {
 	 */
 	public function maybe_upgrade() {
 		// If the current version is the same as the plugin version, do nothing.
-		if ( version_compare( $this->db_version, $this->version, '=' ) &&
+		if ( \version_compare( $this->db_version, $this->version, '=' ) &&
 			! \get_option( 'prpl_debug_migrations' )
 		) {
 			return;
 		}
 
 		// Get all available updates, as an array of integers.
-		$updates_files = glob( PROGRESS_PLANNER_DIR . '/classes/update/*.php' );
-		if ( ! is_array( $updates_files ) ) {
+		$updates_files = \glob( PROGRESS_PLANNER_DIR . '/classes/update/*.php' );
+		if ( ! \is_array( $updates_files ) ) {
 			return;
 		}
-		$updates = array_map(
+		$updates = \array_map(
 			function ( $file ) {
-				return str_replace( 'class-update-', '', basename( $file, '.php' ) );
+				return \str_replace( 'class-update-', '', \basename( $file, '.php' ) );
 			},
 			$updates_files
 		);
-		sort( $updates );
+		\sort( $updates );
 
 		// Run the upgrades.
 		foreach ( $updates as $version_int ) {
@@ -91,10 +91,10 @@ class Plugin_Migrations {
 			$version       = $upgrade_class::VERSION;
 			if (
 				\get_option( 'prpl_debug_migrations' ) ||
-				version_compare( $version, $this->db_version, '>' )
+				\version_compare( $version, $this->db_version, '>' )
 			) {
 				$upgrade_class = new $upgrade_class();
-				if ( method_exists( $upgrade_class, 'run' ) ) {
+				if ( \method_exists( $upgrade_class, 'run' ) ) {
 					$upgrade_class->run();
 				}
 			}
@@ -111,6 +111,6 @@ class Plugin_Migrations {
 		 * @param string $version The new version of the plugin.
 		 * @param string $db_version The old version of the plugin.
 		 */
-		do_action( 'progress_planner_plugin_updated', $this->version, $this->db_version );
+		\do_action( 'progress_planner_plugin_updated', $this->version, $this->db_version );
 	}
 }
