@@ -43,29 +43,26 @@ trait Dismissable_Task {
 	/**
 	 * Handle task dismissal by storing the task data and dismissal date.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param string $post_id The post ID.
 	 *
 	 * @return void
 	 */
-	public function handle_task_dismissal( $task_id ) {
-
+	public function handle_task_dismissal( $post_id ) {
 		// If no task ID is provided, return.
-		if ( ! $task_id ) {
+		if ( ! $post_id ) {
 			return;
 		}
 
 		// Get the task data.
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $post_id );
 
 		// If no task data is found, return.
-		if ( ! $tasks ) {
+		if ( ! $task ) {
 			return;
 		}
 
-		$task_data = $tasks[0];
-
 		// If the task provider ID does not match, return.
-		if ( ! isset( $task_data['provider_id'] ) || $this->get_provider_id() !== $task_data['provider_id'] ) {
+		if ( ! isset( $task->provider->slug ) || $this->get_provider_id() !== $task->provider->slug ) {
 			return;
 		}
 
@@ -81,7 +78,7 @@ trait Dismissable_Task {
 		}
 
 		// Get the task identifier.
-		$task_identifier = $this->get_task_identifier( $task_data );
+		$task_identifier = $this->get_task_identifier( $task->get_data() );
 
 		// If no task identifier is found, return.
 		if ( ! $task_identifier ) {
@@ -90,8 +87,8 @@ trait Dismissable_Task {
 
 		// Store the task dismissal data.
 		$dismissal_data = [
-			'date'      => gmdate( 'YW' ),
-			'timestamp' => time(),
+			'date'      => \gmdate( 'YW' ),
+			'timestamp' => \time(),
 		];
 
 		/**
@@ -101,7 +98,7 @@ trait Dismissable_Task {
 		 * @param array  $task_data      The task data.
 		 * @param string $provider_id    The provider ID.
 		 */
-		$dismissal_data = \apply_filters( 'progress_planner_task_dismissal_data', $dismissal_data, $task_data, $provider_id );
+		$dismissal_data = \apply_filters( 'progress_planner_task_dismissal_data', $dismissal_data, $task->get_data(), $provider_id );
 
 		$dismissed_tasks[ $provider_id ][ $task_identifier ] = $dismissal_data;
 
@@ -120,12 +117,12 @@ trait Dismissable_Task {
 	protected function get_task_identifier( $task_data ) {
 		$task_identifier = $this->get_provider_id();
 
-		if ( isset( $task_data['post_id'] ) ) {
-			$task_identifier .= '-' . $task_data['post_id'];
+		if ( isset( $task_data['target_post_id'] ) ) {
+			$task_identifier .= '-' . $task_data['target_post_id'];
 		}
 
-		if ( isset( $task_data['term_id'] ) ) {
-			$task_identifier .= '-' . $task_data['term_id'];
+		if ( isset( $task_data['target_term_id'] ) ) {
+			$task_identifier .= '-' . $task_data['target_term_id'];
 		}
 
 		return $task_identifier;
@@ -166,12 +163,12 @@ trait Dismissable_Task {
 		$dismissal_data = $dismissed_tasks[ $provider_key ][ $task_identifier ];
 
 		// If the task was dismissed in the current week, don't show it again.
-		if ( $dismissal_data['date'] === gmdate( 'YW' ) ) {
+		if ( $dismissal_data['date'] === \gmdate( 'YW' ) ) {
 			return true;
 		}
 
 		// If the task was dismissed more than the expiration period ago, we can show it again.
-		if ( ( time() - $dismissal_data['timestamp'] ) > $this->get_expiration_period( $dismissal_data ) ) {
+		if ( ( \time() - $dismissal_data['timestamp'] ) > $this->get_expiration_period( $dismissal_data ) ) {
 			unset( $dismissed_tasks[ $provider_key ][ $task_identifier ] );
 			\progress_planner()->get_settings()->set( $this->dismissed_tasks_option, $dismissed_tasks );
 			return false;
@@ -187,9 +184,7 @@ trait Dismissable_Task {
 	 */
 	public function get_dismissed_tasks() {
 		$dismissed_tasks = \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
-		$provider_key    = $this->get_provider_id();
-
-		return $dismissed_tasks[ $provider_key ] ?? [];
+		return $dismissed_tasks[ $this->get_provider_id() ] ?? [];
 	}
 
 	/**
@@ -213,7 +208,7 @@ trait Dismissable_Task {
 
 		$has_changes = false;
 		foreach ( $dismissed_tasks[ $provider_key ] as $identifier => $data ) {
-			if ( ( time() - $data['timestamp'] ) > $this->get_expiration_period( $data ) ) {
+			if ( ( \time() - $data['timestamp'] ) > $this->get_expiration_period( $data ) ) {
 				unset( $dismissed_tasks[ $provider_key ][ $identifier ] );
 				$has_changes = true;
 			}
@@ -237,8 +232,8 @@ trait Dismissable_Task {
 	 * @return array
 	 */
 	public function add_post_id_to_dismissal_data( $dismissal_data, $task_data, $provider_id ) {
-		if ( $this->get_provider_id() === $provider_id && isset( $task_data['post_id'] ) ) {
-			$dismissal_data['post_id'] = $task_data['post_id'];
+		if ( $this->get_provider_id() === $provider_id && isset( $task_data['target_post_id'] ) ) {
+			$dismissal_data['post_id'] = $task_data['target_post_id'];
 		}
 		return $dismissal_data;
 	}
@@ -253,8 +248,8 @@ trait Dismissable_Task {
 	 * @return array
 	 */
 	public function add_term_id_to_dismissal_data( $dismissal_data, $task_data, $provider_id ) {
-		if ( $this->get_provider_id() === $provider_id && isset( $task_data['term_id'] ) ) {
-			$dismissal_data['term_id'] = $task_data['term_id'];
+		if ( $this->get_provider_id() === $provider_id && isset( $task_data['target_term_id'] ) ) {
+			$dismissal_data['term_id'] = $task_data['target_term_id'];
 		}
 		return $dismissal_data;
 	}

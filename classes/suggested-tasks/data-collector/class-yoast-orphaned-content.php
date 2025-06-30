@@ -29,7 +29,7 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 	 * @return void
 	 */
 	public function init() {
-		if ( ! function_exists( 'YoastSEO' ) ) {
+		if ( ! \function_exists( 'YoastSEO' ) ) {
 			return;
 		}
 
@@ -57,7 +57,7 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 	 * @return array
 	 */
 	protected function calculate_data() {
-		if ( ! function_exists( 'YoastSEO' ) ) {
+		if ( ! \function_exists( 'YoastSEO' ) ) {
 			return [];
 		}
 
@@ -69,19 +69,19 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 		$post_types_in     = '';
 
 		if ( ! empty( $public_post_types ) ) {
-			$post_types_in = array_map(
+			$post_types_in = \array_map(
 				function ( $type ) {
-					return (string) esc_sql( $type );
+					return (string) \esc_sql( $type );
 				},
-				array_values( $public_post_types )
+				\array_values( $public_post_types )
 			);
-			$post_types_in = "p.post_type IN ('" . implode( "','", $post_types_in ) . "')";
+			$post_types_in = "p.post_type IN ('" . \implode( "','", $post_types_in ) . "')";
 
 			$where_clause .= " AND $post_types_in";
 		}
 
 		// Exclude "Hello World" and "Sample Page" posts, use array_filter() to remove empty values.
-		$exclude_post_ids = array_filter(
+		$exclude_post_ids = \array_filter(
 			[
 				( new Hello_World() )->collect(),
 				( new Sample_Page() )->collect(),
@@ -96,18 +96,18 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 		$exclude_post_ids = \apply_filters( 'progress_planner_yoast_orphaned_content_exclude_post_ids', $exclude_post_ids );
 
 		if ( ! empty( $exclude_post_ids ) ) {
-			$exclude_post_ids = array_map( 'intval', $exclude_post_ids );
-			$where_clause    .= ' AND p.ID NOT IN (' . implode( ',', $exclude_post_ids ) . ')';
+			$exclude_post_ids = \array_map( 'intval', $exclude_post_ids );
+			$where_clause    .= ' AND p.ID NOT IN (' . \implode( ',', $exclude_post_ids ) . ')';
 		}
 
 		$query = "
 			SELECT p.ID AS post_id, p.post_title AS post_title
 			FROM {$wpdb->posts} p
 			LEFT JOIN (
-				SELECT DISTINCT target_post_id
-				FROM {$wpdb->prefix}yoast_seo_links
-				WHERE type = 'internal'
-				AND target_post_id IS NOT NULL
+				SELECT DISTINCT l.target_post_id
+				FROM {$wpdb->prefix}yoast_seo_links l
+				WHERE l.type = 'internal'
+				AND l.target_post_id IS NOT NULL
 			) l ON p.ID = l.target_post_id
 			WHERE {$where_clause}
 			AND l.target_post_id IS NULL

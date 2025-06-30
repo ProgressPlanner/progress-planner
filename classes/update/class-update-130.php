@@ -7,7 +7,7 @@
 
 namespace Progress_Planner\Update;
 
-use Progress_Planner\Suggested_Tasks\Task_Factory;
+use Progress_Planner\Utils\Plugin_Migration_Helpers;
 use Progress_Planner\Suggested_Tasks\Task;
 
 /**
@@ -83,7 +83,6 @@ class Update_130 {
 				'type'     => 'completed',
 			],
 		) as $activity ) {
-
 			$continue_main_loop = false;
 
 			// Check if the task with the same task_id exists, it means that task was recreated (and has pending status now).
@@ -135,20 +134,15 @@ class Update_130 {
 	 * @return array The data.
 	 */
 	private function get_data_from_task_id( $task_id ) {
+		$task_object = Plugin_Migration_Helpers::parse_task_data_from_task_id( $task_id );
 
-		$task_object = Task_Factory::create_task_from( 'id', $task_id );
-
-		if ( 0 === strpos( $task_object->get_task_id(), 'create-post-' ) || 0 === strpos( $task_object->get_task_id(), 'create-post-short-' ) ) {
+		if ( 0 === \strpos( $task_object->get_task_id(), 'create-post-' ) || 0 === \strpos( $task_object->get_task_id(), 'create-post-short-' ) ) {
 			$task_object = $this->handle_legacy_post_tasks( $task_object );
-		}
-
-		// Review post task is not recognized by the Task_Factory (because it changed from piped format: post_id/2949|type/update-post -> review-post-2949-202415).
-		if ( 0 === strpos( $task_object->get_task_id(), 'review-post-' ) ) {
+		} elseif ( 0 === \strpos( $task_object->get_task_id(), 'review-post-' ) ) {
+			// Review post task is not recognized by the Task_Factory (because it changed from piped format: post_id/2949|type/update-post -> review-post-2949-202415).
 			$task_object = $this->handle_legacy_review_post_tasks( $task_object );
-		}
-
-		// Yoast SEO tasks and Comment Hacks tasks are not recognized by the Task_Factory, since they are added recently.
-		if ( 0 === strpos( $task_object->get_task_id(), 'yoast-' ) || 0 === strpos( $task_object->get_task_id(), 'ch-comment' ) ) {
+		} elseif ( 0 === \strpos( $task_object->get_task_id(), 'yoast-' ) || 0 === \strpos( $task_object->get_task_id(), 'ch-comment' ) ) {
+			// Yoast SEO tasks and Comment Hacks tasks are not recognized by the Task_Factory, since they are added recently.
 			$task_object = $this->handle_legacy_yoast_and_comment_hacks_tasks( $task_object );
 		}
 
@@ -164,14 +158,14 @@ class Update_130 {
 	 */
 	private function handle_legacy_post_tasks( $task_object ) {
 		// Handle legacy long post tasks, here we just need to set 'long' flag to true.
-		if ( 0 === strpos( $task_object->get_task_id(), 'create-post-long-' ) ) {
+		if ( 0 === \strpos( $task_object->get_task_id(), 'create-post-long-' ) ) {
 			$data         = $task_object->get_data();
 			$data['long'] = true;
 			$task_object->set_data( $data );
 		}
 
 		// Handle legacy short post tasks, here we just need to set 'long' flag to false.
-		if ( 0 === strpos( $task_object->get_task_id(), 'create-post-short-' ) ) {
+		if ( 0 === \strpos( $task_object->get_task_id(), 'create-post-short-' ) ) {
 			$data         = $task_object->get_data();
 			$data['long'] = false;
 			$task_object->set_data( $data );
@@ -192,7 +186,7 @@ class Update_130 {
 		$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( 'review-post' );
 
 		// Get the post ID and date from the task ID.
-		$parts = explode( '-', $task_object->get_task_id() );
+		$parts = \explode( '-', $task_object->get_task_id() );
 
 		$data = [
 			'task_id'     => $task_object->get_task_id(),
@@ -215,14 +209,13 @@ class Update_130 {
 	 * @return Task The task object.
 	 */
 	private function handle_legacy_yoast_and_comment_hacks_tasks( $task_object ) {
-
-		$data = [
-			'task_id'     => $task_object->get_task_id(),
-			'provider_id' => $task_object->get_task_id(),
-			'category'    => 'configuration',
-		];
-
-		$task_object->set_data( $data );
+		$task_object->set_data(
+			[
+				'task_id'     => $task_object->get_task_id(),
+				'provider_id' => $task_object->get_task_id(),
+				'category'    => 'configuration',
+			]
+		);
 
 		return $task_object;
 	}

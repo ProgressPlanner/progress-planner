@@ -29,36 +29,37 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-crawl-settings-feed-authors';
 
 	/**
-	 * The data collector.
+	 * The data collector class name.
 	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author
+	 * @var string
 	 */
-	protected $data_collector;
+	protected const DATA_COLLECTOR_CLASS = Post_Author::class;
 
 	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->data_collector = new Post_Author();
-		$this->url            = \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_authors' );
-	}
-
-	/**
-	 * Get the title.
+	 * Get the task URL.
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_authors' );
+	}
+
+	/**
+	 * Get the task title.
+	 *
+	 * @return string
+	 */
+	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: remove post authors feeds', 'progress-planner' );
 	}
 
 	/**
-	 * Get the description.
+	 * Get the task description.
 	 *
 	 * @return string
 	 */
-	public function get_description() {
-		return sprintf(
+	protected function get_description() {
+		return \sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Remove URLs which provide information about recent posts by specific authors. %s.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/yoast-crawl-optimization-feed-authors" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Crawl Optimization Feed Authors', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
@@ -90,7 +91,6 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-
 		if ( ! $this->is_task_relevant() ) {
 			return false;
 		}
@@ -115,10 +115,6 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	 */
 	public function is_task_relevant() {
 		// If there is more than one author, we don't need to add the task.
-		if ( $this->data_collector->collect() > self::MINIMUM_AUTHOR_WITH_POSTS ) {
-			return false;
-		}
-
-		return true;
+		return $this->get_data_collector()->collect() <= self::MINIMUM_AUTHOR_WITH_POSTS;
 	}
 }

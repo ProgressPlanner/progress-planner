@@ -5,7 +5,7 @@
  * @package Progress_Planner
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -40,4 +40,5 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</prpl-tooltip>
 	</span>
 </p>
+
 <?php \progress_planner()->get_admin__widgets__todo()->the_todo_list(); ?>

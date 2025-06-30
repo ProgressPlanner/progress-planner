@@ -6,7 +6,7 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 ?>
@@ -39,8 +39,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<div class="prpl-popover-column">
 		<?php
 		$prpl_badges_groups = [
-			'content'     => __( 'Writing badges', 'progress-planner' ),
-			'maintenance' => __( 'Streak badges', 'progress-planner' ),
+			'content'     => \__( 'Writing badges', 'progress-planner' ),
+			'maintenance' => \__( 'Streak badges', 'progress-planner' ),
 		];
 		?>
 		<?php foreach ( $prpl_badges_groups as $prpl_badge_group => $prpl_widget_title ) : ?>
@@ -62,7 +62,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 							>
 								<prpl-badge
 									complete="<?php echo $prpl_badge_completed ? 'true' : 'false'; ?>"
-									badge-id="<?php echo esc_attr( $prpl_badge->get_id() ); ?>"
+									badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
 								></prpl-badge>
 								<p><?php echo \esc_html( $prpl_badge->get_name() ); ?></p>
 							</span>

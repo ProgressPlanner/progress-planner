@@ -1,5 +1,6 @@
 const { test, expect, chromium } = require( '@playwright/test' );
 const SELECTORS = require( '../constants/selectors' );
+const { cleanUpPlannerTasks } = require( '../helpers/cleanup' );
 
 const CREATE_TASK_TEXT = 'Test task to create';
 const DELETE_TASK_TEXT = 'Test task to delete';
@@ -20,53 +21,11 @@ function todoTests( testContext = test ) {
 		} );
 
 		testContext.afterEach( async () => {
-			// Clean up any remaining tasks
-			await page.goto(
-				`${ process.env.WORDPRESS_URL }/wp-admin/admin.php?page=progress-planner`
-			);
-			await page.waitForLoadState( 'networkidle' );
-
-			// Clean up active tasks
-			const activeTodoItems = page.locator( SELECTORS.TODO_ITEM );
-
-			while ( ( await activeTodoItems.count() ) > 0 ) {
-				const firstItem = activeTodoItems.first();
-				await firstItem.hover();
-				await page.waitForTimeout( 500 );
-				await firstItem.waitFor( { state: 'visible' } );
-				await firstItem.locator( '.trash' ).click();
-				await page.waitForTimeout( 500 );
-			}
-
-			// Clean up completed tasks if the section exists
-			const completedDetails = page.locator(
-				'details#todo-list-completed-details'
-			);
-
-			if ( await completedDetails.isVisible() ) {
-				await completedDetails.click();
-				await page.waitForTimeout( 500 );
-
-				const completedTodoItems = page.locator(
-					SELECTORS.TODO_COMPLETED_ITEM
-				);
-
-				while ( ( await completedTodoItems.count() ) > 0 ) {
-					const firstItem = completedTodoItems.first();
-					await firstItem.hover();
-					await page.waitForTimeout( 500 );
-					await firstItem.waitFor( { state: 'visible' } );
-					await firstItem.locator( '.trash' ).click();
-					await page.waitForTimeout( 500 );
-				}
-			}
-
-			// Safely close context if it's still open
-			try {
-				await context.close();
-			} catch ( error ) {
-				// Ignore errors if context is already closed
-			}
+			await cleanUpPlannerTasks( {
+				page,
+				context,
+				baseUrl: process.env.WORDPRESS_URL,
+			} );
 		} );
 
 		testContext.afterAll( async () => {
@@ -110,7 +69,7 @@ function todoTests( testContext = test ) {
 			await deleteItem.hover();
 			await deleteItem.waitFor( { state: 'visible' } );
 			await deleteItem.locator( '.trash' ).click();
-			await page.waitForTimeout( 500 );
+			await page.waitForTimeout( 1500 );
 
 			// Verify the todo was deleted
 			const todoItem = page.locator( SELECTORS.TODO_ITEM );

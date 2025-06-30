@@ -27,32 +27,42 @@ class Site_Icon extends Tasks {
 	protected const PROVIDER_ID = 'core-siteicon';
 
 	/**
-	 * Constructor.
+	 * Get the link setting.
+	 *
+	 * @return array
 	 */
-	public function __construct() {
-		$this->url          = \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() );
-		$this->link_setting = [
+	public function get_link_setting() {
+		return [
 			'hook'   => 'options-general.php',
 			'iconEl' => '.site-icon-section th',
 		];
 	}
 
 	/**
-	 * Get the title.
+	 * Get the task URL.
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_url() {
+		return \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() );
+	}
+
+	/**
+	 * Get the task title.
+	 *
+	 * @return string
+	 */
+	protected function get_title() {
 		return \esc_html__( 'Set site icon', 'progress-planner' );
 	}
 
 	/**
-	 * Get the description.
+	 * Get the task description.
 	 *
 	 * @return string
 	 */
-	public function get_description() {
-		return sprintf(
+	protected function get_description() {
+		return \sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/set-site-icon" target="_blank">site icon</a> link */
 			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/set-site-icon" target="_blank">' . \esc_html__( 'site icon', 'progress-planner' ) . '</a>'
