@@ -22,9 +22,9 @@ class Settings_Saved extends Tasks {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'high';
+	protected $priority = 1;
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -34,10 +34,12 @@ class Settings_Saved extends Tasks {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url = \admin_url( 'admin.php?page=progress-planner-settings' );
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=progress-planner-settings' );
 	}
 
 	/**
@@ -45,7 +47,7 @@ class Settings_Saved extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Fill settings page', 'progress-planner' );
 	}
 
@@ -54,7 +56,7 @@ class Settings_Saved extends Tasks {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return \esc_html__( 'Head over to the settings page and fill in the required information.', 'progress-planner' );
 	}
 

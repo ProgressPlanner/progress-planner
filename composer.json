@@ -17,14 +17,15 @@
 		"phpstan/phpstan": "^2.0",
 		"szepeviktor/phpstan-wordpress": "^2.0",
 		"phpstan/extension-installer": "^1.4",
-		"yoast/yoastcs": "^3.0"
+		"yoast/yoastcs": "^3.0",
+		"friendsofphp/php-cs-fixer": "^3.75"
 	},
 	"scripts": {
 		"check-cs": [
 			"@php ./vendor/bin/phpcs -s"
 		],
 		"fix-cs": [
-			"@php ./vendor/bin/phpcbf"
+			"@php ./vendor/bin/phpcbf && ./vendor/bin/php-cs-fixer fix . --allow-risky=yes"
 		],
 		"lint": [
 			"@php ./vendor/php-parallel-lint/php-parallel-lint/parallel-lint . -e php --show-deprecated --exclude vendor --exclude node_modules --exclude .git"

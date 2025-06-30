@@ -17,28 +17,28 @@ class Badges {
 	/**
 	 * Content badges.
 	 *
-	 * @var array<\Progress_Planner\Badges\Badge>
+	 * @var \Progress_Planner\Badges\Badge[]
 	 */
 	private $content = [];
 
 	/**
 	 * Maintenance badges.
 	 *
-	 * @var array<\Progress_Planner\Badges\Badge>
+	 * @var \Progress_Planner\Badges\Badge[]
 	 */
 	private $maintenance = [];
 
 	/**
 	 * Monthly badges.
 	 *
-	 * @var array<\Progress_Planner\Badges\Badge>
+	 * @var \Progress_Planner\Badges\Badge[]
 	 */
 	private $monthly = [];
 
 	/**
 	 * Monthly badges flat.
 	 *
-	 * @var array<\Progress_Planner\Badges\Badge>
+	 * @var \Progress_Planner\Badges\Badge[]
 	 */
 	private $monthly_flat = [];
 
@@ -68,7 +68,7 @@ class Badges {
 		// Init monthly badges.
 		$this->monthly = Monthly::get_instances();
 		foreach ( $this->monthly as $monthly_year_badges ) {
-			$this->monthly_flat = array_merge( $this->monthly_flat, $monthly_year_badges );
+			$this->monthly_flat = \array_merge( $this->monthly_flat, $monthly_year_badges );
 		}
 
 		\add_action( 'progress_planner_suggested_task_completed', [ $this, 'clear_monthly_progress' ] );
@@ -80,7 +80,7 @@ class Badges {
 	 *
 	 * @param string $context The badges context (content|maintenance|monthly).
 	 *
-	 * @return array<\Progress_Planner\Badges\Badge>
+	 * @return \Progress_Planner\Badges\Badge[]
 	 */
 	public function get_badges( $context ) {
 		return isset( $this->$context ) ? $this->$context : [];
@@ -112,7 +112,6 @@ class Badges {
 	 * @return void
 	 */
 	public function clear_monthly_progress( $activity_id ) {
-
 		$activities = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'suggested_task',
@@ -139,17 +138,14 @@ class Badges {
 		}
 	}
 
-
 	/**
 	 * Clear the progress of all badges.
 	 *
 	 * @return void
 	 */
 	public function clear_content_progress() {
-
 		// Clear content saved progress.
 		foreach ( $this->content as $badge ) {
-
 			// If the badge is already complete, skip it.
 			if ( 100 <= $badge->progress_callback()['progress'] ) {
 				continue;
@@ -159,7 +155,6 @@ class Badges {
 			$badge->clear_progress();
 		}
 	}
-
 
 	/**
 	 * Get the latest completed badge.

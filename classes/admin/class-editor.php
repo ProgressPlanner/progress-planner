@@ -35,7 +35,7 @@ class Editor {
 
 		// Check if the page-type is set in the URL (user is coming from the Settings page).
 		if ( isset( $_GET['prpl_page_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$prpl_pt = sanitize_text_field( wp_unslash( $_GET['prpl_page_type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$prpl_pt = \sanitize_text_field( \wp_unslash( $_GET['prpl_page_type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			foreach ( $page_types as $page_type ) {
 				if ( $page_type['slug'] === $prpl_pt ) {

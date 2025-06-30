@@ -36,7 +36,6 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public static function setUpBeforeClass(): void {
-
 		self::set_lessons_cache();
 
 		\progress_planner()->get_page_types()->create_taxonomy();
@@ -81,7 +80,7 @@ class Page_Types_Test extends \WP_UnitTestCase {
 			)
 			: \add_query_arg( [ 'site' => \get_site_url() ], $url );
 
-		$cache_key = md5( $url );
+		$cache_key = \md5( $url );
 
 		\progress_planner()->get_utils__cache()->set( $cache_key, self::get_lessons(), WEEK_IN_SECONDS );
 	}
@@ -124,7 +123,7 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	public function test_get_page_types() {
 		$page_types = \progress_planner()->get_page_types()->get_page_types();
 		$lessons    = self::get_lessons();
-		$this->assertCount( count( $lessons ), $page_types );
+		$this->assertCount( \count( $lessons ), $page_types );
 
 		foreach ( $lessons as $lesson ) {
 			$this->assertCount(
@@ -145,7 +144,6 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_get_posts_by_type() {
-
 		// Assign the post to the "homepage" page type.
 		\progress_planner()->get_page_types()->set_page_type_by_id(
 			self::$homepage_post_id,
@@ -194,13 +192,12 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_transition_post_status_updates_options() {
-
 		// Check if the options are set to default values.
 		$this->assertEquals( 0, \get_option( 'page_on_front' ) );
 		$this->assertEquals( 'posts', \get_option( 'show_on_front' ) );
 
 		// Update homepage page to draft.
-		wp_update_post(
+		\wp_update_post(
 			[
 				'ID'          => self::$homepage_post_id,
 				'post_status' => 'draft',
@@ -213,7 +210,7 @@ class Page_Types_Test extends \WP_UnitTestCase {
 		\wp_set_object_terms( self::$homepage_post_id, $term->term_id, \progress_planner()->get_page_types()::TAXONOMY_NAME );
 
 		// Update the page status to publish.
-		wp_update_post(
+		\wp_update_post(
 			[
 				'ID'          => self::$homepage_post_id,
 				'post_status' => 'publish',

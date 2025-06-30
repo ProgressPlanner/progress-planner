@@ -40,7 +40,6 @@ class Sample_Page extends Base_Data_Collector {
 	 * @return void
 	 */
 	public function update_sample_page_cache( $new_status, $old_status, $post ) {
-
 		// If the status is the same, do nothing.
 		if ( $old_status === $new_status ) {
 			return;
@@ -57,12 +56,12 @@ class Sample_Page extends Base_Data_Collector {
 	 * @return \WP_Post|int
 	 */
 	protected function calculate_data() {
-		$sample_page = get_page_by_path( __( 'sample-page' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+		$sample_page = \get_page_by_path( \__( 'sample-page' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 		if ( null === $sample_page ) {
 			$query = new \WP_Query(
 				[
 					'post_type'      => 'page',
-					'title'          => __( 'Sample Page' ), // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
+					'title'          => \__( 'Sample Page' ), // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 					'post_status'    => 'publish',
 					'posts_per_page' => 1,
 				]
@@ -71,6 +70,6 @@ class Sample_Page extends Base_Data_Collector {
 			$sample_page = ! empty( $query->post ) ? $query->post : 0;
 		}
 
-		return ( is_object( $sample_page ) && is_a( $sample_page, \WP_Post::class ) ) ? $sample_page->ID : 0;
+		return ( \is_object( $sample_page ) && \is_a( $sample_page, \WP_Post::class ) ) ? $sample_page->ID : 0;
 	}
 }

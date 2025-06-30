@@ -18,7 +18,6 @@ class Upgrade_Migrations_111_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_dataset_1() {
-
 		// Delete all activities.
 		\progress_planner()->get_activities__query()->delete_activities(
 			\progress_planner()->get_activities__query()->query_activities(
@@ -215,7 +214,7 @@ class Upgrade_Migrations_111_Test extends \WP_UnitTestCase {
 		];
 
 		// Add the suggested tasks to the database.
-		\update_option( 'progress_planner_suggested_tasks', [ 'completed' => array_keys( $migration_map ) ] );
+		\update_option( 'progress_planner_suggested_tasks', [ 'completed' => \array_keys( $migration_map ) ] );
 
 		// Create a new activity for each item.
 		foreach ( $migration_map as $old_task_id => $item ) {
@@ -245,7 +244,7 @@ class Upgrade_Migrations_111_Test extends \WP_UnitTestCase {
 
 		// Verify that every value in the $items array is present in the $tasks array and has completed status.
 		foreach ( $migration_map as $item ) {
-			$matching_tasks = array_filter(
+			$matching_tasks = \array_filter(
 				$tasks,
 				function ( $task ) use ( $item ) {
 					return isset( $task['task_id'] ) &&
@@ -256,14 +255,14 @@ class Upgrade_Migrations_111_Test extends \WP_UnitTestCase {
 
 			$this->assertNotEmpty(
 				$matching_tasks,
-				sprintf( 'Task ID "%s" not found in tasks', $item['task_id'] )
+				\sprintf( 'Task ID "%s" not found in tasks', $item['task_id'] )
 			);
 
-			$task = reset( $matching_tasks );
+			$task = \reset( $matching_tasks );
 			$this->assertEquals(
 				'completed',
 				$task['status'],
-				sprintf( 'Task ID "%s" status is not "completed"', $item['task_id'] )
+				\sprintf( 'Task ID "%s" status is not "completed"', $item['task_id'] )
 			);
 		}
 

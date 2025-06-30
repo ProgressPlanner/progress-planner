@@ -52,15 +52,15 @@ class Page_Todos {
 	 * @return string
 	 */
 	public function sanitize_post_meta_progress_planner_page_todos( $value ) {
-		$values = explode( ',', $value );
+		$values = \explode( ',', $value );
 		// Remove any empty values.
-		$values = array_filter( $values );
+		$values = \array_filter( $values );
 		// Remove any duplicates.
-		$values = array_unique( $values );
+		$values = \array_unique( $values );
 		// Trim all values.
-		$values = array_map( 'trim', $values );
+		$values = \array_map( 'trim', $values );
 
 		// Return the sanitized value.
-		return \sanitize_text_field( implode( ',', $values ) );
+		return \sanitize_text_field( \implode( ',', $values ) );
 	}
 }

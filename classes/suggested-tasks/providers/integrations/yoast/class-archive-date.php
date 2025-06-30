@@ -20,10 +20,12 @@ class Archive_Date extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-date-archive';
 
 	/**
-	 * Constructor.
+	 * Get the task URL.
+	 *
+	 * @return string
 	 */
-	public function __construct() {
-		$this->url = \admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' );
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' );
 	}
 
 	/**
@@ -31,7 +33,7 @@ class Archive_Date extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: disable the date archive', 'progress-planner' );
 	}
 
@@ -40,8 +42,8 @@ class Archive_Date extends Yoast_Provider {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
-		return sprintf(
+	protected function get_description() {
+		return \sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Yoast SEO can disable the date archive, which is really only useful for news sites and blogs. %s.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/yoast-date-archive" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Date Archive', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
@@ -73,13 +75,8 @@ class Archive_Date extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-
-		if ( ! $this->is_task_relevant() ) {
-			return false;
-		}
-
 		// If the date archive is already disabled, we don't need to add the task.
-		return YoastSEO()->helpers->options->get( 'disable-date' ) !== true;
+		return $this->is_task_relevant() && \YoastSEO()->helpers->options->get( 'disable-date' ) !== true;
 	}
 
 	/**
@@ -92,10 +89,8 @@ class Archive_Date extends Yoast_Provider {
 	public function is_task_relevant() {
 		// If the permalink structure includes %year%, %monthnum%, or %day%, we don't need to add the task.
 		$permalink_structure = \get_option( 'permalink_structure' );
-		if ( strpos( $permalink_structure, '%year%' ) !== false || strpos( $permalink_structure, '%monthnum%' ) !== false || strpos( $permalink_structure, '%day%' ) !== false ) {
-			return false;
-		}
-
-		return true;
+		return \strpos( $permalink_structure, '%year%' ) === false
+			&& \strpos( $permalink_structure, '%monthnum%' ) === false
+			&& \strpos( $permalink_structure, '%day%' ) === false;
 	}
 }
