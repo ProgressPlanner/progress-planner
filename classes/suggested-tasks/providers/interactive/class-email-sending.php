@@ -123,7 +123,7 @@ class Email_Sending extends Interactive {
 			/* translators: %1$s the admin URL. %2$s: "Ravi" */
 			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_blank">Click here to mark %2$s’s Recommendation as completed</a>.', 'progress-planner' ),
 			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ),
-			\esc_html( \progress_planner()->get_ui__branding()->get_strings()['ravi'] )
+			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
 		);
 	}
 
