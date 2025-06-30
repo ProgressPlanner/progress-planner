@@ -1,3 +1,10 @@
+= 1.7.0 =
+
+Bugs we fixed:
+
+* Fix issue where "Perform all updates" task was incorrectly marked as completed.
+
+
 = 1.6.1 =
 
 Bugs we fixed:
