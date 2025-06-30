@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.4.2
+Stable tag: 1.6.1
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -109,6 +109,39 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.6.1 =
+
+Bugs we fixed:
+
+* "Collect your point" not closing the "Test if your website can send emails correctly" popover.
+* Snooze task tooltip overaly not closing properly.
+* Properly trigger migration from v1.5.0.
+
+= 1.6.0 =
+
+Enhancements:
+
+* Allow users to collect extra points for previous months' badges.
+* Added WP-CLI commands to manage recommendations.
+
+Under the hood:
+
+* Ravi's Recommendations are now a custom post type.
+
+= 1.5.0 =
+
+Added these recommendations from Ravi:
+
+* [Test if your website can send emails correctly](https://prpl.fyi/troubleshoot-smtp).
+
+Bugs we fixed:
+
+* Don't redirect user to Progress Planner dashboard if 'redirect_to' GET or POST parameter is set.
+* Removed the Onboard tour steps for the Settings popover which was removed in 1.3.0.
+* Fixed detecting creation of new valuable content posts.
+* Don't award point for all Todo tasks, only for golden.
+* Fix Todo task title not being editable.
 
 = 1.4.2 =
 

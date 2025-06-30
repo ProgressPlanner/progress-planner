@@ -6,7 +6,7 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -29,7 +29,7 @@ $prpl_redirect_on_login = \get_user_meta( \get_current_user_id(), 'prpl_redirect
 					id="prpl-setting-redirect-on-login"
 					name="prpl-redirect-on-login"
 					type="checkbox"
-					<?php checked( $prpl_redirect_on_login ); ?>
+					<?php \checked( $prpl_redirect_on_login ); ?>
 				/>
 				<span><?php \esc_html_e( 'Show the Progress Planner dashboard after login.', 'progress-planner' ); ?></span>
 			</label>

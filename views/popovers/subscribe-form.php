@@ -6,7 +6,7 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -18,7 +18,7 @@ $prpl_current_user = \wp_get_current_user();
 <form id="prpl-settings-license-form">
 	<p>
 	<?php
-	printf(
+	\printf(
 		/* translators: %s: progressplanner.com link */
 		\esc_html__( 'We can send you weekly emails with your own to-do’s, your activity stats and nudges to keep you working on your site. To do this, we’ll create an account for you on %s.', 'progress-planner' ),
 		'<a href="https://prpl.fyi/home" target="_blank">progressplanner.com</a>'

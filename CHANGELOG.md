@@ -1,4 +1,34 @@
+= 1.7.0 =
+
+Bugs we fixed:
+
+* Fix issue where "Perform all updates" task was incorrectly marked as completed.
+
+
+= 1.6.1 =
+
+Bugs we fixed:
+
+* "Collect your point" not closing the "Test if your website can send emails correctly" popover.
+* Snooze task tooltip overaly not closing properly.
+* Properly trigger migration from v1.5.0.
+
+= 1.6.0 =
+
+Enhancements:
+
+* Allow users to collect extra points for previous months' badges.
+* Added WP-CLI commands to manage recommendations.
+
+Under the hood:
+
+* Ravi's Recommendations are now a custom post type.
+
 = 1.5.0 =
+
+Added these recommendations from Ravi:
+
+* [Test if your website can send emails correctly](https://prpl.fyi/troubleshoot-smtp).
 
 Bugs we fixed:
 
@@ -6,6 +36,7 @@ Bugs we fixed:
 * Removed the Onboard tour steps for the Settings popover which was removed in 1.3.0.
 * Fixed detecting creation of new valuable content posts.
 * Don't award point for all Todo tasks, only for golden.
+* Fix Todo task title not being editable.
 
 = 1.4.2 =
 

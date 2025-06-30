@@ -6,7 +6,7 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -19,7 +19,7 @@ if ( empty( $prpl_post_types ) ) {
 }
 
 // We use it in order to change grid layout when there are more than 5 valuable post types.
-$prpl_data_attributes = 5 < count( $prpl_post_types ) ? 'data-has-many-valuable-post-types' : '';
+$prpl_data_attributes = 5 < \count( $prpl_post_types ) ? 'data-has-many-valuable-post-types' : '';
 ?>
 
 <div class="prpl-column prpl-column-post-types" <?php echo \esc_attr( $prpl_data_attributes ); ?>>
@@ -29,11 +29,11 @@ $prpl_data_attributes = 5 < count( $prpl_post_types ) ? 'data-has-many-valuable-
 				<?php \progress_planner()->the_asset( 'images/icon_copywriting.svg' ); ?>
 			</span>
 			<span>
-				<?php esc_html_e( 'Valuable post types', 'progress-planner' ); ?>
+				<?php \esc_html_e( 'Valuable post types', 'progress-planner' ); ?>
 			</span>
 		</h2>
 		<p>
-			<?php esc_html_e( 'You\'re in control of what counts as valuable content. We\'ll track and reward activity only for the post types you select here.', 'progress-planner' ); ?>
+			<?php \esc_html_e( 'You\'re in control of what counts as valuable content. We\'ll track and reward activity only for the post types you select here.', 'progress-planner' ); ?>
 		</p>
 		<div id="prpl-post-types-include-wrapper">
 		<?php foreach ( $prpl_post_types as $prpl_post_type ) : ?>
@@ -42,7 +42,7 @@ $prpl_data_attributes = 5 < count( $prpl_post_types ) ? 'data-has-many-valuable-
 					type="checkbox"
 					name="prpl-post-types-include[]"
 					value="<?php echo \esc_attr( $prpl_post_type ); ?>"
-					<?php checked( \in_array( $prpl_post_type, $prpl_saved_settings, true ) ); ?>
+					<?php \checked( \in_array( $prpl_post_type, $prpl_saved_settings, true ) ); ?>
 				/>
 				<?php echo \esc_html( \get_post_type_object( $prpl_post_type )->labels->name ); // @phpstan-ignore-line property.nonObject ?>
 			</label>

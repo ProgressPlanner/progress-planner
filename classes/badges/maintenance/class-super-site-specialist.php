@@ -37,15 +37,17 @@ final class Super_Site_Specialist extends Badge_Maintenance {
 	 */
 	public function get_description() {
 		/* translators: %d: The number of weeks. */
-		return sprintf( \esc_html__( '%d weeks streak', 'progress-planner' ), 52 );
+		return \sprintf( \esc_html__( '%d weeks streak', 'progress-planner' ), 52 );
 	}
 
 	/**
 	 * Progress callback.
 	 *
+	 * @param array $args The arguments for the progress callback.
+	 *
 	 * @return array
 	 */
-	public function progress_callback() {
+	public function progress_callback( $args = [] ) {
 		$saved_progress = $this->get_saved();
 
 		// If we have a saved value, return it.
@@ -54,8 +56,8 @@ final class Super_Site_Specialist extends Badge_Maintenance {
 		}
 
 		$max_streak = $this->get_goal()->get_streak()['max_streak'];
-		$percent    = min( 100, floor( 100 * $max_streak / 52 ) );
-		$remaining  = 52 - min( 52, $max_streak );
+		$percent    = \min( 100, \floor( 100 * $max_streak / 52 ) );
+		$remaining  = 52 - \min( 52, $max_streak );
 
 		$this->save_progress(
 			[

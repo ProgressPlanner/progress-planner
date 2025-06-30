@@ -7,7 +7,7 @@
 
 use Progress_Planner\Base;
 
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -34,7 +34,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 </h2>
 
 <div style="--background: var(--prpl-background-orange)">
-	<prpl-gauge background="var(--prpl-background-green)" color="<?php echo esc_attr( $prpl_widget->get_gauge_color( $prpl_widget->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-6xl)">
+	<prpl-gauge background="var(--prpl-background-green)" color="<?php echo \esc_attr( $prpl_widget->get_gauge_color( $prpl_widget->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-6xl)">
 		<progress max="100" value="<?php echo (float) $prpl_widget->get_score(); ?>">
 			<?php echo \esc_html( $prpl_widget->get_score() ); ?>
 		</progress>
@@ -91,7 +91,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 	if ( (int) $prpl_record['max_streak'] === 0 ) {
 		\esc_html_e( 'This is the start of your first streak! Add content to your site every week and set a personal record!', 'progress-planner' );
 	} elseif ( (int) $prpl_record['max_streak'] <= (int) $prpl_record['current_streak'] ) {
-		printf(
+		\printf(
 			\esc_html(
 				/* translators: %s: number of weeks. */
 				\_n(
@@ -104,7 +104,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 			\esc_html( \number_format_i18n( $prpl_record['current_streak'] ) )
 		);
 	} elseif ( 1 <= $prpl_record['current_streak'] ) {
-		printf(
+		\printf(
 			\esc_html(
 				/* translators: %1$s: number of weeks for the current streak. %2$s: number of weeks for the maximum streak. %3$s: The number of weeks to go in order to break the record. */
 				\_n(
@@ -119,7 +119,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 			\esc_html( \number_format_i18n( $prpl_record['max_streak'] - $prpl_record['current_streak'] ) )
 		);
 	} else {
-		printf(
+		\printf(
 			\esc_html(
 				/* translators: %1$s: number of weeks for the maximum streak. */
 				\_n(
