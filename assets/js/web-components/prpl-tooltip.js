@@ -49,10 +49,6 @@ customElements.define(
 				openButton = document.createElement( 'button' );
 				openButton.type = 'button';
 				openButton.className = 'prpl-info-icon';
-				openButton.setAttribute(
-					'data-tooltip-action',
-					'open-tooltip'
-				);
 				openButton.innerHTML =
 					openIconSlot?.innerHTML ||
 					`
@@ -62,6 +58,10 @@ customElements.define(
 					</span>
 				`;
 			}
+
+			// Add data attribute to the open button.
+			openButton.setAttribute( 'data-tooltip-action', 'open-tooltip' );
+
 			openSlot?.remove(); // Remove slot element
 			openIconSlot?.remove(); // Remove slot element
 

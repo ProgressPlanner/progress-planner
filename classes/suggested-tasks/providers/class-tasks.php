@@ -8,7 +8,6 @@
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
 use Progress_Planner\Suggested_Tasks\Tasks_Interface;
-use Progress_Planner\Suggested_Tasks\Task_Factory;
 
 /**
  * Add tasks for content updates.
@@ -44,6 +43,13 @@ abstract class Tasks implements Tasks_Interface {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
+	 * The data collector class name.
+	 *
+	 * @var string
+	 */
+	protected const DATA_COLLECTOR_CLASS = \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector::class;
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -67,9 +73,9 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * The task priority.
 	 *
-	 * @var string
+	 * @var int
 	 */
-	protected $priority = 'medium';
+	protected $priority = 50;
 
 	/**
 	 * Whether the task is dismissable.
@@ -77,6 +83,13 @@ abstract class Tasks implements Tasks_Interface {
 	 * @var bool
 	 */
 	protected $is_dismissable = false;
+
+	/**
+	 * Whether the task is snoozable.
+	 *
+	 * @var bool
+	 */
+	protected $is_snoozable = true;
 
 	/**
 	 * The task URL.
@@ -100,6 +113,13 @@ abstract class Tasks implements Tasks_Interface {
 	protected $link_setting;
 
 	/**
+	 * The data collector.
+	 *
+	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector|null
+	 */
+	protected $data_collector = null;
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -112,7 +132,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_title() {
 		return '';
 	}
 
@@ -121,7 +141,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	protected function get_description() {
 		return '';
 	}
 
@@ -146,10 +166,10 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task priority.
 	 *
-	 * @return string
+	 * @return int
 	 */
 	public function get_priority() {
-		return $this->priority;
+		return (int) $this->priority;
 	}
 
 	/**
@@ -162,16 +182,12 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Get the task URL.
+	 * Get whether the task is snoozable.
 	 *
-	 * @return string
+	 * @return bool
 	 */
-	public function get_url() {
-		if ( $this->url ) {
-			return \esc_url( $this->url );
-		}
-
-		return '';
+	public function is_snoozable() {
+		return $this->is_snoozable;
 	}
 
 	/**
@@ -179,7 +195,16 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return string
 	 */
-	public function get_url_target() {
+	protected function get_url() {
+		return $this->url ? \esc_url( $this->url ) : '';
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url_target() {
 		return $this->url_target ? $this->url_target : '_self';
 	}
 
@@ -198,7 +223,7 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return string
 	 */
 	public function get_provider_type() {
-		_deprecated_function( 'Progress_Planner\Suggested_Tasks\Providers\Tasks::get_provider_type()', '1.1.1', 'get_provider_category' );
+		\_deprecated_function( 'Progress_Planner\Suggested_Tasks\Providers\Tasks::get_provider_type()', '1.1.1', 'get_provider_category' );
 		return $this->get_provider_category();
 	}
 
@@ -223,25 +248,75 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task ID.
 	 *
-	 * @param array $data Optional data to include in the task ID.
+	 * @param array $task_data Optional data to include in the task ID.
 	 * @return string
 	 */
-	public function get_task_id( $data = [] ) {
-		if ( ! $this->is_repetitive() ) {
-			return $this->get_provider_id();
-		}
-
+	public function get_task_id( $task_data = [] ) {
 		$parts = [ $this->get_provider_id() ];
 
-		// Add optional data parts if provided.
-		if ( ! empty( $data['post_id'] ) ) {
-			$parts[] = $data['post_id'];
+		// Order is important here, new parameters should be added at the end.
+		if ( isset( $task_data['target_post_id'] ) ) {
+			$parts[] = $task_data['target_post_id'];
 		}
 
-		// Always add the date as the last part.
-		$parts[] = \gmdate( 'YW' );
+		if ( isset( $task_data['target_term_id'] ) ) {
+			$parts[] = $task_data['target_term_id'];
+		}
 
-		return implode( '-', $parts );
+		if ( isset( $task_data['target_taxonomy'] ) ) {
+			$parts[] = $task_data['target_taxonomy'];
+		}
+
+		// If the task is repetitive, add the date as the last part.
+		if ( $this->is_repetitive() ) {
+			$parts[] = \gmdate( 'YW' );
+		}
+
+		return \implode( '-', $parts );
+	}
+
+	/**
+	 * Get the data collector.
+	 *
+	 * @return \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector
+	 */
+	public function get_data_collector() {
+		if ( ! $this->data_collector ) {
+			$class_name           = static::DATA_COLLECTOR_CLASS;
+			$this->data_collector = new $class_name(); // @phpstan-ignore-line assign.propertyType
+		}
+
+		return $this->data_collector; // @phpstan-ignore-line return.type
+	}
+
+	/**
+	 * Get the title with data.
+	 *
+	 * @param array $task_data Optional data to include in the task.
+	 * @return string
+	 */
+	protected function get_title_with_data( $task_data = [] ) {
+		return $this->get_title();
+	}
+
+	/**
+	 * Get the description with data.
+	 *
+	 * @param array $task_data Optional data to include in the task.
+	 * @return string
+	 */
+	protected function get_description_with_data( $task_data = [] ) {
+		return $this->get_description();
+	}
+
+	/**
+	 * Get the URL with data.
+	 *
+	 * @param array $task_data Optional data to include in the task.
+	 * @return string
+	 */
+	protected function get_url_with_data( $task_data = [] ) {
+		return $this->get_url();
 	}
 
 	/**
@@ -274,35 +349,19 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Get the data from a task-ID.
-	 *
-	 * @param string $task_id The task ID (unused here).
-	 *
-	 * @return array The data.
-	 */
-	public function get_data_from_task_id( $task_id ) {
-		$data = [
-			'provider_id' => $this->get_provider_id(),
-			'id'          => $task_id,
-		];
-
-		return $data;
-	}
-
-	/**
 	 * Check if a task category is snoozed.
 	 *
 	 * @return bool
 	 */
 	public function is_task_snoozed() {
-		$snoozed = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'snoozed' );
+		$snoozed = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] );
 		if ( empty( $snoozed ) ) {
 			return false;
 		}
 
 		foreach ( $snoozed as $task ) {
-			$task_object = Task_Factory::create_task_from( 'id', $task['task_id'] );
-			$provider_id = $task_object->get_provider_id();
+			$task        = \progress_planner()->get_suggested_tasks_db()->get_post( $task->task_id );
+			$provider_id = $task ? $task->get_provider_id() : '';
 
 			if ( $provider_id === $this->get_provider_id() ) {
 				return true;
@@ -328,7 +387,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @param string $task_id The task ID.
 	 *
-	 * @return false|\Progress_Planner\Suggested_Tasks\Task The task data or false if the task is not completed.
+	 * @return \Progress_Planner\Suggested_Tasks\Task|false The task data or false if the task is not completed.
 	 */
 	public function evaluate_task( $task_id ) {
 		// Early bail if the user does not have the capability to manage options.
@@ -336,22 +395,32 @@ abstract class Tasks implements Tasks_Interface {
 			return false;
 		}
 
-		if ( ! $this->is_repetitive() ) {
-			if ( 0 !== strpos( $task_id, $this->get_task_id() ) ) {
-				return false;
-			}
-			return $this->is_task_completed( $task_id ) ? Task_Factory::create_task_from( 'id', $task_id ) : false;
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
+
+		if ( ! $task ) {
+			return false;
 		}
 
-		$task_object = Task_Factory::create_task_from( 'id', $task_id );
-		$task_data   = $task_object->get_data();
+		if ( ! $this->is_repetitive() ) {
+			// Collaborator tasks have custom task_ids, so strpos check does not work for them.
+			if ( ! $task->task_id || ( 0 !== \strpos( $task->task_id, $this->get_task_id() ) && 'collaborator' !== $this->get_provider_id() ) ) {
+				return false;
+			}
+			return $this->is_task_completed( $task->task_id ) ? $task : false;
+		}
 
-		if ( $task_data['provider_id'] === $this->get_provider_id() && \gmdate( 'YW' ) === $task_data['date'] && $this->is_task_completed( $task_id ) ) {
+		if (
+			$task->provider &&
+			$task->provider->slug === $this->get_provider_id() &&
+			\DateTime::createFromFormat( 'Y-m-d H:i:s', $task->post_date ) &&
+			\gmdate( 'YW' ) === \gmdate( 'YW', \DateTime::createFromFormat( 'Y-m-d H:i:s', $task->post_date )->getTimestamp() ) && // @phpstan-ignore-line
+			$this->is_task_completed( $task->task_id )
+		) {
 			// Allow adding more data, for example in case of 'create-post' tasks we are adding the post_id.
-			$task_data = $this->modify_evaluated_task_data( $task_data );
-			$task_object->set_data( $task_data );
+			$task_data = $this->modify_evaluated_task_data( $task->get_data() );
+			$task->update( $task_data );
 
-			return $task_object;
+			return $task;
 		}
 
 		return false;
@@ -359,9 +428,8 @@ abstract class Tasks implements Tasks_Interface {
 
 	/**
 	 * Check if the task condition is satisfied.
-	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *
-	 * @return bool
+	 * @return bool true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 */
 	abstract protected function should_add_task();
 
@@ -404,7 +472,6 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-
 		$task_id = $this->get_task_id();
 
 		if (
@@ -415,18 +482,13 @@ abstract class Tasks implements Tasks_Interface {
 			return [];
 		}
 
-		$task_data = [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'category'    => $this->get_provider_category(),
-			'date'        => \gmdate( 'YW' ),
-		];
+		$task_data = $this->modify_injection_task_data( $this->get_task_details() );
 
-		$task_data = $this->modify_injection_task_data( $task_data );
+		// Get the task post.
+		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
 
-		return [
-			$task_data,
-		];
+		// Skip the task if it was already injected.
+		return $task_post ? [] : [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
 	}
 
 	/**
@@ -456,24 +518,50 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get the task details.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return array
 	 */
-	public function get_task_details( $task_id = '' ) {
-
+	public function get_task_details( $task_data = [] ) {
 		return [
-			'task_id'      => $this->get_task_id(),
+			'task_id'      => $this->get_task_id( $task_data ),
 			'provider_id'  => $this->get_provider_id(),
-			'title'        => $this->get_title(),
+			'post_title'   => $this->get_title_with_data( $task_data ),
+			'description'  => $this->get_description_with_data( $task_data ),
 			'parent'       => $this->get_parent(),
 			'priority'     => $this->get_priority(),
 			'category'     => $this->get_provider_category(),
 			'points'       => $this->get_points(),
-			'url'          => $this->capability_required() ? \esc_url( $this->get_url() ) : '',
-			'description'  => $this->get_description(),
+			'date'         => \gmdate( 'YW' ),
+			'url'          => $this->get_url_with_data( $task_data ),
+			'url_target'   => $this->get_url_target(),
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
+			'snoozable'    => $this->is_snoozable(),
 		];
+	}
+
+	/**
+	 * Transform data collector data into task data format.
+	 *
+	 * @param array $data The data from data collector.
+	 * @return array The transformed data with original data merged.
+	 */
+	protected function transform_collector_data( array $data ): array {
+		$transform_keys = [
+			'term_id'    => 'target_term_id',
+			'taxonomy'   => 'target_taxonomy',
+			'name'       => 'target_term_name',
+			'post_id'    => 'target_post_id',
+			'post_title' => 'target_post_title',
+		];
+
+		foreach ( $transform_keys as $key => $value ) {
+			if ( isset( $data[ $key ] ) ) {
+				$data[ $value ] = $data[ $key ];
+			}
+		}
+
+		return $data;
 	}
 }

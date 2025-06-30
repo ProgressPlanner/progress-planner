@@ -104,7 +104,7 @@ class Query {
 
 		$args = \wp_parse_args( $args, $defaults );
 
-		$cache_key = 'progress-planner-activities-' . md5( (string) \wp_json_encode( $args ) );
+		$cache_key = 'progress-planner-activities-' . \md5( (string) \wp_json_encode( $args ) );
 		$results   = \wp_cache_get( $cache_key, static::CACHE_GROUP );
 
 		if ( false === $results ) {
@@ -153,11 +153,11 @@ class Query {
 				: $wpdb->get_results(
 					// phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- This is a false positive.
 					$wpdb->prepare(
-						sprintf(
+						\sprintf(
 							'SELECT * FROM %%i WHERE %s',
 							\implode( ' AND ', $where_args )
 						),
-						array_merge(
+						\array_merge(
 							[ $wpdb->prefix . static::TABLE_NAME ],
 							$prepare_args
 						)
@@ -182,7 +182,7 @@ class Query {
 			}
 			$results_unique[ $result->category . $result->type . $result->data_id . $result->date ] = $result;
 		}
-		$results = array_values( $results_unique );
+		$results = \array_values( $results_unique );
 
 		return 'RAW' === $return_type
 			? $results
@@ -210,7 +210,6 @@ class Query {
 		}
 		return $ids;
 	}
-
 
 	/**
 	 * Insert an activity into the database.
@@ -439,8 +438,8 @@ class Query {
 	 * @return string The class name of the Activity.
 	 */
 	protected function get_activity_class_name( $category ) {
-		if ( class_exists( '\Progress_Planner\Activities\\' . ucfirst( $category ) ) ) {
-			return '\Progress_Planner\Activities\\' . ucfirst( $category );
+		if ( \class_exists( '\Progress_Planner\Activities\\' . \ucfirst( $category ) ) ) {
+			return '\Progress_Planner\Activities\\' . \ucfirst( $category );
 		}
 		return '\Progress_Planner\Activities\Activity';
 	}

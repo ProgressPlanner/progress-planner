@@ -37,15 +37,17 @@ final class Revision_Ranger extends Badge_Content {
 	 */
 	public function get_description() {
 		/* translators: %d: The number of new posts to write. */
-		return sprintf( \esc_html__( 'Write %d new posts or pages', 'progress-planner' ), 30 );
+		return \sprintf( \esc_html__( 'Write %d new posts or pages', 'progress-planner' ), 30 );
 	}
 
 	/**
 	 * Progress callback.
 	 *
+	 * @param array $args The arguments for the progress callback.
+	 *
 	 * @return array
 	 */
-	public function progress_callback() {
+	public function progress_callback( $args = [] ) {
 		$saved_progress = $this->get_saved();
 
 		// If we have a saved value, return it.
@@ -54,7 +56,7 @@ final class Revision_Ranger extends Badge_Content {
 		}
 
 		// Get the number of new posts published.
-		$new_count = count(
+		$new_count = \count(
 			\progress_planner()->get_activities__query()->query_activities(
 				[
 					'category'   => 'content',
@@ -64,8 +66,8 @@ final class Revision_Ranger extends Badge_Content {
 			)
 		);
 
-		$percent   = min( 100, floor( 100 * $new_count / 30 ) );
-		$remaining = 30 - min( 30, $new_count );
+		$percent   = \min( 100, \floor( 100 * $new_count / 30 ) );
+		$remaining = 30 - \min( 30, $new_count );
 
 		$this->save_progress(
 			[

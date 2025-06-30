@@ -78,6 +78,6 @@ class Post_Author extends Base_Data_Collector {
 		"
 		);
 
-		return count( $author_ids );
+		return \count( $author_ids );
 	}
 }
