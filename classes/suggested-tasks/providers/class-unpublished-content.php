@@ -118,7 +118,7 @@ class Unpublished_Content extends Tasks {
 		if ( empty( $post->post_title ) ) {
 			return \sprintf(
 				/* translators: %1$s: post type, %2$d: post ID */
-				\esc_html__( 'Add a title to %1$s %2$d and publish it', 'progress-planner' ),
+				\esc_html__( 'Add a title to %1$s %2$d and finish it', 'progress-planner' ),
 				\strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
 				(int) $post->ID
 			);
@@ -126,7 +126,7 @@ class Unpublished_Content extends Tasks {
 
 		return \sprintf(
 				// translators: %1$s: The post type, %2$s: The post title.
-			\esc_html__( 'Publish %1$s "%2$s"', 'progress-planner' ),
+			\esc_html__( 'Finish %1$s "%2$s" and publish it', 'progress-planner' ),
 			\strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
 			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
 		);
@@ -166,7 +166,7 @@ class Unpublished_Content extends Tasks {
 
 		return \sprintf(
 			/* translators: %s: post title */
-			\esc_html__( 'You started writing %1$s, but never finished it. Perhaps it\'s time to publish it?', 'progress-planner' ),
+			\esc_html__( 'You started writing %1$s, but never finished it. Perhaps it\'s time to finish it?', 'progress-planner' ),
 			'<a href="' . \esc_url( $post_url ) . '" target="_blank">' . \esc_html( $post_title ) . '</a>'
 		);
 	}
