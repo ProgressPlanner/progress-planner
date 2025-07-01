@@ -15,9 +15,11 @@ final class Branding {
 	/**
 	 * Default branding post-ID.
 	 *
-	 * @var int
+	 * @var array<string, int>
 	 */
-	const DEFAULT_BRANDING_POST_ID = 4958;
+	const BRANDING_IDS = [
+		'default' => 4958,
+	];
 
 	/**
 	 * Get the branding ID.
@@ -27,10 +29,23 @@ final class Branding {
 	public function get_branding_id(): int {
 		// TODO: Get branding ID depending on the host, agency etc.
 		if ( \defined( 'PROGRESS_PLANNER_BRANDING_ID' ) ) {
-			return PROGRESS_PLANNER_BRANDING_ID;
+			return \constant( 'PROGRESS_PLANNER_BRANDING_ID' );
 		}
 
-		return self::DEFAULT_BRANDING_POST_ID;
+		$hostname = (string) \gethostname();
+		if ( \str_contains( $hostname, 'siteground' ) ) {
+			$hostname = 'siteground';
+		} elseif ( \str_contains( $hostname, 'wpengine' ) ) {
+			$hostname = 'wpengine';
+		} elseif ( \str_contains( $hostname, 'bluehost' ) ) {
+			$hostname = 'bluehost';
+		} elseif ( \str_contains( $hostname, 'godaddy' ) ) {
+			$hostname = 'godaddy';
+		}
+
+		return isset( self::BRANDING_IDS[ $hostname ] )
+			? self::BRANDING_IDS[ $hostname ]
+			: self::BRANDING_IDS['default'];
 	}
 
 	/**
