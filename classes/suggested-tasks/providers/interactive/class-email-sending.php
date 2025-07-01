@@ -152,7 +152,6 @@ class Email_Sending extends Interactive {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-
 		// Don't enqueue the script if the task is already completed.
 		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() ) ) {
 			return;
@@ -180,13 +179,7 @@ class Email_Sending extends Interactive {
 	 */
 	public function check_if_wp_mail_is_filtered() {
 		global $wp_filter;
-
-		$filters_to_check = [
-			'phpmailer_init',
-			'pre_wp_mail',
-		];
-
-		foreach ( $filters_to_check as $filter ) {
+		foreach ( [ 'phpmailer_init', 'pre_wp_mail' ] as $filter ) {
 			$has_filter                = isset( $wp_filter[ $filter ] ) && ! empty( $wp_filter[ $filter ]->callbacks ) ? true : false;
 			$this->is_wp_mail_filtered = $this->is_wp_mail_filtered || $has_filter;
 		}
@@ -198,7 +191,6 @@ class Email_Sending extends Interactive {
 	 * @return void
 	 */
 	public function check_if_wp_mail_has_override() {
-
 		// Just in case, since it will trigger PHP fatal error if the function doesn't exist.
 		if ( \function_exists( 'wp_mail' ) ) {
 			$file_path = ( new \ReflectionFunction( 'wp_mail' ) )->getFileName();
@@ -222,7 +214,6 @@ class Email_Sending extends Interactive {
 	 * @return void
 	 */
 	public function ajax_test_email_sending() {
-
 		// Check the nonce.
 		\check_admin_referer( 'progress_planner' );
 

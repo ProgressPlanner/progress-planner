@@ -115,15 +115,9 @@ trait Dismissable_Task {
 	 * @return string|false The task identifier or false if not applicable.
 	 */
 	protected function get_task_identifier( $task_data ) {
-		$task_identifier = $this->get_provider_id();
-
-		if ( isset( $task_data['target_post_id'] ) ) {
-			$task_identifier .= '-' . $task_data['target_post_id'];
-		}
-
-		if ( isset( $task_data['target_term_id'] ) ) {
-			$task_identifier .= '-' . $task_data['target_term_id'];
-		}
+		$task_identifier  = $this->get_provider_id();
+		$task_identifier .= isset( $task_data['target_post_id'] ) ? '-' . $task_data['target_post_id'] : '';
+		$task_identifier .= isset( $task_data['target_term_id'] ) ? '-' . $task_data['target_term_id'] : '';
 
 		return $task_identifier;
 	}
@@ -183,8 +177,7 @@ trait Dismissable_Task {
 	 * @return array
 	 */
 	public function get_dismissed_tasks() {
-		$dismissed_tasks = \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
-		return $dismissed_tasks[ $this->get_provider_id() ] ?? [];
+		return \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] )[ $this->get_provider_id() ] ?? [];
 	}
 
 	/**
@@ -193,9 +186,7 @@ trait Dismissable_Task {
 	 * @return void
 	 */
 	public function cleanup_old_dismissals() {
-		$cleanup_recently_performed = \progress_planner()->get_utils__cache()->get( 'cleanup_dismissed_tasks' );
-
-		if ( $cleanup_recently_performed ) {
+		if ( \progress_planner()->get_utils__cache()->get( 'cleanup_dismissed_tasks' ) ) {
 			return;
 		}
 
