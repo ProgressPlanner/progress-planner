@@ -433,10 +433,8 @@ class Content_Review extends Tasks {
 			$this->get_snoozed_post_ids(),
 		);
 
-		$dismissed_post_ids = $this->get_dismissed_post_ids();
-
-		if ( ! empty( $dismissed_post_ids ) ) {
-			$args['post__not_in'] = \array_merge( $args['post__not_in'], $dismissed_post_ids );
+		if ( ! empty( $this->get_dismissed_post_ids() ) ) {
+			$args['post__not_in'] = \array_merge( $args['post__not_in'], $this->get_dismissed_post_ids() );
 		}
 
 		if ( \function_exists( 'YoastSEO' ) ) {
