@@ -10,39 +10,40 @@ customElements.define(
 			// Get parent class properties
 			super();
 
-			// If data is empty, get the data from the contents.
-			if ( 0 === data.length ) {
-				data = JSON.parse( this.getAttribute( 'data' ) );
-			}
+			// Set the object data.
+			this.data =
+				0 === data.length
+					? JSON.parse( this.getAttribute( 'data' ) )
+					: data;
 
-			this.data = data;
-
-			// Check if the options object is empty.
-			if ( 0 === Object.keys( options ).length ) {
-				options = JSON.parse( this.getAttribute( 'data-options' ) );
-			}
+			// Set the object options.
+			this.options =
+				0 === Object.keys( options ).length
+					? JSON.parse( this.getAttribute( 'data-options' ) )
+					: options;
 
 			// Add default values to the options object.
-			options = {
-				...options,
+			this.options = {
+				...this.options,
 				aspectRatio: 2,
 				height: 300,
 				axisOffset: 16,
 				strokeWidth: 4,
 				dataArgs: {
-					...options.dataArgs,
+					...this.options.dataArgs,
 				},
 				showCharts:
-					options.showCharts || Object.keys( options.dataArgs ),
-				axisColor: options.axisColor || '#d1d5db',
-				rulersColor: options.rulersColor || '#d1d5db',
-				filtersLabel: options.filtersLabel || '',
+					this.options.showCharts ||
+					Object.keys( this.options.dataArgs ),
+				axisColor: this.options.axisColor || '#d1d5db',
+				rulersColor: this.options.rulersColor || '#d1d5db',
+				filtersLabel: this.options.filtersLabel || '',
 			};
 
-			this.options = options;
-
+			// Add the HTML to the element.
 			this.innerHTML = `${ this.getCheckboxes() }<div class="svg-container">${ this.getSvg() }</div>`;
 
+			// Add event listeners for the checkboxes.
 			this.addCheckboxesEventListeners();
 		}
 
