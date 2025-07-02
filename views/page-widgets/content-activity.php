@@ -13,15 +13,15 @@ $prpl_widget = \progress_planner()->get_admin__widgets__content_activity();
 
 $prpl_activity_types = [
 	'publish' => [
-		'label' => \__( 'Published', 'progress-planner' ),
+		'label' => \__( 'published', 'progress-planner' ),
 		'color' => 'var(--prpl-color-accent-green)',
 	],
 	'update'  => [
-		'label' => \__( 'Updated', 'progress-planner' ),
+		'label' => \__( 'updated', 'progress-planner' ),
 		'color' => 'var(--prpl-color-accent-purple)',
 	],
 	'delete'  => [
-		'label' => \__( 'Deleted', 'progress-planner' ),
+		'label' => \__( 'deleted', 'progress-planner' ),
 		'color' => 'var(--prpl-color-accent-red)',
 	],
 ];
