@@ -256,7 +256,8 @@ customElements.define(
 									width: 1em;
 									height: 1em;
 									border-radius: 0.25em;
-									border: 1px solid ${ options.dataArgs[ key ].color }
+									outline: 1px solid ${ options.dataArgs[ key ].color };
+									border: 1px solid #fff;
 							"></span>
 							<input
 								type="checkbox"
