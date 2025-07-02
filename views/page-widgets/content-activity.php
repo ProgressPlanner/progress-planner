@@ -100,8 +100,8 @@ foreach ( \array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
 
 <div class="prpl-graph-wrapper">
 	<prpl-chart-line
-		data="<?php echo \esc_attr( (string) \wp_json_encode( $prpl_chart_data ) ); ?>"
-		data-options="<?php echo \esc_attr( (string) \wp_json_encode( $prpl_chart_options ) ); ?>"
+		data='<?php echo \esc_attr( (string) \wp_json_encode( $prpl_chart_data ) ); ?>'
+		data-options='<?php echo \esc_attr( (string) \wp_json_encode( $prpl_chart_options ) ); ?>'
 	></prpl-chart-line>
 </div>
 

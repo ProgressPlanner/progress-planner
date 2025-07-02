@@ -198,7 +198,7 @@ customElements.define(
 						} );
 
 						const polyLine = `<g><polyline fill="none" stroke="${
-							data[ key ][ 0 ].color
+							options.dataArgs[ key ].color
 						}" stroke-width="${
 							options.strokeWidth
 						}" points="${ polylinePoints
