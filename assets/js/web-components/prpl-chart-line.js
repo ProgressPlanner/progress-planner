@@ -33,6 +33,7 @@ customElements.define(
 					options.showCharts || Object.keys( options.dataArgs ),
 				axisColor: options.axisColor || '#d1d5db',
 				rulersColor: options.rulersColor || '#d1d5db',
+				filtersLabel: options.filtersLabel || '',
 			};
 
 			const thisEl = this;
@@ -268,15 +269,24 @@ customElements.define(
 						</label>`
 					);
 				} );
+
+				const getFiltersLabel = () => {
+					if ( '' === options.filtersLabel ) {
+						return '';
+					}
+
+					return `<div class="chart-line-filters-label">${ options.filtersLabel }</div>`;
+				};
+
 				return `<div
 					class="chart-line-checkboxes"
 					style="
 						display: flex;
 						gap: 1em;
 						margin-bottom: 1em;
-						justify-content: center;
+						justify-content: space-between;
 						font-size: 0.85rem;"
-				>${ checkboxes.join( '' ) }</div>`;
+				>${ getFiltersLabel() }${ checkboxes.join( '' ) }</div>`;
 			};
 
 			const getHTML = () =>

@@ -33,10 +33,11 @@ $prpl_activities_count   = [
 
 $prpl_chart_data    = [];
 $prpl_chart_options = [
-	'dataArgs'    => [],
-	'chartId'     => 'prpl-chart-content-activity',
-	'axisColor'   => 'var(--prpl-color-gray-2)',
-	'rulersColor' => 'var(--prpl-color-gray-2)',
+	'dataArgs'     => [],
+	'chartId'      => 'prpl-chart-content-activity',
+	'axisColor'    => 'var(--prpl-color-gray-2)',
+	'rulersColor'  => 'var(--prpl-color-gray-2)',
+	'filtersLabel' => '<strong>' . \__( 'show:', 'progress-planner' ) . '</strong>',
 ];
 foreach ( $prpl_activity_types as $prpl_activity_type => $prpl_activity_data ) {
 	$prpl_chart_data[ $prpl_activity_type ] = \progress_planner()
