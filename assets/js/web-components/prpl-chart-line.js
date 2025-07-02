@@ -31,6 +31,8 @@ customElements.define(
 				},
 				showCharts:
 					options.showCharts || Object.keys( options.dataArgs ),
+				axisColor: options.axisColor || '#d1d5db',
+				rulersColor: options.rulersColor || '#d1d5db',
 			};
 
 			const thisEl = this;
@@ -106,18 +108,18 @@ customElements.define(
 					options.axisOffset * 3
 				}" x2="${ options.aspectRatio * options.height }" y1="${
 					options.height - options.axisOffset
-				}" y2="${
-					options.height - options.axisOffset
-				}" stroke="var(--prpl-color-gray-2)" stroke-width="1" /></g>`;
+				}" y2="${ options.height - options.axisOffset }" stroke="${
+					options.axisColor
+				}" stroke-width="1" /></g>`;
 
 				// Y-axis line.
 				const yAxisLine = `<g><line x1="${
 					options.axisOffset * 3
 				}" x2="${ options.axisOffset * 3 }" y1="${
 					options.axisOffset
-				}" y2="${
-					options.height - options.axisOffset
-				}" stroke="var(--prpl-color-gray-2)" stroke-width="1" /></g>`;
+				}" y2="${ options.height - options.axisOffset }" stroke="${
+					options.axisColor
+				}" stroke-width="1" /></g>`;
 
 				// X-axis labels and rulers.
 				let labelXCoordinate = 0;
@@ -152,7 +154,9 @@ customElements.define(
 								labelXCoordinate + options.axisOffset
 							}" y1="${ options.axisOffset }" y2="${
 								options.height - options.axisOffset
-							}" stroke="var(--prpl-color-gray-1)" stroke-width="1" /></g>`;
+							}" stroke="${
+								options.rulersColor
+							}" stroke-width="1" /></g>`;
 						}
 					} );
 				} );
@@ -174,7 +178,9 @@ customElements.define(
 							options.axisOffset * 3
 						}" x2="${
 							options.aspectRatio * options.height
-						}" y1="${ yLabelCoordinate }" y2="${ yLabelCoordinate }" stroke="var(--prpl-color-gray-2)" stroke-width="1" /></g>`;
+						}" y1="${ yLabelCoordinate }" y2="${ yLabelCoordinate }" stroke="${
+							options.rulersColor
+						}" stroke-width="1" /></g>`;
 					}
 
 					++iYLabel;
