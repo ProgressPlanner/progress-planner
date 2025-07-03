@@ -27,6 +27,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Add_Yoast_Prov
 use Progress_Planner\Suggested_Tasks\Providers\User as User_Tasks;
 use Progress_Planner\Suggested_Tasks\Providers\Interactive\Email_Sending;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Valuable_Post_Types;
+use Progress_Planner\Suggested_Tasks\Providers\Select_Locale;
 use Progress_Planner\Suggested_Tasks\Providers\Fewer_Tags;
 use Progress_Planner\Suggested_Tasks\Providers\Remove_Terms_Without_Posts;
 use Progress_Planner\Suggested_Tasks\Providers\Update_Term_Description;
@@ -68,6 +69,7 @@ class Tasks_Manager {
 			new User_Tasks(),
 			new Email_Sending(),
 			new Set_Valuable_Post_Types(),
+			new Select_Locale(),
 			new Remove_Terms_Without_Posts(),
 			new Fewer_Tags(),
 			new Update_Term_Description(),
