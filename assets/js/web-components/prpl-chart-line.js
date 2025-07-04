@@ -66,7 +66,7 @@ customElements.define(
 					margin-bottom: 1em;
 					justify-content: space-between;
 					font-size: 0.85rem;"
-			>${ this.getCheckboxesFiltersLabel() }${ checkboxesHTML }</div>`;
+			>${ this.getCheckboxesFiltersLabel() }${ checkboxesHTML.join( '' ) }</div>`;
 		}
 
 		/**
