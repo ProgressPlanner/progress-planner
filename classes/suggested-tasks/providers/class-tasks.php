@@ -50,6 +50,16 @@ abstract class Tasks implements Tasks_Interface {
 	protected const DATA_COLLECTOR_CLASS = \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector::class;
 
 	/**
+	 * Dependencies on other tasks.
+	 *
+	 * The key is the task-ID of the other task,
+	 * If the value is true, the task is pending, if false, the task is completed/dismissed/snoozed.
+	 *
+	 * @var array<string, bool>
+	 */
+	protected const DEPENDENCIES = [];
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -547,5 +557,27 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Check if the task dependencies are satisfied.
+	 *
+	 * @return bool
+	 */
+	public function are_dependencies_satisfied() {
+		foreach ( static::DEPENDENCIES as $task_id => $result ) {
+			$post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
+			if ( ! $post ) {
+				return false;
+			}
+			$post_status = $post->post_status;
+			if ( ( 'publish' === $post_status && ! $result )
+				|| ( 'publish' !== $post_status && $result )
+			) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }
