@@ -48,17 +48,10 @@ customElements.define(
 		 *
 		 * @return {string} The checkboxes.
 		 */
-		getCheckboxesHTML() {
-			// Don't show checkboxes if there is only one dataset.
-			if ( 1 >= Object.keys( this.options.dataArgs ).length ) {
-				return '';
-			}
-
-			const checkboxesHTML = Object.keys( this.options.dataArgs ).map(
-				( key ) => this.getCheckboxHTML( key )
-			);
-
-			return `<div
+		getCheckboxesHTML = () =>
+			1 >= Object.keys( this.options.dataArgs ).length
+				? ''
+				: `<div
 				class="chart-line-checkboxes"
 				style="
 					display: flex;
@@ -66,8 +59,9 @@ customElements.define(
 					margin-bottom: 1em;
 					justify-content: space-between;
 					font-size: 0.85rem;"
-			>${ this.getCheckboxesFiltersLabel() }${ checkboxesHTML.join( '' ) }</div>`;
-		}
+			>${ this.getCheckboxesFiltersLabel() }${ Object.keys( this.options.dataArgs )
+				.map( ( key ) => this.getCheckboxHTML( key ) )
+				.join( '' ) }</div>`;
 
 		/**
 		 * Get the HTML for a single checkbox.
@@ -76,10 +70,8 @@ customElements.define(
 		 *
 		 * @return {string} The checkbox HTML.
 		 */
-		getCheckboxHTML( key ) {
-			// Is the checkbox checked?
-			const isChecked = this.options.showCharts.includes( key );
-			return `<label
+		getCheckboxHTML = ( key ) =>
+			`<label
 				style="display: flex; align-items: center; gap: 0.25em; cursor: pointer;"
 				data-color="${ this.options.dataArgs[ key ].color }"
 			>
@@ -87,7 +79,7 @@ customElements.define(
 					class="prpl-chart-line-checkbox-color"
 					style="
 						background-color: ${
-							isChecked
+							this.options.showCharts.includes( key )
 								? this.options.dataArgs[ key ].color
 								: 'transparent'
 						};
@@ -101,31 +93,29 @@ customElements.define(
 					type="checkbox"
 					name="${ key }"
 					value="${ key }"
-					${ isChecked ? 'checked' : '' }
+					${ this.options.showCharts.includes( key ) ? 'checked' : '' }
 					style="display: none;"
 				/>
 				${ this.options.dataArgs[ key ].label }
 			</label>`;
-		}
 
 		/**
 		 * Get the filters label.
 		 *
 		 * @return {string} The filters label.
 		 */
-		getCheckboxesFiltersLabel() {
-			return '' === this.options.filtersLabel
+		getCheckboxesFiltersLabel = () =>
+			'' === this.options.filtersLabel
 				? ''
 				: `<span>${ this.options.filtersLabel }</span>`;
-		}
 
 		/**
 		 * Generate the SVG for the chart.
 		 *
 		 * @return {string} The SVG HTML for the chart.
 		 */
-		getSvgHTML() {
-			return `<svg viewBox="0 0 ${ parseInt(
+		getSvgHTML = () =>
+			`<svg viewBox="0 0 ${ parseInt(
 				this.options.height * this.options.aspectRatio +
 					this.options.axisOffset * 2
 			) } ${ parseInt(
@@ -137,21 +127,16 @@ customElements.define(
 				${ this.getYAxisLabelsAndRulersHTML() }
 				${ this.getPolyLinesHTML() }
 			</svg>`;
-		}
 
 		/**
 		 * Get the poly lines for the SVG.
 		 *
 		 * @return {string} The poly lines.
 		 */
-		getPolyLinesHTML() {
-			let polyLinesHTML = '';
-			Object.keys( this.data ).forEach( ( key ) => {
-				polyLinesHTML += this.getPolylineHTML( key );
-			} );
-
-			return polyLinesHTML;
-		}
+		getPolyLinesHTML = () =>
+			Object.keys( this.data )
+				.map( ( key ) => this.getPolylineHTML( key ) )
+				.join( '' );
 
 		/**
 		 * Get a single polyline.
@@ -160,7 +145,7 @@ customElements.define(
 		 *
 		 * @return {string} The polyline.
 		 */
-		getPolylineHTML( key ) {
+		getPolylineHTML = ( key ) => {
 			if ( ! this.options.showCharts.includes( key ) ) {
 				return '';
 			}
@@ -182,14 +167,14 @@ customElements.define(
 			}" points="${ polylinePoints
 				.map( ( point ) => point.join( ',' ) )
 				.join( ' ' ) }" /></g>`;
-		}
+		};
 
 		/**
 		 * Get the Y labels.
 		 *
 		 * @return {number[]} The Y labels.
 		 */
-		getYLabels() {
+		getYLabels = () => {
 			const maxValuePadded = this.getMaxValuePadded();
 			// Take the maximum value and divide it by 4 to get the step.
 			const yLabelsStep = maxValuePadded / 4;
@@ -211,41 +196,39 @@ customElements.define(
 			}
 
 			return yLabels;
-		}
+		};
 
 		/**
 		 * Get the X axis line.
 		 *
 		 * @return {string} The X axis line.
 		 */
-		getXAxisLineHTML() {
-			return `<g><line x1="${ this.options.axisOffset * 3 }" x2="${
+		getXAxisLineHTML = () =>
+			`<g><line x1="${ this.options.axisOffset * 3 }" x2="${
 				this.options.aspectRatio * this.options.height
 			}" y1="${ this.options.height - this.options.axisOffset }" y2="${
 				this.options.height - this.options.axisOffset
 			}" stroke="${ this.options.axisColor }" stroke-width="1" /></g>`;
-		}
 
 		/**
 		 * Get the Y axis line.
 		 *
 		 * @return {string} The Y axis line.
 		 */
-		getYAxisLineHTML() {
-			return `<g><line x1="${ this.options.axisOffset * 3 }" x2="${
+		getYAxisLineHTML = () =>
+			`<g><line x1="${ this.options.axisOffset * 3 }" x2="${
 				this.options.axisOffset * 3
 			}" y1="${ this.options.axisOffset }" y2="${
 				this.options.height - this.options.axisOffset
 			}" stroke="${ this.options.axisColor }" stroke-width="1" /></g>`;
-		}
 
 		/**
 		 * Get the X axis labels and rulers.
 		 *
 		 * @return {string} The X axis labels and rulers.
 		 */
-		getXAxisLabelsAndRulersHTML() {
-			let xAxisLabelsAndRulersHTML = '';
+		getXAxisLabelsAndRulersHTML = () => {
+			let html = '';
 			let labelXCoordinate = 0;
 			const dataLength =
 				this.data[ Object.keys( this.data )[ 0 ] ].length;
@@ -268,13 +251,13 @@ customElements.define(
 						return;
 					}
 
-					xAxisLabelsAndRulersHTML += `<g><text x="${ labelXCoordinate }" y="${
+					html += `<g><text x="${ labelXCoordinate }" y="${
 						this.options.height + this.options.axisOffset
 					}">${ item.label }</text></g>`;
 
 					// Draw the ruler.
 					if ( 1 !== i ) {
-						xAxisLabelsAndRulersHTML += `<g><line x1="${
+						html += `<g><line x1="${
 							labelXCoordinate + this.options.axisOffset
 						}" x2="${
 							labelXCoordinate + this.options.axisOffset
@@ -287,42 +270,41 @@ customElements.define(
 				} );
 			} );
 
-			return xAxisLabelsAndRulersHTML;
-		}
+			return html;
+		};
 
 		/**
 		 * Get the distance between the points in the X axis.
 		 *
 		 * @return {number} The distance between the points in the X axis.
 		 */
-		getXDistanceBetweenPoints() {
-			return Math.round(
+		getXDistanceBetweenPoints = () =>
+			Math.round(
 				( this.options.height * this.options.aspectRatio -
 					3 * this.options.axisOffset ) /
 					( this.data[ Object.keys( this.data )[ 0 ] ].length - 1 )
 			);
-		}
 
 		/**
 		 * Get the Y axis labels and rulers.
 		 *
 		 * @return {string} The Y axis labels and rulers.
 		 */
-		getYAxisLabelsAndRulersHTML() {
+		getYAxisLabelsAndRulersHTML = () => {
 			// Y-axis labels and rulers.
 			let yLabelCoordinate = 0;
 			let iYLabel = 0;
-			let yAxisLabelsAndRulersHTML = '';
+			let html = '';
 			this.getYLabels().forEach( ( yLabel ) => {
 				yLabelCoordinate = this.calcYCoordinate( yLabel );
 
-				yAxisLabelsAndRulersHTML += `<g><text x="0" y="${
+				html += `<g><text x="0" y="${
 					yLabelCoordinate + this.options.axisOffset / 2
 				}">${ yLabel }</text></g>`;
 
 				// Draw the ruler.
 				if ( 0 !== iYLabel ) {
-					yAxisLabelsAndRulersHTML += `<g><line x1="${
+					html += `<g><line x1="${
 						this.options.axisOffset * 3
 					}" x2="${
 						this.options.aspectRatio * this.options.height
@@ -334,16 +316,16 @@ customElements.define(
 				++iYLabel;
 			} );
 
-			return yAxisLabelsAndRulersHTML;
-		}
+			return html;
+		};
 
 		/**
 		 * Get the max value from the data.
 		 *
 		 * @return {number} The max value.
 		 */
-		getMaxValue() {
-			const maxValue = Object.keys( this.data ).reduce( ( max, key ) => {
+		getMaxValue = () =>
+			Object.keys( this.data ).reduce( ( max, key ) => {
 				if ( this.options.showCharts.includes( key ) ) {
 					return Math.max(
 						max,
@@ -355,27 +337,25 @@ customElements.define(
 				}
 				return max;
 			}, 0 );
-			return maxValue;
-		}
 
 		/**
 		 * Get the max value padded.
 		 *
 		 * @return {number} The max value padded.
 		 */
-		getMaxValuePadded() {
+		getMaxValuePadded = () => {
 			const max = this.getMaxValue();
 			const maxValue = 100 > max && 70 < max ? 100 : max;
 			return Math.max(
 				100 === maxValue ? 100 : parseInt( maxValue * 1.1 ),
 				1
 			);
-		}
+		};
 
 		/**
 		 * Add event listeners to the checkboxes.
 		 */
-		addCheckboxesEventListeners() {
+		addCheckboxesEventListeners = () =>
 			// Add event listeners to the checkboxes.
 			this.querySelectorAll( 'input[type="checkbox"]' ).forEach(
 				( checkbox ) => {
@@ -407,7 +387,6 @@ customElements.define(
 					} );
 				}
 			);
-		}
 
 		/**
 		 * Calculate the Y coordinate for a given value.
@@ -416,7 +395,7 @@ customElements.define(
 		 *
 		 * @return {number} The Y coordinate.
 		 */
-		calcYCoordinate( value ) {
+		calcYCoordinate = ( value ) => {
 			const maxValuePadded = this.getMaxValuePadded();
 			const multiplier =
 				( this.options.height - this.options.axisOffset * 2 ) /
@@ -426,6 +405,6 @@ customElements.define(
 					( this.options.height / maxValuePadded ) -
 				this.options.axisOffset;
 			return yCoordinate - this.options.strokeWidth / 2;
-		}
+		};
 	}
 );
