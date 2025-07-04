@@ -130,11 +130,7 @@ class Task {
 	 * @return bool
 	 */
 	public function celebrate(): bool {
-		if ( ! $this->ID ) {
-			return false;
-		}
-
-		return \progress_planner()->get_suggested_tasks_db()->update_recommendation( $this->ID, [ 'post_status' => 'pending' ] );
+		return $this->ID && \progress_planner()->get_suggested_tasks_db()->update_recommendation( $this->ID, [ 'post_status' => 'pending' ] );
 	}
 
 	/**

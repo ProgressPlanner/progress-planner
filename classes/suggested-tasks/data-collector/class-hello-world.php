@@ -70,6 +70,6 @@ class Hello_World extends Base_Data_Collector {
 			$sample_post = ! empty( $query->post ) ? $query->post : 0;
 		}
 
-		return ( \is_object( $sample_post ) && \is_a( $sample_post, \WP_Post::class ) ) ? $sample_post->ID : 0;
+		return \is_object( $sample_post ) ? $sample_post->ID : 0;
 	}
 }

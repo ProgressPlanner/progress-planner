@@ -255,22 +255,14 @@ abstract class Tasks implements Tasks_Interface {
 		$parts = [ $this->get_provider_id() ];
 
 		// Order is important here, new parameters should be added at the end.
-		if ( isset( $task_data['target_post_id'] ) ) {
-			$parts[] = $task_data['target_post_id'];
-		}
-
-		if ( isset( $task_data['target_term_id'] ) ) {
-			$parts[] = $task_data['target_term_id'];
-		}
-
-		if ( isset( $task_data['target_taxonomy'] ) ) {
-			$parts[] = $task_data['target_taxonomy'];
-		}
-
+		$parts[] = $task_data['target_post_id'] ?? false;
+		$parts[] = $task_data['target_term_id'] ?? false;
+		$parts[] = $task_data['target_taxonomy'] ?? false;
 		// If the task is repetitive, add the date as the last part.
-		if ( $this->is_repetitive() ) {
-			$parts[] = \gmdate( 'YW' );
-		}
+		$parts[] = $this->is_repetitive() ? \gmdate( 'YW' ) : false;
+
+		// Remove empty parts.
+		$parts = \array_filter( $parts );
 
 		return \implode( '-', $parts );
 	}
@@ -354,12 +346,7 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return bool
 	 */
 	public function is_task_snoozed() {
-		$snoozed = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] );
-		if ( empty( $snoozed ) ) {
-			return false;
-		}
-
-		foreach ( $snoozed as $task ) {
+		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] ) as $task ) {
 			$task        = \progress_planner()->get_suggested_tasks_db()->get_post( $task->task_id );
 			$provider_id = $task ? $task->get_provider_id() : '';
 
@@ -472,23 +459,20 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-		$task_id = $this->get_task_id();
-
 		if (
 			true === $this->is_task_snoozed() ||
 			! $this->should_add_task() || // No need to add the task.
-			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id )
+			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() )
 		) {
 			return [];
 		}
 
 		$task_data = $this->modify_injection_task_data( $this->get_task_details() );
 
-		// Get the task post.
-		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
-
 		// Skip the task if it was already injected.
-		return $task_post ? [] : [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
+		return \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] )
+			? []
+			: [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
 	}
 
 	/**
@@ -539,5 +523,29 @@ abstract class Tasks implements Tasks_Interface {
 			'dismissable'  => $this->is_dismissable(),
 			'snoozable'    => $this->is_snoozable(),
 		];
+	}
+
+	/**
+	 * Transform data collector data into task data format.
+	 *
+	 * @param array $data The data from data collector.
+	 * @return array The transformed data with original data merged.
+	 */
+	protected function transform_collector_data( array $data ): array {
+		$transform_keys = [
+			'term_id'    => 'target_term_id',
+			'taxonomy'   => 'target_taxonomy',
+			'name'       => 'target_term_name',
+			'post_id'    => 'target_post_id',
+			'post_title' => 'target_post_title',
+		];
+
+		foreach ( $transform_keys as $key => $value ) {
+			if ( isset( $data[ $key ] ) ) {
+				$data[ $value ] = $data[ $key ];
+			}
+		}
+
+		return $data;
 	}
 }
