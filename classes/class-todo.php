@@ -23,6 +23,9 @@ class Todo {
 
 		// Handle user tasks creation.
 		\add_action( 'rest_after_insert_prpl_recommendations', [ $this, 'handle_creating_user_task' ], 10, 3 );
+
+		// Set a reminder for the current post.
+		\add_action( 'wp_ajax_progress_planner_set_reminder', [ $this, 'set_reminder' ] );
 	}
 
 	/**
@@ -96,6 +99,46 @@ class Todo {
 			$this->maybe_change_first_item_points_on_monday();
 			return;
 		}
+	}
+
+	/**
+	 * Set a reminder for the current post.
+	 *
+	 * @return void
+	 */
+	public function set_reminder() {
+		// Check the nonce.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
+
+		$post_id = isset( $_POST['post_id'] ) ? \sanitize_text_field( \wp_unslash( $_POST['post_id'] ) ) : '';
+		if ( ! $post_id ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing post ID.', 'progress-planner' ) ] );
+		}
+
+		$post_title = isset( $_POST['post_title'] ) ? \sanitize_text_field( \wp_unslash( $_POST['post_title'] ) ) : '';
+		if ( ! $post_title ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing post title.', 'progress-planner' ) ] );
+		}
+
+		// We're creating a new task.
+		\progress_planner()->get_suggested_tasks_db()->add(
+			[
+				'task_id'        => 'user-task-' . \md5( $post_id . '-' . \microtime( true ) ),
+				/* translators: %s: The post title. */
+				'post_title'     => \sprintf( __( 'Review %s', 'progress-planner' ), $post_title ),
+				'provider_id'    => 'user',
+				'category'       => 'user',
+				'status'         => 'publish',
+				'available_at'   => \time() + 30 * DAY_IN_SECONDS,
+				'target_post_id' => $post_id,
+				'dismissable'    => true,
+				'snoozable'      => false,
+			]
+		);
+
+		\wp_send_json_success( [ 'message' => \esc_html__( 'Reminder set.', 'progress-planner' ) ] );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo
