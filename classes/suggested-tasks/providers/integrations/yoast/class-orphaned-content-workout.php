@@ -147,14 +147,7 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( ! \defined( 'WPSEO_PREMIUM_VERSION' ) ) {
-			return false;
-		}
-
-		return ! $this->is_task_dismissed(
-			[
-				'provider_id' => $this->get_provider_id(),
-			]
-		);
+		return \defined( 'WPSEO_PREMIUM_VERSION' )
+			&& ! $this->is_task_dismissed( [ 'provider_id' => $this->get_provider_id() ] );
 	}
 }
