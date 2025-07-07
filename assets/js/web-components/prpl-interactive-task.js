@@ -9,6 +9,8 @@ class PrplInteractiveTask extends HTMLElement {
 	constructor() {
 		// Get parent class properties
 		super();
+
+		this.repositionPopover = this.repositionPopover.bind( this ); // So this is available in the event listener.
 	}
 
 	/**
@@ -56,12 +58,16 @@ class PrplInteractiveTask extends HTMLElement {
 	/**
 	 * Runs when the popover is added to the DOM.
 	 */
-	popoverAddedToDOM() {}
+	popoverAddedToDOM() {
+		window.addEventListener( 'resize', this.repositionPopover );
+	}
 
 	/**
 	 * Runs when the popover is opening.
 	 */
-	popoverOpening() {}
+	popoverOpening() {
+		this.repositionPopover();
+	}
 
 	/**
 	 * Runs when the popover is closing.
@@ -100,5 +106,39 @@ class PrplInteractiveTask extends HTMLElement {
 		const popoverId = this.getAttribute( 'popover-id' );
 		const popover = document.getElementById( popoverId );
 		popover.hidePopover();
+	}
+
+	/**
+	 * Repositions the popover relative to the target element.
+	 * @private
+	 */
+	repositionPopover() {
+		const horizontalTarget = document.querySelector( '.prpl-wrap' );
+		const verticalTarget = document.querySelector(
+			'.prpl-widget-wrapper.prpl-suggested-tasks'
+		);
+
+		// Just in case.
+		if ( ! horizontalTarget || ! verticalTarget ) {
+			return;
+		}
+
+		const horizontalRect = horizontalTarget.getBoundingClientRect();
+		const verticalRect = verticalTarget.getBoundingClientRect();
+		const popoverId = this.getAttribute( 'popover-id' );
+		const popover = document.getElementById( popoverId );
+
+		// Reset default popover styles.
+		popover.style.margin = '0';
+
+		// Calculate target's center
+		const horizontalTargetCenter =
+			horizontalRect.left + horizontalRect.width / 2;
+
+		// Apply the position.
+		popover.style.position = 'fixed';
+		popover.style.left = `${ horizontalTargetCenter }px`;
+		popover.style.top = `${ Math.round( Math.abs( verticalRect.top ) ) }px`;
+		popover.style.transform = 'translateX(-50%)';
 	}
 }
