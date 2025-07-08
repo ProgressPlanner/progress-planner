@@ -45,7 +45,7 @@ class Suggested_Tasks {
 		$this->tasks_manager = new Tasks_Manager();
 
 		if ( \is_admin() ) {
-			\add_action( 'init', [ $this, 'init' ], 100 ); // Wait for the post types to be initialized.
+			\add_action( 'admin_init', [ $this, 'init' ], 20 ); // Wait for the post types to be initialized and transients to be set.
 
 			// Check GET parameter and maybe set task as pending.
 			\add_action( 'init', [ $this, 'maybe_complete_task' ] );

@@ -5,14 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\Interactive;
-
-use Progress_Planner\Suggested_Tasks\Providers\Interactive;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
  * Add task for Email sending.
  */
-class Email_Sending extends Interactive {
+class Email_Sending extends Tasks {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -36,6 +34,20 @@ class Email_Sending extends Interactive {
 	const CATEGORY = 'configuration';
 
 	/**
+	 * Whether the task is interactive.
+	 *
+	 * @var bool
+	 */
+	const IS_INTERACTIVE = true;
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'sending-email';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -48,13 +60,6 @@ class Email_Sending extends Interactive {
 	 * @var int
 	 */
 	protected $priority = 1;
-
-	/**
-	 * The popover ID.
-	 *
-	 * @var string
-	 */
-	protected $popover_id = 'sending-email';
 
 	/**
 	 * The email title.
@@ -127,6 +132,37 @@ class Email_Sending extends Interactive {
 	}
 
 	/**
+	 * We want task to be added always.
+	 *
+	 * @return bool
+	 */
+	public function should_add_task() {
+		return true;
+	}
+
+	/**
+	 * Task should be completed only manually by the user.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function is_task_completed( $task_id = '' ) {
+		return false;
+	}
+
+	/**
+	 * Task should be completed only manually by the user.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool|string
+	 */
+	public function evaluate_task( $task_id ) {
+		return false;
+	}
+
+	/**
 	 * Get the title.
 	 *
 	 * @return string
@@ -151,7 +187,6 @@ class Email_Sending extends Interactive {
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-
 		// Don't enqueue the script if the task is already completed.
 		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() ) ) {
 			return;
@@ -179,13 +214,7 @@ class Email_Sending extends Interactive {
 	 */
 	public function check_if_wp_mail_is_filtered() {
 		global $wp_filter;
-
-		$filters_to_check = [
-			'phpmailer_init',
-			'pre_wp_mail',
-		];
-
-		foreach ( $filters_to_check as $filter ) {
+		foreach ( [ 'phpmailer_init', 'pre_wp_mail' ] as $filter ) {
 			$has_filter                = isset( $wp_filter[ $filter ] ) && ! empty( $wp_filter[ $filter ]->callbacks ) ? true : false;
 			$this->is_wp_mail_filtered = $this->is_wp_mail_filtered || $has_filter;
 		}
@@ -197,7 +226,6 @@ class Email_Sending extends Interactive {
 	 * @return void
 	 */
 	public function check_if_wp_mail_has_override() {
-
 		// Just in case, since it will trigger PHP fatal error if the function doesn't exist.
 		if ( \function_exists( 'wp_mail' ) ) {
 			$file_path = ( new \ReflectionFunction( 'wp_mail' ) )->getFileName();
@@ -221,7 +249,6 @@ class Email_Sending extends Interactive {
 	 * @return void
 	 */
 	public function ajax_test_email_sending() {
-
 		// Check the nonce.
 		\check_admin_referer( 'progress_planner' );
 
@@ -261,7 +288,7 @@ class Email_Sending extends Interactive {
 		\progress_planner()->the_view(
 			'popovers/email-sending.php',
 			[
-				'prpl_popover_id'                      => $this->popover_id,
+				'prpl_popover_id'                      => static::POPOVER_ID,
 				'prpl_provider_id'                     => $this->get_provider_id(),
 				'prpl_email_subject'                   => $this->email_subject,
 				'prpl_email_error'                     => $this->email_error,
@@ -269,18 +296,5 @@ class Email_Sending extends Interactive {
 				'prpl_is_there_sending_email_override' => $this->is_there_sending_email_override(),
 			]
 		);
-	}
-
-	/**
-	 * Modify task data before injecting it.
-	 *
-	 * @param array $task_data The task data.
-	 *
-	 * @return array
-	 */
-	protected function modify_injection_task_data( $task_data ) {
-		$task_data['popover_id'] = 'prpl-popover-' . $this->popover_id;
-
-		return $task_data;
 	}
 }

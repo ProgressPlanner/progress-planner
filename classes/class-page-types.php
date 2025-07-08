@@ -356,7 +356,7 @@ class Page_Types {
 		$posts = $this->get_posts_by_type( 'page', 'homepage' );
 		$term  = \get_term_by( 'slug', 'homepage', self::TAXONOMY_NAME );
 
-		if ( ! $term || ! $term instanceof \WP_Term ) {
+		if ( ! $term ) {
 			return;
 		}
 

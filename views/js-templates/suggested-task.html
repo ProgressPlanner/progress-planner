@@ -28,7 +28,7 @@
 			<div class="tooltip-actions">
 				<# if ( data.post.content.rendered !== '' ) { #>
 					<prpl-tooltip>
-						<slot name="open-icon">
+						<slot name="open">
 							<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="info" data-target="info" title="{{ data.l10n.info }}">
 								<img src="{{ data.assets.infoIcon }}" alt="{{ data.l10n.info }}" class="icon">
 								<span class="screen-reader-text">{{ data.l10n.info }}</span>
@@ -52,7 +52,7 @@
 
 				<# if ( data.post.meta.prpl_snoozable ) { #>
 					<prpl-tooltip class="prpl-suggested-task-snooze">
-						<slot name="open-icon">
+						<slot name="open">
 							<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="snooze" data-target="snooze" title="{{ data.l10n.snooze }}">
 								<img src="{{ data.assets.snoozeIcon }}" alt="{{ data.l10n.snooze }}" class="icon">
 								<span class="screen-reader-text">{{ data.l10n.snooze }}</span>

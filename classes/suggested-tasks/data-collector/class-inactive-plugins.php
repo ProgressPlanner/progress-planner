@@ -66,11 +66,8 @@ class Inactive_Plugins extends Base_Data_Collector {
 			}
 		}
 
-		$unused_plugins = 0;
-		if ( ! \is_multisite() && $plugins_total > $plugins_active ) {
-			$unused_plugins = $plugins_total - $plugins_active;
-		}
-
-		return $unused_plugins;
+		return ! \is_multisite() && $plugins_total > $plugins_active
+			? $plugins_total - $plugins_active
+			: 0;
 	}
 }
