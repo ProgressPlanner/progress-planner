@@ -17,7 +17,7 @@
  * @param {string}      options.popoverId     - The ID of the popover.
  */
 // eslint-disable-next-line no-unused-vars
-const prplInteractiveTaskFormListener = ( {
+const prplInteractiveTaskFormListenerSiteSettings = ( {
 	formElement,
 	settingAPIKey,
 	setting,
