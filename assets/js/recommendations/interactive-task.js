@@ -23,6 +23,7 @@ const prplInteractiveTaskFormListenerSiteSettings = ( {
 	setting,
 	taskId,
 	popoverId,
+	settingCallbackValue = ( value ) => value,
 } = {} ) => {
 	formElement.addEventListener( 'submit', ( event ) => {
 		event.preventDefault();
@@ -33,7 +34,9 @@ const prplInteractiveTaskFormListenerSiteSettings = ( {
 		// Update the blog description.
 		wp.api.loadPromise.done( () => {
 			const settingsToPass = {};
-			settingsToPass[ settingAPIKey ] = formData.get( setting );
+			settingsToPass[ settingAPIKey ] = settingCallbackValue(
+				formData.get( setting )
+			);
 			const settings = new wp.api.models.Settings( settingsToPass );
 
 			settings.save().then( () => {
