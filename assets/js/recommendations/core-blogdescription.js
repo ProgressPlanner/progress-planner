@@ -25,17 +25,24 @@ prplBlogDescriptionForm.addEventListener( 'submit', ( event ) => {
 		} );
 
 		settings.save().then( () => {
+			const taskEl = document.querySelector(
+				`#prpl-suggested-tasks-list .prpl-suggested-task[data-task-id="core-blogdescription"]`
+			);
 			// Close popover.
 			document
 				.getElementById( 'prpl-popover-blog-description' )
 				.hidePopover();
-			const postId = parseInt(
-				document.querySelector(
-					`#prpl-suggested-tasks-list .prpl-suggested-task[data-task-id="core-blogdescription"]`
-				).dataset.postId
-			);
+			const postId = parseInt( taskEl.dataset.postId );
 			if ( postId ) {
 				prplSuggestedTask.maybeComplete( postId );
+				taskEl.setAttribute( 'data-task-action', 'celebrate' );
+				document.dispatchEvent(
+					new CustomEvent( 'prpl/celebrateTasks', {
+						detail: {
+							element: taskEl,
+						},
+					} )
+				);
 			}
 		} );
 	} );
