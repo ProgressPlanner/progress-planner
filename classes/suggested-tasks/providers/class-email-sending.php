@@ -38,7 +38,7 @@ class Email_Sending extends Tasks {
 	 *
 	 * @var bool
 	 */
-	protected $is_interactive = true;
+	const IS_INTERACTIVE = true;
 
 	/**
 	 * Whether the task is dismissable.

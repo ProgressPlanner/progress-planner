@@ -50,6 +50,13 @@ abstract class Tasks implements Tasks_Interface {
 	protected const DATA_COLLECTOR_CLASS = \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector::class;
 
 	/**
+	 * Whether the task is interactive.
+	 *
+	 * @var bool
+	 */
+	const IS_INTERACTIVE = false;
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -127,19 +134,12 @@ abstract class Tasks implements Tasks_Interface {
 	protected $popover_id = '';
 
 	/**
-	 * Whether the task is interactive.
-	 *
-	 * @var bool
-	 */
-	protected $is_interactive = false;
-
-	/**
 	 * Constructor.
 	 *
 	 * @return void
 	 */
 	public function __construct() {
-		if ( $this->is_interactive ) {
+		if ( static::IS_INTERACTIVE ) {
 			\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
 		}
 	}
