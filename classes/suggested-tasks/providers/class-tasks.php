@@ -142,6 +142,9 @@ abstract class Tasks implements Tasks_Interface {
 		if ( static::IS_INTERACTIVE ) {
 			\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
 		}
+
+		// Enqueue the scripts.
+		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 	}
 
 	/**
@@ -601,5 +604,28 @@ abstract class Tasks implements Tasks_Interface {
 				'prpl_provider_id' => $this->get_provider_id(),
 			]
 		);
+	}
+
+	/**
+	 * Enqueue the scripts.
+	 *
+	 * @return void
+	 */
+	public function enqueue_scripts() {
+
+		// Enqueue the web component.
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'progress-planner/recommendations/' . $this->get_provider_id(),
+			$this->get_enqueue_data()
+		);
+	}
+
+	/**
+	 * Get the enqueue data.
+	 *
+	 * @return array
+	 */
+	protected function get_enqueue_data() {
+		return [];
 	}
 }

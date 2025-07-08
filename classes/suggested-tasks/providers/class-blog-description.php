@@ -27,6 +27,20 @@ class Blog_Description extends Tasks {
 	protected const PROVIDER_ID = 'core-blogdescription';
 
 	/**
+	 * Whether the task is interactive.
+	 *
+	 * @var bool
+	 */
+	const IS_INTERACTIVE = true;
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'blog-description';
+
+	/**
 	 * Get the task title.
 	 *
 	 * @return string
@@ -46,15 +60,6 @@ class Blog_Description extends Tasks {
 			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/set-tagline" target="_blank">' . \esc_html__( 'tagline', 'progress-planner' ) . '</a>'
 		);
-	}
-
-	/**
-	 * Get the task URL.
-	 *
-	 * @return string
-	 */
-	protected function get_url() {
-		return \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() );
 	}
 
 	/**
