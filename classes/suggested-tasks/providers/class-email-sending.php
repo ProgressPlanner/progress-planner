@@ -41,6 +41,13 @@ class Email_Sending extends Tasks {
 	const IS_INTERACTIVE = true;
 
 	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'sending-email';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -53,13 +60,6 @@ class Email_Sending extends Tasks {
 	 * @var int
 	 */
 	protected $priority = 1;
-
-	/**
-	 * The popover ID.
-	 *
-	 * @var string
-	 */
-	protected $popover_id = 'sending-email';
 
 	/**
 	 * The email title.
@@ -288,7 +288,7 @@ class Email_Sending extends Tasks {
 		\progress_planner()->the_view(
 			'popovers/email-sending.php',
 			[
-				'prpl_popover_id'                      => $this->popover_id,
+				'prpl_popover_id'                      => static::POPOVER_ID,
 				'prpl_provider_id'                     => $this->get_provider_id(),
 				'prpl_email_subject'                   => $this->email_subject,
 				'prpl_email_error'                     => $this->email_error,
@@ -306,7 +306,7 @@ class Email_Sending extends Tasks {
 	 * @return array
 	 */
 	protected function modify_injection_task_data( $task_data ) {
-		$task_data['popover_id'] = 'prpl-popover-' . $this->popover_id;
+		$task_data['popover_id'] = 'prpl-popover-' . static::POPOVER_ID;
 
 		return $task_data;
 	}

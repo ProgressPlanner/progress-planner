@@ -57,6 +57,13 @@ abstract class Tasks implements Tasks_Interface {
 	const IS_INTERACTIVE = false;
 
 	/**
+	 * The popover ID for interactive tasks.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = '';
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -125,13 +132,6 @@ abstract class Tasks implements Tasks_Interface {
 	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector|null
 	 */
 	protected $data_collector = null;
-
-	/**
-	 * The popover ID for interactive tasks.
-	 *
-	 * @var string
-	 */
-	protected $popover_id = '';
 
 	/**
 	 * Constructor.
@@ -581,7 +581,7 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function add_popover() {
 		?>
-		<div id="prpl-popover-<?php echo \esc_attr( $this->popover_id ); ?>" class="prpl-popover prpl-popover-interactive" popover>
+		<div id="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>" class="prpl-popover prpl-popover-interactive" popover>
 			<?php $this->the_popover_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
 		</div>
 		<?php
@@ -594,9 +594,9 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function the_popover_content() {
 		\progress_planner()->the_view(
-			"popovers/{$this->popover_id}.php",
+			'popovers/' . static::POPOVER_ID . '.php',
 			[
-				'prpl_popover_id'  => $this->popover_id,
+				'prpl_popover_id'  => static::POPOVER_ID,
 				'prpl_provider_id' => $this->get_provider_id(),
 			]
 		);
