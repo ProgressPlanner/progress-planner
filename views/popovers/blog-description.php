@@ -18,6 +18,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 >
 	<div class="prpl-columns-wrapper-flex">
 		<div class="prpl-column prpl-column-content">
+			<h2><?php \esc_html_e( 'Set your site’s tagline', 'progress-planner' ); ?></h2>
 			<p><?php \esc_html_e( 'Your site’s tagline is the first thing people see when they land on your site. It’s a short description of what your site is about.', 'progress-planner' ); ?></p>
 		</div>
 		<div class="prpl-column">
