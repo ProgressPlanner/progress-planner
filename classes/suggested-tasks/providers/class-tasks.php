@@ -547,6 +547,7 @@ abstract class Tasks implements Tasks_Interface {
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
 			'snoozable'    => $this->is_snoozable(),
+			'popover_id'   => static::IS_INTERACTIVE ? 'prpl-popover-' . static::POPOVER_ID : '',
 		];
 	}
 

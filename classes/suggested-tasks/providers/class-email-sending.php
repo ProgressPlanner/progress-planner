@@ -297,17 +297,4 @@ class Email_Sending extends Tasks {
 			]
 		);
 	}
-
-	/**
-	 * Modify task data before injecting it.
-	 *
-	 * @param array $task_data The task data.
-	 *
-	 * @return array
-	 */
-	protected function modify_injection_task_data( $task_data ) {
-		$task_data['popover_id'] = 'prpl-popover-' . static::POPOVER_ID;
-
-		return $task_data;
-	}
 }
