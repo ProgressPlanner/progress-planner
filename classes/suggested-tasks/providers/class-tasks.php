@@ -592,5 +592,13 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return void
 	 */
-	public function the_popover_content() {}
+	public function the_popover_content() {
+		\progress_planner()->the_view(
+			"popovers/{$this->popover_id}.php",
+			[
+				'prpl_popover_id'  => $this->popover_id,
+				'prpl_provider_id' => $this->get_provider_id(),
+			]
+		);
+	}
 }
