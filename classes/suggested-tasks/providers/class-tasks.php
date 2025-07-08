@@ -120,6 +120,31 @@ abstract class Tasks implements Tasks_Interface {
 	protected $data_collector = null;
 
 	/**
+	 * The popover ID for interactive tasks.
+	 *
+	 * @var string
+	 */
+	protected $popover_id = '';
+
+	/**
+	 * Whether the task is interactive.
+	 *
+	 * @var bool
+	 */
+	protected $is_interactive = false;
+
+	/**
+	 * Constructor.
+	 *
+	 * @return void
+	 */
+	public function __construct() {
+		if ( $this->is_interactive ) {
+			\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
+		}
+	}
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -548,4 +573,24 @@ abstract class Tasks implements Tasks_Interface {
 
 		return $data;
 	}
+
+	/**
+	 * Add the popover.
+	 *
+	 * @return void
+	 */
+	public function add_popover() {
+		?>
+		<div id="prpl-popover-<?php echo \esc_attr( $this->popover_id ); ?>" class="prpl-popover prpl-popover-interactive" popover>
+			<?php $this->the_popover_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * The popover content.
+	 *
+	 * @return void
+	 */
+	public function the_popover_content() {}
 }
