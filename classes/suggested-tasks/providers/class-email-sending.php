@@ -5,14 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\Interactive;
-
-use Progress_Planner\Suggested_Tasks\Providers\Interactive;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
  * Add task for Email sending.
  */
-class Email_Sending extends Interactive {
+class Email_Sending extends Tasks {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -34,6 +32,13 @@ class Email_Sending extends Interactive {
 	 * @var string
 	 */
 	const CATEGORY = 'configuration';
+
+	/**
+	 * Whether the task is interactive.
+	 *
+	 * @var bool
+	 */
+	protected $is_interactive = true;
 
 	/**
 	 * Whether the task is dismissable.
@@ -124,6 +129,37 @@ class Email_Sending extends Interactive {
 			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_blank">Click here to mark Ravi\'s Recommendation as completed</a>.', 'progress-planner' ),
 			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() )
 		);
+	}
+
+	/**
+	 * We want task to be added always.
+	 *
+	 * @return bool
+	 */
+	public function should_add_task() {
+		return true;
+	}
+
+	/**
+	 * Task should be completed only manually by the user.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function is_task_completed( $task_id = '' ) {
+		return false;
+	}
+
+	/**
+	 * Task should be completed only manually by the user.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool|string
+	 */
+	public function evaluate_task( $task_id ) {
+		return false;
 	}
 
 	/**
