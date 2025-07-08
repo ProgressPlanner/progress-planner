@@ -31,4 +31,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			</form>
 		</div>
 	</div>
+
+	<button class="prpl-popover-close" data-action="closePopover">
+		<span class="dashicons dashicons-no-alt"></span>
+		<span class="screen-reader-text"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></span>
+	</button>
 </prpl-interactive-task-popover>
