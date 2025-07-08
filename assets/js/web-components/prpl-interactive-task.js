@@ -1,4 +1,4 @@
-/* global HTMLElement, prplSuggestedTask */
+/* global HTMLElement, prplSuggestedTask, customElements */
 
 /**
  * Register the custom web component.
@@ -142,3 +142,17 @@ class PrplInteractiveTask extends HTMLElement {
 		popover.style.transform = 'translateX(-50%)';
 	}
 }
+
+/**
+ * Register the custom web component.
+ */
+customElements.define(
+	'prpl-interactive-task-popover',
+	class extends PrplInteractiveTask {
+		// eslint-disable-next-line no-useless-constructor
+		constructor() {
+			// Get parent class properties
+			super();
+		}
+	}
+);
