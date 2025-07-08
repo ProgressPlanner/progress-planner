@@ -1,4 +1,4 @@
-/* global prplInteractiveTaskFormListenerSiteSettings */
+/* global prplInteractiveTaskFormListener */
 
 /*
  * Core Blog Description recommendation.
@@ -6,7 +6,7 @@
  * Dependencies: progress-planner/recommendations/interactive-task
  */
 
-prplInteractiveTaskFormListenerSiteSettings( {
+prplInteractiveTaskFormListener.siteSettings( {
 	formElement: document.getElementById( 'prpl-blog-description-form' ),
 	settingAPIKey: 'description',
 	setting: 'blogdescription',
