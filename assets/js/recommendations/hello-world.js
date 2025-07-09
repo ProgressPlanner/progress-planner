@@ -10,7 +10,6 @@ prplInteractiveTaskFormListener.customSubmit( {
 	taskId: 'hello-world',
 	popoverId: 'prpl-popover-hello-world',
 	callback: () => {
-		console.log( helloWorldData );
 		const post = new wp.api.models.Post( {
 			id: helloWorldData.postId,
 		} );
