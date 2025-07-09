@@ -95,10 +95,12 @@ class Blog_Description extends Tasks {
 	/**
 	 * Get the popover instructions.
 	 *
-	 * @return string
+	 * @return void
 	 */
-	protected function get_popover_instructions() {
-		return \esc_html__( 'In a few words, explain what this site is about.', 'progress-planner' );
+	public function print_popover_instructions() {
+		?>
+		<p><?php \esc_html_e( 'In a few words, explain what this site is about.', 'progress-planner' ); ?></p>
+		<?php
 	}
 
 	/**

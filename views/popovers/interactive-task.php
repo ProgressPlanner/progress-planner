@@ -18,14 +18,14 @@ if ( ! \defined( 'ABSPATH' ) ) {
 >
 	<div class="prpl-columns-wrapper-flex">
 		<div class="prpl-column prpl-column-content">
-			<h2><?php echo \wp_kses_post( $prpl_task_details['post_title'] ); ?></h2>
-			<p><?php echo \wp_kses_post( $prpl_popover_instructions ); ?></p>
+			<h2><?php echo \wp_kses_post( $prpl_task_object->get_task_details()['post_title'] ); ?></h2>
+			<?php $prpl_task_object->print_popover_instructions(); ?>
 		</div>
 		<div class="prpl-column">
 			<form onsubmit="return false;">
 				<label>
 					<?php $prpl_task_object->print_popover_input_field(); ?>
-					<p><?php echo \wp_kses_post( $prpl_task_details['description'] ); ?></p>
+					<p><?php echo \wp_kses_post( $prpl_task_object->get_task_details()['description'] ); ?></p>
 				</label>
 
 				<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;"><?php \esc_html_e( 'Save', 'progress-planner' ); ?></button>

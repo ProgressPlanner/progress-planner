@@ -603,22 +603,19 @@ abstract class Tasks implements Tasks_Interface {
 				'/views/popovers/interactive-task.php',
 			],
 			[
-				'prpl_task_object'          => $this,
-				'prpl_popover_id'           => static::POPOVER_ID,
-				'prpl_provider_id'          => $this->get_provider_id(),
-				'prpl_task_details'         => $this->get_task_details(),
-				'prpl_popover_instructions' => $this->get_popover_instructions(),
+				'prpl_task_object' => $this,
+				'prpl_popover_id'  => static::POPOVER_ID,
+				'prpl_provider_id' => $this->get_provider_id(),
 			]
 		);
 	}
 
 	/**
-	 * Get the popover instructions.
+	 * Print the popover instructions.
 	 *
-	 * @return string
+	 * @return void
 	 */
-	protected function get_popover_instructions() {
-		return '';
+	protected function print_popover_instructions() {
 	}
 
 	/**
