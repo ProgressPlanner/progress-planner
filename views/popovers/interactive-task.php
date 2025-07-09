@@ -18,15 +18,16 @@ if ( ! \defined( 'ABSPATH' ) ) {
 >
 	<div class="prpl-columns-wrapper-flex">
 		<div class="prpl-column prpl-column-content">
-			<h2><?php \esc_html_e( 'Set your site’s tagline', 'progress-planner' ); ?></h2>
-			<p><?php \esc_html_e( 'Your site’s tagline is the first thing people see when they land on your site. It’s a short description of what your site is about.', 'progress-planner' ); ?></p>
+			<h2><?php echo \wp_kses_post( $prpl_task_details['post_title'] ); ?></h2>
+			<p><?php echo \wp_kses_post( $prpl_popover_instructions ); ?></p>
 		</div>
 		<div class="prpl-column">
-			<form id="prpl-blog-description-form" onsubmit="return false;">
-				<input name="blogdescription" type="text" id="blogdescription" aria-describedby="tagline-description" value="" class="regular-text">
-				<p class="description" id="tagline-description">
-					<?php \esc_html_e( 'In a few words, explain what this site is about.', 'progress-planner' ); ?>
-				</p>
+			<form onsubmit="return false;">
+				<label>
+					<?php $prpl_task_object->print_popover_input_field(); ?>
+					<p><?php echo \wp_kses_post( $prpl_task_details['description'] ); ?></p>
+				</label>
+
 				<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;"><?php \esc_html_e( 'Save', 'progress-planner' ); ?></button>
 			</form>
 		</div>

@@ -7,7 +7,9 @@
  */
 
 prplInteractiveTaskFormListener.siteSettings( {
-	formElement: document.getElementById( 'prpl-blog-description-form' ),
+	formElement: document.querySelector(
+		'#prpl-popover-blog-description form'
+	),
 	settingAPIKey: 'description',
 	setting: 'blogdescription',
 	taskId: 'core-blogdescription',

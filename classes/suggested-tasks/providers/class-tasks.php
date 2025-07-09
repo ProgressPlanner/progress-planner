@@ -598,12 +598,35 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function the_popover_content() {
 		\progress_planner()->the_view(
-			'popovers/' . static::POPOVER_ID . '.php',
 			[
-				'prpl_popover_id'  => static::POPOVER_ID,
-				'prpl_provider_id' => $this->get_provider_id(),
+				'/views/popovers/' . static::POPOVER_ID . '.php',
+				'/views/popovers/interactive-task.php',
+			],
+			[
+				'prpl_task_object'          => $this,
+				'prpl_popover_id'           => static::POPOVER_ID,
+				'prpl_provider_id'          => $this->get_provider_id(),
+				'prpl_task_details'         => $this->get_task_details(),
+				'prpl_popover_instructions' => $this->get_popover_instructions(),
 			]
 		);
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return string
+	 */
+	protected function get_popover_instructions() {
+		return '';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_input_field() {
 	}
 
 	/**

@@ -91,4 +91,30 @@ class Blog_Description extends Tasks {
 	public function should_add_task() {
 		return '' === \get_bloginfo( 'description' );
 	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return string
+	 */
+	protected function get_popover_instructions() {
+		return \esc_html__( 'In a few words, explain what this site is about.', 'progress-planner' );
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_input_field() {
+		?>
+		<input
+			name="blogdescription"
+			type="text"
+			id="blogdescription"
+			value="<?php echo \esc_attr( \get_bloginfo( 'description' ) ); ?>"
+			class="regular-text"
+		>
+		<?php
+	}
 }
