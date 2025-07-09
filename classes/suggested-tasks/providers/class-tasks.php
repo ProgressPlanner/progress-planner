@@ -619,11 +619,11 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Print the popover input field for the form.
+	 * Print the popover form contents.
 	 *
 	 * @return void
 	 */
-	public function print_popover_input_field() {
+	public function print_popover_form_contents() {
 	}
 
 	/**

@@ -108,15 +108,21 @@ class Blog_Description extends Tasks {
 	 *
 	 * @return void
 	 */
-	public function print_popover_input_field() {
+	public function print_popover_form_contents() {
 		?>
-		<input
-			name="blogdescription"
-			type="text"
-			id="blogdescription"
-			value="<?php echo \esc_attr( \get_bloginfo( 'description' ) ); ?>"
-			class="regular-text"
-		>
+		<label>
+			<input
+				name="blogdescription"
+				type="text"
+				id="blogdescription"
+				value="<?php echo \esc_attr( \get_bloginfo( 'description' ) ); ?>"
+				class="regular-text"
+			>
+			<p><?php echo \wp_kses_post( $this->get_task_details()['description'] ); ?></p>
+		</label>
+		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+			<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
+		</button>
 		<?php
 	}
 }

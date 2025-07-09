@@ -23,12 +23,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		</div>
 		<div class="prpl-column">
 			<form onsubmit="return false;">
-				<label>
-					<?php $prpl_task_object->print_popover_input_field(); ?>
-					<p><?php echo \wp_kses_post( $prpl_task_object->get_task_details()['description'] ); ?></p>
-				</label>
-
-				<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;"><?php \esc_html_e( 'Save', 'progress-planner' ); ?></button>
+				<?php $prpl_task_object->print_popover_form_contents(); ?>
 			</form>
 		</div>
 	</div>
