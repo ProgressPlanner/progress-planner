@@ -11,22 +11,27 @@ const prplInteractiveTaskFormListener = {
 	/**
 	 * Add a form listener to an interactive task form.
 	 *
-	 * @param {Object}      options                      - The options for the interactive task form listener.
-	 * @param {HTMLElement} options.formElement          - The form element.
-	 * @param {string}      options.settingAPIKey        - The API key for the setting.
-	 * @param {string}      options.setting              - The setting to update.
-	 * @param {string}      options.taskId               - The ID of the task.
-	 * @param {string}      options.popoverId            - The ID of the popover.
-	 * @param {Function}    options.settingCallbackValue - The callback function to get the value of the setting.
+	 * @param {Object}   options                      - The options for the interactive task form listener.
+	 * @param {string}   options.settingAPIKey        - The API key for the setting.
+	 * @param {string}   options.setting              - The setting to update.
+	 * @param {string}   options.taskId               - The ID of the task.
+	 * @param {string}   options.popoverId            - The ID of the popover.
+	 * @param {Function} options.settingCallbackValue - The callback function to get the value of the setting.
 	 */
 	siteSettings: ( {
-		formElement,
 		settingAPIKey,
 		setting,
 		taskId,
 		popoverId,
 		settingCallbackValue = ( value ) => value,
 	} = {} ) => {
+		const formElement = document.querySelector( `#${ popoverId } form` );
+
+		if ( ! formElement ) {
+			return;
+		}
+
+		// Add a form listener to the form.
 		formElement.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
 
