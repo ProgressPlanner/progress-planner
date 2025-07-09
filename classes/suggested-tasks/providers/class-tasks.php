@@ -615,7 +615,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return void
 	 */
-	protected function print_popover_instructions() {
+	public function print_popover_instructions() {
 	}
 
 	/**
