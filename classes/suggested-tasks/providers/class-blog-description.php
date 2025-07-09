@@ -63,6 +63,15 @@ class Blog_Description extends Tasks {
 	}
 
 	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() );
+	}
+
+	/**
 	 * Get the link setting.
 	 *
 	 * @return array
