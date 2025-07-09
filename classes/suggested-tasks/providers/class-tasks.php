@@ -616,6 +616,9 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return void
 	 */
 	public function print_popover_instructions() {
+		?>
+		<p><?php echo \wp_kses_post( $this->get_description() ); ?></p>
+		<?php
 	}
 
 	/**
