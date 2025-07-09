@@ -70,4 +70,39 @@ const prplInteractiveTaskFormListener = {
 			} );
 		} );
 	},
+
+	customSubmit: ( { taskId, popoverId, callback = () => {} } = {} ) => {
+		const formElement = document.querySelector( `#${ popoverId } form` );
+
+		if ( ! formElement ) {
+			return;
+		}
+
+		// Add a form listener to the form.
+		formElement.addEventListener( 'submit', ( event ) => {
+			event.preventDefault();
+
+			callback();
+
+			const taskEl = document.querySelector(
+				`.prpl-suggested-task[data-task-id="${ taskId }"]`
+			);
+
+			// Close popover.
+			document.getElementById( popoverId ).hidePopover();
+			const postId = parseInt( taskEl.dataset.postId );
+			if ( ! postId ) {
+				return;
+			}
+			prplSuggestedTask.maybeComplete( postId );
+			taskEl.setAttribute( 'data-task-action', 'celebrate' );
+			document.dispatchEvent(
+				new CustomEvent( 'prpl/celebrateTasks', {
+					detail: {
+						element: taskEl,
+					},
+				} )
+			);
+		} );
+	},
 };
