@@ -27,6 +27,20 @@ class Disable_Comments extends Tasks {
 	protected const PROVIDER_ID = 'disable-comments';
 
 	/**
+	 * Whether the task is interactive.
+	 *
+	 * @var bool
+	 */
+	const IS_INTERACTIVE = true;
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'disable-comments';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -96,5 +110,29 @@ class Disable_Comments extends Tasks {
 	 */
 	public function is_task_completed( $task_id = '' ) {
 		return 'open' !== \get_default_comment_status();
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		?>
+		<p><?php \esc_html_e( 'If you don\'t need comments on your site, consider disabling them.', 'progress-planner' ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+			<?php \esc_html_e( 'Disable comments', 'progress-planner' ); ?>
+		</button>
+		<?php
 	}
 }

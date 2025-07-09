@@ -27,6 +27,20 @@ class Blog_Description extends Tasks {
 	protected const PROVIDER_ID = 'core-blogdescription';
 
 	/**
+	 * Whether the task is interactive.
+	 *
+	 * @var bool
+	 */
+	const IS_INTERACTIVE = true;
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'blog-description';
+
+	/**
 	 * Get the task title.
 	 *
 	 * @return string
@@ -76,5 +90,39 @@ class Blog_Description extends Tasks {
 	 */
 	public function should_add_task() {
 		return '' === \get_bloginfo( 'description' );
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		?>
+		<p><?php \esc_html_e( 'In a few words, explain what this site is about.', 'progress-planner' ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<label>
+			<input
+				name="blogdescription"
+				type="text"
+				id="blogdescription"
+				value="<?php echo \esc_attr( \get_bloginfo( 'description' ) ); ?>"
+				class="regular-text"
+			>
+			<p><?php echo \wp_kses_post( $this->get_task_details()['description'] ); ?></p>
+		</label>
+		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+			<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
+		</button>
+		<?php
 	}
 }

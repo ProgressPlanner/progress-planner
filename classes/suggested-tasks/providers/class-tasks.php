@@ -142,6 +142,9 @@ abstract class Tasks implements Tasks_Interface {
 		if ( static::IS_INTERACTIVE ) {
 			\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
 		}
+
+		// Enqueue the scripts.
+		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 	}
 
 	/**
@@ -595,11 +598,57 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function the_popover_content() {
 		\progress_planner()->the_view(
-			'popovers/' . static::POPOVER_ID . '.php',
 			[
+				'/views/popovers/' . static::POPOVER_ID . '.php',
+				'/views/popovers/interactive-task.php',
+			],
+			[
+				'prpl_task_object' => $this,
 				'prpl_popover_id'  => static::POPOVER_ID,
 				'prpl_provider_id' => $this->get_provider_id(),
 			]
 		);
+	}
+
+	/**
+	 * Print the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		?>
+		<p><?php echo \wp_kses_post( $this->get_description() ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Print the popover form contents.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+	}
+
+	/**
+	 * Enqueue the scripts.
+	 *
+	 * @return void
+	 */
+	public function enqueue_scripts() {
+
+		// Enqueue the web component.
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'progress-planner/recommendations/' . $this->get_provider_id(),
+			$this->get_enqueue_data()
+		);
+	}
+
+	/**
+	 * Get the enqueue data.
+	 *
+	 * @return array
+	 */
+	protected function get_enqueue_data() {
+		return [];
 	}
 }

@@ -43,6 +43,20 @@ class Sample_Page extends Tasks {
 	protected const DATA_COLLECTOR_CLASS = Sample_Page_Data_Collector::class;
 
 	/**
+	 * Whether the task is interactive.
+	 *
+	 * @var bool
+	 */
+	const IS_INTERACTIVE = true;
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'sample-page';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -95,5 +109,32 @@ class Sample_Page extends Tasks {
 	 */
 	public function should_add_task() {
 		return 0 !== $this->get_data_collector()->collect();
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+			<?php \esc_html_e( 'Delete the "Sample Page" page', 'progress-planner' ); ?>
+		</button>
+		<?php
+	}
+
+	/**
+	 * Get the enqueue data.
+	 *
+	 * @return array
+	 */
+	protected function get_enqueue_data() {
+		return [
+			'name' => 'samplePageData',
+			'data' => [
+				'postId' => $this->get_data_collector()->collect(),
+			],
+		];
 	}
 }
