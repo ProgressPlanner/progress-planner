@@ -112,13 +112,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * @return void
 	 */
 	public function maybe_remove_irrelevant_tasks( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
-		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
-
-		if ( ! $pending_tasks ) {
-			return;
-		}
-
-		foreach ( $pending_tasks as $task ) {
+		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] ) as $task ) {
 			/**
 			 * The task post object.
 			 *
@@ -298,13 +292,10 @@ class Remove_Terms_Without_Posts extends Tasks {
 		}
 
 		$this->completed_term_ids = [];
-		$tasks                    = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
-		if ( ! empty( $tasks ) ) {
-			foreach ( $tasks as $task ) {
-				if ( 'trash' === $task->post_status ) {
-					$this->completed_term_ids[] = $task->target_term_id;
-				}
+		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] ) as $task ) {
+			if ( 'trash' === $task->post_status ) {
+				$this->completed_term_ids[] = $task->target_term_id;
 			}
 		}
 

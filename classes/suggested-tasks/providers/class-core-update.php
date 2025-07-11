@@ -97,11 +97,9 @@ class Core_Update extends Tasks {
 	 * @return array
 	 */
 	public function add_core_update_link( $update_actions ) {
-		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
-
 		// All updates are completed and there is a 'update-core' task in the published tasks.
-		if ( $pending_tasks && $this->is_task_completed() ) {
-			foreach ( $pending_tasks as $task ) {
+		if ( $this->is_task_completed() ) {
+			foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] ) as $task ) {
 				if ( $this->get_task_id() === $task->task_id ) {
 					$update_actions['prpl_core_update'] =
 						'<img src="' . \esc_attr( \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg' ) . '" style="width:1rem;padding-left:0.25rem;padding-right:0.25rem;vertical-align:middle;" alt="Progress Planner" />' .
@@ -124,6 +122,19 @@ class Core_Update extends Tasks {
 		if ( ! \function_exists( 'get_core_updates' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/update.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
+
+		// For wp_get_update_data() to return correct data it needs to be called after the 'admin_init' action (with priority 10).
 		return 0 < \wp_get_update_data()['counts']['total'];
+	}
+
+	/**
+	 * Check if the task is completed.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function is_task_completed( $task_id = '' ) {
+		return \wp_doing_ajax() ? false : ! $this->should_add_task();
 	}
 }
