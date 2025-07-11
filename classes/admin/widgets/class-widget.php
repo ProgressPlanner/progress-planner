@@ -15,6 +15,15 @@ namespace Progress_Planner\Admin\Widgets;
 abstract class Widget {
 
 	/**
+	 * The widget width.
+	 *
+	 * Can be 1 or 2.
+	 *
+	 * @var int
+	 */
+	protected $width = 1;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -71,7 +80,7 @@ abstract class Widget {
 		$this->enqueue_styles();
 		$this->enqueue_scripts();
 		?>
-		<div class="prpl-widget-wrapper prpl-<?php echo \esc_attr( $this->id ); ?>">
+		<div class="prpl-widget-wrapper prpl-<?php echo \esc_attr( $this->id ); ?> prpl-widget-width-<?php echo (int) $this->width; ?>">
 			<div class="widget-inner-container">
 				<?php \progress_planner()->the_view( "page-widgets/{$this->id}.php" ); ?>
 			</div>
