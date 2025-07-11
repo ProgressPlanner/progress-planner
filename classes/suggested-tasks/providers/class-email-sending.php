@@ -5,14 +5,12 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Suggested_Tasks\Providers\Interactive;
-
-use Progress_Planner\Suggested_Tasks\Providers\Interactive;
+namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
  * Add task for Email sending.
  */
-class Email_Sending extends Interactive {
+class Email_Sending extends Tasks {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -36,6 +34,20 @@ class Email_Sending extends Interactive {
 	const CATEGORY = 'configuration';
 
 	/**
+	 * Whether the task is interactive.
+	 *
+	 * @var bool
+	 */
+	const IS_INTERACTIVE = true;
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'sending-email';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -48,13 +60,6 @@ class Email_Sending extends Interactive {
 	 * @var int
 	 */
 	protected $priority = 1;
-
-	/**
-	 * The popover ID.
-	 *
-	 * @var string
-	 */
-	protected $popover_id = 'sending-email';
 
 	/**
 	 * The email title.
@@ -125,6 +130,37 @@ class Email_Sending extends Interactive {
 			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ),
 			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
 		);
+	}
+
+	/**
+	 * We want task to be added always.
+	 *
+	 * @return bool
+	 */
+	public function should_add_task() {
+		return true;
+	}
+
+	/**
+	 * Task should be completed only manually by the user.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function is_task_completed( $task_id = '' ) {
+		return false;
+	}
+
+	/**
+	 * Task should be completed only manually by the user.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool|string
+	 */
+	public function evaluate_task( $task_id ) {
+		return false;
 	}
 
 	/**
@@ -253,7 +289,7 @@ class Email_Sending extends Interactive {
 		\progress_planner()->the_view(
 			'popovers/email-sending.php',
 			[
-				'prpl_popover_id'                      => $this->popover_id,
+				'prpl_popover_id'                      => static::POPOVER_ID,
 				'prpl_provider_id'                     => $this->get_provider_id(),
 				'prpl_email_subject'                   => $this->email_subject,
 				'prpl_email_error'                     => $this->email_error,
@@ -261,18 +297,5 @@ class Email_Sending extends Interactive {
 				'prpl_is_there_sending_email_override' => $this->is_there_sending_email_override(),
 			]
 		);
-	}
-
-	/**
-	 * Modify task data before injecting it.
-	 *
-	 * @param array $task_data The task data.
-	 *
-	 * @return array
-	 */
-	protected function modify_injection_task_data( $task_data ) {
-		$task_data['popover_id'] = 'prpl-popover-' . $this->popover_id;
-
-		return $task_data;
 	}
 }
