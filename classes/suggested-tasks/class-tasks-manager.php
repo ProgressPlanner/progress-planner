@@ -14,6 +14,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Blog_Description;
 use Progress_Planner\Suggested_Tasks\Providers\Settings_Saved;
 use Progress_Planner\Suggested_Tasks\Providers\Debug_Display;
 use Progress_Planner\Suggested_Tasks\Providers\Disable_Comments;
+use Progress_Planner\Suggested_Tasks\Providers\Disable_Comment_Pagination;
 use Progress_Planner\Suggested_Tasks\Providers\Sample_Page;
 use Progress_Planner\Suggested_Tasks\Providers\Hello_World;
 use Progress_Planner\Suggested_Tasks\Providers\Remove_Inactive_Plugins;
@@ -57,6 +58,7 @@ class Tasks_Manager {
 			new Settings_Saved(),
 			new Debug_Display(),
 			new Disable_Comments(),
+			new Disable_Comment_Pagination(),
 			new Sample_Page(),
 			new Hello_World(),
 			new Remove_Inactive_Plugins(),
