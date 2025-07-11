@@ -16,7 +16,6 @@ customElements.define(
 		constructor() {
 			// Get parent class properties
 			super();
-			this.repositionPopover = this.repositionPopover.bind( this ); // So this is available in the event listener.
 
 			// First step.
 			this.formStep = this.querySelector(
@@ -25,46 +24,10 @@ customElements.define(
 		}
 
 		/**
-		 * Repositions the popover relative to the target element.
-		 * @private
-		 */
-		repositionPopover() {
-			const horizontalTarget = document.querySelector( '.prpl-wrap' );
-			const verticalTarget = document.querySelector(
-				'.prpl-widget-wrapper.prpl-suggested-tasks'
-			);
-
-			// Just in case.
-			if ( ! horizontalTarget || ! verticalTarget ) {
-				return;
-			}
-
-			const horizontalRect = horizontalTarget.getBoundingClientRect();
-			const verticalRect = verticalTarget.getBoundingClientRect();
-			const popoverId = this.getAttribute( 'popover-id' );
-			const popover = document.getElementById( popoverId );
-
-			// Reset default popover styles.
-			popover.style.margin = '0';
-
-			// Calculate target's center
-			const horizontalTargetCenter =
-				horizontalRect.left + horizontalRect.width / 2;
-
-			// Apply the position.
-			popover.style.position = 'fixed';
-			popover.style.left = `${ horizontalTargetCenter }px`;
-			popover.style.top = `${ Math.round(
-				Math.abs( verticalRect.top )
-			) }px`;
-			popover.style.transform = 'translateX(-50%)';
-		}
-
-		/**
 		 * Runs when the popover is added to the DOM.
 		 */
 		popoverAddedToDOM() {
-			window.addEventListener( 'resize', this.repositionPopover );
+			super.popoverAddedToDOM();
 
 			// For the results step, add event listener to radio buttons.
 			const nextButton = this.querySelector(
@@ -83,13 +46,6 @@ customElements.define(
 					} );
 				} );
 			}
-		}
-
-		/**
-		 * Runs when the popover is opening.
-		 */
-		popoverOpening() {
-			this.repositionPopover();
 		}
 
 		/**
