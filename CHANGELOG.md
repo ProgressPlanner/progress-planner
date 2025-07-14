@@ -5,6 +5,12 @@ Bugs we fixed:
 * Fix issue where "Perform all updates" task was incorrectly marked as completed.
 
 
+= 1.6.2 =
+
+Bugs we fixed:
+
+* Ensure that the Custom Post Type for Recommendations is not publicly queryable.
+
 = 1.6.1 =
 
 Bugs we fixed:
