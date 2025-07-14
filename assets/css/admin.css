@@ -4,7 +4,7 @@
 :root {
 	--prpl-gap: 32px;
 	--prpl-settings-page-gap: 1.5rem;
-	--prpl-padding: 20px;
+	--prpl-padding: 1.25rem;
 	--prpl-column-min-width: 22rem;
 	--prpl-max-columns: 3;
 	--prpl-border-radius: 8px;
@@ -57,12 +57,13 @@
 	background: #fff;
 	border: 1px solid var(--prpl-color-gray-2);
 	border-radius: var(--prpl-border-radius);
-	padding: calc(var(--prpl-padding) * 2);
+	padding: var(--prpl-settings-page-gap) calc(var(--prpl-padding) * 2);
 	max-width: var(--prpl-container-max-width);
 	color: var(--prpl-color-text);
 	font-size: var(--prpl-font-size-base);
 	line-height: 1.4;
 	position: relative;
+	margin-top: var(--prpl-padding);
 }
 
 /*------------------------------------*\
@@ -164,7 +165,7 @@ button.prpl-info-icon {
 	Header & logo.
 \*------------------------------------*/
 .prpl-header {
-	margin-bottom: 2em;
+	margin-bottom: 2rem;
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
@@ -172,7 +173,7 @@ button.prpl-info-icon {
 }
 
 .prpl-header-logo svg {
-	height: 100px;
+	height: 5.5rem;
 }
 
 .prpl-header-right {
