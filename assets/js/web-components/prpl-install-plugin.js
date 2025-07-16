@@ -13,7 +13,7 @@
 customElements.define(
 	'prpl-install-plugin',
 	class extends HTMLElement {
-		constructor( { pluginSlug, pluginName, action, providerId } ) {
+		constructor( pluginSlug, pluginName, action, providerId ) {
 			// Get parent class properties
 			super();
 
