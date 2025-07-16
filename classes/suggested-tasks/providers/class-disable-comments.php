@@ -98,7 +98,9 @@ class Disable_Comments extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return 10 > \wp_count_comments()->approved && 'open' === \get_default_comment_status();
+		return ! \progress_planner()->get_plugin_installer()->is_plugin_activated( 'comment-free-zone' )
+			&& 10 > \wp_count_comments()->approved
+			&& 'open' === \get_default_comment_status();
 	}
 
 	/**
@@ -134,9 +136,9 @@ class Disable_Comments extends Tasks {
 			<?php \esc_html_e( 'Disable comments', 'progress-planner' ); ?>
 		</button>
 		<prpl-install-plugin
-			data-plugin-name="Comment Experience by Progress Planner"
-			data-plugin-slug="yoast-comment-hacks"
-			data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'akismet' ) ? 'activate' : 'install'; ?>"
+			data-plugin-name="Comment-free zone"
+			data-plugin-slug="comment-free-zone"
+			data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'comment-free-zone' ) ? 'activate' : 'install'; ?>"
 		></prpl-install-plugin>
 		<?php
 	}
