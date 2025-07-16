@@ -239,6 +239,9 @@ class Plugin_Installer {
 		if ( empty( $plugin_slug ) ) {
 			return '';
 		}
+		if ( ! function_exists( 'get_plugins' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore-line
+		}
 		foreach ( \array_keys( \get_plugins() ) as $plugin ) {
 			if ( \explode( '/', $plugin )[0] === $plugin_slug ) {
 				return $plugin;
