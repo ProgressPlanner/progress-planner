@@ -207,14 +207,36 @@ class Plugin_Installer {
 	 * @return bool
 	 */
 	public function is_plugin_installed( $plugin_slug ) {
+		return ! empty( $this->get_plugin_path( $plugin_slug ) );
+	}
+
+	/**
+	 * Checks if plugin is activated
+	 *
+	 * @param string $plugin_slug The slug of the plugin we want to install.
+	 *
+	 * @return bool
+	 */
+	public function is_plugin_activated( $plugin_slug ) {
+		return \is_plugin_active( $this->get_plugin_path( $plugin_slug ) );
+	}
+
+	/**
+	 * Get the path of the plugin
+	 *
+	 * @param string $plugin_slug The slug of the plugin we want to install.
+	 *
+	 * @return string
+	 */
+	private function get_plugin_path( $plugin_slug ) {
 		if ( empty( $plugin_slug ) ) {
-			return false;
+			return '';
 		}
 		foreach ( \array_keys( \get_plugins() ) as $plugin ) {
 			if ( \explode( '/', $plugin )[0] === $plugin_slug ) {
-				return true;
+				return $plugin;
 			}
 		}
-		return false;
+		return '';
 	}
 }
