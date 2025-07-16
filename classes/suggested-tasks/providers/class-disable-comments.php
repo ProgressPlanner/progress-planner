@@ -135,7 +135,7 @@ class Disable_Comments extends Tasks {
 		</button>
 		<prpl-install-plugin
 			data-plugin-name="Comment Experience by Progress Planner"
-			data-plugin-slug="akismet"
+			data-plugin-slug="yoast-comment-hacks"
 			data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'akismet' ) ? 'activate' : 'install'; ?>"
 		></prpl-install-plugin>
 		<?php
