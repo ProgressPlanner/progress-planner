@@ -18,13 +18,12 @@ class Plugin_Installer {
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_action( 'wp_ajax_progress_planner_install', [ $this, 'install' ] );
+		\add_action( 'wp_ajax_progress_planner_install_plugin', [ $this, 'install' ] );
+		\add_action( 'wp_ajax_progress_planner_activate_plugin', [ $this, 'activate' ] );
 	}
 
 	/**
 	 * Tries to install the plugin
-	 *
-	 * @access public
 	 *
 	 * @return void
 	 */
@@ -36,21 +35,104 @@ class Plugin_Installer {
 
 		\check_ajax_referer( 'progress_planner', 'nonce' );
 
-		$download = isset( $_POST['item_name'] )
-			? \sanitize_text_field( \wp_unslash( $_POST['item_name'] ) )
+		$download = isset( $_POST['plugin_slug'] )
+			? \sanitize_text_field( \wp_unslash( $_POST['plugin_slug'] ) )
 			: '';
 
-		// Throw error if the product is not free and license it empty.
 		if ( empty( $download ) ) {
-			\wp_send_json_error( \esc_attr__( 'An Error Occured', 'progress-planner' ) );
+			\wp_send_json_error(
+				[
+					'code'    => 'empty_plugin_slug',
+					'message' => \esc_attr__( 'An Error Occured', 'progress-planner' ),
+				]
+			);
 		}
 
-		// Install the plugin.
+		if ( $this->is_plugin_installed( $download ) ) {
+			\wp_send_json_success(
+				[
+					'code'    => 'plugin_already_installed',
+					'message' => \esc_html__( 'Plugin already installed', 'progress-planner' ),
+				]
+			);
+		}
+
 		$installed = $this->install_plugin( $download );
 		if ( $installed && ! \is_wp_error( $installed ) ) {
-			\wp_send_json_success( $installed );
+			\wp_send_json_success(
+				[
+					'code'    => 'plugin_installed',
+					'message' => \esc_html__( 'Plugin installed', 'progress-planner' ),
+				]
+			);
 		}
-		\wp_send_json_error( \esc_html__( 'An Error Occured', 'progress-planner' ) );
+		\wp_send_json_error(
+			[
+				'code'    => 'install_failed',
+				'message' => \esc_html__( 'An Error Occured', 'progress-planner' ),
+			]
+		);
+	}
+
+	/**
+	 * Tries to activate the plugin
+	 *
+	 * @return void
+	 */
+	public function activate() {
+		$can_activate = $this->check_capabilities();
+		if ( ! $can_activate ) {
+			\wp_die( \esc_html( $can_activate ) );
+		}
+
+		\check_ajax_referer( 'progress_planner', 'nonce' );
+
+		$plugin_slug = isset( $_POST['plugin_slug'] )
+			? \sanitize_text_field( \wp_unslash( $_POST['plugin_slug'] ) )
+			: '';
+
+		if ( empty( $plugin_slug ) ) {
+			\wp_send_json_error(
+				[
+					'code'    => 'empty_plugin_slug',
+					'message' => \esc_attr__( 'An Error Occured', 'progress-planner' ),
+				]
+			);
+		}
+
+		$plugin_path = '';
+		foreach ( \array_keys( \get_plugins() ) as $plugin ) {
+			if ( \explode( '/', $plugin )[0] === $plugin_slug ) {
+				$plugin_path = $plugin;
+				break;
+			}
+		}
+
+		if ( empty( $plugin_path ) ) {
+			\wp_send_json_error(
+				[
+					'code'    => 'plugin_not_found',
+					'message' => \esc_attr__( 'An Error Occured', 'progress-planner' ),
+				]
+			);
+		}
+
+		$activated = \activate_plugin( $plugin_path );
+		if ( \is_wp_error( $activated ) ) {
+			\wp_send_json_error(
+				[
+					'code'    => 'activate_failed',
+					'message' => \esc_attr__( 'An Error Occured', 'progress-planner' ),
+				]
+			);
+		}
+
+		\wp_send_json_success(
+			[
+				'code'    => 'plugin_activated',
+				'message' => \esc_html__( 'Plugin activated', 'progress-planner' ),
+			]
+		);
 	}
 
 	/**
@@ -60,17 +142,11 @@ class Plugin_Installer {
 	 *
 	 * @return bool|\WP_Error
 	 */
-	public function install_plugin( $plugin ) {
-
-		// Check if the user has the necessary capabilities.
-		$can_install = $this->check_capabilities();
-		if ( ! $can_install ) {
-			\wp_die( \esc_html( $can_install ) );
-		}
-
+	private function install_plugin( $plugin ) {
+		require_once ABSPATH . 'wp-admin/includes/class-wp-upgrader.php'; // @phpstan-ignore-line
 		require_once ABSPATH . 'wp-admin/includes/plugin-install.php'; // @phpstan-ignore-line
-
-		\check_admin_referer( 'install-plugin_' . $plugin );
+		require_once ABSPATH . 'wp-admin/includes/class-plugin-upgrader.php'; // @phpstan-ignore-line
+		require_once ABSPATH . 'wp-admin/includes/class-plugin-installer-skin.php'; // @phpstan-ignore-line
 		$api = \plugins_api(
 			'plugin_information',
 			[
@@ -126,16 +202,16 @@ class Plugin_Installer {
 	/**
 	 * Checks if plugin is intalled
 	 *
-	 * @param string $plugin_name The name of the plugin we want to install.
+	 * @param string $plugin_slug The slug of the plugin we want to install.
 	 *
 	 * @return bool
 	 */
-	public function is_plugin_installed( $plugin_name ) {
-		if ( empty( $plugin_name ) ) {
+	public function is_plugin_installed( $plugin_slug ) {
+		if ( empty( $plugin_slug ) ) {
 			return false;
 		}
-		foreach ( \get_plugins() as $plugin ) {
-			if ( $plugin['Name'] === $plugin_name ) {
+		foreach ( \array_keys( \get_plugins() ) as $plugin ) {
+			if ( \explode( '/', $plugin )[0] === $plugin_slug ) {
 				return true;
 			}
 		}
