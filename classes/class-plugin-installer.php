@@ -218,7 +218,14 @@ class Plugin_Installer {
 	 * @return bool
 	 */
 	public function is_plugin_activated( $plugin_slug ) {
-		return \is_plugin_active( $this->get_plugin_path( $plugin_slug ) );
+		$plugin_path = $this->get_plugin_path( $plugin_slug );
+		if ( empty( $plugin_path ) ) {
+			return false;
+		}
+		if ( ! function_exists( 'is_plugin_active' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore-line
+		}
+		return \is_plugin_active( $plugin_path );
 	}
 
 	/**
