@@ -218,11 +218,8 @@ class Update_Term_Description extends Tasks {
 			)
 		);
 
-		// Get the task post.
-		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
-
 		// Skip the task if it was already injected.
-		if ( $task_post ) {
+		if ( \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] ) ) {
 			return [];
 		}
 
@@ -282,13 +279,10 @@ class Update_Term_Description extends Tasks {
 		}
 
 		$this->completed_term_ids = [];
-		$tasks                    = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
-		if ( ! empty( $tasks ) ) {
-			foreach ( $tasks as $task ) {
-				if ( 'trash' === $task->post_status ) {
-					$this->completed_term_ids[] = $task->target_term_id;
-				}
+		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] ) as $task ) {
+			if ( 'trash' === $task->post_status ) {
+				$this->completed_term_ids[] = $task->target_term_id;
 			}
 		}
 
