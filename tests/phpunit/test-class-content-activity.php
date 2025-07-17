@@ -52,11 +52,11 @@ class Content_Activity_Test extends \WP_UnitTestCase {
 	 */
 	public function test_points_decay_over_time( $days_ago, $expected_ratio ): void {
 		// Create a test post.
-		$post_id = $this->factory->post->create(
+		$post_id = $this->factory()->post->create(
 			[
 				'post_content' => 'Test content',
 				'post_status'  => 'publish',
-				'post_date'    => \gmdate( 'Y-m-d H:i:s', strtotime( "-{$days_ago} days" ) ),
+				'post_date'    => \gmdate( 'Y-m-d H:i:s', \strtotime( "-{$days_ago} days" ) ),
 			]
 		);
 
@@ -69,7 +69,7 @@ class Content_Activity_Test extends \WP_UnitTestCase {
 		$points = $content_activity->get_points( $date );
 
 		$base_points     = Content::$points_config['publish'];
-		$expected_points = $days_ago >= 30 ? 0 : round( $base_points * $expected_ratio );
+		$expected_points = $days_ago >= 30 ? 0 : \round( $base_points * $expected_ratio );
 
 		$this->assertEquals( $expected_points, $points );
 	}
@@ -96,7 +96,7 @@ class Content_Activity_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_points_caching(): void {
-		$post_id = $this->factory->post->create(
+		$post_id = $this->factory()->post->create(
 			[
 				'post_content' => 'Test content',
 				'post_status'  => 'publish',
@@ -125,7 +125,7 @@ class Content_Activity_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_different_activity_types(): void {
-		$post_id = $this->factory->post->create(
+		$post_id = $this->factory()->post->create(
 			[
 				'post_content' => 'Test content',
 				'post_status'  => 'publish',

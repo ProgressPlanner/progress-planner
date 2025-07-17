@@ -12,8 +12,8 @@
  *
  * @return {Promise} The promise of the tasks.
  */
-async function prplOnboardTasks() {
-	return new Promise( ( resolve ) => {
+const prplOnboardTasks = async () =>
+	new Promise( ( resolve ) => {
 		( async () => {
 			const tasksElement = document.getElementById(
 				'prpl-onboarding-tasks'
@@ -79,7 +79,6 @@ async function prplOnboardTasks() {
 			resolve();
 		} )();
 	} );
-}
 
 /**
  * Redirect user to the stats page after onboarding or plugin upgrade.

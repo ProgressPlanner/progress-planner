@@ -24,10 +24,10 @@ class Date {
 	 *               ].
 	 */
 	public function get_range( $start_date, $end_date ) {
-		$dates = iterator_to_array( new \DatePeriod( $start_date, new \DateInterval( 'P1D' ), $end_date ), false );
+		$dates = \iterator_to_array( new \DatePeriod( $start_date, new \DateInterval( 'P1D' ), $end_date ), false );
 		return [
 			'start_date' => $dates[0],
-			'end_date'   => end( $dates ),
+			'end_date'   => \end( $dates ),
 		];
 	}
 
@@ -60,7 +60,7 @@ class Date {
 				break;
 		}
 
-		$period = iterator_to_array( new \DatePeriod( $start_date, $interval, $end_date ), false );
+		$period = \iterator_to_array( new \DatePeriod( $start_date, $interval, $end_date ), false );
 
 		$date_ranges = [];
 		foreach ( $period as $key => $date ) {
@@ -71,8 +71,8 @@ class Date {
 		if ( empty( $date_ranges ) ) {
 			return [];
 		}
-		if ( $end_date->format( 'z' ) !== end( $date_ranges )['end_date']->format( 'z' ) ) {
-			$final_end     = clone end( $date_ranges )['end_date'];
+		if ( $end_date->format( 'z' ) !== \end( $date_ranges )['end_date']->format( 'z' ) ) {
+			$final_end     = clone \end( $date_ranges )['end_date'];
 			$date_ranges[] = $this->get_range( $final_end->modify( '+1 day' ), $end_date );
 		}
 

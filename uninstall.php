@@ -8,7 +8,7 @@
  */
 
 // If uninstall not called from WordPress, then exit.
-if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+if ( ! \defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
@@ -23,16 +23,16 @@ require_once __DIR__ . '/classes/activities/class-query.php';
  * @return void
  */
 function progress_planner_cleanup_options() {
-	$value = get_option( \Progress_Planner\Settings::OPTION_NAME, [] );
+	$value = \get_option( \Progress_Planner\Settings::OPTION_NAME, [] );
 	$keep  = [ 'badges', 'activation_date' ];
-	foreach ( array_keys( $value ) as $key ) { // @phpstan-ignore-line argument.type
-		if ( ! in_array( $key, $keep, true ) ) {
+	foreach ( \array_keys( $value ) as $key ) { // @phpstan-ignore-line argument.type
+		if ( ! \in_array( $key, $keep, true ) ) {
 			unset( $value[ $key ] ); // @phpstan-ignore-line offsetAccess.nonOffsetAccessible
 		}
 	}
-	update_option( \Progress_Planner\Settings::OPTION_NAME, $value );
+	\update_option( \Progress_Planner\Settings::OPTION_NAME, $value );
 }
-progress_planner_cleanup_options();
+\progress_planner_cleanup_options();
 
 // Delete the custom database tables.
 global $wpdb;

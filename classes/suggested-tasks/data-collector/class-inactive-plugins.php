@@ -46,31 +46,28 @@ class Inactive_Plugins extends Base_Data_Collector {
 	 * @return int
 	 */
 	protected function calculate_data() {
-		if ( ! function_exists( 'get_plugins' ) ) {
+		if ( ! \function_exists( 'get_plugins' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
 
 		// Clear the plugins cache, so get_plugins() returns the latest plugins.
-		wp_cache_delete( 'plugins', 'plugins' );
+		\wp_cache_delete( 'plugins', 'plugins' );
 
-		$plugins        = get_plugins();
+		$plugins        = \get_plugins();
 		$plugins_active = 0;
 		$plugins_total  = 0;
 
 		// Loop over the available plugins and check their versions and active state.
-		foreach ( array_keys( $plugins ) as $plugin_path ) {
+		foreach ( \array_keys( $plugins ) as $plugin_path ) {
 			++$plugins_total;
 
-			if ( is_plugin_active( $plugin_path ) ) {
+			if ( \is_plugin_active( $plugin_path ) ) {
 				++$plugins_active;
 			}
 		}
 
-		$unused_plugins = 0;
-		if ( ! is_multisite() && $plugins_total > $plugins_active ) {
-			$unused_plugins = $plugins_total - $plugins_active;
-		}
-
-		return $unused_plugins;
+		return ! \is_multisite() && $plugins_total > $plugins_active
+			? $plugins_total - $plugins_active
+			: 0;
 	}
 }

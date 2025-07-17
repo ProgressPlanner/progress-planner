@@ -118,9 +118,9 @@ prplDocumentReady( () => {
 } );
 
 // Recheck the accessibility of the page when a new task is injected.
-document.addEventListener( 'prpl/suggestedTask/injectItem', () => {
+document.addEventListener( 'prpl/suggestedTask/itemInjected', () => {
 	// Wait for the new task to be added to the DOM.
 	setTimeout( () => {
 		externalLinkHelper.applyAccessibility();
-	}, 500 );
+	}, 10 );
 } );
