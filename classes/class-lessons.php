@@ -47,10 +47,10 @@ class Lessons {
 			)
 			: \add_query_arg( [ 'site' => \get_site_url() ], $url );
 
-		$cache_key = md5( $url );
+		$cache_key = \md5( $url );
 
 		$cached = \progress_planner()->get_utils__cache()->get( $cache_key );
-		if ( is_array( $cached ) ) {
+		if ( \is_array( $cached ) ) {
 			return $cached;
 		}
 
@@ -61,13 +61,13 @@ class Lessons {
 			return [];
 		}
 
-		if ( 200 !== (int) wp_remote_retrieve_response_code( $response ) ) {
+		if ( 200 !== (int) \wp_remote_retrieve_response_code( $response ) ) {
 			\progress_planner()->get_utils__cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
 			return [];
 		}
 
-		$json = json_decode( \wp_remote_retrieve_body( $response ), true );
-		if ( ! is_array( $json ) ) {
+		$json = \json_decode( \wp_remote_retrieve_body( $response ), true );
+		if ( ! \is_array( $json ) ) {
 			\progress_planner()->get_utils__cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
 			return [];
 		}

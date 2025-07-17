@@ -1,4 +1,4 @@
-/* global HTMLElement */
+/* global HTMLElement, prplSuggestedTask, customElements */
 
 /**
  * Register the custom web component.
@@ -9,6 +9,8 @@ class PrplInteractiveTask extends HTMLElement {
 	constructor() {
 		// Get parent class properties
 		super();
+
+		this.repositionPopover = this.repositionPopover.bind( this ); // So this is available in the event listener.
 	}
 
 	/**
@@ -56,12 +58,16 @@ class PrplInteractiveTask extends HTMLElement {
 	/**
 	 * Runs when the popover is added to the DOM.
 	 */
-	popoverAddedToDOM() {}
+	popoverAddedToDOM() {
+		window.addEventListener( 'resize', this.repositionPopover );
+	}
 
 	/**
 	 * Runs when the popover is opening.
 	 */
-	popoverOpening() {}
+	popoverOpening() {
+		this.repositionPopover();
+	}
 
 	/**
 	 * Runs when the popover is closing.
@@ -73,17 +79,22 @@ class PrplInteractiveTask extends HTMLElement {
 	 */
 	completeTask() {
 		const providerId = this.getAttribute( 'provider-id' );
-		const components = document.querySelectorAll( 'prpl-suggested-task' );
+		const tasks = document.querySelectorAll(
+			'#prpl-suggested-tasks-list .prpl-suggested-task'
+		);
 
-		components.forEach( ( component ) => {
-			const liElement = component.querySelector( 'li' );
-			if ( liElement.dataset.taskId === providerId ) {
+		tasks.forEach( ( taskElement ) => {
+			if ( taskElement.dataset.taskId === providerId ) {
 				// Close popover.
 				document
 					.getElementById( 'prpl-popover-' + providerId )
 					.hidePopover();
-				// Complete task.
-				component.runTaskAction( liElement.dataset.taskId, 'complete' );
+
+				const postId = parseInt( taskElement.dataset.postId );
+
+				if ( postId ) {
+					prplSuggestedTask.maybeComplete( postId );
+				}
 			}
 		} );
 	}
@@ -96,4 +107,52 @@ class PrplInteractiveTask extends HTMLElement {
 		const popover = document.getElementById( popoverId );
 		popover.hidePopover();
 	}
+
+	/**
+	 * Repositions the popover relative to the target element.
+	 * @private
+	 */
+	repositionPopover() {
+		const horizontalTarget = document.querySelector( '.prpl-wrap' );
+		const verticalTarget = document.querySelector(
+			'.prpl-widget-wrapper.prpl-suggested-tasks'
+		);
+
+		// Just in case.
+		if ( ! horizontalTarget || ! verticalTarget ) {
+			return;
+		}
+
+		const horizontalRect = horizontalTarget.getBoundingClientRect();
+		const verticalRect = verticalTarget.getBoundingClientRect();
+		const popoverId = this.getAttribute( 'popover-id' );
+		const popover = document.getElementById( popoverId );
+
+		// Reset default popover styles.
+		popover.style.margin = '0';
+
+		// Calculate target's center
+		const horizontalTargetCenter =
+			horizontalRect.left + horizontalRect.width / 2;
+
+		// Apply the position.
+		popover.style.position = 'fixed';
+		popover.style.left = `${ horizontalTargetCenter }px`;
+		popover.style.top = `${ Math.round( Math.abs( verticalRect.top ) ) }px`;
+		popover.style.transform = 'translateX(-50%)';
+	}
 }
+
+/**
+ * Register the custom web component.
+ */
+customElements.define(
+	'prpl-interactive-task-popover',
+	class extends PrplInteractiveTask {
+		// eslint-disable-next-line no-useless-constructor
+		constructor() {
+			// Get parent class properties
+			super();
+		}
+	}
+);

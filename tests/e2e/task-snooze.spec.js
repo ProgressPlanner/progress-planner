@@ -69,7 +69,7 @@ test.describe( 'PRPL Task Snooze', () => {
 			const updatedTask = updatedTasks.find(
 				( task ) => task.task_id === taskToSnooze.task_id
 			);
-			expect( updatedTask.status ).toBe( 'snoozed' );
+			expect( updatedTask.post_status ).toBe( 'future' );
 		}
 	} );
 } );

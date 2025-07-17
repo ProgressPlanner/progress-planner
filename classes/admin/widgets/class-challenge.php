@@ -39,25 +39,25 @@ final class Challenge extends Widget {
 		}
 
 		// Transient expired, fetch new feed.
-		if ( $feed_data['expires'] < time() ) {
+		if ( $feed_data['expires'] < \time() ) {
 			// Get the feed using the REST API.
 			$response = \wp_remote_get( $this->get_remote_api_url( $force_free ) );
 
-			if ( 200 !== wp_remote_retrieve_response_code( $response ) ) {
+			if ( 200 !== \wp_remote_retrieve_response_code( $response ) ) {
 				// Fallback to free response if PRO but the license is invalid.
 				if ( ! $force_free && \progress_planner()->is_pro_site() ) {
 					return $this->get_challenge( true );
 				}
 
 				// If we cant fetch the feed, we will try again later.
-				$feed_data['expires'] = time() + 5 * MINUTE_IN_SECONDS;
+				$feed_data['expires'] = \time() + 5 * MINUTE_IN_SECONDS;
 			} else {
-				$feed = json_decode( \wp_remote_retrieve_body( $response ), true );
+				$feed = \json_decode( \wp_remote_retrieve_body( $response ), true );
 
 				$feed_data['feed']    = $feed;
-				$feed_data['expires'] = time() + 1 * DAY_IN_SECONDS;
+				$feed_data['expires'] = \time() + 1 * DAY_IN_SECONDS;
 				if ( empty( $feed ) ) {
-					$feed_data['expires'] = time() + 1 * HOUR_IN_SECONDS;
+					$feed_data['expires'] = \time() + 1 * HOUR_IN_SECONDS;
 				}
 			}
 
@@ -88,7 +88,7 @@ final class Challenge extends Widget {
 	 * @return string
 	 */
 	public function get_cache_key( $force_free = false ) {
-		return md5( $this->get_remote_api_url( $force_free ) );
+		return \md5( $this->get_remote_api_url( $force_free ) );
 	}
 
 	/**

@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Task_Factory;
 use Progress_Planner\Suggested_Tasks\Providers\Traits\Dismissable_Task;
 use Progress_Planner\Page_Types;
 
@@ -46,11 +45,18 @@ class Content_Review extends Tasks {
 	protected $is_repetitive = true;
 
 	/**
-	 * The task priority.
+	 * The task URL target.
 	 *
 	 * @var string
 	 */
-	protected $priority = 'high';
+	protected $url_target = '_blank';
+
+	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 30;
 
 	/**
 	 * Whether the task is dismissable.
@@ -69,23 +75,23 @@ class Content_Review extends Tasks {
 	/**
 	 * The snoozed post IDs.
 	 *
-	 * @var array|null
+	 * @var array
 	 */
-	protected $snoozed_post_ids = null;
+	protected $snoozed_post_ids = [];
 
 	/**
 	 * The dismissed post IDs.
 	 *
-	 * @var array|null
+	 * @var array
 	 */
-	protected $dismissed_post_ids = null;
+	protected $dismissed_post_ids = [];
 
 	/**
 	 * The post to update IDs.
 	 *
-	 * @var array|null
+	 * @var array
 	 */
-	protected $task_post_mappings = null;
+	protected $task_post_mappings = [];
 
 	/**
 	 * The include post types.
@@ -105,7 +111,7 @@ class Content_Review extends Tasks {
 		\add_filter( 'progress_planner_update_posts_tasks_args', [ $this, 'filter_update_posts_args' ] );
 
 		// Add the Yoast cornerstone pages to the important page IDs.
-		if ( function_exists( 'YoastSEO' ) ) {
+		if ( \function_exists( 'YoastSEO' ) ) {
 			\add_filter( 'progress_planner_update_posts_important_page_ids', [ $this, 'add_yoast_cornerstone_pages' ] );
 		}
 
@@ -115,60 +121,86 @@ class Content_Review extends Tasks {
 	/**
 	 * Get the task title.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_title( $task_id = '' ) {
-		$post = $this->get_post_from_task_id( $task_id );
+	protected function get_title_with_data( $task_data = [] ) {
+		if ( ! isset( $task_data['target_post_id'] ) ) {
+			return '';
+		}
 
-		return $post
-			? sprintf(
-				// translators: %1$s: The post type, %2$s: The post title.
-				\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
-				strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
-				\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
-			) : '';
-	}
-
-	/**
-	 * Get the task description.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return string
-	 */
-	public function get_description( $task_id = '' ) {
-		$post = $this->get_post_from_task_id( $task_id );
+		$post = \get_post( $task_data['target_post_id'] );
 
 		if ( ! $post ) {
 			return '';
 		}
 
-		$months = in_array( (int) $post->ID, $this->get_saved_page_types(), true ) ? '12' : '6';
+		return \sprintf(
+				// translators: %1$s: The post type, %2$s: The post title.
+			\esc_html__( 'Review %1$s "%2$s"', 'progress-planner' ),
+			\strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
+			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
+		);
+	}
 
-		return '<p>' . sprintf(
+	/**
+	 * Get the task description.
+	 *
+	 * @param array $task_data The task data.
+	 *
+	 * @return string
+	 */
+	protected function get_description_with_data( $task_data = [] ) {
+		if ( ! isset( $task_data['target_post_id'] ) ) {
+			return '';
+		}
+
+		$post = \get_post( $task_data['target_post_id'] );
+
+		if ( ! $post ) {
+			return '';
+		}
+
+		$months = \in_array( (int) $post->ID, $this->get_saved_page_types(), true ) ? '12' : '6';
+
+		return '<p>' . \sprintf(
 			/* translators: %1$s <a href="https://prpl.fyi/review-post" target="_blank">Review</a> link, %2$s: The post title, %3$s: The number of months. */
 			\esc_html__( '%1$s the post "%2$s" as it was last updated more than %3$s months ago.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/review-post" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
 			\esc_html( $post->post_title ), // @phpstan-ignore-line property.nonObject
 			\esc_html( $months )
-		) . '</p>' . ( $this->capability_required() ? '<p><a href="' . \esc_url( \get_edit_post_link( $post->ID ) ) . '">' . \esc_html__( 'Edit the post', 'progress-planner' ) . '</a>.</p>' : '' ); // @phpstan-ignore-line property.nonObject
+		) . '</p>';
 	}
 
 	/**
 	 * Get the task URL.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param array $task_data The task data.
 	 *
 	 * @return string
 	 */
-	public function get_url( $task_id = '' ) {
-		$post = $this->get_post_from_task_id( $task_id );
+	protected function get_url_with_data( $task_data = [] ) {
+		if ( ! isset( $task_data['target_post_id'] ) ) {
+			return '';
+		}
 
-		return $post && $this->capability_required()
-			? \esc_url( (string) \get_edit_post_link( $post->ID ) )
-			: '';
+		$post = \get_post( $task_data['target_post_id'] );
+
+		if ( ! $post ) {
+			return '';
+		}
+
+		// We don't use the edit_post_link() function because we need to bypass it's current_user_can() check.
+		return \esc_url(
+			\add_query_arg(
+				[
+					'post'   => $post->ID,
+					'action' => 'edit',
+				],
+				\admin_url( 'post.php' )
+			)
+		);
 	}
 
 	/**
@@ -177,97 +209,93 @@ class Content_Review extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( null === $this->task_post_mappings ) {
-			$this->task_post_mappings = [];
+		if ( ! empty( $this->task_post_mappings ) ) {
+			return true;
+		}
 
-			$number_of_posts_to_inject = static::ITEMS_TO_INJECT;
-			$last_updated_posts        = [];
+		$last_updated_posts = [];
 
-			// Check if there are any important pages to update.
-			$important_page_ids = [];
-			foreach ( \progress_planner()->get_admin__page_settings()->get_settings() as $important_page ) {
-				if ( 0 !== (int) $important_page['value'] ) {
-					$important_page_ids[] = (int) $important_page['value'];
-				}
-			}
-
-			// Add the privacy policy page ID if it exists. Not 'publish' page will not be fetched by get_posts().
-			$privacy_policy_page_id = \get_option( 'wp_page_for_privacy_policy' );
-			if ( $privacy_policy_page_id ) {
-				$important_page_ids[] = (int) $privacy_policy_page_id;
-			}
-
-			/**
-			 * Filters the pages we deem more important for content updates.
-			 *
-			 * @param int[] $important_page_ids Post & page IDs of the important pages.
-			 */
-			$important_page_ids = \apply_filters( 'progress_planner_update_posts_important_page_ids', $important_page_ids );
-
-			if ( ! empty( $important_page_ids ) ) {
-				$last_updated_posts = $this->get_old_posts(
-					[
-						'post__in'   => $important_page_ids,
-						'post_type'  => 'any',
-						'date_query' => [
-							[
-								'column' => 'post_modified',
-								'before' => '-6 months', // Important pages are updated more often.
-							],
-						],
-					]
-				);
-			}
-
-			// Lets check for other posts to update.
-			$number_of_posts_to_inject = $number_of_posts_to_inject - count( $last_updated_posts );
-
-			if ( 0 < $number_of_posts_to_inject ) {
-				// Get the post that was updated last.
-				$last_updated_posts = array_merge(
-					$last_updated_posts,
-					$this->get_old_posts(
-						[
-							'post__not_in' => $important_page_ids, // This can be an empty array.
-							'post_type'    => $this->include_post_types,
-						]
-					)
-				);
-			}
-
-			if ( ! $last_updated_posts ) {
-				return false;
-			}
-
-			foreach ( $last_updated_posts as $post ) {
-				$task_data = [
-					'post_id'     => $post->ID,
-					'provider_id' => $this->get_provider_id(),
-				];
-
-				// Skip if the task has been dismissed.
-				if ( $this->is_task_dismissed( $task_data ) ) {
-					continue;
-				}
-
-				$task_id = $this->get_task_id( [ 'post_id' => $post->ID ] );
-
-				// Don't add the task if it was completed.
-				if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
-					continue;
-				}
-
-				$this->task_post_mappings[ $task_id ] = [
-					'task_id'   => $task_id,
-					'post_id'   => $post->ID,
-					'post_type' => $post->post_type,
-				];
+		// Check if there are any important pages to update.
+		$important_page_ids = [];
+		foreach ( \progress_planner()->get_admin__page_settings()->get_settings() as $important_page ) {
+			if ( 0 !== (int) $important_page['value'] ) {
+				$important_page_ids[] = (int) $important_page['value'];
 			}
 		}
 
-		return 0 < count( $this->task_post_mappings );
-	}
+		// Add the privacy policy page ID if it exists. Not 'publish' page will not be fetched by get_posts().
+		$privacy_policy_page_id = \get_option( 'wp_page_for_privacy_policy' );
+		if ( $privacy_policy_page_id ) {
+			$important_page_ids[] = (int) $privacy_policy_page_id;
+		}
 
+		/**
+		 * Filters the pages we deem more important for content updates.
+		 *
+		 * @param int[] $important_page_ids Post & page IDs of the important pages.
+		 */
+		$important_page_ids = \apply_filters( 'progress_planner_update_posts_important_page_ids', $important_page_ids );
+
+		if ( ! empty( $important_page_ids ) ) {
+			$last_updated_posts = $this->get_old_posts(
+				[
+					'post__in'   => $important_page_ids,
+					'post_type'  => 'any',
+					'date_query' => [
+						[
+							'column' => 'post_modified',
+							'before' => '-6 months', // Important pages are updated more often.
+						],
+					],
+				]
+			);
+		}
+
+		// Lets check for other posts to update.
+		if ( 0 < static::ITEMS_TO_INJECT - \count( $last_updated_posts ) ) {
+			// Get the post that was updated last.
+			$last_updated_posts = \array_merge(
+				$last_updated_posts,
+				$this->get_old_posts(
+					[
+						'post__not_in' => $important_page_ids, // This can be an empty array.
+						'post_type'    => $this->include_post_types,
+					]
+				)
+			);
+		}
+
+		if ( ! $last_updated_posts ) {
+			return false;
+		}
+
+		foreach ( $last_updated_posts as $post ) {
+			// Skip if the task has been dismissed.
+			if ( $this->is_task_dismissed(
+				[
+					'target_post_id' => $post->ID,
+					'provider_id'    => $this->get_provider_id(),
+				]
+			) ) {
+				continue;
+			}
+
+			$task_id = $this->get_task_id( [ 'target_post_id' => $post->ID ] );
+
+			// Don't add the task if it was completed.
+			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
+				continue;
+			}
+
+			$this->task_post_mappings[ $task_id ] = [
+				'task_id'          => $task_id,
+				'target_post_id'   => $post->ID,
+				'target_post_type' => $post->post_type,
+			];
+		}
+
+		return ! empty( $this->task_post_mappings );
+	}
 
 	/**
 	 * Get an array of tasks to inject.
@@ -275,62 +303,45 @@ class Content_Review extends Tasks {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-
-		if (
-			! $this->should_add_task() // No need to add the task.
-		) {
+		if ( ! $this->should_add_task() ) {
 			return [];
 		}
 
 		$task_to_inject = [];
-		if ( ! empty( $this->task_post_mappings ) ) {
-			foreach ( $this->task_post_mappings as $task_data ) {
-				if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_data['task_id'] ) ) {
-					continue;
-				}
-
-				$task_to_inject[] = [
-					'task_id'     => $this->get_task_id( [ 'post_id' => $task_data['post_id'] ] ),
-					'provider_id' => $this->get_provider_id(),
-					'category'    => $this->get_provider_category(),
-					'post_id'     => $task_data['post_id'],
-					'post_type'   => $task_data['post_type'],
-					'date'        => \gmdate( 'YW' ),
-				];
+		foreach ( $this->task_post_mappings as $task_data ) {
+			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_data['task_id'] ) ) {
+				continue;
 			}
+
+			$task_to_inject[] = [
+				'task_id'          => $this->get_task_id( [ 'target_post_id' => $task_data['target_post_id'] ] ),
+				'provider_id'      => $this->get_provider_id(),
+				'category'         => $this->get_provider_category(),
+				'target_post_id'   => $task_data['target_post_id'],
+				'target_post_type' => $task_data['target_post_type'],
+				'date'             => \gmdate( 'YW' ),
+				'post_title'       => $this->get_title_with_data( $task_data ),
+				'description'      => $this->get_description_with_data( $task_data ),
+				'url'              => $this->get_url_with_data( $task_data ),
+				'url_target'       => $this->get_url_target(),
+				'dismissable'      => $this->is_dismissable(),
+				'snoozable'        => $this->is_snoozable,
+				'points'           => $this->get_points(),
+			];
 		}
 
-		return $task_to_inject;
-	}
+		$added_tasks = [];
 
-	/**
-	 * Get the task details.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return array
-	 */
-	public function get_task_details( $task_id = '' ) {
+		foreach ( $task_to_inject as $task_data ) {
+			// Skip the task if it was already injected.
+			if ( \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] ) ) {
+				continue;
+			}
 
-		if ( ! $task_id ) {
-			return [];
+			$added_tasks[] = \progress_planner()->get_suggested_tasks_db()->add( $task_data );
 		}
 
-		$task_details = [
-			'task_id'     => $task_id,
-			'provider_id' => $this->get_provider_id(),
-			'title'       => $this->get_title( $task_id ),
-			'parent'      => $this->get_parent(),
-			'priority'    => $this->get_priority(),
-			'category'    => $this->get_provider_category(),
-			'points'      => $this->get_points(),
-			'dismissable' => $this->is_dismissable(),
-			'url'         => $this->get_url( $task_id ),
-			'url_target'  => $this->get_url_target(),
-			'description' => $this->get_description( $task_id ),
-		];
-
-		return $task_details;
+		return $added_tasks;
 	}
 
 	/**
@@ -341,15 +352,15 @@ class Content_Review extends Tasks {
 	 * @return \WP_Post|null
 	 */
 	public function get_post_from_task_id( $task_id ) {
-		$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'task_id', $task_id );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
 		if ( empty( $tasks ) ) {
 			return null;
 		}
 
-		$data = $tasks[0];
-
-		return isset( $data['post_id'] ) && $data['post_id'] ? \get_post( $data['post_id'] ) : null;
+		return isset( $tasks[0]->target_post_id ) && $tasks[0]->target_post_id
+			? \get_post( $tasks[0]->target_post_id )
+			: null;
 	}
 
 	/**
@@ -374,7 +385,7 @@ class Content_Review extends Tasks {
 		$posts = [];
 
 		// Parse default args.
-		$args = wp_parse_args(
+		$args = \wp_parse_args(
 			$args,
 			[
 				'posts_per_page'      => static::ITEMS_TO_INJECT,
@@ -396,7 +407,7 @@ class Content_Review extends Tasks {
 		 *
 		 * @param array $args The get_posts args.
 		 */
-		$args = apply_filters( 'progress_planner_update_posts_tasks_args', $args );
+		$args = \apply_filters( 'progress_planner_update_posts_tasks_args', $args );
 
 		// Get the post that was updated last.
 		$posts = \get_posts( $args );
@@ -416,19 +427,17 @@ class Content_Review extends Tasks {
 			? $args['post__not_in']
 			: [];
 
-		$args['post__not_in'] = array_merge(
+		$args['post__not_in'] = \array_merge(
 			$args['post__not_in'],
 			// Add the snoozed post IDs to the post__not_in array.
 			$this->get_snoozed_post_ids(),
 		);
 
-		$dismissed_post_ids = $this->get_dismissed_post_ids();
-
-		if ( ! empty( $dismissed_post_ids ) ) {
-			$args['post__not_in'] = array_merge( $args['post__not_in'], $dismissed_post_ids );
+		if ( ! empty( $this->get_dismissed_post_ids() ) ) {
+			$args['post__not_in'] = \array_merge( $args['post__not_in'], $this->get_dismissed_post_ids() );
 		}
 
-		if ( function_exists( 'YoastSEO' ) ) {
+		if ( \function_exists( 'YoastSEO' ) ) {
 			// Handle the case when the meta key doesn't exist.
 			$args['meta_query'] = [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
 				'relation' => 'OR',
@@ -455,19 +464,20 @@ class Content_Review extends Tasks {
 	 * @return array
 	 */
 	protected function get_snoozed_post_ids() {
-
-		if ( null !== $this->snoozed_post_ids ) {
+		if ( ! empty( $this->snoozed_post_ids ) ) {
 			return $this->snoozed_post_ids;
 		}
 
-		$this->snoozed_post_ids = [];
-		$snoozed                = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'snoozed' );
+		$snoozed = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] );
 
-		if ( ! empty( $snoozed ) ) {
-			foreach ( $snoozed as $task ) {
-				if ( isset( $task['provider_id'] ) && 'review-post' === $task['provider_id'] ) {
-					$this->snoozed_post_ids[] = $task['post_id'];
-				}
+		foreach ( $snoozed as $task ) {
+			/**
+			 * The task object.
+			 *
+			 * @var \Progress_Planner\Suggested_Tasks\Task $task
+			 */
+			if ( isset( $task->provider->slug ) && 'review-post' === $task->provider->slug ) {
+				$this->snoozed_post_ids[] = $task->target_post_id;
 			}
 		}
 
@@ -480,16 +490,14 @@ class Content_Review extends Tasks {
 	 * @return array
 	 */
 	protected function get_dismissed_post_ids() {
-
-		if ( null !== $this->dismissed_post_ids ) {
+		if ( ! empty( $this->dismissed_post_ids ) ) {
 			return $this->dismissed_post_ids;
 		}
 
-		$this->dismissed_post_ids = [];
-		$dismissed                = $this->get_dismissed_tasks();
+		$dismissed = $this->get_dismissed_tasks();
 
 		if ( ! empty( $dismissed ) ) {
-			$this->dismissed_post_ids = array_values( wp_list_pluck( $dismissed, 'post_id' ) );
+			$this->dismissed_post_ids = \array_values( \wp_list_pluck( $dismissed, 'post_id' ) );
 		}
 
 		return $this->dismissed_post_ids;
@@ -504,7 +512,7 @@ class Content_Review extends Tasks {
 	 * @return string|false The task identifier or false if not applicable.
 	 */
 	protected function get_task_identifier( $task_data ) {
-		return $this->get_provider_id() . '-' . $task_data['post_id'];
+		return $this->get_provider_id() . '-' . $task_data['target_post_id'];
 	}
 
 	/**
@@ -531,15 +539,16 @@ class Content_Review extends Tasks {
 	 * @return bool
 	 */
 	protected function is_specific_task_completed( $task_id ) {
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
-		$task = Task_Factory::create_task_from( 'id', $task_id );
-		$data = $task->get_data();
-
-		if ( isset( $data['post_id'] ) && (int) \get_post_modified_time( 'U', false, (int) $data['post_id'] ) > strtotime( '-12 months' ) ) {
-			return true;
+		if ( ! $task ) {
+			return false;
 		}
 
-		return false;
+		$data = $task->get_data();
+
+		return $data && isset( $data['target_post_id'] )
+			&& (int) \get_post_modified_time( 'U', false, (int) $data['target_post_id'] ) > \strtotime( '-12 months' );
 	}
 
 	/**
@@ -549,18 +558,19 @@ class Content_Review extends Tasks {
 	 * @return int[]
 	 */
 	public function add_yoast_cornerstone_pages( $important_page_ids ) {
-		if ( function_exists( 'YoastSEO' ) ) {
-			$cornerstone_page_ids = \get_posts(
-				[
-					'post_type'  => 'any',
-					'meta_key'   => '_yoast_wpseo_is_cornerstone', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
-					'meta_value' => '1', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
-					'fields'     => 'ids',
-				]
-			);
-			if ( ! empty( $cornerstone_page_ids ) ) {
-				$important_page_ids = array_merge( $important_page_ids, $cornerstone_page_ids );
-			}
+		if ( ! \function_exists( 'YoastSEO' ) ) {
+			return $important_page_ids;
+		}
+		$cornerstone_page_ids = \get_posts(
+			[
+				'post_type'  => 'any',
+				'meta_key'   => '_yoast_wpseo_is_cornerstone', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_key
+				'meta_value' => '1', // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_value
+				'fields'     => 'ids',
+			]
+		);
+		if ( ! empty( $cornerstone_page_ids ) ) {
+			$important_page_ids = \array_merge( $important_page_ids, $cornerstone_page_ids );
 		}
 		return $important_page_ids;
 	}
@@ -584,7 +594,7 @@ class Content_Review extends Tasks {
 		}
 
 		// Check if it his cornerstone content.
-		if ( function_exists( 'YoastSEO' ) ) {
+		if ( \function_exists( 'YoastSEO' ) ) {
 			$is_cornerstone = \get_post_meta( $dismissal_data['post_id'], '_yoast_wpseo_is_cornerstone', true );
 			if ( '1' === $is_cornerstone ) {
 				return 6 * MONTH_IN_SECONDS;

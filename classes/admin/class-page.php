@@ -110,18 +110,16 @@ class Page {
 	 * @return string The notification count in HTML format.
 	 */
 	protected function get_notification_counter() {
-
-		$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_by( 'status', 'pending_celebration' );
-		$notification_count        = count( $pending_celebration_tasks );
+		$notification_count = \wp_count_posts( 'prpl_recommendations' )->pending;
 
 		if ( 0 === $notification_count ) {
 			return '';
 		}
 
 		/* translators: Hidden accessibility text; %s: number of notifications. */
-		$notifications = sprintf( _n( '%s pending celebration', '%s pending celebrations', $notification_count, 'progress-planner' ), number_format_i18n( $notification_count ) );
+		$notifications = \sprintf( \_n( '%s pending celebration', '%s pending celebrations', $notification_count, 'progress-planner' ), \number_format_i18n( $notification_count ) );
 
-		return sprintf( '<span class="update-plugins count-%1$d" style="background-color:#f9b23c;color:#38296d;"><span class="plugin-count" aria-hidden="true">%1$d</span><span class="screen-reader-text">%2$s</span></span>', $notification_count, $notifications );
+		return \sprintf( '<span class="update-plugins count-%1$d" style="background-color:#f9b23c;color:#38296d;"><span class="plugin-count" aria-hidden="true">%1$d</span><span class="screen-reader-text">%2$s</span></span>', $notification_count, $notifications );
 	}
 
 	/**
@@ -162,7 +160,6 @@ class Page {
 		}
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
-
 			$default_localization_data = [
 				'name' => 'progressPlanner',
 				'data' => [
@@ -175,6 +172,7 @@ class Page {
 
 			if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-gauge' );
+				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-badge-progress-bar' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-bar' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-line' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-big-counter' );
@@ -213,8 +211,7 @@ class Page {
 	 * @return void
 	 */
 	public function maybe_enqueue_focus_el_script( $hook ) {
-		$suggested_tasks  = \progress_planner()->get_suggested_tasks();
-		$tasks_providers  = $suggested_tasks->get_tasks_manager()->get_task_providers();
+		$tasks_providers  = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers();
 		$tasks_details    = [];
 		$total_points     = 0;
 		$completed_points = 0;
@@ -222,15 +219,23 @@ class Page {
 			if ( 'configuration' !== $provider->get_provider_category() ) {
 				continue;
 			}
-			$details = $provider->get_task_details();
-			if ( ! isset( $details['link_setting']['hook'] ) ||
-				$hook !== $details['link_setting']['hook']
+
+			$link_setting = $provider->get_link_setting();
+			if ( ! isset( $link_setting['hook'] ) ||
+				$hook !== $link_setting['hook']
 			) {
 				continue;
 			}
-			$details['is_complete'] = $provider->is_task_completed();
-			$tasks_details[]        = $details;
-			$total_points          += $details['points'];
+
+			$details = [
+				'link_setting' => $link_setting,
+				'task_id'      => $provider->get_task_id(),
+				'points'       => $provider->get_points(),
+				'is_complete'  => $provider->is_task_completed(),
+			];
+
+			$tasks_details[] = $details;
+			$total_points   += $details['points'];
 			if ( $details['is_complete'] ) {
 				$completed_points += $details['points'];
 			}
@@ -249,7 +254,7 @@ class Page {
 					'tasks'           => $tasks_details,
 					'totalPoints'     => $total_points,
 					'completedPoints' => $completed_points,
-					'base_url'        => constant( 'PROGRESS_PLANNER_URL' ),
+					'base_url'        => \constant( 'PROGRESS_PLANNER_URL' ),
 					'l10n'            => [
 						/* translators: %d: The number of points. */
 						'fixThisIssue' => \esc_html__( 'Fix this issue to get %d point(s) in Progress Planner', 'progress-planner' ),
@@ -315,6 +320,7 @@ class Page {
 		}
 
 		\remove_all_actions( 'admin_notices' );
+		\remove_all_actions( 'all_admin_notices' );
 	}
 
 	/**
