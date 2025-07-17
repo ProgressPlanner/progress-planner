@@ -122,21 +122,69 @@ class Todo {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing post title.', 'progress-planner' ) ] );
 		}
 
-		// We're creating a new task.
-		\progress_planner()->get_suggested_tasks_db()->add(
+		$reminder_date = isset( $_POST['reminder_date'] ) ? \sanitize_text_field( \wp_unslash( $_POST['reminder_date'] ) ) : '';
+		if ( ! $reminder_date ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing reminder date.', 'progress-planner' ) ] );
+		}
+
+		$reminder_date_timestamp = \strtotime( $reminder_date );
+		if ( ! $reminder_date_timestamp ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid reminder date.', 'progress-planner' ) ] );
+		}
+
+		// Check if we have an existing reminder for this post.
+		$posts = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
 			[
-				'task_id'        => 'user-task-' . \md5( $post_id . '-' . \microtime( true ) ),
-				/* translators: %s: The post title. */
-				'post_title'     => \sprintf( __( 'Review %s', 'progress-planner' ), $post_title ),
-				'provider_id'    => 'user',
-				'category'       => 'user',
-				'status'         => 'publish',
-				'available_at'   => \time() + 30 * DAY_IN_SECONDS,
-				'target_post_id' => $post_id,
-				'dismissable'    => true,
-				'snoozable'      => false,
+				'post_status' => [ 'publish' ],
+				'numberposts' => 1,
+				'meta_query'  => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+					[
+						'key'     => 'prpl_target_post_id',
+						'value'   => $post_id,
+						'compare' => '=',
+					],
+					[
+						'key'     => 'prpl_available_at',
+						'compare' => 'EXISTS',
+					],
+				],
+				'tax_query'   => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+					[
+						'taxonomy' => 'prpl_recommendations_provider',
+						'field'    => 'slug',
+						'terms'    => 'user',
+					],
+				],
 			]
 		);
+
+		// If we have an existing task, skip.
+		if ( ! empty( $posts ) ) {
+			// Update the existing task.
+			\progress_planner()->get_suggested_tasks_db()->update_recommendation(
+				$posts[0]->ID,
+				[
+					'post_title'        => $post_title,
+					'prpl_available_at' => $reminder_date_timestamp,
+				]
+			);
+		} else {
+			// We're creating a new task.
+			\progress_planner()->get_suggested_tasks_db()->add(
+				[
+					'task_id'        => 'user-task-' . \md5( $post_id . '-' . \microtime( true ) ),
+					/* translators: %s: The post title. */
+					'post_title'     => \sprintf( __( 'Review %s', 'progress-planner' ), $post_title ),
+					'provider_id'    => 'user',
+					'category'       => 'user',
+					'status'         => 'publish',
+					'available_at'   => $reminder_date_timestamp,
+					'target_post_id' => $post_id,
+					'dismissable'    => true,
+					'snoozable'      => false,
+				]
+			);
+		}
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Reminder set.', 'progress-planner' ) ] );
 	}

@@ -252,8 +252,24 @@ const PrplLessonItemsHTML = () => {
  * @return {Element} Element to render.
  */
 const PrplRemindMeSection = () => {
+	const [ selectedDate, setSelectedDate ] = useState( '' );
+
 	// Callback function for the Remind Me button
 	const handleRemindMeClick = () => {
+		// Validate that a date is selected
+		if ( ! selectedDate ) {
+			wp.data
+				.dispatch( 'core/notices' )
+				.createErrorNotice(
+					prplL10n( 'remindMeToReviewContentError' ),
+					{
+						type: 'snackbar',
+						isDismissible: true,
+					}
+				);
+			return;
+		}
+
 		// Get the current post ID
 		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
 
@@ -275,6 +291,7 @@ const PrplRemindMeSection = () => {
 		formData.append( 'action', 'progress_planner_set_reminder' );
 		formData.append( 'post_id', postId );
 		formData.append( 'post_title', postTitle );
+		formData.append( 'reminder_date', selectedDate );
 		formData.append( 'nonce', progressPlannerEditor.nonce );
 
 		fetch( progressPlannerEditor.ajaxUrl, {
@@ -297,6 +314,8 @@ const PrplRemindMeSection = () => {
 								isDismissible: true,
 							}
 						);
+					// Clear the selected date after successful reminder set
+					setSelectedDate( '' );
 				} else {
 					// Show error notification
 					wp.data
@@ -326,6 +345,9 @@ const PrplRemindMeSection = () => {
 			} );
 	};
 
+	// Get minimum date (today)
+	const today = new Date().toISOString().split( 'T' )[ 0 ];
+
 	return el(
 		PanelBody,
 		{
@@ -340,18 +362,56 @@ const PrplRemindMeSection = () => {
 					padding: '10px 0',
 				},
 			},
+			// Date picker
+			el(
+				'div',
+				{
+					style: {
+						marginBottom: '15px',
+					},
+				},
+				el(
+					'label',
+					{
+						style: {
+							display: 'block',
+							marginBottom: '5px',
+							fontWeight: 'bold',
+							color: '#38296D',
+						},
+					},
+					prplL10n( 'remindMeToReviewContentDate' )
+				),
+				el( 'input', {
+					type: 'date',
+					value: selectedDate,
+					min: today,
+					onChange: ( event ) =>
+						setSelectedDate( event.target.value ),
+					style: {
+						width: '100%',
+						padding: '8px 12px',
+						border: '1px solid #ddd',
+						borderRadius: '4px',
+						fontSize: '14px',
+						color: '#38296D',
+					},
+				} )
+			),
 			el(
 				Button,
 				{
 					key: 'progress-planner-sidebar-remind-me-button',
 					onClick: handleRemindMeClick,
-					icon: 'clock',
 					variant: 'secondary',
+					disabled: ! selectedDate,
 					style: {
 						width: '100%',
 						margin: '15px 0',
-						color: '#38296D',
-						boxShadow: 'inset 0 0 0 1px #38296D',
+						color: selectedDate ? '#38296D' : '#999',
+						boxShadow: selectedDate
+							? 'inset 0 0 0 1px #38296D'
+							: 'inset 0 0 0 1px #ddd',
 						whiteSpace: 'normal',
 						height: 'auto',
 						minHeight: '60px',
