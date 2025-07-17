@@ -283,7 +283,6 @@ class Suggested_Tasks {
 				'menu_position'         => 5,
 				'hierarchical'          => true,
 				'exclude_from_search'   => true,
-				'publicly_queryable'    => true,
 			]
 		);
 
