@@ -21,10 +21,14 @@ customElements.define(
 			pluginName = pluginName || this.getAttribute( 'data-plugin-name' );
 			pluginName = pluginName || pluginSlug;
 			action = action || this.getAttribute( 'data-action' );
+			providerId = providerId || this.getAttribute( 'data-provider-id' );
+
+			// If the plugin slug is empty, bail out.
 			if ( ! pluginSlug ) {
 				return;
 			}
 
+			// Set the inner HTML.
 			this.innerHTML = `
 				<button
 					type="button"
@@ -50,9 +54,13 @@ customElements.define(
 				</button>
 			`;
 
+			// Handle the click event.
 			this.handleClick();
 		}
 
+		/**
+		 * Handle the click event.
+		 */
 		handleClick() {
 			const button = this.querySelector( 'button' );
 			if ( ! button ) {
@@ -79,7 +87,10 @@ customElements.define(
 
 			const thisObj = this;
 
-			button.innerHTML = prplL10n( 'installing' );
+			button.innerHTML = `
+				<span class="prpl-install-button-loader"></span>
+				${ prplL10n( 'installing' ) }
+			`;
 
 			progressPlannerAjaxRequest( {
 				url: progressPlanner.ajaxUrl,
@@ -104,7 +115,10 @@ customElements.define(
 			const pluginSlug = button.getAttribute( 'data-plugin-slug' );
 			const nonce = button.getAttribute( 'data-nonce' );
 			const thisObj = this;
-			button.innerHTML = prplL10n( 'activating' );
+			button.innerHTML = `
+				<span class="prpl-install-button-loader"></span>
+				${ prplL10n( 'activating' ) }
+			`;
 
 			progressPlannerAjaxRequest( {
 				url: progressPlanner.ajaxUrl,

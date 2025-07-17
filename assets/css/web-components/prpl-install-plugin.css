@@ -1,0 +1,40 @@
+prpl-install-plugin {
+
+	button {
+		display: flex !important;
+		align-items: center;
+		justify-content: center;
+		gap: 0.5rem;
+	}
+
+	.prpl-install-button-loader {
+		display: none;
+		width: 1rem;
+		height: 1rem;
+		border: 3px solid #fff;
+		border-bottom-color: transparent;
+		border-radius: 50%;
+		box-sizing: border-box;
+		animation: install-button-rotation 1s linear infinite;
+	}
+
+	button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed;
+
+		.prpl-install-button-loader {
+			display: block;
+		}
+	}
+}
+
+@keyframes install-button-rotation {
+
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
+}
