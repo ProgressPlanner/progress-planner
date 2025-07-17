@@ -50,6 +50,20 @@ abstract class Tasks implements Tasks_Interface {
 	protected const DATA_COLLECTOR_CLASS = \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector::class;
 
 	/**
+	 * Whether the task is interactive.
+	 *
+	 * @var bool
+	 */
+	const IS_INTERACTIVE = false;
+
+	/**
+	 * The popover ID for interactive tasks.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = '';
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -118,6 +132,17 @@ abstract class Tasks implements Tasks_Interface {
 	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector|null
 	 */
 	protected $data_collector = null;
+
+	/**
+	 * Constructor.
+	 *
+	 * @return void
+	 */
+	public function __construct() {
+		if ( static::IS_INTERACTIVE ) {
+			\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
+		}
+	}
 
 	/**
 	 * Initialize the task provider.
@@ -255,22 +280,14 @@ abstract class Tasks implements Tasks_Interface {
 		$parts = [ $this->get_provider_id() ];
 
 		// Order is important here, new parameters should be added at the end.
-		if ( isset( $task_data['target_post_id'] ) ) {
-			$parts[] = $task_data['target_post_id'];
-		}
-
-		if ( isset( $task_data['target_term_id'] ) ) {
-			$parts[] = $task_data['target_term_id'];
-		}
-
-		if ( isset( $task_data['target_taxonomy'] ) ) {
-			$parts[] = $task_data['target_taxonomy'];
-		}
-
+		$parts[] = $task_data['target_post_id'] ?? false;
+		$parts[] = $task_data['target_term_id'] ?? false;
+		$parts[] = $task_data['target_taxonomy'] ?? false;
 		// If the task is repetitive, add the date as the last part.
-		if ( $this->is_repetitive() ) {
-			$parts[] = \gmdate( 'YW' );
-		}
+		$parts[] = $this->is_repetitive() ? \gmdate( 'YW' ) : false;
+
+		// Remove empty parts.
+		$parts = \array_filter( $parts );
 
 		return \implode( '-', $parts );
 	}
@@ -354,12 +371,7 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return bool
 	 */
 	public function is_task_snoozed() {
-		$snoozed = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] );
-		if ( empty( $snoozed ) ) {
-			return false;
-		}
-
-		foreach ( $snoozed as $task ) {
+		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] ) as $task ) {
 			$task        = \progress_planner()->get_suggested_tasks_db()->get_post( $task->task_id );
 			$provider_id = $task ? $task->get_provider_id() : '';
 
@@ -472,23 +484,20 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return array
 	 */
 	public function get_tasks_to_inject() {
-		$task_id = $this->get_task_id();
-
 		if (
 			true === $this->is_task_snoozed() ||
 			! $this->should_add_task() || // No need to add the task.
-			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id )
+			true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() )
 		) {
 			return [];
 		}
 
 		$task_data = $this->modify_injection_task_data( $this->get_task_details() );
 
-		// Get the task post.
-		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
-
 		// Skip the task if it was already injected.
-		return $task_post ? [] : [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
+		return \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] )
+			? []
+			: [ \progress_planner()->get_suggested_tasks_db()->add( $task_data ) ];
 	}
 
 	/**
@@ -538,6 +547,7 @@ abstract class Tasks implements Tasks_Interface {
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
 			'snoozable'    => $this->is_snoozable(),
+			'popover_id'   => static::IS_INTERACTIVE ? 'prpl-popover-' . static::POPOVER_ID : '',
 		];
 	}
 
@@ -563,5 +573,33 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		return $data;
+	}
+
+	/**
+	 * Add the popover.
+	 *
+	 * @return void
+	 */
+	public function add_popover() {
+		?>
+		<div id="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>" class="prpl-popover prpl-popover-interactive" popover>
+			<?php $this->the_popover_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * The popover content.
+	 *
+	 * @return void
+	 */
+	public function the_popover_content() {
+		\progress_planner()->the_view(
+			'popovers/' . static::POPOVER_ID . '.php',
+			[
+				'prpl_popover_id'  => static::POPOVER_ID,
+				'prpl_provider_id' => $this->get_provider_id(),
+			]
+		);
 	}
 }

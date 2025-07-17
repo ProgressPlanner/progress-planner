@@ -70,6 +70,6 @@ class Sample_Page extends Base_Data_Collector {
 			$sample_page = ! empty( $query->post ) ? $query->post : 0;
 		}
 
-		return ( \is_object( $sample_page ) && \is_a( $sample_page, \WP_Post::class ) ) ? $sample_page->ID : 0;
+		return \is_object( $sample_page ) ? $sample_page->ID : 0;
 	}
 }
