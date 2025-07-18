@@ -632,9 +632,15 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Enqueue the scripts.
 	 *
+	 * @param string $hook The current admin page.
+	 *
 	 * @return void
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts( $hook ) {
+		// Enqueue the script only on Progress Planner and WP dashboard pages.
+		if ( 'toplevel_page_progress-planner' !== $hook && 'index.php' !== $hook ) {
+			return;
+		}
 
 		// Enqueue the web component.
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
