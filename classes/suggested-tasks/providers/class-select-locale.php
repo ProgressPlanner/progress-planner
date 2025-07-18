@@ -110,18 +110,21 @@ class Select_Locale extends Tasks {
 	 * @return array
 	 */
 	protected function get_locales() {
-		$cached = \progress_planner()->get_utils__cache()->get( 'all_locales' );
+		$cache_key = 'all_locales';
+		$cached    = \progress_planner()->get_utils__cache()->get( $cache_key );
 		if ( $cached ) {
 			return $cached;
 		}
 
 		$response = \wp_remote_get( 'https://api.wordpress.org/translations/core/1.0/' );
 		if ( \is_wp_error( $response ) ) {
+			\progress_planner()->get_utils__cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
 			return [];
 		}
 		$body    = \wp_remote_retrieve_body( $response );
 		$locales = \json_decode( $body, true );
 		if ( ! \is_array( $locales ) || ! isset( $locales['translations'] ) ) {
+			\progress_planner()->get_utils__cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
 			return [];
 		}
 
@@ -136,7 +139,7 @@ class Select_Locale extends Tasks {
 			$locales['translations']
 		);
 
-		\progress_planner()->get_utils__cache()->set( 'all_locales', $locales, MONTH_IN_SECONDS );
+		\progress_planner()->get_utils__cache()->set( $cache_key, $locales, MONTH_IN_SECONDS );
 
 		// Return the locales.
 		return $locales;
