@@ -39,7 +39,7 @@ const prplGetPageTypeSlugFromId = ( id ) => {
 
 	return progressPlannerEditor.pageTypes.find(
 		( pageTypeItem ) => parseInt( pageTypeItem.id ) === parseInt( id )
-	).slug;
+	)?.slug;
 };
 
 /**
@@ -48,6 +48,14 @@ const prplGetPageTypeSlugFromId = ( id ) => {
  * @return {Element} Element to render.
  */
 const PrplRenderPageTypeSelector = () => {
+	// Bail early if the page types are not set.
+	if (
+		! progressPlannerEditor.pageTypes ||
+		0 === progressPlannerEditor.pageTypes.length
+	) {
+		return el( 'div', {}, '' );
+	}
+
 	// Build the page types array, to be used in the dropdown.
 	const pageTypes = [];
 	progressPlannerEditor.pageTypes.forEach( ( term ) => {
@@ -187,8 +195,12 @@ const PrplLessonItemsHTML = () => {
 	}, [] );
 	const pageTodos = pageTodosMeta || '';
 
-	// Bail early if the page type is not set.
-	if ( ! pageType ) {
+	// Bail early if the page type or lessons are not set.
+	if (
+		! pageType ||
+		! progressPlannerEditor.lessons ||
+		0 === progressPlannerEditor.lessons.length
+	) {
 		return el( 'div', {}, '' );
 	}
 
