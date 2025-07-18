@@ -38,7 +38,7 @@ class Blog_Description extends Tasks {
 	 *
 	 * @var string
 	 */
-	const POPOVER_ID = 'blog-description';
+	const POPOVER_ID = 'core-blogdescription';
 
 	/**
 	 * Get the task title.

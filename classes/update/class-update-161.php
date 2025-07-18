@@ -1,6 +1,6 @@
 <?php
 /**
- * Update class for version 1.5.0.
+ * Update class for version 1.6.1.
  *
  * @package Progress_Planner
  */
@@ -8,7 +8,7 @@
 namespace Progress_Planner\Update;
 
 /**
- * Update class for version 1.5.0.
+ * Update class for version 1.6.1.
  *
  * @package Progress_Planner
  */

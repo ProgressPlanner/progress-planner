@@ -10,5 +10,5 @@ prplInteractiveTaskFormListener.siteSettings( {
 	settingAPIKey: 'description',
 	setting: 'blogdescription',
 	taskId: 'core-blogdescription',
-	popoverId: 'prpl-popover-blog-description',
+	popoverId: 'prpl-popover-core-blogdescription',
 } );
