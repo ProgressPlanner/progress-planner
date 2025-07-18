@@ -90,7 +90,16 @@ class Select_Locale extends Tasks {
 	 * @return string
 	 */
 	protected function get_browser_locale() {
-		return \strtolower( \substr( \sanitize_text_field( \wp_unslash( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '' ) ), 0, 2 ) );
+		$lang = \sanitize_text_field( \wp_unslash( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '' ) );
+		if ( ! $lang ) {
+			return '';
+		}
+
+		$lang = \strtolower( \substr( $lang, 0, 2 ) );
+		$lang = \explode( '-', $lang )[0];
+		$lang = \explode( '_', $lang )[0];
+
+		return $lang;
 	}
 
 	/**
