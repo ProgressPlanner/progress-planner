@@ -3,6 +3,7 @@
 Bugs we fixed:
 
 * Fix issue where "Perform all updates" task was incorrectly marked as completed.
+* Prevent new lines to be added when user task title is edited.
 
 
 = 1.6.2 =
