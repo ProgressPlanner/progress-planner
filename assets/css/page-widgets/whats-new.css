@@ -12,8 +12,10 @@
 
 		h3 {
 			margin-top: 0;
-			font-size: 1.15em;
+			font-size: var(--prpl-font-size-lg);
+			line-height: 1.25;
 			font-weight: 600;
+			margin-bottom: 6px;
 
 			> a {
 				color: var(--prpl-color-headings);
@@ -21,6 +23,11 @@
 
 				.prpl-external-link-icon {
 					margin-inline-start: 0.15em;
+				}
+
+				&:hover {
+					color: var(--prpl-color-link);
+					text-decoration: underline;
 				}
 			}
 		}
@@ -33,6 +40,11 @@
 	.prpl-widget-footer {
 		display: flex;
 		justify-content: flex-end;
+
+		a {
+			text-decoration: none;
+			color: var(--prpl-color-gray-6);
+		}
 	}
 }
 
@@ -41,9 +53,14 @@
 	min-height: 120px;
 	aspect-ratio: 16 / 9;
 	background-size: cover;
-	margin-bottom: 1em;
-	border-radius: var(--prpl-border-radius);
-	box-shadow: 5px 5px 5px var(--prpl-color-gray-2);
+	margin-bottom: 0.75rem;
+	border-radius: var(--prpl-border-radius-big);
 	border: 1px solid var(--prpl-color-gray-2);
 	background-color: var(--prpl-color-gray-1); /* Fallback, if remote host image is not accessible */
+	transition: transform 0.2s, box-shadow 0.2s;
+
+	&:hover {
+		transform: scale(1.01);
+		box-shadow: 4px 4px 8px 0 rgba(0, 0, 0, 0.2);
+	}
 }
