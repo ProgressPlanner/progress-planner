@@ -32,15 +32,6 @@ abstract class Tasks_Interactive extends Tasks {
 	}
 
 	/**
-	 * Check if the task is an onboarding task.
-	 *
-	 * @return bool
-	 */
-	public function is_onboarding_task() {
-		return static::IS_ONBOARDING_TASK;
-	}
-
-	/**
 	 * Get the task details.
 	 *
 	 * @param array $task_data The task data.

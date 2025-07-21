@@ -332,6 +332,15 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
+	 * Check if the task is an onboarding task.
+	 *
+	 * @return bool
+	 */
+	public function is_onboarding_task() {
+		return static::IS_ONBOARDING_TASK;
+	}
+
+	/**
 	 * Check if a task category is snoozed.
 	 *
 	 * @return bool
