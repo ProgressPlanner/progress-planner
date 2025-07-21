@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 /**
  * Add tasks to disable comments.
  */
-class Disable_Comments extends Tasks {
+class Disable_Comments extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -25,13 +25,6 @@ class Disable_Comments extends Tasks {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'disable-comments';
-
-	/**
-	 * Whether the task is interactive.
-	 *
-	 * @var bool
-	 */
-	const IS_INTERACTIVE = true;
 
 	/**
 	 * The popover ID.

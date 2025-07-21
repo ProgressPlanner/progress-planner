@@ -12,7 +12,7 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page as Sample_Page_D
 /**
  * Add task to delete the Sample Page.
  */
-class Sample_Page extends Tasks {
+class Sample_Page extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -41,13 +41,6 @@ class Sample_Page extends Tasks {
 	 * @var string
 	 */
 	protected const DATA_COLLECTOR_CLASS = Sample_Page_Data_Collector::class;
-
-	/**
-	 * Whether the task is interactive.
-	 *
-	 * @var bool
-	 */
-	const IS_INTERACTIVE = true;
 
 	/**
 	 * The popover ID.
