@@ -63,7 +63,7 @@ abstract class Tasks_Interactive extends Tasks {
 	 *
 	 * @return void
 	 */
-	public function the_popover_content() {
+	protected function the_popover_content() {
 		\progress_planner()->the_view(
 			[
 				'/views/popovers/' . static::POPOVER_ID . '.php',
