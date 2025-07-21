@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 /**
  * Add tasks for Core blogdescription.
  */
-class Blog_Description extends Tasks {
+class Blog_Description extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -25,13 +25,6 @@ class Blog_Description extends Tasks {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'core-blogdescription';
-
-	/**
-	 * Whether the task is interactive.
-	 *
-	 * @var bool
-	 */
-	const IS_INTERACTIVE = true;
 
 	/**
 	 * The popover ID.
