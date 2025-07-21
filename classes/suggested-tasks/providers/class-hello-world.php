@@ -12,7 +12,7 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Hello_World as Hello_World_D
 /**
  * Add tasks for hello world post.
  */
-class Hello_World extends Tasks {
+class Hello_World extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -41,13 +41,6 @@ class Hello_World extends Tasks {
 	 * @var string
 	 */
 	protected const DATA_COLLECTOR_CLASS = Hello_World_Data_Collector::class;
-
-	/**
-	 * Whether the task is interactive.
-	 *
-	 * @var bool
-	 */
-	const IS_INTERACTIVE = true;
 
 	/**
 	 * The popover ID.

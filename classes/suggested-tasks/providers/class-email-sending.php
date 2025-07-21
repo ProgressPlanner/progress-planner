@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 /**
  * Add task for Email sending.
  */
-class Email_Sending extends Tasks {
+class Email_Sending extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -32,13 +32,6 @@ class Email_Sending extends Tasks {
 	 * @var string
 	 */
 	const CATEGORY = 'configuration';
-
-	/**
-	 * Whether the task is interactive.
-	 *
-	 * @var bool
-	 */
-	const IS_INTERACTIVE = true;
 
 	/**
 	 * The popover ID.
