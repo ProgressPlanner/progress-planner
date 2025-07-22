@@ -71,7 +71,7 @@ const PrplRenderPageTypeSelector = () => {
 		value: wp.data.useSelect( ( select ) => {
 			const pageTypeArr =
 				select( 'core/editor' ).getEditedPostAttribute( TAXONOMY );
-			return 0 < pageTypeArr.length
+			return pageTypeArr && 0 < pageTypeArr.length
 				? parseInt( pageTypeArr[ 0 ] )
 				: parseInt( progressPlannerEditor.defaultPageType );
 		}, [] ),
