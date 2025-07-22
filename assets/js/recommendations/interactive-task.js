@@ -1,9 +1,9 @@
-/* global prplSuggestedTask */
+/* global prplSuggestedTask, progressPlannerAjaxRequest, progressPlanner */
 
 /*
  * Core Blog Description recommendation.
  *
- * Dependencies: wp-api, progress-planner/suggested-task, progress-planner/web-components/prpl-interactive-task
+ * Dependencies: wp-api, progress-planner/suggested-task, progress-planner/web-components/prpl-interactive-task, progress-planner/ajax-request
  */
 
 // eslint-disable-next-line no-unused-vars
@@ -103,6 +103,67 @@ const prplInteractiveTaskFormListener = {
 					},
 				} )
 			);
+		} );
+	},
+
+	settings: ( {
+		taskId,
+		setting,
+		value,
+		settingPath,
+		popoverId,
+		settingCallbackValue = ( settingValue ) => settingValue,
+	} = {} ) => {
+		const formElement = document.querySelector( `#${ popoverId } form` );
+
+		if ( ! formElement ) {
+			return;
+		}
+
+		formElement.addEventListener( 'submit', ( event ) => {
+			event.preventDefault();
+
+			const formData = new FormData( formElement );
+			const settingsToPass = {};
+			settingsToPass[ setting ] = settingCallbackValue(
+				formData.get( setting )
+			);
+
+			progressPlannerAjaxRequest( {
+				url: progressPlanner.ajaxUrl,
+				data: {
+					action: 'prpl_interactive_task_submit',
+					_ajax_nonce: progressPlanner.nonce,
+					post_id: taskId,
+					setting,
+					value,
+					setting_path: settingPath,
+				},
+			} ).then( () => {
+				const taskEl = document.querySelector(
+					`.prpl-suggested-task[data-task-id="${ taskId }"]`
+				);
+
+				if ( ! taskEl ) {
+					return;
+				}
+
+				// Close popover.
+				document.getElementById( popoverId ).hidePopover();
+				const postId = parseInt( taskEl.dataset.postId );
+				if ( ! postId ) {
+					return;
+				}
+				prplSuggestedTask.maybeComplete( postId );
+				taskEl.setAttribute( 'data-task-action', 'celebrate' );
+				document.dispatchEvent(
+					new CustomEvent( 'prpl/celebrateTasks', {
+						detail: {
+							element: taskEl,
+						},
+					} )
+				);
+			} );
 		} );
 	},
 };
