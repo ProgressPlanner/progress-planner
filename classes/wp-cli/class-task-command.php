@@ -63,9 +63,33 @@ class Task_Command extends \WP_CLI_Command {
 		}
 
 		$format = isset( $assoc_args['format'] ) ? $assoc_args['format'] : 'table';
-		$fields = isset( $assoc_args['fields'] ) ? \explode( ',', $assoc_args['fields'] ) : [ 'task_id', 'provider_id', 'category', 'date', 'status' ];
+		$fields = isset( $assoc_args['fields'] ) ? \explode( ',', $assoc_args['fields'] ) : [ 'task_id', 'provider_id', 'category', 'date', 'post_status' ];
 
-		WP_CLI\Utils\format_items( $format, $tasks, $fields ); // @phpstan-ignore-line
+		$formatted_tasks = [];
+		foreach ( $tasks as $task ) {
+			$formatted = [];
+			foreach ( $fields as $field ) {
+				switch ( $field ) {
+					case 'task_id':
+					case 'date':
+					case 'post_status':
+						$formatted[ $field ] = $task->$field ?? '';
+						break;
+					case 'provider_id':
+						$formatted[ $field ] = is_object( $task->provider ?? null ) && isset( $task->provider->name ) ? $task->provider->name : '';
+						break;
+					case 'category':
+						$formatted[ $field ] = is_object( $task->category ?? null ) && isset( $task->category->name ) ? $task->category->name : '';
+						break;
+					default:
+						$formatted[ $field ] = $task->$field ?? '';
+				}
+			}
+
+			$formatted_tasks[] = $formatted;
+		}
+
+		WP_CLI\Utils\format_items( $format, $formatted_tasks, $fields ); // @phpstan-ignore-line
 	}
 
 	/**
@@ -188,17 +212,9 @@ class Task_Command extends \WP_CLI_Command {
 	 * @return array
 	 */
 	private function get_tasks( $args ) {
-		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] ); // Get tasks from the database, without filtering.
-
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( $args );
 		if ( empty( $tasks ) ) {
 			return [];
-		}
-
-		// Set fields which are not set for all tasks.
-		foreach ( $tasks as $key => $task ) {
-			if ( ! isset( $task['date'] ) ) {
-				$tasks[ $key ]['date'] = '';
-			}
 		}
 
 		return $tasks;
