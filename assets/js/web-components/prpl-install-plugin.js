@@ -18,44 +18,37 @@ customElements.define(
 			pluginName,
 			action,
 			providerId,
-			className = 'prpl-button prpl-button-primary'
+			className = 'prpl-button-link'
 		) {
 			// Get parent class properties
 			super();
 
-			pluginSlug = pluginSlug || this.getAttribute( 'data-plugin-slug' );
-			pluginName = pluginName || this.getAttribute( 'data-plugin-name' );
-			pluginName = pluginName || pluginSlug;
-			action = action || this.getAttribute( 'data-action' );
-			providerId = providerId || this.getAttribute( 'data-provider-id' );
-			className = className || this.getAttribute( 'class' );
-
+			this.pluginSlug =
+				pluginSlug ?? this.getAttribute( 'data-plugin-slug' );
+			this.pluginName =
+				pluginName ?? this.getAttribute( 'data-plugin-name' );
+			this.pluginName = this.pluginName ?? this.pluginSlug;
+			this.action = action ?? this.getAttribute( 'data-action' );
+			this.providerId =
+				providerId ?? this.getAttribute( 'data-provider-id' );
+			this.className = className ?? this.getAttribute( 'class' );
 			// If the plugin slug is empty, bail out.
-			if ( ! pluginSlug ) {
+			if ( ! this.pluginSlug ) {
 				return;
 			}
 
 			// Set the inner HTML.
 			this.innerHTML = `
-				<button
-					type="button"
-					class="${ className }"
-					data-plugin-name="${ pluginName }"
-					data-plugin-slug="${ pluginSlug }"
-					data-action="${ action }"
-					data-nonce="${ progressPlanner.nonce }"
-					data-provider-id="${ providerId }"
-					style="color: #fff;"
-				>
+				<button type="button" class="${ this.className }">
 					${
-						'install' === action
+						'install' === this.action
 							? prplL10n( 'installPlugin' ).replace(
 									'%s',
-									pluginName
+									this.pluginName
 							  )
 							: prplL10n( 'activatePlugin' ).replace(
 									'%s',
-									pluginName
+									this.pluginName
 							  )
 					}
 				</button>
@@ -74,11 +67,9 @@ customElements.define(
 				return;
 			}
 
-			const action = button.getAttribute( 'data-action' );
-
 			button.addEventListener( 'click', () => {
 				button.disabled = true;
-				if ( 'install' === action ) {
+				if ( 'install' === this.action ) {
 					this.installPlugin();
 				} else {
 					this.activatePlugin();
@@ -88,9 +79,6 @@ customElements.define(
 
 		installPlugin() {
 			const button = this.querySelector( 'button' );
-			const pluginName = button.getAttribute( 'data-plugin-name' );
-			const pluginSlug = button.getAttribute( 'data-plugin-slug' );
-			const nonce = button.getAttribute( 'data-nonce' );
 
 			const thisObj = this;
 
@@ -103,9 +91,9 @@ customElements.define(
 				url: progressPlanner.ajaxUrl,
 				data: {
 					action: 'progress_planner_install_plugin',
-					plugin_slug: pluginSlug,
-					plugin_name: pluginName,
-					nonce,
+					plugin_slug: this.pluginSlug,
+					plugin_name: this.pluginName,
+					nonce: progressPlanner.nonce,
 				},
 			} )
 				.then( () => {
@@ -118,9 +106,6 @@ customElements.define(
 
 		activatePlugin() {
 			const button = this.querySelector( 'button' );
-			const pluginName = button.getAttribute( 'data-plugin-name' );
-			const pluginSlug = button.getAttribute( 'data-plugin-slug' );
-			const nonce = button.getAttribute( 'data-nonce' );
 			const thisObj = this;
 			button.innerHTML = `
 				<span class="prpl-install-button-loader"></span>
@@ -131,9 +116,9 @@ customElements.define(
 				url: progressPlanner.ajaxUrl,
 				data: {
 					action: 'progress_planner_activate_plugin',
-					plugin_slug: pluginSlug,
-					plugin_name: pluginName,
-					nonce,
+					plugin_slug: thisObj.pluginSlug,
+					plugin_name: thisObj.pluginName,
+					nonce: progressPlanner.nonce,
 				},
 			} )
 				.then( () => {
@@ -149,16 +134,16 @@ customElements.define(
 		 * Complete the task.
 		 */
 		completeTask() {
-			const providerId = this.getAttribute( 'data-provider-id' );
 			const tasks = document.querySelectorAll(
 				'#prpl-suggested-tasks-list .prpl-suggested-task'
 			);
+			const thisObj = this;
 
 			tasks.forEach( ( taskElement ) => {
-				if ( taskElement.dataset.taskId === providerId ) {
+				if ( taskElement.dataset.taskId === thisObj.providerId ) {
 					// Close popover.
 					document
-						.getElementById( 'prpl-popover-' + providerId )
+						.getElementById( 'prpl-popover-' + thisObj.providerId )
 						.hidePopover();
 
 					const postId = parseInt( taskElement.dataset.postId );
