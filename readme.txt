@@ -110,6 +110,14 @@ https://youtu.be/e1bmxZYyXFY
 
 == Changelog ==
 
+= 1.6.3 =
+
+Bugs we fixed:
+
+* Fixed a bug in the WP-CLI task-list command.
+* Fixed a bug in the post-editor when lessons cannot be retrieved.
+* Fixed a bug in the site-editor when using block themes, where the sidebar was instantiated on some servers.
+
 = 1.6.2 =
 
 Bugs we fixed:
