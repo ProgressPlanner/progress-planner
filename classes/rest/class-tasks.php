@@ -54,7 +54,7 @@ class Tasks {
 	 * @return bool
 	 */
 	public function validate_token( $token ) {
-		$token = str_replace( 'token/', '', $token );
+		$token = \str_replace( 'token/', '', $token );
 
 		if ( $token === \get_option( 'progress_planner_test_token', '' ) ) {
 			return true;
@@ -78,8 +78,13 @@ class Tasks {
 	 */
 	public function get_tasks() {
 
-		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
+		// Collection of task objects.
+		$tasks           = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => [ 'publish', 'trash', 'draft', 'future', 'pending' ] ] );
+		$tasks_to_return = [];
 
-		return new \WP_REST_Response( $tasks );
+		foreach ( $tasks as $task ) {
+			$tasks_to_return[] = $task->get_data();
+		}
+		return new \WP_REST_Response( $tasks_to_return );
 	}
 }

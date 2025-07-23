@@ -5,7 +5,7 @@
  * @package Progress_Planner
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
@@ -13,16 +13,16 @@ $prpl_widget = \progress_planner()->get_admin__widgets__content_activity();
 
 $prpl_activity_types = [
 	'publish' => [
-		'label' => __( 'Content published', 'progress-planner' ),
-		'color' => 'var(--prpl-color-accent-green)',
+		'label' => \__( 'published', 'progress-planner' ),
+		'color' => 'var(--prpl-color-accent-orange)',
 	],
 	'update'  => [
-		'label' => __( 'Content updated', 'progress-planner' ),
-		'color' => 'var(--prpl-color-accent-purple)',
+		'label' => \__( 'updated', 'progress-planner' ),
+		'color' => 'var(--prpl-color-accent-green)',
 	],
 	'delete'  => [
-		'label' => __( 'Content deleted', 'progress-planner' ),
-		'color' => 'var(--prpl-color-accent-red)',
+		'label' => \__( 'deleted', 'progress-planner' ),
+		'color' => 'var(--prpl-color-headings)',
 	],
 ];
 
@@ -31,8 +31,31 @@ $prpl_activities_count   = [
 	'all' => 0,
 ];
 
-foreach ( array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
+$prpl_chart_data    = [];
+$prpl_chart_options = [
+	'dataArgs'     => [],
+	'chartId'      => 'prpl-chart-content-activity',
+	'axisColor'    => 'var(--prpl-color-gray-2)',
+	'rulersColor'  => 'var(--prpl-color-gray-2)',
+	'filtersLabel' => '<strong>' . \__( 'show:', 'progress-planner' ) . '</strong>',
+];
+foreach ( $prpl_activity_types as $prpl_activity_type => $prpl_activity_data ) {
+	$prpl_chart_data[ $prpl_activity_type ] = \progress_planner()
+		->get_ui__chart()
+		->get_chart_data(
+			$prpl_widget->get_chart_args_content_count(
+				$prpl_activity_type,
+				$prpl_activity_data['color']
+			)
+		);
 
+	$prpl_chart_options['dataArgs'][ $prpl_activity_type ] = [
+		'color' => $prpl_activity_data['color'],
+		'label' => $prpl_activity_data['label'],
+	];
+}
+
+foreach ( \array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
 	// Default count.
 	$prpl_activities_count[ $prpl_activity_type ] = 0;
 
@@ -47,19 +70,18 @@ foreach ( array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
 	);
 
 	if ( $prpl_activities ) {
-
 		if ( 'delete' !== $prpl_activity_type ) {
 			// Filter the activities to only include the tracked post types.
-			$prpl_activities = array_filter(
+			$prpl_activities = \array_filter(
 				$prpl_activities,
 				function ( $activity ) use ( $prpl_tracked_post_types ) {
-					return in_array( get_post_type( $activity->data_id ), $prpl_tracked_post_types, true );
+					return \in_array( \get_post_type( $activity->data_id ), $prpl_tracked_post_types, true );
 				}
 			);
 		}
 
 		// Update the count.
-		$prpl_activities_count[ $prpl_activity_type ] = count( $prpl_activities );
+		$prpl_activities_count[ $prpl_activity_type ] = \count( $prpl_activities );
 	}
 
 	$prpl_activities_count['all'] += $prpl_activities_count[ $prpl_activity_type ];
@@ -79,12 +101,12 @@ foreach ( array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
 	background-color="var(--prpl-background-blue)"
 ></prpl-big-counter>
 
-<?php foreach ( $prpl_activity_types as $prpl_activity_type => $prpl_activity_data ) : ?>
-	<h3><?php echo \esc_html( $prpl_activity_data['label'] ); ?></h3>
-	<div class="prpl-graph-wrapper">
-		<?php \progress_planner()->get_ui__chart()->the_chart( $prpl_widget->get_chart_args_content_count( $prpl_activity_type, $prpl_activity_data['color'] ) ); ?>
-	</div>
-<?php endforeach; ?>
+<div class="prpl-graph-wrapper">
+	<prpl-chart-line
+		data='<?php echo \esc_attr( (string) \wp_json_encode( $prpl_chart_data ) ); ?>'
+		data-options='<?php echo \esc_attr( (string) \wp_json_encode( $prpl_chart_options ) ); ?>'
+	></prpl-chart-line>
+</div>
 
 <table>
 	<thead>

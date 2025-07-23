@@ -20,28 +20,30 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-crawl-settings-emoji-scripts';
 
 	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		$this->url = \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_emoji_scripts' );
-	}
-
-	/**
-	 * Get the title.
+	 * Get the task URL.
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_emoji_scripts' );
+	}
+
+	/**
+	 * Get the task title.
+	 *
+	 * @return string
+	 */
+	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: remove emoji scripts', 'progress-planner' );
 	}
 
 	/**
-	 * Get the description.
+	 * Get the task description.
 	 *
 	 * @return string
 	 */
-	public function get_description() {
-		return sprintf(
+	protected function get_description() {
+		return \sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Remove JavaScript used for converting emoji characters in older browsers. %s.', 'progress-planner' ),
 			'<a href="https://prpl.fyi/yoast-crawl-optimization-emoji-scripts" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Crawl Optimization Emoji Scripts', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'

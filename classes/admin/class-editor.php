@@ -27,7 +27,10 @@ class Editor {
 	public function enqueue_editor_script() {
 		// Bail early when we're on the site-editor.php page.
 		$request = \filter_input( INPUT_SERVER, 'REQUEST_URI' );
-		if ( false !== \strpos( (string) $request, '/site-editor.php' ) ) {
+		if ( ! $request && isset( $_SERVER['REQUEST_URI'] ) ) {
+			$request = \sanitize_text_field( \wp_unslash( $_SERVER['REQUEST_URI'] ) );
+		}
+		if ( $request && str_contains( $request, 'site-editor.php' ) ) {
 			return;
 		}
 
@@ -35,7 +38,7 @@ class Editor {
 
 		// Check if the page-type is set in the URL (user is coming from the Settings page).
 		if ( isset( $_GET['prpl_page_type'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			$prpl_pt = sanitize_text_field( wp_unslash( $_GET['prpl_page_type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$prpl_pt = \sanitize_text_field( \wp_unslash( $_GET['prpl_page_type'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			foreach ( $page_types as $page_type ) {
 				if ( $page_type['slug'] === $prpl_pt ) {

@@ -19,7 +19,6 @@ class Content extends Activity {
 	 */
 	public $category = 'content';
 
-
 	/**
 	 * Points configuration for content activities.
 	 *
@@ -54,7 +53,7 @@ class Content extends Activity {
 		}
 
 		// Get the number of days between the activity date and the given date.
-		$days = absint( \progress_planner()->get_utils__date()->get_days_between_dates( $date, $this->date ) );
+		$days = \absint( \progress_planner()->get_utils__date()->get_days_between_dates( $date, $this->date ) );
 
 		// Maximum range for awarded points is 30 days.
 		if ( $days >= 30 ) {
@@ -72,8 +71,8 @@ class Content extends Activity {
 
 		// Calculate the points based on the age of the activity.
 		$this->points[ $date_ymd ] = ( $days < 7 )
-			? round( $this->points[ $date_ymd ] ) // If the activity is new (less than 7 days old), award full points.
-			: round( $this->points[ $date_ymd ] * max( 0, ( 1 - $days / 30 ) ) ); // Decay the points based on the age of the activity.
+			? \round( $this->points[ $date_ymd ] ) // If the activity is new (less than 7 days old), award full points.
+			: \round( $this->points[ $date_ymd ] * \max( 0, ( 1 - $days / 30 ) ) ); // Decay the points based on the age of the activity.
 
 		return (int) $this->points[ $date_ymd ];
 	}

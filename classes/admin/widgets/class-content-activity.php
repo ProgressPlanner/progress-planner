@@ -28,12 +28,13 @@ final class Content_Activity extends Widget {
 	 * @return array The chart args.
 	 */
 	public function get_chart_args_content_count( $type = 'publish', $color = '#534786' ) {
-		return array_merge(
+		return \array_merge(
 			$this->get_chart_args( $type, $color ),
 			[
 				'count_callback' => function ( $activities, $date = null ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
-					return count( $activities );
+					return \count( $activities );
 				},
+				'return_data'    => [ 'label', 'score' ],
 			]
 		);
 	}
@@ -80,11 +81,11 @@ final class Content_Activity extends Widget {
 	 * @return \Progress_Planner\Activities\Content[]
 	 */
 	public function filter_activities( $activities ) {
-		return array_filter(
+		return \array_filter(
 			$activities,
 			function ( $activity ) {
 				$post = $activity->get_post();
-				return 'delete' === $activity->type || ( is_object( $post )
+				return 'delete' === $activity->type || ( \is_object( $post )
 					&& \in_array( $post->post_type, \progress_planner()->get_activities__content_helpers()->get_post_types_names(), true ) );
 			}
 		);

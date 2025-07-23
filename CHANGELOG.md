@@ -1,3 +1,44 @@
+= 1.7.0 =
+
+Bugs we fixed:
+
+* Fix issue where "Perform all updates" task was incorrectly marked as completed.
+* Prevent new lines to be added when user task title is edited.
+
+
+= 1.6.3 =
+
+Bugs we fixed:
+
+* Fixed a bug in the WP-CLI task-list command.
+* Fixed a bug in the post-editor when lessons cannot be retrieved.
+* Fixed a bug in the site-editor when using block themes, where the sidebar was instantiated on some servers.
+
+= 1.6.2 =
+
+Bugs we fixed:
+
+* Ensure that the Custom Post Type for Recommendations is not publicly queryable.
+
+= 1.6.1 =
+
+Bugs we fixed:
+
+* "Collect your point" not closing the "Test if your website can send emails correctly" popover.
+* Snooze task tooltip overaly not closing properly.
+* Properly trigger migration from v1.5.0.
+
+= 1.6.0 =
+
+Enhancements:
+
+* Allow users to collect extra points for previous months' badges.
+* Added WP-CLI commands to manage recommendations.
+
+Under the hood:
+
+* Ravi's Recommendations are now a custom post type.
+
 = 1.5.0 =
 
 Added these recommendations from Ravi:

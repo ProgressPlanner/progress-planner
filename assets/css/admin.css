@@ -57,12 +57,13 @@
 	background: #fff;
 	border: 1px solid var(--prpl-color-gray-2);
 	border-radius: var(--prpl-border-radius);
-	padding: calc(var(--prpl-padding) * 2);
+	padding: var(--prpl-settings-page-gap) calc(var(--prpl-padding) * 2);
 	max-width: var(--prpl-container-max-width);
 	color: var(--prpl-color-text);
 	font-size: var(--prpl-font-size-base);
 	line-height: 1.4;
 	position: relative;
+	margin-top: var(--prpl-padding);
 }
 
 /*------------------------------------*\
@@ -137,8 +138,6 @@
 			}
 		}
 	}
-
-
 }
 
 .prpl-hidden {
@@ -166,7 +165,7 @@ button.prpl-info-icon {
 	Header & logo.
 \*------------------------------------*/
 .prpl-header {
-	margin-bottom: 2em;
+	margin-bottom: 2rem;
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
@@ -174,7 +173,7 @@ button.prpl-info-icon {
 }
 
 .prpl-header-logo svg {
-	height: 100px;
+	height: 88px;
 }
 
 .prpl-header-right {
@@ -280,7 +279,6 @@ button.prpl-info-icon {
 		cursor: pointer;
 	}
 }
-
 
 /*------------------------------------*\
   Buttons
@@ -480,4 +478,34 @@ button.prpl-info-icon {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
 	gap: var(--prpl-padding);
+}
+
+/*------------------------------------*\
+	Loader.
+	See https://cssloaders.github.io/ for more.
+\*------------------------------------*/
+.prpl-loader {
+	width: 48px;
+	height: 48px;
+	border: 5px solid #fff;
+	border-bottom-color: transparent;
+	border-radius: 50%;
+	display: inline-block;
+	box-sizing: border-box;
+	animation: rotation 1s linear infinite;
+	z-index: 20;
+	position: absolute;
+	top: calc(50% - 24px);
+	left: calc(50% - 24px);
+}
+
+@keyframes rotation {
+
+	0% {
+		transform: rotate(0deg);
+	}
+
+	100% {
+		transform: rotate(360deg);
+	}
 }

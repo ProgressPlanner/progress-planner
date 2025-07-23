@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Suggested_Tasks\Data_Collector;
 
+use Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content;
+
 /**
  * Manages the collection and initialization of data collectors.
  */
@@ -34,7 +36,10 @@ class Data_Collector_Manager {
 	 */
 	public function __construct() {
 		$this->load_data_collectors();
-		$this->initialize_collectors();
+		$this->add_plugin_integration();
+
+		// At all all CPTs and taxonomies are initialized, init the data collectors.
+		\add_action( 'init', [ $this, 'init' ], 99 ); // Wait for the post types to be initialized.
 
 		// Update the cache once per day.
 		\add_action( 'admin_init', [ $this, 'update_data_collectors_cache' ] );
@@ -69,6 +74,18 @@ class Data_Collector_Manager {
 	}
 
 	/**
+	 * Add plugin integration.
+	 *
+	 * @return void
+	 */
+	public function add_plugin_integration() {
+		// Yoast SEO integration.
+		if ( \function_exists( 'YoastSEO' ) ) {
+			$this->data_collectors[] = new Yoast_Orphaned_Content();
+		}
+	}
+
+	/**
 	 * Check if a file should be skipped during loading.
 	 *
 	 * @param string $file_path The full path to the file.
@@ -97,9 +114,17 @@ class Data_Collector_Manager {
 	 *
 	 * @return void
 	 */
-	protected function initialize_collectors() {
-		foreach ( $this->data_collectors as $collector ) {
-			$collector->init();
+	public function init() {
+		/**
+		 * Filter the data collectors.
+		 *
+		 * @param array $data_collectors The data collectors.
+		 */
+		$this->data_collectors = \apply_filters( 'progress_planner_data_collectors', $this->data_collectors );
+
+		// Initialize (add hooks) the data collectors.
+		foreach ( $this->data_collectors as $data_collector ) {
+			$data_collector->init();
 		}
 	}
 
@@ -109,9 +134,7 @@ class Data_Collector_Manager {
 	 * @return void
 	 */
 	public function update_data_collectors_cache() {
-		$update_recently_performed = \progress_planner()->get_utils__cache()->get( 'update_data_collectors_cache' );
-
-		if ( $update_recently_performed ) {
+		if ( \progress_planner()->get_utils__cache()->get( 'update_data_collectors_cache' ) ) {
 			return;
 		}
 

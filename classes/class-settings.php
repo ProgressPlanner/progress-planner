@@ -40,7 +40,7 @@ class Settings {
 	public function get( $setting, $default_value = null ) {
 		$this->load_settings();
 
-		if ( is_array( $setting ) ) {
+		if ( \is_array( $setting ) ) {
 			return \_wp_array_get( self::$settings, $setting, $default_value );
 		}
 		return self::$settings[ $setting ] ?? $default_value;
@@ -59,7 +59,7 @@ class Settings {
 	 */
 	public function set( $setting, $value ) {
 		$this->load_settings();
-		if ( is_array( $setting ) ) {
+		if ( \is_array( $setting ) ) {
 			\_wp_array_set( self::$settings, $setting, $value );
 		} else {
 			self::$settings[ $setting ] = $value;
@@ -119,11 +119,11 @@ class Settings {
 	public function get_post_types_names() {
 		static $include_post_types;
 
-		if ( ! doing_action( 'init' ) && ! did_action( 'init' ) ) {
+		if ( ! \doing_action( 'init' ) && ! \did_action( 'init' ) ) {
 			\trigger_error( // phpcs:ignore
-				sprintf(
+				\sprintf(
 					'%1$s was called too early. Wait for init hook to be called to have access to the post types.',
-					\esc_html( get_class() . '::' . __FUNCTION__ )
+					\esc_html( \get_class() . '::' . __FUNCTION__ )
 				),
 				E_USER_WARNING
 			);
@@ -137,10 +137,10 @@ class Settings {
 		$public_post_types = $this->get_public_post_types();
 
 		// Post or pages can be deregistered.
-		$default = array_intersect( [ 'post', 'page' ], $public_post_types );
+		$default = \array_intersect( [ 'post', 'page' ], $public_post_types );
 
 		// Filter the saved post types.
-		$include_post_types = array_intersect( $this->get( [ 'include_post_types' ], $default ), $public_post_types );
+		$include_post_types = \array_intersect( $this->get( [ 'include_post_types' ], $default ), $public_post_types );
 
 		return empty( $include_post_types ) ? $default : \array_values( $include_post_types );
 	}
@@ -155,6 +155,7 @@ class Settings {
 
 		unset( $public_post_types['attachment'] );
 		unset( $public_post_types['elementor_library'] ); // Elementor templates are not a post type we want to track.
+		unset( $public_post_types['prpl_recommendations'] );
 
 		/**
 		 * Filter the public post types.

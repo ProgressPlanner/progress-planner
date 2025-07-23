@@ -35,7 +35,7 @@ class Date_Test extends \WP_UnitTestCase {
 	public function test_get_periods( $start_date, $end_date, $frequency ) {
 		$periods = \progress_planner()->get_utils__date()->get_periods( $start_date, $end_date, $frequency );
 		$this->assertEquals( $start_date, $periods[0]['start_date'] );
-		$this->assertEquals( $end_date, end( $periods )['end_date']->modify( '+1 day' ) );
+		$this->assertEquals( $end_date, \end( $periods )['end_date']->modify( '+1 day' ) );
 	}
 
 	/**

@@ -57,7 +57,9 @@ class Last_Published_Post extends Base_Data_Collector {
 	 * @return void
 	 */
 	public function update_last_published_post_cache( $new_status, $old_status, $post ) {
-		if ( true === \in_array( get_post_type( $post ), $this->include_post_types, true ) && ( $new_status === 'publish' || $old_status === 'publish' ) ) {
+		if ( true === \in_array( \get_post_type( $post ), $this->include_post_types, true ) &&
+			( $new_status === 'publish' || $old_status === 'publish' )
+		) {
 			$this->update_cache();
 		}
 	}
@@ -68,7 +70,6 @@ class Last_Published_Post extends Base_Data_Collector {
 	 * @return array
 	 */
 	protected function calculate_data() {
-
 		// Default data.
 		$data = [
 			'post_id'   => 0,
