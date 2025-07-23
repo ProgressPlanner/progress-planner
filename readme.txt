@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.6.2
+Stable tag: 1.6.3
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -109,6 +109,14 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.6.3 =
+
+Bugs we fixed:
+
+* Fixed a bug in the WP-CLI task-list command.
+* Fixed a bug in the post-editor when lessons cannot be retrieved.
+* Fixed a bug in the site-editor when using block themes, where the sidebar was instantiated on some servers.
 
 = 1.6.2 =
 
