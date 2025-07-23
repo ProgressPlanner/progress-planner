@@ -68,4 +68,14 @@ class Settings_Saved extends Tasks {
 	public function should_add_task() {
 		return false === \get_option( 'progress_planner_pro_license_key', false );
 	}
+
+	/**
+	 * Check if the task is completed.
+	 *
+	 * @param string $task_id Optional task ID to check completion for.
+	 * @return bool
+	 */
+	public function is_task_completed( $task_id = '' ) {
+		return false !== \get_option( 'progress_planner_pro_license_key', false );
+	}
 }
