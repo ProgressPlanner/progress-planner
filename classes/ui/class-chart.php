@@ -63,6 +63,7 @@ class Chart {
 				},
 				'max'            => null,
 				'type'           => 'line',
+				'return_data'    => [ 'label', 'score', 'color' ],
 			]
 		);
 
@@ -95,11 +96,11 @@ class Chart {
 		foreach ( $periods as $period ) {
 			$period_data                = $this->get_period_data( $period, $args, $previous_period_activities );
 			$previous_period_activities = $period_data['previous_period_activities'];
-			$data[]                     = [
-				'label' => $period_data['label'],
-				'score' => $period_data['score'],
-				'color' => $period_data['color'],
-			];
+			$period_data_filtered       = [];
+			foreach ( $args['return_data'] as $key ) {
+				$period_data_filtered[ $key ] = $period_data[ $key ];
+			}
+			$data[] = $period_data_filtered;
 		}
 
 		return $data;

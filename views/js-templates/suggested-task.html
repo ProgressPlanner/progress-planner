@@ -21,7 +21,7 @@
 		<# } #>
 
 		<h3 style="width: 100%;">
-			<span <# if ( 'user' === categorySlug ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>><# if ( data.post.meta.prpl_url ) { #><a href="{{{ data.post.meta.prpl_url }}}" target="{{{ data.post.meta.prpl_url_target }}}">{{{ data.post.title.rendered }}}</a><# } else if ( data.post.meta.prpl_popover_id ) { #><a href="#" role="button" onclick="document.getElementById('{{{ data.post.meta.prpl_popover_id }}}')?.showPopover()">{{{ data.post.title.rendered }}}</a><# } else { #>{{{ data.post.title.rendered }}}<# } #></span>
+			<span <# if ( 'user' === categorySlug ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.preventEnterKey( event ); prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>><# if ( data.post.meta.prpl_url ) { #><a href="{{{ data.post.meta.prpl_url }}}" target="{{{ data.post.meta.prpl_url_target }}}">{{{ data.post.title.rendered }}}</a><# } else if ( data.post.meta.prpl_popover_id ) { #><a href="#" role="button" onclick="document.getElementById('{{{ data.post.meta.prpl_popover_id }}}')?.showPopover()">{{{ data.post.title.rendered }}}</a><# } else { #>{{{ data.post.title.rendered }}}<# } #></span>
 		</h3>
 
 		<div class="prpl-suggested-task-actions">

@@ -4,7 +4,7 @@
 :root {
 	--prpl-gap: 32px;
 	--prpl-settings-page-gap: 1.5rem;
-	--prpl-padding: 1.25rem;
+	--prpl-padding: 20px;
 	--prpl-column-min-width: 22rem;
 	--prpl-max-columns: 3;
 	--prpl-border-radius: 8px;
@@ -173,7 +173,7 @@ button.prpl-info-icon {
 }
 
 .prpl-header-logo svg {
-	height: 5.5rem;
+	height: 88px;
 }
 
 .prpl-header-right {
