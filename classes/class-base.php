@@ -101,7 +101,7 @@ class Base {
 			$this->get_actions__maintenance();
 
 			// Onboarding.
-			$this->get_onboard();
+			$this->get_utils__onboard();
 
 			// To-do.
 			$this->get_todo();
@@ -127,12 +127,6 @@ class Base {
 		// REST API.
 		$this->get_rest__stats();
 		$this->get_rest__tasks();
-
-		// Onboarding.
-		$this->get_utils__onboard();
-
-		// To-do.
-		$this->get_todo();
 
 		// Post-meta.
 		if ( $this->is_pro_site() ) {
