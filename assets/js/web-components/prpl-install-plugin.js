@@ -13,7 +13,13 @@
 customElements.define(
 	'prpl-install-plugin',
 	class extends HTMLElement {
-		constructor( pluginSlug, pluginName, action, providerId ) {
+		constructor(
+			pluginSlug,
+			pluginName,
+			action,
+			providerId,
+			className = 'prpl-button prpl-button-primary'
+		) {
 			// Get parent class properties
 			super();
 
@@ -22,6 +28,7 @@ customElements.define(
 			pluginName = pluginName || pluginSlug;
 			action = action || this.getAttribute( 'data-action' );
 			providerId = providerId || this.getAttribute( 'data-provider-id' );
+			className = className || this.getAttribute( 'class' );
 
 			// If the plugin slug is empty, bail out.
 			if ( ! pluginSlug ) {
@@ -32,7 +39,7 @@ customElements.define(
 			this.innerHTML = `
 				<button
 					type="button"
-					class="prpl-button prpl-button-primary"
+					class="${ className }"
 					data-plugin-name="${ pluginName }"
 					data-plugin-slug="${ pluginSlug }"
 					data-action="${ action }"
