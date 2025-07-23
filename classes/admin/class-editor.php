@@ -27,7 +27,10 @@ class Editor {
 	public function enqueue_editor_script() {
 		// Bail early when we're on the site-editor.php page.
 		$request = \filter_input( INPUT_SERVER, 'REQUEST_URI' );
-		if ( false !== \strpos( (string) $request, '/site-editor.php' ) ) {
+		if ( ! $request && isset( $_SERVER['REQUEST_URI'] ) ) {
+			$request = \sanitize_text_field( \wp_unslash( $_SERVER['REQUEST_URI'] ) );
+		}
+		if ( $request && str_contains( $request, 'site-editor.php' ) ) {
 			return;
 		}
 
