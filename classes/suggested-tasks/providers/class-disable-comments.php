@@ -114,7 +114,8 @@ class Disable_Comments extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		?>
-		<p><?php \esc_html_e( 'If you don\'t need comments on your site, consider disabling them.', 'progress-planner' ); ?></p>
+		<p><?php \esc_html_e( "If you don't need comments on your site, consider disabling them.", 'progress-planner' ); ?></p>
+		<p><?php \esc_html_e( 'You can disable new comments by clicking on the button, or disable all comments by installing the Comment-free zone plugin.', 'progress-planner' ); ?></p>
 		<?php
 	}
 
@@ -126,7 +127,7 @@ class Disable_Comments extends Tasks_Interactive {
 	public function print_popover_form_contents() {
 		?>
 		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
-			<?php \esc_html_e( 'Disable comments', 'progress-planner' ); ?>
+			<?php \esc_html_e( 'Disable new comments', 'progress-planner' ); ?>
 		</button>
 		<prpl-install-plugin
 			data-plugin-name="Comment-free zone"
