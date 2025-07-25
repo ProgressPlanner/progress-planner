@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 /**
  * Add tasks for Core blogdescription.
  */
-class Blog_Description extends Tasks {
+class Blog_Description extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -25,6 +25,13 @@ class Blog_Description extends Tasks {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'core-blogdescription';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'core-blogdescription';
 
 	/**
 	 * Get the task title.
@@ -76,5 +83,39 @@ class Blog_Description extends Tasks {
 	 */
 	public function should_add_task() {
 		return '' === \get_bloginfo( 'description' );
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		?>
+		<p><?php \esc_html_e( 'In a few words, explain what this site is about.', 'progress-planner' ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<label>
+			<input
+				name="blogdescription"
+				type="text"
+				id="blogdescription"
+				value="<?php echo \esc_attr( \get_bloginfo( 'description' ) ); ?>"
+				class="regular-text"
+			>
+			<p><?php echo \wp_kses_post( $this->get_task_details()['description'] ); ?></p>
+		</label>
+		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+			<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
+		</button>
+		<?php
 	}
 }

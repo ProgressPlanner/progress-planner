@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 /**
  * Add task for Email sending.
  */
-class Email_Sending extends Tasks {
+class Email_Sending extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -32,13 +32,6 @@ class Email_Sending extends Tasks {
 	 * @var string
 	 */
 	const CATEGORY = 'configuration';
-
-	/**
-	 * Whether the task is interactive.
-	 *
-	 * @var bool
-	 */
-	const IS_INTERACTIVE = true;
 
 	/**
 	 * The popover ID.
@@ -184,9 +177,11 @@ class Email_Sending extends Tasks {
 	/**
 	 * Enqueue the scripts.
 	 *
+	 * @param string $hook The current admin page.
+	 *
 	 * @return void
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts( $hook ) {
 		// Don't enqueue the script if the task is already completed.
 		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() ) ) {
 			return;
@@ -284,7 +279,7 @@ class Email_Sending extends Tasks {
 	 *
 	 * @return void
 	 */
-	public function the_popover_content() {
+	protected function the_popover_content() {
 		\progress_planner()->the_view(
 			'popovers/email-sending.php',
 			[
