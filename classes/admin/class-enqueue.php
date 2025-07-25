@@ -381,7 +381,7 @@ class Enqueue {
 			'disabledRRCheckboxTooltip'    => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),
 			'opensInNewWindow'             => \esc_html__( 'Opens in new window', 'progress-planner' ),
 			/* translators: %s: The plugin name. */
-			'installPlugin'                => \esc_html__( 'Install and activate plugin "%s"', 'progress-planner' ),
+			'installPlugin'                => \esc_html__( 'Install and activate the "%s" plugin', 'progress-planner' ),
 			/* translators: %s: The plugin name. */
 			'activatePlugin'               => \esc_html__( 'Activate plugin "%s"', 'progress-planner' ),
 			'installing'                   => \esc_html__( 'Installing...', 'progress-planner' ),
