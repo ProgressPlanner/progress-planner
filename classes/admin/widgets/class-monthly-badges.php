@@ -7,24 +7,46 @@
 
 namespace Progress_Planner\Admin\Widgets;
 
+use DateTime;
+use Progress_Planner\Badges\Monthly;
+
 /**
- * Suggested_Tasks class.
+ * Monthly_Badges class.
  */
-final class Suggested_Tasks extends Widget {
+final class Monthly_Badges extends Widget {
 
 	/**
 	 * The widget ID.
 	 *
 	 * @var string
 	 */
-	protected $id = 'suggested-tasks';
+	protected $id = 'monthly-badges';
 
 	/**
-	 * The widget width.
+	 * Get the score.
 	 *
-	 * @var int
+	 * @return array<string, int> The scores.
 	 */
-	protected $width = 2;
+	public function get_score() {
+		$activities = \progress_planner()->get_activities__query()->query_activities(
+			[
+				'category'   => 'suggested_task',
+				'start_date' => \DateTime::createFromFormat( 'Y-m-d', \gmdate( 'Y-m-01' ) ),
+				'end_date'   => \DateTime::createFromFormat( 'Y-m-d', \gmdate( 'Y-m-t' ) ),
+			]
+		);
+
+		$score = 0;
+		foreach ( $activities as $activity ) {
+			$score += $activity->get_points( $activity->date );
+		}
+
+		return [
+			'score'        => (int) $score,
+			'target'       => (int) Monthly::TARGET_POINTS,
+			'target_score' => (int) \min( Monthly::TARGET_POINTS, \max( 0, \floor( $score ) ) ),
+		];
+	}
 
 	/**
 	 * Enqueue the scripts.
