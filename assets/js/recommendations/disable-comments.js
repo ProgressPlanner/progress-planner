@@ -3,7 +3,7 @@
 /*
  * Disable Comments recommendation.
  *
- * Dependencies: progress-planner/recommendations/interactive-task
+ * Dependencies: progress-planner/recommendations/interactive-task, progress-planner/web-components/prpl-install-plugin
  */
 
 prplInteractiveTaskFormListener.siteSettings( {
