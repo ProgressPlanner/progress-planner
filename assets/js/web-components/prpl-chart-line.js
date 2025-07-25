@@ -181,28 +181,21 @@ customElements.define(
 		getYLabelsStepsDivider = () => {
 			const maxValuePadded = this.getMaxValuePadded();
 
-			const steps3Remainder = maxValuePadded % 3;
-			const steps4Remainder = maxValuePadded % 4;
-			const steps5Remainder = maxValuePadded % 5;
+			const stepsRemainders = {
+				4: maxValuePadded % 4,
+				5: maxValuePadded % 5,
+				3: maxValuePadded % 3,
+			};
+			// Get the smallest remainder.
+			const smallestRemainder = Math.min(
+				...Object.values( stepsRemainders )
+			);
 
-			if ( steps4Remainder === 0 ) {
-				return 4;
-			} else if ( steps3Remainder === 0 ) {
-				return 3;
-			} else if ( steps5Remainder === 0 ) {
-				return 5;
-			} else if (
-				steps3Remainder < steps4Remainder &&
-				steps3Remainder < steps5Remainder
-			) {
-				return 3;
-			} else if (
-				steps5Remainder < steps3Remainder &&
-				steps5Remainder < steps4Remainder
-			) {
-				return 5;
-			}
-			return 4;
+			// Get the key of the smallest remainder.
+			const smallestRemainderKey = Object.keys( stepsRemainders ).find(
+				( key ) => stepsRemainders[ key ] === smallestRemainder
+			);
+			return smallestRemainderKey;
 		};
 
 		/**
