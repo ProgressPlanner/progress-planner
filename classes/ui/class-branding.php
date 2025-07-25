@@ -27,7 +27,7 @@ final class Branding {
 	 * @return int
 	 */
 	public function get_branding_id(): int {
-		// TODO: Get branding ID depending on the host, agency etc.
+		// Get branding ID depending on the host, agency etc.
 		if ( \defined( 'PROGRESS_PLANNER_BRANDING_ID' ) ) {
 			return \constant( 'PROGRESS_PLANNER_BRANDING_ID' );
 		}
