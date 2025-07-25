@@ -10,7 +10,9 @@ $finder = ( new PhpCsFixer\Finder() )
 		]
 	);
 
-return ( new PhpCsFixer\Config() )->setRules(
+$config = new PhpCsFixer\Config();
+
+return $config->setRules(
 	[
 		'native_function_invocation' => [
 			'include' => [ '@all' ],
