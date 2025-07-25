@@ -170,22 +170,58 @@ customElements.define(
 		};
 
 		/**
+		 * Get the number of steps for the Y axis.
+		 *
+		 * Choose between 3, 4, or 5 steps.
+		 * The result should be the number that when used as a divisor,
+		 * produces integer values for the Y labels - or at least as close as possible.
+		 *
+		 * @return {number} The number of steps.
+		 */
+		getYLabelsStepsDivider = () => {
+			const maxValuePadded = this.getMaxValuePadded();
+
+			const steps3Remainder = maxValuePadded % 3;
+			const steps4Remainder = maxValuePadded % 4;
+			const steps5Remainder = maxValuePadded % 5;
+
+			if ( steps4Remainder === 0 ) {
+				return 4;
+			} else if ( steps3Remainder === 0 ) {
+				return 3;
+			} else if ( steps5Remainder === 0 ) {
+				return 5;
+			} else if (
+				steps3Remainder < steps4Remainder &&
+				steps3Remainder < steps5Remainder
+			) {
+				return 3;
+			} else if (
+				steps5Remainder < steps3Remainder &&
+				steps5Remainder < steps4Remainder
+			) {
+				return 5;
+			}
+			return 4;
+		};
+
+		/**
 		 * Get the Y labels.
 		 *
 		 * @return {number[]} The Y labels.
 		 */
 		getYLabels = () => {
 			const maxValuePadded = this.getMaxValuePadded();
-			// Take the maximum value and divide it by 4 to get the step.
-			const yLabelsStep = maxValuePadded / 4;
+			const yLabelsStepsDivider = this.getYLabelsStepsDivider();
+			const yLabelsStep = maxValuePadded / yLabelsStepsDivider;
 			const yLabels = [];
 			if ( 100 === maxValuePadded || 15 > maxValuePadded ) {
-				for ( let i = 0; i <= 4; i++ ) {
+				for ( let i = 0; i <= yLabelsStepsDivider; i++ ) {
 					yLabels.push( parseInt( yLabelsStep * i ) );
 				}
 			} else {
 				// Round the values to the nearest 10.
-				for ( let i = 0; i <= 4; i++ ) {
+				for ( let i = 0; i <= yLabelsStepsDivider; i++ ) {
 					yLabels.push(
 						Math.min(
 							maxValuePadded,
