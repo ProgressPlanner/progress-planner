@@ -71,17 +71,18 @@ final class Branding {
 	 */
 	public function the_logo(): void {
 		// Get the logo ID from the API data.
-		if ( ! empty( $this->get_api_data() ) ) {
+		if ( ! empty( $this->get_api_data() )
+			&& isset( $this->get_api_data()['acf']['logo'] )
+			&& ! empty( $this->get_api_data()['acf']['logo'] )
+		) {
 			$logo_id = $this->get_api_data()['acf']['logo'];
-			if ( $logo_id ) {
-				// Get the logo URL.
-				$response = $this->get_remote_data( \progress_planner()->get_remote_server_root_url() . '/wp-json/wp/v2/media/' . $logo_id );
-				if ( $response ) {
-					$media = \json_decode( $response, true );
-					if ( isset( $media['source_url'] ) ) {
-						echo '<img src="' . \esc_url( $media['source_url'] ) . '" alt="Logo" style="height:100px;"/>';
-						return;
-					}
+			// Get the logo URL.
+			$response = $this->get_remote_data( \progress_planner()->get_remote_server_root_url() . '/wp-json/wp/v2/media/' . $logo_id );
+			if ( $response ) {
+				$media = \json_decode( $response, true );
+				if ( isset( $media['source_url'] ) ) {
+					echo '<img src="' . \esc_url( $media['source_url'] ) . '" alt="Logo" style="height:100px;"/>';
+					return;
 				}
 			}
 		}
@@ -99,7 +100,7 @@ final class Branding {
 	 * @return string
 	 */
 	public function get_color_palette(): string {
-		$defaults = [
+		$colors = [
 			'--prpl-color-gray-1'             => '#e1e3e7',
 			'--prpl-color-gray-2'             => '#d1d5db',
 			'--prpl-color-gray-3'             => '#9ca3af',
@@ -127,11 +128,8 @@ final class Branding {
 			'--prpl-background-blue'          => '#effbfe',
 		];
 
-		if ( ! empty( $this->get_api_data() ) ) {
-			$api_colors = $this->get_api_data()['acf']['colors'];
-			$colors     = empty( $api_colors ) ? $defaults : \wp_parse_args( $api_colors, $defaults );
-		} else {
-			$colors = $defaults;
+		if ( ! empty( $this->get_api_data() ) && ! empty( $this->get_api_data()['acf']['colors'] ) ) {
+			$colors = \wp_parse_args( $this->get_api_data()['acf']['colors'], $colors );
 		}
 
 		$palette_string = '';
@@ -176,10 +174,9 @@ final class Branding {
 	 * @return string
 	 */
 	public function get_ravi_name(): string {
-		$default  = 'Ravi';
-		$api_name = empty( $this->get_api_data() ) ? '' : $this->get_api_data()['acf']['ravis_name'];
-
-		return $api_name ? $api_name : $default;
+		return empty( $this->get_api_data() )
+			? 'Ravi'
+			: $this->get_api_data()['acf']['ravis_name'];
 	}
 
 	/**
