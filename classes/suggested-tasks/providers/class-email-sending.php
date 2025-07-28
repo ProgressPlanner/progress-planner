@@ -292,4 +292,13 @@ class Email_Sending extends Tasks_Interactive {
 			]
 		);
 	}
+
+	/**
+	 * Print the popover form contents.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		// The form is handled in the popovers/email-sending view.
+	}
 }
