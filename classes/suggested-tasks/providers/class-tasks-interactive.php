@@ -151,8 +151,7 @@ abstract class Tasks_Interactive extends Tasks {
 	 *
 	 * @return void
 	 */
-	public function print_popover_form_contents() {
-	}
+	abstract public function print_popover_form_contents();
 
 	/**
 	 * Enqueue the scripts.
