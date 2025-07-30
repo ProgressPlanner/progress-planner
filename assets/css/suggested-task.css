@@ -119,7 +119,6 @@
 		color: var(--prpl-color-gray-3);
 		cursor: pointer;
 		box-shadow: none;
-		transition: all 0.1s;
 		margin-top: 1px;
 	}
 
