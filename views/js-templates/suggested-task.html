@@ -4,50 +4,52 @@
 	var categorySlug = prplTerms.getTerm( data.post[ prplTerms.category ][0], prplTerms.category ).slug;
 	#>
 	<li class="prpl-suggested-task" data-task-id="{{ data.post.meta.prpl_task_id || data.post.id }}" data-post-id="{{ data.post.id }}" data-task-action="{{ data.action }}" data-task-url="{{ data.post.meta.prpl_url }}" data-task-provider-id="{{ providerSlug }}" data-task-points="{{ data.post.meta.prpl_points }}" data-task-category="{{ categorySlug }}" data-task-order="{{ data.post.menu_order }}">
-		<div class="prpl-suggested-task-title-wrapper">
+		<div class="prpl-suggested-task-checkbox-wrapper">
 			<# if ( data.useCheckbox ) { #>
 				<# if ( ! data.post.meta.prpl_dismissable ) { #>
 					<prpl-tooltip class="prpl-suggested-task-disabled-checkbox-tooltip">
 						<slot name="open-icon">
-							<input type="checkbox" class="prpl-suggested-task-checkbox" style="margin-top: 2px; pointer-events: none;" <# if ( ! data.post.meta.prpl_dismissable ) { #>disabled<# } #> <# if ( 'trash' === data.post.status || 'pending' === data.post.status ) { #>checked<# } #>>
+							<input type="checkbox" class="prpl-suggested-task-checkbox" style="margin: 0; pointer-events: none;" <# if ( ! data.post.meta.prpl_dismissable ) { #>disabled<# } #> <# if ( 'trash' === data.post.status || 'pending' === data.post.status ) { #>checked<# } #>>
 						</slot>
 						<slot name="content">{{{ data.l10n.disabledRRCheckboxTooltip }}}</slot>
 					</prpl-tooltip>
 				<# } else { #>
 					<label>
-						<input type="checkbox" class="prpl-suggested-task-checkbox" onchange="prplSuggestedTask.maybeComplete( {{ data.post.id }} );" style="margin-top: 2px; pointer-events: none;" <# if ( ! data.post.meta.prpl_dismissable || 'user' !== categorySlug && ( 'trash' === data.post.status || 'pending' === data.post.status ) ) { #>disabled<# } #> <# if ( 'trash' === data.post.status || 'pending' === data.post.status ) { #>checked<# } #>>
+						<input type="checkbox" class="prpl-suggested-task-checkbox" onchange="prplSuggestedTask.maybeComplete( {{ data.post.id }} );" style="margin: 0; pointer-events: none;" <# if ( ! data.post.meta.prpl_dismissable || 'user' !== categorySlug && ( 'trash' === data.post.status || 'pending' === data.post.status ) ) { #>disabled<# } #> <# if ( 'trash' === data.post.status || 'pending' === data.post.status ) { #>checked<# } #>>
 						<span class="screen-reader-text">{{{ data.post.title.rendered }}}: {{ data.l10n.markAsComplete }}</span>
 					</label>
 				<# } #>
 			<# } #>
+		</div>
 
+		<div class="prpl-suggested-task-title-wrapper">
 			<h3 style="width: 100%;">
 				<span <# if ( 'user' === categorySlug ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.preventEnterKey( event ); prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>><# if ( data.post.meta.prpl_url ) { #><a href="{{{ data.post.meta.prpl_url }}}" target="{{{ data.post.meta.prpl_url_target }}}">{{{ data.post.title.rendered }}}</a><# } else if ( data.post.meta.prpl_popover_id ) { #><a href="#" role="button" onclick="document.getElementById('{{{ data.post.meta.prpl_popover_id }}}')?.showPopover()">{{{ data.post.title.rendered }}}</a><# } else { #>{{{ data.post.title.rendered }}}<# } #></span>
 			</h3>
 		</div>
 
 		<div class="prpl-suggested-task-points-wrapper">
-			<# if ( 'user' === categorySlug ) { #>
-				<div class="tooltip-actions">
-					<span class="prpl-move-buttons">
-						<button type="button" class="prpl-suggested-task-button move-up" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="move-up" data-target="move-up" title="{{ data.l10n.moveUp }}" onclick="prplSuggestedTask.runButtonAction( this );">
-							<span class="dashicons dashicons-arrow-up-alt2"></span>
-							<span class="screen-reader-text">{{ data.l10n.moveUp }}</span>
-						</button>
-						<button type="button" class="prpl-suggested-task-button move-down" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="move-down" data-target="move-down" title="{{ data.l10n.moveDown }}" onclick="prplSuggestedTask.runButtonAction( this );">
-							<span class="dashicons dashicons-arrow-down-alt2"></span>
-							<span class="screen-reader-text">{{ data.l10n.moveDown }}</span>
-						</button>
-					</span>
-				</div>
-			<# } #>
-
 			<# if ( data.post.meta.prpl_points ) { #>
 				<span class="prpl-suggested-task-points">
 					+{{ data.post.meta.prpl_points }}
 				</span>
 			<# } #>
 		</div>
+
+		<# if ( 'user' === categorySlug ) { #>
+			<div class="tooltip-actions">
+				<span class="prpl-move-buttons">
+					<button type="button" class="prpl-suggested-task-button move-up" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="move-up" data-target="move-up" title="{{ data.l10n.moveUp }}" onclick="prplSuggestedTask.runButtonAction( this );">
+						<span class="dashicons dashicons-arrow-up-alt2"></span>
+						<span class="screen-reader-text">{{ data.l10n.moveUp }}</span>
+					</button>
+					<button type="button" class="prpl-suggested-task-button move-down" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="move-down" data-target="move-down" title="{{ data.l10n.moveDown }}" onclick="prplSuggestedTask.runButtonAction( this );">
+						<span class="dashicons dashicons-arrow-down-alt2"></span>
+						<span class="screen-reader-text">{{ data.l10n.moveDown }}</span>
+					</button>
+				</span>
+			</div>
+		<# } #>
 
 		<div class="prpl-suggested-task-actions-wrapper">
 			<div class="tooltip-actions">
