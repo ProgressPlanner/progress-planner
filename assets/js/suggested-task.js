@@ -24,6 +24,8 @@ prplSuggestedTask = {
 		snoozeDurationForever: prplL10n( 'snoozeDurationForever' ),
 		disabledRRCheckboxTooltip: prplL10n( 'disabledRRCheckboxTooltip' ),
 		markAsComplete: prplL10n( 'markAsComplete' ),
+		taskDelete: prplL10n( 'taskDelete' ),
+		delete: prplL10n( 'delete' ),
 	},
 
 	/**
