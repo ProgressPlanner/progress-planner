@@ -19,6 +19,7 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Description;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Tag_Count;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Published_Post_Count;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Unpublished_Content;
 
 /**
  * Base data collector.
@@ -50,6 +51,7 @@ class Data_Collector_Manager {
 			new Terms_Without_Description(),
 			new Post_Tag_Count(),
 			new Published_Post_Count(),
+			new Unpublished_Content(),
 		];
 
 		// Add the plugin integration.
