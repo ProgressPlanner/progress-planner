@@ -3,6 +3,7 @@
 	table {
 		width: 100%;
 		margin-bottom: 1em;
+		border-spacing: 6px 0;
 	}
 
 	th,
@@ -19,15 +20,24 @@
 		text-align: start;
 	}
 
-	tbody th {
-		font-weight: 400;
+	tbody {
+
+		th {
+			font-weight: 400;
+		}
+
+		tr {
+
+			&:nth-child(odd) {
+				background-color: #f9fafb;
+			}
+		}
 	}
 
 	thead {
 
 		th,
 		td {
-			border-bottom: 1px solid var(--prpl-color-gray-3);
 			text-align: start;
 		}
 	}
@@ -36,13 +46,9 @@
 
 		th,
 		td {
-			border-top: 1px solid var(--prpl-color-gray-3);
 			text-align: start;
+			border-top: 1px solid var(--prpl-color-gray-2);
 		}
-	}
-
-	tr:nth-child(even) {
-		background-color: #f9fafb;
 	}
 
 	tr:last-child td {
