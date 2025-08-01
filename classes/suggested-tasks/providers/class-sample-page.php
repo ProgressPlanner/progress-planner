@@ -12,7 +12,7 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page as Sample_Page_D
 /**
  * Add task to delete the Sample Page.
  */
-class Sample_Page extends Tasks {
+class Sample_Page extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -41,6 +41,13 @@ class Sample_Page extends Tasks {
 	 * @var string
 	 */
 	protected const DATA_COLLECTOR_CLASS = Sample_Page_Data_Collector::class;
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'sample-page';
 
 	/**
 	 * Get the task URL.
@@ -95,5 +102,32 @@ class Sample_Page extends Tasks {
 	 */
 	public function should_add_task() {
 		return 0 !== $this->get_data_collector()->collect();
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+			<?php \esc_html_e( 'Delete the "Sample Page" page', 'progress-planner' ); ?>
+		</button>
+		<?php
+	}
+
+	/**
+	 * Get the enqueue data.
+	 *
+	 * @return array
+	 */
+	protected function get_enqueue_data() {
+		return [
+			'name' => 'samplePageData',
+			'data' => [
+				'postId' => $this->get_data_collector()->collect(),
+			],
+		];
 	}
 }

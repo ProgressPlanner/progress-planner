@@ -111,7 +111,7 @@ const prplTodoWidget = {
 		// add a new todo item to the list
 		document
 			.getElementById( 'create-todo-item' )
-			.addEventListener( 'submit', ( event ) => {
+			?.addEventListener( 'submit', ( event ) => {
 				event.preventDefault();
 
 				// Add the loader.
@@ -203,7 +203,7 @@ const prplTodoWidget = {
 
 document
 	.getElementById( 'todo-list-completed-details' )
-	.addEventListener( 'toggle', () => {
+	?.addEventListener( 'toggle', () => {
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	} );
 
