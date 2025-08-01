@@ -24,6 +24,8 @@ prplSuggestedTask = {
 		snoozeDurationForever: prplL10n( 'snoozeDurationForever' ),
 		disabledRRCheckboxTooltip: prplL10n( 'disabledRRCheckboxTooltip' ),
 		markAsComplete: prplL10n( 'markAsComplete' ),
+		taskDelete: prplL10n( 'taskDelete' ),
+		delete: prplL10n( 'delete' ),
 	},
 
 	/**
@@ -305,6 +307,11 @@ prplSuggestedTask = {
 								).removeAttribute( 'disabled' );
 							}, 2000 );
 						} else {
+							// Check the chekcbox, since completing task can be triggered in different ways ("Mark as done" button), without triggering the onchange event.
+							el.querySelector(
+								'.prpl-suggested-task-checkbox'
+							).checked = true;
+
 							/**
 							 * Strike completed tasks and remove them from the DOM.
 							 */
