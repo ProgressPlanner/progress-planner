@@ -122,7 +122,7 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	 */
 	public function test_get_page_types() {
 		// Reset the page types, before the test.
-		$page_types_object = \progress_planner()->get_page_types();
+		$page_types_object              = \progress_planner()->get_page_types();
 		$page_types_object::$page_types = null;
 
 		$page_types = \progress_planner()->get_page_types()->get_page_types();
