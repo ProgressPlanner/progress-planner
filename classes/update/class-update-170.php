@@ -43,7 +43,7 @@ class Update_170 {
 			$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
 				[
 					'task_id'     => $task_id,
-					'post_status' => 'publish',
+					'post_status' => [ 'publish', 'future' ],
 				]
 			);
 
