@@ -383,14 +383,14 @@ class Page_Types {
 	 *
 	 * Runs on post_updated hook.
 	 *
-	 * @param int      $post_id The post ID.
-	 * @param \WP_Post $post    The post object.
+	 * @param int           $post_id The post ID.
+	 * @param \WP_Post|null $post    The post object.
 	 *
 	 * @return void
 	 */
 	public function post_updated( $post_id, $post ) {
 		// Check if the post is set as a homepage.
-		if ( 'page' !== $post->post_type || 'publish' !== $post->post_status ) {
+		if ( ! $post || 'page' !== $post->post_type || 'publish' !== $post->post_status ) {
 			return;
 		}
 
