@@ -91,7 +91,9 @@ class Disable_Comments extends Tasks_Interactive {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return 10 > \wp_count_comments()->approved && 'open' === \get_default_comment_status();
+		return ! \progress_planner()->get_plugin_installer()->is_plugin_activated( 'comment-free-zone' )
+			&& 10 > \wp_count_comments()->approved
+			&& 'open' === \get_default_comment_status();
 	}
 
 	/**
@@ -112,7 +114,8 @@ class Disable_Comments extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		?>
-		<p><?php \esc_html_e( 'If you don\'t need comments on your site, consider disabling them.', 'progress-planner' ); ?></p>
+		<p><?php \esc_html_e( "If you don't need comments on your site, consider disabling them.", 'progress-planner' ); ?></p>
+		<p><?php \esc_html_e( 'You can disable new comments by clicking on the button, or disable all comments by installing the Comment-free zone plugin.', 'progress-planner' ); ?></p>
 		<?php
 	}
 
@@ -124,8 +127,14 @@ class Disable_Comments extends Tasks_Interactive {
 	public function print_popover_form_contents() {
 		?>
 		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
-			<?php \esc_html_e( 'Disable comments', 'progress-planner' ); ?>
+			<?php \esc_html_e( 'Disable new comments', 'progress-planner' ); ?>
 		</button>
+		<prpl-install-plugin
+			data-plugin-name="Comment-free zone"
+			data-plugin-slug="comment-free-zone"
+			data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'comment-free-zone' ) ? 'activate' : 'install'; ?>"
+			data-provider-id="<?php echo \esc_attr( self::PROVIDER_ID ); ?>"
+		></prpl-install-plugin>
 		<?php
 	}
 }
