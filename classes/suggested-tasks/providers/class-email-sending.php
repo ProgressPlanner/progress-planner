@@ -109,7 +109,6 @@ class Email_Sending extends Tasks {
 	 * @return void
 	 */
 	public function init() {
-
 		// Enqueue the scripts.
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 

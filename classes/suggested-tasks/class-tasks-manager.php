@@ -84,6 +84,9 @@ class Tasks_Manager {
 
 		// Add the cleanup action.
 		\add_action( 'admin_init', [ $this, 'cleanup_pending_tasks' ] );
+
+		// Handle tasks when snoozed period is over.
+		\add_action( 'transition_post_status', [ $this, 'handle_task_unsnooze' ], 10, 3 );
 	}
 
 	/**
@@ -286,5 +289,38 @@ class Tasks_Manager {
 		}
 
 		\progress_planner()->get_utils__cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );
+	}
+
+	/**
+	 * Handle task unsnooze.
+	 *
+	 * @param string   $new_status The new status.
+	 * @param string   $old_status The old status.
+	 * @param \WP_Post $post The post.
+	 *
+	 * @return void
+	 */
+	public function handle_task_unsnooze( $new_status, $old_status, $post ) {
+		// Early exit if it's not task for which snooze period is over.
+		if ( 'future' !== $old_status || 'publish' !== $new_status || 'prpl_recommendations' !== get_post_type( $post ) ) {
+			return;
+		}
+
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $post->ID );
+		if ( ! $task ) {
+			return;
+		}
+
+		$task_provider = $this->get_task_provider( $task->get_provider_id() );
+
+		// Delete tasks which don't have a task provider or repetitive tasks which were created in the previous week.
+		if ( ! $task_provider || ( $task_provider->is_repetitive() && ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) ) ) {
+			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
+		}
+
+		// Delete the task if it is not relevant anymore.
+		if ( $task_provider instanceof \Progress_Planner\Suggested_Tasks\Providers\Tasks && ! $task_provider->should_add_task() ) {
+			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
+		}
 	}
 }
