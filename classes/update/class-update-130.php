@@ -15,7 +15,7 @@ use Progress_Planner\Suggested_Tasks\Task;
  *
  * @package Progress_Planner
  */
-class Update_130 {
+class Update_130 extends Update {
 
 	const VERSION = '1.3.0';
 
