@@ -315,7 +315,6 @@ class Task_Command extends \WP_CLI_Command {
 	 * @return void
 	 */
 	public function create( $args, $assoc_args ) {
-
 		$task_id               = isset( $assoc_args['task_id'] ) ? $assoc_args['task_id'] : '';
 		$title                 = isset( $assoc_args['title'] ) ? $assoc_args['title'] : '';
 		$description           = isset( $assoc_args['description'] ) ? $assoc_args['description'] : 'Test description ';
