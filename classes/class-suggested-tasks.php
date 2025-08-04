@@ -479,7 +479,6 @@ class Suggested_Tasks {
 
 		// Get the tasks for each category.
 		foreach ( $max_items_per_category as $category_slug => $max_items ) {
-
 			// Skip excluded providers.
 			if ( ! empty( $args['exclude_provider'] ) && \in_array( $category_slug, $args['exclude_provider'], true ) ) {
 				continue;

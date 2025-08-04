@@ -79,7 +79,6 @@ class Todo {
 	 * @return void
 	 */
 	public function handle_creating_user_task( $post, $request, $creating ) {
-
 		if ( ! $creating || ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) ) {
 			return;
 		}

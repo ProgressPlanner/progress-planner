@@ -258,7 +258,6 @@ class Playground {
 		?>
 		<script>
 			( function waitForWp() {
-
 				if ( ! window.wp || ! wp.api?.models?.Prpl_recommendations ) {
 					return setTimeout(waitForWp, 50);
 				}
