@@ -14,7 +14,7 @@ use Progress_Planner\Utils\Plugin_Migration_Helpers;
  *
  * @package Progress_Planner
  */
-class Update_111 {
+class Update_111 extends Update {
 
 	const VERSION = '1.1.1';
 
