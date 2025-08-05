@@ -453,7 +453,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return bool true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 */
-	abstract protected function should_add_task();
+	abstract public function should_add_task();
 
 	/**
 	 * Alias for should_add_task(), for better readability when using in the evaluate_task() method.
