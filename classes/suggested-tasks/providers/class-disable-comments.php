@@ -113,10 +113,26 @@ class Disable_Comments extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_instructions() {
-		?>
-		<p><?php \esc_html_e( "If you don't need comments on your site, consider disabling them.", 'progress-planner' ); ?></p>
-		<p><?php \esc_html_e( 'You can disable new comments by clicking on the button, or disable all comments by installing the Comment-free zone plugin.', 'progress-planner' ); ?></p>
-		<?php
+		$comments_count = (int) \wp_count_comments()->approved;
+
+		echo '<p>';
+		if ( 0 === $comments_count ) {
+			\esc_html_e( 'Your site currently has no approved comments. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments. If your site really doesn\'t need any comments, we recommend installing the "Comment-Free Zone" plugin.', 'progress-planner' );
+		} else {
+			printf(
+				\esc_html(
+					// translators: %d is the number of approved comments.
+					\_n(
+						'Your site currently has %d approved comment. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments. If your site really doesn\'t need any comments, we recommend installing the "Comment-Free Zone" plugin.',
+						'Your site currently has %d approved comments. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments. If your site really doesn\'t need any comments, we recommend installing the "Comment-Free Zone" plugin.',
+						$comments_count,
+						'progress-planner'
+					)
+				),
+				(int) $comments_count
+			);
+		}
+		echo '</p>';
 	}
 
 	/**
