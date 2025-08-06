@@ -24,7 +24,7 @@
 			gap: 0.5rem;
 			background: var(--prpl-background-orange);
 			padding: 1.2rem;
-			border-radius: 0.5rem;
+			border-radius: var(--prpl-border-radius);
 			margin-bottom: 2rem;
 
 			.icon {
@@ -56,7 +56,7 @@
 		gap: 0.5rem;
 		background: var(--prpl-background-purple);
 		padding: 1.2rem;
-		border-radius: 0.5rem;
+		border-radius: var(--prpl-border-radius);
 		margin-bottom: var(--prpl-settings-page-gap);
 
 		&:first-child {

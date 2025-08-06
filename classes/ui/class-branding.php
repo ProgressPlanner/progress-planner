@@ -142,6 +142,30 @@ final class Branding {
 	}
 
 	/**
+	 * Get the border radii.
+	 *
+	 * @return string
+	 */
+	public function get_border_radii(): string {
+		$radii = [
+			'--prpl-border-radius'       => '8px',
+			'--prpl-border-radius-small' => 'calc(var(--prpl-border-radius) * 0.75)',
+			'--prpl-border-radius-big'   => 'calc(var(--prpl-border-radius) * 2)',
+		];
+
+		if ( ! empty( $this->get_api_data() ) && ! empty( $this->get_api_data()['acf']['border-radii'] ) ) {
+			$radii = \wp_parse_args( $this->get_api_data()['acf']['border-radii'], $radii );
+		}
+
+		$radii_string = '';
+		foreach ( $radii as $key => $value ) {
+			$radii_string .= $key . ': ' . $value . ';';
+		}
+
+		return ":root { $radii_string }";
+	}
+
+	/**
 	 * Get the admin-menu icon.
 	 *
 	 * @return string
