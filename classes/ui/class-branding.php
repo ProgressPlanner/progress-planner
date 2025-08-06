@@ -166,6 +166,15 @@ final class Branding {
 	}
 
 	/**
+	 * Get the custom CSS.
+	 *
+	 * @return string
+	 */
+	public function get_custom_css(): string {
+		return empty( $this->get_api_data() ) ? '' : $this->get_api_data()['acf']['custom_css'];
+	}
+
+	/**
 	 * Get the admin-menu icon.
 	 *
 	 * @return string
