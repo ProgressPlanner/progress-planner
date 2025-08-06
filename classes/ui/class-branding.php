@@ -121,6 +121,7 @@ final class Branding {
 			'--prpl-color-notification-green' => '#16a34a',
 			'--prpl-color-notification-red'   => '#e73136',
 
+			'--prpl-background-body'          => '#f0f0f1',
 			'--prpl-background-orange'        => '#fff9f0',
 			'--prpl-background-purple'        => '#f6f5fb',
 			'--prpl-background-green'         => '#f2faf9',

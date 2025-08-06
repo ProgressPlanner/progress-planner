@@ -7,8 +7,6 @@
 	--prpl-padding: 20px;
 	--prpl-column-min-width: 22rem;
 	--prpl-max-columns: 3;
-	--prpl-border-radius: 8px;
-	--prpl-border-radius-big: calc(var(--prpl-border-radius) * 2);
 
 	--prpl-container-max-width: calc(var(--prpl-column-min-width) * var(--prpl-max-columns) + var(--prpl-gap) * (var(--prpl-max-columns) - 1) + var(--prpl-column-min-width));
 
@@ -22,6 +20,10 @@
 	--prpl-font-size-4xl: 3rem;       /* 48px */
 	--prpl-font-size-5xl: 3.5rem;     /* 56px */
 	--prpl-font-size-6xl: 4.5rem;     /* 72px */
+}
+
+body.toplevel_page_progress-planner { /* stylelint-disable-line */
+	background: var(--prpl-background-body);
 }
 
 /*------------------------------------*\
@@ -276,7 +278,7 @@ button.prpl-info-icon {
 	line-height: 1.25;
 	box-shadow: none;
 	border: none;
-	border-radius: 6px;
+	border-radius: var(--prpl-border-radius-small);
 	transition: all 0.25s ease-in-out;
 	font-weight: 600;
 	text-align: center;
@@ -294,7 +296,7 @@ button.prpl-info-icon {
 		top: 0;
 		left: 0;
 		z-index: -1;
-		border-radius: 6px;
+		border-radius: var(--prpl-border-radius-small);
 		transition: all 0.25s ease-in-out;
 	}
 
