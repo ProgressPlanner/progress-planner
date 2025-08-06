@@ -32,7 +32,7 @@ class Select_Timezone extends Tasks {
 	 * @return string
 	 */
 	protected function get_url() {
-		return \admin_url( 'options-general.php' );
+		return \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() );
 	}
 
 	/**
