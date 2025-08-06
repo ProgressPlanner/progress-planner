@@ -92,7 +92,7 @@ class Blog_Description extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		?>
-		<p><?php \esc_html_e( 'In a few words, explain what this site is about.', 'progress-planner' ); ?></p>
+		<p><?php \esc_html_e( 'In a few words, explain what this site is about. This information is used in your website\'s schema and RSS feeds, and can be displayed on your site. The tagline typically is your site\'s mission statement.', 'progress-planner' ); ?></p>
 		<?php
 	}
 
@@ -104,6 +104,7 @@ class Blog_Description extends Tasks_Interactive {
 	public function print_popover_form_contents() {
 		?>
 		<label>
+			<p><?php echo \wp_kses_post( $this->get_task_details()['description'] ); ?></p>
 			<input
 				name="blogdescription"
 				type="text"
@@ -111,7 +112,6 @@ class Blog_Description extends Tasks_Interactive {
 				value="<?php echo \esc_attr( \get_bloginfo( 'description' ) ); ?>"
 				class="regular-text"
 			>
-			<p><?php echo \wp_kses_post( $this->get_task_details()['description'] ); ?></p>
 		</label>
 		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
 			<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
