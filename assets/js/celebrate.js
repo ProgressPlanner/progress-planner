@@ -99,7 +99,10 @@ document.addEventListener( 'prpl/removeCelebratedTasks', () => {
 			item.classList.add( 'prpl-suggested-task-celebrated' );
 
 			// Remove the item from the DOM.
-			setTimeout( () => item.remove(), 2000 );
+			setTimeout( () => {
+				item.remove();
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+			}, 2000 );
 		} );
 } );
 
