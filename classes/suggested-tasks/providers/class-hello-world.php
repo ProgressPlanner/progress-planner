@@ -95,7 +95,7 @@ class Hello_World extends Tasks_Interactive {
 			return \esc_html__( 'On install, WordPress creates a "Hello World!" post. This post is not needed and should be deleted.', 'progress-planner' );
 		}
 
-		$hello_world_post_url = \get_permalink( $hello_world_post_id );
+		$hello_world_post_url = (string) \get_permalink( $hello_world_post_id );
 
 		return '<p>' . \sprintf(
 			/* translators: %s: Link to the post. */

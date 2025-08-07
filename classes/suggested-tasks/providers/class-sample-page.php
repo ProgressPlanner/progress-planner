@@ -94,7 +94,7 @@ class Sample_Page extends Tasks_Interactive {
 			return \esc_html__( 'On install, WordPress creates a "Sample Page" page. This page does not add value to your website and solely exists to show what a page can look like. Therefore, "Sample Page" is not needed and should be deleted.', 'progress-planner' );
 		}
 
-		$sample_page_url = \get_permalink( $sample_page_id );
+		$sample_page_url = (string) \get_permalink( $sample_page_id );
 
 		return '<p>' . \sprintf(
 			/* translators: %s: Link to the post. */
