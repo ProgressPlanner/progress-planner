@@ -52,13 +52,6 @@ class Unpublished_Content extends Tasks {
 	protected $is_repetitive = false;
 
 	/**
-	 * The task URL target.
-	 *
-	 * @var string
-	 */
-	protected $url_target = '_blank';
-
-	/**
 	 * The task priority.
 	 *
 	 * @var int
