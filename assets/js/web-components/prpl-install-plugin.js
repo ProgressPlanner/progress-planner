@@ -40,17 +40,11 @@ customElements.define(
 			// Set the inner HTML.
 			this.innerHTML = `
 				<button type="button" class="${ this.className }">
-					${
+					${ prplL10n(
 						'install' === this.action
-							? prplL10n( 'installPlugin' ).replace(
-									'%s',
-									this.pluginName
-							  )
-							: prplL10n( 'activatePlugin' ).replace(
-									'%s',
-									this.pluginName
-							  )
-					}
+							? 'installPlugin'
+							: 'activatePlugin'
+					).replace( '%s', this.pluginName ) }
 				</button>
 			`;
 
@@ -79,7 +73,6 @@ customElements.define(
 
 		installPlugin() {
 			const button = this.querySelector( 'button' );
-
 			const thisObj = this;
 
 			button.innerHTML = `
@@ -96,12 +89,8 @@ customElements.define(
 					nonce: progressPlanner.nonce,
 				},
 			} )
-				.then( () => {
-					thisObj.activatePlugin();
-				} )
-				.catch( ( error ) => {
-					console.error( error );
-				} );
+				.then( () => thisObj.activatePlugin() )
+				.catch( ( error ) => console.error( error ) );
 		}
 
 		activatePlugin() {
@@ -125,9 +114,7 @@ customElements.define(
 					button.innerHTML = prplL10n( 'activated' );
 					thisObj.completeTask();
 				} )
-				.catch( ( error ) => {
-					console.error( error );
-				} );
+				.catch( ( error ) => console.error( error ) );
 		}
 
 		/**
