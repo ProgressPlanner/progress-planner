@@ -145,12 +145,14 @@ class Disable_Comments extends Tasks_Interactive {
 		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
 			<?php \esc_html_e( 'Disable new comments', 'progress-planner' ); ?>
 		</button>
-		<prpl-install-plugin
-			data-plugin-name="Comment-free zone"
-			data-plugin-slug="comment-free-zone"
-			data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'comment-free-zone' ) ? 'activate' : 'install'; ?>"
-			data-provider-id="<?php echo \esc_attr( self::PROVIDER_ID ); ?>"
-		></prpl-install-plugin>
+		<?php if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) : ?>
+			<prpl-install-plugin
+				data-plugin-name="Comment-free zone"
+				data-plugin-slug="comment-free-zone"
+				data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'comment-free-zone' ) ? 'activate' : 'install'; ?>"
+				data-provider-id="<?php echo \esc_attr( self::PROVIDER_ID ); ?>"
+			></prpl-install-plugin>
+		<?php endif; ?>
 		<?php
 	}
 }
