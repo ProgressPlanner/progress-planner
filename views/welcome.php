@@ -160,7 +160,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					\printf(
 						/* translators: %s: progressplanner.com link */
 						\esc_html__( 'Success! We saved your data on %s so we can email you every week.', 'progress-planner' ),
-						'<a href="https://prpl.fyi/home">ProgressPlanner.com</a>'
+						'<a href="https://prpl.fyi/home">progressplanner.com</a>'
 					);
 					?>
 				</p>

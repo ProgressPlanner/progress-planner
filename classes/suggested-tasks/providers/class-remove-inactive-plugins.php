@@ -62,7 +62,7 @@ class Remove_Inactive_Plugins extends Tasks {
 		return \sprintf(
 			/* translators: %1$s <a href="https://prpl.fyi/remove-inactive-plugins" target="_blank">removing any plugins</a> link */
 			\esc_html__( 'You have inactive plugins. Consider %1$s that are not activated to free up resources, and improve security.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/remove-inactive-plugins" target="_blank">' . \esc_html__( 'removing any plugins', 'progress-planner' ) . '</a>',
+			'<a href="' . \apply_filters( 'progress_planner_task_description_link', 'https://prpl.fyi/remove-inactive-plugins', $this->get_task_id(), $this->get_provider_id() ) . '" target="_blank">' . \esc_html__( 'removing any plugins', 'progress-planner' ) . '</a>',
 		);
 	}
 

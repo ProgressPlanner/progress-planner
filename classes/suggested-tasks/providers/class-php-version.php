@@ -53,7 +53,7 @@ class Php_Version extends Tasks {
 			/* translators: %1$s: php version, %2$s: <a href="https://prpl.fyi/update-php-version" target="_blank">We recommend</a> link. %3$s: minimum PHP version recommended. */
 			\esc_html__( 'Your site is running on PHP version %1$s. %2$s updating to PHP version %3$s or higher.', 'progress-planner' ),
 			\phpversion(),
-			'<a href="https://prpl.fyi/update-php-version" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
+			'<a href="' . \apply_filters( 'progress_planner_task_description_link', 'https://prpl.fyi/update-php-version', $this->get_task_id(), $this->get_provider_id() ) . '" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
 			\esc_html( self::RECOMMENDED_PHP_VERSION )
 		);
 	}

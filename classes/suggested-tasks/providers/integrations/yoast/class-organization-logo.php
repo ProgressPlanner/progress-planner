@@ -63,11 +63,11 @@ class Organization_Logo extends Yoast_Provider {
 			? \sprintf(
 				/* translators: %s: "Read more" link. */
 				\esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your organization logo in the Yoast SEO settings. %s.', 'progress-planner' ),
-				'<a href="https://prpl.fyi/yoast-person-logo" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Organization Logo', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+				'<a href="' . \apply_filters( 'progress_planner_task_description_link', 'https://prpl.fyi/yoast-person-logo', $this->get_task_id(), $this->get_provider_id() ) . '" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Organization Logo', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 			) : \sprintf(
 				/* translators: %s: "Read more" link. */
 				\esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your person logo in the Yoast SEO settings. %s.', 'progress-planner' ),
-				'<a href="https://prpl.fyi/yoast-organization-logo" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Person Logo', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+				'<a href="' . \apply_filters( 'progress_planner_task_description_link', 'https://prpl.fyi/yoast-organization-logo', $this->get_task_id(), $this->get_provider_id() ) . '" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Person Logo', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 			);
 	}
 
