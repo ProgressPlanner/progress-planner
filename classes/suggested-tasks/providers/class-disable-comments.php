@@ -117,14 +117,14 @@ class Disable_Comments extends Tasks_Interactive {
 
 		echo '<p>';
 		if ( 0 === $comments_count ) {
-			\esc_html_e( 'Your site currently has no approved comments. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments. If your site really doesn\'t need any comments, we recommend installing the "Comment-Free Zone" plugin.', 'progress-planner' );
+			\esc_html_e( 'Your site currently has no approved comments. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments.', 'progress-planner' );
 		} else {
 			printf(
 				\esc_html(
 					// translators: %d is the number of approved comments.
 					\_n(
-						'Your site currently has %d approved comment. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments. If your site really doesn\'t need any comments, we recommend installing the "Comment-Free Zone" plugin.',
-						'Your site currently has %d approved comments. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments. If your site really doesn\'t need any comments, we recommend installing the "Comment-Free Zone" plugin.',
+						'Your site currently has %d approved comment. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments.',
+						'Your site currently has %d approved comments. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments.',
 						$comments_count,
 						'progress-planner'
 					)
@@ -133,6 +133,15 @@ class Disable_Comments extends Tasks_Interactive {
 			);
 		}
 		echo '</p>';
+		if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) {
+			echo '<p>';
+			\printf(
+				/* translators: %s is the <a href="https://w.org/plugins/comment-free-zone/" target="_blank">Comment-Free Zone</a> link */
+				\esc_html__( 'If your site really doesn\'t need any comments, we recommend installing the "%s" plugin.', 'progress-planner' ),
+				'<a href="https://w.org/plugins/comment-free-zone/" target="_blank">' . \esc_html__( 'Comment-Free Zone', 'progress-planner' ) . '</a>'
+			);
+			echo '</p>';
+		}
 	}
 
 	/**

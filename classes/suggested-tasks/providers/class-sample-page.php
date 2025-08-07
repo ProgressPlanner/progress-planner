@@ -88,11 +88,23 @@ class Sample_Page extends Tasks_Interactive {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %s:<a href="https://prpl.fyi/delete-sample-page" target="_blank">Sample Page</a> link */
-			\esc_html__( 'On install, WordPress creates a %s page. This page is not needed and should be deleted.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/delete-sample-page" target="_blank">' . \esc_html__( '"Sample Page"', 'progress-planner' ) . '</a>'
-		);
+		$sample_page_id = $this->get_data_collector()->collect();
+
+		if ( 0 === $sample_page_id ) {
+			return \esc_html__( 'On install, WordPress creates a "Sample Page" page. This page does not add value to your website and solely exists to show what a page can look like. Therefore, "Sample Page" is not needed and should be deleted.', 'progress-planner' );
+		}
+
+		$sample_page_url = (string) \get_permalink( $sample_page_id );
+
+		return '<p>' . \sprintf(
+			/* translators: %s: Link to the post. */
+			\esc_html__( 'On install, WordPress creates a "Sample Page" page. You can find yours at %s.', 'progress-planner' ),
+			'<a href="' . \esc_attr( $sample_page_url ) . '" target="_blank">' . \esc_html( $sample_page_url ) . '</a>',
+		) . '</p><p>' . \sprintf(
+			/* translators: %s: URL to https://prpl.fyi/delete-sample-page */
+			\__( 'This page does not add value to your website and solely exists to show what a page can look like. Therefore, <a href="%s" target="_blank">"Sample Page" is not needed and should be deleted</a>.', 'progress-planner' ),
+			'https://prpl.fyi/delete-sample-page'
+		) . '</p>';
 	}
 
 	/**
