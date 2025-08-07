@@ -98,8 +98,8 @@ class Page {
 		$page_identifier = 'progress-planner';
 
 		\add_menu_page(
-			'Progress Planner',
-			'Progress Planner' . $this->get_notification_counter(),
+			\progress_planner()->get_ui__branding()->get_admin_menu_name(),
+			\progress_planner()->get_ui__branding()->get_admin_menu_name() . $this->get_notification_counter(),
 			'manage_options',
 			$page_identifier,
 			[ $this, 'render_page' ],
