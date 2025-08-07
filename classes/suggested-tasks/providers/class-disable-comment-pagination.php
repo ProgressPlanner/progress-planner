@@ -27,15 +27,6 @@ class Disable_Comment_Pagination extends Tasks {
 	protected const PROVIDER_ID = 'disable-comment-pagination';
 
 	/**
-	 * Dependencies on other tasks.
-	 *
-	 * @var array<string, bool>
-	 */
-	protected const DEPENDENCIES = [
-		'disable-comments' => true,
-	];
-
-	/**
 	 * Get the task URL.
 	 *
 	 * @return string
