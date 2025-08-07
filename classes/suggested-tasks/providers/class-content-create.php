@@ -62,7 +62,7 @@ class Content_Create extends Tasks {
 	 * @return string
 	 */
 	protected function get_url() {
-		return 'https://prpl.fyi/valuable-content';
+		return \apply_filters( 'progress_planner_task_description_link', 'https://prpl.fyi/valuable-content', $this->get_task_id(), $this->get_provider_id() );
 	}
 
 	/**
@@ -83,7 +83,7 @@ class Content_Create extends Tasks {
 		return \sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Time to add more valuable content to your site! Check our blog for inspiration. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/valuable-content" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			'<a href="' . \apply_filters( 'progress_planner_task_description_link', 'https://prpl.fyi/valuable-content', $this->get_task_id(), $this->get_provider_id() ) . '" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		);
 	}
 

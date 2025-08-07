@@ -44,7 +44,7 @@ class Blog_Description extends Tasks {
 		return \sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/set-tagline" target="_blank">tagline</a> link */
 			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/set-tagline" target="_blank">' . \esc_html__( 'tagline', 'progress-planner' ) . '</a>'
+			'<a href="' . \apply_filters( 'progress_planner_task_description_link', 'https://prpl.fyi/set-tagline', $this->get_task_id(), $this->get_provider_id() ) . '" target="_blank">' . \esc_html__( 'tagline', 'progress-planner' ) . '</a>'
 		);
 	}
 

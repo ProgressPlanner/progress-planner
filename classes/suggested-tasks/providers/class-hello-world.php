@@ -85,7 +85,7 @@ class Hello_World extends Tasks {
 		return \sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">Hello World!</a> link */
 			\esc_html__( 'On install, WordPress creates a %s post. This post is not needed and should be deleted.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">' . \esc_html__( '"Hello World!"', 'progress-planner' ) . '</a>'
+			'<a href="' . \apply_filters( 'progress_planner_task_description_link', 'https://prpl.fyi/delete-hello-world-post', $this->get_task_id(), $this->get_provider_id() ) . '" target="_blank">' . \esc_html__( '"Hello World!"', 'progress-planner' ) . '</a>'
 		);
 	}
 

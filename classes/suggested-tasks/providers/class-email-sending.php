@@ -101,7 +101,15 @@ class Email_Sending extends Tasks {
 	 *
 	 * @var string
 	 */
-	protected $troubleshooting_guide_url = 'https://prpl.fyi/troubleshoot-smtp';
+	protected $troubleshooting_guide_url;
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		parent::__construct();
+		$this->troubleshooting_guide_url = \apply_filters( 'progress_planner_task_description_link', 'https://prpl.fyi/troubleshoot-smtp', $this->get_task_id(), $this->get_provider_id() );
+	}
 
 	/**
 	 * Initialize the task provider.

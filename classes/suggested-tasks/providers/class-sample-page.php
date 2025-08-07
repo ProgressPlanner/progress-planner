@@ -84,7 +84,7 @@ class Sample_Page extends Tasks {
 		return \sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/delete-sample-page" target="_blank">Sample Page</a> link */
 			\esc_html__( 'On install, WordPress creates a %s page. This page is not needed and should be deleted.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/delete-sample-page" target="_blank">' . \esc_html__( '"Sample Page"', 'progress-planner' ) . '</a>'
+			'<a href="' . \apply_filters( 'progress_planner_task_description_link', 'https://prpl.fyi/delete-sample-page', $this->get_task_id(), $this->get_provider_id() ) . '" target="_blank">' . \esc_html__( '"Sample Page"', 'progress-planner' ) . '</a>'
 		);
 	}
 
