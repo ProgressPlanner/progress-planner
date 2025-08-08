@@ -345,25 +345,6 @@ class Content_Review extends Tasks {
 	}
 
 	/**
-	 * Get the post ID from the task ID.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return \WP_Post|null
-	 */
-	public function get_post_from_task_id( $task_id ) {
-		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
-
-		if ( empty( $tasks ) ) {
-			return null;
-		}
-
-		return isset( $tasks[0]->target_post_id ) && $tasks[0]->target_post_id
-			? \get_post( $tasks[0]->target_post_id )
-			: null;
-	}
-
-	/**
 	 * This method is added just to override the parent method.
 	 * For this task provider we can't check if it is snoozed like for other as we snooze the task for specific post.
 	 * Check for that is included in the should_add_task method.
