@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 /**
  * Add task to select the site locale.
  */
-class Select_Timezone extends Tasks {
+class Select_Timezone extends Tasks_Interactive {
 
 	/**
 	 * The provider ID.
@@ -18,6 +18,13 @@ class Select_Timezone extends Tasks {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'select-timezone';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'select-timezone';
 
 	/**
 	 * Whether the task is dismissable.
@@ -79,5 +86,51 @@ class Select_Timezone extends Tasks {
 		);
 
 		return ! $timezone_activity;
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		?>
+		<p><?php \esc_html_e( 'Set site timezone to ensure scheduled posts and pages are published at desired time', 'progress-planner' ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		$current_offset = \get_option( 'gmt_offset' );
+		$tzstring       = \get_option( 'timezone_string' );
+
+		// Remove old Etc mappings. Fallback to gmt_offset.
+		if ( str_contains( $tzstring, 'Etc/GMT' ) ) {
+			$tzstring = '';
+		}
+
+		if ( empty( $tzstring ) ) { // Create a UTC+- zone if no timezone string exists.
+			if ( 0 === (int) $current_offset ) {
+				$tzstring = 'UTC+0';
+			} elseif ( $current_offset < 0 ) {
+				$tzstring = 'UTC' . $current_offset;
+			} else {
+				$tzstring = 'UTC+' . $current_offset;
+			}
+		}
+		?>
+		<label>
+			<select id="timezone" name="timezone">
+				<?php echo \wp_timezone_choice( $tzstring, \get_user_locale() ); ?>
+			</select>
+		</label>
+		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+			<?php \esc_html_e( 'Set site timezone', 'progress-planner' ); ?>
+		</button>
+		<?php
 	}
 }
