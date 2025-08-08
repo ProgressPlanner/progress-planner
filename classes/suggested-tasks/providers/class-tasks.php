@@ -144,17 +144,6 @@ abstract class Tasks implements Tasks_Interface {
 	protected $data_collector = null;
 
 	/**
-	 * Constructor.
-	 *
-	 * @return void
-	 */
-	public function __construct() {
-		if ( static::IS_INTERACTIVE ) {
-			\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
-		}
-	}
-
-	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -376,7 +365,7 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Check if a task category is snoozed.
+	 * Check if task provider is snoozed.
 	 *
 	 * @return bool
 	 */
@@ -557,7 +546,6 @@ abstract class Tasks implements Tasks_Interface {
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
 			'snoozable'    => $this->is_snoozable(),
-			'popover_id'   => static::IS_INTERACTIVE ? 'prpl-popover-' . static::POPOVER_ID : '',
 		];
 	}
 
