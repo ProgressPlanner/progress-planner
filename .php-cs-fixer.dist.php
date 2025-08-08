@@ -11,6 +11,7 @@ $finder = ( new PhpCsFixer\Finder() )
 	);
 
 $config = new PhpCsFixer\Config();
+$config->setUnsupportedPhpVersionAllowed( true );
 
 return $config->setRules(
 	[

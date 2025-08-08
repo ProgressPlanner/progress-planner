@@ -31,6 +31,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Select_Locale;
 use Progress_Planner\Suggested_Tasks\Providers\Fewer_Tags;
 use Progress_Planner\Suggested_Tasks\Providers\Remove_Terms_Without_Posts;
 use Progress_Planner\Suggested_Tasks\Providers\Update_Term_Description;
+use Progress_Planner\Suggested_Tasks\Providers\Unpublished_Content;
 use Progress_Planner\Suggested_Tasks\Providers\Collaborator;
 use Progress_Planner\Suggested_Tasks\Providers\Select_Timezone;
 
@@ -74,6 +75,7 @@ class Tasks_Manager {
 			new Remove_Terms_Without_Posts(),
 			new Fewer_Tags(),
 			new Update_Term_Description(),
+			new Unpublished_Content(),
 			new Collaborator(),
 			new Select_Timezone(),
 		];
