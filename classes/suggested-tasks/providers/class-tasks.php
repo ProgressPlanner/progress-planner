@@ -60,20 +60,6 @@ abstract class Tasks implements Tasks_Interface {
 	protected const DEPENDENCIES = [];
 
 	/**
-	 * Whether the task is interactive.
-	 *
-	 * @var bool
-	 */
-	const IS_INTERACTIVE = false;
-
-	/**
-	 * The popover ID for interactive tasks.
-	 *
-	 * @var string
-	 */
-	const POPOVER_ID = '';
-
-	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -571,34 +557,6 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		return $data;
-	}
-
-	/**
-	 * Add the popover.
-	 *
-	 * @return void
-	 */
-	public function add_popover() {
-		?>
-		<div id="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>" class="prpl-popover prpl-popover-interactive" popover>
-			<?php $this->the_popover_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		</div>
-		<?php
-	}
-
-	/**
-	 * The popover content.
-	 *
-	 * @return void
-	 */
-	public function the_popover_content() {
-		\progress_planner()->the_view(
-			'popovers/' . static::POPOVER_ID . '.php',
-			[
-				'prpl_popover_id'  => static::POPOVER_ID,
-				'prpl_provider_id' => $this->get_provider_id(),
-			]
-		);
 	}
 
 	/**
