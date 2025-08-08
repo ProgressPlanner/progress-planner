@@ -1,5 +1,8 @@
 = 1.7.0 =
 
+Added these recommendations from Ravi:
+* Select site timezone.
+
 Bugs we fixed:
 
 * Fix issue where "Perform all updates" task was incorrectly marked as completed.
