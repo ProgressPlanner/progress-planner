@@ -82,6 +82,8 @@ prplSuggestedTask = {
 									item,
 									listId: 'prpl-suggested-tasks-list',
 									insertPosition: 'beforeend',
+									useCheckbox: false,
+									useArrow: true,
 								},
 							} )
 						);
@@ -116,6 +118,8 @@ prplSuggestedTask = {
 							item,
 							listId: 'prpl-suggested-tasks-list',
 							insertPosition: 'beforeend',
+							useCheckbox: false,
+							useArrow: true,
 						},
 					} )
 				);
@@ -150,10 +154,12 @@ prplSuggestedTask = {
 	 *
 	 * @param {Object}  post        The post object.
 	 * @param {boolean} useCheckbox Whether to use a checkbox.
+	 * @param {boolean} useArrow    Whether to use an arrow.
 	 */
 	getNewItemTemplatePromise: ( {
 		post = {},
 		useCheckbox = true,
+		useArrow = false,
 		listId = '',
 	} ) =>
 		new Promise( ( resolve ) => {
@@ -183,6 +189,7 @@ prplSuggestedTask = {
 				post,
 				terms,
 				useCheckbox,
+				useArrow,
 				listId,
 				assets: prplSuggestedTask.assets,
 				action: 'pending' === post.status ? 'celebrate' : '',
@@ -543,6 +550,8 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 		.getNewItemTemplatePromise( {
 			post: event.detail.item,
 			listId: event.detail.listId,
+			useCheckbox: event.detail.useCheckbox || false,
+			useArrow: event.detail.useArrow || true,
 		} )
 		.then( ( itemHTML ) => {
 			/**
@@ -579,6 +588,8 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 								item: event.detail.item,
 								listId: event.detail.listId,
 								insertPosition: event.detail.insertPosition,
+								useCheckbox: event.detail.useCheckbox || true,
+								useArrow: event.detail.useArrow || false,
 							},
 						} )
 					);
