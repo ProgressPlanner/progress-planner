@@ -43,7 +43,7 @@
 
 		a {
 			text-decoration: none;
-			color: var(--prpl-color-gray-6);
+			color: var(--prpl-color-link);
 		}
 	}
 }
