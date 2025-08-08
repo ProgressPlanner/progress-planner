@@ -23,6 +23,13 @@ final class Branding {
 	];
 
 	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		\add_filter( 'progress_planner_admin_widgets', [ $this, 'filter_widgets' ] );
+	}
+
+	/**
 	 * Get the branding ID.
 	 *
 	 * @return int
@@ -252,5 +259,30 @@ final class Branding {
 		\progress_planner()->get_utils__cache()->set( $cache_key, $body, WEEK_IN_SECONDS );
 
 		return $body;
+	}
+
+	/**
+	 * Filter the widgets to be displayed on the admin page.
+	 *
+	 * @param array<\Progress_Planner\Admin\Widgets\Widget> $widgets The widgets.
+	 *
+	 * @return array<\Progress_Planner\Admin\Widgets\Widget>
+	 */
+	public function filter_widgets( $widgets ) {
+		if ( empty( $this->get_api_data() ) || ! isset( $this->get_api_data()['acf']['papers'] ) ) {
+			return $widgets;
+		}
+
+		$show_papers = $this->get_api_data()['acf']['papers'];
+		if ( ! $show_papers ) {
+			return $widgets;
+		}
+
+		return array_filter(
+			$widgets,
+			function ( $widget ) use ( $show_papers ) {
+				return \in_array( $widget->get_id(), $show_papers, true );
+			}
+		);
 	}
 }
