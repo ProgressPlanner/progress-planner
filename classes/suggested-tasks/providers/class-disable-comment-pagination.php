@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 /**
  * Add tasks to disable comments.
  */
-class Disable_Comment_Pagination extends Tasks {
+class Disable_Comment_Pagination extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -25,6 +25,43 @@ class Disable_Comment_Pagination extends Tasks {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'disable-comment-pagination';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'disable-comment-pagination';
+
+	/**
+	 * Initialize the task.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		\add_action( 'rest_api_init', [ $this, 'register_setting_with_rest' ] );
+	}
+
+	/**
+	 * Register the setting with the REST API.
+	 *
+	 * @return void
+	 */
+	public function register_setting_with_rest() {
+		register_setting(
+			'discussion',
+			'page_comments',
+			[
+				'type'         => 'string',
+				'label'        => __( 'Break comments into pages', 'progress-planner' ),
+				'show_in_rest' => [
+					'schema' => [
+						'enum' => [ '1', '' ],
+					],
+				],
+			]
+		);
+	}
 
 	/**
 	 * Get the task URL.
@@ -84,5 +121,29 @@ class Disable_Comment_Pagination extends Tasks {
 	 */
 	public function is_task_completed( $task_id = '' ) {
 		return ! \get_option( 'page_comments' );
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		?>
+		<p><?php \esc_html_e( 'Comment pagination is enabled by default. This means that comments are split into multiple pages. This can be disabled to make the comments easier to read.', 'progress-planner' ); ?></p>
+		<?php
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+			<?php \esc_html_e( 'Disable comment pagination', 'progress-planner' ); ?>
+		</button>
+		<?php
 	}
 }
