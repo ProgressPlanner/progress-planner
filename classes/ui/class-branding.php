@@ -18,7 +18,8 @@ final class Branding {
 	 * @var array<string, int>
 	 */
 	const BRANDING_IDS = [
-		'default' => 4958,
+		// TODO: Change this to the default value of 4958.
+		'default' => 5159,
 	];
 
 	/**
@@ -99,8 +100,8 @@ final class Branding {
 	 *
 	 * @return string
 	 */
-	public function get_color_palette(): string {
-		$colors = [
+	public function get_css_variables(): string {
+		$vars = [
 			'--prpl-color-gray-1'             => '#e1e3e7',
 			'--prpl-color-gray-2'             => '#d1d5db',
 			'--prpl-color-gray-3'             => '#9ca3af',
@@ -122,47 +123,34 @@ final class Branding {
 			'--prpl-color-notification-red'   => '#e73136',
 
 			'--prpl-background-body'          => '#f0f0f1',
+			'--prpl-background-main'          => '#ffffff',
+			'--prpl-background-papers'        => '#ffffff',
 			'--prpl-background-orange'        => '#fff9f0',
 			'--prpl-background-purple'        => '#f6f5fb',
 			'--prpl-background-green'         => '#f2faf9',
 			'--prpl-background-red'           => '#fff6f7',
 			'--prpl-background-blue'          => '#effbfe',
+
+			'--prpl-main-area-border-color'   => 'var(--prpl-color-gray-2)',
+			'--prpl-paper-border-color'       => 'var(--prpl-color-gray-2)',
+
+			'--prpl-papers-box-shadow'        => '4px 4px 10px rgba(0, 0, 0, 0.07), -2px 0 6px rgba(0, 0, 0, 0.07)',
+
+			'--prpl-border-radius'            => '8px',
+			'--prpl-border-radius-small'      => 'calc(var(--prpl-border-radius) * 0.75)',
+			'--prpl-border-radius-big'        => 'calc(var(--prpl-border-radius) * 2)',
 		];
 
-		if ( ! empty( $this->get_api_data() ) && ! empty( $this->get_api_data()['acf']['colors'] ) ) {
-			$colors = \wp_parse_args( $this->get_api_data()['acf']['colors'], $colors );
+		if ( ! empty( $this->get_api_data() ) && ! empty( $this->get_api_data()['acf']['css_variables'] ) ) {
+			$vars = \wp_parse_args( $this->get_api_data()['acf']['css_variables'], $vars );
 		}
 
-		$palette_string = '';
-		foreach ( $colors as $key => $value ) {
-			$palette_string .= $key . ': ' . $value . ';';
+		$vars_string = '';
+		foreach ( $vars as $key => $value ) {
+			$vars_string .= $key . ': ' . $value . ';';
 		}
 
-		return ":root { $palette_string }";
-	}
-
-	/**
-	 * Get the border radii.
-	 *
-	 * @return string
-	 */
-	public function get_border_radii(): string {
-		$radii = [
-			'--prpl-border-radius'       => '8px',
-			'--prpl-border-radius-small' => 'calc(var(--prpl-border-radius) * 0.75)',
-			'--prpl-border-radius-big'   => 'calc(var(--prpl-border-radius) * 2)',
-		];
-
-		if ( ! empty( $this->get_api_data() ) && ! empty( $this->get_api_data()['acf']['border-radii'] ) ) {
-			$radii = \wp_parse_args( $this->get_api_data()['acf']['border-radii'], $radii );
-		}
-
-		$radii_string = '';
-		foreach ( $radii as $key => $value ) {
-			$radii_string .= $key . ': ' . $value . ';';
-		}
-
-		return ":root { $radii_string }";
+		return ":root { $vars_string }";
 	}
 
 	/**

@@ -294,8 +294,7 @@ class Page {
 
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/admin' );
 		if ( ! static::$branding_inline_styles_added ) {
-			\wp_add_inline_style( 'progress-planner/admin', \progress_planner()->get_ui__branding()->get_color_palette() );
-			\wp_add_inline_style( 'progress-planner/admin', \progress_planner()->get_ui__branding()->get_border_radii() );
+			\wp_add_inline_style( 'progress-planner/admin', \progress_planner()->get_ui__branding()->get_css_variables() );
 			\wp_add_inline_style( 'progress-planner/admin', \progress_planner()->get_ui__branding()->get_custom_css() );
 			static::$branding_inline_styles_added = true;
 		}

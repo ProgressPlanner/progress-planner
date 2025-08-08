@@ -30,8 +30,8 @@ body.toplevel_page_progress-planner { /* stylelint-disable-line */
 	Styles for the container of the page.
 \*------------------------------------*/
 .prpl-wrap {
-	background: #fff;
-	border: 1px solid var(--prpl-color-gray-2);
+	background: var(--prpl-background-main, #fff);
+	border: 1px solid var(--prpl-main-area-border-color, var(--prpl-color-gray-2));
 	border-radius: var(--prpl-border-radius);
 	padding: var(--prpl-settings-page-gap) calc(var(--prpl-padding) * 2);
 	max-width: var(--prpl-container-max-width);
@@ -210,13 +210,14 @@ button.prpl-info-icon {
 	Generic styles for individual widgets.
 \*------------------------------------*/
 .prpl-widget-wrapper {
-	border: 1px solid var(--prpl-color-gray-2);
+	border: 1px solid var(--prpl-paper-border-color);
+	background: var(--prpl-background-papers);
 	border-radius: var(--prpl-border-radius);
 	padding: var(--prpl-padding);
 	min-width: 0;
 	min-height: 0;
 	margin-bottom: var(--prpl-gap);
-	box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.07), -2px 0 6px rgba(0, 0, 0, 0.07);
+	box-shadow: var(--prpl-papers-box-shadow);
 
 	hr {
 		margin-top: 1.25rem;
