@@ -341,7 +341,7 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Check if a task category is snoozed.
+	 * Check if task provider is snoozed.
 	 *
 	 * @return bool
 	 */
