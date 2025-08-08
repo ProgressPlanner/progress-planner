@@ -48,7 +48,7 @@ class Rename_Uncategorized_Category extends Tasks {
 	 * @return string
 	 */
 	protected function get_url() {
-		return \admin_url( 'edit-tags.php?taxonomy=category&post_type=post' );
+		return \admin_url( 'term.php?taxonomy=category&tag_ID=' . $this->get_data_collector()->collect() );
 	}
 
 	/**

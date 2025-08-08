@@ -52,7 +52,7 @@ class Content_Activity_Test extends \WP_UnitTestCase {
 	 */
 	public function test_points_decay_over_time( $days_ago, $expected_ratio ): void {
 		// Create a test post.
-		$post_id = $this->factory->post->create(
+		$post_id = $this->factory()->post->create(
 			[
 				'post_content' => 'Test content',
 				'post_status'  => 'publish',
@@ -96,7 +96,7 @@ class Content_Activity_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_points_caching(): void {
-		$post_id = $this->factory->post->create(
+		$post_id = $this->factory()->post->create(
 			[
 				'post_content' => 'Test content',
 				'post_status'  => 'publish',
@@ -125,7 +125,7 @@ class Content_Activity_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_different_activity_types(): void {
-		$post_id = $this->factory->post->create(
+		$post_id = $this->factory()->post->create(
 			[
 				'post_content' => 'Test content',
 				'post_status'  => 'publish',

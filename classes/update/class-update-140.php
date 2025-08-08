@@ -12,7 +12,7 @@ namespace Progress_Planner\Update;
  *
  * @package Progress_Planner
  */
-class Update_140 {
+class Update_140 extends Update {
 
 	const VERSION = '1.4.0';
 

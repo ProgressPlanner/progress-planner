@@ -77,7 +77,6 @@ class Tasks {
 	 * @return \WP_REST_Response The REST response object containing the recommendations.
 	 */
 	public function get_tasks() {
-
 		// Collection of task objects.
 		$tasks           = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => [ 'publish', 'trash', 'draft', 'future', 'pending' ] ] );
 		$tasks_to_return = [];

@@ -11,21 +11,6 @@
 		padding-left: var(--prpl-padding);
 	}
 
-	.prpl-widget-title {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 1.3rem;
-		background: var(--prpl-background-red);
-		padding: 0.5rem 1rem;
-		border-radius: 0.5rem;
-
-		.icon {
-			width: 1.25em;
-			height: 1.25em;
-		}
-	}
-
 	.prpl-todo-golden-task-description,
 	.prpl-todo-silver-task-description {
 		display: none;
