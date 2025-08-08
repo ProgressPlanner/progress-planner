@@ -214,6 +214,17 @@ final class Branding {
 	}
 
 	/**
+	 * Get the admin-submenu name.
+	 *
+	 * @return string
+	 */
+	public function get_admin_submenu_name(): string {
+		return empty( $this->get_api_data() )
+			? $this->get_admin_menu_name()
+			: $this->get_api_data()['acf']['admin_submenu_name'];
+	}
+
+	/**
 	 * Get the Ravi name.
 	 *
 	 * @return string

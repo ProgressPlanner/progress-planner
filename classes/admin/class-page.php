@@ -98,12 +98,21 @@ class Page {
 		$page_identifier = 'progress-planner';
 
 		\add_menu_page(
-			\progress_planner()->get_ui__branding()->get_admin_menu_name(),
+			\progress_planner()->get_ui__branding()->get_admin_submenu_name(),
 			\progress_planner()->get_ui__branding()->get_admin_menu_name() . $this->get_notification_counter(),
 			'manage_options',
 			$page_identifier,
-			[ $this, 'render_page' ],
+			'__return_empty_string',
 			\progress_planner()->get_ui__branding()->get_admin_menu_icon()
+		);
+
+		\add_submenu_page(
+			$page_identifier,
+			\progress_planner()->get_ui__branding()->get_admin_submenu_name(),
+			\progress_planner()->get_ui__branding()->get_admin_submenu_name() . $this->get_notification_counter(),
+			'manage_options',
+			$page_identifier,
+			[ $this, 'render_page' ],
 		);
 
 		// Wipe notification bits from hooks.
