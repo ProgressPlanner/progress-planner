@@ -95,7 +95,7 @@ class Select_Timezone extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		?>
-		<p><?php \esc_html_e( 'Set site timezone to ensure scheduled posts and pages are published at desired time', 'progress-planner' ); ?></p>
+		<p><?php \esc_html_e( 'Set site timezone to ensure scheduled posts and pages are published at desired time.', 'progress-planner' ); ?></p>
 		<?php
 	}
 
