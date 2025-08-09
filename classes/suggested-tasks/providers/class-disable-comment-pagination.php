@@ -99,8 +99,12 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	 * @return string
 	 */
 	protected function get_description() {
-		/* translators: %d is the number of comments per page */
-		return \sprintf( \esc_html__( 'When comment pagination is enabled, your site creates a new page for every %d comments. This is not helping your website in search engines, and can break up the ongoing conversation. That\'s why we recommend to disable comment pagination.', 'progress-planner' ), (int) \get_option( 'comments_per_page' ) );
+		return \sprintf(
+			/* translators: %d is the number of comments per page, %s is the "recommend to disable comment pagination" link */
+			\esc_html__( 'When comment pagination is enabled, your site creates a new page for every %1$d comments. This is not helping your website in search engines, and can break up the ongoing conversation. That\'s why we %2$s.', 'progress-planner' ),
+			(int) \get_option( 'comments_per_page' ),
+			'<a href="https://prpl.fyi/disable-comment-pagination" target="_blank">' . \esc_html__( 'recommend to disable comment pagination', 'progress-planner' ) . '</a>'
+		);
 	}
 
 	/**
@@ -133,8 +137,12 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 		?>
 		<p>
 		<?php
-		/* translators: %d is the number of comments per page */
-		\printf( \esc_html__( 'When comment pagination is enabled, your site creates a new page for every %d comments. This is not helping your website in search engines, and can break up the ongoing conversation. That\'s why we recommend to disable comment pagination.', 'progress-planner' ), (int) \get_option( 'comments_per_page' ) );
+		\printf(
+			/* translators: %d is the number of comments per page, %s is the "recommend to disable comment pagination" link */
+			\esc_html__( 'When comment pagination is enabled, your site creates a new page for every %1$d comments. This is not helping your website in search engines, and can break up the ongoing conversation. That\'s why we %2$s.', 'progress-planner' ),
+			(int) \get_option( 'comments_per_page' ),
+			'<a href="https://prpl.fyi/disable-comment-pagination" target="_blank">' . \esc_html__( 'recommend to disable comment pagination', 'progress-planner' ) . '</a>'
+		);
 		?>
 		</p>
 		<?php
