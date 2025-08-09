@@ -99,7 +99,8 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \esc_html__( 'Disable comment pagination', 'progress-planner' );
+		/* translators: %d is the number of comments per page */
+		return \sprintf( \esc_html__( 'When comment pagination is enabled, your site creates a new page for every %d comments. This is not helping your website in search engines, and can break up the ongoing conversation. That\'s why we recommend to disable comment pagination.', 'progress-planner' ), (int) \get_option( 'comments_per_page' ) );
 	}
 
 	/**
@@ -130,7 +131,12 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		?>
-		<p><?php \esc_html_e( 'Comment pagination is enabled by default. This means that comments are split into multiple pages. This can be disabled to make the comments easier to read.', 'progress-planner' ); ?></p>
+		<p>
+		<?php
+		/* translators: %d is the number of comments per page */
+		\printf( \esc_html__( 'When comment pagination is enabled, your site creates a new page for every %d comments. This is not helping your website in search engines, and can break up the ongoing conversation. That\'s why we recommend to disable comment pagination.', 'progress-planner' ), (int) \get_option( 'comments_per_page' ) );
+		?>
+		</p>
 		<?php
 	}
 
