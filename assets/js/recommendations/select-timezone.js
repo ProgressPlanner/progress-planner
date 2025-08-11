@@ -6,11 +6,12 @@
  * Dependencies: progress-planner/recommendations/interactive-task
  */
 
-prplInteractiveTaskFormListener.siteSettings( {
+prplInteractiveTaskFormListener.settings( {
 	settingAPIKey: 'timezone',
 	setting: 'timezone',
 	taskId: 'select-timezone',
 	popoverId: 'prpl-popover-select-timezone',
+	action: 'prpl_interactive_task_submit_select-timezone',
 } );
 
 prplDocumentReady( () => {

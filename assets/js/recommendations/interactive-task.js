@@ -100,6 +100,7 @@ const prplInteractiveTaskFormListener = {
 		settingPath = false,
 		popoverId,
 		settingCallbackValue = ( settingValue ) => settingValue,
+		action = 'prpl_interactive_task_submit',
 	} = {} ) => {
 		const formElement = document.querySelector( `#${ popoverId } form` );
 
@@ -119,7 +120,7 @@ const prplInteractiveTaskFormListener = {
 			progressPlannerAjaxRequest( {
 				url: progressPlanner.ajaxUrl,
 				data: {
-					action: 'prpl_interactive_task_submit',
+					action,
 					_ajax_nonce: progressPlanner.nonce,
 					post_id: taskId,
 					setting,
