@@ -49,7 +49,6 @@ abstract class Tasks_Interactive extends Tasks {
 	 *
 	 * This is only for interactive tasks that change non-core settings.
 	 * The $_POST data is expected to be:
-	 * - post_id: (int) The post ID.
 	 * - setting: (string) The setting to update.
 	 * - value: (mixed) The value to update the setting to.
 	 * - setting_path: (array) The path to the setting to update.
@@ -64,10 +63,6 @@ abstract class Tasks_Interactive extends Tasks {
 		// Check the nonce.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
-		}
-
-		if ( ! isset( $_POST['post_id'] ) || ! isset( $_POST['action_type'] ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing data.', 'progress-planner' ) ] );
 		}
 
 		if ( ! isset( $_POST['setting'] ) ) {

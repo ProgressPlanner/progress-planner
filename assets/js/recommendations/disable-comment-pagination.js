@@ -6,10 +6,10 @@
  * Dependencies: progress-planner/recommendations/interactive-task
  */
 
-prplInteractiveTaskFormListener.siteSettings( {
-	settingAPIKey: 'page_comments',
+prplInteractiveTaskFormListener.settings( {
 	setting: 'page_comments',
+	settingPath: '{}',
 	taskId: 'disable-comment-pagination',
 	popoverId: 'prpl-popover-disable-comment-pagination',
-	settingCallbackValue: () => '',
+	settingCallbackValue: () => false,
 } );

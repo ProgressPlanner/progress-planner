@@ -34,36 +34,6 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	const POPOVER_ID = 'disable-comment-pagination';
 
 	/**
-	 * Initialize the task.
-	 *
-	 * @return void
-	 */
-	public function init() {
-		\add_action( 'rest_api_init', [ $this, 'register_setting_with_rest' ] );
-	}
-
-	/**
-	 * Register the setting with the REST API.
-	 *
-	 * @return void
-	 */
-	public function register_setting_with_rest() {
-		register_setting(
-			'discussion',
-			'page_comments',
-			[
-				'type'         => 'string',
-				'label'        => __( 'Break comments into pages', 'progress-planner' ),
-				'show_in_rest' => [
-					'schema' => [
-						'enum' => [ '1', '' ],
-					],
-				],
-			]
-		);
-	}
-
-	/**
 	 * Get the task URL.
 	 *
 	 * @return string
