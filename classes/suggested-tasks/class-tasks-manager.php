@@ -14,6 +14,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Blog_Description;
 use Progress_Planner\Suggested_Tasks\Providers\Settings_Saved;
 use Progress_Planner\Suggested_Tasks\Providers\Debug_Display;
 use Progress_Planner\Suggested_Tasks\Providers\Disable_Comments;
+use Progress_Planner\Suggested_Tasks\Providers\Disable_Comment_Pagination;
 use Progress_Planner\Suggested_Tasks\Providers\Sample_Page;
 use Progress_Planner\Suggested_Tasks\Providers\Hello_World;
 use Progress_Planner\Suggested_Tasks\Providers\Remove_Inactive_Plugins;
@@ -33,6 +34,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Remove_Terms_Without_Posts;
 use Progress_Planner\Suggested_Tasks\Providers\Update_Term_Description;
 use Progress_Planner\Suggested_Tasks\Providers\Unpublished_Content;
 use Progress_Planner\Suggested_Tasks\Providers\Collaborator;
+use Progress_Planner\Suggested_Tasks\Providers\Select_Timezone;
 
 /**
  * Tasks_Manager class.
@@ -59,6 +61,7 @@ class Tasks_Manager {
 			new Settings_Saved(),
 			new Debug_Display(),
 			new Disable_Comments(),
+			new Disable_Comment_Pagination(),
 			new Sample_Page(),
 			new Hello_World(),
 			new Remove_Inactive_Plugins(),
@@ -76,6 +79,7 @@ class Tasks_Manager {
 			new Update_Term_Description(),
 			new Unpublished_Content(),
 			new Collaborator(),
+			new Select_Timezone(),
 		];
 
 		// Add the plugin integration.
