@@ -91,9 +91,9 @@ class Blog_Description extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_instructions() {
-		?>
-		<p><?php \esc_html_e( 'In a few words, explain what this site is about. This information is used in your website\'s schema and RSS feeds, and can be displayed on your site. The tagline typically is your site\'s mission statement.', 'progress-planner' ); ?></p>
-		<?php
+		echo '<p>';
+		\esc_html_e( 'In a few words, explain what this site is about. This information is used in your website\'s schema and RSS feeds, and can be displayed on your site. The tagline typically is your site\'s mission statement.', 'progress-planner' );
+		echo '</p>';
 	}
 
 	/**
