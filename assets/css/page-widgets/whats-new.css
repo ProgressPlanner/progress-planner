@@ -42,8 +42,13 @@
 		justify-content: flex-end;
 
 		a {
-			text-decoration: none;
 			color: var(--prpl-color-link);
+			text-decoration: underline;
+
+			&:hover {
+				color: var(--prpl-color-gray-6);
+				text-decoration: none;
+			}
 		}
 	}
 }
