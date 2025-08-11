@@ -69,7 +69,7 @@ class Select_Timezone extends Tasks_Interactive {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \esc_html__( 'Set site timezone to ensure scheduled posts and pages are published at desired time.', 'progress-planner' );
+		return \esc_html__( 'Setting the time zone correctly on your site is valuable. By setting the correct time zone, you ensure scheduled tasks happen exactly when you want them to happen. To correctly account for daylight savings\', we recommend you use the city-based time zone instead of the UTC offset (e.g. Amsterdam or London).', 'progress-planner' );
 	}
 
 	/**
@@ -95,7 +95,7 @@ class Select_Timezone extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Set site timezone to ensure scheduled posts and pages are published at desired time.', 'progress-planner' );
+		\esc_html_e( 'Setting the time zone correctly on your site is valuable. By setting the correct time zone, you ensure scheduled tasks happen exactly when you want them to happen. To correctly account for daylight savings\', we recommend you use the city-based time zone instead of the UTC offset (e.g. Amsterdam or London).', 'progress-planner' );
 		echo '</p>';
 	}
 
@@ -107,6 +107,7 @@ class Select_Timezone extends Tasks_Interactive {
 	public function print_popover_form_contents() {
 		$current_offset = \get_option( 'gmt_offset' );
 		$tzstring       = \get_option( 'timezone_string' );
+		$was_tzstring_saved = '' !== $tzstring || '0' !== $current_offset ? 'true' : 'false';
 
 		// Remove old Etc mappings. Fallback to gmt_offset.
 		if ( str_contains( $tzstring, 'Etc/GMT' ) ) {
@@ -124,7 +125,7 @@ class Select_Timezone extends Tasks_Interactive {
 		}
 		?>
 		<label>
-			<select id="timezone" name="timezone">
+			<select id="gmt_offset" name="gmt_offset" data-timezone-saved="<?php echo \esc_attr( $was_tzstring_saved ); ?>">
 				<?php echo \wp_timezone_choice( $tzstring, \get_user_locale() ); ?>
 			</select>
 		</label>

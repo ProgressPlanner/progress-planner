@@ -57,15 +57,9 @@ const prplInteractiveTaskFormListener = {
 					if ( ! postId ) {
 						return;
 					}
+
+					// This will trigger the celebration event (confetti) as well.
 					prplSuggestedTask.maybeComplete( postId );
-					taskEl.setAttribute( 'data-task-action', 'celebrate' );
-					document.dispatchEvent(
-						new CustomEvent( 'prpl/celebrateTasks', {
-							detail: {
-								element: taskEl,
-							},
-						} )
-					);
 				} );
 			} );
 		} );
@@ -94,15 +88,9 @@ const prplInteractiveTaskFormListener = {
 			if ( ! postId ) {
 				return;
 			}
+
+			// This will trigger the celebration event (confetti) as well.
 			prplSuggestedTask.maybeComplete( postId );
-			taskEl.setAttribute( 'data-task-action', 'celebrate' );
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/celebrateTasks', {
-					detail: {
-						element: taskEl,
-					},
-				} )
-			);
 		} );
 	},
 
@@ -153,15 +141,9 @@ const prplInteractiveTaskFormListener = {
 				if ( ! postId ) {
 					return;
 				}
+
+				// This will trigger the celebration event (confetti) as well.
 				prplSuggestedTask.maybeComplete( postId );
-				taskEl.setAttribute( 'data-task-action', 'celebrate' );
-				document.dispatchEvent(
-					new CustomEvent( 'prpl/celebrateTasks', {
-						detail: {
-							element: taskEl,
-						},
-					} )
-				);
 			} );
 		} );
 	},
