@@ -11,5 +11,5 @@ prplInteractiveTaskFormListener.settings( {
 	settingPath: '{}',
 	taskId: 'disable-comment-pagination',
 	popoverId: 'prpl-popover-disable-comment-pagination',
-	settingCallbackValue: () => false,
+	settingCallbackValue: () => '',
 } );
