@@ -109,8 +109,7 @@ const prplInteractiveTaskFormListener = {
 	settings: ( {
 		taskId,
 		setting,
-		value,
-		settingPath,
+		settingPath = false,
 		popoverId,
 		settingCallbackValue = ( settingValue ) => settingValue,
 	} = {} ) => {
@@ -136,7 +135,7 @@ const prplInteractiveTaskFormListener = {
 					_ajax_nonce: progressPlanner.nonce,
 					post_id: taskId,
 					setting,
-					value,
+					value: settingsToPass[ setting ],
 					setting_path: settingPath,
 				},
 			} ).then( () => {

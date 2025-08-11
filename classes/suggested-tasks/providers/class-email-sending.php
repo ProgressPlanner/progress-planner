@@ -278,7 +278,7 @@ class Email_Sending extends Tasks_Interactive {
 	 *
 	 * @return void
 	 */
-	protected function the_popover_content() {
+	public function the_popover_content() {
 		\progress_planner()->the_view(
 			'popovers/email-sending.php',
 			[
