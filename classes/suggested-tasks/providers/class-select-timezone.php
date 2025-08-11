@@ -114,8 +114,8 @@ class Select_Timezone extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		$current_offset = \get_option( 'gmt_offset' );
-		$tzstring       = \get_option( 'timezone_string' );
+		$current_offset     = \get_option( 'gmt_offset' );
+		$tzstring           = \get_option( 'timezone_string' );
 		$was_tzstring_saved = '' !== $tzstring || '0' !== $current_offset ? 'true' : 'false';
 
 		// Remove old Etc mappings. Fallback to gmt_offset.
@@ -188,7 +188,7 @@ class Select_Timezone extends Tasks_Interactive {
 		// Map UTC+- timezones to gmt_offsets and set timezone_string to empty.
 		if ( preg_match( '/^UTC[+-]/', $timezone_string ) ) {
 			// Set the gmt_offset to the value of the timezone_string, strip the UTC prefix.
-			$gmt_offset      = preg_replace( '/UTC\+?/', '', $timezone_string );
+			$gmt_offset = preg_replace( '/UTC\+?/', '', $timezone_string );
 
 			// Reset the timezone_string to empty.
 			$timezone_string = '';
