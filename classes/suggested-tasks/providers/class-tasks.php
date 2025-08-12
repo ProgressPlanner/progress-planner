@@ -50,18 +50,14 @@ abstract class Tasks implements Tasks_Interface {
 	protected const DATA_COLLECTOR_CLASS = \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector::class;
 
 	/**
-	 * Whether the task is interactive.
+	 * Dependencies on other tasks.
 	 *
-	 * @var bool
-	 */
-	const IS_INTERACTIVE = false;
-
-	/**
-	 * The popover ID for interactive tasks.
+	 * The key is the task-ID of the other task,
+	 * If the value is true, the task is pending, if false, the task is completed/dismissed/snoozed.
 	 *
-	 * @var string
+	 * @var array<string, bool>
 	 */
-	const POPOVER_ID = '';
+	protected const DEPENDENCIES = [];
 
 	/**
 	 * Whether the task is repetitive.
@@ -132,17 +128,6 @@ abstract class Tasks implements Tasks_Interface {
 	 * @var \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector|null
 	 */
 	protected $data_collector = null;
-
-	/**
-	 * Constructor.
-	 *
-	 * @return void
-	 */
-	public function __construct() {
-		if ( static::IS_INTERACTIVE ) {
-			\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
-		}
-	}
 
 	/**
 	 * Initialize the task provider.
@@ -366,7 +351,7 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Check if a task category is snoozed.
+	 * Check if task provider is snoozed.
 	 *
 	 * @return bool
 	 */
@@ -547,7 +532,6 @@ abstract class Tasks implements Tasks_Interface {
 			'link_setting' => $this->get_link_setting(),
 			'dismissable'  => $this->is_dismissable(),
 			'snoozable'    => $this->is_snoozable(),
-			'popover_id'   => static::IS_INTERACTIVE ? 'prpl-popover-' . static::POPOVER_ID : '',
 		];
 	}
 
@@ -576,30 +560,24 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Add the popover.
+	 * Check if the task dependencies are satisfied.
 	 *
-	 * @return void
+	 * @return bool
 	 */
-	public function add_popover() {
-		?>
-		<div id="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>" class="prpl-popover prpl-popover-interactive" popover>
-			<?php $this->the_popover_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		</div>
-		<?php
-	}
+	public function are_dependencies_satisfied() {
+		foreach ( static::DEPENDENCIES as $task_id => $result ) {
+			$post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
+			if ( ! $post ) {
+				return false;
+			}
+			$post_status = $post->post_status;
+			if ( ( 'publish' === $post_status && ! $result )
+				|| ( 'publish' !== $post_status && $result )
+			) {
+				return false;
+			}
+		}
 
-	/**
-	 * The popover content.
-	 *
-	 * @return void
-	 */
-	public function the_popover_content() {
-		\progress_planner()->the_view(
-			'popovers/' . static::POPOVER_ID . '.php',
-			[
-				'prpl_popover_id'  => static::POPOVER_ID,
-				'prpl_provider_id' => $this->get_provider_id(),
-			]
-		);
+		return true;
 	}
 }

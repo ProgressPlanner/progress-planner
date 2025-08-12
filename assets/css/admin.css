@@ -301,8 +301,13 @@ button.prpl-info-icon {
 		transition: all 0.25s ease-in-out;
 	}
 
-	&:hover,
-	&:focus {
+	&:disabled {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+
+	&:not([disabled]):hover,
+	&:not([disabled]):focus {
 		background: #cf2441;
 
 		&::after {
@@ -319,8 +324,8 @@ button.prpl-info-icon {
 .prpl-wrap button.prpl-button-secondary {
 	background: var(--prpl-color-gray-3);
 
-	&:hover,
-	&:focus {
+	&:not([disabled]):hover,
+	&:not([disabled]):focus {
 		background: var(--prpl-color-gray-4);
 		box-shadow: 3px 3px 10px var(--prpl-color-gray-4);
 	}
@@ -486,3 +491,4 @@ button.prpl-info-icon {
 		transform: rotate(360deg);
 	}
 }
+
