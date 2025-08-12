@@ -92,12 +92,16 @@ class BadgeScroller {
 	}
 
 	addEventListeners() {
-		this.badgeButtonUp.addEventListener( 'click', () =>
-			this.handleUpClick()
-		);
-		this.badgeButtonDown.addEventListener( 'click', () =>
-			this.handleDownClick()
-		);
+		if ( this.badgeButtonUp ) {
+			this.badgeButtonUp.addEventListener( 'click', () =>
+				this.handleUpClick()
+			);
+		}
+		if ( this.badgeButtonDown ) {
+			this.badgeButtonDown.addEventListener( 'click', () =>
+				this.handleDownClick()
+			);
+		}
 	}
 
 	handleUpClick() {

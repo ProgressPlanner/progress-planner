@@ -46,9 +46,9 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	/**
 	 * The completed post IDs.
 	 *
-	 * @var array|null
+	 * @var array
 	 */
-	protected $completed_post_ids = null;
+	protected $completed_post_ids = [];
 
 	/**
 	 * The data collector class name.
@@ -148,22 +148,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	}
 
 	/**
-	 * Transform data collector data into task data format.
-	 *
-	 * @param array $data The data from data collector.
-	 * @return array The transformed data with original data merged.
-	 */
-	protected function transform_collector_data( array $data ): array {
-		return \array_merge(
-			$data,
-			[
-				'target_post_id'    => $data['post_id'],
-				'target_post_title' => $data['post_title'],
-			]
-		);
-	}
-
-	/**
 	 * Get an array of tasks to inject.
 	 *
 	 * @return array
@@ -173,12 +157,8 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return [];
 		}
 
-		$data    = $this->get_data_collector()->collect();
-		$task_id = $this->get_task_id(
-			[
-				'post_id' => $data['post_id'],
-			]
-		);
+		$data    = $this->transform_collector_data( $this->get_data_collector()->collect() );
+		$task_id = $this->get_task_id( [ 'target_post_id' => $data['target_post_id'] ] );
 
 		// When we have data, check if task was completed.
 		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_id ) ) {
@@ -188,7 +168,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		// Transform the data to match the task data structure.
 		$task_data = $this->modify_injection_task_data(
 			$this->get_task_details(
-				$this->transform_collector_data( $data )
+				$data
 			)
 		);
 
@@ -223,9 +203,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return null;
 		}
 
-		$task = $tasks[0];
-
-		return $task->target_post_id ? \get_post( $task->target_post_id ) : null;
+		return $tasks[0]->target_post_id ? \get_post( $tasks[0]->target_post_id ) : null;
 	}
 
 	/**
@@ -234,18 +212,15 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return array
 	 */
 	protected function get_completed_post_ids() {
-		if ( null !== $this->completed_post_ids ) {
+		if ( ! empty( $this->completed_post_ids ) ) {
 			return $this->completed_post_ids;
 		}
 
-		$this->completed_post_ids = [];
-		$tasks                    = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
-		if ( ! empty( $tasks ) ) {
-			foreach ( $tasks as $task ) {
-				if ( 'trash' === $task->post_status ) {
-					$this->completed_post_ids[] = $task->target_post_id;
-				}
+		foreach ( $tasks as $task ) {
+			if ( 'trash' === $task->post_status ) {
+				$this->completed_post_ids[] = $task->target_post_id;
 			}
 		}
 

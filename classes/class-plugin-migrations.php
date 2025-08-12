@@ -85,6 +85,14 @@ class Plugin_Migrations {
 		);
 		\sort( $updates );
 
+		// Remove "class-update" from the updates.
+		$updates = \array_filter(
+			$updates,
+			function ( $update ) {
+				return $update !== 'class-update';
+			}
+		);
+
 		// Run the upgrades.
 		foreach ( $updates as $version_int ) {
 			$upgrade_class = 'Progress_Planner\Update\Update_' . $version_int;

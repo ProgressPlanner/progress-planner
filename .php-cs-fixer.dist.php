@@ -10,7 +10,10 @@ $finder = ( new PhpCsFixer\Finder() )
 		]
 	);
 
-return ( new PhpCsFixer\Config() )->setRules(
+$config = new PhpCsFixer\Config();
+$config->setUnsupportedPhpVersionAllowed( true );
+
+return $config->setRules(
 	[
 		'native_function_invocation' => [
 			'include' => [ '@all' ],
