@@ -2,6 +2,7 @@
 
 Added these recommendations from Ravi:
 * Select site timezone.
+* Select site locale.
 * Disable comment pagination
 
 Following recommendations are now interactive:
