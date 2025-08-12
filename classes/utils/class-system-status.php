@@ -144,7 +144,7 @@ class System_Status {
 			];
 		}
 
-		$data['branding_id'] = \progress_planner()->get_branding_id()->get_branding_id();
+		$data['branding_id'] = (int) \progress_planner()->get_ui__branding()->get_branding_id();
 
 		return $data;
 	}

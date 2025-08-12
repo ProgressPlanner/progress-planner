@@ -26,6 +26,7 @@ customElements.define(
 				contentPadding:
 					'var(--prpl-padding) var(--prpl-padding) calc(var(--prpl-padding) * 2) var(--prpl-padding)',
 				marginBottom: 'var(--prpl-padding)',
+				brandingId: '',
 			},
 			content = ''
 		) {
@@ -55,7 +56,8 @@ customElements.define(
 				this.getAttribute( 'contentPadding' ) || props.contentPadding;
 			props.marginBottom =
 				this.getAttribute( 'marginBottom' ) || props.marginBottom;
-
+			props.brandingId =
+				this.getAttribute( 'branding-id' ) || props.brandingId;
 			this.innerHTML = `
 			<div style="padding: ${ props.contentPadding };
 			background: ${
@@ -148,8 +150,9 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 			contentPadding:
 				'var(--prpl-padding) var(--prpl-padding) calc(var(--prpl-padding) * 2) var(--prpl-padding)',
 			marginBottom: 'var(--prpl-padding)',
+			brandingId: gaugeProps.brandingId,
 		},
-		`<prpl-badge complete="true" badge-id="${ gaugeProps.badgeId }"></prpl-badge>`
+		`<prpl-badge complete="true" badge-id="${ gaugeProps.badgeId }" branding-id="${ gaugeProps.brandingId }"></prpl-badge>`
 	);
 	gauge.id = gaugeProps.id;
 	gauge.setAttribute( 'background', gaugeProps.background );
@@ -157,6 +160,7 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 	gauge.setAttribute( 'data-max', gaugeProps.max );
 	gauge.setAttribute( 'data-value', newValue );
 	gauge.setAttribute( 'data-badge-id', gaugeProps.badgeId );
+	gauge.setAttribute( 'data-branding-id', gaugeProps.brandingId );
 
 	// Replace the old gauge with the new one.
 	const oldGauge = document.getElementById( gaugeProps.id );

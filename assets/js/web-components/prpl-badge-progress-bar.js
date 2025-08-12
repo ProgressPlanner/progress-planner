@@ -13,12 +13,13 @@
 customElements.define(
 	'prpl-badge-progress-bar',
 	class extends HTMLElement {
-		constructor( badgeId, points, maxPoints ) {
+		constructor( badgeId, points, maxPoints, brandingId = '' ) {
 			// Get parent class properties
 			super();
 			badgeId = badgeId || this.getAttribute( 'data-badge-id' );
 			points = points || this.getAttribute( 'data-points' );
 			maxPoints = maxPoints || this.getAttribute( 'data-max-points' );
+			brandingId = brandingId || this.getAttribute( 'data-branding-id' );
 			const progress = ( points / maxPoints ) * 100;
 
 			this.innerHTML = `
@@ -49,6 +50,7 @@ customElements.define(
 								position: absolute;
 								left: calc(${ progress }% - 2.5rem);
 								top: -2.5rem;"
+								branding-id="${ brandingId }"
 						></prpl-badge>
 					</div>
 				</div>
@@ -93,16 +95,19 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 	const badgeMaxPoints = progressBar.getAttribute( 'data-max-points' );
 	const badgeProgress = customElements.get( 'prpl-badge-progress-bar' );
 	const badgeNewPoints = parseInt( badgePoints ) + pointsDiff;
+	const brandingId = progressBar.getAttribute( 'data-branding-id' );
 
 	// Create a new badge progress bar.
 	const newProgressBar = new badgeProgress(
 		badgeId,
 		badgeNewPoints,
-		badgeMaxPoints
+		badgeMaxPoints,
+		brandingId
 	);
 	newProgressBar.setAttribute( 'data-badge-id', badgeId );
 	newProgressBar.setAttribute( 'data-points', badgeNewPoints );
 	newProgressBar.setAttribute( 'data-max-points', badgeMaxPoints );
+	newProgressBar.setAttribute( 'data-branding-id', brandingId );
 
 	// Replace the old badge progress bar with the new one.
 	progressBar.replaceWith( newProgressBar );

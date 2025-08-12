@@ -25,6 +25,7 @@ use Progress_Planner\Badges\Monthly;
 				<prpl-badge
 					complete="true"
 					badge-id="<?php echo \esc_attr( Monthly::get_badge_id_from_date( new \DateTime() ) ); ?>"
+					branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
 				></prpl-badge>
 			</progress>
 		</prpl-gauge>
