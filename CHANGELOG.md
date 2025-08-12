@@ -2,6 +2,13 @@
 
 Added these recommendations from Ravi:
 * Select site timezone.
+* Disable comment pagination
+
+Following recommendations are now interactive:
+* Set tagline
+* Disable comments
+* Delete the "Hello World!" post
+* Delete "Sample Page"
 
 Bugs we fixed:
 
