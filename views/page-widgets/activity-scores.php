@@ -16,7 +16,12 @@ $prpl_record = $prpl_widget->personal_record_callback();
 
 ?>
 <h2 class="prpl-widget-title">
-	<?php \esc_html_e( 'Your website activity score', 'progress-planner' ); ?>
+	<?php
+	echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		'activity-scores',
+		\esc_html__( 'Your website activity score', 'progress-planner' )
+	);
+	?>
 
 	<div class="tooltip-actions">
 		<prpl-tooltip>

@@ -14,7 +14,12 @@ $prpl_latest_badge = \progress_planner()->get_badges()->get_latest_completed_bad
 
 ?>
 <h2 class="prpl-widget-title">
-	<?php \esc_html_e( 'Latest new badge!', 'progress-planner' ); ?>
+	<?php
+	echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		'latest-badge',
+		\esc_html__( 'Latest new badge!', 'progress-planner' )
+	);
+	?>
 </h2>
 <?php if ( ! $prpl_latest_badge ) : ?>
 	<p><?php \esc_html_e( 'You haven\'t unlocked any badges yet. Hang on, you\'ll get there!', 'progress-planner' ); ?></p>

@@ -285,4 +285,26 @@ final class Branding {
 			}
 		);
 	}
+
+	/**
+	 * Get the widget title.
+	 *
+	 * @param string $widget_id     The widget ID.
+	 * @param string $default_value The default value.
+	 *
+	 * @return string
+	 */
+	public function get_widget_title( $widget_id, $default_value = '' ) {
+		if ( empty( $this->get_api_data() ) || ! isset( $this->get_api_data()['acf']['widget_titles'] ) ) {
+			return $default_value;
+		}
+
+		foreach ( $this->get_api_data()['acf']['widget_titles'] as $widget ) {
+			if ( $widget['widget_id'] === $widget_id && isset( $widget['title'] ) ) {
+				return $widget['title'];
+			}
+		}
+
+		return $default_value;
+	}
 }

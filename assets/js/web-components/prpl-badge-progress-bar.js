@@ -13,7 +13,7 @@
 customElements.define(
 	'prpl-badge-progress-bar',
 	class extends HTMLElement {
-		constructor( badgeId, points, maxPoints, brandingId = '' ) {
+		constructor( badgeId, points, maxPoints, brandingId = 0 ) {
 			// Get parent class properties
 			super();
 			badgeId = badgeId || this.getAttribute( 'data-badge-id' );

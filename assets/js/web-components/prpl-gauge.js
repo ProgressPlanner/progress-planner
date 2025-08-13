@@ -26,7 +26,7 @@ customElements.define(
 				contentPadding:
 					'var(--prpl-padding) var(--prpl-padding) calc(var(--prpl-padding) * 2) var(--prpl-padding)',
 				marginBottom: 'var(--prpl-padding)',
-				brandingId: '',
+				brandingId: 0,
 			},
 			content = ''
 		) {

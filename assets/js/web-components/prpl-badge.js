@@ -13,7 +13,7 @@
 customElements.define(
 	'prpl-badge',
 	class extends HTMLElement {
-		constructor( badgeId, brandingId = '' ) {
+		constructor( badgeId, brandingId = 0 ) {
 			// Get parent class properties
 			super();
 
