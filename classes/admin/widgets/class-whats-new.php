@@ -55,7 +55,7 @@ final class Whats_New extends Widget {
 		// Transient expired, fetch new feed.
 		if ( $feed_data['expires'] < \time() ) {
 			// Get the feed using the REST API.
-			$response = \wp_remote_get( \progress_planner()->get_remote_server_root_url() . '/wp-json/wp/v2/posts/?per_page=2' );
+			$response = \wp_remote_get( \progress_planner()->get_ui__branding()->get_blog_feed_url() . '/wp-json/wp/v2/posts/?per_page=2' );
 
 			if ( 200 !== \wp_remote_retrieve_response_code( $response ) ) {
 				// If we cant fetch the feed, we will try again later.

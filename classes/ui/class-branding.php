@@ -307,4 +307,15 @@ final class Branding {
 
 		return $default_value;
 	}
+
+	/**
+	 * Get the blog-feed URL.
+	 *
+	 * @return string
+	 */
+	public function get_blog_feed_url(): string {
+		return empty( $this->get_api_data() ) || ! isset( $this->get_api_data()['acf']['blog_feed_url'] )
+			? \progress_planner()->get_remote_server_root_url()
+			: $this->get_api_data()['acf']['blog_feed_url'];
+	}
 }
