@@ -192,7 +192,7 @@
 
 	.prpl-widget-title {
 		padding: 0.5rem 1rem;
-		border-radius: 0.5rem;
+		border-radius: var(--prpl-border-radius);
 		background: var(--prpl-background-orange);
 	}
 
@@ -382,7 +382,7 @@
 			padding: 0.75rem;
 			color: #854d0e;
 			font-size: var(--prpl-font-size-small);
-			border-radius: 6px;
+			border-radius: var(--prpl-border-radius-small);
 			background-color: #fefce8;
 
 			.prpl-note-icon {
@@ -428,7 +428,7 @@
 			padding: 1rem; /* WIP */
 			width: 100%;
 			min-width: 300px; /* WIP */
-			border-radius: 6px;
+			border-radius: var(--prpl-border-radius-small);
 			border: 1px solid var(--prpl-color-gray-2);
 		}
 
@@ -452,7 +452,7 @@
 				top: 0;
 				left: 0;
 				z-index: -1;
-				border-radius: 6px;
+				border-radius: var(--prpl-border-radius-small);
 				transition: all 0.25s ease-in-out;
 			}
 
@@ -473,7 +473,7 @@
 		textarea {
 			width: 100%;
 			min-height: 100px;
-			border-radius: 6px;
+			border-radius: var(--prpl-border-radius-small);
 			box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.05);
 			border: 1px solid var(--prpl-color-gray-2);
 		}
@@ -529,7 +529,7 @@
 
 				.prpl-custom-control {
 					border: 1px solid var(--prpl-input-gray);
-					border-radius: 6px;
+					border-radius: var(--prpl-border-radius-small);
 					background: #fff;
 				}
 
