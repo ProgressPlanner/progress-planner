@@ -15,13 +15,6 @@ use Progress_Planner\Utils\Cache;
 final class Whats_New extends Widget {
 
 	/**
-	 * The cache key.
-	 *
-	 * @var string
-	 */
-	const CACHE_KEY = 'blog_feed';
-
-	/**
 	 * The widget ID.
 	 *
 	 * @var string
@@ -34,13 +27,13 @@ final class Whats_New extends Widget {
 	 * @return array
 	 */
 	public function get_blog_feed() {
-		$feed_data = \progress_planner()->get_utils__cache()->get( self::CACHE_KEY );
+		$feed_data = \progress_planner()->get_utils__cache()->get( $this->get_cache_key() );
 
 		// Migrate old feed to new format.
 		if ( \is_array( $feed_data ) && ! isset( $feed_data['expires'] ) && ! isset( $feed_data['feed'] ) ) {
 			$feed_data = [
 				'feed'    => $feed_data,
-				'expires' => \get_option( '_transient_timeout_' . Cache::CACHE_PREFIX . self::CACHE_KEY, 0 ),
+				'expires' => \get_option( '_transient_timeout_' . Cache::CACHE_PREFIX . $this->get_cache_key(), 0 ),
 			];
 		}
 
@@ -82,9 +75,18 @@ final class Whats_New extends Widget {
 			}
 
 			// Transient uses 'expires' key to determine if it's expired.
-			\progress_planner()->get_utils__cache()->set( self::CACHE_KEY, $feed_data, 0 );
+			\progress_planner()->get_utils__cache()->set( $this->get_cache_key(), $feed_data, 0 );
 		}
 
 		return $feed_data['feed'];
+	}
+
+	/**
+	 * Get the cache key.
+	 *
+	 * @return string
+	 */
+	public function get_cache_key() {
+		return 'blog_feed_' . md5( \progress_planner()->get_ui__branding()->get_blog_feed_url() );
 	}
 }
