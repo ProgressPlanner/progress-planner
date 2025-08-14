@@ -136,9 +136,7 @@ abstract class Tasks_Interactive extends Tasks {
 	 * @return void
 	 */
 	public function print_popover_instructions() {
-		?>
-		<p><?php echo \wp_kses_post( $this->get_description() ); ?></p>
-		<?php
+		echo '<p>' . \wp_kses_post( $this->get_description() ) . '</p>';
 	}
 
 	/**

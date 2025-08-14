@@ -57,15 +57,9 @@ const prplInteractiveTaskFormListener = {
 					if ( ! postId ) {
 						return;
 					}
+
+					// This will trigger the celebration event (confetti) as well.
 					prplSuggestedTask.maybeComplete( postId );
-					taskEl.setAttribute( 'data-task-action', 'celebrate' );
-					document.dispatchEvent(
-						new CustomEvent( 'prpl/celebrateTasks', {
-							detail: {
-								element: taskEl,
-							},
-						} )
-					);
 				} );
 			} );
 		} );
@@ -94,15 +88,9 @@ const prplInteractiveTaskFormListener = {
 			if ( ! postId ) {
 				return;
 			}
+
+			// This will trigger the celebration event (confetti) as well.
 			prplSuggestedTask.maybeComplete( postId );
-			taskEl.setAttribute( 'data-task-action', 'celebrate' );
-			document.dispatchEvent(
-				new CustomEvent( 'prpl/celebrateTasks', {
-					detail: {
-						element: taskEl,
-					},
-				} )
-			);
 		} );
 	},
 
@@ -112,6 +100,7 @@ const prplInteractiveTaskFormListener = {
 		settingPath = false,
 		popoverId,
 		settingCallbackValue = ( settingValue ) => settingValue,
+		action = 'prpl_interactive_task_submit',
 	} = {} ) => {
 		const formElement = document.querySelector( `#${ popoverId } form` );
 
@@ -131,7 +120,7 @@ const prplInteractiveTaskFormListener = {
 			progressPlannerAjaxRequest( {
 				url: progressPlanner.ajaxUrl,
 				data: {
-					action: 'prpl_interactive_task_submit',
+					action,
 					_ajax_nonce: progressPlanner.nonce,
 					post_id: taskId,
 					setting,
@@ -153,15 +142,9 @@ const prplInteractiveTaskFormListener = {
 				if ( ! postId ) {
 					return;
 				}
+
+				// This will trigger the celebration event (confetti) as well.
 				prplSuggestedTask.maybeComplete( postId );
-				taskEl.setAttribute( 'data-task-action', 'celebrate' );
-				document.dispatchEvent(
-					new CustomEvent( 'prpl/celebrateTasks', {
-						detail: {
-							element: taskEl,
-						},
-					} )
-				);
 			} );
 		} );
 	},

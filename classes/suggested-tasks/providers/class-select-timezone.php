@@ -34,6 +34,15 @@ class Select_Timezone extends Tasks_Interactive {
 	protected $is_dismissable = true;
 
 	/**
+	 * Initialize the task.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		\add_action( 'wp_ajax_prpl_interactive_task_submit_select-timezone', [ $this, 'handle_interactive_task_specific_submit' ] );
+	}
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -69,7 +78,7 @@ class Select_Timezone extends Tasks_Interactive {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \esc_html__( 'Set site timezone to ensure scheduled posts and pages are published at desired time.', 'progress-planner' );
+		return \esc_html__( 'Setting the time zone correctly on your site is valuable. By setting the correct time zone, you ensure scheduled tasks happen exactly when you want them to happen. To correctly account for daylight savings\', we recommend you use the city-based time zone instead of the UTC offset (e.g. Amsterdam or London).', 'progress-planner' );
 	}
 
 	/**
@@ -94,9 +103,9 @@ class Select_Timezone extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_instructions() {
-		?>
-		<p><?php \esc_html_e( 'Set site timezone to ensure scheduled posts and pages are published at desired time.', 'progress-planner' ); ?></p>
-		<?php
+		echo '<p>';
+		\esc_html_e( 'Setting the time zone correctly on your site is valuable. By setting the correct time zone, you ensure scheduled tasks happen exactly when you want them to happen. To correctly account for daylight savings\', we recommend you use the city-based time zone instead of the UTC offset (e.g. Amsterdam or London).', 'progress-planner' );
+		echo '</p>';
 	}
 
 	/**
@@ -105,8 +114,9 @@ class Select_Timezone extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		$current_offset = \get_option( 'gmt_offset' );
-		$tzstring       = \get_option( 'timezone_string' );
+		$current_offset     = \get_option( 'gmt_offset' );
+		$tzstring           = \get_option( 'timezone_string' );
+		$was_tzstring_saved = '' !== $tzstring || '0' !== $current_offset ? 'true' : 'false';
 
 		// Remove old Etc mappings. Fallback to gmt_offset.
 		if ( str_contains( $tzstring, 'Etc/GMT' ) ) {
@@ -124,7 +134,7 @@ class Select_Timezone extends Tasks_Interactive {
 		}
 		?>
 		<label>
-			<select id="timezone" name="timezone">
+			<select id="timezone" name="timezone" data-timezone-saved="<?php echo \esc_attr( $was_tzstring_saved ); ?>">
 				<?php echo \wp_timezone_choice( $tzstring, \get_user_locale() ); ?>
 			</select>
 		</label>
@@ -132,5 +142,73 @@ class Select_Timezone extends Tasks_Interactive {
 			<?php \esc_html_e( 'Set site timezone', 'progress-planner' ); ?>
 		</button>
 		<?php
+	}
+
+	/**
+	 * Handle the interactive task submit.
+	 *
+	 * This is only for interactive tasks that change non-core settings.
+	 * The $_POST data is expected to be:
+	 * - setting: (string) The setting to update.
+	 * - value: (mixed) The value to update the setting to.
+	 * - setting_path: (array) The path to the setting to update.
+	 *                         Use an empty array if the setting is not nested.
+	 *                         If the value is nested, use an array of keys.
+	 *                         Example: [ 'a', 'b', 'c' ] will update the value of $option['a']['b']['c'].
+	 * - nonce: (string) The nonce.
+	 *
+	 * @return void
+	 */
+	public function handle_interactive_task_specific_submit() {
+		// Check the nonce.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
+
+		if ( ! isset( $_POST['setting'] ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing setting.', 'progress-planner' ) ] );
+		}
+
+		if ( ! isset( $_POST['value'] ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing value.', 'progress-planner' ) ] );
+		}
+
+		if ( ! isset( $_POST['setting_path'] ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing setting path.', 'progress-planner' ) ] );
+		}
+
+		$timezone_string = \sanitize_text_field( \wp_unslash( $_POST['value'] ) );
+
+		if ( empty( $timezone_string ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid timezone.', 'progress-planner' ) ] );
+		}
+
+		$update_options = false;
+
+		// Map UTC+- timezones to gmt_offsets and set timezone_string to empty.
+		if ( preg_match( '/^UTC[+-]/', $timezone_string ) ) {
+			// Set the gmt_offset to the value of the timezone_string, strip the UTC prefix.
+			$gmt_offset = preg_replace( '/UTC\+?/', '', $timezone_string );
+
+			// Reset the timezone_string to empty.
+			$timezone_string = '';
+
+			$update_options = true;
+		} elseif ( in_array( $timezone_string, \timezone_identifiers_list( \DateTimeZone::ALL_WITH_BC ), true ) ) {
+			// $timezone_string is already set, reset the value for $gmt_offset.
+			$gmt_offset = '';
+
+			$update_options = true;
+		}
+
+		if ( $update_options ) {
+			\update_option( 'timezone_string', $timezone_string );
+			\update_option( 'gmt_offset', $gmt_offset );
+
+			// We're not checking for the return value of the update_option calls, because it will return false if the value is the same (for example if gmt_offset is already set to '').
+			\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
+		}
+
+		\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to update setting.', 'progress-planner' ) ] );
 	}
 }

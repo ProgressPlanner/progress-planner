@@ -104,18 +104,14 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_instructions() {
-		?>
-		<p>
-		<?php
+		echo '<p>';
 		\printf(
 			/* translators: %d is the number of comments per page, %s is the "recommend to disable comment pagination" link */
 			\esc_html__( 'When comment pagination is enabled, your site creates a new page for every %1$d comments. This is not helping your website in search engines, and can break up the ongoing conversation. That\'s why we %2$s.', 'progress-planner' ),
 			(int) \get_option( 'comments_per_page' ),
 			'<a href="https://prpl.fyi/disable-comment-pagination" target="_blank">' . \esc_html__( 'recommend to disable comment pagination', 'progress-planner' ) . '</a>'
 		);
-		?>
-		</p>
-		<?php
+		echo '</p>';
 	}
 
 	/**
