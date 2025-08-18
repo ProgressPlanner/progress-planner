@@ -355,7 +355,13 @@ class Unpublished_Content extends Tasks {
 
 		$data = $task->get_data();
 
-		return $data && isset( $data['target_post_id'] )
-			&& 'publish' === \get_post_status( $data['target_post_id'] );
+		if ( ! $data || ! isset( $data['target_post_id'] ) ) {
+			return false;
+		}
+
+		$post_status = \get_post_status( $data['target_post_id'] );
+
+		// If the post status is publish, trash or false (post was deleted), the task is completed.
+		return ( 'publish' === $post_status || 'trash' === $post_status || false === $post_status );
 	}
 }
