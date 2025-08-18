@@ -1,10 +1,36 @@
+= 1.8.0 =
+
+Bugs we fixed:
+* Not being able to see contents of the interactive task popover when viewport is resized on small screens.
+
 = 1.7.0 =
+
+Added these recommendations from Ravi:
+* Select site timezone.
+* Select site locale.
+* Disable comment pagination.
+* Check unpublished content.
+
+Following recommendations are now interactive:
+* Set tagline.
+* Disable comments.
+* Delete the "Hello World!" post.
+* Delete "Sample Page".
+* Select site timezone.
+* Select site locale.
 
 Bugs we fixed:
 
 * Fix issue where "Perform all updates" task was incorrectly marked as completed.
 * Prevent new lines to be added when user task title is edited.
 
+Enhancements:
+
+* Styling improvements
+* Refactored charts
+* Change the link of the "Rename uncategorized" task to the taxonomy-term edit screen instead of the taxonomy terms list
+* Check tasks when snooze period is over
+* Added a plugin-installer component for recommendations
 
 = 1.6.3 =
 

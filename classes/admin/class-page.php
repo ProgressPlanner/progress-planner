@@ -280,6 +280,7 @@ class Page {
 
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/admin' );
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-tooltip' );
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-install-plugin' );
 
 		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
 			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/settings-page' );
