@@ -18,7 +18,7 @@ final class Branding {
 	 * @var array<string, int>
 	 */
 	const BRANDING_IDS = [
-		// TODO: Change this to the default value of 4958.
+		// TODO: Change this to the default value of 0.
 		'default' => 5159,
 	];
 
@@ -62,6 +62,10 @@ final class Branding {
 	 * @return array
 	 */
 	public function get_api_data(): array {
+		if ( 0 === $this->get_branding_id() ) {
+			return [];
+		}
+
 		$response = $this->get_remote_data(
 			\progress_planner()->get_remote_server_root_url() . '/wp-json/wp/v2/pp-branding/' . $this->get_branding_id()
 		);
