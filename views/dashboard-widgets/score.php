@@ -76,3 +76,12 @@ use Progress_Planner\Badges\Monthly;
 		</div>
 	</div>
 <?php endif; ?>
+
+<?php
+	/**
+	 * Fires after the score widget is rendered.
+	 *
+	 * @since 1.7.1
+	 */
+	\do_action( 'progress_planner_admin_dashboard_widget_score_after' );
+?>
