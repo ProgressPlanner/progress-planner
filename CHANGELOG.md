@@ -1,3 +1,8 @@
+= 1.8.0 =
+
+Bugs we fixed:
+* Not being able to see contents of the interactive task popover when viewport is resized on small screens.
+
 = 1.7.0 =
 
 Added these recommendations from Ravi:
