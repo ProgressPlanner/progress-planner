@@ -155,6 +155,9 @@ class Base {
 			$this->get_wp_cli__get_stats_command();
 			$this->get_wp_cli__task_command();
 		}
+
+		// Init the enqueue class.
+		$this->get_admin__enqueue()->init();
 	}
 
 	/**
