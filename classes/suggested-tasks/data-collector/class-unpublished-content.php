@@ -78,7 +78,7 @@ class Unpublished_Content extends Base_Data_Collector {
 		$args = [
 			'post_type'      => \progress_planner()->get_settings()->get_post_types_names(),
 			'posts_per_page' => static::POSTS_TO_COLLECT,
-			'post_status'    => [ 'draft', 'pending' ],
+			'post_status'    => [ 'draft', 'auto-draft' ],
 			'orderby'        => 'modified',
 			'order'          => 'ASC',
 			'fields'         => 'ids',
