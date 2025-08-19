@@ -13,6 +13,13 @@ namespace Progress_Planner;
 class Page_Types {
 
 	/**
+	 * The page types.
+	 *
+	 * @var array
+	 */
+	public static $page_types = null;
+
+	/**
 	 * The taxonomy name.
 	 *
 	 * @var string
@@ -145,9 +152,8 @@ class Page_Types {
 	 * @return array
 	 */
 	public function get_page_types() {
-		static $page_types;
-		if ( null !== $page_types ) {
-			return $page_types;
+		if ( null !== static::$page_types ) {
+			return static::$page_types;
 		}
 
 		$terms = \get_terms(
@@ -158,13 +164,13 @@ class Page_Types {
 		);
 
 		if ( ! $terms || \is_wp_error( $terms ) ) {
-			$page_types = [];
-			return $page_types;
+			static::$page_types = [];
+			return static::$page_types;
 		}
 
-		$page_types = [];
+		static::$page_types = [];
 		foreach ( $terms as $term ) {
-			$page_types[] = [
+			static::$page_types[] = [
 				'id'          => $term->term_id,
 				'slug'        => $term->slug,
 				'title'       => $term->name,
@@ -172,7 +178,7 @@ class Page_Types {
 			];
 		}
 
-		return $page_types;
+		return static::$page_types;
 	}
 
 	/**
