@@ -114,14 +114,12 @@ https://youtu.be/e1bmxZYyXFY
 
 Bugs we fixed:
 
-* Fix weird popover behaviour on small screens
+* Fix weird interactive task popover behaviour on small screens
 * Fix missing pages (page types) from the Settings screen
-* Clear WP API model schema
+* Clear WP API model schema cache in session storage
 * Make interactive tasks work on WP dashboard screen
-* Exclude 'gblocks_pattern_collections' taxonomy terms from "Remove term" task
-* Improve check for "Unpublished content" task
-* One more check improvement for "Unpublished content" task
 * Exclude taxonomies which are marked as not indexable in Yoast SEO
+* Improve completed task check for "Unpublished content" task
 
 
 = 1.7.0 =
