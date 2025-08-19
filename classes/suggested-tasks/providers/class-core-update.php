@@ -34,6 +34,13 @@ class Core_Update extends Tasks {
 	protected const CAPABILITY = 'update_core';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/perform-all-updates';
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -82,11 +89,7 @@ class Core_Update extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %s:<a href="http://prpl.fyi/perform-all-updates" target="_blank">See why we recommend this</a> link */
-			\esc_html__( 'Regular updates improve security and performance. %s.', 'progress-planner' ),
-			'<a href="http://prpl.fyi/perform-all-updates" target="_blank">' . \esc_html__( 'See why we recommend this', 'progress-planner' ) . '</a>'
-		);
+		return \esc_html__( 'Regular updates improve security and performance.', 'progress-planner' );
 	}
 
 	/**

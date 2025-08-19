@@ -314,19 +314,20 @@ class Content_Review extends Tasks {
 			}
 
 			$task_to_inject[] = [
-				'task_id'          => $this->get_task_id( [ 'target_post_id' => $task_data['target_post_id'] ] ),
-				'provider_id'      => $this->get_provider_id(),
-				'category'         => $this->get_provider_category(),
-				'target_post_id'   => $task_data['target_post_id'],
-				'target_post_type' => $task_data['target_post_type'],
-				'date'             => \gmdate( 'YW' ),
-				'post_title'       => $this->get_title_with_data( $task_data ),
-				'description'      => $this->get_description_with_data( $task_data ),
-				'url'              => $this->get_url_with_data( $task_data ),
-				'url_target'       => $this->get_url_target(),
-				'dismissable'      => $this->is_dismissable(),
-				'snoozable'        => $this->is_snoozable,
-				'points'           => $this->get_points(),
+				'task_id'           => $this->get_task_id( [ 'target_post_id' => $task_data['target_post_id'] ] ),
+				'provider_id'       => $this->get_provider_id(),
+				'category'          => $this->get_provider_category(),
+				'target_post_id'    => $task_data['target_post_id'],
+				'target_post_type'  => $task_data['target_post_type'],
+				'date'              => \gmdate( 'YW' ),
+				'post_title'        => $this->get_title_with_data( $task_data ),
+				'description'       => $this->get_description_with_data( $task_data ),
+				'url'               => $this->get_url_with_data( $task_data ),
+				'url_target'        => $this->get_url_target(),
+				'dismissable'       => $this->is_dismissable(),
+				'snoozable'         => $this->is_snoozable,
+				'points'            => $this->get_points(),
+				'external_link_url' => $this->get_external_link_url(),
 			];
 		}
 

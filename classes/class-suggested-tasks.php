@@ -287,43 +287,48 @@ class Suggested_Tasks {
 		);
 
 		$rest_meta_fields = [
-			'prpl_points'      => [
+			'prpl_points'            => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_task_id'     => [
+			'prpl_task_id'           => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_url'         => [
+			'prpl_url'               => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_url_target'  => [
+			'prpl_url_target'        => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_dismissable' => [
+			'prpl_dismissable'       => [
 				'type'         => 'boolean',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_snoozable'   => [
+			'prpl_snoozable'         => [
 				'type'         => 'boolean',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'menu_order'       => [
+			'menu_order'             => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
 				'default'      => 0,
 			],
-			'prpl_popover_id'  => [
+			'prpl_popover_id'        => [
+				'type'         => 'string',
+				'single'       => true,
+				'show_in_rest' => true,
+			],
+			'prpl_external_link_url' => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,

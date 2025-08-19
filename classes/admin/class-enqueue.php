@@ -238,6 +238,8 @@ class Enqueue {
 					]
 				);
 
+				$tasks_providers = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers();
+
 				$localize_data = [
 					'name' => 'prplSuggestedTask',
 					'data' => [
@@ -390,6 +392,7 @@ class Enqueue {
 			'watchVideo'                   => \esc_html__( 'Watch video', 'progress-planner' ),
 			'disabledRRCheckboxTooltip'    => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),
 			'opensInNewWindow'             => \esc_html__( 'Opens in new window', 'progress-planner' ),
+			'whyIsThisImportant'           => \esc_html__( 'Why is this important?', 'progress-planner' ),
 			/* translators: %s: The plugin name. */
 			'installPlugin'                => \esc_html__( 'Install and activate the "%s" plugin', 'progress-planner' ),
 			/* translators: %s: The plugin name. */

@@ -60,6 +60,13 @@ abstract class Tasks implements Tasks_Interface {
 	protected const DEPENDENCIES = [];
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = '';
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -253,6 +260,15 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function get_provider_id() {
 		return static::PROVIDER_ID;
+	}
+
+	/**
+	 * Get external link URL.
+	 *
+	 * @return string
+	 */
+	public function get_external_link_url() {
+		return static::EXTERNAL_LINK_URL;
 	}
 
 	/**
@@ -518,20 +534,21 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function get_task_details( $task_data = [] ) {
 		return [
-			'task_id'      => $this->get_task_id( $task_data ),
-			'provider_id'  => $this->get_provider_id(),
-			'post_title'   => $this->get_title_with_data( $task_data ),
-			'description'  => $this->get_description_with_data( $task_data ),
-			'parent'       => $this->get_parent(),
-			'priority'     => $this->get_priority(),
-			'category'     => $this->get_provider_category(),
-			'points'       => $this->get_points(),
-			'date'         => \gmdate( 'YW' ),
-			'url'          => $this->get_url_with_data( $task_data ),
-			'url_target'   => $this->get_url_target(),
-			'link_setting' => $this->get_link_setting(),
-			'dismissable'  => $this->is_dismissable(),
-			'snoozable'    => $this->is_snoozable(),
+			'task_id'           => $this->get_task_id( $task_data ),
+			'provider_id'       => $this->get_provider_id(),
+			'post_title'        => $this->get_title_with_data( $task_data ),
+			'description'       => $this->get_description_with_data( $task_data ),
+			'parent'            => $this->get_parent(),
+			'priority'          => $this->get_priority(),
+			'category'          => $this->get_provider_category(),
+			'points'            => $this->get_points(),
+			'date'              => \gmdate( 'YW' ),
+			'url'               => $this->get_url_with_data( $task_data ),
+			'url_target'        => $this->get_url_target(),
+			'link_setting'      => $this->get_link_setting(),
+			'dismissable'       => $this->is_dismissable(),
+			'snoozable'         => $this->is_snoozable(),
+			'external_link_url' => $this->get_external_link_url(),
 		];
 	}
 

@@ -43,6 +43,13 @@ class Content_Create extends Tasks {
 	protected const DATA_COLLECTOR_CLASS = Last_Published_Post_Data_Collector::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/valuable-content';
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -72,19 +79,6 @@ class Content_Create extends Tasks {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Create valuable content', 'progress-planner' );
-	}
-
-	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Time to add more valuable content to your site! Check our blog for inspiration. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/valuable-content" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
 	}
 
 	/**

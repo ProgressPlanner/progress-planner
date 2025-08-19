@@ -26,6 +26,7 @@ prplSuggestedTask = {
 		markAsComplete: prplL10n( 'markAsComplete' ),
 		taskDelete: prplL10n( 'taskDelete' ),
 		delete: prplL10n( 'delete' ),
+		whyIsThisImportant: prplL10n( 'whyIsThisImportant' ),
 	},
 
 	/**

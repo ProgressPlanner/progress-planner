@@ -27,6 +27,13 @@ class Permalink_Structure extends Tasks {
 	protected const PROVIDER_ID = 'core-permalink-structure';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/change-default-permalink-structure';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -77,11 +84,7 @@ class Permalink_Structure extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %1$s <a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">We recommend</a> link */
-			\esc_html__( 'On install, WordPress sets the permalink structure to a format that is not SEO-friendly. %1$s changing it.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
-		);
+		return \esc_html__( 'On install, WordPress sets the permalink structure to a format that is not SEO-friendly. We recommend changing it.', 'progress-planner' );
 	}
 
 	/**

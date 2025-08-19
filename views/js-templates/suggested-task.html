@@ -119,6 +119,12 @@
 					</span>
 				<# } #>
 
+				<# if ( data.post.meta.prpl_external_link_url ) { #>
+					<span class="tooltip-action">
+						<a class="prpl-tooltip-action-text" href="{{ data.post.meta.prpl_external_link_url }}" target="_blank">{{ data.l10n.whyIsThisImportant }}</a>
+					</span>
+				<# } #>
+
 				<# if ( 'user' === categorySlug ) { #>
 					<span class="tooltip-action">
 						<button type="button" class="prpl-suggested-task-button trash" data-post-id="{{ data.post.id }}" title="{{ data.l10n.delete }}" onclick="prplSuggestedTask.trash( {{ data.post.id }} );">

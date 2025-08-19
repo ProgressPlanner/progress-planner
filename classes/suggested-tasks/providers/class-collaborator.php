@@ -90,19 +90,20 @@ class Collaborator extends Tasks {
 			return \wp_parse_args(
 				$task,
 				[
-					'task_id'      => '',
-					'title'        => '',
-					'parent'       => 0,
-					'provider_id'  => $this->get_provider_id(),
-					'category'     => $this->get_provider_category(),
-					'priority'     => 'medium',
-					'points'       => 0,
-					'url'          => '',
-					'url_target'   => '_self',
-					'description'  => '',
-					'link_setting' => [],
-					'dismissable'  => true,
-					'snoozable'    => false,
+					'task_id'           => '',
+					'title'             => '',
+					'parent'            => 0,
+					'provider_id'       => $this->get_provider_id(),
+					'category'          => $this->get_provider_category(),
+					'priority'          => 'medium',
+					'points'            => 0,
+					'url'               => '',
+					'url_target'        => '_self',
+					'description'       => '',
+					'link_setting'      => [],
+					'dismissable'       => true,
+					'snoozable'         => false,
+					'external_link_url' => $this->get_external_link_url(),
 				]
 			);
 		}

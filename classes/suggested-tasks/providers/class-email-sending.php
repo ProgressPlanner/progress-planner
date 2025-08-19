@@ -283,6 +283,7 @@ class Email_Sending extends Tasks_Interactive {
 			'popovers/email-sending.php',
 			[
 				'prpl_popover_id'                      => static::POPOVER_ID,
+				'prpl_external_link_url'               => $this->get_external_link_url(),
 				'prpl_provider_id'                     => $this->get_provider_id(),
 				'prpl_email_subject'                   => $this->email_subject,
 				'prpl_email_error'                     => $this->email_error,

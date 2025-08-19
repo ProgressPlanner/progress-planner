@@ -34,6 +34,13 @@ class Php_Version extends Tasks {
 	protected const RECOMMENDED_PHP_VERSION = '8.2';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/update-php-version';
+
+	/**
 	 * Get the title.
 	 *
 	 * @return string
@@ -50,10 +57,9 @@ class Php_Version extends Tasks {
 	 */
 	protected function get_description( $task_data = [] ) {
 		return \sprintf(
-			/* translators: %1$s: php version, %2$s: <a href="https://prpl.fyi/update-php-version" target="_blank">We recommend</a> link. %3$s: minimum PHP version recommended. */
-			\esc_html__( 'Your site is running on PHP version %1$s. %2$s updating to PHP version %3$s or higher.', 'progress-planner' ),
+			/* translators: %1$s: php version, %2$s: minimum PHP version recommended. */
+			\esc_html__( 'Your site is running on PHP version %1$s. We recommend updating to PHP version %2$s or higher.', 'progress-planner' ),
 			\phpversion(),
-			'<a href="https://prpl.fyi/update-php-version" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
 			\esc_html( self::RECOMMENDED_PHP_VERSION )
 		);
 	}

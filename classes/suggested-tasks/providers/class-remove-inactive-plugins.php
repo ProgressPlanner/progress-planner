@@ -36,6 +36,13 @@ class Remove_Inactive_Plugins extends Tasks {
 	protected const DATA_COLLECTOR_CLASS = Inactive_Plugins_Data_Collector::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/remove-inactive-plugins';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -59,11 +66,7 @@ class Remove_Inactive_Plugins extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %1$s <a href="https://prpl.fyi/remove-inactive-plugins" target="_blank">removing any plugins</a> link */
-			\esc_html__( 'You have inactive plugins. Consider %1$s that are not activated to free up resources, and improve security.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/remove-inactive-plugins" target="_blank">' . \esc_html__( 'removing any plugins', 'progress-planner' ) . '</a>',
-		);
+		return \esc_html__( 'You have inactive plugins. Consider removing any plugins that are not activated to free up resources, and improve security.', 'progress-planner' );
 	}
 
 	/**
