@@ -7,6 +7,10 @@
 	position: relative;
 	line-height: 1.5;
 
+	&:nth-child(odd) {
+		background-color: #f6f7f9;
+	}
+
 	.prpl-suggested-task-title-wrapper {
 		display: flex;
 		align-items: center;
@@ -17,6 +21,18 @@
 	.prpl-suggested-task-actions-wrapper {
 		grid-column: 2 / span 1;
 		display: flex;
+	}
+
+	.prpl-suggested-task-checkbox {
+		flex-shrink: 0; /* Prevent shrinking on mobile */
+	}
+
+	/* If task has disabled checkbox it's title should be italic. */
+	&:has(.prpl-suggested-task-disabled-checkbox-tooltip) {
+
+		h3 {
+			font-style: italic;
+		}
 	}
 
 	h3 {
@@ -77,6 +93,44 @@
 
 	.tooltip-actions {
 		visibility: hidden;
+		padding-top: 2px;
+		gap: 0.4rem;
+
+		/* Style for "hover" links. */
+		.tooltip-action {
+			display: inline-flex;
+			position: relative;
+
+			&:not(:first-child) {
+				padding-left: 0.4rem; /* same as gap */
+
+				&::before {
+					position: absolute;
+					top: 50%;
+					transform: translateY(-50%);
+					left: 0;
+
+					content: "";
+					display: inline-block;
+					width: 1px;
+					background: var(--prpl-color-gray-5);
+					height: 0.75rem;
+				}
+			}
+
+			.prpl-tooltip-action-text {
+				line-height: 1.2;
+				font-size: var(--prpl-font-size-small);
+				color: var(--prpl-color-link);
+			}
+
+			/* we dont use icons here anymore */
+			button {
+				padding: 0;
+				line-height: 1;
+			}
+
+		}
 	}
 
 	&:hover,
@@ -236,6 +290,25 @@
 
 		p:first-child {
 			margin-top: 0;
+		}
+	}
+
+	/* Disabled checkbox styles. */
+	.prpl-suggested-task-disabled-checkbox-tooltip,
+	.tooltip-actions {
+
+		& > button {
+			padding: 0;
+		}
+
+		.prpl-tooltip {
+			transform: translate(-20%, calc(100% + 10px));
+
+			&::after {
+				left: 25px;
+				right: auto;
+				transform: translate(-5px, -10px) rotate(90deg);
+			}
 		}
 	}
 }
