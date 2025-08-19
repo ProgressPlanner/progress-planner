@@ -355,7 +355,13 @@ class Unpublished_Content extends Tasks {
 
 		$data = $task->get_data();
 
-		return $data && isset( $data['target_post_id'] )
-			&& 'publish' === \get_post_status( $data['target_post_id'] );
+		if ( ! $data || ! isset( $data['target_post_id'] ) ) {
+			return false;
+		}
+
+		$post_status = \get_post_status( $data['target_post_id'] );
+
+		// If the post status is not draft or auto-draft (this includes (bool) false when the post was deleted), the task is completed.
+		return ( 'draft' !== $post_status && 'auto-draft' !== $post_status );
 	}
 }
