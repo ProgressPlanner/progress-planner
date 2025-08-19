@@ -176,6 +176,7 @@ class Suggested_Tasks_DB {
 				case 'points':
 				case 'prpl_points':
 				case 'prpl_available_at':
+				case 'prpl_popover_id':
 					$update_meta[ 'prpl_' . \str_replace( 'prpl_', '', (string) $key ) ] = $value;
 					break;
 

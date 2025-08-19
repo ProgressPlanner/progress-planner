@@ -48,6 +48,15 @@ class Enqueue {
 	];
 
 	/**
+	 * Init.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		\add_action( 'admin_head', [ $this, 'maybe_empty_session_storage' ], 1 );
+	}
+
+	/**
 	 * Enqueue script.
 	 *
 	 * @param string $handle        The handle of the script to enqueue.
@@ -397,6 +406,56 @@ class Enqueue {
 			'remindMeToReviewContentError'   => \esc_html__( 'Failed to set reminder. Please try again.', 'progress-planner' ),
 			'remindMeToReviewContentSetting' => \esc_html__( 'Setting reminder...', 'progress-planner' ),
 			'opensInNewWindow'               => \esc_html__( 'Opens in new window', 'progress-planner' ),
+			/* translators: %s: The plugin name. */
+			'installPlugin'                  => \esc_html__( 'Install and activate the "%s" plugin', 'progress-planner' ),
+			/* translators: %s: The plugin name. */
+			'activatePlugin'                 => \esc_html__( 'Activate plugin "%s"', 'progress-planner' ),
+			'installing'                     => \esc_html__( 'Installing...', 'progress-planner' ),
+			'installed'                      => \esc_html__( 'Installed', 'progress-planner' ),
+			'alreadyInstalled'               => \esc_html__( 'Already installed', 'progress-planner' ),
+			'installFailed'                  => \esc_html__( 'Install failed', 'progress-planner' ),
+			'activating'                     => \esc_html__( 'Activating...', 'progress-planner' ),
+			'activated'                      => \esc_html__( 'Activated', 'progress-planner' ),
+			'activateFailed'                 => \esc_html__( 'Activation failed', 'progress-planner' ),
 		];
+	}
+
+	/**
+	 * Maybe empty the session storage for the prpl_recommendations post type.
+	 * We need to do it early, before the WP API script reads the cached data from the browser.
+	 *
+	 * @return void
+	 */
+	public function maybe_empty_session_storage() {
+		$screen = get_current_screen();
+
+		if ( ! $screen ) {
+			return;
+		}
+
+		// Inject the script only on the Progress Planner Dashboard, Progress Planner Settings and the WordPress dashboard pages.
+		if ( 'toplevel_page_progress-planner' !== $screen->id && 'progress-planner_page_progress-planner-settings' !== $screen->id && 'dashboard' !== $screen->id ) {
+			return;
+		}
+		?>
+		<script type="text/javascript">
+			if ( 'sessionStorage' in window ) {
+				try {
+					for ( const key in sessionStorage ) {
+						if ( -1 < key.indexOf( 'wp-api-schema-model' ) ) {
+							const item = sessionStorage.getItem( key );
+							if (
+								-1 === item.indexOf( '/wp/v2/prpl_recommendations' )
+							) {
+								sessionStorage.removeItem( key );
+
+								break;
+							}
+						}
+					}
+				} catch ( er ) {}
+			}
+		</script>
+		<?php
 	}
 }
