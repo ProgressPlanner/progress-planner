@@ -70,6 +70,15 @@ class Archive_Format extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Disable', 'progress-planner' );
+	}
+
+	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array

@@ -65,6 +65,15 @@ class Organization_Logo extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Set logo', 'progress-planner' );
+	}
+
+	/**
 	 * Get external link URL.
 	 *
 	 * @return string

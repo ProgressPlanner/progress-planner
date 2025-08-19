@@ -73,6 +73,15 @@ class Site_Icon extends Tasks {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Go to the Settings page', 'progress-planner' );
+	}
+
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool

@@ -73,6 +73,15 @@ class Search_Engine_Visibility extends Tasks {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Change setting', 'progress-planner' );
+	}
+
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool

@@ -174,6 +174,15 @@ class Content_Review extends Tasks {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Review', 'progress-planner' );
+	}
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @param array $task_data The task data.

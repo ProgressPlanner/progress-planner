@@ -59,6 +59,15 @@ class Blog_Description extends Tasks_Interactive {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Set tagline', 'progress-planner' );
+	}
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string

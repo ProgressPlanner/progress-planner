@@ -88,6 +88,15 @@ class Set_Valuable_Post_Types extends Tasks {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Go to the settings page', 'progress-planner' );
+	}
+
+	/**
 	 * Check if the task should be added.
 	 * We add tasks only to users who have have completed "Fill the settings page" task
 	 * and have upgraded from v1.2 or have 'include_post_types' option empty.

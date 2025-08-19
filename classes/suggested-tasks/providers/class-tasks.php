@@ -163,6 +163,15 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return '';
+	}
+
+	/**
 	 * Get the task points.
 	 *
 	 * @return int
@@ -549,6 +558,7 @@ abstract class Tasks implements Tasks_Interface {
 			'dismissable'       => $this->is_dismissable(),
 			'snoozable'         => $this->is_snoozable(),
 			'external_link_url' => $this->get_external_link_url(),
+			'task_action_text'  => $this->get_task_action_text(),
 		];
 	}
 

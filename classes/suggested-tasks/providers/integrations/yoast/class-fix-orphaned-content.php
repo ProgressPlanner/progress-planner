@@ -98,6 +98,15 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Add internal links', 'progress-planner' );
+	}
+
+	/**
 	 * Get the URL.
 	 *
 	 * @param array $task_data The task data.

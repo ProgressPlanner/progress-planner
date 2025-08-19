@@ -174,6 +174,14 @@ class Email_Sending extends Tasks_Interactive {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Test email sending', 'progress-planner' );
+	}
+	/**
 	 * Enqueue the scripts.
 	 *
 	 * @param string $hook The current admin page.

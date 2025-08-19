@@ -118,6 +118,15 @@ class Hello_World extends Tasks_Interactive {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Delete', 'progress-planner' );
+	}
+
+	/**
 	 * Check if the task condition is satisfied.
 	 *
 	 * @return bool

@@ -333,6 +333,11 @@ class Suggested_Tasks {
 				'single'       => true,
 				'show_in_rest' => true,
 			],
+			'prpl_task_action_text'  => [
+				'type'         => 'string',
+				'single'       => true,
+				'show_in_rest' => true,
+			],
 		];
 
 		foreach ( $rest_meta_fields as $key => $field ) {

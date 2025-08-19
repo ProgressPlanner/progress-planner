@@ -28,7 +28,7 @@
 
 		<div class="prpl-suggested-task-title-wrapper">
 			<h3 style="width: 100%;">
-				<span <# if ( 'user' === categorySlug ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.preventEnterKey( event ); prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>><# if ( data.post.meta.prpl_popover_id ) { #><a href="#" role="button" onclick="document.getElementById('{{{ data.post.meta.prpl_popover_id }}}')?.showPopover()">{{{ data.post.title.rendered }}}</a><# } else if ( data.post.meta.prpl_url ) { #><a href="{{{ data.post.meta.prpl_url }}}" target="{{{ data.post.meta.prpl_url_target }}}">{{{ data.post.title.rendered }}}</a><# } else { #>{{{ data.post.title.rendered }}}<# } #></span>
+				<span <# if ( 'user' === categorySlug ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.preventEnterKey( event ); prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>>{{{ data.post.title.rendered }}}</span>
 			</h3>
 		</div>
 
@@ -57,6 +57,16 @@
 
 		<div class="prpl-suggested-task-actions-wrapper">
 			<div class="tooltip-actions">
+				<# if ( data.post.meta.prpl_task_action_text ) { #>
+					<span class="tooltip-action">
+						<# if ( data.post.meta.prpl_popover_id ) { #>
+							<a href="#" role="button" onclick="document.getElementById('{{{ data.post.meta.prpl_popover_id }}}')?.showPopover()">{{{ data.post.meta.prpl_task_action_text }}}</a>
+						<# } else if ( data.post.meta.prpl_url ) { #>
+							<a class="prpl-tooltip-action-text" href="{{{ data.post.meta.prpl_url }}}" target="{{{ data.post.meta.prpl_url_target }}}">{{{ data.post.meta.prpl_task_action_text }}}</a>
+						<# } #>
+					</span>
+				<# } #>
+
 				<# if ( data.post.meta.prpl_dismissable ) { #>
 					<span class="tooltip-action">
 						<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="complete" data-target="complete" title="{{ data.l10n.markAsComplete }}" onclick="prplSuggestedTask.maybeComplete( {{ data.post.id }} );">

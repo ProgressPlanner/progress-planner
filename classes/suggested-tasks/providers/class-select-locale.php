@@ -96,6 +96,15 @@ class Select_Locale extends Tasks_Interactive {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Select locale', 'progress-planner' );
+	}
+
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool

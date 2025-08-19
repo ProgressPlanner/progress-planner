@@ -118,4 +118,13 @@ class Content_Create extends Tasks {
 		// Add tasks if there are no posts published this week.
 		return \gmdate( 'YW' ) !== \gmdate( 'YW', \strtotime( $last_published_post_data['post_date'] ) );
 	}
+
+	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Create new post', 'progress-planner' );
+	}
 }

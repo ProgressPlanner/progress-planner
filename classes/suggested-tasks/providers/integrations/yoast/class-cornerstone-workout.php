@@ -133,6 +133,15 @@ class Cornerstone_Workout extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Run workout', 'progress-planner' );
+	}
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string

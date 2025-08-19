@@ -166,6 +166,15 @@ class Remove_Terms_Without_Posts extends Tasks {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Remove', 'progress-planner' );
+	}
+
+	/**
 	 * Get the URL.
 	 *
 	 * @param array $task_data The task data.
