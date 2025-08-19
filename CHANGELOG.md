@@ -9,6 +9,7 @@ Bugs we fixed:
 * Exclude taxonomies which are marked as not indexable in Yoast SEO
 * Improve completed task check for "Unpublished content" task
 * Fix "Delete the 'Sample Page' page" interactive task
+* Remove 3rd party plugin tasks if they are deactivated.
 
 = 1.7.0 =
 
