@@ -238,8 +238,6 @@ class Enqueue {
 					]
 				);
 
-				$tasks_providers = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers();
-
 				$localize_data = [
 					'name' => 'prplSuggestedTask',
 					'data' => [
