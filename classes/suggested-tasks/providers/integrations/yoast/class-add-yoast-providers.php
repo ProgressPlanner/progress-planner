@@ -26,6 +26,8 @@ class Add_Yoast_Providers {
 		if ( \function_exists( 'YoastSEO' ) ) {
 			\add_filter( 'progress_planner_suggested_tasks_providers', [ $this, 'add_providers' ], 11, 1 );
 			\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
+
+			\add_filter( 'progress_planner_exclude_public_taxonomies', [ $this, 'exclude_not_indexable_taxonomies' ] );
 		}
 	}
 
@@ -100,5 +102,21 @@ class Add_Yoast_Providers {
 			$providers,
 			$this->providers
 		);
+	}
+
+	/**
+	 * Exclude taxonomies which are marked as not indexable in Yoast SEO.
+	 *
+	 * @param array $exclude_taxonomies The taxonomies.
+	 * @return array
+	 */
+	public function exclude_not_indexable_taxonomies( $exclude_taxonomies ) {
+		foreach ( \YoastSEO()->helpers->taxonomy->get_public_taxonomies() as $taxonomy ) {
+			if ( ! \in_array( $taxonomy, $exclude_taxonomies, true ) && false === \YoastSEO()->helpers->taxonomy->is_indexable( $taxonomy ) ) {
+				$exclude_taxonomies[] = $taxonomy;
+			}
+		}
+
+		return $exclude_taxonomies;
 	}
 }

@@ -361,7 +361,7 @@ class Unpublished_Content extends Tasks {
 
 		$post_status = \get_post_status( $data['target_post_id'] );
 
-		// If the post status is publish, trash or false (post was deleted), the task is completed.
-		return ( 'publish' === $post_status || 'trash' === $post_status || false === $post_status );
+		// If the post status is not draft or auto-draft (this includes (bool) false when the post was deleted), the task is completed.
+		return ( 'draft' !== $post_status && 'auto-draft' !== $post_status );
 	}
 }
