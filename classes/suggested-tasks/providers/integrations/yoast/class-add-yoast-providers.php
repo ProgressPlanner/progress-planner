@@ -111,10 +111,7 @@ class Add_Yoast_Providers {
 	 * @return array
 	 */
 	public function exclude_not_indexable_taxonomies( $exclude_taxonomies ) {
-
-		$public_taxonomies = \YoastSEO()->helpers->taxonomy->get_public_taxonomies();
-
-		foreach ( $public_taxonomies as $taxonomy ) {
+		foreach ( \YoastSEO()->helpers->taxonomy->get_public_taxonomies() as $taxonomy ) {
 			if ( ! \in_array( $taxonomy, $exclude_taxonomies, true ) && false === \YoastSEO()->helpers->taxonomy->is_indexable( $taxonomy ) ) {
 				$exclude_taxonomies[] = $taxonomy;
 			}
