@@ -1,6 +1,6 @@
 <?php
 /**
- * Update class for version 1.5.0.
+ * Update class for version 1.6.1.
  *
  * @package Progress_Planner
  */
@@ -8,11 +8,11 @@
 namespace Progress_Planner\Update;
 
 /**
- * Update class for version 1.5.0.
+ * Update class for version 1.6.1.
  *
  * @package Progress_Planner
  */
-class Update_161 {
+class Update_161 extends Update {
 
 	const VERSION = '1.6.1';
 
@@ -39,7 +39,6 @@ class Update_161 {
 		$badges = \progress_planner()->get_settings()->get( 'badges', [] );
 
 		foreach ( $badges as $badge_id => $badge ) {
-
 			// We are only migrating monthly badges.
 			if ( 0 !== \strpos( $badge_id, 'monthly-' ) ) {
 				continue;

@@ -90,11 +90,13 @@ class Task {
 	 * @return void
 	 */
 	public function delete(): void {
-		$this->data = [];
 		// Delete only if the task is already saved in the database.
 		if ( $this->ID ) {
 			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $this->ID );
 		}
+
+		// Clear the data.
+		$this->data = [];
 	}
 
 	/**
@@ -130,11 +132,7 @@ class Task {
 	 * @return bool
 	 */
 	public function celebrate(): bool {
-		if ( ! $this->ID ) {
-			return false;
-		}
-
-		return \progress_planner()->get_suggested_tasks_db()->update_recommendation( $this->ID, [ 'post_status' => 'pending' ] );
+		return $this->ID && \progress_planner()->get_suggested_tasks_db()->update_recommendation( $this->ID, [ 'post_status' => 'pending' ] );
 	}
 
 	/**

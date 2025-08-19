@@ -199,11 +199,11 @@ class Update_Term_Description extends Tasks {
 			return [];
 		}
 
-		$data    = $this->get_data_collector()->collect();
+		$data    = $this->transform_collector_data( $this->get_data_collector()->collect() );
 		$task_id = $this->get_task_id(
 			[
-				'term_id'  => $data['term_id'],
-				'taxonomy' => $data['taxonomy'],
+				'target_term_id'  => $data['target_term_id'],
+				'target_taxonomy' => $data['target_taxonomy'],
 			]
 		);
 
@@ -214,15 +214,12 @@ class Update_Term_Description extends Tasks {
 		// Transform the data to match the task data structure.
 		$task_data = $this->modify_injection_task_data(
 			$this->get_task_details(
-				$this->transform_collector_data( $data )
+				$data
 			)
 		);
 
-		// Get the task post.
-		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
-
 		// Skip the task if it was already injected.
-		if ( $task_post ) {
+		if ( \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] ) ) {
 			return [];
 		}
 
@@ -282,13 +279,10 @@ class Update_Term_Description extends Tasks {
 		}
 
 		$this->completed_term_ids = [];
-		$tasks                    = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
-		if ( ! empty( $tasks ) ) {
-			foreach ( $tasks as $task ) {
-				if ( 'trash' === $task->post_status ) {
-					$this->completed_term_ids[] = $task->target_term_id;
-				}
+		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] ) as $task ) {
+			if ( 'trash' === $task->post_status ) {
+				$this->completed_term_ids[] = $task->target_term_id;
 			}
 		}
 

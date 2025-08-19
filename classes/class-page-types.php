@@ -13,6 +13,13 @@ namespace Progress_Planner;
 class Page_Types {
 
 	/**
+	 * The page types.
+	 *
+	 * @var array
+	 */
+	public static $page_types = null;
+
+	/**
 	 * The taxonomy name.
 	 *
 	 * @var string
@@ -145,9 +152,8 @@ class Page_Types {
 	 * @return array
 	 */
 	public function get_page_types() {
-		static $page_types;
-		if ( null !== $page_types ) {
-			return $page_types;
+		if ( null !== static::$page_types ) {
+			return static::$page_types;
 		}
 
 		$terms = \get_terms(
@@ -158,13 +164,13 @@ class Page_Types {
 		);
 
 		if ( ! $terms || \is_wp_error( $terms ) ) {
-			$page_types = [];
-			return $page_types;
+			static::$page_types = [];
+			return static::$page_types;
 		}
 
-		$page_types = [];
+		static::$page_types = [];
 		foreach ( $terms as $term ) {
-			$page_types[] = [
+			static::$page_types[] = [
 				'id'          => $term->term_id,
 				'slug'        => $term->slug,
 				'title'       => $term->name,
@@ -172,7 +178,7 @@ class Page_Types {
 			];
 		}
 
-		return $page_types;
+		return static::$page_types;
 	}
 
 	/**
@@ -356,7 +362,7 @@ class Page_Types {
 		$posts = $this->get_posts_by_type( 'page', 'homepage' );
 		$term  = \get_term_by( 'slug', 'homepage', self::TAXONOMY_NAME );
 
-		if ( ! $term || ! $term instanceof \WP_Term ) {
+		if ( ! $term ) {
 			return;
 		}
 
@@ -383,14 +389,14 @@ class Page_Types {
 	 *
 	 * Runs on post_updated hook.
 	 *
-	 * @param int      $post_id The post ID.
-	 * @param \WP_Post $post    The post object.
+	 * @param int           $post_id The post ID.
+	 * @param \WP_Post|null $post    The post object.
 	 *
 	 * @return void
 	 */
 	public function post_updated( $post_id, $post ) {
 		// Check if the post is set as a homepage.
-		if ( 'page' !== $post->post_type || 'publish' !== $post->post_status ) {
+		if ( ! $post || 'page' !== $post->post_type || 'publish' !== $post->post_status ) {
 			return;
 		}
 

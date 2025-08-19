@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.6.1
+Stable tag: 1.7.0
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -109,6 +109,63 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.7.1 =
+
+Bugs we fixed:
+
+* Fix weird popover behaviour on small screens
+* Fix missing pages (page types) from the Settings screen
+* Clear WP API model schema
+* Make interactive tasks work on WP dashboard screen
+* Exclude 'gblocks_pattern_collections' taxonomy terms from "Remove term" task
+* Improve check for "Unpublished content" task
+* One more check improvement for "Unpublished content" task
+* Exclude taxonomies which are marked as not indexable in Yoast SEO
+
+
+= 1.7.0 =
+
+Added these recommendations from Ravi:
+* Select site timezone.
+* Select site locale.
+* Disable comment pagination.
+* Check unpublished content.
+
+Following recommendations are now interactive:
+* Set tagline.
+* Disable comments.
+* Delete the "Hello World!" post.
+* Delete "Sample Page".
+* Select site timezone.
+* Select site locale.
+
+Bugs we fixed:
+
+* Fix issue where "Perform all updates" task was incorrectly marked as completed.
+* Prevent new lines to be added when user task title is edited.
+
+Enhancements:
+
+* Styling improvements
+* Refactored charts
+* Change the link of the "Rename uncategorized" task to the taxonomy-term edit screen instead of the taxonomy terms list
+* Check tasks when snooze period is over
+* Added a plugin-installer component for recommendations
+
+= 1.6.3 =
+
+Bugs we fixed:
+
+* Fixed a bug in the WP-CLI task-list command.
+* Fixed a bug in the post-editor when lessons cannot be retrieved.
+* Fixed a bug in the site-editor when using block themes, where the sidebar was instantiated on some servers.
+
+= 1.6.2 =
+
+Bugs we fixed:
+
+* Ensure that the Custom Post Type for Recommendations is not publicly queryable.
 
 = 1.6.1 =
 

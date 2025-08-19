@@ -34,6 +34,7 @@ final class Content_Activity extends Widget {
 				'count_callback' => function ( $activities, $date = null ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
 					return \count( $activities );
 				},
+				'return_data'    => [ 'label', 'score' ],
 			]
 		);
 	}

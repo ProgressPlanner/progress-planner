@@ -496,6 +496,19 @@ prplSuggestedTask = {
 	},
 
 	/**
+	 * Prevent Enter key in contenteditable elements.
+	 *
+	 * @param {Event} event The keydown event.
+	 */
+	preventEnterKey: ( event ) => {
+		if ( event.key === 'Enter' ) {
+			event.preventDefault();
+			event.stopPropagation();
+			return false;
+		}
+	},
+
+	/**
 	 * Get the task element.
 	 *
 	 * @param {number} postId The post ID.

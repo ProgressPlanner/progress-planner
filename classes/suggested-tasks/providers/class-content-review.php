@@ -75,23 +75,23 @@ class Content_Review extends Tasks {
 	/**
 	 * The snoozed post IDs.
 	 *
-	 * @var array|null
+	 * @var array
 	 */
-	protected $snoozed_post_ids = null;
+	protected $snoozed_post_ids = [];
 
 	/**
 	 * The dismissed post IDs.
 	 *
-	 * @var array|null
+	 * @var array
 	 */
-	protected $dismissed_post_ids = null;
+	protected $dismissed_post_ids = [];
 
 	/**
 	 * The post to update IDs.
 	 *
-	 * @var array|null
+	 * @var array
 	 */
-	protected $task_post_mappings = null;
+	protected $task_post_mappings = [];
 
 	/**
 	 * The include post types.
@@ -209,14 +209,11 @@ class Content_Review extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		if ( null !== $this->task_post_mappings ) {
-			return 0 < \count( $this->task_post_mappings );
+		if ( ! empty( $this->task_post_mappings ) ) {
+			return true;
 		}
 
-		$this->task_post_mappings = [];
-
-		$number_of_posts_to_inject = static::ITEMS_TO_INJECT;
-		$last_updated_posts        = [];
+		$last_updated_posts = [];
 
 		// Check if there are any important pages to update.
 		$important_page_ids = [];
@@ -255,9 +252,7 @@ class Content_Review extends Tasks {
 		}
 
 		// Lets check for other posts to update.
-		$number_of_posts_to_inject = $number_of_posts_to_inject - \count( $last_updated_posts );
-
-		if ( 0 < $number_of_posts_to_inject ) {
+		if ( 0 < static::ITEMS_TO_INJECT - \count( $last_updated_posts ) ) {
 			// Get the post that was updated last.
 			$last_updated_posts = \array_merge(
 				$last_updated_posts,
@@ -299,7 +294,7 @@ class Content_Review extends Tasks {
 			];
 		}
 
-		return 0 < \count( $this->task_post_mappings );
+		return ! empty( $this->task_post_mappings );
 	}
 
 	/**
@@ -313,28 +308,26 @@ class Content_Review extends Tasks {
 		}
 
 		$task_to_inject = [];
-		if ( ! empty( $this->task_post_mappings ) ) {
-			foreach ( $this->task_post_mappings as $task_data ) {
-				if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_data['task_id'] ) ) {
-					continue;
-				}
-
-				$task_to_inject[] = [
-					'task_id'          => $this->get_task_id( [ 'target_post_id' => $task_data['target_post_id'] ] ),
-					'provider_id'      => $this->get_provider_id(),
-					'category'         => $this->get_provider_category(),
-					'target_post_id'   => $task_data['target_post_id'],
-					'target_post_type' => $task_data['target_post_type'],
-					'date'             => \gmdate( 'YW' ),
-					'post_title'       => $this->get_title_with_data( $task_data ),
-					'description'      => $this->get_description_with_data( $task_data ),
-					'url'              => $this->get_url_with_data( $task_data ),
-					'url_target'       => $this->get_url_target(),
-					'dismissable'      => $this->is_dismissable(),
-					'snoozable'        => $this->is_snoozable,
-					'points'           => $this->get_points(),
-				];
+		foreach ( $this->task_post_mappings as $task_data ) {
+			if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $task_data['task_id'] ) ) {
+				continue;
 			}
+
+			$task_to_inject[] = [
+				'task_id'          => $this->get_task_id( [ 'target_post_id' => $task_data['target_post_id'] ] ),
+				'provider_id'      => $this->get_provider_id(),
+				'category'         => $this->get_provider_category(),
+				'target_post_id'   => $task_data['target_post_id'],
+				'target_post_type' => $task_data['target_post_type'],
+				'date'             => \gmdate( 'YW' ),
+				'post_title'       => $this->get_title_with_data( $task_data ),
+				'description'      => $this->get_description_with_data( $task_data ),
+				'url'              => $this->get_url_with_data( $task_data ),
+				'url_target'       => $this->get_url_target(),
+				'dismissable'      => $this->is_dismissable(),
+				'snoozable'        => $this->is_snoozable,
+				'points'           => $this->get_points(),
+			];
 		}
 
 		$added_tasks = [];
@@ -349,25 +342,6 @@ class Content_Review extends Tasks {
 		}
 
 		return $added_tasks;
-	}
-
-	/**
-	 * Get the post ID from the task ID.
-	 *
-	 * @param string $task_id The task ID.
-	 *
-	 * @return \WP_Post|null
-	 */
-	public function get_post_from_task_id( $task_id ) {
-		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
-
-		if ( empty( $tasks ) ) {
-			return null;
-		}
-
-		return isset( $tasks[0]->target_post_id ) && $tasks[0]->target_post_id
-			? \get_post( $tasks[0]->target_post_id )
-			: null;
 	}
 
 	/**
@@ -440,10 +414,8 @@ class Content_Review extends Tasks {
 			$this->get_snoozed_post_ids(),
 		);
 
-		$dismissed_post_ids = $this->get_dismissed_post_ids();
-
-		if ( ! empty( $dismissed_post_ids ) ) {
-			$args['post__not_in'] = \array_merge( $args['post__not_in'], $dismissed_post_ids );
+		if ( ! empty( $this->get_dismissed_post_ids() ) ) {
+			$args['post__not_in'] = \array_merge( $args['post__not_in'], $this->get_dismissed_post_ids() );
 		}
 
 		if ( \function_exists( 'YoastSEO' ) ) {
@@ -473,23 +445,20 @@ class Content_Review extends Tasks {
 	 * @return array
 	 */
 	protected function get_snoozed_post_ids() {
-		if ( null !== $this->snoozed_post_ids ) {
+		if ( ! empty( $this->snoozed_post_ids ) ) {
 			return $this->snoozed_post_ids;
 		}
 
-		$this->snoozed_post_ids = [];
-		$snoozed                = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] );
+		$snoozed = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] );
 
-		if ( ! empty( $snoozed ) ) {
-			foreach ( $snoozed as $task ) {
-				/**
-				 * The task object.
-				 *
-				 * @var \Progress_Planner\Suggested_Tasks\Task $task
-				 */
-				if ( isset( $task->provider->slug ) && 'review-post' === $task->provider->slug ) {
-					$this->snoozed_post_ids[] = $task->target_post_id;
-				}
+		foreach ( $snoozed as $task ) {
+			/**
+			 * The task object.
+			 *
+			 * @var \Progress_Planner\Suggested_Tasks\Task $task
+			 */
+			if ( isset( $task->provider->slug ) && 'review-post' === $task->provider->slug ) {
+				$this->snoozed_post_ids[] = $task->target_post_id;
 			}
 		}
 
@@ -502,12 +471,11 @@ class Content_Review extends Tasks {
 	 * @return array
 	 */
 	protected function get_dismissed_post_ids() {
-		if ( null !== $this->dismissed_post_ids ) {
+		if ( ! empty( $this->dismissed_post_ids ) ) {
 			return $this->dismissed_post_ids;
 		}
 
-		$this->dismissed_post_ids = [];
-		$dismissed                = $this->get_dismissed_tasks();
+		$dismissed = $this->get_dismissed_tasks();
 
 		if ( ! empty( $dismissed ) ) {
 			$this->dismissed_post_ids = \array_values( \wp_list_pluck( $dismissed, 'post_id' ) );
