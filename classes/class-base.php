@@ -40,6 +40,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Suggested_Tasks get_suggested_tasks()
  * @method \Progress_Planner\Suggested_Tasks_DB get_suggested_tasks_db()
  * @method \Progress_Planner\Utils\Deprecations get_utils__deprecations()
+ * @method \Progress_Planner\Plugin_Installer get_plugin_installer()
  */
 class Base {
 
@@ -143,6 +144,9 @@ class Base {
 		// Plugin upgrade.
 		$this->get_plugin_migrations();
 
+		// Plugin installer.
+		$this->get_plugin_installer();
+
 		/**
 		 * Redirect on login.
 		 */
@@ -152,6 +156,9 @@ class Base {
 			$this->get_wp_cli__get_stats_command();
 			$this->get_wp_cli__task_command();
 		}
+
+		// Init the enqueue class.
+		$this->get_admin__enqueue()->init();
 	}
 
 	/**
