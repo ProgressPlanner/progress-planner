@@ -456,8 +456,8 @@
 				transition: all 0.25s ease-in-out;
 			}
 
-			&:hover,
-			&:focus {
+			&:not([disabled]):hover,
+			&:not([disabled]):focus {
 				background: var(--prpl-color-400-orange); /* WIP: pick exact color */
 
 				&::after {
