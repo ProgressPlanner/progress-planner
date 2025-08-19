@@ -8,6 +8,7 @@ Bugs we fixed:
 * Make interactive tasks work on WP dashboard screen
 * Exclude taxonomies which are marked as not indexable in Yoast SEO
 * Improve completed task check for "Unpublished content" task
+* Fix "Delete the 'Sample Page' page" interactive task
 
 = 1.7.0 =
 
