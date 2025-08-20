@@ -126,7 +126,8 @@
 				color: var(--prpl-color-link);
 			}
 
-			button, a {
+			button,
+			a {
 				text-decoration: none;
 				padding: 0;
 				line-height: 1;
