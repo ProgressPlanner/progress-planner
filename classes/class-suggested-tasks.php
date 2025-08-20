@@ -241,6 +241,7 @@ class Suggested_Tasks {
 				$updated = true;
 				break;
 
+			case 'pending': // User task was marked as pending.
 			case 'delete':
 				$this->delete_activity( $task->task_id );
 				$updated = true;
