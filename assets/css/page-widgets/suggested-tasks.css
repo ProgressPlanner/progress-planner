@@ -271,14 +271,6 @@
 			display: flex;
 			flex-direction: column;
 			gap: 0.5rem;
-		}
-
-		.radios,
-		&:not([disabled]):hover,
-		&:not([disabled]):focus {
-			background: var(--prpl-color-400-orange);
-
-			/* WIP: pick exact color */
 
 			.prpl-radio-wrapper {
 				display: flex;
