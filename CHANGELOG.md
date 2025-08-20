@@ -1,3 +1,17 @@
+= 1.7.1 =
+
+Bugs we fixed:
+
+* Fix weird interactive task popover behaviour on small screens
+* Fix missing pages (page types) from the Settings screen
+* Clear WP API model schema cache in session storage
+* Make interactive tasks work on WP dashboard screen
+* Exclude taxonomies which are marked as not indexable in Yoast SEO
+* Improve completed task check for "Unpublished content" task
+* Remove awarded point if the golden todo task is set back to pending status
+* Fix "Delete the 'Sample Page' page" interactive task
+* Remove 3rd party plugin tasks if they are deactivated.
+
 = 1.7.0 =
 
 Added these recommendations from Ravi:

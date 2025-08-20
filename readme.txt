@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.7.0
+Stable tag: 1.7.1
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -109,6 +109,20 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.7.1 =
+
+Bugs we fixed:
+
+* Fix weird interactive task popover behaviour on small screens
+* Fix missing pages (page types) from the Settings screen
+* Clear WP API model schema cache in session storage
+* Make interactive tasks work on WP dashboard screen
+* Exclude taxonomies which are marked as not indexable in Yoast SEO
+* Improve completed task check for "Unpublished content" task
+* Remove awarded point if the golden todo task is set back to pending status
+* Fix "Delete the 'Sample Page' page" interactive task
+* Remove 3rd party plugin tasks if they are deactivated.
 
 = 1.7.0 =
 

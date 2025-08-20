@@ -15,7 +15,7 @@ prplInteractiveTaskFormListener.siteSettings( {
 
 document
 	.querySelector( 'input#blogdescription' )
-	.addEventListener( 'input', function ( e ) {
+	?.addEventListener( 'input', function ( e ) {
 		const button = document.querySelector(
 			'[popover-id="prpl-popover-core-blogdescription"] button[type="submit"]'
 		);

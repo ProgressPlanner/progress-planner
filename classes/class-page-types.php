@@ -17,7 +17,7 @@ class Page_Types {
 	 *
 	 * @var array
 	 */
-	public static $page_types = [];
+	public static $page_types = null;
 
 	/**
 	 * The taxonomy name.
