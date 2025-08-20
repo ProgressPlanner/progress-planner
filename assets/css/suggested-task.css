@@ -95,11 +95,13 @@
 		visibility: hidden;
 		padding-top: 2px;
 		gap: 0.4rem;
+		align-items: baseline;
 
 		/* Style for "hover" links. */
 		.tooltip-action {
 			display: inline-flex;
 			position: relative;
+			text-decoration: none;
 
 			&:not(:first-child) {
 				padding-left: 0.4rem; /* same as gap */
@@ -119,15 +121,21 @@
 			}
 
 			.prpl-tooltip-action-text {
-				line-height: 1.2;
+				line-height: 1;
 				font-size: var(--prpl-font-size-small);
 				color: var(--prpl-color-link);
 			}
 
-			/* we dont use icons here anymore */
-			button {
+			button, a {
+				text-decoration: none;
 				padding: 0;
 				line-height: 1;
+
+				&:hover,
+				&:focus,
+				&:active {
+					text-decoration: underline;
+				}
 			}
 
 		}
