@@ -10,7 +10,7 @@ prplInteractiveTaskFormListener.customSubmit( {
 	taskId: 'sample-page',
 	popoverId: 'prpl-popover-sample-page',
 	callback: () => {
-		const post = new wp.api.models.Post( {
+		const post = new wp.api.models.Page( {
 			id: samplePageData.postId,
 		} );
 		post.fetch().then( () => {
