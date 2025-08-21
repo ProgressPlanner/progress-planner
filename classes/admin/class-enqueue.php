@@ -425,15 +425,12 @@ class Enqueue {
 			if ( 'sessionStorage' in window ) {
 				try {
 					for ( const key in sessionStorage ) {
-						if ( -1 < key.indexOf( 'wp-api-schema-model' ) ) {
-							const item = sessionStorage.getItem( key );
-							if (
-								-1 === item.indexOf( '/wp/v2/prpl_recommendations' )
-							) {
-								sessionStorage.removeItem( key );
-
-								break;
-							}
+						if (
+							-1 < key.indexOf( 'wp-api-schema-model' ) &&
+							-1 === sessionStorage.getItem( key ).indexOf( '/wp/v2/prpl_recommendations' )
+						) {
+							sessionStorage.removeItem( key );
+							break;
 						}
 					}
 				} catch ( er ) {}

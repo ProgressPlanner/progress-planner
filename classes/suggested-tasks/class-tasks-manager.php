@@ -254,14 +254,10 @@ class Tasks_Manager {
 			return false;
 		}
 		$task_provider = $this->get_task_provider( $task->provider->slug );
-		if ( ! $task_provider ) {
-			return false;
-		}
-
-		// Check if the task is no longer relevant.
-		if ( ! $task_provider->is_task_relevant() ) {
+		if ( ! $task_provider || ! $task_provider->is_task_relevant() ) {
 			// Remove the task from the published tasks.
 			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
+			return false;
 		}
 
 		return $task_provider->evaluate_task( $task->task_id );
