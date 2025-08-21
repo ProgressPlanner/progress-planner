@@ -8,6 +8,10 @@
 
 .prpl-dashboard-widget-suggested-tasks {
 
+	.prpl-suggested-tasks-widget-description {
+		max-width: 40rem;
+	}
+
 	&:not(:has(.prpl-suggested-tasks-loading)):not(:has(.prpl-suggested-tasks-list li)) {
 
 		.prpl-no-suggested-tasks {
