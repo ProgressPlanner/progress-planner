@@ -268,7 +268,7 @@ prplSuggestedTask = {
 					// Disable the checkbox for RR tasks, to prevent multiple clicks.
 					el.querySelector(
 						'.prpl-suggested-task-checkbox'
-					).setAttribute( 'disabled', 'disabled' );
+					)?.setAttribute( 'disabled', 'disabled' );
 
 					post.set( 'status', newStatus )
 						.save()
@@ -318,7 +318,7 @@ prplSuggestedTask = {
 										// Remove the disabled attribute for user tasks, so they can be clicked again.
 										el.querySelector(
 											'.prpl-suggested-task-checkbox'
-										).removeAttribute( 'disabled' );
+										)?.removeAttribute( 'disabled' );
 
 										// Resolve the promise after the timeout completes
 										resolve( {
@@ -391,7 +391,7 @@ prplSuggestedTask = {
 								// Remove the disabled attribute for user tasks, so they can be clicked again.
 								el.querySelector(
 									'.prpl-suggested-task-checkbox'
-								).removeAttribute( 'disabled' );
+								)?.removeAttribute( 'disabled' );
 
 								// Resolve immediately for publish actions
 								resolve( { postId, newStatus, eventPoints } );
