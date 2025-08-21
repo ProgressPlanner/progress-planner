@@ -44,10 +44,10 @@ customElements.define(
 							badge-id="${ badgeId }"
 							style="
 								display:flex;
-								width: 5rem;
-								height: 5rem;
+								width: 7.5rem;
+								height: auto;
 								position: absolute;
-								left: calc(${ progress }% - 2.5rem);
+								left: calc(${ progress }% - 3.75rem);
 								top: -2.5rem;"
 						></prpl-badge>
 					</div>

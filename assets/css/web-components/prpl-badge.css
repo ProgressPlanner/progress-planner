@@ -28,4 +28,27 @@
 prpl-badge {
 	width: 100%;
 	margin-bottom: 1rem;
+
+	/* This applies only to the monthly badges. */
+	.prpl-previous-month-badge-progress-bars-wrapper &,
+	.prpl-badge[data-is-missed="true"] & {
+		position: relative;
+
+		&::after {
+			content: "!";
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 20px;
+			height: 20px;
+			background-color: var(--prpl-color-accent-red);
+			border: 2px solid #fff;
+			border-radius: 50%;
+			position: absolute;
+			top: 5%;
+			right: 25%;
+			color: #fff;
+
+		}
+	}
 }

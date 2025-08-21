@@ -19,6 +19,11 @@ if ( isset( $args['css_class'] ) ) {
 
 $prpl_location    = false !== \strpos( $prpl_css_class, 'in-popover' ) ? 'popover' : 'suggested-tasks';
 $prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] : \gmdate( 'Y' );
+
+$prpl_previous_incomplete_month_badge_ids = [];
+foreach ( \progress_planner()->get_admin__widgets__suggested_tasks()->get_previous_incomplete_months_badges() as $prpl_previous_incomplete_month_badge ) {
+	$prpl_previous_incomplete_month_badge_ids[] = $prpl_previous_incomplete_month_badge->get_id();
+}
 ?>
 <div class="prpl-widget-wrapper <?php echo \esc_attr( $prpl_css_class ); ?>">
 	<h3 class="prpl-widget-title">
@@ -81,6 +86,7 @@ $prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] :
 						<span
 							class="prpl-badge prpl-badge-<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
 							data-value="<?php echo \esc_attr( $prpl_badge->progress_callback()['progress'] ); ?>"
+							data-is-missed="<?php echo \in_array( $prpl_badge->get_id(), $prpl_previous_incomplete_month_badge_ids, true ) ? 'true' : 'false'; ?>"
 						>
 							<prpl-badge
 								complete="<?php echo 100 === (int) $prpl_badge->progress_callback()['progress'] ? 'true' : 'false'; ?>"
