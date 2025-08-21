@@ -339,9 +339,12 @@ prplSuggestedTask = {
 									}, 2000 );
 								} else {
 									// Check the chekcbox, since completing task can be triggered in different ways ("Mark as done" button), without triggering the onchange event.
-									el.querySelector(
+									const checkbox = el.querySelector(
 										'.prpl-suggested-task-checkbox'
-									).checked = true;
+									);
+									if ( checkbox ) {
+										checkbox.checked = true;
+									}
 
 									/**
 									 * Strike completed tasks and remove them from the DOM.
