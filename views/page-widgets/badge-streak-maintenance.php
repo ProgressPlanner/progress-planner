@@ -9,24 +9,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_widget                 = \progress_planner()->get_admin__widgets__badge_streak();
+$prpl_widget                 = \progress_planner()->get_admin__widgets__badge_streak_maintenance();
 $prpl_widget_context_details = [];
-if ( $prpl_widget->get_details( 'content' ) ) {
-	$prpl_widget_context_details['content'] = [
-		'text' => \sprintf(
-			\esc_html(
-				/* translators: %s: The remaining number of posts or pages to write. */
-				\_n(
-					'Write %s new post or page and earn your next badge!',
-					'Write %s new posts or pages and earn your next badge!',
-					(int) $prpl_widget->get_details( 'content' )->get_progress()['remaining'],
-					'progress-planner'
-				)
-			),
-			\esc_html( \number_format_i18n( $prpl_widget->get_details( 'content' )->get_progress()['remaining'] ) )
-		),
-	];
-}
+
 if ( $prpl_widget->get_details( 'maintenance' ) ) {
 	$prpl_widget_context_details['maintenance'] = [
 		'text' => \sprintf(
@@ -82,7 +67,7 @@ if ( $prpl_widget->get_details( 'maintenance' ) ) {
 <h3><?php \esc_html_e( 'Your achievements', 'progress-planner' ); ?></h3>
 <div class="prpl-badges-container-achievements">
 	<?php
-	foreach ( [ 'content', 'maintenance' ] as $prpl_badge_group ) :
+	foreach ( [ 'maintenance' ] as $prpl_badge_group ) :
 		$prpl_group_badges = \progress_planner()->get_badges()->get_badges( $prpl_badge_group );
 		?>
 		<div class="progress-wrapper badge-group-<?php echo \esc_attr( $prpl_badge_group ); ?>">
