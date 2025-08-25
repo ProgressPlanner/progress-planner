@@ -72,20 +72,6 @@ final class Monthly_Badges extends Widget {
 	}
 
 	/**
-	 * Enqueue the scripts.
-	 *
-	 * @return void
-	 */
-	public function enqueue_scripts() {
-		parent::enqueue_scripts();
-
-		// Enqueue the badge scroller script.
-		\progress_planner()->get_admin__enqueue()->enqueue_script(
-			'widgets/suggested-tasks-badge-scroller',
-		);
-	}
-
-	/**
 	 * Get the stylesheet dependencies.
 	 *
 	 * @return array

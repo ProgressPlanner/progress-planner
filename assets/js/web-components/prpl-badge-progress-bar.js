@@ -135,7 +135,7 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 	if ( badgeNewPoints >= parseInt( badgeMaxPoints ) ) {
 		document
 			.querySelectorAll(
-				`.prpl-badge-row-wrapper-inner .prpl-badge prpl-badge[complete="false"][badge-id="${ badgeId }"]`
+				`.prpl-badge-row-wrapper .prpl-badge prpl-badge[complete="false"][badge-id="${ badgeId }"]`
 			)
 			?.forEach( ( badge ) => {
 				badge.setAttribute( 'complete', 'true' );

@@ -176,7 +176,7 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 		// We have multiple badges, one in widget and the other in the popover.
 		document
 			.querySelectorAll(
-				`.prpl-badge-row-wrapper-inner .prpl-badge prpl-badge[complete="false"][badge-id="${ gaugeProps.badgeId }"]`
+				`.prpl-badge-row-wrapper .prpl-badge prpl-badge[complete="false"][badge-id="${ gaugeProps.badgeId }"]`
 			)
 			?.forEach( ( badge ) => {
 				badge.setAttribute( 'complete', 'true' );
