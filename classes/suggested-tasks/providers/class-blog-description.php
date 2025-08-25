@@ -34,6 +34,13 @@ class Blog_Description extends Tasks_Interactive {
 	const POPOVER_ID = 'core-blogdescription';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-tagline';
+
+	/**
 	 * Get the task title.
 	 *
 	 * @return string
@@ -48,11 +55,16 @@ class Blog_Description extends Tasks_Interactive {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %s:<a href="https://prpl.fyi/set-tagline" target="_blank">tagline</a> link */
-			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/set-tagline" target="_blank">' . \esc_html__( 'tagline', 'progress-planner' ) . '</a>'
-		);
+		return \esc_html__( 'Set the tagline to make your website look more professional.', 'progress-planner' );
+	}
+
+	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Set tagline', 'progress-planner' );
 	}
 
 	/**

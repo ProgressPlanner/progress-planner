@@ -377,6 +377,7 @@ class Enqueue {
 			'taskCompleted'                => \esc_html__( "Task '%s' completed and moved to the bottom", 'progress-planner' ),
 			/* translators: %s: The task content. */
 			'taskDelete'                   => \esc_html__( "Delete task '%s'", 'progress-planner' ),
+			'delete'                       => \esc_html__( 'Delete', 'progress-planner' ),
 			'taskMovedDown'                => \esc_html__( 'Task moved down', 'progress-planner' ),
 			'taskMovedUp'                  => \esc_html__( 'Task moved up', 'progress-planner' ),
 			/* translators: %s: The task content. */
@@ -389,6 +390,7 @@ class Enqueue {
 			'watchVideo'                   => \esc_html__( 'Watch video', 'progress-planner' ),
 			'disabledRRCheckboxTooltip'    => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),
 			'opensInNewWindow'             => \esc_html__( 'Opens in new window', 'progress-planner' ),
+			'whyIsThisImportant'           => \esc_html__( 'Why is this important?', 'progress-planner' ),
 			/* translators: %s: The plugin name. */
 			'installPlugin'                => \esc_html__( 'Install and activate the "%s" plugin', 'progress-planner' ),
 			/* translators: %s: The plugin name. */

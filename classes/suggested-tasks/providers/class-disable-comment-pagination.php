@@ -34,6 +34,13 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	const POPOVER_ID = 'disable-comment-pagination';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/disable-comment-pagination';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -70,11 +77,19 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	 */
 	protected function get_description() {
 		return \sprintf(
-			/* translators: %d is the number of comments per page, %s is the "recommend to disable comment pagination" link */
-			\esc_html__( 'When comment pagination is enabled, your site creates a new page for every %1$d comments. This is not helping your website in search engines, and can break up the ongoing conversation. That\'s why we %2$s.', 'progress-planner' ),
+			/* translators: %d is the number of comments per page.*/
+			\esc_html__( 'When comment pagination is enabled, your site creates a new page for every %d comments. This is not helping your website in search engines, and can break up the ongoing conversation. That\'s why we recommend to disable comment pagination.', 'progress-planner' ),
 			(int) \get_option( 'comments_per_page' ),
-			'<a href="https://prpl.fyi/disable-comment-pagination" target="_blank">' . \esc_html__( 'recommend to disable comment pagination', 'progress-planner' ) . '</a>'
 		);
+	}
+
+	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Disable pagination', 'progress-planner' );
 	}
 
 	/**

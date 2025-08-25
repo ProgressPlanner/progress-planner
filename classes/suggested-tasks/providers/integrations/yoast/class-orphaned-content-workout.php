@@ -31,6 +31,13 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-orphaned-content-workout';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/run-orphaned-content-workout';
+
+	/**
 	 * The task priority.
 	 *
 	 * @var int
@@ -125,11 +132,16 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Improve your internal linking structure with Yoast SEO\'s Orphaned Content Workout. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/run-orphaned-content-workout" target="_blank"  data-prpl_accessibility_text="' . \esc_attr__( 'Learn more about the Yoast SEO Orphaned Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Lean more', 'progress-planner' ) . '</a>'
-		);
+		return \esc_html__( 'Improve your internal linking structure with Yoast SEO\'s Orphaned Content Workout.', 'progress-planner' );
+	}
+
+	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Run workout', 'progress-planner' );
 	}
 
 	/**

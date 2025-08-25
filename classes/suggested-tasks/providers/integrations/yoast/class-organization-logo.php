@@ -60,15 +60,28 @@ class Organization_Logo extends Yoast_Provider {
 	 */
 	protected function get_description() {
 		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
-			? \sprintf(
-				/* translators: %s: "Read more" link. */
-				\esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your organization logo in the Yoast SEO settings. %s.', 'progress-planner' ),
-				'<a href="https://prpl.fyi/yoast-person-logo" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Organization Logo', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-			) : \sprintf(
-				/* translators: %s: "Read more" link. */
-				\esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your person logo in the Yoast SEO settings. %s.', 'progress-planner' ),
-				'<a href="https://prpl.fyi/yoast-organization-logo" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Person Logo', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-			);
+			? \esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your organization logo in the Yoast SEO settings.', 'progress-planner' )
+			: \esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your person logo in the Yoast SEO settings.', 'progress-planner' );
+	}
+
+	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Set logo', 'progress-planner' );
+	}
+
+	/**
+	 * Get external link URL.
+	 *
+	 * @return string
+	 */
+	public function get_external_link_url() {
+		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
+			? 'https://prpl.fyi/yoast-person-logo'
+			: 'https://prpl.fyi/yoast-organization-logo';
 	}
 
 	/**

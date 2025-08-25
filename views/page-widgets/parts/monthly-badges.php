@@ -21,7 +21,7 @@ $prpl_location    = false !== \strpos( $prpl_css_class, 'in-popover' ) ? 'popove
 $prpl_badges_year = (int) isset( $args['badges_year'] ) ? $args['badges_year'] : \gmdate( 'Y' );
 
 $prpl_previous_incomplete_month_badge_ids = [];
-foreach ( \progress_planner()->get_admin__widgets__suggested_tasks()->get_previous_incomplete_months_badges() as $prpl_previous_incomplete_month_badge ) {
+foreach ( \progress_planner()->get_admin__widgets__monthly_badges()->get_previous_incomplete_months_badges() as $prpl_previous_incomplete_month_badge ) {
 	$prpl_previous_incomplete_month_badge_ids[] = $prpl_previous_incomplete_month_badge->get_id();
 }
 ?>

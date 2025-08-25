@@ -50,6 +50,13 @@ class Hello_World extends Tasks_Interactive {
 	const POPOVER_ID = 'hello-world';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/delete-hello-world-post';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -97,15 +104,26 @@ class Hello_World extends Tasks_Interactive {
 
 		$hello_world_post_url = (string) \get_permalink( $hello_world_post_id );
 
-		return '<p>' . \sprintf(
+		$content  = '<p>';
+		$content .= \sprintf(
 			/* translators: %s: Link to the post. */
 			\esc_html__( 'On install, WordPress creates a "Hello World!" post. You can find yours at %s.', 'progress-planner' ),
 			'<a href="' . \esc_attr( $hello_world_post_url ) . '" target="_blank">' . \esc_html( $hello_world_post_url ) . '</a>',
-		) . '</p><p>' . \sprintf(
-			/* translators: %s: URL to https://prpl.fyi/delete-sample-page */
-			\__( 'This post does not add value to your website and solely exists to show what a post can look like. Therefore, <a href="%s" target="_blank">"Hello World!" is not needed and should be deleted</a>.', 'progress-planner' ),
-			'https://prpl.fyi/delete-hello-world-post'
-		) . '</p>';
+		);
+		$content .= '</p><p>';
+		$content .= \esc_html__( 'This post does not add value to your website and solely exists to show what a post can look like. Therefore, "Hello World!" is not needed and should be deleted.', 'progress-planner' );
+		$content .= '</p>';
+
+		return $content;
+	}
+
+	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Delete', 'progress-planner' );
 	}
 
 	/**

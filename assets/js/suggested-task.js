@@ -24,6 +24,9 @@ prplSuggestedTask = {
 		snoozeDurationForever: prplL10n( 'snoozeDurationForever' ),
 		disabledRRCheckboxTooltip: prplL10n( 'disabledRRCheckboxTooltip' ),
 		markAsComplete: prplL10n( 'markAsComplete' ),
+		taskDelete: prplL10n( 'taskDelete' ),
+		delete: prplL10n( 'delete' ),
+		whyIsThisImportant: prplL10n( 'whyIsThisImportant' ),
 	},
 
 	/**
@@ -80,6 +83,8 @@ prplSuggestedTask = {
 									item,
 									listId: 'prpl-suggested-tasks-list',
 									insertPosition: 'beforeend',
+									useCheckbox: false,
+									useArrow: true,
 								},
 							} )
 						);
@@ -114,6 +119,8 @@ prplSuggestedTask = {
 							item,
 							listId: 'prpl-suggested-tasks-list',
 							insertPosition: 'beforeend',
+							useCheckbox: false,
+							useArrow: true,
 						},
 					} )
 				);
@@ -148,10 +155,12 @@ prplSuggestedTask = {
 	 *
 	 * @param {Object}  post        The post object.
 	 * @param {boolean} useCheckbox Whether to use a checkbox.
+	 * @param {boolean} useArrow    Whether to use an arrow.
 	 */
 	getNewItemTemplatePromise: ( {
 		post = {},
 		useCheckbox = true,
+		useArrow = false,
 		listId = '',
 	} ) =>
 		new Promise( ( resolve ) => {
@@ -181,6 +190,7 @@ prplSuggestedTask = {
 				post,
 				terms,
 				useCheckbox,
+				useArrow,
 				listId,
 				assets: prplSuggestedTask.assets,
 				action: 'pending' === post.status ? 'celebrate' : '',
@@ -328,6 +338,14 @@ prplSuggestedTask = {
 										} );
 									}, 2000 );
 								} else {
+									// Check the chekcbox, since completing task can be triggered in different ways ("Mark as done" button), without triggering the onchange event.
+									const checkbox = el.querySelector(
+										'.prpl-suggested-task-checkbox'
+									);
+									if ( checkbox ) {
+										checkbox.checked = true;
+									}
+
 									/**
 									 * Strike completed tasks and remove them from the DOM.
 									 */
@@ -580,6 +598,8 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 		.getNewItemTemplatePromise( {
 			post: event.detail.item,
 			listId: event.detail.listId,
+			useCheckbox: event.detail.useCheckbox || false,
+			useArrow: event.detail.useArrow || true,
 		} )
 		.then( ( itemHTML ) => {
 			/**
@@ -616,6 +636,8 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 								item: event.detail.item,
 								listId: event.detail.listId,
 								insertPosition: event.detail.insertPosition,
+								useCheckbox: event.detail.useCheckbox || true,
+								useArrow: event.detail.useArrow || false,
 							},
 						} )
 					);

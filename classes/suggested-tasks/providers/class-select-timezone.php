@@ -82,6 +82,14 @@ class Select_Timezone extends Tasks_Interactive {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Select timezone', 'progress-planner' );
+	}
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool

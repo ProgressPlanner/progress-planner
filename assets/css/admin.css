@@ -97,6 +97,14 @@
 	color: var(--prpl-color-link);
 }
 
+.prpl-widget-width-2 {
+	grid-column: span 2;
+
+	.prpl-widget-description {
+		max-width: 640px;
+	}
+}
+
 .prpl-widget-title {
 	margin-top: 0;
 	font-size: 1.375rem;
@@ -418,6 +426,10 @@ button.prpl-info-icon {
 
 	.prpl-welcome .inner-content .right {
 		display: none !important;
+	}
+
+	.prpl-widget-width-2 {
+		grid-column: span 1;
 	}
 }
 

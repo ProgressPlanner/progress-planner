@@ -36,6 +36,13 @@ class Archive_Author extends Yoast_Provider {
 	protected const DATA_COLLECTOR_CLASS = Post_Author::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/yoast-author-archive';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -59,11 +66,16 @@ class Archive_Author extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Yoast SEO can disable the author archive when you have only one author, as it is the same as the homepage. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-author-archive" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Author Archive', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
+		return \esc_html__( 'Yoast SEO can disable the author archive when you have only one author, as it is the same as the homepage.', 'progress-planner' );
+	}
+
+	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Disable', 'progress-planner' );
 	}
 
 	/**

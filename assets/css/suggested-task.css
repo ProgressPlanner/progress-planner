@@ -1,12 +1,39 @@
 .prpl-suggested-task {
 	margin: 0;
-	padding: 0.5rem;
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
+	padding: 0.75rem 0.5rem 0.625rem 0.5rem;
+	display: grid;
+	grid-template-columns: 1.5rem 1fr 2rem;
+	gap: 0.25rem 0.5rem;
 	position: relative;
-	gap: 1rem;
-	line-height: 1.5;
+	line-height: 1;
+
+	&:nth-child(odd) {
+		background-color: #f6f7f9;
+	}
+
+	.prpl-suggested-task-title-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		justify-content: space-between;
+	}
+
+	.prpl-suggested-task-actions-wrapper {
+		grid-column: 2 / span 1;
+		display: flex;
+	}
+
+	.prpl-suggested-task-checkbox {
+		flex-shrink: 0; /* Prevent shrinking on mobile */
+	}
+
+	/* If task has disabled checkbox it's title should be italic. */
+	&:has(.prpl-suggested-task-disabled-checkbox-tooltip) {
+
+		h3 {
+			font-style: italic;
+		}
+	}
 
 	h3 {
 		font-size: 1rem;
@@ -44,10 +71,11 @@
 		text-decoration-color: transparent;
 	}
 
-	.prpl-suggested-task-actions {
+	.prpl-suggested-task-points-wrapper {
 		display: flex;
 		gap: 0.5rem;
-		flex-shrink: 0; /* Prevent the actions from shrinking when the task title is too long */
+		align-items: center;
+		grid-row-end: span 2;
 	}
 
 	.prpl-suggested-task-points {
@@ -65,9 +93,57 @@
 
 	.tooltip-actions {
 		visibility: hidden;
+		padding-top: 2px;
+		gap: 0.4rem;
+		align-items: baseline;
+
+		/* Style for "hover" links. */
+		.tooltip-action {
+			display: inline-flex;
+			position: relative;
+			text-decoration: none;
+
+			&:not(:first-child) {
+				padding-left: 0.4rem; /* same as gap */
+
+				&::before {
+					position: absolute;
+					top: 50%;
+					transform: translateY(-50%);
+					left: 0;
+
+					content: "";
+					display: inline-block;
+					width: 1px;
+					background: var(--prpl-color-gray-5);
+					height: 0.75rem;
+				}
+			}
+
+			.prpl-tooltip-action-text {
+				line-height: 1;
+				font-size: var(--prpl-font-size-small);
+				color: var(--prpl-color-link);
+			}
+
+			button,
+			a {
+				text-decoration: none;
+				padding: 0;
+				line-height: 1;
+
+				&:hover,
+				&:focus,
+				&:active {
+					text-decoration: underline;
+				}
+			}
+
+		}
 	}
 
-	&:hover {
+	&:hover,
+	&:focus-within {
 
 		.tooltip-actions {
 			visibility: visible;
@@ -108,24 +184,18 @@
 		color: var(--prpl-color-gray-3);
 		cursor: pointer;
 		box-shadow: none;
-		transition: all 0.1s;
 		margin-top: 1px;
 	}
 
-	.trash {
-		width: 1.25rem;
-		height: 1.25rem;
-
-		&:hover svg path {
-			fill: var(--prpl-color-accent-red);
-		}
-	}
-
-	.prpl-move-buttons {
-		padding: 0 0.5em;
+	.prpl-move-buttons,
+	.prpl-suggested-task-checkbox-wrapper,
+	.prpl-suggested-task-checkbox-wrapper label {
 		display: flex;
+		width: 100%;
 		gap: 0;
 		flex-direction: column;
+		align-items: center;
+		justify-content: center;
 	}
 
 	.move-up,
@@ -215,8 +285,8 @@
 
 	&[data-task-action="celebrate"] {
 
-		.prpl-suggested-task-button[data-action="snooze"] {
-			display: none;
+		.tooltip-actions {
+			pointer-events: none; /* Prevent clicking on actions while celebrating */
 		}
 	}
 
@@ -229,6 +299,25 @@
 
 		p:first-child {
 			margin-top: 0;
+		}
+	}
+
+	/* Disabled checkbox styles. */
+	.prpl-suggested-task-disabled-checkbox-tooltip,
+	.tooltip-actions {
+
+		& > button {
+			padding: 0;
+		}
+
+		.prpl-tooltip {
+			transform: translate(-20%, calc(100% + 10px));
+
+			&::after {
+				left: 25px;
+				right: auto;
+				transform: translate(-5px, -10px) rotate(90deg);
+			}
 		}
 	}
 }

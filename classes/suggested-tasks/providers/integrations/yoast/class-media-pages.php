@@ -20,6 +20,13 @@ class Media_Pages extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-media-pages';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/yoast-media-pages';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -43,11 +50,16 @@ class Media_Pages extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Yoast SEO can disable the media / attachment pages, which are the pages that show the media files. You really don\'t need them, except when you are displaying photos or art on your site through them. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-media-pages" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Media Pages', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
+		return \esc_html__( 'Yoast SEO can disable the media / attachment pages, which are the pages that show the media files. You really don\'t need them, except when you are displaying photos or art on your site through them.', 'progress-planner' );
+	}
+
+	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Disable', 'progress-planner' );
 	}
 
 	/**
