@@ -253,6 +253,7 @@ button.prpl-info-icon {
 	hr {
 		margin-top: 1.25rem;
 		margin-bottom: 1.25rem;
+		border-top-color: var(--prpl-color-gray-2);
 	}
 }
 
