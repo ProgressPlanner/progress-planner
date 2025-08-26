@@ -34,7 +34,7 @@
 
 		p {
 			margin: 0;
-			font-size: var(--prpl-font-size-xs);
+			font-size: var(--prpl-font-size-small);
 			text-align: center;
 			line-height: 1.2;
 		}
@@ -105,6 +105,7 @@
 	}
 }
 
+/* This is the badge streak widget. */
 .prpl-widget-wrapper.prpl-badge-streak {
 	display: flex;
 	flex-direction: column;
@@ -117,7 +118,7 @@
 	.progress-wrapper {
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
-		gap: calc(var(--prpl-gap) / 2);
+		gap: calc(var(--prpl-gap) / 4);
 		padding: calc(var(--prpl-padding) / 2);
 		border-radius: var(--prpl-border-radius-big);
 
@@ -137,14 +138,14 @@
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			justify-content: space-between;
+			justify-content: flex-start;
 			flex-wrap: wrap;
 			min-width: 0;
 		}
 
 		p {
 			margin: 0;
-			font-size: var(--prpl-font-size-xs);
+			font-size: var(--prpl-font-size-small);
 			text-align: center;
 			line-height: 1.2;
 		}

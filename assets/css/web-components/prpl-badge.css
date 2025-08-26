@@ -3,7 +3,7 @@
 	grid-template-columns: 1fr;
 
 	min-width: 0;
-	gap: 10px;
+	gap: 0.5rem;
 
 	> * {
 		align-self: center;
@@ -58,7 +58,6 @@
 
 prpl-badge {
 	width: 100%;
-	margin-bottom: 1rem;
 
 	/* This applies only to the monthly badges. */
 	.prpl-previous-month-badge-progress-bars-wrapper &,
