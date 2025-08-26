@@ -50,10 +50,16 @@ const prplInteractiveTaskFormListener = {
 			wp.api.loadPromise.done( () => {
 				const settings = new wp.api.models.Settings( settingsToPass );
 
-				settings.save().then( () => {
+				settings.save().then( ( response ) => {
+					console.log( response );
+					if ( true !== response.success ) {
+						// TODO: Handle error.
+						return response;
+					}
+
 					const postId = parseInt( taskEl.dataset.postId );
 					if ( ! postId ) {
-						return;
+						return response;
 					}
 
 					// This will trigger the celebration event (confetti) as well.
@@ -77,22 +83,36 @@ const prplInteractiveTaskFormListener = {
 		formElement.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
 
-			callback();
+			callback()
+				.then( ( response ) => {
+					console.log( response );
+					if ( true !== response.success ) {
+						// TODO: Handle error.
+						return response;
+					}
 
-			const taskEl = document.querySelector(
-				`.prpl-suggested-task[data-task-id="${ taskId }"]`
-			);
+					const taskEl = document.querySelector(
+						`.prpl-suggested-task[data-task-id="${ taskId }"]`
+					);
 
-			const postId = parseInt( taskEl.dataset.postId );
-			if ( ! postId ) {
-				return;
-			}
+					const postId = parseInt( taskEl.dataset.postId );
+					if ( ! postId ) {
+						return;
+					}
 
-			// This will trigger the celebration event (confetti) as well.
-			prplSuggestedTask.maybeComplete( postId ).then( () => {
-				// Close popover.
-				document.getElementById( popoverId ).hidePopover();
-			} );
+					// This will trigger the celebration event (confetti) as well.
+					prplSuggestedTask.maybeComplete( postId ).then( () => {
+						// Close popover.
+						document.getElementById( popoverId ).hidePopover();
+					} );
+				} )
+				.catch( ( error ) => {
+					console.error(
+						'Error in interactive task callback:',
+						error
+					);
+					// TODO: Handle the error appropriately.
+				} );
 		} );
 	},
 
@@ -129,26 +149,40 @@ const prplInteractiveTaskFormListener = {
 					value: settingsToPass[ setting ],
 					setting_path: settingPath,
 				},
-			} ).then( () => {
-				const taskEl = document.querySelector(
-					`.prpl-suggested-task[data-task-id="${ taskId }"]`
-				);
+			} )
+				.then( ( response ) => {
+					console.log( response );
+					if ( true !== response.success ) {
+						// TODO: Handle error.
+						return response;
+					}
 
-				if ( ! taskEl ) {
-					return;
-				}
+					const taskEl = document.querySelector(
+						`.prpl-suggested-task[data-task-id="${ taskId }"]`
+					);
 
-				const postId = parseInt( taskEl.dataset.postId );
-				if ( ! postId ) {
-					return;
-				}
+					if ( ! taskEl ) {
+						return response;
+					}
 
-				// This will trigger the celebration event (confetti) as well.
-				prplSuggestedTask.maybeComplete( postId ).then( () => {
-					// Close popover.
-					document.getElementById( popoverId ).hidePopover();
+					const postId = parseInt( taskEl.dataset.postId );
+					if ( ! postId ) {
+						return response;
+					}
+
+					// This will trigger the celebration event (confetti) as well.
+					prplSuggestedTask.maybeComplete( postId ).then( () => {
+						// Close popover.
+						document.getElementById( popoverId ).hidePopover();
+					} );
+				} )
+				.catch( ( error ) => {
+					console.error(
+						'Error in interactive task settings:',
+						error
+					);
+					// TODO: Handle the error appropriately.
 				} );
-			} );
 		} );
 	},
 };
