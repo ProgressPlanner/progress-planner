@@ -23,7 +23,7 @@ $prpl_data_attributes = 5 < \count( $prpl_post_types ) ? 'data-has-many-valuable
 ?>
 
 <div class="prpl-column prpl-column-post-types" <?php echo \esc_attr( $prpl_data_attributes ); ?>>
-	<div class="prpl-widget-wrapper">
+	<div class="prpl-settings-section-wrapper">
 		<h2 class="prpl-settings-section-title">
 			<span class="icon">
 				<?php \progress_planner()->the_asset( 'images/icon_copywriting.svg' ); ?>

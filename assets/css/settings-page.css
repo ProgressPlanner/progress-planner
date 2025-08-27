@@ -2,7 +2,7 @@
 .progress-planner_page_progress-planner-settings {
 
 	#wpwrap {
-		background: #fff !important;
+		background-color: #f9fafb;
 	}
 
 	ul#adminmenu {
@@ -21,21 +21,8 @@
 		h1 {
 			display: flex;
 			align-items: center;
-			gap: 0.5rem;
-			background: var(--prpl-background-orange);
 			padding: 1.2rem;
-			border-radius: 0.5rem;
 			margin-bottom: 2rem;
-
-			.icon {
-				width: 1.25em;
-				height: 1.25em;
-				color: var(--prpl-color-accent-orange);
-
-				svg path {
-					fill: currentcolor;
-				}
-			}
 
 			span {
 				font-weight: 600;
@@ -50,11 +37,27 @@
 		}
 	}
 
+	.prpl-settings-form-wrap {
+		background-color: #fff;
+
+		border: 1px solid var(--prpl-color-gray-2);
+		border-radius: var(--prpl-border-radius);
+		padding: var(--prpl-padding);
+		box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.07), -2px 0 6px rgba(0, 0, 0, 0.07);
+	}
+
+	.prpl-settings-section-wrapper {
+		border: 1px solid var(--prpl-color-gray-2);
+		border-radius: var(--prpl-border-radius);
+		padding: var(--prpl-padding);
+		flex-grow: 1;
+	}
+
 	.prpl-settings-section-title {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		background: var(--prpl-background-purple);
+		background: var(--prpl-background-orange);
 		padding: 1.2rem;
 		border-radius: 0.5rem;
 		margin-bottom: var(--prpl-settings-page-gap);
@@ -166,6 +169,20 @@
 
 			&:has(input[type="radio"][value="not-applicable"]) {
 				padding-top: 0.25rem; /* Add bit height, because we dont have button or select */
+			}
+		}
+	}
+
+	.prpl-column-pages {
+		margin-bottom: var(--prpl-gap);
+
+		.prpl-settings-section-title {
+
+			.icon {
+
+				path {
+					fill: var(--prpl-color-accent-orange);
+				}
 			}
 		}
 	}
