@@ -66,54 +66,27 @@ const prplUpdateGridMasonryItem = ( item ) => {
 window.addEventListener(
 	'prpl/grid/resize',
 	() => {
-		document
-			.querySelectorAll( '.prpl-widget-wrapper' )
-			.forEach( ( item ) => {
-				prplPopulateOriginalGridOrderData( item );
-				prplPopulateGridColumnsX( item );
-			} );
+		const widgetWrappers = document.querySelectorAll(
+			'.prpl-widget-wrapper'
+		);
 
-		document
-			.querySelectorAll( '.prpl-widget-wrapper' )
-			.forEach( ( item ) => {
-				prplPopulateGridColumnsXItem( item );
-				prplMaybeForceItemToLastColumn( item );
-			} );
+		// Get initial grid data.
+		widgetWrappers.forEach( ( item ) => {
+			prplPopulateGridColumnsX( item );
+		} );
 
-		document
-			.querySelectorAll( '.prpl-widget-wrapper' )
-			.forEach( ( item ) => {
-				prplUpdateGridMasonryItem( item );
-			} );
+		// Reorder items to the grid columns.
+		widgetWrappers.forEach( ( item ) => {
+			prplMaybeForceItemToLastColumn( item );
+		} );
+
+		// Update the grid masonry items.
+		widgetWrappers.forEach( ( item ) => {
+			prplUpdateGridMasonryItem( item );
+		} );
 	},
 	false
 );
-
-/**
- * Populate the original grid order data. Adds a data attribute to the item
- * that contains the original order of the item.
- *
- * @param {HTMLElement} item The item to populate.
- */
-const prplPopulateOriginalGridOrderData = ( item ) => {
-	if (
-		! item ||
-		item.classList.contains( 'in-popover' ) ||
-		! item.querySelector( '.widget-inner-container' )
-	) {
-		return;
-	}
-
-	if ( 'undefined' === typeof window.prplGridOrderLastItem ) {
-		window.prplGridOrderLastItem = 0;
-	} else {
-		window.prplGridOrderLastItem++;
-	}
-
-	if ( ! item.dataset.order ) {
-		item.dataset.order = window.prplGridOrderLastItem;
-	}
-};
 
 /**
  * Populate the grid columns X data in window.prplGridColumnsX.
@@ -141,33 +114,6 @@ const prplPopulateGridColumnsX = ( item ) => {
 
 	// Sort the array.
 	window.prplGridColumnsX.sort( ( a, b ) => a - b );
-};
-
-/**
- * Populate the grid columns X data for an item. Adds a data attribute to the
- * item that contains the column index of the item in the array.
- *
- * @param {HTMLElement} item The item to populate.
- */
-const prplPopulateGridColumnsXItem = ( item ) => {
-	if (
-		! item ||
-		item.classList.contains( 'in-popover' ) ||
-		! item.querySelector( '.widget-inner-container' )
-	) {
-		return;
-	}
-
-	const innerContainer = item.querySelector( '.widget-inner-container' );
-	if ( ! innerContainer ) {
-		return;
-	}
-
-	// Get the item's X position.
-	const itemX = parseInt( item.getBoundingClientRect().left );
-
-	// Get the index of the item in the array.
-	item.dataset.gridColumn = window.prplGridColumnsX.indexOf( itemX );
 };
 
 /**
