@@ -23,15 +23,15 @@ $prpl_data_attributes = 5 < \count( $prpl_post_types ) ? 'data-has-many-valuable
 ?>
 
 <div class="prpl-column prpl-column-post-types" <?php echo \esc_attr( $prpl_data_attributes ); ?>>
+	<h2 class="prpl-settings-section-title">
+		<span class="icon">
+			<?php \progress_planner()->the_asset( 'images/icon_copywriting.svg' ); ?>
+		</span>
+		<span>
+			<?php \esc_html_e( 'Valuable post types', 'progress-planner' ); ?>
+		</span>
+	</h2>
 	<div class="prpl-settings-section-wrapper">
-		<h2 class="prpl-settings-section-title">
-			<span class="icon">
-				<?php \progress_planner()->the_asset( 'images/icon_copywriting.svg' ); ?>
-			</span>
-			<span>
-				<?php \esc_html_e( 'Valuable post types', 'progress-planner' ); ?>
-			</span>
-		</h2>
 		<p>
 			<?php \esc_html_e( 'You\'re in control of what counts as valuable content. We\'ll track and reward activity only for the post types you select here.', 'progress-planner' ); ?>
 		</p>

@@ -60,7 +60,7 @@
 		background: var(--prpl-background-orange);
 		padding: 1.2rem;
 		border-radius: 0.5rem;
-		margin-bottom: var(--prpl-settings-page-gap);
+		margin-bottom: var(--prpl-padding);
 
 		&:first-child {
 			margin-top: 0;

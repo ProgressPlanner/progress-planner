@@ -16,15 +16,15 @@ $prpl_pro_license_status = \get_option( 'progress_planner_pro_license_status', '
 ?>
 
 <div class="prpl-column prpl-column-license">
+	<h2 class="prpl-settings-section-title prpl-settings-section-license">
+		<span class="icon">
+			<?php \progress_planner()->the_asset( 'images/icon_key.svg' ); ?>
+		</span>
+		<span>
+			<?php \esc_html_e( 'License', 'progress-planner' ); ?>
+		</span>
+	</h2>
 	<div class="prpl-settings-section-wrapper">
-		<h2 class="prpl-settings-section-title prpl-settings-section-license">
-			<span class="icon">
-				<?php \progress_planner()->the_asset( 'images/icon_key.svg' ); ?>
-			</span>
-			<span>
-				<?php \esc_html_e( 'License', 'progress-planner' ); ?>
-			</span>
-		</h2>
 		<div class="prpl-license-keys-wrapper">
 			<?php if ( empty( $prpl_pro_license ) || 'valid' !== $prpl_pro_license_status ) : ?>
 				<p>
