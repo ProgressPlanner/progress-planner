@@ -20,6 +20,13 @@ final class Badge_Streak_Content extends Badge_Streak {
 	protected $id = 'badge-streak-content';
 
 	/**
+	 * Whether the widget should be forced to the last column.
+	 *
+	 * @var bool
+	 */
+	protected $force_last_column = true;
+
+	/**
 	 * Enqueue styles.
 	 *
 	 * @return void
