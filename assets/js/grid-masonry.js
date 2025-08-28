@@ -27,110 +27,107 @@ window.addEventListener( 'resize', prplTriggerGridResize );
 // Fire event after all images are loaded.
 window.addEventListener( 'load', prplTriggerGridResize );
 
-/**
- * Update the grid masonry item.
- *
- * @param {HTMLElement} item The item to update.
- */
-const prplUpdateGridMasonryItem = ( item ) => {
-	if ( ! item || item.classList.contains( 'in-popover' ) ) {
-		return;
-	}
-	const innerContainer = item.querySelector( '.widget-inner-container' );
-	if ( ! innerContainer ) {
-		return;
-	}
-	const rowSpan = Math.ceil(
-		( innerContainer.getBoundingClientRect().height +
-			parseInt(
-				window
-					.getComputedStyle( item )
-					.getPropertyValue( 'padding-top' )
-			) +
-			parseInt(
-				window
-					.getComputedStyle( item )
-					.getPropertyValue( 'padding-bottom' )
-			) ) /
-			parseInt(
-				window
-					.getComputedStyle(
-						document.querySelector( '.prpl-widgets-container' )
-					)
-					.getPropertyValue( 'grid-auto-rows' )
-			)
-	);
-	item.style.gridRowEnd = 'span ' + ( rowSpan + 1 );
-};
-
 window.addEventListener(
 	'prpl/grid/resize',
 	() => {
-		const widgetWrappers = document.querySelectorAll(
-			'.prpl-widget-wrapper'
-		);
+		window.prplGridColumnsX = [];
+		/**
+		 * Populate the grid columns X data in window.prplGridColumnsX.
+		 */
+		document
+			.querySelectorAll( '.prpl-widget-wrapper' )
+			.forEach( ( item ) => {
+				if (
+					! item ||
+					item.classList.contains( 'in-popover' ) ||
+					! item.querySelector( '.widget-inner-container' )
+				) {
+					return;
+				}
 
-		// Get initial grid data.
-		widgetWrappers.forEach( ( item ) => {
-			prplPopulateGridColumnsX( item );
-		} );
+				// Get the item's X position.
+				const itemX = parseInt( item.getBoundingClientRect().left );
 
-		// Reorder items to the grid columns.
-		widgetWrappers.forEach( ( item ) => {
-			prplMaybeForceItemToLastColumn( item );
-		} );
+				// Check if the item is already in the array.
+				if ( ! window.prplGridColumnsX.includes( itemX ) ) {
+					window.prplGridColumnsX.push( itemX );
+				}
 
-		// Update the grid masonry items.
-		widgetWrappers.forEach( ( item ) => {
-			prplUpdateGridMasonryItem( item );
-		} );
+				// Sort the array.
+				window.prplGridColumnsX.sort( ( a, b ) => a - b );
+			} );
+
+		/**
+		 * Unforce all items.
+		 */
+		document
+			.querySelectorAll( '.prpl-widget-wrapper' )
+			.forEach( ( item ) => {
+				if ( '1' === item.dataset.forceLastColumn ) {
+					item.style.gridColumnStart = '';
+				}
+			} );
+
+		setTimeout( () => {
+			/**
+			 * Reorder items to the grid columns if forceLastColumn is set.
+			 */
+			document
+				.querySelectorAll( '.prpl-widget-wrapper' )
+				.forEach( ( item ) => {
+					if (
+						! item ||
+						item.classList.contains( 'in-popover' ) ||
+						! item.querySelector( '.widget-inner-container' )
+					) {
+						return;
+					}
+					if ( '1' === item.dataset.forceLastColumn ) {
+						item.style.gridColumnStart =
+							window.prplGridColumnsX.length;
+					}
+				} );
+
+			/**
+			 * Update the grid masonry items.
+			 */
+			document
+				.querySelectorAll( '.prpl-widget-wrapper' )
+				.forEach( ( item ) => {
+					if ( ! item || item.classList.contains( 'in-popover' ) ) {
+						return;
+					}
+					const innerContainer = item.querySelector(
+						'.widget-inner-container'
+					);
+					if ( ! innerContainer ) {
+						return;
+					}
+					const rowSpan = Math.ceil(
+						( innerContainer.getBoundingClientRect().height +
+							parseInt(
+								window
+									.getComputedStyle( item )
+									.getPropertyValue( 'padding-top' )
+							) +
+							parseInt(
+								window
+									.getComputedStyle( item )
+									.getPropertyValue( 'padding-bottom' )
+							) ) /
+							parseInt(
+								window
+									.getComputedStyle(
+										document.querySelector(
+											'.prpl-widgets-container'
+										)
+									)
+									.getPropertyValue( 'grid-auto-rows' )
+							)
+					);
+					item.style.gridRowEnd = 'span ' + ( rowSpan + 1 );
+				} );
+		}, 250 );
 	},
 	false
 );
-
-/**
- * Populate the grid columns X data in window.prplGridColumnsX.
- *
- * @param {HTMLElement} item The item to populate.
- */
-const prplPopulateGridColumnsX = ( item ) => {
-	if (
-		! item ||
-		item.classList.contains( 'in-popover' ) ||
-		! item.querySelector( '.widget-inner-container' )
-	) {
-		return;
-	}
-
-	window.prplGridColumnsX = window.prplGridColumnsX || [];
-
-	// Get the item's X position.
-	const itemX = parseInt( item.getBoundingClientRect().left );
-
-	// Check if the item is already in the array.
-	if ( ! window.prplGridColumnsX.includes( itemX ) ) {
-		window.prplGridColumnsX.push( itemX );
-	}
-
-	// Sort the array.
-	window.prplGridColumnsX.sort( ( a, b ) => a - b );
-};
-
-/**
- * Force item to be in the last column.
- *
- * @param {HTMLElement} item The item to force.
- */
-const prplMaybeForceItemToLastColumn = ( item ) => {
-	if (
-		! item ||
-		item.classList.contains( 'in-popover' ) ||
-		! item.querySelector( '.widget-inner-container' )
-	) {
-		return;
-	}
-	const forceLastColumn = item.dataset.forceLastColumn;
-	if ( '1' === forceLastColumn ) {
-		item.style.gridColumnStart = window.prplGridColumnsX.length;
-	}
-};
