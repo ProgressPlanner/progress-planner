@@ -226,6 +226,7 @@ button.prpl-info-icon {
 	grid-template-columns: repeat(auto-fit, minmax(var(--prpl-column-min-width), 1fr));
 	column-gap: var(--prpl-gap);
 	grid-auto-rows: var(--prpl-gap);
+	grid-auto-flow: dense;
 
 	img {
 		max-width: 100%;
