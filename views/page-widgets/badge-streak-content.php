@@ -47,6 +47,9 @@ if ( $prpl_widget->get_details( 'content' ) ) {
 	$prpl_contexts_count  = \count( \array_keys( $prpl_widget_context_details ) );
 	?>
 	<?php foreach ( $prpl_widget_context_details as $prpl_context => $prpl_details ) : ?>
+		<?php if ( ! $prpl_widget->get_details( $prpl_context ) ) : ?>
+			<?php continue; ?>
+		<?php endif; ?>
 		<?php ++$prpl_current_context; ?>
 		<prpl-gauge background="<?php echo \esc_attr( $prpl_widget->get_details( $prpl_context )->get_background() ); ?>" color="var(--prpl-color-accent-orange)">
 			<progress max="100" value="<?php echo (float) $prpl_widget->get_details( $prpl_context )->get_progress()['progress']; ?>">
@@ -57,9 +60,6 @@ if ( $prpl_widget->get_details( 'content' ) ) {
 			<h3><?php echo \esc_html( $prpl_widget->get_details( $prpl_context )->get_name() ); ?></h3>
 			<p><?php echo \esc_html( $prpl_details['text'] ); ?></p>
 		</div>
-		<?php if ( $prpl_current_context < $prpl_contexts_count ) : ?>
-			<hr>
-		<?php endif; ?>
 	<?php endforeach; ?>
 </div>
 
