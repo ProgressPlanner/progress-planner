@@ -259,6 +259,11 @@ button.prpl-info-icon {
 		margin-bottom: 1.25rem;
 		border-top-color: var(--prpl-color-gray-2);
 	}
+
+	/* Force the last column to be the last column. */
+	&[data-force-last-column="1"] {
+		grid-column: -2 / -1;
+	}
 }
 
 /*------------------------------------*\
