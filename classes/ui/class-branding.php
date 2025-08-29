@@ -113,43 +113,46 @@ final class Branding {
 	 */
 	public function get_css_variables(): string {
 		$vars = [
-			'--prpl-color-gray-1'             => '#e1e3e7',
-			'--prpl-color-gray-2'             => '#d1d5db',
-			'--prpl-color-gray-3'             => '#9ca3af',
-			'--prpl-color-gray-4'             => '#6b7280',
-			'--prpl-color-gray-5'             => '#4b5563',
-			'--prpl-color-gray-6'             => '#374151',
+			'--prpl-color-gray-1'               => '#e1e3e7',
+			'--prpl-color-gray-2'               => '#d1d5db',
+			'--prpl-color-gray-3'               => '#9ca3af',
+			'--prpl-color-gray-4'               => '#6b7280',
+			'--prpl-color-gray-5'               => '#4b5563',
+			'--prpl-color-gray-6'               => '#374151',
 
-			'--prpl-color-accent-red'         => '#f43f5e',
-			'--prpl-color-accent-orange'      => '#faa310',
-			'--prpl-color-400-orange'         => '#f9b23c',
-			'--prpl-color-accent-purple'      => '#0d6b9e',
-			'--prpl-color-accent-green'       => '#14b8a6',
+			'--prpl-color-accent-red'           => '#f43f5e',
+			'--prpl-color-accent-orange'        => '#faa310',
+			'--prpl-color-400-orange'           => '#f9b23c',
+			'--prpl-color-accent-purple'        => '#0d6b9e',
+			'--prpl-color-accent-green'         => '#14b8a6',
 
-			'--prpl-color-headings'           => '#38296d',
-			'--prpl-color-text'               => 'var(--prpl-color-gray-5)',
-			'--prpl-color-link'               => '#1e40af',
+			'--prpl-color-headings'             => '#38296d',
+			'--prpl-color-text'                 => 'var(--prpl-color-gray-5)',
+			'--prpl-color-link'                 => '#1e40af',
 
-			'--prpl-color-notification-green' => '#16a34a',
-			'--prpl-color-notification-red'   => '#e73136',
+			'--prpl-color-notification-green'   => '#16a34a',
+			'--prpl-color-notification-red'     => '#e73136',
 
-			'--prpl-background-body'          => '#f0f0f1',
-			'--prpl-background-main'          => '#ffffff',
-			'--prpl-background-papers'        => '#ffffff',
-			'--prpl-background-orange'        => '#fff9f0',
-			'--prpl-background-purple'        => '#f6f5fb',
-			'--prpl-background-green'         => '#f2faf9',
-			'--prpl-background-red'           => '#fff6f7',
-			'--prpl-background-blue'          => '#effbfe',
+			'--prpl-background-body'            => '#f0f0f1',
+			'--prpl-background-main'            => '#ffffff',
+			'--prpl-background-papers'          => '#ffffff',
+			'--prpl-background-orange'          => '#fff9f0',
+			'--prpl-background-purple'          => '#f6f5fb',
+			'--prpl-background-green'           => '#f2faf9',
+			'--prpl-background-red'             => '#fff6f7',
+			'--prpl-background-blue'            => '#effbfe',
 
-			'--prpl-main-area-border-color'   => 'var(--prpl-color-gray-2)',
-			'--prpl-paper-border-color'       => 'var(--prpl-color-gray-2)',
+			'--prpl-color-button-primary-hover' => '#cf2441',
+			'--prpl-color-button-primary'       => '#dd3244',
 
-			'--prpl-papers-box-shadow'        => '4px 4px 10px rgba(0, 0, 0, 0.07), -2px 0 6px rgba(0, 0, 0, 0.07)',
+			'--prpl-main-area-border-color'     => 'var(--prpl-color-gray-2)',
+			'--prpl-paper-border-color'         => 'var(--prpl-color-gray-2)',
 
-			'--prpl-border-radius'            => '8px',
-			'--prpl-border-radius-small'      => 'calc(var(--prpl-border-radius) * 0.75)',
-			'--prpl-border-radius-big'        => 'calc(var(--prpl-border-radius) * 2)',
+			'--prpl-papers-box-shadow'          => '4px 4px 10px rgba(0, 0, 0, 0.07), -2px 0 6px rgba(0, 0, 0, 0.07)',
+
+			'--prpl-border-radius'              => '8px',
+			'--prpl-border-radius-small'        => 'calc(var(--prpl-border-radius) * 0.75)',
+			'--prpl-border-radius-big'          => 'calc(var(--prpl-border-radius) * 2)',
 		];
 
 		if ( ! empty( $this->get_api_data() ) && ! empty( $this->get_api_data()['acf']['css_variables'] ) ) {
