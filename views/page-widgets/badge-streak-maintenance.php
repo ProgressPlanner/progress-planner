@@ -9,26 +9,10 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_widget                 = \progress_planner()->get_admin__widgets__badge_streak_maintenance();
-$prpl_widget_context_details = [];
-
-if ( $prpl_widget->get_details( 'maintenance' ) ) {
-	$prpl_widget_context_details['maintenance'] = [
-		'text' => \sprintf(
-			\esc_html(
-				/* translators: %s: The remaining number of weeks. */
-				\_n(
-					'%s week to go to complete this streak!',
-					'%s weeks to go to complete this streak!',
-					(int) $prpl_widget->get_details( 'maintenance' )->get_progress()['remaining'],
-					'progress-planner'
-				)
-			),
-			\esc_html( \number_format_i18n( $prpl_widget->get_details( 'maintenance' )->get_progress()['remaining'] ) )
-		),
-	];
+$prpl_widget_details = \progress_planner()->get_admin__widgets__badge_streak_content()->get_details( 'content' );
+if ( ! $prpl_widget_details ) {
+	return;
 }
-
 ?>
 
 <h2 class="prpl-widget-title">
@@ -43,50 +27,46 @@ if ( $prpl_widget->get_details( 'maintenance' ) ) {
 </h2>
 
 <div class="prpl-latest-badges-wrapper">
-	<?php
-	$prpl_current_context = 0;
-	$prpl_contexts_count  = \count( \array_keys( $prpl_widget_context_details ) );
-	?>
-	<?php foreach ( $prpl_widget_context_details as $prpl_context => $prpl_details ) : ?>
-		<?php if ( ! $prpl_widget->get_details( $prpl_context ) ) : ?>
-			<?php continue; ?>
-		<?php endif; ?>
-		<?php ++$prpl_current_context; ?>
-		<prpl-gauge background="<?php echo \esc_attr( $prpl_widget->get_details( $prpl_context )->get_background() ); ?>" color="var(--prpl-color-accent-orange)">
-			<progress max="100" value="<?php echo (float) $prpl_widget->get_details( $prpl_context )->get_progress()['progress']; ?>">
-				<prpl-badge complete="true" badge-id="<?php echo \esc_attr( $prpl_widget->get_details( $prpl_context )->get_id() ); ?>"></prpl-badge>
-			</progress>
-		</prpl-gauge>
-		<div class="prpl-badge-content-wrapper">
-			<h3><?php echo \esc_html( $prpl_widget->get_details( $prpl_context )->get_name() ); ?></h3>
-			<p><?php echo \esc_html( $prpl_details['text'] ); ?></p>
-		</div>
-	<?php endforeach; ?>
+	<prpl-gauge background="<?php echo \esc_attr( $prpl_widget_details->get_background() ); ?>" color="var(--prpl-color-accent-orange)">
+		<progress max="100" value="<?php echo (float) $prpl_widget_details->get_progress()['progress']; ?>">
+			<prpl-badge complete="true" badge-id="<?php echo \esc_attr( $prpl_widget_details->get_id() ); ?>"></prpl-badge>
+		</progress>
+	</prpl-gauge>
+	<div class="prpl-badge-content-wrapper">
+		<h3><?php echo \esc_html( $prpl_widget_details->get_name() ); ?></h3>
+		<p>
+			<?php
+			\printf(
+				\esc_html(
+					/* translators: %s: The remaining number of weeks. */
+					\_n(
+						'%s week to go to complete this streak!',
+						'%s weeks to go to complete this streak!',
+						(int) $prpl_widget_details->get_progress()['remaining'],
+						'progress-planner'
+					)
+				),
+				\esc_html( \number_format_i18n( $prpl_widget_details->get_progress()['remaining'] ) )
+			);
+			?>
+		</p>
+	</div>
 </div>
 
 <h3><?php \esc_html_e( 'Your achievements', 'progress-planner' ); ?></h3>
 <div class="prpl-badges-container-achievements">
-	<?php
-	foreach ( [ 'maintenance' ] as $prpl_badge_group ) :
-		$prpl_group_badges = \progress_planner()->get_badges()->get_badges( $prpl_badge_group );
-		?>
-		<div class="progress-wrapper badge-group-<?php echo \esc_attr( $prpl_badge_group ); ?>">
-			<?php foreach ( $prpl_group_badges as $prpl_badge ) : ?>
-				<?php
-				$prpl_badge_progress  = $prpl_badge->get_progress();
-				$prpl_badge_completed = 100 === (int) $prpl_badge_progress['progress'];
-				?>
-				<span
-					class="prpl-badge"
-					data-value="<?php echo \esc_attr( $prpl_badge_progress['progress'] ); ?>"
-				>
-					<prpl-badge
-						complete="<?php echo $prpl_badge_completed ? 'true' : 'false'; ?>"
-						badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
-					></prpl-badge>
-					<p><?php echo \esc_html( $prpl_badge->get_name() ); ?></p>
-				</span>
-			<?php endforeach; ?>
-		</div>
-	<?php endforeach; ?>
+	<div class="progress-wrapper badge-group-<?php echo \esc_attr( 'maintenance' ); ?>">
+		<?php foreach ( \progress_planner()->get_badges()->get_badges( 'maintenance' ) as $prpl_badge ) : ?>
+			<span
+				class="prpl-badge"
+				data-value="<?php echo \esc_attr( $prpl_badge->get_progress()['progress'] ); ?>"
+			>
+				<prpl-badge
+					complete="<?php echo 100 === (int) $prpl_badge->get_progress()['progress'] ? 'true' : 'false'; ?>"
+					badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+				></prpl-badge>
+				<p><?php echo \esc_html( $prpl_badge->get_name() ); ?></p>
+			</span>
+		<?php endforeach; ?>
+	</div>
 </div>
