@@ -41,6 +41,8 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Suggested_Tasks_DB get_suggested_tasks_db()
  * @method \Progress_Planner\Utils\Deprecations get_utils__deprecations()
  * @method \Progress_Planner\Plugin_Installer get_plugin_installer()
+ * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Content get_admin__widgets__badge_streak_content()
+ * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Maintenance get_admin__widgets__badge_streak_maintenance()
  */
 class Base {
 
