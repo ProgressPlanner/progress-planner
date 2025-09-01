@@ -337,6 +337,7 @@ class Content_Review extends Tasks {
 				'snoozable'         => $this->is_snoozable,
 				'points'            => $this->get_points(),
 				'external_link_url' => $this->get_external_link_url(),
+				'actions'           => $this->get_task_actions(),
 			];
 		}
 

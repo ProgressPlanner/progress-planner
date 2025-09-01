@@ -297,6 +297,7 @@ class Email_Sending extends Tasks_Interactive {
 				'prpl_email_error'                     => $this->email_error,
 				'prpl_troubleshooting_guide_url'       => $this->troubleshooting_guide_url,
 				'prpl_is_there_sending_email_override' => $this->is_there_sending_email_override(),
+				'prpl_task_actions'                    => $this->get_task_actions(),
 			]
 		);
 	}

@@ -559,6 +559,7 @@ abstract class Tasks implements Tasks_Interface {
 			'snoozable'         => $this->is_snoozable(),
 			'external_link_url' => $this->get_external_link_url(),
 			'task_action_text'  => $this->get_task_action_text(),
+			'actions'           => $this->get_task_actions(),
 		];
 	}
 
@@ -606,5 +607,15 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get task actions.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions() {
+		$actions = [];
+		return $actions;
 	}
 }

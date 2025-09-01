@@ -94,4 +94,11 @@ interface Tasks_Interface {
 	 * @return bool
 	 */
 	public function is_repetitive();
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions();
 }
