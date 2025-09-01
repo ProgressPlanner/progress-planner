@@ -69,7 +69,7 @@ class Suggested_Tasks {
 
 		\add_filter( 'wp_trash_post_days', [ $this, 'change_trashed_posts_lifetime' ], 10, 2 );
 
-		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'add_data_to_rest_response' ], 10, 3 );
+		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'add_data_to_rest_response' ], 10, 2 );
 	}
 
 	/**
@@ -557,11 +557,10 @@ class Suggested_Tasks {
 	 *
 	 * @param \WP_REST_Response $response The response.
 	 * @param \WP_Post          $post The post.
-	 * @param \WP_REST_Request  $request The request.
 	 *
 	 * @return \WP_REST_Response
 	 */
-	public function add_data_to_rest_response( $response, $post, $request ) {
+	public function add_data_to_rest_response( $response, $post ) {
 		if ( ! isset( $response->data['meta'] ) ) {
 			$response->data['meta'] = [];
 		}
