@@ -27,20 +27,6 @@ final class Suggested_Tasks extends Widget {
 	protected $width = 2;
 
 	/**
-	 * Enqueue the scripts.
-	 *
-	 * @return void
-	 */
-	public function enqueue_scripts() {
-		parent::enqueue_scripts();
-
-		// Enqueue the badge scroller script.
-		\progress_planner()->get_admin__enqueue()->enqueue_script(
-			'widgets/suggested-tasks-badge-scroller',
-		);
-	}
-
-	/**
 	 * Get the stylesheet dependencies.
 	 *
 	 * @return array
