@@ -141,7 +141,7 @@
 	}
 
 	.prpl-suggested-task:nth-child(odd) {
-		background-color: #f9fafb;
+		background-color: #f9f7f9;
 	}
 
 	/* If task has disabled checkbox it's title should be italic. */
