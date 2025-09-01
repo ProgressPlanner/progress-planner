@@ -1,3 +1,9 @@
+
+= 1.7.0 =
+
+Added these recommendations from Ravi:
+* Set date format.
+
 = 1.7.1 =
 
 Bugs we fixed:
