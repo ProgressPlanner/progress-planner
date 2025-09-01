@@ -32,6 +32,12 @@
 
 		<div class="prpl-suggested-task-actions-wrapper">
 			<div class="tooltip-actions">
+				<# Object.keys( data.post.meta.prpl_task_actions ).forEach( function( action ) { #>
+					<# if ( action !== 'move_buttons' && action !== 'checkbox' && action !== 'arrow' ) { #>
+						{{{ data.post.meta.prpl_task_actions[ action ] }}}
+					<# } #>
+				<# }); #>
+
 				<# if ( data.post.meta.prpl_task_action_text ) { #>
 					<span class="tooltip-action">
 						<# if ( data.post.meta.prpl_popover_id ) { #>
