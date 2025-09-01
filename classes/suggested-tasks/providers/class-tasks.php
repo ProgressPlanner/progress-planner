@@ -81,6 +81,13 @@ abstract class Tasks implements Tasks_Interface {
 	protected const HAS_ARROW = true;
 
 	/**
+	 * Whether the task has move/reorder buttons.
+	 *
+	 * @var bool
+	 */
+	protected const HAS_MOVE_BUTTONS = false;
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -634,6 +641,10 @@ abstract class Tasks implements Tasks_Interface {
 			$actions['checkbox'] = \progress_planner()->the_view( 'actions/checkbox.php', [ 'prpl_data' => $data ], true );
 		} elseif ( static::HAS_ARROW ) {
 			$actions['arrow'] = \progress_planner()->the_view( 'actions/arrow.php', [ 'prpl_data' => $data ], true );
+		}
+
+		if ( static::HAS_MOVE_BUTTONS ) {
+			$actions['move_buttons'] = \progress_planner()->the_view( 'actions/move-buttons.php', [ 'prpl_data' => $data ], true );
 		}
 
 		return $actions;

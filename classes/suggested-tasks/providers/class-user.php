@@ -27,6 +27,13 @@ class User extends Tasks {
 	protected const HAS_ARROW = false;
 
 	/**
+	 * Whether the task has move/reorder buttons.
+	 *
+	 * @var bool
+	 */
+	protected const HAS_MOVE_BUTTONS = true;
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool

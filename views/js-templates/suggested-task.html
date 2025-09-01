@@ -27,18 +27,7 @@
 		</div>
 
 		<# if ( 'user' === categorySlug ) { #>
-			<div class="tooltip-actions">
-				<span class="prpl-move-buttons">
-					<button type="button" class="prpl-suggested-task-button move-up" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="move-up" data-target="move-up" title="{{ data.l10n.moveUp }}" onclick="prplSuggestedTask.runButtonAction( this );">
-						<span class="dashicons dashicons-arrow-up-alt2"></span>
-						<span class="screen-reader-text">{{ data.l10n.moveUp }}</span>
-					</button>
-					<button type="button" class="prpl-suggested-task-button move-down" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="move-down" data-target="move-down" title="{{ data.l10n.moveDown }}" onclick="prplSuggestedTask.runButtonAction( this );">
-						<span class="dashicons dashicons-arrow-down-alt2"></span>
-						<span class="screen-reader-text">{{ data.l10n.moveDown }}</span>
-					</button>
-				</span>
-			</div>
+			{{{ data.post.meta.prpl_task_actions.move_buttons }}}
 		<# } #>
 
 		<div class="prpl-suggested-task-actions-wrapper">
