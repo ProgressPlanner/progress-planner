@@ -570,7 +570,7 @@ class Suggested_Tasks {
 		if ( $provider_term && ! \is_wp_error( $provider_term ) ) {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
 			if ( $provider ) {
-				$response->data['meta']['prpl_task_actions'] = $provider->get_task_actions();
+				$response->data['meta']['prpl_task_actions'] = $provider->get_task_actions( $response->data );
 			}
 		}
 

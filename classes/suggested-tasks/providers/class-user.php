@@ -13,6 +13,20 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 class User extends Tasks {
 
 	/**
+	 * Whether the task has a checkbox.
+	 *
+	 * @var bool
+	 */
+	protected const HAS_CHECKBOX = true;
+
+	/**
+	 * Whether the task has an arrow.
+	 *
+	 * @var bool
+	 */
+	protected const HAS_ARROW = false;
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool

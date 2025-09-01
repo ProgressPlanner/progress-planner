@@ -277,13 +277,13 @@ class Base {
 	 * @param string|array $template The template to include.
 	 *                               If an array, go through each item until the template exists.
 	 * @param array        $args   The arguments to pass to the template.
-	 * @return void
+	 * @return string Return the file contents if $get_contents is true, otherwise return an empty string.
 	 */
-	public function the_view( $template, $args = [] ) {
+	public function the_view( $template, $args = [], $get_contents = false ) {
 		$templates = ( \is_string( $template ) )
 			? [ $template, "/views/{$template}" ]
 			: $template;
-		$this->the_file( $templates, $args );
+		return $this->the_file( $templates, $args, $get_contents );
 	}
 
 	/**
@@ -326,9 +326,10 @@ class Base {
 	 * @param string|array $files The file to include.
 	 *                           If an array, go through each item until the file exists.
 	 * @param array        $args  The arguments to pass to the template.
-	 * @return void
+	 * @param bool         $get_contents Whether to return the file contents.
+	 * @return string Return the file contents if $get_contents is true, otherwise return an empty string.
 	 */
-	public function the_file( $files, $args = [] ) {
+	public function the_file( $files, $args = [], $get_contents = false ) {
 		/**
 		 * Allow filtering the files to include.
 		 *
@@ -342,10 +343,17 @@ class Base {
 			}
 			if ( \file_exists( $path ) ) {
 				\extract( $args ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
+				if ( $get_contents ) {
+					\ob_start();
+				}
 				include $path; // phpcs:ignore PEAR.Files.IncludingFile.UseRequire
+				if ( $get_contents ) {
+					return \ob_get_clean();
+				}
 				break;
 			}
 		}
+		return '';
 	}
 
 	/**

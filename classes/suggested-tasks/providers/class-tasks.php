@@ -67,6 +67,20 @@ abstract class Tasks implements Tasks_Interface {
 	protected const EXTERNAL_LINK_URL = '';
 
 	/**
+	 * Whether the task has a checkbox.
+	 *
+	 * @var bool
+	 */
+	protected const HAS_CHECKBOX = false;
+
+	/**
+	 * Whether the task has an arrow.
+	 *
+	 * @var bool
+	 */
+	protected const HAS_ARROW = true;
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -614,8 +628,12 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return array
 	 */
-	public function get_task_actions() {
+	public function get_task_actions( $data = [] ) {
 		$actions = [];
+		if ( static::HAS_CHECKBOX && $this->is_dismissable() ) {
+			$actions['checkbox'] = \progress_planner()->the_view( 'actions/checkbox.php', [ 'prpl_data' => $data ], true );
+		}
+
 		return $actions;
 	}
 }
