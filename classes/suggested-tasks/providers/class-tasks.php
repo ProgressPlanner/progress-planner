@@ -632,6 +632,8 @@ abstract class Tasks implements Tasks_Interface {
 		$actions = [];
 		if ( static::HAS_CHECKBOX && $this->is_dismissable() ) {
 			$actions['checkbox'] = \progress_planner()->the_view( 'actions/checkbox.php', [ 'prpl_data' => $data ], true );
+		} elseif ( static::HAS_ARROW ) {
+			$actions['arrow'] = \progress_planner()->the_view( 'actions/arrow.php', [ 'prpl_data' => $data ], true );
 		}
 
 		return $actions;
