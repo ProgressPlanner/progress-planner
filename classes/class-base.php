@@ -274,9 +274,10 @@ class Base {
 	/**
 	 * Include a template.
 	 *
-	 * @param string|array $template The template to include.
-	 *                               If an array, go through each item until the template exists.
-	 * @param array        $args   The arguments to pass to the template.
+	 * @param string|array $template     The template to include.
+	 *                                   If an array, go through each item until the template exists.
+	 * @param array        $args         The arguments to pass to the template.
+	 * @param bool         $get_contents Whether to return the file contents.
 	 * @return string Return the file contents if $get_contents is true, otherwise return an empty string.
 	 */
 	public function the_view( $template, $args = [], $get_contents = false ) {
