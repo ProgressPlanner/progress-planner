@@ -647,6 +647,22 @@ abstract class Tasks implements Tasks_Interface {
 			$actions['move_buttons'] = \progress_planner()->the_view( 'actions/move-buttons.php', [ 'prpl_data' => $data ], true );
 		}
 
+		if ( $this->is_dismissable() ) {
+			$actions['mark_as_complete'] = \progress_planner()->the_view( 'actions/mark-as-complete.php', [ 'prpl_data' => $data ], true );
+		}
+
+		if ( isset( $data['content']['rendered'] ) && $data['content']['rendered'] !== '' ) {
+			$actions['info'] = \progress_planner()->the_view( 'actions/info.php', [ 'prpl_data' => $data ], true );
+		}
+
+		if ( $this->is_snoozable() ) {
+			$actions['snooze'] = \progress_planner()->the_view( 'actions/snooze.php', [ 'prpl_data' => $data ], true );
+		}
+
+		if ( $this->get_external_link_url() ) {
+			$actions['external_link'] = \progress_planner()->the_view( 'actions/external-link.php', [ 'prpl_data' => $data ], true );
+		}
+
 		return $actions;
 	}
 }
