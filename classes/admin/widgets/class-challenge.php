@@ -88,15 +88,12 @@ final class Challenge extends Widget {
 	 * @return string
 	 */
 	public function get_remote_api_url() {
-		$url = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/challenges';
-		$url = \add_query_arg(
+		return \add_query_arg(
 			[
 				'license_key' => \get_option( 'progress_planner_license_key' ),
 				'site'        => \get_site_url(),
 			],
-			$url
+			\progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/challenges'
 		);
-
-		return $url;
 	}
 }
