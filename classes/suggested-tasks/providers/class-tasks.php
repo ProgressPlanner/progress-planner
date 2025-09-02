@@ -633,10 +633,16 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * Get task actions.
 	 *
+	 * @param array $data The task data.
+	 *
 	 * @return array
 	 */
 	public function get_task_actions( $data = [] ) {
 		$actions = [];
+		if ( ! isset( $data['meta'] ) ) {
+			return $actions;
+		}
+
 		if ( static::HAS_CHECKBOX && $this->is_dismissable() ) {
 			$actions['checkbox'] = \progress_planner()->the_view( 'actions/checkbox.php', [ 'prpl_data' => $data ], true );
 		} elseif ( static::HAS_ARROW ) {
@@ -660,7 +666,7 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		if ( $this->get_external_link_url() ) {
-			$actions['external_link'] = \progress_planner()->the_view( 'actions/external-link.php', [ 'prpl_data' => $data ], true );
+			$actions['external_link'] = \progress_planner()->the_view( 'actions/external-link.php', [ 'prpl_external_url' => $this->get_external_link_url() ], true );
 		}
 
 		return $actions;
