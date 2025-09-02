@@ -113,9 +113,7 @@ class Base {
 		$this->get_todo();
 
 		// Post-meta.
-		if ( $this->is_pro_site() ) {
-			$this->get_page_todos();
-		}
+		$this->get_page_todos();
 
 		\add_filter( 'plugin_action_links_' . \plugin_basename( PROGRESS_PLANNER_FILE ), [ $this, 'add_action_links' ] );
 
@@ -431,16 +429,6 @@ class Base {
 		}
 
 		return false;
-	}
-
-	/**
-	 * Check if this is a PRO site.
-	 *
-	 * @return bool
-	 */
-	public function is_pro_site() {
-		return \get_option( 'progress_planner_pro_license_key' )
-			&& 'valid' === \get_option( 'progress_planner_pro_license_status' );
 	}
 
 	/**

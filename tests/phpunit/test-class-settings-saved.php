@@ -27,6 +27,7 @@ class Settings_Saved_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	protected function complete_task() {
+		// TODO: Use a different option.
 		\update_option( 'progress_planner_pro_license_key', '12345' );
 	}
 }
