@@ -78,7 +78,7 @@ class Set_Date_Format extends Tasks_Interactive {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \esc_html__( 'Setting the date format correctly on your site is valuable. By setting the correct date format, you ensure the dates are displayed correctly in the admin area and the front end. We recommend you use the same date format as your country.', 'progress-planner' );
+		return \esc_html__( 'Setting the date format correctly on your site is valuable. By setting the correct date format, you ensure the dates are displayed correctly in the admin area and the front end.', 'progress-planner' );
 	}
 
 	/**
@@ -112,7 +112,7 @@ class Set_Date_Format extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Setting the date format correctly on your site is valuable. By setting the correct date format, you ensure the dates are displayed correctly in the admin area and the front end. We recommend you use the same date format as your country.', 'progress-planner' );
+		\esc_html_e( 'Setting the date format correctly on your site is valuable. By setting the correct date format, you ensure the dates are displayed correctly in the admin area and the front end.', 'progress-planner' );
 		echo '</p>';
 	}
 
@@ -173,12 +173,8 @@ class Set_Date_Format extends Tasks_Interactive {
 	 *
 	 * This is only for interactive tasks that change non-core settings.
 	 * The $_POST data is expected to be:
-	 * - setting: (string) The setting to update.
-	 * - value: (mixed) The value to update the setting to.
-	 * - setting_path: (array) The path to the setting to update.
-	 *                         Use an empty array if the setting is not nested.
-	 *                         If the value is nested, use an array of keys.
-	 *                         Example: [ 'a', 'b', 'c' ] will update the value of $option['a']['b']['c'].
+	 * - date_format: (string) The date format to update.
+	 * - date_format_custom: (string) The custom date format to update.
 	 * - nonce: (string) The nonce.
 	 *
 	 * @return void

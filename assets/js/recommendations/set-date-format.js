@@ -16,8 +16,7 @@ prplInteractiveTaskFormListener.customSubmit( {
 		const customFormat = document.querySelector(
 			'#prpl-popover-set-date-format input[name="date_format_custom"]'
 		);
-		console.log( format.value );
-		console.log( customFormat.value );
+
 		fetch( progressPlanner.ajaxUrl, {
 			method: 'POST',
 			headers: {
@@ -29,17 +28,9 @@ prplInteractiveTaskFormListener.customSubmit( {
 				date_format: format.value,
 				date_format_custom: customFormat.value,
 			} ),
-		} ).then( () => {} );
+		} );
 	},
 } );
-
-// prplInteractiveTaskFormListener.settings( {
-// 	settingAPIKey: 'date_format',
-// 	setting: 'date_format',
-// 	taskId: 'set-date-format',
-// 	popoverId: 'prpl-popover-set-date-format',
-// 	action: 'prpl_interactive_task_submit_set-date-format',
-// } );
 
 prplDocumentReady( () => {
 	// Handle date format radio button clicks
