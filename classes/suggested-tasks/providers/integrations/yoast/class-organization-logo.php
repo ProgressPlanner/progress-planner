@@ -65,15 +65,6 @@ class Organization_Logo extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Set logo', 'progress-planner' );
-	}
-
-	/**
 	 * Get external link URL.
 	 *
 	 * @return string
@@ -133,5 +124,30 @@ class Organization_Logo extends Yoast_Provider {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'task_action_text' => \esc_html__( 'Set logo', 'progress-planner' ),
+					'url'              => \admin_url( 'admin.php?page=wpseo_page_settings#/site-representation' ),
+					'url_target'       => '_blank',
+				]
+			),
+			true
+		);
+		return $actions;
 	}
 }

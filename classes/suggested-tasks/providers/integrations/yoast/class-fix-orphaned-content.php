@@ -98,15 +98,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Add internal links', 'progress-planner' );
-	}
-
-	/**
 	 * Get the URL.
 	 *
 	 * @param array $task_data The task data.
@@ -247,5 +238,30 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 */
 	public function exclude_completed_posts( $exclude_post_ids ) {
 		return \array_merge( $exclude_post_ids, $this->get_completed_post_ids() );
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'task_action_text' => \esc_html__( 'Add internal links', 'progress-planner' ),
+					'url'              => \admin_url( 'admin.php?page=wpseo_tools#/fix-orphaned-content' ),
+					'url_target'       => '_blank',
+				]
+			),
+			true
+		);
+		return $actions;
 	}
 }
