@@ -147,15 +147,6 @@ class Update_Term_Description extends Tasks {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Write description', 'progress-planner' );
-	}
-
-	/**
 	 * Get the URL.
 	 *
 	 * @param array $task_data The task data.
@@ -306,5 +297,39 @@ class Update_Term_Description extends Tasks {
 	 */
 	public function exclude_completed_terms( $exclude_term_ids ) {
 		return \array_merge( $exclude_term_ids, $this->get_completed_term_ids() );
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		if ( ! isset( $data['meta']['prpl_task_id'] ) ) {
+			return $actions;
+		}
+
+		$term = $this->get_term_from_task_id( $data['meta']['prpl_task_id'] );
+		if ( ! $term ) {
+			return $actions;
+		}
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'task_action_text' => \esc_html__( 'Write description', 'progress-planner' ),
+					'url'              => \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id ),
+					'url_target'       => '_blank',
+				]
+			),
+			true
+		);
+		return $actions;
 	}
 }

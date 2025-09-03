@@ -375,6 +375,10 @@ class Unpublished_Content extends Tasks {
 	public function get_task_actions( $data = [] ) {
 		$actions = parent::get_task_actions( $data );
 
+		if ( ! isset( $data['meta']['prpl_url'] ) ) {
+			return $actions;
+		}
+
 		$actions['do'] = \progress_planner()->the_view(
 			'actions/do.php',
 			\array_merge(
