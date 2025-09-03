@@ -120,11 +120,27 @@ class Content_Create extends Tasks {
 	}
 
 	/**
-	 * Get the task-action text.
+	 * Get the task actions.
 	 *
-	 * @return string
+	 * @param array $data The task data.
+	 *
+	 * @return array
 	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Create new post', 'progress-planner' );
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'task_action_text' => \esc_html__( 'Create new post', 'progress-planner' ),
+					'url'              => \admin_url( 'post-new.php' ),
+					'url_target'       => '_blank',
+				]
+			),
+			true
+		);
+		return $actions;
 	}
 }

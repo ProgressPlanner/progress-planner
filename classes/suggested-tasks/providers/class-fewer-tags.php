@@ -128,15 +128,6 @@ class Fewer_Tags extends Tasks {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Install plugin', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task condition is satisfied.
 	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *
@@ -183,5 +174,31 @@ class Fewer_Tags extends Tasks {
 		}
 
 		return $this->is_plugin_active;
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'task_action_text' => \esc_html__( 'Install plugin', 'progress-planner' ),
+					'url'              => \admin_url( '/plugin-install.php?tab=search&s=fewer+tags' ),
+					'url_target'       => '_self',
+				]
+			),
+			true
+		);
+
+		return $actions;
 	}
 }

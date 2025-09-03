@@ -82,14 +82,6 @@ class Select_Timezone extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Select timezone', 'progress-planner' );
-	}
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
@@ -218,5 +210,30 @@ class Select_Timezone extends Tasks_Interactive {
 		}
 
 		\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to update setting.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'popover_id'       => static::POPOVER_ID,
+					'task_action_text' => \esc_html__( 'Select timezone', 'progress-planner' ),
+				]
+			),
+			true
+		);
+
+		return $actions;
 	}
 }

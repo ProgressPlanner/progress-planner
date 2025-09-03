@@ -77,15 +77,6 @@ class Rename_Uncategorized_Category extends Tasks {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Rename', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
@@ -101,5 +92,31 @@ class Rename_Uncategorized_Category extends Tasks {
 	 */
 	public function update_uncategorized_category_cache() {
 		$this->get_data_collector()->update_uncategorized_category_cache(); // @phpstan-ignore-line method.notFound
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'task_action_text' => \esc_html__( 'Rename', 'progress-planner' ),
+					'url'              => \admin_url( 'term.php?taxonomy=category&tag_ID=' . $this->get_data_collector()->collect() ),
+					'url_target'       => '_self',
+				]
+			),
+			true
+		);
+
+		return $actions;
 	}
 }

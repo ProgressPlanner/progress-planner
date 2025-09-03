@@ -174,14 +174,6 @@ class Email_Sending extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Test email sending', 'progress-planner' );
-	}
-	/**
 	 * Enqueue the scripts.
 	 *
 	 * @param string $hook The current admin page.
@@ -309,5 +301,29 @@ class Email_Sending extends Tasks_Interactive {
 	 */
 	public function print_popover_form_contents() {
 		// The form is handled in the popovers/email-sending view.
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'popover_id'       => static::POPOVER_ID,
+					'task_action_text' => \esc_html__( 'Test email sending', 'progress-planner' ),
+				]
+			),
+			true
+		);
+		return $actions;
 	}
 }

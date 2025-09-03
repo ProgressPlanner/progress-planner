@@ -165,14 +165,6 @@ class Unpublished_Content extends Tasks {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Publish', 'progress-planner' );
-	}
-	/**
 	 * Get the task URL.
 	 *
 	 * @param array $task_data The task data.
@@ -371,5 +363,31 @@ class Unpublished_Content extends Tasks {
 
 		// If the post status is not draft or auto-draft (this includes (bool) false when the post was deleted), the task is completed.
 		return ( 'draft' !== $post_status && 'auto-draft' !== $post_status );
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'task_action_text' => \esc_html__( 'Publish', 'progress-planner' ),
+					'url'              => $data['meta']['prpl_url'],
+					'url_target'       => '_self',
+				]
+			),
+			true
+		);
+
+		return $actions;
 	}
 }

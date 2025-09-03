@@ -118,15 +118,6 @@ class Hello_World extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Delete', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task condition is satisfied.
 	 *
 	 * @return bool
@@ -160,5 +151,30 @@ class Hello_World extends Tasks_Interactive {
 				'postId' => $this->get_data_collector()->collect(),
 			],
 		];
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'popover_id'       => static::POPOVER_ID,
+					'task_action_text' => \esc_html__( 'Delete', 'progress-planner' ),
+				]
+			),
+			true
+		);
+
+		return $actions;
 	}
 }

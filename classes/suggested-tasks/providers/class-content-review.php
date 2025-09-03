@@ -174,15 +174,6 @@ class Content_Review extends Tasks {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Review', 'progress-planner' );
-	}
-
-	/**
 	 * Get the task URL.
 	 *
 	 * @param array $task_data The task data.
@@ -594,5 +585,30 @@ class Content_Review extends Tasks {
 		}
 
 		return 12 * MONTH_IN_SECONDS;
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'task_action_text' => \esc_html__( 'Review', 'progress-planner' ),
+					'url'              => \admin_url( 'post.php?action=edit&post=' . $data['id'] ),
+					'url_target'       => '_blank',
+				]
+			),
+			true
+		);
+		return $actions;
 	}
 }

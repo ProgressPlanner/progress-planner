@@ -166,15 +166,6 @@ class Remove_Terms_Without_Posts extends Tasks {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Remove', 'progress-planner' );
-	}
-
-	/**
 	 * Get the URL.
 	 *
 	 * @param array $task_data The task data.
@@ -319,5 +310,31 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 */
 	public function exclude_completed_terms( $exclude_term_ids ) {
 		return \array_merge( $exclude_term_ids, $this->get_completed_term_ids() );
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'task_action_text' => \esc_html__( 'Go to the "Taxonomies" page', 'progress-planner' ),
+					'url'              => \admin_url( 'options-permalink.php' ),
+					'url_target'       => '_self',
+				]
+			),
+			true
+		);
+
+		return $actions;
 	}
 }

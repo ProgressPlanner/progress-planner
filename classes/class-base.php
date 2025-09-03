@@ -349,9 +349,8 @@ class Base {
 				}
 				include $path; // phpcs:ignore PEAR.Files.IncludingFile.UseRequire
 				if ( $get_contents ) {
-					return \ob_get_clean();
+					return (string) \ob_get_clean();
 				}
-				break;
 			}
 		}
 		return '';

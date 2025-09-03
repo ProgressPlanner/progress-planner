@@ -61,20 +61,37 @@ class Settings_Saved extends Tasks {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Go to the settings page', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
 	public function should_add_task() {
 		return false === \get_option( 'progress_planner_pro_license_key', false );
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'task_action_text' => \esc_html__( 'Go to the settings page', 'progress-planner' ),
+					'url'              => \admin_url( 'admin.php?page=progress-planner-settings' ),
+					'url_target'       => '_self',
+				]
+			),
+			true
+		);
+
+		return $actions;
 	}
 }

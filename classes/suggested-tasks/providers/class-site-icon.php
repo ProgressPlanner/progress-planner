@@ -73,15 +73,6 @@ class Site_Icon extends Tasks {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Go to the Settings page', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
@@ -89,5 +80,31 @@ class Site_Icon extends Tasks {
 	public function should_add_task() {
 		$site_icon = \get_option( 'site_icon' );
 		return '' === $site_icon || '0' === $site_icon;
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'task_action_text' => \esc_html__( 'Go to the settings page', 'progress-planner' ),
+					'url'              => \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() ),
+					'url_target'       => '_self',
+				]
+			),
+			true
+		);
+
+		return $actions;
 	}
 }

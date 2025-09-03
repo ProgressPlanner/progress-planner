@@ -1,3 +1,14 @@
+<?php
+/**
+ * View for an action.
+ *
+ * @package Progress_Planner
+ */
+
+if ( ! \defined( 'ABSPATH' ) ) {
+	exit;
+}
+?>
 <span class="tooltip-action">
 	<prpl-tooltip class="prpl-suggested-task-snooze">
 		<slot name="open">

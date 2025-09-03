@@ -73,20 +73,37 @@ class Search_Engine_Visibility extends Tasks {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Change setting', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
 	public function should_add_task() {
 		return 0 === (int) \get_option( 'blog_public' );
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] ) {
+		$actions = parent::get_task_actions( $data );
+
+		$actions['do'] = \progress_planner()->the_view(
+			'actions/do.php',
+			\array_merge(
+				$data,
+				[
+					'task_action_text' => \esc_html__( 'Change setting', 'progress-planner' ),
+					'url'              => \admin_url( 'options-reading.php' ),
+					'url_target'       => '_self',
+				]
+			),
+			true
+		);
+
+		return $actions;
 	}
 }

@@ -98,7 +98,9 @@ interface Tasks_Interface {
 	/**
 	 * Get the task actions.
 	 *
+	 * @param array $data The task data.
+	 *
 	 * @return array
 	 */
-	public function get_task_actions();
+	public function get_task_actions( $data = [] );
 }
