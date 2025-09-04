@@ -412,7 +412,7 @@ class Enqueue {
 	 * @return void
 	 */
 	public function maybe_empty_session_storage() {
-		$screen = get_current_screen();
+		$screen = \get_current_screen();
 
 		if ( ! $screen ) {
 			return;
