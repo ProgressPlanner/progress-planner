@@ -1,11 +1,9 @@
 /* stylelint-disable-next-line selector-class-pattern */
 .progress-planner_page_progress-planner-settings {
 
-	/*
-	We need to change body background, not just #wpwrap, because of the "triangle"
-	(for the active menu item) in the Core admin menu.
-	*/
-	background-color: #f9f7f9;
+	#wpwrap {
+		background-color: #f6f7f9;
+	}
 
 	ul#adminmenu {
 
@@ -13,7 +11,7 @@
 		> li.current > a.current {
 
 			&::after {
-				border-right-color: #fff !important;
+				border-right-color: #f6f7f9 !important;
 			}
 		}
 	}

@@ -30,7 +30,7 @@
 		position: relative;
 
 		&:nth-child(2n+1) {
-			background-color: #f9f7f9;
+			background-color: #f6f7f9;
 		}
 
 		h3 {
