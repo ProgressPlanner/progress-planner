@@ -66,7 +66,7 @@ class Settings_Saved extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return false === \get_option( 'progress_planner_pro_license_key', false );
+		return ! \progress_planner()->get_settings()->get( 'include_post_types' );
 	}
 
 	/**
