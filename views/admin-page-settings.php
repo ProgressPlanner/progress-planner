@@ -14,13 +14,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 <div class="wrap prpl-wrap prpl-settings-wrap">
 	<div class="prpl-header">
 		<div class="prpl-header-logo">
-			<?php
-			if ( \progress_planner()->is_pro_site() ) {
-				\progress_planner()->the_asset( 'images/logo_progress_planner_pro.svg' );
-			} else {
-				\progress_planner()->the_asset( 'images/logo_progress_planner.svg' );
-			}
-			?>
+			<?php \progress_planner()->the_asset( 'images/logo_progress_planner.svg' ); ?>
 		</div>
 	</div>
 	<h1>
@@ -38,7 +32,6 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<div id="prpl-grid-column-wrapper">
 			<?php \progress_planner()->the_view( 'page-settings/post-types.php' ); ?>
 			<?php \progress_planner()->the_view( 'page-settings/settings.php' ); ?>
-			<?php \progress_planner()->the_view( 'page-settings/license.php' ); ?>
 		</div>
 
 		<?php \wp_nonce_field( 'progress_planner' ); ?>
