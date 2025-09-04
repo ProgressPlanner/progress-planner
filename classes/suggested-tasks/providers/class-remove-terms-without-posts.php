@@ -324,18 +324,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 		$actions[] = [
 			'id'       => 'do',
 			'priority' => 100,
-			'html'     => \progress_planner()->the_view(
-				'actions/do.php',
-				[
-					'prpl_data' => [
-						...$data,
-						'task_action_text' => \esc_html__( 'Go to the "Taxonomies" page', 'progress-planner' ),
-						'url'              => \admin_url( 'options-permalink.php' ),
-						'url_target'       => '_self',
-					],
-				],
-				true
-			),
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'options-permalink.php' ) . '" target="_self">' . \esc_html__( 'Go to the "Taxonomies" page', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

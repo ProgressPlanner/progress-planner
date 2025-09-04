@@ -318,22 +318,8 @@ class Update_Term_Description extends Tasks {
 		}
 
 		$actions[] = [
-			'id'       => 'do',
 			'priority' => 100,
-			'html'     => \progress_planner()->the_view(
-				'actions/do.php',
-				[
-					'prpl_data' => \array_merge(
-						$data,
-						[
-							'task_action_text' => \esc_html__( 'Write description', 'progress-planner' ),
-							'url'              => \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id ),
-							'url_target'       => '_blank',
-						]
-					),
-				],
-				true
-			),
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id ) . '" target="_blank">' . \esc_html__( 'Write description', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

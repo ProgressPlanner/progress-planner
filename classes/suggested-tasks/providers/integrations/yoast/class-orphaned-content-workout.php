@@ -164,20 +164,8 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
-			'id'       => 'do',
 			'priority' => 100,
-			'html'     => \progress_planner()->the_view(
-				'actions/do.php',
-				[
-					'prpl_data' => [
-						...$data,
-						'task_action_text' => \esc_html__( 'Run workout', 'progress-planner' ),
-						'url'              => \admin_url( 'admin.php?page=wpseo_workouts#orphaned' ),
-						'url_target'       => '_blank',
-					],
-				],
-				true
-			),
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_workouts#orphaned' ) . '" target="_blank">' . \esc_html__( 'Run workout', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

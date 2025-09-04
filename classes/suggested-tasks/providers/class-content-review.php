@@ -597,20 +597,8 @@ class Content_Review extends Tasks {
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
-			'id'       => 'do',
 			'priority' => 100,
-			'html'     => \progress_planner()->the_view(
-				'actions/do.php',
-				[
-					'prpl_data' => [
-						...$data,
-						'task_action_text' => \esc_html__( 'Review', 'progress-planner' ),
-						'url'              => \admin_url( 'post.php?action=edit&post=' . $data['id'] ),
-						'url_target'       => '_blank',
-					],
-				],
-				true
-			),
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'post.php?action=edit&post=' . $data['id'] ) . '" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

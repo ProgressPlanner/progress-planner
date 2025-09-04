@@ -129,20 +129,8 @@ class Content_Create extends Tasks {
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
-			'id'       => 'do',
 			'priority' => 100,
-			'html'     => \progress_planner()->the_view(
-				'actions/do.php',
-				[
-					'prpl_data' => [
-						...$data,
-						'task_action_text' => \esc_html__( 'Create new post', 'progress-planner' ),
-						'url'              => \admin_url( 'post-new.php' ),
-						'url_target'       => '_blank',
-					],
-				],
-				true
-			),
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'post-new.php' ) . '" target="_blank">' . \esc_html__( 'Create new post', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

@@ -99,20 +99,8 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
-			'id'       => 'do',
 			'priority' => 100,
-			'html'     => \progress_planner()->the_view(
-				'actions/do.php',
-				[
-					'prpl_data' => [
-						...$data,
-						'task_action_text' => \esc_html__( 'Remove', 'progress-planner' ),
-						'url'              => \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_global_comments' ),
-						'url_target'       => '_blank',
-					],
-				],
-				true
-			),
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_global_comments' ) . '" target="_blank">' . \esc_html__( 'Remove', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

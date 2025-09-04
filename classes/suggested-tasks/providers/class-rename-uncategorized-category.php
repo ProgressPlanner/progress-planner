@@ -104,20 +104,8 @@ class Rename_Uncategorized_Category extends Tasks {
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
-			'id'       => 'do',
 			'priority' => 100,
-			'html'     => \progress_planner()->the_view(
-				'actions/do.php',
-				[
-					'prpl_data' => [
-						...$data,
-						'task_action_text' => \esc_html__( 'Rename', 'progress-planner' ),
-						'url'              => \admin_url( 'term.php?taxonomy=category&tag_ID=' . $this->get_data_collector()->collect() ),
-						'url_target'       => '_self',
-					],
-				],
-				true
-			),
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'term.php?taxonomy=category&tag_ID=' . $this->get_data_collector()->collect() ) . '" target="_self">' . \esc_html__( 'Rename', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

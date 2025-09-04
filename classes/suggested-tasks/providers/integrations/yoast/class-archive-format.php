@@ -120,20 +120,8 @@ class Archive_Format extends Yoast_Provider {
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
-			'id'       => 'do',
 			'priority' => 100,
-			'html'     => \progress_planner()->the_view(
-				'actions/do.php',
-				[
-					'prpl_data' => [
-						...$data,
-						'task_action_text' => \esc_html__( 'Disable', 'progress-planner' ),
-						'url'              => \admin_url( 'admin.php?page=wpseo_page_settings#/format-archives' ),
-						'url_target'       => '_blank',
-					],
-				],
-				true
-			),
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/format-archives' ) . '" target="_blank">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

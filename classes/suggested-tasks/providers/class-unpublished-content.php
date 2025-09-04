@@ -379,20 +379,8 @@ class Unpublished_Content extends Tasks {
 		}
 
 		$actions[] = [
-			'id'       => 'do',
 			'priority' => 100,
-			'html'     => \progress_planner()->the_view(
-				'actions/do.php',
-				[
-					'prpl_data' => [
-						...$data,
-						'task_action_text' => \esc_html__( 'Publish', 'progress-planner' ),
-						'url'              => $data['meta']['prpl_url'],
-						'url_target'       => '_self',
-					],
-				],
-				true
-			),
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( $data['meta']['prpl_url'] ) . '" target="_self">' . \esc_html__( 'Publish', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

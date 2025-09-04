@@ -143,19 +143,8 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
-			'id'       => 'do',
 			'priority' => 100,
-			'html'     => \progress_planner()->the_view(
-				'actions/do.php',
-				[
-					'prpl_data' => [
-						...$data,
-						'popover_id'       => static::POPOVER_ID,
-						'task_action_text' => \esc_html__( 'Disable pagination', 'progress-planner' ),
-					],
-				],
-				true
-			),
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'' . \esc_attr( $data['meta']['prpl_popover_id'] ) . '\')?.showPopover()">' . \esc_html__( 'Disable pagination', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

@@ -151,20 +151,8 @@ class Core_Update extends Tasks {
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
-			'id'       => 'do',
 			'priority' => 100,
-			'html'     => \progress_planner()->the_view(
-				'actions/do.php',
-				[
-					'prpl_data' => [
-						...$data,
-						'task_action_text' => \esc_html__( 'Go to the Updates page', 'progress-planner' ),
-						'url'              => \admin_url( 'update-core.php' ),
-						'url_target'       => '_blank',
-					],
-				],
-				true
-			),
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'update-core.php' ) . '" target="_blank">' . \esc_html__( 'Go to the Updates page', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;
