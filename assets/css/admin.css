@@ -62,6 +62,17 @@ body.toplevel_page_progress-planner {
 	#wpwrap {
 		background-color: #f6f7f9;
 	}
+
+	ul#adminmenu {
+
+		a.wp-has-current-submenu,
+		>li.current > a.current {
+
+			&::after {
+				border-right-color: #f6f7f9 !important;
+			}
+		}
+	}
 }
 
 /*------------------------------------*\
