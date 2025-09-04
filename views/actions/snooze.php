@@ -39,7 +39,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 						] as $prpl_snooze_key => $prpl_snooze_value ) :
 						?>
 						<label>
-							<input type="radio" name="snooze-duration-<?php echo \esc_attr( $prpl_data['meta']['prpl_task_id'] ); ?>" value="<?php \esc_attr( $prpl_snooze_key ); ?>" onchange="prplSuggestedTask.snooze( <?php echo (int) $prpl_data['id']; ?>, '<?php echo \esc_attr( $prpl_snooze_key ); ?>' );">
+							<input type="radio" name="snooze-duration-<?php echo \esc_attr( $prpl_data['meta']['prpl_task_id'] ); ?>" value="<?php echo \esc_attr( $prpl_snooze_key ); ?>" onchange="prplSuggestedTask.snooze( <?php echo (int) $prpl_data['id']; ?>, '<?php echo \esc_attr( $prpl_snooze_key ); ?>' );">
 							<?php echo \esc_html( $prpl_snooze_value ); ?>
 						</label>
 					<?php endforeach; ?>
