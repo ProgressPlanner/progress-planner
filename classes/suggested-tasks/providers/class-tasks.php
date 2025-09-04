@@ -680,6 +680,7 @@ abstract class Tasks implements Tasks_Interface {
 			}
 		);
 
+
 		$return_actions = [];
 		foreach ( $actions as $action ) {
 			$return_actions[] = $action['html'];
