@@ -89,7 +89,7 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 			<?php $prpl_remaining_points += $prpl_previous_incomplete_month_badge->progress_callback()['remaining']; ?>
 			<div
 				class="prpl-previous-month-badge-progress-bar-wrapper"
-				style="padding: 1rem 0; border-radius: 0.5rem; padding: 0.75rem 1rem;"
+				style="border-radius: 0.5rem; padding: 0.75rem 1rem 1.25rem 1rem;"
 				data-badge-id="<?php echo \esc_attr( $prpl_previous_incomplete_month_badge->get_id() ); ?>"
 			>
 				<prpl-badge-progress-bar
