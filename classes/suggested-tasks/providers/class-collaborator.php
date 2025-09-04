@@ -104,7 +104,6 @@ class Collaborator extends Tasks {
 					'dismissable'       => true,
 					'snoozable'         => false,
 					'external_link_url' => $this->get_external_link_url(),
-					'actions'           => $this->get_task_actions( $task_data ),
 				]
 			);
 		}
