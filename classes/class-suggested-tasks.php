@@ -68,8 +68,6 @@ class Suggested_Tasks {
 		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'rest_prepare_recommendation' ], 10, 2 );
 
 		\add_filter( 'wp_trash_post_days', [ $this, 'change_trashed_posts_lifetime' ], 10, 2 );
-
-		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'add_data_to_rest_response' ], 10, 2 );
 	}
 
 	/**
@@ -452,14 +450,19 @@ class Suggested_Tasks {
 	 */
 	public function rest_prepare_recommendation( $response, $post ) {
 		$provider_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_provider' );
+		if ( ! isset( $response->data['meta'] ) ) {
+			$response->data['meta'] = [];
+		}
 		if ( $provider_term && ! \is_wp_error( $provider_term ) ) {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
 
 			if ( $provider ) {
 				// Link should be added during run time, since it is not added for users without required capability.
 				$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
-				? \esc_url( (string) $response->data['meta']['prpl_url'] )
-				: '';
+					? \esc_url( (string) $response->data['meta']['prpl_url'] )
+					: '';
+
+				$response->data['meta']['prpl_task_actions'] = $provider->get_task_actions( $response->data );
 			}
 		}
 
@@ -550,30 +553,5 @@ class Suggested_Tasks {
 		}
 
 		return \apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category );
-	}
-
-	/**
-	 * Add data to the REST API response.
-	 *
-	 * @param \WP_REST_Response $response The response.
-	 * @param \WP_Post          $post The post.
-	 *
-	 * @return \WP_REST_Response
-	 */
-	public function add_data_to_rest_response( $response, $post ) {
-		if ( ! isset( $response->data['meta'] ) ) {
-			$response->data['meta'] = [];
-		}
-
-		// Get the term for the `prpl_recommendations_provider` taxonomy.
-		$provider_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_provider' );
-		if ( $provider_term && ! \is_wp_error( $provider_term ) ) {
-			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
-			if ( $provider ) {
-				$response->data['meta']['prpl_task_actions'] = $provider->get_task_actions( $response->data );
-			}
-		}
-
-		return $response;
 	}
 }
