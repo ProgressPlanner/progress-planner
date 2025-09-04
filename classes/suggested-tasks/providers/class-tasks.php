@@ -580,7 +580,7 @@ abstract class Tasks implements Tasks_Interface {
 			'snoozable'         => $this->is_snoozable(),
 			'external_link_url' => $this->get_external_link_url(),
 			'task_action_text'  => $this->get_task_action_text(),
-			'actions'           => $this->get_task_actions(),
+			'actions'           => $this->get_task_actions( $task_data ),
 		];
 	}
 
@@ -643,32 +643,71 @@ abstract class Tasks implements Tasks_Interface {
 			return $actions;
 		}
 
-		if ( static::HAS_CHECKBOX && $this->is_dismissable() ) {
-			$actions['checkbox'] = \progress_planner()->the_view( 'actions/checkbox.php', [ 'prpl_data' => $data ], true );
-		} elseif ( static::HAS_ARROW ) {
-			$actions['arrow'] = \progress_planner()->the_view( 'actions/arrow.php', [ 'prpl_data' => $data ], true );
-		}
-
-		if ( static::HAS_MOVE_BUTTONS ) {
-			$actions['move_buttons'] = \progress_planner()->the_view( 'actions/move-buttons.php', [ 'prpl_data' => $data ], true );
-		}
-
 		if ( $this->is_dismissable() ) {
-			$actions['mark_as_complete'] = \progress_planner()->the_view( 'actions/mark-as-complete.php', [ 'prpl_data' => $data ], true );
+			$actions[] = [
+				'id'       => 'mark_as_complete',
+				'priority' => 0,
+				'html'     => \progress_planner()->the_view( 'actions/mark-as-complete.php', [ 'prpl_data' => $data ], true ),
+			];
 		}
 
 		if ( isset( $data['content']['rendered'] ) && $data['content']['rendered'] !== '' ) {
-			$actions['info'] = \progress_planner()->the_view( 'actions/info.php', [ 'prpl_data' => $data ], true );
+			$actions[] = [
+				'id'       => 'info',
+				'priority' => 10,
+				'html'     => \progress_planner()->the_view( 'actions/info.php', [ 'prpl_data' => $data ], true ),
+			];
 		}
 
 		if ( $this->is_snoozable() ) {
-			$actions['snooze'] = \progress_planner()->the_view( 'actions/snooze.php', [ 'prpl_data' => $data ], true );
+			$actions[] = [
+				'id'       => 'snooze',
+				'priority' => 20,
+				'html'     => \progress_planner()->the_view( 'actions/snooze.php', [ 'prpl_data' => $data ], true ),
+			];
 		}
 
 		if ( $this->get_external_link_url() ) {
-			$actions['external_link'] = \progress_planner()->the_view( 'actions/external-link.php', [ 'prpl_external_url' => $this->get_external_link_url() ], true );
+			$actions[] = [
+				'id'       => 'external_link',
+				'priority' => 30,
+				'html'     => \progress_planner()->the_view( 'actions/external-link.php', [ 'prpl_external_url' => $this->get_external_link_url() ], true ),
+			];
 		}
 
+		$actions = $this->add_task_actions( $data, $actions );
+		foreach ( $actions as $key => $action ) {
+			$actions[ $key ]['priority'] = $action['priority'] ?? 1000;
+			if ( ! isset( $action['html'] ) || '' === $action['html'] ) {
+				unset( $actions[ $key ] );
+			}
+		}
+
+		// Order actions by priority.
+		\usort(
+			$actions,
+			function ( $a, $b ) {
+				return $a['priority'] - $b['priority'];
+			}
+		);
+
+		$return_actions = [];
+		foreach ( $actions as $action ) {
+			$return_actions[] = $action['html'];
+		}
+
+		return $return_actions;
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
 		return $actions;
 	}
 }

@@ -300,15 +300,14 @@ class Update_Term_Description extends Tasks {
 	}
 
 	/**
-	 * Get the task actions.
+	 * Add task actions specific to this task.
 	 *
-	 * @param array $data The task data.
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
 	 *
 	 * @return array
 	 */
-	public function get_task_actions( $data = [] ) {
-		$actions = parent::get_task_actions( $data );
-
+	public function add_task_actions( $data = [], $actions = [] ) {
 		if ( ! isset( $data['meta']['prpl_task_id'] ) ) {
 			return $actions;
 		}
@@ -318,18 +317,25 @@ class Update_Term_Description extends Tasks {
 			return $actions;
 		}
 
-		$actions['do'] = \progress_planner()->the_view(
-			'actions/do.php',
-			\array_merge(
-				$data,
+		$actions[] = [
+			'id'       => 'do',
+			'priority' => 100,
+			'html'     => \progress_planner()->the_view(
+				'actions/do.php',
 				[
-					'task_action_text' => \esc_html__( 'Write description', 'progress-planner' ),
-					'url'              => \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id ),
-					'url_target'       => '_blank',
-				]
+					'prpl_data' => \array_merge(
+						$data,
+						[
+							'task_action_text' => \esc_html__( 'Write description', 'progress-planner' ),
+							'url'              => \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id ),
+							'url_target'       => '_blank',
+						]
+					),
+				],
+				true
 			),
-			true
-		);
+		];
+
 		return $actions;
 	}
 }

@@ -241,27 +241,31 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task actions.
+	 * Add task actions specific to this task.
 	 *
-	 * @param array $data The task data.
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
 	 *
 	 * @return array
 	 */
-	public function get_task_actions( $data = [] ) {
-		$actions = parent::get_task_actions( $data );
-
-		$actions['do'] = \progress_planner()->the_view(
-			'actions/do.php',
-			\array_merge(
-				$data,
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'id'       => 'do',
+			'priority' => 100,
+			'html'     => \progress_planner()->the_view(
+				'actions/do.php',
 				[
-					'task_action_text' => \esc_html__( 'Add internal links', 'progress-planner' ),
-					'url'              => \admin_url( 'admin.php?page=wpseo_tools#/fix-orphaned-content' ),
-					'url_target'       => '_blank',
-				]
+					'prpl_data' => [
+						...$data,
+						'task_action_text' => \esc_html__( 'Add internal links', 'progress-planner' ),
+						'url'              => \admin_url( 'admin.php?page=wpseo_tools#/fix-orphaned-content' ),
+						'url_target'       => '_blank',
+					],
+				],
+				true
 			),
-			true
-		);
+		];
+
 		return $actions;
 	}
 }

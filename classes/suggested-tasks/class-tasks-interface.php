@@ -103,4 +103,14 @@ interface Tasks_Interface {
 	 * @return array
 	 */
 	public function get_task_actions( $data = [] );
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] );
 }

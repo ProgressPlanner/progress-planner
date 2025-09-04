@@ -304,26 +304,30 @@ class Email_Sending extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the task actions.
+	 * Add task actions specific to this task.
 	 *
-	 * @param array $data The task data.
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
 	 *
 	 * @return array
 	 */
-	public function get_task_actions( $data = [] ) {
-		$actions = parent::get_task_actions( $data );
-
-		$actions['do'] = \progress_planner()->the_view(
-			'actions/do.php',
-			\array_merge(
-				$data,
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'id'       => 'do',
+			'priority' => 100,
+			'html'     => \progress_planner()->the_view(
+				'actions/do.php',
 				[
-					'popover_id'       => static::POPOVER_ID,
-					'task_action_text' => \esc_html__( 'Test email sending', 'progress-planner' ),
-				]
+					'prpl_data' => [
+						...$data,
+						'popover_id'       => static::POPOVER_ID,
+						'task_action_text' => \esc_html__( 'Test email sending', 'progress-planner' ),
+					],
+				],
+				true
 			),
-			true
-		);
+		];
+
 		return $actions;
 	}
 }

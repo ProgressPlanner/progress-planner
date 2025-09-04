@@ -95,27 +95,30 @@ class Rename_Uncategorized_Category extends Tasks {
 	}
 
 	/**
-	 * Get the task actions.
+	 * Add task actions specific to this task.
 	 *
-	 * @param array $data The task data.
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
 	 *
 	 * @return array
 	 */
-	public function get_task_actions( $data = [] ) {
-		$actions = parent::get_task_actions( $data );
-
-		$actions['do'] = \progress_planner()->the_view(
-			'actions/do.php',
-			\array_merge(
-				$data,
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'id'       => 'do',
+			'priority' => 100,
+			'html'     => \progress_planner()->the_view(
+				'actions/do.php',
 				[
-					'task_action_text' => \esc_html__( 'Rename', 'progress-planner' ),
-					'url'              => \admin_url( 'term.php?taxonomy=category&tag_ID=' . $this->get_data_collector()->collect() ),
-					'url_target'       => '_self',
-				]
+					'prpl_data' => [
+						...$data,
+						'task_action_text' => \esc_html__( 'Rename', 'progress-planner' ),
+						'url'              => \admin_url( 'term.php?taxonomy=category&tag_ID=' . $this->get_data_collector()->collect() ),
+						'url_target'       => '_self',
+					],
+				],
+				true
 			),
-			true
-		);
+		];
 
 		return $actions;
 	}
