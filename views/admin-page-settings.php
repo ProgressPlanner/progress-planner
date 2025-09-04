@@ -32,7 +32,6 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<div id="prpl-grid-column-wrapper">
 			<?php \progress_planner()->the_view( 'page-settings/post-types.php' ); ?>
 			<?php \progress_planner()->the_view( 'page-settings/settings.php' ); ?>
-			<?php \progress_planner()->the_view( 'page-settings/license.php' ); ?>
 		</div>
 
 		<?php \wp_nonce_field( 'progress_planner' ); ?>

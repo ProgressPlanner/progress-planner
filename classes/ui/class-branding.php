@@ -99,11 +99,7 @@ final class Branding {
 			}
 		}
 
-		\progress_planner()->the_asset(
-			\progress_planner()->is_pro_site()
-				? 'images/logo_progress_planner_pro.svg'
-				: 'images/logo_progress_planner.svg'
-		);
+		\progress_planner()->the_asset( 'images/logo_progress_planner.svg' );
 	}
 
 	/**
