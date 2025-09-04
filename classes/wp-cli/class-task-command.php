@@ -76,10 +76,10 @@ class Task_Command extends \WP_CLI_Command {
 						$formatted[ $field ] = $task->$field ?? '';
 						break;
 					case 'provider_id':
-						$formatted[ $field ] = is_object( $task->provider ?? null ) && isset( $task->provider->name ) ? $task->provider->name : '';
+						$formatted[ $field ] = \is_object( $task->provider ?? null ) && isset( $task->provider->name ) ? $task->provider->name : '';
 						break;
 					case 'category':
-						$formatted[ $field ] = is_object( $task->category ?? null ) && isset( $task->category->name ) ? $task->category->name : '';
+						$formatted[ $field ] = \is_object( $task->category ?? null ) && isset( $task->category->name ) ? $task->category->name : '';
 						break;
 					default:
 						$formatted[ $field ] = $task->$field ?? '';
