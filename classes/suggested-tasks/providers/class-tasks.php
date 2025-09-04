@@ -67,27 +67,6 @@ abstract class Tasks implements Tasks_Interface {
 	protected const EXTERNAL_LINK_URL = '';
 
 	/**
-	 * Whether the task has a checkbox.
-	 *
-	 * @var bool
-	 */
-	protected const HAS_CHECKBOX = false;
-
-	/**
-	 * Whether the task has an arrow.
-	 *
-	 * @var bool
-	 */
-	protected const HAS_ARROW = true;
-
-	/**
-	 * Whether the task has move/reorder buttons.
-	 *
-	 * @var bool
-	 */
-	protected const HAS_MOVE_BUTTONS = false;
-
-	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
