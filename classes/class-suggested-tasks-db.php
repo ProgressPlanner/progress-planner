@@ -39,21 +39,17 @@ class Suggested_Tasks_DB {
 		$lock_key   = 'prpl_task_lock_' . $data['task_id'];
 		$lock_value = \time();
 
-		// Try to acquire lock atomically, add_option will return false if the option already exists.
-		$got_lock = \add_option( $lock_key, $lock_value, '', false );
-
-		if ( ! $got_lock ) {
+		// add_option will return false if the option is already there.
+		if ( ! \add_option( $lock_key, $lock_value, '', false ) ) {
 			$current = \get_option( $lock_key );
 
-			// If lock is older than 30 seconds, consider it stale and replace it.
-			if ( $current && ( $current < time() - 30 ) ) {
-				update_option( $lock_key, $lock_value );
-				$got_lock = true;
+			// If lock is stale (older than 30s), take over.
+			if ( $current && ( $current < \time() - 30 ) ) {
+				\update_option( $lock_key, $lock_value );
+			} else {
+				error_log( 'Lock for: ' . $data['task_id'] ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- TODO: remove this after testing.
+				return 0; // Other process is using it.
 			}
-		}
-
-		if ( ! $got_lock ) {
-			return 0; // Another process is already working.
 		}
 
 		// Check if we have an existing task with the same title.
@@ -109,56 +105,59 @@ class Suggested_Tasks_DB {
 				break;
 		}
 
-		$post_id = \wp_insert_post( $args );
+		try {
+			$post_id = \wp_insert_post( $args );
 
-		// Add terms if they don't exist.
-		foreach ( [ 'category', 'provider_id' ] as $context ) {
-			$taxonomy_name = \str_replace( '_id', '', $context );
-			$term          = \get_term_by( 'name', $data[ $context ], "prpl_recommendations_$taxonomy_name" );
-			if ( ! $term ) {
-				\wp_insert_term( $data[ $context ], "prpl_recommendations_$taxonomy_name" );
-			}
-		}
-
-		// Set the task category.
-		\wp_set_post_terms( $post_id, $data['category'], 'prpl_recommendations_category' );
-
-		// Set the task provider.
-		\wp_set_post_terms( $post_id, $data['provider_id'], 'prpl_recommendations_provider' );
-
-		// Set the task parent.
-		if ( ! empty( $data['parent'] ) ) {
-			$parent = \get_post( $data['parent'] );
-			if ( $parent ) {
-				\wp_update_post(
-					[
-						'ID'          => $post_id,
-						'post_parent' => $parent->ID,
-					]
-				);
-			}
-		}
-
-		// Set other meta.
-		$default_keys = [
-			'title',
-			'description',
-			'status',
-			'category',
-			'provider_id',
-			'parent',
-			'order',
-			'post_status',
-		];
-		foreach ( $data as $key => $value ) {
-			if ( \in_array( $key, $default_keys, true ) ) {
-				continue;
+			// Add terms if they don't exist.
+			foreach ( [ 'category', 'provider_id' ] as $context ) {
+				$taxonomy_name = \str_replace( '_id', '', $context );
+				$term          = \get_term_by( 'name', $data[ $context ], "prpl_recommendations_$taxonomy_name" );
+				if ( ! $term ) {
+					\wp_insert_term( $data[ $context ], "prpl_recommendations_$taxonomy_name" );
+				}
 			}
 
-			\update_post_meta( $post_id, "prpl_$key", $value );
-		}
+			// Set the task category.
+			\wp_set_post_terms( $post_id, $data['category'], 'prpl_recommendations_category' );
 
-		\delete_option( $lock_key );
+			// Set the task provider.
+			\wp_set_post_terms( $post_id, $data['provider_id'], 'prpl_recommendations_provider' );
+
+			// Set the task parent.
+			if ( ! empty( $data['parent'] ) ) {
+				$parent = \get_post( $data['parent'] );
+				if ( $parent ) {
+					\wp_update_post(
+						[
+							'ID'          => $post_id,
+							'post_parent' => $parent->ID,
+						]
+					);
+				}
+			}
+
+			// Set other meta.
+			$default_keys = [
+				'title',
+				'description',
+				'status',
+				'category',
+				'provider_id',
+				'parent',
+				'order',
+				'post_status',
+			];
+			foreach ( $data as $key => $value ) {
+				if ( \in_array( $key, $default_keys, true ) ) {
+					continue;
+				}
+
+				\update_post_meta( $post_id, "prpl_$key", $value );
+			}
+		} finally {
+			// Delete the lock. This executes always.
+			\delete_option( $lock_key );
+		}
 
 		return $post_id;
 	}
