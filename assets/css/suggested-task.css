@@ -16,6 +16,11 @@
 		align-items: center;
 		gap: 0.5rem;
 		justify-content: space-between;
+
+		.prpl-task-title {
+			width: 100%;
+			color: #4b5563;
+		}
 	}
 
 	.prpl-suggested-task-actions-wrapper {
