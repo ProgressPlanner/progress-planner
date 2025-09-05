@@ -176,6 +176,7 @@ class Suggested_Tasks_DB {
 				case 'points':
 				case 'prpl_points':
 				case 'prpl_popover_id':
+				case 'prpl_external_link_url':
 					$update_meta[ 'prpl_' . \str_replace( 'prpl_', '', (string) $key ) ] = $value;
 					break;
 
