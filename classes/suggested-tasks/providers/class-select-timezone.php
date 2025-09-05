@@ -119,7 +119,7 @@ class Select_Timezone extends Tasks_Interactive {
 		$was_tzstring_saved = '' !== $tzstring || '0' !== $current_offset ? 'true' : 'false';
 
 		// Remove old Etc mappings. Fallback to gmt_offset.
-		if ( str_contains( $tzstring, 'Etc/GMT' ) ) {
+		if ( \str_contains( $tzstring, 'Etc/GMT' ) ) {
 			$tzstring = '';
 		}
 
@@ -186,15 +186,15 @@ class Select_Timezone extends Tasks_Interactive {
 		$update_options = false;
 
 		// Map UTC+- timezones to gmt_offsets and set timezone_string to empty.
-		if ( preg_match( '/^UTC[+-]/', $timezone_string ) ) {
+		if ( \preg_match( '/^UTC[+-]/', $timezone_string ) ) {
 			// Set the gmt_offset to the value of the timezone_string, strip the UTC prefix.
-			$gmt_offset = preg_replace( '/UTC\+?/', '', $timezone_string );
+			$gmt_offset = \preg_replace( '/UTC\+?/', '', $timezone_string );
 
 			// Reset the timezone_string to empty.
 			$timezone_string = '';
 
 			$update_options = true;
-		} elseif ( in_array( $timezone_string, \timezone_identifiers_list( \DateTimeZone::ALL_WITH_BC ), true ) ) {
+		} elseif ( \in_array( $timezone_string, \timezone_identifiers_list( \DateTimeZone::ALL_WITH_BC ), true ) ) {
 			// $timezone_string is already set, reset the value for $gmt_offset.
 			$gmt_offset = '';
 
