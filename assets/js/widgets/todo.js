@@ -61,8 +61,6 @@ const prplTodoWidget = {
 										item.status === 'publish'
 											? 'todo-list'
 											: 'todo-list-completed',
-									useCheckbox: true,
-									useArrow: false,
 								},
 							} )
 						);
@@ -98,8 +96,6 @@ const prplTodoWidget = {
 										item.status === 'publish'
 											? 'todo-list'
 											: 'todo-list-completed',
-									useCheckbox: true,
-									useArrow: false,
 								},
 							} )
 						);
@@ -165,8 +161,6 @@ const prplTodoWidget = {
 										? 'afterbegin'
 										: 'beforeend', // Add golden task to the start of the list.
 								listId: 'todo-list',
-								useCheckbox: true,
-								useArrow: false,
 							},
 						} )
 					);
