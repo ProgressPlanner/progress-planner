@@ -547,7 +547,6 @@ abstract class Tasks implements Tasks_Interface {
 			'url_target'        => $this->get_url_target(),
 			'link_setting'      => $this->get_link_setting(),
 			'dismissable'       => $this->is_dismissable(),
-			'snoozable'         => $this->is_snoozable(),
 			'external_link_url' => $this->get_external_link_url(),
 		];
 	}

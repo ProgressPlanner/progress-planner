@@ -325,7 +325,6 @@ class Content_Review extends Tasks {
 				'url'               => $this->get_url_with_data( $task_data ),
 				'url_target'        => $this->get_url_target(),
 				'dismissable'       => $this->is_dismissable(),
-				'snoozable'         => $this->is_snoozable,
 				'points'            => $this->get_points(),
 				'external_link_url' => $this->get_external_link_url(),
 			];
