@@ -442,6 +442,7 @@ class Suggested_Tasks {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
 
 			if ( $provider ) {
+				$response->data['prpl_provider'] = $provider_term[0];
 				// Link should be added during run time, since it is not added for users without required capability.
 				$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
 					? \esc_url( (string) $response->data['meta']['prpl_url'] )
@@ -449,6 +450,11 @@ class Suggested_Tasks {
 
 				$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
 			}
+		}
+
+		$category_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_category' );
+		if ( $category_term && ! \is_wp_error( $category_term ) ) {
+			$response->data['prpl_category'] = $category_term[0];
 		}
 
 		return $response;

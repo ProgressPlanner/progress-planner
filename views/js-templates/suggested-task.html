@@ -1,11 +1,7 @@
 <script type="text/html" id="tmpl-prpl-suggested-task">
-	<#
-	var providerSlug = prplTerms.getTerm( data.post[ prplTerms.provider ][0], prplTerms.provider ).slug;
-	var categorySlug = prplTerms.getTerm( data.post[ prplTerms.category ][0], prplTerms.category ).slug;
-	#>
-	<li class="prpl-suggested-task" data-task-id="{{ data.post.meta.prpl_task_id || data.post.id }}" data-post-id="{{ data.post.id }}" data-task-action="{{ data.action }}" data-task-url="{{ data.post.meta.prpl_url }}" data-task-provider-id="{{ providerSlug }}" data-task-points="{{ data.post.meta.prpl_points }}" data-task-category="{{ categorySlug }}" data-task-order="{{ data.post.menu_order }}">
+	<li class="prpl-suggested-task" data-task-id="{{ data.post.meta.prpl_task_id || data.post.id }}" data-post-id="{{ data.post.id }}" data-task-action="{{ data.action }}" data-task-url="{{ data.post.meta.prpl_url }}" data-task-provider-id="{{ data.post.prpl_provider.slug }}" data-task-points="{{ data.post.meta.prpl_points }}" data-task-category="{{ data.post.prpl_category.slug }}" data-task-order="{{ data.post.menu_order }}">
 		<div class="prpl-suggested-task-checkbox-wrapper">
-			<# if ( 'user' === categorySlug ) { #>
+			<# if ( 'user' === data.post.prpl_category.slug ) { #>
 				<label>
 					<input type="checkbox" class="prpl-suggested-task-checkbox" onchange="prplSuggestedTask.maybeComplete( {{ data.post.id }} );" style="margin: 0; pointer-events: none;"<# if ( 'trash' === data.post.status || 'pending' === data.post.status ) { #> checked<# } #>>
 					<span class="screen-reader-text">{{{ data.post.title.rendered }}}: {{ data.l10n.markAsComplete }}</span>
@@ -19,7 +15,7 @@
 
 		<div class="prpl-suggested-task-title-wrapper">
 			<h3 style="width: 100%;">
-				<span <# if ( 'user' === categorySlug ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.preventEnterKey( event ); prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>>{{{ data.post.title.rendered }}}</span>
+				<span <# if ( 'user' === data.post.prpl_category.slug ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.preventEnterKey( event ); prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>>{{{ data.post.title.rendered }}}</span>
 			</h3>
 		</div>
 
@@ -31,7 +27,7 @@
 			<# } #>
 		</div>
 
-		<# if ( 'user' === categorySlug ) { #>
+		<# if ( 'user' === data.post.prpl_category.slug ) { #>
 			<div class="tooltip-actions">
 				<span class="prpl-move-buttons">
 					<button type="button" class="prpl-suggested-task-button move-up" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="move-up" data-target="move-up" title="{{ data.l10n.moveUp }}" onclick="prplSuggestedTask.runButtonAction( this );">
@@ -52,7 +48,7 @@
 					<span class="tooltip-action">{{{ actionHTML }}}</span>
 				<# }); #>
 
-				<# if ( 'user' === categorySlug ) { #>
+				<# if ( 'user' === data.post.prpl_category.slug ) { #>
 					<span class="tooltip-action">
 						<button type="button" class="prpl-suggested-task-button trash" data-post-id="{{ data.post.id }}" title="{{ data.l10n.delete }}" onclick="prplSuggestedTask.trash( {{ data.post.id }} );">
 							<span class="prpl-tooltip-action-text">{{ data.l10n.delete }}</span>
