@@ -108,14 +108,14 @@
 			position: relative;
 			text-decoration: none;
 
-			&:not(:first-child) {
-				padding-left: 0.4rem; /* same as gap */
+			&:not(:last-child) {
+				padding-right: 0.4rem; /* same as gap */
 
-				&::before {
+				&::after {
 					position: absolute;
 					top: 50%;
 					transform: translateY(-50%);
-					left: 0;
+					right: 0;
 
 					content: "";
 					display: inline-block;
