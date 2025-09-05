@@ -457,7 +457,7 @@ class Suggested_Tasks {
 					? \esc_url( (string) $response->data['meta']['prpl_url'] )
 					: '';
 
-				$response->data['meta']['prpl_task_actions'] = $provider->get_task_actions( $response->data );
+				$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
 			}
 		}
 
