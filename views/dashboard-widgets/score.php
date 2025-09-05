@@ -25,6 +25,7 @@ use Progress_Planner\Badges\Monthly;
 				<prpl-badge
 					complete="true"
 					badge-id="<?php echo \esc_attr( Monthly::get_badge_id_from_date( new \DateTime() ) ); ?>"
+					branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
 				></prpl-badge>
 			</progress>
 		</prpl-gauge>
@@ -43,7 +44,7 @@ use Progress_Planner\Badges\Monthly;
 
 <hr style="margin: 1rem 0">
 
-<h3><?php \esc_html_e( 'Ravi\'s Recommendations', 'progress-planner' ); ?></h3>
+<h3><?php echo \esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() ); ?></h3>
 <ul style="display:none"></ul>
 <p class="prpl-suggested-tasks-loading">
 	<?php \esc_html_e( 'Loading tasks...', 'progress-planner' ); ?>

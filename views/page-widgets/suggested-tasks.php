@@ -17,10 +17,25 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 
 <div class="prpl-dashboard-widget-suggested-tasks">
 	<h2 class="prpl-widget-title">
-		<?php \esc_html_e( 'Ravi\'s Recommendations', 'progress-planner' ); ?>
+		<?php
+		echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'suggested-tasks',
+			\sprintf(
+				/* translators: %s: "Ravi" */
+				\esc_html__( '%s’s Recommendations', 'progress-planner' ),
+				\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
+			)
+		);
+		?>
 	</h2>
 	<p>
-		<?php \esc_html_e( 'Complete a task from Ravi’s Recommendations to improve your site and earn points toward this month’s badge!', 'progress-planner' ); ?>
+		<?php
+		\printf(
+			/* translators: %s: "Ravi" */
+			\esc_html__( 'Complete a task from %s’s Recommendations to improve your site and earn points toward this month’s badge!', 'progress-planner' ),
+			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
+		);
+		?>
 	</p>
 
 	<ul style="display:none"></ul>
@@ -50,7 +65,11 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 		data-badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
 	>
 		<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) $prpl_widget->get_score()['target_score']; ?>">
-			<prpl-badge complete="true" badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"></prpl-badge>
+			<prpl-badge
+				complete="true"
+				badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+				branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
+			></prpl-badge>
 		</progress>
 	</prpl-gauge>
 
@@ -82,6 +101,7 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 						data-badge-id="<?php echo \esc_attr( $prpl_previous_incomplete_month_badge->get_id() ); ?>"
 						data-points="<?php echo (int) $prpl_previous_incomplete_month_badge->progress_callback()['points']; ?>"
 						data-max-points="<?php echo (int) Monthly::TARGET_POINTS; ?>"
+						data-branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
 					></prpl-badge-progress-bar>
 
 					<div class="prpl-widget-content-points">

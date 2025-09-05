@@ -48,7 +48,11 @@ if ( $prpl_widget->get_details( 'maintenance' ) ) {
 
 <h2 class="prpl-widget-title">
 	<?php
-	\esc_html_e( 'Your streak badges', 'progress-planner' );
+	echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		'badge-streak',
+		\esc_html__( 'Your streak badges', 'progress-planner' )
+	);
+
 	\progress_planner()->get_ui__popover()->the_popover( 'badge-streak' )->render_button(
 		'',
 		'<span class="icon prpl-info-icon">' . \progress_planner()->get_asset( 'images/icon_info.svg' ) . '</span> <span class="screen-reader-text">' . \esc_html__( 'More info', 'progress-planner' ) . '</span>'
@@ -66,7 +70,11 @@ if ( $prpl_widget->get_details( 'maintenance' ) ) {
 		<?php ++$prpl_current_context; ?>
 		<prpl-gauge background="<?php echo \esc_attr( $prpl_widget->get_details( $prpl_context )->get_background() ); ?>" color="var(--prpl-color-accent-orange)">
 			<progress max="100" value="<?php echo (float) $prpl_widget->get_details( $prpl_context )->get_progress()['progress']; ?>">
-				<prpl-badge complete="true" badge-id="<?php echo \esc_attr( $prpl_widget->get_details( $prpl_context )->get_id() ); ?>"></prpl-badge>
+				<prpl-badge
+					complete="true"
+					badge-id="<?php echo \esc_attr( $prpl_widget->get_details( $prpl_context )->get_id() ); ?>"
+					branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
+				></prpl-badge>
 			</progress>
 		</prpl-gauge>
 		<div class="prpl-badge-content-wrapper">
@@ -98,6 +106,7 @@ if ( $prpl_widget->get_details( 'maintenance' ) ) {
 					<prpl-badge
 						complete="<?php echo $prpl_badge_completed ? 'true' : 'false'; ?>"
 						badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+						branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
 					></prpl-badge>
 					<p><?php echo \esc_html( $prpl_badge->get_name() ); ?></p>
 				</span>
