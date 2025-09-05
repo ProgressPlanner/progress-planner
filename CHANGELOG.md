@@ -1,3 +1,8 @@
+
+= 1.7.2 =
+
+* Backported some features from the Progress Planner Pro plugin.
+
 = 1.7.1 =
 
 Bugs we fixed:

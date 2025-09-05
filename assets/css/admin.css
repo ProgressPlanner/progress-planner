@@ -32,6 +32,9 @@
 	--prpl-color-notification-green: #16a34a;
 	--prpl-color-notification-red: #e73136;
 
+	--prpl-color-button-primary: #dd3244;
+	--prpl-color-button-primary-hover: #cf2441;
+
 	--prpl-background-orange: #fff9f0;
 	--prpl-background-purple: #f6f5fb;
 	--prpl-background-green: #f2faf9;
@@ -245,6 +248,7 @@ button.prpl-info-icon {
 	hr {
 		margin-top: 1.25rem;
 		margin-bottom: 1.25rem;
+		border-top-color: var(--prpl-color-gray-2);
 	}
 }
 
@@ -298,7 +302,7 @@ button.prpl-info-icon {
 	text-decoration: none;
 	cursor: pointer;
 	font-size: var(--prpl-font-size-base);
-	background: var(--prpl-color-accent-red);
+	background: var(--prpl-color-button-primary);
 	line-height: 1.25;
 	box-shadow: none;
 	border: none;
@@ -315,7 +319,7 @@ button.prpl-info-icon {
 		display: block;
 		width: 100%;
 		height: 100%;
-		background: var(--prpl-color-accent-red);
+		background: var(--prpl-color-button-primary);
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -331,10 +335,10 @@ button.prpl-info-icon {
 
 	&:not([disabled]):hover,
 	&:not([disabled]):focus {
-		background: #cf2441;
+		background: var(--prpl-color-button-primary-hover);
 
 		&::after {
-			background: #cf2441;
+			background: var(--prpl-color-button-primary-hover);
 			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
 			width: calc(100% + 4px);
 			height: calc(100% + 4px);

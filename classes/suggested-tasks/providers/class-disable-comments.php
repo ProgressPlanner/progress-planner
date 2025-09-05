@@ -119,7 +119,7 @@ class Disable_Comments extends Tasks_Interactive {
 		if ( 0 === $comments_count ) {
 			\esc_html_e( 'Your site currently has no approved comments. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments.', 'progress-planner' );
 		} else {
-			printf(
+			\printf(
 				\esc_html(
 					// translators: %d is the number of approved comments.
 					\_n(

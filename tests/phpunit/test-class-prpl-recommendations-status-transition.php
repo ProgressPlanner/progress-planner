@@ -23,7 +23,7 @@ class Prpl_Recommendations_Status_Transition_Test extends \WP_UnitTestCase {
 		$notices = [];
 
 		// Set up error handlers to capture errors and notices.
-		set_error_handler( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
+		\set_error_handler( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
 			function ( $errno, $errstr, $errfile, $errline ) use ( &$errors, &$notices ) {
 				if ( $errno === E_ERROR || $errno === E_PARSE || $errno === E_CORE_ERROR || $errno === E_COMPILE_ERROR ) {
 						$errors[] = [
@@ -55,35 +55,35 @@ class Prpl_Recommendations_Status_Transition_Test extends \WP_UnitTestCase {
 				'post_content' => 'This is a test recommendation content.',
 				'post_status'  => 'future',
 				'post_type'    => 'prpl_recommendations',
-				'post_date'    => gmdate( 'Y-m-d H:i:s', strtotime( '+1 hour' ) ),
+				'post_date'    => \gmdate( 'Y-m-d H:i:s', \strtotime( '+1 hour' ) ),
 			];
 
-			$post_id = wp_insert_post( $post_data );
+			$post_id = \wp_insert_post( $post_data );
 
 			// Add required taxonomy terms for the post.
-			wp_set_object_terms( $post_id, 'test-category', 'prpl_recommendations_category' );
-			wp_set_object_terms( $post_id, 'test-provider', 'prpl_recommendations_provider' );
+			\wp_set_object_terms( $post_id, 'test-category', 'prpl_recommendations_category' );
+			\wp_set_object_terms( $post_id, 'test-provider', 'prpl_recommendations_provider' );
 
 			// Now publish the post (change status from future to publish).
 			$updated_post_data = [
 				'ID'            => $post_id,
 				'post_status'   => 'publish',
-				'post_date'     => gmdate( 'Y-m-d H:i:s' ),
-				'post_date_gmt' => gmdate( 'Y-m-d H:i:s' ),
+				'post_date'     => \gmdate( 'Y-m-d H:i:s' ),
+				'post_date_gmt' => \gmdate( 'Y-m-d H:i:s' ),
 			];
 
-			wp_update_post( $updated_post_data );
+			\wp_update_post( $updated_post_data );
 
 		} finally {
 			// Restore error handler.
-			restore_error_handler();
+			\restore_error_handler();
 		}
 
 		// Assert that no PHP errors occurred.
-		$this->assertEmpty( $errors, 'No PHP errors should occur during the status transition. Errors found: ' . wp_json_encode( $errors ) );
+		$this->assertEmpty( $errors, 'No PHP errors should occur during the status transition. Errors found: ' . \wp_json_encode( $errors ) );
 
 		// Assert that no PHP notices occurred.
-		$this->assertEmpty( $notices, 'No PHP notices should occur during the status transition. Notices found: ' . wp_json_encode( $notices ) );
+		$this->assertEmpty( $notices, 'No PHP notices should occur during the status transition. Notices found: ' . \wp_json_encode( $notices ) );
 	}
 
 	/**
@@ -91,7 +91,7 @@ class Prpl_Recommendations_Status_Transition_Test extends \WP_UnitTestCase {
 	 */
 	public function tearDown(): void {
 		// Clean up any posts created during tests.
-		$posts = get_posts(
+		$posts = \get_posts(
 			[
 				'post_type'   => 'prpl_recommendations',
 				'post_status' => 'any',
@@ -100,7 +100,7 @@ class Prpl_Recommendations_Status_Transition_Test extends \WP_UnitTestCase {
 		);
 
 		foreach ( $posts as $post ) {
-			wp_delete_post( $post->ID, true );
+			\wp_delete_post( $post->ID, true );
 		}
 
 		parent::tearDown();
