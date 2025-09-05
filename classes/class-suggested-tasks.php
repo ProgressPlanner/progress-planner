@@ -177,7 +177,21 @@ class Suggested_Tasks {
 	 */
 	public function was_task_completed( $task_id ): bool {
 		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
-		return $task && $task->is_completed();
+
+		// Checks for task (post) status, trash or pending.
+		if ( $task && $task->is_completed() ) {
+			return true;
+		}
+
+		// Checks for activity, if there is an activity for the task, it means that the task was completed (and post might already be deleted from the trash).
+		$activity = \progress_planner()->get_activities__query()->query_activities(
+			[
+				'category' => 'suggested_task',
+				'data_id'  => $task_id,
+			]
+		);
+
+		return ! empty( $activity );
 	}
 
 	/**
