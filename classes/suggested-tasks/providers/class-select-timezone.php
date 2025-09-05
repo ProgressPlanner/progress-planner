@@ -87,14 +87,14 @@ class Select_Timezone extends Tasks_Interactive {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		$timezone_activity = \progress_planner()->get_activities__query()->query_activities(
+		$activity = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'suggested_task',
 				'data_id'  => static::PROVIDER_ID,
 			]
 		);
 
-		return ! $timezone_activity;
+		return ! $activity;
 	}
 
 	/**

@@ -175,14 +175,14 @@ class Select_Locale extends Tasks_Interactive {
 	 * @return bool
 	 */
 	public function is_task_completed( $task_id = '' ) {
-		$locale_activity = \progress_planner()->get_activities__query()->query_activities(
+		$activity = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'suggested_task',
 				'data_id'  => static::PROVIDER_ID,
 			]
 		);
 
-		return ! empty( $locale_activity );
+		return ! empty( $activity );
 	}
 
 	/**
