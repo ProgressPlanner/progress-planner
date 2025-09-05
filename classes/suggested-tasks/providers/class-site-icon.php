@@ -65,7 +65,7 @@ class Site_Icon extends Tasks {
 		return \sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/set-site-icon" target="_blank">site icon</a> link */
 			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/set-site-icon" target="_blank">' . \esc_html__( 'site icon', 'progress-planner' ) . '</a>'
+			'<a href="' . \apply_filters( 'progress_planner_task_description_link', 'https://prpl.fyi/set-site-icon', $this->get_task_id(), $this->get_provider_id() ) . '" target="_blank">' . \esc_html__( 'site icon', 'progress-planner' ) . '</a>'
 		);
 	}
 

@@ -80,7 +80,7 @@ class Permalink_Structure extends Tasks {
 		return \sprintf(
 			/* translators: %1$s <a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">We recommend</a> link */
 			\esc_html__( 'On install, WordPress sets the permalink structure to a format that is not SEO-friendly. %1$s changing it.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/change-default-permalink-structure" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
+			'<a href="' . \apply_filters( 'progress_planner_task_description_link', 'https://prpl.fyi/change-default-permalink-structure', $this->get_task_id(), $this->get_provider_id() ) . '" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
 		);
 	}
 

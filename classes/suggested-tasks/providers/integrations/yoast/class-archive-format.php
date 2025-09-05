@@ -62,7 +62,7 @@ class Archive_Format extends Yoast_Provider {
 		return \sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'WordPress creates an archive for each post format. This is not useful and can be disabled in the Yoast SEO settings. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-format-archive" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Format Archive', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			'<a href="' . \apply_filters( 'progress_planner_task_description_link', 'https://prpl.fyi/yoast-format-archive', $this->get_task_id(), $this->get_provider_id() ) . '" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Format Archive', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		);
 	}
 
