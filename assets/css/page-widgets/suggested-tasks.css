@@ -415,6 +415,7 @@
 		&:not(.prpl-column-content) {
 			display: flex;
 			flex-direction: column;
+			padding-top: 3px; /* To prevent custom radio and checkbox from being cut off. */
 		}
 
 		/* Inputs. */
@@ -634,6 +635,17 @@
 				}
 			}
 
+		}
+	}
+
+	/* Set the date format. */
+	&#prpl-popover-set-date-format {
+
+		.prpl-radio-wrapper {
+
+			.date-time-text {
+				min-width: 10rem;
+			}
 		}
 	}
 }

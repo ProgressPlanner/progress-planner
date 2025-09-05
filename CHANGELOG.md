@@ -1,4 +1,10 @@
 
+= 1.8.0 =
+
+Added these recommendations from Ravi:
+* Set date format.
+
+
 = 1.7.2 =
 
 * Backported some features from the Progress Planner Pro plugin.

@@ -8,7 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
- * Add task to select the site locale.
+ * Add task to select the site timezone.
  */
 class Select_Timezone extends Tasks_Interactive {
 
