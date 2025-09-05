@@ -308,11 +308,6 @@ class Suggested_Tasks {
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_dismissable'       => [
-				'type'         => 'boolean',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
 			'prpl_snoozable'         => [
 				'type'         => 'boolean',
 				'single'       => true,
