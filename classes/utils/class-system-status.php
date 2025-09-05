@@ -115,7 +115,47 @@ class System_Status {
 
 		// Timezone offset.
 		$data['timezone_offset'] = \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600;
-		$ravis_recommendations   = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
+
+		// Recommendations, will include user tasks.
+		$ravis_recommendations = [];
+
+		// Array with category slug as key and max items as value.
+		$max_items_per_category = \progress_planner()->get_suggested_tasks()->get_max_items_per_category();
+		$widget_post_ids        = [];
+
+		// First fetch recommendations which are visible in the Recommendations widget.
+		foreach ( $max_items_per_category as $category_slug => $max_items ) {
+
+			// Skip user tasks.
+			if ( 'user' === $category_slug ) {
+				continue;
+			}
+
+			$recommendations = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+				[
+					'post_status'    => 'publish',
+					'category'       => $category_slug,
+					'posts_per_page' => $max_items,
+				]
+			);
+
+			if ( ! empty( $recommendations ) ) {
+				$ravis_recommendations = array_merge( $ravis_recommendations, $recommendations );
+				$widget_post_ids       = array_merge( $widget_post_ids, \wp_list_pluck( $recommendations, 'ID' ) );
+			}
+		}
+
+		// Then fetch recommendations which are not visible in the widget, ordered by menu order (this includes user tasks).
+		$ravis_recommendations = array_merge(
+			$ravis_recommendations,
+			\progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+				[
+					'post_status'  => 'publish',
+					'post__not_in' => $widget_post_ids,
+				]
+			)
+		);
+
 		$data['recommendations'] = [];
 		foreach ( $ravis_recommendations as $recommendation ) {
 			$r = [
