@@ -334,11 +334,6 @@ class Suggested_Tasks {
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_task_action_text'  => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
 		];
 
 		foreach ( $rest_meta_fields as $key => $field ) {
@@ -450,14 +445,19 @@ class Suggested_Tasks {
 	 */
 	public function rest_prepare_recommendation( $response, $post ) {
 		$provider_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_provider' );
+		if ( ! isset( $response->data['meta'] ) ) {
+			$response->data['meta'] = [];
+		}
 		if ( $provider_term && ! \is_wp_error( $provider_term ) ) {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
 
 			if ( $provider ) {
 				// Link should be added during run time, since it is not added for users without required capability.
 				$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
-				? \esc_url( (string) $response->data['meta']['prpl_url'] )
-				: '';
+					? \esc_url( (string) $response->data['meta']['prpl_url'] )
+					: '';
+
+				$response->data['meta']['prpl_task_actions'] = $provider->get_task_actions( $response->data );
 			}
 		}
 

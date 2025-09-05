@@ -54,15 +54,6 @@ class Archive_Date extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Disable', 'progress-planner' );
-	}
-
-	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array
@@ -104,5 +95,22 @@ class Archive_Date extends Yoast_Provider {
 		return \strpos( $permalink_structure, '%year%' ) === false
 			&& \strpos( $permalink_structure, '%monthnum%' ) === false
 			&& \strpos( $permalink_structure, '%day%' ) === false;
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 100,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' ) . '" target="_blank">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

@@ -70,15 +70,6 @@ class Archive_Format extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Disable', 'progress-planner' );
-	}
-
-	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array
@@ -117,5 +108,22 @@ class Archive_Format extends Yoast_Provider {
 	public function is_task_relevant() {
 		// If there are more than X posts with a post format, we don't need to add the task. X is set in the class.
 		return $this->get_data_collector()->collect() <= static::MINIMUM_POSTS_WITH_FORMAT;
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 100,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/format-archives' ) . '" target="_blank">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }
