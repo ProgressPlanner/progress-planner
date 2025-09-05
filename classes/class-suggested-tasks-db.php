@@ -36,16 +36,25 @@ class Suggested_Tasks_DB {
 			return 0;
 		}
 
-		// Set lock transient.
-		$transient_key = 'prpl_task_lock_' . $data['task_id'];
+		$lock_key   = 'prpl_task_lock_' . $data['task_id'];
+		$lock_value = \time();
 
-		// Check if the task is already being processed.
-		if ( \get_transient( $transient_key ) ) {
-			return 0;
+		// Try to acquire lock atomically, add_option will return false if the option already exists.
+		$got_lock = \add_option( $lock_key, $lock_value, '', false );
+
+		if ( ! $got_lock ) {
+			$current = \get_option( $lock_key );
+
+			// If lock is older than 30 seconds, consider it stale and replace it.
+			if ( $current && ( $current < time() - 30 ) ) {
+				update_option( $lock_key, $lock_value );
+				$got_lock = true;
+			}
 		}
 
-		// Set lock transient.
-		\set_transient( $transient_key, true, 5 );
+		if ( ! $got_lock ) {
+			return 0; // Another process is already working.
+		}
 
 		// Check if we have an existing task with the same title.
 		$posts = $this->get_tasks_by(
@@ -64,7 +73,7 @@ class Suggested_Tasks_DB {
 
 		// If we have an existing task, skip.
 		if ( ! empty( $posts ) ) {
-			\delete_transient( $transient_key );
+			\delete_option( $lock_key );
 			return $posts[0]->ID;
 		}
 
@@ -149,7 +158,7 @@ class Suggested_Tasks_DB {
 			\update_post_meta( $post_id, "prpl_$key", $value );
 		}
 
-		\delete_transient( $transient_key );
+		\delete_option( $lock_key );
 
 		return $post_id;
 	}
