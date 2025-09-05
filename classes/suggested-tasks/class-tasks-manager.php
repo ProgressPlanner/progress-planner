@@ -304,7 +304,7 @@ class Tasks_Manager {
 	 */
 	public function handle_task_unsnooze( $new_status, $old_status, $post ) {
 		// Early exit if it's not task for which snooze period is over.
-		if ( 'future' !== $old_status || 'publish' !== $new_status || 'prpl_recommendations' !== get_post_type( $post ) ) {
+		if ( 'future' !== $old_status || 'publish' !== $new_status || 'prpl_recommendations' !== \get_post_type( $post ) ) {
 			return;
 		}
 
