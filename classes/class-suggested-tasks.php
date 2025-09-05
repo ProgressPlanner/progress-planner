@@ -490,13 +490,17 @@ class Suggested_Tasks {
 				continue;
 			}
 
-			$category_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
-				[
-					'category'       => $category_slug,
-					'posts_per_page' => 0 < $args['posts_per_page'] ? $args['posts_per_page'] : $max_items,
-					'post_status'    => $args['post_status'],
-				]
-			);
+			$get_tasks_args = [
+				'category'       => $category_slug,
+				'posts_per_page' => 0 < $args['posts_per_page'] ? $args['posts_per_page'] : $max_items,
+				'post_status'    => $args['post_status'],
+			];
+
+			if ( ! empty( $args['meta_query'] ) ) {
+				$get_tasks_args['meta_query'] = $args['meta_query']; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+			}
+
+			$category_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( $get_tasks_args );
 
 			if ( ! empty( $category_tasks ) ) {
 				$tasks[ $category_slug ] = [];
