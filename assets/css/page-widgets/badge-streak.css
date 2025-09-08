@@ -99,14 +99,6 @@
 			margin-top: var(--prpl-padding);
 		}
 
-		&.badge-group-content {
-			background: var(--prpl-background-blue);
-		}
-
-		&.badge-group-maintenance {
-			background: var(--prpl-background-red);
-		}
-
 		.prpl-badge {
 			display: flex;
 			flex-direction: column;
