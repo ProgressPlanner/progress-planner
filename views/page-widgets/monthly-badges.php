@@ -84,7 +84,9 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 	?>
 	<div class="prpl-previous-month-badge-progress-bars-wrapper">
 		<h3><?php \esc_html_e( 'Oh no! You missed the previous monthly badge!', 'progress-planner' ); ?></h3>
-		<p class="prpl-previous-month-badge-progress-bars-wrapper-description"><?php echo \wp_kses( \__( 'No worries though! <strong>Collect the surplus of points</strong> you earn, and get your badge!', 'progress-planner' ), [ 'strong' => [] ] ); ?></p>
+		<p class="prpl-previous-month-badge-progress-bars-wrapper-description">
+			<?php echo \wp_kses_post( \__( 'No worries though! <strong>Collect the surplus of points</strong> you earn, and get your badge!', 'progress-planner' ) ); ?>
+		</p>
 		<?php foreach ( $prpl_widget->get_previous_incomplete_months_badges() as $prpl_previous_incomplete_month_badge ) : ?>
 			<?php $prpl_remaining_points += $prpl_previous_incomplete_month_badge->progress_callback()['remaining']; ?>
 			<div
@@ -102,7 +104,10 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 					<span class="prpl-widget-previous-ravi-points-number" class="prpl-widget-content-points-number">
 						<?php echo (int) $prpl_previous_incomplete_month_badge->progress_callback()['points']; ?>pt
 					</span>
-					<span class="prpl-previous-month-badge-progress-bar-remaining" data-remaining="<?php echo (int) $prpl_previous_incomplete_month_badge->progress_callback()['remaining']; ?>">
+					<span
+						class="prpl-previous-month-badge-progress-bar-remaining"
+						data-remaining="<?php echo (int) $prpl_previous_incomplete_month_badge->progress_callback()['remaining']; ?>"
+					>
 						<?php
 						\printf(
 							/* translators: %1$d: The number of points. %2$d: The number of days. */
