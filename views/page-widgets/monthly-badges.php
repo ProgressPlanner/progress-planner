@@ -106,7 +106,7 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 						<?php
 						\printf(
 							/* translators: %1$d: The number of points. %2$d: The number of days. */
-							\esc_html( _n( '%1$d more points to go - %2$d day left', '%1$d more points to go - %2$d days left', (int) $prpl_days_remaining, 'progress-planner' ) ),
+							\esc_html( \_n( '%1$d more points to go - %2$d day left', '%1$d more points to go - %2$d days left', (int) $prpl_days_remaining, 'progress-planner' ) ),
 							(int) $prpl_remaining_points,
 							(int) $prpl_days_remaining
 						);
