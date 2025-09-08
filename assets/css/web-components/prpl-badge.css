@@ -66,7 +66,7 @@ prpl-badge {
 
 	/* This applies only to the monthly badges. */
 	.prpl-previous-month-badge-progress-bars-wrapper &,
-	.prpl-badge[data-monthly-is-missed="true"] & {
+	.prpl-badge[data-monthly-is-missed="true"] &[complete="false"] {
 		position: relative;
 
 		&::after {
