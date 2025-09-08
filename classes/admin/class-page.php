@@ -52,7 +52,6 @@ class Page {
 			\progress_planner()->get_admin__widgets__challenge(),
 			\progress_planner()->get_admin__widgets__activity_scores(),
 			\progress_planner()->get_admin__widgets__latest_badge(),
-			\progress_planner()->get_admin__widgets__missed_badges(),
 			\progress_planner()->get_admin__widgets__content_activity(),
 			\progress_planner()->get_admin__widgets__whats_new(),
 		];

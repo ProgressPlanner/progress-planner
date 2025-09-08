@@ -23,58 +23,18 @@
 	}
 
 	.badge-group-monthly {
-		padding: calc(var(--prpl-padding) / 2);
-		border-radius: var(--prpl-border-radius-big);
-		background-color: var(--prpl-background-orange);
+
 
 		.prpl-badge-row-wrapper {
-			overflow: hidden;
-		}
-
-		.prpl-badge-row-wrapper-inner {
-			--prpl-current-row: 1;
 
 			display: grid;
 			grid-template-columns: 1fr 1fr 1fr;
 			gap: calc(var(--prpl-gap) / 2);
-
-			transition: transform 0.3s ease-in-out;
-			transform: translateY(calc((var(--row-height) + var(--grid-gap)) * (var(--prpl-current-row) - 1) * -1));
-		}
-
-		.prpl-badge-row-button-wrapper {
-			display: flex;
-			justify-content: center;
-
-			&:has(.prpl-badge-row-button-up) {
-				margin-bottom: var(--prpl-padding);
-				padding-bottom: 0.2rem;
-
-				border-bottom: 1px solid var(--prpl-color-gray-3);
-			}
-
-			&:has(.prpl-badge-row-button-down) {
-				margin-top: var(--prpl-padding);
-				padding-top: 0.2rem;
-
-				border-top: 1px solid var(--prpl-color-gray-3);
-			}
-
-			&.prpl-badge-row-button-disabled {
-				opacity: 0.5;
-				pointer-events: none;
-			}
-		}
-
-		.prpl-badge-row-button {
-			border: none;
-			background: none;
-			cursor: pointer;
 		}
 
 		p {
 			margin: 0;
-			font-size: var(--prpl-font-size-xs);
+			font-size: var(--prpl-font-size-small);
 			text-align: center;
 			line-height: 1.2;
 		}
@@ -145,9 +105,64 @@
 	}
 }
 
+/* This is the badge streak widget. */
+.prpl-widget-wrapper.prpl-badge-streak {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+
+	.progress-label {
+		display: inline-block;
+	}
+
+	.progress-wrapper {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		gap: calc(var(--prpl-gap) / 4);
+		padding: calc(var(--prpl-padding) / 2);
+		border-radius: var(--prpl-border-radius-big);
+
+		&:not(:first-child) {
+			margin-top: var(--prpl-padding);
+		}
+
+		&.badge-group-content {
+			background: var(--prpl-background-blue);
+		}
+
+		&.badge-group-maintenance {
+			background: var(--prpl-background-red);
+		}
+
+		.prpl-badge {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: flex-start;
+			flex-wrap: wrap;
+			min-width: 0;
+		}
+
+		p {
+			margin: 0;
+			font-size: var(--prpl-font-size-small);
+			text-align: center;
+			line-height: 1.2;
+		}
+	}
+
+	.prpl-widget-content {
+		margin-bottom: 1em;
+	}
+
+	.badge-group-monthly {
+		background-color: transparent;
+	}
+}
+
 #prpl-popover-monthly-badges-trigger {
 	font-size: var(--prpl-font-size-base);
 	color: var(--prpl-color-link);
 	text-decoration: underline;
-	margin-top: 0.75rem;
+	margin-top: 1.25rem;
 }

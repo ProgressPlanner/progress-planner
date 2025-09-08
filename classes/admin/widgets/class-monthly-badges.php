@@ -49,17 +49,26 @@ final class Monthly_Badges extends Widget {
 	}
 
 	/**
-	 * Enqueue the scripts.
+	 * Get previous month badge.
 	 *
-	 * @return void
+	 * @return \Progress_Planner\Badges\Monthly[]
 	 */
-	public function enqueue_scripts() {
-		parent::enqueue_scripts();
+	public function get_previous_incomplete_months_badges() {
+		$previous_incomplete_month_badges = [];
 
-		// Enqueue the badge scroller script.
-		\progress_planner()->get_admin__enqueue()->enqueue_script(
-			'widgets/suggested-tasks-badge-scroller',
-		);
+		$minus_one_month       = ( new DateTime() )->modify( 'first day of previous month' );
+		$minus_one_month_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( $minus_one_month ) );
+		if ( $minus_one_month_badge && $minus_one_month_badge->progress_callback()['progress'] < 100 ) {
+			$previous_incomplete_month_badges[] = $minus_one_month_badge;
+		}
+
+		$minus_two_months       = ( new DateTime() )->modify( 'first day of previous month' )->modify( 'first day of previous month' );
+		$minus_two_months_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( $minus_two_months ) );
+		if ( $minus_two_months_badge && $minus_two_months_badge->progress_callback()['progress'] < 100 ) {
+			$previous_incomplete_month_badges[] = $minus_two_months_badge;
+		}
+
+		return $previous_incomplete_month_badges;
 	}
 
 	/**

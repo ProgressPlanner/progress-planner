@@ -39,7 +39,7 @@ if ( ! $prpl_widget_details ) {
 			<span>
 				<?php
 				// translators: %s: The badge name.
-				printf( 'Progress %s', \esc_html( $prpl_widget_details->get_name() ) );
+				\printf( 'Progress %s', \esc_html( $prpl_widget_details->get_name() ) );
 				?>
 			</span>
 			<span style="font-weight:600;font-size:var(--prpl-font-size-3xl);"><?php echo (float) $prpl_widget_details->get_progress()['progress']; ?>%</span>
