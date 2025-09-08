@@ -88,6 +88,15 @@ class Permalink_Structure extends Tasks {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Go to the "Permalinks" page', 'progress-planner' );
+	}
+
+	/**
 	 * Check if the task condition is satisfied.
 	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *
@@ -96,22 +105,5 @@ class Permalink_Structure extends Tasks {
 	public function should_add_task() {
 		$permalink_structure = \get_option( 'permalink_structure' );
 		return '/%year%/%monthnum%/%day%/%postname%/' === $permalink_structure || '/index.php/%year%/%monthnum%/%day%/%postname%/' === $permalink_structure;
-	}
-
-	/**
-	 * Add task actions specific to this task.
-	 *
-	 * @param array $data    The task data.
-	 * @param array $actions The existing actions.
-	 *
-	 * @return array
-	 */
-	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
-			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'options-permalink.php' ) . '" target="_self">' . \esc_html__( 'Go to the "Permalinks" page', 'progress-planner' ) . '</a>',
-		];
-
-		return $actions;
 	}
 }

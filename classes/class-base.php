@@ -41,8 +41,6 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Suggested_Tasks_DB get_suggested_tasks_db()
  * @method \Progress_Planner\Utils\Deprecations get_utils__deprecations()
  * @method \Progress_Planner\Plugin_Installer get_plugin_installer()
- * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Content get_admin__widgets__badge_streak_content()
- * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Maintenance get_admin__widgets__badge_streak_maintenance()
  */
 class Base {
 
@@ -115,7 +113,9 @@ class Base {
 		$this->get_todo();
 
 		// Post-meta.
-		$this->get_page_todos();
+		if ( $this->is_pro_site() ) {
+			$this->get_page_todos();
+		}
 
 		\add_filter( 'plugin_action_links_' . \plugin_basename( PROGRESS_PLANNER_FILE ), [ $this, 'add_action_links' ] );
 
@@ -272,17 +272,16 @@ class Base {
 	/**
 	 * Include a template.
 	 *
-	 * @param string|array $template     The template to include.
-	 *                                   If an array, go through each item until the template exists.
-	 * @param array        $args         The arguments to pass to the template.
-	 * @param bool         $get_contents Whether to return the file contents.
-	 * @return string Return the file contents if $get_contents is true, otherwise return an empty string.
+	 * @param string|array $template The template to include.
+	 *                               If an array, go through each item until the template exists.
+	 * @param array        $args   The arguments to pass to the template.
+	 * @return void
 	 */
-	public function the_view( $template, $args = [], $get_contents = false ) {
+	public function the_view( $template, $args = [] ) {
 		$templates = ( \is_string( $template ) )
 			? [ $template, "/views/{$template}" ]
 			: $template;
-		return $this->the_file( $templates, $args, $get_contents );
+		$this->the_file( $templates, $args );
 	}
 
 	/**
@@ -325,10 +324,9 @@ class Base {
 	 * @param string|array $files The file to include.
 	 *                           If an array, go through each item until the file exists.
 	 * @param array        $args  The arguments to pass to the template.
-	 * @param bool         $get_contents Whether to return the file contents.
-	 * @return string Return the file contents if $get_contents is true, otherwise return an empty string.
+	 * @return void
 	 */
-	public function the_file( $files, $args = [], $get_contents = false ) {
+	public function the_file( $files, $args = [] ) {
 		/**
 		 * Allow filtering the files to include.
 		 *
@@ -342,16 +340,10 @@ class Base {
 			}
 			if ( \file_exists( $path ) ) {
 				\extract( $args ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
-				if ( $get_contents ) {
-					\ob_start();
-				}
 				include $path; // phpcs:ignore PEAR.Files.IncludingFile.UseRequire
-				if ( $get_contents ) {
-					return (string) \ob_get_clean();
-				}
+				break;
 			}
 		}
-		return '';
 	}
 
 	/**
@@ -439,6 +431,16 @@ class Base {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Check if this is a PRO site.
+	 *
+	 * @return bool
+	 */
+	public function is_pro_site() {
+		return \get_option( 'progress_planner_pro_license_key' )
+			&& 'valid' === \get_option( 'progress_planner_pro_license_status' );
 	}
 
 	/**

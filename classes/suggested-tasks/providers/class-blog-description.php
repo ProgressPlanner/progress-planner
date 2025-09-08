@@ -59,6 +59,15 @@ class Blog_Description extends Tasks_Interactive {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Set tagline', 'progress-planner' );
+	}
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -121,22 +130,5 @@ class Blog_Description extends Tasks_Interactive {
 			<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
 		</button>
 		<?php
-	}
-
-	/**
-	 * Add task actions specific to this task.
-	 *
-	 * @param array $data    The task data.
-	 * @param array $actions The existing actions.
-	 *
-	 * @return array
-	 */
-	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
-			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'' . \esc_attr( $data['meta']['prpl_popover_id'] ) . '\')?.showPopover()">' . \esc_html__( 'Set tagline', 'progress-planner' ) . '</a>',
-		];
-
-		return $actions;
 	}
 }

@@ -61,6 +61,8 @@ const prplTodoWidget = {
 										item.status === 'publish'
 											? 'todo-list'
 											: 'todo-list-completed',
+									useCheckbox: true,
+									useArrow: false,
 								},
 							} )
 						);
@@ -96,6 +98,8 @@ const prplTodoWidget = {
 										item.status === 'publish'
 											? 'todo-list'
 											: 'todo-list-completed',
+									useCheckbox: true,
+									useArrow: false,
 								},
 							} )
 						);
@@ -129,6 +133,10 @@ const prplTodoWidget = {
 					prpl_recommendations_provider:
 						prplTerms.get( 'provider' ).user.id,
 					menu_order: prplTodoWidget.getHighestItemOrder() + 1,
+					meta: {
+						prpl_snoozable: false,
+						prpl_dismissable: true,
+					},
 				} );
 				post.save().then( ( response ) => {
 					if ( ! response.id ) {
@@ -138,6 +146,8 @@ const prplTodoWidget = {
 						...response,
 						meta: {
 							prpl_points: 0,
+							prpl_snoozable: false,
+							prpl_dismissable: true,
 							prpl_url: '',
 							prpl_url_target: '_self',
 							...( response.meta || {} ),
@@ -157,6 +167,8 @@ const prplTodoWidget = {
 										? 'afterbegin'
 										: 'beforeend', // Add golden task to the start of the list.
 								listId: 'todo-list',
+								useCheckbox: true,
+								useArrow: false,
 							},
 						} )
 					);

@@ -16,11 +16,6 @@
 		align-items: center;
 		gap: 0.5rem;
 		justify-content: space-between;
-
-		.prpl-task-title {
-			width: 100%;
-			color: #4b5563;
-		}
 	}
 
 	.prpl-suggested-task-actions-wrapper {
@@ -108,14 +103,14 @@
 			position: relative;
 			text-decoration: none;
 
-			&:not(:last-child) {
-				padding-right: 0.4rem; /* same as gap */
+			&:not(:first-child) {
+				padding-left: 0.4rem; /* same as gap */
 
-				&::after {
+				&::before {
 					position: absolute;
 					top: 50%;
 					transform: translateY(-50%);
-					right: 0;
+					left: 0;
 
 					content: "";
 					display: inline-block;

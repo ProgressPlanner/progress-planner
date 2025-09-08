@@ -69,7 +69,7 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 	<?php
 	\progress_planner()->get_ui__popover()->the_popover( 'monthly-badges' )->render_button(
 		'',
-		\esc_html__( 'Show all badges', 'progress-planner' )
+		\esc_html__( 'Show all my badges!', 'progress-planner' )
 	);
 	\progress_planner()->get_ui__popover()->the_popover( 'monthly-badges' )->render();
 	?>

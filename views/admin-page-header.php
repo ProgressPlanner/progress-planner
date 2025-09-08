@@ -19,7 +19,13 @@ $progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_tex
 ?>
 <div class="prpl-header">
 	<div class="prpl-header-logo">
-		<?php \progress_planner()->the_asset( 'images/logo_progress_planner.svg' ); ?>
+		<?php
+		if ( \progress_planner()->is_pro_site() ) {
+			\progress_planner()->the_asset( 'images/logo_progress_planner_pro.svg' );
+		} else {
+			\progress_planner()->the_asset( 'images/logo_progress_planner.svg' );
+		}
+		?>
 	</div>
 
 	<div class="prpl-header-right">

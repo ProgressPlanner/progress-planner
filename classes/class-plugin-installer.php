@@ -259,7 +259,7 @@ class Plugin_Installer {
 		}
 
 		// If the is_plugin_active function does not exist, include the necessary file.
-		if ( ! \function_exists( 'is_plugin_active' ) ) {
+		if ( ! function_exists( 'is_plugin_active' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore-line
 		}
 
@@ -281,7 +281,7 @@ class Plugin_Installer {
 		}
 
 		// If the get_plugins function does not exist, include the necessary file.
-		if ( ! \function_exists( 'get_plugins' ) ) {
+		if ( ! function_exists( 'get_plugins' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore-line
 		}
 

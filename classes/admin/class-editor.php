@@ -30,7 +30,7 @@ class Editor {
 		if ( ! $request && isset( $_SERVER['REQUEST_URI'] ) ) {
 			$request = \sanitize_text_field( \wp_unslash( $_SERVER['REQUEST_URI'] ) );
 		}
-		if ( $request && \str_contains( $request, 'site-editor.php' ) ) {
+		if ( $request && str_contains( $request, 'site-editor.php' ) ) {
 			return;
 		}
 

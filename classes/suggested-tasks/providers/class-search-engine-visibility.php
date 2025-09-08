@@ -73,28 +73,20 @@ class Search_Engine_Visibility extends Tasks {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Change setting', 'progress-planner' );
+	}
+
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
 	public function should_add_task() {
 		return 0 === (int) \get_option( 'blog_public' );
-	}
-
-	/**
-	 * Add task actions specific to this task.
-	 *
-	 * @param array $data    The task data.
-	 * @param array $actions The existing actions.
-	 *
-	 * @return array
-	 */
-	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
-			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'options-reading.php' ) . '" target="_self">' . \esc_html__( 'Change setting', 'progress-planner' ) . '</a>',
-		];
-
-		return $actions;
 	}
 }

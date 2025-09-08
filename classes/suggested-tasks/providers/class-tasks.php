@@ -163,6 +163,15 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return '';
+	}
+
+	/**
 	 * Get the task points.
 	 *
 	 * @return int
@@ -547,7 +556,9 @@ abstract class Tasks implements Tasks_Interface {
 			'url_target'        => $this->get_url_target(),
 			'link_setting'      => $this->get_link_setting(),
 			'dismissable'       => $this->is_dismissable(),
+			'snoozable'         => $this->is_snoozable(),
 			'external_link_url' => $this->get_external_link_url(),
+			'task_action_text'  => $this->get_task_action_text(),
 		];
 	}
 
@@ -595,89 +606,5 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Get task actions.
-	 *
-	 * @param array $data The task data.
-	 *
-	 * @return array
-	 */
-	public function get_task_actions( $data = [] ) {
-		$actions = [];
-		if ( ! isset( $data['meta'] ) ) {
-			return $actions;
-		}
-
-		if ( $this->is_dismissable() ) {
-			$actions[] = [
-				'priority' => 20,
-				'html'     => '<button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="complete" data-target="complete" title="' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '" onclick="prplSuggestedTask.maybeComplete(' . (int) $data['id'] . ');"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span></button>',
-			];
-		}
-
-		if ( $this->is_snoozable() ) {
-			$snooze_html  = '<prpl-tooltip class="prpl-suggested-task-snooze"><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="snooze" data-target="snooze" title="' . \esc_attr__( 'Snooze', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span></button></slot><slot name="content">';
-			$snooze_html .= '<fieldset><legend><span>' . \esc_html__( 'Snooze this task?', 'progress-planner' ) . '</span><button type="button" class="prpl-toggle-radio-group" onclick="this.closest(\'.prpl-suggested-task-snooze\').classList.toggle(\'prpl-toggle-radio-group-open\');"><span class="prpl-toggle-radio-group-text">' . \esc_html__( 'How long?', 'progress-planner' ) . '</span><span class="prpl-toggle-radio-group-arrow">&rsaquo;</span></button></legend><div class="prpl-snooze-duration-radio-group">';
-			foreach (
-				[
-					'1-week'   => \esc_html__( '1 week', 'progress-planner' ),
-					'1-month'  => \esc_html__( '1 month', 'progress-planner' ),
-					'3-months' => \esc_html__( '3 months', 'progress-planner' ),
-					'6-months' => \esc_html__( '6 months', 'progress-planner' ),
-					'1-year'   => \esc_html__( '1 year', 'progress-planner' ),
-					'forever'  => \esc_html__( 'forever', 'progress-planner' ),
-				] as $snooze_key => $snooze_value ) {
-					$snooze_html .= '<label><input type="radio" name="snooze-duration-' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" value="' . \esc_attr( $snooze_key ) . '" onchange="prplSuggestedTask.snooze(' . (int) $data['id'] . ', \'' . \esc_attr( $snooze_key ) . '\');">' . \esc_html( $snooze_value ) . '</label>';
-			}
-			$snooze_html .= '</div></fieldset></slot></prpl-tooltip>';
-			$actions[]    = [
-				'priority' => 30,
-				'html'     => $snooze_html,
-			];
-		}
-
-		if ( $this->get_external_link_url() ) {
-			$actions[] = [
-				'priority' => 40,
-				'html'     => '<a class="prpl-tooltip-action-text" href="' . \esc_attr( $this->get_external_link_url() ) . '" target="_blank">' . \esc_html__( 'Why is this important?', 'progress-planner' ) . '</a>',
-			];
-		}
-
-		$actions = $this->add_task_actions( $data, $actions );
-		foreach ( $actions as $key => $action ) {
-			$actions[ $key ]['priority'] = $action['priority'] ?? 1000;
-			if ( ! isset( $action['html'] ) || '' === $action['html'] ) {
-				unset( $actions[ $key ] );
-			}
-		}
-
-		// Order actions by priority.
-		\usort(
-			$actions,
-			function ( $a, $b ) {
-				return $a['priority'] - $b['priority'];
-			}
-		);
-
-		$return_actions = [];
-		foreach ( $actions as $action ) {
-			$return_actions[] = $action['html'];
-		}
-
-		return $return_actions;
-	}
-
-	/**
-	 * Get the task actions.
-	 *
-	 * @param array $data The task data.
-	 * @param array $actions The existing actions.
-	 *
-	 * @return array
-	 */
-	public function add_task_actions( $data = [], $actions = [] ) {
-		return $actions;
 	}
 }

@@ -229,7 +229,6 @@ button.prpl-info-icon {
 	grid-template-columns: repeat(auto-fit, minmax(var(--prpl-column-min-width), 1fr));
 	column-gap: var(--prpl-gap);
 	grid-auto-rows: var(--prpl-gap);
-	grid-auto-flow: dense;
 
 	img {
 		max-width: 100%;
@@ -258,11 +257,6 @@ button.prpl-info-icon {
 		margin-top: 1.25rem;
 		margin-bottom: 1.25rem;
 		border-top-color: var(--prpl-color-gray-2);
-	}
-
-	/* Force the last column to be the last column. */
-	&[data-force-last-column="1"] {
-		grid-column: -2 / -1;
 	}
 }
 

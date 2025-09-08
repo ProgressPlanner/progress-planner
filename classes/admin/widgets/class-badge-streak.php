@@ -10,7 +10,7 @@ namespace Progress_Planner\Admin\Widgets;
 /**
  * Badge_Streak class.
  */
-abstract class Badge_Streak extends Widget {
+final class Badge_Streak extends Widget {
 
 	/**
 	 * The widget ID.

@@ -37,13 +37,15 @@ class Lessons {
 	 */
 	public function get_remote_api_items() {
 		$url = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/lessons';
-		$url = \add_query_arg(
-			[
-				'site'        => \get_site_url(),
-				'license_key' => \get_option( 'progress_planner_license_key' ),
-			],
-			$url
-		);
+		$url = ( \progress_planner()->is_pro_site() )
+			? \add_query_arg(
+				[
+					'site'        => \get_site_url(),
+					'license_key' => \get_option( 'progress_planner_pro_license_key' ),
+				],
+				$url
+			)
+			: \add_query_arg( [ 'site' => \get_site_url() ], $url );
 
 		$cache_key = \md5( $url );
 

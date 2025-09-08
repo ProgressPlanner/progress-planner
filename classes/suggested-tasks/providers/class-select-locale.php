@@ -96,6 +96,15 @@ class Select_Locale extends Tasks_Interactive {
 	}
 
 	/**
+	 * Get the task-action text.
+	 *
+	 * @return string
+	 */
+	protected function get_task_action_text() {
+		return \esc_html__( 'Select locale', 'progress-planner' );
+	}
+
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
@@ -201,25 +210,25 @@ class Select_Locale extends Tasks_Interactive {
 	 */
 	public function print_popover_form_contents() {
 
-		if ( ! \function_exists( 'wp_get_available_translations' ) ) {
+		if ( ! function_exists( 'wp_get_available_translations' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/translation-install.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
 
 		$languages    = \get_available_languages();
 		$translations = \wp_get_available_translations();
 		$locale       = \get_locale();
-		if ( ! \in_array( $locale, $languages, true ) ) {
+		if ( ! in_array( $locale, $languages, true ) ) {
 			$locale = '';
 		}
 
-		\wp_dropdown_languages(
+		wp_dropdown_languages(
 			[
 				'name'                        => 'language',
 				'id'                          => 'language',
 				'selected'                    => $locale,
 				'languages'                   => $languages,
 				'translations'                => $translations,
-				'show_available_translations' => \current_user_can( 'install_languages' ) && \wp_can_install_language_pack(),
+				'show_available_translations' => current_user_can( 'install_languages' ) && wp_can_install_language_pack(),
 			]
 		);
 		?>
@@ -270,11 +279,11 @@ class Select_Locale extends Tasks_Interactive {
 		}
 
 		// Handle translation installation.
-		if ( \current_user_can( 'install_languages' ) ) {
+		if ( current_user_can( 'install_languages' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/translation-install.php'; // @phpstan-ignore requireOnce.fileNotFound
 
-			if ( \wp_can_install_language_pack() ) {
-				$language = \wp_download_language_pack( $language_for_update );
+			if ( wp_can_install_language_pack() ) {
+				$language = wp_download_language_pack( $language_for_update );
 				if ( $language ) {
 					$language_for_update = $language;
 
@@ -288,22 +297,5 @@ class Select_Locale extends Tasks_Interactive {
 		}
 
 		\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to update setting.', 'progress-planner' ) ] );
-	}
-
-	/**
-	 * Add task actions specific to this task.
-	 *
-	 * @param array $data    The task data.
-	 * @param array $actions The existing actions.
-	 *
-	 * @return array
-	 */
-	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
-			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'' . \esc_attr( $data['meta']['prpl_popover_id'] ) . '\')?.showPopover()">' . \esc_html__( 'Select locale', 'progress-planner' ) . '</a>',
-		];
-
-		return $actions;
 	}
 }

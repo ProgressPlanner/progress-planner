@@ -58,11 +58,6 @@
 
 prpl-badge {
 	width: 100%;
-	margin-bottom: 1rem;
-
-	& > img {
-		vertical-align: bottom;
-	}
 
 	/* This applies only to the monthly badges. */
 	.prpl-previous-month-badge-progress-bars-wrapper &,

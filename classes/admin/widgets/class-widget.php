@@ -24,13 +24,6 @@ abstract class Widget {
 	protected $width = 1;
 
 	/**
-	 * Whether the widget should be forced to the last column.
-	 *
-	 * @var bool
-	 */
-	protected $force_last_column = false;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -87,10 +80,7 @@ abstract class Widget {
 		$this->enqueue_styles();
 		$this->enqueue_scripts();
 		?>
-		<div
-			class="prpl-widget-wrapper prpl-<?php echo \esc_attr( $this->id ); ?> prpl-widget-width-<?php echo (int) $this->width; ?>"
-			data-force-last-column="<?php echo (int) $this->force_last_column; ?>"
-		>
+		<div class="prpl-widget-wrapper prpl-<?php echo \esc_attr( $this->id ); ?> prpl-widget-width-<?php echo (int) $this->width; ?>">
 			<div class="widget-inner-container">
 				<?php \progress_planner()->the_view( "page-widgets/{$this->id}.php" ); ?>
 			</div>

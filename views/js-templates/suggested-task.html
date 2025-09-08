@@ -1,12 +1,25 @@
 <script type="text/html" id="tmpl-prpl-suggested-task">
-	<li class="prpl-suggested-task" data-task-id="{{ data.post.meta.prpl_task_id || data.post.id }}" data-post-id="{{ data.post.id }}" data-task-action="{{ data.action }}" data-task-url="{{ data.post.meta.prpl_url }}" data-task-provider-id="{{ data.post.prpl_provider.slug }}" data-task-points="{{ data.post.meta.prpl_points }}" data-task-category="{{ data.post.prpl_category.slug }}" data-task-order="{{ data.post.menu_order }}">
+	<#
+	var providerSlug = prplTerms.getTerm( data.post[ prplTerms.provider ][0], prplTerms.provider ).slug;
+	var categorySlug = prplTerms.getTerm( data.post[ prplTerms.category ][0], prplTerms.category ).slug;
+	#>
+	<li class="prpl-suggested-task" data-task-id="{{ data.post.meta.prpl_task_id || data.post.id }}" data-post-id="{{ data.post.id }}" data-task-action="{{ data.action }}" data-task-url="{{ data.post.meta.prpl_url }}" data-task-provider-id="{{ providerSlug }}" data-task-points="{{ data.post.meta.prpl_points }}" data-task-category="{{ categorySlug }}" data-task-order="{{ data.post.menu_order }}">
 		<div class="prpl-suggested-task-checkbox-wrapper">
-			<# if ( 'user' === data.post.prpl_category.slug ) { #>
-				<label>
-					<input type="checkbox" class="prpl-suggested-task-checkbox" onchange="prplSuggestedTask.maybeComplete( {{ data.post.id }} );" style="margin: 0; pointer-events: none;"<# if ( 'trash' === data.post.status || 'pending' === data.post.status ) { #> checked<# } #>>
-					<span class="screen-reader-text">{{{ data.post.title.rendered }}}: {{ data.l10n.markAsComplete }}</span>
-				</label>
-			<# } else { #>
+			<# if ( data.useCheckbox ) { #>
+				<# if ( ! data.post.meta.prpl_dismissable ) { #>
+					<prpl-tooltip class="prpl-suggested-task-disabled-checkbox-tooltip">
+						<slot name="open-icon">
+							<input type="checkbox" class="prpl-suggested-task-checkbox" style="margin: 0; pointer-events: none;" <# if ( ! data.post.meta.prpl_dismissable ) { #>disabled<# } #> <# if ( 'trash' === data.post.status || 'pending' === data.post.status ) { #>checked<# } #>>
+						</slot>
+						<slot name="content">{{{ data.l10n.disabledRRCheckboxTooltip }}}</slot>
+					</prpl-tooltip>
+				<# } else { #>
+					<label>
+						<input type="checkbox" class="prpl-suggested-task-checkbox" onchange="prplSuggestedTask.maybeComplete( {{ data.post.id }} );" style="margin: 0; pointer-events: none;" <# if ( ! data.post.meta.prpl_dismissable || 'user' !== categorySlug && ( 'trash' === data.post.status || 'pending' === data.post.status ) ) { #>disabled<# } #> <# if ( 'trash' === data.post.status || 'pending' === data.post.status ) { #>checked<# } #>>
+						<span class="screen-reader-text">{{{ data.post.title.rendered }}}: {{ data.l10n.markAsComplete }}</span>
+					</label>
+				<# } #>
+			<# } else if ( data.useArrow ) { #>
 				<span style="width: 0.75rem; height: 100%; display: flex; align-items: center; justify-content: center;">
 					<svg role="img" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 17"><path fill="#6b7280" d="M19.92 8.12c-.05-.12-.12-.23-.22-.33L12.21.29A.996.996 0 1 0 10.8 1.7l5.79 5.79H1c-.55 0-1 .45-1 1s.45 1 1 1h15.59l-5.79 5.79a.996.996 0 0 0 .71 1.7c.26 0 .51-.1.71-.29l7.5-7.5c.1-.1.17-.21.22-.33.05-.12.07-.24.08-.38 0-.14-.03-.27-.08-.38Z"/></svg>
 				</span>
@@ -14,8 +27,8 @@
 		</div>
 
 		<div class="prpl-suggested-task-title-wrapper">
-			<h3 class="prpl-task-title">
-				<span <# if ( 'user' === data.post.prpl_category.slug ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.preventEnterKey( event ); prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>>{{{ data.post.title.rendered }}}</span>
+			<h3 style="width: 100%;">
+				<span <# if ( 'user' === categorySlug ) { #>contenteditable="plaintext-only" onkeydown="prplSuggestedTask.preventEnterKey( event ); prplSuggestedTask.updateTaskTitle( this );" data-post-id="{{ data.post.id }}"<# } #>>{{{ data.post.title.rendered }}}</span>
 			</h3>
 		</div>
 
@@ -27,7 +40,7 @@
 			<# } #>
 		</div>
 
-		<# if ( 'user' === data.post.prpl_category.slug ) { #>
+		<# if ( 'user' === categorySlug ) { #>
 			<div class="tooltip-actions">
 				<span class="prpl-move-buttons">
 					<button type="button" class="prpl-suggested-task-button move-up" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="move-up" data-target="move-up" title="{{ data.l10n.moveUp }}" onclick="prplSuggestedTask.runButtonAction( this );">
@@ -44,17 +57,91 @@
 
 		<div class="prpl-suggested-task-actions-wrapper">
 			<div class="tooltip-actions">
-				<# data.post.prpl_task_actions.forEach( function( actionHTML ) { #>
-					<span class="tooltip-action">{{{ actionHTML }}}</span>
-				<# }); #>
+				<# if ( data.post.meta.prpl_task_action_text ) { #>
+					<span class="tooltip-action">
+						<# if ( data.post.meta.prpl_popover_id ) { #>
+							<a href="#" role="button" onclick="document.getElementById('{{{ data.post.meta.prpl_popover_id }}}')?.showPopover()">{{{ data.post.meta.prpl_task_action_text }}}</a>
+						<# } else if ( data.post.meta.prpl_url ) { #>
+							<a class="prpl-tooltip-action-text" href="{{{ data.post.meta.prpl_url }}}" target="{{{ data.post.meta.prpl_url_target }}}">{{{ data.post.meta.prpl_task_action_text }}}</a>
+						<# } #>
+					</span>
+				<# } #>
 
-				<# if ( 'user' === data.post.prpl_category.slug ) { #>
+				<# if ( data.post.meta.prpl_dismissable ) { #>
+					<span class="tooltip-action">
+						<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="complete" data-target="complete" title="{{ data.l10n.markAsComplete }}" onclick="prplSuggestedTask.maybeComplete( {{ data.post.id }} );">
+							<span class="prpl-tooltip-action-text">{{ data.l10n.markAsComplete }}</span>
+							<span class="screen-reader-text">{{ data.l10n.markAsComplete }}</span>
+						</button>
+					</span>
+				<# } #>
+
+				<# if ( data.post.content.rendered !== '' ) { #>
+					<span class="tooltip-action">
+						<prpl-tooltip>
+							<slot name="open">
+								<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="info" data-target="info" title="{{ data.l10n.info }}">
+									<span class="prpl-tooltip-action-text">{{ data.l10n.info }}</span>
+									<span class="screen-reader-text">{{ data.l10n.info }}</span>
+								</button>
+							</slot>
+							<slot name="content">{{{ data.post.content.rendered }}}</slot>
+						</prpl-tooltip>
+					</span>
+				<# } #>
+
+				<# if ( data.post.meta.prpl_snoozable ) { #>
+					<span class="tooltip-action">
+						<prpl-tooltip class="prpl-suggested-task-snooze">
+							<slot name="open">
+								<button type="button" class="prpl-suggested-task-button" data-task-id="{{ data.post.meta.prpl_task_id }}" data-task-title="{{ data.post.title.rendered }}" data-action="snooze" data-target="snooze" title="{{ data.l10n.snooze }}">
+									<span class="prpl-tooltip-action-text">{{ data.l10n.snooze }}</span>
+									<span class="screen-reader-text">{{ data.l10n.snooze }}</span>
+								</button>
+							</slot>
+							<slot name="content">
+								<fieldset>
+									<legend>
+										<span>{{ data.l10n.snoozeThisTask }}</span>
+										<button type="button" class="prpl-toggle-radio-group" onclick="this.closest( '.prpl-suggested-task-snooze' ).classList.toggle( 'prpl-toggle-radio-group-open' );">
+											<span class="prpl-toggle-radio-group-text">{{ data.l10n.howLong }}</span>
+											<span class="prpl-toggle-radio-group-arrow">&rsaquo;</span>
+										</button>
+									</legend>
+									<div class="prpl-snooze-duration-radio-group">
+										<# _.each( {
+											'1-week': data.l10n.snoozeDurationOneWeek,
+											'1-month': data.l10n.snoozeDurationOneMonth,
+											'3-months': data.l10n.snoozeDurationThreeMonths,
+											'6-months': data.l10n.snoozeDurationSixMonths,
+											'1-year': data.l10n.snoozeDurationOneYear,
+											'forever': data.l10n.snoozeDurationForever,
+										}, function( value, key ) { #>
+											<label>
+												<input type="radio" name="snooze-duration-{{ data.post.meta.prpl_task_id }}" value="{{ key }}" onchange="prplSuggestedTask.snooze( {{ data.post.id }}, '{{ key }}' );">
+												{{ value }}
+											</label>
+										<# }); #>
+									</div>
+								</fieldset>
+							</slot>
+						</prpl-tooltip>
+					</span>
+				<# } #>
+
+				<# if ( data.post.meta.prpl_external_link_url ) { #>
+					<span class="tooltip-action">
+						<a class="prpl-tooltip-action-text" href="{{ data.post.meta.prpl_external_link_url }}" target="_blank">{{ data.l10n.whyIsThisImportant }}</a>
+					</span>
+				<# } #>
+
+				<# if ( 'user' === categorySlug ) { #>
 					<span class="tooltip-action">
 						<button type="button" class="prpl-suggested-task-button trash" data-post-id="{{ data.post.id }}" title="{{ data.l10n.delete }}" onclick="prplSuggestedTask.trash( {{ data.post.id }} );">
 							<span class="prpl-tooltip-action-text">{{ data.l10n.delete }}</span>
 							<span class="screen-reader-text">{{ data.l10n.taskDelete.replace( '%s', data.post.title.rendered ) }}</span>
 						</button>
-					</span>
+					</div>
 				<# } #>
 			</div>
 		</div>
