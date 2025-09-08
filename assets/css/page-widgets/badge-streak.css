@@ -103,14 +103,13 @@
 			display: flex;
 			flex-direction: column;
 			align-items: center;
-			justify-content: space-between;
 			flex-wrap: wrap;
 			min-width: 0;
 		}
 
 		p {
 			margin: 0;
-			font-size: var(--prpl-font-size-xs);
+			font-size: var(--prpl-font-size-small);
 			text-align: center;
 			line-height: 1.2;
 		}
