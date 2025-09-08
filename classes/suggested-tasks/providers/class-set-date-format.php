@@ -127,7 +127,7 @@ class Set_Date_Format extends Tasks_Interactive {
 		 *
 		 * @param string[] $default_date_formats Array of default date formats.
 		 */
-		$date_formats = array_unique( \apply_filters( 'date_formats', [ 'F j, Y', 'Y-m-d', 'm/d/Y', 'd/m/Y', 'd.m.Y' ] ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- WP core filter
+		$date_formats = array_unique( \apply_filters( 'date_formats', [ __( 'F j, Y' ), 'F j, Y', 'Y-m-d', 'm/d/Y', 'd/m/Y', 'd.m.Y' ] ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound, WordPress.WP.I18n.MissingArgDomain -- WP core filter & we want to add the default date format
 
 		$custom = true;
 
