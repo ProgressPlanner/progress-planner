@@ -91,15 +91,6 @@ class Disable_Comments extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Disable comments', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task condition is satisfied.
 	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *
@@ -134,7 +125,7 @@ class Disable_Comments extends Tasks_Interactive {
 		if ( 0 === $comments_count ) {
 			\esc_html_e( 'Your site currently has no approved comments. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments.', 'progress-planner' );
 		} else {
-			printf(
+			\printf(
 				\esc_html(
 					// translators: %d is the number of approved comments.
 					\_n(
@@ -178,5 +169,22 @@ class Disable_Comments extends Tasks_Interactive {
 			></prpl-install-plugin>
 		<?php endif; ?>
 		<?php
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'' . \esc_attr( $data['meta']['prpl_popover_id'] ) . '\')?.showPopover()">' . \esc_html__( 'Disable comments', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

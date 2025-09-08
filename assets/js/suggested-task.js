@@ -14,14 +14,6 @@ prplSuggestedTask = {
 		moveUp: prplL10n( 'moveUp' ),
 		moveDown: prplL10n( 'moveDown' ),
 		snooze: prplL10n( 'snooze' ),
-		snoozeThisTask: prplL10n( 'snoozeThisTask' ),
-		howLong: prplL10n( 'howLong' ),
-		snoozeDurationOneWeek: prplL10n( 'snoozeDurationOneWeek' ),
-		snoozeDurationOneMonth: prplL10n( 'snoozeDurationOneMonth' ),
-		snoozeDurationThreeMonths: prplL10n( 'snoozeDurationThreeMonths' ),
-		snoozeDurationSixMonths: prplL10n( 'snoozeDurationSixMonths' ),
-		snoozeDurationOneYear: prplL10n( 'snoozeDurationOneYear' ),
-		snoozeDurationForever: prplL10n( 'snoozeDurationForever' ),
 		disabledRRCheckboxTooltip: prplL10n( 'disabledRRCheckboxTooltip' ),
 		markAsComplete: prplL10n( 'markAsComplete' ),
 		taskDelete: prplL10n( 'taskDelete' ),
@@ -83,8 +75,6 @@ prplSuggestedTask = {
 									item,
 									listId: 'prpl-suggested-tasks-list',
 									insertPosition: 'beforeend',
-									useCheckbox: false,
-									useArrow: true,
 								},
 							} )
 						);
@@ -119,8 +109,6 @@ prplSuggestedTask = {
 							item,
 							listId: 'prpl-suggested-tasks-list',
 							insertPosition: 'beforeend',
-							useCheckbox: false,
-							useArrow: true,
 						},
 					} )
 				);
@@ -153,16 +141,9 @@ prplSuggestedTask = {
 	/**
 	 * Render a new item.
 	 *
-	 * @param {Object}  post        The post object.
-	 * @param {boolean} useCheckbox Whether to use a checkbox.
-	 * @param {boolean} useArrow    Whether to use an arrow.
+	 * @param {Object} post The post object.
 	 */
-	getNewItemTemplatePromise: ( {
-		post = {},
-		useCheckbox = true,
-		useArrow = false,
-		listId = '',
-	} ) =>
+	getNewItemTemplatePromise: ( { post = {}, listId = '' } ) =>
 		new Promise( ( resolve ) => {
 			const {
 				prpl_recommendations_provider,
@@ -189,8 +170,6 @@ prplSuggestedTask = {
 			const data = {
 				post,
 				terms,
-				useCheckbox,
-				useArrow,
 				listId,
 				assets: prplSuggestedTask.assets,
 				action: 'pending' === post.status ? 'celebrate' : '',
@@ -451,16 +430,11 @@ prplSuggestedTask = {
 			date_gmt: date,
 		} );
 		postModelToSave.save().then( ( postData ) => {
-			const taskCategorySlug = prplTerms.getTerm(
-				postData?.[ prplTerms.category ],
-				prplTerms.category
-			).slug;
-
 			prplSuggestedTask.removeTaskElement( postId );
 
 			// Inject more tasks from the same category.
 			prplSuggestedTask.injectItemsFromCategory( {
-				category: taskCategorySlug,
+				category: postData?.prpl_category?.slug,
 				status: [ 'publish' ],
 			} );
 		} );
@@ -598,8 +572,6 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 		.getNewItemTemplatePromise( {
 			post: event.detail.item,
 			listId: event.detail.listId,
-			useCheckbox: event.detail.useCheckbox || false,
-			useArrow: event.detail.useArrow || true,
 		} )
 		.then( ( itemHTML ) => {
 			/**
@@ -636,8 +608,6 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 								item: event.detail.item,
 								listId: event.detail.listId,
 								insertPosition: event.detail.insertPosition,
-								useCheckbox: event.detail.useCheckbox || true,
-								useArrow: event.detail.useArrow || false,
 							},
 						} )
 					);

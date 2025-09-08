@@ -76,3 +76,51 @@
 .string-freeze-explain {
 	max-width: 42em;
 }
+
+.prpl-widget-wrapper.prpl-badge-streak,
+.prpl-widget-wrapper.prpl-badge-streak-content,
+.prpl-widget-wrapper.prpl-badge-streak-maintenance {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+
+	.progress-label {
+		display: inline-block;
+	}
+
+	.progress-wrapper {
+		display: grid;
+		grid-template-columns: 1fr 1fr 1fr;
+		gap: calc(var(--prpl-gap) / 2);
+		padding: calc(var(--prpl-padding) / 2);
+		border-radius: var(--prpl-border-radius-big);
+
+		&:not(:first-child) {
+			margin-top: var(--prpl-padding);
+		}
+
+		.prpl-badge {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: space-between;
+			flex-wrap: wrap;
+			min-width: 0;
+		}
+
+		p {
+			margin: 0;
+			font-size: var(--prpl-font-size-xs);
+			text-align: center;
+			line-height: 1.2;
+		}
+	}
+
+	.prpl-widget-content {
+		margin-bottom: 1em;
+	}
+
+	.badge-group-monthly {
+		background-color: transparent;
+	}
+}

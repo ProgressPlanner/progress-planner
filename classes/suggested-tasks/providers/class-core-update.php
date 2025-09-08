@@ -93,15 +93,6 @@ class Core_Update extends Tasks {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Go to the Updates page', 'progress-planner' );
-	}
-
-	/**
 	 * Add the link to the Progress Planner Dashboard to the update complete actions.
 	 *
 	 * @param array $update_actions The update actions.
@@ -148,5 +139,22 @@ class Core_Update extends Tasks {
 	 */
 	public function is_task_completed( $task_id = '' ) {
 		return \wp_doing_ajax() ? false : ! $this->should_add_task();
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'update-core.php' ) . '" target="_blank">' . \esc_html__( 'Go to the Updates page', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

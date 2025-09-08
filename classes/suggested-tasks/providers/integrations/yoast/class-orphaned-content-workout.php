@@ -136,15 +136,6 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Run workout', 'progress-planner' );
-	}
-
-	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -161,5 +152,22 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	public function should_add_task() {
 		return \defined( 'WPSEO_PREMIUM_VERSION' )
 			&& ! $this->is_task_dismissed( [ 'provider_id' => $this->get_provider_id() ] );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_workouts#orphaned' ) . '" target="_blank">' . \esc_html__( 'Run workout', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }
