@@ -36,8 +36,13 @@ if ( ! $prpl_widget_details ) {
 	</prpl-gauge>
 	<div class="prpl-badge-content-wrapper">
 		<p style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:0;">
-			<?php echo \esc_html( $prpl_widget_details->get_name() ); ?>
-			<span style="font-weight:600;font-size:1.5rem;"><?php echo (float) $prpl_widget_details->get_progress()['progress']; ?>%</span>
+			<span>
+				<?php
+				// translators: %s: The badge name.
+				printf( 'Progress %s', \esc_html( $prpl_widget_details->get_name() ) );
+				?>
+			</span>
+			<span style="font-weight:600;font-size:var(--prpl-font-size-3xl);"><?php echo (float) $prpl_widget_details->get_progress()['progress']; ?>%</span>
 		</p>
 
 		<p style="margin-top:0;">
