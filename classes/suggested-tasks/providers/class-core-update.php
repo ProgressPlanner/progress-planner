@@ -151,7 +151,7 @@ class Core_Update extends Tasks {
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
-			'priority' => 100,
+			'priority' => 10,
 			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'update-core.php' ) . '" target="_blank">' . \esc_html__( 'Go to the Updates page', 'progress-planner' ) . '</a>',
 		];
 

@@ -318,7 +318,7 @@ class Update_Term_Description extends Tasks {
 		}
 
 		$actions[] = [
-			'priority' => 100,
+			'priority' => 10,
 			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id ) . '" target="_blank">' . \esc_html__( 'Write description', 'progress-planner' ) . '</a>',
 		];
 

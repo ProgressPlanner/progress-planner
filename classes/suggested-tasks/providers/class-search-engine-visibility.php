@@ -91,7 +91,7 @@ class Search_Engine_Visibility extends Tasks {
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
-			'priority' => 100,
+			'priority' => 10,
 			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'options-reading.php' ) . '" target="_self">' . \esc_html__( 'Change setting', 'progress-planner' ) . '</a>',
 		];
 

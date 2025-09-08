@@ -595,7 +595,7 @@ class Content_Review extends Tasks {
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
-			'priority' => 100,
+			'priority' => 10,
 			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'post.php?action=edit&post=' . $data['id'] ) . '" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
 		];
 

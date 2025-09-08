@@ -612,7 +612,7 @@ abstract class Tasks implements Tasks_Interface {
 
 		if ( $this->is_dismissable() ) {
 			$actions[] = [
-				'priority' => 0,
+				'priority' => 20,
 				'html'     => '<button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="complete" data-target="complete" title="' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '" onclick="prplSuggestedTask.maybeComplete(' . (int) $data['id'] . ');"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span></button>',
 			];
 		}
@@ -640,14 +640,14 @@ abstract class Tasks implements Tasks_Interface {
 			}
 			$snooze_html .= '</div></fieldset></slot></prpl-tooltip>';
 			$actions[]    = [
-				'priority' => 20,
+				'priority' => 30,
 				'html'     => $snooze_html,
 			];
 		}
 
 		if ( $this->get_external_link_url() ) {
 			$actions[] = [
-				'priority' => 30,
+				'priority' => 40,
 				'html'     => '<a class="prpl-tooltip-action-text" href="' . \esc_attr( $this->get_external_link_url() ) . '" target="_blank">' . \esc_html__( 'Why is this important?', 'progress-planner' ) . '</a>',
 			];
 		}
