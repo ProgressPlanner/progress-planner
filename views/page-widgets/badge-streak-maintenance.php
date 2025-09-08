@@ -26,6 +26,8 @@ if ( ! $prpl_widget_details ) {
 	?>
 </h2>
 
+<p><?php \esc_html_e( 'Execute at least one website maintenance task every week.', 'progress-planner' ); ?></p>
+
 <div class="prpl-latest-badges-wrapper">
 	<prpl-gauge background="<?php echo \esc_attr( $prpl_widget_details->get_background() ); ?>" color="var(--prpl-color-accent-orange)">
 		<progress max="100" value="<?php echo (float) $prpl_widget_details->get_progress()['progress']; ?>">
