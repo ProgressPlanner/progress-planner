@@ -54,14 +54,6 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Remove', 'progress-planner' );
-	}
-	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array
@@ -95,5 +87,22 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_emoji_scripts' ) . '" target="_blank">' . \esc_html__( 'Remove', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

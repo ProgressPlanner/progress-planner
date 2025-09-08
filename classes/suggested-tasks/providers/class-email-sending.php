@@ -174,14 +174,6 @@ class Email_Sending extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Test email sending', 'progress-planner' );
-	}
-	/**
 	 * Enqueue the scripts.
 	 *
 	 * @param string $hook The current admin page.
@@ -297,6 +289,7 @@ class Email_Sending extends Tasks_Interactive {
 				'prpl_email_error'                     => $this->email_error,
 				'prpl_troubleshooting_guide_url'       => $this->troubleshooting_guide_url,
 				'prpl_is_there_sending_email_override' => $this->is_there_sending_email_override(),
+				'prpl_task_actions'                    => $this->get_task_actions(),
 			]
 		);
 	}
@@ -308,5 +301,22 @@ class Email_Sending extends Tasks_Interactive {
 	 */
 	public function print_popover_form_contents() {
 		// The form is handled in the popovers/email-sending view.
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'' . \esc_attr( $data['meta']['prpl_popover_id'] ) . '\')?.showPopover()">' . \esc_html__( 'Test email sending', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

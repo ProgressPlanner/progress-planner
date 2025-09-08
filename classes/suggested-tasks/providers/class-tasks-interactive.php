@@ -128,6 +128,7 @@ abstract class Tasks_Interactive extends Tasks {
 				'prpl_popover_id'        => static::POPOVER_ID,
 				'prpl_external_link_url' => $this->get_external_link_url(),
 				'prpl_provider_id'       => $this->get_provider_id(),
+				'prpl_task_actions'      => $this->get_task_actions(),
 			]
 		);
 	}
