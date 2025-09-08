@@ -388,6 +388,8 @@ class Enqueue {
 			'video'                        => \esc_html__( 'Video', 'progress-planner' ),
 			'watchVideo'                   => \esc_html__( 'Watch video', 'progress-planner' ),
 			'disabledRRCheckboxTooltip'    => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),
+			'remoteAPIStatusOk'            => \esc_html__( 'API is accessible', 'progress-planner' ),
+			'remoteAPIStatusError'         => \esc_html__( 'API is not accessible', 'progress-planner' ),
 			'opensInNewWindow'             => \esc_html__( 'Opens in new window', 'progress-planner' ),
 			/* translators: %s: The plugin name. */
 			'installPlugin'                => \esc_html__( 'Install and activate the "%s" plugin', 'progress-planner' ),
