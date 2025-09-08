@@ -35,8 +35,12 @@ if ( ! $prpl_widget_details ) {
 		</progress>
 	</prpl-gauge>
 	<div class="prpl-badge-content-wrapper">
-		<h3><?php echo \esc_html( $prpl_widget_details->get_name() ); ?></h3>
-		<p>
+		<p style="display:flex;align-items:center;justify-content:space-between;gap:1rem;margin-bottom:0;">
+			<?php echo \esc_html( $prpl_widget_details->get_name() ); ?>
+			<span style="font-weight:600;font-size:1.5rem;"><?php echo (float) $prpl_widget_details->get_progress()['progress']; ?>%</span>
+		</p>
+
+		<p style="margin-top:0;">
 			<?php
 			\printf(
 				\esc_html(
@@ -55,6 +59,8 @@ if ( ! $prpl_widget_details ) {
 	</div>
 </div>
 
+<hr>
+
 <h3><?php \esc_html_e( 'Your achievements', 'progress-planner' ); ?></h3>
 <div class="prpl-badges-container-achievements">
 	<div class="progress-wrapper badge-group-<?php echo \esc_attr( 'content' ); ?>">
@@ -72,3 +78,11 @@ if ( ! $prpl_widget_details ) {
 		<?php endforeach; ?>
 	</div>
 </div>
+
+<?php
+\progress_planner()->get_ui__popover()->the_popover( 'monthly-badges' )->render_button(
+	'',
+	\esc_html__( 'Show all badges', 'progress-planner' )
+);
+\progress_planner()->get_ui__popover()->the_popover( 'monthly-badges' )->render();
+?>
