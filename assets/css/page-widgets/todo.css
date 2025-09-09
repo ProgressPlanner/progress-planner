@@ -192,6 +192,38 @@
 		display: none;
 	}
 
+	#todo-list-completed-delete-all-wrapper {
+		margin: 0.25rem 0.5rem 0.75rem 0.5rem;
+		border-top: 1px solid var(--prpl-color-gray-2);
+		display: none;
+
+		#todo-list-completed-delete-all {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			background-color: transparent;
+			border: none;
+			padding: 0;
+			margin: 0.5rem 0 0 0;
+			cursor: pointer;
+			color: var(--prpl-color-link);
+			font-size: var(--prpl-font-size-small);
+
+			&:hover {
+
+				svg path {
+					fill: var(--prpl-color-accent-red);
+				}
+			}
+
+		}
+	}
+
+	/* Show the delete all button if there are at least 3 completed tasks */
+	&:has(.prpl-suggested-task:nth-of-type(3)) #todo-list-completed-delete-all-wrapper {
+		display: block;
+	}
+
 	.prpl-suggested-task-points-wrapper {
 		position: relative;
 	}

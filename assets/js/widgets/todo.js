@@ -193,6 +193,20 @@ const prplTodoWidget = {
 	removeLoader: () => {
 		document.querySelector( '#todo-list .prpl-loader' )?.remove();
 	},
+
+	/**
+	 * Delete all completed tasks.
+	 */
+	deleteAllCompletedTasks: () => {
+		document
+			.querySelectorAll( '#todo-list-completed .prpl-suggested-task' )
+			.forEach( ( item ) => {
+				const postId = parseInt( item.getAttribute( 'data-post-id' ) );
+				prplSuggestedTask.trash( postId );
+			} );
+
+		// Resize event will be triggered by the trash function.
+	},
 };
 
 document
