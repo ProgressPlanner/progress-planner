@@ -376,10 +376,15 @@ prplSuggestedTask = {
 								// Update the Ravi gauge.
 								prplUpdateRaviGauge( 0 - eventPoints );
 
-								// Move task from trash to published.
+								// Move task from trash to published, tasks with points go to the beginning of the list.
 								document
 									.getElementById( 'todo-list' )
-									.insertAdjacentElement( 'beforeend', el );
+									.insertAdjacentElement(
+										0 < eventPoints
+											? 'afterbegin'
+											: 'beforeend',
+										el
+									);
 
 								window.dispatchEvent(
 									new CustomEvent( 'prpl/grid/resize' )
