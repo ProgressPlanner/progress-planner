@@ -259,6 +259,190 @@ const PrplLessonItemsHTML = () => {
 };
 
 /**
+ * Render the Remind Me button section.
+ *
+ * @return {Element} Element to render.
+ */
+const PrplRemindMeSection = () => {
+	const [ selectedDate, setSelectedDate ] = useState( '' );
+
+	// Callback function for the Remind Me button
+	const handleRemindMeClick = () => {
+		// Validate that a date is selected
+		if ( ! selectedDate ) {
+			wp.data
+				.dispatch( 'core/notices' )
+				.createErrorNotice(
+					prplL10n( 'remindMeToReviewContentError' ),
+					{
+						type: 'snackbar',
+						isDismissible: true,
+					}
+				);
+			return;
+		}
+
+		// Get the current post ID
+		const postId = wp.data.select( 'core/editor' ).getCurrentPostId();
+
+		// Get the current post title
+		const postTitle = wp.data
+			.select( 'core/editor' )
+			.getEditedPostAttribute( 'title' );
+
+		// Show loading state
+		wp.data
+			.dispatch( 'core/notices' )
+			.createInfoNotice( prplL10n( 'remindMeToReviewContentSetting' ), {
+				type: 'snackbar',
+				isDismissible: true,
+			} );
+
+		// Make AJAX request to set reminder
+		const formData = new FormData();
+		formData.append( 'action', 'progress_planner_set_reminder' );
+		formData.append( 'post_id', postId );
+		formData.append( 'post_title', postTitle );
+		formData.append( 'reminder_date', selectedDate );
+		formData.append( 'nonce', progressPlannerEditor.nonce );
+
+		fetch( progressPlannerEditor.ajaxUrl, {
+			method: 'POST',
+			credentials: 'same-origin',
+			body: formData,
+		} )
+			.then( ( response ) => response.json() )
+			.then( ( responseData ) => {
+				if ( responseData.success ) {
+					// Show success notification
+					wp.data
+						.dispatch( 'core/notices' )
+						.createSuccessNotice(
+							responseData.data.message ||
+								prplL10n( 'remindMeToReviewContentSuccess' ) +
+									postTitle,
+							{
+								type: 'snackbar',
+								isDismissible: true,
+							}
+						);
+					// Clear the selected date after successful reminder set
+					setSelectedDate( '' );
+				} else {
+					// Show error notification
+					wp.data
+						.dispatch( 'core/notices' )
+						.createErrorNotice(
+							responseData.data.message ||
+								prplL10n( 'remindMeToReviewContentError' ),
+							{
+								type: 'snackbar',
+								isDismissible: true,
+							}
+						);
+				}
+			} )
+			.catch( ( error ) => {
+				console.error( 'Error setting reminder:', error );
+				// Show error notification
+				wp.data
+					.dispatch( 'core/notices' )
+					.createErrorNotice(
+						prplL10n( 'remindMeToReviewContentError' ),
+						{
+							type: 'snackbar',
+							isDismissible: true,
+						}
+					);
+			} );
+	};
+
+	// Get minimum date (today)
+	const today = new Date().toISOString().split( 'T' )[ 0 ];
+
+	return el(
+		PanelBody,
+		{
+			key: 'progress-planner-sidebar-remind-me-section',
+			title: prplL10n( 'remindMeToReviewContent' ),
+			initialOpen: true,
+		},
+		el(
+			'div',
+			{
+				style: {
+					padding: '10px 0',
+				},
+			},
+			// Date picker
+			el(
+				'div',
+				{
+					style: {
+						marginBottom: '15px',
+					},
+				},
+				el(
+					'label',
+					{
+						style: {
+							display: 'block',
+							marginBottom: '5px',
+							fontWeight: 'bold',
+							color: '#38296D',
+						},
+					},
+					prplL10n( 'remindMeToReviewContentDate' )
+				),
+				el( 'input', {
+					type: 'date',
+					value: selectedDate,
+					min: today,
+					onChange: ( event ) =>
+						setSelectedDate( event.target.value ),
+					style: {
+						width: '100%',
+						padding: '8px 12px',
+						border: '1px solid #ddd',
+						borderRadius: '4px',
+						fontSize: '14px',
+						color: '#38296D',
+					},
+				} )
+			),
+			el(
+				Button,
+				{
+					key: 'progress-planner-sidebar-remind-me-button',
+					onClick: handleRemindMeClick,
+					variant: 'secondary',
+					disabled: ! selectedDate,
+					style: {
+						width: '100%',
+						margin: '15px 0',
+						color: selectedDate ? '#38296D' : '#999',
+						boxShadow: selectedDate
+							? 'inset 0 0 0 1px #38296D'
+							: 'inset 0 0 0 1px #ddd',
+						whiteSpace: 'normal',
+						height: 'auto',
+						minHeight: '60px',
+						padding: '10px 15px',
+						display: 'flex',
+						flexDirection: 'column',
+						alignItems: 'center',
+						justifyContent: 'center',
+						textAlign: 'center',
+						lineHeight: '1.4',
+					},
+				},
+				prplL10n( 'remindMeToReviewContent' )
+			)
+		)
+	);
+};
+
+/**
  * Render the Progress Planner sidebar.
  * This sidebar will display the lessons and videos for the current page.
  *
@@ -294,7 +478,8 @@ const PrplProgressPlannerSidebar = () =>
 					},
 				},
 				PrplRenderPageTypeSelector(),
-				PrplLessonItemsHTML()
+				PrplLessonItemsHTML(),
+				PrplRemindMeSection()
 			)
 		)
 	);
