@@ -239,7 +239,7 @@
 	.prpl-suggested-task-button {
 
 		&.trash {
-			display: inline-block;
+			display: none;
 			margin-left: auto;
 			flex-shrink: 0;
 			width: 1.25rem;
@@ -264,19 +264,13 @@
 		}
 
 		.prpl-suggested-task-button {
+			display: inline-block;
 			opacity: 1;
 		}
 	}
 }
 
 #todo-list {
-
-	.prpl-suggested-task-button {
-
-		&.trash {
-			display: none;
-		}
-	}
 
 	&:has(.prpl-loader) {
 		position: relative;
