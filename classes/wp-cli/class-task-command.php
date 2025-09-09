@@ -325,6 +325,7 @@ class Task_Command extends \WP_CLI_Command {
 		$is_completed_callback = isset( $assoc_args['is_completed_callback'] ) ? $assoc_args['is_completed_callback'] : null;
 		$dismissable           = isset( $assoc_args['dismissable'] ) ? $assoc_args['dismissable'] : true;
 		$snoozable             = isset( $assoc_args['snoozable'] ) ? $assoc_args['snoozable'] : true;
+		$external_link_url     = isset( $assoc_args['external_link_url'] ) ? $assoc_args['external_link_url'] : '';
 
 		if ( empty( $task_id ) || empty( $title ) ) {
 			\WP_CLI::error( 'task_id and title are required.' ); // @phpstan-ignore-line
@@ -344,6 +345,7 @@ class Task_Command extends \WP_CLI_Command {
 				'dismissable'           => $dismissable,
 				'snoozable'             => $snoozable,
 				'is_completed_callback' => $is_completed_callback,
+				'external_link_url'     => $external_link_url,
 			]
 		);
 

@@ -364,4 +364,25 @@ class Unpublished_Content extends Tasks {
 		// If the post status is not draft or auto-draft (this includes (bool) false when the post was deleted), the task is completed.
 		return ( 'draft' !== $post_status && 'auto-draft' !== $post_status );
 	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		if ( ! isset( $data['meta']['prpl_url'] ) ) {
+			return $actions;
+		}
+
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( $data['meta']['prpl_url'] ) . '" target="_self">' . \esc_html__( 'Publish', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
+	}
 }
