@@ -27,23 +27,21 @@
 			display: none;
 		}
 
-		#todo-list > *:first-child {
+		#todo-list > .prpl-suggested-task:first-child {
 
-			.prpl-suggested-task {
-				border: 1px solid #796da2;
-				background-color: #f6f7f9;
+			border: 1px solid #796da2;
+			background-color: #f6f7f9;
 
-				.prpl-suggested-task-points-wrapper {
+			.prpl-suggested-task-points-wrapper {
 
-					&::after {
-						content: "";
-						display: inline-block;
-						width: 24px;
-						height: 24px;
-						background-image: url("../../images/icon_progress_planner.svg");
-						background-size: contain;
-						background-repeat: no-repeat;
-					}
+				&::after {
+					content: "";
+					display: inline-block;
+					width: 24px;
+					height: 24px;
+					background-image: url("../../images/icon_progress_planner.svg");
+					background-size: contain;
+					background-repeat: no-repeat;
 				}
 			}
 		}
