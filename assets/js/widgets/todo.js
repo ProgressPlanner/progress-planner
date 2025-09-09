@@ -195,6 +195,32 @@ const prplTodoWidget = {
 	},
 
 	/**
+	 * Show the delete all popover.
+	 */
+	showDeleteAllPopover: () => {
+		document
+			.getElementById( 'todo-list-completed-delete-all-popover' )
+			.showPopover();
+	},
+
+	/**
+	 * Close the delete all popover.
+	 */
+	closeDeleteAllPopover: () => {
+		document
+			.getElementById( 'todo-list-completed-delete-all-popover' )
+			.hidePopover();
+	},
+
+	/**
+	 * Delete all completed tasks and close the popover.
+	 */
+	deleteAllCompletedTasksAndClosePopover: () => {
+		prplTodoWidget.deleteAllCompletedTasks();
+		prplTodoWidget.closeDeleteAllPopover();
+	},
+
+	/**
 	 * Delete all completed tasks.
 	 */
 	deleteAllCompletedTasks: () => {
