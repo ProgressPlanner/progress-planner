@@ -610,7 +610,7 @@ abstract class Tasks implements Tasks_Interface {
 			return $actions;
 		}
 
-		if ( $this->is_dismissable() ) {
+		if ( $this->is_dismissable() && 'user' !== static::PROVIDER_ID ) {
 			$actions[] = [
 				'priority' => 20,
 				'html'     => '<button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="complete" data-target="complete" title="' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '" onclick="prplSuggestedTask.maybeComplete(' . (int) $data['id'] . ');"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span></button>',
