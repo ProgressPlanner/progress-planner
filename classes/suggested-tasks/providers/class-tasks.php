@@ -643,11 +643,7 @@ abstract class Tasks implements Tasks_Interface {
 				'priority' => 40,
 				'html'     => '<a class="prpl-tooltip-action-text" href="' . \esc_attr( $this->get_external_link_url() ) . '" target="_blank">' . \esc_html__( 'Why is this important?', 'progress-planner' ) . '</a>',
 			];
-		} elseif ( isset( $data['content']['rendered'] )
-			&& $data['content']['rendered'] !== ''
-			// Check if the object is an instance of Tasks_Interactive.
-			&& ! $this instanceof Tasks_Interactive
-		) {
+		} elseif ( isset( $data['content']['rendered'] ) && $data['content']['rendered'] !== '' && ! $this instanceof Tasks_Interactive ) {
 			$actions[] = [
 				'priority' => 40,
 				'html'     => '<prpl-tooltip><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="info" data-target="info" title="' . \esc_html__( 'Info', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Info', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Info', 'progress-planner' ) . '</span></button></slot><slot name="content">' . \wp_kses_post( $data['content']['rendered'] ) . '</slot></prpl-tooltip>',
