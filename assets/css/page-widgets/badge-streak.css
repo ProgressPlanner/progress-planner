@@ -92,7 +92,6 @@
 		display: grid;
 		grid-template-columns: 1fr 1fr 1fr;
 		gap: calc(var(--prpl-gap) / 2);
-		padding: calc(var(--prpl-padding) / 2);
 		border-radius: var(--prpl-border-radius-big);
 
 		&:not(:first-child) {
