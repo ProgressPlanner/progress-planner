@@ -27,6 +27,13 @@ class Site_Icon extends Tasks {
 	protected const PROVIDER_ID = 'core-siteicon';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-site-icon';
+
+	/**
 	 * Get the link setting.
 	 *
 	 * @return array
@@ -62,11 +69,7 @@ class Site_Icon extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %s:<a href="https://prpl.fyi/set-site-icon" target="_blank">site icon</a> link */
-			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/set-site-icon" target="_blank">' . \esc_html__( 'site icon', 'progress-planner' ) . '</a>'
-		);
+		return \esc_html__( 'Set the site icon to make your website look more professional.', 'progress-planner' );
 	}
 
 	/**
@@ -77,5 +80,22 @@ class Site_Icon extends Tasks {
 	public function should_add_task() {
 		$site_icon = \get_option( 'site_icon' );
 		return '' === $site_icon || '0' === $site_icon;
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() ) . '" target="_self">' . \esc_html__( 'Go to the settings page', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

@@ -34,6 +34,13 @@ class Disable_Comments extends Tasks_Interactive {
 	const POPOVER_ID = 'disable-comments';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/disable-comments';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -71,16 +78,15 @@ class Disable_Comments extends Tasks_Interactive {
 	protected function get_description() {
 		return \sprintf(
 			\esc_html(
-					// translators: %d is the number of approved comments, %s is the <a href="https://prpl.fyi/disable-comments" target="_blank">disabling them</a> link.
+				// translators: %d is the number of approved comments.
 				\_n(
-					'There is %1$d comment. If you don\'t need comments on your site, consider %2$s.',
-					'There are %1$d comments. If you don\'t need comments on your site, consider %2$s.',
+					'There is %1$d comment. If you don\'t need comments on your site, consider disabling them.',
+					'There are %1$d comments. If you don\'t need comments on your site, consider disabling them.',
 					(int) \wp_count_comments()->approved,
 					'progress-planner'
 				)
 			),
 			(int) \wp_count_comments()->approved,
-			'<a href="https://prpl.fyi/disable-comments" target="_blank">' . \esc_html__( 'disabling them', 'progress-planner' ) . '</a>',
 		);
 	}
 
@@ -163,5 +169,22 @@ class Disable_Comments extends Tasks_Interactive {
 			></prpl-install-plugin>
 		<?php endif; ?>
 		<?php
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'' . \esc_attr( $data['meta']['prpl_popover_id'] ) . '\')?.showPopover()">' . \esc_html__( 'Disable comments', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }
