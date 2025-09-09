@@ -54,13 +54,33 @@
 }
 
 /*------------------------------------*\
+	Progress Planner dashboard page.
+\*------------------------------------*/
+/* stylelint-disable-next-line selector-class-pattern */
+body.toplevel_page_progress-planner {
+
+	#wpwrap {
+		background-color: #f6f7f9;
+	}
+
+	ul#adminmenu {
+
+		a.wp-has-current-submenu,
+		>li.current > a.current {
+
+			&::after {
+				border-right-color: #f6f7f9 !important;
+			}
+		}
+	}
+}
+
+/*------------------------------------*\
 	Styles for the container of the page.
 \*------------------------------------*/
 .prpl-wrap {
-	background: #fff;
-	border: 1px solid var(--prpl-color-gray-2);
 	border-radius: var(--prpl-border-radius);
-	padding: var(--prpl-settings-page-gap) calc(var(--prpl-padding) * 2);
+	padding: var(--prpl-settings-page-gap) var(--prpl-padding);
 	max-width: var(--prpl-container-max-width);
 	color: var(--prpl-color-text);
 	font-size: var(--prpl-font-size-base);
@@ -201,6 +221,7 @@ button.prpl-info-icon {
 		padding: 0.4em;
 
 		/* color: var(--prpl-color-gray-2); */
+		background-color: #fff;
 		border: 1px solid var(--prpl-color-gray-2);
 		border-radius: var(--prpl-border-radius);
 
@@ -246,6 +267,7 @@ button.prpl-info-icon {
 	Generic styles for individual widgets.
 \*------------------------------------*/
 .prpl-widget-wrapper {
+	background-color: #fff;
 	border: 1px solid var(--prpl-color-gray-2);
 	border-radius: var(--prpl-border-radius);
 	padding: var(--prpl-padding);
