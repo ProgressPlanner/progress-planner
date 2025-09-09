@@ -90,7 +90,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 		return \sprintf(
 			/* translators: %s: "Read more" link. */
 			\esc_html__( 'Yoast SEO detected that this article has no links pointing to it. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/fix-orphaned-content" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the fixing the orphaned content.', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/fix-orphaned-content' ) ) . '" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the fixing the orphaned content.', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		);
 	}
 
@@ -102,7 +102,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_url_with_data( $task_data = [] ) {
-		return \get_post( $task_data['target_post_id'] ) ? 'https://prpl.fyi/fix-orphaned-content' : '';
+		return \get_post( $task_data['target_post_id'] ) ? \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/fix-orphaned-content' ) ) : '';
 	}
 
 	/**

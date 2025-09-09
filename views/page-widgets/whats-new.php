@@ -45,7 +45,7 @@ $prpl_widget = \progress_planner()->get_admin__widgets__whats_new();
 	<?php endforeach; ?>
 </ul>
 <div class="prpl-widget-footer">
-	<a href="https://prpl.fyi/blog" target="_blank">
+	<a href="<?php echo \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/blog' ) ); ?>" target="_blank">
 		<?php \esc_html_e( 'Read all posts', 'progress-planner' ); ?>
 	</a>
 </div>

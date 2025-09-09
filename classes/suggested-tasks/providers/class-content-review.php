@@ -167,7 +167,7 @@ class Content_Review extends Tasks {
 		return '<p>' . \sprintf(
 			/* translators: %1$s <a href="https://prpl.fyi/review-post" target="_blank">Review</a> link, %2$s: The post title, %3$s: The number of months. */
 			\esc_html__( '%1$s the post "%2$s" as it was last updated more than %3$s months ago.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/review-post" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
+			'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/review-post' ) ) . '" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
 			\esc_html( $post->post_title ), // @phpstan-ignore-line property.nonObject
 			\esc_html( $months )
 		) . '</p>';

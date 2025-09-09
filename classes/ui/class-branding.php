@@ -321,4 +321,26 @@ final class Branding {
 			? \progress_planner()->get_remote_server_root_url()
 			: $this->get_api_data()['acf']['blog_feed_url'];
 	}
+
+	/**
+	 * Get a URL from the API data.
+	 *
+	 * @param string $default_url The default value.
+	 *
+	 * @return string
+	 */
+	public function get_url( $default_url = '' ) {
+		$api_data = $this->get_api_data();
+		if ( empty( $api_data ) || ! isset( $api_data['acf']['links'] ) ) {
+			return $default_url;
+		}
+
+		foreach ( $api_data['acf']['links'] as $link ) {
+			if ( $link['original_url'] === $default_url ) {
+				return $link['url'];
+			}
+		}
+
+		return $default_url;
+	}
 }

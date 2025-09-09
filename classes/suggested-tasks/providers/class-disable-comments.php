@@ -80,7 +80,7 @@ class Disable_Comments extends Tasks_Interactive {
 				)
 			),
 			(int) \wp_count_comments()->approved,
-			'<a href="https://prpl.fyi/disable-comments" target="_blank">' . \esc_html__( 'disabling them', 'progress-planner' ) . '</a>',
+			'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/disable-comments' ) ) . '" target="_blank">' . \esc_html__( 'disabling them', 'progress-planner' ) . '</a>',
 		);
 	}
 

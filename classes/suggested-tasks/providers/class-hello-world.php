@@ -104,7 +104,7 @@ class Hello_World extends Tasks_Interactive {
 		) . '</p><p>' . \sprintf(
 			/* translators: %s: URL to https://prpl.fyi/delete-sample-page */
 			\__( 'This post does not add value to your website and solely exists to show what a post can look like. Therefore, <a href="%s" target="_blank">"Hello World!" is not needed and should be deleted</a>.', 'progress-planner' ),
-			'https://prpl.fyi/delete-hello-world-post'
+			\esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/delete-hello-world-post' ) )
 		) . '</p>';
 	}
 

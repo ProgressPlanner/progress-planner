@@ -103,7 +103,7 @@ class Sample_Page extends Tasks_Interactive {
 		) . '</p><p>' . \sprintf(
 			/* translators: %s: URL to https://prpl.fyi/delete-sample-page */
 			\__( 'This page does not add value to your website and solely exists to show what a page can look like. Therefore, <a href="%s" target="_blank">"Sample Page" is not needed and should be deleted</a>.', 'progress-planner' ),
-			'https://prpl.fyi/delete-sample-page'
+			\esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/delete-sample-page' ) )
 		) . '</p>';
 	}
 

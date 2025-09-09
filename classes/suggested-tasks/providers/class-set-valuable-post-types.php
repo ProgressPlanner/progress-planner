@@ -80,7 +80,7 @@ class Set_Valuable_Post_Types extends Tasks {
 		return \sprintf(
 			/* translators: %s:<a href="https://prpl.fyi/valuable-content" target="_blank">Read more</a> link */
 			\esc_html__( 'Tell us which post types matter most for your site. Go to your settings and select your valuable content types. %s', 'progress-planner' ),
-			'<a href="https://prpl.fyi/valuable-content" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/valuable-content' ) ) . '" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		);
 	}
 
