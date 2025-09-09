@@ -83,6 +83,12 @@ https://youtu.be/e1bmxZYyXFY
 
 == Changelog ==
 
+= 1.8.0 =
+
+Enhancements:
+
+* Redesign of the admin pages.
+
 = 1.7.2 =
 
 * Backported some features from the Progress Planner Pro plugin.
