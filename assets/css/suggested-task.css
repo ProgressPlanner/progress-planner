@@ -203,6 +203,14 @@
 		justify-content: center;
 	}
 
+	.prpl-move-buttons-wrapper {
+		position: absolute;
+		left: calc(-8px - 0.5rem); /* -7px is the half width of the arrow, -0.5rem is the padding of the widget */
+		top: 50%;
+		transform: translateY(-50%);
+		padding: 10px 10px 10px 0; /* Padding is needed for arrows to be accessible on hover */
+	}
+
 	.move-up,
 	.move-down {
 		height: 0.75rem;
