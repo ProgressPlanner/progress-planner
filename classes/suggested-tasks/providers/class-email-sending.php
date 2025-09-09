@@ -283,11 +283,13 @@ class Email_Sending extends Tasks_Interactive {
 			'popovers/email-sending.php',
 			[
 				'prpl_popover_id'                      => static::POPOVER_ID,
+				'prpl_external_link_url'               => $this->get_external_link_url(),
 				'prpl_provider_id'                     => $this->get_provider_id(),
 				'prpl_email_subject'                   => $this->email_subject,
 				'prpl_email_error'                     => $this->email_error,
 				'prpl_troubleshooting_guide_url'       => $this->troubleshooting_guide_url,
 				'prpl_is_there_sending_email_override' => $this->is_there_sending_email_override(),
+				'prpl_task_actions'                    => $this->get_task_actions(),
 			]
 		);
 	}
@@ -299,5 +301,22 @@ class Email_Sending extends Tasks_Interactive {
 	 */
 	public function print_popover_form_contents() {
 		// The form is handled in the popovers/email-sending view.
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'' . \esc_attr( $data['meta']['prpl_popover_id'] ) . '\')?.showPopover()">' . \esc_html__( 'Test email sending', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

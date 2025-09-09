@@ -33,7 +33,7 @@
 				border: 1px solid #796da2;
 				background-color: #f6f7f9;
 
-				.prpl-suggested-task-actions {
+				.prpl-suggested-task-points-wrapper {
 
 					&::after {
 						content: "";
@@ -170,6 +170,23 @@
 	summary {
 		padding: 0.5rem;
 		font-weight: 500;
+		display: flex;
+
+		& > .prpl-todo-list-completed-summary-icon {
+			margin-inline-start: auto;
+			display: block;
+			width: 20px;
+			height: 20px;
+
+			transition: transform 0.3s ease-in-out;
+		}
+	}
+
+	&[open] {
+
+		summary > .prpl-todo-list-completed-summary-icon {
+			transform: rotate(180deg);
+		}
 	}
 
 	&:not(:has(.prpl-suggested-task)) {
