@@ -66,7 +66,6 @@ if ( ! $prpl_widget_details ) {
 
 <hr>
 
-<h3><?php \esc_html_e( 'Your achievements', 'progress-planner' ); ?></h3>
 <div class="prpl-badges-container-achievements">
 	<div class="progress-wrapper badge-group-<?php echo \esc_attr( 'content' ); ?>">
 		<?php foreach ( \progress_planner()->get_badges()->get_badges( 'content' ) as $prpl_badge ) : ?>
