@@ -41,6 +41,13 @@ class Select_Locale extends Tasks_Interactive {
 	const POPOVER_ID = 'select-locale';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-locale';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool

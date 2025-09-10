@@ -45,6 +45,13 @@ class Unpublished_Content extends Tasks {
 	protected const DATA_COLLECTOR_CLASS = Unpublished_Content_Data_Collector::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/check-unpublished-content';
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool

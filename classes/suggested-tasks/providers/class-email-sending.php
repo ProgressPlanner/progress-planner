@@ -41,6 +41,13 @@ class Email_Sending extends Tasks_Interactive {
 	const POPOVER_ID = 'sending-email';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/check-if-your-websites-email-system-works';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool

@@ -27,6 +27,13 @@ class Select_Timezone extends Tasks_Interactive {
 	const POPOVER_ID = 'select-timezone';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-timezone';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
