@@ -80,15 +80,6 @@ class Select_Timezone extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Setting the time zone correctly on your site is valuable. By setting the correct time zone, you ensure scheduled tasks happen exactly when you want them to happen. To correctly account for daylight savings\', we recommend you use the city-based time zone instead of the UTC offset (e.g. Amsterdam or London).', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool

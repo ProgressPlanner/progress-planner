@@ -54,17 +54,6 @@ class Organization_Logo extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
-			? \esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your organization logo in the Yoast SEO settings.', 'progress-planner' )
-			: \esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your person logo in the Yoast SEO settings.', 'progress-planner' );
-	}
-
-	/**
 	 * Get external link URL.
 	 *
 	 * @return string

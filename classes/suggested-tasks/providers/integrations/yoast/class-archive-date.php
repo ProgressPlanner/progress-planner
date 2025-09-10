@@ -45,15 +45,6 @@ class Archive_Date extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Yoast SEO can disable the date archive, which is really only useful for news sites and blogs.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array

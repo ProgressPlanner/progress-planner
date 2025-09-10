@@ -61,15 +61,6 @@ class Archive_Format extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'WordPress creates an archive for each post format. This is not useful and can be disabled in the Yoast SEO settings.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array

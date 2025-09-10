@@ -61,15 +61,6 @@ class Remove_Inactive_Plugins extends Tasks {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'You have inactive plugins. Consider removing any plugins that are not activated to free up resources, and improve security.', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool

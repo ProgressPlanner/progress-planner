@@ -45,15 +45,6 @@ class Media_Pages extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Yoast SEO can disable the media / attachment pages, which are the pages that show the media files. You really don\'t need them, except when you are displaying photos or art on your site through them.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array

@@ -89,15 +89,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Yoast SEO detected that this article has no links pointing to it.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the URL.
 	 *
 	 * @param array $task_data The task data.

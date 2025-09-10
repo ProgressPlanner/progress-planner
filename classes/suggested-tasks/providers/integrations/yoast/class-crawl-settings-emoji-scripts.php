@@ -45,15 +45,6 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Remove JavaScript used for converting emoji characters in older browsers.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array
