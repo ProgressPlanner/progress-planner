@@ -77,4 +77,21 @@ class User extends Tasks {
 		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
 		return $task_post ? $task_post->get_data() : [];
 	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="#" target="_self" onclick="this.closest(\'li.prpl-suggested-task\').querySelector(\'.prpl-task-title span\').focus();">' . \esc_html__( 'Edit', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
+	}
 }

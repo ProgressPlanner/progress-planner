@@ -129,10 +129,6 @@ const prplTodoWidget = {
 					prpl_recommendations_provider:
 						prplTerms.get( 'provider' ).user.id,
 					menu_order: prplTodoWidget.getHighestItemOrder() + 1,
-					meta: {
-						prpl_snoozable: false,
-						prpl_dismissable: true,
-					},
 				} );
 				post.save().then( ( response ) => {
 					if ( ! response.id ) {
@@ -142,8 +138,6 @@ const prplTodoWidget = {
 						...response,
 						meta: {
 							prpl_points: 0,
-							prpl_snoozable: false,
-							prpl_dismissable: true,
 							prpl_url: '',
 							prpl_url_target: '_self',
 							...( response.meta || {} ),

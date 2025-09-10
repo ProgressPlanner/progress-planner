@@ -27,6 +27,13 @@ class Search_Engine_Visibility extends Tasks {
 	protected const PROVIDER_ID = 'search-engine-visibility';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/blog-indexing-settings';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -62,11 +69,7 @@ class Search_Engine_Visibility extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %1$s <a href="https://prpl.fyi/blog-indexing-settings" target="_blank">allowing search engines</a> link */
-			\esc_html__( 'Your site is not currently visible to search engines. Consider %1$s to index your site.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/blog-indexing-settings" target="_blank">' . \esc_html__( 'allowing search engines', 'progress-planner' ) . '</a>',
-		);
+		return \esc_html__( 'Your site is not currently visible to search engines. Consider allowing search engines to index your site.', 'progress-planner' );
 	}
 
 	/**
@@ -76,5 +79,22 @@ class Search_Engine_Visibility extends Tasks {
 	 */
 	public function should_add_task() {
 		return 0 === (int) \get_option( 'blog_public' );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'options-reading.php' ) . '" target="_self">' . \esc_html__( 'Change setting', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

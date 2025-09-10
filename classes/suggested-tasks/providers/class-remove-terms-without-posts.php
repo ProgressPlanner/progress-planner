@@ -79,6 +79,13 @@ class Remove_Terms_Without_Posts extends Tasks {
 	protected const DATA_COLLECTOR_CLASS = Terms_Without_Posts_Data_Collector::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/remove-empty-taxonomy';
+
+	/**
 	 * The completed term IDs.
 	 *
 	 * @var array|null
@@ -310,5 +317,22 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 */
 	public function exclude_completed_terms( $exclude_term_ids ) {
 		return \array_merge( $exclude_term_ids, $this->get_completed_term_ids() );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'options-permalink.php' ) . '" target="_self">' . \esc_html__( 'Go to the "Taxonomies" page', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }
