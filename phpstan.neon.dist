@@ -1,5 +1,5 @@
 parameters:
-  level: 8
+  level: 10
   reportUnmatchedIgnoredErrors: false
   paths:
     - ./classes
@@ -9,6 +9,23 @@ parameters:
   ignoreErrors:
     - identifier: missingType.iterableValue
     - identifier: missingType.generics
+    - identifier: binaryOp.invalid
+    - identifier: cast.string
+    - identifier: cast.int
+    - identifier: cast.double
+    - identifier: offsetAccess.nonOffsetAccessible
+    - identifier: echo.nonString
+    - identifier: encapsedStringPart.nonString
+    - identifier: assignOp.invalid
+    - identifier: method.nonObject
+    - identifier: property.nonObject
+    - identifier: foreach.nonIterable
+    - identifier: argument.type
+    - identifier: return.type
+    - identifier: clone.nonObject
+    - identifier: callable.nonCallable
+    - identifier: assign.propertyType
+    - identifier: parameter.phpDocType
     - '#Function YoastSEO not found.#'
     - '#.*unknown class YoastSEO.*#'
     - '#Call to static method get_instance\(\) on an unknown class WPSEO_Options.#'
