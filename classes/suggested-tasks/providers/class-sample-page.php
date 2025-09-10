@@ -95,7 +95,7 @@ class Sample_Page extends Tasks_Interactive {
 	 * @return string
 	 */
 	protected function get_description() {
-		$sample_page_id = (int) $this->get_data_collector()->collect();
+		$sample_page_id = (int) $this->get_data_collector()->collect(); // @phpstan-ignore-line cast.int
 
 		if ( 0 === $sample_page_id ) {
 			return \esc_html__( 'On install, WordPress creates a "Sample Page" page. This page does not add value to your website and solely exists to show what a page can look like. Therefore, "Sample Page" is not needed and should be deleted.', 'progress-planner' );

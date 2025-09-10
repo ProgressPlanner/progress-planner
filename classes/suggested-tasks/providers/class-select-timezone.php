@@ -112,8 +112,8 @@ class Select_Timezone extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		$current_offset     = (float) \get_option( 'gmt_offset' );
-		$tzstring           = (string) \get_option( 'timezone_string', '' );
+		$current_offset     = (float) \get_option( 'gmt_offset' ); // @phpstan-ignore-line cast.float
+		$tzstring           = (string) \get_option( 'timezone_string', '' ); // @phpstan-ignore-line cast.string
 		$was_tzstring_saved = '' !== $tzstring || 0 !== (int) $current_offset ? 'true' : 'false';
 
 		// Remove old Etc mappings. Fallback to gmt_offset.

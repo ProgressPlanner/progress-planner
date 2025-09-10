@@ -25,7 +25,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					<?php endif; ?>
 					<?php echo ( (string) $prpl_option_value === (string) $prpl_setting['value'] ) ? ' checked' : ''; ?>
 				>
-				<?php echo \wp_kses_post( (string) $prpl_option_label ); ?>
+				<?php echo \wp_kses_post( $prpl_option_label ); ?>
 			</label>
 		<?php endforeach; ?>
 	</div>

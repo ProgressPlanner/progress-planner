@@ -9,10 +9,6 @@ parameters:
   ignoreErrors:
     - identifier: missingType.iterableValue
     - identifier: missingType.generics
-    - identifier: binaryOp.invalid
-    - identifier: cast.string
-    - identifier: cast.int
-    - identifier: cast.double
     - '#Function YoastSEO not found.#'
     - '#.*unknown class YoastSEO.*#'
     - '#Call to static method get_instance\(\) on an unknown class WPSEO_Options.#'
