@@ -32,6 +32,9 @@
 	--prpl-color-notification-green: #16a34a;
 	--prpl-color-notification-red: #e73136;
 
+	--prpl-color-button-primary: #dd3244;
+	--prpl-color-button-primary-hover: #cf2441;
+
 	--prpl-background-orange: #fff9f0;
 	--prpl-background-purple: #f6f5fb;
 	--prpl-background-green: #f2faf9;
@@ -51,13 +54,33 @@
 }
 
 /*------------------------------------*\
+	Progress Planner dashboard page.
+\*------------------------------------*/
+/* stylelint-disable-next-line selector-class-pattern */
+body.toplevel_page_progress-planner {
+
+	#wpwrap {
+		background-color: #f6f7f9;
+	}
+
+	ul#adminmenu {
+
+		a.wp-has-current-submenu,
+		>li.current > a.current {
+
+			&::after {
+				border-right-color: #f6f7f9 !important;
+			}
+		}
+	}
+}
+
+/*------------------------------------*\
 	Styles for the container of the page.
 \*------------------------------------*/
 .prpl-wrap {
-	background: #fff;
-	border: 1px solid var(--prpl-color-gray-2);
 	border-radius: var(--prpl-border-radius);
-	padding: var(--prpl-settings-page-gap) calc(var(--prpl-padding) * 2);
+	padding: var(--prpl-settings-page-gap) var(--prpl-padding);
 	max-width: var(--prpl-container-max-width);
 	color: var(--prpl-color-text);
 	font-size: var(--prpl-font-size-base);
@@ -95,6 +118,14 @@
 
 .prpl-wrap a {
 	color: var(--prpl-color-link);
+}
+
+.prpl-widget-width-2 {
+	grid-column: span 2;
+
+	.prpl-widget-description {
+		max-width: 640px;
+	}
 }
 
 .prpl-widget-title {
@@ -190,6 +221,7 @@ button.prpl-info-icon {
 		padding: 0.4em;
 
 		/* color: var(--prpl-color-gray-2); */
+		background-color: #fff;
 		border: 1px solid var(--prpl-color-gray-2);
 		border-radius: var(--prpl-border-radius);
 
@@ -218,6 +250,7 @@ button.prpl-info-icon {
 	grid-template-columns: repeat(auto-fit, minmax(var(--prpl-column-min-width), 1fr));
 	column-gap: var(--prpl-gap);
 	grid-auto-rows: var(--prpl-gap);
+	grid-auto-flow: dense;
 
 	img {
 		max-width: 100%;
@@ -234,6 +267,7 @@ button.prpl-info-icon {
 	Generic styles for individual widgets.
 \*------------------------------------*/
 .prpl-widget-wrapper {
+	background-color: #fff;
 	border: 1px solid var(--prpl-color-gray-2);
 	border-radius: var(--prpl-border-radius);
 	padding: var(--prpl-padding);
@@ -245,6 +279,12 @@ button.prpl-info-icon {
 	hr {
 		margin-top: 1.25rem;
 		margin-bottom: 1.25rem;
+		border-top-color: var(--prpl-color-gray-2);
+	}
+
+	/* Force the last column to be the last column. */
+	&[data-force-last-column="1"] {
+		grid-column: -2 / -1;
 	}
 }
 
@@ -298,7 +338,7 @@ button.prpl-info-icon {
 	text-decoration: none;
 	cursor: pointer;
 	font-size: var(--prpl-font-size-base);
-	background: var(--prpl-color-accent-red);
+	background: var(--prpl-color-button-primary);
 	line-height: 1.25;
 	box-shadow: none;
 	border: none;
@@ -315,7 +355,7 @@ button.prpl-info-icon {
 		display: block;
 		width: 100%;
 		height: 100%;
-		background: var(--prpl-color-accent-red);
+		background: var(--prpl-color-button-primary);
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -331,10 +371,10 @@ button.prpl-info-icon {
 
 	&:not([disabled]):hover,
 	&:not([disabled]):focus {
-		background: #cf2441;
+		background: var(--prpl-color-button-primary-hover);
 
 		&::after {
-			background: #cf2441;
+			background: var(--prpl-color-button-primary-hover);
 			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
 			width: calc(100% + 4px);
 			height: calc(100% + 4px);
@@ -417,6 +457,10 @@ button.prpl-info-icon {
 
 	.prpl-welcome .inner-content .right {
 		display: none !important;
+	}
+
+	.prpl-widget-width-2 {
+		grid-column: span 1;
 	}
 }
 

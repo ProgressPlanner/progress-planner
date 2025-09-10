@@ -492,24 +492,6 @@ class Debug_Tools {
 				'title'  => 'Free License: ' . ( false !== $prpl_free_license_key ? $prpl_free_license_key : 'Not set' ),
 			]
 		);
-
-		$prpl_pro_license = \get_option( 'progress_planner_pro_license_key', false );
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-pro-license',
-				'parent' => 'prpl-more-info',
-				'title'  => 'Pro License: ' . ( false !== $prpl_pro_license ? $prpl_pro_license : 'Not set' ),
-			]
-		);
-
-		$prpl_pro_license_status = \get_option( 'progress_planner_pro_license_status', false );
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-pro-license-status',
-				'parent' => 'prpl-more-info',
-				'title'  => 'Pro License Status: ' . ( false !== $prpl_pro_license_status ? $prpl_pro_license_status : 'Not set' ),
-			]
-		);
 	}
 
 	/**
@@ -591,8 +573,6 @@ class Debug_Tools {
 
 		// Delete the option.
 		\delete_option( 'progress_planner_license_key' );
-		\delete_option( 'progress_planner_pro_license_key' );
-		\delete_option( 'progress_planner_pro_license_status' );
 
 		// Redirect to the same page without the parameter.
 		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_licenses', '_wpnonce' ] ) );

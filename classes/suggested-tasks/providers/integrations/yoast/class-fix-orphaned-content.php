@@ -58,6 +58,13 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	protected const DATA_COLLECTOR_CLASS = Yoast_Orphaned_Content::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/fix-orphaned-content';
+
+	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -87,11 +94,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Yoast SEO detected that this article has no links pointing to it. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/fix-orphaned-content" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the fixing the orphaned content.', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
+		return \esc_html__( 'Yoast SEO detected that this article has no links pointing to it.', 'progress-planner' );
 	}
 
 	/**
@@ -235,5 +238,22 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 */
 	public function exclude_completed_posts( $exclude_post_ids ) {
 		return \array_merge( $exclude_post_ids, $this->get_completed_post_ids() );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_tools#/fix-orphaned-content' ) . '" target="_blank">' . \esc_html__( 'Add internal links', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }
