@@ -44,17 +44,16 @@ class Maintenance extends Activity {
 		$this->date    = new \DateTime();
 		$this->user_id = \get_current_user_id();
 
-		$existing = \progress_planner()->get_activities__query()->query_activities(
+		$existing = \progress_planner()->get_activities__query()->query_activities_get_raw(
 			[
 				'category'   => $this->category,
 				'type'       => $this->type,
 				'data_id'    => $this->data_id,
 				'start_date' => $this->date,
-			],
-			'RAW'
+			]
 		);
 		if ( ! empty( $existing ) ) {
-			\progress_planner()->get_activities__query()->update_activity( $existing[0]->id, $this );
+			\progress_planner()->get_activities__query()->update_activity( $existing[0]->id, $this ); // @phpstan-ignore-line property.nonObject
 			return;
 		}
 		\progress_planner()->get_activities__query()->insert_activity( $this );

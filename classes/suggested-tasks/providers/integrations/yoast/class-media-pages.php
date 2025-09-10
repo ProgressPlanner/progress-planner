@@ -70,7 +70,7 @@ class Media_Pages extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		// If the media pages are already disabled, we don't need to add the task.
-		return \YoastSEO()->helpers->options->get( 'disable-attachment' ) !== true;
+		return \YoastSEO()->helpers->options->get( 'disable-attachment' ) !== true; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**

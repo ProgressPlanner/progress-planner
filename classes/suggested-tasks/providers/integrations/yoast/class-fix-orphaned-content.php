@@ -128,12 +128,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 
 		$linked_count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
-				"
-			SELECT COUNT(*)
-			FROM {$wpdb->prefix}yoast_seo_links
-			WHERE target_post_id = %d
-			AND type = 'internal'
-			",
+				"SELECT COUNT(*) FROM {$wpdb->prefix}yoast_seo_links WHERE target_post_id = %d AND type = 'internal'", // @phpstan-ignore-line property.nonObject
 				$post->ID
 			)
 		);
