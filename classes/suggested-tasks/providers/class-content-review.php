@@ -38,6 +38,13 @@ class Content_Review extends Tasks {
 	protected const CATEGORY = 'content-update';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/review-post';
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool

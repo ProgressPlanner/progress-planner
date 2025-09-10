@@ -79,6 +79,13 @@ class Remove_Terms_Without_Posts extends Tasks {
 	protected const DATA_COLLECTOR_CLASS = Terms_Without_Posts_Data_Collector::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/remove-empty-taxonomy';
+
+	/**
 	 * The completed term IDs.
 	 *
 	 * @var array|null

@@ -51,6 +51,13 @@ class Update_Term_Description extends Tasks {
 	protected const DATA_COLLECTOR_CLASS = Terms_Without_Description_Data_Collector::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/taxonomy-terms-description';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
