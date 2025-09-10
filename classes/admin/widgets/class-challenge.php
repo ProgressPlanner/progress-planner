@@ -34,6 +34,8 @@ final class Challenge extends Widget {
 				'feed'    => [],
 				'expires' => 0,
 			];
+		} else {
+			$feed_data = (array) $feed_data;
 		}
 
 		// Transient expired, fetch new feed.

@@ -61,7 +61,7 @@ abstract class Widget {
 		// phpcs:ignore WordPress.Security.NonceVerification
 		return isset( $_GET['range'] )
 			// phpcs:ignore WordPress.Security.NonceVerification
-			? \sanitize_text_field( \wp_unslash( $_GET['range'] ) )
+			? \sanitize_text_field( \wp_unslash( $_GET['range'] ) ) // @phpstan-ignore-line argument.type
 			: '-6 months';
 	}
 
@@ -74,7 +74,7 @@ abstract class Widget {
 		// phpcs:ignore WordPress.Security.NonceVerification
 		return isset( $_GET['frequency'] )
 			// phpcs:ignore WordPress.Security.NonceVerification
-			? \sanitize_text_field( \wp_unslash( $_GET['frequency'] ) )
+			? \sanitize_text_field( \wp_unslash( $_GET['frequency'] ) ) // @phpstan-ignore-line argument.type
 			: 'monthly';
 	}
 

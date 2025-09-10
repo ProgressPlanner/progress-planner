@@ -39,7 +39,7 @@ class Plugin_Installer {
 
 		// Get the plugin slug from the request.
 		$slug = isset( $_POST['plugin_slug'] )
-			? \sanitize_text_field( \wp_unslash( $_POST['plugin_slug'] ) )
+			? \sanitize_text_field( \wp_unslash( $_POST['plugin_slug'] ) ) // @phpstan-ignore-line argument.type
 			: '';
 
 		// If the plugin slug is empty, return an error.
@@ -101,7 +101,7 @@ class Plugin_Installer {
 
 		// Get the plugin slug from the request.
 		$plugin_slug = isset( $_POST['plugin_slug'] )
-			? \sanitize_text_field( \wp_unslash( $_POST['plugin_slug'] ) )
+			? \sanitize_text_field( \wp_unslash( $_POST['plugin_slug'] ) ) // @phpstan-ignore-line argument.type
 			: '';
 
 		// If the plugin slug is empty, return an error.

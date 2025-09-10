@@ -71,7 +71,7 @@ abstract class Badge {
 	 * @return array
 	 */
 	protected function get_saved() {
-		return \progress_planner()->get_settings()->get( [ 'badges', $this->id ], [] );
+		return (array) \progress_planner()->get_settings()->get( [ 'badges', $this->id ], [] );
 	}
 
 	/**

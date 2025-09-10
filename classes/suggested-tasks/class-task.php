@@ -210,6 +210,6 @@ class Task {
 		// Get formatted response.
 		$response = $controller->prepare_item_for_response( $post, $request );
 
-		return $response->get_data();
+		return (array) $response->get_data();
 	}
 }

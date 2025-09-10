@@ -87,7 +87,7 @@ abstract class Base_Data_Collector {
 	 * @return mixed
 	 */
 	protected function get_cached_data( string $key ) {
-		$data = \progress_planner()->get_settings()->get( static::CACHE_KEY, [] );
+		$data = (array) \progress_planner()->get_settings()->get( static::CACHE_KEY, [] );
 		return $data[ $key ] ?? null;
 	}
 
@@ -100,7 +100,7 @@ abstract class Base_Data_Collector {
 	 * @return void
 	 */
 	protected function set_cached_data( string $key, $value ) {
-		$data         = \progress_planner()->get_settings()->get( static::CACHE_KEY, [] );
+		$data         = (array) \progress_planner()->get_settings()->get( static::CACHE_KEY, [] );
 		$data[ $key ] = $value;
 		\progress_planner()->get_settings()->set( static::CACHE_KEY, $data );
 	}

@@ -26,9 +26,12 @@ class Content_Helpers {
 		}
 		$default            = [ 'post', 'page' ];
 		$include_post_types = \array_filter(
-			\progress_planner()->get_settings()->get( [ 'include_post_types' ], $default ),
+			(array) \progress_planner()->get_settings()->get( [ 'include_post_types' ], $default ),
 			function ( $post_type ) {
-				return $post_type && \post_type_exists( $post_type ) && \is_post_type_viewable( $post_type );
+				return $post_type
+					&& \is_string( $post_type )
+					&& \post_type_exists( $post_type )
+					&& \is_post_type_viewable( $post_type );
 			}
 		);
 		return empty( $include_post_types ) ? $default : \array_values( $include_post_types );

@@ -204,7 +204,7 @@ class Content_Review extends Tasks {
 		// Add the privacy policy page ID if it exists. Not 'publish' page will not be fetched by get_posts().
 		$privacy_policy_page_id = \get_option( 'wp_page_for_privacy_policy' );
 		if ( $privacy_policy_page_id ) {
-			$important_page_ids[] = (int) $privacy_policy_page_id;
+			$important_page_ids[] = (int) $privacy_policy_page_id; // @phpstan-ignore-line cast.int
 		}
 
 		/**
@@ -506,7 +506,7 @@ class Content_Review extends Tasks {
 		$data = $task->get_data();
 
 		return $data && isset( $data['target_post_id'] )
-			&& (int) \get_post_modified_time( 'U', false, (int) $data['target_post_id'] ) > \strtotime( '-12 months' );
+			&& (int) \get_post_modified_time( 'U', false, (int) $data['target_post_id'] ) > \strtotime( '-12 months' ); // @phpstan-ignore-line cast.int
 	}
 
 	/**

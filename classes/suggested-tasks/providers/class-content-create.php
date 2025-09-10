@@ -89,7 +89,7 @@ class Content_Create extends Tasks {
 	 * @return array
 	 */
 	public function modify_evaluated_task_data( $task_data ) {
-		$last_published_post_data = $this->get_data_collector()->collect();
+		$last_published_post_data = (array) $this->get_data_collector()->collect();
 
 		if ( ! $last_published_post_data || empty( $last_published_post_data['post_id'] ) ) {
 			return $task_data;
@@ -108,15 +108,18 @@ class Content_Create extends Tasks {
 	 */
 	public function should_add_task() {
 		// Get the post that was created last.
-		$last_published_post_data = $this->get_data_collector()->collect();
+		$last_published_post_data = (array) $this->get_data_collector()->collect();
 
 		// There are no published posts, add task.
-		if ( ! $last_published_post_data || empty( $last_published_post_data['post_id'] ) ) {
+		if ( ! $last_published_post_data
+			|| empty( $last_published_post_data['post_id'] )
+			|| ! isset( $last_published_post_data['post_date'] )
+		) {
 			return true;
 		}
 
 		// Add tasks if there are no posts published this week.
-		return \gmdate( 'YW' ) !== \gmdate( 'YW', \strtotime( $last_published_post_data['post_date'] ) );
+		return \gmdate( 'YW' ) !== \gmdate( 'YW', \strtotime( $last_published_post_data['post_date'] ) ); // @phpstan-ignore-line argument.type
 	}
 
 	/**

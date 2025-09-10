@@ -450,7 +450,7 @@ class Query {
 	 * @return void
 	 */
 	private function maybe_upgrade() {
-		$db_version         = (int) \get_option( 'progress_planner_db_version', 0 );
+		$db_version         = (int) \get_option( 'progress_planner_db_version', 0 ); // @phpstan-ignore-line cast.int
 		$available_upgrades = [];
 		// Get an array of methods that are prefixed with "upgrade_".
 		$methods = \get_class_methods( $this );

@@ -36,17 +36,17 @@ class Update_161 extends Update {
 	 */
 	private function migrate_badges() {
 		// Get all badges.
-		$badges = \progress_planner()->get_settings()->get( 'badges', [] );
+		$badges = (array) \progress_planner()->get_settings()->get( 'badges', [] );
 
 		foreach ( $badges as $badge_id => $badge ) {
 			// We are only migrating monthly badges.
-			if ( 0 !== \strpos( $badge_id, 'monthly-' ) ) {
+			if ( 0 !== \strpos( (string) $badge_id, 'monthly-' ) ) {
 				continue;
 			}
 
-			if ( ! isset( $badges[ $badge_id ]['points'] ) ) {
+			if ( ! isset( $badges[ (string) $badge_id ]['points'] ) ) { // @phpstan-ignore-line
 				// We are just adding the points to the badge, for the new data structure - 10 is the max points for a badge.
-				$badges[ $badge_id ]['points'] = 10 - (int) $badge['remaining'];
+				$badges[ (string) $badge_id ]['points'] = 10 - (int) $badge['remaining']; // @phpstan-ignore-line
 			}
 		}
 
@@ -61,11 +61,11 @@ class Update_161 extends Update {
 	 */
 	private function migrate_tasks() {
 		// Get all tasks.
-		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
+		$tasks = (array) \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		// Migrate the tasks.
 		foreach ( $tasks as $task ) {
-			$this->migrate_task( $task );
+			$this->migrate_task( (array) $task );
 		}
 
 		// Delete the tasks option.

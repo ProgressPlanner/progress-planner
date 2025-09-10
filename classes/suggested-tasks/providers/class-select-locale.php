@@ -111,7 +111,7 @@ class Select_Locale extends Tasks_Interactive {
 	 * @return string
 	 */
 	protected function get_browser_locale() {
-		$lang = \sanitize_text_field( \wp_unslash( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '' ) );
+		$lang = \sanitize_text_field( \wp_unslash( $_SERVER['HTTP_ACCEPT_LANGUAGE'] ?? '' ) ); // @phpstan-ignore-line
 		if ( ! $lang ) {
 			return '';
 		}
@@ -132,7 +132,7 @@ class Select_Locale extends Tasks_Interactive {
 	 */
 	protected function get_locales() {
 		$cache_key = 'all_locales';
-		$cached    = \progress_planner()->get_utils__cache()->get( $cache_key );
+		$cached    = (array) \progress_planner()->get_utils__cache()->get( $cache_key );
 		if ( $cached ) {
 			return $cached;
 		}
@@ -152,12 +152,12 @@ class Select_Locale extends Tasks_Interactive {
 		// Get the locales.
 		$locales = \array_map(
 			function ( $locale ) {
-				return [
+				return \is_array( $locale ) ? [
 					'code' => $locale['language'],
 					'name' => $locale['native_name'],
-				];
+				] : [];
 			},
-			$locales['translations']
+			(array) $locales['translations']
 		);
 
 		\progress_planner()->get_utils__cache()->set( $cache_key, $locales, MONTH_IN_SECONDS );

@@ -45,7 +45,7 @@ class Update_130 extends Update {
 	 * @return void
 	 */
 	private function migrate_badges() {
-		$options = \get_option( \Progress_Planner\Settings::OPTION_NAME );
+		$options = (array) \get_option( \Progress_Planner\Settings::OPTION_NAME, [] );
 
 		$badges_renamed = [
 			'wonderful-writer' => 'content-curator',
@@ -53,7 +53,7 @@ class Update_130 extends Update {
 			'awesome-author'   => 'purposeful-publisher',
 		];
 
-		if ( ! isset( $options['badges'] ) ) {
+		if ( ! isset( $options['badges'] ) || ! \is_array( $options['badges'] ) ) {
 			return;
 		}
 
@@ -73,7 +73,7 @@ class Update_130 extends Update {
 	 * @return void
 	 */
 	private function restore_completed_tasks() {
-		$local_tasks         = \progress_planner()->get_settings()->get( 'local_tasks', [] );
+		$local_tasks         = (array) \progress_planner()->get_settings()->get( 'local_tasks', [] );
 		$local_tasks_changed = false;
 
 		// Migrate acgtivities saved in the progress_planner_activities table.

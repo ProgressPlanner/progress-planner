@@ -167,14 +167,14 @@ class Badges {
 		}
 
 		// Get the settings for badges.
-		$settings = \progress_planner()->get_settings()->get( 'badges', [] );
+		$settings = (array) \progress_planner()->get_settings()->get( 'badges', [] );
 
 		$latest_date = null;
 
 		foreach ( [ 'content', 'maintenance', 'monthly_flat' ] as $context ) {
 			foreach ( $this->$context as $badge ) {
 				// Skip if the badge has no date.
-				if ( ! isset( $settings[ $badge->get_id() ]['date'] ) ) {
+				if ( ! \is_array( $settings[ $badge->get_id() ] ) || ! isset( $settings[ $badge->get_id() ] ) ) {
 					continue;
 				}
 
@@ -195,7 +195,7 @@ class Badges {
 				}
 
 				// Compare dates.
-				if ( \DateTime::createFromFormat( 'Y-m-d H:i:s', $settings[ $badge->get_id() ]['date'] )->format( 'U' ) >= \DateTime::createFromFormat( 'Y-m-d H:i:s', $latest_date )->format( 'U' ) ) {
+				if ( \DateTime::createFromFormat( 'Y-m-d H:i:s', $settings[ $badge->get_id() ]['date'] )->format( 'U' ) >= \DateTime::createFromFormat( 'Y-m-d H:i:s', $latest_date )->format( 'U' ) ) { // @phpstan-ignore-line argument.type
 					$latest_date                  = $settings[ $badge->get_id() ]['date'];
 					$this->latest_completed_badge = $badge;
 				}

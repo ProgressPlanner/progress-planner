@@ -151,7 +151,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			return [];
 		}
 
-		$data    = $this->transform_collector_data( $this->get_data_collector()->collect() );
+		$data    = $this->transform_collector_data( (array) $this->get_data_collector()->collect() );
 		$task_id = $this->get_task_id( [ 'target_post_id' => $data['target_post_id'] ] );
 
 		// When we have data, check if task was completed.
@@ -179,7 +179,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return array
 	 */
 	protected function modify_injection_task_data( $task_data ) {
-		$task_data['target_post_id'] = $this->transform_collector_data( $this->get_data_collector()->collect() )['target_post_id'];
+		$task_data['target_post_id'] = $this->transform_collector_data( (array) $this->get_data_collector()->collect() )['target_post_id'];
 		return $task_data;
 	}
 

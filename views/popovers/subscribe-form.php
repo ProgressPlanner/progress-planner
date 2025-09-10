@@ -11,6 +11,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 }
 
 $prpl_current_user = \wp_get_current_user();
+
+$prpl_current_user_first_name = \get_user_meta( $prpl_current_user->ID, 'first_name', true );
+$prpl_current_user_first_name = ( \is_string( $prpl_current_user_first_name ) ) ? $prpl_current_user_first_name : '';
 ?>
 
 <h2><?php \esc_html_e( 'Subscribe to weekly emails', 'progress-planner' ); ?></h2>
@@ -35,7 +38,7 @@ $prpl_current_user = \wp_get_current_user();
 				name="name"
 				class="prpl-input"
 				required
-				value="<?php echo \esc_attr( \get_user_meta( $prpl_current_user->ID, 'first_name', true ) ); ?>"
+				value="<?php echo \esc_attr( $prpl_current_user_first_name ); ?>"
 			>
 		</label>
 		<label>

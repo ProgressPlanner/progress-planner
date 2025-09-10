@@ -65,7 +65,7 @@ class Plugin_Upgrade_Tasks {
 		$fresh_install = ! \progress_planner()->is_privacy_policy_accepted();
 
 		// Check if task providers option exists, it will not on fresh installs and v1.0.4 and older.
-		$old_task_providers = \get_option( 'progress_planner_previous_version_task_providers', [] );
+		$old_task_providers = (array) \get_option( 'progress_planner_previous_version_task_providers', [] );
 
 		// We're upgrading from v1.0.4 or older, set the old task providers to what we had before the upgrade.
 		if ( ! $fresh_install && empty( $old_task_providers ) ) {
@@ -78,7 +78,7 @@ class Plugin_Upgrade_Tasks {
 			];
 		}
 
-		$newly_added_task_provider_ids = \get_option( 'progress_planner_upgrade_popover_task_provider_ids', [] );
+		$newly_added_task_provider_ids = (array) \get_option( 'progress_planner_upgrade_popover_task_provider_ids', [] );
 
 		foreach ( $onboard_task_provider_ids as $task_provider_id ) {
 			if ( ! empty( $task_provider_id ) && ! \in_array( $task_provider_id, $old_task_providers, true ) && ! \in_array( $task_provider_id, $newly_added_task_provider_ids, true ) ) {
@@ -138,7 +138,7 @@ class Plugin_Upgrade_Tasks {
 	 * @return array
 	 */
 	public function get_upgrade_popover_task_provider_ids() {
-		return \get_option( 'progress_planner_upgrade_popover_task_provider_ids', [] );
+		return (array) \get_option( 'progress_planner_upgrade_popover_task_provider_ids', [] );
 	}
 
 	/**
