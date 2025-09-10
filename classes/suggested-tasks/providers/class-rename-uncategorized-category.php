@@ -55,7 +55,7 @@ class Rename_Uncategorized_Category extends Tasks {
 	 * @return string
 	 */
 	protected function get_url() {
-		return \admin_url( 'term.php?taxonomy=category&tag_ID=' . (int) $this->get_data_collector()->collect() ); // @phpstan-ignore-line cast.int
+		return \admin_url( 'term.php?taxonomy=category&tag_ID=' . (int) $this->get_data_collector()->collect() );
 	}
 
 	/**
@@ -96,7 +96,7 @@ class Rename_Uncategorized_Category extends Tasks {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'term.php?taxonomy=category&tag_ID=' . (int) $this->get_data_collector()->collect() ) . '" target="_self">' . \esc_html__( 'Rename', 'progress-planner' ) . '</a>', // @phpstan-ignore-line cast.int
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'term.php?taxonomy=category&tag_ID=' . (int) $this->get_data_collector()->collect() ) . '" target="_self">' . \esc_html__( 'Rename', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

@@ -96,7 +96,7 @@ class Hello_World extends Tasks_Interactive {
 	 * @return string
 	 */
 	protected function get_description() {
-		$hello_world_post_id = (int) $this->get_data_collector()->collect(); // @phpstan-ignore-line cast.int
+		$hello_world_post_id = (int) $this->get_data_collector()->collect();
 
 		if ( 0 === $hello_world_post_id ) {
 			return \esc_html__( 'On install, WordPress creates a "Hello World!" post. This post is not needed and should be deleted.', 'progress-planner' );

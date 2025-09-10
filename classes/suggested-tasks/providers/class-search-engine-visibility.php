@@ -69,7 +69,7 @@ class Search_Engine_Visibility extends Tasks {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return 0 === (int) \get_option( 'blog_public' ); // @phpstan-ignore-line cast.int
+		return 0 === (int) \get_option( 'blog_public' );
 	}
 
 	/**

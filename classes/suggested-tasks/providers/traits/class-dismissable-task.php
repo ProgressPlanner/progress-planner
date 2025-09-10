@@ -165,7 +165,7 @@ trait Dismissable_Task {
 		}
 
 		// If the task was dismissed more than the expiration period ago, we can show it again.
-		if ( ( \time() - (int) $dismissal_data['timestamp'] ) > $this->get_expiration_period( $dismissal_data ) ) { // @phpstan-ignore-line cast.int
+		if ( ( \time() - (int) $dismissal_data['timestamp'] ) > $this->get_expiration_period( $dismissal_data ) ) {
 			unset( $dismissed_tasks[ $provider_key ][ $task_identifier ] );
 			\progress_planner()->get_settings()->set( $this->dismissed_tasks_option, $dismissed_tasks );
 			return false;
@@ -208,7 +208,7 @@ trait Dismissable_Task {
 			if ( ! \is_array( $data ) ) {
 				continue;
 			}
-			if ( ( \time() - (int) $data['timestamp'] ) > $this->get_expiration_period( $data ) ) { // @phpstan-ignore-line cast.int
+			if ( ( \time() - (int) $data['timestamp'] ) > $this->get_expiration_period( $data ) ) {
 				unset( $dismissed_tasks[ $provider_key ][ $identifier ] ); // @phpstan-ignore-line
 				$has_changes = true;
 			}
