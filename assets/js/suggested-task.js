@@ -14,16 +14,11 @@ prplSuggestedTask = {
 		moveUp: prplL10n( 'moveUp' ),
 		moveDown: prplL10n( 'moveDown' ),
 		snooze: prplL10n( 'snooze' ),
-		snoozeThisTask: prplL10n( 'snoozeThisTask' ),
-		howLong: prplL10n( 'howLong' ),
-		snoozeDurationOneWeek: prplL10n( 'snoozeDurationOneWeek' ),
-		snoozeDurationOneMonth: prplL10n( 'snoozeDurationOneMonth' ),
-		snoozeDurationThreeMonths: prplL10n( 'snoozeDurationThreeMonths' ),
-		snoozeDurationSixMonths: prplL10n( 'snoozeDurationSixMonths' ),
-		snoozeDurationOneYear: prplL10n( 'snoozeDurationOneYear' ),
-		snoozeDurationForever: prplL10n( 'snoozeDurationForever' ),
 		disabledRRCheckboxTooltip: prplL10n( 'disabledRRCheckboxTooltip' ),
 		markAsComplete: prplL10n( 'markAsComplete' ),
+		taskDelete: prplL10n( 'taskDelete' ),
+		delete: prplL10n( 'delete' ),
+		whyIsThisImportant: prplL10n( 'whyIsThisImportant' ),
 	},
 
 	/**
@@ -146,14 +141,9 @@ prplSuggestedTask = {
 	/**
 	 * Render a new item.
 	 *
-	 * @param {Object}  post        The post object.
-	 * @param {boolean} useCheckbox Whether to use a checkbox.
+	 * @param {Object} post The post object.
 	 */
-	getNewItemTemplatePromise: ( {
-		post = {},
-		useCheckbox = true,
-		listId = '',
-	} ) =>
+	getNewItemTemplatePromise: ( { post = {}, listId = '' } ) =>
 		new Promise( ( resolve ) => {
 			const {
 				prpl_recommendations_provider,
@@ -180,7 +170,6 @@ prplSuggestedTask = {
 			const data = {
 				post,
 				terms,
-				useCheckbox,
 				listId,
 				assets: prplSuggestedTask.assets,
 				action: 'pending' === post.status ? 'celebrate' : '',
@@ -328,6 +317,14 @@ prplSuggestedTask = {
 										} );
 									}, 2000 );
 								} else {
+									// Check the chekcbox, since completing task can be triggered in different ways ("Mark as done" button), without triggering the onchange event.
+									const checkbox = el.querySelector(
+										'.prpl-suggested-task-checkbox'
+									);
+									if ( checkbox ) {
+										checkbox.checked = true;
+									}
+
 									/**
 									 * Strike completed tasks and remove them from the DOM.
 									 */
@@ -379,10 +376,15 @@ prplSuggestedTask = {
 								// Update the Ravi gauge.
 								prplUpdateRaviGauge( 0 - eventPoints );
 
-								// Move task from trash to published.
+								// Move task from trash to published, tasks with points go to the beginning of the list.
 								document
 									.getElementById( 'todo-list' )
-									.insertAdjacentElement( 'beforeend', el );
+									.insertAdjacentElement(
+										0 < eventPoints
+											? 'afterbegin'
+											: 'beforeend',
+										el
+									);
 
 								window.dispatchEvent(
 									new CustomEvent( 'prpl/grid/resize' )
@@ -433,16 +435,11 @@ prplSuggestedTask = {
 			date_gmt: date,
 		} );
 		postModelToSave.save().then( ( postData ) => {
-			const taskCategorySlug = prplTerms.getTerm(
-				postData?.[ prplTerms.category ],
-				prplTerms.category
-			).slug;
-
 			prplSuggestedTask.removeTaskElement( postId );
 
 			// Inject more tasks from the same category.
 			prplSuggestedTask.injectItemsFromCategory( {
-				category: taskCategorySlug,
+				category: postData?.prpl_category?.slug,
 				status: [ 'publish' ],
 			} );
 		} );

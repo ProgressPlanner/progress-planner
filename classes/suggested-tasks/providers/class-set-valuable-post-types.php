@@ -27,6 +27,13 @@ class Set_Valuable_Post_Types extends Tasks {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/valuable-content';
+
+	/**
 	 * The task priority.
 	 *
 	 * @var int
@@ -77,11 +84,7 @@ class Set_Valuable_Post_Types extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %s:<a href="https://prpl.fyi/valuable-content" target="_blank">Read more</a> link */
-			\esc_html__( 'Tell us which post types matter most for your site. Go to your settings and select your valuable content types. %s', 'progress-planner' ),
-			'<a href="https://prpl.fyi/valuable-content" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
+		return \esc_html__( 'Tell us which post types matter most for your site. Go to your settings and select your valuable content types.', 'progress-planner' );
 	}
 
 	/**
@@ -123,5 +126,22 @@ class Set_Valuable_Post_Types extends Tasks {
 	 */
 	public function is_task_completed( $task_id = '' ) {
 		return false === \get_option( 'progress_planner_set_valuable_post_types', false );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=progress-planner-settings' ) . '" target="_self">' . \esc_html__( 'Go to the settings page', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

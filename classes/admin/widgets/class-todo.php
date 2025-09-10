@@ -20,6 +20,13 @@ final class ToDo extends Widget {
 	protected $id = 'todo';
 
 	/**
+	 * The widget width.
+	 *
+	 * @var int
+	 */
+	protected $width = 2;
+
+	/**
 	 * Print the widget content.
 	 *
 	 * @return void
@@ -48,7 +55,13 @@ final class ToDo extends Widget {
 			</button>
 		</form>
 		<details id="todo-list-completed-details">
-			<summary><?php \esc_html_e( 'Completed tasks', 'progress-planner' ); ?></summary>
+			<summary><?php \esc_html_e( 'Completed tasks', 'progress-planner' ); ?>
+				<span class="prpl-todo-list-completed-summary-icon">
+					<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
+						<path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" />
+					</svg>
+				</span>
+			</summary>
 			<ul id="todo-list-completed" class="prpl-todo-list prpl-suggested-tasks-list"></ul>
 		</details>
 		<?php
