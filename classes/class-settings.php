@@ -76,7 +76,7 @@ class Settings {
 		if ( ! empty( self::$settings ) ) {
 			return;
 		}
-		self::$settings = (array) \get_option( self::OPTION_NAME, [] );
+		self::$settings = \get_option( self::OPTION_NAME, [] );
 	}
 
 	/**
@@ -140,9 +140,9 @@ class Settings {
 		$default = \array_intersect( [ 'post', 'page' ], $public_post_types );
 
 		// Filter the saved post types.
-		$include_post_types = \array_intersect( (array) $this->get( [ 'include_post_types' ], $default ), $public_post_types );
+		$include_post_types = \array_intersect( $this->get( [ 'include_post_types' ], $default ), $public_post_types );
 
-		return empty( $include_post_types ) ? $default : \array_values( $include_post_types ); // @phpstan-ignore-line return.type
+		return empty( $include_post_types ) ? $default : \array_values( $include_post_types );
 	}
 
 	/**

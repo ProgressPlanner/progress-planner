@@ -105,7 +105,7 @@ class Content_Scan extends Content {
 		// Calculate the total pages to scan.
 		$total_pages = $this->get_total_pages();
 		// Get the last scanned page.
-		$last_page = (int) \progress_planner()->get_settings()->get( static::LAST_SCANNED_PAGE_OPTION, 0 ); // @phpstan-ignore-line cast.int
+		$last_page = (int) \progress_planner()->get_settings()->get( static::LAST_SCANNED_PAGE_OPTION, 0 );
 		// The current page to scan.
 		$current_page = $last_page + 1;
 

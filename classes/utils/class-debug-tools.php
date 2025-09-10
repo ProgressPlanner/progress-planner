@@ -37,7 +37,7 @@ class Debug_Tools {
 			return;
 		}
 
-		$this->current_url = \wp_nonce_url( \esc_url_raw( \wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'prpl_debug_tools' ); // @phpstan-ignore-line argument.type
+		$this->current_url = \wp_nonce_url( \esc_url_raw( \wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'prpl_debug_tools' );
 
 		\add_action( 'admin_bar_menu', [ $this, 'add_toolbar_items' ], 100 );
 		\add_action( 'init', [ $this, 'check_clear_cache' ] );
@@ -411,7 +411,7 @@ class Debug_Tools {
 		\progress_planner()->get_activities__query()->delete_category_activities( 'suggested_task' );
 
 		// Delete the badges.
-		$progress_planner_settings           = (array) \get_option( \Progress_Planner\Settings::OPTION_NAME, [] );
+		$progress_planner_settings           = \get_option( \Progress_Planner\Settings::OPTION_NAME, [] );
 		$progress_planner_settings['badges'] = [];
 		\update_option( \Progress_Planner\Settings::OPTION_NAME, $progress_planner_settings );
 
@@ -434,7 +434,7 @@ class Debug_Tools {
 			return $max_items_per_category;
 		}
 
-		$max_items = \absint( \wp_unslash( $_GET['prpl_show_all_suggested_tasks'] ) );  // phpcs:ignore WordPress.Security.NonceVerification.Recommended, @phpstan-ignore-line argument.type
+		$max_items = \absint( \wp_unslash( $_GET['prpl_show_all_suggested_tasks'] ) );  // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		foreach ( $max_items_per_category as $key => $value ) {
 			$max_items_per_category[ $key ] = $max_items;
@@ -479,7 +479,7 @@ class Debug_Tools {
 			[
 				'id'     => 'prpl-plugin-activation-date',
 				'parent' => 'prpl-more-info',
-				'title'  => 'Plugin Activation Date: ' . ( isset( $progress_planner_settings['activation_date'] ) ? $progress_planner_settings['activation_date'] : 'Unknown' ), // @phpstan-ignore-line
+				'title'  => 'Plugin Activation Date: ' . ( isset( $progress_planner_settings['activation_date'] ) ? $progress_planner_settings['activation_date'] : 'Unknown' ),
 			]
 		);
 
@@ -489,7 +489,7 @@ class Debug_Tools {
 			[
 				'id'     => 'prpl-free-license',
 				'parent' => 'prpl-more-info',
-				'title'  => 'Free License: ' . ( false !== $prpl_free_license_key ? $prpl_free_license_key : 'Not set' ), // @phpstan-ignore-line
+				'title'  => 'Free License: ' . ( false !== $prpl_free_license_key ? $prpl_free_license_key : 'Not set' ),
 			]
 		);
 	}
@@ -585,7 +585,7 @@ class Debug_Tools {
 	 * @return void
 	 */
 	protected function verify_nonce() {
-		if ( ! isset( $_GET['_wpnonce'] ) || ! \wp_verify_nonce( \wp_unslash( $_GET['_wpnonce'] ), 'prpl_debug_tools' ) ) { //  phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, @phpstan-ignore-line argument.type
+		if ( ! isset( $_GET['_wpnonce'] ) || ! \wp_verify_nonce( \wp_unslash( $_GET['_wpnonce'] ), 'prpl_debug_tools' ) ) { //  phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			\wp_die( \esc_html__( 'Security check failed', 'progress-planner' ) );
 		}
 	}
@@ -609,7 +609,7 @@ class Debug_Tools {
 		// Verify nonce for security.
 		$this->verify_nonce();
 
-		$task_id = \sanitize_text_field( \wp_unslash( $_GET['prpl_delete_single_task'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, @phpstan-ignore-line argument.type
+		$task_id = \sanitize_text_field( \wp_unslash( $_GET['prpl_delete_single_task'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 

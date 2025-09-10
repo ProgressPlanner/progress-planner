@@ -127,7 +127,7 @@ class Terms_Without_Posts extends Base_Data_Collector {
 
 		foreach ( $public_taxonomies as $taxonomy ) {
 			// Term which cannot be removed.
-			$default_taxonomy_term_id = (int) \get_option( 'default_' . $taxonomy, 0 ); // @phpstan-ignore-line cast.int
+			$default_taxonomy_term_id = (int) \get_option( 'default_' . $taxonomy, 0 );
 
 			// If the default taxonomy term (which cannot be removed) is set, we need to query 2 terms.
 			$query_limit = $default_taxonomy_term_id ? 2 : 1;

@@ -78,12 +78,12 @@ abstract class Tasks_Interactive extends Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing setting path.', 'progress-planner' ) ] );
 		}
 
-		$setting      = \sanitize_text_field( \wp_unslash( $_POST['setting'] ) ); // @phpstan-ignore-line
+		$setting      = \sanitize_text_field( \wp_unslash( $_POST['setting'] ) );
 		$value        = \sanitize_text_field( \wp_unslash( $_POST['value'] ) );
-		$setting_path = (array) \json_decode( \sanitize_text_field( \wp_unslash( $_POST['setting_path'] ) ), true );
+		$setting_path = \json_decode( \sanitize_text_field( \wp_unslash( $_POST['setting_path'] ) ), true );
 
 		if ( ! empty( $setting_path ) ) {
-			$setting_value = (array) \get_option( $setting, [] );
+			$setting_value = \get_option( $setting );
 			\_wp_array_set( $setting_value, $setting_path, $value );
 			$updated = \update_option( $setting, $setting_value );
 			if ( ! $updated ) {

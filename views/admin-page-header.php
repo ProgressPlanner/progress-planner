@@ -11,9 +11,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 }
 
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$progress_planner_active_range = isset( $_GET['range'] ) ? \sanitize_text_field( \wp_unslash( $_GET['range'] ) ) : '-6 months'; // @phpstan-ignore-line variable.type
+$progress_planner_active_range = isset( $_GET['range'] ) ? \sanitize_text_field( \wp_unslash( $_GET['range'] ) ) : '-6 months';
 // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_text_field( \wp_unslash( $_GET['frequency'] ) ) : 'monthly'; // @phpstan-ignore-line variable.type
+$progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_text_field( \wp_unslash( $_GET['frequency'] ) ) : 'monthly';
 
 \do_action( 'progress_planner_admin_page_header_before' );
 ?>

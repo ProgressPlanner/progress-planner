@@ -270,16 +270,16 @@ class Suggested_Tasks_DB {
 		$post_data = (array) $post;
 
 		// Format the post meta.
-		$post_meta = (array) \get_post_meta( $post_data['ID'] );
+		$post_meta = \get_post_meta( $post_data['ID'] );
 		foreach ( $post_meta as $key => $value ) {
-			$post_data[ \str_replace( 'prpl_', '', (string) $key ) ] = // @phpstan-ignore-line cast.string
+			$post_data[ \str_replace( 'prpl_', '', (string) $key ) ] =
 				\is_array( $value ) && isset( $value[0] ) && 1 === \count( $value )
 					? $value[0]
 					: $value;
 		}
 
 		foreach ( [ 'category', 'provider' ] as $context ) {
-			$terms                 = \wp_get_post_terms( $post_data['ID'], "prpl_recommendations_$context" ); // @phpstan-ignore-line argument.type
+			$terms                 = \wp_get_post_terms( $post_data['ID'], "prpl_recommendations_$context" );
 			$post_data[ $context ] = \is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
 		}
 
@@ -372,7 +372,7 @@ class Suggested_Tasks_DB {
 		$cache_key = 'progress-planner-get-tasks-' . \md5( (string) \wp_json_encode( $args ) );
 		$results   = \wp_cache_get( $cache_key, static::GET_TASKS_CACHE_GROUP );
 		if ( $results ) {
-			return $results; // @phpstan-ignore-line return.type
+			return $results;
 		}
 
 		$results = $this->format_recommendations(

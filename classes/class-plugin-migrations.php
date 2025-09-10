@@ -56,7 +56,7 @@ class Plugin_Migrations {
 	 * @return string
 	 */
 	private function get_db_version() {
-		return (string) \get_option( 'progress_planner_version', '1.1.0' ); // @phpstan-ignore-line cast.string
+		return \get_option( 'progress_planner_version', '1.1.0' );
 	}
 
 	/**

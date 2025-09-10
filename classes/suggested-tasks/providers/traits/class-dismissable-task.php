@@ -67,7 +67,7 @@ trait Dismissable_Task {
 		}
 
 		// Get the dismissed tasks.
-		$dismissed_tasks = (array) \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
+		$dismissed_tasks = \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
 
 		// Get the provider key.
 		$provider_id = $this->get_provider_id();
@@ -100,7 +100,7 @@ trait Dismissable_Task {
 		 */
 		$dismissal_data = \apply_filters( 'progress_planner_task_dismissal_data', $dismissal_data, $task->get_data(), $provider_id );
 
-		$dismissed_tasks[ $provider_id ][ $task_identifier ] = $dismissal_data; // @phpstan-ignore-line
+		$dismissed_tasks[ $provider_id ][ $task_identifier ] = $dismissal_data;
 
 		// Store the dismissed tasks.
 		\progress_planner()->get_settings()->set( $this->dismissed_tasks_option, $dismissed_tasks );
@@ -142,7 +142,7 @@ trait Dismissable_Task {
 	 * @return bool
 	 */
 	protected function is_task_dismissed( $task_data ) {
-		$dismissed_tasks = (array) \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
+		$dismissed_tasks = \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
 		$provider_key    = $this->get_provider_id();
 
 		if ( ! isset( $dismissed_tasks[ $provider_key ] ) ) {
@@ -150,14 +150,11 @@ trait Dismissable_Task {
 		}
 
 		$task_identifier = $this->get_task_identifier( $task_data );
-		if ( ! $task_identifier
-			|| ! \is_array( $dismissed_tasks[ $provider_key ] )
-			|| ! isset( $dismissed_tasks[ $provider_key ][ $task_identifier ] )
-		) {
+		if ( ! $task_identifier || ! isset( $dismissed_tasks[ $provider_key ][ $task_identifier ] ) ) {
 			return false;
 		}
 
-		$dismissal_data = (array) $dismissed_tasks[ $provider_key ][ $task_identifier ];
+		$dismissal_data = $dismissed_tasks[ $provider_key ][ $task_identifier ];
 
 		// If the task was dismissed in the current week, don't show it again.
 		if ( $dismissal_data['date'] === \gmdate( 'YW' ) ) {
@@ -165,7 +162,7 @@ trait Dismissable_Task {
 		}
 
 		// If the task was dismissed more than the expiration period ago, we can show it again.
-		if ( ( \time() - (int) $dismissal_data['timestamp'] ) > $this->get_expiration_period( $dismissal_data ) ) { // @phpstan-ignore-line cast.int
+		if ( ( \time() - $dismissal_data['timestamp'] ) > $this->get_expiration_period( $dismissal_data ) ) {
 			unset( $dismissed_tasks[ $provider_key ][ $task_identifier ] );
 			\progress_planner()->get_settings()->set( $this->dismissed_tasks_option, $dismissed_tasks );
 			return false;
@@ -180,10 +177,7 @@ trait Dismissable_Task {
 	 * @return array
 	 */
 	public function get_dismissed_tasks() {
-		$setting = (array) \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
-		return isset( $setting[ $this->get_provider_id() ] )
-			? (array) $setting[ $this->get_provider_id() ]
-			: [];
+		return \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] )[ $this->get_provider_id() ] ?? [];
 	}
 
 	/**
@@ -196,20 +190,17 @@ trait Dismissable_Task {
 			return;
 		}
 
-		$dismissed_tasks = (array) \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
-		$provider_key    = (string) $this->get_provider_id();
+		$dismissed_tasks = \progress_planner()->get_settings()->get( $this->dismissed_tasks_option, [] );
+		$provider_key    = $this->get_provider_id();
 
-		if ( ! isset( $dismissed_tasks[ $provider_key ] ) || ! \is_array( $dismissed_tasks[ $provider_key ] ) ) {
+		if ( ! isset( $dismissed_tasks[ $provider_key ] ) ) {
 			return;
 		}
 
 		$has_changes = false;
 		foreach ( $dismissed_tasks[ $provider_key ] as $identifier => $data ) {
-			if ( ! \is_array( $data ) ) {
-				continue;
-			}
-			if ( ( \time() - (int) $data['timestamp'] ) > $this->get_expiration_period( $data ) ) { // @phpstan-ignore-line cast.int
-				unset( $dismissed_tasks[ $provider_key ][ $identifier ] ); // @phpstan-ignore-line
+			if ( ( \time() - $data['timestamp'] ) > $this->get_expiration_period( $data ) ) {
+				unset( $dismissed_tasks[ $provider_key ][ $identifier ] );
 				$has_changes = true;
 			}
 		}

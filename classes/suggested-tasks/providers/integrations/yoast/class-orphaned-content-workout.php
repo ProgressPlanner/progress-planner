@@ -80,8 +80,8 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	/**
 	 * Maybe update the workout status.
 	 *
-	 * @param array  $old_value The old value.
-	 * @param array  $value The new value.
+	 * @param mixed  $old_value The old value.
+	 * @param mixed  $value The new value.
 	 * @param string $option The option name.
 	 *
 	 * @return void
@@ -108,8 +108,8 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 		}
 
 		// There should be 3 steps in the workout.
-		$workout_was_completed = 3 === \count( $old_value['workouts']['orphaned']['finishedSteps'] ); // @phpstan-ignore-line
-		$workout_completed     = 3 === \count( $value['workouts']['orphaned']['finishedSteps'] ); // @phpstan-ignore-line
+		$workout_was_completed = 3 === \count( $old_value['workouts']['orphaned']['finishedSteps'] );
+		$workout_completed     = 3 === \count( $value['workouts']['orphaned']['finishedSteps'] );
 
 		// Dismiss the task if workout wasn't completed before and now is.
 		if ( ! $workout_was_completed && $workout_completed ) {

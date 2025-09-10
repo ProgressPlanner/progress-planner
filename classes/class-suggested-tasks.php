@@ -192,7 +192,7 @@ class Suggested_Tasks {
 			return;
 		}
 
-		$task_id = \sanitize_text_field( \wp_unslash( $_GET['prpl_complete_task'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended, @phpstan-ignore-line argument.type
+		$task_id = \sanitize_text_field( \wp_unslash( $_GET['prpl_complete_task'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( ! $task_id ) {
 			return;
 		}
@@ -225,7 +225,7 @@ class Suggested_Tasks {
 		}
 
 		$action  = \sanitize_text_field( \wp_unslash( $_POST['action_type'] ) );
-		$post_id = (string) \sanitize_text_field( \wp_unslash( $_POST['post_id'] ) ); // @phpstan-ignore-line argument.type
+		$post_id = (string) \sanitize_text_field( \wp_unslash( $_POST['post_id'] ) );
 		$task    = \progress_planner()->get_suggested_tasks_db()->get_post( $post_id );
 
 		if ( ! $task ) {
@@ -434,11 +434,8 @@ class Suggested_Tasks {
 	 * @return \WP_REST_Response
 	 */
 	public function rest_prepare_recommendation( $response, $post ) {
-		if ( ! isset( $response->data ) || ! \is_array( $response->data ) ) {
-			return $response;
-		}
 		$provider_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_provider' );
-		if ( ! isset( $response->data['meta'] ) || ! \is_array( $response->data['meta'] ) ) {
+		if ( ! isset( $response->data['meta'] ) ) {
 			$response->data['meta'] = [];
 		}
 		if ( $provider_term && ! \is_wp_error( $provider_term ) ) {
@@ -448,7 +445,7 @@ class Suggested_Tasks {
 				$response->data['prpl_provider'] = $provider_term[0];
 				// Link should be added during run time, since it is not added for users without required capability.
 				$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
-					? \esc_url( (string) $response->data['meta']['prpl_url'] ) // @phpstan-ignore-line cast.string
+					? \esc_url( (string) $response->data['meta']['prpl_url'] )
 					: '';
 
 				$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );

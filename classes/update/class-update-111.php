@@ -79,10 +79,10 @@ class Update_111 extends Update {
 	 * @return void
 	 */
 	private function migrate_local_tasks() {
-		$local_tasks_option = (array) \get_option( 'progress_planner_local_tasks', [] );
+		$local_tasks_option = \get_option( 'progress_planner_local_tasks', [] );
 		if ( ! empty( $local_tasks_option ) ) {
 			foreach ( $local_tasks_option as $task_id ) {
-				$task           = Plugin_Migration_Helpers::parse_task_data_from_task_id( $task_id )->get_data(); // @phpstan-ignore-line
+				$task           = Plugin_Migration_Helpers::parse_task_data_from_task_id( $task_id )->get_data();
 				$task['status'] = 'pending';
 
 				if ( ! isset( $task['task_id'] ) ) {
@@ -101,19 +101,16 @@ class Update_111 extends Update {
 	 * @return void
 	 */
 	private function migrate_suggested_tasks() {
-		$suggested_tasks_option = (array) \get_option( 'progress_planner_suggested_tasks', [] );
+		$suggested_tasks_option = \get_option( 'progress_planner_suggested_tasks', [] );
 		if ( empty( $suggested_tasks_option ) ) {
 			return;
 		}
 		foreach ( $suggested_tasks_option as $status => $tasks ) {
-			if ( ! \is_array( $tasks ) ) {
-				continue;
-			}
 			foreach ( $tasks as $_task ) {
-				$task_id        = \is_string( $_task ) ? $_task : (string) $_task['id']; // @phpstan-ignore-line
+				$task_id        = \is_string( $_task ) ? $_task : $_task['id'];
 				$task           = Plugin_Migration_Helpers::parse_task_data_from_task_id( $task_id )->get_data();
 				$task['status'] = $status;
-				if ( 'snoozed' === $status && \is_array( $_task ) && isset( $_task['time'] ) ) {
+				if ( 'snoozed' === $status && isset( $_task['time'] ) ) {
 					$task['time'] = $_task['time'];
 				}
 
@@ -193,18 +190,15 @@ class Update_111 extends Update {
 	 * @return void
 	 */
 	private function migrate_todo_items() {
-		$todo_items = (array) \get_option( 'progress_planner_todo', [] );
+		$todo_items = \get_option( 'progress_planner_todo', [] );
 		if ( empty( $todo_items ) ) {
 			\delete_option( 'progress_planner_todo' );
 			return;
 		}
 		foreach ( $todo_items as $todo_item ) {
-			if ( ! \is_array( $todo_item ) ) {
-				continue;
-			}
 			$this->add_local_task(
 				[
-					'task_id'     => 'user-task-' . \md5( $todo_item['content'] ), // @phpstan-ignore-line
+					'task_id'     => 'user-task-' . \md5( $todo_item['content'] ),
 					'status'      => $todo_item['done'] ? 'completed' : 'pending',
 					'provider_id' => 'user',
 					'category'    => 'user',

@@ -181,7 +181,7 @@ class Unpublished_Content extends Tasks {
 			return [];
 		}
 
-		$data    = $this->transform_collector_data( (array) $this->get_data_collector()->collect() );
+		$data    = $this->transform_collector_data( $this->get_data_collector()->collect() );
 		$task_id = $this->get_task_id(
 			[
 				'target_post_id' => $data['target_post_id'],
@@ -219,7 +219,7 @@ class Unpublished_Content extends Tasks {
 	 */
 	protected function modify_injection_task_data( $task_data ) {
 		// Transform the data to match the task data structure.
-		$data = $this->transform_collector_data( (array) $this->get_data_collector()->collect() );
+		$data = $this->transform_collector_data( $this->get_data_collector()->collect() );
 
 		$task_data['target_post_id'] = $data['target_post_id'];
 
@@ -323,11 +323,11 @@ class Unpublished_Content extends Tasks {
 
 		$data = $task->get_data();
 
-		if ( ! $data || ! isset( $data['target_post_id'] ) || ! \is_numeric( $data['target_post_id'] ) ) {
+		if ( ! $data || ! isset( $data['target_post_id'] ) ) {
 			return false;
 		}
 
-		$post_status = \get_post_status( (int) $data['target_post_id'] );
+		$post_status = \get_post_status( $data['target_post_id'] );
 
 		// If the post status is not draft or auto-draft (this includes (bool) false when the post was deleted), the task is completed.
 		return ( 'draft' !== $post_status && 'auto-draft' !== $post_status );

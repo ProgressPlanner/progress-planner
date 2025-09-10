@@ -300,7 +300,7 @@ class Page_Types {
 
 		// Early return for the homepage.
 		if ( 'homepage' === $page_type ) {
-			return (int) $homepage_id; // @phpstan-ignore-line cast.int
+			return $homepage_id;
 		}
 
 		$types_pages = [
@@ -514,7 +514,7 @@ class Page_Types {
 		$cache_group = \Progress_Planner\Activities\Query::CACHE_GROUP;
 		$posts_ids   = \wp_cache_get( $cache_key, $cache_group );
 		if ( false !== $posts_ids ) {
-			return (array) $posts_ids;
+			return $posts_ids;
 		}
 
 		// Cache the query.

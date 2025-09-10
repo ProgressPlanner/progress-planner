@@ -80,10 +80,9 @@ class Collaborator extends Tasks {
 	 * @return array
 	 */
 	public function get_task_details( $task_data = [] ) {
-		$tasks = (array) \progress_planner()->get_settings()->get( 'tasks', [] );
+		$tasks = \progress_planner()->get_settings()->get( 'tasks', [] );
 
 		foreach ( $tasks as $task ) {
-			$task = (array) $task;
 			if ( $task['task_id'] !== $task_data['task_id'] ) {
 				continue;
 			}

@@ -80,8 +80,8 @@ class Cornerstone_Workout extends Yoast_Provider {
 	/**
 	 * Maybe update the workout status.
 	 *
-	 * @param array  $old_value The old value.
-	 * @param array  $value The new value.
+	 * @param mixed  $old_value The old value.
+	 * @param mixed  $value The new value.
 	 * @param string $option The option name.
 	 *
 	 * @return void

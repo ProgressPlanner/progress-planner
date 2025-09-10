@@ -132,12 +132,9 @@ class Page_Settings {
 		\check_admin_referer( 'progress_planner' );
 
 		if ( isset( $_POST['pages'] ) ) {
-			$pages = (array) \wp_unslash( $_POST['pages'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			foreach ( $pages as $type => $page_args ) {
-				$page_args = (array) $page_args;
-				$need_page = isset( $page_args['have_page'] )
-					? \sanitize_text_field( \wp_unslash( $page_args['have_page'] ) ) // @phpstan-ignore-line argument.type
-					: 'not-applicable';
+			foreach ( \wp_unslash( $_POST['pages'] ) as $type => $page_args ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+
+				$need_page = \sanitize_text_field( \wp_unslash( $page_args['have_page'] ) );
 
 				\progress_planner()->get_page_types()->set_no_page_needed(
 					$type,
@@ -168,7 +165,7 @@ class Page_Settings {
 
 				if ( 'no' !== $page_args['have_page'] ) {
 					// Add the term to the `progress_planner_page_types` taxonomy.
-					\progress_planner()->get_page_types()->set_page_type_by_id( (int) $page_args['id'], $type ); // @phpstan-ignore-line cast.int
+					\progress_planner()->get_page_types()->set_page_type_by_id( (int) $page_args['id'], $type );
 				}
 			}
 		}
@@ -191,7 +188,7 @@ class Page_Settings {
 		\check_admin_referer( 'progress_planner' );
 
 		$redirect_on_login = isset( $_POST['prpl-redirect-on-login'] )
-			? \sanitize_text_field( \wp_unslash( $_POST['prpl-redirect-on-login'] ) ) // @phpstan-ignore-line argument.type
+			? \sanitize_text_field( \wp_unslash( $_POST['prpl-redirect-on-login'] ) )
 			: false;
 
 		\update_user_meta( \get_current_user_id(), 'prpl_redirect_on_login', (bool) $redirect_on_login );
@@ -207,7 +204,7 @@ class Page_Settings {
 		\check_admin_referer( 'progress_planner' );
 
 		$include_post_types = isset( $_POST['prpl-post-types-include'] )
-			? \array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized @phpstan-ignore-line argument.type
+			? \array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 			// If no post types are selected, use the default post types (post and page can be deregistered).
 			: \array_intersect( [ 'post', 'page' ], \progress_planner()->get_settings()->get_public_post_types() );
 

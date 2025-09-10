@@ -36,20 +36,20 @@ final class Whats_New extends Widget {
 	public function get_blog_feed() {
 		$feed_data = \progress_planner()->get_utils__cache()->get( self::CACHE_KEY );
 
+		// Migrate old feed to new format.
+		if ( \is_array( $feed_data ) && ! isset( $feed_data['expires'] ) && ! isset( $feed_data['feed'] ) ) {
+			$feed_data = [
+				'feed'    => $feed_data,
+				'expires' => \get_option( '_transient_timeout_' . Cache::CACHE_PREFIX . self::CACHE_KEY, 0 ),
+			];
+		}
+
 		// Transient not set.
 		if ( false === $feed_data ) {
 			$feed_data = [
 				'feed'    => [],
 				'expires' => 0,
 			];
-		} elseif ( \is_array( $feed_data ) && ! isset( $feed_data['expires'] ) && ! isset( $feed_data['feed'] ) ) {
-			// Migrate old feed to new format.
-			$feed_data = [
-				'feed'    => $feed_data,
-				'expires' => \get_option( '_transient_timeout_' . Cache::CACHE_PREFIX . self::CACHE_KEY, 0 ),
-			];
-		} else {
-			$feed_data = (array) $feed_data;
 		}
 
 		// Transient expired, fetch new feed.
@@ -61,15 +61,11 @@ final class Whats_New extends Widget {
 				// If we cant fetch the feed, we will try again later.
 				$feed_data['expires'] = \time() + 5 * MINUTE_IN_SECONDS;
 			} else {
-				$feed = (array) \json_decode( \wp_remote_retrieve_body( $response ), true );
+				$feed = \json_decode( \wp_remote_retrieve_body( $response ), true );
 
 				foreach ( $feed as $key => $post ) {
-					if ( ! \is_array( $post ) ) {
-						continue;
-					}
-
 					// Get the featured media.
-					$featured_media_id = (int) $post['featured_media']; // @phpstan-ignore-line cast.int
+					$featured_media_id = $post['featured_media'];
 					if ( $featured_media_id ) {
 						$response = \wp_remote_get( \progress_planner()->get_remote_server_root_url() . '/wp-json/wp/v2/media/' . $featured_media_id );
 						if ( ! \is_wp_error( $response ) ) {

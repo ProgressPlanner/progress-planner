@@ -253,7 +253,7 @@ class Email_Sending extends Tasks_Interactive {
 		// Check the nonce.
 		\check_admin_referer( 'progress_planner' );
 
-		$email_address = isset( $_GET['email_address'] ) ? \sanitize_email( \wp_unslash( $_GET['email_address'] ) ) : ''; // @phpstan-ignore-line argument.type
+		$email_address = isset( $_GET['email_address'] ) ? \sanitize_email( \wp_unslash( $_GET['email_address'] ) ) : '';
 
 		if ( ! $email_address ) {
 			\wp_send_json_error( \esc_html__( 'Invalid email address.', 'progress-planner' ) );
