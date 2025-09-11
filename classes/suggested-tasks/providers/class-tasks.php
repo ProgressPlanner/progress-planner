@@ -67,6 +67,13 @@ abstract class Tasks implements Tasks_Interface {
 	protected const EXTERNAL_LINK_URL = '';
 
 	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	protected const POPOVER_ID = '';
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -178,6 +185,15 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function get_parent() {
 		return $this->parent;
+	}
+
+	/**
+	 * Get the popover ID.
+	 *
+	 * @return string
+	 */
+	public function get_popover_id() {
+		return static::POPOVER_ID;
 	}
 
 	/**
