@@ -216,7 +216,7 @@ class Email_Sending extends Tasks_Interactive {
 	public function check_if_wp_mail_is_filtered() {
 		global $wp_filter;
 		foreach ( [ 'phpmailer_init', 'pre_wp_mail' ] as $filter ) {
-			$has_filter                = isset( $wp_filter[ $filter ] ) && ! empty( $wp_filter[ $filter ]->callbacks ) ? true : false;
+			$has_filter                = isset( $wp_filter[ $filter ] ) && ! empty( $wp_filter[ $filter ]->callbacks ) ? true : false; // @phpstan-ignore-line property.nonObject
 			$this->is_wp_mail_filtered = $this->is_wp_mail_filtered || $has_filter;
 		}
 	}

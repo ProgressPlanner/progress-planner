@@ -70,7 +70,7 @@ class Archive_Date extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		// If the date archive is already disabled, we don't need to add the task.
-		return $this->is_task_relevant() && \YoastSEO()->helpers->options->get( 'disable-date' ) !== true;
+		return $this->is_task_relevant() && \YoastSEO()->helpers->options->get( 'disable-date' ) !== true; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**

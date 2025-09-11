@@ -64,13 +64,13 @@ class Cache {
 		global $wpdb;
 		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
-				"DELETE FROM $wpdb->options WHERE option_name LIKE %s",
+				"DELETE FROM $wpdb->options WHERE option_name LIKE %s", // @phpstan-ignore-line property.nonObject
 				'_transient_' . self::CACHE_PREFIX . '%'
 			)
 		);
 		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
-				"DELETE FROM $wpdb->options WHERE option_name LIKE %s",
+				"DELETE FROM $wpdb->options WHERE option_name LIKE %s", // @phpstan-ignore-line property.nonObject
 				'_transient_timeout_' . self::CACHE_PREFIX . '%'
 			)
 		);

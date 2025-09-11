@@ -86,7 +86,7 @@ class Archive_Format extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		return $this->is_task_relevant()
-			&& \YoastSEO()->helpers->options->get( 'disable-post_format' ) !== true;
+			&& \YoastSEO()->helpers->options->get( 'disable-post_format' ) !== true; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**

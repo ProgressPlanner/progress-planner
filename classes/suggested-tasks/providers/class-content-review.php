@@ -337,7 +337,7 @@ class Content_Review extends Tasks {
 	 *
 	 * @param array $args The args.
 	 *
-	 * @return array
+	 * @return \WP_Post[]
 	 */
 	public function get_old_posts( $args = [] ) {
 		$posts = [];
