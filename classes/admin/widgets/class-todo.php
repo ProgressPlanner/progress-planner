@@ -86,13 +86,13 @@ final class ToDo extends Widget {
 				<button id="todo-list-completed-delete-all-cancel" onclick="prplTodoWidget.closeDeleteAllPopover()">
 					<?php
 					/* translators: %1$s is the strong tag, %2$s is the closing strong tag. */
-					printf( \esc_html__( '%1$sNo%2$s, keep this list', 'progress-planner' ), '<strong>', '</strong>' );
+					\printf( \esc_html__( '%1$sNo%2$s, keep this list', 'progress-planner' ), '<strong>', '</strong>' );
 					?>
 				</button>
 				<button id="todo-list-completed-delete-all-confirm" onclick="prplTodoWidget.deleteAllCompletedTasksAndClosePopover()">
 					<?php
 					/* translators: %1$s is the strong tag, %2$s is the closing strong tag. */
-					printf( \esc_html__( '%1$sYes%2$s, delete all completed tasks', 'progress-planner' ), '<strong>', '</strong>' );
+					\printf( \esc_html__( '%1$sYes%2$s, delete all completed tasks', 'progress-planner' ), '<strong>', '</strong>' );
 					?>
 				</button>
 			</div>

@@ -314,11 +314,6 @@ class Suggested_Tasks {
 				'show_in_rest' => true,
 				'default'      => 0,
 			],
-			'prpl_popover_id'        => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
 			'prpl_external_link_url' => [
 				'type'         => 'string',
 				'single'       => true,
@@ -450,6 +445,9 @@ class Suggested_Tasks {
 				? \esc_url( (string) $response->data['meta']['prpl_url'] )
 				: '';
 
+			$response->data['prpl_popover_id'] = $provider->get_popover_id();
+
+			// This has to be the last item to be added because actions use data from previous items.
 			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
 		}
 

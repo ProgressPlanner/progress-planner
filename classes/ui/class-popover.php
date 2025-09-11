@@ -56,11 +56,6 @@ class Popover {
 	 * @return void
 	 */
 	public function render() {
-		\progress_planner()->the_view(
-			'popovers/popover.php',
-			[
-				'prpl_popover_id' => $this->id,
-			]
-		);
+		\progress_planner()->the_view( 'popovers/popover.php', [ 'prpl_popover_id' => $this->id ] );
 	}
 }
