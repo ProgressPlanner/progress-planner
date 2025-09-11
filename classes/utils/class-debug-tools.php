@@ -282,14 +282,7 @@ class Debug_Tools {
 			]
 		);
 
-		// Get suggested tasks.
-		$activities = \progress_planner()->get_activities__query()->query_activities(
-			[
-				'category' => 'suggested_task',
-			]
-		);
-
-		foreach ( $activities as $activity ) {
+		foreach ( \progress_planner()->get_activities__query()->query_activities( [ 'category' => 'suggested_task' ] ) as $activity ) {
 			$admin_bar->add_node(
 				[
 					'id'     => 'prpl-activity-' . $activity->id,

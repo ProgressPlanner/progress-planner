@@ -100,8 +100,7 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 			$where_clause    .= ' AND p.ID NOT IN (' . \implode( ',', $exclude_post_ids ) . ')';
 		}
 
-		$query = "
-			SELECT p.ID AS post_id, p.post_title AS post_title
+		$query = "SELECT p.ID AS post_id, p.post_title AS post_title
 			FROM {$wpdb->posts} p
 			LEFT JOIN (
 				SELECT DISTINCT l.target_post_id
@@ -112,8 +111,7 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 			WHERE {$where_clause}
 			AND l.target_post_id IS NULL
 			ORDER BY p.post_date DESC
-			LIMIT 1
-		";
+			LIMIT 1";
 
 		$post_to_update = $wpdb->get_row( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$query, // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared -- The query is prepared in the $where_clause variable.

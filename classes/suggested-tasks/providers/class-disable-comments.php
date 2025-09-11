@@ -71,26 +71,6 @@ class Disable_Comments extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			\esc_html(
-				// translators: %d is the number of approved comments.
-				\_n(
-					'There is %1$d comment. If you don\'t need comments on your site, consider disabling them.',
-					'There are %1$d comments. If you don\'t need comments on your site, consider disabling them.',
-					(int) \wp_count_comments()->approved,
-					'progress-planner'
-				)
-			),
-			(int) \wp_count_comments()->approved,
-		);
-	}
-
-	/**
 	 * Check if the task condition is satisfied.
 	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *

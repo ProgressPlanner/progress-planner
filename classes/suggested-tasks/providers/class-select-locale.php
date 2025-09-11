@@ -94,15 +94,6 @@ class Select_Locale extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Select your site locale to ensure your site is displayed correctly in the correct language.', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool

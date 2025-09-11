@@ -63,7 +63,7 @@ class Page {
 		 *
 		 * @return array<\Progress_Planner\Admin\Widgets\Widget>
 		 */
-		return \apply_filters( 'progress_planner_admin_widgets', $widgets );
+		return \apply_filters( 'progress_planner_admin_widgets', $widgets ); // @phpstan-ignore-line parameter.phpDocType
 	}
 
 	/**
