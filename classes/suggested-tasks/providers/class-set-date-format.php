@@ -128,7 +128,8 @@ class Set_Date_Format extends Tasks_Interactive {
 			\esc_html_e( 'Choosing the right date format helps your visitors instantly understand when something was published without confusion or guessing. It also makes your site feel more familiar and trustworthy, especially if your audience is local.', 'progress-planner' );
 			echo '</p>';
 			echo '<p>';
-			\esc_html_e( 'The date format currently set matches the default format for your site language ([display site language]). Therefore, we expect it\'s set correctly. But can you have a quick look, just to be sure?', 'progress-planner' );
+			/* translators: %s: The date format. */
+			printf( \esc_html__( 'The date format currently set matches the default format for your site language (%s). Therefore, we expect it\'s set correctly. But can you have a quick look, just to be sure?', 'progress-planner' ), \esc_html( \get_option( 'date_format' ) ) );
 			echo '</p>';
 			echo '<p>';
 			\esc_html_e( 'Tip: Pick the format that matches what your audience expects.', 'progress-planner' );
