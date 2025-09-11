@@ -41,6 +41,13 @@ class Select_Locale extends Tasks_Interactive {
 	const POPOVER_ID = 'select-locale';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-locale';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -84,15 +91,6 @@ class Select_Locale extends Tasks_Interactive {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Select your site locale', 'progress-planner' );
-	}
-
-	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Select your site locale to ensure your site is displayed correctly in the correct language.', 'progress-planner' );
 	}
 
 	/**

@@ -45,6 +45,13 @@ class Unpublished_Content extends Tasks {
 	protected const DATA_COLLECTOR_CLASS = Unpublished_Content_Data_Collector::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/check-unpublished-content';
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -122,45 +129,6 @@ class Unpublished_Content extends Tasks {
 			\esc_html__( 'Finish %1$s "%2$s" and publish it', 'progress-planner' ),
 			\strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
 			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
-		);
-	}
-
-	/**
-	 * Get the task description.
-	 *
-	 * @param array $task_data The task data.
-	 *
-	 * @return string
-	 */
-	protected function get_description_with_data( $task_data = [] ) {
-		if ( ! isset( $task_data['target_post_id'] ) ) {
-			return '';
-		}
-
-		$post = \get_post( $task_data['target_post_id'] );
-
-		if ( ! $post ) {
-			return '';
-		}
-
-		$post_title = \get_the_title( $post );
-		$post_title = \trim( $post_title );
-		$post_title = empty( $post_title )
-			? \strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ) . ' ' . (int) $post->ID // @phpstan-ignore-line property.nonObject
-			: '"' . $post_title . '"';
-
-		$post_url = \add_query_arg(
-			[
-				'post'   => $post->ID,
-				'action' => 'edit',
-			],
-			\admin_url( 'post.php' )
-		);
-
-		return \sprintf(
-			/* translators: %s: post title */
-			\esc_html__( 'You started writing %1$s, but never finished it. Perhaps it\'s time to finish it?', 'progress-planner' ),
-			'<a href="' . \esc_url( $post_url ) . '" target="_blank">' . \esc_html( $post_title ) . '</a>'
 		);
 	}
 

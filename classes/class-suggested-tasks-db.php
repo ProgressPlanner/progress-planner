@@ -203,7 +203,7 @@ class Suggested_Tasks_DB {
 
 		if ( ! empty( $update_terms ) ) {
 			foreach ( $update_terms as $taxonomy => $term ) {
-				$update_results[] = (bool) \wp_set_object_terms( $id, $term->slug, $taxonomy );
+				$update_results[] = (bool) \wp_set_object_terms( $id, $term->slug, $taxonomy ); // @phpstan-ignore-line property.nonObject
 			}
 		}
 

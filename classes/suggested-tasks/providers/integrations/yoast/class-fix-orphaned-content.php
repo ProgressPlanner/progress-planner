@@ -89,15 +89,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Yoast SEO detected that this article has no links pointing to it.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the URL.
 	 *
 	 * @param array $task_data The task data.
@@ -137,12 +128,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 
 		$linked_count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
-				"
-			SELECT COUNT(*)
-			FROM {$wpdb->prefix}yoast_seo_links
-			WHERE target_post_id = %d
-			AND type = 'internal'
-			",
+				"SELECT COUNT(*) FROM {$wpdb->prefix}yoast_seo_links WHERE target_post_id = %d AND type = 'internal'", // @phpstan-ignore-line property.nonObject
 				$post->ID
 			)
 		);
