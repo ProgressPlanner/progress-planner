@@ -438,19 +438,20 @@ class Suggested_Tasks {
 		if ( ! isset( $response->data['meta'] ) ) {
 			$response->data['meta'] = [];
 		}
+		$provider = false;
 		if ( $provider_term && ! \is_wp_error( $provider_term ) ) {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
+		}
 
-			if ( $provider ) {
-				$response->data['prpl_provider'] = $provider_term[0];
-				// Link should be added during run time, since it is not added for users without required capability.
-				$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
-					? \esc_url( (string) $response->data['meta']['prpl_url'] )
-					: '';
+		if ( $provider ) {
+			$response->data['prpl_provider'] = $provider_term[0];
+			// Link should be added during run time, since it is not added for users without required capability.
+			$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
+				? \esc_url( (string) $response->data['meta']['prpl_url'] )
+				: '';
 
-				$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
-			}
-			$response->data['prpl_points'] = $provider->get_points();
+			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
+			$response->data['prpl_points']       = $provider->get_points();
 		}
 
 		$category_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_category' );
