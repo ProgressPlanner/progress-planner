@@ -67,6 +67,10 @@ class Task_Command extends \WP_CLI_Command {
 
 		$formatted_tasks = [];
 		foreach ( $tasks as $task ) {
+			if ( ! \is_object( $task ) ) {
+				continue;
+			}
+
 			$formatted = [];
 			foreach ( $fields as $field ) {
 				switch ( $field ) {

@@ -40,11 +40,7 @@ class System_Status {
 
 		// Get the number of activities in the past week.
 		$data['activities'] = \count(
-			\progress_planner()->get_activities__query()->query_activities(
-				[
-					'start_date' => new \DateTime( '-7 days' ),
-				]
-			)
+			\progress_planner()->get_activities__query()->query_activities( [ 'start_date' => new \DateTime( '-7 days' ) ] )
 		);
 
 		// Get the website activity score.

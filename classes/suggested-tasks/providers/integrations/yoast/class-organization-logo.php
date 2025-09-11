@@ -48,20 +48,9 @@ class Organization_Logo extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_title() {
-		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
+		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person' // @phpstan-ignore-line property.nonObject
 			? \esc_html__( 'Yoast SEO: set your organization logo', 'progress-planner' )
 			: \esc_html__( 'Yoast SEO: set your person logo', 'progress-planner' );
-	}
-
-	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
-			? \esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your organization logo in the Yoast SEO settings.', 'progress-planner' )
-			: \esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your person logo in the Yoast SEO settings.', 'progress-planner' );
 	}
 
 	/**
@@ -70,7 +59,7 @@ class Organization_Logo extends Yoast_Provider {
 	 * @return string
 	 */
 	public function get_external_link_url() {
-		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'
+		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person' // @phpstan-ignore-line property.nonObject
 			? 'https://prpl.fyi/yoast-person-logo'
 			: 'https://prpl.fyi/yoast-organization-logo';
 	}
@@ -110,15 +99,15 @@ class Organization_Logo extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		// If the site is for a person, and the person logo is already set, we don't need to add the task.
-		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'company'
-			&& $this->yoast_seo->helpers->options->get( 'company_logo' )
+		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'company' // @phpstan-ignore-line property.nonObject
+			&& $this->yoast_seo->helpers->options->get( 'company_logo' ) // @phpstan-ignore-line property.nonObject
 		) {
 			return false;
 		}
 
 		// If the site is for a person, and the organization logo is already set, we don't need to add the task.
-		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'person'
-			&& $this->yoast_seo->helpers->options->get( 'person_logo' )
+		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'person' // @phpstan-ignore-line property.nonObject
+			&& $this->yoast_seo->helpers->options->get( 'person_logo' ) // @phpstan-ignore-line property.nonObject
 		) {
 			return false;
 		}

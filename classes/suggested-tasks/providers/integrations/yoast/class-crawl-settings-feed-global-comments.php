@@ -45,15 +45,6 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Remove URLs which provide an overview of recent comments on your site.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array

@@ -368,14 +368,6 @@ class Enqueue {
 			/* translators: %s: The task content. */
 			'taskDelete'                   => \esc_html__( "Delete task '%s'", 'progress-planner' ),
 			'delete'                       => \esc_html__( 'Delete', 'progress-planner' ),
-			'taskMovedDown'                => \esc_html__( 'Task moved down', 'progress-planner' ),
-			'taskMovedUp'                  => \esc_html__( 'Task moved up', 'progress-planner' ),
-			/* translators: %s: The task content. */
-			'taskMoveDown'                 => \esc_html__( "Move task '%s' down", 'progress-planner' ),
-			/* translators: %s: The task content. */
-			'taskMoveUp'                   => \esc_html__( "Move task '%s' up", 'progress-planner' ),
-			/* translators: %s: The task content. */
-			'taskNotCompleted'             => \esc_html__( "Task '%s' marked as not completed and moved to the top", 'progress-planner' ),
 			'video'                        => \esc_html__( 'Video', 'progress-planner' ),
 			'watchVideo'                   => \esc_html__( 'Watch video', 'progress-planner' ),
 			'disabledRRCheckboxTooltip'    => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),

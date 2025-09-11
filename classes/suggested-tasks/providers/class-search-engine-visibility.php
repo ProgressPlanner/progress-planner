@@ -64,15 +64,6 @@ class Search_Engine_Visibility extends Tasks {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Your site is not currently visible to search engines. Consider allowing search engines to index your site.', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool

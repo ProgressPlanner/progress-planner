@@ -27,6 +27,13 @@ class Select_Timezone extends Tasks_Interactive {
 	const POPOVER_ID = 'select-timezone';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-timezone';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -70,15 +77,6 @@ class Select_Timezone extends Tasks_Interactive {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Set site timezone', 'progress-planner' );
-	}
-
-	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Setting the time zone correctly on your site is valuable. By setting the correct time zone, you ensure scheduled tasks happen exactly when you want them to happen. To correctly account for daylight savings\', we recommend you use the city-based time zone instead of the UTC offset (e.g. Amsterdam or London).', 'progress-planner' );
 	}
 
 	/**
