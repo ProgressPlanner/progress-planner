@@ -69,7 +69,7 @@ class Set_Date_Format extends Tasks_Interactive {
 	 * @return string
 	 */
 	protected function get_title() {
-		return \esc_html__( 'Set site date format', 'progress-planner' );
+		return 'wp_default' === $this->get_date_format_type() ? \esc_html__( 'Set site date format', 'progress-planner' ) : \esc_html__( 'Verify site date format', 'progress-planner' );
 	}
 
 	/**
@@ -111,9 +111,39 @@ class Set_Date_Format extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'Setting the date format correctly on your site is valuable. By setting the correct date format, you ensure the dates are displayed correctly in the admin area and the front end.', 'progress-planner' );
-		echo '</p>';
+		$detected_date_format = $this->get_date_format_type();
+
+		if ( 'wp_default' === $detected_date_format ) {
+			echo '<p>';
+			\esc_html_e( 'Choosing the right date format helps your visitors instantly understand when something was published without confusion or guessing. It also makes your site feel more familiar and trustworthy, especially if your audience is local.', 'progress-planner' );
+			echo '</p>';
+			echo '<p>';
+			\esc_html_e( 'By setting the correct format, you make sure dates show up clearly both in your dashboard and on your live site.', 'progress-planner' );
+			echo '</p>';
+			echo '<p>';
+			\esc_html_e( 'Tip: Pick the format that matches what your audience expects.', 'progress-planner' );
+			echo '</p>';
+		} elseif ( 'localized_default' === $detected_date_format ) {
+			echo '<p>';
+			\esc_html_e( 'Choosing the right date format helps your visitors instantly understand when something was published without confusion or guessing. It also makes your site feel more familiar and trustworthy, especially if your audience is local.', 'progress-planner' );
+			echo '</p>';
+			echo '<p>';
+			\esc_html_e( 'The date format currently set matches the default format for your site language ([display site language]). Therefore, we expect it\'s set correctly. But can you have a quick look, just to be sure?', 'progress-planner' );
+			echo '</p>';
+			echo '<p>';
+			\esc_html_e( 'Tip: Pick the format that matches what your audience expects.', 'progress-planner' );
+			echo '</p>';
+		} else {
+			echo '<p>';
+			\esc_html_e( 'Choosing the right date format helps your visitors instantly understand when something was published without confusion or guessing. It also makes your site feel more familiar and trustworthy, especially if your audience is local.', 'progress-planner' );
+			echo '</p>';
+			echo '<p>';
+			\esc_html_e( 'Because your site is not using the WordPress default setting, we expect you may have set this already. That\'s why we just want you to verify if it\'s set correctly.', 'progress-planner' );
+			echo '</p>';
+			echo '<p>';
+			\esc_html_e( 'Tip: Pick the format that matches what your audience expects.', 'progress-planner' );
+			echo '</p>';
+		}
 	}
 
 	/**
@@ -212,11 +242,34 @@ class Set_Date_Format extends Tasks_Interactive {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
+		$action_label = 'wp_default' === $this->get_date_format_type() ? \esc_html__( 'Set date format', 'progress-planner' ) : \esc_html__( 'Verify date format', 'progress-planner' );
+		$actions[]    = [
 			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Set date format', 'progress-planner' ) . '</a>',
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html( $action_label ) . '</a>',
 		];
 
 		return $actions;
+	}
+
+	/**
+	 * Checks to which format the date is set.
+	 *  - 'F j, Y' - WP default with US-en locale.
+	 *  - __( ''F j, Y' ), localized version of the default date format.
+	 *  - non default date format.
+	 *
+	 * @return string
+	 */
+	protected function get_date_format_type() {
+		$date_format = \get_option( 'date_format' );
+
+		if ( $date_format === 'F j, Y' && 'F j, Y' !== __( 'F j, Y' ) ) { // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- We want localized date format from WP Core.
+			return 'wp_default';
+		}
+
+		if ( $date_format === __( 'F j, Y' ) ) { // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- We want localized date format from WP Core.
+			return 'localized_default';
+		}
+
+		return 'non_default';
 	}
 }
