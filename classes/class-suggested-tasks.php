@@ -450,6 +450,7 @@ class Suggested_Tasks {
 
 				$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
 			}
+			$response->data['prpl_points'] = $provider->get_points();
 		}
 
 		$category_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_category' );
