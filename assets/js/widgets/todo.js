@@ -139,7 +139,6 @@ const prplTodoWidget = {
 						meta: {
 							prpl_points: 0,
 							prpl_url: '',
-							prpl_url_target: '_self',
 							...( response.meta || {} ),
 						},
 						provider: 'user',
