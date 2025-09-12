@@ -107,7 +107,7 @@ class Update_161 extends Update {
 				'provider_id' => 'user',
 				'category'    => 'user',
 				'task_id'     => isset( $task['task_id'] ) ? $task['task_id'] : '',
-				'post_status' => ! isset( $task['status'] ) || 'pending' === $task['status'] ? 'publish' : $task['status'],
+				'post_status' => 'pending' === $task['status'] ? 'publish' : $task['status'],
 				'dismissable' => true,
 				'snoozable'   => false,
 			];
