@@ -107,7 +107,7 @@ class Sample_Page extends Tasks_Interactive {
 		$content .= \sprintf(
 			/* translators: %s: Link to the post. */
 			\esc_html__( 'On install, WordPress creates a "Sample Page" page. You can find yours at %s.', 'progress-planner' ),
-			'<a href="' . \esc_attr( $sample_page_url ) . '" target="_blank">' . \esc_html( $sample_page_url ) . '</a>',
+			'<a href="' . \esc_attr( $sample_page_url ) . '" target="_self">' . \esc_html( $sample_page_url ) . '</a>',
 		);
 		$content .= '</p><p>';
 		$content .= \esc_html__( 'This page does not add value to your website and solely exists to show what a page can look like. Therefore, "Sample Page" is not needed and should be deleted.', 'progress-planner' );
