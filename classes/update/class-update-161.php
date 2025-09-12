@@ -101,13 +101,13 @@ class Update_161 extends Update {
 		if ( 'user' === $task['provider_id'] ) {
 			// User tasks have different data structure, so we can copy directly.
 			$task_details = [
-				'post_title'  => $task['title'],
+				'post_title'  => isset( $task['title'] ) ? $task['title'] : '',
 				'description' => '',
-				'points'      => $task['points'],
+				'points'      => isset( $task['points'] ) ? $task['points'] : 0,
 				'provider_id' => 'user',
 				'category'    => 'user',
-				'task_id'     => $task['task_id'],
-				'post_status' => 'pending' === $task['status'] ? 'publish' : $task['status'],
+				'task_id'     => isset( $task['task_id'] ) ? $task['task_id'] : '',
+				'post_status' => ! isset( $task['status'] ) || 'pending' === $task['status'] ? 'publish' : $task['status'],
 				'dismissable' => true,
 				'snoozable'   => false,
 			];
