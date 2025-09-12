@@ -1,5 +1,8 @@
 .prpl-wrap.prpl-pp-not-accepted {
 	padding: 0;
+	background-color: #fff;
+	border: 1px solid var(--prpl-color-gray-2);
+	border-radius: var(--prpl-border-radius);
 }
 
 .prpl-welcome {

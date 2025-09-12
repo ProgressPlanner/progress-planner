@@ -61,15 +61,6 @@ class Archive_Author extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Yoast SEO can disable the author archive when you have only one author, as it is the same as the homepage.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array
@@ -95,7 +86,7 @@ class Archive_Author extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		return $this->is_task_relevant()
-			&& \YoastSEO()->helpers->options->get( 'disable-author' ) !== true;
+			&& \YoastSEO()->helpers->options->get( 'disable-author' ) !== true; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**

@@ -61,15 +61,6 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Remove URLs which provide information about recent posts by specific authors.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array

@@ -154,25 +154,6 @@ class Remove_Terms_Without_Posts extends Tasks {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @param array $task_data The task data.
-	 *
-	 * @return string
-	 */
-	protected function get_description_with_data( $task_data = [] ) {
-		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
-		return ( $term && ! \is_wp_error( $term ) )
-			? \sprintf(
-				/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/remove-empty-taxonomy" target="_blank">Read more</a> link */
-				\esc_html__( 'The "%1$s" term has one or less posts associated with it, we recommend removing it. %2$s', 'progress-planner' ),
-				$term->name,
-				'<a href="https://prpl.fyi/remove-empty-taxonomy" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the removing the empty terms', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-			)
-			: '';
-	}
-
-	/**
 	 * Get the URL.
 	 *
 	 * @param array $task_data The task data.

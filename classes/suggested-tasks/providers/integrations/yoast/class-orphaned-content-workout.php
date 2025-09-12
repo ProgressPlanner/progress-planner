@@ -127,15 +127,6 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Improve your internal linking structure with Yoast SEO\'s Orphaned Content Workout.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the task URL.
 	 *
 	 * @return string

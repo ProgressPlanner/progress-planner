@@ -41,6 +41,13 @@ class Email_Sending extends Tasks_Interactive {
 	const POPOVER_ID = 'sending-email';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/check-if-your-websites-email-system-works';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -209,7 +216,7 @@ class Email_Sending extends Tasks_Interactive {
 	public function check_if_wp_mail_is_filtered() {
 		global $wp_filter;
 		foreach ( [ 'phpmailer_init', 'pre_wp_mail' ] as $filter ) {
-			$has_filter                = isset( $wp_filter[ $filter ] ) && ! empty( $wp_filter[ $filter ]->callbacks ) ? true : false;
+			$has_filter                = isset( $wp_filter[ $filter ] ) && ! empty( $wp_filter[ $filter ]->callbacks ) ? true : false; // @phpstan-ignore-line property.nonObject
 			$this->is_wp_mail_filtered = $this->is_wp_mail_filtered || $has_filter;
 		}
 	}
@@ -314,7 +321,7 @@ class Email_Sending extends Tasks_Interactive {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'' . \esc_attr( $data['meta']['prpl_popover_id'] ) . '\')?.showPopover()">' . \esc_html__( 'Test email sending', 'progress-planner' ) . '</a>',
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Test email sending', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

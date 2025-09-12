@@ -84,15 +84,6 @@ class Core_Update extends Tasks {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Regular updates improve security and performance.', 'progress-planner' );
-	}
-
-	/**
 	 * Add the link to the Progress Planner Dashboard to the update complete actions.
 	 *
 	 * @param array $update_actions The update actions.

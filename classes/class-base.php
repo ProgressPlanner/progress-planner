@@ -43,6 +43,18 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Plugin_Installer get_plugin_installer()
  * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Content get_admin__widgets__badge_streak_content()
  * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Maintenance get_admin__widgets__badge_streak_maintenance()
+ * @method \Progress_Planner\Admin\Enqueue get_admin__enqueue()
+ * @method \Progress_Planner\Admin\Widgets\Whats_New get_admin__widgets__whats_new()
+ * @method \Progress_Planner\Admin\Widgets\ToDo get_admin__widgets__todo()
+ * @method \Progress_Planner\Admin\Widgets\Monthly_Badges get_admin__widgets__monthly_badges()
+ * @method \Progress_Planner\UI\Popover get_ui__popover()
+ * @method \Progress_Planner\Admin\Widgets\Latest_Badge get_admin__widgets__latest_badge()
+ * @method \Progress_Planner\Admin\Widgets\Content_Activity get_admin__widgets__content_activity()
+ * @method \Progress_Planner\UI\Chart get_ui__chart()
+ * @method \Progress_Planner\Activities\Content_Helpers get_activities__content_helpers()
+ * @method \Progress_Planner\Admin\Widgets\Challenge get_admin__widgets__challenge()
+ * @method \Progress_Planner\Admin\Widgets\Activity_Scores get_admin__widgets__activity_scores()
+ * @method \Progress_Planner\Utils\Date get_utils__date()
  */
 class Base {
 
@@ -460,7 +472,7 @@ class Base {
 			return;
 		}
 
-		if ( isset( $_REQUEST['redirect_to'] ) && '' !== $_REQUEST['redirect_to'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing -- We're not processing any data.
+		if ( isset( $_REQUEST['redirect_to'] ) && '' !== $_REQUEST['redirect_to'] && \admin_url( '/' ) !== $_REQUEST['redirect_to'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing -- We're not processing any data.
 			return;
 		}
 

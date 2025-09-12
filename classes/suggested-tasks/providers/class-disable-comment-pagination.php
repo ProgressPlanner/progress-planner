@@ -71,19 +71,6 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %d is the number of comments per page.*/
-			\esc_html__( 'When comment pagination is enabled, your site creates a new page for every %d comments. This is not helping your website in search engines, and can break up the ongoing conversation. That\'s why we recommend to disable comment pagination.', 'progress-planner' ),
-			(int) \get_option( 'comments_per_page' ),
-		);
-	}
-
-	/**
 	 * Check if the task condition is satisfied.
 	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *
@@ -144,7 +131,7 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'' . \esc_attr( $data['meta']['prpl_popover_id'] ) . '\')?.showPopover()">' . \esc_html__( 'Disable pagination', 'progress-planner' ) . '</a>',
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Disable pagination', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;
