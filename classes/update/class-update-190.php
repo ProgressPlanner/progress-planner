@@ -49,7 +49,8 @@ class Update_190 {
 				]
 			);
 			if ( ! empty( $existing_posts ) ) {
-				continue;
+				// Delete the existing post.
+				\wp_delete_post( $existing_posts[0]->ID, true );
 			}
 
 			// Set the slug.
