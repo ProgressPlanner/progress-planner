@@ -52,13 +52,7 @@ class Suggested_Tasks_DB {
 			[
 				'post_status' => [ 'publish', 'trash', 'draft', 'future', 'pending' ], // 'any' doesn't include statuses which have 'exclude_from_search' set to true (trash and pending).
 				'numberposts' => 1,
-				'meta_query'  => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-					[
-						'key'     => 'prpl_task_id',
-						'value'   => $data['task_id'],
-						'compare' => '=',
-					],
-				],
+				'name'        => $data['task_id'],
 			]
 		);
 
@@ -330,12 +324,7 @@ class Suggested_Tasks_DB {
 					break;
 
 				case 'task_id':
-					$args['meta_query']   = isset( $args['meta_query'] ) ? $args['meta_query'] : []; // phpcs:ignore WordPress.DB.SlowDBQuery
-					$args['meta_query'][] = [
-						'key'   => 'prpl_task_id',
-						'value' => $value,
-					];
-
+					$args['name'] = $value;
 					unset( $params[ $param ] );
 					break;
 

@@ -629,12 +629,12 @@ abstract class Tasks implements Tasks_Interface {
 		if ( $this->is_dismissable() && 'user' !== static::PROVIDER_ID ) {
 			$actions[] = [
 				'priority' => 20,
-				'html'     => '<button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="complete" data-target="complete" title="' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '" onclick="prplSuggestedTask.maybeComplete(' . (int) $data['id'] . ');"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span></button>',
+				'html'     => '<button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['slug'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="complete" data-target="complete" title="' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '" onclick="prplSuggestedTask.maybeComplete(' . (int) $data['id'] . ');"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span></button>',
 			];
 		}
 
 		if ( $this->is_snoozable() ) {
-			$snooze_html  = '<prpl-tooltip class="prpl-suggested-task-snooze"><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="snooze" data-target="snooze" title="' . \esc_attr__( 'Snooze', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span></button></slot><slot name="content">';
+			$snooze_html  = '<prpl-tooltip class="prpl-suggested-task-snooze"><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['slug'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="snooze" data-target="snooze" title="' . \esc_attr__( 'Snooze', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span></button></slot><slot name="content">';
 			$snooze_html .= '<fieldset><legend><span>' . \esc_html__( 'Snooze this task?', 'progress-planner' ) . '</span><button type="button" class="prpl-toggle-radio-group" onclick="this.closest(\'.prpl-suggested-task-snooze\').classList.toggle(\'prpl-toggle-radio-group-open\');"><span class="prpl-toggle-radio-group-text">' . \esc_html__( 'How long?', 'progress-planner' ) . '</span><span class="prpl-toggle-radio-group-arrow">&rsaquo;</span></button></legend><div class="prpl-snooze-duration-radio-group">';
 			foreach (
 				[
@@ -645,7 +645,7 @@ abstract class Tasks implements Tasks_Interface {
 					'1-year'   => \esc_html__( '1 year', 'progress-planner' ),
 					'forever'  => \esc_html__( 'forever', 'progress-planner' ),
 				] as $snooze_key => $snooze_value ) {
-					$snooze_html .= '<label><input type="radio" name="snooze-duration-' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" value="' . \esc_attr( $snooze_key ) . '" onchange="prplSuggestedTask.snooze(' . (int) $data['id'] . ', \'' . \esc_attr( $snooze_key ) . '\');">' . \esc_html( $snooze_value ) . '</label>';
+					$snooze_html .= '<label><input type="radio" name="snooze-duration-' . \esc_attr( $data['slug'] ) . '" value="' . \esc_attr( $snooze_key ) . '" onchange="prplSuggestedTask.snooze(' . (int) $data['id'] . ', \'' . \esc_attr( $snooze_key ) . '\');">' . \esc_html( $snooze_value ) . '</label>';
 			}
 			$snooze_html .= '</div></fieldset></slot></prpl-tooltip>';
 			$actions[]    = [
@@ -662,7 +662,7 @@ abstract class Tasks implements Tasks_Interface {
 		} elseif ( isset( $data['content']['rendered'] ) && $data['content']['rendered'] !== '' && ! $this instanceof Tasks_Interactive ) {
 			$actions[] = [
 				'priority' => 40,
-				'html'     => '<prpl-tooltip><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="info" data-target="info" title="' . \esc_html__( 'Info', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Info', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Info', 'progress-planner' ) . '</span></button></slot><slot name="content">' . \wp_kses_post( $data['content']['rendered'] ) . '</slot></prpl-tooltip>',
+				'html'     => '<prpl-tooltip><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['slug'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="info" data-target="info" title="' . \esc_html__( 'Info', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Info', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Info', 'progress-planner' ) . '</span></button></slot><slot name="content">' . \wp_kses_post( $data['content']['rendered'] ) . '</slot></prpl-tooltip>',
 			];
 		}
 

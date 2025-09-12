@@ -297,11 +297,11 @@ class Update_Term_Description extends Tasks {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		if ( ! isset( $data['meta']['prpl_task_id'] ) ) {
+		if ( ! isset( $data['slug'] ) ) {
 			return $actions;
 		}
 
-		$term = $this->get_term_from_task_id( $data['meta']['prpl_task_id'] );
+		$term = $this->get_term_from_task_id( $data['slug'] );
 		if ( ! $term ) {
 			return $actions;
 		}

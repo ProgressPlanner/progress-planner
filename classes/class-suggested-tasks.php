@@ -293,11 +293,6 @@ class Suggested_Tasks {
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_task_id'           => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
 			'prpl_url'               => [
 				'type'         => 'string',
 				'single'       => true,
