@@ -112,39 +112,29 @@ class Set_Date_Format extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		$detected_date_format = $this->get_date_format_type();
-
-		if ( 'wp_default' === $detected_date_format ) {
-			echo '<p>';
-			\esc_html_e( 'Choosing the right date format helps your visitors instantly understand when something was published without confusion or guessing. It also makes your site feel more familiar and trustworthy, especially if your audience is local.', 'progress-planner' );
-			echo '</p>';
-			echo '<p>';
-			\esc_html_e( 'By setting the correct format, you make sure dates show up clearly both in your dashboard and on your live site.', 'progress-planner' );
-			echo '</p>';
-			echo '<p>';
-			\esc_html_e( 'Tip: Pick the format that matches what your audience expects.', 'progress-planner' );
-			echo '</p>';
-		} elseif ( 'localized_default' === $detected_date_format ) {
-			echo '<p>';
-			\esc_html_e( 'Choosing the right date format helps your visitors instantly understand when something was published without confusion or guessing. It also makes your site feel more familiar and trustworthy, especially if your audience is local.', 'progress-planner' );
-			echo '</p>';
-			echo '<p>';
-			/* translators: %s: The date format. */
-			printf( \esc_html__( 'The date format currently set matches the default format for your site language (%s). Therefore, we expect it\'s set correctly. But can you have a quick look, just to be sure?', 'progress-planner' ), \esc_html( \get_option( 'date_format' ) ) );
-			echo '</p>';
-			echo '<p>';
-			\esc_html_e( 'Tip: Pick the format that matches what your audience expects.', 'progress-planner' );
-			echo '</p>';
-		} else {
-			echo '<p>';
-			\esc_html_e( 'Choosing the right date format helps your visitors instantly understand when something was published without confusion or guessing. It also makes your site feel more familiar and trustworthy, especially if your audience is local.', 'progress-planner' );
-			echo '</p>';
-			echo '<p>';
-			\esc_html_e( 'Because your site is not using the WordPress default setting, we expect you may have set this already. That\'s why we just want you to verify if it\'s set correctly.', 'progress-planner' );
-			echo '</p>';
-			echo '<p>';
-			\esc_html_e( 'Tip: Pick the format that matches what your audience expects.', 'progress-planner' );
-			echo '</p>';
-		}
+		?>
+		<?php if ( 'wp_default' === $detected_date_format ) : ?>
+			<p><?php \esc_html_e( 'Choosing the right date format helps your visitors instantly understand when something was published without confusion or guessing. It also makes your site feel more familiar and trustworthy, especially if your audience is local.', 'progress-planner' ); ?></p>
+			<p><?php \esc_html_e( 'By setting the correct format, you make sure dates show up clearly both in your dashboard and on your live site.', 'progress-planner' ); ?></p>
+			<p><?php \esc_html_e( 'Tip: Pick the format that matches what your audience expects.', 'progress-planner' ); ?></p>
+		<?php elseif ( 'localized_default' === $detected_date_format ) : ?>
+			<p><?php \esc_html_e( 'Choosing the right date format helps your visitors instantly understand when something was published without confusion or guessing. It also makes your site feel more familiar and trustworthy, especially if your audience is local.', 'progress-planner' ); ?></p>
+			<p>
+				<?php
+				printf(
+					/* translators: %s: The date format. */
+					\esc_html__( 'The date format currently set matches the default format for your site language (%s). Therefore, we expect it\'s set correctly. But can you have a quick look, just to be sure?', 'progress-planner' ),
+					\esc_html( \get_option( 'date_format' ) )
+				);
+				?>
+			</p>
+			<p><?php \esc_html_e( 'Tip: Pick the format that matches what your audience expects.', 'progress-planner' ); ?></p>
+		<?php else : ?>
+			<p><?php \esc_html_e( 'Choosing the right date format helps your visitors instantly understand when something was published without confusion or guessing. It also makes your site feel more familiar and trustworthy, especially if your audience is local.', 'progress-planner' ); ?></p>
+			<p><?php \esc_html_e( 'Because your site is not using the WordPress default setting, we expect you may have set this already. That\'s why we just want you to verify if it\'s set correctly.', 'progress-planner' ); ?></p>
+			<p><?php \esc_html_e( 'Tip: Pick the format that matches what your audience expects.', 'progress-planner' ); ?></p>
+		<?php endif; ?>
+		<?php
 	}
 
 	/**
