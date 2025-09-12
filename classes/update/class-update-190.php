@@ -41,6 +41,17 @@ class Update_190 {
 				continue;
 			}
 
+			// Check if there are any existing posts with the same slug.
+			$existing_posts = \get_posts(
+				[
+					'post_type' => 'prpl_recommendations',
+					'name'      => $prpl_task_id,
+				]
+			);
+			if ( ! empty( $existing_posts ) ) {
+				continue;
+			}
+
 			// Set the slug.
 			\wp_update_post(
 				[
