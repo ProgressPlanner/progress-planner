@@ -23,13 +23,17 @@ $prpl_custom = true;
 	<fieldset>
 		<?php foreach ( $prpl_date_formats as $prpl_format ) : ?>
 		<div class="prpl-radio-wrapper">
-			<label class="prpl-custom-radio"><input type="radio" name="date_format" value="<?php echo \esc_attr( $prpl_format ); ?>"
-				<?php
-				if ( \get_option( 'date_format' ) === $prpl_format ) { // checked() uses "==" rather than "===".
-					echo " checked='checked'";
-					$prpl_custom = false;
-				}
-				?>
+			<label class="prpl-custom-radio">
+				<input
+					type="radio"
+					name="date_format"
+					value="<?php echo \esc_attr( $prpl_format ); ?>"
+					<?php
+					if ( \get_option( 'date_format' ) === $prpl_format ) { // checked() uses "==" rather than "===".
+						echo " checked='checked'";
+						$prpl_custom = false;
+					}
+					?>
 				/>
 				<span class="prpl-custom-control"></span>
 				<span class="date-time-text format-i18n"><?php echo \esc_html( \date_i18n( $prpl_format ) ); ?></span>
@@ -43,29 +47,34 @@ $prpl_custom = true;
 			<label class="prpl-custom-radio">
 				<input type="radio" name="date_format" id="date_format_custom_radio" value="\c\u\s\t\o\m" <?php checked( $prpl_custom ); ?>/>
 				<span class="prpl-custom-control"></span> <span class="date-time-text date-time-custom-text">
-					<?php \esc_html_e( 'Custom:', 'progress-planner' ); ?>
-					<span class="screen-reader-text">
 					<?php
+					printf(
+						/* translators: %s: Screen reader text "enter a custom date format in the following field". */
+						\esc_html__( 'Custom: %s', 'progress-planner' ),
 						/* translators: Hidden accessibility text. */
-						\esc_html_e( 'enter a custom date format in the following field', 'progress-planner' );
+						'<span class="screen-reader-text">' . \esc_html__( 'enter a custom date format in the following field', 'progress-planner' ) . '</span>'
+					);
 					?>
-					</span>
 				</span>
 			</label>
 			<label for="date_format_custom" class="screen-reader-text">
-			<?php
-			/* translators: Hidden accessibility text. */
-			\esc_html_e( 'Custom date format:', 'progress-planner' );
-			?>
+				<?php
+				/* translators: Hidden accessibility text. */
+				\esc_html_e( 'Custom date format:', 'progress-planner' );
+				?>
 			</label>
 			<input type="text" name="date_format_custom" id="date_format_custom" value="<?php echo \esc_attr( \get_option( 'date_format' ) ); ?>" class="small-text" />
 		</div>
 
 		<?php /* Preview. */ ?>
 		<p>
-			<strong><?php \esc_html_e( 'Preview:', 'progress-planner' ); ?></strong>
-			<span class="example"><?php echo \esc_html( \date_i18n( \get_option( 'date_format' ) ) ); ?></span>
-			<span class="spinner"></span>
+			<?php
+			printf(
+				/* translators: %s: Preview text. */
+				\wp_kses_post( \__( '<strong>Preview:</strong> %s', 'progress-planner' ) ),
+				'<span class="example">' . \esc_html( \date_i18n( \get_option( 'date_format' ) ) ) . '</span><span class="spinner"></span>'
+			);
+			?>
 		</p>
 	</fieldset>
 </div>
