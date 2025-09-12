@@ -84,7 +84,7 @@ class Site_Icon extends Tasks {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() ) . '" target="_self">' . \esc_html__( 'Go to the settings page', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'options-general.php?pp-focus-el=' . $this->get_task_id() ) . '" target="_blank">' . \esc_html__( 'Go to the settings page', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

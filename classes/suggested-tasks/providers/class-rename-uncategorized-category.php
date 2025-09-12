@@ -96,7 +96,7 @@ class Rename_Uncategorized_Category extends Tasks {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'term.php?taxonomy=category&tag_ID=' . $this->get_data_collector()->collect() ) . '" target="_self">' . \esc_html__( 'Rename', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'term.php?taxonomy=category&tag_ID=' . $this->get_data_collector()->collect() ) . '" target="_blank">' . \esc_html__( 'Rename', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;
