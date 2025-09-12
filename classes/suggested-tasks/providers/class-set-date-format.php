@@ -121,7 +121,7 @@ class Set_Date_Format extends Tasks_Interactive {
 			<p><?php \esc_html_e( 'Choosing the right date format helps your visitors instantly understand when something was published without confusion or guessing. It also makes your site feel more familiar and trustworthy, especially if your audience is local.', 'progress-planner' ); ?></p>
 			<p>
 				<?php
-				printf(
+				\printf(
 					/* translators: %s: The date format. */
 					\esc_html__( 'The date format currently set matches the default format for your site language (%s). Therefore, we expect it\'s set correctly. But can you have a quick look, just to be sure?', 'progress-planner' ),
 					\esc_html( \get_option( 'date_format' ) )
@@ -210,11 +210,11 @@ class Set_Date_Format extends Tasks_Interactive {
 	protected function get_date_format_type() {
 		$date_format = \get_option( 'date_format' );
 
-		if ( $date_format === 'F j, Y' && 'F j, Y' !== __( 'F j, Y' ) ) { // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- We want localized date format from WP Core.
+		if ( $date_format === 'F j, Y' && 'F j, Y' !== \__( 'F j, Y' ) ) { // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- We want localized date format from WP Core.
 			return 'wp_default';
 		}
 
-		if ( $date_format === __( 'F j, Y' ) ) { // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- We want localized date format from WP Core.
+		if ( $date_format === \__( 'F j, Y' ) ) { // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- We want localized date format from WP Core.
 			return 'localized_default';
 		}
 

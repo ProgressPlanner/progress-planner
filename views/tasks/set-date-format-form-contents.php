@@ -15,7 +15,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
  *
  * @param string[] $default_date_formats Array of default date formats.
  */
-$prpl_date_formats = array_unique( \apply_filters( 'date_formats', [ __( 'F j, Y' ), 'F j, Y', 'Y-m-d', 'm/d/Y', 'd/m/Y', 'd.m.Y' ] ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound, WordPress.WP.I18n.MissingArgDomain -- WP core filter & we want to add the default date format
+$prpl_date_formats = \array_unique( \apply_filters( 'date_formats', [ \__( 'F j, Y' ), 'F j, Y', 'Y-m-d', 'm/d/Y', 'd/m/Y', 'd.m.Y' ] ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound, WordPress.WP.I18n.MissingArgDomain -- WP core filter & we want to add the default date format
 
 $prpl_custom = true;
 ?>
@@ -45,10 +45,10 @@ $prpl_custom = true;
 		<?php /* Custom date format. */ ?>
 		<div class="prpl-radio-wrapper">
 			<label class="prpl-custom-radio">
-				<input type="radio" name="date_format" id="date_format_custom_radio" value="\c\u\s\t\o\m" <?php checked( $prpl_custom ); ?>/>
+				<input type="radio" name="date_format" id="date_format_custom_radio" value="\c\u\s\t\o\m" <?php \checked( $prpl_custom ); ?>/>
 				<span class="prpl-custom-control"></span> <span class="date-time-text date-time-custom-text">
 					<?php
-					printf(
+					\printf(
 						/* translators: %s: Screen reader text "enter a custom date format in the following field". */
 						\esc_html__( 'Custom: %s', 'progress-planner' ),
 						/* translators: Hidden accessibility text. */
@@ -69,7 +69,7 @@ $prpl_custom = true;
 		<?php /* Preview. */ ?>
 		<p>
 			<?php
-			printf(
+			\printf(
 				/* translators: %s: Preview text. */
 				\wp_kses_post( \__( '<strong>Preview:</strong> %s', 'progress-planner' ) ),
 				'<span class="example">' . \esc_html( \date_i18n( \get_option( 'date_format' ) ) ) . '</span><span class="spinner"></span>'
