@@ -153,50 +153,7 @@ class Set_Date_Format extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		/**
-		 * Filters the default date formats.
-		 *
-		 * @param string[] $default_date_formats Array of default date formats.
-		 */
-		$date_formats = array_unique( \apply_filters( 'date_formats', [ __( 'F j, Y' ), 'F j, Y', 'Y-m-d', 'm/d/Y', 'd/m/Y', 'd.m.Y' ] ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound, WordPress.WP.I18n.MissingArgDomain -- WP core filter & we want to add the default date format
-
-		$custom = true;
-
-		echo '<div class="radios">';
-		echo '<fieldset>';
-		foreach ( $date_formats as $format ) {
-			echo '<div class="prpl-radio-wrapper">';
-			echo "<label class='prpl-custom-radio'><input type='radio' name='date_format' value='" . \esc_attr( $format ) . "'";
-			if ( \get_option( 'date_format' ) === $format ) { // checked() uses "==" rather than "===".
-				echo " checked='checked'";
-				$custom = false;
-			}
-			echo ' /> <span class="prpl-custom-control"></span><span class="date-time-text format-i18n">' . \esc_html( \date_i18n( $format ) ) . '</span><code>' . \esc_html( $format ) . '</code></label>';
-			echo '</div>';
-		}
-
-		echo '<div class="prpl-radio-wrapper">';
-		echo '<label class="prpl-custom-radio"><input type="radio" name="date_format" id="date_format_custom_radio" value="\c\u\s\t\o\m"';
-		checked( $custom );
-		echo '/> <span class="prpl-custom-control"></span> <span class="date-time-text date-time-custom-text">' . \esc_html( __( 'Custom:', 'progress-planner' ) ) . '<span class="screen-reader-text"> ' .
-				/* translators: Hidden accessibility text. */
-				\esc_html( __( 'enter a custom date format in the following field', 'progress-planner' ) ) .
-			'</span></span></label>' .
-			'<label for="date_format_custom" class="screen-reader-text">' .
-				/* translators: Hidden accessibility text. */
-				\esc_html( __( 'Custom date format:', 'progress-planner' ) ) .
-			'</label>' .
-			'<input type="text" name="date_format_custom" id="date_format_custom" value="' . \esc_attr( \get_option( 'date_format' ) ) . '" class="small-text" />' .
-			'</div>' .
-			'<p><strong>' . \esc_html( __( 'Preview:', 'progress-planner' ) ) . '</strong> <span class="example">' . \esc_html( \date_i18n( \get_option( 'date_format' ) ) ) . '</span>' .
-			"<span class='spinner'></span>\n" . '</p>';
-		?>
-		</fieldset>
-		</div>
-		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
-			<?php \esc_html_e( 'Set date format', 'progress-planner' ); ?>
-		</button>
-		<?php
+		\progress_planner()->the_view( 'tasks/set-date-format-form-contents.php' );
 	}
 
 	/**
