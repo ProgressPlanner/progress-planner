@@ -44,7 +44,7 @@ class Maintenance extends Activity {
 		$this->date    = new \DateTime();
 		$this->user_id = \get_current_user_id();
 
-		$existing = \progress_planner()->get_activities__query()->query_activities_get_raw(
+		$existing = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category'   => $this->category,
 				'type'       => $this->type,
@@ -52,6 +52,7 @@ class Maintenance extends Activity {
 				'start_date' => $this->date,
 			]
 		);
+
 		if ( ! empty( $existing ) ) {
 			\progress_planner()->get_activities__query()->update_activity( $existing[0]->id, $this ); // @phpstan-ignore-line property.nonObject
 			return;
