@@ -52,7 +52,6 @@ class Maintenance extends Activity {
 				'start_date' => $this->date,
 			]
 		);
-
 		if ( ! empty( $existing ) ) {
 			\progress_planner()->get_activities__query()->update_activity( $existing[0]->id, $this ); // @phpstan-ignore-line property.nonObject
 			return;
