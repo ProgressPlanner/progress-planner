@@ -1,6 +1,10 @@
 
 = 1.8.0 =
 
+Added these recommendations from Ravi:
+
+* Set date format.
+
 Enhancements:
 
 * Redesign of the admin pages.
