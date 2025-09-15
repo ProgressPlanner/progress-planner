@@ -123,7 +123,7 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_authors' ) . '" target="_blank">' . \esc_html__( 'Remove', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_authors' ) . '" target="_self">' . \esc_html__( 'Remove', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

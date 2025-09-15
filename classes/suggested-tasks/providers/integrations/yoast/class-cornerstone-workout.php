@@ -157,7 +157,7 @@ class Cornerstone_Workout extends Yoast_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) . '" target="_blank">' . \esc_html__( 'Run workout', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) . '" target="_self">' . \esc_html__( 'Run workout', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;
