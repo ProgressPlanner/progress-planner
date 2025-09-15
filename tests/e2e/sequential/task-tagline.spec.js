@@ -53,11 +53,10 @@ function taglineTests( testContext = test ) {
 					`${ process.env.WORDPRESS_URL }/?rest_route=/progress-planner/v1/tasks`
 				);
 				const finalTasks = await finalResponse.json();
-				console.error( finalTasks );
 
 				// Find the blog description task again
 				const updatedTask = finalTasks.find(
-					( task ) => task.task_id === 'core-blogdescription'
+					( task ) => task.post_name === 'core-blogdescription'
 				);
 				expect( updatedTask ).toBeDefined();
 				expect( updatedTask.post_status ).toBe( 'pending' );
@@ -102,7 +101,7 @@ function taglineTests( testContext = test ) {
 
 				// Find the blog description task one last time
 				const completedTask = completedTasks.find(
-					( task ) => task.task_id === 'core-blogdescription'
+					( task ) => task.post_name === 'core-blogdescription'
 				);
 				expect( completedTask ).toBeDefined();
 				expect( completedTask.post_status ).toBe( 'trash' );
