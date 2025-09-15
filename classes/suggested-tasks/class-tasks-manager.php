@@ -262,7 +262,7 @@ class Tasks_Manager {
 			return false;
 		}
 
-		return $task_provider->evaluate_task( $task->task_id );
+		return $task_provider->evaluate_task( $task->post_name );
 	}
 
 	/**

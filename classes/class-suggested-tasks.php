@@ -80,7 +80,7 @@ class Suggested_Tasks {
 		$completed_tasks = $this->tasks_manager->evaluate_tasks();
 
 		foreach ( $completed_tasks as $task ) {
-			if ( ! $task->task_id && $task->ID ) {
+			if ( ! $task->post_name && $task->ID ) {
 				continue;
 			}
 
@@ -88,7 +88,7 @@ class Suggested_Tasks {
 			$task->celebrate();
 
 			// Insert an activity.
-			$this->insert_activity( $task->task_id );
+			$this->insert_activity( $task->post_name );
 		}
 	}
 
@@ -156,7 +156,7 @@ class Suggested_Tasks {
 		\progress_planner()->get_suggested_tasks_db()->update_recommendation( $pending_tasks[0]->ID, [ 'post_status' => 'trash' ] );
 
 		// Insert an activity.
-		$this->insert_activity( $pending_tasks[0]->task_id );
+		$this->insert_activity( $pending_tasks[0]->post_name );
 	}
 
 	/**
@@ -237,13 +237,13 @@ class Suggested_Tasks {
 		switch ( $action ) {
 			case 'complete':
 				// Insert an activity.
-				$this->insert_activity( $task->task_id );
+				$this->insert_activity( $task->post_name );
 				$updated = true;
 				break;
 
 			case 'pending': // User task was marked as pending.
 			case 'delete':
-				$this->delete_activity( $task->task_id );
+				$this->delete_activity( $task->post_name );
 				$updated = true;
 				break;
 		}

@@ -389,7 +389,7 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function is_task_snoozed() {
 		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] ) as $task ) {
-			$task        = \progress_planner()->get_suggested_tasks_db()->get_post( $task->task_id );
+			$task        = \progress_planner()->get_suggested_tasks_db()->get_post( $task->post_name );
 			$provider_id = $task ? $task->get_provider_id() : '';
 
 			if ( $provider_id === $this->get_provider_id() ) {
@@ -432,10 +432,10 @@ abstract class Tasks implements Tasks_Interface {
 
 		if ( ! $this->is_repetitive() ) {
 			// Collaborator tasks have custom task_ids, so strpos check does not work for them.
-			if ( ! $task->task_id || ( 0 !== \strpos( $task->task_id, $this->get_task_id() ) && 'collaborator' !== $this->get_provider_id() ) ) {
+			if ( ! $task->post_name || ( 0 !== \strpos( $task->post_name, $this->get_task_id() ) && 'collaborator' !== $this->get_provider_id() ) ) {
 				return false;
 			}
-			return $this->is_task_completed( $task->task_id ) ? $task : false;
+			return $this->is_task_completed( $task->post_name ) ? $task : false;
 		}
 
 		if (
@@ -443,7 +443,7 @@ abstract class Tasks implements Tasks_Interface {
 			$task->provider->slug === $this->get_provider_id() &&
 			\DateTime::createFromFormat( 'Y-m-d H:i:s', $task->post_date ) &&
 			\gmdate( 'YW' ) === \gmdate( 'YW', \DateTime::createFromFormat( 'Y-m-d H:i:s', $task->post_date )->getTimestamp() ) && // @phpstan-ignore-line
-			$this->is_task_completed( $task->task_id )
+			$this->is_task_completed( $task->post_name )
 		) {
 			// Allow adding more data, for example in case of 'create-post' tasks we are adding the post_id.
 			$task_data = $this->modify_evaluated_task_data( $task->get_data() );

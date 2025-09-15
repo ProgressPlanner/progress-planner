@@ -245,7 +245,7 @@ class Debug_Tools {
 					// Add delete button.
 					$delete_url = \add_query_arg(
 						[
-							'prpl_delete_single_task' => $task->task_id,
+							'prpl_delete_single_task' => $task->post_name,
 							'_wpnonce'                => \wp_create_nonce( 'prpl_debug_tools' ),
 						],
 						$this->current_url
