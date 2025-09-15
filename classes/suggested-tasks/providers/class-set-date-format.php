@@ -112,6 +112,18 @@ class Set_Date_Format extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		$detected_date_format = $this->get_date_format_type();
+
+		// Get the site default language name.
+		$available_languages = wp_get_available_translations();
+		$site_locale         = get_locale();
+
+		if ( isset( $available_languages[ $site_locale ] ) ) {
+			$lang_name = $available_languages[ $site_locale ]['english_name'];
+		} elseif ( function_exists( 'locale_get_display_name' ) ) {
+			$lang_name = locale_get_display_name( $site_locale, 'en' );
+		} else {
+			$lang_name = $site_locale;
+		}
 		?>
 		<?php if ( 'wp_default' === $detected_date_format ) : ?>
 			<p><?php \esc_html_e( 'Choosing the right date format helps your visitors instantly understand when something was published without confusion or guessing. It also makes your site feel more familiar and trustworthy, especially if your audience is local.', 'progress-planner' ); ?></p>
@@ -124,7 +136,7 @@ class Set_Date_Format extends Tasks_Interactive {
 				\printf(
 					/* translators: %s: The date format. */
 					\esc_html__( 'The date format currently set matches the default format for your site language (%s). Therefore, we expect it\'s set correctly. But can you have a quick look, just to be sure?', 'progress-planner' ),
-					\esc_html( \get_option( 'date_format' ) )
+					\esc_html( $lang_name )
 				);
 				?>
 			</p>
@@ -143,12 +155,24 @@ class Set_Date_Format extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
+
+		// Default date format, based on the user's locale.
+		$localized_default_date_format = \__( 'F j, Y' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- We want localized date format from WP Core.
+
+		// Try to get the localized default date format.
+		$site_locale = get_locale();
+		$user_locale = get_user_locale();
+		if ( $user_locale !== $site_locale && switch_to_locale( $site_locale ) ) {
+			$localized_default_date_format = \__( 'F j, Y' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- We want localized date format from WP Core.
+			restore_previous_locale();
+		}
+
 		/**
 		 * Filters the default date formats.
 		 *
 		 * @param string[] $default_date_formats Array of default date formats.
 		 */
-		$prpl_date_formats = \array_unique( \apply_filters( 'date_formats', [ \__( 'F j, Y' ), 'F j, Y', 'Y-m-d', 'm/d/Y', 'd/m/Y', 'd.m.Y' ] ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound, WordPress.WP.I18n.MissingArgDomain -- WP core filter & we want to add the default date format
+		$prpl_date_formats = \array_unique( \apply_filters( 'date_formats', [ $localized_default_date_format, 'F j, Y', 'Y-m-d', 'm/d/Y', 'd/m/Y', 'd.m.Y' ] ) ); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound, WordPress.WP.I18n.MissingArgDomain -- WP core filter & we want to add the default date format
 
 		$prpl_custom = true;
 		?>
