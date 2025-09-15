@@ -173,7 +173,7 @@ class Fewer_Tags extends Tasks {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( '/plugin-install.php?tab=search&s=fewer+tags' ) . '" target="_blank">' . \esc_html__( 'Install plugin', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( '/plugin-install.php?tab=search&s=fewer+tags' ) . '" target="_self">' . \esc_html__( 'Install plugin', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;
