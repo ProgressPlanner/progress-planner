@@ -97,7 +97,7 @@ class Core_Update extends Tasks {
 				if ( $this->get_task_id() === $task->task_id ) {
 					$update_actions['prpl_core_update'] =
 						'<img src="' . \esc_attr( \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg' ) . '" style="width:1rem;padding-left:0.25rem;padding-right:0.25rem;vertical-align:middle;" alt="Progress Planner" />' .
-						'<a href="' . \esc_url( \admin_url( 'admin.php?page=progress-planner' ) ) . '" target="_parent">' . \esc_html__( 'Click here to celebrate your completed task!', 'progress-planner' ) . '</a>';
+						'<a href="' . \esc_url( \admin_url( 'admin.php?page=progress-planner' ) ) . '" target="_self">' . \esc_html__( 'Click here to celebrate your completed task!', 'progress-planner' ) . '</a>';
 					break;
 				}
 			}
@@ -143,7 +143,7 @@ class Core_Update extends Tasks {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'update-core.php' ) . '" target="_blank">' . \esc_html__( 'Go to the Updates page', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'update-core.php' ) . '" target="_self">' . \esc_html__( 'Go to the Updates page', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

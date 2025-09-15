@@ -108,7 +108,7 @@ class Hello_World extends Tasks_Interactive {
 		$content .= \sprintf(
 			/* translators: %s: Link to the post. */
 			\esc_html__( 'On install, WordPress creates a "Hello World!" post. You can find yours at %s.', 'progress-planner' ),
-			'<a href="' . \esc_attr( $hello_world_post_url ) . '" target="_blank">' . \esc_html( $hello_world_post_url ) . '</a>',
+			'<a href="' . \esc_attr( $hello_world_post_url ) . '" target="_self">' . \esc_html( $hello_world_post_url ) . '</a>',
 		);
 		$content .= '</p><p>';
 		$content .= \esc_html__( 'This post does not add value to your website and solely exists to show what a post can look like. Therefore, "Hello World!" is not needed and should be deleted.', 'progress-planner' );

@@ -144,6 +144,17 @@
 				}
 			}
 
+			/* Close and toggle radio group buttons should not have a text decoration. */
+			.prpl-tooltip-close,
+			.prpl-toggle-radio-group {
+
+				&:hover,
+				&:focus,
+				&:active {
+					text-decoration: none;
+				}
+			}
+
 		}
 	}
 
