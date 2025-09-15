@@ -545,6 +545,7 @@ prplSuggestedTask = {
 		if ( event.key === 'Enter' ) {
 			event.preventDefault();
 			event.stopPropagation();
+			event.target.blur();
 			return false;
 		}
 	},
