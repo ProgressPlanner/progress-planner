@@ -107,12 +107,13 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 					<span
 						class="prpl-previous-month-badge-progress-bar-remaining"
 						data-remaining="<?php echo (int) $prpl_previous_incomplete_month_badge->progress_callback()['remaining']; ?>"
+						data-remaining-total-points="<?php echo (int) $prpl_remaining_points; ?>"
 					>
 						<?php
 						\printf(
-							/* translators: %1$d: The number of points. %2$d: The number of days. */
-							\esc_html( \_n( '%1$d more points to go - %2$d day left', '%1$d more points to go - %2$d days left', (int) $prpl_days_remaining, 'progress-planner' ) ),
-							(int) $prpl_remaining_points,
+							/* translators: %1$s: The number of points. %2$d: The number of days. */
+							\esc_html( \_n( '%1$s more points to go - %2$d day left', '%1$s more points to go - %2$d days left', (int) $prpl_days_remaining, 'progress-planner' ) ),
+							'<span class="number">' . (int) $prpl_remaining_points . '</span>',
 							(int) $prpl_days_remaining
 						);
 						?>
