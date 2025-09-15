@@ -89,7 +89,7 @@ class User extends Tasks {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="#" target="_self" onclick="this.closest(\'li.prpl-suggested-task\').querySelector(\'.prpl-task-title span\').focus();">' . \esc_html__( 'Edit', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="#" target="_self" onclick="event.preventDefault();this.closest(\'li.prpl-suggested-task\').querySelector(\'.prpl-task-title span\').focus();">' . \esc_html__( 'Edit', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

@@ -666,11 +666,14 @@ abstract class Tasks implements Tasks_Interface {
 			];
 		}
 
-		$actions = $this->add_task_actions( $data, $actions );
-		foreach ( $actions as $key => $action ) {
-			$actions[ $key ]['priority'] = $action['priority'] ?? 1000;
-			if ( ! isset( $action['html'] ) || '' === $action['html'] ) {
-				unset( $actions[ $key ] );
+		// Add action links only if the user has the capability to perform the task.
+		if ( $this->capability_required() ) {
+			$actions = $this->add_task_actions( $data, $actions );
+			foreach ( $actions as $key => $action ) {
+				$actions[ $key ]['priority'] = $action['priority'] ?? 1000;
+				if ( ! isset( $action['html'] ) || '' === $action['html'] ) {
+					unset( $actions[ $key ] );
+				}
 			}
 		}
 
