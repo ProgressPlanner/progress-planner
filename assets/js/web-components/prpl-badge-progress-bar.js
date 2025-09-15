@@ -30,7 +30,7 @@ customElements.define(
 							width: 100%;
 							height: 1rem;
 							background-color: var(--prpl-color-gray-1);
-							border-radius: var(--prpl-border-radius);
+							border-radius: 0.5rem;
 							position: relative;"
 					>
 						<div
@@ -39,7 +39,7 @@ customElements.define(
 								width: ${ progress }%;
 								height: 100%;
 								background-color: var(--prpl-color-accent-orange);
-								border-radius: var(--prpl-border-radius);"
+								border-radius: 0.5rem;"
 						></div>
 						<prpl-badge
 							badge-id="${ badgeId }"

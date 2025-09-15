@@ -44,7 +44,15 @@ use Progress_Planner\Badges\Monthly;
 
 <hr style="margin: 1rem 0">
 
-<h3><?php echo \esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() ); ?></h3>
+<h3>
+	<?php
+	printf(
+		/* translators: %s: "Ravi" */
+		\esc_html__( '%s\'s Recommendations', 'progress-planner' ),
+		\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
+	);
+	?>
+</h3>
 <ul style="display:none"></ul>
 <p class="prpl-suggested-tasks-loading">
 	<?php \esc_html_e( 'Loading tasks...', 'progress-planner' ); ?>
