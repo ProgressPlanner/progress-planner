@@ -21,7 +21,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	</span>
 </h2>
 
-<p>
+<p class="prpl-widget-description">
 	<span class="prpl-todo-golden-task-description">
 		<?php \esc_html_e( 'Write down all your tasks you want to get done on your website! You’ll earn points for your ‘golden task’. ', 'progress-planner' ); ?>
 	</span>

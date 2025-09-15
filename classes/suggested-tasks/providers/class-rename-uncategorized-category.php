@@ -43,6 +43,13 @@ class Rename_Uncategorized_Category extends Tasks {
 	protected const DATA_COLLECTOR_CLASS = Uncategorized_Category_Data_Collector::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/rename-uncategorized-category';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -61,19 +68,6 @@ class Rename_Uncategorized_Category extends Tasks {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %1$s <a href="https://prpl.fyi/rename-uncategorized-category" target="_blank">We recommend</a> link */
-			\esc_html__( 'The Uncategorized category is used for posts that don\'t have a category. %1$s renaming it to something that fits your site better.', 'progress-planner' ),
-			'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/rename-uncategorized-category' ) ) . '" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>',
-		);
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
@@ -89,5 +83,22 @@ class Rename_Uncategorized_Category extends Tasks {
 	 */
 	public function update_uncategorized_category_cache() {
 		$this->get_data_collector()->update_uncategorized_category_cache(); // @phpstan-ignore-line method.notFound
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'term.php?taxonomy=category&tag_ID=' . $this->get_data_collector()->collect() ) . '" target="_self">' . \esc_html__( 'Rename', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

@@ -20,11 +20,7 @@ class Upgrade_Migrations_111_Test extends \WP_UnitTestCase {
 	public function test_dataset_1() {
 		// Delete all activities.
 		\progress_planner()->get_activities__query()->delete_activities(
-			\progress_planner()->get_activities__query()->query_activities(
-				[
-					'category' => 'suggested_task',
-				]
-			)
+			\progress_planner()->get_activities__query()->query_activities( [ 'category' => 'suggested_task' ] )
 		);
 
 		// Delete all tasks.
@@ -219,11 +215,7 @@ class Upgrade_Migrations_111_Test extends \WP_UnitTestCase {
 		// Create a new activity for each item.
 		foreach ( $migration_map as $old_task_id => $item ) {
 			// Check if the activity already exists.
-			$activity = \progress_planner()->get_activities__query()->query_activities(
-				[
-					'data_id' => $old_task_id,
-				]
-			);
+			$activity = \progress_planner()->get_activities__query()->query_activities( [ 'data_id' => $old_task_id ] );
 			if ( $activity ) {
 				continue;
 			}
@@ -268,11 +260,7 @@ class Upgrade_Migrations_111_Test extends \WP_UnitTestCase {
 
 		// Verify that every value in the $items array has it's own activity.
 		foreach ( $migration_map as $item ) {
-			$activity = \progress_planner()->get_activities__query()->query_activities(
-				[
-					'data_id' => $item['task_id'],
-				]
-			);
+			$activity = \progress_planner()->get_activities__query()->query_activities( [ 'data_id' => $item['task_id'] ] );
 			$this->assertNotEmpty( $activity );
 		}
 	}

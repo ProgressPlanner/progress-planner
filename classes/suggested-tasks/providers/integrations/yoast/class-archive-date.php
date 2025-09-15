@@ -20,6 +20,13 @@ class Archive_Date extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-date-archive';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/yoast-date-archive';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -35,19 +42,6 @@ class Archive_Date extends Yoast_Provider {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: disable the date archive', 'progress-planner' );
-	}
-
-	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Yoast SEO can disable the date archive, which is really only useful for news sites and blogs. %s.', 'progress-planner' ),
-			'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/yoast-date-archive' ) ) . '" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Date Archive', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
 	}
 
 	/**
@@ -76,7 +70,7 @@ class Archive_Date extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		// If the date archive is already disabled, we don't need to add the task.
-		return $this->is_task_relevant() && \YoastSEO()->helpers->options->get( 'disable-date' ) !== true;
+		return $this->is_task_relevant() && \YoastSEO()->helpers->options->get( 'disable-date' ) !== true; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**
@@ -92,5 +86,22 @@ class Archive_Date extends Yoast_Provider {
 		return \strpos( $permalink_structure, '%year%' ) === false
 			&& \strpos( $permalink_structure, '%monthnum%' ) === false
 			&& \strpos( $permalink_structure, '%day%' ) === false;
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' ) . '" target="_self">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

@@ -36,6 +36,13 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	protected const DATA_COLLECTOR_CLASS = Post_Author::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/yoast-crawl-optimization-feed-authors';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -51,19 +58,6 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: remove post authors feeds', 'progress-planner' );
-	}
-
-	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Remove URLs which provide information about recent posts by specific authors. %s.', 'progress-planner' ),
-			'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/yoast-crawl-optimization-feed-authors' ) ) . '" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Crawl Optimization Feed Authors', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
 	}
 
 	/**
@@ -116,5 +110,22 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	public function is_task_relevant() {
 		// If there is more than one author, we don't need to add the task.
 		return $this->get_data_collector()->collect() <= self::MINIMUM_AUTHOR_WITH_POSTS;
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_authors' ) . '" target="_self">' . \esc_html__( 'Remove', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

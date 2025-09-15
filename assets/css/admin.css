@@ -91,6 +91,14 @@ body.toplevel_page_progress-planner { /* stylelint-disable-line */
 	color: var(--prpl-color-link);
 }
 
+.prpl-widget-width-2 {
+	grid-column: span 2;
+
+	.prpl-widget-description {
+		max-width: 640px;
+	}
+}
+
 .prpl-widget-title {
 	margin-top: 0;
 	font-size: 1.375rem;
@@ -212,6 +220,7 @@ button.prpl-info-icon {
 	grid-template-columns: repeat(auto-fit, minmax(var(--prpl-column-min-width), 1fr));
 	column-gap: var(--prpl-gap);
 	grid-auto-rows: var(--prpl-gap);
+	grid-auto-flow: dense;
 
 	img {
 		max-width: 100%;
@@ -241,6 +250,11 @@ button.prpl-info-icon {
 		margin-top: 1.25rem;
 		margin-bottom: 1.25rem;
 		border-top-color: var(--prpl-color-gray-2);
+	}
+
+	/* Force the last column to be the last column. */
+	&[data-force-last-column="1"] {
+		grid-column: -2 / -1;
 	}
 }
 
@@ -413,6 +427,10 @@ button.prpl-info-icon {
 
 	.prpl-welcome .inner-content .right {
 		display: none !important;
+	}
+
+	.prpl-widget-width-2 {
+		grid-column: span 1;
 	}
 }
 

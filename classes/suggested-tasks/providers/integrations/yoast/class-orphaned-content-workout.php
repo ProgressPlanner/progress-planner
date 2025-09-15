@@ -31,6 +31,13 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-orphaned-content-workout';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/run-orphaned-content-workout';
+
+	/**
 	 * The task priority.
 	 *
 	 * @var int
@@ -120,19 +127,6 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Improve your internal linking structure with Yoast SEO\'s Orphaned Content Workout. %s.', 'progress-planner' ),
-			'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/run-orphaned-content-workout' ) ) . '" target="_blank"  data-prpl_accessibility_text="' . \esc_attr__( 'Learn more about the Yoast SEO Orphaned Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Lean more', 'progress-planner' ) . '</a>'
-		);
-	}
-
-	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -149,5 +143,22 @@ class Orphaned_Content_Workout extends Yoast_Provider {
 	public function should_add_task() {
 		return \defined( 'WPSEO_PREMIUM_VERSION' )
 			&& ! $this->is_task_dismissed( [ 'provider_id' => $this->get_provider_id() ] );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_workouts#orphaned' ) . '" target="_self">' . \esc_html__( 'Run workout', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

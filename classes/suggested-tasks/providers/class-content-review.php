@@ -38,6 +38,13 @@ class Content_Review extends Tasks {
 	protected const CATEGORY = 'content-update';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/review-post';
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -142,35 +149,6 @@ class Content_Review extends Tasks {
 			\strtolower( \get_post_type_object( \esc_html( $post->post_type ) )->labels->singular_name ), // @phpstan-ignore-line property.nonObject
 			\esc_html( $post->post_title ) // @phpstan-ignore-line property.nonObject
 		);
-	}
-
-	/**
-	 * Get the task description.
-	 *
-	 * @param array $task_data The task data.
-	 *
-	 * @return string
-	 */
-	protected function get_description_with_data( $task_data = [] ) {
-		if ( ! isset( $task_data['target_post_id'] ) ) {
-			return '';
-		}
-
-		$post = \get_post( $task_data['target_post_id'] );
-
-		if ( ! $post ) {
-			return '';
-		}
-
-		$months = \in_array( (int) $post->ID, $this->get_saved_page_types(), true ) ? '12' : '6';
-
-		return '<p>' . \sprintf(
-			/* translators: %1$s <a href="https://prpl.fyi/review-post" target="_blank">Review</a> link, %2$s: The post title, %3$s: The number of months. */
-			\esc_html__( '%1$s the post "%2$s" as it was last updated more than %3$s months ago.', 'progress-planner' ),
-			'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/review-post' ) ) . '" target="_blank">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
-			\esc_html( $post->post_title ), // @phpstan-ignore-line property.nonObject
-			\esc_html( $months )
-		) . '</p>';
 	}
 
 	/**
@@ -314,19 +292,18 @@ class Content_Review extends Tasks {
 			}
 
 			$task_to_inject[] = [
-				'task_id'          => $this->get_task_id( [ 'target_post_id' => $task_data['target_post_id'] ] ),
-				'provider_id'      => $this->get_provider_id(),
-				'category'         => $this->get_provider_category(),
-				'target_post_id'   => $task_data['target_post_id'],
-				'target_post_type' => $task_data['target_post_type'],
-				'date'             => \gmdate( 'YW' ),
-				'post_title'       => $this->get_title_with_data( $task_data ),
-				'description'      => $this->get_description_with_data( $task_data ),
-				'url'              => $this->get_url_with_data( $task_data ),
-				'url_target'       => $this->get_url_target(),
-				'dismissable'      => $this->is_dismissable(),
-				'snoozable'        => $this->is_snoozable,
-				'points'           => $this->get_points(),
+				'task_id'           => $this->get_task_id( [ 'target_post_id' => $task_data['target_post_id'] ] ),
+				'provider_id'       => $this->get_provider_id(),
+				'category'          => $this->get_provider_category(),
+				'target_post_id'    => $task_data['target_post_id'],
+				'target_post_type'  => $task_data['target_post_type'],
+				'date'              => \gmdate( 'YW' ),
+				'post_title'        => $this->get_title_with_data( $task_data ),
+				'url'               => $this->get_url_with_data( $task_data ),
+				'url_target'        => $this->get_url_target(),
+				'dismissable'       => $this->is_dismissable(),
+				'points'            => $this->get_points(),
+				'external_link_url' => $this->get_external_link_url(),
 			];
 		}
 
@@ -360,7 +337,7 @@ class Content_Review extends Tasks {
 	 *
 	 * @param array $args The args.
 	 *
-	 * @return array
+	 * @return \WP_Post[]
 	 */
 	public function get_old_posts( $args = [] ) {
 		$posts = [];
@@ -583,5 +560,22 @@ class Content_Review extends Tasks {
 		}
 
 		return 12 * MONTH_IN_SECONDS;
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'post.php?action=edit&post=' . $data['id'] ) . '" target="_self">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

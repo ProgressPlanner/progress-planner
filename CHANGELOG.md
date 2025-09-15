@@ -1,4 +1,13 @@
 
+= 1.8.0 =
+
+Enhancements:
+
+* Redesign of the admin pages.
+
+Bugs we fixed:
+* Fix redirecting to Progress Planner Dashboard after login.
+
 = 1.7.2 =
 
 * Backported some features from the Progress Planner Pro plugin.

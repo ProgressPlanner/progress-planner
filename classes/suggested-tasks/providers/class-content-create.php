@@ -43,6 +43,13 @@ class Content_Create extends Tasks {
 	protected const DATA_COLLECTOR_CLASS = Last_Published_Post_Data_Collector::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/valuable-content';
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -72,19 +79,6 @@ class Content_Create extends Tasks {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Create valuable content', 'progress-planner' );
-	}
-
-	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Time to add more valuable content to your site! Check our blog for inspiration. %s.', 'progress-planner' ),
-			'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/valuable-content' ) ) . '" target="_blank">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
 	}
 
 	/**
@@ -123,5 +117,22 @@ class Content_Create extends Tasks {
 
 		// Add tasks if there are no posts published this week.
 		return \gmdate( 'YW' ) !== \gmdate( 'YW', \strtotime( $last_published_post_data['post_date'] ) );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'post-new.php' ) . '" target="_self">' . \esc_html__( 'Create new post', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

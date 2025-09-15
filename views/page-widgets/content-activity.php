@@ -75,6 +75,7 @@ foreach ( \array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
 			$prpl_activities = \array_filter(
 				$prpl_activities,
 				function ( $activity ) use ( $prpl_tracked_post_types ) {
+
 					return \in_array( \get_post_type( $activity->data_id ), $prpl_tracked_post_types, true );
 				}
 			);

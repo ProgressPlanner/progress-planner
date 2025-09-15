@@ -21,11 +21,7 @@ class Upgrade_Migrations_130_Test extends \WP_UnitTestCase {
 	public function test_recreating_tasks_from_activities() {
 		// Delete all activities.
 		\progress_planner()->get_activities__query()->delete_activities(
-			\progress_planner()->get_activities__query()->query_activities(
-				[
-					'category' => 'suggested_task',
-				]
-			)
+			\progress_planner()->get_activities__query()->query_activities( [ 'category' => 'suggested_task' ] )
 		);
 
 		// Delete all tasks.

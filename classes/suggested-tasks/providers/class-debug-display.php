@@ -27,27 +27,19 @@ class Debug_Display extends Tasks {
 	protected const PROVIDER_ID = 'wp-debug-display';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-wp-debug';
+
+	/**
 	 * Get the task title.
 	 *
 	 * @return string
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Disable public display of PHP errors', 'progress-planner' );
-	}
-
-	/**
-	 * Get the task description.
-	 *
-	 * @param array $task_data Optional data to include in the task.
-	 * @return string
-	 */
-	protected function get_description( $task_data = [] ) {
-		return \sprintf(
-			// translators: %1$s is the name of the WP_DEBUG_DISPLAY constant, %2$s <a href="https://prpl.fyi/set-wp-debug" target="_blank">We recommend</a> link.
-			\esc_html__( '%1$s is enabled. This means that errors are shown to users. %2$s disabling it.', 'progress-planner' ),
-			'<code>WP_DEBUG_DISPLAY</code>',
-			'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/set-wp-debug' ) ) . '" target="_blank">' . \esc_html__( 'We recommend', 'progress-planner' ) . '</a>'
-		);
 	}
 
 	/**

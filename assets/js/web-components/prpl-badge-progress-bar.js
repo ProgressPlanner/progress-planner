@@ -30,7 +30,7 @@ customElements.define(
 							width: 100%;
 							height: 1rem;
 							background-color: var(--prpl-color-gray-1);
-							border-radius: 0.5rem;
+							border-radius: var(--prpl-border-radius);
 							position: relative;"
 					>
 						<div
@@ -39,16 +39,16 @@ customElements.define(
 								width: ${ progress }%;
 								height: 100%;
 								background-color: var(--prpl-color-accent-orange);
-								border-radius: 0.5rem;"
+								border-radius: var(--prpl-border-radius);"
 						></div>
 						<prpl-badge
 							badge-id="${ badgeId }"
 							style="
 								display:flex;
-								width: 5rem;
-								height: 5rem;
+								width: 7.5rem;
+								height: auto;
 								position: absolute;
-								left: calc(${ progress }% - 2.5rem);
+								left: calc(${ progress }% - 3.75rem);
 								top: -2.5rem;"
 								branding-id="${ brandingId }"
 						></prpl-badge>
@@ -140,7 +140,7 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 	if ( badgeNewPoints >= parseInt( badgeMaxPoints ) ) {
 		document
 			.querySelectorAll(
-				`.prpl-badge-row-wrapper-inner .prpl-badge prpl-badge[complete="false"][badge-id="${ badgeId }"]`
+				`.prpl-badge-row-wrapper .prpl-badge prpl-badge[complete="false"][badge-id="${ badgeId }"]`
 			)
 			?.forEach( ( badge ) => {
 				badge.setAttribute( 'complete', 'true' );
