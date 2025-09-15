@@ -73,6 +73,7 @@ class Suggested_Tasks_DB {
 			'post_title'   => $data['post_title'],
 			'post_content' => $data['description'] ?? '',
 			'menu_order'   => $data['order'] ?? 0,
+			'post_name'    => $data['task_id'],
 		];
 		switch ( $data['post_status'] ) {
 			case 'pending':
