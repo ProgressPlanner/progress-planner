@@ -69,5 +69,5 @@ jobs:
         with:
           message: |
             **Test on Playground**
-            [Test this pull request on the Playground](https://playground.wordpress.net/?blueprint-url=https%3A%2F%2Fprogressplanner.com%2Fresearch%2Fblueprint-pp.php%3Frepo%3D${{ github.repository }}%26branch%3D${{ github.head_ref }})
+            [Test this pull request on the Playground](https://playground.wordpress.net/?blueprint-url=https%3A%2F%2Fprogressplanner.com%2Fresearch%2Fblueprint-pp2.php%3Frepo%3D${{ github.repository }}%26run%3D${{ github.run_id }})
             or [download the zip](https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/${{ github.event.repository.name }}.zip)
