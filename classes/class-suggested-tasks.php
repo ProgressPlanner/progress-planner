@@ -460,10 +460,10 @@ class Suggested_Tasks {
 		$args = \wp_parse_args(
 			$args,
 			[
-				'post_status'      => 'publish',
-				'exclude_provider' => [],
-				'include_provider' => [],
-				'posts_per_page'   => 0,
+				'post_status'               => 'publish',
+				'posts_per_page'            => 0,
+				'exclude_provider_category' => [],
+				'include_provider_category' => [],
 			]
 		);
 
