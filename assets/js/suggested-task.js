@@ -595,6 +595,9 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 						itemHTML
 					);
 
+				// Trigger the grid resize event.
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+
 				return;
 			}
 
