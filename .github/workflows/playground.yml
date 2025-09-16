@@ -10,8 +10,6 @@ jobs:
       contents: read
       pull-requests: write
       actions: read
-    env:
-      LANDING_PAGE: "/wp-admin/"
 
     steps:
       - uses: actions/checkout@v4
@@ -54,6 +52,20 @@ jobs:
           # Replace the version line
           sed -i "s/Version:[[:space:]]*[0-9.]*/Version:           ${NEW_VERSION}/" "$PLUGIN_FILE"
 
+      - name: Prepare blueprint with artifact link
+        id: blueprint
+        run: |
+          set -euxo pipefail
+          ARTIFACT_URL="https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/${{ github.event.repository.name }}.zip"
+
+          # Load blueprint and replace plugin name with artifact URL
+          BLUEPRINT=$(cat .wordpress-org/blueprints/blueprint.json | sed "s/\"progress-planner\"/\"${ARTIFACT_URL}\"/g")
+
+          # Base64 encode the blueprint
+          ENCODED_BLUEPRINT=$(echo -n "$BLUEPRINT" | base64 -w 0)
+
+          echo "blueprint=$ENCODED_BLUEPRINT" >> "$GITHUB_OUTPUT"
+
       # Upload the FOLDER (not a .zip). The artifact service zips it for us,
       # keeping the top-level folder name inside the archive.
       - name: Upload plugin artifact
@@ -69,5 +81,5 @@ jobs:
         with:
           message: |
             **Test on Playground**
-            [Test this pull request on the Playground](https://playground.wordpress.net/?blueprint-url=https%3A%2F%2Fprogressplanner.com%2Fresearch%2Fblueprint-pp2.php%3Frepo%3D${{ github.repository }}%26run%3D${{ github.run_id }})
+            [Test this pull request on the Playground](https://playground.wordpress.net/?blueprint=${{ steps.blueprint.outputs.blueprint }})
             or [download the zip](https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/${{ github.event.repository.name }}.zip)
