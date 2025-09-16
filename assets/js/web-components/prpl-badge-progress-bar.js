@@ -112,10 +112,6 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 		`.prpl-previous-month-badge-progress-bar-wrapper[data-badge-id="${ badgeId }"] .prpl-previous-month-badge-progress-bar-remaining`
 	);
 
-	const remainingPointsEls = document.querySelectorAll(
-		`.prpl-previous-month-badge-progress-bar-wrapper .prpl-previous-month-badge-progress-bar-remaining`
-	);
-
 	if ( remainingPointsEl ) {
 		remainingPointsEl.textContent = remainingPointsEl.textContent.replace(
 			remainingPointsEl.getAttribute( 'data-remaining' ),
@@ -125,21 +121,6 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 			'data-remaining',
 			badgeMaxPoints - badgeNewPoints
 		);
-
-		remainingPointsEls.forEach( ( pointsEl ) => {
-			const totalPoints = pointsEl.getAttribute(
-				'data-remaining-total-points'
-			);
-			pointsEl.setAttribute(
-				'data-remaining-total-points',
-				totalPoints - pointsDiff
-			);
-
-			const numberEl = pointsEl.querySelector( '.number' );
-			if ( numberEl ) {
-				numberEl.textContent = totalPoints - pointsDiff;
-			}
-		} );
 	}
 
 	// Update the previous month badge points number.
@@ -180,4 +161,37 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 				?.remove();
 		}
 	}
+};
+
+/**
+ * Update the previous month badge counters.
+ *
+ * @param {number} pointsDiff The points difference.
+ *
+ * @return {void}
+ */
+// eslint-disable-next-line no-unused-vars
+const prplUpdatePreviousMonthBadgeCounters = ( pointsDiff ) => {
+	const remainingPointsEls = document.querySelectorAll(
+		`.prpl-previous-month-badge-progress-bar-wrapper .prpl-previous-month-badge-progress-bar-remaining`
+	);
+
+	if ( ! remainingPointsEls.length ) {
+		return;
+	}
+
+	remainingPointsEls.forEach( ( pointsEl ) => {
+		const totalPoints = pointsEl.getAttribute(
+			'data-remaining-total-points'
+		);
+		pointsEl.setAttribute(
+			'data-remaining-total-points',
+			totalPoints - pointsDiff
+		);
+
+		const numberEl = pointsEl.querySelector( '.number' );
+		if ( numberEl ) {
+			numberEl.textContent = totalPoints - pointsDiff;
+		}
+	} );
 };
