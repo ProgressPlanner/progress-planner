@@ -18,15 +18,13 @@ customElements.define(
 			super();
 
 			badgeId = badgeId || this.getAttribute( 'badge-id' );
+			const badgeName =
+				this.getAttribute( 'badge-name' ) || `${ prplL10n( 'badge' ) }`;
 			this.innerHTML = `
 				<img
-					src="${
-						progressPlannerBadge.remoteServerRootUrl
-					}/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ badgeId }"
-					alt="${ prplL10n( 'badge' ) }"
-					onerror="this.onerror=null;this.src='${
-						progressPlannerBadge.placeholderImageUrl
-					}';"
+					src="${ progressPlannerBadge.remoteServerRootUrl }/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ badgeId }"
+					alt="${ badgeName }"
+					onerror="this.onerror=null;this.src='${ progressPlannerBadge.placeholderImageUrl }';"
 				/>
 			`;
 		}

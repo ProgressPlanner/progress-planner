@@ -7,6 +7,7 @@
 
 use Progress_Planner\Badges\Monthly;
 
+$prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( new \DateTime() ) );
 ?>
 <div class="prpl-dashboard-widget">
 	<div>
@@ -19,12 +20,13 @@ use Progress_Planner\Badges\Monthly;
 			marginBottom="0"
 			data-max="<?php echo (int) Monthly::TARGET_POINTS; ?>"
 			data-value="<?php echo (float) \progress_planner()->get_admin__widgets__monthly_badges()->get_score()['target_score']; ?>"
-			data-badge-id="<?php echo \esc_attr( Monthly::get_badge_id_from_date( new \DateTime() ) ); ?>"
+			data-badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
 		>
 			<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) \progress_planner()->get_admin__widgets__monthly_badges()->get_score()['target_score']; ?>">
 				<prpl-badge
 					complete="true"
-					badge-id="<?php echo \esc_attr( Monthly::get_badge_id_from_date( new \DateTime() ) ); ?>"
+					badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+					badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
 				></prpl-badge>
 			</progress>
 		</prpl-gauge>
