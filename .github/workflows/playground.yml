@@ -38,7 +38,21 @@ jobs:
               --exclude="${STAGE}" \
               ./ "$STAGE/$REPO/"
             echo "PKG_DIR=$STAGE/$REPO" >> "$GITHUB_OUTPUT"
+
           fi
+
+      - name: Update plugin version with PR number
+        run: |
+          set -euxo pipefail
+          PLUGIN_FILE="${{ steps.prep.outputs.PKG_DIR }}/${{ github.event.repository.name }}.php"
+          PR_NUMBER="${{ github.event.number }}"
+
+          # Extract current version and add PR number
+          CURRENT_VERSION=$(grep -o "Version:[[:space:]]*[0-9.]*" "$PLUGIN_FILE" | sed 's/Version:[[:space:]]*//')
+          NEW_VERSION="${CURRENT_VERSION} - PR ${PR_NUMBER}"
+
+          # Replace the version line
+          sed -i "s/Version:[[:space:]]*[0-9.]*/Version:           ${NEW_VERSION}/" "$PLUGIN_FILE"
 
       # Upload the FOLDER (not a .zip). The artifact service zips it for us,
       # keeping the top-level folder name inside the archive.
