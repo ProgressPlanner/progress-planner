@@ -58,13 +58,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	protected const DATA_COLLECTOR_CLASS = Yoast_Orphaned_Content::class;
 
 	/**
-	 * The external link URL.
-	 *
-	 * @var string
-	 */
-	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/fix-orphaned-content';
-
-	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -237,7 +230,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_tools#/fix-orphaned-content' ) . '" target="_self">' . \esc_html__( 'Add internal links', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="https://prpl.fyi/fix-orphaned-content" target="_blank">' . \esc_html__( 'Learn more about internal linking', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;
