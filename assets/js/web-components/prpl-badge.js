@@ -13,13 +13,14 @@
 customElements.define(
 	'prpl-badge',
 	class extends HTMLElement {
-		constructor( badgeId ) {
+		constructor( badgeId, badgeName ) {
 			// Get parent class properties
 			super();
 
 			badgeId = badgeId || this.getAttribute( 'badge-id' );
-			const badgeName =
-				this.getAttribute( 'badge-name' ) || `${ prplL10n( 'badge' ) }`;
+			badgeName = badgeName || this.getAttribute( 'badge-name' );
+			badgeName = badgeName || `${ prplL10n( 'badge' ) }`;
+
 			this.innerHTML = `
 				<img
 					src="${ progressPlannerBadge.remoteServerRootUrl }/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ badgeId }"
