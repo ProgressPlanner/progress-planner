@@ -61,9 +61,9 @@ jobs:
           # Use Node.js to parse, modify, and stringify the JSON
           BLUEPRINT=$(node -e "
             const fs = require('fs');
-            const blueprint = JSON.parse(fs.readFileSync('.wordpress-org/blueprints/blueprint.json', 'utf8'));
+            const blueprint = JSON.parse(fs.readFileSync('.wordpress-org/blueprints/playground.json', 'utf8'));
             blueprint.plugins = blueprint.plugins.map(plugin =>
-              plugin === 'progress-planner' ? '$ARTIFACT_URL' : plugin
+              plugin === '${{ github.repository }}' ? '$ARTIFACT_URL' : plugin
             );
             console.log(JSON.stringify(blueprint));
           ")
