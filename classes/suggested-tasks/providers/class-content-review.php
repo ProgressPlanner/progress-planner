@@ -571,10 +571,19 @@ class Content_Review extends Tasks {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
-			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'post.php?action=edit&post=' . $data['id'] ) . '" target="_self">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
-		];
+		$task_post = \progress_planner()->get_suggested_tasks_db()->get_post( $data['id'] );
+		if ( ! $task_post ) {
+			return $actions;
+		}
+
+		$task_data = $task_post->get_data();
+
+		if ( isset( $task_data['target_post_id'] ) ) {
+			$actions[] = [
+				'priority' => 10,
+				'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'post.php?action=edit&post=' . $task_data['target_post_id'] ) . '" target="_self">' . \esc_html__( 'Review', 'progress-planner' ) . '</a>',
+			];
+		}
 
 		return $actions;
 	}
