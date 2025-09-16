@@ -63,7 +63,7 @@ jobs:
             const fs = require('fs');
             const blueprint = JSON.parse(fs.readFileSync('.wordpress-org/blueprints/playground.json', 'utf8'));
             blueprint.plugins = blueprint.plugins.map(plugin =>
-              plugin === '${{ github.repository }}' ? '$ARTIFACT_URL' : plugin
+              plugin === '${{ github.event.repository.name }}' ? '$ARTIFACT_URL' : plugin
             );
             console.log(JSON.stringify(blueprint));
           ")
