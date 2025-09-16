@@ -19,7 +19,10 @@ customElements.define(
 
 			badgeId = badgeId || this.getAttribute( 'badge-id' );
 			badgeName = badgeName || this.getAttribute( 'badge-name' );
-			badgeName = badgeName || `${ prplL10n( 'badge' ) }`;
+
+			if ( ! badgeName || 'null' === badgeName ) {
+				badgeName = `${ prplL10n( 'badge' ) }`;
+			}
 
 			this.innerHTML = `
 				<img
