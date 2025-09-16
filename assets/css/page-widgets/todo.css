@@ -126,6 +126,11 @@
 		h3 {
 			margin-bottom: 0;
 		}
+
+		/* Override the default position of the move buttons. */
+		.prpl-move-buttons-wrapper {
+			left: calc(-5px - 0.5rem);
+		}
 	}
 
 	#create-todo-item {
