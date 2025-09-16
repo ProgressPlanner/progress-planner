@@ -104,6 +104,7 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 		max: gaugeElement.getAttribute( 'data-max' ),
 		value: gaugeElement.getAttribute( 'data-value' ),
 		badgeId: gaugeElement.getAttribute( 'data-badge-id' ),
+		badgeName: gaugeElement.getAttribute( 'data-badge-name' ),
 	};
 
 	if ( ! gaugeProps ) {
@@ -130,7 +131,7 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 				'var(--prpl-padding) var(--prpl-padding) calc(var(--prpl-padding) * 2) var(--prpl-padding)',
 			marginBottom: 'var(--prpl-padding)',
 		},
-		`<prpl-badge complete="true" badge-id="${ gaugeProps.badgeId }"></prpl-badge>`
+		`<prpl-badge complete="true" badge-id="${ gaugeProps.badgeId }" badge-name="${ gaugeProps.badgeName }"></prpl-badge>`
 	);
 	gauge.id = gaugeProps.id;
 	gauge.setAttribute( 'background', gaugeProps.background );
