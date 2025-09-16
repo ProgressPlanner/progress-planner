@@ -58,8 +58,15 @@ jobs:
           set -euxo pipefail
           ARTIFACT_URL="https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/${{ github.event.repository.name }}.zip"
 
-          # Load blueprint and replace plugin name with artifact URL using | as delimiter
-          BLUEPRINT=$(cat .wordpress-org/blueprints/blueprint.json | sed "s|\"progress-planner\"|\"${ARTIFACT_URL}\"|g")
+          # Use Node.js to parse, modify, and stringify the JSON
+          BLUEPRINT=$(node -e "
+            const fs = require('fs');
+            const blueprint = JSON.parse(fs.readFileSync('.wordpress-org/blueprints/blueprint.json', 'utf8'));
+            blueprint.plugins = blueprint.plugins.map(plugin =>
+              plugin === 'progress-planner' ? '$ARTIFACT_URL' : plugin
+            );
+            console.log(JSON.stringify(blueprint));
+          ")
 
           # Base64 encode the blueprint
           ENCODED_BLUEPRINT=$(echo -n "$BLUEPRINT" | base64 -w 0)
@@ -81,5 +88,5 @@ jobs:
         with:
           message: |
             **Test on Playground**
-            [Test this pull request on the Playground](https://playground.wordpress.net/?blueprint=${{ steps.blueprint.outputs.blueprint }})
+            [Test this pull request on the Playground](https://playground.wordpress.net/#${{ steps.blueprint.outputs.blueprint }})
             or [download the zip](https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/${{ github.event.repository.name }}.zip)
