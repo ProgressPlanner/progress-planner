@@ -476,12 +476,12 @@ class Suggested_Tasks {
 		// Get the tasks for each category.
 		foreach ( $max_items_per_category as $category_slug => $max_items ) {
 			// Skip excluded providers.
-			if ( ! empty( $args['exclude_provider'] ) && \in_array( $category_slug, $args['exclude_provider'], true ) ) {
+			if ( ! empty( $args['exclude_provider_category'] ) && \in_array( $category_slug, $args['exclude_provider_category'], true ) ) {
 				continue;
 			}
 
 			// Skip not included providers.
-			if ( ! empty( $args['include_provider'] ) && ! \in_array( $category_slug, $args['include_provider'], true ) ) {
+			if ( ! empty( $args['include_provider_category'] ) && ! \in_array( $category_slug, $args['include_provider_category'], true ) ) {
 				continue;
 			}
 
