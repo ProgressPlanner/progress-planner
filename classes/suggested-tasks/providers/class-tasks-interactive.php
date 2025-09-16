@@ -124,9 +124,11 @@ abstract class Tasks_Interactive extends Tasks {
 				'/views/popovers/interactive-task.php',
 			],
 			[
-				'prpl_task_object' => $this,
-				'prpl_popover_id'  => static::POPOVER_ID,
-				'prpl_provider_id' => $this->get_provider_id(),
+				'prpl_task_object'       => $this,
+				'prpl_popover_id'        => static::POPOVER_ID,
+				'prpl_external_link_url' => $this->get_external_link_url(),
+				'prpl_provider_id'       => $this->get_provider_id(),
+				'prpl_task_actions'      => $this->get_task_actions(),
 			]
 		);
 	}
@@ -137,7 +139,12 @@ abstract class Tasks_Interactive extends Tasks {
 	 * @return void
 	 */
 	public function print_popover_instructions() {
-		echo '<p>' . \wp_kses_post( $this->get_description() ) . '</p>';
+		$description = $this->get_description();
+		if ( empty( $description ) ) {
+			return;
+		}
+
+		echo '<p>' . \wp_kses_post( $description ) . '</p>';
 	}
 
 	/**

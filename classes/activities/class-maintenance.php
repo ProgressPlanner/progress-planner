@@ -50,11 +50,10 @@ class Maintenance extends Activity {
 				'type'       => $this->type,
 				'data_id'    => $this->data_id,
 				'start_date' => $this->date,
-			],
-			'RAW'
+			]
 		);
 		if ( ! empty( $existing ) ) {
-			\progress_planner()->get_activities__query()->update_activity( $existing[0]->id, $this );
+			\progress_planner()->get_activities__query()->update_activity( $existing[0]->id, $this ); // @phpstan-ignore-line property.nonObject
 			return;
 		}
 		\progress_planner()->get_activities__query()->insert_activity( $this );

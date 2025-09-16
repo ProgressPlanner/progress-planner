@@ -3,7 +3,7 @@
 	grid-template-columns: 1fr;
 
 	min-width: 0;
-	gap: 10px;
+	gap: 0.5rem;
 
 	> * {
 		align-self: center;
@@ -25,7 +25,65 @@
 	}
 }
 
+.prpl-previous-month-badge-progress-bars-wrapper {
+
+	h3 {
+		margin-bottom: 6px;
+	}
+
+	.prpl-previous-month-badge-progress-bars-wrapper-description {
+		margin-top: 0;
+		margin-bottom: 1.25rem;
+	}
+
+	.prpl-previous-month-badge-progress-bar-wrapper:last-of-type {
+		padding-bottom: 0 !important; /* override inline style */
+	}
+
+	/* Single progress bar wrapper */
+	.prpl-previous-month-badge-progress-bar-wrapper {
+
+		.prpl-widget-content-points {
+			justify-content: flex-start !important;
+			gap: 1rem;
+		}
+
+		.prpl-widget-previous-ravi-points-number {
+			font-size: var(--prpl-font-size-3xl);
+			font-weight: 600;
+		}
+	}
+}
+
+
 prpl-badge {
 	width: 100%;
 	margin-bottom: 1rem;
+
+	& > img {
+		vertical-align: bottom;
+	}
+
+	/* This applies only to the monthly badges. */
+	.prpl-previous-month-badge-progress-bars-wrapper &,
+	.prpl-badge[data-monthly-is-missed="true"] &[complete="false"] {
+		position: relative;
+
+		&::after {
+			content: "!";
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			width: 20px;
+			height: 20px;
+			background-color: var(--prpl-color-accent-red);
+			border: 2px solid #fff;
+			border-radius: 50%;
+			position: absolute;
+			top: 10%;
+			right: 25%;
+			color: #fff;
+
+		}
+	}
 }

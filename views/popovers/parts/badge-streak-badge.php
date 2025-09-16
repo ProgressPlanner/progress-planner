@@ -20,6 +20,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<prpl-badge
 				complete="<?php echo 100 === (int) $prpl_badge_progress['progress'] ? 'true' : 'false'; ?>"
 				badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+				badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
 			></prpl-badge>
 			<?php echo \esc_html( $prpl_badge->get_name() ); ?>
 		</div>

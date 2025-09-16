@@ -34,6 +34,13 @@ class Blog_Description extends Tasks_Interactive {
 	const POPOVER_ID = 'core-blogdescription';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-tagline';
+
+	/**
 	 * Get the task title.
 	 *
 	 * @return string
@@ -48,11 +55,7 @@ class Blog_Description extends Tasks_Interactive {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %s:<a href="https://prpl.fyi/set-tagline" target="_blank">tagline</a> link */
-			\esc_html__( 'Set the %s to make your website look more professional.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/set-tagline" target="_blank">' . \esc_html__( 'tagline', 'progress-planner' ) . '</a>'
-		);
+		return \esc_html__( 'Set the tagline to make your website look more professional.', 'progress-planner' );
 	}
 
 	/**
@@ -118,5 +121,22 @@ class Blog_Description extends Tasks_Interactive {
 			<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
 		</button>
 		<?php
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Set tagline', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

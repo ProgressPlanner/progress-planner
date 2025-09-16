@@ -288,46 +288,26 @@ class Suggested_Tasks {
 		);
 
 		$rest_meta_fields = [
-			'prpl_points'      => [
+			'prpl_points'  => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_task_id'     => [
+			'prpl_task_id' => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_url'         => [
+			'prpl_url'     => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_url_target'  => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'prpl_dismissable' => [
-				'type'         => 'boolean',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'prpl_snoozable'   => [
-				'type'         => 'boolean',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'menu_order'       => [
+			'menu_order'   => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
 				'default'      => 0,
-			],
-			'prpl_popover_id'  => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
 			],
 		];
 
@@ -440,15 +420,30 @@ class Suggested_Tasks {
 	 */
 	public function rest_prepare_recommendation( $response, $post ) {
 		$provider_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_provider' );
+		if ( ! isset( $response->data['meta'] ) ) {
+			$response->data['meta'] = [];
+		}
+		$provider = false;
 		if ( $provider_term && ! \is_wp_error( $provider_term ) ) {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
+		}
 
-			if ( $provider ) {
-				// Link should be added during run time, since it is not added for users without required capability.
-				$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
+		if ( $provider ) {
+			$response->data['prpl_provider'] = $provider_term[0];
+			// Link should be added during run time, since it is not added for users without required capability.
+			$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
 				? \esc_url( (string) $response->data['meta']['prpl_url'] )
 				: '';
-			}
+
+			$response->data['prpl_popover_id'] = $provider->get_popover_id();
+
+			// This has to be the last item to be added because actions use data from previous items.
+			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
+		}
+
+		$category_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_category' );
+		if ( $category_term && ! \is_wp_error( $category_term ) ) {
+			$response->data['prpl_category'] = $category_term[0];
 		}
 
 		return $response;

@@ -82,19 +82,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Yoast SEO detected that this article has no links pointing to it. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/fix-orphaned-content" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the fixing the orphaned content.', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
-	}
-
-	/**
 	 * Get the URL.
 	 *
 	 * @param array $task_data The task data.
@@ -134,12 +121,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 
 		$linked_count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
-				"
-			SELECT COUNT(*)
-			FROM {$wpdb->prefix}yoast_seo_links
-			WHERE target_post_id = %d
-			AND type = 'internal'
-			",
+				"SELECT COUNT(*) FROM {$wpdb->prefix}yoast_seo_links WHERE target_post_id = %d AND type = 'internal'", // @phpstan-ignore-line property.nonObject
 				$post->ID
 			)
 		);
@@ -235,5 +217,22 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 */
 	public function exclude_completed_posts( $exclude_post_ids ) {
 		return \array_merge( $exclude_post_ids, $this->get_completed_post_ids() );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="https://prpl.fyi/fix-orphaned-content" target="_blank">' . \esc_html__( 'Learn more about internal linking', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

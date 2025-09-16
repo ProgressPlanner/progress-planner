@@ -36,6 +36,13 @@ class Archive_Format extends Yoast_Provider {
 	protected const DATA_COLLECTOR_CLASS = Archive_Format_Data_Collector::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/yoast-format-archive';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -51,19 +58,6 @@ class Archive_Format extends Yoast_Provider {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: disable the format archives', 'progress-planner' );
-	}
-
-	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'WordPress creates an archive for each post format. This is not useful and can be disabled in the Yoast SEO settings. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-format-archive" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Format Archive', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
 	}
 
 	/**
@@ -92,7 +86,7 @@ class Archive_Format extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		return $this->is_task_relevant()
-			&& \YoastSEO()->helpers->options->get( 'disable-post_format' ) !== true;
+			&& \YoastSEO()->helpers->options->get( 'disable-post_format' ) !== true; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**
@@ -105,5 +99,22 @@ class Archive_Format extends Yoast_Provider {
 	public function is_task_relevant() {
 		// If there are more than X posts with a post format, we don't need to add the task. X is set in the class.
 		return $this->get_data_collector()->collect() <= static::MINIMUM_POSTS_WITH_FORMAT;
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/format-archives' ) . '" target="_self">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

@@ -41,6 +41,13 @@ class Email_Sending extends Tasks_Interactive {
 	const POPOVER_ID = 'sending-email';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/check-if-your-websites-email-system-works';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -118,7 +125,7 @@ class Email_Sending extends Tasks_Interactive {
 		$this->email_subject = \esc_html__( 'Your Progress Planner test message!', 'progress-planner' );
 		$this->email_content = \sprintf(
 			// translators: %1$s the admin URL.
-			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_blank">Click here to mark Ravi\'s Recommendation as completed</a>.', 'progress-planner' ),
+			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_self">Click here to mark Ravi\'s Recommendation as completed</a>.', 'progress-planner' ),
 			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() )
 		);
 	}
@@ -209,7 +216,7 @@ class Email_Sending extends Tasks_Interactive {
 	public function check_if_wp_mail_is_filtered() {
 		global $wp_filter;
 		foreach ( [ 'phpmailer_init', 'pre_wp_mail' ] as $filter ) {
-			$has_filter                = isset( $wp_filter[ $filter ] ) && ! empty( $wp_filter[ $filter ]->callbacks ) ? true : false;
+			$has_filter                = isset( $wp_filter[ $filter ] ) && ! empty( $wp_filter[ $filter ]->callbacks ) ? true : false; // @phpstan-ignore-line property.nonObject
 			$this->is_wp_mail_filtered = $this->is_wp_mail_filtered || $has_filter;
 		}
 	}
@@ -283,11 +290,13 @@ class Email_Sending extends Tasks_Interactive {
 			'popovers/email-sending.php',
 			[
 				'prpl_popover_id'                      => static::POPOVER_ID,
+				'prpl_external_link_url'               => $this->get_external_link_url(),
 				'prpl_provider_id'                     => $this->get_provider_id(),
 				'prpl_email_subject'                   => $this->email_subject,
 				'prpl_email_error'                     => $this->email_error,
 				'prpl_troubleshooting_guide_url'       => $this->troubleshooting_guide_url,
 				'prpl_is_there_sending_email_override' => $this->is_there_sending_email_override(),
+				'prpl_task_actions'                    => $this->get_task_actions(),
 			]
 		);
 	}
@@ -299,5 +308,22 @@ class Email_Sending extends Tasks_Interactive {
 	 */
 	public function print_popover_form_contents() {
 		// The form is handled in the popovers/email-sending view.
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Test email sending', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }
