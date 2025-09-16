@@ -1,4 +1,4 @@
-/* global customElements, HTMLElement, prplUpdatePreviousMonthBadgeProgressBar */
+/* global customElements, HTMLElement, prplUpdatePreviousMonthBadgeProgressBar, prplUpdatePreviousMonthBadgeCounters */
 /*
  * Web Component: prpl-gauge
  *
@@ -151,6 +151,9 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 	if ( oldCounter ) {
 		oldCounter.textContent = newValue + 'pt';
 	}
+
+	// Update the previous month badge counters.
+	prplUpdatePreviousMonthBadgeCounters( pointsDiff );
 
 	// Mark badge as completed, in the a Monthly badges widgets, if we reached the max points.
 	if ( newValue >= parseInt( gaugeProps.max ) ) {
