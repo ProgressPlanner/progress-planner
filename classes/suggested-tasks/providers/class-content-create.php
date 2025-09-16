@@ -130,7 +130,7 @@ class Content_Create extends Tasks {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'post-new.php' ) . '" target="_blank">' . \esc_html__( 'Create new post', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'post-new.php' ) . '" target="_self">' . \esc_html__( 'Create new post', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

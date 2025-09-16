@@ -545,6 +545,7 @@ prplSuggestedTask = {
 		if ( event.key === 'Enter' ) {
 			event.preventDefault();
 			event.stopPropagation();
+			event.target.blur();
 			return false;
 		}
 	},
@@ -593,6 +594,9 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 						event.detail.insertPosition,
 						itemHTML
 					);
+
+				// Trigger the grid resize event.
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 
 				return;
 			}

@@ -162,3 +162,36 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 		}
 	}
 };
+
+/**
+ * Update the previous month badge counters.
+ *
+ * @param {number} pointsDiff The points difference.
+ *
+ * @return {void}
+ */
+// eslint-disable-next-line no-unused-vars
+const prplUpdatePreviousMonthBadgeCounters = ( pointsDiff ) => {
+	const remainingPointsEls = document.querySelectorAll(
+		`.prpl-previous-month-badge-progress-bar-wrapper .prpl-previous-month-badge-progress-bar-remaining`
+	);
+
+	if ( ! remainingPointsEls.length ) {
+		return;
+	}
+
+	remainingPointsEls.forEach( ( pointsEl ) => {
+		const totalPoints = pointsEl.getAttribute(
+			'data-remaining-total-points'
+		);
+		pointsEl.setAttribute(
+			'data-remaining-total-points',
+			totalPoints - pointsDiff
+		);
+
+		const numberEl = pointsEl.querySelector( '.number' );
+		if ( numberEl ) {
+			numberEl.textContent = totalPoints - pointsDiff;
+		}
+	} );
+};
