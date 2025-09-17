@@ -54,6 +54,9 @@ function onboardingTests( testContext = test ) {
 					timeout: 10000,
 				} );
 
+				// Output page source code.
+				console.log( await page.content() );
+
 				// Verify onboarding completion by checking for expected elements
 				await expect(
 					page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
