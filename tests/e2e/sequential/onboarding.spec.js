@@ -8,6 +8,17 @@ function onboardingTests( testContext = test ) {
 		testContext(
 			'should complete onboarding process successfully',
 			async ( { page } ) => {
+				// Listen for console messages
+				page.on( 'console', ( msg ) => {
+					console.log(
+						`Browser console [${ msg.type() }]: ${ msg.text() }`
+					);
+				} );
+
+				// Listen for page errors
+				page.on( 'pageerror', ( error ) => {
+					console.log( `Page error: ${ error.message }` );
+				} );
 				// Navigate to Progress Planner page
 				await page.goto( '/wp-admin/admin.php?page=progress-planner' );
 				await page.waitForLoadState( 'networkidle' );
