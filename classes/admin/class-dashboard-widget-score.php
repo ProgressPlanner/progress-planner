@@ -85,7 +85,7 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 		$result = [
 			'progress'   => $progress,
 			'badge'      => $badge,
-			'color'      => 'var(--prpl-color-accent-red)',
+			'color'      => 'var(--prpl-graph-color-1)',
 			'background' => $badge->get_background(),
 		];
 

@@ -257,7 +257,7 @@
 	.prpl-settings-section-title {
 
 		svg {
-			color: var(--prpl-color-accent-red);
+			color: var(--prpl-graph-color-1);
 		}
 
 		background-color: var(--prpl-background-red);

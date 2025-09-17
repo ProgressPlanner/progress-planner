@@ -253,7 +253,7 @@
 				text-decoration: underline;
 
 				svg path {
-					fill: var(--prpl-color-accent-red);
+					fill: var(--prpl-graph-color-1);
 				}
 			}
 
@@ -291,7 +291,7 @@
 			&:hover {
 
 				svg path {
-					fill: var(--prpl-color-accent-red);
+					fill: var(--prpl-graph-color-1);
 				}
 			}
 		}
