@@ -19,19 +19,6 @@ function onboardingTests( testContext = test ) {
 				page.on( 'pageerror', ( error ) => {
 					console.log( `Page error: ${ error.message }` );
 				} );
-
-				// Listen for network requests
-				page.on( 'request', ( request ) => {
-					console.log(
-						`Request: ${ request.method() } ${ request.url() }`
-					);
-				} );
-
-				page.on( 'response', ( response ) => {
-					console.log(
-						`Response: ${ response.status() } ${ response.url() }`
-					);
-				} );
 				// Navigate to Progress Planner page
 				await page.goto( '/wp-admin/admin.php?page=progress-planner' );
 				await page.waitForLoadState( 'networkidle' );
@@ -73,31 +60,12 @@ function onboardingTests( testContext = test ) {
 					)
 					.click();
 
-				// Wait for navigation to complete
-				console.log(
-					'Waiting for navigation after form submission...'
-				);
+				// Here the page should redirect to the Progress Planner Dashboard page.
+				await page.waitForLoadState( 'networkidle', {
+					timeout: 10000,
+				} );
 
-				try {
-					// Wait for the navigation to complete with a longer timeout
-					await page.waitForLoadState( 'networkidle', {
-						timeout: 30000,
-					} );
-					console.log( 'Navigation completed successfully' );
-				} catch ( error ) {
-					console.log( `Navigation timeout: ${ error.message }` );
-					console.log( `Current URL: ${ page.url() }` );
-
-					// Try to wait for DOM content loaded instead
-					await page.waitForLoadState( 'domcontentloaded', {
-						timeout: 10000,
-					} );
-					console.log( 'DOM content loaded, continuing...' );
-				}
-
-				// Output current URL and page source code
-				console.log( `Current URL after navigation: ${ page.url() }` );
-				console.log( 'Page content:' );
+				// Output page source code.
 				console.log( await page.content() );
 
 				// Verify onboarding completion by checking for expected elements
