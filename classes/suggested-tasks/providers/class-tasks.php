@@ -67,6 +67,13 @@ abstract class Tasks implements Tasks_Interface {
 	protected const EXTERNAL_LINK_URL = '';
 
 	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	protected const POPOVER_ID = '';
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -178,6 +185,15 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function get_parent() {
 		return $this->parent;
+	}
+
+	/**
+	 * Get the popover ID.
+	 *
+	 * @return string
+	 */
+	public function get_popover_id() {
+		return static::POPOVER_ID;
 	}
 
 	/**
@@ -610,14 +626,14 @@ abstract class Tasks implements Tasks_Interface {
 			return $actions;
 		}
 
-		if ( $this->is_dismissable() && 'user' !== static::PROVIDER_ID ) {
+		if ( $this->capability_required() && $this->is_dismissable() && 'user' !== static::PROVIDER_ID ) {
 			$actions[] = [
 				'priority' => 20,
 				'html'     => '<button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="complete" data-target="complete" title="' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '" onclick="prplSuggestedTask.maybeComplete(' . (int) $data['id'] . ');"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span></button>',
 			];
 		}
 
-		if ( $this->is_snoozable() ) {
+		if ( $this->capability_required() && $this->is_snoozable() ) {
 			$snooze_html  = '<prpl-tooltip class="prpl-suggested-task-snooze"><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="snooze" data-target="snooze" title="' . \esc_attr__( 'Snooze', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span></button></slot><slot name="content">';
 			$snooze_html .= '<fieldset><legend><span>' . \esc_html__( 'Snooze this task?', 'progress-planner' ) . '</span><button type="button" class="prpl-toggle-radio-group" onclick="this.closest(\'.prpl-suggested-task-snooze\').classList.toggle(\'prpl-toggle-radio-group-open\');"><span class="prpl-toggle-radio-group-text">' . \esc_html__( 'How long?', 'progress-planner' ) . '</span><span class="prpl-toggle-radio-group-arrow">&rsaquo;</span></button></legend><div class="prpl-snooze-duration-radio-group">';
 			foreach (
@@ -650,11 +666,14 @@ abstract class Tasks implements Tasks_Interface {
 			];
 		}
 
-		$actions = $this->add_task_actions( $data, $actions );
-		foreach ( $actions as $key => $action ) {
-			$actions[ $key ]['priority'] = $action['priority'] ?? 1000;
-			if ( ! isset( $action['html'] ) || '' === $action['html'] ) {
-				unset( $actions[ $key ] );
+		// Add action links only if the user has the capability to perform the task.
+		if ( $this->capability_required() ) {
+			$actions = $this->add_task_actions( $data, $actions );
+			foreach ( $actions as $key => $action ) {
+				$actions[ $key ]['priority'] = $action['priority'] ?? 1000;
+				if ( ! isset( $action['html'] ) || '' === $action['html'] ) {
+					unset( $actions[ $key ] );
+				}
 			}
 		}
 

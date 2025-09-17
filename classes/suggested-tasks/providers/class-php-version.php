@@ -50,21 +50,6 @@ class Php_Version extends Tasks {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @param array $task_data Optional data to include in the task.
-	 * @return string
-	 */
-	protected function get_description( $task_data = [] ) {
-		return \sprintf(
-			/* translators: %1$s: php version, %2$s: minimum PHP version recommended. */
-			\esc_html__( 'Your site is running on PHP version %1$s. We recommend updating to PHP version %2$s or higher.', 'progress-planner' ),
-			\phpversion(),
-			\esc_html( self::RECOMMENDED_PHP_VERSION )
-		);
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool

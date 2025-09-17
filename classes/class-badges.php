@@ -117,8 +117,7 @@ class Badges {
 				'category' => 'suggested_task',
 				'type'     => 'completed',
 				'data_id'  => (string) $activity_id,
-			],
-			'ACTIVITIES'
+			]
 		);
 
 		if ( empty( $activities ) ) {

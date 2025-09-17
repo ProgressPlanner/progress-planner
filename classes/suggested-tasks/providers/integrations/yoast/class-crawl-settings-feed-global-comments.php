@@ -45,15 +45,6 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Remove URLs which provide an overview of recent comments on your site.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array
@@ -100,7 +91,7 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_global_comments' ) . '" target="_blank">' . \esc_html__( 'Remove', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_global_comments' ) . '" target="_self">' . \esc_html__( 'Remove', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

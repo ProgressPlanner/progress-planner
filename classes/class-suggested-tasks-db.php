@@ -175,8 +175,6 @@ class Suggested_Tasks_DB {
 			switch ( $key ) {
 				case 'points':
 				case 'prpl_points':
-				case 'prpl_popover_id':
-				case 'prpl_external_link_url':
 					$update_meta[ 'prpl_' . \str_replace( 'prpl_', '', (string) $key ) ] = $value;
 					break;
 
@@ -203,7 +201,7 @@ class Suggested_Tasks_DB {
 
 		if ( ! empty( $update_terms ) ) {
 			foreach ( $update_terms as $taxonomy => $term ) {
-				$update_results[] = (bool) \wp_set_object_terms( $id, $term->slug, $taxonomy );
+				$update_results[] = (bool) \wp_set_object_terms( $id, $term->slug, $taxonomy ); // @phpstan-ignore-line property.nonObject
 			}
 		}
 

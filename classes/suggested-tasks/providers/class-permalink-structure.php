@@ -79,15 +79,6 @@ class Permalink_Structure extends Tasks {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'On install, WordPress sets the permalink structure to a format that is not SEO-friendly. We recommend changing it.', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task condition is satisfied.
 	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *

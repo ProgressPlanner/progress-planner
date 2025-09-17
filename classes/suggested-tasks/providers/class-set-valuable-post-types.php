@@ -79,15 +79,6 @@ class Set_Valuable_Post_Types extends Tasks {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Tell us which post types matter most for your site. Go to your settings and select your valuable content types.', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task should be added.
 	 * We add tasks only to users who have have completed "Fill the settings page" task
 	 * and have upgraded from v1.2 or have 'include_post_types' option empty.

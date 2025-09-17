@@ -58,13 +58,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	protected const DATA_COLLECTOR_CLASS = Yoast_Orphaned_Content::class;
 
 	/**
-	 * The external link URL.
-	 *
-	 * @var string
-	 */
-	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/fix-orphaned-content';
-
-	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -86,15 +79,6 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 			\esc_html__( 'Yoast SEO: add internal links to article "%s"!', 'progress-planner' ),
 			\esc_html( $task_data['target_post_title'] )
 		);
-	}
-
-	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Yoast SEO detected that this article has no links pointing to it.', 'progress-planner' );
 	}
 
 	/**
@@ -137,12 +121,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 
 		$linked_count = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 			$wpdb->prepare(
-				"
-			SELECT COUNT(*)
-			FROM {$wpdb->prefix}yoast_seo_links
-			WHERE target_post_id = %d
-			AND type = 'internal'
-			",
+				"SELECT COUNT(*) FROM {$wpdb->prefix}yoast_seo_links WHERE target_post_id = %d AND type = 'internal'", // @phpstan-ignore-line property.nonObject
 				$post->ID
 			)
 		);
@@ -251,7 +230,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_tools#/fix-orphaned-content' ) . '" target="_blank">' . \esc_html__( 'Add internal links', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="https://prpl.fyi/fix-orphaned-content" target="_blank">' . \esc_html__( 'Learn more about internal linking', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

@@ -13,20 +13,22 @@
 customElements.define(
 	'prpl-badge',
 	class extends HTMLElement {
-		constructor( badgeId ) {
+		constructor( badgeId, badgeName ) {
 			// Get parent class properties
 			super();
 
 			badgeId = badgeId || this.getAttribute( 'badge-id' );
+			badgeName = badgeName || this.getAttribute( 'badge-name' );
+
+			if ( ! badgeName || 'null' === badgeName ) {
+				badgeName = `${ prplL10n( 'badge' ) }`;
+			}
+
 			this.innerHTML = `
 				<img
-					src="${
-						progressPlannerBadge.remoteServerRootUrl
-					}/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ badgeId }"
-					alt="${ prplL10n( 'badge' ) }"
-					onerror="this.onerror=null;this.src='${
-						progressPlannerBadge.placeholderImageUrl
-					}';"
+					src="${ progressPlannerBadge.remoteServerRootUrl }/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ badgeId }"
+					alt="${ badgeName }"
+					onerror="this.onerror=null;this.src='${ progressPlannerBadge.placeholderImageUrl }';"
 				/>
 			`;
 		}

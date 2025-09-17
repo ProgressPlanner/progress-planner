@@ -114,20 +114,6 @@ class Fewer_Tags extends Tasks {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			// translators: %1$s is the number of tags, %2$s is the number of published posts.
-			\esc_html__( 'We detected that you have %1$s tags and %2$s published posts. Consider installing the "Fewer Tags" plugin.', 'progress-planner' ),
-			$this->post_tag_count_data_collector->collect(),
-			$this->published_post_count_data_collector->collect(),
-		);
-	}
-
-	/**
 	 * Check if the task condition is satisfied.
 	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *

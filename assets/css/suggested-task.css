@@ -2,7 +2,7 @@
 	margin: 0;
 	padding: 0.75rem 0.5rem 0.625rem 0.5rem;
 	display: grid;
-	grid-template-columns: 1.5rem 1fr 2rem;
+	grid-template-columns: 1.5rem 1fr 3.5rem;
 	gap: 0.25rem 0.5rem;
 	position: relative;
 	line-height: 1;
@@ -80,6 +80,7 @@
 		display: flex;
 		gap: 0.5rem;
 		align-items: center;
+		justify-content: flex-end;
 		grid-row-end: span 2;
 	}
 
@@ -141,6 +142,17 @@
 				&:focus,
 				&:active {
 					text-decoration: underline;
+				}
+			}
+
+			/* Close and toggle radio group buttons should not have a text decoration. */
+			.prpl-tooltip-close,
+			.prpl-toggle-radio-group {
+
+				&:hover,
+				&:focus,
+				&:active {
+					text-decoration: none;
 				}
 			}
 

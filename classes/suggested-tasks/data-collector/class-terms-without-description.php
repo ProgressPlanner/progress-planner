@@ -120,8 +120,7 @@ class Terms_Without_Description extends Base_Data_Collector {
 		$result = [];
 
 		foreach ( $public_taxonomies as $taxonomy ) {
-			$query = "
-				SELECT t.term_id, t.name, tt.count, tt.taxonomy
+			$query = "SELECT t.term_id, t.name, tt.count, tt.taxonomy
 				FROM {$wpdb->terms} AS t
 				INNER JOIN {$wpdb->term_taxonomy} AS tt ON t.term_id = tt.term_id
 				WHERE tt.taxonomy = %s

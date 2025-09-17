@@ -105,6 +105,13 @@ interface Tasks_Interface {
 	public function get_task_actions( $data = [] );
 
 	/**
+	 * Get the popover ID.
+	 *
+	 * @return string
+	 */
+	public function get_popover_id();
+
+	/**
 	 * Add task actions specific to this task.
 	 *
 	 * @param array $data    The task data.
