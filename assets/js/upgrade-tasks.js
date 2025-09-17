@@ -85,32 +85,13 @@ const prplOnboardTasks = async () =>
  */
 // eslint-disable-next-line no-unused-vars
 const prplOnboardRedirect = () => {
-	const onboardingTasksElement = document.getElementById(
-		'prpl-onboarding-tasks'
-	);
-
-	let redirectUrl = window.location.href
+	const redirectUrl = window.location.href
 		.replace( '&content-scan-finished=true', '' )
 		.replace( '&content-scan', '' )
 		.replace( '&delay-tour=true', '' );
 
 	// If plugin is upgraded, we dont show the tour.
 	if ( document.getElementById( 'prpl-popover-upgrade-tasks' ) ) {
-		window.location.href = redirectUrl;
-	} else {
-		// We show the tour.
-		redirectUrl = redirectUrl + '&content-scan-finished=true';
-
-		// Check if there are completed tasks, delay tour so the user can see the celebration.
-		if (
-			onboardingTasksElement &&
-			onboardingTasksElement.querySelectorAll(
-				'.prpl-onboarding-task-completed'
-			).length > 0
-		) {
-			redirectUrl = redirectUrl + '&delay-tour=true';
-		}
-
 		window.location.href = redirectUrl;
 	}
 };
