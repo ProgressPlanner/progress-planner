@@ -15,7 +15,7 @@ $prpl_widget = \progress_planner()->get_admin__widgets__whats_new();
 <h2 class="prpl-widget-title">
 	<?php \esc_html_e( 'What\'s new on the Progress Planner blog', 'progress-planner' ); ?>
 </h2>
-
+<hr />
 <ul>
 	<?php foreach ( $prpl_widget->get_blog_feed() as $prpl_blog_post ) : ?>
 		<?php
@@ -24,16 +24,16 @@ $prpl_widget = \progress_planner()->get_admin__widgets__whats_new();
 			: false;
 		?>
 		<li>
-			<h3>
-				<a href="<?php echo \esc_url( $prpl_blog_post['link'] ); ?>" target="_blank">
-					<?php echo \esc_html( $prpl_blog_post['title']['rendered'] ); ?>
-				</a>
-			</h3>
 			<?php if ( $prpl_blog_post_image_url ) : ?>
 				<a href="<?php echo \esc_url( $prpl_blog_post['link'] ); ?>" target="_blank">
 					<div class="prpl-blog-post-image" style="background-image:url(<?php echo \esc_url( $prpl_blog_post_image_url ); ?>)"></div>
 				</a>
 			<?php endif; ?>
+			<h3>
+				<a href="<?php echo \esc_url( $prpl_blog_post['link'] ); ?>" target="_blank">
+					<?php echo \esc_html( $prpl_blog_post['title']['rendered'] ); ?>
+				</a>
+			</h3>
 			<p><?php echo \esc_html( \wp_trim_words( \wp_strip_all_tags( $prpl_blog_post['content']['rendered'] ), 55 ) ); ?></p>
 			<hr />
 		</li>

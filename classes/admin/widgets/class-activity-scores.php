@@ -70,11 +70,8 @@ final class Activity_Scores extends Widget {
 	 */
 	public function get_score() {
 		$activities = \progress_planner()->get_activities__query()->query_activities(
-			[
-				// Use 31 days to take into account
-				// the activities score decay from previous activities.
-				'start_date' => new \DateTime( '-31 days' ),
-			]
+			// Use 31 days to take into account the activities score decay from previous activities.
+			[ 'start_date' => new \DateTime( '-31 days' ) ]
 		);
 
 		$score        = 0;

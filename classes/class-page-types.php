@@ -520,13 +520,13 @@ class Page_Types {
 		// Cache the query.
 		$posts     = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts WHERE post_type = 'page' AND post_status != 'trash' AND post_title LIKE %s",
+				"SELECT ID FROM $wpdb->posts WHERE post_type = 'page' AND post_status != 'trash' AND post_title LIKE %s", // @phpstan-ignore-line property.nonObject
 				'%' . $wpdb->esc_like( $title ) . '%'
 			)
 		);
 		$posts_ids = [];
 		foreach ( $posts as $post ) {
-			$posts_ids[] = (int) $post->ID;
+			$posts_ids[] = (int) $post->ID; // @phpstan-ignore-line property.nonObject
 		}
 		\wp_cache_set( $cache_key, $posts_ids, $cache_group );
 		return $posts_ids;
