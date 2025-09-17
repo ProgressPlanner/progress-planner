@@ -373,15 +373,7 @@ class Suggested_Tasks {
 	public function rest_api_tax_query( $args, $request ) {
 		$tax_query = [];
 
-		// Include terms (matches any term in list).
-		if ( isset( $request['provider'] ) ) {
-			$tax_query[] = [
-				'taxonomy' => 'prpl_recommendations_provider',
-				'field'    => 'slug',
-				'terms'    => \explode( ',', $request['provider'] ),
-				'operator' => 'IN',
-			];
-		}
+		// TODO: Check if 'exclude_provider' and 'include_provider' are used anywhere, looks like they are not used anymore.
 
 		// Exclude terms.
 		if ( isset( $request['exclude_provider'] ) ) {
@@ -393,9 +385,26 @@ class Suggested_Tasks {
 			];
 		}
 
-		if ( ! empty( $tax_query ) ) {
-			$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		$include_providers            = [];
+		$providers_available_for_user = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers_available_for_user();
+		foreach ( $providers_available_for_user as $provider ) {
+			$include_providers[] = $provider->get_provider_id();
 		}
+
+		// Include terms (matches any term in list).
+		if ( isset( $request['provider'] ) ) {
+			$request_providers = \explode( ',', $request['provider'] );
+			$include_providers = \array_intersect( $include_providers, $request_providers );
+		}
+
+		$tax_query[] = [
+			'taxonomy' => 'prpl_recommendations_provider',
+			'field'    => 'slug',
+			'terms'    => $include_providers,
+			'operator' => 'IN',
+		];
+
+		$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 
 		// Handle sorting parameters.
 		if ( isset( $request['filter']['orderby'] ) ) {
