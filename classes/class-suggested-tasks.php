@@ -439,7 +439,7 @@ class Suggested_Tasks {
 			Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
 			 * Those are tasks which are completed by toggling an option, so non repetitive & not user tasks.
 			*/
-			if ( ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['meta']['prpl_task_id'] ) ) {
+			if ( ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['slug'] ) ) {
 				$response->data['meta']['prpl_points'] = 0;
 			}
 		}
