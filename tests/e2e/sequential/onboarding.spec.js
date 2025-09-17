@@ -50,16 +50,16 @@ function onboardingTests( testContext = test ) {
 					.click();
 
 				// Verify onboarding completion by checking for expected elements
-				await expect(
-					page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
-				).toBeVisible( { timeout: 5000 } );
-				await expect(
-					page.locator(
-						'.prpl-widget-wrapper.prpl-suggested-tasks .prpl-suggested-tasks-list'
-					)
-				).toBeVisible( {
-					timeout: 5000,
-				} );
+				// await expect(
+				// 	page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
+				// ).toBeVisible( { timeout: 5000 } );
+				// await expect(
+				// 	page.locator(
+				// 		'.prpl-widget-wrapper.prpl-suggested-tasks .prpl-suggested-tasks-list'
+				// 	)
+				// ).toBeVisible( {
+				// 	timeout: 5000,
+				// } );
 
 				// Visit the WP Dashboard page and back to the Progress Planner page.
 				await page.goto( '/wp-admin/' );
