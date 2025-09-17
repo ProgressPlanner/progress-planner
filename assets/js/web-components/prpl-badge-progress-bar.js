@@ -109,7 +109,7 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 
 	// Update the remaining points.
 	const remainingPointsEl = document.querySelector(
-		`.prpl-previous-month-badge-progress-bar-wrapper[data-badge-id="${ badgeId }"] .prpl-previous-month-badge-progress-bar-remaining .number`
+		`.prpl-previous-month-badge-progress-bar-wrapper[data-badge-id="${ badgeId }"] .prpl-previous-month-badge-progress-bar-remaining`
 	);
 
 	if ( remainingPointsEl ) {
