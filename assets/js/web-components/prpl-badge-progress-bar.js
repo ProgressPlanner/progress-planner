@@ -113,10 +113,8 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 	);
 
 	if ( remainingPointsEl ) {
-		remainingPointsEl.textContent = remainingPointsEl.textContent.replace(
-			remainingPointsEl.getAttribute( 'data-remaining' ),
-			badgeMaxPoints - badgeNewPoints
-		);
+		// The points in the remaining points element are updated in the prplUpdatePreviousMonthBadgeCounters function.
+
 		remainingPointsEl.setAttribute(
 			'data-remaining',
 			badgeMaxPoints - badgeNewPoints
