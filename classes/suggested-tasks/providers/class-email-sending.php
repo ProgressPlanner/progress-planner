@@ -188,6 +188,11 @@ class Email_Sending extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function enqueue_scripts( $hook ) {
+		// Enqueue the script only on Progress Planner and WP dashboard pages.
+		if ( 'toplevel_page_progress-planner' !== $hook && 'index.php' !== $hook ) {
+			return;
+		}
+
 		// Don't enqueue the script if the task is already completed.
 		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() ) ) {
 			return;
