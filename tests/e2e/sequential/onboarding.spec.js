@@ -49,11 +49,6 @@ function onboardingTests( testContext = test ) {
 					)
 					.click();
 
-				// Here the page should redirect to the Progress Planner Dashboard page.
-				await page.waitForLoadState( 'networkidle', {
-					timeout: 10000,
-				} );
-
 				// Verify onboarding completion by checking for expected elements
 				await expect(
 					page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
