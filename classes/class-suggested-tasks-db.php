@@ -378,7 +378,7 @@ class Suggested_Tasks_DB {
 			\get_posts( $args )
 		);
 		if ( ! empty( $args['post_status'] )
-			&& \in_array( 'trash', $args['post_status'], true )
+			&& \in_array( 'trash', (array) $args['post_status'], true )
 			&& isset( $args['name'] )
 		) {
 			$results_trashed = $this->format_recommendations(
