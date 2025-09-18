@@ -47,7 +47,7 @@ class Suggested_Tasks_DB {
 			if ( $current && ( $current < \time() - 30 ) ) {
 				\update_option( $lock_key, $lock_value );
 			} else {
-				error_log( 'Lock for: ' . $data['task_id'] ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- TODO: remove this after testing.
+				error_log( 'Lock for: ' . $data['task_id'] ); // TODO: remove this after testing.
 				return 0; // Other process is using it.
 			}
 		}
