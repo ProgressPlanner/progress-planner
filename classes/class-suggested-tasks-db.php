@@ -392,7 +392,7 @@ class Suggested_Tasks_DB {
 					)
 				)
 			);
-			$results = array_merge( $results, $results_trashed );
+			$results         = array_merge( $results, $results_trashed );
 		}
 
 		\wp_cache_set( $cache_key, $results, static::GET_TASKS_CACHE_GROUP );
