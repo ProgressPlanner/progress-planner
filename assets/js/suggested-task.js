@@ -267,7 +267,7 @@ prplSuggestedTask = {
 								'trash' === newStatus ? 'complete' : 'pending'
 							);
 							const eventPoints = parseInt(
-								postData?.meta?.prpl_points
+								postData?.prpl_points
 							);
 
 							// Task is trashed, check if we need to celebrate.

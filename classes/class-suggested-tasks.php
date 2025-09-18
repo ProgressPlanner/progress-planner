@@ -288,11 +288,6 @@ class Suggested_Tasks {
 		);
 
 		$rest_meta_fields = [
-			'prpl_points'  => [
-				'type'         => 'number',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
 			'prpl_task_id' => [
 				'type'         => 'string',
 				'single'       => true,
