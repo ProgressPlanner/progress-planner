@@ -79,12 +79,12 @@
 		border-radius: 50%;
 		background: none;
 		box-shadow: none;
-		color: var(--prpl-color-gray-3);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		padding: 0.2em;
 		margin-inline-start: 0.3rem;
+		color: var(--prpl-color-ui-icon);
 
 		.dashicons {
 			font-size: 0.825em;
@@ -218,6 +218,10 @@
 			height: 20px;
 
 			transition: transform 0.3s ease-in-out;
+
+			svg {
+				stroke: var(--prpl-color-ui-icon);
+			}
 		}
 	}
 
@@ -249,11 +253,15 @@
 			color: var(--prpl-color-link);
 			font-size: var(--prpl-font-size-small);
 
+			svg path {
+				fill: var(--prpl-color-ui-icon);
+			}
+
 			&:hover {
 				text-decoration: underline;
 
 				svg path {
-					fill: var(--prpl-graph-color-1);
+					fill: var(--prpl-color-ui-icon-hover-delete);
 				}
 			}
 
@@ -273,8 +281,8 @@
 		position: absolute;
 		right: 0;
 		transition: all 0.3s ease-in-out;
-		color: #38296d;
-		background-color: var(--prpl-color-border);
+		color: var(--prpl-text-point-inactive);
+		background-color: var(--prpl-background-point-inactive);
 	}
 
 	.prpl-suggested-task-button {
@@ -288,10 +296,14 @@
 			opacity: 0;
 			transition: opacity 0.3s ease-in-out;
 
+			svg path {
+				fill: var(--prpl-color-ui-icon);
+			}
+
 			&:hover {
 
 				svg path {
-					fill: var(--prpl-graph-color-1);
+					fill: var(--prpl-color-ui-icon-hover-delete);
 				}
 			}
 		}
