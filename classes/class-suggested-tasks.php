@@ -423,6 +423,8 @@ class Suggested_Tasks {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
 		}
 
+		$response->data['slug'] = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $response->data['slug'] );
+
 		if ( $provider ) {
 			$response->data['prpl_provider'] = $provider_term[0];
 			// Link should be added during run time, since it is not added for users without required capability.
@@ -432,9 +434,6 @@ class Suggested_Tasks {
 
 			$response->data['prpl_popover_id'] = $provider->get_popover_id();
 
-			// This has to be the last item to be added because actions use data from previous items.
-			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
-
 			/*
 			 * Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
 			 * Those are tasks which are completed by toggling an option, so non repetitive & not user tasks.
@@ -442,9 +441,10 @@ class Suggested_Tasks {
 			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $response->data['slug'] ) ) ) {
 				$response->data['meta']['prpl_points'] = 0;
 			}
-		}
 
-		$response->data['slug'] = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $response->data['slug'] );
+			// This has to be the last item to be added because actions use data from previous items.
+			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
+		}
 
 		$category_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_category' );
 		if ( $category_term && ! \is_wp_error( $category_term ) ) {
