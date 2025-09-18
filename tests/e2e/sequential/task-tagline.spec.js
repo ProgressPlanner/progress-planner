@@ -53,7 +53,7 @@ function taglineTests( testContext = test ) {
 					`${ process.env.WORDPRESS_URL }/?rest_route=/progress-planner/v1/tasks`
 				);
 				const finalTasks = await finalResponse.json();
-				console.error( finalTasks );
+
 				// Find the blog description task again
 				const updatedTask = finalTasks.find( ( task ) =>
 					task.post_name.startsWith( 'core-blogdescription' )
