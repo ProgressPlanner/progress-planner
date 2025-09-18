@@ -545,9 +545,8 @@ class Suggested_Tasks {
 	 * @return string
 	 */
 	public function get_task_id_from_slug( $slug ) {
-		if ( \str_ends_with( $slug, '_trashed' ) ) {
-			$slug = \substr( $slug, 0, -7 );
-		}
-		return trim( $slug, '_' );
+		return ( \str_ends_with( $slug, '__trashed' ) )
+			? \substr( $slug, 0, -8 )
+			: $slug;
 	}
 }
