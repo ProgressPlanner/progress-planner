@@ -19,7 +19,7 @@
 
 		.prpl-task-title {
 			width: 100%;
-			color: #4b5563;
+			color: var(--prpl-color-text);
 		}
 	}
 

@@ -397,8 +397,8 @@ button.prpl-info-icon {
 	Popovers generic styles.
 \*------------------------------------*/
 .prpl-popover {
-	background: #fff;
-	border: 1px solid var(--prpl-color-gray-3);
+	background: var(--prpl-background-paper);
+	border: 1px solid var(--prpl-color-border);
 	border-radius: var(--prpl-border-radius);
 	padding: var(--prpl-padding);
 	font-weight: 400;
