@@ -159,7 +159,7 @@
 			padding: 0.75rem;
 			color: #854d0e;
 			font-size: var(--prpl-font-size-small);
-			border-radius: var(--prpl-border-radius-small);
+			border-radius: 6px;
 			background-color: #fefce8;
 
 			.prpl-note-icon {
@@ -210,7 +210,7 @@
 			min-width: 300px;
 
 			/* WIP */
-			border-radius: var(--prpl-border-radius-small);;
+			border-radius: 6px;
 			border: 1px solid var(--prpl-color-gray-2);
 		}
 
@@ -238,7 +238,7 @@
 				top: 0;
 				left: 0;
 				z-index: -1;
-				border-radius: var(--prpl-border-radius-small);
+				border-radius: 6px;
 				transition: all 0.25s ease-in-out;
 			}
 
@@ -263,7 +263,7 @@
 		textarea {
 			width: 100%;
 			min-height: 100px;
-			border-radius: var(--prpl-border-radius-small);
+			border-radius: 6px;
 			box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.05);
 			border: 1px solid var(--prpl-color-gray-2);
 		}
@@ -321,7 +321,7 @@
 
 				.prpl-custom-control {
 					border: 1px solid var(--prpl-input-gray);
-					border-radius: var(--prpl-border-radius-small);
+					border-radius: 6px;
 					background: #fff;
 				}
 

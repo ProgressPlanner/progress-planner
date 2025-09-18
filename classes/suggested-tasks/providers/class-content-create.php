@@ -69,7 +69,7 @@ class Content_Create extends Tasks {
 	 * @return string
 	 */
 	protected function get_url() {
-		return \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/valuable-content' );
+		return 'https://prpl.fyi/valuable-content';
 	}
 
 	/**

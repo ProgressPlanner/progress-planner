@@ -59,8 +59,8 @@
 		gap: 0.5rem;
 		background: var(--prpl-background-orange);
 		padding: 1.2rem;
-		border-radius: var(--prpl-border-radius);
-		margin-bottom: var(--prpl-settings-page-gap);
+		border-radius: 0.5rem;
+		margin-bottom: var(--prpl-padding);
 
 		&:first-child {
 			margin-top: 0;

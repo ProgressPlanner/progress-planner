@@ -44,7 +44,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		];
 		?>
 		<?php foreach ( $prpl_badges_groups as $prpl_badge_group => $prpl_widget_title ) : ?>
-			<div class="prpl-widget-wrapper prpl-widget-wrapper-<?php echo \esc_attr( $prpl_badge_group ); ?> in-popover prpl-badge-streak">
+			<div class="prpl-widget-wrapper prpl-widget-wrapper-<?php echo \esc_attr( $prpl_badge_group ); ?> in-popover  prpl-badge-streak">
 				<h3 class="prpl-widget-title">
 					<?php echo \esc_html( $prpl_widget_title ); ?>
 				</h3>
@@ -63,7 +63,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 								<prpl-badge
 									complete="<?php echo $prpl_badge_completed ? 'true' : 'false'; ?>"
 									badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
-									branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
+									badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
 								></prpl-badge>
 								<p><?php echo \esc_html( $prpl_badge->get_name() ); ?></p>
 							</span>

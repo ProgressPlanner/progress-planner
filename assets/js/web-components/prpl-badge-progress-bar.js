@@ -13,13 +13,12 @@
 customElements.define(
 	'prpl-badge-progress-bar',
 	class extends HTMLElement {
-		constructor( badgeId, points, maxPoints, brandingId = 0 ) {
+		constructor( badgeId, points, maxPoints ) {
 			// Get parent class properties
 			super();
 			badgeId = badgeId || this.getAttribute( 'data-badge-id' );
 			points = points || this.getAttribute( 'data-points' );
 			maxPoints = maxPoints || this.getAttribute( 'data-max-points' );
-			brandingId = brandingId || this.getAttribute( 'data-branding-id' );
 			const progress = ( points / maxPoints ) * 100;
 
 			this.innerHTML = `
@@ -50,7 +49,6 @@ customElements.define(
 								position: absolute;
 								left: calc(${ progress }% - 3.75rem);
 								top: -2.5rem;"
-								branding-id="${ brandingId }"
 						></prpl-badge>
 					</div>
 				</div>
@@ -95,19 +93,16 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 	const badgeMaxPoints = progressBar.getAttribute( 'data-max-points' );
 	const badgeProgress = customElements.get( 'prpl-badge-progress-bar' );
 	const badgeNewPoints = parseInt( badgePoints ) + pointsDiff;
-	const brandingId = progressBar.getAttribute( 'data-branding-id' );
 
 	// Create a new badge progress bar.
 	const newProgressBar = new badgeProgress(
 		badgeId,
 		badgeNewPoints,
-		badgeMaxPoints,
-		brandingId
+		badgeMaxPoints
 	);
 	newProgressBar.setAttribute( 'data-badge-id', badgeId );
 	newProgressBar.setAttribute( 'data-points', badgeNewPoints );
 	newProgressBar.setAttribute( 'data-max-points', badgeMaxPoints );
-	newProgressBar.setAttribute( 'data-branding-id', brandingId );
 
 	// Replace the old badge progress bar with the new one.
 	progressBar.replaceWith( newProgressBar );
@@ -118,10 +113,8 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 	);
 
 	if ( remainingPointsEl ) {
-		remainingPointsEl.textContent = remainingPointsEl.textContent.replace(
-			remainingPointsEl.getAttribute( 'data-remaining' ),
-			badgeMaxPoints - badgeNewPoints
-		);
+		// The points in the remaining points element are updated in the prplUpdatePreviousMonthBadgeCounters function.
+
 		remainingPointsEl.setAttribute(
 			'data-remaining',
 			badgeMaxPoints - badgeNewPoints
@@ -166,4 +159,37 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 				?.remove();
 		}
 	}
+};
+
+/**
+ * Update the previous month badge counters.
+ *
+ * @param {number} pointsDiff The points difference.
+ *
+ * @return {void}
+ */
+// eslint-disable-next-line no-unused-vars
+const prplUpdatePreviousMonthBadgeCounters = ( pointsDiff ) => {
+	const remainingPointsEls = document.querySelectorAll(
+		`.prpl-previous-month-badge-progress-bar-wrapper .prpl-previous-month-badge-progress-bar-remaining`
+	);
+
+	if ( ! remainingPointsEls.length ) {
+		return;
+	}
+
+	remainingPointsEls.forEach( ( pointsEl ) => {
+		const totalPoints = pointsEl.getAttribute(
+			'data-remaining-total-points'
+		);
+		pointsEl.setAttribute(
+			'data-remaining-total-points',
+			totalPoints - pointsDiff
+		);
+
+		const numberEl = pointsEl.querySelector( '.number' );
+		if ( numberEl ) {
+			numberEl.textContent = totalPoints - pointsDiff;
+		}
+	} );
 };

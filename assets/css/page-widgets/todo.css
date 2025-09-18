@@ -121,10 +121,50 @@
 \*------------------------------------*/
 #progress_planner_dashboard_widget_todo {
 
+	/* Silver task */
+	&:not(:has(#todo-list li[data-task-points="1"])) {
+
+		#todo-list > .prpl-suggested-task:first-child {
+
+			border: 1px solid #796da2;
+			background-color: #f6f7f9;
+
+			.prpl-suggested-task-points-wrapper {
+
+				&::after {
+					content: "";
+					display: inline-block;
+					width: 24px;
+					height: 24px;
+					background-image: url("../../images/icon_progress_planner.svg");
+					background-size: contain;
+					background-repeat: no-repeat;
+				}
+			}
+		}
+	}
+
+	/* Golden task */
+	&:has(#todo-list li[data-task-points="1"]) {
+
+		#todo-list {
+
+			.prpl-suggested-task[data-task-points="1"] {
+				border: 1px solid var(--prpl-color-accent-orange);
+				background-color: var(--prpl-background-orange);
+			}
+		}
+	}
+
 	.prpl-suggested-task {
 
 		h3 {
 			margin-bottom: 0;
+		}
+
+		/* Override the default position of the move buttons. */
+		.prpl-move-buttons-wrapper {
+			left: calc(-5px - 0.5rem);
 		}
 	}
 
@@ -164,7 +204,7 @@
 #todo-list-completed-details {
 	margin-top: 1rem;
 	border: 1px solid var(--prpl-color-gray-3);
-	border-radius: var(--prpl-border-radius);
+	border-radius: 0.5rem;
 
 	summary {
 		padding: 0.5rem;
@@ -302,7 +342,7 @@
 		padding: 0.75rem;
 		color: #854d0e;
 		font-size: var(--prpl-font-size-small);
-		border-radius: var(--prpl-border-radius-small);
+		border-radius: 6px;
 		background-color: #fefce8;
 
 		.prpl-note-icon {

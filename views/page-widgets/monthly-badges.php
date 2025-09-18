@@ -17,12 +17,7 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 ?>
 <?php if ( $prpl_badge ) : ?>
 	<h2 class="prpl-widget-title">
-		<?php
-		echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-			'monthly-badges',
-			\esc_html__( 'Your monthly badge', 'progress-planner' )
-		);
-		?>
+		<?php \esc_html_e( 'Your monthly badge', 'progress-planner' ); ?>
 	</h2>
 
 	<prpl-gauge
@@ -32,13 +27,10 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 		data-max="<?php echo (int) Monthly::TARGET_POINTS; ?>"
 		data-value="<?php echo (float) $prpl_widget->get_score()['target_score']; ?>"
 		data-badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+		data-badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
 	>
 		<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) $prpl_widget->get_score()['target_score']; ?>">
-			<prpl-badge
-				complete="true"
-				badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
-				branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
-			></prpl-badge>
+			<prpl-badge complete="true" badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>" badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"></prpl-badge>
 		</progress>
 	</prpl-gauge>
 
@@ -100,7 +92,7 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 			<?php $prpl_remaining_points += $prpl_previous_incomplete_month_badge->progress_callback()['remaining']; ?>
 			<div
 				class="prpl-previous-month-badge-progress-bar-wrapper"
-				style="border-radius: var(--prpl-border-radius); padding: 0.75rem 1rem 1.25rem 1rem;"
+				style="border-radius: 0.5rem; padding: 0.75rem 1rem 1.25rem 1rem;"
 				data-badge-id="<?php echo \esc_attr( $prpl_previous_incomplete_month_badge->get_id() ); ?>"
 			>
 				<prpl-badge-progress-bar
@@ -116,12 +108,13 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 					<span
 						class="prpl-previous-month-badge-progress-bar-remaining"
 						data-remaining="<?php echo (int) $prpl_previous_incomplete_month_badge->progress_callback()['remaining']; ?>"
+						data-remaining-total-points="<?php echo (int) $prpl_remaining_points; ?>"
 					>
 						<?php
 						\printf(
-							/* translators: %1$d: The number of points. %2$d: The number of days. */
-							\esc_html( \_n( '%1$d more points to go - %2$d day left', '%1$d more points to go - %2$d days left', (int) $prpl_days_remaining, 'progress-planner' ) ),
-							(int) $prpl_remaining_points,
+							/* translators: %1$s: The number of points. %2$d: The number of days. */
+							\esc_html( \_n( '%1$s more points to go - %2$d day left', '%1$s more points to go - %2$d days left', (int) $prpl_days_remaining, 'progress-planner' ) ),
+							'<span class="number">' . (int) $prpl_remaining_points . '</span>',
 							(int) $prpl_days_remaining
 						);
 						?>
