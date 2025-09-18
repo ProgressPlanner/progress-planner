@@ -54,11 +54,6 @@ function onboardingTests( testContext = test ) {
 					timeout: 30000,
 				} );
 
-				// Debug.
-				const wrap = page.locator( 'div.prpl-wrap' );
-				const outer = await wrap.evaluate( ( el ) => el.outerHTML );
-				console.log( 'prpl-wrap outerHTML:', outer );
-
 				// Verify onboarding completion by checking for expected elements
 				await expect(
 					page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
