@@ -436,9 +436,9 @@ class Suggested_Tasks {
 			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
 
 			/*
-			Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
+			 * Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
 			 * Those are tasks which are completed by toggling an option, so non repetitive & not user tasks.
-			*/
+			 */
 			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $response->data['slug'] ) ) ) {
 				$response->data['meta']['prpl_points'] = 0;
 			}
