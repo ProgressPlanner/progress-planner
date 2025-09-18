@@ -49,6 +49,16 @@ function onboardingTests( testContext = test ) {
 					)
 					.click();
 
+				// Wait for progress bar to be visible (scanning starts).
+				await expect(
+					page.locator( 'progress-planner-scan-progress' )
+				).toBeVisible( { timeout: 5000 } );
+
+				// Wait for progress bar to be visible (scanning completes and page reloads).
+				await expect(
+					page.locator( 'progress-planner-scan-progress' )
+				).toBeHidden( { timeout: 5000 } );
+
 				// Verify onboarding completion by checking for expected elements
 				await expect(
 					page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
