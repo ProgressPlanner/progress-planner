@@ -104,6 +104,12 @@ body.toplevel_page_progress-planner {
 	border-color: var(--prpl-color-selection-controls-inactive);
 }
 
+.prpl-wrap select {
+	border-color: var(--prpl-color-field-border);
+
+	/* box-shadow: 1px 2px 4px 0 var(--prpl-color-field-shadow); */
+}
+
 .prpl-widget-width-2 {
 	grid-column: span 2;
 
