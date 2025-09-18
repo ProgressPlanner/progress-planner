@@ -28,7 +28,7 @@ customElements.define(
 						style="
 							width: 100%;
 							height: 1rem;
-							background-color: var(--prpl-color-gray-1);
+							background-color: var(--prpl-color-gauge-main);
 							border-radius: 0.5rem;
 							position: relative;"
 					>
