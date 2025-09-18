@@ -444,6 +444,8 @@ class Suggested_Tasks {
 			}
 		}
 
+		$response->data['slug'] = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $response->data['slug'] );
+
 		$category_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_category' );
 		if ( $category_term && ! \is_wp_error( $category_term ) ) {
 			$response->data['prpl_category'] = $category_term[0];
