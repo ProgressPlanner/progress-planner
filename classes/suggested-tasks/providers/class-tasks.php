@@ -284,7 +284,7 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return string
 	 */
 	public function get_external_link_url() {
-		return static::EXTERNAL_LINK_URL;
+		return \progress_planner()->get_ui__branding()->get_url( static::EXTERNAL_LINK_URL );
 	}
 
 	/**

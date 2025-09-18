@@ -223,7 +223,7 @@ class Base {
 	public function get_remote_server_root_url() {
 		return \defined( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
 			? \constant( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
-			: 'https://progressplanner.com';
+			: \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com' );
 	}
 
 	/**
