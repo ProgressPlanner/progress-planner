@@ -29,8 +29,8 @@
 
 		#todo-list > .prpl-suggested-task:first-child {
 
-			border: 1px solid #796da2;
-			background-color: #f6f7f9;
+			border: 1px solid var(--prpl-color-border-next-top-task);
+			background-color: var(--prpl-background-table);
 
 			.prpl-suggested-task-points-wrapper {
 
@@ -126,8 +126,8 @@
 
 		#todo-list > .prpl-suggested-task:first-child {
 
-			border: 1px solid #796da2;
-			background-color: #f6f7f9;
+			border: 1px solid var(--prpl-color-border-next-top-task);
+			background-color: var(--prpl-background-table);
 
 			.prpl-suggested-task-points-wrapper {
 

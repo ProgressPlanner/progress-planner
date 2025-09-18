@@ -2,7 +2,7 @@
 .progress-planner_page_progress-planner-settings {
 
 	#wpwrap {
-		background-color: #f6f7f9;
+		background-color: var(--prpl-background);
 	}
 
 	ul#adminmenu {
@@ -11,7 +11,7 @@
 		> li.current > a.current {
 
 			&::after {
-				border-right-color: #f6f7f9 !important;
+				border-right-color: var(--prpl-background) !important;
 			}
 		}
 	}

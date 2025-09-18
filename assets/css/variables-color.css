@@ -21,7 +21,7 @@
 	--prpl-background-table: var(--prpl-background);
 	--prpl-background-top-task: #fff9f0;
 	--prpl-color-border-top-task: var(--prpl-color-monthly);
-	--prpl-color-next-top-task: var(--prpl-graph-color-4);
+	--prpl-color-border-next-top-task: var(--prpl-graph-color-4);
 	--prpl-color-selection-controls-inactive: #9ca3af;
 	--prpl-color-selection-controls: var(--prpl-color-selection-controls-inactive); /* TBD */
 	--prpl-color-ui-icon: #6b7280;

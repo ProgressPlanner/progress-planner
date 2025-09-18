@@ -8,7 +8,7 @@
 	line-height: 1;
 
 	&:nth-child(odd) {
-		background-color: #f6f7f9;
+		background-color: var(--prpl-background-table);
 	}
 
 	.prpl-suggested-task-title-wrapper {
