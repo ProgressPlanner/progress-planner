@@ -30,7 +30,12 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 		data-badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
 	>
 		<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) $prpl_widget->get_score()['target_score']; ?>">
-			<prpl-badge complete="true" badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>" badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"></prpl-badge>
+			<prpl-badge
+				complete="true"
+				badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+				badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
+				branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
+			></prpl-badge>
 		</progress>
 	</prpl-gauge>
 

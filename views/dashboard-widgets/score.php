@@ -28,6 +28,7 @@ $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( ne
 					complete="true"
 					badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
 					badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
+					branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
 				></prpl-badge>
 			</progress>
 		</prpl-gauge>
