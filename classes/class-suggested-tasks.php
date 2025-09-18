@@ -88,7 +88,7 @@ class Suggested_Tasks {
 			$task->celebrate();
 
 			// Insert an activity.
-			$this->insert_activity( $task->post_name );
+			$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 		}
 	}
 
@@ -156,7 +156,7 @@ class Suggested_Tasks {
 		\progress_planner()->get_suggested_tasks_db()->update_recommendation( $pending_tasks[0]->ID, [ 'post_status' => 'trash' ] );
 
 		// Insert an activity.
-		$this->insert_activity( $pending_tasks[0]->post_name );
+		$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $pending_tasks[0]->post_name ) );
 	}
 
 	/**
@@ -237,13 +237,13 @@ class Suggested_Tasks {
 		switch ( $action ) {
 			case 'complete':
 				// Insert an activity.
-				$this->insert_activity( $task->post_name );
+				$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 				$updated = true;
 				break;
 
 			case 'pending': // User task was marked as pending.
 			case 'delete':
-				$this->delete_activity( $task->post_name );
+				$this->delete_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 				$updated = true;
 				break;
 		}
@@ -439,7 +439,7 @@ class Suggested_Tasks {
 			Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
 			 * Those are tasks which are completed by toggling an option, so non repetitive & not user tasks.
 			*/
-			if ( ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['slug'] ) ) {
+			if ( ! $provider->is_repetitive() && $provider->task_has_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $response->data['slug'] ) ) ) {
 				$response->data['meta']['prpl_points'] = 0;
 			}
 		}
@@ -536,5 +536,18 @@ class Suggested_Tasks {
 		}
 
 		return \apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category );
+	}
+
+	/**
+	 * Get the task ID from a slug.
+	 *
+	 * @param string $slug The slug.
+	 * @return string
+	 */
+	public function get_task_id_from_slug( $slug ) {
+		if ( \str_ends_with( $slug, '_trashed' ) ) {
+			$slug = \substr( $slug, 0, -7 );
+		}
+		return trim( $slug, '_' );
 	}
 }

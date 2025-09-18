@@ -301,7 +301,7 @@ class Update_Term_Description extends Tasks {
 			return $actions;
 		}
 
-		$term = $this->get_term_from_task_id( $data['slug'] );
+		$term = $this->get_term_from_task_id( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['slug'] ) );
 		if ( ! $term ) {
 			return $actions;
 		}

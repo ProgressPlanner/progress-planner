@@ -45,7 +45,7 @@ class Update_190 {
 			$existing_posts = \get_posts(
 				[
 					'post_type' => 'prpl_recommendations',
-					'name'      => $prpl_task_id,
+					'name'      => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $prpl_task_id ),
 				]
 			);
 			if ( ! empty( $existing_posts ) ) {
@@ -57,7 +57,7 @@ class Update_190 {
 			\wp_update_post(
 				[
 					'ID'        => $recommendation->ID,
-					'post_name' => $prpl_task_id,
+					'post_name' => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $prpl_task_id ),
 				]
 			);
 		}

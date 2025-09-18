@@ -52,7 +52,7 @@ class Suggested_Tasks_DB {
 			[
 				'post_status' => [ 'publish', 'trash', 'draft', 'future', 'pending' ], // 'any' doesn't include statuses which have 'exclude_from_search' set to true (trash and pending).
 				'numberposts' => 1,
-				'name'        => $data['task_id'],
+				'name'        => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['task_id'] ),
 			]
 		);
 
@@ -73,7 +73,7 @@ class Suggested_Tasks_DB {
 			'post_title'   => $data['post_title'],
 			'post_content' => $data['description'] ?? '',
 			'menu_order'   => $data['order'] ?? 0,
-			'post_name'    => $data['task_id'],
+			'post_name'    => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['task_id'] ),
 		];
 		switch ( $data['post_status'] ) {
 			case 'pending':
@@ -325,7 +325,7 @@ class Suggested_Tasks_DB {
 					break;
 
 				case 'task_id':
-					$args['name'] = $value;
+					$args['name'] = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $value );
 					unset( $params[ $param ] );
 					break;
 
