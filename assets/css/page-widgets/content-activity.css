@@ -47,7 +47,7 @@
 		th,
 		td {
 			text-align: start;
-			border-top: 1px solid var(--prpl-color-gray-2);
+			border-top: 1px solid var(--prpl-color-border);
 		}
 	}
 

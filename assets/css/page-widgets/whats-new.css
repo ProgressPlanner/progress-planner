@@ -60,7 +60,7 @@
 	background-size: cover;
 	margin-bottom: 0.75rem;
 	border-radius: var(--prpl-border-radius-big);
-	border: 1px solid var(--prpl-color-gray-2);
+	border: 1px solid var(--prpl-color-border);
 	background-color: var(--prpl-color-gray-1); /* Fallback, if remote host image is not accessible */
 	transition: transform 0.2s, box-shadow 0.2s;
 

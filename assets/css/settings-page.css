@@ -40,14 +40,14 @@
 	.prpl-settings-form-wrap {
 		background-color: #fff;
 
-		border: 1px solid var(--prpl-color-gray-2);
+		border: 1px solid var(--prpl-color-border);
 		border-radius: var(--prpl-border-radius);
 		padding: var(--prpl-padding);
 		box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.07), -2px 0 6px rgba(0, 0, 0, 0.07);
 	}
 
 	.prpl-settings-section-wrapper {
-		border: 1px solid var(--prpl-color-gray-2);
+		border: 1px solid var(--prpl-color-border);
 		border-radius: var(--prpl-border-radius);
 		padding: var(--prpl-padding);
 		flex-grow: 1;
@@ -73,7 +73,7 @@
 	}
 
 	.prpl-pages-item {
-		border: 1px solid var(--prpl-color-gray-2);
+		border: 1px solid var(--prpl-color-border);
 		border-radius: var(--prpl-border-radius);
 		padding: var(--prpl-padding);
 		flex-grow: 1;
@@ -213,7 +213,7 @@
 	.prpl-button {
 		color: var(--prpl-color-gray-7);
 		text-decoration: none;
-		border: 1px solid var(--prpl-color-gray-2);
+		border: 1px solid var(--prpl-color-border);
 		border-radius: var(--prpl-border-radius);
 		padding: 0.5em 0.5em;
 		font-size: 14px; /* It matches <select> font size, which comes from Core */
@@ -305,7 +305,7 @@
 		input {
 			width: 30rem;
 			max-width: calc(100% - 2rem);
-			border: 1px solid var(--prpl-color-gray-2);
+			border: 1px solid var(--prpl-color-border);
 		}
 	}
 

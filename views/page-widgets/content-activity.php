@@ -35,8 +35,8 @@ $prpl_chart_data    = [];
 $prpl_chart_options = [
 	'dataArgs'     => [],
 	'chartId'      => 'prpl-chart-content-activity',
-	'axisColor'    => 'var(--prpl-color-gray-2)',
-	'rulersColor'  => 'var(--prpl-color-gray-2)',
+	'axisColor'    => 'var(--prpl-color-border)',
+	'rulersColor'  => 'var(--prpl-color-border)',
 	'filtersLabel' => '<strong>' . \__( 'show:', 'progress-planner' ) . '</strong>',
 ];
 foreach ( $prpl_activity_types as $prpl_activity_type => $prpl_activity_data ) {

@@ -13,7 +13,6 @@
 	--prpl-container-max-width: calc(var(--prpl-column-min-width) * var(--prpl-max-columns) + var(--prpl-gap) * (var(--prpl-max-columns) - 1) + var(--prpl-column-min-width));
 
 	--prpl-color-gray-1: #e1e3e7;
-	--prpl-color-gray-2: #d1d5db;
 	--prpl-color-gray-3: #9ca3af;
 	--prpl-color-gray-4: #6b7280;
 	--prpl-color-gray-5: #4b5563;
@@ -218,9 +217,9 @@ button.prpl-info-icon {
 		justify-content: center;
 		padding: 0.4em;
 
-		/* color: var(--prpl-color-gray-2); */
+		/* color: var(--prpl-color-border); */
 		background-color: #fff;
-		border: 1px solid var(--prpl-color-gray-2);
+		border: 1px solid var(--prpl-color-border);
 		border-radius: var(--prpl-border-radius);
 
 		svg {
@@ -266,7 +265,7 @@ button.prpl-info-icon {
 \*------------------------------------*/
 .prpl-widget-wrapper {
 	background-color: #fff;
-	border: 1px solid var(--prpl-color-gray-2);
+	border: 1px solid var(--prpl-color-border);
 	border-radius: var(--prpl-border-radius);
 	padding: var(--prpl-padding);
 	min-width: 0;
@@ -277,7 +276,7 @@ button.prpl-info-icon {
 	hr {
 		margin-top: 1.25rem;
 		margin-bottom: 1.25rem;
-		border-top-color: var(--prpl-color-gray-2);
+		border-top-color: var(--prpl-color-border);
 	}
 
 	/* Force the last column to be the last column. */

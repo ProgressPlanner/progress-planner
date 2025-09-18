@@ -95,7 +95,7 @@
 					left: -20px;
 					width: 1px;
 					height: 100%;
-					background-color: var(--prpl-color-gray-2);
+					background-color: var(--prpl-color-border);
 				}
 
 				&::after {
@@ -211,7 +211,7 @@
 
 			/* WIP */
 			border-radius: 6px;
-			border: 1px solid var(--prpl-color-gray-2);
+			border: 1px solid var(--prpl-color-border);
 		}
 
 		.prpl-button {
@@ -265,7 +265,7 @@
 			min-height: 100px;
 			border-radius: 6px;
 			box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.05);
-			border: 1px solid var(--prpl-color-gray-2);
+			border: 1px solid var(--prpl-color-border);
 		}
 
 		/* Used for radio and checkbox inputs. */

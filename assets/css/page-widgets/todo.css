@@ -234,7 +234,7 @@
 
 	#todo-list-completed-delete-all-wrapper {
 		margin: 0.25rem 0.5rem 0.75rem 0.5rem;
-		border-top: 1px solid var(--prpl-color-gray-2);
+		border-top: 1px solid var(--prpl-color-border);
 		display: none;
 
 		#todo-list-completed-delete-all {
@@ -274,7 +274,7 @@
 		right: 0;
 		transition: all 0.3s ease-in-out;
 		color: #38296d;
-		background-color: #d1d5db;
+		background-color: var(--prpl-color-border);
 	}
 
 	.prpl-suggested-task-button {

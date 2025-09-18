@@ -43,7 +43,7 @@ final class Activity_Scores extends Widget {
 			'monthly' === $this->get_frequency() &&
 			\gmdate( 'Y-m-01' ) === $date->format( 'Y-m-01' )
 		) {
-			return 'var(--prpl-color-gray-2)';
+			return 'var(--prpl-color-border)';
 		}
 
 		// If weekly and the current week, return gray (in progress).
@@ -51,7 +51,7 @@ final class Activity_Scores extends Widget {
 			'weekly' === $this->get_frequency() &&
 			\gmdate( 'Y-W' ) === $date->format( 'Y-W' )
 		) {
-			return 'var(--prpl-color-gray-2)';
+			return 'var(--prpl-color-border)';
 		}
 
 		if ( $number > 90 ) {
