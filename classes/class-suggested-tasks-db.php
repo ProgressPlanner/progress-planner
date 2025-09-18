@@ -48,13 +48,24 @@ class Suggested_Tasks_DB {
 		\set_transient( $transient_key, true, 5 );
 
 		// Check if we have an existing task with the same title.
-		$posts = $this->get_tasks_by(
+		$posts         = $this->get_tasks_by(
 			[
 				'post_status' => [ 'publish', 'trash', 'draft', 'future', 'pending' ], // 'any' doesn't include statuses which have 'exclude_from_search' set to true (trash and pending).
 				'numberposts' => 1,
 				'name'        => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['task_id'] ),
 			]
 		);
+		$posts_trashed = $this->get_tasks_by(
+			[
+				'post_status' => [ 'trash' ],
+				'numberposts' => 1,
+				'name'        => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['task_id'] ) . '__trashed',
+			]
+		);
+
+		if ( empty( $posts ) && ! empty( $posts_trashed ) ) {
+			$posts = $posts_trashed;
+		}
 
 		// If we have an existing task, skip.
 		if ( ! empty( $posts ) ) {
@@ -366,6 +377,23 @@ class Suggested_Tasks_DB {
 		$results = $this->format_recommendations(
 			\get_posts( $args )
 		);
+		if ( ! empty( $args['post_status'] )
+			&& \in_array( 'trash', $args['post_status'], true )
+			&& isset( $args['name'] )
+		) {
+			$results_trashed = $this->format_recommendations(
+				\get_posts(
+					\wp_parse_args(
+						$args,
+						[
+							'post_status' => [ 'trash' ],
+							'name'        => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $args['name'] ) . '__trashed',
+						]
+					)
+				)
+			);
+			$results = array_merge( $results, $results_trashed );
+		}
 
 		\wp_cache_set( $cache_key, $results, static::GET_TASKS_CACHE_GROUP );
 
