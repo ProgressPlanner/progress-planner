@@ -97,13 +97,6 @@ class Email_Sending extends Tasks_Interactive {
 	protected $is_wp_mail_overridden = false;
 
 	/**
-	 * The troubleshooting guide URL.
-	 *
-	 * @var string
-	 */
-	protected $troubleshooting_guide_url = 'https://prpl.fyi/troubleshoot-smtp';
-
-	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -129,6 +122,15 @@ class Email_Sending extends Tasks_Interactive {
 			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ),
 			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
 		);
+	}
+
+	/**
+	 * Get the troubleshooting guide URL.
+	 *
+	 * @return string
+	 */
+	protected function get_troubleshooting_guide_url() {
+		return \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/troubleshoot-smtp' ) );
 	}
 
 	/**
@@ -208,7 +210,7 @@ class Email_Sending extends Tasks_Interactive {
 					'ajax_url'                  => \admin_url( 'admin-ajax.php' ),
 					'nonce'                     => \wp_create_nonce( 'progress_planner' ),
 					'unknown_error'             => \esc_html__( 'Unknown error', 'progress-planner' ),
-					'troubleshooting_guide_url' => \progress_planner()->get_ui__branding()->get_url( $this->troubleshooting_guide_url ),
+					'troubleshooting_guide_url' => $this->get_troubleshooting_guide_url(),
 				],
 			]
 		);
@@ -300,7 +302,7 @@ class Email_Sending extends Tasks_Interactive {
 				'prpl_provider_id'                     => $this->get_provider_id(),
 				'prpl_email_subject'                   => $this->email_subject,
 				'prpl_email_error'                     => $this->email_error,
-				'prpl_troubleshooting_guide_url'       => \progress_planner()->get_ui__branding()->get_url( $this->troubleshooting_guide_url ),
+				'prpl_troubleshooting_guide_url'       => $this->get_troubleshooting_guide_url(),
 				'prpl_is_there_sending_email_override' => $this->is_there_sending_email_override(),
 				'prpl_task_actions'                    => $this->get_task_actions(),
 			]
