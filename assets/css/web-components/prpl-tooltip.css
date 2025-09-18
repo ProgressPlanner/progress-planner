@@ -21,7 +21,7 @@
 
 	padding: 0.75rem 1.5rem 0.75rem 0.75rem;
 	width: 150px;
-	background: var(--background-activity);
+	background: var(--prpl-background-activity);
 	border-radius: var(--prpl-border-radius);
 	z-index: 2; /* above the gauges */
 	visibility: hidden; /* hidden by default */
@@ -60,7 +60,7 @@
 		height: 0;
 		border-style: solid;
 		border-width: 7.5px 10px 7.5px 0;
-		border-color: transparent var(--background-activity) transparent transparent;
+		border-color: transparent var(--prpl-background-activity) transparent transparent;
 	}
 }
 

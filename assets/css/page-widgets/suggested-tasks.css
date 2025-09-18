@@ -38,7 +38,7 @@
 	.prpl-no-suggested-tasks,
 	.prpl-suggested-tasks-loading {
 		display: none;
-		background-color: var(--background-activity);
+		background-color: var(--prpl-background-activity);
 		padding: calc(var(--prpl-padding) / 2);
 	}
 
