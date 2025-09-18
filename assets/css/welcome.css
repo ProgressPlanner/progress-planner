@@ -43,7 +43,7 @@
 
 		.welcome-header-icon {
 			background: var(--prpl-background-banner);
-			background: linear-gradient(105deg, var(--prpl-background-banner) 25%, var(--background-monthly) 25%);
+			background: linear-gradient(105deg, var(--prpl-background-banner) 25%, var(--prpl-background-monthly) 25%);
 			padding: var(--prpl-padding);
 			padding-left: 100px;
 			padding-right: calc(var(--prpl-gap) * 1.5);

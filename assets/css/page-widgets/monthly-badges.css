@@ -75,7 +75,7 @@
 	.prpl-widget-title {
 		padding: 0.5rem 1rem;
 		border-radius: 0.5rem;
-		background: var(--background-monthly);
+		background: var(--prpl-background-monthly);
 	}
 
 	.badge-group-monthly {

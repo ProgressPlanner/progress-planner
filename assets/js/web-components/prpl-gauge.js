@@ -18,7 +18,7 @@ customElements.define(
 				max: 100,
 				value: 0,
 				maxDeg: '180deg',
-				background: 'var(--background-monthly)',
+				background: 'var(--prpl-background-monthly)',
 				color: 'var(--prpl-color-monthly)',
 				start: '270deg',
 				cutout: '57%',

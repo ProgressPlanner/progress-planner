@@ -57,7 +57,7 @@
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		background: var(--background-monthly);
+		background: var(--prpl-background-monthly);
 		padding: 1.2rem;
 		border-radius: 0.5rem;
 		margin-bottom: var(--prpl-padding);
@@ -177,6 +177,7 @@
 		margin-bottom: var(--prpl-gap);
 
 		.prpl-settings-section-title {
+			background: var(--prpl-background-setting-pages);
 
 			.icon {
 
@@ -239,14 +240,14 @@
 	.prpl-settings-section-title {
 
 		svg {
-			color: #038d88;
+			color: var(--prpl-color-setting-posts-icon);
 
 			path {
 				fill: currentcolor;
 			}
 		}
 
-		background-color: #f3faf9;
+		background-color: var(--prpl-background-setting-posts);
 	}
 
 }
@@ -257,10 +258,10 @@
 	.prpl-settings-section-title {
 
 		svg {
-			color: var(--prpl-graph-color-1);
+			color: var(--prpl-color-setting-login-icon);
 		}
 
-		background-color: var(--prpl-background-red);
+		background-color: var(--prpl-background-setting-login);
 	}
 
 }
