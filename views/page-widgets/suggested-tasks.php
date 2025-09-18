@@ -12,7 +12,12 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 <div class="prpl-dashboard-widget-suggested-tasks">
 	<h2 class="prpl-widget-title">
-		<?php \esc_html_e( 'Ravi\'s Recommendations', 'progress-planner' ); ?>
+		<?php
+		echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'suggested-tasks',
+			\esc_html__( 'Ravi\'s Recommendations', 'progress-planner' )
+		);
+		?>
 	</h2>
 	<p class="prpl-suggested-tasks-widget-description">
 		<?php \esc_html_e( 'Complete a task from Ravi’s Recommendations to improve your site and earn points toward this month’s badge!', 'progress-planner' ); ?>

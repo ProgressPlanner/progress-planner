@@ -17,7 +17,12 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 ?>
 <?php if ( $prpl_badge ) : ?>
 	<h2 class="prpl-widget-title">
-		<?php \esc_html_e( 'Your monthly badge', 'progress-planner' ); ?>
+		<?php
+		echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'monthly-badges',
+			\esc_html__( 'Your monthly badge', 'progress-planner' )
+		);
+		?>
 	</h2>
 
 	<prpl-gauge

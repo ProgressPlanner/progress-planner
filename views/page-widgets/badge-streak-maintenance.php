@@ -17,7 +17,10 @@ if ( ! $prpl_widget_details ) {
 
 <h2 class="prpl-widget-title">
 	<?php
-	\esc_html_e( 'Your streak badges', 'progress-planner' );
+	echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		'badge-streak-maintenance',
+		\esc_html__( 'Your streak badges', 'progress-planner' )
+	);
 	\progress_planner()->get_ui__popover()->the_popover( 'badge-streak' )->render_button(
 		'',
 		'<span class="icon prpl-info-icon">' . \progress_planner()->get_asset( 'images/icon_info.svg' ) . '</span> <span class="screen-reader-text">' . \esc_html__( 'More info', 'progress-planner' ) . '</span>'
