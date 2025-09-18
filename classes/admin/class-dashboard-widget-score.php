@@ -93,7 +93,7 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 			$result['color'] = 'var(--prpl-color-accent-orange)';
 		}
 		if ( $result['progress']['progress'] > 75 ) {
-			$result['color'] = 'var(--prpl-color-accent-green)';
+			$result['color'] = 'var(--prpl-graph-color-3)';
 		}
 
 		$cached[ $category ] = $result;

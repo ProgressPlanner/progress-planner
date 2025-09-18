@@ -55,7 +55,7 @@ final class Activity_Scores extends Widget {
 		}
 
 		if ( $number > 90 ) {
-			return 'var(--prpl-color-accent-green)';
+			return 'var(--prpl-graph-color-3)';
 		}
 		if ( $number > 30 ) {
 			return 'var(--prpl-color-accent-orange)';
@@ -156,7 +156,7 @@ final class Activity_Scores extends Widget {
 	 */
 	public function get_gauge_color( $score ) {
 		if ( $score >= 75 ) {
-			return 'var(--prpl-color-accent-green)';
+			return 'var(--prpl-graph-color-3)';
 		}
 		if ( $score >= 50 ) {
 			return 'var(--prpl-color-accent-orange)';

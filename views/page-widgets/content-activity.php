@@ -18,7 +18,7 @@ $prpl_activity_types = [
 	],
 	'update'  => [
 		'label' => \__( 'updated', 'progress-planner' ),
-		'color' => 'var(--prpl-color-accent-green)',
+		'color' => 'var(--prpl-graph-color-3)',
 	],
 	'delete'  => [
 		'label' => \__( 'deleted', 'progress-planner' ),
