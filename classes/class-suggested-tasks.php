@@ -288,36 +288,26 @@ class Suggested_Tasks {
 		);
 
 		$rest_meta_fields = [
-			'prpl_points'            => [
+			'prpl_points'  => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_task_id'           => [
+			'prpl_task_id' => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_url'               => [
+			'prpl_url'     => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_url_target'        => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'menu_order'             => [
+			'menu_order'   => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
 				'default'      => 0,
-			],
-			'prpl_external_link_url' => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
 			],
 		];
 
@@ -450,6 +440,14 @@ class Suggested_Tasks {
 			// This has to be the last item to be added because actions use data from previous items.
 			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
 			$response->data['prpl_points']       = $provider->get_points();
+
+			/*
+			Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
+			 * Those are tasks which are completed by toggling an option, so non repetitive & not user tasks.
+			*/
+			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['meta']['prpl_task_id'] ) ) {
+				$response->data['prpl_points'] = 0;
+			}
 		}
 
 		$category_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_category' );

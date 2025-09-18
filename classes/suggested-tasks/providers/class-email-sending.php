@@ -125,7 +125,7 @@ class Email_Sending extends Tasks_Interactive {
 		$this->email_subject = \esc_html__( 'Your Progress Planner test message!', 'progress-planner' );
 		$this->email_content = \sprintf(
 			// translators: %1$s the admin URL.
-			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_blank">Click here to mark Ravi\'s Recommendation as completed</a>.', 'progress-planner' ),
+			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_self">Click here to mark Ravi\'s Recommendation as completed</a>.', 'progress-planner' ),
 			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() )
 		);
 	}
@@ -188,6 +188,11 @@ class Email_Sending extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function enqueue_scripts( $hook ) {
+		// Enqueue the script only on Progress Planner and WP dashboard pages.
+		if ( 'toplevel_page_progress-planner' !== $hook && 'index.php' !== $hook ) {
+			return;
+		}
+
 		// Don't enqueue the script if the task is already completed.
 		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() ) ) {
 			return;

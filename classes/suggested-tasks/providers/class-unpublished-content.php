@@ -348,7 +348,7 @@ class Unpublished_Content extends Tasks {
 
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( $data['meta']['prpl_url'] ) . '" target="_self">' . \esc_html__( 'Publish', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \esc_url( $data['meta']['prpl_url'] ) . '" target="_self">' . \esc_html__( 'Edit', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

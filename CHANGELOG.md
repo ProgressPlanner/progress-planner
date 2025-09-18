@@ -1,11 +1,17 @@
-
 = 1.8.0 =
 
 Enhancements:
 
 * Redesign of the admin pages.
+* Improved capability checks.
+* a11y improvements.
+
+Added these recommendations from Ravi:
+
+* Set date format.
 
 Bugs we fixed:
+
 * Fix redirecting to Progress Planner Dashboard after login.
 
 = 1.7.2 =

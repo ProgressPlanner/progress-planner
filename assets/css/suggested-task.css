@@ -80,6 +80,7 @@
 		display: flex;
 		gap: 0.5rem;
 		align-items: center;
+		justify-content: flex-end;
 		grid-row-end: span 2;
 	}
 
@@ -141,6 +142,17 @@
 				&:focus,
 				&:active {
 					text-decoration: underline;
+				}
+			}
+
+			/* Close and toggle radio group buttons should not have a text decoration. */
+			.prpl-tooltip-close,
+			.prpl-toggle-radio-group {
+
+				&:hover,
+				&:focus,
+				&:active {
+					text-decoration: none;
 				}
 			}
 
