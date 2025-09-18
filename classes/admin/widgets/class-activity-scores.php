@@ -60,7 +60,7 @@ final class Activity_Scores extends Widget {
 		if ( $number > 30 ) {
 			return 'var(--prpl-color-accent-orange)';
 		}
-		return '#f43f5e';
+		return 'var(--prpl-graph-color-1)';
 	}
 
 	/**
