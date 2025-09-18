@@ -9,7 +9,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_widget_details = \progress_planner()->get_admin__widgets__badge_streak_content()->get_details( 'maintenance' );
+$prpl_widget_details = \progress_planner()->get_admin__widgets__badge_streak_maintenance()->get_details( 'maintenance' );
 if ( ! $prpl_widget_details ) {
 	return;
 }
