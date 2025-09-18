@@ -704,4 +704,26 @@ abstract class Tasks implements Tasks_Interface {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		return $actions;
 	}
+
+	/**
+	 * Check if the task has activity.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function task_has_activity( $task_id = '' ) {
+		if ( empty( $task_id ) ) {
+			$task_id = $this->get_task_id();
+		}
+
+		$activity = \progress_planner()->get_activities__query()->query_activities(
+			[
+				'category' => 'suggested_task',
+				'data_id'  => $task_id,
+			]
+		);
+
+		return ! empty( $activity );
+	}
 }
