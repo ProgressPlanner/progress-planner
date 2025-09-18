@@ -49,6 +49,13 @@ function onboardingTests( testContext = test ) {
 					)
 					.click();
 
+				// Wait until the scan completes and page navigates.
+				await page.waitForURL( /content-scan-finished=true/, {
+					timeout: 30000,
+				} );
+
+				console.log( 'Current URL:', page.url() );
+
 				// Verify onboarding completion by checking for expected elements
 				await expect(
 					page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
