@@ -14,14 +14,10 @@
 
 	--prpl-color-gray-3: #9ca3af;
 	--prpl-color-gray-4: #6b7280;
-	--prpl-color-gray-5: #4b5563;
-	--prpl-color-gray-6: #374151;
 
 	--prpl-color-accent-orange: #faa310;
 	--prpl-color-accent-purple: #0d6b9e;
 
-	--prpl-color-headings: #38296d;
-	--prpl-color-text: var(--prpl-color-gray-5);
 	--prpl-color-link: #1e40af;
 
 	--prpl-color-notification-green: #16a34a;
@@ -435,11 +431,11 @@ button.prpl-info-icon {
 	cursor: pointer;
 	background: none;
 	border: none;
-	color: var(--prpl-color-gray-4);
+	color: var(--prpl-color-text);
 
 	&:hover,
 	&:focus {
-		color: var(--prpl-color-gray-6);
+		color: var(--prpl-color-text-hover);
 	}
 }
 

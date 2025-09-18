@@ -203,7 +203,7 @@
 
 #todo-list-completed-details {
 	margin-top: 1rem;
-	border: 1px solid var(--prpl-color-gray-3);
+	border: 1px solid var(--prpl-color-border);
 	border-radius: 0.5rem;
 
 	summary {

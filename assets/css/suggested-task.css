@@ -121,7 +121,7 @@
 					content: "";
 					display: inline-block;
 					width: 1px;
-					background: var(--prpl-color-gray-5);
+					background: var(--prpl-color-text);
 					height: 0.75rem;
 				}
 			}
@@ -173,7 +173,7 @@
 
 	.prpl-suggested-task-description {
 		font-size: 0.825rem;
-		color: var(--prpl-color-gray-6);
+		color: var(--prpl-color-text);
 		margin: 0;
 	}
 
@@ -198,7 +198,7 @@
 		padding: 0;
 		border: 0;
 		background: none;
-		color: var(--prpl-color-gray-3);
+		color: var(--prpl-color-ui-icon);
 		cursor: pointer;
 		box-shadow: none;
 		margin-top: 1px;
@@ -234,7 +234,7 @@
 		}
 
 		&:hover {
-			color: var(--prpl-color-gray-6);
+			color: var(--prpl-color-ui-icon-hover);
 		}
 	}
 

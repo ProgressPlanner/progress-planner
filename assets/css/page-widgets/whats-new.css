@@ -46,7 +46,7 @@
 			text-decoration: underline;
 
 			&:hover {
-				color: var(--prpl-color-gray-6);
+				color: var(--prpl-color-link-hover);
 				text-decoration: none;
 			}
 		}

@@ -217,7 +217,7 @@
 		.prpl-button {
 			padding: 0.75rem 1.25rem;
 			border: none;
-			color: var(--prpl-color-gray-6);
+			color: var(--prpl-color-text);
 			font-weight: 600;
 			border-radius: var(--prpl-border-radius);
 			background-color: var(--prpl-background-banner);
