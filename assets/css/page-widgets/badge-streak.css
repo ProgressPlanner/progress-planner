@@ -15,11 +15,11 @@
 }
 
 #popover-badge-streak-content .inner {
-	background: var(--prpl-background-red);
+	background: var(--prpl-background-streak);
 }
 
 #popover-badge-streak-maintenance .inner {
-	background: var(--prpl-background-blue);
+	background: var(--prpl-background-content-badge);
 }
 
 .badges-popover-progress-total {

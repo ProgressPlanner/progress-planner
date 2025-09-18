@@ -15,20 +15,12 @@
 	--prpl-color-gray-3: #9ca3af;
 	--prpl-color-gray-4: #6b7280;
 
-	--prpl-color-accent-orange: #faa310;
-	--prpl-color-accent-purple: #0d6b9e;
-
-	--prpl-color-link: #1e40af;
-
 	--prpl-color-notification-green: #16a34a;
 	--prpl-color-notification-red: #e73136;
 
 	--prpl-color-button-primary: #dd3244;
 	--prpl-color-button-primary-hover: #cf2441;
 
-	--prpl-background-orange: #fff9f0;
-	--prpl-background-purple: #f6f5fb;
-	--prpl-background-green: #f2faf9;
 	--prpl-background-red: #fff6f7;
 	--prpl-background-blue: #effbfe;
 
@@ -480,7 +472,7 @@ button.prpl-info-icon {
 }
 
 .driver-popover.prpl-driverjs-theme {
-	background-color: var(--prpl-background-orange);
+	background-color: var(--background-monthly);
 	color: var(--prpl-color-text);
 
 	.driver-popover-title {
@@ -492,7 +484,7 @@ button.prpl-info-icon {
 	}
 
 	button:not(.driver-popover-close-btn):hover {
-		background-color: var(--prpl-background-orange);
+		background-color: var(--background-monthly);
 	}
 }
 

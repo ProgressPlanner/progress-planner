@@ -58,7 +58,7 @@ final class Activity_Scores extends Widget {
 			return 'var(--prpl-graph-color-3)';
 		}
 		if ( $number > 30 ) {
-			return 'var(--prpl-color-accent-orange)';
+			return 'var(--prpl-color-monthly)';
 		}
 		return 'var(--prpl-graph-color-1)';
 	}
@@ -159,7 +159,7 @@ final class Activity_Scores extends Widget {
 			return 'var(--prpl-graph-color-3)';
 		}
 		if ( $score >= 50 ) {
-			return 'var(--prpl-color-accent-orange)';
+			return 'var(--prpl-color-monthly)';
 		}
 		return 'var(--prpl-graph-color-1)';
 	}

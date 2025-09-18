@@ -38,7 +38,7 @@
 	.prpl-no-suggested-tasks,
 	.prpl-suggested-tasks-loading {
 		display: none;
-		background-color: var(--prpl-background-green);
+		background-color: var(--background-activity);
 		padding: calc(var(--prpl-padding) / 2);
 	}
 
@@ -148,7 +148,7 @@
 		&.prpl-column-content {
 			padding: 20px;
 			border-radius: var(--prpl-border-radius-big);
-			background-color: var(--prpl-background-purple);
+			background-color: var(--background-content);
 		}
 
 		.prpl-note {
@@ -157,10 +157,10 @@
 			align-items: flex-start;
 			gap: 0.5rem;
 			padding: 0.75rem;
-			color: #854d0e;
+			color: var(--prpl-color-alert-warning-text);
 			font-size: var(--prpl-font-size-small);
 			border-radius: 6px;
-			background-color: #fefce8;
+			background-color: var(--prpl-background-alert-warning);
 
 			.prpl-note-icon {
 				display: flex;
@@ -169,7 +169,7 @@
 				justify-content: center;
 				width: 20px;
 				height: 20px;
-				color: #eab308;
+				color: var(--prpl-color-alert-warning);
 
 				svg {
 					width: 100%;
@@ -178,11 +178,11 @@
 			}
 
 			&.prpl-note-error {
-				color: #9f0712;
-				background-color: var(--prpl-background-red);
+				color: var(--prpl-color-alert-error-text);
+				background-color: var(--prpl-background-alert-error);
 
 				.prpl-note-icon {
-					color: var(--prpl-color-notification-red);
+					color: var(--prpl-color-alert-error);
 				}
 
 			}

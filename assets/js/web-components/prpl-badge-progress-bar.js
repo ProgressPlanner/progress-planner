@@ -37,7 +37,7 @@ customElements.define(
 							style="
 								width: ${ progress }%;
 								height: 100%;
-								background-color: var(--prpl-color-accent-orange);
+								background-color: var(--prpl-color-monthly);
 								border-radius: 0.5rem;"
 						></div>
 						<prpl-badge

@@ -33,8 +33,8 @@ $prpl_record = $prpl_widget->personal_record_callback();
 	</div>
 </h2>
 
-<div style="--background: var(--prpl-background-orange)">
-	<prpl-gauge background="var(--prpl-background-green)" color="<?php echo \esc_attr( $prpl_widget->get_gauge_color( $prpl_widget->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-6xl)">
+<div style="--background: var(--background-monthly)">
+	<prpl-gauge background="var(--background-activity)" color="<?php echo \esc_attr( $prpl_widget->get_gauge_color( $prpl_widget->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-6xl)">
 		<progress max="100" value="<?php echo (float) $prpl_widget->get_score(); ?>">
 			<?php echo \esc_html( $prpl_widget->get_score() ); ?>
 		</progress>
@@ -83,7 +83,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 <prpl-big-counter
 	number="<?php echo \esc_html( \number_format_i18n( (int) $prpl_record['max_streak'] ) ); ?>"
 	content="<?php echo \esc_attr_e( 'personal record', 'progress-planner' ); ?>"
-	background-color="var(--prpl-background-green)"
+	background-color="var(--background-activity)"
 ></prpl-big-counter>
 
 <div class="prpl-widget-content">

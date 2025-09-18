@@ -14,7 +14,7 @@ $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( ne
 		<prpl-gauge
 			id="prpl-gauge-ravi"
 			background="#fff"
-			color="var(--prpl-color-accent-orange)"
+			color="var(--prpl-color-monthly)"
 			contentFontSize="var(--prpl-font-size-4xl)"
 			contentPadding="var(--prpl-padding)"
 			marginBottom="0"
