@@ -54,8 +54,6 @@ function onboardingTests( testContext = test ) {
 					timeout: 30000,
 				} );
 
-				console.log( 'Current URL:', page.url() );
-
 				// Verify onboarding completion by checking for expected elements
 				await expect(
 					page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
