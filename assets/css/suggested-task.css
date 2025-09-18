@@ -88,7 +88,7 @@
 		font-size: var(--prpl-font-size-xs);
 		font-weight: 700;
 		color: var(--prpl-color-headings);
-		background-color: var(--prpl-color-400-orange);
+		background-color: var(--prpl-background-banner);
 		width: 1.5rem;
 		height: 1.5rem;
 		border-radius: 50%;
