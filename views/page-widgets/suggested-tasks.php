@@ -23,6 +23,21 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	<p class="prpl-suggested-tasks-loading">
 		<?php \esc_html_e( 'Loading tasks...', 'progress-planner' ); ?>
 	</p>
+	<?php
+	// Check if the request URI contains the parameter 'prpl_show_all_recommendations'.
+	$prpl_request_uri = isset( $_SERVER['REQUEST_URI'] ) ? \sanitize_text_field( \wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+	?>
+	<p class="prpl-show-all-tasks">
+		<?php if ( false === strpos( $prpl_request_uri, 'prpl_show_all_recommendations' ) ) : ?>
+		<a href="<?php echo \esc_url( \add_query_arg( 'prpl_show_all_recommendations', '', \admin_url( 'admin.php?page=progress-planner&prpl_show_all_recommendations' ) ) ); ?>">
+			<?php \esc_html_e( 'Show all Recommendations', 'progress-planner' ); ?>
+		</a>
+		<?php else : ?>
+		<a href="<?php echo \esc_url( \remove_query_arg( 'prpl_show_all_recommendations', \admin_url( 'admin.php?page=progress-planner' ) ) ); ?>">
+			<?php \esc_html_e( 'Show less recommendations', 'progress-planner' ); ?>
+		</a>
+		<?php endif; ?>
+	</p>
 	<p class="prpl-no-suggested-tasks">
 		<?php \esc_html_e( 'You have completed all recommended tasks.', 'progress-planner' ); ?>
 		<br>
