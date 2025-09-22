@@ -59,7 +59,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					\printf(
 						/* translators: %s: progressplanner.com link */
 						\esc_html__( 'To send these updates, we’ll create an account for you on %s.', 'progress-planner' ),
-						'<a href="https://prpl.fyi/home" target="_blank">progressplanner.com</a>'
+						'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/home' ) ) . '" target="_blank">progressplanner.com</a>'
 					)
 					?>
 				</div>
@@ -130,7 +130,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 						\printf(
 						/* translators: %s: progressplanner.com/privacy-policy link */
 							\esc_html__( 'I agree to the %s.', 'progress-planner' ),
-							'<a href="https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy" target="_blank">Privacy policy</a>'
+							'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">Privacy policy</a>'
 						);
 						?>
 					</label>
@@ -160,7 +160,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					\printf(
 						/* translators: %s: progressplanner.com link */
 						\esc_html__( 'Success! We saved your data on %s so we can email you every week.', 'progress-planner' ),
-						'<a href="https://prpl.fyi/home">ProgressPlanner.com</a>'
+						'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/home' ) ) . '">ProgressPlanner.com</a>'
 					);
 					?>
 				</p>
