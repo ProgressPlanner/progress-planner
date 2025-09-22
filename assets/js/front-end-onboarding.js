@@ -103,8 +103,6 @@ class ProgressPlannerTour {
 	 * @param {Object} state
 	 */
 	mountMoreTasksStep( state ) {
-		state.data.moreTasksCompleted = {};
-
 		const handler = ( e ) => {
 			const thisBtn = e.target.closest( 'button' );
 			this.completeTask( thisBtn.dataset.taskId )
