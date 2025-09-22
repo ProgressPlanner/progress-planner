@@ -40,7 +40,45 @@ class Front_End_Onboarding {
 	 * @return void
 	 */
 	public function add_popover_scripts() {
+		// Enqueue front-end-onboarding.css.
 		\wp_enqueue_style( 'prpl-popover-front-end-onboarding', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/css/front-end-onboarding.css', [], \progress_planner()->get_plugin_version() );
+
+		// Enqueue front-end-onboarding.js.
+		\wp_enqueue_script( 'prpl-popover-front-end-onboarding', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/js/front-end-onboarding.js', [], \progress_planner()->get_plugin_version(), true );
+
+		$ravis_recommendations = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'post_status' => 'publish',
+				'tax_query'   => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+					[
+						'taxonomy' => 'prpl_recommendations_provider',
+						'field'    => 'slug',
+						'terms'    => 'user',
+						'operator' => 'NOT IN',
+					],
+				],
+			]
+		);
+		$tasks                 = [];
+		foreach ( $ravis_recommendations as $recommendation ) {
+			$tasks[] = [
+				'task_id'     => $recommendation->task_id,
+				'title'       => $recommendation->post_title,
+				'url'         => $recommendation->url,
+				'provider_id' => $recommendation->get_provider_id(),
+				'points'      => $recommendation->points,
+			];
+		}
+
+		\wp_localize_script(
+			'prpl-popover-front-end-onboarding',
+			'ProgressPlannerData',
+			[
+				'adminAjaxUrl'         => \esc_url_raw( admin_url( 'admin-ajax.php' ) ),
+				'nonceProgressPlanner' => \esc_js( \wp_create_nonce( 'progress_planner' ) ),
+				'tasks'                => $tasks,
+			]
+		);
 	}
 
 	/**
@@ -182,304 +220,18 @@ class Front_End_Onboarding {
 		}
 		?>
 		<script>
-			const prplPopoverId = 'prpl-popover-front-end-onboarding';
-
-			// Open popover on page load.
-			document.addEventListener( 'DOMContentLoaded', function() {
-				const popover = document.getElementById( prplPopoverId );
-				if ( popover ) {
-					popover.addEventListener( 'beforetoggle', ( event ) => {
-						if ( event.newState === 'open' ) {
-							// If we need to do something when the popover is opened, do it here.
-							console.log('Opened');
-						}
-
-						if ( event.newState === 'closed' ) {
-							// If we need to do something when the popover is closed, do it here.
-						}
-					} );
-				}
-			} );
-
-			function prplStartTour() {
-				const popover = document.getElementById(prplPopoverId);
-				if ( popover ) {
-					popover.showPopover();
-					renderStep();
-				}
-			}
-
-			// Prototyping code.
-			ProgressPlannerData = {
-				adminAjaxUrl: '<?php echo \esc_url_raw( admin_url( 'admin-ajax.php' ) ); ?>',
-				nonceProgressPlanner: '<?php echo \esc_js( \wp_create_nonce( 'progress_planner' ) ); ?>',
-				tasks: <?php echo \wp_json_encode( $tasks ); ?>,
-			};
-
-			const prplTourSteps = [
-				{
-					id: 'welcome',
-					title: 'Welcome',
-					render: () => document.getElementById('tour-step-welcome').innerHTML,
-				},
-				{
-					id: 'first-task',
-					title: 'Complete first task',
-					render: () => document.getElementById('tour-step-first-task').innerHTML,
-					onMount: (state) => {
-						const btn = document.querySelector('#first-task-btn');
-
-						const handler = (e) => {
-							const thisBtn = e.target.closest('button');
-
-							fetch(ProgressPlannerData.adminAjaxUrl, {
-								method: 'POST',
-								body: new URLSearchParams({
-									task_id: thisBtn.dataset.taskId,
-									nonce: ProgressPlannerData.nonceProgressPlanner,
-									action: 'progress_planner_tour_complete_task',
-								}),
-							}).then(res => {
-								if (!res.ok) throw new Error('Request failed: ' + res.status);
-								return res.json();
-							}).then(data => {
-								thisBtn.classList.add('prpl-complete-task-btn-completed');
-								state.data.firstTaskCompleted = {
-									[ thisBtn.dataset.taskId ]: true,
-								};
-							}).catch(error => {
-								console.error(error);
-								thisBtn.classList.add('prpl-complete-task-btn-error');
-							});
-						};
-
-						btn.addEventListener('click', handler );
-
-						// Cleanup function — automatically removes event listener.
-						return () => {
-							btn.removeEventListener('click', handler);
-						};
-					},
-					canProceed: (state) => !! state.data.firstTaskCompleted,
-				},
-				{
-					id: 'badges',
-					title: 'Our badges are waiting for you',
-					render: () => document.getElementById('tour-step-badges').innerHTML,
-				},
-				{
-					id: 'more-tasks',
-					title: 'Complete more tasks',
-					render: () => document.getElementById('tour-step-more-tasks').innerHTML,
-					onMount: (state) => {
-						// Set more tasks completed to empty object.
-						state.data.moreTasksCompleted = {};
-
-						const handler = (e) => {
-							const thisBtn = e.target.closest('button');
-
-							fetch(ProgressPlannerData.adminAjaxUrl, {
-								method: 'POST',
-								body: new URLSearchParams({
-									task_id: thisBtn.dataset.taskId,
-									nonce: ProgressPlannerData.nonceProgressPlanner,
-									action: 'progress_planner_tour_complete_task',
-								}),
-							}).then(res => {
-								if (!res.ok) throw new Error('Request failed: ' + res.status);
-								return res.json();
-							}).then(data => {
-								thisBtn.classList.add('prpl-complete-task-btn-completed');
-								state.data.moreTasksCompleted[ thisBtn.dataset.taskId ] = true;
-							}).catch(error => {
-								console.error(error);
-								thisBtn.classList.add('prpl-complete-task-btn-error');
-							});
-
-						};
-
-						const btns = document.querySelectorAll('button[data-task-id]');
-
-						btns.forEach(btn => {
-							btn.addEventListener('click', handler );
-
-							// Set more tasks completed to false.
-							state.data.moreTasksCompleted[ btn.dataset.taskId ] = false;
-						});
-
-						// Cleanup function — automatically removes event listener.
-						return () => {
-							btns.forEach(btn => {
-								btn.removeEventListener('click', handler);
-							});
-						};
-					},
-					canProceed: (state) => {
-						return Object.keys(state.data.moreTasksCompleted).length > 0 && Object.values(state.data.moreTasksCompleted).every(Boolean);
-					},
-				},
-				{
-					id: 'finish',
-					title: 'Done',
-					render: () => document.getElementById('tour-step-finish').innerHTML,
-					onMount: (state) => {
-						const btn = document.querySelector('#prpl-finish-btn');
-						const handler = () => {
-							state.data.finished = true;
-
-							// close the tour
-							closeTour();
-						};
-						btn.addEventListener('click', handler );
-						return () => {
-							btn.removeEventListener('click', handler);
-						};
-					},
-				}
-			];
-
-			// State.
-			const prplTourState = {
-				currentStep: 0,
-				data: {
-					moreTasksCompleted: {},
-					firstTaskCompleted: false,
-					finished: false,
-				},
-			};
-
-			function renderStep() {
-				const step = prplTourSteps[prplTourState.currentStep];
-				const popover = document.getElementById(prplPopoverId);
-				popover.querySelector('.tour-title').innerHTML = step.title;
-				popover.querySelector('.tour-content').innerHTML = step.render();
-
-				// Unmount per-step logic.
-				if (prplTourState.cleanup) {
-					prplTourState.cleanup();
-				}
-
-				// Mount per-step logic.
-				if (typeof step.onMount === 'function') {
-					prplTourState.cleanup = step.onMount(prplTourState);
-				} else {
-					prplTourState.cleanup = () => {};
-				}
-
-				// Update data-prpl-step attribute.
-				popover.dataset.prplStep = prplTourState.currentStep;
-
-				updateNextButton();
-
-				// If we reached last step, show finish button.
-				if (prplTourState.currentStep === prplTourSteps.length - 1) {
-					// Hide other buttons.
-					popover.querySelector('.prpl-tour-prev').style.display = 'none';
-					popover.querySelector('.prpl-tour-next').style.display = 'none';
-
-					// Show finish button.
-					popover.querySelector('#prpl-finish-btn').style.display = 'inline-block';
-				} else {
-					// Hide finish button.
-					popover.querySelector('#prpl-finish-btn').style.display = 'none';
-
-					// Show other buttons.
-					popover.querySelector('.prpl-tour-prev').style.display = 'inline-block';
-					popover.querySelector('.prpl-tour-next').style.display = 'inline-block';
-				}
-			}
-
-			function nextStep() {
-				const step = prplTourSteps[prplTourState.currentStep];
-				if (step.canProceed && !step.canProceed(prplTourState)) return;
-
-				if (prplTourState.currentStep < prplTourSteps.length - 1) {
-					prplTourState.currentStep++;
-					saveProgressToServer(prplTourState);
-					renderStep();
-				} else {
-					closeTour();
-				}
-			}
-
-			function prevStep() {
-				if (prplTourState.currentStep > 0) {
-					prplTourState.currentStep--;
-					renderStep();
-				}
-			}
-
-			function closeTour() {
-				const popover = document.getElementById( prplPopoverId );
-
-				if ( popover ) {
-					popover.hidePopover();
-				}
-
-				saveProgressToServer( prplTourState );
-			}
-
-			// Persistence, save state (if we want to allow user to continue the tour later).
-			function saveProgressToServer(state) {
-
-				// Or use browser's localStorage.
-				return fetch(ProgressPlannerData.adminAjaxUrl, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-					},
-					body: new URLSearchParams({
-						state: JSON.stringify(state),
-						nonce: ProgressPlannerData.nonceProgressPlanner,
-						action: 'progress_planner_tour_save_progress',
-					}),
-					credentials: 'same-origin', // ensures cookies (auth) are sent
-				}).then(res => {
-					if (!res.ok) throw new Error('Request failed: ' + res.status);
-					return res.json();
-				});
-			}
-
-			// Bootstrapping.
+			// Initialize tour when DOM is ready
 			document.addEventListener('DOMContentLoaded', () => {
-				const popover = document.getElementById(prplPopoverId);
-				popover.querySelector('.prpl-tour-next').addEventListener('click', nextStep);
-				popover.querySelector('.prpl-tour-prev').addEventListener('click', prevStep);
 
-				// Fetch saved state (if we want to allow user to continue the tour later).
+				// Initialize tour instance
+				window.prplTour = new ProgressPlannerTour(window.ProgressPlannerData);
+
+				// Setup event listeners after DOM is ready
+				window.prplTour.setupEventListeners();
+
+				// Global function for starting tour (used by admin toolbar)
+				window.prplStartTour = () => window.prplTour.startTour();
 			});
-
-			// Deep proxy function to watch nested object changes.
-			function createDeepProxy(target, callback) {
-				return new Proxy(target, {
-					set(obj, prop, value) {
-						// If the value is an object, make it a deep proxy too
-						if (value && typeof value === 'object' && !Array.isArray(value)) {
-							value = createDeepProxy(value, callback);
-						}
-
-						obj[prop] = value;
-						callback();
-						return true;
-					}
-				});
-			}
-
-			// Live update whenever state changes (including nested objects).
-			prplTourState.data = createDeepProxy( prplTourState.data, updateNextButton );
-
-			function updateNextButton() {
-				const step = prplTourSteps[ prplTourState.currentStep ];
-
-				const popover = document.getElementById( prplPopoverId );
-				const nextBtn = popover.querySelector( '.prpl-tour-next' );
-
-				if ( step.canProceed ) {
-					nextBtn.disabled = ! step.canProceed( prplTourState );
-				} else {
-					nextBtn.disabled = false;
-				}
-			}
 		</script>
 
 		<!-- Tour step welcome -->
