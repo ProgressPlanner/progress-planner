@@ -1,0 +1,83 @@
+#prpl-popover-front-end-onboarding {
+
+	padding: 24px 24px 14px 24px;
+	box-sizing: border-box;
+
+	background: #fff;
+	border: 1px solid #9ca3af;
+	border-radius: 8px;
+	font-weight: 400;
+	max-height: 82vh;
+	width: 1200px;
+	max-width: 80vw;
+
+	&::backdrop {
+		background: rgba(0, 0, 0, 0.5);
+	}
+
+	.prpl-btn {
+		display: inline-block;
+		margin: 1rem 0;
+		padding: 0.75rem 1.25rem;
+		color: #fff;
+		text-decoration: none;
+		cursor: pointer;
+		font-size: 16px;
+		background: #dd3244;
+		line-height: 1.25;
+		box-shadow: none;
+		border: none;
+		border-radius: 6px;
+		transition: all 0.25s  ease-in-out;
+		font-weight: 600;
+		text-align: center;
+		box-sizing: border-box;
+		position: relative;
+		z-index: 1;
+
+		&:disabled {
+			opacity: 0.5;
+			pointer-events: none;
+		}
+
+		&:not([disabled]):hover,
+		&:not([disabled]):focus {
+			background: #cf2441;
+		}
+	}
+
+	.prpl-complete-task-btn {
+		border: none;
+		background: none;
+		cursor: pointer;
+		padding: 0;
+		margin: 0;
+		font-size: 16px;
+		color: #1e40af;
+	}
+
+	.prpl-complete-task-btn-completed {
+		color: #059669;
+	}
+
+	.prpl-complete-task-btn-error {
+		color: #9f0712;
+	}
+
+	.prpl-complete-task-item {
+		margin-bottom: 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+
+	#prpl-more-tasks-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+
+		li:not(:last-child) {
+			margin-bottom: 10px;
+		}
+	}
+}

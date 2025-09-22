@@ -13,23 +13,18 @@ namespace Progress_Planner\Front_End;
 class Front_End_Onboarding {
 
 	/**
-	 * The popover ID for front end onboarding.
-	 *
-	 * @var string
-	 */
-	const POPOVER_ID = 'front-end-onboarding';
-
-	/**
 	 * Constructor.
 	 *
 	 * @return void
 	 */
 	public function __construct() {
+		// Add popover markup.
 		\add_action( 'wp_footer', [ $this, 'add_popover' ] );
 
-		\add_action( 'wp_footer', [ $this, 'add_popover_style' ] );
-
 		\add_action( 'wp_footer', [ $this, 'add_popover_inline_script' ] );
+
+		// Add popover scripts.
+		\add_action( 'wp_enqueue_scripts', [ $this, 'add_popover_scripts' ] );
 
 		// Add admin toolbar item.
 		\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_item' ] );
@@ -37,6 +32,15 @@ class Front_End_Onboarding {
 		// Note: AJAX action needs to be registered early (ie wrapping init in is_admin() check will be to late).
 		\add_action( 'wp_ajax_progress_planner_tour_complete_task', [ $this, 'ajax_complete_task' ] );
 		\add_action( 'wp_ajax_progress_planner_tour_save_progress', [ $this, 'ajax_save_tour_progress' ] );
+	}
+
+	/**
+	 * Add popover scripts.
+	 *
+	 * @return void
+	 */
+	public function add_popover_scripts() {
+		\wp_enqueue_style( 'prpl-popover-front-end-onboarding', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/css/front-end-onboarding.css', [], \progress_planner()->get_plugin_version() );
 	}
 
 	/**
@@ -127,7 +131,7 @@ class Front_End_Onboarding {
 	 */
 	public function add_popover() {
 		?>
-		<div id="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>" class="prpl-popover prpl-popover-onboarding" data-prpl-step="0" popover>
+		<div id="prpl-popover-front-end-onboarding" class="prpl-popover prpl-popover-onboarding" data-prpl-step="0" popover>
 
 			<div class="tour-header">
 				<h2 class="tour-title">
@@ -143,101 +147,6 @@ class Front_End_Onboarding {
 				<button id="prpl-finish-btn" class="prpl-btn prpl-btn-primary">Finish</button>
 			</div>
 		</div>
-		<?php
-	}
-
-	/**
-	 * Add the popover style.
-	 *
-	 * @return void
-	 */
-	public function add_popover_style() {
-		?>
-		<style>
-			#prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?> {
-
-				padding: 24px 24px 14px 24px;
-				box-sizing: border-box;
-
-				background: #fff;
-				border: 1px solid #9ca3af;
-				border-radius: 8px;
-				font-weight: 400;
-				max-height: 82vh;
-				width: 1200px;
-				max-width: 80vw;
-
-				&::backdrop {
-					background: rgba(0, 0, 0, 0.5);
-				}
-
-				.prpl-btn {
-					display: inline-block;
-					margin: 1rem 0;
-					padding: 0.75rem 1.25rem;
-					color: #fff;
-					text-decoration: none;
-					cursor: pointer;
-					font-size: 16px;
-					background: #dd3244;
-					line-height: 1.25;
-					box-shadow: none;
-					border: none;
-					border-radius: 6px;
-					transition: all 0.25s  ease-in-out;
-					font-weight: 600;
-					text-align: center;
-					box-sizing: border-box;
-					position: relative;
-					z-index: 1;
-
-					&:disabled {
-						opacity: 0.5;
-						pointer-events: none;
-					}
-
-					&:not([disabled]):hover,
-					&:not([disabled]):focus {
-						background: #cf2441;
-					}
-				}
-
-				.prpl-complete-task-btn {
-					border: none;
-					background: none;
-					cursor: pointer;
-					padding: 0;
-					margin: 0;
-					font-size: 16px;
-					color: #1e40af;
-				}
-
-				.prpl-complete-task-btn-completed {
-					color: #059669;
-				}
-
-				.prpl-complete-task-btn-error {
-					color: #9f0712;
-				}
-
-				.prpl-complete-task-item {
-					margin-bottom: 1rem;
-					display: flex;
-					align-items: center;
-					justify-content: space-between;
-				}
-
-				#prpl-more-tasks-list {
-					list-style: none;
-					padding: 0;
-					margin: 0;
-
-					li:not(:last-child) {
-						margin-bottom: 10px;
-					}
-				}
-			}
-		</style>
 		<?php
 	}
 
@@ -273,7 +182,7 @@ class Front_End_Onboarding {
 		}
 		?>
 		<script>
-			const prplPopoverId = 'prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>';
+			const prplPopoverId = 'prpl-popover-front-end-onboarding';
 
 			// Open popover on page load.
 			document.addEventListener( 'DOMContentLoaded', function() {
