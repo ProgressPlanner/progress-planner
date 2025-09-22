@@ -188,21 +188,16 @@ class Front_End_Onboarding {
 			document.addEventListener( 'DOMContentLoaded', function() {
 				const popover = document.getElementById( prplPopoverId );
 				if ( popover ) {
-					// popover.showPopover();
-					// renderStep();
+					popover.addEventListener( 'beforetoggle', ( event ) => {
+						if ( event.newState === 'open' ) {
+							// If we need to do something when the popover is opened, do it here.
+							console.log('Opened');
+						}
 
-					// popover.addEventListener( 'beforetoggle', ( event ) => {
-					// 	if ( event.newState === 'open' ) {
-					// 		console.log('Opened');
-					// 		renderStep();
-					// 	}
-
-					// 	if ( event.newState === 'closed' ) {
-					// 		console.log('Closed');
-					// 		// TODO: Save progress to server.
-					// 		saveProgressToServer({ finished: true });
-					// 	}
-					// } );
+						if ( event.newState === 'closed' ) {
+							// If we need to do something when the popover is closed, do it here.
+						}
+					} );
 				}
 			} );
 
@@ -216,9 +211,7 @@ class Front_End_Onboarding {
 
 			// Prototyping code.
 			ProgressPlannerData = {
-				restUrl: '<?php echo \esc_url_raw( rest_url( 'progress-planner/v1/tour-progress' ) ); ?>',
 				adminAjaxUrl: '<?php echo \esc_url_raw( admin_url( 'admin-ajax.php' ) ); ?>',
-				nonceWpRest: '<?php echo \esc_js( \wp_create_nonce( 'wp_rest' ) ); ?>',
 				nonceProgressPlanner: '<?php echo \esc_js( \wp_create_nonce( 'progress_planner' ) ); ?>',
 				tasks: <?php echo \wp_json_encode( $tasks ); ?>,
 			};
