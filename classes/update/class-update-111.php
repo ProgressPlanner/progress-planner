@@ -172,9 +172,7 @@ class Update_111 extends Update {
 	 */
 	private function migrate_activities() {
 		// Migrate acgtivities saved in the progress_planner_activities table.
-		foreach ( \progress_planner()->get_activities__query()->query_activities(
-			[ 'category' => 'suggested_task' ],
-		) as $activity ) {
+		foreach ( \progress_planner()->get_activities__query()->query_activities( [ 'category' => 'suggested_task' ] ) as $activity ) {
 			$data_id     = $activity->data_id;
 			$new_data_id = $this->convert_task_id( $data_id );
 			if ( $new_data_id !== $data_id ) {
@@ -339,14 +337,14 @@ class Update_111 extends Update {
 
 		if ( ! empty( $activities ) ) {
 			foreach ( $activities as $activity ) {
-				if ( ! isset( $activity->data_id ) || ! isset( $activity->date ) ) {
+				if ( ! isset( $activity->date ) ) {
 					continue;
 				}
 				if ( false !== \strpos( $activity->data_id, 'provider_id/review-post' ) ) {
 					$data = $this->get_data_from_task_id( $activity->data_id );
 
 					$new_data_id = $data['provider_id'] . '-' . $data['post_id'] . '-' . $activity->date->format( 'YW' );
-					if ( $new_data_id !== $activity->data_id && \is_callable( [ $activity, 'save' ] ) ) {
+					if ( $new_data_id !== $activity->data_id ) {
 						$activity->data_id = $new_data_id;
 						$activity->save();
 					}

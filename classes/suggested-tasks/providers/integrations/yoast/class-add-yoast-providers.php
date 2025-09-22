@@ -111,8 +111,10 @@ class Add_Yoast_Providers {
 	 * @return array
 	 */
 	public function exclude_not_indexable_taxonomies( $exclude_taxonomies ) {
-		foreach ( \YoastSEO()->helpers->taxonomy->get_public_taxonomies() as $taxonomy ) {
-			if ( ! \in_array( $taxonomy, $exclude_taxonomies, true ) && false === \YoastSEO()->helpers->taxonomy->is_indexable( $taxonomy ) ) {
+		foreach ( \YoastSEO()->helpers->taxonomy->get_public_taxonomies() as $taxonomy ) { // @phpstan-ignore-line property.nonObject
+			if ( ! \in_array( $taxonomy, $exclude_taxonomies, true )
+				&& false === \YoastSEO()->helpers->taxonomy->is_indexable( $taxonomy ) // @phpstan-ignore-line property.nonObject
+			) {
 				$exclude_taxonomies[] = $taxonomy;
 			}
 		}

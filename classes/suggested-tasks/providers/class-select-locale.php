@@ -41,6 +41,13 @@ class Select_Locale extends Tasks_Interactive {
 	const POPOVER_ID = 'select-locale';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-locale';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -84,15 +91,6 @@ class Select_Locale extends Tasks_Interactive {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Select your site locale', 'progress-planner' );
-	}
-
-	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Select your site locale to ensure your site is displayed correctly in the correct language.', 'progress-planner' );
 	}
 
 	/**
@@ -175,14 +173,14 @@ class Select_Locale extends Tasks_Interactive {
 	 * @return bool
 	 */
 	public function is_task_completed( $task_id = '' ) {
-		$locale_activity = \progress_planner()->get_activities__query()->query_activities(
+		$activity = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'suggested_task',
 				'data_id'  => static::PROVIDER_ID,
 			]
 		);
 
-		return ! empty( $locale_activity );
+		return ! empty( $activity );
 	}
 
 	/**
@@ -288,5 +286,22 @@ class Select_Locale extends Tasks_Interactive {
 		}
 
 		\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to update setting.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Select locale', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

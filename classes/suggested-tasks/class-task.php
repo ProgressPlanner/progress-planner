@@ -141,7 +141,7 @@ class Task {
 	 * @return string
 	 */
 	public function get_provider_id(): string {
-		return $this->data['provider']->slug ?? '';
+		return $this->data['provider']->slug ?? ''; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**
@@ -150,7 +150,7 @@ class Task {
 	 * @return string
 	 */
 	public function get_category(): string {
-		return $this->data['category']->slug ?? '';
+		return $this->data['category']->slug ?? ''; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**
