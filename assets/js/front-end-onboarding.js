@@ -67,7 +67,6 @@ class ProgressPlannerTour {
 				title: 'Setup complete',
 				render: () =>
 					document.getElementById( 'tour-step-finish' ).innerHTML,
-				onMount: ( state ) => this.mountFinishStep( state ),
 			},
 		];
 	}
@@ -132,23 +131,6 @@ class ProgressPlannerTour {
 				btn.removeEventListener( 'click', handler )
 			);
 		};
-	}
-
-	/**
-	 * Mount finish step
-	 * @param {Object} state
-	 */
-	mountFinishStep( state ) {
-		const btn = document.querySelector( '#prpl-finish-btn' );
-		if ( ! btn ) return () => {};
-
-		const handler = () => {
-			state.data.finished = true;
-			this.closeTour();
-		};
-
-		btn.addEventListener( 'click', handler );
-		return () => btn.removeEventListener( 'click', handler );
 	}
 
 	/**
@@ -355,9 +337,11 @@ class ProgressPlannerTour {
 
 			const nextBtn = popover.querySelector( '.prpl-tour-next' );
 			const prevBtn = popover.querySelector( '.prpl-tour-prev' );
+			const finishBtn = popover.querySelector( '#prpl-finish-btn' );
 
 			console.log( 'Next button found:', nextBtn );
 			console.log( 'Prev button found:', prevBtn );
+			console.log( 'Finish button found:', finishBtn );
 
 			if ( nextBtn ) {
 				nextBtn.addEventListener( 'click', () => {
@@ -370,6 +354,13 @@ class ProgressPlannerTour {
 				prevBtn.addEventListener( 'click', () => {
 					console.log( 'Prev button clicked!' );
 					this.prevStep();
+				} );
+			}
+
+			if ( finishBtn ) {
+				finishBtn.addEventListener( 'click', () => {
+					console.log( 'Finish button clicked!' );
+					this.closeTour();
 				} );
 			}
 		} else {
