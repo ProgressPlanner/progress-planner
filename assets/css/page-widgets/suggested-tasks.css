@@ -214,7 +214,7 @@
 			border: 1px solid var(--prpl-color-border);
 		}
 
-		.prpl-button {
+		.prpl-button-step {
 			padding: 0.75rem 1.25rem;
 			border: none;
 			color: var(--prpl-color-text);
