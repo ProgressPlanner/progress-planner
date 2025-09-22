@@ -225,7 +225,7 @@ class Front_End_Onboarding {
 
 		<!-- Tour step welcome -->
 		<script type="text/template" id="tour-step-welcome">
-			<p>Welcome to the Progress Planner onboarding.</p>
+			<p><?php \esc_html_e( 'Welcome to the Progress Planner onboarding.', 'progress-planner' ); ?></p>
 		</script>
 
 		<!-- Tour step connect -->
@@ -234,7 +234,7 @@ class Front_End_Onboarding {
 			<?php if ( isset( $tasks[0] ) ) : ?>
 			<p class="prpl-complete-task-item">
 				<?php echo esc_html( $tasks[0]['title'] ); ?>
-				<button id="first-task-btn" data-task-id="<?php echo esc_attr( $tasks[0]['task_id'] ); ?>" class="prpl-complete-task-btn">Complete first task</button>
+				<button id="first-task-btn" data-task-id="<?php echo esc_attr( $tasks[0]['task_id'] ); ?>" class="prpl-complete-task-btn"><?php \esc_html_e( 'Complete first task', 'progress-planner' ); ?></button>
 			</p>
 			<div id="first-task-status"></div>
 			<?php endif; ?>
@@ -243,13 +243,13 @@ class Front_End_Onboarding {
 		<!-- Tour step badges -->
 		<script type="text/template" id="tour-step-badges">
 			<p>
-				Every step you take makes your website better. Progress Planner tracks your progress, celebrating achievements with badges and streaks to keep you motivated and engaged.
+				<?php \esc_html_e( 'Every step you take makes your website better. Progress Planner tracks your progress, celebrating achievements with badges and streaks to keep you motivated and engaged.', 'progress-planner' ); ?>
 			</p>
 		</script>
 
 		<!-- Tour step more tasks -->
 		<script type="text/template" id="tour-step-more-tasks">
-			<p>Check out more tasks to complete:</p>
+			<p><?php \esc_html_e( 'Check out more tasks to complete:', 'progress-planner' ); ?></p>
 			<ul id="prpl-more-tasks-list">
 				<?php
 				for ( $i = 1; $i < 6; $i++ ) :
@@ -258,7 +258,7 @@ class Front_End_Onboarding {
 					?>
 					<li class="prpl-complete-task-item">
 						<?php echo esc_html( $tasks[ $i ]['title'] ); ?>
-						<button id="more-tasks-btn-<?php echo esc_attr( $tasks[ $i ]['task_id'] ); ?>" data-task-id="<?php echo esc_attr( $tasks[ $i ]['task_id'] ); ?>" class="prpl-complete-task-btn">Complete task</button>
+						<button id="more-tasks-btn-<?php echo esc_attr( $tasks[ $i ]['task_id'] ); ?>" data-task-id="<?php echo esc_attr( $tasks[ $i ]['task_id'] ); ?>" class="prpl-complete-task-btn"><?php \esc_html_e( 'Complete task', 'progress-planner' ); ?></button>
 					</li>
 				<?php endfor; ?>
 			</ul>
@@ -266,7 +266,7 @@ class Front_End_Onboarding {
 
 		<!-- Tour step finish -->
 		<script type="text/template" id="tour-step-finish">
-			<p>Congratulations, setup complete. 🎉</p>
+			<p><?php \esc_html_e( 'Congratulations, setup complete. 🎉', 'progress-planner' ); ?></p>
 		</script>
 		<?php
 	}
