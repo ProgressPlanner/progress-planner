@@ -59,16 +59,6 @@ class Front_End_Onboarding {
 				],
 			]
 		);
-		$tasks                 = [];
-		foreach ( $ravis_recommendations as $recommendation ) {
-			$tasks[] = [
-				'task_id'     => $recommendation->task_id,
-				'title'       => $recommendation->post_title,
-				'url'         => $recommendation->url,
-				'provider_id' => $recommendation->get_provider_id(),
-				'points'      => $recommendation->points,
-			];
-		}
 
 		\wp_localize_script(
 			'prpl-popover-front-end-onboarding',
@@ -76,7 +66,6 @@ class Front_End_Onboarding {
 			[
 				'adminAjaxUrl'         => \esc_url_raw( admin_url( 'admin-ajax.php' ) ),
 				'nonceProgressPlanner' => \esc_js( \wp_create_nonce( 'progress_planner' ) ),
-				'tasks'                => $tasks,
 			]
 		);
 	}
