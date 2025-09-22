@@ -90,7 +90,7 @@
 	.icon-exclamation-circle {
 
 		path {
-			fill: #6b7280;
+			fill: var(--prpl-color-ui-icon);
 		}
 	}
 
