@@ -32,6 +32,9 @@ class Onboard {
 
 		// Redirect on plugin activation.
 		\add_action( 'activated_plugin', [ $this, 'on_activate_plugin' ], 10 );
+
+		// Detect domain changes.
+		\add_action( 'shutdown', [ $this, 'detect_domain_changes' ] );
 	}
 
 	/**
@@ -158,5 +161,59 @@ class Onboard {
 			|| ! isset( $body['license_key'] )
 				? ''
 				: $body['license_key'];
+	}
+
+	/**
+	 * Detect domain changes.
+	 *
+	 * @return void
+	 */
+	public function detect_domain_changes() {
+		// Get the saved site URL.
+		$saved_site_url = \get_option( 'progress_planner_site_url', false );
+
+		// Get the current site URL.
+		$current_site_url = \set_url_scheme( \site_url() );
+
+		// Update the saved site URL if it's not set.
+		if ( ! $saved_site_url ) {
+			\update_option( 'progress_planner_site_url', $current_site_url );
+		}
+
+		// Get the saved license key.
+		$saved_license_key = \get_option( 'progress_planner_license_key', false );
+
+		// Bail early if the license key is not set.
+		if ( ! $saved_license_key ) {
+			return;
+		}
+
+		// Bail early if the site URL has not changed.
+		if ( $saved_site_url === $current_site_url ) {
+			return;
+		}
+
+		// Make a request to the remote endpoint to update the license key.
+		$response = \wp_remote_post(
+			\progress_planner()->get_remote_server_root_url() . self::REMOTE_API_URL . 'change-domain',
+			[
+				'body' => [
+					'license_key' => $saved_license_key,
+					'old_url'     => $saved_site_url,
+					'new_url'     => $current_site_url,
+					'nonce'       => $this->get_remote_nonce(),
+				],
+			]
+		);
+		if ( \is_wp_error( $response ) ) {
+			return;
+		}
+		$body = \wp_remote_retrieve_body( $response );
+		$body = \json_decode( $body, true );
+
+		// Update the saved site URL if the request was successful.
+		if ( isset( $body['status'] ) && 'ok' === $body['status'] ) {
+			\update_option( 'progress_planner_site_url', $saved_site_url );
+		}
 	}
 }
