@@ -26,15 +26,15 @@ class Onboard {
 		// Handle saving data from the onboarding form response.
 		\add_action( 'wp_ajax_progress_planner_save_onboard_data', [ $this, 'save_onboard_response' ] );
 
+		// Detect domain changes.
+		\add_action( 'shutdown', [ $this, 'detect_domain_changes' ] );
+
 		if ( \get_option( 'progress_planner_license_key' ) ) {
 			return;
 		}
 
 		// Redirect on plugin activation.
 		\add_action( 'activated_plugin', [ $this, 'on_activate_plugin' ], 10 );
-
-		// Detect domain changes.
-		\add_action( 'shutdown', [ $this, 'detect_domain_changes' ] );
 	}
 
 	/**
