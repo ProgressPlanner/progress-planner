@@ -384,6 +384,8 @@ class ProgressPlannerTour {
 	 */
 	createDeepProxy( target, callback ) {
 		return new Proxy( target, {
+			// Note: Maybe hook into get here as well, to handle reactivity better.
+
 			set: ( obj, prop, value ) => {
 				if (
 					value &&
