@@ -34,7 +34,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		</a>
 		<?php else : ?>
 		<a href="<?php echo \esc_url( \remove_query_arg( 'prpl_show_all_recommendations', \admin_url( 'admin.php?page=progress-planner' ) ) ); ?>">
-			<?php \esc_html_e( 'Show less recommendations', 'progress-planner' ); ?>
+			<?php \esc_html_e( 'Show less Recommendations', 'progress-planner' ); ?>
 		</a>
 		<?php endif; ?>
 	</p>

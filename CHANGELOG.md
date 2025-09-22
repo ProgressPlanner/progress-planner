@@ -2,7 +2,7 @@
 
 Enhancements:
 
-* Add "Show all Recommendations" button to the "Ravi's Recommendations widget"
+* Add "Show all Recommendations" button to the "Ravi's Recommendations" widget
 
 Bugs we fixed:
 
