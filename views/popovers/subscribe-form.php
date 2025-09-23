@@ -21,7 +21,7 @@ $prpl_current_user = \wp_get_current_user();
 	\printf(
 		/* translators: %s: progressplanner.com link */
 		\esc_html__( 'We can send you weekly emails with your own to-do’s, your activity stats and nudges to keep you working on your site. To do this, we’ll create an account for you on %s.', 'progress-planner' ),
-		'<a href="https://prpl.fyi/home" target="_blank">progressplanner.com</a>'
+		'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/home' ) ) . '" target="_blank">progressplanner.com</a>'
 	)
 	?>
 	</p>

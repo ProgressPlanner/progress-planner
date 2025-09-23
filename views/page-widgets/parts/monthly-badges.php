@@ -65,6 +65,7 @@ foreach ( \progress_planner()->get_admin__widgets__monthly_badges()->get_previou
 							complete="<?php echo 100 === (int) $prpl_badge->progress_callback()['progress'] ? 'true' : 'false'; ?>"
 							badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
 							badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
+							branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
 						></prpl-badge>
 						<p><?php echo \esc_html( $prpl_badge->get_name() ); ?></p>
 					</span>
