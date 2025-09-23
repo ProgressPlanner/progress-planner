@@ -201,10 +201,7 @@ class Front_End_Onboarding {
 			document.addEventListener('DOMContentLoaded', () => {
 
 				// Initialize tour instance
-				window.prplTour = new ProgressPlannerTour(window.ProgressPlannerData);
-
-				// Setup event listeners after DOM is ready
-				window.prplTour.setupEventListeners();
+				window.prplTour = new ProgressPlannerTour( window.ProgressPlannerData );
 			});
 		</script>
 		<?php

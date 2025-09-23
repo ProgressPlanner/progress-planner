@@ -19,6 +19,18 @@ class ProgressPlannerTour {
 
 		this.tourSteps = this.initializeTourSteps();
 		this.setupStateProxy();
+
+		// Set DOM related properties.
+		this.popover = document.getElementById( this.popoverId );
+		this.contentWrapper = this.popover.querySelector(
+			'.tour-content-wrapper'
+		);
+		this.prevBtn = this.popover.querySelector( '.prpl-tour-prev' );
+		this.nextBtn = this.popover.querySelector( '.prpl-tour-next' );
+		this.finishBtn = this.popover.querySelector( '#prpl-finish-btn' );
+
+		// Setup event listeners after DOM is ready
+		this.setupEventListeners();
 	}
 
 	/**
@@ -71,7 +83,7 @@ class ProgressPlannerTour {
 	 * @param {Object} state
 	 */
 	mountFirstTaskStep( state ) {
-		const btn = document.querySelector( '#first-task-btn' );
+		const btn = this.popover.querySelector( '#first-task-btn' );
 		if ( ! btn ) return () => {};
 
 		const handler = ( e ) => {
@@ -113,7 +125,7 @@ class ProgressPlannerTour {
 				} );
 		};
 
-		const btns = document.querySelectorAll( 'button[data-task-id]' );
+		const btns = this.popover.querySelectorAll( 'button[data-task-id]' );
 		btns.forEach( ( btn ) => {
 			btn.addEventListener( 'click', handler );
 			state.data.moreTasksCompleted[ btn.dataset.taskId ] = false;
@@ -152,9 +164,8 @@ class ProgressPlannerTour {
 	 */
 	renderStep() {
 		const step = this.tourSteps[ this.state.currentStep ];
-		const popover = this.getPopover();
 
-		popover.querySelector( '.tour-content-wrapper' ).innerHTML =
+		this.popover.querySelector( '.tour-content-wrapper' ).innerHTML =
 			step.render();
 
 		// Cleanup previous step
@@ -170,7 +181,7 @@ class ProgressPlannerTour {
 		}
 
 		// Update step indicator
-		popover.dataset.prplStep = this.state.currentStep;
+		this.popover.dataset.prplStep = this.state.currentStep;
 		this.updateButtonStates();
 		this.updateNextButton();
 	}
@@ -179,19 +190,14 @@ class ProgressPlannerTour {
 	 * Update button visibility states
 	 */
 	updateButtonStates() {
-		const popover = this.getPopover();
 		const isFirstStep = this.state.currentStep === 0;
 		const isLastStep = this.state.currentStep === this.tourSteps.length - 1;
 
 		// Toggle button visibility
-		popover.querySelector( '.prpl-tour-prev' ).style.display =
+		this.prevBtn.style.display =
 			isFirstStep || isLastStep ? 'none' : 'inline-block';
-		popover.querySelector( '.prpl-tour-next' ).style.display = isLastStep
-			? 'none'
-			: 'inline-block';
-		popover.querySelector( '#prpl-finish-btn' ).style.display = isLastStep
-			? 'inline-block'
-			: 'none';
+		this.nextBtn.style.display = isLastStep ? 'none' : 'inline-block';
+		this.finishBtn.style.display = isLastStep ? 'inline-block' : 'none';
 	}
 
 	/**
@@ -234,9 +240,8 @@ class ProgressPlannerTour {
 	 * Close the tour
 	 */
 	closeTour() {
-		const popover = this.getPopover();
-		if ( popover ) {
-			popover.hidePopover();
+		if ( this.popover ) {
+			this.popover.hidePopover();
 		}
 		this.saveProgressToServer();
 
@@ -253,9 +258,8 @@ class ProgressPlannerTour {
 	 * Start the tour
 	 */
 	startTour() {
-		const popover = this.getPopover();
-		if ( popover ) {
-			popover.showPopover();
+		if ( this.popover ) {
+			this.popover.showPopover();
 			this.renderStep();
 		}
 	}
@@ -293,13 +297,11 @@ class ProgressPlannerTour {
 	 */
 	updateNextButton() {
 		const step = this.tourSteps[ this.state.currentStep ];
-		const popover = this.getPopover();
-		const nextBtn = popover.querySelector( '.prpl-tour-next' );
 
 		if ( step.canProceed ) {
-			nextBtn.disabled = ! step.canProceed( this.state );
+			this.nextBtn.disabled = ! step.canProceed( this.state );
 		} else {
-			nextBtn.disabled = false;
+			this.nextBtn.disabled = false;
 		}
 	}
 
@@ -315,11 +317,10 @@ class ProgressPlannerTour {
 	 */
 	setupEventListeners() {
 		console.log( 'Setting up event listeners...' );
-		const popover = this.getPopover();
-		if ( popover ) {
-			console.log( 'Popover found:', popover );
+		if ( this.popover ) {
+			console.log( 'Popover found:', this.popover );
 
-			popover.addEventListener( 'beforetoggle', ( event ) => {
+			this.popover.addEventListener( 'beforetoggle', ( event ) => {
 				if ( event.newState === 'open' ) {
 					console.log( 'Tour opened' );
 				}
@@ -328,30 +329,22 @@ class ProgressPlannerTour {
 				}
 			} );
 
-			const nextBtn = popover.querySelector( '.prpl-tour-next' );
-			const prevBtn = popover.querySelector( '.prpl-tour-prev' );
-			const finishBtn = popover.querySelector( '#prpl-finish-btn' );
-
-			console.log( 'Next button found:', nextBtn );
-			console.log( 'Prev button found:', prevBtn );
-			console.log( 'Finish button found:', finishBtn );
-
-			if ( nextBtn ) {
-				nextBtn.addEventListener( 'click', () => {
+			if ( this.nextBtn ) {
+				this.nextBtn.addEventListener( 'click', () => {
 					console.log( 'Next button clicked!' );
 					this.nextStep();
 				} );
 			}
 
-			if ( prevBtn ) {
-				prevBtn.addEventListener( 'click', () => {
+			if ( this.prevBtn ) {
+				this.prevBtn.addEventListener( 'click', () => {
 					console.log( 'Prev button clicked!' );
 					this.prevStep();
 				} );
 			}
 
-			if ( finishBtn ) {
-				finishBtn.addEventListener( 'click', () => {
+			if ( this.finishBtn ) {
+				this.finishBtn.addEventListener( 'click', () => {
 					console.log( 'Finish button clicked!' );
 					this.closeTour();
 				} );
