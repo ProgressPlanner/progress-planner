@@ -80,4 +80,27 @@
 			margin-bottom: 10px;
 		}
 	}
+
+	/* WIP for tasks which need user input. */
+	.prpl-complete-task-form {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		border: none;
+		padding: 0;
+		margin: 0;
+		background: none;
+
+		input[type="text"] {
+			width: 100%;
+			padding: 0.5rem;
+			border: 1px solid #ccc;
+			border-radius: 0.25rem;
+		}
+
+		.prpl-complete-task-btn {
+			flex-shrink: 0;
+		}
+
+	}
 }

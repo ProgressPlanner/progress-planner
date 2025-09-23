@@ -126,6 +126,13 @@ class Front_End_Onboarding {
 
 		// TODO: Actually complete the task, for example delete the hello world post.
 
+		// Aditional data for the task, besides the task ID.
+		$form_values = [];
+		if ( isset( $_POST['form_values'] ) ) {
+			$form_values = \sanitize_text_field( \wp_unslash( $_POST['form_values'] ) );
+			$form_values = \json_decode( $form_values, true );
+		}
+
 		// Note: Completing task will set it it to pending, so user will get celebration.
 		// Do we want that?
 		$result = \progress_planner()->get_suggested_tasks()->complete_task( $task_id );

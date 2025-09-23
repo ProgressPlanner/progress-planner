@@ -21,10 +21,15 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	<div class="tour-content">
 		<p>You have pending tasks to complete.</p>
 		<?php if ( isset( $task ) ) : ?>
-		<p class="prpl-complete-task-item">
-			<?php echo esc_html( $task['title'] ); ?>
-			<button id="first-task-btn" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn"><?php \esc_html_e( 'Complete first task', 'progress-planner' ); ?></button>
-		</p>
+		<div class="prpl-complete-task-item">
+			<p>
+				<?php echo esc_html( $task['title'] ); ?>
+			</p>
+			<form class="prpl-complete-task-form" onsubmit="return false;">
+				<input type="text" name="prpl-test-input" value="" /> <?php // TODO: This is test input field, demo for the tasks which need user input. ?>
+				<button type="button" id="first-task-btn" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn"><?php \esc_html_e( 'Complete first task', 'progress-planner' ); ?></button>
+			</form>
+		</div>
 		<div id="first-task-status"></div>
 		<?php endif; ?>
 	</div>

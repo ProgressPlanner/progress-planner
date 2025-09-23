@@ -88,7 +88,18 @@ class ProgressPlannerTour {
 
 		const handler = ( e ) => {
 			const thisBtn = e.target.closest( 'button' );
-			this.completeTask( thisBtn.dataset.taskId )
+
+			const form = thisBtn.closest( 'form' ); // find parent form
+			let formValues = {};
+
+			if ( form ) {
+				const formData = new FormData( form );
+
+				// Convert to plain object
+				formValues = Object.fromEntries( formData.entries() );
+			}
+
+			this.completeTask( thisBtn.dataset.taskId, formValues )
 				.then( () => {
 					thisBtn.classList.add( 'prpl-complete-task-btn-completed' );
 					state.data.firstTaskCompleted = {
@@ -112,7 +123,18 @@ class ProgressPlannerTour {
 	mountMoreTasksStep( state ) {
 		const handler = ( e ) => {
 			const thisBtn = e.target.closest( 'button' );
-			this.completeTask( thisBtn.dataset.taskId )
+
+			const form = thisBtn.closest( 'form' ); // find parent form
+			let formValues = {};
+
+			if ( form ) {
+				const formData = new FormData( form );
+
+				// Convert to plain object
+				formValues = Object.fromEntries( formData.entries() );
+			}
+
+			this.completeTask( thisBtn.dataset.taskId, formValues )
 				.then( () => {
 					thisBtn.classList.add( 'prpl-complete-task-btn-completed' );
 					state.data.moreTasksCompleted[
@@ -141,11 +163,13 @@ class ProgressPlannerTour {
 	/**
 	 * Complete a task via AJAX
 	 * @param {string} taskId
+	 * @param {Object} formValues
 	 */
-	async completeTask( taskId ) {
+	async completeTask( taskId, formValues = {} ) {
 		const response = await fetch( this.config.adminAjaxUrl, {
 			method: 'POST',
 			body: new URLSearchParams( {
+				form_values: JSON.stringify( formValues ),
 				task_id: taskId,
 				nonce: this.config.nonceProgressPlanner,
 				action: 'progress_planner_tour_complete_task',

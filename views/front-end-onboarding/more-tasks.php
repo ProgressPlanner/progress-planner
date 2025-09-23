@@ -27,8 +27,12 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					break; }
 				?>
 				<li class="prpl-complete-task-item">
-					<?php echo esc_html( $tasks[ $prpl_i ]['title'] ); ?>
-					<button id="more-tasks-btn-<?php echo esc_attr( $tasks[ $prpl_i ]['task_id'] ); ?>" data-task-id="<?php echo esc_attr( $tasks[ $prpl_i ]['task_id'] ); ?>" class="prpl-complete-task-btn"><?php \esc_html_e( 'Complete task', 'progress-planner' ); ?></button>
+					<span>
+						<?php echo esc_html( $tasks[ $prpl_i ]['title'] ); ?>
+					</span>
+					<form class="prpl-complete-task-form" onsubmit="return false;">
+						<button type="button" id="more-tasks-btn-<?php echo esc_attr( $tasks[ $prpl_i ]['task_id'] ); ?>" data-task-id="<?php echo esc_attr( $tasks[ $prpl_i ]['task_id'] ); ?>" class="prpl-complete-task-btn"><?php \esc_html_e( 'Complete task', 'progress-planner' ); ?></button>
+					</form>
 				</li>
 			<?php endfor; ?>
 		</ul>
