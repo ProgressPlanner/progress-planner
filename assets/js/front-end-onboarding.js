@@ -381,9 +381,18 @@ class ProgressPlannerTour {
 	 * @param {Function} callback
 	 */
 	createDeepProxy( target, callback ) {
-		return new Proxy( target, {
-			// Note: Maybe hook into get here as well, to handle reactivity better.
+		// Recursively wrap existing nested objects first
+		for ( const key of Object.keys( target ) ) {
+			if (
+				target[ key ] &&
+				typeof target[ key ] === 'object' &&
+				! Array.isArray( target[ key ] )
+			) {
+				target[ key ] = this.createDeepProxy( target[ key ], callback );
+			}
+		}
 
+		return new Proxy( target, {
 			set: ( obj, prop, value ) => {
 				if (
 					value &&
