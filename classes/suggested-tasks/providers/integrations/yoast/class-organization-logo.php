@@ -60,8 +60,8 @@ class Organization_Logo extends Yoast_Provider {
 	 */
 	public function get_external_link_url() {
 		return $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person' // @phpstan-ignore-line property.nonObject
-			? 'https://prpl.fyi/yoast-person-logo'
-			: 'https://prpl.fyi/yoast-organization-logo';
+			? \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/yoast-person-logo' )
+			: \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/yoast-organization-logo' );
 	}
 
 	/**
