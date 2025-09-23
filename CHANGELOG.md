@@ -1,3 +1,10 @@
+= 1.9.0 =
+
+Bugs we fixed:
+
+* Fix missing content and streak badges after they are all completed.
+
+
 = 1.8.0 =
 
 Enhancements:
