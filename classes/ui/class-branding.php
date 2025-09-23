@@ -18,8 +18,7 @@ final class Branding {
 	 * @var array<string, int>
 	 */
 	const BRANDING_IDS = [
-		// TODO: Change this to the default value of 0.
-		'default' => 5159,
+		'default' => 0,
 	];
 
 	/**
