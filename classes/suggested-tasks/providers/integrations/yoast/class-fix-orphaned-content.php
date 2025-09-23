@@ -89,7 +89,9 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	 * @return string
 	 */
 	protected function get_url_with_data( $task_data = [] ) {
-		return \get_post( $task_data['target_post_id'] ) ? 'https://prpl.fyi/fix-orphaned-content' : '';
+		return \get_post( $task_data['target_post_id'] )
+			? \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/fix-orphaned-content' )
+			: '';
 	}
 
 	/**
@@ -230,7 +232,7 @@ class Fix_Orphaned_Content extends Yoast_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="https://prpl.fyi/fix-orphaned-content" target="_blank">' . \esc_html__( 'Learn more about internal linking', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/fix-orphaned-content' ) ) . '" target="_blank">' . \esc_html__( 'Learn more about internal linking', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;
