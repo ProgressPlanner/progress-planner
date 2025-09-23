@@ -28,13 +28,11 @@ class ProgressPlannerTour {
 		return [
 			{
 				id: 'welcome',
-				title: 'Welcome',
 				render: () =>
 					document.getElementById( 'tour-step-welcome' ).innerHTML,
 			},
 			{
 				id: 'first-task',
-				title: 'Complete your first task',
 				render: () =>
 					document.getElementById( 'tour-step-first-task' ).innerHTML,
 				onMount: ( state ) => this.mountFirstTaskStep( state ),
@@ -42,13 +40,11 @@ class ProgressPlannerTour {
 			},
 			{
 				id: 'badges',
-				title: 'Our badges are waiting for you',
 				render: () =>
 					document.getElementById( 'tour-step-badges' ).innerHTML,
 			},
 			{
 				id: 'more-tasks',
-				title: 'Complete more tasks',
 				render: () =>
 					document.getElementById( 'tour-step-more-tasks' ).innerHTML,
 				onMount: ( state ) => this.mountMoreTasksStep( state ),
@@ -64,7 +60,6 @@ class ProgressPlannerTour {
 			},
 			{
 				id: 'finish',
-				title: 'Setup complete',
 				render: () =>
 					document.getElementById( 'tour-step-finish' ).innerHTML,
 			},
@@ -159,8 +154,8 @@ class ProgressPlannerTour {
 		const step = this.tourSteps[ this.state.currentStep ];
 		const popover = this.getPopover();
 
-		popover.querySelector( '.tour-title' ).innerHTML = step.title;
-		popover.querySelector( '.tour-content' ).innerHTML = step.render();
+		popover.querySelector( '.tour-content-wrapper' ).innerHTML =
+			step.render();
 
 		// Cleanup previous step
 		if ( this.state.cleanup ) {
