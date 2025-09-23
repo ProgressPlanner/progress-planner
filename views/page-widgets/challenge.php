@@ -12,7 +12,12 @@ if ( ! \defined( 'ABSPATH' ) ) {
 $prpl_challenge = \progress_planner()->get_admin__widgets__challenge()->get_challenge();
 ?>
 <h2 class="prpl-widget-title">
-	<?php echo \esc_html( $prpl_challenge['name'] ); ?>
+	<?php
+	echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		'challenge',
+		\esc_html( $prpl_challenge['name'] )
+	);
+	?>
 </h2>
 
 <div class="prpl-challenge-content">
