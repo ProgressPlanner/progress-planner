@@ -21,7 +21,7 @@ class Front_End_Onboarding {
 		// Add popover markup.
 		\add_action( 'wp_footer', [ $this, 'add_popover' ] );
 
-		\add_action( 'wp_footer', [ $this, 'add_popover_inline_script' ] );
+		\add_action( 'wp_footer', [ $this, 'add_popover_step_templates' ] );
 
 		// Add popover scripts.
 		\add_action( 'wp_enqueue_scripts', [ $this, 'add_popover_scripts' ] );
@@ -164,7 +164,7 @@ class Front_End_Onboarding {
 	 *
 	 * @return void
 	 */
-	public function add_popover_inline_script() {
+	public function add_popover_step_templates() {
 		$ravis_recommendations = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
 			[
 				'post_status' => 'publish',
@@ -189,6 +189,11 @@ class Front_End_Onboarding {
 				'points'      => $recommendation->points,
 			];
 		}
+		\progress_planner()->the_view( 'front-end-onboarding/welcome.php' );
+		\progress_planner()->the_view( 'front-end-onboarding/first-task.php', [ 'task' => $tasks[0] ] ); // WIP: We need only 1 task for this step.
+		\progress_planner()->the_view( 'front-end-onboarding/badges.php' );
+		\progress_planner()->the_view( 'front-end-onboarding/more-tasks.php', [ 'tasks' => array_slice( $tasks, 1, 5 ) ] ); // WIP: We need up to 5 tasks for this step.
+		\progress_planner()->the_view( 'front-end-onboarding/finish.php' );
 		?>
 		<script>
 			// Initialize tour when DOM is ready
@@ -200,87 +205,6 @@ class Front_End_Onboarding {
 				// Setup event listeners after DOM is ready
 				window.prplTour.setupEventListeners();
 			});
-		</script>
-
-		<!-- Tour step welcome -->
-		<script type="text/template" id="tour-step-welcome">
-			<div class="tour-header">
-				<h2 class="tour-title">
-					<?php \esc_html_e( 'Welcome to the Progress Planner onboarding.', 'progress-planner' ); ?>
-				</h2>
-			</div>
-			<div class="tour-content">
-				<p><?php \esc_html_e( 'Welcome to the Progress Planner onboarding.', 'progress-planner' ); ?></p>
-			</div>
-		</script>
-
-		<!-- Tour step connect -->
-		<script type="text/template" id="tour-step-first-task">
-			<div class="tour-header">
-				<h2 class="tour-title">
-					<?php \esc_html_e( 'Complete your first task', 'progress-planner' ); ?>
-				</h2>
-			</div>
-			<div class="tour-content">
-				<p>You have pending tasks to complete.</p>
-				<?php if ( isset( $tasks[0] ) ) : ?>
-				<p class="prpl-complete-task-item">
-					<?php echo esc_html( $tasks[0]['title'] ); ?>
-					<button id="first-task-btn" data-task-id="<?php echo esc_attr( $tasks[0]['task_id'] ); ?>" class="prpl-complete-task-btn"><?php \esc_html_e( 'Complete first task', 'progress-planner' ); ?></button>
-				</p>
-				<div id="first-task-status"></div>
-				<?php endif; ?>
-			</div>
-		</script>
-
-		<!-- Tour step badges -->
-		<script type="text/template" id="tour-step-badges">
-			<div class="tour-header">
-				<h2 class="tour-title">
-					<?php \esc_html_e( 'Our badges are waiting for you', 'progress-planner' ); ?>
-				</h2>
-			</div>
-			<div class="tour-content">
-				<p>
-					<?php \esc_html_e( 'Every step you take makes your website better. Progress Planner tracks your progress, celebrating achievements with badges and streaks to keep you motivated and engaged.', 'progress-planner' ); ?>
-				</p>
-			</div>
-		</script>
-
-		<!-- Tour step more tasks -->
-		<script type="text/template" id="tour-step-more-tasks">
-			<div class="tour-header">
-				<h2 class="tour-title">
-					<?php \esc_html_e( 'Complete more tasks', 'progress-planner' ); ?>
-				</h2>
-			</div>
-			<div class="tour-content">
-				<p><?php \esc_html_e( 'Check out more tasks to complete:', 'progress-planner' ); ?></p>
-				<ul id="prpl-more-tasks-list">
-					<?php
-					for ( $i = 1; $i < 6; $i++ ) :
-						if ( ! isset( $tasks[ $i ] ) ) {
-							break; }
-						?>
-						<li class="prpl-complete-task-item">
-							<?php echo esc_html( $tasks[ $i ]['title'] ); ?>
-							<button id="more-tasks-btn-<?php echo esc_attr( $tasks[ $i ]['task_id'] ); ?>" data-task-id="<?php echo esc_attr( $tasks[ $i ]['task_id'] ); ?>" class="prpl-complete-task-btn"><?php \esc_html_e( 'Complete task', 'progress-planner' ); ?></button>
-						</li>
-					<?php endfor; ?>
-				</ul>
-			</div>
-		</script>
-
-		<!-- Tour step finish -->
-		<script type="text/template" id="tour-step-finish">
-			<div class="tour-header">
-				<h2 class="tour-title">
-					<?php \esc_html_e( 'Setup complete', 'progress-planner' ); ?>
-				</h2>
-			</div>
-			<div class="tour-content">
-				<p><?php \esc_html_e( 'Congratulations, setup complete. 🎉', 'progress-planner' ); ?></p>
-			</div>
 		</script>
 		<?php
 	}
