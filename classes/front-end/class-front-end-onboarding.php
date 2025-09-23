@@ -167,8 +167,9 @@ class Front_End_Onboarding {
 	public function add_popover_step_templates() {
 		$ravis_recommendations = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
 			[
-				'post_status' => 'publish',
-				'tax_query'   => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+				'post_status'    => 'publish',
+				'posts_per_page' => 6,
+				'tax_query'      => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 					[
 						'taxonomy' => 'prpl_recommendations_provider',
 						'field'    => 'slug',
