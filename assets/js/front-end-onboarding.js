@@ -330,6 +330,14 @@ class ProgressPlannerTour {
 	}
 
 	/**
+	 * Update DOM, used for reactive updates.
+	 * All changes which should happen when the state changes should be done here.
+	 */
+	updateDOM() {
+		this.updateNextButton();
+	}
+
+	/**
 	 * Get popover element
 	 */
 	getPopover() {
@@ -384,7 +392,7 @@ class ProgressPlannerTour {
 	 */
 	setupStateProxy() {
 		this.state.data = this.createDeepProxy( this.state.data, () =>
-			this.updateNextButton()
+			this.updateDOM()
 		);
 	}
 

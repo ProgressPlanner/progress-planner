@@ -90,6 +90,10 @@ class Front_End_Onboarding {
 	 * @return void
 	 */
 	public function add_admin_toolbar_item() {
+		if ( is_admin() ) {
+			return;
+		}
+
 		\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_item_callback' ], 100 );
 	}
 
