@@ -32,6 +32,34 @@ class Front_End_Onboarding {
 		// Note: AJAX action needs to be registered early (ie wrapping init in is_admin() check will be to late).
 		\add_action( 'wp_ajax_progress_planner_tour_complete_task', [ $this, 'ajax_complete_task' ] );
 		\add_action( 'wp_ajax_progress_planner_tour_save_progress', [ $this, 'ajax_save_tour_progress' ] );
+
+		// Maybe show user notification that tour is not finished.
+		\add_action( 'init', [ $this, 'maybe_show_user_notification' ] );
+	}
+
+	/**
+	 * Maybe show user notification that tour is not finished.
+	 *
+	 * @return void
+	 */
+	public function maybe_show_user_notification() {
+		if ( ! is_admin() || ! \get_current_user_id() ) {
+			return;
+		}
+
+		$tour_data = \get_user_meta( \get_current_user_id(), '_prpl_tour_progress', true );
+		if ( ! $tour_data ) {
+			return;
+		}
+
+		$tour_data = \json_decode( $tour_data, true );
+
+		if ( $tour_data && isset( $tour_data['data'] ) && ! $tour_data['data']['finished'] ) {
+			// TODO: Show user notification.
+			\error_log( 'Tour is not finished.' );
+		}
+
+		// TODO: Clean up the user meta.
 	}
 
 	/**

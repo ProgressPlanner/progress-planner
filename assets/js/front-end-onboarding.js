@@ -370,6 +370,7 @@ class ProgressPlannerTour {
 			if ( this.finishBtn ) {
 				this.finishBtn.addEventListener( 'click', () => {
 					console.log( 'Finish button clicked!' );
+					this.state.data.finished = true;
 					this.closeTour();
 				} );
 			}
