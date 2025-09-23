@@ -124,6 +124,8 @@ class Front_End_Onboarding {
 
 		$task_id = \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) );
 
+		// TODO: Actually complete the task, for example delete the hello world post.
+
 		// Note: Completing task will set it it to pending, so user will get celebration.
 		// Do we want that?
 		$result = \progress_planner()->get_suggested_tasks()->complete_task( $task_id );
