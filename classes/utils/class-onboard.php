@@ -84,21 +84,14 @@ class Onboard {
 	}
 
 	/**
-	 * Get the remote nonce URL.
-	 *
-	 * @return string
-	 */
-	public function get_remote_nonce_url() {
-		return \progress_planner()->get_remote_server_root_url() . self::REMOTE_API_URL . 'get-nonce';
-	}
-
-	/**
 	 * Get the onboarding remote URL.
 	 *
+	 * @param string $endpoint The endpoint to append to the remote URL.
+	 *
 	 * @return string
 	 */
-	public function get_remote_url() {
-		return \progress_planner()->get_remote_server_root_url() . self::REMOTE_API_URL . 'onboard';
+	public function get_remote_url( $endpoint = '' ) {
+		return \progress_planner()->get_remote_server_root_url() . self::REMOTE_API_URL . $endpoint;
 	}
 
 	/**
@@ -109,7 +102,7 @@ class Onboard {
 	public function get_remote_nonce() {
 		// Make a POST request to the remote nonce endpoint.
 		$response = \wp_remote_post(
-			$this->get_remote_nonce_url(),
+			$this->get_remote_url( 'get-nonce' ),
 			[ 'body' => [ 'site' => \set_url_scheme( \site_url() ) ] ]
 		);
 		if ( \is_wp_error( $response ) ) {
@@ -148,7 +141,7 @@ class Onboard {
 
 		// Make the request.
 		$response = \wp_remote_post(
-			$this->get_remote_url(),
+			$this->get_remote_url( 'onboard' ),
 			[ 'body' => $data ]
 		);
 		if ( \is_wp_error( $response ) ) {
@@ -192,7 +185,7 @@ class Onboard {
 
 		// Make a request to the remote endpoint to update the license key.
 		$response = \wp_remote_post(
-			\progress_planner()->get_remote_server_root_url() . self::REMOTE_API_URL . 'change-domain',
+			$this->get_remote_url( 'change-domain' ),
 			[
 				'body' => [
 					'license_key' => $saved_license_key,
