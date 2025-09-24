@@ -27,7 +27,7 @@ class Onboard {
 		\add_action( 'wp_ajax_progress_planner_save_onboard_data', [ $this, 'save_onboard_response' ] );
 
 		// Detect domain changes.
-		\add_action( 'shutdown', [ $this, 'detect_domain_changes' ] );
+		\add_action( 'shutdown', [ $this, 'detect_site_url_changes' ] );
 
 		if ( \get_option( 'progress_planner_license_key' ) ) {
 			return;
@@ -168,7 +168,7 @@ class Onboard {
 	 *
 	 * @return void
 	 */
-	public function detect_domain_changes() {
+	public function detect_site_url_changes() {
 		// Get the saved site URL.
 		$saved_site_url = \get_option( 'progress_planner_site_url', false );
 
@@ -177,19 +177,16 @@ class Onboard {
 
 		// Update the saved site URL if it's not set.
 		if ( ! $saved_site_url ) {
-			\update_option( 'progress_planner_site_url', $current_site_url );
+			\update_option( 'progress_planner_site_url', $current_site_url, false );
+			// Bail early, there's obviously nothing to do.
+			return;
 		}
 
 		// Get the saved license key.
 		$saved_license_key = \get_option( 'progress_planner_license_key', false );
 
-		// Bail early if the license key is not set.
-		if ( ! $saved_license_key ) {
-			return;
-		}
-
-		// Bail early if the site URL has not changed.
-		if ( $saved_site_url === $current_site_url ) {
+		// Bail early if the license key is not set, or if the site URL has not changed.
+		if ( ! $saved_license_key || $saved_site_url === $current_site_url ) {
 			return;
 		}
 
@@ -213,7 +210,7 @@ class Onboard {
 
 		// Update the saved site URL if the request was successful.
 		if ( isset( $body['status'] ) && 'ok' === $body['status'] ) {
-			\update_option( 'progress_planner_site_url', $saved_site_url );
+			\update_option( 'progress_planner_site_url', $saved_site_url, false );
 		}
 	}
 }
