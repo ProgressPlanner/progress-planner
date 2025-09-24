@@ -224,7 +224,7 @@
 		&:focus {
 			color: var(--prpl-color-link);
 			border-color: var(--prpl-color-link);
-			background-color: var(--prpl-background-blue);
+			background-color: var(--prpl-background-content-badge);
 		}
 	}
 
