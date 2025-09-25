@@ -97,9 +97,7 @@ foreach ( \array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
 	);
 	?>
 </h2>
-<p>
-	<?php \esc_html_e( 'Here are the updates you made to your content last week. Whether you published something new, updated an existing post, or removed outdated content, it all helps you stay on top of your site!', 'progress-planner' ); ?>
-</p>
+<p><?php \esc_html_e( 'Here are the updates you made to your content last week. Whether you published something new, updated an existing post, or removed outdated content, it all helps you stay on top of your site!', 'progress-planner' ); ?></p>
 
 <prpl-big-counter
 	number="<?php echo \esc_html( \number_format_i18n( (int) $prpl_activities_count['all'] ) ); ?>"
