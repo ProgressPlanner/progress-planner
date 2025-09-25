@@ -45,11 +45,11 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	<p class="prpl-show-all-tasks">
 		<?php if ( false === strpos( $prpl_request_uri, 'prpl_show_all_recommendations' ) ) : ?>
 			<a href="<?php echo \esc_url( \add_query_arg( 'prpl_show_all_recommendations', '', \admin_url( 'admin.php?page=progress-planner&prpl_show_all_recommendations' ) ) ); ?>">
-				<?php \esc_html_e( 'Show all Recommendations', 'progress-planner' ); ?>
+				<?php \esc_html_e( 'Show all recommendations', 'progress-planner' ); ?>
 			</a>
 		<?php else : ?>
 			<a href="<?php echo \esc_url( \remove_query_arg( 'prpl_show_all_recommendations', \admin_url( 'admin.php?page=progress-planner' ) ) ); ?>">
-				<?php \esc_html_e( 'Show fewer Recommendations', 'progress-planner' ); ?>
+				<?php \esc_html_e( 'Show fewer recommendations', 'progress-planner' ); ?>
 			</a>
 		<?php endif; ?>
 	</p>
