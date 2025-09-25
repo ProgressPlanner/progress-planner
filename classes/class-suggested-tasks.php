@@ -68,6 +68,9 @@ class Suggested_Tasks {
 		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'rest_prepare_recommendation' ], 10, 2 );
 
 		\add_filter( 'wp_trash_post_days', [ $this, 'change_trashed_posts_lifetime' ], 10, 2 );
+
+		// Add filter to modify the maximum number of suggested tasks to display.
+		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_recommendations' ] );
 	}
 
 	/**
@@ -537,5 +540,24 @@ class Suggested_Tasks {
 		}
 
 		return \apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category );
+	}
+
+	/**
+	 * Modify the maximum number of suggested tasks to display.
+	 *
+	 * @param array $max_items_per_category Array of maximum items per category.
+	 * @return array Modified array of maximum items per category.
+	 */
+	public function check_show_all_recommendations( $max_items_per_category ) {
+		return (
+			isset( $_GET['prpl_show_all_recommendations'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			&& \current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		)
+			? \array_map(
+				function () {
+					return 99;
+				},
+				$max_items_per_category
+			) : $max_items_per_category;
 	}
 }
