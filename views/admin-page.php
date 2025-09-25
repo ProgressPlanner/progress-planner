@@ -13,6 +13,14 @@ if ( ! \defined( 'ABSPATH' ) ) {
 $prpl_privacy_policy_accepted = \progress_planner()->is_privacy_policy_accepted();
 $prpl_wrapper_class           = '';
 
+if ( 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id() ) {
+	$prpl_license_key = \progress_planner()->get_utils__onboard()->make_remote_onboarding_request();
+	if ( '' !== $prpl_license_key ) {
+		\update_option( 'progress_planner_license_key', $prpl_license_key );
+		$prpl_privacy_policy_accepted = true;
+	}
+}
+
 if ( ! $prpl_privacy_policy_accepted ) {
 	$prpl_wrapper_class = 'prpl-pp-not-accepted';
 }
