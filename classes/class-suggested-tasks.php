@@ -553,19 +553,15 @@ class Suggested_Tasks {
 	 * @return array Modified array of maximum items per category.
 	 */
 	public function check_show_all_recommendations( $max_items_per_category ) {
-		if (
-			! isset( $_GET['prpl_show_all_recommendations'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! \current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		) {
-			return $max_items_per_category;
-		}
-
-		$max_items = 99;
-
-		foreach ( $max_items_per_category as $key => $value ) {
-			$max_items_per_category[ $key ] = $max_items;
-		}
-
-		return $max_items_per_category;
+		return (
+			isset( $_GET['prpl_show_all_recommendations'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			&& \current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		)
+			? \array_map(
+				function () {
+					return 99;
+				},
+				$max_items_per_category
+			) : $max_items_per_category;
 	}
 }
