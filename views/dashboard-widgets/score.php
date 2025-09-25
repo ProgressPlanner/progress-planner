@@ -49,7 +49,7 @@ $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( ne
 
 <h3>
 	<?php
-	printf(
+	\printf(
 		/* translators: %s: Ravi's name. */
 		\esc_html__( '%s\'s Recommendations', 'progress-planner' ),
 		\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )

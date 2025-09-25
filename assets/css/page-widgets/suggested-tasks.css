@@ -19,6 +19,17 @@
 		}
 	}
 
+	&:not(:has(.prpl-suggested-tasks-loading)):has(.prpl-suggested-tasks-list li) {
+
+		.prpl-show-all-tasks {
+			display: block;
+		}
+	}
+
+	.prpl-show-all-tasks {
+		display: none;
+	}
+
 	&:has(.prpl-suggested-tasks-list li) {
 
 		.prpl-widget-title {
