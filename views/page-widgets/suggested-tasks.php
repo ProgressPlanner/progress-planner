@@ -15,7 +15,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<?php
 		echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			'suggested-tasks',
-			sprintf(
+			\sprintf(
 				/* translators: %s: Ravi's name. */
 				\esc_html__( '%s\'s Recommendations', 'progress-planner' ),
 				\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
@@ -25,7 +25,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	</h2>
 	<p class="prpl-suggested-tasks-widget-description">
 		<?php
-		printf(
+		\printf(
 			/* translators: %s: Ravi's name. */
 			\esc_html__( 'Complete a task from %s’s Recommendations to improve your site and earn points toward this month’s badge!', 'progress-planner' ),
 			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
