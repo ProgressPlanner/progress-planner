@@ -87,6 +87,6 @@ final class Whats_New extends Widget {
 	 * @return string
 	 */
 	public function get_cache_key() {
-		return 'blog_feed_' . md5( \progress_planner()->get_ui__branding()->get_blog_feed_url() );
+		return 'blog_feed_' . \md5( \progress_planner()->get_ui__branding()->get_blog_feed_url() );
 	}
 }
