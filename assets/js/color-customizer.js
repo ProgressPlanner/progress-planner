@@ -9,7 +9,9 @@
 
 	// Normalize color value to 6-digit hex format
 	function normalizeColorValue( colorValue ) {
-		if ( ! colorValue ) return null;
+		if ( ! colorValue ) {
+			return null;
+		}
 
 		// Handle special cases
 		if ( colorValue === 'none' ) {
@@ -47,7 +49,9 @@
 		colorPickers.forEach( function ( picker, index ) {
 			const textInput = textInputs[ index ];
 
-			if ( ! textInput ) return;
+			if ( ! textInput ) {
+				return;
+			}
 
 			// Update text input when color picker changes
 			picker.addEventListener( 'input', function () {
