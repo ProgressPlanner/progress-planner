@@ -90,8 +90,7 @@ const prplOnboardRedirect = () => {
 	);
 
 	let redirectUrl = window.location.href
-		.replace( '&content-scan-finished=true', '' )
-		.replace( '&content-scan', '' )
+		.replace( '&&show-tour=true', '' )
 		.replace( '&delay-tour=true', '' );
 
 	// If plugin is upgraded, we dont show the tour.
@@ -99,7 +98,7 @@ const prplOnboardRedirect = () => {
 		window.location.href = redirectUrl;
 	} else {
 		// We show the tour.
-		redirectUrl = redirectUrl + '&content-scan-finished=true';
+		redirectUrl = redirectUrl + '&show-tour=true';
 
 		// Check if there are completed tasks, delay tour so the user can see the celebration.
 		if (
