@@ -54,34 +54,15 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 	<hr>
 <?php endif; ?>
 
-
-
 <div class="prpl-widget-content">
-	<?php if ( 2024 === (int) \gmdate( 'Y' ) ) : ?>
-		<?php
-		\progress_planner()->the_view(
-			'page-widgets/parts/monthly-badges-2024.php',
-			[
-				'title_tag' => 'h2',
-			]
-		);
-		?>
-	<?php else : ?>
-
-		<?php
-		\progress_planner()->the_view(
-			'page-widgets/parts/monthly-badges.php',
-			[
-				'title_year' => 2025,
-			]
-		);
-		?>
-	<?php endif; ?>
 	<?php
-	\progress_planner()->get_ui__popover()->the_popover( 'monthly-badges' )->render_button(
-		'',
-		\esc_html__( 'Show all badges', 'progress-planner' )
-	);
+	if ( 2024 === (int) \gmdate( 'Y' ) ) {
+		\progress_planner()->the_view( 'page-widgets/parts/monthly-badges-2024.php', [ 'title_tag' => 'h2' ] );
+	} else {
+		\progress_planner()->the_view( 'page-widgets/parts/monthly-badges.php', [ 'title_year' => 2025 ] );
+	}
+
+	\progress_planner()->get_ui__popover()->the_popover( 'monthly-badges' )->render_button( '', \esc_html__( 'Show all badges', 'progress-planner' ) );
 	\progress_planner()->get_ui__popover()->the_popover( 'monthly-badges' )->render();
 	?>
 </div>
