@@ -72,12 +72,7 @@ foreach ( \array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
 	if ( $prpl_activities ) {
 		if ( 'delete' !== $prpl_activity_type ) {
 			// Filter the activities to only include the tracked post types.
-			$prpl_activities = \array_filter(
-				$prpl_activities,
-				function ( $activity ) use ( $prpl_tracked_post_types ) {
-					return \in_array( \get_post_type( $activity->data_id ), $prpl_tracked_post_types, true );
-				}
-			);
+			$prpl_activities = \array_filter( $prpl_activities, fn( $activity ) => \in_array( \get_post_type( $activity->data_id ), $prpl_tracked_post_types, true ) );
 		}
 
 		// Update the count.

@@ -66,13 +66,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 				'frequency'  => $prpl_widget->get_frequency(),
 				'format'     => 'M',
 			],
-			'count_callback' => function ( $activities, $date ) {
-				$score = 0;
-				foreach ( $activities as $activity ) {
-					$score += $activity->get_points( $date );
-				}
-				return $score * 100 / Base::SCORE_TARGET;
-			},
+			'count_callback' => fn( $activities, $date ) => array_sum( array_map( fn( $activity ) => $activity->get_points( $date ), $activities ) ) * 100 / Base::SCORE_TARGET,
 			'normalized'     => true,
 			'color'          => [ $prpl_widget, 'get_color' ],
 			'max'            => 100,
