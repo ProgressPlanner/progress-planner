@@ -185,7 +185,7 @@ class Onboard {
 
 		// Make a request to the remote endpoint to update the license key.
 		$response = \wp_remote_post(
-			$this->get_remote_url( 'change-domain' ),
+			$this->get_remote_url( 'change-site-url' ),
 			[
 				'body' => [
 					'license_key' => $saved_license_key,
