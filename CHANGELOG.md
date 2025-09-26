@@ -1,5 +1,9 @@
 = 1.9.0 =
 
+Enhancements:
+
+* Add "Show all Recommendations" button to the "Ravi's Recommendations" widget
+
 Bugs we fixed:
 
 * Fix missing content and streak badges after they are all completed.
