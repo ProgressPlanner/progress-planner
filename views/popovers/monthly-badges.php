@@ -52,16 +52,13 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					<?php $prpl_group_badges = \progress_planner()->get_badges()->get_badges( $prpl_badge_group ); ?>
 					<div class="progress-wrapper badge-group-<?php echo \esc_attr( $prpl_badge_group ); ?>">
 						<?php foreach ( $prpl_group_badges as $prpl_badge ) : ?>
-							<?php
-							$prpl_badge_progress  = $prpl_badge->get_progress();
-							$prpl_badge_completed = 100 === (int) $prpl_badge_progress['progress'];
-							?>
+							<?php $prpl_badge_progress = $prpl_badge->get_progress(); ?>
 							<span
 								class="prpl-badge"
 								data-value="<?php echo \esc_attr( $prpl_badge_progress['progress'] ); ?>"
 							>
 								<prpl-badge
-									complete="<?php echo $prpl_badge_completed ? 'true' : 'false'; ?>"
+									complete="<?php echo 100 === (int) $prpl_badge_progress['progress'] ? 'true' : 'false'; ?>"
 									badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
 									badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
 									branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
