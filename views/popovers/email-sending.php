@@ -21,7 +21,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<div class="prpl-column prpl-column-content">
 			<h2 class="prpl-interactive-task-title"><?php \esc_html_e( 'Test if your site can send emails', 'progress-planner' ); ?></h2>
 			<p class="prpl-interactive-task-description"><?php \esc_html_e( 'Your WordPress site sometimes needs to send emails. For example, to reset a password, send a comment notification, or warn you when something breaks. Contact forms also use email.', 'progress-planner' ); ?></p>
-			<p class="prpl-interactive-task-description"><?php \esc_html_e( 'It’s important to check if these emails are actually sent. Enter your email address on the right to get a test email.', 'progress-planner' ); ?></p>
+			<p class="prpl-interactive-task-description"><?php \esc_html_e( 'It is important to check if these emails are actually sent. Enter your email address on the right to get a test email.', 'progress-planner' ); ?></p>
 		</div>
 		<div class="prpl-column">
 			<p><?php \esc_html_e( 'Where should we send the test email?', 'progress-planner' ); ?></p>
@@ -38,10 +38,8 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 				<div class="prpl-steps-nav-wrapper">
 					<button class="prpl-button" data-action="showResults" type="submit">
-						<?php
-						/* translators: %s is a forward arrow icon. */
-						\printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
-						?>
+						<?php /* translators: %s is a forward arrow icon. */ ?>
+						<?php \printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' ); ?>
 					</button>
 				</div>
 			</form>
@@ -72,7 +70,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				<span class="prpl-note-text" data-email-message="
 					<?php
 						/* translators: %s is the error message. */
-						\printf( \esc_attr__( 'The test email didn’t work. The error message was: [ERROR_MESSAGE]', 'progress-planner' ), \esc_attr( $prpl_email_error ) );
+						\printf( \esc_attr__( 'The test email did not work. The error message was: [ERROR_MESSAGE]', 'progress-planner' ), \esc_attr( $prpl_email_error ) );
 					?>
 				">
 				</span>
@@ -82,7 +80,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				<?php
 				\printf(
 					/* translators: %s is a link to the troubleshooting guide. */
-					\esc_html__( 'There are a few common reasons why your email might not be sending. Check the %s to find out what’s causing the issue and how to fix it.', 'progress-planner' ),
+					\esc_html__( 'There are a few common reasons why your email might not be sending. Check the %s to find out what is causing the issue and how to fix it.', 'progress-planner' ),
 					'<a href="' . \esc_url( $prpl_troubleshooting_guide_url ) . '" target="_blank">' . \esc_html__( 'troubleshooting guide', 'progress-planner' ) . '</a>'
 				);
 				?>
@@ -184,7 +182,8 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<p class="prpl-interactive-task-description">
 				<?php \esc_html_e( 'We\'re sorry to hear you did not receive our confirmation email yet. On some websites, it make take up to a few hours to send email. That\'s why we strongly advise you to check back in a few hours from now.', 'progress-planner' ); ?>
 			</p>
-			<p class="prpl-interactive-task-description"><?php \esc_html_e( 'If you already waited a couple of hours and you still didn\'t get our email, your email might not be working well.', 'progress-planner' ); ?>
+			<p class="prpl-interactive-task-description">
+				<?php \esc_html_e( 'If you already waited a couple of hours and you still didn\'t get our email, your email might not be working well.', 'progress-planner' ); ?>
 			</p>
 		</div>
 
