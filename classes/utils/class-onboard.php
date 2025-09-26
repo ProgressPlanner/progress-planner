@@ -202,7 +202,7 @@ class Onboard {
 
 		// Update the saved site URL if the request was successful.
 		if ( isset( $body['status'] ) && 'ok' === $body['status'] ) {
-			\update_option( 'progress_planner_saved_site_url', $saved_site_url, false );
+			\update_option( 'progress_planner_saved_site_url', $current_site_url, false );
 		}
 	}
 }
