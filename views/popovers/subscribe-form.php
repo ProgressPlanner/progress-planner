@@ -17,13 +17,13 @@ $prpl_current_user = \wp_get_current_user();
 
 <form id="prpl-settings-license-form">
 	<p>
-	<?php
-	\printf(
-		/* translators: %s: progressplanner.com link */
-		\esc_html__( 'We can send you weekly emails with your own to-do’s, your activity stats and nudges to keep you working on your site. To do this, we’ll create an account for you on %s.', 'progress-planner' ),
-		'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/home' ) ) . '" target="_blank">progressplanner.com</a>'
-	)
-	?>
+		<?php
+		\printf(
+			/* translators: %s: progressplanner.com link */
+			\esc_html__( 'We can send you weekly emails with your own to-dos, your activity stats and nudges to keep you working on your site. To do this, we’ll create an account for you on %s.', 'progress-planner' ),
+			'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/home' ) ) . '" target="_blank">progressplanner.com</a>'
+		)
+		?>
 	</p>
 	<div class="prpl-form-fields">
 		<label>
