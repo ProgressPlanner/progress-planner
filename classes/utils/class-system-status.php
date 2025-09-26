@@ -85,7 +85,7 @@ class System_Status {
 					'format'     => 'M',
 				],
 				'count_callback' => fn( $activities, $date ) =>
-					array_sum( array_map( fn( $activity ) => $activity->get_points( $date ), $activities ) ) * 100 / Base::SCORE_TARGET,
+					\array_sum( \array_map( fn( $activity ) => $activity->get_points( $date ), $activities ) ) * 100 / Base::SCORE_TARGET,
 				'normalized'     => true,
 				'max'            => 100,
 			]
