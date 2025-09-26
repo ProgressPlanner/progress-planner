@@ -52,7 +52,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					<?php
 					\printf(
 						/* translators: %s: progressplanner.com link */
-						\esc_html__( 'To send these updates, we willll create an account for you on %s.', 'progress-planner' ),
+						\esc_html__( 'To send these updates, we will create an account for you on %s.', 'progress-planner' ),
 						'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/home' ) ) . '" target="_blank">progressplanner.com</a>'
 					)
 					?>
