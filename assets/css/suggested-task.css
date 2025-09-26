@@ -278,7 +278,7 @@
 			padding: 0.5rem;
 
 			&:hover {
-				background-color: var(--prpl-color-gauge-main);
+				background-color: var(--prpl-color-gauge-remain);
 			}
 
 			input[type="radio"] {

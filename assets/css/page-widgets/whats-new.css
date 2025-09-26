@@ -61,7 +61,7 @@
 	margin-bottom: 0.75rem;
 	border-radius: var(--prpl-border-radius-big);
 	border: 1px solid var(--prpl-color-border);
-	background-color: var(--prpl-color-gauge-main); /* Fallback, if remote host image is not accessible */
+	background-color: var(--prpl-color-gauge-remain); /* Fallback, if remote host image is not accessible */
 	transition: transform 0.2s, box-shadow 0.2s;
 
 	&:hover {

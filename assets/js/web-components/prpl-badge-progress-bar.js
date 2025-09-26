@@ -29,7 +29,7 @@ customElements.define(
 						style="
 							width: 100%;
 							height: 1rem;
-							background-color: var(--prpl-color-gauge-main);
+							background-color: var(--prpl-color-gauge-remain);
 							border-radius: 0.5rem;
 							position: relative;"
 					>
