@@ -37,28 +37,22 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					<strong class="prpl-form-notice-title"><?php \esc_html_e( 'Stay on track with weekly updates', 'progress-planner' ); ?></strong>
 					<ul>
 						<li>
-						<?php
-						/* translators: %s: <strong> tag */
-						\printf( \esc_html__( '%1$s Personalized to-do’s %2$s to keep your site in great shape.', 'progress-planner' ), '<strong>', '</strong>' );
-						?>
+							<?php /* translators: %1$s: <strong> tag, %2$s: </strong> tag */ ?>
+							<?php \printf( \esc_html__( '%1$s Personalized to-dos %2$s to keep your site in great shape.', 'progress-planner' ), '<strong>', '</strong>' ); ?>
 						</li>
 						<li>
-						<?php
-						/* translators: %s: <strong> tag */
-						\printf( \esc_html__( '%1$s Activity stats %2$s so you can track your progress.', 'progress-planner' ), '<strong>', '</strong>' );
-						?>
+							<?php /* translators: %1$s: <strong> tag, %2$s: </strong> tag */ ?>
+							<?php \printf( \esc_html__( '%1$s Activity stats %2$s so you can track your progress.', 'progress-planner' ), '<strong>', '</strong>' ); ?>
 						</li>
 						<li>
-						<?php
-						/* translators: %s: <strong> tag */
-						\printf( \esc_html__( '%1$s Helpful nudges %2$s to stay consistent with your website goals.', 'progress-planner' ), '<strong>', '</strong>' );
-						?>
+							<?php /* translators: %1$s: <strong> tag, %2$s: </strong> tag */ ?>
+							<?php \printf( \esc_html__( '%1$s Helpful nudges %2$s to stay consistent with your website goals.', 'progress-planner' ), '<strong>', '</strong>' ); ?>
 						</li>
 					</ul>
 					<?php
 					\printf(
 						/* translators: %s: progressplanner.com link */
-						\esc_html__( 'To send these updates, we’ll create an account for you on %s.', 'progress-planner' ),
+						\esc_html__( 'To send these updates, we will create an account for you on %s.', 'progress-planner' ),
 						'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/home' ) ) . '" target="_blank">progressplanner.com</a>'
 					)
 					?>
@@ -75,7 +69,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					<label>
 						<input type="radio" name="with-email" value="no">
 						<span class="prpl-label-content">
-							<?php \esc_html_e( 'No, I don’t want emails right now.', 'progress-planner' ); ?>
+							<?php \esc_html_e( 'No, I do not want emails right now.', 'progress-planner' ); ?>
 						</span>
 					</label>
 				</div>
@@ -128,7 +122,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 						>
 						<?php
 						\printf(
-						/* translators: %s: progressplanner.com/privacy-policy link */
+							/* translators: %s: progressplanner.com/privacy-policy link */
 							\esc_html__( 'I agree to the %s.', 'progress-planner' ),
 							'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">Privacy policy</a>'
 						);
@@ -165,11 +159,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					?>
 				</p>
 				<p id="prpl-account-not-created-message" style="display:none;">
-					<?php
-					\printf(
-						\esc_html__( 'Success! Enjoy using the Progress Planner plugin!', 'progress-planner' ),
-					);
-					?>
+					<?php \esc_html_e( 'Success! Enjoy using the Progress Planner plugin!', 'progress-planner' ); ?>
 				</p>
 
 				<?php \progress_planner()->the_view( 'popovers/parts/upgrade-tasks.php', [ 'context' => 'onboarding' ] ); ?>
