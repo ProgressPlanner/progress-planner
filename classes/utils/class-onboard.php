@@ -105,15 +105,14 @@ class Onboard {
 			$this->get_remote_url( 'get-nonce' ),
 			[ 'body' => [ 'site' => \set_url_scheme( \site_url() ) ] ]
 		);
+
 		if ( \is_wp_error( $response ) ) {
 			return '';
 		}
-		$body = \wp_remote_retrieve_body( $response );
-		$body = \json_decode( $body, true );
-		if ( ! isset( $body['nonce'] ) ) {
-			return '';
-		}
-		return $body['nonce'];
+
+		$body = \json_decode( \wp_remote_retrieve_body( $response ), true );
+
+		return isset( $body['nonce'] ) ? $body['nonce'] : '';
 	}
 
 	/**
@@ -144,11 +143,14 @@ class Onboard {
 			$this->get_remote_url( 'onboard' ),
 			[ 'body' => $data ]
 		);
+
+		// Bail early if there is an error.
 		if ( \is_wp_error( $response ) ) {
 			return '';
 		}
-		$body = \wp_remote_retrieve_body( $response );
-		$body = \json_decode( $body, true );
+
+		$body = \json_decode( \wp_remote_retrieve_body( $response ), true );
+
 		return ! isset( $body['status'] )
 			|| 'ok' !== $body['status']
 			|| ! isset( $body['license_key'] )
@@ -162,20 +164,15 @@ class Onboard {
 	 * @return void
 	 */
 	public function detect_site_url_changes() {
-		// Get the saved site URL.
-		$saved_site_url = \get_option( 'progress_planner_site_url', false );
-
-		// Get the current site URL.
+		$saved_site_url   = \get_option( 'progress_planner_saved_site_url', false );
 		$current_site_url = \set_url_scheme( \site_url() );
 
-		// Update the saved site URL if it's not set.
+		// Update the saved site URL if it's not set, then bail early.
 		if ( ! $saved_site_url ) {
-			\update_option( 'progress_planner_site_url', $current_site_url, false );
-			// Bail early, there's obviously nothing to do.
+			\update_option( 'progress_planner_saved_site_url', $current_site_url, false );
 			return;
 		}
 
-		// Get the saved license key.
 		$saved_license_key = \get_option( 'progress_planner_license_key', false );
 
 		// Bail early if the license key is not set, or if the site URL has not changed.
@@ -195,15 +192,17 @@ class Onboard {
 				],
 			]
 		);
+
+		// Bail early if there is an error.
 		if ( \is_wp_error( $response ) ) {
 			return;
 		}
-		$body = \wp_remote_retrieve_body( $response );
-		$body = \json_decode( $body, true );
+
+		$body = \json_decode( \wp_remote_retrieve_body( $response ), true );
 
 		// Update the saved site URL if the request was successful.
 		if ( isset( $body['status'] ) && 'ok' === $body['status'] ) {
-			\update_option( 'progress_planner_site_url', $saved_site_url, false );
+			\update_option( 'progress_planner_saved_site_url', $saved_site_url, false );
 		}
 	}
 }
