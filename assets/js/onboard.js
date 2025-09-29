@@ -1,10 +1,10 @@
-/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerTriggerScan */
+/* global progressPlanner, progressPlannerAjaxRequest */
 /*
  * Onboard
  *
  * A script to handle the onboarding process.
  *
- * Dependencies: progress-planner/ajax-request, progress-planner/scan-posts, progress-planner/upgrade-tasks
+ * Dependencies: progress-planner/ajax-request, progress-planner/upgrade-tasks
  */
 
 /**
@@ -48,15 +48,6 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 
 			// Make a local request to save the response data.
 			progressPlannerSaveLicenseKey( response.license_key );
-
-			// Start scanning posts.
-			progressPlannerTriggerScan().then( () => {
-				window.location.href =
-					window.location.href
-						.replace( '&content-scan-finished=true', '' )
-						.replace( '&content-scan', '' ) +
-					'&content-scan-finished=true';
-			} );
 		} )
 		.catch( ( error ) => {
 			console.warn( error );

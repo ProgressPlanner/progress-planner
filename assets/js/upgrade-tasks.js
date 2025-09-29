@@ -85,10 +85,7 @@ const prplOnboardTasks = async () =>
  */
 // eslint-disable-next-line no-unused-vars
 const prplOnboardRedirect = () => {
-	const redirectUrl = window.location.href
-		.replace( '&content-scan-finished=true', '' )
-		.replace( '&content-scan', '' )
-		.replace( '&delay-tour=true', '' );
+	const redirectUrl = window.location.href.replace( '&show-tour=true', '' );
 
 	// If plugin is upgraded, we dont show the tour.
 	if ( document.getElementById( 'prpl-popover-upgrade-tasks' ) ) {

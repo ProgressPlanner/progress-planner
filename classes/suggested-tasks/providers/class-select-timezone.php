@@ -136,7 +136,7 @@ class Select_Timezone extends Tasks_Interactive {
 				<?php echo \wp_timezone_choice( $tzstring, \get_user_locale() ); ?>
 			</select>
 		</label>
-		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+		<button type="submit" class="prpl-button prpl-button-primary">
 			<?php \esc_html_e( 'Set site timezone', 'progress-planner' ); ?>
 		</button>
 		<?php

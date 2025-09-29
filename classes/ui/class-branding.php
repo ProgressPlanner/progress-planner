@@ -38,6 +38,9 @@ final class Branding {
 		if ( \defined( 'PROGRESS_PLANNER_BRANDING_ID' ) ) {
 			return \constant( 'PROGRESS_PLANNER_BRANDING_ID' );
 		}
+		if ( isset( $_GET['pp_branding_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return (int) $_GET['pp_branding_id']; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		}
 
 		$hostname = (string) \gethostname();
 		if ( \str_contains( $hostname, 'siteground' ) ) {
@@ -223,7 +226,7 @@ final class Branding {
 			return $widgets;
 		}
 
-		return array_filter(
+		return \array_filter(
 			$widgets,
 			function ( $widget ) use ( $show_papers ) {
 				return \in_array( $widget->get_id(), $show_papers, true );

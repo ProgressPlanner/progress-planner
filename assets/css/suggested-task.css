@@ -8,7 +8,7 @@
 	line-height: 1;
 
 	&:nth-child(odd) {
-		background-color: #f6f7f9;
+		background-color: var(--prpl-background-table);
 	}
 
 	.prpl-suggested-task-title-wrapper {
@@ -19,7 +19,7 @@
 
 		.prpl-task-title {
 			width: 100%;
-			color: #4b5563;
+			color: var(--prpl-color-text);
 		}
 	}
 
@@ -87,8 +87,8 @@
 	.prpl-suggested-task-points {
 		font-size: var(--prpl-font-size-xs);
 		font-weight: 700;
-		color: var(--prpl-color-headings);
-		background-color: var(--prpl-color-400-orange);
+		color: var(--prpl-text-point);
+		background-color: var(--prpl-background-point);
 		width: 1.5rem;
 		height: 1.5rem;
 		border-radius: 50%;
@@ -121,7 +121,7 @@
 					content: "";
 					display: inline-block;
 					width: 1px;
-					background: var(--prpl-color-gray-5);
+					background: var(--prpl-color-text);
 					height: 0.75rem;
 				}
 			}
@@ -173,7 +173,7 @@
 
 	.prpl-suggested-task-description {
 		font-size: 0.825rem;
-		color: var(--prpl-color-gray-6);
+		color: var(--prpl-color-text);
 		margin: 0;
 	}
 
@@ -198,7 +198,7 @@
 		padding: 0;
 		border: 0;
 		background: none;
-		color: var(--prpl-color-gray-3);
+		color: var(--prpl-color-ui-icon);
 		cursor: pointer;
 		box-shadow: none;
 		margin-top: 1px;
@@ -234,7 +234,7 @@
 		}
 
 		&:hover {
-			color: var(--prpl-color-gray-6);
+			color: var(--prpl-color-ui-icon-hover);
 		}
 	}
 
@@ -278,7 +278,7 @@
 			padding: 0.5rem;
 
 			&:hover {
-				background-color: var(--prpl-color-gray-1);
+				background-color: var(--prpl-color-gauge-remain);
 			}
 
 			input[type="radio"] {

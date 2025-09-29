@@ -19,6 +19,17 @@
 		}
 	}
 
+	&:not(:has(.prpl-suggested-tasks-loading)):has(.prpl-suggested-tasks-list li) {
+
+		.prpl-show-all-tasks {
+			display: block;
+		}
+	}
+
+	.prpl-show-all-tasks {
+		display: none;
+	}
+
 	&:has(.prpl-suggested-tasks-list li) {
 
 		.prpl-widget-title {
@@ -38,7 +49,7 @@
 	.prpl-no-suggested-tasks,
 	.prpl-suggested-tasks-loading {
 		display: none;
-		background-color: var(--prpl-background-green);
+		background-color: var(--prpl-background-activity);
 		padding: calc(var(--prpl-padding) / 2);
 	}
 
@@ -95,7 +106,7 @@
 					left: -20px;
 					width: 1px;
 					height: 100%;
-					background-color: var(--prpl-color-gray-2);
+					background-color: var(--prpl-color-border);
 				}
 
 				&::after {
@@ -148,7 +159,7 @@
 		&.prpl-column-content {
 			padding: 20px;
 			border-radius: var(--prpl-border-radius-big);
-			background-color: var(--prpl-background-purple);
+			background-color: var(--background-content);
 		}
 
 		.prpl-note {
@@ -157,10 +168,10 @@
 			align-items: flex-start;
 			gap: 0.5rem;
 			padding: 0.75rem;
-			color: #854d0e;
+			color: var(--prpl-color-alert-warning-text);
 			font-size: var(--prpl-font-size-small);
 			border-radius: 6px;
-			background-color: #fefce8;
+			background-color: var(--prpl-background-alert-warning);
 
 			.prpl-note-icon {
 				display: flex;
@@ -169,7 +180,7 @@
 				justify-content: center;
 				width: 20px;
 				height: 20px;
-				color: #eab308;
+				color: var(--prpl-color-alert-warning);
 
 				svg {
 					width: 100%;
@@ -178,11 +189,11 @@
 			}
 
 			&.prpl-note-error {
-				color: #9f0712;
-				background-color: var(--prpl-background-red);
+				color: var(--prpl-color-alert-error-text);
+				background-color: var(--prpl-background-alert-error);
 
 				.prpl-note-icon {
-					color: var(--prpl-color-notification-red);
+					color: var(--prpl-color-alert-error);
 				}
 
 			}
@@ -211,16 +222,16 @@
 
 			/* WIP */
 			border-radius: 6px;
-			border: 1px solid var(--prpl-color-gray-2);
+			border: 1px solid var(--prpl-color-border);
 		}
 
-		.prpl-button {
+		.prpl-button-step {
 			padding: 0.75rem 1.25rem;
 			border: none;
-			color: var(--prpl-color-gray-6);
+			color: var(--prpl-color-text);
 			font-weight: 600;
 			border-radius: var(--prpl-border-radius);
-			background-color: var(--prpl-color-400-orange);
+			background-color: var(--prpl-background-banner);
 
 			/* WIP: pick exact color */
 			transition: all 0.25s ease-in-out;
@@ -231,7 +242,7 @@
 				display: block;
 				width: 100%;
 				height: 100%;
-				background: var(--prpl-color-400-orange);
+				background: var(--prpl-background-banner);
 
 				/* WIP: pick exact color */
 				position: absolute;
@@ -244,12 +255,12 @@
 
 			&:hover,
 			&:focus {
-				background: var(--prpl-color-400-orange);
+				background: var(--prpl-background-banner);
 
 				/* WIP: pick exact color */
 
 				&::after {
-					background: var(--prpl-color-400-orange);
+					background: var(--prpl-background-banner);
 
 					/* WIP: pick exact color */
 					box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
@@ -265,7 +276,7 @@
 			min-height: 100px;
 			border-radius: 6px;
 			box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.05);
-			border: 1px solid var(--prpl-color-gray-2);
+			border: 1px solid var(--prpl-color-border);
 		}
 
 		/* Used for radio and checkbox inputs. */

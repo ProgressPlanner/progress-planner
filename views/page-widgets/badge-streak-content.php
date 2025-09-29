@@ -32,7 +32,7 @@ if ( ! $prpl_widget_details ) {
 <p><?php \esc_html_e( 'The more you work on meaninful content, the sooner you unlock new badges.', 'progress-planner' ); ?></p>
 
 <div class="prpl-latest-badges-wrapper">
-	<prpl-gauge background="<?php echo \esc_attr( $prpl_widget_details->get_background() ); ?>" color="var(--prpl-color-accent-orange)">
+	<prpl-gauge background="<?php echo \esc_attr( $prpl_widget_details->get_background() ); ?>" color="var(--prpl-color-monthly)">
 		<progress max="100" value="<?php echo (float) $prpl_widget_details->get_progress()['progress']; ?>">
 			<prpl-badge
 				complete="true"
