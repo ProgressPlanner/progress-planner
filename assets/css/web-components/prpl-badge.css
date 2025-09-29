@@ -76,7 +76,7 @@ prpl-badge {
 			justify-content: center;
 			width: 20px;
 			height: 20px;
-			background-color: var(--prpl-color-accent-red);
+			background-color: var(--prpl-color-alert-error);
 			border: 2px solid #fff;
 			border-radius: 50%;
 			position: absolute;
