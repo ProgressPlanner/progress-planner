@@ -235,7 +235,7 @@ class Set_Date_Format extends Tasks_Interactive {
 				</p>
 			</fieldset>
 		</div>
-		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+		<button type="submit" class="prpl-button prpl-button-primary">
 			<?php \esc_html_e( 'Set date format', 'progress-planner' ); ?>
 		</button>
 		<?php

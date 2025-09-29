@@ -137,7 +137,7 @@ class Page {
 		/* translators: Hidden accessibility text; %s: number of notifications. */
 		$notifications = \sprintf( \_n( '%s pending celebration', '%s pending celebrations', $notification_count, 'progress-planner' ), \number_format_i18n( $notification_count ) );
 
-		return \sprintf( '<span class="update-plugins count-%1$d" style="background-color:#f9b23c;color:#38296d;"><span class="plugin-count" aria-hidden="true">%1$d</span><span class="screen-reader-text">%2$s</span></span>', $notification_count, $notifications );
+		return \sprintf( '<span class="update-plugins count-%1$d" style="background-color:var(--prpl-background-banner);color:#38296d;"><span class="plugin-count" aria-hidden="true">%1$d</span><span class="screen-reader-text">%2$s</span></span>', $notification_count, $notifications );
 	}
 
 	/**
@@ -294,6 +294,7 @@ class Page {
 			return;
 		}
 
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/variables-color' );
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/admin' );
 		if ( ! static::$branding_inline_styles_added ) {
 			\wp_add_inline_style( 'progress-planner/admin', \progress_planner()->get_ui__branding()->get_custom_css() );
