@@ -50,6 +50,9 @@ class Debug_Tools {
 
 		// Add filter to modify the maximum number of suggested tasks to display.
 		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_suggested_tasks' ] );
+
+		// Initialize color customizer.
+		$this->get_color_customizer();
 	}
 
 	/**
@@ -92,6 +95,16 @@ class Debug_Tools {
 		$this->add_more_info_submenu_item( $admin_bar );
 
 		$this->add_toggle_migrations_submenu_item( $admin_bar );
+
+		// Add color customizer item.
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-color-customizer',
+				'parent' => 'prpl-debug',
+				'title'  => 'Color Customizer',
+				'href'   => \admin_url( 'admin.php?page=progress-planner-color-customizer' ),
+			]
+		);
 	}
 
 	/**
@@ -616,5 +629,18 @@ class Debug_Tools {
 		// Redirect to the same page without the parameter.
 		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_single_task', '_wpnonce' ] ) );
 		exit;
+	}
+
+	/**
+	 * Get color customizer instance.
+	 *
+	 * @return \Progress_Planner\Utils\Color_Customizer
+	 */
+	public function get_color_customizer() {
+		static $color_customizer = null;
+		if ( null === $color_customizer ) {
+			$color_customizer = new Color_Customizer();
+		}
+		return $color_customizer;
 	}
 }
