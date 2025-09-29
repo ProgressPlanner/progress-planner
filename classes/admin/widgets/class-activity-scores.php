@@ -112,37 +112,33 @@ final class Activity_Scores extends Widget {
 		return [
 			[
 				'label'    => \esc_html__( 'published content', 'progress-planner' ),
-				'callback' => function () {
-					$events = \progress_planner()->get_activities__query()->query_activities(
+				'callback' => fn() => \count(
+					\progress_planner()->get_activities__query()->query_activities(
 						[
 							'start_date' => new \DateTime( '-7 days' ),
 							'category'   => 'content',
 							'type'       => 'publish',
 						]
-					);
-					return \count( $events ) > 0;
-				},
+					)
+				) > 0,
 			],
 			[
 				'label'    => \esc_html__( 'updated content', 'progress-planner' ),
-				'callback' => function () {
-					$events = \progress_planner()->get_activities__query()->query_activities(
+				'callback' => fn() => \count(
+					\progress_planner()->get_activities__query()->query_activities(
 						[
 							'start_date' => new \DateTime( '-7 days' ),
 							'category'   => 'content',
 							'type'       => 'update',
 						]
-					);
-					return \count( $events ) > 0;
-				},
+					)
+				) > 0,
 			],
 			[
 				'label'    => 0 === \wp_get_update_data()['counts']['total']
 					? \esc_html__( 'performed all updates', 'progress-planner' )
 					: '<a href="' . \esc_url( \admin_url( 'update-core.php' ) ) . '">' . \esc_html__( 'Perform all updates', 'progress-planner' ) . '</a>',
-				'callback' => function () {
-					return ! \wp_get_update_data()['counts']['total'];
-				},
+				'callback' => fn() => ! \wp_get_update_data()['counts']['total'],
 			],
 		];
 	}
