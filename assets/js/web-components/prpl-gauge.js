@@ -18,8 +18,8 @@ customElements.define(
 				max: 100,
 				value: 0,
 				maxDeg: '180deg',
-				background: 'var(--prpl-background-orange)',
-				color: 'var(--prpl-color-accent-orange)',
+				background: 'var(--prpl-background-monthly)',
+				color: 'var(--prpl-color-monthly)',
 				start: '270deg',
 				cutout: '57%',
 				contentFontSize: 'var(--prpl-font-size-6xl)',
@@ -67,14 +67,14 @@ customElements.define(
 			this.innerHTML = `
 			<div style="padding: ${ props.contentPadding };
 			background: ${ props.background }; border-radius:var(--prpl-border-radius-big); aspect-ratio: 2 / 1; overflow: hidden; position: relative; margin-bottom: ${ props.marginBottom };">
-				<div style="width: 100%; aspect-ratio: 1 / 1; border-radius: 100%; position: relative; background: radial-gradient(${ props.background } 0 ${ props.cutout }, transparent ${ props.cutout } 100%), conic-gradient(from ${ props.start }, ${ props.color } calc(${ props.maxDeg } * ${ props.value }), var(--prpl-color-gray-1) calc(${ props.maxDeg } * ${ props.value }) ${ props.maxDeg }, transparent ${ props.maxDeg }); text-align: center;">
-					<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-gray-5); width: 10%; text-align: center; left:0;">0</span>
-						<span style="font-size: ${ props.contentFontSize }; ${ contentSpecificStyles } display: block; font-weight: 600; text-align: center; position: absolute; color: var(--prpl-color-gray-5); width: 100%; line-height: 1.2;">
+				<div style="width: 100%; aspect-ratio: 1 / 1; border-radius: 100%; position: relative; background: radial-gradient(${ props.background } 0 ${ props.cutout }, transparent ${ props.cutout } 100%), conic-gradient(from ${ props.start }, ${ props.color } calc(${ props.maxDeg } * ${ props.value }), var(--prpl-color-gauge-remain) calc(${ props.maxDeg } * ${ props.value }) ${ props.maxDeg }, transparent ${ props.maxDeg }); text-align: center;">
+					<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-text); width: 10%; text-align: center; left:0;">0</span>
+						<span style="font-size: ${ props.contentFontSize }; ${ contentSpecificStyles } display: block; font-weight: 600; text-align: center; position: absolute; color: var(--prpl-color-text); width: 100%; line-height: 1.2;">
 							<span style="display:inline-block;width: 50%;">
 								${ content }
 							</span>
 						</span>
-					<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-gray-5); width: 10%; text-align: center; right:0;">${ props.max }</span>
+					<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-text); width: 10%; text-align: center; right:0;">${ props.max }</span>
 				</div>
 			</div>
 			`;

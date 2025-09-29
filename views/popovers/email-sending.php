@@ -37,7 +37,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				<input type="email" id="prpl-sending-email-address" placeholder="<?php \esc_html_e( 'Enter your e-mail address', 'progress-planner' ); ?>" value="<?php echo \esc_attr( \wp_get_current_user()->user_email ); ?>" />
 
 				<div class="prpl-steps-nav-wrapper">
-					<button class="prpl-button" data-action="showResults" type="submit">
+					<button class="prpl-button prpl-button-step" data-action="showResults" type="submit">
 						<?php /* translators: %s is a forward arrow icon. */ ?>
 						<?php \printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' ); ?>
 					</button>
@@ -87,13 +87,13 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			</p>
 
 			<div class="prpl-steps-nav-wrapper">
-				<button class="prpl-button" data-action="showForm">
+				<button class="prpl-button prpl-button-step" data-action="showForm">
 					<?php
 						/* translators: %s is a back arrow icon. */
 						\printf( \esc_html__( ' %s Try again', 'progress-planner' ), '<span class="dashicons dashicons-arrow-left-alt2"></span>' );
 					?>
 				</button>
-				<button class="prpl-button" data-action="closePopover"><?php \esc_html_e( 'Retry later', 'progress-planner' ); ?></button>
+				<button class="prpl-button prpl-button-step" data-action="closePopover"><?php \esc_html_e( 'Retry later', 'progress-planner' ); ?></button>
 			</div>
 		</div>
 	</div>
@@ -149,7 +149,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			</div>
 
 			<div class="prpl-steps-nav-wrapper">
-				<button class="prpl-button" data-action="">
+				<button class="prpl-button prpl-button-step" data-action="">
 					<?php
 					/* translators: %s is an arrow icon. */
 					\printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
@@ -170,7 +170,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<p><?php \esc_html_e( 'Celebrate this achievement!', 'progress-planner' ); ?></p>
 
 			<div class="prpl-steps-nav-wrapper">
-				<button class="prpl-button" data-action="completeTask"><?php \esc_html_e( 'Collect your point!', 'progress-planner' ); ?></button>
+				<button class="prpl-button prpl-button-step" data-action="completeTask"><?php \esc_html_e( 'Collect your point!', 'progress-planner' ); ?></button>
 			</div>
 		</div>
 	</div>
@@ -197,7 +197,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<?php endif; ?>
 
 			<div class="prpl-steps-nav-wrapper">
-				<button class="prpl-button" data-action="openTroubleshootingGuide"><?php \esc_html_e( 'Take me to your troubleshooting guide', 'progress-planner' ); ?></button>
+				<button class="prpl-button prpl-button-step" data-action="openTroubleshootingGuide"><?php \esc_html_e( 'Take me to your troubleshooting guide', 'progress-planner' ); ?></button>
 			</div>
 		</div>
 	</div>
