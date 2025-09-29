@@ -2,7 +2,7 @@
 
 	img {
 		margin-top: 0.5rem;
-		border: 1px solid var(--prpl-color-gray-2);
+		border: 1px solid var(--prpl-color-border);
 		border-radius: var(--prpl-border-radius);
 	}
 
@@ -17,15 +17,15 @@
 		align-items: center;
 		gap: 0.5em;
 		text-decoration: none;
-		color: var(--prpl-color-gray-7);
-		border: 1px solid var(--prpl-color-gray-2);
+		color: var(--prpl-color-ui-icon);
+		border: 1px solid var(--prpl-color-ui-icon);
 		border-radius: var(--prpl-border-radius);
 		padding: 0.5em 1em;
 
 		&:hover {
-			color: var(--prpl-color-link);
-			border-color: var(--prpl-color-link);
-			background-color: var(--prpl-background-blue);
+			color: var(--prpl-color-ui-icon-hover);
+			border-color: var(--prpl-color-ui-icon-hover);
+			background-color: var(--prpl-color-ui-icon-hover-fill);
 		}
 	}
 }
