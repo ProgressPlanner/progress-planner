@@ -151,12 +151,10 @@ class Select_Locale extends Tasks_Interactive {
 
 		// Get the locales.
 		$locales = \array_map(
-			function ( $locale ) {
-				return [
-					'code' => $locale['language'],
-					'name' => $locale['native_name'],
-				];
-			},
+			fn( $locale ) => [
+				'code' => $locale['language'],
+				'name' => $locale['native_name'],
+			],
 			$locales['translations']
 		);
 
