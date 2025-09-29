@@ -195,7 +195,7 @@ class Front_End_Onboarding {
 				<button class="prpl-tour-prev prpl-btn prpl-btn-primary"><?php \esc_html_e( 'Back', 'progress-planner' ); ?></button>
 				<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php esc_html_e( 'Next', 'progress-planner' ); ?></button>
 				<button id="prpl-finish-btn" class="prpl-btn prpl-btn-primary"><?php esc_html_e( 'Close', 'progress-planner' ); ?></button>
-				<button id="prpl-dashboard-btn" class="prpl-btn prpl-btn-primary"><?php esc_html_e( 'Take me to the dashboard', 'progress-planner' ); ?></button>
+				<button id="prpl-dashboard-btn" class="prpl-btn prpl-btn-primary" onclick="window.location.href = '<?php echo \esc_url( admin_url( 'admin.php?page=progress-planner' ) ); ?>';"><?php esc_html_e( 'Take me to the dashboard', 'progress-planner' ); ?></button>
 			</div>
 		</div>
 		<?php
