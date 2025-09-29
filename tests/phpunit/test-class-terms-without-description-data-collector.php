@@ -134,12 +134,7 @@ class Terms_Without_Description_Data_Collector_Test extends \WP_UnitTestCase {
 		$term_id = $term_result['term_id'];
 
 		// Add filter to exclude the term.
-		\add_filter(
-			'progress_planner_terms_without_description_exclude_term_ids',
-			function () use ( $term_id ) {
-				return [ $term_id ];
-			}
-		);
+		\add_filter( 'progress_planner_terms_without_description_exclude_term_ids', fn() => [ $term_id ] );
 
 		// Get the data.
 		$this->data_collector->update_cache();
