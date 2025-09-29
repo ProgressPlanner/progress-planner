@@ -226,12 +226,7 @@ final class Branding {
 			return $widgets;
 		}
 
-		return \array_filter(
-			$widgets,
-			function ( $widget ) use ( $show_papers ) {
-				return \in_array( $widget->get_id(), $show_papers, true );
-			}
-		);
+		return \array_filter( $widgets, fn( $widget ) => \in_array( $widget->get_id(), $show_papers, true ) );
 	}
 
 	/**
