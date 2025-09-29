@@ -41,12 +41,23 @@ foreach ( \progress_planner()->get_admin__widgets__monthly_badges()->get_previou
 		<?php
 		if ( 'popover' !== $prpl_location && 3 < \count( $prpl_badges ) ) {
 			// If we have more than 3 badges, we need to show the current month badge and the previous 2 months badges.
-			$prpl_current_month_badge_id = Monthly::get_badge_id_from_date( new \DateTime() );
-			$prpl_temp_badges            = [];
+			$prpl_current_month_badge_id    = Monthly::get_badge_id_from_date( new \DateTime() );
+			$prpl_temp_badges               = [];
+			$prpl_current_month_badge_index = 0;
 			foreach ( $prpl_badges as $prpl_badge ) {
 				$prpl_temp_badges[] = $prpl_badge;
 				if ( $prpl_current_month_badge_id === $prpl_badge->get_id() ) {
 					break;
+				}
+				++$prpl_current_month_badge_index;
+			}
+			if ( 3 > \count( $prpl_temp_badges ) ) {
+				$prpl_temp_badges = [ $prpl_badges[ $prpl_current_month_badge_index ] ];
+				if ( isset( $prpl_badges[ $prpl_current_month_badge_index + 1 ] ) ) {
+					$prpl_temp_badges[] = $prpl_badges[ $prpl_current_month_badge_index + 1 ];
+				}
+				if ( isset( $prpl_badges[ $prpl_current_month_badge_index + 2 ] ) ) {
+					$prpl_temp_badges[] = $prpl_badges[ $prpl_current_month_badge_index + 2 ];
 				}
 			}
 			$prpl_badges = \array_slice( $prpl_temp_badges, -3 ); // We show only 3 badges in page widget.
