@@ -38,7 +38,7 @@
 	}
 
 	.prpl-settings-form-wrap {
-		background-color: #fff;
+		background-color: var(--prpl-background-paper);
 
 		border: 1px solid var(--prpl-color-border);
 		border-radius: var(--prpl-border-radius);
