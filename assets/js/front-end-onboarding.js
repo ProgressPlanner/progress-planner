@@ -28,6 +28,7 @@ class ProgressPlannerTour {
 		this.prevBtn = this.popover.querySelector( '.prpl-tour-prev' );
 		this.nextBtn = this.popover.querySelector( '.prpl-tour-next' );
 		this.finishBtn = this.popover.querySelector( '#prpl-finish-btn' );
+		this.dashboardBtn = this.popover.querySelector( '#prpl-dashboard-btn' );
 
 		// Setup event listeners after DOM is ready
 		this.setupEventListeners();
@@ -222,6 +223,7 @@ class ProgressPlannerTour {
 			isFirstStep || isLastStep ? 'none' : 'inline-block';
 		this.nextBtn.style.display = isLastStep ? 'none' : 'inline-block';
 		this.finishBtn.style.display = isLastStep ? 'inline-block' : 'none';
+		this.dashboardBtn.style.display = isLastStep ? 'inline-block' : 'none';
 	}
 
 	/**
