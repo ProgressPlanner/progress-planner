@@ -678,12 +678,7 @@ abstract class Tasks implements Tasks_Interface {
 		}
 
 		// Order actions by priority.
-		\usort(
-			$actions,
-			function ( $a, $b ) {
-				return $a['priority'] - $b['priority'];
-			}
-		);
+		\usort( $actions, fn( $a, $b ) => $a['priority'] - $b['priority'] );
 
 		$return_actions = [];
 		foreach ( $actions as $action ) {

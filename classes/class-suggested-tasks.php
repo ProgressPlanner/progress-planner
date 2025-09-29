@@ -554,12 +554,8 @@ class Suggested_Tasks {
 			isset( $_GET['prpl_show_all_recommendations'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			&& \current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		)
-			? \array_map(
-				function () {
-					return 99;
-				},
-				$max_items_per_category
-			) : $max_items_per_category;
+			? \array_map( fn() => 99, $max_items_per_category )
+			: $max_items_per_category;
 	}
 
 	/**
