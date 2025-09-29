@@ -54,27 +54,19 @@ $prpl_record = $prpl_widget->personal_record_callback();
 	\progress_planner()->get_ui__chart()->the_chart(
 		[
 			'type'           => 'bar',
-			'items_callback' => function ( $start_date, $end_date ) {
-				return \progress_planner()->get_activities__query()->query_activities(
-					[
-						'start_date' => $start_date,
-						'end_date'   => $end_date,
-					]
-				);
-			},
+			'items_callback' => fn( $start_date, $end_date ) => \progress_planner()->get_activities__query()->query_activities(
+				[
+					'start_date' => $start_date,
+					'end_date'   => $end_date,
+				]
+			),
 			'dates_params'   => [
 				'start_date' => \DateTime::createFromFormat( 'Y-m-d', \gmdate( 'Y-m-01' ) )->modify( $prpl_widget->get_range() ),
 				'end_date'   => new \DateTime(),
 				'frequency'  => $prpl_widget->get_frequency(),
 				'format'     => 'M',
 			],
-			'count_callback' => function ( $activities, $date ) {
-				$score = 0;
-				foreach ( $activities as $activity ) {
-					$score += $activity->get_points( $date );
-				}
-				return $score * 100 / Base::SCORE_TARGET;
-			},
+			'count_callback' => fn( $activities, $date ) => \array_sum( \array_map( fn( $activity ) => $activity->get_points( $date ), $activities ) ) * 100 / Base::SCORE_TARGET,
 			'normalized'     => true,
 			'color'          => [ $prpl_widget, 'get_color' ],
 			'max'            => 100,
