@@ -20,7 +20,7 @@ abstract class Badge_Maintenance extends Badge {
 	 *
 	 * @var string
 	 */
-	protected $background = 'var(--prpl-background-red)';
+	protected $background = 'var(--prpl-background-streak)';
 
 	/**
 	 * Get a recurring goal for any type of weekly activity.

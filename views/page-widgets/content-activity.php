@@ -14,11 +14,11 @@ $prpl_widget = \progress_planner()->get_admin__widgets__content_activity();
 $prpl_activity_types = [
 	'publish' => [
 		'label' => \__( 'published', 'progress-planner' ),
-		'color' => 'var(--prpl-color-accent-orange)',
+		'color' => 'var(--prpl-color-monthly)',
 	],
 	'update'  => [
 		'label' => \__( 'updated', 'progress-planner' ),
-		'color' => 'var(--prpl-color-accent-green)',
+		'color' => 'var(--prpl-graph-color-3)',
 	],
 	'delete'  => [
 		'label' => \__( 'deleted', 'progress-planner' ),
@@ -35,8 +35,8 @@ $prpl_chart_data    = [];
 $prpl_chart_options = [
 	'dataArgs'     => [],
 	'chartId'      => 'prpl-chart-content-activity',
-	'axisColor'    => 'var(--prpl-color-gray-2)',
-	'rulersColor'  => 'var(--prpl-color-gray-2)',
+	'axisColor'    => 'var(--prpl-color-border)',
+	'rulersColor'  => 'var(--prpl-color-border)',
 	'filtersLabel' => '<strong>' . \__( 'show:', 'progress-planner' ) . '</strong>',
 ];
 foreach ( $prpl_activity_types as $prpl_activity_type => $prpl_activity_data ) {
@@ -96,7 +96,7 @@ foreach ( \array_keys( $prpl_activity_types ) as $prpl_activity_type ) {
 <prpl-big-counter
 	number="<?php echo \esc_html( \number_format_i18n( (int) $prpl_activities_count['all'] ) ); ?>"
 	content="<?php \esc_attr_e( 'pieces of content managed', 'progress-planner' ); ?>"
-	background-color="var(--prpl-background-purple)"
+	background-color="var(--background-content)"
 ></prpl-big-counter>
 
 <div class="prpl-graph-wrapper">

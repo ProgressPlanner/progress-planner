@@ -219,7 +219,7 @@ class Select_Locale extends Tasks_Interactive {
 			]
 		);
 		?>
-		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+		<button type="submit" class="prpl-button prpl-button-primary">
 			<?php \esc_html_e( 'Select locale', 'progress-planner' ); ?>
 		</button>
 		<?php
