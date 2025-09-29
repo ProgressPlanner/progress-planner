@@ -19,8 +19,19 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		</h2>
 	</div>
 	<div class="tour-content">
-		<p>
-			<?php \esc_html_e( 'Every step you take makes your website better. Progress Planner tracks your progress, celebrating achievements with badges and streaks to keep you motivated and engaged.', 'progress-planner' ); ?>
-		</p>
+		<div class="prpl-columns-wrapper-flex">
+			<div class="prpl-column prpl-column-content">
+				<p>
+					<?php \esc_html_e( 'As you progress and are more active on your website, you can earn badges. These badges are displayed here!', 'progress-planner' ); ?>
+				</p>
+
+				<p>
+					Lorem ipsum dolor sit amet consectetur adipiscing, elit nullam hendrerit porttitor torquent, nec molestie hac parturient vehicula. Fames condimentum netus nisl tempus potenti curabitur iaculis nam velit, etiam sapien mollis dictum vitae eu bibendum per mus, hendrerit dis blandit parturient dictumst cum ridiculus libero.
+				</p>
+			</div>
+			<div class="prpl-column">
+				<img src="http://server.planner.test/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=monthly-2025-m9&branding_id=0" alt="Badges">
+			</div>
+		</div>
 	</div>
 </script>

@@ -27,7 +27,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					break; }
 				?>
 				<li class="prpl-complete-task-item">
-					<span>
+					<span class="task-title">
 						<?php echo esc_html( $tasks[ $prpl_i ]['title'] ); ?>
 					</span>
 					<form class="prpl-complete-task-form" onsubmit="return false;">

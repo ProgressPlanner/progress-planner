@@ -1,5 +1,9 @@
 #prpl-popover-front-end-onboarding {
 
+	& * {
+		box-sizing: border-box;
+	}
+
 	padding: 24px 24px 14px 24px;
 	box-sizing: border-box;
 
@@ -13,6 +17,56 @@
 
 	&::backdrop {
 		background: rgba(0, 0, 0, 0.5);
+	}
+
+	.tour-header {
+
+		.tour-title {
+			margin-top: 0;
+			font-size: 20px;
+			color: #38296d;
+			font-weight: 600;
+		}
+	}
+
+	.tour-footer {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.tour-content {
+		font-size: 16px;
+		line-height: 1.5;
+
+		p {
+			margin-bottom: 10px;
+		}
+
+		img {
+			max-width: 100%;
+			height: auto;
+		}
+
+	}
+
+	.prpl-columns-wrapper-flex {
+		display: flex;
+		gap: 40px;
+		overflow: hidden;
+		padding-bottom: 10px;
+
+		.prpl-column {
+			flex-grow: 1;
+			flex-basis: 50%;
+
+			&.prpl-column-content {
+				padding: 20px;
+				border-radius: 6px;
+				background-color: #f6f5fb;
+			}
+		}
 	}
 
 	.prpl-btn {
@@ -46,7 +100,7 @@
 		}
 	}
 
-	.prpl-complete-task-btn {
+	.prpl-complete-task-btn:not(.prpl-btn) {
 		border: none;
 		background: none;
 		cursor: pointer;
@@ -56,29 +110,12 @@
 		color: #1e40af;
 	}
 
-	.prpl-complete-task-btn-completed {
+	.prpl-complete-task-btn-completed:not(.prpl-btn) {
 		color: #059669;
 	}
 
 	.prpl-complete-task-btn-error {
 		color: #9f0712;
-	}
-
-	.prpl-complete-task-item {
-		margin-bottom: 1rem;
-		display: flex;
-		align-items: center;
-		justify-content: space-between;
-	}
-
-	#prpl-more-tasks-list {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-
-		li:not(:last-child) {
-			margin-bottom: 10px;
-		}
 	}
 
 	/* WIP for tasks which need user input. */
@@ -101,6 +138,78 @@
 		.prpl-complete-task-btn {
 			flex-shrink: 0;
 		}
+	}
 
+	.prpl-complete-task-item {
+		display: flex;
+		justify-content: space-between;
+	}
+
+	/* Welcome */
+	&[data-prpl-step="0"] {
+
+		.prpl-column:not(.prpl-column-content) {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+	}
+
+	/* First task */
+	.prpl-complete-first-task {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+
+		.first-task-title {
+			margin: 0;
+			font-size: 18px;
+			font-weight: 600;
+			color: #4b5563;
+		}
+
+		input[type="text"] {
+			width: 100%;
+
+			/* padding: 0.5rem;
+			border: 1px solid #ccc;
+			border-radius: 0.25rem; */
+		}
+
+		.prpl-complete-task-form {
+			width: 100%;
+			flex-direction: column;
+
+			.prpl-complete-task-btn {
+				align-self: flex-end;
+
+				&.prpl-complete-task-btn-completed {
+					opacity: 0.5;
+					pointer-events: none;
+				}
+			}
+		}
+	}
+
+	/* More tasks */
+	#prpl-more-tasks-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+
+		li {
+			padding: 7px 5px;
+			margin: 0;
+
+			&:nth-child(odd) {
+				background-color: #f6f7f9;
+			}
+
+			.task-title {
+				color: #4b5563;
+				font-weight: 500;
+			}
+		}
 	}
 }
