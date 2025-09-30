@@ -56,16 +56,10 @@ class Crawl_Settings_Feed_Global_Comments extends AIOSEO_Provider {
 		}
 
 		// Check if crawl cleanup is enabled and comment feeds are disabled.
-		$options = \aioseo()->options->searchAppearance->advanced;
-
-		// First check if crawl cleanup is enabled.
-		if ( ! isset( $options->crawlCleanup ) || false === $options->crawlCleanup ) {
-			// If crawl cleanup is not enabled, this task is not yet applicable.
-			return false;
-		}
+		$disable_comment_feed = \aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->globalComments;
 
 		// Check if comment feeds are already disabled.
-		if ( isset( $options->feeds ) && isset( $options->feeds->comments ) && false === $options->feeds->comments ) {
+		if ( $disable_comment_feed === false ) {
 			return false;
 		}
 

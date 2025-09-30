@@ -39,7 +39,6 @@ class Add_AIOSEO_Providers {
 			new Archive_Author(),
 			new Archive_Date(),
 			new Media_Pages(),
-			new Crawl_Settings_Emoji_Scripts(),
 			new Crawl_Settings_Feed_Authors(),
 			new Crawl_Settings_Feed_Global_Comments(),
 			new Organization_Logo(),

@@ -39,11 +39,7 @@ class Organization_Logo extends AIOSEO_Provider {
 			return \esc_html__( 'All in One SEO: set your organization logo', 'progress-planner' );
 		}
 
-		$options       = \aioseo()->options->searchAppearance->global->schema;
-		$is_person     = isset( $options->personOrOrganization ) && 'person' === $options->personOrOrganization;
-		return $is_person
-			? \esc_html__( 'All in One SEO: set your person logo', 'progress-planner' )
-			: \esc_html__( 'All in One SEO: set your organization logo', 'progress-planner' );
+		return \esc_html__( 'All in One SEO: set your organization logo', 'progress-planner' );
 	}
 
 	/**
@@ -58,7 +54,7 @@ class Organization_Logo extends AIOSEO_Provider {
 		}
 
 		$options   = \aioseo()->options->searchAppearance->global->schema;
-		$is_person = isset( $options->personOrOrganization ) && 'person' === $options->personOrOrganization;
+		$is_person = isset( $options->siteRepresents ) && 'person' === $options->siteRepresents;
 		return $is_person
 			? \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/aioseo-person-logo' )
 			: \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/aioseo-organization-logo' );
@@ -75,20 +71,14 @@ class Organization_Logo extends AIOSEO_Provider {
 			return false;
 		}
 
-		$options = \aioseo()->options->searchAppearance->global->schema;
-
-		// Check if person or organization.
-		$is_person = isset( $options->personOrOrganization ) && 'person' === $options->personOrOrganization;
+		$represents = \aioseo()->options->searchAppearance->global->schema->siteRepresents;
 
 		// Check if logo is already set.
-		if ( $is_person ) {
-			// Check person logo.
-			if ( isset( $options->person->image ) && ! empty( $options->person->image ) ) {
-				return false;
-			}
+		if ( $represents === 'person' ) {
+			return false;
 		} else {
 			// Check organization logo.
-			if ( isset( $options->organizationLogo ) && ! empty( $options->organizationLogo ) ) {
+			if ( \aioseo()->options->searchAppearance->global->schema->organizationLogo !== '' ) {
 				return false;
 			}
 		}

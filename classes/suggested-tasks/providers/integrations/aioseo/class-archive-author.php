@@ -57,7 +57,7 @@ class Archive_Author extends AIOSEO_Provider {
 	 * @return string
 	 */
 	protected function get_title() {
-		return \esc_html__( 'All in One SEO: disable the author archive', 'progress-planner' );
+		return \esc_html__( 'All in One SEO: noindex the author archive', 'progress-planner' );
 	}
 
 	/**

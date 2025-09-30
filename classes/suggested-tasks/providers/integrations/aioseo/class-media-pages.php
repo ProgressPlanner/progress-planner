@@ -58,18 +58,12 @@ class Media_Pages extends AIOSEO_Provider {
 		// Check if redirect attachment URLs is already set to 'attachment'.
 		// This setting is stored in aioseo_options_dynamic under:
 		// searchAppearance -> postTypes -> attachment -> redirectAttachmentUrls.
-		$dynamic_options = \aioseo()->dynamicOptions->searchAppearance->postTypes->attachment ?? null;
-
-		if ( ! $dynamic_options ) {
-			return true;
-		}
-
-		$redirect_value = $dynamic_options->redirectAttachmentUrls ?? null;
+		$redirect = \aioseo()->dynamicOptions->searchAppearance->postTypes->attachment->redirectAttachmentUrls;
 
 		// The task is complete if redirectAttachmentUrls is set to 'attachment'.
 		// Possible values: 'disabled', 'attachment', or 'attachmentParent'.
 		// We recommend 'attachment' as it redirects to the attachment file itself.
-		if ( 'attachment' === $redirect_value ) {
+		if ( 'attachment' === $redirect ) {
 			return false;
 		}
 

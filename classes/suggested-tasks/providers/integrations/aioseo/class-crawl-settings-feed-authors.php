@@ -77,16 +77,10 @@ class Crawl_Settings_Feed_Authors extends AIOSEO_Provider {
 		}
 
 		// Check if crawl cleanup is enabled and author feeds are disabled.
-		$options = \aioseo()->options->searchAppearance->advanced;
-
-		// First check if crawl cleanup is enabled.
-		if ( ! isset( $options->crawlCleanup ) || false === $options->crawlCleanup ) {
-			// If crawl cleanup is not enabled, this task is not yet applicable.
-			return false;
-		}
+		$disable_author_feed = \aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->authors;
 
 		// Check if author feeds are already disabled.
-		if ( isset( $options->feeds ) && isset( $options->feeds->author ) && false === $options->feeds->author ) {
+		if ( $disable_author_feed === false ) {
 			return false;
 		}
 
