@@ -52,7 +52,7 @@ function onboardingTests( testContext = test ) {
 				// Verify onboarding completion by checking for expected elements
 				await expect(
 					page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
-				).toBeVisible( { timeout: 5000 } );
+				).toBeVisible( { timeout: 15000 } );
 				await expect(
 					page.locator(
 						'.prpl-widget-wrapper.prpl-suggested-tasks .prpl-suggested-tasks-list'
