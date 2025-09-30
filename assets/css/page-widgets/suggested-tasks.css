@@ -35,14 +35,9 @@
 		.prpl-widget-title {
 			display: flex;
 		}
-
-		hr {
-			display: block;
-		}
 	}
 
-	.prpl-widget-title,
-	hr {
+	.prpl-widget-title {
 		display: none;
 	}
 
