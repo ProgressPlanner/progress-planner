@@ -26,13 +26,6 @@ test.describe( 'PRPL Task Snooze', () => {
 		);
 
 		if ( taskToSnooze ) {
-			// Debug.
-			const wrap = page.locator(
-				'div.prpl-dashboard-widget-suggested-tasks'
-			);
-			const outer = await wrap.evaluate( ( el ) => el.outerHTML );
-			console.log( 'outerHTML:', outer );
-
 			// Hover over the task to show actions
 			const taskElement = page.locator(
 				`li[data-task-id="${ taskToSnooze.task_id }"]`
