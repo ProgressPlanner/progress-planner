@@ -38,7 +38,6 @@ class Add_AIOSEO_Providers {
 		$this->providers = [
 			new Archive_Author(),
 			new Archive_Date(),
-			new Archive_Format(),
 			new Media_Pages(),
 			new Crawl_Settings_Emoji_Scripts(),
 			new Crawl_Settings_Feed_Authors(),
