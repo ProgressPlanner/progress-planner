@@ -78,11 +78,12 @@ class Archive_Author extends AIOSEO_Provider {
 
 		// Check if author archives are already disabled in AIOSEO.
 		// AIOSEO uses 'show' property - when false, archives are hidden from search results.
-		$options = \aioseo()->options->searchAppearance->archives;
+		// Get a fresh copy of the options to avoid caching issues.
+		$show_value = \aioseo()->options->searchAppearance->archives->author->show;
 
-		// Check if author archives show is disabled.
-		// Using empty() to catch false, 0, '0', null, etc.
-		if ( isset( $options->author ) && isset( $options->author->show ) && empty( $options->author->show ) ) {
+		// If show is false (disabled), the task is complete (return false means don't add task).
+		// Using loose comparison to handle string/int/bool variations.
+		if ( ! $show_value ) {
 			return false;
 		}
 
