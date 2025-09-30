@@ -36,6 +36,13 @@ class Remove_Inactive_Plugins extends Tasks {
 	protected const DATA_COLLECTOR_CLASS = Inactive_Plugins_Data_Collector::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/remove-inactive-plugins';
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -54,24 +61,28 @@ class Remove_Inactive_Plugins extends Tasks {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %1$s <a href="https://prpl.fyi/remove-inactive-plugins" target="_blank">removing any plugins</a> link */
-			\esc_html__( 'You have inactive plugins. Consider %1$s that are not activated to free up resources, and improve security.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/remove-inactive-plugins" target="_blank">' . \esc_html__( 'removing any plugins', 'progress-planner' ) . '</a>',
-		);
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
 	public function should_add_task() {
 		return $this->get_data_collector()->collect() > 0;
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'plugins.php?plugin_status=inactive' ) . '" target="_self">' . \esc_html__( 'Go to the "Plugins" page', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

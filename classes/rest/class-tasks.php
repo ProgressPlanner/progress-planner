@@ -60,9 +60,6 @@ class Tasks {
 			return true;
 		}
 
-		if ( \progress_planner()->is_pro_site() && $token === \get_option( 'progress_planner_pro_license_key' ) ) {
-			return true;
-		}
 		$license_key = \get_option( 'progress_planner_license_key', false );
 		if ( ! $license_key || 'no-license' === $license_key ) {
 			return false;
@@ -77,7 +74,6 @@ class Tasks {
 	 * @return \WP_REST_Response The REST response object containing the recommendations.
 	 */
 	public function get_tasks() {
-
 		// Collection of task objects.
 		$tasks           = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => [ 'publish', 'trash', 'draft', 'future', 'pending' ] ] );
 		$tasks_to_return = [];

@@ -51,6 +51,13 @@ class Update_Term_Description extends Tasks {
 	protected const DATA_COLLECTOR_CLASS = Terms_Without_Description_Data_Collector::class;
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/taxonomy-terms-description';
+
+	/**
 	 * Whether the task is dismissable.
 	 *
 	 * @var bool
@@ -129,24 +136,6 @@ class Update_Term_Description extends Tasks {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @param array $task_data The task data.
-	 *
-	 * @return string
-	 */
-	public function get_description_with_data( $task_data = [] ) {
-		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
-
-		return $term && ! \is_wp_error( $term ) ? \sprintf(
-			/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/taxonomy-terms-description" target="_blank">Read more</a> link */
-			\esc_html__( 'Your "%1$s" archives probably show the description of that specific term. %2$s', 'progress-planner' ),
-			$term->name,
-			'<a href="https://prpl.fyi/taxonomy-terms-description" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the writing a description for taxonomy terms.', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		) : '';
-	}
-
-	/**
 	 * Get the URL.
 	 *
 	 * @param array $task_data The task data.
@@ -199,11 +188,11 @@ class Update_Term_Description extends Tasks {
 			return [];
 		}
 
-		$data    = $this->get_data_collector()->collect();
+		$data    = $this->transform_collector_data( $this->get_data_collector()->collect() );
 		$task_id = $this->get_task_id(
 			[
-				'term_id'  => $data['term_id'],
-				'taxonomy' => $data['taxonomy'],
+				'target_term_id'  => $data['target_term_id'],
+				'target_taxonomy' => $data['target_taxonomy'],
 			]
 		);
 
@@ -214,7 +203,7 @@ class Update_Term_Description extends Tasks {
 		// Transform the data to match the task data structure.
 		$task_data = $this->modify_injection_task_data(
 			$this->get_task_details(
-				$this->transform_collector_data( $data )
+				$data
 			)
 		);
 
@@ -297,5 +286,31 @@ class Update_Term_Description extends Tasks {
 	 */
 	public function exclude_completed_terms( $exclude_term_ids ) {
 		return \array_merge( $exclude_term_ids, $this->get_completed_term_ids() );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		if ( ! isset( $data['meta']['prpl_task_id'] ) ) {
+			return $actions;
+		}
+
+		$term = $this->get_term_from_task_id( $data['meta']['prpl_task_id'] );
+		if ( ! $term ) {
+			return $actions;
+		}
+
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id ) . '" target="_self">' . \esc_html__( 'Write description', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

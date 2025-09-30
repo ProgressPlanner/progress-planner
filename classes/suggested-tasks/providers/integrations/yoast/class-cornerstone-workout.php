@@ -31,6 +31,13 @@ class Cornerstone_Workout extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-cornerstone-workout';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/run-cornerstone-content-workout';
+
+	/**
 	 * The task priority.
 	 *
 	 * @var int
@@ -117,19 +124,6 @@ class Cornerstone_Workout extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Improve your most important pages with Yoast SEO\'s Cornerstone Content Workout. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/run-cornerstone-content-workout" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Learn more about the Yoast SEO Cornerstone Content Workout', 'progress-planner' ) . '">' . \esc_html__( 'Learn more', 'progress-planner' ) . '</a>'
-		);
-	}
-
-	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -150,5 +144,22 @@ class Cornerstone_Workout extends Yoast_Provider {
 					'provider_id' => $this->get_provider_id(),
 				]
 			);
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) . '" target="_self">' . \esc_html__( 'Run workout', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

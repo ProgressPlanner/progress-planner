@@ -105,6 +105,7 @@ class Terms_Without_Posts extends Base_Data_Collector {
 				'product_shipping_class',
 				'prpl_recommendations_category',
 				'prpl_recommendations_provider',
+				'gblocks_pattern_collections',
 			]
 		);
 
@@ -131,8 +132,7 @@ class Terms_Without_Posts extends Base_Data_Collector {
 			// If the default taxonomy term (which cannot be removed) is set, we need to query 2 terms.
 			$query_limit = $default_taxonomy_term_id ? 2 : 1;
 
-			$query = "
-				SELECT t.term_id, t.name, tt.count, tt.taxonomy
+			$query = "SELECT t.term_id, t.name, tt.count, tt.taxonomy
 				FROM {$wpdb->terms} AS t
 				INNER JOIN {$wpdb->term_taxonomy} AS tt ON t.term_id = tt.term_id
 				WHERE tt.taxonomy = %s AND tt.count <= %d
@@ -152,7 +152,7 @@ class Terms_Without_Posts extends Base_Data_Collector {
 			if ( ! empty( $terms ) ) {
 				foreach ( $terms as $term ) {
 					// Default categories can not be removed.
-					if ( $default_taxonomy_term_id !== (int) $term->term_id ) {
+					if ( $default_taxonomy_term_id !== (int) $term->term_id ) { // @phpstan-ignore-line property.nonObject
 						$result = (array) $term;
 						break 2; // We have found the term, break out of both foreach loops.
 					}

@@ -12,7 +12,7 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Hello_World as Hello_World_D
 /**
  * Add tasks for hello world post.
  */
-class Hello_World extends Tasks {
+class Hello_World extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -41,6 +41,20 @@ class Hello_World extends Tasks {
 	 * @var string
 	 */
 	protected const DATA_COLLECTOR_CLASS = Hello_World_Data_Collector::class;
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'hello-world';
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/delete-hello-world-post';
 
 	/**
 	 * Get the task URL.
@@ -82,11 +96,25 @@ class Hello_World extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %s:<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">Hello World!</a> link */
-			\esc_html__( 'On install, WordPress creates a %s post. This post is not needed and should be deleted.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/delete-hello-world-post" target="_blank">' . \esc_html__( '"Hello World!"', 'progress-planner' ) . '</a>'
+		$hello_world_post_id = $this->get_data_collector()->collect();
+
+		if ( 0 === $hello_world_post_id ) {
+			return \esc_html__( 'On install, WordPress creates a "Hello World!" post. This post is not needed and should be deleted.', 'progress-planner' );
+		}
+
+		$hello_world_post_url = (string) \get_permalink( $hello_world_post_id );
+
+		$content  = '<p>';
+		$content .= \sprintf(
+			/* translators: %s: Link to the post. */
+			\esc_html__( 'On install, WordPress creates a "Hello World!" post. You can find yours at %s.', 'progress-planner' ),
+			'<a href="' . \esc_attr( $hello_world_post_url ) . '" target="_self">' . \esc_html( $hello_world_post_url ) . '</a>',
 		);
+		$content .= '</p><p>';
+		$content .= \esc_html__( 'This post does not add value to your website and solely exists to show what a post can look like. Therefore, "Hello World!" is not needed and should be deleted.', 'progress-planner' );
+		$content .= '</p>';
+
+		return $content;
 	}
 
 	/**
@@ -96,5 +124,49 @@ class Hello_World extends Tasks {
 	 */
 	public function should_add_task() {
 		return 0 !== $this->get_data_collector()->collect();
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<button type="submit" class="prpl-button prpl-button-primary">
+			<?php \esc_html_e( 'Delete the "Hello World!" post', 'progress-planner' ); ?>
+		</button>
+		<?php
+	}
+
+	/**
+	 * Get the enqueue data.
+	 *
+	 * @return array
+	 */
+	protected function get_enqueue_data() {
+		return [
+			'name' => 'helloWorldData',
+			'data' => [
+				'postId' => $this->get_data_collector()->collect(),
+			],
+		];
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Delete', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

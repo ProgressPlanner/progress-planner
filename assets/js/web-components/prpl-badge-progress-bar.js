@@ -13,12 +13,13 @@
 customElements.define(
 	'prpl-badge-progress-bar',
 	class extends HTMLElement {
-		constructor( badgeId, points, maxPoints ) {
+		constructor( badgeId, points, maxPoints, brandingId = 0 ) {
 			// Get parent class properties
 			super();
 			badgeId = badgeId || this.getAttribute( 'data-badge-id' );
 			points = points || this.getAttribute( 'data-points' );
 			maxPoints = maxPoints || this.getAttribute( 'data-max-points' );
+			brandingId = brandingId || this.getAttribute( 'data-branding-id' );
 			const progress = ( points / maxPoints ) * 100;
 
 			this.innerHTML = `
@@ -28,7 +29,7 @@ customElements.define(
 						style="
 							width: 100%;
 							height: 1rem;
-							background-color: var(--prpl-color-gray-1);
+							background-color: var(--prpl-color-gauge-remain);
 							border-radius: 0.5rem;
 							position: relative;"
 					>
@@ -37,18 +38,19 @@ customElements.define(
 							style="
 								width: ${ progress }%;
 								height: 100%;
-								background-color: var(--prpl-color-accent-orange);
+								background-color: var(--prpl-color-monthly);
 								border-radius: 0.5rem;"
 						></div>
 						<prpl-badge
 							badge-id="${ badgeId }"
 							style="
 								display:flex;
-								width: 5rem;
-								height: 5rem;
+								width: 7.5rem;
+								height: auto;
 								position: absolute;
-								left: calc(${ progress }% - 2.5rem);
+								left: calc(${ progress }% - 3.75rem);
 								top: -2.5rem;"
+							branding-id="${ brandingId }"
 						></prpl-badge>
 					</div>
 				</div>
@@ -93,16 +95,19 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 	const badgeMaxPoints = progressBar.getAttribute( 'data-max-points' );
 	const badgeProgress = customElements.get( 'prpl-badge-progress-bar' );
 	const badgeNewPoints = parseInt( badgePoints ) + pointsDiff;
+	const brandingId = progressBar.getAttribute( 'data-branding-id' );
 
 	// Create a new badge progress bar.
 	const newProgressBar = new badgeProgress(
 		badgeId,
 		badgeNewPoints,
-		badgeMaxPoints
+		badgeMaxPoints,
+		brandingId
 	);
 	newProgressBar.setAttribute( 'data-badge-id', badgeId );
 	newProgressBar.setAttribute( 'data-points', badgeNewPoints );
 	newProgressBar.setAttribute( 'data-max-points', badgeMaxPoints );
+	newProgressBar.setAttribute( 'data-branding-id', brandingId );
 
 	// Replace the old badge progress bar with the new one.
 	progressBar.replaceWith( newProgressBar );
@@ -113,10 +118,8 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 	);
 
 	if ( remainingPointsEl ) {
-		remainingPointsEl.textContent = remainingPointsEl.textContent.replace(
-			remainingPointsEl.getAttribute( 'data-remaining' ),
-			badgeMaxPoints - badgeNewPoints
-		);
+		// The points in the remaining points element are updated in the prplUpdatePreviousMonthBadgeCounters function.
+
 		remainingPointsEl.setAttribute(
 			'data-remaining',
 			badgeMaxPoints - badgeNewPoints
@@ -135,7 +138,7 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 	if ( badgeNewPoints >= parseInt( badgeMaxPoints ) ) {
 		document
 			.querySelectorAll(
-				`.prpl-badge-row-wrapper-inner .prpl-badge prpl-badge[complete="false"][badge-id="${ badgeId }"]`
+				`.prpl-badge-row-wrapper .prpl-badge prpl-badge[complete="false"][badge-id="${ badgeId }"]`
 			)
 			?.forEach( ( badge ) => {
 				badge.setAttribute( 'complete', 'true' );
@@ -161,4 +164,37 @@ const prplUpdatePreviousMonthBadgeProgressBar = ( pointsDiff ) => {
 				?.remove();
 		}
 	}
+};
+
+/**
+ * Update the previous month badge counters.
+ *
+ * @param {number} pointsDiff The points difference.
+ *
+ * @return {void}
+ */
+// eslint-disable-next-line no-unused-vars
+const prplUpdatePreviousMonthBadgeCounters = ( pointsDiff ) => {
+	const remainingPointsEls = document.querySelectorAll(
+		`.prpl-previous-month-badge-progress-bar-wrapper .prpl-previous-month-badge-progress-bar-remaining`
+	);
+
+	if ( ! remainingPointsEls.length ) {
+		return;
+	}
+
+	remainingPointsEls.forEach( ( pointsEl ) => {
+		const totalPoints = pointsEl.getAttribute(
+			'data-remaining-total-points'
+		);
+		pointsEl.setAttribute(
+			'data-remaining-total-points',
+			totalPoints - pointsDiff
+		);
+
+		const numberEl = pointsEl.querySelector( '.number' );
+		if ( numberEl ) {
+			numberEl.textContent = totalPoints - pointsDiff;
+		}
+	} );
 };

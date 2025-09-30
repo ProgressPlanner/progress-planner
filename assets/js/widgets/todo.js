@@ -111,7 +111,7 @@ const prplTodoWidget = {
 		// add a new todo item to the list
 		document
 			.getElementById( 'create-todo-item' )
-			.addEventListener( 'submit', ( event ) => {
+			?.addEventListener( 'submit', ( event ) => {
 				event.preventDefault();
 
 				// Add the loader.
@@ -129,10 +129,6 @@ const prplTodoWidget = {
 					prpl_recommendations_provider:
 						prplTerms.get( 'provider' ).user.id,
 					menu_order: prplTodoWidget.getHighestItemOrder() + 1,
-					meta: {
-						prpl_snoozable: false,
-						prpl_dismissable: true,
-					},
 				} );
 				post.save().then( ( response ) => {
 					if ( ! response.id ) {
@@ -142,10 +138,7 @@ const prplTodoWidget = {
 						...response,
 						meta: {
 							prpl_points: 0,
-							prpl_snoozable: false,
-							prpl_dismissable: true,
 							prpl_url: '',
-							prpl_url_target: '_self',
 							...( response.meta || {} ),
 						},
 						provider: 'user',
@@ -199,11 +192,51 @@ const prplTodoWidget = {
 	removeLoader: () => {
 		document.querySelector( '#todo-list .prpl-loader' )?.remove();
 	},
+
+	/**
+	 * Show the delete all popover.
+	 */
+	showDeleteAllPopover: () => {
+		document
+			.getElementById( 'todo-list-completed-delete-all-popover' )
+			.showPopover();
+	},
+
+	/**
+	 * Close the delete all popover.
+	 */
+	closeDeleteAllPopover: () => {
+		document
+			.getElementById( 'todo-list-completed-delete-all-popover' )
+			.hidePopover();
+	},
+
+	/**
+	 * Delete all completed tasks and close the popover.
+	 */
+	deleteAllCompletedTasksAndClosePopover: () => {
+		prplTodoWidget.deleteAllCompletedTasks();
+		prplTodoWidget.closeDeleteAllPopover();
+	},
+
+	/**
+	 * Delete all completed tasks.
+	 */
+	deleteAllCompletedTasks: () => {
+		document
+			.querySelectorAll( '#todo-list-completed .prpl-suggested-task' )
+			.forEach( ( item ) => {
+				const postId = parseInt( item.getAttribute( 'data-post-id' ) );
+				prplSuggestedTask.trash( postId );
+			} );
+
+		// Resize event will be triggered by the trash function.
+	},
 };
 
 document
 	.getElementById( 'todo-list-completed-details' )
-	.addEventListener( 'toggle', () => {
+	?.addEventListener( 'toggle', () => {
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 	} );
 

@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.6.3
+Stable tag: 1.8.0
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -35,29 +35,6 @@ Motivation matters! Stay engaged with Progress Planner’s built-in gamification
 #### Everything in one place: Your dashboard
 Your dashboard gives you a clear overview of your website’s progress. See your recommendations, to-do list and achievements at a glance — so you can jump right into the most important tasks.
 
-### 🆘 Want expert guidance? Get Progress Planner Pro
-
-If you’re ready to take things further, [Progress Planner Pro](https://progressplanner.com/pro/) gives you access to in-depth guidance and structured challenges that walk you through key website improvements step by step.
-
-#### Get results with guided challenges
-Maintaining a website can feel overwhelming — but you don’t have to do it alone. With Progress Planner Pro, you get access to expert-led challenges that guide you through key website improvements step by step.
-
-Each challenge is interactive and tailored to help you make real progress. You can expect:
-
-* Live **webinars & workshops** with experts sharing insights and strategies
-* Actionable **reports & exercises** to apply what you’ve learned to your own site
-* Personal **feedback & support**, like having your copywriting reviewed
-* A **structured plan**, so you always know what to do next
-
-It’s not just advice — it’s a hands-on, practical experience that helps you take real action and see results.
-
-#### Learn with practical mini courses
-
-Want to sharpen your skills while improving your site? [Progress Planner Pro](https://progressplanner.com/pro/) includes mini courses that give you the knowledge you need — without the fluff.
-
-#### Get support when you need it
-Sometimes you just need a little extra help. With Pro, you get access to our support team, ready to answer your questions and guide you through website improvements.
-
 ### 🧹 Ready to make website maintenance easier?
 Progress Planner takes the frustration out of keeping your website in top shape. Whether you’re tackling quick fixes or diving into bigger improvements, you’ll always know what to do next.
 
@@ -73,10 +50,6 @@ Absolutely! Progress Planner is designed to assist users of all skill levels, pr
 = Can I track the progress of multiple websites with Progress Planner? =
 
 Currently, Progress Planner supports tracking for one website per WordPress installation. We are exploring multi-site support for future updates.
-
-= Is there a Pro version of Progress Planner? =
-
-Yes! You can [find it right here](https://progressplanner.com/pro/).
 
 = Where do I file bugs? =
 
@@ -109,6 +82,69 @@ https://youtu.be/e1bmxZYyXFY
 7. Get a weekly email with stats on how well you're doing on your site!
 
 == Changelog ==
+
+= 1.8.0 =
+
+Enhancements:
+
+* Redesign of the admin pages.
+* Improved capability checks.
+* a11y improvements.
+
+Added these recommendations from Ravi:
+
+* Set date format.
+
+Bugs we fixed:
+
+* Fix redirecting to Progress Planner Dashboard after login.
+
+= 1.7.2 =
+
+* Backported some features from the Progress Planner Pro plugin.
+
+= 1.7.1 =
+
+Bugs we fixed:
+
+* Fix weird interactive task popover behaviour on small screens
+* Fix missing pages (page types) from the Settings screen
+* Clear WP API model schema cache in session storage
+* Make interactive tasks work on WP dashboard screen
+* Exclude taxonomies which are marked as not indexable in Yoast SEO
+* Improve completed task check for "Unpublished content" task
+* Remove awarded point if the golden todo task is set back to pending status
+* Fix "Delete the 'Sample Page' page" interactive task
+* Remove 3rd party plugin tasks if they are deactivated.
+
+= 1.7.0 =
+
+Added these recommendations from Ravi:
+* Select site timezone.
+* Select site locale.
+* Disable comment pagination.
+* Check unpublished content.
+
+Following recommendations are now interactive:
+* Set tagline.
+* Disable comments.
+* Delete the "Hello World!" post.
+* Delete "Sample Page".
+* Select site timezone.
+* Select site locale.
+
+Bugs we fixed:
+
+* Fix issue where "Perform all updates" task was incorrectly marked as completed.
+* Prevent new lines to be added when user task title is edited.
+
+Enhancements:
+
+* Styling improvements
+* Refactored charts
+* Change the link of the "Rename uncategorized" task to the taxonomy-term edit screen instead of the taxonomy terms list
+* Check tasks when snooze period is over
+* Added a plugin-installer component for recommendations
 
 = 1.6.3 =
 

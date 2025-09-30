@@ -48,6 +48,15 @@ class Enqueue {
 	];
 
 	/**
+	 * Init.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		\add_action( 'admin_head', [ $this, 'maybe_empty_session_storage' ], 1 );
+	}
+
+	/**
 	 * Enqueue script.
 	 *
 	 * @param string $handle        The handle of the script to enqueue.
@@ -340,7 +349,6 @@ class Enqueue {
 			),
 			'close'                        => \esc_html__( 'Close', 'progress-planner' ),
 			'doneBtnText'                  => \esc_html__( 'Finish', 'progress-planner' ),
-			'howLong'                      => \esc_html__( 'How long?', 'progress-planner' ),
 			'info'                         => \esc_html__( 'Info', 'progress-planner' ),
 			'markAsComplete'               => \esc_html__( 'Mark as completed', 'progress-planner' ),
 			'nextBtnText'                  => \esc_html__( 'Next &rarr;', 'progress-planner' ),
@@ -355,31 +363,60 @@ class Enqueue {
 			),
 			'saving'                       => \esc_html__( 'Saving...', 'progress-planner' ),
 			'snooze'                       => \esc_html__( 'Snooze', 'progress-planner' ),
-			'snoozeDurationOneWeek'        => \esc_html__( '1 week', 'progress-planner' ),
-			'snoozeDurationOneMonth'       => \esc_html__( '1 month', 'progress-planner' ),
-			'snoozeDurationThreeMonths'    => \esc_html__( '3 months', 'progress-planner' ),
-			'snoozeDurationSixMonths'      => \esc_html__( '6 months', 'progress-planner' ),
-			'snoozeDurationOneYear'        => \esc_html__( '1 year', 'progress-planner' ),
-			'snoozeDurationForever'        => \esc_html__( 'forever', 'progress-planner' ),
-			'snoozeThisTask'               => \esc_html__( 'Snooze this task?', 'progress-planner' ),
 			'subscribed'                   => \esc_html__( 'Subscribed...', 'progress-planner' ),
 			'subscribing'                  => \esc_html__( 'Subscribing...', 'progress-planner' ),
 			/* translators: %s: The task content. */
-			'taskCompleted'                => \esc_html__( "Task '%s' completed and moved to the bottom", 'progress-planner' ),
-			/* translators: %s: The task content. */
 			'taskDelete'                   => \esc_html__( "Delete task '%s'", 'progress-planner' ),
-			'taskMovedDown'                => \esc_html__( 'Task moved down', 'progress-planner' ),
-			'taskMovedUp'                  => \esc_html__( 'Task moved up', 'progress-planner' ),
-			/* translators: %s: The task content. */
-			'taskMoveDown'                 => \esc_html__( "Move task '%s' down", 'progress-planner' ),
-			/* translators: %s: The task content. */
-			'taskMoveUp'                   => \esc_html__( "Move task '%s' up", 'progress-planner' ),
-			/* translators: %s: The task content. */
-			'taskNotCompleted'             => \esc_html__( "Task '%s' marked as not completed and moved to the top", 'progress-planner' ),
+			'delete'                       => \esc_html__( 'Delete', 'progress-planner' ),
 			'video'                        => \esc_html__( 'Video', 'progress-planner' ),
 			'watchVideo'                   => \esc_html__( 'Watch video', 'progress-planner' ),
 			'disabledRRCheckboxTooltip'    => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),
 			'opensInNewWindow'             => \esc_html__( 'Opens in new window', 'progress-planner' ),
+			'whyIsThisImportant'           => \esc_html__( 'Why is this important?', 'progress-planner' ),
+			/* translators: %s: The plugin name. */
+			'installPlugin'                => \esc_html__( 'Install and activate the "%s" plugin', 'progress-planner' ),
+			/* translators: %s: The plugin name. */
+			'activatePlugin'               => \esc_html__( 'Activate plugin "%s"', 'progress-planner' ),
+			'installing'                   => \esc_html__( 'Installing...', 'progress-planner' ),
+			'installed'                    => \esc_html__( 'Installed', 'progress-planner' ),
+			'activating'                   => \esc_html__( 'Activating...', 'progress-planner' ),
+			'activated'                    => \esc_html__( 'Activated', 'progress-planner' ),
 		];
+	}
+
+	/**
+	 * Maybe empty the session storage for the prpl_recommendations post type.
+	 * We need to do it early, before the WP API script reads the cached data from the browser.
+	 *
+	 * @return void
+	 */
+	public function maybe_empty_session_storage() {
+		$screen = \get_current_screen();
+
+		if ( ! $screen ) {
+			return;
+		}
+
+		// Inject the script only on the Progress Planner Dashboard, Progress Planner Settings and the WordPress dashboard pages.
+		if ( 'toplevel_page_progress-planner' !== $screen->id && 'progress-planner_page_progress-planner-settings' !== $screen->id && 'dashboard' !== $screen->id ) {
+			return;
+		}
+		?>
+		<script type="text/javascript">
+			if ( 'sessionStorage' in window ) {
+				try {
+					for ( const key in sessionStorage ) {
+						if (
+							-1 < key.indexOf( 'wp-api-schema-model' ) &&
+							-1 === sessionStorage.getItem( key ).indexOf( '/wp/v2/prpl_recommendations' )
+						) {
+							sessionStorage.removeItem( key );
+							break;
+						}
+					}
+				} catch ( er ) {}
+			}
+		</script>
+		<?php
 	}
 }

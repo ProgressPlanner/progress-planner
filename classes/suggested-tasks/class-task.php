@@ -90,11 +90,13 @@ class Task {
 	 * @return void
 	 */
 	public function delete(): void {
-		$this->data = [];
 		// Delete only if the task is already saved in the database.
 		if ( $this->ID ) {
 			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $this->ID );
 		}
+
+		// Clear the data.
+		$this->data = [];
 	}
 
 	/**
@@ -139,7 +141,7 @@ class Task {
 	 * @return string
 	 */
 	public function get_provider_id(): string {
-		return $this->data['provider']->slug ?? '';
+		return $this->data['provider']->slug ?? ''; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**
@@ -148,7 +150,7 @@ class Task {
 	 * @return string
 	 */
 	public function get_category(): string {
-		return $this->data['category']->slug ?? '';
+		return $this->data['category']->slug ?? ''; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**

@@ -12,7 +12,7 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page as Sample_Page_D
 /**
  * Add task to delete the Sample Page.
  */
-class Sample_Page extends Tasks {
+class Sample_Page extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -41,6 +41,20 @@ class Sample_Page extends Tasks {
 	 * @var string
 	 */
 	protected const DATA_COLLECTOR_CLASS = Sample_Page_Data_Collector::class;
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'sample-page';
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/delete-sample-page';
 
 	/**
 	 * Get the task URL.
@@ -81,11 +95,25 @@ class Sample_Page extends Tasks {
 	 * @return string
 	 */
 	protected function get_description() {
-		return \sprintf(
-			/* translators: %s:<a href="https://prpl.fyi/delete-sample-page" target="_blank">Sample Page</a> link */
-			\esc_html__( 'On install, WordPress creates a %s page. This page is not needed and should be deleted.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/delete-sample-page" target="_blank">' . \esc_html__( '"Sample Page"', 'progress-planner' ) . '</a>'
+		$sample_page_id = $this->get_data_collector()->collect();
+
+		if ( 0 === $sample_page_id ) {
+			return \esc_html__( 'On install, WordPress creates a "Sample Page" page. This page does not add value to your website and solely exists to show what a page can look like. Therefore, "Sample Page" is not needed and should be deleted.', 'progress-planner' );
+		}
+
+		$sample_page_url = (string) \get_permalink( $sample_page_id );
+
+		$content  = '<p>';
+		$content .= \sprintf(
+			/* translators: %s: Link to the post. */
+			\esc_html__( 'On install, WordPress creates a "Sample Page" page. You can find yours at %s.', 'progress-planner' ),
+			'<a href="' . \esc_attr( $sample_page_url ) . '" target="_blank">' . \esc_html( $sample_page_url ) . '</a>',
 		);
+		$content .= '</p><p>';
+		$content .= \esc_html__( 'This page does not add value to your website and solely exists to show what a page can look like. Therefore, "Sample Page" is not needed and should be deleted.', 'progress-planner' );
+		$content .= '</p>';
+
+		return $content;
 	}
 
 	/**
@@ -95,5 +123,49 @@ class Sample_Page extends Tasks {
 	 */
 	public function should_add_task() {
 		return 0 !== $this->get_data_collector()->collect();
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<button type="submit" class="prpl-button prpl-button-primary">
+			<?php \esc_html_e( 'Delete the "Sample Page" page', 'progress-planner' ); ?>
+		</button>
+		<?php
+	}
+
+	/**
+	 * Get the enqueue data.
+	 *
+	 * @return array
+	 */
+	protected function get_enqueue_data() {
+		return [
+			'name' => 'samplePageData',
+			'data' => [
+				'postId' => $this->get_data_collector()->collect(),
+			],
+		];
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Delete', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

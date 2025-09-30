@@ -135,11 +135,34 @@ class PrplInteractiveTask extends HTMLElement {
 		const horizontalTargetCenter =
 			horizontalRect.left + horizontalRect.width / 2;
 
+		// Ensure that the popover is not too far from the top of the screen on small screens.
+		const MARGIN_TOP = 12; // minimum gap from top
+		const MARGIN_BOTTOM = 12; // minimum gap from bottom
+		const MOBILE_TOP_CAP = 100; // max starting offset on small screens
+		const isSmallScreen = window.matchMedia( '(max-width: 768px)' ).matches;
+		const MAX_TOP_CAP = isSmallScreen
+			? MOBILE_TOP_CAP
+			: Number.POSITIVE_INFINITY;
+
+		const desiredTop = Math.round( verticalRect.top );
+
+		const clampedTop = Math.max(
+			MARGIN_TOP,
+			Math.min( desiredTop, MAX_TOP_CAP )
+		);
+
 		// Apply the position.
 		popover.style.position = 'fixed';
 		popover.style.left = `${ horizontalTargetCenter }px`;
-		popover.style.top = `${ Math.round( Math.abs( verticalRect.top ) ) }px`;
+		popover.style.top = `${ Math.round( clampedTop ) }px`;
 		popover.style.transform = 'translateX(-50%)';
+
+		// Make sure popover content can scroll if needed
+		popover.style.maxHeight = '80vh'; // adjustable
+		popover.style.overflowY = 'auto';
+		popover.style.maxHeight = `calc(100vh - ${
+			clampedTop + MARGIN_BOTTOM
+		}px)`;
 	}
 }
 

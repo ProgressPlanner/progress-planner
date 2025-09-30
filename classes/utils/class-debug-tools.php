@@ -50,6 +50,9 @@ class Debug_Tools {
 
 		// Add filter to modify the maximum number of suggested tasks to display.
 		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_suggested_tasks' ] );
+
+		// Initialize color customizer.
+		$this->get_color_customizer();
 	}
 
 	/**
@@ -92,6 +95,16 @@ class Debug_Tools {
 		$this->add_more_info_submenu_item( $admin_bar );
 
 		$this->add_toggle_migrations_submenu_item( $admin_bar );
+
+		// Add color customizer item.
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-color-customizer',
+				'parent' => 'prpl-debug',
+				'title'  => 'Color Customizer',
+				'href'   => \admin_url( 'admin.php?page=progress-planner-color-customizer' ),
+			]
+		);
 	}
 
 	/**
@@ -282,14 +295,7 @@ class Debug_Tools {
 			]
 		);
 
-		// Get suggested tasks.
-		$activities = \progress_planner()->get_activities__query()->query_activities(
-			[
-				'category' => 'suggested_task',
-			]
-		);
-
-		foreach ( $activities as $activity ) {
+		foreach ( \progress_planner()->get_activities__query()->query_activities( [ 'category' => 'suggested_task' ] ) as $activity ) {
 			$admin_bar->add_node(
 				[
 					'id'     => 'prpl-activity-' . $activity->id,
@@ -492,24 +498,6 @@ class Debug_Tools {
 				'title'  => 'Free License: ' . ( false !== $prpl_free_license_key ? $prpl_free_license_key : 'Not set' ),
 			]
 		);
-
-		$prpl_pro_license = \get_option( 'progress_planner_pro_license_key', false );
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-pro-license',
-				'parent' => 'prpl-more-info',
-				'title'  => 'Pro License: ' . ( false !== $prpl_pro_license ? $prpl_pro_license : 'Not set' ),
-			]
-		);
-
-		$prpl_pro_license_status = \get_option( 'progress_planner_pro_license_status', false );
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-pro-license-status',
-				'parent' => 'prpl-more-info',
-				'title'  => 'Pro License Status: ' . ( false !== $prpl_pro_license_status ? $prpl_pro_license_status : 'Not set' ),
-			]
-		);
 	}
 
 	/**
@@ -591,8 +579,6 @@ class Debug_Tools {
 
 		// Delete the option.
 		\delete_option( 'progress_planner_license_key' );
-		\delete_option( 'progress_planner_pro_license_key' );
-		\delete_option( 'progress_planner_pro_license_status' );
 
 		// Redirect to the same page without the parameter.
 		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_licenses', '_wpnonce' ] ) );
@@ -643,5 +629,18 @@ class Debug_Tools {
 		// Redirect to the same page without the parameter.
 		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_single_task', '_wpnonce' ] ) );
 		exit;
+	}
+
+	/**
+	 * Get color customizer instance.
+	 *
+	 * @return \Progress_Planner\Utils\Color_Customizer
+	 */
+	public function get_color_customizer() {
+		static $color_customizer = null;
+		if ( null === $color_customizer ) {
+			$color_customizer = new Color_Customizer();
+		}
+		return $color_customizer;
 	}
 }

@@ -50,18 +50,28 @@ abstract class Tasks implements Tasks_Interface {
 	protected const DATA_COLLECTOR_CLASS = \Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector::class;
 
 	/**
-	 * Whether the task is interactive.
+	 * Dependencies on other tasks.
 	 *
-	 * @var bool
+	 * The key is the task-ID of the other task,
+	 * If the value is true, the task is pending, if false, the task is completed/dismissed/snoozed.
+	 *
+	 * @var array<string, bool>
 	 */
-	const IS_INTERACTIVE = false;
+	protected const DEPENDENCIES = [];
 
 	/**
-	 * The popover ID for interactive tasks.
+	 * The external link URL.
 	 *
 	 * @var string
 	 */
-	const POPOVER_ID = '';
+	protected const EXTERNAL_LINK_URL = '';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	protected const POPOVER_ID = '';
 
 	/**
 	 * Whether the task is repetitive.
@@ -134,17 +144,6 @@ abstract class Tasks implements Tasks_Interface {
 	protected $data_collector = null;
 
 	/**
-	 * Constructor.
-	 *
-	 * @return void
-	 */
-	public function __construct() {
-		if ( static::IS_INTERACTIVE ) {
-			\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
-		}
-	}
-
-	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
@@ -186,6 +185,15 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function get_parent() {
 		return $this->parent;
+	}
+
+	/**
+	 * Get the popover ID.
+	 *
+	 * @return string
+	 */
+	public function get_popover_id() {
+		return static::POPOVER_ID;
 	}
 
 	/**
@@ -268,6 +276,15 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function get_provider_id() {
 		return static::PROVIDER_ID;
+	}
+
+	/**
+	 * Get external link URL.
+	 *
+	 * @return string
+	 */
+	public function get_external_link_url() {
+		return \progress_planner()->get_ui__branding()->get_url( static::EXTERNAL_LINK_URL );
 	}
 
 	/**
@@ -366,7 +383,7 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Check if a task category is snoozed.
+	 * Check if task provider is snoozed.
 	 *
 	 * @return bool
 	 */
@@ -443,7 +460,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @return bool true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 */
-	abstract protected function should_add_task();
+	abstract public function should_add_task();
 
 	/**
 	 * Alias for should_add_task(), for better readability when using in the evaluate_task() method.
@@ -533,21 +550,20 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function get_task_details( $task_data = [] ) {
 		return [
-			'task_id'      => $this->get_task_id( $task_data ),
-			'provider_id'  => $this->get_provider_id(),
-			'post_title'   => $this->get_title_with_data( $task_data ),
-			'description'  => $this->get_description_with_data( $task_data ),
-			'parent'       => $this->get_parent(),
-			'priority'     => $this->get_priority(),
-			'category'     => $this->get_provider_category(),
-			'points'       => $this->get_points(),
-			'date'         => \gmdate( 'YW' ),
-			'url'          => $this->get_url_with_data( $task_data ),
-			'url_target'   => $this->get_url_target(),
-			'link_setting' => $this->get_link_setting(),
-			'dismissable'  => $this->is_dismissable(),
-			'snoozable'    => $this->is_snoozable(),
-			'popover_id'   => static::IS_INTERACTIVE ? 'prpl-popover-' . static::POPOVER_ID : '',
+			'task_id'           => $this->get_task_id( $task_data ),
+			'provider_id'       => $this->get_provider_id(),
+			'post_title'        => $this->get_title_with_data( $task_data ),
+			'description'       => $this->get_description_with_data( $task_data ),
+			'parent'            => $this->get_parent(),
+			'priority'          => $this->get_priority(),
+			'category'          => $this->get_provider_category(),
+			'points'            => $this->get_points(),
+			'date'              => \gmdate( 'YW' ),
+			'url'               => $this->get_url_with_data( $task_data ),
+			'url_target'        => $this->get_url_target(),
+			'link_setting'      => $this->get_link_setting(),
+			'dismissable'       => $this->is_dismissable(),
+			'external_link_url' => $this->get_external_link_url(),
 		];
 	}
 
@@ -576,30 +592,133 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Add the popover.
+	 * Check if the task dependencies are satisfied.
 	 *
-	 * @return void
+	 * @return bool
 	 */
-	public function add_popover() {
-		?>
-		<div id="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>" class="prpl-popover prpl-popover-interactive" popover>
-			<?php $this->the_popover_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		</div>
-		<?php
+	public function are_dependencies_satisfied() {
+		foreach ( static::DEPENDENCIES as $task_id => $result ) {
+			$post = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
+			if ( ! $post ) {
+				return false;
+			}
+			$post_status = $post->post_status;
+			if ( ( 'publish' === $post_status && ! $result )
+				|| ( 'publish' !== $post_status && $result )
+			) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	/**
-	 * The popover content.
+	 * Get task actions.
 	 *
-	 * @return void
+	 * @param array $data The task data.
+	 *
+	 * @return array
 	 */
-	public function the_popover_content() {
-		\progress_planner()->the_view(
-			'popovers/' . static::POPOVER_ID . '.php',
+	public function get_task_actions( $data = [] ) {
+		$actions = [];
+		if ( ! isset( $data['meta'] ) ) {
+			return $actions;
+		}
+
+		if ( $this->capability_required() && $this->is_dismissable() && 'user' !== static::PROVIDER_ID ) {
+			$actions[] = [
+				'priority' => 20,
+				'html'     => '<button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="complete" data-target="complete" title="' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '" onclick="prplSuggestedTask.maybeComplete(' . (int) $data['id'] . ');"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span></button>',
+			];
+		}
+
+		if ( $this->capability_required() && $this->is_snoozable() ) {
+			$snooze_html  = '<prpl-tooltip class="prpl-suggested-task-snooze"><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="snooze" data-target="snooze" title="' . \esc_attr__( 'Snooze', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span></button></slot><slot name="content">';
+			$snooze_html .= '<fieldset><legend><span>' . \esc_html__( 'Snooze this task?', 'progress-planner' ) . '</span><button type="button" class="prpl-toggle-radio-group" onclick="this.closest(\'.prpl-suggested-task-snooze\').classList.toggle(\'prpl-toggle-radio-group-open\');"><span class="prpl-toggle-radio-group-text">' . \esc_html__( 'How long?', 'progress-planner' ) . '</span><span class="prpl-toggle-radio-group-arrow">&rsaquo;</span></button></legend><div class="prpl-snooze-duration-radio-group">';
+			foreach (
+				[
+					'1-week'   => \esc_html__( '1 week', 'progress-planner' ),
+					'1-month'  => \esc_html__( '1 month', 'progress-planner' ),
+					'3-months' => \esc_html__( '3 months', 'progress-planner' ),
+					'6-months' => \esc_html__( '6 months', 'progress-planner' ),
+					'1-year'   => \esc_html__( '1 year', 'progress-planner' ),
+					'forever'  => \esc_html__( 'forever', 'progress-planner' ),
+				] as $snooze_key => $snooze_value ) {
+					$snooze_html .= '<label><input type="radio" name="snooze-duration-' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" value="' . \esc_attr( $snooze_key ) . '" onchange="prplSuggestedTask.snooze(' . (int) $data['id'] . ', \'' . \esc_attr( $snooze_key ) . '\');">' . \esc_html( $snooze_value ) . '</label>';
+			}
+			$snooze_html .= '</div></fieldset></slot></prpl-tooltip>';
+			$actions[]    = [
+				'priority' => 30,
+				'html'     => $snooze_html,
+			];
+		}
+
+		if ( $this->get_external_link_url() ) {
+			$actions[] = [
+				'priority' => 40,
+				'html'     => '<a class="prpl-tooltip-action-text" href="' . \esc_attr( $this->get_external_link_url() ) . '" target="_blank">' . \esc_html__( 'Why is this important?', 'progress-planner' ) . '</a>',
+			];
+		} elseif ( isset( $data['content']['rendered'] ) && $data['content']['rendered'] !== '' && ! $this instanceof Tasks_Interactive ) {
+			$actions[] = [
+				'priority' => 40,
+				'html'     => '<prpl-tooltip><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="info" data-target="info" title="' . \esc_html__( 'Info', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Info', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Info', 'progress-planner' ) . '</span></button></slot><slot name="content">' . \wp_kses_post( $data['content']['rendered'] ) . '</slot></prpl-tooltip>',
+			];
+		}
+
+		// Add action links only if the user has the capability to perform the task.
+		if ( $this->capability_required() ) {
+			$actions = $this->add_task_actions( $data, $actions );
+			foreach ( $actions as $key => $action ) {
+				$actions[ $key ]['priority'] = $action['priority'] ?? 1000;
+				if ( ! isset( $action['html'] ) || '' === $action['html'] ) {
+					unset( $actions[ $key ] );
+				}
+			}
+		}
+
+		// Order actions by priority.
+		\usort( $actions, fn( $a, $b ) => $a['priority'] - $b['priority'] );
+
+		$return_actions = [];
+		foreach ( $actions as $action ) {
+			$return_actions[] = $action['html'];
+		}
+
+		return $return_actions;
+	}
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		return $actions;
+	}
+
+	/**
+	 * Check if the task has activity.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function task_has_activity( $task_id = '' ) {
+		if ( empty( $task_id ) ) {
+			$task_id = $this->get_task_id();
+		}
+
+		$activity = \progress_planner()->get_activities__query()->query_activities(
 			[
-				'prpl_popover_id'  => static::POPOVER_ID,
-				'prpl_provider_id' => $this->get_provider_id(),
+				'category' => 'suggested_task',
+				'data_id'  => $task_id,
 			]
 		);
+
+		return ! empty( $activity );
 	}
 }

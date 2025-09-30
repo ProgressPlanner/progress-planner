@@ -14,6 +14,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Blog_Description;
 use Progress_Planner\Suggested_Tasks\Providers\Settings_Saved;
 use Progress_Planner\Suggested_Tasks\Providers\Debug_Display;
 use Progress_Planner\Suggested_Tasks\Providers\Disable_Comments;
+use Progress_Planner\Suggested_Tasks\Providers\Disable_Comment_Pagination;
 use Progress_Planner\Suggested_Tasks\Providers\Sample_Page;
 use Progress_Planner\Suggested_Tasks\Providers\Hello_World;
 use Progress_Planner\Suggested_Tasks\Providers\Remove_Inactive_Plugins;
@@ -27,11 +28,15 @@ use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Add_Yoast_Prov
 use Progress_Planner\Suggested_Tasks\Providers\User as User_Tasks;
 use Progress_Planner\Suggested_Tasks\Providers\Email_Sending;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Valuable_Post_Types;
+use Progress_Planner\Suggested_Tasks\Providers\Select_Locale;
 use Progress_Planner\Suggested_Tasks\Providers\Fewer_Tags;
 use Progress_Planner\Suggested_Tasks\Providers\Remove_Terms_Without_Posts;
 use Progress_Planner\Suggested_Tasks\Providers\Update_Term_Description;
 use Progress_Planner\Suggested_Tasks\Providers\Reduce_Autoloaded_Options;
+use Progress_Planner\Suggested_Tasks\Providers\Unpublished_Content;
 use Progress_Planner\Suggested_Tasks\Providers\Collaborator;
+use Progress_Planner\Suggested_Tasks\Providers\Select_Timezone;
+use Progress_Planner\Suggested_Tasks\Providers\Set_Date_Format;
 
 /**
  * Tasks_Manager class.
@@ -58,6 +63,7 @@ class Tasks_Manager {
 			new Settings_Saved(),
 			new Debug_Display(),
 			new Disable_Comments(),
+			new Disable_Comment_Pagination(),
 			new Sample_Page(),
 			new Hello_World(),
 			new Remove_Inactive_Plugins(),
@@ -70,10 +76,14 @@ class Tasks_Manager {
 			new User_Tasks(),
 			new Email_Sending(),
 			new Set_Valuable_Post_Types(),
+			new Select_Locale(),
 			new Remove_Terms_Without_Posts(),
 			new Fewer_Tags(),
 			new Update_Term_Description(),
+			new Unpublished_Content(),
 			new Collaborator(),
+			new Select_Timezone(),
+			new Set_Date_Format(),
 		];
 
 		// Add the plugin integration.
@@ -84,6 +94,9 @@ class Tasks_Manager {
 
 		// Add the cleanup action.
 		\add_action( 'admin_init', [ $this, 'cleanup_pending_tasks' ] );
+
+		// Handle tasks when snoozed period is over.
+		\add_action( 'transition_post_status', [ $this, 'handle_task_unsnooze' ], 10, 3 );
 	}
 
 	/**
@@ -245,14 +258,10 @@ class Tasks_Manager {
 			return false;
 		}
 		$task_provider = $this->get_task_provider( $task->provider->slug );
-		if ( ! $task_provider ) {
-			return false;
-		}
-
-		// Check if the task is no longer relevant.
-		if ( ! $task_provider->is_task_relevant() ) {
+		if ( ! $task_provider || ! $task_provider->is_task_relevant() ) {
 			// Remove the task from the published tasks.
 			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
+			return false;
 		}
 
 		return $task_provider->evaluate_task( $task->task_id );
@@ -286,5 +295,38 @@ class Tasks_Manager {
 		}
 
 		\progress_planner()->get_utils__cache()->set( 'cleanup_pending_tasks', true, DAY_IN_SECONDS );
+	}
+
+	/**
+	 * Handle task unsnooze.
+	 *
+	 * @param string   $new_status The new status.
+	 * @param string   $old_status The old status.
+	 * @param \WP_Post $post The post.
+	 *
+	 * @return void
+	 */
+	public function handle_task_unsnooze( $new_status, $old_status, $post ) {
+		// Early exit if it's not task for which snooze period is over.
+		if ( 'future' !== $old_status || 'publish' !== $new_status || 'prpl_recommendations' !== \get_post_type( $post ) ) {
+			return;
+		}
+
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $post->ID );
+		if ( ! $task ) {
+			return;
+		}
+
+		$task_provider = $this->get_task_provider( $task->get_provider_id() );
+
+		// Delete tasks which don't have a task provider or repetitive tasks which were created in the previous week.
+		if ( ! $task_provider || ( $task_provider->is_repetitive() && ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) ) ) {
+			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
+		}
+
+		// Delete the task if it is not relevant anymore.
+		if ( $task_provider instanceof \Progress_Planner\Suggested_Tasks\Providers\Tasks && ! $task_provider->should_add_task() ) {
+			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
+		}
 	}
 }

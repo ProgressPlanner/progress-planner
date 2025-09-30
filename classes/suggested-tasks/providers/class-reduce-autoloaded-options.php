@@ -158,7 +158,7 @@ class Reduce_Autoloaded_Options extends Tasks {
 
 			// phpcs:disable WordPress.DB
 			$this->autoloaded_options_count = $wpdb->get_var(
-				$wpdb->prepare( "SELECT COUNT(*) FROM `{$wpdb->options}` WHERE autoload IN ( $placeholders )", $autoload_values )
+				$wpdb->prepare( "SELECT COUNT(*) FROM `{$wpdb->options}` WHERE autoload IN ( $placeholders )", $autoload_values ) // @phpstan-ignore-line property.nonObject
 			);
 
 		}
