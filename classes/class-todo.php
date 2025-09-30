@@ -7,19 +7,10 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Activities\Todo as Activities_Todo;
-
 /**
  * Todo class.
  */
 class Todo {
-
-	/**
-	 * The name of the settings option.
-	 *
-	 * @var string
-	 */
-	const OPTION_NAME = 'progress_planner_todo';
 
 	/**
 	 * Constructor.
@@ -27,73 +18,83 @@ class Todo {
 	 * @return void
 	 */
 	public function __construct() {
-		\add_action( 'wp_ajax_progress_planner_save_todo_list', [ $this, 'save' ] );
+		// Wait for the CPT to be registered.
+		\add_action( 'init', [ $this, 'maybe_change_first_item_points_on_monday' ] );
+
+		// Handle user tasks creation.
+		\add_action( 'rest_after_insert_prpl_recommendations', [ $this, 'handle_creating_user_task' ], 10, 3 );
 	}
 
 	/**
-	 * Get the todo list items.
-	 *
-	 * @return array
-	 */
-	public function get_items() {
-		$value = \get_option( self::OPTION_NAME, [] );
-		foreach ( $value as $key => $item ) {
-			if ( ! isset( $item['content'] ) || empty( $item['content'] ) ) {
-				unset( $value[ $key ] );
-			}
-			$value[ $key ]['content'] = \wp_kses_post( $item['content'] );
-		}
-
-		return array_values( $value );
-	}
-
-	/**
-	 * Save the todo list.
+	 * Maybe change the points of the first item in the todo list on Monday.
 	 *
 	 * @return void
 	 */
-	public function save() {
-		// Check the nonce.
-		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+	public function maybe_change_first_item_points_on_monday() {
+		// Ordered by menu_order ASC, by default.
+		$pending_items = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'provider_id' => 'user',
+				'post_status' => 'publish',
+			]
+		);
+
+		// Bail if there are no items.
+		if ( ! \count( $pending_items ) ) {
+			return;
 		}
 
-		if ( ! isset( $_POST['todo_list'] ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing data.', 'progress-planner' ) ] );
+		$transient_name = 'todo_points_change_on_monday';
+		$next_update    = \progress_planner()->get_utils__cache()->get( $transient_name );
+
+		if ( false !== $next_update && $next_update > \time() ) {
+			return;
 		}
 
-		if ( $_POST['todo_list'] === 'empty' ) {
-			\delete_option( self::OPTION_NAME );
-			\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
+		$next_monday = new \DateTime( 'monday next week' );
+
+		// Reset the points of all the tasks, except for the first one in the todo list.
+		foreach ( $pending_items as $task ) {
+			\progress_planner()->get_suggested_tasks_db()->update_recommendation(
+				$task->ID,
+				[ 'points' => $task->ID === $pending_items[0]->ID ? 1 : 0 ]
+			);
 		}
 
-		$items          = [];
-		$previous_items = self::get_items();
+		\progress_planner()->get_utils__cache()->set( $transient_name, $next_monday->getTimestamp(), WEEK_IN_SECONDS );
+	}
 
-		if ( ! empty( $_POST['todo_list'] ) ) {
-			foreach ( array_values( \wp_unslash( $_POST['todo_list'] ) ) as $item ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-				$items[] = [
-					'content' => \wp_strip_all_tags( \sanitize_text_field( $item['content'] ) ),
-					'done'    => true === $item['done'] || 'true' === $item['done'],
-				];
-			}
+	/**
+	 * Handle the creation of the first user task.
+	 * We need separate hook, since at the time 'maybe_change_first_item_points_on_monday' is called there might not be any tasks yet.
+	 * TODO: Revisit when we see how we handle completed user tasks.
+	 *
+	 * @param \WP_Post         $post      Inserted or updated post object.
+	 * @param \WP_REST_Request $request   Request object.
+	 * @param bool             $creating  True when creating a post, false when updating.
+	 *
+	 * @return void
+	 */
+	public function handle_creating_user_task( $post, $request, $creating ) {
+		if ( ! $creating || ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) ) {
+			return;
 		}
 
-		if ( ! \update_option( self::OPTION_NAME, $items ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to save.', 'progress-planner' ) ] );
-		}
+		// Add task_id to the post.
+		\update_post_meta( $post->ID, 'prpl_task_id', 'user-' . $post->ID );
 
-		// Save the activity.
-		$activity       = new Activities_Todo();
-		$activity->type = 'update';
-		if ( count( $items ) > count( $previous_items ) ) {
-			$activity->type = 'add';
-		} elseif ( count( $items ) < count( $previous_items ) ) {
-			$activity->type = 'delete';
-		}
-		$activity->save();
+		// If it is first task ever created, it should be golden.
+		$pending_items = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'provider_id' => 'user',
+			]
+		);
 
-		\wp_send_json_success( [ 'message' => \esc_html__( 'Saved.', 'progress-planner' ) ] );
+		// If this is the first task created, it should be golden.
+		if ( 1 === \count( $pending_items ) && $pending_items[0]->ID === $post->ID ) {
+			$this->maybe_change_first_item_points_on_monday();
+			return;
+		}
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

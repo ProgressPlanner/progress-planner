@@ -37,7 +37,6 @@ class Dashboard_Widget_Todo extends Dashboard_Widget {
 	 */
 	public function render_widget() {
 		\progress_planner()->get_admin__page()->enqueue_styles();
-		\progress_planner()->get_admin__scripts()->register_scripts();
 
 		$todo_widget = \progress_planner()->get_admin__page()->get_widget( 'todo' );
 		if ( $todo_widget ) {
@@ -46,6 +45,8 @@ class Dashboard_Widget_Todo extends Dashboard_Widget {
 		}
 
 		\progress_planner()->the_view( "dashboard-widgets/{$this->id}.php" );
+
+		\progress_planner()->the_view( 'js-templates/suggested-task.html' );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

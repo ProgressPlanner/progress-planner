@@ -10,21 +10,24 @@
 
 	li {
 
-		> a {
-			color: var(--prpl-color-gray-6);
-			text-decoration: none;
+		h3 {
+			margin-top: 0;
+			font-size: var(--prpl-font-size-lg);
+			line-height: 1.25;
+			font-weight: 600;
+			margin-bottom: 6px;
 
-			h3 {
-				margin-top: 0;
-				font-size: 1.15em;
-				font-weight: 600;
+			> a {
+				color: var(--prpl-color-headings);
+				text-decoration: none;
 
-				&::after {
-					content: url('data:image/svg+xml,<%3Fxml version="1.0" encoding="UTF-8"%3F><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12"><path fill="%23currentcolor" d="M6 1h5v5L8.86 3.85 4.7 8 4 7.3l4.15-4.16zM2 3h2v1H2v6h6V8h1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1"/></svg>');
-					margin-left: 0.25em;
-					width: 0.75em;
-					height: 0.75em;
-					display: inline-block;
+				.prpl-external-link-icon {
+					margin-inline-start: 0.15em;
+				}
+
+				&:hover {
+					color: var(--prpl-color-link);
+					text-decoration: underline;
 				}
 			}
 		}
@@ -38,12 +41,14 @@
 		display: flex;
 		justify-content: flex-end;
 
-		a::after {
-			content: url('data:image/svg+xml,<%3Fxml version="1.0" encoding="UTF-8"%3F><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12"><path fill="%23currentcolor" d="M6 1h5v5L8.86 3.85 4.7 8 4 7.3l4.15-4.16zM2 3h2v1H2v6h6V8h1v2a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1"/></svg>');
-			margin-left: 0.25em;
-			width: 1em;
-			height: 1em;
-			display: inline-block;
+		a {
+			color: var(--prpl-color-link);
+			text-decoration: underline;
+
+			&:hover {
+				color: var(--prpl-color-link-hover);
+				text-decoration: none;
+			}
 		}
 	}
 }
@@ -51,11 +56,16 @@
 .prpl-blog-post-image {
 	width: 100%;
 	min-height: 120px;
-	aspect-ratio: 16 / 9;
+	aspect-ratio: 3 / 2;
 	background-size: cover;
-	margin-bottom: 1em;
-	border-radius: var(--prpl-border-radius);
-	box-shadow: 5px 5px 5px var(--prpl-color-gray-2);
-	border: 1px solid var(--prpl-color-gray-2);
-	background-color: var(--prpl-color-gray-1); /* Fallback, if remote host image is not accessible */
+	margin-bottom: 0.75rem;
+	border-radius: var(--prpl-border-radius-big);
+	border: 1px solid var(--prpl-color-border);
+	background-color: var(--prpl-color-gauge-remain); /* Fallback, if remote host image is not accessible */
+	transition: transform 0.2s, box-shadow 0.2s;
+
+	&:hover {
+		transform: scale(1.01);
+		box-shadow: 4px 4px 8px 0 rgba(0, 0, 0, 0.2);
+	}
 }

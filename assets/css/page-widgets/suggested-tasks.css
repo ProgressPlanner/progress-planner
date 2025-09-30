@@ -1,126 +1,55 @@
-.prpl-widget-wrapper.prpl-suggested-tasks {
+/* stylelint-disable max-line-length */
 
-	.badge-group-monthly {
-		padding: calc(var(--prpl-padding) / 2);
-		border-radius: var(--prpl-border-radius);
-		background-color: var(--prpl-background-orange);
-
-		.prpl-badge-row-wrapper {
-			overflow: hidden;
-		}
-
-		.prpl-badge-row-wrapper-inner {
-			--prpl-current-row: 1;
-
-			display: grid;
-			grid-template-columns: 1fr 1fr 1fr;
-			gap: calc(var(--prpl-gap) / 2);
-
-			transition: transform 0.3s ease-in-out;
-			transform: translateY(calc((var(--row-height) + var(--grid-gap)) * (var(--prpl-current-row) - 1) * -1));
-		}
-
-		.prpl-badge-row-button-wrapper {
-			display: flex;
-			justify-content: center;
-
-			&:has(.prpl-badge-row-button-up) {
-				margin-bottom: var(--prpl-padding);
-				padding-bottom: 0.2rem;
-
-				border-bottom: 1px solid var(--prpl-color-gray-3);
-			}
-
-			&:has(.prpl-badge-row-button-down) {
-				margin-top: var(--prpl-padding);
-				padding-top: 0.2rem;
-
-				border-top: 1px solid var(--prpl-color-gray-3);
-			}
-
-			&.prpl-badge-row-button-disabled {
-				opacity: 0.5;
-				pointer-events: none;
-			}
-		}
-
-		.prpl-badge-row-button {
-			border: none;
-			background: none;
-			cursor: pointer;
-		}
-
-		.prpl-badge {
-			display: grid;
-			grid-template-columns: 1fr;
-
-			min-width: 0;
-			gap: 10px;
-
-			> * {
-				align-self: center;
-			}
-
-			prpl-badge {
-
-				img {
-					transition: opacity 0.3s ease-in-out, filter 0.3s ease-in-out;
-				}
-
-				&[complete="false"] {
-
-					img {
-						opacity: 0.25;
-						filter: grayscale(1);
-					}
-				}
-			}
-		}
-
-		p {
-			margin: 0;
-			font-size: var(--prpl-font-size-xs);
-			text-align: center;
-			line-height: 1.2;
-		}
-	}
-
-	.prpl-widget-content {
-		margin-bottom: 1em;
-
-		&:last-child {
-			margin-bottom: 0;
-		}
-	}
-
-	.prpl-widget-content-points {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-
-		.prpl-widget-content-points-number {
-			font-size: var(--prpl-font-size-3xl);
-			font-weight: 600;
-		}
-	}
-}
+/**
+ * Suggested tasks widget.
+ *
+ * Dependencies: progress-planner/suggested-task, progress-planner/web-components/prpl-badge
+ */
 
 .prpl-dashboard-widget-suggested-tasks {
+
+	.prpl-suggested-tasks-widget-description {
+		max-width: 40rem;
+	}
+
+	&:not(:has(.prpl-suggested-tasks-loading)):not(:has(.prpl-suggested-tasks-list li)) {
+
+		.prpl-no-suggested-tasks {
+			display: block;
+		}
+	}
+
+	&:not(:has(.prpl-suggested-tasks-loading)):has(.prpl-suggested-tasks-list li) {
+
+		.prpl-show-all-tasks {
+			display: block;
+		}
+	}
+
+	.prpl-show-all-tasks {
+		display: none;
+	}
 
 	&:has(.prpl-suggested-tasks-list li) {
 
 		.prpl-widget-title {
 			display: flex;
 		}
-
-		hr {
-			display: block;
-		}
 	}
 
-	.prpl-widget-title,
-	hr {
+	.prpl-widget-title {
 		display: none;
+	}
+
+	.prpl-no-suggested-tasks,
+	.prpl-suggested-tasks-loading {
+		display: none;
+		background-color: var(--prpl-background-activity);
+		padding: calc(var(--prpl-padding) / 2);
+	}
+
+	.prpl-suggested-tasks-loading {
+		display: block;
 	}
 }
 
@@ -132,306 +61,388 @@
 	&:not(:has(+ .prpl-suggested-tasks-list)) .prpl-suggested-task:last-child {
 		border-bottom: none;
 	}
+}
 
-	prpl-suggested-task:nth-child(odd) {
+/*------------------------------------*\
+	Interactive tasks, popover.
+\*------------------------------------*/
+.prpl-popover.prpl-popover-interactive {
+	padding: 24px 24px 14px 24px;
 
-		.prpl-suggested-task {
-			background-color: #f9fafb;
+	/* 14px is needed for the "next" button hover state. */
+	box-sizing: border-box;
+
+	* {
+		max-width: calc(100% - 1px);
+	}
+
+	.prpl-columns-wrapper-flex {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 40px;
+		overflow: hidden;
+		padding-bottom: 10px;
+
+		/* Needed for the "next" button hover state. */
+
+		>* {
+			flex-grow: 1;
+			flex-basis: 300px;
+			position: relative;
+
+			&:not(:first-child) {
+
+				&::before,
+				&::after {
+					content: "";
+					display: block;
+					position: absolute;
+					top: 0;
+					left: -20px;
+					width: 1px;
+					height: 100%;
+					background-color: var(--prpl-color-border);
+				}
+
+				&::after {
+					top: -20px;
+					left: 0;
+					width: 100%;
+					height: 1px;
+				}
+			}
 		}
 	}
 
-	.prpl-suggested-task {
-		margin: 0;
-		padding: 0.5rem 0.5rem;
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		position: relative;
+	.prpl-column {
 
-		h3 {
-			font-size: 1rem;
-			margin: 0;
-			font-weight: 500;
+		/* Set margin for headings and paragraphs. */
+		h1,
+		h2,
+		h3,
+		h4,
+		h5,
+		h6 {
 
-			span {
-				text-decoration: none;
-				background-image: linear-gradient(#000, #000);
-				background-repeat: no-repeat;
-				background-position: center left;
-				background-size: 0% 1px;
-				transition: background-size 500ms ease-in-out;
-			}
-
-		}
-
-		&.prpl-suggested-task-celebrated h3 span {
-			background-size: 100% 1px;
-			color: inherit;
-
-			/* Accessibility */
-			text-decoration: line-through;
-			text-decoration-color: transparent;
-		}
-
-		.prpl-suggested-task-actions {
-			display: flex;
-			gap: 0.5rem;
-			flex-shrink: 0; /* Prevent the actions from shrinking when the task title is too long */
-		}
-
-		.prpl-suggested-task-points {
-			font-size: var(--prpl-font-size-xs);
-			font-weight: 700;
-			color: var(--prpl-color-headings);
-			background-color: var(--prpl-color-400-orange);
-			width: 1.5rem;
-			height: 1.5rem;
-			border-radius: 50%;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-		}
-
-		.tooltip-actions {
-			visibility: hidden;
-		}
-
-		&:hover {
-
-			.tooltip-actions {
-				visibility: visible;
-			}
-		}
-
-		.tooltip-actions:has([data-tooltip-visible]) {
-			visibility: visible;
-		}
-
-		.prpl-suggested-task-description {
-			font-size: 0.825rem;
-			color: var(--prpl-color-gray-6);
-			margin: 0;
-		}
-
-		button {
-			padding: 0.1rem;
-			line-height: 0;
-			margin: 0;
-			background: none;
-			border: none;
-			cursor: pointer;
-		}
-
-		.icon {
-			width: 1rem;
-			height: 1rem;
-			display: inline-block;
-		}
-
-		.prpl-suggested-task-snooze {
-			margin-left: 5px;
-
-			&.prpl-toggle-radio-group-open {
-
-				.prpl-snooze-duration-radio-group {
-					display: block;
-				}
-
-				.prpl-toggle-radio-group-arrow {
-					transform: rotate(270deg);
-				}
-			}
-
-			legend {
-				display: block;
-				width: 100%;
-
-				.prpl-toggle-radio-group {
-					display: flex;
-					justify-content: space-between;
-					width: 100%;
-					margin-top: 0.5rem;
-					padding: 0.5rem;
-					background-color: #fff;
-					border-radius: var(--prpl-border-radius);
-					line-height: 1;
-					text-align: start;
-
-					.prpl-toggle-radio-group-arrow {
-						transform: rotate(90deg);
-					}
-				}
-			}
-
-			label {
-				display: block;
-				background-color: #fff;
-				padding: 0.5rem;
-
-				&:hover {
-					background-color: var(--prpl-color-gray-1);
-				}
-
-				input[type="radio"] {
-					display: none;
-				}
-			}
-
-			.prpl-snooze-duration-radio-group {
-				display: none;
-				margin-top: 0.75rem;
-
-				label {
-					border-top: 1px solid #dcdcde;
-
-					&:first-child {
-						border-top-left-radius: var(--prpl-border-radius);
-						border-top-right-radius: var(--prpl-border-radius);
-						border-top: none;
-					}
-
-					&:last-child {
-						border-bottom-left-radius: var(--prpl-border-radius);
-						border-bottom-right-radius: var(--prpl-border-radius);
-					}
-				}
-
-			}
-
-
-		}
-
-		&[data-task-action="celebrate"] {
-
-			.prpl-suggested-task-button[data-action="snooze"] {
-				display: none;
-			}
-		}
-
-		.prpl-suggested-task-info {
-			margin-left: -30px;
-
-			p {
-				margin-bottom: 0;
-			}
-
-			p:first-child {
+			&:first-child {
 				margin-top: 0;
 			}
 		}
 
-	}
-}
+		p {
+			margin-bottom: 1rem;
 
-/*------------------------------------*\
-	Popover styles.
-\*------------------------------------*/
-#prpl-popover-monthly-badges {
+			&:first-child {
+				margin-top: 0;
+			}
 
-	.prpl-widgets-container {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(var(--prpl-column-min-width), 1fr));
-		grid-gap: var(--prpl-gap);
-		grid-auto-rows: auto;
-	}
-
-	.prpl-widget-title {
-		padding: 0.5rem 1rem;
-		border-radius: 0.5rem;
-		background: var(--prpl-background-orange);
-	}
-
-	.badge-group-monthly {
-		background-color: transparent;
-	}
-
-	.prpl-widget-wrapper-content {
-
-		.prpl-widget-title {
-			background: var(--prpl-background-blue);
+			&:last-child {
+				margin-bottom: 0;
+			}
 		}
 
-		.badge-group-content {
-			background-color: transparent;
-		}
-	}
+		.prpl-interactive-task-title {
+			font-size: 18px;
+			line-height: 22px;
 
-	.prpl-widget-wrapper-maintenance {
-
-		.prpl-widget-title {
-			background: var(--prpl-background-red);
+			& + p {
+				margin-top: 4px;
+			}
 		}
 
-		.badge-group-maintenance {
-			background-color: transparent;
-		}
-	}
-}
-
-.prpl-widget-wrapper.prpl-badge-streak {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-
-
-	.progress-label {
-		display: inline-block;
-	}
-
-	.progress-wrapper {
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		gap: calc(var(--prpl-gap) / 2);
-		padding: calc(var(--prpl-padding) / 2);
-		border-radius: var(--prpl-border-radius-big);
-
-		&:not(:first-child) {
-			margin-top: var(--prpl-padding);
+		/* Set padding and background color for content column (description text). */
+		&.prpl-column-content {
+			padding: 20px;
+			border-radius: var(--prpl-border-radius-big);
+			background-color: var(--background-content);
 		}
 
-		&.badge-group-content {
-			background: var(--prpl-background-blue);
+		.prpl-note {
+			margin-bottom: 1rem;
+			display: flex;
+			align-items: flex-start;
+			gap: 0.5rem;
+			padding: 0.75rem;
+			color: var(--prpl-color-alert-warning-text);
+			font-size: var(--prpl-font-size-small);
+			border-radius: 6px;
+			background-color: var(--prpl-background-alert-warning);
+
+			.prpl-note-icon {
+				display: flex;
+				flex-shrink: 0;
+				align-items: center;
+				justify-content: center;
+				width: 20px;
+				height: 20px;
+				color: var(--prpl-color-alert-warning);
+
+				svg {
+					width: 100%;
+					height: 100%;
+				}
+			}
+
+			&.prpl-note-error {
+				color: var(--prpl-color-alert-error-text);
+				background-color: var(--prpl-background-alert-error);
+
+				.prpl-note-icon {
+					color: var(--prpl-color-alert-error);
+				}
+
+			}
 		}
 
-		&.badge-group-maintenance {
-			background: var(--prpl-background-red);
-		}
-
-		.prpl-badge {
+		/* To align the buttons to the bottom of the column. */
+		&:not(.prpl-column-content) {
 			display: flex;
 			flex-direction: column;
-			align-items: center;
-			justify-content: space-between;
-			flex-wrap: wrap;
-			min-width: 0;
+			padding-top: 3px; /* To prevent custom radio and checkbox from being cut off. */
 		}
 
-		p {
-			margin: 0;
-			font-size: var(--prpl-font-size-xs);
-			text-align: center;
-			line-height: 1.2;
-		}
+		/* Inputs. */
+		input[type="text"],
+		input[type="email"],
+		input[type="number"],
+		input[type="url"],
+		input[type="tel"],
+		input[type="search"] {
+			height: 44px;
+			padding: 1rem;
 
-		prpl-badge {
+			/* WIP */
 			width: 100%;
-			margin-bottom: 1rem;
+			min-width: 300px;
+
+			/* WIP */
+			border-radius: 6px;
+			border: 1px solid var(--prpl-color-border);
+		}
+
+		.prpl-button-step {
+			padding: 0.75rem 1.25rem;
+			border: none;
+			color: var(--prpl-color-text);
+			font-weight: 600;
+			border-radius: var(--prpl-border-radius);
+			background-color: var(--prpl-background-banner);
+
+			/* WIP: pick exact color */
+			transition: all 0.25s ease-in-out;
+			position: relative;
+
+			&::after {
+				content: "";
+				display: block;
+				width: 100%;
+				height: 100%;
+				background: var(--prpl-background-banner);
+
+				/* WIP: pick exact color */
+				position: absolute;
+				top: 0;
+				left: 0;
+				z-index: -1;
+				border-radius: 6px;
+				transition: all 0.25s ease-in-out;
+			}
+
+			&:hover,
+			&:focus {
+				background: var(--prpl-background-banner);
+
+				/* WIP: pick exact color */
+
+				&::after {
+					background: var(--prpl-background-banner);
+
+					/* WIP: pick exact color */
+					box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
+					width: calc(100% + 4px);
+					height: calc(100% + 4px);
+					margin: -2px;
+				}
+			}
+		}
+
+		textarea {
+			width: 100%;
+			min-height: 100px;
+			border-radius: 6px;
+			box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.05);
+			border: 1px solid var(--prpl-color-border);
+		}
+
+		/* Used for radio and checkbox inputs. */
+		.radios {
+			padding-left: 3px;
+
+			/* To prevent custom radio and checkbox from being cut off. */
+			display: flex;
+			flex-direction: column;
+			gap: 0.5rem;
+
+			.prpl-radio-wrapper {
+				display: flex;
+				align-items: center;
+			}
+
+			--prpl-input-green: #3bb3a6;
+			--prpl-input-gray: #8b99a6;
+
+			/* Hide the default input, because WP has it's own styles (which include pseudo-elements). */
+			.prpl-custom-checkbox input[type="checkbox"],
+			.prpl-custom-radio input[type="radio"] {
+				position: absolute;
+				opacity: 0;
+				width: 0;
+				height: 0;
+			}
+
+			/* Shared styles for the custom control */
+			.prpl-custom-control {
+				display: inline-block;
+				vertical-align: middle;
+				margin-right: 12px;
+				width: 20px;
+				height: 20px;
+				box-sizing: border-box;
+				position: relative;
+				transition: border-color 0.2s, background 0.2s;
+			}
+
+			/* Label text styling */
+			.prpl-custom-checkbox,
+			.prpl-custom-radio {
+				display: flex;
+				align-items: center;
+				margin-bottom: 0.5rem;
+				cursor: pointer;
+				user-select: none;
+			}
+
+			/* Checkbox styles */
+			.prpl-custom-checkbox {
+
+				.prpl-custom-control {
+					border: 1px solid var(--prpl-input-gray);
+					border-radius: 6px;
+					background: #fff;
+				}
+
+				input[type="checkbox"] {
+
+					/* Checkbox hover (off) */
+					&:hover + .prpl-custom-control {
+						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+					}
+
+					/* Checkbox checked (on) */
+					&:checked + .prpl-custom-control {
+						background: var(--prpl-input-green);
+						border-color: var(--prpl-input-green);
+						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+					}
+				}
+
+				/* Checkmark */
+				.prpl-custom-control::after {
+					content: "";
+					position: absolute;
+					left: 6px;
+					top: 2px;
+					width: 4px;
+					height: 9px;
+					border: solid #fff;
+					border-width: 0 2px 2px 0;
+					opacity: 0;
+					transform: scale(0.8) rotate(45deg);
+					transition: opacity 0.2s, transform 0.2s;
+				}
+
+				input[type="checkbox"]:checked + .prpl-custom-control::after {
+					opacity: 1;
+					transform: scale(1) rotate(45deg);
+				}
+			}
+
+			/* Radio styles */
+			.prpl-custom-radio {
+
+				.prpl-custom-control {
+					border: 1px solid var(--prpl-input-gray);
+					border-radius: 50%;
+					background: #fff;
+				}
+
+				/* Radio hover (off) */
+				input[type="radio"] {
+
+					&:hover + .prpl-custom-control {
+						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+					}
+
+					/* Radio checked (on) */
+					&:checked + .prpl-custom-control {
+						background: var(--prpl-input-green);
+						border-color: var(--prpl-input-green);
+						box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+					}
+				}
+
+				/* Radio dot */
+				.prpl-custom-control::after {
+					content: "";
+					position: absolute;
+					top: 5px;
+					left: 5px;
+					width: 8px;
+					height: 8px;
+					background: #fff;
+					border-radius: 50%;
+					opacity: 0;
+					transition: opacity 0.2s;
+				}
+
+				input[type="radio"]:checked + .prpl-custom-control::after {
+					opacity: 1;
+					background: #fff;
+				}
+			}
+		}
+
+		/* Used for next step button. */
+		.prpl-steps-nav-wrapper {
+			margin-top: auto;
+			padding-top: 1rem;
+			display: flex;
+			justify-content: flex-end;
+			gap: 1rem;
+			align-self: flex-end;
+			width: 100%;
+
+			.prpl-button {
+				cursor: pointer;
+
+				/* If the button has empty data-action attribute disable it. */
+				&[data-action=""] {
+					pointer-events: none;
+					opacity: 0.5;
+				}
+			}
+
 		}
 	}
 
-	.prpl-widget-content {
-		margin-bottom: 1em;
+	/* Set the date format. */
+	&#prpl-popover-set-date-format {
+
+		.prpl-radio-wrapper {
+
+			.date-time-text {
+				min-width: 10rem;
+			}
+		}
 	}
-
-	.badge-group-monthly {
-		background-color: transparent;
-	}
-}
-
-
-#prpl-popover-monthly-badges-trigger {
-	font-size: var(--prpl-font-size-base);
-	color: var(--prpl-color-link);
-	text-decoration: underline;
-	margin-top: var(--prpl-padding);
 }

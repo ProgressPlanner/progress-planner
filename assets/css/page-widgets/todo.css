@@ -1,3 +1,9 @@
+/**
+ * TODOs widget.
+ *
+ * Dependencies: progress-planner/suggested-task
+ */
+
 .prpl-widget-wrapper.prpl-todo {
 	padding-left: 0;
 
@@ -5,18 +11,59 @@
 		padding-left: var(--prpl-padding);
 	}
 
-	.prpl-widget-title {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		font-size: 1.3rem;
-		background: var(--prpl-background-red);
-		padding: 0.5rem 1rem;
-		border-radius: 0.5rem;
+	.prpl-todo-golden-task-description,
+	.prpl-todo-silver-task-description {
+		display: none;
+	}
 
-		.icon {
-			width: 1.25em;
-			height: 1.25em;
+	/* Silver task */
+	&:not(:has(#todo-list li[data-task-points="1"])) {
+
+		.prpl-todo-silver-task-description {
+			display: initial;
+		}
+
+		.prpl-todo-golden-task-description {
+			display: none;
+		}
+
+		#todo-list > .prpl-suggested-task:first-child {
+
+			border: 1px solid var(--prpl-color-border-next-top-task);
+			background-color: var(--prpl-background-table);
+
+			.prpl-suggested-task-points-wrapper {
+
+				&::after {
+					content: "";
+					display: inline-block;
+					width: 24px;
+					height: 24px;
+					background-image: url("../../images/icon_progress_planner.svg");
+					background-size: contain;
+					background-repeat: no-repeat;
+				}
+			}
+		}
+	}
+
+	/* Golden task */
+	&:has(#todo-list li[data-task-points="1"]) {
+
+		.prpl-todo-silver-task-description {
+			display: none;
+		}
+
+		.prpl-todo-golden-task-description {
+			display: initial;
+		}
+
+		#todo-list {
+
+			.prpl-suggested-task[data-task-points="1"] {
+				border: 1px solid var(--prpl-color-border-top-task);
+				background-color: var(--prpl-background-top-task);
+			}
 		}
 	}
 }
@@ -32,12 +79,12 @@
 		border-radius: 50%;
 		background: none;
 		box-shadow: none;
-		color: var(--prpl-color-gray-3);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		padding: 0.2em;
 		margin-inline-start: 0.3rem;
+		color: var(--prpl-color-ui-icon);
 
 		.dashicons {
 			font-size: 0.825em;
@@ -52,119 +99,20 @@
 	min-width: 0;
 }
 
-#todo-list {
+#todo-list,
+#todo-list-completed {
 	list-style: none;
 	padding: 0;
-	max-height: 30em;
-	overflow-y: auto;
-	margin: 0 0 0.5em calc(var(--prpl-padding) * -1);
-}
 
-prpl-todo-item {
-	position: relative;
-	display: flex;
-	align-items: center;
-	font-size: 14px;
+	/* max-height: 30em; */
 
-	.prpl-move-buttons {
-		padding: 0 0.5em;
-		display: flex;
-		gap: 0;
-		flex-direction: column;
-	}
+	/* overflow-y: auto; */
 
-	input[type="checkbox"] {
-		margin: 0;
-		flex-shrink: 0;
+	/* margin: 0 0 0.5em calc(var(--prpl-padding) * -1); */
 
-		&:checked::before {
-			content: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%27%20viewBox%3D%270%200%2020%2020%27%3E%3Cpath%20d%3D%27M14.83%204.89l1.34.94-5.81%208.38H9.02L5.78%209.67l1.34-1.25%202.57%202.4z%27%20fill%3D%27%2316a34a%27%2F%3E%3C%2Fsvg%3E");
-		}
-	}
-
-	.content {
-		font-size: 1rem;
-		padding: 0;
-		margin-top: 2px;
-		margin-left: 1em;
-		margin-right: 0.5em;
-		width: 100%;
-		display: border-box;
-		border-bottom: 1.5px solid transparent;
-	}
-
-	input[type="checkbox"]:checked + .content {
-		text-decoration: line-through;
-	}
-
-	.trash,
-	.move-up,
-	.move-down {
-		opacity: 0;
-		padding: 0;
-		border: 0;
-		background: none;
-		color: var(--prpl-color-gray-3);
-		cursor: pointer;
-		box-shadow: none;
-		transition: all 0.1s;
-		margin-top: 1px;
-	}
-
-	.trash {
-		width: 1.5rem;
-		height: 1.5rem;
-
-		&:hover svg path {
-			fill: var(--prpl-color-accent-red);
-		}
-	}
-
-	.move-up,
-	.move-down {
-		height: 0.75rem;
-
-		.dashicons {
-			font-size: 0.875rem;
-			width: 1em;
-			height: 1em;
-		}
-
-		&:hover {
-			color: var(--prpl-color-gray-6);
-		}
-	}
-
-	:not(:focus-within):has(:checked) .content {
-		opacity: 0.5;
-		text-decoration: line-through;
-	}
-
-	&:focus-within .content {
-		outline: none;
-		border-bottom: 1.5px solid var(--prpl-color-gray-3);
-	}
-
-	&:hover,
-	&:focus-within {
-
-		.trash,
-		.move-up,
-		.move-down {
-			opacity: 1;
-		}
-	}
-
-	&:first-child .move-up,
-	&:last-child .move-down {
-		display: none;
-	}
-
-	/* If there is only one todo item,
-	let button take up space to prevent layout shift. */
-	&:first-child:last-child .move-up {
+	> *:first-child .move-up,
+	> *:last-child .move-down {
 		visibility: hidden;
-		display: block;
 	}
 }
 
@@ -173,8 +121,51 @@ prpl-todo-item {
 \*------------------------------------*/
 #progress_planner_dashboard_widget_todo {
 
-	#todo-list {
-		margin-left: -5px;
+	/* Silver task */
+	&:not(:has(#todo-list li[data-task-points="1"])) {
+
+		#todo-list > .prpl-suggested-task:first-child {
+
+			border: 1px solid var(--prpl-color-border-next-top-task);
+			background-color: var(--prpl-background-table);
+
+			.prpl-suggested-task-points-wrapper {
+
+				&::after {
+					content: "";
+					display: inline-block;
+					width: 24px;
+					height: 24px;
+					background-image: url("../../images/icon_progress_planner.svg");
+					background-size: contain;
+					background-repeat: no-repeat;
+				}
+			}
+		}
+	}
+
+	/* Golden task */
+	&:has(#todo-list li[data-task-points="1"]) {
+
+		#todo-list {
+
+			.prpl-suggested-task[data-task-points="1"] {
+				border: 1px solid var(--prpl-color-border-top-task);
+				background-color: var(--prpl-background-top-task);
+			}
+		}
+	}
+
+	.prpl-suggested-task {
+
+		h3 {
+			margin-bottom: 0;
+		}
+
+		/* Override the default position of the move buttons. */
+		.prpl-move-buttons-wrapper {
+			left: calc(-5px - 0.5rem);
+		}
 	}
 
 	#create-todo-item {
@@ -191,5 +182,215 @@ prpl-todo-item {
 
 	p {
 		font-size: 14px;
+	}
+}
+
+#todo-list-completed {
+
+	.prpl-suggested-task {
+
+		h3 {
+			text-decoration: line-through;
+		}
+
+		.prpl-suggested-task-actions-wrapper,
+		.prpl-move-buttons-wrapper,
+		button[data-action="complete"] {
+			display: none;
+		}
+	}
+}
+
+#todo-list-completed-details {
+	margin-top: 1rem;
+	border: 1px solid var(--prpl-color-border);
+	border-radius: 0.5rem;
+
+	summary {
+		padding: 0.5rem;
+		font-weight: 500;
+		display: flex;
+
+		& > .prpl-todo-list-completed-summary-icon {
+			margin-inline-start: auto;
+			display: block;
+			width: 20px;
+			height: 20px;
+
+			transition: transform 0.3s ease-in-out;
+
+			svg {
+				stroke: var(--prpl-color-ui-icon);
+			}
+		}
+	}
+
+	&[open] {
+
+		summary > .prpl-todo-list-completed-summary-icon {
+			transform: rotate(180deg);
+		}
+	}
+
+	&:not(:has(.prpl-suggested-task)) {
+		display: none;
+	}
+
+	#todo-list-completed-delete-all-wrapper {
+		margin: 0.25rem 0.5rem 0.75rem 0.5rem;
+		border-top: 1px solid var(--prpl-color-border);
+		display: none;
+
+		#todo-list-completed-delete-all {
+			display: flex;
+			align-items: center;
+			gap: 0.5rem;
+			background-color: transparent;
+			border: none;
+			padding: 0;
+			margin: 0.5rem 0 0 0;
+			cursor: pointer;
+			color: var(--prpl-color-link);
+			font-size: var(--prpl-font-size-small);
+
+			svg path {
+				fill: var(--prpl-color-ui-icon);
+			}
+
+			&:hover {
+				text-decoration: underline;
+
+				svg path {
+					fill: var(--prpl-color-ui-icon-hover-delete);
+				}
+			}
+
+		}
+	}
+
+	/* Show the delete all button if there are at least 3 completed tasks */
+	&:has(.prpl-suggested-task:nth-of-type(3)) #todo-list-completed-delete-all-wrapper {
+		display: block;
+	}
+
+	.prpl-suggested-task-points-wrapper {
+		position: relative;
+	}
+
+	.prpl-suggested-task-points {
+		position: absolute;
+		right: 0;
+		transition: all 0.3s ease-in-out;
+		color: var(--prpl-text-point-inactive);
+		background-color: var(--prpl-background-point-inactive);
+	}
+
+	.prpl-suggested-task-button {
+
+		&.trash {
+			display: none;
+			margin-left: auto;
+			flex-shrink: 0;
+			width: 1.25rem;
+			height: 1.25rem;
+			opacity: 0;
+			transition: opacity 0.3s ease-in-out;
+
+			svg path {
+				fill: var(--prpl-color-ui-icon);
+			}
+
+			&:hover {
+
+				svg path {
+					fill: var(--prpl-color-ui-icon-hover-delete);
+				}
+			}
+		}
+	}
+
+	.prpl-suggested-task:hover {
+
+		.prpl-suggested-task-points {
+			right: 100%;
+			transform: translateX(100%);
+		}
+
+		.prpl-suggested-task-button {
+			display: inline-block;
+			opacity: 1;
+		}
+	}
+}
+
+#todo-list {
+
+	&:has(.prpl-loader) {
+		position: relative;
+
+		&::before {
+			content: "";
+			display: block;
+			width: 100%;
+			height: 100%;
+			background-color: rgba(0, 0, 0, 0.2);
+			position: absolute;
+			top: 0;
+			left: 0;
+			z-index: 10;
+		}
+	}
+}
+
+
+#todo-list-completed-delete-all-popover {
+	max-width: 600px;
+
+	.prpl-note {
+		margin-bottom: 1rem;
+		display: flex;
+		align-items: flex-start;
+		gap: 0.5rem;
+		padding: 0.75rem;
+		color: var(--prpl-color-alert-warning-text);
+		font-size: var(--prpl-font-size-small);
+		border-radius: 6px;
+		background-color: var(--prpl-background-alert-warning);
+
+		.prpl-note-icon {
+			display: flex;
+			flex-shrink: 0;
+			align-items: center;
+			justify-content: center;
+			width: 20px;
+			height: 20px;
+			color: var(--prpl-color-alert-warning);
+
+			svg {
+				width: 100%;
+				height: 100%;
+			}
+		}
+	}
+
+	.prpl-buttons-wrapper {
+		display: flex;
+		gap: 2rem;
+
+		button {
+			background-color: transparent;
+			border: none;
+			color: var(--prpl-color-link);
+			font-size: var(--prpl-font-size-small);
+			padding: 0;
+			margin: 0;
+			cursor: pointer;
+
+			&:hover,
+			&:focus,
+			&:active {
+				text-decoration: underline;
+			}
+		}
 	}
 }

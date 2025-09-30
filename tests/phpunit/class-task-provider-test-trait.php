@@ -7,9 +7,6 @@
 
 namespace Progress_Planner\Tests;
 
-use Progress_Planner\Suggested_Tasks\Local_Tasks_Manager;
-use Progress_Planner\Suggested_Tasks;
-
 /**
  * Task provider test case.
  */
@@ -23,20 +20,13 @@ trait Task_Provider_Test_Trait {
 	protected $task_provider;
 
 	/**
-	 * The suggested tasks instance.
-	 *
-	 * @var Suggested_Tasks
-	 */
-	protected $suggested_tasks;
-
-	/**
 	 * Setup the test.
 	 *
 	 * @return void
 	 */
 	public static function setUpBeforeClass(): void { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
 		// Set the current user to the admin user.
-		wp_set_current_user( 1 );
+		\wp_set_current_user( 1 );
 	}
 
 	/**
@@ -46,7 +36,7 @@ trait Task_Provider_Test_Trait {
 	 */
 	public static function tearDownAfterClass(): void { // phpcs:ignore WordPress.NamingConventions.ValidFunctionName.MethodNameInvalid
 		// Reset the current user.
-		wp_set_current_user( 0 );
+		\wp_set_current_user( 0 );
 	}
 
 	/**
@@ -58,10 +48,7 @@ trait Task_Provider_Test_Trait {
 		parent::set_up();
 
 		// Get the task provider.
-		$this->task_provider = \progress_planner()->get_suggested_tasks()->get_local()->get_task_provider( $this->task_provider_id );
-
-		// Get the suggested tasks instance.
-		$this->suggested_tasks = \progress_planner()->get_suggested_tasks();
+		$this->task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $this->task_provider_id );
 	}
 
 	/**
@@ -72,11 +59,8 @@ trait Task_Provider_Test_Trait {
 	public function tear_down() {
 		parent::tear_down();
 
-		// Delete local tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
-
-		// Delete suggested tasks.
-		\progress_planner()->get_settings()->set( 'local_tasks', [] );
+		// Delete tasks.
+		\progress_planner()->get_suggested_tasks_db()->delete_all_recommendations();
 	}
 
 	/**
@@ -92,65 +76,44 @@ trait Task_Provider_Test_Trait {
 	 * @return void
 	 */
 	public function test_task_provider() {
-
 		// Test that the blog description is empty.
 		$this->assertTrue( $this->task_provider->should_add_task() );
 
-		// Get all tasks to inject.
+		// WIP, get_tasks_to_inject() is injecting tasks.
 		$tasks = $this->task_provider->get_tasks_to_inject();
 
-		// Add the task(s) to the local suggested tasks.
-		foreach ( $tasks as $task ) {
-			$this->suggested_tasks->get_local()->add_pending_task( $task['task_id'] );
-		}
+		// Verify that the task(s) are in the suggested tasks.
+		$pending_tasks = (array) \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'post_status' => 'publish',
+				'provider'    => $this->task_provider_id,
+			]
+		);
 
-		// Verify that the task(s) are in the local suggested tasks.
-		$pending_tasks = (array) \progress_planner()->get_settings()->get( 'local_tasks', [] );
-		foreach ( $tasks as $task ) {
-			$item_found = false;
-			foreach ( $pending_tasks as $pending_task ) {
-				if ( $pending_task['task_id'] === $task['task_id'] ) {
-					$item_found = true;
-					break;
-				}
-			}
-			$this->assertTrue( $item_found );
-		}
+		// Assert that task is in the pending tasks.
+		$this->assertTrue( \has_term( $this->task_provider_id, 'prpl_recommendations_provider', $pending_tasks[0]->ID ) );
 
 		// Complete the task.
 		$this->complete_task();
 
 		// Change the task status to pending celebration for all completed tasks.
-		foreach ( $this->suggested_tasks->get_local()->evaluate_tasks() as $task_id ) {
+		foreach ( \progress_planner()->get_suggested_tasks()->get_tasks_manager()->evaluate_tasks() as $task ) {
 			// Change the task status to pending celebration.
-			$this->suggested_tasks->mark_task_as_pending_celebration( $task_id );
-
-			// In production we insert an activity here.
-		}
-
-		// Verify that the task(s) we're testing is pending celebration.
-		foreach ( $tasks as $task ) {
-			$this->assertTrue(
-				$this->suggested_tasks->check_task_condition(
-					[
-						'status'  => 'pending_celebration',
-						'task_id' => $task['task_id'],
-					]
-				)
+			\progress_planner()->get_suggested_tasks_db()->update_recommendation(
+				$task->get_data()['ID'],
+				[ 'post_status' => 'pending' ]
 			);
+			// Verify that the task(s) we're testing is pending celebration.
+			$this->assertTrue( 'pending' === \get_post_status( $task->get_data()['ID'] ) );
 		}
 
 		// Verify that the task(s) we're testing is completed.
-		foreach ( $tasks as $task ) {
-			$this->suggested_tasks->transition_task_status( $task['task_id'], 'pending_celebration', 'completed' );
-			$this->assertTrue(
-				$this->suggested_tasks->check_task_condition(
-					[
-						'status'  => 'completed',
-						'task_id' => $task['task_id'],
-					]
-				)
+		foreach ( $tasks as $post_id ) {
+			\progress_planner()->get_suggested_tasks_db()->update_recommendation(
+				$post_id,
+				[ 'post_status' => 'trash' ]
 			);
+			$this->assertTrue( 'trash' === \get_post_status( $post_id ) );
 		}
 	}
 }

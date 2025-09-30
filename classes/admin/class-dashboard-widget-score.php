@@ -37,9 +37,8 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 	 */
 	public function render_widget() {
 		// Enqueue stylesheets.
-		\progress_planner()->get_admin__scripts()->register_scripts();
 		\progress_planner()->get_admin__page()->enqueue_styles();
-		\wp_enqueue_script( 'progress-planner-web-components-prpl-gauge' );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-gauge' );
 
 		$suggested_tasks_widget = \progress_planner()->get_admin__page()->get_widget( 'suggested-tasks' );
 		if ( $suggested_tasks_widget ) {
@@ -47,12 +46,9 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 			$suggested_tasks_widget->enqueue_scripts();
 		}
 
-		\wp_enqueue_style(
-			'prpl-dashboard-widget-' . $this->id,
-			PROGRESS_PLANNER_URL . "/assets/css/dashboard-widgets/{$this->id}.css",
-			[],
-			\progress_planner()->get_file_version( PROGRESS_PLANNER_DIR . "/assets/css/dashboard-widgets/{$this->id}.css" )
-		);
+		\progress_planner()->get_admin__enqueue()->enqueue_style( "progress-planner/dashboard-widgets/{$this->id}" );
+
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
 
 		\progress_planner()->the_view( "dashboard-widgets/{$this->id}.php" );
 	}
@@ -89,15 +85,15 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 		$result = [
 			'progress'   => $progress,
 			'badge'      => $badge,
-			'color'      => 'var(--prpl-color-accent-red)',
+			'color'      => 'var(--prpl-graph-color-1)',
 			'background' => $badge->get_background(),
 		];
 
 		if ( $result['progress']['progress'] > 50 ) {
-			$result['color'] = 'var(--prpl-color-accent-orange)';
+			$result['color'] = 'var(--prpl-color-monthly)';
 		}
 		if ( $result['progress']['progress'] > 75 ) {
-			$result['color'] = 'var(--prpl-color-accent-green)';
+			$result['color'] = 'var(--prpl-graph-color-3)';
 		}
 
 		$cached[ $category ] = $result;

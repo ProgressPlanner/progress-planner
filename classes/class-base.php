@@ -7,21 +7,55 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Admin\Page as Admin_Page;
-use Progress_Planner\Admin\Tour as Admin_Tour;
-use Progress_Planner\Admin\Dashboard_Widget_Score as Admin_Dashboard_Widget_Score;
-use Progress_Planner\Admin\Dashboard_Widget_Todo as Admin_Dashboard_Widget_Todo;
-use Progress_Planner\Admin\Editor as Admin_Editor;
-use Progress_Planner\Actions\Content as Actions_Content;
-use Progress_Planner\Actions\Content_Scan as Actions_Content_Scan;
-use Progress_Planner\Actions\Maintenance as Actions_Maintenance;
-use Progress_Planner\Admin\Page_Settings as Admin_Page_Settings;
-use Progress_Planner\Plugin_Upgrade_Tasks;
-use Progress_Planner\Debug_Tools;
-use Progress_Planner\Data_Collector\Data_Collector_Manager;
+use Progress_Planner\Utils\Deprecations;
 
 /**
  * Main plugin class.
+ *
+ * @method \Progress_Planner\Settings get_settings()
+ * @method \Progress_Planner\Activities\Query get_activities__query()
+ * @method \Progress_Planner\Utils\Cache get_utils__cache()
+ * @method \Progress_Planner\Page_Types get_page_types()
+ * @method \Progress_Planner\Rest\Stats get_rest__stats()
+ * @method \Progress_Planner\Rest\Tasks get_rest__tasks()
+ * @method \Progress_Planner\Todo get_todo()
+ * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
+ * @method \Progress_Planner\Utils\Playground get_utils__playground()
+ * @method \Progress_Planner\Admin\Page get_admin__page()
+ * @method \Progress_Planner\Admin\Tour get_admin__tour()
+ * @method \Progress_Planner\Admin\Dashboard_Widget_Score get_admin__dashboard_widget_score()
+ * @method \Progress_Planner\Admin\Dashboard_Widget_Todo get_admin__dashboard_widget_todo()
+ * @method \Progress_Planner\Admin\Editor get_admin__editor()
+ * @method \Progress_Planner\Actions\Content get_actions__content()
+ * @method \Progress_Planner\Actions\Content_Scan get_actions__content_scan()
+ * @method \Progress_Planner\Actions\Maintenance get_actions__maintenance()
+ * @method \Progress_Planner\Admin\Page_Settings get_admin__page_settings()
+ * @method \Progress_Planner\Plugin_Deactivation get_plugin_deactivation()
+ * @method \Progress_Planner\Plugin_Upgrade_Tasks get_plugin_upgrade_tasks()
+ * @method \Progress_Planner\Page_Todos get_page_todos()
+ * @method \Progress_Planner\Suggested_Tasks\Data_Collector\Data_Collector_Manager get_suggested_tasks__data_collector__data_collector_manager()
+ * @method \Progress_Planner\Utils\Debug_Tools get_utils__debug_tools()
+ * @method \Progress_Planner\Badges get_badges()
+ * @method \Progress_Planner\Plugin_Migrations get_plugin_migrations()
+ * @method \Progress_Planner\Suggested_Tasks get_suggested_tasks()
+ * @method \Progress_Planner\Suggested_Tasks_DB get_suggested_tasks_db()
+ * @method \Progress_Planner\Utils\Deprecations get_utils__deprecations()
+ * @method \Progress_Planner\UI\Branding get_ui__branding()
+ * @method \Progress_Planner\Plugin_Installer get_plugin_installer()
+ * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Content get_admin__widgets__badge_streak_content()
+ * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Maintenance get_admin__widgets__badge_streak_maintenance()
+ * @method \Progress_Planner\Admin\Enqueue get_admin__enqueue()
+ * @method \Progress_Planner\Admin\Widgets\Whats_New get_admin__widgets__whats_new()
+ * @method \Progress_Planner\Admin\Widgets\ToDo get_admin__widgets__todo()
+ * @method \Progress_Planner\Admin\Widgets\Monthly_Badges get_admin__widgets__monthly_badges()
+ * @method \Progress_Planner\UI\Popover get_ui__popover()
+ * @method \Progress_Planner\Admin\Widgets\Latest_Badge get_admin__widgets__latest_badge()
+ * @method \Progress_Planner\Admin\Widgets\Content_Activity get_admin__widgets__content_activity()
+ * @method \Progress_Planner\UI\Chart get_ui__chart()
+ * @method \Progress_Planner\Activities\Content_Helpers get_activities__content_helpers()
+ * @method \Progress_Planner\Admin\Widgets\Challenge get_admin__widgets__challenge()
+ * @method \Progress_Planner\Admin\Widgets\Activity_Scores get_admin__widgets__activity_scores()
+ * @method \Progress_Planner\Utils\Date get_utils__date()
  */
 class Base {
 
@@ -52,79 +86,91 @@ class Base {
 	 * @return void
 	 */
 	public function init() {
-		if ( ! function_exists( 'current_user_can' ) ) {
+		if ( ! \function_exists( 'current_user_can' ) ) {
 			require_once ABSPATH . 'wp-includes/capabilities.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
-		if ( ! function_exists( 'wp_get_current_user' ) ) {
+		if ( ! \function_exists( 'wp_get_current_user' ) ) {
 			require_once ABSPATH . 'wp-includes/pluggable.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
 
-		if ( defined( '\IS_PLAYGROUND_PREVIEW' ) && constant( '\IS_PLAYGROUND_PREVIEW' ) === true ) {
-			new Playground();
+		if ( \defined( '\IS_PLAYGROUND_PREVIEW' ) && \constant( '\IS_PLAYGROUND_PREVIEW' ) === true ) {
+			$this->get_utils__playground();
 		}
 
 		// Basic classes.
 		if ( \is_admin() && \current_user_can( 'edit_others_posts' ) ) {
-			$this->cached['admin__page'] = new Admin_Page();
-			$this->cached['admin__tour'] = new Admin_Tour();
+			$this->get_admin__page();
+			$this->get_admin__tour();
 
 			// Dont add the widget if the privacy policy is not accepted.
 			if ( true === $this->is_privacy_policy_accepted() ) {
-				$this->cached['admin__dashboard_widget_score'] = new Admin_Dashboard_Widget_Score();
-				$this->cached['admin__dashboard_widget_todo']  = new Admin_Dashboard_Widget_Todo();
+				$this->get_admin__dashboard_widget_score();
+				$this->get_admin__dashboard_widget_todo();
 			}
 		}
-		$this->cached['admin__editor'] = new Admin_Editor();
 
-		$this->cached['actions__content']      = new Actions_Content();
-		$this->cached['actions__content_scan'] = new Actions_Content_Scan();
-		$this->cached['actions__maintenance']  = new Actions_Maintenance();
+		$this->get_suggested_tasks();
+
+		$this->get_admin__editor();
+
+		$this->get_actions__content();
+		$this->get_actions__content_scan();
+		$this->get_actions__maintenance();
 
 		// REST API.
-		$this->cached['rest_api_stats'] = new Rest_API_Stats();
+		$this->get_rest__stats();
+		$this->get_rest__tasks();
 
 		// Onboarding.
-		$this->cached['onboard'] = new Onboard();
+		$this->get_utils__onboard();
 
 		// To-do.
-		$this->cached['todo'] = new Todo();
+		$this->get_todo();
 
 		// Post-meta.
-		if ( $this->is_pro_site() ) {
-			$this->cached['page_todos'] = new Page_Todos();
-		}
+		$this->get_page_todos();
 
-		\add_filter( 'plugin_action_links_' . plugin_basename( PROGRESS_PLANNER_FILE ), [ $this, 'add_action_links' ] );
+		\add_filter( 'plugin_action_links_' . \plugin_basename( PROGRESS_PLANNER_FILE ), [ $this, 'add_action_links' ] );
 
 		// We need to initialize some classes early.
-		$this->cached['page_types']      = new Page_Types();
-		$this->cached['settings']        = new Settings();
-		$this->cached['suggested_tasks'] = new Suggested_Tasks();
-		$this->cached['badges']          = new Badges();
+		$this->get_page_types();
+		$this->get_settings();
+		$this->get_badges();
 
 		if ( true === $this->is_privacy_policy_accepted() ) {
-			$this->cached['settings_page'] = new Admin_Page_Settings();
+			$this->get_admin__page_settings();
 
 			new Plugin_Deactivation();
 		}
 
-		$this->cached['plugin_upgrade_tasks'] = new Plugin_Upgrade_Tasks();
+		$this->get_plugin_upgrade_tasks();
 
 		// Add hooks for data collectors.
-		$this->cached['data_collector_manager'] = new Data_Collector_Manager();
+		$this->get_suggested_tasks__data_collector__data_collector_manager();
 
 		// Debug tools.
-		if ( ( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) {
-			new Debug_Tools();
+		if ( $this->is_debug_mode_enabled() ) {
+			$this->get_utils__debug_tools();
 		}
 
 		// Plugin upgrade.
-		$this->cached['plugin_migrations'] = new Plugin_Migrations();
+		$this->get_plugin_migrations();
+
+		// Plugin installer.
+		$this->get_plugin_installer();
 
 		/**
 		 * Redirect on login.
 		 */
 		\add_action( 'wp_login', [ $this, 'redirect_on_login' ], 10, 2 );
+
+		if ( \defined( 'WP_CLI' ) && \WP_CLI ) {
+			$this->get_wp_cli__get_stats_command();
+			$this->get_wp_cli__task_command();
+		}
+
+		// Init the enqueue class.
+		$this->get_admin__enqueue()->init();
 	}
 
 	/**
@@ -142,19 +188,30 @@ class Base {
 	 * @return mixed
 	 */
 	public function __call( $name, $arguments ) {
-		if ( 0 !== strpos( $name, 'get_' ) ) {
+		if ( 0 !== \strpos( $name, 'get_' ) ) {
 			return;
 		}
-		$cache_name = substr( $name, 4 );
+		$cache_name = \substr( $name, 4 );
 		if ( isset( $this->cached[ $cache_name ] ) ) {
 			return $this->cached[ $cache_name ];
 		}
 
-		$class_name = implode( '\\', explode( '__', $cache_name ) );
-		$class_name = 'Progress_Planner\\' . implode( '_', array_map( 'ucfirst', explode( '_', $class_name ) ) );
-		if ( class_exists( $class_name ) ) {
+		$class_name = \implode( '\\', \explode( '__', $cache_name ) );
+		$class_name = 'Progress_Planner\\' . \implode( '_', \array_map( 'ucfirst', \explode( '_', $class_name ) ) );
+		if ( \class_exists( $class_name ) ) {
 			$this->cached[ $cache_name ] = new $class_name( $arguments );
 			return $this->cached[ $cache_name ];
+		}
+
+		// Backwards-compatibility.
+		if ( isset( Deprecations::BASE_METHODS[ $name ] ) ) {
+			// Deprecated method.
+			\_deprecated_function(
+				\esc_html( $name ),
+				\esc_html( Deprecations::BASE_METHODS[ $name ][1] ),
+				\esc_html( Deprecations::BASE_METHODS[ $name ][0] )
+			);
+			return $this->{Deprecations::BASE_METHODS[ $name ][0]}();
 		}
 	}
 
@@ -164,8 +221,8 @@ class Base {
 	 * @return string
 	 */
 	public function get_remote_server_root_url() {
-		return defined( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
-			? \PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL
+		return \defined( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
+			? \constant( 'PROGRESS_PLANNER_REMOTE_SERVER_ROOT_URL' )
 			: 'https://progressplanner.com';
 	}
 
@@ -178,13 +235,13 @@ class Base {
 	 * @return string
 	 */
 	public function get_placeholder_svg( $width = 1200, $height = 675 ) {
-		return 'data:image/svg+xml;base64,' . base64_encode( sprintf( '<svg width="%1$d" height="%2$d" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="%3$d" height="%4$d" style="fill:#F6F5FB;stroke:#534786;stroke-width:2"/><text x="50%%" y="50%%" font-size="20" text-anchor="middle" alignment-baseline="middle" font-family="monospace" fill="#534786">progressplanner.com</text></svg>', $width, $height, ( $width - 4 ), ( $height - 4 ) ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
+		return 'data:image/svg+xml;base64,' . \base64_encode( \sprintf( '<svg width="%1$d" height="%2$d" xmlns="http://www.w3.org/2000/svg"><rect x="2" y="2" width="%3$d" height="%4$d" style="fill:#F6F5FB;stroke:#534786;stroke-width:2"/><text x="50%%" y="50%%" font-size="20" text-anchor="middle" alignment-baseline="middle" font-family="monospace" fill="#534786">progressplanner.com</text></svg>', $width, $height, ( $width - 4 ), ( $height - 4 ) ) ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.obfuscation_base64_encode
 	}
 
 	/**
 	 * Get the activation date.
 	 *
-	 * @return \DateTime|false
+	 * @return \DateTime
 	 */
 	public function get_activation_date() {
 		$activation_date = $this->get_settings()->get( 'activation_date' );
@@ -193,7 +250,7 @@ class Base {
 			$this->get_settings()->set( 'activation_date', $activation_date->format( 'Y-m-d' ) );
 			return $activation_date;
 		}
-		return \DateTime::createFromFormat( 'Y-m-d', $activation_date );
+		return \DateTime::createFromFormat( 'Y-m-d', $activation_date ); // @phpstan-ignore-line return.type
 	}
 
 	/**
@@ -202,7 +259,7 @@ class Base {
 	 * @return bool
 	 */
 	public function is_privacy_policy_accepted() {
-		return false !== get_option( 'progress_planner_license_key', false );
+		return false !== \get_option( 'progress_planner_license_key', false );
 	}
 
 	/**
@@ -213,12 +270,12 @@ class Base {
 	 * @return array
 	 */
 	public function add_action_links( $actions ) {
-		return array_merge(
+		return \array_merge(
 			[
-				sprintf(
+				\sprintf(
 					'<a href="%1$s">%2$s</a>',
-					admin_url( 'admin.php?page=progress-planner' ),
-					__( 'Dashboard', 'progress-planner' )
+					\admin_url( 'admin.php?page=progress-planner' ),
+					\__( 'Dashboard', 'progress-planner' )
 				),
 			],
 			$actions
@@ -228,16 +285,17 @@ class Base {
 	/**
 	 * Include a template.
 	 *
-	 * @param string|array $template The template to include.
-	 *                               If an array, go through each item until the template exists.
-	 * @param array        $args   The arguments to pass to the template.
-	 * @return void
+	 * @param string|array $template     The template to include.
+	 *                                   If an array, go through each item until the template exists.
+	 * @param array        $args         The arguments to pass to the template.
+	 * @param bool         $get_contents Whether to return the file contents.
+	 * @return string Return the file contents if $get_contents is true, otherwise return an empty string.
 	 */
-	public function the_view( $template, $args = [] ) {
-		$templates = ( is_string( $template ) )
+	public function the_view( $template, $args = [], $get_contents = false ) {
+		$templates = ( \is_string( $template ) )
 			? [ $template, "/views/{$template}" ]
 			: $template;
-		$this->the_file( $templates, $args );
+		return $this->the_file( $templates, $args, $get_contents );
 	}
 
 	/**
@@ -250,7 +308,7 @@ class Base {
 	 * @return void
 	 */
 	public function the_asset( $asset, $args = [] ) {
-		$assets = ( is_string( $asset ) )
+		$assets = ( \is_string( $asset ) )
 			? [ $asset, "/assets/{$asset}" ]
 			: $asset;
 		$this->the_file( $assets, $args );
@@ -266,12 +324,12 @@ class Base {
 	 * @return string|false
 	 */
 	public function get_asset( $asset, $args = [] ) {
-		ob_start();
-		$assets = ( is_string( $asset ) )
+		\ob_start();
+		$assets = ( \is_string( $asset ) )
 			? [ $asset, "/assets/{$asset}" ]
 			: $asset;
 		$this->the_file( $assets, $args );
-		return ob_get_clean();
+		return \ob_get_clean();
 	}
 
 	/**
@@ -280,9 +338,10 @@ class Base {
 	 * @param string|array $files The file to include.
 	 *                           If an array, go through each item until the file exists.
 	 * @param array        $args  The arguments to pass to the template.
-	 * @return void
+	 * @param bool         $get_contents Whether to return the file contents.
+	 * @return string Return the file contents if $get_contents is true, otherwise return an empty string.
 	 */
-	public function the_file( $files, $args = [] ) {
+	public function the_file( $files, $args = [], $get_contents = false ) {
 		/**
 		 * Allow filtering the files to include.
 		 *
@@ -295,11 +354,17 @@ class Base {
 				$path = \PROGRESS_PLANNER_DIR . "/{$file}";
 			}
 			if ( \file_exists( $path ) ) {
-				extract( $args ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
+				\extract( $args ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
+				if ( $get_contents ) {
+					\ob_start();
+				}
 				include $path; // phpcs:ignore PEAR.Files.IncludingFile.UseRequire
-				break;
+				if ( $get_contents ) {
+					return (string) \ob_get_clean();
+				}
 			}
 		}
+		return '';
 	}
 
 	/**
@@ -310,12 +375,12 @@ class Base {
 	 */
 	public function get_file_version( $file ) {
 		// If we're in debug mode, use filemtime.
-		if ( defined( 'WP_SCRIPT_DEBUG' ) && \WP_SCRIPT_DEBUG ) {
-			return (string) filemtime( $file );
+		if ( \defined( 'WP_SCRIPT_DEBUG' ) && \constant( 'WP_SCRIPT_DEBUG' ) ) {
+			return (string) \filemtime( $file );
 		}
 
 		// Otherwise, use the plugin header.
-		if ( ! function_exists( 'get_file_data' ) ) {
+		if ( ! \function_exists( 'get_file_data' ) ) {
 			require_once ABSPATH . 'wp-includes/functions.php'; // @phpstan-ignore requireOnce.fileNotFound
 		}
 
@@ -340,8 +405,7 @@ class Base {
 		$host      = ! empty( $url_parts['host'] ) ? $url_parts['host'] : false;
 
 		if ( ! empty( $url ) && ! empty( $host ) ) {
-			if (
-				'localhost' === $host
+			if ( 'localhost' === $host
 				|| (
 					false !== \ip2long( $host )
 					&& ! \filter_var( $host, \FILTER_VALIDATE_IP, \FILTER_FLAG_NO_PRIV_RANGE | \FILTER_FLAG_NO_RES_RANGE )
@@ -391,16 +455,6 @@ class Base {
 	}
 
 	/**
-	 * Check if this is a PRO site.
-	 *
-	 * @return bool
-	 */
-	public function is_pro_site() {
-		return \get_option( 'progress_planner_pro_license_key' )
-			&& 'valid' === \get_option( 'progress_planner_pro_license_status' );
-	}
-
-	/**
 	 * Redirect on login.
 	 *
 	 * @param string   $user_login The user login.
@@ -419,9 +473,32 @@ class Base {
 			return;
 		}
 
+		if ( isset( $_REQUEST['redirect_to'] ) && '' !== $_REQUEST['redirect_to'] && \admin_url( '/' ) !== $_REQUEST['redirect_to'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing -- We're not processing any data.
+			return;
+		}
+
 		// Redirect to the Progress Planner dashboard.
 		\wp_safe_redirect( \admin_url( 'admin.php?page=progress-planner' ) );
 		exit;
+	}
+
+	/**
+	 * Check if we're on the Progress Planner dashboard page.
+	 *
+	 * @return bool
+	 */
+	public function is_on_progress_planner_dashboard_page() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- We're not processing any data.
+		return \is_admin() && isset( $_GET['page'] ) && $_GET['page'] === 'progress-planner';
+	}
+
+	/**
+	 * Check whether debug mode is enabled.
+	 *
+	 * @return bool
+	 */
+	public function is_debug_mode_enabled() {
+		return ( \defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

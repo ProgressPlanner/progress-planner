@@ -1,0 +1,138 @@
+name: Progress Planner Update & Compatibility Tests
+
+env:
+  WORDPRESS_URL: http://localhost:8080
+  WORDPRESS_ADMIN_USER: admin
+  WORDPRESS_ADMIN_PASSWORD: password
+  WORDPRESS_ADMIN_EMAIL: admin@example.com
+  WORDPRESS_TABLE_PREFIX: wp_
+  WORDPRESS_DB_USER: wpuser
+  WORDPRESS_DB_PASSWORD: wppass
+  WORDPRESS_DB_NAME: wordpress
+  WORDPRESS_DB_PORT: 3307
+  PLUGIN_REPO: ProgressPlanner/progress-planner
+  YOAST_TOKEN: ${{ secrets.YOAST_TOKEN }}
+
+on:
+  push:
+    branches:
+      - develop
+  pull_request:
+  # Allow manually triggering the workflow.
+  workflow_dispatch:
+
+jobs:
+  upgrade-compat:
+    runs-on: ubuntu-22.04
+
+    services:
+      mysql:
+        image: mariadb:10.6
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: ${{ env.WORDPRESS_DB_NAME }}
+          MYSQL_USER: ${{ env.WORDPRESS_DB_USER }}
+          MYSQL_PASSWORD: ${{ env.WORDPRESS_DB_PASSWORD }}
+        ports:
+          - 3307:3306
+
+      wordpress:
+        image: wordpress:latest
+        env:
+          WORDPRESS_DB_HOST: mysql
+          WORDPRESS_DB_USER: ${{ env.WORDPRESS_DB_USER }}
+          WORDPRESS_DB_PASSWORD: ${{ env.WORDPRESS_DB_PASSWORD }}
+          WORDPRESS_DB_NAME: ${{ env.WORDPRESS_DB_NAME }}
+          WORDPRESS_DB_PORT: ${{ env.WORDPRESS_DB_PORT }}
+          WORDPRESS_TABLE_PREFIX: ${{ env.WORDPRESS_TABLE_PREFIX }}
+          WORDPRESS_DEBUG: 1
+          WORDPRESS_URL: ${{ env.WORDPRESS_URL }}
+          WORDPRESS_ADMIN_USER: ${{ env.WORDPRESS_ADMIN_USER }}
+          WORDPRESS_ADMIN_PASSWORD: ${{ env.WORDPRESS_ADMIN_PASSWORD }}
+          WORDPRESS_ADMIN_EMAIL: ${{ env.WORDPRESS_ADMIN_EMAIL }}
+        ports:
+          - 8080:80
+        options: >-
+          --health-cmd="curl --silent --fail http://localhost:8080/wp-login.php || exit 0"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Install PHP & Composer on host
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y git curl unzip php-cli php-curl php-mbstring php-xml php-zip
+          curl -sS https://getcomposer.org/installer | php
+          sudo mv composer.phar /usr/local/bin/composer
+
+      - name: Install plugin dependencies (Composer)
+        run: |
+          composer config -g http-basic.my.yoast.com token $YOAST_TOKEN
+          composer config repositories.my-yoast composer https://my.yoast.com/packages/
+          composer config --no-plugins allow-plugins.composer/installers true
+          composer install --working-dir=./
+
+      - name: Complete WordPress installation
+        run: |
+          echo "Installing WordPress at: $WORDPRESS_URL"
+          curl --silent -X POST "$WORDPRESS_URL/wp-admin/install.php?step=2" \
+          -d "weblog_title=My%20WordPress%20Site" \
+          -d "user_name=$WORDPRESS_ADMIN_USER" \
+          -d "admin_password=$WORDPRESS_ADMIN_PASSWORD" \
+          -d "admin_password2=$WORDPRESS_ADMIN_PASSWORD" \
+          -d "admin_email=$WORDPRESS_ADMIN_EMAIL" \
+          -d "public=1"
+
+      - name: Install and activate plugins in WordPress container
+        run: |
+          WP_CONTAINER=$(docker ps -qf "name=wordpress")
+
+          # Install git inside the WordPress container
+          docker exec $WP_CONTAINER apt-get update
+          docker exec $WP_CONTAINER apt-get install -y git
+
+          # Install WP-CLI
+          docker exec $WP_CONTAINER curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          docker exec $WP_CONTAINER chmod +x wp-cli.phar
+          docker exec $WP_CONTAINER mv wp-cli.phar /usr/local/bin/wp
+
+          # Create plugin directory
+          docker exec $WP_CONTAINER mkdir -p /var/www/html/wp-content/plugins/progress-planner
+
+          # Clone plugin repository (v1.1.0)
+          docker exec $WP_CONTAINER git clone --branch v1.1.0 https://github.com/$PLUGIN_REPO.git /var/www/html/wp-content/plugins/progress-planner
+
+          # Activate plugin using WP-CLI
+          docker exec $WP_CONTAINER wp plugin activate progress-planner --allow-root
+
+          # Show plugin settings (before 1.1.1 there was no version set)
+          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
+
+          # Overwrite plugin files with the latest version from this branch
+          docker cp . $WP_CONTAINER:/var/www/html/wp-content/plugins/progress-planner
+
+          # Show updated plugin settings
+          docker exec $WP_CONTAINER wp option get progress_planner_version --allow-root
+          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
+
+          # Activate 3rd party plugins
+          docker exec $WP_CONTAINER wp plugin install wordpress-seo --activate --allow-root
+          docker exec $WP_CONTAINER wp plugin install yoast-comment-hacks --activate --allow-root
+
+          # Show plugin settings
+          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root
+
+          # Require Yoast SEO Premium & copy files
+          composer require yoast/wordpress-seo-premium
+          composer dump-autoload --working-dir=./wp-content/plugins/wordpress-seo-premium
+          docker cp ./wp-content/plugins/wordpress-seo-premium $WP_CONTAINER:/var/www/html/wp-content/plugins/wordpress-seo-premium
+
+          # Activate Yoast SEO Premium
+          docker exec $WP_CONTAINER wp plugin activate wordpress-seo-premium --allow-root
+
+          # Show plugin settings
+          docker exec $WP_CONTAINER wp option get progress_planner_settings --allow-root

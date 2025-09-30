@@ -6,8 +6,11 @@
 /vendor
 .distignore
 .editorconfig
+.eslintrc.js
+.env.example
 .gitignore
 .gitattributes
+.php-cs-fixer.dist.php
 composer.json
 composer.lock
 package.json

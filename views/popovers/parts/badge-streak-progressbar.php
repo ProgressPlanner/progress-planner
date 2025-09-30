@@ -6,15 +6,19 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
 $prpl_badges = \progress_planner()->get_badges()->get_badges( $prpl_context ); // @phpstan-ignore-line variable.undefined
+
+if ( empty( $prpl_badges ) ) {
+	return;
+}
 ?>
 <div class="progress-badges">
 	<span class="badges-popover-progress-total">
-		<span style="width: <?php echo (int) end( $prpl_badges )->get_progress()['progress']; ?>%"></span>
+		<span style="width: <?php echo (int) \end( $prpl_badges )->get_progress()['progress']; ?>%"></span>
 	</span>
 	<div class="indicators">
 		<?php foreach ( $prpl_badges as $prpl_badge ) : ?>
@@ -25,11 +29,11 @@ $prpl_badges = \progress_planner()->get_badges()->get_badges( $prpl_context ); /
 						✔️
 					<?php else : ?>
 						<?php
-						printf(
+						\printf(
 							'content' === $prpl_context // @phpstan-ignore-line variable.undefined
 								? \esc_html(
 									/* translators: The number of weeks remaining to complete the badge. */
-									_n(
+									\_n(
 										'%s post to go',
 										'%s posts to go',
 										(int) $prpl_badge_progress['remaining'],
@@ -37,7 +41,7 @@ $prpl_badges = \progress_planner()->get_badges()->get_badges( $prpl_context ); /
 									)
 								) : \esc_html(
 									/* translators: The number of weeks remaining to complete the badge. */
-									_n(
+									\_n(
 										'%s week to go',
 										'%s weeks to go',
 										(int) $prpl_badge_progress['remaining'],

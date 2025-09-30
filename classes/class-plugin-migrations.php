@@ -9,8 +9,6 @@
 
 namespace Progress_Planner;
 
-use Progress_Planner\Update\Update_111;
-
 /**
  * Plugin Upgrade class.
  *
@@ -35,21 +33,12 @@ class Plugin_Migrations {
 	private $version;
 
 	/**
-	 * An array of upgrade methods.
-	 *
-	 * @var array
-	 */
-	private const UPGRADE_CLASSES = [
-		'1.1.1' => Update_111::class,
-	];
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->db_version = $this->get_db_version();
 		$this->version    = $this->get_plugin_version();
-		$this->maybe_upgrade();
+		\add_action( 'init', [ $this, 'maybe_upgrade' ], 1 );
 	}
 
 	/**
@@ -75,28 +64,44 @@ class Plugin_Migrations {
 	 *
 	 * @return void
 	 */
-	private function maybe_upgrade() {
+	public function maybe_upgrade() {
 		// If the current version is the same as the plugin version, do nothing.
-		if ( version_compare( $this->db_version, $this->version, '=' ) &&
-			( ! defined( 'PRPL_DEBUG' ) || ! PRPL_DEBUG ) &&
-			! \get_option( 'prpl_debug' )
+		if ( \version_compare( $this->db_version, $this->version, '=' ) &&
+			! \get_option( 'prpl_debug_migrations' )
 		) {
 			return;
 		}
 
+		// Get all available updates, as an array of integers.
+		$updates_files = \glob( PROGRESS_PLANNER_DIR . '/classes/update/*.php' );
+		if ( ! \is_array( $updates_files ) ) {
+			return;
+		}
+		$updates = \array_map( fn( $file ) => \str_replace( 'class-update-', '', \basename( $file, '.php' ) ), $updates_files );
+		\sort( $updates );
+
+		// Remove "class-update" from the updates.
+		$updates = \array_filter( $updates, fn( $update ) => $update !== 'class-update' );
+
 		// Run the upgrades.
-		foreach ( self::UPGRADE_CLASSES as $version => $upgrade_class ) {
+		foreach ( $updates as $version_int ) {
+			$upgrade_class = 'Progress_Planner\Update\Update_' . $version_int;
+			$version       = $upgrade_class::VERSION;
 			if (
-				( defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) ||
-				\get_option( 'prpl_debug' ) ||
-				version_compare( $version, $this->db_version, '>' )
+				\get_option( 'prpl_debug_migrations' ) ||
+				\version_compare( $version, $this->db_version, '>' )
 			) {
 				$upgrade_class = new $upgrade_class();
-				$upgrade_class->run();
+				if ( \method_exists( $upgrade_class, 'run' ) ) {
+					$upgrade_class->run();
+				}
 			}
 		}
 
 		\update_option( 'progress_planner_version', $this->version );
+
+		// Clear cache.
+		\progress_planner()->get_utils__cache()->delete_all();
 
 		/**
 		 * Fires when the plugin is updated.
@@ -104,6 +109,6 @@ class Plugin_Migrations {
 		 * @param string $version The new version of the plugin.
 		 * @param string $db_version The old version of the plugin.
 		 */
-		do_action( 'progress_planner_plugin_updated', $this->version, $this->db_version );
+		\do_action( 'progress_planner_plugin_updated', $this->version, $this->db_version );
 	}
 }

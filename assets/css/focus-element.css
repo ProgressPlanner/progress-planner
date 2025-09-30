@@ -16,7 +16,7 @@
 	gap: 0.25rem;
 	background-color: #fff9f0;
 	font-size: 0.75rem;
-	border: 2px solid #faa310;
+	border: 2px solid #faa310 !important;
 	border-radius: 1rem;
 	color: #534786;
 	font-weight: 600;

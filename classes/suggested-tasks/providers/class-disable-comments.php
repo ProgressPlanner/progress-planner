@@ -1,0 +1,170 @@
+<?php
+/**
+ * Add tasks for disabling comments.
+ *
+ * @package Progress_Planner
+ */
+
+namespace Progress_Planner\Suggested_Tasks\Providers;
+
+/**
+ * Add tasks to disable comments.
+ */
+class Disable_Comments extends Tasks_Interactive {
+
+	/**
+	 * Whether the task is an onboarding task.
+	 *
+	 * @var bool
+	 */
+	protected const IS_ONBOARDING_TASK = true;
+
+	/**
+	 * The provider ID.
+	 *
+	 * @var string
+	 */
+	protected const PROVIDER_ID = 'disable-comments';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'disable-comments';
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/disable-comments';
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return \admin_url( 'options-discussion.php' );
+	}
+
+	/**
+	 * Get the link setting.
+	 *
+	 * @return array
+	 */
+	public function get_link_setting() {
+		return [
+			'hook'   => 'options-discussion.php',
+			'iconEl' => 'label[for="default_comment_status"]',
+		];
+	}
+
+	/**
+	 * Get the task title.
+	 *
+	 * @return string
+	 */
+	protected function get_title() {
+		return \esc_html__( 'Disable comments', 'progress-planner' );
+	}
+
+	/**
+	 * Check if the task condition is satisfied.
+	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
+	 *
+	 * @return bool
+	 */
+	public function should_add_task() {
+		return ! \progress_planner()->get_plugin_installer()->is_plugin_activated( 'comment-free-zone' )
+			&& 10 > \wp_count_comments()->approved
+			&& 'open' === \get_default_comment_status();
+	}
+
+	/**
+	 * Check if the task is completed.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function is_task_completed( $task_id = '' ) {
+		return 'open' !== \get_default_comment_status();
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		$comments_count = (int) \wp_count_comments()->approved;
+
+		echo '<p>';
+		if ( 0 === $comments_count ) {
+			\esc_html_e( 'Your site currently has no approved comments. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments.', 'progress-planner' );
+		} else {
+			\printf(
+				\esc_html(
+					// translators: %d is the number of approved comments.
+					\_n(
+						'Your site currently has %d approved comment. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments.',
+						'Your site currently has %d approved comments. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments.',
+						$comments_count,
+						'progress-planner'
+					)
+				),
+				(int) $comments_count
+			);
+		}
+		echo '</p>';
+		if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) {
+			echo '<p>';
+			\printf(
+				/* translators: %s is the <a href="https://w.org/plugins/comment-free-zone/" target="_blank">Comment-Free Zone</a> link */
+				\esc_html__( 'If your site really doesn\'t need any comments, we recommend installing the "%s" plugin.', 'progress-planner' ),
+				'<a href="https://w.org/plugins/comment-free-zone/" target="_blank">' . \esc_html__( 'Comment-Free Zone', 'progress-planner' ) . '</a>'
+			);
+			echo '</p>';
+		}
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<button type="submit" class="prpl-button prpl-button-primary">
+			<?php \esc_html_e( 'Disable new comments', 'progress-planner' ); ?>
+		</button>
+		<?php if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) : ?>
+			<prpl-install-plugin
+				data-plugin-name="Comment-free zone"
+				data-plugin-slug="comment-free-zone"
+				data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'comment-free-zone' ) ? 'activate' : 'install'; ?>"
+				data-provider-id="<?php echo \esc_attr( self::PROVIDER_ID ); ?>"
+			></prpl-install-plugin>
+		<?php endif; ?>
+		<?php
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Disable comments', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
+	}
+}

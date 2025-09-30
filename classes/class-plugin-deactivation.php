@@ -216,7 +216,7 @@ class Plugin_Deactivation {
 					const requestData = {
 						action: 'plugin_deactivation',
 						plugin: '<?php echo \esc_attr( self::PLUGIN_SLUG ); ?>',
-						site: '<?php echo \esc_attr( get_site_url() ); ?>',
+						site: '<?php echo \esc_attr( \get_site_url() ); ?>',
 					};
 					deactivatePluginFeedbackAjaxRequest( {
 						// Get a nonce from the remote server.

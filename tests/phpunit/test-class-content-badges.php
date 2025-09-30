@@ -12,7 +12,6 @@ namespace Progress_Planner\Tests;
  */
 class Content_Badges_Test extends \WP_UnitTestCase {
 
-
 	/**
 	 * Current month.
 	 *
@@ -29,7 +28,7 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		parent::set_up();
 
 		// Remove all content activities.
-		\progress_planner()->get_query()->delete_category_activities( 'content' );
+		\progress_planner()->get_activities__query()->delete_category_activities( 'content' );
 	}
 
 	/**
@@ -37,12 +36,10 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	 *
 	 * @return void
 	 */
-	public function test_wonderful_writer_0_progress() {
-
+	public function test_content_curator_0_progress() {
 		$group_badges = \progress_planner()->get_badges()->get_badges( 'content' );
-
 		foreach ( $group_badges as $badge ) {
-			if ( 'wonderful-writer' === $badge->get_id() ) {
+			if ( 'content-curator' === $badge->get_id() ) {
 				$this->assertEquals( 0, $badge->progress_callback()['progress'] );
 
 				// Delete the badge value so it can be re-calculated.
@@ -52,12 +49,11 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test Wonderful Writer badge 50 percent.
+	 * Test Content Curator badge 50 percent.
 	 *
 	 * @return void
 	 */
-	public function test_wonderful_writer_50_progress() {
-
+	public function test_content_curator_50_progress() {
 		// Insert 5 posts.
 		for ( $i = 0; $i < 5; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -66,7 +62,7 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		$group_badges = \progress_planner()->get_badges()->get_badges( 'content' );
 
 		foreach ( $group_badges as $badge ) {
-			if ( 'wonderful-writer' === $badge->get_id() ) {
+			if ( 'content-curator' === $badge->get_id() ) {
 				$this->assertEquals( 50, $badge->progress_callback()['progress'] );
 
 				// Delete the badge value so it can be re-calculated.
@@ -76,12 +72,11 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test Wonderful Writer badge 100 percent.
+	 * Test Content Curator badge 100 percent.
 	 *
 	 * @return void
 	 */
-	public function test_wonderful_writer_100_progress() {
-
+	public function test_content_curator_100_progress() {
 		// Insert 10 posts.
 		for ( $i = 0; $i < 10; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -90,7 +85,7 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		$group_badges = \progress_planner()->get_badges()->get_badges( 'content' );
 
 		foreach ( $group_badges as $badge ) {
-			if ( 'wonderful-writer' === $badge->get_id() ) {
+			if ( 'content-curator' === $badge->get_id() ) {
 				$this->assertEquals( 100, $badge->progress_callback()['progress'] );
 
 				// Delete the badge value so it can be re-calculated.
@@ -100,12 +95,11 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test Bold Blogger badge 50 percent.
+	 * Test Revision Ranger badge 50 percent.
 	 *
 	 * @return void
 	 */
-	public function test_bold_blogger_50_progress() {
-
+	public function test_revision_ranger_50_progress() {
 		// Insert 15 posts.
 		for ( $i = 0; $i < 15; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -114,7 +108,7 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		$group_badges = \progress_planner()->get_badges()->get_badges( 'content' );
 
 		foreach ( $group_badges as $badge ) {
-			if ( 'bold-blogger' === $badge->get_id() ) {
+			if ( 'revision-ranger' === $badge->get_id() ) {
 				$this->assertEquals( 50, $badge->progress_callback()['progress'] );
 
 				// Delete the badge value so it can be re-calculated.
@@ -124,12 +118,11 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test Bold Blogger badge 100 percent.
+	 * Test Revision Ranger badge 100 percent.
 	 *
 	 * @return void
 	 */
-	public function test_bold_blogger_100_progress() {
-
+	public function test_revision_ranger_100_progress() {
 		// Insert 30 posts.
 		for ( $i = 0; $i < 30; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -138,7 +131,7 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		$group_badges = \progress_planner()->get_badges()->get_badges( 'content' );
 
 		foreach ( $group_badges as $badge ) {
-			if ( 'bold-blogger' === $badge->get_id() ) {
+			if ( 'revision-ranger' === $badge->get_id() ) {
 				$this->assertEquals( 100, $badge->progress_callback()['progress'] );
 
 				// Delete the badge value so it can be re-calculated.
@@ -148,12 +141,11 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test Bold Blogger badge badge over 100 percent, we should top at 100 percent.
+	 * Test Revision Ranger badge badge over 100 percent, we should top at 100 percent.
 	 *
 	 * @return void
 	 */
-	public function test_bold_blogger_over_100_progress() {
-
+	public function test_revision_ranger_over_100_progress() {
 		// Insert 40 posts.
 		for ( $i = 0; $i < 40; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -162,7 +154,7 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		$group_badges = \progress_planner()->get_badges()->get_badges( 'content' );
 
 		foreach ( $group_badges as $badge ) {
-			if ( 'bold-blogger' === $badge->get_id() ) {
+			if ( 'revision-ranger' === $badge->get_id() ) {
 				$this->assertEquals( 100, $badge->progress_callback()['progress'] );
 
 				// Delete the badge value so it can be re-calculated.
@@ -172,12 +164,11 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test Awesome Author badge 50 percent.
+	 * Test Purposeful Publisher badge 50 percent.
 	 *
 	 * @return void
 	 */
-	public function test_awesome_author_50_progress() {
-
+	public function test_purposeful_publisher_50_progress() {
 		// Insert 25 posts.
 		for ( $i = 0; $i < 25; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -186,7 +177,7 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		$group_badges = \progress_planner()->get_badges()->get_badges( 'content' );
 
 		foreach ( $group_badges as $badge ) {
-			if ( 'awesome-author' === $badge->get_id() ) {
+			if ( 'purposeful-publisher' === $badge->get_id() ) {
 				$this->assertEquals( 50, $badge->progress_callback()['progress'] );
 
 				// Delete the badge value so it can be re-calculated.
@@ -196,12 +187,11 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test Awesome Author badge 100 percent.
+	 * Test Purposeful Publisher badge 100 percent.
 	 *
 	 * @return void
 	 */
-	public function test_awesome_author_100_progress() {
-
+	public function test_purposeful_publisher_100_progress() {
 		// Insert 50 posts.
 		for ( $i = 0; $i < 50; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -210,7 +200,7 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		$group_badges = \progress_planner()->get_badges()->get_badges( 'content' );
 
 		foreach ( $group_badges as $badge ) {
-			if ( 'awesome-author' === $badge->get_id() ) {
+			if ( 'purposeful-publisher' === $badge->get_id() ) {
 				$this->assertEquals( 100, $badge->progress_callback()['progress'] );
 
 				// Delete the badge value so it can be re-calculated.
@@ -220,12 +210,11 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test Awesome Author badge badge over 100 percent, we should top at 100 percent.
+	 * Test Purposeful Publisher badge badge over 100 percent, we should top at 100 percent.
 	 *
 	 * @return void
 	 */
-	public function test_awesome_author_over_100_progress() {
-
+	public function test_purposeful_publisher_over_100_progress() {
 		// Insert 60 posts.
 		for ( $i = 0; $i < 60; $i++ ) {
 			$this->insert_post( 'Test post ' . $i );
@@ -234,7 +223,7 @@ class Content_Badges_Test extends \WP_UnitTestCase {
 		$group_badges = \progress_planner()->get_badges()->get_badges( 'content' );
 
 		foreach ( $group_badges as $badge ) {
-			if ( 'awesome-author' === $badge->get_id() ) {
+			if ( 'purposeful-publisher' === $badge->get_id() ) {
 				$this->assertEquals( 100, $badge->progress_callback()['progress'] );
 
 				// Delete the badge value so it can be re-calculated.

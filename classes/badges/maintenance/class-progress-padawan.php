@@ -37,15 +37,17 @@ final class Progress_Padawan extends Badge_Maintenance {
 	 */
 	public function get_description() {
 		/* translators: %d: The number of weeks. */
-		return sprintf( \esc_html__( '%d weeks streak', 'progress-planner' ), 6 );
+		return \sprintf( \esc_html__( '%d weeks streak', 'progress-planner' ), 6 );
 	}
 
 	/**
 	 * Progress callback.
 	 *
+	 * @param array $args The arguments for the progress callback.
+	 *
 	 * @return array
 	 */
-	public function progress_callback() {
+	public function progress_callback( $args = [] ) {
 		$saved_progress = $this->get_saved();
 
 		// If we have a saved value, return it.
@@ -54,8 +56,8 @@ final class Progress_Padawan extends Badge_Maintenance {
 		}
 
 		$max_streak = $this->get_goal()->get_streak()['max_streak'];
-		$percent    = min( 100, floor( 100 * $max_streak / 6 ) );
-		$remaining  = 6 - min( 6, $max_streak );
+		$percent    = \min( 100, \floor( 100 * $max_streak / 6 ) );
+		$remaining  = 6 - \min( 6, $max_streak );
 
 		$this->save_progress(
 			[

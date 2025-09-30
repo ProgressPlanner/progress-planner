@@ -4,7 +4,7 @@
  *
  * A script to process the onboarding task checklist.
  *
- * Dependencies: progress-planner-document-ready
+ * Dependencies: progress-planner/document-ready
  */
 
 /**
@@ -12,13 +12,13 @@
  *
  * @return {Promise} The promise of the tasks.
  */
-async function prplOnboardTasks() {
-	return new Promise( ( resolve ) => {
+const prplOnboardTasks = async () =>
+	new Promise( ( resolve ) => {
 		( async () => {
 			const tasksElement = document.getElementById(
 				'prpl-onboarding-tasks'
 			);
-			const timeToWait = 2000;
+			const timeToWait = 1000;
 
 			if ( ! tasksElement ) {
 				resolve();
@@ -75,28 +75,22 @@ async function prplOnboardTasks() {
 			// Wait for all tasks to complete.
 			await Promise.all( tasks );
 
-			// We add a small delay to make sure the user sees if the last task is completed and total points.
-			await new Promise( ( resolveTimeout ) =>
-				setTimeout( resolveTimeout, timeToWait )
-			);
-
 			// Resolve the promise.
 			resolve();
 		} )();
 	} );
-}
 
 /**
  * Redirect user to the stats page after onboarding or plugin upgrade.
  */
+// eslint-disable-next-line no-unused-vars
 const prplOnboardRedirect = () => {
 	const onboardingTasksElement = document.getElementById(
 		'prpl-onboarding-tasks'
 	);
 
 	let redirectUrl = window.location.href
-		.replace( '&content-scan-finished=true', '' )
-		.replace( '&content-scan', '' )
+		.replace( '&&show-tour=true', '' )
 		.replace( '&delay-tour=true', '' );
 
 	// If plugin is upgraded, we dont show the tour.
@@ -104,7 +98,7 @@ const prplOnboardRedirect = () => {
 		window.location.href = redirectUrl;
 	} else {
 		// We show the tour.
-		redirectUrl = redirectUrl + '&content-scan-finished=true';
+		redirectUrl = redirectUrl + '&show-tour=true';
 
 		// Check if there are completed tasks, delay tour so the user can see the celebration.
 		if (
@@ -127,7 +121,19 @@ prplDocumentReady( function () {
 		popover.showPopover();
 
 		prplOnboardTasks().then( () => {
-			prplOnboardRedirect();
+			document
+				.getElementById( 'prpl-onboarding-continue-button' )
+				.classList.remove( 'prpl-disabled' );
 		} );
+
+		// Click on the close popover button should also redirect to the PP Dashboard page.
+		const closePopoverButton = document.querySelector(
+			'#prpl-popover-upgrade-tasks .prpl-popover-close'
+		);
+		if ( closePopoverButton ) {
+			closePopoverButton.addEventListener( 'click', () => {
+				prplOnboardRedirect();
+			} );
+		}
 	}
 } );

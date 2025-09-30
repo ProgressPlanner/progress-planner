@@ -118,16 +118,16 @@ class Goal_Recurring {
 		if ( ! empty( $this->occurences ) ) {
 			return $this->occurences;
 		}
-		$ranges = \progress_planner()->get_date()->get_periods( $this->start_date, $this->end_date, $this->frequency );
+		$ranges = \progress_planner()->get_utils__date()->get_periods( $this->start_date, $this->end_date, $this->frequency );
 
 		if ( empty( $ranges ) ) {
 			return $this->occurences;
 		}
 
 		// If the last range ends before today, add a new range.
-		if ( (int) gmdate( 'Ymd' ) > (int) end( $ranges )['end_date']->format( 'Ymd' ) ) {
-			$ranges[] = \progress_planner()->get_date()->get_range(
-				end( $ranges )['end_date'],
+		if ( (int) \gmdate( 'Ymd' ) > (int) \end( $ranges )['end_date']->format( 'Ymd' ) ) {
+			$ranges[] = \progress_planner()->get_utils__date()->get_range(
+				\end( $ranges )['end_date'],
 				new \DateTime( 'tomorrow' )
 			);
 		}
@@ -163,7 +163,7 @@ class Goal_Recurring {
 			$evaluation = $occurence->evaluate();
 			if ( $evaluation ) {
 				++$streak_nr;
-				$max_streak = max( $max_streak, $streak_nr );
+				$max_streak = \max( $max_streak, $streak_nr );
 				continue;
 			}
 

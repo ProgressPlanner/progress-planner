@@ -7,41 +7,39 @@
 
 use Progress_Planner\Base;
 
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_widget = \progress_planner()->get_widgets__activity_scores();
+$prpl_widget = \progress_planner()->get_admin__widgets__activity_scores();
 $prpl_record = $prpl_widget->personal_record_callback();
 
 ?>
 <h2 class="prpl-widget-title">
-	<?php \esc_html_e( 'Your website activity score', 'progress-planner' ); ?>
+	<?php
+	echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		'activity-scores',
+		\esc_html__( 'Your website activity score', 'progress-planner' )
+	);
+	?>
 
 	<div class="tooltip-actions">
-		<button
-			class="prpl-info-icon"
-			onclick="this.closest( '.tooltip-actions' ).querySelector( '.prpl-tooltip' ).toggleAttribute( 'data-tooltip-visible' )"
-		>
-			<span class="icon prpl-info-icon">
-				<?php \progress_planner()->the_asset( 'images/icon_info.svg' ); ?>
-			</span>
-			<span class="screen-reader-text"><?php \esc_html_e( 'More info', 'progress-planner' ); ?></span>
-		</button>
-
-		<div class="prpl-tooltip">
-			<?php \esc_html_e( 'Your website activity score is based on the amount of website maintenance work you have done over the past 30 days.', 'progress-planner' ); ?>
-
-			<button type="button" class="prpl-tooltip-close" onclick="this.closest( '.prpl-tooltip' ).removeAttribute( 'data-tooltip-visible' )">
-				<span class="dashicons dashicons-no-alt"></span>
-				<span class="screen-reader-text"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></span>
-			</button>
-		</div>
+		<prpl-tooltip>
+			<slot name="open-icon">
+				<span class="icon prpl-info-icon">
+					<?php \progress_planner()->the_asset( 'images/icon_info.svg' ); ?>
+					<span class="screen-reader-text"><?php \esc_html_e( 'More info', 'progress-planner' ); ?></span>
+				</span>
+			</slot>
+			<slot name="content">
+				<?php \esc_html_e( 'Your website activity score is based on the amount of website maintenance work you have done over the past 30 days.', 'progress-planner' ); ?>
+			</slot>
+		</prpl-tooltip>
 	</div>
 </h2>
 
-<div style="--background: var(--prpl-background-orange)">
-	<prpl-gauge background="var(--prpl-background-green)" color="<?php echo esc_attr( $prpl_widget->get_gauge_color( $prpl_widget->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-6xl)">
+<div style="--background: var(--prpl-background-monthly)">
+	<prpl-gauge background="var(--prpl-background-activity)" color="<?php echo \esc_attr( $prpl_widget->get_gauge_color( $prpl_widget->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-6xl)">
 		<progress max="100" value="<?php echo (float) $prpl_widget->get_score(); ?>">
 			<?php echo \esc_html( $prpl_widget->get_score() ); ?>
 		</progress>
@@ -53,30 +51,22 @@ $prpl_record = $prpl_widget->personal_record_callback();
 <p><?php \esc_html_e( 'Check out your website activity in the past months:', 'progress-planner' ); ?></p>
 <div class="prpl-graph-wrapper">
 	<?php
-	\progress_planner()->get_chart()->the_chart(
+	\progress_planner()->get_ui__chart()->the_chart(
 		[
 			'type'           => 'bar',
-			'items_callback' => function ( $start_date, $end_date ) {
-				return \progress_planner()->get_query()->query_activities(
-					[
-						'start_date' => $start_date,
-						'end_date'   => $end_date,
-					]
-				);
-			},
+			'items_callback' => fn( $start_date, $end_date ) => \progress_planner()->get_activities__query()->query_activities(
+				[
+					'start_date' => $start_date,
+					'end_date'   => $end_date,
+				]
+			),
 			'dates_params'   => [
 				'start_date' => \DateTime::createFromFormat( 'Y-m-d', \gmdate( 'Y-m-01' ) )->modify( $prpl_widget->get_range() ),
 				'end_date'   => new \DateTime(),
 				'frequency'  => $prpl_widget->get_frequency(),
 				'format'     => 'M',
 			],
-			'count_callback' => function ( $activities, $date ) {
-				$score = 0;
-				foreach ( $activities as $activity ) {
-					$score += $activity->get_points( $date );
-				}
-				return $score * 100 / Base::SCORE_TARGET;
-			},
+			'count_callback' => fn( $activities, $date ) => \array_sum( \array_map( fn( $activity ) => $activity->get_points( $date ), $activities ) ) * 100 / Base::SCORE_TARGET,
 			'normalized'     => true,
 			'color'          => [ $prpl_widget, 'get_color' ],
 			'max'            => 100,
@@ -90,7 +80,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 <prpl-big-counter
 	number="<?php echo \esc_html( \number_format_i18n( (int) $prpl_record['max_streak'] ) ); ?>"
 	content="<?php echo \esc_attr_e( 'personal record', 'progress-planner' ); ?>"
-	background-color="var(--prpl-background-green)"
+	background-color="var(--prpl-background-activity)"
 ></prpl-big-counter>
 
 <div class="prpl-widget-content">
@@ -98,7 +88,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 	if ( (int) $prpl_record['max_streak'] === 0 ) {
 		\esc_html_e( 'This is the start of your first streak! Add content to your site every week and set a personal record!', 'progress-planner' );
 	} elseif ( (int) $prpl_record['max_streak'] <= (int) $prpl_record['current_streak'] ) {
-		printf(
+		\printf(
 			\esc_html(
 				/* translators: %s: number of weeks. */
 				\_n(
@@ -111,7 +101,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 			\esc_html( \number_format_i18n( $prpl_record['current_streak'] ) )
 		);
 	} elseif ( 1 <= $prpl_record['current_streak'] ) {
-		printf(
+		\printf(
 			\esc_html(
 				/* translators: %1$s: number of weeks for the current streak. %2$s: number of weeks for the maximum streak. %3$s: The number of weeks to go in order to break the record. */
 				\_n(
@@ -126,7 +116,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 			\esc_html( \number_format_i18n( $prpl_record['max_streak'] - $prpl_record['current_streak'] ) )
 		);
 	} else {
-		printf(
+		\printf(
 			\esc_html(
 				/* translators: %1$s: number of weeks for the maximum streak. */
 				\_n(

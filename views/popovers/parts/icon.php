@@ -5,7 +5,7 @@
  * @package Progress_Planner
  */
 
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 

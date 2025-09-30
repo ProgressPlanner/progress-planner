@@ -8,7 +8,7 @@
 use Progress_Planner\Badges\Monthly;
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 

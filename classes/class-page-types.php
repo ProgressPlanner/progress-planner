@@ -13,6 +13,13 @@ namespace Progress_Planner;
 class Page_Types {
 
 	/**
+	 * The page types.
+	 *
+	 * @var array
+	 */
+	public static $page_types = null;
+
+	/**
 	 * The taxonomy name.
 	 *
 	 * @var string
@@ -89,7 +96,7 @@ class Page_Types {
 	 * @return void
 	 */
 	public function maybe_update_terms() {
-		$updated = \progress_planner()->get_cache()->get( 'page_types_updated' );
+		$updated = \progress_planner()->get_utils__cache()->get( 'page_types_updated' );
 		if ( $updated ) {
 			return;
 		}
@@ -136,7 +143,7 @@ class Page_Types {
 			}
 		}
 
-		\progress_planner()->get_cache()->set( 'page_types_updated', true, \WEEK_IN_SECONDS );
+		\progress_planner()->get_utils__cache()->set( 'page_types_updated', true, \WEEK_IN_SECONDS );
 	}
 
 	/**
@@ -145,9 +152,8 @@ class Page_Types {
 	 * @return array
 	 */
 	public function get_page_types() {
-		static $page_types;
-		if ( null !== $page_types ) {
-			return $page_types;
+		if ( null !== static::$page_types ) {
+			return static::$page_types;
 		}
 
 		$terms = \get_terms(
@@ -158,13 +164,13 @@ class Page_Types {
 		);
 
 		if ( ! $terms || \is_wp_error( $terms ) ) {
-			$page_types = [];
-			return $page_types;
+			static::$page_types = [];
+			return static::$page_types;
 		}
 
-		$page_types = [];
+		static::$page_types = [];
 		foreach ( $terms as $term ) {
-			$page_types[] = [
+			static::$page_types[] = [
 				'id'          => $term->term_id,
 				'slug'        => $term->slug,
 				'title'       => $term->name,
@@ -172,7 +178,7 @@ class Page_Types {
 			];
 		}
 
-		return $page_types;
+		return static::$page_types;
 	}
 
 	/**
@@ -257,7 +263,6 @@ class Page_Types {
 	public function get_default_page_type( $post_type, $post_id ) {
 		// Post-type checks.
 		switch ( $post_type ) {
-
 			// Products from WooCommerce & EDD.
 			case 'product':
 			case 'download':
@@ -291,7 +296,6 @@ class Page_Types {
 	 * @return int
 	 */
 	public function get_default_page_id_by_type( $page_type ) {
-
 		$homepage_id = \get_option( 'page_on_front' ) ?? 0;
 
 		// Early return for the homepage.
@@ -301,18 +305,18 @@ class Page_Types {
 
 		$types_pages = [
 			'homepage' => [ $homepage_id ],
-			'contact'  => $this->get_posts_by_title( __( 'Contact', 'progress-planner' ) ),
-			'about'    => $this->get_posts_by_title( __( 'About', 'progress-planner' ) ),
-			'faq'      => array_merge(
-				$this->get_posts_by_title( __( 'FAQ', 'progress-planner' ) ),
-				$this->get_posts_by_title( __( 'Frequently Asked Questions', 'progress-planner' ) ),
+			'contact'  => $this->get_posts_by_title( \__( 'Contact', 'progress-planner' ) ),
+			'about'    => $this->get_posts_by_title( \__( 'About', 'progress-planner' ) ),
+			'faq'      => \array_merge(
+				$this->get_posts_by_title( \__( 'FAQ', 'progress-planner' ) ),
+				$this->get_posts_by_title( \__( 'Frequently Asked Questions', 'progress-planner' ) ),
 			),
 		];
 
-		$defined_page_types = array_keys( $types_pages );
+		$defined_page_types = \array_keys( $types_pages );
 
 		// If the page type is not among defined page types, return 0.
-		if ( ! in_array( $page_type, $defined_page_types, true ) ) {
+		if ( ! \in_array( $page_type, $defined_page_types, true ) ) {
 			return 0;
 		}
 
@@ -326,7 +330,6 @@ class Page_Types {
 
 		// Exclude the homepage and any pages that are already assigned to another page-type.
 		foreach ( $defined_page_types as $defined_page_type ) {
-
 			// Skip the current page-type.
 			if ( $page_type === $defined_page_type ) {
 				continue;
@@ -359,7 +362,7 @@ class Page_Types {
 		$posts = $this->get_posts_by_type( 'page', 'homepage' );
 		$term  = \get_term_by( 'slug', 'homepage', self::TAXONOMY_NAME );
 
-		if ( ! $term || ! $term instanceof \WP_Term ) {
+		if ( ! $term ) {
 			return;
 		}
 
@@ -386,14 +389,14 @@ class Page_Types {
 	 *
 	 * Runs on post_updated hook.
 	 *
-	 * @param int      $post_id The post ID.
-	 * @param \WP_Post $post    The post object.
+	 * @param int           $post_id The post ID.
+	 * @param \WP_Post|null $post    The post object.
 	 *
 	 * @return void
 	 */
 	public function post_updated( $post_id, $post ) {
 		// Check if the post is set as a homepage.
-		if ( 'page' !== $post->post_type || 'publish' !== $post->post_status ) {
+		if ( ! $post || 'page' !== $post->post_type || 'publish' !== $post->post_status ) {
 			return;
 		}
 
@@ -473,7 +476,7 @@ class Page_Types {
 		if ( ! $term ) {
 			return false;
 		}
-		return '' !== get_term_meta( $term->term_id, '_progress_planner_no_page', true ) ? false : true;
+		return '' !== \get_term_meta( $term->term_id, '_progress_planner_no_page', true ) ? false : true;
 	}
 
 	/**
@@ -506,16 +509,26 @@ class Page_Types {
 	 */
 	private function get_posts_by_title( $title ) {
 		global $wpdb;
+		// Check if we have a cached result.
+		$cache_key   = 'pp_posts_by_title_' . \sanitize_title( $title );
+		$cache_group = \Progress_Planner\Activities\Query::CACHE_GROUP;
+		$posts_ids   = \wp_cache_get( $cache_key, $cache_group );
+		if ( false !== $posts_ids ) {
+			return $posts_ids;
+		}
+
+		// Cache the query.
 		$posts     = $wpdb->get_results( // phpcs:ignore WordPress.DB.DirectDatabaseQuery
 			$wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts WHERE post_title LIKE %s",
+				"SELECT ID FROM $wpdb->posts WHERE post_type = 'page' AND post_status != 'trash' AND post_title LIKE %s", // @phpstan-ignore-line property.nonObject
 				'%' . $wpdb->esc_like( $title ) . '%'
 			)
 		);
 		$posts_ids = [];
 		foreach ( $posts as $post ) {
-			$posts_ids[] = (int) $post->ID;
+			$posts_ids[] = (int) $post->ID; // @phpstan-ignore-line property.nonObject
 		}
+		\wp_cache_set( $cache_key, $posts_ids, $cache_group );
 		return $posts_ids;
 	}
 }

@@ -7,39 +7,10 @@
 
 namespace Progress_Planner\Tests;
 
-use Progress_Planner\Suggested_Tasks;
-use Progress_Planner\Suggested_Tasks\Remote_Tasks;
-
 /**
- * Suggested_Tasks test case.
+ * CPT_Recommendations test case.
  */
-class Suggested_Tasks_Test extends \WP_UnitTestCase {
-
-	/**
-	 * Suggested_Tasks object.
-	 *
-	 * @var Suggested_Tasks
-	 */
-	protected $suggested_tasks;
-
-	/**
-	 * Setup the test case.
-	 *
-	 * @return void
-	 */
-	public function set_up() {
-		$this->suggested_tasks = \progress_planner()->get_suggested_tasks();
-	}
-
-	/**
-	 * Test the get_api method.
-	 *
-	 * @return void
-	 */
-	public function test_get_remote_tasks() {
-		$remote_tasks = $this->suggested_tasks->get_remote();
-		$this->assertInstanceOf( Remote_Tasks::class, $remote_tasks );
-	}
+class CPT_Recommendations_Test extends \WP_UnitTestCase {
 
 	/**
 	 * Test the task_cleanup method.
@@ -49,29 +20,86 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 	public function test_task_cleanup() {
 		// Tasks that should not be removed.
 		$tasks_to_keep = [
-			'remote-task-1234',
-			'post_id/14|provider_id/review-post',
-			'date/' . \gmdate( 'YW' ) . '|long/0|provider_id/create-post',
-			'update-core-' . \gmdate( 'YW' ),
-			'settings-saved-' . \gmdate( 'YW' ),
+			[
+				'post_title'  => 'review-post-14-' . \gmdate( 'YW' ),
+				'task_id'     => 'review-post-14-' . \gmdate( 'YW' ),
+				'date'        => \gmdate( 'YW' ),
+				'category'    => 'content-update',
+				'provider_id' => 'review-post',
+			],
+			[
+				'post_title'  => 'create-post-' . \gmdate( 'YW' ),
+				'task_id'     => 'create-post-' . \gmdate( 'YW' ),
+				'date'        => \gmdate( 'YW' ),
+				'category'    => 'content-new',
+				'provider_id' => 'create-post',
+			],
+			[
+				'post_title'  => 'update-core-' . \gmdate( 'YW' ),
+				'task_id'     => 'update-core-' . \gmdate( 'YW' ),
+				'date'        => \gmdate( 'YW' ),
+				'category'    => 'maintenance',
+				'provider_id' => 'update-core',
+			],
+			[
+				'post_title'  => 'settings-saved-' . \gmdate( 'YW' ),
+				'task_id'     => 'settings-saved-' . \gmdate( 'YW' ),
+				'date'        => \gmdate( 'YW' ),
+				'provider_id' => 'settings-saved',
+				'category'    => 'configuration',
+			],
+
+			// Not repetitive task, but with past date.
+			[
+				'post_title'  => 'settings-saved-202451',
+				'task_id'     => 'settings-saved-202451',
+				'date'        => '202451',
+				'provider_id' => 'settings-saved',
+				'category'    => 'configuration',
+			],
+
+			// User task, with past date.
+			[
+				'post_title'  => 'user-task-1',
+				'task_id'     => 'user-task-1',
+				'provider_id' => 'user',
+				'category'    => 'user',
+				'date'        => '202451',
+			],
 		];
 
-		foreach ( $tasks_to_keep as $task_id ) {
-			$this->suggested_tasks->get_local()->add_pending_task( $task_id );
+		foreach ( $tasks_to_keep as $task ) {
+			\progress_planner()->get_suggested_tasks_db()->add( $task );
 		}
 
 		// Tasks that should be removed.
 		$tasks_to_remove = [
-			'update-core-202451',
-			'settings-saved-202451',
+
+			// Repetitive task with past date.
+			[
+				'post_title'  => 'update-core-202451',
+				'task_id'     => 'update-core-202451',
+				'date'        => '202451',
+				'category'    => 'maintenance',
+				'provider_id' => 'update-core',
+			],
+
+			// Task with invalid provider.
+			[
+				'post_title'  => 'invalid-task-1',
+				'task_id'     => 'invalid-task-1',
+				'date'        => '202451',
+				'category'    => 'invalid-category',
+				'provider_id' => 'invalid-provider',
+			],
 		];
 
-		foreach ( $tasks_to_remove as $task_id ) {
-			$this->suggested_tasks->get_local()->add_pending_task( $task_id );
+		foreach ( $tasks_to_remove as $task ) {
+			\progress_planner()->get_suggested_tasks_db()->add( $task );
 		}
 
-		$this->suggested_tasks->get_local()->cleanup_pending_tasks();
-
-		$this->assertEquals( count( $tasks_to_keep ), \count( \progress_planner()->get_settings()->get( 'local_tasks', [] ) ) );
+		\progress_planner()->get_suggested_tasks()->get_tasks_manager()->cleanup_pending_tasks();
+		\wp_cache_flush_group( \Progress_Planner\Suggested_Tasks_DB::GET_TASKS_CACHE_GROUP ); // Clear the cache.
+		$this->assertEquals( \count( $tasks_to_keep ), \count( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] ) ) );
 	}
 }

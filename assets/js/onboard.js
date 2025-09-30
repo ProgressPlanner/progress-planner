@@ -1,10 +1,10 @@
-/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerTriggerScan, prplOnboardRedirect, prplOnboardTasks */
+/* global progressPlanner, progressPlannerAjaxRequest, prplOnboardTasks */
 /*
  * Onboard
  *
  * A script to handle the onboarding process.
  *
- * Dependencies: progress-planner-ajax-request, progress-planner-scan-posts, progress-planner-upgrade-tasks
+ * Dependencies: progress-planner/ajax-request, progress-planner/upgrade-tasks
  */
 
 /**
@@ -13,7 +13,6 @@
  * @param {string} licenseKey The license key.
  */
 const progressPlannerSaveLicenseKey = ( licenseKey ) => {
-	// eslint-disable-next-line no-console
 	console.log( 'License key: ' + licenseKey );
 	progressPlannerAjaxRequest( {
 		url: progressPlanner.ajaxUrl,
@@ -50,20 +49,18 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 			// Make a local request to save the response data.
 			progressPlannerSaveLicenseKey( response.license_key );
 
-			// Start scanning posts.
-			const scanPromise = progressPlannerTriggerScan();
-
 			// Start the tasks.
 			const tasksPromise = prplOnboardTasks();
 
 			// Wait for all promises to resolve.
-			Promise.all( [ scanPromise, tasksPromise ] ).then( () => {
-				// All promises resolved, redirect to the next step.
-				prplOnboardRedirect();
+			Promise.all( [ tasksPromise ] ).then( () => {
+				// All promises resolved, enable the continue button.
+				document
+					.getElementById( 'prpl-onboarding-continue-button' )
+					.classList.remove( 'prpl-disabled' );
 			} );
 		} )
 		.catch( ( error ) => {
-			// eslint-disable-next-line no-console
 			console.warn( error );
 		} );
 };

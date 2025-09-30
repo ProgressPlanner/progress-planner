@@ -12,32 +12,6 @@
 
 	--prpl-container-max-width: calc(var(--prpl-column-min-width) * var(--prpl-max-columns) + var(--prpl-gap) * (var(--prpl-max-columns) - 1) + var(--prpl-column-min-width));
 
-	--prpl-color-gray-1: #e1e3e7;
-	--prpl-color-gray-2: #d1d5db;
-	--prpl-color-gray-3: #9ca3af;
-	--prpl-color-gray-4: #6b7280;
-	--prpl-color-gray-5: #4b5563;
-	--prpl-color-gray-6: #374151;
-
-	--prpl-color-accent-red: #f43f5e;
-	--prpl-color-accent-orange: #faa310;
-	--prpl-color-400-orange: #f9b23c;
-	--prpl-color-accent-purple: #0d6b9e;
-	--prpl-color-accent-green: #14b8a6;
-
-	--prpl-color-headings: #38296d;
-	--prpl-color-text: var(--prpl-color-gray-5);
-	--prpl-color-link: #1e40af;
-
-	--prpl-color-notification-green: #16a34a;
-	--prpl-color-notification-red: #e73136;
-
-	--prpl-background-orange: #fff9f0;
-	--prpl-background-purple: #f6f5fb;
-	--prpl-background-green: #f2faf9;
-	--prpl-background-red: #fff6f7;
-	--prpl-background-blue: #effbfe;
-
 	--prpl-font-size-xs: 0.75rem;     /* 12px */
 	--prpl-font-size-small: 0.875rem; /* 14px */
 	--prpl-font-size-base: 1rem;      /* 16px */
@@ -51,18 +25,39 @@
 }
 
 /*------------------------------------*\
+	Progress Planner dashboard page.
+\*------------------------------------*/
+/* stylelint-disable-next-line selector-class-pattern */
+body.toplevel_page_progress-planner {
+
+	#wpwrap {
+		background-color: var(--prpl-background);
+	}
+
+	ul#adminmenu {
+
+		a.wp-has-current-submenu,
+		>li.current > a.current {
+
+			&::after {
+				border-right-color: var(--prpl-background) !important;
+			}
+		}
+	}
+}
+
+/*------------------------------------*\
 	Styles for the container of the page.
 \*------------------------------------*/
 .prpl-wrap {
-	background: #fff;
-	border: 1px solid var(--prpl-color-gray-2);
 	border-radius: var(--prpl-border-radius);
-	padding: calc(var(--prpl-padding) * 2);
+	padding: var(--prpl-settings-page-gap) var(--prpl-padding);
 	max-width: var(--prpl-container-max-width);
 	color: var(--prpl-color-text);
 	font-size: var(--prpl-font-size-base);
 	line-height: 1.4;
 	position: relative;
+	margin-top: var(--prpl-padding);
 }
 
 /*------------------------------------*\
@@ -79,7 +74,8 @@
 }
 
 .prpl-wrap h2 + p {
-	margin-top: 0.5em;
+	margin-top: 0.75rem;
+	margin-bottom: 0.75rem;
 }
 
 .prpl-wrap h1,
@@ -93,6 +89,24 @@
 
 .prpl-wrap a {
 	color: var(--prpl-color-link);
+}
+
+.prpl-wrap input[type="checkbox"] {
+	border-color: var(--prpl-color-selection-controls-inactive);
+}
+
+.prpl-wrap select {
+	border-color: var(--prpl-color-field-border);
+
+	/* box-shadow: 1px 2px 4px 0 var(--prpl-color-field-shadow); */
+}
+
+.prpl-widget-width-2 {
+	grid-column: span 2;
+
+	.prpl-widget-description {
+		max-width: 640px;
+	}
 }
 
 .prpl-widget-title {
@@ -116,32 +130,26 @@
 
 			&:hover {
 				border-radius: 50%;
-				background-color: var(--prpl-color-gray-4);
 
-				&::before {
-					content: "";
-					position: absolute;
-					top: 0;
-					left: 0;
-					width: 100%;
-					height: 100%;
-					border: 2px solid var(--prpl-color-gray-4);
-					border-radius: 50%;
-					box-sizing: border-box;
-				}
+				color: var(--prpl-color-ui-icon-hover);
+				border-color: var(--prpl-color-ui-icon-hover);
+				background-color: var(--prpl-color-ui-icon-hover-fill);
 
 				svg path {
-					fill: #fff;
+					fill: var(--prpl-color-ui-icon-hover);
 				}
 			}
 		}
 	}
-
-
 }
 
 .prpl-hidden {
 	display: none !important;
+}
+
+.prpl-disabled {
+	opacity: 0.5;
+	pointer-events: none;
 }
 
 /*------------------------------------*\
@@ -150,17 +158,21 @@
 button.prpl-info-icon {
 	background: none;
 	border: none;
-	color: var(--prpl-color-gray-4);
+	color: var(--prpl-color-ui-icon);
 	cursor: pointer;
 	font-size: var(--prpl-font-size-xs);
 	padding: 0;
+
+	svg path {
+		fill: var(--prpl-color-ui-icon);
+	}
 }
 
 /*------------------------------------*\
 	Header & logo.
 \*------------------------------------*/
 .prpl-header {
-	margin-bottom: 2em;
+	margin-bottom: 2rem;
 	display: flex;
 	flex-wrap: wrap;
 	justify-content: space-between;
@@ -168,7 +180,7 @@ button.prpl-info-icon {
 }
 
 .prpl-header-logo svg {
-	height: 100px;
+	height: 88px;
 }
 
 .prpl-header-right {
@@ -184,8 +196,9 @@ button.prpl-info-icon {
 		justify-content: center;
 		padding: 0.4em;
 
-		/* color: var(--prpl-color-gray-2); */
-		border: 1px solid var(--prpl-color-gray-2);
+		/* color: var(--prpl-color-border); */
+		background-color: #fff;
+		border: 1px solid var(--prpl-color-ui-icon);
 		border-radius: var(--prpl-border-radius);
 
 		svg {
@@ -198,9 +211,9 @@ button.prpl-info-icon {
 		}
 
 		&:hover {
-			color: var(--prpl-color-link);
-			border-color: var(--prpl-color-link);
-			background-color: var(--prpl-background-blue);
+			color: var(--prpl-color-ui-icon-hover);
+			border-color: var(--prpl-color-ui-icon-hover);
+			background-color: var(--prpl-color-ui-icon-hover-fill);
 		}
 	}
 }
@@ -213,6 +226,7 @@ button.prpl-info-icon {
 	grid-template-columns: repeat(auto-fit, minmax(var(--prpl-column-min-width), 1fr));
 	column-gap: var(--prpl-gap);
 	grid-auto-rows: var(--prpl-gap);
+	grid-auto-flow: dense;
 
 	img {
 		max-width: 100%;
@@ -229,7 +243,8 @@ button.prpl-info-icon {
 	Generic styles for individual widgets.
 \*------------------------------------*/
 .prpl-widget-wrapper {
-	border: 1px solid var(--prpl-color-gray-2);
+	background-color: var(--prpl-background-paper);
+	border: 1px solid var(--prpl-color-border);
 	border-radius: var(--prpl-border-radius);
 	padding: var(--prpl-padding);
 	min-width: 0;
@@ -240,6 +255,12 @@ button.prpl-info-icon {
 	hr {
 		margin-top: 1.25rem;
 		margin-bottom: 1.25rem;
+		border-top-color: var(--prpl-color-border);
+	}
+
+	/* Force the last column to be the last column. */
+	&[data-force-last-column="1"] {
+		grid-column: -2 / -1;
 	}
 }
 
@@ -275,7 +296,6 @@ button.prpl-info-icon {
 	}
 }
 
-
 /*------------------------------------*\
   Buttons
 \*------------------------------------*/
@@ -285,7 +305,8 @@ button.prpl-info-icon {
 .prpl-wrap button.prpl-button-primary,
 .prpl-wrap button.prpl-button-secondary,
 .prpl-wrap a.prpl-button-primary,
-.prpl-wrap a.prpl-button-secondary {
+.prpl-wrap a.prpl-button-secondary,
+#progress_planner_dashboard_widget_score a.prpl-button-primary { /* To be used in WP Dashboard widget */
 	display: block;
 	margin: 1rem 0;
 	padding: 0.75rem 1.25rem;
@@ -293,7 +314,7 @@ button.prpl-info-icon {
 	text-decoration: none;
 	cursor: pointer;
 	font-size: var(--prpl-font-size-base);
-	background: var(--prpl-color-accent-red);
+	background: var(--prpl-color-button-primary);
 	line-height: 1.25;
 	box-shadow: none;
 	border: none;
@@ -310,7 +331,7 @@ button.prpl-info-icon {
 		display: block;
 		width: 100%;
 		height: 100%;
-		background: var(--prpl-color-accent-red);
+		background: var(--prpl-color-button-primary);
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -319,12 +340,17 @@ button.prpl-info-icon {
 		transition: all 0.25s ease-in-out;
 	}
 
-	&:hover,
-	&:focus {
-		background: #cf2441;
+	&:disabled {
+		opacity: 0.5;
+		pointer-events: none;
+	}
+
+	&:not([disabled]):hover,
+	&:not([disabled]):focus {
+		background: var(--prpl-color-button-primary-hover);
 
 		&::after {
-			background: #cf2441;
+			background: var(--prpl-color-button-primary-hover);
 			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
 			width: calc(100% + 4px);
 			height: calc(100% + 4px);
@@ -335,12 +361,12 @@ button.prpl-info-icon {
 
 .prpl-wrap input.prpl-button-secondary,
 .prpl-wrap button.prpl-button-secondary {
-	background: var(--prpl-color-gray-3);
+	background: var(--prpl-color-selection-controls-inactive);
 
-	&:hover,
-	&:focus {
-		background: var(--prpl-color-gray-4);
-		box-shadow: 3px 3px 10px var(--prpl-color-gray-4);
+	&:not([disabled]):hover,
+	&:not([disabled]):focus {
+		background: var(--prpl-color-ui-icon);
+		box-shadow: 3px 3px 10px var(--prpl-color-ui-icon);
 	}
 }
 
@@ -355,15 +381,15 @@ button.prpl-info-icon {
 .prpl-wrap input[type="tel"],
 .prpl-wrap input[type="search"] {
 	height: 40px;
-	box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.25);
+	box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.05);
 }
 
 /*------------------------------------*\
 	Popovers generic styles.
 \*------------------------------------*/
 .prpl-popover {
-	background: #fff;
-	border: 1px solid var(--prpl-color-gray-3);
+	background: var(--prpl-background-paper);
+	border: 1px solid var(--prpl-color-border);
 	border-radius: var(--prpl-border-radius);
 	padding: var(--prpl-padding);
 	font-weight: 400;
@@ -391,11 +417,11 @@ button.prpl-info-icon {
 	cursor: pointer;
 	background: none;
 	border: none;
-	color: var(--prpl-color-gray-4);
+	color: var(--prpl-color-text);
 
 	&:hover,
 	&:focus {
-		color: var(--prpl-color-gray-6);
+		color: var(--prpl-color-text-hover);
 	}
 }
 
@@ -408,16 +434,22 @@ button.prpl-info-icon {
 	.prpl-welcome .inner-content .right {
 		display: none !important;
 	}
+
+	.prpl-widget-width-2 {
+		grid-column: span 1;
+	}
 }
 
 /*------------------------------------*\
 	Settings popover.
 \*------------------------------------*/
-#prpl-settings-license-form,
-#prpl-settings-form {
+#prpl-settings-license-form {
 
 	label {
-		display: block;
+		display: grid;
+		grid-template-columns: 1fr 3fr;
+		margin-bottom: 0.5em;
+		gap: var(--prpl-padding);
 	}
 
 	p {
@@ -434,7 +466,7 @@ button.prpl-info-icon {
 }
 
 .driver-popover.prpl-driverjs-theme {
-	background-color: var(--prpl-background-orange);
+	background-color: var(--prpl-background-monthly);
 	color: var(--prpl-color-text);
 
 	.driver-popover-title {
@@ -446,77 +478,59 @@ button.prpl-info-icon {
 	}
 
 	button:not(.driver-popover-close-btn):hover {
-		background-color: var(--prpl-background-orange);
+		background-color: var(--prpl-background-monthly);
 	}
 }
-
-#prpl-settings-license-form {
-
-	label {
-		display: grid;
-		grid-template-columns: 1fr 3fr;
-		margin-bottom: 0.5em;
-		gap: var(--prpl-padding);
-	}
-}
-
 
 /*------------------------------------*\
-	Tooltip.
+	External link accessibility helper.
 \*------------------------------------*/
-.tooltip-actions {
-	justify-content: flex-end;
-	gap: 0.5em;
-	display: flex;
-	position: relative;
+.prpl-external-link-icon {
+	display: inline-flex;
+	margin-inline-start: 0.25em;
+	vertical-align: middle;
+
+	svg {
+		width: 1em;
+		height: 1em;
+	}
 }
 
-.prpl-tooltip {
+/*------------------------------------*\
+	Layout for columns.
+\*------------------------------------*/
+.prpl-columns-wrapper {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: var(--prpl-padding);
+}
+
+/*------------------------------------*\
+	Loader.
+	See https://cssloaders.github.io/ for more.
+\*------------------------------------*/
+.prpl-loader {
+	width: 48px;
+	height: 48px;
+	border: 5px solid #fff;
+	border-bottom-color: transparent;
+	border-radius: 50%;
+	display: inline-block;
+	box-sizing: border-box;
+	animation: rotation 1s linear infinite;
+	z-index: 20;
 	position: absolute;
-	bottom: 0;
-	left: 100%;
-	transform: translate(-100%, calc(100% + 10px));
+	top: calc(50% - 24px);
+	left: calc(50% - 24px);
+}
 
-	padding: 0.75rem 1.5rem 0.75rem 0.75rem;
-	width: 150px;
-	background: var(--prpl-background-green);
-	border-radius: var(--prpl-border-radius);
-	z-index: 2; /* above the gauges */
-	visibility: hidden; /* hidden by default */
+@keyframes rotation {
 
-	font-size: 1rem;
-	font-weight: 400;
-	color: var(--prpl-color-text);
-
-	&[data-tooltip-visible] {
-		visibility: visible;
+	0% {
+		transform: rotate(0deg);
 	}
 
-	.close,
-	.prpl-tooltip-close {
-		position: absolute;
-		top: 0.75rem;
-		right: 0;
-		padding: 0.1rem;
-		line-height: 0;
-		margin: 0;
-		background: none;
-		border: none;
-		cursor: pointer;
-	}
-
-	/* Arrow */
-	&::after {
-		content: "";
-		position: absolute;
-		top: 0;
-		right: 0;
-		transform: translate(-10px, -10px) rotate(90deg);
-
-		width: 0;
-		height: 0;
-		border-style: solid;
-		border-width: 7.5px 10px 7.5px 0;
-		border-color: transparent var(--prpl-background-green) transparent transparent;
+	100% {
+		transform: rotate(360deg);
 	}
 }

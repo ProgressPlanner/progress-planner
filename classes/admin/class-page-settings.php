@@ -81,14 +81,14 @@ class Page_Settings {
 					$settings[ $page_type['slug'] ]['isset'] = 'yes';
 
 					// If there is more than one page, we need to check if the page has a parent with the same page-type assigned.
-					if ( 1 < count( $type_pages ) ) {
+					if ( 1 < \count( $type_pages ) ) {
 						$type_pages_ids = [];
 						foreach ( $type_pages as $type_page ) {
 							$type_pages_ids[] = (int) $type_page->ID;
 						}
 						foreach ( $type_pages as $type_page ) {
 							$parent = \get_post_field( 'post_parent', $type_page->ID );
-							if ( $parent && in_array( (int) $parent, $type_pages_ids, true ) ) {
+							if ( $parent && \in_array( (int) $parent, $type_pages_ids, true ) ) {
 								$settings[ $page_type['slug'] ]['value'] = $parent;
 								break;
 							}
@@ -132,7 +132,7 @@ class Page_Settings {
 		\check_admin_referer( 'progress_planner' );
 
 		if ( isset( $_POST['pages'] ) ) {
-			foreach ( wp_unslash( $_POST['pages'] ) as $type => $page_args ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			foreach ( \wp_unslash( $_POST['pages'] ) as $type => $page_args ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 				$need_page = \sanitize_text_field( \wp_unslash( $page_args['have_page'] ) );
 
@@ -171,9 +171,9 @@ class Page_Settings {
 		}
 
 		$this->save_settings();
-		$this->save_license();
+		$this->save_post_types();
 
-		do_action( 'progress_planner_settings_form_options_stored' );
+		\do_action( 'progress_planner_settings_form_options_stored' );
 
 		\wp_send_json_success( \esc_html__( 'Options stored successfully', 'progress-planner' ) );
 	}
@@ -184,112 +184,30 @@ class Page_Settings {
 	 * @return void
 	 */
 	public function save_settings() {
-		$redirect_on_login = isset( $_POST['prpl-redirect-on-login'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			? \sanitize_text_field( \wp_unslash( $_POST['prpl-redirect-on-login'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		// Check the nonce.
+		\check_admin_referer( 'progress_planner' );
+
+		$redirect_on_login = isset( $_POST['prpl-redirect-on-login'] )
+			? \sanitize_text_field( \wp_unslash( $_POST['prpl-redirect-on-login'] ) )
 			: false;
 
 		\update_user_meta( \get_current_user_id(), 'prpl_redirect_on_login', (bool) $redirect_on_login );
 	}
 
 	/**
-	 * Save the license key.
+	 * Save the post types.
 	 *
 	 * @return void
 	 */
-	public function save_license() {
-		$license = isset( $_POST['prpl-pro-license-key'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			? \sanitize_text_field( \wp_unslash( $_POST['prpl-pro-license-key'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			: '';
+	public function save_post_types() {
+		// Check the nonce.
+		\check_admin_referer( 'progress_planner' );
 
-		$previous = \get_option( 'progress_planner_pro_license_key' );
-		$is_new   = $previous !== $license;
+		$include_post_types = isset( $_POST['prpl-post-types-include'] )
+			? \array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			// If no post types are selected, use the default post types (post and page can be deregistered).
+			: \array_intersect( [ 'post', 'page' ], \progress_planner()->get_settings()->get_public_post_types() );
 
-		if ( ! $is_new ) {
-			return;
-		}
-
-		\update_option( 'progress_planner_pro_license_key', $license );
-		\update_option( 'progress_planner_pro_license_status', null );
-
-		// Do nothing if user just cleared the license.
-		if ( empty( $license ) ) {
-			return;
-		}
-
-		// Call the custom API.
-		$response = \wp_remote_post(
-			\progress_planner()->get_remote_server_root_url(),
-			[
-				'timeout'   => 15,
-				'sslverify' => false,
-				'body'      => [
-					'edd_action'  => 'activate_license',
-					'license'     => $license,
-					'item_id'     => 1136,
-					'item_name'   => rawurlencode( 'Progress Planner Pro' ),
-					'url'         => \home_url(),
-					'environment' => function_exists( 'wp_get_environment_type' ) ? \wp_get_environment_type() : 'production',
-				],
-			]
-		);
-
-		// Make sure the response came back okay.
-		if ( \is_wp_error( $response ) || 200 !== \wp_remote_retrieve_response_code( $response ) ) {
-			if ( \is_wp_error( $response ) ) {
-				\wp_send_json_error( $response->get_error_message() );
-			}
-			\wp_send_json_error( \esc_html__( 'An error occurred, please try again.', 'progress-planner' ) );
-		}
-		$license_data = \json_decode( \wp_remote_retrieve_body( $response ), true );
-		if ( ! $license_data || ! \is_array( $license_data ) ) {
-			\wp_send_json_error( \esc_html__( 'An error occurred, please try again.', 'progress-planner' ) );
-		}
-
-		\update_option( 'progress_planner_pro_license_status', $license_data['license'] );
-
-		if ( true === $license_data['success'] ) {
-			return;
-		}
-
-		if ( false !== $license_data['success'] ) {
-			\wp_send_json_error( \esc_html__( 'An error occurred, please try again.', 'progress-planner' ) );
-		}
-
-		if ( ! isset( $license_data['error'] ) ) {
-			\wp_send_json_error( \esc_html__( 'An error occurred, please try again.', 'progress-planner' ) );
-		}
-
-		// phpcs:disable PSR2.ControlStructures.SwitchDeclaration.TerminatingComment
-		switch ( $license_data['error'] ) {
-			case 'expired':
-				\wp_send_json_error( \esc_html__( 'Your license key has expired.', 'progress-planner' ) );
-
-			case 'disabled':
-			case 'revoked':
-				\wp_send_json_error( \esc_html__( 'Your license key has been disabled.', 'progress-planner' ) );
-
-			case 'missing':
-				\wp_send_json_error( \esc_html__( 'Invalid license.', 'progress-planner' ) );
-
-			case 'invalid':
-			case 'site_inactive':
-				\wp_send_json_error( \esc_html__( 'Your license is not active for this URL.', 'progress-planner' ) );
-
-			case 'item_name_mismatch':
-				\wp_send_json_error(
-					sprintf(
-						/* translators: the plugin name */
-						\esc_html__( 'This appears to be an invalid license key for %s.', 'progress-planner' ),
-						'Progress Planner Pro'
-					)
-				);
-
-			case 'no_activations_left':
-				\wp_send_json_error( \esc_html__( 'Your license key has reached its activation limit.', 'progress-planner' ) );
-
-			default:
-				\wp_send_json_error( \esc_html__( 'An error occurred, please try again.', 'progress-planner' ) );
-		}
-		// phpcs:enable
+		\progress_planner()->get_settings()->set( 'include_post_types', $include_post_types );
 	}
 }

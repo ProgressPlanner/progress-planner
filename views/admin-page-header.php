@@ -6,26 +6,15 @@
  */
 
 // Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
+if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
-
-// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$progress_planner_active_range = isset( $_GET['range'] ) ? \sanitize_text_field( \wp_unslash( $_GET['range'] ) ) : '-6 months';
-// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_text_field( \wp_unslash( $_GET['frequency'] ) ) : 'monthly';
 
 \do_action( 'progress_planner_admin_page_header_before' );
 ?>
 <div class="prpl-header">
 	<div class="prpl-header-logo">
-		<?php
-		if ( \progress_planner()->is_pro_site() ) {
-			\progress_planner()->the_asset( 'images/logo_progress_planner_pro.svg' );
-		} else {
-			\progress_planner()->the_asset( 'images/logo_progress_planner.svg' );
-		}
-		?>
+		<?php \progress_planner()->get_ui__branding()->the_logo(); ?>
 	</div>
 
 	<div class="prpl-header-right">
@@ -34,22 +23,15 @@ $progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_tex
 			<span class="screen-reader-text"><?php \esc_html_e( 'Start tour', 'progress-planner' ); ?>
 		</button>
 		<?php
-		// Render the settings button.
-		\progress_planner()->get_popover()->the_popover( 'settings' )->render_button(
-			'',
-			\progress_planner()->get_asset( 'images/icon_settings.svg' ) . '<span class="screen-reader-text">' . \esc_html__( 'Settings', 'progress-planner' ) . '</span>'
-		);
-		// Render the settings popover.
-		\progress_planner()->get_popover()->the_popover( 'settings' )->render();
 
 		// Render the subscribe form button and popover if the license key is not set.
 		if ( 'no-license' === \get_option( 'progress_planner_license_key', 'no-license' ) ) {
-			\progress_planner()->get_popover()->the_popover( 'subscribe-form' )->render_button(
+			\progress_planner()->get_ui__popover()->the_popover( 'subscribe-form' )->render_button(
 				'',
 				\progress_planner()->get_asset( 'images/register_icon.svg' ) . '<span class="screen-reader-text">' . \esc_html__( 'Subscribe', 'progress-planner' ) . '</span>'
 			);
 			// Render the subscribe form popover.
-			\progress_planner()->get_popover()->the_popover( 'subscribe-form' )->render();
+			\progress_planner()->get_ui__popover()->the_popover( 'subscribe-form' )->render();
 		}
 		?>
 		<div class="prpl-header-select-range">
@@ -65,10 +47,10 @@ $progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_tex
 					'-18 months' => \esc_html__( 'Activity over the past 18 months', 'progress-planner' ),
 					'-24 months' => \esc_html__( 'Activity over the past 24 months', 'progress-planner' ),
 				] as $progress_planner_range => $progress_planner_label ) {
-					printf(
+					\printf(
 						'<option value="%1$s" %2$s>%3$s</option>',
 						\esc_attr( $progress_planner_range ),
-						\selected( $progress_planner_active_range, $progress_planner_range, false ),
+						\selected( isset( $_GET['range'] ) ? \sanitize_text_field( \wp_unslash( $_GET['range'] ) ) : '-6 months', $progress_planner_range, false ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 						\esc_html( $progress_planner_label )
 					);
 				}
@@ -83,10 +65,10 @@ $progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_tex
 					'weekly'  => \esc_html__( 'Weekly', 'progress-planner' ),
 					'monthly' => \esc_html__( 'Monthly', 'progress-planner' ),
 				] as $progress_planner_frequency => $progress_planner_label ) {
-					printf(
+					\printf(
 						'<option value="%1$s" %2$s>%3$s</option>',
 						\esc_attr( $progress_planner_frequency ),
-						\selected( $progress_planner_active_frequency, $progress_planner_frequency, false ),
+						\selected( isset( $_GET['frequency'] ) ? \sanitize_text_field( \wp_unslash( $_GET['frequency'] ) ) : 'monthly', $progress_planner_frequency, false ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 						\esc_html( $progress_planner_label )
 					);
 				}

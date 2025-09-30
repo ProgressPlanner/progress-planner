@@ -1,0 +1,57 @@
+.prpl-widget-wrapper.prpl-content-activity {
+
+	table {
+		width: 100%;
+		margin-bottom: 1em;
+		border-spacing: 6px 0;
+	}
+
+	th,
+	td {
+		border: none;
+		padding: 0.5em;
+
+		&:not(:first-child) {
+			text-align: center;
+		}
+	}
+
+	th {
+		text-align: start;
+	}
+
+	tbody {
+
+		th {
+			font-weight: 400;
+		}
+
+		tr {
+
+			&:nth-child(odd) {
+				background-color: var(--prpl-background-table);
+			}
+		}
+	}
+
+	thead {
+
+		th,
+		td {
+			text-align: start;
+		}
+	}
+
+	tfoot {
+
+		th,
+		td {
+			text-align: start;
+			border-top: 1px solid var(--prpl-color-border);
+		}
+	}
+
+	tr:last-child td {
+		border-bottom: none;
+	}
+}

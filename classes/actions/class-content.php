@@ -27,7 +27,6 @@ class Content {
 	 * @return void
 	 */
 	public function register_hooks() {
-
 		// Add activity when a post is added or updated.
 		\add_action( 'wp_insert_post', [ $this, 'insert_post' ], 10, 3 );
 		\add_action( 'transition_post_status', [ $this, 'transition_post_status' ], 10, 3 );
@@ -55,11 +54,6 @@ class Content {
 
 		// Set the type of activity.
 		$type = $update ? 'update' : 'publish';
-
-		// Reset the words count if it's an update.
-		if ( 'update' === $type ) {
-			\progress_planner()->get_settings()->set( [ 'word_count', $post_id ], false );
-		}
 
 		// Bail if the post is not published.
 		if ( 'publish' !== $post->post_status ) {
@@ -123,9 +117,6 @@ class Content {
 		}
 
 		$this->add_post_activity( $post, 'trash' );
-
-		// Reset the words count.
-		\progress_planner()->get_settings()->set( [ 'word_count', $post_id ], false );
 	}
 
 	/**
@@ -147,9 +138,6 @@ class Content {
 		if ( $this->should_skip_saving( $post ) ) {
 			return;
 		}
-
-		// Reset the words count.
-		\progress_planner()->get_settings()->set( [ 'word_count', $post_id ], false );
 
 		// Add activity.
 		$activity           = new Activities_Content();
@@ -214,15 +202,12 @@ class Content {
 
 		// If it's an update add the start and end date. We don't want to add multiple update activities for the same post on the same day.
 		if ( 'update' === $type ) {
-			$query_args['start_date'] = \progress_planner()->get_date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '-12 hours' );
-			$query_args['end_date']   = \progress_planner()->get_date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '+12 hours' );
+			$query_args['start_date'] = \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '-12 hours' );
+			$query_args['end_date']   = \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '+12 hours' );
 		}
 
 		// Check if there is an activity for this post.
-		$existing = \progress_planner()->get_query()->query_activities(
-			$query_args,
-			'RAW'
-		);
+		$existing = \progress_planner()->get_activities__query()->query_activities_get_raw( $query_args );
 
 		// If there is an activity for this post, bail.
 		return ! empty( $existing ) ? true : false;
@@ -237,17 +222,15 @@ class Content {
 	 * @return void
 	 */
 	private function add_post_activity( $post, $type ) {
-
 		// Post was updated to publish for the first time, ie draft was published.
 		if ( 'update' === $type && 'publish' === $post->post_status ) {
 			// Check if there is a publish activity for this post.
-			$existing = \progress_planner()->get_query()->query_activities(
+			$existing = \progress_planner()->get_activities__query()->query_activities_get_raw(
 				[
 					'category' => 'content',
 					'type'     => 'publish',
 					'data_id'  => (string) $post->ID,
-				],
-				'RAW'
+				]
 			);
 
 			// If there is no publish activity for this post, add it.
@@ -259,41 +242,33 @@ class Content {
 
 		// Post was updated, but it was published previously.
 		if ( 'update' === $type ) {
-
 			// Check if there are any activities for this post, on this date.
-			$existing = \progress_planner()->get_query()->query_activities(
+			$existing = \progress_planner()->get_activities__query()->query_activities_get_raw(
 				[
 					'category'   => 'content',
 					'data_id'    => (string) $post->ID,
-					'start_date' => \progress_planner()->get_date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '-12 hours' ),
-					'end_date'   => \progress_planner()->get_date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '+12 hours' ),
-				],
-				'RAW'
+					'start_date' => \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '-12 hours' ),
+					'end_date'   => \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '+12 hours' ),
+				]
 			);
 
 			// If there are activities for this post, on this date, bail.
 			if ( ! empty( $existing ) ) {
-				// Reset the words count.
-				\progress_planner()->get_settings()->set( [ 'word_count', $post->ID ], false );
-
 				return;
 			}
 		}
 
-		$activity       = \progress_planner()->get_activities__content_helpers()->get_activity_from_post( $post );
-		$activity->type = $type;
+		$activity = \progress_planner()->get_activities__content_helpers()->get_activity_from_post( $post, $type );
 
 		// Update the badges.
 		if ( 'publish' === $type ) {
-
 			// Check if there is a publish activity for this post.
-			$existing = \progress_planner()->get_query()->query_activities(
+			$existing = \progress_planner()->get_activities__query()->query_activities_get_raw(
 				[
 					'category' => 'content',
 					'type'     => 'publish',
 					'data_id'  => (string) $post->ID,
-				],
-				'RAW'
+				]
 			);
 
 			// If there is no publish activity for this post, add it.
@@ -305,9 +280,11 @@ class Content {
 			}
 		}
 
-		$activity->save();
+		// We need to set the date explicitly since post_date & post_modified dates are not changed when the post is trashed.
+		if ( 'trash' === $type ) {
+			$activity->date = new \DateTime();
+		}
 
-		// Reset the words count.
-		\progress_planner()->get_settings()->set( [ 'word_count', $post->ID ], false );
+		$activity->save();
 	}
 }

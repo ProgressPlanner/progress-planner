@@ -2,7 +2,7 @@
 .progress-planner_page_progress-planner-settings {
 
 	#wpwrap {
-		background: #fff !important;
+		background-color: var(--prpl-background);
 	}
 
 	ul#adminmenu {
@@ -11,7 +11,7 @@
 		> li.current > a.current {
 
 			&::after {
-				border-right-color: #fff !important;
+				border-right-color: var(--prpl-background) !important;
 			}
 		}
 	}
@@ -21,21 +21,8 @@
 		h1 {
 			display: flex;
 			align-items: center;
-			gap: 0.5rem;
-			background: var(--prpl-background-orange);
 			padding: 1.2rem;
-			border-radius: 0.5rem;
 			margin-bottom: 2rem;
-
-			.icon {
-				width: 1.25em;
-				height: 1.25em;
-				color: var(--prpl-color-accent-orange);
-
-				svg path {
-					fill: currentcolor;
-				}
-			}
 
 			span {
 				font-weight: 600;
@@ -48,18 +35,32 @@
 				padding: var(--prpl-settings-page-gap) var(--prpl-settings-page-gap) 2rem var(--prpl-settings-page-gap);
 			}
 		}
+	}
 
+	.prpl-settings-form-wrap {
+		background-color: var(--prpl-background-paper);
 
+		border: 1px solid var(--prpl-color-border);
+		border-radius: var(--prpl-border-radius);
+		padding: var(--prpl-padding);
+		box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.07), -2px 0 6px rgba(0, 0, 0, 0.07);
+	}
+
+	.prpl-settings-section-wrapper {
+		border: 1px solid var(--prpl-color-border);
+		border-radius: var(--prpl-border-radius);
+		padding: var(--prpl-padding);
+		flex-grow: 1;
 	}
 
 	.prpl-settings-section-title {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		background: var(--prpl-background-purple);
+		background: var(--prpl-background-monthly);
 		padding: 1.2rem;
 		border-radius: 0.5rem;
-		margin-bottom: var(--prpl-settings-page-gap);
+		margin-bottom: var(--prpl-padding);
 
 		&:first-child {
 			margin-top: 0;
@@ -72,7 +73,7 @@
 	}
 
 	.prpl-pages-item {
-		border: 1px solid var(--prpl-color-gray-2);
+		border: 1px solid var(--prpl-color-border);
 		border-radius: var(--prpl-border-radius);
 		padding: var(--prpl-padding);
 		flex-grow: 1;
@@ -107,7 +108,6 @@
 				}
 			}
 		}
-
 
 		.item-actions,
 		.prpl-select-page {
@@ -173,6 +173,21 @@
 		}
 	}
 
+	.prpl-column-pages {
+		margin-bottom: var(--prpl-gap);
+
+		.prpl-settings-section-title {
+			background: var(--prpl-background-setting-pages);
+
+			.icon {
+
+				path {
+					fill: var(--prpl-color-setting-pages-icon);
+				}
+			}
+		}
+	}
+
 	.prpl-pages-list {
 		display: flex;
 		flex-wrap: wrap;
@@ -199,7 +214,7 @@
 	.prpl-button {
 		color: var(--prpl-color-gray-7);
 		text-decoration: none;
-		border: 1px solid var(--prpl-color-gray-2);
+		border: 1px solid var(--prpl-color-border);
 		border-radius: var(--prpl-border-radius);
 		padding: 0.5em 0.5em;
 		font-size: 14px; /* It matches <select> font size, which comes from Core */
@@ -209,7 +224,7 @@
 		&:focus {
 			color: var(--prpl-color-link);
 			border-color: var(--prpl-color-link);
-			background-color: var(--prpl-background-blue);
+			background-color: var(--prpl-background-content-badge);
 		}
 	}
 
@@ -219,29 +234,117 @@
 	}
 }
 
-.prpl-license-keys-wrapper {
-	display: flex;
-	flex-direction: column;
-	gap: 1rem;
+/* Post types */
+.prpl-column-post-types {
 
-	.prpl-license-key-wrapper {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
+	.prpl-settings-section-title {
 
-		.prpl-license-status {
-			width: 1rem;
-			height: 1rem;
+		svg {
+			color: var(--prpl-color-setting-posts-icon);
 
-			svg {
-				width: 1rem;
-				height: 1rem;
+			path {
+				fill: currentcolor;
 			}
+		}
+
+		background-color: var(--prpl-background-setting-posts);
+	}
+
+}
+
+/* Login destination */
+.prpl-column-login-destination {
+
+	.prpl-settings-section-title {
+
+		svg {
+			color: var(--prpl-color-setting-login-icon);
+		}
+
+		background-color: var(--prpl-background-setting-login);
+	}
+
+}
+
+/* Grid layout for wrapper for:
+- Valuable post types
+- Default login destination
+- License keys
+*/
+#prpl-grid-column-wrapper {
+	display: grid;
+	margin-bottom: var(--prpl-gap);
+
+	/* There are 5 or less valuable post types */
+	grid-template-columns: 1fr 1fr;
+	grid-template-rows: auto auto;
+	gap: var(--prpl-settings-page-gap);
+
+	.prpl-column {
+		align-self: stretch;
+		display: flex;
+		flex-direction: column;
+
+		.prpl-widget-wrapper {
+			flex: 1;
+			margin-bottom: 0;
 		}
 	}
 
-	input {
-		width: 20rem;
-		max-width: calc(100% - 2rem);
+	/* Valuable post types */
+	.prpl-column:nth-child(1) {
+		grid-column: 1;
+		grid-row: 1;
+	}
+
+	/* Default login destination */
+	.prpl-column:nth-child(2) {
+		grid-column: 2;
+		grid-row: 1;
+	}
+
+	/* License keys */
+	.prpl-column:nth-child(3) {
+		grid-column: 1 / span 2;
+		grid-row: 2;
+	}
+
+	/* We have more than 5 valuable post types */
+	&:has([data-has-many-valuable-post-types]) {
+		grid-template-rows: auto auto;
+
+		/* Valuable post types */
+		.prpl-column:nth-child(1) {
+			grid-column: 1;
+			grid-row: 1 / span 2;
+
+			/* Span 2 rows on the left */
+		}
+
+		/* Default login destination */
+		.prpl-column:nth-child(2) {
+			grid-column: 2;
+			grid-row: 1;
+		}
+
+		/* License keys */
+		.prpl-column:nth-child(3) {
+			grid-column: 2;
+			grid-row: 2;
+		}
+	}
+}
+
+/* Valuable post types */
+#prpl-post-types-include-wrapper {
+	padding-top: 0.75rem;
+
+	label {
+		display: block;
+		margin-top: 0.75rem;
+
+		&:first-child {
+			margin-top: 0;
+		}
 	}
 }

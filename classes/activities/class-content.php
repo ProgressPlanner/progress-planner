@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Activities;
 
-use Progress_Planner\Activity;
-
 /**
  * Handler for content activities.
  */
@@ -21,21 +19,15 @@ class Content extends Activity {
 	 */
 	public $category = 'content';
 
-
 	/**
 	 * Points configuration for content activities.
 	 *
 	 * @var array
 	 */
 	public static $points_config = [
-		'publish'          => 50,
-		'update'           => 10,
-		'delete'           => 5,
-		'word-multipliers' => [
-			100  => 1.1,
-			350  => 1.25,
-			1000 => 0.8,
-		],
+		'publish' => 50,
+		'update'  => 10,
+		'delete'  => 5,
 	];
 
 	/**
@@ -61,7 +53,7 @@ class Content extends Activity {
 		}
 
 		// Get the number of days between the activity date and the given date.
-		$days = absint( \progress_planner()->get_date()->get_days_between_dates( $date, $this->date ) );
+		$days = \absint( \progress_planner()->get_utils__date()->get_days_between_dates( $date, $this->date ) );
 
 		// Maximum range for awarded points is 30 days.
 		if ( $days >= 30 ) {
@@ -79,8 +71,8 @@ class Content extends Activity {
 
 		// Calculate the points based on the age of the activity.
 		$this->points[ $date_ymd ] = ( $days < 7 )
-			? round( $this->points[ $date_ymd ] ) // If the activity is new (less than 7 days old), award full points.
-			: round( $this->points[ $date_ymd ] * max( 0, ( 1 - $days / 30 ) ) ); // Decay the points based on the age of the activity.
+			? \round( $this->points[ $date_ymd ] ) // If the activity is new (less than 7 days old), award full points.
+			: \round( $this->points[ $date_ymd ] * \max( 0, ( 1 - $days / 30 ) ) ); // Decay the points based on the age of the activity.
 
 		return (int) $this->points[ $date_ymd ];
 	}
@@ -95,25 +87,7 @@ class Content extends Activity {
 		if ( isset( self::$points_config[ $this->type ] ) ) {
 			$points = self::$points_config[ $this->type ];
 		}
-		$post = $this->get_post();
 
-		if ( ! $post ) {
-			return 0;
-		}
-
-		// Modify the score based on the words count.
-		$words       = \progress_planner()->get_activities__content_helpers()->get_word_count( $post->post_content, $post->ID );
-		$multipliers = self::$points_config['word-multipliers'];
-		if ( $words > 1000 ) {
-			return (int) ( $points * $multipliers[1000] );
-		}
-		if ( $words > 350 ) {
-			return (int) ( $points * $multipliers[350] );
-		}
-		if ( $words > 100 ) {
-			return (int) ( $points * $multipliers[100] );
-		}
-
-		return (int) $points;
+		return $this->get_post() ? $points : 0;
 	}
 }

@@ -1,10 +1,230 @@
+= 1.9.0 =
+
+Enhancements:
+
+* Add "Show all Recommendations" button to the "Ravi's Recommendations" widget
+
+Bugs we fixed:
+
+* Fix missing content and streak badges after they are all completed.
+
+
+= 1.8.0 =
+
+Enhancements:
+
+* Redesign of the admin pages.
+* Improved capability checks.
+* a11y improvements.
+
+Added these recommendations from Ravi:
+
+* Set date format.
+
+Bugs we fixed:
+
+* Fix redirecting to Progress Planner Dashboard after login.
+
+= 1.7.2 =
+
+* Backported some features from the Progress Planner Pro plugin.
+
+= 1.7.1 =
+
+Bugs we fixed:
+
+* Fix weird interactive task popover behaviour on small screens
+* Fix missing pages (page types) from the Settings screen
+* Clear WP API model schema cache in session storage
+* Make interactive tasks work on WP dashboard screen
+* Exclude taxonomies which are marked as not indexable in Yoast SEO
+* Improve completed task check for "Unpublished content" task
+* Remove awarded point if the golden todo task is set back to pending status
+* Fix "Delete the 'Sample Page' page" interactive task
+* Remove 3rd party plugin tasks if they are deactivated.
+
+= 1.7.0 =
+
+Added these recommendations from Ravi:
+* Select site timezone.
+* Select site locale.
+* Disable comment pagination.
+* Check unpublished content.
+
+Following recommendations are now interactive:
+* Set tagline.
+* Disable comments.
+* Delete the "Hello World!" post.
+* Delete "Sample Page".
+* Select site timezone.
+* Select site locale.
+
+Bugs we fixed:
+
+* Fix issue where "Perform all updates" task was incorrectly marked as completed.
+* Prevent new lines to be added when user task title is edited.
+
+Enhancements:
+
+* Styling improvements
+* Refactored charts
+* Change the link of the "Rename uncategorized" task to the taxonomy-term edit screen instead of the taxonomy terms list
+* Check tasks when snooze period is over
+* Added a plugin-installer component for recommendations
+
+= 1.6.3 =
+
+Bugs we fixed:
+
+* Fixed a bug in the WP-CLI task-list command.
+* Fixed a bug in the post-editor when lessons cannot be retrieved.
+* Fixed a bug in the site-editor when using block themes, where the sidebar was instantiated on some servers.
+
+= 1.6.2 =
+
+Bugs we fixed:
+
+* Ensure that the Custom Post Type for Recommendations is not publicly queryable.
+
+= 1.6.1 =
+
+Bugs we fixed:
+
+* "Collect your point" not closing the "Test if your website can send emails correctly" popover.
+* Snooze task tooltip overaly not closing properly.
+* Properly trigger migration from v1.5.0.
+
+= 1.6.0 =
+
+Enhancements:
+
+* Allow users to collect extra points for previous months' badges.
+* Added WP-CLI commands to manage recommendations.
+
+Under the hood:
+
+* Ravi's Recommendations are now a custom post type.
+
+= 1.5.0 =
+
+Added these recommendations from Ravi:
+
+* [Test if your website can send emails correctly](https://prpl.fyi/troubleshoot-smtp).
+
+Bugs we fixed:
+
+* Don't redirect user to Progress Planner dashboard if 'redirect_to' GET or POST parameter is set.
+* Removed the Onboard tour steps for the Settings popover which was removed in 1.3.0.
+* Fixed detecting creation of new valuable content posts.
+* Don't award point for all Todo tasks, only for golden.
+* Fix Todo task title not being editable.
+
+= 1.4.2 =
+
+Bugs we fixed:
+
+* Fixed snoozing some of Yoast SEO Recommendations.
+
+= 1.4.1 =
+
+Bugs we fixed:
+
+* Fixed a conflict with the premium version of Yoast SEO.
+
+= 1.4.0 =
+
+Enhancements:
+
+* Review Content task takes into account Yoast SEO readibility score when suggesting posts to update.
+* Change update frequency for articles which are not selected in "Your page" section or as Yoast SEO Cornerstone content to 12 months.
+* Factor in Yoast SEO readibility score when suggesting which articles should be updated.
+
+Bugs we fixed:
+
+* Fixed a bug where dismissed review content tasks would reappear in the following week.
+
+Added these recommendations from Ravi:
+
+* [Remove terms](http://prpl.fyi/remove-empty-taxonomy) which have less than 2 posts.
+* [Give description](http://prpl.fyi/taxonomy-terms-description) to terms which have more than 2 posts.
+* Suggest to install [Fewer Tags plugin](https://prpl.fyi/install-fewer-tags).
+* Yoast SEO: [do Yoast SEO's Cornerstone Content Workout](http://prpl.fyi/run-orphaned-content-workout).
+* Yoast SEO: [do Yoast SEO's Orphaned Content Workout](https://prpl.fyi/run-cornerstone-content-workout).
+* Yoast SEO: [add internal links](https://prpl.fyi/fix-orphaned-content) to articles which don't have them.
+
+= 1.3.0 =
+
+Enhancements:
+
+* Improved checks when adding Ravi icon to the Yoast SEO settings page.
+* Add "golden" tasks to weekly emails.
+* Add text to clarify when the user has completed all tasks.
+* Improve the content widget & stats to show more accurate data. It now shows content _activity_ instead of content _published_.
+* Implemented "valuable post-types" and added settings for them.
+* Changed the "create a post" task to "create valuable content".
+* Renamed & migrated content badges.
+* Added a link to the 'Create valuable content' task description.
+* Improve accessibility of Recommendations (and other links) linking to external resources
+
+Bugs we fixed:
+
+* Fixed error during plugin uninstall.
+* Archive_Format data collector hooks weren't registered early enough.
+* Ensure fresh plugin list by clearing plugin cache before checking for inactive plugins after deletion.
+* Clear plugin cache when checking for inactive plugins.
+* Delete no-longer relevant pending tasks.
+* Fixed timing issue for tasks added by 3rd-party plugins.
+
+= 1.2.0 =
+
+In this release we've [added an integration with the **Yoast SEO** plugin](https://prpl.fyi/v12), so you’ll now see personalized suggestions based on your current SEO configuration.
+
+Added these recommendations from Ravi:
+
+* Yoast SEO: [disable the author archive](https://prpl.fyi/yoast-author-archive)
+* Yoast SEO: [disable the date archive](https://prpl.fyi/yoast-date-archive)
+* Yoast SEO: [disable the format archives](https://prpl.fyi/yoast-format-archive)
+* Yoast SEO: [Remove emoji scripts](https://prpl.fyi/yoast-crawl-optimization-emoji-scripts)
+* Yoast SEO: [Remove post authors feeds](https://prpl.fyi/yoast-crawl-optimization-feed-authors)
+* Yoast SEO: [Remove global comment feeds](https://prpl.fyi/yoast-crawl-optimization-feed-global-comments)
+* Yoast SEO: [disable the media pages](https://prpl.fyi/yoast-media-pages)
+* Yoast SEO: set your [organization](https://prpl.fyi/yoast-organization-logo) or [person](https://prpl.fyi/yoast-person-logo) logo
+
+Under the hood:
+* Changed how the titles and descriptions of one_time and repetitive tasks are defined to be compatible with WP 6.8.
+
 = 1.1.1 =
 
 Bugs we fixed:
 
 * Fixed unnecessary display of the upgrade popover.
 * Fixed saving license key from 'Subscribe to weekly' emails popover.
+* Reduced number of database queries when checking for user activity scores.
+* Fixed database queries when getting activities by type.
 
+Enhancements:
+
+* Simplified the Dashboard widget.
+* Styling improvements.
+* Improved some translation strings.
+* Improved suggestions for writing new posts.
+* UI improvements in the plugin settings page.
+* TODO tasks can now award 1 point per week, counting toward the monthly badges.
+
+Under the hood:
+
+* Completely refactored the TODOs system.
+* Refactored the suggested-tasks system.
+* Refactored our AJAX calls.
+* Performance & caching improvements.
+* Refactored popovers implementation.
+* Added implementation to migrate plugin data on updates.
+* Improved debugging suite.
+* Added new hooks for integration with 3rd-party plugins.
+* Added a data collector system for tasks providers.
+* Refactored the way tasks are saved in the database for consistency.
+* Improved `one_time` and `repetitive` task type abstractions.
+* Refactored the celebrations system.
 
 = 1.1.0 =
 

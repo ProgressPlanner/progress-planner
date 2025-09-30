@@ -36,7 +36,6 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public static function setUpBeforeClass(): void {
-
 		self::set_lessons_cache();
 
 		\progress_planner()->get_page_types()->create_taxonomy();
@@ -71,19 +70,17 @@ class Page_Types_Test extends \WP_UnitTestCase {
 		// Mimic the URL building and caching of the lessons, see Progress_Planner\Lessons::get_remote_api_items .
 		$url = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/lessons';
 
-		$url = ( \progress_planner()->is_pro_site() )
-			? \add_query_arg(
-				[
-					'site'        => \get_site_url(),
-					'license_key' => \get_option( 'progress_planner_pro_license_key' ),
-				],
-				$url
-			)
-			: \add_query_arg( [ 'site' => \get_site_url() ], $url );
+		$url = \add_query_arg(
+			[
+				'site'        => \get_site_url(),
+				'license_key' => \get_option( 'progress_planner_license_key' ),
+			],
+			$url
+		);
 
-		$cache_key = md5( $url );
+		$cache_key = \md5( $url );
 
-		\progress_planner()->get_cache()->set( $cache_key, self::get_lessons(), WEEK_IN_SECONDS );
+		\progress_planner()->get_utils__cache()->set( $cache_key, self::get_lessons(), WEEK_IN_SECONDS );
 	}
 
 	/**
@@ -122,20 +119,16 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_get_page_types() {
+		// Reset the page types, before the test.
+		$page_types_object              = \progress_planner()->get_page_types();
+		$page_types_object::$page_types = null;
+
 		$page_types = \progress_planner()->get_page_types()->get_page_types();
 		$lessons    = self::get_lessons();
-		$this->assertCount( count( $lessons ), $page_types );
+		$this->assertCount( \count( $lessons ), $page_types );
 
 		foreach ( $lessons as $lesson ) {
-			$this->assertCount(
-				1,
-				\array_filter(
-					$page_types,
-					function ( $page_type ) use ( $lesson ) {
-						return $page_type['slug'] === $lesson['settings']['id'];
-					}
-				)
-			);
+			$this->assertCount( 1, \array_filter( $page_types, fn( $page_type ) => $page_type['slug'] === $lesson['settings']['id'] ) );
 		}
 	}
 
@@ -145,7 +138,6 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_get_posts_by_type() {
-
 		// Assign the post to the "homepage" page type.
 		\progress_planner()->get_page_types()->set_page_type_by_id(
 			self::$homepage_post_id,
@@ -194,13 +186,12 @@ class Page_Types_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_transition_post_status_updates_options() {
-
 		// Check if the options are set to default values.
-		$this->assertEquals( 0, get_option( 'page_on_front' ) );
-		$this->assertEquals( 'posts', get_option( 'show_on_front' ) );
+		$this->assertEquals( 0, \get_option( 'page_on_front' ) );
+		$this->assertEquals( 'posts', \get_option( 'show_on_front' ) );
 
 		// Update homepage page to draft.
-		wp_update_post(
+		\wp_update_post(
 			[
 				'ID'          => self::$homepage_post_id,
 				'post_status' => 'draft',
@@ -213,7 +204,7 @@ class Page_Types_Test extends \WP_UnitTestCase {
 		\wp_set_object_terms( self::$homepage_post_id, $term->term_id, \progress_planner()->get_page_types()::TAXONOMY_NAME );
 
 		// Update the page status to publish.
-		wp_update_post(
+		\wp_update_post(
 			[
 				'ID'          => self::$homepage_post_id,
 				'post_status' => 'publish',
@@ -221,7 +212,7 @@ class Page_Types_Test extends \WP_UnitTestCase {
 		);
 
 		// Check if the options are updated.
-		$this->assertEquals( self::$homepage_post_id, get_option( 'page_on_front' ) );
-		$this->assertEquals( 'page', get_option( 'show_on_front' ) );
+		$this->assertEquals( self::$homepage_post_id, \get_option( 'page_on_front' ) );
+		$this->assertEquals( 'page', \get_option( 'show_on_front' ) );
 	}
 }

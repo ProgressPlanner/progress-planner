@@ -1,4 +1,9 @@
-/* global progressPlannerEditor */
+/* global progressPlannerEditor, prplL10n */
+/**
+ * Editor script.
+ *
+ * Dependencies: wp-plugins, wp-edit-post, wp-element, progress-planner/l10n
+ */
 const { createElement: el, Fragment, useState } = wp.element;
 const { registerPlugin } = wp.plugins;
 const { PluginSidebar, PluginPostStatusInfo, PluginSidebarMoreMenuItem } =
@@ -34,7 +39,7 @@ const prplGetPageTypeSlugFromId = ( id ) => {
 
 	return progressPlannerEditor.pageTypes.find(
 		( pageTypeItem ) => parseInt( pageTypeItem.id ) === parseInt( id )
-	).slug;
+	)?.slug;
 };
 
 /**
@@ -43,6 +48,14 @@ const prplGetPageTypeSlugFromId = ( id ) => {
  * @return {Element} Element to render.
  */
 const PrplRenderPageTypeSelector = () => {
+	// Bail early if the page types are not set.
+	if (
+		! progressPlannerEditor.pageTypes ||
+		0 === progressPlannerEditor.pageTypes.length
+	) {
+		return el( 'div', {}, '' );
+	}
+
 	// Build the page types array, to be used in the dropdown.
 	const pageTypes = [];
 	progressPlannerEditor.pageTypes.forEach( ( term ) => {
@@ -53,12 +66,12 @@ const PrplRenderPageTypeSelector = () => {
 	} );
 
 	return el( SelectControl, {
-		label: progressPlannerEditor.i18n.pageType,
+		label: prplL10n( 'pageType' ),
 		// Get the current term from the TAXONOMY.
 		value: wp.data.useSelect( ( select ) => {
 			const pageTypeArr =
 				select( 'core/editor' ).getEditedPostAttribute( TAXONOMY );
-			return 0 < pageTypeArr.length
+			return pageTypeArr && 0 < pageTypeArr.length
 				? parseInt( pageTypeArr[ 0 ] )
 				: parseInt( progressPlannerEditor.defaultPageType );
 		}, [] ),
@@ -87,7 +100,7 @@ const PrplSectionVideo = ( lessonSection ) => {
 	return el(
 		'div',
 		{
-			title: progressPlannerEditor.i18n.video,
+			title: prplL10n( 'video' ),
 			initialOpen: false,
 		},
 		el(
@@ -109,14 +122,14 @@ const PrplSectionVideo = ( lessonSection ) => {
 				},
 				lessonSection.video_button_label
 					? lessonSection.video_button_text
-					: progressPlannerEditor.i18n.watchVideo
+					: prplL10n( 'watchVideo' )
 			),
 			isOpen &&
 				el(
 					Modal,
 					{
 						key: 'progress-planner-sidebar-video-modal',
-						title: progressPlannerEditor.i18n.video,
+						title: prplL10n( 'video' ),
 						onRequestClose: closeModal,
 						shouldCloseOnClickOutside: true,
 						shouldCloseOnEsc: true,
@@ -182,8 +195,12 @@ const PrplLessonItemsHTML = () => {
 	}, [] );
 	const pageTodos = pageTodosMeta || '';
 
-	// Bail early if the page type is not set.
-	if ( ! pageType ) {
+	// Bail early if the page type or lessons are not set.
+	if (
+		! pageType ||
+		! progressPlannerEditor.lessons ||
+		0 === progressPlannerEditor.lessons.length
+	) {
 		return el( 'div', {}, '' );
 	}
 
@@ -257,14 +274,14 @@ const PrplProgressPlannerSidebar = () =>
 				target: 'progress-planner-sidebar',
 				key: 'progress-planner-sidebar-menu-item',
 			},
-			progressPlannerEditor.i18n.progressPlannerSidebar
+			prplL10n( 'progressPlannerSidebar' )
 		),
 		el(
 			PluginSidebar,
 			{
 				name: 'progress-planner-sidebar',
 				key: 'progress-planner-sidebar-sidebar',
-				title: progressPlannerEditor.i18n.progressPlannerSidebar,
+				title: prplL10n( 'progressPlannerSidebar' ),
 				icon: PrplIcon(),
 			},
 			el(
@@ -357,7 +374,7 @@ const PrplTodoProgress = ( lessonSection, pageTodos ) => {
 		),
 		el( 'div', {
 			dangerouslySetInnerHTML: {
-				__html: progressPlannerEditor.i18n.checklistProgressDescription,
+				__html: prplL10n( 'checklistProgressDescription' ),
 			},
 		} )
 	);
@@ -505,7 +522,7 @@ const PrplPostStatus = () =>
 								'progress-planner-sidebar/progress-planner-sidebar'
 							),
 				},
-				progressPlannerEditor.i18n.progressPlanner
+				'Progress Planner'
 			)
 		),
 		el( PluginPostStatusInfo, {} )

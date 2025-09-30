@@ -18,7 +18,6 @@ const progressPlannerAjaxRequest = ( { url, data } ) => {
 				response = JSON.parse( http.response );
 			} catch ( e ) {
 				if ( http.readyState === 4 && http.status !== 200 ) {
-					// eslint-disable-next-line no-console
 					console.warn( http, e );
 					return http.response;
 				}
