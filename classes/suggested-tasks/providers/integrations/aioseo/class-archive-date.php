@@ -61,10 +61,12 @@ class Archive_Date extends AIOSEO_Provider {
 		}
 
 		// Check if date archives are already disabled in AIOSEO.
-		$options = \aioseo()->options->searchAppearance->archives;
+		// AIOSEO uses 'show' property - when false, archives are hidden from search results.
+		$show_value = \aioseo()->options->searchAppearance->archives->date->show;
 
-		// Check if date archives show in search results is set to false.
-		if ( isset( $options->date->show ) && false === $options->date->show ) {
+		// If show is false (disabled), the task is complete (return false means don't add task).
+		// Using loose comparison to handle string/int/bool variations.
+		if ( ! $show_value ) {
 			return false;
 		}
 
