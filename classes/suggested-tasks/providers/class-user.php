@@ -48,6 +48,13 @@ class User extends Tasks {
 	protected const PROVIDER_ID = 'user';
 
 	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		\add_filter( 'progress_planner_suggested_tasks_in_rest_format', [ $this, 'modify_task_details_for_user_tasks_rest_format' ], 10, 2 );
+	}
+
+	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
@@ -93,5 +100,30 @@ class User extends Tasks {
 		];
 
 		return $actions;
+	}
+
+	/**
+	 * Modify the task details for user tasks in REST format.
+	 *
+	 * @param array $tasks The tasks.
+	 * @param array $args  The arguments.
+	 *
+	 * @return array
+	 */
+	public function modify_task_details_for_user_tasks_rest_format( $tasks, $args ) {
+		static $modified_tasks = [];
+		if ( ! isset( $args['include_provider'] ) || ! \in_array( 'user', $args['include_provider'], true ) ) {
+			return $tasks;
+		}
+		foreach ( $tasks['user'] as $key => $task ) {
+			if ( \in_array( $task['id'], $modified_tasks, true ) ) {
+				continue;
+			}
+
+			$task['prpl_points']   = ( isset( $task['excerpt']['rendered'] ) && \str_contains( $task['excerpt']['rendered'], 'GOLDEN' ) ) ? 1 : 0;
+			$tasks['user'][ $key ] = $task;
+			$modified_tasks[]      = $task['id'];
+		}
+		return $tasks;
 	}
 }

@@ -281,7 +281,7 @@ class Suggested_Tasks {
 				'show_in_admin_bar'     => \apply_filters( 'progress_planner_tasks_show_ui', false ),
 				'show_in_rest'          => true,
 				'rest_controller_class' => \Progress_Planner\Rest\Recommendations_Controller::class,
-				'supports'              => [ 'title', 'editor', 'author', 'custom-fields', 'page-attributes' ],
+				'supports'              => [ 'title', 'excerpt', 'editor', 'author', 'custom-fields', 'page-attributes' ],
 				'rewrite'               => false,
 				'menu_icon'             => 'dashicons-admin-tools',
 				'menu_position'         => 5,
@@ -509,7 +509,15 @@ class Suggested_Tasks {
 			}
 		}
 
-		return $tasks;
+		/**
+		 * Allow other classes to modify the tasks in REST format.
+		 *
+		 * @param array $tasks The tasks.
+		 * @param array $args  The arguments.
+		 *
+		 * @return array
+		 */
+		return \apply_filters( 'progress_planner_suggested_tasks_in_rest_format', $tasks, $args );
 	}
 
 	/**
