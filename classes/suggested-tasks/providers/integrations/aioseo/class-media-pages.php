@@ -41,7 +41,7 @@ class Media_Pages extends AIOSEO_Provider {
 	 * @return string
 	 */
 	protected function get_title() {
-		return \esc_html__( 'All in One SEO: redirect media/attachment pages', 'progress-planner' );
+		return \esc_html__( 'All in One SEO: redirect media/attachment pages to attachment', 'progress-planner' );
 	}
 
 	/**
@@ -55,13 +55,14 @@ class Media_Pages extends AIOSEO_Provider {
 			return false;
 		}
 
-		// Check if redirect attachment URLs is already enabled.
-		$options = \aioseo()->options->searchAppearance;
+		// Check if redirect attachment URLs is already set to 'attachment'.
+		// The setting is stored in searchAppearance -> postTypes -> attachment -> redirectAttachmentUrls.
+		$redirect_value = \aioseo()->options->searchAppearance->postTypes->attachment->redirectAttachmentUrls;
 
-		// Check if redirectAttachmentUrls is set to 'attachment' or 'attachmentParent'.
-		// The setting should be 'disabled', 'attachment', or 'attachmentParent'.
-		// We want to recommend setting it to 'attachmentParent'.
-		if ( isset( $options->redirectAttachmentUrls ) && 'disabled' !== $options->redirectAttachmentUrls ) {
+		// The task is complete if redirectAttachmentUrls is set to 'attachment'.
+		// Possible values: 'disabled', 'attachment', or 'attachmentParent'.
+		// We recommend 'attachment' as it redirects to the attachment file itself.
+		if ( 'attachment' === $redirect_value ) {
 			return false;
 		}
 
