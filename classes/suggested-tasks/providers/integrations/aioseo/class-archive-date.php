@@ -99,7 +99,7 @@ class Archive_Date extends AIOSEO_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=aioseo-search-appearance#/archives' ) . '" target="_self">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=aioseo-search-appearance&aioseo-scroll=aioseo-card-dateArchives&aioseo-highlight=aioseo-card-dateArchives#/archives' ) . '" target="_self">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;
