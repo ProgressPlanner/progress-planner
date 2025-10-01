@@ -128,7 +128,13 @@ class Remove_Terms_Without_Posts extends Tasks {
 			if ( $task->target_term_id && $task->target_taxonomy ) {
 				$term = \get_term( $task->target_term_id, $task->target_taxonomy );
 
-				if ( \is_wp_error( $term ) || ! $term || $term->count > self::MIN_POSTS ) {
+				// If the term is NULL it means the term was deleted, but we want to keep the task (and award a point).
+				if ( ! $term ) {
+					continue;
+				}
+
+				// If the taxonomy is not found the $term will be a WP_Error object.
+				if ( \is_wp_error( $term ) || $term->count > self::MIN_POSTS ) {
 					\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 				}
 			}
