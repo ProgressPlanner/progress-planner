@@ -262,7 +262,7 @@ class Tasks_Manager {
 			return false;
 		}
 
-		return $task_provider->evaluate_task( $task->task_id );
+		return $task_provider->evaluate_task( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 	}
 
 	/**

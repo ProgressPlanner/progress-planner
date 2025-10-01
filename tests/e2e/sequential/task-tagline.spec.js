@@ -55,8 +55,8 @@ function taglineTests( testContext = test ) {
 				const finalTasks = await finalResponse.json();
 
 				// Find the blog description task again
-				const updatedTask = finalTasks.find(
-					( task ) => task.task_id === 'core-blogdescription'
+				const updatedTask = finalTasks.find( ( task ) =>
+					task.post_name.startsWith( 'core-blogdescription' )
 				);
 				expect( updatedTask ).toBeDefined();
 				expect( updatedTask.post_status ).toBe( 'pending' );
@@ -100,8 +100,8 @@ function taglineTests( testContext = test ) {
 				const completedTasks = await completedResponse.json();
 
 				// Find the blog description task one last time
-				const completedTask = completedTasks.find(
-					( task ) => task.task_id === 'core-blogdescription'
+				const completedTask = completedTasks.find( ( task ) =>
+					task.post_name.startsWith( 'core-blogdescription' )
 				);
 				expect( completedTask ).toBeDefined();
 				expect( completedTask.post_status ).toBe( 'trash' );

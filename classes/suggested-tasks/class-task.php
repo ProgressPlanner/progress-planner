@@ -13,9 +13,9 @@ namespace Progress_Planner\Suggested_Tasks;
  * @property int $ID The task ID
  * @property string $post_status The task status
  * @property string $post_title The task title
+ * @property string $post_name The task name
  * @property string $post_date The task date
  * @property \stdClass|null $provider The task provider object with slug property
- * @property string $task_id The task identifier
  * @property string $provider_id The provider identifier
  * @property string $category The task category
  * @property int $priority The task priority (0-100, 0 being highest and 100 being lowest).
