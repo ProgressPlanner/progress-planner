@@ -112,7 +112,7 @@ class User extends Tasks {
 	 */
 	public function modify_task_details_for_user_tasks_rest_format( $tasks, $args ) {
 		static $modified_tasks = [];
-		if ( ! isset( $args['include_provider'] ) || ! \in_array( 'user', $args['include_provider'], true ) ) {
+		if ( ! isset( $tasks['user'] ) || ! isset( $args['include_provider'] ) || ! \in_array( 'user', $args['include_provider'], true ) ) {
 			return $tasks;
 		}
 		foreach ( $tasks['user'] as $key => $task ) {
