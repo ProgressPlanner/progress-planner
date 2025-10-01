@@ -139,7 +139,6 @@ const prplTodoWidget = {
 						meta: {
 							prpl_points: 0,
 							prpl_url: '',
-							prpl_url_target: '_self',
 							...( response.meta || {} ),
 						},
 						provider: 'user',
@@ -192,6 +191,46 @@ const prplTodoWidget = {
 	 */
 	removeLoader: () => {
 		document.querySelector( '#todo-list .prpl-loader' )?.remove();
+	},
+
+	/**
+	 * Show the delete all popover.
+	 */
+	showDeleteAllPopover: () => {
+		document
+			.getElementById( 'todo-list-completed-delete-all-popover' )
+			.showPopover();
+	},
+
+	/**
+	 * Close the delete all popover.
+	 */
+	closeDeleteAllPopover: () => {
+		document
+			.getElementById( 'todo-list-completed-delete-all-popover' )
+			.hidePopover();
+	},
+
+	/**
+	 * Delete all completed tasks and close the popover.
+	 */
+	deleteAllCompletedTasksAndClosePopover: () => {
+		prplTodoWidget.deleteAllCompletedTasks();
+		prplTodoWidget.closeDeleteAllPopover();
+	},
+
+	/**
+	 * Delete all completed tasks.
+	 */
+	deleteAllCompletedTasks: () => {
+		document
+			.querySelectorAll( '#todo-list-completed .prpl-suggested-task' )
+			.forEach( ( item ) => {
+				const postId = parseInt( item.getAttribute( 'data-post-id' ) );
+				prplSuggestedTask.trash( postId );
+			} );
+
+		// Resize event will be triggered by the trash function.
 	},
 };
 

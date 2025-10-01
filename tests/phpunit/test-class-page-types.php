@@ -128,15 +128,7 @@ class Page_Types_Test extends \WP_UnitTestCase {
 		$this->assertCount( \count( $lessons ), $page_types );
 
 		foreach ( $lessons as $lesson ) {
-			$this->assertCount(
-				1,
-				\array_filter(
-					$page_types,
-					function ( $page_type ) use ( $lesson ) {
-						return $page_type['slug'] === $lesson['settings']['id'];
-					}
-				)
-			);
+			$this->assertCount( 1, \array_filter( $page_types, fn( $page_type ) => $page_type['slug'] === $lesson['settings']['id'] ) );
 		}
 	}
 

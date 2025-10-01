@@ -43,20 +43,6 @@ class Debug_Display extends Tasks {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @param array $task_data Optional data to include in the task.
-	 * @return string
-	 */
-	protected function get_description( $task_data = [] ) {
-		return \sprintf(
-			// translators: %s is the name of the WP_DEBUG_DISPLAY constant.
-			\esc_html__( '%s is enabled. This means that errors are shown to users. We recommend disabling it.', 'progress-planner' ),
-			'<code>WP_DEBUG_DISPLAY</code>',
-		);
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool

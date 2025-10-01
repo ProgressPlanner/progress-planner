@@ -2,13 +2,13 @@
 	margin: 0;
 	padding: 0.75rem 0.5rem 0.625rem 0.5rem;
 	display: grid;
-	grid-template-columns: 1.5rem 1fr 2rem;
+	grid-template-columns: 1.5rem 1fr 3.5rem;
 	gap: 0.25rem 0.5rem;
 	position: relative;
 	line-height: 1;
 
 	&:nth-child(odd) {
-		background-color: #f6f7f9;
+		background-color: var(--prpl-background-table);
 	}
 
 	.prpl-suggested-task-title-wrapper {
@@ -19,7 +19,7 @@
 
 		.prpl-task-title {
 			width: 100%;
-			color: #4b5563;
+			color: var(--prpl-color-text);
 		}
 	}
 
@@ -80,14 +80,15 @@
 		display: flex;
 		gap: 0.5rem;
 		align-items: center;
+		justify-content: flex-end;
 		grid-row-end: span 2;
 	}
 
 	.prpl-suggested-task-points {
 		font-size: var(--prpl-font-size-xs);
 		font-weight: 700;
-		color: var(--prpl-color-headings);
-		background-color: var(--prpl-color-400-orange);
+		color: var(--prpl-text-point);
+		background-color: var(--prpl-background-point);
 		width: 1.5rem;
 		height: 1.5rem;
 		border-radius: 50%;
@@ -120,7 +121,7 @@
 					content: "";
 					display: inline-block;
 					width: 1px;
-					background: var(--prpl-color-gray-5);
+					background: var(--prpl-color-text);
 					height: 0.75rem;
 				}
 			}
@@ -144,6 +145,17 @@
 				}
 			}
 
+			/* Close and toggle radio group buttons should not have a text decoration. */
+			.prpl-tooltip-close,
+			.prpl-toggle-radio-group {
+
+				&:hover,
+				&:focus,
+				&:active {
+					text-decoration: none;
+				}
+			}
+
 		}
 	}
 
@@ -161,7 +173,7 @@
 
 	.prpl-suggested-task-description {
 		font-size: 0.825rem;
-		color: var(--prpl-color-gray-6);
+		color: var(--prpl-color-text);
 		margin: 0;
 	}
 
@@ -186,7 +198,7 @@
 		padding: 0;
 		border: 0;
 		background: none;
-		color: var(--prpl-color-gray-3);
+		color: var(--prpl-color-ui-icon);
 		cursor: pointer;
 		box-shadow: none;
 		margin-top: 1px;
@@ -222,7 +234,7 @@
 		}
 
 		&:hover {
-			color: var(--prpl-color-gray-6);
+			color: var(--prpl-color-ui-icon-hover);
 		}
 	}
 
@@ -266,7 +278,7 @@
 			padding: 0.5rem;
 
 			&:hover {
-				background-color: var(--prpl-color-gray-1);
+				background-color: var(--prpl-color-gauge-remain);
 			}
 
 			input[type="radio"] {

@@ -128,7 +128,13 @@ class Remove_Terms_Without_Posts extends Tasks {
 			if ( $task->target_term_id && $task->target_taxonomy ) {
 				$term = \get_term( $task->target_term_id, $task->target_taxonomy );
 
-				if ( \is_wp_error( $term ) || ! $term || $term->count > self::MIN_POSTS ) {
+				// If the term is NULL it means the term was deleted, but we want to keep the task (and award a point).
+				if ( ! $term ) {
+					continue;
+				}
+
+				// If the taxonomy is not found the $term will be a WP_Error object.
+				if ( \is_wp_error( $term ) || $term->count > self::MIN_POSTS ) {
 					\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 				}
 			}
@@ -149,25 +155,6 @@ class Remove_Terms_Without_Posts extends Tasks {
 				/* translators: %s: The term name */
 				\esc_html__( 'Remove term named "%s"', 'progress-planner' ),
 				\esc_html( $term->name )
-			)
-			: '';
-	}
-
-	/**
-	 * Get the description.
-	 *
-	 * @param array $task_data The task data.
-	 *
-	 * @return string
-	 */
-	protected function get_description_with_data( $task_data = [] ) {
-		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
-		return ( $term && ! \is_wp_error( $term ) )
-			? \sprintf(
-				/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/remove-empty-taxonomy" target="_blank">Read more</a> link */
-				\esc_html__( 'The "%1$s" term has one or less posts associated with it, we recommend removing it. %2$s', 'progress-planner' ),
-				$term->name,
-				'<a href="https://prpl.fyi/remove-empty-taxonomy" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the removing the empty terms', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 			)
 			: '';
 	}
@@ -330,7 +317,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'options-permalink.php' ) . '" target="_self">' . \esc_html__( 'Go to the "Taxonomies" page', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \esc_url( $data['meta']['prpl_url'] ) . '" target="_self">' . \esc_html__( 'Go to the "Taxonomies" page', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

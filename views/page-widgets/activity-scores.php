@@ -16,7 +16,12 @@ $prpl_record = $prpl_widget->personal_record_callback();
 
 ?>
 <h2 class="prpl-widget-title">
-	<?php \esc_html_e( 'Your website activity score', 'progress-planner' ); ?>
+	<?php
+	echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		'activity-scores',
+		\esc_html__( 'Your website activity score', 'progress-planner' )
+	);
+	?>
 
 	<div class="tooltip-actions">
 		<prpl-tooltip>
@@ -33,8 +38,8 @@ $prpl_record = $prpl_widget->personal_record_callback();
 	</div>
 </h2>
 
-<div style="--background: var(--prpl-background-orange)">
-	<prpl-gauge background="var(--prpl-background-green)" color="<?php echo \esc_attr( $prpl_widget->get_gauge_color( $prpl_widget->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-6xl)">
+<div style="--background: var(--prpl-background-monthly)">
+	<prpl-gauge background="var(--prpl-background-activity)" color="<?php echo \esc_attr( $prpl_widget->get_gauge_color( $prpl_widget->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-6xl)">
 		<progress max="100" value="<?php echo (float) $prpl_widget->get_score(); ?>">
 			<?php echo \esc_html( $prpl_widget->get_score() ); ?>
 		</progress>
@@ -49,27 +54,19 @@ $prpl_record = $prpl_widget->personal_record_callback();
 	\progress_planner()->get_ui__chart()->the_chart(
 		[
 			'type'           => 'bar',
-			'items_callback' => function ( $start_date, $end_date ) {
-				return \progress_planner()->get_activities__query()->query_activities(
-					[
-						'start_date' => $start_date,
-						'end_date'   => $end_date,
-					]
-				);
-			},
+			'items_callback' => fn( $start_date, $end_date ) => \progress_planner()->get_activities__query()->query_activities(
+				[
+					'start_date' => $start_date,
+					'end_date'   => $end_date,
+				]
+			),
 			'dates_params'   => [
 				'start_date' => \DateTime::createFromFormat( 'Y-m-d', \gmdate( 'Y-m-01' ) )->modify( $prpl_widget->get_range() ),
 				'end_date'   => new \DateTime(),
 				'frequency'  => $prpl_widget->get_frequency(),
 				'format'     => 'M',
 			],
-			'count_callback' => function ( $activities, $date ) {
-				$score = 0;
-				foreach ( $activities as $activity ) {
-					$score += $activity->get_points( $date );
-				}
-				return $score * 100 / Base::SCORE_TARGET;
-			},
+			'count_callback' => fn( $activities, $date ) => \array_sum( \array_map( fn( $activity ) => $activity->get_points( $date ), $activities ) ) * 100 / Base::SCORE_TARGET,
 			'normalized'     => true,
 			'color'          => [ $prpl_widget, 'get_color' ],
 			'max'            => 100,
@@ -83,7 +80,7 @@ $prpl_record = $prpl_widget->personal_record_callback();
 <prpl-big-counter
 	number="<?php echo \esc_html( \number_format_i18n( (int) $prpl_record['max_streak'] ) ); ?>"
 	content="<?php echo \esc_attr_e( 'personal record', 'progress-planner' ); ?>"
-	background-color="var(--prpl-background-green)"
+	background-color="var(--prpl-background-activity)"
 ></prpl-big-counter>
 
 <div class="prpl-widget-content">

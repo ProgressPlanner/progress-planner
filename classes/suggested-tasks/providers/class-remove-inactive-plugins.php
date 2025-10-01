@@ -61,15 +61,6 @@ class Remove_Inactive_Plugins extends Tasks {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'You have inactive plugins. Consider removing any plugins that are not activated to free up resources, and improve security.', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
@@ -89,7 +80,7 @@ class Remove_Inactive_Plugins extends Tasks {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'plugins.php' ) . '" target="_self">' . \esc_html__( 'Go to the "Plugins" page', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'plugins.php?plugin_status=inactive' ) . '" target="_self">' . \esc_html__( 'Go to the "Plugins" page', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

@@ -17,19 +17,30 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 ?>
 <?php if ( $prpl_badge ) : ?>
 	<h2 class="prpl-widget-title">
-		<?php \esc_html_e( 'Your monthly badge', 'progress-planner' ); ?>
+		<?php
+		echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+			'monthly-badges',
+			\esc_html__( 'Your monthly badge', 'progress-planner' )
+		);
+		?>
 	</h2>
 
 	<prpl-gauge
 		id="prpl-gauge-ravi"
-		background="var(--prpl-background-orange)"
-		color="var(--prpl-color-accent-orange)"
+		background="var(--prpl-background-monthly)"
+		color="var(--prpl-color-monthly)"
 		data-max="<?php echo (int) Monthly::TARGET_POINTS; ?>"
 		data-value="<?php echo (float) $prpl_widget->get_score()['target_score']; ?>"
 		data-badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+		data-badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
 	>
 		<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) $prpl_widget->get_score()['target_score']; ?>">
-			<prpl-badge complete="true" badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"></prpl-badge>
+			<prpl-badge
+				complete="true"
+				badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+				badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
+				branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
+			></prpl-badge>
 		</progress>
 	</prpl-gauge>
 
@@ -43,34 +54,15 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 	<hr>
 <?php endif; ?>
 
-
-
 <div class="prpl-widget-content">
-	<?php if ( 2024 === (int) \gmdate( 'Y' ) ) : ?>
-		<?php
-		\progress_planner()->the_view(
-			'page-widgets/parts/monthly-badges-2024.php',
-			[
-				'title_tag' => 'h2',
-			]
-		);
-		?>
-	<?php else : ?>
-
-		<?php
-		\progress_planner()->the_view(
-			'page-widgets/parts/monthly-badges.php',
-			[
-				'title_year' => 2025,
-			]
-		);
-		?>
-	<?php endif; ?>
 	<?php
-	\progress_planner()->get_ui__popover()->the_popover( 'monthly-badges' )->render_button(
-		'',
-		\esc_html__( 'Show all badges', 'progress-planner' )
-	);
+	if ( 2024 === (int) \gmdate( 'Y' ) ) {
+		\progress_planner()->the_view( 'page-widgets/parts/monthly-badges-2024.php', [ 'title_tag' => 'h2' ] );
+	} else {
+		\progress_planner()->the_view( 'page-widgets/parts/monthly-badges.php', [ 'title_year' => 2025 ] );
+	}
+
+	\progress_planner()->get_ui__popover()->the_popover( 'monthly-badges' )->render_button( '', \esc_html__( 'Show all badges', 'progress-planner' ) );
 	\progress_planner()->get_ui__popover()->the_popover( 'monthly-badges' )->render();
 	?>
 </div>
@@ -107,12 +99,13 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 					<span
 						class="prpl-previous-month-badge-progress-bar-remaining"
 						data-remaining="<?php echo (int) $prpl_previous_incomplete_month_badge->progress_callback()['remaining']; ?>"
+						data-remaining-total-points="<?php echo (int) $prpl_remaining_points; ?>"
 					>
 						<?php
 						\printf(
-							/* translators: %1$d: The number of points. %2$d: The number of days. */
-							\esc_html( \_n( '%1$d more points to go - %2$d day left', '%1$d more points to go - %2$d days left', (int) $prpl_days_remaining, 'progress-planner' ) ),
-							(int) $prpl_remaining_points,
+							/* translators: %1$s: The number of points. %2$d: The number of days. */
+							\esc_html( \_n( '%1$s more points to go - %2$d day left', '%1$s more points to go - %2$d days left', (int) $prpl_days_remaining, 'progress-planner' ) ),
+							'<span class="number">' . (int) $prpl_remaining_points . '</span>',
 							(int) $prpl_days_remaining
 						);
 						?>
