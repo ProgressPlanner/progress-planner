@@ -1,4 +1,4 @@
-/* global progressPlanner, progressPlannerAjaxRequest, prplOnboardTasks */
+/* global progressPlanner, progressPlannerAjaxRequest */
 /*
  * Onboard
  *
@@ -14,7 +14,7 @@
  */
 const progressPlannerSaveLicenseKey = ( licenseKey ) => {
 	console.log( 'License key: ' + licenseKey );
-	progressPlannerAjaxRequest( {
+	return progressPlannerAjaxRequest( {
 		url: progressPlanner.ajaxUrl,
 		data: {
 			action: 'progress_planner_save_onboard_data',
@@ -47,17 +47,9 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 				'none';
 
 			// Make a local request to save the response data.
-			progressPlannerSaveLicenseKey( response.license_key );
-
-			// Start the tasks.
-			const tasksPromise = prplOnboardTasks();
-
-			// Wait for all promises to resolve.
-			Promise.all( [ tasksPromise ] ).then( () => {
-				// All promises resolved, enable the continue button.
-				document
-					.getElementById( 'prpl-onboarding-continue-button' )
-					.classList.remove( 'prpl-disabled' );
+			progressPlannerSaveLicenseKey( response.license_key ).then( () => {
+				// Refresh the page.
+				window.location.reload();
 			} );
 		} )
 		.catch( ( error ) => {

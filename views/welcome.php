@@ -19,8 +19,6 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 // Enqueue styles.
 \progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/welcome' );
 \progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/onboard' );
-\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
-
 ?>
 <div class="prpl-welcome">
 	<div class="welcome-header">
@@ -173,8 +171,6 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 				<p id="prpl-account-not-created-message" style="display:none;">
 					<?php \esc_html_e( 'Success! Enjoy using the Progress Planner plugin!', 'progress-planner' ); ?>
 				</p>
-
-				<?php \progress_planner()->the_view( 'popovers/parts/upgrade-tasks.php', [ 'context' => 'onboarding' ] ); ?>
 			</div>
 		</div>
 		<div class="right">
