@@ -40,7 +40,7 @@ class Add_AIOSEO_Providers {
 			new Archive_Date(),
 			new Media_Pages(),
 			new Crawl_Settings_Feed_Authors(),
-			new Crawl_Settings_Feed_Global_Comments(),
+			new Crawl_Settings_Feed_Comments(),
 			new Organization_Logo(),
 		];
 

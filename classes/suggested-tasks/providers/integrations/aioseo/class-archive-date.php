@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\AIOSEO;
 /**
  * Add task for All in One SEO: disable the date archive.
  */
-class Archive_Date extends AIOSEO_Provider {
+class Archive_Date extends AIOSEO_Interactive_Provider {
 
 	/**
 	 * The provider ID.
@@ -20,11 +20,27 @@ class Archive_Date extends AIOSEO_Provider {
 	protected const PROVIDER_ID = 'aioseo-date-archive';
 
 	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'aioseo-date-archive';
+
+	/**
 	 * The external link URL.
 	 *
 	 * @var string
 	 */
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/aioseo-date-archive';
+
+	/**
+	 * Initialize the task.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		\add_action( 'wp_ajax_prpl_interactive_task_submit_aioseo-date-archive', [ $this, 'handle_interactive_task_specific_submit' ] );
+	}
 
 	/**
 	 * Get the task URL.
@@ -89,6 +105,57 @@ class Archive_Date extends AIOSEO_Provider {
 	}
 
 	/**
+	 * Get the description.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'Date archives rarely add any real value for users or search engines, so there\'s no reason for search engines to index these. That\'s why we suggest keeping them out of search results.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<button type="submit" class="prpl-button prpl-button-primary">
+			<?php \esc_html_e( 'Noindex the date archive', 'progress-planner' ); ?>
+		</button>
+		<?php
+	}
+
+	/**
+	 * Handle the interactive task submit.
+	 *
+	 * This is only for interactive tasks that change non-core settings.
+	 * The $_POST data is expected to be:
+	 * - nonce: (string) The nonce.
+	 *
+	 * @return void
+	 */
+	public function handle_interactive_task_specific_submit() {
+		if ( ! \function_exists( 'aioseo' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'AIOSEO is not active.', 'progress-planner' ) ] );
+		}
+
+		// Check the nonce.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
+
+		\aioseo()->options->searchAppearance->archives->date->show = false;
+
+		// Update the option.
+		\aioseo()->options->save();
+
+		\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
+	}
+
+	/**
 	 * Add task actions specific to this task.
 	 *
 	 * @param array $data    The task data.
@@ -99,7 +166,7 @@ class Archive_Date extends AIOSEO_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=aioseo-search-appearance&aioseo-scroll=aioseo-card-dateArchives&aioseo-highlight=aioseo-card-dateArchives#/archives' ) . '" target="_self">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover();return false;">' . \esc_html__( 'Noindex', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

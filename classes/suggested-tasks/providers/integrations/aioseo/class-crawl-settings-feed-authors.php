@@ -122,7 +122,7 @@ class Crawl_Settings_Feed_Authors extends AIOSEO_Interactive_Provider {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Remove URLs which provide information about recent posts by specific authors.', 'progress-planner' );
+		\esc_html_e( 'The author feed on your site will be similar to your main feed if you have only one author, so there\'s no reason to have it.', 'progress-planner' );
 		echo '</p>';
 	}
 
@@ -144,7 +144,6 @@ class Crawl_Settings_Feed_Authors extends AIOSEO_Interactive_Provider {
 	 *
 	 * This is only for interactive tasks that change non-core settings.
 	 * The $_POST data is expected to be:
-	 * - disable_author_feed: (boolean) Just a boolean.
 	 * - nonce: (string) The nonce.
 	 *
 	 * @return void
@@ -157,16 +156,6 @@ class Crawl_Settings_Feed_Authors extends AIOSEO_Interactive_Provider {
 		// Check the nonce.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
-		}
-
-		if ( ! isset( $_POST['disable_author_feed'] ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing value.', 'progress-planner' ) ] );
-		}
-
-		$disable_author_feed = \sanitize_text_field( \wp_unslash( $_POST['disable_author_feed'] ) );
-
-		if ( empty( $disable_author_feed ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid author feed.', 'progress-planner' ) ] );
 		}
 
 		\aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->authors = false;

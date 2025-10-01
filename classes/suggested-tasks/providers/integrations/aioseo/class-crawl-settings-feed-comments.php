@@ -10,28 +10,28 @@ namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\AIOSEO;
 /**
  * Add task for All in One SEO: disable global comment RSS feeds.
  */
-class Crawl_Settings_Feed_Global_Comments extends AIOSEO_Interactive_Provider {
+class Crawl_Settings_Feed_Comments extends AIOSEO_Interactive_Provider {
 
 	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
-	protected const PROVIDER_ID = 'aioseo-crawl-settings-feed-global-comments';
+	protected const PROVIDER_ID = 'aioseo-crawl-settings-feed-comments';
 
 	/**
 	 * The popover ID.
 	 *
 	 * @var string
 	 */
-	const POPOVER_ID = 'aioseo-crawl-settings-feed-global-comments';
+	const POPOVER_ID = 'aioseo-crawl-settings-feed-comments';
 
 	/**
 	 * The external link URL.
 	 *
 	 * @var string
 	 */
-	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/aioseo-crawl-optimization-feed-global-comments';
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/aioseo-crawl-optimization-feed-comments';
 
 	/**
 	 * Initialize the task.
@@ -39,7 +39,7 @@ class Crawl_Settings_Feed_Global_Comments extends AIOSEO_Interactive_Provider {
 	 * @return void
 	 */
 	public function init() {
-		\add_action( 'wp_ajax_prpl_interactive_task_submit_aioseo-crawl-settings-feed-global-comments', [ $this, 'handle_interactive_task_specific_submit' ] );
+		\add_action( 'wp_ajax_prpl_interactive_task_submit_aioseo-crawl-settings-feed-comments', [ $this, 'handle_interactive_task_specific_submit' ] );
 	}
 
 	/**
@@ -57,7 +57,7 @@ class Crawl_Settings_Feed_Global_Comments extends AIOSEO_Interactive_Provider {
 	 * @return string
 	 */
 	protected function get_title() {
-		return \esc_html__( 'All in One SEO: disable global comment RSS feeds', 'progress-planner' );
+		return \esc_html__( 'All in One SEO: disable comment RSS feeds', 'progress-planner' );
 	}
 
 	/**
@@ -72,10 +72,11 @@ class Crawl_Settings_Feed_Global_Comments extends AIOSEO_Interactive_Provider {
 		}
 
 		// Check if crawl cleanup is enabled and comment feeds are disabled.
-		$disable_comment_feed = \aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->globalComments;
+		$disable_global_comment_feed = \aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->globalComments; // @phpstan-ignore-line
+		$disable_post_comment_feed   = \aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->postComments; // @phpstan-ignore-line
 
 		// Check if comment feeds are already disabled.
-		if ( $disable_comment_feed === false ) {
+		if ( $disable_global_comment_feed === false && $disable_post_comment_feed === false ) {
 			return false;
 		}
 
@@ -89,7 +90,7 @@ class Crawl_Settings_Feed_Global_Comments extends AIOSEO_Interactive_Provider {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Remove URLs which provide information about recent comments.', 'progress-planner' );
+		\esc_html_e( 'We suggest disabling both the global "recent comments feed" from your site as well as the "comments feed" per post that WordPress generates. These feeds are rarely used by real users, but get crawled a lot. They don\'t have any interesting information for crawlers, so removing them leads to less bot-traffic on your site without downsides.', 'progress-planner' );
 		echo '</p>';
 	}
 
@@ -101,7 +102,7 @@ class Crawl_Settings_Feed_Global_Comments extends AIOSEO_Interactive_Provider {
 	public function print_popover_form_contents() {
 		?>
 		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Disable global comment RSS feeds', 'progress-planner' ); ?>
+			<?php \esc_html_e( 'Disable comment RSS feeds', 'progress-planner' ); ?>
 		</button>
 		<?php
 	}
@@ -111,7 +112,6 @@ class Crawl_Settings_Feed_Global_Comments extends AIOSEO_Interactive_Provider {
 	 *
 	 * This is only for interactive tasks that change non-core settings.
 	 * The $_POST data is expected to be:
-	 * - disable_global_comment_feed: (boolean) Just a boolean.
 	 * - nonce: (string) The nonce.
 	 *
 	 * @return void
@@ -126,20 +126,18 @@ class Crawl_Settings_Feed_Global_Comments extends AIOSEO_Interactive_Provider {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
 
-		if ( ! isset( $_POST['disable_global_comment_feed'] ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing value.', 'progress-planner' ) ] );
+		// Global comment feed.
+		if ( \aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->globalComments ) { // @phpstan-ignore-line
+			\aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->globalComments = false; // @phpstan-ignore-line
 		}
 
-		$disable_global_comment_feed = \sanitize_text_field( \wp_unslash( $_POST['disable_global_comment_feed'] ) );
-
-		if ( empty( $disable_global_comment_feed ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid global comment feed.', 'progress-planner' ) ] );
+		// Post comment feed.
+		if ( \aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->postComments ) { // @phpstan-ignore-line
+			\aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->postComments = false; // @phpstan-ignore-line
 		}
-
-		\aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->globalComments = false;
 
 		// Update the option.
-		\aioseo()->options->save();
+		\aioseo()->options->save(); // @phpstan-ignore-line
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
 	}

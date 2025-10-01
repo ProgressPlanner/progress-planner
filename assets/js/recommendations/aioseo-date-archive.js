@@ -1,14 +1,14 @@
 /* global prplInteractiveTaskFormListener, progressPlanner */
 
 /*
- * All in One SEO: disable author RSS feeds.
+ * All in One SEO: noindex the date archive.
  *
  * Dependencies: progress-planner/recommendations/interactive-task
  */
 
 prplInteractiveTaskFormListener.customSubmit( {
-	taskId: 'aioseo-crawl-settings-feed-authors',
-	popoverId: 'prpl-popover-aioseo-crawl-settings-feed-authors',
+	taskId: 'aioseo-date-archive',
+	popoverId: 'prpl-popover-aioseo-date-archive',
 	callback: () => {
 		fetch( progressPlanner.ajaxUrl, {
 			method: 'POST',
@@ -16,7 +16,7 @@ prplInteractiveTaskFormListener.customSubmit( {
 				'Content-Type': 'application/x-www-form-urlencoded',
 			},
 			body: new URLSearchParams( {
-				action: 'prpl_interactive_task_submit_aioseo-crawl-settings-feed-authors',
+				action: 'prpl_interactive_task_submit_aioseo-date-archive',
 				nonce: progressPlanner.nonce,
 			} ),
 		} );

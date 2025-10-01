@@ -1,14 +1,14 @@
 /* global prplInteractiveTaskFormListener, progressPlanner */
 
 /*
- * All in One SEO: disable global comment RSS feeds.
+ * All in One SEO: noindex the author archive.
  *
  * Dependencies: progress-planner/recommendations/interactive-task
  */
 
 prplInteractiveTaskFormListener.customSubmit( {
-	taskId: 'aioseo-crawl-settings-feed-global-comments',
-	popoverId: 'prpl-popover-aioseo-crawl-settings-feed-global-comments',
+	taskId: 'aioseo-author-archive',
+	popoverId: 'prpl-popover-aioseo-author-archive',
 	callback: () => {
 		fetch( progressPlanner.ajaxUrl, {
 			method: 'POST',
@@ -16,9 +16,8 @@ prplInteractiveTaskFormListener.customSubmit( {
 				'Content-Type': 'application/x-www-form-urlencoded',
 			},
 			body: new URLSearchParams( {
-				action: 'prpl_interactive_task_submit_aioseo-crawl-settings-feed-global-comments',
+				action: 'prpl_interactive_task_submit_aioseo-author-archive',
 				nonce: progressPlanner.nonce,
-				disable_global_comment_feed: true,
 			} ),
 		} );
 	},

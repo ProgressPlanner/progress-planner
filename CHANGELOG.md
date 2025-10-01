@@ -4,10 +4,10 @@ In this release we've added an integration with the **All In One Seo** plugin so
 
 Added these recommendations from Ravi:
 
-* All In One SEO: [disable the author archive](https://prpl.fyi/aioseo-author-archive)
-* All In One SEO: [disable the date archive](https://prpl.fyi/aioseo-date-archive)
+* All In One SEO: [noindex the author archive](https://prpl.fyi/aioseo-author-archive)
+* All In One SEO: [noindex the date archive](https://prpl.fyi/aioseo-date-archive)
 * All In One SEO: [Remove post authors feeds](https://prpl.fyi/aioseo-crawl-optimization-feed-authors)
-* All In One SEO: [Remove global comment feeds](https://prpl.fyi/aioseo-crawl-optimization-feed-global-comments)
+* All In One SEO: [Remove comment feeds](https://prpl.fyi/aioseo-crawl-optimization-feed-comments)
 * All In One SEO: [disable the media pages](https://prpl.fyi/aioseo-media-pages)
 * All In One SEO: set your [organization](https://prpl.fyi/aioseo-organization-logo) or [person](https://prpl.fyi/aioseo-person-logo) logo
 
