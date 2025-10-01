@@ -56,5 +56,4 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<br>
 		<?php \esc_html_e( 'Check back later for new tasks!', 'progress-planner' ); ?>
 	</p>
-	<hr>
 </div>
