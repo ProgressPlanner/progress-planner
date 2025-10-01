@@ -62,54 +62,60 @@ prplDocumentReady( () => {
 		'input[name="date_format_custom"]'
 	);
 
-	customDateInput.addEventListener( 'click', function () {
-		document.getElementById( 'date_format_custom_radio' ).checked = true;
-	} );
+	if ( customDateInput ) {
+		customDateInput.addEventListener( 'click', function () {
+			document.getElementById(
+				'date_format_custom_radio'
+			).checked = true;
+		} );
 
-	customDateInput.addEventListener( 'input', function () {
-		document.getElementById( 'date_format_custom_radio' ).checked = true;
+		customDateInput.addEventListener( 'input', function () {
+			document.getElementById(
+				'date_format_custom_radio'
+			).checked = true;
 
-		const format = this;
-		const fieldset = format.closest( 'fieldset' );
-		const example = fieldset.querySelector( '.example' );
+			const format = this;
+			const fieldset = format.closest( 'fieldset' );
+			const example = fieldset.querySelector( '.example' );
 
-		// Debounce the event callback while users are typing.
-		clearTimeout( format.dataset.timer );
-		format.dataset.timer = setTimeout( function () {
-			// If custom date is not empty.
-			if ( format.value ) {
-				// Find the spinner element within the fieldset
-				const spinner = fieldset.querySelector( '.spinner' );
-				if ( spinner ) {
-					spinner.classList.add( 'is-active' );
+			// Debounce the event callback while users are typing.
+			clearTimeout( format.dataset.timer );
+			format.dataset.timer = setTimeout( function () {
+				// If custom date is not empty.
+				if ( format.value ) {
+					// Find the spinner element within the fieldset
+					const spinner = fieldset.querySelector( '.spinner' );
+					if ( spinner ) {
+						spinner.classList.add( 'is-active' );
+					}
+
+					// Use fetch instead of $.post
+					fetch( progressPlanner.ajaxUrl, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded',
+						},
+						body: new URLSearchParams( {
+							action: 'date_format',
+							date: format.value,
+						} ),
+					} )
+						.then( function ( response ) {
+							return response.text();
+						} )
+						.then( function ( data ) {
+							example.textContent = data;
+						} )
+						.catch( function ( error ) {
+							console.error( 'Error:', error );
+						} )
+						.finally( function () {
+							if ( spinner ) {
+								spinner.classList.remove( 'is-active' );
+							}
+						} );
 				}
-
-				// Use fetch instead of $.post
-				fetch( progressPlanner.ajaxUrl, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-					},
-					body: new URLSearchParams( {
-						action: 'date_format',
-						date: format.value,
-					} ),
-				} )
-					.then( function ( response ) {
-						return response.text();
-					} )
-					.then( function ( data ) {
-						example.textContent = data;
-					} )
-					.catch( function ( error ) {
-						console.error( 'Error:', error );
-					} )
-					.finally( function () {
-						if ( spinner ) {
-							spinner.classList.remove( 'is-active' );
-						}
-					} );
-			}
-		}, 500 );
-	} );
+			}, 500 );
+		} );
+	}
 } );
