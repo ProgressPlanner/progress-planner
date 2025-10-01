@@ -7,6 +7,7 @@ Enhancements:
 Bugs we fixed:
 
 * Fix missing content and streak badges after they are all completed.
+* Fix issue when point is sometimes not awarded for completing "Remove term without posts" task.
 
 
 = 1.8.0 =
