@@ -54,7 +54,7 @@ class Organization_Logo extends AIOSEO_Provider {
 		}
 
 		$options   = \aioseo()->options->searchAppearance->global->schema;
-		$is_person = isset( $options->siteRepresents ) && 'person' === $options->siteRepresents;
+		$is_person = isset( $options->siteRepresents ) && 'person' === $options->siteRepresents; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		return $is_person
 			? \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/aioseo-person-logo' )
 			: \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/aioseo-organization-logo' );
@@ -76,14 +76,10 @@ class Organization_Logo extends AIOSEO_Provider {
 		// Check if logo is already set.
 		if ( $represents === 'person' ) {
 			return false;
-		} else {
-			// Check organization logo.
-			if ( \aioseo()->options->searchAppearance->global->schema->organizationLogo !== '' ) {
-				return false;
-			}
 		}
 
-		return true;
+		// Check organization logo.
+		return \aioseo()->options->searchAppearance->global->schema->organizationLogo === '';
 	}
 
 	/**
