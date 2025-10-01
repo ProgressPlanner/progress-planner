@@ -151,12 +151,10 @@ class Select_Locale extends Tasks_Interactive {
 
 		// Get the locales.
 		$locales = \array_map(
-			function ( $locale ) {
-				return [
-					'code' => $locale['language'],
-					'name' => $locale['native_name'],
-				];
-			},
+			fn( $locale ) => [
+				'code' => $locale['language'],
+				'name' => $locale['native_name'],
+			],
 			$locales['translations']
 		);
 
@@ -221,7 +219,7 @@ class Select_Locale extends Tasks_Interactive {
 			]
 		);
 		?>
-		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+		<button type="submit" class="prpl-button prpl-button-primary">
 			<?php \esc_html_e( 'Select locale', 'progress-planner' ); ?>
 		</button>
 		<?php

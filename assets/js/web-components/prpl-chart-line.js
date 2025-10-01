@@ -30,8 +30,8 @@ customElements.define(
 				strokeWidth: 4,
 				dataArgs: {},
 				showCharts: Object.keys( this.options.dataArgs ),
-				axisColor: '#d1d5db',
-				rulersColor: '#d1d5db',
+				axisColor: 'var(--prpl-color-border)',
+				rulersColor: 'var(--prpl-color-border)',
 				filtersLabel: '',
 				...this.options,
 			};

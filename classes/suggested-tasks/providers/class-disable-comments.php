@@ -137,7 +137,7 @@ class Disable_Comments extends Tasks_Interactive {
 	 */
 	public function print_popover_form_contents() {
 		?>
-		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+		<button type="submit" class="prpl-button prpl-button-primary">
 			<?php \esc_html_e( 'Disable new comments', 'progress-planner' ); ?>
 		</button>
 		<?php if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) : ?>
