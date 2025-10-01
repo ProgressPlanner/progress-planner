@@ -92,22 +92,12 @@ function prplStartTour() {
 			: 0 // Start from beginning.
 	);
 
-	// Remove `delay-tour=true` from the URL, without refreshing the page.
+	// Remove `show-tour=true` from the URL, without refreshing the page.
 	window.history.replaceState(
 		{},
 		document.title,
 		window.location.href
 			.replace( '&show-tour=true', '' )
 			.replace( 'show-tour=true', '' )
-			.replace( '&delay-tour=true', '' )
-			.replace( 'delay-tour=true', '' )
 	);
-}
-
-// Start the tour if the URL contains the query parameter.
-if ( window.location.href.includes( 'show-tour=true' ) ) {
-	// If there are pending tasks, delay the tour until celebration is done.
-	const delay = window.location.href.includes( 'delay-tour=true' ) ? 5000 : 0;
-
-	setTimeout( prplStartTour, delay );
 }

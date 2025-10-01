@@ -27,8 +27,8 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 
 	<prpl-gauge
 		id="prpl-gauge-ravi"
-		background="var(--prpl-background-orange)"
-		color="var(--prpl-color-accent-orange)"
+		background="var(--prpl-background-monthly)"
+		color="var(--prpl-color-monthly)"
 		data-max="<?php echo (int) Monthly::TARGET_POINTS; ?>"
 		data-value="<?php echo (float) $prpl_widget->get_score()['target_score']; ?>"
 		data-badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"

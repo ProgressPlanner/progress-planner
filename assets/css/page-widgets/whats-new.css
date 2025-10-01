@@ -46,7 +46,7 @@
 			text-decoration: underline;
 
 			&:hover {
-				color: var(--prpl-color-gray-6);
+				color: var(--prpl-color-link-hover);
 				text-decoration: none;
 			}
 		}
@@ -60,8 +60,8 @@
 	background-size: cover;
 	margin-bottom: 0.75rem;
 	border-radius: var(--prpl-border-radius-big);
-	border: 1px solid var(--prpl-color-gray-2);
-	background-color: var(--prpl-color-gray-1); /* Fallback, if remote host image is not accessible */
+	border: 1px solid var(--prpl-color-border);
+	background-color: var(--prpl-color-gauge-remain); /* Fallback, if remote host image is not accessible */
 	transition: transform 0.2s, box-shadow 0.2s;
 
 	&:hover {
