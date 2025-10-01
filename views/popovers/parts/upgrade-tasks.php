@@ -21,16 +21,9 @@ if ( empty( $prpl_task_providers ) ) {
 	return;
 }
 
-// Context can be 'onboarding' or 'upgrade'.
-$prpl_context = isset( $context ) ? $context : 'upgrade';
+$prpl_title = \__( "We've added new recommendations to the Progress Planner plugin", 'progress-planner' );
 
-$prpl_title = 'onboarding' === $prpl_context
-	? \__( "Let's check off what you've already done! We're checking your site now—this will only take a minute...", 'progress-planner' )
-	: \__( "We've added new recommendations to the Progress Planner plugin", 'progress-planner' );
-
-$prpl_subtitle = 'onboarding' === $prpl_context
-	? ''
-	: \__( "Let's check if you've already done those tasks, this will take only a minute...", 'progress-planner' );
+$prpl_subtitle = \__( "Let's check if you've already done those tasks, this will take only a minute...", 'progress-planner' );
 
 $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 ?>
