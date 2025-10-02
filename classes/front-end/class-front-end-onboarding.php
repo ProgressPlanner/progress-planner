@@ -167,7 +167,7 @@ class Front_End_Onboarding {
 
 		// Note: Completing task will set it it to pending, so user will get celebration.
 		// Do we want that?
-		$result = \progress_planner()->get_suggested_tasks()->complete_task( $task_id );
+		$result = \progress_planner()->get_suggested_tasks()->mark_task_as_completed( $task_id );
 
 		if ( ! $result ) {
 			\error_log( 'Task not completed: ' . $task_id ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
