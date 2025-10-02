@@ -94,6 +94,32 @@ class PrplGaugeProgressController {
 
 					// Update remaining points for all progress bars
 					this.updateRemainingPoints();
+
+					// If the previous month badge is completed, remove the progress bar.
+					if (
+						event.detail.points >=
+						parseInt( event.detail.maxPoints )
+					) {
+						// Remove the previous month badge progress bar.
+						document
+							.querySelector(
+								`.prpl-previous-month-badge-progress-bar-wrapper[data-badge-id="${ event.detail.badgeId }"]`
+							)
+							?.remove();
+
+						// If there are no more progress bars, remove the previous month badge progress bar wrapper.
+						if (
+							! document.querySelector(
+								'.prpl-previous-month-badge-progress-bar-wrapper'
+							)
+						) {
+							document
+								.querySelector(
+									'.prpl-previous-month-badge-progress-bars-wrapper'
+								)
+								?.remove();
+						}
+					}
 				}
 			}
 		);

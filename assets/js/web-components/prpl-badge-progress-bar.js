@@ -77,42 +77,57 @@ customElements.define(
 
 		render() {
 			this.shadowRoot.innerHTML = `
-        <style>
-          .container {
-            padding: 1rem 0;
-          }
-          .bar {
-            width: 100%;
-            height: 1rem;
-            background-color: var(--prpl-color-gauge-remain);
-            border-radius: 0.5rem;
-            position: relative;
-          }
-          .progress {
-            height: 100%;
-            background-color: var(--prpl-color-monthly);
-            border-radius: 0.5rem;
-            transition: width 0.4s ease;
-          }
-          prpl-badge {
-            display: flex;
-            width: 7.5rem;
-            height: auto;
-            position: absolute;
-            top: -2.5rem;
-            transition: left 0.4s ease;
-          }
-        </style>
-        <div class="container">
-          <div class="bar">
-            <div class="progress"></div>
-            <prpl-badge
-              badge-id="${ this.state.badgeId }"
-              branding-id="${ this.state.brandingId }">
-            </prpl-badge>
-          </div>
-        </div>
-      `;
+		<style>
+		  .container {
+			padding: 1rem 0;
+		  }
+		  .bar {
+			width: 100%;
+			height: 1rem;
+			background-color: var(--prpl-color-gauge-remain);
+			border-radius: 0.5rem;
+			position: relative;
+		  }
+		  .progress {
+			height: 100%;
+			background-color: var(--prpl-color-monthly);
+			border-radius: 0.5rem;
+			transition: width 0.4s ease;
+		  }
+		  prpl-badge {
+			display: flex;
+			width: 7.5rem;
+			height: auto;
+			position: absolute;
+			top: -2.5rem;
+			transition: left 0.4s ease;
+
+			&::after {
+				content: "!";
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 20px;
+				height: 20px;
+				background-color: var(--prpl-color-alert-error);
+				border: 2px solid #fff;
+				border-radius: 50%;
+				position: absolute;
+				top: 10%;
+				right: 25%;
+				color: #fff;
+		  }
+		</style>
+		<div class="container">
+		  <div class="bar">
+			<div class="progress"></div>
+			<prpl-badge
+			  badge-id="${ this.state.badgeId }"
+			  branding-id="${ this.state.brandingId }">
+			</prpl-badge>
+		  </div>
+		</div>
+	  `;
 
 			this.progressEl = this.shadowRoot.querySelector( '.progress' );
 			this.badgeEl = this.shadowRoot.querySelector( 'prpl-badge' );
