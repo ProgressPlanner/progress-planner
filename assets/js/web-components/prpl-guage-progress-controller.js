@@ -153,12 +153,13 @@ class PrplGaugeProgressController {
 		}
 
 		// See if the badge is completed or not, this is used as attribute value.
-		const badgeCompleted = value >= parseInt( max ) ? 'true' : 'false';
+		const badgeCompleted =
+			parseInt( value ) >= parseInt( max ) ? 'true' : 'false';
 
 		// If the badge was completed we need to select all badges with the same badge-id which are marked as not completed.
 		// And vice versa.
 		const badgeSelector = `prpl-badge[complete="${
-			badgeCompleted ? 'false' : 'true'
+			'true' === badgeCompleted ? 'false' : 'true'
 		}"][badge-id="${ badgeId }"]`;
 
 		// We have multiple badges, one in widget and the other in the popover.
