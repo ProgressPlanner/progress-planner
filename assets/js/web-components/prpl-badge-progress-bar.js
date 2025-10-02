@@ -27,8 +27,8 @@ customElements.define(
 			this.attachShadow( { mode: 'open' } );
 			this.state = {
 				badgeId: this.getAttribute( 'data-badge-id' ) || '',
-				points: parseFloat( this.getAttribute( 'data-points' ) || '0' ),
-				maxPoints: parseFloat(
+				points: parseInt( this.getAttribute( 'data-points' ) || '0' ),
+				maxPoints: parseInt(
 					this.getAttribute( 'data-max-points' ) || '10'
 				),
 				// brandingId: this.getAttribute( 'branding-id' ) || 0,
@@ -50,7 +50,7 @@ customElements.define(
 			if ( oldVal === newVal ) return;
 			if ( name === 'data-points' || name === 'data-max-points' ) {
 				this.state[ name === 'data-points' ? 'points' : 'maxPoints' ] =
-					parseFloat( newVal );
+					parseInt( newVal );
 			} else {
 				this.state[ name.replace( '-', '' ) ] = newVal;
 			}

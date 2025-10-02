@@ -90,10 +90,10 @@ customElements.define(
 			if ( newVal === oldVal ) return;
 			switch ( name ) {
 				case 'data-value':
-					this.state.value = parseFloat( newVal );
+					this.state.value = parseInt( newVal );
 					break;
 				case 'data-max':
-					this.state.max = parseFloat( newVal );
+					this.state.max = parseInt( newVal );
 					break;
 				case 'maxdeg':
 					this.state.maxDeg = newVal;
