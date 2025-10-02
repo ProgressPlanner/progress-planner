@@ -14,6 +14,9 @@
 customElements.define(
 	'prpl-gauge',
 	class extends HTMLElement {
+		/**
+		 * Observed attributes, defined the attributes that will trigger the attributeChangedCallback.
+		 */
 		static get observedAttributes() {
 			return [
 				'data-value',
@@ -31,6 +34,9 @@ customElements.define(
 			];
 		}
 
+		/**
+		 * Constructor, ran when the element is instantiated.
+		 */
 		constructor() {
 			super();
 			this.attachShadow( { mode: 'open' } );
@@ -51,24 +57,42 @@ customElements.define(
 			};
 		}
 
+		/**
+		 * Get the value of the gauge.
+		 */
 		get value() {
 			return parseInt( this.state.value );
 		}
+
+		/**
+		 * Set the value of the gauge.
+		 */
 		set value( v ) {
+			v = Math.max( 0, Math.min( v, this.max ) );
 			this.state.value = v;
 			this.setAttribute( 'data-value', v );
 		}
 
+		/**
+		 * Get the max of the gauge.
+		 */
 		get max() {
 			return parseInt( this.state.max );
 		}
+
+		/**
+		 * Set the max of the gauge.
+		 */
 		set max( v ) {
 			this.state.max = v;
 			this.setAttribute( 'data-max', v );
 		}
 
+		/**
+		 * Connected callback, ran after the element is connected to the DOM.
+		 */
 		connectedCallback() {
-			// Wait for slot to be populated, wait for the next 'tick'.
+			// Wait for slot to be populated, wait for the next 'tick' - this will be executed last.
 			setTimeout( () => {
 				const slot = this.shadowRoot.querySelector( 'slot' );
 				const nodes = slot.assignedElements();
@@ -80,16 +104,25 @@ customElements.define(
 							node.innerHTML.includes( '<prpl-badge' )
 					);
 					this.state.content = hasPrplBadge ? '<prpl-badge' : '';
-					this.render();
 				}
-			}, 0 );
 
-			this.updateStateFromAttributes();
-			this.render();
+				// Render the gauge.
+				this.render();
+			}, 0 );
 		}
 
+		/**
+		 * Attribute changed callback, ran on page load and when an observed attribute is changed.
+		 *
+		 * @param {string} name   The name of the attribute that was changed.
+		 * @param {string} oldVal The old value of the attribute.
+		 * @param {string} newVal The new value of the attribute.
+		 */
 		attributeChangedCallback( name, oldVal, newVal ) {
-			if ( newVal === oldVal ) return;
+			if ( newVal === oldVal ) {
+				return;
+			}
+
 			switch ( name ) {
 				case 'data-value':
 					this.state.value = parseInt( newVal );
@@ -145,16 +178,9 @@ customElements.define(
 			);
 		}
 
-		// WIP, we need to sync the state but in a better way.
-		updateStateFromAttributes() {
-			// for ( const attr of PrplGauge.observedAttributes ) {
-			// 	if ( this.hasAttribute( attr ) ) {
-			// 		const val = this.getAttribute( attr );
-			// 		this.attributeChangedCallback( attr, null, val );
-			// 	}
-			// }
-		}
-
+		/**
+		 * Render the gauge.
+		 */
 		render() {
 			const {
 				max,
@@ -208,12 +234,14 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 		return;
 	}
 
+	// Get the gauge.
 	const controllerGauge = document.getElementById( 'prpl-gauge-ravi' );
 
 	if ( ! controllerGauge ) {
 		return;
 	}
 
+	// Get the progress bars, if any.
 	const controlProgressBars = [];
 
 	if (
@@ -228,13 +256,13 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 		);
 	}
 
+	// Create the controller.
 	const controller = new PrplGaugeProgressController(
 		controllerGauge,
 		...controlProgressBars
 	);
 
-	// WIP: handle points difference.
-	console.log( { pointsDiff } );
+	// Handle points difference.
 	if ( 0 < pointsDiff ) {
 		controller.increase( pointsDiff );
 	} else {

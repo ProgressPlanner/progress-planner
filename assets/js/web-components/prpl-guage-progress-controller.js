@@ -21,11 +21,12 @@ class PrplGaugeProgressController {
 			0
 		);
 
-		console.log( this.totalMaxPoints );
-
 		this.addListeners();
 	}
 
+	/**
+	 * Add listeners to the gauge and progress bars.
+	 */
 	addListeners() {
 		// Update the main gauge points counter.
 		document.addEventListener( 'prpl-gauge-update', ( event ) => {
@@ -59,12 +60,6 @@ class PrplGaugeProgressController {
 		document.addEventListener(
 			'prlp-badge-progress-bar-update',
 			( event ) => {
-				if ( 'prpl-badge-progress-bar' !== event.detail.elementId ) {
-					// return;
-				}
-
-				console.log( event.detail );
-
 				// Update the remaining points.
 				const remainingPointsEl = event.detail.element;
 
@@ -147,8 +142,6 @@ class PrplGaugeProgressController {
 			} else {
 				// Gauge is full, show remaining points in this specific bar
 				for ( let j = 0; j <= i; j++ ) {
-					console.log( this._barMaxPoints( this.progressBars[ j ] ) );
-					console.log( this._barValue( this.progressBars[ j ] ) );
 					remainingPoints +=
 						this._barMaxPoints( this.progressBars[ j ] ) -
 						this._barValue( this.progressBars[ j ] );
@@ -172,6 +165,13 @@ class PrplGaugeProgressController {
 		}
 	}
 
+	/**
+	 * Maybe update the badge completed status.
+	 *
+	 * @param {string} badgeId The badge id.
+	 * @param {number} value   The value.
+	 * @param {number} max     The max.
+	 */
 	maybeUpdateBadgeCompletedStatus( badgeId, value, max ) {
 		if ( ! badgeId ) {
 			return;
@@ -197,11 +197,19 @@ class PrplGaugeProgressController {
 			} );
 	}
 
+	/**
+	 * Get the gauge value.
+	 */
 	get gaugeValue() {
 		return parseInt( this.gauge.value ) || 0;
 	}
+
+	/**
+	 * Set the gauge value.
+	 *
+	 * @param {number} v The value.
+	 */
 	set gaugeValue( v ) {
-		v = Math.max( 0, Math.min( v, this.gaugeMax ) );
 		this.gauge.value = v;
 	}
 
@@ -213,8 +221,6 @@ class PrplGaugeProgressController {
 		return parseInt( bar.points ) || 0;
 	}
 	_setBarValue( bar, v ) {
-		const max = parseInt( bar.maxPoints ) || 10;
-		v = Math.max( 0, Math.min( v, max ) );
 		bar.points = v;
 	}
 
@@ -222,6 +228,12 @@ class PrplGaugeProgressController {
 		return parseInt( bar.state.maxPoints ) || 10;
 	}
 
+	/**
+	 * Increase the gauge and progress bars.
+	 * This method is used to sync the gauge and progress bars.
+	 *
+	 * @param {number} amount The amount.
+	 */
 	increase( amount = 1 ) {
 		let remaining = amount;
 
@@ -243,6 +255,12 @@ class PrplGaugeProgressController {
 		}
 	}
 
+	/**
+	 * Decrease the gauge and progress bars.
+	 * This method is used to sync the gauge and progress bars.
+	 *
+	 * @param {number} amount The amount.
+	 */
 	decrease( amount = 1 ) {
 		// Convert negative amount to positive.
 		if ( 0 > amount ) {
