@@ -120,8 +120,8 @@ class PrplGaugeProgressController {
 	}
 
 	/**
-	 * Update the remaining points display for all progress bars
-	 * based on current gauge and progress bar values
+	 * Update the remaining points display for all progress bars based on current gauge and progress bar values.
+	 * For example: "11 more points to go" text.
 	 */
 	updateRemainingPoints() {
 		const currentGaugeValue = this.gaugeValue;
@@ -213,17 +213,39 @@ class PrplGaugeProgressController {
 		this.gauge.value = v;
 	}
 
+	/**
+	 * Get the gauge max.
+	 */
 	get gaugeMax() {
 		return parseInt( this.gauge.max ) || 10;
 	}
 
+	/**
+	 * Get the bar value.
+	 *
+	 * @param {number} bar The bar.
+	 * @return {number} The value.
+	 */
 	_barValue( bar ) {
 		return parseInt( bar.points ) || 0;
 	}
+
+	/**
+	 * Set the bar value.
+	 *
+	 * @param {number} bar The bar.
+	 * @param {number} v   The value.
+	 */
 	_setBarValue( bar, v ) {
 		bar.points = v;
 	}
 
+	/**
+	 * Get the bar max points.
+	 *
+	 * @param {number} bar The bar.
+	 * @return {number} The max points.
+	 */
 	_barMaxPoints( bar ) {
 		return parseInt( bar.state.maxPoints ) || 10;
 	}
