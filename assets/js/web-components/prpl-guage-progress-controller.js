@@ -13,12 +13,11 @@ class PrplGaugeProgressController {
 		this.progressBars = progressBars; // array, can be empty.
 
 		// Gauge max points.
-		this.totalMaxPoints = parseInt( this.gauge.getAttribute( 'data-max' ) );
+		this.totalMaxPoints = parseInt( this.gaugeMax );
 
 		// Add progress bars max points.
 		this.totalMaxPoints += this.progressBars.reduce(
-			( acc, bar ) =>
-				acc + parseInt( bar.getAttribute( 'data-max-points' ) ),
+			( acc, bar ) => acc + parseInt( bar.maxPoints ),
 			0
 		);
 
@@ -199,28 +198,28 @@ class PrplGaugeProgressController {
 	}
 
 	get gaugeValue() {
-		return parseInt( this.gauge.getAttribute( 'data-value' ) ) || 0;
+		return parseInt( this.gauge.value ) || 0;
 	}
 	set gaugeValue( v ) {
 		v = Math.max( 0, Math.min( v, this.gaugeMax ) );
-		this.gauge.setAttribute( 'data-value', v );
+		this.gauge.value = v;
 	}
 
 	get gaugeMax() {
-		return parseInt( this.gauge.getAttribute( 'data-max' ) ) || 10;
+		return parseInt( this.gauge.max ) || 10;
 	}
 
 	_barValue( bar ) {
-		return parseInt( bar.getAttribute( 'data-points' ) ) || 0;
+		return parseInt( bar.points ) || 0;
 	}
 	_setBarValue( bar, v ) {
-		const max = parseInt( bar.getAttribute( 'data-max-points' ) ) || 10;
+		const max = parseInt( bar.maxPoints ) || 10;
 		v = Math.max( 0, Math.min( v, max ) );
-		bar.setAttribute( 'data-points', v );
+		bar.points = v;
 	}
 
 	_barMaxPoints( bar ) {
-		return parseInt( bar.getAttribute( 'data-max-points' ) ) || 10;
+		return parseInt( bar.state.maxPoints ) || 10;
 	}
 
 	increase( amount = 1 ) {
@@ -235,9 +234,7 @@ class PrplGaugeProgressController {
 		// Fill progress bars in order
 		for ( const bar of this.progressBars ) {
 			if ( remaining <= 0 ) break;
-			const barSpace =
-				parseInt( bar.getAttribute( 'data-max-points' ) ) -
-				this._barValue( bar );
+			const barSpace = parseInt( bar.maxPoints ) - this._barValue( bar );
 
 			const toBar = Math.min( remaining, barSpace );
 

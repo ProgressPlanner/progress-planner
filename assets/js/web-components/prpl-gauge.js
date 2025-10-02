@@ -52,16 +52,18 @@ customElements.define(
 		}
 
 		get value() {
-			return parseInt( this.getAttribute( 'data-value' ) || '0' );
+			return parseInt( this.state.value );
 		}
 		set value( v ) {
+			this.state.value = v;
 			this.setAttribute( 'data-value', v );
 		}
 
 		get max() {
-			return parseInt( this.getAttribute( 'data-max' ) || '10' );
+			return parseInt( this.state.max );
 		}
 		set max( v ) {
+			this.state.max = v;
 			this.setAttribute( 'data-max', v );
 		}
 

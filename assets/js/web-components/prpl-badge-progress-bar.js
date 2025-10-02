@@ -36,10 +36,23 @@ customElements.define(
 		}
 
 		get points() {
-			return parseInt( this.getAttribute( 'data-points' ) || '0' );
+			return parseInt( this.state.points );
 		}
 		set points( v ) {
+			this.state.points = v;
 			this.setAttribute( 'data-points', v );
+		}
+
+		get maxPoints() {
+			return parseInt( this.state.maxPoints );
+		}
+		set maxPoints( v ) {
+			this.state.maxPoints = v;
+			this.setAttribute( 'data-max-points', v );
+		}
+
+		get progressPercent() {
+			return ( this.points / this.maxPoints ) * 100;
 		}
 
 		connectedCallback() {
@@ -48,12 +61,15 @@ customElements.define(
 
 		attributeChangedCallback( name, oldVal, newVal ) {
 			if ( oldVal === newVal ) return;
+
+			// Update state.
 			if ( name === 'data-points' || name === 'data-max-points' ) {
 				this.state[ name === 'data-points' ? 'points' : 'maxPoints' ] =
 					parseInt( newVal );
 			} else {
 				this.state[ name.replace( '-', '' ) ] = newVal;
 			}
+
 			this.updateProgress();
 
 			this.dispatchEvent(
@@ -69,10 +85,6 @@ customElements.define(
 					composed: true,
 				} )
 			);
-		}
-
-		get progressPercent() {
-			return ( this.state.points / this.state.maxPoints ) * 100;
 		}
 
 		render() {
