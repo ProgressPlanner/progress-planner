@@ -165,6 +165,21 @@ class Front_End_Onboarding {
 			$form_values = \json_decode( $form_values, true );
 		}
 
+		// Get the task.
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
+		if ( ! $task ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
+		}
+
+		// To get the provider and complete the task, we need to use the provider.
+		$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task->get_provider_id() );
+		if ( ! $provider ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Provider not found.', 'progress-planner' ) ] );
+		}
+
+		// Complete the task.
+		$provider->complete_task( $form_values, $task_id );
+
 		// Note: Marking task as completed will set it it to pending, so user will get celebration. Do we want that?
 		$result = \progress_planner()->get_suggested_tasks()->mark_task_as_completed( $task_id );
 
