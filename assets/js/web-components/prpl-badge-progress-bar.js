@@ -160,6 +160,7 @@ customElements.define(
 						top: 10%;
 						right: 25%;
 						color: #fff;
+					}
 				}
 				</style>
 				<div class="container">
