@@ -12,15 +12,6 @@ class PrplGaugeProgressController {
 		this.gauge = gauge;
 		this.progressBars = progressBars; // array, can be empty.
 
-		// Gauge max points.
-		this.totalMaxPoints = parseInt( this.gaugeMax );
-
-		// Add progress bars max points.
-		this.totalMaxPoints += this.progressBars.reduce(
-			( acc, bar ) => acc + parseInt( bar.maxPoints ),
-			0
-		);
-
 		this.addListeners();
 	}
 
