@@ -19,7 +19,8 @@ class PrplGaugeProgressController {
 	 * Add listeners to the gauge and progress bars.
 	 */
 	addListeners() {
-		// Update the main gauge points counter.
+		// Updates the gauge and bars side elements (elements there are not part of the component) after the gauge is updated.
+		// For example: the points counter.
 		document.addEventListener( 'prpl-gauge-update', ( event ) => {
 			if (
 				'prpl-gauge-ravi' !== event.detail.element.getAttribute( 'id' )
@@ -47,7 +48,7 @@ class PrplGaugeProgressController {
 			this.updateRemainingPoints();
 		} );
 
-		// Update the progress bars points counters.
+		// Updates the gauge and bars side elements (elements there are not part of the component) after the bar is updated.
 		document.addEventListener(
 			'prlp-badge-progress-bar-update',
 			( event ) => {
@@ -80,31 +81,12 @@ class PrplGaugeProgressController {
 					// Update remaining points for all progress bars
 					this.updateRemainingPoints();
 
-					// If the previous month badge is completed, remove the progress bar.
-					if (
-						event.detail.points >=
-						parseInt( event.detail.maxPoints )
-					) {
-						// Remove the previous month badge progress bar.
-						document
-							.querySelector(
-								`.prpl-previous-month-badge-progress-bar-wrapper[data-badge-id="${ event.detail.badgeId }"]`
-							)
-							?.remove();
-
-						// If there are no more progress bars, remove the previous month badge progress bar wrapper.
-						if (
-							! document.querySelector(
-								'.prpl-previous-month-badge-progress-bar-wrapper'
-							)
-						) {
-							document
-								.querySelector(
-									'.prpl-previous-month-badge-progress-bars-wrapper'
-								)
-								?.remove();
-						}
-					}
+					// Maybe remove the completed bar.
+					this.maybeRemoveCompletedBar(
+						event.detail.badgeId,
+						event.detail.points,
+						event.detail.maxPoints
+					);
 				}
 			}
 		);
@@ -158,6 +140,7 @@ class PrplGaugeProgressController {
 
 	/**
 	 * Maybe update the badge completed status.
+	 * This sets the complete attribute on the badge element.
 	 *
 	 * @param {string} badgeId The badge id.
 	 * @param {number} value   The value.
@@ -186,6 +169,41 @@ class PrplGaugeProgressController {
 			?.forEach( ( badge ) => {
 				badge.setAttribute( 'complete', badgeCompleted );
 			} );
+	}
+
+	/**
+	 * Maybe remove the completed bar.
+	 *
+	 * @param {string} badgeId The badge id.
+	 * @param {number} value   The value.
+	 * @param {number} max     The max.
+	 */
+	maybeRemoveCompletedBar( badgeId, value, max ) {
+		if ( ! badgeId ) {
+		}
+
+		// If the previous month badge is completed, remove the progress bar.
+		if ( value >= parseInt( max ) ) {
+			// Remove the previous month badge progress bar.
+			document
+				.querySelector(
+					`.prpl-previous-month-badge-progress-bar-wrapper[data-badge-id="${ badgeId }"]`
+				)
+				?.remove();
+
+			// If there are no more progress bars, remove the previous month badge progress bar wrapper.
+			if (
+				! document.querySelector(
+					'.prpl-previous-month-badge-progress-bar-wrapper'
+				)
+			) {
+				document
+					.querySelector(
+						'.prpl-previous-month-badge-progress-bars-wrapper'
+					)
+					?.remove();
+			}
+		}
 	}
 
 	/**
