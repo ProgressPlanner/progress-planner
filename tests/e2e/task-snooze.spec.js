@@ -15,7 +15,12 @@ test.describe( 'PRPL Task Snooze', () => {
 			request,
 			`${ process.env.WORDPRESS_URL }/?rest_route=/progress-planner/v1/tasks`
 		);
-		const initialTasks = await response.json();
+		const responseData = await response.json();
+
+		// Handle both array and object responses
+		const initialTasks = Array.isArray( responseData )
+			? responseData
+			: responseData.tasks || [];
 
 		// Snooze task ID, Save Settings should be always available.
 		const snoozeTaskId = 'settings-saved';
@@ -65,7 +70,10 @@ test.describe( 'PRPL Task Snooze', () => {
 				request,
 				`${ process.env.WORDPRESS_URL }/?rest_route=/progress-planner/v1/tasks`
 			);
-			const updatedTasks = await updatedResponse.json();
+			const updatedResponseData = await updatedResponse.json();
+			const updatedTasks = Array.isArray( updatedResponseData )
+				? updatedResponseData
+				: updatedResponseData.tasks || [];
 			const updatedTask = updatedTasks.find(
 				( task ) => task.task_id === taskToSnooze.task_id
 			);
