@@ -40,26 +40,20 @@ class PrplGaugeProgressController {
 			const oldCounter = document.getElementById(
 				'prpl-widget-content-ravi-points-number'
 			);
+
 			if ( oldCounter ) {
 				oldCounter.textContent = parseInt( event.detail.value ) + 'pt';
 			}
 
-			// Mark badge as completed, in the a Monthly badges widgets, if we reached the max points.
-			if (
-				event.detail.badgeId &&
-				event.detail.value >= parseInt( event.detail.max )
-			) {
-				// We have multiple badges, one in widget and the other in the popover.
-				document
-					.querySelectorAll(
-						`.prpl-badge-row-wrapper .prpl-badge prpl-badge[complete="false"][badge-id="${ event.detail.badgeId }"]`
-					)
-					?.forEach( ( badge ) => {
-						badge.setAttribute( 'complete', 'true' );
-					} );
-			}
+			// Mark badge as (not)completed, in the a Monthly badges widgets, if we reached the max points.
+			this.maybeUpdateBadgeCompletedStatus(
+				event.detail.badgeId,
+				event.detail.value,
+				event.detail.max
+			);
 
-			// TODO: Update the points in the remaining points element.
+			// Update remaining points for all progress bars
+			this.updateRemainingPoints();
 		} );
 
 		// Update the progress bars points counters.
@@ -80,11 +74,6 @@ class PrplGaugeProgressController {
 				);
 
 				if ( remainingPointsElWrapper ) {
-					// remainingPointsEl.setAttribute(
-					// 	'data-remaining',
-					// 	event.detail.maxPoints - event.detail.points
-					// );
-
 					// Update the badge points number.
 					const badgePointsNumberEl =
 						remainingPointsElWrapper.querySelector(
@@ -96,18 +85,90 @@ class PrplGaugeProgressController {
 							event.detail.points + 'pt';
 					}
 
-					// Update the points in the remaining points element.
-					for ( let i = 0; i < this.progressBars.length; i++ ) {
-						console.log( i * 10 + event.detail.points );
-						this._setBarValue(
-							this.progressBars[ i ],
-							i * 10 +
-								( event.detail.maxPoints - event.detail.points )
-						);
-					}
+					// Mark badge as (not)completed, in the a Monthly badges widgets, if we reached the max points.
+					this.maybeUpdateBadgeCompletedStatus(
+						event.detail.badgeId,
+						event.detail.points,
+						event.detail.maxPoints
+					);
+
+					// Update remaining points for all progress bars
+					this.updateRemainingPoints();
 				}
 			}
 		);
+	}
+
+	/**
+	 * Update the remaining points display for all progress bars
+	 * based on current gauge and progress bar values
+	 */
+	updateRemainingPoints() {
+		const currentGaugeValue = this.gaugeValue;
+
+		for ( let i = 0; i < this.progressBars.length; i++ ) {
+			const bar = this.progressBars[ i ];
+
+			// Calculate remaining points for this bar
+			let remainingPoints = 0;
+			if ( currentGaugeValue < this.gaugeMax ) {
+				// Calculate the threshold for this progress bar
+				// First bar starts at gauge max (10), second at gauge max + first bar max (20), etc.
+				const barThreshold =
+					this.gaugeMax + ( i + 1 ) * this._barMaxPoints( bar );
+
+				// Gauge is not full yet, show points needed to reach this bar
+				remainingPoints = barThreshold - currentGaugeValue;
+			} else {
+				// Gauge is full, show remaining points in this specific bar
+				for ( let j = 0; j <= i; j++ ) {
+					console.log( this._barMaxPoints( this.progressBars[ j ] ) );
+					console.log( this._barValue( this.progressBars[ j ] ) );
+					remainingPoints +=
+						this._barMaxPoints( this.progressBars[ j ] ) -
+						this._barValue( this.progressBars[ j ] );
+				}
+			}
+
+			// Ensure remaining points is never negative
+			remainingPoints = Math.max( 0, remainingPoints );
+
+			// Update the display
+			const parentWrapper = bar.closest(
+				'.prpl-previous-month-badge-progress-bar-wrapper'
+			);
+
+			if ( parentWrapper ) {
+				const numberEl = parentWrapper.querySelector( '.number' );
+				if ( numberEl ) {
+					numberEl.textContent = remainingPoints;
+				}
+			}
+		}
+	}
+
+	maybeUpdateBadgeCompletedStatus( badgeId, value, max ) {
+		if ( ! badgeId ) {
+			return;
+		}
+
+		// See if the badge is completed or not, this is used as attribute value.
+		const badgeCompleted = value >= parseInt( max ) ? 'true' : 'false';
+
+		// If the badge was completed we need to select all badges with the same badge-id which are marked as not completed.
+		// And vice versa.
+		const badgeSelector = `prpl-badge[complete="${
+			badgeCompleted ? 'false' : 'true'
+		}"][badge-id="${ badgeId }"]`;
+
+		// We have multiple badges, one in widget and the other in the popover.
+		document
+			.querySelectorAll(
+				`.prpl-badge-row-wrapper .prpl-badge ${ badgeSelector }`
+			)
+			?.forEach( ( badge ) => {
+				badge.setAttribute( 'complete', badgeCompleted );
+			} );
 	}
 
 	get gaugeValue() {
@@ -129,6 +190,10 @@ class PrplGaugeProgressController {
 		const max = parseFloat( bar.getAttribute( 'data-max-points' ) ) || 10;
 		v = Math.max( 0, Math.min( v, max ) );
 		bar.setAttribute( 'data-points', v );
+	}
+
+	_barMaxPoints( bar ) {
+		return parseFloat( bar.getAttribute( 'data-max-points' ) ) || 10;
 	}
 
 	increase( amount = 1 ) {
