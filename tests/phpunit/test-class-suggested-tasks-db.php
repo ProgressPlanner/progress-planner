@@ -31,7 +31,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 
 		// Clean up existing tasks.
 		$this->db->delete_all_recommendations();
-		wp_cache_flush_group( Suggested_Tasks_DB::GET_TASKS_CACHE_GROUP );
+		\wp_cache_flush_group( Suggested_Tasks_DB::GET_TASKS_CACHE_GROUP );
 	}
 
 	/**
@@ -39,7 +39,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 	 */
 	public function tear_down() {
 		$this->db->delete_all_recommendations();
-		wp_cache_flush_group( Suggested_Tasks_DB::GET_TASKS_CACHE_GROUP );
+		\wp_cache_flush_group( Suggested_Tasks_DB::GET_TASKS_CACHE_GROUP );
 		parent::tear_down();
 	}
 
@@ -59,7 +59,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 		$post_id = $this->db->add( $data );
 
 		$this->assertGreaterThan( 0, $post_id );
-		$this->assertEquals( 'prpl_recommendations', get_post_type( $post_id ) );
+		$this->assertEquals( 'prpl_recommendations', \get_post_type( $post_id ) );
 	}
 
 	/**
@@ -110,7 +110,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 		];
 
 		$post_id = $this->db->add( $data );
-		$post    = get_post( $post_id );
+		$post    = \get_post( $post_id );
 
 		$this->assertEquals( 'pending', $post->post_status );
 	}
@@ -129,7 +129,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 		];
 
 		$post_id = $this->db->add( $data );
-		$post    = get_post( $post_id );
+		$post    = \get_post( $post_id );
 
 		$this->assertEquals( 'trash', $post->post_status );
 	}
@@ -148,7 +148,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 		];
 
 		$post_id = $this->db->add( $data );
-		$post    = get_post( $post_id );
+		$post    = \get_post( $post_id );
 
 		$this->assertEquals( 'trash', $post->post_status );
 	}
@@ -157,7 +157,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 	 * Test adding a snoozed task.
 	 */
 	public function test_add_task_snoozed_status() {
-		$snooze_time = time() + DAY_IN_SECONDS;
+		$snooze_time = \time() + DAY_IN_SECONDS;
 		$data        = [
 			'task_id'     => 'snoozed-task',
 			'post_title'  => 'Snoozed Task',
@@ -169,7 +169,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 		];
 
 		$post_id = $this->db->add( $data );
-		$post    = get_post( $post_id );
+		$post    = \get_post( $post_id );
 
 		$this->assertEquals( 'future', $post->post_status );
 	}
@@ -188,7 +188,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 		];
 
 		$post_id = $this->db->add( $data );
-		$post    = get_post( $post_id );
+		$post    = \get_post( $post_id );
 
 		$this->assertEquals( 5, $post->menu_order );
 	}
@@ -218,7 +218,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 		];
 		$child_id   = $this->db->add( $child_data );
 
-		$child_post = get_post( $child_id );
+		$child_post = \get_post( $child_id );
 		$this->assertEquals( $parent_id, $child_post->post_parent );
 	}
 
@@ -236,7 +236,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 		];
 
 		$post_id = $this->db->add( $data );
-		$meta    = get_post_meta( $post_id, 'prpl_custom_key', true );
+		$meta    = \get_post_meta( $post_id, 'prpl_custom_key', true );
 
 		$this->assertEquals( 'custom_value', $meta );
 	}
@@ -258,7 +258,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 
 		// Manually set a fresh lock to simulate concurrent request.
 		$lock_key = 'prpl_task_lock_locked-task';
-		update_option( $lock_key, time() );
+		\update_option( $lock_key, \time() );
 
 		// Try to add the same task again - should be blocked by lock.
 		$post_id2 = $this->db->add( $data );
@@ -267,7 +267,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 		$this->assertEquals( 0, $post_id2 );
 
 		// Clean up.
-		delete_option( $lock_key );
+		\delete_option( $lock_key );
 	}
 
 	/**
@@ -284,8 +284,8 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 
 		// Manually create a stale lock (older than 30 seconds).
 		$lock_key   = 'prpl_task_lock_stale-lock-task';
-		$stale_time = time() - 60; // 60 seconds ago.
-		update_option( $lock_key, $stale_time );
+		$stale_time = \time() - 60; // 60 seconds ago.
+		\update_option( $lock_key, $stale_time );
 
 		// Try to add the task - should take over the stale lock.
 		$post_id = $this->db->add( $data );
@@ -293,7 +293,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 		$this->assertGreaterThan( 0, $post_id );
 
 		// Lock should be deleted after add completes.
-		$this->assertFalse( get_option( $lock_key ) );
+		$this->assertFalse( \get_option( $lock_key ) );
 	}
 
 	/**
@@ -464,7 +464,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 		$result = $this->db->delete_recommendation( $post_id );
 
 		$this->assertTrue( $result );
-		$this->assertNull( get_post( $post_id ) );
+		$this->assertNull( \get_post( $post_id ) );
 	}
 
 	/**
@@ -559,7 +559,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 			]
 		);
 
-		$post = get_post( $post_id );
+		$post = \get_post( $post_id );
 		$task = $this->db->format_recommendation( $post );
 
 		$this->assertInstanceOf( 'Progress_Planner\Suggested_Tasks\Task', $task );
@@ -583,7 +583,7 @@ class Test_Suggested_Tasks_DB extends WP_UnitTestCase {
 			);
 		}
 
-		$posts = array_map( 'get_post', $post_ids );
+		$posts = \array_map( 'get_post', $post_ids );
 		$tasks = $this->db->format_recommendations( $posts );
 
 		$this->assertCount( 2, $tasks );

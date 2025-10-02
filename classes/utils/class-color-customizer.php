@@ -271,7 +271,7 @@ class Color_Customizer {
 
 				<?php foreach ( $color_variables as $section_name => $variables ) : ?>
 					<?php
-					if ( ! $section_name || ! is_array( $variables ) ) {
+					if ( ! $section_name || ! \is_array( $variables ) ) {
 						continue;}
 					?>
 					<div class="color-section">
@@ -462,14 +462,14 @@ class Color_Customizer {
 		}
 
 		// If it's already a 6-digit hex, return as is.
-		if ( preg_match( '/^#[0-9A-Fa-f]{6}$/', $color_value ) ) {
-			return strtolower( $color_value );
+		if ( \preg_match( '/^#[0-9A-Fa-f]{6}$/', $color_value ) ) {
+			return \strtolower( $color_value );
 		}
 
 		// Convert 3-digit hex to 6-digit.
-		if ( preg_match( '/^#[0-9A-Fa-f]{3}$/', $color_value ) ) {
-			$hex = substr( $color_value, 1 );
-			return '#' . strtolower( $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2] );
+		if ( \preg_match( '/^#[0-9A-Fa-f]{3}$/', $color_value ) ) {
+			$hex = \substr( $color_value, 1 );
+			return '#' . \strtolower( $hex[0] . $hex[0] . $hex[1] . $hex[1] . $hex[2] . $hex[2] );
 		}
 
 		// If it's not a valid hex color, return black as fallback.

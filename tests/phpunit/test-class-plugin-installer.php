@@ -31,8 +31,8 @@ class Plugin_Installer_Test extends \WP_UnitTestCase {
 	 * Test constructor hooks are registered.
 	 */
 	public function test_constructor_registers_hooks() {
-		$this->assertEquals( 10, has_action( 'wp_ajax_progress_planner_install_plugin', [ $this->installer, 'install' ] ) );
-		$this->assertEquals( 10, has_action( 'wp_ajax_progress_planner_activate_plugin', [ $this->installer, 'activate' ] ) );
+		$this->assertEquals( 10, \has_action( 'wp_ajax_progress_planner_install_plugin', [ $this->installer, 'install' ] ) );
+		$this->assertEquals( 10, \has_action( 'wp_ajax_progress_planner_activate_plugin', [ $this->installer, 'activate' ] ) );
 	}
 
 	/**
@@ -41,7 +41,12 @@ class Plugin_Installer_Test extends \WP_UnitTestCase {
 	public function test_check_capabilities_admin() {
 		// Create an admin user.
 		$admin_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		wp_set_current_user( $admin_id );
+		\wp_set_current_user( $admin_id );
+
+		// On multisite, grant super admin capabilities to install plugins.
+		if ( \is_multisite() ) {
+			\grant_super_admin( $admin_id );
+		}
 
 		$result = $this->installer->check_capabilities();
 
@@ -54,7 +59,7 @@ class Plugin_Installer_Test extends \WP_UnitTestCase {
 	public function test_check_capabilities_non_admin() {
 		// Create a subscriber user.
 		$subscriber_id = $this->factory->user->create( [ 'role' => 'subscriber' ] );
-		wp_set_current_user( $subscriber_id );
+		\wp_set_current_user( $subscriber_id );
 
 		$result = $this->installer->check_capabilities();
 
@@ -76,16 +81,16 @@ class Plugin_Installer_Test extends \WP_UnitTestCase {
 	 */
 	public function test_is_plugin_installed_existing_plugin() {
 		// Get any installed plugin from the test environment.
-		if ( ! function_exists( 'get_plugins' ) ) {
+		if ( ! \function_exists( 'get_plugins' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$plugins = get_plugins();
+		$plugins = \get_plugins();
 
 		// If there are plugins, test with the first one.
 		if ( ! empty( $plugins ) ) {
-			$first_plugin = array_keys( $plugins )[0];
-			$plugin_slug  = explode( '/', $first_plugin )[0];
+			$first_plugin = \array_keys( $plugins )[0];
+			$plugin_slug  = \explode( '/', $first_plugin )[0];
 
 			$result = $this->installer->is_plugin_installed( $plugin_slug );
 			$this->assertTrue( $result );
@@ -110,16 +115,16 @@ class Plugin_Installer_Test extends \WP_UnitTestCase {
 	 */
 	public function test_is_plugin_activated_active_plugin() {
 		// Get any installed plugin from the test environment.
-		if ( ! function_exists( 'get_plugins' ) ) {
+		if ( ! \function_exists( 'get_plugins' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$plugins = get_plugins();
+		$plugins = \get_plugins();
 
 		// If there are plugins, test with the first one.
 		if ( ! empty( $plugins ) ) {
-			$first_plugin = array_keys( $plugins )[0];
-			$plugin_slug  = explode( '/', $first_plugin )[0];
+			$first_plugin = \array_keys( $plugins )[0];
+			$plugin_slug  = \explode( '/', $first_plugin )[0];
 
 			$result = $this->installer->is_plugin_activated( $plugin_slug );
 			// Result should be boolean.

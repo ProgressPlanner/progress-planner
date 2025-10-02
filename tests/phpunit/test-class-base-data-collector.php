@@ -121,13 +121,28 @@ class Test_Base_Data_Collector extends WP_UnitTestCase {
 class Test_Concrete_Data_Collector extends Base_Data_Collector {
 	protected const DATA_KEY = 'test_data';
 
+	/**
+	 * Track the number of times calculate_data is called.
+	 *
+	 * @var int
+	 */
 	private $calculate_call_count = 0;
 
+	/**
+	 * Calculate the data.
+	 *
+	 * @return string
+	 */
 	protected function calculate_data() {
 		++$this->calculate_call_count;
 		return 'calculated_value';
 	}
 
+	/**
+	 * Get the number of times calculate_data has been called.
+	 *
+	 * @return int
+	 */
 	public function get_calculate_call_count() {
 		return $this->calculate_call_count;
 	}
@@ -139,6 +154,11 @@ class Test_Concrete_Data_Collector extends Base_Data_Collector {
 class Test_Array_Data_Collector extends Base_Data_Collector {
 	protected const DATA_KEY = 'test_array';
 
+	/**
+	 * Calculate the data.
+	 *
+	 * @return array<string, string>
+	 */
 	protected function calculate_data() {
 		return [ 'foo' => 'bar' ];
 	}
@@ -150,6 +170,11 @@ class Test_Array_Data_Collector extends Base_Data_Collector {
 class Test_Int_Data_Collector extends Base_Data_Collector {
 	protected const DATA_KEY = 'test_int';
 
+	/**
+	 * Calculate the data.
+	 *
+	 * @return int
+	 */
 	protected function calculate_data() {
 		return 42;
 	}
@@ -160,16 +185,35 @@ class Test_Int_Data_Collector extends Base_Data_Collector {
  */
 class Test_Init_Data_Collector extends Base_Data_Collector {
 	protected const DATA_KEY = 'test_init';
-	private $initialized     = false;
 
+	/**
+	 * Track whether the collector has been initialized.
+	 *
+	 * @var bool
+	 */
+	private $initialized = false;
+
+	/**
+	 * Calculate the data.
+	 *
+	 * @return string
+	 */
 	protected function calculate_data() {
 		return 'test';
 	}
 
+	/**
+	 * Initialize the collector.
+	 */
 	public function init() {
 		$this->initialized = true;
 	}
 
+	/**
+	 * Check if the collector has been initialized.
+	 *
+	 * @return bool
+	 */
 	public function is_initialized() {
 		return $this->initialized;
 	}

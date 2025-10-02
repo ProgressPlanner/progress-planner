@@ -53,13 +53,13 @@ class Lessons_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_utils__cache()->delete_all();
 
 		// Mock the remote API response with high priority to override any other filters.
-		add_filter(
+		\add_filter(
 			'pre_http_request',
 			function ( $preempt, $args, $url ) {
-				if ( strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
+				if ( \strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
 					return [
 						'response' => [ 'code' => 200 ],
-						'body'     => wp_json_encode(
+						'body'     => \wp_json_encode(
 							[
 								[
 									'name'     => 'Test Lesson 1',
@@ -90,15 +90,15 @@ class Lessons_Test extends \WP_UnitTestCase {
 
 		// Should be an array with items.
 		$this->assertIsArray( $result1 );
-		$this->assertGreaterThan( 0, count( $result1 ) );
+		$this->assertGreaterThan( 0, \count( $result1 ) );
 
 		// If our mock worked, we should have exactly 2 items.
-		if ( count( $result1 ) === 2 ) {
+		if ( \count( $result1 ) === 2 ) {
 			$this->assertEquals( 'Test Lesson 1', $result1[0]['name'] );
 			$this->assertEquals( 'Test Lesson 2', $result1[1]['name'] );
 		}
 
-		remove_all_filters( 'pre_http_request' );
+		\remove_all_filters( 'pre_http_request' );
 	}
 
 	/**
@@ -109,10 +109,10 @@ class Lessons_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_utils__cache()->delete_all();
 
 		// Mock a WP_Error response.
-		add_filter(
+		\add_filter(
 			'pre_http_request',
 			function ( $preempt, $args, $url ) {
-				if ( strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
+				if ( \strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
 					return new \WP_Error( 'http_request_failed', 'Connection timeout' );
 				}
 				return $preempt;
@@ -127,7 +127,7 @@ class Lessons_Test extends \WP_UnitTestCase {
 		$this->assertIsArray( $result );
 		$this->assertEmpty( $result );
 
-		remove_all_filters( 'pre_http_request' );
+		\remove_all_filters( 'pre_http_request' );
 	}
 
 	/**
@@ -138,10 +138,10 @@ class Lessons_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_utils__cache()->delete_all();
 
 		// Mock a 404 response.
-		add_filter(
+		\add_filter(
 			'pre_http_request',
 			function ( $preempt, $args, $url ) {
-				if ( strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
+				if ( \strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
 					return [
 						'response' => [ 'code' => 404 ],
 						'body'     => 'Not Found',
@@ -159,7 +159,7 @@ class Lessons_Test extends \WP_UnitTestCase {
 		$this->assertIsArray( $result );
 		$this->assertEmpty( $result );
 
-		remove_all_filters( 'pre_http_request' );
+		\remove_all_filters( 'pre_http_request' );
 	}
 
 	/**
@@ -170,10 +170,10 @@ class Lessons_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_utils__cache()->delete_all();
 
 		// Mock an invalid JSON response.
-		add_filter(
+		\add_filter(
 			'pre_http_request',
 			function ( $preempt, $args, $url ) {
-				if ( strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
+				if ( \strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
 					return [
 						'response' => [ 'code' => 200 ],
 						'body'     => 'invalid json{',
@@ -191,7 +191,7 @@ class Lessons_Test extends \WP_UnitTestCase {
 		$this->assertIsArray( $result );
 		$this->assertEmpty( $result );
 
-		remove_all_filters( 'pre_http_request' );
+		\remove_all_filters( 'pre_http_request' );
 	}
 
 	/**
@@ -202,13 +202,13 @@ class Lessons_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_utils__cache()->delete_all();
 
 		// Mock the remote API response.
-		add_filter(
+		\add_filter(
 			'pre_http_request',
 			function ( $preempt, $args, $url ) {
-				if ( strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
+				if ( \strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
 					return [
 						'response' => [ 'code' => 200 ],
-						'body'     => wp_json_encode(
+						'body'     => \wp_json_encode(
 							[
 								[
 									'name'     => 'About Page',
@@ -239,7 +239,7 @@ class Lessons_Test extends \WP_UnitTestCase {
 		$this->assertEquals( 'About Page', $result[0]['label'] );
 		$this->assertEquals( 'about', $result[0]['value'] );
 
-		remove_all_filters( 'pre_http_request' );
+		\remove_all_filters( 'pre_http_request' );
 	}
 
 	/**
@@ -250,16 +250,16 @@ class Lessons_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_utils__cache()->delete_all();
 
 		// Set show_on_front to 'posts'.
-		update_option( 'show_on_front', 'posts' );
+		\update_option( 'show_on_front', 'posts' );
 
 		// Mock the remote API response with homepage lesson.
-		add_filter(
+		\add_filter(
 			'pre_http_request',
 			function ( $preempt, $args, $url ) {
-				if ( strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
+				if ( \strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
 					return [
 						'response' => [ 'code' => 200 ],
-						'body'     => wp_json_encode(
+						'body'     => \wp_json_encode(
 							[
 								[
 									'name'     => 'Homepage',
@@ -287,8 +287,8 @@ class Lessons_Test extends \WP_UnitTestCase {
 		$this->assertEquals( 'about', $result[0]['value'] );
 
 		// Clean up.
-		delete_option( 'show_on_front' );
-		remove_all_filters( 'pre_http_request' );
+		\delete_option( 'show_on_front' );
+		\remove_all_filters( 'pre_http_request' );
 	}
 
 	/**
@@ -299,16 +299,16 @@ class Lessons_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_utils__cache()->delete_all();
 
 		// Set show_on_front to 'page'.
-		update_option( 'show_on_front', 'page' );
+		\update_option( 'show_on_front', 'page' );
 
 		// Mock the remote API response with homepage lesson.
-		add_filter(
+		\add_filter(
 			'pre_http_request',
 			function ( $preempt, $args, $url ) {
-				if ( strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
+				if ( \strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
 					return [
 						'response' => [ 'code' => 200 ],
-						'body'     => wp_json_encode(
+						'body'     => \wp_json_encode(
 							[
 								[
 									'name'     => 'Homepage',
@@ -336,8 +336,8 @@ class Lessons_Test extends \WP_UnitTestCase {
 		$this->assertEquals( 'homepage', $result[0]['value'] );
 
 		// Clean up.
-		delete_option( 'show_on_front' );
-		remove_all_filters( 'pre_http_request' );
+		\delete_option( 'show_on_front' );
+		\remove_all_filters( 'pre_http_request' );
 	}
 
 	/**
@@ -348,13 +348,13 @@ class Lessons_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_utils__cache()->delete_all();
 
 		// Mock empty response.
-		add_filter(
+		\add_filter(
 			'pre_http_request',
 			function ( $preempt, $args, $url ) {
-				if ( strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
+				if ( \strpos( $url, '/wp-json/progress-planner-saas/v1/lessons' ) !== false ) {
 					return [
 						'response' => [ 'code' => 200 ],
-						'body'     => wp_json_encode( [] ),
+						'body'     => \wp_json_encode( [] ),
 					];
 				}
 				return $preempt;
@@ -368,6 +368,6 @@ class Lessons_Test extends \WP_UnitTestCase {
 		$this->assertIsArray( $result );
 		$this->assertEmpty( $result );
 
-		remove_all_filters( 'pre_http_request' );
+		\remove_all_filters( 'pre_http_request' );
 	}
 }

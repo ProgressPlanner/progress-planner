@@ -147,4 +147,14 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<exclude-pattern>/tests/bootstrap\.php$</exclude-pattern>
 	</rule>
+
+	<!-- Exclude test files from file naming conventions. -->
+	<rule ref="WordPress.Files.FileName">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
+
+	<!-- Allow multiple classes in test files for test helper classes. -->
+	<rule ref="Generic.Files.OneObjectStructurePerFile">
+		<exclude-pattern>/tests/*</exclude-pattern>
+	</rule>
 </ruleset>

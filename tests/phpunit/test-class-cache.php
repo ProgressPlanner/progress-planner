@@ -124,7 +124,7 @@ class Test_Cache extends WP_UnitTestCase {
 		$this->cache->delete_all();
 
 		// Clear WordPress object cache to force DB lookup.
-		wp_cache_flush();
+		\wp_cache_flush();
 
 		// Verify they're gone.
 		$this->assertFalse( $this->cache->get( 'key1' ) );
@@ -146,7 +146,7 @@ class Test_Cache extends WP_UnitTestCase {
 		$this->assertEquals( $value, $this->cache->get( $key ) );
 
 		// Wait 2 seconds.
-		sleep( 2 );
+		\sleep( 2 );
 
 		// Now it should be expired.
 		$this->assertFalse( $this->cache->get( $key ) );
@@ -163,7 +163,7 @@ class Test_Cache extends WP_UnitTestCase {
 
 		// The actual transient name should have the prefix.
 		$prefixed_key = Cache::CACHE_PREFIX . $key;
-		$result       = get_transient( $prefixed_key );
+		$result       = \get_transient( $prefixed_key );
 
 		$this->assertEquals( $value, $result );
 	}
@@ -176,26 +176,26 @@ class Test_Cache extends WP_UnitTestCase {
 		$this->cache->set( 'pp_key', 'pp_value' );
 
 		// Set a non-Progress Planner transient.
-		set_transient( 'other_plugin_key', 'other_value' );
+		\set_transient( 'other_plugin_key', 'other_value' );
 
 		// Verify both exist.
 		$this->assertEquals( 'pp_value', $this->cache->get( 'pp_key' ) );
-		$this->assertEquals( 'other_value', get_transient( 'other_plugin_key' ) );
+		$this->assertEquals( 'other_value', \get_transient( 'other_plugin_key' ) );
 
 		// Delete all Progress Planner caches.
 		$this->cache->delete_all();
 
 		// Clear WordPress object cache to force DB lookup.
-		wp_cache_flush();
+		\wp_cache_flush();
 
 		// Progress Planner cache should be gone.
 		$this->assertFalse( $this->cache->get( 'pp_key' ) );
 
 		// Other transient should still exist.
-		$this->assertEquals( 'other_value', get_transient( 'other_plugin_key' ) );
+		$this->assertEquals( 'other_value', \get_transient( 'other_plugin_key' ) );
 
 		// Clean up.
-		delete_transient( 'other_plugin_key' );
+		\delete_transient( 'other_plugin_key' );
 	}
 
 	/**
@@ -212,9 +212,9 @@ class Test_Cache extends WP_UnitTestCase {
 		$this->assertEquals( $value, $this->cache->get( $key ) );
 
 		// Verify the timeout is set correctly.
-		$timeout = get_option( '_transient_timeout_' . Cache::CACHE_PREFIX . $key );
-		$this->assertGreaterThan( time(), $timeout );
-		$this->assertLessThanOrEqual( time() + $expiration + 10, $timeout ); // Allow 10 second buffer.
+		$timeout = \get_option( '_transient_timeout_' . Cache::CACHE_PREFIX . $key );
+		$this->assertGreaterThan( \time(), $timeout );
+		$this->assertLessThanOrEqual( \time() + $expiration + 10, $timeout ); // Allow 10 second buffer.
 	}
 
 	/**

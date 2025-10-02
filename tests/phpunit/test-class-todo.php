@@ -31,8 +31,8 @@ class Todo_Test extends \WP_UnitTestCase {
 	 * Test constructor hooks are registered.
 	 */
 	public function test_constructor_registers_hooks() {
-		$this->assertEquals( 10, has_action( 'init', [ $this->todo, 'maybe_change_first_item_points_on_monday' ] ) );
-		$this->assertEquals( 10, has_action( 'rest_after_insert_prpl_recommendations', [ $this->todo, 'handle_creating_user_task' ] ) );
+		$this->assertEquals( 10, \has_action( 'init', [ $this->todo, 'maybe_change_first_item_points_on_monday' ] ) );
+		$this->assertEquals( 10, \has_action( 'rest_after_insert_prpl_recommendations', [ $this->todo, 'handle_creating_user_task' ] ) );
 	}
 
 	/**
@@ -57,7 +57,7 @@ class Todo_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_suggested_tasks();
 
 		// Create test tasks.
-		$task1 = wp_insert_post(
+		$task1 = \wp_insert_post(
 			[
 				'post_type'   => 'prpl_recommendations',
 				'post_title'  => 'Test Task 1',
@@ -65,7 +65,7 @@ class Todo_Test extends \WP_UnitTestCase {
 			]
 		);
 
-		$task2 = wp_insert_post(
+		$task2 = \wp_insert_post(
 			[
 				'post_type'   => 'prpl_recommendations',
 				'post_title'  => 'Test Task 2',
@@ -74,8 +74,8 @@ class Todo_Test extends \WP_UnitTestCase {
 		);
 
 		// Set the provider to 'user'.
-		wp_set_object_terms( $task1, 'user', 'prpl_recommendations_provider' );
-		wp_set_object_terms( $task2, 'user', 'prpl_recommendations_provider' );
+		\wp_set_object_terms( $task1, 'user', 'prpl_recommendations_provider' );
+		\wp_set_object_terms( $task2, 'user', 'prpl_recommendations_provider' );
 
 		// Clear the cache so the transient check doesn't prevent the update.
 		\progress_planner()->get_utils__cache()->delete( 'todo_points_change_on_monday' );
@@ -84,8 +84,8 @@ class Todo_Test extends \WP_UnitTestCase {
 		$this->todo->maybe_change_first_item_points_on_monday();
 
 		// Get the tasks.
-		$task1_post = get_post( $task1 );
-		$task2_post = get_post( $task2 );
+		$task1_post = \get_post( $task1 );
+		$task2_post = \get_post( $task2 );
 
 		// The first task should be golden.
 		$this->assertEquals( 'GOLDEN', $task1_post->post_excerpt );
@@ -102,7 +102,7 @@ class Todo_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_suggested_tasks();
 
 		// Create a test task.
-		$task1 = wp_insert_post(
+		$task1 = \wp_insert_post(
 			[
 				'post_type'   => 'prpl_recommendations',
 				'post_title'  => 'Test Task',
@@ -110,16 +110,16 @@ class Todo_Test extends \WP_UnitTestCase {
 			]
 		);
 
-		wp_set_object_terms( $task1, 'user', 'prpl_recommendations_provider' );
+		\wp_set_object_terms( $task1, 'user', 'prpl_recommendations_provider' );
 
 		// Set the cache to a future time.
-		\progress_planner()->get_utils__cache()->set( 'todo_points_change_on_monday', time() + 3600, 3600 );
+		\progress_planner()->get_utils__cache()->set( 'todo_points_change_on_monday', \time() + 3600, 3600 );
 
 		// Run the method.
 		$this->todo->maybe_change_first_item_points_on_monday();
 
 		// The task should not be updated because the cache is still valid.
-		$task1_post = get_post( $task1 );
+		$task1_post = \get_post( $task1 );
 		$this->assertEquals( '', $task1_post->post_excerpt );
 	}
 
@@ -131,7 +131,7 @@ class Todo_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_suggested_tasks();
 
 		// Create a test task.
-		$task_id = wp_insert_post(
+		$task_id = \wp_insert_post(
 			[
 				'post_type'   => 'prpl_recommendations',
 				'post_title'  => 'User Task 1',
@@ -139,9 +139,9 @@ class Todo_Test extends \WP_UnitTestCase {
 			]
 		);
 
-		wp_set_object_terms( $task_id, 'user', 'prpl_recommendations_provider' );
+		\wp_set_object_terms( $task_id, 'user', 'prpl_recommendations_provider' );
 
-		$post    = get_post( $task_id );
+		$post    = \get_post( $task_id );
 		$request = new \WP_REST_Request();
 
 		// Clear the cache.
@@ -151,10 +151,10 @@ class Todo_Test extends \WP_UnitTestCase {
 		$this->todo->handle_creating_user_task( $post, $request, true );
 
 		// Check that the task_id meta was added.
-		$this->assertEquals( 'user-' . $task_id, get_post_meta( $task_id, 'prpl_task_id', true ) );
+		$this->assertEquals( 'user-' . $task_id, \get_post_meta( $task_id, 'prpl_task_id', true ) );
 
 		// The first task should be golden.
-		$task_post = get_post( $task_id );
+		$task_post = \get_post( $task_id );
 		$this->assertEquals( 'GOLDEN', $task_post->post_excerpt );
 	}
 
@@ -166,39 +166,39 @@ class Todo_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_suggested_tasks();
 
 		// Create the first task.
-		$task1 = wp_insert_post(
+		$task1 = \wp_insert_post(
 			[
 				'post_type'   => 'prpl_recommendations',
 				'post_title'  => 'User Task 1',
 				'post_status' => 'publish',
 			]
 		);
-		wp_set_object_terms( $task1, 'user', 'prpl_recommendations_provider' );
+		\wp_set_object_terms( $task1, 'user', 'prpl_recommendations_provider' );
 
 		// Clear the cache.
 		\progress_planner()->get_utils__cache()->delete( 'todo_points_change_on_monday' );
 
 		// Create the second task.
-		$task2 = wp_insert_post(
+		$task2 = \wp_insert_post(
 			[
 				'post_type'   => 'prpl_recommendations',
 				'post_title'  => 'User Task 2',
 				'post_status' => 'publish',
 			]
 		);
-		wp_set_object_terms( $task2, 'user', 'prpl_recommendations_provider' );
+		\wp_set_object_terms( $task2, 'user', 'prpl_recommendations_provider' );
 
-		$post    = get_post( $task2 );
+		$post    = \get_post( $task2 );
 		$request = new \WP_REST_Request();
 
 		// Run the method for the second task.
 		$this->todo->handle_creating_user_task( $post, $request, true );
 
 		// Check that the task_id meta was added.
-		$this->assertEquals( 'user-' . $task2, get_post_meta( $task2, 'prpl_task_id', true ) );
+		$this->assertEquals( 'user-' . $task2, \get_post_meta( $task2, 'prpl_task_id', true ) );
 
 		// The second task should not be golden (first one should be).
-		$task2_post = get_post( $task2 );
+		$task2_post = \get_post( $task2 );
 		$this->assertEquals( '', $task2_post->post_excerpt );
 	}
 
@@ -210,7 +210,7 @@ class Todo_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_suggested_tasks();
 
 		// Create a test task.
-		$task_id = wp_insert_post(
+		$task_id = \wp_insert_post(
 			[
 				'post_type'   => 'prpl_recommendations',
 				'post_title'  => 'User Task',
@@ -218,16 +218,16 @@ class Todo_Test extends \WP_UnitTestCase {
 			]
 		);
 
-		wp_set_object_terms( $task_id, 'user', 'prpl_recommendations_provider' );
+		\wp_set_object_terms( $task_id, 'user', 'prpl_recommendations_provider' );
 
-		$post    = get_post( $task_id );
+		$post    = \get_post( $task_id );
 		$request = new \WP_REST_Request();
 
 		// Run the method with $creating = false.
 		$this->todo->handle_creating_user_task( $post, $request, false );
 
 		// The task_id meta should not be added.
-		$this->assertEquals( '', get_post_meta( $task_id, 'prpl_task_id', true ) );
+		$this->assertEquals( '', \get_post_meta( $task_id, 'prpl_task_id', true ) );
 	}
 
 	/**
@@ -238,7 +238,7 @@ class Todo_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_suggested_tasks();
 
 		// Create a test task with a different provider.
-		$task_id = wp_insert_post(
+		$task_id = \wp_insert_post(
 			[
 				'post_type'   => 'prpl_recommendations',
 				'post_title'  => 'System Task',
@@ -246,16 +246,16 @@ class Todo_Test extends \WP_UnitTestCase {
 			]
 		);
 
-		wp_set_object_terms( $task_id, 'system', 'prpl_recommendations_provider' );
+		\wp_set_object_terms( $task_id, 'system', 'prpl_recommendations_provider' );
 
-		$post    = get_post( $task_id );
+		$post    = \get_post( $task_id );
 		$request = new \WP_REST_Request();
 
 		// Run the method.
 		$this->todo->handle_creating_user_task( $post, $request, true );
 
 		// The task_id meta should not be added.
-		$this->assertEquals( '', get_post_meta( $task_id, 'prpl_task_id', true ) );
+		$this->assertEquals( '', \get_post_meta( $task_id, 'prpl_task_id', true ) );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

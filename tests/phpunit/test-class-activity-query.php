@@ -32,8 +32,9 @@ class Test_Activity_Query extends WP_UnitTestCase {
 
 		// Clean up any existing activities.
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
 		$wpdb->query( 'TRUNCATE TABLE ' . $wpdb->prefix . Query::TABLE_NAME );
-		wp_cache_flush_group( Query::CACHE_GROUP );
+		\wp_cache_flush_group( Query::CACHE_GROUP );
 	}
 
 	/**
@@ -41,8 +42,9 @@ class Test_Activity_Query extends WP_UnitTestCase {
 	 */
 	public function tear_down() {
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.SchemaChange
 		$wpdb->query( 'TRUNCATE TABLE ' . $wpdb->prefix . Query::TABLE_NAME );
-		wp_cache_flush_group( Query::CACHE_GROUP );
+		\wp_cache_flush_group( Query::CACHE_GROUP );
 		parent::tear_down();
 	}
 
@@ -54,7 +56,8 @@ class Test_Activity_Query extends WP_UnitTestCase {
 		$table_name = $wpdb->prefix . Query::TABLE_NAME;
 
 		// Table should exist after constructor.
-		$this->assertEquals( $table_name, $wpdb->get_var( "SHOW TABLES LIKE '$table_name'" ) );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$this->assertEquals( $table_name, $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) ) );
 	}
 
 	/**
@@ -582,6 +585,7 @@ class Test_Activity_Query extends WP_UnitTestCase {
 		$table_name = $wpdb->prefix . Query::TABLE_NAME;
 
 		// Manually insert a duplicate entry directly into the database.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->insert(
 			$table_name,
 			[
@@ -594,6 +598,7 @@ class Test_Activity_Query extends WP_UnitTestCase {
 		);
 		$id1 = $wpdb->insert_id;
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->insert(
 			$table_name,
 			[
@@ -607,7 +612,7 @@ class Test_Activity_Query extends WP_UnitTestCase {
 		$id2 = $wpdb->insert_id;
 
 		// Clear cache to force a fresh query.
-		wp_cache_flush_group( Query::CACHE_GROUP );
+		\wp_cache_flush_group( Query::CACHE_GROUP );
 
 		// Query should remove the duplicate.
 		$results = $this->query->query_activities( [] );
@@ -616,6 +621,7 @@ class Test_Activity_Query extends WP_UnitTestCase {
 		$this->assertCount( 1, $results );
 
 		// Verify one of the IDs was deleted.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 		$remaining_results = $wpdb->get_results( "SELECT * FROM $table_name" );
 		$this->assertCount( 1, $remaining_results );
 	}
