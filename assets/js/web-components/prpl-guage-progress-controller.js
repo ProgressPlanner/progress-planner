@@ -256,7 +256,7 @@ class PrplGaugeProgressController {
 	 * @return {number} The max points.
 	 */
 	_barMaxPoints( bar ) {
-		return parseInt( bar.state.maxPoints ) || 10;
+		return parseInt( bar.maxPoints ) || 10;
 	}
 
 	/**
