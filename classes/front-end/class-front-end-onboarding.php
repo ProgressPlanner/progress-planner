@@ -165,8 +165,7 @@ class Front_End_Onboarding {
 			$form_values = \json_decode( $form_values, true );
 		}
 
-		// Note: Completing task will set it it to pending, so user will get celebration.
-		// Do we want that?
+		// Note: Marking task as completed will set it it to pending, so user will get celebration. Do we want that?
 		$result = \progress_planner()->get_suggested_tasks()->mark_task_as_completed( $task_id );
 
 		if ( ! $result ) {
