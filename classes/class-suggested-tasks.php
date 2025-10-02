@@ -68,6 +68,9 @@ class Suggested_Tasks {
 		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'rest_prepare_recommendation' ], 10, 2 );
 
 		\add_filter( 'wp_trash_post_days', [ $this, 'change_trashed_posts_lifetime' ], 10, 2 );
+
+		// Add filter to modify the maximum number of suggested tasks to display.
+		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_recommendations' ] );
 	}
 
 	/**
@@ -278,7 +281,7 @@ class Suggested_Tasks {
 				'show_in_admin_bar'     => \apply_filters( 'progress_planner_tasks_show_ui', false ),
 				'show_in_rest'          => true,
 				'rest_controller_class' => \Progress_Planner\Rest\Recommendations_Controller::class,
-				'supports'              => [ 'title', 'editor', 'author', 'custom-fields', 'page-attributes' ],
+				'supports'              => [ 'title', 'excerpt', 'editor', 'author', 'custom-fields', 'page-attributes' ],
 				'rewrite'               => false,
 				'menu_icon'             => 'dashicons-admin-tools',
 				'menu_position'         => 5,
@@ -288,11 +291,6 @@ class Suggested_Tasks {
 		);
 
 		$rest_meta_fields = [
-			'prpl_points'  => [
-				'type'         => 'number',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
 			'prpl_task_id' => [
 				'type'         => 'string',
 				'single'       => true,
@@ -439,6 +437,15 @@ class Suggested_Tasks {
 
 			// This has to be the last item to be added because actions use data from previous items.
 			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
+			$response->data['prpl_points']       = $provider->get_points();
+
+			/*
+			 * Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
+			 * Those are tasks which are completed by toggling an option, so non repetitive & not user tasks.
+			 */
+			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['meta']['prpl_task_id'] ) ) {
+				$response->data['prpl_points'] = 0;
+			}
 		}
 
 		$category_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_category' );
@@ -502,7 +509,15 @@ class Suggested_Tasks {
 			}
 		}
 
-		return $tasks;
+		/**
+		 * Allow other classes to modify the tasks in REST format.
+		 *
+		 * @param array $tasks The tasks.
+		 * @param array $args  The arguments.
+		 *
+		 * @return array
+		 */
+		return \apply_filters( 'progress_planner_suggested_tasks_in_rest_format', $tasks, $args );
 	}
 
 	/**
@@ -533,5 +548,20 @@ class Suggested_Tasks {
 		}
 
 		return \apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category );
+	}
+
+	/**
+	 * Modify the maximum number of suggested tasks to display.
+	 *
+	 * @param array $max_items_per_category Array of maximum items per category.
+	 * @return array Modified array of maximum items per category.
+	 */
+	public function check_show_all_recommendations( $max_items_per_category ) {
+		return (
+			isset( $_GET['prpl_show_all_recommendations'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			&& \current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		)
+			? \array_map( fn() => 99, $max_items_per_category )
+			: $max_items_per_category;
 	}
 }

@@ -1,3 +1,15 @@
+= 1.9.0 =
+
+Enhancements:
+
+* Add "Show all Recommendations" button to the "Ravi's Recommendations" widget
+
+Bugs we fixed:
+
+* Fix missing content and streak badges after they are all completed.
+* Fix issue when point is sometimes not awarded for completing "Remove term without posts" task.
+
+
 = 1.8.0 =
 
 Enhancements:

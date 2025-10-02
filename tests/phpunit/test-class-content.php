@@ -216,12 +216,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		);
 
 		// Get the types in order.
-		$types = \array_map(
-			function ( $activity ) {
-				return $activity->type;
-			},
-			$activities
-		);
+		$types = \array_map( fn( $activity ) => $activity->type, $activities );
 
 		$this->assertCount( 1, $types );
 		$this->assertContains( 'publish', $types ); // Should have publish when first published.

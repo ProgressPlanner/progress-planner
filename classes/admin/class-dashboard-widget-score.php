@@ -85,15 +85,15 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 		$result = [
 			'progress'   => $progress,
 			'badge'      => $badge,
-			'color'      => 'var(--prpl-color-accent-red)',
+			'color'      => 'var(--prpl-graph-color-1)',
 			'background' => $badge->get_background(),
 		];
 
 		if ( $result['progress']['progress'] > 50 ) {
-			$result['color'] = 'var(--prpl-color-accent-orange)';
+			$result['color'] = 'var(--prpl-color-monthly)';
 		}
 		if ( $result['progress']['progress'] > 75 ) {
-			$result['color'] = 'var(--prpl-color-accent-green)';
+			$result['color'] = 'var(--prpl-graph-color-3)';
 		}
 
 		$cached[ $category ] = $result;
