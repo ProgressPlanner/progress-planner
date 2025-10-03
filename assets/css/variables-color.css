@@ -93,4 +93,7 @@
 	--prpl-color-text-placeholder: var(--prpl-color-ui-icon);
 	--prpl-color-text-dropdown: var(--prpl-color-text);
 	--prpl-color-field-shadow: var(--prpl-color-shadow-paper);
+
+	/* Badge */
+	--prpl-color-icon-missed-badge: var(--prpl-color-alert-error);
 }
