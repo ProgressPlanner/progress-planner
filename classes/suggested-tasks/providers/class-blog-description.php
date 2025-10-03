@@ -139,4 +139,21 @@ class Blog_Description extends Tasks_Interactive {
 
 		return $actions;
 	}
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return void
+	 */
+	public function complete_task( $args = [], $task_id = '' ) {
+
+		if ( ! isset( $args['blogdescription'] ) ) {
+			return;
+		}
+
+		\update_option( 'blogdescription', \sanitize_text_field( $args['blogdescription'] ) );
+	}
 }

@@ -721,4 +721,15 @@ abstract class Tasks implements Tasks_Interface {
 
 		return ! empty( $activity );
 	}
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return void
+	 */
+	public function complete_task( $args = [], $task_id = '' ) {
+	}
 }

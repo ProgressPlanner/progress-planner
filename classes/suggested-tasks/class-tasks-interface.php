@@ -129,4 +129,14 @@ interface Tasks_Interface {
 	 * @return bool
 	 */
 	public function task_has_activity( $task_id = '' );
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return void
+	 */
+	public function complete_task( $args = [], $task_id = '' );
 }
