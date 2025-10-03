@@ -1,3 +1,9 @@
+= 1.8.1 =
+
+Bugs we fixed:
+
+* Fix vulnerbility with arbitrary option update.
+
 = 1.8.0 =
 
 Enhancements:
