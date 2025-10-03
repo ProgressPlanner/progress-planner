@@ -18,7 +18,8 @@ customElements.define(
 			pluginName,
 			action,
 			providerId,
-			className = 'prpl-button-link'
+			className = 'prpl-button-link',
+			completeTask = 'true' // String on purpose, since element attributes are always strings.
 		) {
 			// Get parent class properties
 			super();
@@ -29,6 +30,8 @@ customElements.define(
 				pluginName ?? this.getAttribute( 'data-plugin-name' );
 			this.pluginName = this.pluginName ?? this.pluginSlug;
 			this.action = action ?? this.getAttribute( 'data-action' );
+			this.completeTask =
+				completeTask ?? this.getAttribute( 'data-complete-task' );
 			this.providerId =
 				providerId ?? this.getAttribute( 'data-provider-id' );
 			this.className = className ?? this.getAttribute( 'class' );
@@ -36,6 +39,9 @@ customElements.define(
 			if ( ! this.pluginSlug ) {
 				return;
 			}
+
+			// Convert the string to a boolean.
+			this.completeTask = 'true' === this.completeTask;
 
 			// Set the inner HTML.
 			this.innerHTML = `
@@ -112,7 +118,11 @@ customElements.define(
 			} )
 				.then( () => {
 					button.innerHTML = prplL10n( 'activated' );
-					thisObj.completeTask();
+
+					// Complete the task if the completeTask attribute is set to true.
+					if ( true === thisObj.completeTask ) {
+						thisObj.completeTask();
+					}
 				} )
 				.catch( ( error ) => console.error( error ) );
 		}
