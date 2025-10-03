@@ -13,7 +13,8 @@ customElements.define(
 			content = content || this.getAttribute( 'content' );
 			backgroundColor =
 				backgroundColor || this.getAttribute( 'background-color' );
-			backgroundColor = backgroundColor || 'var(--background-content)';
+			backgroundColor =
+				backgroundColor || 'var(--prpl-background-content)';
 
 			const el = this;
 

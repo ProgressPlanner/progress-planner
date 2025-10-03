@@ -154,7 +154,7 @@
 		&.prpl-column-content {
 			padding: 20px;
 			border-radius: var(--prpl-border-radius-big);
-			background-color: var(--background-content);
+			background-color: var(--prpl-background-content);
 		}
 
 		.prpl-note {
