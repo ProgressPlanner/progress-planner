@@ -128,6 +128,11 @@ class Page_Settings {
 	 * @return void
 	 */
 	public function store_settings_form_options() {
+
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
+		}
+
 		// Check the nonce.
 		\check_admin_referer( 'progress_planner' );
 
