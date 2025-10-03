@@ -85,9 +85,9 @@ https://youtu.be/e1bmxZYyXFY
 
 = 1.8.1 =
 
-Bugs we fixed:
-
-* Fix vulnerability with arbitrary option update.
+- Security fix: Privilege escalation via an AJAX call where authenticated users could update arbitrary site options.
+- Added capability checks.
+- Thanks to [NumeX](https://github.com/NumeXx) for responsibly disclosing via the Patchstack Bug Bounty Program.
 
 = 1.8.0 =
 
