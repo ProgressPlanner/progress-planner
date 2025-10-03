@@ -45,6 +45,11 @@ class Content_Scan extends Content {
 	 * @return void
 	 */
 	public function ajax_scan() {
+
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to scan posts.', 'progress-planner' ) ] );
+		}
+
 		// Check the nonce.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
@@ -71,6 +76,11 @@ class Content_Scan extends Content {
 	 * @return void
 	 */
 	public function ajax_reset_posts_data() {
+
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to reset posts data.', 'progress-planner' ) ] );
+		}
+
 		// Check the nonce.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
