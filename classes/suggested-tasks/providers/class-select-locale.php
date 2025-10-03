@@ -243,6 +243,12 @@ class Select_Locale extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function handle_interactive_task_specific_submit() {
+
+		// Check if the user has the necessary capabilities.
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
+		}
+
 		// Check the nonce.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
