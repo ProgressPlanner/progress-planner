@@ -191,6 +191,20 @@ class Tasks_Manager {
 	}
 
 	/**
+	 * Get the user available task providers, based on the capability required and the user role.
+	 *
+	 * @return array
+	 */
+	public function get_task_providers_available_for_user() {
+		return \array_filter(
+			$this->task_providers,
+			function ( $task_provider ) {
+				return $task_provider->capability_required();
+			}
+		);
+	}
+
+	/**
 	 * Get a task provider by its ID.
 	 *
 	 * @param string $provider_id The provider ID.
