@@ -2,7 +2,7 @@
 
 Bugs we fixed:
 
-* Fix vulnerbility with arbitrary option update.
+* Fix vulnerability with arbitrary option update.
 
 = 1.8.0 =
 
