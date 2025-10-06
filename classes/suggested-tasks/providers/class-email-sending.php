@@ -258,6 +258,11 @@ class Email_Sending extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function ajax_test_email_sending() {
+
+		if ( ! $this->capability_required() ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to test email sending.', 'progress-planner' ) ] );
+		}
+
 		// Check the nonce.
 		\check_admin_referer( 'progress_planner' );
 
