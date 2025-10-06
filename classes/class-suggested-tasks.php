@@ -381,8 +381,6 @@ class Suggested_Tasks {
 	public function rest_api_tax_query( $args, $request ) {
 		$tax_query = [];
 
-		// TODO: Check if 'exclude_provider' and 'include_provider' are used anywhere, looks like they are not used anymore.
-
 		// Exclude terms.
 		if ( isset( $request['exclude_provider'] ) ) {
 			$tax_query[] = [
