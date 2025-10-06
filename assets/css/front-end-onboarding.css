@@ -1,4 +1,4 @@
-#prpl-popover-front-end-onboarding {
+.prpl-popover-onboarding {
 
 	& * {
 		box-sizing: border-box;
@@ -15,8 +15,21 @@
 	width: 1200px;
 	max-width: 80vw;
 
+	position: relative;
+
 	&::backdrop {
 		background: rgba(0, 0, 0, 0.5);
+	}
+
+	.prpl-popover-close {
+		position: absolute;
+		top: 0;
+		right: 0;
+		padding: 0.5em;
+		cursor: pointer;
+		background: none;
+		border: none;
+		color: #4b5563;
 	}
 
 	.tour-header {
@@ -119,7 +132,7 @@
 	}
 
 	/* WIP for tasks which need user input. */
-	.prpl-complete-task-form {
+	.prpl-onboarding-task-form {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
@@ -142,6 +155,7 @@
 
 	.prpl-complete-task-item {
 		display: flex;
+		gap: 30px;
 		justify-content: space-between;
 	}
 
@@ -156,28 +170,20 @@
 	}
 
 	/* First task */
-	.prpl-complete-first-task {
+	.prpl-onboarding-task {
 		display: flex;
 		flex-direction: column;
 		align-items: flex-start;
 		gap: 10px;
 
-		.first-task-title {
+		.prpl-onboarding-task-title {
 			margin: 0;
 			font-size: 18px;
 			font-weight: 600;
 			color: #4b5563;
 		}
 
-		input[type="text"] {
-			width: 100%;
-
-			/* padding: 0.5rem;
-			border: 1px solid #ccc;
-			border-radius: 0.25rem; */
-		}
-
-		.prpl-complete-task-form {
+		.prpl-onboarding-task-form {
 			width: 100%;
 			flex-direction: column;
 

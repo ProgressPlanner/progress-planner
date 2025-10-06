@@ -199,7 +199,7 @@ class Front_End_Onboarding {
 	 */
 	public function add_popover() {
 		?>
-		<div id="prpl-popover-front-end-onboarding" class="prpl-popover prpl-popover-onboarding" data-prpl-step="0" popover>
+		<div id="prpl-popover-front-end-onboarding" class="prpl-popover prpl-popover-onboarding" data-prpl-step="0" popover="manual">
 
 			<div class="tour-content-wrapper">
 				<!-- Tour content will be rendered here -->
@@ -221,63 +221,47 @@ class Front_End_Onboarding {
 	 * @return void
 	 */
 	public function add_popover_step_templates() {
-
-		// First task.
-		$first_task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => 'core-blogdescription' ] );
-
-		// If there is no 'blog description' task, create it.
-		if ( ! $first_task ) {
-			$first_task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( 'core-blogdescription' );
-
-			if ( $first_task_provider ) {
-				$first_task_data = $first_task_provider->get_task_details();
-
-				\progress_planner()->get_suggested_tasks_db()->add( $first_task_data );
-
-				// Now get the task.
-				$first_task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => 'core-blogdescription' ] );
-			}
-		}
-
-		$first_task = [
-			'task_id'          => $first_task[0]->task_id,
-			'title'            => $first_task[0]->post_title,
-			'url'              => $first_task[0]->url,
-			'provider_id'      => $first_task[0]->get_provider_id(),
-			'points'           => $first_task[0]->points,
-			'site_description' => \get_bloginfo( 'description' ),
+		$onboarding_tasks = [
+			'core-blogdescription',
+			'select-timezone',
+			'select-locale',
 		];
 
-		// Other tasks.
-		$ravis_recommendations = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
-			[
-				'post_status'    => 'publish',
-				'posts_per_page' => 6,
-				'tax_query'      => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
-					[
-						'taxonomy' => 'prpl_recommendations_provider',
-						'field'    => 'slug',
-						'terms'    => 'user',
-						'operator' => 'NOT IN',
-					],
-				],
-			]
-		);
+		foreach ( $onboarding_tasks as $task_id ) {
+			$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
-		$tasks = [];
-		foreach ( $ravis_recommendations as $recommendation ) {
+			// If there is no 'blog description' task, create it.
+			if ( ! $task ) {
+				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id );
 
-			$tasks[] = [
-				'task_id'     => $recommendation->task_id,
-				'title'       => $recommendation->post_title,
-				'url'         => $recommendation->url,
-				'provider_id' => $recommendation->get_provider_id(),
-				'points'      => $recommendation->points,
+				if ( $task_provider ) {
+					$task_data = $task_provider->get_task_details();
+
+					\progress_planner()->get_suggested_tasks_db()->add( $task_data );
+
+					// Now get the task.
+					$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
+				}
+			}
+
+			$task_formatted = [
+				'task_id'     => $task[0]->task_id,
+				'title'       => $task[0]->post_title,
+				'url'         => $task[0]->url,
+				'provider_id' => $task[0]->get_provider_id(),
+				'points'      => $task[0]->points,
 			];
+
+			// WIP, add task specific data.
+			if ( 'core-blogdescription' === $task_id ) {
+				$task_formatted['site_description'] = \get_bloginfo( 'description' );
+			}
+
+			$tasks[ $task_id ] = $task_formatted;
 		}
 
 		\progress_planner()->the_view( 'front-end-onboarding/welcome.php' );
-		\progress_planner()->the_view( 'front-end-onboarding/first-task.php', [ 'task' => $first_task ] ); // WIP: We need only 1 task for this step.
+		\progress_planner()->the_view( 'front-end-onboarding/first-task.php', [ 'task' => array_shift( $tasks ) ] ); // WIP: We need only 1 task for this step.
 		\progress_planner()->the_view( 'front-end-onboarding/badges.php' );
 		\progress_planner()->the_view( 'front-end-onboarding/more-tasks.php', [ 'tasks' => $tasks ] ); // WIP: We need up to 5 tasks for this step.
 		\progress_planner()->the_view( 'front-end-onboarding/finish.php' );
