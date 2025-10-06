@@ -47,6 +47,9 @@ class Debug_Tools {
 		\add_action( 'init', [ $this, 'check_delete_badges' ] );
 		\add_action( 'init', [ $this, 'check_toggle_migrations' ] );
 		\add_action( 'init', [ $this, 'check_delete_single_task' ] );
+		if ( \defined( '\IS_PLAYGROUND_PREVIEW' ) && \constant( '\IS_PLAYGROUND_PREVIEW' ) === true ) {
+			\add_action( 'init', [ $this, 'check_toggle_placeholder_demo' ] );
+		}
 
 		// Add filter to modify the maximum number of suggested tasks to display.
 		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_suggested_tasks' ] );
@@ -105,6 +108,8 @@ class Debug_Tools {
 				'href'   => \admin_url( 'admin.php?page=progress-planner-color-customizer' ),
 			]
 		);
+
+		$this->add_placeholder_demo_submenu_item( $admin_bar );
 	}
 
 	/**
@@ -628,6 +633,60 @@ class Debug_Tools {
 
 		// Redirect to the same page without the parameter.
 		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_single_task', '_wpnonce' ] ) );
+		exit;
+	}
+
+	/**
+	 * Add Placeholder Demo submenu to the debug menu.
+	 *
+	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
+	 * @return void
+	 */
+	protected function add_placeholder_demo_submenu_item( $admin_bar ) {
+		$demo_enabled = isset( $_COOKIE['prpl_placeholder_demo'] ) && '1' === $_COOKIE['prpl_placeholder_demo'];
+		$title        = $demo_enabled ? '<span style="color: green;">Placeholder Demo Enabled</span>' : '<span style="color: red;">Placeholder Demo Disabled</span>';
+		$href         = \add_query_arg( 'prpl_toggle_placeholder_demo', '1', $this->current_url );
+
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-placeholder-demo',
+				'parent' => 'prpl-debug',
+				'title'  => $title,
+				'href'   => $href,
+			]
+		);
+	}
+
+	/**
+	 * Check and process the toggle placeholder demo action.
+	 *
+	 * Toggles the placeholder demo cookie if the appropriate query parameter is set
+	 * and user has required capabilities.
+	 *
+	 * @return void
+	 */
+	public function check_toggle_placeholder_demo() {
+		if (
+			! isset( $_GET['prpl_toggle_placeholder_demo'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$_GET['prpl_toggle_placeholder_demo'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			! \current_user_can( 'manage_options' )
+		) {
+			return;
+		}
+
+		// Verify nonce for security.
+		$this->verify_nonce();
+
+		// Toggle the cookie.
+		$current_value = isset( $_COOKIE['prpl_placeholder_demo'] ) && '1' === $_COOKIE['prpl_placeholder_demo'];
+		if ( $current_value ) {
+			\setcookie( 'prpl_placeholder_demo', '0', \time() - 3600, \COOKIEPATH, \COOKIE_DOMAIN ); // @phpstan-ignore-line constant.notFound
+		} else {
+			\setcookie( 'prpl_placeholder_demo', '1', \time() + ( 30 * DAY_IN_SECONDS ), \COOKIEPATH, \COOKIE_DOMAIN ); // @phpstan-ignore-line constant.notFound
+		}
+
+		// Redirect to the same page without the parameter.
+		\wp_safe_redirect( \remove_query_arg( [ 'prpl_toggle_placeholder_demo', '_wpnonce' ] ) );
 		exit;
 	}
 
