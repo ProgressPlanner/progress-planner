@@ -111,6 +111,17 @@
 		&:not([disabled]):focus {
 			background: #cf2441;
 		}
+
+		&.prpl-btn-secondary {
+			background: #f9b23c;
+			color: #4b5563;
+
+			&:not([disabled]):hover,
+			&:not([disabled]):focus {
+				background: #f9b23c;
+				color: #4b5563;
+			}
+		}
 	}
 
 	.prpl-complete-task-btn:not(.prpl-btn) {
