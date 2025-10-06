@@ -43,8 +43,14 @@ if ( ! \defined( 'ABSPATH' ) ) {
 							</p>
 						</div>
 						<form class="prpl-complete-task-form" onsubmit="return false;">
-							<input type="text" name="prpl-test-input" value="" /> <?php // TODO: This is test input field, demo for the tasks which need user input. ?>
-							<button type="button" id="first-task-btn" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-primary"><?php \esc_html_e( 'Complete first task', 'progress-planner' ); ?></button>
+							<input type="text" name="prpl-test-input" value="<?php echo esc_attr( $task['site_description'] ); ?>" />
+							<button type="button" id="first-task-btn" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-primary">
+								<?php if ( isset( $task['site_description'] ) && '' !== $task['site_description'] ) : ?>
+									<?php \esc_html_e( 'Verify tagline', 'progress-planner' ); ?>
+								<?php else : ?>
+									<?php \esc_html_e( 'Complete first task', 'progress-planner' ); ?>
+								<?php endif; ?>
+							</button>
 						</form>
 					</div>
 					<div id="first-task-status"></div>
