@@ -61,6 +61,11 @@ class Onboard {
 	 * @return void
 	 */
 	public function save_onboard_response() {
+
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
+		}
+
 		// Check the nonce.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
