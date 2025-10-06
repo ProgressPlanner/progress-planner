@@ -685,6 +685,11 @@ class Debug_Tools {
 			\setcookie( 'prpl_placeholder_demo', '1', \time() + ( 30 * DAY_IN_SECONDS ), \COOKIEPATH, \COOKIE_DOMAIN ); // @phpstan-ignore-line constant.notFound
 		}
 
+		// Clear cache since branding data is cached.
+		if ( \function_exists( 'progress_planner' ) ) {
+			\progress_planner()->get_utils__cache()->delete_all();
+		}
+
 		// Redirect to the same page without the parameter.
 		\wp_safe_redirect( \remove_query_arg( [ 'prpl_toggle_placeholder_demo', '_wpnonce' ] ) );
 		exit;
