@@ -175,16 +175,10 @@ class Suggested_Tasks_DB {
 		}
 
 		$update_data    = [ 'ID' => $id ];
-		$update_meta    = [];
 		$update_terms   = [];
 		$update_results = [];
 		foreach ( $data as $key => $value ) {
 			switch ( $key ) {
-				case 'points':
-				case 'prpl_points':
-					$update_meta[ 'prpl_' . \str_replace( 'prpl_', '', (string) $key ) ] = $value;
-					break;
-
 				case 'category':
 				case 'provider':
 					$update_terms[ "prpl_recommendations_$key" ] = $value;
@@ -198,12 +192,6 @@ class Suggested_Tasks_DB {
 
 		if ( 1 < \count( $update_data ) ) {
 			$update_results[] = (bool) \wp_update_post( $update_data );
-		}
-
-		if ( ! empty( $update_meta ) ) {
-			foreach ( $update_meta as $key => $value ) {
-				$update_results[] = (bool) \update_post_meta( $id, $key, $value );
-			}
 		}
 
 		if ( ! empty( $update_terms ) ) {
