@@ -27,7 +27,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					</span>
 
 
-					<div style="max-width: 300px;">
+					<div style="max-width: 600px;">
 						<details>
 							<summary style="text-align: end;"><?php \esc_html_e( 'Complete task', 'progress-planner' ); ?></summary>
 
