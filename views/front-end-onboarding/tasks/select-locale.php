@@ -44,8 +44,8 @@ if ( ! \in_array( $prpl_locale, $prpl_languages, true ) ) {
 		</div>
 		<form class="prpl-onboarding-task-form" onsubmit="return false;">
 			<?php
-				ob_start();
-				\wp_dropdown_languages(
+
+				$prpl_dropdown_html = \wp_dropdown_languages(
 					[
 						'name'                        => 'language',
 						'id'                          => 'language',
@@ -56,7 +56,6 @@ if ( ! \in_array( $prpl_locale, $prpl_languages, true ) ) {
 						'echo'                        => false,
 					]
 				);
-				$prpl_dropdown_html = ob_get_clean();
 
 				// Add data-validate attribute to the select element.
 				$prpl_dropdown_html = str_replace(

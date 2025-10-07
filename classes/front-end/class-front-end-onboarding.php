@@ -228,6 +228,7 @@ class Front_End_Onboarding {
 			'core-blogdescription',
 			'select-timezone',
 			'select-locale',
+			'core-siteicon',
 		];
 
 		foreach ( $onboarding_tasks as $task_id ) {

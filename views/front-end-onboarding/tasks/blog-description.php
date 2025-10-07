@@ -32,7 +32,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<?php if ( isset( $task['site_description'] ) && '' !== $task['site_description'] ) : ?>
 				<?php \esc_html_e( 'Verify tagline', 'progress-planner' ); ?>
 			<?php else : ?>
-				<?php \esc_html_e( 'Complete first task', 'progress-planner' ); ?>
+				<?php \esc_html_e( 'Set tagline', 'progress-planner' ); ?>
 			<?php endif; ?>
 		</button>
 	</form>

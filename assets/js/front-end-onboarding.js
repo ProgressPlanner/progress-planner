@@ -406,21 +406,19 @@ class PopoverTask {
 				const formData = new FormData(
 					this.popover.querySelector( 'form' )
 				);
-
-				// Convert to plain object
 				this.formValues = Object.fromEntries( formData.entries() );
-
 				this.complete();
 			}
 		} );
 
-		// Add close button event listener.
 		this.popover
 			.querySelector( '.prpl-popover-close' )
 			?.addEventListener( 'click', () => this.close() );
 
-		// Setup generic form validation
 		this.setupFormValidation();
+
+		// Initialize upload handling (only if upload field exists)
+		this.setupFileUpload();
 	}
 
 	open() {
@@ -481,27 +479,17 @@ class PopoverTask {
 		this.el.dispatchEvent( event );
 	}
 
-	/**
-	 * Setup generic form validation using data attributes
-	 */
 	setupFormValidation() {
 		const form = this.popover.querySelector( 'form' );
 		const submitButton = this.popover.querySelector(
 			'.prpl-complete-task-btn'
 		);
 
-		if ( ! form || ! submitButton ) {
-			return;
-		}
+		if ( ! form || ! submitButton ) return;
 
-		// Find all elements with data-validate attribute
 		const validateElements = form.querySelectorAll( '[data-validate]' );
+		if ( validateElements.length === 0 ) return;
 
-		if ( validateElements.length === 0 ) {
-			return;
-		}
-
-		// Function to check if all validation requirements are met
 		const checkValidation = () => {
 			let isValid = true;
 
@@ -531,13 +519,121 @@ class PopoverTask {
 			submitButton.disabled = ! isValid;
 		};
 
-		// Set initial validation state
 		checkValidation();
-
-		// Add event listeners to all validation elements
 		validateElements.forEach( ( element ) => {
 			element.addEventListener( 'change', checkValidation );
 			element.addEventListener( 'input', checkValidation );
+		} );
+	}
+
+	/**
+	 * Handles drag-and-drop or manual file upload for specific tasks.
+	 * Only runs if the form contains an upload field.
+	 */
+	setupFileUpload() {
+		const uploadContainer = this.popover.querySelector(
+			'[data-upload-field]'
+		);
+		if ( ! uploadContainer ) return; // no upload for this task
+
+		const fileInput = uploadContainer.querySelector( 'input[type="file"]' );
+		const statusDiv = uploadContainer.querySelector(
+			'.prpl-upload-status'
+		);
+
+		// Visual drag behavior
+		[ 'dragenter', 'dragover' ].forEach( ( event ) => {
+			uploadContainer.addEventListener( event, ( e ) => {
+				e.preventDefault();
+				uploadContainer.classList.add( 'dragover' );
+			} );
+		} );
+
+		[ 'dragleave', 'drop' ].forEach( ( event ) => {
+			uploadContainer.addEventListener( event, ( e ) => {
+				e.preventDefault();
+				uploadContainer.classList.remove( 'dragover' );
+			} );
+		} );
+
+		uploadContainer.addEventListener( 'drop', ( e ) => {
+			const file = e.dataTransfer.files[ 0 ];
+			if ( file ) this.uploadFile( file, statusDiv );
+		} );
+
+		fileInput?.addEventListener( 'change', ( e ) => {
+			const file = e.target.files[ 0 ];
+			if ( file ) this.uploadFile( file, statusDiv );
+		} );
+	}
+
+	async uploadFile( file, statusDiv ) {
+		// Validate file extension
+		if ( ! this.isValidFaviconFile( file ) ) {
+			const fileInput =
+				this.popover.querySelector( 'input[type="file"]' );
+			const acceptedTypes = fileInput?.accept || 'supported file types';
+			statusDiv.textContent = `Invalid file type. Please upload a file with one of these formats: ${ acceptedTypes }`;
+			return;
+		}
+
+		statusDiv.textContent = `Uploading ${ file.name }...`;
+
+		const formData = new FormData();
+		formData.append( 'file', file );
+		formData.append( 'task_id', this.id );
+
+		try {
+			// TODO: Replace with actual upload endpoint.
+			const response = await fetch( ProgressPlannerData.adminAjaxUrl, {
+				method: 'POST',
+				body: formData,
+				credentials: 'same-origin',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				action: 'progress_planner_tour_upload_file',
+			} );
+
+			if ( response.ok ) {
+				const data = await response.json();
+				statusDiv.textContent = `${ file.name } uploaded.`;
+
+				// Store uploaded file info in formValues
+				this.formValues.uploadedFile = data.file_url || file.name;
+			} else {
+				statusDiv.textContent = `Failed to upload ${ file.name }`;
+			}
+		} catch ( err ) {
+			statusDiv.textContent = `Error: ${ err.message }`;
+		}
+	}
+
+	/**
+	 * Validate if file matches the accepted file types from the input
+	 * @param {File} file The file to validate
+	 * @return {boolean} True if file extension is supported
+	 */
+	isValidFaviconFile( file ) {
+		const fileInput = this.popover.querySelector( 'input[type="file"]' );
+		if ( ! fileInput || ! fileInput.accept ) {
+			return true; // No restrictions if no accept attribute
+		}
+
+		const acceptedTypes = fileInput.accept
+			.split( ',' )
+			.map( ( type ) => type.trim() );
+		const fileName = file.name.toLowerCase();
+
+		return acceptedTypes.some( ( type ) => {
+			if ( type.startsWith( '.' ) ) {
+				// Extension-based validation
+				return fileName.endsWith( type );
+			} else if ( type.includes( '/' ) ) {
+				// MIME type-based validation
+				return file.type === type;
+			}
+			return false;
 		} );
 	}
 }

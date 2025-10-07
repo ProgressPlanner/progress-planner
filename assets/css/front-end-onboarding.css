@@ -256,12 +256,40 @@
 		}
 	}
 
-	/* Task popover. */
-	&.prpl-task-popover {
-
-		&::backdrop {
-			background-color: transparent !important;
-		}
+	/* File drop zone. */
+	.prpl-file-drop-zone {
+		border: 2px dashed #aaa;
+		border-radius: 10px;
+		padding: 40px;
+		text-align: center;
+		color: #555;
+		transition: background 0.2s, border-color 0.2s;
+		cursor: pointer;
 	}
 
+	.prpl-file-drop-zone.dragover {
+		background: #f0f8ff;
+		border-color: #007bff;
+	}
+
+	.prpl-file-browse-link {
+		color: #007bff;
+		text-decoration: underline;
+		cursor: pointer;
+	}
+
+	/* WIP */
+	#prpl-upload-status {
+		margin-top: 10px;
+		font-family: monospace;
+	}
+}
+
+/* Task popover is opened. */
+body:has(.prpl-task-popover) {
+
+	/* Hide Tour (parent) popover, this will hide it's backdrop as well. */
+	#prpl-popover-front-end-onboarding {
+		display: none;
+	}
 }
