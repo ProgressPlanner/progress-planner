@@ -34,16 +34,16 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					printf(
 						// translators: %1$s is opening label tag, %2$s is the closing label tag.
 						\esc_html__( 'Drag & drop a file here, or %1$s browse %2$s', 'progress-planner' ),
-						'<label for="file-input" class="prpl-file-browse-link">',
+						'<label for="prpl-file-input-core-siteicon" class="prpl-file-browse-link">',
 						'</label>'
 					);
 					?>
 				</p>
-				<input type="file" id="file-input" accept=".ico,.png,.jpg,.jpeg,.gif,.svg,.webp" hidden>
+				<input type="file" id="prpl-file-input-core-siteicon" accept=".ico,.png,.jpg,.jpeg,.gif,.svg,.webp" hidden>
 				<div class="prpl-upload-status"></div> <!-- WIP -->
 			</div>
 			<button type="button" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-primary">
-				<?php \esc_html_e( 'Upload site icon', 'progress-planner' ); ?>
+				<?php \esc_html_e( 'Set site icon', 'progress-planner' ); ?>
 			</button>
 		</form>
 	</div>
