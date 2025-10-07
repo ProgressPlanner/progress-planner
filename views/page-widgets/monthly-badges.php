@@ -88,6 +88,7 @@ $prpl_badge  = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_
 					data-badge-id="<?php echo \esc_attr( $prpl_previous_incomplete_month_badge->get_id() ); ?>"
 					data-points="<?php echo (int) $prpl_previous_incomplete_month_badge->progress_callback()['points']; ?>"
 					data-max-points="<?php echo (int) Monthly::TARGET_POINTS; ?>"
+					data-branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
 				></prpl-badge-progress-bar>
 
 				<div class="prpl-widget-content-points">
