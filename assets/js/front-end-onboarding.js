@@ -418,6 +418,9 @@ class PopoverTask {
 		this.popover
 			.querySelector( '.prpl-popover-close' )
 			?.addEventListener( 'click', () => this.close() );
+
+		// Setup generic form validation
+		this.setupFormValidation();
 	}
 
 	open() {
@@ -476,6 +479,66 @@ class PopoverTask {
 			detail: { id: this.id, formValues: this.formValues },
 		} );
 		this.el.dispatchEvent( event );
+	}
+
+	/**
+	 * Setup generic form validation using data attributes
+	 */
+	setupFormValidation() {
+		const form = this.popover.querySelector( 'form' );
+		const submitButton = this.popover.querySelector(
+			'.prpl-complete-task-btn'
+		);
+
+		if ( ! form || ! submitButton ) {
+			return;
+		}
+
+		// Find all elements with data-validate attribute
+		const validateElements = form.querySelectorAll( '[data-validate]' );
+
+		if ( validateElements.length === 0 ) {
+			return;
+		}
+
+		// Function to check if all validation requirements are met
+		const checkValidation = () => {
+			let isValid = true;
+
+			validateElements.forEach( ( element ) => {
+				const validationType = element.getAttribute( 'data-validate' );
+				let elementValid = false;
+
+				switch ( validationType ) {
+					case 'required':
+						elementValid =
+							element.value !== null &&
+							element.value !== undefined &&
+							element.value !== '';
+						break;
+					case 'not-empty':
+						elementValid = element.value.trim() !== '';
+						break;
+					default:
+						elementValid = true;
+				}
+
+				if ( ! elementValid ) {
+					isValid = false;
+				}
+			} );
+
+			submitButton.disabled = ! isValid;
+		};
+
+		// Set initial validation state
+		checkValidation();
+
+		// Add event listeners to all validation elements
+		validateElements.forEach( ( element ) => {
+			element.addEventListener( 'change', checkValidation );
+			element.addEventListener( 'input', checkValidation );
+		} );
 	}
 }
 

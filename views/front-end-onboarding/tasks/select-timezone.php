@@ -31,7 +31,7 @@ $prpl_tzstring       = \get_option( 'timezone_string' );
 			</p>
 		</div>
 		<form class="prpl-onboarding-task-form" onsubmit="return false;">
-			<select id="timezone" name="timezone">
+			<select id="timezone" name="timezone" data-validate="required">
 				<?php echo \wp_timezone_choice( $prpl_tzstring, \get_user_locale() ); ?>
 			</select>
 			<button type="button" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-primary">
