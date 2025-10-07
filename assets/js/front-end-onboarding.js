@@ -394,16 +394,14 @@ class PopoverTask {
 		this.id = el.dataset.taskId;
 		this.popover = null;
 		this.formValues = {};
+		this.openPopoverBtn = el.querySelector( '[prpl-open-task-popover]' );
 
-		// Register popover open event.
-		this.el
-			.querySelector( '[prpl-open-task-popover]' )
-			?.addEventListener( 'click', () => this.open() );
+		// Register popover open event, this is needed to be able to open the popover from the button.
+		this.openPopoverBtn?.addEventListener( 'click', () => this.open() );
 	}
 
 	registerEvents() {
 		this.popover.addEventListener( 'click', ( e ) => {
-			console.log( 'click', e.target );
 			if ( e.target.classList.contains( 'prpl-complete-task-btn' ) ) {
 				const formData = new FormData(
 					this.popover.querySelector( 'form' )
@@ -415,6 +413,11 @@ class PopoverTask {
 				this.complete();
 			}
 		} );
+
+		// Add close button event listener.
+		this.popover
+			.querySelector( '.prpl-popover-close' )
+			?.addEventListener( 'click', () => this.close() );
 	}
 
 	open() {
@@ -424,9 +427,19 @@ class PopoverTask {
 			.querySelector( 'template' )
 			.content.cloneNode( true );
 		this.popover = document.createElement( 'div' );
-		this.popover.className = 'prpl-popover prpl-popover-onboarding';
+		this.popover.className =
+			'prpl-popover prpl-popover-onboarding prpl-task-popover';
 		this.popover.setAttribute( 'popover', 'manual' );
 		this.popover.appendChild( content );
+
+		// Add close button.
+		const closeBtn = document.createElement( 'button' );
+		closeBtn.className = 'prpl-popover-close';
+		closeBtn.setAttribute( 'popovertarget', this.popover.id );
+		closeBtn.setAttribute( 'popovertargetaction', 'hide' );
+		closeBtn.innerHTML = '<span class="dashicons dashicons-no-alt"></span>';
+		this.popover.appendChild( closeBtn );
+
 		document.body.appendChild( this.popover );
 
 		// Register events
