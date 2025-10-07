@@ -2,6 +2,8 @@
  * Progress Planner Tour
  * Handles the front-end onboarding tour functionality
  */
+/* global ProgressPlannerData */
+
 // eslint-disable-next-line no-unused-vars
 class ProgressPlannerTour {
 	constructor( config ) {
@@ -25,7 +27,6 @@ class ProgressPlannerTour {
 		this.contentWrapper = this.popover.querySelector(
 			'.tour-content-wrapper'
 		);
-		this.prevBtn = this.popover.querySelector( '.prpl-tour-prev' );
 		this.nextBtn = this.popover.querySelector( '.prpl-tour-next' );
 		this.finishBtn = this.popover.querySelector( '#prpl-finish-btn' );
 		this.dashboardBtn = this.popover.querySelector( '#prpl-dashboard-btn' );
@@ -100,7 +101,10 @@ class ProgressPlannerTour {
 				formValues = Object.fromEntries( formData.entries() );
 			}
 
-			this.completeTask( thisBtn.dataset.taskId, formValues )
+			ProgressPlannerTourUtils.completeTask(
+				thisBtn.dataset.taskId,
+				formValues
+			)
 				.then( () => {
 					thisBtn.classList.add( 'prpl-complete-task-btn-completed' );
 					state.data.firstTaskCompleted = {
@@ -122,66 +126,27 @@ class ProgressPlannerTour {
 	 * @param {Object} state
 	 */
 	mountMoreTasksStep( state ) {
-		const handler = ( e ) => {
-			const thisBtn = e.target.closest( 'button' );
-
-			const form = thisBtn.closest( 'form' ); // find parent form
-			let formValues = {};
-
-			if ( form ) {
-				const formData = new FormData( form );
-
-				// Convert to plain object
-				formValues = Object.fromEntries( formData.entries() );
-			}
-
-			this.completeTask( thisBtn.dataset.taskId, formValues )
-				.then( () => {
-					thisBtn.classList.add( 'prpl-complete-task-btn-completed' );
-					state.data.moreTasksCompleted[
-						thisBtn.dataset.taskId
-					] = true;
-				} )
-				.catch( ( error ) => {
-					console.error( error );
-					thisBtn.classList.add( 'prpl-complete-task-btn-error' );
-				} );
-		};
-
-		const btns = this.popover.querySelectorAll( 'button[data-task-id]' );
-		btns.forEach( ( btn ) => {
-			btn.addEventListener( 'click', handler );
+		const moreTasks = this.popover.querySelectorAll(
+			'.prpl-task-item[data-task-id]'
+		);
+		moreTasks.forEach( ( btn ) => {
 			state.data.moreTasksCompleted[ btn.dataset.taskId ] = false;
 		} );
 
-		return () => {
-			btns.forEach( ( btn ) =>
-				btn.removeEventListener( 'click', handler )
-			);
+		this.tasks = Array.from(
+			this.popover.querySelectorAll( '[data-popover="task"]' )
+		).map( ( t ) => new PopoverTask( t ) );
+
+		const handler = ( e ) => {
+			// Update state.
+			state.data.moreTasksCompleted[ e.target.dataset.taskId ] = true;
 		};
-	}
 
-	/**
-	 * Complete a task via AJAX
-	 * @param {string} taskId
-	 * @param {Object} formValues
-	 */
-	async completeTask( taskId, formValues = {} ) {
-		const response = await fetch( this.config.adminAjaxUrl, {
-			method: 'POST',
-			body: new URLSearchParams( {
-				form_values: JSON.stringify( formValues ),
-				task_id: taskId,
-				nonce: this.config.nonceProgressPlanner,
-				action: 'progress_planner_tour_complete_task',
-			} ),
-		} );
+		this.popover.addEventListener( 'taskCompleted', ( e ) => handler( e ) );
 
-		if ( ! response.ok ) {
-			throw new Error( 'Request failed: ' + response.status );
-		}
-
-		return response.json();
+		return () => {
+			this.popover.removeEventListener( 'taskCompleted', handler );
+		};
 	}
 
 	/**
@@ -215,12 +180,9 @@ class ProgressPlannerTour {
 	 * Update button visibility states
 	 */
 	updateButtonStates() {
-		const isFirstStep = this.state.currentStep === 0;
 		const isLastStep = this.state.currentStep === this.tourSteps.length - 1;
 
 		// Toggle button visibility
-		this.prevBtn.style.display =
-			isFirstStep || isLastStep ? 'none' : 'inline-block';
 		this.nextBtn.style.display = isLastStep ? 'none' : 'inline-block';
 		this.finishBtn.style.display = isLastStep ? 'inline-block' : 'none';
 		this.dashboardBtn.style.display = isLastStep ? 'inline-block' : 'none';
@@ -370,13 +332,6 @@ class ProgressPlannerTour {
 				} );
 			}
 
-			if ( this.prevBtn ) {
-				this.prevBtn.addEventListener( 'click', () => {
-					console.log( 'Prev button clicked!' );
-					this.prevStep();
-				} );
-			}
-
 			if ( this.finishBtn ) {
 				this.finishBtn.addEventListener( 'click', () => {
 					console.log( 'Finish button clicked!' );
@@ -429,5 +384,109 @@ class ProgressPlannerTour {
 				return true;
 			},
 		} );
+	}
+}
+
+// eslint-disable-next-line no-unused-vars
+class PopoverTask {
+	constructor( el ) {
+		this.el = el;
+		this.id = el.dataset.taskId;
+		this.popover = null;
+		this.formValues = {};
+
+		// Register popover open event.
+		this.el
+			.querySelector( '[prpl-open-task-popover]' )
+			?.addEventListener( 'click', () => this.open() );
+	}
+
+	registerEvents() {
+		this.popover.addEventListener( 'click', ( e ) => {
+			console.log( 'click', e.target );
+			if ( e.target.classList.contains( 'prpl-complete-task-btn' ) ) {
+				const formData = new FormData(
+					this.popover.querySelector( 'form' )
+				);
+
+				// Convert to plain object
+				this.formValues = Object.fromEntries( formData.entries() );
+
+				this.complete();
+			}
+		} );
+	}
+
+	open() {
+		if ( this.popover ) return;
+
+		const content = this.el
+			.querySelector( 'template' )
+			.content.cloneNode( true );
+		this.popover = document.createElement( 'div' );
+		this.popover.className = 'prpl-popover prpl-popover-onboarding';
+		this.popover.setAttribute( 'popover', 'manual' );
+		this.popover.appendChild( content );
+		document.body.appendChild( this.popover );
+
+		// Register events
+		this.registerEvents();
+
+		this.popover.showPopover();
+	}
+
+	close() {
+		this.popover?.remove();
+		this.popover = null;
+	}
+
+	complete() {
+		ProgressPlannerTourUtils.completeTask( this.id, this.formValues )
+			.then( () => {
+				this.el.classList.add( 'completed' );
+				this.el
+					.querySelector( '.prpl-complete-task-btn' )
+					.classList.add( 'prpl-complete-task-btn-completed' );
+
+				this.close();
+				this.notifyParent();
+			} )
+			.catch( ( error ) => {
+				console.error( error );
+				// TODO: Handle error.
+			} );
+	}
+
+	notifyParent() {
+		const event = new CustomEvent( 'taskCompleted', {
+			bubbles: true,
+			detail: { id: this.id, formValues: this.formValues },
+		} );
+		this.el.dispatchEvent( event );
+	}
+}
+
+class ProgressPlannerTourUtils {
+	/**
+	 * Complete a task via AJAX
+	 * @param {string} taskId
+	 * @param {Object} formValues
+	 */
+	static async completeTask( taskId, formValues = {} ) {
+		const response = await fetch( ProgressPlannerData.adminAjaxUrl, {
+			method: 'POST',
+			body: new URLSearchParams( {
+				form_values: JSON.stringify( formValues ),
+				task_id: taskId,
+				nonce: ProgressPlannerData.nonceProgressPlanner,
+				action: 'progress_planner_tour_complete_task',
+			} ),
+		} );
+
+		if ( ! response.ok ) {
+			throw new Error( 'Request failed: ' + response.status );
+		}
+
+		return response.json();
 	}
 }

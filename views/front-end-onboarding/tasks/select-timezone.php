@@ -3,6 +3,8 @@
  * Onboarding task, set site timezone.
  *
  * @package Progress_Planner
+ *
+ * @var array $task
  */
 
 // Exit if accessed directly.
@@ -10,9 +12,8 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_current_offset     = \get_option( 'gmt_offset' );
-$prpl_tzstring           = \get_option( 'timezone_string' );
-$prpl_was_tzstring_saved = '' !== $prpl_tzstring || '0' !== $prpl_current_offset ? 'true' : 'false';
+$prpl_current_offset = \get_option( 'gmt_offset' );
+$prpl_tzstring       = \get_option( 'timezone_string' );
 ?>
 
 <div class="prpl-onboarding-task">
@@ -30,7 +31,7 @@ $prpl_was_tzstring_saved = '' !== $prpl_tzstring || '0' !== $prpl_current_offset
 			</p>
 		</div>
 		<form class="prpl-onboarding-task-form" onsubmit="return false;">
-			<select id="timezone" name="timezone" data-timezone-saved="<?php echo \esc_attr( $was_tzstring_saved ); ?>">
+			<select id="timezone" name="timezone">
 				<?php echo \wp_timezone_choice( $prpl_tzstring, \get_user_locale() ); ?>
 			</select>
 			<button type="button" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-primary">

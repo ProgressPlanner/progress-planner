@@ -3,6 +3,8 @@
  * Onboarding task, blog description.
  *
  * @package Progress_Planner
+ *
+ * @var array $task
  */
 
 // Exit if accessed directly.

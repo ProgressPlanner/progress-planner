@@ -3,6 +3,8 @@
  * Onboarding task, set site locale.
  *
  * @package Progress_Planner
+ *
+ * @var array $task
  */
 
 // Exit if accessed directly.

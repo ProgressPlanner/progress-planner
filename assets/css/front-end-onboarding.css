@@ -169,6 +169,7 @@
 			border-radius: 3px;
 			padding: 0 24px 0 8px;
 			min-height: 30px;
+
 			/* max-width: 25rem; */
 			width: 100%;
 			-webkit-appearance: none;
@@ -181,6 +182,12 @@
 		.prpl-complete-task-btn {
 			flex-shrink: 0;
 		}
+	}
+
+	.prpl-task-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
 	}
 
 	.prpl-complete-task-item {
