@@ -419,6 +419,24 @@ class PopoverTask {
 
 		// Initialize upload handling (only if upload field exists)
 		this.setupFileUpload();
+
+		this.el.addEventListener( 'prplFileUploaded', ( e ) => {
+			// Handle file upload for the 'set site icon' task.
+			if ( 'core-siteicon' === e.detail.fileInput.dataset.taskId ) {
+				// Element which will be used to store the file post ID.
+				const nextElementSibling =
+					e.detail.fileInput.nextElementSibling;
+
+				nextElementSibling.value = e.detail.filePost.id;
+
+				// Trigger change so validation is triggered and "Complete" button is enabled.
+				nextElementSibling.dispatchEvent(
+					new CustomEvent( 'change', {
+						bubbles: true,
+					} )
+				);
+			}
+		} );
 	}
 
 	open() {
@@ -558,12 +576,32 @@ class PopoverTask {
 
 		uploadContainer.addEventListener( 'drop', ( e ) => {
 			const file = e.dataTransfer.files[ 0 ];
-			if ( file ) this.uploadFile( file, statusDiv );
+			if ( file ) {
+				this.uploadFile( file, statusDiv ).then( ( response ) => {
+					this.el.dispatchEvent(
+						new CustomEvent( 'prplFileUploaded', {
+							detail: { file, filePost: response, fileInput },
+							bubbles: true,
+						} )
+					);
+				} );
+			}
 		} );
 
 		fileInput?.addEventListener( 'change', ( e ) => {
 			const file = e.target.files[ 0 ];
-			if ( file ) this.uploadFile( file, statusDiv );
+			if ( file ) {
+				this.uploadFile( file, statusDiv, fileInput ).then(
+					( response ) => {
+						this.el.dispatchEvent(
+							new CustomEvent( 'prplFileUploaded', {
+								detail: { file, filePost: response, fileInput },
+								bubbles: true,
+							} )
+						);
+					}
+				);
+			}
 		} );
 	}
 
@@ -581,32 +619,30 @@ class PopoverTask {
 
 		const formData = new FormData();
 		formData.append( 'file', file );
-		formData.append( 'task_id', this.id );
+		formData.append( 'prplFileUpload', '1' );
 
-		try {
-			// TODO: Replace with actual upload endpoint.
-			const response = await fetch( ProgressPlannerData.adminAjaxUrl, {
-				method: 'POST',
-				body: formData,
-				credentials: 'same-origin',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-				},
-				action: 'progress_planner_tour_upload_file',
-			} );
-
-			if ( response.ok ) {
-				const data = await response.json();
+		return fetch( '/wp-json/wp/v2/media', {
+			method: 'POST',
+			headers: {
+				'X-WP-Nonce': ProgressPlannerData.nonceWPAPI, // usually wp_localize_script adds this
+			},
+			body: formData,
+			credentials: 'same-origin',
+		} )
+			.then( ( res ) => {
+				if ( 201 !== res.status ) {
+					throw new Error( 'Failed to upload file' );
+				}
+				return res.json();
+			} )
+			.then( ( response ) => {
 				statusDiv.textContent = `${ file.name } uploaded.`;
-
-				// Store uploaded file info in formValues
-				this.formValues.uploadedFile = data.file_url || file.name;
-			} else {
-				statusDiv.textContent = `Failed to upload ${ file.name }`;
-			}
-		} catch ( err ) {
-			statusDiv.textContent = `Error: ${ err.message }`;
-		}
+				return response;
+			} )
+			.catch( ( error ) => {
+				console.error( error );
+				statusDiv.textContent = `Error: ${ error.message }`;
+			} );
 	}
 
 	/**

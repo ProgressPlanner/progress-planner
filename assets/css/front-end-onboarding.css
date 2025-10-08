@@ -136,6 +136,8 @@
 
 	.prpl-complete-task-btn-completed:not(.prpl-btn) {
 		color: #059669;
+		pointer-events: none;
+		opacity: 0.5;
 	}
 
 	.prpl-complete-task-btn-error {

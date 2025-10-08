@@ -35,6 +35,46 @@ class Front_End_Onboarding {
 
 		// Maybe show user notification that tour is not finished.
 		\add_action( 'init', [ $this, 'maybe_show_user_notification' ] );
+
+		// Allow only images for the front-end upload.
+		add_filter( 'rest_pre_insert_attachment', [ $this, 'rest_pre_insert_attachment' ], 10, 2 );
+	}
+
+	/**
+	 * Allow only images for the front-end upload.
+	 *
+	 * @param array            $attachment The attachment.
+	 * @param \WP_REST_Request $request The request.
+	 * @return array|\WP_Error The attachment or WP_Error.
+	 */
+	public function rest_pre_insert_attachment( $attachment, $request ) {
+
+		// Only run for our file upload.
+		if ( isset( $request['prplFileUpload'] ) && $request['prplFileUpload'] ) {
+
+			$files = $request->get_file_params();
+
+			if ( empty( $files['file'] ) ) {
+				return new \WP_Error(
+					'rest_no_file',
+					__( 'No file uploaded.', 'progress-planner' ),
+					[ 'status' => 400 ]
+				);
+			}
+
+			$file = $files['file'];
+
+			// Check MIME type.
+			if ( strpos( $file['type'], 'image/' ) !== 0 ) {
+				return new \WP_Error(
+					'rest_invalid_file_type',
+					__( 'Only images are allowed for this upload.', 'progress-planner' ),
+					[ 'status' => 400 ]
+				);
+			}
+		}
+
+		return $attachment;
 	}
 
 	/**
@@ -80,6 +120,7 @@ class Front_End_Onboarding {
 			[
 				'adminAjaxUrl'         => \esc_url_raw( admin_url( 'admin-ajax.php' ) ),
 				'nonceProgressPlanner' => \esc_js( \wp_create_nonce( 'progress_planner' ) ),
+				'nonceWPAPI'           => \esc_js( \wp_create_nonce( 'wp_rest' ) ),
 			]
 		);
 	}
