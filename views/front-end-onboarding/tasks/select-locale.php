@@ -45,7 +45,8 @@ if ( ! \in_array( $prpl_locale, $prpl_languages, true ) ) {
 		<form class="prpl-onboarding-task-form" onsubmit="return false;">
 			<?php
 
-				$prpl_dropdown_html = \wp_dropdown_languages(
+				/* This is not required field because default locale (selection with empty value) is English US */
+				\wp_dropdown_languages(
 					[
 						'name'                        => 'language',
 						'id'                          => 'language',
@@ -53,18 +54,9 @@ if ( ! \in_array( $prpl_locale, $prpl_languages, true ) ) {
 						'languages'                   => $prpl_languages,
 						'translations'                => $prpl_translations,
 						'show_available_translations' => \current_user_can( 'install_languages' ) && \wp_can_install_language_pack(),
-						'echo'                        => false,
+						'echo'                        => true,
 					]
 				);
-
-				// Add data-validate attribute to the select element.
-				$prpl_dropdown_html = str_replace(
-					'<select',
-					'<select data-validate="required"',
-					$prpl_dropdown_html
-				);
-
-				echo $prpl_dropdown_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 				?>
 			<button type="button" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-primary">
 				<?php \esc_html_e( 'Set the locale', 'progress-planner' ); ?>

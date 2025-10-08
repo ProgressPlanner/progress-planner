@@ -339,6 +339,19 @@ class ProgressPlannerTour {
 					this.closeTour();
 				} );
 			}
+
+			if ( this.dashboardBtn ) {
+				this.dashboardBtn.addEventListener( 'click', ( e ) => {
+					e.preventDefault();
+					console.log( 'Dashboard button clicked!' );
+					this.state.data.finished = true;
+					this.closeTour();
+
+					// Redirect to the dashboard.
+					window.location.href =
+						this.dashboardBtn.getAttribute( 'data-redirect-to' );
+				} );
+			}
 		} else {
 			console.error( 'Popover not found!' );
 		}
