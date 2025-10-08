@@ -136,7 +136,7 @@ interface Tasks_Interface {
 	 * @param array  $args The task data.
 	 * @param string $task_id The task ID.
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public function complete_task( $args = [], $task_id = '' );
 }

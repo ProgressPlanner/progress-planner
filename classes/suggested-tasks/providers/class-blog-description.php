@@ -146,14 +146,21 @@ class Blog_Description extends Tasks_Interactive {
 	 * @param array  $args The task data.
 	 * @param string $task_id The task ID.
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public function complete_task( $args = [], $task_id = '' ) {
 
-		if ( ! isset( $args['blogdescription'] ) ) {
-			return;
+		if ( ! $this->capability_required() ) {
+			return false;
 		}
 
+		if ( ! isset( $args['blogdescription'] ) ) {
+			return false;
+		}
+
+		// update_option will return false if the option value is the same as the one being set.
 		\update_option( 'blogdescription', \sanitize_text_field( $args['blogdescription'] ) );
+
+		return true;
 	}
 }

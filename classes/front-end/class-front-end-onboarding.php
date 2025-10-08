@@ -83,7 +83,7 @@ class Front_End_Onboarding {
 	 * @return void
 	 */
 	public function maybe_show_user_notification() {
-		if ( ! is_admin() || ! \get_current_user_id() ) {
+		if ( ! is_admin() || ! \get_current_user_id() || \wp_doing_ajax() ) {
 			return;
 		}
 
@@ -201,8 +201,6 @@ class Front_End_Onboarding {
 
 		$task_id = \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) );
 
-		// TODO: Actually complete the task, for example delete the hello world post.
-
 		// Aditional data for the task, besides the task ID.
 		$form_values = [];
 		if ( isset( $_POST['form_values'] ) ) {
@@ -222,13 +220,13 @@ class Front_End_Onboarding {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Provider not found.', 'progress-planner' ) ] );
 		}
 
-		// Complete the task.
-		$provider->complete_task( $form_values, $task_id );
+		// WIP: Complete the task.
+		$task_completed = $provider->complete_task( $form_values, $task_id );
 
 		// Note: Marking task as completed will set it it to pending, so user will get celebration. Do we want that?
-		$result = \progress_planner()->get_suggested_tasks()->mark_task_as_completed( $task_id );
+		$task_post_marked_as_completed = \progress_planner()->get_suggested_tasks()->mark_task_as_completed( $task_id );
 
-		if ( ! $result ) {
+		if ( ! $task_completed || ! $task_post_marked_as_completed ) {
 			\error_log( 'Task not completed: ' . $task_id ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not completed.', 'progress-planner' ) ] );
 		}
