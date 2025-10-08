@@ -30,7 +30,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				</p>
 			</div>
 			<div class="prpl-column">
-				<img src="http://server.planner.test/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=monthly-2025-m9&branding_id=0" alt="Badges">
+				<img src="<?php echo esc_url( \constant( 'PROGRESS_PLANNER_URL' ) ); ?>/assets/front-end-onboarding/images/badge-gauge.png" alt="Badges">
 			</div>
 		</div>
 	</div>

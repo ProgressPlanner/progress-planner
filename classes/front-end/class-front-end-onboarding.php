@@ -109,10 +109,10 @@ class Front_End_Onboarding {
 	 */
 	public function add_popover_scripts() {
 		// Enqueue front-end-onboarding.css.
-		\wp_enqueue_style( 'prpl-popover-front-end-onboarding', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/css/front-end-onboarding.css', [], \progress_planner()->get_plugin_version() );
+		\wp_enqueue_style( 'prpl-popover-front-end-onboarding', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/front-end-onboarding/css/front-end-onboarding.css', [], \progress_planner()->get_plugin_version() );
 
 		// Enqueue front-end-onboarding.js.
-		\wp_enqueue_script( 'prpl-popover-front-end-onboarding', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/js/front-end-onboarding.js', [], \progress_planner()->get_plugin_version(), true );
+		\wp_enqueue_script( 'prpl-popover-front-end-onboarding', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/front-end-onboarding/js/front-end-onboarding.js', [], \progress_planner()->get_plugin_version(), true );
 
 		\wp_localize_script(
 			'prpl-popover-front-end-onboarding',
