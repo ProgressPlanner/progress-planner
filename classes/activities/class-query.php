@@ -496,9 +496,16 @@ class Query {
 
 		$table_name = $wpdb->prefix . static::TABLE_NAME; // @phpstan-ignore-line property.nonObject
 
-		foreach ( $wpdb->get_results( "DESCRIBE $table_name" ) as $column ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		foreach ( $wpdb->get_results( $wpdb->prepare( 'DESCRIBE %i', $table_name ) ) as $column ) {
 			if ( 'data_id' === $column->Field && \str_contains( \strtolower( $column->Type ), 'int' ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase, @phpstan-ignore-line property.nonObject
-				$wpdb->query( "ALTER TABLE $table_name CHANGE COLUMN data_id data_id VARCHAR(255)" );
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+				$wpdb->query(
+					$wpdb->prepare(
+						'ALTER TABLE %i CHANGE COLUMN data_id data_id VARCHAR(255)',
+						$table_name
+					)
+				);
 			}
 		}
 	}

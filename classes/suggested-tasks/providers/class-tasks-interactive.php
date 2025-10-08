@@ -84,9 +84,39 @@ abstract class Tasks_Interactive extends Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing setting path.', 'progress-planner' ) ] );
 		}
 
-		$setting      = \sanitize_text_field( \wp_unslash( $_POST['setting'] ) );
-		$value        = \sanitize_text_field( \wp_unslash( $_POST['value'] ) );
-		$setting_path = \json_decode( \sanitize_text_field( \wp_unslash( $_POST['setting_path'] ) ), true );
+		$setting = \sanitize_text_field( \wp_unslash( $_POST['setting'] ) );
+
+		// SECURITY: Whitelist of allowed settings that this endpoint can modify.
+		// Only safe WordPress core settings are allowed.
+		$allowed_settings = \apply_filters(
+			'progress_planner_interactive_task_allowed_settings',
+			[
+				'date_format',
+				'time_format',
+				'timezone_string',
+				'WPLANG',
+				'start_of_week',
+			]
+		);
+
+		if ( ! \in_array( $setting, $allowed_settings, true ) ) {
+			\wp_send_json_error(
+				[
+					'message' => \esc_html__( 'This setting cannot be modified via this endpoint for security reasons.', 'progress-planner' ),
+				]
+			);
+		}
+
+		// Decode setting path before sanitization to preserve JSON structure.
+		$setting_path_raw = \wp_unslash( $_POST['setting_path'] ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- We're decoding JSON, sanitization happens after validation.
+		$setting_path     = \json_decode( $setting_path_raw, true );
+
+		if ( \json_last_error() !== JSON_ERROR_NONE ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid setting path format.', 'progress-planner' ) ] );
+		}
+
+		// Sanitize value based on the specific setting type.
+		$value = $this->sanitize_setting_value( $setting, \wp_unslash( $_POST['value'] ) ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Sanitization handled in sanitize_setting_value().
 
 		if ( ! empty( $setting_path ) ) {
 			$setting_value = \get_option( $setting );
@@ -103,6 +133,40 @@ abstract class Tasks_Interactive extends Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to update setting.', 'progress-planner' ) ] );
 		}
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Sanitize setting value based on the setting type.
+	 *
+	 * @param string $setting The setting name.
+	 * @param mixed  $value   The value to sanitize.
+	 * @return mixed The sanitized value.
+	 */
+	private function sanitize_setting_value( $setting, $value ) {
+		switch ( $setting ) {
+			case 'date_format':
+			case 'time_format':
+				// Allow common date/time format characters.
+				return \sanitize_text_field( $value );
+
+			case 'timezone_string':
+				// Validate timezone against PHP's list of valid timezones.
+				$valid_timezones = \timezone_identifiers_list();
+				return \in_array( $value, $valid_timezones, true ) ? $value : '';
+
+			case 'WPLANG':
+				// Validate language code format (e.g., en_US, fr_FR).
+				return \sanitize_text_field( $value );
+
+			case 'start_of_week':
+				// Must be a number 0-6 (Sunday-Saturday).
+				$int_value = \absint( $value );
+				return ( $int_value >= 0 && $int_value <= 6 ) ? $int_value : 0;
+
+			default:
+				// Default to text sanitization.
+				return \sanitize_text_field( $value );
+		}
 	}
 
 	/**

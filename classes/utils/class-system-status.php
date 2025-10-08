@@ -18,10 +18,15 @@ class System_Status {
 	/**
 	 * Get the system status.
 	 *
+	 * @param bool $include_sensitive_data Whether to include potentially sensitive data. Default false for external access.
+	 *
 	 * @return array The system status data.
 	 */
-	public function get_system_status() {
+	public function get_system_status( $include_sensitive_data = false ) {
 		$data = [];
+
+		// Allow filtering whether sensitive data should be included.
+		$include_sensitive_data = \apply_filters( 'progress_planner_system_status_include_sensitive_data', $include_sensitive_data );
 
 		// Get the number of pending updates.
 		$data['pending_updates'] = \wp_get_update_data()['counts']['total'];
@@ -122,15 +127,21 @@ class System_Status {
 
 		$data['plugin_url'] = \esc_url( \get_admin_url( null, 'admin.php?page=progress-planner' ) );
 
-		$active_plugins  = \get_option( 'active_plugins' );
-		$data['plugins'] = [];
-		foreach ( $active_plugins as $plugin ) {
-			$plugin_data       = \get_plugin_data( \WP_PLUGIN_DIR . '/' . $plugin );
-			$data['plugins'][] = [
-				'plugin'  => $plugin,
-				'name'    => $plugin_data['Name'] ?? 'N/A', // @phpstan-ignore-line nullCoalesce.offset
-				'version' => $plugin_data['Version'] ?? 'N/A', // @phpstan-ignore-line nullCoalesce.offset
-			];
+		// Only include detailed plugin information for authenticated users or if explicitly allowed.
+		if ( $include_sensitive_data ) {
+			$active_plugins  = \get_option( 'active_plugins' );
+			$data['plugins'] = [];
+			foreach ( $active_plugins as $plugin ) {
+				$plugin_data       = \get_plugin_data( \WP_PLUGIN_DIR . '/' . $plugin );
+				$data['plugins'][] = [
+					'plugin'  => $plugin,
+					'name'    => $plugin_data['Name'] ?? 'N/A', // @phpstan-ignore-line nullCoalesce.offset
+					'version' => $plugin_data['Version'] ?? 'N/A', // @phpstan-ignore-line nullCoalesce.offset
+				];
+			}
+		} else {
+			// Only include plugin count, not details.
+			$data['plugins_count'] = \count( \get_option( 'active_plugins', [] ) );
 		}
 
 		$data['branding_id'] = (int) \progress_planner()->get_ui__branding()->get_branding_id();

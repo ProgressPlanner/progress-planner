@@ -85,7 +85,13 @@ class Debug_Tools {
 				'id'     => 'prpl-show-all-suggested-tasks',
 				'parent' => 'prpl-debug',
 				'title'  => 'Show All Suggested Tasks',
-				'href'   => \add_query_arg( 'prpl_show_all_suggested_tasks', '99', $this->current_url ),
+				'href'   => \add_query_arg(
+					[
+						'prpl_show_all_suggested_tasks' => '99',
+						'_wpnonce'                      => \wp_create_nonce( 'prpl_debug_tools' ),
+					],
+					\remove_query_arg( '_wpnonce', $this->current_url )
+				),
 			]
 		);
 
@@ -439,13 +445,18 @@ class Debug_Tools {
 	 */
 	public function check_show_all_suggested_tasks( $max_items_per_category ) {
 		if (
-			! isset( $_GET['prpl_show_all_suggested_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! \current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			! isset( $_GET['prpl_show_all_suggested_tasks'] ) ||
+			! \current_user_can( 'manage_options' )
 		) {
 			return $max_items_per_category;
 		}
 
-		$max_items = \absint( \wp_unslash( $_GET['prpl_show_all_suggested_tasks'] ) );  // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// Verify nonce for security.
+		if ( ! isset( $_GET['_wpnonce'] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_GET['_wpnonce'] ) ), 'prpl_debug_tools' ) ) {
+			return $max_items_per_category;
+		}
+
+		$max_items = \absint( \wp_unslash( $_GET['prpl_show_all_suggested_tasks'] ) );
 
 		foreach ( $max_items_per_category as $key => $value ) {
 			$max_items_per_category[ $key ] = $max_items;
