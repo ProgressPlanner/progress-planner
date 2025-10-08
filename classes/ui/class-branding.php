@@ -34,6 +34,15 @@ final class Branding {
 	 * @return int
 	 */
 	public function get_branding_id(): int {
+		// Check for placeholder demo cookie.
+		if ( \defined( '\IS_PLAYGROUND_PREVIEW' )
+			&& \constant( '\IS_PLAYGROUND_PREVIEW' ) === true
+			&& isset( $_COOKIE['prpl_placeholder_demo'] )
+			&& '1' === $_COOKIE['prpl_placeholder_demo']
+		) {
+			return 5938;
+		}
+
 		// Get branding ID depending on the host, agency etc.
 		if ( \defined( 'PROGRESS_PLANNER_BRANDING_ID' ) ) {
 			return \constant( 'PROGRESS_PLANNER_BRANDING_ID' );
