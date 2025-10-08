@@ -64,8 +64,8 @@ class Test_Security extends \WP_UnitTestCase {
 		$this->token = 'test_token_123456789';
 
 		// Create test users.
-		$this->admin_user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		$this->editor_user_id = $this->factory->user->create( [ 'role' => 'editor' ] );
+		$this->admin_user_id      = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		$this->editor_user_id     = $this->factory->user->create( [ 'role' => 'editor' ] );
 		$this->subscriber_user_id = $this->factory->user->create( [ 'role' => 'subscriber' ] );
 
 		// Set license key.
@@ -89,7 +89,9 @@ class Test_Security extends \WP_UnitTestCase {
 
 		// Clear rate limit transients.
 		global $wpdb;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_prpl_api_rate_limit_%'" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE '_transient_timeout_prpl_api_rate_limit_%'" );
 
 		global $wp_rest_server;
@@ -299,11 +301,13 @@ class Test_Security extends \WP_UnitTestCase {
 		\wp_set_current_user( 0 );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/prpl_recommendations' );
-		$request->set_body_params( [
-			'title'   => 'Test Recommendation',
-			'content' => 'Test content',
-			'status'  => 'publish',
-		] );
+		$request->set_body_params(
+			[
+				'title'   => 'Test Recommendation',
+				'content' => 'Test content',
+				'status'  => 'publish',
+			]
+		);
 
 		$response = $this->server->dispatch( $request );
 		$this->assertNotEquals( 200, $response->get_status(), 'Unauthenticated user should not create recommendations' );
@@ -312,11 +316,13 @@ class Test_Security extends \WP_UnitTestCase {
 		\wp_set_current_user( $this->subscriber_user_id );
 
 		$request = new WP_REST_Request( 'POST', '/wp/v2/prpl_recommendations' );
-		$request->set_body_params( [
-			'title'   => 'Test Recommendation',
-			'content' => 'Test content',
-			'status'  => 'publish',
-		] );
+		$request->set_body_params(
+			[
+				'title'   => 'Test Recommendation',
+				'content' => 'Test content',
+				'status'  => 'publish',
+			]
+		);
 
 		$response = $this->server->dispatch( $request );
 		$this->assertNotEquals( 200, $response->get_status(), 'Subscriber should not create recommendations' );
@@ -334,7 +340,8 @@ class Test_Security extends \WP_UnitTestCase {
 		$test_table = $wpdb->prefix . 'progress_planner_activities';
 
 		// Verify the table exists.
-		$table_exists = $wpdb->get_var( "SHOW TABLES LIKE '{$test_table}'" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$table_exists = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $test_table ) );
 		$this->assertEquals( $test_table, $table_exists, 'Test table should exist' );
 
 		// Test that the query uses prepared statements (just verify no errors).
@@ -360,9 +367,9 @@ class Test_Security extends \WP_UnitTestCase {
 		try {
 			\progress_planner()->get_suggested_tasks()->maybe_complete_task();
 			$this->fail( 'Should have died due to missing nonce' );
-		} catch ( \WPAjaxDieStopException $e ) {
+		} catch ( \WPAjaxDieStopException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 			// Expected - nonce verification failed.
-		} catch ( \Exception $e ) {
+		} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 			// WP_Die throws different exceptions.
 		}
 
@@ -373,9 +380,9 @@ class Test_Security extends \WP_UnitTestCase {
 		try {
 			\progress_planner()->get_suggested_tasks()->maybe_complete_task();
 			$this->fail( 'Should have died due to invalid nonce' );
-		} catch ( \WPAjaxDieStopException $e ) {
+		} catch ( \WPAjaxDieStopException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 			// Expected.
-		} catch ( \Exception $e ) {
+		} catch ( \Exception $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
 			// Expected.
 		}
 

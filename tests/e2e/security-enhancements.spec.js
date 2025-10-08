@@ -83,9 +83,7 @@ test.describe( 'Security Enhancements - Normal Functionality', () => {
 
 	test( 'Settings page still loads and saves', async ( { page } ) => {
 		// Navigate to settings page.
-		await page.goto(
-			'/wp-admin/admin.php?page=progress-planner-settings'
-		);
+		await page.goto( '/wp-admin/admin.php?page=progress-planner-settings' );
 		await page.waitForLoadState( 'networkidle' );
 
 		// Check page loaded.
@@ -137,9 +135,7 @@ test.describe( 'Security Enhancements - Normal Functionality', () => {
 		await page.waitForLoadState( 'networkidle' );
 
 		// Look for email sending task.
-		const emailTask = page.locator(
-			'li[data-task-id="sending-email"]'
-		);
+		const emailTask = page.locator( 'li[data-task-id="sending-email"]' );
 
 		if ( ( await emailTask.count() ) > 0 ) {
 			// Click on test email action.
@@ -154,9 +150,7 @@ test.describe( 'Security Enhancements - Normal Functionality', () => {
 				await page.waitForTimeout( 1000 );
 
 				// Verify popover opened.
-				const popover = page.locator(
-					'#prpl-popover-sending-email'
-				);
+				const popover = page.locator( '#prpl-popover-sending-email' );
 				expect( await popover.count() ).toBeGreaterThan( 0 );
 
 				// Close popover.
@@ -172,7 +166,6 @@ test.describe( 'Security Enhancements - Security Verification', () => {
 		const wpUrl = process.env.WORDPRESS_URL || 'http://localhost:8889';
 
 		// Make many requests to trigger rate limiting.
-		let rateLimitHit = false;
 		let successCount = 0;
 		const maxAttempts = 15; // More than the default 10 limit.
 
@@ -188,7 +181,6 @@ test.describe( 'Security Enhancements - Security Verification', () => {
 				);
 
 				if ( response.status() === 429 ) {
-					rateLimitHit = true;
 					break;
 				}
 
@@ -327,9 +319,7 @@ test.describe( 'Security Enhancements - Security Verification', () => {
 } );
 
 test.describe( 'Security Enhancements - Backward Compatibility', () => {
-	test( 'Existing workflows still function correctly', async ( {
-		page,
-	} ) => {
+	test( 'Existing workflows still function correctly', async ( { page } ) => {
 		// Test the main dashboard loads.
 		await page.goto( '/wp-admin/admin.php?page=progress-planner' );
 		await page.waitForLoadState( 'networkidle' );
@@ -361,9 +351,7 @@ test.describe( 'Security Enhancements - Backward Compatibility', () => {
 		expect( menuItems ).toBeGreaterThan( 0 );
 
 		// Navigate to settings.
-		await page.goto(
-			'/wp-admin/admin.php?page=progress-planner-settings'
-		);
+		await page.goto( '/wp-admin/admin.php?page=progress-planner-settings' );
 		await page.waitForLoadState( 'networkidle' );
 
 		// Page should load without errors.
