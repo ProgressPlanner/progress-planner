@@ -44,6 +44,7 @@
 
 	/* Topics */
 	--prpl-color-monthly: #faa310;
+	--prpl-color-monthly-2: #faa310;
 	--prpl-color-streak: var(--prpl-color-monthly);
 	--prpl-color-content-badge: var(--prpl-color-monthly);
 	--prpl-background-monthly: #fff9f0;
@@ -93,4 +94,7 @@
 	--prpl-color-text-placeholder: var(--prpl-color-ui-icon);
 	--prpl-color-text-dropdown: var(--prpl-color-text);
 	--prpl-color-field-shadow: var(--prpl-color-shadow-paper);
+
+	/* Badge */
+	--prpl-color-icon-missed-badge: var(--prpl-color-alert-error);
 }

@@ -46,6 +46,7 @@ customElements.define(
 				maxDeg: '180deg',
 				background: 'var(--prpl-background-monthly)',
 				color: 'var(--prpl-color-monthly)',
+				color2: 'var(--prpl-color-monthly-2)',
 				start: '270deg',
 				cutout: '57%',
 				contentFontSize: 'var(--prpl-font-size-6xl)',
@@ -188,6 +189,7 @@ customElements.define(
 				maxDeg,
 				background,
 				color,
+				color2,
 				start,
 				cutout,
 				contentFontSize,
@@ -200,13 +202,29 @@ customElements.define(
 				? 'bottom: 50%;'
 				: 'top: -1em; padding-top: 50%;';
 
+			let colorTransitions;
+
+			// If the progress is less than 50%, we have only one color, no gradient.
+			if ( value / max <= 0.5 ) {
+				colorTransitions = `${ color } calc(${ maxDeg } * ${
+					value / max
+				})`;
+			} else {
+				// Otherwise we show first color for 0.5 and then the second color.
+				colorTransitions = `${ color } calc(${ maxDeg } * ${ 0.5 })`;
+				colorTransitions += `, ${ color2 } calc(${ maxDeg } * ${
+					value / max
+				})`;
+			}
+
+			// Add the remaining color.
+			colorTransitions += `,var(--prpl-color-gauge-remain) calc(${ maxDeg } * ${
+				value / max
+			}) ${ maxDeg }`;
+
 			this.shadowRoot.innerHTML = `
 		<div style="padding: ${ contentPadding }; background: ${ background }; border-radius:var(--prpl-border-radius-big); aspect-ratio: 2 / 1; overflow: hidden; position: relative; margin-bottom: ${ marginBottom };">
-			<div style="width: 100%; aspect-ratio: 1 / 1; border-radius: 100%; position: relative; background: radial-gradient(${ background } 0 ${ cutout }, transparent ${ cutout } 100%), conic-gradient(from ${ start }, ${ color } calc(${ maxDeg } * ${
-				value / max
-			}), var(--prpl-color-gauge-remain) calc(${ maxDeg } * ${
-				value / max
-			}) ${ maxDeg }, transparent ${ maxDeg }); text-align: center;">
+			<div style="width: 100%; aspect-ratio: 1 / 1; border-radius: 100%; position: relative; background: radial-gradient(${ background } 0 ${ cutout }, transparent ${ cutout } 100%), conic-gradient(from ${ start }, ${ colorTransitions }, transparent ${ maxDeg }); text-align: center;">
 			<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-text); width: 10%; text-align: center; left:0;">0</span>
 			<span style="font-size: ${ contentFontSize }; ${ contentSpecificStyles } display: block; font-weight: 600; text-align: center; position: absolute; color: var(--prpl-color-text); width: 100%; line-height: 1.2;">
 				<span style="display:inline-block;width: 50%;">
