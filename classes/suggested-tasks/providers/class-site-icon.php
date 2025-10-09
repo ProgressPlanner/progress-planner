@@ -89,4 +89,28 @@ class Site_Icon extends Tasks {
 
 		return $actions;
 	}
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function complete_task( $args = [], $task_id = '' ) {
+
+		if ( ! $this->capability_required() ) {
+			return false;
+		}
+
+		if ( ! isset( $args['post_id'] ) ) {
+			return false;
+		}
+
+		// update_option will return false if the option value is the same as the one being set.
+		\update_option( 'site_icon', \sanitize_text_field( $args['post_id'] ) );
+
+		return true;
+	}
 }
