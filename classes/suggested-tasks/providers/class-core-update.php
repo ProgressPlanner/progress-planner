@@ -84,15 +84,6 @@ class Core_Update extends Tasks {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Regular updates improve security and performance.', 'progress-planner' );
-	}
-
-	/**
 	 * Add the link to the Progress Planner Dashboard to the update complete actions.
 	 *
 	 * @param array $update_actions The update actions.
@@ -152,7 +143,7 @@ class Core_Update extends Tasks {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'update-core.php' ) . '" target="_blank">' . \esc_html__( 'Go to the Updates page', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'update-core.php' ) . '" target="_self">' . \esc_html__( 'Go to the Updates page', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

@@ -4,7 +4,7 @@ Tags: planning, maintenance, writing, blogging
 Requires at least: 6.3
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.8.0
+Stable tag: 1.8.1
 License: GPL3+
 License URI: https://www.gnu.org/licenses/gpl-3.0.en.html
 
@@ -83,11 +83,27 @@ https://youtu.be/e1bmxZYyXFY
 
 == Changelog ==
 
+= 1.8.1 =
+
+- Security fix: Privilege escalation via an AJAX call where authenticated users could update arbitrary site options.
+- Added capability checks.
+- Thanks to [NumeX](https://github.com/NumeXx) for responsibly disclosing via the Patchstack Bug Bounty Program.
+
 = 1.8.0 =
 
 Enhancements:
 
 * Redesign of the admin pages.
+* Improved capability checks.
+* a11y improvements.
+
+Added these recommendations from Ravi:
+
+* Set date format.
+
+Bugs we fixed:
+
+* Fix redirecting to Progress Planner Dashboard after login.
 
 = 1.7.2 =
 

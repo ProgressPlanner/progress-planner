@@ -1,9 +1,35 @@
+= 1.9.0 =
+
+Enhancements:
+
+* Add "Show all Recommendations" button to the "Ravi's Recommendations" widget
+
+Bugs we fixed:
+
+* Fix missing content and streak badges after they are all completed.
+* Fix issue when point is sometimes not awarded for completing "Remove term without posts" task.
+
+= 1.8.1 =
+
+- Security fix: Privilege escalation via an AJAX call where authenticated users could update arbitrary site options.
+- Added capability checks.
+- Thanks to [NumeX](https://github.com/NumeXx) for responsibly disclosing via the Patchstack Bug Bounty Program.
 
 = 1.8.0 =
 
 Enhancements:
 
 * Redesign of the admin pages.
+* Improved capability checks.
+* a11y improvements.
+
+Added these recommendations from Ravi:
+
+* Set date format.
+
+Bugs we fixed:
+
+* Fix redirecting to Progress Planner Dashboard after login.
 
 = 1.7.2 =
 

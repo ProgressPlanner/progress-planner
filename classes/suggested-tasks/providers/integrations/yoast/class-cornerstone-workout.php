@@ -124,15 +124,6 @@ class Cornerstone_Workout extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Improve your most important pages with Yoast SEO\'s Cornerstone Content Workout.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -166,7 +157,7 @@ class Cornerstone_Workout extends Yoast_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) . '" target="_blank">' . \esc_html__( 'Run workout', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_workouts#cornerstone' ) . '" target="_self">' . \esc_html__( 'Run workout', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

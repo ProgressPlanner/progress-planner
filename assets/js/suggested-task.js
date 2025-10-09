@@ -267,7 +267,7 @@ prplSuggestedTask = {
 								'trash' === newStatus ? 'complete' : 'pending'
 							);
 							const eventPoints = parseInt(
-								postData?.meta?.prpl_points
+								postData?.prpl_points
 							);
 
 							// Task is trashed, check if we need to celebrate.
@@ -545,6 +545,7 @@ prplSuggestedTask = {
 		if ( event.key === 'Enter' ) {
 			event.preventDefault();
 			event.stopPropagation();
+			event.target.blur();
 			return false;
 		}
 	},
@@ -593,6 +594,9 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 						event.detail.insertPosition,
 						itemHTML
 					);
+
+				// Trigger the grid resize event.
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 
 				return;
 			}

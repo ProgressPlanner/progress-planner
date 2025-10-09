@@ -58,6 +58,11 @@ class Onboard {
 	 * @return void
 	 */
 	public function save_onboard_response() {
+
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
+		}
+
 		// Check the nonce.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
@@ -96,5 +101,67 @@ class Onboard {
 	 */
 	public function get_remote_url() {
 		return \progress_planner()->get_remote_server_root_url() . self::REMOTE_API_URL . 'onboard';
+	}
+
+	/**
+	 * Get the remote nonce.
+	 *
+	 * @return string
+	 */
+	public function get_remote_nonce() {
+		// Make a POST request to the remote nonce endpoint.
+		$response = \wp_remote_post(
+			$this->get_remote_nonce_url(),
+			[ 'body' => [ 'site' => \set_url_scheme( \site_url() ) ] ]
+		);
+		if ( \is_wp_error( $response ) ) {
+			return '';
+		}
+		$body = \wp_remote_retrieve_body( $response );
+		$body = \json_decode( $body, true );
+		if ( ! isset( $body['nonce'] ) ) {
+			return '';
+		}
+		return $body['nonce'];
+	}
+
+	/**
+	 * Make a request to the remote onboarding endpoint.
+	 *
+	 * @param array $data The data to send with the request.
+	 *
+	 * @return string The license key.
+	 */
+	public function make_remote_onboarding_request( $data = [] ) {
+		// Set the data.
+		if ( ! isset( $data['nonce'] ) ) {
+			$data['nonce'] = $this->get_remote_nonce();
+		}
+		$data = \wp_parse_args(
+			$data,
+			[
+				'site'            => \set_url_scheme( \site_url() ),
+				'email'           => \wp_get_current_user()->user_email,
+				'name'            => \get_user_meta( \wp_get_current_user()->ID, 'first_name', true ),
+				'with-email'      => 'yes',
+				'timezone_offset' => (float) ( \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600 ),
+			]
+		);
+
+		// Make the request.
+		$response = \wp_remote_post(
+			$this->get_remote_url(),
+			[ 'body' => $data ]
+		);
+		if ( \is_wp_error( $response ) ) {
+			return '';
+		}
+		$body = \wp_remote_retrieve_body( $response );
+		$body = \json_decode( $body, true );
+		return ! isset( $body['status'] )
+			|| 'ok' !== $body['status']
+			|| ! isset( $body['license_key'] )
+				? ''
+				: $body['license_key'];
 	}
 }

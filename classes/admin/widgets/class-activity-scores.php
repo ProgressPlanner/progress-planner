@@ -43,7 +43,7 @@ final class Activity_Scores extends Widget {
 			'monthly' === $this->get_frequency() &&
 			\gmdate( 'Y-m-01' ) === $date->format( 'Y-m-01' )
 		) {
-			return 'var(--prpl-color-gray-2)';
+			return 'var(--prpl-color-border)';
 		}
 
 		// If weekly and the current week, return gray (in progress).
@@ -51,16 +51,16 @@ final class Activity_Scores extends Widget {
 			'weekly' === $this->get_frequency() &&
 			\gmdate( 'Y-W' ) === $date->format( 'Y-W' )
 		) {
-			return 'var(--prpl-color-gray-2)';
+			return 'var(--prpl-color-border)';
 		}
 
 		if ( $number > 90 ) {
-			return 'var(--prpl-color-accent-green)';
+			return 'var(--prpl-graph-color-3)';
 		}
 		if ( $number > 30 ) {
-			return 'var(--prpl-color-accent-orange)';
+			return 'var(--prpl-color-monthly)';
 		}
-		return '#f43f5e';
+		return 'var(--prpl-graph-color-1)';
 	}
 
 	/**
@@ -70,11 +70,8 @@ final class Activity_Scores extends Widget {
 	 */
 	public function get_score() {
 		$activities = \progress_planner()->get_activities__query()->query_activities(
-			[
-				// Use 31 days to take into account
-				// the activities score decay from previous activities.
-				'start_date' => new \DateTime( '-31 days' ),
-			]
+			// Use 31 days to take into account the activities score decay from previous activities.
+			[ 'start_date' => new \DateTime( '-31 days' ) ]
 		);
 
 		$score        = 0;
@@ -115,37 +112,33 @@ final class Activity_Scores extends Widget {
 		return [
 			[
 				'label'    => \esc_html__( 'published content', 'progress-planner' ),
-				'callback' => function () {
-					$events = \progress_planner()->get_activities__query()->query_activities(
+				'callback' => fn() => \count(
+					\progress_planner()->get_activities__query()->query_activities(
 						[
 							'start_date' => new \DateTime( '-7 days' ),
 							'category'   => 'content',
 							'type'       => 'publish',
 						]
-					);
-					return \count( $events ) > 0;
-				},
+					)
+				) > 0,
 			],
 			[
 				'label'    => \esc_html__( 'updated content', 'progress-planner' ),
-				'callback' => function () {
-					$events = \progress_planner()->get_activities__query()->query_activities(
+				'callback' => fn() => \count(
+					\progress_planner()->get_activities__query()->query_activities(
 						[
 							'start_date' => new \DateTime( '-7 days' ),
 							'category'   => 'content',
 							'type'       => 'update',
 						]
-					);
-					return \count( $events ) > 0;
-				},
+					)
+				) > 0,
 			],
 			[
 				'label'    => 0 === \wp_get_update_data()['counts']['total']
 					? \esc_html__( 'performed all updates', 'progress-planner' )
 					: '<a href="' . \esc_url( \admin_url( 'update-core.php' ) ) . '">' . \esc_html__( 'Perform all updates', 'progress-planner' ) . '</a>',
-				'callback' => function () {
-					return ! \wp_get_update_data()['counts']['total'];
-				},
+				'callback' => fn() => ! \wp_get_update_data()['counts']['total'],
 			],
 		];
 	}
@@ -159,12 +152,12 @@ final class Activity_Scores extends Widget {
 	 */
 	public function get_gauge_color( $score ) {
 		if ( $score >= 75 ) {
-			return 'var(--prpl-color-accent-green)';
+			return 'var(--prpl-graph-color-3)';
 		}
 		if ( $score >= 50 ) {
-			return 'var(--prpl-color-accent-orange)';
+			return 'var(--prpl-color-monthly)';
 		}
-		return 'var(--prpl-color-accent-red)';
+		return 'var(--prpl-graph-color-1)';
 	}
 
 	/**

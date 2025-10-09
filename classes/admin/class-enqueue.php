@@ -312,7 +312,7 @@ class Enqueue {
 		$monthly_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 
 		if ( $monthly_badge ) {
-			$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id();
+			$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id() . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
 		}
 
 		// Get the content and maintenance badge URLs.
@@ -321,12 +321,12 @@ class Enqueue {
 			foreach ( $set_badges as $badge ) {
 				$progress = $badge->get_progress();
 				if ( $progress['progress'] > 100 ) {
-					$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge->get_id();
+					$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge->get_id() . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
 				}
 			}
 			if ( ! isset( $badge_urls[ $context ] ) ) {
 				// Fallback to the first badge in the set if no badge is completed.
-				$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $set_badges[0]->get_id();
+				$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $set_badges[0]->get_id() . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
 			}
 		}
 
@@ -368,14 +368,6 @@ class Enqueue {
 			/* translators: %s: The task content. */
 			'taskDelete'                   => \esc_html__( "Delete task '%s'", 'progress-planner' ),
 			'delete'                       => \esc_html__( 'Delete', 'progress-planner' ),
-			'taskMovedDown'                => \esc_html__( 'Task moved down', 'progress-planner' ),
-			'taskMovedUp'                  => \esc_html__( 'Task moved up', 'progress-planner' ),
-			/* translators: %s: The task content. */
-			'taskMoveDown'                 => \esc_html__( "Move task '%s' down", 'progress-planner' ),
-			/* translators: %s: The task content. */
-			'taskMoveUp'                   => \esc_html__( "Move task '%s' up", 'progress-planner' ),
-			/* translators: %s: The task content. */
-			'taskNotCompleted'             => \esc_html__( "Task '%s' marked as not completed and moved to the top", 'progress-planner' ),
 			'video'                        => \esc_html__( 'Video', 'progress-planner' ),
 			'watchVideo'                   => \esc_html__( 'Watch video', 'progress-planner' ),
 			'disabledRRCheckboxTooltip'    => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),

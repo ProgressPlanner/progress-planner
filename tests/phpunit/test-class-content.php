@@ -45,13 +45,12 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		$post_id = \wp_insert_post( $post_data );
 
 		// Assert that activities were created.
-		$activities = \progress_planner()->get_activities__query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities_get_raw(
 			[
 				'category' => 'content',
 				'type'     => 'publish',
 				'data_id'  => $post_id,
-			],
-			'RAW'
+			]
 		);
 
 		$this->assertNotEmpty( $activities );
@@ -74,12 +73,11 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		\wp_publish_post( $post_id );
 
 		// Assert that publish activity was created.
-		$activities = \progress_planner()->get_activities__query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities_get_raw(
 			[
 				'category' => 'content',
 				'data_id'  => $post_id,
-			],
-			'RAW'
+			]
 		);
 
 		// There should be only one activity, publish (not update).
@@ -103,13 +101,12 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		\wp_trash_post( $post_id );
 
 		// Assert that trash activity was created.
-		$activities = \progress_planner()->get_activities__query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities_get_raw(
 			[
 				'category' => 'content',
 				'type'     => 'trash',
 				'data_id'  => $post_id,
-			],
-			'RAW'
+			]
 		);
 
 		$this->assertCount( 1, $activities );
@@ -132,13 +129,12 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		\wp_delete_post( $post_id, true );
 
 		// Assert that delete activity was created.
-		$activities = \progress_planner()->get_activities__query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities_get_raw(
 			[
 				'category' => 'content',
 				'type'     => 'delete',
 				'data_id'  => $post_id,
-			],
-			'RAW'
+			]
 		);
 
 		$this->assertCount( 1, $activities );
@@ -163,8 +159,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 			[
 				'category' => 'content',
 				'data_id'  => $post_id,
-			],
-			'ACTIVITIES'
+			]
 		);
 
 		$this->assertCount( 0, $activities );
@@ -182,8 +177,7 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 			[
 				'category' => 'content',
 				'data_id'  => $post_id,
-			],
-			'ACTIVITIES'
+			]
 		);
 
 		$this->assertCount( 0, $activities );
@@ -214,21 +208,15 @@ class Content_Actions_Test extends \WP_UnitTestCase {
 		);
 
 		// Assert activities were created in correct order.
-		$activities = \progress_planner()->get_activities__query()->query_activities(
+		$activities = \progress_planner()->get_activities__query()->query_activities_get_raw(
 			[
 				'category' => 'content',
 				'data_id'  => $post_id,
-			],
-			'RAW'
+			]
 		);
 
 		// Get the types in order.
-		$types = \array_map(
-			function ( $activity ) {
-				return $activity->type;
-			},
-			$activities
-		);
+		$types = \array_map( fn( $activity ) => $activity->type, $activities );
 
 		$this->assertCount( 1, $types );
 		$this->assertContains( 'publish', $types ); // Should have publish when first published.

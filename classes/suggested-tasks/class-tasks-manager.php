@@ -36,6 +36,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Unpublished_Content;
 use Progress_Planner\Suggested_Tasks\Providers\Collaborator;
 use Progress_Planner\Suggested_Tasks\Providers\Select_Timezone;
 use Progress_Planner\Suggested_Tasks\Providers\Check_Email_DNS_Records;
+use Progress_Planner\Suggested_Tasks\Providers\Set_Date_Format;
 
 /**
  * Tasks_Manager class.
@@ -82,6 +83,7 @@ class Tasks_Manager {
 			new Collaborator(),
 			new Select_Timezone(),
 			new Check_Email_DNS_Records(),
+			new Set_Date_Format(),
 		];
 
 		// Add the plugin integration.

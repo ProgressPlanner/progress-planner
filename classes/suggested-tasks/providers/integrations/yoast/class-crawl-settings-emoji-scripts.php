@@ -45,15 +45,6 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Remove JavaScript used for converting emoji characters in older browsers.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array
@@ -100,7 +91,7 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_emoji_scripts' ) . '" target="_blank">' . \esc_html__( 'Remove', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_emoji_scripts' ) . '" target="_self">' . \esc_html__( 'Remove', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

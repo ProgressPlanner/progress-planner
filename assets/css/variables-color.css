@@ -1,0 +1,100 @@
+:root {
+
+	/* Background */
+	--prpl-background: #f6f7f9;
+	--prpl-background-banner: #f9b23c;
+
+	/* Paper */
+	--prpl-background-paper: #fff;
+	--prpl-color-border: #d1d5db;
+	--prpl-color-divider: var(--prpl-color-border);
+	--prpl-color-shadow-paper: #000;
+
+	/* Graph */
+	--prpl-color-gauge-remain: #e1e3e7;
+	--prpl-graph-color-1: #f43f5e;
+	--prpl-graph-color-2: #faa310;
+	--prpl-graph-color-3: #14b8a6;
+	--prpl-graph-color-4: #534786;
+
+	/* Table */
+	--prpl-background-table: var(--prpl-background);
+	--prpl-background-top-task: #fff9f0;
+	--prpl-color-border-top-task: var(--prpl-color-monthly);
+	--prpl-color-border-next-top-task: var(--prpl-graph-color-4);
+	--prpl-color-selection-controls-inactive: #9ca3af;
+	--prpl-color-selection-controls: var(--prpl-color-selection-controls-inactive); /* TBD */
+	--prpl-color-ui-icon: #6b7280;
+	--prpl-color-ui-icon-hover: var(--prpl-color-link);
+	--prpl-color-ui-icon-hover-fill: var(--prpl-background-content-badge);
+	--prpl-color-ui-icon-hover-delete: var(--prpl-color-alert-error);
+	--prpl-background-point: var(--prpl-background-banner);
+	--prpl-text-point: var(--prpl-color-headings);
+	--prpl-background-point-inactive: var(--prpl-color-border);
+	--prpl-text-point-inactive: var(--prpl-color-headings);
+
+	/* Text */
+	--prpl-color-text: #4b5563;
+	--prpl-color-text-hover: var(--prpl-color-link);
+	--prpl-color-headings: #38296d;
+	--prpl-color-subheadings: var(--prpl-color-headings);
+	--prpl-color-link: #1e40af;
+	--prpl-color-link-hover: var(--prpl-color-text);
+	--prpl-color-link-visited: var(--prpl-graph-color-4);
+
+	/* Topics */
+	--prpl-color-monthly: #faa310;
+	--prpl-color-monthly-2: #faa310;
+	--prpl-color-streak: var(--prpl-color-monthly);
+	--prpl-color-content-badge: var(--prpl-color-monthly);
+	--prpl-background-monthly: #fff9f0;
+	--prpl-background-content: #f6f5fb;
+	--prpl-background-activity: #f2faf9;
+	--prpl-background-streak: #fff6f7;
+	--prpl-background-content-badge: #effbfe;
+
+	/* Alert success */
+	--prpl-color-alert-success: #16a34a;
+	--prpl-color-alert-success-text: #14532d;
+	--prpl-background-alert-success: #f0fdf4;
+
+	/* Alert error */
+	--prpl-color-alert-error: #e73136;
+	--prpl-color-alert-error-text: #7f1d1d;
+	--prpl-background-alert-error: #fdeded;
+
+	/* Alert warning */
+	--prpl-color-alert-warning: #eab308;
+	--prpl-color-alert-warning-text: #713f12;
+	--prpl-background-alert-warning: #fefce8;
+
+	/* Alert info */
+	--prpl-color-alert-info: #2563eb;
+	--prpl-color-alert-info-text: #1e3a8a;
+	--prpl-background-alert-info: #eff6ff;
+
+	/* Button */
+	--prpl-color-button-primary: #dd324f;
+	--prpl-color-button-primary-hover: #cf2441;
+	--prpl-color-button-primary-shadow: var(--prpl-color-shadow-paper);
+	--prpl-color-button-primary-border: none;
+	--prpl-color-button-primary-text: var(--prpl-background-paper);
+
+	/* Settings page */
+	--prpl-color-setting-pages-icon: var(--prpl-color-monthly);
+	--prpl-color-setting-posts-icon: var(--prpl-graph-color-4);
+	--prpl-color-setting-login-icon: var(--prpl-graph-color-3);
+	--prpl-background-setting-pages: var(--prpl-background-monthly);
+	--prpl-background-setting-posts: var(--prpl-background-content);
+	--prpl-background-setting-login: var(--prpl-background-activity);
+	--prpl-color-border-settings: var(--prpl-color-border);
+
+	/* Input field dropdown */
+	--prpl-color-field-border: var(--prpl-color-border);
+	--prpl-color-text-placeholder: var(--prpl-color-ui-icon);
+	--prpl-color-text-dropdown: var(--prpl-color-text);
+	--prpl-color-field-shadow: var(--prpl-color-shadow-paper);
+
+	/* Badge */
+	--prpl-color-icon-missed-badge: var(--prpl-color-alert-error);
+}

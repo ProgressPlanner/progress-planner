@@ -45,15 +45,6 @@ class Archive_Date extends Yoast_Provider {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Yoast SEO can disable the date archive, which is really only useful for news sites and blogs.', 'progress-planner' );
-	}
-
-	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array
@@ -79,7 +70,7 @@ class Archive_Date extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		// If the date archive is already disabled, we don't need to add the task.
-		return $this->is_task_relevant() && \YoastSEO()->helpers->options->get( 'disable-date' ) !== true;
+		return $this->is_task_relevant() && \YoastSEO()->helpers->options->get( 'disable-date' ) !== true; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**
@@ -108,7 +99,7 @@ class Archive_Date extends Yoast_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' ) . '" target="_blank">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' ) . '" target="_self">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

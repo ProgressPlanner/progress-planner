@@ -71,26 +71,6 @@ class Disable_Comments extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			\esc_html(
-				// translators: %d is the number of approved comments.
-				\_n(
-					'There is %1$d comment. If you don\'t need comments on your site, consider disabling them.',
-					'There are %1$d comments. If you don\'t need comments on your site, consider disabling them.',
-					(int) \wp_count_comments()->approved,
-					'progress-planner'
-				)
-			),
-			(int) \wp_count_comments()->approved,
-		);
-	}
-
-	/**
 	 * Check if the task condition is satisfied.
 	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *
@@ -157,7 +137,7 @@ class Disable_Comments extends Tasks_Interactive {
 	 */
 	public function print_popover_form_contents() {
 		?>
-		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+		<button type="submit" class="prpl-button prpl-button-primary">
 			<?php \esc_html_e( 'Disable new comments', 'progress-planner' ); ?>
 		</button>
 		<?php if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) : ?>
@@ -182,7 +162,7 @@ class Disable_Comments extends Tasks_Interactive {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'' . \esc_attr( $data['meta']['prpl_popover_id'] ) . '\')?.showPopover()">' . \esc_html__( 'Disable comments', 'progress-planner' ) . '</a>',
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Disable comments', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;
