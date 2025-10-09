@@ -26,6 +26,9 @@ class Onboard {
 		// Handle saving data from the onboarding form response.
 		\add_action( 'wp_ajax_progress_planner_save_onboard_data', [ $this, 'save_onboard_response' ] );
 
+		// Detect domain changes.
+		\add_action( 'shutdown', [ $this, 'detect_site_url_changes' ] );
+
 		if ( \get_option( 'progress_planner_license_key' ) ) {
 			return;
 		}
@@ -86,21 +89,14 @@ class Onboard {
 	}
 
 	/**
-	 * Get the remote nonce URL.
-	 *
-	 * @return string
-	 */
-	public function get_remote_nonce_url() {
-		return \progress_planner()->get_remote_server_root_url() . self::REMOTE_API_URL . 'get-nonce';
-	}
-
-	/**
 	 * Get the onboarding remote URL.
 	 *
+	 * @param string $endpoint The endpoint to append to the remote URL.
+	 *
 	 * @return string
 	 */
-	public function get_remote_url() {
-		return \progress_planner()->get_remote_server_root_url() . self::REMOTE_API_URL . 'onboard';
+	public function get_remote_url( $endpoint = '' ) {
+		return \progress_planner()->get_remote_server_root_url() . self::REMOTE_API_URL . $endpoint;
 	}
 
 	/**
@@ -111,18 +107,17 @@ class Onboard {
 	public function get_remote_nonce() {
 		// Make a POST request to the remote nonce endpoint.
 		$response = \wp_remote_post(
-			$this->get_remote_nonce_url(),
+			$this->get_remote_url( 'get-nonce' ),
 			[ 'body' => [ 'site' => \set_url_scheme( \site_url() ) ] ]
 		);
+
 		if ( \is_wp_error( $response ) ) {
 			return '';
 		}
-		$body = \wp_remote_retrieve_body( $response );
-		$body = \json_decode( $body, true );
-		if ( ! isset( $body['nonce'] ) ) {
-			return '';
-		}
-		return $body['nonce'];
+
+		$body = \json_decode( \wp_remote_retrieve_body( $response ), true );
+
+		return isset( $body['nonce'] ) ? $body['nonce'] : '';
 	}
 
 	/**
@@ -150,18 +145,69 @@ class Onboard {
 
 		// Make the request.
 		$response = \wp_remote_post(
-			$this->get_remote_url(),
+			$this->get_remote_url( 'onboard' ),
 			[ 'body' => $data ]
 		);
+
+		// Bail early if there is an error.
 		if ( \is_wp_error( $response ) ) {
 			return '';
 		}
-		$body = \wp_remote_retrieve_body( $response );
-		$body = \json_decode( $body, true );
+
+		$body = \json_decode( \wp_remote_retrieve_body( $response ), true );
+
 		return ! isset( $body['status'] )
 			|| 'ok' !== $body['status']
 			|| ! isset( $body['license_key'] )
 				? ''
 				: $body['license_key'];
+	}
+
+	/**
+	 * Detect domain changes.
+	 *
+	 * @return void
+	 */
+	public function detect_site_url_changes() {
+		$saved_site_url   = \get_option( 'progress_planner_saved_site_url', false );
+		$current_site_url = \set_url_scheme( \site_url() );
+
+		// Update the saved site URL if it's not set, then bail early.
+		if ( ! $saved_site_url ) {
+			\update_option( 'progress_planner_saved_site_url', $current_site_url, false );
+			return;
+		}
+
+		$saved_license_key = \get_option( 'progress_planner_license_key', false );
+
+		// Bail early if the license key is not set, or if the site URL has not changed.
+		if ( ! $saved_license_key || $saved_site_url === $current_site_url ) {
+			return;
+		}
+
+		// Make a request to the remote endpoint to update the license key.
+		$response = \wp_remote_post(
+			$this->get_remote_url( 'change-site-url' ),
+			[
+				'body' => [
+					'license_key' => $saved_license_key,
+					'old_url'     => $saved_site_url,
+					'new_url'     => $current_site_url,
+					'nonce'       => $this->get_remote_nonce(),
+				],
+			]
+		);
+
+		// Bail early if there is an error.
+		if ( \is_wp_error( $response ) ) {
+			return;
+		}
+
+		$body = \json_decode( \wp_remote_retrieve_body( $response ), true );
+
+		// Update the saved site URL if the request was successful.
+		if ( isset( $body['status'] ) && 'ok' === $body['status'] ) {
+			\update_option( 'progress_planner_saved_site_url', $current_site_url, false );
+		}
 	}
 }
