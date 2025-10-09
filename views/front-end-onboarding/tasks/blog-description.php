@@ -19,11 +19,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<?php echo esc_html( $task['title'] ); ?>
 		</h3>
 		<p>
-			Lorem ipsum dolor sit amet consectetur adipiscing elit, eget interdum nostra tortor vestibulum ultrices, quisque congue nibh ullamcorper sapien natoque.
-		</p>
-
-		<p>
-			Venenatis parturient suspendisse massa cursus litora dapibus auctor, et vestibulum blandit condimentum quis ultrices sagittis aliquam.
+			<?php \esc_html_e( 'In a few words, explain what this site is about. This information is used in your website\'s schema and RSS feeds, and can be displayed on your site. The tagline typically is your site\'s mission statement.', 'progress-planner' ); ?>
 		</p>
 	</div>
 	<form class="prpl-onboarding-task-form" onsubmit="return false;">

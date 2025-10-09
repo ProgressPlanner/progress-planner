@@ -15,17 +15,20 @@ if ( ! \defined( 'ABSPATH' ) ) {
 <script type="text/template" id="tour-step-welcome">
 	<div class="tour-header">
 		<h2 class="tour-title">
-			<?php \esc_html_e( 'Welcome to the Progress Planner onboarding.', 'progress-planner' ); ?>
+			<?php \esc_html_e( 'Welcome to Progress Planner!', 'progress-planner' ); ?>
 		</h2>
 	</div>
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex">
 			<div class="prpl-column prpl-column-content">
 				<p>
-					Lorem ipsum dolor sit amet consectetur adipiscing elit facilisis interdum rhoncus magnis, curabitur pretium molestie posuere massa tristique commodo pellentesque ullamcorper vulputate risus, netus sem est metus habitasse sodales diam aliquam scelerisque mi.
+					<?php \esc_html_e( 'Progress Planner helps you set clear, focused goals for your website, and actually reach them.', 'progress-planner' ); ?>
 				</p>
 				<p>
-					Egestas turpis class nostra sociis felis nunc rhoncus, semper tristique fermentum mus scelerisque habitasse accumsan imperdiet, nisl in vehicula magna pretium ullamcorper. Dis dictumst semper urna hendrerit a pretium lectus luctus justo proin, elementum cras sodales dictum habitant curae iaculis nibh nisi tortor tempus, malesuada torquent etiam litora facilisis arcu montes bibendum nisl. Ultrices arcu varius id pellentesque metus quis litora odio vestibulum taciti molestie, maecenas fames quam conubia ultricies donec aliquet pharetra tristique.
+					<?php \esc_html_e( 'Instead of getting stuck in to-do lists or unfinished ideas, you’ll turn your goals into small, achievable steps. Everything happens inside your WordPress dashboard, with no need for extra tools or complicated setups.', 'progress-planner' ); ?>
+				</p>
+				<p>
+					<?php \esc_html_e( 'The onboarding takes just 3 to 5 minutes. You’ll go through a few simple steps and complete your first recommendation. After that, you’ll be ready to start making real progress.', 'progress-planner' ); ?>
 				</p>
 			</div>
 			<div class="prpl-column">

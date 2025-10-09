@@ -21,11 +21,10 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex">
 			<div class="prpl-column prpl-column-content">
-				<p>You have pending tasks to complete.</p>
-
 				<p>
-					Lorem ipsum dolor sit amet consectetur adipiscing elit, eget interdum nostra tortor vestibulum ultrices, quisque congue nibh ullamcorper sapien natoque. Venenatis parturient suspendisse massa cursus litora dapibus auctor, et vestibulum blandit condimentum quis ultrices sagittis aliquam, nibh accumsan ultricies ad placerat maecenas. Id sollicitudin ac auctor odio luctus ornare donec duis maecenas sodales montes nostra mi aliquam ultricies augue, posuere torquent imperdiet lobortis cras gravida nascetur venenatis malesuada potenti et mattis massa parturient.
+					<?php \esc_html_e( 'This is an example of a recommendation in Progress Planner. It\'s a task that helps improve your website. Most recommendations can be completed in under five minutes. Once you\'ve completed a recommendation, we\'ll celebrate your success together and provide you with a new recommendation.', 'progress-planner' ); ?>
 				</p>
+				<p><?php \esc_html_e( 'Let\'s give it a try!', 'progress-planner' ); ?></p>
 			</div>
 			<div class="prpl-column">
 				<?php if ( isset( $task ) ) : ?>

@@ -22,11 +22,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<div class="prpl-columns-wrapper-flex">
 			<div class="prpl-column prpl-column-content">
 				<p>
-					<?php \esc_html_e( 'As you progress and are more active on your website, you can earn badges. These badges are displayed here!', 'progress-planner' ); ?>
-				</p>
-
-				<p>
-					Lorem ipsum dolor sit amet consectetur adipiscing, elit nullam hendrerit porttitor torquent, nec molestie hac parturient vehicula. Fames condimentum netus nisl tempus potenti curabitur iaculis nam velit, etiam sapien mollis dictum vitae eu bibendum per mus, hendrerit dis blandit parturient dictumst cum ridiculus libero.
+					<?php \esc_html_e( 'For every recommendation you complete, you earn points. When you earn at least 10 points each month, you\'ll unlock the special badge for that month. Can you collect them all?', 'progress-planner' ); ?>
 				</p>
 			</div>
 			<div class="prpl-column">
