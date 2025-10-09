@@ -381,16 +381,6 @@ class Suggested_Tasks {
 	public function rest_api_tax_query( $args, $request ) {
 		$tax_query = [];
 
-		// Include terms (matches any term in list).
-		if ( isset( $request['provider'] ) ) {
-			$tax_query[] = [
-				'taxonomy' => 'prpl_recommendations_provider',
-				'field'    => 'slug',
-				'terms'    => \explode( ',', $request['provider'] ),
-				'operator' => 'IN',
-			];
-		}
-
 		// Exclude terms.
 		if ( isset( $request['exclude_provider'] ) ) {
 			$tax_query[] = [
@@ -401,9 +391,26 @@ class Suggested_Tasks {
 			];
 		}
 
-		if ( ! empty( $tax_query ) ) {
-			$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		$include_providers            = [];
+		$providers_available_for_user = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers_available_for_user();
+		foreach ( $providers_available_for_user as $provider ) {
+			$include_providers[] = $provider->get_provider_id();
 		}
+
+		// Include terms (matches any term in list).
+		if ( isset( $request['provider'] ) ) {
+			$request_providers = \explode( ',', $request['provider'] );
+			$include_providers = \array_intersect( $include_providers, $request_providers );
+		}
+
+		$tax_query[] = [
+			'taxonomy' => 'prpl_recommendations_provider',
+			'field'    => 'slug',
+			'terms'    => $include_providers,
+			'operator' => 'IN',
+		];
+
+		$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 
 		// Handle sorting parameters.
 		if ( isset( $request['filter']['orderby'] ) ) {
@@ -477,10 +484,11 @@ class Suggested_Tasks {
 		$args = \wp_parse_args(
 			$args,
 			[
-				'post_status'      => 'publish',
-				'exclude_provider' => [],
-				'include_provider' => [],
-				'posts_per_page'   => 0,
+				'post_status'               => 'publish',
+				'posts_per_page'            => 0,
+				'exclude_provider_category' => [],
+				'include_provider_category' => [],
+				'include_provider'          => [],
 			]
 		);
 
@@ -493,22 +501,26 @@ class Suggested_Tasks {
 		// Get the tasks for each category.
 		foreach ( $max_items_per_category as $category_slug => $max_items ) {
 			// Skip excluded providers.
-			if ( ! empty( $args['exclude_provider'] ) && \in_array( $category_slug, $args['exclude_provider'], true ) ) {
+			if ( ! empty( $args['exclude_provider_category'] ) && \in_array( $category_slug, $args['exclude_provider_category'], true ) ) {
 				continue;
 			}
 
 			// Skip not included providers.
-			if ( ! empty( $args['include_provider'] ) && ! \in_array( $category_slug, $args['include_provider'], true ) ) {
+			if ( ! empty( $args['include_provider_category'] ) && ! \in_array( $category_slug, $args['include_provider_category'], true ) ) {
 				continue;
 			}
 
-			$category_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
-				[
-					'category'       => $category_slug,
-					'posts_per_page' => 0 < $args['posts_per_page'] ? $args['posts_per_page'] : $max_items,
-					'post_status'    => $args['post_status'],
-				]
-			);
+			$get_tasks_args = [
+				'category'       => $category_slug,
+				'posts_per_page' => 0 < $args['posts_per_page'] ? $args['posts_per_page'] : $max_items,
+				'post_status'    => $args['post_status'],
+			];
+
+			if ( ! empty( $args['include_provider'] ) ) {
+				$get_tasks_args['provider_id'] = $args['include_provider'];
+			}
+
+			$category_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( $get_tasks_args );
 
 			if ( ! empty( $category_tasks ) ) {
 				$tasks[ $category_slug ] = [];
