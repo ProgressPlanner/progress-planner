@@ -250,8 +250,8 @@ class Front_End_Onboarding {
 
 			<div class="tour-footer">
 				<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php esc_html_e( 'Next', 'progress-planner' ); ?></button>
-				<button id="prpl-finish-btn" class="prpl-btn prpl-btn-secondary"><?php esc_html_e( 'Close', 'progress-planner' ); ?></button>
-				<button id="prpl-dashboard-btn" class="prpl-btn prpl-btn-primary" data-redirect-to="<?php echo \esc_url( admin_url( 'admin.php?page=progress-planner' ) ); ?>"><?php esc_html_e( 'Take me to the dashboard', 'progress-planner' ); ?></button>
+				<!-- <button id="prpl-finish-btn" class="prpl-btn prpl-btn-secondary"><?php esc_html_e( 'Close', 'progress-planner' ); ?></button> -->
+				<button id="prpl-dashboard-btn" class="prpl-btn prpl-btn-primary" data-redirect-to="<?php echo \esc_url( admin_url( 'admin.php?page=progress-planner' ) ); ?>"><?php esc_html_e( 'Take me to the Recommendations dashboard', 'progress-planner' ); ?></button>
 			</div>
 		</div>
 		<?php
@@ -307,7 +307,6 @@ class Front_End_Onboarding {
 		\progress_planner()->the_view( 'front-end-onboarding/first-task.php', [ 'task' => array_shift( $tasks ) ] ); // WIP: We need only 1 task for this step.
 		\progress_planner()->the_view( 'front-end-onboarding/badges.php' );
 		\progress_planner()->the_view( 'front-end-onboarding/more-tasks.php', [ 'tasks' => $tasks ] ); // WIP: We need up to 5 tasks for this step.
-		\progress_planner()->the_view( 'front-end-onboarding/finish.php' );
 		?>
 		<script>
 			// Initialize tour when DOM is ready

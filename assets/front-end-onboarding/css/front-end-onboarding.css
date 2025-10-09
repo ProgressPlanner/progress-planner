@@ -186,12 +186,6 @@
 		}
 	}
 
-	.prpl-task-list {
-		list-style: none;
-		padding: 0;
-		margin: 0;
-	}
-
 	.prpl-complete-task-item {
 		display: flex;
 		gap: 30px;
@@ -238,10 +232,16 @@
 	}
 
 	/* More tasks */
-	#prpl-more-tasks-list {
+	.prpl-column:has(.prpl-task-list) {
+		display: flex;
+		align-items: center;
+	}
+
+	.prpl-task-list {
 		list-style: none;
 		padding: 0;
 		margin: 0;
+		width: 100%;
 
 		li {
 			padding: 7px 5px;
