@@ -250,9 +250,12 @@ class Front_End_Onboarding {
 
 			<div class="tour-footer">
 				<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php esc_html_e( 'Next', 'progress-planner' ); ?></button>
-				<!-- <button id="prpl-finish-btn" class="prpl-btn prpl-btn-secondary"><?php esc_html_e( 'Close', 'progress-planner' ); ?></button> -->
 				<button id="prpl-dashboard-btn" class="prpl-btn prpl-btn-primary" data-redirect-to="<?php echo \esc_url( admin_url( 'admin.php?page=progress-planner' ) ); ?>"><?php esc_html_e( 'Take me to the Recommendations dashboard', 'progress-planner' ); ?></button>
 			</div>
+
+			<button id="prpl-tour-close-btn" class="prpl-popover-close" popovertarget="prpl-popover-front-end-onboarding" popovertargetaction="hide">
+				<span class="dashicons dashicons-no-alt"></span>
+			</button>
 		</div>
 		<?php
 	}

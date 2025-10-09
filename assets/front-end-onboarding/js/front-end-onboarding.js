@@ -29,6 +29,7 @@ class ProgressPlannerTour {
 		);
 		this.nextBtn = this.popover.querySelector( '.prpl-tour-next' );
 		this.dashboardBtn = this.popover.querySelector( '#prpl-dashboard-btn' );
+		this.closeBtn = this.popover.querySelector( '#prpl-tour-close-btn' );
 
 		// Setup event listeners after DOM is ready
 		this.setupEventListeners();
@@ -178,7 +179,6 @@ class ProgressPlannerTour {
 
 		// Toggle button visibility
 		this.nextBtn.style.display = isLastStep ? 'none' : 'inline-block';
-		// this.finishBtn.style.display = isLastStep ? 'inline-block' : 'none';
 		this.dashboardBtn.style.display = isLastStep ? 'inline-block' : 'none';
 	}
 
@@ -336,6 +336,15 @@ class ProgressPlannerTour {
 					// Redirect to the dashboard.
 					window.location.href =
 						this.dashboardBtn.getAttribute( 'data-redirect-to' );
+				} );
+			}
+
+			if ( this.closeBtn ) {
+				this.closeBtn.addEventListener( 'click', () => {
+					console.log( 'Close button clicked!' );
+					this.state.data.finished =
+						this.state.currentStep === this.tourSteps.length - 1;
+					this.closeTour();
 				} );
 			}
 		} else {
