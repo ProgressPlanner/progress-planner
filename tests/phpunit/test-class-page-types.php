@@ -70,15 +70,13 @@ class Page_Types_Test extends \WP_UnitTestCase {
 		// Mimic the URL building and caching of the lessons, see Progress_Planner\Lessons::get_remote_api_items .
 		$url = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/lessons';
 
-		$url = ( \progress_planner()->is_pro_site() )
-			? \add_query_arg(
-				[
-					'site'        => \get_site_url(),
-					'license_key' => \get_option( 'progress_planner_pro_license_key' ),
-				],
-				$url
-			)
-			: \add_query_arg( [ 'site' => \get_site_url() ], $url );
+		$url = \add_query_arg(
+			[
+				'site'        => \get_site_url(),
+				'license_key' => \get_option( 'progress_planner_license_key' ),
+			],
+			$url
+		);
 
 		$cache_key = \md5( $url );
 
@@ -130,15 +128,7 @@ class Page_Types_Test extends \WP_UnitTestCase {
 		$this->assertCount( \count( $lessons ), $page_types );
 
 		foreach ( $lessons as $lesson ) {
-			$this->assertCount(
-				1,
-				\array_filter(
-					$page_types,
-					function ( $page_type ) use ( $lesson ) {
-						return $page_type['slug'] === $lesson['settings']['id'];
-					}
-				)
-			);
+			$this->assertCount( 1, \array_filter( $page_types, fn( $page_type ) => $page_type['slug'] === $lesson['settings']['id'] ) );
 		}
 	}
 

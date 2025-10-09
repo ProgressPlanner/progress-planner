@@ -12,14 +12,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 $prpl_setting_value = isset( $prpl_setting['value'] ) ? $prpl_setting['value'] : '';
 
-// Default values.
-$prpl_select_value = 0;
-$prpl_radio_value  = ( '_no_page_needed' === $prpl_setting_value ) ? 'not-applicable' : 'no';
-
-if ( \is_numeric( $prpl_setting_value ) && 0 < $prpl_setting_value ) {
-	$prpl_radio_value  = 'yes';
-	$prpl_select_value = (int) $prpl_setting_value;
-}
+// Default value for the radio button.
+$prpl_radio_value = '_no_page_needed' === $prpl_setting_value ? 'not-applicable' : 'no';
+$prpl_radio_value = \is_numeric( $prpl_setting_value ) && 0 < $prpl_setting_value ? 'yes' : $prpl_radio_value;
 
 ?>
 <div
@@ -50,16 +45,14 @@ if ( \is_numeric( $prpl_setting_value ) && 0 < $prpl_setting_value ) {
 					'not-applicable' => \esc_html__( 'My site doesn\'t need this page', 'progress-planner' ),
 				] as $prpl_r_value => $prpl_r_label ) :
 					$prpl_radio_checked = ( 'no' === $prpl_r_value && 'no' === $prpl_setting['isset'] );
-					if ( ! $prpl_radio_checked ) {
-						$prpl_radio_checked = ( $prpl_radio_value === $prpl_r_value );
-					}
+					$prpl_radio_checked = ! $prpl_radio_checked ? $prpl_radio_value === $prpl_r_value : $prpl_radio_checked;
 					?>
 					<div class="prpl-radio-wrapper">
 						<label>
 							<input
-							type="radio"
-							id="<?php echo \esc_attr( 'pages[' . \esc_attr( $prpl_setting['id'] ) . '][have_page]' ); ?>"
-							name="<?php echo \esc_attr( 'pages[' . \esc_attr( $prpl_setting['id'] ) . '][have_page]' ); ?>"
+								type="radio"
+								id="<?php echo \esc_attr( 'pages[' . \esc_attr( $prpl_setting['id'] ) . '][have_page]' ); ?>"
+								name="<?php echo \esc_attr( 'pages[' . \esc_attr( $prpl_setting['id'] ) . '][have_page]' ); ?>"
 								value="<?php echo \esc_attr( $prpl_r_value ); ?>"
 								data-page="<?php echo \esc_attr( $prpl_setting['page'] ); ?>"
 								<?php echo $prpl_radio_checked ? ' checked' : ''; ?>

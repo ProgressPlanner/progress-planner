@@ -14,7 +14,7 @@ customElements.define(
 			backgroundColor =
 				backgroundColor || this.getAttribute( 'background-color' );
 			backgroundColor =
-				backgroundColor || 'var(--prpl-background-purple)';
+				backgroundColor || 'var(--prpl-background-content)';
 
 			const el = this;
 

@@ -54,9 +54,7 @@ class Update_170 {
 			// Update the task.
 			\progress_planner()->get_suggested_tasks_db()->update_recommendation(
 				$task[0]->ID,
-				[
-					'prpl_popover_id' => 'prpl-popover-' . $task_id,
-				]
+				[ 'prpl_popover_id' => 'prpl-popover-' . $task_id ]
 			);
 
 		}

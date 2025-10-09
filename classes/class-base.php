@@ -40,7 +40,22 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Suggested_Tasks get_suggested_tasks()
  * @method \Progress_Planner\Suggested_Tasks_DB get_suggested_tasks_db()
  * @method \Progress_Planner\Utils\Deprecations get_utils__deprecations()
+ * @method \Progress_Planner\UI\Branding get_ui__branding()
  * @method \Progress_Planner\Plugin_Installer get_plugin_installer()
+ * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Content get_admin__widgets__badge_streak_content()
+ * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Maintenance get_admin__widgets__badge_streak_maintenance()
+ * @method \Progress_Planner\Admin\Enqueue get_admin__enqueue()
+ * @method \Progress_Planner\Admin\Widgets\Whats_New get_admin__widgets__whats_new()
+ * @method \Progress_Planner\Admin\Widgets\ToDo get_admin__widgets__todo()
+ * @method \Progress_Planner\Admin\Widgets\Monthly_Badges get_admin__widgets__monthly_badges()
+ * @method \Progress_Planner\UI\Popover get_ui__popover()
+ * @method \Progress_Planner\Admin\Widgets\Latest_Badge get_admin__widgets__latest_badge()
+ * @method \Progress_Planner\Admin\Widgets\Content_Activity get_admin__widgets__content_activity()
+ * @method \Progress_Planner\UI\Chart get_ui__chart()
+ * @method \Progress_Planner\Activities\Content_Helpers get_activities__content_helpers()
+ * @method \Progress_Planner\Admin\Widgets\Challenge get_admin__widgets__challenge()
+ * @method \Progress_Planner\Admin\Widgets\Activity_Scores get_admin__widgets__activity_scores()
+ * @method \Progress_Planner\Utils\Date get_utils__date()
  */
 class Base {
 
@@ -130,9 +145,7 @@ class Base {
 		$this->get_rest__tasks();
 
 		// Post-meta.
-		if ( $this->is_pro_site() ) {
-			$this->get_page_todos();
-		}
+		$this->get_page_todos();
 
 		\add_filter( 'plugin_action_links_' . \plugin_basename( PROGRESS_PLANNER_FILE ), [ $this, 'add_action_links' ] );
 
@@ -289,16 +302,17 @@ class Base {
 	/**
 	 * Include a template.
 	 *
-	 * @param string|array $template The template to include.
-	 *                               If an array, go through each item until the template exists.
-	 * @param array        $args   The arguments to pass to the template.
-	 * @return void
+	 * @param string|array $template     The template to include.
+	 *                                   If an array, go through each item until the template exists.
+	 * @param array        $args         The arguments to pass to the template.
+	 * @param bool         $get_contents Whether to return the file contents.
+	 * @return string Return the file contents if $get_contents is true, otherwise return an empty string.
 	 */
-	public function the_view( $template, $args = [] ) {
+	public function the_view( $template, $args = [], $get_contents = false ) {
 		$templates = ( \is_string( $template ) )
 			? [ $template, "/views/{$template}" ]
 			: $template;
-		$this->the_file( $templates, $args );
+		return $this->the_file( $templates, $args, $get_contents );
 	}
 
 	/**
@@ -341,9 +355,10 @@ class Base {
 	 * @param string|array $files The file to include.
 	 *                           If an array, go through each item until the file exists.
 	 * @param array        $args  The arguments to pass to the template.
-	 * @return void
+	 * @param bool         $get_contents Whether to return the file contents.
+	 * @return string Return the file contents if $get_contents is true, otherwise return an empty string.
 	 */
-	public function the_file( $files, $args = [] ) {
+	public function the_file( $files, $args = [], $get_contents = false ) {
 		/**
 		 * Allow filtering the files to include.
 		 *
@@ -357,10 +372,16 @@ class Base {
 			}
 			if ( \file_exists( $path ) ) {
 				\extract( $args ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
+				if ( $get_contents ) {
+					\ob_start();
+				}
 				include $path; // phpcs:ignore PEAR.Files.IncludingFile.UseRequire
-				break;
+				if ( $get_contents ) {
+					return (string) \ob_get_clean();
+				}
 			}
 		}
+		return '';
 	}
 
 	/**
@@ -451,16 +472,6 @@ class Base {
 	}
 
 	/**
-	 * Check if this is a PRO site.
-	 *
-	 * @return bool
-	 */
-	public function is_pro_site() {
-		return \get_option( 'progress_planner_pro_license_key' )
-			&& 'valid' === \get_option( 'progress_planner_pro_license_status' );
-	}
-
-	/**
 	 * Redirect on login.
 	 *
 	 * @param string   $user_login The user login.
@@ -479,7 +490,7 @@ class Base {
 			return;
 		}
 
-		if ( isset( $_REQUEST['redirect_to'] ) && '' !== $_REQUEST['redirect_to'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing -- We're not processing any data.
+		if ( isset( $_REQUEST['redirect_to'] ) && '' !== $_REQUEST['redirect_to'] && \admin_url( '/' ) !== $_REQUEST['redirect_to'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.NonceVerification.Missing -- We're not processing any data.
 			return;
 		}
 

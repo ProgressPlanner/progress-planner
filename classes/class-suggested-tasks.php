@@ -68,6 +68,9 @@ class Suggested_Tasks {
 		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'rest_prepare_recommendation' ], 10, 2 );
 
 		\add_filter( 'wp_trash_post_days', [ $this, 'change_trashed_posts_lifetime' ], 10, 2 );
+
+		// Add filter to modify the maximum number of suggested tasks to display.
+		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_recommendations' ] );
 	}
 
 	/**
@@ -232,6 +235,16 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
 		}
 
+		$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task->get_provider_id() );
+
+		if ( ! $provider ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Provider not found.', 'progress-planner' ) ] );
+		}
+
+		if ( ! $provider->capability_required() ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to complete this task.', 'progress-planner' ) ] );
+		}
+
 		$updated = false;
 
 		switch ( $action ) {
@@ -241,6 +254,7 @@ class Suggested_Tasks {
 				$updated = true;
 				break;
 
+			case 'pending': // User task was marked as pending.
 			case 'delete':
 				$this->delete_activity( $task->task_id );
 				$updated = true;
@@ -277,7 +291,7 @@ class Suggested_Tasks {
 				'show_in_admin_bar'     => \apply_filters( 'progress_planner_tasks_show_ui', false ),
 				'show_in_rest'          => true,
 				'rest_controller_class' => \Progress_Planner\Rest\Recommendations_Controller::class,
-				'supports'              => [ 'title', 'editor', 'author', 'custom-fields', 'page-attributes' ],
+				'supports'              => [ 'title', 'excerpt', 'editor', 'author', 'custom-fields', 'page-attributes' ],
 				'rewrite'               => false,
 				'menu_icon'             => 'dashicons-admin-tools',
 				'menu_position'         => 5,
@@ -287,46 +301,21 @@ class Suggested_Tasks {
 		);
 
 		$rest_meta_fields = [
-			'prpl_points'      => [
-				'type'         => 'number',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'prpl_task_id'     => [
+			'prpl_task_id' => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_url'         => [
+			'prpl_url'     => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_url_target'  => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'prpl_dismissable' => [
-				'type'         => 'boolean',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'prpl_snoozable'   => [
-				'type'         => 'boolean',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'menu_order'       => [
+			'menu_order'   => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
 				'default'      => 0,
-			],
-			'prpl_popover_id'  => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
 			],
 		];
 
@@ -439,15 +428,39 @@ class Suggested_Tasks {
 	 */
 	public function rest_prepare_recommendation( $response, $post ) {
 		$provider_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_provider' );
+		if ( ! isset( $response->data['meta'] ) ) {
+			$response->data['meta'] = [];
+		}
+		$provider = false;
 		if ( $provider_term && ! \is_wp_error( $provider_term ) ) {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
+		}
 
-			if ( $provider ) {
-				// Link should be added during run time, since it is not added for users without required capability.
-				$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
+		if ( $provider ) {
+			$response->data['prpl_provider'] = $provider_term[0];
+			// Link should be added during run time, since it is not added for users without required capability.
+			$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
 				? \esc_url( (string) $response->data['meta']['prpl_url'] )
 				: '';
+
+			$response->data['prpl_popover_id'] = $provider->get_popover_id();
+
+			// This has to be the last item to be added because actions use data from previous items.
+			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
+			$response->data['prpl_points']       = $provider->get_points();
+
+			/*
+			 * Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
+			 * Those are tasks which are completed by toggling an option, so non repetitive & not user tasks.
+			 */
+			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['meta']['prpl_task_id'] ) ) {
+				$response->data['prpl_points'] = 0;
 			}
+		}
+
+		$category_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_category' );
+		if ( $category_term && ! \is_wp_error( $category_term ) ) {
+			$response->data['prpl_category'] = $category_term[0];
 		}
 
 		return $response;
@@ -506,7 +519,15 @@ class Suggested_Tasks {
 			}
 		}
 
-		return $tasks;
+		/**
+		 * Allow other classes to modify the tasks in REST format.
+		 *
+		 * @param array $tasks The tasks.
+		 * @param array $args  The arguments.
+		 *
+		 * @return array
+		 */
+		return \apply_filters( 'progress_planner_suggested_tasks_in_rest_format', $tasks, $args );
 	}
 
 	/**
@@ -537,5 +558,20 @@ class Suggested_Tasks {
 		}
 
 		return \apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category );
+	}
+
+	/**
+	 * Modify the maximum number of suggested tasks to display.
+	 *
+	 * @param array $max_items_per_category Array of maximum items per category.
+	 * @return array Modified array of maximum items per category.
+	 */
+	public function check_show_all_recommendations( $max_items_per_category ) {
+		return (
+			isset( $_GET['prpl_show_all_recommendations'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			&& \current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		)
+			? \array_map( fn() => 99, $max_items_per_category )
+			: $max_items_per_category;
 	}
 }

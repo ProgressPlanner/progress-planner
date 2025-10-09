@@ -61,6 +61,12 @@ abstract class Tasks_Interactive extends Tasks {
 	 * @return void
 	 */
 	public function handle_interactive_task_submit() {
+
+		// Check if the user has the necessary capabilities.
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
+		}
+
 		// Check the nonce.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
@@ -124,9 +130,11 @@ abstract class Tasks_Interactive extends Tasks {
 				'/views/popovers/interactive-task.php',
 			],
 			[
-				'prpl_task_object' => $this,
-				'prpl_popover_id'  => static::POPOVER_ID,
-				'prpl_provider_id' => $this->get_provider_id(),
+				'prpl_task_object'       => $this,
+				'prpl_popover_id'        => static::POPOVER_ID,
+				'prpl_external_link_url' => $this->get_external_link_url(),
+				'prpl_provider_id'       => $this->get_provider_id(),
+				'prpl_task_actions'      => $this->get_task_actions(),
 			]
 		);
 	}
@@ -137,7 +145,12 @@ abstract class Tasks_Interactive extends Tasks {
 	 * @return void
 	 */
 	public function print_popover_instructions() {
-		echo '<p>' . \wp_kses_post( $this->get_description() ) . '</p>';
+		$description = $this->get_description();
+		if ( empty( $description ) ) {
+			return;
+		}
+
+		echo '<p>' . \wp_kses_post( $description ) . '</p>';
 	}
 
 	/**
@@ -155,6 +168,12 @@ abstract class Tasks_Interactive extends Tasks {
 	 * @return void
 	 */
 	public function enqueue_scripts( $hook ) {
+
+		// Don't enqueue the script if the user is not at least an editor, since we dont want to enqueue scripts on WP Dashboard page.
+		if ( ! \current_user_can( 'edit_others_posts' ) ) {
+			return;
+		}
+
 		// Enqueue the script only on Progress Planner and WP dashboard pages.
 		if ( 'toplevel_page_progress-planner' !== $hook && 'index.php' !== $hook ) {
 			return;

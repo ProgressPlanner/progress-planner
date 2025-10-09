@@ -12,32 +12,6 @@
 
 	--prpl-container-max-width: calc(var(--prpl-column-min-width) * var(--prpl-max-columns) + var(--prpl-gap) * (var(--prpl-max-columns) - 1) + var(--prpl-column-min-width));
 
-	--prpl-color-gray-1: #e1e3e7;
-	--prpl-color-gray-2: #d1d5db;
-	--prpl-color-gray-3: #9ca3af;
-	--prpl-color-gray-4: #6b7280;
-	--prpl-color-gray-5: #4b5563;
-	--prpl-color-gray-6: #374151;
-
-	--prpl-color-accent-red: #f43f5e;
-	--prpl-color-accent-orange: #faa310;
-	--prpl-color-400-orange: #f9b23c;
-	--prpl-color-accent-purple: #0d6b9e;
-	--prpl-color-accent-green: #14b8a6;
-
-	--prpl-color-headings: #38296d;
-	--prpl-color-text: var(--prpl-color-gray-5);
-	--prpl-color-link: #1e40af;
-
-	--prpl-color-notification-green: #16a34a;
-	--prpl-color-notification-red: #e73136;
-
-	--prpl-background-orange: #fff9f0;
-	--prpl-background-purple: #f6f5fb;
-	--prpl-background-green: #f2faf9;
-	--prpl-background-red: #fff6f7;
-	--prpl-background-blue: #effbfe;
-
 	--prpl-font-size-xs: 0.75rem;     /* 12px */
 	--prpl-font-size-small: 0.875rem; /* 14px */
 	--prpl-font-size-base: 1rem;      /* 16px */
@@ -51,13 +25,33 @@
 }
 
 /*------------------------------------*\
+	Progress Planner dashboard page.
+\*------------------------------------*/
+/* stylelint-disable-next-line selector-class-pattern */
+body.toplevel_page_progress-planner {
+
+	#wpwrap {
+		background-color: var(--prpl-background);
+	}
+
+	ul#adminmenu {
+
+		a.wp-has-current-submenu,
+		>li.current > a.current {
+
+			&::after {
+				border-right-color: var(--prpl-background) !important;
+			}
+		}
+	}
+}
+
+/*------------------------------------*\
 	Styles for the container of the page.
 \*------------------------------------*/
 .prpl-wrap {
-	background: #fff;
-	border: 1px solid var(--prpl-color-gray-2);
 	border-radius: var(--prpl-border-radius);
-	padding: var(--prpl-settings-page-gap) calc(var(--prpl-padding) * 2);
+	padding: var(--prpl-settings-page-gap) var(--prpl-padding);
 	max-width: var(--prpl-container-max-width);
 	color: var(--prpl-color-text);
 	font-size: var(--prpl-font-size-base);
@@ -97,6 +91,24 @@
 	color: var(--prpl-color-link);
 }
 
+.prpl-wrap input[type="checkbox"] {
+	border-color: var(--prpl-color-selection-controls-inactive);
+}
+
+.prpl-wrap select {
+	border-color: var(--prpl-color-field-border);
+
+	/* box-shadow: 1px 2px 4px 0 var(--prpl-color-field-shadow); */
+}
+
+.prpl-widget-width-2 {
+	grid-column: span 2;
+
+	.prpl-widget-description {
+		max-width: 640px;
+	}
+}
+
 .prpl-widget-title {
 	margin-top: 0;
 	font-size: 1.375rem;
@@ -118,22 +130,13 @@
 
 			&:hover {
 				border-radius: 50%;
-				background-color: var(--prpl-color-gray-4);
 
-				&::before {
-					content: "";
-					position: absolute;
-					top: 0;
-					left: 0;
-					width: 100%;
-					height: 100%;
-					border: 2px solid var(--prpl-color-gray-4);
-					border-radius: 50%;
-					box-sizing: border-box;
-				}
+				color: var(--prpl-color-ui-icon-hover);
+				border-color: var(--prpl-color-ui-icon-hover);
+				background-color: var(--prpl-color-ui-icon-hover-fill);
 
 				svg path {
-					fill: #fff;
+					fill: var(--prpl-color-ui-icon-hover);
 				}
 			}
 		}
@@ -155,10 +158,14 @@
 button.prpl-info-icon {
 	background: none;
 	border: none;
-	color: var(--prpl-color-gray-4);
+	color: var(--prpl-color-ui-icon);
 	cursor: pointer;
 	font-size: var(--prpl-font-size-xs);
 	padding: 0;
+
+	svg path {
+		fill: var(--prpl-color-ui-icon);
+	}
 }
 
 /*------------------------------------*\
@@ -189,8 +196,9 @@ button.prpl-info-icon {
 		justify-content: center;
 		padding: 0.4em;
 
-		/* color: var(--prpl-color-gray-2); */
-		border: 1px solid var(--prpl-color-gray-2);
+		/* color: var(--prpl-color-border); */
+		background-color: #fff;
+		border: 1px solid var(--prpl-color-ui-icon);
 		border-radius: var(--prpl-border-radius);
 
 		svg {
@@ -203,9 +211,9 @@ button.prpl-info-icon {
 		}
 
 		&:hover {
-			color: var(--prpl-color-link);
-			border-color: var(--prpl-color-link);
-			background-color: var(--prpl-background-blue);
+			color: var(--prpl-color-ui-icon-hover);
+			border-color: var(--prpl-color-ui-icon-hover);
+			background-color: var(--prpl-color-ui-icon-hover-fill);
 		}
 	}
 }
@@ -218,6 +226,7 @@ button.prpl-info-icon {
 	grid-template-columns: repeat(auto-fit, minmax(var(--prpl-column-min-width), 1fr));
 	column-gap: var(--prpl-gap);
 	grid-auto-rows: var(--prpl-gap);
+	grid-auto-flow: dense;
 
 	img {
 		max-width: 100%;
@@ -234,7 +243,8 @@ button.prpl-info-icon {
 	Generic styles for individual widgets.
 \*------------------------------------*/
 .prpl-widget-wrapper {
-	border: 1px solid var(--prpl-color-gray-2);
+	background-color: var(--prpl-background-paper);
+	border: 1px solid var(--prpl-color-border);
 	border-radius: var(--prpl-border-radius);
 	padding: var(--prpl-padding);
 	min-width: 0;
@@ -245,6 +255,12 @@ button.prpl-info-icon {
 	hr {
 		margin-top: 1.25rem;
 		margin-bottom: 1.25rem;
+		border-top-color: var(--prpl-color-border);
+	}
+
+	/* Force the last column to be the last column. */
+	&[data-force-last-column="1"] {
+		grid-column: -2 / -1;
 	}
 }
 
@@ -298,7 +314,7 @@ button.prpl-info-icon {
 	text-decoration: none;
 	cursor: pointer;
 	font-size: var(--prpl-font-size-base);
-	background: var(--prpl-color-accent-red);
+	background: var(--prpl-color-button-primary);
 	line-height: 1.25;
 	box-shadow: none;
 	border: none;
@@ -315,7 +331,7 @@ button.prpl-info-icon {
 		display: block;
 		width: 100%;
 		height: 100%;
-		background: var(--prpl-color-accent-red);
+		background: var(--prpl-color-button-primary);
 		position: absolute;
 		top: 0;
 		left: 0;
@@ -331,10 +347,10 @@ button.prpl-info-icon {
 
 	&:not([disabled]):hover,
 	&:not([disabled]):focus {
-		background: #cf2441;
+		background: var(--prpl-color-button-primary-hover);
 
 		&::after {
-			background: #cf2441;
+			background: var(--prpl-color-button-primary-hover);
 			box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
 			width: calc(100% + 4px);
 			height: calc(100% + 4px);
@@ -345,12 +361,12 @@ button.prpl-info-icon {
 
 .prpl-wrap input.prpl-button-secondary,
 .prpl-wrap button.prpl-button-secondary {
-	background: var(--prpl-color-gray-3);
+	background: var(--prpl-color-selection-controls-inactive);
 
 	&:not([disabled]):hover,
 	&:not([disabled]):focus {
-		background: var(--prpl-color-gray-4);
-		box-shadow: 3px 3px 10px var(--prpl-color-gray-4);
+		background: var(--prpl-color-ui-icon);
+		box-shadow: 3px 3px 10px var(--prpl-color-ui-icon);
 	}
 }
 
@@ -372,8 +388,8 @@ button.prpl-info-icon {
 	Popovers generic styles.
 \*------------------------------------*/
 .prpl-popover {
-	background: #fff;
-	border: 1px solid var(--prpl-color-gray-3);
+	background: var(--prpl-background-paper);
+	border: 1px solid var(--prpl-color-border);
 	border-radius: var(--prpl-border-radius);
 	padding: var(--prpl-padding);
 	font-weight: 400;
@@ -401,11 +417,11 @@ button.prpl-info-icon {
 	cursor: pointer;
 	background: none;
 	border: none;
-	color: var(--prpl-color-gray-4);
+	color: var(--prpl-color-text);
 
 	&:hover,
 	&:focus {
-		color: var(--prpl-color-gray-6);
+		color: var(--prpl-color-text-hover);
 	}
 }
 
@@ -417,6 +433,10 @@ button.prpl-info-icon {
 
 	.prpl-welcome .inner-content .right {
 		display: none !important;
+	}
+
+	.prpl-widget-width-2 {
+		grid-column: span 1;
 	}
 }
 
@@ -446,7 +466,7 @@ button.prpl-info-icon {
 }
 
 .driver-popover.prpl-driverjs-theme {
-	background-color: var(--prpl-background-orange);
+	background-color: var(--prpl-background-monthly);
 	color: var(--prpl-color-text);
 
 	.driver-popover-title {
@@ -458,7 +478,7 @@ button.prpl-info-icon {
 	}
 
 	button:not(.driver-popover-close-btn):hover {
-		background-color: var(--prpl-background-orange);
+		background-color: var(--prpl-background-monthly);
 	}
 }
 
@@ -514,4 +534,3 @@ button.prpl-info-icon {
 		transform: rotate(360deg);
 	}
 }
-

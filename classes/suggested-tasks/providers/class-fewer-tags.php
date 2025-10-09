@@ -38,6 +38,13 @@ class Fewer_Tags extends Tasks {
 	const PROVIDER_ID = 'fewer-tags';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/install-fewer-tags';
+
+	/**
 	 * The task priority.
 	 *
 	 * @var int
@@ -107,21 +114,6 @@ class Fewer_Tags extends Tasks {
 	}
 
 	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			// translators: %1$s is the number of tags, %2$s is the number of published posts, %3$s <a href="https://prpl.fyi/install-fewer-tags" target="_blank">Read more</a> link.
-			\esc_html__( 'We detected that you have %1$s tags and %2$s published posts. Consider installing the "Fewer Tags" plugin. %3$s', 'progress-planner' ),
-			$this->post_tag_count_data_collector->collect(),
-			$this->published_post_count_data_collector->collect(),
-			'<a href="https://prpl.fyi/install-fewer-tags" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Fewer Tags plugin', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
-	}
-
-	/**
 	 * Check if the task condition is satisfied.
 	 * (bool) true means that the task condition is satisfied, meaning that we don't need to add the task or task was completed.
 	 *
@@ -168,5 +160,22 @@ class Fewer_Tags extends Tasks {
 		}
 
 		return $this->is_plugin_active;
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( '/plugin-install.php?tab=search&s=fewer+tags' ) . '" target="_self">' . \esc_html__( 'Install plugin', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

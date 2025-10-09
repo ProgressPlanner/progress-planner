@@ -6,95 +6,11 @@
  * Dependencies: progress-planner/suggested-task, progress-planner/web-components/prpl-badge
  */
 
-.prpl-widget-wrapper.prpl-suggested-tasks {
-
-	/* Remove styling from the widget wrapper (but not in popover view). */
-	& > .widget-inner-container .prpl-widget-content > .prpl-widget-wrapper:has(.badge-group-monthly) {
-		padding: 0;
-		border: none;
-		box-shadow: none;
-		margin-bottom: 0;
-	}
-
-	.badge-group-monthly {
-		padding: calc(var(--prpl-padding) / 2);
-		border-radius: var(--prpl-border-radius-big);
-		background-color: var(--prpl-background-orange);
-
-		.prpl-badge-row-wrapper {
-			overflow: hidden;
-		}
-
-		.prpl-badge-row-wrapper-inner {
-			--prpl-current-row: 1;
-
-			display: grid;
-			grid-template-columns: 1fr 1fr 1fr;
-			gap: calc(var(--prpl-gap) / 2);
-
-			transition: transform 0.3s ease-in-out;
-			transform: translateY(calc((var(--row-height) + var(--grid-gap)) * (var(--prpl-current-row) - 1) * -1));
-		}
-
-		.prpl-badge-row-button-wrapper {
-			display: flex;
-			justify-content: center;
-
-			&:has(.prpl-badge-row-button-up) {
-				margin-bottom: var(--prpl-padding);
-				padding-bottom: 0.2rem;
-
-				border-bottom: 1px solid var(--prpl-color-gray-3);
-			}
-
-			&:has(.prpl-badge-row-button-down) {
-				margin-top: var(--prpl-padding);
-				padding-top: 0.2rem;
-
-				border-top: 1px solid var(--prpl-color-gray-3);
-			}
-
-			&.prpl-badge-row-button-disabled {
-				opacity: 0.5;
-				pointer-events: none;
-			}
-		}
-
-		.prpl-badge-row-button {
-			border: none;
-			background: none;
-			cursor: pointer;
-		}
-
-		p {
-			margin: 0;
-			font-size: var(--prpl-font-size-xs);
-			text-align: center;
-			line-height: 1.2;
-		}
-	}
-
-	.prpl-widget-content {
-		margin-bottom: 1em;
-
-		&:last-child {
-			margin-bottom: 0;
-		}
-	}
-
-	.prpl-widget-content-points {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-
-		.prpl-widget-content-points-number {
-			font-size: var(--prpl-font-size-3xl);
-			font-weight: 600;
-		}
-	}
-}
-
 .prpl-dashboard-widget-suggested-tasks {
+
+	.prpl-suggested-tasks-widget-description {
+		max-width: 40rem;
+	}
 
 	&:not(:has(.prpl-suggested-tasks-loading)):not(:has(.prpl-suggested-tasks-list li)) {
 
@@ -103,26 +19,32 @@
 		}
 	}
 
+	&:not(:has(.prpl-suggested-tasks-loading)):has(.prpl-suggested-tasks-list li) {
+
+		.prpl-show-all-tasks {
+			display: block;
+		}
+	}
+
+	.prpl-show-all-tasks {
+		display: none;
+	}
+
 	&:has(.prpl-suggested-tasks-list li) {
 
 		.prpl-widget-title {
 			display: flex;
 		}
-
-		hr {
-			display: block;
-		}
 	}
 
-	.prpl-widget-title,
-	hr {
+	.prpl-widget-title {
 		display: none;
 	}
 
 	.prpl-no-suggested-tasks,
 	.prpl-suggested-tasks-loading {
 		display: none;
-		background-color: var(--prpl-background-green);
+		background-color: var(--prpl-background-activity);
 		padding: calc(var(--prpl-padding) / 2);
 	}
 
@@ -139,156 +61,15 @@
 	&:not(:has(+ .prpl-suggested-tasks-list)) .prpl-suggested-task:last-child {
 		border-bottom: none;
 	}
-
-	.prpl-suggested-task:nth-child(odd) {
-		background-color: #f9fafb;
-	}
-
-	/* If task has disabled checkbox it's title should be italic. */
-	.prpl-suggested-task:has(.prpl-suggested-task-disabled-checkbox-tooltip) {
-
-		h3 {
-			font-style: italic;
-		}
-	}
-
-	.prpl-suggested-task {
-
-		.prpl-suggested-task-checkbox {
-			flex-shrink: 0; /* Prevent shrinking on mobile */
-		}
-	}
-
-	/* Disabled checkbox styles. */
-	.prpl-suggested-task-disabled-checkbox-tooltip {
-
-		& > button {
-			padding: 0;
-		}
-
-		.prpl-tooltip {
-			transform: translate(-20%, calc(100% + 10px));
-
-			&::after {
-				left: 25px;
-				right: auto;
-				transform: translate(-5px, -10px) rotate(90deg);
-			}
-		}
-	}
-}
-
-/*------------------------------------*\
-	Popover styles.
-\*------------------------------------*/
-#prpl-popover-monthly-badges {
-
-	.prpl-widgets-container {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(var(--prpl-column-min-width), 1fr));
-		grid-gap: var(--prpl-gap);
-		grid-auto-rows: auto;
-	}
-
-	.prpl-widget-title {
-		padding: 0.5rem 1rem;
-		border-radius: 0.5rem;
-		background: var(--prpl-background-orange);
-	}
-
-	.badge-group-monthly {
-		background-color: transparent;
-	}
-
-	.prpl-widget-wrapper-content {
-
-		.prpl-widget-title {
-			background: var(--prpl-background-blue);
-		}
-
-		.badge-group-content {
-			background-color: transparent;
-		}
-	}
-
-	.prpl-widget-wrapper-maintenance {
-
-		.prpl-widget-title {
-			background: var(--prpl-background-red);
-		}
-
-		.badge-group-maintenance {
-			background-color: transparent;
-		}
-	}
-}
-
-.prpl-widget-wrapper.prpl-badge-streak {
-	display: flex;
-	flex-direction: column;
-	justify-content: space-between;
-
-	.progress-label {
-		display: inline-block;
-	}
-
-	.progress-wrapper {
-		display: grid;
-		grid-template-columns: 1fr 1fr 1fr;
-		gap: calc(var(--prpl-gap) / 2);
-		padding: calc(var(--prpl-padding) / 2);
-		border-radius: var(--prpl-border-radius-big);
-
-		&:not(:first-child) {
-			margin-top: var(--prpl-padding);
-		}
-
-		&.badge-group-content {
-			background: var(--prpl-background-blue);
-		}
-
-		&.badge-group-maintenance {
-			background: var(--prpl-background-red);
-		}
-
-		.prpl-badge {
-			display: flex;
-			flex-direction: column;
-			align-items: center;
-			justify-content: space-between;
-			flex-wrap: wrap;
-			min-width: 0;
-		}
-
-		p {
-			margin: 0;
-			font-size: var(--prpl-font-size-xs);
-			text-align: center;
-			line-height: 1.2;
-		}
-	}
-
-	.prpl-widget-content {
-		margin-bottom: 1em;
-	}
-
-	.badge-group-monthly {
-		background-color: transparent;
-	}
-}
-
-#prpl-popover-monthly-badges-trigger {
-	font-size: var(--prpl-font-size-base);
-	color: var(--prpl-color-link);
-	text-decoration: underline;
-	margin-top: 0.75rem;
 }
 
 /*------------------------------------*\
 	Interactive tasks, popover.
 \*------------------------------------*/
 .prpl-popover.prpl-popover-interactive {
-	padding: 24px 24px 14px 24px; /* 14px is needed for the "next" button hover state. */
+	padding: 24px 24px 14px 24px;
+
+	/* 14px is needed for the "next" button hover state. */
 	box-sizing: border-box;
 
 	* {
@@ -300,9 +81,11 @@
 		flex-wrap: wrap;
 		gap: 40px;
 		overflow: hidden;
-		padding-bottom: 10px; /* Needed for the "next" button hover state. */
+		padding-bottom: 10px;
 
-		> * {
+		/* Needed for the "next" button hover state. */
+
+		>* {
 			flex-grow: 1;
 			flex-basis: 300px;
 			position: relative;
@@ -318,7 +101,7 @@
 					left: -20px;
 					width: 1px;
 					height: 100%;
-					background-color: var(--prpl-color-gray-2);
+					background-color: var(--prpl-color-border);
 				}
 
 				&::after {
@@ -371,7 +154,7 @@
 		&.prpl-column-content {
 			padding: 20px;
 			border-radius: var(--prpl-border-radius-big);
-			background-color: var(--prpl-background-purple);
+			background-color: var(--prpl-background-content);
 		}
 
 		.prpl-note {
@@ -380,10 +163,10 @@
 			align-items: flex-start;
 			gap: 0.5rem;
 			padding: 0.75rem;
-			color: #854d0e;
+			color: var(--prpl-color-alert-warning-text);
 			font-size: var(--prpl-font-size-small);
 			border-radius: 6px;
-			background-color: #fefce8;
+			background-color: var(--prpl-background-alert-warning);
 
 			.prpl-note-icon {
 				display: flex;
@@ -392,7 +175,7 @@
 				justify-content: center;
 				width: 20px;
 				height: 20px;
-				color: #eab308;
+				color: var(--prpl-color-alert-warning);
 
 				svg {
 					width: 100%;
@@ -401,11 +184,11 @@
 			}
 
 			&.prpl-note-error {
-				color: #9f0712;
-				background-color: var(--prpl-background-red);
+				color: var(--prpl-color-alert-error-text);
+				background-color: var(--prpl-background-alert-error);
 
 				.prpl-note-icon {
-					color: var(--prpl-color-notification-red);
+					color: var(--prpl-color-alert-error);
 				}
 
 			}
@@ -415,6 +198,7 @@
 		&:not(.prpl-column-content) {
 			display: flex;
 			flex-direction: column;
+			padding-top: 3px; /* To prevent custom radio and checkbox from being cut off. */
 		}
 
 		/* Inputs. */
@@ -425,20 +209,26 @@
 		input[type="tel"],
 		input[type="search"] {
 			height: 44px;
-			padding: 1rem; /* WIP */
+			padding: 1rem;
+
+			/* WIP */
 			width: 100%;
-			min-width: 300px; /* WIP */
+			min-width: 300px;
+
+			/* WIP */
 			border-radius: 6px;
-			border: 1px solid var(--prpl-color-gray-2);
+			border: 1px solid var(--prpl-color-border);
 		}
 
-		.prpl-button {
+		.prpl-button-step {
 			padding: 0.75rem 1.25rem;
 			border: none;
-			color: var(--prpl-color-gray-6);
+			color: var(--prpl-color-text);
 			font-weight: 600;
 			border-radius: var(--prpl-border-radius);
-			background-color: var(--prpl-color-400-orange); /* WIP: pick exact color */
+			background-color: var(--prpl-background-banner);
+
+			/* WIP: pick exact color */
 			transition: all 0.25s ease-in-out;
 			position: relative;
 
@@ -447,7 +237,9 @@
 				display: block;
 				width: 100%;
 				height: 100%;
-				background: var(--prpl-color-400-orange); /* WIP: pick exact color */
+				background: var(--prpl-background-banner);
+
+				/* WIP: pick exact color */
 				position: absolute;
 				top: 0;
 				left: 0;
@@ -456,12 +248,16 @@
 				transition: all 0.25s ease-in-out;
 			}
 
-			&:not([disabled]):hover,
-			&:not([disabled]):focus {
-				background: var(--prpl-color-400-orange); /* WIP: pick exact color */
+			&:hover,
+			&:focus {
+				background: var(--prpl-background-banner);
+
+				/* WIP: pick exact color */
 
 				&::after {
-					background: var(--prpl-color-400-orange); /* WIP: pick exact color */
+					background: var(--prpl-background-banner);
+
+					/* WIP: pick exact color */
 					box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15);
 					width: calc(100% + 4px);
 					height: calc(100% + 4px);
@@ -475,12 +271,14 @@
 			min-height: 100px;
 			border-radius: 6px;
 			box-shadow: 1px 2px 4px 0 rgba(0, 0, 0, 0.05);
-			border: 1px solid var(--prpl-color-gray-2);
+			border: 1px solid var(--prpl-color-border);
 		}
 
 		/* Used for radio and checkbox inputs. */
 		.radios {
-			padding-left: 3px; /* To prevent custom radio and checkbox from being cut off. */
+			padding-left: 3px;
+
+			/* To prevent custom radio and checkbox from being cut off. */
 			display: flex;
 			flex-direction: column;
 			gap: 0.5rem;
@@ -634,6 +432,17 @@
 				}
 			}
 
+		}
+	}
+
+	/* Set the date format. */
+	&#prpl-popover-set-date-format {
+
+		.prpl-radio-wrapper {
+
+			.date-time-text {
+				min-width: 10rem;
+			}
 		}
 	}
 }

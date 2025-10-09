@@ -21,16 +21,9 @@ if ( empty( $prpl_task_providers ) ) {
 	return;
 }
 
-// Context can be 'onboarding' or 'upgrade'.
-$prpl_context = isset( $context ) ? $context : 'upgrade';
+$prpl_title = \__( "We've added new recommendations to the Progress Planner plugin", 'progress-planner' );
 
-$prpl_title = 'onboarding' === $prpl_context
-	? \__( "Let's check off what you've already done! We're checking your site now—this will only take a minute...", 'progress-planner' )
-	: \__( "We've added new recommendations to the Progress Planner plugin", 'progress-planner' );
-
-$prpl_subtitle = 'onboarding' === $prpl_context
-	? ''
-	: \__( "Let's check if you've already done those tasks, this will take only a minute...", 'progress-planner' );
+$prpl_subtitle = \__( "Let's check if you've already done those tasks, this will take only a minute...", 'progress-planner' );
 
 $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 ?>
@@ -109,12 +102,12 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 			<span class="prpl-onboarding-tasks-montly-badge">
 				<span class="prpl-onboarding-tasks-montly-badge-image">
 					<img
-						src="<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . \esc_attr( $prpl_badge->get_id() ) ); ?>"
+						src="<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . \esc_attr( $prpl_badge->get_id() ) . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id() ); ?>"
 						alt="<?php \esc_attr_e( 'Badge', 'progress-planner' ); ?>"
 						onerror="this.onerror=null;this.src='<?php echo \esc_url( \progress_planner()->get_placeholder_svg() ); ?>';"
 					/>
 				</span>
-				<?php \esc_html_e( 'These tasks contribute to your monthly badge—every check completed brings you closer!', 'progress-planner' ); ?>
+				<?php \esc_html_e( 'These tasks contribute to your monthly badge. Every check completed brings you closer!', 'progress-planner' ); ?>
 			</span>
 			<span class="prpl-onboarding-tasks-total-points">0pt</span>
 		</div>

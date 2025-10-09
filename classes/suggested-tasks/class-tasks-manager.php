@@ -35,6 +35,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Update_Term_Description;
 use Progress_Planner\Suggested_Tasks\Providers\Unpublished_Content;
 use Progress_Planner\Suggested_Tasks\Providers\Collaborator;
 use Progress_Planner\Suggested_Tasks\Providers\Select_Timezone;
+use Progress_Planner\Suggested_Tasks\Providers\Set_Date_Format;
 
 /**
  * Tasks_Manager class.
@@ -80,6 +81,7 @@ class Tasks_Manager {
 			new Unpublished_Content(),
 			new Collaborator(),
 			new Select_Timezone(),
+			new Set_Date_Format(),
 		];
 
 		// Add the plugin integration.
@@ -254,14 +256,10 @@ class Tasks_Manager {
 			return false;
 		}
 		$task_provider = $this->get_task_provider( $task->provider->slug );
-		if ( ! $task_provider ) {
-			return false;
-		}
-
-		// Check if the task is no longer relevant.
-		if ( ! $task_provider->is_task_relevant() ) {
+		if ( ! $task_provider || ! $task_provider->is_task_relevant() ) {
 			// Remove the task from the published tasks.
 			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
+			return false;
 		}
 
 		return $task_provider->evaluate_task( $task->task_id );
@@ -308,7 +306,7 @@ class Tasks_Manager {
 	 */
 	public function handle_task_unsnooze( $new_status, $old_status, $post ) {
 		// Early exit if it's not task for which snooze period is over.
-		if ( 'future' !== $old_status || 'publish' !== $new_status || 'prpl_recommendations' !== get_post_type( $post ) ) {
+		if ( 'future' !== $old_status || 'publish' !== $new_status || 'prpl_recommendations' !== \get_post_type( $post ) ) {
 			return;
 		}
 

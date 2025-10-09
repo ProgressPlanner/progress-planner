@@ -8,7 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
- * Add task to select the site locale.
+ * Add task to select the site timezone.
  */
 class Select_Timezone extends Tasks_Interactive {
 
@@ -25,6 +25,13 @@ class Select_Timezone extends Tasks_Interactive {
 	 * @var string
 	 */
 	const POPOVER_ID = 'select-timezone';
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-timezone';
 
 	/**
 	 * Whether the task is dismissable.
@@ -73,28 +80,19 @@ class Select_Timezone extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \esc_html__( 'Setting the time zone correctly on your site is valuable. By setting the correct time zone, you ensure scheduled tasks happen exactly when you want them to happen. To correctly account for daylight savings\', we recommend you use the city-based time zone instead of the UTC offset (e.g. Amsterdam or London).', 'progress-planner' );
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
 	public function should_add_task() {
-		$timezone_activity = \progress_planner()->get_activities__query()->query_activities(
+		$activity = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'suggested_task',
 				'data_id'  => static::PROVIDER_ID,
 			]
 		);
 
-		return ! $timezone_activity;
+		return ! $activity;
 	}
 
 	/**
@@ -119,7 +117,7 @@ class Select_Timezone extends Tasks_Interactive {
 		$was_tzstring_saved = '' !== $tzstring || '0' !== $current_offset ? 'true' : 'false';
 
 		// Remove old Etc mappings. Fallback to gmt_offset.
-		if ( str_contains( $tzstring, 'Etc/GMT' ) ) {
+		if ( \str_contains( $tzstring, 'Etc/GMT' ) ) {
 			$tzstring = '';
 		}
 
@@ -138,7 +136,7 @@ class Select_Timezone extends Tasks_Interactive {
 				<?php echo \wp_timezone_choice( $tzstring, \get_user_locale() ); ?>
 			</select>
 		</label>
-		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
+		<button type="submit" class="prpl-button prpl-button-primary">
 			<?php \esc_html_e( 'Set site timezone', 'progress-planner' ); ?>
 		</button>
 		<?php
@@ -160,6 +158,12 @@ class Select_Timezone extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function handle_interactive_task_specific_submit() {
+
+		// Check if the user has the necessary capabilities.
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
+		}
+
 		// Check the nonce.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
@@ -186,15 +190,15 @@ class Select_Timezone extends Tasks_Interactive {
 		$update_options = false;
 
 		// Map UTC+- timezones to gmt_offsets and set timezone_string to empty.
-		if ( preg_match( '/^UTC[+-]/', $timezone_string ) ) {
+		if ( \preg_match( '/^UTC[+-]/', $timezone_string ) ) {
 			// Set the gmt_offset to the value of the timezone_string, strip the UTC prefix.
-			$gmt_offset = preg_replace( '/UTC\+?/', '', $timezone_string );
+			$gmt_offset = \preg_replace( '/UTC\+?/', '', $timezone_string );
 
 			// Reset the timezone_string to empty.
 			$timezone_string = '';
 
 			$update_options = true;
-		} elseif ( in_array( $timezone_string, \timezone_identifiers_list( \DateTimeZone::ALL_WITH_BC ), true ) ) {
+		} elseif ( \in_array( $timezone_string, \timezone_identifiers_list( \DateTimeZone::ALL_WITH_BC ), true ) ) {
 			// $timezone_string is already set, reset the value for $gmt_offset.
 			$gmt_offset = '';
 
@@ -210,5 +214,22 @@ class Select_Timezone extends Tasks_Interactive {
 		}
 
 		\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to update setting.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Select timezone', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

@@ -1,5 +1,8 @@
 .prpl-wrap.prpl-pp-not-accepted {
 	padding: 0;
+	background-color: var(--prpl-background-paper);
+	border: 1px solid var(--prpl-color-border);
+	border-radius: var(--prpl-border-radius);
 }
 
 .prpl-welcome {
@@ -24,7 +27,7 @@
 	}
 
 	.welcome-header {
-		background: var(--prpl-color-400-orange);
+		background: var(--prpl-background-banner);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
@@ -39,8 +42,8 @@
 		}
 
 		.welcome-header-icon {
-			background: var(--prpl-color-400-orange);
-			background: linear-gradient(105deg, var(--prpl-color-400-orange) 25%, var(--prpl-background-orange) 25%);
+			background: var(--prpl-background-banner);
+			background: linear-gradient(105deg, var(--prpl-background-banner) 25%, var(--prpl-background-monthly) 25%);
 			padding: var(--prpl-padding);
 			padding-left: 100px;
 			padding-right: calc(var(--prpl-gap) * 1.5);

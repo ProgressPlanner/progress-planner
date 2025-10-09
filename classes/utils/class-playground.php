@@ -162,12 +162,21 @@ class Playground {
 	 * @return void
 	 */
 	public function generate_data() {
+		// Insert 24 posts.
 		for ( $i = 0; $i < 24; $i++ ) {
 			$this->create_random_post();
 		}
+
+		// Insert 10 draft posts.
+		for ( $i = 0; $i < 10; $i++ ) {
+			$this->create_random_post( true, 'post', 'draft' );
+		}
+
+		// Insert 5 pages.
 		for ( $i = 0; $i < 5; $i++ ) {
 			$this->create_random_post( true, 'page' );
 		}
+
 		// One post for today.
 		$this->create_random_post( false );
 	}
@@ -177,16 +186,17 @@ class Playground {
 	 *
 	 * @param bool   $random_date Whether to use a random date or not.
 	 * @param string $post_type   The post type to create.
+	 * @param string $post_status The post status to create.
 	 *
 	 * @return int Post ID.
 	 */
-	private function create_random_post( $random_date = true, $post_type = 'post' ) {
+	private function create_random_post( $random_date = true, $post_type = 'post', $post_status = 'publish' ) {
 		$postarr = [
 			'post_title'   => \str_replace( '.', '', $this->create_random_string( 5 ) ),
 			'post_content' => $this->create_random_string( \wp_rand( 200, 500 ) ),
-			'post_status'  => 'publish',
+			'post_status'  => $post_status,
 			'post_type'    => $post_type,
-			'post_date'    => $this->get_random_date_last_12_months(),
+			'post_date'    => $this->get_random_date_last_x_months( 18 ),
 		];
 
 		if ( ! $random_date ) {
@@ -196,20 +206,22 @@ class Playground {
 	}
 
 	/**
-	 * Generate a random date within the last 12 months.
+	 * Generate a random date within the last x months.
+	 *
+	 * @param int $months Number of months to go back.
 	 *
 	 * @return string Random date in 'Y-m-d H:i:s' format.
 	 */
-	private function get_random_date_last_12_months() {
+	private function get_random_date_last_x_months( $months ) {
 		// Current time.
 		// phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- This works fine for these purposes.
 		$now = \current_time( 'timestamp' );
 
-		// Timestamp for 12 months ago.
-		$last_year = \strtotime( '-12 months', $now );
+		// Timestamp for x months ago.
+		$last_year = \strtotime( "-{$months} months", $now );
 
 		// Generate a random timestamp between last year and now.
-		$random_timestamp = \wp_rand( $last_year, $now );
+		$random_timestamp = \wp_rand( $last_year, $now ); // @phpstan-ignore-line argument.type
 
 		// Format the random timestamp as a MySQL datetime string.
 		return \gmdate( 'Y-m-d H:i:s', $random_timestamp );
