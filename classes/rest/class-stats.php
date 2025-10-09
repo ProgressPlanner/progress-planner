@@ -39,7 +39,7 @@ class Stats {
 				[
 					'methods'             => 'GET',
 					'callback'            => [ $this, 'get_stats' ],
-					'permission_callback' => '__return_true',
+					'permission_callback' => [ $this, 'check_permission' ],
 					'args'                => [
 						'token' => [
 							'required'          => true,
@@ -52,6 +52,90 @@ class Stats {
 	}
 
 	/**
+	 * Check permission for the REST API endpoint.
+	 *
+	 * This endpoint requires either:
+	 * 1. User to be authenticated with manage_options capability, OR
+	 * 2. Valid token with rate limiting
+	 *
+	 * @param \WP_REST_Request $request The request object.
+	 *
+	 * @return bool|\WP_Error
+	 */
+	public function check_permission( $request ) {
+		// If user is authenticated and has manage_options capability, allow access.
+		if ( \is_user_logged_in() && \current_user_can( 'manage_options' ) ) {
+			return true;
+		}
+
+		// Otherwise, validate token with rate limiting.
+		$token = $request->get_param( 'token' );
+		if ( ! $token ) {
+			return false;
+		}
+
+		// Check rate limiting to prevent brute force attacks.
+		if ( ! $this->check_rate_limit() ) {
+			return new \WP_Error(
+				'rest_too_many_requests',
+				\__( 'Too many requests. Please try again later.', 'progress-planner' ),
+				[ 'status' => 429 ]
+			);
+		}
+
+		return $this->validate_token( $token );
+	}
+
+	/**
+	 * Check rate limiting for token-based authentication.
+	 *
+	 * @return bool True if within rate limit, false otherwise.
+	 */
+	private function check_rate_limit() {
+		// Get the client IP.
+		$ip = $this->get_client_ip();
+
+		// Rate limit: 10 requests per minute per IP.
+		$transient_key   = 'prpl_api_rate_limit_' . \md5( $ip );
+		$request_count   = \get_transient( $transient_key );
+		$max_requests    = \apply_filters( 'progress_planner_api_rate_limit', 10 );
+		$rate_limit_time = \apply_filters( 'progress_planner_api_rate_limit_time', 60 ); // seconds.
+
+		if ( false === $request_count ) {
+			// First request, set the counter.
+			\set_transient( $transient_key, 1, $rate_limit_time );
+			return true;
+		}
+
+		if ( $request_count >= $max_requests ) {
+			return false;
+		}
+
+		// Increment the counter.
+		\set_transient( $transient_key, $request_count + 1, $rate_limit_time );
+		return true;
+	}
+
+	/**
+	 * Get the client IP address.
+	 *
+	 * @return string
+	 */
+	private function get_client_ip() {
+		$ip = '';
+
+		if ( ! empty( $_SERVER['HTTP_CLIENT_IP'] ) ) {
+			$ip = \sanitize_text_field( \wp_unslash( $_SERVER['HTTP_CLIENT_IP'] ) );
+		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_FOR'] ) ) {
+			$ip = \sanitize_text_field( \wp_unslash( $_SERVER['HTTP_X_FORWARDED_FOR'] ) );
+		} elseif ( ! empty( $_SERVER['REMOTE_ADDR'] ) ) {
+			$ip = \sanitize_text_field( \wp_unslash( $_SERVER['REMOTE_ADDR'] ) );
+		}
+
+		return $ip;
+	}
+
+	/**
 	 * Receive the data from the client.
 	 *
 	 * This method handles a REST request and returns a REST response.
@@ -61,7 +145,10 @@ class Stats {
 	public function get_stats() {
 		$system_status = new \Progress_Planner\Utils\System_Status();
 
-		return new \WP_REST_Response( $system_status->get_system_status() );
+		// Only include sensitive data if user is authenticated with proper capabilities.
+		$include_sensitive = \is_user_logged_in() && \current_user_can( 'manage_options' );
+
+		return new \WP_REST_Response( $system_status->get_system_status( $include_sensitive ) );
 	}
 
 	/**
@@ -78,6 +165,7 @@ class Stats {
 			return false;
 		}
 
-		return $token === $license_key;
+		// Use timing-safe comparison to prevent timing attacks.
+		return \hash_equals( $license_key, $token );
 	}
 }

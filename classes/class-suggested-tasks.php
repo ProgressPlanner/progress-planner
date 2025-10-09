@@ -195,7 +195,12 @@ class Suggested_Tasks {
 			return;
 		}
 
-		$task_id = \sanitize_text_field( \wp_unslash( $_GET['prpl_complete_task'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		// Verify nonce for security.
+		if ( ! isset( $_GET['_wpnonce'] ) || ! \wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_GET['_wpnonce'] ) ), 'prpl_complete_task' ) ) {
+			\wp_die( \esc_html__( 'Security check failed. Please try again.', 'progress-planner' ) );
+		}
+
+		$task_id = \sanitize_text_field( \wp_unslash( $_GET['prpl_complete_task'] ) );
 		if ( ! $task_id ) {
 			return;
 		}
@@ -223,6 +228,11 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
 
+		// Add top-level capability check as a safety net.
+		if ( ! \current_user_can( 'edit_posts' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Insufficient permissions.', 'progress-planner' ) ] );
+		}
+
 		if ( ! isset( $_POST['post_id'] ) || ! isset( $_POST['action_type'] ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing data.', 'progress-planner' ) ] );
 		}
@@ -241,6 +251,7 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Provider not found.', 'progress-planner' ) ] );
 		}
 
+		// Check provider-specific capability requirements.
 		if ( ! $provider->capability_required() ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to complete this task.', 'progress-planner' ) ] );
 		}
@@ -567,11 +578,16 @@ class Suggested_Tasks {
 	 * @return array Modified array of maximum items per category.
 	 */
 	public function check_show_all_recommendations( $max_items_per_category ) {
-		return (
-			isset( $_GET['prpl_show_all_recommendations'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			&& \current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		)
-			? \array_map( fn() => 99, $max_items_per_category )
-			: $max_items_per_category;
+		// Verify nonce for security.
+		if (
+			isset( $_GET['prpl_show_all_recommendations'] ) &&
+			isset( $_GET['_wpnonce'] ) &&
+			\wp_verify_nonce( \sanitize_text_field( \wp_unslash( $_GET['_wpnonce'] ) ), 'prpl_show_all_recommendations' ) &&
+			\current_user_can( 'manage_options' )
+		) {
+			return \array_map( fn() => 99, $max_items_per_category );
+		}
+
+		return $max_items_per_category;
 	}
 }

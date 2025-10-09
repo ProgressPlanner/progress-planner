@@ -119,7 +119,14 @@ class Email_Sending extends Tasks_Interactive {
 		$this->email_content = \sprintf(
 			// translators: %1$s the admin URL.
 			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_self">Click here to mark %2$s\'s Recommendation as completed</a>.', 'progress-planner' ),
-			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ),
+			\add_query_arg(
+				[
+					'page'               => 'progress-planner',
+					'prpl_complete_task' => $this->get_task_id(),
+					'_wpnonce'           => \wp_create_nonce( 'prpl_complete_task' ),
+				],
+				\admin_url( 'admin.php' )
+			),
 			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
 		);
 	}

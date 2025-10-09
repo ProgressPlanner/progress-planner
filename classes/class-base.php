@@ -349,16 +349,28 @@ class Base {
 		 */
 		$files = (array) $files;
 		foreach ( $files as $file ) {
+			// Sanitize the file path to prevent directory traversal.
+			$file = \str_replace( [ '../', '..\\' ], '', $file );
+			$file = \ltrim( $file, '/' );
+
+			// Build the full path.
 			$path = $file;
 			if ( ! \file_exists( $path ) ) {
-				$path = \PROGRESS_PLANNER_DIR . "/{$file}";
+				$path = \PROGRESS_PLANNER_DIR . '/' . $file;
 			}
-			if ( \file_exists( $path ) ) {
+
+			// Get the real path and validate it's within the plugin directory.
+			$realpath = \realpath( $path );
+			if ( ! $realpath || \strpos( $realpath, \PROGRESS_PLANNER_DIR ) !== 0 ) {
+				continue;
+			}
+
+			if ( \file_exists( $realpath ) ) {
 				\extract( $args ); // phpcs:ignore WordPress.PHP.DontExtract.extract_extract
 				if ( $get_contents ) {
 					\ob_start();
 				}
-				include $path; // phpcs:ignore PEAR.Files.IncludingFile.UseRequire
+				include $realpath; // phpcs:ignore PEAR.Files.IncludingFile.UseRequire
 				if ( $get_contents ) {
 					return (string) \ob_get_clean();
 				}
