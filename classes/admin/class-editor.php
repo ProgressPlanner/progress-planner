@@ -56,9 +56,10 @@ class Editor {
 			[
 				'name' => 'progressPlannerEditor',
 				'data' => [
-					'lessons'         => \progress_planner()->get_lessons()->get_items(),
-					'pageTypes'       => $page_types,
-					'defaultPageType' => $prpl_preselected_page_type,
+					'lessons'             => \progress_planner()->get_lessons()->get_items(),
+					'pageTypes'           => $page_types,
+					'defaultPageType'     => $prpl_preselected_page_type,
+					'progressPlannerName' => \progress_planner()->get_branding()->get_progress_planner_name(),
 				],
 			]
 		);

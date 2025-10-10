@@ -22,7 +22,15 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 ?>
 <div class="prpl-welcome">
 	<div class="welcome-header">
-		<h1><?php \esc_html_e( 'Welcome to the Progress Planner plugin!', 'progress-planner' ); ?></h1>
+		<h1>
+		<?php
+		\printf(
+			/* translators: %s: Progress Planner name. */
+			\esc_html__( 'Welcome to the %s plugin!', 'progress-planner' ),
+			\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+		);
+		?>
+		</h1>
 		<span class="welcome-header-icon">
 			<span class="slant"></span>
 			<?php \progress_planner()->the_asset( 'images/icon_progress_planner.svg' ); ?>
@@ -157,7 +165,13 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					?>
 				</p>
 				<p id="prpl-account-not-created-message" style="display:none;">
-					<?php \esc_html_e( 'Success! Enjoy using the Progress Planner plugin!', 'progress-planner' ); ?>
+					<?php
+					printf(
+						/* translators: %s: Progress Planner name. */
+						\esc_html__( 'Success! Enjoy using the %s plugin!', 'progress-planner' ),
+						\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+					);
+					?>
 				</p>
 			</div>
 		</div>

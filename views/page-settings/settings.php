@@ -31,7 +31,15 @@ $prpl_redirect_on_login = \get_user_meta( \get_current_user_id(), 'prpl_redirect
 					type="checkbox"
 					<?php \checked( $prpl_redirect_on_login ); ?>
 				/>
-				<span><?php \esc_html_e( 'Show the Progress Planner dashboard after login.', 'progress-planner' ); ?></span>
+				<span>
+				<?php
+				\printf(
+					/* translators: %s: Progress Planner name. */
+					\esc_html__( 'Show the %s dashboard after login.', 'progress-planner' ),
+					\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+				);
+				?>
+				</span>
 			</label>
 		</div>
 	</div>

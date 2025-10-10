@@ -22,7 +22,11 @@ if ( empty( $prpl_blog_posts ) ) {
 	<?php
 	echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 		'whats-new',
-		\esc_html__( 'What\'s new on the Progress Planner blog', 'progress-planner' )
+		\sprintf(
+			/* translators: %s: Progress Planner name. */
+			\esc_html__( 'What\'s new on the %s blog', 'progress-planner' ),
+			\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+		)
 	);
 	?>
 </h2>

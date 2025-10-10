@@ -522,7 +522,7 @@ const PrplPostStatus = () =>
 								'progress-planner-sidebar/progress-planner-sidebar'
 							),
 				},
-				'Progress Planner'
+				progressPlannerEditor.progressPlannerName
 			)
 		),
 		el( PluginPostStatusInfo, {} )

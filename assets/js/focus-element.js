@@ -12,7 +12,7 @@ const prplGetIndicatorElement = ( content, taskId, points ) => {
 		progressPlannerFocusElement.base_url +
 		'/assets/images/icon_progress_planner.svg';
 	imgEl.alt = points
-		? prplL10n( 'fixThisIssue' ).replace( '%d', points )
+		? prplL10n( 'fixThisIssue' ).replace( 'NUMBER', points )
 		: '';
 
 	// Create a span element for the points.

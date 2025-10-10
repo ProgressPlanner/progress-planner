@@ -11,7 +11,15 @@ if ( ! \defined( 'ABSPATH' ) ) {
 }
 ?>
 <h2><?php \esc_html_e( 'You are on the right track!', 'progress-planner' ); ?></h2>
-<p><?php \esc_html_e( 'Find out which badges to unlock next and become a Progress Planner Professional!', 'progress-planner' ); ?></p>
+<p>
+<?php
+\printf(
+	/* translators: %s: Progress Planner name. */
+	\esc_html__( 'Find out which badges to unlock next and become a %s Professional!', 'progress-planner' ),
+	\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+);
+?>
+</p>
 
 <div class="prpl-widgets-container in-popover">
 	<div class="prpl-widget-wrapper in-popover">

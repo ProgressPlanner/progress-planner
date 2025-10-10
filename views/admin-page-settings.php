@@ -21,7 +21,13 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	<div class="prpl-settings-form-wrap">
 		<h1>
 			<span>
-				<?php \esc_html_e( 'Your Progress Planner settings', 'progress-planner' ); ?>
+				<?php
+				\printf(
+					/* translators: %s: Progress Planner name. */
+					\esc_html__( 'Your %s settings', 'progress-planner' ),
+					\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+				);
+				?>
 			</span>
 		</h1>
 

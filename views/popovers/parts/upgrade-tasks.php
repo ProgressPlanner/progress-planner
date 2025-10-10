@@ -21,18 +21,22 @@ if ( empty( $prpl_task_providers ) ) {
 	return;
 }
 
-$prpl_title = \__( "We've added new recommendations to the Progress Planner plugin", 'progress-planner' );
-
-$prpl_subtitle = \__( "Let's check if you've already done those tasks, this will take only a minute...", 'progress-planner' );
-
 $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 ?>
 <div id="prpl-onboarding-tasks">
-	<strong class="prpl-onboarding-tasks-title"><?php echo \esc_html( $prpl_title ); ?></strong>
+	<strong class="prpl-onboarding-tasks-title">
+	<?php
+	printf(
+		/* translators: %s: Progress Planner name. */
+		\esc_html__( 'We have added new recommendations to the %s plugin', 'progress-planner' ),
+		\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+	);
+	?>
+	</strong>
 
-	<?php if ( '' !== $prpl_subtitle ) : ?>
-		<span class="prpl-onboarding-tasks-description"><?php echo \esc_html( $prpl_subtitle ); ?></span>
-	<?php endif; ?>
+	<span class="prpl-onboarding-tasks-description">
+		<?php \esc_html_e( "Let's check if you've already done those tasks, this will take only a minute...", 'progress-planner' ); ?>
+	</span>
 
 	<ul class="prpl-onboarding-tasks-list">
 		<?php foreach ( $prpl_task_providers as $prpl_task_provider ) : ?>

@@ -274,8 +274,12 @@ class Page {
 					'completedPoints' => $completed_points,
 					'base_url'        => \constant( 'PROGRESS_PLANNER_URL' ),
 					'l10n'            => [
-						/* translators: %d: The number of points. */
-						'fixThisIssue' => \esc_html__( 'Fix this issue to get %d point(s) in Progress Planner', 'progress-planner' ),
+						'fixThisIssue' => \sprintf(
+							/* translators: %1$d: The number of points. %2$s: Progress Planner name. */
+							\esc_html__( 'Fix this issue to get %1$d point(s) in %2$s', 'progress-planner' ),
+							'NUMBER',
+							\progress_planner()->get_branding()->get_progress_planner_name()
+						),
 					],
 				],
 			]

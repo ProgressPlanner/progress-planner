@@ -188,6 +188,17 @@ final class Branding {
 	}
 
 	/**
+	 * Get the "Progress Planner" name.
+	 *
+	 * @return string
+	 */
+	public function get_progress_planner_name(): string {
+		return empty( $this->get_api_data() ) || empty( $this->get_api_data()['progress_planner_name'] )
+			? 'Progress Planner'
+			: $this->get_api_data()['progress_planner_name'];
+	}
+
+	/**
 	 * Get data from a remote URL, cached.
 	 *
 	 * @param string $url The URL to get the data from.

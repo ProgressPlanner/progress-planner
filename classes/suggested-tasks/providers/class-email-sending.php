@@ -115,10 +115,15 @@ class Email_Sending extends Tasks_Interactive {
 		\add_action( 'init', [ $this, 'check_if_wp_mail_is_filtered' ], PHP_INT_MAX );
 		\add_action( 'init', [ $this, 'check_if_wp_mail_has_override' ], PHP_INT_MAX );
 
-		$this->email_subject = \esc_html__( 'Your Progress Planner test message!', 'progress-planner' );
+		$this->email_subject = \sprintf(
+			/* translators: %s: Progress Planner name. */
+			\esc_html__( 'Your %s test message!', 'progress-planner' ),
+			\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+		);
 		$this->email_content = \sprintf(
-			// translators: %1$s the admin URL.
-			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_self">Click here to mark %2$s\'s Recommendation as completed</a>.', 'progress-planner' ),
+			// translators: %1$s: Progress Planner name. %2$s: Admin URL. %3$s: Ravi name.
+			\__( 'You just used %1$s to verify if sending email works on your website. <br><br> The good news; it does! <a href="%2$s" target="_self">Click here to mark %3$s\'s Recommendation as completed</a>.', 'progress-planner' ),
+			\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() ),
 			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ),
 			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
 		);
