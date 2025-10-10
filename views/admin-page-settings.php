@@ -25,7 +25,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				\printf(
 					/* translators: %s: Progress Planner name. */
 					\esc_html__( 'Your %s settings', 'progress-planner' ),
-					\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+					\esc_html( \progress_planner()->get_ui__branding()->get_progress_planner_name() )
 				);
 				?>
 			</span>

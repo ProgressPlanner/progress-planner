@@ -23,7 +23,7 @@ if ( 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id() ) {
 
 <div class="wrap prpl-wrap <?php echo \esc_attr( $prpl_privacy_policy_accepted ? '' : 'prpl-pp-not-accepted' ); ?>">
 	<?php if ( true === $prpl_privacy_policy_accepted ) : ?>
-		<h1 class="screen-reader-text"><?php echo \esc_html( \progress_planner()->get_branding()->get_progress_planner_name() ); ?></h1>
+		<h1 class="screen-reader-text"><?php echo \esc_html( \progress_planner()->get_ui__branding()->get_progress_planner_name() ); ?></h1>
 		<?php \progress_planner()->the_view( 'admin-page-header.php' ); ?>
 		<div class="prpl-widgets-container">
 			<?php foreach ( \progress_planner()->get_admin__page()->get_widgets() as $prpl_admin_widget ) : ?>

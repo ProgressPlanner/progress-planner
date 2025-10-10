@@ -29,7 +29,7 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 	printf(
 		/* translators: %s: Progress Planner name. */
 		\esc_html__( 'We have added new recommendations to the %s plugin', 'progress-planner' ),
-		\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+		\esc_html( \progress_planner()->get_ui__branding()->get_progress_planner_name() )
 	);
 	?>
 	</strong>

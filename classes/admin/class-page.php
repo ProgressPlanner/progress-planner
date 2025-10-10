@@ -278,7 +278,7 @@ class Page {
 							/* translators: %1$d: The number of points. %2$s: Progress Planner name. */
 							\esc_html__( 'Fix this issue to get %1$d point(s) in %2$s', 'progress-planner' ),
 							'NUMBER',
-							\progress_planner()->get_branding()->get_progress_planner_name()
+							\progress_planner()->get_ui__branding()->get_progress_planner_name()
 						),
 					],
 				],

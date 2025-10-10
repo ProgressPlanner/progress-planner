@@ -25,7 +25,7 @@ if ( empty( $prpl_blog_posts ) ) {
 		\sprintf(
 			/* translators: %s: Progress Planner name. */
 			\esc_html__( 'What\'s new on the %s blog', 'progress-planner' ),
-			\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+			\esc_html( \progress_planner()->get_ui__branding()->get_progress_planner_name() )
 		)
 	);
 	?>

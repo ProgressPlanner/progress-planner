@@ -16,7 +16,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 \printf(
 	/* translators: %s: Progress Planner name. */
 	\esc_html__( 'Find out which badges to unlock next and become a %s Professional!', 'progress-planner' ),
-	\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+	\esc_html( \progress_planner()->get_ui__branding()->get_progress_planner_name() )
 );
 ?>
 </p>

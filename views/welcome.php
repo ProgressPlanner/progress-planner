@@ -27,7 +27,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 		\printf(
 			/* translators: %s: Progress Planner name. */
 			\esc_html__( 'Welcome to the %s plugin!', 'progress-planner' ),
-			\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+			\esc_html( \progress_planner()->get_ui__branding()->get_progress_planner_name() )
 		);
 		?>
 		</h1>
@@ -169,7 +169,7 @@ if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
 					printf(
 						/* translators: %s: Progress Planner name. */
 						\esc_html__( 'Success! Enjoy using the %s plugin!', 'progress-planner' ),
-						\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+						\esc_html( \progress_planner()->get_ui__branding()->get_progress_planner_name() )
 					);
 					?>
 				</p>

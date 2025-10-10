@@ -32,7 +32,7 @@ class Tour {
 					'title'       => \sprintf(
 						/* translators: %s: Progress Planner name. */
 						\esc_html__( 'Tour of %s', 'progress-planner' ),
-						\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+						\esc_html( \progress_planner()->get_ui__branding()->get_progress_planner_name() )
 					),
 					'description' => \esc_html__( "We'll show you around the plugin. You can stop at any time, and restart the tour at any time by clicking this button.", 'progress-planner' ),
 					'side'        => 'top',

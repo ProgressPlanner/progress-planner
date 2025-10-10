@@ -357,7 +357,7 @@ class Enqueue {
 			'progressPlannerSidebar'       => \sprintf(
 				/* translators: %s: Progress Planner name. */
 				\esc_html__( '%s Sidebar', 'progress-planner' ),
-				\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+				\esc_html( \progress_planner()->get_ui__branding()->get_progress_planner_name() )
 			),
 			'progressText'                 => \sprintf(
 				/* translators: %1$s: The current step number. %2$s: The total number of steps. */

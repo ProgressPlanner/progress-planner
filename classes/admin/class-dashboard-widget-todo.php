@@ -30,7 +30,7 @@ class Dashboard_Widget_Todo extends Dashboard_Widget {
 		return sprintf(
 			/* translators: %s: Progress Planner name. */
 			\esc_html__( 'To-do list %s', 'progress-planner' ),
-			\esc_html( \progress_planner()->get_branding()->get_progress_planner_name() )
+			\esc_html( \progress_planner()->get_ui__branding()->get_progress_planner_name() )
 		);
 	}
 
