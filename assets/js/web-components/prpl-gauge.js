@@ -124,47 +124,19 @@ customElements.define(
 				return;
 			}
 
-			switch ( name ) {
-				case 'data-value':
-					this.state.value = parseInt( newVal );
-					break;
-				case 'data-max':
-					this.state.max = parseInt( newVal );
-					break;
-				case 'maxdeg':
-					this.state.maxDeg = newVal;
-					break;
-				case 'background':
-					this.state.background = newVal;
-					break;
-				case 'color':
-					this.state.color = newVal;
-					break;
-				case 'start':
-					this.state.start = newVal;
-					break;
-				case 'cutout':
-					this.state.cutout = newVal;
-					break;
-				case 'contentfontsize':
-					this.state.contentFontSize = newVal;
-					break;
-				case 'contentpadding':
-					this.state.contentPadding = newVal;
-					break;
-				case 'marginbottom':
-					this.state.marginBottom = newVal;
-					break;
-				case 'branding-id':
-					this.state.brandingId = newVal;
-					break;
-				case 'data-badge-id':
-					this.state.badgeId = newVal;
-					break;
-			}
+			// Convert attribute name to camelCase, remove "data-" or "aria-" prefix if present.
+			const camelCaseName = name
+				.replace( /^(data|aria)-/, '' )
+				// Convert kebab-case to camelCase
+				.replace( /-([a-z])/g, ( _, chr ) => chr.toUpperCase() );
 
+			// Update state.
+			this.state[ camelCaseName ] = newVal;
+
+			// Render the gauge.
 			this.render();
 
+			// Dispatch event.
 			this.dispatchEvent(
 				new CustomEvent( 'prpl-gauge-update', {
 					detail: {

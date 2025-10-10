@@ -92,16 +92,19 @@ customElements.define(
 				return;
 			}
 
-			// Update state.
-			if ( name === 'data-points' || name === 'data-max-points' ) {
-				this.state[ name === 'data-points' ? 'points' : 'maxPoints' ] =
-					parseInt( newVal );
-			} else {
-				this.state[ name.replace( '-', '' ) ] = newVal;
-			}
+			// Convert attribute name to camelCase, remove "data-" or "aria-" prefix if present.
+			const camelCaseName = name
+				.replace( /^(data|aria)-/, '' )
+				// Convert kebab-case to camelCase
+				.replace( /-([a-z])/g, ( _, chr ) => chr.toUpperCase() );
 
+			// Update state.
+			this.state[ camelCaseName ] = newVal;
+
+			// Update progress.
 			this.updateProgress();
 
+			// Dispatch event.
 			this.dispatchEvent(
 				new CustomEvent( 'prlp-badge-progress-bar-update', {
 					detail: {
