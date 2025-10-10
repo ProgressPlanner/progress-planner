@@ -42,3 +42,9 @@ parameters:
         - classes/suggested-tasks/data-collector/class-terms-without-description.php
         - classes/suggested-tasks/data-collector/class-post-tag-count.php
         - classes/suggested-tasks/data-collector/class-post-author.php
+        - classes/suggested-tasks/providers/integrations/aioseo/class-archive-author.php
+        - classes/suggested-tasks/providers/integrations/aioseo/class-archive-date.php
+        - classes/suggested-tasks/providers/integrations/aioseo/class-crawl-settings-feed-authors.php
+        - classes/suggested-tasks/providers/integrations/aioseo/class-crawl-settings-feed-global-comments.php
+        - classes/suggested-tasks/providers/integrations/aioseo/class-media-pages.php
+        - classes/suggested-tasks/providers/integrations/aioseo/class-organization-logo.php

@@ -1,0 +1,297 @@
+.prpl-popover-onboarding {
+
+	& * {
+		box-sizing: border-box;
+	}
+
+	padding: 24px 24px 14px 24px;
+	box-sizing: border-box;
+
+	background: #fff;
+	border: 1px solid #9ca3af;
+	border-radius: 8px;
+	font-weight: 400;
+	max-height: 82vh;
+	width: 1200px;
+	max-width: 80vw;
+
+	position: relative;
+
+	&::backdrop {
+		background: rgba(0, 0, 0, 0.5);
+	}
+
+	.prpl-popover-close {
+		position: absolute;
+		top: 0;
+		right: 0;
+		padding: 0.5em;
+		cursor: pointer;
+		background: none;
+		border: none;
+		color: #4b5563;
+	}
+
+	.tour-header {
+
+		.tour-title {
+			margin-top: 0;
+			font-size: 20px;
+			color: #38296d;
+			font-weight: 600;
+		}
+	}
+
+	.tour-footer {
+		display: flex;
+		justify-content: flex-end;
+		align-items: center;
+		gap: 10px;
+	}
+
+	.tour-content {
+		font-size: 16px;
+		line-height: 1.5;
+
+		p {
+			margin-bottom: 10px;
+		}
+
+		img {
+			max-width: 100%;
+			height: auto;
+		}
+
+	}
+
+	.prpl-columns-wrapper-flex {
+		display: flex;
+		gap: 40px;
+		overflow: hidden;
+		padding-bottom: 10px;
+
+		.prpl-column {
+			flex-grow: 1;
+			flex-basis: 50%;
+
+			&.prpl-column-content {
+				padding: 20px;
+				border-radius: 6px;
+				background-color: #f6f5fb;
+			}
+		}
+	}
+
+	.prpl-btn {
+		display: inline-block;
+		margin: 1rem 0;
+		padding: 0.75rem 1.25rem;
+		color: #fff;
+		text-decoration: none;
+		cursor: pointer;
+		font-size: 16px;
+		background: #dd3244;
+		line-height: 1.25;
+		box-shadow: none;
+		border: none;
+		border-radius: 6px;
+		transition: all 0.25s  ease-in-out;
+		font-weight: 600;
+		text-align: center;
+		box-sizing: border-box;
+		position: relative;
+		z-index: 1;
+
+		&:disabled {
+			opacity: 0.5;
+			pointer-events: none;
+		}
+
+		&:not([disabled]):hover,
+		&:not([disabled]):focus {
+			background: #cf2441;
+		}
+
+		&.prpl-btn-secondary {
+			background: #f9b23c;
+			color: #4b5563;
+
+			&:not([disabled]):hover,
+			&:not([disabled]):focus {
+				background: #f9b23c;
+				color: #4b5563;
+			}
+		}
+	}
+
+	.prpl-complete-task-btn:not(.prpl-btn) {
+		border: none;
+		background: none;
+		cursor: pointer;
+		padding: 0;
+		margin: 0;
+		font-size: 16px;
+		color: #1e40af;
+	}
+
+	.prpl-complete-task-btn-completed:not(.prpl-btn) {
+		color: #059669;
+		pointer-events: none;
+		opacity: 0.5;
+	}
+
+	.prpl-complete-task-btn-error {
+		color: #9f0712;
+	}
+
+	/* WIP for tasks which need user input. */
+	.prpl-onboarding-task-form {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		border: none;
+		padding: 0;
+		margin: 0;
+		background: none;
+
+		input[type="text"] {
+			width: 100%;
+			padding: 0.5rem;
+			border: 1px solid #ccc;
+			border-radius: 0.25rem;
+		}
+
+		/* WIP */
+		select {
+			font-size: 14px;
+			line-height: 2;
+			color: #2c3338;
+			border-color: #8c8f94;
+			box-shadow: none;
+			border-radius: 3px;
+			padding: 0 24px 0 8px;
+			min-height: 30px;
+
+			/* max-width: 25rem; */
+			width: 100%;
+			-webkit-appearance: none;
+			background: #fff url(data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23555%22%2F%3E%3C%2Fsvg%3E) no-repeat right 5px top 55%;
+			background-size: 16px 16px;
+			cursor: pointer;
+			vertical-align: middle;
+		}
+
+		.prpl-complete-task-btn {
+			flex-shrink: 0;
+		}
+	}
+
+	.prpl-complete-task-item {
+		display: flex;
+		gap: 30px;
+		justify-content: space-between;
+	}
+
+	/* Welcome */
+	&[data-prpl-step="0"] {
+
+		.prpl-column:not(.prpl-column-content) {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+	}
+
+	/* First task */
+	.prpl-onboarding-task {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+
+		.prpl-onboarding-task-title {
+			margin: 0;
+			font-size: 18px;
+			font-weight: 600;
+			color: #4b5563;
+		}
+
+		.prpl-onboarding-task-form {
+			width: 100%;
+			flex-direction: column;
+
+			.prpl-complete-task-btn {
+				align-self: flex-end;
+
+				&.prpl-complete-task-btn-completed {
+					opacity: 0.5;
+					pointer-events: none;
+				}
+			}
+		}
+	}
+
+	/* More tasks */
+	.prpl-column:has(.prpl-task-list) {
+		display: flex;
+		align-items: center;
+	}
+
+	.prpl-task-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		width: 100%;
+
+		li {
+			padding: 7px 5px;
+			margin: 0;
+
+			&:nth-child(odd) {
+				background-color: #f6f7f9;
+			}
+
+			.task-title {
+				color: #4b5563;
+				font-weight: 500;
+			}
+		}
+	}
+
+	/* File drop zone. */
+	.prpl-file-drop-zone {
+		border: 2px dashed #aaa;
+		border-radius: 10px;
+		padding: 40px;
+		text-align: center;
+		color: #555;
+		transition: background 0.2s, border-color 0.2s;
+		cursor: pointer;
+	}
+
+	.prpl-file-drop-zone.dragover {
+		background: #f0f8ff;
+		border-color: #007bff;
+	}
+
+	.prpl-file-browse-link {
+		color: #007bff;
+		text-decoration: underline;
+		cursor: pointer;
+	}
+
+	/* WIP */
+	#prpl-upload-status {
+		margin-top: 10px;
+		font-family: monospace;
+	}
+}
+
+/* Task popover is opened. */
+body:has(.prpl-task-popover) {
+
+	/* Hide Tour (parent) popover, this will hide it's backdrop as well. */
+	#prpl-popover-front-end-onboarding {
+		display: none;
+	}
+}

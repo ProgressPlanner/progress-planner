@@ -200,6 +200,17 @@ class Suggested_Tasks {
 			return;
 		}
 
+		$this->mark_task_as_completed( $task_id );
+	}
+
+	/**
+	 * Complete a task.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function mark_task_as_completed( $task_id ) {
 		if ( ! $this->was_task_completed( $task_id ) ) {
 			$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
@@ -208,8 +219,12 @@ class Suggested_Tasks {
 
 				// Insert an activity.
 				$this->insert_activity( $task_id );
+
+				return true;
 			}
 		}
+
+		return false;
 	}
 
 	/**
