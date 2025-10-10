@@ -124,14 +124,29 @@ customElements.define(
 				return;
 			}
 
-			// Convert attribute name to camelCase, remove "data-" or "aria-" prefix if present.
-			const camelCaseName = name
-				.replace( /^(data|aria)-/, '' )
-				// Convert kebab-case to camelCase
-				.replace( /-([a-z])/g, ( _, chr ) => chr.toUpperCase() );
+			switch ( name ) {
+				case 'contentfontsize':
+					this.state.contentFontSize = newVal;
+					break;
+				case 'contentpadding':
+					this.state.contentPadding = newVal;
+					break;
+				case 'marginbottom':
+					this.state.marginBottom = newVal;
+					break;
+				default:
+					// Convert attribute name to camelCase, remove "data-" or "aria-" prefix if present.
+					const camelCaseName = name
+						.replace( /^(data|aria)-/, '' )
+						// Convert kebab-case to camelCase
+						.replace( /-([a-z])/g, ( _, chr ) =>
+							chr.toUpperCase()
+						);
 
-			// Update state.
-			this.state[ camelCaseName ] = newVal;
+					// Update state.
+					this.state[ camelCaseName ] = newVal;
+					break;
+			}
 
 			// Render the gauge.
 			this.render();
