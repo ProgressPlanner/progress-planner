@@ -19,8 +19,8 @@ class PrplGaugeProgressController {
 	 * Add listeners to the gauge and progress bars.
 	 */
 	addListeners() {
-		// Updates the gauge and bars side elements (elements there are not part of the component) after the gauge is updated.
-		// For example: the points counter.
+		// Monthy badge gauge updated.
+		// Update the gauge and bars side elements (elements there are not part of the component), for example: the points counter.
 		document.addEventListener( 'prpl-gauge-update', ( event ) => {
 			if (
 				'prpl-gauge-ravi' !== event.detail.element.getAttribute( 'id' )
@@ -28,27 +28,22 @@ class PrplGaugeProgressController {
 				return;
 			}
 
-			// Update the points counter.
-			const oldCounter = document.getElementById(
-				'prpl-widget-content-ravi-points-number'
-			);
+			// Update the monthly badge gauge points counter.
+			this.updateGaugePointsCounter( event.detail.value );
 
-			if ( oldCounter ) {
-				oldCounter.textContent = parseInt( event.detail.value ) + 'pt';
-			}
-
-			// Mark badge as (not)completed, in the a Monthly badges widgets, if we reached the max points.
+			// Mark badge as (not)completed, in the a Monthly badges widgets (both on page and in the popover), if we reached the max points.
 			this.maybeUpdateBadgeCompletedStatus(
 				event.detail.badgeId,
 				event.detail.value,
 				event.detail.max
 			);
 
-			// Update remaining points for all progress bars
-			this.updateRemainingPoints();
+			// Update remaining points side elements for all progress bars, for example: "20 more points to go" text.
+			this.updateBarsRemainingPoints();
 		} );
 
-		// Updates the gauge and bars side elements (elements there are not part of the component) after the bar is updated.
+		// Progress bar for the previous month badge updated.
+		// Updates the gauge and bars side elements (elements there are not part of the component), for example: "20 more points to go" text.
 		document.addEventListener(
 			'prlp-badge-progress-bar-update',
 			( event ) => {
@@ -60,7 +55,7 @@ class PrplGaugeProgressController {
 				);
 
 				if ( remainingPointsElWrapper ) {
-					// Update the badge points number.
+					// Update the progress bars points number.
 					const badgePointsNumberEl =
 						remainingPointsElWrapper.querySelector(
 							'.prpl-widget-previous-ravi-points-number'
@@ -71,18 +66,18 @@ class PrplGaugeProgressController {
 							event.detail.points + 'pt';
 					}
 
-					// Mark badge as (not)completed, in the a Monthly badges widgets, if we reached the max points.
+					// Mark badge as (not)completed, in the a Monthly badges widgets (both on page and in the popover), if we reached the max points.
 					this.maybeUpdateBadgeCompletedStatus(
 						event.detail.badgeId,
 						event.detail.points,
 						event.detail.maxPoints
 					);
 
-					// Update remaining points for all progress bars
-					this.updateRemainingPoints();
+					// Update remaining points text for all progress bars, for example: "20 more points to go".
+					this.updateBarsRemainingPoints();
 
-					// Maybe remove the completed bar.
-					this.maybeRemoveCompletedBar(
+					// Maybe remove the completed progress bar.
+					this.maybeRemoveCompletedBarFromDom(
 						event.detail.badgeId,
 						event.detail.points,
 						event.detail.maxPoints
@@ -93,10 +88,26 @@ class PrplGaugeProgressController {
 	}
 
 	/**
+	 * Update the monthly badge gauge points counter.
+	 *
+	 * @param {number} value The value.
+	 */
+	updateGaugePointsCounter( value ) {
+		// Update the points counter.
+		const pointsCounter = document.getElementById(
+			'prpl-widget-content-ravi-points-number'
+		);
+
+		if ( pointsCounter ) {
+			pointsCounter.textContent = parseInt( value ) + 'pt';
+		}
+	}
+
+	/**
 	 * Update the remaining points display for all progress bars based on current gauge and progress bar values.
 	 * For example: "11 more points to go" text.
 	 */
-	updateRemainingPoints() {
+	updateBarsRemainingPoints() {
 		const currentGaugeValue = this.gaugeValue;
 
 		for ( let i = 0; i < this.progressBars.length; i++ ) {
@@ -140,7 +151,7 @@ class PrplGaugeProgressController {
 
 	/**
 	 * Maybe update the badge completed status.
-	 * This sets the complete attribute on the badge element.
+	 * This sets the complete attribute on the badge element and toggles visibility of the ! icon.
 	 *
 	 * @param {string} badgeId The badge id.
 	 * @param {number} value   The value.
@@ -178,7 +189,7 @@ class PrplGaugeProgressController {
 	 * @param {number} value   The value.
 	 * @param {number} max     The max.
 	 */
-	maybeRemoveCompletedBar( badgeId, value, max ) {
+	maybeRemoveCompletedBarFromDom( badgeId, value, max ) {
 		if ( ! badgeId ) {
 		}
 

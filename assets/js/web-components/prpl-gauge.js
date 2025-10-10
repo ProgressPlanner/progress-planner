@@ -260,19 +260,13 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 	}
 
 	// Get the progress bars, if any.
-	const controlProgressBars = [];
+	const progressBarElements = document.querySelectorAll(
+		'.prpl-previous-month-badge-progress-bars-wrapper prpl-badge-progress-bar'
+	);
 
-	if (
-		document.querySelectorAll(
-			'.prpl-previous-month-badge-progress-bars-wrapper prpl-badge-progress-bar'
-		).length
-	) {
-		controlProgressBars.push(
-			...document.querySelectorAll(
-				'.prpl-previous-month-badge-progress-bars-wrapper prpl-badge-progress-bar'
-			)
-		);
-	}
+	const controlProgressBars = progressBarElements.length
+		? [ ...progressBarElements ]
+		: [];
 
 	// Create the controller.
 	const controller = new PrplGaugeProgressController(
