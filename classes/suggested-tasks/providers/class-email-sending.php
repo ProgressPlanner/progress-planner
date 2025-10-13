@@ -116,10 +116,15 @@ class Email_Sending extends Tasks_Interactive {
 		\add_action( 'init', [ $this, 'check_if_wp_mail_has_override' ], PHP_INT_MAX );
 
 		$this->email_subject = \esc_html__( 'Your Progress Planner test message!', 'progress-planner' );
+
+		// SECURITY FIX: Generate a secure token for the completion link to prevent CSRF.
+		$user_id = \get_current_user_id();
+		$token   = \progress_planner()->get_suggested_tasks()->generate_task_completion_token( $this->get_task_id(), $user_id );
+
 		$this->email_content = \sprintf(
 			// translators: %1$s the admin URL.
 			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_self">Click here to mark %2$s\'s Recommendation as completed</a>.', 'progress-planner' ),
-			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() ),
+			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() . '&token=' . $token ),
 			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
 		);
 	}
@@ -255,6 +260,8 @@ class Email_Sending extends Tasks_Interactive {
 	/**
 	 * Test email sending.
 	 *
+	 * SECURITY FIX: Changed to use check_ajax_referer and get email from $_POST.
+	 *
 	 * @return void
 	 */
 	public function ajax_test_email_sending() {
@@ -263,18 +270,32 @@ class Email_Sending extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to test email sending.', 'progress-planner' ) ] );
 		}
 
-		// Check the nonce.
-		\check_admin_referer( 'progress_planner' );
+		// SECURITY FIX: Use check_ajax_referer for AJAX handlers.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
 
-		$email_address = isset( $_GET['email_address'] ) ? \sanitize_email( \wp_unslash( $_GET['email_address'] ) ) : '';
+		// SECURITY FIX: Get email from POST data (AJAX request).
+		$email_address = isset( $_POST['email_address'] ) ? \sanitize_email( \wp_unslash( $_POST['email_address'] ) ) : '';
 
 		if ( ! $email_address ) {
 			\wp_send_json_error( \esc_html__( 'Invalid email address.', 'progress-planner' ) );
 		}
 
+		// Regenerate email content with fresh token for current user.
+		$user_id = \get_current_user_id();
+		$token   = \progress_planner()->get_suggested_tasks()->generate_task_completion_token( $this->get_task_id(), $user_id );
+
+		$email_content = \sprintf(
+			// translators: %1$s the admin URL.
+			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_self">Click here to mark %2$s\'s Recommendation as completed</a>.', 'progress-planner' ),
+			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() . '&token=' . $token ),
+			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
+		);
+
 		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 
-		$result = \wp_mail( $email_address, $this->email_subject, $this->email_content, $headers );
+		$result = \wp_mail( $email_address, $this->email_subject, $email_content, $headers );
 
 		if ( $result ) {
 			\wp_send_json_success( \esc_html__( 'Email sent successfully.', 'progress-planner' ) );
