@@ -86,6 +86,7 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Interactive_Provider {
 
 		return true;
 	}
+
 	/**
 	 * Get the popover instructions.
 	 *
