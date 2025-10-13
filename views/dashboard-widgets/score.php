@@ -34,7 +34,15 @@ $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( ne
 	</div>
 
 	<div>
-		<prpl-gauge background="#fff" color="<?php echo \esc_attr( \progress_planner()->get_admin__widgets__activity_scores()->get_gauge_color( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-5xl)" contentPadding="var(--prpl-padding)" marginBottom="0" data-max="100" data-value="<?php echo (float) \progress_planner()->get_admin__widgets__activity_scores()->get_score(); ?>">
+		<prpl-gauge
+			background="#fff"
+			color="<?php echo \esc_attr( \progress_planner()->get_admin__widgets__activity_scores()->get_gauge_color( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ) ); ?>"
+			contentFontSize="var(--prpl-font-size-5xl)"
+			contentPadding="var(--prpl-padding)"
+			marginBottom="0"
+			data-max="100"
+			data-value="<?php echo (float) \progress_planner()->get_admin__widgets__activity_scores()->get_score(); ?>"
+		>
 			<?php echo \esc_html( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ); ?>
 		</prpl-gauge>
 		<?php \esc_html_e( 'Website activity score', 'progress-planner' ); ?>
