@@ -473,10 +473,10 @@ class Security_Test extends \WP_UnitTestCase {
 		};
 
 		// Test 1: Try to update a non-whitelisted option (should FAIL with fix).
-		$original_admin_email = \get_option( 'admin_email' );
-		$_POST['nonce']       = \wp_create_nonce( 'progress_planner' );
-		$_POST['setting']     = 'admin_email'; // Not in whitelist.
-		$_POST['value']       = 'hacker@evil.com';
+		$original_admin_email  = \get_option( 'admin_email' );
+		$_POST['nonce']        = \wp_create_nonce( 'progress_planner' );
+		$_POST['setting']      = 'admin_email'; // Not in whitelist.
+		$_POST['value']        = 'hacker@evil.com';
 		$_POST['setting_path'] = '[]';
 
 		\ob_start();
@@ -690,13 +690,13 @@ class Security_Test extends \WP_UnitTestCase {
 		};
 
 		$critical_options = [
-			'admin_email'         => 'admin@example.com',
-			'siteurl'             => 'https://example.com',
-			'home'                => 'https://example.com',
-			'users_can_register'  => '0',
-			'active_plugins'      => [],
-			'default_role'        => 'subscriber',
-			'wp_user_roles'       => [],
+			'admin_email'        => 'admin@example.com',
+			'siteurl'            => 'https://example.com',
+			'home'               => 'https://example.com',
+			'users_can_register' => '0',
+			'active_plugins'     => [],
+			'default_role'       => 'subscriber',
+			'wp_user_roles'      => [],
 		];
 
 		foreach ( $critical_options as $option => $malicious_value ) {
