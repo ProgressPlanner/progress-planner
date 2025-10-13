@@ -287,7 +287,9 @@ class PrplGaugeProgressController {
 
 		// Fill progress bars in order
 		for ( const bar of this.progressBars ) {
-			if ( remaining <= 0 ) break;
+			if ( remaining <= 0 ) {
+				break;
+			}
 			const barSpace = parseInt( bar.maxPoints ) - this._barValue( bar );
 
 			const toBar = Math.min( remaining, barSpace );
@@ -313,7 +315,9 @@ class PrplGaugeProgressController {
 
 		// Decrease progress bars first, in reverse order
 		for ( let i = this.progressBars.length - 1; i >= 0; i-- ) {
-			if ( remaining <= 0 ) break;
+			if ( remaining <= 0 ) {
+				break;
+			}
 			const bar = this.progressBars[ i ];
 			const barVal = this._barValue( bar );
 			const fromBar = Math.min( remaining, barVal );
