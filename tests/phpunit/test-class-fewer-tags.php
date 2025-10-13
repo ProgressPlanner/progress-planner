@@ -73,6 +73,7 @@ class Fewer_Tags_Provider_Test extends \WP_UnitTestCase {
 
 		// Create a new Fewer_Tags instance here so it's internal cache is populated with the correct data.
 		$this->task_provider = new Fewer_Tags();
+		$this->task_provider->init();
 
 		$this->assertTrue( $this->task_provider->should_add_task() );
 
@@ -110,6 +111,7 @@ class Fewer_Tags_Provider_Test extends \WP_UnitTestCase {
 
 		// Create a new Fewer_Tags instance here so it's internal cache is populated with the correct data.
 		$this->task_provider = new Fewer_Tags();
+		$this->task_provider->init();
 
 		$this->assertFalse( $this->task_provider->should_add_task() );
 
