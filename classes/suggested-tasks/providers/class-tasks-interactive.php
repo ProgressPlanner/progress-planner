@@ -132,7 +132,7 @@ abstract class Tasks_Interactive extends Tasks {
 			'default_comment_status',   // Comment settings.
 			'default_ping_status',      // Pingback settings.
 			'timezone_string',          // Site timezone.
-			'WPLANG',                   // Site language/locale.
+			'WPLANG',                   // Site language/locale (deprecated since WP 4.0, but still used by class-select-locale.php).
 			'date_format',              // Date format.
 			'time_format',              // Time format.
 			'default_pingback_flag',    // Pingback flag.
