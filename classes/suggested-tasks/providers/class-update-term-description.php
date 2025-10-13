@@ -30,13 +30,6 @@ class Update_Term_Description extends Tasks {
 	protected const PROVIDER_ID = 'update-term-description';
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'content-update';
-
-	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string

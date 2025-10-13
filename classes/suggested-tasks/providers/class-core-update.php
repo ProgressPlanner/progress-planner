@@ -13,13 +13,6 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 class Core_Update extends Tasks {
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'maintenance';
-
-	/**
 	 * The provider ID.
 	 *
 	 * @var string

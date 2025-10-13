@@ -31,13 +31,6 @@ class Unpublished_Content extends Tasks {
 	protected const PROVIDER_ID = 'unpublished-content';
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'content-publish';
-
-	/**
 	 * The data collector class name.
 	 *
 	 * @var string

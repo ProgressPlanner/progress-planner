@@ -241,18 +241,17 @@ class Enqueue {
 				$localize_data = [
 					'name' => 'prplSuggestedTask',
 					'data' => [
-						'nonce'               => \wp_create_nonce( 'progress_planner' ),
-						'assets'              => [
+						'nonce'            => \wp_create_nonce( 'progress_planner' ),
+						'assets'           => [
 							'infoIcon'   => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_info.svg',
 							'snoozeIcon' => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_snooze.svg',
 						],
-						'tasks'               => [
+						'tasks'            => [
 							'pendingTasks'            => $tasks,
 							'pendingCelebrationTasks' => $pending_celebration_tasks,
-							'userTasks'               => isset( $user_tasks['user'] ) ? $user_tasks['user'] : [],
+							'userTasks'               => $user_tasks,
 						],
-						'maxItemsPerCategory' => \progress_planner()->get_suggested_tasks()->get_max_items_per_category(),
-						'delayCelebration'    => $delay_celebration,
+						'delayCelebration' => $delay_celebration,
 					],
 				];
 				break;

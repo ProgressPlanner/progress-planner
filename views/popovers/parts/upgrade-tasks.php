@@ -40,7 +40,6 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 			$prpl_task_data = [
 				'task_id'     => $prpl_task_provider->get_task_id(),
 				'provider_id' => $prpl_task_provider->get_provider_id(),
-				'category'    => $prpl_task_provider->get_provider_category(),
 			];
 
 			// Note: get_post() returns a formatted array (details), not an object.

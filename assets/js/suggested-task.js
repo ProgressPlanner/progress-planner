@@ -1,4 +1,4 @@
-/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplTerms, prplSuggestedTasksWidget */
+/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplTerms */
 /*
  * Suggested Task scripts & helpers.
  *
@@ -34,7 +34,7 @@ prplSuggestedTask = {
 
 		const fetchData = {
 			status: args.status,
-			per_page: args.per_page || 1,
+			per_page: args.per_page || 100,
 			_embed: true,
 			exclude: prplSuggestedTask.injectedItemIds,
 			filter: {
@@ -42,57 +42,11 @@ prplSuggestedTask = {
 				order: 'ASC',
 			},
 		};
-		if ( args.category ) {
-			fetchData[ prplTerms.category ] =
-				prplTerms.get( 'category' )[ args.category ].id;
-		}
 
 		return prplSuggestedTask
 			.getPostsCollectionPromise( { data: fetchData } )
 			.then( ( response ) => response.data );
 	},
-
-	/**
-	 * Inject items from a category.
-	 *
-	 * @param {string}   taskCategorySlug The task category slug.
-	 * @param {string[]} taskStatus       The task status.
-	 */
-	injectItemsFromCategory: ( args ) =>
-		prplSuggestedTask
-			.fetchItems( {
-				category: args.category,
-				status: args.status || [ 'publish' ],
-				per_page: args.per_page || 1,
-			} )
-			.then( ( data ) => {
-				if ( data.length ) {
-					// Inject the items into the DOM.
-					data.forEach( ( item ) => {
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/suggestedTask/injectItem', {
-								detail: {
-									item,
-									listId: 'prpl-suggested-tasks-list',
-									insertPosition: 'beforeend',
-								},
-							} )
-						);
-						prplSuggestedTask.injectedItemIds.push( item.id );
-					} );
-				}
-
-				return data;
-			} )
-			.then( ( data ) => {
-				// Toggle the "Loading..." text.
-				prplSuggestedTasksWidget.removeLoadingItems();
-
-				// Trigger the grid resize event.
-				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-
-				return data;
-			} ),
 
 	/**
 	 * Inject items.
@@ -145,24 +99,12 @@ prplSuggestedTask = {
 	 */
 	getNewItemTemplatePromise: ( { post = {}, listId = '' } ) =>
 		new Promise( ( resolve ) => {
-			const {
-				prpl_recommendations_provider,
-				prpl_recommendations_category,
-			} = post;
-			const terms = {
-				prpl_recommendations_provider,
-				prpl_recommendations_category,
-			};
+			const { prpl_recommendations_provider } = post;
+			const terms = { prpl_recommendations_provider };
 
 			Object.values( prplTerms.get( 'provider' ) ).forEach( ( term ) => {
 				if ( term.id === terms[ prplTerms.provider ][ 0 ] ) {
 					terms[ prplTerms.provider ] = term;
-				}
-			} );
-
-			Object.values( prplTerms.get( 'category' ) ).forEach( ( term ) => {
-				if ( term.id === terms[ prplTerms.category ][ 0 ] ) {
-					terms[ prplTerms.category ] = term;
 				}
 			} );
 
@@ -242,10 +184,6 @@ prplSuggestedTask = {
 					const taskProviderId = prplTerms.getTerm(
 						postData?.[ prplTerms.provider ],
 						prplTerms.provider
-					).slug;
-					const taskCategorySlug = prplTerms.getTerm(
-						postData?.[ prplTerms.category ],
-						prplTerms.category
 					).slug;
 
 					const el = prplSuggestedTask.getTaskElement( postId );
@@ -333,12 +271,6 @@ prplSuggestedTask = {
 											'prpl/removeCelebratedTasks'
 										)
 									);
-
-									// Inject more tasks from the same category.
-									prplSuggestedTask.injectItemsFromCategory( {
-										category: taskCategorySlug,
-										status: [ 'publish' ],
-									} );
 
 									// Resolve immediately for non-user tasks
 									resolve( {
@@ -434,14 +366,8 @@ prplSuggestedTask = {
 			date,
 			date_gmt: date,
 		} );
-		postModelToSave.save().then( ( postData ) => {
+		postModelToSave.save().then( () => {
 			prplSuggestedTask.removeTaskElement( postId );
-
-			// Inject more tasks from the same category.
-			prplSuggestedTask.injectItemsFromCategory( {
-				category: postData?.prpl_category?.slug,
-				status: [ 'publish' ],
-			} );
 		} );
 	},
 

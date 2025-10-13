@@ -34,13 +34,6 @@ class User extends Tasks {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'user';
-
-	/**
 	 * The provider ID.
 	 *
 	 * @var string

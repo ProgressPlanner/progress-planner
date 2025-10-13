@@ -234,7 +234,8 @@ class Page {
 		$total_points     = 0;
 		$completed_points = 0;
 		foreach ( $tasks_providers as $provider ) {
-			if ( 'configuration' !== $provider->get_provider_category() ) {
+			// Only include providers that extend Yoast_Provider (these were previously categorized as 'configuration').
+			if ( ! $provider instanceof \Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Yoast_Provider ) {
 				continue;
 			}
 

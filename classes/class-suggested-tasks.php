@@ -68,9 +68,6 @@ class Suggested_Tasks {
 		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'rest_prepare_recommendation' ], 10, 2 );
 
 		\add_filter( 'wp_trash_post_days', [ $this, 'change_trashed_posts_lifetime' ], 10, 2 );
-
-		// Add filter to modify the maximum number of suggested tasks to display.
-		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_recommendations' ] );
 	}
 
 	/**
@@ -346,28 +343,24 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function register_taxonomy() {
-		foreach ( [
-			'prpl_recommendations_category' => \__( 'Categories', 'progress-planner' ),
-			'prpl_recommendations_provider' => \__( 'Providers', 'progress-planner' ),
-		] as $taxonomy => $label ) {
-			\register_taxonomy(
-				$taxonomy,
-				[ 'prpl_recommendations' ],
-				[
-					'public'            => false,
-					'hierarchical'      => false,
-					'labels'            => [
-						'name' => $label,
-					],
-					'show_ui'           => \apply_filters( 'progress_planner_tasks_show_ui', false ),
-					'show_admin_column' => false,
-					'query_var'         => true,
-					'rewrite'           => [ 'slug' => $taxonomy ],
-					'show_in_rest'      => true,
-					'show_in_menu'      => \apply_filters( 'progress_planner_tasks_show_ui', false ),
-				]
-			);
-		}
+		// Register only the provider taxonomy (category taxonomy removed).
+		\register_taxonomy(
+			'prpl_recommendations_provider',
+			[ 'prpl_recommendations' ],
+			[
+				'public'            => false,
+				'hierarchical'      => false,
+				'labels'            => [
+					'name' => \__( 'Providers', 'progress-planner' ),
+				],
+				'show_ui'           => \apply_filters( 'progress_planner_tasks_show_ui', false ),
+				'show_admin_column' => false,
+				'query_var'         => true,
+				'rewrite'           => [ 'slug' => 'prpl_recommendations_provider' ],
+				'show_in_rest'      => true,
+				'show_in_menu'      => \apply_filters( 'progress_planner_tasks_show_ui', false ),
+			]
+		);
 	}
 
 	/**
@@ -458,10 +451,7 @@ class Suggested_Tasks {
 			}
 		}
 
-		$category_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_category' );
-		if ( $category_term && ! \is_wp_error( $category_term ) ) {
-			$response->data['prpl_category'] = $category_term[0];
-		}
+		// Category taxonomy removed - no longer adding prpl_category to response.
 
 		return $response;
 	}
@@ -480,43 +470,38 @@ class Suggested_Tasks {
 				'post_status'      => 'publish',
 				'exclude_provider' => [],
 				'include_provider' => [],
-				'posts_per_page'   => 0,
+				'posts_per_page'   => -1,
 			]
 		);
 
-		// Get the max items per category.
-		$max_items_per_category = $this->get_max_items_per_category();
+		// Build query args for get_tasks_by.
+		$query_args = [
+			'post_status'    => $args['post_status'],
+			'posts_per_page' => $args['posts_per_page'],
+		];
 
-		// Initialize the tasks array.
-		$tasks = [];
-
-		// Get the tasks for each category.
-		foreach ( $max_items_per_category as $category_slug => $max_items ) {
-			// Skip excluded providers.
-			if ( ! empty( $args['exclude_provider'] ) && \in_array( $category_slug, $args['exclude_provider'], true ) ) {
-				continue;
-			}
-
-			// Skip not included providers.
-			if ( ! empty( $args['include_provider'] ) && ! \in_array( $category_slug, $args['include_provider'], true ) ) {
-				continue;
-			}
-
-			$category_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
-				[
-					'category'       => $category_slug,
-					'posts_per_page' => 0 < $args['posts_per_page'] ? $args['posts_per_page'] : $max_items,
-					'post_status'    => $args['post_status'],
-				]
-			);
-
-			if ( ! empty( $category_tasks ) ) {
-				$tasks[ $category_slug ] = [];
-
-				foreach ( $category_tasks as $task ) {
-					$tasks[ $category_slug ][] = $task->get_rest_formatted_data();
+		// Add provider filters if specified.
+		if ( ! empty( $args['exclude_provider'] ) ) {
+			// Note: Database filtering doesn't support exclude_provider directly,
+			// so we'll filter after fetching.
+			$all_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( $query_args );
+			$all_tasks = \array_filter(
+				$all_tasks,
+				function ( $task ) use ( $args ) {
+					return ! \in_array( $task->get_provider_id(), $args['exclude_provider'], true );
 				}
-			}
+			);
+		} elseif ( ! empty( $args['include_provider'] ) ) {
+			$query_args['provider'] = $args['include_provider'];
+			$all_tasks              = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( $query_args );
+		} else {
+			$all_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( $query_args );
+		}
+
+		// Convert tasks to REST format.
+		$tasks = [];
+		foreach ( $all_tasks as $task ) {
+			$tasks[] = $task->get_rest_formatted_data();
 		}
 
 		/**
@@ -528,50 +513,5 @@ class Suggested_Tasks {
 		 * @return array
 		 */
 		return \apply_filters( 'progress_planner_suggested_tasks_in_rest_format', $tasks, $args );
-	}
-
-	/**
-	 * Get the max items per category.
-	 *
-	 * @return array
-	 */
-	public function get_max_items_per_category() {
-		// Set max items per category.
-		$max_items_per_category = [];
-		$provider_categories    = \get_terms(
-			[
-				'taxonomy'   => 'prpl_recommendations_category',
-				'hide_empty' => false,
-			]
-		);
-
-		if ( ! empty( $provider_categories ) && ! \is_wp_error( $provider_categories ) ) {
-			$content_review_category = ( new Content_Review() )->get_provider_category();
-			foreach ( $provider_categories as $provider_category ) {
-				$max_items_per_category[ $provider_category->slug ] = $provider_category->slug === $content_review_category ? 2 : 1;
-			}
-		}
-
-		// This should never happen, but just in case - user tasks are displayed in different widget.
-		if ( isset( $max_items_per_category['user'] ) ) {
-			$max_items_per_category['user'] = 100;
-		}
-
-		return \apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category );
-	}
-
-	/**
-	 * Modify the maximum number of suggested tasks to display.
-	 *
-	 * @param array $max_items_per_category Array of maximum items per category.
-	 * @return array Modified array of maximum items per category.
-	 */
-	public function check_show_all_recommendations( $max_items_per_category ) {
-		return (
-			isset( $_GET['prpl_show_all_recommendations'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			&& \current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		)
-			? \array_map( fn() => 99, $max_items_per_category )
-			: $max_items_per_category;
 	}
 }

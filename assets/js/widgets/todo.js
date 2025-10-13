@@ -73,7 +73,7 @@ const prplTodoWidget = {
 			// Otherwise, inject tasks from the API.
 			prplSuggestedTask
 				.fetchItems( {
-					category: 'user',
+					provider: 'user',
 					status: [ 'publish', 'trash' ],
 					per_page: 100,
 				} )
@@ -122,9 +122,6 @@ const prplTodoWidget = {
 					// Set the post title.
 					title: document.getElementById( 'new-todo-content' ).value,
 					status: 'publish',
-					// Set the `prpl_recommendations_category` term.
-					prpl_recommendations_category:
-						prplTerms.get( 'category' ).user.id,
 					// Set the `prpl_recommendations_provider` term.
 					prpl_recommendations_provider:
 						prplTerms.get( 'provider' ).user.id,
@@ -141,7 +138,6 @@ const prplTodoWidget = {
 							...( response.meta || {} ),
 						},
 						provider: 'user',
-						category: 'user',
 						order: prplTodoWidget.getHighestItemOrder() + 1,
 						prpl_points: 0,
 					};

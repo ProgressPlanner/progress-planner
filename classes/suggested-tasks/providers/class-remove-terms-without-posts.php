@@ -30,13 +30,6 @@ class Remove_Terms_Without_Posts extends Tasks {
 	protected const PROVIDER_ID = 'remove-terms-without-posts';
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'content-update';
-
-	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string

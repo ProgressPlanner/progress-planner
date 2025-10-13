@@ -15,13 +15,6 @@ use Progress_Planner\Suggested_Tasks\Tasks_Interface;
 abstract class Tasks implements Tasks_Interface {
 
 	/**
-	 * The category of the task.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'configuration';
-
-	/**
 	 * The ID of the task provider.
 	 *
 	 * @var string
@@ -248,25 +241,6 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function get_link_setting() {
 		return $this->link_setting;
-	}
-
-	/**
-	 * Alias for get_provider_category(), to provide backwards compatibility.
-	 *
-	 * @return string
-	 */
-	public function get_provider_type() {
-		\_deprecated_function( 'Progress_Planner\Suggested_Tasks\Providers\Tasks::get_provider_type()', '1.1.1', 'get_provider_category' );
-		return $this->get_provider_category();
-	}
-
-	/**
-	 * Get the provider category.
-	 *
-	 * @return string
-	 */
-	public function get_provider_category() {
-		return static::CATEGORY;
 	}
 
 	/**
@@ -556,7 +530,6 @@ abstract class Tasks implements Tasks_Interface {
 			'description'       => $this->get_description_with_data( $task_data ),
 			'parent'            => $this->get_parent(),
 			'priority'          => $this->get_priority(),
-			'category'          => $this->get_provider_category(),
 			'points'            => $this->get_points(),
 			'date'              => \gmdate( 'YW' ),
 			'url'               => $this->get_url_with_data( $task_data ),

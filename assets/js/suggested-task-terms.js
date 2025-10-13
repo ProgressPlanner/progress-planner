@@ -8,7 +8,6 @@
 const prplSuggestedTasksTerms = {};
 
 const prplTerms = {
-	category: 'prpl_recommendations_category',
 	provider: 'prpl_recommendations_provider',
 
 	/**
@@ -19,9 +18,7 @@ const prplTerms = {
 	 */
 	// eslint-disable-next-line no-unused-vars
 	get: ( taxonomy ) => {
-		if ( 'category' === taxonomy ) {
-			taxonomy = prplTerms.category;
-		} else if ( 'provider' === taxonomy ) {
+		if ( 'provider' === taxonomy ) {
 			taxonomy = prplTerms.provider;
 		}
 		return prplSuggestedTasksTerms[ taxonomy ] || {};
@@ -94,7 +91,6 @@ const prplTerms = {
 		return new Promise( ( resolve ) => {
 			prplDocumentReady( () => {
 				Promise.all( [
-					prplTerms.getCollectionPromise( prplTerms.category ),
 					prplTerms.getCollectionPromise( prplTerms.provider ),
 				] ).then( () => resolve( prplSuggestedTasksTerms ) );
 			} );
