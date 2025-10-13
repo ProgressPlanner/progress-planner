@@ -24,13 +24,6 @@ class Fewer_Tags extends Tasks {
 	protected const IS_ONBOARDING_TASK = true;
 
 	/**
-	 * The provider type.
-	 *
-	 * @var string
-	 */
-	const CATEGORY = 'configuration';
-
-	/**
 	 * The provider ID.
 	 *
 	 * @var string

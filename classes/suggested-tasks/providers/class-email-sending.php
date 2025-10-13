@@ -27,13 +27,6 @@ class Email_Sending extends Tasks_Interactive {
 	const PROVIDER_ID = 'sending-email';
 
 	/**
-	 * The provider type.
-	 *
-	 * @var string
-	 */
-	const CATEGORY = 'configuration';
-
-	/**
 	 * The popover ID.
 	 *
 	 * @var string
