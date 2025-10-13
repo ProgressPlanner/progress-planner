@@ -193,16 +193,15 @@ class Fewer_Tags extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		?>
-		<?php if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) : ?>
+		if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) : ?>
 			<prpl-install-plugin
 				data-plugin-name="Fewer Tags"
 				data-plugin-slug="fewer-tags"
 				data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'fewer-tags' ) ? 'activate' : 'install'; ?>"
 				data-provider-id="<?php echo \esc_attr( self::PROVIDER_ID ); ?>"
 			></prpl-install-plugin>
-		<?php endif; ?>
-		<?php
+			<?php
+		endif;
 	}
 
 	/**
