@@ -100,14 +100,11 @@ const prplSuggestedTasksWidget = {
 				.fetchItems( {
 					status: [ 'publish' ],
 					per_page: tasksPerPage,
+					exclude_provider: 'user',
 				} )
 				.then( ( data ) => {
-					// Filter out user tasks.
-					const nonUserTasks = data.filter(
-						( task ) => task.prpl_provider.slug !== 'user'
-					);
-					if ( nonUserTasks.length ) {
-						prplSuggestedTask.injectItems( nonUserTasks );
+					if ( data.length ) {
+						prplSuggestedTask.injectItems( data );
 					}
 				} );
 
@@ -118,18 +115,15 @@ const prplSuggestedTasksWidget = {
 					.fetchItems( {
 						status: [ 'pending' ],
 						per_page: tasksPerPage,
+						exclude_provider: 'user',
 					} )
 					.then( ( data ) => {
-						// Filter out user tasks.
-						const nonUserTasks = data.filter(
-							( task ) => task.prpl_provider.slug !== 'user'
-						);
 						// If there were pending tasks.
-						if ( nonUserTasks.length ) {
-							prplSuggestedTask.injectItems( nonUserTasks );
+						if ( data.length ) {
+							prplSuggestedTask.injectItems( data );
 
 							// Set post status to trash.
-							nonUserTasks.forEach( ( task ) => {
+							data.forEach( ( task ) => {
 								const post =
 									new wp.api.models.Prpl_recommendations( {
 										id: task.id,
@@ -219,14 +213,11 @@ prplDocumentReady( () => {
 			.fetchItems( {
 				status: [ 'publish' ],
 				per_page: newPerPage,
+				exclude_provider: 'user',
 			} )
 			.then( ( data ) => {
-				// Filter out user tasks.
-				const nonUserTasks = data.filter(
-					( task ) => task.prpl_provider.slug !== 'user'
-				);
-				if ( nonUserTasks.length ) {
-					prplSuggestedTask.injectItems( nonUserTasks );
+				if ( data.length ) {
+					prplSuggestedTask.injectItems( data );
 				}
 
 				// Remove loading message.

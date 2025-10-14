@@ -483,14 +483,20 @@ class Suggested_Tasks {
 		// Add provider filters if specified.
 		if ( ! empty( $args['exclude_provider'] ) ) {
 			// Note: Database filtering doesn't support exclude_provider directly,
-			// so we'll filter after fetching.
-			$all_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( $query_args );
-			$all_tasks = \array_filter(
+			// so we'll fetch all tasks, filter, then limit.
+			$original_limit               = $query_args['posts_per_page'];
+			$query_args['posts_per_page'] = -1; // Fetch all tasks.
+			$all_tasks                    = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( $query_args );
+			$all_tasks                    = \array_filter(
 				$all_tasks,
 				function ( $task ) use ( $args ) {
 					return ! \in_array( $task->get_provider_id(), $args['exclude_provider'], true );
 				}
 			);
+			// Now limit to the originally requested number.
+			if ( -1 !== $original_limit ) {
+				$all_tasks = \array_slice( $all_tasks, 0, $original_limit );
+			}
 		} elseif ( ! empty( $args['include_provider'] ) ) {
 			$query_args['provider'] = $args['include_provider'];
 			$all_tasks              = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( $query_args );

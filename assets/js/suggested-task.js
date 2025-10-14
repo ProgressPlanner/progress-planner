@@ -43,6 +43,14 @@ prplSuggestedTask = {
 			},
 		};
 
+		// Pass through provider and exclude_provider if provided.
+		if ( args.provider ) {
+			fetchData.provider = args.provider;
+		}
+		if ( args.exclude_provider ) {
+			fetchData.exclude_provider = args.exclude_provider;
+		}
+
 		return prplSuggestedTask
 			.getPostsCollectionPromise( { data: fetchData } )
 			.then( ( response ) => response.data );
