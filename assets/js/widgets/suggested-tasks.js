@@ -94,7 +94,8 @@ const prplSuggestedTasksWidget = {
 				'undefined' !== typeof prplSuggestedTask.tasksPerPage &&
 				-1 === prplSuggestedTask.tasksPerPage
 					? 100
-					: prplSuggestedTask.tasksPerPage || 5;
+					: prplSuggestedTask.tasksPerPage ||
+					  prplSuggestedTask.perPageDefault;
 
 			prplSuggestedTask
 				.fetchItems( {
@@ -181,7 +182,7 @@ prplDocumentReady( () => {
 
 	toggleButton.addEventListener( 'click', () => {
 		const showAll = toggleButton.dataset.showAll === '1';
-		const newPerPage = showAll ? 5 : 100;
+		const newPerPage = showAll ? prplSuggestedTask.perPageDefault : 100;
 
 		// Update button text and state.
 		toggleButton.textContent = showAll
