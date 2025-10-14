@@ -90,10 +90,16 @@ const prplSuggestedTasksWidget = {
 		} else {
 			// Otherwise, inject tasks from the API.
 			// Inject published tasks (excluding user tasks).
+			const tasksPerPage =
+				'undefined' !== typeof prplSuggestedTask.tasksPerPage &&
+				-1 === prplSuggestedTask.tasksPerPage
+					? 100
+					: prplSuggestedTask.tasksPerPage || 5;
+
 			prplSuggestedTask
 				.fetchItems( {
 					status: [ 'publish' ],
-					per_page: 100,
+					per_page: tasksPerPage,
 				} )
 				.then( ( data ) => {
 					// Filter out user tasks.
@@ -111,7 +117,7 @@ const prplSuggestedTasksWidget = {
 				prplSuggestedTask
 					.fetchItems( {
 						status: [ 'pending' ],
-						per_page: 100,
+						per_page: tasksPerPage,
 					} )
 					.then( ( data ) => {
 						// Filter out user tasks.

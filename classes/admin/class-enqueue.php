@@ -214,10 +214,15 @@ class Enqueue {
 					$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
 				}
 
-				// Get tasks from task providers.
+				// Check if user wants to see all recommendations.
+				$show_all_recommendations = isset( $_GET['prpl_show_all_recommendations'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$tasks_per_page           = $show_all_recommendations ? -1 : 5;
+
+				// Get tasks from task providers (limited to 5 by default, or unlimited if showing all).
 				$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
 					[
 						'post_status'      => 'publish',
+						'posts_per_page'   => $tasks_per_page,
 						'exclude_provider' => [ 'user' ],
 					]
 				);
@@ -252,6 +257,7 @@ class Enqueue {
 							'userTasks'               => $user_tasks,
 						],
 						'delayCelebration' => $delay_celebration,
+						'tasksPerPage'     => $tasks_per_page,
 					],
 				];
 				break;
