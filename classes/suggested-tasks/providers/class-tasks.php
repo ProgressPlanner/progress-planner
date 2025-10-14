@@ -90,10 +90,10 @@ abstract class Tasks implements Tasks_Interface {
 	 * - Examples: Term descriptions, advanced SEO features
 	 */
 	protected const PRIORITY_CRITICAL = 0;
-	protected const PRIORITY_URGENT = 10;
-	protected const PRIORITY_HIGH = 20;
-	protected const PRIORITY_NORMAL = 50;
-	protected const PRIORITY_LOW = 60;
+	protected const PRIORITY_URGENT   = 10;
+	protected const PRIORITY_HIGH     = 20;
+	protected const PRIORITY_NORMAL   = 50;
+	protected const PRIORITY_LOW      = 60;
 	protected const PRIORITY_OPTIONAL = 80;
 
 	/**
