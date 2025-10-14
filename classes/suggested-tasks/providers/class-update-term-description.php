@@ -323,17 +323,36 @@ class Update_Term_Description extends Tasks_Interactive {
 		}
 
 		$task_data = [
-			'termId'   => $term->term_id,
-			'taxonomy' => $term->taxonomy,
-			'termName' => $term->name,
+			'target_term_id'   => $term->term_id,
+			'target_taxonomy'  => $term->taxonomy,
+			'target_term_name' => $term->name,
 		];
+
+		$task_details = $this->get_task_details( $task_data );
 
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text prpl-update-term-description-action" role="button" '
-				. 'data-task-context="' . \esc_attr( \wp_json_encode( $task_data ) ) . '" '
-				. 'onclick="event.preventDefault(); document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover(); this.dispatchEvent(new CustomEvent(\'prpl-interactive-task-action\', { bubbles: true, detail: JSON.parse(this.dataset.taskContext) }));">'
-				. \esc_html__( 'Write description', 'progress-planner' ) . '</a>',
+			'html'     => sprintf(
+				'<a href="#" class="prpl-tooltip-action-text prpl-delete-term-action" role="button"
+					data-task-context=\'%s\'
+					onclick="event.preventDefault(); document.getElementById(\'prpl-popover-%s\')?.showPopover(); this.dispatchEvent(new CustomEvent(\'prpl-interactive-task-action\', { bubbles: true, detail: JSON.parse(this.dataset.taskContext) }));">
+					%s
+				</a>',
+				htmlspecialchars(
+					wp_json_encode(
+						[
+							'post_title'       => $task_details['post_title'],
+							'target_term_id'   => $task_data['target_term_id'],
+							'target_taxonomy'  => $task_data['target_taxonomy'],
+							'target_term_name' => $task_data['target_term_name'],
+						]
+					),
+					ENT_QUOTES,
+					'UTF-8'
+				),
+				\esc_attr( static::POPOVER_ID ),
+				\esc_html__( 'Write description', 'progress-planner' )
+			),
 		];
 
 		return $actions;

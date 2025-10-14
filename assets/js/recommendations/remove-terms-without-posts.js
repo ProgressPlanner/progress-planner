@@ -61,8 +61,7 @@
 			this.currentTaskElement = event.target.closest(
 				'.prpl-suggested-task'
 			);
-			console.log( this.currentTermData );
-			console.log( event.detail.post_title );
+
 			// Update the popover content with the term data.
 			this.updatePopoverContent(
 				this.currentTermData.termId,

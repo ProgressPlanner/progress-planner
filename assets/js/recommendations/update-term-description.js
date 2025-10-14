@@ -14,6 +14,7 @@
 		 */
 		constructor() {
 			this.popoverId = 'prpl-popover-update-term-description';
+			this.popover = document.getElementById( this.popoverId );
 			this.currentTermData = null;
 			this.currentTaskElement = null;
 			this.init();
@@ -35,14 +36,7 @@
 			document.addEventListener(
 				'prpl-interactive-task-action',
 				( event ) => {
-					// Only handle events for update term description tasks.
-					if (
-						event.target.classList.contains(
-							'prpl-update-term-description-action'
-						)
-					) {
-						this.handleInteractiveTaskAction( event );
-					}
+					this.handleInteractiveTaskAction( event );
 				}
 			);
 		}
@@ -53,8 +47,15 @@
 		 * @param {CustomEvent} event The custom event with task context data.
 		 */
 		handleInteractiveTaskAction( event ) {
-			const { termId, taxonomy, termName } = event.detail;
-			this.currentTermData = { termId, taxonomy, termName };
+			this.currentTermData = {
+				termId: this.decodeHtmlEntities( event.detail.target_term_id ),
+				taxonomy: this.decodeHtmlEntities(
+					event.detail.target_taxonomy
+				),
+				termName: this.decodeHtmlEntities(
+					event.detail.target_term_name
+				),
+			};
 
 			// Store reference to the task element that triggered this.
 			this.currentTaskElement = event.target.closest(
@@ -62,32 +63,46 @@
 			);
 
 			// Update the popover content with the term data.
-			this.updatePopoverContent( termId, taxonomy, termName );
+			this.updatePopoverContent(
+				this.currentTermData.termId,
+				this.currentTermData.taxonomy,
+				this.currentTermData.termName,
+				this.decodeHtmlEntities( event.detail.post_title )
+			);
 		}
 
 		/**
 		 * Update the popover content.
 		 *
-		 * @param {string} termId   The term ID.
-		 * @param {string} taxonomy The taxonomy.
-		 * @param {string} termName The term name.
+		 * @param {string} termId    The term ID.
+		 * @param {string} taxonomy  The taxonomy.
+		 * @param {string} termName  The term name.
+		 * @param {string} postTitle The post title.
 		 */
-		updatePopoverContent( termId, taxonomy, termName ) {
-			const termNameElement = document.getElementById(
-				'prpl-update-term-name'
+		updatePopoverContent( termId, taxonomy, termName, postTitle ) {
+			const popoverTitle = this.popover.querySelector(
+				'.prpl-popover-title'
 			);
-			const taxonomyElement = document.getElementById(
-				'prpl-update-term-taxonomy'
+
+			const termNameElement = this.popover.querySelector(
+				'#prpl-update-term-name'
 			);
-			const termIdField = document.getElementById(
-				'prpl-update-term-id'
+			const taxonomyElement = this.popover.querySelector(
+				'#prpl-update-term-taxonomy'
 			);
-			const taxonomyField = document.getElementById(
-				'prpl-update-taxonomy'
+			const termIdField = this.popover.querySelector(
+				'#prpl-update-term-id'
 			);
-			const descriptionField = document.getElementById(
-				'prpl-term-description'
+			const taxonomyField = this.popover.querySelector(
+				'#prpl-update-taxonomy'
 			);
+			const descriptionField = this.popover.querySelector(
+				'#prpl-term-description'
+			);
+
+			if ( popoverTitle ) {
+				popoverTitle.textContent = postTitle;
+			}
 
 			if ( termNameElement ) {
 				termNameElement.textContent = termName;
@@ -200,6 +215,24 @@
 						}
 					} );
 			} );
+		}
+
+		/**
+		 * Decodes HTML entities in a string (like &quot;, &amp;, etc.)
+		 * @param {string} str The string to decode.
+		 * @return {string} The decoded string.
+		 */
+		decodeHtmlEntities( str ) {
+			if ( typeof str !== 'string' ) {
+				return str;
+			}
+
+			return str
+				.replace( /&quot;/g, '"' )
+				.replace( /&#039;/g, "'" )
+				.replace( /&lt;/g, '<' )
+				.replace( /&gt;/g, '>' )
+				.replace( /&amp;/g, '&' );
 		}
 	}
 
