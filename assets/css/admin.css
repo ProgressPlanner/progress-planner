@@ -360,13 +360,23 @@ button.prpl-info-icon {
 }
 
 .prpl-wrap input.prpl-button-secondary,
-.prpl-wrap button.prpl-button-secondary {
+.prpl-wrap button.prpl-button-secondary,
+.prpl-wrap a.prpl-button-secondary,
+#progress_planner_dashboard_widget_score a.prpl-button-secondary {
 	background: var(--prpl-color-selection-controls-inactive);
+
+	&::after {
+		background: var(--prpl-color-selection-controls-inactive);
+	}
 
 	&:not([disabled]):hover,
 	&:not([disabled]):focus {
 		background: var(--prpl-color-ui-icon);
 		box-shadow: 3px 3px 10px var(--prpl-color-ui-icon);
+
+		&::after {
+			background: var(--prpl-color-ui-icon);
+		}
 	}
 }
 

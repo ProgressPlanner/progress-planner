@@ -6,28 +6,6 @@
  * Dependencies: progress-planner/recommendations/interactive-task, progress-planner/document-ready
  */
 
-// prplInteractiveTaskFormListener.settings( {
-// 	setting: 'permalink_structure',
-// 	taskId: 'permalink-structure',
-// 	popoverId: 'prpl-popover-permalink-structure',
-// 	action: 'prpl_interactive_task_submit_permalink-structure',
-// 	settingCallbackValue: ( value ) => {
-// 		// If custom structure radio is selected, get value from text input instead
-// 		const customRadio = document.getElementById(
-// 			'custom_permalink_structure'
-// 		);
-// 		const customInput = document.getElementById(
-// 			'custom_permalink_structure'
-// 		);
-
-// 		if ( customRadio && customRadio.checked && customInput ) {
-// 			return customInput.value;
-// 		}
-
-// 		return value;
-// 	},
-// } );
-
 prplInteractiveTaskFormListener.customSubmit( {
 	taskId: 'core-permalink-structure',
 	popoverId: 'prpl-popover-core-permalink-structure',
