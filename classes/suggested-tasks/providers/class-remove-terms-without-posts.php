@@ -7,13 +7,13 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Providers\Tasks;
+use Progress_Planner\Suggested_Tasks\Providers\Tasks_Interactive;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Posts as Terms_Without_Posts_Data_Collector;
 
 /**
  * Add task to remove terms without posts.
  */
-class Remove_Terms_Without_Posts extends Tasks {
+class Remove_Terms_Without_Posts extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -28,6 +28,13 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'remove-terms-without-posts';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'remove-terms-without-posts';
 
 	/**
 	 * The provider category.
@@ -93,17 +100,13 @@ class Remove_Terms_Without_Posts extends Tasks {
 	protected $completed_term_ids = null;
 
 	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		\add_filter( 'progress_planner_terms_without_posts_exclude_term_ids', [ $this, 'exclude_completed_terms' ] );
-	}
-
-	/**
 	 * Initialize the task.
 	 */
 	public function init() {
 		\add_action( 'set_object_terms', [ $this, 'maybe_remove_irrelevant_tasks' ], 10, 6 );
+		\add_filter( 'progress_planner_terms_without_posts_exclude_term_ids', [ $this, 'exclude_completed_terms' ] );
+
+		\add_action( 'wp_ajax_prpl_interactive_task_submit_remove-terms-without-posts', [ $this, 'handle_interactive_task_submit' ] );
 	}
 
 	/**
@@ -149,6 +152,12 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * @return string
 	 */
 	protected function get_title_with_data( $task_data = [] ) {
+
+		// TODO: This is a temporary fix to avoid errors.
+		if ( ! isset( $task_data['target_term_id'] ) || ! isset( $task_data['target_taxonomy'] ) ) {
+			return '';
+		}
+
 		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return ( $term && ! \is_wp_error( $term ) )
 			? \sprintf(
@@ -167,6 +176,12 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * @return string
 	 */
 	protected function get_url_with_data( $task_data = [] ) {
+
+		// TODO: This is a temporary fix to avoid errors.
+		if ( ! isset( $task_data['target_term_id'] ) || ! isset( $task_data['target_taxonomy'] ) ) {
+			return '';
+		}
+
 		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return ( $term && ! \is_wp_error( $term ) )
 			? \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id )
@@ -315,11 +330,96 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
+		$term = $this->get_term_from_task_id( $data['meta']['prpl_task_id'] );
+
+		$task_data = [
+			'target_term_id'   => $term->term_id ?? '',
+			'target_taxonomy'  => $term->taxonomy ?? '',
+			'target_term_name' => $term->name ?? '',
+		];
+
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \esc_url( $data['meta']['prpl_url'] ) . '" target="_self">' . \esc_html__( 'Go to the "Taxonomies" page', 'progress-planner' ) . '</a>',
+			'html'     => '<a href="#" class="prpl-tooltip-action-text prpl-delete-term-action" role="button" '
+				. 'data-task-context="' . \esc_attr( \wp_json_encode( $task_data ) ) . '" '
+				. 'onclick="event.preventDefault(); document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover(); this.dispatchEvent(new CustomEvent(\'prpl-interactive-task-action\', { bubbles: true, detail: JSON.parse(this.dataset.taskContext) }));">'
+				. \esc_html__( 'Delete term', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;
+	}
+
+	/**
+	 * Print the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'Deleting this empty term will help keep your site organized. This action cannot be undone.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover form contents.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<div class="prpl-delete-term-info" style="margin-bottom: 15px; padding: 10px; background: #f0f0f1; border-radius: 4px;">
+			<p style="margin: 0;">
+				<strong><?php \esc_html_e( 'Term:', 'progress-planner' ); ?></strong>
+				<span id="prpl-delete-term-name"></span>
+			</p>
+			<p style="margin: 5px 0 0 0; font-size: 12px; color: #646970;">
+				<span id="prpl-delete-term-taxonomy"></span>
+			</p>
+		</div>
+		<input type="hidden" name="term_id" id="prpl-delete-term-id" value="">
+		<input type="hidden" name="taxonomy" id="prpl-delete-taxonomy" value="">
+		<button type="submit" class="prpl-button prpl-button-primary" id="prpl-delete-term-button">
+			<?php \esc_html_e( 'Delete term', 'progress-planner' ); ?>
+		</button>
+		<?php
+	}
+
+	/**
+	 * Handle the interactive task submit for term deletion.
+	 *
+	 * @return void
+	 */
+	public function handle_interactive_task_submit() {
+		// Check if the user has the necessary capabilities.
+		if ( ! \current_user_can( static::CAPABILITY ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to delete terms.', 'progress-planner' ) ] );
+		}
+
+		// Check the nonce.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
+
+		if ( ! isset( $_POST['term_id'] ) || ! isset( $_POST['taxonomy'] ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing term information.', 'progress-planner' ) ] );
+		}
+
+		$term_id  = \absint( \wp_unslash( $_POST['term_id'] ) );
+		$taxonomy = \sanitize_text_field( \wp_unslash( $_POST['taxonomy'] ) );
+
+		// Verify the term exists.
+		$term = \get_term( $term_id, $taxonomy );
+		if ( ! $term || \is_wp_error( $term ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Term not found.', 'progress-planner' ) ] );
+		}
+
+		// Delete the term.
+		$result = \wp_delete_term( $term_id, $taxonomy );
+
+		if ( \is_wp_error( $result ) ) {
+			\wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+		}
+
+		\wp_send_json_success( [ 'message' => \esc_html__( 'Term deleted successfully.', 'progress-planner' ) ] );
 	}
 }
