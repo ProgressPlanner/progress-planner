@@ -49,7 +49,6 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Admin\Widgets\ToDo get_admin__widgets__todo()
  * @method \Progress_Planner\Admin\Widgets\Monthly_Badges get_admin__widgets__monthly_badges()
  * @method \Progress_Planner\UI\Popover get_ui__popover()
- * @method \Progress_Planner\Admin\Widgets\Latest_Badge get_admin__widgets__latest_badge()
  * @method \Progress_Planner\Admin\Widgets\Content_Activity get_admin__widgets__content_activity()
  * @method \Progress_Planner\UI\Chart get_ui__chart()
  * @method \Progress_Planner\Activities\Content_Helpers get_activities__content_helpers()
