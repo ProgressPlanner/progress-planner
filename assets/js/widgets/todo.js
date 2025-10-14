@@ -45,28 +45,29 @@ const prplTodoWidget = {
 		// If preloaded tasks are available, inject them.
 		if ( 'undefined' !== typeof prplSuggestedTask.tasks ) {
 			// Inject the tasks.
-			if ( Object.keys( prplSuggestedTask.tasks.userTasks ).length ) {
-				Object.values( prplSuggestedTask.tasks.userTasks ).forEach(
-					( item ) => {
-						// Inject the items into the DOM.
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/suggestedTask/injectItem', {
-								detail: {
-									item,
-									insertPosition:
-										1 === item?.prpl_points
-											? 'afterbegin' // Add golden task to the start of the list.
-											: 'beforeend',
-									listId:
-										item.status === 'publish'
-											? 'todo-list'
-											: 'todo-list-completed',
-								},
-							} )
-						);
-						prplSuggestedTask.injectedItemIds.push( item.id );
-					}
-				);
+			if (
+				Array.isArray( prplSuggestedTask.tasks.userTasks ) &&
+				prplSuggestedTask.tasks.userTasks.length
+			) {
+				prplSuggestedTask.tasks.userTasks.forEach( ( item ) => {
+					// Inject the items into the DOM.
+					document.dispatchEvent(
+						new CustomEvent( 'prpl/suggestedTask/injectItem', {
+							detail: {
+								item,
+								insertPosition:
+									1 === item?.prpl_points
+										? 'afterbegin' // Add golden task to the start of the list.
+										: 'beforeend',
+								listId:
+									item.status === 'publish'
+										? 'todo-list'
+										: 'todo-list-completed',
+							},
+						} )
+					);
+					prplSuggestedTask.injectedItemIds.push( item.id );
+				} );
 			}
 			prplTodoWidget.removeLoadingItems();
 		} else {
