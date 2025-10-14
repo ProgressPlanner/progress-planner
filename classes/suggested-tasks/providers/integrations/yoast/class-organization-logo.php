@@ -98,6 +98,18 @@ class Organization_Logo extends Yoast_Provider {
 	 * @return bool
 	 */
 	public function should_add_task() {
+
+		// Check if the site logo is set, Yoast SEO uses it as a fallback.
+		$site_logo_id = \get_option( 'site_logo' );
+		if ( ! $site_logo_id ) {
+			$site_logo_id = \get_theme_mod( 'custom_logo', false );
+		}
+
+		// If the site logo is set, we don't need to add the task.
+		if ( (int) $site_logo_id ) {
+			return true;
+		}
+
 		// If the site is for a person, and the person logo is already set, we don't need to add the task.
 		if ( $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) === 'company' // @phpstan-ignore-line property.nonObject
 			&& $this->yoast_seo->helpers->options->get( 'company_logo' ) // @phpstan-ignore-line property.nonObject
