@@ -55,7 +55,7 @@ class Remove_Terms_Without_Posts extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = 60;
+	protected $priority = self::PRIORITY_LOW;
 
 	/**
 	 * The minimum number of posts.

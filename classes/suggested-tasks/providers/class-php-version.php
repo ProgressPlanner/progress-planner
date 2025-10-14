@@ -41,6 +41,13 @@ class Php_Version extends Tasks {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/update-php-version';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = self::PRIORITY_URGENT + 3;
+
+	/**
 	 * Get the title.
 	 *
 	 * @return string

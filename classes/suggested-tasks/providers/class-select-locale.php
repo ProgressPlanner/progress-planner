@@ -55,6 +55,13 @@ class Select_Locale extends Tasks_Interactive {
 	protected $is_dismissable = true;
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = self::PRIORITY_NORMAL - 4;
+
+	/**
 	 * Initialize the task.
 	 *
 	 * @return void

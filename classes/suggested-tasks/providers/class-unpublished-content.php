@@ -56,7 +56,7 @@ class Unpublished_Content extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = 30;
+	protected $priority = self::PRIORITY_HIGH + 10;
 
 	/**
 	 * Whether the task is dismissable.

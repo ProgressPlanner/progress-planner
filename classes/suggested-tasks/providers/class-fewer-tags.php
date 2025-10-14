@@ -42,7 +42,7 @@ class Fewer_Tags extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = 10;
+	protected $priority = self::PRIORITY_HIGH + 12;
 
 	/**
 	 * The plugin active state.

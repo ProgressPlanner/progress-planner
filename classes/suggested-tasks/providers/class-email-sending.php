@@ -52,7 +52,7 @@ class Email_Sending extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = 1;
+	protected $priority = self::PRIORITY_URGENT + 1;
 
 	/**
 	 * The email title.
