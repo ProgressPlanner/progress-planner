@@ -107,7 +107,7 @@ class Organization_Logo extends Yoast_Provider {
 
 		// If the site logo is set, we don't need to add the task.
 		if ( (int) $site_logo_id ) {
-			return true;
+			return false;
 		}
 
 		// If the site is for a person, and the person logo is already set, we don't need to add the task.
