@@ -1,4 +1,4 @@
-/* global progressPlannerAjaxRequest, progressPlanner, prplSuggestedTask, alert */
+/* global progressPlannerAjaxRequest, progressPlanner, prplSuggestedTask */
 /**
  * Remove Terms Without Posts recommendation.
  *
@@ -14,6 +14,7 @@
 		 */
 		constructor() {
 			this.popoverId = 'prpl-popover-remove-terms-without-posts';
+			this.popover = document.getElementById( this.popoverId );
 			this.currentTermData = null;
 			this.currentTaskElement = null;
 			this.init();
@@ -47,44 +48,59 @@
 		 */
 		handleInteractiveTaskAction( event ) {
 			this.currentTermData = {
-				termId: event.detail.target_term_id,
-				taxonomy: event.detail.target_taxonomy,
-				termName: event.detail.target_term_name,
+				termId: this.decodeHtmlEntities( event.detail.target_term_id ),
+				taxonomy: this.decodeHtmlEntities(
+					event.detail.target_taxonomy
+				),
+				termName: this.decodeHtmlEntities(
+					event.detail.target_term_name
+				),
 			};
 
 			// Store reference to the task element that triggered this.
 			this.currentTaskElement = event.target.closest(
 				'.prpl-suggested-task'
 			);
-
+			console.log( this.currentTermData );
+			console.log( event.detail.post_title );
 			// Update the popover content with the term data.
 			this.updatePopoverContent(
 				this.currentTermData.termId,
 				this.currentTermData.taxonomy,
-				this.currentTermData.termName
+				this.currentTermData.termName,
+				this.decodeHtmlEntities( event.detail.post_title )
 			);
 		}
 
 		/**
 		 * Update the popover content.
 		 *
-		 * @param {string} termId   The term ID.
-		 * @param {string} taxonomy The taxonomy.
-		 * @param {string} termName The term name.
+		 * @param {string} termId    The term ID.
+		 * @param {string} taxonomy  The taxonomy.
+		 * @param {string} termName  The term name.
+		 * @param {string} postTitle The post title.
 		 */
-		updatePopoverContent( termId, taxonomy, termName ) {
-			const termNameElement = document.getElementById(
-				'prpl-delete-term-name'
+		updatePopoverContent( termId, taxonomy, termName, postTitle ) {
+			const popoverTitle = this.popover.querySelector(
+				'.prpl-popover-title'
 			);
-			const taxonomyElement = document.getElementById(
-				'prpl-delete-term-taxonomy'
+
+			const termNameElement = this.popover.querySelector(
+				'#prpl-delete-term-name'
 			);
-			const termIdField = document.getElementById(
-				'prpl-delete-term-id'
+			const taxonomyElement = this.popover.querySelector(
+				'#prpl-delete-term-taxonomy'
 			);
-			const taxonomyField = document.getElementById(
-				'prpl-delete-taxonomy'
+			const termIdField = this.popover.querySelector(
+				'#prpl-delete-term-id'
 			);
+			const taxonomyField = this.popover.querySelector(
+				'#prpl-delete-taxonomy'
+			);
+
+			if ( popoverTitle ) {
+				popoverTitle.textContent = postTitle;
+			}
 
 			if ( termNameElement ) {
 				termNameElement.textContent = termName;
@@ -168,25 +184,23 @@
 					.catch( ( error ) => {
 						// eslint-disable-next-line no-console
 						console.error( 'Error deleting term:', error );
-
-						// Re-enable the button.
-						if ( submitButton ) {
-							submitButton.disabled = false;
-							submitButton.textContent =
-								submitButton.textContent.replace(
-									/^.*$/,
-									'Delete term'
-								);
-						}
-
-						// Show error message to user.
-						const errorMessage =
-							error?.message ||
-							error?.data?.message ||
-							'Failed to delete term. Please try again.';
-						alert( errorMessage );
 					} );
 			} );
+		}
+
+		/**
+		 * Decodes HTML entities in a string (like &quot;, &amp;, etc.)
+		 * @param {string} str The string to decode.
+		 * @return {string} The decoded string.
+		 */
+		decodeHtmlEntities( str ) {
+			if ( typeof str !== 'string' ) return str;
+			return str
+				.replace( /&quot;/g, '"' )
+				.replace( /&#039;/g, "'" )
+				.replace( /&lt;/g, '<' )
+				.replace( /&gt;/g, '>' )
+				.replace( /&amp;/g, '&' );
 		}
 	}
 
