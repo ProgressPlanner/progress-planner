@@ -386,6 +386,9 @@ class Enqueue {
 			'installed'                    => \esc_html__( 'Installed', 'progress-planner' ),
 			'activating'                   => \esc_html__( 'Activating...', 'progress-planner' ),
 			'activated'                    => \esc_html__( 'Activated', 'progress-planner' ),
+			'showAllRecommendations'       => \esc_html__( 'Show all recommendations', 'progress-planner' ),
+			'showFewerRecommendations'     => \esc_html__( 'Show fewer recommendations', 'progress-planner' ),
+			'loadingTasks'                 => \esc_html__( 'Loading tasks...', 'progress-planner' ),
 		];
 	}
 

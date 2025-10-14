@@ -1,10 +1,10 @@
-/* global prplSuggestedTask, prplTerms, prplTodoWidget */
+/* global prplSuggestedTask, prplTerms, prplTodoWidget, prplL10nStrings, history, prplDocumentReady */
 /*
  * Widget: Suggested Tasks
  *
  * A widget that displays a list of suggested tasks.
  *
- * Dependencies: wp-api, progress-planner/suggested-task, progress-planner/widgets/todo, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-tooltip, progress-planner/suggested-task-terms
+ * Dependencies: wp-api, progress-planner/document-ready, progress-planner/suggested-task, progress-planner/widgets/todo, progress-planner/celebrate, progress-planner/grid-masonry, progress-planner/web-components/prpl-tooltip, progress-planner/suggested-task-terms
  */
 /* eslint-disable camelcase */
 
@@ -172,6 +172,95 @@ const prplSuggestedTasksWidget = {
 prplTerms.getCollectionsPromises().then( () => {
 	prplSuggestedTasksWidget.populateList();
 	prplTodoWidget.populateList();
+} );
+
+/**
+ * Handle the "Show all recommendations" / "Show fewer recommendations" toggle.
+ */
+prplDocumentReady( () => {
+	const toggleButton = document.getElementById(
+		'prpl-toggle-all-recommendations'
+	);
+	if ( ! toggleButton ) {
+		return;
+	}
+
+	toggleButton.addEventListener( 'click', () => {
+		const showAll = toggleButton.dataset.showAll === '1';
+		const newPerPage = showAll ? 5 : 100;
+
+		// Update button text and state.
+		toggleButton.textContent = showAll
+			? prplL10nStrings.showAllRecommendations
+			: prplL10nStrings.showFewerRecommendations;
+		toggleButton.dataset.showAll = showAll ? '0' : '1';
+		toggleButton.disabled = true;
+
+		// Clear existing tasks.
+		const tasksList = document.getElementById(
+			'prpl-suggested-tasks-list'
+		);
+		tasksList.innerHTML = '';
+
+		// Clear the injected items tracking array so tasks can be fetched again.
+		prplSuggestedTask.injectedItemIds = [];
+
+		// Show loading message.
+		const loadingMessage = document.createElement( 'p' );
+		loadingMessage.className = 'prpl-suggested-tasks-loading';
+		loadingMessage.textContent = prplL10nStrings.loadingTasks;
+		tasksList.parentNode.insertBefore(
+			loadingMessage,
+			tasksList.nextSibling
+		);
+
+		// Fetch and inject new tasks.
+		prplSuggestedTask
+			.fetchItems( {
+				status: [ 'publish' ],
+				per_page: newPerPage,
+			} )
+			.then( ( data ) => {
+				// Filter out user tasks.
+				const nonUserTasks = data.filter(
+					( task ) => task.prpl_provider.slug !== 'user'
+				);
+				if ( nonUserTasks.length ) {
+					prplSuggestedTask.injectItems( nonUserTasks );
+				}
+
+				// Remove loading message.
+				loadingMessage?.remove();
+
+				// Re-enable button.
+				toggleButton.disabled = false;
+
+				// Trigger grid resize.
+				setTimeout( () => {
+					window.dispatchEvent(
+						new CustomEvent( 'prpl/grid/resize' )
+					);
+				}, 100 );
+			} )
+			.catch( () => {
+				// On error, restore button state.
+				toggleButton.textContent = showAll
+					? prplL10nStrings.showFewerRecommendations
+					: prplL10nStrings.showAllRecommendations;
+				toggleButton.dataset.showAll = showAll ? '1' : '0';
+				toggleButton.disabled = false;
+				loadingMessage?.remove();
+			} );
+
+		// Update URL without reload.
+		const url = new URL( window.location );
+		if ( showAll ) {
+			url.searchParams.delete( 'prpl_show_all_recommendations' );
+		} else {
+			url.searchParams.set( 'prpl_show_all_recommendations', '' );
+		}
+		history.pushState( {}, '', url );
+	} );
 } );
 
 /* eslint-enable camelcase */

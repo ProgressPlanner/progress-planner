@@ -40,16 +40,22 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	</p>
 	<?php // Check if the request URI contains the parameter 'prpl_show_all_recommendations'. ?>
 	<?php $prpl_request_uri = isset( $_SERVER['REQUEST_URI'] ) ? \sanitize_text_field( \wp_unslash( $_SERVER['REQUEST_URI'] ) ) : ''; ?>
+	<?php $prpl_show_all = false !== \strpos( $prpl_request_uri, 'prpl_show_all_recommendations' ); ?>
 	<p class="prpl-show-all-tasks">
-		<?php if ( false === \strpos( $prpl_request_uri, 'prpl_show_all_recommendations' ) ) : ?>
-			<a href="<?php echo \esc_url( \add_query_arg( 'prpl_show_all_recommendations', '', \admin_url( 'admin.php?page=progress-planner&prpl_show_all_recommendations' ) ) ); ?>">
-				<?php \esc_html_e( 'Show all recommendations', 'progress-planner' ); ?>
-			</a>
-		<?php else : ?>
-			<a href="<?php echo \esc_url( \remove_query_arg( 'prpl_show_all_recommendations', \admin_url( 'admin.php?page=progress-planner' ) ) ); ?>">
-				<?php \esc_html_e( 'Show fewer recommendations', 'progress-planner' ); ?>
-			</a>
-		<?php endif; ?>
+		<button
+			type="button"
+			id="prpl-toggle-all-recommendations"
+			class="prpl-toggle-all-recommendations-button"
+			data-show-all="<?php echo $prpl_show_all ? '1' : '0'; ?>"
+		>
+			<?php
+			if ( $prpl_show_all ) {
+				\esc_html_e( 'Show fewer recommendations', 'progress-planner' );
+			} else {
+				\esc_html_e( 'Show all recommendations', 'progress-planner' );
+			}
+			?>
+		</button>
 	</p>
 	<p class="prpl-no-suggested-tasks">
 		<?php \esc_html_e( 'You have completed all recommended tasks.', 'progress-planner' ); ?>
