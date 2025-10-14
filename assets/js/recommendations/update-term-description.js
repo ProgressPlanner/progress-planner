@@ -1,20 +1,19 @@
-/* global progressPlannerAjaxRequest, progressPlanner, prplSuggestedTask */
+/* global progressPlannerAjaxRequest, progressPlanner, prplSuggestedTask, alert */
 /**
- * Remove Terms Without Posts recommendation.
+ * Update Term Description recommendation.
  *
  * Dependencies: progress-planner/recommendations/interactive-task, progress-planner/ajax-request, progress-planner/suggested-task
  */
 ( function () {
 	/**
-	 * Remove Terms Without Posts class.
+	 * Update Term Description class.
 	 */
-	class RemoveTermsWithoutPosts {
+	class UpdateTermDescription {
 		/**
 		 * Constructor.
 		 */
 		constructor() {
-			this.popoverId = 'prpl-popover-remove-terms-without-posts';
-			this.popover = document.getElementById( this.popoverId );
+			this.popoverId = 'prpl-popover-update-term-description';
 			this.currentTermData = null;
 			this.currentTaskElement = null;
 			this.init();
@@ -36,7 +35,14 @@
 			document.addEventListener(
 				'prpl-interactive-task-action',
 				( event ) => {
-					this.handleInteractiveTaskAction( event );
+					// Only handle events for update term description tasks.
+					if (
+						event.target.classList.contains(
+							'prpl-update-term-description-action'
+						)
+					) {
+						this.handleInteractiveTaskAction( event );
+					}
 				}
 			);
 		}
@@ -47,60 +53,41 @@
 		 * @param {CustomEvent} event The custom event with task context data.
 		 */
 		handleInteractiveTaskAction( event ) {
-			this.currentTermData = {
-				termId: this.decodeHtmlEntities( event.detail.target_term_id ),
-				taxonomy: this.decodeHtmlEntities(
-					event.detail.target_taxonomy
-				),
-				termName: this.decodeHtmlEntities(
-					event.detail.target_term_name
-				),
-			};
+			const { termId, taxonomy, termName } = event.detail;
+			this.currentTermData = { termId, taxonomy, termName };
 
 			// Store reference to the task element that triggered this.
 			this.currentTaskElement = event.target.closest(
 				'.prpl-suggested-task'
 			);
-			console.log( this.currentTermData );
-			console.log( event.detail.post_title );
+
 			// Update the popover content with the term data.
-			this.updatePopoverContent(
-				this.currentTermData.termId,
-				this.currentTermData.taxonomy,
-				this.currentTermData.termName,
-				this.decodeHtmlEntities( event.detail.post_title )
-			);
+			this.updatePopoverContent( termId, taxonomy, termName );
 		}
 
 		/**
 		 * Update the popover content.
 		 *
-		 * @param {string} termId    The term ID.
-		 * @param {string} taxonomy  The taxonomy.
-		 * @param {string} termName  The term name.
-		 * @param {string} postTitle The post title.
+		 * @param {string} termId   The term ID.
+		 * @param {string} taxonomy The taxonomy.
+		 * @param {string} termName The term name.
 		 */
-		updatePopoverContent( termId, taxonomy, termName, postTitle ) {
-			const popoverTitle = this.popover.querySelector(
-				'.prpl-popover-title'
+		updatePopoverContent( termId, taxonomy, termName ) {
+			const termNameElement = document.getElementById(
+				'prpl-update-term-name'
 			);
-
-			const termNameElement = this.popover.querySelector(
-				'#prpl-delete-term-name'
+			const taxonomyElement = document.getElementById(
+				'prpl-update-term-taxonomy'
 			);
-			const taxonomyElement = this.popover.querySelector(
-				'#prpl-delete-term-taxonomy'
+			const termIdField = document.getElementById(
+				'prpl-update-term-id'
 			);
-			const termIdField = this.popover.querySelector(
-				'#prpl-delete-term-id'
+			const taxonomyField = document.getElementById(
+				'prpl-update-taxonomy'
 			);
-			const taxonomyField = this.popover.querySelector(
-				'#prpl-delete-taxonomy'
+			const descriptionField = document.getElementById(
+				'prpl-term-description'
 			);
-
-			if ( popoverTitle ) {
-				popoverTitle.textContent = postTitle;
-			}
 
 			if ( termNameElement ) {
 				termNameElement.textContent = termName;
@@ -116,6 +103,11 @@
 
 			if ( taxonomyField ) {
 				taxonomyField.value = taxonomy;
+			}
+
+			// Clear the description field.
+			if ( descriptionField ) {
+				descriptionField.value = '';
 			}
 		}
 
@@ -139,8 +131,16 @@
 				}
 
 				const formData = new FormData( formElement );
+
+				// Validate description is not empty.
+				const description = formData.get( 'description' );
+				if ( ! description || description.trim() === '' ) {
+					alert( 'Please enter a description.' ); // eslint-disable-line no-alert
+					return;
+				}
+
 				const submitButton = document.getElementById(
-					'prpl-delete-term-button'
+					'prpl-update-term-description-button'
 				);
 
 				// Disable button and show loading state.
@@ -148,17 +148,18 @@
 					submitButton.disabled = true;
 					submitButton.textContent = submitButton.textContent.replace(
 						/^.*$/,
-						'Deleting...'
+						'Saving...'
 					);
 				}
 
 				progressPlannerAjaxRequest( {
 					url: progressPlanner.ajaxUrl,
 					data: {
-						action: 'prpl_interactive_task_submit_remove-terms-without-posts',
+						action: 'prpl_interactive_task_submit_update-term-description',
 						_ajax_nonce: progressPlanner.nonce,
 						term_id: formData.get( 'term_id' ),
 						taxonomy: formData.get( 'taxonomy' ),
+						description: formData.get( 'description' ),
 					},
 				} )
 					.then( () => {
@@ -183,30 +184,25 @@
 					} )
 					.catch( ( error ) => {
 						// eslint-disable-next-line no-console
-						console.error( 'Error deleting term:', error );
+						console.error(
+							'Error updating term description:',
+							error
+						);
+
+						// Re-enable the button.
+						if ( submitButton ) {
+							submitButton.disabled = false;
+							submitButton.textContent =
+								submitButton.textContent.replace(
+									/^.*$/,
+									'Save description'
+								);
+						}
 					} );
 			} );
-		}
-
-		/**
-		 * Decodes HTML entities in a string (like &quot;, &amp;, etc.)
-		 * @param {string} str The string to decode.
-		 * @return {string} The decoded string.
-		 */
-		decodeHtmlEntities( str ) {
-			if ( typeof str !== 'string' ) {
-				return str;
-			}
-
-			return str
-				.replace( /&quot;/g, '"' )
-				.replace( /&#039;/g, "'" )
-				.replace( /&lt;/g, '<' )
-				.replace( /&gt;/g, '>' )
-				.replace( /&amp;/g, '&' );
 		}
 	}
 
 	// Initialize the component.
-	new RemoveTermsWithoutPosts();
+	new UpdateTermDescription();
 } )();

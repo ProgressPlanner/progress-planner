@@ -153,7 +153,6 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 	 */
 	protected function get_title_with_data( $task_data = [] ) {
 
-		// TODO: This is a temporary fix to avoid errors.
 		if ( ! isset( $task_data['target_term_id'] ) || ! isset( $task_data['target_taxonomy'] ) ) {
 			return '';
 		}
@@ -177,7 +176,6 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 	 */
 	protected function get_url_with_data( $task_data = [] ) {
 
-		// TODO: This is a temporary fix to avoid errors.
 		if ( ! isset( $task_data['target_term_id'] ) || ! isset( $task_data['target_taxonomy'] ) ) {
 			return '';
 		}
