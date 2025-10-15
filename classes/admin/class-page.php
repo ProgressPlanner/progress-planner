@@ -233,11 +233,6 @@ class Page {
 		$total_points     = 0;
 		$completed_points = 0;
 		foreach ( $tasks_providers as $provider ) {
-			// Only include providers that extend Yoast_Provider (these were previously categorized as 'configuration').
-			if ( ! $provider instanceof \Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Yoast_Provider ) {
-				continue;
-			}
-
 			$link_setting = $provider->get_link_setting();
 			if ( ! isset( $link_setting['hook'] ) ||
 				$hook !== $link_setting['hook']
