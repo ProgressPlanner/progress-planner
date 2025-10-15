@@ -112,6 +112,11 @@ class User extends Tasks {
 
 		// Loop through all tasks in the flat array.
 		foreach ( $tasks as $key => $task ) {
+			// Only process user provider tasks.
+			if ( ! isset( $task['prpl_provider']->slug ) || $task['prpl_provider']->slug !== self::PROVIDER_ID ) {
+				continue;
+			}
+
 			if ( \in_array( $task['id'], $modified_tasks, true ) ) {
 				continue;
 			}
