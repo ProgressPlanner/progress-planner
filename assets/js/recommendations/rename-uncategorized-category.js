@@ -1,7 +1,7 @@
-/* global prplInteractiveTaskFormListener, progressPlanner */
+/* global prplInteractiveTaskFormListener, progressPlanner, prplDocumentReady */
 
 /*
- * Set the site date format.
+ * Rename the Uncategorized category.
  *
  * Dependencies: progress-planner/recommendations/interactive-task
  */
@@ -30,4 +30,39 @@ prplInteractiveTaskFormListener.customSubmit( {
 			} ),
 		} );
 	},
+} );
+
+prplDocumentReady( () => {
+	const name = document.querySelector(
+		'#prpl-popover-rename-uncategorized-category input[name="prpl_uncategorized_category_name"]'
+	);
+	const slug = document.querySelector(
+		'#prpl-popover-rename-uncategorized-category input[name="prpl_uncategorized_category_slug"]'
+	);
+
+	if ( ! name || ! slug ) {
+		return;
+	}
+
+	// Function to check if both fields are valid and toggle button state
+	const toggleSubmitButton = () => {
+		const submitButton = document.querySelector(
+			'#prpl-popover-rename-uncategorized-category button[type="submit"]'
+		);
+		const isNameValid =
+			name.value &&
+			name.value.toLowerCase() !== name.placeholder.toLowerCase();
+		const isSlugValid =
+			slug.value &&
+			slug.value.toLowerCase() !== slug.placeholder.toLowerCase();
+
+		submitButton.disabled = ! ( isNameValid && isSlugValid );
+	};
+
+	// If there is no name or slug or it is the same as placeholder the submit button should be disabled.
+	toggleSubmitButton();
+
+	// Add event listeners to both fields
+	name.addEventListener( 'input', toggleSubmitButton );
+	slug.addEventListener( 'input', toggleSubmitButton );
 } );

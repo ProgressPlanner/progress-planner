@@ -129,13 +129,13 @@ class Rename_Uncategorized_Category extends Tasks_Interactive {
 			<p style="margin-bottom: 0.5rem;">
 				<?php \esc_html_e( 'New name for the Uncategorized category', 'progress-planner' ); ?>
 			</p>
-			<input type="text" name="prpl_uncategorized_category_name" id="prpl_uncategorized_category_name" value="" placeholder="<?php echo \esc_attr( $uncategorized_category->name ); ?>" class="regular-text" />
+			<input type="text" name="prpl_uncategorized_category_name" id="prpl_uncategorized_category_name" value="" placeholder="<?php echo \esc_attr( $uncategorized_category->name ); ?>" />
 		</label>
 		<label style="display: block; margin-top: 1rem;">
 			<p style="margin-bottom: 0.5rem;">
 				<?php \esc_html_e( 'New slug for the Uncategorized category', 'progress-planner' ); ?>
 			</p>
-			<input type="text" name="prpl_uncategorized_category_slug" id="prpl_uncategorized_category_slug" value="" placeholder="<?php echo \esc_attr( $uncategorized_category->slug ); ?>" class="regular-text" />
+			<input type="text" name="prpl_uncategorized_category_slug" id="prpl_uncategorized_category_slug" value="" placeholder="<?php echo \esc_attr( $uncategorized_category->slug ); ?>" />
 		</label>
 		<button type="submit" class="prpl-button prpl-button-primary">
 			<?php \esc_html_e( 'Rename the Uncategorized category', 'progress-planner' ); ?>
@@ -180,27 +180,28 @@ class Rename_Uncategorized_Category extends Tasks_Interactive {
 		$default_category_name = \__( 'Uncategorized' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 		$default_category_slug = \sanitize_title( \_x( 'Uncategorized', 'Default category slug' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 
-		if ( $uncategorized_category_name === $default_category_name || $uncategorized_category_slug === $default_category_slug ) {
+		$strtolower = function_exists( 'mb_strtolower' ) ? 'mb_strtolower' : 'strtolower';
+		if ( $strtolower( $uncategorized_category_name ) === $strtolower( $default_category_name ) || $strtolower( $uncategorized_category_slug ) === $strtolower( $default_category_slug ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'You cannot use the default name or slug for the Uncategorized category.', 'progress-planner' ) ] );
 		}
 
 		$uncategorized_category_id = $this->get_data_collector()->collect();
 
 		$term = \get_term_by( 'id', $uncategorized_category_id, 'category' );
-		if ( $term ) {
-			\wp_update_term(
-				$term->term_id,
-				'category',
-				[
-					'name' => $uncategorized_category_name,
-					'slug' => $uncategorized_category_slug,
-				]
-			);
-
-			\wp_send_json_success( [ 'message' => \esc_html__( 'Uncategorized category updated.', 'progress-planner' ) ] );
+		if ( ! $term ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Uncategorized category not found.', 'progress-planner' ) ] );
 		}
 
-		\wp_send_json_error( [ 'message' => \esc_html__( 'Uncategorized category not found.', 'progress-planner' ) ] );
+		\wp_update_term(
+			$term->term_id,
+			'category',
+			[
+				'name' => $uncategorized_category_name,
+				'slug' => $uncategorized_category_slug,
+			]
+		);
+
+		\wp_send_json_success( [ 'message' => \esc_html__( 'Uncategorized category updated.', 'progress-planner' ) ] );
 	}
 
 	/**
