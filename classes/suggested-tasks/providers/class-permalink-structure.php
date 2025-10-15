@@ -112,7 +112,7 @@ class Permalink_Structure extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'By default, WordPress uses URLs with question marks and post IDs. This is not ideal for SEO and user experience. Choose a more readable permalink structure for your site.', 'progress-planner' );
+		\esc_html_e( 'On install, WordPress sets the permalink structure to a format that is not SEO-friendly. We recommend changing it.', 'progress-planner' );
 		echo '</p>';
 	}
 
