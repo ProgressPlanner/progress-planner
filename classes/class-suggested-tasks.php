@@ -301,12 +301,12 @@ class Suggested_Tasks {
 		);
 
 		$rest_meta_fields = [
-			'prpl_url'    => [
+			'prpl_url'   => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'menu_order'  => [
+			'menu_order' => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
