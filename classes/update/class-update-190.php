@@ -92,8 +92,8 @@ class Update_190 {
 		// Remove term relationships.
 		$placeholders = \implode( ',', \array_fill( 0, \count( $term_taxonomy_ids ), '%d' ) );
 		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				"DELETE FROM %i WHERE term_taxonomy_id IN ($placeholders)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $placeholders contains format specifiers
+			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $placeholders contains format specifiers.
+				"DELETE FROM %i WHERE term_taxonomy_id IN ($placeholders)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 				$wpdb->term_relationships, // @phpstan-ignore-line property.nonObject
 				...$term_taxonomy_ids
 			)
@@ -119,8 +119,8 @@ class Update_190 {
 		if ( ! empty( $term_ids ) ) {
 			$term_placeholders = \implode( ',', \array_fill( 0, \count( $term_ids ), '%d' ) );
 			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->prepare(
-					"DELETE FROM %i WHERE term_id IN ($term_placeholders) AND term_id NOT IN (SELECT DISTINCT term_id FROM %i)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $term_placeholders contains format specifiers
+				$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $term_placeholders contains format specifiers.
+					"DELETE FROM %i WHERE term_id IN ($term_placeholders) AND term_id NOT IN (SELECT DISTINCT term_id FROM %i)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 					$wpdb->terms, // @phpstan-ignore-line property.nonObject
 					$wpdb->term_taxonomy, // @phpstan-ignore-line property.nonObject
 					...$term_ids
@@ -132,8 +132,8 @@ class Update_190 {
 		if ( ! empty( $term_ids ) ) {
 			$term_placeholders = \implode( ',', \array_fill( 0, \count( $term_ids ), '%d' ) );
 			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->prepare(
-					"DELETE FROM %i WHERE term_id IN ($term_placeholders) AND term_id NOT IN (SELECT DISTINCT term_id FROM %i)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $term_placeholders contains format specifiers
+				$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $term_placeholders contains format specifiers.
+					"DELETE FROM %i WHERE term_id IN ($term_placeholders) AND term_id NOT IN (SELECT DISTINCT term_id FROM %i)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
 					$wpdb->termmeta, // @phpstan-ignore-line property.nonObject
 					$wpdb->terms, // @phpstan-ignore-line property.nonObject
 					...$term_ids
