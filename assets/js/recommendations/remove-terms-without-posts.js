@@ -14,10 +14,32 @@
 		 */
 		constructor() {
 			this.popoverId = 'prpl-popover-remove-terms-without-posts';
-			this.popover = document.getElementById( this.popoverId );
 			this.currentTermData = null;
 			this.currentTaskElement = null;
+			this.elements = this.getElements();
 			this.init();
+		}
+
+		/**
+		 * Get all DOM elements.
+		 *
+		 * @return {Object} Object containing all DOM elements.
+		 */
+		getElements() {
+			const popover = document.getElementById( this.popoverId );
+			return {
+				popover,
+				popoverTitle: popover.querySelector( '.prpl-popover-title' ),
+
+				termNameElement: popover.querySelector(
+					'#prpl-delete-term-name'
+				),
+				taxonomyElement: popover.querySelector(
+					'#prpl-delete-term-taxonomy'
+				),
+				termIdField: popover.querySelector( '#prpl-delete-term-id' ),
+				taxonomyField: popover.querySelector( '#prpl-delete-taxonomy' ),
+			};
 		}
 
 		/**
@@ -80,41 +102,24 @@
 		 * @param {string} postTitle The post title.
 		 */
 		updatePopoverContent( termId, taxonomy, termName, postTitle ) {
-			const popoverTitle = this.popover.querySelector(
-				'.prpl-popover-title'
-			);
-
-			const termNameElement = this.popover.querySelector(
-				'#prpl-delete-term-name'
-			);
-			const taxonomyElement = this.popover.querySelector(
-				'#prpl-delete-term-taxonomy'
-			);
-			const termIdField = this.popover.querySelector(
-				'#prpl-delete-term-id'
-			);
-			const taxonomyField = this.popover.querySelector(
-				'#prpl-delete-taxonomy'
-			);
-
-			if ( popoverTitle ) {
-				popoverTitle.textContent = postTitle;
+			if ( this.elements.popoverTitle ) {
+				this.elements.popoverTitle.textContent = postTitle;
 			}
 
-			if ( termNameElement ) {
-				termNameElement.textContent = termName;
+			if ( this.elements.termNameElement ) {
+				this.elements.termNameElement.textContent = termName;
 			}
 
-			if ( taxonomyElement ) {
-				taxonomyElement.textContent = taxonomy;
+			if ( this.elements.taxonomyElement ) {
+				this.elements.taxonomyElement.textContent = taxonomy;
 			}
 
-			if ( termIdField ) {
-				termIdField.value = termId;
+			if ( this.elements.termIdField ) {
+				this.elements.termIdField.value = termId;
 			}
 
-			if ( taxonomyField ) {
-				taxonomyField.value = taxonomy;
+			if ( this.elements.taxonomyField ) {
+				this.elements.taxonomyField.value = taxonomy;
 			}
 		}
 
@@ -122,9 +127,7 @@
 		 * Initialize the form listener.
 		 */
 		initFormListener() {
-			const formElement = document.querySelector(
-				`#${ this.popoverId } form`
-			);
+			const formElement = this.elements.popover.querySelector( `form` );
 
 			if ( ! formElement ) {
 				return;
@@ -137,20 +140,6 @@
 					return;
 				}
 
-				const formData = new FormData( formElement );
-				const submitButton = document.getElementById(
-					'prpl-delete-term-button'
-				);
-
-				// Disable button and show loading state.
-				if ( submitButton ) {
-					submitButton.disabled = true;
-					submitButton.textContent = submitButton.textContent.replace(
-						/^.*$/,
-						'Deleting...'
-					);
-				}
-
 				fetch( progressPlanner.ajaxUrl, {
 					method: 'POST',
 					headers: {
@@ -159,8 +148,8 @@
 					body: new URLSearchParams( {
 						action: 'prpl_interactive_task_submit_remove-terms-without-posts',
 						_ajax_nonce: progressPlanner.nonce,
-						term_id: formData.get( 'term_id' ),
-						taxonomy: formData.get( 'taxonomy' ),
+						term_id: this.currentTermData.termId,
+						taxonomy: this.currentTermData.taxonomy,
 					} ),
 				} )
 					.then( () => {

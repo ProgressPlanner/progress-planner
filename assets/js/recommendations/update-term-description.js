@@ -1,4 +1,4 @@
-/* global progressPlanner, prplSuggestedTask, alert */
+/* global progressPlanner, prplSuggestedTask */
 /**
  * Update Term Description recommendation.
  *
@@ -17,7 +17,34 @@
 			this.popover = document.getElementById( this.popoverId );
 			this.currentTermData = null;
 			this.currentTaskElement = null;
+			this.elements = this.getElements();
 			this.init();
+		}
+
+		/**
+		 * Get all DOM elements.
+		 *
+		 * @return {Object} Object containing all DOM elements.
+		 */
+		getElements() {
+			const popover = document.getElementById( this.popoverId );
+
+			return {
+				popover,
+				popoverTitle: popover.querySelector( '.prpl-popover-title' ),
+
+				termNameElement: popover.querySelector(
+					'#prpl-update-term-name'
+				),
+				taxonomyElement: popover.querySelector(
+					'#prpl-update-term-taxonomy'
+				),
+				termIdField: popover.querySelector( '#prpl-update-term-id' ),
+				taxonomyField: popover.querySelector( '#prpl-update-taxonomy' ),
+				descriptionField: popover.querySelector(
+					'#prpl-term-description'
+				),
+			};
 		}
 
 		/**
@@ -80,49 +107,29 @@
 		 * @param {string} postTitle The post title.
 		 */
 		updatePopoverContent( termId, taxonomy, termName, postTitle ) {
-			const popoverTitle = this.popover.querySelector(
-				'.prpl-popover-title'
-			);
-
-			const termNameElement = this.popover.querySelector(
-				'#prpl-update-term-name'
-			);
-			const taxonomyElement = this.popover.querySelector(
-				'#prpl-update-term-taxonomy'
-			);
-			const termIdField = this.popover.querySelector(
-				'#prpl-update-term-id'
-			);
-			const taxonomyField = this.popover.querySelector(
-				'#prpl-update-taxonomy'
-			);
-			const descriptionField = this.popover.querySelector(
-				'#prpl-term-description'
-			);
-
-			if ( popoverTitle ) {
-				popoverTitle.textContent = postTitle;
+			if ( this.elements.popoverTitle ) {
+				this.elements.popoverTitle.textContent = postTitle;
 			}
 
-			if ( termNameElement ) {
-				termNameElement.textContent = termName;
+			if ( this.elements.termNameElement ) {
+				this.elements.termNameElement.textContent = termName;
 			}
 
-			if ( taxonomyElement ) {
-				taxonomyElement.textContent = taxonomy;
+			if ( this.elements.taxonomyElement ) {
+				this.elements.taxonomyElement.textContent = taxonomy;
 			}
 
-			if ( termIdField ) {
-				termIdField.value = termId;
+			if ( this.elements.termIdField ) {
+				this.elements.termIdField.value = termId;
 			}
 
-			if ( taxonomyField ) {
-				taxonomyField.value = taxonomy;
+			if ( this.elements.taxonomyField ) {
+				this.elements.taxonomyField.value = taxonomy;
 			}
 
 			// Clear the description field.
-			if ( descriptionField ) {
-				descriptionField.value = '';
+			if ( this.elements.descriptionField ) {
+				this.elements.descriptionField.value = '';
 			}
 		}
 
@@ -164,24 +171,6 @@
 					return;
 				}
 
-				const formData = new FormData( formElement );
-
-				// Validate description is not empty.
-				const description = formData.get( 'description' );
-				if ( ! description || description.trim() === '' ) {
-					alert( 'Please enter a description.' ); // eslint-disable-line no-alert
-					return;
-				}
-
-				// Disable button and show loading state.
-				if ( submitButton ) {
-					submitButton.disabled = true;
-					submitButton.textContent = submitButton.textContent.replace(
-						/^.*$/,
-						'Saving...'
-					);
-				}
-
 				fetch( progressPlanner.ajaxUrl, {
 					method: 'POST',
 					headers: {
@@ -190,9 +179,9 @@
 					body: new URLSearchParams( {
 						action: 'prpl_interactive_task_submit_update-term-description',
 						_ajax_nonce: progressPlanner.nonce,
-						term_id: formData.get( 'term_id' ),
-						taxonomy: formData.get( 'taxonomy' ),
-						description: formData.get( 'description' ),
+						term_id: this.currentTermData.termId,
+						taxonomy: this.currentTermData.taxonomy,
+						description: this.elements.descriptionField.value,
 					} ),
 				} )
 					.then( () => {
@@ -221,16 +210,6 @@
 							'Error updating term description:',
 							error
 						);
-
-						// Re-enable the button.
-						if ( submitButton ) {
-							submitButton.disabled = false;
-							submitButton.textContent =
-								submitButton.textContent.replace(
-									/^.*$/,
-									'Save description'
-								);
-						}
 					} );
 			} );
 		}
