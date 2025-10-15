@@ -333,9 +333,9 @@ class Update_Term_Description extends Tasks_Interactive {
 		$actions[] = [
 			'priority' => 10,
 			'html'     => sprintf(
-				'<a href="#" class="prpl-tooltip-action-text prpl-delete-term-action" role="button"
+				'<a href="#" class="prpl-tooltip-action-text prpl-update-term-description-action" role="button"
 					data-task-context=\'%s\'
-					onclick="event.preventDefault(); document.getElementById(\'prpl-popover-%s\')?.showPopover(); this.dispatchEvent(new CustomEvent(\'prpl-interactive-task-action\', { bubbles: true, detail: JSON.parse(this.dataset.taskContext) }));">
+					onclick="event.preventDefault(); document.getElementById(\'prpl-popover-%s\')?.showPopover(); this.dispatchEvent(new CustomEvent(\'prpl-interactive-task-action-update-term-description\', { bubbles: true, detail: JSON.parse(this.dataset.taskContext) }));">
 					%s
 				</a>',
 				htmlspecialchars(

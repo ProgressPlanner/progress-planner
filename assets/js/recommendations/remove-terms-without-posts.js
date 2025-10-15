@@ -1,4 +1,4 @@
-/* global progressPlannerAjaxRequest, progressPlanner, prplSuggestedTask */
+/* global progressPlanner, prplSuggestedTask */
 /**
  * Remove Terms Without Posts recommendation.
  *
@@ -34,7 +34,7 @@
 		bindEvents() {
 			// Listen for the generic interactive task action event.
 			document.addEventListener(
-				'prpl-interactive-task-action',
+				'prpl-interactive-task-action-remove-terms-without-posts',
 				( event ) => {
 					this.handleInteractiveTaskAction( event );
 				}
@@ -151,14 +151,17 @@
 					);
 				}
 
-				progressPlannerAjaxRequest( {
-					url: progressPlanner.ajaxUrl,
-					data: {
+				fetch( progressPlanner.ajaxUrl, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+					body: new URLSearchParams( {
 						action: 'prpl_interactive_task_submit_remove-terms-without-posts',
 						_ajax_nonce: progressPlanner.nonce,
 						term_id: formData.get( 'term_id' ),
 						taxonomy: formData.get( 'taxonomy' ),
-					},
+					} ),
 				} )
 					.then( () => {
 						if ( ! this.currentTaskElement ) {

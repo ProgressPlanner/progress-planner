@@ -1,4 +1,4 @@
-/* global progressPlannerAjaxRequest, progressPlanner, prplSuggestedTask, alert */
+/* global progressPlanner, prplSuggestedTask, alert */
 /**
  * Update Term Description recommendation.
  *
@@ -34,7 +34,7 @@
 		bindEvents() {
 			// Listen for the generic interactive task action event.
 			document.addEventListener(
-				'prpl-interactive-task-action',
+				'prpl-interactive-task-action-update-term-description',
 				( event ) => {
 					this.handleInteractiveTaskAction( event );
 				}
@@ -138,6 +138,25 @@
 				return;
 			}
 
+			// Submit button should be disabled if description is empty.
+			const submitButton = document.getElementById(
+				'prpl-update-term-description-button'
+			);
+
+			if ( submitButton ) {
+				submitButton.disabled = true;
+			}
+
+			// Add event listener to description field.
+			const descriptionField = formElement.querySelector(
+				'#prpl-term-description'
+			);
+			if ( descriptionField ) {
+				descriptionField.addEventListener( 'input', () => {
+					submitButton.disabled = ! descriptionField.value.trim();
+				} );
+			}
+
 			formElement.addEventListener( 'submit', ( event ) => {
 				event.preventDefault();
 
@@ -154,10 +173,6 @@
 					return;
 				}
 
-				const submitButton = document.getElementById(
-					'prpl-update-term-description-button'
-				);
-
 				// Disable button and show loading state.
 				if ( submitButton ) {
 					submitButton.disabled = true;
@@ -167,15 +182,18 @@
 					);
 				}
 
-				progressPlannerAjaxRequest( {
-					url: progressPlanner.ajaxUrl,
-					data: {
+				fetch( progressPlanner.ajaxUrl, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/x-www-form-urlencoded',
+					},
+					body: new URLSearchParams( {
 						action: 'prpl_interactive_task_submit_update-term-description',
 						_ajax_nonce: progressPlanner.nonce,
 						term_id: formData.get( 'term_id' ),
 						taxonomy: formData.get( 'taxonomy' ),
 						description: formData.get( 'description' ),
-					},
+					} ),
 				} )
 					.then( () => {
 						if ( ! this.currentTaskElement ) {

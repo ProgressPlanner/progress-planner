@@ -187,8 +187,8 @@ class Rename_Uncategorized_Category extends Tasks_Interactive {
 
 		$uncategorized_category_id = $this->get_data_collector()->collect();
 
-		$term = \get_term_by( 'id', $uncategorized_category_id, 'category' );
-		if ( ! $term ) {
+		$term = \get_term( $uncategorized_category_id, 'category' );
+		if ( ! $term || \is_wp_error( $term ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Uncategorized category not found.', 'progress-planner' ) ] );
 		}
 
