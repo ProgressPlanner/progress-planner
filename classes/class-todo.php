@@ -57,7 +57,7 @@ class Todo {
 		foreach ( $pending_items as $task ) {
 			\progress_planner()->get_suggested_tasks_db()->update_recommendation(
 				$task->ID,
-				[ 'points' => $task->ID === $pending_items[0]->ID ? 1 : 0 ]
+				[ 'post_excerpt' => $task->ID === $pending_items[0]->ID ? 'GOLDEN' : '' ]
 			);
 		}
 

@@ -235,6 +235,16 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
 		}
 
+		$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task->get_provider_id() );
+
+		if ( ! $provider ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Provider not found.', 'progress-planner' ) ] );
+		}
+
+		if ( ! $provider->capability_required() ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to complete this task.', 'progress-planner' ) ] );
+		}
+
 		$updated = false;
 
 		switch ( $action ) {
@@ -281,7 +291,7 @@ class Suggested_Tasks {
 				'show_in_admin_bar'     => \apply_filters( 'progress_planner_tasks_show_ui', false ),
 				'show_in_rest'          => true,
 				'rest_controller_class' => \Progress_Planner\Rest\Recommendations_Controller::class,
-				'supports'              => [ 'title', 'editor', 'author', 'custom-fields', 'page-attributes' ],
+				'supports'              => [ 'title', 'excerpt', 'editor', 'author', 'custom-fields', 'page-attributes' ],
 				'rewrite'               => false,
 				'menu_icon'             => 'dashicons-admin-tools',
 				'menu_position'         => 5,
@@ -291,11 +301,6 @@ class Suggested_Tasks {
 		);
 
 		$rest_meta_fields = [
-			'prpl_points' => [
-				'type'         => 'number',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
 			'prpl_url'    => [
 				'type'         => 'string',
 				'single'       => true,
@@ -441,8 +446,8 @@ class Suggested_Tasks {
 			 * Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
 			 * Those are tasks which are completed by toggling an option, so non repetitive & not user tasks.
 			 */
-			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $response->data['slug'] ) ) ) {
-				$response->data['meta']['prpl_points'] = 0;
+			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['slug'] ) ) {
+				$response->data['prpl_points'] = 0;
 			}
 
 			// This has to be the last item to be added because actions use data from previous items.
@@ -510,7 +515,15 @@ class Suggested_Tasks {
 			}
 		}
 
-		return $tasks;
+		/**
+		 * Allow other classes to modify the tasks in REST format.
+		 *
+		 * @param array $tasks The tasks.
+		 * @param array $args  The arguments.
+		 *
+		 * @return array
+		 */
+		return \apply_filters( 'progress_planner_suggested_tasks_in_rest_format', $tasks, $args );
 	}
 
 	/**

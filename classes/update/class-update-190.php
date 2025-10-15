@@ -24,6 +24,9 @@ class Update_190 {
 	public function run() {
 		// Delete the 'progress_planner_pro_license_key' entry from wp_options table.
 		$this->migrate_recommendations_slugs();
+
+		// Migrate the golden task.
+		$this->migrate_golden_todo_task();
 	}
 
 	/**
@@ -60,6 +63,35 @@ class Update_190 {
 					'post_name' => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $prpl_task_id ),
 				]
 			);
+		}
+	}
+
+	/**
+	 * Migrate the golden task.
+	 *
+	 * @return void
+	 */
+	private function migrate_golden_todo_task() {
+		// Get all user tasks.
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => 'user' ] );
+
+		// Loop through tasks and update the `post_excerpt` if the `prpl_points` meta is set to 1.
+		global $wpdb;
+		foreach ( $tasks as $task ) {
+			// Get the `prpl_points` meta.
+			// We'll be getting the value directly from the database since the post-meta is no longer used.
+			$points = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->prepare(
+					"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = 'prpl_points'", // @phpstan-ignore-line property.nonObject
+					$task->ID
+				)
+			);
+			if ( 1 === (int) $points ) {
+				\progress_planner()->get_suggested_tasks_db()->update_recommendation(
+					$task->ID,
+					[ 'post_excerpt' => 'GOLDEN' ]
+				);
+			}
 		}
 	}
 }
