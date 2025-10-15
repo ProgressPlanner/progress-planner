@@ -441,6 +441,7 @@ class Suggested_Tasks {
 				: '';
 
 			$response->data['prpl_popover_id'] = $provider->get_popover_id();
+			$response->data['prpl_points']     = $provider->get_points();
 
 			/*
 			 * Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
