@@ -182,7 +182,13 @@ class Permalink_Structure extends Tasks_Interactive {
 				<?php /* Custom permalink structure. */ ?>
 				<div class="prpl-radio-wrapper">
 					<label class="prpl-custom-radio">
-						<input type="radio" name="prpl_permalink_structure" id="prpl_permalink_structure_custom_radio" value="custom" <?php \checked( $is_custom ); ?>/>
+						<input
+							id="prpl_permalink_structure_custom_radio"
+							name="prpl_permalink_structure"
+							type="radio"
+							value="custom"
+							<?php \checked( $is_custom ); ?>
+						/>
 						<span class="prpl-custom-control"></span> <span>
 							<?php
 							\printf(
@@ -201,8 +207,8 @@ class Permalink_Structure extends Tasks_Interactive {
 					\esc_html_e( 'Custom permalink structure:', 'progress-planner' );
 					?>
 				</label>
-				<div style="display: flex; gap: 0.5rem;">
-					<code style="display: flex; align-items: center;"><?php echo \esc_html( $url_base ); ?></code>
+				<div style="display: flex; gap: 0.5rem; align-items: center;">
+					<code style="display: flex; align-items: center; height: 1.25rem;"><?php echo \esc_html( $url_base ); ?></code>
 					<input type="text" name="prpl_custom_permalink_structure" id="prpl_custom_permalink_structure" value="<?php echo \esc_attr( $permalink_structure ); ?>" class="small-text" />
 				</div>
 			</fieldset>
@@ -239,7 +245,7 @@ class Permalink_Structure extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing value.', 'progress-planner' ) ] );
 		}
 
-		$permalink_structure = \sanitize_text_field( \wp_unslash( $_POST['value'] ) );
+		$permalink_structure = trim( \sanitize_text_field( \wp_unslash( $_POST['value'] ) ) );
 
 		if ( empty( $permalink_structure ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid permalink structure.', 'progress-planner' ) ] );

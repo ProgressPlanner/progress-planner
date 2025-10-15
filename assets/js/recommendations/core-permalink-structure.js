@@ -29,30 +29,34 @@ prplInteractiveTaskFormListener.customSubmit( {
 } );
 
 prplDocumentReady( () => {
-	// Handle custom date format input
+	// Handle custom date format input, this value is what is actually submitted to the server.
 	const customPermalinkStructureInput = document.querySelector(
-		'input[name="prpl_custom_permalink_structure"]'
+		'#prpl-popover-core-permalink-structure input[name="prpl_custom_permalink_structure"]'
 	);
 
-	// Handle date format radio button clicks
+	// If there is no custom permalink structure input, return.
+	if ( ! customPermalinkStructureInput ) {
+		return;
+	}
+
+	// Handle date format radio button clicks.
 	document
 		.querySelectorAll(
 			'#prpl-popover-core-permalink-structure input[name="prpl_permalink_structure"]'
 		)
 		.forEach( function ( input ) {
 			input.addEventListener( 'click', function () {
+				// Dont update the custom permalink structure input if the custom radio button is checked.
 				if ( 'prpl_permalink_structure_custom_radio' !== this.id ) {
-					console.log( this.value );
 					customPermalinkStructureInput.value = this.value;
 				}
 			} );
 		} );
 
-	if ( customPermalinkStructureInput ) {
-		customPermalinkStructureInput.addEventListener( 'click', function () {
-			document.getElementById(
-				'prpl_permalink_structure_custom_radio'
-			).checked = true;
-		} );
-	}
+	// If users clicks on the custom permalink structure input, check the custom radio button.
+	customPermalinkStructureInput.addEventListener( 'click', function () {
+		document.getElementById(
+			'prpl_permalink_structure_custom_radio'
+		).checked = true;
+	} );
 } );
