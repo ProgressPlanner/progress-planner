@@ -56,6 +56,6 @@ class Published_Post_Count extends Base_Data_Collector {
 	protected function calculate_data() {
 		$result = \wp_count_posts( 'post' )->publish;
 
-		return ! empty( $result ) ? $result : 0;
+		return ! empty( $result ) ? (int) $result : 0;
 	}
 }
