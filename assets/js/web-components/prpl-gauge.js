@@ -1,21 +1,47 @@
-/* global customElements, HTMLElement, prplUpdatePreviousMonthBadgeProgressBar, prplUpdatePreviousMonthBadgeCounters */
+/* global customElements, HTMLElement, PrplGaugeProgressController */
 /*
  * Web Component: prpl-gauge
  *
  * A web component that displays a gauge.
  *
- * Dependencies: progress-planner/web-components/prpl-badge, progress-planner/web-components/prpl-badge-progress-bar
+ * Dependencies: progress-planner/web-components/prpl-badge, progress-planner/web-components/prpl-badge-progress-bar, progress-planner/web-components/prpl-gauge-progress-controller
  */
 
 /**
  * Register the custom web component.
  */
+
 customElements.define(
 	'prpl-gauge',
 	class extends HTMLElement {
-		constructor(
-			props = {
-				max: 100,
+		/**
+		 * Observed attributes, defined the attributes that will trigger the attributeChangedCallback.
+		 */
+		static get observedAttributes() {
+			return [
+				'data-value',
+				'data-max',
+				'maxdeg',
+				'background',
+				'color',
+				'start',
+				'cutout',
+				'contentfontsize',
+				'contentpadding',
+				'marginbottom',
+				'branding-id',
+				'data-badge-id',
+			];
+		}
+
+		/**
+		 * Constructor, ran when the element is instantiated.
+		 */
+		constructor() {
+			super();
+			this.attachShadow( { mode: 'open' } );
+			this.state = {
+				max: 10,
 				value: 0,
 				maxDeg: '180deg',
 				background: 'var(--prpl-background-monthly)',
@@ -28,72 +54,174 @@ customElements.define(
 					'var(--prpl-padding) var(--prpl-padding) calc(var(--prpl-padding) * 2) var(--prpl-padding)',
 				marginBottom: 'var(--prpl-padding)',
 				brandingId: 0,
-			},
-			content = ''
-		) {
-			// Get parent class properties
-			super();
+				content: '',
+			};
+		}
 
-			if ( this.querySelector( 'progress' ) ) {
-				props.max = parseFloat(
-					this.querySelector( 'progress' ).getAttribute( 'max' )
-				);
-				props.value =
-					parseFloat(
-						this.querySelector( 'progress' ).getAttribute( 'value' )
-					) / props.max;
+		/**
+		 * Get the value of the gauge.
+		 */
+		get value() {
+			return parseInt( this.state.value );
+		}
 
-				content = this.querySelector( 'progress' ).innerHTML;
+		/**
+		 * Set the value of the gauge.
+		 */
+		set value( v ) {
+			v = Math.max( 0, Math.min( v, this.max ) );
+			this.state.value = v;
+			this.setAttribute( 'data-value', v );
+		}
+
+		/**
+		 * Get the max of the gauge.
+		 */
+		get max() {
+			return parseInt( this.state.max );
+		}
+
+		/**
+		 * Set the max of the gauge.
+		 */
+		set max( v ) {
+			this.state.max = v;
+			this.setAttribute( 'data-max', v );
+		}
+
+		/**
+		 * Connected callback, ran after the element is connected to the DOM.
+		 */
+		connectedCallback() {
+			// Wait for slot to be populated, wait for the next 'tick' - this will be executed last.
+			setTimeout( () => {
+				const slot = this.shadowRoot.querySelector( 'slot' );
+				const nodes = slot.assignedElements();
+
+				if ( 0 < nodes.length ) {
+					const hasPrplBadge = nodes.some(
+						( node ) =>
+							node.tagName.toLowerCase() === 'prpl-badge' ||
+							node.innerHTML.includes( '<prpl-badge' )
+					);
+					this.state.content = hasPrplBadge ? '<prpl-badge' : '';
+				}
+
+				// Render the gauge.
+				this.render();
+			}, 0 );
+		}
+
+		/**
+		 * Attribute changed callback, ran on page load and when an observed attribute is changed.
+		 *
+		 * @param {string} name   The name of the attribute that was changed.
+		 * @param {string} oldVal The old value of the attribute.
+		 * @param {string} newVal The new value of the attribute.
+		 */
+		attributeChangedCallback( name, oldVal, newVal ) {
+			if ( newVal === oldVal ) {
+				return;
 			}
 
-			// We need different styles for the content depending on the presence of a prpl-badge.
+			switch ( name ) {
+				case 'contentfontsize':
+					this.state.contentFontSize = newVal;
+					break;
+				case 'contentpadding':
+					this.state.contentPadding = newVal;
+					break;
+				case 'marginbottom':
+					this.state.marginBottom = newVal;
+					break;
+				default:
+					// Convert attribute name to camelCase, remove "data-" or "aria-" prefix if present.
+					const camelCaseName = name
+						.replace( /^(data|aria)-/, '' )
+						// Convert kebab-case to camelCase
+						.replace( /-([a-z])/g, ( _, chr ) =>
+							chr.toUpperCase()
+						);
+
+					// Update state.
+					this.state[ camelCaseName ] = newVal;
+					break;
+			}
+
+			// Render the gauge.
+			this.render();
+
+			// Dispatch event.
+			this.dispatchEvent(
+				new CustomEvent( 'prpl-gauge-update', {
+					detail: {
+						value: this.state.value,
+						max: this.state.max,
+						element: this,
+						badgeId: this.state.badgeId,
+					},
+					bubbles: true,
+					composed: true,
+				} )
+			);
+		}
+
+		/**
+		 * Render the gauge.
+		 */
+		render() {
+			const {
+				max,
+				value,
+				maxDeg,
+				background,
+				color,
+				color2,
+				start,
+				cutout,
+				contentFontSize,
+				contentPadding,
+				marginBottom,
+				content,
+			} = this.state;
+
 			const contentSpecificStyles = content.includes( '<prpl-badge' )
 				? 'bottom: 50%;'
 				: 'top: -1em; padding-top: 50%;';
 
-			props.background =
-				this.getAttribute( 'background' ) || props.background;
-			props.color = this.getAttribute( 'color' ) || props.color;
-			props.start = this.getAttribute( 'start' ) || props.start;
-			props.cutout = this.getAttribute( 'cutout' ) || props.cutout;
-			props.contentFontSize =
-				this.getAttribute( 'contentFontSize' ) || props.contentFontSize;
-			props.contentPadding =
-				this.getAttribute( 'contentPadding' ) || props.contentPadding;
-			props.marginBottom =
-				this.getAttribute( 'marginBottom' ) || props.marginBottom;
-			props.brandingId =
-				this.getAttribute( 'branding-id' ) || props.brandingId;
-
 			let colorTransitions;
 
 			// If the progress is less than 50%, we have only one color, no gradient.
-			if ( props.value <= 0.5 ) {
-				colorTransitions = `${ props.color } calc(${ props.maxDeg } * ${ props.value })`;
+			if ( value / max <= 0.5 ) {
+				colorTransitions = `${ color } calc(${ maxDeg } * ${
+					value / max
+				})`;
 			} else {
 				// Otherwise we show first color for 0.5 and then the second color.
-				colorTransitions = `${ props.color } calc(${
-					props.maxDeg
-				} * ${ 0.5 })`;
-				colorTransitions += `, ${ props.color2 } calc(${ props.maxDeg } * ${ props.value })`;
+				colorTransitions = `${ color } calc(${ maxDeg } * ${ 0.5 })`;
+				colorTransitions += `, ${ color2 } calc(${ maxDeg } * ${
+					value / max
+				})`;
 			}
-			// Add the remaining color.
-			colorTransitions += `, var(--prpl-color-gauge-remain) calc(${ props.maxDeg } * ${ props.value }) ${ props.maxDeg }`;
 
-			this.innerHTML = `
-			<div style="padding: ${ props.contentPadding };
-			background: ${ props.background }; border-radius:var(--prpl-border-radius-big); aspect-ratio: 2 / 1; overflow: hidden; position: relative; margin-bottom: ${ props.marginBottom };">
-				<div style="width: 100%; aspect-ratio: 1 / 1; border-radius: 100%; position: relative; background: radial-gradient(${ props.background } 0 ${ props.cutout }, transparent ${ props.cutout } 100%), conic-gradient(from ${ props.start }, ${ colorTransitions }, transparent ${ props.maxDeg }); text-align: center;">
-					<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-text); width: 10%; text-align: center; left:0;">0</span>
-						<span style="font-size: ${ props.contentFontSize }; ${ contentSpecificStyles } display: block; font-weight: 600; text-align: center; position: absolute; color: var(--prpl-color-text); width: 100%; line-height: 1.2;">
-							<span style="display:inline-block;width: 50%;">
-								${ content }
-							</span>
-						</span>
-					<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-text); width: 10%; text-align: center; right:0;">${ props.max }</span>
-				</div>
+			// Add the remaining color.
+			colorTransitions += `,var(--prpl-color-gauge-remain) calc(${ maxDeg } * ${
+				value / max
+			}) ${ maxDeg }`;
+
+			this.shadowRoot.innerHTML = `
+		<div style="padding: ${ contentPadding }; background: ${ background }; border-radius:var(--prpl-border-radius-big); aspect-ratio: 2 / 1; overflow: hidden; position: relative; margin-bottom: ${ marginBottom };">
+			<div style="width: 100%; aspect-ratio: 1 / 1; border-radius: 100%; position: relative; background: radial-gradient(${ background } 0 ${ cutout }, transparent ${ cutout } 100%), conic-gradient(from ${ start }, ${ colorTransitions }, transparent ${ maxDeg }); text-align: center;">
+			<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-text); width: 10%; text-align: center; left:0;">0</span>
+			<span style="font-size: ${ contentFontSize }; ${ contentSpecificStyles } display: block; font-weight: 600; text-align: center; position: absolute; color: var(--prpl-color-text); width: 100%; line-height: 1.2;">
+				<span style="display:inline-block;width: 50%;">
+				<slot></slot>
+				</span>
+			</span>
+			<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-text); width: 10%; text-align: center; right:0;">${ max }</span>
 			</div>
-			`;
+		</div>
+		`;
 		}
 	}
 );
@@ -111,85 +239,32 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 		return;
 	}
 
-	const gaugeElement = document.getElementById( 'prpl-gauge-ravi' );
-	if ( ! gaugeElement ) {
+	// Get the gauge.
+	const controllerGauge = document.getElementById( 'prpl-gauge-ravi' );
+
+	if ( ! controllerGauge ) {
 		return;
 	}
 
-	const gaugeProps = {
-		id: gaugeElement.id,
-		background: gaugeElement.getAttribute( 'background' ),
-		color: gaugeElement.getAttribute( 'color' ),
-		max: gaugeElement.getAttribute( 'data-max' ),
-		value: gaugeElement.getAttribute( 'data-value' ),
-		badgeId: gaugeElement.getAttribute( 'data-badge-id' ),
-		badgeName: gaugeElement.getAttribute( 'data-badge-name' ),
-	};
-
-	if ( ! gaugeProps ) {
-		return;
-	}
-
-	let newValue = parseInt( gaugeProps.value ) + pointsDiff;
-	newValue = Math.round( newValue );
-	newValue = Math.max( 0, newValue );
-	newValue = Math.min( newValue, parseInt( gaugeProps.max ) );
-
-	const Gauge = customElements.get( 'prpl-gauge' );
-	const gauge = new Gauge(
-		{
-			max: parseInt( gaugeProps.max ),
-			value: parseFloat( newValue / parseInt( gaugeProps.max ) ),
-			background: gaugeProps.background,
-			color: gaugeProps.color,
-			maxDeg: '180deg',
-			start: '270deg',
-			cutout: '57%',
-			contentFontSize: 'var(--prpl-font-size-6xl)',
-			contentPadding:
-				'var(--prpl-padding) var(--prpl-padding) calc(var(--prpl-padding) * 2) var(--prpl-padding)',
-			marginBottom: 'var(--prpl-padding)',
-			brandingId: gaugeProps.brandingId,
-		},
-		`<prpl-badge complete="true" badge-id="${ gaugeProps.badgeId }" badge-name="${ gaugeProps.badgeName }" branding-id="${ gaugeProps.brandingId }"></prpl-badge>`
+	// Get the progress bars, if any.
+	const progressBarElements = document.querySelectorAll(
+		'.prpl-previous-month-badge-progress-bars-wrapper prpl-badge-progress-bar'
 	);
-	gauge.id = gaugeProps.id;
-	gauge.setAttribute( 'background', gaugeProps.background );
-	gauge.setAttribute( 'color', gaugeProps.color );
-	gauge.setAttribute( 'data-max', gaugeProps.max );
-	gauge.setAttribute( 'data-value', newValue );
-	gauge.setAttribute( 'data-badge-id', gaugeProps.badgeId );
-	gauge.setAttribute( 'data-branding-id', gaugeProps.brandingId );
 
-	// Replace the old gauge with the new one.
-	const oldGauge = document.getElementById( gaugeProps.id );
-	if ( oldGauge ) {
-		oldGauge.replaceWith( gauge );
-	}
+	const controlProgressBars = progressBarElements.length
+		? [ ...progressBarElements ]
+		: [];
 
-	const oldCounter = document.getElementById(
-		'prpl-widget-content-ravi-points-number'
+	// Create the controller.
+	const controller = new PrplGaugeProgressController(
+		controllerGauge,
+		...controlProgressBars
 	);
-	if ( oldCounter ) {
-		oldCounter.textContent = newValue + 'pt';
-	}
 
-	// Update the previous month badge counters.
-	prplUpdatePreviousMonthBadgeCounters( pointsDiff );
-
-	// Mark badge as completed, in the a Monthly badges widgets, if we reached the max points.
-	if ( newValue >= parseInt( gaugeProps.max ) ) {
-		// We have multiple badges, one in widget and the other in the popover.
-		document
-			.querySelectorAll(
-				`.prpl-badge-row-wrapper .prpl-badge prpl-badge[complete="false"][badge-id="${ gaugeProps.badgeId }"]`
-			)
-			?.forEach( ( badge ) => {
-				badge.setAttribute( 'complete', 'true' );
-			} );
-
-		if ( gaugeProps.value >= parseInt( gaugeProps.max ) ) {
-			prplUpdatePreviousMonthBadgeProgressBar( pointsDiff );
-		}
+	// Handle points difference.
+	if ( 0 < pointsDiff ) {
+		controller.increase( pointsDiff );
+	} else {
+		controller.decrease( pointsDiff );
 	}
 };
