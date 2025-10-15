@@ -35,6 +35,7 @@ customElements.define(
 					src="${ url }"
 					alt="${ badgeName }"
 					onerror="this.onerror=null;this.src='${ progressPlannerBadge.placeholderImageUrl }';"
+					style="max-width: 100%; height: auto%;"
 				/>
 			`;
 		}
