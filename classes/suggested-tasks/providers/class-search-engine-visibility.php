@@ -95,11 +95,7 @@ class Search_Engine_Visibility extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\printf(
-			/* translators: %1$s <a href="https://prpl.fyi/blog-indexing-settings" target="_blank">allowing search engines</a> link */
-			\esc_html__( 'Your site is not currently visible to search engines. Consider %1$s to index your site.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/blog-indexing-settings" target="_blank">' . \esc_html__( 'allowing search engines', 'progress-planner' ) . '</a>',
-		);
+		\esc_html_e( 'Your site is not currently visible to search engines. Consider allowing search engines to index your site.', 'progress-planner' );
 		echo '</p>';
 	}
 
