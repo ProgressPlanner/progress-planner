@@ -95,7 +95,7 @@ const prplTerms = {
 						error
 					);
 					// Resolve with empty object on error.
-					resolve( prplSuggestedTasksTerms[ taxonomy ] );
+					resolve( prplSuggestedTasksTerms[ taxonomy ] || {} );
 				} );
 		} );
 	},
