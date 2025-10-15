@@ -25,6 +25,9 @@ class Update_190 {
 		// Migrate the golden task.
 		$this->migrate_golden_todo_task();
 
+		// Clean up old category taxonomy data.
+		$this->cleanup_category_taxonomy();
+
 		// Migrate task priorities to new priority system.
 		// This needs to run after tasks_manager is initialized (priority 99 on init hook).
 		// So we hook it to run at priority 100.
@@ -47,8 +50,10 @@ class Update_190 {
 			// We'll be getting the value directly from the database since the post-meta is no longer used.
 			$points = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
 				$wpdb->prepare(
-					"SELECT meta_value FROM {$wpdb->postmeta} WHERE post_id = %d AND meta_key = 'prpl_points'", // @phpstan-ignore-line property.nonObject
-					$task->ID
+					'SELECT meta_value FROM %i WHERE post_id = %d AND meta_key = %s',
+					$wpdb->postmeta, // @phpstan-ignore-line property.nonObject
+					$task->ID,
+					'prpl_points'
 				)
 			);
 			if ( 1 === (int) $points ) {
@@ -58,6 +63,86 @@ class Update_190 {
 				);
 			}
 		}
+	}
+
+	/**
+	 * Clean up old category taxonomy data.
+	 *
+	 * The prpl_recommendations_category taxonomy has been removed in v1.9.0.
+	 * This method removes all related data from the database.
+	 *
+	 * @return void
+	 */
+	private function cleanup_category_taxonomy() {
+		global $wpdb;
+
+		// Get term taxonomy IDs for the old category taxonomy.
+		$term_taxonomy_ids = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				'SELECT term_taxonomy_id FROM %i WHERE taxonomy = %s',
+				$wpdb->term_taxonomy, // @phpstan-ignore-line property.nonObject
+				'prpl_recommendations_category'
+			)
+		);
+
+		if ( empty( $term_taxonomy_ids ) ) {
+			return; // Nothing to clean up.
+		}
+
+		// Remove term relationships.
+		$placeholders = \implode( ',', \array_fill( 0, \count( $term_taxonomy_ids ), '%d' ) );
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"DELETE FROM %i WHERE term_taxonomy_id IN ($placeholders)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $placeholders contains format specifiers
+				$wpdb->term_relationships, // @phpstan-ignore-line property.nonObject
+				...$term_taxonomy_ids
+			)
+		);
+
+		// Get term IDs before deleting term taxonomy entries.
+		$term_ids = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				'SELECT term_id FROM %i WHERE taxonomy = %s',
+				$wpdb->term_taxonomy, // @phpstan-ignore-line property.nonObject
+				'prpl_recommendations_category'
+			)
+		);
+
+		// Remove term taxonomy entries.
+		$wpdb->delete( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->term_taxonomy, // @phpstan-ignore-line property.nonObject
+			[ 'taxonomy' => 'prpl_recommendations_category' ],
+			[ '%s' ]
+		);
+
+		// Remove orphaned terms that are no longer used by any taxonomy.
+		if ( ! empty( $term_ids ) ) {
+			$term_placeholders = \implode( ',', \array_fill( 0, \count( $term_ids ), '%d' ) );
+			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->prepare(
+					"DELETE FROM %i WHERE term_id IN ($term_placeholders) AND term_id NOT IN (SELECT DISTINCT term_id FROM %i)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $term_placeholders contains format specifiers
+					$wpdb->terms, // @phpstan-ignore-line property.nonObject
+					$wpdb->term_taxonomy, // @phpstan-ignore-line property.nonObject
+					...$term_ids
+				)
+			);
+		}
+
+		// Clean up term meta for deleted terms.
+		if ( ! empty( $term_ids ) ) {
+			$term_placeholders = \implode( ',', \array_fill( 0, \count( $term_ids ), '%d' ) );
+			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+				$wpdb->prepare(
+					"DELETE FROM %i WHERE term_id IN ($term_placeholders) AND term_id NOT IN (SELECT DISTINCT term_id FROM %i)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $term_placeholders contains format specifiers
+					$wpdb->termmeta, // @phpstan-ignore-line property.nonObject
+					$wpdb->terms, // @phpstan-ignore-line property.nonObject
+					...$term_ids
+				)
+			);
+		}
+
+		// Clear WordPress caches.
+		\wp_cache_flush();
 	}
 
 	/**

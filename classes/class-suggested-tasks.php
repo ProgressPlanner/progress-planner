@@ -343,7 +343,7 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function register_taxonomy() {
-		// Register only the provider taxonomy (category taxonomy removed).
+		// Register only the provider taxonomy.
 		\register_taxonomy(
 			'prpl_recommendations_provider',
 			[ 'prpl_recommendations' ],
