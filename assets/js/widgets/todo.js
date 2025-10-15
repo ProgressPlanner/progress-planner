@@ -54,7 +54,7 @@ const prplTodoWidget = {
 								detail: {
 									item,
 									insertPosition:
-										1 === item?.meta?.prpl_points
+										1 === item?.prpl_points
 											? 'afterbegin' // Add golden task to the start of the list.
 											: 'beforeend',
 									listId:
@@ -89,7 +89,7 @@ const prplTodoWidget = {
 								detail: {
 									item,
 									insertPosition:
-										1 === item?.meta?.prpl_points
+										1 === item?.prpl_points
 											? 'afterbegin' // Add golden task to the start of the list.
 											: 'beforeend',
 									listId:
@@ -137,13 +137,13 @@ const prplTodoWidget = {
 					const newTask = {
 						...response,
 						meta: {
-							prpl_points: 0,
 							prpl_url: '',
 							...( response.meta || {} ),
 						},
 						provider: 'user',
 						category: 'user',
 						order: prplTodoWidget.getHighestItemOrder() + 1,
+						prpl_points: 0,
 					};
 
 					// Inject the new task into the DOM.
