@@ -162,6 +162,10 @@ prplSuggestedTask = {
 			post.destroy( { url } ).then( () => {
 				// Remove the task from the todo list.
 				prplSuggestedTask.removeTaskElement( postId );
+
+				// Fetch and inject a replacement task
+				prplSuggestedTask.fetchAndInjectReplacementTask();
+
 				setTimeout(
 					() =>
 						window.dispatchEvent(
@@ -280,6 +284,9 @@ prplSuggestedTask = {
 										)
 									);
 
+									// Fetch and inject a replacement task for non-user tasks
+									prplSuggestedTask.fetchAndInjectReplacementTask();
+
 									// Resolve immediately for non-user tasks
 									resolve( {
 										postId,
@@ -376,6 +383,9 @@ prplSuggestedTask = {
 		} );
 		postModelToSave.save().then( () => {
 			prplSuggestedTask.removeTaskElement( postId );
+
+			// Fetch and inject a replacement task
+			prplSuggestedTask.fetchAndInjectReplacementTask();
 		} );
 	},
 
@@ -502,6 +512,42 @@ prplSuggestedTask = {
 	 */
 	removeTaskElement: ( postId ) =>
 		prplSuggestedTask.getTaskElement( postId )?.remove(),
+
+	/**
+	 * Fetch and inject a replacement task after one is removed.
+	 *
+	 * Replacement tasks are always fetched for the suggested-tasks-list,
+	 * which excludes user tasks (user tasks have their own todo list).
+	 */
+	fetchAndInjectReplacementTask: () => {
+		// Collect all currently visible task IDs from the DOM
+		const visibleTaskIds = Array.from(
+			document.querySelectorAll( '.prpl-suggested-task[data-post-id]' )
+		).map( ( el ) => parseInt( el.getAttribute( 'data-post-id' ) ) );
+
+		// Combine with injectedItemIds to ensure we have a complete exclusion list
+		const allTaskIds = [
+			...new Set( [
+				...prplSuggestedTask.injectedItemIds,
+				...visibleTaskIds,
+			] ),
+		];
+
+		// Update injectedItemIds to include any tasks that might have been missed
+		prplSuggestedTask.injectedItemIds = allTaskIds;
+
+		const fetchArgs = {
+			status: 'publish',
+			per_page: 1,
+			exclude_provider: 'user', // Always exclude user tasks from suggested-tasks-list
+		};
+
+		prplSuggestedTask.fetchItems( fetchArgs ).then( ( items ) => {
+			if ( items && items.length > 0 ) {
+				prplSuggestedTask.injectItems( items );
+			}
+		} );
+	},
 };
 
 /**
