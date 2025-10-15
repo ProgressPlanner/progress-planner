@@ -10,22 +10,11 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$progress_planner_active_range = isset( $_GET['range'] ) ? \sanitize_text_field( \wp_unslash( $_GET['range'] ) ) : '-6 months';
-// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-$progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_text_field( \wp_unslash( $_GET['frequency'] ) ) : 'monthly';
-
 \do_action( 'progress_planner_admin_page_header_before' );
 ?>
 <div class="prpl-header">
 	<div class="prpl-header-logo">
-		<?php
-		if ( \progress_planner()->is_pro_site() ) {
-			\progress_planner()->the_asset( 'images/logo_progress_planner_pro.svg' );
-		} else {
-			\progress_planner()->the_asset( 'images/logo_progress_planner.svg' );
-		}
-		?>
+		<?php \progress_planner()->get_ui__branding()->the_logo(); ?>
 	</div>
 
 	<div class="prpl-header-right">
@@ -61,7 +50,7 @@ $progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_tex
 					\printf(
 						'<option value="%1$s" %2$s>%3$s</option>',
 						\esc_attr( $progress_planner_range ),
-						\selected( $progress_planner_active_range, $progress_planner_range, false ),
+						\selected( isset( $_GET['range'] ) ? \sanitize_text_field( \wp_unslash( $_GET['range'] ) ) : '-6 months', $progress_planner_range, false ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 						\esc_html( $progress_planner_label )
 					);
 				}
@@ -79,7 +68,7 @@ $progress_planner_active_frequency = isset( $_GET['frequency'] ) ? \sanitize_tex
 					\printf(
 						'<option value="%1$s" %2$s>%3$s</option>',
 						\esc_attr( $progress_planner_frequency ),
-						\selected( $progress_planner_active_frequency, $progress_planner_frequency, false ),
+						\selected( isset( $_GET['frequency'] ) ? \sanitize_text_field( \wp_unslash( $_GET['frequency'] ) ) : 'monthly', $progress_planner_frequency, false ), // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 						\esc_html( $progress_planner_label )
 					);
 				}

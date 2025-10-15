@@ -2,7 +2,7 @@
 .progress-planner_page_progress-planner-settings {
 
 	#wpwrap {
-		background: #fff !important;
+		background-color: var(--prpl-background);
 	}
 
 	ul#adminmenu {
@@ -11,7 +11,7 @@
 		> li.current > a.current {
 
 			&::after {
-				border-right-color: #fff !important;
+				border-right-color: var(--prpl-background) !important;
 			}
 		}
 	}
@@ -21,21 +21,8 @@
 		h1 {
 			display: flex;
 			align-items: center;
-			gap: 0.5rem;
-			background: var(--prpl-background-orange);
 			padding: 1.2rem;
-			border-radius: 0.5rem;
 			margin-bottom: 2rem;
-
-			.icon {
-				width: 1.25em;
-				height: 1.25em;
-				color: var(--prpl-color-accent-orange);
-
-				svg path {
-					fill: currentcolor;
-				}
-			}
 
 			span {
 				font-weight: 600;
@@ -50,14 +37,30 @@
 		}
 	}
 
+	.prpl-settings-form-wrap {
+		background-color: var(--prpl-background-paper);
+
+		border: 1px solid var(--prpl-color-border);
+		border-radius: var(--prpl-border-radius);
+		padding: var(--prpl-padding);
+		box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.07), -2px 0 6px rgba(0, 0, 0, 0.07);
+	}
+
+	.prpl-settings-section-wrapper {
+		border: 1px solid var(--prpl-color-border);
+		border-radius: var(--prpl-border-radius);
+		padding: var(--prpl-padding);
+		flex-grow: 1;
+	}
+
 	.prpl-settings-section-title {
 		display: flex;
 		align-items: center;
 		gap: 0.5rem;
-		background: var(--prpl-background-purple);
+		background: var(--prpl-background-monthly);
 		padding: 1.2rem;
 		border-radius: 0.5rem;
-		margin-bottom: var(--prpl-settings-page-gap);
+		margin-bottom: var(--prpl-padding);
 
 		&:first-child {
 			margin-top: 0;
@@ -70,7 +73,7 @@
 	}
 
 	.prpl-pages-item {
-		border: 1px solid var(--prpl-color-gray-2);
+		border: 1px solid var(--prpl-color-border);
 		border-radius: var(--prpl-border-radius);
 		padding: var(--prpl-padding);
 		flex-grow: 1;
@@ -170,6 +173,21 @@
 		}
 	}
 
+	.prpl-column-pages {
+		margin-bottom: var(--prpl-gap);
+
+		.prpl-settings-section-title {
+			background: var(--prpl-background-setting-pages);
+
+			.icon {
+
+				path {
+					fill: var(--prpl-color-setting-pages-icon);
+				}
+			}
+		}
+	}
+
 	.prpl-pages-list {
 		display: flex;
 		flex-wrap: wrap;
@@ -196,7 +214,7 @@
 	.prpl-button {
 		color: var(--prpl-color-gray-7);
 		text-decoration: none;
-		border: 1px solid var(--prpl-color-gray-2);
+		border: 1px solid var(--prpl-color-border);
 		border-radius: var(--prpl-border-radius);
 		padding: 0.5em 0.5em;
 		font-size: 14px; /* It matches <select> font size, which comes from Core */
@@ -206,7 +224,7 @@
 		&:focus {
 			color: var(--prpl-color-link);
 			border-color: var(--prpl-color-link);
-			background-color: var(--prpl-background-blue);
+			background-color: var(--prpl-background-content-badge);
 		}
 	}
 
@@ -222,14 +240,14 @@
 	.prpl-settings-section-title {
 
 		svg {
-			color: #038d88;
+			color: var(--prpl-color-setting-posts-icon);
 
 			path {
 				fill: currentcolor;
 			}
 		}
 
-		background-color: #f3faf9;
+		background-color: var(--prpl-background-setting-posts);
 	}
 
 }
@@ -240,56 +258,10 @@
 	.prpl-settings-section-title {
 
 		svg {
-			color: var(--prpl-color-accent-red);
+			color: var(--prpl-color-setting-login-icon);
 		}
 
-		background-color: var(--prpl-background-red);
-	}
-
-}
-
-/* License */
-.prpl-column-license {
-
-	.prpl-settings-section-title {
-
-		svg {
-			color: #0773b4;
-		}
-		background-color: #effbfe;
-	}
-
-	.prpl-license-keys-wrapper {
-		display: flex;
-		flex-direction: column;
-		gap: 1rem;
-		max-width: 40rem;
-
-		& > p:first-child {
-			margin-top: 0;
-		}
-
-		.prpl-license-key-wrapper {
-			display: flex;
-			align-items: center;
-			gap: 0.5rem;
-
-			.prpl-license-status {
-				width: 1rem;
-				height: 1rem;
-
-				svg {
-					width: 1rem;
-					height: 1rem;
-				}
-			}
-		}
-
-		input {
-			width: 30rem;
-			max-width: calc(100% - 2rem);
-			border: 1px solid var(--prpl-color-gray-2);
-		}
+		background-color: var(--prpl-background-setting-login);
 	}
 
 }

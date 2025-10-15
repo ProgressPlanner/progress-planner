@@ -51,15 +51,16 @@ const prplInteractiveTaskFormListener = {
 				const settings = new wp.api.models.Settings( settingsToPass );
 
 				settings.save().then( () => {
-					// Close popover.
-					document.getElementById( popoverId ).hidePopover();
 					const postId = parseInt( taskEl.dataset.postId );
 					if ( ! postId ) {
 						return;
 					}
 
 					// This will trigger the celebration event (confetti) as well.
-					prplSuggestedTask.maybeComplete( postId );
+					prplSuggestedTask.maybeComplete( postId ).then( () => {
+						// Close popover.
+						document.getElementById( popoverId ).hidePopover();
+					} );
 				} );
 			} );
 		} );
@@ -82,15 +83,16 @@ const prplInteractiveTaskFormListener = {
 				`.prpl-suggested-task[data-task-id="${ taskId }"]`
 			);
 
-			// Close popover.
-			document.getElementById( popoverId ).hidePopover();
 			const postId = parseInt( taskEl.dataset.postId );
 			if ( ! postId ) {
 				return;
 			}
 
 			// This will trigger the celebration event (confetti) as well.
-			prplSuggestedTask.maybeComplete( postId );
+			prplSuggestedTask.maybeComplete( postId ).then( () => {
+				// Close popover.
+				document.getElementById( popoverId ).hidePopover();
+			} );
 		} );
 	},
 
@@ -136,15 +138,16 @@ const prplInteractiveTaskFormListener = {
 					return;
 				}
 
-				// Close popover.
-				document.getElementById( popoverId ).hidePopover();
 				const postId = parseInt( taskEl.dataset.postId );
 				if ( ! postId ) {
 					return;
 				}
 
 				// This will trigger the celebration event (confetti) as well.
-				prplSuggestedTask.maybeComplete( postId );
+				prplSuggestedTask.maybeComplete( postId ).then( () => {
+					// Close popover.
+					document.getElementById( popoverId ).hidePopover();
+				} );
 			} );
 		} );
 	},

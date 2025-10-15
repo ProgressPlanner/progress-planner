@@ -7,35 +7,43 @@
 
 use Progress_Planner\Badges\Monthly;
 
+$prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( new \DateTime() ) );
 ?>
 <div class="prpl-dashboard-widget">
 	<div>
 		<prpl-gauge
 			id="prpl-gauge-ravi"
 			background="#fff"
-			color="var(--prpl-color-accent-orange)"
+			color="var(--prpl-color-monthly)"
 			contentFontSize="var(--prpl-font-size-4xl)"
 			contentPadding="var(--prpl-padding)"
 			marginBottom="0"
 			data-max="<?php echo (int) Monthly::TARGET_POINTS; ?>"
-			data-value="<?php echo (float) \progress_planner()->get_admin__widgets__suggested_tasks()->get_score()['target_score']; ?>"
-			data-badge-id="<?php echo \esc_attr( Monthly::get_badge_id_from_date( new \DateTime() ) ); ?>"
+			data-value="<?php echo (float) \progress_planner()->get_admin__widgets__monthly_badges()->get_score()['target_score']; ?>"
+			data-badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+			data-badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
 		>
-			<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) \progress_planner()->get_admin__widgets__suggested_tasks()->get_score()['target_score']; ?>">
-				<prpl-badge
-					complete="true"
-					badge-id="<?php echo \esc_attr( Monthly::get_badge_id_from_date( new \DateTime() ) ); ?>"
-				></prpl-badge>
-			</progress>
+			<prpl-badge
+				complete="true"
+				badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+				badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
+				branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
+			></prpl-badge>
 		</prpl-gauge>
 		<?php \esc_html_e( 'Monthly badge', 'progress-planner' ); ?>
 	</div>
 
 	<div>
-		<prpl-gauge background="#fff" color="<?php echo \esc_attr( \progress_planner()->get_admin__widgets__activity_scores()->get_gauge_color( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-5xl)" contentPadding="var(--prpl-padding)" marginBottom="0">
-			<progress max="100" value="<?php echo (float) \progress_planner()->get_admin__widgets__activity_scores()->get_score(); ?>">
-				<?php echo \esc_html( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ); ?>
-			</progress>
+		<prpl-gauge
+			background="#fff"
+			color="<?php echo \esc_attr( \progress_planner()->get_admin__widgets__activity_scores()->get_gauge_color( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ) ); ?>"
+			contentFontSize="var(--prpl-font-size-5xl)"
+			contentPadding="var(--prpl-padding)"
+			marginBottom="0"
+			data-max="100"
+			data-value="<?php echo (float) \progress_planner()->get_admin__widgets__activity_scores()->get_score(); ?>"
+		>
+			<?php echo \esc_html( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ); ?>
 		</prpl-gauge>
 		<?php \esc_html_e( 'Website activity score', 'progress-planner' ); ?>
 	</div>
@@ -43,7 +51,15 @@ use Progress_Planner\Badges\Monthly;
 
 <hr style="margin: 1rem 0">
 
-<h3><?php \esc_html_e( 'Ravi\'s Recommendations', 'progress-planner' ); ?></h3>
+<h3>
+	<?php
+	\printf(
+		/* translators: %s: Ravi's name. */
+		\esc_html__( '%s\'s Recommendations', 'progress-planner' ),
+		\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
+	);
+	?>
+</h3>
 <ul style="display:none"></ul>
 <p class="prpl-suggested-tasks-loading">
 	<?php \esc_html_e( 'Loading tasks...', 'progress-planner' ); ?>
