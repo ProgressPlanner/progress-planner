@@ -168,6 +168,12 @@ abstract class Tasks_Interactive extends Tasks {
 	 * @return void
 	 */
 	public function enqueue_scripts( $hook ) {
+
+		// Don't enqueue the script if the user is not at least an editor, since we dont want to enqueue scripts on WP Dashboard page.
+		if ( ! \current_user_can( 'edit_others_posts' ) ) {
+			return;
+		}
+
 		// Enqueue the script only on Progress Planner and WP dashboard pages.
 		if ( 'toplevel_page_progress-planner' !== $hook && 'index.php' !== $hook ) {
 			return;
