@@ -26,7 +26,8 @@ class Update_190 {
 		$this->migrate_golden_todo_task();
 
 		// Clean up old category taxonomy data.
-		$this->cleanup_category_taxonomy();
+		// This needs to run on init hook so we can register the taxonomy.
+		\add_action( 'init', [ $this, 'cleanup_category_taxonomy' ], 0 );
 
 		// Migrate task priorities to new priority system.
 		// This needs to run after tasks_manager is initialized (priority 99 on init hook).
@@ -69,77 +70,39 @@ class Update_190 {
 	 * Clean up old category taxonomy data.
 	 *
 	 * The prpl_recommendations_category taxonomy has been removed in v1.9.0.
-	 * This method removes all related data from the database.
+	 * This method temporarily registers the taxonomy, deletes all its terms,
+	 * then unregisters it.
 	 *
 	 * @return void
 	 */
-	private function cleanup_category_taxonomy() {
-		global $wpdb;
-
-		// Get term taxonomy IDs for the old category taxonomy.
-		$term_taxonomy_ids = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				'SELECT term_taxonomy_id FROM %i WHERE taxonomy = %s',
-				$wpdb->term_taxonomy, // @phpstan-ignore-line property.nonObject
-				'prpl_recommendations_category'
-			)
+	public function cleanup_category_taxonomy() {
+		// Temporarily register the old taxonomy so we can use WordPress functions.
+		\register_taxonomy(
+			'prpl_recommendations_category',
+			[ 'prpl_recommendations' ],
+			[
+				'public'       => false,
+				'hierarchical' => false,
+			]
 		);
 
-		if ( empty( $term_taxonomy_ids ) ) {
-			return; // Nothing to clean up.
+		// Get all terms in this taxonomy.
+		$terms = \get_terms(
+			[
+				'taxonomy'   => 'prpl_recommendations_category',
+				'hide_empty' => false,
+			]
+		);
+
+		// Delete each term. WordPress will handle all related cleanup automatically.
+		if ( ! \is_wp_error( $terms ) && ! empty( $terms ) ) {
+			foreach ( $terms as $term ) {
+				\wp_delete_term( $term->term_id, 'prpl_recommendations_category' );
+			}
 		}
 
-		// Remove term relationships.
-		$placeholders = \implode( ',', \array_fill( 0, \count( $term_taxonomy_ids ), '%d' ) );
-		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $placeholders contains format specifiers.
-				"DELETE FROM %i WHERE term_taxonomy_id IN ($placeholders)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-				$wpdb->term_relationships, // @phpstan-ignore-line property.nonObject
-				...$term_taxonomy_ids
-			)
-		);
-
-		// Get term IDs before deleting term taxonomy entries.
-		$term_ids = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->prepare(
-				'SELECT term_id FROM %i WHERE taxonomy = %s',
-				$wpdb->term_taxonomy, // @phpstan-ignore-line property.nonObject
-				'prpl_recommendations_category'
-			)
-		);
-
-		// Remove term taxonomy entries.
-		$wpdb->delete( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			$wpdb->term_taxonomy, // @phpstan-ignore-line property.nonObject
-			[ 'taxonomy' => 'prpl_recommendations_category' ],
-			[ '%s' ]
-		);
-
-		// Remove orphaned terms that are no longer used by any taxonomy.
-		if ( ! empty( $term_ids ) ) {
-			$term_placeholders = \implode( ',', \array_fill( 0, \count( $term_ids ), '%d' ) );
-			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $term_placeholders contains format specifiers.
-					"DELETE FROM %i WHERE term_id IN ($term_placeholders) AND term_id NOT IN (SELECT DISTINCT term_id FROM %i)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					$wpdb->terms, // @phpstan-ignore-line property.nonObject
-					$wpdb->term_taxonomy, // @phpstan-ignore-line property.nonObject
-					...$term_ids
-				)
-			);
-		}
-
-		// Clean up term meta for deleted terms.
-		if ( ! empty( $term_ids ) ) {
-			$term_placeholders = \implode( ',', \array_fill( 0, \count( $term_ids ), '%d' ) );
-			$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-				$wpdb->prepare( // phpcs:ignore WordPress.DB.PreparedSQLPlaceholders.ReplacementsWrongNumber -- $term_placeholders contains format specifiers.
-					"DELETE FROM %i WHERE term_id IN ($term_placeholders) AND term_id NOT IN (SELECT DISTINCT term_id FROM %i)", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
-					$wpdb->termmeta, // @phpstan-ignore-line property.nonObject
-					$wpdb->terms, // @phpstan-ignore-line property.nonObject
-					...$term_ids
-				)
-			);
-		}
+		// Unregister the taxonomy.
+		\unregister_taxonomy( 'prpl_recommendations_category' );
 
 		// Clear WordPress caches.
 		\wp_cache_flush();
