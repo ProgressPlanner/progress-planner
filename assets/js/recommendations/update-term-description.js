@@ -1,4 +1,4 @@
-/* global progressPlanner, prplSuggestedTask */
+/* global progressPlanner, prplInteractiveTaskFormListener */
 /**
  * Update Term Description recommendation.
  *
@@ -14,7 +14,6 @@
 		 */
 		constructor() {
 			this.popoverId = 'prpl-popover-update-term-description';
-			this.popover = document.getElementById( this.popoverId );
 			this.currentTermData = null;
 			this.currentTaskElement = null;
 			this.elements = this.getElements();
@@ -52,7 +51,6 @@
 		 */
 		init() {
 			this.bindEvents();
-			this.initFormListener();
 		}
 
 		/**
@@ -64,6 +62,9 @@
 				'prpl-interactive-task-action-update-term-description',
 				( event ) => {
 					this.handleInteractiveTaskAction( event );
+
+					// After the event is handled, initialize the form listener.
+					this.initFormListener();
 				}
 			);
 		}
@@ -137,9 +138,11 @@
 		 * Initialize the form listener.
 		 */
 		initFormListener() {
-			const formElement = document.querySelector(
-				`#${ this.popoverId } form`
-			);
+			if ( ! this.currentTermData || ! this.currentTaskElement ) {
+				return;
+			}
+
+			const formElement = this.elements.popover.querySelector( 'form' );
 
 			if ( ! formElement ) {
 				return;
@@ -164,53 +167,27 @@
 				} );
 			}
 
-			formElement.addEventListener( 'submit', ( event ) => {
-				event.preventDefault();
-
-				if ( ! this.currentTermData || ! this.currentTaskElement ) {
-					return;
-				}
-
-				fetch( progressPlanner.ajaxUrl, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/x-www-form-urlencoded',
-					},
-					body: new URLSearchParams( {
-						action: 'prpl_interactive_task_submit_update-term-description',
-						_ajax_nonce: progressPlanner.nonce,
-						term_id: this.currentTermData.termId,
-						taxonomy: this.currentTermData.taxonomy,
-						description: this.elements.descriptionField.value,
-					} ),
-				} )
-					.then( () => {
-						if ( ! this.currentTaskElement ) {
-							return;
-						}
-
-						const postId = parseInt(
-							this.currentTaskElement.dataset.postId
-						);
-						if ( ! postId ) {
-							return;
-						}
-
-						// This will trigger the celebration event (confetti) as well.
-						prplSuggestedTask.maybeComplete( postId ).then( () => {
-							// Close popover.
-							document
-								.getElementById( this.popoverId )
-								.hidePopover();
-						} );
-					} )
-					.catch( ( error ) => {
-						// eslint-disable-next-line no-console
-						console.error(
-							'Error updating term description:',
-							error
-						);
+			prplInteractiveTaskFormListener.customSubmit( {
+				taskId: this.currentTaskElement.dataset.taskId,
+				popoverId: this.popoverId,
+				callback: () => {
+					fetch( progressPlanner.ajaxUrl, {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/x-www-form-urlencoded',
+						},
+						body: new URLSearchParams( {
+							action: 'prpl_interactive_task_submit_update-term-description',
+							nonce: progressPlanner.nonce,
+							term_id: this.elements.termIdField.value,
+							taxonomy: this.elements.taxonomyField.value,
+							description: this.elements.descriptionField.value,
+						} ),
+					} ).then( () => {
+						this.currentTaskElement = null;
+						this.currentTermData = null;
 					} );
+				},
 			} );
 		}
 
