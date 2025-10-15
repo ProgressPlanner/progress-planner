@@ -83,6 +83,12 @@ https://youtu.be/e1bmxZYyXFY
 
 == Changelog ==
 
+= 1.9.0 =
+
+Enhancements:
+
+* "Yoast SEO: set your organization logo" task detects site logo as fallback, same as Yoast SEO does.
+
 = 1.8.1 =
 
 - Security fix: Privilege escalation via an AJAX call where authenticated users could update arbitrary site options.
