@@ -20,6 +20,7 @@ customElements.define(
 				maxDeg: '180deg',
 				background: 'var(--prpl-background-monthly)',
 				color: 'var(--prpl-color-monthly)',
+				color2: 'var(--prpl-color-monthly-2)',
 				start: '270deg',
 				cutout: '57%',
 				contentFontSize: 'var(--prpl-font-size-6xl)',
@@ -64,10 +65,25 @@ customElements.define(
 			props.brandingId =
 				this.getAttribute( 'branding-id' ) || props.brandingId;
 
+			let colorTransitions;
+
+			// If the progress is less than 50%, we have only one color, no gradient.
+			if ( props.value <= 0.5 ) {
+				colorTransitions = `${ props.color } calc(${ props.maxDeg } * ${ props.value })`;
+			} else {
+				// Otherwise we show first color for 0.5 and then the second color.
+				colorTransitions = `${ props.color } calc(${
+					props.maxDeg
+				} * ${ 0.5 })`;
+				colorTransitions += `, ${ props.color2 } calc(${ props.maxDeg } * ${ props.value })`;
+			}
+			// Add the remaining color.
+			colorTransitions += `, var(--prpl-color-gauge-remain) calc(${ props.maxDeg } * ${ props.value }) ${ props.maxDeg }`;
+
 			this.innerHTML = `
 			<div style="padding: ${ props.contentPadding };
 			background: ${ props.background }; border-radius:var(--prpl-border-radius-big); aspect-ratio: 2 / 1; overflow: hidden; position: relative; margin-bottom: ${ props.marginBottom };">
-				<div style="width: 100%; aspect-ratio: 1 / 1; border-radius: 100%; position: relative; background: radial-gradient(${ props.background } 0 ${ props.cutout }, transparent ${ props.cutout } 100%), conic-gradient(from ${ props.start }, ${ props.color } calc(${ props.maxDeg } * ${ props.value }), var(--prpl-color-gauge-remain) calc(${ props.maxDeg } * ${ props.value }) ${ props.maxDeg }, transparent ${ props.maxDeg }); text-align: center;">
+				<div style="width: 100%; aspect-ratio: 1 / 1; border-radius: 100%; position: relative; background: radial-gradient(${ props.background } 0 ${ props.cutout }, transparent ${ props.cutout } 100%), conic-gradient(from ${ props.start }, ${ colorTransitions }, transparent ${ props.maxDeg }); text-align: center;">
 					<span style="font-size: var(--prpl-font-size-small); position: absolute; top: 50%; color: var(--prpl-color-text); width: 10%; text-align: center; left:0;">0</span>
 						<span style="font-size: ${ props.contentFontSize }; ${ contentSpecificStyles } display: block; font-weight: 600; text-align: center; position: absolute; color: var(--prpl-color-text); width: 100%; line-height: 1.2;">
 							<span style="display:inline-block;width: 50%;">

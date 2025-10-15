@@ -89,5 +89,5 @@ $prpl_current_user = \wp_get_current_user();
 			>
 		</div>
 	</div>
-	<button id="submit-license-key" class="button button-primary"><?php \esc_html_e( 'Subscribe', 'progress-planner' ); ?></button>
+	<button id="submit-license-key" class="prpl-button prpl-button-primary"><?php \esc_html_e( 'Subscribe', 'progress-planner' ); ?></button>
 </form>
