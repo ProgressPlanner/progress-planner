@@ -4,7 +4,7 @@
  *
  * A web component that displays a gauge.
  *
- * Dependencies: progress-planner/web-components/prpl-badge, progress-planner/web-components/prpl-badge-progress-bar, progress-planner/web-components/prpl-guage-progress-controller
+ * Dependencies: progress-planner/web-components/prpl-badge, progress-planner/web-components/prpl-badge-progress-bar, progress-planner/web-components/prpl-gauge-progress-controller
  */
 
 /**

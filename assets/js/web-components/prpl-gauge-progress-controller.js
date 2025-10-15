@@ -1,5 +1,5 @@
 /*
- * Web Component: prpl-guage-progress-controller
+ * Web Component: prpl-gauge-progress-controller
  *
  * A web component that controls the progress of a gauge and its progress bars.
  *
@@ -191,6 +191,7 @@ class PrplGaugeProgressController {
 	 */
 	maybeRemoveCompletedBarFromDom( badgeId, value, max ) {
 		if ( ! badgeId ) {
+			return;
 		}
 
 		// If the previous month badge is completed, remove the progress bar.
