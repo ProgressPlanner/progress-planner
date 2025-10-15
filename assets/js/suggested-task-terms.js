@@ -2,7 +2,7 @@
 /*
  * Populate prplSuggestedTasksTerms with the terms for the taxonomies we use.
  *
- * Dependencies: wp-api, progress-planner/document-ready
+ * Dependencies: wp-api-fetch, progress-planner/document-ready
  */
 
 const prplSuggestedTasksTerms = {};
@@ -40,48 +40,63 @@ const prplTerms = {
 					`Terms already fetched for taxonomy: ${ taxonomy }`
 				);
 				resolve( prplSuggestedTasksTerms[ taxonomy ] );
+				return;
 			}
-			wp.api.loadPromise.done( () => {
-				console.info( `Fetching terms for taxonomy: ${ taxonomy }...` );
 
-				const typeName = taxonomy.replace( 'prpl_', 'Prpl_' );
-				prplSuggestedTasksTerms[ taxonomy ] =
-					prplSuggestedTasksTerms[ taxonomy ] || {};
-				const TermsCollection = new wp.api.collections[ typeName ]();
-				TermsCollection.fetch( { data: { per_page: 100 } } ).done(
-					( data ) => {
-						let userTermFound = false;
-						// 100 is the maximum number of terms that can be fetched in one request.
-						data.forEach( ( term ) => {
-							prplSuggestedTasksTerms[ taxonomy ][ term.slug ] =
-								term;
-							if ( 'user' === term.slug ) {
-								userTermFound = true;
-							}
-						} );
+			console.info( `Fetching terms for taxonomy: ${ taxonomy }...` );
 
-						if ( userTermFound ) {
-							resolve( prplSuggestedTasksTerms[ taxonomy ] );
-						} else {
-							// If the `user` term doesn't exist, create it.
-							const newTermModel = new wp.api.models[ typeName ](
-								{
-									slug: 'user',
-									name: 'user',
-								}
-							);
-							newTermModel
-								.save()
-								.then( ( response ) => {
-									prplSuggestedTasksTerms[ taxonomy ].user =
-										response;
-									return prplSuggestedTasksTerms[ taxonomy ];
-								} )
-								.then( resolve ); // Resolve the promise after all requests are complete.
+			prplSuggestedTasksTerms[ taxonomy ] =
+				prplSuggestedTasksTerms[ taxonomy ] || {};
+
+			// Fetch terms using wp.apiFetch.
+			wp.apiFetch( {
+				path: `/wp/v2/${ taxonomy }?per_page=100`,
+			} )
+				.then( ( data ) => {
+					let userTermFound = false;
+					// 100 is the maximum number of terms that can be fetched in one request.
+					data.forEach( ( term ) => {
+						prplSuggestedTasksTerms[ taxonomy ][ term.slug ] = term;
+						if ( 'user' === term.slug ) {
+							userTermFound = true;
 						}
+					} );
+
+					if ( userTermFound ) {
+						resolve( prplSuggestedTasksTerms[ taxonomy ] );
+					} else {
+						// If the `user` term doesn't exist, create it.
+						wp.apiFetch( {
+							path: `/wp/v2/${ taxonomy }`,
+							method: 'POST',
+							data: {
+								slug: 'user',
+								name: 'user',
+							},
+						} )
+							.then( ( response ) => {
+								prplSuggestedTasksTerms[ taxonomy ].user =
+									response;
+								resolve( prplSuggestedTasksTerms[ taxonomy ] );
+							} )
+							.catch( ( error ) => {
+								console.error(
+									`Error creating user term for taxonomy: ${ taxonomy }`,
+									error
+								);
+								// Resolve anyway even if creation fails.
+								resolve( prplSuggestedTasksTerms[ taxonomy ] );
+							} );
 					}
-				);
-			} );
+				} )
+				.catch( ( error ) => {
+					console.error(
+						`Error fetching terms for taxonomy: ${ taxonomy }`,
+						error
+					);
+					// Resolve with empty object on error.
+					resolve( prplSuggestedTasksTerms[ taxonomy ] );
+				} );
 		} );
 	},
 
