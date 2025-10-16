@@ -36,6 +36,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Unpublished_Content;
 use Progress_Planner\Suggested_Tasks\Providers\Collaborator;
 use Progress_Planner\Suggested_Tasks\Providers\Select_Timezone;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Date_Format;
+use Progress_Planner\Suggested_Tasks\Providers\Search_Template;
 
 /**
  * Tasks_Manager class.
@@ -82,6 +83,7 @@ class Tasks_Manager {
 			new Collaborator(),
 			new Select_Timezone(),
 			new Set_Date_Format(),
+			new Search_Template(),
 		];
 
 		// Add the plugin integration.
