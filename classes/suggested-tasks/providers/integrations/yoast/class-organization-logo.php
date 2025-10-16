@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 /**
  * Add task for Yoast SEO: set your organization logo.
  */
-class Organization_Logo extends Yoast_Provider {
+class Organization_Logo extends Yoast_Interactive_Provider {
 
 	/**
 	 * The provider ID.
@@ -18,6 +18,13 @@ class Organization_Logo extends Yoast_Provider {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'yoast-organization-logo';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'yoast-organization-logo';
 
 	/**
 	 * Yoast SEO instance.
@@ -30,6 +37,7 @@ class Organization_Logo extends Yoast_Provider {
 	 * Constructor.
 	 */
 	public function __construct() {
+		parent::__construct();
 		$this->yoast_seo = \YoastSEO();
 	}
 
@@ -128,6 +136,70 @@ class Organization_Logo extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		$this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person'  // @phpstan-ignore-line property.nonObject
+			? \printf(
+				/* translators: %s: "Read more" link. */
+				\esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your organization logo in the Yoast SEO settings. %s.', 'progress-planner' ),
+				'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/yoast-person-logo' ) ) . '" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Organization Logo', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			) : \printf(
+				/* translators: %s: "Read more" link. */
+				\esc_html__( 'To make Yoast SEO output the correct Schema, you need to set your person logo in the Yoast SEO settings. %s.', 'progress-planner' ),
+				'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/yoast-organization-logo' ) ) . '" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Person Logo', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
+			);
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		// Enqueue media scripts.
+		\wp_enqueue_media();
+
+		$organization_logo_id = $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person' ? $this->yoast_seo->helpers->options->get( 'company_logo' ) : $this->yoast_seo->helpers->options->get( 'person_logo' ); // @phpstan-ignore-line property.nonObject
+		?>
+		<div id="organization-logo-preview" style="margin-bottom: 15px; min-height: 150px; display: flex; align-items: center; justify-content: center; border: 2px dashed #ddd; border-radius: 4px; padding: 10px;">
+			<?php if ( $organization_logo_id ) : ?>
+				<?php echo \wp_get_attachment_image( $organization_logo_id, 'thumbnail', false, [ 'style' => 'max-width: 150px; height: auto; border-radius: 4px; border: 1px solid #ddd;' ] ); ?>
+			<?php else : ?>
+				<span style="color: #999;"><?php \esc_html_e( 'No image selected', 'progress-planner' ); ?></span>
+			<?php endif; ?>
+		</div>
+		<button type="button" id="prpl-upload-organization-logo-button" class="prpl-button prpl-button-secondary" style="margin-bottom: 15px;">
+			<?php \esc_html_e( 'Choose or Upload Image', 'progress-planner' ); ?>
+		</button>
+		<input type="hidden" name="prpl_yoast_organization_logo_id" id="prpl-yoast-organization-logo-id" value="<?php echo \esc_attr( $organization_logo_id ); ?>">
+		<button type="submit" class="prpl-button prpl-button-primary" id="prpl-set-organization-logo-button" <?php echo $organization_logo_id ? '' : 'disabled'; ?>>
+			<?php \esc_html_e( 'Set logo', 'progress-planner' ); ?>
+		</button>
+		<?php
+	}
+
+	/**
+	 * Get the enqueue data.
+	 *
+	 * @return array
+	 */
+	protected function get_enqueue_data() {
+		return [
+			'name' => 'prplYoastOrganizationLogo',
+			'data' => [
+				'mediaTitle'      => $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person' ? \esc_html__( 'Choose Organization Logo', 'progress-planner' ) : \esc_html__( 'Choose Person Logo', 'progress-planner' ),  // @phpstan-ignore-line property.nonObject
+				'mediaButtonText' => $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person' ? \esc_html__( 'Use as Organization Logo', 'progress-planner' ) : \esc_html__( 'Use as Person Logo', 'progress-planner' ),  // @phpstan-ignore-line property.nonObject
+				'companyOrPerson' => $this->yoast_seo->helpers->options->get( 'company_or_person', 'company' ) !== 'person' ? 'company' : 'person',  // @phpstan-ignore-line property.nonObject
+			],
+		];
+	}
+
+	/**
 	 * Add task actions specific to this task.
 	 *
 	 * @param array $data    The task data.
@@ -138,7 +210,7 @@ class Organization_Logo extends Yoast_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/site-representation' ) . '" target="_self">' . \esc_html__( 'Set logo', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Set logo', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;
