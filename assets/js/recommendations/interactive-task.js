@@ -1,4 +1,4 @@
-/* global prplSuggestedTask, progressPlannerAjaxRequest, progressPlanner */
+/* global prplSuggestedTask, progressPlannerAjaxRequest, progressPlanner, prplL10n */
 
 /*
  * Core Blog Description recommendation.
@@ -85,9 +85,13 @@ const prplInteractiveTaskFormListener = {
 
 			callback()
 				.then( ( response ) => {
-					console.log( response );
 					if ( true !== response.success ) {
-						// TODO: Handle error.
+						// Show error to the user.
+						prplInteractiveTaskFormListener.showError(
+							response,
+							popoverId
+						);
+
 						return response;
 					}
 
@@ -107,11 +111,11 @@ const prplInteractiveTaskFormListener = {
 					} );
 				} )
 				.catch( ( error ) => {
-					console.error(
-						'Error in interactive task callback:',
-						error
+					// Show error to the user.
+					prplInteractiveTaskFormListener.showError(
+						error,
+						popoverId
 					);
-					// TODO: Handle the error appropriately.
 				} );
 		} );
 	},
@@ -153,7 +157,12 @@ const prplInteractiveTaskFormListener = {
 				.then( ( response ) => {
 					console.log( response );
 					if ( true !== response.success ) {
-						// TODO: Handle error.
+						// Show error to the user.
+						prplInteractiveTaskFormListener.showError(
+							response,
+							popoverId
+						);
+
 						return response;
 					}
 
@@ -177,12 +186,57 @@ const prplInteractiveTaskFormListener = {
 					} );
 				} )
 				.catch( ( error ) => {
-					console.error(
-						'Error in interactive task settings:',
-						error
+					// Show error to the user.
+					prplInteractiveTaskFormListener.showError(
+						error,
+						popoverId
 					);
-					// TODO: Handle the error appropriately.
 				} );
 		} );
+	},
+
+	/**
+	 * Helper which shows user an error message.
+	 * For now the error message is generic.
+	 *
+	 * @param {Object} error     - The error object.
+	 * @param {string} popoverId - The ID of the popover.
+	 * @return {void}
+	 */
+	showError: ( error, popoverId ) => {
+		const formElement = document.querySelector( `#${ popoverId } form` );
+
+		if ( ! formElement ) {
+			return;
+		}
+
+		console.error( 'Error in interactive task callback:', error );
+
+		// Add error message.
+		const submitButton = formElement.querySelector(
+			'button[type="submit"]'
+		);
+
+		if (
+			submitButton &&
+			! formElement.querySelector(
+				'.prpl-interactive-task-error-message'
+			)
+		) {
+			// Add paragraph with error message.
+			const errorParagraph = document.createElement( 'p' );
+			errorParagraph.classList.add(
+				'prpl-note',
+				'prpl-note-error',
+				'prpl-interactive-task-error-message'
+			);
+			errorParagraph.textContent = prplL10n( 'somethingWentWrong' );
+
+			// Append before submit button.
+			submitButton.parentNode.insertBefore(
+				errorParagraph,
+				submitButton
+			);
+		}
 	},
 };

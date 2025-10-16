@@ -10,24 +10,32 @@ prplInteractiveTaskFormListener.customSubmit( {
 	taskId: 'set-date-format',
 	popoverId: 'prpl-popover-set-date-format',
 	callback: () => {
-		const format = document.querySelector(
-			'#prpl-popover-set-date-format input[name="date_format"]:checked'
-		);
-		const customFormat = document.querySelector(
-			'#prpl-popover-set-date-format input[name="date_format_custom"]'
-		);
+		return new Promise( ( resolve, reject ) => {
+			const format = document.querySelector(
+				'#prpl-popover-set-date-format input[name="date_format"]:checked'
+			);
+			const customFormat = document.querySelector(
+				'#prpl-popover-set-date-format input[name="date_format_custom"]'
+			);
 
-		fetch( progressPlanner.ajaxUrl, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded',
-			},
-			body: new URLSearchParams( {
-				action: 'prpl_interactive_task_submit_set-date-format',
-				nonce: progressPlanner.nonce,
-				date_format: format.value,
-				date_format_custom: customFormat.value,
-			} ),
+			fetch( progressPlanner.ajaxUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: new URLSearchParams( {
+					action: 'prpl_interactive_task_submit_set-date-format',
+					nonce: progressPlanner.nonce,
+					date_format: format.value,
+					date_format_custom: customFormat.value,
+				} ),
+			} )
+				.then( ( response ) => {
+					resolve( { response, success: true } );
+				} )
+				.catch( ( error ) => {
+					reject( { success: false, error } );
+				} );
 		} );
 	},
 } );
