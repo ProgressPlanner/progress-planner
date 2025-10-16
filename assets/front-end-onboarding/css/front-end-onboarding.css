@@ -1,8 +1,26 @@
+@font-face {
+	font-family: Gilroy;
+	src: url( '../fonts/Gilroy-Regular.woff2' ) format('woff2');
+	font-weight: 400;
+	font-style: normal;
+}
+
+@font-face {
+	font-family: Gilroy-Bold;
+	src: url('../fonts/Gilroy-Bold.woff2') format('woff2');
+	font-weight: 700;
+	font-style: normal;
+}
+
+
+
 .prpl-popover-onboarding {
 
 	& * {
 		box-sizing: border-box;
 	}
+
+	font-family: Gilroy, sans-serif;
 
 	padding: 24px 24px 14px 24px;
 	box-sizing: border-box;
@@ -19,6 +37,10 @@
 
 	&::backdrop {
 		background: rgba(0, 0, 0, 0.5);
+	}
+
+	h1, h2, h3, h4, h5, h6 {
+		font-family: Gilroy-Bold, sans-serif;
 	}
 
 	.prpl-popover-close {
