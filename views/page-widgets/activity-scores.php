@@ -39,10 +39,14 @@ $prpl_record = $prpl_widget->personal_record_callback();
 </h2>
 
 <div style="--background: var(--prpl-background-monthly)">
-	<prpl-gauge background="var(--prpl-background-activity)" color="<?php echo \esc_attr( $prpl_widget->get_gauge_color( $prpl_widget->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-6xl)">
-		<progress max="100" value="<?php echo (float) $prpl_widget->get_score(); ?>">
-			<?php echo \esc_html( $prpl_widget->get_score() ); ?>
-		</progress>
+	<prpl-gauge
+		background="var(--prpl-background-activity)"
+		color="<?php echo \esc_attr( $prpl_widget->get_gauge_color( $prpl_widget->get_score() ) ); ?>"
+		contentFontSize="var(--prpl-font-size-6xl)"
+		data-max="100"
+		data-value="<?php echo (float) $prpl_widget->get_score(); ?>"
+	>
+		<?php echo \esc_html( $prpl_widget->get_score() ); ?>
 	</prpl-gauge>
 </div>
 

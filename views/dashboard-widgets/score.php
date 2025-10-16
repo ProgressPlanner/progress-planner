@@ -23,23 +23,27 @@ $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( ne
 			data-badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
 			data-badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
 		>
-			<progress max="<?php echo (int) Monthly::TARGET_POINTS; ?>" value="<?php echo (float) \progress_planner()->get_admin__widgets__monthly_badges()->get_score()['target_score']; ?>">
-				<prpl-badge
-					complete="true"
-					badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
-					badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
-					branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
-				></prpl-badge>
-			</progress>
+			<prpl-badge
+				complete="true"
+				badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+				badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
+				branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
+			></prpl-badge>
 		</prpl-gauge>
 		<?php \esc_html_e( 'Monthly badge', 'progress-planner' ); ?>
 	</div>
 
 	<div>
-		<prpl-gauge background="#fff" color="<?php echo \esc_attr( \progress_planner()->get_admin__widgets__activity_scores()->get_gauge_color( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ) ); ?>" contentFontSize="var(--prpl-font-size-5xl)" contentPadding="var(--prpl-padding)" marginBottom="0">
-			<progress max="100" value="<?php echo (float) \progress_planner()->get_admin__widgets__activity_scores()->get_score(); ?>">
-				<?php echo \esc_html( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ); ?>
-			</progress>
+		<prpl-gauge
+			background="#fff"
+			color="<?php echo \esc_attr( \progress_planner()->get_admin__widgets__activity_scores()->get_gauge_color( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ) ); ?>"
+			contentFontSize="var(--prpl-font-size-5xl)"
+			contentPadding="var(--prpl-padding)"
+			marginBottom="0"
+			data-max="100"
+			data-value="<?php echo (float) \progress_planner()->get_admin__widgets__activity_scores()->get_score(); ?>"
+		>
+			<?php echo \esc_html( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ); ?>
 		</prpl-gauge>
 		<?php \esc_html_e( 'Website activity score', 'progress-planner' ); ?>
 	</div>
