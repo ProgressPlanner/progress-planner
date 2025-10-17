@@ -16,7 +16,18 @@ function todoTests( testContext = test ) {
 		} );
 
 		testContext.beforeEach( async () => {
-			context = await browser.newContext();
+			const fs = require( 'fs' );
+			const path = require( 'path' );
+			const authFile = path.join( process.cwd(), 'auth.json' );
+
+			// Load auth state if it exists
+			if ( fs.existsSync( authFile ) ) {
+				context = await browser.newContext( {
+					storageState: authFile,
+				} );
+			} else {
+				context = await browser.newContext();
+			}
 			page = await context.newPage();
 		} );
 
