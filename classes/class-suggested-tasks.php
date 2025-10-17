@@ -83,7 +83,7 @@ class Suggested_Tasks {
 		$completed_tasks = $this->tasks_manager->evaluate_tasks();
 
 		foreach ( $completed_tasks as $task ) {
-			if ( ! $task->task_id && $task->ID ) {
+			if ( ! $task->post_name && $task->ID ) {
 				continue;
 			}
 
@@ -91,7 +91,7 @@ class Suggested_Tasks {
 			$task->celebrate();
 
 			// Insert an activity.
-			$this->insert_activity( $task->task_id );
+			$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 		}
 	}
 
@@ -159,7 +159,7 @@ class Suggested_Tasks {
 		\progress_planner()->get_suggested_tasks_db()->update_recommendation( $pending_tasks[0]->ID, [ 'post_status' => 'trash' ] );
 
 		// Insert an activity.
-		$this->insert_activity( $pending_tasks[0]->task_id );
+		$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $pending_tasks[0]->post_name ) );
 	}
 
 	/**
@@ -250,13 +250,13 @@ class Suggested_Tasks {
 		switch ( $action ) {
 			case 'complete':
 				// Insert an activity.
-				$this->insert_activity( $task->task_id );
+				$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 				$updated = true;
 				break;
 
 			case 'pending': // User task was marked as pending.
 			case 'delete':
-				$this->delete_activity( $task->task_id );
+				$this->delete_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 				$updated = true;
 				break;
 		}
@@ -301,17 +301,12 @@ class Suggested_Tasks {
 		);
 
 		$rest_meta_fields = [
-			'prpl_task_id' => [
+			'prpl_url'   => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_url'     => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'menu_order'   => [
+			'menu_order' => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
@@ -436,6 +431,8 @@ class Suggested_Tasks {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
 		}
 
+		$response->data['slug'] = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $response->data['slug'] );
+
 		if ( $provider ) {
 			$response->data['prpl_provider'] = $provider_term[0];
 			// Link should be added during run time, since it is not added for users without required capability.
@@ -444,18 +441,18 @@ class Suggested_Tasks {
 				: '';
 
 			$response->data['prpl_popover_id'] = $provider->get_popover_id();
-
-			// This has to be the last item to be added because actions use data from previous items.
-			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
-			$response->data['prpl_points']       = $provider->get_points();
+			$response->data['prpl_points']     = $provider->get_points();
 
 			/*
 			 * Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
 			 * Those are tasks which are completed by toggling an option, so non repetitive & not user tasks.
 			 */
-			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['meta']['prpl_task_id'] ) ) {
+			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['slug'] ) ) {
 				$response->data['prpl_points'] = 0;
 			}
+
+			// This has to be the last item to be added because actions use data from previous items.
+			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
 		}
 
 		$category_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_category' );
@@ -573,5 +570,15 @@ class Suggested_Tasks {
 		)
 			? \array_map( fn() => 99, $max_items_per_category )
 			: $max_items_per_category;
+	}
+
+	/**
+	 * Get the task ID from a slug.
+	 *
+	 * @param string $slug The slug.
+	 * @return string
+	 */
+	public function get_task_id_from_slug( $slug ) {
+		return explode( '__trashed', $slug )[0];
 	}
 }
