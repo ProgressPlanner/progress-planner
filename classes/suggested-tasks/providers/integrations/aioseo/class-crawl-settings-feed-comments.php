@@ -1,0 +1,161 @@
+<?php
+/**
+ * Add task for All in One SEO: disable global comment RSS feeds.
+ *
+ * @package Progress_Planner
+ */
+
+namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\AIOSEO;
+
+/**
+ * Add task for All in One SEO: disable global comment RSS feeds.
+ */
+class Crawl_Settings_Feed_Comments extends AIOSEO_Interactive_Provider {
+
+	/**
+	 * The provider ID.
+	 *
+	 * @var string
+	 */
+	protected const PROVIDER_ID = 'aioseo-crawl-settings-feed-comments';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'aioseo-crawl-settings-feed-comments';
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/aioseo-crawl-optimization-feed-comments';
+
+	/**
+	 * Initialize the task.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		\add_action( 'wp_ajax_prpl_interactive_task_submit_aioseo-crawl-settings-feed-comments', [ $this, 'handle_interactive_task_specific_submit' ] );
+	}
+
+	/**
+	 * Get the task URL.
+	 *
+	 * @return string
+	 */
+	protected function get_url() {
+		return \admin_url( 'admin.php?page=aioseo-search-appearance#/advanced' );
+	}
+
+	/**
+	 * Get the title.
+	 *
+	 * @return string
+	 */
+	protected function get_title() {
+		return \esc_html__( 'All in One SEO: disable comment RSS feeds', 'progress-planner' );
+	}
+
+	/**
+	 * Determine if the task should be added.
+	 *
+	 * @return bool
+	 */
+	public function should_add_task() {
+		// Check if AIOSEO is active.
+		if ( ! \function_exists( 'aioseo' ) ) {
+			return false;
+		}
+
+		// Check if crawl cleanup is enabled and comment feeds are disabled.
+		$disable_global_comment_feed = \aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->globalComments; // @phpstan-ignore-line
+		$disable_post_comment_feed   = \aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->postComments; // @phpstan-ignore-line
+
+		// Check if comment feeds are already disabled.
+		if ( $disable_global_comment_feed === false && $disable_post_comment_feed === false ) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Get the description.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'We suggest disabling both the global "recent comments feed" from your site as well as the "comments feed" per post that WordPress generates. These feeds are rarely used by real users, but get crawled a lot. They don\'t have any interesting information for crawlers, so removing them leads to less bot-traffic on your site without downsides.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<button type="submit" class="prpl-button prpl-button-primary">
+			<?php \esc_html_e( 'Disable comment RSS feeds', 'progress-planner' ); ?>
+		</button>
+		<?php
+	}
+
+	/**
+	 * Handle the interactive task submit.
+	 *
+	 * This is only for interactive tasks that change non-core settings.
+	 * The $_POST data is expected to be:
+	 * - nonce: (string) The nonce.
+	 *
+	 * @return void
+	 */
+	public function handle_interactive_task_specific_submit() {
+		if ( ! \function_exists( 'aioseo' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'AIOSEO is not active.', 'progress-planner' ) ] );
+		}
+
+		// Check the nonce.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
+
+		// Global comment feed.
+		if ( \aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->globalComments ) { // @phpstan-ignore-line
+			\aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->globalComments = false; // @phpstan-ignore-line
+		}
+
+		// Post comment feed.
+		if ( \aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->postComments ) { // @phpstan-ignore-line
+			\aioseo()->options->searchAppearance->advanced->crawlCleanup->feeds->postComments = false; // @phpstan-ignore-line
+		}
+
+		// Update the option.
+		\aioseo()->options->save(); // @phpstan-ignore-line
+
+		\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover();return false;">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
+	}
+}
