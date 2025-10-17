@@ -97,34 +97,51 @@ class Base {
 		}
 
 		// Basic classes.
-		if ( \is_admin() && \current_user_can( 'edit_others_posts' ) ) {
-			$this->get_admin__page();
-			$this->get_admin__tour();
+		if ( \is_admin() || ( defined( 'REST_REQUEST' ) && REST_REQUEST ) ) {
+
+			if ( \current_user_can( 'edit_others_posts' ) ) {
+				$this->get_admin__page();
+				$this->get_admin__tour();
+
+				// Dont add the widget if the privacy policy is not accepted.
+				if ( true === $this->is_privacy_policy_accepted() ) {
+					$this->get_admin__dashboard_widget_score();
+					$this->get_admin__dashboard_widget_todo();
+				}
+			}
+			$this->get_admin__editor();
+
+			$this->get_actions__content();
+			$this->get_actions__content_scan();
+			$this->get_actions__maintenance();
+
+			// Onboarding.
+			$this->get_utils__onboard();
+
+			// To-do.
+			$this->get_todo();
+
+			\add_filter( 'plugin_action_links_' . plugin_basename( PROGRESS_PLANNER_FILE ), [ $this, 'add_action_links' ] );
+
+			// We need to initialize some classes early.
+			$this->get_settings();
+			$this->get_suggested_tasks();
+			$this->get_badges();
 
 			// Dont add the widget if the privacy policy is not accepted.
 			if ( true === $this->is_privacy_policy_accepted() ) {
-				$this->get_admin__dashboard_widget_score();
-				$this->get_admin__dashboard_widget_todo();
+				$this->get_admin__page_settings();
 			}
 		}
 
-		$this->get_suggested_tasks();
-
-		$this->get_admin__editor();
-
+		// Content actions.
 		$this->get_actions__content();
-		$this->get_actions__content_scan();
-		$this->get_actions__maintenance();
+
+		$this->get_page_types();
 
 		// REST API.
 		$this->get_rest__stats();
 		$this->get_rest__tasks();
-
-		// Onboarding.
-		$this->get_utils__onboard();
-
-		// To-do.
-		$this->get_todo();
 
 		// Post-meta.
 		$this->get_page_todos();
