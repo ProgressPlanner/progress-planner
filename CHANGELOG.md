@@ -1,5 +1,16 @@
 = 1.9.0 =
 
+In this release we've added an integration with the **All In One Seo** plugin so you’ll now see personalized suggestions based on your current SEO configuration.
+
+Added these recommendations from Ravi:
+
+* All In One SEO: [noindex the author archive](https://prpl.fyi/aioseo-author-archive)
+* All In One SEO: [noindex the date archive](https://prpl.fyi/aioseo-date-archive)
+* All In One SEO: [Remove post authors feeds](https://prpl.fyi/aioseo-crawl-optimization-feed-authors)
+* All In One SEO: [Remove comment feeds](https://prpl.fyi/aioseo-crawl-optimization-feed-comments)
+* All In One SEO: [disable the media pages](https://prpl.fyi/aioseo-media-pages)
+* All In One SEO: set your [organization](https://prpl.fyi/aioseo-organization-logo) or [person](https://prpl.fyi/aioseo-person-logo) logo
+
 Enhancements:
 
 * Add "Show all Recommendations" button to the "Ravi's Recommendations" widget
