@@ -57,3 +57,4 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<?php \esc_html_e( 'Check back later for new tasks!', 'progress-planner' ); ?>
 	</p>
 </div>
+<prpl-popover-post-content post-id="3771" button-content="Read more"></prpl-popover-post-content>
