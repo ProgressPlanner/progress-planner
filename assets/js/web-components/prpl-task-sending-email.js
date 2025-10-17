@@ -96,14 +96,16 @@ customElements.define(
 				'#prpl-sending-email-sent-message'
 			).textContent = resultMessageText;
 
-			// Make AJAX GET request.
-			fetch(
-				prplEmailSending.ajax_url +
-					'?action=prpl_test_email_sending&_wpnonce=' +
-					prplEmailSending.nonce +
-					'&email_address=' +
-					emailAddress.value
-			)
+			// Make AJAX POST request.
+			const formData = new FormData();
+			formData.append( 'action', 'prpl_test_email_sending' );
+			formData.append( 'email_address', emailAddress.value );
+			formData.append( '_wpnonce', prplEmailSending.nonce );
+
+			fetch( prplEmailSending.ajax_url, {
+				method: 'POST',
+				body: formData,
+			} )
 				.then( ( response ) => response.json() )
 				// eslint-disable-next-line no-unused-vars
 				.then( ( response ) => {

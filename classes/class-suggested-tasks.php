@@ -188,6 +188,9 @@ class Suggested_Tasks {
 	 * Primarly this is used for deeplinking, ie user is testing if the emails are working
 	 * He gets an email with a link which automatically completes the task.
 	 *
+	 * SECURITY FIX: Added token verification to prevent CSRF attacks.
+	 * Tokens are one-time use and expire after 24 hours.
+	 *
 	 * @return void
 	 */
 	public function maybe_complete_task() {
@@ -200,6 +203,19 @@ class Suggested_Tasks {
 			return;
 		}
 
+		// SECURITY FIX: Verify token to prevent CSRF attacks.
+		if ( ! isset( $_GET['token'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
+
+		$provided_token = \sanitize_text_field( \wp_unslash( $_GET['token'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$user_id        = \get_current_user_id();
+
+		// Verify the token.
+		if ( ! $this->verify_task_completion_token( $task_id, $user_id, $provided_token ) ) {
+			return;
+		}
+
 		if ( ! $this->was_task_completed( $task_id ) ) {
 			$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
@@ -208,8 +224,69 @@ class Suggested_Tasks {
 
 				// Insert an activity.
 				$this->insert_activity( $task_id );
+
+				// Delete the token after successful use (one-time use).
+				$this->delete_task_completion_token( $task_id, $user_id );
 			}
 		}
+	}
+
+	/**
+	 * Generate a secure token for task completion via email link.
+	 *
+	 * This token prevents CSRF attacks by ensuring only legitimate email
+	 * links can mark tasks as complete.
+	 *
+	 * @param string $task_id The task ID.
+	 * @param int    $user_id The user ID.
+	 *
+	 * @return string The generated token.
+	 */
+	public function generate_task_completion_token( $task_id, $user_id ) {
+		// Generate a cryptographically secure random token.
+		$random = \wp_generate_password( 32, false );
+		$token  = \wp_hash( $task_id . $user_id . $random . \wp_salt( 'auth' ) );
+
+		// Store the token in a transient (expires after 24 hours).
+		\set_transient(
+			'prpl_complete_' . $task_id . '_' . $user_id,
+			$token,
+			DAY_IN_SECONDS
+		);
+
+		return $token;
+	}
+
+	/**
+	 * Verify a task completion token.
+	 *
+	 * @param string $task_id        The task ID.
+	 * @param int    $user_id        The user ID.
+	 * @param string $provided_token The token to verify.
+	 *
+	 * @return bool True if token is valid, false otherwise.
+	 */
+	protected function verify_task_completion_token( $task_id, $user_id, $provided_token ) {
+		$stored_token = \get_transient( 'prpl_complete_' . $task_id . '_' . $user_id );
+
+		if ( ! $stored_token ) {
+			return false; // Token expired or doesn't exist.
+		}
+
+		// Use hash_equals to prevent timing attacks.
+		return \hash_equals( $stored_token, $provided_token );
+	}
+
+	/**
+	 * Delete a task completion token after use.
+	 *
+	 * @param string $task_id The task ID.
+	 * @param int    $user_id The user ID.
+	 *
+	 * @return bool True if deleted, false otherwise.
+	 */
+	protected function delete_task_completion_token( $task_id, $user_id ) {
+		return \delete_transient( 'prpl_complete_' . $task_id . '_' . $user_id );
 	}
 
 	/**

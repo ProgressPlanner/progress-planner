@@ -133,8 +133,11 @@ class Page_Settings {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
 		}
 
-		// Check the nonce.
-		\check_admin_referer( 'progress_planner' );
+		// SECURITY FIX: Use check_ajax_referer instead of check_admin_referer for AJAX handlers.
+		// check_admin_referer is designed for form submissions, not AJAX requests.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
 
 		if ( isset( $_POST['pages'] ) ) {
 			foreach ( \wp_unslash( $_POST['pages'] ) as $type => $page_args ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
@@ -189,11 +192,9 @@ class Page_Settings {
 	 * @return void
 	 */
 	public function save_settings() {
-		// Check the nonce.
-		\check_admin_referer( 'progress_planner' );
-
-		$redirect_on_login = isset( $_POST['prpl-redirect-on-login'] )
-			? \sanitize_text_field( \wp_unslash( $_POST['prpl-redirect-on-login'] ) )
+		// Nonce is already checked in store_settings_form_options() which calls this method.
+		$redirect_on_login = isset( $_POST['prpl-redirect-on-login'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			? \sanitize_text_field( \wp_unslash( $_POST['prpl-redirect-on-login'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
 			: false;
 
 		\update_user_meta( \get_current_user_id(), 'prpl_redirect_on_login', (bool) $redirect_on_login );
@@ -205,11 +206,9 @@ class Page_Settings {
 	 * @return void
 	 */
 	public function save_post_types() {
-		// Check the nonce.
-		\check_admin_referer( 'progress_planner' );
-
-		$include_post_types = isset( $_POST['prpl-post-types-include'] )
-			? \array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+		// Nonce is already checked in store_settings_form_options() which calls this method.
+		$include_post_types = isset( $_POST['prpl-post-types-include'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			? \array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
 			// If no post types are selected, use the default post types (post and page can be deregistered).
 			: \array_intersect( [ 'post', 'page' ], \progress_planner()->get_settings()->get_public_post_types() );
 

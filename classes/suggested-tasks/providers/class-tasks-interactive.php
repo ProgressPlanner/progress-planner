@@ -88,6 +88,18 @@ abstract class Tasks_Interactive extends Tasks {
 		$value        = \sanitize_text_field( \wp_unslash( $_POST['value'] ) );
 		$setting_path = \json_decode( \sanitize_text_field( \wp_unslash( $_POST['setting_path'] ) ), true );
 
+		// SECURITY FIX: Whitelist allowed options to prevent arbitrary options update.
+		// This prevents privilege escalation by restricting which options can be updated.
+		$allowed_options = $this->get_allowed_interactive_options();
+
+		if ( ! \in_array( $setting, $allowed_options, true ) ) {
+			\wp_send_json_error(
+				[
+					'message' => \esc_html__( 'Invalid setting. This option cannot be updated through interactive tasks.', 'progress-planner' ),
+				]
+			);
+		}
+
 		if ( ! empty( $setting_path ) ) {
 			$setting_value = \get_option( $setting );
 			\_wp_array_set( $setting_value, $setting_path, $value );
@@ -103,6 +115,47 @@ abstract class Tasks_Interactive extends Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to update setting.', 'progress-planner' ) ] );
 		}
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Get the list of allowed options that can be updated via interactive tasks.
+	 *
+	 * This whitelist prevents privilege escalation by ensuring only specific
+	 * WordPress options can be modified through the interactive task interface.
+	 *
+	 * @return array List of allowed option names.
+	 */
+	protected function get_allowed_interactive_options() {
+		$allowed_options = [
+			// Core WordPress settings that are safe to update via interactive tasks.
+			'blogdescription',          // Site tagline.
+			'default_comment_status',   // Comment settings.
+			'default_ping_status',      // Pingback settings.
+			'timezone_string',          // Site timezone.
+			'WPLANG',                   // Site language/locale (deprecated since WP 4.0, but still used by class-select-locale.php).
+			'date_format',              // Date format.
+			'time_format',              // Time format.
+			'default_pingback_flag',    // Pingback flag.
+			'comment_registration',     // Comment registration.
+			'close_comments_for_old_posts', // Close comments for old posts.
+			'thread_comments',          // Threaded comments.
+			'comments_per_page',        // Comments per page.
+			'comment_order',            // Comment order.
+			'page_comments',            // Paginate comments.
+		];
+
+		/**
+		 * Filter the list of allowed options for interactive tasks.
+		 *
+		 * WARNING: Be very careful when extending this list. Adding sensitive
+		 * options like 'admin_email', 'users_can_register', or plugin-specific
+		 * options that control access or permissions could create security vulnerabilities.
+		 *
+		 * @param array $allowed_options List of allowed option names.
+		 *
+		 * @return array Modified list of allowed option names.
+		 */
+		return \apply_filters( 'progress_planner_interactive_task_allowed_options', $allowed_options );
 	}
 
 	/**
