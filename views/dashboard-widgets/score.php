@@ -37,6 +37,7 @@ $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( ne
 		<prpl-gauge
 			background="#fff"
 			color="<?php echo \esc_attr( \progress_planner()->get_admin__widgets__activity_scores()->get_gauge_color( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ) ); ?>"
+			color2="<?php echo \esc_attr( \progress_planner()->get_admin__widgets__activity_scores()->get_gauge_color( \progress_planner()->get_admin__widgets__activity_scores()->get_score() ) ); ?>"
 			contentFontSize="var(--prpl-font-size-5xl)"
 			contentPadding="var(--prpl-padding)"
 			marginBottom="0"
