@@ -264,26 +264,13 @@ class Select_Locale extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing setting path.', 'progress-planner' ) ] );
 		}
 
-		$option_updated      = false;
 		$language_for_update = \sanitize_text_field( \wp_unslash( $_POST['value'] ) );
 
 		if ( empty( $language_for_update ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid language.', 'progress-planner' ) ] );
 		}
 
-		// Handle translation installation.
-		if ( \current_user_can( 'install_languages' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/translation-install.php'; // @phpstan-ignore requireOnce.fileNotFound
-
-			if ( \wp_can_install_language_pack() ) {
-				$language = \wp_download_language_pack( $language_for_update );
-				if ( $language ) {
-					$language_for_update = $language;
-
-					$option_updated = \update_option( 'WPLANG', $language_for_update );
-				}
-			}
-		}
+		$option_updated = $this->update_language( $language_for_update );
 
 		if ( $option_updated ) {
 			\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
@@ -307,5 +294,54 @@ class Select_Locale extends Tasks_Interactive {
 		];
 
 		return $actions;
+	}
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function complete_task( $args = [], $task_id = '' ) {
+
+		if ( ! $this->capability_required() ) {
+			return false;
+		}
+
+		if ( ! isset( $args['language'] ) ) {
+			return false;
+		}
+
+		return $this->update_language( \sanitize_text_field( \wp_unslash( $args['language'] ) ) );
+	}
+
+	/**
+	 * Update the language.
+	 *
+	 * @param string $language_for_update The language to update.
+	 *
+	 * @return bool
+	 */
+	protected function update_language( $language_for_update ) {
+		// Handle translation installation.
+		if ( \current_user_can( 'install_languages' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/translation-install.php'; // @phpstan-ignore requireOnce.fileNotFound
+
+			if ( \wp_can_install_language_pack() ) {
+				$language = \wp_download_language_pack( $language_for_update );
+				if ( $language ) {
+					$language_for_update = $language;
+
+					// update_option will return false if the option value is the same as the one being set.
+					\update_option( 'WPLANG', $language_for_update );
+
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 }
