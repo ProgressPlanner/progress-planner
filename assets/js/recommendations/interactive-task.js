@@ -1,4 +1,4 @@
-/* global prplSuggestedTask, progressPlannerAjaxRequest, progressPlanner */
+/* global prplSuggestedTask, progressPlannerAjaxRequest, progressPlanner, prplL10n */
 
 /*
  * Core Blog Description recommendation.
@@ -50,10 +50,16 @@ const prplInteractiveTaskFormListener = {
 			wp.api.loadPromise.done( () => {
 				const settings = new wp.api.models.Settings( settingsToPass );
 
-				settings.save().then( () => {
+				settings.save().then( ( response ) => {
+					console.log( response );
+					if ( true !== response.success ) {
+						// TODO: Handle error.
+						return response;
+					}
+
 					const postId = parseInt( taskEl.dataset.postId );
 					if ( ! postId ) {
-						return;
+						return response;
 					}
 
 					// This will trigger the celebration event (confetti) as well.
@@ -77,22 +83,40 @@ const prplInteractiveTaskFormListener = {
 		formElement.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
 
-			callback();
+			callback()
+				.then( ( response ) => {
+					if ( true !== response.success ) {
+						// Show error to the user.
+						prplInteractiveTaskFormListener.showError(
+							response,
+							popoverId
+						);
 
-			const taskEl = document.querySelector(
-				`.prpl-suggested-task[data-task-id="${ taskId }"]`
-			);
+						return response;
+					}
 
-			const postId = parseInt( taskEl.dataset.postId );
-			if ( ! postId ) {
-				return;
-			}
+					const taskEl = document.querySelector(
+						`.prpl-suggested-task[data-task-id="${ taskId }"]`
+					);
 
-			// This will trigger the celebration event (confetti) as well.
-			prplSuggestedTask.maybeComplete( postId ).then( () => {
-				// Close popover.
-				document.getElementById( popoverId ).hidePopover();
-			} );
+					const postId = parseInt( taskEl.dataset.postId );
+					if ( ! postId ) {
+						return;
+					}
+
+					// This will trigger the celebration event (confetti) as well.
+					prplSuggestedTask.maybeComplete( postId ).then( () => {
+						// Close popover.
+						document.getElementById( popoverId ).hidePopover();
+					} );
+				} )
+				.catch( ( error ) => {
+					// Show error to the user.
+					prplInteractiveTaskFormListener.showError(
+						error,
+						popoverId
+					);
+				} );
 		} );
 	},
 
@@ -129,26 +153,90 @@ const prplInteractiveTaskFormListener = {
 					value: settingsToPass[ setting ],
 					setting_path: settingPath,
 				},
-			} ).then( () => {
-				const taskEl = document.querySelector(
-					`.prpl-suggested-task[data-task-id="${ taskId }"]`
-				);
+			} )
+				.then( ( response ) => {
+					console.log( response );
+					if ( true !== response.success ) {
+						// Show error to the user.
+						prplInteractiveTaskFormListener.showError(
+							response,
+							popoverId
+						);
 
-				if ( ! taskEl ) {
-					return;
-				}
+						return response;
+					}
 
-				const postId = parseInt( taskEl.dataset.postId );
-				if ( ! postId ) {
-					return;
-				}
+					const taskEl = document.querySelector(
+						`.prpl-suggested-task[data-task-id="${ taskId }"]`
+					);
 
-				// This will trigger the celebration event (confetti) as well.
-				prplSuggestedTask.maybeComplete( postId ).then( () => {
-					// Close popover.
-					document.getElementById( popoverId ).hidePopover();
+					if ( ! taskEl ) {
+						return response;
+					}
+
+					const postId = parseInt( taskEl.dataset.postId );
+					if ( ! postId ) {
+						return response;
+					}
+
+					// This will trigger the celebration event (confetti) as well.
+					prplSuggestedTask.maybeComplete( postId ).then( () => {
+						// Close popover.
+						document.getElementById( popoverId ).hidePopover();
+					} );
+				} )
+				.catch( ( error ) => {
+					// Show error to the user.
+					prplInteractiveTaskFormListener.showError(
+						error,
+						popoverId
+					);
 				} );
-			} );
 		} );
+	},
+
+	/**
+	 * Helper which shows user an error message.
+	 * For now the error message is generic.
+	 *
+	 * @param {Object} error     - The error object.
+	 * @param {string} popoverId - The ID of the popover.
+	 * @return {void}
+	 */
+	showError: ( error, popoverId ) => {
+		const formElement = document.querySelector( `#${ popoverId } form` );
+
+		if ( ! formElement ) {
+			return;
+		}
+
+		console.error( 'Error in interactive task callback:', error );
+
+		// Add error message.
+		const submitButton = formElement.querySelector(
+			'button[type="submit"]'
+		);
+
+		if (
+			submitButton &&
+			! formElement.querySelector(
+				'.prpl-interactive-task-error-message'
+			)
+		) {
+			// Add paragraph with error message.
+			const errorParagraph = document.createElement( 'p' );
+			errorParagraph.classList.add(
+				'prpl-note',
+				'prpl-note-error',
+				'prpl-interactive-task-error-message'
+			);
+			errorParagraph.textContent = prplL10n( 'somethingWentWrong' );
+
+			// Append before submit button.
+			submitButton.parentNode.insertBefore(
+				errorParagraph,
+				submitButton
+			);
+		}
 	},
 };

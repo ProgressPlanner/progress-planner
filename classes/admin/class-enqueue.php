@@ -381,6 +381,7 @@ class Enqueue {
 			'installed'                    => \esc_html__( 'Installed', 'progress-planner' ),
 			'activating'                   => \esc_html__( 'Activating...', 'progress-planner' ),
 			'activated'                    => \esc_html__( 'Activated', 'progress-planner' ),
+			'somethingWentWrong'           => \esc_html__( 'Something went wrong.', 'progress-planner' ),
 		];
 	}
 
