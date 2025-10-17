@@ -214,27 +214,35 @@ class Enqueue {
 					$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
 				}
 
+				$include_providers            = [];
+				$providers_available_for_user = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers_available_for_user();
+				foreach ( $providers_available_for_user as $provider ) {
+					$include_providers[] = $provider->get_provider_id();
+				}
+
 				// Get tasks from task providers.
 				$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
 					[
-						'post_status'      => 'publish',
-						'exclude_provider' => [ 'user' ],
+						'post_status'               => 'publish',
+						'exclude_provider_category' => [ 'user' ],
+						'include_provider'          => $include_providers,
 					]
 				);
 				// Get pending celebration tasks.
 				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
 					[
-						'post_status'      => 'pending',
-						'posts_per_page'   => 100,
-						'exclude_provider' => [ 'user' ],
+						'post_status'               => 'pending',
+						'posts_per_page'            => 100,
+						'exclude_provider_category' => [ 'user' ],
+						'include_provider'          => $include_providers,
 					]
 				);
 
 				// Get user tasks.
 				$user_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
 					[
-						'post_status'      => [ 'publish', 'trash' ],
-						'include_provider' => [ 'user' ],
+						'post_status'               => [ 'publish', 'trash' ],
+						'include_provider_category' => [ 'user' ],
 					]
 				);
 
