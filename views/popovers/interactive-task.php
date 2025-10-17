@@ -18,7 +18,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 >
 	<div class="prpl-columns-wrapper-flex">
 		<div class="prpl-column prpl-column-content">
-			<h2><?php echo \wp_kses_post( $prpl_task_object->get_task_details()['post_title'] ); ?></h2>
+			<h2 class="prpl-popover-title"><?php echo \wp_kses_post( $prpl_task_object->get_task_details()['post_title'] ); ?></h2>
 			<?php $prpl_task_object->print_popover_instructions(); ?>
 		</div>
 		<div class="prpl-column">

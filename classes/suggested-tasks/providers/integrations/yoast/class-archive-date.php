@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 /**
  * Add task for Yoast SEO: disable the date archive.
  */
-class Archive_Date extends Yoast_Provider {
+class Archive_Date extends Yoast_Interactive_Provider {
 
 	/**
 	 * The provider ID.
@@ -18,6 +18,13 @@ class Archive_Date extends Yoast_Provider {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'yoast-date-archive';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'yoast-date-archive';
 
 	/**
 	 * The external link URL.
@@ -89,6 +96,30 @@ class Archive_Date extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'Yoast SEO can disable the date archive, which is really only useful for news sites and blogs.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<button type="submit" class="prpl-button prpl-button-primary">
+			<?php \esc_html_e( 'Disable', 'progress-planner' ); ?>
+		</button>
+		<?php
+	}
+
+	/**
 	 * Add task actions specific to this task.
 	 *
 	 * @param array $data    The task data.
@@ -99,7 +130,7 @@ class Archive_Date extends Yoast_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/date-archives' ) . '" target="_self">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

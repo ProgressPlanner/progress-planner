@@ -113,7 +113,6 @@ class Blog_Description extends Tasks_Interactive {
 				type="text"
 				id="blogdescription"
 				value="<?php echo \esc_attr( \get_bloginfo( 'description' ) ); ?>"
-				class="regular-text"
 				placeholder="<?php \esc_html_e( 'A catchy phrase to describe your website', 'progress-planner' ); ?>"
 			>
 		</label>

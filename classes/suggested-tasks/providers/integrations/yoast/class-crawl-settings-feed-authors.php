@@ -12,7 +12,7 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author;
 /**
  * Add task for Yoast SEO: Remove post authors feeds.
  */
-class Crawl_Settings_Feed_Authors extends Yoast_Provider {
+class Crawl_Settings_Feed_Authors extends Yoast_Interactive_Provider {
 
 	/**
 	 * The minimum number of posts with a post format to add the task.
@@ -27,6 +27,13 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'yoast-crawl-settings-feed-authors';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'yoast-crawl-settings-feed-authors';
 
 	/**
 	 * The data collector class name.
@@ -113,6 +120,30 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'Remove URLs which provide information about recent posts by specific authors.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<button type="submit" class="prpl-button prpl-button-primary">
+			<?php \esc_html_e( 'Remove', 'progress-planner' ); ?>
+		</button>
+		<?php
+	}
+
+	/**
 	 * Add task actions specific to this task.
 	 *
 	 * @param array $data    The task data.
@@ -123,7 +154,7 @@ class Crawl_Settings_Feed_Authors extends Yoast_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_authors' ) . '" target="_self">' . \esc_html__( 'Remove', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Remove', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

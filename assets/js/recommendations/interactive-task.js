@@ -73,8 +73,7 @@ const prplInteractiveTaskFormListener = {
 			return;
 		}
 
-		// Add a form listener to the form.
-		formElement.addEventListener( 'submit', ( event ) => {
+		const formSubmitHandler = ( event ) => {
 			event.preventDefault();
 
 			callback();
@@ -93,7 +92,13 @@ const prplInteractiveTaskFormListener = {
 				// Close popover.
 				document.getElementById( popoverId ).hidePopover();
 			} );
-		} );
+
+			// Remove the form listener once the callback is executed.
+			formElement.removeEventListener( 'submit', formSubmitHandler );
+		};
+
+		// Add a form listener to the form.
+		formElement.addEventListener( 'submit', formSubmitHandler );
 	},
 
 	settings: ( {
