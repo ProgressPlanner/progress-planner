@@ -28,6 +28,26 @@
 
 	.prpl-show-all-tasks {
 		display: none;
+
+		.prpl-toggle-all-recommendations-button {
+			background: none;
+			border: none;
+			padding: 0;
+			color: var(--wp-admin-theme-color, #2271b1);
+			text-decoration: underline;
+			cursor: pointer;
+			font-size: inherit;
+			font-family: inherit;
+
+			&:hover {
+				color: var(--wp-admin-theme-color-darker-10, #135e96);
+			}
+
+			&:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+			}
+		}
 	}
 
 	&:has(.prpl-suggested-tasks-list li) {

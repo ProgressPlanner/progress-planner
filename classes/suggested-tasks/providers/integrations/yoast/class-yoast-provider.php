@@ -15,13 +15,6 @@ use Progress_Planner\Suggested_Tasks\Providers\Tasks;
 abstract class Yoast_Provider extends Tasks {
 
 	/**
-	 * The provider type.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'configuration';
-
-	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool

@@ -27,13 +27,6 @@ class Email_Sending extends Tasks_Interactive {
 	const PROVIDER_ID = 'sending-email';
 
 	/**
-	 * The provider type.
-	 *
-	 * @var string
-	 */
-	const CATEGORY = 'configuration';
-
-	/**
 	 * The popover ID.
 	 *
 	 * @var string
@@ -59,7 +52,7 @@ class Email_Sending extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = 1;
+	protected $priority = self::PRIORITY_URGENT + 1;
 
 	/**
 	 * The email title.
