@@ -22,6 +22,13 @@ abstract class Yoast_Provider extends Tasks {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = self::PRIORITY_HIGH;
+
+	/**
 	 * Get the focus tasks.
 	 *
 	 * @return array
