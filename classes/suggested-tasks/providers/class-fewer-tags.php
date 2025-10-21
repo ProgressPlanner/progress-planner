@@ -173,7 +173,7 @@ class Fewer_Tags extends Tasks_Interactive {
 		echo '<p>';
 		\printf(
 			// translators: %1$s is the number of tags, %2$s is the number of published posts.
-			\esc_html__( 'We detected that you have %1$s tags and %2$s published posts. Consider installing the "Fewer Tags" plugin.', 'progress-planner' ),
+			\esc_html__( 'Your site has %1$s tags across %2$s published posts. Having too many tags can dilute your content organization and hurt SEO. The "Fewer Tags" plugin helps you consolidate similar tags.', 'progress-planner' ),
 			(int) $this->post_tag_count_data_collector->collect(),
 			(int) $this->published_post_count_data_collector->collect(),
 		);

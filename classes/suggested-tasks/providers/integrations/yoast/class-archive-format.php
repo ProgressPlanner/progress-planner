@@ -115,7 +115,7 @@ class Archive_Format extends Yoast_Interactive_Provider {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'WordPress creates an archive for each post format. This is not useful and can be disabled in the Yoast SEO settings.', 'progress-planner' );
+		\esc_html_e( 'WordPress creates separate archives for each post format (standard, aside, gallery, etc.). Most sites don\'t use post formats, making these archives unnecessary. Disabling them reduces crawl waste and potential duplicate content.', 'progress-planner' );
 		echo '</p>';
 	}
 

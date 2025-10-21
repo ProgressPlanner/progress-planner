@@ -119,7 +119,7 @@ class Permalink_Structure extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'On install, WordPress sets the permalink structure to a format that is not SEO-friendly. We recommend changing it.', 'progress-planner' );
+		\esc_html_e( 'By default, WordPress uses date-based URLs (e.g., /2025/01/21/post-name/) which can make your content seem outdated. SEO-friendly URLs help search engines and visitors better understand your content.', 'progress-planner' );
 		echo '</p>';
 	}
 

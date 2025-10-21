@@ -102,7 +102,7 @@ class Search_Engine_Visibility extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Your site is not currently visible to search engines. Consider allowing search engines to index your site.', 'progress-planner' );
+		\esc_html_e( 'Your site is currently hidden from search engines like Google and Bing. This setting is useful during development, but prevents people from finding your content through search. If your site is ready to go live, you should enable search engine visibility.', 'progress-planner' );
 		echo '</p>';
 	}
 

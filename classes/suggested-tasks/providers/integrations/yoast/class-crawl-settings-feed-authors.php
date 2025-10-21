@@ -126,7 +126,7 @@ class Crawl_Settings_Feed_Authors extends Yoast_Interactive_Provider {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Remove URLs which provide information about recent posts by specific authors.', 'progress-planner' );
+		\esc_html_e( 'WordPress creates RSS feeds for each author (e.g., /author/john/feed/). Unless you\'re running a multi-author blog where readers want to follow specific writers, these feeds are unnecessary and create extra URLs for search engines to crawl.', 'progress-planner' );
 		echo '</p>';
 	}
 

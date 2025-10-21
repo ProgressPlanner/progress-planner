@@ -358,7 +358,7 @@ class Update_Term_Description extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Adding a description to your term helps search engines and visitors understand what content to expect.', 'progress-planner' );
+		\esc_html_e( 'Term descriptions appear on category and tag archive pages, helping visitors understand what to expect. They also provide important context for search engines, which can improve your SEO.', 'progress-planner' );
 		echo '</p>';
 	}
 

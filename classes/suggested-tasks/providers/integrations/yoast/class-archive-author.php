@@ -115,7 +115,7 @@ class Archive_Author extends Yoast_Interactive_Provider {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Yoast SEO can disable the author archive when you have only one author, as it is the same as the homepage.', 'progress-planner' );
+		\esc_html_e( 'When your site has only one author, the author archive is redundant and creates duplicate content issues. Disabling it prevents search engines from indexing the same content multiple times.', 'progress-planner' );
 		echo '</p>';
 	}
 

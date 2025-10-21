@@ -102,7 +102,7 @@ class Archive_Date extends Yoast_Interactive_Provider {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Yoast SEO can disable the date archive, which is really only useful for news sites and blogs.', 'progress-planner' );
+		\esc_html_e( 'Date archives are primarily useful for news sites and time-sensitive content. For most websites, they add unnecessary URLs that can dilute your SEO. Disable them unless your content is date-specific.', 'progress-planner' );
 		echo '</p>';
 	}
 

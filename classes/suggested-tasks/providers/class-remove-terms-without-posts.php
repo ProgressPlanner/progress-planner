@@ -366,7 +366,7 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Deleting this empty term will help keep your site organized. This action cannot be undone.', 'progress-planner' );
+		\esc_html_e( 'This term has no posts assigned to it. Removing unused terms keeps your site organized, improves navigation, and prevents empty archive pages. Note: This action cannot be undone.', 'progress-planner' );
 		echo '</p>';
 	}
 

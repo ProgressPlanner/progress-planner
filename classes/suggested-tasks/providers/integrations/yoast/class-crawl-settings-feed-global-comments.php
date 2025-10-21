@@ -94,7 +94,7 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Interactive_Provider {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Remove URLs which provide an overview of recent comments on your site.', 'progress-planner' );
+		\esc_html_e( 'WordPress creates an RSS feed of all comments on your site. Unless you have active discussions that people want to follow, this feed is rarely used and creates an unnecessary URL.', 'progress-planner' );
 		echo '</p>';
 	}
 

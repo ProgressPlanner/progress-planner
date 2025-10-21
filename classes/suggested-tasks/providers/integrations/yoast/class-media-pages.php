@@ -88,7 +88,7 @@ class Media_Pages extends Yoast_Interactive_Provider {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Yoast SEO can disable the media / attachment pages, which are the pages that show the media files. You really don\'t need them, except when you are displaying photos or art on your site through them.', 'progress-planner' );
+		\esc_html_e( 'WordPress creates individual pages for every image you upload. These attachment pages rarely provide value and can cause thin content issues for SEO. Disable them unless you\'re running a photography or art portfolio site where the attachment pages themselves are important.', 'progress-planner' );
 		echo '</p>';
 	}
 

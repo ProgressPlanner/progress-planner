@@ -94,7 +94,7 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Interactive_Provider {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Remove JavaScript used for converting emoji characters in older browsers.', 'progress-planner' );
+		\esc_html_e( 'WordPress loads extra JavaScript to support emojis in older browsers. Modern browsers (and most of your visitors) don\'t need this, so removing it improves your site\'s loading speed.', 'progress-planner' );
 		echo '</p>';
 	}
 

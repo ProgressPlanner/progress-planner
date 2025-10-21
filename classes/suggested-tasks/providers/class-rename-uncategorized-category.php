@@ -108,7 +108,7 @@ class Rename_Uncategorized_Category extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'The Uncategorized category is used for posts that don\'t have a category. We recommend renaming it to something that fits your site better.', 'progress-planner' );
+		\esc_html_e( 'WordPress assigns posts to "Uncategorized" by default if no category is selected. Renaming this to something meaningful (like "General" or your main topic) creates a better user experience and looks more professional.', 'progress-planner' );
 		echo '</p>';
 	}
 
