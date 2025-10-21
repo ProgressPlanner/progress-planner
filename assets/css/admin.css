@@ -177,6 +177,10 @@ button.prpl-info-icon {
 	flex-wrap: wrap;
 	justify-content: space-between;
 	align-items: center;
+
+	.prpl-header-logo img {
+		height: 100px;
+	}
 }
 
 .prpl-header-logo svg {
