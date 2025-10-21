@@ -20,4 +20,11 @@ abstract class AIOSEO_Interactive_Provider extends Tasks_Interactive {
 	 * @var bool
 	 */
 	protected const IS_ONBOARDING_TASK = false;
+
+	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = self::PRIORITY_NORMAL;
 }

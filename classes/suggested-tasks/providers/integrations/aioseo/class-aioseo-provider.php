@@ -20,4 +20,11 @@ abstract class AIOSEO_Provider extends Tasks {
 	 * @var bool
 	 */
 	protected const IS_ONBOARDING_TASK = false;
+
+	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = self::PRIORITY_NORMAL;
 }
