@@ -107,17 +107,11 @@ class Suggested_Tasks_DB {
 		try {
 			$post_id = \wp_insert_post( $args );
 
-			// Add terms if they don't exist.
-			foreach ( [ 'category', 'provider_id' ] as $context ) {
-				$taxonomy_name = \str_replace( '_id', '', $context );
-				$term          = \get_term_by( 'name', $data[ $context ], "prpl_recommendations_$taxonomy_name" );
-				if ( ! $term ) {
-					\wp_insert_term( $data[ $context ], "prpl_recommendations_$taxonomy_name" );
-				}
+			// Add provider term if it doesn't exist.
+			$term = \get_term_by( 'name', $data['provider_id'], 'prpl_recommendations_provider' );
+			if ( ! $term ) {
+				\wp_insert_term( $data['provider_id'], 'prpl_recommendations_provider' );
 			}
-
-			// Set the task category.
-			\wp_set_post_terms( $post_id, $data['category'], 'prpl_recommendations_category' );
 
 			// Set the task provider.
 			\wp_set_post_terms( $post_id, $data['provider_id'], 'prpl_recommendations_provider' );
@@ -140,7 +134,6 @@ class Suggested_Tasks_DB {
 				'title',
 				'description',
 				'status',
-				'category',
 				'provider_id',
 				'parent',
 				'order',
@@ -179,9 +172,8 @@ class Suggested_Tasks_DB {
 		$update_results = [];
 		foreach ( $data as $key => $value ) {
 			switch ( $key ) {
-				case 'category':
 				case 'provider':
-					$update_terms[ "prpl_recommendations_$key" ] = $value;
+					$update_terms['prpl_recommendations_provider'] = $value;
 					break;
 
 				default:
@@ -271,10 +263,9 @@ class Suggested_Tasks_DB {
 					: $value;
 		}
 
-		foreach ( [ 'category', 'provider' ] as $context ) {
-			$terms                 = \wp_get_post_terms( $post_data['ID'], "prpl_recommendations_$context" );
-			$post_data[ $context ] = \is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
-		}
+		// Get provider taxonomy term.
+		$terms                 = \wp_get_post_terms( $post_data['ID'], 'prpl_recommendations_provider' );
+		$post_data['provider'] = \is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
 
 		$cached[ $post_data['ID'] ] = new Task( $post_data );
 		return $cached[ $post_data['ID'] ];
@@ -311,12 +302,9 @@ class Suggested_Tasks_DB {
 			switch ( $param ) {
 				case 'provider':
 				case 'provider_id':
-				case 'category':
 					$args['tax_query']   = isset( $args['tax_query'] ) ? $args['tax_query'] : []; // phpcs:ignore WordPress.DB.SlowDBQuery
 					$args['tax_query'][] = [
-						'taxonomy' => 'category' === $param
-							? 'prpl_recommendations_category'
-							: 'prpl_recommendations_provider',
+						'taxonomy' => 'prpl_recommendations_provider',
 						'field'    => 'slug',
 						'terms'    => (array) $value,
 					];

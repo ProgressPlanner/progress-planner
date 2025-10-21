@@ -34,6 +34,13 @@ class Site_Icon extends Tasks {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-site-icon';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = self::PRIORITY_NORMAL - 5;
+
+	/**
 	 * Get the link setting.
 	 *
 	 * @return array

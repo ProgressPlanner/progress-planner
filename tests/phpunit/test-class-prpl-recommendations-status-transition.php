@@ -60,8 +60,7 @@ class Prpl_Recommendations_Status_Transition_Test extends \WP_UnitTestCase {
 
 			$post_id = \wp_insert_post( $post_data );
 
-			// Add required taxonomy terms for the post.
-			\wp_set_object_terms( $post_id, 'test-category', 'prpl_recommendations_category' );
+			// Add required taxonomy term for the post.
 			\wp_set_object_terms( $post_id, 'test-provider', 'prpl_recommendations_provider' );
 
 			// Now publish the post (change status from future to publish).
