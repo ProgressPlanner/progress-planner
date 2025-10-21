@@ -25,6 +25,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Php_Version;
 use Progress_Planner\Suggested_Tasks\Providers\Search_Engine_Visibility;
 use Progress_Planner\Suggested_Tasks\Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
+use Progress_Planner\Suggested_Tasks\Providers\Integrations\AIOSEO\Add_AIOSEO_Providers;
 use Progress_Planner\Suggested_Tasks\Providers\User as User_Tasks;
 use Progress_Planner\Suggested_Tasks\Providers\Email_Sending;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Valuable_Post_Types;
@@ -100,13 +101,16 @@ class Tasks_Manager {
 	}
 
 	/**
-	 * Add the Yoast task if the plugin is active.
+	 * Add the plugin integrations if the plugins are active.
 	 *
 	 * @return void
 	 */
 	public function add_plugin_integration() {
 		// Yoast SEO integration.
 		new Add_Yoast_Providers();
+
+		// All in One SEO integration.
+		new Add_AIOSEO_Providers();
 	}
 
 	/**
@@ -264,7 +268,7 @@ class Tasks_Manager {
 			return false;
 		}
 
-		return $task_provider->evaluate_task( $task->task_id );
+		return $task_provider->evaluate_task( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 	}
 
 	/**
