@@ -8,7 +8,7 @@
 namespace Progress_Planner\Update;
 
 /**
- * Update class for version 1.7.2.
+ * Update class for version 1.9.0.
  *
  * @package Progress_Planner
  */
@@ -22,6 +22,9 @@ class Update_190 {
 	 * @return void
 	 */
 	public function run() {
+		// Delete the 'progress_planner_pro_license_key' entry from wp_options table.
+		$this->migrate_recommendations_slugs();
+
 		// Migrate the golden task.
 		$this->migrate_golden_todo_task();
 
@@ -33,6 +36,48 @@ class Update_190 {
 		// This needs to run after tasks_manager is initialized (priority 99 on init hook).
 		// So we hook it to run at priority 100.
 		\add_action( 'init', [ $this, 'migrate_task_priorities' ], 100 );
+	}
+
+	/**
+	 * Migrate the recommendations slugs.
+	 *
+	 * @return void
+	 */
+	private function migrate_recommendations_slugs() {
+		// Get all recommendations.
+		$recommendations = \progress_planner()->get_suggested_tasks_db()->get();
+		foreach ( $recommendations as $recommendation ) {
+			// Get the `prpl_task_id` meta.
+			$prpl_task_id = \get_post_meta( $recommendation->ID, 'prpl_task_id', true );
+			if ( ! $prpl_task_id ) {
+				continue;
+			}
+
+			// Get the target slug.
+			$target_slug = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $prpl_task_id );
+
+			// Check if there are any existing posts with the same slug.
+			$existing_posts = \get_posts(
+				[
+					'post_type' => 'prpl_recommendations',
+					'name'      => $target_slug,
+				]
+			);
+			if ( ! empty( $existing_posts ) && $existing_posts[0]->ID !== $recommendation->ID ) {
+				// Delete the existing post (but not if it's the current one).
+				\wp_delete_post( $existing_posts[0]->ID, true );
+			}
+
+			// Only update if the slug is different from the current slug.
+			if ( $recommendation->post_name !== $target_slug ) {
+				\wp_update_post(
+					[
+						'ID'        => $recommendation->ID,
+						'post_name' => $target_slug,
+					]
+				);
+			}
+		}
 	}
 
 	/**
@@ -154,10 +199,18 @@ class Update_190 {
 
 			// Update the menu_order for each task.
 			foreach ( $tasks as $task ) {
+				// Refresh the task data to ensure we have the latest menu_order value.
+				$refreshed_task = \get_post( $task->ID );
+
+				// Skip if the post no longer exists.
+				if ( ! $refreshed_task ) {
+					continue;
+				}
+
 				// Only update if the menu_order is different from the current priority.
-				if ( (int) $task->menu_order !== $priority ) {
+				if ( (int) $refreshed_task->menu_order !== $priority ) {
 					\progress_planner()->get_suggested_tasks_db()->update_recommendation(
-						$task->ID,
+						$refreshed_task->ID,
 						[ 'menu_order' => $priority ]
 					);
 				}

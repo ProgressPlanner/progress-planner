@@ -108,7 +108,7 @@ class System_Status {
 		$data['recommendations'] = [];
 		foreach ( $ravis_recommendations as $recommendation ) {
 			$r = [
-				'id'          => $recommendation->task_id,
+				'id'          => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $recommendation->post_name ),
 				'title'       => $recommendation->post_title,
 				'url'         => $recommendation->url,
 				'provider_id' => $recommendation->get_provider_id(),
