@@ -517,4 +517,14 @@ class Suggested_Tasks {
 		 */
 		return \apply_filters( 'progress_planner_suggested_tasks_in_rest_format', $tasks, $args );
 	}
+
+	/**
+	 * Get the task ID from a slug.
+	 *
+	 * @param string $slug The slug.
+	 * @return string
+	 */
+	public function get_task_id_from_slug( $slug ) {
+		return explode( '__trashed', $slug )[0];
+	}
 }
