@@ -38,7 +38,7 @@ class Set_Valuable_Post_Types extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = 70;
+	protected $priority = self::PRIORITY_LOW + 10;
 
 	/**
 	 * Get the task URL.

@@ -14,10 +14,10 @@ namespace Progress_Planner\Suggested_Tasks;
  * @property string $post_status The task status
  * @property string $post_title The task title
  * @property string $post_date The task date
+ * @property int $menu_order The task menu order (priority)
  * @property \stdClass|null $provider The task provider object with slug property
  * @property string $task_id The task identifier
  * @property string $provider_id The provider identifier
- * @property string $category The task category
  * @property int $priority The task priority (0-100, 0 being highest and 100 being lowest).
  * @property int $points The task points
  * @property bool $dismissable Whether the task is dismissable
@@ -142,15 +142,6 @@ class Task {
 	 */
 	public function get_provider_id(): string {
 		return $this->data['provider']->slug ?? ''; // @phpstan-ignore-line property.nonObject
-	}
-
-	/**
-	 * Get the category.
-	 *
-	 * @return string
-	 */
-	public function get_category(): string {
-		return $this->data['category']->slug ?? ''; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**
