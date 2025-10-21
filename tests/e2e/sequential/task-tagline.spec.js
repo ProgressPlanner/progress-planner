@@ -22,7 +22,7 @@ function taglineTests( testContext = test ) {
 
 				// Find the blog description task
 				const blogDescriptionTask = initialTasks.find(
-					( task ) => task.slug === 'core-blogdescription'
+					( task ) => task.post_name === 'core-blogdescription'
 				);
 				expect( blogDescriptionTask ).toBeDefined();
 				expect( blogDescriptionTask.post_status ).toBe( 'publish' );
