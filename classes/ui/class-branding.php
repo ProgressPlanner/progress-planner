@@ -292,4 +292,15 @@ final class Branding {
 
 		return $default_url;
 	}
+
+	/**
+	 * Get the recommended SEO plugin slug.
+	 *
+	 * @return string
+	 */
+	public function get_seo_plugin_recommendation_slug(): string {
+		return empty( $this->get_api_data() ) || ! isset( $this->get_api_data()['seo_plugin_recommendation_slug'] )
+			? 'wordpress-seo'
+			: $this->get_api_data()['seo_plugin_recommendation_slug'];
+	}
 }
