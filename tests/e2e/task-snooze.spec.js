@@ -5,7 +5,7 @@ test.describe( 'PRPL Task Snooze', () => {
 	test( 'Snooze a task for one week', async ( { page, request } ) => {
 		// Navigate to Progress Planner dashboard with show all tasks parameter
 		await page.goto(
-			`${ process.env.WORDPRESS_URL }/wp-admin/admin.php?page=progress-planner&prpl_show_all_suggested_tasks=99`
+			`${ process.env.WORDPRESS_URL }/wp-admin/admin.php?page=progress-planner&prpl_show_all_recommendations`
 		);
 		await page.waitForLoadState( 'networkidle' );
 
