@@ -233,10 +233,6 @@ class Page {
 		$total_points     = 0;
 		$completed_points = 0;
 		foreach ( $tasks_providers as $provider ) {
-			if ( 'configuration' !== $provider->get_provider_category() ) {
-				continue;
-			}
-
 			$link_setting = $provider->get_link_setting();
 			if ( ! isset( $link_setting['hook'] ) ||
 				$hook !== $link_setting['hook']

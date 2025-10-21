@@ -24,6 +24,7 @@ customElements.define(
 				'maxdeg',
 				'background',
 				'color',
+				'color2',
 				'start',
 				'cutout',
 				'contentfontsize',
