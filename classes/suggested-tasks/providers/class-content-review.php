@@ -31,13 +31,6 @@ class Content_Review extends Tasks {
 	protected const PROVIDER_ID = 'review-post';
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'content-update';
-
-	/**
 	 * The external link URL.
 	 *
 	 * @var string
@@ -63,7 +56,7 @@ class Content_Review extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = 30;
+	protected $priority = self::PRIORITY_LOW;
 
 	/**
 	 * Whether the task is dismissable.
@@ -294,7 +287,6 @@ class Content_Review extends Tasks {
 			$task_to_inject[] = [
 				'task_id'           => $this->get_task_id( [ 'target_post_id' => $task_data['target_post_id'] ] ),
 				'provider_id'       => $this->get_provider_id(),
-				'category'          => $this->get_provider_category(),
 				'target_post_id'    => $task_data['target_post_id'],
 				'target_post_type'  => $task_data['target_post_type'],
 				'date'              => \gmdate( 'YW' ),
@@ -302,6 +294,7 @@ class Content_Review extends Tasks {
 				'url'               => $this->get_url_with_data( $task_data ),
 				'url_target'        => $this->get_url_target(),
 				'dismissable'       => $this->is_dismissable(),
+				'priority'          => $this->get_priority(),
 				'points'            => $this->get_points(),
 				'external_link_url' => $this->get_external_link_url(),
 			];
