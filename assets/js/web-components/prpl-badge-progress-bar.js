@@ -17,7 +17,12 @@ customElements.define(
 		 * Observed attributes, defined the attributes that will trigger the attributeChangedCallback.
 		 */
 		static get observedAttributes() {
-			return [ 'data-badge-id', 'data-points', 'data-max-points' ];
+			return [
+				'data-badge-id',
+				'data-points',
+				'data-max-points',
+				'data-branding-id',
+			];
 		}
 
 		/**
