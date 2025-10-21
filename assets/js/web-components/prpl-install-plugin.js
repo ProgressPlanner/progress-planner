@@ -1,4 +1,4 @@
-/* global customElements, HTMLElement, prplL10n, progressPlanner, progressPlannerAjaxRequest, prplSuggestedTask */
+/* global customElements, HTMLElement, prplL10n, progressPlannerAjaxRequest, prplSuggestedTask */
 /*
  * Install Plugin
  *
@@ -81,12 +81,12 @@ customElements.define(
 			`;
 
 			progressPlannerAjaxRequest( {
-				url: progressPlanner.ajaxUrl,
+				url: this.getAjaxUrl(),
 				data: {
 					action: 'progress_planner_install_plugin',
 					plugin_slug: this.pluginSlug,
 					plugin_name: this.pluginName,
-					nonce: progressPlanner.nonce,
+					nonce: this.getNonce(),
 				},
 			} )
 				.then( () => thisObj.activatePlugin() )
@@ -102,12 +102,12 @@ customElements.define(
 			`;
 
 			progressPlannerAjaxRequest( {
-				url: progressPlanner.ajaxUrl,
+				url: this.getAjaxUrl(),
 				data: {
 					action: 'progress_planner_activate_plugin',
 					plugin_slug: thisObj.pluginSlug,
 					plugin_name: thisObj.pluginName,
-					nonce: progressPlanner.nonce,
+					nonce: this.getNonce(),
 				},
 			} )
 				.then( () => {
@@ -140,6 +140,26 @@ customElements.define(
 					}
 				}
 			} );
+		}
+
+		/**
+		 * Get the AJAX URL.
+		 *
+		 * @return {string} The AJAX URL.
+		 */
+		getAjaxUrl() {
+			return window.progressPlanner?.ajaxUrl ?? window.ajaxurl;
+		}
+
+		/**
+		 * Get the nonce.
+		 *
+		 * @return {string} The nonce.
+		 */
+		getNonce() {
+			return (
+				window.progressPlanner?.nonce ?? window.prplSuggestedTask?.nonce
+			);
 		}
 	}
 );

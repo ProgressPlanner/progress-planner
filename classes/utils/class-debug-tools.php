@@ -51,9 +51,6 @@ class Debug_Tools {
 			\add_action( 'init', [ $this, 'check_toggle_placeholder_demo' ] );
 		}
 
-		// Add filter to modify the maximum number of suggested tasks to display.
-		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_suggested_tasks' ] );
-
 		// Initialize color customizer.
 		$this->get_color_customizer();
 	}
@@ -78,16 +75,6 @@ class Debug_Tools {
 		);
 
 		$this->add_delete_submenu_item( $admin_bar );
-
-		// Show all suggested tasks.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-show-all-suggested-tasks',
-				'parent' => 'prpl-debug',
-				'title'  => 'Show All Suggested Tasks',
-				'href'   => \add_query_arg( 'prpl_show_all_suggested_tasks', '99', $this->current_url ),
-			]
-		);
 
 		$this->add_upgrading_tasks_submenu_item( $admin_bar );
 
@@ -429,29 +416,6 @@ class Debug_Tools {
 		// Redirect to the same page without the parameter.
 		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_badges', '_wpnonce' ] ) );
 		exit;
-	}
-
-	/**
-	 * Modify the maximum number of suggested tasks to display.
-	 *
-	 * @param array $max_items_per_category Array of maximum items per category.
-	 * @return array Modified array of maximum items per category.
-	 */
-	public function check_show_all_suggested_tasks( $max_items_per_category ) {
-		if (
-			! isset( $_GET['prpl_show_all_suggested_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! \current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		) {
-			return $max_items_per_category;
-		}
-
-		$max_items = \absint( \wp_unslash( $_GET['prpl_show_all_suggested_tasks'] ) );  // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-		foreach ( $max_items_per_category as $key => $value ) {
-			$max_items_per_category[ $key ] = $max_items;
-		}
-
-		return $max_items_per_category;
 	}
 
 	/**

@@ -22,13 +22,6 @@ class Content_Create extends Tasks {
 	protected const PROVIDER_ID = 'create-post';
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'content-new';
-
-	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string

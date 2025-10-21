@@ -31,13 +31,6 @@ class Unpublished_Content extends Tasks {
 	protected const PROVIDER_ID = 'unpublished-content';
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'content-publish';
-
-	/**
 	 * The data collector class name.
 	 *
 	 * @var string
@@ -63,7 +56,7 @@ class Unpublished_Content extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = 30;
+	protected $priority = self::PRIORITY_HIGH + 10;
 
 	/**
 	 * Whether the task is dismissable.

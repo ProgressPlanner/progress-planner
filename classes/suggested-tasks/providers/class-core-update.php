@@ -13,13 +13,6 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 class Core_Update extends Tasks {
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'maintenance';
-
-	/**
 	 * The provider ID.
 	 *
 	 * @var string
@@ -52,7 +45,7 @@ class Core_Update extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = 0;
+	protected $priority = self::PRIORITY_CRITICAL;
 
 	/**
 	 * Get the task URL.
