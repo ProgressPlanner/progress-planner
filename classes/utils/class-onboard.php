@@ -96,6 +96,10 @@ class Onboard {
 	 * @return string
 	 */
 	public function get_remote_url( $endpoint = '' ) {
+		// Sanitize and validate the endpoint parameter.
+		$endpoint = \sanitize_key( $endpoint );
+		$endpoint = \ltrim( $endpoint, '/' );
+
 		return \progress_planner()->get_remote_server_root_url() . self::REMOTE_API_URL . $endpoint;
 	}
 
@@ -108,7 +112,10 @@ class Onboard {
 		// Make a POST request to the remote nonce endpoint.
 		$response = \wp_remote_post(
 			$this->get_remote_url( 'get-nonce' ),
-			[ 'body' => [ 'site' => \set_url_scheme( \site_url() ) ] ]
+			[
+				'timeout' => 10,
+				'body'    => [ 'site' => \set_url_scheme( \site_url() ) ],
+			]
 		);
 
 		if ( \is_wp_error( $response ) ) {
@@ -146,7 +153,10 @@ class Onboard {
 		// Make the request.
 		$response = \wp_remote_post(
 			$this->get_remote_url( 'onboard' ),
-			[ 'body' => $data ]
+			[
+				'timeout' => 10,
+				'body'    => $data,
+			]
 		);
 
 		// Bail early if there is an error.
@@ -169,6 +179,12 @@ class Onboard {
 	 * @return void
 	 */
 	public function detect_site_url_changes() {
+		// Only check once per day to avoid performance issues.
+		if ( \get_transient( 'progress_planner_site_url_check_done' ) ) {
+			return;
+		}
+		\set_transient( 'progress_planner_site_url_check_done', 1, DAY_IN_SECONDS );
+
 		$saved_site_url   = \get_option( 'progress_planner_saved_site_url', false );
 		$current_site_url = \set_url_scheme( \site_url() );
 
@@ -189,7 +205,8 @@ class Onboard {
 		$response = \wp_remote_post(
 			$this->get_remote_url( 'change-site-url' ),
 			[
-				'body' => [
+				'timeout' => 10,
+				'body'    => [
 					'license_key' => $saved_license_key,
 					'old_url'     => $saved_site_url,
 					'new_url'     => $current_site_url,
