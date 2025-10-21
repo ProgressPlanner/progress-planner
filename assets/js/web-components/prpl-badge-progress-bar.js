@@ -128,7 +128,6 @@ customElements.define(
 		 * Render the gauge.
 		 */
 		render() {
-			console.log( this.state );
 			this.shadowRoot.innerHTML = `
 				<style>
 				.container {
