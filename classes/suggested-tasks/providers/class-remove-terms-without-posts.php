@@ -1,6 +1,6 @@
 <?php
 /**
- * Add task to rename the Uncategorized category.
+ * Add task to remove terms without posts.
  *
  * @package Progress_Planner
  */
