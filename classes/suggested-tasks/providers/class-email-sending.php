@@ -263,6 +263,13 @@ class Email_Sending extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to test email sending.', 'progress-planner' ) ] );
 		}
 
+		// Check the nonce.
+		\check_admin_referer( 'progress_planner' );
+
+		if ( ! $this->capability_required() ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to test email sending.', 'progress-planner' ) ] );
+		}
+
 		// Use check_ajax_referer for AJAX handlers.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
