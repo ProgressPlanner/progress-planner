@@ -20,7 +20,7 @@ class Playground {
 		\add_action( 'plugins_loaded', [ $this, 'enable_debug_tools' ], 1 );
 		\add_filter( 'progress_planner_tasks_show_ui', '__return_true' );
 		\add_action( 'admin_footer', [ $this, 'inject_playground_js_patch' ] );
-		\add_action( 'init', [ $this, 'disable_upgrade_tasks_popover' ], 100 );
+		\add_action( 'init', [ $this, 'disable_upgrade_tasks_popover' ], 101 );
 	}
 
 	/**
@@ -66,6 +66,9 @@ class Playground {
 
 		// Update 'progress_planner_previous_version_task_providers' option.
 		\update_option( 'progress_planner_previous_version_task_providers', \array_unique( $onboard_task_provider_ids ), SORT_REGULAR );
+
+		// Clear the upgrade popover task provider IDs, this are the 'newly' added task providers, so the upgrade tasks popover will not be shown.
+		\update_option( 'progress_planner_upgrade_popover_task_provider_ids', [] );
 	}
 
 	/**
