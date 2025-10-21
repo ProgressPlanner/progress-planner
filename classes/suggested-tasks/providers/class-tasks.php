@@ -15,13 +15,6 @@ use Progress_Planner\Suggested_Tasks\Tasks_Interface;
 abstract class Tasks implements Tasks_Interface {
 
 	/**
-	 * The category of the task.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'configuration';
-
-	/**
 	 * The ID of the task provider.
 	 *
 	 * @var string
@@ -74,6 +67,36 @@ abstract class Tasks implements Tasks_Interface {
 	protected const POPOVER_ID = '';
 
 	/**
+	 * Priority constants for task ordering.
+	 *
+	 * Tasks are ordered from lowest to highest priority value (0 = highest priority, 100 = lowest priority).
+	 *
+	 * CRITICAL (0-9): System-critical issues that must be addressed immediately
+	 * - Examples: Core updates, security vulnerabilities, public error display
+	 *
+	 * URGENT (10-19): Important for security, SEO, or core functionality
+	 * - Examples: Search engine visibility, email functionality, PHP version, initial settings
+	 *
+	 * HIGH (20-39): Important for site quality and SEO
+	 * - Examples: Permalink structure, content optimization
+	 *
+	 * NORMAL (40-59): Standard site configuration and cleanup
+	 * - Examples: Branding (tagline, site icon), default content cleanup, regular content creation
+	 *
+	 * LOW (60-79): Nice-to-have improvements
+	 * - Examples: Content review, content organization, configuration refinements
+	 *
+	 * OPTIONAL (80-100): Advanced optimization and enhancement features
+	 * - Examples: Term descriptions, advanced SEO features
+	 */
+	protected const PRIORITY_CRITICAL = 0;
+	protected const PRIORITY_URGENT   = 10;
+	protected const PRIORITY_HIGH     = 20;
+	protected const PRIORITY_NORMAL   = 50;
+	protected const PRIORITY_LOW      = 60;
+	protected const PRIORITY_OPTIONAL = 80;
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -97,9 +120,12 @@ abstract class Tasks implements Tasks_Interface {
 	/**
 	 * The task priority.
 	 *
+	 * Tasks are ordered from lowest to highest priority value (0 = highest priority, 100 = lowest priority).
+	 * Use the PRIORITY_* constants defined in this class for consistency.
+	 *
 	 * @var int
 	 */
-	protected $priority = 50;
+	protected $priority = self::PRIORITY_NORMAL;
 
 	/**
 	 * Whether the task is dismissable.
@@ -251,25 +277,6 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
-	 * Alias for get_provider_category(), to provide backwards compatibility.
-	 *
-	 * @return string
-	 */
-	public function get_provider_type() {
-		\_deprecated_function( 'Progress_Planner\Suggested_Tasks\Providers\Tasks::get_provider_type()', '1.1.1', 'get_provider_category' );
-		return $this->get_provider_category();
-	}
-
-	/**
-	 * Get the provider category.
-	 *
-	 * @return string
-	 */
-	public function get_provider_category() {
-		return static::CATEGORY;
-	}
-
-	/**
 	 * Get the provider ID.
 	 *
 	 * @return string
@@ -389,7 +396,7 @@ abstract class Tasks implements Tasks_Interface {
 	 */
 	public function is_task_snoozed() {
 		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'future' ] ) as $task ) {
-			$task        = \progress_planner()->get_suggested_tasks_db()->get_post( $task->task_id );
+			$task        = \progress_planner()->get_suggested_tasks_db()->get_post( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 			$provider_id = $task ? $task->get_provider_id() : '';
 
 			if ( $provider_id === $this->get_provider_id() ) {
@@ -432,10 +439,10 @@ abstract class Tasks implements Tasks_Interface {
 
 		if ( ! $this->is_repetitive() ) {
 			// Collaborator tasks have custom task_ids, so strpos check does not work for them.
-			if ( ! $task->task_id || ( 0 !== \strpos( $task->task_id, $this->get_task_id() ) && 'collaborator' !== $this->get_provider_id() ) ) {
+			if ( ! $task->post_name || ( 0 !== \strpos( $task->post_name, $this->get_task_id() ) && 'collaborator' !== $this->get_provider_id() ) ) {
 				return false;
 			}
-			return $this->is_task_completed( $task->task_id ) ? $task : false;
+			return $this->is_task_completed( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) ) ? $task : false;
 		}
 
 		if (
@@ -443,7 +450,7 @@ abstract class Tasks implements Tasks_Interface {
 			$task->provider->slug === $this->get_provider_id() &&
 			\DateTime::createFromFormat( 'Y-m-d H:i:s', $task->post_date ) &&
 			\gmdate( 'YW' ) === \gmdate( 'YW', \DateTime::createFromFormat( 'Y-m-d H:i:s', $task->post_date )->getTimestamp() ) && // @phpstan-ignore-line
-			$this->is_task_completed( $task->task_id )
+			$this->is_task_completed( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) )
 		) {
 			// Allow adding more data, for example in case of 'create-post' tasks we are adding the post_id.
 			$task_data = $this->modify_evaluated_task_data( $task->get_data() );
@@ -556,7 +563,6 @@ abstract class Tasks implements Tasks_Interface {
 			'description'       => $this->get_description_with_data( $task_data ),
 			'parent'            => $this->get_parent(),
 			'priority'          => $this->get_priority(),
-			'category'          => $this->get_provider_category(),
 			'points'            => $this->get_points(),
 			'date'              => \gmdate( 'YW' ),
 			'url'               => $this->get_url_with_data( $task_data ),
@@ -629,12 +635,12 @@ abstract class Tasks implements Tasks_Interface {
 		if ( $this->capability_required() && $this->is_dismissable() && 'user' !== static::PROVIDER_ID ) {
 			$actions[] = [
 				'priority' => 20,
-				'html'     => '<button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="complete" data-target="complete" title="' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '" onclick="prplSuggestedTask.maybeComplete(' . (int) $data['id'] . ');"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span></button>',
+				'html'     => '<button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['slug'] ) ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="complete" data-target="complete" title="' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '" onclick="prplSuggestedTask.maybeComplete(' . (int) $data['id'] . ');"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Mark as complete', 'progress-planner' ) . '</span></button>',
 			];
 		}
 
 		if ( $this->capability_required() && $this->is_snoozable() ) {
-			$snooze_html  = '<prpl-tooltip class="prpl-suggested-task-snooze"><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="snooze" data-target="snooze" title="' . \esc_attr__( 'Snooze', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span></button></slot><slot name="content">';
+			$snooze_html  = '<prpl-tooltip class="prpl-suggested-task-snooze"><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['slug'] ) ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="snooze" data-target="snooze" title="' . \esc_attr__( 'Snooze', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Snooze', 'progress-planner' ) . '</span></button></slot><slot name="content">';
 			$snooze_html .= '<fieldset><legend><span>' . \esc_html__( 'Snooze this task?', 'progress-planner' ) . '</span><button type="button" class="prpl-toggle-radio-group" onclick="this.closest(\'.prpl-suggested-task-snooze\').classList.toggle(\'prpl-toggle-radio-group-open\');"><span class="prpl-toggle-radio-group-text">' . \esc_html__( 'How long?', 'progress-planner' ) . '</span><span class="prpl-toggle-radio-group-arrow">&rsaquo;</span></button></legend><div class="prpl-snooze-duration-radio-group">';
 			foreach (
 				[
@@ -645,7 +651,7 @@ abstract class Tasks implements Tasks_Interface {
 					'1-year'   => \esc_html__( '1 year', 'progress-planner' ),
 					'forever'  => \esc_html__( 'forever', 'progress-planner' ),
 				] as $snooze_key => $snooze_value ) {
-					$snooze_html .= '<label><input type="radio" name="snooze-duration-' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" value="' . \esc_attr( $snooze_key ) . '" onchange="prplSuggestedTask.snooze(' . (int) $data['id'] . ', \'' . \esc_attr( $snooze_key ) . '\');">' . \esc_html( $snooze_value ) . '</label>';
+					$snooze_html .= '<label><input type="radio" name="snooze-duration-' . \esc_attr( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['slug'] ) ) . '" value="' . \esc_attr( $snooze_key ) . '" onchange="prplSuggestedTask.snooze(' . (int) $data['id'] . ', \'' . \esc_attr( $snooze_key ) . '\');">' . \esc_html( $snooze_value ) . '</label>';
 			}
 			$snooze_html .= '</div></fieldset></slot></prpl-tooltip>';
 			$actions[]    = [
@@ -662,7 +668,7 @@ abstract class Tasks implements Tasks_Interface {
 		} elseif ( isset( $data['content']['rendered'] ) && $data['content']['rendered'] !== '' && ! $this instanceof Tasks_Interactive ) {
 			$actions[] = [
 				'priority' => 40,
-				'html'     => '<prpl-tooltip><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( $data['meta']['prpl_task_id'] ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="info" data-target="info" title="' . \esc_html__( 'Info', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Info', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Info', 'progress-planner' ) . '</span></button></slot><slot name="content">' . \wp_kses_post( $data['content']['rendered'] ) . '</slot></prpl-tooltip>',
+				'html'     => '<prpl-tooltip><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="' . \esc_attr( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['slug'] ) ) . '" data-task-title="' . \esc_attr( $data['title']['rendered'] ) . '" data-action="info" data-target="info" title="' . \esc_html__( 'Info', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Info', 'progress-planner' ) . '</span><span class="screen-reader-text">' . \esc_html__( 'Info', 'progress-planner' ) . '</span></button></slot><slot name="content">' . \wp_kses_post( $data['content']['rendered'] ) . '</slot></prpl-tooltip>',
 			];
 		}
 

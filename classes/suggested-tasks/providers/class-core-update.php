@@ -13,13 +13,6 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 class Core_Update extends Tasks {
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'maintenance';
-
-	/**
 	 * The provider ID.
 	 *
 	 * @var string
@@ -52,7 +45,7 @@ class Core_Update extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = 0;
+	protected $priority = self::PRIORITY_CRITICAL;
 
 	/**
 	 * Get the task URL.
@@ -94,7 +87,7 @@ class Core_Update extends Tasks {
 		// All updates are completed and there is a 'update-core' task in the published tasks.
 		if ( $this->is_task_completed() ) {
 			foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] ) as $task ) {
-				if ( $this->get_task_id() === $task->task_id ) {
+				if ( $this->get_task_id() === \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) ) {
 					$update_actions['prpl_core_update'] =
 						'<img src="' . \esc_attr( \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg' ) . '" style="width:1rem;padding-left:0.25rem;padding-right:0.25rem;vertical-align:middle;" alt="Progress Planner" />' .
 						'<a href="' . \esc_url( \admin_url( 'admin.php?page=progress-planner' ) ) . '" target="_parent">' . \esc_html__( 'Click here to celebrate your completed task!', 'progress-planner' ) . '</a>';
