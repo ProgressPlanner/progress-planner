@@ -13,6 +13,13 @@ namespace Progress_Planner\Admin\Widgets;
 final class Suggested_Tasks extends Widget {
 
 	/**
+	 * Default number of tasks to show per page.
+	 *
+	 * @var int
+	 */
+	public const PER_PAGE_DEFAULT = 5;
+
+	/**
 	 * The widget ID.
 	 *
 	 * @var string

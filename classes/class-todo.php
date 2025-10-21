@@ -81,7 +81,12 @@ class Todo {
 		}
 
 		// Add task_id to the post.
-		\update_post_meta( $post->ID, 'prpl_task_id', 'user-' . $post->ID );
+		\wp_update_post(
+			[
+				'ID'        => $post->ID,
+				'post_name' => 'user-' . $post->ID,
+			]
+		);
 
 		// If it is first task ever created, it should be golden.
 		$pending_items = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(

@@ -68,9 +68,6 @@ class Suggested_Tasks {
 		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'rest_prepare_recommendation' ], 10, 2 );
 
 		\add_filter( 'wp_trash_post_days', [ $this, 'change_trashed_posts_lifetime' ], 10, 2 );
-
-		// Add filter to modify the maximum number of suggested tasks to display.
-		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_recommendations' ] );
 	}
 
 	/**
@@ -83,7 +80,7 @@ class Suggested_Tasks {
 		$completed_tasks = $this->tasks_manager->evaluate_tasks();
 
 		foreach ( $completed_tasks as $task ) {
-			if ( ! $task->task_id && $task->ID ) {
+			if ( ! $task->post_name && $task->ID ) {
 				continue;
 			}
 
@@ -91,7 +88,7 @@ class Suggested_Tasks {
 			$task->celebrate();
 
 			// Insert an activity.
-			$this->insert_activity( $task->task_id );
+			$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 		}
 	}
 
@@ -159,7 +156,7 @@ class Suggested_Tasks {
 		\progress_planner()->get_suggested_tasks_db()->update_recommendation( $pending_tasks[0]->ID, [ 'post_status' => 'trash' ] );
 
 		// Insert an activity.
-		$this->insert_activity( $pending_tasks[0]->task_id );
+		$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $pending_tasks[0]->post_name ) );
 	}
 
 	/**
@@ -188,6 +185,9 @@ class Suggested_Tasks {
 	 * Primarly this is used for deeplinking, ie user is testing if the emails are working
 	 * He gets an email with a link which automatically completes the task.
 	 *
+	 * Verify token to prevent CSRF attacks.
+	 * Tokens are one-time use and expire after 24 hours.
+	 *
 	 * @return void
 	 */
 	public function maybe_complete_task() {
@@ -200,6 +200,19 @@ class Suggested_Tasks {
 			return;
 		}
 
+		// Verify token to prevent CSRF attacks.
+		if ( ! isset( $_GET['token'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
+
+		$provided_token = \sanitize_text_field( \wp_unslash( $_GET['token'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$user_id        = \get_current_user_id();
+
+		// Verify the token.
+		if ( ! $this->verify_task_completion_token( $task_id, $user_id, $provided_token ) ) {
+			return;
+		}
+
 		if ( ! $this->was_task_completed( $task_id ) ) {
 			$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
@@ -208,8 +221,69 @@ class Suggested_Tasks {
 
 				// Insert an activity.
 				$this->insert_activity( $task_id );
+
+				// Delete the token after successful use (one-time use).
+				$this->delete_task_completion_token( $task_id, $user_id );
 			}
 		}
+	}
+
+	/**
+	 * Generate a secure token for task completion via email link.
+	 *
+	 * This token prevents CSRF attacks by ensuring only legitimate email
+	 * links can mark tasks as complete.
+	 *
+	 * @param string $task_id The task ID.
+	 * @param int    $user_id The user ID.
+	 *
+	 * @return string The generated token.
+	 */
+	public function generate_task_completion_token( $task_id, $user_id ) {
+		// Generate a cryptographically secure random token.
+		$random = \wp_generate_password( 32, false );
+		$token  = \wp_hash( $task_id . $user_id . $random . \wp_salt( 'auth' ) );
+
+		// Store the token in a transient (expires after 24 hours).
+		\set_transient(
+			'prpl_complete_' . $task_id . '_' . $user_id,
+			$token,
+			DAY_IN_SECONDS
+		);
+
+		return $token;
+	}
+
+	/**
+	 * Verify a task completion token.
+	 *
+	 * @param string $task_id        The task ID.
+	 * @param int    $user_id        The user ID.
+	 * @param string $provided_token The token to verify.
+	 *
+	 * @return bool True if token is valid, false otherwise.
+	 */
+	protected function verify_task_completion_token( $task_id, $user_id, $provided_token ) {
+		$stored_token = \get_transient( 'prpl_complete_' . $task_id . '_' . $user_id );
+
+		if ( ! $stored_token ) {
+			return false; // Token expired or doesn't exist.
+		}
+
+		// Use hash_equals to prevent timing attacks.
+		return \hash_equals( $stored_token, $provided_token );
+	}
+
+	/**
+	 * Delete a task completion token after use.
+	 *
+	 * @param string $task_id The task ID.
+	 * @param int    $user_id The user ID.
+	 *
+	 * @return bool True if deleted, false otherwise.
+	 */
+	protected function delete_task_completion_token( $task_id, $user_id ) {
+		return \delete_transient( 'prpl_complete_' . $task_id . '_' . $user_id );
 	}
 
 	/**
@@ -250,13 +324,13 @@ class Suggested_Tasks {
 		switch ( $action ) {
 			case 'complete':
 				// Insert an activity.
-				$this->insert_activity( $task->task_id );
+				$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 				$updated = true;
 				break;
 
 			case 'pending': // User task was marked as pending.
 			case 'delete':
-				$this->delete_activity( $task->task_id );
+				$this->delete_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 				$updated = true;
 				break;
 		}
@@ -301,17 +375,12 @@ class Suggested_Tasks {
 		);
 
 		$rest_meta_fields = [
-			'prpl_task_id' => [
+			'prpl_url'   => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_url'     => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'menu_order'   => [
+			'menu_order' => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
@@ -346,28 +415,24 @@ class Suggested_Tasks {
 	 * @return void
 	 */
 	public function register_taxonomy() {
-		foreach ( [
-			'prpl_recommendations_category' => \__( 'Categories', 'progress-planner' ),
-			'prpl_recommendations_provider' => \__( 'Providers', 'progress-planner' ),
-		] as $taxonomy => $label ) {
-			\register_taxonomy(
-				$taxonomy,
-				[ 'prpl_recommendations' ],
-				[
-					'public'            => false,
-					'hierarchical'      => false,
-					'labels'            => [
-						'name' => $label,
-					],
-					'show_ui'           => \apply_filters( 'progress_planner_tasks_show_ui', false ),
-					'show_admin_column' => false,
-					'query_var'         => true,
-					'rewrite'           => [ 'slug' => $taxonomy ],
-					'show_in_rest'      => true,
-					'show_in_menu'      => \apply_filters( 'progress_planner_tasks_show_ui', false ),
-				]
-			);
-		}
+		// Register only the provider taxonomy.
+		\register_taxonomy(
+			'prpl_recommendations_provider',
+			[ 'prpl_recommendations' ],
+			[
+				'public'            => false,
+				'hierarchical'      => false,
+				'labels'            => [
+					'name' => \__( 'Providers', 'progress-planner' ),
+				],
+				'show_ui'           => \apply_filters( 'progress_planner_tasks_show_ui', false ),
+				'show_admin_column' => false,
+				'query_var'         => true,
+				'rewrite'           => [ 'slug' => 'prpl_recommendations_provider' ],
+				'show_in_rest'      => true,
+				'show_in_menu'      => \apply_filters( 'progress_planner_tasks_show_ui', false ),
+			]
+		);
 	}
 
 	/**
@@ -436,6 +501,8 @@ class Suggested_Tasks {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
 		}
 
+		$response->data['slug'] = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $response->data['slug'] );
+
 		if ( $provider ) {
 			$response->data['prpl_provider'] = $provider_term[0];
 			// Link should be added during run time, since it is not added for users without required capability.
@@ -444,24 +511,21 @@ class Suggested_Tasks {
 				: '';
 
 			$response->data['prpl_popover_id'] = $provider->get_popover_id();
-
-			// This has to be the last item to be added because actions use data from previous items.
-			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
-			$response->data['prpl_points']       = $provider->get_points();
+			$response->data['prpl_points']     = $provider->get_points();
 
 			/*
 			 * Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
 			 * Those are tasks which are completed by toggling an option, so non repetitive & not user tasks.
 			 */
-			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['meta']['prpl_task_id'] ) ) {
+			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['slug'] ) ) {
 				$response->data['prpl_points'] = 0;
 			}
+
+			// This has to be the last item to be added because actions use data from previous items.
+			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
 		}
 
-		$category_term = \wp_get_object_terms( $post->ID, 'prpl_recommendations_category' );
-		if ( $category_term && ! \is_wp_error( $category_term ) ) {
-			$response->data['prpl_category'] = $category_term[0];
-		}
+		// Category taxonomy removed - no longer adding prpl_category to response.
 
 		return $response;
 	}
@@ -480,43 +544,44 @@ class Suggested_Tasks {
 				'post_status'      => 'publish',
 				'exclude_provider' => [],
 				'include_provider' => [],
-				'posts_per_page'   => 0,
+				'posts_per_page'   => -1,
 			]
 		);
 
-		// Get the max items per category.
-		$max_items_per_category = $this->get_max_items_per_category();
+		// Build query args for get_tasks_by.
+		$query_args = [
+			'post_status'    => $args['post_status'],
+			'posts_per_page' => $args['posts_per_page'],
+		];
 
-		// Initialize the tasks array.
-		$tasks = [];
-
-		// Get the tasks for each category.
-		foreach ( $max_items_per_category as $category_slug => $max_items ) {
-			// Skip excluded providers.
-			if ( ! empty( $args['exclude_provider'] ) && \in_array( $category_slug, $args['exclude_provider'], true ) ) {
-				continue;
-			}
-
-			// Skip not included providers.
-			if ( ! empty( $args['include_provider'] ) && ! \in_array( $category_slug, $args['include_provider'], true ) ) {
-				continue;
-			}
-
-			$category_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
-				[
-					'category'       => $category_slug,
-					'posts_per_page' => 0 < $args['posts_per_page'] ? $args['posts_per_page'] : $max_items,
-					'post_status'    => $args['post_status'],
-				]
-			);
-
-			if ( ! empty( $category_tasks ) ) {
-				$tasks[ $category_slug ] = [];
-
-				foreach ( $category_tasks as $task ) {
-					$tasks[ $category_slug ][] = $task->get_rest_formatted_data();
+		// Add provider filters if specified.
+		if ( ! empty( $args['exclude_provider'] ) ) {
+			// Note: Database filtering doesn't support exclude_provider directly,
+			// so we'll fetch all tasks, filter, then limit.
+			$original_limit               = $query_args['posts_per_page'];
+			$query_args['posts_per_page'] = -1; // Fetch all tasks.
+			$all_tasks                    = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( $query_args );
+			$all_tasks                    = \array_filter(
+				$all_tasks,
+				function ( $task ) use ( $args ) {
+					return ! \in_array( $task->get_provider_id(), $args['exclude_provider'], true );
 				}
+			);
+			// Now limit to the originally requested number.
+			if ( -1 !== $original_limit ) {
+				$all_tasks = \array_slice( $all_tasks, 0, $original_limit );
 			}
+		} elseif ( ! empty( $args['include_provider'] ) ) {
+			$query_args['provider'] = $args['include_provider'];
+			$all_tasks              = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( $query_args );
+		} else {
+			$all_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( $query_args );
+		}
+
+		// Convert tasks to REST format.
+		$tasks = [];
+		foreach ( $all_tasks as $task ) {
+			$tasks[] = $task->get_rest_formatted_data();
 		}
 
 		/**
@@ -531,47 +596,12 @@ class Suggested_Tasks {
 	}
 
 	/**
-	 * Get the max items per category.
+	 * Get the task ID from a slug.
 	 *
-	 * @return array
+	 * @param string $slug The slug.
+	 * @return string
 	 */
-	public function get_max_items_per_category() {
-		// Set max items per category.
-		$max_items_per_category = [];
-		$provider_categories    = \get_terms(
-			[
-				'taxonomy'   => 'prpl_recommendations_category',
-				'hide_empty' => false,
-			]
-		);
-
-		if ( ! empty( $provider_categories ) && ! \is_wp_error( $provider_categories ) ) {
-			$content_review_category = ( new Content_Review() )->get_provider_category();
-			foreach ( $provider_categories as $provider_category ) {
-				$max_items_per_category[ $provider_category->slug ] = $provider_category->slug === $content_review_category ? 2 : 1;
-			}
-		}
-
-		// This should never happen, but just in case - user tasks are displayed in different widget.
-		if ( isset( $max_items_per_category['user'] ) ) {
-			$max_items_per_category['user'] = 100;
-		}
-
-		return \apply_filters( 'progress_planner_suggested_tasks_max_items_per_category', $max_items_per_category );
-	}
-
-	/**
-	 * Modify the maximum number of suggested tasks to display.
-	 *
-	 * @param array $max_items_per_category Array of maximum items per category.
-	 * @return array Modified array of maximum items per category.
-	 */
-	public function check_show_all_recommendations( $max_items_per_category ) {
-		return (
-			isset( $_GET['prpl_show_all_recommendations'] ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			&& \current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		)
-			? \array_map( fn() => 99, $max_items_per_category )
-			: $max_items_per_category;
+	public function get_task_id_from_slug( $slug ) {
+		return explode( '__trashed', $slug )[0];
 	}
 }
