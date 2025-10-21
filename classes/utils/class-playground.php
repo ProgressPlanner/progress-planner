@@ -20,6 +20,8 @@ class Playground {
 		\add_action( 'plugins_loaded', [ $this, 'enable_debug_tools' ], 1 );
 		\add_filter( 'progress_planner_tasks_show_ui', '__return_true' );
 		\add_action( 'admin_footer', [ $this, 'inject_playground_js_patch' ] );
+
+		\add_action( 'muplugins_loaded', [ $this, 'disable_upgrade_tasks_popover' ], 1 );
 	}
 
 	/**
@@ -52,6 +54,16 @@ class Playground {
 		\add_action( 'wp_ajax_progress_planner_show_onboarding', [ $this, 'show_onboarding' ] );
 
 		\progress_planner()->get_settings()->set( 'activation_date', ( new \DateTime() )->modify( '-2 months' )->format( 'Y-m-d' ) );
+	}
+
+	/**
+	 * Disable the upgrade tasks popover.
+	 *
+	 * @return void
+	 */
+	public function disable_upgrade_tasks_popover() {
+		// This will make the plugin think it was activated, so the upgrade tasks popover will not be shown.
+		\update_option( 'progress_planner_plugin_was_activated', true );
 	}
 
 	/**
