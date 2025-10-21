@@ -37,13 +37,6 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 	const POPOVER_ID = 'remove-terms-without-posts';
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'content-update';
-
-	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
@@ -69,7 +62,7 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = 60;
+	protected $priority = self::PRIORITY_LOW;
 
 	/**
 	 * The minimum number of posts.

@@ -41,6 +41,13 @@ class Search_Engine_Visibility extends Tasks_Interactive {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/blog-indexing-settings';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = self::PRIORITY_URGENT + 2;
+
+	/**
 	 * Initialize the task.
 	 *
 	 * @return void

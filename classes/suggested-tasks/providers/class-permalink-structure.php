@@ -41,6 +41,13 @@ class Permalink_Structure extends Tasks_Interactive {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/change-default-permalink-structure';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = self::PRIORITY_HIGH;
+
+	/**
 	 * Initialize the task.
 	 *
 	 * @return void

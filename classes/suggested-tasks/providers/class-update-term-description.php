@@ -37,13 +37,6 @@ class Update_Term_Description extends Tasks_Interactive {
 	const POPOVER_ID = 'update-term-description';
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'content-update';
-
-	/**
 	 * The capability required to perform the task.
 	 *
 	 * @var string
@@ -83,7 +76,7 @@ class Update_Term_Description extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = 80;
+	protected $priority = self::PRIORITY_OPTIONAL;
 
 	/**
 	 * The completed term IDs.

@@ -24,13 +24,6 @@ class Fewer_Tags extends Tasks_Interactive {
 	protected const IS_ONBOARDING_TASK = true;
 
 	/**
-	 * The provider type.
-	 *
-	 * @var string
-	 */
-	const CATEGORY = 'configuration';
-
-	/**
 	 * The provider ID.
 	 *
 	 * @var string
@@ -56,7 +49,7 @@ class Fewer_Tags extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = 10;
+	protected $priority = self::PRIORITY_HIGH + 12;
 
 	/**
 	 * The plugin active state.
