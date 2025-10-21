@@ -104,7 +104,7 @@ final class Branding {
 			if ( $response ) {
 				$media = \json_decode( $response, true );
 				if ( isset( $media['source_url'] ) ) {
-					echo '<img src="' . \esc_url( $media['source_url'] ) . '" alt="Logo" style="height:100px;"/>';
+					echo '<img src="' . \esc_url( $media['source_url'] ) . '" alt="Logo"/>';
 					return;
 				}
 			}
