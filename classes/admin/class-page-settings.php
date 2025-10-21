@@ -133,7 +133,7 @@ class Page_Settings {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
 		}
 
-		// SECURITY FIX: Use check_ajax_referer instead of check_admin_referer for AJAX handlers.
+		// Use check_ajax_referer instead of check_admin_referer for AJAX handlers.
 		// check_admin_referer is designed for form submissions, not AJAX requests.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );

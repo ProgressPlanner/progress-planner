@@ -185,7 +185,7 @@ class Suggested_Tasks {
 	 * Primarly this is used for deeplinking, ie user is testing if the emails are working
 	 * He gets an email with a link which automatically completes the task.
 	 *
-	 * SECURITY FIX: Added token verification to prevent CSRF attacks.
+	 * Verify token to prevent CSRF attacks.
 	 * Tokens are one-time use and expire after 24 hours.
 	 *
 	 * @return void
@@ -200,7 +200,7 @@ class Suggested_Tasks {
 			return;
 		}
 
-		// SECURITY FIX: Verify token to prevent CSRF attacks.
+		// Verify token to prevent CSRF attacks.
 		if ( ! isset( $_GET['token'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			return;
 		}

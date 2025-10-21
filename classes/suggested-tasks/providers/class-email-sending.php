@@ -110,7 +110,7 @@ class Email_Sending extends Tasks_Interactive {
 
 		$this->email_subject = \esc_html__( 'Your Progress Planner test message!', 'progress-planner' );
 
-		// SECURITY FIX: Generate a secure token for the completion link to prevent CSRF.
+		// Generate a secure token for the completion link to prevent CSRF.
 		$user_id = \get_current_user_id();
 		$token   = \progress_planner()->get_suggested_tasks()->generate_task_completion_token( $this->get_task_id(), $user_id );
 
@@ -253,7 +253,7 @@ class Email_Sending extends Tasks_Interactive {
 	/**
 	 * Test email sending.
 	 *
-	 * SECURITY FIX: Changed to use check_ajax_referer and get email from $_POST.
+	 * Use check_ajax_referer and get email from $_POST.
 	 *
 	 * @return void
 	 */
@@ -263,12 +263,12 @@ class Email_Sending extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to test email sending.', 'progress-planner' ) ] );
 		}
 
-		// SECURITY FIX: Use check_ajax_referer for AJAX handlers.
+		// Use check_ajax_referer for AJAX handlers.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
 
-		// SECURITY FIX: Get email from POST data (AJAX request).
+		// Get email from POST data (AJAX request).
 		$email_address = isset( $_POST['email_address'] ) ? \sanitize_email( \wp_unslash( $_POST['email_address'] ) ) : '';
 
 		if ( ! $email_address ) {

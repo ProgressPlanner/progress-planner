@@ -88,7 +88,7 @@ abstract class Tasks_Interactive extends Tasks {
 		$value        = \sanitize_text_field( \wp_unslash( $_POST['value'] ) );
 		$setting_path = \json_decode( \sanitize_text_field( \wp_unslash( $_POST['setting_path'] ) ), true );
 
-		// SECURITY FIX: Whitelist allowed options to prevent arbitrary options update.
+		// Whitelist allowed options to prevent arbitrary options update.
 		// This prevents privilege escalation by restricting which options can be updated.
 		$allowed_options = $this->get_allowed_interactive_options();
 
