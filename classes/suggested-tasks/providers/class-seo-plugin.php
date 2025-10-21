@@ -133,12 +133,18 @@ class SEO_Plugin extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
+		$seo_plugin_recommendation_slug = \progress_planner()->get_ui__branding()->get_seo_plugin_recommendation_slug();
+		$seo_plugin_recommendation_name = $this->get_plugin_name_by_slug( $seo_plugin_recommendation_slug );
+		if ( ! $seo_plugin_recommendation_name ) {
+			return;
+		}
+
 		?>
 		<?php if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) : ?>
 			<prpl-install-plugin
-				data-plugin-name="Yoast SEO"
-				data-plugin-slug="wordpress-seo"
-				data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'wordpress-seo' ) ? 'activate' : 'install'; ?>"
+				data-plugin-name="<?php echo \esc_html( $seo_plugin_recommendation_name ); ?>"
+				data-plugin-slug="<?php echo \esc_attr( $seo_plugin_recommendation_slug ); ?>"
+				data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( $seo_plugin_recommendation_slug ) ? 'activate' : 'install'; ?>"
 				data-provider-id="<?php echo \esc_attr( self::PROVIDER_ID ); ?>"
 			></prpl-install-plugin>
 		<?php else : ?>
