@@ -53,11 +53,14 @@ class Update_190 {
 				continue;
 			}
 
+			// Get the target slug.
+			$target_slug = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $prpl_task_id );
+
 			// Check if there are any existing posts with the same slug.
 			$existing_posts = \get_posts(
 				[
 					'post_type' => 'prpl_recommendations',
-					'name'      => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $prpl_task_id ),
+					'name'      => $target_slug,
 				]
 			);
 			if ( ! empty( $existing_posts ) && $existing_posts[0]->ID !== $recommendation->ID ) {
@@ -65,13 +68,15 @@ class Update_190 {
 				\wp_delete_post( $existing_posts[0]->ID, true );
 			}
 
-			// Set the slug.
-			\wp_update_post(
-				[
-					'ID'        => $recommendation->ID,
-					'post_name' => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $prpl_task_id ),
-				]
-			);
+			// Only update if the slug is different from the current slug.
+			if ( $recommendation->post_name !== $target_slug ) {
+				\wp_update_post(
+					[
+						'ID'        => $recommendation->ID,
+						'post_name' => $target_slug,
+					]
+				);
+			}
 		}
 	}
 
@@ -194,10 +199,18 @@ class Update_190 {
 
 			// Update the menu_order for each task.
 			foreach ( $tasks as $task ) {
+				// Refresh the task data to ensure we have the latest menu_order value.
+				$refreshed_task = \get_post( $task->ID );
+
+				// Skip if the post no longer exists.
+				if ( ! $refreshed_task ) {
+					continue;
+				}
+
 				// Only update if the menu_order is different from the current priority.
-				if ( (int) $task->menu_order !== $priority ) {
+				if ( (int) $refreshed_task->menu_order !== $priority ) {
 					\progress_planner()->get_suggested_tasks_db()->update_recommendation(
-						$task->ID,
+						$refreshed_task->ID,
 						[ 'menu_order' => $priority ]
 					);
 				}
