@@ -60,8 +60,8 @@ class Update_190 {
 					'name'      => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $prpl_task_id ),
 				]
 			);
-			if ( ! empty( $existing_posts ) ) {
-				// Delete the existing post.
+			if ( ! empty( $existing_posts ) && $existing_posts[0]->ID !== $recommendation->ID ) {
+				// Delete the existing post (but not if it's the current one).
 				\wp_delete_post( $existing_posts[0]->ID, true );
 			}
 
