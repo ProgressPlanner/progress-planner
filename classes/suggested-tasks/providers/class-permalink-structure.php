@@ -54,6 +54,22 @@ class Permalink_Structure extends Tasks_Interactive {
 	 */
 	public function init() {
 		\add_action( 'wp_ajax_prpl_interactive_task_submit_core-permalink-structure', [ $this, 'handle_interactive_task_specific_submit' ] );
+		\add_action( 'init', [ $this, 'maybe_flush_rewrite_rules' ] );
+	}
+
+	/**
+	 * Maybe flush rewrite rules.
+	 *
+	 * Checks for a transient flag and flushes rewrite rules if needed.
+	 * This is more performant than flushing immediately during the AJAX request.
+	 *
+	 * @return void
+	 */
+	public function maybe_flush_rewrite_rules() {
+		if ( \get_transient( 'prpl_flush_rewrite_rules' ) ) {
+			\flush_rewrite_rules();
+			\delete_transient( 'prpl_flush_rewrite_rules' );
+		}
 	}
 
 	/**
@@ -261,8 +277,9 @@ class Permalink_Structure extends Tasks_Interactive {
 		// Update the permalink structure.
 		\update_option( 'permalink_structure', $permalink_structure );
 
-		// Flush rewrite rules to apply the new permalink structure.
-		\flush_rewrite_rules();
+		// Set a transient to flush rewrite rules on the next page load.
+		// This is more performant than flushing immediately during the AJAX request.
+		\set_transient( 'prpl_flush_rewrite_rules', 1, HOUR_IN_SECONDS );
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Permalink structure updated.', 'progress-planner' ) ] );
 	}
