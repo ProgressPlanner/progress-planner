@@ -28,28 +28,6 @@ body:
     validations:
       required: true
 
-  - type: dropdown
-    id: category
-    attributes:
-      label: Recommendation category
-      description: Select the most appropriate category for this recommendation
-      options:
-        - content-update
-        - configuration
-        - user
-        - other
-    validations:
-      required: true
-
-  - type: input
-    id: other_category
-    attributes:
-      label: Other category
-      description: If you selected "other", please specify the category
-      placeholder: "Specify the category"
-    validations:
-      required: false
-
   - type: input
     id: capability
     attributes:

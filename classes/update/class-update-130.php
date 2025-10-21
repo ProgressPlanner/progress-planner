@@ -106,8 +106,8 @@ class Update_130 extends Update {
 			// Generate the data from the task ID.
 			$data = $this->get_data_from_task_id( $activity->data_id );
 
-			// Don't import back tasks that don't have a provider_id or category.
-			if ( empty( $data['provider_id'] ) || empty( $data['category'] ) ) {
+			// Don't import back tasks that don't have a provider_id.
+			if ( empty( $data['provider_id'] ) ) {
 				continue;
 			}
 
@@ -193,7 +193,6 @@ class Update_130 extends Update {
 			'post_id'     => $parts[2],
 			'date'        => $parts[3],
 			'provider_id' => $task_provider ? $task_provider->get_provider_id() : 'review-post',
-			'category'    => $task_provider ? $task_provider->get_provider_category() : 'content-update',
 		];
 
 		$task_object->set_data( $data );
@@ -213,7 +212,6 @@ class Update_130 extends Update {
 			[
 				'task_id'     => $task_object->get_task_id(),
 				'provider_id' => $task_object->get_task_id(),
-				'category'    => 'configuration',
 			]
 		);
 
