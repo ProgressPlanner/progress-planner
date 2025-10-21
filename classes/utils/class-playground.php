@@ -18,7 +18,6 @@ class Playground {
 	public function __construct() {
 		\add_action( 'init', [ $this, 'register_hooks' ], 9 );
 		\add_action( 'plugins_loaded', [ $this, 'enable_debug_tools' ], 1 );
-		\add_filter( 'progress_planner_tasks_show_ui', '__return_true' );
 		\add_action( 'admin_footer', [ $this, 'inject_playground_js_patch' ] );
 		\add_action( 'init', [ $this, 'disable_upgrade_tasks_popover' ], 101 );
 	}
