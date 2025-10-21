@@ -15,13 +15,6 @@ use Progress_Planner\Suggested_Tasks\Providers\Tasks_Interactive;
 abstract class AIOSEO_Interactive_Provider extends Tasks_Interactive {
 
 	/**
-	 * The provider type.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'configuration';
-
-	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
