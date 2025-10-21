@@ -69,9 +69,6 @@ class Playground {
 
 		// Clear the upgrade popover task provider IDs, this are the 'newly' added task providers, so the upgrade tasks popover will not be shown.
 		\update_option( 'progress_planner_upgrade_popover_task_provider_ids', [] );
-
-		error_log( 'playground' );
-		error_log( print_r( get_option( 'progress_planner_upgrade_popover_task_provider_ids' ), true ) );
 	}
 
 	/**
