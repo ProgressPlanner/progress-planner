@@ -37,6 +37,9 @@ customElements.define(
 				maxPoints: parseInt(
 					this.getAttribute( 'data-max-points' ) || 10
 				),
+				brandingId: parseInt(
+					this.getAttribute( 'data-branding-id' ) || 0
+				),
 			};
 		}
 
@@ -75,6 +78,10 @@ customElements.define(
 		 * Get the progress percent.
 		 */
 		get progressPercent() {
+			// Prevent division by zero.
+			if ( 0 === this.maxPoints ) {
+				return 0;
+			}
 			return ( this.points / this.maxPoints ) * 100;
 		}
 
@@ -103,8 +110,14 @@ customElements.define(
 				// Convert kebab-case to camelCase
 				.replace( /-([a-z])/g, ( _, chr ) => chr.toUpperCase() );
 
-			// Update state.
-			this.state[ camelCaseName ] = newVal;
+			// Update state with proper type conversion.
+			this.state[ camelCaseName ] = [
+				'points',
+				'maxPoints',
+				'brandingId',
+			].includes( camelCaseName )
+				? parseInt( newVal || 0 )
+				: newVal;
 
 			// Update progress.
 			this.updateProgress();
