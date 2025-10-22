@@ -73,7 +73,7 @@ class Stats extends Base {
 	public function validate_token( $token ) {
 		// Rate limiting: Check for too many failed attempts.
 		$ip_address      = $this->get_client_ip();
-		$rate_limit_key  = 'prpl_api_rate_limit_' . \md5( $ip_address );
+		$rate_limit_key  = 'prpl_api_rate_limit_stats_' . \md5( $ip_address );
 		$failed_attempts = (int) \get_transient( $rate_limit_key );
 
 		// Block if more than 10 failed attempts in the last hour.
