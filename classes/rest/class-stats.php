@@ -62,44 +62,4 @@ class Stats extends Base {
 
 		return new \WP_REST_Response( $system_status->get_system_status() );
 	}
-
-	/**
-	 * Validate the token.
-	 *
-	 * @param string $token The token.
-	 *
-	 * @return bool
-	 */
-	public function validate_token( $token ) {
-		// Rate limiting: Check for too many failed attempts.
-		$ip_address      = $this->get_client_ip();
-		$rate_limit_key  = 'prpl_api_rate_limit_stats_' . \md5( $ip_address );
-		$failed_attempts = (int) \get_transient( $rate_limit_key );
-
-		// Block if more than 10 failed attempts in the last hour.
-		if ( $failed_attempts >= 10 ) {
-			return false;
-		}
-
-		$token       = \str_replace( 'token/', '', $token );
-		$license_key = \get_option( 'progress_planner_license_key', false );
-		if ( ! $license_key || 'no-license' === $license_key ) {
-			// Increment failed attempts counter.
-			\set_transient( $rate_limit_key, $failed_attempts + 1, HOUR_IN_SECONDS );
-			return false;
-		}
-
-		// Use hash_equals() to prevent timing attacks.
-		$is_valid = \hash_equals( $license_key, $token );
-
-		if ( ! $is_valid ) {
-			// Increment failed attempts counter.
-			\set_transient( $rate_limit_key, $failed_attempts + 1, HOUR_IN_SECONDS );
-		} else {
-			// Clear failed attempts on successful authentication.
-			\delete_transient( $rate_limit_key );
-		}
-
-		return $is_valid;
-	}
 }
