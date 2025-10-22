@@ -140,9 +140,11 @@ class Page_Settings {
 		}
 
 		if ( isset( $_POST['pages'] ) ) {
-			foreach ( \wp_unslash( $_POST['pages'] ) as $type => $page_args ) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			// Sanitize the pages array at point of reception.
+			$pages = \map_deep( \wp_unslash( $_POST['pages'] ), 'sanitize_text_field' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
-				$need_page = \sanitize_text_field( \wp_unslash( $page_args['have_page'] ) );
+			foreach ( $pages as $type => $page_args ) {
+				$need_page = isset( $page_args['have_page'] ) ? $page_args['have_page'] : '';
 
 				\progress_planner()->get_page_types()->set_no_page_needed(
 					$type,
