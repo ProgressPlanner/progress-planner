@@ -348,7 +348,7 @@ class Front_End_Onboarding {
 			}
 
 			$task_formatted = [
-				'task_id'     => $task[0]->task_id,
+				'task_id'     => $task[0]->get_task_id(),
 				'title'       => $task[0]->post_title,
 				'url'         => $task[0]->url,
 				'provider_id' => $task[0]->get_provider_id(),

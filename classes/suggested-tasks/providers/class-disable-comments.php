@@ -41,6 +41,13 @@ class Disable_Comments extends Tasks_Interactive {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/disable-comments';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 9;
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string

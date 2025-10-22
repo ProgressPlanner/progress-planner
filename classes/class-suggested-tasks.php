@@ -80,7 +80,7 @@ class Suggested_Tasks {
 		$completed_tasks = $this->tasks_manager->evaluate_tasks();
 
 		foreach ( $completed_tasks as $task ) {
-			if ( ! $task->task_id && $task->ID ) {
+			if ( ! $task->post_name && $task->ID ) {
 				continue;
 			}
 
@@ -88,7 +88,7 @@ class Suggested_Tasks {
 			$task->celebrate();
 
 			// Insert an activity.
-			$this->insert_activity( $task->task_id );
+			$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 		}
 	}
 
@@ -156,7 +156,7 @@ class Suggested_Tasks {
 		\progress_planner()->get_suggested_tasks_db()->update_recommendation( $pending_tasks[0]->ID, [ 'post_status' => 'trash' ] );
 
 		// Insert an activity.
-		$this->insert_activity( $pending_tasks[0]->task_id );
+		$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $pending_tasks[0]->post_name ) );
 	}
 
 	/**
@@ -185,6 +185,9 @@ class Suggested_Tasks {
 	 * Primarly this is used for deeplinking, ie user is testing if the emails are working
 	 * He gets an email with a link which automatically completes the task.
 	 *
+	 * Verify token to prevent CSRF attacks.
+	 * Tokens are one-time use and expire after 24 hours.
+	 *
 	 * @return void
 	 */
 	public function maybe_complete_task() {
@@ -197,17 +200,32 @@ class Suggested_Tasks {
 			return;
 		}
 
-		$this->mark_task_as_completed( $task_id );
+		// Verify token to prevent CSRF attacks.
+		if ( ! isset( $_GET['token'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
+
+		$provided_token = \sanitize_text_field( \wp_unslash( $_GET['token'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$user_id        = \get_current_user_id();
+
+		// Verify the token.
+		if ( ! $this->verify_task_completion_token( $task_id, $user_id, $provided_token ) ) {
+			return;
+		}
+
+		// Mark task as completed and delete the token.
+		$this->mark_task_as_completed( $task_id, $user_id );
 	}
 
 	/**
 	 * Complete a task.
 	 *
-	 * @param string $task_id The task ID.
+	 * @param string   $task_id The task ID.
+	 * @param int|null $user_id Optional. The user ID for token deletion. If provided, the token will be deleted.
 	 *
 	 * @return bool
 	 */
-	public function mark_task_as_completed( $task_id ) {
+	public function mark_task_as_completed( $task_id, $user_id = null ) {
 		if ( ! $this->was_task_completed( $task_id ) ) {
 			$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
@@ -217,11 +235,74 @@ class Suggested_Tasks {
 				// Insert an activity.
 				$this->insert_activity( $task_id );
 
+				// Delete the token after successful use (one-time use) if user_id is provided.
+				if ( $user_id ) {
+					$this->delete_task_completion_token( $task_id, $user_id );
+				}
+
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Generate a secure token for task completion via email link.
+	 *
+	 * This token prevents CSRF attacks by ensuring only legitimate email
+	 * links can mark tasks as complete.
+	 *
+	 * @param string $task_id The task ID.
+	 * @param int    $user_id The user ID.
+	 *
+	 * @return string The generated token.
+	 */
+	public function generate_task_completion_token( $task_id, $user_id ) {
+		// Generate a cryptographically secure random token.
+		$random = \wp_generate_password( 32, false );
+		$token  = \wp_hash( $task_id . $user_id . $random . \wp_salt( 'auth' ) );
+
+		// Store the token in a transient (expires after 24 hours).
+		\set_transient(
+			'prpl_complete_' . $task_id . '_' . $user_id,
+			$token,
+			DAY_IN_SECONDS
+		);
+
+		return $token;
+	}
+
+	/**
+	 * Verify a task completion token.
+	 *
+	 * @param string $task_id        The task ID.
+	 * @param int    $user_id        The user ID.
+	 * @param string $provided_token The token to verify.
+	 *
+	 * @return bool True if token is valid, false otherwise.
+	 */
+	protected function verify_task_completion_token( $task_id, $user_id, $provided_token ) {
+		$stored_token = \get_transient( 'prpl_complete_' . $task_id . '_' . $user_id );
+
+		if ( ! $stored_token ) {
+			return false; // Token expired or doesn't exist.
+		}
+
+		// Use hash_equals to prevent timing attacks.
+		return \hash_equals( $stored_token, $provided_token );
+	}
+
+	/**
+	 * Delete a task completion token after use.
+	 *
+	 * @param string $task_id The task ID.
+	 * @param int    $user_id The user ID.
+	 *
+	 * @return bool True if deleted, false otherwise.
+	 */
+	protected function delete_task_completion_token( $task_id, $user_id ) {
+		return \delete_transient( 'prpl_complete_' . $task_id . '_' . $user_id );
 	}
 
 	/**
@@ -262,13 +343,13 @@ class Suggested_Tasks {
 		switch ( $action ) {
 			case 'complete':
 				// Insert an activity.
-				$this->insert_activity( $task->task_id );
+				$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 				$updated = true;
 				break;
 
 			case 'pending': // User task was marked as pending.
 			case 'delete':
-				$this->delete_activity( $task->task_id );
+				$this->delete_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
 				$updated = true;
 				break;
 		}
@@ -313,17 +394,12 @@ class Suggested_Tasks {
 		);
 
 		$rest_meta_fields = [
-			'prpl_task_id' => [
+			'prpl_url'   => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_url'     => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'menu_order'   => [
+			'menu_order' => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
@@ -389,16 +465,6 @@ class Suggested_Tasks {
 	public function rest_api_tax_query( $args, $request ) {
 		$tax_query = [];
 
-		// Include terms (matches any term in list).
-		if ( isset( $request['provider'] ) ) {
-			$tax_query[] = [
-				'taxonomy' => 'prpl_recommendations_provider',
-				'field'    => 'slug',
-				'terms'    => \explode( ',', $request['provider'] ),
-				'operator' => 'IN',
-			];
-		}
-
 		// Exclude terms.
 		if ( isset( $request['exclude_provider'] ) ) {
 			$tax_query[] = [
@@ -409,9 +475,26 @@ class Suggested_Tasks {
 			];
 		}
 
-		if ( ! empty( $tax_query ) ) {
-			$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		$include_providers            = [];
+		$providers_available_for_user = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers_available_for_user();
+		foreach ( $providers_available_for_user as $provider ) {
+			$include_providers[] = $provider->get_provider_id();
 		}
+
+		// Include terms (matches any term in list).
+		if ( isset( $request['provider'] ) ) {
+			$request_providers = \explode( ',', $request['provider'] );
+			$include_providers = \array_intersect( $include_providers, $request_providers );
+		}
+
+		$tax_query[] = [
+			'taxonomy' => 'prpl_recommendations_provider',
+			'field'    => 'slug',
+			'terms'    => $include_providers,
+			'operator' => 'IN',
+		];
+
+		$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 
 		// Handle sorting parameters.
 		if ( isset( $request['filter']['orderby'] ) ) {
@@ -444,6 +527,8 @@ class Suggested_Tasks {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
 		}
 
+		$response->data['slug'] = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $response->data['slug'] );
+
 		if ( $provider ) {
 			$response->data['prpl_provider'] = $provider_term[0];
 			// Link should be added during run time, since it is not added for users without required capability.
@@ -452,18 +537,18 @@ class Suggested_Tasks {
 				: '';
 
 			$response->data['prpl_popover_id'] = $provider->get_popover_id();
-
-			// This has to be the last item to be added because actions use data from previous items.
-			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
-			$response->data['prpl_points']       = $provider->get_points();
+			$response->data['prpl_points']     = $provider->get_points();
 
 			/*
 			 * Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
 			 * Those are tasks which are completed by toggling an option, so non repetitive & not user tasks.
 			 */
-			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['meta']['prpl_task_id'] ) ) {
+			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['slug'] ) ) {
 				$response->data['prpl_points'] = 0;
 			}
+
+			// This has to be the last item to be added because actions use data from previous items.
+			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
 		}
 
 		// Category taxonomy removed - no longer adding prpl_category to response.
@@ -534,5 +619,15 @@ class Suggested_Tasks {
 		 * @return array
 		 */
 		return \apply_filters( 'progress_planner_suggested_tasks_in_rest_format', $tasks, $args );
+	}
+
+	/**
+	 * Get the task ID from a slug.
+	 *
+	 * @param string $slug The slug.
+	 * @return string
+	 */
+	public function get_task_id_from_slug( $slug ) {
+		return explode( '__trashed', $slug )[0];
 	}
 }

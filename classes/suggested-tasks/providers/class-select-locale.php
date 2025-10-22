@@ -59,7 +59,7 @@ class Select_Locale extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_NORMAL - 4;
+	protected $priority = 8;
 
 	/**
 	 * Initialize the task.

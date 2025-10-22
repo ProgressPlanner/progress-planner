@@ -38,7 +38,7 @@ class Set_Date_Format extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_NORMAL - 4;
+	protected $priority = 7;
 
 	/**
 	 * Initialize the task.

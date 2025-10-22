@@ -45,7 +45,7 @@ class Select_Timezone extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_NORMAL - 4;
+	protected $priority = 6;
 
 	/**
 	 * Initialize the task.
