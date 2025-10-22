@@ -163,28 +163,54 @@ class Update_190 {
 	 */
 	public function migrate_task_priorities() {
 		// Map of provider_id => new priority value.
+		// Ordered by priority (low number = high priority).
 		// This is hardcoded to avoid dependency on tasks_manager being initialized.
 		$priority_map = [
-			'update-core'                => 0,  // PRIORITY_CRITICAL.
-			'wp-debug-display'           => 5,  // PRIORITY_CRITICAL + 5.
-			'settings-saved'             => 10, // PRIORITY_URGENT.
-			'email-sending'              => 11, // PRIORITY_URGENT + 1.
-			'search-engine-visibility'   => 12, // PRIORITY_URGENT + 2.
-			'php-version'                => 13, // PRIORITY_URGENT + 3.
-			'core-permalink-structure'   => 20, // PRIORITY_HIGH.
-			'unpublished-content'        => 30, // PRIORITY_HIGH + 10.
-			'fewer-tags'                 => 32, // PRIORITY_HIGH + 12.
-			'core-blogdescription'       => 45, // PRIORITY_NORMAL - 5.
-			'core-siteicon'              => 45, // PRIORITY_NORMAL - 5.
-			'select-locale'              => 46, // PRIORITY_NORMAL - 4.
-			'select-timezone'            => 46, // PRIORITY_NORMAL - 4.
-			'set-date-format'            => 46, // PRIORITY_NORMAL - 4.
-			'review-post'                => 60, // PRIORITY_LOW.
-			'remove-terms-without-posts' => 60, // PRIORITY_LOW.
-			'set-valuable-post-types'    => 70, // PRIORITY_LOW + 10.
-			'update-term-description'    => 80, // PRIORITY_OPTIONAL.
-			'yoast-cornerstone-workout'  => 90, // PRIORITY_OPTIONAL + 10.
-			'yoast-orphaned-content'     => 90, // PRIORITY_OPTIONAL + 10.
+			'core-siteicon'                             => 1,
+			'core-blogdescription'                      => 2,
+			'core-permalink-structure'                  => 3,
+			'sending-email'                             => 4,
+			'search-engine-visibility'                  => 5,
+			'select-timezone'                           => 6,
+			'set-date-format'                           => 7,
+			'select-locale'                             => 8,
+			'disable-comments'                          => 9,
+			'settings-saved'                            => 10,
+			'wp-debug-display'                          => 10,
+			'review-post'                               => 10,
+			'disable-comment-pagination'                => 10,
+			'sample-page'                               => 14,
+			'hello-world'                               => 15,
+			'update-core'                               => 20,
+			'seo-plugin'                                => 20,
+			'yoast-cornerstone-workout'                 => 20,
+			'yoast-orphaned-content-workout'            => 20,
+			'yoast-date-archive'                        => 20,
+			'yoast-format-archive'                      => 20,
+			'yoast-author-archive'                      => 20,
+			'yoast-media-pages'                         => 20,
+			'yoast-organization-logo'                   => 20,
+			'yoast-crawl-settings-feed-authors'         => 20,
+			'yoast-crawl-settings-feed-global-comments' => 20,
+			'yoast-crawl-settings-emoji-scripts'        => 20,
+			'yoast-fix-orphaned-content'                => 20,
+			'aioseo-media-pages'                        => 20,
+			'aioseo-organization-logo'                  => 20,
+			'aioseo-crawl-settings-feed-comments'       => 20,
+			'aioseo-author-archive'                     => 20,
+			'aioseo-crawl-settings-feed-authors'        => 20,
+			'aioseo-date-archive'                       => 20,
+			'php-version'                               => 25,
+			'fewer-tags'                                => 32,
+			'collaborator'                              => 50,
+			'user'                                      => 50,
+			'create-post'                               => 50,
+			'unpublished-content'                       => 55,
+			'remove-inactive-plugins'                   => 60,
+			'rename-uncategorized-category'             => 60,
+			'remove-terms-without-posts'                => 60,
+			'set-valuable-post-types'                   => 70,
+			'update-term-description'                   => 80,
 		];
 
 		// Loop through each provider and update its tasks.

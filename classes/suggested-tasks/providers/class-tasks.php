@@ -67,36 +67,6 @@ abstract class Tasks implements Tasks_Interface {
 	protected const POPOVER_ID = '';
 
 	/**
-	 * Priority constants for task ordering.
-	 *
-	 * Tasks are ordered from lowest to highest priority value (0 = highest priority, 100 = lowest priority).
-	 *
-	 * CRITICAL (0-9): System-critical issues that must be addressed immediately
-	 * - Examples: Core updates, security vulnerabilities, public error display
-	 *
-	 * URGENT (10-19): Important for security, SEO, or core functionality
-	 * - Examples: Search engine visibility, email functionality, PHP version, initial settings
-	 *
-	 * HIGH (20-39): Important for site quality and SEO
-	 * - Examples: Permalink structure, content optimization
-	 *
-	 * NORMAL (40-59): Standard site configuration and cleanup
-	 * - Examples: Branding (tagline, site icon), default content cleanup, regular content creation
-	 *
-	 * LOW (60-79): Nice-to-have improvements
-	 * - Examples: Content review, content organization, configuration refinements
-	 *
-	 * OPTIONAL (80-100): Advanced optimization and enhancement features
-	 * - Examples: Term descriptions, advanced SEO features
-	 */
-	protected const PRIORITY_CRITICAL = 0;
-	protected const PRIORITY_URGENT   = 10;
-	protected const PRIORITY_HIGH     = 20;
-	protected const PRIORITY_NORMAL   = 50;
-	protected const PRIORITY_LOW      = 60;
-	protected const PRIORITY_OPTIONAL = 80;
-
-	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -125,7 +95,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_NORMAL;
+	protected $priority = 50;
 
 	/**
 	 * Whether the task is dismissable.

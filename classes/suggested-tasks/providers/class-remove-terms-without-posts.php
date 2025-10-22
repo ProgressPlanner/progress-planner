@@ -62,7 +62,7 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_LOW;
+	protected $priority = 60;
 
 	/**
 	 * The minimum number of posts.

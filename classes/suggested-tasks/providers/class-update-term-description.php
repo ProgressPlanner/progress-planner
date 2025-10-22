@@ -76,7 +76,7 @@ class Update_Term_Description extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_OPTIONAL;
+	protected $priority = 80;
 
 	/**
 	 * The completed term IDs.
