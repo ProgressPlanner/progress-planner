@@ -31,10 +31,19 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			</p>
 
 			<div class="prpl-steps-nav-wrapper">
-				<button class="prpl-button prpl-button-step" data-action="showPdfXmlSitemapStep">
-					<?php /* translators: %s is a forward arrow icon. */ ?>
-					<?php \printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' ); ?>
-				</button>
+				<?php /* If the user has the necessary permissions and Yoast SEO is active, but PDF Library is not activated, show the next step button. */ ?>
+				<?php
+				if ( ! \is_multisite() && \current_user_can( 'install_plugins' )
+						&& \progress_planner()->get_plugin_installer()->is_plugin_activated( 'wordpress-seo' )
+						&& ! \progress_planner()->get_plugin_installer()->is_plugin_activated( 'pdf-library' ) ) :
+					?>
+					<button class="prpl-button prpl-button-step" data-action="showPdfXmlSitemapStep">
+						<?php /* translators: %s is a forward arrow icon. */ ?>
+						<?php \printf( \esc_html__( 'Next step %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' ); ?>
+					</button>
+				<?php else : ?>
+					<button class="prpl-button prpl-button-step" data-action="completeTask"><?php \esc_html_e( 'Collect your point!', 'progress-planner' ); ?></button>
+				<?php endif; ?>
 			</div>
 		</div>
 	</div>

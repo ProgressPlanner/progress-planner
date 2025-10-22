@@ -85,17 +85,21 @@ class Improve_Pdf_Handling extends Tasks_Interactive {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		// Detect if there are more than 10 PDF files.
-		$query           = new \WP_Query(
-			[
-				'post_type'      => 'attachment',
-				'post_mime_type' => 'application/pdf',
-				'post_status'    => 'publish',
-				'posts_per_page' => static::MIN_PDF_FILES + 1, // We want to get at least 11 PDF files to be sure we have enough.
-				'fields'         => 'ids',
-			]
-		);
-		$pdf_files_count = $query->found_posts;
+		$pdf_files_count = \progress_planner()->get_utils__cache()->get( 'pdf_files_count' );
+		if ( false === $pdf_files_count ) {
+			// Detect if there are more than 10 PDF files.
+			$query           = new \WP_Query(
+				[
+					'post_type'      => 'attachment',
+					'post_mime_type' => 'application/pdf',
+					'post_status'    => 'publish',
+					'posts_per_page' => static::MIN_PDF_FILES + 1, // We want to get at least 11 PDF files to be sure we have enough.
+					'fields'         => 'ids',
+				]
+			);
+			$pdf_files_count = $query->found_posts;
+			\progress_planner()->get_utils__cache()->set( 'pdf_count', $pdf_files_count, DAY_IN_SECONDS );
+		}
 
 		return static::MIN_PDF_FILES < $pdf_files_count;
 	}
