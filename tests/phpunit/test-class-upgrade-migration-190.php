@@ -44,7 +44,7 @@ class Upgrade_Migrations_190_Test extends \WP_UnitTestCase {
 				'expected_priority' => 10,
 			],
 			[
-				'provider_id'       => 'email-sending',
+				'provider_id'       => 'sending-email',
 				'old_priority'      => 1, // Old hardcoded value.
 				'expected_priority' => 4,
 			],
