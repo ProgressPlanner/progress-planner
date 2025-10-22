@@ -26,5 +26,5 @@ abstract class AIOSEO_Provider extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_NORMAL;
+	protected $priority = 20;
 }

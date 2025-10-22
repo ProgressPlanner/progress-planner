@@ -45,7 +45,7 @@ class Php_Version extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_URGENT + 3;
+	protected $priority = 25;
 
 	/**
 	 * Get the title.
