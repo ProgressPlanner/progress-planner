@@ -54,7 +54,7 @@ class SEO_Plugin extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_HIGH;
+	protected $priority = 20;
 
 	/**
 	 * Get the task URL.

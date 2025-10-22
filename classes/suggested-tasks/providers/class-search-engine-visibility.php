@@ -45,7 +45,7 @@ class Search_Engine_Visibility extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_URGENT + 2;
+	protected $priority = 5;
 
 	/**
 	 * Initialize the task.

@@ -45,7 +45,7 @@ class Permalink_Structure extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_HIGH;
+	protected $priority = 3;
 
 	/**
 	 * Initialize the task.

@@ -45,7 +45,7 @@ class Site_Icon extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_NORMAL - 5;
+	protected $priority = 1;
 
 	/**
 	 * Get the link setting.

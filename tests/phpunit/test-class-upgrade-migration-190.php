@@ -26,42 +26,42 @@ class Upgrade_Migrations_190_Test extends \WP_UnitTestCase {
 			[
 				'provider_id'       => 'update-core',
 				'old_priority'      => 50, // Was using default priority.
-				'expected_priority' => 0, // Should be PRIORITY_CRITICAL.
+				'expected_priority' => 20,
 			],
 			[
 				'provider_id'       => 'review-post',
 				'old_priority'      => 30, // Was using old HIGH value.
-				'expected_priority' => 60, // Should be PRIORITY_LOW.
+				'expected_priority' => 10,
 			],
 			[
 				'provider_id'       => 'wp-debug-display',
 				'old_priority'      => 50, // Was using default priority.
-				'expected_priority' => 5, // Should be PRIORITY_CRITICAL + 5.
+				'expected_priority' => 10,
 			],
 			[
 				'provider_id'       => 'settings-saved',
 				'old_priority'      => 1, // Old hardcoded value.
-				'expected_priority' => 10, // Should be PRIORITY_URGENT.
+				'expected_priority' => 10,
 			],
 			[
 				'provider_id'       => 'email-sending',
 				'old_priority'      => 1, // Old hardcoded value.
-				'expected_priority' => 11, // Should be PRIORITY_URGENT + 1.
+				'expected_priority' => 4,
 			],
 			[
 				'provider_id'       => 'search-engine-visibility',
 				'old_priority'      => 50, // Was using default priority.
-				'expected_priority' => 12, // Should be PRIORITY_URGENT + 2.
+				'expected_priority' => 5,
 			],
 			[
 				'provider_id'       => 'core-permalink-structure',
 				'old_priority'      => 50, // Was using default priority.
-				'expected_priority' => 20, // Should be PRIORITY_HIGH.
+				'expected_priority' => 3,
 			],
 			[
 				'provider_id'       => 'remove-terms-without-posts',
 				'old_priority'      => 60, // Old hardcoded value.
-				'expected_priority' => 60, // Should be PRIORITY_LOW (no change).
+				'expected_priority' => 60, // No change.
 			],
 		];
 
@@ -155,7 +155,7 @@ class Upgrade_Migrations_190_Test extends \WP_UnitTestCase {
 			$post = \get_post( $task_id );
 			$this->assertNotNull( $post, "Task with status {$status} should exist after migration" );
 			$this->assertEquals(
-				0, // PRIORITY_CRITICAL.
+				20,
 				(int) $post->menu_order,
 				"Task with status {$status} should have updated priority"
 			);
@@ -218,7 +218,7 @@ class Upgrade_Migrations_190_Test extends \WP_UnitTestCase {
 				'provider_id' => 'update-core',
 				'post_title'  => 'Test Task with correct priority',
 				'post_status' => 'publish',
-				'priority'    => 0, // Already correct (PRIORITY_CRITICAL).
+				'priority'    => 20,
 			]
 		);
 
@@ -248,8 +248,8 @@ class Upgrade_Migrations_190_Test extends \WP_UnitTestCase {
 		$post_correct_after   = \get_post( $task_id_correct );
 		$post_incorrect_after = \get_post( $task_id_incorrect );
 
-		$this->assertEquals( 0, (int) $post_correct_after->menu_order );
-		$this->assertEquals( 0, (int) $post_incorrect_after->menu_order );
+		$this->assertEquals( 20, (int) $post_correct_after->menu_order );
+		$this->assertEquals( 20, (int) $post_incorrect_after->menu_order );
 
 		// The task that already had correct priority should not have been touched.
 		// (post_modified timestamp should be the same).

@@ -57,6 +57,13 @@ class Rename_Uncategorized_Category extends Tasks_Interactive {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/rename-uncategorized-category';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 60;
+
+	/**
 	 * Initialize the task.
 	 *
 	 * @return void

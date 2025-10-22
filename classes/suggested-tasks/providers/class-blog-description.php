@@ -45,7 +45,7 @@ class Blog_Description extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_NORMAL - 5;
+	protected $priority = 2;
 
 	/**
 	 * Get the task title.

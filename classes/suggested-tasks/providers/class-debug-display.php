@@ -38,7 +38,7 @@ class Debug_Display extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_CRITICAL + 5;
+	protected $priority = 10;
 
 	/**
 	 * Get the task title.

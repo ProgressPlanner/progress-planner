@@ -26,7 +26,7 @@ abstract class Yoast_Provider extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_HIGH;
+	protected $priority = 20;
 
 	/**
 	 * Get the focus tasks.
