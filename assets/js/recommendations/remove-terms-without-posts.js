@@ -14,6 +14,12 @@
 		 */
 		constructor() {
 			this.popoverId = 'prpl-popover-remove-terms-without-posts';
+
+			// Early return if the popover is not found.
+			if ( ! document.getElementById( this.popoverId ) ) {
+				return;
+			}
+
 			this.currentTermData = null;
 			this.currentTaskElement = null;
 			this.elements = this.getElements();
