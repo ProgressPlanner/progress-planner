@@ -26,7 +26,7 @@ abstract class Base {
 		];
 
 		foreach ( $ip_keys as $key ) {
-			if ( ! empty( $_SERVER[ $key ] ) ) {
+			if ( isset( $_SERVER[ $key ] ) && ! empty( $_SERVER[ $key ] ) ) {
 				$ip = \sanitize_text_field( \wp_unslash( $_SERVER[ $key ] ) );
 				// Handle X-Forwarded-For which may contain multiple IPs.
 				if ( \strpos( $ip, ',' ) !== false ) {
