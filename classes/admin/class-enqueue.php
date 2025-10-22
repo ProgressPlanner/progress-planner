@@ -214,6 +214,17 @@ class Enqueue {
 					$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
 				}
 
+				// Get the providers available for the user.
+				$include_providers            = [];
+				$providers_available_for_user = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers_available_for_user();
+				foreach ( $providers_available_for_user as $provider ) {
+					// Skip user provider.
+					if ( 'user' === $provider->get_provider_id() ) {
+						continue;
+					}
+					$include_providers[] = $provider->get_provider_id();
+				}
+
 				// Check if user wants to see all recommendations.
 				$show_all_recommendations = isset( $_GET['prpl_show_all_recommendations'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$tasks_per_page           = $show_all_recommendations ? -1 : \Progress_Planner\Admin\Widgets\Suggested_Tasks::PER_PAGE_DEFAULT;
@@ -223,7 +234,7 @@ class Enqueue {
 					[
 						'post_status'      => 'publish',
 						'posts_per_page'   => $tasks_per_page,
-						'exclude_provider' => [ 'user' ],
+						'include_provider' => $include_providers, // User provider is already excluded.
 					]
 				);
 				// Get pending celebration tasks.
@@ -231,7 +242,7 @@ class Enqueue {
 					[
 						'post_status'      => 'pending',
 						'posts_per_page'   => 100,
-						'exclude_provider' => [ 'user' ],
+						'include_provider' => $include_providers, // User provider is already excluded.
 					]
 				);
 
@@ -387,6 +398,7 @@ class Enqueue {
 			'installed'                    => \esc_html__( 'Installed', 'progress-planner' ),
 			'activating'                   => \esc_html__( 'Activating...', 'progress-planner' ),
 			'activated'                    => \esc_html__( 'Activated', 'progress-planner' ),
+			'somethingWentWrong'           => \esc_html__( 'Something went wrong.', 'progress-planner' ),
 			'showAllRecommendations'       => \esc_html__( 'Show all recommendations', 'progress-planner' ),
 			'showFewerRecommendations'     => \esc_html__( 'Show fewer recommendations', 'progress-planner' ),
 			'loadingTasks'                 => \esc_html__( 'Loading tasks...', 'progress-planner' ),
