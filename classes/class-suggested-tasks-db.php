@@ -273,6 +273,9 @@ class Suggested_Tasks_DB {
 		$terms                 = \wp_get_post_terms( $post_data['ID'], 'prpl_recommendations_provider' );
 		$post_data['provider'] = \is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
 
+		// Set task_id from post_name.
+		$post_data['task_id'] = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $post_data['post_name'] );
+
 		$cached[ $post_data['ID'] ] = new Task( $post_data );
 		return $cached[ $post_data['ID'] ];
 	}
