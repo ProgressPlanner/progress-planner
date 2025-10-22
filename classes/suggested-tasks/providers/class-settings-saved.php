@@ -24,7 +24,7 @@ class Settings_Saved extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_URGENT;
+	protected $priority = 10;
 
 	/**
 	 * Whether the task is an onboarding task.

@@ -26,5 +26,5 @@ abstract class AIOSEO_Interactive_Provider extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_NORMAL;
+	protected $priority = 20;
 }

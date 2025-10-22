@@ -43,6 +43,13 @@ class Remove_Inactive_Plugins extends Tasks {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/remove-inactive-plugins';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 60;
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
