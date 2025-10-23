@@ -57,6 +57,13 @@ class Sample_Page extends Tasks_Interactive {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/delete-sample-page';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 14;
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string

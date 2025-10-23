@@ -47,15 +47,15 @@ class Debug_Tools {
 		\add_action( 'init', [ $this, 'check_delete_badges' ] );
 		\add_action( 'init', [ $this, 'check_toggle_migrations' ] );
 		\add_action( 'init', [ $this, 'check_delete_single_task' ] );
+		\add_action( 'init', [ $this, 'check_toggle_recommendations_ui' ] );
 		if ( \defined( '\IS_PLAYGROUND_PREVIEW' ) && \constant( '\IS_PLAYGROUND_PREVIEW' ) === true ) {
 			\add_action( 'init', [ $this, 'check_toggle_placeholder_demo' ] );
 		}
 
-		// Add filter to modify the maximum number of suggested tasks to display.
-		\add_filter( 'progress_planner_suggested_tasks_max_items_per_category', [ $this, 'check_show_all_suggested_tasks' ] );
-
 		// Initialize color customizer.
 		$this->get_color_customizer();
+
+		\add_filter( 'progress_planner_tasks_show_ui', [ $this, 'filter_tasks_show_ui' ] );
 	}
 
 	/**
@@ -79,16 +79,6 @@ class Debug_Tools {
 
 		$this->add_delete_submenu_item( $admin_bar );
 
-		// Show all suggested tasks.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-show-all-suggested-tasks',
-				'parent' => 'prpl-debug',
-				'title'  => 'Show All Suggested Tasks',
-				'href'   => \add_query_arg( 'prpl_show_all_suggested_tasks', '99', $this->current_url ),
-			]
-		);
-
 		$this->add_upgrading_tasks_submenu_item( $admin_bar );
 
 		$this->add_suggested_tasks_submenu_item( $admin_bar );
@@ -98,6 +88,8 @@ class Debug_Tools {
 		$this->add_more_info_submenu_item( $admin_bar );
 
 		$this->add_toggle_migrations_submenu_item( $admin_bar );
+
+		$this->add_toggle_recommendations_ui_submenu_item( $admin_bar );
 
 		// Add color customizer item.
 		$admin_bar->add_node(
@@ -263,7 +255,7 @@ class Debug_Tools {
 					// Add delete button.
 					$delete_url = \add_query_arg(
 						[
-							'prpl_delete_single_task' => $task->task_id,
+							'prpl_delete_single_task' => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ),
 							'_wpnonce'                => \wp_create_nonce( 'prpl_debug_tools' ),
 						],
 						$this->current_url
@@ -333,6 +325,27 @@ class Debug_Tools {
 	}
 
 	/**
+	 * Add Toggle Recommendations UI submenu to the debug menu.
+	 *
+	 * @param \WP_Admin_Bar $admin_bar The WordPress admin bar object.
+	 * @return void
+	 */
+	protected function add_toggle_recommendations_ui_submenu_item( $admin_bar ) {
+		$debug_enabled = \get_option( 'prpl_debug_recommendations_ui', false );
+		$title         = $debug_enabled ? '<span style="color: green;">Recommendations UI Enabled</span>' : '<span style="color: red;">Recommendations UI Disabled</span>';
+		$href          = \add_query_arg( 'prpl_toggle_recommendations_ui', '1', $this->current_url );
+
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-toggle-recommendations-ui',
+				'parent' => 'prpl-debug',
+				'title'  => $title,
+				'href'   => $href,
+			]
+		);
+	}
+
+	/**
 	 * Check and process the toggle migrations action.
 	 *
 	 * Toggles the debug option if the appropriate query parameter is set
@@ -362,6 +375,39 @@ class Debug_Tools {
 
 		// Redirect to the same page without the parameter.
 		\wp_safe_redirect( \remove_query_arg( [ 'prpl_toggle_migrations', '_wpnonce' ] ) );
+		exit;
+	}
+
+	/**
+	 * Check and process the toggle recommendations UI action.
+	 *
+	 * Toggles the debug option if the appropriate query parameter is set
+	 * and user has required capabilities.
+	 *
+	 * @return void
+	 */
+	public function check_toggle_recommendations_ui() {
+		if (
+			! isset( $_GET['prpl_toggle_recommendations_ui'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			$_GET['prpl_toggle_recommendations_ui'] !== '1' || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			! \current_user_can( 'manage_options' )
+		) {
+			return;
+		}
+
+		// Verify nonce for security.
+		$this->verify_nonce();
+
+		// Toggle the debug option.
+		$current_value = \get_option( 'prpl_debug_recommendations_ui', false );
+		if ( $current_value ) {
+			\delete_option( 'prpl_debug_recommendations_ui' );
+		} else {
+			\update_option( 'prpl_debug_recommendations_ui', true );
+		}
+
+		// Redirect to the same page without the parameter.
+		\wp_safe_redirect( \remove_query_arg( [ 'prpl_toggle_recommendations_ui', '_wpnonce' ] ) );
 		exit;
 	}
 
@@ -429,29 +475,6 @@ class Debug_Tools {
 		// Redirect to the same page without the parameter.
 		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_badges', '_wpnonce' ] ) );
 		exit;
-	}
-
-	/**
-	 * Modify the maximum number of suggested tasks to display.
-	 *
-	 * @param array $max_items_per_category Array of maximum items per category.
-	 * @return array Modified array of maximum items per category.
-	 */
-	public function check_show_all_suggested_tasks( $max_items_per_category ) {
-		if (
-			! isset( $_GET['prpl_show_all_suggested_tasks'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! \current_user_can( 'manage_options' ) // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		) {
-			return $max_items_per_category;
-		}
-
-		$max_items = \absint( \wp_unslash( $_GET['prpl_show_all_suggested_tasks'] ) );  // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-		foreach ( $max_items_per_category as $key => $value ) {
-			$max_items_per_category[ $key ] = $max_items;
-		}
-
-		return $max_items_per_category;
 	}
 
 	/**
@@ -706,5 +729,18 @@ class Debug_Tools {
 			$color_customizer = new Color_Customizer();
 		}
 		return $color_customizer;
+	}
+
+	/**
+	 * Filter the tasks show UI.
+	 *
+	 * @param bool $show_ui The show UI.
+	 * @return bool
+	 */
+	public function filter_tasks_show_ui( $show_ui ) {
+		if ( \get_option( 'prpl_debug_recommendations_ui', false ) ) {
+			return true;
+		}
+		return $show_ui;
 	}
 }
