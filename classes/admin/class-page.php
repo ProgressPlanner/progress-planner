@@ -180,8 +180,8 @@ class Page {
 			$default_localization_data = [
 				'name' => 'progressPlanner',
 				'data' => [
-					'onboardNonceURL' => \progress_planner()->get_utils__onboard()->get_remote_nonce_url(),
-					'onboardAPIUrl'   => \progress_planner()->get_utils__onboard()->get_remote_url(),
+					'onboardNonceURL' => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
+					'onboardAPIUrl'   => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
 					'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
 					'nonce'           => \wp_create_nonce( 'progress_planner' ),
 				],
@@ -233,10 +233,6 @@ class Page {
 		$total_points     = 0;
 		$completed_points = 0;
 		foreach ( $tasks_providers as $provider ) {
-			if ( 'configuration' !== $provider->get_provider_category() ) {
-				continue;
-			}
-
 			$link_setting = $provider->get_link_setting();
 			if ( ! isset( $link_setting['hook'] ) ||
 				$hook !== $link_setting['hook']

@@ -57,6 +57,13 @@ class Hello_World extends Tasks_Interactive {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/delete-hello-world-post';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 15;
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string

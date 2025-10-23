@@ -5,7 +5,7 @@ test.describe( 'PRPL Task Snooze', () => {
 	test( 'Snooze a task for one week', async ( { page, request } ) => {
 		// Navigate to Progress Planner dashboard with show all tasks parameter
 		await page.goto(
-			`${ process.env.WORDPRESS_URL }/wp-admin/admin.php?page=progress-planner&prpl_show_all_suggested_tasks=99`
+			`${ process.env.WORDPRESS_URL }/wp-admin/admin.php?page=progress-planner&prpl_show_all_recommendations`
 		);
 		await page.waitForLoadState( 'networkidle' );
 
@@ -22,13 +22,13 @@ test.describe( 'PRPL Task Snooze', () => {
 
 		// Find a task that's not completed or snoozed
 		const taskToSnooze = initialTasks.find(
-			( task ) => task.task_id === snoozeTaskId
+			( task ) => task.post_name === snoozeTaskId
 		);
 
 		if ( taskToSnooze ) {
 			// Hover over the task to show actions
 			const taskElement = page.locator(
-				`li[data-task-id="${ taskToSnooze.task_id }"]`
+				`li[data-task-id="${ taskToSnooze.post_name }"]`
 			);
 			await taskElement.hover();
 
@@ -47,7 +47,7 @@ test.describe( 'PRPL Task Snooze', () => {
 			// Select 1 week duration by clicking the label
 			await page.evaluate( ( taskToBeSnoozed ) => {
 				const radio = document.querySelector(
-					`li[data-task-id="${ taskToBeSnoozed.task_id }"] .prpl-snooze-duration-radio-group input[type="radio"][value="1-week"]`
+					`li[data-task-id="${ taskToBeSnoozed.post_name }"] .prpl-snooze-duration-radio-group input[type="radio"][value="1-week"]`
 				);
 				const label = radio.closest( 'label' );
 				label.click();
@@ -67,7 +67,7 @@ test.describe( 'PRPL Task Snooze', () => {
 			);
 			const updatedTasks = await updatedResponse.json();
 			const updatedTask = updatedTasks.find(
-				( task ) => task.task_id === taskToSnooze.task_id
+				( task ) => task.post_name === taskToSnooze.post_name
 			);
 			expect( updatedTask.post_status ).toBe( 'future' );
 		}

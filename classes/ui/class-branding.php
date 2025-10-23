@@ -104,7 +104,7 @@ final class Branding {
 			if ( $response ) {
 				$media = \json_decode( $response, true );
 				if ( isset( $media['source_url'] ) ) {
-					echo '<img src="' . \esc_url( $media['source_url'] ) . '" alt="Logo" style="height:100px;"/>';
+					echo '<img src="' . \esc_url( $media['source_url'] ) . '" alt="Logo"/>';
 					return;
 				}
 			}
@@ -291,5 +291,16 @@ final class Branding {
 		}
 
 		return $default_url;
+	}
+
+	/**
+	 * Get the recommended SEO plugin slug.
+	 *
+	 * @return string
+	 */
+	public function get_seo_plugin_recommendation_slug(): string {
+		return empty( $this->get_api_data() ) || ! isset( $this->get_api_data()['seo_plugin_recommendation_slug'] )
+			? 'wordpress-seo'
+			: $this->get_api_data()['seo_plugin_recommendation_slug'];
 	}
 }
