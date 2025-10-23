@@ -59,13 +59,6 @@ interface Tasks_Interface {
 	public function get_link_setting();
 
 	/**
-	 * Get the provider category.
-	 *
-	 * @return string
-	 */
-	public function get_provider_category();
-
-	/**
 	 * Get the provider ID.
 	 *
 	 * @return string

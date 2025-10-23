@@ -41,6 +41,13 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/disable-comment-pagination';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 10;
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string

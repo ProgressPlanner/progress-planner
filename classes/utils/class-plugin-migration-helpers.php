@@ -34,7 +34,6 @@ class Plugin_Migration_Helpers {
 				return new Task(
 					[
 						'task_id'     => $task_id,
-						'category'    => $task_provider ? $task_provider->get_provider_category() : '',
 						'provider_id' => $task_provider ? $task_provider->get_provider_id() : '',
 					]
 				);
@@ -53,7 +52,6 @@ class Plugin_Migration_Helpers {
 			return new Task(
 				[
 					'task_id'     => $task_id,
-					'category'    => $task_provider ? $task_provider->get_provider_category() : '',
 					'provider_id' => $task_provider ? $task_provider->get_provider_id() : '',
 					'date'        => \substr( $task_id, $last_pos + 1 ),
 				]
@@ -84,11 +82,6 @@ class Plugin_Migration_Helpers {
 		if ( isset( $data['type'] ) && ! isset( $data['provider_id'] ) ) {
 			$data['provider_id'] = $data['type'];
 			unset( $data['type'] );
-		}
-
-		if ( isset( $data['provider_id'] ) ) {
-			$task_provider    = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $data['provider_id'] ); // @phpstan-ignore-line
-			$data['category'] = $task_provider ? $task_provider->get_provider_category() : '';
 		}
 
 		return new Task( $data );

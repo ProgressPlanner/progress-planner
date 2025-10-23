@@ -13,7 +13,7 @@ namespace Progress_Planner\Rest;
 /**
  * Rest_API_Tasks class.
  */
-class Tasks {
+class Tasks extends Base {
 	/**
 	 * Constructor.
 	 */
@@ -44,28 +44,6 @@ class Tasks {
 				],
 			]
 		);
-	}
-
-	/**
-	 * Permission callback.
-	 *
-	 * @param string $token The token.
-	 *
-	 * @return bool
-	 */
-	public function validate_token( $token ) {
-		$token = \str_replace( 'token/', '', $token );
-
-		if ( $token === \get_option( 'progress_planner_test_token', '' ) ) {
-			return true;
-		}
-
-		$license_key = \get_option( 'progress_planner_license_key', false );
-		if ( ! $license_key || 'no-license' === $license_key ) {
-			return false;
-		}
-
-		return $token === $license_key;
 	}
 
 	/**
