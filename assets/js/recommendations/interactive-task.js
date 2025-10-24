@@ -35,6 +35,8 @@ const prplInteractiveTaskFormListener = {
 		formElement.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
 
+			prplInteractiveTaskFormListener.showLoading( formElement );
+
 			// Get the form data.
 			const formData = new FormData( formElement );
 			const settingsToPass = {};
@@ -56,6 +58,8 @@ const prplInteractiveTaskFormListener = {
 						return response;
 					}
 
+					prplInteractiveTaskFormListener.hideLoading( formElement );
+
 					// This will trigger the celebration event (confetti) as well.
 					prplSuggestedTask.maybeComplete( postId ).then( () => {
 						// Close popover.
@@ -75,6 +79,8 @@ const prplInteractiveTaskFormListener = {
 
 		const formSubmitHandler = ( event ) => {
 			event.preventDefault();
+
+			prplInteractiveTaskFormListener.showLoading( formElement );
 
 			callback()
 				.then( ( response ) => {
@@ -110,6 +116,9 @@ const prplInteractiveTaskFormListener = {
 					);
 				} )
 				.finally( () => {
+					// Hide loading state.
+					prplInteractiveTaskFormListener.hideLoading( formElement );
+
 					// Remove the form listener once the callback is executed.
 					formElement.removeEventListener(
 						'submit',
@@ -139,6 +148,8 @@ const prplInteractiveTaskFormListener = {
 		formElement.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
 
+			prplInteractiveTaskFormListener.showLoading( formElement );
+
 			const formData = new FormData( formElement );
 			const settingsToPass = {};
 			settingsToPass[ setting ] = settingCallbackValue(
@@ -157,7 +168,6 @@ const prplInteractiveTaskFormListener = {
 				},
 			} )
 				.then( ( response ) => {
-					console.log( response );
 					if ( true !== response.success ) {
 						// Show error to the user.
 						prplInteractiveTaskFormListener.showError(
@@ -193,6 +203,10 @@ const prplInteractiveTaskFormListener = {
 						error,
 						popoverId
 					);
+				} )
+				.finally( () => {
+					// Hide loading state.
+					prplInteractiveTaskFormListener.hideLoading( formElement );
 				} );
 		} );
 	},
@@ -240,5 +254,36 @@ const prplInteractiveTaskFormListener = {
 				submitButton
 			);
 		}
+	},
+
+	/**
+	 * Show loading state.
+	 *
+	 * @param {HTMLFormElement} formElement - The form element.
+	 * @return {void}
+	 */
+	showLoading: ( formElement ) => {
+		// data-action="completeTask"
+		formElement.querySelector( 'button[type="submit"]' ).disabled = true;
+
+		// Add spinner.
+		const spinner = document.createElement( 'span' );
+		spinner.classList.add( 'prpl-spinner' );
+		spinner.innerHTML =
+			'<span class="spinner" style="visibility: visible;"></span>'; // WP spinner.
+
+		// Append spinner after submit button.
+		formElement.querySelector( 'button[type="submit"]' ).after( spinner );
+	},
+
+	/**
+	 * Hide loading state.
+	 *
+	 * @param {HTMLFormElement} formElement - The form element.
+	 * @return {void}
+	 */
+	hideLoading: ( formElement ) => {
+		formElement.querySelector( 'button[type="submit"]' ).disabled = false;
+		formElement.querySelector( 'span.prpl-spinner' )?.remove();
 	},
 };

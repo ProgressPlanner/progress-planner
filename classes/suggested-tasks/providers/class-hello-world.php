@@ -140,9 +140,11 @@ class Hello_World extends Tasks_Interactive {
 	 */
 	public function print_popover_form_contents() {
 		?>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Delete the "Hello World!" post', 'progress-planner' ); ?>
-		</button>
+		<div class="prpl-steps-nav-wrapper">
+			<button type="submit" class="prpl-button prpl-button-primary">
+				<?php \esc_html_e( 'Delete the "Hello World!" post', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 

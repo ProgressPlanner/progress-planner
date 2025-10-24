@@ -441,9 +441,21 @@
 			padding-top: 1rem;
 			display: flex;
 			justify-content: flex-end;
+			align-items: center;
 			gap: 1rem;
 			align-self: flex-end;
 			width: 100%;
+
+			/* If there are no other elements in the form, align the button to the left. */
+			&:only-child {
+				padding-top: 0;
+				justify-content: flex-start;
+
+				/* Display the spinner after the button. */
+				.prpl-spinner {
+					order: 99;
+				}
+			}
 
 			.prpl-button {
 				cursor: pointer;
@@ -454,6 +466,11 @@
 					pointer-events: none;
 					opacity: 0.5;
 				}
+			}
+
+			/* Display the spinner before the button. */
+			.prpl-spinner {
+				order: -1;
 			}
 
 		}

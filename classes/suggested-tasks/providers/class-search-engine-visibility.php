@@ -113,9 +113,11 @@ class Search_Engine_Visibility extends Tasks_Interactive {
 	 */
 	public function print_popover_form_contents() {
 		?>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Allow search engines to index your site', 'progress-planner' ); ?>
-		</button>
+		<div class="prpl-steps-nav-wrapper">
+			<button type="submit" class="prpl-button prpl-button-primary">
+				<?php \esc_html_e( 'Allow search engines to index your site', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 
