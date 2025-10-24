@@ -321,12 +321,22 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		$term = $this->get_term_from_task_id( $data['meta']['prpl_task_id'] );
+
+		if ( ! isset( $data['slug'] ) ) {
+			return $actions;
+		}
+
+		$term = $this->get_term_from_task_id( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['slug'] ) );
+
+		// If the term is not found, return the actions.
+		if ( ! $term ) {
+			return $actions;
+		}
 
 		$task_data = [
-			'target_term_id'   => $term->term_id ?? '',
-			'target_taxonomy'  => $term->taxonomy ?? '',
-			'target_term_name' => $term->name ?? '',
+			'target_term_id'   => $term->term_id,
+			'target_taxonomy'  => $term->taxonomy,
+			'target_term_name' => $term->name,
 		];
 
 		$task_details = $this->get_task_details( $task_data );
