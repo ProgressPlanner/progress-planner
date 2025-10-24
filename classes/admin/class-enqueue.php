@@ -403,8 +403,8 @@ class Enqueue {
 			'showFewerRecommendations'     => \esc_html__( 'Show fewer recommendations', 'progress-planner' ),
 			'loadingTasks'                 => \esc_html__( 'Loading tasks...', 'progress-planner' ),
 			'taskAddedSuccessfully'        => \esc_html__( 'Task added successfully', 'progress-planner' ),
-			'tasksDeleted'                 => \esc_html__( 'completed tasks deleted', 'progress-planner' ),
-			'taskDeleted'                  => \esc_html__( 'completed task deleted', 'progress-planner' ),
+			'tasksDeleted'                 => \esc_html__( 'Completed tasks deleted', 'progress-planner' ),
+			'taskDeleted'                  => \esc_html__( 'Completed task deleted', 'progress-planner' ),
 			'moveUp'                       => \esc_html__( 'Move up', 'progress-planner' ),
 			'moveDown'                     => \esc_html__( 'Move down', 'progress-planner' ),
 			/* translators: %d: The number of points. */
