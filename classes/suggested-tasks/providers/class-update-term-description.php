@@ -311,6 +311,8 @@ class Update_Term_Description extends Tasks_Interactive {
 		}
 
 		$term = $this->get_term_from_task_id( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['slug'] ) );
+
+		// If the term is not found, return the actions.
 		if ( ! $term ) {
 			return $actions;
 		}

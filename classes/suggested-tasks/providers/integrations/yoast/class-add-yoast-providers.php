@@ -28,6 +28,8 @@ class Add_Yoast_Providers {
 			\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_assets' ] );
 
 			\add_filter( 'progress_planner_exclude_public_taxonomies', [ $this, 'exclude_not_indexable_taxonomies' ] );
+
+			\add_filter( 'progress_planner_interactive_task_allowed_options', [ $this, 'add_interactive_task_allowed_options' ] );
 		}
 	}
 
@@ -120,5 +122,16 @@ class Add_Yoast_Providers {
 		}
 
 		return $exclude_taxonomies;
+	}
+
+	/**
+	 * Add the interactive task allowed options.
+	 *
+	 * @param array $allowed_options The allowed options.
+	 * @return array
+	 */
+	public function add_interactive_task_allowed_options( $allowed_options ) {
+		$allowed_options[] = 'wpseo';
+		return $allowed_options;
 	}
 }

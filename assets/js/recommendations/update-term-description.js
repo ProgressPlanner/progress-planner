@@ -177,21 +177,32 @@
 				taskId: this.currentTaskElement.dataset.taskId,
 				popoverId: this.popoverId,
 				callback: () => {
-					fetch( progressPlanner.ajaxUrl, {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded',
-						},
-						body: new URLSearchParams( {
-							action: 'prpl_interactive_task_submit_update-term-description',
-							nonce: progressPlanner.nonce,
-							term_id: this.elements.termIdField.value,
-							taxonomy: this.elements.taxonomyField.value,
-							description: this.elements.descriptionField.value,
-						} ),
-					} ).then( () => {
-						this.currentTaskElement = null;
-						this.currentTermData = null;
+					return new Promise( ( resolve, reject ) => {
+						fetch( progressPlanner.ajaxUrl, {
+							method: 'POST',
+							headers: {
+								'Content-Type':
+									'application/x-www-form-urlencoded',
+							},
+							body: new URLSearchParams( {
+								action: 'prpl_interactive_task_submit_update-term-description',
+								nonce: progressPlanner.nonce,
+								term_id: this.elements.termIdField.value,
+								taxonomy: this.elements.taxonomyField.value,
+								description:
+									this.elements.descriptionField.value,
+							} ),
+						} )
+							.then( () => {
+								this.currentTaskElement = null;
+								this.currentTermData = null;
+							} )
+							.then( ( response ) => {
+								resolve( { response, success: true } );
+							} )
+							.catch( ( error ) => {
+								reject( { success: false, error } );
+							} );
 					} );
 				},
 			} );

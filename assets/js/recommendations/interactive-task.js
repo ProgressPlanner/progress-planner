@@ -51,12 +51,6 @@ const prplInteractiveTaskFormListener = {
 				const settings = new wp.api.models.Settings( settingsToPass );
 
 				settings.save().then( ( response ) => {
-					console.log( response );
-					if ( true !== response.success ) {
-						// TODO: Handle error.
-						return response;
-					}
-
 					const postId = parseInt( taskEl.dataset.postId );
 					if ( ! postId ) {
 						return response;
@@ -97,7 +91,6 @@ const prplInteractiveTaskFormListener = {
 					const taskEl = document.querySelector(
 						`.prpl-suggested-task[data-task-id="${ taskId }"]`
 					);
-
 					const postId = parseInt( taskEl.dataset.postId );
 					if ( ! postId ) {
 						return;
