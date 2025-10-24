@@ -53,10 +53,8 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<div class="prpl-column prpl-column-content">
 			<h2 class="prpl-interactive-task-title"><?php \esc_html_e( 'Do you want these PDFs to be found in search engines better?', 'progress-planner' ); ?></h2>
 			<p class="prpl-interactive-task-description">
-				<?php \esc_html_e( 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut vel nisi consequat, imperdiet magna nec, commodo ipsum. Fusce nec venenatis diam. Curabitur ac laoreet risus. Vivamus non interdum elit. Nunc sed arcu eget dolor dapibus suscipit. Morbi euismod volutpat egestas. Duis mi ipsum, hendrerit eu accumsan ut, placerat id nulla. ', 'progress-planner' ); ?>
+				<?php \esc_html_e( 'Adding an XML sitemap for your PDF files helps search engines discover and index them more effectively. This can improve visibility in search results and drive more organic traffic to your valuable PDF content.', 'progress-planner' ); ?>
 			</p>
-		</p>
-
 		</div>
 
 		<div class="prpl-column">
