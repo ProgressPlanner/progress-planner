@@ -98,7 +98,7 @@ class Improve_Pdf_Handling extends Tasks_Interactive {
 				]
 			);
 			$pdf_files_count = $query->found_posts;
-			\progress_planner()->get_utils__cache()->set( 'pdf_count', $pdf_files_count, DAY_IN_SECONDS );
+			\progress_planner()->get_utils__cache()->set( 'pdf_files_count', $pdf_files_count, DAY_IN_SECONDS );
 		}
 
 		return static::MIN_PDF_FILES < $pdf_files_count;
