@@ -132,13 +132,7 @@ class Crawl_Settings_Feed_Authors extends AIOSEO_Interactive_Provider {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		?>
-		<div class="prpl-steps-nav-wrapper">
-			<button type="submit" class="prpl-button prpl-button-primary">
-				<?php \esc_html_e( 'Disable author RSS feeds', 'progress-planner' ); ?>
-			</button>
-		</div>
-		<?php
+		$this->print_submit_button( \__( 'Disable author RSS feeds', 'progress-planner' ) );
 	}
 
 	/**

@@ -120,13 +120,7 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		?>
-		<div class="prpl-steps-nav-wrapper">
-			<button type="submit" class="prpl-button prpl-button-primary">
-				<?php \esc_html_e( 'Disable comment pagination', 'progress-planner' ); ?>
-			</button>
-		</div>
-		<?php
+		$this->print_submit_button( \__( 'Disable comment pagination', 'progress-planner' ) );
 	}
 
 	/**

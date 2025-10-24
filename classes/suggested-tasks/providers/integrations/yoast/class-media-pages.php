@@ -98,13 +98,7 @@ class Media_Pages extends Yoast_Interactive_Provider {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		?>
-		<div class="prpl-steps-nav-wrapper">
-			<button type="submit" class="prpl-button prpl-button-primary">
-				<?php \esc_html_e( 'Disable', 'progress-planner' ); ?>
-			</button>
-		</div>
-		<?php
+		$this->print_submit_button( \__( 'Disable', 'progress-planner' ) );
 	}
 
 	/**
