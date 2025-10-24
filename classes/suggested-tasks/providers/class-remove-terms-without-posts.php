@@ -343,14 +343,14 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 
 		$actions[] = [
 			'priority' => 10,
-			'html'     => sprintf(
+			'html'     => \sprintf(
 				'<a href="#" class="prpl-tooltip-action-text prpl-delete-term-action" role="button"
 					data-task-context=\'%s\'
 					onclick="event.preventDefault(); document.getElementById(\'prpl-popover-%s\')?.showPopover(); this.dispatchEvent(new CustomEvent(\'prpl-interactive-task-action-remove-terms-without-posts\', { bubbles: true, detail: JSON.parse(this.dataset.taskContext) }));">
 					%s
 				</a>',
-				htmlspecialchars(
-					wp_json_encode(
+				\htmlspecialchars(
+					\wp_json_encode(
 						[
 							'post_title'       => $task_details['post_title'],
 							'target_term_id'   => $task_data['target_term_id'],

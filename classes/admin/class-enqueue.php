@@ -402,6 +402,13 @@ class Enqueue {
 			'showAllRecommendations'       => \esc_html__( 'Show all recommendations', 'progress-planner' ),
 			'showFewerRecommendations'     => \esc_html__( 'Show fewer recommendations', 'progress-planner' ),
 			'loadingTasks'                 => \esc_html__( 'Loading tasks...', 'progress-planner' ),
+			'taskAddedSuccessfully'        => \esc_html__( 'Task added successfully', 'progress-planner' ),
+			'tasksDeleted'                 => \esc_html__( 'completed tasks deleted', 'progress-planner' ),
+			'taskDeleted'                  => \esc_html__( 'completed task deleted', 'progress-planner' ),
+			'moveUp'                       => \esc_html__( 'Move up', 'progress-planner' ),
+			'moveDown'                     => \esc_html__( 'Move down', 'progress-planner' ),
+			/* translators: %d: The number of points. */
+			'fixThisIssue'                 => \esc_html__( 'Fix this issue for %d points', 'progress-planner' ),
 		];
 	}
 

@@ -609,6 +609,6 @@ class Suggested_Tasks {
 	 * @return string
 	 */
 	public function get_task_id_from_slug( $slug ) {
-		return explode( '__trashed', $slug )[0];
+		return \explode( '__trashed', $slug )[0];
 	}
 }

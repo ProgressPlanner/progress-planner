@@ -268,7 +268,7 @@ class Permalink_Structure extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing value.', 'progress-planner' ) ] );
 		}
 
-		$permalink_structure = trim( \sanitize_text_field( \wp_unslash( $_POST['value'] ) ) );
+		$permalink_structure = \trim( \sanitize_text_field( \wp_unslash( $_POST['value'] ) ) );
 
 		if ( empty( $permalink_structure ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid permalink structure.', 'progress-planner' ) ] );
