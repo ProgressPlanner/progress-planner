@@ -132,6 +132,7 @@ class Add_Yoast_Providers {
 	 */
 	public function add_interactive_task_allowed_options( $allowed_options ) {
 		$allowed_options[] = 'wpseo';
+		$allowed_options[] = 'wpseo_titles';
 		return $allowed_options;
 	}
 }

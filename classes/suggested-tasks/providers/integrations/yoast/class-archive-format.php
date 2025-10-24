@@ -126,9 +126,11 @@ class Archive_Format extends Yoast_Interactive_Provider {
 	 */
 	public function print_popover_form_contents() {
 		?>
+		<div class="prpl-steps-nav-wrapper">
 		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Disable', 'progress-planner' ); ?>
-		</button>
+				<?php \esc_html_e( 'Disable', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 

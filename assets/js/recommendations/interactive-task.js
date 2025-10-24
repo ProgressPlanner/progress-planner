@@ -228,17 +228,12 @@ const prplInteractiveTaskFormListener = {
 
 		console.error( 'Error in interactive task callback:', error );
 
-		// Add error message.
-		const submitButton = formElement.querySelector(
-			'button[type="submit"]'
+		// Check if there's already an error message <p> element right after the form
+		const existingErrorElement = formElement.parentNode.querySelector(
+			'p.prpl-interactive-task-error-message'
 		);
 
-		if (
-			submitButton &&
-			! formElement.querySelector(
-				'.prpl-interactive-task-error-message'
-			)
-		) {
+		if ( ! existingErrorElement ) {
 			// Add paragraph with error message.
 			const errorParagraph = document.createElement( 'p' );
 			errorParagraph.classList.add(
@@ -248,11 +243,8 @@ const prplInteractiveTaskFormListener = {
 			);
 			errorParagraph.textContent = prplL10n( 'somethingWentWrong' );
 
-			// Append before submit button.
-			submitButton.parentNode.insertBefore(
-				errorParagraph,
-				submitButton
-			);
+			// Append after the form element.
+			formElement.insertAdjacentElement( 'afterend', errorParagraph );
 		}
 	},
 
@@ -263,8 +255,15 @@ const prplInteractiveTaskFormListener = {
 	 * @return {void}
 	 */
 	showLoading: ( formElement ) => {
-		// data-action="completeTask"
-		formElement.querySelector( 'button[type="submit"]' ).disabled = true;
+		let submitButton = formElement.querySelector( 'button[type="submit"]' );
+
+		if ( ! submitButton ) {
+			submitButton = formElement.querySelector(
+				'button[data-action="completeTask"]'
+			);
+		}
+
+		submitButton.disabled = true;
 
 		// Add spinner.
 		const spinner = document.createElement( 'span' );
@@ -273,7 +272,7 @@ const prplInteractiveTaskFormListener = {
 			'<span class="spinner" style="visibility: visible;"></span>'; // WP spinner.
 
 		// Append spinner after submit button.
-		formElement.querySelector( 'button[type="submit"]' ).after( spinner );
+		submitButton.after( spinner );
 	},
 
 	/**
@@ -283,7 +282,18 @@ const prplInteractiveTaskFormListener = {
 	 * @return {void}
 	 */
 	hideLoading: ( formElement ) => {
-		formElement.querySelector( 'button[type="submit"]' ).disabled = false;
-		formElement.querySelector( 'span.prpl-spinner' )?.remove();
+		let submitButton = formElement.querySelector( 'button[type="submit"]' );
+
+		if ( ! submitButton ) {
+			submitButton = formElement.querySelector(
+				'button[data-action="completeTask"]'
+			);
+		}
+
+		submitButton.disabled = false;
+		const spinner = formElement.querySelector( 'span.prpl-spinner' );
+		if ( spinner ) {
+			spinner.remove();
+		}
 	},
 };

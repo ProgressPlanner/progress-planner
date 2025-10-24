@@ -206,6 +206,10 @@
 			&.prpl-note-error {
 				color: var(--prpl-color-alert-error-text);
 				background-color: var(--prpl-background-alert-error);
+				margin-bottom: 0;
+
+				order: 98; /* One less than the spinner. */
+				flex-grow: 1;
 
 				.prpl-note-icon {
 					color: var(--prpl-color-alert-error);
