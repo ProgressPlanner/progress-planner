@@ -92,7 +92,7 @@ class Improve_Pdf_Handling extends Tasks_Interactive {
 				[
 					'post_type'      => 'attachment',
 					'post_mime_type' => 'application/pdf',
-					'post_status'    => 'publish',
+					'post_status'    => 'inherit',
 					'posts_per_page' => static::MIN_PDF_FILES + 1, // We want to get at least 11 PDF files to be sure we have enough.
 					'fields'         => 'ids',
 				]
@@ -101,7 +101,7 @@ class Improve_Pdf_Handling extends Tasks_Interactive {
 			\progress_planner()->get_utils__cache()->set( 'pdf_files_count', $pdf_files_count, DAY_IN_SECONDS );
 		}
 
-		return static::MIN_PDF_FILES < $pdf_files_count;
+		return static::MIN_PDF_FILES < (int) $pdf_files_count;
 	}
 
 	/**
