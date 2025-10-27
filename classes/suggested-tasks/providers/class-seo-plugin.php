@@ -113,10 +113,10 @@ class SEO_Plugin extends Tasks_Interactive {
 		</p>
 		<p>
 			<?php
-			printf(
+			\printf(
 				/* translators: %s is the plugin name */
 				\esc_html__( 'We recommend installing %s, one of the most popular and comprehensive SEO plugins for WordPress.', 'progress-planner' ),
-				sprintf(
+				\sprintf(
 					'<a href="https://w.org/plugins/%1$s/" target="_blank">%2$s</a>',
 					\esc_attr( $seo_plugin_recommendation_slug ),
 					\esc_html( $seo_plugin_recommendation_name )
