@@ -325,6 +325,8 @@ class Update_Term_Description extends Tasks_Interactive {
 
 		$task_details = $this->get_task_details( $task_data );
 
+		$taxonomy = \get_taxonomy( $term->taxonomy );
+
 		$actions[] = [
 			'priority' => 10,
 			'html'     => \sprintf(
@@ -336,10 +338,11 @@ class Update_Term_Description extends Tasks_Interactive {
 				\htmlspecialchars(
 					\wp_json_encode(
 						[
-							'post_title'       => $task_details['post_title'],
-							'target_term_id'   => $task_data['target_term_id'],
-							'target_taxonomy'  => $task_data['target_taxonomy'],
-							'target_term_name' => $task_data['target_term_name'],
+							'post_title'           => $task_details['post_title'],
+							'target_term_id'       => $task_data['target_term_id'],
+							'target_taxonomy'      => $task_data['target_taxonomy'],
+							'target_taxonomy_name' => $taxonomy ? $taxonomy->label : '',
+							'target_term_name'     => $task_data['target_term_name'],
 						]
 					),
 					ENT_QUOTES,
@@ -377,7 +380,14 @@ class Update_Term_Description extends Tasks_Interactive {
 				<span id="prpl-update-term-name"></span>
 			</p>
 			<p style="margin: 0 0 10px 0; font-size: 12px; color: #646970;">
-				<span id="prpl-update-term-taxonomy"></span>
+				<?php
+				printf(
+					/* translators: %1$s: The taxonomy name, %2$s: The term slug */
+					\esc_html__( 'You are updating the term which belongs to the "%1$s" (slug "%2$s").', 'progress-planner' ),
+					'<span id="prpl-update-term-taxonomy-name"></span>',
+					'<span id="prpl-update-term-taxonomy"></span>'
+				);
+				?>
 			</p>
 		</div>
 		<textarea
