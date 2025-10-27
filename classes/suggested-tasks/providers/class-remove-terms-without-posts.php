@@ -115,6 +115,14 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function maybe_remove_irrelevant_tasks( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
+
+		$taxonomy_object = \get_taxonomy( $taxonomy );
+
+		// Check if the taxonomy is public, we are not interested in non-public taxonomies (also our data collector doesn't track non-public taxonomies).
+		if ( ! $taxonomy_object || ! $taxonomy_object->public ) {
+			return;
+		}
+
 		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] ) as $task ) {
 			/**
 			 * The task post object.
