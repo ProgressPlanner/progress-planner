@@ -236,10 +236,8 @@ class Permalink_Structure extends Tasks_Interactive {
 				</div>
 			</fieldset>
 		</div>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Set permalink structure', 'progress-planner' ); ?>
-		</button>
 		<?php
+		$this->print_submit_button( \__( 'Set permalink structure', 'progress-planner' ) );
 	}
 
 	/**

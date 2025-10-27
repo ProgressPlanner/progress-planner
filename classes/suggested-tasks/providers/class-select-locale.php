@@ -225,11 +225,8 @@ class Select_Locale extends Tasks_Interactive {
 				'show_available_translations' => \current_user_can( 'install_languages' ) && \wp_can_install_language_pack(),
 			]
 		);
-		?>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Select locale', 'progress-planner' ); ?>
-		</button>
-		<?php
+
+		$this->print_submit_button( \__( 'Select locale', 'progress-planner' ) );
 	}
 
 	/**

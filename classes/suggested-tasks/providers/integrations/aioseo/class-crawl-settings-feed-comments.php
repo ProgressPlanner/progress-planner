@@ -100,11 +100,7 @@ class Crawl_Settings_Feed_Comments extends AIOSEO_Interactive_Provider {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		?>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Disable comment RSS feeds', 'progress-planner' ); ?>
-		</button>
-		<?php
+		$this->print_submit_button( \__( 'Disable comment RSS feeds', 'progress-planner' ) );
 	}
 
 	/**
