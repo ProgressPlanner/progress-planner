@@ -16,3 +16,8 @@
 		display: block !important;
 	}
 }
+
+#prpl-onboarding-submit-wrapper {
+	display: flex;
+	align-items: center;
+}

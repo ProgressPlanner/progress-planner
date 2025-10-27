@@ -389,9 +389,11 @@ class Update_Term_Description extends Tasks_Interactive {
 		></textarea>
 		<input type="hidden" name="term_id" id="prpl-update-term-id" value="">
 		<input type="hidden" name="taxonomy" id="prpl-update-taxonomy" value="">
-		<button type="submit" class="prpl-button prpl-button-primary" id="prpl-update-term-description-button">
-			<?php \esc_html_e( 'Save description', 'progress-planner' ); ?>
-		</button>
+		<div class="prpl-steps-nav-wrapper">
+			<button type="submit" class="prpl-button prpl-button-primary" id="prpl-update-term-description-button">
+				<?php \esc_html_e( 'Save description', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 

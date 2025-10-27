@@ -121,11 +121,7 @@ class Archive_Date extends AIOSEO_Interactive_Provider {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		?>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Noindex the date archive', 'progress-planner' ); ?>
-		</button>
-		<?php
+		$this->print_submit_button( \__( 'Noindex the date archive', 'progress-planner' ) );
 	}
 
 	/**

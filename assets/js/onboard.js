@@ -35,17 +35,6 @@ const progressPlannerAjaxAPIRequest = ( data ) => {
 		data,
 	} )
 		.then( ( response ) => {
-			// Show success message.
-			document.getElementById(
-				'no-license' === response.license_key
-					? 'prpl-account-not-created-message'
-					: 'prpl-account-created-message'
-			).style.display = 'block';
-
-			// Hide the form.
-			document.getElementById( 'prpl-onboarding-form' ).style.display =
-				'none';
-
 			// Make a local request to save the response data.
 			progressPlannerSaveLicenseKey( response.license_key ).then( () => {
 				// Refresh the page.
@@ -144,9 +133,26 @@ if ( document.getElementById( 'prpl-onboarding-form' ) ) {
 				return;
 			}
 
-			document.querySelector(
-				'#prpl-onboarding-form input[type="submit"]'
-			).disabled = true;
+			// Disable all (both buttons) submit buttons.
+			document
+				.querySelectorAll(
+					'#prpl-onboarding-form input[type="submit"]'
+				)
+				.forEach( ( input ) => {
+					input.disabled = true;
+				} );
+
+			// Show the spinner.
+			const spinner = document.createElement( 'span' );
+			spinner.classList.add( 'prpl-spinner' );
+			spinner.innerHTML =
+				'<span class="spinner" style="visibility: visible;"></span>'; // WP spinner.
+
+			// Append spinner after submit button.
+
+			document
+				.getElementById( 'prpl-onboarding-submit-wrapper' )
+				.appendChild( spinner );
 
 			// Get all form data.
 			const data = Object.fromEntries( new FormData( event.target ) );
