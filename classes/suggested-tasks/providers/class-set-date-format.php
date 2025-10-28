@@ -243,7 +243,7 @@ class Set_Date_Format extends Tasks_Interactive {
 			</fieldset>
 		</div>
 		<?php
-		$this->print_submit_button( \__( 'Set date format', 'progress-planner' ) );
+		$this->print_submit_button( \__( 'Set date format', 'progress-planner' ), 'prpl-steps-nav-wrapper-align-left' );
 	}
 
 	/**
