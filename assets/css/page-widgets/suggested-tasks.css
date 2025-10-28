@@ -453,6 +453,10 @@
 			/* If there are no other elements in the form, align the button to the left. */
 			&:only-child {
 				padding-top: 0;
+			}
+
+			&:only-child,
+			&.prpl-steps-nav-wrapper-align-left {
 				justify-content: flex-start;
 
 				/* Display the spinner after the button. */
