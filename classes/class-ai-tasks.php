@@ -87,25 +87,36 @@ class AI_Tasks {
 	public function execute_ai_task( $task_id, $site_url, $license_key ) {
 		$url = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/execute-ai-task';
 
+		// Testing.
+		$site_url = 'https://progressplanner.com';
+
+		$post_data = [
+			'task_id'     => $task_id,
+			'site_url'    => $site_url,
+			'license_key' => $license_key,
+		];
+
 		$response = \wp_remote_post(
 			$url,
 			[
-				'body'    => [
-					'task_id'     => $task_id,
-					'site_url'    => $site_url,
-					'license_key' => $license_key,
-				],
+				'body'    => $post_data,
 				'timeout' => 45, // AI tasks may take longer.
 			]
 		);
 
 		if ( \is_wp_error( $response ) ) {
+			\error_log( 'WP_Error response: ' . $response->get_error_message() );
 			return $response;
 		}
 
 		$response_code = \wp_remote_retrieve_response_code( $response );
 		$body          = \wp_remote_retrieve_body( $response );
 		$json          = \json_decode( $body, true );
+
+		// Debug logging for response.
+		\error_log( 'SaaS server response:' );
+		\error_log( '  Response code: ' . $response_code );
+		\error_log( '  Response body: ' . $body );
 
 		if ( 200 !== $response_code ) {
 			$error_message = isset( $json['message'] ) ? $json['message'] : 'Unknown error occurred';
@@ -127,7 +138,7 @@ class AI_Tasks {
 	 */
 	public function get_cached_response( $task_id ) {
 		$cache_key = 'prpl_ai_response_' . $task_id;
-		return \get_transient( $cache_key );
+		return progress_planner()->get_utils__cache()->get( $cache_key );
 	}
 
 	/**
@@ -140,7 +151,7 @@ class AI_Tasks {
 	 */
 	public function cache_response( $task_id, $response, $expiry = WEEK_IN_SECONDS ) {
 		$cache_key = 'prpl_ai_response_' . $task_id;
-		return \set_transient( $cache_key, $response, $expiry );
+		return progress_planner()->get_utils__cache()->set( $cache_key, $response, $expiry );
 	}
 
 	/**
@@ -151,6 +162,6 @@ class AI_Tasks {
 	 */
 	public function clear_cached_response( $task_id ) {
 		$cache_key = 'prpl_ai_response_' . $task_id;
-		return \delete_transient( $cache_key );
+		return progress_planner()->get_utils__cache()->delete( $cache_key );
 	}
 }

@@ -45,7 +45,7 @@ class AI_Tasks_From_Server extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $points = 3;
+	protected $points = 1;
 
 	/**
 	 * AI tasks can be dismissed.
@@ -190,6 +190,20 @@ class AI_Tasks_From_Server extends Tasks {
 		$site_url    = \get_site_url();
 		$license_key = \get_option( 'progress_planner_license_key' );
 
+		// Debug logging.
+		\error_log( 'AI Task Execution Debug:' );
+		\error_log( '  Task ID: ' . $task_id );
+		\error_log( '  Site URL: ' . $site_url );
+		\error_log( '  License key exists: ' . ( ! empty( $license_key ) ? 'yes' : 'no' ) );
+		\error_log( '  License key length: ' . \strlen( $license_key ) );
+		\error_log( '  License key first 10 chars: ' . \substr( $license_key, 0, 10 ) . '...' );
+		\error_log( '  License key type: ' . \gettype( $license_key ) );
+
+		// Validate we have the required data.
+		if ( empty( $license_key ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'No license key found. Please configure your Progress Planner license key in settings.', 'progress-planner' ) ] );
+		}
+
 		$result = \progress_planner()->get_ai_tasks()->execute_ai_task( $task_id, $site_url, $license_key );
 
 		if ( \is_wp_error( $result ) ) {
@@ -217,37 +231,48 @@ class AI_Tasks_From_Server extends Tasks {
 	public function add_popover() {
 		?>
 		<div id="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>" class="prpl-popover prpl-popover-ai-task" popover>
-			<div class="prpl-popover-header">
-				<h3 class="prpl-popover-title"><?php \esc_html_e( 'AI Analysis', 'progress-planner' ); ?></h3>
-				<button type="button" class="prpl-popover-close" popovertarget="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>" popovertargetaction="hide">
-					<span class="screen-reader-text"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></span>
-					<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-						<path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-					</svg>
-				</button>
-			</div>
-			<div class="prpl-popover-content">
-				<div class="prpl-ai-task-content">
-					<div class="prpl-ai-task-loading" style="display:none;">
-						<div class="prpl-spinner"></div>
-						<p><?php \esc_html_e( 'Analyzing your site with AI... This may take up to 30 seconds.', 'progress-planner' ); ?></p>
-					</div>
-					<div class="prpl-ai-task-result" style="display:none;">
-						<div class="prpl-ai-task-response"></div>
-					</div>
-					<div class="prpl-ai-task-error" style="display:none;">
-						<p class="prpl-error-message"></p>
-					</div>
-				</div>
-				<div class="prpl-steps-nav-wrapper">
-					<button type="button" class="prpl-button prpl-button-primary prpl-ai-task-execute">
-						<?php \esc_html_e( 'Analyze', 'progress-planner' ); ?>
-					</button>
-					<button type="button" class="prpl-button prpl-ai-task-retry" style="display:none;">
-						<?php \esc_html_e( 'Try Again', 'progress-planner' ); ?>
+			<prpl-ai-task-popover
+				popover-id="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>"
+				provider-id="<?php echo \esc_attr( static::PROVIDER_ID ); ?>"
+			>
+				<div class="prpl-popover-header">
+					<h3 class="prpl-popover-title"><?php \esc_html_e( 'AI Analysis', 'progress-planner' ); ?></h3>
+					<button type="button" class="prpl-popover-close" data-action="closePopover">
+						<span class="screen-reader-text"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></span>
+						<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+							<path d="M15 5L5 15M5 5L15 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+						</svg>
 					</button>
 				</div>
-			</div>
+				<div class="prpl-popover-content">
+					<div class="prpl-ai-task-content">
+						<div class="prpl-ai-task-instructions">
+							<p><?php \esc_html_e( 'Click "Analyze" below to get AI-powered insights about your site. This analysis may take up to 30 seconds.', 'progress-planner' ); ?></p>
+						</div>
+						<div class="prpl-ai-task-loading" style="display:none;">
+							<div class="prpl-spinner"></div>
+							<p><?php \esc_html_e( 'Analyzing your site with AI... This may take up to 30 seconds.', 'progress-planner' ); ?></p>
+						</div>
+						<div class="prpl-ai-task-result" style="display:none;">
+							<div class="prpl-ai-task-response"></div>
+						</div>
+						<div class="prpl-ai-task-error" style="display:none;">
+							<p class="prpl-error-message"></p>
+						</div>
+					</div>
+					<div class="prpl-steps-nav-wrapper">
+						<button type="button" class="prpl-button prpl-button-primary prpl-ai-task-execute">
+							<?php \esc_html_e( 'Analyze', 'progress-planner' ); ?>
+						</button>
+						<button type="button" class="prpl-button prpl-button-secondary prpl-ai-task-retry" style="display:none;">
+							<?php \esc_html_e( 'Try Again', 'progress-planner' ); ?>
+						</button>
+						<button type="button" class="prpl-button prpl-button-primary prpl-ai-task-complete" data-action="completeTask" style="display:none;">
+							<?php \esc_html_e( 'Collect your point!', 'progress-planner' ); ?>
+						</button>
+					</div>
+				</div>
+			</prpl-ai-task-popover>
 		</div>
 		<?php
 	}
@@ -269,12 +294,21 @@ class AI_Tasks_From_Server extends Tasks {
 			return;
 		}
 
+		// Enqueue the AI task web component (must be loaded before the main script).
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'progress-planner/web-components/prpl-ai-task-popover',
+			[
+				'file'         => 'web-components/prpl-ai-task-popover.js',
+				'dependencies' => [ 'progress-planner/web-components/prpl-interactive-task' ],
+			]
+		);
+
 		// Enqueue the AI task script.
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
 			'progress-planner/recommendations/ai-task',
 			[
 				'file'         => 'recommendations/ai-task.js',
-				'dependencies' => [ 'progress-planner/suggested-task' ],
+				'dependencies' => [ 'progress-planner/suggested-task', 'progress-planner/web-components/prpl-ai-task-popover' ],
 			]
 		);
 
@@ -291,10 +325,13 @@ class AI_Tasks_From_Server extends Tasks {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
+		// Get the task ID from meta - REST API strips the prpl_ prefix.
+		$task_id = 6149; //$data[0]['task_id'] ?? '';
+
 		// Add the "Analyze" button that opens the popover.
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<button type="button" class="prpl-suggested-task-button prpl-button-primary prpl-ai-task-trigger" popovertarget="prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '" data-task-id="' . \esc_attr( $data['meta']['ai_task_server_id'] ?? '' ) . '" data-action="analyze" title="' . \esc_attr__( 'Analyze with AI', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Analyze', 'progress-planner' ) . '</span></button>',
+			'html'     => '<button type="button" class="prpl-suggested-task-button prpl-ai-task-trigger" popovertarget="prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '" data-task-id="' . \esc_attr( $task_id ) . '" data-action="analyze" title="' . \esc_attr__( 'Analyze with AI', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Analyze', 'progress-planner' ) . '</span></button>',
 		];
 
 		return $actions;

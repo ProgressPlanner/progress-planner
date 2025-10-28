@@ -85,21 +85,6 @@
 }
 
 /* Buttons */
-.prpl-ai-task-trigger {
-	background: #534786 !important;
-	color: white !important;
-	border: none;
-	padding: 6px 12px;
-	border-radius: 4px;
-	cursor: pointer;
-	font-size: 14px;
-	transition: background 0.2s;
-}
-
-.prpl-ai-task-trigger:hover {
-	background: #453670 !important;
-}
-
 .prpl-ai-task-execute,
 .prpl-ai-task-retry {
 	min-width: 120px;

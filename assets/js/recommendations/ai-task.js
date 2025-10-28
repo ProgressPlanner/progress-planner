@@ -20,6 +20,8 @@
 
 		const executeButton = popover.querySelector( '.prpl-ai-task-execute' );
 		const retryButton = popover.querySelector( '.prpl-ai-task-retry' );
+		const completeButton = popover.querySelector( '.prpl-ai-task-complete' );
+		const instructionsEl = popover.querySelector( '.prpl-ai-task-instructions' );
 		const loadingEl = popover.querySelector( '.prpl-ai-task-loading' );
 		const resultEl = popover.querySelector( '.prpl-ai-task-result' );
 		const responseEl = popover.querySelector( '.prpl-ai-task-response' );
@@ -34,6 +36,10 @@
 		const showLoading = () => {
 			executeButton.style.display = 'none';
 			retryButton.style.display = 'none';
+			completeButton.style.display = 'none';
+			if ( instructionsEl ) {
+				instructionsEl.style.display = 'none';
+			}
 			loadingEl.style.display = 'block';
 			resultEl.style.display = 'none';
 			errorEl.style.display = 'none';
@@ -46,11 +52,15 @@
 		 * @param {boolean} cached - Whether the response was cached.
 		 */
 		const showResult = ( response, cached = false ) => {
+			if ( instructionsEl ) {
+				instructionsEl.style.display = 'none';
+			}
 			loadingEl.style.display = 'none';
 			executeButton.style.display = 'none';
 			retryButton.style.display = 'none';
 			errorEl.style.display = 'none';
 			resultEl.style.display = 'block';
+			completeButton.style.display = 'inline-block';
 
 			// Format the response with markdown-like formatting.
 			const formattedResponse = formatAIResponse( response );
@@ -74,9 +84,13 @@
 		 * @param {string} message - The error message.
 		 */
 		const showError = ( message ) => {
+			if ( instructionsEl ) {
+				instructionsEl.style.display = 'none';
+			}
 			loadingEl.style.display = 'none';
 			executeButton.style.display = 'none';
 			retryButton.style.display = 'inline-block';
+			completeButton.style.display = 'none';
 			resultEl.style.display = 'none';
 			errorEl.style.display = 'block';
 			errorMessageEl.textContent = message;
@@ -123,9 +137,12 @@
 
 			// Make AJAX request to execute the AI task.
 			progressPlannerAjaxRequest( {
-				action: 'prpl_execute_ai_task',
-				task_id: taskId,
-				nonce: progressPlanner.nonce,
+				url: progressPlanner.ajaxUrl,
+				data: {
+					action: 'prpl_execute_ai_task',
+					task_id: taskId,
+					nonce: progressPlanner.nonce,
+				},
 			} )
 				.then( ( response ) => {
 					if ( ! response.success ) {
@@ -158,19 +175,42 @@
 				'.prpl-ai-task-trigger'
 			);
 
+			console.log( 'Found AI task trigger buttons:', triggerButtons.length );
+
 			triggerButtons.forEach( ( button ) => {
 				button.addEventListener( 'click', () => {
 					const taskId = button.dataset.taskId;
+					console.log( 'Trigger button clicked, task ID from data attribute:', taskId );
+
+					// Get the task element and its slug for completion
+					const taskElement = button.closest( '.prpl-suggested-task' );
+					const taskSlug = taskElement ? taskElement.dataset.taskId : null;
+					console.log( 'Task slug from element:', taskSlug );
+
 					if ( taskId ) {
-						// Store the task ID for execution.
+						// Store the task ID on the execute button
+						executeButton.dataset.taskId = taskId;
+						retryButton.dataset.taskId = taskId;
 						currentTaskId = parseInt( taskId );
+						console.log( 'Set currentTaskId to:', currentTaskId );
+
+						// Store the task slug on the web component so completeTask can find it
+						const webComponent = popover.querySelector( 'prpl-ai-task-popover' );
+						if ( webComponent && taskSlug ) {
+							webComponent.setAttribute( 'current-task-id', taskSlug );
+							console.log( 'Set current-task-id on web component:', taskSlug );
+						}
 
 						// Reset the popover state.
+						if ( instructionsEl ) {
+							instructionsEl.style.display = 'block';
+						}
 						loadingEl.style.display = 'none';
 						resultEl.style.display = 'none';
 						errorEl.style.display = 'none';
 						executeButton.style.display = 'inline-block';
 						retryButton.style.display = 'none';
+						completeButton.style.display = 'none';
 					}
 				} );
 			} );
@@ -179,8 +219,13 @@
 		// Execute button click handler.
 		if ( executeButton ) {
 			executeButton.addEventListener( 'click', () => {
-				if ( currentTaskId ) {
-					executeTask( currentTaskId );
+				// Get task ID from button's data attribute as fallback
+				const taskId = currentTaskId || parseInt( executeButton.dataset.taskId );
+				console.log( 'Execute button clicked, task ID:', taskId, '(currentTaskId:', currentTaskId, ')' );
+				if ( taskId ) {
+					executeTask( taskId );
+				} else {
+					console.error( 'No task ID set' );
 				}
 			} );
 		}
@@ -188,8 +233,9 @@
 		// Retry button click handler.
 		if ( retryButton ) {
 			retryButton.addEventListener( 'click', () => {
-				if ( currentTaskId ) {
-					executeTask( currentTaskId );
+				const taskId = currentTaskId || parseInt( retryButton.dataset.taskId );
+				if ( taskId ) {
+					executeTask( taskId );
 				}
 			} );
 		}
