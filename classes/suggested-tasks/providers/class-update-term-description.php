@@ -107,6 +107,14 @@ class Update_Term_Description extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function maybe_remove_irrelevant_tasks( $term, $tt_id, $taxonomy, $deleted_term, $object_ids ) {
+
+		$taxonomy_object = \get_taxonomy( $taxonomy );
+
+		// Check if the taxonomy is public, we are not interested in non-public taxonomies (also our data collector doesn't track non-public taxonomies).
+		if ( ! $taxonomy_object || ! $taxonomy_object->public ) {
+			return;
+		}
+
 		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! $pending_tasks ) {
