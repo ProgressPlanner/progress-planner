@@ -4,6 +4,8 @@ In this release we've added an integration with the **All In One Seo** plugin so
 
 Added these recommendations from Ravi:
 
+* Install an SEO plugin
+* Improve PDF handling if the site has many PDFs
 * All In One SEO: [noindex the author archive](https://prpl.fyi/aioseo-author-archive)
 * All In One SEO: [noindex the date archive](https://prpl.fyi/aioseo-date-archive)
 * All In One SEO: [Remove post authors feeds](https://prpl.fyi/aioseo-crawl-optimization-feed-authors)
@@ -14,11 +16,19 @@ Added these recommendations from Ravi:
 Enhancements:
 
 * Add "Show all Recommendations" button to the "Ravi's Recommendations" widget
+* Performance improvements
+* Removed the "Latest Badge" widget from the plugin page
+* Styling improvements
+* Improved task prioritization
+* Converted many tasks to be "Interactive", improving user-experience.
+* Dont display tasks to users which dont't have capability to complete them
+* Proactively ran a complete security audit of the plugin, and strengthened security
 
 Bugs we fixed:
 
 * Fix missing content and streak badges after they are all completed.
 * Fix issue when point is sometimes not awarded for completing "Remove term without posts" task.
+* "Yoast SEO: set your organization logo" task detects site logo as fallback, same as Yoast SEO does.
 
 = 1.8.1 =
 

@@ -115,6 +115,14 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function maybe_remove_irrelevant_tasks( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
+
+		$taxonomy_object = \get_taxonomy( $taxonomy );
+
+		// Check if the taxonomy is public, we are not interested in non-public taxonomies (also our data collector doesn't track non-public taxonomies).
+		if ( ! $taxonomy_object || ! $taxonomy_object->public ) {
+			return;
+		}
+
 		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] ) as $task ) {
 			/**
 			 * The task post object.
@@ -321,26 +329,36 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		$term = $this->get_term_from_task_id( $data['meta']['prpl_task_id'] );
+
+		if ( ! isset( $data['slug'] ) ) {
+			return $actions;
+		}
+
+		$term = $this->get_term_from_task_id( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['slug'] ) );
+
+		// If the term is not found, return the actions.
+		if ( ! $term ) {
+			return $actions;
+		}
 
 		$task_data = [
-			'target_term_id'   => $term->term_id ?? '',
-			'target_taxonomy'  => $term->taxonomy ?? '',
-			'target_term_name' => $term->name ?? '',
+			'target_term_id'   => $term->term_id,
+			'target_taxonomy'  => $term->taxonomy,
+			'target_term_name' => $term->name,
 		];
 
 		$task_details = $this->get_task_details( $task_data );
 
 		$actions[] = [
 			'priority' => 10,
-			'html'     => sprintf(
+			'html'     => \sprintf(
 				'<a href="#" class="prpl-tooltip-action-text prpl-delete-term-action" role="button"
 					data-task-context=\'%s\'
 					onclick="event.preventDefault(); document.getElementById(\'prpl-popover-%s\')?.showPopover(); this.dispatchEvent(new CustomEvent(\'prpl-interactive-task-action-remove-terms-without-posts\', { bubbles: true, detail: JSON.parse(this.dataset.taskContext) }));">
 					%s
 				</a>',
-				htmlspecialchars(
-					wp_json_encode(
+				\htmlspecialchars(
+					\wp_json_encode(
 						[
 							'post_title'       => $task_details['post_title'],
 							'target_term_id'   => $task_data['target_term_id'],

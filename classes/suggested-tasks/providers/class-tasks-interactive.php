@@ -207,6 +207,27 @@ abstract class Tasks_Interactive extends Tasks {
 	}
 
 	/**
+	 * Print the submit button.
+	 *
+	 * @param string $button_text The text for the button.
+	 *                           If empty, the default text "Submit" will be used.
+	 *
+	 * @return void
+	 */
+	protected function print_submit_button( $button_text = '' ) {
+		if ( empty( $button_text ) ) {
+			$button_text = \__( 'Submit', 'progress-planner' );
+		}
+		?>
+		<div class="prpl-steps-nav-wrapper">
+			<button type="submit" class="prpl-button prpl-button-primary">
+				<?php echo \esc_html( $button_text ); ?>
+			</button>
+		</div>
+		<?php
+	}
+
+	/**
 	 * Print the popover form contents.
 	 *
 	 * @return void

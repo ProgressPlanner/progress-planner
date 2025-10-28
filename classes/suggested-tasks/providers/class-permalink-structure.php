@@ -236,10 +236,8 @@ class Permalink_Structure extends Tasks_Interactive {
 				</div>
 			</fieldset>
 		</div>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Set permalink structure', 'progress-planner' ); ?>
-		</button>
 		<?php
+		$this->print_submit_button( \__( 'Set permalink structure', 'progress-planner' ) );
 	}
 
 	/**
@@ -268,7 +266,7 @@ class Permalink_Structure extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing value.', 'progress-planner' ) ] );
 		}
 
-		$permalink_structure = trim( \sanitize_text_field( \wp_unslash( $_POST['value'] ) ) );
+		$permalink_structure = \trim( \sanitize_text_field( \wp_unslash( $_POST['value'] ) ) );
 
 		if ( empty( $permalink_structure ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid permalink structure.', 'progress-planner' ) ] );

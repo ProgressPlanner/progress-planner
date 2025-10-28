@@ -14,16 +14,24 @@ prplInteractiveTaskFormListener.customSubmit( {
 			'#prpl-popover-core-permalink-structure input[name="prpl_custom_permalink_structure"]'
 		);
 
-		fetch( progressPlanner.ajaxUrl, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded',
-			},
-			body: new URLSearchParams( {
-				action: 'prpl_interactive_task_submit_core-permalink-structure',
-				nonce: progressPlanner.nonce,
-				value: customPermalinkStructure.value,
-			} ),
+		return new Promise( ( resolve, reject ) => {
+			fetch( progressPlanner.ajaxUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: new URLSearchParams( {
+					action: 'prpl_interactive_task_submit_core-permalink-structure',
+					nonce: progressPlanner.nonce,
+					value: customPermalinkStructure.value,
+				} ),
+			} )
+				.then( ( response ) => {
+					resolve( { response, success: true } );
+				} )
+				.catch( ( error ) => {
+					reject( { success: false, error } );
+				} );
 		} );
 	},
 } );

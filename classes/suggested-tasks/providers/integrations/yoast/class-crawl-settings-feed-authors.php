@@ -136,11 +136,7 @@ class Crawl_Settings_Feed_Authors extends Yoast_Interactive_Provider {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		?>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Remove', 'progress-planner' ); ?>
-		</button>
-		<?php
+		$this->print_submit_button( \__( 'Remove', 'progress-planner' ) );
 	}
 
 	/**

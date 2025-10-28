@@ -123,9 +123,11 @@ class Blog_Description extends Tasks_Interactive {
 				placeholder="<?php \esc_html_e( 'A catchy phrase to describe your website', 'progress-planner' ); ?>"
 			>
 		</label>
-		<button type="submit" class="prpl-button prpl-button-primary" disabled>
-			<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
-		</button>
+		<div class="prpl-steps-nav-wrapper">
+			<button type="submit" class="prpl-button prpl-button-primary" disabled>
+				<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 
