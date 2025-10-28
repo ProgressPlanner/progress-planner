@@ -39,6 +39,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Select_Timezone;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Date_Format;
 use Progress_Planner\Suggested_Tasks\Providers\SEO_Plugin;
 use Progress_Planner\Suggested_Tasks\Providers\Improve_Pdf_Handling;
+use Progress_Planner\Suggested_Tasks\Providers\AI_Tasks_From_Server;
 
 /**
  * Tasks_Manager class.
@@ -87,6 +88,7 @@ class Tasks_Manager {
 			new Set_Date_Format(),
 			new SEO_Plugin(),
 			new Improve_Pdf_Handling(),
+			new AI_Tasks_From_Server(),
 		];
 
 		// Add the plugin integration.
