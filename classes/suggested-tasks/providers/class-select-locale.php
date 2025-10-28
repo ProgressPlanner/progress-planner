@@ -226,7 +226,7 @@ class Select_Locale extends Tasks_Interactive {
 			]
 		);
 
-		$this->print_submit_button( \__( 'Select locale', 'progress-planner' ) );
+		$this->print_submit_button( \__( 'Select locale', 'progress-planner' ), 'prpl-steps-nav-wrapper-align-left' );
 	}
 
 	/**
