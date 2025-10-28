@@ -77,6 +77,16 @@ class Debug_Tools {
 			]
 		);
 
+		// Show all suggested tasks.
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-show-all-suggested-tasks',
+				'parent' => 'prpl-debug',
+				'title'  => 'Show All Suggested Tasks',
+				'href'   => \add_query_arg( 'prpl_show_all_recommendations', $this->current_url ),
+			]
+		);
+
 		$this->add_delete_submenu_item( $admin_bar );
 
 		$this->add_upgrading_tasks_submenu_item( $admin_bar );
