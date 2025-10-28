@@ -12,8 +12,6 @@
 	font-style: normal;
 }
 
-
-
 .prpl-popover-onboarding {
 
 	& * {
@@ -108,11 +106,11 @@
 		display: inline-block;
 		margin: 1rem 0;
 		padding: 0.75rem 1.25rem;
-		color: #fff;
+		color: var(--prpl-color-button-primary-text);
 		text-decoration: none;
 		cursor: pointer;
 		font-size: 16px;
-		background: #dd3244;
+		background: var(--prpl-color-button-primary);
 		line-height: 1.25;
 		box-shadow: none;
 		border: none;
@@ -131,17 +129,17 @@
 
 		&:not([disabled]):hover,
 		&:not([disabled]):focus {
-			background: #cf2441;
+			background: var(--prpl-color-button-primary-hover);
 		}
 
 		&.prpl-btn-secondary {
-			background: #f9b23c;
-			color: #4b5563;
+			background: var(--prpl-background-banner);
+			color: var(--prpl-color-text);;
 
 			&:not([disabled]):hover,
 			&:not([disabled]):focus {
-				background: #f9b23c;
-				color: #4b5563;
+				background: var(--prpl-background-banner);
+				color: var(--prpl-color-text);;
 			}
 		}
 	}
@@ -221,6 +219,16 @@
 			display: flex;
 			justify-content: center;
 			align-items: center;
+		}
+
+		#prpl-welcome-logo {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+
+			img, svg {
+				height: 150px; /* Set height since it is what we do in the PP dashboard. */
+			}
 		}
 	}
 

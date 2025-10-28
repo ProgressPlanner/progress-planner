@@ -22,7 +22,10 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<div class="prpl-columns-wrapper-flex">
 			<div class="prpl-column prpl-column-content">
 				<p>
-					<?php \esc_html_e( 'This is an example of a recommendation in Progress Planner. It\'s a task that helps improve your website. Most recommendations can be completed in under five minutes. Once you\'ve completed a recommendation, we\'ll celebrate your success together and provide you with a new recommendation.', 'progress-planner' ); ?>
+					<?php
+					/* translators: %s: Progress Planner name. */
+					\printf( \esc_html__( 'This is an example of a recommendation in %s. It\'s a task that helps improve your website. Most recommendations can be completed in under five minutes. Once you\'ve completed a recommendation, we\'ll celebrate your success together and provide you with a new recommendation.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_progress_planner_name() ) );
+					?>
 				</p>
 				<p><?php \esc_html_e( 'Let\'s give it a try!', 'progress-planner' ); ?></p>
 			</div>

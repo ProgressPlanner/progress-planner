@@ -23,7 +23,12 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex">
 			<div class="prpl-column prpl-column-content">
-				<p><?php \esc_html_e( 'You now master the basics of Progress Planner! We\'ve got a few more recommendations lined up for you. Are you ready to take them on now, or should we show you where you can find Ravi\'s Recommendations from now on?', 'progress-planner' ); ?></p>
+				<p>
+					<?php
+					/* translators: %1$s: Progress Planner name. %2$s: Ravi name. */
+					\printf( \esc_html__( 'You now master the basics of %1$s! We\'ve got a few more recommendations lined up for you. Are you ready to take them on now, or should we show you where you can find %2$s\'s Recommendations from now on?', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_progress_planner_name() ), \esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() ) );
+					?>
+					</p>
 			</div>
 			<div class="prpl-column">
 				<ul class="prpl-task-list">

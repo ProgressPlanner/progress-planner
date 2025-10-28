@@ -165,6 +165,11 @@ class Front_End_Onboarding {
 	 * @return void
 	 */
 	public function add_popover_scripts() {
+		// Enqueue variables-color.css.
+		\wp_enqueue_style( 'prpl-variables-color', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/css/variables-color.css', [], \progress_planner()->get_plugin_version() );
+
+		\wp_add_inline_style( 'prpl-variables-color', \progress_planner()->get_ui__branding()->get_custom_css() );
+
 		// Enqueue front-end-onboarding.css.
 		\wp_enqueue_style( 'prpl-popover-front-end-onboarding', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/front-end-onboarding/css/front-end-onboarding.css', [], \progress_planner()->get_plugin_version() );
 
