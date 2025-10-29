@@ -20,7 +20,7 @@ abstract class Badge_Maintenance extends Badge {
 	 *
 	 * @var string
 	 */
-	protected $background = 'var(--prpl-background-red)';
+	protected $background = 'var(--prpl-background-streak)';
 
 	/**
 	 * Get a recurring goal for any type of weekly activity.
@@ -37,16 +37,14 @@ abstract class Badge_Maintenance extends Badge {
 				'description' => \esc_html__( 'Streak: The number of weeks this goal has been accomplished consistently.', 'progress-planner' ),
 				'status'      => 'active',
 				'priority'    => 'low',
-				'evaluate'    => function ( $goal_object ) {
-					return \count(
-						\progress_planner()->get_activities__query()->query_activities(
-							[
-								'start_date' => $goal_object->get_details()['start_date'],
-								'end_date'   => $goal_object->get_details()['end_date'],
-							]
-						)
-					);
-				},
+				'evaluate'    => fn( $goal_object ) => \count(
+					\progress_planner()->get_activities__query()->query_activities(
+						[
+							'start_date' => $goal_object->get_details()['start_date'],
+							'end_date'   => $goal_object->get_details()['end_date'],
+						]
+					)
+				),
 			],
 			[
 				'frequency'     => 'weekly',

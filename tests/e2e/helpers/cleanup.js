@@ -12,7 +12,9 @@ const SELECTORS = require( '../constants/selectors' );
  */
 async function cleanUpPlannerTasks( { page, context, baseUrl } ) {
 	try {
-		if ( page.isClosed?.() ) return;
+		if ( page.isClosed?.() ) {
+			return;
+		}
 
 		await page.goto(
 			`${ baseUrl }/wp-admin/admin.php?page=progress-planner`

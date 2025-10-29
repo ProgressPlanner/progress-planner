@@ -34,18 +34,18 @@ class User extends Tasks {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'user';
-
-	/**
 	 * The provider ID.
 	 *
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'user';
+
+	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		\add_filter( 'progress_planner_suggested_tasks_in_rest_format', [ $this, 'modify_task_details_for_user_tasks_rest_format' ], 10, 2 );
+	}
 
 	/**
 	 * Check if the task should be added.
@@ -93,5 +93,39 @@ class User extends Tasks {
 		];
 
 		return $actions;
+	}
+
+	/**
+	 * Modify the task details for user tasks in REST format.
+	 *
+	 * @param array $tasks The tasks.
+	 * @param array $args  The arguments.
+	 *
+	 * @return array
+	 */
+	public function modify_task_details_for_user_tasks_rest_format( $tasks, $args ) {
+		static $modified_tasks = [];
+		// Only process when fetching user tasks (include_provider contains 'user').
+		if ( ! isset( $args['include_provider'] ) || ! \in_array( 'user', $args['include_provider'], true ) ) {
+			return $tasks;
+		}
+
+		// Loop through all tasks in the flat array.
+		foreach ( $tasks as $key => $task ) {
+			// Only process user provider tasks.
+			if ( ! isset( $task['prpl_provider']->slug ) || $task['prpl_provider']->slug !== self::PROVIDER_ID ) { // @phpstan-ignore-line property.nonObject
+				continue;
+			}
+
+			if ( \in_array( $task['id'], $modified_tasks, true ) ) {
+				continue;
+			}
+
+			// Set points: 1 for golden task (excerpt contains 'GOLDEN'), 0 for regular user tasks.
+			$task['prpl_points'] = ( isset( $task['excerpt']['rendered'] ) && \str_contains( $task['excerpt']['rendered'], 'GOLDEN' ) ) ? 1 : 0;
+			$tasks[ $key ]       = $task;
+			$modified_tasks[]    = $task['id'];
+		}
+		return $tasks;
 	}
 }

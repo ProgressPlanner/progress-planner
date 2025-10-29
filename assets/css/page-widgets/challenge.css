@@ -10,7 +10,7 @@
 			left: 0;
 			width: 100%;
 			height: 100%;
-			background: var(--prpl-color-gray-2);
+			background: var(--prpl-color-border);
 			opacity: 0.4;
 		}
 
@@ -23,7 +23,7 @@
 				z-index: 1;
 				width: calc(100% - (var(--prpl-padding) * 4));
 				background-color: #fff;
-				border: 1px solid var(--prpl-color-gray-2);
+				border: 1px solid var(--prpl-color-border);
 				padding: var(--prpl-padding);
 				border-radius: var(--prpl-border-radius);
 

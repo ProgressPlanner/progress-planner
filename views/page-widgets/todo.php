@@ -11,7 +11,12 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 ?>
 <h2 class="prpl-widget-title">
-	<span><?php \esc_html_e( 'My to-do list', 'progress-planner' ); ?></span>
+	<?php
+	echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+		'todo',
+		\esc_html__( 'My to-do list', 'progress-planner' )
+	);
+	?>
 </h2>
 
 <p class="prpl-widget-description">

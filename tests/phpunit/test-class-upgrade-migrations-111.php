@@ -236,14 +236,7 @@ class Upgrade_Migrations_111_Test extends \WP_UnitTestCase {
 
 		// Verify that every value in the $items array is present in the $tasks array and has completed status.
 		foreach ( $migration_map as $item ) {
-			$matching_tasks = \array_filter(
-				$tasks,
-				function ( $task ) use ( $item ) {
-					return isset( $task['task_id'] ) &&
-						isset( $item['task_id'] ) &&
-						$task['task_id'] === $item['task_id'];
-				}
-			);
+			$matching_tasks = \array_filter( $tasks, fn( $task ) => isset( $task['task_id'] ) && isset( $item['task_id'] ) && $task['task_id'] === $item['task_id'] );
 
 			$this->assertNotEmpty(
 				$matching_tasks,

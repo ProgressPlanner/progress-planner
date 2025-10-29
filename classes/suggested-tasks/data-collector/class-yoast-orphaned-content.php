@@ -69,12 +69,7 @@ class Yoast_Orphaned_Content extends Base_Data_Collector {
 		$post_types_in     = '';
 
 		if ( ! empty( $public_post_types ) ) {
-			$post_types_in = \array_map(
-				function ( $type ) {
-					return (string) \esc_sql( $type );
-				},
-				\array_values( $public_post_types )
-			);
+			$post_types_in = \array_map( fn( $type ) => (string) \esc_sql( $type ), \array_values( $public_post_types ) );
 			$post_types_in = "p.post_type IN ('" . \implode( "','", $post_types_in ) . "')";
 
 			$where_clause .= " AND $post_types_in";

@@ -49,20 +49,10 @@ function onboardingTests( testContext = test ) {
 					)
 					.click();
 
-				// Wait for continue button and verify it becomes enabled
-				const continueButton = page.locator(
-					'#prpl-onboarding-continue-button'
-				);
-				await continueButton.waitFor( { state: 'visible' } );
-				await page.waitForSelector(
-					'#prpl-onboarding-continue-button:not(.prpl-disabled)'
-				);
-				await continueButton.click();
-
 				// Verify onboarding completion by checking for expected elements
 				await expect(
 					page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
-				).toBeVisible( { timeout: 5000 } );
+				).toBeVisible( { timeout: 15000 } );
 				await expect(
 					page.locator(
 						'.prpl-widget-wrapper.prpl-suggested-tasks .prpl-suggested-tasks-list'

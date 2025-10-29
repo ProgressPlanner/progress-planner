@@ -34,6 +34,13 @@ class Set_Date_Format extends Tasks_Interactive {
 	protected $is_dismissable = true;
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 7;
+
+	/**
 	 * Initialize the task.
 	 *
 	 * @return void
@@ -114,13 +121,13 @@ class Set_Date_Format extends Tasks_Interactive {
 		$detected_date_format = $this->get_date_format_type();
 
 		// Get the site default language name.
-		$available_languages = wp_get_available_translations();
-		$site_locale         = get_locale();
+		$available_languages = \wp_get_available_translations();
+		$site_locale         = \get_locale();
 
 		if ( isset( $available_languages[ $site_locale ] ) ) {
 			$lang_name = $available_languages[ $site_locale ]['english_name'];
-		} elseif ( function_exists( 'locale_get_display_name' ) ) {
-			$lang_name = locale_get_display_name( $site_locale, 'en' );
+		} elseif ( \function_exists( 'locale_get_display_name' ) ) {
+			$lang_name = \locale_get_display_name( $site_locale, 'en' );
 		} else {
 			$lang_name = $site_locale;
 		}
@@ -160,11 +167,11 @@ class Set_Date_Format extends Tasks_Interactive {
 		$localized_default_date_format = \__( 'F j, Y' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- We want localized date format from WP Core.
 
 		// Try to get the localized default date format.
-		$site_locale = get_locale();
-		$user_locale = get_user_locale();
-		if ( $user_locale !== $site_locale && switch_to_locale( $site_locale ) ) {
+		$site_locale = \get_locale();
+		$user_locale = \get_user_locale();
+		if ( $user_locale !== $site_locale && \switch_to_locale( $site_locale ) ) {
 			$localized_default_date_format = \__( 'F j, Y' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain -- We want localized date format from WP Core.
-			restore_previous_locale();
+			\restore_previous_locale();
 		}
 
 		/**
@@ -235,10 +242,8 @@ class Set_Date_Format extends Tasks_Interactive {
 				</p>
 			</fieldset>
 		</div>
-		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
-			<?php \esc_html_e( 'Set date format', 'progress-planner' ); ?>
-		</button>
 		<?php
+		$this->print_submit_button( \__( 'Set date format', 'progress-planner' ), 'prpl-steps-nav-wrapper-align-left' );
 	}
 
 	/**

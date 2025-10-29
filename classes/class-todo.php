@@ -57,7 +57,7 @@ class Todo {
 		foreach ( $pending_items as $task ) {
 			\progress_planner()->get_suggested_tasks_db()->update_recommendation(
 				$task->ID,
-				[ 'points' => $task->ID === $pending_items[0]->ID ? 1 : 0 ]
+				[ 'post_excerpt' => $task->ID === $pending_items[0]->ID ? 'GOLDEN' : '' ]
 			);
 		}
 
@@ -81,7 +81,12 @@ class Todo {
 		}
 
 		// Add task_id to the post.
-		\update_post_meta( $post->ID, 'prpl_task_id', 'user-' . $post->ID );
+		\wp_update_post(
+			[
+				'ID'        => $post->ID,
+				'post_name' => 'user-' . $post->ID,
+			]
+		);
 
 		// If it is first task ever created, it should be golden.
 		$pending_items = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(

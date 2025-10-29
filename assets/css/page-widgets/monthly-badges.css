@@ -75,7 +75,7 @@
 	.prpl-widget-title {
 		padding: 0.5rem 1rem;
 		border-radius: 0.5rem;
-		background: var(--prpl-background-orange);
+		background: var(--prpl-background-monthly);
 	}
 
 	.badge-group-monthly {
@@ -85,7 +85,7 @@
 	.prpl-widget-wrapper-content {
 
 		.prpl-widget-title {
-			background: var(--prpl-background-blue);
+			background: var(--prpl-background-content-badge);
 		}
 
 		.badge-group-content {
@@ -96,7 +96,7 @@
 	.prpl-widget-wrapper-maintenance {
 
 		.prpl-widget-title {
-			background: var(--prpl-background-red);
+			background: var(--prpl-background-streak);
 		}
 
 		.badge-group-maintenance {
@@ -127,11 +127,11 @@
 		}
 
 		&.badge-group-content {
-			background: var(--prpl-background-blue);
+			background: var(--prpl-background-content-badge);
 		}
 
 		&.badge-group-maintenance {
-			background: var(--prpl-background-red);
+			background: var(--prpl-background-streak);
 		}
 
 		.prpl-badge {

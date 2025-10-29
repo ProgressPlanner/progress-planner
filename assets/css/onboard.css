@@ -1,8 +1,3 @@
-#progress-planner-scan-progress progress {
-	width: 100%;
-	min-height: 1px;
-}
-
 #prpl-onboarding-form .prpl-form-fields label {
 	display: grid;
 	grid-template-columns: 1fr 3fr;
@@ -20,4 +15,9 @@
 	label {
 		display: block !important;
 	}
+}
+
+#prpl-onboarding-submit-wrapper {
+	display: flex;
+	align-items: center;
 }

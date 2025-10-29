@@ -17,10 +17,10 @@ class Plugin_Upgrade_Tasks {
 	 */
 	public function __construct() {
 		// Plugin (possibly 3rd party) activated.
-		\add_action( 'activated_plugin', [ $this, 'plugin_activated_or_updated' ], 10 );
+		\add_action( 'activated_plugin', [ $this, 'plugin_activated' ], 10 );
 
 		// Progress Planner plugin updated.
-		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_activated_or_updated' ], 10 );
+		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_updated' ], 10 );
 
 		// Check if the plugin was upgraded or new plugin was activated.
 		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 100 ); // We need to run this after the Local_Tasks_Manager::init() is called.
@@ -32,10 +32,25 @@ class Plugin_Upgrade_Tasks {
 	/**
 	 * Plugin upgraded or (3rd party) plugin was activated.
 	 *
+	 * @param string $plugin The plugin file.
+	 *
 	 * @return void
 	 */
-	public function plugin_activated_or_updated() {
+	public function plugin_activated( $plugin ) {
+		if ( 'progress-planner/progress-planner.php' !== $plugin ) {
+			return;
+		}
+
 		\update_option( 'progress_planner_plugin_was_activated', true );
+	}
+
+	/**
+	 * Plugin upgraded.
+	 *
+	 * @return void
+	 */
+	public function plugin_updated() {
+		\update_option( 'progress_planner_plugin_was_updated', true );
 	}
 
 	/**
@@ -44,13 +59,40 @@ class Plugin_Upgrade_Tasks {
 	 * @return void
 	 */
 	public function handle_activation_or_upgrade() {
-		if ( ! \get_option( 'progress_planner_plugin_was_activated', false ) ) {
+
+		// Plugin was installed.
+		if ( \get_option( 'progress_planner_plugin_was_activated', false ) ) {
+			$this->add_initial_onboarding_tasks();
+
+			\delete_option( 'progress_planner_plugin_was_activated' );
 			return;
 		}
 
-		\delete_option( 'progress_planner_plugin_was_activated' );
+		// Plugin was updated.
+		if ( \get_option( 'progress_planner_plugin_was_updated', false ) ) {
+			$this->maybe_add_onboarding_tasks();
 
-		$this->maybe_add_onboarding_tasks();
+			\delete_option( 'progress_planner_plugin_was_updated' );
+			return;
+		}
+	}
+
+	/**
+	 * Add initial onboarding tasks.
+	 *
+	 * @return void
+	 */
+	protected function add_initial_onboarding_tasks() {
+		// Privacy policy is not accepted, so it's a fresh install.
+		$fresh_install = ! \progress_planner()->is_privacy_policy_accepted();
+
+		// If this is the first time the plugin is installed, save the task providers.
+		if ( $fresh_install ) {
+			$onboard_task_provider_ids = \apply_filters( 'prpl_onboarding_task_providers', [] );
+
+			// Update 'progress_planner_previous_version_task_providers' option.
+			\update_option( 'progress_planner_previous_version_task_providers', \array_unique( $onboard_task_provider_ids ), SORT_REGULAR );
+		}
 	}
 
 	/**

@@ -48,19 +48,13 @@ class Chart {
 		$args = \wp_parse_args(
 			$args,
 			[
-				'items_callback' => function ( $start_date, $end_date ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
-					return 0;
-				},
+				'items_callback' => fn( $start_date, $end_date ) => 0, // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
 				'filter_results' => null,
 				'dates_params'   => [],
 				'normalized'     => false,
-				'color'          => function () {
-					return '#534786';
-				},
+				'color'          => fn() => '#534786',
 				// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter
-				'count_callback' => function ( $activities, $date = null ) {
-					return \count( $activities );
-				},
+				'count_callback' => fn( $activities, $date = null ) => \count( $activities ),
 				'max'            => null,
 				'type'           => 'line',
 				'return_data'    => [ 'label', 'score', 'color' ],

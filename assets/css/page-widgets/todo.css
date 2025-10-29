@@ -29,8 +29,8 @@
 
 		#todo-list > .prpl-suggested-task:first-child {
 
-			border: 1px solid #796da2;
-			background-color: #f6f7f9;
+			border: 1px solid var(--prpl-color-border-next-top-task);
+			background-color: var(--prpl-background-table);
 
 			.prpl-suggested-task-points-wrapper {
 
@@ -61,8 +61,8 @@
 		#todo-list {
 
 			.prpl-suggested-task[data-task-points="1"] {
-				border: 1px solid var(--prpl-color-accent-orange);
-				background-color: var(--prpl-background-orange);
+				border: 1px solid var(--prpl-color-border-top-task);
+				background-color: var(--prpl-background-top-task);
 			}
 		}
 	}
@@ -79,12 +79,12 @@
 		border-radius: 50%;
 		background: none;
 		box-shadow: none;
-		color: var(--prpl-color-gray-3);
 		display: flex;
 		align-items: center;
 		justify-content: center;
 		padding: 0.2em;
 		margin-inline-start: 0.3rem;
+		color: var(--prpl-color-ui-icon);
 
 		.dashicons {
 			font-size: 0.825em;
@@ -126,8 +126,8 @@
 
 		#todo-list > .prpl-suggested-task:first-child {
 
-			border: 1px solid #796da2;
-			background-color: #f6f7f9;
+			border: 1px solid var(--prpl-color-border-next-top-task);
+			background-color: var(--prpl-background-table);
 
 			.prpl-suggested-task-points-wrapper {
 
@@ -150,8 +150,8 @@
 		#todo-list {
 
 			.prpl-suggested-task[data-task-points="1"] {
-				border: 1px solid var(--prpl-color-accent-orange);
-				background-color: var(--prpl-background-orange);
+				border: 1px solid var(--prpl-color-border-top-task);
+				background-color: var(--prpl-background-top-task);
 			}
 		}
 	}
@@ -203,7 +203,7 @@
 
 #todo-list-completed-details {
 	margin-top: 1rem;
-	border: 1px solid var(--prpl-color-gray-3);
+	border: 1px solid var(--prpl-color-border);
 	border-radius: 0.5rem;
 
 	summary {
@@ -218,6 +218,10 @@
 			height: 20px;
 
 			transition: transform 0.3s ease-in-out;
+
+			svg {
+				stroke: var(--prpl-color-ui-icon);
+			}
 		}
 	}
 
@@ -234,7 +238,7 @@
 
 	#todo-list-completed-delete-all-wrapper {
 		margin: 0.25rem 0.5rem 0.75rem 0.5rem;
-		border-top: 1px solid var(--prpl-color-gray-2);
+		border-top: 1px solid var(--prpl-color-border);
 		display: none;
 
 		#todo-list-completed-delete-all {
@@ -249,11 +253,15 @@
 			color: var(--prpl-color-link);
 			font-size: var(--prpl-font-size-small);
 
+			svg path {
+				fill: var(--prpl-color-ui-icon);
+			}
+
 			&:hover {
 				text-decoration: underline;
 
 				svg path {
-					fill: var(--prpl-color-accent-red);
+					fill: var(--prpl-color-ui-icon-hover-delete);
 				}
 			}
 
@@ -273,8 +281,8 @@
 		position: absolute;
 		right: 0;
 		transition: all 0.3s ease-in-out;
-		color: #38296d;
-		background-color: #d1d5db;
+		color: var(--prpl-text-point-inactive);
+		background-color: var(--prpl-background-point-inactive);
 	}
 
 	.prpl-suggested-task-button {
@@ -288,10 +296,14 @@
 			opacity: 0;
 			transition: opacity 0.3s ease-in-out;
 
+			svg path {
+				fill: var(--prpl-color-ui-icon);
+			}
+
 			&:hover {
 
 				svg path {
-					fill: var(--prpl-color-accent-red);
+					fill: var(--prpl-color-ui-icon-hover-delete);
 				}
 			}
 		}
@@ -340,10 +352,10 @@
 		align-items: flex-start;
 		gap: 0.5rem;
 		padding: 0.75rem;
-		color: #854d0e;
+		color: var(--prpl-color-alert-warning-text);
 		font-size: var(--prpl-font-size-small);
 		border-radius: 6px;
-		background-color: #fefce8;
+		background-color: var(--prpl-background-alert-warning);
 
 		.prpl-note-icon {
 			display: flex;
@@ -352,22 +364,12 @@
 			justify-content: center;
 			width: 20px;
 			height: 20px;
-			color: #eab308;
+			color: var(--prpl-color-alert-warning);
 
 			svg {
 				width: 100%;
 				height: 100%;
 			}
-		}
-
-		&.prpl-note-error {
-			color: #9f0712;
-			background-color: var(--prpl-background-red);
-
-			.prpl-note-icon {
-				color: var(--prpl-color-notification-red);
-			}
-
 		}
 	}
 

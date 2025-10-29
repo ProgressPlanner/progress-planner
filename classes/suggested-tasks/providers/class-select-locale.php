@@ -55,6 +55,13 @@ class Select_Locale extends Tasks_Interactive {
 	protected $is_dismissable = true;
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 8;
+
+	/**
 	 * Initialize the task.
 	 *
 	 * @return void
@@ -151,12 +158,10 @@ class Select_Locale extends Tasks_Interactive {
 
 		// Get the locales.
 		$locales = \array_map(
-			function ( $locale ) {
-				return [
-					'code' => $locale['language'],
-					'name' => $locale['native_name'],
-				];
-			},
+			fn( $locale ) => [
+				'code' => $locale['language'],
+				'name' => $locale['native_name'],
+			],
 			$locales['translations']
 		);
 
@@ -173,14 +178,14 @@ class Select_Locale extends Tasks_Interactive {
 	 * @return bool
 	 */
 	public function is_task_completed( $task_id = '' ) {
-		$locale_activity = \progress_planner()->get_activities__query()->query_activities(
+		$activity = \progress_planner()->get_activities__query()->query_activities(
 			[
 				'category' => 'suggested_task',
 				'data_id'  => static::PROVIDER_ID,
 			]
 		);
 
-		return ! empty( $locale_activity );
+		return ! empty( $activity );
 	}
 
 	/**
@@ -220,11 +225,8 @@ class Select_Locale extends Tasks_Interactive {
 				'show_available_translations' => \current_user_can( 'install_languages' ) && \wp_can_install_language_pack(),
 			]
 		);
-		?>
-		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
-			<?php \esc_html_e( 'Select locale', 'progress-planner' ); ?>
-		</button>
-		<?php
+
+		$this->print_submit_button( \__( 'Select locale', 'progress-planner' ), 'prpl-steps-nav-wrapper-align-left' );
 	}
 
 	/**

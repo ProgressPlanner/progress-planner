@@ -36,35 +36,44 @@ class Suggested_Tasks_DB {
 			return 0;
 		}
 
-		// Set lock transient.
-		$transient_key = 'prpl_task_lock_' . $data['task_id'];
+		$lock_key   = 'prpl_task_lock_' . $data['task_id'];
+		$lock_value = \time();
 
-		// Check if the task is already being processed.
-		if ( \get_transient( $transient_key ) ) {
-			return 0;
+		// add_option will return false if the option is already there.
+		if ( ! \add_option( $lock_key, $lock_value, '', false ) ) {
+			$current = \get_option( $lock_key );
+
+			// If lock is stale (older than 30s), take over.
+			if ( $current && ( $current < \time() - 30 ) ) {
+				\update_option( $lock_key, $lock_value );
+			} else {
+				return 0; // Other process is using it.
+			}
 		}
 
-		// Set lock transient.
-		\set_transient( $transient_key, true, 5 );
-
 		// Check if we have an existing task with the same title.
-		$posts = $this->get_tasks_by(
+		$posts         = $this->get_tasks_by(
 			[
 				'post_status' => [ 'publish', 'trash', 'draft', 'future', 'pending' ], // 'any' doesn't include statuses which have 'exclude_from_search' set to true (trash and pending).
 				'numberposts' => 1,
-				'meta_query'  => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-					[
-						'key'     => 'prpl_task_id',
-						'value'   => $data['task_id'],
-						'compare' => '=',
-					],
-				],
+				'name'        => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['task_id'] ),
+			]
+		);
+		$posts_trashed = $this->get_tasks_by(
+			[
+				'post_status' => [ 'trash' ],
+				'numberposts' => 1,
+				'name'        => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['task_id'] ) . '__trashed',
 			]
 		);
 
+		if ( empty( $posts ) && ! empty( $posts_trashed ) ) {
+			$posts = $posts_trashed;
+		}
+
 		// If we have an existing task, skip.
 		if ( ! empty( $posts ) ) {
-			\delete_transient( $transient_key );
+			\delete_option( $lock_key );
 			return $posts[0]->ID;
 		}
 
@@ -79,6 +88,7 @@ class Suggested_Tasks_DB {
 			'post_title'   => $data['post_title'],
 			'post_content' => $data['description'] ?? '',
 			'menu_order'   => $data['order'] ?? 0,
+			'post_name'    => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['task_id'] ),
 		];
 		switch ( $data['post_status'] ) {
 			case 'pending':
@@ -100,56 +110,52 @@ class Suggested_Tasks_DB {
 				break;
 		}
 
-		$post_id = \wp_insert_post( $args );
+		try {
+			$post_id = \wp_insert_post( $args );
 
-		// Add terms if they don't exist.
-		foreach ( [ 'category', 'provider_id' ] as $context ) {
-			$taxonomy_name = \str_replace( '_id', '', $context );
-			$term          = \get_term_by( 'name', $data[ $context ], "prpl_recommendations_$taxonomy_name" );
+			// Add provider term if it doesn't exist.
+			$term = \get_term_by( 'name', $data['provider_id'], 'prpl_recommendations_provider' );
 			if ( ! $term ) {
-				\wp_insert_term( $data[ $context ], "prpl_recommendations_$taxonomy_name" );
-			}
-		}
-
-		// Set the task category.
-		\wp_set_post_terms( $post_id, $data['category'], 'prpl_recommendations_category' );
-
-		// Set the task provider.
-		\wp_set_post_terms( $post_id, $data['provider_id'], 'prpl_recommendations_provider' );
-
-		// Set the task parent.
-		if ( ! empty( $data['parent'] ) ) {
-			$parent = \get_post( $data['parent'] );
-			if ( $parent ) {
-				\wp_update_post(
-					[
-						'ID'          => $post_id,
-						'post_parent' => $parent->ID,
-					]
-				);
-			}
-		}
-
-		// Set other meta.
-		$default_keys = [
-			'title',
-			'description',
-			'status',
-			'category',
-			'provider_id',
-			'parent',
-			'order',
-			'post_status',
-		];
-		foreach ( $data as $key => $value ) {
-			if ( \in_array( $key, $default_keys, true ) ) {
-				continue;
+				\wp_insert_term( $data['provider_id'], 'prpl_recommendations_provider' );
 			}
 
-			\update_post_meta( $post_id, "prpl_$key", $value );
-		}
+			// Set the task provider.
+			\wp_set_post_terms( $post_id, $data['provider_id'], 'prpl_recommendations_provider' );
 
-		\delete_transient( $transient_key );
+			// Set the task parent.
+			if ( ! empty( $data['parent'] ) ) {
+				$parent = \get_post( $data['parent'] );
+				if ( $parent ) {
+					\wp_update_post(
+						[
+							'ID'          => $post_id,
+							'post_parent' => $parent->ID,
+						]
+					);
+				}
+			}
+
+			// Set other meta.
+			$default_keys = [
+				'title',
+				'description',
+				'status',
+				'provider_id',
+				'parent',
+				'order',
+				'post_status',
+			];
+			foreach ( $data as $key => $value ) {
+				if ( \in_array( $key, $default_keys, true ) ) {
+					continue;
+				}
+
+				\update_post_meta( $post_id, "prpl_$key", $value );
+			}
+		} finally {
+			// Delete the lock. This executes always.
+			\delete_option( $lock_key );
+		}
 
 		return $post_id;
 	}
@@ -168,19 +174,12 @@ class Suggested_Tasks_DB {
 		}
 
 		$update_data    = [ 'ID' => $id ];
-		$update_meta    = [];
 		$update_terms   = [];
 		$update_results = [];
 		foreach ( $data as $key => $value ) {
 			switch ( $key ) {
-				case 'points':
-				case 'prpl_points':
-					$update_meta[ 'prpl_' . \str_replace( 'prpl_', '', (string) $key ) ] = $value;
-					break;
-
-				case 'category':
 				case 'provider':
-					$update_terms[ "prpl_recommendations_$key" ] = $value;
+					$update_terms['prpl_recommendations_provider'] = $value;
 					break;
 
 				default:
@@ -191,12 +190,6 @@ class Suggested_Tasks_DB {
 
 		if ( 1 < \count( $update_data ) ) {
 			$update_results[] = (bool) \wp_update_post( $update_data );
-		}
-
-		if ( ! empty( $update_meta ) ) {
-			foreach ( $update_meta as $key => $value ) {
-				$update_results[] = (bool) \update_post_meta( $id, $key, $value );
-			}
 		}
 
 		if ( ! empty( $update_terms ) ) {
@@ -276,10 +269,9 @@ class Suggested_Tasks_DB {
 					: $value;
 		}
 
-		foreach ( [ 'category', 'provider' ] as $context ) {
-			$terms                 = \wp_get_post_terms( $post_data['ID'], "prpl_recommendations_$context" );
-			$post_data[ $context ] = \is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
-		}
+		// Get provider taxonomy term.
+		$terms                 = \wp_get_post_terms( $post_data['ID'], 'prpl_recommendations_provider' );
+		$post_data['provider'] = \is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
 
 		$cached[ $post_data['ID'] ] = new Task( $post_data );
 		return $cached[ $post_data['ID'] ];
@@ -316,12 +308,9 @@ class Suggested_Tasks_DB {
 			switch ( $param ) {
 				case 'provider':
 				case 'provider_id':
-				case 'category':
 					$args['tax_query']   = isset( $args['tax_query'] ) ? $args['tax_query'] : []; // phpcs:ignore WordPress.DB.SlowDBQuery
 					$args['tax_query'][] = [
-						'taxonomy' => 'category' === $param
-							? 'prpl_recommendations_category'
-							: 'prpl_recommendations_provider',
+						'taxonomy' => 'prpl_recommendations_provider',
 						'field'    => 'slug',
 						'terms'    => (array) $value,
 					];
@@ -330,12 +319,7 @@ class Suggested_Tasks_DB {
 					break;
 
 				case 'task_id':
-					$args['meta_query']   = isset( $args['meta_query'] ) ? $args['meta_query'] : []; // phpcs:ignore WordPress.DB.SlowDBQuery
-					$args['meta_query'][] = [
-						'key'   => 'prpl_task_id',
-						'value' => $value,
-					];
-
+					$args['name'] = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $value );
 					unset( $params[ $param ] );
 					break;
 
@@ -376,6 +360,23 @@ class Suggested_Tasks_DB {
 		$results = $this->format_recommendations(
 			\get_posts( $args )
 		);
+		if ( ! empty( $args['post_status'] )
+			&& \in_array( 'trash', (array) $args['post_status'], true )
+			&& isset( $args['name'] )
+		) {
+			$results_trashed = $this->format_recommendations(
+				\get_posts(
+					\wp_parse_args(
+						$args,
+						[
+							'post_status' => [ 'trash' ],
+							'name'        => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $args['name'] ) . '__trashed',
+						]
+					)
+				)
+			);
+			$results         = \array_merge( $results, $results_trashed );
+		}
 
 		\wp_cache_set( $cache_key, $results, static::GET_TASKS_CACHE_GROUP );
 

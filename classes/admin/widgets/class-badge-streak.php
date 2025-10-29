@@ -37,7 +37,7 @@ abstract class Badge_Streak extends Widget {
 		// Get the badge to display.
 		foreach ( $badges as $badge ) {
 			$progress = $badge->get_progress();
-			if ( 100 > $progress['progress'] ) {
+			if ( 100 >= $progress['progress'] ) {
 				$result[ $context ] = $badge;
 				break;
 			}

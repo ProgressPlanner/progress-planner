@@ -94,8 +94,8 @@ class Terms_Without_Description extends Base_Data_Collector {
 			[
 				'post_format',
 				'product_shipping_class',
-				'prpl_recommendations_category',
 				'prpl_recommendations_provider',
+				'gblocks_pattern_collections',
 			]
 		);
 

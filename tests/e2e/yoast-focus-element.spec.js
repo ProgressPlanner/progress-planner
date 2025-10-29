@@ -11,6 +11,12 @@ test.describe( 'Yoast Focus Element', () => {
 			'/wp-admin/admin.php?page=wpseo_page_settings#/crawl-optimization'
 		);
 
+		// If there is an modal with overlay (which prevents clicks), close it.
+		const closeButton = page.locator( 'button.yst-modal__close-button' );
+		if ( await closeButton.isVisible() ) {
+			await closeButton.click();
+		}
+
 		// Wait for the page to load and the toggle to be visible
 		await page.waitForSelector(
 			'button[data-id="input-wpseo-remove_feed_global_comments"]'

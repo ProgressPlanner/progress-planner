@@ -50,6 +50,18 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 
 		\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
 
+		// Majoriry of the tasks are now interactive, we need a global object to handle the AJAX requests.
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'recommendations/interactive-task',
+			[
+				'name' => 'progressPlanner',
+				'data' => [
+					'ajaxUrl' => \admin_url( 'admin-ajax.php' ),
+					'nonce'   => \wp_create_nonce( 'progress_planner' ),
+				],
+			]
+		);
+
 		\progress_planner()->the_view( "dashboard-widgets/{$this->id}.php" );
 	}
 
@@ -85,15 +97,15 @@ class Dashboard_Widget_Score extends Dashboard_Widget {
 		$result = [
 			'progress'   => $progress,
 			'badge'      => $badge,
-			'color'      => 'var(--prpl-color-accent-red)',
+			'color'      => 'var(--prpl-graph-color-1)',
 			'background' => $badge->get_background(),
 		];
 
 		if ( $result['progress']['progress'] > 50 ) {
-			$result['color'] = 'var(--prpl-color-accent-orange)';
+			$result['color'] = 'var(--prpl-color-monthly)';
 		}
 		if ( $result['progress']['progress'] > 75 ) {
-			$result['color'] = 'var(--prpl-color-accent-green)';
+			$result['color'] = 'var(--prpl-graph-color-3)';
 		}
 
 		$cached[ $category ] = $result;
