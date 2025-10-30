@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 /**
  * Fetches and manages AI-powered tasks from the SaaS server.
  */
-class AI_Tasks_From_Server extends Tasks {
+class AI_Tasks_From_Server extends Tasks_Interactive {
 
 	/**
 	 * The ID of the task provider.
@@ -31,7 +31,7 @@ class AI_Tasks_From_Server extends Tasks {
 	 *
 	 * @var string
 	 */
-	protected const POPOVER_ID = 'ai-task';
+	const POPOVER_ID = 'ai-task';
 
 	/**
 	 * Priority for AI tasks (higher priority = shown earlier).
@@ -69,21 +69,14 @@ class AI_Tasks_From_Server extends Tasks {
 	protected $ai_tasks = [];
 
 	/**
-	 * Constructor.
+	 * Initialize the task provider.
 	 */
-	public function __construct() {
+	public function init() {
 		// Fetch AI tasks from server.
 		$this->ai_tasks = \progress_planner()->get_ai_tasks()->get_items();
 
 		// Add AJAX handler for AI task execution.
 		\add_action( 'wp_ajax_prpl_execute_ai_task', [ $this, 'handle_ai_task_execution' ] );
-
-		// Add popover for AI tasks.
-		\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
-		\add_action( 'progress_planner_admin_dashboard_widget_score_after', [ $this, 'add_popover' ] );
-
-		// Enqueue AI task scripts.
-		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 	}
 
 	/**
@@ -187,24 +180,7 @@ class AI_Tasks_From_Server extends Tasks {
 		}
 
 		// Execute the AI task via the SaaS server.
-		$site_url    = \get_site_url();
-		$license_key = \get_option( 'progress_planner_license_key' );
-
-		// Debug logging.
-		\error_log( 'AI Task Execution Debug:' );
-		\error_log( '  Task ID: ' . $task_id );
-		\error_log( '  Site URL: ' . $site_url );
-		\error_log( '  License key exists: ' . ( ! empty( $license_key ) ? 'yes' : 'no' ) );
-		\error_log( '  License key length: ' . \strlen( $license_key ) );
-		\error_log( '  License key first 10 chars: ' . \substr( $license_key, 0, 10 ) . '...' );
-		\error_log( '  License key type: ' . \gettype( $license_key ) );
-
-		// Validate we have the required data.
-		if ( empty( $license_key ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'No license key found. Please configure your Progress Planner license key in settings.', 'progress-planner' ) ] );
-		}
-
-		$result = \progress_planner()->get_ai_tasks()->execute_ai_task( $task_id, $site_url, $license_key );
+		$result = $this->execute_ai_task( $task_id );
 
 		if ( \is_wp_error( $result ) ) {
 			\wp_send_json_error(
@@ -224,7 +200,69 @@ class AI_Tasks_From_Server extends Tasks {
 	}
 
 	/**
+	 * Execute an AI task.
+	 *
+	 * @param int $task_id The task ID to execute.
+	 * @return array|\WP_Error Response array on success, WP_Error on failure.
+	 */
+	protected function execute_ai_task( $task_id ) {
+		$url = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/execute-ai-task';
+
+		$site_url    = \get_site_url();
+		$license_key = \get_option( 'progress_planner_license_key' );
+
+		// Validate we have the required data.
+		if ( empty( $license_key ) ) {
+			return new \WP_Error( 'no_license_key', \esc_html__( 'No license key found. Please configure your Progress Planner license key in settings.', 'progress-planner' ) );
+		}
+
+		$post_data = [
+			'task_id'     => $task_id,
+			'site_url'    => $site_url,
+			'license_key' => $license_key,
+		];
+
+		$response = \wp_remote_post(
+			$url,
+			[
+				'body'    => $post_data,
+				'timeout' => 45, // AI tasks may take longer.
+			]
+		);
+
+		if ( \is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		$response_code = \wp_remote_retrieve_response_code( $response );
+		$body          = \wp_remote_retrieve_body( $response );
+		$json          = \json_decode( $body, true );
+
+		if ( 200 !== $response_code ) {
+			$error_message = isset( $json['message'] ) ? $json['message'] : 'Unknown error occurred';
+			return new \WP_Error( 'ai_execution_failed', $error_message, [ 'status' => $response_code ] );
+		}
+
+		if ( ! \is_array( $json ) ) {
+			return new \WP_Error( 'invalid_response', 'Invalid response from server', [ 'status' => 500 ] );
+		}
+
+		return $json;
+	}
+
+	/**
+	 * Print popover form contents.
+	 * Required by Tasks_Interactive, but we override add_popover() completely.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		// Not used - we override add_popover() completely.
+	}
+
+	/**
 	 * Add the popover for AI tasks.
+	 * Overrides parent to provide custom popover structure for AI tasks.
 	 *
 	 * @return void
 	 */

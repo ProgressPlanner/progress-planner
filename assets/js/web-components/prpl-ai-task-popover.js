@@ -1,4 +1,4 @@
-/* global HTMLElement, prplSuggestedTask, customElements, PrplInteractiveTask */
+/* global prplSuggestedTask, customElements, PrplInteractiveTask */
 
 /**
  * AI Task Popover Web Component
@@ -20,7 +20,9 @@ customElements.define(
 		attachDefaultEventListeners() {
 			// Prevent attaching listeners multiple times
 			if ( this.listenersAttached ) {
-				console.log( 'AI Task: Event listeners already attached, skipping' );
+				console.log(
+					'AI Task: Event listeners already attached, skipping'
+				);
 				return;
 			}
 
@@ -50,7 +52,9 @@ customElements.define(
 
 			// Prevent multiple completions
 			if ( this.isCompleting ) {
-				console.warn( 'AI Task: Already completing, ignoring duplicate call' );
+				console.warn(
+					'AI Task: Already completing, ignoring duplicate call'
+				);
 				return;
 			}
 
@@ -71,17 +75,26 @@ customElements.define(
 				'#prpl-suggested-tasks-list .prpl-suggested-task'
 			);
 
-			console.log( 'AI Task: Found', tasks.length, 'task elements in list' );
+			console.log(
+				'AI Task: Found',
+				tasks.length,
+				'task elements in list'
+			);
 
 			let foundMatch = false;
 
 			tasks.forEach( ( taskElement ) => {
-				console.log( 'AI Task: Checking task element with ID:', taskElement.dataset.taskId );
+				console.log(
+					'AI Task: Checking task element with ID:',
+					taskElement.dataset.taskId
+				);
 				if ( taskElement.dataset.taskId === currentTaskId ) {
 					console.log( 'AI Task: Found matching task element' );
 
 					if ( foundMatch ) {
-						console.warn( 'AI Task: Found duplicate matching task element! This should not happen.' );
+						console.warn(
+							'AI Task: Found duplicate matching task element! This should not happen.'
+						);
 						return;
 					}
 
@@ -97,7 +110,10 @@ customElements.define(
 					const postId = parseInt( taskElement.dataset.postId );
 
 					if ( postId ) {
-						console.log( 'AI Task: Calling maybeComplete with post ID:', postId );
+						console.log(
+							'AI Task: Calling maybeComplete with post ID:',
+							postId
+						);
 						prplSuggestedTask.maybeComplete( postId );
 
 						// Reset flag after a delay
@@ -105,7 +121,9 @@ customElements.define(
 							this.isCompleting = false;
 						}, 1000 );
 					} else {
-						console.error( 'AI Task: No post ID found on task element' );
+						console.error(
+							'AI Task: No post ID found on task element'
+						);
 						this.isCompleting = false;
 					}
 				}
