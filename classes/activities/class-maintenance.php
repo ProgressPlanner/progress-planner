@@ -24,7 +24,7 @@ class Maintenance extends Activity {
 	 *
 	 * @var string
 	 */
-	public $category = 'maintenance';
+	public string $category = 'maintenance';
 
 	/**
 	 * The data ID.
@@ -33,14 +33,14 @@ class Maintenance extends Activity {
 	 *
 	 * @var string
 	 */
-	public $data_id = '0';
+	public string $data_id = '0';
 
 	/**
 	 * Save the activity.
 	 *
 	 * @return void
 	 */
-	public function save() {
+	public function save(): void {
 		$this->date    = new \DateTime();
 		$this->user_id = \get_current_user_id();
 

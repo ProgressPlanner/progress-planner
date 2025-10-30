@@ -17,5 +17,5 @@ abstract class Badge_Content extends Badge {
 	 *
 	 * @var string
 	 */
-	protected $background = 'var(--prpl-background-content-badge)';
+	protected string $background = 'var(--prpl-background-content-badge)';
 }

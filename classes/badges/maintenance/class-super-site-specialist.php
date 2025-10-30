@@ -19,14 +19,14 @@ final class Super_Site_Specialist extends Badge_Maintenance {
 	 *
 	 * @var string
 	 */
-	protected $id = 'super-site-specialist';
+	protected string $id = 'super-site-specialist';
 
 	/**
 	 * The badge name.
 	 *
 	 * @return string
 	 */
-	public function get_name() {
+	public function get_name(): string {
 		return \__( 'Super Site Specialist', 'progress-planner' );
 	}
 
@@ -35,7 +35,7 @@ final class Super_Site_Specialist extends Badge_Maintenance {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	public function get_description(): string {
 		/* translators: %d: The number of weeks. */
 		return \sprintf( \esc_html__( '%d weeks streak', 'progress-planner' ), 52 );
 	}
@@ -47,7 +47,7 @@ final class Super_Site_Specialist extends Badge_Maintenance {
 	 *
 	 * @return array
 	 */
-	public function progress_callback( $args = [] ) {
+	public function progress_callback( array $args = [] ): array {
 		$saved_progress = $this->get_saved();
 
 		// If we have a saved value, return it.

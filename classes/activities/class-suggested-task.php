@@ -24,14 +24,14 @@ class Suggested_Task extends Activity {
 	 *
 	 * @var string
 	 */
-	public $category = 'suggested_task';
+	public string $category = 'suggested_task';
 
 	/**
 	 * Save the activity.
 	 *
 	 * @return void
 	 */
-	public function save() {
+	public function save(): void {
 		if ( ! $this->date ) {
 			$this->date = new \DateTime();
 		}

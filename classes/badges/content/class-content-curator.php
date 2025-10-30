@@ -19,14 +19,14 @@ final class Content_Curator extends Badge_Content {
 	 *
 	 * @var string
 	 */
-	protected $id = 'content-curator';
+	protected string $id = 'content-curator';
 
 	/**
 	 * The badge name.
 	 *
 	 * @return string
 	 */
-	public function get_name() {
+	public function get_name(): string {
 		return \__( 'Content Curator', 'progress-planner' );
 	}
 
@@ -35,7 +35,7 @@ final class Content_Curator extends Badge_Content {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	public function get_description(): string {
 		return \esc_html__( '20 existing posts/pages, or 10 new posts/pages', 'progress-planner' );
 	}
 
@@ -46,7 +46,7 @@ final class Content_Curator extends Badge_Content {
 	 *
 	 * @return array
 	 */
-	public function progress_callback( $args = [] ) {
+	public function progress_callback( array $args = [] ): array {
 		// Get the saved progress.
 		$saved_progress = $this->get_saved();
 

@@ -20,14 +20,14 @@ abstract class Badge_Maintenance extends Badge {
 	 *
 	 * @var string
 	 */
-	protected $background = 'var(--prpl-background-streak)';
+	protected string $background = 'var(--prpl-background-streak)';
 
 	/**
 	 * Get a recurring goal for any type of weekly activity.
 	 *
 	 * @return \Progress_Planner\Goals\Goal_Recurring
 	 */
-	public function get_goal() {
+	public function get_goal(): \Progress_Planner\Goals\Goal_Recurring {
 		return Goal_Recurring::get_instance(
 			'weekly_activity',
 			[
@@ -60,7 +60,7 @@ abstract class Badge_Maintenance extends Badge {
 	 *
 	 * @return array
 	 */
-	protected function get_saved() {
+	protected function get_saved(): array {
 		$value = parent::get_saved();
 
 		if ( isset( $value['progress'] ) && 100 === $value['progress'] ) {

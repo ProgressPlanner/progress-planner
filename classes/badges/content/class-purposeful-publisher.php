@@ -19,14 +19,14 @@ final class Purposeful_Publisher extends Badge_Content {
 	 *
 	 * @var string
 	 */
-	protected $id = 'purposeful-publisher';
+	protected string $id = 'purposeful-publisher';
 
 	/**
 	 * The badge name.
 	 *
 	 * @return string
 	 */
-	public function get_name() {
+	public function get_name(): string {
 		return \__( 'Purposeful Publisher', 'progress-planner' );
 	}
 
@@ -35,7 +35,7 @@ final class Purposeful_Publisher extends Badge_Content {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	public function get_description(): string {
 		/* translators: %d: The number of new posts to write. */
 		return \sprintf( \esc_html__( 'Write %d new posts or pages', 'progress-planner' ), 50 );
 	}
@@ -47,7 +47,7 @@ final class Purposeful_Publisher extends Badge_Content {
 	 *
 	 * @return array
 	 */
-	public function progress_callback( $args = [] ) {
+	public function progress_callback( array $args = [] ): array {
 		$saved_progress = $this->get_saved();
 
 		// If we have a saved value, return it.

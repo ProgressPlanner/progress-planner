@@ -24,7 +24,7 @@ final class Monthly extends Badge {
 	 *
 	 * @var string
 	 */
-	protected $id;
+	protected string $id;
 
 	/**
 	 * An array of instances for this object (one/month).
@@ -38,7 +38,7 @@ final class Monthly extends Badge {
 	 *
 	 * @param string $id The badge ID.
 	 */
-	public function __construct( $id ) {
+	public function __construct( string $id ) {
 		$this->id = $id;
 	}
 
@@ -177,7 +177,7 @@ final class Monthly extends Badge {
 	 *
 	 * @return string
 	 */
-	public function get_name() {
+	public function get_name(): string {
 		return $this->id
 			? self::get_months()[ 'm' . $this->get_month() ]
 			: '';
@@ -188,7 +188,7 @@ final class Monthly extends Badge {
 	 *
 	 * @return string
 	 */
-	public function get_description() {
+	public function get_description(): string {
 		return '';
 	}
 
@@ -197,7 +197,7 @@ final class Monthly extends Badge {
 	 *
 	 * @return string
 	 */
-	public function get_year() {
+	public function get_year(): string {
 		return \explode( '-', \str_replace( 'monthly-', '', $this->id ) )[0];
 	}
 
@@ -206,7 +206,7 @@ final class Monthly extends Badge {
 	 *
 	 * @return string
 	 */
-	public function get_month() {
+	public function get_month(): string {
 		return \str_replace( 'm', '', \explode( '-', \str_replace( 'monthly-', '', $this->id ) )[1] );
 	}
 
@@ -217,7 +217,7 @@ final class Monthly extends Badge {
 	 *
 	 * @return array
 	 */
-	public function progress_callback( $args = [] ) {
+	public function progress_callback( array $args = [] ): array {
 		$saved_progress = $this->get_saved();
 
 		// If we have a saved value, return it.
