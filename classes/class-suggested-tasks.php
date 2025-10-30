@@ -386,33 +386,18 @@ class Suggested_Tasks {
 				'show_in_rest' => true,
 				'default'      => 0,
 			],
-			'is_ai_task'            => [
+			'prpl_is_ai_task'            => [
 				'type'         => 'boolean',
 				'single'       => true,
 				'show_in_rest' => true,
 				'default'      => false,
 			],
-			'ai_task_server_id'     => [
+			'prpl_ai_task_server_id'     => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'ai_prompt_template'    => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'ai_provider'           => [
-				'type'         => 'string',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'ai_max_tokens'         => [
-				'type'         => 'number',
-				'single'       => true,
-				'show_in_rest' => true,
-			],
-			'branding'              => [
+			'prpl_ai_prompt_template'    => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,

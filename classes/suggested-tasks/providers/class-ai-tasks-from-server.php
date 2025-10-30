@@ -133,9 +133,6 @@ class AI_Tasks_From_Server extends Tasks_Interactive {
 				'is_ai_task'           => true,
 				'ai_task_server_id'    => $ai_task['task_id'],
 				'ai_prompt_template'   => $ai_task['ai_prompt_template'] ?? '',
-				'ai_provider'          => $ai_task['ai_provider'] ?? 'chatgpt',
-				'ai_max_tokens'        => $ai_task['ai_max_tokens'] ?? 500,
-				'branding'             => $ai_task['branding'] ?? '',
 			];
 
 			$tasks_to_inject[] = \progress_planner()->get_suggested_tasks_db()->add( $task_data );
@@ -208,7 +205,6 @@ class AI_Tasks_From_Server extends Tasks_Interactive {
 	protected function execute_ai_task( $task_id ) {
 		$url = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/execute-ai-task';
 
-		$site_url    = \get_site_url();
 		$license_key = \get_option( 'progress_planner_license_key' );
 
 		// Validate we have the required data.
@@ -218,7 +214,7 @@ class AI_Tasks_From_Server extends Tasks_Interactive {
 
 		$post_data = [
 			'task_id'     => $task_id,
-			'site_url'    => $site_url,
+			'site_url'    => \get_site_url(),
 			'license_key' => $license_key,
 		];
 
@@ -363,8 +359,12 @@ class AI_Tasks_From_Server extends Tasks_Interactive {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		// Get the task ID from meta - REST API strips the prpl_ prefix.
-		$task_id = 6149; //$data[0]['task_id'] ?? '';
+
+		$task_id = $data['meta']['prpl_ai_task_server_id'] ?? '';
+
+		if ( ! $task_id ) {
+			return $actions;
+		}
 
 		// Add the "Analyze" button that opens the popover.
 		$actions[] = [

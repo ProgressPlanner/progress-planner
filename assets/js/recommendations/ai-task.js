@@ -20,8 +20,12 @@
 
 		const executeButton = popover.querySelector( '.prpl-ai-task-execute' );
 		const retryButton = popover.querySelector( '.prpl-ai-task-retry' );
-		const completeButton = popover.querySelector( '.prpl-ai-task-complete' );
-		const instructionsEl = popover.querySelector( '.prpl-ai-task-instructions' );
+		const completeButton = popover.querySelector(
+			'.prpl-ai-task-complete'
+		);
+		const instructionsEl = popover.querySelector(
+			'.prpl-ai-task-instructions'
+		);
 		const loadingEl = popover.querySelector( '.prpl-ai-task-loading' );
 		const resultEl = popover.querySelector( '.prpl-ai-task-result' );
 		const responseEl = popover.querySelector( '.prpl-ai-task-response' );
@@ -48,8 +52,8 @@
 		/**
 		 * Show result state.
 		 *
-		 * @param {string} response - The AI response text.
-		 * @param {boolean} cached - Whether the response was cached.
+		 * @param {string}  response - The AI response text.
+		 * @param {boolean} cached   - Whether the response was cached.
 		 */
 		const showResult = ( response, cached = false ) => {
 			if ( instructionsEl ) {
@@ -175,16 +179,26 @@
 				'.prpl-ai-task-trigger'
 			);
 
-			console.log( 'Found AI task trigger buttons:', triggerButtons.length );
+			console.log(
+				'Found AI task trigger buttons:',
+				triggerButtons.length
+			);
 
 			triggerButtons.forEach( ( button ) => {
 				button.addEventListener( 'click', () => {
 					const taskId = button.dataset.taskId;
-					console.log( 'Trigger button clicked, task ID from data attribute:', taskId );
+					console.log(
+						'Trigger button clicked, task ID from data attribute:',
+						taskId
+					);
 
 					// Get the task element and its slug for completion
-					const taskElement = button.closest( '.prpl-suggested-task' );
-					const taskSlug = taskElement ? taskElement.dataset.taskId : null;
+					const taskElement = button.closest(
+						'.prpl-suggested-task'
+					);
+					const taskSlug = taskElement
+						? taskElement.dataset.taskId
+						: null;
 					console.log( 'Task slug from element:', taskSlug );
 
 					if ( taskId ) {
@@ -195,10 +209,18 @@
 						console.log( 'Set currentTaskId to:', currentTaskId );
 
 						// Store the task slug on the web component so completeTask can find it
-						const webComponent = popover.querySelector( 'prpl-ai-task-popover' );
+						const webComponent = popover.querySelector(
+							'prpl-ai-task-popover'
+						);
 						if ( webComponent && taskSlug ) {
-							webComponent.setAttribute( 'current-task-id', taskSlug );
-							console.log( 'Set current-task-id on web component:', taskSlug );
+							webComponent.setAttribute(
+								'current-task-id',
+								taskSlug
+							);
+							console.log(
+								'Set current-task-id on web component:',
+								taskSlug
+							);
 						}
 
 						// Reset the popover state.
@@ -220,8 +242,15 @@
 		if ( executeButton ) {
 			executeButton.addEventListener( 'click', () => {
 				// Get task ID from button's data attribute as fallback
-				const taskId = currentTaskId || parseInt( executeButton.dataset.taskId );
-				console.log( 'Execute button clicked, task ID:', taskId, '(currentTaskId:', currentTaskId, ')' );
+				const taskId =
+					currentTaskId || parseInt( executeButton.dataset.taskId );
+				console.log(
+					'Execute button clicked, task ID:',
+					taskId,
+					'(currentTaskId:',
+					currentTaskId,
+					')'
+				);
 				if ( taskId ) {
 					executeTask( taskId );
 				} else {
@@ -233,7 +262,8 @@
 		// Retry button click handler.
 		if ( retryButton ) {
 			retryButton.addEventListener( 'click', () => {
-				const taskId = currentTaskId || parseInt( retryButton.dataset.taskId );
+				const taskId =
+					currentTaskId || parseInt( retryButton.dataset.taskId );
 				if ( taskId ) {
 					executeTask( taskId );
 				}
