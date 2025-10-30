@@ -107,7 +107,7 @@ final class Monthly extends Badge {
 		if ( empty( self::$instances ) ) {
 			self::$instances = self::init_badges();
 		}
-		return isset( self::$instances[ $year ] ) ? self::$instances[ $year ] : [];
+		return self::$instances[ $year ] ?? [];
 	}
 
 	/**
