@@ -45,16 +45,16 @@ class Goal {
 	/**
 	 * The goal start date.
 	 *
-	 * @var string
+	 * @var string|\DateTime
 	 */
-	protected string $start_date;
+	protected $start_date;
 
 	/**
 	 * The goal end date.
 	 *
-	 * @var string
+	 * @var string|\DateTime
 	 */
-	protected string $end_date;
+	protected $end_date;
 
 	/**
 	 * The goal status.
@@ -140,22 +140,22 @@ class Goal {
 	/**
 	 * Set the start date.
 	 *
-	 * @param string $start_date The start date.
+	 * @param string|\DateTime $start_date The start date.
 	 *
 	 * @return void
 	 */
-	public function set_start_date( $start_date ) {
+	public function set_start_date( $start_date ): void {
 		$this->start_date = $start_date;
 	}
 
 	/**
 	 * Set the end date.
 	 *
-	 * @param string $end_date The end date.
+	 * @param string|\DateTime $end_date The end date.
 	 *
 	 * @return void
 	 */
-	public function set_end_date( $end_date ) {
+	public function set_end_date( $end_date ): void {
 		$this->end_date = $end_date;
 	}
 
