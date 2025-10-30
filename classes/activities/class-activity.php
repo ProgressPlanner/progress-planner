@@ -54,14 +54,14 @@ class Activity {
 	 *
 	 * @var int
 	 */
-	public int $id;
+	public $id;
 
 	/**
 	 * User ID.
 	 *
 	 * @var int
 	 */
-	public int $user_id;
+	public $user_id;
 
 	/**
 	 * Activity points by date.
