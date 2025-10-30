@@ -175,53 +175,15 @@
 		 * Set up event listeners for trigger buttons in task list.
 		 */
 		const setupTriggerButtons = () => {
-			const triggerButtons = document.querySelectorAll(
-				'.prpl-ai-task-trigger'
-			);
+			document.addEventListener(
+				'prpl-interactive-task-ai-task',
+				( event ) => {
+					const taskContext = event.detail;
+					console.log( 'AI task event received:', taskContext );
 
-			console.log(
-				'Found AI task trigger buttons:',
-				triggerButtons.length
-			);
-
-			triggerButtons.forEach( ( button ) => {
-				button.addEventListener( 'click', () => {
-					const taskId = button.dataset.taskId;
-					console.log(
-						'Trigger button clicked, task ID from data attribute:',
-						taskId
-					);
-
-					// Get the task element and its slug for completion
-					const taskElement = button.closest(
-						'.prpl-suggested-task'
-					);
-					const taskSlug = taskElement
-						? taskElement.dataset.taskId
-						: null;
-					console.log( 'Task slug from element:', taskSlug );
-
-					if ( taskId ) {
-						// Store the task ID on the execute button
-						executeButton.dataset.taskId = taskId;
-						retryButton.dataset.taskId = taskId;
-						currentTaskId = parseInt( taskId );
+					if ( taskContext.remote_task_id ) {
+						currentTaskId = parseInt( taskContext.remote_task_id );
 						console.log( 'Set currentTaskId to:', currentTaskId );
-
-						// Store the task slug on the web component so completeTask can find it
-						const webComponent = popover.querySelector(
-							'prpl-ai-task-popover'
-						);
-						if ( webComponent && taskSlug ) {
-							webComponent.setAttribute(
-								'current-task-id',
-								taskSlug
-							);
-							console.log(
-								'Set current-task-id on web component:',
-								taskSlug
-							);
-						}
 
 						// Reset the popover state.
 						if ( instructionsEl ) {
@@ -234,49 +196,9 @@
 						retryButton.style.display = 'none';
 						completeButton.style.display = 'none';
 					}
-				} );
-			} );
+				}
+			);
 		};
-
-		// Execute button click handler.
-		if ( executeButton ) {
-			executeButton.addEventListener( 'click', () => {
-				// Get task ID from button's data attribute as fallback
-				const taskId =
-					currentTaskId || parseInt( executeButton.dataset.taskId );
-				console.log(
-					'Execute button clicked, task ID:',
-					taskId,
-					'(currentTaskId:',
-					currentTaskId,
-					')'
-				);
-				if ( taskId ) {
-					executeTask( taskId );
-				} else {
-					console.error( 'No task ID set' );
-				}
-			} );
-		}
-
-		// Retry button click handler.
-		if ( retryButton ) {
-			retryButton.addEventListener( 'click', () => {
-				const taskId =
-					currentTaskId || parseInt( retryButton.dataset.taskId );
-				if ( taskId ) {
-					executeTask( taskId );
-				}
-			} );
-		}
-
-		// Set up trigger buttons initially.
-		setupTriggerButtons();
-
-		// Re-setup trigger buttons when new tasks are injected.
-		document.addEventListener( 'prpl/suggestedTask/injectItem', () => {
-			setTimeout( setupTriggerButtons, 100 );
-		} );
 	};
 
 	// Initialize when DOM is ready.

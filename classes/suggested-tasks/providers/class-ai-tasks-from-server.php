@@ -360,16 +360,34 @@ class AI_Tasks_From_Server extends Tasks_Interactive {
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
 
-		$task_id = $data['meta']['prpl_ai_task_server_id'] ?? '';
+		$remote_task_id = $data['meta']['prpl_ai_task_server_id'] ?? '';
 
-		if ( ! $task_id ) {
+		if ( ! $remote_task_id ) {
 			return $actions;
 		}
 
 		// Add the "Analyze" button that opens the popover.
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<button type="button" class="prpl-suggested-task-button prpl-ai-task-trigger" popovertarget="prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '" data-task-id="' . \esc_attr( $task_id ) . '" data-action="analyze" title="' . \esc_attr__( 'Analyze with AI', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Analyze', 'progress-planner' ) . '</span></button>',
+			'html'     => \sprintf(
+				'<a href="#" class="prpl-tooltip-action-text prpl-delete-term-action" role="button"
+					data-task-context=\'%s\'
+					onclick="event.preventDefault(); document.getElementById(\'prpl-popover-%s\')?.showPopover(); this.dispatchEvent(new CustomEvent(\'prpl-interactive-task-ai-task\', { bubbles: true, detail: JSON.parse(this.dataset.taskContext) }));">
+					%s
+				</a>',
+				\htmlspecialchars(
+					\wp_json_encode(
+						[
+							'remote_task_id' => $remote_task_id,
+							'task_prompt'    => $data['meta']['prpl_ai_prompt_template'] ?? '',
+						]
+					),
+					ENT_QUOTES,
+					'UTF-8'
+				),
+				\esc_attr( static::POPOVER_ID ),
+				\esc_html__( 'Analyze', 'progress-planner' )
+			),
 		];
 
 		return $actions;
