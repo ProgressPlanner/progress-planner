@@ -280,6 +280,9 @@ class AI_Tasks_From_Server extends Tasks_Interactive {
 				</div>
 				<div class="prpl-popover-content">
 					<div class="prpl-ai-task-content">
+						<div class="prpl-ai-task-prompt" style="display:none;">
+							<p><strong><?php \esc_html_e( 'Task:', 'progress-planner' ); ?></strong> <span class="prpl-ai-task-prompt-text"></span></p>
+						</div>
 						<div class="prpl-ai-task-instructions">
 							<p><?php \esc_html_e( 'Click "Analyze" below to get AI-powered insights about your site. This analysis may take up to 30 seconds.', 'progress-planner' ); ?></p>
 						</div>
@@ -361,6 +364,7 @@ class AI_Tasks_From_Server extends Tasks_Interactive {
 	public function add_task_actions( $data = [], $actions = [] ) {
 
 		$task_id = $data['meta']['prpl_ai_task_server_id'] ?? '';
+		$task_prompt = $data['meta']['prpl_ai_prompt_template'] ?? '';
 
 		if ( ! $task_id ) {
 			return $actions;
@@ -369,7 +373,7 @@ class AI_Tasks_From_Server extends Tasks_Interactive {
 		// Add the "Analyze" button that opens the popover.
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<button type="button" class="prpl-suggested-task-button prpl-ai-task-trigger" popovertarget="prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '" data-task-id="' . \esc_attr( $task_id ) . '" data-action="analyze" title="' . \esc_attr__( 'Analyze with AI', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Analyze', 'progress-planner' ) . '</span></button>',
+			'html'     => '<button type="button" class="prpl-suggested-task-button prpl-ai-task-trigger" popovertarget="prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '" data-task-id="' . \esc_attr( $task_id ) . '" data-task-prompt="' . \esc_attr( $task_prompt ) . '" data-action="analyze" title="' . \esc_attr__( 'Analyze with AI', 'progress-planner' ) . '"><span class="prpl-tooltip-action-text">' . \esc_html__( 'Analyze', 'progress-planner' ) . '</span></button>',
 		];
 
 		return $actions;

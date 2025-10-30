@@ -14,6 +14,107 @@ customElements.define(
 		}
 
 		/**
+		 * Runs when the popover is opening.
+		 * Use this to set up task-specific data.
+		 */
+		popoverOpening() {
+			super.popoverOpening();
+
+			console.log( 'AI Task: Popover opening' );
+
+			// Get task data from the trigger button
+			const popoverId = this.getAttribute( 'popover-id' );
+			const popover = document.getElementById( popoverId );
+
+			// Find the trigger button that was just clicked
+			// When a button with popovertarget is clicked, it becomes the activeElement
+			let triggerButton = document.activeElement;
+
+			// Verify it's the correct button (has the matching popovertarget)
+			if ( ! triggerButton || triggerButton.getAttribute( 'popovertarget' ) !== popoverId ) {
+				// Fallback: search for the button within the closest task element if we can find one
+				console.warn( 'AI Task: Could not determine which trigger button was clicked via activeElement' );
+				triggerButton = document.querySelector(
+					`button[popovertarget="${ popoverId }"]`
+				);
+			}
+
+			if ( ! triggerButton ) {
+				console.warn( 'AI Task: Could not find trigger button' );
+				return;
+			}
+
+			console.log( 'AI Task: Found trigger button:', triggerButton );
+
+			// Get task data from button attributes
+			const taskId = triggerButton.dataset.taskId;
+			const taskPrompt = triggerButton.dataset.taskPrompt;
+
+			// Get the task element and its slug for completion
+			const taskElement = triggerButton.closest( '.prpl-suggested-task' );
+			const taskSlug = taskElement ? taskElement.dataset.taskId : null;
+
+			console.log( 'AI Task: Task ID:', taskId );
+			console.log( 'AI Task: Task slug:', taskSlug );
+			console.log( 'AI Task: Task prompt:', taskPrompt );
+
+			// Store task data on web component
+			this.setAttribute( 'data-task-id', taskId );
+			this.setAttribute( 'current-task-id', taskSlug );
+
+			// Display task prompt if available
+			const promptEl = popover.querySelector( '.prpl-ai-task-prompt' );
+			const promptTextEl = popover.querySelector(
+				'.prpl-ai-task-prompt-text'
+			);
+			if ( taskPrompt && promptTextEl ) {
+				promptTextEl.textContent = taskPrompt;
+				promptEl.style.display = 'block';
+			} else if ( promptEl ) {
+				promptEl.style.display = 'none';
+			}
+
+			// Reset popover state
+			const instructionsEl = popover.querySelector(
+				'.prpl-ai-task-instructions'
+			);
+			const loadingEl = popover.querySelector( '.prpl-ai-task-loading' );
+			const resultEl = popover.querySelector( '.prpl-ai-task-result' );
+			const errorEl = popover.querySelector( '.prpl-ai-task-error' );
+			const executeButton = popover.querySelector(
+				'.prpl-ai-task-execute'
+			);
+			const retryButton = popover.querySelector( '.prpl-ai-task-retry' );
+			const completeButton = popover.querySelector(
+				'.prpl-ai-task-complete'
+			);
+
+			if ( instructionsEl ) {
+				instructionsEl.style.display = 'block';
+			}
+			if ( loadingEl ) {
+				loadingEl.style.display = 'none';
+			}
+			if ( resultEl ) {
+				resultEl.style.display = 'none';
+			}
+			if ( errorEl ) {
+				errorEl.style.display = 'none';
+			}
+			if ( executeButton ) {
+				executeButton.style.display = 'inline-block';
+				executeButton.dataset.taskId = taskId;
+			}
+			if ( retryButton ) {
+				retryButton.style.display = 'none';
+				retryButton.dataset.taskId = taskId;
+			}
+			if ( completeButton ) {
+				completeButton.style.display = 'none';
+			}
+		}
+
+		/**
 		 * Attach button event listeners.
 		 * Overrides parent to prevent duplicate listeners.
 		 */

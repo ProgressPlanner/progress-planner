@@ -5,7 +5,7 @@
  *
  * Handles execution of AI-powered tasks from the SaaS server.
  *
- * Dependencies: progress-planner/suggested-task, progress-planner/ajax-request
+ * Dependencies: progress-planner/suggested-task, progress-planner/ajax-request, progress-planner/web-components/prpl-ai-task-popover
  */
 
 ( () => {
@@ -18,6 +18,7 @@
 			return;
 		}
 
+		const webComponent = popover.querySelector( 'prpl-ai-task-popover' );
 		const executeButton = popover.querySelector( '.prpl-ai-task-execute' );
 		const retryButton = popover.querySelector( '.prpl-ai-task-retry' );
 		const completeButton = popover.querySelector(
@@ -32,21 +33,31 @@
 		const errorEl = popover.querySelector( '.prpl-ai-task-error' );
 		const errorMessageEl = popover.querySelector( '.prpl-error-message' );
 
-		let currentTaskId = null;
-
 		/**
 		 * Show loading state.
 		 */
 		const showLoading = () => {
-			executeButton.style.display = 'none';
-			retryButton.style.display = 'none';
-			completeButton.style.display = 'none';
+			if ( executeButton ) {
+				executeButton.style.display = 'none';
+			}
+			if ( retryButton ) {
+				retryButton.style.display = 'none';
+			}
+			if ( completeButton ) {
+				completeButton.style.display = 'none';
+			}
 			if ( instructionsEl ) {
 				instructionsEl.style.display = 'none';
 			}
-			loadingEl.style.display = 'block';
-			resultEl.style.display = 'none';
-			errorEl.style.display = 'none';
+			if ( loadingEl ) {
+				loadingEl.style.display = 'block';
+			}
+			if ( resultEl ) {
+				resultEl.style.display = 'none';
+			}
+			if ( errorEl ) {
+				errorEl.style.display = 'none';
+			}
 		};
 
 		/**
@@ -59,19 +70,33 @@
 			if ( instructionsEl ) {
 				instructionsEl.style.display = 'none';
 			}
-			loadingEl.style.display = 'none';
-			executeButton.style.display = 'none';
-			retryButton.style.display = 'none';
-			errorEl.style.display = 'none';
-			resultEl.style.display = 'block';
-			completeButton.style.display = 'inline-block';
+			if ( loadingEl ) {
+				loadingEl.style.display = 'none';
+			}
+			if ( executeButton ) {
+				executeButton.style.display = 'none';
+			}
+			if ( retryButton ) {
+				retryButton.style.display = 'none';
+			}
+			if ( errorEl ) {
+				errorEl.style.display = 'none';
+			}
+			if ( resultEl ) {
+				resultEl.style.display = 'block';
+			}
+			if ( completeButton ) {
+				completeButton.style.display = 'inline-block';
+			}
 
 			// Format the response with markdown-like formatting.
 			const formattedResponse = formatAIResponse( response );
-			responseEl.innerHTML = formattedResponse;
+			if ( responseEl ) {
+				responseEl.innerHTML = formattedResponse;
+			}
 
 			// Add cached indicator if applicable.
-			if ( cached ) {
+			if ( cached && responseEl ) {
 				const cachedIndicator = document.createElement( 'p' );
 				cachedIndicator.className = 'prpl-ai-cached-indicator';
 				cachedIndicator.style.fontSize = '0.9em';
@@ -91,13 +116,27 @@
 			if ( instructionsEl ) {
 				instructionsEl.style.display = 'none';
 			}
-			loadingEl.style.display = 'none';
-			executeButton.style.display = 'none';
-			retryButton.style.display = 'inline-block';
-			completeButton.style.display = 'none';
-			resultEl.style.display = 'none';
-			errorEl.style.display = 'block';
-			errorMessageEl.textContent = message;
+			if ( loadingEl ) {
+				loadingEl.style.display = 'none';
+			}
+			if ( executeButton ) {
+				executeButton.style.display = 'none';
+			}
+			if ( retryButton ) {
+				retryButton.style.display = 'inline-block';
+			}
+			if ( completeButton ) {
+				completeButton.style.display = 'none';
+			}
+			if ( resultEl ) {
+				resultEl.style.display = 'none';
+			}
+			if ( errorEl ) {
+				errorEl.style.display = 'block';
+			}
+			if ( errorMessageEl ) {
+				errorMessageEl.textContent = message;
+			}
 		};
 
 		/**
@@ -136,7 +175,6 @@
 				return;
 			}
 
-			currentTaskId = taskId;
 			showLoading();
 
 			// Make AJAX request to execute the AI task.
@@ -171,90 +209,18 @@
 				} );
 		};
 
-		/**
-		 * Set up event listeners for trigger buttons in task list.
-		 */
-		const setupTriggerButtons = () => {
-			const triggerButtons = document.querySelectorAll(
-				'.prpl-ai-task-trigger'
-			);
-
-			console.log(
-				'Found AI task trigger buttons:',
-				triggerButtons.length
-			);
-
-			triggerButtons.forEach( ( button ) => {
-				button.addEventListener( 'click', () => {
-					const taskId = button.dataset.taskId;
-					console.log(
-						'Trigger button clicked, task ID from data attribute:',
-						taskId
-					);
-
-					// Get the task element and its slug for completion
-					const taskElement = button.closest(
-						'.prpl-suggested-task'
-					);
-					const taskSlug = taskElement
-						? taskElement.dataset.taskId
-						: null;
-					console.log( 'Task slug from element:', taskSlug );
-
-					if ( taskId ) {
-						// Store the task ID on the execute button
-						executeButton.dataset.taskId = taskId;
-						retryButton.dataset.taskId = taskId;
-						currentTaskId = parseInt( taskId );
-						console.log( 'Set currentTaskId to:', currentTaskId );
-
-						// Store the task slug on the web component so completeTask can find it
-						const webComponent = popover.querySelector(
-							'prpl-ai-task-popover'
-						);
-						if ( webComponent && taskSlug ) {
-							webComponent.setAttribute(
-								'current-task-id',
-								taskSlug
-							);
-							console.log(
-								'Set current-task-id on web component:',
-								taskSlug
-							);
-						}
-
-						// Reset the popover state.
-						if ( instructionsEl ) {
-							instructionsEl.style.display = 'block';
-						}
-						loadingEl.style.display = 'none';
-						resultEl.style.display = 'none';
-						errorEl.style.display = 'none';
-						executeButton.style.display = 'inline-block';
-						retryButton.style.display = 'none';
-						completeButton.style.display = 'none';
-					}
-				} );
-			} );
-		};
-
-		// Execute button click handler.
+		// Execute button click handler - get task ID from web component attribute.
 		if ( executeButton ) {
 			executeButton.addEventListener( 'click', () => {
-				// Get task ID from button's data attribute as fallback
 				const taskId =
-					currentTaskId || parseInt( executeButton.dataset.taskId );
-				console.log(
-					'Execute button clicked, task ID:',
-					taskId,
-					'(currentTaskId:',
-					currentTaskId,
-					')'
-				);
+					webComponent?.getAttribute( 'data-task-id' ) ||
+					executeButton.dataset.taskId;
+				console.log( 'Execute button clicked, task ID:', taskId );
 				if ( taskId ) {
-					executeTask( taskId );
+					executeTask( parseInt( taskId ) );
 				} else {
-					console.error( 'No task ID set' );
+					console.error( 'No task ID found' );
+					showError( 'Task ID not found. Please try again.' );
 				}
 			} );
 		}
@@ -263,20 +229,16 @@
 		if ( retryButton ) {
 			retryButton.addEventListener( 'click', () => {
 				const taskId =
-					currentTaskId || parseInt( retryButton.dataset.taskId );
+					webComponent?.getAttribute( 'data-task-id' ) ||
+					retryButton.dataset.taskId;
 				if ( taskId ) {
-					executeTask( taskId );
+					executeTask( parseInt( taskId ) );
+				} else {
+					console.error( 'No task ID found' );
+					showError( 'Task ID not found. Please try again.' );
 				}
 			} );
 		}
-
-		// Set up trigger buttons initially.
-		setupTriggerButtons();
-
-		// Re-setup trigger buttons when new tasks are injected.
-		document.addEventListener( 'prpl/suggestedTask/injectItem', () => {
-			setTimeout( setupTriggerButtons, 100 );
-		} );
 	};
 
 	// Initialize when DOM is ready.
