@@ -42,21 +42,21 @@ const prplDriverObj = prplDriver( {
 	},
 } );
 
-function prplTourShowPopover( popover ) {
+const prplTourShowPopover = ( popover ) => {
 	popover.showPopover();
 	prplMakePopoverBackdropTransparent( popover );
-}
+};
 
-function prplTourHidePopover( popover ) {
+const prplTourHidePopover = ( popover ) => {
 	popover.hidePopover();
-	document.getElementById( popover.id + '-backdrop-transparency' ).remove();
-}
+	document.getElementById( `${ popover.id }-backdrop-transparency` ).remove();
+};
 
 // Function to make the backdrop of a popover transparent.
-function prplMakePopoverBackdropTransparent( popover ) {
+const prplMakePopoverBackdropTransparent = ( popover ) => {
 	if ( popover ) {
 		const style = document.createElement( 'style' );
-		style.id = popover.id + '-backdrop-transparency';
+		style.id = `${ popover.id }-backdrop-transparency`;
 		style.innerHTML = `
 					#${ popover.id }::backdrop {
 							background-color: transparent !important;
@@ -64,20 +64,20 @@ function prplMakePopoverBackdropTransparent( popover ) {
 			`;
 		document.head.appendChild( style );
 	}
-}
+};
 
 // eslint-disable-next-line no-unused-vars -- This is called on a few buttons.
-function prplStartTour() {
+const prplStartTour = () => {
 	const monthlyBadgesPopover = document.getElementById(
 		'prpl-popover-monthly-badges'
 	);
 	const progressPlannerTourSteps = progressPlannerTour.steps;
 
-	progressPlannerTourSteps[ 4 ].popover.onNextClick = function () {
+	progressPlannerTourSteps[ 4 ].popover.onNextClick = () => {
 		prplTourShowPopover( monthlyBadgesPopover );
 		prplDriverObj.moveNext();
 	};
-	progressPlannerTourSteps[ 5 ].popover.onNextClick = function () {
+	progressPlannerTourSteps[ 5 ].popover.onNextClick = () => {
 		prplTourHidePopover( monthlyBadgesPopover );
 		prplDriverObj.moveNext();
 	};
@@ -100,7 +100,7 @@ function prplStartTour() {
 			.replace( '&show-tour=true', '' )
 			.replace( 'show-tour=true', '' )
 	);
-}
+};
 
 // Add event listener for tour button.
 document
