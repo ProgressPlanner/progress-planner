@@ -104,4 +104,43 @@ abstract class Base_Data_Collector {
 		$data[ $key ] = $value;
 		\progress_planner()->get_settings()->set( static::CACHE_KEY, $data );
 	}
+
+	/**
+	 * Get filtered public taxonomies.
+	 *
+	 * Returns public taxonomies with exclusions applied via filter.
+	 *
+	 * @return array<string, string> Array of public taxonomy names.
+	 */
+	protected function get_filtered_public_taxonomies() {
+		/**
+		 * Array of public taxonomy names where both keys and values are taxonomy names.
+		 *
+		 * @var array<string, string> $public_taxonomies
+		 */
+		$public_taxonomies = \get_taxonomies( [ 'public' => true ], 'names' );
+
+		/**
+		 * Array of public taxonomies to exclude from queries.
+		 *
+		 * @var array<string> $exclude_public_taxonomies
+		 */
+		$exclude_public_taxonomies = \apply_filters(
+			'progress_planner_exclude_public_taxonomies',
+			[
+				'post_format',
+				'product_shipping_class',
+				'prpl_recommendations_provider',
+				'gblocks_pattern_collections',
+			]
+		);
+
+		foreach ( $exclude_public_taxonomies as $taxonomy ) {
+			if ( isset( $public_taxonomies[ $taxonomy ] ) ) {
+				unset( $public_taxonomies[ $taxonomy ] );
+			}
+		}
+
+		return $public_taxonomies;
+	}
 }
