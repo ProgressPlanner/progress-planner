@@ -13,6 +13,22 @@ namespace Progress_Planner\Rest;
 abstract class Base {
 
 	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		\add_action( 'rest_api_init', [ $this, 'register_rest_endpoint' ] );
+	}
+
+	/**
+	 * Register REST endpoint.
+	 *
+	 * Child classes must implement this method to define their REST endpoints.
+	 *
+	 * @return void
+	 */
+	abstract public function register_rest_endpoint();
+
+	/**
 	 * Get client IP address.
 	 *
 	 * @return string
