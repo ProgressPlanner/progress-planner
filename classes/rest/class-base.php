@@ -20,6 +20,15 @@ abstract class Base {
 	}
 
 	/**
+	 * Register REST endpoint.
+	 *
+	 * Child classes must implement this method to define their REST endpoints.
+	 *
+	 * @return void
+	 */
+	abstract public function register_rest_endpoint();
+
+	/**
 	 * Get client IP address.
 	 *
 	 * @return string
