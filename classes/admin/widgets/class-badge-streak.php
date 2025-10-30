@@ -20,6 +20,15 @@ abstract class Badge_Streak extends Widget {
 	protected $id = 'badge-streak';
 
 	/**
+	 * Enqueue styles.
+	 *
+	 * @return void
+	 */
+	public function enqueue_styles() {
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/page-widgets/badge-streak' );
+	}
+
+	/**
 	 * Get the badge.
 	 *
 	 * @param string $context The context of the badges (content|maintenance|monthly).
