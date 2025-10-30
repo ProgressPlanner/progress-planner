@@ -1,4 +1,4 @@
-/* global customElements, HTMLElement, prplL10n, progressPlannerAjaxRequest, prplSuggestedTask */
+/* global customElements, HTMLElement, prplL10n, progressPlanner, progressPlannerAjaxRequest, prplSuggestedTask */
 /*
  * Install Plugin
  *
@@ -19,7 +19,7 @@ customElements.define(
 			action,
 			providerId,
 			className = 'prpl-button-link',
-			completeTask = 'true' // String on purpose, since element attributes are always strings.
+			completeTaskAttr = 'true' // String on purpose, since element attributes are always strings.
 		) {
 			// Get parent class properties
 			super();
@@ -30,8 +30,8 @@ customElements.define(
 				pluginName ?? this.getAttribute( 'data-plugin-name' );
 			this.pluginName = this.pluginName ?? this.pluginSlug;
 			this.action = action ?? this.getAttribute( 'data-action' );
-			this.completeTask =
-				completeTask ?? this.getAttribute( 'data-complete-task' );
+			this.completeTaskAttr =
+				completeTaskAttr ?? this.getAttribute( 'data-complete-task' );
 			this.providerId =
 				providerId ?? this.getAttribute( 'data-provider-id' );
 			this.className = className ?? this.getAttribute( 'class' );
@@ -41,7 +41,7 @@ customElements.define(
 			}
 
 			// Convert the string to a boolean.
-			this.completeTask = 'true' === this.completeTask;
+			this.completeTaskAttr = 'true' === this.completeTaskAttr;
 
 			// Set the inner HTML.
 			this.innerHTML = `
@@ -87,12 +87,12 @@ customElements.define(
 			`;
 
 			progressPlannerAjaxRequest( {
-				url: this.getAjaxUrl(),
+				url: progressPlanner.ajaxUrl,
 				data: {
 					action: 'progress_planner_install_plugin',
 					plugin_slug: this.pluginSlug,
 					plugin_name: this.pluginName,
-					nonce: this.getNonce(),
+					nonce: progressPlanner.nonce,
 				},
 			} )
 				.then( () => thisObj.activatePlugin() )
@@ -108,19 +108,19 @@ customElements.define(
 			`;
 
 			progressPlannerAjaxRequest( {
-				url: this.getAjaxUrl(),
+				url: progressPlanner.ajaxUrl,
 				data: {
 					action: 'progress_planner_activate_plugin',
 					plugin_slug: thisObj.pluginSlug,
 					plugin_name: thisObj.pluginName,
-					nonce: this.getNonce(),
+					nonce: progressPlanner.nonce,
 				},
 			} )
 				.then( () => {
 					button.innerHTML = prplL10n( 'activated' );
 
 					// Complete the task if the completeTask attribute is set to true.
-					if ( true === thisObj.completeTask ) {
+					if ( true === thisObj.completeTaskAttr ) {
 						thisObj.completeTask();
 					}
 				} )
@@ -150,26 +150,6 @@ customElements.define(
 					}
 				}
 			} );
-		}
-
-		/**
-		 * Get the AJAX URL.
-		 *
-		 * @return {string} The AJAX URL.
-		 */
-		getAjaxUrl() {
-			return window.progressPlanner?.ajaxUrl ?? window.ajaxurl;
-		}
-
-		/**
-		 * Get the nonce.
-		 *
-		 * @return {string} The nonce.
-		 */
-		getNonce() {
-			return (
-				window.progressPlanner?.nonce ?? window.prplSuggestedTask?.nonce
-			);
 		}
 	}
 );

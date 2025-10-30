@@ -44,6 +44,9 @@
 				taxonomyElement: popover.querySelector(
 					'#prpl-update-term-taxonomy'
 				),
+				taxonomyNameElement: popover.querySelector(
+					'#prpl-update-term-taxonomy-name'
+				),
 				termIdField: popover.querySelector( '#prpl-update-term-id' ),
 				taxonomyField: popover.querySelector( '#prpl-update-taxonomy' ),
 				descriptionField: popover.querySelector(
@@ -86,6 +89,9 @@
 				taxonomy: this.decodeHtmlEntities(
 					event.detail.target_taxonomy
 				),
+				taxonomyName: this.decodeHtmlEntities(
+					event.detail.target_taxonomy_name
+				),
 				termName: this.decodeHtmlEntities(
 					event.detail.target_term_name
 				),
@@ -101,6 +107,7 @@
 				this.currentTermData.termId,
 				this.currentTermData.taxonomy,
 				this.currentTermData.termName,
+				this.currentTermData.taxonomyName,
 				this.decodeHtmlEntities( event.detail.post_title )
 			);
 		}
@@ -108,12 +115,19 @@
 		/**
 		 * Update the popover content.
 		 *
-		 * @param {string} termId    The term ID.
-		 * @param {string} taxonomy  The taxonomy.
-		 * @param {string} termName  The term name.
-		 * @param {string} postTitle The post title.
+		 * @param {string} termId       The term ID.
+		 * @param {string} taxonomy     The taxonomy.
+		 * @param {string} termName     The term name.
+		 * @param {string} taxonomyName The taxonomy name.
+		 * @param {string} postTitle    The post title.
 		 */
-		updatePopoverContent( termId, taxonomy, termName, postTitle ) {
+		updatePopoverContent(
+			termId,
+			taxonomy,
+			termName,
+			taxonomyName,
+			postTitle
+		) {
 			if ( this.elements.popoverTitle ) {
 				this.elements.popoverTitle.textContent = postTitle;
 			}
@@ -124,6 +138,10 @@
 
 			if ( this.elements.taxonomyElement ) {
 				this.elements.taxonomyElement.textContent = taxonomy;
+			}
+
+			if ( this.elements.taxonomyNameElement ) {
+				this.elements.taxonomyNameElement.textContent = taxonomyName;
 			}
 
 			if ( this.elements.termIdField ) {

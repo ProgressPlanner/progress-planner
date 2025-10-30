@@ -559,6 +559,11 @@ class Suggested_Tasks {
 				$response->data['prpl_points'] = 0;
 			}
 
+			// Assign point only to golden user task.
+			if ( 'user' === $provider->get_provider_id() ) {
+				$response->data['prpl_points'] = ( ! empty( $post->post_excerpt ) && \str_contains( $post->post_excerpt, 'GOLDEN' ) ) ? 1 : 0;
+			}
+
 			// This has to be the last item to be added because actions use data from previous items.
 			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
 		}

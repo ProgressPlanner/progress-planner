@@ -292,9 +292,11 @@ final class Monthly extends Badge {
 	 * @return int
 	 */
 	public function get_next_badges_excess_points() {
-		$excess_points       = 0;
-		$next_1_badge_points = 0;
-		$next_2_badge_points = 0;
+		$next_1_badge_points   = 0;
+		$next_2_badge_points   = 0;
+		$badge_1_excess_points = 0;
+		$badge_2_excess_points = 0;
+
 		// Get the next badge object.
 		$next_1_badge = self::get_instance_from_id( $this->get_next_badge_id() );
 		if ( $next_1_badge ) {
@@ -306,9 +308,21 @@ final class Monthly extends Badge {
 			}
 		}
 
-		$excess_points  = \max( 0, $next_1_badge_points - self::TARGET_POINTS );
-		$excess_points += \max( 0, $next_2_badge_points - 2 * self::TARGET_POINTS );
+		// If the $next_1_badge has more than 10 points, calculate the excess points.
+		if ( $next_1_badge_points > self::TARGET_POINTS ) {
+			$badge_1_excess_points = \max( 0, $next_1_badge_points - self::TARGET_POINTS );
+		}
 
-		return (int) $excess_points;
+		// If the $next_2_badge has more than 10 points, calculate the excess points.
+		if ( $next_2_badge_points > self::TARGET_POINTS ) {
+			$badge_2_excess_points = \max( 0, $next_2_badge_points - self::TARGET_POINTS );
+
+			// Does the $next_1_badge need more points to reach 10?
+			if ( $next_1_badge_points < self::TARGET_POINTS ) {
+				$badge_2_excess_points = \max( 0, ( $next_1_badge_points + $badge_2_excess_points ) - self::TARGET_POINTS );
+			}
+		}
+
+		return (int) $badge_1_excess_points + (int) $badge_2_excess_points;
 	}
 }

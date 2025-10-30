@@ -349,6 +349,8 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 
 		$task_details = $this->get_task_details( $task_data );
 
+		$taxonomy = \get_taxonomy( $term->taxonomy );
+
 		$actions[] = [
 			'priority' => 10,
 			'html'     => \sprintf(
@@ -360,10 +362,11 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 				\htmlspecialchars(
 					\wp_json_encode(
 						[
-							'post_title'       => $task_details['post_title'],
-							'target_term_id'   => $task_data['target_term_id'],
-							'target_taxonomy'  => $task_data['target_taxonomy'],
-							'target_term_name' => $task_data['target_term_name'],
+							'post_title'           => $task_details['post_title'],
+							'target_term_id'       => $task_data['target_term_id'],
+							'target_taxonomy'      => $task_data['target_taxonomy'],
+							'target_taxonomy_name' => $taxonomy ? $taxonomy->label : '',
+							'target_term_name'     => $task_data['target_term_name'],
 						]
 					),
 					ENT_QUOTES,
@@ -401,14 +404,23 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 				<span id="prpl-delete-term-name"></span>
 			</p>
 			<p style="margin: 5px 0 0 0; font-size: 12px; color: #646970;">
-				<span id="prpl-delete-term-taxonomy"></span>
+				<?php
+				printf(
+					/* translators: %1$s: The taxonomy name, %2$s: The term slug */
+					\esc_html__( 'You are deleting the term which belongs to the "%1$s" (slug "%2$s").', 'progress-planner' ),
+					'<span id="prpl-delete-term-taxonomy-name"></span>',
+					'<span id="prpl-delete-term-taxonomy"></span>'
+				);
+				?>
 			</p>
 		</div>
 		<input type="hidden" name="term_id" id="prpl-delete-term-id" value="">
 		<input type="hidden" name="taxonomy" id="prpl-delete-taxonomy" value="">
-		<button type="submit" class="prpl-button prpl-button-primary" id="prpl-delete-term-button">
-			<?php \esc_html_e( 'Delete term', 'progress-planner' ); ?>
-		</button>
+		<div class="prpl-steps-nav-wrapper">
+			<button type="submit" class="prpl-button prpl-button-primary" id="prpl-delete-term-button">
+				<?php \esc_html_e( 'Delete term', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 
