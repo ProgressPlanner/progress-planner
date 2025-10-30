@@ -17,28 +17,28 @@ abstract class Badge {
 	 *
 	 * @var string
 	 */
-	protected $id;
+	protected string $id;
 
 	/**
 	 * The icon URL.
 	 *
 	 * @var string
 	 */
-	protected $icon_url;
+	protected string $icon_url;
 
 	/**
 	 * The background color for the badge.
 	 *
 	 * @var string
 	 */
-	protected $background = 'none';
+	protected string $background = 'none';
 
 	/**
 	 * Get the badge ID.
 	 *
 	 * @return string
 	 */
-	public function get_id() {
+	public function get_id(): string {
 		return $this->id;
 	}
 
@@ -47,14 +47,14 @@ abstract class Badge {
 	 *
 	 * @return string
 	 */
-	abstract public function get_name();
+	abstract public function get_name(): string;
 
 	/**
 	 * Get the badge description.
 	 *
 	 * @return string
 	 */
-	abstract public function get_description();
+	abstract public function get_description(): string;
 
 	/**
 	 * Progress callback.
@@ -63,14 +63,14 @@ abstract class Badge {
 	 *
 	 * @return array
 	 */
-	abstract public function progress_callback( $args = [] );
+	abstract public function progress_callback( array $args = [] ): array;
 
 	/**
 	 * Get the saved progress.
 	 *
 	 * @return array
 	 */
-	protected function get_saved() {
+	protected function get_saved(): array {
 		return \progress_planner()->get_settings()->get( [ 'badges', $this->id ], [] );
 	}
 
@@ -79,7 +79,7 @@ abstract class Badge {
 	 *
 	 * @return array
 	 */
-	public function get_progress() {
+	public function get_progress(): array {
 		return $this->progress_callback();
 	}
 
@@ -90,7 +90,7 @@ abstract class Badge {
 	 *
 	 * @return void
 	 */
-	protected function save_progress( $progress ) {
+	protected function save_progress( array $progress ): void {
 		$progress['date'] = ( new \DateTime() )->format( 'Y-m-d H:i:s' );
 		\progress_planner()->get_settings()->set( [ 'badges', $this->id ], $progress );
 	}
@@ -100,7 +100,7 @@ abstract class Badge {
 	 *
 	 * @return void
 	 */
-	public function clear_progress() {
+	public function clear_progress(): void {
 		\progress_planner()->get_settings()->set( [ 'badges', $this->id ], [] );
 	}
 
@@ -109,7 +109,7 @@ abstract class Badge {
 	 *
 	 * @return string
 	 */
-	public function get_background() {
+	public function get_background(): string {
 		return $this->background;
 	}
 }

@@ -18,7 +18,7 @@ trait Dismissable_Task {
 	 *
 	 * @var string
 	 */
-	protected $dismissed_tasks_option = 'dismissed_tasks';
+	protected string $dismissed_tasks_option = 'dismissed_tasks';
 
 	/**
 	 * The expiration period in seconds.
@@ -26,14 +26,14 @@ trait Dismissable_Task {
 	 *
 	 * @var int
 	 */
-	protected $dismissal_expiration_period = 6 * MONTH_IN_SECONDS;
+	protected int $dismissal_expiration_period = 6 * MONTH_IN_SECONDS;
 
 	/**
 	 * Initialize the dismissable task functionality.
 	 *
 	 * @return void
 	 */
-	protected function init_dismissable_task() {
+	protected function init_dismissable_task(): void {
 		\add_action( 'progress_planner_ajax_task_complete', [ $this, 'handle_task_dismissal' ], 10, 1 );
 		\add_action( 'admin_init', [ $this, 'cleanup_old_dismissals' ] );
 		\add_filter( 'progress_planner_task_dismissal_data', [ $this, 'add_post_id_to_dismissal_data' ], 10, 3 );
@@ -47,7 +47,7 @@ trait Dismissable_Task {
 	 *
 	 * @return void
 	 */
-	public function handle_task_dismissal( $post_id ) {
+	public function handle_task_dismissal( string $post_id ): void {
 		// If no task ID is provided, return.
 		if ( ! $post_id ) {
 			return;

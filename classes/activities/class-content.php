@@ -17,7 +17,7 @@ class Content extends Activity {
 	 *
 	 * @var string
 	 */
-	public $category = 'content';
+	public string $category = 'content';
 
 	/**
 	 * Points configuration for content activities.

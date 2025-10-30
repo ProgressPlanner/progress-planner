@@ -19,63 +19,63 @@ class Goal {
 	 *
 	 * @var string
 	 */
-	protected $id;
+	protected string $id;
 
 	/**
 	 * The goal title.
 	 *
 	 * @var string
 	 */
-	protected $title;
+	protected string $title;
 
 	/**
 	 * The goal description.
 	 *
 	 * @var string
 	 */
-	protected $description;
+	protected string $description;
 
 	/**
 	 * The goal type.
 	 *
 	 * @var string
 	 */
-	protected $type;
+	protected string $type;
 
 	/**
 	 * The goal start date.
 	 *
 	 * @var string
 	 */
-	protected $start_date;
+	protected string $start_date;
 
 	/**
 	 * The goal end date.
 	 *
 	 * @var string
 	 */
-	protected $end_date;
+	protected string $end_date;
 
 	/**
 	 * The goal status.
 	 *
 	 * @var string
 	 */
-	protected $status;
+	protected string $status;
 
 	/**
 	 * The goal priority.
 	 *
 	 * @var string
 	 */
-	protected $priority;
+	protected string $priority;
 
 	/**
 	 * The goal progress.
 	 *
 	 * @var string
 	 */
-	protected $progress;
+	protected string $progress;
 
 	/**
 	 * The goal evaluation function.
@@ -89,7 +89,7 @@ class Goal {
 	 *
 	 * @param array $args The goal arguments.
 	 */
-	public function __construct( $args = [] ) {
+	public function __construct( array $args = [] ) {
 		$args              = \wp_parse_args(
 			$args,
 			[

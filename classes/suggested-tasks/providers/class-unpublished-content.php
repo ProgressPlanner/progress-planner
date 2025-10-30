@@ -236,7 +236,7 @@ class Unpublished_Content extends Tasks {
 	 * @param array $post_ids The post IDs.
 	 * @return array
 	 */
-	public function exclude_completed_posts( $post_ids ) {
+	public function exclude_completed_posts( array $post_ids ): array {
 		return \array_merge( $post_ids, $this->get_snoozed_post_ids(), $this->get_dismissed_post_ids() );
 	}
 

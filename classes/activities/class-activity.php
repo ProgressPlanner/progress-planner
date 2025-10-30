@@ -24,21 +24,21 @@ class Activity {
 	 *
 	 * @var string
 	 */
-	public $category;
+	public string $category;
 
 	/**
 	 * Type of the activity.
 	 *
 	 * @var string
 	 */
-	public $type;
+	public string $type;
 
 	/**
 	 * The date of the activity.
 	 *
 	 * @var \DateTime|null
 	 */
-	public $date;
+	public ?\DateTime $date;
 
 	/**
 	 * The data ID.
@@ -47,35 +47,35 @@ class Activity {
 	 *
 	 * @var string
 	 */
-	public $data_id;
+	public string $data_id;
 
 	/**
 	 * ID of the activity.
 	 *
 	 * @var int
 	 */
-	public $id;
+	public int $id;
 
 	/**
 	 * User ID.
 	 *
 	 * @var int
 	 */
-	public $user_id;
+	public int $user_id;
 
 	/**
 	 * Activity points by date.
 	 *
 	 * @var array
 	 */
-	public $points = [];
+	public array $points = [];
 
 	/**
 	 * Save the activity.
 	 *
 	 * @return void
 	 */
-	public function save() {
+	public function save(): void {
 		$existing = \progress_planner()->get_activities__query()->query_activities_get_raw(
 			[
 				'category' => $this->category,
@@ -96,7 +96,7 @@ class Activity {
 	 *
 	 * @return void
 	 */
-	public function delete() {
+	public function delete(): void {
 		\progress_planner()->get_activities__query()->delete_activity( $this );
 		\do_action( 'progress_planner_activity_deleted', $this );
 	}
