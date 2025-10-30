@@ -30,6 +30,7 @@
 }
 
 @keyframes prpl-spin {
+
 	to {
 		transform: rotate(360deg);
 	}
@@ -101,6 +102,7 @@
 
 /* Responsive */
 @media (max-width: 768px) {
+
 	.prpl-popover-ai-task {
 		max-width: 90vw;
 	}

@@ -93,21 +93,21 @@ class AI_Tasks {
 	 * @param int    $task_id  The task ID.
 	 * @param string $response The AI response.
 	 * @param int    $expiry   Optional. Cache expiry in seconds. Default 1 week.
-	 * @return bool True on success, false on failure.
+	 * @return void
 	 */
 	public function cache_response( $task_id, $response, $expiry = WEEK_IN_SECONDS ) {
 		$cache_key = 'prpl_ai_response_' . $task_id;
-		return \progress_planner()->get_utils__cache()->set( $cache_key, $response, $expiry );
+		\progress_planner()->get_utils__cache()->set( $cache_key, $response, $expiry );
 	}
 
 	/**
 	 * Clear the cached AI response for a task.
 	 *
 	 * @param int $task_id The task ID.
-	 * @return bool True on success, false on failure.
+	 * @return void
 	 */
 	public function clear_cached_response( $task_id ) {
 		$cache_key = 'prpl_ai_response_' . $task_id;
-		return \progress_planner()->get_utils__cache()->delete( $cache_key );
+		\progress_planner()->get_utils__cache()->delete( $cache_key );
 	}
 }
