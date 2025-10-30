@@ -56,7 +56,7 @@ class Content_Review extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_LOW;
+	protected $priority = 10;
 
 	/**
 	 * Whether the task is dismissable.

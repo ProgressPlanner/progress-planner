@@ -36,6 +36,12 @@ customElements.define(
 			const tooltipContent = document.createElement( 'div' );
 			tooltipContent.className = 'prpl-tooltip';
 			tooltipContent.setAttribute( 'data-tooltip-content', '' );
+			tooltipContent.setAttribute( 'role', 'tooltip' );
+			tooltipContent.setAttribute( 'aria-hidden', 'true' );
+			// Generate a unique ID for the tooltip.
+			const tooltipId =
+				'prpl-tooltip-' + Math.random().toString( 36 ).substr( 2, 9 );
+			tooltipContent.setAttribute( 'id', tooltipId );
 
 			// Move content inside the tooltip container
 			while ( contentSlot?.childNodes.length ) {
@@ -61,6 +67,8 @@ customElements.define(
 
 			// Add data attribute to the open button.
 			openButton.setAttribute( 'data-tooltip-action', 'open-tooltip' );
+			// Connect button to tooltip for screen readers.
+			openButton.setAttribute( 'aria-describedby', tooltipId );
 
 			openSlot?.remove(); // Remove slot element
 			openIconSlot?.remove(); // Remove slot element
@@ -108,16 +116,20 @@ customElements.define(
 
 			// Open the tooltip.
 			openTooltipButton?.addEventListener( 'click', () => {
-				thisObj
-					.querySelector( '[data-tooltip-content]' )
-					.setAttribute( 'data-tooltip-visible', 'true' );
+				const tooltip = thisObj.querySelector(
+					'[data-tooltip-content]'
+				);
+				tooltip.setAttribute( 'data-tooltip-visible', 'true' );
+				tooltip.removeAttribute( 'aria-hidden' );
 			} );
 
 			// Close the tooltip.
 			closeTooltipButton?.addEventListener( 'click', () => {
-				thisObj
-					.querySelector( '[data-tooltip-content]' )
-					.removeAttribute( 'data-tooltip-visible' );
+				const tooltip = thisObj.querySelector(
+					'[data-tooltip-content]'
+				);
+				tooltip.removeAttribute( 'data-tooltip-visible' );
+				tooltip.setAttribute( 'aria-hidden', 'true' );
 			} );
 		};
 	}

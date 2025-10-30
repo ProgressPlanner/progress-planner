@@ -25,6 +25,26 @@
 }
 
 /*------------------------------------*\
+	Accessibility: Skip link
+\*------------------------------------*/
+.prpl-skip-link {
+	position: absolute;
+	top: -40px;
+	left: 0;
+	background: var(--prpl-color-button-primary);
+	color: var(--prpl-color-button-primary-text);
+	padding: 8px 16px;
+	text-decoration: none;
+	border-radius: var(--prpl-border-radius);
+	z-index: 100000;
+}
+
+.prpl-skip-link:focus {
+	top: 10px;
+	left: 10px;
+}
+
+/*------------------------------------*\
 	Progress Planner dashboard page.
 \*------------------------------------*/
 /* stylelint-disable-next-line selector-class-pattern */

@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 /**
  * Add task for Yoast SEO: disable the media pages.
  */
-class Media_Pages extends Yoast_Provider {
+class Media_Pages extends Yoast_Interactive_Provider {
 
 	/**
 	 * The provider ID.
@@ -18,6 +18,14 @@ class Media_Pages extends Yoast_Provider {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'yoast-media-pages';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'yoast-media-pages';
+
 
 	/**
 	 * The external link URL.
@@ -74,6 +82,26 @@ class Media_Pages extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'WordPress creates individual pages for every image you upload. These attachment pages rarely provide value and can cause thin content issues for SEO. Disable them unless you\'re running a photography or art portfolio site where the attachment pages themselves are important.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		$this->print_submit_button( \__( 'Disable', 'progress-planner' ) );
+	}
+
+	/**
 	 * Add task actions specific to this task.
 	 *
 	 * @param array $data    The task data.
@@ -84,7 +112,7 @@ class Media_Pages extends Yoast_Provider {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/media-pages' ) . '" target="_self">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
+			'html'     => '<a class="prpl-tooltip-action-text" href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
 		];
 
 		return $actions;

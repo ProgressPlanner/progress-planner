@@ -45,7 +45,7 @@ class Select_Timezone extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_NORMAL - 4;
+	protected $priority = 6;
 
 	/**
 	 * Initialize the task.
@@ -143,10 +143,8 @@ class Select_Timezone extends Tasks_Interactive {
 				<?php echo \wp_timezone_choice( $tzstring, \get_user_locale() ); ?>
 			</select>
 		</label>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Set site timezone', 'progress-planner' ); ?>
-		</button>
 		<?php
+		$this->print_submit_button( \__( 'Set site timezone', 'progress-planner' ), 'prpl-steps-nav-wrapper-align-left' );
 	}
 
 	/**

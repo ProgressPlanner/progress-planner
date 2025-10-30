@@ -45,7 +45,7 @@ class Blog_Description extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = self::PRIORITY_NORMAL - 5;
+	protected $priority = 2;
 
 	/**
 	 * Get the task title.
@@ -120,13 +120,14 @@ class Blog_Description extends Tasks_Interactive {
 				type="text"
 				id="blogdescription"
 				value="<?php echo \esc_attr( \get_bloginfo( 'description' ) ); ?>"
-				class="regular-text"
 				placeholder="<?php \esc_html_e( 'A catchy phrase to describe your website', 'progress-planner' ); ?>"
 			>
 		</label>
-		<button type="submit" class="prpl-button prpl-button-primary" disabled>
-			<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
-		</button>
+		<div class="prpl-steps-nav-wrapper">
+			<button type="submit" class="prpl-button prpl-button-primary" disabled>
+				<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 
