@@ -11,9 +11,9 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Posts;
 use WP_UnitTestCase;
 
 /**
- * Class Terms_Without_Posts_Data_Collector_Test.
+ * Class Suggested_Tasks_Data_Collector_Terms_Without_Posts_Test.
  */
-class Terms_Without_Posts_Data_Collector_Test extends \WP_UnitTestCase {
+class Suggested_Tasks_Data_Collector_Terms_Without_Posts_Test extends \WP_UnitTestCase {
 
 	/**
 	 * The data collector instance.

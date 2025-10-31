@@ -1,6 +1,6 @@
 <?php
 /**
- * Class Core_Siteicon_Test
+ * Class Suggested_Tasks_Providers_Core_Siteicon_Test
  *
  * @package Progress_Planner
  */
@@ -10,7 +10,7 @@ namespace Progress_Planner\Tests;
 /**
  * Core siteicon test case.
  */
-class Core_Siteicon_Test extends \WP_UnitTestCase {
+class Suggested_Tasks_Providers_Core_Siteicon_Test extends \WP_UnitTestCase {
 
 	use Task_Provider_Test_Trait;
 

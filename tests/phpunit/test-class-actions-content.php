@@ -11,9 +11,9 @@ use Progress_Planner\Actions\Content;
 use WP_UnitTestCase;
 
 /**
- * Class Content_Actions_Test
+ * Class Actions_Content_Test
  */
-class Content_Actions_Test extends \WP_UnitTestCase {
+class Actions_Content_Test extends \WP_UnitTestCase {
 
 	/**
 	 * The Content instance.

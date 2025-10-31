@@ -11,12 +11,12 @@ use WP_UnitTestCase;
 use Progress_Planner\Utils\Cache;
 
 /**
- * Test_Cache test case.
+ * Utils_Cache test case.
  *
  * Tests the Cache utility class that wraps WordPress transients
  * with a prefixed key system for organized cache management.
  */
-class Test_Cache extends WP_UnitTestCase {
+class Utils_Cache_Test extends WP_UnitTestCase {
 
 	/**
 	 * Cache instance.

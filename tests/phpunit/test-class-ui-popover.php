@@ -11,12 +11,12 @@ use WP_UnitTestCase;
 use Progress_Planner\UI\Popover;
 
 /**
- * Test_Popover test case.
+ * UI_Popover test case.
  *
  * Tests the Popover UI class that manages popover
  * instances and rendering.
  */
-class Test_Popover extends WP_UnitTestCase {
+class UI_Popover_Test extends WP_UnitTestCase {
 
 	/**
 	 * Popover instance.

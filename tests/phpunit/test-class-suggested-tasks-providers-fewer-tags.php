@@ -12,9 +12,9 @@ use WP_UnitTestCase;
 use WP_Filesystem_Base;
 
 /**
- * Class Fewer_Tags_Provider_Test.
+ * Class Suggested_Tasks_Providers_Fewer_Tags_Test.
  */
-class Fewer_Tags_Provider_Test extends \WP_UnitTestCase {
+class Suggested_Tasks_Providers_Fewer_Tags_Test extends \WP_UnitTestCase {
 
 	/**
 	 * The task provider instance.

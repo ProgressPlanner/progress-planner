@@ -11,12 +11,12 @@ use WP_UnitTestCase;
 use Progress_Planner\Utils\Onboard;
 
 /**
- * Test_Onboard test case.
+ * Utils_Onboard test case.
  *
  * Tests the Onboard utility class that handles plugin
  * onboarding and activation workflows.
  */
-class Test_Onboard extends WP_UnitTestCase {
+class Utils_Onboard_Test extends WP_UnitTestCase {
 
 	/**
 	 * Onboard instance.

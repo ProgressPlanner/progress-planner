@@ -10,7 +10,7 @@ namespace Progress_Planner\Tests;
 /**
  * Settings saved test case.
  */
-class Search_Engine_Visibility_Test extends \WP_UnitTestCase {
+class Suggested_Tasks_Providers_Search_Engine_Visibility_Test extends \WP_UnitTestCase {
 
 	use Task_Provider_Test_Trait {
 		setUpBeforeClass as public parentSetUpBeforeClass;

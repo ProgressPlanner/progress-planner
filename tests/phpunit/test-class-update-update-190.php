@@ -8,9 +8,9 @@
 namespace Progress_Planner\Tests;
 
 /**
- * Test upgrade migrations for version 1.9.0.
+ * Update\Update_190 test case.
  */
-class Upgrade_Migrations_190_Test extends \WP_UnitTestCase {
+class Update_Update_190_Test extends \WP_UnitTestCase {
 
 	/**
 	 * Test migrating task priorities to the new priority system.

@@ -13,12 +13,12 @@ use Progress_Planner\UI\Chart;
 // phpcs:disable Generic.CodeAnalysis.UnusedFunctionParameter -- Callback signatures must match expected format.
 
 /**
- * Test_Chart test case.
+ * UI_Chart test case.
  *
  * Tests the Chart UI class that generates chart data
  * with support for normalized scoring and decay algorithms.
  */
-class Test_Chart extends WP_UnitTestCase {
+class UI_Chart_Test extends WP_UnitTestCase {
 
 	/**
 	 * Chart instance.

@@ -1,6 +1,6 @@
 <?php
 /**
- * Class Monthly_Badge_Test
+ * Class Badges_Monthly_Test
  *
  * @package Progress_Planner\Tests
  */
@@ -11,9 +11,9 @@ use Progress_Planner\Activities\Activity;
 use Progress_Planner\Badges\Monthly;
 
 /**
- * Monthly badge test case.
+ * Badges\Monthly test case.
  */
-class Monthly_Badge_Test extends \WP_UnitTestCase {
+class Badges_Monthly_Test extends \WP_UnitTestCase {
 
 	/**
 	 * Current month.

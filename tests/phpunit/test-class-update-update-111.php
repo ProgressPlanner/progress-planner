@@ -8,9 +8,9 @@
 namespace Progress_Planner\Tests;
 
 /**
- * Test upgrade migrations.
+ * Update\Update_111 test case.
  */
-class Upgrade_Migrations_111_Test extends \WP_UnitTestCase {
+class Update_Update_111_Test extends \WP_UnitTestCase {
 
 	/**
 	 * Test upgrade from 1.0.0 to 1.1.0.

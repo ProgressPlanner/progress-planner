@@ -1,6 +1,6 @@
 <?php
 /**
- * Class Date_Test
+ * Class Utils_Date_Test
  *
  * @package Progress_Planner\Tests
  */
@@ -8,9 +8,9 @@
 namespace Progress_Planner\Tests;
 
 /**
- * Date test case.
+ * Utils\Date test case.
  */
-class Date_Test extends \WP_UnitTestCase {
+class Utils_Date_Test extends \WP_UnitTestCase {
 
 	/**
 	 * Test get_range.

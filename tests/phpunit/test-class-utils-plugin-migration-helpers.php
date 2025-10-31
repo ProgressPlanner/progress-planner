@@ -11,12 +11,12 @@ use WP_UnitTestCase;
 use Progress_Planner\Utils\Plugin_Migration_Helpers;
 
 /**
- * Test_Plugin_Migration_Helpers test case.
+ * Utils_Plugin_Migration_Helpers test case.
  *
  * Tests the Plugin_Migration_Helpers utility class that handles
  * parsing legacy task ID formats for backward compatibility.
  */
-class Test_Plugin_Migration_Helpers extends WP_UnitTestCase {
+class Utils_Plugin_Migration_Helpers_Test extends WP_UnitTestCase {
 
 	/**
 	 * Test parsing simple one-time task ID format.

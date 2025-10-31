@@ -11,12 +11,12 @@ use WP_UnitTestCase;
 use Progress_Planner\Utils\Deprecations;
 
 /**
- * Test_Deprecations test case.
+ * Utils_Deprecations test case.
  *
  * Tests the Deprecations utility class that maintains mappings
  * of deprecated classes and methods to their new locations.
  */
-class Test_Deprecations extends WP_UnitTestCase {
+class Utils_Deprecations_Test extends WP_UnitTestCase {
 
 	/**
 	 * Test CLASSES constant exists and is an array.

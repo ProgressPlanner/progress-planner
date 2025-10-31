@@ -11,12 +11,12 @@ use WP_UnitTestCase;
 use Progress_Planner\UI\Branding;
 
 /**
- * Test_Branding test case.
+ * UI_Branding test case.
  *
  * Tests the Branding UI class that handles custom branding
  * based on hosting provider and configuration.
  */
-class Test_Branding extends WP_UnitTestCase {
+class UI_Branding_Test extends WP_UnitTestCase {
 
 	/**
 	 * Branding instance.

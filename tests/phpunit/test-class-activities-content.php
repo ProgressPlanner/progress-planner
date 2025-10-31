@@ -1,6 +1,6 @@
 <?php
 /**
- * Class Content_Activity_Test
+ * Class Activities_Content_Test
  *
  * @package Progress_Planner\Tests
  */
@@ -11,9 +11,9 @@ use Progress_Planner\Activities\Content;
 use WP_UnitTestCase;
 
 /**
- * Content activity test case.
+ * Activities\Content test case.
  */
-class Content_Activity_Test extends \WP_UnitTestCase {
+class Activities_Content_Test extends \WP_UnitTestCase {
 
 	/**
 	 * The content activity instance for testing.

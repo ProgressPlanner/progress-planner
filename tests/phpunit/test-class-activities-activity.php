@@ -1,6 +1,6 @@
 <?php
 /**
- * Class Date_Test
+ * Class Activities_Activity_Test
  *
  * @package Progress_Planner\Tests
  */
@@ -10,9 +10,9 @@ namespace Progress_Planner\Tests;
 use Progress_Planner\Activities\Activity;
 
 /**
- * Date test case.
+ * Activities\Activity test case.
  */
-class Activity_Test extends \WP_UnitTestCase {
+class Activities_Activity_Test extends \WP_UnitTestCase {
 
 	/**
 	 * Activity object.

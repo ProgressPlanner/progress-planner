@@ -1,6 +1,6 @@
 <?php
 /**
- * Class Content_Badges_Test
+ * Class Badges_Content_Test
  *
  * @package Progress_Planner\Tests
  */
@@ -8,9 +8,9 @@
 namespace Progress_Planner\Tests;
 
 /**
- * Content badges test case.
+ * Badges content test case.
  */
-class Content_Badges_Test extends \WP_UnitTestCase {
+class Badges_Content_Test extends \WP_UnitTestCase {
 
 	/**
 	 * Current month.

@@ -16,12 +16,12 @@ require_once __DIR__ . '/class-testable-goal-recurring.php';
 require_once __DIR__ . '/class-mock-goal-object.php';
 
 /**
- * Test_Goal_Recurring_Streaks test case.
+ * Goals_Goal_Recurring test case.
  *
  * Tests the streak calculation algorithm with allowed breaks feature
  * that provides flexibility when users miss occasional goals.
  */
-class Test_Goal_Recurring_Streaks extends WP_UnitTestCase {
+class Goals_Goal_Recurring_Test extends WP_UnitTestCase {
 
 	/**
 	 * Setup the test case.

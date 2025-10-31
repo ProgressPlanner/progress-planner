@@ -11,12 +11,12 @@ use WP_UnitTestCase;
 use Progress_Planner\Utils\System_Status;
 
 /**
- * Test_System_Status test case.
+ * Utils_System_Status test case.
  *
  * Tests the System_Status utility class that aggregates
  * various system and plugin status information.
  */
-class Test_System_Status extends WP_UnitTestCase {
+class Utils_System_Status_Test extends WP_UnitTestCase {
 
 	/**
 	 * System_Status instance.

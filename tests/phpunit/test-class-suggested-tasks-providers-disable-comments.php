@@ -1,6 +1,6 @@
 <?php
 /**
- * Class Settings_Saved_Test
+ * Class Suggested_Tasks_Providers_Disable_Comments_Test
  *
  * @package Progress_Planner
  */
@@ -10,7 +10,7 @@ namespace Progress_Planner\Tests;
 /**
  * Settings saved test case.
  */
-class Disable_Comments_Test extends \WP_UnitTestCase {
+class Suggested_Tasks_Providers_Disable_Comments_Test extends \WP_UnitTestCase {
 
 	use Task_Provider_Test_Trait;
 
