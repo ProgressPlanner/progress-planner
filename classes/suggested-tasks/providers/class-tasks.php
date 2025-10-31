@@ -283,7 +283,7 @@ abstract class Tasks implements Tasks_Interface {
 	 *     @type int    $target_term_id  The ID of the term this task targets.
 	 *     @type string $target_taxonomy The taxonomy slug for term-based tasks.
 	 * }
-	 * @return string The generated task ID (e.g., "provider-id-123-2025W42").
+	 * @return string The generated task ID (e.g., "provider-id-123-202542").
 	 */
 	public function get_task_id( $task_data = [] ) {
 		$parts = [ $this->get_provider_id() ];

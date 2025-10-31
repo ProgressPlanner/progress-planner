@@ -170,7 +170,6 @@ class Badges {
 	 * - Later completion dates take precedence (>= comparison ensures newer badges win)
 	 *
 	 * This is used to:
-	 * - Display the most recent achievement on the dashboard
 	 * - Trigger celebrations for newly completed badges
 	 * - Track user progress momentum
 	 *
