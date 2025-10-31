@@ -389,7 +389,7 @@ class Update_Term_Description extends Tasks_Interactive {
 			</p>
 			<p style="margin: 0 0 10px 0; font-size: 12px; color: #646970;">
 				<?php
-				printf(
+				\printf(
 					/* translators: %1$s: The taxonomy name, %2$s: The term slug */
 					\esc_html__( 'You are updating the term which belongs to the "%1$s" (slug "%2$s").', 'progress-planner' ),
 					'<span id="prpl-update-term-taxonomy-name"></span>',
