@@ -228,20 +228,26 @@ class Page {
 	 * @return void
 	 */
 	public function maybe_enqueue_focus_el_script( $hook ) {
+		// Get all registered task providers from the task manager.
 		$tasks_providers  = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers();
 		$tasks_details    = [];
 		$total_points     = 0;
 		$completed_points = 0;
+
+		// Filter providers to only those relevant to the current admin page.
 		foreach ( $tasks_providers as $provider ) {
 			$link_setting = $provider->get_link_setting();
+
+			// Skip tasks that aren't configured for this admin page.
 			if ( ! isset( $link_setting['hook'] ) ||
 				$hook !== $link_setting['hook']
 			) {
 				continue;
 			}
 
+			// Build task details for JavaScript.
 			$details = [
-				'link_setting' => $link_setting,
+				'link_setting' => $link_setting, // Contains selector, hook, and highlight config.
 				'task_id'      => $provider->get_task_id(),
 				'points'       => $provider->get_points(),
 				'is_complete'  => $provider->is_task_completed(),
@@ -254,11 +260,12 @@ class Page {
 			}
 		}
 
+		// No tasks for this page - don't enqueue the script.
 		if ( empty( $tasks_details ) ) {
 			return;
 		}
 
-		// Register the scripts.
+		// Enqueue the focus element script with task data.
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
 			'focus-element',
 			[
