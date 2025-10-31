@@ -132,7 +132,7 @@ class Suggested_Tasks_Task_Test extends WP_UnitTestCase {
 	 */
 	public function test_get_provider_id() {
 		// Test with provider object.
-		$provider = new \stdClass();
+		$provider       = new \stdClass();
 		$provider->slug = 'test-provider';
 		$task           = new Task( [ 'provider' => $provider ] );
 
