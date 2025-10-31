@@ -84,8 +84,8 @@ class UI_Popover_Test extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_render_button_method_exists() {
-		$this->assertTrue( method_exists( $this->popover, 'render_button' ), 'render_button method should exist' );
-		$this->assertTrue( is_callable( [ $this->popover, 'render_button' ] ), 'render_button should be callable' );
+		$this->assertTrue( \method_exists( $this->popover, 'render_button' ), 'render_button method should exist' );
+		$this->assertTrue( \is_callable( [ $this->popover, 'render_button' ] ), 'render_button should be callable' );
 	}
 
 	/**
@@ -94,8 +94,8 @@ class UI_Popover_Test extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_render_method_exists() {
-		$this->assertTrue( method_exists( $this->popover, 'render' ), 'render method should exist' );
-		$this->assertTrue( is_callable( [ $this->popover, 'render' ] ), 'render should be callable' );
+		$this->assertTrue( \method_exists( $this->popover, 'render' ), 'render method should exist' );
+		$this->assertTrue( \is_callable( [ $this->popover, 'render' ] ), 'render should be callable' );
 	}
 
 	/**

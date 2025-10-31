@@ -30,7 +30,7 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 
 		// Set up admin user.
 		$admin_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		wp_set_current_user( $admin_id );
+		\wp_set_current_user( $admin_id );
 	}
 
 	/**
@@ -167,7 +167,7 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 	 */
 	public function test_generate_task_completion_token() {
 		$task_id = 'test-task';
-		$user_id = get_current_user_id();
+		$user_id = \get_current_user_id();
 
 		$token = $this->suggested_tasks->generate_task_completion_token( $task_id, $user_id );
 
@@ -175,7 +175,7 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 		$this->assertNotEmpty( $token );
 
 		// Verify token is stored.
-		$stored = get_transient( 'prpl_complete_' . $task_id . '_' . $user_id );
+		$stored = \get_transient( 'prpl_complete_' . $task_id . '_' . $user_id );
 		$this->assertEquals( $token, $stored );
 	}
 
@@ -235,7 +235,7 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 	public function test_register_post_type() {
 		$this->suggested_tasks->register_post_type();
 
-		$this->assertTrue( post_type_exists( 'prpl_recommendations' ) );
+		$this->assertTrue( \post_type_exists( 'prpl_recommendations' ) );
 	}
 
 	/**
@@ -244,7 +244,7 @@ class Suggested_Tasks_Test extends \WP_UnitTestCase {
 	public function test_register_taxonomy() {
 		$this->suggested_tasks->register_taxonomy();
 
-		$this->assertTrue( taxonomy_exists( 'prpl_recommendations_provider' ) );
+		$this->assertTrue( \taxonomy_exists( 'prpl_recommendations_provider' ) );
 	}
 
 	/**

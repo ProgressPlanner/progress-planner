@@ -69,7 +69,7 @@ class Suggested_Tasks_Tasks_Manager_Test extends WP_UnitTestCase {
 			$this->markTestSkipped( 'No providers available' );
 		}
 
-		$first_provider = reset( $providers );
+		$first_provider = \reset( $providers );
 		$provider_id    = $first_provider->get_provider_id();
 
 		$provider = $this->manager->get_task_provider( $provider_id );
@@ -97,12 +97,12 @@ class Suggested_Tasks_Tasks_Manager_Test extends WP_UnitTestCase {
 			$this->markTestSkipped( 'No providers available' );
 		}
 
-		$first_provider = reset( $providers );
+		$first_provider = \reset( $providers );
 		$provider_id    = $first_provider->get_provider_id();
 
 		// Transform provider ID to method name format.
 		// e.g., 'content-create' becomes 'get_content_create'.
-		$method_name = 'get_' . str_replace( '-', '_', $provider_id );
+		$method_name = 'get_' . \str_replace( '-', '_', $provider_id );
 
 		$provider = $this->manager->$method_name();
 
@@ -169,28 +169,28 @@ class Suggested_Tasks_Tasks_Manager_Test extends WP_UnitTestCase {
 		// Check if plugins_loaded action is registered.
 		$this->assertEquals(
 			10,
-			has_action( 'plugins_loaded', [ $this->manager, 'add_plugin_integration' ] ),
+			\has_action( 'plugins_loaded', [ $this->manager, 'add_plugin_integration' ] ),
 			'plugins_loaded hook should be registered'
 		);
 
 		// Check if init action is registered.
 		$this->assertEquals(
 			99,
-			has_action( 'init', [ $this->manager, 'init' ] ),
+			\has_action( 'init', [ $this->manager, 'init' ] ),
 			'init hook should be registered with priority 99'
 		);
 
 		// Check if admin_init action is registered.
 		$this->assertEquals(
 			10,
-			has_action( 'admin_init', [ $this->manager, 'cleanup_pending_tasks' ] ),
+			\has_action( 'admin_init', [ $this->manager, 'cleanup_pending_tasks' ] ),
 			'admin_init hook should be registered'
 		);
 
 		// Check if transition_post_status action is registered.
 		$this->assertEquals(
 			10,
-			has_action( 'transition_post_status', [ $this->manager, 'handle_task_unsnooze' ] ),
+			\has_action( 'transition_post_status', [ $this->manager, 'handle_task_unsnooze' ] ),
 			'transition_post_status hook should be registered'
 		);
 	}

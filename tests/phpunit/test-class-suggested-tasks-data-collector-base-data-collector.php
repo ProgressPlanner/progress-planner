@@ -84,7 +84,7 @@ class Suggested_Tasks_Data_Collector_Base_Data_Collector_Test extends WP_UnitTes
 	 * Test init method exists and is callable.
 	 */
 	public function test_init_method_exists() {
-		$this->assertTrue( method_exists( $this->collector, 'init' ), 'init method should exist' );
+		$this->assertTrue( \method_exists( $this->collector, 'init' ), 'init method should exist' );
 		$this->assertNull( $this->collector->init(), 'init should return null by default' );
 	}
 
@@ -184,10 +184,10 @@ class Suggested_Tasks_Data_Collector_Base_Data_Collector_Test extends WP_UnitTes
 	 */
 	public function test_get_filtered_public_taxonomies_filter() {
 		// Register a test taxonomy.
-		register_taxonomy( 'test_taxonomy', 'post', [ 'public' => true ] );
+		\register_taxonomy( 'test_taxonomy', 'post', [ 'public' => true ] );
 
 		// Add filter to exclude our test taxonomy.
-		add_filter(
+		\add_filter(
 			'progress_planner_exclude_public_taxonomies',
 			function ( $excluded ) {
 				$excluded[] = 'test_taxonomy';
@@ -205,7 +205,7 @@ class Suggested_Tasks_Data_Collector_Base_Data_Collector_Test extends WP_UnitTes
 		$this->assertArrayNotHasKey( 'test_taxonomy', $result, 'Custom excluded taxonomy should not be present' );
 
 		// Clean up.
-		unregister_taxonomy( 'test_taxonomy' );
+		\unregister_taxonomy( 'test_taxonomy' );
 	}
 
 	/**

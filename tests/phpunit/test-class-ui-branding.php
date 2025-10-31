@@ -41,7 +41,7 @@ class UI_Branding_Test extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_branding_ids_constant() {
-		$this->assertTrue( defined( 'Progress_Planner\UI\Branding::BRANDING_IDS' ), 'BRANDING_IDS constant should exist' );
+		$this->assertTrue( \defined( 'Progress_Planner\UI\Branding::BRANDING_IDS' ), 'BRANDING_IDS constant should exist' );
 		$this->assertIsArray( Branding::BRANDING_IDS, 'BRANDING_IDS should be an array' );
 		$this->assertArrayHasKey( 'default', Branding::BRANDING_IDS, 'BRANDING_IDS should have default key' );
 		$this->assertEquals( 0, Branding::BRANDING_IDS['default'], 'Default branding ID should be 0' );
@@ -126,8 +126,8 @@ class UI_Branding_Test extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_get_branding_id_with_constant() {
-		if ( ! defined( 'PROGRESS_PLANNER_BRANDING_ID' ) ) {
-			define( 'PROGRESS_PLANNER_BRANDING_ID', 1234 );
+		if ( ! \defined( 'PROGRESS_PLANNER_BRANDING_ID' ) ) {
+			\define( 'PROGRESS_PLANNER_BRANDING_ID', 1234 );
 		}
 
 		$branding    = new Branding();
@@ -142,8 +142,8 @@ class UI_Branding_Test extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_filter_widgets_method_exists() {
-		$this->assertTrue( method_exists( $this->branding, 'filter_widgets' ), 'filter_widgets method should exist' );
-		$this->assertTrue( is_callable( [ $this->branding, 'filter_widgets' ] ), 'filter_widgets should be callable' );
+		$this->assertTrue( \method_exists( $this->branding, 'filter_widgets' ), 'filter_widgets method should exist' );
+		$this->assertTrue( \is_callable( [ $this->branding, 'filter_widgets' ] ), 'filter_widgets should be callable' );
 	}
 
 	/**

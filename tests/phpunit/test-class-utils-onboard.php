@@ -52,7 +52,7 @@ class Utils_Onboard_Test extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_remote_api_url_constant() {
-		$this->assertTrue( defined( 'Progress_Planner\Utils\Onboard::REMOTE_API_URL' ), 'REMOTE_API_URL constant should exist' );
+		$this->assertTrue( \defined( 'Progress_Planner\Utils\Onboard::REMOTE_API_URL' ), 'REMOTE_API_URL constant should exist' );
 		$this->assertIsString( Onboard::REMOTE_API_URL, 'REMOTE_API_URL should be a string' );
 		$this->assertStringStartsWith( '/wp-json/', Onboard::REMOTE_API_URL, 'REMOTE_API_URL should start with /wp-json/' );
 	}
@@ -115,9 +115,9 @@ class Utils_Onboard_Test extends WP_UnitTestCase {
 	 */
 	public function test_on_activate_plugin_handles_wp_cli() {
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound -- WP_CLI is a WordPress core constant.
-		if ( ! defined( 'WP_CLI' ) ) {
+		if ( ! \defined( 'WP_CLI' ) ) {
 			// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
-			define( 'WP_CLI', true );
+			\define( 'WP_CLI', true );
 		}
 
 		$onboard = new Onboard();

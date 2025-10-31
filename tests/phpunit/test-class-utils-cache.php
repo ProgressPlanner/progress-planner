@@ -133,7 +133,7 @@ class Utils_Cache_Test extends WP_UnitTestCase {
 		$this->assertEquals( $value, $this->cache->get( $key ), 'Value should be cached initially' );
 
 		// Wait for expiration.
-		sleep( 2 );
+		\sleep( 2 );
 
 		$this->assertFalse( $this->cache->get( $key ), 'Expired cache key should return false' );
 	}

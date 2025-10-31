@@ -79,21 +79,21 @@ class Suggested_Tasks_Data_Collector_Data_Collector_Manager_Test extends WP_Unit
 		// Check if plugins_loaded action is registered.
 		$this->assertEquals(
 			10,
-			has_action( 'plugins_loaded', [ $this->manager, 'add_plugin_integration' ] ),
+			\has_action( 'plugins_loaded', [ $this->manager, 'add_plugin_integration' ] ),
 			'plugins_loaded hook should be registered'
 		);
 
 		// Check if init action is registered.
 		$this->assertEquals(
 			99,
-			has_action( 'init', [ $this->manager, 'init' ] ),
+			\has_action( 'init', [ $this->manager, 'init' ] ),
 			'init hook should be registered with priority 99'
 		);
 
 		// Check if admin_init action is registered.
 		$this->assertEquals(
 			10,
-			has_action( 'admin_init', [ $this->manager, 'update_data_collectors_cache' ] ),
+			\has_action( 'admin_init', [ $this->manager, 'update_data_collectors_cache' ] ),
 			'admin_init hook should be registered'
 		);
 	}
@@ -105,7 +105,7 @@ class Suggested_Tasks_Data_Collector_Data_Collector_Manager_Test extends WP_Unit
 		$filter_called = false;
 
 		// Add filter to verify it's called.
-		add_filter(
+		\add_filter(
 			'progress_planner_data_collectors',
 			function ( $collectors ) use ( &$filter_called ) {
 				$filter_called = true;
@@ -131,7 +131,7 @@ class Suggested_Tasks_Data_Collector_Data_Collector_Manager_Test extends WP_Unit
 			->method( 'init' );
 
 		// Add mock collector via filter.
-		add_filter(
+		\add_filter(
 			'progress_planner_data_collectors',
 			function ( $collectors ) use ( $mock_collector ) {
 				$collectors[] = $mock_collector;
@@ -147,7 +147,7 @@ class Suggested_Tasks_Data_Collector_Data_Collector_Manager_Test extends WP_Unit
 	 */
 	public function test_add_plugin_integration_exists() {
 		$this->assertTrue(
-			method_exists( $this->manager, 'add_plugin_integration' ),
+			\method_exists( $this->manager, 'add_plugin_integration' ),
 			'add_plugin_integration method should exist'
 		);
 	}
@@ -168,9 +168,9 @@ class Suggested_Tasks_Data_Collector_Data_Collector_Manager_Test extends WP_Unit
 			->method( 'update_cache' );
 
 		// Add mock via filter.
-		add_filter(
+		\add_filter(
 			'progress_planner_data_collectors',
-			function ( $collectors ) use ( $mock_collector ) {
+			function ( $collectors ) use ( $mock_collector ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 				return [ $mock_collector ];
 			}
 		);
@@ -198,9 +198,9 @@ class Suggested_Tasks_Data_Collector_Data_Collector_Manager_Test extends WP_Unit
 			->method( 'update_cache' );
 
 		// Add mock via filter.
-		add_filter(
+		\add_filter(
 			'progress_planner_data_collectors',
-			function ( $collectors ) use ( $mock_collector ) {
+			function ( $collectors ) use ( $mock_collector ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.Found
 				return [ $mock_collector ];
 			}
 		);
@@ -239,13 +239,18 @@ class Suggested_Tasks_Data_Collector_Data_Collector_Manager_Test extends WP_Unit
 	public function test_filter_can_add_collectors() {
 		$custom_collector = new class() extends Base_Data_Collector {
 			protected const DATA_KEY = 'custom_test';
+			/**
+			 * Calculate the data. Dummy function.
+			 *
+			 * @return string
+			 */
 			protected function calculate_data() {
 				return 'custom';
 			}
 		};
 
 		// Add custom collector via filter.
-		add_filter(
+		\add_filter(
 			'progress_planner_data_collectors',
 			function ( $collectors ) use ( $custom_collector ) {
 				$collectors[] = $custom_collector;

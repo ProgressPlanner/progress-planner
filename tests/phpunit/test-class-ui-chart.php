@@ -147,7 +147,7 @@ class UI_Chart_Test extends WP_UnitTestCase {
 	public function test_get_chart_data_with_count_callback() {
 		$args = [
 			'items_callback' => fn( $start, $end ) => [ 1, 2, 3, 4, 5 ],
-			'count_callback' => fn( $items, $date = null ) => array_sum( $items ),
+			'count_callback' => fn( $items, $date = null ) => \array_sum( $items ),
 			'dates_params'   => [
 				'start_date' => new \DateTime( '2024-01-01' ),
 				'end_date'   => new \DateTime( '2024-01-03' ),
@@ -204,7 +204,7 @@ class UI_Chart_Test extends WP_UnitTestCase {
 	public function test_get_chart_data_normalized() {
 		$args = [
 			'items_callback' => fn( $start, $end ) => [ 1, 2, 3 ],
-			'count_callback' => fn( $items, $date = null ) => count( $items ),
+			'count_callback' => fn( $items, $date = null ) => \count( $items ),
 			'normalized'     => true,
 			'dates_params'   => [
 				'start_date' => new \DateTime( '2024-01-01' ),
@@ -224,8 +224,8 @@ class UI_Chart_Test extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_the_chart_method_exists() {
-		$this->assertTrue( method_exists( $this->chart, 'the_chart' ), 'the_chart method should exist' );
-		$this->assertTrue( is_callable( [ $this->chart, 'the_chart' ] ), 'the_chart should be callable' );
+		$this->assertTrue( \method_exists( $this->chart, 'the_chart' ), 'the_chart method should exist' );
+		$this->assertTrue( \is_callable( [ $this->chart, 'the_chart' ] ), 'the_chart should be callable' );
 	}
 
 	/**
@@ -246,7 +246,7 @@ class UI_Chart_Test extends WP_UnitTestCase {
 	public function test_get_chart_data_with_max() {
 		$args = [
 			'items_callback' => fn( $start, $end ) => [ 1, 2, 3 ],
-			'count_callback' => fn( $items, $date = null ) => array_sum( $items ),
+			'count_callback' => fn( $items, $date = null ) => \array_sum( $items ),
 			'max'            => 100,
 			'dates_params'   => [
 				'start_date' => new \DateTime( '2024-01-01' ),
@@ -268,7 +268,7 @@ class UI_Chart_Test extends WP_UnitTestCase {
 	public function test_get_chart_data_with_filter_results() {
 		$args = [
 			'items_callback' => fn( $start, $end ) => [ 1, 2, 3, 4, 5 ],
-			'filter_results' => fn( $activities ) => array_filter( $activities, fn( $item ) => $item > 2 ),
+			'filter_results' => fn( $activities ) => \array_filter( $activities, fn( $item ) => $item > 2 ),
 			'dates_params'   => [
 				'start_date' => new \DateTime( '2024-01-01' ),
 				'end_date'   => new \DateTime( '2024-01-03' ),

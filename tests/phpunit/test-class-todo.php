@@ -34,7 +34,7 @@ class Todo_Test extends WP_UnitTestCase {
 
 		// Set up admin user.
 		$admin_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		wp_set_current_user( $admin_id );
+		\wp_set_current_user( $admin_id );
 
 		// Clear cache.
 		\progress_planner()->get_utils__cache()->delete( 'todo_points_change_on_monday' );
@@ -57,13 +57,13 @@ class Todo_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			10,
-			has_action( 'init', [ $todo, 'maybe_change_first_item_points_on_monday' ] ),
+			\has_action( 'init', [ $todo, 'maybe_change_first_item_points_on_monday' ] ),
 			'init hook should be registered'
 		);
 
 		$this->assertEquals(
 			10,
-			has_action( 'rest_after_insert_prpl_recommendations', [ $todo, 'handle_creating_user_task' ] ),
+			\has_action( 'rest_after_insert_prpl_recommendations', [ $todo, 'handle_creating_user_task' ] ),
 			'rest_after_insert_prpl_recommendations hook should be registered'
 		);
 	}
@@ -81,7 +81,7 @@ class Todo_Test extends WP_UnitTestCase {
 		);
 
 		foreach ( $tasks as $task ) {
-			wp_delete_post( $task->ID, true );
+			\wp_delete_post( $task->ID, true );
 		}
 
 		// Should return early without error.
@@ -119,16 +119,16 @@ class Todo_Test extends WP_UnitTestCase {
 		$this->todo->maybe_change_first_item_points_on_monday();
 
 		// Verify first task is GOLDEN.
-		$task1 = get_post( $task1_id );
+		$task1 = \get_post( $task1_id );
 		$this->assertEquals( 'GOLDEN', $task1->post_excerpt, 'First task should be GOLDEN' );
 
 		// Verify second task is not GOLDEN.
-		$task2 = get_post( $task2_id );
+		$task2 = \get_post( $task2_id );
 		$this->assertEquals( '', $task2->post_excerpt, 'Second task should not be GOLDEN' );
 
 		// Clean up.
-		wp_delete_post( $task1_id, true );
-		wp_delete_post( $task2_id, true );
+		\wp_delete_post( $task1_id, true );
+		\wp_delete_post( $task2_id, true );
 	}
 
 	/**
@@ -148,12 +148,12 @@ class Todo_Test extends WP_UnitTestCase {
 		// Set cache to future time.
 		\progress_planner()->get_utils__cache()->set(
 			'todo_points_change_on_monday',
-			time() + HOUR_IN_SECONDS,
+			\time() + HOUR_IN_SECONDS,
 			WEEK_IN_SECONDS
 		);
 
 		// Clear post_excerpt to test that it doesn't get updated.
-		wp_update_post(
+		\wp_update_post(
 			[
 				'ID'           => $task_id,
 				'post_excerpt' => 'TEST',
@@ -164,11 +164,11 @@ class Todo_Test extends WP_UnitTestCase {
 		$this->todo->maybe_change_first_item_points_on_monday();
 
 		// Verify task wasn't modified (still has TEST excerpt).
-		$task = get_post( $task_id );
+		$task = \get_post( $task_id );
 		$this->assertEquals( 'TEST', $task->post_excerpt, 'Task should not be modified when cache is active' );
 
 		// Clean up.
-		wp_delete_post( $task_id, true );
+		\wp_delete_post( $task_id, true );
 	}
 
 	/**
@@ -194,10 +194,10 @@ class Todo_Test extends WP_UnitTestCase {
 		// Verify cache was set.
 		$cached = \progress_planner()->get_utils__cache()->get( 'todo_points_change_on_monday' );
 		$this->assertNotFalse( $cached, 'Cache should be set' );
-		$this->assertGreaterThan( time(), $cached, 'Cache should be set to future time' );
+		$this->assertGreaterThan( \time(), $cached, 'Cache should be set to future time' );
 
 		// Clean up.
-		wp_delete_post( $task_id, true );
+		\wp_delete_post( $task_id, true );
 	}
 
 	/**
@@ -213,9 +213,9 @@ class Todo_Test extends WP_UnitTestCase {
 		);
 
 		// Assign non-user provider.
-		wp_set_object_terms( $post_id, 'test-provider', 'prpl_recommendations_provider' );
+		\wp_set_object_terms( $post_id, 'test-provider', 'prpl_recommendations_provider' );
 
-		$post    = get_post( $post_id );
+		$post    = \get_post( $post_id );
 		$request = new \WP_REST_Request();
 
 		// Should return early without error.
@@ -238,16 +238,16 @@ class Todo_Test extends WP_UnitTestCase {
 		);
 
 		// Assign user provider.
-		wp_set_object_terms( $post_id, 'user', 'prpl_recommendations_provider' );
+		\wp_set_object_terms( $post_id, 'user', 'prpl_recommendations_provider' );
 
-		$post    = get_post( $post_id );
+		$post    = \get_post( $post_id );
 		$request = new \WP_REST_Request();
 
 		// Call the method.
 		$this->todo->handle_creating_user_task( $post, $request, true );
 
 		// Verify post_name was set.
-		$updated_post = get_post( $post_id );
+		$updated_post = \get_post( $post_id );
 		$this->assertEquals( 'user-' . $post_id, $updated_post->post_name, 'post_name should be set to user-{ID}' );
 	}
 
@@ -258,7 +258,7 @@ class Todo_Test extends WP_UnitTestCase {
 		// Ensure no user tasks exist.
 		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => 'user' ] );
 		foreach ( $tasks as $task ) {
-			wp_delete_post( $task->ID, true );
+			\wp_delete_post( $task->ID, true );
 		}
 
 		// Clear cache.
@@ -272,16 +272,16 @@ class Todo_Test extends WP_UnitTestCase {
 			]
 		);
 
-		wp_set_object_terms( $post_id, 'user', 'prpl_recommendations_provider' );
+		\wp_set_object_terms( $post_id, 'user', 'prpl_recommendations_provider' );
 
-		$post    = get_post( $post_id );
+		$post    = \get_post( $post_id );
 		$request = new \WP_REST_Request();
 
 		// Call the method.
 		$this->todo->handle_creating_user_task( $post, $request, true );
 
 		// Verify task is marked as GOLDEN.
-		$updated_post = get_post( $post_id );
+		$updated_post = \get_post( $post_id );
 		$this->assertEquals( 'GOLDEN', $updated_post->post_excerpt, 'First user task should be GOLDEN' );
 	}
 
@@ -296,16 +296,16 @@ class Todo_Test extends WP_UnitTestCase {
 			]
 		);
 
-		wp_set_object_terms( $post_id, 'user', 'prpl_recommendations_provider' );
+		\wp_set_object_terms( $post_id, 'user', 'prpl_recommendations_provider' );
 
-		$post    = get_post( $post_id );
+		$post    = \get_post( $post_id );
 		$request = new \WP_REST_Request();
 
 		// Call with $creating = false (updating, not creating).
 		$this->todo->handle_creating_user_task( $post, $request, false );
 
 		// Should return early - verify post_name is not set.
-		$updated_post = get_post( $post_id );
+		$updated_post = \get_post( $post_id );
 		$this->assertNotEquals( 'user-' . $post_id, $updated_post->post_name, 'post_name should not be set when updating' );
 	}
 
@@ -340,15 +340,15 @@ class Todo_Test extends WP_UnitTestCase {
 		$this->todo->maybe_change_first_item_points_on_monday();
 
 		// Verify high priority task (menu_order=1) is GOLDEN.
-		$task1 = get_post( $task1_id );
-		$task2 = get_post( $task2_id );
+		$task1 = \get_post( $task1_id );
+		$task2 = \get_post( $task2_id );
 
 		// The task with lower menu_order should be GOLDEN.
 		$this->assertEquals( 'GOLDEN', $task2->post_excerpt, 'Task with menu_order=1 should be GOLDEN' );
 		$this->assertEquals( '', $task1->post_excerpt, 'Task with menu_order=10 should not be GOLDEN' );
 
 		// Clean up.
-		wp_delete_post( $task1_id, true );
-		wp_delete_post( $task2_id, true );
+		\wp_delete_post( $task1_id, true );
+		\wp_delete_post( $task2_id, true );
 	}
 }

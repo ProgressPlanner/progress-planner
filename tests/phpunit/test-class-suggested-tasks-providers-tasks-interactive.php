@@ -91,7 +91,7 @@ class Suggested_Tasks_Providers_Tasks_Interactive_Test extends WP_UnitTestCase {
 
 		// Set up admin user.
 		$admin_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
-		wp_set_current_user( $admin_id );
+		\wp_set_current_user( $admin_id );
 	}
 
 	/**
@@ -102,25 +102,25 @@ class Suggested_Tasks_Providers_Tasks_Interactive_Test extends WP_UnitTestCase {
 
 		$this->assertEquals(
 			10,
-			has_action( 'progress_planner_admin_page_after_widgets', [ $task, 'add_popover' ] ),
+			\has_action( 'progress_planner_admin_page_after_widgets', [ $task, 'add_popover' ] ),
 			'progress_planner_admin_page_after_widgets hook should be registered'
 		);
 
 		$this->assertEquals(
 			10,
-			has_action( 'progress_planner_admin_dashboard_widget_score_after', [ $task, 'add_popover' ] ),
+			\has_action( 'progress_planner_admin_dashboard_widget_score_after', [ $task, 'add_popover' ] ),
 			'progress_planner_admin_dashboard_widget_score_after hook should be registered'
 		);
 
 		$this->assertEquals(
 			10,
-			has_action( 'admin_enqueue_scripts', [ $task, 'enqueue_scripts' ] ),
+			\has_action( 'admin_enqueue_scripts', [ $task, 'enqueue_scripts' ] ),
 			'admin_enqueue_scripts hook should be registered'
 		);
 
 		$this->assertEquals(
 			10,
-			has_action( 'wp_ajax_prpl_interactive_task_submit', [ $task, 'handle_interactive_task_submit' ] ),
+			\has_action( 'wp_ajax_prpl_interactive_task_submit', [ $task, 'handle_interactive_task_submit' ] ),
 			'wp_ajax_prpl_interactive_task_submit hook should be registered'
 		);
 	}
@@ -140,9 +140,9 @@ class Suggested_Tasks_Providers_Tasks_Interactive_Test extends WP_UnitTestCase {
 	 * Test add_popover outputs HTML.
 	 */
 	public function test_add_popover_outputs_html() {
-		ob_start();
+		\ob_start();
 		$this->task->add_popover();
-		$output = ob_get_clean();
+		$output = \ob_get_clean();
 
 		$this->assertStringContainsString( 'prpl-popover-test-popover', $output, 'Should output popover ID' );
 		$this->assertStringContainsString( 'prpl-popover', $output, 'Should have popover class' );
@@ -154,9 +154,9 @@ class Suggested_Tasks_Providers_Tasks_Interactive_Test extends WP_UnitTestCase {
 	 */
 	public function test_print_popover_form_contents_called() {
 		// This is an abstract method that must be implemented.
-		ob_start();
+		\ob_start();
 		$this->task->print_popover_form_contents();
-		$output = ob_get_clean();
+		$output = \ob_get_clean();
 
 		$this->assertStringContainsString( 'Test Form', $output, 'Should output form content' );
 	}
@@ -170,9 +170,9 @@ class Suggested_Tasks_Providers_Tasks_Interactive_Test extends WP_UnitTestCase {
 		$method     = $reflection->getMethod( 'print_popover_instructions' );
 		$method->setAccessible( true );
 
-		ob_start();
+		\ob_start();
 		$method->invoke( $this->task );
-		$output = ob_get_clean();
+		$output = \ob_get_clean();
 
 		// Output may be empty if no description is set.
 		$this->assertIsString( $output, 'Should return string output' );
@@ -186,9 +186,9 @@ class Suggested_Tasks_Providers_Tasks_Interactive_Test extends WP_UnitTestCase {
 		$method     = $reflection->getMethod( 'print_submit_button' );
 		$method->setAccessible( true );
 
-		ob_start();
+		\ob_start();
 		$method->invoke( $this->task );
-		$output = ob_get_clean();
+		$output = \ob_get_clean();
 
 		$this->assertStringContainsString( 'Submit', $output, 'Should have default button text' );
 		$this->assertStringContainsString( 'prpl-button', $output, 'Should have button class' );
@@ -203,9 +203,9 @@ class Suggested_Tasks_Providers_Tasks_Interactive_Test extends WP_UnitTestCase {
 		$method     = $reflection->getMethod( 'print_submit_button' );
 		$method->setAccessible( true );
 
-		ob_start();
+		\ob_start();
 		$method->invoke( $this->task, 'Custom Button', 'custom-class' );
-		$output = ob_get_clean();
+		$output = \ob_get_clean();
 
 		$this->assertStringContainsString( 'Custom Button', $output, 'Should have custom button text' );
 		$this->assertStringContainsString( 'custom-class', $output, 'Should have custom CSS class' );
@@ -217,7 +217,7 @@ class Suggested_Tasks_Providers_Tasks_Interactive_Test extends WP_UnitTestCase {
 	public function test_enqueue_scripts_requires_capability() {
 		// Set current user to subscriber (no edit_others_posts capability).
 		$subscriber_id = $this->factory->user->create( [ 'role' => 'subscriber' ] );
-		wp_set_current_user( $subscriber_id );
+		\wp_set_current_user( $subscriber_id );
 
 		// Should return early without enqueuing.
 		$this->task->enqueue_scripts( 'toplevel_page_progress-planner' );
@@ -257,7 +257,7 @@ class Suggested_Tasks_Providers_Tasks_Interactive_Test extends WP_UnitTestCase {
 	 * Test get_allowed_interactive_options filter works.
 	 */
 	public function test_get_allowed_interactive_options_filter() {
-		add_filter(
+		\add_filter(
 			'progress_planner_interactive_task_allowed_options',
 			function ( $options ) {
 				$options[] = 'custom_option';
@@ -293,7 +293,7 @@ class Suggested_Tasks_Providers_Tasks_Interactive_Test extends WP_UnitTestCase {
 	public function test_handle_interactive_task_submit_requires_capability() {
 		// Set current user to subscriber.
 		$subscriber_id = $this->factory->user->create( [ 'role' => 'subscriber' ] );
-		wp_set_current_user( $subscriber_id );
+		\wp_set_current_user( $subscriber_id );
 
 		// Expect JSON error response.
 		$this->expectException( \WPAjaxDieContinueException::class );
@@ -317,7 +317,7 @@ class Suggested_Tasks_Providers_Tasks_Interactive_Test extends WP_UnitTestCase {
 	 * Test handle_interactive_task_submit requires setting parameter.
 	 */
 	public function test_handle_interactive_task_submit_requires_setting() {
-		$_POST['nonce'] = wp_create_nonce( 'progress_planner' );
+		$_POST['nonce'] = \wp_create_nonce( 'progress_planner' );
 
 		// Expect JSON error response for missing setting.
 		$this->expectException( \WPAjaxDieContinueException::class );
@@ -329,7 +329,7 @@ class Suggested_Tasks_Providers_Tasks_Interactive_Test extends WP_UnitTestCase {
 	 * Test handle_interactive_task_submit validates allowed options.
 	 */
 	public function test_handle_interactive_task_submit_validates_options() {
-		$_POST['nonce']        = wp_create_nonce( 'progress_planner' );
+		$_POST['nonce']        = \wp_create_nonce( 'progress_planner' );
 		$_POST['setting']      = 'admin_email'; // Not in allowed list.
 		$_POST['value']        = 'test@example.com';
 		$_POST['setting_path'] = '[]';

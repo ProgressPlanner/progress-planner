@@ -24,7 +24,7 @@ class Utils_Deprecations_Test extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_classes_constant_exists() {
-		$this->assertTrue( defined( 'Progress_Planner\Utils\Deprecations::CLASSES' ), 'CLASSES constant should exist' );
+		$this->assertTrue( \defined( 'Progress_Planner\Utils\Deprecations::CLASSES' ), 'CLASSES constant should exist' );
 		$this->assertIsArray( Deprecations::CLASSES, 'CLASSES should be an array' );
 	}
 
@@ -34,7 +34,7 @@ class Utils_Deprecations_Test extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_base_methods_constant_exists() {
-		$this->assertTrue( defined( 'Progress_Planner\Utils\Deprecations::BASE_METHODS' ), 'BASE_METHODS constant should exist' );
+		$this->assertTrue( \defined( 'Progress_Planner\Utils\Deprecations::BASE_METHODS' ), 'BASE_METHODS constant should exist' );
 		$this->assertIsArray( Deprecations::BASE_METHODS, 'BASE_METHODS should be an array' );
 	}
 
@@ -110,11 +110,11 @@ class Utils_Deprecations_Test extends WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_no_duplicate_keys() {
-		$class_keys  = array_keys( Deprecations::CLASSES );
-		$method_keys = array_keys( Deprecations::BASE_METHODS );
+		$class_keys  = \array_keys( Deprecations::CLASSES );
+		$method_keys = \array_keys( Deprecations::BASE_METHODS );
 
-		$this->assertCount( count( $class_keys ), array_unique( $class_keys ), 'CLASSES should have no duplicate keys' );
-		$this->assertCount( count( $method_keys ), array_unique( $method_keys ), 'BASE_METHODS should have no duplicate keys' );
+		$this->assertCount( \count( $class_keys ), \array_unique( $class_keys ), 'CLASSES should have no duplicate keys' );
+		$this->assertCount( \count( $method_keys ), \array_unique( $method_keys ), 'BASE_METHODS should have no duplicate keys' );
 	}
 
 	/**
