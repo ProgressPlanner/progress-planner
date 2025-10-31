@@ -42,5 +42,8 @@ function _manually_load_plugin() {
 // Start up the WP testing environment.
 require "{$_tests_dir}/includes/bootstrap.php";
 
+// Ensure database tables are created for tests.
+\progress_planner()->get_activities__query()->create_tables();
+
 // Load base provider test class.
 require_once __DIR__ . '/phpunit/class-task-provider-test-trait.php';
