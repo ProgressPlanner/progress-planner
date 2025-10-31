@@ -8,9 +8,30 @@
 namespace Progress_Planner\Tests;
 
 /**
- * CPT_Recommendations test case.
+ * Suggested_Tasks test case.
+ *
+ * Tests the Suggested_Tasks class that manages the suggested tasks system.
  */
-class CPT_Recommendations_Test extends \WP_UnitTestCase {
+class Suggested_Tasks_Test extends \WP_UnitTestCase {
+
+	/**
+	 * Suggested_Tasks instance.
+	 *
+	 * @var \Progress_Planner\Suggested_Tasks
+	 */
+	private $suggested_tasks;
+
+	/**
+	 * Set up test environment.
+	 */
+	public function setUp(): void {
+		parent::setUp();
+		$this->suggested_tasks = \progress_planner()->get_suggested_tasks();
+
+		// Set up admin user.
+		$admin_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		wp_set_current_user( $admin_id );
+	}
 
 	/**
 	 * Test the task_cleanup method.
@@ -101,5 +122,167 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 		\progress_planner()->get_suggested_tasks()->get_tasks_manager()->cleanup_pending_tasks();
 		\wp_cache_flush_group( \Progress_Planner\Suggested_Tasks_DB::GET_TASKS_CACHE_GROUP ); // Clear the cache.
 		$this->assertEquals( \count( $tasks_to_keep ), \count( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] ) ) );
+	}
+
+	/**
+	 * Test STATUS_MAP constant.
+	 */
+	public function test_status_map_constant() {
+		$status_map = \Progress_Planner\Suggested_Tasks::STATUS_MAP;
+
+		$this->assertIsArray( $status_map );
+		$this->assertArrayHasKey( 'completed', $status_map );
+		$this->assertEquals( 'trash', $status_map['completed'] );
+	}
+
+	/**
+	 * Test get_tasks_manager returns Tasks_Manager.
+	 */
+	public function test_get_tasks_manager() {
+		$manager = $this->suggested_tasks->get_tasks_manager();
+
+		$this->assertInstanceOf(
+			\Progress_Planner\Suggested_Tasks\Tasks_Manager::class,
+			$manager
+		);
+	}
+
+	/**
+	 * Test get_task_id_from_slug.
+	 */
+	public function test_get_task_id_from_slug() {
+		$this->assertEquals(
+			'task-123',
+			$this->suggested_tasks->get_task_id_from_slug( 'task-123' )
+		);
+
+		$this->assertEquals(
+			'task-456',
+			$this->suggested_tasks->get_task_id_from_slug( 'task-456__trashed' )
+		);
+	}
+
+	/**
+	 * Test generate_task_completion_token.
+	 */
+	public function test_generate_task_completion_token() {
+		$task_id = 'test-task';
+		$user_id = get_current_user_id();
+
+		$token = $this->suggested_tasks->generate_task_completion_token( $task_id, $user_id );
+
+		$this->assertIsString( $token );
+		$this->assertNotEmpty( $token );
+
+		// Verify token is stored.
+		$stored = get_transient( 'prpl_complete_' . $task_id . '_' . $user_id );
+		$this->assertEquals( $token, $stored );
+	}
+
+	/**
+	 * Test insert_activity creates activity.
+	 */
+	public function test_insert_activity() {
+		$task_id = 'test-task-activity-insert';
+
+		$this->suggested_tasks->insert_activity( $task_id );
+
+		$activities = \progress_planner()->get_activities__query()->query_activities(
+			[
+				'data_id' => $task_id,
+				'type'    => 'completed',
+			]
+		);
+
+		$this->assertNotEmpty( $activities );
+		$this->assertEquals( $task_id, $activities[0]->data_id );
+	}
+
+	/**
+	 * Test delete_activity removes activity.
+	 */
+	public function test_delete_activity() {
+		$task_id = 'test-task-activity-delete';
+
+		// Create activity first.
+		$this->suggested_tasks->insert_activity( $task_id );
+
+		// Delete it.
+		$this->suggested_tasks->delete_activity( $task_id );
+
+		// Verify deleted.
+		$activities = \progress_planner()->get_activities__query()->query_activities(
+			[
+				'data_id' => $task_id,
+				'type'    => 'completed',
+			]
+		);
+
+		$this->assertEmpty( $activities );
+	}
+
+	/**
+	 * Test was_task_completed.
+	 */
+	public function test_was_task_completed() {
+		$result = $this->suggested_tasks->was_task_completed( 99999 );
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test register_post_type.
+	 */
+	public function test_register_post_type() {
+		$this->suggested_tasks->register_post_type();
+
+		$this->assertTrue( post_type_exists( 'prpl_recommendations' ) );
+	}
+
+	/**
+	 * Test register_taxonomy.
+	 */
+	public function test_register_taxonomy() {
+		$this->suggested_tasks->register_taxonomy();
+
+		$this->assertTrue( taxonomy_exists( 'prpl_recommendations_provider' ) );
+	}
+
+	/**
+	 * Test change_trashed_posts_lifetime.
+	 */
+	public function test_change_trashed_posts_lifetime() {
+		$recommendation_post = (object) [ 'post_type' => 'prpl_recommendations' ];
+		$regular_post        = (object) [ 'post_type' => 'post' ];
+
+		$this->assertEquals(
+			60,
+			$this->suggested_tasks->change_trashed_posts_lifetime( 30, $recommendation_post )
+		);
+
+		$this->assertEquals(
+			30,
+			$this->suggested_tasks->change_trashed_posts_lifetime( 30, $regular_post )
+		);
+	}
+
+	/**
+	 * Test get_tasks_in_rest_format.
+	 */
+	public function test_get_tasks_in_rest_format() {
+		$tasks = $this->suggested_tasks->get_tasks_in_rest_format();
+
+		$this->assertIsArray( $tasks );
+	}
+
+	/**
+	 * Test rest_api_tax_query.
+	 */
+	public function test_rest_api_tax_query() {
+		$request = new \WP_REST_Request();
+		$args    = [];
+
+		$result = $this->suggested_tasks->rest_api_tax_query( $args, $request );
+
+		$this->assertArrayHasKey( 'tax_query', $result );
 	}
 }
