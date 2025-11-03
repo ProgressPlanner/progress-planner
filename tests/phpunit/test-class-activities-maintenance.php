@@ -34,22 +34,17 @@ class Activities_Maintenance_Test extends WP_UnitTestCase {
 		// Set up admin user.
 		$admin_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
 		\wp_set_current_user( $admin_id );
-
-		// Clean up activities table.
-		global $wpdb;
-		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}prpl_activities" );
 	}
 
 	/**
 	 * Tear down test environment.
+	 *
+	 * phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found -- Reserved for future test cleanup
 	 */
 	public function tearDown(): void {
-		// Clean up activities.
-		global $wpdb;
-		$wpdb->query( "TRUNCATE TABLE {$wpdb->prefix}prpl_activities" );
-
 		parent::tearDown();
 	}
+	// phpcs:enable Generic.CodeAnalysis.UselessOverridingMethod.Found
 
 	/**
 	 * Test class has correct points configuration.

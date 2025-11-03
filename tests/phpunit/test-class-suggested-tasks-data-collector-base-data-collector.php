@@ -136,8 +136,8 @@ class Suggested_Tasks_Data_Collector_Base_Data_Collector_Test extends WP_UnitTes
 
 		$result = $this->collector->collect();
 
-		// Null is a valid cached value, so it should return null.
-		$this->assertNull( $result, 'Should return cached null value' );
+		// Null cached values are treated as no cache, so it recalculates.
+		$this->assertEquals( 'calculated', $result, 'Should recalculate when cached value is null' );
 	}
 
 	/**
@@ -252,7 +252,18 @@ class Suggested_Tasks_Data_Collector_Base_Data_Collector_Test extends WP_UnitTes
 		// Create another mock class with different DATA_KEY.
 		$collector2 = new class() extends Base_Data_Collector {
 			protected const DATA_KEY = 'another_test_key';
-			public $test_data        = 'collector2_data';
+			/**
+			 * Test data for mock collector.
+			 *
+			 * @var mixed
+			 */
+			public $test_data = 'collector2_data';
+
+			/**
+			 * Calculate and return test data.
+			 *
+			 * @return mixed
+			 */
 			protected function calculate_data() {
 				return $this->test_data;
 			}

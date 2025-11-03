@@ -39,10 +39,13 @@ class Activities_Content_Helpers_Test extends WP_UnitTestCase {
 
 	/**
 	 * Tear down test environment.
+	 *
+	 * phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod.Found -- Reserved for future test cleanup
 	 */
 	public function tearDown(): void {
 		parent::tearDown();
 	}
+	// phpcs:enable Generic.CodeAnalysis.UselessOverridingMethod.Found
 
 	/**
 	 * Test get_post_types_names() returns default types.
