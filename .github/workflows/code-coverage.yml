@@ -65,7 +65,18 @@ jobs:
 
       - name: Generate code coverage report for current branch
         run: |
-          vendor/bin/phpunit --dont-report-useless-tests --coverage-clover=${{ github.workspace }}/coverage.xml --coverage-text | tee coverage-output.txt
+          echo "=== Debug: Before running PHPUnit ==="
+          pwd
+          ls -la
+          echo "=== Running PHPUnit with coverage ==="
+          vendor/bin/phpunit --dont-report-useless-tests --coverage-clover=coverage.xml --coverage-text | tee coverage-output.txt
+          echo "=== Debug: After running PHPUnit ==="
+          pwd
+          ls -la coverage* 2>/dev/null || echo "No coverage files in current directory"
+          echo "=== Searching entire workspace for coverage.xml ==="
+          find . -name "coverage.xml" -type f 2>/dev/null || echo "No coverage.xml found anywhere"
+          echo "=== Searching for any XML files ==="
+          find . -name "*.xml" -type f 2>/dev/null | head -20
         continue-on-error: false
 
       - name: Upload coverage to Codecov
@@ -83,20 +94,35 @@ jobs:
           # Debug: Check for coverage files
           echo "=== Debug: Looking for coverage files ==="
           ls -la coverage* 2>/dev/null || echo "No coverage files found in current directory"
-          ls -la ${{ github.workspace }}/coverage* 2>/dev/null || echo "No coverage files in workspace"
-          echo "=== Debug: Searching for coverage.xml recursively ==="
-          find ${{ github.workspace }} -name "coverage.xml" 2>/dev/null || echo "No coverage.xml found anywhere"
           echo "=== Debug: Current directory ==="
           pwd
           echo "=== Debug: Workspace directory ==="
           echo "${{ github.workspace }}"
 
-          # Try both locations
+          # Search for coverage.xml anywhere in the workspace
+          echo "=== Searching for coverage.xml recursively ==="
+          FOUND_FILES=$(find ${{ github.workspace }} -name "coverage.xml" -type f 2>/dev/null)
+          if [ -n "$FOUND_FILES" ]; then
+            echo "Found coverage.xml files:"
+            echo "$FOUND_FILES"
+          else
+            echo "No coverage.xml found anywhere in workspace"
+          fi
+
+          # Try to find coverage.xml in multiple locations
           COVERAGE_FILE=""
           if [ -f coverage.xml ]; then
             COVERAGE_FILE="coverage.xml"
+            echo "Found coverage.xml in current directory"
           elif [ -f ${{ github.workspace }}/coverage.xml ]; then
             COVERAGE_FILE="${{ github.workspace }}/coverage.xml"
+            echo "Found coverage.xml in workspace root"
+          else
+            # Try to find it anywhere
+            COVERAGE_FILE=$(find ${{ github.workspace }} -name "coverage.xml" -type f 2>/dev/null | head -1)
+            if [ -n "$COVERAGE_FILE" ]; then
+              echo "Found coverage.xml at: $COVERAGE_FILE"
+            fi
           fi
 
           if [ -n "$COVERAGE_FILE" ]; then
