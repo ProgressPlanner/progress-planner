@@ -71,16 +71,16 @@ jobs:
         run: |
           case "${{ matrix.group }}" in
             "activities-badges")
-              echo "filter=tests/phpunit/test-class-activities-*.php tests/phpunit/test-class-badges-*.php" >> $GITHUB_OUTPUT
+              echo "filter=Activities|Badges" >> $GITHUB_OUTPUT
               ;;
             "admin-api")
-              echo "filter=tests/phpunit/test-class-admin-*.php tests/phpunit/test-class-api-*.php" >> $GITHUB_OUTPUT
+              echo "filter=Admin|Api" >> $GITHUB_OUTPUT
               ;;
             "suggested-tasks")
-              echo "filter=tests/phpunit/test-class-suggested-tasks-*.php" >> $GITHUB_OUTPUT
+              echo "filter=Suggested_Tasks" >> $GITHUB_OUTPUT
               ;;
             "goals-updates-misc")
-              echo "filter=tests/phpunit/test-class-goals-*.php tests/phpunit/test-class-update-*.php tests/phpunit/test-class-ui-*.php tests/phpunit/test-class-utils-*.php tests/phpunit/test-class-*.php" >> $GITHUB_OUTPUT
+              echo "filter=Goals|Update|UI|Utils|Onboard|Security|Lessons|Page|Rest|Actions|Uninstall|Prpl" >> $GITHUB_OUTPUT
               ;;
           esac
 
@@ -89,13 +89,15 @@ jobs:
           echo "Running coverage for group: ${{ matrix.group }}"
           FILTER="${{ steps.filters.outputs.filter }}"
 
-          # Run PHPUnit with coverage
+          echo "Test class name filter (regex): $FILTER"
+
+          # Run PHPUnit with coverage using --filter to match class names
           set +e
           php -d memory_limit=512M \
             vendor/bin/phpunit \
             --coverage-clover=coverage-${{ matrix.group }}.xml \
             --coverage-text \
-            $FILTER
+            --filter "$FILTER"
           EXIT_CODE=$?
           set -e
 
