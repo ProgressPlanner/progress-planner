@@ -43,7 +43,7 @@ jobs:
         with:
           php-version: '8.2'
           ini-values: zend.assertions=1, error_reporting=-1, display_errors=On
-          coverage: xdebug  # Enable Xdebug for code coverage
+          coverage: pcov  # Use PCOV for faster code coverage (5x faster than Xdebug)
           tools: composer
 
       - name: Install SVN
@@ -65,7 +65,7 @@ jobs:
 
       - name: Generate code coverage report for current branch
         run: |
-          XDEBUG_MODE=coverage vendor/bin/phpunit --dont-report-useless-tests --coverage-clover=${{ github.workspace }}/coverage.xml --coverage-text | tee coverage-output.txt
+          vendor/bin/phpunit --dont-report-useless-tests --coverage-clover=${{ github.workspace }}/coverage.xml --coverage-text | tee coverage-output.txt
         continue-on-error: false
 
       - name: Upload coverage to Codecov
