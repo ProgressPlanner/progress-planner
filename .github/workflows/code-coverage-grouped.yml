@@ -29,8 +29,13 @@ jobs:
           - badges
           - admin
           - api
-          - suggested-tasks-providers
-          - suggested-tasks-data-collectors
+          - suggested-tasks-providers-1
+          - suggested-tasks-providers-2
+          - suggested-tasks-providers-3
+          - suggested-tasks-providers-4
+          - suggested-tasks-data-collectors-1
+          - suggested-tasks-data-collectors-2
+          - suggested-tasks-data-collectors-3
           - goals
           - updates
           - ui
@@ -77,44 +82,13 @@ jobs:
         run: |
           echo "Running coverage for group: ${{ matrix.group }}"
 
-          # Map matrix group to PHPUnit group(s)
-          case "${{ matrix.group }}" in
-            "suggested-tasks-providers")
-              # Run only suggested-tasks tests where filename contains 'providers'
-              GROUP_FILTER="suggested-tasks"
-              FILE_FILTER="tests/phpunit/test-class-suggested-tasks-providers-*.php"
-              ;;
-            "suggested-tasks-data-collectors")
-              # Run only suggested-tasks tests where filename contains 'data-collector'
-              GROUP_FILTER="suggested-tasks"
-              FILE_FILTER="tests/phpunit/test-class-suggested-tasks-data-collector*.php tests/phpunit/test-class-suggested-tasks-task*.php tests/phpunit/test-class-suggested-tasks-tasks-manager.php"
-              ;;
-            *)
-              # For all other groups, use the group annotation directly
-              GROUP_FILTER="${{ matrix.group }}"
-              FILE_FILTER=""
-              ;;
-          esac
-
-          echo "PHPUnit group filter: $GROUP_FILTER"
-
-          # Run PHPUnit with coverage
+          # Run PHPUnit with coverage using the group annotation
           set +e
-          if [ -n "$FILE_FILTER" ]; then
-            echo "Additional file filter: $FILE_FILTER"
-            php -d memory_limit=512M \
-              vendor/bin/phpunit \
-              --coverage-clover=coverage-${{ matrix.group }}.xml \
-              --coverage-text \
-              --group "$GROUP_FILTER" \
-              $FILE_FILTER
-          else
-            php -d memory_limit=512M \
-              vendor/bin/phpunit \
-              --coverage-clover=coverage-${{ matrix.group }}.xml \
-              --coverage-text \
-              --group "$GROUP_FILTER"
-          fi
+          php -d memory_limit=512M \
+            vendor/bin/phpunit \
+            --coverage-clover=coverage-${{ matrix.group }}.xml \
+            --coverage-text \
+            --group "${{ matrix.group }}"
           EXIT_CODE=$?
           set -e
 

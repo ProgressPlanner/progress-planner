@@ -4,6 +4,7 @@
  *
  * @package Progress_Planner
  * @group suggested-tasks
+ * @group suggested-tasks-providers-4
  */
 
 namespace Progress_Planner\Tests;

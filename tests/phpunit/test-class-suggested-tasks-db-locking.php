@@ -4,6 +4,7 @@
  *
  * @package Progress_Planner\Tests
  * @group suggested-tasks
+ * @group suggested-tasks-data-collectors-3
  */
 
 namespace Progress_Planner\Tests;
