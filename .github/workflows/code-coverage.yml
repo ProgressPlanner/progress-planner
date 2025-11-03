@@ -42,7 +42,7 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          ini-values: zend.assertions=1, error_reporting=-1, display_errors=On
+          ini-values: zend.assertions=1, error_reporting=-1, display_errors=On, memory_limit=512M
           coverage: pcov  # Use PCOV for faster code coverage (5x faster than Xdebug)
           tools: composer
 
@@ -62,38 +62,38 @@ jobs:
 
       - name: Generate code coverage report for current branch
         run: |
+          echo "=== Debug: PHP Configuration ==="
+          php -i | grep -E "(memory_limit|max_execution_time|pcov)"
           echo "=== Debug: Check PCOV is loaded ==="
           php -m | grep pcov || echo "PCOV not loaded"
           php -r "var_dump(extension_loaded('pcov'));"
-          echo "=== Debug: Check PHPUnit version and php-code-coverage ==="
-          vendor/bin/phpunit --version
-          php -r "require 'vendor/autoload.php'; echo class_exists('SebastianBergmann\CodeCoverage\CodeCoverage') ? 'CodeCoverage class exists' : 'CodeCoverage class NOT found'; echo PHP_EOL;"
-          echo "=== Debug: Check if php-code-coverage package is installed ==="
-          ls -la vendor/phpunit/php-code-coverage/ 2>/dev/null || echo "php-code-coverage directory not found"
-          echo "=== Debug: Before running PHPUnit ==="
-          pwd
-          ls -la
-          echo "=== Debug: Check phpunit.xml.dist contents ==="
-          cat phpunit.xml.dist
-          echo "=== Debug: Test PCOV is actually working ==="
-          php -d pcov.enabled=1 -d pcov.directory=${{ github.workspace }} -r "var_dump(ini_get('pcov.enabled'), ini_get('pcov.directory'));"
           echo "=== Running PHPUnit with coverage ==="
-          php -d pcov.enabled=1 -d pcov.directory=${{ github.workspace }} vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-clover=coverage.xml --coverage-text || true
-          PHPUNIT_EXIT=$?
+          echo "Start time: $(date)"
+          echo "Memory before: $(free -h | grep Mem)"
+          set -o pipefail
+          php -d memory_limit=512M -d max_execution_time=300 -d pcov.enabled=1 -d pcov.directory=${{ github.workspace }} \
+            vendor/bin/phpunit --configuration phpunit.xml.dist \
+            --coverage-clover=coverage.xml \
+            --coverage-text \
+            --verbose 2>&1 | tee phpunit-output.log
+          PHPUNIT_EXIT=${PIPESTATUS[0]}
+          echo "End time: $(date)"
+          echo "Memory after: $(free -h | grep Mem)"
           echo "=== Debug: PHPUnit exit code: $PHPUNIT_EXIT ==="
+          echo "=== Debug: Last 50 lines of PHPUnit output ==="
+          tail -50 phpunit-output.log
           echo "=== Debug: After running PHPUnit ==="
-          pwd
           ls -la coverage* 2>/dev/null || echo "No coverage files in current directory"
-          echo "=== Searching entire workspace for coverage.xml ==="
-          find . -name "coverage.xml" -type f 2>/dev/null || echo "No coverage.xml found anywhere"
           echo "=== Checking if coverage report was generated ==="
           if [ -f coverage.xml ]; then
             echo "SUCCESS: coverage.xml exists!"
             ls -lh coverage.xml
+            echo "First 20 lines of coverage.xml:"
+            head -20 coverage.xml
           else
             echo "FAIL: coverage.xml was not generated"
-            echo "=== Checking stderr for errors ==="
-            php -d pcov.enabled=1 -d pcov.directory=. vendor/bin/phpunit --dont-report-useless-tests --coverage-clover=coverage.xml --coverage-text 2>&1 >/dev/null | grep -i "error\|warning\|coverage" || echo "No error messages found"
+            echo "=== Checking for errors in PHPUnit output ==="
+            grep -i "error\|fatal\|exception\|segfault\|out of memory" phpunit-output.log || echo "No obvious errors found"
           fi
         continue-on-error: false
 
