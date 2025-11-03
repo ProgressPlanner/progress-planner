@@ -65,7 +65,7 @@ jobs:
 
       - name: Generate code coverage report for current branch
         run: |
-          composer test -- --coverage-clover=coverage.xml --coverage-text | tee coverage-output.txt
+          composer test -- --coverage-clover=${{ github.workspace }}/coverage.xml --coverage-text | tee coverage-output.txt
         continue-on-error: false
 
       - name: Upload coverage to Codecov
