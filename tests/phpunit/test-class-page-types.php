@@ -3,6 +3,7 @@
  * Class Page_Types_Test
  *
  * @package Progress_Planner\Tests
+ * @group pages
  */
 
 namespace Progress_Planner\Tests;

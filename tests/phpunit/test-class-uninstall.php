@@ -3,6 +3,7 @@
  * Class Uninstall_Test
  *
  * @package Progress_Planner\Tests
+ * @group uninstall
  */
 
 namespace Progress_Planner\Tests;

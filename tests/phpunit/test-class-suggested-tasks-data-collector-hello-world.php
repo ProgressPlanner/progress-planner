@@ -3,6 +3,7 @@
  * Class Suggested_Tasks_Data_Collector_Hello_World_Test
  *
  * @package Progress_Planner\Tests
+ * @group suggested-tasks
  */
 
 namespace Progress_Planner\Tests;

@@ -3,6 +3,7 @@
  * Unit tests for onboarding tasks.
  *
  * @package Progress_Planner
+ * @group onboarding
  */
 
 namespace Progress_Planner\Tests\Unit;

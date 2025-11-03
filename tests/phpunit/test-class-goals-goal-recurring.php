@@ -3,6 +3,7 @@
  * Unit tests for recurring goal streak calculation.
  *
  * @package Progress_Planner\Tests
+ * @group goals
  */
 
 namespace Progress_Planner\Tests;

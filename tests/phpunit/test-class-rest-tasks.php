@@ -3,6 +3,7 @@
  * Class Rest_Tasks_Test
  *
  * @package Progress_Planner\Tests
+ * @group rest-api
  */
 
 namespace Progress_Planner\Tests;

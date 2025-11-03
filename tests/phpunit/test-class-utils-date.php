@@ -3,6 +3,7 @@
  * Class Utils_Date_Test
  *
  * @package Progress_Planner\Tests
+ * @group utils
  */
 
 namespace Progress_Planner\Tests;

@@ -3,6 +3,7 @@
  * Class Suggested_Tasks_Providers_Settings_Saved_Test
  *
  * @package Progress_Planner
+ * @group suggested-tasks
  */
 
 namespace Progress_Planner\Tests;

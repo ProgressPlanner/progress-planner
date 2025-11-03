@@ -3,6 +3,7 @@
  * Class Plugin_Upgrade_Tasks_Test
  *
  * @package Progress_Planner\Tests
+ * @group misc
  */
 
 namespace Progress_Planner\Tests;

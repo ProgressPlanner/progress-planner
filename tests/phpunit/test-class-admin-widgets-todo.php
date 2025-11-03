@@ -3,6 +3,7 @@
  * Test for the Admin Widgets Task List functionality
  *
  * @package Progress_Planner\Tests
+ * @group admin
  */
 
 namespace Progress_Planner\Tests;

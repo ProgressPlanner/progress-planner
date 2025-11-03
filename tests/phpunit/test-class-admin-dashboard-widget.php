@@ -3,6 +3,7 @@
  * Class Admin_Dashboard_Widget_Test
  *
  * @package Progress_Planner\Tests
+ * @group admin
  */
 
 namespace Progress_Planner\Tests;

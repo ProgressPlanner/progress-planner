@@ -3,6 +3,7 @@
  * Class Suggested_Tasks_Providers_Improve_Pdf_Handling_Test
  *
  * @package Progress_Planner\Tests
+ * @group suggested-tasks
  */
 
 namespace Progress_Planner\Tests;

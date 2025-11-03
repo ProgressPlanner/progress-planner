@@ -3,6 +3,7 @@
  * Unit tests for Activities\Maintenance class.
  *
  * @package Progress_Planner\Tests
+ * @group activities
  */
 
 namespace Progress_Planner\Tests;

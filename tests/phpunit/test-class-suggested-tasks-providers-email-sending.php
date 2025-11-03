@@ -3,6 +3,7 @@
  * Class Suggested_Tasks_Providers_Email_Sending_Test
  *
  * @package Progress_Planner\Tests
+ * @group suggested-tasks
  */
 
 namespace Progress_Planner\Tests;

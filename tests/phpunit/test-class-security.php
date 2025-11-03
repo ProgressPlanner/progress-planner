@@ -5,6 +5,7 @@
  * Tests for security vulnerabilities and their fixes.
  *
  * @package Progress_Planner\Tests
+ * @group security
  */
 
 namespace Progress_Planner\Tests;

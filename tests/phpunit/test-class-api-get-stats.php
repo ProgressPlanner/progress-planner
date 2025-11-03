@@ -3,6 +3,7 @@
  * Class Test_API_Get_Stats
  *
  * @package Progress_Planner\Tests
+ * @group api
  */
 
 namespace Progress_Planner\Tests;

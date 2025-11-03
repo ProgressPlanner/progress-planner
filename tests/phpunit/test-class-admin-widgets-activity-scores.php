@@ -3,6 +3,7 @@
  * Class Admin_Widgets_Activity_Scores_Test
  *
  * @package Progress_Planner\Tests
+ * @group admin
  */
 
 namespace Progress_Planner\Tests;

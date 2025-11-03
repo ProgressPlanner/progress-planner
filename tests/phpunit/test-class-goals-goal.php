@@ -3,6 +3,7 @@
  * Unit tests for Goals\Goal class.
  *
  * @package Progress_Planner\Tests
+ * @group goals
  */
 
 namespace Progress_Planner\Tests;

@@ -3,6 +3,7 @@
  * Unit tests for Terms_Without_Posts_Data_Collector_Test class.
  *
  * @package Progress_Planner\Tests
+ * @group suggested-tasks
  */
 
 namespace Progress_Planner\Tests;

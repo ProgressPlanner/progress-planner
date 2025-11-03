@@ -3,6 +3,7 @@
  * Class Update_Update_130_Test
  *
  * @package Progress_Planner\Tests
+ * @group updates
  */
 
 namespace Progress_Planner\Tests;

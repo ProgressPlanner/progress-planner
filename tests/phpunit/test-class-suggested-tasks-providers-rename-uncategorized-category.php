@@ -3,6 +3,7 @@
  * Class Suggested_Tasks_Providers_Rename_Uncategorized_Category_Test
  *
  * @package Progress_Planner
+ * @group suggested-tasks
  */
 
 namespace Progress_Planner\Tests;

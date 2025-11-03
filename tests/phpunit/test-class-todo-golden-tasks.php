@@ -3,6 +3,7 @@
  * Unit tests for GOLDEN task system.
  *
  * @package Progress_Planner\Tests
+ * @group todos
  */
 
 namespace Progress_Planner\Tests;

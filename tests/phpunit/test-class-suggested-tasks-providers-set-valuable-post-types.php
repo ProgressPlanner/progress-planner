@@ -3,6 +3,7 @@
  * Class Suggested_Tasks_Providers_Set_Valuable_Post_Types_Test
  *
  * @package Progress_Planner\Tests
+ * @group suggested-tasks
  */
 
 namespace Progress_Planner\Tests;

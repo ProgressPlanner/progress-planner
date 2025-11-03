@@ -3,6 +3,7 @@
  * Class Badges_Badge_Content_Test
  *
  * @package Progress_Planner\Tests
+ * @group badges
  */
 
 namespace Progress_Planner\Tests;

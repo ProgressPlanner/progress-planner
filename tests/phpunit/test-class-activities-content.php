@@ -3,6 +3,7 @@
  * Class Activities_Content_Test
  *
  * @package Progress_Planner\Tests
+ * @group activities
  */
 
 namespace Progress_Planner\Tests;

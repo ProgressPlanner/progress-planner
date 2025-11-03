@@ -3,6 +3,7 @@
  * Class Activities_Suggested_Task_Test
  *
  * @package Progress_Planner\Tests
+ * @group activities
  */
 
 namespace Progress_Planner\Tests;

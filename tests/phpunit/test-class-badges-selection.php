@@ -3,6 +3,7 @@
  * Unit tests for badge selection by timestamp.
  *
  * @package Progress_Planner\Tests
+ * @group badges
  */
 
 namespace Progress_Planner\Tests;

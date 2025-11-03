@@ -3,6 +3,7 @@
  * Class Actions_Content_Scan_Test
  *
  * @package Progress_Planner\Tests
+ * @group actions
  */
 
 namespace Progress_Planner\Tests;

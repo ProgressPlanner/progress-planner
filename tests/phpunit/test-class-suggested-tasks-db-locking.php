@@ -3,6 +3,7 @@
  * Unit tests for distributed locking mechanism in task creation.
  *
  * @package Progress_Planner\Tests
+ * @group suggested-tasks
  */
 
 namespace Progress_Planner\Tests;

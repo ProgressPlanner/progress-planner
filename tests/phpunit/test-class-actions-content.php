@@ -3,6 +3,7 @@
  * Test Content actions.
  *
  * @package Progress_Planner
+ * @group actions
  */
 
 namespace Progress_Planner\Tests;

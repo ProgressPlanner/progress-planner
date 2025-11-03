@@ -3,6 +3,7 @@
  * Class Rest_Recommendations_Controller_Test
  *
  * @package Progress_Planner\Tests
+ * @group rest-api
  */
 
 namespace Progress_Planner\Tests;

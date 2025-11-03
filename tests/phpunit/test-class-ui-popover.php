@@ -3,6 +3,7 @@
  * Unit tests for Popover UI class.
  *
  * @package Progress_Planner\Tests
+ * @group ui
  */
 
 namespace Progress_Planner\Tests;

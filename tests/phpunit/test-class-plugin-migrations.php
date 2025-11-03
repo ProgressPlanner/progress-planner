@@ -3,6 +3,7 @@
  * Class Plugin_Migrations_Test
  *
  * @package Progress_Planner\Tests
+ * @group misc
  */
 
 namespace Progress_Planner\Tests;

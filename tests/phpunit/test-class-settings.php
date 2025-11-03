@@ -3,6 +3,7 @@
  * Class Settings_Test
  *
  * @package Progress_Planner\Tests
+ * @group misc
  */
 
 namespace Progress_Planner\Tests;

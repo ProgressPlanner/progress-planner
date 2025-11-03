@@ -3,6 +3,7 @@
  * Unit tests for Deprecations utility class.
  *
  * @package Progress_Planner\Tests
+ * @group utils
  */
 
 namespace Progress_Planner\Tests;

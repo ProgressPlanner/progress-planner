@@ -3,6 +3,7 @@
  * Class Lessons_Test
  *
  * @package Progress_Planner\Tests
+ * @group lessons
  */
 
 namespace Progress_Planner\Tests;

@@ -3,6 +3,7 @@
  * Test for the Dashboard Widget Task List functionality
  *
  * @package Progress_Planner\Tests
+ * @group admin
  */
 
 namespace Progress_Planner\Tests;

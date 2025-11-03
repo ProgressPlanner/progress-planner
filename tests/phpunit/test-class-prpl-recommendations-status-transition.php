@@ -3,6 +3,7 @@
  * Test prpl_recommendations post type status transitions.
  *
  * @package Progress_Planner\Tests
+ * @group recommendations
  */
 
 namespace Progress_Planner\Tests;
