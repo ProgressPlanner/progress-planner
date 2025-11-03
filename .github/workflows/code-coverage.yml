@@ -41,7 +41,7 @@ jobs:
       - name: Install PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.2'
+          php-version: '8.3'
           ini-values: zend.assertions=1, error_reporting=-1, display_errors=On
           coverage: pcov  # Use PCOV for faster code coverage (5x faster than Xdebug)
           tools: composer
@@ -49,14 +49,11 @@ jobs:
       - name: Install SVN
         run: sudo apt-get install subversion
 
-      - name: "Composer: remove the PHP platform requirement"
-        run: composer config --unset platform.php
-
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v2
         with:
           dependency-versions: "highest"
-          composer-options: "yoast/wp-test-utils --with-dependencies"
+          composer-options: "--prefer-dist --with-dependencies"
           custom-cache-suffix: $(date -u -d "-0 month -$(($(date +%d)-1)) days" "+%F")-codecov-v2
 
       - name: Install WordPress Test Suite
@@ -99,15 +96,6 @@ jobs:
             php -d pcov.enabled=1 -d pcov.directory=. vendor/bin/phpunit --dont-report-useless-tests --coverage-clover=coverage.xml --coverage-text 2>&1 >/dev/null | grep -i "error\|warning\|coverage" || echo "No error messages found"
           fi
         continue-on-error: false
-
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
-        with:
-          files: ./coverage.xml
-          flags: unittests
-          name: codecov-progress-planner
-          fail_ci_if_error: false
-          token: ${{ secrets.CODECOV_TOKEN }}
 
       - name: Generate coverage report summary
         id: coverage
