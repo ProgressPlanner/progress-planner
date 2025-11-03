@@ -98,7 +98,8 @@ final class Activity_Scores extends Widget {
 		$items   = $this->get_checklist();
 		$results = [];
 		foreach ( $items as $item ) {
-			$results[ $item['label'] ] = $item['callback']();
+			$label = (string) $item['label']; // @phpstan-ignore offsetAccess.invalidOffset
+			$results[ $label ] = $item['callback'](); // @phpstan-ignore offsetAccess.invalidOffset
 		}
 		return $results;
 	}

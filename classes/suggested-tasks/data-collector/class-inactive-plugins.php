@@ -47,7 +47,8 @@ class Inactive_Plugins extends Base_Data_Collector {
 	 */
 	protected function calculate_data() {
 		if ( ! \function_exists( 'get_plugins' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore requireOnce.fileNotFound
+			// @phpstan-ignore-next-line requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
 		// Clear the plugins cache, so get_plugins() returns the latest plugins.
