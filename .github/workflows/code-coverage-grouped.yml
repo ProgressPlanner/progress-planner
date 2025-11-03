@@ -214,16 +214,11 @@ jobs:
           echo "current_coverage=$COVERAGE" >> $GITHUB_OUTPUT
           echo "Current code coverage: $COVERAGE%"
 
-      - name: Checkout base branch for comparison
+      - name: Save current coverage
         if: github.event_name == 'pull_request'
         run: |
-          cp coverage.xml /tmp/current-coverage.xml
-          git fetch origin ${{ github.base_ref }}
-          git checkout origin/${{ github.base_ref }}
-
-      - name: Install dependencies on base branch
-        if: github.event_name == 'pull_request'
-        run: composer install --no-interaction --prefer-dist
+          cp coverage-summary.txt /tmp/current-coverage.txt
+          echo "Saved current coverage: $(cat coverage-summary.txt)%"
 
       - name: Comment PR with coverage
         if: github.event_name == 'pull_request'
@@ -231,18 +226,24 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const current = '${{ steps.coverage.outputs.current_coverage }}';
-            const diff = parseFloat(current);
-            const emoji = diff >= 50 ? '📈' : diff >= 30 ? '📊' : '📉';
-            const status = '✅';
+            const current = parseFloat('${{ steps.coverage.outputs.current_coverage }}');
+            const emoji = current >= 80 ? '🎉' : current >= 60 ? '📈' : current >= 40 ? '📊' : '📉';
+            const status = current >= 40 ? '✅' : '⚠️';
 
-            const comment = `## ${status} Code Coverage Report (Grouped)
+            const comment = `## ${status} Code Coverage Report
 
             | Metric | Value |
             |--------|-------|
-            | Current Coverage | **${current}%** ${emoji} |
+            | **Total Coverage** | **${current.toFixed(2)}%** ${emoji} |
 
-            Coverage collected by running tests in groups to avoid timeout/crash issues.
+            Coverage collected from **18 test groups** running in parallel:
+            - activities, badges, admin, api, goals, updates, ui, utils, misc
+            - suggested-tasks-providers (1-4)
+            - suggested-tasks-data-collectors (1-3)
+
+            ${current >= 40 ? '✅ Coverage meets minimum threshold' : '⚠️ Coverage below recommended 40% threshold'}
+
+            _Tests are grouped to avoid memory/timeout issues. Each group runs independently with Xdebug coverage._
 
             🤖 Generated with [Claude Code](https://claude.com/claude-code)
             `;
@@ -255,7 +256,7 @@ jobs:
 
             const botComment = comments.find(comment =>
               comment.user.type === 'Bot' &&
-              comment.body.includes('Code Coverage Report (Grouped)')
+              comment.body.includes('Code Coverage Report')
             );
 
             if (botComment) {
