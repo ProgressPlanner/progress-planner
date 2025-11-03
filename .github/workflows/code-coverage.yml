@@ -43,7 +43,7 @@ jobs:
         with:
           php-version: '8.3'
           ini-values: zend.assertions=1, error_reporting=-1, display_errors=On, memory_limit=512M
-          coverage: pcov  # Use PCOV for faster code coverage (5x faster than Xdebug)
+          coverage: xdebug  # Use Xdebug for coverage (PCOV was causing PHP to crash)
           tools: composer
 
       - name: Install SVN
@@ -63,16 +63,16 @@ jobs:
       - name: Generate code coverage report for current branch
         run: |
           echo "=== Debug: PHP Configuration ==="
-          php -i | grep -E "(memory_limit|max_execution_time|pcov)"
-          echo "=== Debug: Check PCOV is loaded ==="
-          php -m | grep pcov || echo "PCOV not loaded"
-          php -r "var_dump(extension_loaded('pcov'));"
+          php -i | grep -E "(memory_limit|max_execution_time|xdebug)"
+          echo "=== Debug: Check Xdebug is loaded ==="
+          php -m | grep xdebug || echo "Xdebug not loaded"
+          php -r "var_dump(extension_loaded('xdebug'));"
           echo "=== Running PHPUnit with coverage ==="
           echo "Start time: $(date)"
           echo "Memory before: $(free -h | grep Mem)"
           # Run PHPUnit and save output to file, allow test failures
           set +e
-          php -d memory_limit=512M -d max_execution_time=300 -d pcov.enabled=1 -d pcov.directory=${{ github.workspace }} \
+          php -d memory_limit=512M -d max_execution_time=300 \
             vendor/bin/phpunit --configuration phpunit.xml.dist \
             --coverage-clover=coverage.xml \
             --coverage-text \
