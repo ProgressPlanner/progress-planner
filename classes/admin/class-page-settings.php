@@ -146,8 +146,14 @@ class Page_Settings {
 			$this->set_page_values( $pages );
 		}
 
+		// It's possible that none of the post types are selected, so we need to handle that case.
+		$post_types = isset( $_POST['prpl-post-types-include'] )
+		? \array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
+		: [];
+
+		$this->save_post_types( $post_types );
+
 		$this->save_settings();
-		$this->save_post_types();
 
 		\do_action( 'progress_planner_settings_form_options_stored' );
 
@@ -221,13 +227,13 @@ class Page_Settings {
 	/**
 	 * Save the post types.
 	 *
+	 * @param array $post_types The post types.
+	 *
 	 * @return void
 	 */
-	public function save_post_types() {
-		// Nonce is already checked in store_settings_form_options() which calls this method.
-		$include_post_types = isset( $_POST['prpl-post-types-include'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			? \array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
-			// If no post types are selected, use the default post types (post and page can be deregistered).
+	public function save_post_types( $post_types = [] ) {
+		$include_post_types = ! empty( $post_types )
+			? $post_types
 			: \array_intersect( [ 'post', 'page' ], \progress_planner()->get_settings()->get_public_post_types() );
 
 		\progress_planner()->get_settings()->set( 'include_post_types', $include_post_types );

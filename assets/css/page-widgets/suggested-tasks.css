@@ -596,3 +596,18 @@
 		}
 	}
 }
+
+/*------------------------------------*\
+	Post types selection.
+\*------------------------------------*/
+.prpl-post-types-selection {
+
+	label {
+		display: block;
+		margin-top: 0.75rem;
+
+		&:first-child {
+			margin-top: 0;
+		}
+	}
+}
