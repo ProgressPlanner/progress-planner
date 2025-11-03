@@ -3,7 +3,6 @@
  * Unit tests for Task_Factory class.
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-data-collectors-3
  */
 
@@ -18,6 +17,8 @@ use Progress_Planner\Suggested_Tasks\Task;
  *
  * Tests the Task_Factory class that creates Task instances
  * from task IDs stored in the database.
+ *
+ * @group suggested-tasks-data-collectors-3
  */
 class Suggested_Tasks_Task_Factory_Test extends WP_UnitTestCase {
 

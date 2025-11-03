@@ -13,6 +13,8 @@ use Progress_Planner\Activities\Query;
 
 /**
  * Actions_Content_Scan_Test test case.
+ *
+ * @group actions
  */
 class Actions_Content_Scan_Test extends \WP_UnitTestCase {
 

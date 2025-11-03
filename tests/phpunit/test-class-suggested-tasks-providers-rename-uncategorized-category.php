@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Providers_Rename_Uncategorized_Category_Test
  *
  * @package Progress_Planner
- * @group suggested-tasks
  * @group suggested-tasks-providers-3
  */
 
@@ -11,6 +10,8 @@ namespace Progress_Planner\Tests;
 
 /**
  * Rename Uncategorized Category test case.
+ *
+ * @group suggested-tasks-providers-3
  */
 class Suggested_Tasks_Providers_Rename_Uncategorized_Category_Test extends \WP_UnitTestCase {
 

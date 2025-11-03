@@ -3,7 +3,6 @@
  * Unit tests for Tasks_Manager class.
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-data-collectors-3
  */
 
@@ -18,6 +17,8 @@ use Progress_Planner\Suggested_Tasks\Tasks_Interface;
  *
  * Tests the Tasks_Manager class that manages task providers,
  * task evaluation, and task injection.
+ *
+ * @group suggested-tasks-data-collectors-3
  */
 class Suggested_Tasks_Tasks_Manager_Test extends WP_UnitTestCase {
 

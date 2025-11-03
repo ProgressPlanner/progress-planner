@@ -14,6 +14,8 @@ use WP_REST_Request;
 
 /**
  * Rest_Tasks_Test test case.
+ *
+ * @group rest-api
  */
 class Rest_Tasks_Test extends \WP_UnitTestCase {
 

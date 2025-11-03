@@ -12,6 +12,8 @@ use Progress_Planner\Rest\Base;
 
 /**
  * Rest_Base_Test test case.
+ *
+ * @group rest-api
  */
 class Rest_Base_Test extends \WP_UnitTestCase {
 

@@ -12,6 +12,8 @@ use Progress_Planner\Todo;
 
 /**
  * Test case for the Task List class.
+ *
+ * @group misc
  */
 class Todo_Test extends \WP_UnitTestCase {
 

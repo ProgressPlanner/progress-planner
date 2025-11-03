@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Editor;
 
 /**
  * Admin_Editor_Test test case.
+ *
+ * @group admin
  */
 class Admin_Editor_Test extends \WP_UnitTestCase {
 

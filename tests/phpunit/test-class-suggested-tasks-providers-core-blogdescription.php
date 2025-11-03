@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Providers_Core_Blogdescription_Test
  *
  * @package Progress_Planner
- * @group suggested-tasks
  * @group suggested-tasks-providers-1
  */
 
@@ -11,6 +10,8 @@ namespace Progress_Planner\Tests;
 
 /**
  * Core blogdescription test case.
+ *
+ * @group suggested-tasks-providers-1
  */
 class Suggested_Tasks_Providers_Core_Blogdescription_Test extends \WP_UnitTestCase {
 

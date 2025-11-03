@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Providers_Remove_Inactive_Plugins_Test
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-providers-3
  */
 
@@ -13,6 +12,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Remove_Inactive_Plugins;
 
 /**
  * Suggested_Tasks_Providers_Remove_Inactive_Plugins_Test test case.
+ *
+ * @group suggested-tasks-providers-3
  */
 class Suggested_Tasks_Providers_Remove_Inactive_Plugins_Test extends \WP_UnitTestCase {
 

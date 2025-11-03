@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Providers_Permalink_Structure_Test
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-providers-2
  */
 
@@ -13,6 +12,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Permalink_Structure;
 
 /**
  * Suggested_Tasks_Providers_Permalink_Structure_Test test case.
+ *
+ * @group suggested-tasks-providers-2
  */
 class Suggested_Tasks_Providers_Permalink_Structure_Test extends \WP_UnitTestCase {
 

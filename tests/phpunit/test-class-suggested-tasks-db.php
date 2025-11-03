@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_DB_Test
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-data-collectors-3
  */
 
@@ -13,6 +12,8 @@ use Progress_Planner\Suggested_Tasks_DB;
 
 /**
  * Suggested_Tasks_DB_Test test case.
+ *
+ * @group suggested-tasks-data-collectors-3
  */
 class Suggested_Tasks_DB_Test extends \WP_UnitTestCase {
 

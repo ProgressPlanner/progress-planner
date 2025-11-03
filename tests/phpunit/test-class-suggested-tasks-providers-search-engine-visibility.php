@@ -3,7 +3,6 @@
  * Class Settings_Saved_Test
  *
  * @package Progress_Planner
- * @group suggested-tasks
  * @group suggested-tasks-providers-3
  */
 
@@ -11,6 +10,8 @@ namespace Progress_Planner\Tests;
 
 /**
  * Settings saved test case.
+ *
+ * @group suggested-tasks-providers-3
  */
 class Suggested_Tasks_Providers_Search_Engine_Visibility_Test extends \WP_UnitTestCase {
 

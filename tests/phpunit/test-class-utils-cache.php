@@ -16,6 +16,8 @@ use Progress_Planner\Utils\Cache;
  *
  * Tests the Cache utility class that wraps WordPress transients
  * with a prefixed key system for organized cache management.
+ *
+ * @group utils
  */
 class Utils_Cache_Test extends WP_UnitTestCase {
 

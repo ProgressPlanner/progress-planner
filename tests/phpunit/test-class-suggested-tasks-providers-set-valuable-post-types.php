@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Providers_Set_Valuable_Post_Types_Test
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-providers-4
  */
 
@@ -13,6 +12,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Set_Valuable_Post_Types;
 
 /**
  * Suggested_Tasks_Providers_Set_Valuable_Post_Types_Test test case.
+ *
+ * @group suggested-tasks-providers-4
  */
 class Suggested_Tasks_Providers_Set_Valuable_Post_Types_Test extends \WP_UnitTestCase {
 

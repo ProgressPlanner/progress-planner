@@ -18,6 +18,8 @@ use Progress_Planner\UI\Chart;
  *
  * Tests the Chart UI class that generates chart data
  * with support for normalized scoring and decay algorithms.
+ *
+ * @group ui
  */
 class UI_Chart_Test extends WP_UnitTestCase {
 

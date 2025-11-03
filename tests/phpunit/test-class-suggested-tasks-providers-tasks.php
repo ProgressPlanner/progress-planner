@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Providers_Tasks_Test
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-providers-4
  */
 
@@ -13,6 +12,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Tasks;
 
 /**
  * Mock Tasks class for testing.
+ *
+ * @group suggested-tasks-providers-4
  */
 class Mock_Tasks_Provider extends Tasks {
 

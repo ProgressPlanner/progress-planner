@@ -14,6 +14,8 @@ use WP_REST_Request;
 
 /**
  * Test_API_Get_Stats test case.
+ *
+ * @group api
  */
 class Test_API_Get_Stats extends \WP_UnitTestCase {
 

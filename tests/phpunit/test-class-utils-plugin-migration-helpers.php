@@ -16,6 +16,8 @@ use Progress_Planner\Utils\Plugin_Migration_Helpers;
  *
  * Tests the Plugin_Migration_Helpers utility class that handles
  * parsing legacy task ID formats for backward compatibility.
+ *
+ * @group utils
  */
 class Utils_Plugin_Migration_Helpers_Test extends WP_UnitTestCase {
 

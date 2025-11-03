@@ -15,6 +15,8 @@ use Progress_Planner\Goals\Goal;
  * Goals_Goal test case.
  *
  * Tests the Goals\Goal class that represents individual goals.
+ *
+ * @group goals
  */
 class Goals_Goal_Test extends WP_UnitTestCase {
 

@@ -12,6 +12,8 @@ use Progress_Planner\Lessons;
 
 /**
  * Lessons_Test test case.
+ *
+ * @group lessons
  */
 class Lessons_Test extends \WP_UnitTestCase {
 

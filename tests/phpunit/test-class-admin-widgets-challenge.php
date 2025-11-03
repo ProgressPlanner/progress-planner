@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Widgets\Challenge;
 
 /**
  * Admin_Widgets_Challenge_Test test case.
+ *
+ * @group admin
  */
 class Admin_Widgets_Challenge_Test extends \WP_UnitTestCase {
 

@@ -10,6 +10,8 @@ namespace Progress_Planner\Tests;
 
 /**
  * Class Prpl_Recommendations_Status_Transition_Test
+ *
+ * @group recommendations
  */
 class Prpl_Recommendations_Status_Transition_Test extends \WP_UnitTestCase {
 

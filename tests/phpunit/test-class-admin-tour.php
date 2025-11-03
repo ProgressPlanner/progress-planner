@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Tour;
 
 /**
  * Admin_Tour_Test test case.
+ *
+ * @group admin
  */
 class Admin_Tour_Test extends \WP_UnitTestCase {
 

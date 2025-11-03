@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Widgets\Suggested_Tasks;
 
 /**
  * Admin_Widgets_Suggested_Tasks_Test test case.
+ *
+ * @group admin
  */
 class Admin_Widgets_Suggested_Tasks_Test extends \WP_UnitTestCase {
 

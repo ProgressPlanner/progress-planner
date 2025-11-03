@@ -12,6 +12,8 @@ use Progress_Planner\Badges\Badge_Maintenance;
 
 /**
  * Mock Badge_Maintenance for testing.
+ *
+ * @group badges
  */
 class Mock_Badge_Maintenance extends Badge_Maintenance {
 	/**

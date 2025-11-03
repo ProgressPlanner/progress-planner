@@ -3,7 +3,6 @@
  * Unit tests for Tasks_Interactive class.
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-providers-4
  */
 
@@ -14,6 +13,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Tasks_Interactive;
 
 /**
  * Mock interactive task for testing.
+ *
+ * @group suggested-tasks-providers-4
  */
 class Mock_Interactive_Task extends Tasks_Interactive {
 	/**

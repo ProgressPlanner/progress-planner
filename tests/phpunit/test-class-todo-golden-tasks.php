@@ -17,6 +17,8 @@ use WP_UnitTestCase;
  *
  * Tests the GOLDEN task assignment and reset mechanism that awards
  * bonus points to the first task in the user's task list.
+ *
+ * @group todos
  */
 class Test_Todo_Golden_Tasks extends WP_UnitTestCase {
 

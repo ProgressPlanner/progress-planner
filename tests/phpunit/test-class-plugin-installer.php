@@ -12,6 +12,8 @@ use Progress_Planner\Plugin_Installer;
 
 /**
  * Plugin_Installer_Test test case.
+ *
+ * @group misc
  */
 class Plugin_Installer_Test extends \WP_UnitTestCase {
 

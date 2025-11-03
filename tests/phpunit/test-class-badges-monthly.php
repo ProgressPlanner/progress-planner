@@ -13,6 +13,8 @@ use Progress_Planner\Badges\Monthly;
 
 /**
  * Badges\Monthly test case.
+ *
+ * @group badges
  */
 class Badges_Monthly_Test extends \WP_UnitTestCase {
 

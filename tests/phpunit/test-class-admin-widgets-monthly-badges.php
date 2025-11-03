@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Widgets\Monthly_Badges;
 
 /**
  * Admin_Widgets_Monthly_Badges_Test test case.
+ *
+ * @group admin
  */
 class Admin_Widgets_Monthly_Badges_Test extends \WP_UnitTestCase {
 

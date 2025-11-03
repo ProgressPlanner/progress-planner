@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Widgets\Widget;
 
 /**
  * Admin_Widgets_Widget_Test test case.
+ *
+ * @group admin
  */
 class Admin_Widgets_Widget_Test extends \WP_UnitTestCase {
 

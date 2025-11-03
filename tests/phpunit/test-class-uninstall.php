@@ -10,6 +10,8 @@ namespace Progress_Planner\Tests;
 
 /**
  * Uninstall test case.
+ *
+ * @group uninstall
  */
 class Uninstall_Test extends \WP_UnitTestCase {
 

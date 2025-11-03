@@ -12,6 +12,8 @@ use Progress_Planner\Page_Todos;
 
 /**
  * Page_Todos_Test test case.
+ *
+ * @group pages
  */
 class Page_Todos_Test extends \WP_UnitTestCase {
 

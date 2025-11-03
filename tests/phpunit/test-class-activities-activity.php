@@ -3,7 +3,6 @@
  * Class Activities_Activity_Test
  *
  * @package Progress_Planner\Tests
- * @group activities
  */
 
 namespace Progress_Planner\Tests;
@@ -12,6 +11,8 @@ use Progress_Planner\Activities\Activity;
 
 /**
  * Activities\Activity test case.
+ *
+ * @group activities
  */
 class Activities_Activity_Test extends \WP_UnitTestCase {
 

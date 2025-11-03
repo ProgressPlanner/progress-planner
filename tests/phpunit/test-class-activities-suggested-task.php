@@ -3,7 +3,6 @@
  * Class Activities_Suggested_Task_Test
  *
  * @package Progress_Planner\Tests
- * @group activities
  */
 
 namespace Progress_Planner\Tests;
@@ -13,6 +12,8 @@ use Progress_Planner\Activities\Query;
 
 /**
  * Activities_Suggested_Task_Test test case.
+
+ * @group activities
  */
 class Activities_Suggested_Task_Test extends \WP_UnitTestCase {
 

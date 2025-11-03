@@ -12,6 +12,8 @@ use Progress_Planner\Plugin_Deactivation;
 
 /**
  * Plugin_Deactivation_Test test case.
+ *
+ * @group misc
  */
 class Plugin_Deactivation_Test extends \WP_UnitTestCase {
 

@@ -21,6 +21,8 @@ require_once __DIR__ . '/class-mock-goal-object.php';
  *
  * Tests the streak calculation algorithm with allowed breaks feature
  * that provides flexibility when users miss occasional goals.
+ *
+ * @group goals
  */
 class Goals_Goal_Recurring_Test extends WP_UnitTestCase {
 

@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Widgets\Todo;
 
 /**
  * Test case for the Admin Widgets Task List class.
+ *
+ * @group admin
  */
 class Admin_Widgets_Todo_Test extends \WP_UnitTestCase {
 

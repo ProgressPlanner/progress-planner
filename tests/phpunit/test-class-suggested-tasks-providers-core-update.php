@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Providers_Core_Update_Test
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-providers-1
  */
 
@@ -13,6 +12,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Core_Update;
 
 /**
  * Suggested_Tasks_Providers_Core_Update_Test test case.
+ *
+ * @group suggested-tasks-providers-1
  */
 class Suggested_Tasks_Providers_Core_Update_Test extends \WP_UnitTestCase {
 

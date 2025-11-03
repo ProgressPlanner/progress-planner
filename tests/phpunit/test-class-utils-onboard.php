@@ -16,6 +16,8 @@ use Progress_Planner\Utils\Onboard;
  *
  * Tests the Onboard utility class that handles plugin
  * onboarding and activation workflows.
+ *
+ * @group utils
  */
 class Utils_Onboard_Test extends WP_UnitTestCase {
 

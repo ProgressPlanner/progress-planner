@@ -12,6 +12,8 @@ use Progress_Planner\Settings;
 
 /**
  * Settings_Test test case.
+ *
+ * @group misc
  */
 class Settings_Test extends \WP_UnitTestCase {
 

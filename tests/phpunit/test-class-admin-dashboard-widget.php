@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Dashboard_Widget;
 
 /**
  * Mock Dashboard_Widget for testing.
+ *
+ * @group admin
  */
 class Mock_Dashboard_Widget extends Dashboard_Widget {
 	/**

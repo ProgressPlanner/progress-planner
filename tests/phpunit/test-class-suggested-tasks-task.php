@@ -3,7 +3,6 @@
  * Unit tests for Task class.
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-data-collectors-3
  */
 
@@ -17,6 +16,8 @@ use Progress_Planner\Suggested_Tasks\Task;
  *
  * Tests the Task class that represents a suggested task
  * with various properties and methods for task management.
+ *
+ * @group suggested-tasks-data-collectors-3
  */
 class Suggested_Tasks_Task_Test extends WP_UnitTestCase {
 

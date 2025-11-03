@@ -3,7 +3,6 @@
  * Unit tests for Activities\Maintenance class.
  *
  * @package Progress_Planner\Tests
- * @group activities
  */
 
 namespace Progress_Planner\Tests;
@@ -15,6 +14,8 @@ use Progress_Planner\Activities\Maintenance;
  * Activities_Maintenance test case.
  *
  * Tests the Activities\Maintenance class for maintenance activities.
+
+ * @group activities
  */
 class Activities_Maintenance_Test extends WP_UnitTestCase {
 

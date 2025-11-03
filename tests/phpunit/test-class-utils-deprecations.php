@@ -16,6 +16,8 @@ use Progress_Planner\Utils\Deprecations;
  *
  * Tests the Deprecations utility class that maintains mappings
  * of deprecated classes and methods to their new locations.
+ *
+ * @group utils
  */
 class Utils_Deprecations_Test extends WP_UnitTestCase {
 

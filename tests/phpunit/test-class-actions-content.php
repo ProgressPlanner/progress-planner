@@ -13,6 +13,8 @@ use WP_UnitTestCase;
 
 /**
  * Class Actions_Content_Test
+ *
+ * @group actions
  */
 class Actions_Content_Test extends \WP_UnitTestCase {
 

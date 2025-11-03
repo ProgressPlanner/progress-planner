@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Widgets\Whats_New;
 
 /**
  * Admin_Widgets_Whats_New_Test test case.
+ *
+ * @group admin
  */
 class Admin_Widgets_Whats_New_Test extends \WP_UnitTestCase {
 

@@ -3,7 +3,6 @@
  * Unit tests for Fewer_Tags_Provider_Test class.
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-providers-2
  */
 
@@ -15,6 +14,8 @@ use WP_Filesystem_Base;
 
 /**
  * Class Suggested_Tasks_Providers_Fewer_Tags_Test.
+ *
+ * @group suggested-tasks-providers-2
  */
 class Suggested_Tasks_Providers_Fewer_Tags_Test extends \WP_UnitTestCase {
 

@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Enqueue;
 
 /**
  * Admin_Enqueue_Test test case.
+ *
+ * @group admin
  */
 class Admin_Enqueue_Test extends \WP_UnitTestCase {
 

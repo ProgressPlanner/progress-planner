@@ -12,6 +12,8 @@ use Progress_Planner\Plugin_Upgrade_Tasks;
 
 /**
  * Plugin_Upgrade_Tasks_Test test case.
+ *
+ * @group misc
  */
 class Plugin_Upgrade_Tasks_Test extends \WP_UnitTestCase {
 

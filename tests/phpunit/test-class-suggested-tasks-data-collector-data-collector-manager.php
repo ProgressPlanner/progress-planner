@@ -3,7 +3,6 @@
  * Unit tests for Data_Collector_Manager class.
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-data-collectors-1
  */
 
@@ -18,6 +17,8 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector;
  *
  * Tests the Data_Collector_Manager class that manages all data collectors
  * and handles cache updates.
+ *
+ * @group suggested-tasks-data-collectors-1
  */
 class Suggested_Tasks_Data_Collector_Data_Collector_Manager_Test extends WP_UnitTestCase {
 

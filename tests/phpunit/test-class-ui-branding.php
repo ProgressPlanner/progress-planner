@@ -16,6 +16,8 @@ use Progress_Planner\UI\Branding;
  *
  * Tests the Branding UI class that handles custom branding
  * based on hosting provider and configuration.
+ *
+ * @group ui
  */
 class UI_Branding_Test extends WP_UnitTestCase {
 

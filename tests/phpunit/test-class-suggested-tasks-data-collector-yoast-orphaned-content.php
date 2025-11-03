@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Data_Collector_Yoast_Orphaned_Content_Test
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-data-collectors-2
  */
 
@@ -13,6 +12,8 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content;
 
 /**
  * Suggested_Tasks_Data_Collector_Yoast_Orphaned_Content_Test test case.
+ *
+ * @group suggested-tasks-data-collectors-2
  */
 class Suggested_Tasks_Data_Collector_Yoast_Orphaned_Content_Test extends \WP_UnitTestCase {
 

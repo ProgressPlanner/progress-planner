@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Providers_Improve_Pdf_Handling_Test
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-providers-2
  */
 
@@ -13,6 +12,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Improve_Pdf_Handling;
 
 /**
  * Suggested_Tasks_Providers_Improve_Pdf_Handling_Test test case.
+ *
+ * @group suggested-tasks-providers-2
  */
 class Suggested_Tasks_Providers_Improve_Pdf_Handling_Test extends \WP_UnitTestCase {
 

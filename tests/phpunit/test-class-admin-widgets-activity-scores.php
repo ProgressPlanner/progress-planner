@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Widgets\Activity_Scores;
 
 /**
  * Admin_Widgets_Activity_Scores_Test test case.
+ *
+ * @group admin
  */
 class Admin_Widgets_Activity_Scores_Test extends \WP_UnitTestCase {
 

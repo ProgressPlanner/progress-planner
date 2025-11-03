@@ -246,8 +246,6 @@ class Activities_Content_Helpers_Test extends WP_UnitTestCase {
 	 * Tests that the method properly filters post types and returns a valid array structure.
 	 * Note: Custom post type registration testing is limited due to static caching in the method.
 	 * The static cache persists across test methods, making it difficult to test dynamic post type registration.
-	 *
-	 * @group post-types
 	 */
 	public function test_get_post_types_names_filtering() {
 		// Test that the method returns an array.

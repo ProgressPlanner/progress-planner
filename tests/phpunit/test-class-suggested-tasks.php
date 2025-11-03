@@ -12,6 +12,8 @@ use Progress_Planner\Suggested_Tasks;
 
 /**
  * Suggested_Tasks_Test test case.
+ *
+ * @group misc
  */
 class Suggested_Tasks_Test extends \WP_UnitTestCase {
 

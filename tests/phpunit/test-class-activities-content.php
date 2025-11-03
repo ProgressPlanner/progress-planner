@@ -3,7 +3,6 @@
  * Class Activities_Content_Test
  *
  * @package Progress_Planner\Tests
- * @group activities
  */
 
 namespace Progress_Planner\Tests;
@@ -13,6 +12,8 @@ use WP_UnitTestCase;
 
 /**
  * Activities\Content test case.
+
+ * @group activities
  */
 class Activities_Content_Test extends \WP_UnitTestCase {
 

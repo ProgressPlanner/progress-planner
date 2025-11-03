@@ -12,6 +12,8 @@ use Progress_Planner\Plugin_Migrations;
 
 /**
  * Plugin_Migrations_Test test case.
+ *
+ * @group misc
  */
 class Plugin_Migrations_Test extends \WP_UnitTestCase {
 

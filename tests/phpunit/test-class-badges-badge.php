@@ -12,6 +12,8 @@ use Progress_Planner\Badges\Badge;
 
 /**
  * Mock Badge for testing abstract class.
+ *
+ * @group badges
  */
 class Mock_Badge extends Badge {
 	/**

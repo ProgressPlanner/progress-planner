@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Widgets\Badge_Streak_Maintenance;
 
 /**
  * Admin_Widgets_Badge_Streak_Maintenance_Test test case.
+ *
+ * @group admin
  */
 class Admin_Widgets_Badge_Streak_Maintenance_Test extends \WP_UnitTestCase {
 

@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Providers_Integrations_AIOSEO_AIOSEO_Provider_Test
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-providers-2
  */
 
@@ -13,6 +12,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Integrations\AIOSEO\AIOSEO_Provid
 
 /**
  * Mock AIOSEO_Provider for testing.
+ *
+ * @group suggested-tasks-providers-2
  */
 class Mock_AIOSEO_Provider extends AIOSEO_Provider {
 	protected const PROVIDER_ID = 'test-aioseo';

@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Widgets\Badge_Streak;
 
 /**
  * Mock Badge_Streak for testing abstract class.
+ *
+ * @group admin
  */
 class Mock_Badge_Streak extends Badge_Streak {
 	// No additional methods needed - Badge_Streak is abstract but has no abstract methods.

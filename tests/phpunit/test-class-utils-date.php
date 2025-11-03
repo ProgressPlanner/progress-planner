@@ -10,6 +10,8 @@ namespace Progress_Planner\Tests;
 
 /**
  * Utils\Date test case.
+ *
+ * @group utils
  */
 class Utils_Date_Test extends \WP_UnitTestCase {
 

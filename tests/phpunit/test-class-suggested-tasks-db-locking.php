@@ -3,7 +3,6 @@
  * Unit tests for distributed locking mechanism in task creation.
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-data-collectors-3
  */
 
@@ -16,6 +15,8 @@ use WP_UnitTestCase;
  *
  * Tests the distributed locking mechanism that prevents race conditions
  * when multiple processes attempt to create the same task simultaneously.
+ *
+ * @group suggested-tasks-data-collectors-3
  */
 class Test_Suggested_Tasks_DB_Locking extends WP_UnitTestCase {
 

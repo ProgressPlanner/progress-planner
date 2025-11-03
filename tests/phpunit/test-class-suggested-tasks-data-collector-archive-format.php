@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Data_Collector_Archive_Format_Test
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-data-collectors-1
  */
 
@@ -13,6 +12,8 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Archive_Format;
 
 /**
  * Suggested_Tasks_Data_Collector_Archive_Format_Test test case.
+ *
+ * @group suggested-tasks-data-collectors-1
  */
 class Suggested_Tasks_Data_Collector_Archive_Format_Test extends \WP_UnitTestCase {
 

@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Widgets\Content_Activity;
 
 /**
  * Admin_Widgets_Content_Activity_Test test case.
+ *
+ * @group admin
  */
 class Admin_Widgets_Content_Activity_Test extends \WP_UnitTestCase {
 

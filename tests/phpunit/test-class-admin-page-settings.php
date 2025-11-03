@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Page_Settings;
 
 /**
  * Admin_Page_Settings_Test test case.
+ *
+ * @group admin
  */
 class Admin_Page_Settings_Test extends \WP_UnitTestCase {
 

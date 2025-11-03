@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Providers_Disable_Comments_Test
  *
  * @package Progress_Planner
- * @group suggested-tasks
  * @group suggested-tasks-providers-2
  */
 
@@ -11,6 +10,8 @@ namespace Progress_Planner\Tests;
 
 /**
  * Settings saved test case.
+ *
+ * @group suggested-tasks-providers-2
  */
 class Suggested_Tasks_Providers_Disable_Comments_Test extends \WP_UnitTestCase {
 

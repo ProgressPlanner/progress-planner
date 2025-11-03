@@ -12,6 +12,8 @@ use Progress_Planner\Badges;
 
 /**
  * Badges_Test test case.
+ *
+ * @group misc
  */
 class Badges_Test extends \WP_UnitTestCase {
 

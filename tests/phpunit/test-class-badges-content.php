@@ -10,6 +10,8 @@ namespace Progress_Planner\Tests;
 
 /**
  * Badges content test case.
+ *
+ * @group badges
  */
 class Badges_Content_Test extends \WP_UnitTestCase {
 

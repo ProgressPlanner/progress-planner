@@ -12,6 +12,8 @@ use Progress_Planner\Page_Types;
 
 /**
  * Page_Types_Test test case.
+ *
+ * @group pages
  */
 class Page_Types_Test extends \WP_UnitTestCase {
 

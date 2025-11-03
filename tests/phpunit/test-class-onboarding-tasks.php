@@ -12,6 +12,8 @@ use WP_UnitTestCase;
 
 /**
  * Class Onboarding_Tasks_Test.
+ *
+ * @group onboarding
  */
 class Onboarding_Tasks_Test extends \WP_UnitTestCase {
 

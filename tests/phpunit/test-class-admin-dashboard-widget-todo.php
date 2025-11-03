@@ -12,6 +12,8 @@ use Progress_Planner\Admin\Dashboard_Widget_Todo;
 
 /**
  * Test case for the Dashboard Widget Task List class.
+ *
+ * @group admin
  */
 class Admin_Dashboard_Widget_Todo_Test extends \WP_UnitTestCase {
 

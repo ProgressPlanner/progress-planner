@@ -13,6 +13,8 @@ use WP_REST_Request;
 
 /**
  * Rest_Recommendations_Controller_Test test case.
+ *
+ * @group rest-api
  */
 class Rest_Recommendations_Controller_Test extends \WP_UnitTestCase {
 

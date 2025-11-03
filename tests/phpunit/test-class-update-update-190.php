@@ -12,6 +12,8 @@ use Progress_Planner\Update\Update_190;
 
 /**
  * Update_Update_190_Test test case.
+ *
+ * @group updates
  */
 class Update_Update_190_Test extends \WP_UnitTestCase {
 

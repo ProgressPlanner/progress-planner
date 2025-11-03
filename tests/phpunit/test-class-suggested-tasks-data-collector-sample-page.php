@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Data_Collector_Sample_Page_Test
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-data-collectors-2
  */
 
@@ -13,6 +12,8 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page;
 
 /**
  * Suggested_Tasks_Data_Collector_Sample_Page_Test test case.
+ *
+ * @group suggested-tasks-data-collectors-2
  */
 class Suggested_Tasks_Data_Collector_Sample_Page_Test extends \WP_UnitTestCase {
 

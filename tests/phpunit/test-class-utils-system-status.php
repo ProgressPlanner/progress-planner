@@ -16,6 +16,8 @@ use Progress_Planner\Utils\System_Status;
  *
  * Tests the System_Status utility class that aggregates
  * various system and plugin status information.
+ *
+ * @group utils
  */
 class Utils_System_Status_Test extends WP_UnitTestCase {
 

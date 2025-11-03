@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Providers_Select_Locale_Test
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-providers-3
  */
 
@@ -13,6 +12,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Select_Locale;
 
 /**
  * Suggested_Tasks_Providers_Select_Locale_Test test case.
+ *
+ * @group suggested-tasks-providers-3
  */
 class Suggested_Tasks_Providers_Select_Locale_Test extends \WP_UnitTestCase {
 

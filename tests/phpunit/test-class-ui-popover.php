@@ -16,6 +16,8 @@ use Progress_Planner\UI\Popover;
  *
  * Tests the Popover UI class that manages popover
  * instances and rendering.
+ *
+ * @group ui
  */
 class UI_Popover_Test extends WP_UnitTestCase {
 

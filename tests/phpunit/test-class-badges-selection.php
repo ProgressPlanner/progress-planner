@@ -15,6 +15,8 @@ use WP_UnitTestCase;
  *
  * Tests the badge system structure and settings storage.
  * Full badge completion tests would require creating actual activities.
+ *
+ * @group badges
  */
 class Test_Badges_Selection extends WP_UnitTestCase {
 

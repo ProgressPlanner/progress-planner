@@ -3,7 +3,6 @@
  * Unit tests for Terms_Without_Description_Data_Collector_Test class.
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-data-collectors-2
  */
 
@@ -14,6 +13,8 @@ use WP_UnitTestCase;
 
 /**
  * Class Suggested_Tasks_Data_Collector_Terms_Without_Description_Test.
+ *
+ * @group suggested-tasks-data-collectors-2
  */
 class Suggested_Tasks_Data_Collector_Terms_Without_Description_Test extends \WP_UnitTestCase {
 

@@ -3,7 +3,6 @@
  * Class Suggested_Tasks_Providers_Site_Icon_Test
  *
  * @package Progress_Planner\Tests
- * @group suggested-tasks
  * @group suggested-tasks-providers-4
  */
 
@@ -13,6 +12,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Site_Icon;
 
 /**
  * Suggested_Tasks_Providers_Site_Icon_Test test case.
+ *
+ * @group suggested-tasks-providers-4
  */
 class Suggested_Tasks_Providers_Site_Icon_Test extends \WP_UnitTestCase {
 
