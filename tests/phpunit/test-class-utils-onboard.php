@@ -3,7 +3,6 @@
  * Unit tests for Onboard utility class.
  *
  * @package Progress_Planner\Tests
- * @group misc
  */
 
 namespace Progress_Planner\Tests;
@@ -17,7 +16,9 @@ use Progress_Planner\Utils\Onboard;
  * Tests the Onboard utility class that handles plugin
  * onboarding and activation workflows.
  *
- * @group misc
+ * Note: This test is not included in grouped coverage runs because
+ * it calls methods that use wp_send_json_error() which outputs JSON
+ * and interferes with Xdebug coverage generation.
  */
 class Utils_Onboard_Test extends WP_UnitTestCase {
 
