@@ -6,16 +6,17 @@
 	convertErrorsToExceptions="true"
 	convertNoticesToExceptions="true"
 	convertWarningsToExceptions="true"
+	beStrictAboutCoverageMetadata="false"
 	>
 	<testsuites>
 		<testsuite name="testing">
 			<directory prefix="test-" suffix=".php">./tests/</directory>
 		</testsuite>
 	</testsuites>
-	<coverage>
-    <include>
-        <directory suffix=".php">classes</directory>
-		<file>progress-planner.php</file>
-    </include>
-  </coverage>
+	<coverage processUncoveredFiles="true">
+		<include>
+			<directory suffix=".php">classes</directory>
+			<file>progress-planner.php</file>
+		</include>
+	</coverage>
 </phpunit>
