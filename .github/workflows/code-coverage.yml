@@ -77,7 +77,7 @@ jobs:
           pwd
           ls -la
           echo "=== Running PHPUnit with coverage (without piping to tee) ==="
-          php -d pcov.enabled=1 -d pcov.directory=. vendor/bin/phpunit --dont-report-useless-tests --coverage-clover=coverage.xml --coverage-text 2>&1 | tail -100
+          php -d pcov.enabled=1 -d pcov.directory=${{ github.workspace }} vendor/bin/phpunit --dont-report-useless-tests --coverage-clover=coverage.xml --coverage-text 2>&1 | tail -100
           PHPUNIT_EXIT=$?
           echo "=== Debug: PHPUnit exit code: $PHPUNIT_EXIT ==="
           echo "=== Debug: After running PHPUnit ==="
