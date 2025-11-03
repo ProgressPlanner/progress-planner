@@ -1,0 +1,23 @@
+name: Coverage Status Check
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  coverage-gate:
+    name: Coverage Gate
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Wait for coverage check to complete
+        uses: lewagon/wait-on-check-action@v1.3.4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          check-name: 'Code Coverage Check'
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          wait-interval: 10
+          allowed-conclusions: success
+
+      - name: Coverage gate passed
+        run: echo "✅ Code coverage requirements met!"

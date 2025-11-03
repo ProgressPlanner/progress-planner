@@ -1,0 +1,180 @@
+name: Code Coverage
+
+on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - develop
+      - main
+  workflow_dispatch:
+
+# Cancels all previous workflow runs for the same branch that have not yet completed.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  code-coverage:
+    name: Code Coverage Check
+    runs-on: ubuntu-latest
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: false
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_tests
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=10s --health-retries=10
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for accurate diff
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          ini-values: zend.assertions=1, error_reporting=-1, display_errors=On
+          coverage: xdebug  # Enable Xdebug for code coverage
+          tools: composer
+
+      - name: Install SVN
+        run: sudo apt-get install subversion
+
+      - name: "Composer: remove the PHP platform requirement"
+        run: composer config --unset platform.php
+
+      - name: Install Composer dependencies
+        uses: ramsey/composer-install@v2
+        with:
+          dependency-versions: "highest"
+          composer-options: "yoast/wp-test-utils --with-dependencies"
+          custom-cache-suffix: $(date -u -d "-0 month -$(($(date +%d)-1)) days" "+%F")
+
+      - name: Install WordPress Test Suite
+        shell: bash
+        run: tests/bin/install-wp-tests.sh wordpress_tests root root 127.0.0.1:3306 latest
+
+      - name: Generate code coverage report for current branch
+        run: |
+          composer test -- --coverage-clover=coverage.xml --coverage-text
+        continue-on-error: false
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage.xml
+          flags: unittests
+          name: codecov-progress-planner
+          fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+
+      - name: Generate coverage report summary
+        id: coverage
+        run: |
+          # Extract coverage percentage from PHPUnit output
+          COVERAGE=$(vendor/bin/phpunit --coverage-text --colors=never | grep "Lines:" | awk '{print $2}' | sed 's/%//')
+          echo "current_coverage=$COVERAGE" >> $GITHUB_OUTPUT
+          echo "Current code coverage: $COVERAGE%"
+
+      - name: Checkout base branch for comparison
+        if: github.event_name == 'pull_request'
+        run: |
+          git fetch origin ${{ github.base_ref }}
+          git checkout origin/${{ github.base_ref }}
+
+      - name: Install dependencies on base branch
+        if: github.event_name == 'pull_request'
+        run: |
+          composer install --no-interaction --prefer-dist --optimize-autoloader
+
+      - name: Generate coverage report for base branch
+        if: github.event_name == 'pull_request'
+        id: base_coverage
+        run: |
+          # Generate coverage for base branch
+          vendor/bin/phpunit --coverage-text --colors=never > base-coverage.txt 2>&1 || true
+          BASE_COVERAGE=$(cat base-coverage.txt | grep "Lines:" | awk '{print $2}' | sed 's/%//' || echo "0")
+          echo "base_coverage=$BASE_COVERAGE" >> $GITHUB_OUTPUT
+          echo "Base branch code coverage: $BASE_COVERAGE%"
+        continue-on-error: true
+
+      - name: Compare coverage and enforce threshold
+        if: github.event_name == 'pull_request'
+        run: |
+          CURRENT="${{ steps.coverage.outputs.current_coverage }}"
+          BASE="${{ steps.base_coverage.outputs.base_coverage }}"
+
+          # Default to 0 if base coverage couldn't be determined
+          BASE=${BASE:-0}
+
+          echo "Current Coverage: $CURRENT%"
+          echo "Base Coverage: $BASE%"
+
+          # Calculate the difference
+          DIFF=$(echo "$CURRENT - $BASE" | bc)
+          echo "Coverage Difference: $DIFF%"
+
+          # Check if coverage dropped by more than 0.5%
+          THRESHOLD=-0.5
+          if (( $(echo "$DIFF < $THRESHOLD" | bc -l) )); then
+            echo "❌ Code coverage dropped by ${DIFF}%, which exceeds the allowed threshold of ${THRESHOLD}%"
+            echo "Please add tests to maintain or improve code coverage."
+            exit 1
+          else
+            echo "✅ Code coverage check passed!"
+            echo "Coverage change: ${DIFF}%"
+          fi
+
+      - name: Comment PR with coverage
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const current = '${{ steps.coverage.outputs.current_coverage }}';
+            const base = '${{ steps.base_coverage.outputs.base_coverage }}' || '0';
+            const diff = (parseFloat(current) - parseFloat(base)).toFixed(2);
+            const emoji = diff >= 0 ? '📈' : '📉';
+            const status = diff >= -0.5 ? '✅' : '❌';
+
+            const comment = `## ${status} Code Coverage Report
+
+            | Metric | Value |
+            |--------|-------|
+            | Current Coverage | **${current}%** |
+            | Base Coverage | **${base}%** |
+            | Difference | ${emoji} **${diff}%** |
+
+            ${diff < -0.5 ? '⚠️ **Warning:** Coverage dropped by more than 0.5%. Please add tests.' : ''}
+            ${diff >= 0 ? '🎉 Great job maintaining/improving code coverage!' : ''}
+            `;
+
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+
+      - name: Generate HTML coverage report
+        if: always()
+        run: |
+          vendor/bin/phpunit --coverage-html=coverage-html
+        continue-on-error: true
+
+      - name: Upload HTML coverage report as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-html/
+          retention-days: 30
