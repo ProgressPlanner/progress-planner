@@ -80,8 +80,19 @@ jobs:
       - name: Generate coverage report summary
         id: coverage
         run: |
-          # Extract coverage percentage from the saved output
-          COVERAGE=$(grep "Lines:" coverage-output.txt | awk '{print $2}' | sed 's/%//')
+          # Extract coverage percentage from clover XML
+          if [ -f coverage.xml ]; then
+            # Extract lines covered and total from XML
+            LINES=$(grep -o 'statements="[0-9]*"' coverage.xml | head -1 | grep -o '[0-9]*')
+            COVERED=$(grep -o 'coveredstatements="[0-9]*"' coverage.xml | head -1 | grep -o '[0-9]*')
+            if [ -n "$LINES" ] && [ -n "$COVERED" ] && [ "$LINES" -gt 0 ]; then
+              COVERAGE=$(awk "BEGIN {printf \"%.2f\", ($COVERED/$LINES)*100}")
+            else
+              COVERAGE="0"
+            fi
+          else
+            COVERAGE="0"
+          fi
           echo "current_coverage=$COVERAGE" >> $GITHUB_OUTPUT
           echo "Current code coverage: $COVERAGE%"
 
@@ -158,12 +169,35 @@ jobs:
             ${diff >= 0 ? '🎉 Great job maintaining/improving code coverage!' : ''}
             `;
 
-            github.rest.issues.createComment({
+            // Find existing coverage report comment
+            const {data: comments} = await github.rest.issues.listComments({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: comment
             });
+
+            const botComment = comments.find(comment =>
+              comment.user.type === 'Bot' &&
+              comment.body.includes('Code Coverage Report')
+            );
+
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                comment_id: botComment.id,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                issue_number: context.issue.number,
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                body: comment
+              });
+            }
 
       - name: Generate HTML coverage report
         if: always()
