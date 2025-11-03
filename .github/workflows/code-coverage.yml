@@ -76,8 +76,12 @@ jobs:
           echo "=== Debug: Before running PHPUnit ==="
           pwd
           ls -la
-          echo "=== Running PHPUnit with coverage (without piping to tee) ==="
-          php -d pcov.enabled=1 -d pcov.directory=${{ github.workspace }} vendor/bin/phpunit --coverage-clover=coverage.xml --coverage-text 2>&1 | tail -100
+          echo "=== Debug: Check phpunit.xml.dist contents ==="
+          cat phpunit.xml.dist
+          echo "=== Debug: Test PCOV is actually working ==="
+          php -d pcov.enabled=1 -d pcov.directory=${{ github.workspace }} -r "var_dump(ini_get('pcov.enabled'), ini_get('pcov.directory'));"
+          echo "=== Running PHPUnit with coverage ==="
+          php -d pcov.enabled=1 -d pcov.directory=${{ github.workspace }} vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-clover=coverage.xml --coverage-text 2>&1 | tail -150
           PHPUNIT_EXIT=$?
           echo "=== Debug: PHPUnit exit code: $PHPUNIT_EXIT ==="
           echo "=== Debug: After running PHPUnit ==="
