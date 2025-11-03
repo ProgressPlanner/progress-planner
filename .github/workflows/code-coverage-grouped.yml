@@ -113,6 +113,7 @@ jobs:
   merge-coverage:
     name: Merge & Report Coverage
     needs: coverage-matrix
+    if: always()
     runs-on: ubuntu-latest
 
     steps:
@@ -132,11 +133,12 @@ jobs:
         with:
           pattern: coverage-*
           merge-multiple: true
+        continue-on-error: true
 
       - name: List downloaded coverage files
         run: |
           echo "Downloaded coverage files:"
-          ls -lh coverage-*.xml
+          ls -lh coverage-*.xml || echo "No coverage files found"
 
       - name: Merge coverage reports
         run: |
