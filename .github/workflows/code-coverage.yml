@@ -80,17 +80,44 @@ jobs:
       - name: Generate coverage report summary
         id: coverage
         run: |
-          # Extract coverage percentage from clover XML
+          # Debug: Check for coverage files
+          echo "=== Debug: Looking for coverage files ==="
+          ls -la coverage* 2>/dev/null || echo "No coverage files found in current directory"
+          ls -la ${{ github.workspace }}/coverage* 2>/dev/null || echo "No coverage files in workspace"
+
+          # Try both locations
+          COVERAGE_FILE=""
           if [ -f coverage.xml ]; then
-            # Extract lines covered and total from XML
-            LINES=$(grep -o 'statements="[0-9]*"' coverage.xml | head -1 | grep -o '[0-9]*')
-            COVERED=$(grep -o 'coveredstatements="[0-9]*"' coverage.xml | head -1 | grep -o '[0-9]*')
+            COVERAGE_FILE="coverage.xml"
+          elif [ -f ${{ github.workspace }}/coverage.xml ]; then
+            COVERAGE_FILE="${{ github.workspace }}/coverage.xml"
+          fi
+
+          if [ -n "$COVERAGE_FILE" ]; then
+            echo "=== Debug: Found coverage file at $COVERAGE_FILE ==="
+            echo "=== Debug: First 50 lines of coverage.xml ==="
+            head -50 "$COVERAGE_FILE"
+
+            # Extract coverage using various possible attribute names
+            # Try 'statements' and 'coveredstatements'
+            LINES=$(grep -o 'statements="[0-9]*"' "$COVERAGE_FILE" | head -1 | grep -o '[0-9]*')
+            COVERED=$(grep -o 'coveredstatements="[0-9]*"' "$COVERAGE_FILE" | head -1 | grep -o '[0-9]*')
+
+            # Try alternative: 'elements' and 'coveredelements'
+            if [ -z "$LINES" ]; then
+              LINES=$(grep -o 'elements="[0-9]*"' "$COVERAGE_FILE" | head -1 | grep -o '[0-9]*')
+              COVERED=$(grep -o 'coveredelements="[0-9]*"' "$COVERAGE_FILE" | head -1 | grep -o '[0-9]*')
+            fi
+
+            echo "=== Debug: LINES=$LINES, COVERED=$COVERED ==="
+
             if [ -n "$LINES" ] && [ -n "$COVERED" ] && [ "$LINES" -gt 0 ]; then
               COVERAGE=$(awk "BEGIN {printf \"%.2f\", ($COVERED/$LINES)*100}")
             else
               COVERAGE="0"
             fi
           else
+            echo "=== Debug: No coverage.xml file found ==="
             COVERAGE="0"
           fi
           echo "current_coverage=$COVERAGE" >> $GITHUB_OUTPUT
