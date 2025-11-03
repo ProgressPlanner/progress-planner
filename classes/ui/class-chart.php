@@ -125,7 +125,7 @@ class Chart {
 			$previous_period_activities = $period_data['previous_period_activities'];
 			$period_data_filtered       = [];
 			foreach ( $args['return_data'] as $key ) {
-				$key_string = (string) $key; // @phpstan-ignore offsetAccess.invalidOffset
+				$key_string                          = (string) $key; // @phpstan-ignore offsetAccess.invalidOffset
 				$period_data_filtered[ $key_string ] = $period_data[ $key_string ]; // @phpstan-ignore offsetAccess.invalidOffset
 			}
 			$data[] = $period_data_filtered;
