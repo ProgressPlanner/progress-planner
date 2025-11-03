@@ -10,6 +10,13 @@ namespace Progress_Planner\Tests;
 use Progress_Planner\Admin\Widgets\Badge_Streak;
 
 /**
+ * Mock Badge_Streak for testing abstract class.
+ */
+class Mock_Badge_Streak extends Badge_Streak {
+	// No additional methods needed - Badge_Streak is abstract but has no abstract methods.
+}
+
+/**
  * Admin_Widgets_Badge_Streak_Test test case.
  */
 class Admin_Widgets_Badge_Streak_Test extends \WP_UnitTestCase {
@@ -17,7 +24,7 @@ class Admin_Widgets_Badge_Streak_Test extends \WP_UnitTestCase {
 	/**
 	 * Badge_Streak instance.
 	 *
-	 * @var Badge_Streak
+	 * @var Mock_Badge_Streak
 	 */
 	protected $widget;
 
@@ -28,7 +35,7 @@ class Admin_Widgets_Badge_Streak_Test extends \WP_UnitTestCase {
 	 */
 	public function setUp(): void {
 		parent::setUp();
-		$this->widget = new Badge_Streak();
+		$this->widget = new Mock_Badge_Streak();
 	}
 
 	/**

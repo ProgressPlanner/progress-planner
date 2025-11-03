@@ -21,21 +21,34 @@ class Mock_Badge_Content extends Badge_Content {
 	protected $id = 'test-content-badge';
 
 	/**
-	 * Get the badge title.
+	 * Get the badge name.
 	 *
 	 * @return string
 	 */
-	public function get_title() {
+	public function get_name() {
 		return 'Test Content Badge';
 	}
 
 	/**
-	 * Check if badge is completed.
+	 * Get the badge description.
 	 *
-	 * @return bool
+	 * @return string
 	 */
-	public function is_completed() {
-		return false;
+	public function get_description() {
+		return 'A test content badge for testing purposes';
+	}
+
+	/**
+	 * Progress callback.
+	 *
+	 * @param array $args The arguments for the progress callback.
+	 * @return array
+	 */
+	public function progress_callback( $args = [] ) {
+		return [
+			'current' => 0,
+			'goal'    => 10,
+		];
 	}
 }
 
