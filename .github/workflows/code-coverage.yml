@@ -57,7 +57,7 @@ jobs:
         with:
           dependency-versions: "highest"
           composer-options: "yoast/wp-test-utils --with-dependencies"
-          custom-cache-suffix: $(date -u -d "-0 month -$(($(date +%d)-1)) days" "+%F")
+          custom-cache-suffix: $(date -u -d "-0 month -$(($(date +%d)-1)) days" "+%F")-codecov-v2
 
       - name: Install WordPress Test Suite
         shell: bash
@@ -173,6 +173,10 @@ jobs:
       - name: Checkout base branch for comparison
         if: github.event_name == 'pull_request'
         run: |
+          # Save coverage.xml before switching branches
+          cp coverage.xml /tmp/current-coverage.xml 2>/dev/null || true
+          # Stash any local changes (like composer.lock)
+          git stash --include-untracked || true
           git fetch origin ${{ github.base_ref }}
           git checkout origin/${{ github.base_ref }}
 
