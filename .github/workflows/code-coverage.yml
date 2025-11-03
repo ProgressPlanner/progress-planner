@@ -65,11 +65,17 @@ jobs:
 
       - name: Generate code coverage report for current branch
         run: |
+          echo "=== Debug: Check PCOV is loaded ==="
+          php -m | grep pcov || echo "PCOV not loaded"
+          php -i | grep pcov || echo "PCOV not in phpinfo"
+          echo "=== Debug: Check PHPUnit version ==="
+          vendor/bin/phpunit --version
           echo "=== Debug: Before running PHPUnit ==="
           pwd
           ls -la
           echo "=== Running PHPUnit with coverage ==="
-          vendor/bin/phpunit --dont-report-useless-tests --coverage-clover=coverage.xml --coverage-text | tee coverage-output.txt
+          php -d pcov.enabled=1 -d pcov.directory=. vendor/bin/phpunit --dont-report-useless-tests --coverage-clover=coverage.xml --coverage-text | tee coverage-output.txt
+          echo "=== Debug: PHPUnit exit code: $? ==="
           echo "=== Debug: After running PHPUnit ==="
           pwd
           ls -la coverage* 2>/dev/null || echo "No coverage files in current directory"
