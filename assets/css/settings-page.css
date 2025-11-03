@@ -211,7 +211,7 @@
 		}
 	}
 
-	.prpl-button {
+	.prpl-button-link {
 		color: var(--prpl-color-gray-7);
 		text-decoration: none;
 		border: 1px solid var(--prpl-color-border);

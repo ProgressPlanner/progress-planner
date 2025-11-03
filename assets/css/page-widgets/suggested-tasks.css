@@ -495,3 +495,104 @@
 		}
 	}
 }
+
+/*------------------------------------*\
+	Page select setting.
+\*------------------------------------*/
+.prpl-pages-item {
+
+	&:has(input[type="radio"][value="yes"]:checked),
+	&:has(input[type="radio"][value="no"]:checked) {
+
+		h3 {
+
+			.icon-exclamation-circle {
+				display: block;
+			}
+
+			.icon-check-circle {
+				display: none;
+			}
+		}
+	}
+
+	&:has(option[value=""]:not(:checked)):has(input[type="radio"][value="yes"]:checked),
+	&:has(input[type="radio"][value="not-applicable"]:checked) {
+
+		h3 {
+
+			.icon-check-circle {
+				display: block;
+			}
+
+			.icon-exclamation-circle {
+				display: none;
+			}
+		}
+	}
+
+	.item-actions,
+	.prpl-select-page {
+		display: flex;
+		align-items: center;
+		gap: 1rem;
+	}
+
+	.remind-button,
+	.assign-button {
+
+		svg {
+			width: 1rem;
+			height: 1rem;
+		}
+	}
+
+	h3 {
+		font-size: 1.15rem;
+		margin: 0;
+
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+
+		.icon {
+			width: 1em;
+			height: 1em;
+			display: none;
+		}
+	}
+
+	p {
+		margin-block-start: 0.5rem;
+		margin-block-end: 1rem;
+	}
+
+	.radios {
+		margin-bottom: 1rem;
+	}
+
+	.prpl-radio-wrapper {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+
+		[data-action="select"],
+		[data-action="create"] {
+			visibility: hidden;
+		}
+
+		&:has(input[type="radio"]:checked) {
+
+			[data-action="select"],
+			[data-action="create"] {
+				visibility: visible;
+			}
+		}
+
+		&:has(input[type="radio"][value="not-applicable"]) {
+			padding-top: 0.25rem;
+
+			/* Add bit height, because we dont have button or select */
+		}
+	}
+}
