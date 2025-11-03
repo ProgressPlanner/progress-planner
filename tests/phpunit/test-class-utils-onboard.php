@@ -3,7 +3,7 @@
  * Unit tests for Onboard utility class.
  *
  * @package Progress_Planner\Tests
- * @group utils
+ * @group misc
  */
 
 namespace Progress_Planner\Tests;
@@ -17,7 +17,7 @@ use Progress_Planner\Utils\Onboard;
  * Tests the Onboard utility class that handles plugin
  * onboarding and activation workflows.
  *
- * @group utils
+ * @group misc
  */
 class Utils_Onboard_Test extends WP_UnitTestCase {
 
