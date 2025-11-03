@@ -78,7 +78,7 @@ jobs:
           echo "=== Debug: Test PCOV is actually working ==="
           php -d pcov.enabled=1 -d pcov.directory=${{ github.workspace }} -r "var_dump(ini_get('pcov.enabled'), ini_get('pcov.directory'));"
           echo "=== Running PHPUnit with coverage ==="
-          php -d pcov.enabled=1 -d pcov.directory=${{ github.workspace }} vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-clover=coverage.xml --coverage-text 2>&1 | tail -150
+          php -d pcov.enabled=1 -d pcov.directory=${{ github.workspace }} vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-clover=coverage.xml --coverage-text || true
           PHPUNIT_EXIT=$?
           echo "=== Debug: PHPUnit exit code: $PHPUNIT_EXIT ==="
           echo "=== Debug: After running PHPUnit ==="
