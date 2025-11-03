@@ -161,31 +161,39 @@ jobs:
                   continue;
               }
 
-              // Extract metrics from each file
+              // Extract metrics from each file and merge coverage
               foreach ($xml->xpath("//file") as $file) {
                   $path = (string)$file["name"];
                   $metrics = $file->metrics[0];
 
+                  $statements = (int)$metrics["statements"];
+                  $coveredstatements = (int)$metrics["coveredstatements"];
+
+                  // Take the maximum coverage for each file across all test groups
                   if (!isset($files[$path])) {
                       $files[$path] = [
-                          "elements" => (int)$metrics["elements"],
-                          "coveredelements" => (int)$metrics["coveredelements"],
-                          "statements" => (int)$metrics["statements"],
-                          "coveredstatements" => (int)$metrics["coveredstatements"],
+                          "statements" => $statements,
+                          "coveredstatements" => $coveredstatements,
                       ];
+                  } else {
+                      // If we see this file again, take the max covered statements
+                      if ($coveredstatements > $files[$path]["coveredstatements"]) {
+                          $files[$path]["coveredstatements"] = $coveredstatements;
+                      }
                   }
-              }
-
-              // Get project totals
-              $project = $xml->project[0];
-              if ($project && $project->metrics[0]) {
-                  $metrics = $project->metrics[0];
-                  $totalLines += (int)$metrics["statements"];
-                  $coveredLines += (int)$metrics["coveredstatements"];
               }
           }
 
+          // Calculate totals from the deduplicated file list
+          $totalLines = 0;
+          $coveredLines = 0;
+          foreach ($files as $fileMetrics) {
+              $totalLines += $fileMetrics["statements"];
+              $coveredLines += $fileMetrics["coveredstatements"];
+          }
+
           echo "Processed " . count($xmlFiles) . " coverage files\n";
+          echo "Unique files: " . count($files) . "\n";
           echo "Total statements: $totalLines\n";
           echo "Covered statements: $coveredLines\n";
 
