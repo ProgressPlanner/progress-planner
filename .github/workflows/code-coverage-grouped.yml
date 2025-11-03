@@ -291,3 +291,21 @@ jobs:
           name: coverage-summary
           path: coverage-summary.txt
           retention-days: 30
+
+  # Final status check job that other workflows can depend on
+  coverage-check:
+    name: Code Coverage Check
+    needs: merge-coverage
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Check coverage status
+        run: |
+          if [ "${{ needs.merge-coverage.result }}" == "success" ]; then
+            echo "✅ Code coverage check passed"
+            exit 0
+          else
+            echo "❌ Code coverage check failed"
+            exit 1
+          fi
