@@ -150,10 +150,9 @@ jobs:
               exit(1);
           }
 
-          $totalLines = 0;
-          $coveredLines = 0;
           $files = [];
 
+          // First pass: collect all line coverage data
           foreach ($xmlFiles as $xmlFile) {
               $xml = simplexml_load_file($xmlFile);
               if ($xml === false) {
@@ -161,41 +160,50 @@ jobs:
                   continue;
               }
 
-              // Extract metrics from each file and merge coverage
+              // Extract line-level coverage from each file
               foreach ($xml->xpath("//file") as $file) {
                   $path = (string)$file["name"];
-                  $metrics = $file->metrics[0];
 
-                  $statements = (int)$metrics["statements"];
-                  $coveredstatements = (int)$metrics["coveredstatements"];
-
-                  // Take the maximum coverage for each file across all test groups
+                  // Initialize file tracking if not exists
                   if (!isset($files[$path])) {
                       $files[$path] = [
-                          "statements" => $statements,
-                          "coveredstatements" => $coveredstatements,
+                          "lines" => [],
+                          "covered_lines" => [],
                       ];
-                  } else {
-                      // If we see this file again, take the max covered statements
-                      if ($coveredstatements > $files[$path]["coveredstatements"]) {
-                          $files[$path]["coveredstatements"] = $coveredstatements;
+                  }
+
+                  // Track all executable lines and which ones are covered
+                  foreach ($file->line as $line) {
+                      $lineNum = (int)$line["num"];
+                      $count = (int)$line["count"];
+                      $type = (string)$line["type"];
+
+                      // Only count statement lines (not method declarations)
+                      if ($type === "stmt") {
+                          $files[$path]["lines"][$lineNum] = true;
+
+                          // If this line is covered in any test group, mark it as covered
+                          if ($count > 0) {
+                              $files[$path]["covered_lines"][$lineNum] = true;
+                          }
                       }
                   }
               }
           }
 
-          // Calculate totals from the deduplicated file list
+          // Calculate totals from unique line coverage
           $totalLines = 0;
           $coveredLines = 0;
-          foreach ($files as $fileMetrics) {
-              $totalLines += $fileMetrics["statements"];
-              $coveredLines += $fileMetrics["coveredstatements"];
+
+          foreach ($files as $path => $data) {
+              $totalLines += count($data["lines"]);
+              $coveredLines += count($data["covered_lines"]);
           }
 
           echo "Processed " . count($xmlFiles) . " coverage files\n";
-          echo "Unique files: " . count($files) . "\n";
-          echo "Total statements: $totalLines\n";
-          echo "Covered statements: $coveredLines\n";
+          echo "Unique files analyzed: " . count($files) . "\n";
+          echo "Total executable lines: $totalLines\n";
+          echo "Covered lines (union across all groups): $coveredLines\n";
 
           if ($totalLines > 0) {
               $percentage = round(($coveredLines / $totalLines) * 100, 2);
