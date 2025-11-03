@@ -14,7 +14,7 @@
 	</testsuites>
 	<coverage>
     <include>
-        <directory suffix=".php">src</directory>
+        <directory suffix=".php">classes</directory>
 		<file>progress-planner.php</file>
     </include>
   </coverage>
