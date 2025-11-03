@@ -26,21 +26,30 @@ jobs:
       matrix:
         group:
           - activities
+          - actions
           - badges
           - admin
           - api
+          - goals
+          - lessons
+          - misc
+          - onboarding
+          - pages
+          - recommendations
+          - rest-api
+          - security
+          - suggested-tasks-data-collectors-1
+          - suggested-tasks-data-collectors-2
+          - suggested-tasks-data-collectors-3
           - suggested-tasks-providers-1
           - suggested-tasks-providers-2
           - suggested-tasks-providers-3
           - suggested-tasks-providers-4
-          - suggested-tasks-data-collectors-1
-          - suggested-tasks-data-collectors-2
-          - suggested-tasks-data-collectors-3
-          - goals
-          - updates
+          - todos
           - ui
+          - uninstall
+          - updates
           - utils
-          - misc
 
     services:
       mysql:
@@ -254,10 +263,10 @@ jobs:
             |--------|-------|
             | **Total Coverage** | **${current.toFixed(2)}%** ${emoji} |
 
-            Coverage collected from **18 test groups** running in parallel:
-            - activities, badges, admin, api, goals, updates, ui, utils, misc
-            - suggested-tasks-providers (1-4)
-            - suggested-tasks-data-collectors (1-3)
+            Coverage collected from **25 test groups** running in parallel:
+            - Core: activities, actions, admin, api, goals, ui, utils
+            - Suggested tasks providers (1-4) and data collectors (1-3)
+            - Features: badges, lessons, onboarding, pages, recommendations, rest-api, security, todos, uninstall, updates, misc
 
             ${current >= 40 ? '✅ Coverage meets minimum threshold' : '⚠️ Coverage below recommended 40% threshold'}
 
