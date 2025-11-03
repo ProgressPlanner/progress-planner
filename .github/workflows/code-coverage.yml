@@ -84,6 +84,12 @@ jobs:
           echo "=== Debug: Looking for coverage files ==="
           ls -la coverage* 2>/dev/null || echo "No coverage files found in current directory"
           ls -la ${{ github.workspace }}/coverage* 2>/dev/null || echo "No coverage files in workspace"
+          echo "=== Debug: Searching for coverage.xml recursively ==="
+          find ${{ github.workspace }} -name "coverage.xml" 2>/dev/null || echo "No coverage.xml found anywhere"
+          echo "=== Debug: Current directory ==="
+          pwd
+          echo "=== Debug: Workspace directory ==="
+          echo "${{ github.workspace }}"
 
           # Try both locations
           COVERAGE_FILE=""
