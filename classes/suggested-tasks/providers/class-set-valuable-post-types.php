@@ -64,6 +64,58 @@ class Set_Valuable_Post_Types extends Tasks_Interactive {
 	public function init() {
 		\add_action( 'progress_planner_settings_form_options_stored', [ $this, 'remove_upgrade_option' ] );
 		\add_action( 'wp_ajax_prpl_interactive_task_submit_set-valuable-post-types', [ $this, 'handle_interactive_task_specific_submit' ] );
+
+		// On late init hook we need to check if the public post types are changed.
+		\add_action( 'init', [ $this, 'check_public_post_types' ], PHP_INT_MAX - 1 );
+	}
+
+	/**
+	 * Check if the public post types are changed.
+	 *
+	 * @return void
+	 */
+	public function check_public_post_types() {
+		$previosly_set_public_post_types = \array_unique( \get_option( 'progress_planner_public_post_types', [] ) );
+		$public_post_types               = \array_unique( \progress_planner()->get_settings()->get_public_post_types() );
+
+		// Sort the public post types.
+		\sort( $previosly_set_public_post_types );
+		\sort( $public_post_types );
+
+		// Compare the previously set public post types with the current public post types.
+		if ( $previosly_set_public_post_types === $public_post_types ) {
+			return;
+		}
+
+		// Update the previously set public post types.
+		\update_option( 'progress_planner_public_post_types', $public_post_types );
+
+		// Exit if post type was removed, or it is not public anymore, since the user will not to able to make different selection.
+		if ( count( $public_post_types ) < count( $previosly_set_public_post_types ) ) {
+			return;
+		}
+
+		// If we're here that means that there is new public post type.
+
+		// Check if the task exists, if it does and it is published do nothing.
+		$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => static::PROVIDER_ID ] );
+		if ( ! empty( $task ) && 'publish' === $task[0]->post_status ) {
+			return;
+		}
+
+		// If it is trashed, change it's status to publish.
+		if ( ! empty( $task ) && 'trash' === $task[0]->post_status ) {
+			\wp_update_post(
+				[
+					'ID'          => $task[0]->ID,
+					'post_status' => 'publish',
+				]
+			);
+			return;
+		}
+
+		// If we're here then we need to add it.
+		\progress_planner()->get_suggested_tasks_db()->add( $this->modify_injection_task_data( $this->get_task_details() ) );
 	}
 
 	/**
