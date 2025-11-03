@@ -65,7 +65,7 @@ jobs:
 
       - name: Generate code coverage report for current branch
         run: |
-          composer test -- --coverage-clover=coverage.xml --coverage-text
+          composer test -- --coverage-clover=coverage.xml --coverage-text | tee coverage-output.txt
         continue-on-error: false
 
       - name: Upload coverage to Codecov
@@ -80,8 +80,8 @@ jobs:
       - name: Generate coverage report summary
         id: coverage
         run: |
-          # Extract coverage percentage from PHPUnit output
-          COVERAGE=$(vendor/bin/phpunit --coverage-text --colors=never | grep "Lines:" | awk '{print $2}' | sed 's/%//')
+          # Extract coverage percentage from the saved output
+          COVERAGE=$(grep "Lines:" coverage-output.txt | awk '{print $2}' | sed 's/%//')
           echo "current_coverage=$COVERAGE" >> $GITHUB_OUTPUT
           echo "Current code coverage: $COVERAGE%"
 
