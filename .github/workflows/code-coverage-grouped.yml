@@ -138,38 +138,79 @@ jobs:
           echo "Downloaded coverage files:"
           ls -lh coverage-*.xml
 
-      - name: Install phpcov for merging
-        run: composer global require phpunit/phpcov
-
       - name: Merge coverage reports
         run: |
-          # Merge all coverage XML files
-          ~/.composer/vendor/bin/phpcov merge \
-            --clover=coverage.xml \
-            --text \
-            .
+          # Merge all Clover XML files into a single report
+          php -r '
+          $xmlFiles = glob("coverage-*.xml");
+          if (empty($xmlFiles)) {
+              echo "No coverage files found\n";
+              exit(1);
+          }
 
-          echo "Merged coverage file:"
-          ls -lh coverage.xml
+          $totalLines = 0;
+          $coveredLines = 0;
+          $files = [];
+
+          foreach ($xmlFiles as $xmlFile) {
+              $xml = simplexml_load_file($xmlFile);
+              if ($xml === false) {
+                  echo "Failed to parse $xmlFile\n";
+                  continue;
+              }
+
+              // Extract metrics from each file
+              foreach ($xml->xpath("//file") as $file) {
+                  $path = (string)$file["name"];
+                  $metrics = $file->metrics[0];
+
+                  if (!isset($files[$path])) {
+                      $files[$path] = [
+                          "elements" => (int)$metrics["elements"],
+                          "coveredelements" => (int)$metrics["coveredelements"],
+                          "statements" => (int)$metrics["statements"],
+                          "coveredstatements" => (int)$metrics["coveredstatements"],
+                      ];
+                  }
+              }
+
+              // Get project totals
+              $project = $xml->project[0];
+              if ($project && $project->metrics[0]) {
+                  $metrics = $project->metrics[0];
+                  $totalLines += (int)$metrics["statements"];
+                  $coveredLines += (int)$metrics["coveredstatements"];
+              }
+          }
+
+          echo "Processed " . count($xmlFiles) . " coverage files\n";
+          echo "Total statements: $totalLines\n";
+          echo "Covered statements: $coveredLines\n";
+
+          if ($totalLines > 0) {
+              $percentage = round(($coveredLines / $totalLines) * 100, 2);
+              echo "Coverage: $percentage%\n";
+
+              // Save coverage percentage for next step
+              file_put_contents("coverage-summary.txt", $percentage);
+          } else {
+              echo "No coverage data found\n";
+              file_put_contents("coverage-summary.txt", "0");
+          }
+          '
+
+          echo "Merged coverage summary saved"
 
       - name: Generate coverage summary
         id: coverage
         run: |
-          if [ ! -f coverage.xml ]; then
+          if [ ! -f coverage-summary.txt ]; then
             echo "current_coverage=0" >> $GITHUB_OUTPUT
+            echo "Current code coverage: 0%"
             exit 0
           fi
 
-          # Extract coverage percentage from Clover XML
-          LINES=$(grep -o 'statements="[0-9]*"' coverage.xml | head -1 | grep -o '[0-9]*')
-          COVERED=$(grep -o 'coveredstatements="[0-9]*"' coverage.xml | head -1 | grep -o '[0-9]*')
-
-          if [ -n "$LINES" ] && [ -n "$COVERED" ] && [ "$LINES" -gt 0 ]; then
-            COVERAGE=$(awk "BEGIN {printf \"%.2f\", ($COVERED/$LINES)*100}")
-          else
-            COVERAGE="0"
-          fi
-
+          COVERAGE=$(cat coverage-summary.txt)
           echo "current_coverage=$COVERAGE" >> $GITHUB_OUTPUT
           echo "Current code coverage: $COVERAGE%"
 
@@ -233,9 +274,9 @@ jobs:
               });
             }
 
-      - name: Upload merged coverage report
+      - name: Upload coverage summary
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-merged
-          path: coverage.xml
+          name: coverage-summary
+          path: coverage-summary.txt
           retention-days: 30
