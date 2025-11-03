@@ -67,22 +67,31 @@ jobs:
         run: |
           echo "=== Debug: Check PCOV is loaded ==="
           php -m | grep pcov || echo "PCOV not loaded"
-          php -i | grep pcov || echo "PCOV not in phpinfo"
-          echo "=== Debug: Check PHPUnit version ==="
+          php -r "var_dump(extension_loaded('pcov'));"
+          echo "=== Debug: Check PHPUnit version and php-code-coverage ==="
           vendor/bin/phpunit --version
+          php -r "echo class_exists('SebastianBergmann\CodeCoverage\CodeCoverage') ? 'CodeCoverage class exists' : 'CodeCoverage class NOT found'; echo PHP_EOL;"
           echo "=== Debug: Before running PHPUnit ==="
           pwd
           ls -la
-          echo "=== Running PHPUnit with coverage ==="
-          php -d pcov.enabled=1 -d pcov.directory=. vendor/bin/phpunit --dont-report-useless-tests --coverage-clover=coverage.xml --coverage-text | tee coverage-output.txt
-          echo "=== Debug: PHPUnit exit code: $? ==="
+          echo "=== Running PHPUnit with coverage (without piping to tee) ==="
+          php -d pcov.enabled=1 -d pcov.directory=. vendor/bin/phpunit --dont-report-useless-tests --coverage-clover=coverage.xml --coverage-text 2>&1 | tail -100
+          PHPUNIT_EXIT=$?
+          echo "=== Debug: PHPUnit exit code: $PHPUNIT_EXIT ==="
           echo "=== Debug: After running PHPUnit ==="
           pwd
           ls -la coverage* 2>/dev/null || echo "No coverage files in current directory"
           echo "=== Searching entire workspace for coverage.xml ==="
           find . -name "coverage.xml" -type f 2>/dev/null || echo "No coverage.xml found anywhere"
-          echo "=== Searching for any XML files ==="
-          find . -name "*.xml" -type f 2>/dev/null | head -20
+          echo "=== Checking if coverage report was generated ==="
+          if [ -f coverage.xml ]; then
+            echo "SUCCESS: coverage.xml exists!"
+            ls -lh coverage.xml
+          else
+            echo "FAIL: coverage.xml was not generated"
+            echo "=== Checking stderr for errors ==="
+            php -d pcov.enabled=1 -d pcov.directory=. vendor/bin/phpunit --dont-report-useless-tests --coverage-clover=coverage.xml --coverage-text 2>&1 >/dev/null | grep -i "error\|warning\|coverage" || echo "No error messages found"
+          fi
         continue-on-error: false
 
       - name: Upload coverage to Codecov
