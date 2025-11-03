@@ -70,7 +70,9 @@ jobs:
           php -r "var_dump(extension_loaded('pcov'));"
           echo "=== Debug: Check PHPUnit version and php-code-coverage ==="
           vendor/bin/phpunit --version
-          php -r "echo class_exists('SebastianBergmann\CodeCoverage\CodeCoverage') ? 'CodeCoverage class exists' : 'CodeCoverage class NOT found'; echo PHP_EOL;"
+          php -r "require 'vendor/autoload.php'; echo class_exists('SebastianBergmann\CodeCoverage\CodeCoverage') ? 'CodeCoverage class exists' : 'CodeCoverage class NOT found'; echo PHP_EOL;"
+          echo "=== Debug: Check if php-code-coverage package is installed ==="
+          ls -la vendor/phpunit/php-code-coverage/ 2>/dev/null || echo "php-code-coverage directory not found"
           echo "=== Debug: Before running PHPUnit ==="
           pwd
           ls -la
