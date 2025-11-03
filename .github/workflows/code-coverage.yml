@@ -70,16 +70,19 @@ jobs:
           echo "=== Running PHPUnit with coverage ==="
           echo "Start time: $(date)"
           echo "Memory before: $(free -h | grep Mem)"
-          set -o pipefail
+          # Don't use pipefail - we want coverage even if tests fail
+          set +e
           php -d memory_limit=512M -d max_execution_time=300 -d pcov.enabled=1 -d pcov.directory=${{ github.workspace }} \
             vendor/bin/phpunit --configuration phpunit.xml.dist \
             --coverage-clover=coverage.xml \
             --coverage-text \
             --verbose 2>&1 | tee phpunit-output.log
           PHPUNIT_EXIT=${PIPESTATUS[0]}
+          set -e
           echo "End time: $(date)"
           echo "Memory after: $(free -h | grep Mem)"
           echo "=== Debug: PHPUnit exit code: $PHPUNIT_EXIT ==="
+          echo "=== Note: Exit code $PHPUNIT_EXIT (non-zero means test failures, but coverage should still be generated) ==="
           echo "=== Debug: Last 50 lines of PHPUnit output ==="
           tail -50 phpunit-output.log
           echo "=== Debug: After running PHPUnit ==="
