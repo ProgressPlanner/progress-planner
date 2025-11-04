@@ -348,12 +348,9 @@ jobs:
               changesContent += '\n### 🆕 New Files\n\n';
               changesContent += '| Class | Coverage | Lines |\n';
               changesContent += '|-------|----------|-------|\n';
-              for (const file of changesJson.new_files.slice(0, 10)) {  // Limit to 10
+              for (const file of changesJson.new_files) {
                 const emoji = file.coverage >= 80 ? '🟢' : file.coverage >= 60 ? '🟡' : '🔴';
                 changesContent += `| ${emoji} \`${file.class}\` | ${file.coverage.toFixed(2)}% | ${file.lines} |\n`;
-              }
-              if (changesJson.new_files.length > 10) {
-                changesContent += `\n_... and ${changesJson.new_files.length - 10} more new files_\n`;
               }
             }
 
@@ -364,11 +361,8 @@ jobs:
               changesContent += '| Class | Before | After | Change |\n';
               changesContent += '|-------|--------|-------|--------|\n';
               const sortedImproved = changesJson.improved.sort((a, b) => b.diff - a.diff);
-              for (const file of sortedImproved.slice(0, 10)) {  // Limit to 10
+              for (const file of sortedImproved) {
                 changesContent += `| \`${file.class}\` | ${file.old.toFixed(2)}% | ${file.new.toFixed(2)}% | +${file.diff.toFixed(2)}% |\n`;
-              }
-              if (changesJson.improved.length > 10) {
-                changesContent += `\n_... and ${changesJson.improved.length - 10} more improvements_\n`;
               }
             }
 
@@ -379,11 +373,8 @@ jobs:
               changesContent += '| Class | Before | After | Change |\n';
               changesContent += '|-------|--------|-------|--------|\n';
               const sortedDegraded = changesJson.degraded.sort((a, b) => a.diff - b.diff);
-              for (const file of sortedDegraded.slice(0, 10)) {  // Limit to 10
+              for (const file of sortedDegraded) {
                 changesContent += `| \`${file.class}\` | ${file.old.toFixed(2)}% | ${file.new.toFixed(2)}% | ${file.diff.toFixed(2)}% |\n`;
-              }
-              if (changesJson.degraded.length > 10) {
-                changesContent += `\n_... and ${changesJson.degraded.length - 10} more decreases_\n`;
               }
             }
 
