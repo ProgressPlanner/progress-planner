@@ -70,15 +70,16 @@ jobs:
           echo "=== Running PHPUnit with coverage ==="
           echo "Start time: $(date)"
           echo "Memory before: $(free -h | grep Mem)"
-          # Run PHPUnit and save output to file, allow test failures
+
+          # Run PHPUnit with coverage - allow test failures but ensure coverage is generated
           set +e
           php -d memory_limit=512M -d max_execution_time=300 \
             vendor/bin/phpunit --configuration phpunit.xml.dist \
             --coverage-clover=coverage.xml \
-            --coverage-text \
-            --verbose > phpunit-output.log 2>&1
+            --coverage-text 2>&1 | tee phpunit-output.log
           PHPUNIT_EXIT=$?
           set -e
+
           echo "End time: $(date)"
           echo "Memory after: $(free -h | grep Mem)"
           echo "=== Debug: PHPUnit exit code: $PHPUNIT_EXIT ==="
@@ -99,6 +100,8 @@ jobs:
             echo "FAIL: coverage.xml was not generated"
             echo "=== Checking for errors in PHPUnit output ==="
             grep -i "error\|fatal\|exception\|segfault\|out of memory" phpunit-output.log || echo "No obvious errors found"
+            # Exit with error if coverage wasn't generated
+            exit 1
           fi
         continue-on-error: false
 
