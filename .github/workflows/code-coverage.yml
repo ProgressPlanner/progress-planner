@@ -127,10 +127,16 @@ jobs:
           echo "Current code coverage: $COVERAGE%"
 
           # Save detailed per-file coverage for later comparison
-          # Extract lines that show per-file coverage (format: "ClassName  Methods: X% Lines: Y%")
-          grep -E "^\s+[A-Za-z_\\]+" current-coverage-full.txt | \
-            grep -E "Methods:.*Lines:" | \
-            sed 's/\x1b\[[0-9;]*m//g' > current-coverage-details.txt || true
+          # PHPUnit outputs class name on one line, stats on the next line
+          # We need to combine them: "ClassName" + "  Methods: X% Lines: Y%"
+          awk '
+            /^[A-Za-z_]/ { classname = $0; next }
+            /^  Methods:.*Lines:/ {
+              gsub(/\x1b\[[0-9;]*m/, "", classname);
+              gsub(/\x1b\[[0-9;]*m/, "", $0);
+              print classname " " $0
+            }
+          ' current-coverage-full.txt > current-coverage-details.txt || true
 
           echo "=== Current coverage details saved ==="
           head -20 current-coverage-details.txt || true
@@ -164,9 +170,15 @@ jobs:
           echo "Base branch code coverage: $BASE_COVERAGE%"
 
           # Extract per-file coverage for comparison
-          grep -E "^\s+[A-Za-z_\\]+" base-coverage-full.txt | \
-            grep -E "Methods:.*Lines:" | \
-            sed 's/\x1b\[[0-9;]*m//g' > base-coverage-details.txt || true
+          # PHPUnit outputs class name on one line, stats on the next line
+          awk '
+            /^[A-Za-z_]/ { classname = $0; next }
+            /^  Methods:.*Lines:/ {
+              gsub(/\x1b\[[0-9;]*m/, "", classname);
+              gsub(/\x1b\[[0-9;]*m/, "", $0);
+              print classname " " $0
+            }
+          ' base-coverage-full.txt > base-coverage-details.txt || true
 
           echo "=== Base coverage details saved ==="
           head -20 base-coverage-details.txt || true
