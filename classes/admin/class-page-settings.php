@@ -58,27 +58,28 @@ class Page_Settings {
 	public function get_settings() {
 		$settings = [];
 		foreach ( \progress_planner()->get_page_types()->get_page_types() as $page_type ) {
-			if ( ! $this->should_show_setting( $page_type['slug'] ) ) {
+			$slug = (string) $page_type['slug']; // @phpstan-ignore offsetAccess.invalidOffset
+			if ( ! $this->should_show_setting( $slug ) ) {
 				continue;
 			}
 
-			$settings[ $page_type['slug'] ] = [
-				'id'          => $page_type['slug'],
+			$settings[ $slug ] = [
+				'id'          => $slug,
 				'value'       => '_no_page_needed',
 				'isset'       => 'no',
-				'title'       => $page_type['title'],
-				'description' => $page_type['description'] ?? '',
+				'title'       => $page_type['title'], // @phpstan-ignore offsetAccess.invalidOffset
+				'description' => $page_type['description'] ?? '', // @phpstan-ignore offsetAccess.invalidOffset
 				'type'        => 'page-select',
-				'page'        => $page_type['slug'],
+				'page'        => $slug,
 			];
 
-			if ( \progress_planner()->get_page_types()->is_page_needed( $page_type['slug'] ) ) {
-				$type_pages = \progress_planner()->get_page_types()->get_posts_by_type( 'any', $page_type['slug'] );
+			if ( \progress_planner()->get_page_types()->is_page_needed( $slug ) ) {
+				$type_pages = \progress_planner()->get_page_types()->get_posts_by_type( 'any', $slug );
 				if ( empty( $type_pages ) ) {
-					$settings[ $page_type['slug'] ]['value'] = \progress_planner()->get_page_types()->get_default_page_id_by_type( $page_type['slug'] );
+					$settings[ $slug ]['value'] = \progress_planner()->get_page_types()->get_default_page_id_by_type( $slug );
 				} else {
-					$settings[ $page_type['slug'] ]['value'] = $type_pages[0]->ID;
-					$settings[ $page_type['slug'] ]['isset'] = 'yes';
+					$settings[ $slug ]['value'] = $type_pages[0]->ID;
+					$settings[ $slug ]['isset'] = 'yes';
 
 					// If there is more than one page, we need to check if the page has a parent with the same page-type assigned.
 					if ( 1 < \count( $type_pages ) ) {
@@ -89,7 +90,7 @@ class Page_Settings {
 						foreach ( $type_pages as $type_page ) {
 							$parent = \get_post_field( 'post_parent', $type_page->ID );
 							if ( $parent && \in_array( (int) $parent, $type_pages_ids, true ) ) {
-								$settings[ $page_type['slug'] ]['value'] = $parent;
+								$settings[ $slug ]['value'] = $parent;
 								break;
 							}
 						}
