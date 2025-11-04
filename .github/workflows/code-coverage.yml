@@ -1,6 +1,14 @@
-name: Code Coverage (DISABLED - See code-coverage-grouped.yml)
+name: Code Coverage
 
 on:
+  pull_request:
+    branches:
+      - develop
+      - main
+  push:
+    branches:
+      - develop
+      - main
   workflow_dispatch:
 
 # Cancels all previous workflow runs for the same branch that have not yet completed.

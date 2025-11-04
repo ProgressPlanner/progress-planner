@@ -1,8 +1,7 @@
-name: Coverage Status Check
+name: Coverage Status Check - DISABLED
 
 on:
-  pull_request:
-    types: [opened, synchronize, reopened]
+  workflow_dispatch:
 
 jobs:
   coverage-gate:
