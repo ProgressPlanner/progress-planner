@@ -313,6 +313,8 @@ jobs:
       - name: Comment PR with coverage
         if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
+        env:
+          COVERAGE_CHANGES: ${{ steps.coverage_diff.outputs.coverage_changes }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
@@ -323,13 +325,14 @@ jobs:
             const coverageEmoji = current >= 80 ? '🎉' : current >= 60 ? '📈' : current >= 40 ? '📊' : '📉';
             const status = diff >= -0.5 ? '✅' : '⚠️';
 
-            // Parse coverage changes JSON
+            // Parse coverage changes JSON from environment variable
             let changesJson = {};
             try {
-              const changesStr = `${{ steps.coverage_diff.outputs.coverage_changes }}`;
-              changesJson = changesStr ? JSON.parse(changesStr) : {};
+              const changesStr = process.env.COVERAGE_CHANGES || '{}';
+              changesJson = JSON.parse(changesStr);
             } catch (e) {
               console.log('Failed to parse coverage changes:', e);
+              console.log('Raw value:', process.env.COVERAGE_CHANGES);
             }
 
             // Build detailed changes section
