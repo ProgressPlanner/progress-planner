@@ -321,47 +321,62 @@ jobs:
 
             // Build detailed changes section
             let detailedChanges = '';
+            let hasChanges = false;
+
+            // Build inner content for details
+            let changesContent = '';
 
             // New files with coverage
             if (changesJson.new_files && changesJson.new_files.length > 0) {
-              detailedChanges += '\n### 🆕 New Files\n\n';
-              detailedChanges += '| Class | Coverage | Lines |\n';
-              detailedChanges += '|-------|----------|-------|\n';
+              hasChanges = true;
+              changesContent += '\n### 🆕 New Files\n\n';
+              changesContent += '| Class | Coverage | Lines |\n';
+              changesContent += '|-------|----------|-------|\n';
               for (const file of changesJson.new_files.slice(0, 10)) {  // Limit to 10
                 const emoji = file.coverage >= 80 ? '🟢' : file.coverage >= 60 ? '🟡' : '🔴';
-                detailedChanges += `| ${emoji} \`${file.class}\` | ${file.coverage.toFixed(2)}% | ${file.lines} |\n`;
+                changesContent += `| ${emoji} \`${file.class}\` | ${file.coverage.toFixed(2)}% | ${file.lines} |\n`;
               }
               if (changesJson.new_files.length > 10) {
-                detailedChanges += `\n_... and ${changesJson.new_files.length - 10} more new files_\n`;
+                changesContent += `\n_... and ${changesJson.new_files.length - 10} more new files_\n`;
               }
             }
 
             // Improved coverage
             if (changesJson.improved && changesJson.improved.length > 0) {
-              detailedChanges += '\n### 📈 Coverage Improved\n\n';
-              detailedChanges += '| Class | Before | After | Change |\n';
-              detailedChanges += '|-------|--------|-------|--------|\n';
+              hasChanges = true;
+              changesContent += '\n### 📈 Coverage Improved\n\n';
+              changesContent += '| Class | Before | After | Change |\n';
+              changesContent += '|-------|--------|-------|--------|\n';
               const sortedImproved = changesJson.improved.sort((a, b) => b.diff - a.diff);
               for (const file of sortedImproved.slice(0, 10)) {  // Limit to 10
-                detailedChanges += `| \`${file.class}\` | ${file.old.toFixed(2)}% | ${file.new.toFixed(2)}% | +${file.diff.toFixed(2)}% |\n`;
+                changesContent += `| \`${file.class}\` | ${file.old.toFixed(2)}% | ${file.new.toFixed(2)}% | +${file.diff.toFixed(2)}% |\n`;
               }
               if (changesJson.improved.length > 10) {
-                detailedChanges += `\n_... and ${changesJson.improved.length - 10} more improvements_\n`;
+                changesContent += `\n_... and ${changesJson.improved.length - 10} more improvements_\n`;
               }
             }
 
             // Degraded coverage
             if (changesJson.degraded && changesJson.degraded.length > 0) {
-              detailedChanges += '\n### 📉 Coverage Decreased\n\n';
-              detailedChanges += '| Class | Before | After | Change |\n';
-              detailedChanges += '|-------|--------|-------|--------|\n';
+              hasChanges = true;
+              changesContent += '\n### 📉 Coverage Decreased\n\n';
+              changesContent += '| Class | Before | After | Change |\n';
+              changesContent += '|-------|--------|-------|--------|\n';
               const sortedDegraded = changesJson.degraded.sort((a, b) => a.diff - b.diff);
               for (const file of sortedDegraded.slice(0, 10)) {  // Limit to 10
-                detailedChanges += `| \`${file.class}\` | ${file.old.toFixed(2)}% | ${file.new.toFixed(2)}% | ${file.diff.toFixed(2)}% |\n`;
+                changesContent += `| \`${file.class}\` | ${file.old.toFixed(2)}% | ${file.new.toFixed(2)}% | ${file.diff.toFixed(2)}% |\n`;
               }
               if (changesJson.degraded.length > 10) {
-                detailedChanges += `\n_... and ${changesJson.degraded.length - 10} more decreases_\n`;
+                changesContent += `\n_... and ${changesJson.degraded.length - 10} more decreases_\n`;
               }
+            }
+
+            // Wrap in collapsible details if there are changes
+            if (hasChanges) {
+              const totalFiles = (changesJson.new_files?.length || 0) +
+                                 (changesJson.improved?.length || 0) +
+                                 (changesJson.degraded?.length || 0);
+              detailedChanges = `\n<details>\n<summary>📊 File-level Coverage Changes (${totalFiles} files)</summary>\n${changesContent}\n</details>\n`;
             }
 
             const comment = `## ${status} Code Coverage Report
