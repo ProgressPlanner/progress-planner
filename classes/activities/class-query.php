@@ -181,17 +181,32 @@ class Query {
 			return [];
 		}
 
-		// Remove duplicates. This could be removed in a future release.
+		// Remove duplicate activities and clean up the database.
+		// Duplicates can occur due to race conditions in concurrent processes.
+		// This cleanup routine identifies duplicates by creating a unique key from:
+		// - category (e.g., 'content', 'maintenance')
+		// - type (e.g., 'post_publish', 'plugin_update')
+		// - data_id (e.g., post ID, plugin slug)
+		// - date (Y-m-d format)
+		// When duplicates are found, only the first occurrence is kept, and subsequent
+		// duplicates are permanently deleted from the database.
+		// This could be removed in a future release once all legacy duplicates are cleaned up.
 		$results_unique = [];
 		foreach ( $results as $key => $result ) {
+			// Generate unique key for this activity based on its core identifying attributes.
 			$result_key = $result->category . $result->type . $result->data_id . $result->date; // @phpstan-ignore-line property.nonObject
-			// Cleanup any duplicates that may exist.
+
+			// If we've already seen an activity with this key, it's a duplicate - delete it.
 			if ( isset( $results_unique[ $result_key ] ) ) {
 				$this->delete_activity_by_id( $result->id ); // @phpstan-ignore-line property.nonObject
 				continue;
 			}
-			$results_unique[ $result->category . $result->type . $result->data_id . $result->date ] = $result; // @phpstan-ignore-line property.nonObject
+
+			// First occurrence of this activity - keep it.
+			$results_unique[ $result_key ] = $result;
 		}
+
+		// Return array values to reset numeric keys (0, 1, 2...) after filtering.
 		return \array_values( $results_unique );
 	}
 
