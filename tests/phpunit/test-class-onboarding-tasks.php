@@ -3,7 +3,6 @@
  * Unit tests for onboarding tasks.
  *
  * @package Progress_Planner
- * @group onboarding
  */
 
 namespace Progress_Planner\Tests\Unit;
@@ -12,8 +11,6 @@ use WP_UnitTestCase;
 
 /**
  * Class Onboarding_Tasks_Test.
- *
- * @group onboarding
  */
 class Onboarding_Tasks_Test extends \WP_UnitTestCase {
 

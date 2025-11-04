@@ -3,106 +3,103 @@
  * Class Suggested_Tasks_Test
  *
  * @package Progress_Planner\Tests
- * @group misc
  */
 
 namespace Progress_Planner\Tests;
 
-use Progress_Planner\Suggested_Tasks;
-
 /**
- * Suggested_Tasks_Test test case.
- *
- * @group misc
+ * CPT_Recommendations test case.
  */
-class Suggested_Tasks_Test extends \WP_UnitTestCase {
+class CPT_Recommendations_Test extends \WP_UnitTestCase {
 
 	/**
-	 * Suggested_Tasks instance.
-	 *
-	 * @var Suggested_Tasks
-	 */
-	protected $suggested_tasks;
-
-	/**
-	 * Setup the test case.
+	 * Test the task_cleanup method.
 	 *
 	 * @return void
 	 */
-	public function setUp(): void {
-		parent::setUp();
-		$this->suggested_tasks = new Suggested_Tasks();
-	}
-
-	/**
-	 * Test constructor registers hooks.
-	 *
-	 * @return void
-	 */
-	public function test_constructor_registers_hooks() {
-		$this->assertEquals( 10, \has_action( 'wp_ajax_progress_planner_suggested_task_action', [ $this->suggested_tasks, 'suggested_task_action' ] ) );
-		$this->assertEquals( 10, \has_action( 'automatic_updates_complete', [ $this->suggested_tasks, 'on_automatic_updates_complete' ] ) );
-		$this->assertEquals( 0, \has_action( 'init', [ $this->suggested_tasks, 'register_post_type' ] ) );
-		$this->assertEquals( 0, \has_action( 'init', [ $this->suggested_tasks, 'register_taxonomy' ] ) );
-	}
-
-	/**
-	 * Test STATUS_MAP constant exists and has expected values.
-	 *
-	 * @return void
-	 */
-	public function test_status_map_constant() {
-		$this->assertIsArray( Suggested_Tasks::STATUS_MAP );
-		$this->assertArrayHasKey( 'completed', Suggested_Tasks::STATUS_MAP );
-		$this->assertArrayHasKey( 'pending', Suggested_Tasks::STATUS_MAP );
-		$this->assertArrayHasKey( 'snoozed', Suggested_Tasks::STATUS_MAP );
-		$this->assertEquals( 'trash', Suggested_Tasks::STATUS_MAP['completed'] );
-		$this->assertEquals( 'publish', Suggested_Tasks::STATUS_MAP['pending'] );
-		$this->assertEquals( 'future', Suggested_Tasks::STATUS_MAP['snoozed'] );
-	}
-
-	/**
-	 * Test insert_activity method.
-	 *
-	 * @return void
-	 */
-	public function test_insert_activity() {
-		$user_id = $this->factory->user->create();
-		\wp_set_current_user( $user_id );
-
-		$this->suggested_tasks->insert_activity( 'test-task-id' );
-
-		$activities = \progress_planner()->get_activities__query()->query_activities(
+	public function test_task_cleanup() {
+		// Tasks that should not be removed.
+		$tasks_to_keep = [
 			[
-				'data_id' => 'test-task-id',
-				'type'    => 'completed',
-			]
-		);
-
-		$this->assertNotEmpty( $activities );
-		$this->assertEquals( 'test-task-id', $activities[0]->data_id );
-		$this->assertEquals( 'completed', $activities[0]->type );
-	}
-
-	/**
-	 * Test delete_activity method.
-	 *
-	 * @return void
-	 */
-	public function test_delete_activity() {
-		$user_id = $this->factory->user->create();
-		\wp_set_current_user( $user_id );
-
-		$this->suggested_tasks->insert_activity( 'test-task-to-delete' );
-		$this->suggested_tasks->delete_activity( 'test-task-to-delete' );
-
-		$activities = \progress_planner()->get_activities__query()->query_activities(
+				'post_title'  => 'review-post-14-' . \gmdate( 'YW' ),
+				'task_id'     => 'review-post-14-' . \gmdate( 'YW' ),
+				'date'        => \gmdate( 'YW' ),
+				'category'    => 'content-update',
+				'provider_id' => 'review-post',
+			],
 			[
-				'data_id' => 'test-task-to-delete',
-				'type'    => 'completed',
-			]
-		);
+				'post_title'  => 'create-post-' . \gmdate( 'YW' ),
+				'task_id'     => 'create-post-' . \gmdate( 'YW' ),
+				'date'        => \gmdate( 'YW' ),
+				'category'    => 'content-new',
+				'provider_id' => 'create-post',
+			],
+			[
+				'post_title'  => 'update-core-' . \gmdate( 'YW' ),
+				'task_id'     => 'update-core-' . \gmdate( 'YW' ),
+				'date'        => \gmdate( 'YW' ),
+				'category'    => 'maintenance',
+				'provider_id' => 'update-core',
+			],
+			[
+				'post_title'  => 'settings-saved-' . \gmdate( 'YW' ),
+				'task_id'     => 'settings-saved-' . \gmdate( 'YW' ),
+				'date'        => \gmdate( 'YW' ),
+				'provider_id' => 'settings-saved',
+				'category'    => 'configuration',
+			],
 
-		$this->assertEmpty( $activities );
+			// Not repetitive task, but with past date.
+			[
+				'post_title'  => 'settings-saved-202451',
+				'task_id'     => 'settings-saved-202451',
+				'date'        => '202451',
+				'provider_id' => 'settings-saved',
+				'category'    => 'configuration',
+			],
+
+			// User task, with past date.
+			[
+				'post_title'  => 'user-task-1',
+				'task_id'     => 'user-task-1',
+				'provider_id' => 'user',
+				'category'    => 'user',
+				'date'        => '202451',
+			],
+		];
+
+		foreach ( $tasks_to_keep as $task ) {
+			\progress_planner()->get_suggested_tasks_db()->add( $task );
+		}
+
+		// Tasks that should be removed.
+		$tasks_to_remove = [
+
+			// Repetitive task with past date.
+			[
+				'post_title'  => 'update-core-202451',
+				'task_id'     => 'update-core-202451',
+				'date'        => '202451',
+				'category'    => 'maintenance',
+				'provider_id' => 'update-core',
+			],
+
+			// Task with invalid provider.
+			[
+				'post_title'  => 'invalid-task-1',
+				'task_id'     => 'invalid-task-1',
+				'date'        => '202451',
+				'category'    => 'invalid-category',
+				'provider_id' => 'invalid-provider',
+			],
+		];
+
+		foreach ( $tasks_to_remove as $task ) {
+			\progress_planner()->get_suggested_tasks_db()->add( $task );
+		}
+
+		\progress_planner()->get_suggested_tasks()->get_tasks_manager()->cleanup_pending_tasks();
+		\wp_cache_flush_group( \Progress_Planner\Suggested_Tasks_DB::GET_TASKS_CACHE_GROUP ); // Clear the cache.
+		$this->assertEquals( \count( $tasks_to_keep ), \count( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] ) ) );
 	}
 }

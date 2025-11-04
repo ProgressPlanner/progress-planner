@@ -3,7 +3,6 @@
  * Class Test_API_Get_Stats
  *
  * @package Progress_Planner\Tests
- * @group api
  */
 
 namespace Progress_Planner\Tests;
@@ -14,8 +13,6 @@ use WP_REST_Request;
 
 /**
  * Test_API_Get_Stats test case.
- *
- * @group api
  */
 class Test_API_Get_Stats extends \WP_UnitTestCase {
 
