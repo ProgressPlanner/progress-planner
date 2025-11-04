@@ -203,9 +203,10 @@ jobs:
               match = re.search(r'^([\w\\]+)\s+Methods:\s+([\d.]+)%.*Lines:\s+([\d.]+)%\s+\(\s*(\d+)/\s*(\d+)\)', line)
               if match:
                   class_name = match.group(1)
-                  line_percent = float(match.group(2))
-                  covered_lines = int(match.group(3))
-                  total_lines = int(match.group(4))
+                  # Group 2 is methods percentage (not used)
+                  line_percent = float(match.group(3))  # Lines percentage
+                  covered_lines = int(match.group(4))   # Covered lines count
+                  total_lines = int(match.group(5))     # Total lines count
                   return class_name, line_percent, covered_lines, total_lines
               return None, None, None, None
 
