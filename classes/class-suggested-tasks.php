@@ -375,29 +375,29 @@ class Suggested_Tasks {
 		);
 
 		$rest_meta_fields = [
-			'prpl_url'              => [
+			'prpl_url'                => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'menu_order'            => [
+			'menu_order'              => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
 				'default'      => 0,
 			],
-			'prpl_is_ai_task'            => [
+			'prpl_is_ai_task'         => [
 				'type'         => 'boolean',
 				'single'       => true,
 				'show_in_rest' => true,
 				'default'      => false,
 			],
-			'prpl_ai_task_server_id'     => [
+			'prpl_ai_task_server_id'  => [
 				'type'         => 'number',
 				'single'       => true,
 				'show_in_rest' => true,
 			],
-			'prpl_ai_prompt_template'    => [
+			'prpl_ai_prompt_template' => [
 				'type'         => 'string',
 				'single'       => true,
 				'show_in_rest' => true,
