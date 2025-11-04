@@ -236,22 +236,29 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const current = '${{ steps.coverage.outputs.current_coverage }}';
-            const base = '${{ steps.base_coverage.outputs.base_coverage }}' || '0';
-            const diff = (parseFloat(current) - parseFloat(base)).toFixed(2);
-            const emoji = diff >= 0 ? '📈' : '📉';
-            const status = diff >= -0.5 ? '✅' : '❌';
+            const current = parseFloat('${{ steps.coverage.outputs.current_coverage }}') || 0;
+            const base = parseFloat('${{ steps.base_coverage.outputs.base_coverage }}') || 0;
+            const diff = (current - base).toFixed(2);
+            const diffEmoji = diff >= 0 ? '📈' : '📉';
+            const coverageEmoji = current >= 80 ? '🎉' : current >= 60 ? '📈' : current >= 40 ? '📊' : '📉';
+            const status = diff >= -0.5 ? '✅' : '⚠️';
 
             const comment = `## ${status} Code Coverage Report
 
             | Metric | Value |
             |--------|-------|
-            | Current Coverage | **${current}%** |
-            | Base Coverage | **${base}%** |
-            | Difference | ${emoji} **${diff}%** |
+            | **Total Coverage** | **${current.toFixed(2)}%** ${coverageEmoji} |
+            | Base Coverage | ${base.toFixed(2)}% |
+            | Difference | ${diffEmoji} **${diff}%** |
+
+            ${current >= 40 ? '✅ Coverage meets minimum threshold (40%)' : '⚠️ Coverage below recommended 40% threshold'}
 
             ${diff < -0.5 ? '⚠️ **Warning:** Coverage dropped by more than 0.5%. Please add tests.' : ''}
             ${diff >= 0 ? '🎉 Great job maintaining/improving code coverage!' : ''}
+
+            _All tests run in a single job with Xdebug coverage._
+
+            🤖 Generated with [Claude Code](https://claude.com/claude-code)
             `;
 
             // Find existing coverage report comment
