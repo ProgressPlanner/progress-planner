@@ -14,6 +14,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Tasks_Interactive;
 
 /**
  * Security test case.
+ *
+ * @coversNothing
  */
 class Security_Test extends \WP_UnitTestCase {
 
