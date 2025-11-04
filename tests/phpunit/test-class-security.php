@@ -84,6 +84,7 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
+	 * @coversNothing
 	 * @return void
 	 */
 	public function test_settings_form_requires_manage_options() {
@@ -119,6 +120,7 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
+	 * @coversNothing
 	 * @return void
 	 */
 	public function test_settings_form_sanitizes_input() {
@@ -164,6 +166,7 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
+	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_arbitrary_options_vulnerability() {
@@ -261,6 +264,7 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
+	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_requires_nonce() {
@@ -329,6 +333,7 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
+	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_requires_manage_options() {
@@ -396,6 +401,7 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
+	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_nested_setting_path() {
@@ -479,6 +485,7 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
+	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_whitelist_prevents_arbitrary_updates() {
@@ -569,6 +576,7 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
+	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_allows_whitelisted_options() {
@@ -642,6 +650,7 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
+	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_whitelist_filter() {
@@ -722,6 +731,7 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
+	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_protects_critical_options() {
@@ -804,6 +814,7 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
+	 * @coversNothing
 	 * @return void
 	 */
 	public function test_settings_form_ajax_nonce_check() {
@@ -1018,6 +1029,7 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * @runInSeparateProcess
 	 * @preserveGlobalState disabled
+	 * @coversNothing
 	 * @return void
 	 */
 	public function test_email_ajax_uses_correct_nonce() {
