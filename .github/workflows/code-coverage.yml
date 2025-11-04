@@ -120,8 +120,9 @@ jobs:
           # Generate coverage text report and save it
           vendor/bin/phpunit --coverage-text --colors=never > current-coverage-full.txt 2>&1 || true
 
-          # Extract overall coverage from the text report
-          COVERAGE=$(grep "Lines:" current-coverage-full.txt | awk '{print $2}' | sed 's/%//' || echo "0")
+          # Extract overall coverage from the text report (the summary line, not per-class lines)
+          # Look for the line that starts with "  Lines:" (two spaces at the start)
+          COVERAGE=$(grep "^  Lines:" current-coverage-full.txt | tail -1 | awk '{print $2}' | sed 's/%//' || echo "0")
           echo "current_coverage=$COVERAGE" >> $GITHUB_OUTPUT
           echo "Current code coverage: $COVERAGE%"
 
@@ -157,7 +158,8 @@ jobs:
         run: |
           # Generate coverage for base branch
           vendor/bin/phpunit --coverage-text --colors=never > base-coverage-full.txt 2>&1 || true
-          BASE_COVERAGE=$(grep "Lines:" base-coverage-full.txt | awk '{print $2}' | sed 's/%//' || echo "0")
+          # Extract overall coverage (summary line starting with "  Lines:")
+          BASE_COVERAGE=$(grep "^  Lines:" base-coverage-full.txt | tail -1 | awk '{print $2}' | sed 's/%//' || echo "0")
           echo "base_coverage=$BASE_COVERAGE" >> $GITHUB_OUTPUT
           echo "Base branch code coverage: $BASE_COVERAGE%"
 
