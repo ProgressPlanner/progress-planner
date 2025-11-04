@@ -495,7 +495,9 @@ class Suggested_Tasks {
 
 		// Handle sorting parameters.
 		if ( isset( $request['filter']['orderby'] ) ) {
-			$args['orderby'] = \sanitize_sql_orderby( $request['filter']['orderby'] );
+			// @phpstan-ignore-next-line argument.templateType
+			$orderby         = \sanitize_sql_orderby( $request['filter']['orderby'] ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			$args['orderby'] = $orderby !== false ? $orderby : 'date';
 		}
 		if ( isset( $request['filter']['order'] ) ) {
 			$args['order'] = \in_array( \strtoupper( $request['filter']['order'] ), [ 'ASC', 'DESC' ], true )

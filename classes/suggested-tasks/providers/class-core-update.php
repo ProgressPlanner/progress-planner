@@ -107,7 +107,8 @@ class Core_Update extends Tasks {
 	public function should_add_task() {
 		// Without this \wp_get_update_data() might not return correct data for the core updates (depending on the timing).
 		if ( ! \function_exists( 'get_core_updates' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/update.php'; // @phpstan-ignore requireOnce.fileNotFound
+			// @phpstan-ignore-next-line requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-admin/includes/update.php';
 		}
 
 		// For wp_get_update_data() to return correct data it needs to be called after the 'admin_init' action (with priority 10).
