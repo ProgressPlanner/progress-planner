@@ -97,9 +97,14 @@ class Security_Test extends \WP_UnitTestCase {
 		// Create the settings page instance.
 		$settings_page = new Page_Settings();
 
-		// Capture the JSON output.
+		// Capture the JSON output and catch WPDieException.
 		\ob_start();
-		$settings_page->store_settings_form_options();
+		try {
+			$settings_page->store_settings_form_options();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json_error calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -136,7 +141,12 @@ class Security_Test extends \WP_UnitTestCase {
 
 		// This should succeed.
 		\ob_start();
-		$settings_page->store_settings_form_options();
+		try {
+			$settings_page->store_settings_form_options();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json_success calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -202,7 +212,12 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path'] = '[]';
 
 		\ob_start();
-		$task->handle_interactive_task_submit();
+		try {
+			$task->handle_interactive_task_submit();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -217,7 +232,12 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['value']    = 'Hacked Site';
 
 		\ob_start();
-		$task->handle_interactive_task_submit();
+		try {
+			$task->handle_interactive_task_submit();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -282,7 +302,12 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path'] = '[]';
 
 		\ob_start();
-		$task->handle_interactive_task_submit();
+		try {
+			$task->handle_interactive_task_submit();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -342,7 +367,12 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path'] = '[]';
 
 		\ob_start();
-		$task->handle_interactive_task_submit();
+		try {
+			$task->handle_interactive_task_submit();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -414,7 +444,12 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path'] = \wp_json_encode( [ 'level1', 'level2', 'level3' ] );
 
 		\ob_start();
-		$task->handle_interactive_task_submit();
+		try {
+			$task->handle_interactive_task_submit();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -480,7 +515,12 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path'] = '[]';
 
 		\ob_start();
-		$task->handle_interactive_task_submit();
+		try {
+			$task->handle_interactive_task_submit();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -495,7 +535,12 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['value']   = 'malicious-plugin/malicious.php';
 
 		\ob_start();
-		$task->handle_interactive_task_submit();
+		try {
+			$task->handle_interactive_task_submit();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -558,7 +603,12 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path']    = '[]';
 
 		\ob_start();
-		$task->handle_interactive_task_submit();
+		try {
+			$task->handle_interactive_task_submit();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -631,7 +681,12 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path'] = '[]';
 
 		\ob_start();
-		$task->handle_interactive_task_submit();
+		try {
+			$task->handle_interactive_task_submit();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -708,7 +763,12 @@ class Security_Test extends \WP_UnitTestCase {
 			$_POST['setting_path'] = '[]';
 
 			\ob_start();
-			$task->handle_interactive_task_submit();
+			try {
+				$task->handle_interactive_task_submit();
+			} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+				// Expected - wp_send_json calls wp_die.
+				unset( $e ); // Suppress empty catch block warning.
+			}
 			$output = \ob_get_clean();
 
 			$result = \json_decode( $output, true );
@@ -739,7 +799,12 @@ class Security_Test extends \WP_UnitTestCase {
 		];
 
 		\ob_start();
-		$settings_page->store_settings_form_options();
+		try {
+			$settings_page->store_settings_form_options();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -749,7 +814,12 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['nonce'] = 'invalid_nonce';
 
 		\ob_start();
-		$settings_page->store_settings_form_options();
+		try {
+			$settings_page->store_settings_form_options();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -937,7 +1007,12 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['email_address'] = 'test@example.com';
 
 		\ob_start();
-		$email_task->ajax_test_email_sending();
+		try {
+			$email_task->ajax_test_email_sending();
+		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
+			// Expected - wp_send_json calls wp_die.
+			unset( $e ); // Suppress empty catch block warning.
+		}
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
