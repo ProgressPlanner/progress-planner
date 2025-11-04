@@ -144,9 +144,11 @@ class Disable_Comments extends Tasks_Interactive {
 	 */
 	public function print_popover_form_contents() {
 		?>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Disable new comments', 'progress-planner' ); ?>
-		</button>
+		<div class="prpl-steps-nav-wrapper prpl-steps-nav-wrapper-align-left" style="justify-content: flex-start;margin-bottom: 1.25rem;">
+			<button type="submit" class="prpl-button prpl-button-primary">
+				<?php \esc_html_e( 'Disable new comments', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) : ?>
 			<prpl-install-plugin
 				data-plugin-name="Comment-free zone"

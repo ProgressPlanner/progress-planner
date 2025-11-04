@@ -18,9 +18,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	</div>
 
 	<div class="prpl-header-right">
-		<button class="prpl-info-icon" id="prpl-start-tour-icon-button" onclick="prplStartTour()">
+		<button class="prpl-info-icon" id="prpl-start-tour-icon-button">
 			<?php \progress_planner()->the_asset( 'images/icon_tour.svg' ); ?>
-			<span class="screen-reader-text"><?php \esc_html_e( 'Start tour', 'progress-planner' ); ?>
+			<span class="screen-reader-text"><?php \esc_html_e( 'Start tour', 'progress-planner' ); ?></span>
 		</button>
 		<?php
 

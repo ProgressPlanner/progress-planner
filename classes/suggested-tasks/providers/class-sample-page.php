@@ -138,11 +138,7 @@ class Sample_Page extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		?>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Delete the "Sample Page" page', 'progress-planner' ); ?>
-		</button>
-		<?php
+		$this->print_submit_button( \__( 'Delete the "Sample Page" page', 'progress-planner' ) );
 	}
 
 	/**
