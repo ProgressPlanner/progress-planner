@@ -199,8 +199,8 @@ jobs:
 
           def parse_coverage_line(line):
               """Parse a coverage line to extract class name and line coverage percentage."""
-              # Example line: "  Progress_Planner\Activity  Methods: 55.56% ( 5/ 9)   Lines: 91.92% ( 91/ 99)"
-              match = re.search(r'^\s+([\w\\]+)\s+Methods:\s+[\d.]+%.*Lines:\s+([\d.]+)%\s+\(\s*(\d+)/\s*(\d+)\)', line)
+              # Example line: "Progress_Planner\Activity   Methods:  55.56% ( 5/ 9)   Lines:  91.92% ( 91/ 99)"
+              match = re.search(r'^([\w\\]+)\s+Methods:\s+[\d.]+%.*Lines:\s+([\d.]+)%\s+\(\s*(\d+)/\s*(\d+)\)', line)
               if match:
                   class_name = match.group(1)
                   line_percent = float(match.group(2))
