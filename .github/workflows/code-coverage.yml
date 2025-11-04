@@ -72,12 +72,10 @@ jobs:
           echo "Memory before: $(free -h | grep Mem)"
 
           # Run PHPUnit with coverage - allow test failures but ensure coverage is generated
-          # Exclude test-class-security.php to avoid output contamination issues
+          # test-class-security.php is excluded via phpunit.xml.dist to avoid output contamination
           set +e
           php -d memory_limit=512M -d max_execution_time=300 \
             vendor/bin/phpunit --configuration phpunit.xml.dist \
-            --exclude-group none \
-            --exclude tests/phpunit/test-class-security.php \
             --coverage-clover=coverage.xml \
             --coverage-text 2>&1 | tee phpunit-output.log
           PHPUNIT_EXIT=$?
@@ -300,7 +298,7 @@ jobs:
       - name: Generate HTML coverage report
         if: always()
         run: |
-          vendor/bin/phpunit --exclude tests/phpunit/test-class-security.php --coverage-html=coverage-html
+          vendor/bin/phpunit --coverage-html=coverage-html
         continue-on-error: true
 
       - name: Upload HTML coverage report as artifact
