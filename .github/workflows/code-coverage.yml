@@ -117,75 +117,30 @@ jobs:
       - name: Generate coverage report summary
         id: coverage
         run: |
-          # Debug: Check for coverage files
-          echo "=== Debug: Looking for coverage files ==="
-          ls -la coverage* 2>/dev/null || echo "No coverage files found in current directory"
-          echo "=== Debug: Current directory ==="
-          pwd
-          echo "=== Debug: Workspace directory ==="
-          echo "${{ github.workspace }}"
+          # Generate coverage text report and save it
+          vendor/bin/phpunit --coverage-text --colors=never > current-coverage-full.txt 2>&1 || true
 
-          # Search for coverage.xml anywhere in the workspace
-          echo "=== Searching for coverage.xml recursively ==="
-          FOUND_FILES=$(find ${{ github.workspace }} -name "coverage.xml" -type f 2>/dev/null)
-          if [ -n "$FOUND_FILES" ]; then
-            echo "Found coverage.xml files:"
-            echo "$FOUND_FILES"
-          else
-            echo "No coverage.xml found anywhere in workspace"
-          fi
-
-          # Try to find coverage.xml in multiple locations
-          COVERAGE_FILE=""
-          if [ -f coverage.xml ]; then
-            COVERAGE_FILE="coverage.xml"
-            echo "Found coverage.xml in current directory"
-          elif [ -f ${{ github.workspace }}/coverage.xml ]; then
-            COVERAGE_FILE="${{ github.workspace }}/coverage.xml"
-            echo "Found coverage.xml in workspace root"
-          else
-            # Try to find it anywhere
-            COVERAGE_FILE=$(find ${{ github.workspace }} -name "coverage.xml" -type f 2>/dev/null | head -1)
-            if [ -n "$COVERAGE_FILE" ]; then
-              echo "Found coverage.xml at: $COVERAGE_FILE"
-            fi
-          fi
-
-          if [ -n "$COVERAGE_FILE" ]; then
-            echo "=== Debug: Found coverage file at $COVERAGE_FILE ==="
-            echo "=== Debug: First 50 lines of coverage.xml ==="
-            head -50 "$COVERAGE_FILE"
-
-            # Extract coverage using various possible attribute names
-            # Try 'statements' and 'coveredstatements'
-            LINES=$(grep -o 'statements="[0-9]*"' "$COVERAGE_FILE" | head -1 | grep -o '[0-9]*')
-            COVERED=$(grep -o 'coveredstatements="[0-9]*"' "$COVERAGE_FILE" | head -1 | grep -o '[0-9]*')
-
-            # Try alternative: 'elements' and 'coveredelements'
-            if [ -z "$LINES" ]; then
-              LINES=$(grep -o 'elements="[0-9]*"' "$COVERAGE_FILE" | head -1 | grep -o '[0-9]*')
-              COVERED=$(grep -o 'coveredelements="[0-9]*"' "$COVERAGE_FILE" | head -1 | grep -o '[0-9]*')
-            fi
-
-            echo "=== Debug: LINES=$LINES, COVERED=$COVERED ==="
-
-            if [ -n "$LINES" ] && [ -n "$COVERED" ] && [ "$LINES" -gt 0 ]; then
-              COVERAGE=$(awk "BEGIN {printf \"%.2f\", ($COVERED/$LINES)*100}")
-            else
-              COVERAGE="0"
-            fi
-          else
-            echo "=== Debug: No coverage.xml file found ==="
-            COVERAGE="0"
-          fi
+          # Extract overall coverage from the text report
+          COVERAGE=$(grep "Lines:" current-coverage-full.txt | awk '{print $2}' | sed 's/%//' || echo "0")
           echo "current_coverage=$COVERAGE" >> $GITHUB_OUTPUT
           echo "Current code coverage: $COVERAGE%"
+
+          # Save detailed per-file coverage for later comparison
+          # Extract lines that show per-file coverage (format: "ClassName  Methods: X% Lines: Y%")
+          grep -E "^\s+[A-Za-z_\\]+" current-coverage-full.txt | \
+            grep -E "Methods:.*Lines:" | \
+            sed 's/\x1b\[[0-9;]*m//g' > current-coverage-details.txt || true
+
+          echo "=== Current coverage details saved ==="
+          head -20 current-coverage-details.txt || true
 
       - name: Checkout base branch for comparison
         if: github.event_name == 'pull_request'
         run: |
-          # Save coverage.xml before switching branches
-          cp coverage.xml /tmp/current-coverage.xml 2>/dev/null || true
+          # Save current branch coverage files
+          cp current-coverage-details.txt /tmp/current-coverage-details.txt 2>/dev/null || true
+          cp current-coverage-full.txt /tmp/current-coverage-full.txt 2>/dev/null || true
+
           # Stash any local changes (like composer.lock)
           git stash --include-untracked || true
           git fetch origin ${{ github.base_ref }}
@@ -201,10 +156,116 @@ jobs:
         id: base_coverage
         run: |
           # Generate coverage for base branch
-          vendor/bin/phpunit --coverage-text --colors=never > base-coverage.txt 2>&1 || true
-          BASE_COVERAGE=$(cat base-coverage.txt | grep "Lines:" | awk '{print $2}' | sed 's/%//' || echo "0")
+          vendor/bin/phpunit --coverage-text --colors=never > base-coverage-full.txt 2>&1 || true
+          BASE_COVERAGE=$(grep "Lines:" base-coverage-full.txt | awk '{print $2}' | sed 's/%//' || echo "0")
           echo "base_coverage=$BASE_COVERAGE" >> $GITHUB_OUTPUT
           echo "Base branch code coverage: $BASE_COVERAGE%"
+
+          # Extract per-file coverage for comparison
+          grep -E "^\s+[A-Za-z_\\]+" base-coverage-full.txt | \
+            grep -E "Methods:.*Lines:" | \
+            sed 's/\x1b\[[0-9;]*m//g' > base-coverage-details.txt || true
+
+          echo "=== Base coverage details saved ==="
+          head -20 base-coverage-details.txt || true
+        continue-on-error: true
+
+      - name: Generate coverage diff report
+        if: github.event_name == 'pull_request'
+        id: coverage_diff
+        run: |
+          # Restore current branch coverage files
+          cp /tmp/current-coverage-details.txt current-coverage-details.txt 2>/dev/null || true
+
+          # Create a Python script to compare coverage
+          cat > compare_coverage.py << 'PYTHON_SCRIPT'
+          import re
+          import sys
+          import json
+
+          def parse_coverage_line(line):
+              """Parse a coverage line to extract class name and line coverage percentage."""
+              # Example line: "  Progress_Planner\Activity  Methods: 55.56% ( 5/ 9)   Lines: 91.92% ( 91/ 99)"
+              match = re.search(r'^\s+([\w\\]+)\s+Methods:\s+[\d.]+%.*Lines:\s+([\d.]+)%\s+\(\s*(\d+)/\s*(\d+)\)', line)
+              if match:
+                  class_name = match.group(1)
+                  line_percent = float(match.group(2))
+                  covered_lines = int(match.group(3))
+                  total_lines = int(match.group(4))
+                  return class_name, line_percent, covered_lines, total_lines
+              return None, None, None, None
+
+          def load_coverage(filename):
+              """Load coverage data from file."""
+              coverage = {}
+              try:
+                  with open(filename, 'r') as f:
+                      for line in f:
+                          class_name, percent, covered, total = parse_coverage_line(line)
+                          if class_name:
+                              coverage[class_name] = {
+                                  'percent': percent,
+                                  'covered': covered,
+                                  'total': total
+                              }
+              except FileNotFoundError:
+                  pass
+              return coverage
+
+          # Load current and base coverage
+          current = load_coverage('current-coverage-details.txt')
+          base = load_coverage('base-coverage-details.txt')
+
+          # Find changes
+          changes = {
+              'new_files': [],
+              'improved': [],
+              'degraded': [],
+              'unchanged': []
+          }
+
+          # Check all current files
+          for class_name in sorted(current.keys()):
+              curr_data = current[class_name]
+              if class_name not in base:
+                  # New file
+                  changes['new_files'].append({
+                      'class': class_name,
+                      'coverage': curr_data['percent'],
+                      'lines': f"{curr_data['covered']}/{curr_data['total']}"
+                  })
+              else:
+                  base_data = base[class_name]
+                  diff = curr_data['percent'] - base_data['percent']
+                  if abs(diff) < 0.01:  # Less than 0.01% difference
+                      continue  # Skip unchanged files for brevity
+                  elif diff > 0:
+                      changes['improved'].append({
+                          'class': class_name,
+                          'old': base_data['percent'],
+                          'new': curr_data['percent'],
+                          'diff': diff
+                      })
+                  else:
+                      changes['degraded'].append({
+                          'class': class_name,
+                          'old': base_data['percent'],
+                          'new': curr_data['percent'],
+                          'diff': diff
+                      })
+
+          # Output as JSON for GitHub Actions
+          print(json.dumps(changes))
+          PYTHON_SCRIPT
+
+          # Run the comparison
+          CHANGES_JSON=$(python3 compare_coverage.py)
+          echo "coverage_changes<<EOF" >> $GITHUB_OUTPUT
+          echo "$CHANGES_JSON" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+          echo "=== Coverage changes ==="
+          echo "$CHANGES_JSON" | python3 -m json.tool || echo "$CHANGES_JSON"
         continue-on-error: true
 
       - name: Compare coverage and enforce threshold
@@ -247,6 +308,60 @@ jobs:
             const coverageEmoji = current >= 80 ? '🎉' : current >= 60 ? '📈' : current >= 40 ? '📊' : '📉';
             const status = diff >= -0.5 ? '✅' : '⚠️';
 
+            // Parse coverage changes JSON
+            let changesJson = {};
+            try {
+              const changesStr = `${{ steps.coverage_diff.outputs.coverage_changes }}`;
+              changesJson = changesStr ? JSON.parse(changesStr) : {};
+            } catch (e) {
+              console.log('Failed to parse coverage changes:', e);
+            }
+
+            // Build detailed changes section
+            let detailedChanges = '';
+
+            // New files with coverage
+            if (changesJson.new_files && changesJson.new_files.length > 0) {
+              detailedChanges += '\n### 🆕 New Files\n\n';
+              detailedChanges += '| Class | Coverage | Lines |\n';
+              detailedChanges += '|-------|----------|-------|\n';
+              for (const file of changesJson.new_files.slice(0, 10)) {  // Limit to 10
+                const emoji = file.coverage >= 80 ? '🟢' : file.coverage >= 60 ? '🟡' : '🔴';
+                detailedChanges += `| ${emoji} \`${file.class}\` | ${file.coverage.toFixed(2)}% | ${file.lines} |\n`;
+              }
+              if (changesJson.new_files.length > 10) {
+                detailedChanges += `\n_... and ${changesJson.new_files.length - 10} more new files_\n`;
+              }
+            }
+
+            // Improved coverage
+            if (changesJson.improved && changesJson.improved.length > 0) {
+              detailedChanges += '\n### 📈 Coverage Improved\n\n';
+              detailedChanges += '| Class | Before | After | Change |\n';
+              detailedChanges += '|-------|--------|-------|--------|\n';
+              const sortedImproved = changesJson.improved.sort((a, b) => b.diff - a.diff);
+              for (const file of sortedImproved.slice(0, 10)) {  // Limit to 10
+                detailedChanges += `| \`${file.class}\` | ${file.old.toFixed(2)}% | ${file.new.toFixed(2)}% | +${file.diff.toFixed(2)}% |\n`;
+              }
+              if (changesJson.improved.length > 10) {
+                detailedChanges += `\n_... and ${changesJson.improved.length - 10} more improvements_\n`;
+              }
+            }
+
+            // Degraded coverage
+            if (changesJson.degraded && changesJson.degraded.length > 0) {
+              detailedChanges += '\n### 📉 Coverage Decreased\n\n';
+              detailedChanges += '| Class | Before | After | Change |\n';
+              detailedChanges += '|-------|--------|-------|--------|\n';
+              const sortedDegraded = changesJson.degraded.sort((a, b) => a.diff - b.diff);
+              for (const file of sortedDegraded.slice(0, 10)) {  // Limit to 10
+                detailedChanges += `| \`${file.class}\` | ${file.old.toFixed(2)}% | ${file.new.toFixed(2)}% | ${file.diff.toFixed(2)}% |\n`;
+              }
+              if (changesJson.degraded.length > 10) {
+                detailedChanges += `\n_... and ${changesJson.degraded.length - 10} more decreases_\n`;
+              }
+            }
+
             const comment = `## ${status} Code Coverage Report
 
             | Metric | Value |
@@ -260,7 +375,16 @@ jobs:
             ${diff < -0.5 ? '⚠️ **Warning:** Coverage dropped by more than 0.5%. Please add tests.' : ''}
             ${diff >= 0 ? '🎉 Great job maintaining/improving code coverage!' : ''}
 
-            _All tests run in a single job with Xdebug coverage._
+            ${detailedChanges}
+
+            <details>
+            <summary>ℹ️ About this report</summary>
+
+            - All tests run in a single job with Xdebug coverage
+            - Security tests excluded from coverage to prevent output issues
+            - Coverage calculated from line coverage percentages
+
+            </details>
 
             🤖 Generated with [Claude Code](https://claude.com/claude-code)
             `;
