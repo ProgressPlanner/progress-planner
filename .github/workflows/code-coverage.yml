@@ -409,8 +409,6 @@ jobs:
             - Coverage calculated from line coverage percentages
 
             </details>
-
-            🤖 Generated with [Claude Code](https://claude.com/claude-code)
             `;
 
             // Find existing coverage report comment

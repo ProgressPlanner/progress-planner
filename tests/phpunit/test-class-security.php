@@ -14,8 +14,6 @@ use Progress_Planner\Suggested_Tasks\Providers\Tasks_Interactive;
 
 /**
  * Security test case.
- *
- * @coversNothing
  */
 class Security_Test extends \WP_UnitTestCase {
 
@@ -84,9 +82,6 @@ class Security_Test extends \WP_UnitTestCase {
 	/**
 	 * Test that only users with manage_options can save settings.
 	 *
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 * @coversNothing
 	 * @return void
 	 */
 	public function test_settings_form_requires_manage_options() {
@@ -102,14 +97,9 @@ class Security_Test extends \WP_UnitTestCase {
 		// Create the settings page instance.
 		$settings_page = new Page_Settings();
 
-		// Capture the JSON output and catch WPDieException.
+		// Capture the JSON output.
 		\ob_start();
-		try {
-			$settings_page->store_settings_form_options();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json_error calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$settings_page->store_settings_form_options();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -120,9 +110,6 @@ class Security_Test extends \WP_UnitTestCase {
 	/**
 	 * Test that settings form properly sanitizes input.
 	 *
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 * @coversNothing
 	 * @return void
 	 */
 	public function test_settings_form_sanitizes_input() {
@@ -149,12 +136,7 @@ class Security_Test extends \WP_UnitTestCase {
 
 		// This should succeed.
 		\ob_start();
-		try {
-			$settings_page->store_settings_form_options();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json_success calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$settings_page->store_settings_form_options();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -166,9 +148,6 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * This tests the CURRENT vulnerable behavior where any option can be updated.
 	 *
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_arbitrary_options_vulnerability() {
@@ -223,12 +202,7 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path'] = '[]';
 
 		\ob_start();
-		try {
-			$task->handle_interactive_task_submit();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$task->handle_interactive_task_submit();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -243,12 +217,7 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['value']    = 'Hacked Site';
 
 		\ob_start();
-		try {
-			$task->handle_interactive_task_submit();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$task->handle_interactive_task_submit();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -264,9 +233,6 @@ class Security_Test extends \WP_UnitTestCase {
 	/**
 	 * Test that interactive task requires proper nonce.
 	 *
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_requires_nonce() {
@@ -316,12 +282,7 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path'] = '[]';
 
 		\ob_start();
-		try {
-			$task->handle_interactive_task_submit();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$task->handle_interactive_task_submit();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -333,9 +294,6 @@ class Security_Test extends \WP_UnitTestCase {
 	/**
 	 * Test that interactive task requires manage_options capability.
 	 *
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_requires_manage_options() {
@@ -384,12 +342,7 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path'] = '[]';
 
 		\ob_start();
-		try {
-			$task->handle_interactive_task_submit();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$task->handle_interactive_task_submit();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -401,9 +354,6 @@ class Security_Test extends \WP_UnitTestCase {
 	/**
 	 * Test nested setting path update.
 	 *
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_nested_setting_path() {
@@ -464,12 +414,7 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path'] = \wp_json_encode( [ 'level1', 'level2', 'level3' ] );
 
 		\ob_start();
-		try {
-			$task->handle_interactive_task_submit();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$task->handle_interactive_task_submit();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -485,9 +430,6 @@ class Security_Test extends \WP_UnitTestCase {
 	 *
 	 * This tests the FIXED behavior with the whitelist in place.
 	 *
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_whitelist_prevents_arbitrary_updates() {
@@ -538,12 +480,7 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path'] = '[]';
 
 		\ob_start();
-		try {
-			$task->handle_interactive_task_submit();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$task->handle_interactive_task_submit();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -558,12 +495,7 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['value']   = 'malicious-plugin/malicious.php';
 
 		\ob_start();
-		try {
-			$task->handle_interactive_task_submit();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$task->handle_interactive_task_submit();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -576,9 +508,6 @@ class Security_Test extends \WP_UnitTestCase {
 	/**
 	 * Test that whitelisted options CAN be updated.
 	 *
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_allows_whitelisted_options() {
@@ -629,12 +558,7 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path']    = '[]';
 
 		\ob_start();
-		try {
-			$task->handle_interactive_task_submit();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$task->handle_interactive_task_submit();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -650,9 +574,6 @@ class Security_Test extends \WP_UnitTestCase {
 	/**
 	 * Test that the whitelist filter works correctly.
 	 *
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_whitelist_filter() {
@@ -710,12 +631,7 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['setting_path'] = '[]';
 
 		\ob_start();
-		try {
-			$task->handle_interactive_task_submit();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$task->handle_interactive_task_submit();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -731,9 +647,6 @@ class Security_Test extends \WP_UnitTestCase {
 	/**
 	 * Test that critical WordPress options are protected.
 	 *
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 * @coversNothing
 	 * @return void
 	 */
 	public function test_interactive_task_protects_critical_options() {
@@ -795,12 +708,7 @@ class Security_Test extends \WP_UnitTestCase {
 			$_POST['setting_path'] = '[]';
 
 			\ob_start();
-			try {
-				$task->handle_interactive_task_submit();
-			} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-				// Expected - wp_send_json calls wp_die.
-				unset( $e ); // Suppress empty catch block warning.
-			}
+			$task->handle_interactive_task_submit();
 			$output = \ob_get_clean();
 
 			$result = \json_decode( $output, true );
@@ -814,9 +722,6 @@ class Security_Test extends \WP_UnitTestCase {
 	/**
 	 * Test that AJAX nonce check fix works correctly.
 	 *
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 * @coversNothing
 	 * @return void
 	 */
 	public function test_settings_form_ajax_nonce_check() {
@@ -834,12 +739,7 @@ class Security_Test extends \WP_UnitTestCase {
 		];
 
 		\ob_start();
-		try {
-			$settings_page->store_settings_form_options();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$settings_page->store_settings_form_options();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -849,12 +749,7 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['nonce'] = 'invalid_nonce';
 
 		\ob_start();
-		try {
-			$settings_page->store_settings_form_options();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$settings_page->store_settings_form_options();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
@@ -1029,9 +924,6 @@ class Security_Test extends \WP_UnitTestCase {
 	/**
 	 * Test email AJAX handler uses correct nonce function.
 	 *
-	 * @runInSeparateProcess
-	 * @preserveGlobalState disabled
-	 * @coversNothing
 	 * @return void
 	 */
 	public function test_email_ajax_uses_correct_nonce() {
@@ -1045,12 +937,7 @@ class Security_Test extends \WP_UnitTestCase {
 		$_POST['email_address'] = 'test@example.com';
 
 		\ob_start();
-		try {
-			$email_task->ajax_test_email_sending();
-		} catch ( \WPDieException $e ) { // phpcs:ignore Generic.CodeAnalysis.EmptyStatement.DetectedCatch
-			// Expected - wp_send_json calls wp_die.
-			unset( $e ); // Suppress empty catch block warning.
-		}
+		$email_task->ajax_test_email_sending();
 		$output = \ob_get_clean();
 
 		$result = \json_decode( $output, true );
