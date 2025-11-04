@@ -14,12 +14,6 @@ namespace Progress_Planner\Rest;
  * Rest_API_Tasks class.
  */
 class Tasks extends Base {
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		\add_action( 'rest_api_init', [ $this, 'register_rest_endpoint' ] );
-	}
 
 	/**
 	 * Register the REST-API endpoint.

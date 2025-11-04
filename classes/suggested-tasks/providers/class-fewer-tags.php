@@ -154,7 +154,8 @@ class Fewer_Tags extends Tasks_Interactive {
 	protected function is_plugin_active() {
 		if ( null === $this->is_plugin_active ) {
 			if ( ! \function_exists( 'get_plugins' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore requireOnce.fileNotFound
+				// @phpstan-ignore-next-line requireOnce.fileNotFound
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
 			}
 
 			$plugins                = \get_plugins();

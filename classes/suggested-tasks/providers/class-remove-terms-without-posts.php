@@ -115,6 +115,14 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function maybe_remove_irrelevant_tasks( $object_id, $terms, $tt_ids, $taxonomy, $append, $old_tt_ids ) {
+
+		$taxonomy_object = \get_taxonomy( $taxonomy );
+
+		// Check if the taxonomy is public, we are not interested in non-public taxonomies (also our data collector doesn't track non-public taxonomies).
+		if ( ! $taxonomy_object || ! $taxonomy_object->public ) {
+			return;
+		}
+
 		foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] ) as $task ) {
 			/**
 			 * The task post object.
@@ -321,31 +329,44 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		$term = $this->get_term_from_task_id( $data['meta']['prpl_task_id'] );
+
+		if ( ! isset( $data['slug'] ) ) {
+			return $actions;
+		}
+
+		$term = $this->get_term_from_task_id( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['slug'] ) );
+
+		// If the term is not found, return the actions.
+		if ( ! $term ) {
+			return $actions;
+		}
 
 		$task_data = [
-			'target_term_id'   => $term->term_id ?? '',
-			'target_taxonomy'  => $term->taxonomy ?? '',
-			'target_term_name' => $term->name ?? '',
+			'target_term_id'   => $term->term_id,
+			'target_taxonomy'  => $term->taxonomy,
+			'target_term_name' => $term->name,
 		];
 
 		$task_details = $this->get_task_details( $task_data );
 
+		$taxonomy = \get_taxonomy( $term->taxonomy );
+
 		$actions[] = [
 			'priority' => 10,
-			'html'     => sprintf(
+			'html'     => \sprintf(
 				'<a href="#" class="prpl-tooltip-action-text prpl-delete-term-action" role="button"
 					data-task-context=\'%s\'
 					onclick="event.preventDefault(); document.getElementById(\'prpl-popover-%s\')?.showPopover(); this.dispatchEvent(new CustomEvent(\'prpl-interactive-task-action-remove-terms-without-posts\', { bubbles: true, detail: JSON.parse(this.dataset.taskContext) }));">
 					%s
 				</a>',
-				htmlspecialchars(
-					wp_json_encode(
+				\htmlspecialchars(
+					\wp_json_encode(
 						[
-							'post_title'       => $task_details['post_title'],
-							'target_term_id'   => $task_data['target_term_id'],
-							'target_taxonomy'  => $task_data['target_taxonomy'],
-							'target_term_name' => $task_data['target_term_name'],
+							'post_title'           => $task_details['post_title'],
+							'target_term_id'       => $task_data['target_term_id'],
+							'target_taxonomy'      => $task_data['target_taxonomy'],
+							'target_taxonomy_name' => $taxonomy ? $taxonomy->label : '',
+							'target_term_name'     => $task_data['target_term_name'],
 						]
 					),
 					ENT_QUOTES,
@@ -383,14 +404,23 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 				<span id="prpl-delete-term-name"></span>
 			</p>
 			<p style="margin: 5px 0 0 0; font-size: 12px; color: #646970;">
-				<span id="prpl-delete-term-taxonomy"></span>
+				<?php
+				\printf(
+					/* translators: %1$s: The taxonomy name, %2$s: The term slug */
+					\esc_html__( 'You are deleting the term which belongs to the "%1$s" (slug "%2$s").', 'progress-planner' ),
+					'<span id="prpl-delete-term-taxonomy-name"></span>',
+					'<span id="prpl-delete-term-taxonomy"></span>'
+				);
+				?>
 			</p>
 		</div>
 		<input type="hidden" name="term_id" id="prpl-delete-term-id" value="">
 		<input type="hidden" name="taxonomy" id="prpl-delete-taxonomy" value="">
-		<button type="submit" class="prpl-button prpl-button-primary" id="prpl-delete-term-button">
-			<?php \esc_html_e( 'Delete term', 'progress-planner' ); ?>
-		</button>
+		<div class="prpl-steps-nav-wrapper">
+			<button type="submit" class="prpl-button prpl-button-primary" id="prpl-delete-term-button">
+				<?php \esc_html_e( 'Delete term', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 

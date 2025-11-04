@@ -107,6 +107,14 @@ class Update_Term_Description extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function maybe_remove_irrelevant_tasks( $term, $tt_id, $taxonomy, $deleted_term, $object_ids ) {
+
+		$taxonomy_object = \get_taxonomy( $taxonomy );
+
+		// Check if the taxonomy is public, we are not interested in non-public taxonomies (also our data collector doesn't track non-public taxonomies).
+		if ( ! $taxonomy_object || ! $taxonomy_object->public ) {
+			return;
+		}
+
 		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! $pending_tasks ) {
@@ -311,6 +319,8 @@ class Update_Term_Description extends Tasks_Interactive {
 		}
 
 		$term = $this->get_term_from_task_id( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['slug'] ) );
+
+		// If the term is not found, return the actions.
 		if ( ! $term ) {
 			return $actions;
 		}
@@ -323,21 +333,24 @@ class Update_Term_Description extends Tasks_Interactive {
 
 		$task_details = $this->get_task_details( $task_data );
 
+		$taxonomy = \get_taxonomy( $term->taxonomy );
+
 		$actions[] = [
 			'priority' => 10,
-			'html'     => sprintf(
+			'html'     => \sprintf(
 				'<a href="#" class="prpl-tooltip-action-text prpl-update-term-description-action" role="button"
 					data-task-context=\'%s\'
 					onclick="event.preventDefault(); document.getElementById(\'prpl-popover-%s\')?.showPopover(); this.dispatchEvent(new CustomEvent(\'prpl-interactive-task-action-update-term-description\', { bubbles: true, detail: JSON.parse(this.dataset.taskContext) }));">
 					%s
 				</a>',
-				htmlspecialchars(
-					wp_json_encode(
+				\htmlspecialchars(
+					\wp_json_encode(
 						[
-							'post_title'       => $task_details['post_title'],
-							'target_term_id'   => $task_data['target_term_id'],
-							'target_taxonomy'  => $task_data['target_taxonomy'],
-							'target_term_name' => $task_data['target_term_name'],
+							'post_title'           => $task_details['post_title'],
+							'target_term_id'       => $task_data['target_term_id'],
+							'target_taxonomy'      => $task_data['target_taxonomy'],
+							'target_taxonomy_name' => $taxonomy ? $taxonomy->label : '',
+							'target_term_name'     => $task_data['target_term_name'],
 						]
 					),
 					ENT_QUOTES,
@@ -375,7 +388,14 @@ class Update_Term_Description extends Tasks_Interactive {
 				<span id="prpl-update-term-name"></span>
 			</p>
 			<p style="margin: 0 0 10px 0; font-size: 12px; color: #646970;">
-				<span id="prpl-update-term-taxonomy"></span>
+				<?php
+				\printf(
+					/* translators: %1$s: The taxonomy name, %2$s: The term slug */
+					\esc_html__( 'You are updating the term which belongs to the "%1$s" (slug "%2$s").', 'progress-planner' ),
+					'<span id="prpl-update-term-taxonomy-name"></span>',
+					'<span id="prpl-update-term-taxonomy"></span>'
+				);
+				?>
 			</p>
 		</div>
 		<textarea
@@ -387,9 +407,11 @@ class Update_Term_Description extends Tasks_Interactive {
 		></textarea>
 		<input type="hidden" name="term_id" id="prpl-update-term-id" value="">
 		<input type="hidden" name="taxonomy" id="prpl-update-taxonomy" value="">
-		<button type="submit" class="prpl-button prpl-button-primary" id="prpl-update-term-description-button">
-			<?php \esc_html_e( 'Save description', 'progress-planner' ); ?>
-		</button>
+		<div class="prpl-steps-nav-wrapper">
+			<button type="submit" class="prpl-button prpl-button-primary" id="prpl-update-term-description-button">
+				<?php \esc_html_e( 'Save description', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 
