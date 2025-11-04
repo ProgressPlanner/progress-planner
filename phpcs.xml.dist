@@ -147,4 +147,12 @@
 	<rule ref="WordPress.NamingConventions.PrefixAllGlobals">
 		<exclude-pattern>/tests/bootstrap\.php$</exclude-pattern>
 	</rule>
+
+	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
+		<exclude-pattern>/tests/phpunit/</exclude-pattern>
+	</rule>
+
+	<rule ref="Generic.Files.OneObjectStructurePerFile.MultipleFound">
+		<exclude-pattern>/tests/phpunit/</exclude-pattern>
+	</rule>
 </ruleset>

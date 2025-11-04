@@ -5,32 +5,6 @@ if [ $# -lt 3 ]; then
 	exit 1
 fi
 
-# Function to check if a command exists
-command_exists() {
-	command -v "$1" >/dev/null 2>&1
-}
-
-# Check if SVN is installed
-if command_exists svn; then
-	echo "SVN is already installed."
-else
-	echo "SVN is not installed. Installing SVN..."
-
-	# Update the package list
-	sudo apt-get update -y
-
-	# Install SVN
-	sudo apt-get install -y subversion
-
-	# Verify installation
-	if command_exists svn; then
-		echo "SVN was successfully installed."
-	else
-		echo "Failed to install SVN. Please check your system configuration."
-		exit 1
-	fi
-fi
-
 DB_NAME=$1
 DB_USER=$2
 DB_PASS=$3
@@ -41,7 +15,7 @@ SKIP_DB_CREATE=${6-false}
 TMPDIR=${TMPDIR-/tmp}
 TMPDIR=$(echo $TMPDIR | sed -e "s/\/$//")
 WP_TESTS_DIR=${WP_TESTS_DIR-$TMPDIR/wordpress-tests-lib}
-WP_CORE_DIR=${WP_CORE_DIR-$TMPDIR/wordpress}
+WP_CORE_DIR=${WP_CORE_DIR-$TMPDIR/wordpress/}
 
 download() {
     if [ `which curl` ]; then
@@ -80,6 +54,7 @@ fi
 set -ex
 
 install_wp() {
+
 	if [ -d $WP_CORE_DIR ]; then
 		return;
 	fi
@@ -89,35 +64,24 @@ install_wp() {
 	if [[ $WP_VERSION == 'nightly' || $WP_VERSION == 'trunk' ]]; then
 		mkdir -p $TMPDIR/wordpress-trunk
 		rm -rf $TMPDIR/wordpress-trunk/*
-		svn export https://core.svn.wordpress.org/trunk $TMPDIR/wordpress-trunk/wordpress
+		svn export --quiet https://core.svn.wordpress.org/trunk $TMPDIR/wordpress-trunk/wordpress
 		mv $TMPDIR/wordpress-trunk/wordpress/* $WP_CORE_DIR
 	else
 		if [ $WP_VERSION == 'latest' ]; then
 			local ARCHIVE_NAME='latest'
 		elif [[ $WP_VERSION =~ [0-9]+\.[0-9]+ ]]; then
 			# https serves multiple offers, whereas http serves single.
-			download https://api.wordpress.org/core/version-check/1.7/ $TMPDIR/wp-latest.json
-			if [[ $WP_VERSION =~ [0-9]+\.[0-9]+\.[0] ]]; then
-				# version x.x.0 means the first release of the major version, so strip off the .0 and download version x.x
-				LATEST_VERSION=${WP_VERSION%??}
-			else
-				# otherwise, scan the releases and get the most up to date minor version of the major release
-				local VERSION_ESCAPED=`echo $WP_VERSION | sed 's/\./\\\\./g'`
-				LATEST_VERSION=$(grep -o '"version":"'$VERSION_ESCAPED'[^"]*' $TMPDIR/wp-latest.json | sed 's/"version":"//' | head -1)
-			fi
-			if [[ -z "$LATEST_VERSION" ]]; then
-				local ARCHIVE_NAME="wordpress-$WP_VERSION"
-			else
-				local ARCHIVE_NAME="wordpress-$LATEST_VERSION"
-			fi
-		else
-			local ARCHIVE_NAME="wordpress-$WP_VERSION"
+			download https://wordpress.org/wordpress-$WP_VERSION.tar.gz  $TMPDIR/wordpress.tar.gz
+			ARCHIVE_NAME="wordpress-$WP_VERSION"
 		fi
-		download https://wordpress.org/${ARCHIVE_NAME}.tar.gz  $TMPDIR/wordpress.tar.gz
+
+		if [ ! -f $TMPDIR/wordpress.tar.gz ]; then
+			download https://wordpress.org/latest.tar.gz  $TMPDIR/wordpress.tar.gz
+		fi
 		tar --strip-components=1 -zxmf $TMPDIR/wordpress.tar.gz -C $WP_CORE_DIR
 	fi
 
-	download https://raw.githubusercontent.com/markoheijnen/wp-mysqli/master/db.php $WP_CORE_DIR/wp-content/db.php
+	download https://raw.github.com/markoheijnen/wp-mysqli/master/db.php $WP_CORE_DIR/wp-content/db.php
 }
 
 install_test_suite() {
@@ -133,8 +97,8 @@ install_test_suite() {
 		# set up testing suite
 		mkdir -p $WP_TESTS_DIR
 		rm -rf $WP_TESTS_DIR/{includes,data}
-		svn export --ignore-externals https://develop.svn.wordpress.org/${WP_TESTS_TAG}/tests/phpunit/includes/ $WP_TESTS_DIR/includes
-		svn export --ignore-externals https://develop.svn.wordpress.org/${WP_TESTS_TAG}/tests/phpunit/data/ $WP_TESTS_DIR/data
+		svn export --quiet --ignore-externals https://develop.svn.wordpress.org/${WP_TESTS_TAG}/tests/phpunit/includes/ $WP_TESTS_DIR/includes
+		svn export --quiet --ignore-externals https://develop.svn.wordpress.org/${WP_TESTS_TAG}/tests/phpunit/data/ $WP_TESTS_DIR/data
 	fi
 
 	if [ ! -f wp-tests-config.php ]; then
@@ -142,7 +106,6 @@ install_test_suite() {
 		# remove all forward slashes in the end
 		WP_CORE_DIR=$(echo $WP_CORE_DIR | sed "s:/\+$::")
 		sed $ioption "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR/':" "$WP_TESTS_DIR"/wp-tests-config.php
-		sed $ioption "s:__DIR__ . '/src/':'$WP_CORE_DIR/':" "$WP_TESTS_DIR"/wp-tests-config.php
 		sed $ioption "s/youremptytestdbnamehere/$DB_NAME/" "$WP_TESTS_DIR"/wp-tests-config.php
 		sed $ioption "s/yourusernamehere/$DB_USER/" "$WP_TESTS_DIR"/wp-tests-config.php
 		sed $ioption "s/yourpasswordhere/$DB_PASS/" "$WP_TESTS_DIR"/wp-tests-config.php
@@ -169,6 +132,7 @@ create_db() {
 }
 
 install_db() {
+
 	if [ ${SKIP_DB_CREATE} = "true" ]; then
 		return 0
 	fi
@@ -193,14 +157,8 @@ install_db() {
 	if [ $(mysql --user="$DB_USER" --password="$DB_PASS"$EXTRA --execute='show databases;' | grep ^$DB_NAME$) ]
 	then
 		echo "Reinstalling will delete the existing test database ($DB_NAME)"
-		# In CI environments, automatically proceed without prompting
-		if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ]; then
-			echo "CI environment detected, automatically recreating database..."
-			recreate_db "y"
-		else
-			read -p 'Are you sure you want to proceed? [y/N]: ' DELETE_EXISTING_DB
-			recreate_db $DELETE_EXISTING_DB
-		fi
+		read -p 'Are you sure you want to proceed? [y/N]: ' DELETE_EXISTING_DB
+		recreate_db $DELETE_EXISTING_DB
 	else
 		create_db
 	fi
