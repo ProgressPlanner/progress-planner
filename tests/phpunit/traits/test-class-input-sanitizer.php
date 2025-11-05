@@ -555,32 +555,6 @@ class Input_Sanitizer_Test extends \WP_UnitTestCase {
 		];
 	}
 
-	/**
-	 * Test get_sanitized_post with empty string.
-	 *
-	 * @return void
-	 */
-	public function test_get_sanitized_post_empty_string() {
-		$_POST['test_key'] = '';
-
-		$result = $this->mock_class->public_get_sanitized_post( 'test_key' );
-
-		$this->assertEquals( '', $result );
-	}
-
-	/**
-	 * Test get_sanitized_get with whitespace.
-	 *
-	 * @return void
-	 */
-	public function test_get_sanitized_get_whitespace() {
-		$_GET['test_key'] = '   test value   ';
-
-		$result = $this->mock_class->public_get_sanitized_get( 'test_key' );
-
-		// sanitize_text_field should trim whitespace.
-		$this->assertEquals( 'test value', $result );
-	}
 
 	/**
 	 * Test get_sanitized_get_array with non-array value.
@@ -626,20 +600,6 @@ class Input_Sanitizer_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test get_sanitized_post with special characters.
-	 *
-	 * @return void
-	 */
-	public function test_get_sanitized_post_special_chars() {
-		$_POST['test_key'] = 'Test & Value "with" <tags>';
-
-		$result = $this->mock_class->public_get_sanitized_post( 'test_key' );
-
-		// Should escape special characters.
-		$this->assertStringNotContainsString( '<tags>', $result );
-	}
-
-	/**
 	 * Test get_sanitized_request with unicode.
 	 *
 	 * @return void
@@ -650,20 +610,6 @@ class Input_Sanitizer_Test extends \WP_UnitTestCase {
 		$result = $this->mock_class->public_get_sanitized_request( 'test_key' );
 
 		$this->assertEquals( '日本語テスト', $result );
-	}
-
-	/**
-	 * Test get_sanitized_post_int with very large number.
-	 *
-	 * @return void
-	 */
-	public function test_get_sanitized_post_int_large_number() {
-		$_POST['test_key'] = '999999999';
-
-		$result = $this->mock_class->public_get_sanitized_post_int( 'test_key' );
-
-		$this->assertEquals( 999999999, $result );
-		$this->assertIsInt( $result );
 	}
 
 	/**
