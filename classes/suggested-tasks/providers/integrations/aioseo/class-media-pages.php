@@ -7,10 +7,16 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\AIOSEO;
 
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder;
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_AIOSEO;
+
 /**
  * Add task for All in One SEO: redirect media/attachment pages.
  */
 class Media_Pages extends AIOSEO_Interactive_Provider {
+
+	use Task_Action_Builder;
+	use Ajax_Security_AIOSEO;
 
 	/**
 	 * The provider ID.
@@ -120,19 +126,13 @@ class Media_Pages extends AIOSEO_Interactive_Provider {
 	 * @return void
 	 */
 	public function handle_interactive_task_specific_submit() {
-		if ( ! \function_exists( 'aioseo' ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'AIOSEO is not active.', 'progress-planner' ) ] );
-		}
+		$this->verify_aioseo_active_or_fail();
+		$this->verify_nonce_or_fail();
 
-		// Check the nonce.
-		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
-		}
-
-		\aioseo()->dynamicOptions->searchAppearance->postTypes->attachment->redirectAttachmentUrls = 'attachment';
+		\aioseo()->dynamicOptions->searchAppearance->postTypes->attachment->redirectAttachmentUrls = 'attachment'; // @phpstan-ignore-line
 
 		// Update the option.
-		\aioseo()->options->save();
+		\aioseo()->options->save(); // @phpstan-ignore-line
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
 	}
@@ -146,11 +146,6 @@ class Media_Pages extends AIOSEO_Interactive_Provider {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
-			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover();return false;">' . \esc_html__( 'Redirect', 'progress-planner' ) . '</a>',
-		];
-
-		return $actions;
+		return $this->add_popover_action( $actions, \__( 'Redirect', 'progress-planner' ) );
 	}
 }

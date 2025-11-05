@@ -7,12 +7,16 @@
 
 namespace Progress_Planner\Admin\Widgets;
 
+use Progress_Planner\Utils\Traits\Input_Sanitizer;
+
 /**
  * Widgets class.
  *
  * All widgets should extend this class.
  */
 abstract class Widget {
+
+	use Input_Sanitizer;
 
 	/**
 	 * The widget width.
@@ -58,11 +62,7 @@ abstract class Widget {
 	 * @return string
 	 */
 	public function get_range() {
-		// phpcs:ignore WordPress.Security.NonceVerification
-		return isset( $_GET['range'] )
-			// phpcs:ignore WordPress.Security.NonceVerification
-			? \sanitize_text_field( \wp_unslash( $_GET['range'] ) )
-			: '-6 months';
+		return $this->get_sanitized_get( 'range', '-6 months' );
 	}
 
 	/**
@@ -71,11 +71,7 @@ abstract class Widget {
 	 * @return string
 	 */
 	public function get_frequency() {
-		// phpcs:ignore WordPress.Security.NonceVerification
-		return isset( $_GET['frequency'] )
-			// phpcs:ignore WordPress.Security.NonceVerification
-			? \sanitize_text_field( \wp_unslash( $_GET['frequency'] ) )
-			: 'monthly';
+		return $this->get_sanitized_get( 'frequency', 'monthly' );
 	}
 
 	/**
