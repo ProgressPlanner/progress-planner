@@ -43,7 +43,7 @@ trait Task_Action_Builder {
 	 * @return string The HTML for the popover trigger button.
 	 */
 	protected function generate_popover_button_html( $label ) {
-		return sprintf(
+		return \sprintf(
 			'<a class="prpl-tooltip-action-text" href="#" role="button" onclick="document.getElementById(\'prpl-popover-%1$s\')?.showPopover()">%2$s</a>',
 			\esc_attr( static::POPOVER_ID ),
 			\esc_html( $label )
