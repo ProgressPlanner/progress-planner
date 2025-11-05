@@ -14,7 +14,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base;
  *
  * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base
  */
-class Ajax_Security_Base_Test extends \WP_UnitTestCase {
+class Ajax_Security_Base_Test extends \WP_Ajax_UnitTestCase {
 
 	/**
 	 * Mock class that uses the trait.
@@ -102,10 +102,17 @@ class Ajax_Security_Base_Test extends \WP_UnitTestCase {
 	public function test_verify_nonce_or_fail_invalid() {
 		$_REQUEST['nonce'] = 'invalid_nonce';
 
-		// We can't easily test wp_send_json_error because it exits,
-		// but we can verify the check_ajax_referer behavior.
-		$result = \check_ajax_referer( 'progress_planner', 'nonce', false );
-		$this->assertFalse( $result );
+		// WP_Ajax_UnitTestCase allows us to test AJAX methods that call wp_send_json_error().
+		try {
+			$this->mock_class->public_verify_nonce_or_fail();
+			$this->fail( 'Expected WPAjaxDieStopException was not thrown' );
+		} catch ( \WPAjaxDieStopException $e ) {
+			// Get the response.
+			$response = json_decode( $this->_last_response, true );
+			$this->assertFalse( $response['success'] );
+			$this->assertArrayHasKey( 'data', $response );
+			$this->assertArrayHasKey( 'message', $response['data'] );
+		}
 
 		// Clean up.
 		unset( $_REQUEST['nonce'] );
@@ -141,8 +148,18 @@ class Ajax_Security_Base_Test extends \WP_UnitTestCase {
 		$user_id = $this->factory->user->create( [ 'role' => 'subscriber' ] );
 		\wp_set_current_user( $user_id );
 
-		// Verify user cannot manage options.
-		$this->assertFalse( \current_user_can( 'manage_options' ) );
+		// WP_Ajax_UnitTestCase allows us to test AJAX methods that call wp_send_json_error().
+		try {
+			$this->mock_class->public_verify_capability_or_fail();
+			$this->fail( 'Expected WPAjaxDieStopException was not thrown' );
+		} catch ( \WPAjaxDieStopException $e ) {
+			// Get the response.
+			$response = json_decode( $this->_last_response, true );
+			$this->assertFalse( $response['success'] );
+			$this->assertArrayHasKey( 'data', $response );
+			$this->assertArrayHasKey( 'message', $response['data'] );
+			$this->assertStringContainsString( 'permission', $response['data']['message'] );
+		}
 	}
 
 	/**

@@ -14,7 +14,7 @@ use Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Yoast;
  *
  * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Yoast
  */
-class Ajax_Security_Yoast_Test extends \WP_UnitTestCase {
+class Ajax_Security_Yoast_Test extends \WP_Ajax_UnitTestCase {
 
 	/**
 	 * Mock class that uses the trait.
@@ -61,15 +61,26 @@ class Ajax_Security_Yoast_Test extends \WP_UnitTestCase {
 	/**
 	 * Test verify_yoast_active_or_fail when Yoast is not active.
 	 *
+	 * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Yoast::verify_yoast_active_or_fail
+	 *
 	 * @return void
 	 */
 	public function test_verify_yoast_active_or_fail_not_active() {
 		// Verify WPSEO_Options class doesn't exist.
 		$this->assertFalse( \class_exists( 'WPSEO_Options' ) );
 
-		// We can't easily test wp_send_json_error because it exits,
-		// but we can verify the class check.
-		$this->assertTrue( true );
+		// WP_Ajax_UnitTestCase allows us to test AJAX methods that call wp_send_json_error().
+		try {
+			$this->mock_class->public_verify_yoast_active_or_fail();
+			$this->fail( 'Expected WPAjaxDieStopException was not thrown' );
+		} catch ( \WPAjaxDieStopException $e ) {
+			// Get the response.
+			$response = json_decode( $this->_last_response, true );
+			$this->assertFalse( $response['success'] );
+			$this->assertArrayHasKey( 'data', $response );
+			$this->assertArrayHasKey( 'message', $response['data'] );
+			$this->assertStringContainsString( 'Yoast', $response['data']['message'] );
+		}
 	}
 
 	/**
