@@ -73,16 +73,18 @@ class Ajax_Security_AIOSEO_Test extends \WP_UnitTestCase {
 	/**
 	 * Test that the trait uses Ajax_Security_Base.
 	 *
+	 * This test verifies that base trait methods are available,
+	 * indicating Ajax_Security_Base is properly included.
+	 *
 	 * @return void
 	 */
 	public function test_uses_base_trait() {
 		$reflection = new \ReflectionClass( $this->mock_class );
-		$traits     = $reflection->getTraitNames();
 
-		$this->assertContains(
-			'Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base',
-			$traits
-		);
+		// Verify base trait methods are available via the AIOSEO trait.
+		$this->assertTrue( $reflection->hasMethod( 'verify_nonce_or_fail' ) );
+		$this->assertTrue( $reflection->hasMethod( 'verify_capability_or_fail' ) );
+		$this->assertTrue( $reflection->hasMethod( 'verify_ajax_security' ) );
 	}
 
 	/**

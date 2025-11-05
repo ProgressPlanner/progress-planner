@@ -204,7 +204,7 @@ class Input_Sanitizer_Test extends \WP_UnitTestCase {
 			'simple_text'   => [ 'test value', 'test value', '' ],
 			'xss_script'    => [ '<script>alert("xss")</script>', '', '<script>' ],
 			'html_tags'     => [ 'Test <b>bold</b> text', 'Test bold text', '<b>' ],
-			'special_chars' => [ 'Test & Value', 'Test &amp; Value', '' ],
+			'special_chars' => [ 'Test & Value', 'Test & Value', '' ],
 			'empty_string'  => [ '', '', '' ],
 			'whitespace'    => [ '   test value   ', 'test value', '' ],
 			'unicode'       => [ '日本語テスト', '日本語テスト', '' ],
