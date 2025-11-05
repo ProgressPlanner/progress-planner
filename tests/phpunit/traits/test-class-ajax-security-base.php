@@ -105,8 +105,8 @@ class Ajax_Security_Base_Test extends \WP_Ajax_UnitTestCase {
 		// WP_Ajax_UnitTestCase allows us to test AJAX methods that call wp_send_json_error().
 		try {
 			$this->mock_class->public_verify_nonce_or_fail();
-			$this->fail( 'Expected WPAjaxDieStopException was not thrown' );
-		} catch ( \WPAjaxDieStopException $e ) {
+			$this->fail( 'Expected WPAjaxDieContinueException was not thrown' );
+		} catch ( \WPAjaxDieContinueException $e ) {
 			// Get the response.
 			$response = json_decode( $this->_last_response, true );
 			$this->assertFalse( $response['success'] );
@@ -151,8 +151,8 @@ class Ajax_Security_Base_Test extends \WP_Ajax_UnitTestCase {
 		// WP_Ajax_UnitTestCase allows us to test AJAX methods that call wp_send_json_error().
 		try {
 			$this->mock_class->public_verify_capability_or_fail();
-			$this->fail( 'Expected WPAjaxDieStopException was not thrown' );
-		} catch ( \WPAjaxDieStopException $e ) {
+			$this->fail( 'Expected WPAjaxDieContinueException was not thrown' );
+		} catch ( \WPAjaxDieContinueException $e ) {
 			// Get the response.
 			$response = json_decode( $this->_last_response, true );
 			$this->assertFalse( $response['success'] );
