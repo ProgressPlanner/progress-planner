@@ -144,7 +144,7 @@ class Select_Timezone extends Tasks_Interactive {
 			</select>
 		</label>
 		<?php
-		$this->print_submit_button( \__( 'Set site timezone', 'progress-planner' ) );
+		$this->print_submit_button( \__( 'Set site timezone', 'progress-planner' ), 'prpl-steps-nav-wrapper-align-left' );
 	}
 
 	/**

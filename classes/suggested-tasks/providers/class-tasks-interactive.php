@@ -211,15 +211,18 @@ abstract class Tasks_Interactive extends Tasks {
 	 *
 	 * @param string $button_text The text for the button.
 	 *                           If empty, the default text "Submit" will be used.
+	 * @param string $css_class The CSS class for the wrapper.
 	 *
 	 * @return void
 	 */
-	protected function print_submit_button( $button_text = '' ) {
+	protected function print_submit_button( $button_text = '', $css_class = '' ) {
 		if ( empty( $button_text ) ) {
 			$button_text = \__( 'Submit', 'progress-planner' );
 		}
+
+		$css_class = empty( $css_class ) ? 'prpl-steps-nav-wrapper' : 'prpl-steps-nav-wrapper ' . $css_class;
 		?>
-		<div class="prpl-steps-nav-wrapper">
+		<div class="<?php echo \esc_attr( $css_class ); ?>">
 			<button type="submit" class="prpl-button prpl-button-primary">
 				<?php echo \esc_html( $button_text ); ?>
 			</button>

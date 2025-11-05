@@ -498,7 +498,9 @@ class Suggested_Tasks {
 
 		// Handle sorting parameters.
 		if ( isset( $request['filter']['orderby'] ) ) {
-			$args['orderby'] = \sanitize_sql_orderby( $request['filter']['orderby'] );
+			// @phpstan-ignore-next-line argument.templateType
+			$orderby         = \sanitize_sql_orderby( $request['filter']['orderby'] ); // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+			$args['orderby'] = $orderby !== false ? $orderby : 'date';
 		}
 		if ( isset( $request['filter']['order'] ) ) {
 			$args['order'] = \in_array( \strtoupper( $request['filter']['order'] ), [ 'ASC', 'DESC' ], true )
@@ -545,6 +547,11 @@ class Suggested_Tasks {
 			 */
 			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['slug'] ) ) {
 				$response->data['prpl_points'] = 0;
+			}
+
+			// Assign point only to golden user task.
+			if ( 'user' === $provider->get_provider_id() ) {
+				$response->data['prpl_points'] = ( ! empty( $post->post_excerpt ) && \str_contains( $post->post_excerpt, 'GOLDEN' ) ) ? 1 : 0;
 			}
 
 			// This has to be the last item to be added because actions use data from previous items.

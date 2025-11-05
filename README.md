@@ -1,4 +1,5 @@
 [![Test](https://github.com/ProgressPlanner/progress-planner/actions/workflows/phpunit.yml/badge.svg)](https://github.com/ProgressPlanner/progress-planner/actions/workflows/phpunit.yml)
+[![Code Coverage](https://github.com/ProgressPlanner/progress-planner/actions/workflows/code-coverage.yml/badge.svg)](https://github.com/ProgressPlanner/progress-planner/actions/workflows/code-coverage.yml)
 [![CS](https://github.com/ProgressPlanner/progress-planner/actions/workflows/cs.yml/badge.svg)](https://github.com/ProgressPlanner/progress-planner/actions/workflows/cs.yml)
 [![PHPStan](https://github.com/ProgressPlanner/progress-planner/actions/workflows/phpstan.yml/badge.svg)](https://github.com/ProgressPlanner/progress-planner/actions/workflows/phpstan.yml)
 [![Lint](https://github.com/ProgressPlanner/progress-planner/actions/workflows/lint.yml/badge.svg)](https://github.com/ProgressPlanner/progress-planner/actions/workflows/lint.yml)
@@ -23,6 +24,39 @@ This post explains what Progress Planner does and how to use it: [What does Prog
 ## How to install Progress Planner
 
 You can find [installation instructions here](https://prpl.fyi/install).
+
+## Contributing
+
+### Running Tests
+
+To run the test suite:
+
+```bash
+composer test
+```
+
+### Code Coverage
+
+To generate code coverage reports locally, you need either [PCOV](https://pecl.php.net/package/PCOV) (recommended) or [Xdebug](https://xdebug.org/) installed:
+
+```bash
+composer coverage
+```
+
+This will generate:
+- An HTML coverage report in the `coverage-html/` directory
+- A text-based coverage summary in your terminal
+
+**Coverage Requirements:** Pull requests must maintain code coverage within 0.5% of the base branch. PRs that drop coverage by more than 0.5% will be blocked until additional tests are added.
+
+### Other Quality Commands
+
+```bash
+composer check-cs    # Check coding standards
+composer fix-cs      # Auto-fix coding standards
+composer phpstan     # Run static analysis
+composer lint        # Check PHP syntax
+```
 
 ## Branches on this repository
 
