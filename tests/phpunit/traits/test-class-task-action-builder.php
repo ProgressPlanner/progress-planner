@@ -11,6 +11,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder;
 
 /**
  * Task_Action_Builder test case.
+ *
+ * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder
  */
 class Task_Action_Builder_Test extends \WP_UnitTestCase {
 

@@ -11,6 +11,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base;
 
 /**
  * Ajax_Security_Base test case.
+ *
+ * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base
  */
 class Ajax_Security_Base_Test extends \WP_UnitTestCase {
 
@@ -71,6 +73,8 @@ class Ajax_Security_Base_Test extends \WP_UnitTestCase {
 	/**
 	 * Test verify_nonce_or_fail with valid nonce.
 	 *
+	 * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base::verify_nonce_or_fail
+	 *
 	 * @return void
 	 */
 	public function test_verify_nonce_or_fail_valid() {
@@ -91,6 +95,8 @@ class Ajax_Security_Base_Test extends \WP_UnitTestCase {
 	/**
 	 * Test verify_nonce_or_fail with invalid nonce.
 	 *
+	 * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base::verify_nonce_or_fail
+	 *
 	 * @return void
 	 */
 	public function test_verify_nonce_or_fail_invalid() {
@@ -107,6 +113,8 @@ class Ajax_Security_Base_Test extends \WP_UnitTestCase {
 
 	/**
 	 * Test verify_capability_or_fail with admin user.
+	 *
+	 * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base::verify_capability_or_fail
 	 *
 	 * @return void
 	 */
@@ -125,6 +133,7 @@ class Ajax_Security_Base_Test extends \WP_UnitTestCase {
 	/**
 	 * Test verify_capability_or_fail with non-admin user.
 	 *
+	 * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base::verify_capability_or_fail
 	 * @return void
 	 */
 	public function test_verify_capability_or_fail_non_admin() {
@@ -139,6 +148,7 @@ class Ajax_Security_Base_Test extends \WP_UnitTestCase {
 	/**
 	 * Test verify_ajax_security with valid conditions.
 	 *
+	 * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base::verify_ajax_security
 	 * @return void
 	 */
 	public function test_verify_ajax_security_valid() {
@@ -230,6 +240,7 @@ class Ajax_Security_Base_Test extends \WP_UnitTestCase {
 	/**
 	 * Test verify_nonce_or_fail with missing nonce field.
 	 *
+	 * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base::verify_nonce_or_fail
 	 * @return void
 	 */
 	public function test_verify_nonce_or_fail_missing_field() {
@@ -279,6 +290,7 @@ class Ajax_Security_Base_Test extends \WP_UnitTestCase {
 	/**
 	 * Test verify_capability_or_fail with no user logged in.
 	 *
+	 * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base::verify_capability_or_fail
 	 * @return void
 	 */
 	public function test_verify_capability_or_fail_no_user() {
@@ -292,6 +304,7 @@ class Ajax_Security_Base_Test extends \WP_UnitTestCase {
 	/**
 	 * Test verify_ajax_security with invalid nonce.
 	 *
+	 * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base::verify_ajax_security
 	 * @return void
 	 */
 	public function test_verify_ajax_security_invalid_nonce() {
@@ -313,6 +326,7 @@ class Ajax_Security_Base_Test extends \WP_UnitTestCase {
 	/**
 	 * Test verify_ajax_security with insufficient permissions.
 	 *
+	 * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base::verify_ajax_security
 	 * @return void
 	 */
 	public function test_verify_ajax_security_insufficient_permissions() {
@@ -334,6 +348,7 @@ class Ajax_Security_Base_Test extends \WP_UnitTestCase {
 	/**
 	 * Test verify_ajax_security with custom parameters.
 	 *
+	 * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Base::verify_ajax_security
 	 * @return void
 	 */
 	public function test_verify_ajax_security_custom_parameters() {

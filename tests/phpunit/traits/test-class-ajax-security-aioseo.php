@@ -11,6 +11,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_AIOSEO;
 
 /**
  * Ajax_Security_AIOSEO test case.
+ *
+ * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_AIOSEO
  */
 class Ajax_Security_AIOSEO_Test extends \WP_UnitTestCase {
 

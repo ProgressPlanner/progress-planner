@@ -11,6 +11,8 @@ use Progress_Planner\Utils\Traits\Input_Sanitizer;
 
 /**
  * Input_Sanitizer test case.
+ *
+ * @covers \Progress_Planner\Utils\Traits\Input_Sanitizer
  */
 class Input_Sanitizer_Test extends \WP_UnitTestCase {
 

@@ -11,6 +11,8 @@ use Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Yoast;
 
 /**
  * Ajax_Security_Yoast test case.
+ *
+ * @covers \Progress_Planner\Suggested_Tasks\Providers\Traits\Ajax_Security_Yoast
  */
 class Ajax_Security_Yoast_Test extends \WP_UnitTestCase {
 
