@@ -164,6 +164,11 @@ abstract class Tasks_Interactive extends Tasks {
 	 * @return void
 	 */
 	public function add_popover() {
+
+		// Don't add the popover if the task is not published.
+		if ( ! $this->is_task_published() ) {
+			return;
+		}
 		?>
 		<div id="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>" class="prpl-popover prpl-popover-interactive" popover>
 			<?php $this->the_popover_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -256,6 +261,11 @@ abstract class Tasks_Interactive extends Tasks {
 			return;
 		}
 
+		// Don't enqueue the script if the task is not published.
+		if ( ! $this->is_task_published() ) {
+			return;
+		}
+
 		// Enqueue the web component.
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
 			'progress-planner/recommendations/' . $this->get_provider_id(),
@@ -270,5 +280,20 @@ abstract class Tasks_Interactive extends Tasks {
 	 */
 	protected function get_enqueue_data() {
 		return [];
+	}
+
+	/**
+	 * Check if the task is published.
+	 *
+	 * @return bool
+	 */
+	public function is_task_published() {
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'provider'    => $this->get_provider_id(),
+				'post_status' => 'publish',
+			]
+		);
+		return ! empty( $tasks );
 	}
 }
