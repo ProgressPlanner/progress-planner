@@ -13,11 +13,11 @@ if ( ! \defined( 'ABSPATH' ) ) {
 }
 
 if ( ! \function_exists( 'request_filesystem_credentials' ) ) {
-	require_once ABSPATH . 'wp-admin/includes/file.php'; // @phpstan-ignore requireOnce.fileNotFound
+	require_once ABSPATH . 'wp-admin/includes/file.php';
 }
 
 if ( ! \function_exists( 'wp_get_available_translations' ) ) {
-	require_once ABSPATH . 'wp-admin/includes/translation-install.php'; // @phpstan-ignore requireOnce.fileNotFound
+	require_once ABSPATH . 'wp-admin/includes/translation-install.php';
 }
 
 $prpl_languages    = \get_available_languages();

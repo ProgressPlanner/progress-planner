@@ -205,7 +205,6 @@ class Select_Locale extends Tasks_Interactive {
 	public function print_popover_form_contents() {
 
 		if ( ! \function_exists( 'wp_get_available_translations' ) ) {
-			// @phpstan-ignore-next-line requireOnce.fileNotFound
 			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
 		}
 
@@ -332,8 +331,7 @@ class Select_Locale extends Tasks_Interactive {
 	protected function update_language( $language_for_update ) {
 		// Handle translation installation.
 		if ( \current_user_can( 'install_languages' ) ) {
-            // @phpstan-ignore-next-line requireOnce.fileNotFound
-			require_once ABSPATH . 'wp-admin/includes/translation-install.php'; // @phpstan-ignore requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
 
 			if ( \wp_can_install_language_pack() ) {
 				$language = \wp_download_language_pack( $language_for_update );

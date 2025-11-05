@@ -31,6 +31,10 @@ parameters:
     - '#Call to an undefined method Progress_Planner\\Base\:\:get_[a-zA-Z0-9\\_]+\(\).#'
     - '#Cannot call method modify\(\) on DateTime\|false.#'
     - '#Cannot call method format\(\) on DateTime\|false.#'
+    - '#Path in require_once\(\) "wp-admin/includes/[a-zA-Z0-9\/_-]+\.php" is not a file or it does not exist.#'
+    - '#Path in require_once\(\) "1wp-admin/includes/[a-zA-Z0-9\/_-]+\.php" is not a file or it does not exist.#'
+    - '#Path in require_once\(\) "wp-includes/[a-zA-Z0-9\/_-]+\.php" is not a file or it does not exist.#'
+    - '#Path in require_once\(\) "1wp-includes/[a-zA-Z0-9\/_-]+\.php" is not a file or it does not exist.#'
     -
       identifier: variable.undefined
       path: views/popovers/email-sending.php

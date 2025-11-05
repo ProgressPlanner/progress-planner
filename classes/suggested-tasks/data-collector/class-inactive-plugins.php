@@ -47,7 +47,6 @@ class Inactive_Plugins extends Base_Data_Collector {
 	 */
 	protected function calculate_data() {
 		if ( ! \function_exists( 'get_plugins' ) ) {
-			// @phpstan-ignore-next-line requireOnce.fileNotFound
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 

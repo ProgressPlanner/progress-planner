@@ -87,11 +87,9 @@ class Base {
 	 */
 	public function init() {
 		if ( ! \function_exists( 'current_user_can' ) ) {
-			// @phpstan-ignore-next-line requireOnce.fileNotFound
 			require_once ABSPATH . 'wp-includes/capabilities.php';
 		}
 		if ( ! \function_exists( 'wp_get_current_user' ) ) {
-			// @phpstan-ignore-next-line requireOnce.fileNotFound
 			require_once ABSPATH . 'wp-includes/pluggable.php';
 		}
 
@@ -427,7 +425,6 @@ class Base {
 
 		// Otherwise, use the plugin header.
 		if ( ! \function_exists( 'get_file_data' ) ) {
-			// @phpstan-ignore-next-line requireOnce.fileNotFound
 			require_once ABSPATH . 'wp-includes/functions.php';
 		}
 
