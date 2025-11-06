@@ -110,7 +110,7 @@ class Angie_API extends Base {
 			$tasks_to_return = [];
 			$angie_tasks     = $this->get_angie_tasks();
 			foreach ( $tasks as $task ) {
-				$task_data         = $task->get_data();
+				$task_data = $task->get_data();
 
 				// Skip tasks which are not handled by Angie.
 				if ( ! in_array( $task_data['task_id'], $angie_tasks, true ) ) {
@@ -118,12 +118,12 @@ class Angie_API extends Base {
 				}
 
 				$tasks_to_return[] = [
-					'id'             => $task_data['task_id'],
-					'title'          => $task_data['post_title'],
-					'description'    => $task_data['post_content'],
-					'url'            => $task_data['url'],
-					'priority'       => $task_data['priority'] ?? 0,
-					'status'         => 'active',
+					'id'          => $task_data['task_id'],
+					'title'       => $task_data['post_title'],
+					'description' => $task_data['post_content'],
+					'url'         => $task_data['url'],
+					'priority'    => $task_data['priority'] ?? 0,
+					'status'      => 'active',
 				];
 			}
 
@@ -194,6 +194,15 @@ class Angie_API extends Base {
 		$task_id = $request->get_param( 'task_id' );
 		$value   = $request->get_param( 'value' );
 
+		// Ensure task_id is a string for type safety.
+		if ( ! \is_string( $task_id ) ) {
+			return new \WP_Error(
+				'invalid_task_id',
+				\__( 'Task ID must be a string.', 'progress-planner' ),
+				[ 'status' => 400 ]
+			);
+		}
+
 		try {
 			// For other tasks, try to find and mark as completed.
 			$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
@@ -255,7 +264,7 @@ class Angie_API extends Base {
 	/**
 	 * Get the Angie tasks.
 	 *
-	 * @return array The Angie tasks, keyed by task ID, value is the argument name for the complete_task method.
+	 * @return array An array of Angie task IDs (for WIP they are the same as the provider IDs).
 	 */
 	protected function get_angie_tasks() {
 		return array_keys( $this->get_angie_tasks_map() );
