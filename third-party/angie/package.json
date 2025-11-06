@@ -1,0 +1,27 @@
+{
+  "name": "progress-planner-angie-integration",
+  "version": "1.0.0",
+  "description": "Angie AI MCP server integration for Progress Planner",
+  "main": "dist/mcp-server.js",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "wordpress",
+    "angie",
+    "mcp",
+    "ai",
+    "progress-planner"
+  ],
+  "author": "Team Emilia Projects",
+  "license": "GPL-3.0-or-later",
+  "dependencies": {
+    "@elementor/angie-sdk": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}
