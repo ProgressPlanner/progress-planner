@@ -108,15 +108,22 @@ class Angie_API extends Base {
 			$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
 
 			$tasks_to_return = [];
+			$angie_tasks     = $this->get_angie_tasks();
 			foreach ( $tasks as $task ) {
 				$task_data         = $task->get_data();
+
+				// Skip tasks which are not handled by Angie.
+				if ( ! in_array( $task_data['task_id'], $angie_tasks, true ) ) {
+					continue;
+				}
+
 				$tasks_to_return[] = [
-					'id'          => $task_data['task_id'],
-					'title'       => $task_data['post_title'],
-					'description' => $task_data['post_content'],
-					'url'         => $task_data['url'],
-					'priority'    => $task_data['priority'] ?? 0,
-					'status'      => 'active',
+					'id'             => $task_data['task_id'],
+					'title'          => $task_data['post_title'],
+					'description'    => $task_data['post_content'],
+					'url'            => $task_data['url'],
+					'priority'       => $task_data['priority'] ?? 0,
+					'status'         => 'active',
 				];
 			}
 
@@ -188,11 +195,6 @@ class Angie_API extends Base {
 		$value   = $request->get_param( 'value' );
 
 		try {
-			// Special handling for blog description task.
-			if ( 'core-blogdescription' === $task_id ) {
-				return $this->complete_blog_description_task( $value );
-			}
-
 			// For other tasks, try to find and mark as completed.
 			$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
 				[
@@ -205,7 +207,7 @@ class Angie_API extends Base {
 				return new \WP_Error(
 					'task_not_found',
 					\sprintf(
-						/* translators: %s: task ID */
+					/* translators: %s: task ID */
 						\__( 'Task with ID "%s" not found or already completed.', 'progress-planner' ),
 						$task_id
 					),
@@ -216,6 +218,16 @@ class Angie_API extends Base {
 			// Get the first matching task.
 			$task = $tasks[0];
 
+			$angie_tasks_map = $this->get_angie_tasks_map();
+
+			// Special handling for tasks which are handled by Angie.
+			if ( isset( $angie_tasks_map[ $task_id ] ) ) {
+				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id ); // @phpstan-ignore-line method.nonObject
+				if ( $task_provider ) {
+					$task_provider->complete_task( [ $angie_tasks_map[ $task_id ] => $value ], $task_id );
+				}
+			}
+
 			// Mark task as completed (celebrate).
 			$task->celebrate();
 
@@ -225,7 +237,7 @@ class Angie_API extends Base {
 					'message' => \sprintf(
 						/* translators: %s: task title */
 						\__( 'Task "%s" has been marked as completed.', 'progress-planner' ),
-						$task->get_data()['title']
+						$task->get_data()['post_title']
 					),
 					'task_id' => $task_id,
 				],
@@ -241,60 +253,25 @@ class Angie_API extends Base {
 	}
 
 	/**
-	 * Complete the blog description task.
+	 * Get the Angie tasks.
 	 *
-	 * @param string $value The blog description value.
-	 * @return \WP_REST_Response|\WP_Error The REST response object.
+	 * @return array The Angie tasks, keyed by task ID, value is the argument name for the complete_task method.
 	 */
-	private function complete_blog_description_task( $value ) {
-		// Check if task exists and is active.
-		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
-			[
-				'post_status' => 'publish',
-				'provider_id' => 'core-blogdescription',
-			]
-		);
+	protected function get_angie_tasks() {
+		return array_keys( $this->get_angie_tasks_map() );
+	}
 
-		if ( empty( $tasks ) ) {
-			return new \WP_Error(
-				'task_not_found',
-				\__( 'The "Set blog description" task is not currently active. It may have already been completed or the blog description is already set.', 'progress-planner' ),
-				[ 'status' => 404 ]
-			);
-		}
-
-		// Validate the value parameter.
-		if ( empty( $value ) ) {
-			return new \WP_Error(
-				'missing_value',
-				\__( 'The "value" parameter is required to complete the blog description task. Please provide a blog description.', 'progress-planner' ),
-				[ 'status' => 400 ]
-			);
-		}
-
-		// Update the blog description.
-		$updated = \update_option( 'blogdescription', \sanitize_text_field( $value ) );
-
-		if ( ! $updated ) {
-			return new \WP_Error(
-				'update_failed',
-				\__( 'Failed to update the blog description. Please try again.', 'progress-planner' ),
-				[ 'status' => 500 ]
-			);
-		}
-
-		// Mark the task as completed.
-		$task = $tasks[0];
-		$task->celebrate();
-
-		return new \WP_REST_Response(
-			[
-				'success'          => true,
-				'message'          => \__( 'Blog description has been set successfully and the task has been marked as completed.', 'progress-planner' ),
-				'task_id'          => 'core-blogdescription',
-				'blog_description' => $value,
-			],
-			200
-		);
+	/**
+	 * Get the Angie tasks map.
+	 *
+	 * @return array The Angie tasks map, keyed by task ID, value is the argument name for the complete_task method.
+	 */
+	protected function get_angie_tasks_map() {
+		return [
+			'core-blogdescription' => 'blogdescription',
+			'core-siteicon'        => 'post_id',
+			'set-locale'           => 'language',
+			'select-timezone'      => 'timezone',
+		];
 	}
 }
