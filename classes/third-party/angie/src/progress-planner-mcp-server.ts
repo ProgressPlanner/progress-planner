@@ -152,7 +152,7 @@ function createProgressPlannerMcpServer() {
 		'complete-task',
 		'Completes a specific Progress Planner task. ' +
 			'For the "Set blog description" task (core-blogdescription), you must provide the tagline text in the "value" parameter. ' +
-			'For other tasks, only the task_id is required. ' +
+			'Some other tasks may require parameter as well, like "select-timezone" or "set-locale", but not all. ' +
 			'This will mark the task as completed and may perform associated actions (like updating settings).',
 		{
 			task_id: z
