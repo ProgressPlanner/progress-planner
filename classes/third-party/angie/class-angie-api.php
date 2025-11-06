@@ -113,7 +113,7 @@ class Angie_API extends Base {
 				$task_data = $task->get_data();
 
 				// Skip tasks which are not handled by Angie.
-				if ( ! in_array( $task_data['task_id'], $angie_tasks, true ) ) {
+				if ( ! \in_array( $task_data['task_id'], $angie_tasks, true ) ) {
 					continue;
 				}
 
@@ -267,7 +267,7 @@ class Angie_API extends Base {
 	 * @return array An array of Angie task IDs (for WIP they are the same as the provider IDs).
 	 */
 	protected function get_angie_tasks() {
-		return array_keys( $this->get_angie_tasks_map() );
+		return \array_keys( $this->get_angie_tasks_map() );
 	}
 
 	/**

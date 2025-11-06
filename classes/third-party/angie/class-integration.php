@@ -27,7 +27,7 @@ class Integration {
 		new Angie_API();
 
 		// Enqueue MCP server script.
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 	}
 
 	/**
@@ -45,25 +45,25 @@ class Integration {
 		$script_path = \constant( 'PROGRESS_PLANNER_DIR' ) . '/classes/third-party/angie/dist/progress-planner-mcp-server.js';
 		$script_url  = \constant( 'PROGRESS_PLANNER_URL' ) . '/classes/third-party/angie/dist/progress-planner-mcp-server.js';
 
-		if ( file_exists( $script_path ) ) {
-			wp_enqueue_script(
+		if ( \file_exists( $script_path ) ) {
+			\wp_enqueue_script(
 				'progress-planner-angie-mcp',
 				$script_url,
 				[],
-				filemtime( $script_path ),
+				\filemtime( $script_path ),
 				true
 			);
 
 			// Add type="module" attribute to the script tag for ES modules.
-			add_filter(
+			\add_filter(
 				'script_loader_tag',
 				function ( $tag, $handle ) {
 					if ( 'progress-planner-angie-mcp' === $handle ) {
 						// Ensure type="module" is added and remove any existing type attribute.
-						if ( false !== strpos( $tag, 'type=' ) ) {
-							$tag = preg_replace( '/type=["\'][^"\']*["\']/', 'type="module"', $tag );
+						if ( false !== \strpos( $tag, 'type=' ) ) {
+							$tag = \preg_replace( '/type=["\'][^"\']*["\']/', 'type="module"', $tag );
 						} else {
-							$tag = str_replace( '<script ', '<script type="module" ', $tag );
+							$tag = \str_replace( '<script ', '<script type="module" ', $tag );
 						}
 					}
 					return $tag;
@@ -73,13 +73,13 @@ class Integration {
 			);
 
 			// Pass WordPress site URL and nonce to the script.
-			wp_localize_script(
+			\wp_localize_script(
 				'progress-planner-angie-mcp',
 				'progressPlannerAngie',
 				[
-					'restUrl'   => rest_url( 'progress-planner/v1/angie' ),
-					'nonce'     => wp_create_nonce( 'wp_rest' ),
-					'siteUrl'   => get_site_url(),
+					'restUrl'   => \rest_url( 'progress-planner/v1/angie' ),
+					'nonce'     => \wp_create_nonce( 'wp_rest' ),
+					'siteUrl'   => \get_site_url(),
 					'pluginUrl' => \constant( 'PROGRESS_PLANNER_URL' ),
 				]
 			);
@@ -93,6 +93,6 @@ class Integration {
 	 */
 	private function is_angie_active() {
 		// Check if Angie plugin is active.
-		return class_exists( 'Angie' ) || defined( 'ANGIE_VERSION' );
+		return \class_exists( 'Angie' ) || \defined( 'ANGIE_VERSION' );
 	}
 }

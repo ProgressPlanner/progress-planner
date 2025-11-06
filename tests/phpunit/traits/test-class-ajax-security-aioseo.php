@@ -75,7 +75,7 @@ class Ajax_Security_AIOSEO_Test extends \WP_Ajax_UnitTestCase {
 			$this->fail( 'Expected WPAjaxDieContinueException was not thrown' );
 		} catch ( \WPAjaxDieContinueException $e ) {
 			// Get the response.
-			$response = json_decode( $this->_last_response, true );
+			$response = \json_decode( $this->_last_response, true );
 			$this->assertFalse( $response['success'] );
 			$this->assertArrayHasKey( 'data', $response );
 			$this->assertArrayHasKey( 'message', $response['data'] );
