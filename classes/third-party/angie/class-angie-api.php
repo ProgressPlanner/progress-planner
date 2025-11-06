@@ -10,12 +10,14 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Rest;
+namespace Progress_Planner\Third_Party\Angie;
+
+use Progress_Planner\Rest\Base;
 
 /**
  * Angie Integration REST-API class.
  */
-class Angie extends Base {
+class Angie_API extends Base {
 
 	/**
 	 * Register the REST-API endpoints.
@@ -59,13 +61,13 @@ class Angie extends Base {
 					'callback'            => [ $this, 'complete_task' ],
 					'permission_callback' => [ $this, 'check_permissions' ],
 					'args'                => [
-						'task_id'   => [
+						'task_id' => [
 							'required'          => true,
 							'type'              => 'string',
 							'description'       => 'The task ID to complete (e.g., "core-blogdescription")',
 							'sanitize_callback' => 'sanitize_text_field',
 						],
-						'value'     => [
+						'value'   => [
 							'required'          => false,
 							'type'              => 'string',
 							'description'       => 'The value to set for the task (e.g., blog description text)',
@@ -107,11 +109,11 @@ class Angie extends Base {
 
 			$tasks_to_return = [];
 			foreach ( $tasks as $task ) {
-				$task_data = $task->get_data();
+				$task_data         = $task->get_data();
 				$tasks_to_return[] = [
 					'id'          => $task_data['task_id'],
-					'title'       => $task_data['title'],
-					'description' => $task_data['description'],
+					'title'       => $task_data['post_title'],
+					'description' => $task_data['post_content'],
 					'url'         => $task_data['url'],
 					'priority'    => $task_data['priority'] ?? 0,
 					'status'      => 'active',
@@ -147,11 +149,11 @@ class Angie extends Base {
 
 			$tasks_to_return = [];
 			foreach ( $tasks as $task ) {
-				$task_data = $task->get_data();
+				$task_data         = $task->get_data();
 				$tasks_to_return[] = [
 					'id'          => $task_data['task_id'],
-					'title'       => $task_data['title'],
-					'description' => $task_data['description'],
+					'title'       => $task_data['post_title'],
+					'description' => $task_data['post_content'],
 					'url'         => $task_data['url'],
 					'priority'    => $task_data['priority'] ?? 0,
 					'status'      => 'completed',
@@ -287,9 +289,9 @@ class Angie extends Base {
 
 		return new \WP_REST_Response(
 			[
-				'success'         => true,
-				'message'         => \__( 'Blog description has been set successfully and the task has been marked as completed.', 'progress-planner' ),
-				'task_id'         => 'core-blogdescription',
+				'success'          => true,
+				'message'          => \__( 'Blog description has been set successfully and the task has been marked as completed.', 'progress-planner' ),
+				'task_id'          => 'core-blogdescription',
 				'blog_description' => $value,
 			],
 			200

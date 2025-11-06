@@ -12,6 +12,7 @@
 
 namespace Progress_Planner\Third_Party\Angie;
 
+use Progress_Planner\Third_Party\Angie\Angie_API;
 /**
  * Main Angie Integration class.
  */
@@ -21,23 +22,12 @@ class Integration {
 	 * Constructor.
 	 */
 	public function __construct() {
-		// Load REST API endpoints.
-		require_once __DIR__ . '/class-angie.php';
 
 		// Initialize REST API.
-		add_action( 'rest_api_init', [ $this, 'init_rest_api' ] );
+		new Angie_API();
 
 		// Enqueue MCP server script.
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
-	}
-
-	/**
-	 * Initialize REST API endpoints.
-	 *
-	 * @return void
-	 */
-	public function init_rest_api() {
-		new \Progress_Planner\Rest\Angie();
 	}
 
 	/**
@@ -52,8 +42,8 @@ class Integration {
 		}
 
 		// Enqueue the MCP server script.
-		$script_path = PROGRESS_PLANNER_DIR . '/third-party/angie/dist/mcp-server.js';
-		$script_url  = PROGRESS_PLANNER_URL . '/third-party/angie/dist/mcp-server.js';
+		$script_path = \constant( 'PROGRESS_PLANNER_DIR' ) . '/classes/third-party/angie/dist/progress-planner-mcp-server.js';
+		$script_url  = \constant( 'PROGRESS_PLANNER_URL' ) . '/classes/third-party/angie/dist/progress-planner-mcp-server.js';
 
 		if ( file_exists( $script_path ) ) {
 			wp_enqueue_script(
@@ -64,6 +54,24 @@ class Integration {
 				true
 			);
 
+			// Add type="module" attribute to the script tag for ES modules.
+			add_filter(
+				'script_loader_tag',
+				function ( $tag, $handle ) {
+					if ( 'progress-planner-angie-mcp' === $handle ) {
+						// Ensure type="module" is added and remove any existing type attribute.
+						if ( false !== strpos( $tag, 'type=' ) ) {
+							$tag = preg_replace( '/type=["\'][^"\']*["\']/', 'type="module"', $tag );
+						} else {
+							$tag = str_replace( '<script ', '<script type="module" ', $tag );
+						}
+					}
+					return $tag;
+				},
+				10,
+				2
+			);
+
 			// Pass WordPress site URL and nonce to the script.
 			wp_localize_script(
 				'progress-planner-angie-mcp',
@@ -72,7 +80,7 @@ class Integration {
 					'restUrl'   => rest_url( 'progress-planner/v1/angie' ),
 					'nonce'     => wp_create_nonce( 'wp_rest' ),
 					'siteUrl'   => get_site_url(),
-					'pluginUrl' => PROGRESS_PLANNER_URL,
+					'pluginUrl' => \constant( 'PROGRESS_PLANNER_URL' ),
 				]
 			);
 		}

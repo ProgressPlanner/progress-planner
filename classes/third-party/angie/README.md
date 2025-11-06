@@ -13,8 +13,8 @@ The integration enables Angie to:
 
 The integration consists of two main components:
 
-1. **PHP REST API** (`class-angie.php`): WordPress REST API endpoints for task management
-2. **MCP Server** (`src/mcp-server.ts`): TypeScript-based MCP server that bridges Angie AI with the REST API
+1. **PHP REST API** (`class-angie-api.php`): WordPress REST API endpoints for task management
+2. **MCP Server** (`src/progress-planner-mcp-server.ts`): TypeScript-based MCP server that bridges Angie AI with the REST API, bundled with Vite for browser compatibility
 
 ## Installation
 
@@ -29,7 +29,7 @@ The integration consists of two main components:
 
 1. **Install Dependencies:**
    ```bash
-   cd third-party/angie
+   cd classes/third-party/angie
    npm install
    ```
 
@@ -38,12 +38,16 @@ The integration consists of two main components:
    npm run build
    ```
 
-   This will compile the TypeScript code and generate `dist/mcp-server.js`.
+   This will:
+   - Compile TypeScript to JavaScript (`tsc`)
+   - Bundle all dependencies with Vite into a single ES module
+   - Generate `dist/progress-planner-mcp-server.js` (bundled, ~442KB)
 
 3. **Development Mode:**
    For active development, use watch mode:
    ```bash
-   npm run watch
+   npm run watch  # TypeScript watch mode
+   npm run dev    # Vite dev server (for testing)
    ```
 
 The integration is automatically enabled when Progress Planner is active. The MCP server script will be automatically enqueued when the Angie plugin is detected.
@@ -237,8 +241,24 @@ To get a complete list of available task IDs, use the "Get Active Tasks" endpoin
 
 ### File Structure
 
-- **Main Integration Class:** `/code/classes/rest/class-angie.php`
-- **Registration:** The class is automatically instantiated in `/code/classes/class-base.php`
+- **Main Integration Class:** `classes/third-party/angie/class-integration.php`
+- **REST API Class:** `classes/third-party/angie/class-angie-api.php`
+- **MCP Server Source:** `classes/third-party/angie/src/progress-planner-mcp-server.ts`
+- **MCP Server Bundle:** `classes/third-party/angie/dist/progress-planner-mcp-server.js`
+- **Build Configuration:** `classes/third-party/angie/vite.config.ts`
+- **Registration:** The integration is automatically instantiated in `classes/class-base.php`
+
+### Build Process
+
+The MCP server uses:
+- **TypeScript** for type-safe development
+- **Vite** for bundling dependencies (Angie SDK, MCP SDK, Zod) into a single ES module
+- **ES Modules** for browser compatibility
+
+The build process (`npm run build`) does the following:
+1. Compiles TypeScript (`tsc`) - generates type definitions
+2. Bundles with Vite - resolves all `import` statements and creates a single file
+3. Outputs `dist/progress-planner-mcp-server.js` - ready for browser use
 
 ### How It Works
 
@@ -321,14 +341,29 @@ Check the debug log at `/wp-content/debug.log` for error messages.
 
 **Solution:** This typically happens if the value hasn't changed. WordPress's `update_option()` returns false when the new value is the same as the old value.
 
+### Module resolution errors in browser
+
+**Solution:** Ensure you've run `npm run build` after making changes. The build process bundles all dependencies. Clear your browser cache (hard refresh: Cmd+Shift+R / Ctrl+Shift+F5) to load the new bundled file.
+
 ## Contributing
 
 To extend this integration:
 
-1. Add new methods to `/code/classes/rest/class-angie.php`
-2. Register new routes in the `register_rest_endpoint()` method
-3. Follow WordPress REST API best practices
-4. Update this documentation
+1. **Add new REST API endpoints:**
+   - Add new methods to `classes/third-party/angie/class-angie-api.php`
+   - Register new routes in the `register_rest_endpoint()` method
+
+2. **Add new MCP tools:**
+   - Edit `classes/third-party/angie/src/progress-planner-mcp-server.ts`
+   - Use `server.tool()` to register new tools (see example code)
+   - Rebuild with `npm run build`
+
+3. **Development workflow:**
+   - Edit TypeScript source files in `src/`
+   - Run `npm run build` to rebuild
+   - Clear browser cache to see changes
+   - Follow WordPress REST API best practices
+   - Update this documentation
 
 ## Support
 

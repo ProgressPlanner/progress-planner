@@ -2,10 +2,11 @@
   "name": "progress-planner-angie-integration",
   "version": "1.0.0",
   "description": "Angie AI MCP server integration for Progress Planner",
-  "main": "dist/mcp-server.js",
+  "main": "dist/progress-planner-mcp-server.js",
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && vite build",
     "watch": "tsc --watch",
+    "dev": "vite dev",
     "clean": "rm -rf dist"
   },
   "keywords": [
@@ -18,10 +19,13 @@
   "author": "Team Emilia Projects",
   "license": "GPL-3.0-or-later",
   "dependencies": {
-    "@elementor/angie-sdk": "^0.1.0"
+    "@elementor/angie-sdk": "1.0.0",
+    "@modelcontextprotocol/sdk": "^1.13.0",
+    "zod": "^3.22.0"
   },
   "devDependencies": {
     "@types/node": "^20.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "vite": "^6.3.5"
   }
 }
