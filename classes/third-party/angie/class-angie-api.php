@@ -233,7 +233,15 @@ class Angie_API extends Base {
 			if ( isset( $angie_tasks_map[ $task_id ] ) ) {
 				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id ); // @phpstan-ignore-line method.nonObject
 				if ( $task_provider ) {
-					$task_provider->complete_task( [ $angie_tasks_map[ $task_id ] => $value ], $task_id );
+					$param_name = $angie_tasks_map[ $task_id ];
+					if ( ! \is_string( $param_name ) ) {
+						return new \WP_Error(
+							'invalid_task_config',
+							\__( 'Invalid task configuration.', 'progress-planner' ),
+							[ 'status' => 500 ]
+						);
+					}
+					$task_provider->complete_task( [ $param_name => $value ], $task_id );
 				}
 			}
 
