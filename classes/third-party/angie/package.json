@@ -4,8 +4,10 @@
   "description": "Angie AI MCP server integration for Progress Planner",
   "main": "dist/progress-planner-mcp-server.js",
   "scripts": {
-    "build": "tsc && vite build",
-    "watch": "tsc --watch",
+    "build": "vite build",
+    "build:types": "tsc --emitDeclarationOnly",
+    "build:all": "npm run build:types && npm run build",
+    "watch": "vite build --watch",
     "dev": "vite dev",
     "clean": "rm -rf dist"
   },
