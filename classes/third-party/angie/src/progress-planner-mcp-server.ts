@@ -54,6 +54,16 @@ interface CompleteTaskResponse {
 	new_value?: string;
 }
 
+/**
+ * JSON Schema property definition with support for enum and default values
+ */
+interface JsonSchemaProperty {
+	type: string;
+	description?: string;
+	enum?: unknown[];
+	default?: unknown;
+}
+
 interface ToolDefinition {
 	name: string;
 	description: string;
@@ -62,13 +72,7 @@ interface ToolDefinition {
 	responseFormatter?: string;
 	inputSchema: {
 		type: string;
-		properties?: Record<
-			string,
-			{
-				type: string;
-				description?: string;
-			}
-		>;
+		properties?: Record< string, JsonSchemaProperty >;
 		required?: string[];
 	};
 }
@@ -121,7 +125,7 @@ async function makeApiRequest(
  * @return Zod schema object
  */
 function jsonSchemaToZod(
-	properties: Record< string, { type: string; description?: string } >,
+	properties: Record< string, JsonSchemaProperty >,
 	required: string[] = []
 ): Record< string, z.ZodTypeAny > {
 	const zodSchema: Record< string, z.ZodTypeAny > = {};
@@ -129,24 +133,51 @@ function jsonSchemaToZod(
 	for ( const [ key, prop ] of Object.entries( properties ) ) {
 		let zodType: z.ZodTypeAny;
 
-		switch ( prop.type ) {
-			case 'string':
-				zodType = z.string();
-				break;
-			case 'number':
-				zodType = z.number();
-				break;
-			case 'boolean':
-				zodType = z.boolean();
-				break;
-			case 'array':
-				zodType = z.array( z.unknown() );
-				break;
-			case 'object':
-				zodType = z.record( z.unknown() );
-				break;
-			default:
-				zodType = z.unknown();
+		// Handle enum constraint if present
+		if ( prop.enum && Array.isArray( prop.enum ) && prop.enum.length > 0 ) {
+			// Create enum schema based on the first enum value type
+			const firstValue = prop.enum[ 0 ];
+			if ( typeof firstValue === 'string' ) {
+				zodType = z.enum( prop.enum as [ string, ...string[] ] );
+			} else {
+				// For numbers, booleans, or mixed types, use union with literals
+				const literals = prop.enum.map( ( val ) => {
+					if (
+						typeof val === 'string' ||
+						typeof val === 'number' ||
+						typeof val === 'boolean'
+					) {
+						return z.literal( val );
+					}
+					return z.literal( val as string | number | boolean );
+				} ) as [
+					z.ZodLiteral< string | number | boolean >,
+					z.ZodLiteral< string | number | boolean >,
+					...z.ZodLiteral< string | number | boolean >[],
+				];
+				zodType = z.union( literals );
+			}
+		} else {
+			// Handle regular type-based schemas
+			switch ( prop.type ) {
+				case 'string':
+					zodType = z.string();
+					break;
+				case 'number':
+					zodType = z.number();
+					break;
+				case 'boolean':
+					zodType = z.boolean();
+					break;
+				case 'array':
+					zodType = z.array( z.unknown() );
+					break;
+				case 'object':
+					zodType = z.record( z.unknown() );
+					break;
+				default:
+					zodType = z.unknown();
+			}
 		}
 
 		// Add description if provided
@@ -154,8 +185,13 @@ function jsonSchemaToZod(
 			zodType = zodType.describe( prop.description );
 		}
 
-		// Make optional if not in required array
-		if ( ! required.includes( key ) ) {
+		// Add default value if provided
+		if ( prop.default !== undefined ) {
+			zodType = zodType.default( prop.default );
+		}
+
+		// Make optional if not in required array (unless default is set, which makes it effectively optional)
+		if ( ! required.includes( key ) && prop.default === undefined ) {
 			zodType = zodType.optional();
 		}
 

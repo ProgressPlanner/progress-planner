@@ -365,14 +365,14 @@ class Angie_API extends Base {
 							'task_id' => [
 								'type'        => 'string',
 								'description' => \__(
-									'The unique identifier of the recommendation to complete (e.g., "core-blogdescription", "select-timezone", "set-locale"). Use list-active-recommendations to see available recommendation IDs and their requirements.',
+									'The unique identifier of the recommendation to complete. Valid task IDs include: "core-blogdescription" (requires value with tagline text), "core-siteicon" (requires value with media attachment ID), "select-timezone" (requires value with timezone identifier like "America/New_York"), "set-locale" (requires value with locale code like "en_US"). Use list-active-recommendations to see all available recommendation IDs and their current requirements.',
 									'progress-planner'
 								),
 							],
 							'value'   => [
 								'type'        => 'string',
 								'description' => \__(
-									'The value to set for recommendations that require input. Required for: "core-blogdescription" (provide the tagline text), "select-timezone" (provide timezone identifier like "America/New_York"), "set-locale" (provide locale code like "en_US"). Optional or not needed for other recommendations.',
+									'The value to set for recommendations that require input. Required for: "core-blogdescription" (provide the blog tagline/description text), "core-siteicon" (provide the WordPress media attachment post ID as a string), "select-timezone" (provide timezone identifier like "America/New_York" or "Europe/London"), "set-locale" (provide WordPress locale code like "en_US" or "en_GB"). Leave empty or omit for recommendations that do not require a value.',
 									'progress-planner'
 								),
 							],
