@@ -61,7 +61,7 @@ class Angie_API extends Base {
 	 * @return void
 	 */
 	protected function log_angie_request( $route, $method, $params ) {
-		\error_log(
+		\error_log( // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			\sprintf(
 				'[Progress Planner Angie] %s %s - Params: %s',
 				$method,
@@ -334,7 +334,7 @@ class Angie_API extends Base {
 						'properties' => [],
 						'required'   => [],
 					],
-					'outputSchema'     => [
+					'outputSchema'      => [
 						'type'       => 'object',
 						'properties' => [
 							'success' => [
@@ -358,12 +358,12 @@ class Angie_API extends Base {
 									'progress-planner'
 								),
 								'items'       => [
-									'type'       => 'object',
+									'type'        => 'object',
 									'description' => \__(
 										'A recommendation task.',
 										'progress-planner'
 									),
-									'properties' => [
+									'properties'  => [
 										'id'          => [
 											'type'        => 'string',
 											'description' => \__(
@@ -428,7 +428,7 @@ class Angie_API extends Base {
 						'properties' => [],
 						'required'   => [],
 					],
-					'outputSchema'     => [
+					'outputSchema'      => [
 						'type'       => 'object',
 						'properties' => [
 							'success' => [
@@ -452,12 +452,12 @@ class Angie_API extends Base {
 									'progress-planner'
 								),
 								'items'       => [
-									'type'       => 'object',
+									'type'        => 'object',
 									'description' => \__(
 										'A completed recommendation task.',
 										'progress-planner'
 									),
-									'properties' => [
+									'properties'  => [
 										'id'          => [
 											'type'        => 'string',
 											'description' => \__(
@@ -537,24 +537,24 @@ class Angie_API extends Base {
 						],
 						'required'   => [ 'task_id' ],
 					],
-					'outputSchema'     => [
+					'outputSchema'      => [
 						'type'       => 'object',
 						'properties' => [
-							'success'  => [
+							'success'   => [
 								'type'        => 'boolean',
 								'description' => \__(
 									'Whether the recommendation was successfully completed.',
 									'progress-planner'
 								),
 							],
-							'message'  => [
+							'message'   => [
 								'type'        => 'string',
 								'description' => \__(
 									'A human-readable message confirming the recommendation was completed.',
 									'progress-planner'
 								),
 							],
-							'task_id'  => [
+							'task_id'   => [
 								'type'        => 'string',
 								'description' => \__(
 									'The unique identifier of the recommendation that was completed.',
