@@ -20,6 +20,58 @@ use Progress_Planner\Rest\Base;
 class Angie_API extends Base {
 
 	/**
+	 * Constructor.
+	 */
+	public function __construct() {
+		parent::__construct();
+		// Add logging filter for all Angie endpoints.
+		if ( defined( 'PRPL_DEBUG' ) && \constant( 'PRPL_DEBUG' ) ) {
+			\add_filter( 'rest_pre_dispatch', [ $this, 'log_angie_endpoints' ], 10, 3 );
+		}
+	}
+
+	/**
+	 * Log Angie API endpoint requests.
+	 *
+	 * @param mixed            $result  Response to replace the requested version with. Can be anything a normal endpoint can return, or null to not hijack the request.
+	 * @param \WP_REST_Server  $server  Server instance.
+	 * @param \WP_REST_Request $request Request used to generate the response.
+	 * @return mixed Unchanged result (we're just logging, not hijacking).
+	 */
+	public function log_angie_endpoints( $result, $server, $request ) {
+		$route = $request->get_route();
+
+		// Only log requests to our Angie endpoints.
+		if ( \strpos( $route, '/progress-planner/v1/angie/' ) === 0 ) {
+			$method = $request->get_method();
+			$params = $request->get_params();
+
+			$this->log_angie_request( $route, $method, $params );
+		}
+
+		return $result;
+	}
+
+	/**
+	 * Log a single Angie API request.
+	 *
+	 * @param string $route  The API route.
+	 * @param string $method The HTTP method.
+	 * @param array  $params The request parameters.
+	 * @return void
+	 */
+	protected function log_angie_request( $route, $method, $params ) {
+		\error_log(
+			\sprintf(
+				'[Progress Planner Angie] %s %s - Params: %s',
+				$method,
+				$route,
+				\wp_json_encode( $params )
+			)
+		);
+	}
+
+	/**
 	 * Register the REST-API endpoints.
 	 *
 	 * @return void
@@ -103,14 +155,16 @@ class Angie_API extends Base {
 	}
 
 	/**
-	 * Get all active (published) tasks.
+	 * Get all tasks by status.
+	 *
+	 * @param string $post_status The status of the tasks to get.
 	 *
 	 * @return \WP_REST_Response|\WP_Error The REST response object containing active tasks.
 	 */
-	public function get_active_tasks() {
+	public function get_tasks_by_status( $post_status ) {
 		try {
 			// Get all published recommendations.
-			$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] );
+			$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => $post_status ] );
 
 			$tasks_to_return = [];
 			$angie_tasks     = $this->get_angie_tasks();
@@ -128,7 +182,7 @@ class Angie_API extends Base {
 					'description' => $task_data['post_content'],
 					'url'         => $task_data['url'],
 					'priority'    => $task_data['priority'] ?? 0,
-					'status'      => 'active',
+					'status'      => 'publish' === $task_data['post_status'] ? 'active' : 'completed',
 				];
 			}
 
@@ -150,43 +204,22 @@ class Angie_API extends Base {
 	}
 
 	/**
+	 * Get all active (published) tasks.
+	 *
+	 * @return \WP_REST_Response|\WP_Error The REST response object containing active tasks.
+	 */
+	public function get_active_tasks() {
+		return $this->get_tasks_by_status( 'publish' );
+	}
+
+	/**
 	 * Get all completed (trashed) tasks.
 	 *
+	 * @param \WP_REST_Request $request The REST request object.
 	 * @return \WP_REST_Response|\WP_Error The REST response object containing completed tasks.
 	 */
-	public function get_completed_tasks() {
-		try {
-			// Get all trashed recommendations.
-			$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'trash' ] );
-
-			$tasks_to_return = [];
-			foreach ( $tasks as $task ) {
-				$task_data         = $task->get_data();
-				$tasks_to_return[] = [
-					'id'          => $task_data['task_id'],
-					'title'       => $task_data['post_title'],
-					'description' => $task_data['post_content'],
-					'url'         => $task_data['url'],
-					'priority'    => $task_data['priority'] ?? 0,
-					'status'      => 'completed',
-				];
-			}
-
-			return new \WP_REST_Response(
-				[
-					'success' => true,
-					'count'   => \count( $tasks_to_return ),
-					'tasks'   => $tasks_to_return,
-				],
-				200
-			);
-		} catch ( \Exception $e ) {
-			return new \WP_Error(
-				'tasks_error',
-				$e->getMessage(),
-				[ 'status' => 500 ]
-			);
-		}
+	public function get_completed_tasks( $request ) {
+		return $this->get_tasks_by_status( 'trash' );
 	}
 
 	/**
@@ -281,9 +314,10 @@ class Angie_API extends Base {
 	/**
 	 * Get MCP tool definitions.
 	 *
+	 * @param \WP_REST_Request $request The REST request object.
 	 * @return \WP_REST_Response|\WP_Error The REST response object containing tool definitions.
 	 */
-	public function get_tools() {
+	public function get_tools( $request ) {
 		try {
 			$tools = [
 				[

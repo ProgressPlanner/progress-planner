@@ -11831,9 +11831,9 @@ function rh(r, e) {
   if (!e)
     return JSON.stringify(r, null, 2);
   switch (e) {
-    case "format_tasks_list":
+    case "format_recommendations_list":
       return ah(r.tasks, "Tasks");
-    case "format_complete_task": {
+    case "format_complete_recommendation": {
       const t = r;
       let s = t.message;
       return t.new_value && (s += `
