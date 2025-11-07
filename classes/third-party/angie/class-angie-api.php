@@ -607,7 +607,7 @@ class Angie_API extends Base {
 	protected function get_angie_tasks_map() {
 		return [
 			'core-blogdescription' => 'blogdescription',
-			// 'core-siteicon'        => 'post_id', // Seems like Angie can't upload media.
+			// 'core-siteicon'        => 'post_id', -- Seems like Angie can't upload media.
 			'select-locale'        => 'language',
 			'select-timezone'      => 'timezone',
 		];
