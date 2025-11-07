@@ -51,7 +51,31 @@ interface CompleteTaskResponse {
 	success: boolean;
 	message: string;
 	task_id: string;
-	blog_description?: string;
+	new_value?: string;
+}
+
+interface ToolDefinition {
+	name: string;
+	description: string;
+	endpoint: string;
+	method: 'GET' | 'POST';
+	responseFormatter?: string;
+	inputSchema: {
+		type: string;
+		properties?: Record<
+			string,
+			{
+				type: string;
+				description?: string;
+			}
+		>;
+		required?: string[];
+	};
+}
+
+interface ToolsResponse {
+	success: boolean;
+	tools: ToolDefinition[];
 }
 
 export type ApiResponse = Record< string, unknown >;
@@ -90,9 +114,129 @@ async function makeApiRequest(
 }
 
 /**
+ * Convert JSON Schema properties to Zod schema object
+ *
+ * @param properties The JSON Schema properties to convert
+ * @param required   Array of required property names
+ * @return Zod schema object
+ */
+function jsonSchemaToZod(
+	properties: Record< string, { type: string; description?: string } >,
+	required: string[] = []
+): Record< string, z.ZodTypeAny > {
+	const zodSchema: Record< string, z.ZodTypeAny > = {};
+
+	for ( const [ key, prop ] of Object.entries( properties ) ) {
+		let zodType: z.ZodTypeAny;
+
+		switch ( prop.type ) {
+			case 'string':
+				zodType = z.string();
+				break;
+			case 'number':
+				zodType = z.number();
+				break;
+			case 'boolean':
+				zodType = z.boolean();
+				break;
+			case 'array':
+				zodType = z.array( z.unknown() );
+				break;
+			case 'object':
+				zodType = z.record( z.unknown() );
+				break;
+			default:
+				zodType = z.unknown();
+		}
+
+		// Add description if provided
+		if ( prop.description ) {
+			zodType = zodType.describe( prop.description );
+		}
+
+		// Make optional if not in required array
+		if ( ! required.includes( key ) ) {
+			zodType = zodType.optional();
+		}
+
+		zodSchema[ key ] = zodType;
+	}
+
+	return zodSchema;
+}
+
+/**
+ * Format response based on formatter type from PHP
+ *
+ * @param response  The API response data
+ * @param formatter The formatter type from tool definition
+ * @return Formatted text string
+ */
+function formatResponse( response: ApiResponse, formatter?: string ): string {
+	if ( ! formatter ) {
+		// Default: JSON format
+		return JSON.stringify( response, null, 2 );
+	}
+
+	switch ( formatter ) {
+		case 'format_recommendations_list': {
+			const data = response as unknown as TasksResponse;
+			return formatTasksList( data.tasks, 'Tasks' );
+		}
+
+		case 'format_complete_recommendation': {
+			const data = response as unknown as CompleteTaskResponse;
+			let message = data.message;
+			if ( data.new_value ) {
+				message += `\n\nNew value: "${ data.new_value }"`;
+			}
+			return message;
+		}
+
+		default:
+			// Fallback to JSON
+			return JSON.stringify( response, null, 2 );
+	}
+}
+
+/**
+ * Create a generic tool handler that uses the endpoint from tool definition
+ *
+ * @param tool The tool definition containing endpoint and method
+ * @return The tool handler function
+ */
+function createToolHandler( tool: ToolDefinition ) {
+	return async (
+		args: Record< string, unknown >,
+		_extra?: unknown
+	): Promise< { content: Array< { type: 'text'; text: string } > } > => {
+		// Prepare request body for POST requests
+		const requestBody =
+			tool.method === 'POST'
+				? ( args as Record< string, unknown > )
+				: undefined;
+
+		// Make API request
+		const response = await makeApiRequest( tool.endpoint, requestBody );
+
+		// Format response using formatter from tool definition
+		const text = formatResponse( response, tool.responseFormatter );
+
+		return {
+			content: [
+				{
+					type: 'text' as const,
+					text,
+				},
+			],
+		};
+	};
+}
+
+/**
  * Create Progress Planner MCP Server
  */
-function createProgressPlannerMcpServer() {
+async function createProgressPlannerMcpServer() {
 	const server = new McpServer(
 		{
 			name: 'progress-planner',
@@ -105,97 +249,28 @@ function createProgressPlannerMcpServer() {
 		}
 	);
 
-	// Register tool: List active tasks
-	server.tool(
-		'list-active-tasks',
-		'Lists all active Progress Planner tasks that the user needs to complete. ' +
-			'These are recommendations with status "publish" that are currently visible to the user. ' +
-			'Use this to see what tasks are pending or to help the user understand their to-do list.',
-		{},
-		async () => {
-			const response = await makeApiRequest( '/tasks' );
-			const data = response as unknown as TasksResponse;
-			return {
-				content: [
-					{
-						type: 'text',
-						text: formatTasksList( data.tasks, 'Active' ),
-					},
-				],
-			};
-		}
-	);
+	// Fetch tool definitions from the API
+	const toolsResponse = await makeApiRequest( '/tools' );
+	const toolsData = toolsResponse as unknown as ToolsResponse;
 
-	// Register tool: List completed tasks
-	server.tool(
-		'list-completed-tasks',
-		'Lists all completed Progress Planner tasks. ' +
-			'These are recommendations that have been marked as done (status "trash"). ' +
-			'Use this to see what the user has already accomplished or to review their progress history.',
-		{},
-		async () => {
-			const response = await makeApiRequest( '/tasks/completed' );
-			const data = response as unknown as TasksResponse;
-			return {
-				content: [
-					{
-						type: 'text',
-						text: formatTasksList( data.tasks, 'Completed' ),
-					},
-				],
-			};
-		}
-	);
+	if ( ! toolsData.success || ! toolsData.tools ) {
+		throw new Error( 'Failed to fetch tool definitions from API' );
+	}
 
-	// Register tool: Complete a task
-	server.tool(
-		'complete-task',
-		'Completes a specific Progress Planner task. ' +
-			'For the "Set blog description" task (core-blogdescription), you must provide the tagline text in the "value" parameter. ' +
-			'Some other tasks may require parameter as well, like "select-timezone" or "set-locale", but not all. ' +
-			'This will mark the task as completed and may perform associated actions (like updating settings).',
-		{
-			task_id: z
-				.string()
-				.describe(
-					'The unique identifier of the task to complete (e.g., "core-blogdescription", "content-create"). ' +
-						'Use list-active-tasks to see available task IDs.'
-				),
-			value: z
-				.string()
-				.optional()
-				.describe(
-					'The value to set for tasks that require input. ' +
-						'For example, when completing the "Set blog description" task, provide the tagline text here.'
-				),
-		},
-		async ( { task_id, value }: { task_id: string; value?: string } ) => {
-			const requestBody: Record< string, unknown > = { task_id };
-			if ( value ) {
-				requestBody.value = value;
-			}
+	// Register each tool dynamically
+	for ( const tool of toolsData.tools ) {
+		const zodSchema = tool.inputSchema.properties
+			? jsonSchemaToZod(
+					tool.inputSchema.properties,
+					tool.inputSchema.required || []
+			  )
+			: {};
 
-			const response = await makeApiRequest(
-				'/tasks/complete',
-				requestBody
-			);
-			const data = response as unknown as CompleteTaskResponse;
+		const handler = createToolHandler( tool );
 
-			let message = data.message;
-			if ( data.blog_description ) {
-				message += `\n\nNew tagline: "${ data.blog_description }"`;
-			}
-
-			return {
-				content: [
-					{
-						type: 'text',
-						text: message,
-					},
-				],
-			};
-		}
-	);
+		// Register tool with dynamic schema and handler
+		server.tool( tool.name, tool.description, zodSchema, handler );
+	}
 
 	return server;
 }
@@ -205,7 +280,7 @@ function createProgressPlannerMcpServer() {
  */
 const init = async () => {
 	try {
-		const server = createProgressPlannerMcpServer();
+		const server = await createProgressPlannerMcpServer();
 		const sdk = new AngieMcpSdk();
 
 		await sdk.registerServer( {
@@ -229,15 +304,17 @@ const init = async () => {
 
 /**
  * Format tasks list for display
- * @param tasks
- * @param listType
+ *
+ * @param tasks    Array of tasks to format
+ * @param listType Type label for the list (e.g., "Tasks", "Active Tasks")
+ * @return Formatted markdown string
  */
 function formatTasksList( tasks: Task[], listType: string ): string {
 	if ( ! tasks || tasks.length === 0 ) {
-		return `No ${ listType.toLowerCase() } tasks found.`;
+		return `No ${ listType.toLowerCase() } found.`;
 	}
 
-	let output = `## ${ listType } Tasks (${ tasks.length })\n\n`;
+	let output = `## ${ listType } (${ tasks.length })\n\n`;
 
 	tasks.forEach( ( task, index ) => {
 		output += `### ${ index + 1 }. ${ task.title }\n`;

@@ -3,9 +3,9 @@
  * Progress_Planner Angie Integration REST-API.
  *
  * Provides REST-API endpoints for Angie AI integration:
- * - <site-url>/wp-json/progress-planner/v1/angie/tasks - Get active tasks
- * - <site-url>/wp-json/progress-planner/v1/angie/tasks/completed - Get completed tasks
- * - <site-url>/wp-json/progress-planner/v1/angie/tasks/complete - Complete a task
+ * - <site-url>/wp-json/progress-planner/v1/angie/tasks (GET) - Get active tasks
+ * - <site-url>/wp-json/progress-planner/v1/angie/tasks (POST) - Complete a task
+ * - <site-url>/wp-json/progress-planner/v1/angie/tasks/completed (GET) - Get completed tasks
  *
  * @package Progress_Planner
  */
@@ -25,37 +25,16 @@ class Angie_API extends Base {
 	 * @return void
 	 */
 	public function register_rest_endpoint() {
-		// Get all active (published) tasks.
+		// Get all active (published) tasks and complete tasks.
 		\register_rest_route(
 			'progress-planner/v1',
-			'/angie/tasks',
+			'/angie/recommendations',
 			[
 				[
 					'methods'             => 'GET',
 					'callback'            => [ $this, 'get_active_tasks' ],
 					'permission_callback' => [ $this, 'check_permissions' ],
 				],
-			]
-		);
-
-		// Get all completed (trashed) tasks.
-		\register_rest_route(
-			'progress-planner/v1',
-			'/angie/tasks/completed',
-			[
-				[
-					'methods'             => 'GET',
-					'callback'            => [ $this, 'get_completed_tasks' ],
-					'permission_callback' => [ $this, 'check_permissions' ],
-				],
-			]
-		);
-
-		// Complete a task.
-		\register_rest_route(
-			'progress-planner/v1',
-			'/angie/tasks/complete',
-			[
 				[
 					'methods'             => 'POST',
 					'callback'            => [ $this, 'complete_task' ],
@@ -74,6 +53,32 @@ class Angie_API extends Base {
 							'sanitize_callback' => 'sanitize_text_field',
 						],
 					],
+				],
+			]
+		);
+
+		// Get all completed (trashed) tasks.
+		\register_rest_route(
+			'progress-planner/v1',
+			'/angie/recommendations/completed',
+			[
+				[
+					'methods'             => 'GET',
+					'callback'            => [ $this, 'get_completed_tasks' ],
+					'permission_callback' => [ $this, 'check_permissions' ],
+				],
+			]
+		);
+
+		// Get MCP tool definitions.
+		\register_rest_route(
+			'progress-planner/v1',
+			'/angie/tools',
+			[
+				[
+					'methods'             => 'GET',
+					'callback'            => [ $this, 'get_tools' ],
+					'permission_callback' => [ $this, 'check_permissions' ],
 				],
 			]
 		);
@@ -248,21 +253,111 @@ class Angie_API extends Base {
 			// Mark task as completed (celebrate).
 			$task->celebrate();
 
+			$response_data = [
+				'success' => true,
+				'message' => \sprintf(
+					/* translators: %s: task title */
+					\__( 'Task "%s" has been marked as completed.', 'progress-planner' ),
+					$task->get_data()['post_title']
+				),
+				'task_id' => $task_id,
+			];
+
+			// Include the new value if provided (for tasks that set a value).
+			if ( $value ) {
+				$response_data['new_value'] = $value;
+			}
+
+			return new \WP_REST_Response( $response_data, 200 );
+		} catch ( \Exception $e ) {
+			return new \WP_Error(
+				'task_completion_error',
+				$e->getMessage(),
+				[ 'status' => 500 ]
+			);
+		}
+	}
+
+	/**
+	 * Get MCP tool definitions.
+	 *
+	 * @return \WP_REST_Response|\WP_Error The REST response object containing tool definitions.
+	 */
+	public function get_tools() {
+		try {
+			$tools = [
+				[
+					'name'              => 'list-active-recommendations',
+					'description'       => \__(
+						'Lists all active Progress Planner recommendations that the user needs to complete. These are recommendations with status "publish" that are currently visible to the user. Use this to see what recommendations are pending or to help the user understand their to-do list.',
+						'progress-planner'
+					),
+					'endpoint'          => '/recommendations',
+					'method'            => 'GET',
+					'responseFormatter' => 'format_recommendations_list',
+					'inputSchema'       => [
+						'type'       => 'object',
+						'properties' => [],
+						'required'   => [],
+					],
+				],
+				[
+					'name'              => 'list-completed-recommendations',
+					'description'       => \__(
+						'Lists all completed Progress Planner recommendations. These are recommendations that have been marked as done (status "trash"). Use this to see what the user has already accomplished or to review their progress history.',
+						'progress-planner'
+					),
+					'endpoint'          => '/recommendations/completed',
+					'method'            => 'GET',
+					'responseFormatter' => 'format_recommendations_list',
+					'inputSchema'       => [
+						'type'       => 'object',
+						'properties' => [],
+						'required'   => [],
+					],
+				],
+				[
+					'name'              => 'complete-recommendation',
+					'description'       => \__(
+						'Completes a specific Progress Planner recommendation. Some recommendations require a value parameter (like "core-blogdescription" which needs the tagline text, or "select-timezone" and "set-locale" which need their respective values). Other recommendations may not require a value. This will mark the recommendation as completed and may perform associated actions (like updating settings).',
+						'progress-planner'
+					),
+					'endpoint'          => '/recommendations',
+					'method'            => 'POST',
+					'responseFormatter' => 'format_complete_recommendation',
+					'inputSchema'       => [
+						'type'       => 'object',
+						'properties' => [
+							'task_id' => [
+								'type'        => 'string',
+								'description' => \__(
+									'The unique identifier of the recommendation to complete (e.g., "core-blogdescription", "select-timezone", "set-locale"). Use list-active-recommendations to see available recommendation IDs and their requirements.',
+									'progress-planner'
+								),
+							],
+							'value'   => [
+								'type'        => 'string',
+								'description' => \__(
+									'The value to set for recommendations that require input. Required for: "core-blogdescription" (provide the tagline text), "select-timezone" (provide timezone identifier like "America/New_York"), "set-locale" (provide locale code like "en_US"). Optional or not needed for other recommendations.',
+									'progress-planner'
+								),
+							],
+						],
+						'required'   => [ 'task_id' ],
+					],
+				],
+			];
+
 			return new \WP_REST_Response(
 				[
 					'success' => true,
-					'message' => \sprintf(
-						/* translators: %s: task title */
-						\__( 'Task "%s" has been marked as completed.', 'progress-planner' ),
-						$task->get_data()['post_title']
-					),
-					'task_id' => $task_id,
+					'tools'   => $tools,
 				],
 				200
 			);
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
-				'task_completion_error',
+				'tools_error',
 				$e->getMessage(),
 				[ 'status' => 500 ]
 			);
