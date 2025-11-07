@@ -11886,7 +11886,7 @@ const eo = async () => {
     await new xu().registerServer({
       name: "progress-planner",
       version: "1.0.0",
-      description: "Manage Progress Planner tasks, including viewing active and completed tasks, and completing tasks through AI assistance.",
+      description: "Manage Progress Planner recommendations, including viewing active and completed recommendations, and completing recommendations through AI assistance.",
       server: r
     }), console.log(
       "Progress Planner MCP Server registered with Angie successfully"
