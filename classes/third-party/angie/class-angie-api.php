@@ -334,6 +334,85 @@ class Angie_API extends Base {
 						'properties' => [],
 						'required'   => [],
 					],
+					'outputSchema'     => [
+						'type'       => 'object',
+						'properties' => [
+							'success' => [
+								'type'        => 'boolean',
+								'description' => \__(
+									'Whether the request was successful.',
+									'progress-planner'
+								),
+							],
+							'count'   => [
+								'type'        => 'number',
+								'description' => \__(
+									'The total number of active recommendations returned.',
+									'progress-planner'
+								),
+							],
+							'tasks'   => [
+								'type'        => 'array',
+								'description' => \__(
+									'An array of active recommendations.',
+									'progress-planner'
+								),
+								'items'       => [
+									'type'       => 'object',
+									'description' => \__(
+										'A recommendation task.',
+										'progress-planner'
+									),
+									'properties' => [
+										'id'          => [
+											'type'        => 'string',
+											'description' => \__(
+												'The unique identifier of the recommendation (e.g., "core-blogdescription", "select-timezone").',
+												'progress-planner'
+											),
+										],
+										'title'       => [
+											'type'        => 'string',
+											'description' => \__(
+												'The title of the recommendation.',
+												'progress-planner'
+											),
+										],
+										'description' => [
+											'type'        => 'string',
+											'description' => \__(
+												'The description of what the recommendation requires.',
+												'progress-planner'
+											),
+										],
+										'url'         => [
+											'type'        => 'string',
+											'description' => \__(
+												'The URL where the user can complete this recommendation, if available.',
+												'progress-planner'
+											),
+										],
+										'priority'    => [
+											'type'        => 'number',
+											'description' => \__(
+												'The priority of the recommendation (0 = highest priority, 100 = lowest priority).',
+												'progress-planner'
+											),
+										],
+										'status'      => [
+											'type'        => 'string',
+											'description' => \__(
+												'The status of the recommendation. Always "active" for this endpoint.',
+												'progress-planner'
+											),
+											'enum'        => [ 'active' ],
+										],
+									],
+								],
+							],
+						],
+						'required'   => [ 'success', 'count', 'tasks' ],
+					],
 				],
 				[
 					'name'              => 'list-completed-recommendations',
@@ -348,6 +427,85 @@ class Angie_API extends Base {
 						'type'       => 'object',
 						'properties' => [],
 						'required'   => [],
+					],
+					'outputSchema'     => [
+						'type'       => 'object',
+						'properties' => [
+							'success' => [
+								'type'        => 'boolean',
+								'description' => \__(
+									'Whether the request was successful.',
+									'progress-planner'
+								),
+							],
+							'count'   => [
+								'type'        => 'number',
+								'description' => \__(
+									'The total number of completed recommendations returned.',
+									'progress-planner'
+								),
+							],
+							'tasks'   => [
+								'type'        => 'array',
+								'description' => \__(
+									'An array of completed recommendations.',
+									'progress-planner'
+								),
+								'items'       => [
+									'type'       => 'object',
+									'description' => \__(
+										'A completed recommendation task.',
+										'progress-planner'
+									),
+									'properties' => [
+										'id'          => [
+											'type'        => 'string',
+											'description' => \__(
+												'The unique identifier of the recommendation.',
+												'progress-planner'
+											),
+										],
+										'title'       => [
+											'type'        => 'string',
+											'description' => \__(
+												'The title of the recommendation.',
+												'progress-planner'
+											),
+										],
+										'description' => [
+											'type'        => 'string',
+											'description' => \__(
+												'The description of what the recommendation required.',
+												'progress-planner'
+											),
+										],
+										'url'         => [
+											'type'        => 'string',
+											'description' => \__(
+												'The URL where the recommendation could be completed, if available.',
+												'progress-planner'
+											),
+										],
+										'priority'    => [
+											'type'        => 'number',
+											'description' => \__(
+												'The priority the recommendation had when it was active.',
+												'progress-planner'
+											),
+										],
+										'status'      => [
+											'type'        => 'string',
+											'description' => \__(
+												'The status of the recommendation. Always "completed" for this endpoint.',
+												'progress-planner'
+											),
+											'enum'        => [ 'completed' ],
+										],
+									],
+								],
+							],
+						],
+						'required'   => [ 'success', 'count', 'tasks' ],
 					],
 				],
 				[
@@ -378,6 +536,40 @@ class Angie_API extends Base {
 							],
 						],
 						'required'   => [ 'task_id' ],
+					],
+					'outputSchema'     => [
+						'type'       => 'object',
+						'properties' => [
+							'success'  => [
+								'type'        => 'boolean',
+								'description' => \__(
+									'Whether the recommendation was successfully completed.',
+									'progress-planner'
+								),
+							],
+							'message'  => [
+								'type'        => 'string',
+								'description' => \__(
+									'A human-readable message confirming the recommendation was completed.',
+									'progress-planner'
+								),
+							],
+							'task_id'  => [
+								'type'        => 'string',
+								'description' => \__(
+									'The unique identifier of the recommendation that was completed.',
+									'progress-planner'
+								),
+							],
+							'new_value' => [
+								'type'        => 'string',
+								'description' => \__(
+									'The value that was set for the recommendation, if a value was provided. This field is only present when a value parameter was included in the request.',
+									'progress-planner'
+								),
+							],
+						],
+						'required'   => [ 'success', 'message', 'task_id' ],
 					],
 				],
 			];

@@ -55,13 +55,22 @@ interface CompleteTaskResponse {
 }
 
 /**
- * JSON Schema property definition with support for enum and default values
+ * JSON Schema property definition with support for enum, default values, and nested schemas
  */
 interface JsonSchemaProperty {
 	type: string;
 	description?: string;
 	enum?: unknown[];
 	default?: unknown;
+	items?:
+		| JsonSchemaProperty
+		| {
+				type: string;
+				properties?: Record< string, JsonSchemaProperty >;
+				required?: string[];
+		  };
+	properties?: Record< string, JsonSchemaProperty >;
+	required?: string[];
 }
 
 interface ToolDefinition {
@@ -71,6 +80,11 @@ interface ToolDefinition {
 	method: 'GET' | 'POST';
 	responseFormatter?: string;
 	inputSchema: {
+		type: string;
+		properties?: Record< string, JsonSchemaProperty >;
+		required?: string[];
+	};
+	outputSchema?: {
 		type: string;
 		properties?: Record< string, JsonSchemaProperty >;
 		required?: string[];
@@ -115,6 +129,25 @@ async function makeApiRequest(
 	}
 
 	return await response.json();
+}
+
+/**
+ * Convert a simple JSON Schema type to a Zod type
+ *
+ * @param type The JSON Schema type
+ * @return Zod type
+ */
+function convertSimpleTypeToZod( type: string ): z.ZodTypeAny {
+	switch ( type ) {
+		case 'string':
+			return z.string();
+		case 'number':
+			return z.number();
+		case 'boolean':
+			return z.boolean();
+		default:
+			return z.unknown();
+	}
 }
 
 /**
@@ -170,10 +203,51 @@ function jsonSchemaToZod(
 					zodType = z.boolean();
 					break;
 				case 'array':
-					zodType = z.array( z.unknown() );
+					// Handle array with items schema
+					if ( prop.items ) {
+						if (
+							typeof prop.items === 'object' &&
+							'type' in prop.items
+						) {
+							if (
+								prop.items.type === 'object' &&
+								prop.items.properties
+							) {
+								// Recursively convert nested object schema
+								const itemSchema = z.object(
+									jsonSchemaToZod(
+										prop.items.properties,
+										prop.items.required || []
+									)
+								);
+								zodType = z.array( itemSchema );
+							} else {
+								// Simple type in items
+								const itemType = convertSimpleTypeToZod(
+									prop.items.type
+								);
+								zodType = z.array( itemType );
+							}
+						} else {
+							// Fallback for complex items
+							zodType = z.array( z.unknown() );
+						}
+					} else {
+						zodType = z.array( z.unknown() );
+					}
 					break;
 				case 'object':
-					zodType = z.record( z.unknown() );
+					// Handle object with properties schema
+					if ( prop.properties ) {
+						zodType = z.object(
+							jsonSchemaToZod(
+								prop.properties,
+								prop.required || []
+							)
+						);
+					} else {
+						zodType = z.record( z.unknown() );
+					}
 					break;
 				default:
 					zodType = z.unknown();
@@ -245,7 +319,13 @@ function createToolHandler( tool: ToolDefinition ) {
 	return async (
 		args: Record< string, unknown >,
 		_extra?: unknown
-	): Promise< { content: Array< { type: 'text'; text: string } > } > => {
+	): Promise<
+		| { content: Array< { type: 'text'; text: string } > }
+		| {
+				content: Array< { type: 'text'; text: string } >;
+				structuredContent: Record< string, unknown >;
+		  }
+	> => {
 		// Prepare request body for POST requests
 		const requestBody =
 			tool.method === 'POST'
@@ -258,6 +338,20 @@ function createToolHandler( tool: ToolDefinition ) {
 		// Format response using formatter from tool definition
 		const text = formatResponse( response, tool.responseFormatter );
 
+		// If outputSchema is defined, return structured content
+		if ( tool.outputSchema ) {
+			return {
+				content: [
+					{
+						type: 'text' as const,
+						text,
+					},
+				],
+				structuredContent: response as Record< string, unknown >,
+			};
+		}
+
+		// Otherwise, return only text content
 		return {
 			content: [
 				{
@@ -302,10 +396,26 @@ async function createProgressPlannerMcpServer() {
 			  )
 			: {};
 
+		const outputZodSchema = tool.outputSchema?.properties
+			? jsonSchemaToZod(
+					tool.outputSchema.properties,
+					tool.outputSchema.required || []
+			  )
+			: undefined;
+
 		const handler = createToolHandler( tool );
 
 		// Register tool with dynamic schema and handler
-		server.tool( tool.name, tool.description, zodSchema, handler );
+		// The MCP SDK's tool() method signature: tool(name, description, inputSchema, handler, options?)
+		// We pass outputSchema in options if available
+		if ( outputZodSchema ) {
+			// @ts-expect-error - The MCP SDK may support outputSchema as 5th parameter or in options
+			server.tool( tool.name, tool.description, zodSchema, handler, {
+				outputSchema: outputZodSchema,
+			} );
+		} else {
+			server.tool( tool.name, tool.description, zodSchema, handler );
+		}
 	}
 
 	return server;
