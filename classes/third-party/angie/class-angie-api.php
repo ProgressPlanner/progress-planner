@@ -25,7 +25,7 @@ class Angie_API extends Base {
 	public function __construct() {
 		parent::__construct();
 		// Add logging filter for all Angie endpoints.
-		if ( defined( 'PRPL_DEBUG' ) && \constant( 'PRPL_DEBUG' ) ) {
+		if ( \defined( 'PRPL_DEBUG' ) && \constant( 'PRPL_DEBUG' ) ) {
 			\add_filter( 'rest_pre_dispatch', [ $this, 'log_angie_endpoints' ], 10, 3 );
 		}
 	}
@@ -319,260 +319,64 @@ class Angie_API extends Base {
 	 */
 	public function get_tools( $request ) {
 		try {
-			$tools = [
-				[
-					'name'              => 'list-active-recommendations',
-					'description'       => \__(
-						'Lists all active Progress Planner recommendations that the user needs to complete. These are recommendations with status "publish" that are currently visible to the user. Use this to see what recommendations are pending or to help the user understand their to-do list.',
-						'progress-planner'
-					),
-					'endpoint'          => '/recommendations',
-					'method'            => 'GET',
-					'responseFormatter' => 'format_recommendations_list',
-					'inputSchema'       => [
-						'type'       => 'object',
-						'properties' => [],
-						'required'   => [],
+			$url       = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/angie-jobs';
+			$cache_key = \md5( $url );
+
+			// Get the cached value.
+			$cached = \progress_planner()->get_utils__cache()->get( $cache_key );
+			if ( \is_array( $cached ) && ! empty( $cached ) ) {
+				return new \WP_REST_Response(
+					[
+						'success' => true,
+						'tools'   => $cached,
 					],
-					'outputSchema'      => [
-						'type'       => 'object',
-						'properties' => [
-							'success' => [
-								'type'        => 'boolean',
-								'description' => \__(
-									'Whether the request was successful.',
-									'progress-planner'
-								),
-							],
-							'count'   => [
-								'type'        => 'number',
-								'description' => \__(
-									'The total number of active recommendations returned.',
-									'progress-planner'
-								),
-							],
-							'tasks'   => [
-								'type'        => 'array',
-								'description' => \__(
-									'An array of active recommendations.',
-									'progress-planner'
-								),
-								'items'       => [
-									'type'        => 'object',
-									'description' => \__(
-										'A recommendation task.',
-										'progress-planner'
-									),
-									'properties'  => [
-										'id'          => [
-											'type'        => 'string',
-											'description' => \__(
-												'The unique identifier of the recommendation (e.g., "core-blogdescription", "select-timezone").',
-												'progress-planner'
-											),
-										],
-										'title'       => [
-											'type'        => 'string',
-											'description' => \__(
-												'The title of the recommendation.',
-												'progress-planner'
-											),
-										],
-										'description' => [
-											'type'        => 'string',
-											'description' => \__(
-												'The description of what the recommendation requires.',
-												'progress-planner'
-											),
-										],
-										'url'         => [
-											'type'        => 'string',
-											'description' => \__(
-												'The URL where the user can complete this recommendation, if available.',
-												'progress-planner'
-											),
-										],
-										'priority'    => [
-											'type'        => 'number',
-											'description' => \__(
-												'The priority of the recommendation (0 = highest priority, 100 = lowest priority).',
-												'progress-planner'
-											),
-										],
-										'status'      => [
-											'type'        => 'string',
-											'description' => \__(
-												'The status of the recommendation. Always "active" for this endpoint.',
-												'progress-planner'
-											),
-											'enum'        => [ 'active' ],
-										],
-									],
-								],
-							],
-						],
-						'required'   => [ 'success', 'count', 'tasks' ],
+					200
+				);
+			}
+
+			// Get the jobs from the remote server.
+			$response = \wp_remote_get( $url );
+
+			// Helper to reduce code duplication.
+			static $return_empty = function ( $cache_key ) {
+				\progress_planner()->get_utils__cache()->set(
+					$cache_key,
+					[],
+					5 * MINUTE_IN_SECONDS
+				);
+				return new \WP_REST_Response(
+					[
+						'success' => true,
+						'tools'   => [],
 					],
-				],
-				[
-					'name'              => 'list-completed-recommendations',
-					'description'       => \__(
-						'Lists all completed Progress Planner recommendations. These are recommendations that have been marked as done (status "trash"). Use this to see what the user has already accomplished or to review their progress history.',
-						'progress-planner'
-					),
-					'endpoint'          => '/recommendations/completed',
-					'method'            => 'GET',
-					'responseFormatter' => 'format_recommendations_list',
-					'inputSchema'       => [
-						'type'       => 'object',
-						'properties' => [],
-						'required'   => [],
-					],
-					'outputSchema'      => [
-						'type'       => 'object',
-						'properties' => [
-							'success' => [
-								'type'        => 'boolean',
-								'description' => \__(
-									'Whether the request was successful.',
-									'progress-planner'
-								),
-							],
-							'count'   => [
-								'type'        => 'number',
-								'description' => \__(
-									'The total number of completed recommendations returned.',
-									'progress-planner'
-								),
-							],
-							'tasks'   => [
-								'type'        => 'array',
-								'description' => \__(
-									'An array of completed recommendations.',
-									'progress-planner'
-								),
-								'items'       => [
-									'type'        => 'object',
-									'description' => \__(
-										'A completed recommendation task.',
-										'progress-planner'
-									),
-									'properties'  => [
-										'id'          => [
-											'type'        => 'string',
-											'description' => \__(
-												'The unique identifier of the recommendation.',
-												'progress-planner'
-											),
-										],
-										'title'       => [
-											'type'        => 'string',
-											'description' => \__(
-												'The title of the recommendation.',
-												'progress-planner'
-											),
-										],
-										'description' => [
-											'type'        => 'string',
-											'description' => \__(
-												'The description of what the recommendation required.',
-												'progress-planner'
-											),
-										],
-										'url'         => [
-											'type'        => 'string',
-											'description' => \__(
-												'The URL where the recommendation could be completed, if available.',
-												'progress-planner'
-											),
-										],
-										'priority'    => [
-											'type'        => 'number',
-											'description' => \__(
-												'The priority the recommendation had when it was active.',
-												'progress-planner'
-											),
-										],
-										'status'      => [
-											'type'        => 'string',
-											'description' => \__(
-												'The status of the recommendation. Always "completed" for this endpoint.',
-												'progress-planner'
-											),
-											'enum'        => [ 'completed' ],
-										],
-									],
-								],
-							],
-						],
-						'required'   => [ 'success', 'count', 'tasks' ],
-					],
-				],
-				[
-					'name'              => 'complete-recommendation',
-					'description'       => \__(
-						'Completes a specific Progress Planner recommendation. Some recommendations require a value parameter (like "core-blogdescription" which needs the tagline text, or "select-timezone" and "set-locale" which need their respective values). Other recommendations may not require a value. This will mark the recommendation as completed and may perform associated actions (like updating settings).',
-						'progress-planner'
-					),
-					'endpoint'          => '/recommendations',
-					'method'            => 'POST',
-					'responseFormatter' => 'format_complete_recommendation',
-					'inputSchema'       => [
-						'type'       => 'object',
-						'properties' => [
-							'task_id' => [
-								'type'        => 'string',
-								'description' => \__(
-									'The unique identifier of the recommendation to complete. Valid task IDs include: "core-blogdescription" (requires value with tagline text), "core-siteicon" (requires value with media attachment ID), "select-timezone" (requires value with timezone identifier like "America/New_York"), "set-locale" (requires value with locale code like "en_US"). Use list-active-recommendations to see all available recommendation IDs and their current requirements.',
-									'progress-planner'
-								),
-							],
-							'value'   => [
-								'type'        => 'string',
-								'description' => \__(
-									'The value to set for recommendations that require input. Required for: "core-blogdescription" (provide the blog tagline/description text), "core-siteicon" (provide the WordPress media attachment post ID as a string), "select-timezone" (provide timezone identifier like "America/New_York" or "Europe/London"), "set-locale" (provide WordPress locale code like "en_US" or "en_GB"). Leave empty or omit for recommendations that do not require a value.',
-									'progress-planner'
-								),
-							],
-						],
-						'required'   => [ 'task_id' ],
-					],
-					'outputSchema'      => [
-						'type'       => 'object',
-						'properties' => [
-							'success'   => [
-								'type'        => 'boolean',
-								'description' => \__(
-									'Whether the recommendation was successfully completed.',
-									'progress-planner'
-								),
-							],
-							'message'   => [
-								'type'        => 'string',
-								'description' => \__(
-									'A human-readable message confirming the recommendation was completed.',
-									'progress-planner'
-								),
-							],
-							'task_id'   => [
-								'type'        => 'string',
-								'description' => \__(
-									'The unique identifier of the recommendation that was completed.',
-									'progress-planner'
-								),
-							],
-							'new_value' => [
-								'type'        => 'string',
-								'description' => \__(
-									'The value that was set for the recommendation, if a value was provided. This field is only present when a value parameter was included in the request.',
-									'progress-planner'
-								),
-							],
-						],
-						'required'   => [ 'success', 'message', 'task_id' ],
-					],
-				],
-			];
+					200
+				);
+			};
+
+			// Handle network errors.
+			if ( \is_wp_error( $response ) ) {
+				return $return_empty( $cache_key );
+			}
+
+			// Handle HTTP errors.
+			if ( 200 !== (int) \wp_remote_retrieve_response_code( $response ) ) {
+				return $return_empty( $cache_key );
+			}
+
+			// Parse JSON response. IMPORTANT: use true for associative array. Angie is temperamental sometimes.
+			$tools = \json_decode( \wp_remote_retrieve_body( $response ), true );
+
+			// Validate response.
+			if ( ! \is_array( $tools ) || empty( $tools ) ) {
+				return $return_empty( $cache_key );
+			}
+
+			// Cache successful response for 3 days.
+			\progress_planner()->get_utils__cache()->set(
+				$cache_key,
+				$tools,
+				3 * DAY_IN_SECONDS
+			);
 
 			return new \WP_REST_Response(
 				[
