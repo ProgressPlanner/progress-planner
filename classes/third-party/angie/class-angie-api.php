@@ -25,7 +25,7 @@ class Angie_API extends Base {
 	public function __construct() {
 		parent::__construct();
 		// Add logging filter for all Angie endpoints.
-		if ( defined( 'PRPL_DEBUG' ) && \constant( 'PRPL_DEBUG' ) ) {
+		if ( \defined( 'PRPL_DEBUG' ) && \constant( 'PRPL_DEBUG' ) ) {
 			\add_filter( 'rest_pre_dispatch', [ $this, 'log_angie_endpoints' ], 10, 3 );
 		}
 	}
@@ -314,273 +314,20 @@ class Angie_API extends Base {
 	/**
 	 * Get MCP tool definitions.
 	 *
-	 * @param \WP_REST_Request $request The REST request object.
 	 * @return \WP_REST_Response|\WP_Error The REST response object containing tool definitions.
 	 */
-	public function get_tools( $request ) {
+	public function get_tools() {
 		try {
-			$tools = [
-				[
-					'name'              => 'list-active-recommendations',
-					'description'       => \__(
-						'Lists all active Progress Planner recommendations that the user needs to complete. These are recommendations with status "publish" that are currently visible to the user. Use this to see what recommendations are pending or to help the user understand their to-do list.',
-						'progress-planner'
-					),
-					'endpoint'          => '/recommendations',
-					'method'            => 'GET',
-					'responseFormatter' => 'format_recommendations_list',
-					'inputSchema'       => [
-						'type'       => 'object',
-						'properties' => [],
-						'required'   => [],
-					],
-					'outputSchema'      => [
-						'type'       => 'object',
-						'properties' => [
-							'success' => [
-								'type'        => 'boolean',
-								'description' => \__(
-									'Whether the request was successful.',
-									'progress-planner'
-								),
-							],
-							'count'   => [
-								'type'        => 'number',
-								'description' => \__(
-									'The total number of active recommendations returned.',
-									'progress-planner'
-								),
-							],
-							'tasks'   => [
-								'type'        => 'array',
-								'description' => \__(
-									'An array of active recommendations.',
-									'progress-planner'
-								),
-								'items'       => [
-									'type'        => 'object',
-									'description' => \__(
-										'A recommendation task.',
-										'progress-planner'
-									),
-									'properties'  => [
-										'id'          => [
-											'type'        => 'string',
-											'description' => \__(
-												'The unique identifier of the recommendation (e.g., "core-blogdescription", "select-timezone").',
-												'progress-planner'
-											),
-										],
-										'title'       => [
-											'type'        => 'string',
-											'description' => \__(
-												'The title of the recommendation.',
-												'progress-planner'
-											),
-										],
-										'description' => [
-											'type'        => 'string',
-											'description' => \__(
-												'The description of what the recommendation requires.',
-												'progress-planner'
-											),
-										],
-										'url'         => [
-											'type'        => 'string',
-											'description' => \__(
-												'The URL where the user can complete this recommendation, if available.',
-												'progress-planner'
-											),
-										],
-										'priority'    => [
-											'type'        => 'number',
-											'description' => \__(
-												'The priority of the recommendation (0 = highest priority, 100 = lowest priority).',
-												'progress-planner'
-											),
-										],
-										'status'      => [
-											'type'        => 'string',
-											'description' => \__(
-												'The status of the recommendation. Always "active" for this endpoint.',
-												'progress-planner'
-											),
-											'enum'        => [ 'active' ],
-										],
-									],
-								],
-							],
-						],
-						'required'   => [ 'success', 'count', 'tasks' ],
-					],
-				],
-				[
-					'name'              => 'list-completed-recommendations',
-					'description'       => \__(
-						'Lists all completed Progress Planner recommendations. These are recommendations that have been marked as done (status "trash"). Use this to see what the user has already accomplished or to review their progress history.',
-						'progress-planner'
-					),
-					'endpoint'          => '/recommendations/completed',
-					'method'            => 'GET',
-					'responseFormatter' => 'format_recommendations_list',
-					'inputSchema'       => [
-						'type'       => 'object',
-						'properties' => [],
-						'required'   => [],
-					],
-					'outputSchema'      => [
-						'type'       => 'object',
-						'properties' => [
-							'success' => [
-								'type'        => 'boolean',
-								'description' => \__(
-									'Whether the request was successful.',
-									'progress-planner'
-								),
-							],
-							'count'   => [
-								'type'        => 'number',
-								'description' => \__(
-									'The total number of completed recommendations returned.',
-									'progress-planner'
-								),
-							],
-							'tasks'   => [
-								'type'        => 'array',
-								'description' => \__(
-									'An array of completed recommendations.',
-									'progress-planner'
-								),
-								'items'       => [
-									'type'        => 'object',
-									'description' => \__(
-										'A completed recommendation task.',
-										'progress-planner'
-									),
-									'properties'  => [
-										'id'          => [
-											'type'        => 'string',
-											'description' => \__(
-												'The unique identifier of the recommendation.',
-												'progress-planner'
-											),
-										],
-										'title'       => [
-											'type'        => 'string',
-											'description' => \__(
-												'The title of the recommendation.',
-												'progress-planner'
-											),
-										],
-										'description' => [
-											'type'        => 'string',
-											'description' => \__(
-												'The description of what the recommendation required.',
-												'progress-planner'
-											),
-										],
-										'url'         => [
-											'type'        => 'string',
-											'description' => \__(
-												'The URL where the recommendation could be completed, if available.',
-												'progress-planner'
-											),
-										],
-										'priority'    => [
-											'type'        => 'number',
-											'description' => \__(
-												'The priority the recommendation had when it was active.',
-												'progress-planner'
-											),
-										],
-										'status'      => [
-											'type'        => 'string',
-											'description' => \__(
-												'The status of the recommendation. Always "completed" for this endpoint.',
-												'progress-planner'
-											),
-											'enum'        => [ 'completed' ],
-										],
-									],
-								],
-							],
-						],
-						'required'   => [ 'success', 'count', 'tasks' ],
-					],
-				],
-				[
-					'name'              => 'complete-recommendation',
-					'description'       => \__(
-						'Completes a specific Progress Planner recommendation. Some recommendations require a value parameter (like "core-blogdescription" which needs the tagline text, or "select-timezone" and "set-locale" which need their respective values). Other recommendations may not require a value. This will mark the recommendation as completed and may perform associated actions (like updating settings).',
-						'progress-planner'
-					),
-					'endpoint'          => '/recommendations',
-					'method'            => 'POST',
-					'responseFormatter' => 'format_complete_recommendation',
-					'inputSchema'       => [
-						'type'       => 'object',
-						'properties' => [
-							'task_id' => [
-								'type'        => 'string',
-								'description' => \__(
-									'The unique identifier of the recommendation to complete. Valid task IDs include: "core-blogdescription" (requires value with tagline text), "core-siteicon" (requires value with media attachment ID), "select-timezone" (requires value with timezone identifier like "America/New_York"), "set-locale" (requires value with locale code like "en_US"). Use list-active-recommendations to see all available recommendation IDs and their current requirements.',
-									'progress-planner'
-								),
-							],
-							'value'   => [
-								'type'        => 'string',
-								'description' => \__(
-									'The value to set for recommendations that require input. Required for: "core-blogdescription" (provide the blog tagline/description text), "core-siteicon" (provide the WordPress media attachment post ID as a string), "select-timezone" (provide timezone identifier like "America/New_York" or "Europe/London"), "set-locale" (provide WordPress locale code like "en_US" or "en_GB"). Leave empty or omit for recommendations that do not require a value.',
-									'progress-planner'
-								),
-							],
-						],
-						'required'   => [ 'task_id' ],
-					],
-					'outputSchema'      => [
-						'type'       => 'object',
-						'properties' => [
-							'success'   => [
-								'type'        => 'boolean',
-								'description' => \__(
-									'Whether the recommendation was successfully completed.',
-									'progress-planner'
-								),
-							],
-							'message'   => [
-								'type'        => 'string',
-								'description' => \__(
-									'A human-readable message confirming the recommendation was completed.',
-									'progress-planner'
-								),
-							],
-							'task_id'   => [
-								'type'        => 'string',
-								'description' => \__(
-									'The unique identifier of the recommendation that was completed.',
-									'progress-planner'
-								),
-							],
-							'new_value' => [
-								'type'        => 'string',
-								'description' => \__(
-									'The value that was set for the recommendation, if a value was provided. This field is only present when a value parameter was included in the request.',
-									'progress-planner'
-								),
-							],
-						],
-						'required'   => [ 'success', 'message', 'task_id' ],
-					],
-				],
-			];
+			$remote_data = $this->get_remote_angie_data();
+			if ( empty( $remote_data ) ) {
+				return new \WP_Error(
+					'tools_error',
+					\__( 'Failed to get tool definitions.', 'progress-planner' ),
+					[ 'status' => 500 ]
+				);
+			}
 
-			return new \WP_REST_Response(
-				[
-					'success' => true,
-					'tools'   => $tools,
-				],
-				200
-			);
+			return new \WP_REST_Response( $remote_data['tools'], 200 );
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
 				'tools_error',
@@ -605,11 +352,48 @@ class Angie_API extends Base {
 	 * @return array The Angie tasks map, keyed by task ID, value is the argument name for the complete_task method.
 	 */
 	protected function get_angie_tasks_map() {
-		return [
-			'core-blogdescription' => 'blogdescription',
-			// 'core-siteicon'        => 'post_id', -- Seems like Angie can't upload media.
-			'select-locale'        => 'language',
-			'select-timezone'      => 'timezone',
-		];
+
+		$remote_data = $this->get_remote_angie_data();
+		if ( empty( $remote_data ) ) {
+			return [];
+		}
+
+		return $remote_data['tasks'];
+	}
+
+	/**
+	 * Get the remote Angie data.
+	 *
+	 * @return array The remote Angie data.
+	 */
+	protected function get_remote_angie_data() {
+
+		$url = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/angie';
+		$url = \add_query_arg(
+			[
+				'site' => \get_site_url(),
+			],
+			$url
+		);
+
+		$cache_key = \md5( $url );
+
+		$cached = \progress_planner()->get_utils__cache()->get( $cache_key );
+		if ( $cached ) {
+			return $cached;
+		}
+
+		$response = \wp_remote_get( $url );
+
+		if ( \is_wp_error( $response ) || 200 !== (int) \wp_remote_retrieve_response_code( $response ) ) {
+			\progress_planner()->get_utils__cache()->set( $cache_key, [], 5 * MINUTE_IN_SECONDS );
+			return [];
+		}
+
+		$response_body = \json_decode( \wp_remote_retrieve_body( $response ), true );
+
+		\progress_planner()->get_utils__cache()->set( $cache_key, $response_body, 1 * DAY_IN_SECONDS );
+
+		return $response_body;
 	}
 }
