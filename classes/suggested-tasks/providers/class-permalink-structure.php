@@ -272,12 +272,7 @@ class Permalink_Structure extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid permalink structure.', 'progress-planner' ) ] );
 		}
 
-		// Update the permalink structure.
-		\update_option( 'permalink_structure', $permalink_structure );
-
-		// Set a transient to flush rewrite rules on the next page load.
-		// This is more performant than flushing immediately during the AJAX request.
-		\set_transient( 'prpl_flush_rewrite_rules', 1, HOUR_IN_SECONDS );
+		$this->update_permalink_structure( $permalink_structure );
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Permalink structure updated.', 'progress-planner' ) ] );
 	}
@@ -297,5 +292,43 @@ class Permalink_Structure extends Tasks_Interactive {
 		];
 
 		return $actions;
+	}
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function complete_task( $args = [], $task_id = '' ) {
+		if ( ! $this->capability_required() ) {
+			return false;
+		}
+
+		if ( ! isset( $args['permalink_structure'] ) || empty( trim( $args['permalink_structure'] ) ) ) {
+			return false;
+		}
+
+		return $this->update_permalink_structure( \sanitize_text_field( \wp_unslash( $args['permalink_structure'] ) ) );
+	}
+
+	/**
+	 * Update the permalink structure.
+	 *
+	 * @param string $permalink_structure The permalink structure to update.
+	 *
+	 * @return bool
+	 */
+	protected function update_permalink_structure( $permalink_structure ) {
+		// Update the permalink structure.
+		\update_option( 'permalink_structure', $permalink_structure );
+
+		// Set a transient to flush rewrite rules on the next page load.
+		// This is more performant than flushing immediately during the AJAX request.
+		\set_transient( 'prpl_flush_rewrite_rules', 1, HOUR_IN_SECONDS );
+
+		return true;
 	}
 }
