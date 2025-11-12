@@ -172,4 +172,28 @@ class Hello_World extends Tasks_Interactive {
 
 		return $actions;
 	}
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function complete_task( $args = [], $task_id = '' ) {
+		if ( ! $this->capability_required() ) {
+			return false;
+		}
+
+		$post_id = (int) $this->get_data_collector()->collect();
+
+		if ( ! $post_id ) {
+			return false;
+		}
+
+		\wp_delete_post( $post_id, true );
+
+		return true;
+	}
 }

@@ -176,4 +176,22 @@ class Disable_Comments extends Tasks_Interactive {
 
 		return $actions;
 	}
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function complete_task( $args = [], $task_id = '' ) {
+		if ( ! $this->capability_required() ) {
+			return false;
+		}
+
+		\update_option( 'default_comment_status', 'closed' );
+
+		return true;
+	}
 }
