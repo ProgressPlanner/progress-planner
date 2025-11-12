@@ -327,7 +327,13 @@ class Angie_API extends Base {
 				);
 			}
 
-			return new \WP_REST_Response( $remote_data['tools'], 200 );
+			return new \WP_REST_Response(
+				[
+					'success' => true,
+					'tools'   => $remote_data['tools'],
+				],
+				200
+			);
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
 				'tools_error',
