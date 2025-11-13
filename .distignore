@@ -3,6 +3,7 @@
 /.husky
 /.vscode
 /.wordpress-org
+/bin
 /coverage
 /tests
 /vendor
