@@ -26,6 +26,8 @@ declare global {
 	interface Window {
 		wpApiSettings?: WpApiSettings;
 		progressPlannerAngie?: ProgressPlannerAngie;
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
+		console?: Console;
 	}
 }
 
@@ -97,6 +99,96 @@ interface ToolsResponse {
 }
 
 export type ApiResponse = Record< string, unknown >;
+
+/**
+ * Debug logging utility that works in iframe context
+ * Attempts to log to parent window if accessible, otherwise logs to current window
+ *
+ * @param message The debug message to log
+ * @param data    Optional data to include in the log
+ */
+function debugLog( message: string, data?: unknown ): void {
+	if ( typeof window === 'undefined' ) {
+		return;
+	}
+
+	const timestamp = new Date().toISOString();
+	const logMessage = `[Progress Planner MCP ${ timestamp }] ${ message }`;
+	const logData = data ? { message, data } : { message };
+
+	// Try to log to parent window first (if in iframe)
+	try {
+		if ( window.parent && window.parent !== window ) {
+			// Check if parent window is accessible (same-origin)
+			const parentWindow = window.parent as unknown as Window & {
+				console?: Console;
+				__progressPlannerDebug?: unknown[];
+			};
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+			if ( parentWindow.console ) {
+				parentWindow.console.log( logMessage, data || '' );
+				// Also store in parent window for inspection
+				if ( ! parentWindow.__progressPlannerDebug ) {
+					parentWindow.__progressPlannerDebug = [];
+				}
+				parentWindow.__progressPlannerDebug.push( {
+					timestamp,
+					...logData,
+				} );
+				return; // Successfully logged to parent, exit early
+			}
+		}
+	} catch ( error ) {
+		// Cross-origin restriction - parent window not accessible
+		// Fall through to log in current window
+	}
+
+	// Fallback: log to current window
+	const currentWindow = window as unknown as Window & {
+		console?: Console;
+		__progressPlannerDebug?: unknown[];
+	};
+	if ( currentWindow.console ) {
+		currentWindow.console.log( logMessage, data || '' );
+	}
+
+	// Store in current window for inspection
+	if ( ! currentWindow.__progressPlannerDebug ) {
+		currentWindow.__progressPlannerDebug = [];
+	}
+	currentWindow.__progressPlannerDebug.push( {
+		timestamp,
+		...logData,
+	} );
+}
+
+/**
+ * Get parent window if accessible, otherwise return current window
+ * This function is available for future use if needed to interact with parent window
+ *
+ * @return The parent window or current window
+ */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function getParentWindow(): Window {
+	if ( typeof window === 'undefined' ) {
+		throw new Error( 'Window object is not available' );
+	}
+
+	try {
+		if ( window.parent && window.parent !== window ) {
+			// Try to access parent window (will throw if cross-origin)
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+			const parentDoc = window.parent.document;
+			if ( parentDoc ) {
+				return window.parent;
+			}
+		}
+	} catch ( error ) {
+		// Cross-origin restriction - fall through to return current window
+	}
+
+	return window;
+}
 
 /**
  * Make API request to WordPress REST API with authentication
@@ -437,14 +529,19 @@ const init = async () => {
 			server,
 		} );
 
-		console.log(
+		debugLog(
 			'Progress Planner MCP Server registered with Angie successfully'
 		);
 	} catch ( error ) {
-		console.error(
-			'Failed to register Progress Planner MCP Server with Angie:',
-			error
-		);
+		debugLog( 'Failed to register Progress Planner MCP Server with Angie', {
+			error,
+		} );
+		if ( typeof window !== 'undefined' && window.console ) {
+			window.console.error(
+				'Failed to register Progress Planner MCP Server with Angie:',
+				error
+			);
+		}
 	}
 };
 
