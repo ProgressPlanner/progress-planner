@@ -192,21 +192,11 @@ class Rename_Uncategorized_Category extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'You cannot use the default name or slug for the Uncategorized category.', 'progress-planner' ) ] );
 		}
 
-		$uncategorized_category_id = $this->get_data_collector()->collect();
+		$result = $this->update_uncategorized_category( $uncategorized_category_name, $uncategorized_category_slug );
 
-		$term = \get_term( $uncategorized_category_id, 'category' );
-		if ( ! $term || \is_wp_error( $term ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Uncategorized category not found.', 'progress-planner' ) ] );
+		if ( ! $result ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to update Uncategorized category.', 'progress-planner' ) ] );
 		}
-
-		\wp_update_term(
-			$term->term_id,
-			'category',
-			[
-				'name' => $uncategorized_category_name,
-				'slug' => $uncategorized_category_slug,
-			]
-		);
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Uncategorized category updated.', 'progress-planner' ) ] );
 	}
@@ -226,5 +216,58 @@ class Rename_Uncategorized_Category extends Tasks_Interactive {
 		];
 
 		return $actions;
+	}
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function complete_task( $args = [], $task_id = '' ) {
+		if ( ! $this->capability_required() ) {
+			return false;
+		}
+
+		if ( ! isset( $args['uncategorized_category_name'] ) || empty( trim( $args['uncategorized_category_name'] ) ) ) {
+			return false;
+		}
+
+		if ( ! isset( $args['uncategorized_category_slug'] ) || empty( trim( $args['uncategorized_category_slug'] ) ) ) {
+			$args['uncategorized_category_slug'] = \sanitize_title( $args['uncategorized_category_name'] );
+		}
+
+		return $this->update_uncategorized_category( $args['uncategorized_category_name'], $args['uncategorized_category_slug'] );
+	}
+
+	/**
+	 * Update the Uncategorized category.
+	 *
+	 * @param string $uncategorized_category_name The new name for the Uncategorized category.
+	 * @param string $uncategorized_category_slug The new slug for the Uncategorized category.
+	 *
+	 * @return bool
+	 */
+	protected function update_uncategorized_category( $uncategorized_category_name, $uncategorized_category_slug ) {
+
+		$uncategorized_category_id = $this->get_data_collector()->collect();
+
+		$term = \get_term( $uncategorized_category_id, 'category' );
+		if ( ! $term || \is_wp_error( $term ) ) {
+			return false;
+		}
+
+		$result = \wp_update_term(
+			$term->term_id,
+			'category',
+			[
+				'name' => $uncategorized_category_name,
+				'slug' => $uncategorized_category_slug,
+			]
+		);
+
+		return is_wp_error( $result ) ? false : true;
 	}
 }

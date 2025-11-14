@@ -286,8 +286,7 @@ class Set_Date_Format extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid timezone.', 'progress-planner' ) ] );
 		}
 
-		// We're not checking for the return value of the update_option calls, because it will return false if the value is the same.
-		\update_option( 'date_format', $date_format );
+		$this->update_date_format( $date_format );
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
 	}
@@ -330,5 +329,39 @@ class Set_Date_Format extends Tasks_Interactive {
 		}
 
 		return 'non_default';
+	}
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function complete_task( $args = [], $task_id = '' ) {
+		if ( ! $this->capability_required() ) {
+			return false;
+		}
+
+		if ( ! isset( $args['date_format'] ) || empty( trim( $args['date_format'] ) ) ) {
+			return false;
+		}
+
+		return $this->update_date_format( \sanitize_text_field( \wp_unslash( $args['date_format'] ) ) );
+	}
+
+	/**
+	 * Update the date format.
+	 *
+	 * @param string $date_format The date format to update.
+	 *
+	 * @return bool
+	 */
+	protected function update_date_format( $date_format ) {
+		\update_option( 'date_format', $date_format );
+
+		// We're not checking for the return value of the update_option calls, because it will return false if the value is the same.
+		return true;
 	}
 }
