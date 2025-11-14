@@ -2,10 +2,7 @@
 /**
  * Progress_Planner Angie Integration REST-API.
  *
- * Provides REST-API endpoints for Angie AI integration:
- * - <site-url>/wp-json/progress-planner/v1/angie/tasks (GET) - Get active tasks
- * - <site-url>/wp-json/progress-planner/v1/angie/tasks (POST) - Complete a task
- * - <site-url>/wp-json/progress-planner/v1/angie/tasks/completed (GET) - Get completed tasks
+ * Provides REST-API endpoints for Angie AI integration.
  *
  * @package Progress_Planner
  */
@@ -33,7 +30,7 @@ class Angie_API extends Base {
 	/**
 	 * Log Angie API endpoint requests.
 	 *
-	 * @param mixed            $result  Response to replace the requested version with. Can be anything a normal endpoint can return, or null to not hijack the request.
+	 * @param mixed            $result  Response to replace the requested version with.
 	 * @param \WP_REST_Server  $server  Server instance.
 	 * @param \WP_REST_Request $request Request used to generate the response.
 	 * @return mixed Unchanged result (we're just logging, not hijacking).
@@ -130,6 +127,62 @@ class Angie_API extends Base {
 				[
 					'methods'             => 'GET',
 					'callback'            => [ $this, 'get_tools' ],
+					'permission_callback' => [ $this, 'check_permissions' ],
+				],
+			]
+		);
+
+		// Email test endpoints.
+		\register_rest_route(
+			'progress-planner/v1',
+			'/angie/email-test/send',
+			[
+				[
+					'methods'             => 'POST',
+					'callback'            => [ $this, 'send_test_email' ],
+					'permission_callback' => [ $this, 'check_permissions' ],
+					'args'                => [
+						'email' => [
+							'required'          => false,
+							'type'              => 'string',
+							'description'       => 'Email address to send test to (defaults to current user email)',
+							'sanitize_callback' => 'sanitize_email',
+							'validate_callback' => function ( $param ) {
+								return empty( $param ) || \is_email( $param );
+							},
+						],
+					],
+				],
+			]
+		);
+
+		\register_rest_route(
+			'progress-planner/v1',
+			'/angie/email-test/confirm',
+			[
+				[
+					'methods'             => 'POST',
+					'callback'            => [ $this, 'confirm_email_received' ],
+					'permission_callback' => [ $this, 'check_permissions' ],
+					'args'                => [
+						'received' => [
+							'required'    => true,
+							'type'        => 'boolean',
+							'description' => 'Whether the email was received',
+						],
+					],
+				],
+			]
+		);
+
+		// Email test status resource.
+		\register_rest_route(
+			'progress-planner/v1',
+			'/angie/email-test/status',
+			[
+				[
+					'methods'             => 'GET',
+					'callback'            => [ $this, 'get_email_test_status' ],
 					'permission_callback' => [ $this, 'check_permissions' ],
 				],
 			]
@@ -337,6 +390,218 @@ class Angie_API extends Base {
 		} catch ( \Exception $e ) {
 			return new \WP_Error(
 				'tools_error',
+				$e->getMessage(),
+				[ 'status' => 500 ]
+			);
+		}
+	}
+
+	/**
+	 * Send test email.
+	 *
+	 * @param \WP_REST_Request $request The REST request object.
+	 * @return \WP_REST_Response|\WP_Error The REST response object.
+	 */
+	public function send_test_email( $request ) {
+		try {
+			// Get email from request, or default to current user's email.
+			$email = $request->get_param( 'email' );
+
+			if ( empty( $email ) ) {
+				$current_user = \wp_get_current_user();
+				$email        = $current_user->user_email;
+			}
+
+			// Validate email.
+			if ( ! \is_email( $email ) ) {
+				return new \WP_Error(
+					'invalid_email',
+					\__( 'Please provide a valid email address.', 'progress-planner' ),
+					[ 'status' => 400 ]
+				);
+			}
+
+			$subject = \__( 'WordPress Test Email from Progress Planner', 'progress-planner' );
+			$message = \__(
+				'If you received this email, your WordPress site can send emails successfully!',
+				'progress-planner'
+			);
+
+			$sent = \wp_mail( $email, $subject, $message );
+
+			if ( $sent ) {
+				// Store that we sent an email (for tracking).
+				\update_option( 'progress_planner_email_test_sent', \time() );
+				\update_option( 'progress_planner_email_test_step', 'email_sent' );
+				\update_option( 'progress_planner_email_test_address', $email );
+				\delete_option( 'progress_planner_email_test_failed' );
+
+				return new \WP_REST_Response(
+					[
+						'success'       => true,
+						'message'       => \sprintf(
+							/* translators: %s: email address */
+							\__( 'Test email sent to %s. Please check your inbox and spam folder.', 'progress-planner' ),
+							$email
+						),
+						'sent_to_email' => $email,
+						'step'          => 'email_sent',
+					],
+					200
+				);
+			} else {
+				return new \WP_Error(
+					'email_send_failed',
+					\__( 'Failed to send test email. There may be an issue with your email configuration.', 'progress-planner' ),
+					[ 'status' => 500 ]
+				);
+			}
+		} catch ( \Exception $e ) {
+			return new \WP_Error(
+				'email_test_error',
+				$e->getMessage(),
+				[ 'status' => 500 ]
+			);
+		}
+	}
+
+	/**
+	 * Confirm email received.
+	 *
+	 * @param \WP_REST_Request $request The REST request object.
+	 * @return \WP_REST_Response|\WP_Error The REST response object.
+	 */
+	public function confirm_email_received( $request ) {
+		$received = $request->get_param( 'received' );
+
+		try {
+			if ( $received ) {
+				// Success! Email is working.
+				\delete_option( 'progress_planner_email_test_failed' );
+				\update_option( 'progress_planner_email_working', '1' );
+				\update_option( 'progress_planner_email_test_step', 'confirmed' );
+
+				// Mark the "sending-email" task as complete.
+				$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+					[
+						'post_status' => 'publish',
+						'provider_id' => 'sending-email',
+					]
+				);
+
+				if ( ! empty( $tasks ) ) {
+					$tasks[0]->celebrate();
+				}
+
+				return new \WP_REST_Response(
+					[
+						'success'       => true,
+						'message'       => \__(
+							'✓ Great! Your WordPress site is correctly configured to send emails.',
+							'progress-planner'
+						),
+						'email_working' => true,
+						'step'          => 'confirmed',
+					],
+					200
+				);
+			} else {
+				// Email not received - troubleshooting needed.
+				\update_option( 'progress_planner_email_test_failed', '1' );
+				\delete_option( 'progress_planner_email_working' );
+				\update_option( 'progress_planner_email_test_step', 'troubleshooting' );
+
+				$troubleshooting = \__(
+					'Email delivery needs attention. Here are some common solutions:
+
+1. Install an SMTP plugin like WP Mail SMTP or Post SMTP
+2. Check your hosting email settings
+3. Verify your spam/junk folder
+4. Contact your hosting provider about email deliverability
+5. Consider using a transactional email service (SendGrid, Mailgun, etc.)',
+					'progress-planner'
+				);
+
+				return new \WP_REST_Response(
+					[
+						'success'       => true,
+						'message'       => $troubleshooting,
+						'email_working' => false,
+						'step'          => 'troubleshooting',
+					],
+					200
+				);
+			}
+		} catch ( \Exception $e ) {
+			return new \WP_Error(
+				'email_confirm_error',
+				$e->getMessage(),
+				[ 'status' => 500 ]
+			);
+		}
+	}
+
+	/**
+	 * Get email test status (Resource).
+	 *
+	 * @param \WP_REST_Request $request The REST request object.
+	 * @return \WP_REST_Response|\WP_Error The REST response object.
+	 */
+	public function get_email_test_status( $request ) {
+		try {
+			$step          = \get_option( 'progress_planner_email_test_step', 'not_started' );
+			$email_sent_at = \get_option( 'progress_planner_email_test_sent', 0 );
+			$email_working = \get_option( 'progress_planner_email_working', '0' ) === '1';
+			$test_failed   = \get_option( 'progress_planner_email_test_failed', '0' ) === '1';
+			$test_email    = \get_option( 'progress_planner_email_test_address', '' );
+
+			$current_user  = \wp_get_current_user();
+			$default_email = $current_user->user_email;
+
+			$status = [
+				'step'          => $step,
+				'email_working' => $email_working,
+				'test_failed'   => $test_failed,
+				'default_email' => $default_email,
+				'test_email'    => $test_email, // Shows which email was actually tested.
+			];
+
+			// Add contextual information based on step.
+			switch ( $step ) {
+				case 'not_started':
+					$status['message']     = \__( 'Email test has not been started yet. Use send-test-email tool to begin.', 'progress-planner' );
+					$status['next_action'] = 'send-test-email';
+					break;
+
+				case 'email_sent':
+					$status['message']     = \sprintf(
+						/* translators: %s: email address */
+						\__( 'Test email was sent to %s. Waiting for user confirmation.', 'progress-planner' ),
+						$test_email
+					);
+					$status['sent_at']     = $email_sent_at;
+					$status['next_action'] = 'confirm-email-received';
+					break;
+
+				case 'confirmed':
+					$status['message']     = \__( 'Email test completed successfully. Email delivery is working.', 'progress-planner' );
+					$status['next_action'] = null;
+					break;
+
+				case 'troubleshooting':
+					$status['message']     = \__( 'Email test failed. User needs to follow troubleshooting steps.', 'progress-planner' );
+					$status['next_action'] = 'send-test-email'; // Can retry.
+					break;
+
+				default:
+					$status['message']     = \__( 'Unknown email test status.', 'progress-planner' );
+					$status['next_action'] = null;
+			}
+
+			return new \WP_REST_Response( $status, 200 );
+		} catch ( \Exception $e ) {
+			return new \WP_Error(
+				'status_error',
 				$e->getMessage(),
 				[ 'status' => 500 ]
 			);

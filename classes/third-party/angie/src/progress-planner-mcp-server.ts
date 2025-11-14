@@ -98,6 +98,16 @@ interface ToolsResponse {
 	tools: ToolDefinition[];
 }
 
+// Add to interfaces section
+interface ResourceDefinition {
+	uri: string;
+	name: string;
+	description: string;
+	mimeType: string;
+	endpoint: string;
+	method: 'GET';
+}
+
 export type ApiResponse = Record< string, unknown >;
 
 /**
@@ -395,6 +405,25 @@ function formatResponse( response: ApiResponse, formatter?: string ): string {
 			return message;
 		}
 
+		// Email test formatters
+		case 'format_email_test_send': {
+			const data = response as {
+				success: boolean;
+				message: string;
+				sent_to_email: string;
+			};
+			return `${ data.message }\n\nNext step: Ask the user to check their inbox at ${ data.sent_to_email } and confirm whether they received the email.`;
+		}
+
+		case 'format_email_test_confirm': {
+			const data = response as {
+				success: boolean;
+				message: string;
+				email_working: boolean;
+			};
+			return data.message;
+		}
+
 		default:
 			// Fallback to JSON
 			return JSON.stringify( response, null, 2 );
@@ -467,6 +496,7 @@ async function createProgressPlannerMcpServer() {
 		{
 			capabilities: {
 				tools: {},
+				resources: {},
 			},
 		}
 	);
@@ -507,6 +537,40 @@ async function createProgressPlannerMcpServer() {
 			} );
 		} else {
 			server.tool( tool.name, tool.description, zodSchema, handler );
+		}
+	}
+
+	// Fetch and register resources
+	const remoteData = toolsResponse as unknown as {
+		success: boolean;
+		tools: ToolDefinition[];
+		resources?: ResourceDefinition[];
+	};
+
+	if ( remoteData.resources && Array.isArray( remoteData.resources ) ) {
+		for ( const resource of remoteData.resources ) {
+			server.resource(
+				{
+					uri: resource.uri,
+					name: resource.name,
+					description: resource.description,
+					mimeType: resource.mimeType,
+				},
+				async () => {
+					const response = await makeApiRequest( resource.endpoint );
+					return {
+						contents: [
+							{
+								uri: resource.uri,
+								mimeType: resource.mimeType,
+								text: JSON.stringify( response, null, 2 ),
+							},
+						],
+					};
+				}
+			);
+
+			debugLog( `Registered resource: ${ resource.uri }` );
 		}
 	}
 
