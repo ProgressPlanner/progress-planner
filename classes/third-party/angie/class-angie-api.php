@@ -574,7 +574,7 @@ class Angie_API extends Base {
 					break;
 
 				case 'email_sent':
-					$status['message']     = \sprintf(
+					$status['message'] = \sprintf(
 						/* translators: %s: email address */
 						\__( 'Test email was sent to %s. Waiting for user confirmation.', 'progress-planner' ),
 						$test_email
