@@ -307,7 +307,7 @@ class Permalink_Structure extends Tasks_Interactive {
 			return false;
 		}
 
-		if ( ! isset( $args['permalink_structure'] ) || empty( trim( $args['permalink_structure'] ) ) ) {
+		if ( ! isset( $args['permalink_structure'] ) || empty( \trim( $args['permalink_structure'] ) ) ) {
 			return false;
 		}
 

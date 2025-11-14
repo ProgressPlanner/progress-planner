@@ -640,10 +640,7 @@ class Angie_API extends Base {
 		// Extract param_name from each task definition.
 		$tasks_map = [];
 		foreach ( $remote_data['tasks'] as $task_id => $task_config ) {
-			// Handle both old format (string) and new format (array with param_name).
-			if ( \is_string( $task_config ) ) {
-				$tasks_map[ $task_id ] = $task_config;
-			} elseif ( \is_array( $task_config ) && isset( $task_config['param_name'] ) ) {
+			if ( isset( $task_config['param_name'] ) ) {
 				$tasks_map[ $task_id ] = $task_config['param_name'];
 			}
 		}
@@ -666,16 +663,8 @@ class Angie_API extends Base {
 		// Extract schema from each task definition.
 		$schemas = [];
 		foreach ( $remote_data['tasks'] as $task_id => $task_config ) {
-			// Only process array format that contains schema info.
-			if ( \is_array( $task_config ) ) {
-				// Remove param_name as it's not part of the schema.
-				$schema = $task_config;
-				unset( $schema['param_name'] );
-
-				// Only add if there's actual schema data.
-				if ( ! empty( $schema ) ) {
-					$schemas[ $task_id ] = $schema;
-				}
+			if ( isset( $task_config['schema'] ) ) {
+				$schemas[ $task_id ] = $task_config['schema'];
 			}
 		}
 

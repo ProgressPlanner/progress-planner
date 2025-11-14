@@ -344,7 +344,7 @@ class Set_Date_Format extends Tasks_Interactive {
 			return false;
 		}
 
-		if ( ! isset( $args['date_format'] ) || empty( trim( $args['date_format'] ) ) ) {
+		if ( ! isset( $args['date_format'] ) || empty( \trim( $args['date_format'] ) ) ) {
 			return false;
 		}
 

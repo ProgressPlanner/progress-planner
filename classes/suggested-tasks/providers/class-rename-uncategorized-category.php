@@ -231,11 +231,11 @@ class Rename_Uncategorized_Category extends Tasks_Interactive {
 			return false;
 		}
 
-		if ( ! isset( $args['uncategorized_category_name'] ) || empty( trim( $args['uncategorized_category_name'] ) ) ) {
+		if ( ! isset( $args['uncategorized_category_name'] ) || empty( \trim( $args['uncategorized_category_name'] ) ) ) {
 			return false;
 		}
 
-		if ( ! isset( $args['uncategorized_category_slug'] ) || empty( trim( $args['uncategorized_category_slug'] ) ) ) {
+		if ( ! isset( $args['uncategorized_category_slug'] ) || empty( \trim( $args['uncategorized_category_slug'] ) ) ) {
 			$args['uncategorized_category_slug'] = \sanitize_title( $args['uncategorized_category_name'] );
 		}
 
@@ -268,6 +268,6 @@ class Rename_Uncategorized_Category extends Tasks_Interactive {
 			]
 		);
 
-		return is_wp_error( $result ) ? false : true;
+		return \is_wp_error( $result ) ? false : true;
 	}
 }
