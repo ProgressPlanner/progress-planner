@@ -221,6 +221,7 @@ class Angie_API extends Base {
 
 			$tasks_to_return = [];
 			$angie_tasks     = $this->get_angie_tasks();
+			$task_schemas    = $this->get_task_schemas();
 			foreach ( $tasks as $task ) {
 				$task_data = $task->get_data();
 
@@ -229,7 +230,7 @@ class Angie_API extends Base {
 					continue;
 				}
 
-				$tasks_to_return[] = [
+				$task_response = [
 					'id'          => $task_data['task_id'],
 					'title'       => $task_data['post_title'],
 					'description' => $task_data['post_content'],
@@ -237,6 +238,13 @@ class Angie_API extends Base {
 					'priority'    => $task_data['priority'] ?? 0,
 					'status'      => 'publish' === $task_data['post_status'] ? 'active' : 'completed',
 				];
+
+				// Add parameter schema if available.
+				if ( isset( $task_schemas[ $task_data['task_id'] ] ) ) {
+					$task_response['parameter'] = $task_schemas[ $task_data['task_id'] ];
+				}
+
+				$tasks_to_return[] = $task_response;
 			}
 
 			return new \WP_REST_Response(
@@ -625,11 +633,53 @@ class Angie_API extends Base {
 	protected function get_angie_tasks_map() {
 
 		$remote_data = $this->get_remote_angie_data();
-		if ( empty( $remote_data ) ) {
+		if ( empty( $remote_data ) || ! isset( $remote_data['tasks'] ) ) {
 			return [];
 		}
 
-		return $remote_data['tasks'];
+		// Extract param_name from each task definition.
+		$tasks_map = [];
+		foreach ( $remote_data['tasks'] as $task_id => $task_config ) {
+			// Handle both old format (string) and new format (array with param_name).
+			if ( \is_string( $task_config ) ) {
+				$tasks_map[ $task_id ] = $task_config;
+			} elseif ( \is_array( $task_config ) && isset( $task_config['param_name'] ) ) {
+				$tasks_map[ $task_id ] = $task_config['param_name'];
+			}
+		}
+
+		return $tasks_map;
+	}
+
+	/**
+	 * Get the task parameter schemas.
+	 *
+	 * @return array The task schemas, keyed by task ID.
+	 */
+	protected function get_task_schemas() {
+		$remote_data = $this->get_remote_angie_data();
+
+		if ( empty( $remote_data ) || ! isset( $remote_data['tasks'] ) ) {
+			return [];
+		}
+
+		// Extract schema from each task definition.
+		$schemas = [];
+		foreach ( $remote_data['tasks'] as $task_id => $task_config ) {
+			// Only process array format that contains schema info.
+			if ( \is_array( $task_config ) ) {
+				// Remove param_name as it's not part of the schema.
+				$schema = $task_config;
+				unset( $schema['param_name'] );
+
+				// Only add if there's actual schema data.
+				if ( ! empty( $schema ) ) {
+					$schemas[ $task_id ] = $schema;
+				}
+			}
+		}
+
+		return $schemas;
 	}
 
 	/**
