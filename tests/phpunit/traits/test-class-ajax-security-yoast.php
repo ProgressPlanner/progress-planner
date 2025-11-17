@@ -72,7 +72,7 @@ class Ajax_Security_Yoast_Test extends \WP_Ajax_UnitTestCase {
 		// WordPress Core's _handleAjax() starts output buffering before calling AJAX actions.
 		// We need to do the same since we're calling methods directly.
 		// WordPress Core's dieHandler() will call ob_get_clean() to clean this buffer.
-		\ini_set( 'implicit_flush', false );
+		\ini_set( 'implicit_flush', false ); // phpcs:ignore WordPress.PHP.IniSet.Risky
 		\ob_start();
 
 		// WP_Ajax_UnitTestCase allows us to test AJAX methods that call wp_send_json_error().
