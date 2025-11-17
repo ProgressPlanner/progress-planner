@@ -235,4 +235,3 @@ class Admin_Page_Test extends \WP_UnitTestCase {
 		$this->assertTrue( true );
 	}
 }
-

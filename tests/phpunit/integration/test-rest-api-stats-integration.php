@@ -101,4 +101,3 @@ class Rest_Api_Stats_Integration_Test extends Integration_Test_Case {
 		$this->assertIsString( $data['website'] );
 	}
 }
-

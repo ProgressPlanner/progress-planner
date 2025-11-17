@@ -13,24 +13,6 @@ namespace Progress_Planner\Tests;
 abstract class Integration_Test_Case extends \WP_UnitTestCase {
 
 	/**
-	 * Set up test.
-	 *
-	 * @return void
-	 */
-	public function setUp(): void {
-		parent::setUp();
-	}
-
-	/**
-	 * Tear down test.
-	 *
-	 * @return void
-	 */
-	public function tearDown(): void {
-		parent::tearDown();
-	}
-
-	/**
 	 * Create a test task recommendation.
 	 *
 	 * @param array $args Task arguments.
@@ -86,4 +68,3 @@ abstract class Integration_Test_Case extends \WP_UnitTestCase {
 		return $server->dispatch( $request );
 	}
 }
-

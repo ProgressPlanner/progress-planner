@@ -85,4 +85,3 @@ class Goal_Recurring_Test extends \WP_UnitTestCase {
 		$this->assertNotSame( $goal1, $goal2 );
 	}
 }
-

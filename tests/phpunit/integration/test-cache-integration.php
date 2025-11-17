@@ -25,7 +25,7 @@ class Cache_Integration_Test extends Integration_Test_Case {
 
 		// Verify transient exists in database.
 		$transient_name = 'progress_planner_test-key';
-		$transient       = \get_transient( $transient_name );
+		$transient      = \get_transient( $transient_name );
 		$this->assertEquals( 'test-value', $transient );
 
 		// Get cache value.
@@ -114,4 +114,3 @@ class Cache_Integration_Test extends Integration_Test_Case {
 		$this->assertFalse( $cache->get( 'key-3' ) );
 	}
 }
-

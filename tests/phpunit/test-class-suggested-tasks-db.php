@@ -454,4 +454,3 @@ class Suggested_Tasks_Db_Test extends \WP_UnitTestCase {
 		$this->assertEquals( \count( $tasks_1 ), \count( $tasks_2 ) );
 	}
 }
-

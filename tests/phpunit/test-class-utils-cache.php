@@ -144,7 +144,10 @@ class Utils_Cache_Test extends \WP_UnitTestCase {
 	 */
 	public function test_get_array_value() {
 		$key   = 'test-array';
-		$value = [ 'foo' => 'bar', 'baz' => 123 ];
+		$value = [
+			'foo' => 'bar',
+			'baz' => 123,
+		];
 
 		$this->cache_instance->set( $key, $value );
 
@@ -208,4 +211,3 @@ class Utils_Cache_Test extends \WP_UnitTestCase {
 		parent::tearDown();
 	}
 }
-

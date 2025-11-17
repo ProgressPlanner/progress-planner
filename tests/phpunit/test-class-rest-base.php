@@ -407,4 +407,3 @@ class Rest_Base_Test extends \WP_UnitTestCase {
 		parent::tearDown();
 	}
 }
-

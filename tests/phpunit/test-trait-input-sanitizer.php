@@ -45,8 +45,8 @@ class Input_Sanitizer_Trait_Test extends \WP_UnitTestCase {
 	 */
 	public function test_get_sanitized_get_returns_sanitized_value() {
 		$_GET['test_key'] = '<script>alert("xss")</script>';
-		$reflection = new \ReflectionClass( $this->mock_instance );
-		$method = $reflection->getMethod( 'get_sanitized_get' );
+		$reflection       = new \ReflectionClass( $this->mock_instance );
+		$method           = $reflection->getMethod( 'get_sanitized_get' );
 		$method->setAccessible( true );
 		$result = $method->invoke( $this->mock_instance, 'test_key' );
 		$this->assertStringNotContainsString( '<script>', $result );
@@ -62,7 +62,7 @@ class Input_Sanitizer_Trait_Test extends \WP_UnitTestCase {
 	public function test_get_sanitized_get_returns_default() {
 		unset( $_GET['nonexistent_key'] );
 		$reflection = new \ReflectionClass( $this->mock_instance );
-		$method = $reflection->getMethod( 'get_sanitized_get' );
+		$method     = $reflection->getMethod( 'get_sanitized_get' );
 		$method->setAccessible( true );
 		$result = $method->invoke( $this->mock_instance, 'nonexistent_key', 'default_value' );
 		$this->assertEquals( 'default_value', $result );
@@ -75,8 +75,8 @@ class Input_Sanitizer_Trait_Test extends \WP_UnitTestCase {
 	 */
 	public function test_get_sanitized_get_sanitizes_malicious_input() {
 		$_GET['malicious'] = '<img src=x onerror=alert(1)>';
-		$reflection = new \ReflectionClass( $this->mock_instance );
-		$method = $reflection->getMethod( 'get_sanitized_get' );
+		$reflection        = new \ReflectionClass( $this->mock_instance );
+		$method            = $reflection->getMethod( 'get_sanitized_get' );
 		$method->setAccessible( true );
 		$result = $method->invoke( $this->mock_instance, 'malicious' );
 		$this->assertStringNotContainsString( '<img', $result );
@@ -91,8 +91,8 @@ class Input_Sanitizer_Trait_Test extends \WP_UnitTestCase {
 	 */
 	public function test_get_sanitized_get_handles_empty_string() {
 		$_GET['empty_key'] = '';
-		$reflection = new \ReflectionClass( $this->mock_instance );
-		$method = $reflection->getMethod( 'get_sanitized_get' );
+		$reflection        = new \ReflectionClass( $this->mock_instance );
+		$method            = $reflection->getMethod( 'get_sanitized_get' );
 		$method->setAccessible( true );
 		$result = $method->invoke( $this->mock_instance, 'empty_key', 'default' );
 		$this->assertEquals( '', $result );
@@ -106,8 +106,8 @@ class Input_Sanitizer_Trait_Test extends \WP_UnitTestCase {
 	 */
 	public function test_get_sanitized_get_handles_normal_text() {
 		$_GET['normal_key'] = 'normal text value';
-		$reflection = new \ReflectionClass( $this->mock_instance );
-		$method = $reflection->getMethod( 'get_sanitized_get' );
+		$reflection         = new \ReflectionClass( $this->mock_instance );
+		$method             = $reflection->getMethod( 'get_sanitized_get' );
 		$method->setAccessible( true );
 		$result = $method->invoke( $this->mock_instance, 'normal_key' );
 		$this->assertEquals( 'normal text value', $result );
@@ -121,8 +121,8 @@ class Input_Sanitizer_Trait_Test extends \WP_UnitTestCase {
 	 */
 	public function test_get_sanitized_post_returns_sanitized_value() {
 		$_POST['test_key'] = '<script>alert("xss")</script>';
-		$reflection = new \ReflectionClass( $this->mock_instance );
-		$method = $reflection->getMethod( 'get_sanitized_post' );
+		$reflection        = new \ReflectionClass( $this->mock_instance );
+		$method            = $reflection->getMethod( 'get_sanitized_post' );
 		$method->setAccessible( true );
 		$result = $method->invoke( $this->mock_instance, 'test_key' );
 		$this->assertStringNotContainsString( '<script>', $result );
@@ -138,7 +138,7 @@ class Input_Sanitizer_Trait_Test extends \WP_UnitTestCase {
 	public function test_get_sanitized_post_returns_default() {
 		unset( $_POST['nonexistent_key'] );
 		$reflection = new \ReflectionClass( $this->mock_instance );
-		$method = $reflection->getMethod( 'get_sanitized_post' );
+		$method     = $reflection->getMethod( 'get_sanitized_post' );
 		$method->setAccessible( true );
 		$result = $method->invoke( $this->mock_instance, 'nonexistent_key', 'default_value' );
 		$this->assertEquals( 'default_value', $result );
@@ -151,12 +151,11 @@ class Input_Sanitizer_Trait_Test extends \WP_UnitTestCase {
 	 */
 	public function test_get_sanitized_post_sanitizes_malicious_input() {
 		$_POST['malicious'] = '<iframe src="evil.com"></iframe>';
-		$reflection = new \ReflectionClass( $this->mock_instance );
-		$method = $reflection->getMethod( 'get_sanitized_post' );
+		$reflection         = new \ReflectionClass( $this->mock_instance );
+		$method             = $reflection->getMethod( 'get_sanitized_post' );
 		$method->setAccessible( true );
 		$result = $method->invoke( $this->mock_instance, 'malicious' );
 		$this->assertStringNotContainsString( '<iframe', $result );
 		unset( $_POST['malicious'] );
 	}
 }
-

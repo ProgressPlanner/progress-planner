@@ -20,7 +20,7 @@ class Goal_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_constructor_sets_defaults() {
-		$goal = new Goal();
+		$goal    = new Goal();
 		$details = $goal->get_details();
 
 		$this->assertEquals( '', $details['id'] );
@@ -54,7 +54,7 @@ class Goal_Test extends \WP_UnitTestCase {
 			'evaluate'    => '__return_true',
 		];
 
-		$goal = new Goal( $args );
+		$goal    = new Goal( $args );
 		$details = $goal->get_details();
 
 		$this->assertEquals( 'test-goal', $details['id'] );
@@ -146,10 +146,10 @@ class Goal_Test extends \WP_UnitTestCase {
 	public function test_evaluate_with_custom_callback() {
 		$goal = new Goal(
 			[
-				'evaluate' => function( $goal ) {
+				'evaluate' => function ( $goal ) {
 					return $goal->get_details()['id'] === 'test-goal';
 				},
-				'id' => 'test-goal',
+				'id'       => 'test-goal',
 			]
 		);
 
@@ -166,4 +166,3 @@ class Goal_Test extends \WP_UnitTestCase {
 		$this->assertFalse( $goal->evaluate() );
 	}
 }
-

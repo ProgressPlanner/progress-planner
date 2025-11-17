@@ -147,4 +147,3 @@ class Suggested_Tasks_Db_Integration_Test extends Integration_Test_Case {
 		$this->assertNull( $post );
 	}
 }
-

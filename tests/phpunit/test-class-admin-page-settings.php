@@ -75,7 +75,7 @@ class Admin_Page_Settings_Test extends \WP_UnitTestCase {
 	 */
 	public function test_get_settings_includes_page_types() {
 		$settings = $this->page_settings_instance->get_settings();
-		
+
 		// Settings should be an array (may be empty if no page types).
 		$this->assertIsArray( $settings );
 	}
@@ -91,7 +91,7 @@ class Admin_Page_Settings_Test extends \WP_UnitTestCase {
 		\wp_set_current_user( $user_id );
 
 		// Test without nonce.
-		$_POST = [];
+		$_POST           = [];
 		$_POST['action'] = 'prpl_settings_form';
 
 		// Should handle gracefully without nonce.
@@ -100,4 +100,3 @@ class Admin_Page_Settings_Test extends \WP_UnitTestCase {
 		\wp_set_current_user( 0 );
 	}
 }
-

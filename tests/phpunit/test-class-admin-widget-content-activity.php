@@ -56,7 +56,7 @@ class Admin_Widget_Content_Activity_Test extends \WP_UnitTestCase {
 	 */
 	public function test_widget_width() {
 		// Use reflection to check protected property.
-		$reflection = new \ReflectionClass( $this->widget_instance );
+		$reflection     = new \ReflectionClass( $this->widget_instance );
 		$width_property = $reflection->getProperty( 'width' );
 		$width_property->setAccessible( true );
 		$width = $width_property->getValue( $this->widget_instance );
@@ -66,4 +66,3 @@ class Admin_Widget_Content_Activity_Test extends \WP_UnitTestCase {
 		$this->assertLessThanOrEqual( 2, $width );
 	}
 }
-

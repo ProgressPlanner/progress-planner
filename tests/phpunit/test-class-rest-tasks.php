@@ -173,4 +173,3 @@ class Rest_Tasks_Test extends \WP_UnitTestCase {
 		$this->assertArrayHasKey( 'ID', $task );
 	}
 }
-

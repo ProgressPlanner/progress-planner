@@ -103,4 +103,3 @@ class Plugin_Installer_Test extends \WP_UnitTestCase {
 		$this->assertNotFalse( \has_action( 'wp_ajax_progress_planner_activate_plugin', [ $this->installer_instance, 'activate' ] ) );
 	}
 }
-

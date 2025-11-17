@@ -230,4 +230,3 @@ class Rest_Stats_Test extends \WP_UnitTestCase {
 		$this->assertIsInt( $data['branding_id'] );
 	}
 }
-

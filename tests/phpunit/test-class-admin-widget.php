@@ -13,8 +13,26 @@ use Progress_Planner\Admin\Widgets\Widget;
  * Mock widget class for testing.
  */
 class Mock_Widget extends Widget {
+
+	/**
+	 * The widget ID.
+	 *
+	 * @var string
+	 */
 	protected $id = 'test-widget';
+
+	/**
+	 * The widget width.
+	 *
+	 * @var int
+	 */
 	protected $width = 1;
+
+	/**
+	 * Whether the widget should be forced to the last column.
+	 *
+	 * @var bool
+	 */
 	protected $force_last_column = false;
 }
 
@@ -90,7 +108,7 @@ class Admin_Widget_Test extends \WP_UnitTestCase {
 	 */
 	public function test_get_range_sanitizes_input() {
 		$_GET['range'] = '<script>alert("xss")</script>';
-		$result = $this->widget_instance->get_range();
+		$result        = $this->widget_instance->get_range();
 		$this->assertStringNotContainsString( '<script>', $result );
 		$this->assertStringNotContainsString( 'alert', $result );
 		unset( $_GET['range'] );
@@ -103,10 +121,9 @@ class Admin_Widget_Test extends \WP_UnitTestCase {
 	 */
 	public function test_get_frequency_sanitizes_input() {
 		$_GET['frequency'] = '<script>alert("xss")</script>';
-		$result = $this->widget_instance->get_frequency();
+		$result            = $this->widget_instance->get_frequency();
 		$this->assertStringNotContainsString( '<script>', $result );
 		$this->assertStringNotContainsString( 'alert', $result );
 		unset( $_GET['frequency'] );
 	}
 }
-

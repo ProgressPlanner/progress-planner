@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:disable Generic.Commenting.Todo
 /**
  * Class Base_Test
  *
@@ -220,3 +220,4 @@ class Base_Test extends \WP_UnitTestCase {
 	}
 }
 
+// phpcs:enable Generic.Commenting.Todo

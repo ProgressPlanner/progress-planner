@@ -115,4 +115,3 @@ class Rest_Api_Tasks_Integration_Test extends Integration_Test_Case {
 		$this->assertContains( $trash_task, $task_ids );
 	}
 }
-

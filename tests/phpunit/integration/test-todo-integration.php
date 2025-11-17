@@ -1,4 +1,4 @@
-<?php
+<?php // phpcs:disable Generic.Commenting.Todo
 /**
  * Todo Integration Test
  *
@@ -109,3 +109,4 @@ class Todo_Integration_Test extends Integration_Test_Case {
 	}
 }
 
+// phpcs:enable Generic.Commenting.Todo

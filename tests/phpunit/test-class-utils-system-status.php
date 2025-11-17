@@ -218,4 +218,3 @@ class Utils_System_Status_Test extends \WP_UnitTestCase {
 		$this->assertLessThanOrEqual( 10, $status['weekly_posts'] );
 	}
 }
-
