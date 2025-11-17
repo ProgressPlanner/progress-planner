@@ -439,10 +439,15 @@ class Angie_API extends Base {
 
 			if ( $sent ) {
 				// Store that we sent an email (for tracking).
-				\update_option( 'progress_planner_email_test_sent', \time() );
-				\update_option( 'progress_planner_email_test_step', 'email_sent' );
-				\update_option( 'progress_planner_email_test_address', $email );
-				\delete_option( 'progress_planner_email_test_failed' );
+				$this->update_task_state(
+					'sending-email',
+					[
+						'sent_at' => \time(),
+						'step'    => 'email_sent',
+						'address' => $email,
+						'failed'  => false,
+					]
+				);
 
 				return new \WP_REST_Response(
 					[
@@ -485,9 +490,14 @@ class Angie_API extends Base {
 		try {
 			if ( $received ) {
 				// Success! Email is working.
-				\delete_option( 'progress_planner_email_test_failed' );
-				\update_option( 'progress_planner_email_working', '1' );
-				\update_option( 'progress_planner_email_test_step', 'confirmed' );
+				$this->update_task_state(
+					'sending-email',
+					[
+						'failed'  => false,
+						'working' => true,
+						'step'    => 'confirmed',
+					]
+				);
 
 				// Mark the "sending-email" task as complete.
 				$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
@@ -515,9 +525,14 @@ class Angie_API extends Base {
 				);
 			} else {
 				// Email not received - troubleshooting needed.
-				\update_option( 'progress_planner_email_test_failed', '1' );
-				\delete_option( 'progress_planner_email_working' );
-				\update_option( 'progress_planner_email_test_step', 'troubleshooting' );
+				$this->update_task_state(
+					'sending-email',
+					[
+						'failed'  => true,
+						'working' => false,
+						'step'    => 'troubleshooting',
+					]
+				);
 
 				$troubleshooting = \__(
 					'Email delivery needs attention. Here are some common solutions:
@@ -557,11 +572,13 @@ class Angie_API extends Base {
 	 */
 	public function get_email_test_status( $request ) {
 		try {
-			$step          = \get_option( 'progress_planner_email_test_step', 'not_started' );
-			$email_sent_at = \get_option( 'progress_planner_email_test_sent', 0 );
-			$email_working = \get_option( 'progress_planner_email_working', '0' ) === '1';
-			$test_failed   = \get_option( 'progress_planner_email_test_failed', '0' ) === '1';
-			$test_email    = \get_option( 'progress_planner_email_test_address', '' );
+			$task_state = $this->get_task_state( 'sending-email' );
+
+			$step          = $task_state['step'] ?? 'not_started';
+			$email_sent_at = $task_state['sent_at'] ?? 0;
+			$email_working = $task_state['working'] ?? false;
+			$test_failed   = $task_state['failed'] ?? false;
+			$test_email    = $task_state['address'] ?? '';
 
 			$current_user  = \wp_get_current_user();
 			$default_email = $current_user->user_email;
@@ -705,5 +722,50 @@ class Angie_API extends Base {
 		\progress_planner()->get_utils__cache()->set( $cache_key, $response_body, 1 * DAY_IN_SECONDS );
 
 		return $response_body;
+	}
+
+	/**
+	 * Get task state for MCP server.
+	 *
+	 * @param string $task_id The task ID (e.g., 'sending-email').
+	 * @return array The task state array with default values.
+	 */
+	protected function get_task_state( $task_id ) {
+		$angie_state = \get_option( 'progress_planner_angie', [] );
+		return $angie_state[ $task_id ] ?? [];
+	}
+
+	/**
+	 * Update task state for MCP server.
+	 *
+	 * @param string $task_id The task ID (e.g., 'sending-email').
+	 * @param array  $updates The state updates to apply.
+	 * @return void
+	 */
+	protected function update_task_state( $task_id, $updates ) {
+		$angie_state = \get_option( 'progress_planner_angie', [] );
+
+		if ( ! isset( $angie_state[ $task_id ] ) ) {
+			$angie_state[ $task_id ] = [];
+		}
+
+		$angie_state[ $task_id ] = \array_merge( $angie_state[ $task_id ], $updates );
+
+		\update_option( 'progress_planner_angie', $angie_state );
+	}
+
+	/**
+	 * Delete task state for MCP server.
+	 *
+	 * @param string $task_id The task ID (e.g., 'sending-email').
+	 * @return void
+	 */
+	protected function delete_task_state( $task_id ) {
+		$angie_state = \get_option( 'progress_planner_angie', [] );
+
+		if ( isset( $angie_state[ $task_id ] ) ) {
+			unset( $angie_state[ $task_id ] );
+			\update_option( 'progress_planner_angie', $angie_state );
+		}
 	}
 }
