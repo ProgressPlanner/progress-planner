@@ -52,9 +52,6 @@ class Debug_Tools {
 			\add_action( 'init', [ $this, 'check_toggle_placeholder_demo' ] );
 		}
 
-		// Initialize color customizer.
-		$this->get_color_customizer();
-
 		\add_filter( 'progress_planner_tasks_show_ui', [ $this, 'filter_tasks_show_ui' ] );
 	}
 
@@ -726,19 +723,6 @@ class Debug_Tools {
 		// Redirect to the same page without the parameter.
 		\wp_safe_redirect( \remove_query_arg( [ 'prpl_toggle_placeholder_demo', '_wpnonce' ] ) );
 		exit;
-	}
-
-	/**
-	 * Get color customizer instance.
-	 *
-	 * @return \Progress_Planner\Utils\Color_Customizer
-	 */
-	public function get_color_customizer() {
-		static $color_customizer = null;
-		if ( null === $color_customizer ) {
-			$color_customizer = new Color_Customizer();
-		}
-		return $color_customizer;
 	}
 
 	/**
