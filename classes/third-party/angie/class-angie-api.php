@@ -337,30 +337,14 @@ class Angie_API extends Base {
 			// Get the jobs from the remote server.
 			$response = \wp_remote_get( $url );
 
-			// Helper to reduce code duplication.
-			static $return_empty = function ( $cache_key ) {
-				\progress_planner()->get_utils__cache()->set(
-					$cache_key,
-					[],
-					5 * MINUTE_IN_SECONDS
-				);
-				return new \WP_REST_Response(
-					[
-						'success' => true,
-						'tools'   => [],
-					],
-					200
-				);
-			};
-
 			// Handle network errors.
 			if ( \is_wp_error( $response ) ) {
-				return $return_empty( $cache_key );
+				return $this->get_empty_tools_response( $cache_key );
 			}
 
 			// Handle HTTP errors.
 			if ( 200 !== (int) \wp_remote_retrieve_response_code( $response ) ) {
-				return $return_empty( $cache_key );
+				return $this->get_empty_tools_response( $cache_key );
 			}
 
 			// Parse JSON response. IMPORTANT: use true for associative array. Angie is temperamental sometimes.
@@ -368,7 +352,7 @@ class Angie_API extends Base {
 
 			// Validate response.
 			if ( ! \is_array( $tools ) || empty( $tools ) ) {
-				return $return_empty( $cache_key );
+				return $this->get_empty_tools_response( $cache_key );
 			}
 
 			// Cache successful response for 3 days.
@@ -401,6 +385,29 @@ class Angie_API extends Base {
 	 */
 	protected function get_angie_tasks() {
 		return \array_keys( $this->get_angie_tasks_map() );
+	}
+
+	/**
+	 * Get an empty tools response with caching.
+	 *
+	 * Helper method to reduce code duplication when returning empty tools responses.
+	 *
+	 * @param string $cache_key The cache key to use for storing the empty result.
+	 * @return \WP_REST_Response The REST response object with empty tools.
+	 */
+	private function get_empty_tools_response( $cache_key ) {
+		\progress_planner()->get_utils__cache()->set(
+			$cache_key,
+			[],
+			5 * MINUTE_IN_SECONDS
+		);
+		return new \WP_REST_Response(
+			[
+				'success' => true,
+				'tools'   => [],
+			],
+			200
+		);
 	}
 
 	/**
