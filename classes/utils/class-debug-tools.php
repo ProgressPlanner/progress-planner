@@ -98,16 +98,6 @@ class Debug_Tools {
 
 		$this->add_toggle_recommendations_ui_submenu_item( $admin_bar );
 
-		// Add color customizer item.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-color-customizer',
-				'parent' => 'prpl-debug',
-				'title'  => 'Color Customizer',
-				'href'   => \admin_url( 'admin.php?page=progress-planner-color-customizer' ),
-			]
-		);
-
 		$this->add_placeholder_demo_submenu_item( $admin_bar );
 	}
 
