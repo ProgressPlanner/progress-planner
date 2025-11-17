@@ -396,7 +396,7 @@ class Angie_API extends Base {
 				// No more tasks - direct user to plugin page.
 				$plugin_url = \admin_url( 'admin.php?page=progress-planner' );
 
-				$response_data['message']      .= \sprintf(
+				$response_data['message'] .= \sprintf(
 					/* translators: %s: plugin URL */
 					\__( ' All available tasks completed! 🎉 Visit the Progress Planner page to see more recommendations: %s', 'progress-planner' ),
 					$plugin_url
