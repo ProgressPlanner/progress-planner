@@ -179,8 +179,8 @@ class Angie_API extends Base {
 				$tasks_to_return[] = [
 					'id'          => $task_data['task_id'],
 					'title'       => $task_data['post_title'],
-					'description' => $task_data['post_content'],
-					'url'         => $task_data['url'],
+					'description' => $task_data['post_content'] ?? '',
+					'url'         => $task_data['url'] ?? '',
 					'priority'    => $task_data['priority'] ?? 0,
 					'status'      => 'publish' === $task_data['post_status'] ? 'active' : 'completed',
 				];
