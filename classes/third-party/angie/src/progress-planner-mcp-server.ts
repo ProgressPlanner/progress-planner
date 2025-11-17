@@ -397,11 +397,21 @@ function formatResponse( response: ApiResponse, formatter?: string ): string {
 		}
 
 		case 'format_complete_recommendation': {
-			const data = response as unknown as CompleteTaskResponse;
+			const data = response as unknown as CompleteTaskResponse & {
+				next_task?: { id: string; title: string; priority: number };
+				all_completed?: boolean;
+				plugin_url?: string;
+			};
+
 			let message = data.message;
 			if ( data.new_value ) {
 				message += `\n\nNew value: "${ data.new_value }"`;
 			}
+
+			if ( data.all_completed && data.plugin_url ) {
+				message += `\n\n📍 Check the Progress Planner page for more recommendations: ${ data.plugin_url }`;
+			}
+
 			return message;
 		}
 

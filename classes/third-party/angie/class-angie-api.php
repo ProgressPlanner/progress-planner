@@ -212,46 +212,57 @@ class Angie_API extends Base {
 	 *
 	 * @param string $post_status The status of the tasks to get.
 	 *
+	 * @return array The tasks array.
+	 */
+	protected function get_tasks_by_status( $post_status ) {
+		// Get all published recommendations.
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => $post_status ] );
+
+		$tasks_to_return = [];
+		$angie_tasks     = $this->get_angie_tasks();
+		$task_schemas    = $this->get_task_schemas();
+		foreach ( $tasks as $task ) {
+			$task_data = $task->get_data();
+
+			// Skip tasks which are not handled by Angie.
+			if ( ! \in_array( $task_data['task_id'], $angie_tasks, true ) ) {
+				continue;
+			}
+
+			$task_response = [
+				'id'          => $task_data['task_id'],
+				'title'       => $task_data['post_title'],
+				'description' => $task_data['post_content'],
+				'url'         => $task_data['url'],
+				'priority'    => $task_data['priority'] ?? 0,
+				'status'      => 'publish' === $task_data['post_status'] ? 'active' : 'completed',
+			];
+
+			// Add parameter schema if available.
+			if ( isset( $task_schemas[ $task_data['task_id'] ] ) ) {
+				$task_response['parameter'] = $task_schemas[ $task_data['task_id'] ];
+			}
+
+			$tasks_to_return[] = $task_response;
+		}
+
+		return $tasks_to_return;
+	}
+
+	/**
+	 * Get all active (published) tasks.
+	 *
 	 * @return \WP_REST_Response|\WP_Error The REST response object containing active tasks.
 	 */
-	public function get_tasks_by_status( $post_status ) {
+	public function get_active_tasks() {
 		try {
-			// Get all published recommendations.
-			$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => $post_status ] );
-
-			$tasks_to_return = [];
-			$angie_tasks     = $this->get_angie_tasks();
-			$task_schemas    = $this->get_task_schemas();
-			foreach ( $tasks as $task ) {
-				$task_data = $task->get_data();
-
-				// Skip tasks which are not handled by Angie.
-				if ( ! \in_array( $task_data['task_id'], $angie_tasks, true ) ) {
-					continue;
-				}
-
-				$task_response = [
-					'id'          => $task_data['task_id'],
-					'title'       => $task_data['post_title'],
-					'description' => $task_data['post_content'],
-					'url'         => $task_data['url'],
-					'priority'    => $task_data['priority'] ?? 0,
-					'status'      => 'publish' === $task_data['post_status'] ? 'active' : 'completed',
-				];
-
-				// Add parameter schema if available.
-				if ( isset( $task_schemas[ $task_data['task_id'] ] ) ) {
-					$task_response['parameter'] = $task_schemas[ $task_data['task_id'] ];
-				}
-
-				$tasks_to_return[] = $task_response;
-			}
+			$tasks = $this->get_tasks_by_status( 'publish' );
 
 			return new \WP_REST_Response(
 				[
 					'success' => true,
-					'count'   => \count( $tasks_to_return ),
-					'tasks'   => $tasks_to_return,
+					'count'   => \count( $tasks ),
+					'tasks'   => $tasks,
 				],
 				200
 			);
@@ -265,22 +276,30 @@ class Angie_API extends Base {
 	}
 
 	/**
-	 * Get all active (published) tasks.
-	 *
-	 * @return \WP_REST_Response|\WP_Error The REST response object containing active tasks.
-	 */
-	public function get_active_tasks() {
-		return $this->get_tasks_by_status( 'publish' );
-	}
-
-	/**
 	 * Get all completed (trashed) tasks.
 	 *
 	 * @param \WP_REST_Request $request The REST request object.
 	 * @return \WP_REST_Response|\WP_Error The REST response object containing completed tasks.
 	 */
 	public function get_completed_tasks( $request ) {
-		return $this->get_tasks_by_status( 'trash' );
+		try {
+			$tasks = $this->get_tasks_by_status( 'trash' );
+
+			return new \WP_REST_Response(
+				[
+					'success' => true,
+					'count'   => \count( $tasks ),
+					'tasks'   => $tasks,
+				],
+				200
+			);
+		} catch ( \Exception $e ) {
+			return new \WP_Error(
+				'tasks_error',
+				$e->getMessage(),
+				[ 'status' => 500 ]
+			);
+		}
 	}
 
 	/**
@@ -360,6 +379,30 @@ class Angie_API extends Base {
 			// Include the new value if provided (for tasks that set a value).
 			if ( $value ) {
 				$response_data['new_value'] = $value;
+			}
+
+			// Get next task to complete.
+			$next_tasks = $this->get_tasks_by_status( 'publish' );
+
+			// Add next task suggestion or completion message.
+			if ( ! empty( $next_tasks ) ) {
+				$response_data['next_task'] = $next_tasks[0];
+				$response_data['message']  .= \sprintf(
+					/* translators: %s: task title */
+					\__( ' Next recommended task: %s', 'progress-planner' ),
+					$next_tasks[0]['title']
+				);
+			} else {
+				// No more tasks - direct user to plugin page.
+				$plugin_url = \admin_url( 'admin.php?page=progress-planner' );
+
+				$response_data['message']      .= \sprintf(
+					/* translators: %s: plugin URL */
+					\__( ' All available tasks completed! 🎉 Visit the Progress Planner page to see more recommendations: %s', 'progress-planner' ),
+					$plugin_url
+				);
+				$response_data['all_completed'] = true;
+				$response_data['plugin_url']    = $plugin_url;
 			}
 
 			return new \WP_REST_Response( $response_data, 200 );

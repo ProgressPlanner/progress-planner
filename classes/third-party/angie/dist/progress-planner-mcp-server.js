@@ -11905,7 +11905,9 @@ function nh(r, e) {
       let s = t.message;
       return t.new_value && (s += `
 
-New value: "${t.new_value}"`), s;
+New value: "${t.new_value}"`), t.all_completed && t.plugin_url && (s += `
+
+📍 Check the Progress Planner page for more recommendations: ${t.plugin_url}`), s;
     }
     // Email test formatters
     case "format_email_test_send": {
