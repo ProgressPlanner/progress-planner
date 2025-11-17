@@ -39,6 +39,12 @@ class Plugin_Installer_Test extends \WP_UnitTestCase {
 	public function test_check_capabilities_with_permission() {
 		// Create a user with install_plugins capability.
 		$user_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+
+		// In multisite, only super admins can install plugins.
+		if ( \is_multisite() ) {
+			\grant_super_admin( $user_id );
+		}
+
 		\wp_set_current_user( $user_id );
 
 		$result = $this->installer_instance->check_capabilities();
