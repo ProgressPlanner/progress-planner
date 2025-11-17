@@ -2,9 +2,6 @@ name: Code Coverage
 
 on:
   pull_request:
-    branches:
-      - develop
-      - main
   push:
     branches:
       - develop
@@ -46,8 +43,10 @@ jobs:
           coverage: xdebug  # Use Xdebug for coverage (PCOV was causing PHP to crash)
           tools: composer
 
-      - name: Install SVN
-        run: sudo apt-get install subversion
+      - name: Install SVN and XML tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion libxml2-utils
 
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v2
@@ -130,10 +129,10 @@ jobs:
           # Extract overall coverage from coverage.xml (Clover format)
           # This avoids running PHPUnit twice - we already have coverage.xml from the first run
           if [ -f coverage.xml ]; then
-            # Extract metrics from Clover XML
-            # Use xmllint to get statements and coveredstatements attributes
-            STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@statements)' coverage.xml 2>/dev/null || echo "0")
-            COVERED_STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@coveredstatements)' coverage.xml 2>/dev/null || echo "0")
+            # Extract metrics from Clover XML using xmllint
+            # Fallback to Python if xmllint fails
+            STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@statements)' coverage.xml 2>/dev/null || python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); metrics = tree.find('.//project/metrics'); print(metrics.get('statements', '0') if metrics is not None else '0')" 2>/dev/null || echo "0")
+            COVERED_STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@coveredstatements)' coverage.xml 2>/dev/null || python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); metrics = tree.find('.//project/metrics'); print(metrics.get('coveredstatements', '0') if metrics is not None else '0')" 2>/dev/null || echo "0")
 
             # Calculate coverage percentage
             if [ "$STATEMENTS" != "0" ] && [ -n "$STATEMENTS" ] && [ -n "$COVERED_STATEMENTS" ]; then
@@ -201,9 +200,10 @@ jobs:
 
           # Extract overall coverage from base-coverage.xml (Clover format)
           if [ -f base-coverage.xml ]; then
-            # Extract metrics from Clover XML
-            STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@statements)' base-coverage.xml 2>/dev/null || echo "0")
-            COVERED_STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@coveredstatements)' base-coverage.xml 2>/dev/null || echo "0")
+            # Extract metrics from Clover XML using xmllint
+            # Fallback to Python if xmllint fails
+            STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@statements)' base-coverage.xml 2>/dev/null || python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('base-coverage.xml'); metrics = tree.find('.//project/metrics'); print(metrics.get('statements', '0') if metrics is not None else '0')" 2>/dev/null || echo "0")
+            COVERED_STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@coveredstatements)' base-coverage.xml 2>/dev/null || python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('base-coverage.xml'); metrics = tree.find('.//project/metrics'); print(metrics.get('coveredstatements', '0') if metrics is not None else '0')" 2>/dev/null || echo "0")
 
             # Calculate coverage percentage
             if [ "$STATEMENTS" != "0" ] && [ -n "$STATEMENTS" ] && [ -n "$COVERED_STATEMENTS" ]; then
