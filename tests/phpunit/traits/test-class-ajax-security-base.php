@@ -102,11 +102,18 @@ class Ajax_Security_Base_Test extends \WP_Ajax_UnitTestCase {
 	public function test_verify_nonce_or_fail_invalid() {
 		$_REQUEST['nonce'] = 'invalid_nonce';
 
+		// WordPress Core's _handleAjax() starts output buffering before calling AJAX actions.
+		// We need to do the same since we're calling methods directly.
+		// WordPress Core's dieHandler() will call ob_get_clean() to clean this buffer.
+		\ini_set( 'implicit_flush', false );
+		\ob_start();
+
 		// WP_Ajax_UnitTestCase allows us to test AJAX methods that call wp_send_json_error().
 		try {
 			$this->mock_class->public_verify_nonce_or_fail();
 			$this->fail( 'Expected WPAjaxDieContinueException was not thrown' );
 		} catch ( \WPAjaxDieContinueException $e ) {
+			// WordPress Core's dieHandler() calls ob_get_clean() which gets output and cleans buffer.
 			// Get the response.
 			$response = json_decode( $this->_last_response, true );
 			$this->assertFalse( $response['success'] );
@@ -148,11 +155,18 @@ class Ajax_Security_Base_Test extends \WP_Ajax_UnitTestCase {
 		$user_id = $this->factory->user->create( [ 'role' => 'subscriber' ] );
 		\wp_set_current_user( $user_id );
 
+		// WordPress Core's _handleAjax() starts output buffering before calling AJAX actions.
+		// We need to do the same since we're calling methods directly.
+		// WordPress Core's dieHandler() will call ob_get_clean() to clean this buffer.
+		\ini_set( 'implicit_flush', false );
+		\ob_start();
+
 		// WP_Ajax_UnitTestCase allows us to test AJAX methods that call wp_send_json_error().
 		try {
 			$this->mock_class->public_verify_capability_or_fail();
 			$this->fail( 'Expected WPAjaxDieContinueException was not thrown' );
 		} catch ( \WPAjaxDieContinueException $e ) {
+			// WordPress Core's dieHandler() calls ob_get_clean() which gets output and cleans buffer.
 			// Get the response.
 			$response = json_decode( $this->_last_response, true );
 			$this->assertFalse( $response['success'] );

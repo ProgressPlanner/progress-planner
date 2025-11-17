@@ -69,11 +69,18 @@ class Ajax_Security_Yoast_Test extends \WP_Ajax_UnitTestCase {
 		// Verify WPSEO_Options class doesn't exist.
 		$this->assertFalse( \class_exists( 'WPSEO_Options' ) );
 
+		// WordPress Core's _handleAjax() starts output buffering before calling AJAX actions.
+		// We need to do the same since we're calling methods directly.
+		// WordPress Core's dieHandler() will call ob_get_clean() to clean this buffer.
+		\ini_set( 'implicit_flush', false );
+		\ob_start();
+
 		// WP_Ajax_UnitTestCase allows us to test AJAX methods that call wp_send_json_error().
 		try {
 			$this->mock_class->public_verify_yoast_active_or_fail();
 			$this->fail( 'Expected WPAjaxDieContinueException was not thrown' );
 		} catch ( \WPAjaxDieContinueException $e ) {
+			// WordPress Core's dieHandler() calls ob_get_clean() which gets output and cleans buffer.
 			// Get the response.
 			$response = json_decode( $this->_last_response, true );
 			$this->assertFalse( $response['success'] );
