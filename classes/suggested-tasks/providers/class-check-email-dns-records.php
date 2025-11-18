@@ -135,6 +135,11 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function handle_interactive_task_specific_submit() {
+
+		if ( ! $this->capability_required() ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to check email DNS records.', 'progress-planner' ) ] );
+		}
+
 		// Check the nonce.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
@@ -159,11 +164,11 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 		$nonce_response = \json_decode( wp_remote_retrieve_body( $nonce_request ), true );
 		$remote_nonce   = $nonce_response['nonce'] ?? '';
 
-		// TODO: Tell server which email are we going to send, response should be email address.
+		// TODO: Tell server which email are we going to send, response should be email address to which email we are sending the test email.
 		$subject = \get_bloginfo( 'name' ) . ' - ' . \microtime( true );
 
 		$pre_request = wp_remote_post(
-			\progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/register-email-for-dns-check',
+			\progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/email-dns-check',
 			[
 				'body' => [
 					'nonce'   => $remote_nonce,
@@ -194,7 +199,7 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 		sleep( 10 );
 
 		$dns_check_request = wp_remote_get(
-			\progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/check-email-dns-records',
+			\progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/email-dns-check',
 			[
 				'body' => [
 					'nonce'   => $remote_nonce,
