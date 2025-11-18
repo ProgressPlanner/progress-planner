@@ -126,7 +126,7 @@ class ProgressPlannerOnboardWizard {
 	/**
 	 * Move to next step
 	 */
-	nextStep() {
+	async nextStep() {
 		console.log(
 			'nextStep() called, current step:',
 			this.state.currentStep
@@ -137,6 +137,16 @@ class ProgressPlannerOnboardWizard {
 		if ( ! step.canProceed( this.state ) ) {
 			console.log( 'Cannot proceed - step requirements not met' );
 			return;
+		}
+
+		// Call beforeNextStep if step has it (for async operations like license generation)
+		if ( typeof step.beforeNextStep === 'function' ) {
+			try {
+				await step.beforeNextStep();
+			} catch ( error ) {
+				console.error( 'Error in beforeNextStep:', error );
+				return; // Don't proceed if beforeNextStep fails
+			}
 		}
 
 		if ( this.state.currentStep < this.tourSteps.length - 1 ) {
@@ -297,8 +307,16 @@ class ProgressPlannerOnboardWizard {
 			}
 
 			if ( this.closeBtn ) {
-				this.closeBtn.addEventListener( 'click', () => {
+				this.closeBtn.addEventListener( 'click', (e) => {
 					console.log( 'Close button clicked!' );
+
+					// Check if privacy is accepted on welcome step
+					if ( this.state.currentStep === 0 && ! this.state.data.privacyAccepted ) {
+						e.preventDefault();
+						this.showQuitConfirmation();
+						return;
+					}
+
 					this.state.data.finished =
 						this.state.currentStep === this.tourSteps.length - 1;
 					this.closeTour();
@@ -307,6 +325,51 @@ class ProgressPlannerOnboardWizard {
 		} else {
 			console.error( 'Popover not found!' );
 		}
+	}
+
+	/**
+	 * Show quit confirmation when trying to close without accepting privacy
+	 */
+	showQuitConfirmation() {
+		// Replace content with confirmation message
+		const originalContent = this.contentWrapper.innerHTML;
+
+		this.contentWrapper.innerHTML = `
+			<div class="prpl-quit-confirmation">
+				<div class="prpl-error-box">
+					<span class="dashicons dashicons-warning"></span>
+					<div>
+						<h3>Are you sure you want to quit?</h3>
+						<p>You need to finish the onboarding before you can work with the Progress Planner plugin and start improving your site.</p>
+					</div>
+				</div>
+				<div class="prpl-quit-actions">
+					<a href="#" id="prpl-quit-yes" class="prpl-quit-link">Yes, quit the onboarding (for now)</a>
+					<a href="#" id="prpl-quit-no" class="prpl-quit-link prpl-quit-link-primary">No, let's finish the onboarding!</a>
+				</div>
+			</div>
+		`;
+
+		// Hide buttons
+		this.nextBtn.style.display = 'none';
+		this.dashboardBtn.style.display = 'none';
+
+		// Add event listeners
+		const quitYes = this.contentWrapper.querySelector( '#prpl-quit-yes' );
+		const quitNo = this.contentWrapper.querySelector( '#prpl-quit-no' );
+
+		quitYes.addEventListener( 'click', ( e ) => {
+			e.preventDefault();
+			this.closeTour();
+		} );
+
+		quitNo.addEventListener( 'click', ( e ) => {
+			e.preventDefault();
+			// Restore original content
+			this.contentWrapper.innerHTML = originalContent;
+			// Re-mount the step
+			this.renderStep();
+		} );
 	}
 
 	/**

@@ -27,15 +27,25 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				<p>
 					<?php
 					/* translators: %s: Progress Planner name. */
-					\printf( \esc_html__( '%s helps you set clear, focused goals for your website, and actually reach them.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
+					\printf( \esc_html__( '%s helps you set clear, focused goals for your website. Let\'s go through a few simple steps to get everything set up.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
 					?>
 				</p>
 				<p>
-					<?php \esc_html_e( 'Instead of getting stuck in to-do lists or unfinished ideas, you’ll turn your goals into small, achievable steps. Everything happens inside your WordPress dashboard, with no need for extra tools or complicated setups.', 'progress-planner' ); ?>
+					<?php \esc_html_e( 'This will only take 3 to 5 minutes.', 'progress-planner' ); ?>
 				</p>
-				<p>
-					<?php \esc_html_e( 'The onboarding takes just 3 to 5 minutes. You’ll go through a few simple steps and complete your first recommendation. After that, you’ll be ready to start making real progress.', 'progress-planner' ); ?>
-				</p>
+
+				<div class="prpl-privacy-checkbox-wrapper">
+					<label>
+						<input type="checkbox" id="prpl-privacy-checkbox" name="privacy_accepted" value="1">
+						<?php
+						\printf(
+							/* translators: %s: progressplanner.com/privacy-policy link */
+							\esc_html__( 'I agree to the %s.', 'progress-planner' ),
+							'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">Privacy policy</a>'
+						);
+						?>
+					</label>
+				</div>
 			</div>
 			<div class="prpl-column">
 				<div id="prpl-welcome-logo">

@@ -181,8 +181,11 @@ class Onboard_Wizard {
 		// Enqueue PopoverTask (used by MoreTasksStep).
 		\wp_enqueue_script( 'prpl-popover-task', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/PopoverTask.js', [], \progress_planner()->get_plugin_version(), true );
 
+		// Enqueue LicenseGenerator (used by WelcomeStep).
+		\wp_enqueue_script( 'prpl-license-generator', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/LicenseGenerator.js', [], \progress_planner()->get_plugin_version(), true );
+
 		// Enqueue step components.
-		\wp_enqueue_script( 'prpl-onboarding-welcome-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/WelcomeStep.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
+		\wp_enqueue_script( 'prpl-onboarding-welcome-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/WelcomeStep.js', [ 'prpl-onboarding-step', 'prpl-license-generator' ], \progress_planner()->get_plugin_version(), true );
 		\wp_enqueue_script( 'prpl-onboarding-first-task-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/FirstTaskStep.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
 		\wp_enqueue_script( 'prpl-onboarding-badges-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/BadgesStep.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
 		\wp_enqueue_script( 'prpl-onboarding-more-tasks-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/MoreTasksStep.js', [ 'prpl-onboarding-step', 'prpl-popover-task' ], \progress_planner()->get_plugin_version(), true );
@@ -210,6 +213,8 @@ class Onboard_Wizard {
 				'nonceProgressPlanner' => \esc_js( \wp_create_nonce( 'progress_planner' ) ),
 				'nonceWPAPI'           => \esc_js( \wp_create_nonce( 'wp_rest' ) ),
 				'popoverId'            => 'prpl-popover-onboarding',
+				'onboardAPIUrl'        => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
+				'onboardNonceURL'      => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
 				'l10n'                 => [
 					'next' => \esc_html__( 'Next', 'progress-planner' ),
 				],
