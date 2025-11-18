@@ -4,8 +4,6 @@
 		box-sizing: border-box;
 	}
 
-	font-family: Gilroy, sans-serif;
-
 	padding: 0;
 	box-sizing: border-box;
 
@@ -119,12 +117,13 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: 24px;
+		padding: 1.5rem 0 1.5rem 1.5rem;
 	}
 
 	.tour-content-wrapper {
 		flex: 1;
-		overflow-y: auto;
+
+		/* overflow-y: auto; */
 	}
 
 	.tour-header {
@@ -162,7 +161,8 @@
 	.prpl-columns-wrapper-flex {
 		display: flex;
 		gap: 40px;
-		overflow: hidden;
+
+		/* overflow: hidden; */
 		padding-bottom: 10px;
 
 		.prpl-column {

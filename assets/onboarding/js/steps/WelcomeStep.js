@@ -80,10 +80,11 @@ class WelcomeStep extends OnboardingStep {
 		// Show spinner
 		const nextBtn = this.wizard.nextBtn;
 		const spinner = document.createElement( 'span' );
-		spinner.classList.add( 'prpl-spinner', 'is-active' );
-		spinner.style.cssText = 'float: none; margin-left: 10px;';
+		spinner.classList.add( 'prpl-spinner' );
+		spinner.innerHTML =
+			'<span class="spinner" style="visibility: visible;"></span>'; // WP spinner.
 
-		nextBtn.parentElement.appendChild( spinner );
+		nextBtn.parentElement.insertBefore( spinner, nextBtn );
 		nextBtn.disabled = true;
 
 		try {
