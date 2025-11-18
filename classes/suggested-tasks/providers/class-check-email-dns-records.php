@@ -111,12 +111,7 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-
-		?>
-		<button type="submit" class="prpl-button prpl-button-primary" style="color: #fff;">
-			<?php \esc_html_e( 'Check email DNS records', 'progress-planner' ); ?>
-		</button>
-		<?php
+		$this->print_submit_button( \__( 'Check email DNS records', 'progress-planner' ) );
 	}
 
 	/**
@@ -164,16 +159,16 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 		$nonce_response = \json_decode( wp_remote_retrieve_body( $nonce_request ), true );
 		$remote_nonce   = $nonce_response['nonce'] ?? '';
 
-		// TODO: Tell server which email are we going to send, response should be email address to which email we are sending the test email.
-		$subject = \get_bloginfo( 'name' ) . ' - ' . \microtime( true );
+		// Tell server which email identifier are we going to use, response should be email address to which we are sending the test email.
+		$subject = md5( \get_bloginfo( 'name' ) . ' - ' . \microtime( true ) );
 
 		$pre_request = wp_remote_post(
 			\progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/email-dns-check',
 			[
 				'body' => [
-					'nonce'   => $remote_nonce,
-					'site'    => $site,
-					'subject' => $subject,
+					'nonce'            => $remote_nonce,
+					'site'             => $site,
+					'email_identifier' => $subject,
 				],
 			]
 		);
@@ -190,8 +185,7 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 
 		// TODO: If wp_mail returned false we need to tell the server to not check for the email.
 		if ( ! $email_sent ) {
-			// TODO: Tell server that the email was not sent.
-
+			\error_log( 'Failed to send email: ' . $email_address );
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to send email.', 'progress-planner' ) ] );
 		}
 
@@ -202,9 +196,9 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 			\progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/email-dns-check',
 			[
 				'body' => [
-					'nonce'   => $remote_nonce,
-					'site'    => $site,
-					'subject' => $subject,
+					'nonce'            => $remote_nonce,
+					'site'             => $site,
+					'email_identifier' => $subject,
 				],
 			]
 		);
@@ -228,5 +222,22 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 		}
 
 		\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to check email DNS records.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Check', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }
