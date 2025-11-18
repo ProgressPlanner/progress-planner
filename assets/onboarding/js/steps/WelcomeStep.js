@@ -59,7 +59,7 @@ class WelcomeStep extends OnboardingStep {
 	 * @return {string} Button text
 	 */
 	getNextButtonText() {
-		return 'Start onboarding';
+		return ProgressPlannerOnboardData.l10n.startOnboarding;
 	}
 
 	/**

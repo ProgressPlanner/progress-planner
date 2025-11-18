@@ -88,6 +88,9 @@ class Onboard_Wizard {
 	 * @return void
 	 */
 	public function maybe_clean_up_user_meta() {
+		// TODO: When to cleanup the user meta?
+		return;
+
 		if ( ! \get_current_user_id() ) {
 			return;
 		}
@@ -205,6 +208,9 @@ class Onboard_Wizard {
 			true
 		);
 
+		// Get saved progress from user meta.
+		$saved_progress = $this->get_saved_progress();
+
 		\wp_localize_script(
 			'prpl-popover-onboarding',
 			'ProgressPlannerOnboardData',
@@ -217,11 +223,36 @@ class Onboard_Wizard {
 				'onboardNonceURL'      => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
 				'site'                 => \esc_attr( \set_url_scheme( \site_url() ) ),
 				'timezone_offset'      => (float) ( \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600 ),
+				'savedProgress'        => $saved_progress,
 				'l10n'                 => [
-					'next' => \esc_html__( 'Next', 'progress-planner' ),
+					'next'            => \esc_html__( 'Next', 'progress-planner' ),
+					'startOnboarding' => \esc_html__( 'Start onboarding', 'progress-planner' ),
 				],
 			]
 		);
+	}
+
+	/**
+	 * Get saved progress from user meta.
+	 *
+	 * @return array|null
+	 */
+	protected function get_saved_progress() {
+		if ( ! \get_current_user_id() ) {
+			return null;
+		}
+
+		$tour_data = \get_user_meta( \get_current_user_id(), '_prpl_onboard_progress', true );
+		if ( ! $tour_data ) {
+			return null;
+		}
+
+		$decoded = \json_decode( $tour_data, true );
+		if ( ! $decoded || ! \is_array( $decoded ) ) {
+			return null;
+		}
+
+		return $decoded;
 	}
 
 	/**
@@ -303,6 +334,11 @@ class Onboard_Wizard {
 			$form_values = \json_decode( $form_values, true );
 		}
 
+		// Safety check: Ensure form_values is an array after decoding.
+		if ( ! \is_array( $form_values ) ) {
+			$form_values = [];
+		}
+
 		// Get the task.
 		$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 		if ( ! $task ) {
@@ -315,7 +351,7 @@ class Onboard_Wizard {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Provider not found.', 'progress-planner' ) ] );
 		}
 
-		// WIP: Complete the task.
+		// Complete the task.
 		$task_completed = $provider->complete_task( $form_values, $task_id );
 
 		// Note: Marking task as completed will set it it to pending, so user will get celebration. Do we want that?
@@ -394,16 +430,19 @@ class Onboard_Wizard {
 			'core-siteicon',
 		];
 
+		$tasks = [];
+
 		foreach ( $onboarding_tasks as $task_id ) {
 			$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
-			// If there is no 'blog description' task, create it.
+			// If there is no task, create it.
 			if ( ! $task ) {
 				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id );
 
 				if ( $task_provider ) {
 					$task_data = $task_provider->get_task_details();
 
+					// Task will not be inserted if it already exists.
 					\progress_planner()->get_suggested_tasks_db()->add( $task_data );
 
 					// Now get the task.
@@ -411,26 +450,47 @@ class Onboard_Wizard {
 				}
 			}
 
+			// Safety check: Skip if task could not be created or retrieved.
+			if ( ! $task || ! isset( $task[0] ) || ! \is_object( $task[0] ) ) {
+				\error_log( 'Onboarding: Could not retrieve or create task: ' . $task_id ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				continue;
+			}
+
 			$task_formatted = [
 				'task_id'     => $task[0]->get_task_id(),
-				'title'       => $task[0]->post_title,
-				'url'         => $task[0]->url,
+				'title'       => $task[0]->post_title ?? '',
+				'url'         => $task[0]->url ?? '',
 				'provider_id' => $task[0]->get_provider_id(),
-				'points'      => $task[0]->points,
+				'points'      => $task[0]->points ?? 0,
 			];
 
-			// WIP, add task specific data.
+			// Add task specific data.
 			if ( 'core-blogdescription' === $task_id ) {
-				$task_formatted['site_description'] = \get_bloginfo( 'description' );
+				$task_formatted['site_description'] = \get_bloginfo( 'description' ) ?? '';
 			}
 
 			$tasks[ $task_id ] = $task_formatted;
 		}
 
+		// Safety check: Ensure we have at least one task before rendering views.
+		if ( empty( $tasks ) ) {
+			\error_log( 'Onboarding: No tasks available to render onboarding templates.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+			return;
+		}
+
 		\progress_planner()->the_view( 'onboarding/welcome.php' );
-		\progress_planner()->the_view( 'onboarding/first-task.php', [ 'task' => array_shift( $tasks ) ] ); // WIP: We need only 1 task for this step.
+
+		// Get the first task for the first-task step.
+		if ( isset(  $tasks[0] ) && 'core-blogdescription' === $tasks[0]['task_id'] ) {
+			\progress_planner()->the_view( 'onboarding/first-task.php', [ 'task' => \array_shift( $tasks ) ] );
+		}
+
 		\progress_planner()->the_view( 'onboarding/badges.php' );
-		\progress_planner()->the_view( 'onboarding/more-tasks.php', [ 'tasks' => $tasks ] ); // WIP: We need up to 5 tasks for this step.
+
+		// Only render more-tasks view if we have remaining tasks.
+		if ( ! empty( $tasks ) ) {
+			\progress_planner()->the_view( 'onboarding/more-tasks.php', [ 'tasks' => $tasks ] );
+		}
 		?>
 		<script>
 			// Initialize tour when DOM is ready

@@ -18,6 +18,9 @@ class ProgressPlannerOnboardWizard {
 			cleanup: null,
 		};
 
+		// Restore saved progress if available
+		this.restoreSavedProgress();
+
 		this.setupStateProxy();
 
 		// Set DOM related properties FIRST.
@@ -34,6 +37,51 @@ class ProgressPlannerOnboardWizard {
 
 		// Setup event listeners after DOM is ready
 		this.setupEventListeners();
+	}
+
+	/**
+	 * Restore saved progress from server
+	 */
+	restoreSavedProgress() {
+		if (
+			! this.config.savedProgress ||
+			typeof this.config.savedProgress !== 'object'
+		) {
+			return;
+		}
+
+		const savedState = this.config.savedProgress;
+
+		// Restore currentStep if valid
+		if (
+			typeof savedState.currentStep === 'number' &&
+			savedState.currentStep >= 0
+		) {
+			this.state.currentStep = savedState.currentStep;
+			console.log(
+				'Restored onboarding progress to step:',
+				this.state.currentStep
+			);
+		}
+
+		// Restore data object if present
+		if ( savedState.data && typeof savedState.data === 'object' ) {
+			// Merge saved data with default state
+			this.state.data = {
+				...this.state.data,
+				...savedState.data,
+			};
+
+			// Ensure moreTasksCompleted is an object
+			if (
+				! this.state.data.moreTasksCompleted ||
+				typeof this.state.data.moreTasksCompleted !== 'object'
+			) {
+				this.state.data.moreTasksCompleted = {};
+			}
+
+			console.log( 'Restored onboarding data:', this.state.data );
+		}
 	}
 
 	/**
