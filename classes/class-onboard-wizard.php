@@ -42,7 +42,7 @@ class Onboard_Wizard {
 		\add_action( 'admin_notices', [ $this, 'maybe_show_user_notification' ] );
 
 		// Maybe clean up the user meta.
-		\add_action( 'current_screen', [ $this, 'maybe_clean_up_user_meta' ] );
+		// \add_action( 'current_screen', [ $this, 'maybe_clean_up_user_meta' ] ); -- TODO: When to cleanup the user meta?
 	}
 
 	/**
@@ -88,9 +88,6 @@ class Onboard_Wizard {
 	 * @return void
 	 */
 	public function maybe_clean_up_user_meta() {
-		// TODO: When to cleanup the user meta?
-		return;
-
 		if ( ! \get_current_user_id() ) {
 			return;
 		}
@@ -451,7 +448,7 @@ class Onboard_Wizard {
 			}
 
 			// Safety check: Skip if task could not be created or retrieved.
-			if ( ! $task || ! isset( $task[0] ) || ! \is_object( $task[0] ) ) {
+			if ( empty( $task ) ) {
 				\error_log( 'Onboarding: Could not retrieve or create task: ' . $task_id ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				continue;
 			}
@@ -466,7 +463,7 @@ class Onboard_Wizard {
 
 			// Add task specific data.
 			if ( 'core-blogdescription' === $task_id ) {
-				$task_formatted['site_description'] = \get_bloginfo( 'description' ) ?? '';
+				$task_formatted['site_description'] = \get_bloginfo( 'description' );
 			}
 
 			$tasks[ $task_id ] = $task_formatted;
@@ -481,8 +478,8 @@ class Onboard_Wizard {
 		\progress_planner()->the_view( 'onboarding/welcome.php' );
 
 		// Get the first task for the first-task step.
-		if ( isset(  $tasks[0] ) && 'core-blogdescription' === $tasks[0]['task_id'] ) {
-			\progress_planner()->the_view( 'onboarding/first-task.php', [ 'task' => \array_shift( $tasks ) ] );
+		if ( isset( $tasks['core-blogdescription'] ) ) {
+			\progress_planner()->the_view( 'onboarding/first-task.php', [ 'task' => \array_shift( $tasks ) ] ); // If it is set it will be the first one.
 		}
 
 		\progress_planner()->the_view( 'onboarding/badges.php' );
