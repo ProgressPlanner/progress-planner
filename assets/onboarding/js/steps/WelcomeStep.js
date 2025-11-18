@@ -2,7 +2,7 @@
  * Welcome step - First step in the onboarding flow
  * Displays a welcome message, logo, and privacy policy checkbox
  */
-/* global LicenseGenerator */
+/* global LicenseGenerator, ProgressPlannerOnboardData */
 
 class WelcomeStep extends OnboardingStep {
 	constructor() {
@@ -138,7 +138,9 @@ class WelcomeStep extends OnboardingStep {
 	 * Clear error message
 	 */
 	clearErrorMessage() {
-		const existingError = this.wizard.popover.querySelector( '.prpl-error-message' );
+		const existingError = this.wizard.popover.querySelector(
+			'.prpl-error-message'
+		);
 		if ( existingError ) {
 			existingError.remove();
 		}
@@ -165,6 +167,8 @@ class WelcomeStep extends OnboardingStep {
 		return LicenseGenerator.generateLicense( {
 			name: '',
 			email: '',
+			site: ProgressPlannerOnboardData.site,
+			timezone_offset: ProgressPlannerOnboardData.timezone_offset,
 		} );
 	}
 }

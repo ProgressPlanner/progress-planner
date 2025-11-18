@@ -215,6 +215,8 @@ class Onboard_Wizard {
 				'popoverId'            => 'prpl-popover-onboarding',
 				'onboardAPIUrl'        => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
 				'onboardNonceURL'      => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
+				'site'                 => \esc_attr( \set_url_scheme( \site_url() ) ),
+				'timezone_offset'      => (float) ( \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600 ),
 				'l10n'                 => [
 					'next' => \esc_html__( 'Next', 'progress-planner' ),
 				],
@@ -240,11 +242,11 @@ class Onboard_Wizard {
 	public function add_admin_toolbar_item_callback( $admin_bar ) {
 		$admin_bar->add_node(
 			[
-				'id'    => 'progress-planner-tour',
-				'title' => 'Progress Planner Tour',
+				'id'    => 'progress-planner-onboarding',
+				'title' => 'Progress Planner Onboarding',
 				'href'  => '#',
 				'meta'  => [
-					'onclick' => 'window.prplOnboardWizard.startTour(); return false;',
+					'onclick' => 'window.prplOnboardWizard.startOnboarding(); return false;',
 				],
 			]
 		);

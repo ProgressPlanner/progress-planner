@@ -189,9 +189,9 @@ class ProgressPlannerOnboardWizard {
 	}
 
 	/**
-	 * Start the tour
+	 * Start the onboarding
 	 */
-	startTour() {
+	startOnboarding() {
 		if ( this.popover ) {
 			this.popover.showPopover();
 			this.updateStepNavigation();
@@ -307,11 +307,14 @@ class ProgressPlannerOnboardWizard {
 			}
 
 			if ( this.closeBtn ) {
-				this.closeBtn.addEventListener( 'click', (e) => {
+				this.closeBtn.addEventListener( 'click', ( e ) => {
 					console.log( 'Close button clicked!' );
 
 					// Check if privacy is accepted on welcome step
-					if ( this.state.currentStep === 0 && ! this.state.data.privacyAccepted ) {
+					if (
+						this.state.currentStep === 0 &&
+						! this.state.data.privacyAccepted
+					) {
 						e.preventDefault();
 						this.showQuitConfirmation();
 						return;
