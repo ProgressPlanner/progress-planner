@@ -175,9 +175,7 @@ class Base {
 		$this->get_admin__enqueue()->init();
 
 		// TODO: Decide when this needs to be initialized.
-		if ( ! $this->is_privacy_policy_accepted() ) {
-			$this->get_onboard_wizard();
-		}
+		$this->get_onboard_wizard();
 	}
 
 	/**
