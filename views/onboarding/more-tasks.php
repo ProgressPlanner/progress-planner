@@ -34,12 +34,12 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				<ul class="prpl-task-list">
 					<?php foreach ( $tasks as $prpl_task ) : ?>
 					<li class="prpl-complete-task-item">
-						<span class="task-title" style="flex-shrink: 0;">
+						<!-- <span class="task-title" style="flex-shrink: 0;">
 							<?php echo esc_html( $prpl_task['title'] ); ?>
-						</span>
+						</span> -->
 
 						<div class="prpl-task-item" data-popover="task" data-task-id="<?php echo esc_attr( $prpl_task['task_id'] ); ?>">
-							<button class="prpl-complete-task-btn" prpl-open-task-popover><?php \esc_html_e( 'Start this recommendation', 'progress-planner' ); ?></button>
+							<button class="prpl-complete-task-btn" prpl-open-task-popover><?php echo esc_html( $prpl_task['title'] ); ?></button>
 
 							<template style="display: none;">
 								<?php \progress_planner()->the_view( 'onboarding/tasks/' . $prpl_task['task_id'] . '.php', [ 'task' => $prpl_task ] ); ?>

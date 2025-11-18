@@ -1,17 +1,3 @@
-@font-face {
-	font-family: Gilroy;
-	src: url( '../fonts/Gilroy-Regular.woff2' ) format('woff2');
-	font-weight: 400;
-	font-style: normal;
-}
-
-@font-face {
-	font-family: Gilroy-Bold;
-	src: url('../fonts/Gilroy-Bold.woff2') format('woff2');
-	font-weight: 700;
-	font-style: normal;
-}
-
 .prpl-popover-onboarding {
 
 	& * {
@@ -20,7 +6,7 @@
 
 	font-family: Gilroy, sans-serif;
 
-	padding: 24px 24px 14px 24px;
+	padding: 0;
 	box-sizing: border-box;
 
 	background: #fff;
@@ -37,19 +23,108 @@
 		background: rgba(0, 0, 0, 0.5);
 	}
 
-	h1, h2, h3, h4, h5, h6 {
-		font-family: Gilroy-Bold, sans-serif;
+	p {
+		font-size: 1rem;
 	}
 
 	.prpl-popover-close {
 		position: absolute;
-		top: 0;
-		right: 0;
+		top: 10px;
+		right: 10px;
 		padding: 0.5em;
 		cursor: pointer;
 		background: none;
 		border: none;
 		color: #4b5563;
+		z-index: 10;
+	}
+
+	/* Main layout container */
+	.prpl-onboarding-layout {
+		display: flex;
+		min-height: 500px;
+	}
+
+	/* Left column: Step navigation */
+	.prpl-onboarding-navigation {
+		width: 340px;
+		background: #f3f4f6;
+		border-right: none;
+		padding: 32px 24px 24px 24px;
+		flex-shrink: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+	}
+
+	.prpl-step-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.prpl-step-item {
+		display: flex;
+		align-items: flex-start;
+		gap: 14px;
+		padding: 10px 0;
+		margin-bottom: 4px;
+		cursor: default;
+	}
+
+	.prpl-step-icon {
+		width: 36px;
+		height: 36px;
+		border-radius: 50%;
+		background: #d1d5db;
+		color: #9ca3af;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		font-weight: 600;
+		font-size: 15px;
+		flex-shrink: 0;
+		margin-top: 2px;
+	}
+
+	.prpl-step-item.active .prpl-step-icon {
+		background: #4338ca;
+		color: #fff;
+	}
+
+	.prpl-step-item.completed .prpl-step-icon {
+		background: #6b7280;
+		color: #fff;
+		font-size: 18px;
+	}
+
+	.prpl-step-label {
+		font-size: 15px;
+		color: #9ca3af;
+		line-height: 1.5;
+		padding-top: 6px;
+	}
+
+	.prpl-step-item.active .prpl-step-label {
+		color: #111827;
+		font-weight: 700;
+	}
+
+	.prpl-step-item.completed .prpl-step-label {
+		color: #6b7280;
+	}
+
+	/* Right section: Content area */
+	.prpl-onboarding-content {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		padding: 24px;
+	}
+
+	.tour-content-wrapper {
+		flex: 1;
+		overflow-y: auto;
 	}
 
 	.tour-header {

@@ -175,8 +175,32 @@ class Onboard_Wizard {
 		// Enqueue onboarding.css.
 		\wp_enqueue_style( 'prpl-onboarding', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/css/onboarding.css', [], \progress_planner()->get_plugin_version() );
 
-		// Enqueue onboarding.js.
-		\wp_enqueue_script( 'prpl-popover-onboarding', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/onboarding.js', [], \progress_planner()->get_plugin_version(), true );
+		// Enqueue base step class.
+		\wp_enqueue_script( 'prpl-onboarding-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/OnboardingStep.js', [], \progress_planner()->get_plugin_version(), true );
+
+		// Enqueue PopoverTask (used by MoreTasksStep).
+		\wp_enqueue_script( 'prpl-popover-task', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/PopoverTask.js', [], \progress_planner()->get_plugin_version(), true );
+
+		// Enqueue step components.
+		\wp_enqueue_script( 'prpl-onboarding-welcome-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/WelcomeStep.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
+		\wp_enqueue_script( 'prpl-onboarding-first-task-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/FirstTaskStep.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
+		\wp_enqueue_script( 'prpl-onboarding-badges-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/BadgesStep.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
+		\wp_enqueue_script( 'prpl-onboarding-more-tasks-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/MoreTasksStep.js', [ 'prpl-onboarding-step', 'prpl-popover-task' ], \progress_planner()->get_plugin_version(), true );
+
+		// Enqueue main onboarding.js (depends on all step components).
+		\wp_enqueue_script(
+			'prpl-popover-onboarding',
+			\constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/onboarding.js',
+			[
+				'prpl-onboarding-step',
+				'prpl-onboarding-welcome-step',
+				'prpl-onboarding-first-task-step',
+				'prpl-onboarding-badges-step',
+				'prpl-onboarding-more-tasks-step',
+			],
+			\progress_planner()->get_plugin_version(),
+			true
+		);
 
 		\wp_localize_script(
 			'prpl-popover-onboarding',
@@ -186,6 +210,9 @@ class Onboard_Wizard {
 				'nonceProgressPlanner' => \esc_js( \wp_create_nonce( 'progress_planner' ) ),
 				'nonceWPAPI'           => \esc_js( \wp_create_nonce( 'wp_rest' ) ),
 				'popoverId'            => 'prpl-popover-onboarding',
+				'l10n'                 => [
+					'next' => \esc_html__( 'Next', 'progress-planner' ),
+				],
 			]
 		);
 	}
@@ -304,14 +331,40 @@ class Onboard_Wizard {
 	public function add_popover() {
 		?>
 		<div id="prpl-popover-onboarding" class="prpl-popover prpl-popover-onboarding" data-prpl-step="0" popover="manual">
+			<div class="prpl-onboarding-layout">
+				<!-- Left column: Step navigation -->
+				<div class="prpl-onboarding-navigation">
+					<ol class="prpl-step-list">
+						<li class="prpl-step-item" data-step="0">
+							<span class="prpl-step-icon">1</span>
+							<span class="prpl-step-label"><?php esc_html_e( 'Welcome to Progress Planner', 'progress-planner' ); ?></span>
+						</li>
+						<li class="prpl-step-item" data-step="1">
+							<span class="prpl-step-icon">2</span>
+							<span class="prpl-step-label"><?php esc_html_e( 'Complete your first task!', 'progress-planner' ); ?></span>
+						</li>
+						<li class="prpl-step-item" data-step="2">
+							<span class="prpl-step-icon">3</span>
+							<span class="prpl-step-label"><?php esc_html_e( 'Our badges are waiting for you', 'progress-planner' ); ?></span>
+						</li>
+						<li class="prpl-step-item" data-step="3">
+							<span class="prpl-step-icon">4</span>
+							<span class="prpl-step-label"><?php esc_html_e( 'Complete more tasks', 'progress-planner' ); ?></span>
+						</li>
+					</ol>
+				</div>
 
-			<div class="tour-content-wrapper">
-				<!-- Tour content will be rendered here -->
-			</div>
+				<!-- Middle and right columns: Step content (rendered by step components) -->
+				<div class="prpl-onboarding-content">
+					<div class="tour-content-wrapper">
+						<!-- Tour content will be rendered here -->
+					</div>
 
-			<div class="tour-footer">
-				<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php esc_html_e( 'Next', 'progress-planner' ); ?></button>
-				<button id="prpl-dashboard-btn" class="prpl-btn prpl-btn-primary" data-redirect-to="<?php echo \esc_url( admin_url( 'admin.php?page=progress-planner' ) ); ?>"><?php esc_html_e( 'Take me to the Recommendations dashboard', 'progress-planner' ); ?></button>
+					<div class="tour-footer">
+						<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php esc_html_e( 'Next', 'progress-planner' ); ?></button>
+						<button id="prpl-dashboard-btn" class="prpl-btn prpl-btn-primary" data-redirect-to="<?php echo \esc_url( admin_url( 'admin.php?page=progress-planner' ) ); ?>"><?php esc_html_e( 'Take me to the Recommendations dashboard', 'progress-planner' ); ?></button>
+					</div>
+				</div>
 			</div>
 
 			<button id="prpl-tour-close-btn" class="prpl-popover-close" popovertarget="prpl-popover-onboarding" popovertargetaction="hide">
