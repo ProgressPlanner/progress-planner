@@ -478,9 +478,7 @@ class Onboard_Wizard {
 		\progress_planner()->the_view( 'onboarding/welcome.php' );
 
 		// Get the first task for the first-task step.
-		if ( isset( $tasks['core-blogdescription'] ) ) {
-			\progress_planner()->the_view( 'onboarding/first-task.php', [ 'task' => \array_shift( $tasks ) ] ); // If it is set it will be the first one.
-		}
+		\progress_planner()->the_view( 'onboarding/first-task.php', [ 'task' => \array_shift( $tasks ) ] );
 
 		\progress_planner()->the_view( 'onboarding/badges.php' );
 

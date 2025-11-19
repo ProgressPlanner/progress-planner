@@ -262,6 +262,15 @@ class PopoverTask {
 			} )
 			.then( ( response ) => {
 				statusDiv.textContent = `${ file.name } uploaded.`;
+
+				// Update the file preview.
+				const previewDiv =
+					this.popover.querySelector( '.prpl-file-preview' );
+				if ( previewDiv ) {
+					previewDiv.innerHTML = `<img src="${ response.source_url }" alt="${ file.name }" />`;
+					previewDiv.style.display = 'block';
+				}
+				previewDiv.style.display = 'block';
 				return response;
 			} )
 			.catch( ( error ) => {

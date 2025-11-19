@@ -17,7 +17,7 @@ class FirstTaskStep extends OnboardingStep {
 	 * @return {Function} Cleanup function
 	 */
 	onMount( state ) {
-		const btn = this.popover.querySelector( '#first-task-btn' );
+		const btn = this.popover.querySelector( '.prpl-complete-task-btn' );
 		if ( ! btn ) {
 			return () => {};
 		}
