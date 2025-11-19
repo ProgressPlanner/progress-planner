@@ -71,14 +71,6 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the task-action text.
-	 *
-	 * @return string
-	 */
-	protected function get_task_action_text() {
-		return \esc_html__( 'Check email DNS records', 'progress-planner' );
-	}
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
@@ -95,23 +87,81 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 	}
 
 	/**
-	 * Get the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'Check the email DNS records to ensure they are configured correctly.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
+	 * Print popover form contents.
+	 * Required by Tasks_Interactive, but we override add_popover() completely.
 	 *
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		$this->print_submit_button( \__( 'Check email DNS records', 'progress-planner' ) );
+		// Not used - we use a custom popover view.
+	}
+
+	/**
+	 * The popover content, WIP until get_file bug is fixed.
+	 *
+	 * @return void
+	 */
+	public function the_popover_content() {
+		\progress_planner()->the_view(
+			'popovers/' . static::POPOVER_ID . '.php',
+			[
+				'prpl_popover_id'  => static::POPOVER_ID,
+				'prpl_provider_id' => $this->get_provider_id(),
+			]
+		);
+	}
+
+	/**
+	 * Add the popover for email DNS check task.
+	 * Overrides parent to use custom popover view with state management.
+	 *
+	 * @return void
+	 */
+	public function add_popover() {
+		// Don't add the popover if the task is not published.
+		if ( ! $this->is_task_published() ) {
+			return;
+		}
+		?>
+		<div id="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>" class="prpl-popover prpl-popover-email-dns" popover>
+			<?php $this->the_popover_content(); ?>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Enqueue scripts for email DNS check.
+	 *
+	 * @param string $hook The current admin page hook.
+	 * @return void
+	 */
+	public function enqueue_scripts( $hook ) {
+		// Don't enqueue the script if the user is not at least an editor.
+		if ( ! \current_user_can( 'edit_others_posts' ) ) {
+			return;
+		}
+
+		// Enqueue the script only on Progress Planner and WP dashboard pages.
+		if ( 'toplevel_page_progress-planner' !== $hook && 'index.php' !== $hook ) {
+			return;
+		}
+
+		// Don't enqueue the script if the task is not published.
+		if ( ! $this->is_task_published() ) {
+			return;
+		}
+
+		// Enqueue the email DNS check script.
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'progress-planner/recommendations/check-email-dns-records',
+			[
+				'file'         => 'recommendations/check-email-dns-records.js',
+				'dependencies' => [ 'progress-planner/suggested-task', 'progress-planner/ajax-request' ],
+			]
+		);
+
+		// Enqueue the email DNS check CSS.
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/check-email-dns-records' );
 	}
 
 	/**
@@ -214,14 +264,60 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 		// TODO: If the report is still being processed, we need to let the user know and save the email subject for later.
 		// Most likely we will fire another AJAX request (for example up to 5 times) to check if the report is ready.
 
-		// TODO: Handle different statuses, ie SPF set correctly, DKIM is not set, etc.
-		if ( $dns_records_status && $spam_score ) {
+		// Build the response with DNS records status information.
+		$response_html = $this->format_dns_response( $dns_records_status, $spam_score );
 
-			// We're not checking for the return value of the update_option calls, because it will return false if the value is the same (for example if gmt_offset is already set to '').
-			\wp_send_json_success( [ 'message' => \esc_html__( 'Email DNS records checked successfully.', 'progress-planner' ) ] );
+		\wp_send_json_success(
+			[
+				'message'            => \esc_html__( 'Email DNS records checked successfully.', 'progress-planner' ),
+				'dns_records_status' => $dns_records_status,
+				'spam_score'         => $spam_score,
+				'response_html'      => $response_html,
+			]
+		);
+	}
+
+	/**
+	 * Format the DNS check response for display.
+	 *
+	 * @param array|bool $dns_records_status The DNS records status.
+	 * @param float|bool $spam_score The spam score.
+	 * @return string Formatted HTML response.
+	 */
+	protected function format_dns_response( $dns_records_status, $spam_score ) {
+		$html = '<div class="prpl-dns-results">';
+
+		// Format spam score.
+		if ( false !== $spam_score ) {
+			$score_class = $spam_score <= 2 ? 'good' : ( $spam_score <= 5 ? 'warning' : 'bad' );
+			$html       .= sprintf(
+				'<p class="prpl-spam-score prpl-score-%s"><strong>%s</strong> %s</p>',
+				\esc_attr( $score_class ),
+				\esc_html__( 'Spam Score:', 'progress-planner' ),
+				\esc_html( $spam_score )
+			);
 		}
 
-		\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to check email DNS records.', 'progress-planner' ) ] );
+		// Format DNS records status.
+		if ( \is_array( $dns_records_status ) ) {
+			$html .= '<ul class="prpl-dns-records-list">';
+			foreach ( $dns_records_status as $record_type => $status ) {
+				$status_class = $status ? 'pass' : 'fail';
+				$status_icon  = $status ? '&#10003;' : '&#10007;';
+				$html        .= sprintf(
+					'<li class="prpl-dns-record prpl-status-%s"><span class="prpl-status-icon">%s</span> <strong>%s:</strong> %s</li>',
+					\esc_attr( $status_class ),
+					$status_icon,
+					\esc_html( strtoupper( $record_type ) ),
+					$status ? \esc_html__( 'Configured', 'progress-planner' ) : \esc_html__( 'Not configured', 'progress-planner' )
+				);
+			}
+			$html .= '</ul>';
+		}
+
+		$html .= '</div>';
+
+		return $html;
 	}
 
 	/**
