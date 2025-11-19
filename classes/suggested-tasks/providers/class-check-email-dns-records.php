@@ -231,7 +231,7 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 		$email_address        = $pre_request_response['email_address'] ?? '';
 
 		// Send the email.
-		$email_sent = wp_mail( $email_address, $subject, '' );
+		$email_sent = \wp_mail( $email_address, $subject, '' );
 
 		// TODO: If wp_mail returned false we need to tell the server to not check for the email.
 		if ( ! $email_sent ) {
@@ -258,21 +258,21 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 		}
 
 		$dns_check_response = \json_decode( wp_remote_retrieve_body( $dns_check_request ), true );
-		$dns_records_status = $dns_check_response['dns_records_status'] ?? false;
-		$spam_score         = $dns_check_response['spam_score'] ?? false; // Lower is better.
+
+		if ( ! isset( $dns_check_response['results'] ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to check email DNS records.', 'progress-planner' ) ] );
+		}
 
 		// TODO: If the report is still being processed, we need to let the user know and save the email subject for later.
 		// Most likely we will fire another AJAX request (for example up to 5 times) to check if the report is ready.
 
 		// Build the response with DNS records status information.
-		$response_html = $this->format_dns_response( $dns_records_status, $spam_score );
+		$response_html = $this->format_dns_response( $dns_check_response['results'] );
 
 		\wp_send_json_success(
 			[
-				'message'            => \esc_html__( 'Email DNS records checked successfully.', 'progress-planner' ),
-				'dns_records_status' => $dns_records_status,
-				'spam_score'         => $spam_score,
-				'response_html'      => $response_html,
+				'message'       => \esc_html__( 'Email DNS records checked successfully.', 'progress-planner' ),
+				'response_html' => $response_html,
 			]
 		);
 	}
@@ -280,28 +280,16 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 	/**
 	 * Format the DNS check response for display.
 	 *
-	 * @param array|bool $dns_records_status The DNS records status.
-	 * @param float|bool $spam_score The spam score.
+	 * @param array|bool $check_results The DNS records status.
 	 * @return string Formatted HTML response.
 	 */
-	protected function format_dns_response( $dns_records_status, $spam_score ) {
+	protected function format_dns_response( $check_results ) {
 		$html = '<div class="prpl-dns-results">';
 
-		// Format spam score.
-		if ( false !== $spam_score ) {
-			$score_class = $spam_score <= 2 ? 'good' : ( $spam_score <= 5 ? 'warning' : 'bad' );
-			$html       .= sprintf(
-				'<p class="prpl-spam-score prpl-score-%s"><strong>%s</strong> %s</p>',
-				\esc_attr( $score_class ),
-				\esc_html__( 'Spam Score:', 'progress-planner' ),
-				\esc_html( $spam_score )
-			);
-		}
-
 		// Format DNS records status.
-		if ( \is_array( $dns_records_status ) ) {
+		if ( \is_array( $check_results ) ) {
 			$html .= '<ul class="prpl-dns-records-list">';
-			foreach ( $dns_records_status as $record_type => $status ) {
+			foreach ( $check_results as $record_type => $status ) {
 				$status_class = $status ? 'pass' : 'fail';
 				$status_icon  = $status ? '&#10003;' : '&#10007;';
 				$html        .= sprintf(
@@ -309,7 +297,7 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 					\esc_attr( $status_class ),
 					$status_icon,
 					\esc_html( strtoupper( $record_type ) ),
-					$status ? \esc_html__( 'Configured', 'progress-planner' ) : \esc_html__( 'Not configured', 'progress-planner' )
+					$status ? \esc_html__( 'Passed', 'progress-planner' ) : \esc_html__( 'Failed', 'progress-planner' )
 				);
 			}
 			$html .= '</ul>';
