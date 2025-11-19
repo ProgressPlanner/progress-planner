@@ -34,31 +34,96 @@
 		const errorEl = popover.querySelector( '.prpl-email-dns-error' );
 		const errorMessageEl = popover.querySelector( '.prpl-error-message' );
 
+		// Define all elements in one place for easy maintenance.
+		const elements = {
+			checkButton,
+			retryButton,
+			completeButton,
+			instructionsEl,
+			loadingEl,
+			resultEl,
+			responseEl,
+			errorEl,
+			errorMessageEl,
+		};
+
+		// State configuration: define visibility for each element in each state.
+		const states = {
+			loading: {
+				checkButton: 'none',
+				retryButton: 'none',
+				completeButton: 'none',
+				instructionsEl: 'none',
+				loadingEl: 'block',
+				resultEl: 'none',
+				errorEl: 'none',
+			},
+			result: {
+				instructionsEl: 'none',
+				loadingEl: 'none',
+				checkButton: 'none',
+				retryButton: 'none',
+				errorEl: 'none',
+				resultEl: 'block',
+				completeButton: 'inline-block',
+			},
+			error: {
+				instructionsEl: 'none',
+				loadingEl: 'none',
+				checkButton: 'none',
+				retryButton: 'inline-block',
+				completeButton: 'none',
+				resultEl: 'none',
+				errorEl: 'block',
+			},
+		};
+
+		/**
+		 * Set the UI state.
+		 *
+		 * @param {string} stateName            - The state name ('loading', 'result', or 'error').
+		 * @param {Object} options              - Additional options for the state.
+		 * @param {string} options.responseHtml - HTML content for responseEl (result state only).
+		 * @param {string} options.message      - Error message for errorMessageEl (error state only).
+		 */
+		const setUIState = ( stateName, options = {} ) => {
+			const state = states[ stateName ];
+			if ( ! state ) {
+				console.warn( `Unknown state: ${ stateName }` );
+				return;
+			}
+
+			// Apply visibility for each element in the state.
+			Object.entries( state ).forEach( ( [ key, display ] ) => {
+				const element = elements[ key ];
+				if ( element ) {
+					element.style.display = display;
+				}
+			} );
+
+			// Handle special cases.
+			if (
+				stateName === 'result' &&
+				options.responseHtml &&
+				elements.responseEl
+			) {
+				elements.responseEl.innerHTML = options.responseHtml;
+			}
+
+			if (
+				stateName === 'error' &&
+				options.message &&
+				elements.errorMessageEl
+			) {
+				elements.errorMessageEl.textContent = options.message;
+			}
+		};
+
 		/**
 		 * Show loading state.
 		 */
 		const showLoading = () => {
-			if ( checkButton ) {
-				checkButton.style.display = 'none';
-			}
-			if ( retryButton ) {
-				retryButton.style.display = 'none';
-			}
-			if ( completeButton ) {
-				completeButton.style.display = 'none';
-			}
-			if ( instructionsEl ) {
-				instructionsEl.style.display = 'none';
-			}
-			if ( loadingEl ) {
-				loadingEl.style.display = 'block';
-			}
-			if ( resultEl ) {
-				resultEl.style.display = 'none';
-			}
-			if ( errorEl ) {
-				errorEl.style.display = 'none';
-			}
+			setUIState( 'loading' );
 		};
 
 		/**
@@ -67,31 +132,7 @@
 		 * @param {string} responseHtml - The formatted HTML response.
 		 */
 		const showResult = ( responseHtml ) => {
-			if ( instructionsEl ) {
-				instructionsEl.style.display = 'none';
-			}
-			if ( loadingEl ) {
-				loadingEl.style.display = 'none';
-			}
-			if ( checkButton ) {
-				checkButton.style.display = 'none';
-			}
-			if ( retryButton ) {
-				retryButton.style.display = 'none';
-			}
-			if ( errorEl ) {
-				errorEl.style.display = 'none';
-			}
-			if ( resultEl ) {
-				resultEl.style.display = 'block';
-			}
-			if ( completeButton ) {
-				completeButton.style.display = 'inline-block';
-			}
-
-			if ( responseEl ) {
-				responseEl.innerHTML = responseHtml;
-			}
+			setUIState( 'result', { responseHtml } );
 		};
 
 		/**
@@ -100,30 +141,7 @@
 		 * @param {string} message - The error message.
 		 */
 		const showError = ( message ) => {
-			if ( instructionsEl ) {
-				instructionsEl.style.display = 'none';
-			}
-			if ( loadingEl ) {
-				loadingEl.style.display = 'none';
-			}
-			if ( checkButton ) {
-				checkButton.style.display = 'none';
-			}
-			if ( retryButton ) {
-				retryButton.style.display = 'inline-block';
-			}
-			if ( completeButton ) {
-				completeButton.style.display = 'none';
-			}
-			if ( resultEl ) {
-				resultEl.style.display = 'none';
-			}
-			if ( errorEl ) {
-				errorEl.style.display = 'block';
-			}
-			if ( errorMessageEl ) {
-				errorMessageEl.textContent = message;
-			}
+			setUIState( 'error', { message } );
 		};
 
 		/**
