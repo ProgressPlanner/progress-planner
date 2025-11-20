@@ -62,27 +62,31 @@
 	}
 
 	.prpl-step-item {
+		margin-top: 10px;
 		display: flex;
 		align-items: flex-start;
 		gap: 14px;
-		padding: 10px 0;
+		padding: 0;
 		margin-bottom: 4px;
 		cursor: default;
+
+		&:first-child {
+			margin-top: 0;
+		}
 	}
 
 	.prpl-step-icon {
-		width: 36px;
-		height: 36px;
+		width: 20px;
+		height: 20px;
 		border-radius: 50%;
-		background: #d1d5db;
+		border: 1px solid #d1d5db;
 		color: #9ca3af;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		font-weight: 600;
-		font-size: 15px;
 		flex-shrink: 0;
 		margin-top: 2px;
+		font-size: 14px;
 	}
 
 	.prpl-step-item.active .prpl-step-icon {
@@ -93,14 +97,12 @@
 	.prpl-step-item.completed .prpl-step-icon {
 		background: #6b7280;
 		color: #fff;
-		font-size: 18px;
 	}
 
 	.prpl-step-label {
 		font-size: 15px;
 		color: #9ca3af;
 		line-height: 1.5;
-		padding-top: 6px;
 	}
 
 	.prpl-step-item.active .prpl-step-label {

@@ -186,6 +186,7 @@ class Onboard_Wizard {
 
 		// Enqueue step components.
 		\wp_enqueue_script( 'prpl-onboarding-welcome-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/WelcomeStep.js', [ 'prpl-onboarding-step', 'prpl-license-generator' ], \progress_planner()->get_plugin_version(), true );
+		\wp_enqueue_script( 'prpl-onboarding-whats-next-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/WhatsNextStep.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
 		\wp_enqueue_script( 'prpl-onboarding-first-task-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/FirstTaskStep.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
 		\wp_enqueue_script( 'prpl-onboarding-badges-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/BadgesStep.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
 		\wp_enqueue_script( 'prpl-onboarding-more-tasks-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/MoreTasksStep.js', [ 'prpl-onboarding-step', 'prpl-popover-task' ], \progress_planner()->get_plugin_version(), true );
@@ -381,14 +382,18 @@ class Onboard_Wizard {
 						</li>
 						<li class="prpl-step-item" data-step="1">
 							<span class="prpl-step-icon">2</span>
-							<span class="prpl-step-label"><?php esc_html_e( 'Complete your first task!', 'progress-planner' ); ?></span>
+							<span class="prpl-step-label"><?php esc_html_e( 'What\'s next?', 'progress-planner' ); ?></span>
 						</li>
-						<li class="prpl-step-item" data-step="2">
+						<li class="prpl-step-item" data-step="1">
 							<span class="prpl-step-icon">3</span>
-							<span class="prpl-step-label"><?php esc_html_e( 'Our badges are waiting for you', 'progress-planner' ); ?></span>
+							<span class="prpl-step-label"><?php esc_html_e( 'Complete your first task!', 'progress-planner' ); ?></span>
 						</li>
 						<li class="prpl-step-item" data-step="3">
 							<span class="prpl-step-icon">4</span>
+							<span class="prpl-step-label"><?php esc_html_e( 'Our badges are waiting for you', 'progress-planner' ); ?></span>
+						</li>
+						<li class="prpl-step-item" data-step="4">
+							<span class="prpl-step-icon">5</span>
 							<span class="prpl-step-label"><?php esc_html_e( 'Complete more tasks', 'progress-planner' ); ?></span>
 						</li>
 					</ol>
@@ -475,7 +480,10 @@ class Onboard_Wizard {
 			return;
 		}
 
+		// Define the steps and their order.
 		\progress_planner()->the_view( 'onboarding/welcome.php' );
+
+		\progress_planner()->the_view( 'onboarding/whats-next.php' );
 
 		// Get the first task for the first-task step.
 		\progress_planner()->the_view( 'onboarding/first-task.php', [ 'task' => \array_shift( $tasks ) ] );
