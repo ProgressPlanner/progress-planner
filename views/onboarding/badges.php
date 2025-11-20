@@ -12,7 +12,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 ?>
 
 <!-- Tour step badges -->
-<script type="text/template" id="tour-step-badges">
+<script type="text/template" id="onboarding-step-badges">
 	<div class="tour-header">
 		<h2 class="tour-title">
 			<?php \esc_html_e( 'Our badges are waiting for you', 'progress-planner' ); ?>

@@ -6,8 +6,7 @@
 class PrplWhatsNextStep extends OnboardingStep {
 	constructor() {
 		super( {
-			id: 'whats-next',
-			templateId: 'tour-step-whats-next',
+			templateId: 'onboarding-step-whats-next',
 		} );
 	}
 

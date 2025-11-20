@@ -21,6 +21,7 @@ class ProgressPlannerOnboardWizard {
 		// Restore saved progress if available
 		this.restoreSavedProgress();
 
+		// Make state work with reactive updates.
 		this.setupStateProxy();
 
 		// Set DOM related properties FIRST.
@@ -28,8 +29,10 @@ class ProgressPlannerOnboardWizard {
 		this.contentWrapper = this.popover.querySelector(
 			'.tour-content-wrapper'
 		);
+		this.footer = this.popover.querySelector( '.tour-footer' );
+
+		// Popover buttons.
 		this.nextBtn = this.popover.querySelector( '.prpl-tour-next' );
-		this.dashboardBtn = this.popover.querySelector( '#prpl-dashboard-btn' );
 		this.closeBtn = this.popover.querySelector( '#prpl-tour-close-btn' );
 
 		// Initialize tour steps AFTER popover is set
@@ -121,8 +124,7 @@ class ProgressPlannerOnboardWizard {
 		const step = this.tourSteps[ this.state.currentStep ];
 
 		// Render step content
-		this.popover.querySelector( '.tour-content-wrapper' ).innerHTML =
-			step.render();
+		this.contentWrapper.innerHTML = step.render();
 
 		// Cleanup previous step
 		if ( this.state.cleanup ) {
@@ -136,7 +138,6 @@ class ProgressPlannerOnboardWizard {
 		// Update step indicator
 		this.popover.dataset.prplStep = this.state.currentStep;
 		this.updateStepNavigation();
-		this.updateButtonStates();
 		this.updateNextButton();
 	}
 
@@ -170,21 +171,12 @@ class ProgressPlannerOnboardWizard {
 	}
 
 	/**
-	 * Update button visibility states
-	 */
-	updateButtonStates() {
-		// Always show Next button, hide Dashboard button
-		this.nextBtn.style.display = 'inline-block';
-	}
-
-	/**
 	 * Toggle footer visibility
 	 * @param {boolean} visible - Whether to show the footer
 	 */
 	toggleFooter( visible ) {
-		const footer = this.popover.querySelector( '.tour-footer' );
-		if ( footer ) {
-			footer.style.display = visible ? '' : 'none';
+		if ( this.footer ) {
+			this.footer.style.display = visible ? '' : 'none';
 		}
 	}
 
@@ -233,7 +225,7 @@ class ProgressPlannerOnboardWizard {
 	}
 
 	/**
-	 * Move to previous step
+	 * Move to previous step, currently not used.
 	 */
 	prevStep() {
 		if ( this.state.currentStep > 0 ) {
@@ -315,7 +307,7 @@ class ProgressPlannerOnboardWizard {
 			// Step provides custom button text
 			this.nextBtn.textContent = buttonText;
 		} else if ( isLastStep ) {
-			// On last step, use "Go to Progress Planner" text
+			// On last step, use "Take me to the Recommendations dashboard" text
 			const dashboardText =
 				this.config.l10n && this.config.l10n.dashboard
 					? this.config.l10n.dashboard
@@ -337,16 +329,6 @@ class ProgressPlannerOnboardWizard {
 	 */
 	updateDOM() {
 		this.updateNextButton();
-	}
-
-	/**
-	 * Get popover element
-	 */
-	getPopover() {
-		if ( ! this.popover ) {
-			this.popover = document.getElementById( this.config.popoverId );
-		}
-		return this.popover;
 	}
 
 	/**

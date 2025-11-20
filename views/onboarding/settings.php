@@ -32,7 +32,7 @@ $prpl_page_types = [
 ?>
 
 <!-- Tour step settings -->
-<script type="text/template" id="tour-step-settings">
+<script type="text/template" id="onboarding-step-settings">
 	<div class="tour-header">
 		<h2 class="tour-title">
 			<?php \esc_html_e( 'Settings', 'progress-planner' ); ?>

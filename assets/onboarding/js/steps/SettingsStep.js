@@ -7,8 +7,7 @@
 class PrplSettingsStep extends OnboardingStep {
 	constructor() {
 		super( {
-			id: 'settings',
-			templateId: 'tour-step-settings',
+			templateId: 'onboarding-step-settings',
 		} );
 		this.currentSubStep = 0;
 		this.subSteps = [ 'about', 'contact', 'faq' ];

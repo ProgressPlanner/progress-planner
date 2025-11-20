@@ -5,12 +5,11 @@
 class OnboardingStep {
 	/**
 	 * Constructor
-	 * @param {Object} config - Step configuration
-	 * @param {string} config.id - Unique step identifier
+	 * @param {Object} config            - Step configuration
+	 * @param {string} config.id         - Unique step identifier
 	 * @param {string} config.templateId - ID of the template element containing the step HTML
 	 */
 	constructor( config ) {
-		this.id = config.id;
 		this.templateId = config.templateId;
 		this.wizard = null; // Reference to parent wizard
 		this.popover = null; // Reference to popover element
@@ -84,8 +83,8 @@ class OnboardingStep {
 
 	/**
 	 * Utility method to update wizard state
-	 * @param {string} key - State key to update
-	 * @param {*} value - New value
+	 * @param {string} key   - State key to update
+	 * @param {*}      value - New value
 	 */
 	updateState( key, value ) {
 		if ( this.wizard ) {

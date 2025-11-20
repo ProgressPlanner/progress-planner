@@ -8,8 +8,7 @@
 class PrplMoreTasksStep extends OnboardingStep {
 	constructor() {
 		super( {
-			id: 'more-tasks',
-			templateId: 'tour-step-more-tasks',
+			templateId: 'onboarding-step-more-tasks',
 		} );
 		this.tasks = [];
 	}

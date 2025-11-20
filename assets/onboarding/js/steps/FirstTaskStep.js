@@ -6,8 +6,7 @@
 class PrplFirstTaskStep extends OnboardingStep {
 	constructor() {
 		super( {
-			id: 'first-task',
-			templateId: 'tour-step-first-task',
+			templateId: 'onboarding-step-first-task',
 		} );
 	}
 
@@ -24,7 +23,7 @@ class PrplFirstTaskStep extends OnboardingStep {
 		}
 
 		// Hide next button, task form has it's own submit button.
-		this.wizard.nextBtn.style.display = 'none';
+		this.wizard.toggleFooter( false );
 
 		const handler = ( e ) => {
 			const thisBtn = e.target.closest( 'button' );
@@ -75,7 +74,7 @@ class PrplFirstTaskStep extends OnboardingStep {
 	 */
 	async beforeNextStep() {
 		// Show next button again.
-		this.wizard.updateButtonStates();
+		this.wizard.toggleFooter( true );
 	}
 }
 

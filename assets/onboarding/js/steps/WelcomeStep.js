@@ -7,8 +7,7 @@
 class PrplWelcomeStep extends OnboardingStep {
 	constructor() {
 		super( {
-			id: 'welcome',
-			templateId: 'tour-step-welcome',
+			templateId: 'onboarding-step-welcome',
 		} );
 		this.isGeneratingLicense = false;
 	}

@@ -14,7 +14,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 ?>
 
 <!-- Tour step more tasks -->
-<script type="text/template" id="tour-step-more-tasks">
+<script type="text/template" id="onboarding-step-more-tasks">
 	<div class="tour-header">
 		<h2 class="tour-title">
 			<?php \esc_html_e( 'Complete more tasks', 'progress-planner' ); ?>

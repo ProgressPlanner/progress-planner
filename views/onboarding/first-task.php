@@ -12,7 +12,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 ?>
 
 <!-- Tour step connect -->
-<script type="text/template" id="tour-step-first-task">
+<script type="text/template" id="onboarding-step-first-task">
 	<div class="tour-header">
 		<h2 class="tour-title">
 			<?php \esc_html_e( 'Complete your first task', 'progress-planner' ); ?>

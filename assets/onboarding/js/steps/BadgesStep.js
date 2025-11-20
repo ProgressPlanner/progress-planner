@@ -7,8 +7,7 @@
 class PrplBadgesStep extends OnboardingStep {
 	constructor() {
 		super( {
-			id: 'badges',
-			templateId: 'tour-step-badges',
+			templateId: 'onboarding-step-badges',
 		} );
 	}
 

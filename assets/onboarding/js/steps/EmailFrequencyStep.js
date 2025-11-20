@@ -7,8 +7,7 @@
 class PrplEmailFrequencyStep extends OnboardingStep {
 	constructor() {
 		super( {
-			id: 'email-frequency',
-			templateId: 'tour-step-email-frequency',
+			templateId: 'onboarding-step-email-frequency',
 		} );
 	}
 

@@ -116,13 +116,13 @@ class Onboard_Wizard {
 			[
 				'script_file_name'   => 'WelcomeStep',
 				'template_file_name' => 'welcome',
-				'template_id'        => 'tour-step-welcome',
+				'template_id'        => 'onboarding-step-welcome',
 				'title'              => esc_html__( 'Welcome to Progress Planner', 'progress-planner' ),
 			],
 			[
 				'script_file_name'   => 'WhatsNextStep',
 				'template_file_name' => 'whats-next',
-				'template_id'        => 'tour-step-whats-next',
+				'template_id'        => 'onboarding-step-whats-next',
 				'title'              => esc_html__( 'What\'s next?', 'progress-planner' ),
 			],
 		];
@@ -131,7 +131,7 @@ class Onboard_Wizard {
 				'script_file_name'   => 'FirstTaskStep',
 				'template_file_name' => 'first-task',
 				'template_data'      => [ 'task' => \array_shift( $tasks ) ],
-				'template_id'        => 'tour-step-first-task',
+				'template_id'        => 'onboarding-step-first-task',
 				'title'              => esc_html__( 'Complete your first task!', 'progress-planner' ),
 			];
 		}
@@ -139,21 +139,21 @@ class Onboard_Wizard {
 		$this->steps[] = [
 			'script_file_name'   => 'BadgesStep',
 			'template_file_name' => 'badges',
-			'template_id'        => 'tour-step-badges',
+			'template_id'        => 'onboarding-step-badges',
 			'title'              => esc_html__( 'Our badges are waiting for you', 'progress-planner' ),
 		];
 
 		$this->steps[] = [
 			'script_file_name'   => 'EmailFrequencyStep',
 			'template_file_name' => 'email-frequency',
-			'template_id'        => 'tour-step-email-frequency',
+			'template_id'        => 'onboarding-step-email-frequency',
 			'title'              => esc_html__( 'Email Frequency', 'progress-planner' ),
 		];
 
 		$this->steps[] = [
 			'script_file_name'   => 'SettingsStep',
 			'template_file_name' => 'settings',
-			'template_id'        => 'tour-step-settings',
+			'template_id'        => 'onboarding-step-settings',
 			'title'              => esc_html__( 'Settings', 'progress-planner' ),
 		];
 
@@ -163,7 +163,7 @@ class Onboard_Wizard {
 				'script_file_name'   => 'MoreTasksStep',
 				'template_file_name' => 'more-tasks',
 				'template_data'      => [ 'tasks' => $tasks ],
-				'template_id'        => 'tour-step-more-tasks',
+				'template_id'        => 'onboarding-step-more-tasks',
 				'title'              => esc_html__( 'Complete more tasks', 'progress-planner' ),
 			];
 		}

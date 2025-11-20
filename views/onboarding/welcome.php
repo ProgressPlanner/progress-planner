@@ -12,7 +12,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 ?>
 
 <!-- Tour step welcome -->
-<script type="text/template" id="tour-step-welcome">
+<script type="text/template" id="onboarding-step-welcome">
 	<div class="tour-header">
 		<h2 class="tour-title">
 			<?php
