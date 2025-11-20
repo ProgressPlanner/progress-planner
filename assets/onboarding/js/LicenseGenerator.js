@@ -65,19 +65,20 @@ class LicenseGenerator {
 
 				// Make the request to the API.
 				return LicenseGenerator.ajaxAPIRequest( data );
-			} else {
-				// Handle error response
-				const errorMessage = response.message || 'Failed to get nonce for license generation';
-				throw new Error( errorMessage );
 			}
+			// Handle error response
+			const errorMessage =
+				response.message ||
+				'Failed to get nonce for license generation';
+			throw new Error( errorMessage );
 		} );
 	}
 
 	/**
 	 * Helper function to make AJAX requests
 	 *
-	 * @param {Object} options Request options
-	 * @param {string} options.url The URL to send the request to
+	 * @param {Object} options      Request options
+	 * @param {string} options.url  The URL to send the request to
 	 * @param {Object} options.data The data to send with the request
 	 * @return {Promise} Promise that resolves with response data
 	 */

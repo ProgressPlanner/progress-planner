@@ -347,6 +347,39 @@
 		}
 	}
 
+	/* Email frequency */
+	.prpl-email-frequency-options {
+		display: flex;
+		gap: 10px;
+		flex-direction: column;
+	}
+
+	#prpl-email-form {
+		margin-top: 20px;
+
+		.prpl-form-field {
+			margin-top: 1.5rem;
+
+			&:first-child {
+				margin-top: 0;
+			}
+
+			label {
+				padding-bottom: 0.5rem;
+			}
+
+			input[type="text"],
+			input[type="email"] {
+				width: 100%;
+				padding: 8px;
+				border: 1px solid #ccc;
+				border-radius: 4px;
+				font-size: 14px;
+				color: #4b5563;
+			}
+		}
+	}
+
 	/* More tasks */
 	.prpl-column:has(.prpl-task-list) {
 		display: flex;

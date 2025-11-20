@@ -168,6 +168,7 @@ class PrplWelcomeStep extends OnboardingStep {
 		return LicenseGenerator.generateLicense( {
 			name: '',
 			email: '',
+			'with-email': 'no',
 			site: ProgressPlannerOnboardData.site,
 			timezone_offset: ProgressPlannerOnboardData.timezone_offset,
 		} );
