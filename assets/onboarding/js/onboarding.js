@@ -173,11 +173,19 @@ class ProgressPlannerOnboardWizard {
 	 * Update button visibility states
 	 */
 	updateButtonStates() {
-		const isLastStep = this.state.currentStep === this.tourSteps.length - 1;
+		// Always show Next button, hide Dashboard button
+		this.nextBtn.style.display = 'inline-block';
+	}
 
-		// Toggle button visibility
-		this.nextBtn.style.display = isLastStep ? 'none' : 'inline-block';
-		this.dashboardBtn.style.display = isLastStep ? 'inline-block' : 'none';
+	/**
+	 * Toggle footer visibility
+	 * @param {boolean} visible - Whether to show the footer
+	 */
+	toggleFooter( visible ) {
+		const footer = this.popover.querySelector( '.tour-footer' );
+		if ( footer ) {
+			footer.style.display = visible ? '' : 'none';
+		}
 	}
 
 	/**
@@ -212,8 +220,15 @@ class ProgressPlannerOnboardWizard {
 			this.saveProgressToServer();
 			this.renderStep();
 		} else {
-			console.log( 'Closing tour - reached last step' );
+			console.log( 'Finishing tour - reached last step' );
+			this.state.data.finished = true;
 			this.closeTour();
+
+			// Redirect to the Progress Planner dashboard
+			const redirectUrl = this.nextBtn.getAttribute( 'data-redirect-to' );
+			if ( redirectUrl ) {
+				window.location.href = redirectUrl;
+			}
 		}
 	}
 
@@ -289,6 +304,7 @@ class ProgressPlannerOnboardWizard {
 	 */
 	updateNextButton() {
 		const step = this.tourSteps[ this.state.currentStep ];
+		const isLastStep = this.state.currentStep === this.tourSteps.length - 1;
 
 		// Check if user can proceed to next step
 		this.nextBtn.disabled = ! step.canProceed( this.state );
@@ -298,6 +314,13 @@ class ProgressPlannerOnboardWizard {
 		if ( buttonText ) {
 			// Step provides custom button text
 			this.nextBtn.textContent = buttonText;
+		} else if ( isLastStep ) {
+			// On last step, use "Go to Progress Planner" text
+			const dashboardText =
+				this.config.l10n && this.config.l10n.dashboard
+					? this.config.l10n.dashboard
+					: 'Take me to the Recommendations dashboard';
+			this.nextBtn.textContent = dashboardText;
 		} else {
 			// Use default translated text
 			const defaultText =
@@ -350,32 +373,6 @@ class ProgressPlannerOnboardWizard {
 				} );
 			}
 
-			if ( this.dashboardBtn ) {
-				this.dashboardBtn.addEventListener( 'click', async ( e ) => {
-					e.preventDefault();
-					console.log( 'Dashboard button clicked!' );
-
-					const step = this.tourSteps[ this.state.currentStep ];
-
-					// Call beforeNextStep if step has it (for async operations)
-					if ( typeof step.beforeNextStep === 'function' ) {
-						try {
-							await step.beforeNextStep();
-						} catch ( error ) {
-							console.error( 'Error in beforeNextStep:', error );
-							return; // Don't proceed if beforeNextStep fails
-						}
-					}
-
-					this.state.data.finished = true;
-					this.closeTour();
-
-					// Redirect to the dashboard.
-					window.location.href =
-						this.dashboardBtn.getAttribute( 'data-redirect-to' );
-				} );
-			}
-
 			if ( this.closeBtn ) {
 				this.closeBtn.addEventListener( 'click', ( e ) => {
 					console.log( 'Close button clicked!' );
@@ -423,9 +420,8 @@ class ProgressPlannerOnboardWizard {
 			</div>
 		`;
 
-		// Hide buttons
-		this.nextBtn.style.display = 'none';
-		this.dashboardBtn.style.display = 'none';
+		// Hide footer.
+		this.toggleFooter( false );
 
 		// Add event listeners
 		const quitYes = this.contentWrapper.querySelector( '#prpl-quit-yes' );

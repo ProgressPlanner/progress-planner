@@ -44,6 +44,7 @@ class Onboard_Wizard {
 		// Note: AJAX action needs to be registered early (ie wrapping init in is_admin() check will be to late).
 		\add_action( 'wp_ajax_progress_planner_tour_complete_task', [ $this, 'ajax_complete_task' ] );
 		\add_action( 'wp_ajax_progress_planner_tour_save_progress', [ $this, 'ajax_save_tour_progress' ] );
+		\add_action( 'wp_ajax_prpl_save_page_setting', [ $this, 'ajax_save_page_setting' ] );
 
 		// Allow only images for the front-end upload.
 		\add_filter( 'rest_pre_insert_attachment', [ $this, 'rest_pre_insert_attachment' ], 10, 2 );
@@ -52,7 +53,7 @@ class Onboard_Wizard {
 		\add_action( 'admin_notices', [ $this, 'maybe_show_user_notification' ] );
 
 		// Maybe clean up the user meta.
-		\add_action( 'current_screen', [ $this, 'maybe_clean_up_user_meta' ] ); // -- TODO: When to cleanup the user meta?
+		// \add_action( 'current_screen', [ $this, 'maybe_clean_up_user_meta' ] ); -- TODO: When to cleanup the user meta?
 	}
 
 	/**
@@ -147,6 +148,13 @@ class Onboard_Wizard {
 			'template_file_name' => 'email-frequency',
 			'template_id'        => 'tour-step-email-frequency',
 			'title'              => esc_html__( 'Email Frequency', 'progress-planner' ),
+		];
+
+		$this->steps[] = [
+			'script_file_name'   => 'SettingsStep',
+			'template_file_name' => 'settings',
+			'template_id'        => 'tour-step-settings',
+			'title'              => esc_html__( 'Settings', 'progress-planner' ),
 		];
 
 		// Add more-tasks step if there are remaining tasks.
@@ -332,6 +340,7 @@ class Onboard_Wizard {
 				'l10n'                 => [
 					'next'            => \esc_html__( 'Next', 'progress-planner' ),
 					'startOnboarding' => \esc_html__( 'Start onboarding', 'progress-planner' ),
+					'dashboard'       => \esc_html__( 'Take me to the Recommendations dashboard', 'progress-planner' ),
 				],
 				'steps'                => array_column( $this->steps, 'script_file_name' ),
 			]
@@ -473,6 +482,61 @@ class Onboard_Wizard {
 	}
 
 	/**
+	 * Handle the interactive task submit.
+	 *
+	 * This is only for interactive tasks that change core permalink settings.
+	 * The $_POST data is expected to be:
+	 * - have_page: (string) The value to update the setting to.
+	 * - id: (int) The ID of the page to update.
+	 * - task_id: (string) The task ID (e.g., "set-page-about") to identify the page type.
+	 * - nonce: (string) The nonce.
+	 *
+	 * @return void
+	 */
+	public function ajax_save_page_setting() {
+
+		// Check if the user has the necessary capabilities.
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
+		}
+
+		// Check the nonce.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
+
+		if ( ! isset( $_POST['have_page'] ) || ! isset( $_POST['page_type'] ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing value.', 'progress-planner' ) ] );
+		}
+
+		$have_page = \trim( \sanitize_text_field( \wp_unslash( $_POST['have_page'] ) ) );
+		$page_type = \trim( \sanitize_text_field( \wp_unslash( $_POST['page_type'] ) ) );
+		$id        = isset( $_POST['page_id'] ) ? (int) \trim( \sanitize_text_field( \wp_unslash( $_POST['page_id'] ) ) ) : 0;
+
+		if ( empty( $have_page ) || empty( $page_type ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid page value.', 'progress-planner' ) ] );
+		}
+
+		// Validate page name against allowed page types.
+		$pages = \progress_planner()->get_admin__page_settings()->get_settings();
+		if ( ! isset( $pages[ $page_type ] ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid page name.', 'progress-planner' ) ] );
+		}
+
+		// Update the page value.
+		\progress_planner()->get_admin__page_settings()->set_page_values(
+			[
+				$page_type => [
+					'id'        => $id,
+					'have_page' => $have_page, // yes, no, not-applicable.
+				],
+			]
+		);
+
+		\wp_send_json_success( [ 'message' => \esc_html__( 'Page updated.', 'progress-planner' ) ] );
+	}
+
+	/**
 	 * Add the popover.
 	 *
 	 * @return void
@@ -509,8 +573,7 @@ class Onboard_Wizard {
 					</div>
 
 					<div class="tour-footer">
-						<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php esc_html_e( 'Next', 'progress-planner' ); ?></button>
-						<button id="prpl-dashboard-btn" class="prpl-btn prpl-btn-primary" data-redirect-to="<?php echo \esc_url( admin_url( 'admin.php?page=progress-planner' ) ); ?>"><?php esc_html_e( 'Take me to the Recommendations dashboard', 'progress-planner' ); ?></button>
+						<button class="prpl-tour-next prpl-btn prpl-btn-primary" data-redirect-to="<?php echo \esc_url( admin_url( 'admin.php?page=progress-planner' ) ); ?>">><?php esc_html_e( 'Next', 'progress-planner' ); ?></button>
 					</div>
 				</div>
 			</div>

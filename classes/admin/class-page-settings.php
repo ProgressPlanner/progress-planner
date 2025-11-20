@@ -144,41 +144,7 @@ class Page_Settings {
 			// Sanitize the pages array at point of reception.
 			$pages = \map_deep( \wp_unslash( $_POST['pages'] ), 'sanitize_text_field' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
-			foreach ( $pages as $type => $page_args ) {
-				$need_page = isset( $page_args['have_page'] ) ? $page_args['have_page'] : '';
-
-				\progress_planner()->get_page_types()->set_no_page_needed(
-					$type,
-					'not-applicable' === $need_page
-				);
-
-				// Remove the post-meta from the existing posts.
-				$existing_posts = \progress_planner()->get_page_types()->get_posts_by_type( 'any', $type );
-				foreach ( $existing_posts as $post ) {
-					if ( $post->ID === (int) $page_args['id'] && 'no' !== $page_args['have_page'] ) {
-						continue;
-					}
-
-					// Get the term-ID for the type.
-					$term = \get_term_by( 'slug', $type, Page_Types::TAXONOMY_NAME );
-					if ( ! $term instanceof \WP_Term ) {
-						continue;
-					}
-
-					// Remove the assigned terms from the `progress_planner_page_types` taxonomy.
-					\wp_remove_object_terms( $post->ID, $term->term_id, Page_Types::TAXONOMY_NAME );
-				}
-
-				// Skip if the ID is not set.
-				if ( ! isset( $page_args['id'] ) || 1 > (int) $page_args['id'] ) {
-					continue;
-				}
-
-				if ( 'no' !== $page_args['have_page'] ) {
-					// Add the term to the `progress_planner_page_types` taxonomy.
-					\progress_planner()->get_page_types()->set_page_type_by_id( (int) $page_args['id'], $type );
-				}
-			}
+			$this->set_page_values( $pages );
 		}
 
 		$this->save_settings();
@@ -187,6 +153,56 @@ class Page_Settings {
 		\do_action( 'progress_planner_settings_form_options_stored' );
 
 		\wp_send_json_success( \esc_html__( 'Options stored successfully', 'progress-planner' ) );
+	}
+
+	/**
+	 * Set the page value.
+	 *
+	 * @param array $pages The pages.
+	 *
+	 * @return void
+	 */
+	public function set_page_values( $pages ) {
+
+		if ( empty( $pages ) ) {
+			return;
+		}
+
+		foreach ( $pages as $type => $page_args ) {
+			$need_page = isset( $page_args['have_page'] ) ? $page_args['have_page'] : '';
+
+			\progress_planner()->get_page_types()->set_no_page_needed(
+				$type,
+				'not-applicable' === $need_page
+			);
+
+			// Remove the post-meta from the existing posts.
+			$existing_posts = \progress_planner()->get_page_types()->get_posts_by_type( 'any', $type );
+			foreach ( $existing_posts as $post ) {
+				if ( $post->ID === (int) $page_args['id'] && 'no' !== $page_args['have_page'] ) {
+					continue;
+				}
+
+				// Get the term-ID for the type.
+				$term = \get_term_by( 'slug', $type, Page_Types::TAXONOMY_NAME );
+				if ( ! $term instanceof \WP_Term ) {
+					continue;
+				}
+
+				// Remove the assigned terms from the `progress_planner_page_types` taxonomy.
+				\wp_remove_object_terms( $post->ID, $term->term_id, Page_Types::TAXONOMY_NAME );
+			}
+
+			// Skip if the ID is not set.
+			if ( ! isset( $page_args['id'] ) || 1 > (int) $page_args['id'] ) {
+				continue;
+			}
+
+			if ( 'no' !== $page_args['have_page'] ) {
+				// Add the term to the `progress_planner_page_types` taxonomy.
+				\progress_planner()->get_page_types()->set_page_type_by_id( (int) $page_args['id'], $type );
+			}
+		}
 	}
 
 	/**
