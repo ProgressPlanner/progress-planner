@@ -23,6 +23,9 @@ class PrplFirstTaskStep extends OnboardingStep {
 			return () => {};
 		}
 
+		// Hide next button, task form has it's own submit button.
+		this.wizard.nextBtn.style.display = 'none';
+
 		const handler = ( e ) => {
 			const thisBtn = e.target.closest( 'button' );
 			const form = thisBtn.closest( 'form' );
@@ -63,6 +66,16 @@ class PrplFirstTaskStep extends OnboardingStep {
 	 */
 	canProceed( state ) {
 		return !! state.data.firstTaskCompleted;
+	}
+
+	/**
+	 * Called before advancing to next step
+	 * Fires AJAX request to subscribe user if "Email me weekly" was selected
+	 * @return {Promise} Resolves when action is complete
+	 */
+	async beforeNextStep() {
+		// Show next button again.
+		this.wizard.updateButtonStates();
 	}
 }
 

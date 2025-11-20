@@ -112,42 +112,46 @@ class Onboard_Wizard {
 		}
 
 		$this->steps = [
-			'welcome'         => [
+			[
 				'script_file_name'   => 'WelcomeStep',
 				'template_file_name' => 'welcome',
 				'template_id'        => 'tour-step-welcome',
 				'title'              => esc_html__( 'Welcome to Progress Planner', 'progress-planner' ),
 			],
-			'whats-next'      => [
+			[
 				'script_file_name'   => 'WhatsNextStep',
 				'template_file_name' => 'whats-next',
 				'template_id'        => 'tour-step-whats-next',
 				'title'              => esc_html__( 'What\'s next?', 'progress-planner' ),
 			],
-			'first-task'      => [
+		];
+		if ( ! empty( $tasks ) ) {
+			$this->steps[] = [
 				'script_file_name'   => 'FirstTaskStep',
 				'template_file_name' => 'first-task',
 				'template_data'      => [ 'task' => \array_shift( $tasks ) ],
 				'template_id'        => 'tour-step-first-task',
 				'title'              => esc_html__( 'Complete your first task!', 'progress-planner' ),
-			],
-			'badges'          => [
-				'script_file_name'   => 'BadgesStep',
-				'template_file_name' => 'badges',
-				'template_id'        => 'tour-step-badges',
-				'title'              => esc_html__( 'Our badges are waiting for you', 'progress-planner' ),
-			],
-			'email-frequency' => [
-				'script_file_name'   => 'EmailFrequencyStep',
-				'template_file_name' => 'email-frequency',
-				'template_id'        => 'tour-step-email-frequency',
-				'title'              => esc_html__( 'Email Frequency', 'progress-planner' ),
-			],
+			];
+		}
+
+		$this->steps[] = [
+			'script_file_name'   => 'BadgesStep',
+			'template_file_name' => 'badges',
+			'template_id'        => 'tour-step-badges',
+			'title'              => esc_html__( 'Our badges are waiting for you', 'progress-planner' ),
+		];
+
+		$this->steps[] = [
+			'script_file_name'   => 'EmailFrequencyStep',
+			'template_file_name' => 'email-frequency',
+			'template_id'        => 'tour-step-email-frequency',
+			'title'              => esc_html__( 'Email Frequency', 'progress-planner' ),
 		];
 
 		// Add more-tasks step if there are remaining tasks.
 		if ( ! empty( $tasks ) ) {
-			$this->steps['more-tasks'] = [
+			$this->steps[] = [
 				'script_file_name'   => 'MoreTasksStep',
 				'template_file_name' => 'more-tasks',
 				'template_data'      => [ 'tasks' => $tasks ],

@@ -176,10 +176,7 @@ class ProgressPlannerOnboardWizard {
 		const isLastStep = this.state.currentStep === this.tourSteps.length - 1;
 
 		// Toggle button visibility
-		this.nextBtn.style.display =
-			isLastStep || this.state.currentStep === 2 // We hide the "First task" step.
-				? 'none'
-				: 'inline-block';
+		this.nextBtn.style.display = isLastStep ? 'none' : 'inline-block';
 		this.dashboardBtn.style.display = isLastStep ? 'inline-block' : 'none';
 	}
 
