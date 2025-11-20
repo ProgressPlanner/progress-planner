@@ -13,20 +13,30 @@ namespace Progress_Planner;
 class Onboard_Wizard {
 
 	/**
+	 * Steps and their order.
+	 *
+	 * @var array
+	 */
+	protected $steps = [];
+
+	/**
 	 * Constructor.
 	 *
 	 * @return void
 	 */
 	public function __construct() {
-		// Add popover markup.
+		// Add popover on front end.
 		\add_action( 'wp_footer', [ $this, 'add_popover' ] );
 		\add_action( 'wp_footer', [ $this, 'add_popover_step_templates' ] );
+		\add_action( 'wp_enqueue_scripts', [ $this, 'add_popover_scripts' ] );
+
+		// Add popover on admin.
 		\add_action( 'admin_footer', [ $this, 'add_popover' ] );
 		\add_action( 'admin_footer', [ $this, 'add_popover_step_templates' ] );
-
-		// Add popover scripts.
-		\add_action( 'wp_enqueue_scripts', [ $this, 'add_popover_scripts' ] );
 		\add_action( 'admin_enqueue_scripts', [ $this, 'add_popover_scripts' ] );
+
+		// Define steps and their order.
+		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
 
 		// Add admin toolbar item.
 		\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_item' ] );
@@ -42,7 +52,103 @@ class Onboard_Wizard {
 		\add_action( 'admin_notices', [ $this, 'maybe_show_user_notification' ] );
 
 		// Maybe clean up the user meta.
-		// \add_action( 'current_screen', [ $this, 'maybe_clean_up_user_meta' ] ); -- TODO: When to cleanup the user meta?
+		\add_action( 'current_screen', [ $this, 'maybe_clean_up_user_meta' ] ); // -- TODO: When to cleanup the user meta?
+	}
+
+	/**
+	 * Define steps and their order.
+	 *
+	 * @return void
+	 */
+	public function define_steps_and_order() {
+		// Get the onboarding tasks.
+		$onboarding_tasks = [
+			'core-blogdescription',
+			'select-timezone',
+			'select-locale',
+			'core-siteicon',
+		];
+
+		$tasks = [];
+
+		foreach ( $onboarding_tasks as $task_id ) {
+			$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
+
+			// If there is no task, create it.
+			if ( ! $task ) {
+				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id );
+
+				if ( $task_provider ) {
+					$task_data = $task_provider->get_task_details();
+
+					// Task will not be inserted if it already exists.
+					\progress_planner()->get_suggested_tasks_db()->add( $task_data );
+
+					// Now get the task.
+					$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
+				}
+			}
+
+			// Safety check: Skip if task could not be created or retrieved.
+			if ( empty( $task ) ) {
+				\error_log( 'Onboarding: Could not retrieve or create task: ' . $task_id ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				continue;
+			}
+
+			$task_formatted = [
+				'task_id'     => $task[0]->get_task_id(),
+				'title'       => $task[0]->post_title ?? '',
+				'url'         => $task[0]->url ?? '',
+				'provider_id' => $task[0]->get_provider_id(),
+				'points'      => $task[0]->points ?? 0,
+			];
+
+			// Add task specific data.
+			if ( 'core-blogdescription' === $task_id ) {
+				$task_formatted['site_description'] = \get_bloginfo( 'description' );
+			}
+
+			$tasks[ $task_id ] = $task_formatted;
+		}
+
+		$this->steps = [
+			'welcome'    => [
+				'script_file_name'   => 'WelcomeStep',
+				'template_file_name' => 'welcome',
+				'template_id'        => 'tour-step-welcome',
+				'title'              => esc_html__( 'Welcome to Progress Planner', 'progress-planner' ),
+			],
+			'whats-next' => [
+				'script_file_name'   => 'WhatsNextStep',
+				'template_file_name' => 'whats-next',
+				'template_id'        => 'tour-step-whats-next',
+				'title'              => esc_html__( 'What\'s next?', 'progress-planner' ),
+			],
+			'first-task' => [
+				'script_file_name'   => 'FirstTaskStep',
+				'template_file_name' => 'first-task',
+				'template_data'      => [ 'task' => \array_shift( $tasks ) ],
+				'template_id'        => 'tour-step-first-task',
+				'title'              => esc_html__( 'Complete your first task!', 'progress-planner' ),
+			],
+			'badges'     => [
+				'script_file_name'   => 'BadgesStep',
+				'template_file_name' => 'badges',
+				'template_id'        => 'tour-step-badges',
+				'title'              => esc_html__( 'Our badges are waiting for you', 'progress-planner' ),
+			],
+		];
+
+		// Add more-tasks step if there are remaining tasks.
+		if ( ! empty( $tasks ) ) {
+			$this->steps['more-tasks'] = [
+				'script_file_name'   => 'MoreTasksStep',
+				'template_file_name' => 'more-tasks',
+				'template_data'      => [ 'tasks' => $tasks ],
+				'template_id'        => 'tour-step-more-tasks',
+				'title'              => esc_html__( 'Complete more tasks', 'progress-planner' ),
+			];
+		}
 	}
 
 	/**
@@ -185,23 +291,14 @@ class Onboard_Wizard {
 		\wp_enqueue_script( 'prpl-license-generator', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/LicenseGenerator.js', [], \progress_planner()->get_plugin_version(), true );
 
 		// Enqueue step components.
-		\wp_enqueue_script( 'prpl-onboarding-welcome-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/WelcomeStep.js', [ 'prpl-onboarding-step', 'prpl-license-generator' ], \progress_planner()->get_plugin_version(), true );
-		\wp_enqueue_script( 'prpl-onboarding-whats-next-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/WhatsNextStep.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
-		\wp_enqueue_script( 'prpl-onboarding-first-task-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/FirstTaskStep.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
-		\wp_enqueue_script( 'prpl-onboarding-badges-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/BadgesStep.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
-		\wp_enqueue_script( 'prpl-onboarding-more-tasks-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/MoreTasksStep.js', [ 'prpl-onboarding-step', 'prpl-popover-task' ], \progress_planner()->get_plugin_version(), true );
-
+		foreach ( $this->steps as $step ) {
+			\wp_enqueue_script( 'prpl-onboarding-' . $step['script_file_name'], \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/' . $step['script_file_name'] . '.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
+		}
 		// Enqueue main onboarding.js (depends on all step components).
 		\wp_enqueue_script(
 			'prpl-popover-onboarding',
 			\constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/onboarding.js',
-			[
-				'prpl-onboarding-step',
-				'prpl-onboarding-welcome-step',
-				'prpl-onboarding-first-task-step',
-				'prpl-onboarding-badges-step',
-				'prpl-onboarding-more-tasks-step',
-			],
+			[],
 			\progress_planner()->get_plugin_version(),
 			true
 		);
@@ -226,6 +323,7 @@ class Onboard_Wizard {
 					'next'            => \esc_html__( 'Next', 'progress-planner' ),
 					'startOnboarding' => \esc_html__( 'Start onboarding', 'progress-planner' ),
 				],
+				'steps'                => array_column( $this->steps, 'script_file_name' ),
 			]
 		);
 	}
@@ -376,26 +474,18 @@ class Onboard_Wizard {
 				<!-- Left column: Step navigation -->
 				<div class="prpl-onboarding-navigation">
 					<ol class="prpl-step-list">
-						<li class="prpl-step-item" data-step="0">
-							<span class="prpl-step-icon">1</span>
-							<span class="prpl-step-label"><?php esc_html_e( 'Welcome to Progress Planner', 'progress-planner' ); ?></span>
-						</li>
-						<li class="prpl-step-item" data-step="1">
-							<span class="prpl-step-icon">2</span>
-							<span class="prpl-step-label"><?php esc_html_e( 'What\'s next?', 'progress-planner' ); ?></span>
-						</li>
-						<li class="prpl-step-item" data-step="1">
-							<span class="prpl-step-icon">3</span>
-							<span class="prpl-step-label"><?php esc_html_e( 'Complete your first task!', 'progress-planner' ); ?></span>
-						</li>
-						<li class="prpl-step-item" data-step="3">
-							<span class="prpl-step-icon">4</span>
-							<span class="prpl-step-label"><?php esc_html_e( 'Our badges are waiting for you', 'progress-planner' ); ?></span>
-						</li>
-						<li class="prpl-step-item" data-step="4">
-							<span class="prpl-step-icon">5</span>
-							<span class="prpl-step-label"><?php esc_html_e( 'Complete more tasks', 'progress-planner' ); ?></span>
-						</li>
+						<?php
+							$i = 0;
+						foreach ( $this->steps as $step ) :
+							?>
+							<li class="prpl-step-item" data-step="<?php echo esc_attr( $i ); ?>">
+								<span class="prpl-step-icon"><?php echo esc_html( $i + 1 ); ?></span>
+								<span class="prpl-step-label"><?php echo esc_html( $step['title'] ); ?></span>
+							</li>
+							<?php
+							++$i;
+							endforeach;
+						?>
 					</ol>
 				</div>
 
@@ -425,74 +515,8 @@ class Onboard_Wizard {
 	 * @return void
 	 */
 	public function add_popover_step_templates() {
-		$onboarding_tasks = [
-			'core-blogdescription',
-			'select-timezone',
-			'select-locale',
-			'core-siteicon',
-		];
-
-		$tasks = [];
-
-		foreach ( $onboarding_tasks as $task_id ) {
-			$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
-
-			// If there is no task, create it.
-			if ( ! $task ) {
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id );
-
-				if ( $task_provider ) {
-					$task_data = $task_provider->get_task_details();
-
-					// Task will not be inserted if it already exists.
-					\progress_planner()->get_suggested_tasks_db()->add( $task_data );
-
-					// Now get the task.
-					$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
-				}
-			}
-
-			// Safety check: Skip if task could not be created or retrieved.
-			if ( empty( $task ) ) {
-				\error_log( 'Onboarding: Could not retrieve or create task: ' . $task_id ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-				continue;
-			}
-
-			$task_formatted = [
-				'task_id'     => $task[0]->get_task_id(),
-				'title'       => $task[0]->post_title ?? '',
-				'url'         => $task[0]->url ?? '',
-				'provider_id' => $task[0]->get_provider_id(),
-				'points'      => $task[0]->points ?? 0,
-			];
-
-			// Add task specific data.
-			if ( 'core-blogdescription' === $task_id ) {
-				$task_formatted['site_description'] = \get_bloginfo( 'description' );
-			}
-
-			$tasks[ $task_id ] = $task_formatted;
-		}
-
-		// Safety check: Ensure we have at least one task before rendering views.
-		if ( empty( $tasks ) ) {
-			\error_log( 'Onboarding: No tasks available to render onboarding templates.' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
-			return;
-		}
-
-		// Define the steps and their order.
-		\progress_planner()->the_view( 'onboarding/welcome.php' );
-
-		\progress_planner()->the_view( 'onboarding/whats-next.php' );
-
-		// Get the first task for the first-task step.
-		\progress_planner()->the_view( 'onboarding/first-task.php', [ 'task' => \array_shift( $tasks ) ] );
-
-		\progress_planner()->the_view( 'onboarding/badges.php' );
-
-		// Only render more-tasks view if we have remaining tasks.
-		if ( ! empty( $tasks ) ) {
-			\progress_planner()->the_view( 'onboarding/more-tasks.php', [ 'tasks' => $tasks ] );
+		foreach ( $this->steps as $step ) {
+			\progress_planner()->the_view( 'onboarding/' . $step['template_file_name'] . '.php', isset( $step['template_data'] ) ? $step['template_data'] : [] );
 		}
 		?>
 		<script>

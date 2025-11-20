@@ -2,7 +2,8 @@
  * Whats Next step - Explains the badge system to users
  * Simple informational step with no user interaction required
  */
-class WhatsNextStep extends OnboardingStep {
+/* global OnboardingStep */
+class PrplWhatsNextStep extends OnboardingStep {
 	constructor() {
 		super( {
 			id: 'whats-next',
@@ -30,3 +31,5 @@ class WhatsNextStep extends OnboardingStep {
 		return true;
 	}
 }
+
+window.PrplWhatsNextStep = new PrplWhatsNextStep();

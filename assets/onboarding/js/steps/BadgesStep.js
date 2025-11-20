@@ -2,7 +2,9 @@
  * Badges step - Explains the badge system to users
  * Simple informational step with no user interaction required
  */
-class BadgesStep extends OnboardingStep {
+/* global OnboardingStep */
+
+class PrplBadgesStep extends OnboardingStep {
 	constructor() {
 		super( {
 			id: 'badges',
@@ -30,3 +32,5 @@ class BadgesStep extends OnboardingStep {
 		return true;
 	}
 }
+
+window.PrplBadgesStep = new PrplBadgesStep();

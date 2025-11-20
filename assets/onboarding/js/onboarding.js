@@ -89,13 +89,24 @@ class ProgressPlannerOnboardWizard {
 	 * Creates instances of step components
 	 */
 	initializeTourSteps() {
-		const steps = [
-			new WelcomeStep(),
-			new WhatsNextStep(),
-			new FirstTaskStep(),
-			new BadgesStep(),
-			new MoreTasksStep(),
-		];
+		// Create instances of step components.
+		const steps = this.config.steps.map( ( stepName ) => {
+			if (
+				window[ `Prpl${ stepName }` ] &&
+				typeof window[ `Prpl${ stepName }` ] === 'object'
+			) {
+				return window[ `Prpl${ stepName }` ];
+			}
+
+			console.error(
+				`Step class "${ stepName }" not found. Available on window:`,
+				Object.keys( window ).filter( ( key ) =>
+					key.includes( 'Step' )
+				)
+			);
+
+			return null;
+		} );
 
 		// Set wizard reference for each step
 		steps.forEach( ( step ) => step.setWizard( this ) );

@@ -2,9 +2,9 @@
  * Welcome step - First step in the onboarding flow
  * Displays a welcome message, logo, and privacy policy checkbox
  */
-/* global LicenseGenerator, ProgressPlannerOnboardData */
+/* global OnboardingStep, LicenseGenerator, ProgressPlannerOnboardData */
 
-class WelcomeStep extends OnboardingStep {
+class PrplWelcomeStep extends OnboardingStep {
 	constructor() {
 		super( {
 			id: 'welcome',
@@ -173,3 +173,5 @@ class WelcomeStep extends OnboardingStep {
 		} );
 	}
 }
+
+window.PrplWelcomeStep = new PrplWelcomeStep();

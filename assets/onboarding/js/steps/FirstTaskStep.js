@@ -2,7 +2,8 @@
  * First Task step - User completes their first task
  * Handles task completion and form submission
  */
-class FirstTaskStep extends OnboardingStep {
+/* global OnboardingStep, ProgressPlannerTourUtils */
+class PrplFirstTaskStep extends OnboardingStep {
 	constructor() {
 		super( {
 			id: 'first-task',
@@ -64,3 +65,5 @@ class FirstTaskStep extends OnboardingStep {
 		return !! state.data.firstTaskCompleted;
 	}
 }
+
+window.PrplFirstTaskStep = new PrplFirstTaskStep();

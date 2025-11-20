@@ -3,7 +3,9 @@
  * Handles multiple tasks that can be completed in any order
  * Each task may open a sub-popover with its own form
  */
-class MoreTasksStep extends OnboardingStep {
+/* global OnboardingStep, PopoverTask */
+
+class PrplMoreTasksStep extends OnboardingStep {
 	constructor() {
 		super( {
 			id: 'more-tasks',
@@ -70,3 +72,5 @@ class MoreTasksStep extends OnboardingStep {
 		return Object.values( state.data.moreTasksCompleted ).every( Boolean );
 	}
 }
+
+window.PrplMoreTasksStep = new PrplMoreTasksStep();
