@@ -354,9 +354,22 @@ class ProgressPlannerOnboardWizard {
 			}
 
 			if ( this.dashboardBtn ) {
-				this.dashboardBtn.addEventListener( 'click', ( e ) => {
+				this.dashboardBtn.addEventListener( 'click', async ( e ) => {
 					e.preventDefault();
 					console.log( 'Dashboard button clicked!' );
+
+					const step = this.tourSteps[ this.state.currentStep ];
+
+					// Call beforeNextStep if step has it (for async operations)
+					if ( typeof step.beforeNextStep === 'function' ) {
+						try {
+							await step.beforeNextStep();
+						} catch ( error ) {
+							console.error( 'Error in beforeNextStep:', error );
+							return; // Don't proceed if beforeNextStep fails
+						}
+					}
+
 					this.state.data.finished = true;
 					this.closeTour();
 
