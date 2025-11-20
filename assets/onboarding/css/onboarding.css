@@ -55,6 +55,15 @@
 		justify-content: space-between;
 	}
 
+	.prpl-onboarding-logo {
+		height: 60px;
+
+		img, svg {
+			height: 100%;
+			width: auto;
+		}
+	}
+
 	.prpl-step-list {
 		list-style: none;
 		margin: 0;

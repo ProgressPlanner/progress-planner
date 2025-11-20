@@ -487,6 +487,9 @@ class Onboard_Wizard {
 							endforeach;
 						?>
 					</ol>
+					<div class="prpl-onboarding-logo">
+						<?php \progress_planner()->get_ui__branding()->the_logo(); ?>
+					</div>
 				</div>
 
 				<!-- Middle and right columns: Step content (rendered by step components) -->
