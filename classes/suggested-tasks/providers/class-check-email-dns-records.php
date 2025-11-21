@@ -239,8 +239,8 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to send email.', 'progress-planner' ) ] );
 		}
 
-		// TODO: Sleep for 10 seconds, wait for the report to be ready.
-		sleep( 10 );
+		// TODO: Sleep for 15 seconds, wait for the report to be ready.
+		sleep( 15 );
 
 		$dns_check_request = wp_remote_get(
 			\progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/email-dns-check',
