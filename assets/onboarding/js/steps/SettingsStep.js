@@ -77,7 +77,7 @@ class PrplSettingsStep extends OnboardingStep {
 			);
 			if ( container ) {
 				container.style.display =
-					index === this.currentSubStep ? 'block' : 'none';
+					index === this.currentSubStep ? 'flex' : 'none';
 			}
 		} );
 

@@ -43,7 +43,7 @@ $prpl_page_types = [
 		<?php foreach ( $prpl_page_types as $prpl_page_type ) : ?>
 			<div class="prpl-setting-item" data-page="<?php echo \esc_attr( $prpl_page_type['id'] ); ?>">
 				<div class="prpl-setting-header">
-					<h3><?php echo \esc_html( $prpl_page_type['title'] ); ?></h3>
+					<h3 class="prpl-setting-title"><?php echo \esc_html( $prpl_page_type['title'] ); ?></h3>
 					<p><?php echo \esc_html( $prpl_page_type['description'] ); ?></p>
 				</div>
 
@@ -76,17 +76,16 @@ $prpl_page_types = [
 							?>
 						</label>
 					</div>
-
-					<div class="prpl-setting-actions">
-						<button
-							type="button"
-							id="prpl-save-<?php echo \esc_attr( $prpl_page_type['id'] ); ?>-setting"
-							class="prpl-btn prpl-save-setting-btn"
-							disabled
-						>
-							<?php \esc_html_e( 'Save setting', 'progress-planner' ); ?>
-						</button>
-					</div>
+				</div>
+				<div class="prpl-setting-footer">
+					<button
+						type="button"
+						id="prpl-save-<?php echo \esc_attr( $prpl_page_type['id'] ); ?>-setting"
+						class="prpl-btn prpl-save-setting-btn"
+						disabled
+					>
+						<?php \esc_html_e( 'Save setting', 'progress-planner' ); ?>
+					</button>
 				</div>
 			</div>
 		<?php endforeach; ?>

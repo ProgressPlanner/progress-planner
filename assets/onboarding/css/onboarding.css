@@ -40,7 +40,8 @@
 	/* Main layout container */
 	.prpl-onboarding-layout {
 		display: flex;
-		min-height: 500px;
+		gap: 1.5rem;
+		min-height: 350px;
 	}
 
 	/* Left column: Step navigation */
@@ -48,11 +49,12 @@
 		width: 340px;
 		background: #f3f4f6;
 		border-right: none;
-		padding: 32px 24px 24px 24px;
+		padding: 2rem 1.5rem;
 		flex-shrink: 0;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
+		gap: 1.5rem;
 	}
 
 	.prpl-onboarding-logo {
@@ -125,10 +127,11 @@
 
 	/* Right section: Content area */
 	.prpl-onboarding-content {
+		padding: 2rem 1.5rem;
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: 1.5rem;
+		gap: 1.5rem;
 	}
 
 	.tour-content-wrapper {
@@ -152,6 +155,11 @@
 		justify-content: flex-end;
 		align-items: center;
 		gap: 10px;
+
+		.prpl-btn {
+			margin-top: 0;
+			margin-bottom: 0;
+		}
 	}
 
 	.tour-content {
@@ -380,6 +388,38 @@
 		}
 	}
 
+	/* Settings */
+	.tour-content-wrapper:has(.prpl-setting-item) {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+
+		.tour-content,
+		.prpl-setting-item,
+		.prpl-setting-content {
+			display: flex;
+			flex-direction: column;
+			flex-grow: 1;
+			gap: 1.5rem;
+		}
+
+		.prpl-setting-title {
+			margin: 0;
+		}
+
+		.prpl-setting-footer {
+			display: flex;
+			justify-content: flex-end;
+			align-items: center;
+			gap: 10px;
+
+			.prpl-btn {
+				margin-top: 0;
+				margin-bottom: 0;
+			}
+		}
+	}
+
 	/* More tasks */
 	.prpl-column:has(.prpl-task-list) {
 		display: flex;
@@ -566,6 +606,11 @@
 			font-size: 16px;
 		}
 	}
+}
+
+/* Task popover. */
+.prpl-task-popover {
+	padding: 1.5rem;
 }
 
 /* Task popover is opened. */

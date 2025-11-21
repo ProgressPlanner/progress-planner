@@ -38,12 +38,14 @@ class Onboard_Wizard {
 		// Define steps and their order.
 		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
 
-		// Add admin toolbar item.
-		\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_item' ] );
+		// Add admin toolbar items.
+		// TODO: Remove after testing.
+		\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_items' ] );
+		\add_action( 'admin_init', [ $this, 'check_delete_onboarding_progress' ] );
 
 		// Note: AJAX action needs to be registered early (ie wrapping init in is_admin() check will be to late).
-		\add_action( 'wp_ajax_progress_planner_tour_complete_task', [ $this, 'ajax_complete_task' ] );
-		\add_action( 'wp_ajax_progress_planner_tour_save_progress', [ $this, 'ajax_save_tour_progress' ] );
+		\add_action( 'wp_ajax_progress_planner_onboarding_complete_task', [ $this, 'ajax_complete_task' ] );
+		\add_action( 'wp_ajax_progress_planner_onboarding_save_progress', [ $this, 'ajax_save_onboarding_progress' ] );
 		\add_action( 'wp_ajax_prpl_save_page_setting', [ $this, 'ajax_save_page_setting' ] );
 
 		// Allow only images for the front-end upload.
@@ -52,8 +54,8 @@ class Onboard_Wizard {
 		// Maybe show user notification that tour is not finished.
 		\add_action( 'admin_notices', [ $this, 'maybe_show_user_notification' ] );
 
-		// Maybe clean up the user meta.
-		// \add_action( 'current_screen', [ $this, 'maybe_clean_up_user_meta' ] ); -- TODO: When to cleanup the user meta?
+		// Maybe clean up the onboarding progress. -- TODO: When to cleanup the onboarding progress?
+		\add_action( 'current_screen', [ $this, 'maybe_clean_up_onboarding_progress' ] );
 	}
 
 	/**
@@ -207,11 +209,11 @@ class Onboard_Wizard {
 	}
 
 	/**
-	 * Maybe clean up the user meta.
+	 * Maybe clean up the onboarding progress.
 	 *
 	 * @return void
 	 */
-	public function maybe_clean_up_user_meta() {
+	public function maybe_clean_up_onboarding_progress() {
 		if ( ! \get_current_user_id() ) {
 			return;
 		}
@@ -223,12 +225,12 @@ class Onboard_Wizard {
 			return;
 		}
 
-		$tour_data = \get_user_meta( \get_current_user_id(), '_prpl_onboard_progress', true );
-		if ( ! $tour_data ) {
+		$onboarding_progress = \get_option( 'prpl_onboard_progress', true );
+		if ( ! $onboarding_progress ) {
 			return;
 		}
 
-		\delete_user_meta( \get_current_user_id(), '_prpl_onboard_progress' );
+		\delete_option( 'prpl_onboard_progress' );
 	}
 
 
@@ -238,12 +240,12 @@ class Onboard_Wizard {
 	 * @return void
 	 */
 	public function maybe_show_user_notification() {
-		if ( ! \get_current_user_id() ) {
+		if ( ! \current_user_can( 'manage_options' ) ) {
 			return;
 		}
 
-		$tour_data = \get_user_meta( \get_current_user_id(), '_prpl_onboard_progress', true );
-		if ( ! $tour_data ) {
+		$onboarding_progress = \get_option( 'prpl_onboard_progress', true );
+		if ( ! $onboarding_progress ) {
 			return;
 		}
 
@@ -256,15 +258,15 @@ class Onboard_Wizard {
 		// If the user is on the Progress Planner dashboard do not display the notification and delete the user meta.
 		// This is a 'safety net' since we currently prevent all admin notices on the Progress Planner dashboard screen.
 		if ( 'toplevel_page_progress-planner' === $screen->id ) {
-			\delete_user_meta( \get_current_user_id(), '_prpl_onboard_progress' );
+			\delete_option( 'prpl_onboard_progress' );
 
 			// Do not show the notification.
 			return;
 		}
 
-		$tour_data = \json_decode( $tour_data, true );
+		$onboarding_progress = \json_decode( $onboarding_progress, true );
 
-		if ( $tour_data && isset( $tour_data['data'] ) && ! $tour_data['data']['finished'] ) {
+		if ( $onboarding_progress && isset( $onboarding_progress['data'] ) && ! $onboarding_progress['data']['finished'] ) {
 			?>
 			<div class="notice notice-success is-dismissible">
 				<p>
@@ -281,8 +283,8 @@ class Onboard_Wizard {
 			<?php
 		}
 
-		// Clean up the user meta.
-		\delete_user_meta( \get_current_user_id(), '_prpl_onboard_progress' );
+		// Clean up the onboarding progress.
+		\delete_option( 'prpl_onboard_progress' );
 	}
 
 	/**
@@ -357,12 +359,12 @@ class Onboard_Wizard {
 			return null;
 		}
 
-		$tour_data = \get_user_meta( \get_current_user_id(), '_prpl_onboard_progress', true );
-		if ( ! $tour_data ) {
+		$onboarding_progress = \get_option( 'prpl_onboard_progress', true );
+		if ( ! $onboarding_progress ) {
 			return null;
 		}
 
-		$decoded = \json_decode( $tour_data, true );
+		$decoded = \json_decode( $onboarding_progress, true );
 		if ( ! $decoded || ! \is_array( $decoded ) ) {
 			return null;
 		}
@@ -375,8 +377,8 @@ class Onboard_Wizard {
 	 *
 	 * @return void
 	 */
-	public function add_admin_toolbar_item() {
-		\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_item_callback' ], 100 );
+	public function add_admin_toolbar_items() {
+		\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_items_callback' ], 100 );
 	}
 
 	/**
@@ -385,7 +387,7 @@ class Onboard_Wizard {
 	 * @param \WP_Admin_Bar $admin_bar The admin bar.
 	 * @return void
 	 */
-	public function add_admin_toolbar_item_callback( $admin_bar ) {
+	public function add_admin_toolbar_items_callback( $admin_bar ) {
 		$admin_bar->add_node(
 			[
 				'id'    => 'progress-planner-onboarding',
@@ -396,6 +398,51 @@ class Onboard_Wizard {
 				],
 			]
 		);
+
+		if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
+			return;
+		}
+
+		$current_url = \wp_nonce_url( \esc_url_raw( \wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'prpl_onboarding_wizard' );
+
+		// Add Delete License submenu item.
+		$admin_bar->add_node(
+			[
+				'id'     => 'progress-planner-onboarding-delete-progress',
+				'parent' => 'progress-planner-onboarding',
+				'title'  => 'Delete Onboarding Progress',
+				'href'   => \add_query_arg( 'prpl_delete_onboarding_progress', '1', $current_url ),
+			]
+		);
+	}
+
+	/**
+	 * Check and process the delete single task action.
+	 *
+	 * Deletes a single task if the appropriate query parameter is set
+	 * and user has required capabilities.
+	 *
+	 * @return void
+	 */
+	public function check_delete_onboarding_progress() {
+		if (
+			! isset( $_GET['prpl_delete_onboarding_progress'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			! \current_user_can( 'manage_options' )
+		) {
+			return;
+		}
+
+		// Verify nonce for security.
+		if ( ! isset( $_GET['_wpnonce'] ) || ! \wp_verify_nonce( \wp_unslash( $_GET['_wpnonce'] ), 'prpl_onboarding_wizard' ) ) { //  phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			\wp_die( \esc_html__( 'Security check failed', 'progress-planner' ) );
+		}
+
+		// Delete the onboarding progress.
+		\delete_option( 'prpl_onboard_progress' );
+
+		// Redirect to the same page without the parameter.
+		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_onboarding_progress', '_wpnonce' ] ) );
+		exit;
 	}
 
 	/**
@@ -403,7 +450,7 @@ class Onboard_Wizard {
 	 *
 	 * @return void
 	 */
-	public function ajax_save_tour_progress() {
+	public function ajax_save_onboarding_progress() {
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
@@ -416,7 +463,7 @@ class Onboard_Wizard {
 		\error_log( print_r( $progress, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r, WordPress.PHP.DevelopmentFunctions.error_log_error_log
 
 		// Save as user meta?
-		\update_user_meta( \get_current_user_id(), '_prpl_onboard_progress', $progress );
+		\update_option( 'prpl_onboard_progress', $progress );
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Tour progress saved.', 'progress-planner' ) ] );
 	}

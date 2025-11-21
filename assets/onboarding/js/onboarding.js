@@ -276,7 +276,7 @@ class ProgressPlannerOnboardWizard {
 				body: new URLSearchParams( {
 					state: JSON.stringify( this.state ),
 					nonce: this.config.nonceProgressPlanner,
-					action: 'progress_planner_tour_save_progress',
+					action: 'progress_planner_onboarding_save_progress',
 				} ),
 				credentials: 'same-origin',
 			} );
@@ -479,7 +479,7 @@ class ProgressPlannerTourUtils {
 				form_values: JSON.stringify( formValues ),
 				task_id: taskId,
 				nonce: ProgressPlannerOnboardData.nonceProgressPlanner,
-				action: 'progress_planner_tour_complete_task',
+				action: 'progress_planner_onboarding_complete_task',
 			} ),
 		} );
 
