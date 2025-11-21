@@ -15,8 +15,6 @@
 	width: 1200px;
 	max-width: 80vw;
 
-	position: relative;
-
 	&::backdrop {
 		background: rgba(0, 0, 0, 0.5);
 	}

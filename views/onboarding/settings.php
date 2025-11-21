@@ -70,8 +70,8 @@ $prpl_page_types = [
 							<?php
 							\printf(
 								/* translators: %s: page type title */
-								\esc_html__( 'I don\'t have an %s yet', 'progress-planner' ),
-								\esc_html( \strtolower( $prpl_page_type['title'] ) )
+								\esc_html__( 'I don\'t have a %s yet', 'progress-planner' ),
+								\esc_html( $prpl_page_type['title'] )
 							);
 							?>
 						</label>
