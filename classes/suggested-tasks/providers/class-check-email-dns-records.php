@@ -223,7 +223,7 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 			]
 		);
 
-		if ( is_wp_error( $pre_request ) || 200 !== wp_remote_retrieve_response_code( $pre_request ) ) {
+		if ( \is_wp_error( $pre_request ) || 200 !== \wp_remote_retrieve_response_code( $pre_request ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to send test email.', 'progress-planner' ) ] );
 		}
 
@@ -231,7 +231,7 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 		$email_address        = $pre_request_response['email_address'] ?? '';
 
 		// Send the email.
-		$email_sent = \wp_mail( $email_address, $subject, '' );
+		$email_sent = \wp_mail( $email_address, $subject, 'email test' ); // Message body is not important, can't be empty.
 
 		// TODO: If wp_mail returned false we need to tell the server to not check for the email.
 		if ( ! $email_sent ) {
