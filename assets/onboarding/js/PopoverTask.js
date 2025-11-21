@@ -1,36 +1,41 @@
 /**
- * PopoverTask - Handles individual tasks that open sub-popovers
+ * PopoverTask - Handles individual tasks that replace content in tour-content-wrapper
  * Used by the MoreTasksStep for tasks that require user input
  */
 /* global ProgressPlannerOnboardData, ProgressPlannerTourUtils */
 
 // eslint-disable-next-line no-unused-vars
 class PopoverTask {
-	constructor( el ) {
+	constructor( el, wizard ) {
 		this.el = el;
 		this.id = el.dataset.taskId;
-		this.popover = null;
+		this.wizard = wizard;
+		this.taskContent = null;
 		this.formValues = {};
 		this.openPopoverBtn = el.querySelector( '[prpl-open-task-popover]' );
+		this.contentWrapper = null;
+		this.originalContentElements = null;
 
-		// Register popover open event, this is needed to be able to open the popover from the button.
+		// Register task open event
 		this.openPopoverBtn?.addEventListener( 'click', () => this.open() );
 	}
 
 	registerEvents() {
-		this.popover.addEventListener( 'click', ( e ) => {
+		this.taskContent.addEventListener( 'click', ( e ) => {
 			if ( e.target.classList.contains( 'prpl-complete-task-btn' ) ) {
 				const formData = new FormData(
-					this.popover.querySelector( 'form' )
+					this.taskContent.querySelector( 'form' )
 				);
 				this.formValues = Object.fromEntries( formData.entries() );
 				this.complete();
 			}
 		} );
 
-		this.popover
-			.querySelector( '.prpl-popover-close' )
-			?.addEventListener( 'click', () => this.close() );
+		// Close button handler
+		const closeBtn = this.taskContent.querySelector(
+			'.prpl-task-close-btn'
+		);
+		closeBtn?.addEventListener( 'click', () => this.close() );
 
 		this.setupFormValidation();
 
@@ -57,47 +62,122 @@ class PopoverTask {
 	}
 
 	open() {
-		if ( this.popover ) {
+		if ( this.taskContent ) {
+			return; // Already open
+		}
+
+		// Get the content wrapper
+		this.contentWrapper = this.wizard.popover.querySelector(
+			'.tour-content-wrapper'
+		);
+		if ( ! this.contentWrapper ) {
 			return;
 		}
 
+		// Store all children as hidden original content
+		this.originalContentElements = Array.from(
+			this.contentWrapper.children
+		);
+		this.originalContentElements.forEach( ( child ) => {
+			child.style.display = 'none';
+			child.classList.add( 'prpl-original-content' );
+		} );
+
+		// Get task content from template
 		const content = this.el
 			.querySelector( 'template' )
 			.content.cloneNode( true );
-		this.popover = document.createElement( 'div' );
-		this.popover.className =
-			'prpl-popover prpl-popover-onboarding prpl-task-popover';
-		this.popover.setAttribute( 'popover', 'manual' );
-		this.popover.appendChild( content );
 
-		// Add close button.
-		const closeBtn = document.createElement( 'button' );
-		closeBtn.className = 'prpl-popover-close';
-		closeBtn.setAttribute( 'popovertarget', this.popover.id );
-		closeBtn.setAttribute( 'popovertargetaction', 'hide' );
-		closeBtn.innerHTML = '<span class="dashicons dashicons-no-alt"></span>';
-		this.popover.appendChild( closeBtn );
+		// Create task content wrapper
+		this.taskContent = document.createElement( 'div' );
+		this.taskContent.className = 'prpl-task-content-active';
+		this.taskContent.appendChild( content );
 
-		document.body.appendChild( this.popover );
+		// Find the complete button in the form
+		const completeBtn = this.taskContent.querySelector(
+			'.prpl-complete-task-btn'
+		);
+
+		if ( completeBtn ) {
+			// Create close button
+			const closeBtn = document.createElement( 'button' );
+			closeBtn.type = 'button';
+			closeBtn.className = 'prpl-btn prpl-task-close-btn';
+			closeBtn.innerHTML =
+				'<span class="dashicons dashicons-arrow-left-alt2"></span> Back to tasks';
+
+			// Create button wrapper
+			const buttonWrapper = document.createElement( 'div' );
+			buttonWrapper.className = 'prpl-task-buttons';
+
+			// Move complete button into wrapper
+			completeBtn.parentNode.insertBefore( buttonWrapper, completeBtn );
+			buttonWrapper.appendChild( closeBtn );
+			buttonWrapper.appendChild( completeBtn );
+		}
+
+		// Add task content to wrapper
+		this.contentWrapper.appendChild( this.taskContent );
+
+		// Hide footer when task is active
+		this.wizard.toggleFooter( false );
+
+		// Hide the popover close button
+		const popoverCloseBtn = this.wizard.popover.querySelector(
+			'#prpl-tour-close-btn'
+		);
+		if ( popoverCloseBtn ) {
+			popoverCloseBtn.style.display = 'none';
+		}
 
 		// Register events
 		this.registerEvents();
-
-		this.popover.showPopover();
 	}
 
 	close() {
-		this.popover?.remove();
-		this.popover = null;
+		if ( ! this.taskContent ) {
+			return;
+		}
+
+		// Remove task content
+		this.taskContent.remove();
+
+		// Show original content
+		if ( this.originalContentElements ) {
+			this.originalContentElements.forEach( ( child ) => {
+				child.style.display = '';
+				child.classList.remove( 'prpl-original-content' );
+			} );
+		}
+
+		// Show footer
+		this.wizard.toggleFooter( true );
+
+		// Show the popover close button
+		const popoverCloseBtn = this.wizard.popover.querySelector(
+			'#prpl-tour-close-btn'
+		);
+		if ( popoverCloseBtn ) {
+			popoverCloseBtn.style.display = '';
+		}
+
+		// Clean up
+		this.taskContent = null;
+		this.originalContentElements = null;
 	}
 
 	complete() {
 		ProgressPlannerTourUtils.completeTask( this.id, this.formValues )
 			.then( () => {
 				this.el.classList.add( 'completed' );
-				this.el
-					.querySelector( '.prpl-complete-task-btn' )
-					.classList.add( 'prpl-complete-task-btn-completed' );
+				const taskBtn = this.el.querySelector(
+					'.prpl-complete-task-btn'
+				);
+				if ( taskBtn ) {
+					taskBtn.classList.add( 'prpl-complete-task-btn-completed' );
+					taskBtn.textContent = 'Completed';
+					taskBtn.disabled = true;
+				}
 
 				this.close();
 				this.notifyParent();
@@ -117,8 +197,8 @@ class PopoverTask {
 	}
 
 	setupFormValidation() {
-		const form = this.popover.querySelector( 'form' );
-		const submitButton = this.popover.querySelector(
+		const form = this.taskContent.querySelector( 'form' );
+		const submitButton = this.taskContent.querySelector(
 			'.prpl-complete-task-btn'
 		);
 
@@ -172,7 +252,7 @@ class PopoverTask {
 	 * Only runs if the form contains an upload field.
 	 */
 	setupFileUpload() {
-		const uploadContainer = this.popover.querySelector(
+		const uploadContainer = this.taskContent.querySelector(
 			'[data-upload-field]'
 		);
 		if ( ! uploadContainer ) {
@@ -234,7 +314,7 @@ class PopoverTask {
 		// Validate file extension
 		if ( ! this.isValidFaviconFile( file ) ) {
 			const fileInput =
-				this.popover.querySelector( 'input[type="file"]' );
+				this.taskContent.querySelector( 'input[type="file"]' );
 			const acceptedTypes = fileInput?.accept || 'supported file types';
 			statusDiv.textContent = `Invalid file type. Please upload a file with one of these formats: ${ acceptedTypes }`;
 			return;
@@ -265,12 +345,11 @@ class PopoverTask {
 
 				// Update the file preview.
 				const previewDiv =
-					this.popover.querySelector( '.prpl-file-preview' );
+					this.taskContent.querySelector( '.prpl-file-preview' );
 				if ( previewDiv ) {
 					previewDiv.innerHTML = `<img src="${ response.source_url }" alt="${ file.name }" />`;
 					previewDiv.style.display = 'block';
 				}
-				previewDiv.style.display = 'block';
 				return response;
 			} )
 			.catch( ( error ) => {
@@ -285,7 +364,8 @@ class PopoverTask {
 	 * @return {boolean} True if file extension is supported
 	 */
 	isValidFaviconFile( file ) {
-		const fileInput = this.popover.querySelector( 'input[type="file"]' );
+		const fileInput =
+			this.taskContent.querySelector( 'input[type="file"]' );
 		if ( ! fileInput || ! fileInput.accept ) {
 			return true; // No restrictions if no accept attribute
 		}

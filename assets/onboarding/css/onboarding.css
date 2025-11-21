@@ -445,6 +445,56 @@
 		}
 	}
 
+.tour-content-wrapper:has(.prpl-task-content-active) {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+
+	/* Task content active, TOOD: change markup so this is simpler. */
+	.prpl-task-content-active {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+		gap: 1.5rem;
+
+		.prpl-onboarding-task {
+			display: flex;
+			flex-direction: column;
+			flex-grow: 1;
+
+			.prpl-onboarding-task-form,
+			.tour-content {
+				display: flex;
+				flex-direction: column;
+				flex-grow: 1;
+			}
+
+			.prpl-onboarding-task-form {
+				justify-content: space-between;
+				gap: 3rem;
+			}
+		}
+	}
+
+	/* Task buttons. */
+	.prpl-task-buttons {
+		display: flex;
+		justify-content: flex-end;
+		gap: 1rem;
+		width: 100%;
+
+		.prpl-btn {
+			margin-top: 0;
+			margin-bottom: 0;
+
+			&.prpl-task-close-btn {
+				background-color: var(--prpl-background-banner);
+				color: var(--prpl-color-text);
+			}
+		}
+	}
+}
+
 	/* File drop zone. */
 	.prpl-file-drop-zone {
 		border: 2px dashed #aaa;
