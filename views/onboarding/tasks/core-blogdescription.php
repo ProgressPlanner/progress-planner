@@ -23,7 +23,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		</p>
 	</div>
 	<form class="prpl-onboarding-task-form" onsubmit="return false;">
-		<input type="text" name="blogdescription" value="<?php echo esc_attr( $task['site_description'] ?? '' ); ?>" />
+		<input type="text" name="blogdescription" value="<?php echo esc_attr( $task['site_description'] ?? '' ); ?>" placeholder="<?php \esc_html_e( 'A catchy phrase to describe your website', 'progress-planner' ); ?>" />
 		<button type="button" id="first-task-btn" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-primary">
 			<?php if ( isset( $task['site_description'] ) && '' !== $task['site_description'] ) : ?>
 				<?php \esc_html_e( 'Verify tagline', 'progress-planner' ); ?>

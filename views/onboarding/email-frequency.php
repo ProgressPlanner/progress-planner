@@ -24,52 +24,59 @@ $prpl_user_email   = $prpl_current_user->user_email ?? '';
 		</h2>
 	</div>
 	<div class="tour-content">
-		<div class="prpl-column prpl-column-content">
-			<p>
-				<?php \esc_html_e( 'Would you like to receive weekly progress updates?', 'progress-planner' ); ?>
-			</p>
-
-			<div class="prpl-email-frequency-options">
-				<label class="prpl-radio-label">
-					<input type="radio" id="prpl-email-weekly" name="email_frequency" value="weekly">
-					<span><?php \esc_html_e( 'Email me weekly', 'progress-planner' ); ?></span>
-				</label>
-
-				<label class="prpl-radio-label">
-					<input type="radio" id="prpl-dont-email" name="email_frequency" value="none">
-					<span><?php \esc_html_e( 'Don\'t email me', 'progress-planner' ); ?></span>
-				</label>
+		<div class="prpl-columns-wrapper-flex">
+			<div class="prpl-column prpl-column-content">
+				<p>
+					<?php \esc_html_e( 'Stay on track with emails that include recommendations, updates and useful news.', 'progress-planner' ); ?>
+				</p>
+				<p>
+					<?php \esc_html_e( 'Choose how often you want a little nudge to keep your site moving forward.', 'progress-planner' ); ?>
+				</p>
 			</div>
+			<div class="prpl-column">
 
-			<div id="prpl-email-form" class="prpl-email-form" style="display: none;">
-				<div class="prpl-form-field">
-					<label for="prpl-email-name">
-						<?php \esc_html_e( 'Name', 'progress-planner' ); ?>
-						<span class="required">*</span>
+				<div class="prpl-email-frequency-options">
+					<label class="prpl-radio-label">
+						<input type="radio" id="prpl-email-weekly" name="email_frequency" value="weekly">
+						<span><?php \esc_html_e( 'Email me weekly', 'progress-planner' ); ?></span>
 					</label>
-					<input
-						type="text"
-						id="prpl-email-name"
-						name="email_name"
-						value="<?php echo \esc_attr( $prpl_user_name ); ?>"
-						placeholder="<?php \esc_attr_e( 'Enter your name', 'progress-planner' ); ?>"
-						required
-					>
+
+					<label class="prpl-radio-label">
+						<input type="radio" id="prpl-dont-email" name="email_frequency" value="none">
+						<span><?php \esc_html_e( 'Don\'t email me', 'progress-planner' ); ?></span>
+					</label>
 				</div>
 
-				<div class="prpl-form-field">
-					<label for="prpl-email-address">
-						<?php \esc_html_e( 'Email', 'progress-planner' ); ?>
-						<span class="required">*</span>
-					</label>
-					<input
-						type="email"
-						id="prpl-email-address"
-						name="email_address"
-						value="<?php echo \esc_attr( $prpl_user_email ); ?>"
-						placeholder="<?php \esc_attr_e( 'Enter your email', 'progress-planner' ); ?>"
-						required
-					>
+				<div id="prpl-email-form" class="prpl-email-form" style="display: none;">
+					<div class="prpl-form-field">
+						<label for="prpl-email-name">
+							<?php \esc_html_e( 'Name', 'progress-planner' ); ?>
+							<span class="required">*</span>
+						</label>
+						<input
+							type="text"
+							id="prpl-email-name"
+							name="email_name"
+							value="<?php echo \esc_attr( $prpl_user_name ); ?>"
+							placeholder="<?php \esc_attr_e( 'Enter your name', 'progress-planner' ); ?>"
+							required
+						>
+					</div>
+
+					<div class="prpl-form-field">
+						<label for="prpl-email-address">
+							<?php \esc_html_e( 'Email', 'progress-planner' ); ?>
+							<span class="required">*</span>
+						</label>
+						<input
+							type="email"
+							id="prpl-email-address"
+							name="email_address"
+							value="<?php echo \esc_attr( $prpl_user_email ); ?>"
+							placeholder="<?php \esc_attr_e( 'Enter your email', 'progress-planner' ); ?>"
+							required
+						>
+					</div>
 				</div>
 			</div>
 		</div>

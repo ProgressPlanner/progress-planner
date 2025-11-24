@@ -33,150 +33,181 @@ $prpl_page_types = [
 $prpl_saved_settings = \progress_planner()->get_settings()->get_post_types_names();
 $prpl_post_types     = \progress_planner()->get_settings()->get_public_post_types();
 
+// Get redirect on login setting.
+$prpl_redirect_on_login = \get_user_meta( \get_current_user_id(), 'prpl_redirect_on_login', true );
+
+$prpl_total_number_of_steps = 5;
+$prpl_current_step_number   = 0;
+
 ?>
 
 <!-- Tour step settings -->
 <script type="text/template" id="onboarding-step-settings">
-	<div class="tour-header">
+	<!-- <div class="tour-header">
 		<h2 class="tour-title">
 			<?php \esc_html_e( 'Settings', 'progress-planner' ); ?>
 			<span class="prpl-settings-progress">1/5</span>
 		</h2>
-	</div>
+	</div> -->
 	<div class="tour-content">
 		<?php foreach ( $prpl_page_types as $prpl_page_type ) : ?>
+			<?php ++$prpl_current_step_number; ?>
 			<div class="prpl-setting-item" data-page="<?php echo \esc_attr( $prpl_page_type['id'] ); ?>">
-				<div class="prpl-setting-header">
-					<h3 class="prpl-setting-title"><?php echo \esc_html( $prpl_page_type['title'] ); ?></h3>
-					<p><?php echo \esc_html( $prpl_page_type['description'] ); ?></p>
-				</div>
-
-				<div class="prpl-setting-content">
-					<div class="prpl-select-page">
-						<?php
-						\wp_dropdown_pages(
-							[
-								'name'             => 'pages[' . \esc_attr( $prpl_page_type['id'] ) . '][id]',
-								'show_option_none' => '&mdash; ' . \esc_html__( 'Select page', 'progress-planner' ) . ' &mdash;',
-								'selected'         => '',
-								'id'               => 'prpl-select-' . \esc_attr( $prpl_page_type['id'] ),
-							]
-						);
-						?>
+				<div class="prpl-columns-wrapper-flex">
+					<div class="prpl-column prpl-column-content">
+						<p><?php echo \esc_html( $prpl_page_type['description'] ); ?></p>
 					</div>
+					<div class="prpl-column">
+						<div class="prpl-setting-header">
+							<h3 class="prpl-setting-title">
+								<?php \esc_html_e( 'Settings:', 'progress-planner' ); ?> <?php echo \esc_html( $prpl_page_type['title'] ); ?>
+								<span class="prpl-settings-progress"><?php echo \esc_html( $prpl_current_step_number ); ?>/<?php echo \esc_html( $prpl_total_number_of_steps ); ?></span>
+							</h3>
+						</div>
 
-					<div class="prpl-checkbox-wrapper">
-						<label>
-							<input
-								type="checkbox"
-								id="prpl-no-<?php echo \esc_attr( $prpl_page_type['id'] ); ?>-page"
+						<div class="prpl-setting-content">
+							<div class="prpl-select-page">
+								<?php
+								\wp_dropdown_pages(
+									[
+										'name'             => 'pages[' . \esc_attr( $prpl_page_type['id'] ) . '][id]',
+										'show_option_none' => '&mdash; ' . \esc_html__( 'Select page', 'progress-planner' ) . ' &mdash;',
+										'selected'         => '',
+										'id'               => 'prpl-select-' . \esc_attr( $prpl_page_type['id'] ),
+									]
+								);
+								?>
+							</div>
+
+							<div class="prpl-checkbox-wrapper">
+								<label>
+									<input
+										type="checkbox"
+										id="prpl-no-<?php echo \esc_attr( $prpl_page_type['id'] ); ?>-page"
+									>
+									<?php
+									\printf(
+										/* translators: %s: page type title */
+										\esc_html__( 'I don\'t have a %s yet', 'progress-planner' ),
+										\esc_html( $prpl_page_type['title'] )
+									);
+									?>
+								</label>
+							</div>
+						</div>
+						<div class="prpl-setting-footer">
+							<button
+								type="button"
+								id="prpl-save-<?php echo \esc_attr( $prpl_page_type['id'] ); ?>-setting"
+								class="prpl-btn prpl-save-setting-btn"
+								disabled
 							>
-							<?php
-							\printf(
-								/* translators: %s: page type title */
-								\esc_html__( 'I don\'t have a %s yet', 'progress-planner' ),
-								\esc_html( $prpl_page_type['title'] )
-							);
-							?>
-						</label>
+								<?php \esc_html_e( 'Save setting', 'progress-planner' ); ?>
+							</button>
+						</div>
 					</div>
-				</div>
-				<div class="prpl-setting-footer">
-					<button
-						type="button"
-						id="prpl-save-<?php echo \esc_attr( $prpl_page_type['id'] ); ?>-setting"
-						class="prpl-btn prpl-save-setting-btn"
-						disabled
-					>
-						<?php \esc_html_e( 'Save setting', 'progress-planner' ); ?>
-					</button>
 				</div>
 			</div>
 		<?php endforeach; ?>
 
 		<!-- Post Types sub-step -->
 		<?php if ( ! empty( $prpl_post_types ) ) : ?>
+			<?php ++$prpl_current_step_number; ?>
 			<div class="prpl-setting-item" data-page="post-types">
-				<div class="prpl-setting-header">
-					<h3 class="prpl-setting-title">
-						<?php \esc_html_e( 'Valuable post types', 'progress-planner' ); ?>
-					</h3>
-					<p>
-						<?php \esc_html_e( 'Choose the post types you actively use for your content. We\'ll track and reward progress only on the ones you select.', 'progress-planner' ); ?>
-					</p>
-				</div>
+				<div class="prpl-columns-wrapper-flex">
+					<div class="prpl-column prpl-column-content">
+						<p><?php echo \esc_html( $prpl_page_type['description'] ); ?></p>
+					</div>
+					<div class="prpl-column">
+						<div class="prpl-setting-header">
+							<h3 class="prpl-setting-title">
+								<?php \esc_html_e( 'Settings:', 'progress-planner' ); ?> <?php \esc_html_e( 'Valuable post types', 'progress-planner' ); ?>
+								<span class="prpl-settings-progress"><?php echo \esc_html( $prpl_current_step_number ); ?>/<?php echo \esc_html( $prpl_total_number_of_steps ); ?></span>
+							</h3>
+							<p>
+								<?php \esc_html_e( 'Choose the post types you actively use for your content. We\'ll track and reward progress only on the ones you select.', 'progress-planner' ); ?>
+							</p>
+						</div>
 
-				<div class="prpl-setting-content">
-					<div class="prpl-settings-wrapper">
-						<p>
-							<?php \esc_html_e( 'Which post types do you want us to track?', 'progress-planner' ); ?>
-						</p>
-						<div id="prpl-post-types-include-wrapper">
-							<?php foreach ( $prpl_post_types as $prpl_post_type ) : ?>
-								<label>
-									<input
-										type="checkbox"
-										name="prpl-post-types-include[]"
-										value="<?php echo \esc_attr( $prpl_post_type ); ?>"
-										<?php \checked( \in_array( $prpl_post_type, $prpl_saved_settings, true ) ); ?>
-									/>
-									<?php echo \esc_html( \get_post_type_object( $prpl_post_type )->labels->name ); // @phpstan-ignore-line property.nonObject ?>
-								</label>
-							<?php endforeach; ?>
+						<div class="prpl-setting-content">
+							<div class="prpl-settings-wrapper">
+								<p>
+									<?php \esc_html_e( 'Which post types do you want us to track?', 'progress-planner' ); ?>
+								</p>
+								<div id="prpl-post-types-include-wrapper">
+									<?php foreach ( $prpl_post_types as $prpl_post_type ) : ?>
+										<label>
+											<input
+												type="checkbox"
+												name="prpl-post-types-include[]"
+												value="<?php echo \esc_attr( $prpl_post_type ); ?>"
+												<?php \checked( \in_array( $prpl_post_type, $prpl_saved_settings, true ) ); ?>
+											/>
+											<?php echo \esc_html( \get_post_type_object( $prpl_post_type )->labels->name ); // @phpstan-ignore-line property.nonObject ?>
+										</label>
+									<?php endforeach; ?>
+								</div>
+							</div>
+						</div>
+						<div class="prpl-setting-footer">
+							<button
+								type="button"
+								id="prpl-save-post-types-setting"
+								class="prpl-btn prpl-save-setting-btn"
+								disabled
+							>
+								<?php \esc_html_e( 'Save setting', 'progress-planner' ); ?>
+							</button>
 						</div>
 					</div>
-				</div>
-				<div class="prpl-setting-footer">
-					<button
-						type="button"
-						id="prpl-save-post-types-setting"
-						class="prpl-btn prpl-save-setting-btn"
-						disabled
-					>
-						<?php \esc_html_e( 'Save setting', 'progress-planner' ); ?>
-					</button>
 				</div>
 			</div>
 		<?php endif; ?>
 
 		<!-- Login Destination sub-step -->
-		<?php
-		$prpl_redirect_on_login = \get_user_meta( \get_current_user_id(), 'prpl_redirect_on_login', true );
-		?>
+		<?php ++$prpl_current_step_number; ?>
 		<div class="prpl-setting-item" data-page="login-destination">
-			<div class="prpl-setting-header">
-				<h3 class="prpl-setting-title">
-					<?php \esc_html_e( 'Default login destination', 'progress-planner' ); ?>
-				</h3>
-				<p>
-					<?php \esc_html_e( 'Do you want to land on the Progress Planner dashboard after logging in? So you can start improving your site straight away!', 'progress-planner' ); ?>
-				</p>
-			</div>
-
-			<div class="prpl-setting-content">
-				<div class="prpl-settings-wrapper">
-					<p>
-						<?php \esc_html_e( 'Where do you want to start when you login to your site?', 'progress-planner' ); ?>
-					</p>
-					<label for="prpl-setting-redirect-on-login">
-						<input
-							id="prpl-setting-redirect-on-login"
-							name="prpl-redirect-on-login"
-							type="checkbox"
-							<?php \checked( $prpl_redirect_on_login ); ?>
-						/>
-						<span><?php \esc_html_e( 'Show the Progress Planner dashboard after login.', 'progress-planner' ); ?></span>
-					</label>
+			<div class="prpl-columns-wrapper-flex">
+				<div class="prpl-column prpl-column-content">
+					<p><?php echo \esc_html( $prpl_page_type['description'] ); ?></p>
 				</div>
-			</div>
-			<div class="prpl-setting-footer">
-				<button
-					type="button"
-					id="prpl-save-login-destination-setting"
-					class="prpl-btn prpl-save-setting-btn"
-				>
-					<?php \esc_html_e( 'Save setting', 'progress-planner' ); ?>
-				</button>
+				<div class="prpl-column">
+					<div class="prpl-setting-header">
+						<h3 class="prpl-setting-title">
+							<?php \esc_html_e( 'Settings:', 'progress-planner' ); ?> <?php \esc_html_e( 'Default login destination', 'progress-planner' ); ?>
+							<span class="prpl-settings-progress"><?php echo \esc_html( $prpl_current_step_number ); ?>/<?php echo \esc_html( $prpl_total_number_of_steps ); ?></span>
+						</h3>
+						<p>
+							<?php \esc_html_e( 'Do you want to land on the Progress Planner dashboard after logging in? So you can start improving your site straight away!', 'progress-planner' ); ?>
+						</p>
+					</div>
+
+					<div class="prpl-setting-content">
+						<div class="prpl-settings-wrapper">
+							<p>
+								<?php \esc_html_e( 'Where do you want to start when you login to your site?', 'progress-planner' ); ?>
+							</p>
+							<label for="prpl-setting-redirect-on-login">
+								<input
+									id="prpl-setting-redirect-on-login"
+									name="prpl-redirect-on-login"
+									type="checkbox"
+									<?php \checked( $prpl_redirect_on_login ); ?>
+								/>
+								<span><?php \esc_html_e( 'Show the Progress Planner dashboard after login.', 'progress-planner' ); ?></span>
+							</label>
+						</div>
+					</div>
+					<div class="prpl-setting-footer">
+						<button
+							type="button"
+							id="prpl-save-login-destination-setting"
+							class="prpl-btn prpl-save-setting-btn"
+						>
+							<?php \esc_html_e( 'Save setting', 'progress-planner' ); ?>
+						</button>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

@@ -75,6 +75,7 @@ class PrplSettingsStep extends OnboardingStep {
 		const subStepData = state.data.settings[ subStepName ];
 
 		// Update progress indicator
+		/*
 		const progressIndicator = this.popover.querySelector(
 			'.prpl-settings-progress'
 		);
@@ -83,6 +84,7 @@ class PrplSettingsStep extends OnboardingStep {
 				this.subSteps.length
 			}`;
 		}
+		*/
 
 		// Show/hide sub-step containers
 		this.subSteps.forEach( ( step, index ) => {
