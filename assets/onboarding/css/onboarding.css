@@ -192,6 +192,32 @@
 				background-color: #f6f5fb;
 			}
 		}
+
+		&.prpl-columns-2-1 {
+
+			.prpl-column:first-child {
+				flex: 2 1 0;
+				min-width: 0;
+			}
+
+			.prpl-column:last-child {
+				flex: 1 1 0;
+				min-width: 0;
+			}
+		}
+
+		&.prpl-columns-1-2 {
+
+			.prpl-column:first-child {
+				flex: 1 1 0;
+				min-width: 0;
+			}
+
+			.prpl-column:last-child {
+				flex: 2 1 0;
+				min-width: 0;
+			}
+		}
 	}
 
 	.prpl-btn {
@@ -320,6 +346,7 @@
 
 			img, svg {
 				height: 150px; /* Set height since it is what we do in the PP dashboard. */
+				max-width: 100%;
 			}
 		}
 	}

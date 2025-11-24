@@ -22,7 +22,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	</div>
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex">
-			<div class="prpl-column prpl-column-content">
+			<div class="prpl-column prpl-column-content prpl-columns-1-2">
 				<p>
 					<?php
 					/* translators: %1$s: Progress Planner name. %2$s: Ravi name. */

@@ -19,7 +19,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		</h2>
 	</div>
 	<div class="tour-content">
-		<div class="prpl-columns-wrapper-flex">
+		<div class="prpl-columns-wrapper-flex prpl-columns-2-1">
 			<div class="prpl-column prpl-column-content">
 				<p>
 					<?php \esc_html_e( 'For every recommendation you complete, you earn points. When you earn at least 10 points each month, you\'ll unlock the special badge for that month. Can you collect them all?', 'progress-planner' ); ?>

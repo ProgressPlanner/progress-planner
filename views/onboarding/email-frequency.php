@@ -24,7 +24,7 @@ $prpl_user_email   = $prpl_current_user->user_email ?? '';
 		</h2>
 	</div>
 	<div class="tour-content">
-		<div class="prpl-columns-wrapper-flex">
+		<div class="prpl-columns-wrapper-flex prpl-columns-1-2">
 			<div class="prpl-column prpl-column-content">
 				<p>
 					<?php \esc_html_e( 'Stay on track with emails that include recommendations, updates and useful news.', 'progress-planner' ); ?>

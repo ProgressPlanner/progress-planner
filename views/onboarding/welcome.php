@@ -22,7 +22,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		</h2>
 	</div>
 	<div class="tour-content">
-		<div class="prpl-columns-wrapper-flex">
+		<div class="prpl-columns-wrapper-flex prpl-columns-2-1">
 			<div class="prpl-column prpl-column-content">
 				<p>
 					<?php
