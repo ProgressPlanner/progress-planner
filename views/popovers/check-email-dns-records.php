@@ -47,7 +47,10 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				<?php \esc_html_e( 'Check Records', 'progress-planner' ); ?>
 			</button>
 			<button type="button" class="prpl-button prpl-button-secondary prpl-email-dns-retry" style="display:none;">
-				<?php \esc_html_e( 'Try Again', 'progress-planner' ); ?>
+				<?php \esc_html_e( 'Send another test email', 'progress-planner' ); ?>
+			</button>
+			<button type="button" class="prpl-button prpl-button-secondary prpl-email-dns-check-report-again" style="display:none;">
+				<?php \esc_html_e( 'Check again if report is ready', 'progress-planner' ); ?>
 			</button>
 			<button type="button" class="prpl-button prpl-button-primary prpl-email-dns-complete" data-action="completeTask" style="display:none;">
 				<?php \esc_html_e( 'Collect your point!', 'progress-planner' ); ?>

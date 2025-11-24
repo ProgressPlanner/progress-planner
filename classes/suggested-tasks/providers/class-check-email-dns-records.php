@@ -40,6 +40,7 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 	 */
 	public function init() {
 		\add_action( 'wp_ajax_prpl_interactive_task_submit_check-email-dns-records', [ $this, 'handle_interactive_task_specific_submit' ] );
+		\add_action( 'wp_ajax_prpl_check_email_dns_report_again', [ $this, 'handle_check_report_again' ] );
 	}
 
 	/**
@@ -239,40 +240,152 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to send email.', 'progress-planner' ) ] );
 		}
 
+		// Store email identifier and remote nonce in transient for later retrieval.
+		$user_id   = \get_current_user_id();
+		$cache_key = 'prpl_email_dns_check_' . $user_id;
+		\set_transient(
+			$cache_key,
+			[
+				'email_identifier' => $subject,
+				'remote_nonce'     => $remote_nonce,
+				'site'             => $site,
+			],
+			HOUR_IN_SECONDS
+		);
+
 		// TODO: Sleep for 15 seconds, wait for the report to be ready.
 		sleep( 15 );
 
+		// Check DNS report using the extracted method.
+		$check_result = $this->check_dns_report( $subject, $remote_nonce, $site );
+
+		if ( \is_wp_error( $check_result ) ) {
+			\wp_send_json_error( [ 'message' => $check_result->get_error_message() ] );
+		}
+
+		// If report is still processing, return a status indicating that.
+		if ( isset( $check_result['status'] ) && 'pending' === $check_result['status'] ) {
+			\wp_send_json_success(
+				[
+					'message'          => \esc_html__( 'Report is still being processed. Please check again in a moment.', 'progress-planner' ),
+					'status'           => 'pending',
+					'email_identifier' => $subject,
+				]
+			);
+		}
+
+		// Report is ready, return the results and clean up the transient.
+		\delete_transient( $cache_key );
+
+		\wp_send_json_success(
+			[
+				'message'       => \esc_html__( 'Email DNS records checked successfully.', 'progress-planner' ),
+				'response_html' => $check_result['response_html'],
+			]
+		);
+	}
+
+	/**
+	 * Check DNS report status.
+	 *
+	 * @param string $email_identifier The email identifier (subject) used for the check.
+	 * @param string $remote_nonce     The remote nonce for authentication.
+	 * @param string $site             The site URL.
+	 *
+	 * @return array|\WP_Error Array with 'response_html' on success, or 'status' => 'pending' if still processing, or WP_Error on failure.
+	 */
+	protected function check_dns_report( $email_identifier, $remote_nonce, $site ) {
 		$dns_check_request = wp_remote_get(
 			\progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/email-dns-check',
 			[
 				'body' => [
 					'nonce'            => $remote_nonce,
 					'site'             => $site,
-					'email_identifier' => $subject,
+					'email_identifier' => $email_identifier,
 				],
 			]
 		);
 
-		if ( is_wp_error( $dns_check_request ) || 200 !== wp_remote_retrieve_response_code( $dns_check_request ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to check email DNS records.', 'progress-planner' ) ] );
+		if ( \is_wp_error( $dns_check_request ) || 200 !== \wp_remote_retrieve_response_code( $dns_check_request ) ) {
+			return new \WP_Error( 'dns_check_failed', \esc_html__( 'Failed to check email DNS records.', 'progress-planner' ) );
 		}
 
 		$dns_check_response = \json_decode( wp_remote_retrieve_body( $dns_check_request ), true );
 
-		if ( ! isset( $dns_check_response['results'] ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to check email DNS records.', 'progress-planner' ) ] );
+		// Check if the report is still being processed.
+		if ( isset( $dns_check_response['status'] ) && 'pending' === $dns_check_response['status'] ) {
+			return [
+				'status' => 'pending',
+			];
 		}
 
-		// TODO: If the report is still being processed, we need to let the user know and save the email subject for later.
-		// Most likely we will fire another AJAX request (for example up to 5 times) to check if the report is ready.
+		if ( ! isset( $dns_check_response['results'] ) ) {
+			return new \WP_Error( 'dns_check_no_results', \esc_html__( 'Failed to check email DNS records.', 'progress-planner' ) );
+		}
 
 		// Build the response with DNS records status information.
 		$response_html = $this->format_dns_response( $dns_check_response['results'] );
 
+		return [
+			'response_html' => $response_html,
+		];
+	}
+
+	/**
+	 * Handle the check report again AJAX request.
+	 *
+	 * This method only checks if the report is ready and fetches it if it is.
+	 * It does not send a new email.
+	 *
+	 * @return void
+	 */
+	public function handle_check_report_again() {
+		if ( ! $this->capability_required() ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to check email DNS records.', 'progress-planner' ) ] );
+		}
+
+		// Check the nonce.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
+
+		$user_id     = \get_current_user_id();
+		$cache_key   = 'prpl_email_dns_check_' . $user_id;
+		$cached_data = \get_transient( $cache_key );
+
+		if ( false === $cached_data || ! isset( $cached_data['email_identifier'], $cached_data['remote_nonce'], $cached_data['site'] ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Email check session expired. Please start a new check.', 'progress-planner' ) ] );
+		}
+
+		$email_identifier = $cached_data['email_identifier'];
+		$remote_nonce     = $cached_data['remote_nonce'];
+		$site             = $cached_data['site'];
+
+		// Check DNS report using the extracted method.
+		$check_result = $this->check_dns_report( $email_identifier, $remote_nonce, $site );
+
+		if ( \is_wp_error( $check_result ) ) {
+			\wp_send_json_error( [ 'message' => $check_result->get_error_message() ] );
+		}
+
+		// If report is still processing, return a status indicating that.
+		if ( isset( $check_result['status'] ) && 'pending' === $check_result['status'] ) {
+			\wp_send_json_success(
+				[
+					'message'          => \esc_html__( 'Report is still being processed. Please check again in a moment.', 'progress-planner' ),
+					'status'           => 'pending',
+					'email_identifier' => $email_identifier,
+				]
+			);
+		}
+
+		// Report is ready, return the results and clean up the transient.
+		\delete_transient( $cache_key );
+
 		\wp_send_json_success(
 			[
 				'message'       => \esc_html__( 'Email DNS records checked successfully.', 'progress-planner' ),
-				'response_html' => $response_html,
+				'response_html' => $check_result['response_html'],
 			]
 		);
 	}

@@ -22,6 +22,9 @@
 
 		const checkButton = popover.querySelector( '.prpl-email-dns-check' );
 		const retryButton = popover.querySelector( '.prpl-email-dns-retry' );
+		const checkReportAgainButton = popover.querySelector(
+			'.prpl-email-dns-check-report-again'
+		);
 		const completeButton = popover.querySelector(
 			'.prpl-email-dns-complete'
 		);
@@ -38,6 +41,7 @@
 		const elements = {
 			checkButton,
 			retryButton,
+			checkReportAgainButton,
 			completeButton,
 			instructionsEl,
 			loadingEl,
@@ -52,17 +56,29 @@
 			loading: {
 				checkButton: 'none',
 				retryButton: 'none',
+				checkReportAgainButton: 'none',
 				completeButton: 'none',
 				instructionsEl: 'none',
 				loadingEl: 'block',
 				resultEl: 'none',
 				errorEl: 'none',
 			},
+			pending: {
+				instructionsEl: 'none',
+				loadingEl: 'none',
+				checkButton: 'none',
+				retryButton: 'none',
+				checkReportAgainButton: 'inline-block',
+				completeButton: 'none',
+				resultEl: 'none',
+				errorEl: 'block',
+			},
 			result: {
 				instructionsEl: 'none',
 				loadingEl: 'none',
 				checkButton: 'none',
 				retryButton: 'none',
+				checkReportAgainButton: 'none',
 				errorEl: 'none',
 				resultEl: 'block',
 				completeButton: 'inline-block',
@@ -72,6 +88,7 @@
 				loadingEl: 'none',
 				checkButton: 'none',
 				retryButton: 'inline-block',
+				checkReportAgainButton: 'none',
 				completeButton: 'none',
 				resultEl: 'none',
 				errorEl: 'block',
@@ -81,10 +98,10 @@
 		/**
 		 * Set the UI state.
 		 *
-		 * @param {string} stateName            - The state name ('loading', 'result', or 'error').
+		 * @param {string} stateName            - The state name ('loading', 'result', 'error', or 'pending').
 		 * @param {Object} options              - Additional options for the state.
 		 * @param {string} options.responseHtml - HTML content for responseEl (result state only).
-		 * @param {string} options.message      - Error message for errorMessageEl (error state only).
+		 * @param {string} options.message      - Error message for errorMessageEl (error and pending states).
 		 */
 		const setUIState = ( stateName, options = {} ) => {
 			const state = states[ stateName ];
@@ -111,7 +128,7 @@
 			}
 
 			if (
-				stateName === 'error' &&
+				( stateName === 'error' || stateName === 'pending' ) &&
 				options.message &&
 				elements.errorMessageEl
 			) {
@@ -145,6 +162,15 @@
 		};
 
 		/**
+		 * Show pending state (report is still being processed).
+		 *
+		 * @param {string} message - The message to display.
+		 */
+		const showPending = ( message ) => {
+			setUIState( 'pending', { message } );
+		};
+
+		/**
 		 * Execute the email DNS check.
 		 */
 		const executeCheck = () => {
@@ -168,6 +194,64 @@
 					}
 
 					const data = response.data;
+
+					// Check if the report is still being processed.
+					if ( data.status === 'pending' ) {
+						showPending(
+							data.message ||
+								'Report is still being processed. Please check again in a moment.'
+						);
+						return;
+					}
+
+					const responseHtml =
+						data.response_html ||
+						'<p>Check completed successfully.</p>';
+
+					showResult( responseHtml );
+				} )
+				.catch( ( error ) => {
+					console.error( 'Email DNS check error:', error );
+					showError(
+						'An error occurred while checking your email DNS records. Please try again.'
+					);
+				} );
+		};
+
+		/**
+		 * Check if the report is ready (without sending a new email).
+		 */
+		const checkReportAgain = () => {
+			showLoading();
+
+			// Make AJAX request to check if report is ready.
+			progressPlannerAjaxRequest( {
+				url: progressPlanner.ajaxUrl,
+				data: {
+					action: 'prpl_check_email_dns_report_again',
+					nonce: progressPlanner.nonce,
+				},
+			} )
+				.then( ( response ) => {
+					if ( ! response.success ) {
+						const errorMessage =
+							response.data?.message ||
+							'Failed to check email DNS records. Please try again.';
+						showError( errorMessage );
+						return;
+					}
+
+					const data = response.data;
+
+					// Check if the report is still being processed.
+					if ( data.status === 'pending' ) {
+						showPending(
+							data.message ||
+								'Report is still being processed. Please check again in a moment.'
+						);
+						return;
+					}
+
 					const responseHtml =
 						data.response_html ||
 						'<p>Check completed successfully.</p>';
@@ -190,6 +274,14 @@
 		// Retry button click handler.
 		if ( retryButton ) {
 			retryButton.addEventListener( 'click', executeCheck );
+		}
+
+		// Check report again button click handler.
+		if ( checkReportAgainButton ) {
+			checkReportAgainButton.addEventListener(
+				'click',
+				checkReportAgain
+			);
 		}
 	};
 
