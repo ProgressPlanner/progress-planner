@@ -1,6 +1,6 @@
 /**
- * Settings step - Configure About, Contact, and FAQ pages
- * Multi-step process with 3 sub-steps
+ * Settings step - Configure About, Contact, FAQ pages, Post Types, and Login Destination
+ * Multi-step process with 5 sub-steps
  */
 /* global OnboardingStep, ProgressPlannerOnboardData */
 
@@ -10,7 +10,13 @@ class PrplSettingsStep extends OnboardingStep {
 			templateId: 'onboarding-step-settings',
 		} );
 		this.currentSubStep = 0;
-		this.subSteps = [ 'about', 'contact', 'faq' ];
+		this.subSteps = [
+			'about',
+			'contact',
+			'faq',
+			'post-types',
+			'login-destination',
+		];
 	}
 
 	/**
@@ -34,6 +40,12 @@ class PrplSettingsStep extends OnboardingStep {
 				faq: {
 					hasPage: true,
 					pageId: null,
+				},
+				'post-types': {
+					selectedTypes: [], // Array of selected post type slugs
+				},
+				'login-destination': {
+					redirectOnLogin: false, // Checkbox state
 				},
 			};
 		}
@@ -67,7 +79,9 @@ class PrplSettingsStep extends OnboardingStep {
 			'.prpl-settings-progress'
 		);
 		if ( progressIndicator ) {
-			progressIndicator.textContent = `${ this.currentSubStep + 1 }/3`;
+			progressIndicator.textContent = `${ this.currentSubStep + 1 }/${
+				this.subSteps.length
+			}`;
 		}
 
 		// Show/hide sub-step containers
@@ -101,22 +115,46 @@ class PrplSettingsStep extends OnboardingStep {
 
 	/**
 	 * Setup event listeners for a sub-step
-	 * @param {string} subStepName - Name of sub-step (about/contact/faq)
+	 * @param {string} subStepName - Name of sub-step (about/contact/faq/post-types/login-destination)
 	 * @param {Object} subStepData - Data for this sub-step
 	 * @param {Object} state       - Wizard state
 	 */
 	setupSubStepListeners( subStepName, subStepData, state ) {
+		// Handle page selection sub-steps (about, contact, faq)
+		if ( [ 'about', 'contact', 'faq' ].includes( subStepName ) ) {
+			this.setupPageSelectListeners( subStepName, subStepData, state );
+			return;
+		}
+
+		// Handle post types sub-step
+		if ( subStepName === 'post-types' ) {
+			this.setupPostTypesListeners( subStepName, subStepData, state );
+			return;
+		}
+
+		// Handle login destination sub-step
+		if ( subStepName === 'login-destination' ) {
+			this.setupLoginDestinationListeners(
+				subStepName,
+				subStepData,
+				state
+			);
+		}
+	}
+
+	/**
+	 * Setup event listeners for page select sub-steps (about, contact, faq)
+	 * @param {string} subStepName - Name of sub-step
+	 * @param {Object} subStepData - Data for this sub-step
+	 * @param {Object} state       - Wizard state
+	 */
+	setupPageSelectListeners( subStepName, subStepData, state ) {
 		// Get select and checkbox
 		const pageSelect = this.popover.querySelector(
 			`select[name="pages[${ subStepName }][id]"]`
 		);
 		const noPageCheckbox = this.popover.querySelector(
 			`#prpl-no-${ subStepName }-page`
-		);
-
-		// Get select wrapper
-		const selectWrapper = this.popover.querySelector(
-			`.prpl-setting-item[data-page="${ subStepName }"] .prpl-select-page`
 		);
 
 		// Get save button
@@ -127,6 +165,11 @@ class PrplSettingsStep extends OnboardingStep {
 		if ( ! pageSelect || ! noPageCheckbox || ! saveButton ) {
 			return;
 		}
+
+		// Get select wrapper
+		const selectWrapper = this.popover.querySelector(
+			`.prpl-setting-item[data-page="${ subStepName }"] .prpl-select-page`
+		);
 
 		// Set initial states from saved data
 		if ( subStepData.pageId ) {
@@ -163,13 +206,141 @@ class PrplSettingsStep extends OnboardingStep {
 				}
 				pageSelect.value = ''; // Reset selection
 				subStepData.pageId = null;
-			} else {
+			} else if ( selectWrapper ) {
 				// Checkbox is unchecked - show select
-				if ( selectWrapper ) {
-					selectWrapper.style.display = 'block';
-				}
+				selectWrapper.style.display = 'block';
 			}
 
+			this.updateSaveButtonState( saveButton, subStepData );
+
+			// Update Next/Dashboard button if on last sub-step
+			if ( this.currentSubStep === this.subSteps.length - 1 ) {
+				this.wizard.updateNextButton();
+			}
+		} );
+
+		// Save button handler - just advances to next sub-step
+		saveButton.addEventListener( 'click', () => {
+			this.advanceSubStep( state );
+		} );
+
+		// Initial button state
+		this.updateSaveButtonState( saveButton, subStepData );
+	}
+
+	/**
+	 * Setup event listeners for post types sub-step
+	 * @param {string} subStepName - Name of sub-step
+	 * @param {Object} subStepData - Data for this sub-step
+	 * @param {Object} state       - Wizard state
+	 */
+	setupPostTypesListeners( subStepName, subStepData, state ) {
+		const container = this.popover.querySelector(
+			`.prpl-setting-item[data-page="${ subStepName }"]`
+		);
+		const saveButton = this.popover.querySelector(
+			`#prpl-save-${ subStepName }-setting`
+		);
+
+		if ( ! container || ! saveButton ) {
+			return;
+		}
+
+		// Get all checkboxes
+		const checkboxes = container.querySelectorAll(
+			'input[type="checkbox"][name="prpl-post-types-include[]"]'
+		);
+
+		// Initialize selected types from checkboxes that are already checked (from template)
+		// or from saved data if available
+		if (
+			subStepData.selectedTypes &&
+			subStepData.selectedTypes.length > 0
+		) {
+			// Use saved data if available
+			checkboxes.forEach( ( checkbox ) => {
+				checkbox.checked = subStepData.selectedTypes.includes(
+					checkbox.value
+				);
+			} );
+		} else {
+			// Initialize from checkboxes that are already checked in the template
+			subStepData.selectedTypes = Array.from( checkboxes )
+				.filter( ( cb ) => cb.checked )
+				.map( ( cb ) => cb.value );
+
+			// If no checkboxes are checked, default to all checked
+			if ( subStepData.selectedTypes.length === 0 ) {
+				checkboxes.forEach( ( checkbox ) => {
+					checkbox.checked = true;
+					subStepData.selectedTypes.push( checkbox.value );
+				} );
+			}
+		}
+
+		// Add change listeners to checkboxes
+		checkboxes.forEach( ( checkbox ) => {
+			checkbox.addEventListener( 'change', () => {
+				// Update selected types array
+				subStepData.selectedTypes = Array.from( checkboxes )
+					.filter( ( cb ) => cb.checked )
+					.map( ( cb ) => cb.value );
+
+				this.updateSaveButtonState( saveButton, subStepData );
+
+				// Update Next/Dashboard button if on last sub-step
+				if ( this.currentSubStep === this.subSteps.length - 1 ) {
+					this.wizard.updateNextButton();
+				}
+			} );
+		} );
+
+		// Save button handler - just advances to next sub-step
+		saveButton.addEventListener( 'click', () => {
+			this.advanceSubStep( state );
+		} );
+
+		// Initial button state
+		this.updateSaveButtonState( saveButton, subStepData );
+	}
+
+	/**
+	 * Setup event listeners for login destination sub-step
+	 * @param {string} subStepName - Name of sub-step
+	 * @param {Object} subStepData - Data for this sub-step
+	 * @param {Object} state       - Wizard state
+	 */
+	setupLoginDestinationListeners( subStepName, subStepData, state ) {
+		const container = this.popover.querySelector(
+			`.prpl-setting-item[data-page="${ subStepName }"]`
+		);
+		const saveButton = this.popover.querySelector(
+			`#prpl-save-${ subStepName }-setting`
+		);
+
+		if ( ! container || ! saveButton ) {
+			return;
+		}
+
+		// Get checkbox
+		const checkbox = container.querySelector(
+			'input[type="checkbox"][name="prpl-redirect-on-login"]'
+		);
+
+		if ( ! checkbox ) {
+			return;
+		}
+
+		// Initialize from checkbox that is already set in template, or from saved data
+		if ( subStepData.redirectOnLogin === undefined ) {
+			subStepData.redirectOnLogin = checkbox.checked;
+		} else {
+			checkbox.checked = subStepData.redirectOnLogin;
+		}
+
+		// Add change listener
+		checkbox.addEventListener( 'change', ( e ) => {
+			subStepData.redirectOnLogin = e.target.checked;
 			this.updateSaveButtonState( saveButton, subStepData );
 
 			// Update Next/Dashboard button if on last sub-step
@@ -219,18 +390,33 @@ class PrplSettingsStep extends OnboardingStep {
 	 * @return {boolean} True if can save
 	 */
 	canSaveSubStep( subStepData ) {
-		// If user has the page, they must select one
-		if ( subStepData.hasPage && ! subStepData.pageId ) {
-			return false;
+		// Handle page selection sub-steps (about, contact, faq)
+		if ( subStepData.hasPage !== undefined ) {
+			// If user has the page, they must select one
+			if ( subStepData.hasPage && ! subStepData.pageId ) {
+				return false;
+			}
+
+			// If checkbox is checked (don't have page), can save
+			if ( ! subStepData.hasPage ) {
+				return true;
+			}
+
+			// If page is selected, can save
+			return !! subStepData.pageId;
 		}
 
-		// If checkbox is checked (don't have page), can save
-		if ( ! subStepData.hasPage ) {
+		// Handle post types sub-step - at least one must be selected
+		if ( subStepData.selectedTypes !== undefined ) {
+			return subStepData.selectedTypes.length > 0;
+		}
+
+		// Handle login destination sub-step - always valid (checkbox is optional)
+		if ( subStepData.redirectOnLogin !== undefined ) {
 			return true;
 		}
 
-		// If page is selected, can save
-		return !! subStepData.pageId;
+		return false;
 	}
 
 	/**
@@ -278,46 +464,69 @@ class PrplSettingsStep extends OnboardingStep {
 		activeBtn.disabled = true;
 
 		try {
-			// Save all settings via AJAX
+			// Collect all settings data for a single AJAX request
+			const formDataObj = new FormData();
+			formDataObj.append( 'action', 'prpl_save_all_onboarding_settings' );
+			formDataObj.append(
+				'nonce',
+				ProgressPlannerOnboardData.nonceProgressPlanner
+			);
+
+			// Collect page settings (about, contact, faq)
+			const pages = {};
 			for ( const subStepName of this.subSteps ) {
 				const subStepData = state.data.settings[ subStepName ];
 
-				const formData = {
-					action: 'prpl_save_page_setting',
-					nonce: ProgressPlannerOnboardData.nonceProgressPlanner,
-					page_type: subStepName,
-					have_page: subStepData.hasPage ? 'yes' : 'no',
-					page_id: subStepData.pageId || '',
-				};
-
-				const response = await fetch(
-					ProgressPlannerOnboardData.adminAjaxUrl,
-					{
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded',
-						},
-						body: new URLSearchParams( formData ),
-						credentials: 'same-origin',
-					}
-				);
-
-				if ( ! response.ok ) {
-					throw new Error( 'Request failed: ' + response.status );
+				if ( [ 'about', 'contact', 'faq' ].includes( subStepName ) ) {
+					pages[ subStepName ] = {
+						id: subStepData.pageId || '',
+						have_page: subStepData.hasPage ? 'yes' : 'no',
+					};
 				}
+			}
 
-				const result = await response.json();
+			// Add pages data as JSON
+			if ( Object.keys( pages ).length > 0 ) {
+				formDataObj.append( 'pages', JSON.stringify( pages ) );
+			}
 
-				if ( ! result.success ) {
-					throw new Error(
-						result.data?.message || 'Failed to save setting'
-					);
+			// Add post types
+			const postTypesData = state.data.settings[ 'post-types' ];
+			if ( postTypesData && postTypesData.selectedTypes ) {
+				postTypesData.selectedTypes.forEach( ( postType ) => {
+					formDataObj.append( 'prpl-post-types-include[]', postType );
+				} );
+			}
+
+			// Add login destination
+			const loginData = state.data.settings[ 'login-destination' ];
+			if ( loginData && loginData.redirectOnLogin ) {
+				formDataObj.append( 'prpl-redirect-on-login', '1' );
+			}
+
+			// Send single AJAX request
+			const response = await fetch(
+				ProgressPlannerOnboardData.adminAjaxUrl,
+				{
+					method: 'POST',
+					body: formDataObj,
+					credentials: 'same-origin',
 				}
+			);
 
-				console.log(
-					`Successfully saved ${ subStepName } page setting`
+			if ( ! response.ok ) {
+				throw new Error( 'Request failed: ' + response.status );
+			}
+
+			const result = await response.json();
+
+			if ( ! result.success ) {
+				throw new Error(
+					result.data?.message || 'Failed to save settings'
 				);
 			}
+
+			console.log( 'Successfully saved all onboarding settings' );
 		} catch ( error ) {
 			console.error( 'Failed to save settings:', error );
 

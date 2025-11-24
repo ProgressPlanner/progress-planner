@@ -46,7 +46,7 @@ class Onboard_Wizard {
 		// Note: AJAX action needs to be registered early (ie wrapping init in is_admin() check will be to late).
 		\add_action( 'wp_ajax_progress_planner_onboarding_complete_task', [ $this, 'ajax_complete_task' ] );
 		\add_action( 'wp_ajax_progress_planner_onboarding_save_progress', [ $this, 'ajax_save_onboarding_progress' ] );
-		\add_action( 'wp_ajax_prpl_save_page_setting', [ $this, 'ajax_save_page_setting' ] );
+		\add_action( 'wp_ajax_prpl_save_all_onboarding_settings', [ $this, 'ajax_save_all_onboarding_settings' ] );
 
 		// Allow only images for the front-end upload.
 		\add_filter( 'rest_pre_insert_attachment', [ $this, 'rest_pre_insert_attachment' ], 10, 2 );
@@ -529,19 +529,11 @@ class Onboard_Wizard {
 	}
 
 	/**
-	 * Handle the interactive task submit.
-	 *
-	 * This is only for interactive tasks that change core permalink settings.
-	 * The $_POST data is expected to be:
-	 * - have_page: (string) The value to update the setting to.
-	 * - id: (int) The ID of the page to update.
-	 * - task_id: (string) The task ID (e.g., "set-page-about") to identify the page type.
-	 * - nonce: (string) The nonce.
+	 * Handle saving all onboarding settings in a single request.
 	 *
 	 * @return void
 	 */
-	public function ajax_save_page_setting() {
-
+	public function ajax_save_all_onboarding_settings() {
 		// Check if the user has the necessary capabilities.
 		if ( ! \current_user_can( 'manage_options' ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
@@ -552,35 +544,42 @@ class Onboard_Wizard {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
 
-		if ( ! isset( $_POST['have_page'] ) || ! isset( $_POST['page_type'] ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing value.', 'progress-planner' ) ] );
+		$page_settings = \progress_planner()->get_admin__page_settings();
+
+		// Handle page settings (about, contact, faq).
+		if ( isset( $_POST['pages'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$pages_json = \sanitize_text_field( \wp_unslash( $_POST['pages'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$pages      = \json_decode( $pages_json, true );
+
+			if ( \is_array( $pages ) ) {
+				// Convert to the format expected by set_page_values.
+				$pages_formatted = [];
+				foreach ( $pages as $page_type => $page_data ) {
+					if ( isset( $page_data['id'] ) && isset( $page_data['have_page'] ) ) {
+						$pages_formatted[ $page_type ] = [
+							'id'        => (int) $page_data['id'],
+							'have_page' => $page_data['have_page'],
+						];
+					}
+				}
+
+				if ( ! empty( $pages_formatted ) ) {
+					$page_settings->set_page_values( $pages_formatted );
+				}
+			}
 		}
 
-		$have_page = \trim( \sanitize_text_field( \wp_unslash( $_POST['have_page'] ) ) );
-		$page_type = \trim( \sanitize_text_field( \wp_unslash( $_POST['page_type'] ) ) );
-		$id        = isset( $_POST['page_id'] ) ? (int) \trim( \sanitize_text_field( \wp_unslash( $_POST['page_id'] ) ) ) : 0;
+		// Handle post types.
+		$include_post_types = isset( $_POST['prpl-post-types-include'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		? \array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
+		: [];
+		$page_settings->save_post_types( $include_post_types );
 
-		if ( empty( $have_page ) || empty( $page_type ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid page value.', 'progress-planner' ) ] );
-		}
+		// Handle login destination.
+		$redirect_on_login = isset( $_POST['prpl-redirect-on-login'] ) ? (bool) \sanitize_text_field( \wp_unslash( $_POST['prpl-redirect-on-login'] ) ) : false; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$page_settings->save_settings( $redirect_on_login );
 
-		// Validate page name against allowed page types.
-		$pages = \progress_planner()->get_admin__page_settings()->get_settings();
-		if ( ! isset( $pages[ $page_type ] ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid page name.', 'progress-planner' ) ] );
-		}
-
-		// Update the page value.
-		\progress_planner()->get_admin__page_settings()->set_page_values(
-			[
-				$page_type => [
-					'id'        => $id,
-					'have_page' => $have_page, // yes, no, not-applicable.
-				],
-			]
-		);
-
-		\wp_send_json_success( [ 'message' => \esc_html__( 'Page updated.', 'progress-planner' ) ] );
+		\wp_send_json_success( [ 'message' => \esc_html__( 'All settings saved successfully.', 'progress-planner' ) ] );
 	}
 
 	/**
