@@ -243,7 +243,7 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 		// Store email identifier and remote nonce in transient for later retrieval.
 		$user_id   = \get_current_user_id();
 		$cache_key = 'prpl_email_dns_check_' . $user_id;
-		\set_transient(
+		\progress_planner()->get_utils__cache()->set(
 			$cache_key,
 			[
 				'email_identifier' => $subject,
@@ -275,7 +275,7 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 		}
 
 		// Report is ready, return the results and clean up the transient.
-		\delete_transient( $cache_key );
+		\progress_planner()->get_utils__cache()->delete( $cache_key );
 
 		\wp_send_json_success(
 			[
@@ -351,7 +351,7 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 
 		$user_id     = \get_current_user_id();
 		$cache_key   = 'prpl_email_dns_check_' . $user_id;
-		$cached_data = \get_transient( $cache_key );
+		$cached_data = \progress_planner()->get_utils__cache()->get( $cache_key );
 
 		if ( false === $cached_data || ! isset( $cached_data['email_identifier'], $cached_data['remote_nonce'], $cached_data['site'] ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Email check session expired. Please start a new check.', 'progress-planner' ) ] );
@@ -380,7 +380,7 @@ class Check_Email_DNS_Records extends Tasks_Interactive {
 		}
 
 		// Report is ready, return the results and clean up the transient.
-		\delete_transient( $cache_key );
+		\progress_planner()->get_utils__cache()->delete( $cache_key );
 
 		\wp_send_json_success(
 			[
