@@ -38,7 +38,8 @@
 	/* Main layout container */
 	.prpl-onboarding-layout {
 		display: flex;
-		gap: 1.5rem;
+
+		/* gap: 1.5rem; */
 		min-height: 350px;
 	}
 
@@ -129,7 +130,8 @@
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		gap: 1.5rem;
+
+		/* gap: 1.5rem; */
 	}
 
 	.tour-content-wrapper {
@@ -149,15 +151,11 @@
 	}
 
 	.tour-footer {
+		margin-top: 1rem;
 		display: flex;
 		justify-content: flex-end;
 		align-items: center;
 		gap: 10px;
-
-		.prpl-btn {
-			margin-top: 0;
-			margin-bottom: 0;
-		}
 	}
 
 	.tour-content {
@@ -177,10 +175,11 @@
 
 	.prpl-columns-wrapper-flex {
 		display: flex;
-		gap: 40px;
+		gap: 1.5rem;
 
 		/* overflow: hidden; */
-		padding-bottom: 10px;
+
+		/* padding-bottom: 10px; */
 
 		.prpl-column {
 			flex-grow: 1;
@@ -222,7 +221,7 @@
 
 	.prpl-btn {
 		display: inline-block;
-		margin: 1rem 0;
+		margin: 0;
 		padding: 0.75rem 1.25rem;
 		color: var(--prpl-color-button-primary-text);
 		text-decoration: none;
@@ -321,6 +320,7 @@
 
 		.prpl-complete-task-btn {
 			flex-shrink: 0;
+			margin-top: 1rem;
 		}
 	}
 
@@ -408,6 +408,7 @@
 				border: 1px solid #ccc;
 				border-radius: 4px;
 				font-size: 14px;
+				line-height: 1.4;
 				color: #4b5563;
 			}
 		}
@@ -429,7 +430,15 @@
 		}
 
 		.prpl-setting-title {
-			margin: 0;
+			margin: 0 0 1rem 0;
+		}
+
+		.prpl-settings-progress {
+			font-size: 14px;
+			color: #fff;
+			padding: 4px 8px;
+			border-radius: 50%;
+			background-color: #534786;
 		}
 
 		.prpl-setting-footer {
@@ -437,11 +446,7 @@
 			justify-content: flex-end;
 			align-items: center;
 			gap: 10px;
-
-			.prpl-btn {
-				margin-top: 0;
-				margin-bottom: 0;
-			}
+			margin-top: 1rem;
 		}
 	}
 

@@ -50,7 +50,7 @@ $prpl_user_email   = $prpl_current_user->user_email ?? '';
 				<div id="prpl-email-form" class="prpl-email-form" style="display: none;">
 					<div class="prpl-form-field">
 						<label for="prpl-email-name">
-							<?php \esc_html_e( 'Name', 'progress-planner' ); ?>
+							<?php \esc_html_e( 'First name', 'progress-planner' ); ?>
 							<span class="required">*</span>
 						</label>
 						<input
@@ -65,7 +65,7 @@ $prpl_user_email   = $prpl_current_user->user_email ?? '';
 
 					<div class="prpl-form-field">
 						<label for="prpl-email-address">
-							<?php \esc_html_e( 'Email', 'progress-planner' ); ?>
+							<?php \esc_html_e( 'Email address', 'progress-planner' ); ?>
 							<span class="required">*</span>
 						</label>
 						<input

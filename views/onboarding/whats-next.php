@@ -18,6 +18,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<div class="prpl-column prpl-column-content">
 				<h3>
 					<?php \esc_html_e( 'Recommendations', 'progress-planner' ); ?>
+				</h3>
 				<p>
 					<?php
 					\printf( \esc_html__( 'Tasks that show you what to work on next.', 'progress-planner' ) );
@@ -30,6 +31,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<div class="prpl-column prpl-column-content">
 				<h3>
 					<?php \esc_html_e( 'Badges', 'progress-planner' ); ?>
+				</h3>
 				<p>
 					<?php
 					\printf( \esc_html__( 'You earn points for every completed task.', 'progress-planner' ) );
