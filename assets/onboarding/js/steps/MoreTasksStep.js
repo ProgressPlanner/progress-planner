@@ -3,7 +3,7 @@
  * Handles multiple tasks that can be completed in any order
  * Each task may open a sub-popover with its own form
  */
-/* global OnboardingStep, PopoverTask */
+/* global OnboardingStep, PrplOnboardTask */
 
 class PrplMoreTasksStep extends OnboardingStep {
 	constructor() {
@@ -31,10 +31,10 @@ class PrplMoreTasksStep extends OnboardingStep {
 			state.data.moreTasksCompleted[ btn.dataset.taskId ] = false;
 		} );
 
-		// Initialize PopoverTask instances for each task, passing wizard reference
+		// Initialize PrplOnboardTask instances for each task, passing wizard reference
 		this.tasks = Array.from(
 			this.popover.querySelectorAll( '[data-popover="task"]' )
-		).map( ( t ) => new PopoverTask( t, this.wizard ) );
+		).map( ( t ) => new PrplOnboardTask( t, this.wizard ) );
 
 		// Listen for task completion events
 		const handler = ( e ) => {

@@ -1,11 +1,11 @@
 /**
- * PopoverTask - Handles individual tasks that replace content in tour-content-wrapper
+ * OnboardTask - Handles individual tasks that replace content in tour-content-wrapper
  * Used by the MoreTasksStep for tasks that require user input
  */
 /* global ProgressPlannerOnboardData, ProgressPlannerTourUtils */
 
 // eslint-disable-next-line no-unused-vars
-class PopoverTask {
+class PrplOnboardTask {
 	constructor( el, wizard ) {
 		this.el = el;
 		this.id = el.dataset.taskId;
