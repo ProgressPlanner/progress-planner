@@ -131,7 +131,7 @@ class OnboardingStep {
 			</div>
 		`;
 
-		// Insert error message before the footer
+		// TODO: Move to step footer instead of popover footer?
 		const footer = this.wizard?.popover?.querySelector( '.tour-footer' );
 		if ( footer ) {
 			footer.parentElement.insertBefore( errorDiv, footer );
@@ -176,5 +176,28 @@ class OnboardingStep {
 		button.disabled = true;
 
 		return spinner;
+	}
+
+	/**
+	 * Toggle visibility of the footer in this step's template
+	 * @param {boolean} visible - Whether to show the footer
+	 */
+	toggleStepFooter( visible ) {
+		const stepFooter = this.popover?.querySelector(
+			'.tour-content-wrapper .tour-footer'
+		);
+		if ( stepFooter ) {
+			stepFooter.style.display = visible ? 'flex' : 'none';
+		}
+	}
+
+	/**
+	 * Called before advancing to next step
+	 * Fires AJAX request to subscribe user if "Email me weekly" was selected
+	 * @return {Promise} Resolves when action is complete
+	 */
+	async beforeNextStep() {
+		// Override in subclass
+		return Promise.resolve();
 	}
 }

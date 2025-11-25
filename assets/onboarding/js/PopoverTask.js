@@ -119,9 +119,6 @@ class PopoverTask {
 		// Add task content to wrapper
 		this.contentWrapper.appendChild( this.taskContent );
 
-		// Hide footer when task is active
-		this.wizard.toggleFooter( false );
-
 		// Hide the popover close button
 		const popoverCloseBtn = this.wizard.popover.querySelector(
 			'#prpl-tour-close-btn'
@@ -149,9 +146,6 @@ class PopoverTask {
 				child.classList.remove( 'prpl-original-content' );
 			} );
 		}
-
-		// Show footer
-		this.wizard.toggleFooter( true );
 
 		// Show the popover close button
 		const popoverCloseBtn = this.wizard.popover.querySelector(

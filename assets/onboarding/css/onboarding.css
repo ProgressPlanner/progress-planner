@@ -159,6 +159,7 @@
 		justify-content: flex-end;
 		align-items: center;
 		gap: 10px;
+		width: 100%;
 	}
 
 	.tour-content {
@@ -184,15 +185,16 @@
 
 		/* padding-bottom: 10px; */
 
+		.prpl-column-content {
+			padding: 20px;
+			border-radius: 6px;
+			background-color: #f6f5fb;
+		}
+
 		.prpl-column {
 			flex-grow: 1;
 			flex-basis: 50%;
-
-			&.prpl-column-content {
-				padding: 20px;
-				border-radius: 6px;
-				background-color: #f6f5fb;
-			}
+			flex-direction: column;
 		}
 
 		&.prpl-columns-2-1 {

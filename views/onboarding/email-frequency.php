@@ -81,4 +81,7 @@ $prpl_user_email   = $prpl_current_user->user_email ?? '';
 			</div>
 		</div>
 	</div>
+	<div class="tour-footer">
+		<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php \esc_html_e( 'Got it', 'progress-planner' ); ?></button>
+	</div>
 </script>

@@ -32,7 +32,8 @@ class ProgressPlannerOnboardWizard {
 		this.footer = this.popover.querySelector( '.tour-footer' );
 
 		// Popover buttons.
-		this.nextBtn = this.popover.querySelector( '.prpl-tour-next' );
+		// Note: nextBtn is now found in step content after rendering, not in footer
+		this.nextBtn = null; // Will be set in renderStep()
 		this.closeBtn = this.popover.querySelector( '#prpl-tour-close-btn' );
 
 		// Initialize tour steps AFTER popover is set
@@ -126,6 +127,25 @@ class ProgressPlannerOnboardWizard {
 		// Render step content
 		this.contentWrapper.innerHTML = step.render();
 
+		// Find the next button in the rendered step content
+		this.nextBtn = this.contentWrapper.querySelector( '.prpl-tour-next' );
+
+		// Wire up the button click handler if it exists
+		if ( this.nextBtn ) {
+			// Remove any existing listeners by cloning the button
+			const newBtn = this.nextBtn.cloneNode( true );
+			if ( this.nextBtn.parentNode ) {
+				this.nextBtn.parentNode.replaceChild( newBtn, this.nextBtn );
+			}
+			this.nextBtn = newBtn;
+
+			// Add click listener
+			this.nextBtn.addEventListener( 'click', () => {
+				console.log( 'Next button clicked!' );
+				this.nextStep();
+			} );
+		}
+
 		// Cleanup previous step
 		if ( this.state.cleanup ) {
 			this.state.cleanup();
@@ -171,16 +191,6 @@ class ProgressPlannerOnboardWizard {
 	}
 
 	/**
-	 * Toggle footer visibility
-	 * @param {boolean} visible - Whether to show the footer
-	 */
-	toggleFooter( visible ) {
-		if ( this.footer ) {
-			this.footer.style.display = visible ? '' : 'none';
-		}
-	}
-
-	/**
 	 * Move to next step
 	 */
 	async nextStep() {
@@ -197,7 +207,7 @@ class ProgressPlannerOnboardWizard {
 		}
 
 		// Call beforeNextStep if step has it (for async operations like license generation)
-		if ( typeof step.beforeNextStep === 'function' ) {
+		if ( step.beforeNextStep ) {
 			try {
 				await step.beforeNextStep();
 			} catch ( error ) {
@@ -297,6 +307,11 @@ class ProgressPlannerOnboardWizard {
 	 * Update next button state
 	 */
 	updateNextButton() {
+		// Button might not exist if step doesn't include it in template
+		if ( ! this.nextBtn ) {
+			return;
+		}
+
 		const step = this.tourSteps[ this.state.currentStep ];
 		const isLastStep = this.state.currentStep === this.tourSteps.length - 1;
 
@@ -350,12 +365,8 @@ class ProgressPlannerOnboardWizard {
 				}
 			} );
 
-			if ( this.nextBtn ) {
-				this.nextBtn.addEventListener( 'click', () => {
-					console.log( 'Next button clicked!' );
-					this.nextStep();
-				} );
-			}
+			// Note: nextBtn click handler is now set up in renderStep()
+			// since the button is part of the step content
 
 			if ( this.closeBtn ) {
 				this.closeBtn.addEventListener( 'click', ( e ) => {
@@ -401,18 +412,12 @@ class ProgressPlannerOnboardWizard {
 			</div>
 		`;
 
-		// Hide footer.
-		this.toggleFooter( false );
-
 		// Add event listeners
 		const quitYes = this.contentWrapper.querySelector( '#prpl-quit-yes' );
 		const quitNo = this.contentWrapper.querySelector( '#prpl-quit-no' );
 
 		quitYes.addEventListener( 'click', ( e ) => {
 			e.preventDefault();
-
-			// Show footer again.
-			this.toggleFooter( true );
 
 			this.closeTour();
 		} );
@@ -421,9 +426,6 @@ class ProgressPlannerOnboardWizard {
 			e.preventDefault();
 			// Restore original content
 			this.contentWrapper.innerHTML = originalContent;
-
-			// Show footer again.
-			this.toggleFooter( true );
 
 			// Re-mount the step
 			this.renderStep();

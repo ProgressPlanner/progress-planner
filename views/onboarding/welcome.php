@@ -23,28 +23,34 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	</div>
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex prpl-columns-2-1">
-			<div class="prpl-column prpl-column-content">
-				<p>
-					<?php
-					/* translators: %s: Progress Planner name. */
-					\printf( \esc_html__( '%s helps you set clear, focused goals for your website. Let\'s go through a few simple steps to get everything set up.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
-					?>
-				</p>
-				<p>
-					<?php \esc_html_e( 'This will only take 3 to 5 minutes.', 'progress-planner' ); ?>
-				</p>
-
-				<div class="prpl-privacy-checkbox-wrapper">
-					<label>
-						<input type="checkbox" id="prpl-privacy-checkbox" name="privacy_accepted" value="1">
+			<div class="prpl-column">
+				<div class="prpl-column-content">
+					<p>
 						<?php
-						\printf(
-							/* translators: %s: progressplanner.com/privacy-policy link */
-							\esc_html__( 'I agree to the %s.', 'progress-planner' ),
-							'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">Privacy policy</a>'
-						);
+						/* translators: %s: Progress Planner name. */
+						\printf( \esc_html__( '%s helps you set clear, focused goals for your website. Let\'s go through a few simple steps to get everything set up.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
 						?>
-					</label>
+					</p>
+					<p>
+						<?php \esc_html_e( 'This will only take 3 to 5 minutes.', 'progress-planner' ); ?>
+					</p>
+
+					<div class="prpl-privacy-checkbox-wrapper">
+						<label>
+							<input type="checkbox" id="prpl-privacy-checkbox" name="privacy_accepted" value="1">
+							<?php
+							\printf(
+								/* translators: %s: progressplanner.com/privacy-policy link */
+								\esc_html__( 'I agree to the %s.', 'progress-planner' ),
+								'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">Privacy policy</a>'
+							);
+							?>
+						</label>
+					</div>
+				</div>
+
+				<div class="tour-footer">
+					<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php \esc_html_e( 'Next', 'progress-planner' ); ?></button>
 				</div>
 			</div>
 			<div class="prpl-column">

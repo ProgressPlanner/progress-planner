@@ -30,4 +30,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			</div>
 		</div>
 	</div>
+	<div class="tour-footer">
+		<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php \esc_html_e( 'Got it', 'progress-planner' ); ?></button>
+	</div>
 </script>

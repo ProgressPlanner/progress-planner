@@ -53,16 +53,16 @@ class PrplSettingsStep extends OnboardingStep {
 		// Always start from first sub-step
 		this.currentSubStep = 0;
 
-		// Hide footer initially (will show on last sub-step)
-		this.wizard.toggleFooter( false );
+		// Hide footer in step template initially (will show on last sub-step)
+		this.toggleStepFooter( false );
 
 		// Render the current sub-step
 		this.renderSubStep( state );
 
 		// Return cleanup function
 		return () => {
-			// Show footer when leaving this step
-			this.wizard.toggleFooter( true );
+			// Show footer when leaving this step (for other steps that might need it)
+			this.toggleStepFooter( true );
 		};
 	}
 
@@ -108,6 +108,9 @@ class PrplSettingsStep extends OnboardingStep {
 
 		// Setup event listeners for current sub-step
 		this.setupSubStepListeners( subStepName, subStepData, state );
+
+		// Show/hide footer based on sub-step
+		this.toggleStepFooter( isLastSubStep );
 
 		// Update Next/Dashboard button state if on last sub-step
 		if ( isLastSubStep ) {
@@ -368,11 +371,7 @@ class PrplSettingsStep extends OnboardingStep {
 		if ( this.currentSubStep < this.subSteps.length - 1 ) {
 			this.currentSubStep++;
 			this.renderSubStep( state );
-
-			// Show footer if advancing to last sub-step
-			if ( this.currentSubStep === this.subSteps.length - 1 ) {
-				this.wizard.toggleFooter( true );
-			}
+			// Footer visibility is handled in renderSubStep()
 		}
 	}
 

@@ -617,10 +617,11 @@ class Onboard_Wizard {
 				<div class="prpl-onboarding-content">
 					<div class="tour-content-wrapper">
 						<!-- Tour content will be rendered here -->
+						<!-- Note: Each step template should include its own .prpl-tour-next button -->
 					</div>
 
 					<div class="tour-footer">
-						<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php esc_html_e( 'Next', 'progress-planner' ); ?></button>
+						<!-- Footer is kept for potential future use, but button is now in step templates -->
 					</div>
 				</div>
 			</div>
