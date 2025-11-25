@@ -14,18 +14,21 @@ if ( ! \defined( 'ABSPATH' ) ) {
 $prpl_page_types = [
 	'about'   => [
 		'id'          => 'about',
-		'title'       => \esc_html__( 'About page', 'progress-planner' ),
+		'title'       => __( 'About page', 'progress-planner' ),
 		'description' => \esc_html__( 'Help us understand your site a little better so we can give you more useful recommendations.', 'progress-planner' ),
+		'note'        => __( 'An About page is important. We\'ll remind you to make one at later time.', 'progress-planner' ),
 	],
 	'contact' => [
 		'id'          => 'contact',
-		'title'       => \esc_html__( 'Contact page', 'progress-planner' ),
+		'title'       => __( 'Contact page', 'progress-planner' ),
 		'description' => \esc_html__( 'Help us understand your site a little better so we can give you more useful recommendations.', 'progress-planner' ),
+		'note'        => __( 'A Contact page is important. We\'ll remind you to make one at later time.', 'progress-planner' ),
 	],
 	'faq'     => [
 		'id'          => 'faq',
-		'title'       => \esc_html__( 'FAQ page', 'progress-planner' ),
+		'title'       => __( 'FAQ page', 'progress-planner' ),
 		'description' => \esc_html__( 'Help us understand your site a little better so we can give you more useful recommendations.', 'progress-planner' ),
+		'note'        => __( 'An FAQ page is important. We\'ll remind you to make one at later time.', 'progress-planner' ),
 	],
 ];
 
@@ -96,6 +99,14 @@ $prpl_current_step_number   = 0;
 							</div>
 						</div>
 						<div class="prpl-setting-footer">
+							<div class="prpl-setting-note">
+								<span class="prpl-setting-note-icon">
+									i
+								</span>
+								<p>
+									<?php echo \esc_html( $prpl_page_type['note'] ); ?>
+								</p>
+							</div>
 							<button
 								type="button"
 								id="prpl-save-<?php echo \esc_attr( $prpl_page_type['id'] ); ?>-setting"
@@ -136,15 +147,17 @@ $prpl_current_step_number   = 0;
 								</p>
 								<div id="prpl-post-types-include-wrapper">
 									<?php foreach ( $prpl_post_types as $prpl_post_type ) : ?>
-										<label>
-											<input
-												type="checkbox"
-												name="prpl-post-types-include[]"
-												value="<?php echo \esc_attr( $prpl_post_type ); ?>"
-												<?php \checked( \in_array( $prpl_post_type, $prpl_saved_settings, true ) ); ?>
-											/>
-											<?php echo \esc_html( \get_post_type_object( $prpl_post_type )->labels->name ); // @phpstan-ignore-line property.nonObject ?>
-										</label>
+										<div>
+											<label>
+												<input
+													type="checkbox"
+													name="prpl-post-types-include[]"
+													value="<?php echo \esc_attr( $prpl_post_type ); ?>"
+													<?php \checked( \in_array( $prpl_post_type, $prpl_saved_settings, true ) ); ?>
+												/>
+												<?php echo \esc_html( \get_post_type_object( $prpl_post_type )->labels->name ); // @phpstan-ignore-line property.nonObject ?>
+											</label>
+										</div>
 									<?php endforeach; ?>
 								</div>
 							</div>

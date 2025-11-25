@@ -184,7 +184,7 @@ class PrplSettingsStep extends OnboardingStep {
 		if ( ! subStepData.hasPage ) {
 			noPageCheckbox.checked = true;
 			if ( selectWrapper ) {
-				selectWrapper.style.display = 'none';
+				selectWrapper.classList.add( 'prpl-disabled' );
 			}
 		}
 
@@ -203,17 +203,31 @@ class PrplSettingsStep extends OnboardingStep {
 		noPageCheckbox.addEventListener( 'change', ( e ) => {
 			subStepData.hasPage = ! e.target.checked;
 
+			// Display the note if the checkbox is checked.
+			const note = this.popover.querySelector(
+				`.prpl-setting-item[data-page="${ subStepName }"] .prpl-setting-footer .prpl-setting-note`
+			);
+
 			// Hide/show select based on checkbox
 			if ( e.target.checked ) {
 				// Checkbox is checked - hide select
 				if ( selectWrapper ) {
-					selectWrapper.style.display = 'none';
+					selectWrapper.classList.add( 'prpl-disabled' );
 				}
 				pageSelect.value = ''; // Reset selection
 				subStepData.pageId = null;
+				if ( note ) {
+					note.style.display = 'flex';
+				}
 			} else if ( selectWrapper ) {
 				// Checkbox is unchecked - show select
-				selectWrapper.style.display = 'block';
+				if ( selectWrapper ) {
+					selectWrapper.classList.remove( 'prpl-disabled' );
+				}
+
+				if ( note ) {
+					note.style.display = 'none';
+				}
 			}
 
 			this.updateSaveButtonState( saveButton, subStepData );
