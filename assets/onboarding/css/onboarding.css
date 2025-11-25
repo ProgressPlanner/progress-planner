@@ -172,10 +172,14 @@
 	.tour-footer {
 		margin-top: 1rem;
 		display: flex;
-		justify-content: flex-end;
-		align-items: center;
+		justify-content: space-between;
+		align-items: flex-start;
 		gap: 10px;
 		width: 100%;
+
+		.prpl-tour-next {
+			margin-left: auto;
+		}
 	}
 
 	.tour-content {
@@ -616,7 +620,6 @@
 
 	/* Generic error message (reusable for all steps) */
 	.prpl-error-message {
-		margin: 20px 0;
 		animation: prpl-slide-down 0.3s ease-out;
 	}
 

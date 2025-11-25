@@ -132,9 +132,10 @@ class OnboardingStep {
 		`;
 
 		// TODO: Move to step footer instead of popover footer?
-		const footer = this.wizard?.popover?.querySelector( '.tour-footer' );
+		const footer =
+			this.wizard?.contentWrapper?.querySelector( '.tour-footer' );
 		if ( footer ) {
-			footer.parentElement.insertBefore( errorDiv, footer );
+			footer.prepend( errorDiv );
 		}
 	}
 
@@ -183,7 +184,7 @@ class OnboardingStep {
 	 * @param {boolean} visible - Whether to show the footer
 	 */
 	toggleStepFooter( visible ) {
-		const stepFooter = this.popover?.querySelector(
+		const stepFooter = this.wizard?.contentWrapper?.querySelector(
 			'.tour-content-wrapper .tour-footer'
 		);
 		if ( stepFooter ) {

@@ -29,7 +29,6 @@ class ProgressPlannerOnboardWizard {
 		this.contentWrapper = this.popover.querySelector(
 			'.tour-content-wrapper'
 		);
-		this.footer = this.popover.querySelector( '.tour-footer' );
 
 		// Popover buttons.
 		// Note: nextBtn is now found in step content after rendering, not in footer
