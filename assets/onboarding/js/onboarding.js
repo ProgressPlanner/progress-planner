@@ -217,9 +217,11 @@ class ProgressPlannerOnboardWizard {
 			this.closeTour();
 
 			// Redirect to the Progress Planner dashboard
-			const redirectUrl = this.nextBtn.getAttribute( 'data-redirect-to' );
-			if ( redirectUrl ) {
-				window.location.href = redirectUrl;
+			if (
+				this.config.lastStepRedirectUrl &&
+				this.config.lastStepRedirectUrl.length > 0
+			) {
+				window.location.href = this.config.lastStepRedirectUrl;
 			}
 		}
 	}

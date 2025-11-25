@@ -339,6 +339,7 @@ class Onboard_Wizard {
 				'site'                 => \esc_attr( \set_url_scheme( \site_url() ) ),
 				'timezone_offset'      => (float) ( \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600 ),
 				'savedProgress'        => $saved_progress,
+				'lastStepRedirectUrl'  => \esc_url_raw( admin_url( 'admin.php?page=progress-planner' ) ),
 				'l10n'                 => [
 					'next'            => \esc_html__( 'Next', 'progress-planner' ),
 					'startOnboarding' => \esc_html__( 'Start onboarding', 'progress-planner' ),
@@ -619,7 +620,7 @@ class Onboard_Wizard {
 					</div>
 
 					<div class="tour-footer">
-						<button class="prpl-tour-next prpl-btn prpl-btn-primary" data-redirect-to="<?php echo \esc_url( admin_url( 'admin.php?page=progress-planner' ) ); ?>">><?php esc_html_e( 'Next', 'progress-planner' ); ?></button>
+						<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php esc_html_e( 'Next', 'progress-planner' ); ?></button>
 					</div>
 				</div>
 			</div>
