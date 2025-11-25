@@ -396,40 +396,38 @@ class ProgressPlannerOnboardWizard {
 		// Replace content with confirmation message
 		const originalContent = this.contentWrapper.innerHTML;
 
-		this.contentWrapper.innerHTML = `
-			<div class="prpl-quit-confirmation">
-				<div class="prpl-error-box">
-					<span class="dashicons dashicons-warning"></span>
-					<div>
-						<h3>Are you sure you want to quit?</h3>
-						<p>You need to finish the onboarding before you can work with the Progress Planner plugin and start improving your site.</p>
-					</div>
-				</div>
-				<div class="prpl-quit-actions">
-					<a href="#" id="prpl-quit-yes" class="prpl-quit-link">Yes, quit the onboarding (for now)</a>
-					<a href="#" id="prpl-quit-no" class="prpl-quit-link prpl-quit-link-primary">No, let's finish the onboarding!</a>
-				</div>
-			</div>
-		`;
+		// Get template from DOM
+		const template = document.getElementById(
+			'onboarding-quit-confirmation'
+		);
+		if ( ! template ) {
+			console.error( 'Quit confirmation template not found' );
+			return;
+		}
+
+		this.contentWrapper.innerHTML = template.innerHTML;
 
 		// Add event listeners
 		const quitYes = this.contentWrapper.querySelector( '#prpl-quit-yes' );
 		const quitNo = this.contentWrapper.querySelector( '#prpl-quit-no' );
 
-		quitYes.addEventListener( 'click', ( e ) => {
-			e.preventDefault();
+		if ( quitYes ) {
+			quitYes.addEventListener( 'click', ( e ) => {
+				e.preventDefault();
+				this.closeTour();
+			} );
+		}
 
-			this.closeTour();
-		} );
+		if ( quitNo ) {
+			quitNo.addEventListener( 'click', ( e ) => {
+				e.preventDefault();
+				// Restore original content
+				this.contentWrapper.innerHTML = originalContent;
 
-		quitNo.addEventListener( 'click', ( e ) => {
-			e.preventDefault();
-			// Restore original content
-			this.contentWrapper.innerHTML = originalContent;
-
-			// Re-mount the step
-			this.renderStep();
-		} );
+				// Re-mount the step
+				this.renderStep();
+			} );
+		}
 	}
 
 	/**

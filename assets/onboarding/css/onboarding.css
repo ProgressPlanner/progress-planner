@@ -664,11 +664,21 @@
 	}
 
 	/* Popover: Quit confirmation */
+	&:has(.prpl-quit-confirmation) {
+
+		.prpl-onboarding-navigation {
+			display: none;
+		}
+	}
+
+	.prpl-column:has(.prpl-quit-confirmation) {
+		justify-content: flex-start !important;
+	}
+
 	.prpl-quit-confirmation {
 		display: flex;
 		flex-direction: column;
 		gap: 30px;
-		padding: 40px 20px;
 	}
 
 	.prpl-quit-message {
@@ -694,7 +704,7 @@
 	.prpl-quit-actions {
 		display: flex;
 		gap: 40px;
-		justify-content: center;
+		justify-content: space-between;
 		align-items: center;
 	}
 
@@ -711,6 +721,20 @@
 		&.prpl-quit-link-primary {
 			font-weight: 600;
 			font-size: 16px;
+		}
+	}
+
+	#prpl-quit-confirmation-graphic {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		img,
+		svg {
+			height: 250px;
+
+			/* Set height since it is what we do in the PP dashboard. */
+			max-width: 100%;
 		}
 	}
 }

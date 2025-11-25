@@ -619,10 +619,6 @@ class Onboard_Wizard {
 						<!-- Tour content will be rendered here -->
 						<!-- Note: Each step template should include its own .prpl-tour-next button -->
 					</div>
-
-					<div class="tour-footer">
-						<!-- Footer is kept for potential future use, but button is now in step templates -->
-					</div>
 				</div>
 			</div>
 
@@ -642,6 +638,9 @@ class Onboard_Wizard {
 		foreach ( $this->steps as $step ) {
 			\progress_planner()->the_view( 'onboarding/' . $step['template_file_name'] . '.php', isset( $step['template_data'] ) ? $step['template_data'] : [] );
 		}
+
+		// Add quit confirmation template.
+		\progress_planner()->the_view( 'onboarding/quit-confirmation.php' );
 		?>
 		<script>
 			// Initialize tour when DOM is ready
