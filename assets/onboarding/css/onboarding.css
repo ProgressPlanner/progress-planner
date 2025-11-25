@@ -407,6 +407,20 @@
 		}
 	}
 
+	/* What's Next Step */
+	.prpl-suggested-task-points {
+		font-size: var(--prpl-font-size-xs);
+		font-weight: 700;
+		color: var(--prpl-text-point);
+		background-color: var(--prpl-background-point);
+		width: 1.5rem;
+		height: 1.5rem;
+		border-radius: 50%;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
 	/* First Task Step */
 	.prpl-onboarding-task {
 		display: flex;

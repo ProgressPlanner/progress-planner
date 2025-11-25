@@ -33,6 +33,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					<?php \esc_html_e( 'Badges', 'progress-planner' ); ?>
 				</h3>
 				<p>
+					<span class="prpl-suggested-task-points">
+						+1
+					</span>
 					<?php
 					\printf( \esc_html__( 'You earn points for every completed task.', 'progress-planner' ) );
 					?>
