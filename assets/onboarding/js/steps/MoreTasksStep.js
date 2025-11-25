@@ -61,17 +61,7 @@ class PrplMoreTasksStep extends OnboardingStep {
 	 * @return {boolean} True if all tasks are completed
 	 */
 	canProceed( state ) {
-		if ( ! state.data.moreTasksCompleted ) {
-			return false;
-		}
-
-		const completedTasks = Object.keys( state.data.moreTasksCompleted );
-		if ( completedTasks.length === 0 ) {
-			return false;
-		}
-
-		// Check if all tasks are completed
-		return Object.values( state.data.moreTasksCompleted ).every( Boolean );
+		return true; // All tasks are optional, so we can proceed if any are completed.
 	}
 }
 
