@@ -359,11 +359,8 @@ class ProgressPlannerOnboardWizard {
 				this.closeBtn.addEventListener( 'click', ( e ) => {
 					console.log( 'Close button clicked!' );
 
-					// Check if privacy is accepted on welcome step
-					if (
-						this.state.currentStep === 0 &&
-						! this.state.data.privacyAccepted
-					) {
+					// Display quit confirmation if on welcome step (since privacy policy is accepted there)
+					if ( this.state.currentStep === 0 ) {
 						e.preventDefault();
 						this.showQuitConfirmation();
 						return;
