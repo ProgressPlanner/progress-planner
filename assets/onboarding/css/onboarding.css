@@ -365,13 +365,13 @@
 			align-items: center;
 		}
 
-		#prpl-welcome-logo {
+		#prpl-welcome-graphic {
 			display: flex;
 			justify-content: center;
 			align-items: center;
 
 			img, svg {
-				height: 150px; /* Set height since it is what we do in the PP dashboard. */
+				height: 250px; /* Set height since it is what we do in the PP dashboard. */
 				max-width: 100%;
 			}
 		}
@@ -487,7 +487,7 @@
 			font-size: 14px;
 			color: #fff;
 			padding: 4px 8px;
-			border-radius: 50%;
+			border-radius: 20px;
 			background-color: #534786;
 		}
 

@@ -54,8 +54,8 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				</div>
 			</div>
 			<div class="prpl-column">
-				<div id="prpl-welcome-logo">
-					<?php \progress_planner()->get_ui__branding()->the_logo(); ?>
+				<div id="prpl-welcome-graphic">
+					<?php \progress_planner()->the_file( 'assets/onboarding/images/thumbs_up_ravi_rtl.svg' ); ?>
 				</div>
 			</div>
 		</div>
