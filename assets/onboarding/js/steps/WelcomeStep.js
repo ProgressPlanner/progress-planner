@@ -93,7 +93,7 @@ class PrplWelcomeStep extends OnboardingStep {
 			console.error( 'Failed to generate license:', error );
 
 			// Display error message to user
-			this.showErrorMessage( error.message );
+			this.showErrorMessage( error.message, 'Error generating license' );
 
 			// Re-enable the button so user can retry
 			nextBtn.disabled = false;
@@ -105,56 +105,6 @@ class PrplWelcomeStep extends OnboardingStep {
 			spinner.remove();
 			this.isGeneratingLicense = false;
 		}
-	}
-
-	/**
-	 * Show error message to user
-	 * Uses generic error styling that can be reused across all steps
-	 * @param {string} message Error message to display
-	 */
-	showErrorMessage( message ) {
-		// Remove existing error if any
-		this.clearErrorMessage();
-
-		// Create error message element
-		const errorDiv = document.createElement( 'div' );
-		errorDiv.className = 'prpl-error-message';
-		errorDiv.innerHTML = `
-			<div class="prpl-error-box">
-				<span class="dashicons dashicons-warning"></span>
-				<div>
-					<h3>Error generating license</h3>
-					<p>${ this.escapeHtml( message ) }</p>
-				</div>
-			</div>
-		`;
-
-		// Insert error message before the footer
-		const footer = this.wizard.popover.querySelector( '.tour-footer' );
-		footer.parentElement.insertBefore( errorDiv, footer );
-	}
-
-	/**
-	 * Clear error message
-	 */
-	clearErrorMessage() {
-		const existingError = this.wizard.popover.querySelector(
-			'.prpl-error-message'
-		);
-		if ( existingError ) {
-			existingError.remove();
-		}
-	}
-
-	/**
-	 * Escape HTML to prevent XSS
-	 * @param {string} text Text to escape
-	 * @return {string} Escaped text
-	 */
-	escapeHtml( text ) {
-		const div = document.createElement( 'div' );
-		div.textContent = text;
-		return div.innerHTML;
 	}
 
 	/**

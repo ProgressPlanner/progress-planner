@@ -108,4 +108,56 @@ class OnboardingStep {
 			this.wizard.nextStep();
 		}
 	}
+
+	/**
+	 * Show error message to user
+	 * @param {string} message Error message to display
+	 * @param {string} title   Optional error title (defaults to "Error")
+	 */
+	showErrorMessage( message, title = 'Error' ) {
+		// Remove existing error if any
+		this.clearErrorMessage();
+
+		// Create error message element
+		const errorDiv = document.createElement( 'div' );
+		errorDiv.className = 'prpl-error-message';
+		errorDiv.innerHTML = `
+			<div class="prpl-error-box">
+				<span class="dashicons dashicons-warning"></span>
+				<div>
+					<h3>${ this.escapeHtml( title ) }</h3>
+					<p>${ this.escapeHtml( message ) }</p>
+				</div>
+			</div>
+		`;
+
+		// Insert error message before the footer
+		const footer = this.wizard?.popover?.querySelector( '.tour-footer' );
+		if ( footer ) {
+			footer.parentElement.insertBefore( errorDiv, footer );
+		}
+	}
+
+	/**
+	 * Clear error message
+	 */
+	clearErrorMessage() {
+		const existingError = this.wizard?.popover?.querySelector(
+			'.prpl-error-message'
+		);
+		if ( existingError ) {
+			existingError.remove();
+		}
+	}
+
+	/**
+	 * Escape HTML to prevent XSS
+	 * @param {string} text Text to escape
+	 * @return {string} Escaped text
+	 */
+	escapeHtml( text ) {
+		const div = document.createElement( 'div' );
+		div.textContent = text;
+		return div.innerHTML;
+	}
 }
