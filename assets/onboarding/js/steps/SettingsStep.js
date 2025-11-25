@@ -457,13 +457,7 @@ class PrplSettingsStep extends OnboardingStep {
 		const activeBtn =
 			nextBtn.style.display !== 'none' ? nextBtn : dashboardBtn;
 
-		const spinner = document.createElement( 'span' );
-		spinner.classList.add( 'prpl-spinner' );
-		spinner.innerHTML =
-			'<span class="spinner" style="visibility: visible;"></span>';
-
-		activeBtn.parentElement.insertBefore( spinner, activeBtn );
-		activeBtn.disabled = true;
+		const spinner = this.showSpinner( activeBtn );
 
 		try {
 			// Collect all settings data for a single AJAX request

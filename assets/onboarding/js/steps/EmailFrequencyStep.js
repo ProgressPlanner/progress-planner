@@ -164,13 +164,7 @@ class PrplEmailFrequencyStep extends OnboardingStep {
 
 		// Show spinner
 		const nextBtn = this.wizard.nextBtn;
-		const spinner = document.createElement( 'span' );
-		spinner.classList.add( 'prpl-spinner' );
-		spinner.innerHTML =
-			'<span class="spinner" style="visibility: visible;"></span>';
-
-		nextBtn.parentElement.insertBefore( spinner, nextBtn );
-		nextBtn.disabled = true;
+		const spinner = this.showSpinner( nextBtn );
 
 		try {
 			// Use LicenseGenerator to handle the license generation process

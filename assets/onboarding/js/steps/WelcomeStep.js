@@ -78,13 +78,7 @@ class PrplWelcomeStep extends OnboardingStep {
 
 		// Show spinner
 		const nextBtn = this.wizard.nextBtn;
-		const spinner = document.createElement( 'span' );
-		spinner.classList.add( 'prpl-spinner' );
-		spinner.innerHTML =
-			'<span class="spinner" style="visibility: visible;"></span>'; // WP spinner.
-
-		nextBtn.parentElement.insertBefore( spinner, nextBtn );
-		nextBtn.disabled = true;
+		const spinner = this.showSpinner( nextBtn );
 
 		try {
 			// Generate license

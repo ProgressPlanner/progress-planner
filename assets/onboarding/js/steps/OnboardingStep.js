@@ -160,4 +160,21 @@ class OnboardingStep {
 		div.textContent = text;
 		return div.innerHTML;
 	}
+
+	/**
+	 * Show spinner before a button and disable the button
+	 * @param {HTMLElement} button Button element to show spinner before and disable
+	 * @return {HTMLElement} The created spinner element
+	 */
+	showSpinner( button ) {
+		const spinner = document.createElement( 'span' );
+		spinner.classList.add( 'prpl-spinner' );
+		spinner.innerHTML =
+			'<span class="spinner" style="visibility: visible;"></span>';
+
+		button.parentElement.insertBefore( spinner, button );
+		button.disabled = true;
+
+		return spinner;
+	}
 }
