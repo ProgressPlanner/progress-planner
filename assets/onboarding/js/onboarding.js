@@ -411,6 +411,10 @@ class ProgressPlannerOnboardWizard {
 
 		quitYes.addEventListener( 'click', ( e ) => {
 			e.preventDefault();
+
+			// Show footer again.
+			this.toggleFooter( true );
+
 			this.closeTour();
 		} );
 
@@ -418,6 +422,10 @@ class ProgressPlannerOnboardWizard {
 			e.preventDefault();
 			// Restore original content
 			this.contentWrapper.innerHTML = originalContent;
+
+			// Show footer again.
+			this.toggleFooter( true );
+
 			// Re-mount the step
 			this.renderStep();
 		} );
