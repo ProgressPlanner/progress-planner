@@ -177,8 +177,11 @@
 		gap: 10px;
 		width: 100%;
 
-		.prpl-tour-next {
+		.prpl-tour-next-wrapper {
 			margin-left: auto;
+			display: flex;
+			align-items: center;
+			gap: 10px;
 		}
 	}
 

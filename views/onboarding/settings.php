@@ -212,6 +212,8 @@ $prpl_current_step_number   = 0;
 		</div>
 	</div>
 	<div class="tour-footer">
-		<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php \esc_html_e( 'Next', 'progress-planner' ); ?></button>
+		<div class="prpl-tour-next-wrapper">
+			<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php \esc_html_e( 'Next', 'progress-planner' ); ?></button>
+		</div>
 	</div>
 </script>
