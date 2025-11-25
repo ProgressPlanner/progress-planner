@@ -8,6 +8,7 @@
 	max-height: 82vh;
 	width: 1200px;
 	max-width: 80vw;
+	color: var(--prpl-color-text);
 	background: #fff;
 	border: 1px solid #9ca3af;
 
@@ -36,6 +37,21 @@
 
 	p {
 		font-size: 1rem;
+		margin-top: 0;
+		margin-bottom: 0.5rem;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	h3 {
+		margin-top: 0;
+		margin-bottom: 1rem;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
 	}
 
 	/* Main layout container */
@@ -103,7 +119,7 @@
 	}
 
 	.prpl-step-item.active .prpl-step-icon {
-		background: #4338ca;
+		background: #534786;
 		color: #fff;
 	}
 
@@ -166,10 +182,6 @@
 		font-size: 16px;
 		line-height: 1.5;
 
-		p {
-			margin-bottom: 10px;
-		}
-
 		img {
 			max-width: 100%;
 			height: auto;
@@ -187,7 +199,7 @@
 
 		.prpl-column-content {
 			padding: 20px;
-			border-radius: 6px;
+			border-radius: 12px;
 			background-color: #f6f5fb;
 		}
 
@@ -396,13 +408,13 @@
 		gap: 10px;
 
 		.prpl-onboarding-task-title {
-			margin: 0;
+			margin: 0 0 1rem 0;
 			font-size: 18px;
 			font-weight: 600;
-			color: #4b5563;
 		}
 
 		.prpl-onboarding-task-form {
+			margin-top: 1rem;
 			width: 100%;
 			flex-direction: column;
 
