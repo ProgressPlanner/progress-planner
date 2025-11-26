@@ -41,8 +41,8 @@ class PrplMoreTasksStep extends OnboardingStep {
 			// Update state when a task is completed
 			state.data.moreTasksCompleted[ e.detail.id ] = true;
 
-			// Check if all tasks are completed
-			this.wizard.updateNextButton();
+			// Update next button state
+			this.updateNextButton();
 		};
 
 		this.popover.addEventListener( 'taskCompleted', handler );

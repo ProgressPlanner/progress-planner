@@ -51,7 +51,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 				<div class="tour-footer">
 					<div class="prpl-tour-next-wrapper">
-						<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php \esc_html_e( 'Next', 'progress-planner' ); ?></button>
+						<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php \esc_html_e( 'Start onboarding', 'progress-planner' ); ?></button>
 					</div>
 				</div>
 			</div>

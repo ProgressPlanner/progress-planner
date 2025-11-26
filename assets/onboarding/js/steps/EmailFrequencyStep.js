@@ -63,7 +63,7 @@ class PrplEmailFrequencyStep extends OnboardingStep {
 				emailForm.style.display = 'block';
 
 				// Update button state
-				this.wizard.updateNextButton();
+				this.updateNextButton();
 			}
 		};
 
@@ -73,19 +73,19 @@ class PrplEmailFrequencyStep extends OnboardingStep {
 				emailForm.style.display = 'none';
 
 				// Update button state
-				this.wizard.updateNextButton();
+				this.updateNextButton();
 			}
 		};
 
 		// Form input handlers
 		const nameHandler = ( e ) => {
 			state.data.emailFrequency.name = e.target.value.trim();
-			this.wizard.updateNextButton();
+			this.updateNextButton();
 		};
 
 		const emailHandler = ( e ) => {
 			state.data.emailFrequency.email = e.target.value.trim();
-			this.wizard.updateNextButton();
+			this.updateNextButton();
 		};
 
 		// Add event listeners
@@ -163,8 +163,7 @@ class PrplEmailFrequencyStep extends OnboardingStep {
 		}
 
 		// Show spinner
-		const nextBtn = this.wizard.nextBtn;
-		const spinner = this.showSpinner( nextBtn );
+		const spinner = this.showSpinner( this.nextBtn );
 
 		try {
 			// Use LicenseGenerator to handle the license generation process
@@ -187,7 +186,7 @@ class PrplEmailFrequencyStep extends OnboardingStep {
 			);
 
 			// Re-enable the button so user can retry
-			nextBtn.disabled = false;
+			this.setNextButtonDisabled( false );
 
 			// Don't proceed to next step
 			throw error;

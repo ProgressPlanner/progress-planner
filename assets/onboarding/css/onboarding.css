@@ -268,10 +268,14 @@
 		position: relative;
 		z-index: 1;
 
+		flex-shrink: 0;
+
+		&.prpl-btn-disabled,
 		&:disabled {
 
 			/* opacity: 0.5; */
-			pointer-events: none;
+
+			/* pointer-events: none; */
 
 			color: #374151;
 			background-color: #e1e3e7;

@@ -31,8 +31,6 @@ class ProgressPlannerOnboardWizard {
 		);
 
 		// Popover buttons.
-		// Note: nextBtn is now found in step content after rendering, not in footer
-		this.nextBtn = null; // Will be set in renderStep()
 		this.closeBtn = this.popover.querySelector( '#prpl-tour-close-btn' );
 
 		// Initialize tour steps AFTER popover is set
@@ -126,25 +124,6 @@ class ProgressPlannerOnboardWizard {
 		// Render step content
 		this.contentWrapper.innerHTML = step.render();
 
-		// Find the next button in the rendered step content
-		this.nextBtn = this.contentWrapper.querySelector( '.prpl-tour-next' );
-
-		// Wire up the button click handler if it exists
-		if ( this.nextBtn ) {
-			// Remove any existing listeners by cloning the button
-			const newBtn = this.nextBtn.cloneNode( true );
-			if ( this.nextBtn.parentNode ) {
-				this.nextBtn.parentNode.replaceChild( newBtn, this.nextBtn );
-			}
-			this.nextBtn = newBtn;
-
-			// Add click listener
-			this.nextBtn.addEventListener( 'click', () => {
-				console.log( 'Next button clicked!' );
-				this.nextStep();
-			} );
-		}
-
 		// Cleanup previous step
 		if ( this.state.cleanup ) {
 			this.state.cleanup();
@@ -154,10 +133,12 @@ class ProgressPlannerOnboardWizard {
 		// Mount current step and store cleanup function
 		this.state.cleanup = step.onMount( this.state );
 
+		// Setup next button (handled by step now)
+		step.setupNextButton();
+
 		// Update step indicator
 		this.popover.dataset.prplStep = this.state.currentStep;
 		this.updateStepNavigation();
-		this.updateNextButton();
 	}
 
 	/**
@@ -304,38 +285,12 @@ class ProgressPlannerOnboardWizard {
 
 	/**
 	 * Update next button state
+	 * Delegates to current step's updateNextButton method
 	 */
 	updateNextButton() {
-		// Button might not exist if step doesn't include it in template
-		if ( ! this.nextBtn ) {
-			return;
-		}
-
 		const step = this.tourSteps[ this.state.currentStep ];
-		const isLastStep = this.state.currentStep === this.tourSteps.length - 1;
-
-		// Check if user can proceed to next step
-		this.nextBtn.disabled = ! step.canProceed( this.state );
-
-		// Update button text if step provides custom text
-		const buttonText = step.getNextButtonText();
-		if ( buttonText ) {
-			// Step provides custom button text
-			this.nextBtn.textContent = buttonText;
-		} else if ( isLastStep ) {
-			// On last step, use "Take me to the Recommendations dashboard" text
-			const dashboardText =
-				this.config.l10n && this.config.l10n.dashboard
-					? this.config.l10n.dashboard
-					: 'Take me to the Recommendations dashboard';
-			this.nextBtn.textContent = dashboardText;
-		} else {
-			// Use default translated text
-			const defaultText =
-				this.config.l10n && this.config.l10n.next
-					? this.config.l10n.next
-					: 'Next';
-			this.nextBtn.textContent = defaultText;
+		if ( step && typeof step.updateNextButton === 'function' ) {
+			step.updateNextButton();
 		}
 	}
 

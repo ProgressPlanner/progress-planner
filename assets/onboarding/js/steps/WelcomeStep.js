@@ -35,6 +35,9 @@ class PrplWelcomeStep extends OnboardingStep {
 
 		const handler = ( e ) => {
 			state.data.privacyAccepted = e.target.checked;
+
+			// Clear any existing error messages.
+			this.clearErrorMessage();
 		};
 
 		checkbox.addEventListener( 'change', handler );
@@ -45,20 +48,36 @@ class PrplWelcomeStep extends OnboardingStep {
 	}
 
 	/**
+	 * Setup custom handler for disabled button clicks
+	 * Shows error message when user tries to proceed without accepting privacy policy
+	 * @return {Function} Cleanup function
+	 */
+	onNextButtonSetup() {
+		const disabledClickHandler = ( e ) => {
+			if ( this.nextBtn.classList.contains( 'prpl-btn-disabled' ) ) {
+				e.preventDefault();
+				e.stopPropagation();
+				this.showErrorMessage(
+					ProgressPlannerOnboardData.l10n.privacyPolicyError
+				);
+			}
+		};
+
+		this.nextBtn.addEventListener( 'click', disabledClickHandler );
+
+		// Return cleanup function
+		return () => {
+			this.nextBtn?.removeEventListener( 'click', disabledClickHandler );
+		};
+	}
+
+	/**
 	 * User can only proceed if privacy policy is accepted
 	 * @param {Object} state - Wizard state
 	 * @return {boolean} True if privacy is accepted
 	 */
 	canProceed( state ) {
 		return !! state.data.privacyAccepted;
-	}
-
-	/**
-	 * Custom button text for welcome step
-	 * @return {string} Button text
-	 */
-	getNextButtonText() {
-		return ProgressPlannerOnboardData.l10n.startOnboarding;
 	}
 
 	/**
@@ -77,8 +96,7 @@ class PrplWelcomeStep extends OnboardingStep {
 		this.clearErrorMessage();
 
 		// Show spinner
-		const nextBtn = this.wizard.nextBtn;
-		const spinner = this.showSpinner( nextBtn );
+		const spinner = this.showSpinner( this.nextBtn );
 
 		try {
 			// Generate license
@@ -90,7 +108,7 @@ class PrplWelcomeStep extends OnboardingStep {
 			this.showErrorMessage( error.message, 'Error generating license' );
 
 			// Re-enable the button so user can retry
-			nextBtn.disabled = false;
+			this.setNextButtonDisabled( false );
 
 			// Don't proceed to next step
 			throw error;

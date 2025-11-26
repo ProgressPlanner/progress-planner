@@ -114,7 +114,7 @@ class PrplSettingsStep extends OnboardingStep {
 
 		// Update Next/Dashboard button state if on last sub-step
 		if ( isLastSubStep ) {
-			this.wizard.updateNextButton();
+			this.updateNextButton();
 		}
 	}
 
@@ -195,7 +195,7 @@ class PrplSettingsStep extends OnboardingStep {
 
 			// Update Next/Dashboard button if on last sub-step
 			if ( this.currentSubStep === this.subSteps.length - 1 ) {
-				this.wizard.updateNextButton();
+				this.updateNextButton();
 			}
 		} );
 
@@ -234,7 +234,7 @@ class PrplSettingsStep extends OnboardingStep {
 
 			// Update Next/Dashboard button if on last sub-step
 			if ( this.currentSubStep === this.subSteps.length - 1 ) {
-				this.wizard.updateNextButton();
+				this.updateNextButton();
 			}
 		} );
 
@@ -309,7 +309,7 @@ class PrplSettingsStep extends OnboardingStep {
 
 				// Update Next/Dashboard button if on last sub-step
 				if ( this.currentSubStep === this.subSteps.length - 1 ) {
-					this.wizard.updateNextButton();
+					this.updateNextButton();
 				}
 			} );
 		} );
@@ -364,7 +364,7 @@ class PrplSettingsStep extends OnboardingStep {
 
 			// Update Next/Dashboard button if on last sub-step
 			if ( this.currentSubStep === this.subSteps.length - 1 ) {
-				this.wizard.updateNextButton();
+				this.updateNextButton();
 			}
 		} );
 
@@ -464,13 +464,8 @@ class PrplSettingsStep extends OnboardingStep {
 	async beforeNextStep() {
 		const state = this.getState();
 
-		// Show spinner on Next/Dashboard button
-		const nextBtn = this.wizard.nextBtn;
-		const dashboardBtn = this.wizard.dashboardBtn;
-		const activeBtn =
-			nextBtn.style.display !== 'none' ? nextBtn : dashboardBtn;
-
-		const spinner = this.showSpinner( activeBtn );
+		// Show spinner on Next button
+		const spinner = this.showSpinner( this.nextBtn );
 
 		try {
 			// Collect all settings data for a single AJAX request
@@ -546,7 +541,7 @@ class PrplSettingsStep extends OnboardingStep {
 			);
 
 			// Re-enable button
-			activeBtn.disabled = false;
+			this.setNextButtonDisabled( false );
 
 			// Don't proceed to next step
 			throw error;
