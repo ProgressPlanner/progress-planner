@@ -13,40 +13,33 @@ if ( ! \defined( 'ABSPATH' ) ) {
 }
 ?>
 <div class="prpl-onboarding-task">
-	<div class="tour-content">
-		<div>
-			<h3 class="prpl-onboarding-task-title">
-				<?php echo esc_html( $task['title'] ); ?>
-			</h3>
-			<p>
-				Lorem ipsum dolor sit amet consectetur adipiscing elit, eget interdum nostra tortor vestibulum ultrices, quisque congue nibh ullamcorper sapien natoque.
-			</p>
+	<h3 class="prpl-onboarding-task-title">
+		<?php echo esc_html( $task['title'] ); ?>
+	</h3>
+	<p>
+		<?php \esc_html_e( 'Upload an image to make your site stand out.', 'progress-planner' ); ?>
+	</p>
+	<form class="prpl-onboarding-task-form" onsubmit="return false;">
 
+		<div class="prpl-file-drop-zone" data-upload-field>
 			<p>
-				Venenatis parturient suspendisse massa cursus litora dapibus auctor, et vestibulum blandit condimentum quis ultrices sagittis aliquam.
+			<?php
+				printf(
+					// translators: %1$s is opening label tag, %2$s is the closing label tag.
+					\esc_html__( 'Drag and drop a file here or %1$s upload a file %2$s', 'progress-planner' ),
+					'<label for="prpl-file-input-core-siteicon" class="prpl-file-browse-link">',
+					'</label>'
+				);
+				?>
+				<span class="prpl-file-type-hint">PNG, SVG, ICO, WEBP</span>
 			</p>
+			<input type="file" id="prpl-file-input-core-siteicon" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" accept=".ico,.png,.jpg,.jpeg,.gif,.webp" hidden>
+			<input type="hidden" name="post_id" value="" data-validate="required">
+			<div class="prpl-upload-status"></div> <!-- WIP -->
+			<div class="prpl-file-preview"></div>
 		</div>
-		<form class="prpl-onboarding-task-form" onsubmit="return false;">
-
-			<div class="prpl-file-drop-zone" data-upload-field>
-				<p>
-				<?php
-					printf(
-						// translators: %1$s is opening label tag, %2$s is the closing label tag.
-						\esc_html__( 'Drag & drop a file here, or %1$s browse %2$s', 'progress-planner' ),
-						'<label for="prpl-file-input-core-siteicon" class="prpl-file-browse-link">',
-						'</label>'
-					);
-					?>
-				</p>
-				<input type="file" id="prpl-file-input-core-siteicon" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" accept=".ico,.png,.jpg,.jpeg,.gif,.svg,.webp" hidden>
-				<input type="hidden" name="post_id" value="" data-validate="required">
-				<div class="prpl-upload-status"></div> <!-- WIP -->
-				<div class="prpl-file-preview"></div>
-			</div>
-			<button type="button" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-primary">
-				<?php \esc_html_e( 'Set site icon', 'progress-planner' ); ?>
-			</button>
-		</form>
-	</div>
+		<button type="button" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-primary">
+			<?php \esc_html_e( 'Set site icon', 'progress-planner' ); ?>
+		</button>
+	</form>
 </div>

@@ -101,6 +101,14 @@ class OnboardingStep {
 	}
 
 	/**
+	 * Get the tour footer element
+	 * @return {HTMLElement|null} The tour footer element or null if not found
+	 */
+	getTourFooter() {
+		return this.wizard?.contentWrapper?.querySelector( '.tour-footer' );
+	}
+
+	/**
 	 * Show error message to user
 	 * @param {string} message Error message to display
 	 * @param {string} title   Optional error title
@@ -125,9 +133,8 @@ class OnboardingStep {
 			</div>
 		`;
 
-		// TODO: Move to step footer instead of popover footer?
-		const footer =
-			this.wizard?.contentWrapper?.querySelector( '.tour-footer' );
+		// Add error message to tour footer
+		const footer = this.getTourFooter();
 		if ( footer ) {
 			footer.prepend( errorDiv );
 		}
@@ -178,9 +185,7 @@ class OnboardingStep {
 	 * @param {boolean} visible - Whether to show the footer
 	 */
 	toggleStepFooter( visible ) {
-		const stepFooter = this.wizard?.contentWrapper?.querySelector(
-			'.tour-content-wrapper .tour-footer'
-		);
+		const stepFooter = this.getTourFooter();
 		if ( stepFooter ) {
 			stepFooter.style.display = visible ? 'flex' : 'none';
 		}

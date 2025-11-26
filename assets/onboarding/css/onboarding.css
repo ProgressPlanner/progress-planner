@@ -370,14 +370,37 @@
 		color: #1e40af;
 	}
 
+/*
 	.prpl-complete-task-btn-completed:not(.prpl-btn) {
 		color: #059669;
 		pointer-events: none;
 		opacity: 0.5;
-	}
+	} */
 
 	.prpl-complete-task-btn-error {
 		color: #9f0712;
+	}
+
+	.prpl-task-completed-icon {
+		display: none;
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		align-items: center;
+		justify-content: center;
+		color: #fff;
+		background-color: #059669;
+	}
+
+	.prpl-task-completed {
+
+		.prpl-task-completed-icon {
+			display: inline-flex;
+		}
+
+		.prpl-complete-task-btn {
+			display: none;
+		}
 	}
 
 	/* WIP for tasks which need user input. */
@@ -607,6 +630,7 @@
 		padding: 0;
 		margin: 0;
 		width: 100%;
+		border: 1px solid #ccc;
 
 		li {
 			padding: 7px 5px;
@@ -634,6 +658,7 @@
 		flex-direction: column;
 		flex-grow: 1;
 		gap: 1.5rem;
+		width: 100%;
 
 		.prpl-onboarding-task {
 			display: flex;
@@ -675,13 +700,14 @@
 
 	/* File drop zone. */
 	.prpl-file-drop-zone {
-		border: 2px dashed #aaa;
-		border-radius: 10px;
+		width: 100%;
+		border-radius: 12px;
 		padding: 40px;
 		text-align: center;
 		color: #555;
 		transition: background 0.2s, border-color 0.2s;
 		cursor: pointer;
+		border: 2px dashed #aaa;
 	}
 
 	.prpl-file-drop-zone.dragover {
@@ -693,6 +719,12 @@
 		color: #007bff;
 		text-decoration: underline;
 		cursor: pointer;
+	}
+
+	.prpl-file-type-hint {
+		display: block;
+		font-size: 14px;
+		color: #555;
 	}
 
 	/* WIP */

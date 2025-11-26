@@ -1,6 +1,7 @@
 /**
- * OnboardTask - Handles individual tasks that replace content in tour-content-wrapper
+ * OnboardTask - Handles individual tasks that open within the column
  * Used by the MoreTasksStep for tasks that require user input
+ * Toggles visibility of task list and shows task content in the same column
  */
 /* global ProgressPlannerOnboardData, ProgressPlannerTourUtils */
 
@@ -13,11 +14,25 @@ class PrplOnboardTask {
 		this.taskContent = null;
 		this.formValues = {};
 		this.openPopoverBtn = el.querySelector( '[prpl-open-task-popover]' );
-		this.contentWrapper = null;
-		this.originalContentElements = null;
 
 		// Register task open event
 		this.openPopoverBtn?.addEventListener( 'click', () => this.open() );
+	}
+
+	/**
+	 * Get the tour footer element via the current step
+	 * @return {HTMLElement|null} The tour footer element or null if not found
+	 */
+	getTourFooter() {
+		// Get the current step and use its getTourFooter method
+		const currentStep =
+			this.wizard?.tourSteps?.[ this.wizard.state.currentStep ];
+		if ( currentStep && typeof currentStep.getTourFooter === 'function' ) {
+			return currentStep.getTourFooter();
+		}
+
+		// Fallback in case step doesn't have the method
+		return this.wizard?.contentWrapper?.querySelector( '.tour-footer' );
 	}
 
 	registerEvents() {
@@ -66,22 +81,25 @@ class PrplOnboardTask {
 			return; // Already open
 		}
 
-		// Get the content wrapper
-		this.contentWrapper = this.wizard.popover.querySelector(
-			'.tour-content-wrapper'
-		);
-		if ( ! this.contentWrapper ) {
+		// Find the column containing the task list
+		const taskList = this.wizard.popover.querySelector( '.prpl-task-list' );
+		if ( ! taskList ) {
 			return;
 		}
 
-		// Store all children as hidden original content
-		this.originalContentElements = Array.from(
-			this.contentWrapper.children
-		);
-		this.originalContentElements.forEach( ( child ) => {
-			child.style.display = 'none';
-			child.classList.add( 'prpl-original-content' );
-		} );
+		const column = taskList.closest( '.prpl-column' );
+		if ( ! column ) {
+			return;
+		}
+
+		// Hide the task list
+		taskList.style.display = 'none';
+
+		// Hide the tour footer (it's part of the step content)
+		const tourFooter = this.getTourFooter();
+		if ( tourFooter ) {
+			tourFooter.style.display = 'none';
+		}
 
 		// Get task content from template
 		const content = this.el
@@ -116,8 +134,8 @@ class PrplOnboardTask {
 			buttonWrapper.appendChild( completeBtn );
 		}
 
-		// Add task content to wrapper
-		this.contentWrapper.appendChild( this.taskContent );
+		// Add task content to the column
+		column.appendChild( this.taskContent );
 
 		// Hide the popover close button
 		const popoverCloseBtn = this.wizard.popover.querySelector(
@@ -139,12 +157,16 @@ class PrplOnboardTask {
 		// Remove task content
 		this.taskContent.remove();
 
-		// Show original content
-		if ( this.originalContentElements ) {
-			this.originalContentElements.forEach( ( child ) => {
-				child.style.display = '';
-				child.classList.remove( 'prpl-original-content' );
-			} );
+		// Show the task list
+		const taskList = this.wizard.popover.querySelector( '.prpl-task-list' );
+		if ( taskList ) {
+			taskList.style.display = '';
+		}
+
+		// Show the tour footer (it's part of the step content)
+		const tourFooter = this.getTourFooter();
+		if ( tourFooter ) {
+			tourFooter.style.display = '';
 		}
 
 		// Show the popover close button
@@ -157,19 +179,16 @@ class PrplOnboardTask {
 
 		// Clean up
 		this.taskContent = null;
-		this.originalContentElements = null;
 	}
 
 	complete() {
 		ProgressPlannerTourUtils.completeTask( this.id, this.formValues )
 			.then( () => {
-				this.el.classList.add( 'completed' );
+				this.el.classList.add( 'prpl-task-completed' );
 				const taskBtn = this.el.querySelector(
 					'.prpl-complete-task-btn'
 				);
 				if ( taskBtn ) {
-					taskBtn.classList.add( 'prpl-complete-task-btn-completed' );
-					taskBtn.textContent = 'Completed';
 					taskBtn.disabled = true;
 				}
 
