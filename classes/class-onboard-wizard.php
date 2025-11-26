@@ -595,7 +595,7 @@ class Onboard_Wizard {
 	 */
 	public function add_popover() {
 		?>
-		<div id="prpl-popover-onboarding" class="prpl-popover prpl-popover-onboarding" data-prpl-step="0" popover="manual" tabindex="-1">
+		<div id="prpl-popover-onboarding" class="prpl-popover-onboarding" data-prpl-step="0" popover="manual" tabindex="-1">
 			<div class="prpl-onboarding-layout">
 				<!-- Left column: Step navigation -->
 				<div class="prpl-onboarding-navigation">
