@@ -454,6 +454,12 @@
 		}
 	}
 
+	/* Badges Step */
+	.prpl-gauge-wrapper {
+		max-width: 100%;
+		text-align: center;
+	}
+
 	/* Email Frequency Step */
 	.prpl-email-frequency-options {
 		display: flex;

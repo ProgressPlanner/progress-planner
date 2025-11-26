@@ -9,6 +9,10 @@
 if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
+
+use Progress_Planner\Badges\Monthly;
+
+$prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( new \DateTime() ) );
 ?>
 
 <!-- Tour step badges -->
@@ -26,7 +30,24 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				</p>
 			</div>
 			<div class="prpl-column">
-				<img src="<?php echo esc_url( \constant( 'PROGRESS_PLANNER_URL' ) ); ?>/assets/onboarding/images/badge-gauge.png" alt="Badges">
+				<div class="prpl-gauge-wrapper">
+					<prpl-gauge
+						id="prpl-gauge-onboarding"
+						background="#fff"
+						color="var(--prpl-color-monthly)"
+						contentFontSize="var(--prpl-font-size-4xl)"
+						contentPadding="var(--prpl-padding)"
+						marginBottom="0"
+						data-max="<?php echo (int) Monthly::TARGET_POINTS; ?>"
+						data-value="<?php echo (float) \progress_planner()->get_admin__widgets__monthly_badges()->get_score()['target_score']; ?>" <?php /* Note that this will be the value before the onboaring started, which is what we want. */ ?>
+						data-badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
+						data-badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"
+						data-branding-id="<?php echo (int) \progress_planner()->get_ui__branding()->get_branding_id(); ?>"
+					>
+						<!-- Badge will be loaded dynamically after privacy policy acceptance -->
+					</prpl-gauge>
+					<?php \esc_html_e( 'Monthly badge', 'progress-planner' ); ?>
+				</div>
 			</div>
 		</div>
 	</div>

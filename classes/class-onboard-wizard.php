@@ -314,6 +314,9 @@ class Onboard_Wizard {
 		foreach ( $this->steps as $step ) {
 			\wp_enqueue_script( 'prpl-onboarding-' . $step['script_file_name'], \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/' . $step['script_file_name'] . '.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
 		}
+
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-gauge' );
+
 		// Enqueue main onboarding.js (depends on all step components).
 		\wp_enqueue_script(
 			'prpl-popover-onboarding',
