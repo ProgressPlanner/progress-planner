@@ -18,6 +18,9 @@ class ProgressPlannerOnboardWizard {
 			cleanup: null,
 		};
 
+		// Store previously focused element for accessibility
+		this.previouslyFocusedElement = null;
+
 		// Restore saved progress if available
 		this.restoreSavedProgress();
 
@@ -242,6 +245,15 @@ class ProgressPlannerOnboardWizard {
 
 		// Reset cleanup
 		this.state.cleanup = null;
+
+		// Restore focus to previously focused element for accessibility
+		if (
+			this.previouslyFocusedElement &&
+			typeof this.previouslyFocusedElement.focus === 'function'
+		) {
+			this.previouslyFocusedElement.focus();
+			this.previouslyFocusedElement = null;
+		}
 	}
 
 	/**
@@ -249,9 +261,19 @@ class ProgressPlannerOnboardWizard {
 	 */
 	startOnboarding() {
 		if ( this.popover ) {
+			// Store currently focused element for accessibility
+			this.previouslyFocusedElement =
+				this.popover.ownerDocument.activeElement;
+
 			this.popover.showPopover();
 			this.updateStepNavigation();
 			this.renderStep();
+
+			// Move focus to popover for keyboard accessibility
+			// Use setTimeout to ensure popover is visible before focusing
+			setTimeout( () => {
+				this.popover.focus();
+			}, 0 );
 		}
 	}
 
