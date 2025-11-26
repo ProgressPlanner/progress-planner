@@ -119,7 +119,8 @@ class Onboard_Wizard {
 				'script_file_name'   => 'WelcomeStep',
 				'template_file_name' => 'welcome',
 				'template_id'        => 'onboarding-step-welcome',
-				'title'              => esc_html__( 'Welcome to Progress Planner', 'progress-planner' ),
+				/* translators: %s: Progress Planner name. */
+				'title'              => sprintf( esc_html__( 'Welcome to %s', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) ),
 			],
 			[
 				'script_file_name'   => 'WhatsNextStep',

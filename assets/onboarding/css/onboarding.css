@@ -45,6 +45,12 @@
 		}
 	}
 
+	h2 {
+		margin-top: 0;
+		margin-bottom: 0.75rem;
+		font-size: 1.25rem;
+	}
+
 	h3 {
 		margin-top: 0;
 		margin-bottom: 1rem;
@@ -220,8 +226,6 @@
 	.tour-header {
 
 		.tour-title {
-			margin-top: 0;
-			font-size: 20px;
 			color: #38296d;
 			font-weight: 600;
 		}
