@@ -649,6 +649,9 @@ class Onboard_Wizard {
 
 				// Initialize tour instance
 				window.prplOnboardWizard = new ProgressPlannerOnboardWizard( window.ProgressPlannerOnboardData );
+
+				// WIP: Dispatch event to notify that the onboarding wizard is ready.
+				document.dispatchEvent( new Event( 'prplOnboardWizardReady' ) );
 			});
 		</script>
 		<?php

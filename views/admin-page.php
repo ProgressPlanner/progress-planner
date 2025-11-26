@@ -42,7 +42,11 @@ if ( 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id() ) {
 			\do_action( 'progress_planner_admin_page_after_widgets' );
 		?>
 	<?php else : ?>
-		<?php \progress_planner()->the_view( 'welcome.php' ); ?>
+		<script>
+			document.addEventListener( 'prplOnboardWizardReady', function() {
+				window.prplOnboardWizard.startOnboarding();
+			} );
+		</script>
 	<?php endif; ?>
 </div>
 <div class="prpl-overlay" id="prpl-overlay" style="display: none;"></div>

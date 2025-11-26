@@ -1,10 +1,10 @@
-/* global progressPlanner, progressPlannerAjaxRequest, progressPlannerSaveLicenseKey, prplL10n */
+/* global progressPlanner, progressPlannerAjaxRequest, prplL10n */
 /*
  * Settings
  *
  * A script to handle the settings page.
  *
- * Dependencies: progress-planner/ajax-request, progress-planner/onboard, wp-util, progress-planner/l10n
+ * Dependencies: progress-planner/ajax-request, wp-util, progress-planner/l10n
  */
 
 // Submit the email.
@@ -66,3 +66,20 @@ if ( !! settingsLicenseForm ) {
 			prplL10n( 'subscribing' );
 	} );
 }
+
+/**
+ * Make a request to save the license key.
+ *
+ * @param {string} licenseKey The license key.
+ */
+const progressPlannerSaveLicenseKey = ( licenseKey ) => {
+	console.log( 'License key: ' + licenseKey );
+	return progressPlannerAjaxRequest( {
+		url: progressPlanner.ajaxUrl,
+		data: {
+			action: 'progress_planner_save_onboard_data',
+			_ajax_nonce: progressPlanner.nonce,
+			key: licenseKey,
+		},
+	} );
+};
