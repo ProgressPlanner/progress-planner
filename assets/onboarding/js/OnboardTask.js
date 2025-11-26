@@ -13,10 +13,10 @@ class PrplOnboardTask {
 		this.wizard = wizard;
 		this.taskContent = null;
 		this.formValues = {};
-		this.openPopoverBtn = el.querySelector( '[prpl-open-task-popover]' );
+		this.openTaskBtn = el.querySelector( '[prpl-open-task]' );
 
 		// Register task open event
-		this.openPopoverBtn?.addEventListener( 'click', () => this.open() );
+		this.openTaskBtn?.addEventListener( 'click', () => this.open() );
 	}
 
 	/**

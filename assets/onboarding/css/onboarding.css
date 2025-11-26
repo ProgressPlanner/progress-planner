@@ -381,6 +381,17 @@
 		color: #9f0712;
 	}
 
+	.prpl-task-arrow {
+		padding-right: 0.5rem;
+	}
+
+	.prpl-task-item-button-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-shrink: 0;
+	}
+
 	.prpl-task-completed-icon {
 		display: none;
 		width: 20px;
@@ -398,7 +409,7 @@
 			display: inline-flex;
 		}
 
-		.prpl-complete-task-btn {
+		.prpl-task-item-button-wrapper {
 			display: none;
 		}
 	}
