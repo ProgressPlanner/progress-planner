@@ -54,6 +54,9 @@
 	h3 {
 		margin-top: 0;
 		margin-bottom: 1rem;
+		font-size: 1rem;
+		font-weight: 600;
+		color: #4B5563;
 
 		&:last-child {
 			margin-bottom: 0;
@@ -286,7 +289,7 @@
 
 		/* padding-bottom: 10px; */
 
-		.prpl-column-content {
+		.prpl-background-content {
 			padding: 20px;
 			border-radius: 12px;
 			background-color: #f6f5fb;
@@ -605,11 +608,11 @@
 		align-items: flex-start;
 		gap: 10px;
 
-		.prpl-onboarding-task-title {
+		/* .prpl-onboarding-task-title {
 			margin: 0 0 1rem 0;
 			font-size: 18px;
 			font-weight: 600;
-		}
+		} */
 
 		.prpl-onboarding-task-form {
 			margin-top: 1rem;

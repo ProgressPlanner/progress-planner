@@ -63,8 +63,10 @@ $prpl_current_step_number   = 0;
 			<?php ++$prpl_current_step_number; ?>
 			<div class="prpl-setting-item" data-page="<?php echo \esc_attr( $prpl_page_type['id'] ); ?>">
 				<div class="prpl-columns-wrapper-flex prpl-columns-1-2">
-					<div class="prpl-column prpl-column-content">
-						<p><?php echo \esc_html( $prpl_page_type['description'] ); ?></p>
+					<div class="prpl-column">
+						<div class="prpl-background-content">
+							<p><?php echo \esc_html( $prpl_page_type['description'] ); ?></p>
+						</div>
 					</div>
 					<div class="prpl-column">
 						<div class="prpl-setting-header">
@@ -132,8 +134,10 @@ $prpl_current_step_number   = 0;
 			<?php ++$prpl_current_step_number; ?>
 			<div class="prpl-setting-item" data-page="post-types">
 				<div class="prpl-columns-wrapper-flex">
-					<div class="prpl-column prpl-column-content">
-						<p><?php echo \esc_html( $prpl_page_type['description'] ); ?></p>
+					<div class="prpl-column">
+						<div class="prpl-background-content">
+							<p><?php echo \esc_html( $prpl_page_type['description'] ); ?></p>
+						</div>
 					</div>
 					<div class="prpl-column">
 						<div class="prpl-setting-header">
@@ -190,8 +194,10 @@ $prpl_current_step_number   = 0;
 		<?php ++$prpl_current_step_number; ?>
 		<div class="prpl-setting-item" data-page="login-destination">
 			<div class="prpl-columns-wrapper-flex">
-				<div class="prpl-column prpl-column-content">
-					<p><?php echo \esc_html( $prpl_page_type['description'] ); ?></p>
+				<div class="prpl-column">
+					<div class="prpl-background-content">
+						<p><?php echo \esc_html( $prpl_page_type['description'] ); ?></p>
+					</div>
 				</div>
 				<div class="prpl-column">
 					<div class="prpl-setting-header">

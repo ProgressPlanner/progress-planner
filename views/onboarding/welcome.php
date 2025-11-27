@@ -24,7 +24,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex prpl-columns-2-1">
 			<div class="prpl-column">
-				<div class="prpl-column-content">
+				<div class="prpl-background-content">
 					<h3 class="tour-title">
 						<?php
 						\esc_html_e( 'Hi there! Ready to push your website forward? Let\'s go!', 'progress-planner' );

@@ -24,16 +24,18 @@ $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( ne
 	</div> -->
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex prpl-columns-2-1">
-			<div class="prpl-column prpl-column-content">
-				<h3>
-					<?php \esc_html_e( 'Whoohoo, nice one! You just earned your first point!', 'progress-planner' ); ?>
-				</h3>
-				<p>
-					<?php \esc_html_e( 'Gather ten points this month to unlock your special badge.', 'progress-planner' ); ?>
-				</p>
-				<p>
-					<?php \esc_html_e( 'You’re off to a great start!', 'progress-planner' ); ?>
-				</p>
+			<div class="prpl-column">
+				<div class="prpl-background-content">
+					<h3>
+						<?php \esc_html_e( 'Whoohoo, nice one! You just earned your first point!', 'progress-planner' ); ?>
+					</h3>
+					<p>
+						<?php \esc_html_e( 'Gather ten points this month to unlock your special badge.', 'progress-planner' ); ?>
+					</p>
+					<p>
+						<?php \esc_html_e( 'You’re off to a great start!', 'progress-planner' ); ?>
+					</p>
+				</div>
 			</div>
 			<div class="prpl-column">
 				<div class="prpl-gauge-wrapper">

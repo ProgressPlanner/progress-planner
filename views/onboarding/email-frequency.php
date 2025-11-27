@@ -25,13 +25,15 @@ $prpl_user_email   = $prpl_current_user->user_email ?? '';
 	</div>
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex prpl-columns-1-2">
-			<div class="prpl-column prpl-column-content">
-				<p>
-					<?php \esc_html_e( 'Stay on track with emails that include recommendations, updates and useful news.', 'progress-planner' ); ?>
-				</p>
-				<p>
-					<?php \esc_html_e( 'Choose how often you want a little nudge to keep your site moving forward.', 'progress-planner' ); ?>
-				</p>
+			<div class="prpl-column">
+				<div class="prpl-background-content">
+					<p>
+						<?php \esc_html_e( 'Stay on track with emails that include recommendations, updates and useful news.', 'progress-planner' ); ?>
+					</p>
+					<p>
+						<?php \esc_html_e( 'Choose how often you want a little nudge to keep your site moving forward.', 'progress-planner' ); ?>
+					</p>
+				</div>
 			</div>
 			<div class="prpl-column">
 

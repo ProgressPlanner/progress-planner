@@ -11,6 +11,7 @@ class PrplSettingsStep extends OnboardingStep {
 		} );
 		this.currentSubStep = 0;
 		this.subSteps = [
+			'homepage',
 			'about',
 			'contact',
 			'faq',
@@ -28,26 +29,42 @@ class PrplSettingsStep extends OnboardingStep {
 	onMount( state ) {
 		// Initialize state
 		if ( ! state.data.settings ) {
-			state.data.settings = {
-				about: {
-					hasPage: true, // true if checkbox is NOT checked (default: unchecked)
-					pageId: null,
-				},
-				contact: {
-					hasPage: true,
-					pageId: null,
-				},
-				faq: {
-					hasPage: true,
-					pageId: null,
-				},
-				'post-types': {
-					selectedTypes: [], // Array of selected post type slugs
-				},
-				'login-destination': {
-					redirectOnLogin: false, // Checkbox state
-				},
-			};
+			state.data.settings = {};
+		}
+
+		// Ensure all sub-steps are initialized
+		const defaultSettings = {
+			homepage: {
+				hasPage: true, // true if checkbox is NOT checked (default: unchecked)
+				pageId: null,
+			},
+			about: {
+				hasPage: true, // true if checkbox is NOT checked (default: unchecked)
+				pageId: null,
+			},
+			contact: {
+				hasPage: true,
+				pageId: null,
+			},
+			faq: {
+				hasPage: true,
+				pageId: null,
+			},
+			'post-types': {
+				selectedTypes: [], // Array of selected post type slugs
+			},
+			'login-destination': {
+				redirectOnLogin: false, // Checkbox state
+			},
+		};
+
+		// Initialize missing sub-steps
+		for ( const [ key, defaultValue ] of Object.entries(
+			defaultSettings
+		) ) {
+			if ( ! state.data.settings[ key ] ) {
+				state.data.settings[ key ] = { ...defaultValue };
+			}
 		}
 
 		// Always start from first sub-step
@@ -126,7 +143,9 @@ class PrplSettingsStep extends OnboardingStep {
 	 */
 	setupSubStepListeners( subStepName, subStepData, state ) {
 		// Handle page selection sub-steps (about, contact, faq)
-		if ( [ 'about', 'contact', 'faq' ].includes( subStepName ) ) {
+		if (
+			[ 'homepage', 'about', 'contact', 'faq' ].includes( subStepName )
+		) {
 			this.setupPageSelectListeners( subStepName, subStepData, state );
 			return;
 		}
@@ -481,7 +500,11 @@ class PrplSettingsStep extends OnboardingStep {
 			for ( const subStepName of this.subSteps ) {
 				const subStepData = state.data.settings[ subStepName ];
 
-				if ( [ 'about', 'contact', 'faq' ].includes( subStepName ) ) {
+				if (
+					[ 'homepage', 'about', 'contact', 'faq' ].includes(
+						subStepName
+					)
+				) {
 					pages[ subStepName ] = {
 						id: subStepData.pageId || '',
 						have_page: subStepData.hasPage ? 'yes' : 'no',
