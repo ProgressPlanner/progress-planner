@@ -5,19 +5,45 @@
 /* global OnboardingStep, ProgressPlannerOnboardData */
 
 class PrplSettingsStep extends OnboardingStep {
+	subSteps = [
+		'homepage',
+		'about',
+		'contact',
+		'faq',
+		'post-types',
+		'login-destination',
+	];
+
+	defaultSettings = {
+		homepage: {
+			hasPage: true, // true if checkbox is NOT checked (default: unchecked)
+			pageId: null,
+		},
+		about: {
+			hasPage: true, // true if checkbox is NOT checked (default: unchecked)
+			pageId: null,
+		},
+		contact: {
+			hasPage: true,
+			pageId: null,
+		},
+		faq: {
+			hasPage: true,
+			pageId: null,
+		},
+		'post-types': {
+			selectedTypes: [], // Array of selected post type slugs
+		},
+		'login-destination': {
+			redirectOnLogin: false, // Checkbox state
+		},
+	};
+
 	constructor() {
 		super( {
 			templateId: 'onboarding-step-settings',
 		} );
 		this.currentSubStep = 0;
-		this.subSteps = [
-			'homepage',
-			'about',
-			'contact',
-			'faq',
-			'post-types',
-			'login-destination',
-		];
 	}
 
 	/**
@@ -32,35 +58,9 @@ class PrplSettingsStep extends OnboardingStep {
 			state.data.settings = {};
 		}
 
-		// Ensure all sub-steps are initialized
-		const defaultSettings = {
-			homepage: {
-				hasPage: true, // true if checkbox is NOT checked (default: unchecked)
-				pageId: null,
-			},
-			about: {
-				hasPage: true, // true if checkbox is NOT checked (default: unchecked)
-				pageId: null,
-			},
-			contact: {
-				hasPage: true,
-				pageId: null,
-			},
-			faq: {
-				hasPage: true,
-				pageId: null,
-			},
-			'post-types': {
-				selectedTypes: [], // Array of selected post type slugs
-			},
-			'login-destination': {
-				redirectOnLogin: false, // Checkbox state
-			},
-		};
-
 		// Initialize missing sub-steps
 		for ( const [ key, defaultValue ] of Object.entries(
-			defaultSettings
+			this.defaultSettings
 		) ) {
 			if ( ! state.data.settings[ key ] ) {
 				state.data.settings[ key ] = { ...defaultValue };
