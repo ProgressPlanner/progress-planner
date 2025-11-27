@@ -36,15 +36,19 @@ $prpl_user_email   = $prpl_current_user->user_email ?? '';
 			<div class="prpl-column">
 
 				<div class="prpl-email-frequency-options">
-					<label class="prpl-radio-label">
-						<input type="radio" id="prpl-email-weekly" name="email_frequency" value="weekly">
-						<span><?php \esc_html_e( 'Email me weekly', 'progress-planner' ); ?></span>
-					</label>
+					<div>
+						<label class="prpl-radio-label">
+							<input type="radio" id="prpl-email-weekly" name="email_frequency" value="weekly">
+							<span><?php \esc_html_e( 'Email me weekly', 'progress-planner' ); ?></span>
+						</label>
+					</div>
 
-					<label class="prpl-radio-label">
-						<input type="radio" id="prpl-dont-email" name="email_frequency" value="none">
-						<span><?php \esc_html_e( 'Don\'t email me', 'progress-planner' ); ?></span>
-					</label>
+					<div>
+						<label class="prpl-radio-label">
+							<input type="radio" id="prpl-dont-email" name="email_frequency" value="none">
+							<span><?php \esc_html_e( 'Don\'t email me', 'progress-planner' ); ?></span>
+						</label>
+					</div>
 				</div>
 
 				<div id="prpl-email-form" class="prpl-email-form" style="display: none;">
