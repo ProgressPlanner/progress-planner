@@ -122,7 +122,8 @@ class PrplOnboardTask {
 			closeBtn.type = 'button';
 			closeBtn.className = 'prpl-btn prpl-task-close-btn';
 			closeBtn.innerHTML =
-				'<span class="dashicons dashicons-arrow-left-alt2"></span> Back to tasks';
+				'<span class="dashicons dashicons-arrow-left-alt2"></span> ' +
+				ProgressPlannerOnboardData.l10n.backToRecommendations;
 
 			// Create button wrapper
 			const buttonWrapper = document.createElement( 'div' );
@@ -354,7 +355,8 @@ class PrplOnboardTask {
 				return res.json();
 			} )
 			.then( ( response ) => {
-				statusDiv.textContent = `${ file.name } uploaded.`;
+				// Testing only, no need to display file name in production.
+				// statusDiv.textContent = `${ file.name } uploaded.`;
 
 				// Update the file preview.
 				const previewDiv =

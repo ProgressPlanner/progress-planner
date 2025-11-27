@@ -345,10 +345,11 @@ class Onboard_Wizard {
 				'savedProgress'        => $saved_progress,
 				'lastStepRedirectUrl'  => \esc_url_raw( admin_url( 'admin.php?page=progress-planner' ) ),
 				'l10n'                 => [
-					'next'               => \esc_html__( 'Next', 'progress-planner' ),
-					'startOnboarding'    => \esc_html__( 'Start onboarding', 'progress-planner' ),
-					'privacyPolicyError' => \esc_html__( 'You need to agree with the policy to use the Progress Planner plugin.', 'progress-planner' ),
-					'dashboard'          => \esc_html__( 'Take me to the Recommendations dashboard', 'progress-planner' ),
+					'next'                  => \esc_html__( 'Next', 'progress-planner' ),
+					'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),
+					'privacyPolicyError'    => \esc_html__( 'You need to agree with the policy to use the Progress Planner plugin.', 'progress-planner' ),
+					'dashboard'             => \esc_html__( 'Take me to the Recommendations dashboard', 'progress-planner' ),
+					'backToRecommendations' => \esc_html__( 'Back to recommendations', 'progress-planner' ),
 				],
 				'steps'                => array_column( $this->steps, 'script_file_name' ),
 			]
