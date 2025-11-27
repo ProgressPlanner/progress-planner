@@ -20,7 +20,12 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					<span class="dashicons dashicons-warning"></span>
 					<div>
 						<h3><?php \esc_html_e( 'Are you sure you want to quit?', 'progress-planner' ); ?></h3>
-						<p><?php \esc_html_e( 'You need to finish the onboarding before you can work with the Progress Planner plugin and start improving your site.', 'progress-planner' ); ?></p>
+						<p>
+							<?php
+							/* translators: %s: Progress Planner name. */
+							\printf( \esc_html__( 'You need to finish the onboarding before you can work with the %s and start improving your site.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
+							?>
+						</p>
 					</div>
 				</div>
 				<div class="prpl-quit-actions">

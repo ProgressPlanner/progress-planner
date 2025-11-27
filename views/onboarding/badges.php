@@ -17,16 +17,22 @@ $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( ne
 
 <!-- Tour step badges -->
 <script type="text/template" id="onboarding-step-badges">
-	<div class="tour-header">
+	<!-- <div class="tour-header">
 		<h2 class="tour-title">
 			<?php \esc_html_e( 'Our badges are waiting for you', 'progress-planner' ); ?>
 		</h2>
-	</div>
+	</div> -->
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex prpl-columns-2-1">
 			<div class="prpl-column prpl-column-content">
+				<h3>
+					<?php \esc_html_e( 'Whoohoo, nice one! You just earned your first point!', 'progress-planner' ); ?>
+				</h3>
 				<p>
-					<?php \esc_html_e( 'For every recommendation you complete, you earn points. When you earn at least 10 points each month, you\'ll unlock the special badge for that month. Can you collect them all?', 'progress-planner' ); ?>
+					<?php \esc_html_e( 'Gather ten points this month to unlock your special badge.', 'progress-planner' ); ?>
+				</p>
+				<p>
+					<?php \esc_html_e( 'You’re off to a great start!', 'progress-planner' ); ?>
 				</p>
 			</div>
 			<div class="prpl-column">

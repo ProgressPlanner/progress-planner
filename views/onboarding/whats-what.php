@@ -25,7 +25,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					?>
 				</p>
 				<p>
-					<?php \esc_html_e( 'These actions help you to improve your site step by step, withouth having to guess where to start.', 'progress-planner' ); ?>
+					<?php \esc_html_e( 'These actions help you improve your site step by step, without having to guess where to start.', 'progress-planner' ); ?>
 				</p>
 			</div>
 			<div class="prpl-column prpl-column-content">

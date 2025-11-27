@@ -347,8 +347,9 @@ class Onboard_Wizard {
 				'l10n'                 => [
 					'next'                  => \esc_html__( 'Next', 'progress-planner' ),
 					'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),
-					'privacyPolicyError'    => \esc_html__( 'You need to agree with the policy to use the Progress Planner plugin.', 'progress-planner' ),
-					'dashboard'             => \esc_html__( 'Take me to the Recommendations dashboard', 'progress-planner' ),
+					/* translators: %s: Progress Planner name. */
+					'privacyPolicyError'    => sprintf( \esc_html__( 'You need to agree with the privacy policy to use the %s plugin.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) ),
+					'dashboard'             => \esc_html__( 'Take me to the dashboard', 'progress-planner' ),
 					'backToRecommendations' => \esc_html__( 'Back to recommendations', 'progress-planner' ),
 				],
 				'steps'                => array_column( $this->steps, 'script_file_name' ),

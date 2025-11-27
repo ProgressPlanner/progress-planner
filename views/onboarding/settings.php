@@ -12,23 +12,29 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 // Get page types for About, Contact, and FAQ.
 $prpl_page_types = [
-	'about'   => [
+	'homepage' => [
+		'id'          => 'homepage',
+		'title'       => __( 'Home page', 'progress-planner' ),
+		'description' => \esc_html__( 'Help us understand your site a little better so we can give you more useful recommendations. Let\'s start with the home page.', 'progress-planner' ),
+		'note'        => __( 'A Home page is important. We\'ll remind you to make one at a later time.', 'progress-planner' ),
+	],
+	'about'    => [
 		'id'          => 'about',
 		'title'       => __( 'About page', 'progress-planner' ),
-		'description' => \esc_html__( 'Help us understand your site a little better so we can give you more useful recommendations.', 'progress-planner' ),
-		'note'        => __( 'An About page is important. We\'ll remind you to make one at later time.', 'progress-planner' ),
+		'description' => \esc_html__( 'Next up, pick the page you use as your about page.', 'progress-planner' ),
+		'note'        => __( 'An About page is important. We\'ll remind you to make one at a later time.', 'progress-planner' ),
 	],
-	'contact' => [
+	'contact'  => [
 		'id'          => 'contact',
 		'title'       => __( 'Contact page', 'progress-planner' ),
-		'description' => \esc_html__( 'Help us understand your site a little better so we can give you more useful recommendations.', 'progress-planner' ),
-		'note'        => __( 'A Contact page is important. We\'ll remind you to make one at later time.', 'progress-planner' ),
+		'description' => \esc_html__( 'Now choose the page you use as your contact page.', 'progress-planner' ),
+		'note'        => __( 'A Contact page is important. We\'ll remind you to make one at a later time.', 'progress-planner' ),
 	],
-	'faq'     => [
+	'faq'      => [
 		'id'          => 'faq',
 		'title'       => __( 'FAQ page', 'progress-planner' ),
-		'description' => \esc_html__( 'Help us understand your site a little better so we can give you more useful recommendations.', 'progress-planner' ),
-		'note'        => __( 'An FAQ page is important. We\'ll remind you to make one at later time.', 'progress-planner' ),
+		'description' => \esc_html__( 'Next, pick the page you use as your FAQ page.', 'progress-planner' ),
+		'note'        => __( 'An FAQ page is important. We\'ll remind you to make one at a later time.', 'progress-planner' ),
 	],
 ];
 
@@ -136,7 +142,10 @@ $prpl_current_step_number   = 0;
 								<span class="prpl-settings-progress"><?php echo \esc_html( $prpl_current_step_number ); ?>/<?php echo \esc_html( $prpl_total_number_of_steps ); ?></span>
 							</h3>
 							<p>
-								<?php \esc_html_e( 'Choose the post types you actively use for your content. We\'ll track and reward progress only on the ones you select.', 'progress-planner' ); ?>
+								<?php \esc_html_e( 'Choose the post types you actively use for your content.', 'progress-planner' ); ?>
+							</p>
+							<p>
+								<?php \esc_html_e( 'We\'ll track and reward progress only on the ones you select.', 'progress-planner' ); ?>
 							</p>
 						</div>
 
@@ -191,7 +200,10 @@ $prpl_current_step_number   = 0;
 							<span class="prpl-settings-progress"><?php echo \esc_html( $prpl_current_step_number ); ?>/<?php echo \esc_html( $prpl_total_number_of_steps ); ?></span>
 						</h3>
 						<p>
-							<?php \esc_html_e( 'Do you want to land on the Progress Planner dashboard after logging in? So you can start improving your site straight away!', 'progress-planner' ); ?>
+							<?php
+							/* translators: %s: Progress Planner name. */
+							\printf( \esc_html__( 'Do you want to land on the %s dashboard after logging in? So you can start improving your site straight away!', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
+							?>
 						</p>
 					</div>
 
@@ -207,7 +219,12 @@ $prpl_current_step_number   = 0;
 									type="checkbox"
 									<?php \checked( $prpl_redirect_on_login ); ?>
 								/>
-								<span><?php \esc_html_e( 'Show the Progress Planner dashboard after login.', 'progress-planner' ); ?></span>
+								<span>
+								<?php
+								/* translators: %s: Progress Planner name. */
+								\printf( \esc_html__( 'Show the %s dashboard after login.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
+								?>
+								</span>
 							</label>
 						</div>
 					</div>
