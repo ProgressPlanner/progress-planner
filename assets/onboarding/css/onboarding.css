@@ -78,7 +78,8 @@
 		vertical-align: middle;
 	}
 
-	input[type="checkbox"] {
+	input[type="checkbox"],
+	input[type="radio"] {
 		border: 1px solid #8c8f94;
 		border-radius: 4px;
 		background: #fff;
@@ -105,6 +106,23 @@
 		margin: -.1875rem 0 0 -.25rem;
 		height: 1.3125rem;
 		width: 1.3125rem;
+	}
+
+	input[type="radio"] {
+		border-radius: 50%;
+		margin-right: .25rem;
+		line-height: .71428571;
+
+		&:checked::before {
+			content: "";
+			border-radius: 50%;
+			width: .5rem;
+			height: .5rem;
+			margin: .1875rem;
+			background-color: #3582c4;
+			line-height: 1.14285714;
+			display: inline-block;
+		}
 	}
 
 	input[type="text"],
@@ -381,40 +399,130 @@
 		color: #9f0712;
 	}
 
-	.prpl-task-arrow {
-		padding-right: 0.5rem;
+	/* Generic error message (reusable for all steps) */
+	.prpl-error-message {
+		animation: prpl-slide-down 0.3s ease-out;
 	}
 
-	.prpl-task-item-button-wrapper {
-		display: flex;
-		align-items: center;
-		gap: 0.5rem;
-		flex-shrink: 0;
-	}
+	@keyframes prpl-slide-down {
 
-	.prpl-task-completed-icon {
-		display: none;
-		width: 20px;
-		height: 20px;
-		border-radius: 50%;
-		align-items: center;
-		justify-content: center;
-		color: #fff;
-		background-color: #059669;
-	}
-
-	.prpl-task-completed {
-
-		.prpl-task-completed-icon {
-			display: inline-flex;
+		from {
+			opacity: 0;
+			transform: translateY(-10px);
 		}
 
-		.prpl-task-item-button-wrapper {
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.prpl-error-box {
+		display: flex;
+		align-items: flex-start;
+		gap: 15px;
+		background: #fef2f2;
+		padding: 20px;
+		border-radius: 6px;
+		border-left: 4px solid #dc2626;
+
+		.dashicons {
+			color: #dc2626;
+			font-size: 24px;
+			flex-shrink: 0;
+		}
+
+		h3 {
+			margin: 0 0 8px 0;
+			font-size: 16px;
+			font-weight: 700;
+			color: #7f1d1d;
+		}
+
+		p {
+			margin: 0;
+			font-size: 15px;
+			line-height: 1.6;
+			color: #991b1b;
+		}
+	}
+
+	/* Popover: Quit confirmation */
+	&:has(.prpl-quit-confirmation) {
+
+		.prpl-onboarding-navigation {
 			display: none;
 		}
 	}
 
-	/* WIP for tasks which need user input. */
+	.prpl-column:has(.prpl-quit-confirmation) {
+		justify-content: flex-start !important;
+	}
+
+	.prpl-quit-confirmation {
+		display: flex;
+		flex-direction: column;
+		gap: 30px;
+	}
+
+	.prpl-quit-message {
+		display: flex;
+		align-items: flex-start;
+		gap: 15px;
+		background: #fef2f2;
+		padding: 20px;
+		border-radius: 6px;
+		border-left: 4px solid #dc2626;
+
+		h3 {
+			font-size: 18px;
+			font-weight: 700;
+		}
+
+		p {
+			font-size: 15px;
+			line-height: 1.6;
+		}
+	}
+
+	.prpl-quit-actions {
+		display: flex;
+		gap: 40px;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.prpl-quit-link {
+		font-size: 15px;
+		color: #1e40af;
+		text-decoration: underline;
+		cursor: pointer;
+
+		&:hover {
+			color: #1e3a8a;
+		}
+
+		&.prpl-quit-link-primary {
+			font-weight: 600;
+			font-size: 16px;
+		}
+	}
+
+	#prpl-quit-confirmation-graphic {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		img,
+		svg {
+			height: 250px;
+
+			/* Set height since it is what we do in the PP dashboard. */
+			max-width: 100%;
+		}
+	}
+
+	/* Form for onboarding tasks. */
 	.prpl-onboarding-task-form {
 		display: flex;
 		align-items: center;
@@ -428,12 +536,6 @@
 			flex-shrink: 0;
 			margin-top: 1rem;
 		}
-	}
-
-	.prpl-complete-task-item {
-		display: flex;
-		gap: 30px;
-		justify-content: space-between;
 	}
 
 	/* Welcome Step */
@@ -658,56 +760,95 @@
 		}
 	}
 
-.tour-content-wrapper:has(.prpl-task-content-active) {
-	display: flex;
-	flex-direction: column;
-	flex-grow: 1;
+	.prpl-complete-task-item {
+		display: flex;
+		gap: 30px;
+		justify-content: space-between;
+	}
 
-	/* Task content active, TOOD: change markup so this is simpler. */
-	.prpl-task-content-active {
+	.prpl-task-arrow {
+		padding-right: 0.5rem;
+	}
+
+	.prpl-task-item-button-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 0.5rem;
+		flex-shrink: 0;
+	}
+
+	.prpl-task-completed-icon {
+		display: none;
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		align-items: center;
+		justify-content: center;
+		color: #fff;
+		background-color: #059669;
+	}
+
+	.prpl-task-completed {
+
+		.prpl-task-completed-icon {
+			display: inline-flex;
+		}
+
+		.prpl-task-item-button-wrapper {
+			display: none;
+		}
+	}
+
+	.tour-content-wrapper:has(.prpl-task-content-active) {
 		display: flex;
 		flex-direction: column;
 		flex-grow: 1;
-		gap: 1.5rem;
-		width: 100%;
 
-		.prpl-onboarding-task {
+		/* Task content active, TOOD: change markup so this is simpler. */
+		.prpl-task-content-active {
 			display: flex;
 			flex-direction: column;
 			flex-grow: 1;
+			gap: 1.5rem;
+			width: 100%;
 
-			.prpl-onboarding-task-form,
-			.tour-content {
+			.prpl-onboarding-task {
 				display: flex;
 				flex-direction: column;
 				flex-grow: 1;
-			}
 
-			.prpl-onboarding-task-form {
-				justify-content: space-between;
-				gap: 3rem;
+				.prpl-onboarding-task-form,
+				.tour-content {
+					display: flex;
+					flex-direction: column;
+					flex-grow: 1;
+				}
+
+				.prpl-onboarding-task-form {
+					justify-content: space-between;
+					gap: 3rem;
+				}
+			}
+		}
+
+		/* Task buttons. */
+		.prpl-task-buttons {
+			display: flex;
+			justify-content: flex-end;
+			gap: 1rem;
+			width: 100%;
+
+			.prpl-btn {
+				margin-top: 0;
+				margin-bottom: 0;
+
+				&.prpl-task-close-btn {
+					background-color: var(--prpl-background-banner);
+					color: var(--prpl-color-text);
+				}
 			}
 		}
 	}
-
-	/* Task buttons. */
-	.prpl-task-buttons {
-		display: flex;
-		justify-content: flex-end;
-		gap: 1rem;
-		width: 100%;
-
-		.prpl-btn {
-			margin-top: 0;
-			margin-bottom: 0;
-
-			&.prpl-task-close-btn {
-				background-color: var(--prpl-background-banner);
-				color: var(--prpl-color-text);
-			}
-		}
-	}
-}
 
 	/* File drop zone. */
 	.prpl-file-drop-zone {
@@ -751,128 +892,5 @@
 		margin-right: auto;
 		max-width: 200px;
 		height: auto;
-	}
-
-	/* Generic error message (reusable for all steps) */
-	.prpl-error-message {
-		animation: prpl-slide-down 0.3s ease-out;
-	}
-
-	@keyframes prpl-slide-down {
-
-		from {
-			opacity: 0;
-			transform: translateY(-10px);
-		}
-
-		to {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-
-	.prpl-error-box {
-		display: flex;
-		align-items: flex-start;
-		gap: 15px;
-		background: #fef2f2;
-		padding: 20px;
-		border-radius: 6px;
-		border-left: 4px solid #dc2626;
-
-		.dashicons {
-			color: #dc2626;
-			font-size: 24px;
-			flex-shrink: 0;
-		}
-
-		h3 {
-			margin: 0 0 8px 0;
-			font-size: 16px;
-			font-weight: 700;
-			color: #7f1d1d;
-		}
-
-		p {
-			margin: 0;
-			font-size: 15px;
-			line-height: 1.6;
-			color: #991b1b;
-		}
-	}
-
-	/* Popover: Quit confirmation */
-	&:has(.prpl-quit-confirmation) {
-
-		.prpl-onboarding-navigation {
-			display: none;
-		}
-	}
-
-	.prpl-column:has(.prpl-quit-confirmation) {
-		justify-content: flex-start !important;
-	}
-
-	.prpl-quit-confirmation {
-		display: flex;
-		flex-direction: column;
-		gap: 30px;
-	}
-
-	.prpl-quit-message {
-		display: flex;
-		align-items: flex-start;
-		gap: 15px;
-		background: #fef2f2;
-		padding: 20px;
-		border-radius: 6px;
-		border-left: 4px solid #dc2626;
-
-		h3 {
-			font-size: 18px;
-			font-weight: 700;
-		}
-
-		p {
-			font-size: 15px;
-			line-height: 1.6;
-		}
-	}
-
-	.prpl-quit-actions {
-		display: flex;
-		gap: 40px;
-		justify-content: space-between;
-		align-items: center;
-	}
-
-	.prpl-quit-link {
-		font-size: 15px;
-		color: #1e40af;
-		text-decoration: underline;
-		cursor: pointer;
-
-		&:hover {
-			color: #1e3a8a;
-		}
-
-		&.prpl-quit-link-primary {
-			font-weight: 600;
-			font-size: 16px;
-		}
-	}
-
-	#prpl-quit-confirmation-graphic {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-
-		img,
-		svg {
-			height: 250px;
-
-			/* Set height since it is what we do in the PP dashboard. */
-			max-width: 100%;
-		}
 	}
 }
