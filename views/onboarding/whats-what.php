@@ -12,7 +12,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 ?>
 
 <!-- Tour step welcome -->
-<script type="text/template" id="onboarding-step-whats-next">
+<script type="text/template" id="onboarding-step-whats-what">
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex">
 			<div class="prpl-column prpl-column-content">

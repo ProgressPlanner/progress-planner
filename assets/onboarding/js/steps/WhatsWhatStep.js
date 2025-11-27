@@ -1,12 +1,12 @@
 /**
- * Whats Next step - Explains the badge system to users
+ * Whats What step - Explains the badge system to users
  * Simple informational step with no user interaction required
  */
 /* global OnboardingStep */
-class PrplWhatsNextStep extends OnboardingStep {
+class PrplWhatsWhatStep extends OnboardingStep {
 	constructor() {
 		super( {
-			templateId: 'onboarding-step-whats-next',
+			templateId: 'onboarding-step-whats-what',
 		} );
 	}
 
@@ -31,4 +31,4 @@ class PrplWhatsNextStep extends OnboardingStep {
 	}
 }
 
-window.PrplWhatsNextStep = new PrplWhatsNextStep();
+window.PrplWhatsWhatStep = new PrplWhatsWhatStep();

@@ -123,10 +123,10 @@ class Onboard_Wizard {
 				'title'              => sprintf( esc_html__( 'Welcome to %s', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) ),
 			],
 			[
-				'script_file_name'   => 'WhatsNextStep',
-				'template_file_name' => 'whats-next',
-				'template_id'        => 'onboarding-step-whats-next',
-				'title'              => esc_html__( 'What\'s next?', 'progress-planner' ),
+				'script_file_name'   => 'WhatsWhatStep',
+				'template_file_name' => 'whats-what',
+				'template_id'        => 'onboarding-step-whats-what',
+				'title'              => esc_html__( 'What\'s what?', 'progress-planner' ),
 			],
 		];
 		if ( ! empty( $tasks ) ) {
