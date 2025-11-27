@@ -31,7 +31,10 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					'</label>'
 				);
 				?>
-				<span class="prpl-file-type-hint">PNG, SVG, ICO, WEBP</span>
+				<div class="prpl-file-upload-hints">
+					<span class="prpl-file-upload-hint prpl-file-upload-hint-dimensions"><?php \esc_html_e( 'Recommended dimensions: 512 x 521 pixels', 'progress-planner' ); ?></span>
+					<span class="prpl-file-upload-hint prpl-file-upload-hint-type">PNG, ICO, WEBP</span>
+				</div>
 			</p>
 			<input type="file" id="prpl-file-input-core-siteicon" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" accept=".ico,.png,.jpg,.jpeg,.gif,.webp" hidden>
 			<input type="hidden" name="post_id" value="" data-validate="required">

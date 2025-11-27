@@ -877,8 +877,9 @@
 		cursor: pointer;
 	}
 
-	.prpl-file-type-hint {
-		display: block;
+	.prpl-file-upload-hints {
+		display: flex;
+		flex-direction: column;
 		font-size: 14px;
 		color: #555;
 	}
