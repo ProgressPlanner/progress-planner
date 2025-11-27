@@ -735,6 +735,115 @@
 			flex-direction: column;
 			gap: 0.75rem;
 		}
+
+		/* Toggle checkbox for post types. */
+		.prpl-post-type-toggle-wrapper {
+			display: flex;
+			align-items: center;
+		}
+
+		.prpl-post-type-toggle-label {
+			display: flex;
+			align-items: center;
+			gap: 0.75rem;
+			cursor: pointer;
+			position: relative;
+		}
+
+		.prpl-post-type-toggle-input {
+			position: absolute;
+			opacity: 0;
+			width: 0;
+			height: 0;
+			margin: 0;
+			padding: 0;
+		}
+
+		.prpl-post-type-toggle-switch {
+			position: relative;
+			width: 44px;
+			height: 24px;
+			border-radius: 12px;
+			background-color: #d1d5db;
+			transition: background-color 0.2s;
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			&::after {
+				content: '';
+				position: absolute;
+				top: 2px;
+				left: 2px;
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				background-color: #fff;
+				transition: transform 0.2s;
+				z-index: 1;
+			}
+
+			svg {
+				position: absolute;
+				width: 12px;
+				height: 12px;
+				top: 50%;
+				left: 6px;
+				transform: translateY(-50%);
+				z-index: 2;
+				transition: opacity 0.2s, left 0.2s, color 0.2s;
+				color: #9ca3af;
+			}
+
+			.prpl-toggle-icon-check {
+				display: none;
+			}
+
+			.prpl-toggle-icon-x {
+				display: block;
+			}
+		}
+
+		.prpl-post-type-toggle-label:hover .prpl-post-type-toggle-switch svg {
+			opacity: 0.6;
+		}
+
+		.prpl-post-type-toggle-input:checked ~ .prpl-post-type-toggle-switch {
+			background-color: #534786;
+
+			&::after {
+				transform: translateX(20px);
+			}
+
+			svg {
+				left: 26px;
+				color: #534786;
+				transform: translateY(-50%);
+			}
+
+			.prpl-toggle-icon-check {
+				display: block;
+			}
+
+			.prpl-toggle-icon-x {
+				display: none;
+			}
+		}
+
+		.prpl-post-type-toggle-text {
+			font-size: 16px;
+			line-height: 1.5;
+			transition: opacity 0.2s;
+		}
+
+		.prpl-post-type-toggle-input:not(:checked) ~ .prpl-post-type-toggle-text {
+			opacity: 0.78;
+		}
+
+		.prpl-post-type-toggle-input:checked ~ .prpl-post-type-toggle-text {
+			opacity: 1;
+		}
 	}
 
 	/* More Tasks Step */
