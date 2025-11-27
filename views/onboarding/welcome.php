@@ -46,8 +46,8 @@ if ( ! \defined( 'ABSPATH' ) ) {
 							<?php
 							\printf(
 								/* translators: %s: progressplanner.com/privacy-policy link */
-								\esc_html__( 'I agree to the %s.', 'progress-planner' ),
-								'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">Privacy policy</a>'
+								\esc_html__( 'I accept the %s and the essential data processing needed for the plugin.', 'progress-planner' ),
+								'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">privacy policy</a>'
 							);
 							?>
 						</label>
