@@ -66,7 +66,12 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 				<div class="tour-footer">
 					<div class="prpl-tour-next-wrapper">
-						<button class="prpl-tour-next prpl-btn prpl-btn-primary"><?php \esc_html_e( 'Start onboarding', 'progress-planner' ); ?></button>
+						<button class="prpl-tour-next prpl-btn prpl-btn-primary">
+							<?php
+							/* translators: %s: arrow icon */
+							printf( \esc_html__( 'Start onboarding %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
+							?>
+						</button>
 					</div>
 				</div>
 			</div>
