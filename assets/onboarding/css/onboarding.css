@@ -362,6 +362,13 @@
 		color: #6b7280;
 	}
 
+	#prpl-onboarding-mobile-step-label {
+		margin-bottom: 0.25rem;
+		font-size: 14px;
+		color: #534786;
+		font-weight: 600;
+	}
+
 	/* Right section: Content area */
 	.prpl-onboarding-content {
 		padding: 2rem 1.5rem;

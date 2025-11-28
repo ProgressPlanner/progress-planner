@@ -601,20 +601,25 @@ class Onboard_Wizard {
 			<div class="prpl-onboarding-layout">
 				<!-- Left column: Step navigation -->
 				<div class="prpl-onboarding-navigation">
-					<ol class="prpl-step-list">
-						<?php
-							$i = 0;
-						foreach ( $this->steps as $step ) :
-							?>
-							<li class="prpl-nav-step-item" data-step="<?php echo esc_attr( $i ); ?>">
-								<span class="prpl-step-icon"><?php echo esc_html( $i + 1 ); ?></span>
-								<span class="prpl-step-label"><?php echo esc_html( $step['title'] ); ?></span>
-							</li>
+					<div>
+						<div id="prpl-onboarding-mobile-step-label">
+							<?php echo \esc_html( $this->steps[0]['title'] ); ?>
+						</div>
+						<ol class="prpl-step-list">
 							<?php
-							++$i;
-							endforeach;
-						?>
-					</ol>
+								$i = 0;
+							foreach ( $this->steps as $step ) :
+								?>
+								<li class="prpl-nav-step-item" data-step="<?php echo esc_attr( $i ); ?>">
+									<span class="prpl-step-icon"><?php echo esc_html( $i + 1 ); ?></span>
+									<span class="prpl-step-label"><?php echo esc_html( $step['title'] ); ?></span>
+								</li>
+								<?php
+								++$i;
+								endforeach;
+							?>
+						</ol>
+					</div>
 					<div class="prpl-onboarding-logo">
 						<?php \progress_planner()->get_ui__branding()->the_logo(); ?>
 					</div>

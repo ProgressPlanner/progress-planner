@@ -151,6 +151,7 @@ class ProgressPlannerOnboardWizard {
 		const stepItems = this.popover.querySelectorAll(
 			'.prpl-nav-step-item'
 		);
+		let activeStepTitle = '';
 
 		stepItems.forEach( ( item, index ) => {
 			const icon = item.querySelector( '.prpl-step-icon' );
@@ -162,17 +163,27 @@ class ProgressPlannerOnboardWizard {
 			// Add appropriate class and update icon
 			if ( index < this.state.currentStep ) {
 				// Completed step: show checkmark
-				item.classList.add( 'completed' );
+				item.classList.add( 'prpl-completed' );
 				icon.textContent = '✓';
 			} else if ( index === this.state.currentStep ) {
 				// Active step: show number
 				item.classList.add( 'prpl-active' );
 				icon.textContent = stepNumber;
+				activeStepTitle =
+					item.querySelector( '.prpl-step-label' ).textContent;
 			} else {
 				// Future step: show number
 				icon.textContent = stepNumber;
 			}
 		} );
+
+		// Update mobile step label
+		const mobileStepLabel = this.popover.querySelector(
+			'#prpl-onboarding-mobile-step-label'
+		);
+		if ( mobileStepLabel ) {
+			mobileStepLabel.textContent = activeStepTitle;
+		}
 	}
 
 	/**
