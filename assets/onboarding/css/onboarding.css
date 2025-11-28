@@ -1199,5 +1199,12 @@
 		.tour-footer {
 			flex-direction: column; /* So the info / error message is on top of the button. */
 		}
+
+		/* Badges step */
+		.prpl-gauge-wrapper {
+			max-width: 400px;
+			margin-left: auto;
+			margin-right: auto;
+		}
 	}
 }
