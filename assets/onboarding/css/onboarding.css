@@ -295,6 +295,7 @@
 
 	.prpl-onboarding-logo {
 		height: 60px;
+		max-height: 100%;
 
 		img, svg {
 			height: 100%;
@@ -1149,7 +1150,10 @@
 @media (max-width: 1023px) {
 
 	.prpl-popover-onboarding {
+		--prpl-mobile-nav-height: 60px;
 		max-width: 90vw;
+		inset: 0 0 var(--prpl-mobile-nav-height) 0; /* TODO: Adjust this for smallest screen sizes. */
+		margin: auto auto var(--prpl-mobile-nav-height) auto; /* Center in available space above nav */
 
 		/* Hide graphics */
 		.prpl-hide-on-mobile {
@@ -1168,6 +1172,7 @@
 			left: 0;
 			bottom: 0;
 			width: 100%;
+			height: var(--prpl-mobile-nav-height);
 			z-index: 1000;
 
 			flex-direction: row;
