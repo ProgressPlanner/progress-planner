@@ -38,47 +38,28 @@ $prpl_user_email   = $prpl_current_user->user_email ?? '';
 			<div class="prpl-column">
 
 				<div class="prpl-email-frequency-options">
-					<div class="radios">
-						<div class="prpl-radio-wrapper">
-							<label for="prpl-email-weekly" class="prpl-custom-radio">
-								<input
-									type="radio"
-									id="prpl-email-weekly"
-									name="email_frequency"
-									value="weekly"
-								>
-								<span class="prpl-custom-control"></span>
-								<?php \esc_html_e( 'Email me weekly', 'progress-planner' ); ?>
-							</label>
-						</div>
+					<?php
+					\progress_planner()->the_view(
+						'onboarding/form-inputs/radio.php',
+						[
+							'name'          => 'email_frequency',
+							'current_value' => 'weekly',
+							'options'       => [
+								[
+									'id'    => 'prpl-email-weekly',
+									'label' => \esc_html__( 'Email me weekly', 'progress-planner' ),
+									'value' => 'weekly',
+								],
+								[
+									'id'    => 'prpl-dont-email',
+									'label' => \esc_html__( 'Don\'t email me', 'progress-planner' ),
+									'value' => 'none',
 
-						<div class="prpl-radio-wrapper">
-							<label for="prpl-dont-email" class="prpl-custom-radio">
-								<input
-									type="radio"
-									id="prpl-dont-email"
-									name="email_frequency"
-									value="none"
-								>
-								<span class="prpl-custom-control"></span>
-								<?php \esc_html_e( 'Don\'t email me', 'progress-planner' ); ?>
-							</label>
-						</div>
-					</div>
-
-					<!-- <div>
-						<label class="prpl-radio-label">
-							<input type="radio" id="prpl-email-weekly" name="email_frequency" value="weekly">
-							<span><?php \esc_html_e( 'Email me weekly', 'progress-planner' ); ?></span>
-						</label>
-					</div> -->
-
-					<!-- <div>
-						<label class="prpl-radio-label">
-							<input type="radio" id="prpl-dont-email" name="email_frequency" value="none">
-							<span><?php \esc_html_e( 'Don\'t email me', 'progress-planner' ); ?></span>
-						</label>
-					</div> -->
+								],
+							],
+						]
+					);
+					?>
 				</div>
 
 				<div id="prpl-email-form" class="prpl-email-form" style="display: none;">

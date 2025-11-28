@@ -142,7 +142,7 @@
 	}
 
 	/* Used for radio and checkbox inputs. */
-	.radios {
+	.prpl-custom-inputs-wrapper{
 		padding-left: 3px;
 
 		/* To prevent custom radio and checkbox from being cut off. */
@@ -150,13 +150,15 @@
 		flex-direction: column;
 		gap: 0.5rem;
 
+		.prpl-checkbox-wrapper,
 		.prpl-radio-wrapper {
 			display: flex;
-			align-items: center;
+			flex-direction: column;
+			justify-content: flex-start;
 		}
 
-		--prpl-input-green: #3bb3a6;
-		--prpl-input-gray: #8b99a6;
+		--prpl-input-color-active: #5c5677;
+		--prpl-input-color-inactive: #8b99a6;
 
 		/* Hide the default input, because WP has it's own styles (which include pseudo-elements). */
 		.prpl-custom-checkbox input[type="checkbox"],
@@ -194,23 +196,18 @@
 		.prpl-custom-checkbox {
 
 			.prpl-custom-control {
-				border: 1px solid var(--prpl-input-gray);
-				border-radius: 6px;
+				border: 1px solid var(--prpl-input-color-inactive);
+
+				/* border-radius: 6px; */
 				background: #fff;
 			}
 
 			input[type="checkbox"] {
 
-				/* Checkbox hover (off) */
-				&:hover+.prpl-custom-control {
-					box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
-				}
-
 				/* Checkbox checked (on) */
 				&:checked+.prpl-custom-control {
-					background: var(--prpl-input-green);
-					border-color: var(--prpl-input-green);
-					box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+					background: var(--prpl-input-color-active);
+					border-color: var(--prpl-input-color-active);
 				}
 			}
 
@@ -239,7 +236,7 @@
 		.prpl-custom-radio {
 
 			.prpl-custom-control {
-				border: 1px solid var(--prpl-input-gray);
+				border: 1px solid var(--prpl-input-color-inactive);
 				border-radius: 50%;
 				background: #fff;
 			}
@@ -247,15 +244,10 @@
 			/* Radio hover (off) */
 			input[type="radio"] {
 
-				&:hover+.prpl-custom-control {
-					box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
-				}
-
 				/* Radio checked (on) */
 				&:checked+.prpl-custom-control {
-					background: var(--prpl-input-green);
-					border-color: var(--prpl-input-green);
-					box-shadow: 0 0 0 2px #f7f8fa, 0 0 0 3px var(--prpl-input-green);
+					background: var(--prpl-input-color-active);
+					border-color: var(--prpl-input-color-active);
 				}
 			}
 
@@ -776,11 +768,14 @@
 	}
 
 	/* Email Frequency Step */
-	.prpl-email-frequency-options {
+
+	/* .prpl-email-frequency-options {
+
+		.
 		display: flex;
 		gap: 10px;
 		flex-direction: column;
-	}
+	} */
 
 	#prpl-email-form {
 		margin-top: 1rem;

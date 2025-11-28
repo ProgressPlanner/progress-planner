@@ -45,7 +45,7 @@ $prpl_post_types     = \progress_planner()->get_settings()->get_public_post_type
 // Get redirect on login setting.
 $prpl_redirect_on_login = \get_user_meta( \get_current_user_id(), 'prpl_redirect_on_login', true );
 
-$prpl_total_number_of_steps = 5;
+$prpl_total_number_of_steps = 6;
 $prpl_current_step_number   = 0;
 
 ?>
@@ -91,37 +91,26 @@ $prpl_current_step_number   = 0;
 							</div>
 
 							<div class="prpl-checkbox-wrapper">
-								<div class="radios">
-									<div class="prpl-radio-wrapper">
-										<label for="prpl-no-<?php echo \esc_attr( $prpl_page_type['id'] ); ?>-page" class="prpl-custom-checkbox">
-											<input
-												type="checkbox"
-												id="prpl-no-<?php echo \esc_attr( $prpl_page_type['id'] ); ?>-page"
-											>
-											<span class="prpl-custom-control"></span>
-											<?php
-											\printf(
-												/* translators: %s: page type title */
-												\esc_html__( 'I don\'t have a %s yet', 'progress-planner' ),
-												\esc_html( $prpl_page_type['title'] )
-											);
-											?>
-										</label>
-									</div>
-								</div>
-								<!-- <label>
-									<input
-										type="checkbox"
-										id="prpl-no-<?php echo \esc_attr( $prpl_page_type['id'] ); ?>-page"
-									>
-									<?php
-									\printf(
-										/* translators: %s: page type title */
-										\esc_html__( 'I don\'t have a %s yet', 'progress-planner' ),
-										\esc_html( $prpl_page_type['title'] )
-									);
-									?>
-								</label> -->
+								<?php
+								\progress_planner()->the_view(
+									'onboarding/form-inputs/checkbox.php',
+									[
+										'name'          => 'no_' . \esc_attr( $prpl_page_type['id'] ) . '_page',
+										'current_value' => '',
+										'options'       => [
+											[
+												'id'    => 'prpl-no-' . \esc_attr( $prpl_page_type['id'] ) . '-page',
+												'label' => \sprintf(
+													/* translators: %s: page type title */
+													\esc_html__( 'I don\'t have a %s yet', 'progress-planner' ),
+													\esc_html( $prpl_page_type['title'] )
+												),
+												'value' => '1',
+											],
+										],
+									]
+								);
+								?>
 							</div>
 						</div>
 						<div class="prpl-setting-footer">
@@ -247,38 +236,26 @@ $prpl_current_step_number   = 0;
 								<?php \esc_html_e( 'Where do you want to start when you login to your site?', 'progress-planner' ); ?>
 							</p>
 
-							<div class="radios">
-								<div class="prpl-radio-wrapper">
-									<label for="prpl-setting-redirect-on-login" class="prpl-custom-checkbox">
-										<input
-											type="checkbox"
-											id="prpl-setting-redirect-on-login"
-											<?php \checked( $prpl_redirect_on_login ); ?>
-										>
-										<span class="prpl-custom-control"></span>
-										<span>
-										<?php
-										/* translators: %s: Progress Planner name. */
-										\printf( \esc_html__( 'Show the %s dashboard after login.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
-										?>
-										</span>
-									</label>
-								</div>
-							</div>
-							<!-- <label for="prpl-setting-redirect-on-login">
-								<input
-									id="prpl-setting-redirect-on-login"
-									name="prpl-redirect-on-login"
-									type="checkbox"
-									<?php \checked( $prpl_redirect_on_login ); ?>
-								/>
-								<span>
-								<?php
-								/* translators: %s: Progress Planner name. */
-								\printf( \esc_html__( 'Show the %s dashboard after login.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
-								?>
-								</span>
-							</label> -->
+							<?php
+							\progress_planner()->the_view(
+								'onboarding/form-inputs/checkbox.php',
+								[
+									'name'          => 'redirect_on_login',
+									'current_value' => '',
+									'options'       => [
+										[
+											'id'    => 'prpl-setting-redirect-on-login',
+											'label' => \sprintf(
+												/* translators: %s: Progress Planner name. */
+												\esc_html__( 'Show the %s dashboard after login.', 'progress-planner' ),
+												\esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() )
+											),
+											'value' => '1',
+										],
+									],
+								]
+							);
+							?>
 						</div>
 					</div>
 					<div class="prpl-setting-footer">

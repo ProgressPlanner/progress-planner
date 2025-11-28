@@ -41,41 +41,26 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					</p>
 
 					<div class="prpl-privacy-checkbox-wrapper">
-
-						<div class="radios">
-							<div class="prpl-radio-wrapper">
-								<label for="prpl-privacy-checkbox" class="prpl-custom-checkbox">
-									<input
-										type="checkbox"
-										id="prpl-privacy-checkbox"
-										name="privacy_accepted"
-										value="1"
-										checked
-									>
-									<span class="prpl-custom-control"></span>
-									<span>
-										<?php
-										\printf(
-											/* translators: %s: progressplanner.com/privacy-policy link */
-											\esc_html__( 'I accept the %s and the essential data processing needed for the plugin.', 'progress-planner' ),
-											'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">privacy policy</a>'
-										);
-										?>
-									</span>
-								</label>
-							</div>
-						</div>
-
-						<!-- <label>
-							<input type="checkbox" id="prpl-privacy-checkbox" name="privacy_accepted" value="1">
-							<?php
-							\printf(
-								/* translators: %s: progressplanner.com/privacy-policy link */
-								\esc_html__( 'I accept the %s and the essential data processing needed for the plugin.', 'progress-planner' ),
-								'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">privacy policy</a>'
+						<?php
+							\progress_planner()->the_view(
+								'onboarding/form-inputs/checkbox.php',
+								[
+									'name'          => 'privacy_accepted',
+									'current_value' => 0,
+									'options'       => [
+										[
+											'id'    => 'prpl-privacy-checkbox',
+											'label' => \sprintf(
+												/* translators: %s: progressplanner.com/privacy-policy link */
+												\esc_html__( 'I accept the %s and the essential data processing needed for the plugin.', 'progress-planner' ),
+												'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">privacy policy</a>'
+											),
+											'value' => 1,
+										],
+									],
+								]
 							);
 							?>
-						</label> -->
 					</div>
 				</div>
 
