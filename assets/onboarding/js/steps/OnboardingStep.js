@@ -309,14 +309,11 @@ class OnboardingStep {
 			return;
 		}
 
-		// Currently using the disabled attribute
-		// TODO: Consider using prpl-btn-disabled CSS class instead
+		// Using prpl-btn-disabled CSS class instead of the disabled attribute
 		if ( disabled ) {
 			this.nextBtn.classList.add( 'prpl-btn-disabled' );
 		} else {
 			this.nextBtn.classList.remove( 'prpl-btn-disabled' );
 		}
-
-		// this.nextBtn.disabled = disabled;
 	}
 }

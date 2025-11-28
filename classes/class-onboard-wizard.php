@@ -606,7 +606,7 @@ class Onboard_Wizard {
 							$i = 0;
 						foreach ( $this->steps as $step ) :
 							?>
-							<li class="prpl-step-item" data-step="<?php echo esc_attr( $i ); ?>">
+							<li class="prpl-nav-step-item" data-step="<?php echo esc_attr( $i ); ?>">
 								<span class="prpl-step-icon"><?php echo esc_html( $i + 1 ); ?></span>
 								<span class="prpl-step-label"><?php echo esc_html( $step['title'] ); ?></span>
 							</li>

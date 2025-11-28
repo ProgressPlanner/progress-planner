@@ -148,14 +148,16 @@ class ProgressPlannerOnboardWizard {
 	 * Update step navigation in left column
 	 */
 	updateStepNavigation() {
-		const stepItems = this.popover.querySelectorAll( '.prpl-step-item' );
+		const stepItems = this.popover.querySelectorAll(
+			'.prpl-nav-step-item'
+		);
 
 		stepItems.forEach( ( item, index ) => {
 			const icon = item.querySelector( '.prpl-step-icon' );
 			const stepNumber = index + 1;
 
 			// Remove all state classes
-			item.classList.remove( 'active', 'completed' );
+			item.classList.remove( 'prpl-active', 'prpl-completed' );
 
 			// Add appropriate class and update icon
 			if ( index < this.state.currentStep ) {
@@ -164,7 +166,7 @@ class ProgressPlannerOnboardWizard {
 				icon.textContent = '✓';
 			} else if ( index === this.state.currentStep ) {
 				// Active step: show number
-				item.classList.add( 'active' );
+				item.classList.add( 'prpl-active' );
 				icon.textContent = stepNumber;
 			} else {
 				// Future step: show number
@@ -374,7 +376,7 @@ class ProgressPlannerOnboardWizard {
 
 		// Get template from DOM
 		const template = document.getElementById(
-			'onboarding-quit-confirmation'
+			'prpl-onboarding-quit-confirmation'
 		);
 		if ( ! template ) {
 			console.error( 'Quit confirmation template not found' );

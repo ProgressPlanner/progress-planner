@@ -308,7 +308,7 @@
 		padding: 0;
 	}
 
-	.prpl-step-item {
+	.prpl-nav-step-item {
 		margin-top: 10px;
 		display: flex;
 		align-items: flex-start;
@@ -336,12 +336,12 @@
 		font-size: 14px;
 	}
 
-	.prpl-step-item.active .prpl-step-icon {
+	.prpl-nav-step-item.prpl-active .prpl-step-icon {
 		background: #534786;
 		color: #fff;
 	}
 
-	.prpl-step-item.completed .prpl-step-icon {
+	.prpl-nav-step-item.prpl-completed .prpl-step-icon {
 		background: #6b7280;
 		color: #fff;
 	}
@@ -352,12 +352,12 @@
 		line-height: 1.5;
 	}
 
-	.prpl-step-item.active .prpl-step-label {
+	.prpl-nav-step-item.prpl-active .prpl-step-label {
 		color: #111827;
 		font-weight: 700;
 	}
 
-	.prpl-step-item.completed .prpl-step-label {
+	.prpl-nav-step-item.prpl-completed .prpl-step-label {
 		color: #6b7280;
 	}
 

@@ -12,7 +12,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 ?>
 
 <!-- Quit confirmation template -->
-<script type="text/template" id="onboarding-quit-confirmation">
+<script type="text/template" id="prpl-onboarding-quit-confirmation">
 	<div class="prpl-columns-wrapper-flex prpl-columns-2-1">
 		<div class="prpl-column">
 			<div class="prpl-quit-confirmation">
