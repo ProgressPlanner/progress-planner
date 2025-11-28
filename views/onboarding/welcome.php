@@ -39,8 +39,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					<p>
 						<?php \esc_html_e( 'This will only take a few minutes.', 'progress-planner' ); ?>
 					</p>
+				</div>
 
-					<div class="prpl-privacy-checkbox-wrapper">
+				<div class="prpl-privacy-checkbox-wrapper">
 						<?php
 							\progress_planner()->the_view(
 								'onboarding/form-inputs/checkbox.php',
@@ -62,7 +63,6 @@ if ( ! \defined( 'ABSPATH' ) ) {
 							);
 							?>
 					</div>
-				</div>
 
 				<div class="tour-footer">
 					<div class="prpl-tour-next-wrapper">
