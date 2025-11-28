@@ -1146,7 +1146,7 @@
 	}
 }
 
-@media (max-width: 782px) {
+@media (max-width: 1023px) {
 
 	.prpl-popover-onboarding {
 		max-width: 90vw;
