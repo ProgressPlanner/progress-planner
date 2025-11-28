@@ -19,14 +19,14 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				<input
 					type="radio"
 					id="<?php echo \esc_attr( $prpl_option['id'] ); ?>"
-					<?php if ( isset( $prpl_option['name'] ) ) : ?>
-						name="<?php echo \esc_attr( $prpl_option['name'] ); ?>"
+					<?php if ( isset( $name ) ) : ?>
+						name="<?php echo \esc_attr( $name ); ?>"
 					<?php endif; ?>
 					<?php if ( isset( $prpl_option['value'] ) ) : ?>
 						value="<?php echo \esc_attr( $prpl_option['value'] ); ?>"
 					<?php endif; ?>
-					<?php if ( isset( $prpl_option['current_value'] ) && isset( $prpl_option['value'] ) ) : ?>
-						<?php \checked( $prpl_option['current_value'], $prpl_option['value'] ); ?>
+					<?php if ( isset( $current_value ) && isset( $prpl_option['value'] ) ) : ?>
+						<?php \checked( $current_value, $prpl_option['value'] ); ?>
 					<?php endif; ?>
 				>
 				<span class="prpl-custom-control"></span>
