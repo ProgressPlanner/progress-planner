@@ -1,5 +1,7 @@
 .prpl-popover-onboarding {
 
+	font-family: system-ui, Arial,sans-serif;
+
 	--prpl-onboarding-grey: #6B7280;
 	--prpl-onboarding-purple: #534786;
 	--prpl-onboarding-purple-headings: #38296D;
@@ -66,12 +68,14 @@
 	}
 
 	h2 {
+		font-family: system-ui, Arial, sans-serif;
 		margin-top: 0;
 		margin-bottom: 0.75rem;
 		font-size: 1.25rem;
 	}
 
 	h3 {
+		font-family: system-ui, Arial, sans-serif;
 		margin-top: 0;
 		margin-bottom: 1rem;
 		font-size: 1rem;
