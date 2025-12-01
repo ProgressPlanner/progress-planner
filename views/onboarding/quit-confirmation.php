@@ -17,7 +17,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<div class="prpl-column">
 			<div class="prpl-quit-confirmation">
 				<div class="prpl-error-box">
-					<span class="dashicons dashicons-warning"></span>
+					<span class="prpl-error-icon">
+						<?php \progress_planner()->the_asset( 'images/icon_exclamation_circle.svg' ); ?>
+					</span>
 					<div>
 						<h3><?php \esc_html_e( 'Are you sure you want to quit?', 'progress-planner' ); ?></h3>
 						<p>
