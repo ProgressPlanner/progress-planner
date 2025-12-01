@@ -13,11 +13,6 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 <!-- Tour step connect -->
 <script type="text/template" id="onboarding-step-first-task">
-	<!-- <div class="tour-header">
-		<h2 class="tour-title">
-			<?php \esc_html_e( 'Ready for your first task and your first point?', 'progress-planner' ); ?>
-		</h2>
-	</div> -->
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex">
 			<div class="prpl-column">

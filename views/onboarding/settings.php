@@ -52,12 +52,6 @@ $prpl_current_step_number   = 0;
 
 <!-- Tour step settings -->
 <script type="text/template" id="onboarding-step-settings">
-	<!-- <div class="tour-header">
-		<h2 class="tour-title">
-			<?php \esc_html_e( 'Settings', 'progress-planner' ); ?>
-			<span class="prpl-settings-progress">1/5</span>
-		</h2>
-	</div> -->
 	<div class="tour-content">
 		<?php foreach ( $prpl_page_types as $prpl_page_type ) : ?>
 			<?php ++$prpl_current_step_number; ?>

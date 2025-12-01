@@ -13,14 +13,6 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 <!-- Tour step welcome -->
 <script type="text/template" id="onboarding-step-welcome">
-	<!-- <div class="tour-header">
-		<h2 class="tour-title">
-			<?php
-			/* translators: %s: Progress Planner name. */
-			\printf( \esc_html__( 'Welcome to %s!', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
-			?>
-		</h2>
-	</div> -->
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex prpl-columns-2-1">
 			<div class="prpl-column">

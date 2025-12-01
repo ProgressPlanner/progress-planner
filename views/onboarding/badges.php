@@ -17,11 +17,6 @@ $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( ne
 
 <!-- Tour step badges -->
 <script type="text/template" id="onboarding-step-badges">
-	<!-- <div class="tour-header">
-		<h2 class="tour-title">
-			<?php \esc_html_e( 'Our badges are waiting for you', 'progress-planner' ); ?>
-		</h2>
-	</div> -->
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex prpl-columns-2-1">
 			<div class="prpl-column">

@@ -18,11 +18,6 @@ $prpl_user_email   = $prpl_current_user->user_email ?? '';
 
 <!-- Tour step email frequency -->
 <script type="text/template" id="onboarding-step-email-frequency">
-	<div class="tour-header">
-		<h2 class="tour-title">
-			<?php \esc_html_e( 'Email Frequency', 'progress-planner' ); ?>
-		</h2>
-	</div>
 	<div class="tour-content">
 		<div class="prpl-columns-wrapper-flex prpl-columns-1-2">
 			<div class="prpl-column">
@@ -36,6 +31,9 @@ $prpl_user_email   = $prpl_current_user->user_email ?? '';
 				</div>
 			</div>
 			<div class="prpl-column">
+				<h3 class="tour-title">
+					<?php \esc_html_e( 'Email Frequency', 'progress-planner' ); ?>
+				</h3>
 
 				<div class="prpl-email-frequency-options">
 					<?php
