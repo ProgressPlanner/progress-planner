@@ -22,6 +22,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	<form class="prpl-onboarding-task-form" onsubmit="return false;">
 
 		<div class="prpl-file-drop-zone" data-upload-field>
+			<span class="prpl-icon-image">
+				<?php \progress_planner()->the_file( 'assets/onboarding/images/icon_image.svg' ); ?>
+			</span>
 			<p>
 			<?php
 				printf(
