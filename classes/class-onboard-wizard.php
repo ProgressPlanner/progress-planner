@@ -64,6 +64,11 @@ class Onboard_Wizard {
 	 * @return void
 	 */
 	public function define_steps_and_order() {
+		$saved_progress = $this->get_saved_progress();
+
+		// We need to know if the first task is already completed, in case user resumes the onboarding.
+		$was_first_task_completed = isset( $saved_progress['data'] ) && ! empty( $saved_progress['data']['firstTaskCompleted'] );
+
 		// Get the onboarding tasks.
 		$onboarding_tasks = [
 			'core-blogdescription',
@@ -129,11 +134,13 @@ class Onboard_Wizard {
 				'title'              => esc_html__( 'What\'s what?', 'progress-planner' ),
 			],
 		];
-		if ( ! empty( $tasks ) ) {
+
+		// Add first task step if there are tasks or if the first task is already completed.
+		if ( ! empty( $tasks ) || $was_first_task_completed ) {
 			$this->steps[] = [
 				'script_file_name'   => 'FirstTaskStep',
 				'template_file_name' => 'first-task',
-				'template_data'      => [ 'task' => \array_shift( $tasks ) ],
+				'template_data'      => ! $was_first_task_completed ? [ 'task' => \array_shift( $tasks ) ] : [],
 				'template_id'        => 'onboarding-step-first-task',
 				'title'              => esc_html__( 'Complete your first task!', 'progress-planner' ),
 			];
