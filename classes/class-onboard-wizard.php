@@ -524,8 +524,8 @@ class Onboard_Wizard {
 		// Complete the task.
 		$task_completed = $provider->complete_task( $form_values, $task_id );
 
-		// Note: Marking task as completed will set it it to pending, so user will get celebration. Do we want that?
-		$task_post_marked_as_completed = \progress_planner()->get_suggested_tasks()->mark_task_as_completed( $task_id );
+		// It will skip the celebration and set the task's post status to trash.
+		$task_post_marked_as_completed = \progress_planner()->get_suggested_tasks()->mark_task_as_completed( $task_id, null, true );
 
 		if ( ! $task_completed || ! $task_post_marked_as_completed ) {
 			\error_log( 'Task not completed: ' . $task_id ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log

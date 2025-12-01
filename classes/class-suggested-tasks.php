@@ -222,15 +222,17 @@ class Suggested_Tasks {
 	 *
 	 * @param string   $task_id The task ID.
 	 * @param int|null $user_id Optional. The user ID for token deletion. If provided, the token will be deleted.
+	 * @param bool     $skip_celebration Optional. Whether to skip the celebration.
 	 *
 	 * @return bool
 	 */
-	public function mark_task_as_completed( $task_id, $user_id = null ) {
+	public function mark_task_as_completed( $task_id, $user_id = null, $skip_celebration = false ) {
 		if ( ! $this->was_task_completed( $task_id ) ) {
 			$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_id );
 
 			if ( $task ) {
-				\progress_planner()->get_suggested_tasks_db()->update_recommendation( $task->ID, [ 'post_status' => 'pending' ] );
+				$post_status = $skip_celebration ? 'trash' : 'pending';
+				\progress_planner()->get_suggested_tasks_db()->update_recommendation( $task->ID, [ 'post_status' => $post_status ] );
 
 				// Insert an activity.
 				$this->insert_activity( $task_id );
