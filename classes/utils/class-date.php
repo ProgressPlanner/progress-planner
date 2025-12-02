@@ -38,7 +38,7 @@ class Date {
 	 * @param \DateTime $end_date   The end date.
 	 * @param string    $frequency  The frequency. Can be 'daily', 'weekly', 'monthly'.
 	 *
-	 * @return array
+	 * @return array <array{start_date: \DateTime, end_date: \DateTime}>
 	 */
 	public function get_periods( $start_date, $end_date, $frequency ) {
 		$end_date->modify( '+1 day' );
