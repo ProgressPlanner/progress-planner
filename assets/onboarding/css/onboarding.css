@@ -481,6 +481,7 @@
 
 			color: var(--prpl-onboarding-btn-color);
 			background-color: #e1e3e7;
+			cursor: not-allowed;
 		}
 
 		/* &:not([disabled]):hover,
@@ -707,6 +708,43 @@
 		a {
 			color: var(--prpl-onboarding-link-color);
 			text-decoration: underline;
+		}
+
+		.prpl-required-indicator {
+			font-size: 0.875rem;
+			font-style: italic;
+
+			&::before {
+				content: '(';
+			}
+
+			&::after {
+				content: ')';
+			}
+
+			&.prpl-required-indicator-active {
+				color: var(--prpl-onboarding-error-icon-color);
+				font-size: 1rem;
+				font-style: normal;
+
+				&::before {
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					content: '!';
+					width: 16px;
+					height: 16px;
+					border-radius: 50%;
+					background-color: var(--prpl-onboarding-error-icon-color);
+					color: #fff;
+					font-size: 12px;
+					margin-right: 5px;
+				}
+
+				&::after {
+					content: '!';
+				}
+			}
 		}
 	}
 

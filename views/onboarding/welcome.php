@@ -44,9 +44,10 @@ if ( ! \defined( 'ABSPATH' ) ) {
 										[
 											'id'    => 'prpl-privacy-checkbox',
 											'label' => \sprintf(
-												/* translators: %s: progressplanner.com/privacy-policy link */
-												\esc_html__( 'I accept the %s and the essential data processing needed for the plugin.', 'progress-planner' ),
-												'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">privacy policy</a>'
+												/* translators: %1$s: progressplanner.com/privacy-policy link, %2$s: required indicator */
+												\esc_html__( 'I accept the %1$s and the essential data processing needed for the plugin. %2$s', 'progress-planner' ),
+												'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">' . \esc_html__( 'privacy policy', 'progress-planner' ) . '</a>',
+												'<span class="prpl-required-indicator">' . \esc_html__( 'Required', 'progress-planner' ) . '</span>'
 											),
 											'value' => 1,
 										],

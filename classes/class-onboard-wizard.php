@@ -359,6 +359,7 @@ class Onboard_Wizard {
 					'dashboard'             => \esc_html__( 'Take me to the dashboard', 'progress-planner' ),
 					'backToRecommendations' => \esc_html__( 'Back to recommendations', 'progress-planner' ),
 				],
+				'errorIcon'            => \progress_planner()->get_asset( 'images/icon_exclamation_circle.svg' ),
 				'steps'                => array_column( $this->steps, 'script_file_name' ),
 			]
 		);

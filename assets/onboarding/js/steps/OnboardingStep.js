@@ -120,12 +120,17 @@ class OnboardingStep {
 		// Build title HTML if provided
 		const titleHtml = title ? `<h3>${ this.escapeHtml( title ) }</h3>` : '';
 
+		// Get error icon from wizard config
+		const errorIcon = this.wizard?.config?.errorIcon || '';
+
 		// Create error message element
 		const errorDiv = document.createElement( 'div' );
 		errorDiv.className = 'prpl-error-message';
 		errorDiv.innerHTML = `
 			<div class="prpl-error-box">
-				<span class="dashicons dashicons-warning"></span>
+				<span class="prpl-error-icon">
+					${ errorIcon }
+				</span>
 				<div>
 					${ titleHtml }
 					<p>${ this.escapeHtml( message ) }</p>
@@ -312,8 +317,10 @@ class OnboardingStep {
 		// Using prpl-btn-disabled CSS class instead of the disabled attribute
 		if ( disabled ) {
 			this.nextBtn.classList.add( 'prpl-btn-disabled' );
+			this.nextBtn.setAttribute( 'aria-disabled', 'true' );
 		} else {
 			this.nextBtn.classList.remove( 'prpl-btn-disabled' );
+			this.nextBtn.setAttribute( 'aria-disabled', 'false' );
 		}
 	}
 }

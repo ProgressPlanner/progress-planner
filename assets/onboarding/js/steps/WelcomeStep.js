@@ -36,8 +36,12 @@ class PrplWelcomeStep extends OnboardingStep {
 		const handler = ( e ) => {
 			state.data.privacyAccepted = e.target.checked;
 
-			// Clear any existing error messages.
-			this.clearErrorMessage();
+			// Remove active class from required indicator.
+			this.popover
+				.querySelector(
+					'.prpl-privacy-checkbox-wrapper .prpl-required-indicator'
+				)
+				.classList.remove( 'prpl-required-indicator-active' );
 		};
 
 		checkbox.addEventListener( 'change', handler );
@@ -57,9 +61,12 @@ class PrplWelcomeStep extends OnboardingStep {
 			if ( this.nextBtn.classList.contains( 'prpl-btn-disabled' ) ) {
 				e.preventDefault();
 				e.stopPropagation();
-				this.showErrorMessage(
-					ProgressPlannerOnboardData.l10n.privacyPolicyError
-				);
+
+				this.popover
+					.querySelector(
+						'.prpl-privacy-checkbox-wrapper .prpl-required-indicator'
+					)
+					.classList.add( 'prpl-required-indicator-active' );
 			}
 		};
 
