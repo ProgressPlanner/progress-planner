@@ -18,10 +18,7 @@ class Date {
 	 * @param \DateTime $start_date The start date.
 	 * @param \DateTime $end_date   The end date.
 	 *
-	 * @return array [
-	 *                 'start_date' => \DateTime,
-	 *                 'end_date'   => \DateTime,
-	 *               ].
+	 * @return array <array<string, \DateTime>>
 	 */
 	public function get_range( $start_date, $end_date ) {
 		$dates = \iterator_to_array( new \DatePeriod( $start_date, new \DateInterval( 'P1D' ), $end_date ), false );
@@ -38,7 +35,7 @@ class Date {
 	 * @param \DateTime $end_date   The end date.
 	 * @param string    $frequency  The frequency. Can be 'daily', 'weekly', 'monthly'.
 	 *
-	 * @return array
+	 * @return array <array{start_date: \DateTime, end_date: \DateTime}>
 	 */
 	public function get_periods( $start_date, $end_date, $frequency ) {
 		$end_date->modify( '+1 day' );
