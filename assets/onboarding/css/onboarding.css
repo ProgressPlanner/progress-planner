@@ -712,7 +712,7 @@
 
 	/* What's Next Step */
 	.prpl-suggested-task-points {
-		font-size: var(--prpl-font-size-xs);
+		font-size: var(--prpl-font-size-xs, 12px);
 		font-weight: 700;
 		color: var(--prpl-text-point);
 		background-color: var(--prpl-background-point);
