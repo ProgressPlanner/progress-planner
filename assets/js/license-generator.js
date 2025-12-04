@@ -2,10 +2,39 @@
  * License Generator - Handles license key generation during onboarding
  * Adapted from onboard.js
  */
-/* global ProgressPlannerOnboardData */
+/* global progressPlanner */
 
 // eslint-disable-next-line no-unused-vars
 class LicenseGenerator {
+	/**
+	 * Store config for use in other methods.
+	 *
+	 * @type {Object}
+	 */
+	static config = null;
+
+	/**
+	 * Get the default config from progressPlanner global.
+	 *
+	 * @return {Object} Default configuration object.
+	 */
+	static getDefaultConfig() {
+		// eslint-disable-next-line no-undef
+		if ( typeof progressPlanner !== 'undefined' ) {
+			return {
+				// eslint-disable-next-line no-undef
+				onboardNonceURL: progressPlanner.onboardNonceURL,
+				// eslint-disable-next-line no-undef
+				onboardAPIUrl: progressPlanner.onboardAPIUrl,
+				// eslint-disable-next-line no-undef
+				adminAjaxUrl: progressPlanner.ajaxUrl,
+				// eslint-disable-next-line no-undef
+				nonce: progressPlanner.nonce,
+			};
+		}
+		return {};
+	}
+
 	/**
 	 * Make a request to save the license key.
 	 *
@@ -15,10 +44,10 @@ class LicenseGenerator {
 	static saveLicenseKey( licenseKey ) {
 		console.log( 'License key: ' + licenseKey );
 		return LicenseGenerator.ajaxRequest( {
-			url: ProgressPlannerOnboardData.adminAjaxUrl,
+			url: LicenseGenerator.config.adminAjaxUrl,
 			data: {
 				action: 'progress_planner_save_onboard_data',
-				_ajax_nonce: ProgressPlannerOnboardData.nonceProgressPlanner,
+				_ajax_nonce: LicenseGenerator.config.nonce,
 				key: licenseKey,
 			},
 		} );
@@ -32,7 +61,7 @@ class LicenseGenerator {
 	 */
 	static ajaxAPIRequest( data ) {
 		return LicenseGenerator.ajaxRequest( {
-			url: ProgressPlannerOnboardData.onboardAPIUrl,
+			url: LicenseGenerator.config.onboardAPIUrl,
 			data,
 		} )
 			.then( ( response ) => {
@@ -51,12 +80,16 @@ class LicenseGenerator {
 	 * Make a request to get the nonce.
 	 * Once the nonce is received, make a request to the API.
 	 *
-	 * @param {Object} data The data to send with the request.
+	 * @param {Object} data   The data to send with the request.
+	 * @param {Object} config Optional configuration object. Falls back to progressPlanner global.
 	 * @return {Promise} Promise that resolves when license is generated
 	 */
-	static generateLicense( data = {} ) {
+	static generateLicense( data = {}, config = null ) {
+		// Store config for use in other methods, fall back to default if not provided.
+		LicenseGenerator.config = config || LicenseGenerator.getDefaultConfig();
+
 		return LicenseGenerator.ajaxRequest( {
-			url: ProgressPlannerOnboardData.onboardNonceURL,
+			url: LicenseGenerator.config.onboardNonceURL,
 			data,
 		} ).then( ( response ) => {
 			if ( 'ok' === response.status ) {

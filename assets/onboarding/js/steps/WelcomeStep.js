@@ -133,13 +133,21 @@ class PrplWelcomeStep extends OnboardingStep {
 	 */
 	async generateLicense() {
 		// Use LicenseGenerator to handle the license generation process
-		return LicenseGenerator.generateLicense( {
-			name: '',
-			email: '',
-			'with-email': 'no',
-			site: ProgressPlannerOnboardData.site,
-			timezone_offset: ProgressPlannerOnboardData.timezone_offset,
-		} );
+		return LicenseGenerator.generateLicense(
+			{
+				name: '',
+				email: '',
+				'with-email': 'no',
+				site: ProgressPlannerOnboardData.site,
+				timezone_offset: ProgressPlannerOnboardData.timezone_offset,
+			},
+			{
+				onboardNonceURL: ProgressPlannerOnboardData.onboardNonceURL,
+				onboardAPIUrl: ProgressPlannerOnboardData.onboardAPIUrl,
+				adminAjaxUrl: ProgressPlannerOnboardData.adminAjaxUrl,
+				nonce: ProgressPlannerOnboardData.nonceProgressPlanner,
+			}
+		);
 	}
 }
 

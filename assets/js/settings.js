@@ -1,10 +1,10 @@
-/* global progressPlanner, progressPlannerAjaxRequest, prplL10n */
+/* global prplL10n, LicenseGenerator */
 /*
  * Settings
  *
  * A script to handle the settings page.
  *
- * Dependencies: progress-planner/ajax-request, wp-util, progress-planner/l10n
+ * Dependencies: progress-planner/l10n, progress-planner/license-generator
  */
 
 // Submit the email.
@@ -22,64 +22,23 @@ if ( !! settingsLicenseForm ) {
 			data[ key ] = value;
 		}
 
-		progressPlannerAjaxRequest( {
-			url: progressPlanner.onboardNonceURL,
-			data,
-		} )
-			.then( ( response ) => {
-				if ( 'ok' === response.status ) {
-					// Add the nonce to our data object.
-					data.nonce = response.nonce;
+		document.getElementById( 'submit-license-key' ).disabled = true;
+		document.getElementById( 'submit-license-key' ).innerHTML =
+			prplL10n( 'subscribing' );
 
-					// Make the request to the API.
-					progressPlannerAjaxRequest( {
-						url: progressPlanner.onboardAPIUrl,
-						data,
-					} )
-						.then( ( apiResponse ) => {
-							// Make a local request to save the response data.
-							progressPlannerSaveLicenseKey(
-								apiResponse.license_key
-							);
+		LicenseGenerator.generateLicense( data )
+			.then( () => {
+				document.getElementById( 'submit-license-key' ).innerHTML =
+					prplL10n( 'subscribed' );
 
-							document.getElementById(
-								'submit-license-key'
-							).innerHTML = prplL10n( 'subscribed' );
-
-							// Timeout so the license key is saved.
-							setTimeout( () => {
-								// Reload the page.
-								window.location.reload();
-							}, 500 );
-						} )
-						.catch( ( error ) => {
-							console.warn( error );
-						} );
-				}
+				// Timeout so the license key is saved.
+				setTimeout( () => {
+					// Reload the page.
+					window.location.reload();
+				}, 500 );
 			} )
 			.catch( ( error ) => {
 				console.warn( error );
 			} );
-
-		document.getElementById( 'submit-license-key' ).disabled = true;
-		document.getElementById( 'submit-license-key' ).innerHTML =
-			prplL10n( 'subscribing' );
 	} );
 }
-
-/**
- * Make a request to save the license key.
- *
- * @param {string} licenseKey The license key.
- */
-const progressPlannerSaveLicenseKey = ( licenseKey ) => {
-	console.log( 'License key: ' + licenseKey );
-	return progressPlannerAjaxRequest( {
-		url: progressPlanner.ajaxUrl,
-		data: {
-			action: 'progress_planner_save_onboard_data',
-			_ajax_nonce: progressPlanner.nonce,
-			key: licenseKey,
-		},
-	} );
-};

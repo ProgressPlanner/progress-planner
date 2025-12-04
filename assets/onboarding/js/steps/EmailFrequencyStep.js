@@ -167,13 +167,21 @@ class PrplEmailFrequencyStep extends OnboardingStep {
 
 		try {
 			// Use LicenseGenerator to handle the license generation process
-			await LicenseGenerator.generateLicense( {
-				name: state.data.emailFrequency.name,
-				email: state.data.emailFrequency.email,
-				site: ProgressPlannerOnboardData.site,
-				timezone_offset: ProgressPlannerOnboardData.timezone_offset,
-				'with-email': 'yes',
-			} );
+			await LicenseGenerator.generateLicense(
+				{
+					name: state.data.emailFrequency.name,
+					email: state.data.emailFrequency.email,
+					site: ProgressPlannerOnboardData.site,
+					timezone_offset: ProgressPlannerOnboardData.timezone_offset,
+					'with-email': 'yes',
+				},
+				{
+					onboardNonceURL: ProgressPlannerOnboardData.onboardNonceURL,
+					onboardAPIUrl: ProgressPlannerOnboardData.onboardAPIUrl,
+					adminAjaxUrl: ProgressPlannerOnboardData.adminAjaxUrl,
+					nonce: ProgressPlannerOnboardData.nonceProgressPlanner,
+				}
+			);
 
 			console.log( 'Successfully subscribed' );
 		} catch ( error ) {

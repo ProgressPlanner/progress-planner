@@ -316,7 +316,7 @@ class Onboard_Wizard {
 		\wp_enqueue_script( 'prpl-onboard-task', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/OnboardTask.js', [], \progress_planner()->get_plugin_version(), true );
 
 		// Enqueue LicenseGenerator (used by WelcomeStep).
-		\wp_enqueue_script( 'prpl-license-generator', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/LicenseGenerator.js', [], \progress_planner()->get_plugin_version(), true );
+		\wp_enqueue_script( 'prpl-license-generator', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/js/license-generator.js', [], \progress_planner()->get_plugin_version(), true );
 
 		// Enqueue step components.
 		foreach ( $this->steps as $step ) {
