@@ -50,7 +50,7 @@ class Onboard {
 		}
 
 		if ( ! \defined( 'WP_CLI' ) || ! \WP_CLI ) {
-			\wp_safe_redirect( \admin_url( 'admin.php?page=progress-planner' ) );
+			\wp_safe_redirect( \Progress_Planner\Onboard_Wizard::get_onboarding_page_url() );
 			exit;
 		}
 	}

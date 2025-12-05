@@ -46,9 +46,9 @@ if ( 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id() ) {
 			<div class="prpl-start-onboarding-graphic">
 				<?php \progress_planner()->the_file( 'assets/images/onboarding/thumbs_up_ravi_rtl.svg' ); ?>
 			</div>
-			<button class="prpl-button-primary" id="prpl-start-onboarding-button" onclick="window.prplOnboardWizard.startOnboarding();return false;">
+			<a class="prpl-button-primary" id="prpl-start-onboarding-button" href="<?php echo \esc_url( \Progress_Planner\Onboard_Wizard::get_onboarding_page_url() ); ?>">
 				<?php \esc_html_e( 'Are you ready to work on your site?', 'progress-planner' ); ?>
-			</button>
+			</a>
 		</div>
 	<?php endif; ?>
 </div>

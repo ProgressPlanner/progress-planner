@@ -13,6 +13,13 @@ namespace Progress_Planner;
 class Onboard_Wizard {
 
 	/**
+	 * The onboarding page slug.
+	 *
+	 * @var string
+	 */
+	const PAGE_SLUG = 'progress-planner-onboarding';
+
+	/**
 	 * Steps and their order.
 	 *
 	 * @var array
@@ -25,14 +32,31 @@ class Onboard_Wizard {
 	 * @return void
 	 */
 	public function __construct() {
+		// Register onboarding admin page (always, so it's accessible).
+		\add_action( 'admin_menu', [ $this, 'add_onboarding_page' ] );
 
 		// Add admin toolbar items.
 		// TODO: Remove after testing.
 		\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_items' ] );
 		\add_action( 'admin_init', [ $this, 'check_delete_onboarding_progress' ] );
 
-		// If the onboarding is finished, do not add the popover.
-		if ( $this->is_onboarding_finished() ) {
+		// Define steps and their order (always needed for the onboarding page).
+		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
+
+		// AJAX actions need to be registered early.
+		\add_action( 'wp_ajax_progress_planner_onboarding_complete_task', [ $this, 'ajax_complete_task' ] );
+		\add_action( 'wp_ajax_progress_planner_onboarding_save_progress', [ $this, 'ajax_save_onboarding_progress' ] );
+		\add_action( 'wp_ajax_prpl_save_all_onboarding_settings', [ $this, 'ajax_save_all_onboarding_settings' ] );
+
+		// Allow only images for the front-end upload.
+		\add_filter( 'rest_pre_insert_attachment', [ $this, 'rest_pre_insert_attachment' ], 10, 2 );
+
+		// Check if we're on the onboarding page (always load scripts there).
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$is_onboarding_page = isset( $_GET['page'] ) && self::PAGE_SLUG === $_GET['page'];
+
+		// If onboarding is finished and we're not on the onboarding page, skip loading popover.
+		if ( $this->is_onboarding_finished() && ! $is_onboarding_page ) {
 			return;
 		}
 
@@ -45,17 +69,6 @@ class Onboard_Wizard {
 		\add_action( 'admin_footer', [ $this, 'add_popover' ] );
 		\add_action( 'admin_footer', [ $this, 'add_popover_step_templates' ] );
 		\add_action( 'admin_enqueue_scripts', [ $this, 'add_popover_scripts' ] );
-
-		// Define steps and their order.
-		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
-
-		// Note: AJAX action needs to be registered early (ie wrapping init in is_admin() check will be to late).
-		\add_action( 'wp_ajax_progress_planner_onboarding_complete_task', [ $this, 'ajax_complete_task' ] );
-		\add_action( 'wp_ajax_progress_planner_onboarding_save_progress', [ $this, 'ajax_save_onboarding_progress' ] );
-		\add_action( 'wp_ajax_prpl_save_all_onboarding_settings', [ $this, 'ajax_save_all_onboarding_settings' ] );
-
-		// Allow only images for the front-end upload.
-		\add_filter( 'rest_pre_insert_attachment', [ $this, 'rest_pre_insert_attachment' ], 10, 2 );
 
 		// Maybe show user notification that tour is not finished.
 		\add_action( 'admin_notices', [ $this, 'maybe_show_user_notification' ] );
@@ -239,10 +252,8 @@ class Onboard_Wizard {
 			return;
 		}
 
-		// If the user is on the Progress Planner dashboard do not display the notification.
-		// This is a 'safety net' since we currently prevent all admin notices on the Progress Planner dashboard screen.
-		if ( 'toplevel_page_progress-planner' === $screen->id ) {
-			// Do not show the notification.
+		// If the user is on the Progress Planner dashboard or onboarding page, do not display the notification.
+		if ( 'toplevel_page_progress-planner' === $screen->id || 'settings_page_' . self::PAGE_SLUG === $screen->id ) {
 			return;
 		}
 
@@ -252,8 +263,8 @@ class Onboard_Wizard {
 			<?php
 				printf(
 					/* Translators: %1$s: Opening the anchor tag. %2$s: Closing the anchor tag. */
-					\esc_html__( 'You haven\'t completed the onboarding yet. Go the %1$s Recommendations dashboard %2$s to complete it.', 'progress-planner' ),
-					'<a href="' . \esc_url( admin_url( 'admin.php?page=progress-planner' ) ) . '">',
+					\esc_html__( 'You haven\'t completed the onboarding yet. %1$s Complete the setup wizard %2$s to get started.', 'progress-planner' ),
+					'<a href="' . \esc_url( self::get_onboarding_page_url() ) . '">',
 					'</a>'
 				);
 			?>
@@ -295,12 +306,9 @@ class Onboard_Wizard {
 		// Get saved progress from user meta.
 		$saved_progress = $this->get_saved_progress();
 
-		// Check if we're on the Progress Planner dashboard page.
-		$is_dashboard_page = false;
-		if ( \is_admin() ) {
-			$screen            = \function_exists( 'get_current_screen' ) ? \get_current_screen() : null;
-			$is_dashboard_page = $screen && 'toplevel_page_progress-planner' === $screen->id;
-		}
+		// Check if we're on the onboarding page.
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$is_onboarding_page = \is_admin() && isset( $_GET['page'] ) && self::PAGE_SLUG === $_GET['page'];
 
 		// Check if onboarding was already completed.
 		$onboarding_completed = \get_option( 'prpl_onboarding_completed', false );
@@ -321,7 +329,7 @@ class Onboard_Wizard {
 					'timezone_offset'      => (float) ( \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600 ),
 					'savedProgress'        => $saved_progress,
 					'lastStepRedirectUrl'  => \esc_url_raw( admin_url( 'admin.php?page=progress-planner' ) ),
-					'isDashboardPage'      => $is_dashboard_page,
+					'isOnboardingPage'     => $is_onboarding_page,
 					'onboardingCompleted'  => (bool) $onboarding_completed,
 					'fullscreenMode'       => true, // Enable fullscreen takeover mode.
 					'l10n'                 => [
@@ -386,6 +394,41 @@ class Onboard_Wizard {
 	}
 
 	/**
+	 * Add the onboarding admin page.
+	 *
+	 * @return void
+	 */
+	public function add_onboarding_page() {
+		// Use 'options.php' as parent to create a hidden page (common WordPress pattern).
+		\add_submenu_page(
+			'options.php',
+			\esc_html__( 'Setup Wizard', 'progress-planner' ),
+			\esc_html__( 'Setup Wizard', 'progress-planner' ),
+			'manage_options',
+			self::PAGE_SLUG,
+			[ $this, 'render_onboarding_page' ]
+		);
+	}
+
+	/**
+	 * Render the onboarding admin page.
+	 *
+	 * @return void
+	 */
+	public function render_onboarding_page() {
+		\progress_planner()->the_view( 'onboarding-page.php' );
+	}
+
+	/**
+	 * Get the onboarding page URL.
+	 *
+	 * @return string
+	 */
+	public static function get_onboarding_page_url() {
+		return \admin_url( 'options.php?page=' . self::PAGE_SLUG );
+	}
+
+	/**
 	 * Add admin toolbar item.
 	 *
 	 * @return void
@@ -405,10 +448,7 @@ class Onboard_Wizard {
 			[
 				'id'    => 'progress-planner-onboarding',
 				'title' => 'Progress Planner Onboarding',
-				'href'  => '#',
-				'meta'  => [
-					'onclick' => 'window.prplOnboardWizard.startOnboarding(); return false;',
-				],
+				'href'  => self::get_onboarding_page_url(),
 			]
 		);
 

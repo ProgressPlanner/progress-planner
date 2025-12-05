@@ -50,14 +50,8 @@ class ProgressPlannerOnboardWizard {
 		// Setup event listeners after DOM is ready
 		this.setupEventListeners();
 
-		// Auto-start onboarding in fullscreen mode if on dashboard page and not completed
-		const shouldAutoStart =
-			this.isFullscreenMode &&
-			this.config.isDashboardPage &&
-			! this.config.onboardingCompleted &&
-			! this.state.data.finished;
-
-		if ( shouldAutoStart ) {
+		// Auto-start onboarding if on the dedicated onboarding page
+		if ( this.config.isOnboardingPage ) {
 			this.startOnboarding();
 		}
 	}
