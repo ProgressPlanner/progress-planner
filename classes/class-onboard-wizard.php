@@ -26,6 +26,11 @@ class Onboard_Wizard {
 	 */
 	public function __construct() {
 
+		// Add admin toolbar items.
+		// TODO: Remove after testing.
+		\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_items' ] );
+		\add_action( 'admin_init', [ $this, 'check_delete_onboarding_progress' ] );
+
 		// If the onboarding is finished, do not add the popover.
 		if ( $this->is_onboarding_finished() ) {
 			return;
@@ -43,11 +48,6 @@ class Onboard_Wizard {
 
 		// Define steps and their order.
 		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
-
-		// Add admin toolbar items.
-		// TODO: Remove after testing.
-		\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_items' ] );
-		\add_action( 'admin_init', [ $this, 'check_delete_onboarding_progress' ] );
 
 		// Note: AJAX action needs to be registered early (ie wrapping init in is_admin() check will be to late).
 		\add_action( 'wp_ajax_progress_planner_onboarding_complete_task', [ $this, 'ajax_complete_task' ] );
