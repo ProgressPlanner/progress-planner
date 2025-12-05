@@ -25,6 +25,12 @@ class Onboard_Wizard {
 	 * @return void
 	 */
 	public function __construct() {
+
+		// If the onboarding is finished, do not add the popover.
+		if ( $this->is_onboarding_finished() ) {
+			return;
+		}
+
 		// Add popover on front end.
 		\add_action( 'wp_footer', [ $this, 'add_popover' ] );
 		\add_action( 'wp_footer', [ $this, 'add_popover_step_templates' ] );
@@ -53,9 +59,6 @@ class Onboard_Wizard {
 
 		// Maybe show user notification that tour is not finished.
 		\add_action( 'admin_notices', [ $this, 'maybe_show_user_notification' ] );
-
-		// Maybe clean up the onboarding progress. -- TODO: When to cleanup the onboarding progress?
-		\add_action( 'current_screen', [ $this, 'maybe_clean_up_onboarding_progress' ] );
 	}
 
 	/**
@@ -217,32 +220,6 @@ class Onboard_Wizard {
 	}
 
 	/**
-	 * Maybe clean up the onboarding progress.
-	 *
-	 * @return void
-	 */
-	public function maybe_clean_up_onboarding_progress() {
-		if ( ! \get_current_user_id() ) {
-			return;
-		}
-
-		$screen = \get_current_screen();
-
-		// If the user is on the Progress Planner dashboard delete the user meta.
-		if ( ! $screen || 'toplevel_page_progress-planner' !== $screen->id ) {
-			return;
-		}
-
-		$onboarding_progress = \get_option( 'prpl_onboard_progress', true );
-		if ( ! $onboarding_progress ) {
-			return;
-		}
-
-		\delete_option( 'prpl_onboard_progress' );
-	}
-
-
-	/**
 	 * Maybe show user notification that tour is not finished.
 	 *
 	 * @return void
@@ -252,8 +229,7 @@ class Onboard_Wizard {
 			return;
 		}
 
-		$onboarding_progress = \get_option( 'prpl_onboard_progress', true );
-		if ( ! $onboarding_progress ) {
+		if ( $this->is_onboarding_finished() ) {
 			return;
 		}
 
@@ -263,36 +239,30 @@ class Onboard_Wizard {
 			return;
 		}
 
-		// If the user is on the Progress Planner dashboard do not display the notification and delete the user meta.
+		// If the user is on the Progress Planner dashboard do not display the notification.
 		// This is a 'safety net' since we currently prevent all admin notices on the Progress Planner dashboard screen.
 		if ( 'toplevel_page_progress-planner' === $screen->id ) {
-			\delete_option( 'prpl_onboard_progress' );
-
 			// Do not show the notification.
 			return;
 		}
 
-		$onboarding_progress = \json_decode( $onboarding_progress, true );
-
-		if ( $onboarding_progress && isset( $onboarding_progress['data'] ) && ! $onboarding_progress['data']['finished'] ) {
-			?>
-			<div class="notice notice-success is-dismissible">
-				<p>
-				<?php
-					printf(
-						/* Translators: %1$s: Opening the anchor tag. %2$s: Closing the anchor tag. */
-						\esc_html__( 'You haven\'t completed the onboarding yet. Go the %1$s Recommendations dashboard %2$s to complete it.', 'progress-planner' ),
-						'<a href="' . \esc_url( admin_url( 'admin.php?page=progress-planner' ) ) . '">',
-						'</a>'
-					);
-				?>
-				</p>
-			</div>
+		?>
+		<div class="notice notice-success is-dismissible">
+			<p>
 			<?php
-		}
+				printf(
+					/* Translators: %1$s: Opening the anchor tag. %2$s: Closing the anchor tag. */
+					\esc_html__( 'You haven\'t completed the onboarding yet. Go the %1$s Recommendations dashboard %2$s to complete it.', 'progress-planner' ),
+					'<a href="' . \esc_url( admin_url( 'admin.php?page=progress-planner' ) ) . '">',
+					'</a>'
+				);
+			?>
+			</p>
+		</div>
+		<?php
 
-		// Clean up the onboarding progress.
-		\delete_option( 'prpl_onboard_progress' );
+		// TODO: Clean up the onboarding progress.
+		$this->delete_onboarding_progress();
 	}
 
 	/**
@@ -388,7 +358,7 @@ class Onboard_Wizard {
 			return null;
 		}
 
-		$onboarding_progress = \get_option( 'prpl_onboard_progress', true );
+		$onboarding_progress = \get_option( 'prpl_onboard_progress', false );
 		if ( ! $onboarding_progress ) {
 			return null;
 		}
@@ -399,6 +369,29 @@ class Onboard_Wizard {
 		}
 
 		return $decoded;
+	}
+
+	/**
+	 * Clean up the onboarding progress.
+	 *
+	 * @return void
+	 */
+	public function delete_onboarding_progress() {
+		\delete_option( 'prpl_onboard_progress' );
+	}
+
+	/**
+	 * Check if the onboarding is finished.
+	 *
+	 * @return bool
+	 */
+	public function is_onboarding_finished() {
+		$onboarding_progress = $this->get_saved_progress();
+		if ( ! $onboarding_progress ) {
+			return false;
+		}
+
+		return isset( $onboarding_progress['data'] ) && isset( $onboarding_progress['data']['finished'] ) && $onboarding_progress['data']['finished'];
 	}
 
 	/**
@@ -467,7 +460,7 @@ class Onboard_Wizard {
 		}
 
 		// Delete the onboarding progress.
-		\delete_option( 'prpl_onboard_progress' );
+		$this->delete_onboarding_progress();
 
 		// Redirect to the same page without the parameter.
 		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_onboarding_progress', '_wpnonce' ] ) );
