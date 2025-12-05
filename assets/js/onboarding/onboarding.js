@@ -277,6 +277,12 @@ class ProgressPlannerOnboardWizard {
 			this.state.cleanup();
 		}
 
+		// If on the onboarding page and not finishing, redirect back
+		if ( this.config.isOnboardingPage && this.config.cancelUrl && ! this.state.data.finished ) {
+			window.location.href = this.config.cancelUrl;
+			return;
+		}
+
 		// Reset cleanup
 		this.state.cleanup = null;
 

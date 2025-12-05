@@ -329,6 +329,7 @@ class Onboard_Wizard {
 					'timezone_offset'      => (float) ( \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600 ),
 					'savedProgress'        => $saved_progress,
 					'lastStepRedirectUrl'  => \esc_url_raw( admin_url( 'admin.php?page=progress-planner' ) ),
+					'cancelUrl'            => $is_onboarding_page ? \esc_url_raw( \wp_get_referer() ? \wp_get_referer() : admin_url( 'admin.php?page=progress-planner' ) ) : '',
 					'isOnboardingPage'     => $is_onboarding_page,
 					'onboardingCompleted'  => (bool) $onboarding_completed,
 					'fullscreenMode'       => true, // Enable fullscreen takeover mode.
