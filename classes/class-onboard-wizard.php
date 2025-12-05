@@ -337,6 +337,16 @@ class Onboard_Wizard {
 		// Get saved progress from user meta.
 		$saved_progress = $this->get_saved_progress();
 
+		// Check if we're on the Progress Planner dashboard page.
+		$is_dashboard_page = false;
+		if ( \is_admin() ) {
+			$screen            = \function_exists( 'get_current_screen' ) ? \get_current_screen() : null;
+			$is_dashboard_page = $screen && 'toplevel_page_progress-planner' === $screen->id;
+		}
+
+		// Check if onboarding was already completed.
+		$onboarding_completed = \get_option( 'prpl_onboarding_completed', false );
+
 		\wp_localize_script(
 			'prpl-popover-onboarding',
 			'ProgressPlannerOnboardData',
@@ -351,6 +361,9 @@ class Onboard_Wizard {
 				'timezone_offset'      => (float) ( \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600 ),
 				'savedProgress'        => $saved_progress,
 				'lastStepRedirectUrl'  => \esc_url_raw( admin_url( 'admin.php?page=progress-planner' ) ),
+				'isDashboardPage'      => $is_dashboard_page,
+				'onboardingCompleted'  => (bool) $onboarding_completed,
+				'fullscreenMode'       => true, // Enable fullscreen takeover mode.
 				'l10n'                 => [
 					'next'                  => \esc_html__( 'Next', 'progress-planner' ),
 					'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),
@@ -605,6 +618,7 @@ class Onboard_Wizard {
 	 */
 	public function add_popover() {
 		?>
+		<div id="prpl-onboarding-fullscreen" class="prpl-onboarding-fullscreen" style="display: none;">
 		<div id="prpl-popover-onboarding" class="prpl-popover-onboarding" data-prpl-step="0" popover="manual" tabindex="-1">
 			<div class="prpl-onboarding-layout">
 				<!-- Left column: Step navigation -->
@@ -646,6 +660,7 @@ class Onboard_Wizard {
 				<span class="dashicons dashicons-no-alt"></span>
 			</button>
 		</div>
+		</div><!-- /#prpl-onboarding-fullscreen -->
 		<?php
 	}
 

@@ -21,6 +21,9 @@ class ProgressPlannerOnboardWizard {
 		// Store previously focused element for accessibility
 		this.previouslyFocusedElement = null;
 
+		// Fullscreen mode flag
+		this.isFullscreenMode = config.fullscreenMode || false;
+
 		// Restore saved progress if available
 		this.restoreSavedProgress();
 
@@ -29,6 +32,7 @@ class ProgressPlannerOnboardWizard {
 
 		// Set DOM related properties FIRST.
 		this.popover = document.getElementById( this.config.popoverId );
+		this.fullscreenWrapper = document.getElementById( 'prpl-onboarding-fullscreen' );
 		this.contentWrapper = this.popover.querySelector(
 			'.tour-content-wrapper'
 		);
@@ -41,6 +45,17 @@ class ProgressPlannerOnboardWizard {
 
 		// Setup event listeners after DOM is ready
 		this.setupEventListeners();
+
+		// Auto-start onboarding in fullscreen mode if on dashboard page and not completed
+		const shouldAutoStart =
+			this.isFullscreenMode &&
+			this.config.isDashboardPage &&
+			! this.config.onboardingCompleted &&
+			! this.state.data.finished;
+
+		if ( shouldAutoStart ) {
+			this.startOnboarding();
+		}
 	}
 
 	/**
@@ -223,10 +238,12 @@ class ProgressPlannerOnboardWizard {
 			this.closeTour();
 
 			// Redirect to the Progress Planner dashboard
+			// Wait for save to complete before redirecting to prevent re-triggering
 			if (
 				this.config.lastStepRedirectUrl &&
 				this.config.lastStepRedirectUrl.length > 0
 			) {
+				await this.saveProgressToServer();
 				window.location.href = this.config.lastStepRedirectUrl;
 			}
 		}
@@ -246,9 +263,15 @@ class ProgressPlannerOnboardWizard {
 	 * Close the tour
 	 */
 	closeTour() {
-		if ( this.popover ) {
+		// If fullscreen mode, hide the wrapper and remove body class
+		if ( this.isFullscreenMode && this.fullscreenWrapper ) {
+			this.fullscreenWrapper.style.display = 'none';
+			document.body.classList.remove( 'prpl-onboarding-active' );
+			this.popover.classList.remove( 'prpl-popover-visible' );
+		} else if ( this.popover ) {
 			this.popover.hidePopover();
 		}
+
 		this.saveProgressToServer();
 
 		// Cleanup active step
@@ -278,7 +301,16 @@ class ProgressPlannerOnboardWizard {
 			this.previouslyFocusedElement =
 				this.popover.ownerDocument.activeElement;
 
-			this.popover.showPopover();
+			// If fullscreen mode, show the wrapper and add body class
+			// Don't use popover API in fullscreen mode - it moves to top layer and breaks positioning
+			if ( this.isFullscreenMode && this.fullscreenWrapper ) {
+				this.fullscreenWrapper.style.display = 'flex';
+				document.body.classList.add( 'prpl-onboarding-active' );
+				this.popover.classList.add( 'prpl-popover-visible' );
+			} else {
+				this.popover.showPopover();
+			}
+
 			this.updateStepNavigation();
 			this.renderStep();
 
