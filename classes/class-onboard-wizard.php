@@ -277,32 +277,20 @@ class Onboard_Wizard {
 		\wp_add_inline_style( 'prpl-variables-color', \progress_planner()->get_ui__branding()->get_custom_css() );
 
 		// Enqueue onboarding.css.
-		\wp_enqueue_style( 'prpl-onboarding', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/css/onboarding.css', [], \progress_planner()->get_plugin_version() );
-
-		// Enqueue base step class.
-		\wp_enqueue_script( 'prpl-onboarding-step', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/OnboardingStep.js', [], \progress_planner()->get_plugin_version(), true );
+		progress_planner()->get_admin__enqueue()->enqueue_style( 'onboarding/onboarding' );
 
 		// Enqueue PrplOnboardTask (used by MoreTasksStep).
-		\wp_enqueue_script( 'prpl-onboard-task', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/OnboardTask.js', [], \progress_planner()->get_plugin_version(), true );
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboarding/OnboardTask' );
 
-		// Enqueue LicenseGenerator (used by WelcomeStep).
-		\wp_enqueue_script( 'prpl-license-generator', \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/js/license-generator.js', [], \progress_planner()->get_plugin_version(), true );
+		// Enqueue base step class.
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboarding/steps/OnboardingStep' );
 
 		// Enqueue step components.
 		foreach ( $this->steps as $step ) {
-			\wp_enqueue_script( 'prpl-onboarding-' . $step['script_file_name'], \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/steps/' . $step['script_file_name'] . '.js', [ 'prpl-onboarding-step' ], \progress_planner()->get_plugin_version(), true );
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboarding/steps/' . $step['script_file_name'] );
 		}
 
 		\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-gauge' );
-
-		// Enqueue main onboarding.js (depends on all step components).
-		\wp_enqueue_script(
-			'prpl-popover-onboarding',
-			\constant( 'PROGRESS_PLANNER_URL' ) . '/assets/onboarding/js/onboarding.js',
-			[],
-			\progress_planner()->get_plugin_version(),
-			true
-		);
 
 		// Get saved progress from user meta.
 		$saved_progress = $this->get_saved_progress();
@@ -317,33 +305,36 @@ class Onboard_Wizard {
 		// Check if onboarding was already completed.
 		$onboarding_completed = \get_option( 'prpl_onboarding_completed', false );
 
-		\wp_localize_script(
-			'prpl-popover-onboarding',
-			'ProgressPlannerOnboardData',
+		// Enqueue main onboarding.js (depends on all step components).
+		\progress_planner()->get_admin__enqueue()->enqueue_script(
+			'onboarding/onboarding',
 			[
-				'adminAjaxUrl'         => \esc_url_raw( admin_url( 'admin-ajax.php' ) ),
-				'nonceProgressPlanner' => \esc_js( \wp_create_nonce( 'progress_planner' ) ),
-				'nonceWPAPI'           => \esc_js( \wp_create_nonce( 'wp_rest' ) ),
-				'popoverId'            => 'prpl-popover-onboarding',
-				'onboardAPIUrl'        => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
-				'onboardNonceURL'      => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
-				'site'                 => \esc_attr( \set_url_scheme( \site_url() ) ),
-				'timezone_offset'      => (float) ( \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600 ),
-				'savedProgress'        => $saved_progress,
-				'lastStepRedirectUrl'  => \esc_url_raw( admin_url( 'admin.php?page=progress-planner' ) ),
-				'isDashboardPage'      => $is_dashboard_page,
-				'onboardingCompleted'  => (bool) $onboarding_completed,
-				'fullscreenMode'       => true, // Enable fullscreen takeover mode.
-				'l10n'                 => [
-					'next'                  => \esc_html__( 'Next', 'progress-planner' ),
-					'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),
-					/* translators: %s: Progress Planner name. */
-					'privacyPolicyError'    => sprintf( \esc_html__( 'You need to agree with the privacy policy to use the %s plugin.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) ),
-					'dashboard'             => \esc_html__( 'Take me to the dashboard', 'progress-planner' ),
-					'backToRecommendations' => \esc_html__( 'Back to recommendations', 'progress-planner' ),
+				'name' => 'ProgressPlannerOnboardData',
+				'data' => [
+					'adminAjaxUrl'         => \esc_url_raw( admin_url( 'admin-ajax.php' ) ),
+					'nonceProgressPlanner' => \esc_js( \wp_create_nonce( 'progress_planner' ) ),
+					'nonceWPAPI'           => \esc_js( \wp_create_nonce( 'wp_rest' ) ),
+					'popoverId'            => 'prpl-popover-onboarding',
+					'onboardAPIUrl'        => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
+					'onboardNonceURL'      => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
+					'site'                 => \esc_attr( \set_url_scheme( \site_url() ) ),
+					'timezone_offset'      => (float) ( \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600 ),
+					'savedProgress'        => $saved_progress,
+					'lastStepRedirectUrl'  => \esc_url_raw( admin_url( 'admin.php?page=progress-planner' ) ),
+					'isDashboardPage'      => $is_dashboard_page,
+					'onboardingCompleted'  => (bool) $onboarding_completed,
+					'fullscreenMode'       => true, // Enable fullscreen takeover mode.
+					'l10n'                 => [
+						'next'                  => \esc_html__( 'Next', 'progress-planner' ),
+						'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),
+						/* translators: %s: Progress Planner name. */
+						'privacyPolicyError'    => sprintf( \esc_html__( 'You need to agree with the privacy policy to use the %s plugin.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) ),
+						'dashboard'             => \esc_html__( 'Take me to the dashboard', 'progress-planner' ),
+						'backToRecommendations' => \esc_html__( 'Back to recommendations', 'progress-planner' ),
+					],
+					'errorIcon'            => \progress_planner()->get_asset( 'images/icon_exclamation_circle.svg' ),
+					'steps'                => array_column( $this->steps, 'script_file_name' ),
 				],
-				'errorIcon'            => \progress_planner()->get_asset( 'images/icon_exclamation_circle.svg' ),
-				'steps'                => array_column( $this->steps, 'script_file_name' ),
 			]
 		);
 	}

@@ -23,7 +23,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 		<div class="prpl-file-drop-zone" data-upload-field>
 			<span class="prpl-icon-image">
-				<?php \progress_planner()->the_file( 'assets/onboarding/images/icon_image.svg' ); ?>
+				<?php \progress_planner()->the_file( 'assets/images/onboarding/icon_image.svg' ); ?>
 			</span>
 			<p>
 			<?php

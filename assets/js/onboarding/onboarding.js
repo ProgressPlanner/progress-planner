@@ -1,6 +1,8 @@
 /**
  * Progress Planner Onboarding Wizard
  * Handles the onboarding wizard functionality
+ *
+ * Dependencies: progress-planner/license-generator
  */
 /* global ProgressPlannerOnboardData */
 
@@ -32,7 +34,9 @@ class ProgressPlannerOnboardWizard {
 
 		// Set DOM related properties FIRST.
 		this.popover = document.getElementById( this.config.popoverId );
-		this.fullscreenWrapper = document.getElementById( 'prpl-onboarding-fullscreen' );
+		this.fullscreenWrapper = document.getElementById(
+			'prpl-onboarding-fullscreen'
+		);
 		this.contentWrapper = this.popover.querySelector(
 			'.tour-content-wrapper'
 		);
