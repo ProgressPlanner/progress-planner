@@ -1,26 +1,48 @@
 .prpl-popover-onboarding {
 
-	font-family: system-ui, Arial,sans-serif;
+	--prpl-color-text: #4b5563;
 
-	--prpl-onboarding-grey: #6B7280;
-	--prpl-onboarding-purple: #534786;
-	--prpl-onboarding-purple-headings: #38296D;
+	--prpl-background-steps: var(--prpl-background, #f6f7f9);
+	--prpl-background-info: var(--prpl-background-content, #f6f5fb);
+	--prpl-background-step-active: var(--prpl-graph-color-4, #534786);
+	--prpl-color-number-step-active: var(--prpl-background-paper, #fff);
+	--prpl-color-ui-icon: #6b7280; /* already exists in variables-color.css */
+	--prpl-color-text-step-active: var(--prpl-color-headings, #38296d);
+	--prpl-color-border: #d1d5db; /* already exists in variables-color.css */
 
-	--prpl-onboarding-grey-headings: #4B5563;
+	--prpl-color-button-secondary: var(--prpl-background-point, #f9b23c );
+	--prpl-color-button-secondary-hover: var(--prpl-color-monthly, #faa310);
+	--prpl-color-button-secondary-text: #374151;
+	--prpl-color-button-secondary-icon: var(--prpl-color-button-secondary-text);
 
-	--prpl-onboarding-btn-color: #374151;
-	--prpl-onboarding-btn-background-color: #FEB741;
+	--prpl-background-step-label: var(--prpl-background-step-active);
+	--prpl-color-step-label: var(--prpl-background-paper, #fff);
 
-	--prpl-onboarding-link-color: #1e40af;
+	--prpl-color-text-error: var(--prpl-color-button-primary, #dd324f);
+	--prpl-color-alert-error: #e73136;
+
+	--prpl-color-selection-controls-inactive: #9ca3af;
+	--prpl-color-selection-controls: var(--prpl-graph-color-4, #534786);
+
+	--prpl-color-field-border: var(--prpl-color-border);
+
+	--prpl-color-field-border-active: var(--prpl-color-alert-info, #2563eb);
+	--prpl-background-field-active: var(--prpl-background-alert-info, #eff6ff);
+
+	/* Temporary variables for onboarding.css */
+
 	--prpl-onboarding-link-color-hover: #1e3a8a;
 
-	--prpl-onboarding-note-color: #1f3a8a;
+	--prpl-onboarding-note-color: #2563eb;
 	--prpl-onboarding-note-background-color: #eff6ff;
 	--prpl-onboarding-note-icon-color: #2463eb;
+
 
 	--prpl-onboarding-error-background-color: #fef2f2;
 	--prpl-onboarding-error-icon-color: #dc2626;
 	--prpl-onboarding-error-text-color: #7f1d1d;
+
+	font-family: system-ui, Arial, sans-serif;
 
 	padding: 0;
 	box-sizing: border-box;
@@ -32,7 +54,7 @@
 	max-width: 80vw;
 	color: var(--prpl-color-text);
 	background: #fff;
-	border: 1px solid var(--prpl-onboarding-grey);
+	border: 1px solid var(--prpl-color-ui-icon);
 
 	/* Popover backdrop. */
 	&::backdrop {
@@ -48,7 +70,7 @@
 		cursor: pointer;
 		background: none;
 		border: none;
-		color: var(--prpl-onboarding-grey-headings);
+		color: var(--prpl-color-text);
 		z-index: 10;
 	}
 
@@ -80,7 +102,7 @@
 		margin-bottom: 1rem;
 		font-size: 1rem;
 		font-weight: 600;
-		color: var(--prpl-onboarding-grey-headings);
+		color: var(--prpl-color-text);
 
 		&:last-child {
 			margin-bottom: 0;
@@ -115,7 +137,7 @@
 		border-radius: 0.25rem;
 		font-size: 14px;
 		line-height: 1.4;
-		color: var(--prpl-onboarding-grey-headings);
+		color: var(--prpl-color-text);
 	}
 
 	/* Used for radio and checkbox inputs. */
@@ -260,7 +282,7 @@
 	/* Left column: Step navigation */
 	.prpl-onboarding-navigation {
 		width: 340px;
-		background: #f3f4f6;
+		background: var(--prpl-background-steps);
 		border-right: none;
 		padding: 2rem 1.5rem;
 		flex-shrink: 0;
@@ -304,8 +326,8 @@
 		width: 20px;
 		height: 20px;
 		border-radius: 50%;
-		border: 1px solid #d1d5db;
-		color: var(--prpl-onboarding-grey);
+		border: 1px solid var(--prpl-color-border);
+		color: var(--prpl-color-text);
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -315,35 +337,37 @@
 	}
 
 	.prpl-nav-step-item.prpl-active .prpl-step-icon {
-		background: var(--prpl-onboarding-purple);
-		color: #fff;
+		background: var(--prpl-background-step-active);
+		border-color: var(--prpl-background-step-active);
+		color: var(--prpl-color-number-step-active);
 	}
 
 	.prpl-nav-step-item.prpl-completed .prpl-step-icon {
-		background: var(--prpl-onboarding-grey);
-		color: #fff;
+		background: var(--prpl-color-ui-icon);
+		border-color: var(--prpl-color-ui-icon);
+		color: var(--prpl-background-paper);
 	}
 
 	.prpl-step-label {
 		font-size: 15px;
-		color: var(--prpl-onboarding-grey);
+		color: var(--prpl-color-ui-icon);
 		line-height: 1.5;
 	}
 
 	.prpl-nav-step-item.prpl-active .prpl-step-label {
-		color: var(--prpl-onboarding-purple-headings);
+		color: var(--prpl-color-text-step-active);
 		font-weight: 700;
 	}
 
 	.prpl-nav-step-item.prpl-completed .prpl-step-label {
-		color: var(--prpl-onboarding-grey);
+		color: var(--prpl-color-text-step-active);
 	}
 
 	#prpl-onboarding-mobile-step-label {
 		display: none;
 		margin-bottom: 0.25rem;
 		font-size: 14px;
-		color: var(--prpl-onboarding-purple);
+		color: var(--prpl-background-step-active);
 		font-weight: 600;
 	}
 
@@ -366,7 +390,7 @@
 	.tour-header {
 
 		.tour-title {
-			color: var(--prpl-onboarding-purple);
+			color: var(--prpl-background-step-active);
 			font-weight: 600;
 		}
 	}
@@ -409,7 +433,7 @@
 		.prpl-background-content {
 			padding: 20px;
 			border-radius: 12px;
-			background-color: #f6f5fb;
+			background-color: var(--prpl-background-info);
 		}
 
 		.prpl-column {
@@ -457,8 +481,8 @@
 		/* color: var(--prpl-color-button-primary-text); */
 
 		/* background: var(--prpl-color-button-primary); */
-		background-color: var(--prpl-onboarding-btn-background-color);
-		color: var(--prpl-onboarding-btn-color);
+		background-color: var(--prpl-color-button-secondary);
+		color: var(--prpl-color-button-secondary-text);
 		line-height: 1.25;
 		box-shadow: none;
 		border: none;
@@ -479,7 +503,7 @@
 
 			/* pointer-events: none; */
 
-			color: var(--prpl-onboarding-btn-color);
+			color: var(--prpl-color-button-secondary-text);
 			background-color: #e1e3e7;
 			cursor: not-allowed;
 		}
@@ -490,13 +514,13 @@
 		} */
 
 		&.prpl-btn-secondary {
-			background: var(--prpl-background-banner);
-			color: var(--prpl-color-text);;
+			background-color: var(--prpl-color-button-secondary);
+			color: var(--prpl-color-button-secondary-text);
 
 			&:not([disabled]):hover,
 			&:not([disabled]):focus {
-				background: var(--prpl-background-banner);
-				color: var(--prpl-color-text);;
+				background-color: var(--prpl-color-button-secondary-hover);
+				color: var(--prpl-color-button-secondary-text);
 			}
 		}
 	}
@@ -508,7 +532,7 @@
 		padding: 0;
 		margin: 0;
 		font-size: 16px;
-		color: var(--prpl-onboarding-link-color);
+		color: var(--prpl-color-link);
 	}
 
 /*
@@ -624,7 +648,7 @@
 
 	.prpl-quit-link {
 		font-size: 15px;
-		color: var(--prpl-onboarding-link-color);
+		color: var(--prpl-color-link);
 		text-decoration: underline;
 		cursor: pointer;
 
@@ -697,7 +721,7 @@
 			gap: 10px;
 			cursor: pointer;
 			font-size: 15px;
-			color: var(--prpl-onboarding-grey-headings);
+			color: var(--prpl-color-text);
 		}
 
 		input[type="checkbox"] {
@@ -707,7 +731,7 @@
 		}
 
 		a {
-			color: var(--prpl-onboarding-link-color);
+			color: var(--prpl-color-link);
 			text-decoration: underline;
 		}
 
@@ -724,7 +748,7 @@
 			}
 
 			&.prpl-required-indicator-active {
-				color: var(--prpl-onboarding-error-icon-color);
+				color: var(--prpl-color-text-error);
 				font-size: 1rem;
 				font-style: normal;
 
@@ -736,7 +760,7 @@
 					width: 16px;
 					height: 16px;
 					border-radius: 50%;
-					background-color: var(--prpl-onboarding-error-icon-color);
+					background-color: var(--prpl-color-alert-error);
 					color: #fff;
 					font-size: 12px;
 					margin-right: 5px;
@@ -846,10 +870,10 @@
 
 		.prpl-settings-progress {
 			font-size: 14px;
-			color: #fff;
+			color: var(--prpl-color-step-label);
 			padding: 4px 8px;
 			border-radius: 20px;
-			background-color: var(--prpl-onboarding-purple);
+			background-color: var(--prpl-background-step-active);
 		}
 
 		.prpl-setting-footer {
@@ -928,7 +952,7 @@
 			width: 44px;
 			height: 24px;
 			border-radius: 12px;
-			background-color: #d1d5db;
+			background-color: var(--prpl-color-selection-controls-inactive);
 			transition: background-color 0.2s;
 			flex-shrink: 0;
 			display: flex;
@@ -957,7 +981,7 @@
 				transform: translateY(-50%);
 				z-index: 2;
 				transition: opacity 0.2s, left 0.2s, color 0.2s;
-				color: var(--prpl-onboarding-grey);
+				color: var(--prpl-color-ui-icon);
 			}
 
 			.prpl-toggle-icon-check {
@@ -974,7 +998,7 @@
 		}
 
 		.prpl-post-type-toggle-input:checked ~ .prpl-post-type-toggle-switch {
-			background-color: var(--prpl-onboarding-purple);
+			background-color: var(--prpl-background-step-active);
 
 			&::after {
 				transform: translateX(20px);
@@ -982,7 +1006,7 @@
 
 			svg {
 				left: 26px;
-				color: var(--prpl-onboarding-purple);
+				color: var(--prpl-background-step-active);
 				transform: translateY(-50%);
 			}
 
@@ -1028,11 +1052,11 @@
 			margin: 0;
 
 			&:nth-child(odd) {
-				background-color: #f6f7f9;
+				background-color: var(--prpl-background-steps);
 			}
 
 			.task-title {
-				color: var(--prpl-onboarding-grey-headings);
+				color: var(--prpl-color-text);
 				font-weight: 500;
 			}
 		}
@@ -1136,19 +1160,26 @@
 		border-radius: 12px;
 		padding: 40px;
 		text-align: center;
-		color: var(--prpl-onboarding-grey);
+		color: var(--prpl-color-text);
 		transition: background 0.2s, border-color 0.2s;
 		cursor: pointer;
-		border: 2px dashed #aaa;
+		border: 2px dashed var(--prpl-color-field-border);
+
+		svg {
+
+			path {
+				stroke: var(--prpl-color-ui-icon);
+			}
+		}
 	}
 
 	.prpl-file-drop-zone.dragover {
 		background-color: var(--prpl-onboarding-note-background-color);
-		border-color: var(--prpl-onboarding-note-icon-color);
+		border-color: var(--prpl-color-field-border-active);
 	}
 
 	.prpl-file-browse-link {
-		color: var(--prpl-onboarding-link-color);
+		color: var(--prpl-color-link);
 		text-decoration: underline;
 		cursor: pointer;
 	}
@@ -1157,7 +1188,7 @@
 		display: flex;
 		flex-direction: column;
 		font-size: 14px;
-		color: var(--prpl-onboarding-grey);
+		color: var(--prpl-color-ui-icon);
 	}
 
 	/* WIP */
