@@ -682,7 +682,7 @@ class Onboard_Wizard {
 			</div>
 
 			<button id="prpl-tour-close-btn" class="prpl-popover-close" popovertarget="prpl-popover-onboarding" popovertargetaction="hide">
-				<span class="dashicons dashicons-no-alt"></span>
+				<?php echo \esc_html__( 'Close tour', 'progress-planner' ); ?>
 			</button>
 		</div>
 		</div><!-- /#prpl-onboarding-fullscreen -->
