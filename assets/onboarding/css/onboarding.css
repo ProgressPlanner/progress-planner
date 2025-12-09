@@ -2,6 +2,10 @@
 
 	--prpl-color-text: #4b5563;
 
+	/* Paper */
+	--prpl-onboarding-popover-background: var(--prpl-background-paper, #fff);
+
+	/* Steps navigation */
 	--prpl-background-steps: var(--prpl-background, #f6f7f9);
 	--prpl-background-info: var(--prpl-background-content, #f6f5fb);
 	--prpl-background-step-active: var(--prpl-graph-color-4, #534786);
@@ -10,37 +14,35 @@
 	--prpl-color-text-step-active: var(--prpl-color-headings, #38296d);
 	--prpl-color-border: #d1d5db; /* already exists in variables-color.css */
 
+	/* Button secondary */
 	--prpl-color-button-secondary: var(--prpl-background-point, #f9b23c );
 	--prpl-color-button-secondary-hover: var(--prpl-color-monthly, #faa310);
 	--prpl-color-button-secondary-text: #374151;
 	--prpl-color-button-secondary-icon: var(--prpl-color-button-secondary-text);
 
+	/* Button disabled */
+	--prpl-color-button-inactive: var(--prpl-color-gauge-remain, #e1e3e7 );
+	--prpl-color-button-inactive-text: var(--prpl-color-text, #4b5563);
+
 	--prpl-background-step-label: var(--prpl-background-step-active);
 	--prpl-color-step-label: var(--prpl-background-paper, #fff);
 
+	/* Required text */
 	--prpl-color-text-error: var(--prpl-color-button-primary, #dd324f);
-	--prpl-color-alert-error: #e73136;
+	--prpl-color-alert-error: #e73136; /* already exists in variables-color.css */
 
+	/* General error */
+	--prpl-background-alert-error: #fef2f2;/* already exists in variables-color.css */
+	--prpl-color-alert-error-text: #7f1d1d; /* already exists in variables-color.css */
+
+	/* Custom contros (inputs, radio, checkbox) */
 	--prpl-color-selection-controls-inactive: #9ca3af;
 	--prpl-color-selection-controls: var(--prpl-graph-color-4, #534786);
 
 	--prpl-color-field-border: var(--prpl-color-border);
-
 	--prpl-color-field-border-active: var(--prpl-color-alert-info, #2563eb);
 	--prpl-background-field-active: var(--prpl-background-alert-info, #eff6ff);
 
-	/* Temporary variables for onboarding.css */
-
-	--prpl-onboarding-link-color-hover: #1e3a8a;
-
-	--prpl-onboarding-note-color: #2563eb;
-	--prpl-onboarding-note-background-color: #eff6ff;
-	--prpl-onboarding-note-icon-color: #2463eb;
-
-
-	--prpl-onboarding-error-background-color: #fef2f2;
-	--prpl-onboarding-error-icon-color: #dc2626;
-	--prpl-onboarding-error-text-color: #7f1d1d;
 
 	font-family: system-ui, Arial, sans-serif;
 
@@ -53,7 +55,7 @@
 	width: 1200px;
 	max-width: 80vw;
 	color: var(--prpl-color-text);
-	background: #fff;
+	background-color: var(--prpl-onboarding-popover-background);
 	border: 1px solid var(--prpl-color-ui-icon);
 
 	/* Popover backdrop. */
@@ -114,7 +116,7 @@
 		font-size: 14px;
 		line-height: 2;
 		color: #2c3338;
-		border-color: #8c8f94;
+		border-color: var(--prpl-color-field-border);
 		box-shadow: none;
 		border-radius: 3px;
 		padding: 0 24px 0 8px;
@@ -133,7 +135,7 @@
 	input[type="email"] {
 		width: 100%;
 		padding: 0.5rem;
-		border: 1px solid #ccc;
+		border: 1px solid var(--prpl-color-field-border);
 		border-radius: 0.25rem;
 		font-size: 14px;
 		line-height: 1.4;
@@ -155,9 +157,6 @@
 			flex-direction: column;
 			justify-content: flex-start;
 		}
-
-		--prpl-input-color-active: #5c5677;
-		--prpl-input-color-inactive: #8b99a6;
 
 		/* Hide the default input, because WP has it's own styles (which include pseudo-elements). */
 		.prpl-custom-checkbox input[type="checkbox"],
@@ -195,18 +194,18 @@
 		.prpl-custom-checkbox {
 
 			.prpl-custom-control {
-				border: 1px solid var(--prpl-input-color-inactive);
+				border: 1px solid var(--prpl-color-selection-controls-inactive);
 
 				/* border-radius: 6px; */
-				background: #fff;
+				background-color: var(--prpl-onboarding-popover-background);
 			}
 
 			input[type="checkbox"] {
 
 				/* Checkbox checked (on) */
 				&:checked+.prpl-custom-control {
-					background: var(--prpl-input-color-active);
-					border-color: var(--prpl-input-color-active);
+					background: var(--prpl-color-selection-controls);
+					border-color: var(--prpl-color-selection-controls);
 				}
 			}
 
@@ -218,7 +217,7 @@
 				top: 2px;
 				width: 4px;
 				height: 9px;
-				border: solid #fff;
+				border: solid var(--prpl-onboarding-popover-background);
 				border-width: 0 2px 2px 0;
 				opacity: 0;
 				transform: scale(0.8) rotate(45deg);
@@ -235,9 +234,9 @@
 		.prpl-custom-radio {
 
 			.prpl-custom-control {
-				border: 1px solid var(--prpl-input-color-inactive);
+				border: 1px solid var(--prpl-color-selection-controls-inactive);
 				border-radius: 50%;
-				background: #fff;
+				background-color: var(--prpl-onboarding-popover-background);
 			}
 
 			/* Radio hover (off) */
@@ -245,8 +244,8 @@
 
 				/* Radio checked (on) */
 				&:checked+.prpl-custom-control {
-					background: var(--prpl-input-color-active);
-					border-color: var(--prpl-input-color-active);
+					background: var(--prpl-color-selection-controls);
+					border-color: var(--prpl-color-selection-controls);
 				}
 			}
 
@@ -258,7 +257,7 @@
 				left: 5px;
 				width: 8px;
 				height: 8px;
-				background: #fff;
+				background-color: var(--prpl-onboarding-popover-background);
 				border-radius: 50%;
 				opacity: 0;
 				transition: opacity 0.2s;
@@ -266,7 +265,7 @@
 
 			input[type="radio"]:checked+.prpl-custom-control::after {
 				opacity: 1;
-				background: #fff;
+				background-color: var(--prpl-onboarding-popover-background);
 			}
 		}
 	}
@@ -496,31 +495,31 @@
 
 		flex-shrink: 0;
 
-		&.prpl-btn-disabled,
-		&:disabled {
-
-			/* opacity: 0.5; */
-
-			/* pointer-events: none; */
-
-			color: var(--prpl-color-button-secondary-text);
-			background-color: #e1e3e7;
-			cursor: not-allowed;
-		}
-
 		/* &:not([disabled]):hover,
-		&:not([disabled]):focus {
-			background: var(--prpl-color-button-primary-hover);
-		} */
+				&:not([disabled]):focus {
+					background: var(--prpl-color-button-primary-hover);
+				} */
 
 		&.prpl-btn-secondary {
 			background-color: var(--prpl-color-button-secondary);
 			color: var(--prpl-color-button-secondary-text);
 
-			&:not([disabled]):hover,
-			&:not([disabled]):focus {
+			&:not([disabled]):not(.prpl-btn-disabled):hover,
+			&:not([disabled]):not(.prpl-btn-disabled):focus {
 				background-color: var(--prpl-color-button-secondary-hover);
 				color: var(--prpl-color-button-secondary-text);
+			}
+		}
+
+		&.prpl-btn-disabled,
+		&:disabled {
+
+			&,
+			&:hover{
+				color: var(--prpl-color-button-inactive-text);
+				color: rgb(from var(--prpl-color-button-inactive-text) r g b / 0.88);
+				background-color: var(--prpl-color-button-inactive);
+				cursor: not-allowed;
 			}
 		}
 	}
@@ -568,13 +567,13 @@
 		display: flex;
 		align-items: flex-start;
 		gap: 15px;
-		background: var(--prpl-onboarding-error-background-color);
+		background: var(--prpl-background-alert-error);
 		padding: 20px;
 		border-radius: 6px;
-		border-left: 4px solid var(--prpl-onboarding-error-icon-color);
+		border-left: 4px solid var(--prpl-color-alert-error);
 
 		.prpl-error-icon {
-			color: var(--prpl-onboarding-error-icon-color);
+			color: var(--prpl-color-alert-error);
 			width: 20px;
 			height: 20px;
 			flex-shrink: 0;
@@ -589,14 +588,14 @@
 			margin: 0 0 8px 0;
 			font-size: 16px;
 			font-weight: 700;
-			color: var(--prpl-onboarding-error-text-color);
+			color: var(--prpl-color-alert-error-text);
 		}
 
 		p {
 			margin: 0;
 			font-size: 15px;
 			line-height: 1.6;
-			color: var(--prpl-onboarding-error-text-color);
+			color: var(--prpl-color-alert-error-text);
 		}
 	}
 
@@ -623,10 +622,10 @@
 		display: flex;
 		align-items: flex-start;
 		gap: 15px;
-		background: var(--prpl-onboarding-error-background-color);
+		background: var(--prpl-background-alert-error);
 		padding: 20px;
 		border-radius: 6px;
-		border-left: 4px solid var(--prpl-onboarding-error-icon-color);
+		border-left: 4px solid var(--prpl-color-alert-error);
 
 		h3 {
 			font-size: 18px;
@@ -651,10 +650,6 @@
 		color: var(--prpl-color-link);
 		text-decoration: underline;
 		cursor: pointer;
-
-		&:hover {
-			color: var(--prpl-onboarding-link-color-hover);
-		}
 
 		&.prpl-quit-link-primary {
 			font-weight: 600;
@@ -901,9 +896,9 @@
 			gap: 10px;
 			border-radius: 12px;
 			padding: 1rem;
-			color: var(--prpl-onboarding-note-color);
+			color: var(--prpl-color-field-border-active);
 			font-size: 14px;
-			background-color: var(--prpl-onboarding-note-background-color);
+			background-color: var(--prpl-background-field-active);
 
 			.prpl-setting-note-icon {
 				flex-shrink: 0;
@@ -913,7 +908,7 @@
 				width: 20px;
 				height: 20px;
 				border-radius: 50%;
-				color: var(--prpl-onboarding-note-icon-color);
+				color: var(--prpl-color-field-border-active);
 			}
 		}
 
@@ -967,7 +962,7 @@
 				width: 20px;
 				height: 20px;
 				border-radius: 50%;
-				background-color: #fff;
+				background-color: var(--prpl-onboarding-popover-background);
 				transition: transform 0.2s;
 				z-index: 1;
 			}
@@ -1174,7 +1169,7 @@
 	}
 
 	.prpl-file-drop-zone.dragover {
-		background-color: var(--prpl-onboarding-note-background-color);
+		background-color: var(--prpl-background-field-active);
 		border-color: var(--prpl-color-field-border-active);
 	}
 
