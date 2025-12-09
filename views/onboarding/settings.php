@@ -110,7 +110,7 @@ $prpl_current_step_number   = 0;
 						<div class="prpl-setting-footer">
 							<div class="prpl-setting-note">
 								<span class="prpl-setting-note-icon">
-									<?php \progress_planner()->the_file( 'assets/onboarding/images/icon_info_solid.svg' ); ?>
+									<?php \progress_planner()->the_file( 'assets/images/onboarding/icon_info_solid.svg' ); ?>
 								</span>
 								<p>
 									<?php echo \esc_html( $prpl_page_type['note'] ); ?>

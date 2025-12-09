@@ -70,7 +70,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			</div>
 			<div class="prpl-column prpl-hide-on-mobile">
 				<div id="prpl-welcome-graphic">
-					<?php \progress_planner()->the_file( 'assets/onboarding/images/thumbs_up_ravi_rtl.svg' ); ?>
+					<?php \progress_planner()->the_file( 'assets/images/onboarding/thumbs_up_ravi_rtl.svg' ); ?>
 				</div>
 			</div>
 		</div>

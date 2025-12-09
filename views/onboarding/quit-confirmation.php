@@ -38,7 +38,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		</div>
 		<div class="prpl-column prpl-hide-on-mobile">
 			<div id="prpl-quit-confirmation-graphic">
-				<?php \progress_planner()->the_file( 'assets/onboarding/images/neglected_site_ravi.svg' ); ?>
+				<?php \progress_planner()->the_file( 'assets/images/onboarding/neglected_site_ravi.svg' ); ?>
 			</div>
 		</div>
 	</div>

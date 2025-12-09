@@ -1,6 +1,8 @@
 /**
  * Progress Planner Onboarding Wizard
  * Handles the onboarding wizard functionality
+ *
+ * Dependencies: progress-planner/license-generator
  */
 /* global ProgressPlannerOnboardData */
 
