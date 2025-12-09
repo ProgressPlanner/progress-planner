@@ -53,7 +53,7 @@ if ( ! \in_array( $prpl_locale, $prpl_languages, true ) ) {
 				]
 			);
 			?>
-		<button type="button" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-primary">
+		<button type="button" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-secondary">
 			<?php \esc_html_e( 'Set the locale', 'progress-planner' ); ?>
 		</button>
 	</form>
