@@ -12,6 +12,10 @@
 	justify-content: center;
 	padding: 20px;
 	box-sizing: border-box;
+
+	#prpl-tour-close-btn {
+		display: none;
+	}
 }
 
 /* Hide WordPress admin elements when in fullscreen onboarding */
