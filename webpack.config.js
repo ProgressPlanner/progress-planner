@@ -6,6 +6,7 @@ module.exports = {
 	entry: {
 		'content-activity': './assets/src/content-activity.js',
 		'monthly-badges': './assets/src/monthly-badges.js',
+		'content-badges': './assets/src/content-badges.js',
 	},
 	output: {
 		path: path.resolve( __dirname, 'build' ),

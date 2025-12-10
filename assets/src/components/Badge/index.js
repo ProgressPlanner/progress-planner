@@ -24,7 +24,7 @@ export default function Badge( {
 	brandingId = 0,
 	remoteServerUrl,
 	placeholderUrl,
-	isComplete = false,
+	isComplete = true,
 } ) {
 	const [ hasError, setHasError ] = useState( false );
 
@@ -50,30 +50,22 @@ export default function Badge( {
 		}
 	}, [ hasError, placeholderUrl ] );
 
-	const containerStyle = {
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-	};
-
-	const imageStyle = {
+	// Apply grayscale/opacity for incomplete badges (matching original CSS)
+	const imgStyle = {
 		maxWidth: '100%',
 		height: 'auto',
+		verticalAlign: 'bottom',
+		transition: 'opacity 0.3s ease-in-out, filter 0.3s ease-in-out',
+		...( isComplete ? {} : { opacity: 0.25, filter: 'grayscale(1)' } ),
 	};
 
-	const className = `prpl-badge${
-		isComplete ? ' prpl-badge--complete' : ''
-	}`;
-
 	return (
-		<div className={ className } style={ containerStyle }>
-			<img
-				className="prpl-badge__image"
-				src={ hasError ? placeholderUrl : getBadgeUrl() }
-				alt={ badgeName || 'Badge' }
-				onError={ handleError }
-				style={ imageStyle }
-			/>
-		</div>
+		<img
+			className="prpl-badge__image"
+			src={ hasError ? placeholderUrl : getBadgeUrl() }
+			alt={ badgeName || 'Badge' }
+			onError={ handleError }
+			style={ imgStyle }
+		/>
 	);
 }

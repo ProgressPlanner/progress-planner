@@ -20,6 +20,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Rest\Tasks get_rest__tasks()
  * @method \Progress_Planner\Rest\Content_Activity get_rest__content_activity()
  * @method \Progress_Planner\Rest\Monthly_Badges get_rest__monthly_badges()
+ * @method \Progress_Planner\Rest\Content_Badges get_rest__content_badges()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
  * @method \Progress_Planner\Utils\Playground get_utils__playground()
@@ -125,6 +126,7 @@ class Base {
 		$this->get_rest__tasks();
 		$this->get_rest__content_activity();
 		$this->get_rest__monthly_badges();
+		$this->get_rest__content_badges();
 
 		// Onboarding.
 		$this->get_utils__onboard();
