@@ -20,6 +20,32 @@ final class Content_Activity extends Widget {
 	protected $id = 'content-activity';
 
 	/**
+	 * Enqueue scripts for this widget.
+	 *
+	 * @return void
+	 */
+	public function enqueue_scripts() {
+		$asset_file = \PROGRESS_PLANNER_DIR . '/build/content-activity.asset.php';
+
+		// Check if the React build exists.
+		if ( ! \file_exists( $asset_file ) ) {
+			// Fall back to old web components.
+			parent::enqueue_scripts();
+			return;
+		}
+
+		$asset = include $asset_file;
+
+		\wp_enqueue_script(
+			'progress-planner/content-activity',
+			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/content-activity.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
+	}
+
+	/**
 	 * Get the chart args.
 	 *
 	 * @param string $type The type of activity.

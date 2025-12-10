@@ -5,6 +5,9 @@ module.exports = {
 	],
 	parserOptions: {
 		ecmaVersion: 'latest',
+		ecmaFeatures: {
+			jsx: true,
+		},
 	},
 	rules: {
 		'no-console': 'off',
