@@ -15,6 +15,7 @@ import { useMemo } from '@wordpress/element';
  * @param {string}      props.backgroundColor - Background color CSS variable.
  * @param {string}      props.color           - Primary progress color CSS variable.
  * @param {string}      props.color2          - Secondary progress color CSS variable.
+ * @param {string}      props.contentFontSize - Font size for the content inside the gauge.
  * @param {JSX.Element} props.children        - Content to display in the gauge center.
  * @return {JSX.Element} The Gauge component.
  */
@@ -24,6 +25,7 @@ export default function Gauge( {
 	backgroundColor = 'var(--prpl-background-monthly)',
 	color = 'var(--prpl-color-monthly)',
 	color2 = 'var(--prpl-color-monthly-2)',
+	contentFontSize = 'var(--prpl-font-size-6xl)',
 	children,
 } ) {
 	const maxDeg = '180deg';
@@ -92,7 +94,7 @@ export default function Gauge( {
 	};
 
 	const contentStyle = {
-		fontSize: 'var(--prpl-font-size-6xl)',
+		fontSize: contentFontSize,
 		bottom: '50%',
 		display: 'block',
 		fontWeight: 600,

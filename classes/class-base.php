@@ -22,6 +22,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Rest\Monthly_Badges get_rest__monthly_badges()
  * @method \Progress_Planner\Rest\Content_Badges get_rest__content_badges()
  * @method \Progress_Planner\Rest\Streak_Badges get_rest__streak_badges()
+ * @method \Progress_Planner\Rest\Activity_Scores get_rest__activity_scores()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
  * @method \Progress_Planner\Utils\Playground get_utils__playground()
@@ -129,6 +130,7 @@ class Base {
 		$this->get_rest__monthly_badges();
 		$this->get_rest__content_badges();
 		$this->get_rest__streak_badges();
+		$this->get_rest__activity_scores();
 
 		// Onboarding.
 		$this->get_utils__onboard();

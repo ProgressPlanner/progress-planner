@@ -225,4 +225,22 @@ final class Activity_Scores extends Widget {
 	public function get_cache_key() {
 		return $this->cache_key;
 	}
+
+	/**
+	 * Enqueue scripts for this widget.
+	 *
+	 * @return void
+	 */
+	public function enqueue_scripts() {
+		$asset_file = \PROGRESS_PLANNER_DIR . '/build/activity-scores.asset.php';
+		$asset      = include $asset_file;
+
+		\wp_enqueue_script(
+			'progress-planner/activity-scores',
+			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/activity-scores.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
+	}
 }

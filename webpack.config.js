@@ -8,6 +8,7 @@ module.exports = {
 		'monthly-badges': './assets/src/monthly-badges.js',
 		'content-badges': './assets/src/content-badges.js',
 		'streak-badges': './assets/src/streak-badges.js',
+		'activity-scores': './assets/src/activity-scores.js',
 	},
 	output: {
 		path: path.resolve( __dirname, 'build' ),
