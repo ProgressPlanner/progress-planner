@@ -4,7 +4,7 @@
  *
  * A script that triggers confetti on the container element.
  *
- * Dependencies: particles-confetti, progress-planner/suggested-task
+ * Dependencies: particles-confetti
  */
 /* eslint-disable camelcase */
 

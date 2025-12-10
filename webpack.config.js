@@ -10,6 +10,8 @@ module.exports = {
 		'streak-badges': './assets/src/streak-badges.js',
 		'activity-scores': './assets/src/activity-scores.js',
 		'whats-new': './assets/src/whats-new.js',
+		'suggested-tasks': './assets/src/suggested-tasks.js',
+		todo: './assets/src/todo.js',
 	},
 	output: {
 		path: path.resolve( __dirname, 'build' ),

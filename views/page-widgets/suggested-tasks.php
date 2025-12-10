@@ -27,39 +27,11 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<?php
 		\printf(
 			/* translators: %s: Ravi's name. */
-			\esc_html__( 'Complete a task from %s’s Recommendations to improve your site and earn points toward this month’s badge!', 'progress-planner' ),
+			\esc_html__( 'Complete a task from %s\'s Recommendations to improve your site and earn points toward this month\'s badge!', 'progress-planner' ),
 			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
 		);
 		?>
 	</p>
 
-	<ul style="display:none"></ul>
-	<ul id="prpl-suggested-tasks-list" class="prpl-suggested-tasks-list"></ul>
-	<p class="prpl-suggested-tasks-loading">
-		<?php \esc_html_e( 'Loading tasks...', 'progress-planner' ); ?>
-	</p>
-	<?php // Check if the request URI contains the parameter 'prpl_show_all_recommendations'. ?>
-	<?php $prpl_request_uri = isset( $_SERVER['REQUEST_URI'] ) ? \sanitize_text_field( \wp_unslash( $_SERVER['REQUEST_URI'] ) ) : ''; ?>
-	<?php $prpl_show_all = false !== \strpos( $prpl_request_uri, 'prpl_show_all_recommendations' ); ?>
-	<p class="prpl-show-all-tasks">
-		<button
-			type="button"
-			id="prpl-toggle-all-recommendations"
-			class="prpl-toggle-all-recommendations-button"
-			data-show-all="<?php echo $prpl_show_all ? '1' : '0'; ?>"
-		>
-			<?php
-			if ( $prpl_show_all ) {
-				\esc_html_e( 'Show fewer recommendations', 'progress-planner' );
-			} else {
-				\esc_html_e( 'Show all recommendations', 'progress-planner' );
-			}
-			?>
-		</button>
-	</p>
-	<p class="prpl-no-suggested-tasks">
-		<?php \esc_html_e( 'You have completed all recommended tasks.', 'progress-planner' ); ?>
-		<br>
-		<?php \esc_html_e( 'Check back later for new tasks!', 'progress-planner' ); ?>
-	</p>
+	<div id="prpl-suggested-tasks-root"></div>
 </div>

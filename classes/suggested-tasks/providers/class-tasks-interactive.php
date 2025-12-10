@@ -245,32 +245,16 @@ abstract class Tasks_Interactive extends Tasks {
 	/**
 	 * Enqueue the scripts.
 	 *
+	 * Form submission handling is now done by the React PopoverManager component
+	 * in assets/src/widgets/SuggestedTasks/PopoverManager.js.
+	 *
 	 * @param string $hook The current admin page.
 	 *
 	 * @return void
 	 */
 	public function enqueue_scripts( $hook ) {
-
-		// Don't enqueue the script if the user is not at least an editor, since we dont want to enqueue scripts on WP Dashboard page.
-		if ( ! \current_user_can( 'edit_others_posts' ) ) {
-			return;
-		}
-
-		// Enqueue the script only on Progress Planner and WP dashboard pages.
-		if ( 'toplevel_page_progress-planner' !== $hook && 'index.php' !== $hook ) {
-			return;
-		}
-
-		// Don't enqueue the script if the task is not published.
-		if ( ! $this->is_task_published() ) {
-			return;
-		}
-
-		// Enqueue the web component.
-		\progress_planner()->get_admin__enqueue()->enqueue_script(
-			'progress-planner/recommendations/' . $this->get_provider_id(),
-			$this->get_enqueue_data()
-		);
+		// Form submission handling migrated to React PopoverManager.
+		// Individual recommendation JS files are no longer needed.
 	}
 
 	/**
