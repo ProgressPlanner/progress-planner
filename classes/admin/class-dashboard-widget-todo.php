@@ -45,8 +45,6 @@ class Dashboard_Widget_Todo extends Dashboard_Widget {
 		}
 
 		\progress_planner()->the_view( "dashboard-widgets/{$this->id}.php" );
-
-		\progress_planner()->the_view( 'js-templates/suggested-task.html' );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

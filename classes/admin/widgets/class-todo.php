@@ -74,18 +74,6 @@ final class ToDo extends Widget {
 	}
 
 	/**
-	 * The TODO list.
-	 *
-	 * @deprecated 2.0.0 Now handled by React component.
-	 *
-	 * @return void
-	 */
-	public function the_todo_list() {
-		// Legacy method - now handled by React.
-		echo '<div id="prpl-todo-root"></div>';
-	}
-
-	/**
 	 * Get the stylesheet dependencies.
 	 *
 	 * @return array

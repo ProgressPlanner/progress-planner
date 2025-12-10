@@ -16,6 +16,7 @@ import {
 	updateTask,
 	sendTaskAction,
 } from './hooks/useTasksApi';
+import { useGridMasonry } from '../../hooks/useGridMasonry';
 
 /**
  * Suggested Tasks widget component.
@@ -31,6 +32,9 @@ export default function SuggestedTasks() {
 	const [ celebratingTaskIds, setCelebratingTaskIds ] = useState( new Set() );
 	const listRef = useRef( null );
 	const injectedTaskIdsRef = useRef( new Set() );
+
+	// Initialize grid masonry layout.
+	useGridMasonry();
 
 	/**
 	 * Load tasks on component mount.

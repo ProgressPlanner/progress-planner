@@ -196,7 +196,6 @@ class Page {
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-tooltip' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'header-filters', $default_localization_data );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'grid-masonry' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'upgrade-tasks' );
 			} else {
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboard', $default_localization_data );

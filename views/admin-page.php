@@ -56,5 +56,3 @@ document.getElementById( 'prpl-overlay' )?.addEventListener( 'click', function()
 	}
 } );
 </script>
-
-<?php \progress_planner()->the_view( 'js-templates/suggested-task.html' ); ?>

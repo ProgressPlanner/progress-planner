@@ -43,4 +43,4 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	</span>
 </p>
 
-<?php \progress_planner()->get_admin__widgets__todo()->the_todo_list(); ?>
+<?php \progress_planner()->get_admin__widgets__todo()->print_content(); ?>

@@ -7,6 +7,7 @@
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
+import { useGridMasonry } from '../../hooks/useGridMasonry';
 
 /**
  * Fetch user tasks from API.
@@ -256,6 +257,9 @@ export default function TodoWidget() {
 	const [ newTaskTitle, setNewTaskTitle ] = useState( '' );
 	const [ showDeletePopover, setShowDeletePopover ] = useState( false );
 	const inputRef = useRef( null );
+
+	// Initialize grid masonry layout.
+	useGridMasonry();
 
 	/**
 	 * Load tasks on mount.
