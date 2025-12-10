@@ -72,21 +72,20 @@ final class Monthly_Badges extends Widget {
 	}
 
 	/**
-	 * Get the stylesheet dependencies.
+	 * Enqueue scripts for this widget.
 	 *
-	 * @return array
+	 * @return void
 	 */
-	public function get_stylesheet_dependencies() {
-		// Register styles for the web-component.
-		\wp_register_style(
-			'progress-planner-suggested-task',
-			\constant( 'PROGRESS_PLANNER_URL' ) . '/assets/css/suggested-task.css',
-			[],
-			\progress_planner()->get_file_version( \constant( 'PROGRESS_PLANNER_DIR' ) . '/assets/css/suggested-task.css' )
-		);
+	public function enqueue_scripts() {
+		$asset_file = \PROGRESS_PLANNER_DIR . '/build/monthly-badges.asset.php';
+		$asset      = include $asset_file;
 
-		return [
-			'progress-planner-suggested-task',
-		];
+		\wp_enqueue_script(
+			'progress-planner/monthly-badges',
+			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/monthly-badges.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
 	}
 }

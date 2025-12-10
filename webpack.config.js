@@ -5,6 +5,7 @@ module.exports = {
 	...defaultConfig,
 	entry: {
 		'content-activity': './assets/src/content-activity.js',
+		'monthly-badges': './assets/src/monthly-badges.js',
 	},
 	output: {
 		path: path.resolve( __dirname, 'build' ),

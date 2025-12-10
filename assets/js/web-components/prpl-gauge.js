@@ -240,6 +240,13 @@ const prplUpdateRaviGauge = ( pointsDiff ) => {
 		return;
 	}
 
+	// Dispatch event for React components.
+	document.dispatchEvent(
+		new CustomEvent( 'prpl-task-completed', {
+			detail: { points: pointsDiff },
+		} )
+	);
+
 	// Get the gauge.
 	const controllerGauge = document.getElementById( 'prpl-gauge-ravi' );
 
