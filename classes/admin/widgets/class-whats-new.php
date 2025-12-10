@@ -22,6 +22,27 @@ final class Whats_New extends Widget {
 	protected $id = 'whats-new';
 
 	/**
+	 * Enqueue scripts for the widget.
+	 *
+	 * @return void
+	 */
+	public function enqueue_scripts() {
+		$asset_file = \PROGRESS_PLANNER_DIR . '/build/whats-new.asset.php';
+		if ( ! \file_exists( $asset_file ) ) {
+			return;
+		}
+		$asset = include $asset_file;
+
+		\wp_enqueue_script(
+			'progress-planner/whats-new',
+			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/whats-new.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
+	}
+
+	/**
 	 * Get the feed from the blog.
 	 *
 	 * @return array
