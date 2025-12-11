@@ -117,8 +117,44 @@ export default function ActivityScores() {
 		personalRecord.currentStreak
 	);
 
+	// Get title from config or use default.
+	const widgetTitle =
+		window.prplActivityScoresConfig?.title ||
+		__( 'Your website activity score', 'progress-planner' );
+
+	// Get info icon SVG from config.
+	const infoIconSvg = window.prplActivityScoresConfig?.infoIconSvg || '';
+
 	return (
 		<>
+			<h2 className="prpl-widget-title">
+				{ widgetTitle }
+				<div className="tooltip-actions">
+					<prpl-tooltip>
+						<slot name="open-icon">
+							<span className="icon prpl-info-icon">
+								{ infoIconSvg && (
+									<span
+										dangerouslySetInnerHTML={ {
+											__html: infoIconSvg,
+										} }
+									/>
+								) }
+								<span className="screen-reader-text">
+									{ __( 'More info', 'progress-planner' ) }
+								</span>
+							</span>
+						</slot>
+						<slot name="content">
+							{ __(
+								'Your website activity score is based on the amount of website maintenance work you have done over the past 30 days.',
+								'progress-planner'
+							) }
+						</slot>
+					</prpl-tooltip>
+				</div>
+			</h2>
+
 			<div style={ { '--background': 'var(--prpl-background-monthly)' } }>
 				<Gauge
 					value={ score }

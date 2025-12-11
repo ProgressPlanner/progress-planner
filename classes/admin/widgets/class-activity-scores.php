@@ -242,5 +242,23 @@ final class Activity_Scores extends Widget {
 			$asset['version'],
 			true
 		);
+
+		// Get widget title (may be custom branded or default).
+		$widget_title = \progress_planner()->get_ui__branding()->get_widget_title(
+			'activity-scores',
+			\esc_html__( 'Your website activity score', 'progress-planner' )
+		);
+
+		// Get info icon SVG content.
+		$info_icon_svg = \progress_planner()->get_asset( 'images/icon_info.svg' );
+
+		\wp_localize_script(
+			'progress-planner/activity-scores',
+			'prplActivityScoresConfig',
+			[
+				'title'      => $widget_title,
+				'infoIconSvg' => $info_icon_svg,
+			]
+		);
 	}
 }
