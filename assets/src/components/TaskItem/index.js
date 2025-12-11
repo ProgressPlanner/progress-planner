@@ -100,7 +100,10 @@ export default function TaskItem( {
 		clearTimeout( debounceTimeoutRef.current );
 		debounceTimeoutRef.current = setTimeout( () => {
 			if ( titleRef.current ) {
-				const newTitle = titleRef.current.textContent.replace( /\n/g, '' );
+				const newTitle = titleRef.current.textContent.replace(
+					/\n/g,
+					''
+				);
 				onTitleChange( task.id, newTitle );
 			}
 		}, 300 );

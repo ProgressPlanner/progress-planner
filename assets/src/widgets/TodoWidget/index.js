@@ -149,7 +149,12 @@ export default function TodoWidget( { config = {} } ) {
 				setIsCreatingTask( false );
 			}
 		},
-		[ newTaskTitle, pendingTasks, sortTasksWithGoldenFirst ]
+		[
+			newTaskTitle,
+			pendingTasks,
+			sortTasksWithGoldenFirst,
+			config?.userProviderId,
+		]
 	);
 
 	/**

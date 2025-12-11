@@ -3,15 +3,19 @@
  *
  * Renders the points badge and trash button (for user tasks).
  *
- * @param {Object}   props         Component props.
- * @param {Object}   props.task     The task object.
+ * @param {Object}   props            Component props.
+ * @param {Object}   props.task       The task object.
  * @param {boolean}  props.isUserTask Whether this is a user task.
- * @param {Function} props.onDelete Callback for deleting a task.
+ * @param {Function} props.onDelete   Callback for deleting a task.
  * @return {JSX.Element} The points component.
  */
 import { __ } from '@wordpress/i18n';
 import TrashIcon from './icons/TrashIcon';
-import { pointsWrapperStyle, pointsBadgeStyle, trashButtonStyle } from './styles';
+import {
+	pointsWrapperStyle,
+	pointsBadgeStyle,
+	trashButtonStyle,
+} from './styles';
 
 export default function TaskPoints( { task, isUserTask, onDelete } ) {
 	const points = task.prpl_points || 0;

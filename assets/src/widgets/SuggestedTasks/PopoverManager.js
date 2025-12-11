@@ -330,7 +330,7 @@ export default function PopoverManager( { tasks, onComplete, config = {} } ) {
 	 * Handle form submission for a task.
 	 */
 	const handleFormSubmit = useCallback(
-		async ( taskId, popoverId, config ) => {
+		async ( taskId, popoverId, popoverConfig ) => {
 			try {
 				// Find the task
 				const task = tasks.find(
@@ -346,24 +346,27 @@ export default function PopoverManager( { tasks, onComplete, config = {} } ) {
 
 				let submitPromise;
 
-				switch ( config.type ) {
+				switch ( popoverConfig.type ) {
 					case 'siteSettings':
 						submitPromise = submitSiteSettings( {
-							settingAPIKey: config.settingAPIKey,
-							setting: config.setting,
+							settingAPIKey: popoverConfig.settingAPIKey,
+							setting: popoverConfig.setting,
 							popoverId,
-							settingCallbackValue: config.settingCallbackValue,
+							settingCallbackValue:
+								popoverConfig.settingCallbackValue,
 						} );
 						break;
 
 					case 'pluginSettings':
 						submitPromise = submitPluginSettings( {
-							setting: config.setting,
-							settingPath: config.settingPath,
+							setting: popoverConfig.setting,
+							settingPath: popoverConfig.settingPath,
 							popoverId,
 							action:
-								config.action || 'prpl_interactive_task_submit',
-							settingCallbackValue: config.settingCallbackValue,
+								popoverConfig.action ||
+								'prpl_interactive_task_submit',
+							settingCallbackValue:
+								popoverConfig.settingCallbackValue,
 						} );
 						break;
 
@@ -399,24 +402,26 @@ export default function PopoverManager( { tasks, onComplete, config = {} } ) {
 		const formHandlers = new Map();
 
 		// Set up listeners for each configured popover
-		Object.entries( POPOVER_CONFIG ).forEach( ( [ taskId, config ] ) => {
-			const popoverId = `prpl-popover-${ taskId }`;
-			const formElement = document.querySelector(
-				`#${ popoverId } form`
-			);
+		Object.entries( POPOVER_CONFIG ).forEach(
+			( [ taskId, popoverConfig ] ) => {
+				const popoverId = `prpl-popover-${ taskId }`;
+				const formElement = document.querySelector(
+					`#${ popoverId } form`
+				);
 
-			if ( ! formElement ) {
-				return;
+				if ( ! formElement ) {
+					return;
+				}
+
+				const handler = ( event ) => {
+					event.preventDefault();
+					handleFormSubmit( taskId, popoverId, popoverConfig );
+				};
+
+				formElement.addEventListener( 'submit', handler );
+				formHandlers.set( popoverId, { formElement, handler } );
 			}
-
-			const handler = ( event ) => {
-				event.preventDefault();
-				handleFormSubmit( taskId, popoverId, config );
-			};
-
-			formElement.addEventListener( 'submit', handler );
-			formHandlers.set( popoverId, { formElement, handler } );
-		} );
+		);
 
 		// Set up input validation for blogdescription
 		const blogdescriptionInput = document.querySelector(
@@ -435,7 +440,7 @@ export default function PopoverManager( { tasks, onComplete, config = {} } ) {
 		}
 
 		// Set up date format preview
-		setupDateFormatPreview();
+		setupDateFormatPreview( config );
 
 		// Set up permalink structure preview
 		setupPermalinkPreview();
@@ -449,7 +454,7 @@ export default function PopoverManager( { tasks, onComplete, config = {} } ) {
 				formElement.removeEventListener( 'submit', handler );
 			} );
 		};
-	}, [ tasks, handleFormSubmit ] );
+	}, [ tasks, handleFormSubmit, config ] );
 
 	// This component doesn't render anything
 	return null;
@@ -457,8 +462,10 @@ export default function PopoverManager( { tasks, onComplete, config = {} } ) {
 
 /**
  * Set up date format preview functionality.
+ *
+ * @param {Object} widgetConfig Widget configuration object.
  */
-function setupDateFormatPreview() {
+function setupDateFormatPreview( widgetConfig = {} ) {
 	const radios = document.querySelectorAll(
 		'#prpl-popover-set-date-format input[name="date_format"]'
 	);
@@ -494,11 +501,11 @@ function setupDateFormatPreview() {
 
 			try {
 				const ajaxUrl =
-					config?.ajaxUrl ||
+					widgetConfig?.ajaxUrl ||
 					window.progressPlanner?.ajaxUrl ||
 					'/wp-admin/admin-ajax.php';
 				const nonce =
-					config?.nonce || window.progressPlanner?.nonce || '';
+					widgetConfig?.nonce || window.progressPlanner?.nonce || '';
 				const response = await fetch(
 					`${ ajaxUrl }?action=prpl_date_format_preview&format=${ encodeURIComponent(
 						format

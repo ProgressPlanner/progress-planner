@@ -8,7 +8,7 @@
  * @param {boolean}  props.taskIsCompleted Whether the task is completed.
  * @param {boolean}  props.isCelebrating   Whether the task is being celebrated.
  * @param {Object}   props.task            The task object.
- * @param {Function} props.onChange       Callback for checkbox change.
+ * @param {Function} props.onChange        Callback for checkbox change.
  * @return {JSX.Element} The checkbox component.
  */
 

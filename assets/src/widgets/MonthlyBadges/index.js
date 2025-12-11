@@ -151,7 +151,11 @@ export default function MonthlyBadges( { config = {} } ) {
 		};
 
 		fetchData();
-	}, [] );
+	}, [
+		config?.brandingId,
+		config?.placeholderUrl,
+		config?.remoteServerUrl,
+	] );
 
 	/**
 	 * Listen for task completion events.

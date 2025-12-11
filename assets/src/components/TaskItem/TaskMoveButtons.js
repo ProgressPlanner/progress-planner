@@ -3,9 +3,9 @@
  *
  * Renders move up/down buttons for user tasks.
  *
- * @param {Object}   props         Component props.
- * @param {Object}   props.task     The task object.
- * @param {string}   props.taskId  The task ID for data attributes.
+ * @param {Object}   props            Component props.
+ * @param {Object}   props.task       The task object.
+ * @param {string}   props.taskId     The task ID for data attributes.
  * @param {Function} props.onMoveUp   Callback for moving up.
  * @param {Function} props.onMoveDown Callback for moving down.
  * @return {JSX.Element} The move buttons component.
