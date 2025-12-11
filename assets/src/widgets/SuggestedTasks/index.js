@@ -382,7 +382,7 @@ export default function SuggestedTasks() {
 		window.prplSuggestedTasksConfig?.title ||
 		sprintf(
 			/* translators: %s: Ravi's name. */
-			__( '%s\'s Recommendations', 'progress-planner' ),
+			__( "%s's Recommendations", 'progress-planner' ),
 			window.prplSuggestedTasksConfig?.raviName || 'Ravi'
 		);
 
@@ -391,7 +391,7 @@ export default function SuggestedTasks() {
 		sprintf(
 			/* translators: %s: Ravi's name. */
 			__(
-				'Complete a task from %s\'s Recommendations to improve your site and earn points toward this month\'s badge!',
+				"Complete a task from %s's Recommendations to improve your site and earn points toward this month's badge!",
 				'progress-planner'
 			),
 			window.prplSuggestedTasksConfig?.raviName || 'Ravi'
@@ -405,8 +405,11 @@ export default function SuggestedTasks() {
 				<p className="prpl-suggested-tasks-widget-description">
 					{ widgetDescription }
 				</p>
-				<p className="prpl-suggested-tasks-loading" style={ loadingStyle }>
-					{ __( 'Loading tasks...', 'progress-planner' ) }
+				<p
+					className="prpl-suggested-tasks-loading"
+					style={ loadingStyle }
+				>
+					{ __( 'Loading tasks…', 'progress-planner' ) }
 				</p>
 			</>
 		);

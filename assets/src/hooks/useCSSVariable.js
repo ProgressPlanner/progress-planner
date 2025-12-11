@@ -12,7 +12,8 @@ export function useCSSVariable( name, fallback = '' ) {
 		return fallback;
 	}
 
-	const value = getComputedStyle( document.documentElement )
+	const value = window
+		.getComputedStyle( document.documentElement )
 		.getPropertyValue( name )
 		.trim();
 
@@ -21,13 +22,16 @@ export function useCSSVariable( name, fallback = '' ) {
 
 /**
  * Get multiple CSS variables at once.
+ * Note: This is not a React hook, but a utility function.
  *
  * @param {Object} variables - Object mapping variable names to fallback values.
  * @return {Object} Object with same keys but CSS variable values.
  */
 export function useCSSVariables( variables ) {
 	const result = {};
+	// useCSSVariable is not actually a React hook (doesn't use hooks), but ESLint sees the "use" prefix
 	for ( const [ name, fallback ] of Object.entries( variables ) ) {
+		// eslint-disable-next-line react-hooks/rules-of-hooks
 		result[ name ] = useCSSVariable( name, fallback );
 	}
 	return result;

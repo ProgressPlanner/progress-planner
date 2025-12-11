@@ -176,7 +176,10 @@ export default function ActivityScores() {
 					'progress-planner'
 				) }
 			</p>
-			<div className="prpl-graph-wrapper" style={ { maxHeight: '300px' } }>
+			<div
+				className="prpl-graph-wrapper"
+				style={ { maxHeight: '300px' } }
+			>
 				<BarChart data={ chartData } />
 			</div>
 

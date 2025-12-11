@@ -33,7 +33,7 @@ export default function WhatsNew() {
 	// Get title from config or use default.
 	const widgetTitle =
 		window.prplWhatsNewConfig?.title ||
-		__( 'What\'s new on the Progress Planner blog', 'progress-planner' );
+		__( "What's new on the Progress Planner blog", 'progress-planner' );
 
 	// Show loading state.
 	if ( isLoading ) {
@@ -131,9 +131,7 @@ export default function WhatsNew() {
 								{ post.title }
 							</a>
 						</h3>
-						<p style={ excerptStyle }>
-							{ post.excerpt }
-						</p>
+						<p style={ excerptStyle }>{ post.excerpt }</p>
 						<hr />
 					</li>
 				) ) }

@@ -1,7 +1,9 @@
 /* Core .prpl-suggested-task styles migrated to React inline in TaskItem.js */
 
 /* Keep class name for backward compatibility with PHP-rendered tasks */
+
 .prpl-suggested-task {
+
 	/* Input disabled styles - applies to checkboxes */
 	input[type="checkbox"][disabled] {
 		opacity: 0.5;

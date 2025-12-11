@@ -70,13 +70,13 @@ final class ToDo extends Widget {
 			'progress-planner/todo',
 			'prplTodoConfig',
 			[
-				'nonce'                  => \wp_create_nonce( 'wp_rest' ),
-				'userProviderId'         => $user_provider_id,
-				'title'                  => $widget_title,
-				'goldenTaskDescription'  => $golden_task_description,
-				'silverTaskDescription'  => $silver_task_description,
-				'infoIconSvg'            => $info_icon_svg,
-				'tooltipContent'         => $tooltip_content,
+				'nonce'                 => \wp_create_nonce( 'wp_rest' ),
+				'userProviderId'        => $user_provider_id,
+				'title'                 => $widget_title,
+				'goldenTaskDescription' => $golden_task_description,
+				'silverTaskDescription' => $silver_task_description,
+				'infoIconSvg'           => $info_icon_svg,
+				'tooltipContent'        => $tooltip_content,
 			]
 		);
 

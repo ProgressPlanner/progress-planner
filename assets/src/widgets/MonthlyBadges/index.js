@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import Gauge from '../../components/Gauge';
 import Badge from '../../components/Badge';
@@ -50,7 +50,10 @@ export default function MonthlyBadges() {
 		// Calculate accumulated remaining points
 		let accumulatedRemaining = currentMonthRemaining;
 		const badgesWithRemaining = previousBadges.map( ( badge ) => {
-			const badgeRemaining = Math.max( 0, ( badge.maxPoints || 10 ) - badge.points );
+			const badgeRemaining = Math.max(
+				0,
+				( badge.maxPoints || 10 ) - badge.points
+			);
 			accumulatedRemaining += badgeRemaining;
 			return {
 				...badge,
@@ -61,7 +64,11 @@ export default function MonthlyBadges() {
 
 		// Calculate days remaining in current month
 		const now = new Date();
-		const daysInMonth = new Date( now.getFullYear(), now.getMonth() + 1, 0 ).getDate();
+		const daysInMonth = new Date(
+			now.getFullYear(),
+			now.getMonth() + 1,
+			0
+		).getDate();
 		const daysRemaining = daysInMonth - now.getDate();
 
 		return badgesWithRemaining.map( ( badge ) => ( {
@@ -166,12 +173,6 @@ export default function MonthlyBadges() {
 		gap: '1rem',
 	};
 
-	const progressBarsContainerStyle = {
-		display: 'flex',
-		flexDirection: 'column',
-		gap: '0.5rem',
-	};
-
 	const loadingStyle = {
 		display: 'flex',
 		alignItems: 'center',
@@ -225,73 +226,77 @@ export default function MonthlyBadges() {
 		<>
 			<h2 className="prpl-widget-title">{ widgetTitle }</h2>
 			<div className="prpl-monthly-badges" style={ containerStyle }>
-			{ /* Main gauge with current badge */ }
-			<Gauge value={ gaugeValue } max={ maxPoints }>
-				{ currentBadge && (
-					<Badge
-						badgeId={ currentBadge.id }
-						badgeName={ currentBadge.name }
-						brandingId={ config.brandingId }
-						remoteServerUrl={ config.remoteServerUrl }
-						placeholderUrl={ config.placeholderUrl }
-						isComplete={ isComplete }
-					/>
-				) }
-			</Gauge>
-
-			{ /* Points counter */ }
-			<PointsCounter
-				points={ gaugeValue }
-				label={ __( 'Progress monthly badge', 'progress-planner' ) }
-			/>
-
-			{ /* Progress bars for previous incomplete months */ }
-			{ previousBadges.length > 0 && (
-				<>
-					<hr />
-					<div className="prpl-previous-month-badge-progress-bars-wrapper">
-						<h3>
-							{ __(
-								'Oh no! You missed the previous monthly badge!',
-								'progress-planner'
-							) }
-						</h3>
-						<p
-							className="prpl-previous-month-badge-progress-bars-wrapper-description"
-							dangerouslySetInnerHTML={ {
-								__html: __(
-									'No worries though! <strong>Collect the surplus of points</strong> you earn, and get your badge!',
-									'progress-planner'
-								),
-							} }
+				{ /* Main gauge with current badge */ }
+				<Gauge value={ gaugeValue } max={ maxPoints }>
+					{ currentBadge && (
+						<Badge
+							badgeId={ currentBadge.id }
+							badgeName={ currentBadge.name }
+							brandingId={ config.brandingId }
+							remoteServerUrl={ config.remoteServerUrl }
+							placeholderUrl={ config.placeholderUrl }
+							isComplete={ isComplete }
 						/>
-						{ previousBadgesData.map( ( badge ) => (
-							<div
-								key={ badge.id }
-								className="prpl-previous-month-badge-progress-bar-wrapper"
-								style={ {
-									borderRadius: '0.5rem',
-									padding: '0.75rem 1rem 1.25rem 1rem',
+					) }
+				</Gauge>
+
+				{ /* Points counter */ }
+				<PointsCounter
+					points={ gaugeValue }
+					label={ __( 'Progress monthly badge', 'progress-planner' ) }
+				/>
+
+				{ /* Progress bars for previous incomplete months */ }
+				{ previousBadges.length > 0 && (
+					<>
+						<hr />
+						<div className="prpl-previous-month-badge-progress-bars-wrapper">
+							<h3>
+								{ __(
+									'Oh no! You missed the previous monthly badge!',
+									'progress-planner'
+								) }
+							</h3>
+							<p
+								className="prpl-previous-month-badge-progress-bars-wrapper-description"
+								dangerouslySetInnerHTML={ {
+									__html: __(
+										'No worries though! <strong>Collect the surplus of points</strong> you earn, and get your badge!',
+										'progress-planner'
+									),
 								} }
-								data-badge-id={ badge.id }
-							>
-								<BadgeProgressBar
-									badgeId={ badge.id }
-									badgeName={ badge.name }
-									points={ badge.points }
-									maxPoints={ badge.maxPoints || 10 }
-									remaining={ badge.remaining }
-									accumulatedRemaining={ badge.accumulatedRemaining }
-									daysRemaining={ badge.daysRemaining }
-									brandingId={ config.brandingId }
-									remoteServerUrl={ config.remoteServerUrl }
-									placeholderUrl={ config.placeholderUrl }
-								/>
-							</div>
-						) ) }
-					</div>
-				</>
-			) }
+							/>
+							{ previousBadgesData.map( ( badge ) => (
+								<div
+									key={ badge.id }
+									className="prpl-previous-month-badge-progress-bar-wrapper"
+									style={ {
+										borderRadius: '0.5rem',
+										padding: '0.75rem 1rem 1.25rem 1rem',
+									} }
+									data-badge-id={ badge.id }
+								>
+									<BadgeProgressBar
+										badgeId={ badge.id }
+										badgeName={ badge.name }
+										points={ badge.points }
+										maxPoints={ badge.maxPoints || 10 }
+										remaining={ badge.remaining }
+										accumulatedRemaining={
+											badge.accumulatedRemaining
+										}
+										daysRemaining={ badge.daysRemaining }
+										brandingId={ config.brandingId }
+										remoteServerUrl={
+											config.remoteServerUrl
+										}
+										placeholderUrl={ config.placeholderUrl }
+									/>
+								</div>
+							) ) }
+						</div>
+					</>
+				) }
 			</div>
 		</>
 	);

@@ -10,4 +10,3 @@ if ( ! \defined( 'ABSPATH' ) ) {
 }
 
 \progress_planner()->get_admin__widgets__todo()->print_content();
-?>

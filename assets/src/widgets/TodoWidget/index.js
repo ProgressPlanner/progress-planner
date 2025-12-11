@@ -42,7 +42,7 @@ export default function TodoWidget() {
 		return [ ...tasks ].sort( ( a, b ) => {
 			const aIsGolden = ( a.prpl_points || 0 ) === 1;
 			const bIsGolden = ( b.prpl_points || 0 ) === 1;
-			
+
 			// Golden tasks come first
 			if ( aIsGolden && ! bIsGolden ) {
 				return -1;
@@ -94,12 +94,12 @@ export default function TodoWidget() {
 		};
 
 		loadTasks();
-	}, [] );
+	}, [ sortTasksWithGoldenFirst ] );
 
 	/**
 	 * Create a new task.
 	 */
-		const handleCreateTask = useCallback(
+	const handleCreateTask = useCallback(
 		async ( e ) => {
 			e.preventDefault();
 
@@ -344,7 +344,7 @@ export default function TodoWidget() {
 	if ( isLoading ) {
 		return (
 			<p id="prpl-todo-list-loading">
-				{ __( 'Loading items...', 'progress-planner' ) }
+				{ __( 'Loading items…', 'progress-planner' ) }
 			</p>
 		);
 	}
@@ -425,14 +425,23 @@ export default function TodoWidget() {
 		__( 'My to-do list', 'progress-planner' );
 	const goldenTaskDescription =
 		window.prplTodoConfig?.goldenTaskDescription ||
-		__( 'Write down all your tasks you want to get done on your website! You\'ll earn points for your \'golden task\'. ', 'progress-planner' );
+		__(
+			"Write down all your tasks you want to get done on your website! You'll earn points for your 'golden task'.",
+			'progress-planner'
+		);
 	const silverTaskDescription =
 		window.prplTodoConfig?.silverTaskDescription ||
-		__( 'Write down all your tasks you want to get done on your website! The top task will become your \'golden task\' next week. ', 'progress-planner' );
+		__(
+			"Write down all your tasks you want to get done on your website! The top task will become your 'golden task' next week.",
+			'progress-planner'
+		);
 	const infoIconSvg = window.prplTodoConfig?.infoIconSvg;
 	const tooltipContent =
 		window.prplTodoConfig?.tooltipContent ||
-		__( 'Every Monday, your top task becomes the golden task for the week. Complete it anytime this week to earn points toward your monthly total! Once done, the next task is highlighted to become your golden task next week.', 'progress-planner' );
+		__(
+			'Every Monday, your top task becomes the golden task for the week. Complete it anytime this week to earn points toward your monthly total! Once done, the next task is highlighted to become your golden task next week.',
+			'progress-planner'
+		);
 
 	return (
 		<>
@@ -444,7 +453,13 @@ export default function TodoWidget() {
 				<span className="prpl-todo-silver-task-description">
 					{ silverTaskDescription }
 				</span>
-				<span className="tooltip-actions" style={ { display: 'inline-flex', verticalAlign: 'text-top' } }>
+				<span
+					className="tooltip-actions"
+					style={ {
+						display: 'inline-flex',
+						verticalAlign: 'text-top',
+					} }
+				>
 					<prpl-tooltip>
 						<slot name="open-icon">
 							<span className="icon prpl-info-icon">
@@ -460,9 +475,7 @@ export default function TodoWidget() {
 								</span>
 							</span>
 						</slot>
-						<slot name="content">
-							{ tooltipContent }
-						</slot>
+						<slot name="content">{ tooltipContent }</slot>
 					</prpl-tooltip>
 				</span>
 			</p>
@@ -501,7 +514,7 @@ export default function TodoWidget() {
 						aria-live="polite"
 					>
 						<span className="screen-reader-text">
-							{ __( 'Loading tasks...', 'progress-planner' ) }
+							{ __( 'Loading tasks…', 'progress-planner' ) }
 						</span>
 					</li>
 				) }
@@ -539,7 +552,10 @@ export default function TodoWidget() {
 			</form>
 
 			{ completedTasks.length > 0 && (
-				<details id="todo-list-completed-details" style={ detailsStyle }>
+				<details
+					id="todo-list-completed-details"
+					style={ detailsStyle }
+				>
 					<summary style={ summaryStyle }>
 						{ __( 'Completed tasks', 'progress-planner' ) }
 						<span

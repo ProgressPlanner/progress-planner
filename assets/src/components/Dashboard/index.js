@@ -14,8 +14,8 @@ import Welcome from './Welcome';
 /**
  * Dashboard component.
  *
- * @param {Object}   props         - Component props.
- * @param {Object}   props.config - Dashboard configuration from PHP.
+ * @param {Object} props        - Component props.
+ * @param {Object} props.config - Dashboard configuration from PHP.
  * @return {JSX.Element} The Dashboard component.
  */
 export default function Dashboard( { config } ) {

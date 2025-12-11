@@ -13,20 +13,25 @@ import StreakBadges from '../../widgets/StreakBadges';
 import SuggestedTasks from '../../widgets/SuggestedTasks';
 import TodoWidget from '../../widgets/TodoWidget';
 import WhatsNew from '../../widgets/WhatsNew';
-import Challenge from '../../widgets/Challenge';
 
 /**
  * Widget wrapper component.
  *
- * @param {Object}   props         - Component props.
- * @param {string}   props.id      - Widget ID.
- * @param {number}   props.width   - Widget width (1 or 2).
- * @param {boolean}  props.forceLastColumn - Force to last column.
- * @param {string}   props.titleHtml - Widget title HTML.
- * @param {JSX.Element} props.children - Widget content.
+ * @param {Object}      props                 - Component props.
+ * @param {string}      props.id              - Widget ID.
+ * @param {number}      props.width           - Widget width (1 or 2).
+ * @param {boolean}     props.forceLastColumn - Force to last column.
+ * @param {string}      props.titleHtml       - Widget title HTML.
+ * @param {JSX.Element} props.children        - Widget content.
  * @return {JSX.Element} The widget wrapper.
  */
-function WidgetWrapper( { id, width = 1, forceLastColumn = false, titleHtml, children } ) {
+function WidgetWrapper( {
+	id,
+	width = 1,
+	forceLastColumn = false,
+	titleHtml,
+	children,
+} ) {
 	// Widget-specific styles
 	const widgetStyles = {};
 	const innerContainerStyles = {};
@@ -60,7 +65,10 @@ function WidgetWrapper( { id, width = 1, forceLastColumn = false, titleHtml, chi
 			data-force-last-column={ forceLastColumn ? 1 : 0 }
 			style={ widgetStyles }
 		>
-			<div className="widget-inner-container" style={ innerContainerStyles }>
+			<div
+				className="widget-inner-container"
+				style={ innerContainerStyles }
+			>
 				{ titleHtml && (
 					<div
 						className="prpl-widget-title"
@@ -81,17 +89,17 @@ function WidgetWrapper( { id, width = 1, forceLastColumn = false, titleHtml, chi
 /**
  * DashboardWidgets component.
  *
- * @param {Object}   props         - Component props.
- * @param {Object}   props.config - Dashboard configuration.
+ * @param {Object} props        - Component props.
+ * @param {Object} props.config - Dashboard configuration.
  * @return {JSX.Element} The DashboardWidgets component.
  */
 export default function DashboardWidgets( { config } ) {
-	const { widgets = [], challengeData = null } = config;
+	const { widgets = [] } = config;
 
 	/**
 	 * Map widget ID to React component.
 	 *
-	 * @param {string} widgetId - Widget ID.
+	 * @param {string} widgetId     - Widget ID.
 	 * @param {Object} widgetConfig - Widget configuration.
 	 * @return {JSX.Element|null} The widget component.
 	 */
@@ -102,7 +110,6 @@ export default function DashboardWidgets( { config } ) {
 			'monthly-badges': MonthlyBadges,
 			'badge-streak-content': ContentBadges,
 			'badge-streak-maintenance': StreakBadges,
-			challenge: () => <Challenge challenge={ challengeData } />,
 			'activity-scores': ActivityScores,
 			'content-activity': ContentActivity,
 			'whats-new': WhatsNew,
@@ -128,9 +135,7 @@ export default function DashboardWidgets( { config } ) {
 
 	return (
 		<Fragment>
-			{ widgets.map( ( widget ) =>
-				renderWidget( widget.id, widget )
-			) }
+			{ widgets.map( ( widget ) => renderWidget( widget.id, widget ) ) }
 		</Fragment>
 	);
 }

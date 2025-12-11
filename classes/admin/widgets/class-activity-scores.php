@@ -256,7 +256,7 @@ final class Activity_Scores extends Widget {
 			'progress-planner/activity-scores',
 			'prplActivityScoresConfig',
 			[
-				'title'      => $widget_title,
+				'title'       => $widget_title,
 				'infoIconSvg' => $info_icon_svg,
 			]
 		);

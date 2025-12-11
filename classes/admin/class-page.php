@@ -240,7 +240,7 @@ class Page {
 
 		// Get current URL params.
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
-		$current_range = isset( $_GET['range'] )
+		$current_range     = isset( $_GET['range'] )
 			? \sanitize_text_field( \wp_unslash( $_GET['range'] ) )
 			: '-6 months';
 		$current_frequency = isset( $_GET['frequency'] )

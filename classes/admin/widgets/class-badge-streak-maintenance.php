@@ -56,7 +56,7 @@ final class Badge_Streak_Maintenance extends Badge_Streak {
 			'progress-planner/streak-badges',
 			'prplStreakBadgesConfig',
 			[
-				'title'      => $widget_title,
+				'title'       => $widget_title,
 				'infoIconSvg' => $info_icon_svg,
 			]
 		);

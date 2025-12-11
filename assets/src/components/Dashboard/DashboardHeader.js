@@ -10,17 +10,25 @@ import { __ } from '@wordpress/i18n';
 /**
  * DashboardHeader component.
  *
- * @param {Object}   props         - Component props.
- * @param {Object}   props.config  - Dashboard configuration.
+ * @param {Object} props        - Component props.
+ * @param {Object} props.config - Dashboard configuration.
  * @return {JSX.Element} The DashboardHeader component.
  */
 export default function DashboardHeader( { config } ) {
-	const { licenseKey, branding = {}, rangeOptions = [], frequencyOptions = [] } = config;
+	const {
+		licenseKey,
+		branding = {},
+		rangeOptions = [],
+		frequencyOptions = [],
+	} = config;
 	const [ range, setRange ] = useState( config.currentRange || '-6 months' );
-	const [ frequency, setFrequency ] = useState( config.currentFrequency || 'monthly' );
+	const [ frequency, setFrequency ] = useState(
+		config.currentFrequency || 'monthly'
+	);
 
 	/**
 	 * Handle range selector change.
+	 * @param {Event} e - Change event.
 	 */
 	const handleRangeChange = ( e ) => {
 		const newRange = e.target.value;
@@ -32,6 +40,7 @@ export default function DashboardHeader( { config } ) {
 
 	/**
 	 * Handle frequency selector change.
+	 * @param {Event} e - Change event.
 	 */
 	const handleFrequencyChange = ( e ) => {
 		const newFrequency = e.target.value;
@@ -58,7 +67,9 @@ export default function DashboardHeader( { config } ) {
 			<div className="prpl-header-logo">
 				{ branding.logoHtml && (
 					<div
-						dangerouslySetInnerHTML={ { __html: branding.logoHtml } }
+						dangerouslySetInnerHTML={ {
+							__html: branding.logoHtml,
+						} }
 					/>
 				) }
 			</div>
@@ -89,7 +100,8 @@ export default function DashboardHeader( { config } ) {
 						borderRadius: 'var(--prpl-border-radius)',
 					} }
 					onMouseEnter={ ( e ) => {
-						e.target.style.color = 'var(--prpl-color-ui-icon-hover)';
+						e.target.style.color =
+							'var(--prpl-color-ui-icon-hover)';
 						e.target.style.borderColor =
 							'var(--prpl-color-ui-icon-hover)';
 						e.target.style.backgroundColor =
@@ -97,7 +109,8 @@ export default function DashboardHeader( { config } ) {
 					} }
 					onMouseLeave={ ( e ) => {
 						e.target.style.color = 'var(--prpl-color-ui-icon)';
-						e.target.style.borderColor = 'var(--prpl-color-ui-icon)';
+						e.target.style.borderColor =
+							'var(--prpl-color-ui-icon)';
 						e.target.style.backgroundColor = '#fff';
 					} }
 				>
@@ -122,7 +135,10 @@ export default function DashboardHeader( { config } ) {
 								const popover = document.getElementById(
 									'prpl-popover-subscribe-form'
 								);
-								if ( popover && typeof popover.showPopover === 'function' ) {
+								if (
+									popover &&
+									typeof popover.showPopover === 'function'
+								) {
 									popover.showPopover();
 								}
 							} }

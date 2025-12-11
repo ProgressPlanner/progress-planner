@@ -5,23 +5,22 @@
  */
 
 import { useMemo } from '@wordpress/element';
-import { __, _n, sprintf } from '@wordpress/i18n';
+import { _n, sprintf } from '@wordpress/i18n';
 import Badge from '../Badge';
 
 /**
  * BadgeProgressBar component.
  *
- * @param {Object} props                    - Component props.
- * @param {string} props.badgeId            - The badge ID.
- * @param {string} props.badgeName          - The badge name.
- * @param {number} props.points             - Current points.
- * @param {number} props.maxPoints          - Maximum points (default 10).
- * @param {number} props.remaining          - Remaining points for this badge.
+ * @param {Object} props                      - Component props.
+ * @param {string} props.badgeId              - The badge ID.
+ * @param {string} props.badgeName            - The badge name.
+ * @param {number} props.points               - Current points.
+ * @param {number} props.maxPoints            - Maximum points (default 10).
  * @param {number} props.accumulatedRemaining - Accumulated remaining points across all badges.
- * @param {number} props.daysRemaining      - Days remaining in current month.
- * @param {number} props.brandingId         - Branding ID.
- * @param {string} props.remoteServerUrl    - Remote server URL for badge SVGs.
- * @param {string} props.placeholderUrl     - Placeholder image URL.
+ * @param {number} props.daysRemaining        - Days remaining in current month.
+ * @param {number} props.brandingId           - Branding ID.
+ * @param {string} props.remoteServerUrl      - Remote server URL for badge SVGs.
+ * @param {string} props.placeholderUrl       - Placeholder image URL.
  * @return {JSX.Element} The BadgeProgressBar component.
  */
 export default function BadgeProgressBar( {
@@ -29,7 +28,6 @@ export default function BadgeProgressBar( {
 	badgeName,
 	points = 0,
 	maxPoints = 10,
-	remaining = 0,
 	accumulatedRemaining = 0,
 	daysRemaining = 0,
 	brandingId = 0,
@@ -143,8 +141,14 @@ export default function BadgeProgressBar( {
 					) }
 				</div>
 			</div>
-			<div className="prpl-widget-content-points" style={ pointsContainerStyle }>
-				<span className="prpl-widget-previous-ravi-points-number" style={ pointsNumberStyle }>
+			<div
+				className="prpl-widget-content-points"
+				style={ pointsContainerStyle }
+			>
+				<span
+					className="prpl-widget-previous-ravi-points-number"
+					style={ pointsNumberStyle }
+				>
 					{ points }pt
 				</span>
 				{ accumulatedRemaining > 0 && (
@@ -160,7 +164,10 @@ export default function BadgeProgressBar( {
 									daysRemaining,
 									'progress-planner'
 								),
-								sprintf( '<span class="number">%d</span>', accumulatedRemaining ),
+								sprintf(
+									'<span class="number">%d</span>',
+									accumulatedRemaining
+								),
 								daysRemaining
 							),
 						} }

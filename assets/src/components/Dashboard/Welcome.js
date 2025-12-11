@@ -7,13 +7,12 @@
 
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Welcome component.
  *
- * @param {Object}   props         - Component props.
- * @param {Object}   props.config - Dashboard configuration.
+ * @param {Object} props        - Component props.
+ * @param {Object} props.config - Dashboard configuration.
  * @return {JSX.Element} The Welcome component.
  */
 export default function Welcome( { config } ) {
@@ -32,10 +31,9 @@ export default function Welcome( { config } ) {
 	const [ withEmail, setWithEmail ] = useState( 'yes' );
 	const [ name, setName ] = useState( userFirstName );
 	const [ email, setEmail ] = useState( userEmail );
-	const [ privacyPolicyAccepted, setPrivacyPolicyAccepted ] = useState( false );
+	const [ privacyPolicyAccepted, setPrivacyPolicyAccepted ] =
+		useState( false );
 	const [ isSubmitting, setIsSubmitting ] = useState( false );
-	const [ upgradeTasks, setUpgradeTasks ] = useState( [] );
-	const [ showUpgradeTasks, setShowUpgradeTasks ] = useState( false );
 	const formRef = useRef( null );
 
 	/**
@@ -49,7 +47,6 @@ export default function Welcome( { config } ) {
 					'prpl-popover-upgrade-tasks'
 				);
 				if ( upgradeTasksElement ) {
-					setShowUpgradeTasks( true );
 					// Process upgrade tasks animation
 					await processUpgradeTasks();
 				}
@@ -79,39 +76,42 @@ export default function Welcome( { config } ) {
 			return new Promise( ( resolveTask ) => {
 				li.classList.add( 'prpl-onboarding-task-loading' );
 
-				setTimeout( () => {
-					const taskCompleted =
-						'true' === li.dataset.prplTaskCompleted;
-					const classToAdd = taskCompleted
-						? 'prpl-onboarding-task-completed'
-						: 'prpl-onboarding-task-not-completed';
-					li.classList.remove( 'prpl-onboarding-task-loading' );
-					li.classList.add( classToAdd );
+				setTimeout(
+					() => {
+						const taskCompleted =
+							'true' === li.dataset.prplTaskCompleted;
+						const classToAdd = taskCompleted
+							? 'prpl-onboarding-task-completed'
+							: 'prpl-onboarding-task-not-completed';
+						li.classList.remove( 'prpl-onboarding-task-loading' );
+						li.classList.add( classToAdd );
 
-					// Update total points
-					if ( taskCompleted ) {
-						const totalPointsElement = document.querySelector(
-							'#prpl-onboarding-tasks .prpl-onboarding-tasks-total-points'
-						);
-						if ( totalPointsElement ) {
-							const totalPoints = parseInt(
-								totalPointsElement.textContent
+						// Update total points
+						if ( taskCompleted ) {
+							const totalPointsElement = document.querySelector(
+								'#prpl-onboarding-tasks .prpl-onboarding-tasks-total-points'
 							);
-							const taskPointsElement = li.querySelector(
-								'.prpl-suggested-task-points'
-							);
-							if ( taskPointsElement ) {
-								const taskPoints = parseInt(
-									taskPointsElement.textContent
+							if ( totalPointsElement ) {
+								const totalPoints = parseInt(
+									totalPointsElement.textContent
 								);
-								totalPointsElement.textContent =
-									totalPoints + taskPoints + 'pt';
+								const taskPointsElement = li.querySelector(
+									'.prpl-suggested-task-points'
+								);
+								if ( taskPointsElement ) {
+									const taskPoints = parseInt(
+										taskPointsElement.textContent
+									);
+									totalPointsElement.textContent =
+										totalPoints + taskPoints + 'pt';
+								}
 							}
 						}
-					}
 
-					resolveTask();
-				}, ( index + 1 ) * timeToWait );
+						resolveTask();
+					},
+					( index + 1 ) * timeToWait
+				);
 			} );
 		} );
 
@@ -128,6 +128,7 @@ export default function Welcome( { config } ) {
 
 	/**
 	 * Handle form submission.
+	 * @param {Event} e - Form submit event.
 	 */
 	const handleSubmit = async ( e ) => {
 		e.preventDefault();
@@ -163,7 +164,10 @@ export default function Welcome( { config } ) {
 				// Save license key locally via WordPress AJAX
 				if ( response.license_key ) {
 					const saveFormData = new FormData();
-					saveFormData.append( 'action', 'progress_planner_save_onboard_data' );
+					saveFormData.append(
+						'action',
+						'progress_planner_save_onboard_data'
+					);
 					saveFormData.append( '_ajax_nonce', nonce );
 					saveFormData.append( 'key', response.license_key );
 
@@ -185,6 +189,7 @@ export default function Welcome( { config } ) {
 
 	/**
 	 * Handle email preference change.
+	 * @param {string} value - Email preference value.
 	 */
 	const handleEmailPreferenceChange = ( value ) => {
 		setWithEmail( value );
@@ -207,16 +212,21 @@ export default function Welcome( { config } ) {
 				<h1
 					style={ {
 						fontSize: 'var(--prpl-font-size-3xl)',
-						padding: 'var(--prpl-padding) calc(var(--prpl-gap) * 1.5)',
+						padding:
+							'var(--prpl-padding) calc(var(--prpl-gap) * 1.5)',
 						fontWeight: 600,
 					} }
 				>
-					{ __( 'Welcome to the Progress Planner plugin!', 'progress-planner' ) }
+					{ __(
+						'Welcome to the Progress Planner plugin!',
+						'progress-planner'
+					) }
 				</h1>
 				<span
 					className="welcome-header-icon"
 					style={ {
-						background: 'linear-gradient(105deg, var(--prpl-background-banner) 25%, var(--prpl-background-monthly) 25%)',
+						background:
+							'linear-gradient(105deg, var(--prpl-background-banner) 25%, var(--prpl-background-monthly) 25%)',
 						padding: 'var(--prpl-padding)',
 						paddingLeft: '100px',
 						paddingRight: 'calc(var(--prpl-gap) * 1.5)',
@@ -263,7 +273,10 @@ export default function Welcome( { config } ) {
 									fontSize: 'var(--prpl-font-size-lg)',
 								} }
 							>
-								{ __( 'Stay on track with weekly updates', 'progress-planner' ) }
+								{ __(
+									'Stay on track with weekly updates',
+									'progress-planner'
+								) }
 							</strong>
 							<ul
 								style={ {
@@ -274,81 +287,121 @@ export default function Welcome( { config } ) {
 								<li>
 									{ sprintf(
 										/* translators: %1$s: <strong> tag, %2$s: </strong> tag */
-										__( '%1$s Personalized to-dos %2$s to keep your site in great shape.', 'progress-planner' ),
+										__(
+											'%1$s Personalized to-dos %2$s to keep your site in great shape.',
+											'progress-planner'
+										),
 										'<strong>',
 										'</strong>'
-									).split( '<strong>' ).map( ( part, i, arr ) => {
-										if ( i === 0 ) return part;
-										const [ before, after ] = part.split( '</strong>' );
-										return (
-											<span key={ i }>
-												<strong>{ before }</strong>
-												{ after }
-											</span>
-										);
-									} ) }
+									)
+										.split( '<strong>' )
+										.map( ( part, i ) => {
+											if ( i === 0 ) {
+												return part;
+											}
+											const [ before, after ] =
+												part.split( '</strong>' );
+											return (
+												<span key={ i }>
+													<strong>{ before }</strong>
+													{ after }
+												</span>
+											);
+										} ) }
 								</li>
 								<li>
 									{ sprintf(
 										/* translators: %1$s: <strong> tag, %2$s: </strong> tag */
-										__( '%1$s Activity stats %2$s so you can track your progress.', 'progress-planner' ),
+										__(
+											'%1$s Activity stats %2$s so you can track your progress.',
+											'progress-planner'
+										),
 										'<strong>',
 										'</strong>'
-									).split( '<strong>' ).map( ( part, i, arr ) => {
-										if ( i === 0 ) return part;
-										const [ before, after ] = part.split( '</strong>' );
-										return (
-											<span key={ i }>
-												<strong>{ before }</strong>
-												{ after }
-											</span>
-										);
-									} ) }
+									)
+										.split( '<strong>' )
+										.map( ( part, i ) => {
+											if ( i === 0 ) {
+												return part;
+											}
+											const [ before, after ] =
+												part.split( '</strong>' );
+											return (
+												<span key={ i }>
+													<strong>{ before }</strong>
+													{ after }
+												</span>
+											);
+										} ) }
 								</li>
 								<li>
 									{ sprintf(
 										/* translators: %1$s: <strong> tag, %2$s: </strong> tag */
-										__( '%1$s Helpful nudges %2$s to stay consistent with your website goals.', 'progress-planner' ),
+										__(
+											'%1$s Helpful nudges %2$s to stay consistent with your website goals.',
+											'progress-planner'
+										),
 										'<strong>',
 										'</strong>'
-									).split( '<strong>' ).map( ( part, i, arr ) => {
-										if ( i === 0 ) return part;
-										const [ before, after ] = part.split( '</strong>' );
-										return (
-											<span key={ i }>
-												<strong>{ before }</strong>
-												{ after }
-											</span>
-										);
-									} ) }
+									)
+										.split( '<strong>' )
+										.map( ( part, i ) => {
+											if ( i === 0 ) {
+												return part;
+											}
+											const [ before, after ] =
+												part.split( '</strong>' );
+											return (
+												<span key={ i }>
+													<strong>{ before }</strong>
+													{ after }
+												</span>
+											);
+										} ) }
 								</li>
 							</ul>
 							<p>
 								{ sprintf(
 									/* translators: %s: progressplanner.com link */
-									__( 'To send these updates, we will create an account for you on %s.', 'progress-planner' ),
-									'<a href="' + ( branding.homeUrl || 'https://prpl.fyi/home' ) + '" target="_blank">progressplanner.com</a>'
-								).split( '<a' ).map( ( part, i ) => {
-									if ( i === 0 ) return part;
-									const [ linkPart, rest ] = part.split( '</a>' );
-									return (
-										<span key={ i }>
-											<a
-												href={ branding.homeUrl || 'https://prpl.fyi/home' }
-												target="_blank"
-												rel="noopener noreferrer"
-											>
-												{ linkPart.split( '>' )[ 1 ] }
-											</a>
-											{ rest }
-										</span>
-									);
-								} ) }
+									__(
+										'To send these updates, we will create an account for you on %s.',
+										'progress-planner'
+									),
+									'<a href="' +
+										( branding.homeUrl ||
+											'https://prpl.fyi/home' ) +
+										'" target="_blank">progressplanner.com</a>'
+								)
+									.split( '<a' )
+									.map( ( part, i ) => {
+										if ( i === 0 ) {
+											return part;
+										}
+										const [ , rest ] = part.split( '</a>' );
+										return (
+											<span key={ i }>
+												<a
+													href={
+														branding.homeUrl ||
+														'https://prpl.fyi/home'
+													}
+													target="_blank"
+													rel="noopener noreferrer"
+												>
+													{ part.split( '>' )[ 1 ] }
+												</a>
+												{ rest }
+											</span>
+										);
+									} ) }
 							</p>
 						</div>
 						<br />
 						<strong>
-							{ __( 'Choose your preference:', 'progress-planner' ) }
+							{ __(
+								'Choose your preference:',
+								'progress-planner'
+							) }
 						</strong>
 						<div
 							className="prpl-onboard-form-radio-select"
@@ -357,37 +410,51 @@ export default function Welcome( { config } ) {
 							} }
 						>
 							<label
+								htmlFor="prpl-with-email-yes"
 								style={ {
 									display: 'block',
 									marginTop: '0.5rem',
 								} }
 							>
 								<input
+									id="prpl-with-email-yes"
 									type="radio"
 									name="with-email"
 									value="yes"
 									checked={ withEmail === 'yes' }
-									onChange={ () => handleEmailPreferenceChange( 'yes' ) }
+									onChange={ () =>
+										handleEmailPreferenceChange( 'yes' )
+									}
 								/>
 								<span className="prpl-label-content">
-									{ __( 'Yes, send me weekly updates!', 'progress-planner' ) }
+									{ __(
+										'Yes, send me weekly updates!',
+										'progress-planner'
+									) }
 								</span>
 							</label>
 							<label
+								htmlFor="prpl-with-email-no"
 								style={ {
 									display: 'block',
 									marginTop: '0.5rem',
 								} }
 							>
 								<input
+									id="prpl-with-email-no"
 									type="radio"
 									name="with-email"
 									value="no"
 									checked={ withEmail === 'no' }
-									onChange={ () => handleEmailPreferenceChange( 'no' ) }
+									onChange={ () =>
+										handleEmailPreferenceChange( 'no' )
+									}
 								/>
 								<span className="prpl-label-content">
-									{ __( 'No, I do not want emails right now.', 'progress-planner' ) }
+									{ __(
+										'No, I do not want emails right now.',
+										'progress-planner'
+									) }
 								</span>
 							</label>
 						</div>
@@ -398,6 +465,7 @@ export default function Welcome( { config } ) {
 							}` }
 						>
 							<label
+								htmlFor="prpl-name"
 								style={ {
 									display: 'grid',
 									gridTemplateColumns: '1fr 3fr',
@@ -409,15 +477,19 @@ export default function Welcome( { config } ) {
 									{ __( 'First name', 'progress-planner' ) }
 								</span>
 								<input
+									id="prpl-name"
 									type="text"
 									name="name"
 									className="prpl-input"
 									required={ withEmail === 'yes' }
 									value={ name }
-									onChange={ ( e ) => setName( e.target.value ) }
+									onChange={ ( e ) =>
+										setName( e.target.value )
+									}
 								/>
 							</label>
 							<label
+								htmlFor="prpl-email"
 								style={ {
 									display: 'grid',
 									gridTemplateColumns: '1fr 3fr',
@@ -429,12 +501,15 @@ export default function Welcome( { config } ) {
 									{ __( 'Email', 'progress-planner' ) }
 								</span>
 								<input
+									id="prpl-email"
 									type="email"
 									name="email"
 									className="prpl-input"
 									required={ withEmail === 'yes' }
 									value={ email }
-									onChange={ ( e ) => setEmail( e.target.value ) }
+									onChange={ ( e ) =>
+										setEmail( e.target.value )
+									}
 								/>
 							</label>
 							<input
@@ -451,47 +526,69 @@ export default function Welcome( { config } ) {
 						<br />
 						<div className="prpl-form-notice">
 							<label
+								htmlFor="prpl-privacy-policy"
 								style={ {
 									display: 'flex',
 									alignItems: 'baseline',
 								} }
 							>
 								<input
+									id="prpl-privacy-policy"
 									type="checkbox"
 									name="privacy-policy"
 									className="prpl-input"
 									required
 									checked={ privacyPolicyAccepted }
 									onChange={ ( e ) =>
-										setPrivacyPolicyAccepted( e.target.checked )
+										setPrivacyPolicyAccepted(
+											e.target.checked
+										)
 									}
 								/>
 								{ sprintf(
 									/* translators: %s: progressplanner.com/privacy-policy link */
-									__( 'I agree to the %s.', 'progress-planner' ),
-									'<a href="' + ( branding.privacyPolicyUrl || 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) + '" target="_blank">Privacy policy</a>'
-								).split( '<a' ).map( ( part, i ) => {
-									if ( i === 0 ) return part;
-									const [ linkPart, rest ] = part.split( '</a>' );
-									return (
-										<span key={ i }>
-											<a
-												href={ branding.privacyPolicyUrl || 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' }
-												target="_blank"
-												rel="noopener noreferrer"
-											>
-												{ __( 'Privacy policy', 'progress-planner' ) }
-											</a>
-											{ rest }
-										</span>
-									);
-								} ) }
+									__(
+										'I agree to the %s.',
+										'progress-planner'
+									),
+									'<a href="' +
+										( branding.privacyPolicyUrl ||
+											'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) +
+										'" target="_blank">Privacy policy</a>'
+								)
+									.split( '<a' )
+									.map( ( part, i ) => {
+										if ( i === 0 ) {
+											return part;
+										}
+										const [ , rest ] = part.split( '</a>' );
+										return (
+											<span key={ i }>
+												<a
+													href={
+														branding.privacyPolicyUrl ||
+														'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy'
+													}
+													target="_blank"
+													rel="noopener noreferrer"
+												>
+													{ __(
+														'Privacy policy',
+														'progress-planner'
+													) }
+												</a>
+												{ rest }
+											</span>
+										);
+									} ) }
 							</label>
 						</div>
 						<br />
 						<div
 							id="prpl-onboarding-submit-wrapper"
-							className={ privacyPolicyAccepted ? '' : 'prpl-disabled' }
+							className={
+								privacyPolicyAccepted ? '' : 'prpl-disabled'
+							}
 							style={ {
 								display: 'flex',
 								alignItems: 'center',
@@ -501,9 +598,14 @@ export default function Welcome( { config } ) {
 								<span>
 									<input
 										type="submit"
-										value={ __( 'Get going and send me weekly emails', 'progress-planner' ) }
+										value={ __(
+											'Get going and send me weekly emails',
+											'progress-planner'
+										) }
 										className={ `prpl-button-primary ${
-											withEmail === 'no' ? 'prpl-hidden' : ''
+											withEmail === 'no'
+												? 'prpl-hidden'
+												: ''
 										}` }
 										disabled={ isSubmitting }
 									/>
@@ -511,7 +613,10 @@ export default function Welcome( { config } ) {
 							</div>
 							<input
 								type="submit"
-								value={ __( 'Continue without emailing me', 'progress-planner' ) }
+								value={ __(
+									'Continue without emailing me',
+									'progress-planner'
+								) }
 								className={ `prpl-button-secondary prpl-button-secondary--no-email ${
 									withEmail === 'yes' ? 'prpl-hidden' : ''
 								}` }
@@ -530,12 +635,16 @@ export default function Welcome( { config } ) {
 				</div>
 				<div
 					className="right"
-					style={ {
-						// Right column styles - hidden on mobile via CSS
-					} }
+					style={
+						{
+							// Right column styles - hidden on mobile via CSS
+						}
+					}
 				>
 					<img
-						src={ `${ config.baseUrl || '' }/assets/images/image_onboaring_block.png` }
+						src={ `${
+							config.baseUrl || ''
+						}/assets/images/image_onboaring_block.png` }
 						alt=""
 						className="onboarding"
 						style={ {

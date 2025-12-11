@@ -56,11 +56,11 @@ class Monthly_Badges extends Base {
 		$score = $widget->get_score();
 
 		// Get current month badge.
-		$current_date        = new \DateTime();
-		$current_badge_id    = Monthly::get_badge_id_from_date( $current_date );
-		$current_badge       = Monthly::get_instance_from_id( $current_badge_id );
-		$current_badge_name  = $current_badge ? $current_badge->get_name() : '';
-		$current_badge_data  = [
+		$current_date       = new \DateTime();
+		$current_badge_id   = Monthly::get_badge_id_from_date( $current_date );
+		$current_badge      = Monthly::get_instance_from_id( $current_badge_id );
+		$current_badge_name = $current_badge ? $current_badge->get_name() : '';
+		$current_badge_data = [
 			'id'   => $current_badge_id,
 			'name' => $current_badge_name,
 		];
@@ -70,7 +70,7 @@ class Monthly_Badges extends Base {
 		$previous_badges     = $widget->get_previous_incomplete_months_badges();
 
 		foreach ( $previous_badges as $badge ) {
-			$progress            = $badge->progress_callback( [ 'no_next_badge_points' => true ] );
+			$progress              = $badge->progress_callback( [ 'no_next_badge_points' => true ] );
 			$previous_incomplete[] = [
 				'id'        => $badge->get_id(),
 				'name'      => $badge->get_name(),

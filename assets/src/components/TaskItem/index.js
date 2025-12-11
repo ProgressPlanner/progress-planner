@@ -178,7 +178,8 @@ export default function TaskItem( {
 	const taskId = task.slug || task.id;
 
 	// Get the provider slug.
-	const providerSlug = task.prpl_provider?.slug || ( isUserTask ? 'user' : '' );
+	const providerSlug =
+		task.prpl_provider?.slug || ( isUserTask ? 'user' : '' );
 
 	// Build the class name.
 	const className = [
@@ -411,7 +412,10 @@ export default function TaskItem( {
 					className="tooltip-actions prpl-move-buttons-wrapper"
 					style={ moveButtonsWrapperStyle }
 				>
-					<span className="prpl-move-buttons" style={ moveButtonsStyle }>
+					<span
+						className="prpl-move-buttons"
+						style={ moveButtonsStyle }
+					>
 						<button
 							type="button"
 							className="prpl-suggested-task-button move-up"

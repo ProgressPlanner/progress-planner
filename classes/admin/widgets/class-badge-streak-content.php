@@ -56,7 +56,7 @@ final class Badge_Streak_Content extends Badge_Streak {
 			'progress-planner/content-badges',
 			'prplContentBadgesConfig',
 			[
-				'title'      => $widget_title,
+				'title'       => $widget_title,
 				'infoIconSvg' => $info_icon_svg,
 			]
 		);
