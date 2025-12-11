@@ -47,16 +47,56 @@ export default function WhatsNew() {
 		return null;
 	}
 
+	// Inline styles.
+	const listStyle = {
+		listStyle: 'none',
+		padding: 0,
+		margin: 0,
+	};
+
+	const titleStyle = {
+		marginTop: 0,
+		fontSize: 'var(--prpl-font-size-lg)',
+		lineHeight: 1.25,
+		fontWeight: 600,
+		marginBottom: '6px',
+	};
+
+	const titleLinkStyle = {
+		color: 'var(--prpl-color-headings)',
+		textDecoration: 'none',
+	};
+
+	const excerptStyle = {
+		margin: 0,
+	};
+
+	const footerStyle = {
+		display: 'flex',
+		justifyContent: 'flex-end',
+	};
+
+	const footerLinkStyle = {
+		color: 'var(--prpl-color-link)',
+		textDecoration: 'underline',
+	};
+
+	const blogPostImageStyle = {
+		width: '100%',
+		minHeight: '120px',
+		aspectRatio: '3 / 2',
+		backgroundSize: 'cover',
+		marginBottom: '0.75rem',
+		borderRadius: 'var(--prpl-border-radius-big)',
+		border: '1px solid var(--prpl-color-border)',
+		backgroundColor: 'var(--prpl-color-gauge-remain)',
+		transition: 'transform 0.2s, box-shadow 0.2s',
+	};
+
 	return (
 		<Fragment>
 			<hr />
-			<ul
-				className="prpl-whats-new__list"
-				style={ {
-					listStyle: 'none',
-					padding: 0,
-				} }
-			>
+			<ul className="prpl-whats-new__list" style={ listStyle }>
 				{ posts.map( ( post, index ) => (
 					<li key={ index } className="prpl-whats-new__item">
 						{ post.imageUrl && (
@@ -69,29 +109,42 @@ export default function WhatsNew() {
 								<div
 									className="prpl-blog-post-image"
 									style={ {
+										...blogPostImageStyle,
 										backgroundImage: `url(${ post.imageUrl })`,
 									} }
 								/>
 							</a>
 						) }
-						<h3 className="prpl-whats-new__title">
+						<h3
+							className="prpl-whats-new__title"
+							style={ titleStyle }
+						>
 							<a
 								href={ post.link }
 								target="_blank"
 								rel="noopener noreferrer"
+								style={ titleLinkStyle }
 							>
 								{ post.title }
 							</a>
 						</h3>
-						<p className="prpl-whats-new__excerpt">
+						<p
+							className="prpl-whats-new__excerpt"
+							style={ excerptStyle }
+						>
 							{ post.excerpt }
 						</p>
 						<hr />
 					</li>
 				) ) }
 			</ul>
-			<div className="prpl-widget-footer">
-				<a href={ blogUrl } target="_blank" rel="noopener noreferrer">
+			<div className="prpl-widget-footer" style={ footerStyle }>
+				<a
+					href={ blogUrl }
+					target="_blank"
+					rel="noopener noreferrer"
+					style={ footerLinkStyle }
+				>
 					{ __( 'Read all posts', 'progress-planner' ) }
 				</a>
 			</div>

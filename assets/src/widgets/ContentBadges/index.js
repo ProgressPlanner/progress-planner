@@ -65,6 +65,32 @@ export default function ContentBadges() {
 		return <p>{ __( 'No badge data available.', 'progress-planner' ) }</p>;
 	}
 
+	// Inline styles.
+	const progressWrapperStyle = {
+		display: 'grid',
+		gridTemplateColumns: '1fr 1fr 1fr',
+		gap: 'calc(var(--prpl-gap) / 4)',
+		padding: 'calc(var(--prpl-padding) / 2)',
+		borderRadius: 'var(--prpl-border-radius-big)',
+		background: 'var(--prpl-background-content-badge)',
+	};
+
+	const badgeStyle = {
+		display: 'flex',
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'flex-start',
+		flexWrap: 'wrap',
+		minWidth: 0,
+	};
+
+	const badgeLabelStyle = {
+		margin: 0,
+		fontSize: 'var(--prpl-font-size-small)',
+		textAlign: 'center',
+		lineHeight: 1.2,
+	};
+
 	return (
 		<>
 			<p>
@@ -138,11 +164,15 @@ export default function ContentBadges() {
 			<hr />
 
 			<div className="prpl-badges-container-achievements">
-				<div className="progress-wrapper badge-group-content">
+				<div
+					className="progress-wrapper badge-group-content"
+					style={ progressWrapperStyle }
+				>
 					{ allBadges.map( ( badge ) => (
 						<span
 							key={ badge.id }
 							className="prpl-badge"
+							style={ badgeStyle }
 							data-value={ badge.progress }
 						>
 							<Badge
@@ -153,7 +183,7 @@ export default function ContentBadges() {
 								placeholderUrl={ config.placeholderUrl }
 								isComplete={ badge.isComplete }
 							/>
-							<p>{ badge.name }</p>
+							<p style={ badgeLabelStyle }>{ badge.name }</p>
 						</span>
 					) ) }
 				</div>

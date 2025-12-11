@@ -138,12 +138,30 @@ export default function StreakBadges() {
 			<hr />
 
 			<div className="prpl-badges-container-achievements">
-				<div className="progress-wrapper badge-group-maintenance">
+				<div
+					className="progress-wrapper badge-group-maintenance"
+					style={ {
+						display: 'grid',
+						gridTemplateColumns: '1fr 1fr 1fr',
+						gap: 'calc(var(--prpl-gap) / 2)',
+						background: 'var(--prpl-background-streak)',
+						padding: 'calc(var(--prpl-padding) / 2)',
+						borderRadius: 'var(--prpl-border-radius-big)',
+					} }
+				>
 					{ allBadges.map( ( badge ) => (
 						<span
 							key={ badge.id }
 							className="prpl-badge"
 							data-value={ badge.progress }
+							style={ {
+								display: 'flex',
+								flexDirection: 'column',
+								alignItems: 'center',
+								justifyContent: 'flex-start',
+								flexWrap: 'wrap',
+								minWidth: 0,
+							} }
 						>
 							<Badge
 								badgeId={ badge.id }
@@ -153,7 +171,16 @@ export default function StreakBadges() {
 								placeholderUrl={ config.placeholderUrl }
 								isComplete={ badge.isComplete }
 							/>
-							<p>{ badge.name }</p>
+							<p
+								style={ {
+									margin: 0,
+									fontSize: 'var(--prpl-font-size-small)',
+									textAlign: 'center',
+									lineHeight: 1.2,
+								} }
+							>
+								{ badge.name }
+							</p>
 						</span>
 					) ) }
 				</div>

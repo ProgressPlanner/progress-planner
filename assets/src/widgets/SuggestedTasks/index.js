@@ -342,10 +342,40 @@ export default function SuggestedTasks() {
 		window.history.pushState( {}, '', url );
 	}, [ showAll ] );
 
+	// Inline styles
+	const listStyle = {
+		listStyle: 'none',
+		padding: 0,
+		margin: '0 0 var(--prpl-padding) 0',
+	};
+
+	const loadingStyle = {
+		display: 'block',
+		backgroundColor: 'var(--prpl-background-activity)',
+		padding: 'calc(var(--prpl-padding) / 2)',
+	};
+
+	const emptyStyle = {
+		display: 'block',
+		backgroundColor: 'var(--prpl-background-activity)',
+		padding: 'calc(var(--prpl-padding) / 2)',
+	};
+
+	const toggleButtonStyle = {
+		background: 'none',
+		border: 'none',
+		padding: 0,
+		color: 'var(--wp-admin-theme-color, #2271b1)',
+		textDecoration: 'underline',
+		cursor: 'pointer',
+		fontSize: 'inherit',
+		fontFamily: 'inherit',
+	};
+
 	// Show loading state.
 	if ( isLoading ) {
 		return (
-			<p className="prpl-suggested-tasks-loading">
+			<p className="prpl-suggested-tasks-loading" style={ loadingStyle }>
 				{ __( 'Loading tasks…', 'progress-planner' ) }
 			</p>
 		);
@@ -358,9 +388,10 @@ export default function SuggestedTasks() {
 				<ul
 					id="prpl-suggested-tasks-list"
 					className="prpl-suggested-tasks-list"
+					style={ listStyle }
 					ref={ listRef }
 				></ul>
-				<p className="prpl-no-suggested-tasks">
+				<p className="prpl-no-suggested-tasks" style={ emptyStyle }>
 					{ __(
 						'You have completed all recommended tasks.',
 						'progress-planner'
@@ -382,12 +413,14 @@ export default function SuggestedTasks() {
 			<ul
 				id="prpl-suggested-tasks-list"
 				className="prpl-suggested-tasks-list"
+				style={ listStyle }
 				ref={ listRef }
 			>
-				{ tasks.map( ( task ) => (
+				{ tasks.map( ( task, index ) => (
 					<TaskItem
 						key={ task.id }
 						task={ task }
+						index={ index }
 						isUserTask={ task.prpl_provider?.slug === 'user' }
 						isCelebrating={ celebratingTaskIds.has( task.id ) }
 						onComplete={ handleComplete }
@@ -403,6 +436,7 @@ export default function SuggestedTasks() {
 					type="button"
 					id="prpl-toggle-all-recommendations"
 					className="prpl-toggle-all-recommendations-button"
+					style={ toggleButtonStyle }
 					onClick={ handleToggleShowAll }
 				>
 					{ showAll

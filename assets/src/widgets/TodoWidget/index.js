@@ -83,6 +83,7 @@ async function deleteTask( postId ) {
  * @param {Object}   props.task          The task object.
  * @param {boolean}  props.isGolden      Whether this is the golden task.
  * @param {boolean}  props.isCompleted   Whether the task is completed.
+ * @param {number}   props.index         The index of the task in the list.
  * @param {Function} props.onToggle      Callback for toggling completion.
  * @param {Function} props.onDelete      Callback for deleting task.
  * @param {Function} props.onMove        Callback for moving task.
@@ -93,6 +94,7 @@ function TodoItem( {
 	task,
 	isGolden,
 	isCompleted,
+	index = 0,
 	onToggle,
 	onDelete,
 	onMove,
@@ -123,11 +125,103 @@ function TodoItem( {
 		}
 	}, [] );
 
+	// Inline styles for the task item.
+	const taskItemStyle = {
+		margin: 0,
+		padding: '0.75rem 0.5rem 0.625rem 0.5rem',
+		display: 'grid',
+		gridTemplateColumns: '1.5rem 1fr 3.5rem',
+		gap: '0.25rem 0.5rem',
+		position: 'relative',
+		lineHeight: 1,
+		backgroundColor:
+			index % 2 === 0 ? 'var(--prpl-background-table)' : 'transparent',
+	};
+
+	const checkboxWrapperStyle = {
+		display: 'flex',
+		width: '100%',
+		gap: 0,
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+	};
+
+	const titleWrapperStyle = {
+		display: 'flex',
+		alignItems: 'center',
+		gap: '0.5rem',
+		justifyContent: 'space-between',
+	};
+
+	const titleStyle = {
+		width: '100%',
+		color: 'var(--prpl-color-text)',
+		fontSize: '1rem',
+		margin: 0,
+		fontWeight: 500,
+		...(isCompleted ? { textDecoration: 'line-through' } : {}),
+	};
+
+	const pointsWrapperStyle = {
+		display: 'flex',
+		gap: '0.5rem',
+		alignItems: 'center',
+		justifyContent: 'flex-end',
+		gridRowEnd: 'span 2',
+	};
+
+	const pointsBadgeStyle = {
+		fontSize: 'var(--prpl-font-size-xs)',
+		fontWeight: 700,
+		color: 'var(--prpl-text-point)',
+		backgroundColor: 'var(--prpl-background-point)',
+		width: '1.5rem',
+		height: '1.5rem',
+		borderRadius: '50%',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	};
+
+	const buttonStyle = {
+		padding: '0.1rem',
+		lineHeight: 0,
+		margin: 0,
+		background: 'none',
+		border: 'none',
+		cursor: 'pointer',
+		color: 'var(--prpl-color-ui-icon)',
+	};
+
+	const moveButtonsWrapperStyle = {
+		position: 'absolute',
+		left: 'calc(-8px - 0.5rem)',
+		top: '50%',
+		transform: 'translateY(-50%)',
+		padding: '10px 10px 10px 0',
+		display: 'flex',
+		width: '100%',
+		gap: 0,
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+	};
+
+	const moveButtonStyle = {
+		...buttonStyle,
+		padding: 0,
+		height: '0.75rem',
+		boxShadow: 'none',
+		marginTop: '1px',
+	};
+
 	return (
 		<li
 			className={ `prpl-suggested-task${
 				isGolden ? ' prpl-golden-task' : ''
 			}` }
+			style={ taskItemStyle }
 			data-task-id={ task.slug || task.id }
 			data-post-id={ task.id }
 			data-task-action={ isCompleted ? 'completed' : 'publish' }
@@ -135,12 +229,16 @@ function TodoItem( {
 			data-task-points={ task.prpl_points || 0 }
 			data-task-order={ task.menu_order || 0 }
 		>
-			<div className="prpl-suggested-task-checkbox-wrapper">
+			<div
+				className="prpl-suggested-task-checkbox-wrapper"
+				style={ checkboxWrapperStyle }
+			>
 				{ /* eslint-disable-next-line jsx-a11y/label-has-associated-control */ }
-				<label>
+				<label style={ checkboxWrapperStyle }>
 					<input
 						type="checkbox"
 						className="prpl-suggested-task-checkbox"
+						style={ { margin: 0, flexShrink: 0 } }
 						checked={ isCompleted }
 						onChange={ () => onToggle( task.id ) }
 					/>
@@ -151,8 +249,11 @@ function TodoItem( {
 				</label>
 			</div>
 
-			<div className="prpl-suggested-task-title-wrapper">
-				<h3 className="prpl-task-title">
+			<div
+				className="prpl-suggested-task-title-wrapper"
+				style={ titleWrapperStyle }
+			>
+				<h3 className="prpl-task-title" style={ titleStyle }>
 					<span
 						ref={ titleRef }
 						contentEditable
@@ -172,15 +273,22 @@ function TodoItem( {
 				</h3>
 			</div>
 
-			<div className="prpl-suggested-task-points-wrapper">
+			<div
+				className="prpl-suggested-task-points-wrapper"
+				style={ pointsWrapperStyle }
+			>
 				{ ( task.prpl_points || 0 ) > 0 && (
-					<span className="prpl-suggested-task-points">
+					<span
+						className="prpl-suggested-task-points"
+						style={ pointsBadgeStyle }
+					>
 						+{ task.prpl_points }
 					</span>
 				) }
 				<button
 					type="button"
 					className="prpl-suggested-task-delete"
+					style={ buttonStyle }
 					onClick={ () => onDelete( task.id ) }
 					aria-label={ __( 'Delete task', 'progress-planner' ) }
 				>
@@ -200,10 +308,14 @@ function TodoItem( {
 			</div>
 
 			{ ! isCompleted && (
-				<div className="tooltip-actions prpl-move-buttons-wrapper">
+				<div
+					className="tooltip-actions prpl-move-buttons-wrapper"
+					style={ moveButtonsWrapperStyle }
+				>
 					<button
 						type="button"
 						className="prpl-move-up"
+						style={ moveButtonStyle }
 						onClick={ () => onMove( task.id, 'up' ) }
 						aria-label={ __( 'Move up', 'progress-planner' ) }
 					>
@@ -223,6 +335,7 @@ function TodoItem( {
 					<button
 						type="button"
 						className="prpl-move-down"
+						style={ moveButtonStyle }
 						onClick={ () => onMove( task.id, 'down' ) }
 						aria-label={ __( 'Move down', 'progress-planner' ) }
 					>
@@ -535,6 +648,76 @@ export default function TodoWidget() {
 		);
 	}
 
+	// Inline styles
+	const listStyle = {
+		listStyle: 'none',
+		padding: 0,
+		margin: 0,
+	};
+
+	const formStyle = {
+		display: 'flex',
+		gap: '0.5rem',
+		marginTop: 'var(--prpl-padding)',
+	};
+
+	const inputStyle = {
+		flex: 1,
+		minWidth: 0,
+	};
+
+	const addButtonStyle = {
+		padding: '0.5rem',
+		background: 'var(--prpl-color-button-secondary-background)',
+		border: '1px solid var(--prpl-color-button-secondary-border)',
+		borderRadius: 'var(--prpl-border-radius)',
+		cursor: 'pointer',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	};
+
+	const detailsStyle = {
+		marginTop: 'var(--prpl-padding)',
+		borderTop: '1px solid var(--prpl-color-border)',
+		paddingTop: 'var(--prpl-padding)',
+	};
+
+	const summaryStyle = {
+		cursor: 'pointer',
+		fontWeight: 500,
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		padding: '0.5rem 0',
+	};
+
+	const summaryIconStyle = {
+		marginLeft: '0.5rem',
+		transition: 'transform 0.2s',
+		width: '1rem',
+		height: '1rem',
+	};
+
+	const deleteAllWrapperStyle = {
+		marginTop: '0.5rem',
+		marginBottom: '0.5rem',
+		borderBottom: '1px solid var(--prpl-color-border)',
+		paddingBottom: '0.5rem',
+	};
+
+	const deleteAllButtonStyle = {
+		display: 'flex',
+		alignItems: 'center',
+		gap: '0.5rem',
+		padding: '0.5rem',
+		background: 'none',
+		border: 'none',
+		cursor: 'pointer',
+		color: 'var(--prpl-color-text)',
+		fontSize: 'var(--prpl-font-size-small)',
+	};
+
 	return (
 		<>
 			<div
@@ -546,11 +729,13 @@ export default function TodoWidget() {
 			<ul
 				id="todo-list"
 				className="prpl-todo-list prpl-suggested-tasks-list"
+				style={ listStyle }
 			>
 				{ pendingTasks.map( ( task, index ) => (
 					<TodoItem
 						key={ task.id }
 						task={ task }
+						index={ index }
 						isGolden={ index === 0 && task.prpl_points > 0 }
 						isCompleted={ false }
 						onToggle={ handleToggle }
@@ -561,11 +746,16 @@ export default function TodoWidget() {
 				) ) }
 			</ul>
 
-			<form id="create-todo-item" onSubmit={ handleCreateTask }>
+			<form
+				id="create-todo-item"
+				style={ formStyle }
+				onSubmit={ handleCreateTask }
+			>
 				<input
 					ref={ inputRef }
 					type="text"
 					id="new-todo-content"
+					style={ inputStyle }
 					placeholder={ __( 'Add a new task', 'progress-planner' ) }
 					aria-label={ __( 'Add a new task', 'progress-planner' ) }
 					required
@@ -574,6 +764,7 @@ export default function TodoWidget() {
 				/>
 				<button
 					type="submit"
+					style={ addButtonStyle }
 					aria-label={ __( 'Add task', 'progress-planner' ) }
 				>
 					<span
@@ -587,10 +778,13 @@ export default function TodoWidget() {
 			</form>
 
 			{ completedTasks.length > 0 && (
-				<details id="todo-list-completed-details">
-					<summary>
+				<details id="todo-list-completed-details" style={ detailsStyle }>
+					<summary style={ summaryStyle }>
 						{ __( 'Completed tasks', 'progress-planner' ) }
-						<span className="prpl-todo-list-completed-summary-icon">
+						<span
+							className="prpl-todo-list-completed-summary-icon"
+							style={ summaryIconStyle }
+						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								fill="none"
@@ -606,9 +800,13 @@ export default function TodoWidget() {
 							</svg>
 						</span>
 					</summary>
-					<div id="todo-list-completed-delete-all-wrapper">
+					<div
+						id="todo-list-completed-delete-all-wrapper"
+						style={ deleteAllWrapperStyle }
+					>
 						<button
 							id="todo-list-completed-delete-all"
+							style={ deleteAllButtonStyle }
 							onClick={ () => setShowDeletePopover( true ) }
 						>
 							<span
@@ -639,11 +837,13 @@ export default function TodoWidget() {
 					<ul
 						id="todo-list-completed"
 						className="prpl-todo-list prpl-suggested-tasks-list"
+						style={ listStyle }
 					>
-						{ completedTasks.map( ( task ) => (
+						{ completedTasks.map( ( task, index ) => (
 							<TodoItem
 								key={ task.id }
 								task={ task }
+								index={ index }
 								isGolden={ false }
 								isCompleted={ true }
 								onToggle={ handleToggle }

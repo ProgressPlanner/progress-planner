@@ -69,6 +69,7 @@ function TrashIcon() {
  * @param {Object}   props.task          The task object.
  * @param {boolean}  props.isUserTask    Whether this is a user task.
  * @param {boolean}  props.isCelebrating Whether the task is being celebrated.
+ * @param {number}   props.index         The index of the task in the list.
  * @param {Function} props.onComplete    Callback for completing a task.
  * @param {Function} props.onSnooze      Callback for snoozing a task.
  * @param {Function} props.onDelete      Callback for deleting a task.
@@ -80,6 +81,7 @@ export default function TaskItem( {
 	task,
 	isUserTask,
 	isCelebrating,
+	index = 0,
 	onComplete,
 	onSnooze,
 	onDelete,
@@ -175,9 +177,126 @@ export default function TaskItem( {
 		.filter( Boolean )
 		.join( ' ' );
 
+	// Inline styles for the task item.
+	const taskItemStyle = {
+		margin: 0,
+		padding: '0.75rem 0.5rem 0.625rem 0.5rem',
+		display: 'grid',
+		gridTemplateColumns: '1.5rem 1fr 3.5rem',
+		gap: '0.25rem 0.5rem',
+		position: 'relative',
+		lineHeight: 1,
+		// nth-child(odd) background - using index prop
+		backgroundColor:
+			index % 2 === 0 ? 'var(--prpl-background-table)' : 'transparent',
+	};
+
+	const checkboxWrapperStyle = {
+		display: 'flex',
+		width: '100%',
+		gap: 0,
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+	};
+
+	const titleWrapperStyle = {
+		display: 'flex',
+		alignItems: 'center',
+		gap: '0.5rem',
+		justifyContent: 'space-between',
+	};
+
+	const titleStyle = {
+		width: '100%',
+		color: 'var(--prpl-color-text)',
+		fontSize: '1rem',
+		margin: 0,
+		fontWeight: 500,
+	};
+
+	const titleSpanStyle = {
+		textDecoration: 'none',
+		backgroundImage: 'linear-gradient(#000, #000)',
+		backgroundRepeat: 'no-repeat',
+		backgroundPosition: 'center left',
+		backgroundSize: isCelebrating ? '100% 1px' : '0% 1px',
+		transition: 'background-size 500ms ease-in-out',
+	};
+
+	const pointsWrapperStyle = {
+		display: 'flex',
+		gap: '0.5rem',
+		alignItems: 'center',
+		justifyContent: 'flex-end',
+		gridRowEnd: 'span 2',
+	};
+
+	const pointsBadgeStyle = {
+		fontSize: 'var(--prpl-font-size-xs)',
+		fontWeight: 700,
+		color: 'var(--prpl-text-point)',
+		backgroundColor: 'var(--prpl-background-point)',
+		width: '1.5rem',
+		height: '1.5rem',
+		borderRadius: '50%',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	};
+
+	const buttonStyle = {
+		padding: '0.1rem',
+		lineHeight: 0,
+		margin: 0,
+		background: 'none',
+		border: 'none',
+		cursor: 'pointer',
+	};
+
+	const trashButtonStyle = {
+		...buttonStyle,
+		padding: 0,
+		color: 'var(--prpl-color-ui-icon)',
+		boxShadow: 'none',
+		marginTop: '1px',
+	};
+
+	const moveButtonsWrapperStyle = {
+		position: 'absolute',
+		left: 'calc(-8px - 0.5rem)',
+		top: '50%',
+		transform: 'translateY(-50%)',
+		padding: '10px 10px 10px 0',
+	};
+
+	const moveButtonsStyle = {
+		display: 'flex',
+		width: '100%',
+		gap: 0,
+		flexDirection: 'column',
+		alignItems: 'center',
+		justifyContent: 'center',
+	};
+
+	const moveButtonStyle = {
+		...buttonStyle,
+		padding: 0,
+		height: '0.75rem',
+		color: 'var(--prpl-color-ui-icon)',
+		boxShadow: 'none',
+		marginTop: '1px',
+	};
+
+	const actionsWrapperStyle = {
+		gridColumn: '2 / span 1',
+		display: 'flex',
+	};
+
 	return (
 		<li
 			className={ className }
+			style={ taskItemStyle }
 			data-task-id={ taskId }
 			data-post-id={ task.id }
 			data-task-action={ getTaskAction() }
@@ -185,15 +304,18 @@ export default function TaskItem( {
 			data-task-points={ task.prpl_points || 0 }
 			data-task-order={ task.menu_order || 0 }
 		>
-			<div className="prpl-suggested-task-checkbox-wrapper">
+			<div
+				className="prpl-suggested-task-checkbox-wrapper"
+				style={ checkboxWrapperStyle }
+			>
 				{ isUserTask ? (
 					// eslint-disable-next-line jsx-a11y/label-has-associated-control -- Checkbox is nested inside label.
-					<label>
+					<label style={ checkboxWrapperStyle }>
 						<input
 							type="checkbox"
 							className="prpl-suggested-task-checkbox"
 							onChange={ handleCheckboxChange }
-							style={ { margin: 0 } }
+							style={ { margin: 0, flexShrink: 0 } }
 							checked={ isCompleted }
 							disabled={ isCelebrating }
 						/>
@@ -207,8 +329,11 @@ export default function TaskItem( {
 				) }
 			</div>
 
-			<div className="prpl-suggested-task-title-wrapper">
-				<h3 className="prpl-task-title">
+			<div
+				className="prpl-suggested-task-title-wrapper"
+				style={ titleWrapperStyle }
+			>
+				<h3 className="prpl-task-title" style={ titleStyle }>
 					{ isUserTask ? (
 						<span
 							ref={ titleRef }
@@ -223,12 +348,14 @@ export default function TaskItem( {
 							onKeyDown={ handleTitleKeyDown }
 							onInput={ handleTitleInput }
 							suppressContentEditableWarning
+							style={ titleSpanStyle }
 							dangerouslySetInnerHTML={ {
 								__html: task.title?.rendered || task.title,
 							} }
 						/>
 					) : (
 						<span
+							style={ titleSpanStyle }
 							dangerouslySetInnerHTML={ {
 								__html: task.title?.rendered || task.title,
 							} }
@@ -237,9 +364,15 @@ export default function TaskItem( {
 				</h3>
 			</div>
 
-			<div className="prpl-suggested-task-points-wrapper">
+			<div
+				className="prpl-suggested-task-points-wrapper"
+				style={ pointsWrapperStyle }
+			>
 				{ task.prpl_points > 0 && (
-					<span className="prpl-suggested-task-points">
+					<span
+						className="prpl-suggested-task-points"
+						style={ pointsBadgeStyle }
+					>
 						+{ task.prpl_points }
 					</span>
 				) }
@@ -248,6 +381,7 @@ export default function TaskItem( {
 					<button
 						type="button"
 						className="prpl-suggested-task-button trash"
+						style={ trashButtonStyle }
 						data-post-id={ task.id }
 						title={ __( 'Delete', 'progress-planner' ) }
 						onClick={ handleTrash }
@@ -261,11 +395,15 @@ export default function TaskItem( {
 			</div>
 
 			{ isUserTask && (
-				<div className="tooltip-actions prpl-move-buttons-wrapper">
-					<span className="prpl-move-buttons">
+				<div
+					className="tooltip-actions prpl-move-buttons-wrapper"
+					style={ moveButtonsWrapperStyle }
+				>
+					<span className="prpl-move-buttons" style={ moveButtonsStyle }>
 						<button
 							type="button"
 							className="prpl-suggested-task-button move-up"
+							style={ moveButtonStyle }
 							data-task-id={ taskId }
 							data-task-title={
 								task.title?.rendered || task.title
@@ -283,6 +421,7 @@ export default function TaskItem( {
 						<button
 							type="button"
 							className="prpl-suggested-task-button move-down"
+							style={ moveButtonStyle }
 							data-task-id={ taskId }
 							data-task-title={
 								task.title?.rendered || task.title
@@ -301,7 +440,10 @@ export default function TaskItem( {
 				</div>
 			) }
 
-			<div className="prpl-suggested-task-actions-wrapper">
+			<div
+				className="prpl-suggested-task-actions-wrapper"
+				style={ actionsWrapperStyle }
+			>
 				<TaskActions
 					task={ task }
 					isUserTask={ isUserTask }

@@ -1,25 +1,18 @@
+/**
+ * What's New widget.
+ *
+ * Core styles migrated to React inline in WhatsNew/index.js
+ * Only CSS-only features (hover states) remain here.
+ */
+
+/* Hover states - CSS-only features */
 .prpl-widget-wrapper.prpl-whats-new {
-
-	ul {
-		margin: 0;
-
-		p {
-			margin: 0;
-		}
-	}
 
 	li {
 
 		h3 {
-			margin-top: 0;
-			font-size: var(--prpl-font-size-lg);
-			line-height: 1.25;
-			font-weight: 600;
-			margin-bottom: 6px;
 
 			> a {
-				color: var(--prpl-color-headings);
-				text-decoration: none;
 
 				.prpl-external-link-icon {
 					margin-inline-start: 0.15em;
@@ -38,12 +31,8 @@
 	}
 
 	.prpl-widget-footer {
-		display: flex;
-		justify-content: flex-end;
 
 		a {
-			color: var(--prpl-color-link);
-			text-decoration: underline;
 
 			&:hover {
 				color: var(--prpl-color-link-hover);
@@ -54,15 +43,6 @@
 }
 
 .prpl-blog-post-image {
-	width: 100%;
-	min-height: 120px;
-	aspect-ratio: 3 / 2;
-	background-size: cover;
-	margin-bottom: 0.75rem;
-	border-radius: var(--prpl-border-radius-big);
-	border: 1px solid var(--prpl-color-border);
-	background-color: var(--prpl-color-gauge-remain); /* Fallback, if remote host image is not accessible */
-	transition: transform 0.2s, box-shadow 0.2s;
 
 	&:hover {
 		transform: scale(1.01);

@@ -110,33 +110,70 @@ export default function TaskActions( {
 	// Get task actions from API response.
 	const taskActions = task.prpl_task_actions || [];
 
+	// Inline styles.
+	const actionsStyle = {
+		paddingTop: '2px',
+		gap: '0.4rem',
+		alignItems: 'baseline',
+	};
+
+	const actionStyle = {
+		display: 'inline-flex',
+		position: 'relative',
+		textDecoration: 'none',
+	};
+
+	const actionTextStyle = {
+		lineHeight: 1,
+		fontSize: 'var(--prpl-font-size-small)',
+		color: 'var(--prpl-color-link)',
+	};
+
+	const buttonStyle = {
+		textDecoration: 'none',
+		padding: 0,
+		lineHeight: 1,
+		background: 'none',
+		border: 'none',
+		cursor: 'pointer',
+	};
+
 	// If no actions and not a user task, return empty.
 	if ( taskActions.length === 0 && ! isUserTask ) {
-		return <div className="tooltip-actions"></div>;
+		return <div className="tooltip-actions" style={ actionsStyle }></div>;
 	}
 
 	return (
-		<div className="tooltip-actions" ref={ actionsRef }>
+		<div
+			className="tooltip-actions"
+			style={ actionsStyle }
+			ref={ actionsRef }
+		>
 			{ /* Render pre-built HTML actions from the API */ }
 			{ taskActions.map( ( actionHTML, index ) => (
 				<span
 					key={ index }
 					className="tooltip-action"
+					style={ actionStyle }
 					dangerouslySetInnerHTML={ { __html: actionHTML } }
 				/>
 			) ) }
 
 			{ /* Add delete button for user tasks */ }
 			{ isUserTask && (
-				<span className="tooltip-action">
+				<span className="tooltip-action" style={ actionStyle }>
 					<button
 						type="button"
 						className="prpl-suggested-task-button trash"
+						style={ buttonStyle }
 						data-post-id={ task.id }
 						title={ __( 'Delete', 'progress-planner' ) }
 						onClick={ () => onDelete( task.id ) }
 					>
-						<span className="prpl-tooltip-action-text">
+						<span
+							className="prpl-tooltip-action-text"
+							style={ actionTextStyle }
+						>
 							{ __( 'Delete', 'progress-planner' ) }
 						</span>
 						<span className="screen-reader-text">

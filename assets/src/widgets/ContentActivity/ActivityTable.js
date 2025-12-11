@@ -31,6 +31,11 @@ export default function ActivityTable( {
 		padding: '0.5em',
 	};
 
+	const bodyCellStyle = {
+		...cellStyle,
+		fontWeight: 400,
+	};
+
 	const centeredCellStyle = {
 		...cellStyle,
 		textAlign: 'center',
@@ -81,7 +86,7 @@ export default function ActivityTable( {
 						>
 							<th
 								className="prpl-content-activity__table-cell"
-								style={ cellStyle }
+								style={ bodyCellStyle }
 							>
 								{ activityTypes[ key ].label }
 							</th>
