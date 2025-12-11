@@ -76,12 +76,12 @@ export default function TodoWidget() {
 				} );
 
 				// Sort pending tasks: golden tasks (prpl_points === 1) first, then by menu_order
-				pending = sortTasksWithGoldenFirst( pending );
+				const sortedPending = sortTasksWithGoldenFirst( pending );
 				completed.sort(
 					( a, b ) => ( a.menu_order || 0 ) - ( b.menu_order || 0 )
 				);
 
-				setPendingTasks( pending );
+				setPendingTasks( sortedPending );
 				setCompletedTasks( completed );
 			} catch ( error ) {
 				// eslint-disable-next-line no-console
