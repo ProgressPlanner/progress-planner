@@ -150,9 +150,9 @@ export default function TaskActions( {
 			ref={ actionsRef }
 		>
 			{ /* Render pre-built HTML actions from the API */ }
-			{ taskActions.map( ( actionHTML, index ) => (
+			{ taskActions.map( ( actionHTML, actionIndex ) => (
 				<span
-					key={ index }
+					key={ actionIndex }
 					className="tooltip-action"
 					style={ actionStyle }
 					dangerouslySetInnerHTML={ { __html: actionHTML } }

@@ -2,6 +2,7 @@
  * Tasks API Hook.
  *
  * Provides functions for interacting with the tasks REST API.
+ * Used by both SuggestedTasks and TodoWidget.
  */
 
 import apiFetch from '@wordpress/api-fetch';
@@ -88,6 +89,35 @@ export async function fetchTasks( {
 		console.error( 'Error fetching tasks:', error );
 		return [];
 	}
+}
+
+/**
+ * Create a new task.
+ *
+ * @param {Object} options            Create options.
+ * @param {string} options.title      Task title.
+ * @param {number} options.menuOrder  Menu order for sorting.
+ * @param {number} options.providerId Provider taxonomy term ID.
+ * @param {number} options.points     Points value (default 0).
+ * @return {Promise<Object>} Promise resolving to the created task.
+ */
+export async function createTask( {
+	title,
+	menuOrder = 0,
+	providerId,
+	points = 0,
+} ) {
+	return apiFetch( {
+		path: '/wp/v2/prpl_recommendations',
+		method: 'POST',
+		data: {
+			title,
+			status: 'publish',
+			menu_order: menuOrder,
+			prpl_recommendations_provider: providerId,
+			prpl_points: points,
+		},
+	} );
 }
 
 /**

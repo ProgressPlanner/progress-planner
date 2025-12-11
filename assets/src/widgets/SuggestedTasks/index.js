@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import TaskItem from './TaskItem';
+import TaskItem from '../../components/TaskItem';
 import PopoverManager from './PopoverManager';
 import {
 	fetchTasks,
@@ -15,7 +15,7 @@ import {
 	deleteTask,
 	updateTask,
 	sendTaskAction,
-} from './hooks/useTasksApi';
+} from '../../hooks/useTasksApi';
 import { useGridMasonry } from '../../hooks/useGridMasonry';
 
 /**
@@ -376,7 +376,7 @@ export default function SuggestedTasks() {
 	if ( isLoading ) {
 		return (
 			<p className="prpl-suggested-tasks-loading" style={ loadingStyle }>
-				{ __( 'Loading tasks…', 'progress-planner' ) }
+				{ __( 'Loading tasks...', 'progress-planner' ) }
 			</p>
 		);
 	}
@@ -437,6 +437,7 @@ export default function SuggestedTasks() {
 					id="prpl-toggle-all-recommendations"
 					className="prpl-toggle-all-recommendations-button"
 					style={ toggleButtonStyle }
+					data-show-all={ showAll ? '1' : '0' }
 					onClick={ handleToggleShowAll }
 				>
 					{ showAll

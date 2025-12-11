@@ -12,7 +12,7 @@ import {
 	submitPluginSettings,
 	deletePost,
 	closePopover,
-} from './hooks/usePopoverForms';
+} from '../../hooks/usePopoverForms';
 
 /**
  * Popover configuration for each task type.

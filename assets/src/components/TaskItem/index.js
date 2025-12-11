@@ -2,6 +2,7 @@
  * Task Item Component.
  *
  * Renders a single task item with its controls.
+ * Shared between SuggestedTasks and TodoWidget.
  */
 
 import { useRef, useCallback } from '@wordpress/element';
@@ -65,23 +66,29 @@ function TrashIcon() {
 /**
  * Task Item component.
  *
- * @param {Object}   props               Component props.
- * @param {Object}   props.task          The task object.
- * @param {boolean}  props.isUserTask    Whether this is a user task.
- * @param {boolean}  props.isCelebrating Whether the task is being celebrated.
- * @param {number}   props.index         The index of the task in the list.
- * @param {Function} props.onComplete    Callback for completing a task.
- * @param {Function} props.onSnooze      Callback for snoozing a task.
- * @param {Function} props.onDelete      Callback for deleting a task.
- * @param {Function} props.onMove        Callback for moving a task.
- * @param {Function} props.onTitleChange Callback for changing the title.
+ * @param {Object}   props                 Component props.
+ * @param {Object}   props.task            The task object.
+ * @param {boolean}  props.isUserTask      Whether this is a user task.
+ * @param {boolean}  props.isCelebrating   Whether the task is being celebrated.
+ * @param {boolean}  props.isCompleted     Whether the task is completed (for TodoWidget).
+ * @param {number}   props.index           The index of the task in the list.
+ * @param {boolean}  props.showMoveButtons Whether to show move up/down buttons.
+ * @param {boolean}  props.showActions     Whether to show task actions row.
+ * @param {Function} props.onComplete      Callback for completing a task.
+ * @param {Function} props.onSnooze        Callback for snoozing a task.
+ * @param {Function} props.onDelete        Callback for deleting a task.
+ * @param {Function} props.onMove          Callback for moving a task.
+ * @param {Function} props.onTitleChange   Callback for changing the title.
  * @return {JSX.Element} The task item component.
  */
 export default function TaskItem( {
 	task,
 	isUserTask,
 	isCelebrating,
+	isCompleted = false,
 	index = 0,
+	showMoveButtons = true,
+	showActions = true,
 	onComplete,
 	onSnooze,
 	onDelete,
@@ -99,11 +106,15 @@ export default function TaskItem( {
 		if ( isCelebrating ) {
 			return 'celebrate';
 		}
+		if ( isCompleted ) {
+			return 'completed';
+		}
 		return '';
 	};
 
 	// Check if task is completed (for user tasks).
-	const isCompleted = task.status === 'trash' || task.status === 'pending';
+	const taskIsCompleted =
+		isCompleted || task.status === 'trash' || task.status === 'pending';
 
 	/**
 	 * Handle checkbox change for user tasks.
@@ -167,7 +178,7 @@ export default function TaskItem( {
 	const taskId = task.slug || task.id;
 
 	// Get the provider slug.
-	const providerSlug = task.prpl_provider?.slug || '';
+	const providerSlug = task.prpl_provider?.slug || ( isUserTask ? 'user' : '' );
 
 	// Build the class name.
 	const className = [
@@ -213,6 +224,7 @@ export default function TaskItem( {
 		fontSize: '1rem',
 		margin: 0,
 		fontWeight: 500,
+		...( isCompleted ? { textDecoration: 'line-through' } : {} ),
 	};
 
 	const titleSpanStyle = {
@@ -316,7 +328,7 @@ export default function TaskItem( {
 							className="prpl-suggested-task-checkbox"
 							onChange={ handleCheckboxChange }
 							style={ { margin: 0, flexShrink: 0 } }
-							checked={ isCompleted }
+							checked={ taskIsCompleted }
 							disabled={ isCelebrating }
 						/>
 						<span className="screen-reader-text">
@@ -334,7 +346,7 @@ export default function TaskItem( {
 				style={ titleWrapperStyle }
 			>
 				<h3 className="prpl-task-title" style={ titleStyle }>
-					{ isUserTask ? (
+					{ isUserTask && ! isCompleted ? (
 						<span
 							ref={ titleRef }
 							contentEditable="plaintext-only"
@@ -368,7 +380,7 @@ export default function TaskItem( {
 				className="prpl-suggested-task-points-wrapper"
 				style={ pointsWrapperStyle }
 			>
-				{ task.prpl_points > 0 && (
+				{ ( task.prpl_points || 0 ) > 0 && (
 					<span
 						className="prpl-suggested-task-points"
 						style={ pointsBadgeStyle }
@@ -394,7 +406,7 @@ export default function TaskItem( {
 				) }
 			</div>
 
-			{ isUserTask && (
+			{ isUserTask && showMoveButtons && ! isCompleted && (
 				<div
 					className="tooltip-actions prpl-move-buttons-wrapper"
 					style={ moveButtonsWrapperStyle }
@@ -440,18 +452,20 @@ export default function TaskItem( {
 				</div>
 			) }
 
-			<div
-				className="prpl-suggested-task-actions-wrapper"
-				style={ actionsWrapperStyle }
-			>
-				<TaskActions
-					task={ task }
-					isUserTask={ isUserTask }
-					onComplete={ onComplete }
-					onSnooze={ onSnooze }
-					onDelete={ onDelete }
-				/>
-			</div>
+			{ showActions && (
+				<div
+					className="prpl-suggested-task-actions-wrapper"
+					style={ actionsWrapperStyle }
+				>
+					<TaskActions
+						task={ task }
+						isUserTask={ isUserTask }
+						onComplete={ onComplete }
+						onSnooze={ onSnooze }
+						onDelete={ onDelete }
+					/>
+				</div>
+			) }
 		</li>
 	);
 }
