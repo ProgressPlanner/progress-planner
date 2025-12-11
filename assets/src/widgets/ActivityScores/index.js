@@ -31,8 +31,8 @@ function getStreakMessage( maxStreak, currentStreak ) {
 		return sprintf(
 			// translators: %s: number of weeks.
 			_n(
-				"Congratulations! You're on a streak! You've consistently maintained your website for the past %s week!",
-				"Congratulations! You're on a streak! You've consistently maintained your website for the past %s weeks!",
+				"Congratulations! You're on a streak! You've consistently maintained your website for the past %s week! 🎉",
+				"Congratulations! You're on a streak! You've consistently maintained your website for the past %s weeks! 🎉",
 				currentStreak,
 				'progress-planner'
 			),
