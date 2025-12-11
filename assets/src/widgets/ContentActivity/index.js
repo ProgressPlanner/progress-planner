@@ -101,6 +101,13 @@ export default function ContentActivity() {
 
 	return (
 		<div className="prpl-content-activity">
+			<p>
+				{ data.i18n?.description ||
+					__(
+						'Here are the updates you made to your content last week. Whether you published something new, updated an existing post, or removed outdated content, it all helps you stay on top of your site!',
+						'progress-planner'
+					) }
+			</p>
 			<BigCounter
 				number={ data.totalCount }
 				label={
@@ -109,10 +116,7 @@ export default function ContentActivity() {
 				}
 				backgroundColor="var(--prpl-background-content)"
 			/>
-			<div
-				className="prpl-content-activity__graph-wrapper"
-				style={ graphWrapperStyle }
-			>
+			<div className="prpl-graph-wrapper" style={ graphWrapperStyle }>
 				<LineChart
 					data={ data.chartData }
 					options={ data.chartOptions }
