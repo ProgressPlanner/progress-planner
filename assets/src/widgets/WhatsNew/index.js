@@ -96,15 +96,14 @@ export default function WhatsNew() {
 	return (
 		<Fragment>
 			<hr />
-			<ul className="prpl-whats-new__list" style={ listStyle }>
+			<ul style={ listStyle }>
 				{ posts.map( ( post, index ) => (
-					<li key={ index } className="prpl-whats-new__item">
+					<li key={ index }>
 						{ post.imageUrl && (
 							<a
 								href={ post.link }
 								target="_blank"
 								rel="noopener noreferrer"
-								className="prpl-whats-new__image-link"
 							>
 								<div
 									className="prpl-blog-post-image"
@@ -115,10 +114,7 @@ export default function WhatsNew() {
 								/>
 							</a>
 						) }
-						<h3
-							className="prpl-whats-new__title"
-							style={ titleStyle }
-						>
+						<h3 style={ titleStyle }>
 							<a
 								href={ post.link }
 								target="_blank"
@@ -128,10 +124,7 @@ export default function WhatsNew() {
 								{ post.title }
 							</a>
 						</h3>
-						<p
-							className="prpl-whats-new__excerpt"
-							style={ excerptStyle }
-						>
+						<p style={ excerptStyle }>
 							{ post.excerpt }
 						</p>
 						<hr />
