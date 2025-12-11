@@ -2,7 +2,7 @@
 Contributors: joostdevalk, aristath, filipi, jonoaldersonwp, mariekerakt, irisguelen, samalderson, tacoverdo
 Tags: planning, maintenance, writing, blogging
 Requires at least: 6.6
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.4
 Stable tag: 1.9.0
 License: GPL3+
