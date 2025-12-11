@@ -50,12 +50,33 @@ final class ToDo extends Widget {
 		$user_provider_term = \get_term_by( 'slug', 'user', 'prpl_recommendations_provider' );
 		$user_provider_id   = $user_provider_term ? $user_provider_term->term_id : 0;
 
+		// Get widget title (may be custom branded or default).
+		$widget_title = \progress_planner()->get_ui__branding()->get_widget_title(
+			'todo',
+			\esc_html__( 'My to-do list', 'progress-planner' )
+		);
+
+		// Get widget descriptions.
+		$golden_task_description = \esc_html__( 'Write down all your tasks you want to get done on your website! You\'ll earn points for your \'golden task\'. ', 'progress-planner' );
+		$silver_task_description = \esc_html__( 'Write down all your tasks you want to get done on your website! The top task will become your \'golden task\' next week. ', 'progress-planner' );
+
+		// Get info icon SVG content.
+		$info_icon_svg = \progress_planner()->get_asset( 'images/icon_info.svg' );
+
+		// Get tooltip content.
+		$tooltip_content = \esc_html__( 'Every Monday, your top task becomes the golden task for the week. Complete it anytime this week to earn points toward your monthly total! Once done, the next task is highlighted to become your golden task next week.', 'progress-planner' );
+
 		\wp_localize_script(
 			'progress-planner/todo',
 			'prplTodoConfig',
 			[
-				'nonce'          => \wp_create_nonce( 'wp_rest' ),
-				'userProviderId' => $user_provider_id,
+				'nonce'                  => \wp_create_nonce( 'wp_rest' ),
+				'userProviderId'         => $user_provider_id,
+				'title'                  => $widget_title,
+				'goldenTaskDescription'  => $golden_task_description,
+				'silverTaskDescription'  => $silver_task_description,
+				'infoIconSvg'            => $info_icon_svg,
+				'tooltipContent'         => $tooltip_content,
 			]
 		);
 

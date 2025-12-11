@@ -188,30 +188,43 @@ export default function MonthlyBadges() {
 		color: 'var(--prpl-color-alert-error)',
 	};
 
+	// Get title from config or use default.
+	const widgetTitle =
+		window.prplMonthlyBadgesConfig?.title ||
+		__( 'Your monthly badge', 'progress-planner' );
+
 	if ( isLoading ) {
 		return (
-			<div
-				className="prpl-monthly-badges prpl-monthly-badges--loading"
-				style={ loadingStyle }
-			>
-				{ __( 'Loading…', 'progress-planner' ) }
-			</div>
+			<>
+				<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+				<div
+					className="prpl-monthly-badges prpl-monthly-badges--loading"
+					style={ loadingStyle }
+				>
+					{ __( 'Loading…', 'progress-planner' ) }
+				</div>
+			</>
 		);
 	}
 
 	if ( error ) {
 		return (
-			<div
-				className="prpl-monthly-badges prpl-monthly-badges--error"
-				style={ errorStyle }
-			>
-				{ error }
-			</div>
+			<>
+				<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+				<div
+					className="prpl-monthly-badges prpl-monthly-badges--error"
+					style={ errorStyle }
+				>
+					{ error }
+				</div>
+			</>
 		);
 	}
 
 	return (
-		<div className="prpl-monthly-badges" style={ containerStyle }>
+		<>
+			<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+			<div className="prpl-monthly-badges" style={ containerStyle }>
 			{ /* Main gauge with current badge */ }
 			<Gauge value={ gaugeValue } max={ maxPoints }>
 				{ currentBadge && (
@@ -279,6 +292,7 @@ export default function MonthlyBadges() {
 					</div>
 				</>
 			) }
-		</div>
+			</div>
+		</>
 	);
 }

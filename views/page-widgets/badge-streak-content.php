@@ -10,20 +10,6 @@ if ( ! \defined( 'ABSPATH' ) ) {
 }
 ?>
 
-<h2 class="prpl-widget-title">
-	<?php
-	echo \progress_planner()->get_ui__branding()->get_widget_title( // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-		'badge-streak-content',
-		\esc_html__( 'Your content badges', 'progress-planner' )
-	);
-	\progress_planner()->get_ui__popover()->the_popover( 'badge-streak' )->render_button(
-		'',
-		'<span class="icon prpl-info-icon">' . \progress_planner()->get_asset( 'images/icon_info.svg' ) . '</span> <span class="screen-reader-text">' . \esc_html__( 'More info', 'progress-planner' ) . '</span>'
-	);
-	\progress_planner()->get_ui__popover()->the_popover( 'badge-streak' )->render();
-	?>
-</h2>
-
 <div id="prpl-content-badges-root"></div>
 
 <?php

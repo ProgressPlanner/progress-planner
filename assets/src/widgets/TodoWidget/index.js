@@ -419,8 +419,54 @@ export default function TodoWidget() {
 		fontSize: 'var(--prpl-font-size-small)',
 	};
 
+	// Get title, descriptions, and tooltip from config or use defaults.
+	const widgetTitle =
+		window.prplTodoConfig?.title ||
+		__( 'My to-do list', 'progress-planner' );
+	const goldenTaskDescription =
+		window.prplTodoConfig?.goldenTaskDescription ||
+		__( 'Write down all your tasks you want to get done on your website! You\'ll earn points for your \'golden task\'. ', 'progress-planner' );
+	const silverTaskDescription =
+		window.prplTodoConfig?.silverTaskDescription ||
+		__( 'Write down all your tasks you want to get done on your website! The top task will become your \'golden task\' next week. ', 'progress-planner' );
+	const infoIconSvg = window.prplTodoConfig?.infoIconSvg;
+	const tooltipContent =
+		window.prplTodoConfig?.tooltipContent ||
+		__( 'Every Monday, your top task becomes the golden task for the week. Complete it anytime this week to earn points toward your monthly total! Once done, the next task is highlighted to become your golden task next week.', 'progress-planner' );
+
 	return (
 		<>
+			<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+			<p className="prpl-widget-description">
+				<span className="prpl-todo-golden-task-description">
+					{ goldenTaskDescription }
+				</span>
+				<span className="prpl-todo-silver-task-description">
+					{ silverTaskDescription }
+				</span>
+				<span className="tooltip-actions" style={ { display: 'inline-flex', verticalAlign: 'text-top' } }>
+					<prpl-tooltip>
+						<slot name="open-icon">
+							<span className="icon prpl-info-icon">
+								{ infoIconSvg && (
+									<span
+										dangerouslySetInnerHTML={ {
+											__html: infoIconSvg,
+										} }
+									/>
+								) }
+								<span className="screen-reader-text">
+									{ __( 'More info', 'progress-planner' ) }
+								</span>
+							</span>
+						</slot>
+						<slot name="content">
+							{ tooltipContent }
+						</slot>
+					</prpl-tooltip>
+				</span>
+			</p>
+
 			<div
 				id="todo-aria-live-region"
 				aria-live="polite"

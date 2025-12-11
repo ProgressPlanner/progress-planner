@@ -76,6 +76,23 @@ final class Suggested_Tasks extends Widget {
 		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? \sanitize_text_field( \wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 		$show_all    = false !== \strpos( $request_uri, 'prpl_show_all_recommendations' );
 
+		// Get widget title (may be custom branded or default).
+		$widget_title = \progress_planner()->get_ui__branding()->get_widget_title(
+			'suggested-tasks',
+			\sprintf(
+				/* translators: %s: Ravi's name. */
+				\esc_html__( '%s\'s Recommendations', 'progress-planner' ),
+				\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
+			)
+		);
+
+		// Get widget description.
+		$widget_description = \sprintf(
+			/* translators: %s: Ravi's name. */
+			\esc_html__( 'Complete a task from %s\'s Recommendations to improve your site and earn points toward this month\'s badge!', 'progress-planner' ),
+			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
+		);
+
 		\wp_localize_script(
 			'progress-planner/suggested-tasks',
 			'prplSuggestedTasksConfig',
@@ -86,6 +103,8 @@ final class Suggested_Tasks extends Widget {
 				'showAll'          => $show_all,
 				'ajaxUrl'          => \admin_url( 'admin-ajax.php' ),
 				'delayCelebration' => ! \progress_planner()->is_on_progress_planner_dashboard_page(),
+				'title'            => $widget_title,
+				'description'      => $widget_description,
 			]
 		);
 

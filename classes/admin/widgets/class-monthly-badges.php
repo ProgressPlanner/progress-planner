@@ -87,5 +87,19 @@ final class Monthly_Badges extends Widget {
 			$asset['version'],
 			true
 		);
+
+		// Get widget title (may be custom branded or default).
+		$widget_title = \progress_planner()->get_ui__branding()->get_widget_title(
+			'monthly-badges',
+			\esc_html__( 'Your monthly badge', 'progress-planner' )
+		);
+
+		\wp_localize_script(
+			'progress-planner/monthly-badges',
+			'prplMonthlyBadgesConfig',
+			[
+				'title' => $widget_title,
+			]
+		);
 	}
 }

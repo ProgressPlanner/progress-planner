@@ -5,7 +5,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import TaskItem from '../../components/TaskItem';
 import PopoverManager from './PopoverManager';
 import {
@@ -377,12 +377,38 @@ export default function SuggestedTasks() {
 		fontFamily: 'inherit',
 	};
 
+	// Get title and description from config or use defaults.
+	const widgetTitle =
+		window.prplSuggestedTasksConfig?.title ||
+		sprintf(
+			/* translators: %s: Ravi's name. */
+			__( '%s\'s Recommendations', 'progress-planner' ),
+			window.prplSuggestedTasksConfig?.raviName || 'Ravi'
+		);
+
+	const widgetDescription =
+		window.prplSuggestedTasksConfig?.description ||
+		sprintf(
+			/* translators: %s: Ravi's name. */
+			__(
+				'Complete a task from %s\'s Recommendations to improve your site and earn points toward this month\'s badge!',
+				'progress-planner'
+			),
+			window.prplSuggestedTasksConfig?.raviName || 'Ravi'
+		);
+
 	// Show loading state.
 	if ( isLoading ) {
 		return (
-			<p className="prpl-suggested-tasks-loading" style={ loadingStyle }>
-				{ __( 'Loading tasks...', 'progress-planner' ) }
-			</p>
+			<>
+				<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+				<p className="prpl-suggested-tasks-widget-description">
+					{ widgetDescription }
+				</p>
+				<p className="prpl-suggested-tasks-loading" style={ loadingStyle }>
+					{ __( 'Loading tasks...', 'progress-planner' ) }
+				</p>
+			</>
 		);
 	}
 
@@ -390,6 +416,10 @@ export default function SuggestedTasks() {
 	if ( tasks.length === 0 ) {
 		return (
 			<>
+				<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+				<p className="prpl-suggested-tasks-widget-description">
+					{ widgetDescription }
+				</p>
 				<ul
 					id="prpl-suggested-tasks-list"
 					className="prpl-suggested-tasks-list"
@@ -413,6 +443,10 @@ export default function SuggestedTasks() {
 
 	return (
 		<>
+			<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+			<p className="prpl-suggested-tasks-widget-description">
+				{ widgetDescription }
+			</p>
 			<PopoverManager tasks={ tasks } onComplete={ handleComplete } />
 			<ul style={ { display: 'none' } }></ul>
 			<ul

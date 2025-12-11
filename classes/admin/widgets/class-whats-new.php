@@ -40,6 +40,20 @@ final class Whats_New extends Widget {
 			$asset['version'],
 			true
 		);
+
+		// Get widget title (may be custom branded or default).
+		$widget_title = \progress_planner()->get_ui__branding()->get_widget_title(
+			'whats-new',
+			\esc_html__( 'What\'s new on the Progress Planner blog', 'progress-planner' )
+		);
+
+		\wp_localize_script(
+			'progress-planner/whats-new',
+			'prplWhatsNewConfig',
+			[
+				'title' => $widget_title,
+			]
+		);
 	}
 
 	/**

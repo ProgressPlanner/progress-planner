@@ -30,10 +30,16 @@ export default function WhatsNew() {
 			} );
 	}, [] );
 
+	// Get title from config or use default.
+	const widgetTitle =
+		window.prplWhatsNewConfig?.title ||
+		__( 'What\'s new on the Progress Planner blog', 'progress-planner' );
+
 	// Show loading state.
 	if ( isLoading ) {
 		return (
 			<Fragment>
+				<h2 className="prpl-widget-title">{ widgetTitle }</h2>
 				<hr />
 				<p className="prpl-whats-new__loading">
 					{ __( 'Loading…', 'progress-planner' ) }
@@ -95,6 +101,7 @@ export default function WhatsNew() {
 
 	return (
 		<Fragment>
+			<h2 className="prpl-widget-title">{ widgetTitle }</h2>
 			<hr />
 			<ul style={ listStyle }>
 				{ posts.map( ( post, index ) => (

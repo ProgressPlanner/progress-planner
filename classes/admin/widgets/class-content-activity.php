@@ -43,6 +43,20 @@ final class Content_Activity extends Widget {
 			$asset['version'],
 			true
 		);
+
+		// Get widget title (may be custom branded or default).
+		$widget_title = \progress_planner()->get_ui__branding()->get_widget_title(
+			'content-activity',
+			\esc_html__( 'Content activity', 'progress-planner' )
+		);
+
+		\wp_localize_script(
+			'progress-planner/content-activity',
+			'prplContentActivityConfig',
+			[
+				'title' => $widget_title,
+			]
+		);
 	}
 
 	/**

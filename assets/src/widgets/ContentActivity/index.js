@@ -95,12 +95,18 @@ export default function ContentActivity() {
 		return null;
 	}
 
+	// Get title from config or use default.
+	const widgetTitle =
+		window.prplContentActivityConfig?.title ||
+		__( 'Content activity', 'progress-planner' );
+
 	const graphWrapperStyle = {
 		marginBottom: 'var(--prpl-padding)',
 	};
 
 	return (
 		<div className="prpl-content-activity">
+			<h2 className="prpl-widget-title">{ widgetTitle }</h2>
 			<p>
 				{ data.i18n?.description ||
 					__(
