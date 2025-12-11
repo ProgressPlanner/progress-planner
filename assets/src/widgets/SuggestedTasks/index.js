@@ -21,14 +21,14 @@ import { useGridMasonry } from '../../hooks/useGridMasonry';
 /**
  * Suggested Tasks widget component.
  *
+ * @param {Object} props        - Component props.
+ * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The widget component.
  */
-export default function SuggestedTasks() {
+export default function SuggestedTasks( { config = {} } ) {
 	const [ tasks, setTasks ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
-	const [ showAll, setShowAll ] = useState(
-		window.prplSuggestedTasksConfig?.showAll || false
-	);
+	const [ showAll, setShowAll ] = useState( config?.showAll || false );
 	const [ celebratingTaskIds, setCelebratingTaskIds ] = useState( new Set() );
 	const listRef = useRef( null );
 	const injectedTaskIdsRef = useRef( new Set() );
@@ -42,9 +42,7 @@ export default function SuggestedTasks() {
 	useEffect( () => {
 		const loadTasks = async () => {
 			try {
-				const perPage = showAll
-					? 100
-					: window.prplSuggestedTasksConfig?.perPage || 5;
+				const perPage = showAll ? 100 : config?.perPage || 5;
 
 				// Fetch published tasks (excluding user tasks).
 				const publishedTasks = await fetchTasks( {
@@ -62,7 +60,7 @@ export default function SuggestedTasks() {
 				setIsLoading( false );
 
 				// Check for pending celebration tasks.
-				if ( ! window.prplSuggestedTasksConfig?.delayCelebration ) {
+				if ( ! config?.delayCelebration ) {
 					const pendingTasks = await fetchTasks( {
 						status: 'pending',
 						perPage,
@@ -131,7 +129,7 @@ export default function SuggestedTasks() {
 		};
 
 		loadTasks();
-	}, [ showAll ] );
+	}, [ showAll, config ] );
 
 	/**
 	 * Handle task completion.
@@ -379,22 +377,22 @@ export default function SuggestedTasks() {
 
 	// Get title and description from config or use defaults.
 	const widgetTitle =
-		window.prplSuggestedTasksConfig?.title ||
+		config?.title ||
 		sprintf(
 			/* translators: %s: Ravi's name. */
 			__( "%s's Recommendations", 'progress-planner' ),
-			window.prplSuggestedTasksConfig?.raviName || 'Ravi'
+			config?.raviName || 'Ravi'
 		);
 
 	const widgetDescription =
-		window.prplSuggestedTasksConfig?.description ||
+		config?.description ||
 		sprintf(
 			/* translators: %s: Ravi's name. */
 			__(
 				"Complete a task from %s's Recommendations to improve your site and earn points toward this month's badge!",
 				'progress-planner'
 			),
-			window.prplSuggestedTasksConfig?.raviName || 'Ravi'
+			config?.raviName || 'Ravi'
 		);
 
 	// Show loading state.
@@ -450,7 +448,11 @@ export default function SuggestedTasks() {
 			<p className="prpl-suggested-tasks-widget-description">
 				{ widgetDescription }
 			</p>
-			<PopoverManager tasks={ tasks } onComplete={ handleComplete } />
+			<PopoverManager
+				tasks={ tasks }
+				onComplete={ handleComplete }
+				config={ config }
+			/>
 			<ul style={ { display: 'none' } }></ul>
 			<ul
 				id="prpl-suggested-tasks-list"

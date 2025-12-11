@@ -30,14 +30,15 @@ function getRemainingText( remaining ) {
 /**
  * StreakBadges component.
  *
+ * @param {Object} props        - Component props.
+ * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The StreakBadges component.
  */
-export default function StreakBadges() {
+export default function StreakBadges( { config = {} } ) {
 	// Get title and info icon from config or use defaults.
 	const widgetTitle =
-		window.prplStreakBadgesConfig?.title ||
-		__( 'Your streak badges', 'progress-planner' );
-	const infoIconSvg = window.prplStreakBadgesConfig?.infoIconSvg;
+		config?.title || __( 'Your streak badges', 'progress-planner' );
+	const infoIconSvg = config?.infoIconSvg;
 
 	return (
 		<Fragment>

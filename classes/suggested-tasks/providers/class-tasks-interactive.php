@@ -26,7 +26,6 @@ abstract class Tasks_Interactive extends Tasks {
 	 */
 	public function __construct() {
 		\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
-		\add_action( 'progress_planner_admin_dashboard_widget_score_after', [ $this, 'add_popover' ] );
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 		\add_action( 'wp_ajax_prpl_interactive_task_submit', [ $this, 'handle_interactive_task_submit' ] );
 	}

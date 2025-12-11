@@ -179,9 +179,10 @@ const POPOVER_CONFIG = {
  * @param {Object}   props            Component props.
  * @param {Array}    props.tasks      The list of tasks.
  * @param {Function} props.onComplete Callback for completing a task.
+ * @param {Object}   props.config     Widget configuration.
  * @return {null} This component renders nothing.
  */
-export default function PopoverManager( { tasks, onComplete } ) {
+export default function PopoverManager( { tasks, onComplete, config = {} } ) {
 	/**
 	 * Handle custom submit types.
 	 */
@@ -493,13 +494,11 @@ function setupDateFormatPreview() {
 
 			try {
 				const ajaxUrl =
-					window.prplSuggestedTasksConfig?.ajaxUrl ||
+					config?.ajaxUrl ||
 					window.progressPlanner?.ajaxUrl ||
 					'/wp-admin/admin-ajax.php';
 				const nonce =
-					window.prplSuggestedTasksConfig?.nonce ||
-					window.progressPlanner?.nonce ||
-					'';
+					config?.nonce || window.progressPlanner?.nonce || '';
 				const response = await fetch(
 					`${ ajaxUrl }?action=prpl_date_format_preview&format=${ encodeURIComponent(
 						format

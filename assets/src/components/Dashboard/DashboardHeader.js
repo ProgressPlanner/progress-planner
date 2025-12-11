@@ -130,7 +130,36 @@ export default function DashboardHeader( { config } ) {
 					<>
 						{ /* Subscribe form button - triggers popover via showPopover() */ }
 						<button
+							className="prpl-info-icon"
 							type="button"
+							style={ {
+								width: '2rem',
+								height: '2rem',
+								display: 'inline-flex',
+								alignItems: 'center',
+								justifyContent: 'center',
+								padding: '0.4em',
+								color: 'var(--prpl-color-ui-icon)',
+								cursor: 'pointer',
+								backgroundColor: '#fff',
+								border: '1px solid var(--prpl-color-ui-icon)',
+								borderRadius: 'var(--prpl-border-radius)',
+							} }
+							onMouseEnter={ ( e ) => {
+								e.target.style.color =
+									'var(--prpl-color-ui-icon-hover)';
+								e.target.style.borderColor =
+									'var(--prpl-color-ui-icon-hover)';
+								e.target.style.backgroundColor =
+									'var(--prpl-color-ui-icon-hover-fill)';
+							} }
+							onMouseLeave={ ( e ) => {
+								e.target.style.color =
+									'var(--prpl-color-ui-icon)';
+								e.target.style.borderColor =
+									'var(--prpl-color-ui-icon)';
+								e.target.style.backgroundColor = '#fff';
+							} }
 							onClick={ () => {
 								const popover = document.getElementById(
 									'prpl-popover-subscribe-form'

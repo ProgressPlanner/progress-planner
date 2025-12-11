@@ -11,9 +11,11 @@ import { __ } from '@wordpress/i18n';
 /**
  * What's New widget component.
  *
+ * @param {Object} props        - Component props.
+ * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element|null} The widget component or null if no posts.
  */
-export default function WhatsNew() {
+export default function WhatsNew( { config = {} } ) {
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ posts, setPosts ] = useState( [] );
 	const [ blogUrl, setBlogUrl ] = useState( '' );
@@ -32,7 +34,7 @@ export default function WhatsNew() {
 
 	// Get title from config or use default.
 	const widgetTitle =
-		window.prplWhatsNewConfig?.title ||
+		config?.title ||
 		__( "What's new on the Progress Planner blog", 'progress-planner' );
 
 	// Show loading state.

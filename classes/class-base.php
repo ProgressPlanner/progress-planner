@@ -29,8 +29,6 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Utils\Playground get_utils__playground()
  * @method \Progress_Planner\Admin\Page get_admin__page()
  * @method \Progress_Planner\Admin\Tour get_admin__tour()
- * @method \Progress_Planner\Admin\Dashboard_Widget_Score get_admin__dashboard_widget_score()
- * @method \Progress_Planner\Admin\Dashboard_Widget_Todo get_admin__dashboard_widget_todo()
  * @method \Progress_Planner\Admin\Editor get_admin__editor()
  * @method \Progress_Planner\Actions\Content get_actions__content()
  * @method \Progress_Planner\Actions\Content_Scan get_actions__content_scan()
@@ -107,12 +105,6 @@ class Base {
 		if ( \is_admin() && \current_user_can( 'edit_others_posts' ) ) {
 			$this->get_admin__page();
 			$this->get_admin__tour();
-
-			// Dont add the widget if the privacy policy is not accepted.
-			if ( true === $this->is_privacy_policy_accepted() ) {
-				$this->get_admin__dashboard_widget_score();
-				$this->get_admin__dashboard_widget_todo();
-			}
 		}
 
 		$this->get_suggested_tasks();

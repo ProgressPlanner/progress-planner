@@ -23,14 +23,30 @@ if ( 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id() ) {
 
 <div class="wrap prpl-wrap <?php echo \esc_attr( $prpl_privacy_policy_accepted ? '' : 'prpl-pp-not-accepted' ); ?>">
 	<?php if ( true === $prpl_privacy_policy_accepted ) : ?>
-		<a href="#prpl-main-content" class="screen-reader-text prpl-skip-link"><?php \esc_html_e( 'Skip to main content', 'progress-planner' ); ?></a>
-		<h1 class="screen-reader-text"><?php \esc_html_e( 'Progress Planner', 'progress-planner' ); ?></h1>
-		<?php \progress_planner()->the_view( 'admin-page-header.php' ); ?>
-		<div id="prpl-main-content" class="prpl-widgets-container">
-			<?php foreach ( \progress_planner()->get_admin__page()->get_widgets() as $prpl_admin_widget ) : ?>
-				<?php $prpl_admin_widget->render(); ?>
-			<?php endforeach; ?>
-		</div>
+		<?php
+		/**
+		 * Fires before the dashboard header is rendered.
+		 * Useful for adding notices or other content above the header.
+		 *
+		 * @since 1.0.0
+		 */
+		\do_action( 'progress_planner_admin_page_header_before' );
+		?>
+		<div id="prpl-dashboard-root"></div>
+		<?php
+		// Render the subscribe form popover if the license key is not set.
+		// The popover needs to be rendered in PHP for nonces and other server-side data.
+		// It's referenced by the React DashboardHeader component.
+		if ( 'no-license' === \get_option( 'progress_planner_license_key', 'no-license' ) ) {
+			\progress_planner()->get_ui__popover()->the_popover( 'subscribe-form' )->render();
+		}
+		?>
+		<?php
+		// Enqueue widget styles (scripts are now handled by dashboard.js).
+		foreach ( \progress_planner()->get_admin__page()->get_widgets() as $prpl_admin_widget ) {
+			$prpl_admin_widget->enqueue_styles();
+		}
+		?>
 
 		<?php
 			/**

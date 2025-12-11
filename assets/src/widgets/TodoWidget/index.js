@@ -18,9 +18,11 @@ import { useGridMasonry } from '../../hooks/useGridMasonry';
 /**
  * Todo Widget main component.
  *
+ * @param {Object} props        - Component props.
+ * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The widget component.
  */
-export default function TodoWidget() {
+export default function TodoWidget( { config = {} } ) {
 	const [ pendingTasks, setPendingTasks ] = useState( [] );
 	const [ completedTasks, setCompletedTasks ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
@@ -118,7 +120,7 @@ export default function TodoWidget() {
 				const newTask = await createTask( {
 					title: newTaskTitle,
 					menuOrder: highestOrder + 1,
-					providerId: window.prplTodoConfig?.userProviderId,
+					providerId: config?.userProviderId,
 					points: 0,
 				} );
 
@@ -421,23 +423,22 @@ export default function TodoWidget() {
 
 	// Get title, descriptions, and tooltip from config or use defaults.
 	const widgetTitle =
-		window.prplTodoConfig?.title ||
-		__( 'My to-do list', 'progress-planner' );
+		config?.title || __( 'My to-do list', 'progress-planner' );
 	const goldenTaskDescription =
-		window.prplTodoConfig?.goldenTaskDescription ||
+		config?.goldenTaskDescription ||
 		__(
 			"Write down all your tasks you want to get done on your website! You'll earn points for your 'golden task'.",
 			'progress-planner'
 		);
 	const silverTaskDescription =
-		window.prplTodoConfig?.silverTaskDescription ||
+		config?.silverTaskDescription ||
 		__(
 			"Write down all your tasks you want to get done on your website! The top task will become your 'golden task' next week.",
 			'progress-planner'
 		);
-	const infoIconSvg = window.prplTodoConfig?.infoIconSvg;
+	const infoIconSvg = config?.infoIconSvg;
 	const tooltipContent =
-		window.prplTodoConfig?.tooltipContent ||
+		config?.tooltipContent ||
 		__(
 			'Every Monday, your top task becomes the golden task for the week. Complete it anytime this week to earn points toward your monthly total! Once done, the next task is highlighted to become your golden task next week.',
 			'progress-planner'

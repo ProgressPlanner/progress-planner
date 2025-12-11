@@ -27,25 +27,11 @@ final class ToDo extends Widget {
 	protected $width = 2;
 
 	/**
-	 * Enqueue scripts for the widget.
+	 * Get widget configuration.
 	 *
-	 * @return void
+	 * @return array Widget configuration.
 	 */
-	public function enqueue_scripts() {
-		$asset_file = \PROGRESS_PLANNER_DIR . '/build/todo.asset.php';
-		if ( ! \file_exists( $asset_file ) ) {
-			return;
-		}
-		$asset = include $asset_file;
-
-		\wp_enqueue_script(
-			'progress-planner/todo',
-			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/todo.js',
-			$asset['dependencies'],
-			$asset['version'],
-			true
-		);
-
+	public function get_widget_config() {
 		// Get the user provider term ID.
 		$user_provider_term = \get_term_by( 'slug', 'user', 'prpl_recommendations_provider' );
 		$user_provider_id   = $user_provider_term ? $user_provider_term->term_id : 0;
@@ -66,32 +52,15 @@ final class ToDo extends Widget {
 		// Get tooltip content.
 		$tooltip_content = \esc_html__( 'Every Monday, your top task becomes the golden task for the week. Complete it anytime this week to earn points toward your monthly total! Once done, the next task is highlighted to become your golden task next week.', 'progress-planner' );
 
-		\wp_localize_script(
-			'progress-planner/todo',
-			'prplTodoConfig',
-			[
-				'nonce'                 => \wp_create_nonce( 'wp_rest' ),
-				'userProviderId'        => $user_provider_id,
-				'title'                 => $widget_title,
-				'goldenTaskDescription' => $golden_task_description,
-				'silverTaskDescription' => $silver_task_description,
-				'infoIconSvg'           => $info_icon_svg,
-				'tooltipContent'        => $tooltip_content,
-			]
-		);
-
-		// Enqueue celebrate.js for confetti effects.
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'celebrate' );
-	}
-
-	/**
-	 * Print the widget content.
-	 *
-	 * @return void
-	 */
-	public function print_content() {
-		// The React component renders all content.
-		echo '<div id="prpl-todo-root"></div>';
+		return [
+			'nonce'                 => \wp_create_nonce( 'wp_rest' ),
+			'userProviderId'        => $user_provider_id,
+			'title'                 => $widget_title,
+			'goldenTaskDescription' => $golden_task_description,
+			'silverTaskDescription' => $silver_task_description,
+			'infoIconSvg'           => $info_icon_svg,
+			'tooltipContent'        => $tooltip_content,
+		];
 	}
 
 	/**

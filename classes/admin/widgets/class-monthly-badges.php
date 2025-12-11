@@ -76,30 +76,20 @@ final class Monthly_Badges extends Widget {
 	 *
 	 * @return void
 	 */
-	public function enqueue_scripts() {
-		$asset_file = \PROGRESS_PLANNER_DIR . '/build/monthly-badges.asset.php';
-		$asset      = include $asset_file;
-
-		\wp_enqueue_script(
-			'progress-planner/monthly-badges',
-			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/monthly-badges.js',
-			$asset['dependencies'],
-			$asset['version'],
-			true
-		);
-
+	/**
+	 * Get widget configuration.
+	 *
+	 * @return array Widget configuration.
+	 */
+	public function get_widget_config() {
 		// Get widget title (may be custom branded or default).
 		$widget_title = \progress_planner()->get_ui__branding()->get_widget_title(
 			'monthly-badges',
 			\esc_html__( 'Your monthly badge', 'progress-planner' )
 		);
 
-		\wp_localize_script(
-			'progress-planner/monthly-badges',
-			'prplMonthlyBadgesConfig',
-			[
-				'title' => $widget_title,
-			]
-		);
+		return [
+			'title' => $widget_title,
+		];
 	}
 }

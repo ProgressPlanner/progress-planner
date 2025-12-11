@@ -128,7 +128,7 @@ export default function DashboardWidgets( { config } ) {
 				forceLastColumn={ widgetConfig.forceLastColumn || false }
 				titleHtml={ widgetConfig.titleHtml }
 			>
-				<WidgetComponent />
+				<WidgetComponent config={ widgetConfig.config || {} } />
 			</WidgetWrapper>
 		);
 	};

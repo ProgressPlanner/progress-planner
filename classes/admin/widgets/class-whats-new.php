@@ -26,34 +26,21 @@ final class Whats_New extends Widget {
 	 *
 	 * @return void
 	 */
-	public function enqueue_scripts() {
-		$asset_file = \PROGRESS_PLANNER_DIR . '/build/whats-new.asset.php';
-		if ( ! \file_exists( $asset_file ) ) {
-			return;
-		}
-		$asset = include $asset_file;
-
-		\wp_enqueue_script(
-			'progress-planner/whats-new',
-			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/whats-new.js',
-			$asset['dependencies'],
-			$asset['version'],
-			true
-		);
-
+	/**
+	 * Get widget configuration.
+	 *
+	 * @return array Widget configuration.
+	 */
+	public function get_widget_config() {
 		// Get widget title (may be custom branded or default).
 		$widget_title = \progress_planner()->get_ui__branding()->get_widget_title(
 			'whats-new',
 			\esc_html__( 'What\'s new on the Progress Planner blog', 'progress-planner' )
 		);
 
-		\wp_localize_script(
-			'progress-planner/whats-new',
-			'prplWhatsNewConfig',
-			[
-				'title' => $widget_title,
-			]
-		);
+		return [
+			'title' => $widget_title,
+		];
 	}
 
 	/**

@@ -24,39 +24,21 @@ final class Content_Activity extends Widget {
 	 *
 	 * @return void
 	 */
-	public function enqueue_scripts() {
-		$asset_file = \PROGRESS_PLANNER_DIR . '/build/content-activity.asset.php';
-
-		// Check if the React build exists.
-		if ( ! \file_exists( $asset_file ) ) {
-			// Fall back to old web components.
-			parent::enqueue_scripts();
-			return;
-		}
-
-		$asset = include $asset_file;
-
-		\wp_enqueue_script(
-			'progress-planner/content-activity',
-			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/content-activity.js',
-			$asset['dependencies'],
-			$asset['version'],
-			true
-		);
-
+	/**
+	 * Get widget configuration.
+	 *
+	 * @return array Widget configuration.
+	 */
+	public function get_widget_config() {
 		// Get widget title (may be custom branded or default).
 		$widget_title = \progress_planner()->get_ui__branding()->get_widget_title(
 			'content-activity',
 			\esc_html__( 'Content activity', 'progress-planner' )
 		);
 
-		\wp_localize_script(
-			'progress-planner/content-activity',
-			'prplContentActivityConfig',
-			[
-				'title' => $widget_title,
-			]
-		);
+		return [
+			'title' => $widget_title,
+		];
 	}
 
 	/**

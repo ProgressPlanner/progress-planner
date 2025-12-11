@@ -71,9 +71,11 @@ function getStreakMessage( maxStreak, currentStreak ) {
 /**
  * ActivityScores component.
  *
+ * @param {Object} props        - Component props.
+ * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The ActivityScores component.
  */
-export default function ActivityScores() {
+export default function ActivityScores( { config = {} } ) {
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
 	const [ data, setData ] = useState( null );
@@ -119,11 +121,11 @@ export default function ActivityScores() {
 
 	// Get title from config or use default.
 	const widgetTitle =
-		window.prplActivityScoresConfig?.title ||
+		config?.title ||
 		__( 'Your website activity score', 'progress-planner' );
 
 	// Get info icon SVG from config.
-	const infoIconSvg = window.prplActivityScoresConfig?.infoIconSvg || '';
+	const infoIconSvg = config?.infoIconSvg || '';
 
 	return (
 		<>

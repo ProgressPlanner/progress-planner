@@ -16,19 +16,21 @@ import PointsCounter from './PointsCounter';
 /**
  * MonthlyBadges widget component.
  *
+ * @param {Object} props        - Component props.
+ * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The MonthlyBadges widget.
  */
-export default function MonthlyBadges() {
+export default function MonthlyBadges( { config = {} } ) {
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
 	const [ gaugeValue, setGaugeValue ] = useState( 0 );
 	const [ maxPoints, setMaxPoints ] = useState( 10 );
 	const [ currentBadge, setCurrentBadge ] = useState( null );
 	const [ previousBadges, setPreviousBadges ] = useState( [] );
-	const [ config, setConfig ] = useState( {
-		brandingId: 0,
-		remoteServerUrl: '',
-		placeholderUrl: '',
+	const [ widgetConfig, setWidgetConfig ] = useState( {
+		brandingId: config?.brandingId || 0,
+		remoteServerUrl: config?.remoteServerUrl || '',
+		placeholderUrl: config?.placeholderUrl || '',
 	} );
 
 	/**
@@ -129,10 +131,14 @@ export default function MonthlyBadges() {
 				setMaxPoints( response.score?.target || 10 );
 				setCurrentBadge( response.currentBadge || null );
 				setPreviousBadges( response.previousIncompleteBadges || [] );
-				setConfig( {
-					brandingId: response.brandingId || 0,
-					remoteServerUrl: response.remoteServerUrl || '',
-					placeholderUrl: response.placeholderUrl || '',
+				setWidgetConfig( {
+					brandingId: response.brandingId || config?.brandingId || 0,
+					remoteServerUrl:
+						response.remoteServerUrl ||
+						config?.remoteServerUrl ||
+						'',
+					placeholderUrl:
+						response.placeholderUrl || config?.placeholderUrl || '',
 				} );
 				setIsLoading( false );
 			} catch ( err ) {
@@ -191,8 +197,7 @@ export default function MonthlyBadges() {
 
 	// Get title from config or use default.
 	const widgetTitle =
-		window.prplMonthlyBadgesConfig?.title ||
-		__( 'Your monthly badge', 'progress-planner' );
+		config?.title || __( 'Your monthly badge', 'progress-planner' );
 
 	if ( isLoading ) {
 		return (
@@ -232,9 +237,9 @@ export default function MonthlyBadges() {
 						<Badge
 							badgeId={ currentBadge.id }
 							badgeName={ currentBadge.name }
-							brandingId={ config.brandingId }
-							remoteServerUrl={ config.remoteServerUrl }
-							placeholderUrl={ config.placeholderUrl }
+							brandingId={ widgetConfig.brandingId }
+							remoteServerUrl={ widgetConfig.remoteServerUrl }
+							placeholderUrl={ widgetConfig.placeholderUrl }
 							isComplete={ isComplete }
 						/>
 					) }
@@ -286,11 +291,13 @@ export default function MonthlyBadges() {
 											badge.accumulatedRemaining
 										}
 										daysRemaining={ badge.daysRemaining }
-										brandingId={ config.brandingId }
+										brandingId={ widgetConfig.brandingId }
 										remoteServerUrl={
-											config.remoteServerUrl
+											widgetConfig.remoteServerUrl
 										}
-										placeholderUrl={ config.placeholderUrl }
+										placeholderUrl={
+											widgetConfig.placeholderUrl
+										}
 									/>
 								</div>
 							) ) }

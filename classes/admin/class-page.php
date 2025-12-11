@@ -193,7 +193,7 @@ class Page {
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-line' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-big-counter' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-tooltip' );
-				$this->enqueue_dashboard_header_script();
+				$this->enqueue_dashboard_script();
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'upgrade-tasks' );
 			} else {
@@ -219,26 +219,40 @@ class Page {
 	}
 
 	/**
-	 * Enqueue the dashboard header React script.
+	 * Enqueue the unified dashboard React script.
 	 *
 	 * @return void
 	 */
-	private function enqueue_dashboard_header_script() {
-		$asset_file = \PROGRESS_PLANNER_DIR . '/build/dashboard-header.asset.php';
+	private function enqueue_dashboard_script() {
+		$asset_file = \PROGRESS_PLANNER_DIR . '/build/dashboard.asset.php';
 		if ( ! \file_exists( $asset_file ) ) {
 			return;
 		}
 		$asset = include $asset_file;
 
 		\wp_enqueue_script(
-			'progress-planner/dashboard-header',
-			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/dashboard-header.js',
+			'progress-planner/dashboard',
+			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/dashboard.js',
 			$asset['dependencies'],
 			$asset['version'],
 			true
 		);
 
-		// Get current URL params.
+		// Collect widget configurations.
+		$widgets        = $this->get_widgets();
+		$widget_configs = [];
+
+		foreach ( $widgets as $widget ) {
+			$widget_configs[] = [
+				'id'              => $widget->get_id(),
+				'width'           => $widget->get_width(),
+				'forceLastColumn' => $widget->get_force_last_column(),
+				'titleHtml'       => $widget->get_title_html(),
+				'config'          => $widget->get_widget_config(),
+			];
+		}
+
+		// Get header configuration.
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$current_range     = isset( $_GET['range'] )
 			? \sanitize_text_field( \wp_unslash( $_GET['range'] ) )
@@ -253,18 +267,29 @@ class Page {
 		\progress_planner()->get_ui__branding()->the_logo();
 		$logo_html = \ob_get_clean();
 
-		// Localize config.
+		// Get tour icon SVG.
+		$tour_icon_svg = \progress_planner()->get_asset( 'images/icon_tour.svg' );
+
+		// Get register/subscribe icon SVG.
+		$register_icon_svg = \progress_planner()->get_asset( 'images/register_icon.svg' );
+
+		// Localize dashboard config.
 		\wp_localize_script(
-			'progress-planner/dashboard-header',
-			'prplDashboardHeaderConfig',
+			'progress-planner/dashboard',
+			'prplDashboardConfig',
 			[
-				'logoHtml'            => $logo_html,
-				'tourIconSvg'         => \progress_planner()->get_asset( 'images/icon_tour.svg' ),
-				'showSubscribeButton' => 'no-license' === \get_option( 'progress_planner_license_key', 'no-license' ),
-				'subscribeIconSvg'    => \progress_planner()->get_asset( 'images/register_icon.svg' ),
-				'currentRange'        => $current_range,
-				'currentFrequency'    => $current_frequency,
-				'rangeOptions'        => [
+				'privacyPolicyAccepted' => \progress_planner()->is_privacy_policy_accepted(),
+				'widgets'               => $widget_configs,
+				// Header configuration.
+				'licenseKey'            => \get_option( 'progress_planner_license_key', 'no-license' ),
+				'branding'              => [
+					'logoHtml'         => $logo_html,
+					'tourIconHtml'     => $tour_icon_svg ? $tour_icon_svg : '',
+					'registerIconHtml' => $register_icon_svg ? $register_icon_svg : '',
+				],
+				'currentRange'          => $current_range,
+				'currentFrequency'      => $current_frequency,
+				'rangeOptions'          => [
 					[
 						'value' => '-3 months',
 						'label' => \__( 'Activity over the past 3 months', 'progress-planner' ),
@@ -286,7 +311,7 @@ class Page {
 						'label' => \__( 'Activity over the past 24 months', 'progress-planner' ),
 					],
 				],
-				'frequencyOptions'    => [
+				'frequencyOptions'      => [
 					[
 						'value' => 'weekly',
 						'label' => \__( 'Weekly', 'progress-planner' ),
@@ -296,14 +321,11 @@ class Page {
 						'label' => \__( 'Monthly', 'progress-planner' ),
 					],
 				],
-				'l10n'                => [
-					'selectRange'     => \__( 'Select range:', 'progress-planner' ),
-					'selectFrequency' => \__( 'Select frequency:', 'progress-planner' ),
-					'startTour'       => \__( 'Start tour', 'progress-planner' ),
-					'subscribe'       => \__( 'Subscribe', 'progress-planner' ),
-				],
 			]
 		);
+
+		// Enqueue celebrate.js for confetti effects (used by multiple widgets).
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'celebrate' );
 	}
 
 	/**

@@ -30,14 +30,15 @@ function getRemainingText( remaining ) {
 /**
  * ContentBadges component.
  *
+ * @param {Object} props        - Component props.
+ * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The ContentBadges component.
  */
-export default function ContentBadges() {
+export default function ContentBadges( { config = {} } ) {
 	// Get title and info icon from config or use defaults.
 	const widgetTitle =
-		window.prplContentBadgesConfig?.title ||
-		__( 'Your content badges', 'progress-planner' );
-	const infoIconSvg = window.prplContentBadgesConfig?.infoIconSvg;
+		config?.title || __( 'Your content badges', 'progress-planner' );
+	const infoIconSvg = config?.infoIconSvg;
 
 	return (
 		<Fragment>

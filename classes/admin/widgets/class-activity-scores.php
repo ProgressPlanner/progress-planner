@@ -231,18 +231,12 @@ final class Activity_Scores extends Widget {
 	 *
 	 * @return void
 	 */
-	public function enqueue_scripts() {
-		$asset_file = \PROGRESS_PLANNER_DIR . '/build/activity-scores.asset.php';
-		$asset      = include $asset_file;
-
-		\wp_enqueue_script(
-			'progress-planner/activity-scores',
-			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/activity-scores.js',
-			$asset['dependencies'],
-			$asset['version'],
-			true
-		);
-
+	/**
+	 * Get widget configuration.
+	 *
+	 * @return array Widget configuration.
+	 */
+	public function get_widget_config() {
 		// Get widget title (may be custom branded or default).
 		$widget_title = \progress_planner()->get_ui__branding()->get_widget_title(
 			'activity-scores',
@@ -252,13 +246,9 @@ final class Activity_Scores extends Widget {
 		// Get info icon SVG content.
 		$info_icon_svg = \progress_planner()->get_asset( 'images/icon_info.svg' );
 
-		\wp_localize_script(
-			'progress-planner/activity-scores',
-			'prplActivityScoresConfig',
-			[
-				'title'       => $widget_title,
-				'infoIconSvg' => $info_icon_svg,
-			]
-		);
+		return [
+			'title'       => $widget_title,
+			'infoIconSvg' => $info_icon_svg,
+		];
 	}
 }

@@ -56,9 +56,11 @@ function ErrorDisplay( { message } ) {
 /**
  * ContentActivity widget component.
  *
+ * @param {Object} props        - Component props.
+ * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The ContentActivity widget.
  */
-export default function ContentActivity() {
+export default function ContentActivity( { config = {} } ) {
 	const [ data, setData ] = useState( null );
 	const [ loading, setLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
@@ -97,8 +99,7 @@ export default function ContentActivity() {
 
 	// Get title from config or use default.
 	const widgetTitle =
-		window.prplContentActivityConfig?.title ||
-		__( 'Content activity', 'progress-planner' );
+		config?.title || __( 'Content activity', 'progress-planner' );
 
 	const graphWrapperStyle = {
 		marginBottom: 'var(--prpl-padding)',

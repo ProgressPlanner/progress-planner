@@ -57,6 +57,24 @@ abstract class Widget {
 	}
 
 	/**
+	 * Get the widget width.
+	 *
+	 * @return int Widget width (1 or 2).
+	 */
+	public function get_width() {
+		return $this->width;
+	}
+
+	/**
+	 * Get whether the widget should be forced to the last column.
+	 *
+	 * @return bool Whether the widget should be forced to the last column.
+	 */
+	public function get_force_last_column() {
+		return $this->force_last_column;
+	}
+
+	/**
 	 * Get the widget range.
 	 *
 	 * @return string
@@ -77,21 +95,14 @@ abstract class Widget {
 	/**
 	 * Render the widget.
 	 *
+	 * @deprecated This method is no longer used. Widgets are now rendered
+	 *             via the unified React dashboard. Kept for backward compatibility.
+	 *
 	 * @return void
 	 */
 	public function render() {
-		$this->enqueue_styles();
-		$this->enqueue_scripts();
-		?>
-		<div
-			class="prpl-widget-wrapper prpl-<?php echo \esc_attr( $this->id ); ?> prpl-widget-width-<?php echo (int) $this->width; ?>"
-			data-force-last-column="<?php echo (int) $this->force_last_column; ?>"
-		>
-			<div class="widget-inner-container">
-				<?php \progress_planner()->the_view( "page-widgets/{$this->id}.php" ); ?>
-			</div>
-		</div>
-		<?php
+		// Widgets are now rendered via the unified React dashboard.
+		// This method is kept for backward compatibility but does nothing.
 	}
 
 	/**
@@ -106,10 +117,15 @@ abstract class Widget {
 	/**
 	 * Enqueue scripts.
 	 *
+	 * Individual widget scripts for the Progress Planner admin page are now handled
+	 * by the unified dashboard. Widget classes can override this method to enqueue
+	 * individual scripts for WordPress dashboard widgets (wp-admin/index.php).
+	 *
 	 * @return void
 	 */
 	public function enqueue_scripts() {
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/' . $this->id );
+		// Default: scripts are handled by unified dashboard for main admin page.
+		// Override in child classes if needed for WordPress dashboard widgets.
 	}
 
 	/**
@@ -119,5 +135,25 @@ abstract class Widget {
 	 */
 	public function get_stylesheet_dependencies() {
 		return [];
+	}
+
+	/**
+	 * Get widget configuration for React component.
+	 * Should be overridden by child classes.
+	 *
+	 * @return array Widget configuration array.
+	 */
+	public function get_widget_config() {
+		return [];
+	}
+
+	/**
+	 * Get widget title HTML.
+	 * May be overridden by child classes.
+	 *
+	 * @return string Widget title HTML.
+	 */
+	public function get_title_html() {
+		return '';
 	}
 }
