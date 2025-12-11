@@ -23,7 +23,7 @@ jobs:
             sudo mv wp-cli.phar /usr/local/bin/wp
 
         - name: Install latest version of dist-archive-command
-          run: wp package install wp-cli/dist-archive-command:@stable
+          run: wp package install https://github.com/wp-cli/dist-archive-command.git:@stable
 
         - name: Build plugin
           run: |
