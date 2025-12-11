@@ -194,7 +194,7 @@ class Page {
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-line' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-big-counter' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-tooltip' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'header-filters', $default_localization_data );
+				$this->enqueue_dashboard_header_script();
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'upgrade-tasks' );
 			} else {
@@ -217,6 +217,94 @@ class Page {
 
 			\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
 		}
+	}
+
+	/**
+	 * Enqueue the dashboard header React script.
+	 *
+	 * @return void
+	 */
+	private function enqueue_dashboard_header_script() {
+		$asset_file = \PROGRESS_PLANNER_DIR . '/build/dashboard-header.asset.php';
+		if ( ! \file_exists( $asset_file ) ) {
+			return;
+		}
+		$asset = include $asset_file;
+
+		\wp_enqueue_script(
+			'progress-planner/dashboard-header',
+			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/dashboard-header.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
+
+		// Get current URL params.
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$current_range = isset( $_GET['range'] )
+			? \sanitize_text_field( \wp_unslash( $_GET['range'] ) )
+			: '-6 months';
+		$current_frequency = isset( $_GET['frequency'] )
+			? \sanitize_text_field( \wp_unslash( $_GET['frequency'] ) )
+			: 'monthly';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		// Get logo HTML using output buffering.
+		\ob_start();
+		\progress_planner()->get_ui__branding()->the_logo();
+		$logo_html = \ob_get_clean();
+
+		// Localize config.
+		\wp_localize_script(
+			'progress-planner/dashboard-header',
+			'prplDashboardHeaderConfig',
+			[
+				'logoHtml'            => $logo_html,
+				'tourIconSvg'         => \progress_planner()->get_asset( 'images/icon_tour.svg' ),
+				'showSubscribeButton' => 'no-license' === \get_option( 'progress_planner_license_key', 'no-license' ),
+				'subscribeIconSvg'    => \progress_planner()->get_asset( 'images/register_icon.svg' ),
+				'currentRange'        => $current_range,
+				'currentFrequency'    => $current_frequency,
+				'rangeOptions'        => [
+					[
+						'value' => '-3 months',
+						'label' => \__( 'Activity over the past 3 months', 'progress-planner' ),
+					],
+					[
+						'value' => '-6 months',
+						'label' => \__( 'Activity over the past 6 months', 'progress-planner' ),
+					],
+					[
+						'value' => '-12 months',
+						'label' => \__( 'Activity over the past 12 months', 'progress-planner' ),
+					],
+					[
+						'value' => '-18 months',
+						'label' => \__( 'Activity over the past 18 months', 'progress-planner' ),
+					],
+					[
+						'value' => '-24 months',
+						'label' => \__( 'Activity over the past 24 months', 'progress-planner' ),
+					],
+				],
+				'frequencyOptions'    => [
+					[
+						'value' => 'weekly',
+						'label' => \__( 'Weekly', 'progress-planner' ),
+					],
+					[
+						'value' => 'monthly',
+						'label' => \__( 'Monthly', 'progress-planner' ),
+					],
+				],
+				'l10n'                => [
+					'selectRange'     => \__( 'Select range:', 'progress-planner' ),
+					'selectFrequency' => \__( 'Select frequency:', 'progress-planner' ),
+					'startTour'       => \__( 'Start tour', 'progress-planner' ),
+					'subscribe'       => \__( 'Subscribe', 'progress-planner' ),
+				],
+			]
+		);
 	}
 
 	/**

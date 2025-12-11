@@ -191,54 +191,28 @@ button.prpl-info-icon {
 /*------------------------------------*\
 	Header & logo.
 \*------------------------------------*/
-.prpl-header {
-	margin-bottom: 2rem;
-	display: flex;
-	flex-wrap: wrap;
-	justify-content: space-between;
-	align-items: center;
-
-	.prpl-header-logo img {
-		height: 100px;
-	}
+.prpl-header-logo img {
+	height: 100px;
 }
 
 .prpl-header-logo svg {
 	height: 88px;
 }
 
-.prpl-header-right {
-	display: flex;
-	gap: var(--prpl-padding);
-	align-items: center;
+.prpl-header-right .prpl-info-icon {
+	svg {
+		width: 1rem;
+		height: 1rem;
 
-	.prpl-info-icon {
-		width: 2rem;
-		height: 2rem;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0.4em;
-
-		/* color: var(--prpl-color-border); */
-		background-color: #fff;
-		border: 1px solid var(--prpl-color-ui-icon);
-		border-radius: var(--prpl-border-radius);
-
-		svg {
-			width: 1rem;
-			height: 1rem;
-
-			& path {
-				fill: currentcolor;
-			}
+		& path {
+			fill: currentcolor;
 		}
+	}
 
-		&:hover {
-			color: var(--prpl-color-ui-icon-hover);
-			border-color: var(--prpl-color-ui-icon-hover);
-			background-color: var(--prpl-color-ui-icon-hover-fill);
-		}
+	&:hover {
+		color: var(--prpl-color-ui-icon-hover);
+		border-color: var(--prpl-color-ui-icon-hover);
+		background-color: var(--prpl-color-ui-icon-hover-fill);
 	}
 }
 

@@ -12,6 +12,7 @@ module.exports = {
 		'whats-new': './assets/src/whats-new.js',
 		'suggested-tasks': './assets/src/suggested-tasks.js',
 		todo: './assets/src/todo.js',
+		'dashboard-header': './assets/src/dashboard-header.js',
 	},
 	output: {
 		path: path.resolve( __dirname, 'build' ),
