@@ -5,19 +5,23 @@
  */
 
 import { useMemo } from '@wordpress/element';
+import { __, _n, sprintf } from '@wordpress/i18n';
 import Badge from '../Badge';
 
 /**
  * BadgeProgressBar component.
  *
- * @param {Object} props                 - Component props.
- * @param {string} props.badgeId         - The badge ID.
- * @param {string} props.badgeName       - The badge name.
- * @param {number} props.points          - Current points.
- * @param {number} props.maxPoints       - Maximum points (default 10).
- * @param {number} props.brandingId      - Branding ID.
- * @param {string} props.remoteServerUrl - Remote server URL for badge SVGs.
- * @param {string} props.placeholderUrl  - Placeholder image URL.
+ * @param {Object} props                    - Component props.
+ * @param {string} props.badgeId            - The badge ID.
+ * @param {string} props.badgeName          - The badge name.
+ * @param {number} props.points             - Current points.
+ * @param {number} props.maxPoints          - Maximum points (default 10).
+ * @param {number} props.remaining          - Remaining points for this badge.
+ * @param {number} props.accumulatedRemaining - Accumulated remaining points across all badges.
+ * @param {number} props.daysRemaining      - Days remaining in current month.
+ * @param {number} props.brandingId         - Branding ID.
+ * @param {string} props.remoteServerUrl    - Remote server URL for badge SVGs.
+ * @param {string} props.placeholderUrl     - Placeholder image URL.
  * @return {JSX.Element} The BadgeProgressBar component.
  */
 export default function BadgeProgressBar( {
@@ -25,6 +29,9 @@ export default function BadgeProgressBar( {
 	badgeName,
 	points = 0,
 	maxPoints = 10,
+	remaining = 0,
+	accumulatedRemaining = 0,
+	daysRemaining = 0,
 	brandingId = 0,
 	remoteServerUrl,
 	placeholderUrl,
@@ -92,6 +99,22 @@ export default function BadgeProgressBar( {
 		isComplete ? ' prpl-badge-progress-bar--complete' : ''
 	}`;
 
+	const pointsContainerStyle = {
+		display: 'flex',
+		justifyContent: 'flex-start',
+		gap: '1rem',
+	};
+
+	const pointsNumberStyle = {
+		fontSize: 'var(--prpl-font-size-3xl)',
+		fontWeight: 600,
+	};
+
+	const remainingTextStyle = {
+		display: 'flex',
+		alignItems: 'center',
+	};
+
 	return (
 		<div className={ className } style={ containerStyle }>
 			<div className="prpl-badge-progress-bar__bar" style={ barStyle }>
@@ -119,6 +142,30 @@ export default function BadgeProgressBar( {
 						</span>
 					) }
 				</div>
+			</div>
+			<div className="prpl-widget-content-points" style={ pointsContainerStyle }>
+				<span className="prpl-widget-previous-ravi-points-number" style={ pointsNumberStyle }>
+					{ points }pt
+				</span>
+				{ accumulatedRemaining > 0 && (
+					<span
+						className="prpl-previous-month-badge-progress-bar-remaining"
+						style={ remainingTextStyle }
+						dangerouslySetInnerHTML={ {
+							__html: sprintf(
+								/* translators: %1$s: The number of points. %2$d: The number of days. */
+								_n(
+									'%1$s more points to go - %2$d day left',
+									'%1$s more points to go - %2$d days left',
+									daysRemaining,
+									'progress-planner'
+								),
+								sprintf( '<span class="number">%d</span>', accumulatedRemaining ),
+								daysRemaining
+							),
+						} }
+					/>
+				) }
 			</div>
 		</div>
 	);
