@@ -96,6 +96,11 @@ export default function SuggestedTasks() {
 								new CustomEvent( 'prpl/celebrateTasks' )
 							);
 
+							// Dispatch remove celebrated tasks event (for legacy compatibility).
+							document.dispatchEvent(
+								new CustomEvent( 'prpl/removeCelebratedTasks' )
+							);
+
 							// Remove celebrated tasks after animation.
 							setTimeout( () => {
 								setTasks( ( prev ) =>

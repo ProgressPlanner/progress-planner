@@ -26,10 +26,34 @@ export default function TodoWidget() {
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ newTaskTitle, setNewTaskTitle ] = useState( '' );
 	const [ showDeletePopover, setShowDeletePopover ] = useState( false );
+	const [ isCreatingTask, setIsCreatingTask ] = useState( false );
 	const inputRef = useRef( null );
 
 	// Initialize grid masonry layout.
 	useGridMasonry();
+
+	/**
+	 * Sort tasks: golden tasks first, then by menu_order.
+	 *
+	 * @param {Array} tasks Array of task objects.
+	 * @return {Array} Sorted array of tasks.
+	 */
+	const sortTasksWithGoldenFirst = useCallback( ( tasks ) => {
+		return [ ...tasks ].sort( ( a, b ) => {
+			const aIsGolden = ( a.prpl_points || 0 ) === 1;
+			const bIsGolden = ( b.prpl_points || 0 ) === 1;
+			
+			// Golden tasks come first
+			if ( aIsGolden && ! bIsGolden ) {
+				return -1;
+			}
+			if ( ! aIsGolden && bIsGolden ) {
+				return 1;
+			}
+			// Both golden or both not golden - sort by menu_order
+			return ( a.menu_order || 0 ) - ( b.menu_order || 0 );
+		} );
+	}, [] );
 
 	/**
 	 * Load tasks on mount.
@@ -51,10 +75,8 @@ export default function TodoWidget() {
 					perPage: 100,
 				} );
 
-				// Sort by menu_order
-				pending.sort(
-					( a, b ) => ( a.menu_order || 0 ) - ( b.menu_order || 0 )
-				);
+				// Sort pending tasks: golden tasks (prpl_points === 1) first, then by menu_order
+				pending = sortTasksWithGoldenFirst( pending );
 				completed.sort(
 					( a, b ) => ( a.menu_order || 0 ) - ( b.menu_order || 0 )
 				);
@@ -77,13 +99,15 @@ export default function TodoWidget() {
 	/**
 	 * Create a new task.
 	 */
-	const handleCreateTask = useCallback(
+		const handleCreateTask = useCallback(
 		async ( e ) => {
 			e.preventDefault();
 
 			if ( ! newTaskTitle.trim() ) {
 				return;
 			}
+
+			setIsCreatingTask( true );
 
 			try {
 				const highestOrder = pendingTasks.reduce(
@@ -98,7 +122,9 @@ export default function TodoWidget() {
 					points: 0,
 				} );
 
-				setPendingTasks( ( prev ) => [ ...prev, newTask ] );
+				setPendingTasks( ( prev ) =>
+					sortTasksWithGoldenFirst( [ ...prev, newTask ] )
+				);
 				setNewTaskTitle( '' );
 
 				// Announce to screen readers
@@ -117,9 +143,11 @@ export default function TodoWidget() {
 			} catch ( error ) {
 				// eslint-disable-next-line no-console
 				console.error( 'Error creating task:', error );
+			} finally {
+				setIsCreatingTask( false );
 			}
 		},
-		[ newTaskTitle, pendingTasks ]
+		[ newTaskTitle, pendingTasks, sortTasksWithGoldenFirst ]
 	);
 
 	/**
@@ -146,10 +174,12 @@ export default function TodoWidget() {
 					setCompletedTasks( ( prev ) =>
 						prev.filter( ( t ) => t.id !== taskId )
 					);
-					setPendingTasks( ( prev ) => [
-						...prev,
-						{ ...task, status: 'publish' },
-					] );
+					setPendingTasks( ( prev ) =>
+						sortTasksWithGoldenFirst( [
+							...prev,
+							{ ...task, status: 'publish' },
+						] )
+					);
 				} else {
 					// Move from pending to completed
 					setPendingTasks( ( prev ) =>
@@ -182,7 +212,7 @@ export default function TodoWidget() {
 				console.error( 'Error toggling task:', error );
 			}
 		},
-		[ pendingTasks, completedTasks ]
+		[ pendingTasks, completedTasks, sortTasksWithGoldenFirst ]
 	);
 
 	/**
@@ -234,12 +264,14 @@ export default function TodoWidget() {
 				menu_order: i,
 			} ) );
 
-			setPendingTasks( updates );
+			// Re-sort to maintain golden tasks first
+			const sortedUpdates = sortTasksWithGoldenFirst( updates );
+			setPendingTasks( sortedUpdates );
 
 			// Save order changes to server
 			try {
 				await Promise.all(
-					updates.map( ( t ) =>
+					sortedUpdates.map( ( t ) =>
 						updateTask( t.id, { menu_order: t.menu_order } )
 					)
 				);
@@ -251,7 +283,7 @@ export default function TodoWidget() {
 			// Trigger grid resize
 			window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 		},
-		[ pendingTasks ]
+		[ pendingTasks, sortTasksWithGoldenFirst ]
 	);
 
 	/**
@@ -416,6 +448,17 @@ export default function TodoWidget() {
 						onTitleChange={ handleTitleChange }
 					/>
 				) ) }
+				{ isCreatingTask && (
+					<li
+						className="prpl-loader"
+						role="status"
+						aria-live="polite"
+					>
+						<span className="screen-reader-text">
+							{ __( 'Loading tasks...', 'progress-planner' ) }
+						</span>
+					</li>
+				) }
 			</ul>
 
 			<form
