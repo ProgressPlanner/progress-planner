@@ -14,7 +14,13 @@ jobs:
           with:
             php-version: '7.4'
             coverage: none
-            tools: wp-cli
+
+        - name: Install WP-CLI
+          run: |
+            curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+            php wp-cli.phar --info
+            chmod +x wp-cli.phar
+            sudo mv wp-cli.phar /usr/local/bin/wp
 
         - name: Install latest version of dist-archive-command
           run: wp package install wp-cli/dist-archive-command:@stable
