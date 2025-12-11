@@ -143,7 +143,7 @@ export default function StreakBadges() {
 					style={ {
 						display: 'grid',
 						gridTemplateColumns: '1fr 1fr 1fr',
-						gap: 'calc(var(--prpl-gap) / 2)',
+						gap: 'calc(var(--prpl-gap) / 4)',
 						background: 'var(--prpl-background-streak)',
 						padding: 'calc(var(--prpl-padding) / 2)',
 						borderRadius: 'var(--prpl-border-radius-big)',

@@ -95,7 +95,7 @@ export default function ContentBadges() {
 		<>
 			<p>
 				{ __(
-					'The more you work on meaninful content, the sooner you unlock new badges.',
+					'The more you work on meaningful content, the sooner you unlock new badges.',
 					'progress-planner'
 				) }
 			</p>
