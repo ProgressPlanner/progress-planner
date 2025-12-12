@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { doAction } from '@wordpress/hooks';
 import TaskItem from '../../components/TaskItem';
 import PopoverManager from './PopoverManager';
 import {
@@ -26,7 +27,7 @@ import { useCelebration } from '../../hooks/useCelebration';
  * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The widget component.
  */
-export default function SuggestedTasks( { config = {} } ) {
+function SuggestedTasks( { config = {} } ) {
 	const [ tasks, setTasks ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ showAll, setShowAll ] = useState( config?.showAll || false );
@@ -495,3 +496,10 @@ export default function SuggestedTasks( { config = {} } ) {
 		</>
 	);
 }
+
+// Register widget via hook
+doAction( 'prpl.dashboard.registerWidget', {
+	id: 'suggested-tasks',
+	component: SuggestedTasks,
+	priority: 10,
+} );

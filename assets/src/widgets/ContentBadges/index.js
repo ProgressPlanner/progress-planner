@@ -6,6 +6,7 @@
 
 import { Fragment } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { doAction } from '@wordpress/hooks';
 import SimpleBadgeWidget from '../shared/SimpleBadgeWidget';
 
 /**
@@ -34,7 +35,7 @@ function getRemainingText( remaining ) {
  * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The ContentBadges component.
  */
-export default function ContentBadges( { config = {} } ) {
+function ContentBadges( { config = {} } ) {
 	// Get title and info icon from config or use defaults.
 	const widgetTitle =
 		config?.title || __( 'Your content badges', 'progress-planner' );
@@ -82,3 +83,10 @@ export default function ContentBadges( { config = {} } ) {
 		</Fragment>
 	);
 }
+
+// Register widget via hook
+doAction( 'prpl.dashboard.registerWidget', {
+	id: 'badge-streak-content',
+	component: ContentBadges,
+	priority: 10,
+} );

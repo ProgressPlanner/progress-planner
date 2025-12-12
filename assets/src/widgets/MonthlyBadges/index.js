@@ -7,6 +7,7 @@
 
 import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { doAction } from '@wordpress/hooks';
 import apiFetch from '@wordpress/api-fetch';
 import Gauge from '../../components/Gauge';
 import Badge from '../../components/Badge';
@@ -20,7 +21,7 @@ import PointsCounter from './PointsCounter';
  * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The MonthlyBadges widget.
  */
-export default function MonthlyBadges( { config = {} } ) {
+function MonthlyBadges( { config = {} } ) {
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
 	const [ gaugeValue, setGaugeValue ] = useState( 0 );
@@ -312,3 +313,10 @@ export default function MonthlyBadges( { config = {} } ) {
 		</>
 	);
 }
+
+// Register widget via hook
+doAction( 'prpl.dashboard.registerWidget', {
+	id: 'monthly-badges',
+	component: MonthlyBadges,
+	priority: 10,
+} );

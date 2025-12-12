@@ -219,7 +219,7 @@ class Page {
 	}
 
 	/**
-	 * Enqueue the unified dashboard React script.
+	 * Enqueue the unified dashboard React script and widget entry points.
 	 *
 	 * @return void
 	 */
@@ -230,6 +230,7 @@ class Page {
 		}
 		$asset = include $asset_file;
 
+		// Enqueue main dashboard script.
 		\wp_enqueue_script(
 			'progress-planner/dashboard',
 			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/dashboard.js',
@@ -237,6 +238,40 @@ class Page {
 			$asset['version'],
 			true
 		);
+
+		// Enqueue individual widget scripts.
+		$widget_scripts = [
+			'widget-suggested-tasks',
+			'widget-todo',
+			'widget-monthly-badges',
+			'widget-streak-badges',
+			'widget-content-badges',
+			'widget-activity-scores',
+			'widget-content-activity',
+			'widget-whats-new',
+		];
+
+		foreach ( $widget_scripts as $script_handle ) {
+			$widget_asset_file = \PROGRESS_PLANNER_DIR . '/build/' . $script_handle . '.asset.php';
+			if ( ! \file_exists( $widget_asset_file ) ) {
+				continue;
+			}
+			$widget_asset = include $widget_asset_file;
+
+			// Widget scripts depend on dashboard script to ensure widgetRegistry is initialized
+			$widget_dependencies = array_merge(
+				$widget_asset['dependencies'],
+				[ 'progress-planner/dashboard' ]
+			);
+
+			\wp_enqueue_script(
+				'progress-planner/' . $script_handle,
+				\constant( 'PROGRESS_PLANNER_URL' ) . '/build/' . $script_handle . '.js',
+				$widget_dependencies,
+				$widget_asset['version'],
+				true
+			);
+		}
 
 		// Collect widget configurations.
 		$widgets        = $this->get_widgets();

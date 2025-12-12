@@ -2,17 +2,12 @@
  * DashboardWidgets Component
  *
  * Renders all dashboard widgets in a grid layout.
+ * Widgets are registered via WordPress hooks and collected from the registry.
  */
 
-import { Fragment } from '@wordpress/element';
-import ActivityScores from '../../widgets/ActivityScores';
-import ContentActivity from '../../widgets/ContentActivity';
-import ContentBadges from '../../widgets/ContentBadges';
-import MonthlyBadges from '../../widgets/MonthlyBadges';
-import StreakBadges from '../../widgets/StreakBadges';
-import SuggestedTasks from '../../widgets/SuggestedTasks';
-import TodoWidget from '../../widgets/TodoWidget';
-import WhatsNew from '../../widgets/WhatsNew';
+import { Fragment, useState, useEffect } from '@wordpress/element';
+import { addAction } from '@wordpress/hooks';
+import { getRegisteredWidgets } from '../../utils/widgetRegistry';
 
 /**
  * Widget wrapper component.
@@ -95,27 +90,52 @@ function WidgetWrapper( {
  */
 export default function DashboardWidgets( { config } ) {
 	const { widgets = [] } = config;
+	const [ registeredWidgets, setRegisteredWidgets ] = useState( [] );
+
+	// Listen for widget registrations and update state
+	useEffect( () => {
+		// Get initial registered widgets (widgets may have registered before this component mounted)
+		setRegisteredWidgets( getRegisteredWidgets() );
+
+		// Listen for new widget registrations
+		const handleWidgetRegistration = () => {
+			setRegisteredWidgets( getRegisteredWidgets() );
+		};
+
+		addAction(
+			'prpl.dashboard.registerWidget',
+			'progress-planner/dashboard-widgets',
+			handleWidgetRegistration
+		);
+
+		// Cleanup: This component doesn't need to remove the action listener
+		// since it's just reading from the registry
+	}, [] );
 
 	/**
-	 * Map widget ID to React component.
+	 * Create a widget map from registered widgets.
+	 *
+	 * @return {Object<string, Function>} Map of widget ID to component.
+	 */
+	const createWidgetMap = () => {
+		const map = {};
+		registeredWidgets.forEach( ( widget ) => {
+			map[ widget.id ] = widget.component;
+		} );
+		return map;
+	};
+
+	/**
+	 * Render a widget by ID.
 	 *
 	 * @param {string} widgetId     - Widget ID.
 	 * @param {Object} widgetConfig - Widget configuration.
 	 * @return {JSX.Element|null} The widget component.
 	 */
 	const renderWidget = ( widgetId, widgetConfig ) => {
-		const widgetMap = {
-			'suggested-tasks': SuggestedTasks,
-			todo: TodoWidget,
-			'monthly-badges': MonthlyBadges,
-			'badge-streak-content': ContentBadges,
-			'badge-streak-maintenance': StreakBadges,
-			'activity-scores': ActivityScores,
-			'content-activity': ContentActivity,
-			'whats-new': WhatsNew,
-		};
-
+		const widgetMap = createWidgetMap();
 		const WidgetComponent = widgetMap[ widgetId ];
+
 		if ( ! WidgetComponent ) {
 			return null;
 		}

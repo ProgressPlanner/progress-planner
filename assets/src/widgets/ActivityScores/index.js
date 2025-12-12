@@ -7,6 +7,7 @@
 
 import { useState, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { doAction } from '@wordpress/hooks';
 import apiFetch from '@wordpress/api-fetch';
 import Gauge from '../../components/Gauge';
 import BarChart from '../../components/BarChart';
@@ -75,7 +76,7 @@ function getStreakMessage( maxStreak, currentStreak ) {
  * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The ActivityScores component.
  */
-export default function ActivityScores( { config = {} } ) {
+function ActivityScores( { config = {} } ) {
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
 	const [ data, setData ] = useState( null );
@@ -197,3 +198,10 @@ export default function ActivityScores( { config = {} } ) {
 		</>
 	);
 }
+
+// Register widget via hook
+doAction( 'prpl.dashboard.registerWidget', {
+	id: 'activity-scores',
+	component: ActivityScores,
+	priority: 10,
+} );

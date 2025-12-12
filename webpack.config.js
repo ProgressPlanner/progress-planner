@@ -5,6 +5,14 @@ module.exports = {
 	...defaultConfig,
 	entry: {
 		dashboard: './assets/src/dashboard.js',
+		'widget-suggested-tasks': './assets/src/widgets/SuggestedTasks/index.js',
+		'widget-todo': './assets/src/widgets/TodoWidget/index.js',
+		'widget-monthly-badges': './assets/src/widgets/MonthlyBadges/index.js',
+		'widget-streak-badges': './assets/src/widgets/StreakBadges/index.js',
+		'widget-content-badges': './assets/src/widgets/ContentBadges/index.js',
+		'widget-activity-scores': './assets/src/widgets/ActivityScores/index.js',
+		'widget-content-activity': './assets/src/widgets/ContentActivity/index.js',
+		'widget-whats-new': './assets/src/widgets/WhatsNew/index.js',
 	},
 	output: {
 		path: path.resolve( __dirname, 'build' ),

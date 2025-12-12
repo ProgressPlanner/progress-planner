@@ -6,6 +6,7 @@
 
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { doAction } from '@wordpress/hooks';
 import apiFetch from '@wordpress/api-fetch';
 import BigCounter from '../../components/BigCounter';
 import LineChart from '../../components/LineChart';
@@ -60,7 +61,7 @@ function ErrorDisplay( { message } ) {
  * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The ContentActivity widget.
  */
-export default function ContentActivity( { config = {} } ) {
+function ContentActivity( { config = {} } ) {
 	const [ data, setData ] = useState( null );
 	const [ loading, setLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
@@ -137,3 +138,10 @@ export default function ContentActivity( { config = {} } ) {
 		</div>
 	);
 }
+
+// Register widget via hook
+doAction( 'prpl.dashboard.registerWidget', {
+	id: 'content-activity',
+	component: ContentActivity,
+	priority: 10,
+} );

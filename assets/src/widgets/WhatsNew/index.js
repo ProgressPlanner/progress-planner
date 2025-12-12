@@ -7,6 +7,7 @@
 import { useState, useEffect, Fragment } from '@wordpress/element';
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
+import { doAction } from '@wordpress/hooks';
 
 /**
  * What's New widget component.
@@ -15,7 +16,7 @@ import { __ } from '@wordpress/i18n';
  * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element|null} The widget component or null if no posts.
  */
-export default function WhatsNew( { config = {} } ) {
+function WhatsNew( { config = {} } ) {
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ posts, setPosts ] = useState( [] );
 	const [ blogUrl, setBlogUrl ] = useState( '' );
@@ -151,3 +152,10 @@ export default function WhatsNew( { config = {} } ) {
 		</Fragment>
 	);
 }
+
+// Register widget via hook
+doAction( 'prpl.dashboard.registerWidget', {
+	id: 'whats-new',
+	component: WhatsNew,
+	priority: 10,
+} );

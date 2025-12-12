@@ -6,6 +6,7 @@
 
 import { Fragment } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
+import { doAction } from '@wordpress/hooks';
 import SimpleBadgeWidget from '../shared/SimpleBadgeWidget';
 
 /**
@@ -34,7 +35,7 @@ function getRemainingText( remaining ) {
  * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The StreakBadges component.
  */
-export default function StreakBadges( { config = {} } ) {
+function StreakBadges( { config = {} } ) {
 	// Get title and info icon from config or use defaults.
 	const widgetTitle =
 		config?.title || __( 'Your streak badges', 'progress-planner' );
@@ -82,3 +83,10 @@ export default function StreakBadges( { config = {} } ) {
 		</Fragment>
 	);
 }
+
+// Register widget via hook
+doAction( 'prpl.dashboard.registerWidget', {
+	id: 'badge-streak-maintenance',
+	component: StreakBadges,
+	priority: 10,
+} );

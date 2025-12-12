@@ -6,6 +6,7 @@
 
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { doAction } from '@wordpress/hooks';
 import TaskItem from '../../components/TaskItem';
 import {
 	fetchTasks,
@@ -23,7 +24,7 @@ import { useCelebration } from '../../hooks/useCelebration';
  * @param {Object} props.config - Widget configuration.
  * @return {JSX.Element} The widget component.
  */
-export default function TodoWidget( { config = {} } ) {
+function TodoWidget( { config = {} } ) {
 	const [ pendingTasks, setPendingTasks ] = useState( [] );
 	const [ completedTasks, setCompletedTasks ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
@@ -736,3 +737,10 @@ export default function TodoWidget( { config = {} } ) {
 		</>
 	);
 }
+
+// Register widget via hook
+doAction( 'prpl.dashboard.registerWidget', {
+	id: 'todo',
+	component: TodoWidget,
+	priority: 10,
+} );
