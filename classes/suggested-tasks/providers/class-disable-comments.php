@@ -100,65 +100,7 @@ class Disable_Comments extends Tasks_Interactive {
 		return 'open' !== \get_default_comment_status();
 	}
 
-	/**
-	 * Get the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		$comments_count = (int) \wp_count_comments()->approved;
-
-		echo '<p>';
-		if ( 0 === $comments_count ) {
-			\esc_html_e( 'Your site currently has no approved comments. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments.', 'progress-planner' );
-		} else {
-			\printf(
-				\esc_html(
-					// translators: %d is the number of approved comments.
-					\_n(
-						'Your site currently has %d approved comment. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments.',
-						'Your site currently has %d approved comments. Therefore, it seems your site might not need comments. If that is true for most posts or pages on your site, you can use WordPress\'s default setting to disable comments.',
-						$comments_count,
-						'progress-planner'
-					)
-				),
-				(int) $comments_count
-			);
-		}
-		echo '</p>';
-		if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) {
-			echo '<p>';
-			\printf(
-				/* translators: %s is the <a href="https://w.org/plugins/comment-free-zone/" target="_blank">Comment-Free Zone</a> link */
-				\esc_html__( 'If your site really doesn\'t need any comments, we recommend installing the "%s" plugin.', 'progress-planner' ),
-				'<a href="https://w.org/plugins/comment-free-zone/" target="_blank">' . \esc_html__( 'Comment-Free Zone', 'progress-planner' ) . '</a>'
-			);
-			echo '</p>';
-		}
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		?>
-		<div class="prpl-steps-nav-wrapper prpl-steps-nav-wrapper-align-left" style="justify-content: flex-start;margin-bottom: 1.25rem;">
-			<button type="submit" class="prpl-button prpl-button-primary">
-				<?php \esc_html_e( 'Disable new comments', 'progress-planner' ); ?>
-			</button>
-		</div>
-		<?php if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) : ?>
-			<prpl-install-plugin
-				data-plugin-name="Comment-free zone"
-				data-plugin-slug="comment-free-zone"
-				data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'comment-free-zone' ) ? 'activate' : 'install'; ?>"
-				data-provider-id="<?php echo \esc_attr( self::PROVIDER_ID ); ?>"
-			></prpl-install-plugin>
-		<?php endif; ?>
-		<?php
-	}
+	// Popover rendering methods removed - now handled by React DisableCommentsPopover component.
 
 	/**
 	 * Add task actions specific to this task.

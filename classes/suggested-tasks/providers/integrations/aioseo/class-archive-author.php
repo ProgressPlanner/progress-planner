@@ -123,25 +123,7 @@ class Archive_Author extends AIOSEO_Interactive_Provider {
 		return $this->get_data_collector()->collect() <= self::MINIMUM_AUTHOR_WITH_POSTS;
 	}
 
-	/**
-	 * Get the description.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'Your author archives are the same as your normal archives because you have only one author, so there\'s no reason for search engines to index these. That\'s why we suggest keeping them out of search results.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$this->print_submit_button( \__( 'Noindex the author archive', 'progress-planner' ) );
-	}
+	// Popover rendering methods removed - now handled by React AIOSEOPopover component.
 
 	/**
 	 * Handle the interactive task submit.

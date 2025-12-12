@@ -92,56 +92,7 @@ class Site_Icon extends Tasks_Interactive {
 	 *
 	 * @return void
 	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'Site Icons are what you see in browser tabs, bookmark bars, and within the WordPress mobile apps. Upload an image to make your site stand out.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover form contents.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		// Enqueue media scripts.
-		\wp_enqueue_media();
-
-		$site_icon_id = \get_option( 'site_icon' );
-		?>
-		<div id="site-icon-preview" style="margin-bottom: 15px; min-height: 150px; display: flex; align-items: center; justify-content: center; border: 2px dashed #ddd; border-radius: 4px; padding: 10px;">
-			<?php if ( $site_icon_id ) : ?>
-				<?php echo \wp_get_attachment_image( $site_icon_id, 'thumbnail', false, [ 'style' => 'max-width: 150px; height: auto; border-radius: 4px; border: 1px solid #ddd;' ] ); ?>
-			<?php else : ?>
-				<span style="color: #999;"><?php \esc_html_e( 'No image selected', 'progress-planner' ); ?></span>
-			<?php endif; ?>
-		</div>
-		<button type="button" id="prpl-upload-site-icon-button" class="prpl-button prpl-button-secondary" style="margin-bottom: 15px;">
-			<?php \esc_html_e( 'Choose or Upload Image', 'progress-planner' ); ?>
-		</button>
-		<input type="hidden" name="site_icon" id="prpl-site-icon-id" value="<?php echo \esc_attr( $site_icon_id ); ?>">
-		<div class="prpl-steps-nav-wrapper prpl-steps-nav-wrapper-align-left">
-			<button type="submit" class="prpl-button prpl-button-primary" id="prpl-set-site-icon-button" <?php echo $site_icon_id ? '' : 'disabled'; ?>>
-				<?php \esc_html_e( 'Set site icon', 'progress-planner' ); ?>
-			</button>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Get the enqueue data.
-	 *
-	 * @return array
-	 */
-	protected function get_enqueue_data() {
-		return [
-			'name' => 'prplSiteIcon',
-			'data' => [
-				'mediaTitle'      => \esc_html__( 'Choose Site Icon', 'progress-planner' ),
-				'mediaButtonText' => \esc_html__( 'Use as Site Icon', 'progress-planner' ),
-			],
-		];
-	}
+	// Popover rendering methods removed - now handled by React SiteIconPopover component.
 
 	/**
 	 * Add task actions specific to this task.

@@ -111,25 +111,7 @@ class Archive_Author extends Yoast_Interactive_Provider {
 		return $this->get_data_collector()->collect() <= self::MINIMUM_AUTHOR_WITH_POSTS;
 	}
 
-	/**
-	 * Get the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'When your site has only one author, the author archive is redundant and creates duplicate content issues. Disabling it prevents search engines from indexing the same content multiple times.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$this->print_submit_button( \__( 'Disable', 'progress-planner' ) );
-	}
+	// Popover rendering methods removed - now handled by React YoastPopover component.
 
 	/**
 	 * Add task actions specific to this task.

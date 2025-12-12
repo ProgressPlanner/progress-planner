@@ -25,8 +25,8 @@ abstract class Tasks_Interactive extends Tasks {
 	 * @return void
 	 */
 	public function __construct() {
-		\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_popover' ] );
-		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
+		// Popover rendering is now handled by React components.
+		// No need to register popover rendering hooks.
 		\add_action( 'wp_ajax_prpl_interactive_task_submit', [ $this, 'handle_interactive_task_submit' ] );
 	}
 
@@ -157,126 +157,6 @@ abstract class Tasks_Interactive extends Tasks {
 		return \apply_filters( 'progress_planner_interactive_task_allowed_options', $allowed_options );
 	}
 
-	/**
-	 * Add the popover.
-	 *
-	 * @return void
-	 */
-	public function add_popover() {
-
-		// Don't add the popover if the task is not published.
-		if ( ! $this->is_task_published() ) {
-			return;
-		}
-		?>
-		<div id="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>" class="prpl-popover prpl-popover-interactive" popover>
-			<?php $this->the_popover_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
-		</div>
-		<?php
-	}
-
-	/**
-	 * The popover content.
-	 *
-	 * @return void
-	 */
-	public function the_popover_content() {
-		\progress_planner()->the_view(
-			[
-				'/views/popovers/' . static::POPOVER_ID . '.php',
-				'/views/popovers/interactive-task.php',
-			],
-			[
-				'prpl_task_object'       => $this,
-				'prpl_popover_id'        => static::POPOVER_ID,
-				'prpl_external_link_url' => $this->get_external_link_url(),
-				'prpl_provider_id'       => $this->get_provider_id(),
-				'prpl_task_actions'      => $this->get_task_actions(),
-			]
-		);
-	}
-
-	/**
-	 * Print the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		$description = $this->get_description();
-		if ( empty( $description ) ) {
-			return;
-		}
-
-		echo '<p>' . \wp_kses_post( $description ) . '</p>';
-	}
-
-	/**
-	 * Print the submit button.
-	 *
-	 * @param string $button_text The text for the button.
-	 *                           If empty, the default text "Submit" will be used.
-	 * @param string $css_class The CSS class for the wrapper.
-	 *
-	 * @return void
-	 */
-	protected function print_submit_button( $button_text = '', $css_class = '' ) {
-		if ( empty( $button_text ) ) {
-			$button_text = \__( 'Submit', 'progress-planner' );
-		}
-
-		$css_class = empty( $css_class ) ? 'prpl-steps-nav-wrapper' : 'prpl-steps-nav-wrapper ' . $css_class;
-		?>
-		<div class="<?php echo \esc_attr( $css_class ); ?>">
-			<button type="submit" class="prpl-button prpl-button-primary">
-				<?php echo \esc_html( $button_text ); ?>
-			</button>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Print the popover form contents.
-	 *
-	 * @return void
-	 */
-	abstract public function print_popover_form_contents();
-
-	/**
-	 * Enqueue the scripts.
-	 *
-	 * Form submission handling is now done by the React PopoverManager component
-	 * in assets/src/widgets/SuggestedTasks/PopoverManager.js.
-	 *
-	 * @param string $hook The current admin page.
-	 *
-	 * @return void
-	 */
-	public function enqueue_scripts( $hook ) {
-		// Form submission handling migrated to React PopoverManager.
-		// Individual recommendation JS files are no longer needed.
-	}
-
-	/**
-	 * Get the enqueue data.
-	 *
-	 * @return array
-	 */
-	protected function get_enqueue_data() {
-		return [];
-	}
-
-	/**
-	 * Check if the task is published.
-	 *
-	 * @return bool
-	 */
-	public function is_task_published() {
-		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
-			[
-				'provider'    => $this->get_provider_id(),
-				'post_status' => 'publish',
-			]
-		);
-		return ! empty( $tasks );
-	}
+	// Popover rendering methods removed - now handled by React components.
+	// See assets/src/components/Popovers/ for React popover implementations.
 }

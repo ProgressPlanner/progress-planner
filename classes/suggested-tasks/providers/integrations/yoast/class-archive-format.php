@@ -111,25 +111,7 @@ class Archive_Format extends Yoast_Interactive_Provider {
 		return $this->get_data_collector()->collect() <= static::MINIMUM_POSTS_WITH_FORMAT;
 	}
 
-	/**
-	 * Get the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'WordPress creates separate archives for each post format (standard, aside, gallery, etc.). Most sites don\'t use post formats, making these archives unnecessary. Disabling them reduces crawl waste and potential duplicate content.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$this->print_submit_button( \__( 'Disable', 'progress-planner' ) );
-	}
+	// Popover rendering methods removed - now handled by React YoastPopover component.
 
 	/**
 	 * Add task actions specific to this task.

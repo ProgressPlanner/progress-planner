@@ -96,20 +96,7 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Interactive_Provider {
 	 *
 	 * @return void
 	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'WordPress creates an RSS feed of all comments on your site. Unless you have active discussions that people want to follow, this feed is rarely used and creates an unnecessary URL.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$this->print_submit_button( \__( 'Remove', 'progress-planner' ) );
-	}
+	// Popover rendering methods removed - now handled by React YoastPopover component.
 
 	/**
 	 * Add task actions specific to this task.

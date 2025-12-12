@@ -108,47 +108,7 @@ class Rename_Uncategorized_Category extends Tasks_Interactive {
 		$this->get_data_collector()->update_uncategorized_category_cache(); // @phpstan-ignore-line method.notFound
 	}
 
-	/**
-	 * Get the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'WordPress assigns posts to "Uncategorized" by default if no category is selected. Renaming this to something meaningful (like "General" or your main topic) creates a better user experience and looks more professional.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$uncategorized_category_id = $this->get_data_collector()->collect();
-		$uncategorized_category    = \get_term( $uncategorized_category_id, 'category' );
-
-		if ( ! $uncategorized_category || \is_wp_error( $uncategorized_category ) ) {
-			return;
-		}
-		?>
-		<label>
-			<p style="margin-bottom: 0.5rem;">
-				<?php \esc_html_e( 'New name for the Uncategorized category', 'progress-planner' ); ?>
-			</p>
-			<input type="text" name="prpl_uncategorized_category_name" id="prpl_uncategorized_category_name" value="" placeholder="<?php echo \esc_attr( $uncategorized_category->name ); ?>" />
-		</label>
-		<label style="display: block; margin-top: 1rem;">
-			<p style="margin-bottom: 0.5rem;">
-				<?php \esc_html_e( 'New slug for the Uncategorized category', 'progress-planner' ); ?>
-			</p>
-			<input type="text" name="prpl_uncategorized_category_slug" id="prpl_uncategorized_category_slug" value="" placeholder="<?php echo \esc_attr( $uncategorized_category->slug ); ?>" />
-		</label>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Rename the Uncategorized category', 'progress-planner' ); ?>
-		</button>
-		<?php
-	}
+	// Popover rendering methods removed - now handled by React CustomPopover component.
 
 	/**
 	 * Handle the interactive task submit.

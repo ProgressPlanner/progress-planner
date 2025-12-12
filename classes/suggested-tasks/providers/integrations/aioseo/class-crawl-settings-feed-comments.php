@@ -94,20 +94,7 @@ class Crawl_Settings_Feed_Comments extends AIOSEO_Interactive_Provider {
 	 *
 	 * @return void
 	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'We suggest disabling both the global "recent comments feed" from your site as well as the "comments feed" per post that WordPress generates. These feeds are rarely used by real users, but get crawled a lot. They don\'t have any interesting information for crawlers, so removing them leads to less bot-traffic on your site without downsides.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$this->print_submit_button( \__( 'Disable comment RSS feeds', 'progress-planner' ) );
-	}
+	// Popover rendering methods removed - now handled by React AIOSEOPopover component.
 
 	/**
 	 * Handle the interactive task submit.

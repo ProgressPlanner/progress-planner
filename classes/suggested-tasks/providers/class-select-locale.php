@@ -188,47 +188,7 @@ class Select_Locale extends Tasks_Interactive {
 		return ! empty( $activity );
 	}
 
-	/**
-	 * Get the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>' . \esc_html__( 'Select your site locale to ensure your site is displayed correctly in the correct language', 'progress-planner' ) . '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-
-		if ( ! \function_exists( 'wp_get_available_translations' ) ) {
-			// @phpstan-ignore-next-line requireOnce.fileNotFound
-			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
-		}
-
-		$languages    = \get_available_languages();
-		$translations = \wp_get_available_translations();
-		$locale       = \get_locale();
-		if ( ! \in_array( $locale, $languages, true ) ) {
-			$locale = '';
-		}
-
-		\wp_dropdown_languages(
-			[
-				'name'                        => 'language',
-				'id'                          => 'language',
-				'selected'                    => $locale,
-				'languages'                   => $languages,
-				'translations'                => $translations,
-				'show_available_translations' => \current_user_can( 'install_languages' ) && \wp_can_install_language_pack(),
-			]
-		);
-
-		$this->print_submit_button( \__( 'Select locale', 'progress-planner' ), 'prpl-steps-nav-wrapper-align-left' );
-	}
+	// Popover rendering methods removed - now handled by React LocalePopover component.
 
 	/**
 	 * Handle the interactive task submit.

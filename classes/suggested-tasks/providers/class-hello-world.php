@@ -133,14 +133,7 @@ class Hello_World extends Tasks_Interactive {
 		return 0 !== $this->get_data_collector()->collect();
 	}
 
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$this->print_submit_button( \__( 'Delete the "Hello World!" post', 'progress-planner' ) );
-	}
+	// Popover rendering methods removed - now handled by React CustomPopover component.
 
 	/**
 	 * Get the enqueue data.

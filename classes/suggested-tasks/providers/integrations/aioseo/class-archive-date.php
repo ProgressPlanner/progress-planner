@@ -115,20 +115,7 @@ class Archive_Date extends AIOSEO_Interactive_Provider {
 	 *
 	 * @return void
 	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'Date archives rarely add any real value for users or search engines, so there\'s no reason for search engines to index these. That\'s why we suggest keeping them out of search results.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$this->print_submit_button( \__( 'Noindex the date archive', 'progress-planner' ) );
-	}
+	// Popover rendering methods removed - now handled by React AIOSEOPopover component.
 
 	/**
 	 * Handle the interactive task submit.

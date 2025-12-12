@@ -91,25 +91,7 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Interactive_Provider {
 		return true;
 	}
 
-	/**
-	 * Get the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'WordPress loads extra JavaScript to support emojis in older browsers. Modern browsers (and most of your visitors) don\'t need this, so removing it improves your site\'s loading speed.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$this->print_submit_button( \__( 'Remove', 'progress-planner' ) );
-	}
+	// Popover rendering methods removed - now handled by React YoastPopover component.
 
 	/**
 	 * Add task actions specific to this task.

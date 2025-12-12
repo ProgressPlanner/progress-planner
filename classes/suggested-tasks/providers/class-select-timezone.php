@@ -102,50 +102,7 @@ class Select_Timezone extends Tasks_Interactive {
 		return ! $activity;
 	}
 
-	/**
-	 * Get the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'Setting the time zone correctly on your site is valuable. By setting the correct time zone, you ensure scheduled tasks happen exactly when you want them to happen. To correctly account for daylight savings\', we recommend you use the city-based time zone instead of the UTC offset (e.g. Amsterdam or London).', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$current_offset     = \get_option( 'gmt_offset' );
-		$tzstring           = \get_option( 'timezone_string' );
-		$was_tzstring_saved = '' !== $tzstring || '0' !== $current_offset ? 'true' : 'false';
-
-		// Remove old Etc mappings. Fallback to gmt_offset.
-		if ( \str_contains( $tzstring, 'Etc/GMT' ) ) {
-			$tzstring = '';
-		}
-
-		if ( empty( $tzstring ) ) { // Create a UTC+- zone if no timezone string exists.
-			if ( 0 === (int) $current_offset ) {
-				$tzstring = 'UTC+0';
-			} elseif ( $current_offset < 0 ) {
-				$tzstring = 'UTC' . $current_offset;
-			} else {
-				$tzstring = 'UTC+' . $current_offset;
-			}
-		}
-		?>
-		<label>
-			<select id="timezone" name="timezone" data-timezone-saved="<?php echo \esc_attr( $was_tzstring_saved ); ?>">
-				<?php echo \wp_timezone_choice( $tzstring, \get_user_locale() ); ?>
-			</select>
-		</label>
-		<?php
-		$this->print_submit_button( \__( 'Set site timezone', 'progress-planner' ), 'prpl-steps-nav-wrapper-align-left' );
-	}
+	// Popover rendering methods removed - now handled by React TimezonePopover component.
 
 	/**
 	 * Handle the interactive task submit.

@@ -364,56 +364,7 @@ class Update_Term_Description extends Tasks_Interactive {
 		return $actions;
 	}
 
-	/**
-	 * Print the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'Term descriptions appear on category and tag archive pages, helping visitors understand what to expect. They also provide important context for search engines, which can improve your SEO.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover form contents.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		?>
-		<div class="prpl-update-term-info" style="margin-bottom: 15px;">
-			<p style="margin: 0 0 5px 0;">
-				<strong><?php \esc_html_e( 'Term:', 'progress-planner' ); ?></strong>
-				<span id="prpl-update-term-name"></span>
-			</p>
-			<p style="margin: 0 0 10px 0; font-size: 12px; color: #646970;">
-				<?php
-				\printf(
-					/* translators: %1$s: The taxonomy name, %2$s: The term slug */
-					\esc_html__( 'You are updating the term which belongs to the "%1$s" (slug "%2$s").', 'progress-planner' ),
-					'<span id="prpl-update-term-taxonomy-name"></span>',
-					'<span id="prpl-update-term-taxonomy"></span>'
-				);
-				?>
-			</p>
-		</div>
-		<textarea
-			name="description"
-			id="prpl-term-description"
-			rows="5"
-			style="width: 100%; margin-bottom: 15px;"
-			placeholder="<?php \esc_attr_e( 'Enter term description...', 'progress-planner' ); ?>"
-		></textarea>
-		<input type="hidden" name="term_id" id="prpl-update-term-id" value="">
-		<input type="hidden" name="taxonomy" id="prpl-update-taxonomy" value="">
-		<div class="prpl-steps-nav-wrapper">
-			<button type="submit" class="prpl-button prpl-button-primary" id="prpl-update-term-description-button">
-				<?php \esc_html_e( 'Save description', 'progress-planner' ); ?>
-			</button>
-		</div>
-		<?php
-	}
+	// Popover rendering methods removed - now handled by React CustomPopover component.
 
 	/**
 	 * Handle the interactive task submit for term description update.

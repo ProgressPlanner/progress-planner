@@ -95,25 +95,7 @@ class Search_Engine_Visibility extends Tasks_Interactive {
 		return 0 === (int) \get_option( 'blog_public' );
 	}
 
-	/**
-	 * Get the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'Your site is currently hidden from search engines like Google and Bing. This setting is useful during development, but prevents people from finding your content through search. If your site is ready to go live, you should enable search engine visibility.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$this->print_submit_button( \__( 'Allow search engines to index your site', 'progress-planner' ) );
-	}
+	// Popover rendering methods removed - now handled by React DisableCommentsPopover component.
 
 	/**
 	 * Handle the interactive task submit.

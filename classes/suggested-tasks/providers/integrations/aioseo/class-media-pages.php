@@ -97,24 +97,7 @@ class Media_Pages extends AIOSEO_Interactive_Provider {
 	 *
 	 * @return void
 	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'WordPress creates a "page" for every image you upload. These don\'t add any value but do cause more crawling on your site, so we suggest removing those.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		?>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Redirect media pages', 'progress-planner' ); ?>
-		</button>
-		<?php
-	}
+	// Popover rendering methods removed - now handled by React AIOSEOPopover component.
 
 	/**
 	 * Handle the interactive task submit.

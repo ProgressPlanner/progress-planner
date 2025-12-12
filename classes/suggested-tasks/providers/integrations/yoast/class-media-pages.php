@@ -85,25 +85,7 @@ class Media_Pages extends Yoast_Interactive_Provider {
 		return \YoastSEO()->helpers->options->get( 'disable-attachment' ) !== true; // @phpstan-ignore-line property.nonObject
 	}
 
-	/**
-	 * Get the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'WordPress creates individual pages for every image you upload. These attachment pages rarely provide value and can cause thin content issues for SEO. Disable them unless you\'re running a photography or art portfolio site where the attachment pages themselves are important.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$this->print_submit_button( \__( 'Disable', 'progress-planner' ) );
-	}
+	// Popover rendering methods removed - now handled by React YoastPopover component.
 
 	/**
 	 * Add task actions specific to this task.

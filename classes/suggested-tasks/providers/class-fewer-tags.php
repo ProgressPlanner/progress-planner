@@ -170,33 +170,7 @@ class Fewer_Tags extends Tasks_Interactive {
 	 *
 	 * @return void
 	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\printf(
-			// translators: %1$s is the number of tags, %2$s is the number of published posts.
-			\esc_html__( 'Your site has %1$s tags across %2$s published posts. Having too many tags can dilute your content organization and hurt SEO. The "Fewer Tags" plugin helps you consolidate similar tags.', 'progress-planner' ),
-			(int) $this->post_tag_count_data_collector->collect(),
-			(int) $this->published_post_count_data_collector->collect(),
-		);
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) : ?>
-			<prpl-install-plugin
-				data-plugin-name="Fewer Tags"
-				data-plugin-slug="fewer-tags"
-				data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'fewer-tags' ) ? 'activate' : 'install'; ?>"
-				data-provider-id="<?php echo \esc_attr( self::PROVIDER_ID ); ?>"
-			></prpl-install-plugin>
-			<?php
-		endif;
-	}
+	// Popover rendering methods removed - now handled by React CustomPopover component.
 
 	/**
 	 * Add task actions specific to this task.

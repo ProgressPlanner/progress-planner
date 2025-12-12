@@ -380,49 +380,7 @@ class Remove_Terms_Without_Posts extends Tasks_Interactive {
 		return $actions;
 	}
 
-	/**
-	 * Print the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'This term has no posts assigned to it. Removing unused terms keeps your site organized, improves navigation, and prevents empty archive pages. Note: This action cannot be undone.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover form contents.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		?>
-		<div class="prpl-delete-term-info" style="margin-bottom: 15px; padding: 10px; background: #f0f0f1; border-radius: 4px;">
-			<p style="margin: 0;">
-				<strong><?php \esc_html_e( 'Term:', 'progress-planner' ); ?></strong>
-				<span id="prpl-delete-term-name"></span>
-			</p>
-			<p style="margin: 5px 0 0 0; font-size: 12px; color: #646970;">
-				<?php
-				\printf(
-					/* translators: %1$s: The taxonomy name, %2$s: The term slug */
-					\esc_html__( 'You are deleting the term which belongs to the "%1$s" (slug "%2$s").', 'progress-planner' ),
-					'<span id="prpl-delete-term-taxonomy-name"></span>',
-					'<span id="prpl-delete-term-taxonomy"></span>'
-				);
-				?>
-			</p>
-		</div>
-		<input type="hidden" name="term_id" id="prpl-delete-term-id" value="">
-		<input type="hidden" name="taxonomy" id="prpl-delete-taxonomy" value="">
-		<div class="prpl-steps-nav-wrapper">
-			<button type="submit" class="prpl-button prpl-button-primary" id="prpl-delete-term-button">
-				<?php \esc_html_e( 'Delete term', 'progress-planner' ); ?>
-			</button>
-		</div>
-		<?php
-	}
+	// Popover rendering methods removed - now handled by React CustomPopover component.
 
 	/**
 	 * Handle the interactive task submit for term deletion.

@@ -101,70 +101,7 @@ class SEO_Plugin extends Tasks_Interactive {
 	 *
 	 * @return void
 	 */
-	public function print_popover_instructions() {
-		$seo_plugin_recommendation_slug = \progress_planner()->get_ui__branding()->get_seo_plugin_recommendation_slug();
-		$seo_plugin_recommendation_name = $this->get_plugin_name_by_slug( $seo_plugin_recommendation_slug );
-		if ( ! $seo_plugin_recommendation_name ) {
-			return;
-		}
-		?>
-		<p>
-			<?php \esc_html_e( 'Search Engine Optimization (SEO) is essential for improving your website\'s visibility in search engines like Google. An SEO plugin helps you optimize your content, manage meta tags, generate sitemaps, and follow best practices to rank higher in search results.', 'progress-planner' ); ?>
-		</p>
-		<p>
-			<?php
-			\printf(
-				/* translators: %s is the plugin name */
-				\esc_html__( 'We recommend installing %s, one of the most popular and comprehensive SEO plugins for WordPress.', 'progress-planner' ),
-				\sprintf(
-					'<a href="https://w.org/plugins/%1$s/" target="_blank">%2$s</a>',
-					\esc_attr( $seo_plugin_recommendation_slug ),
-					\esc_html( $seo_plugin_recommendation_name )
-				)
-			);
-			?>
-		</p>
-		<?php
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$seo_plugin_recommendation_slug = \progress_planner()->get_ui__branding()->get_seo_plugin_recommendation_slug();
-		$seo_plugin_recommendation_name = $this->get_plugin_name_by_slug( $seo_plugin_recommendation_slug );
-		if ( ! $seo_plugin_recommendation_name ) {
-			return;
-		}
-
-		?>
-		<?php if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) : ?>
-			<prpl-install-plugin
-				data-plugin-name="<?php echo \esc_html( $seo_plugin_recommendation_name ); ?>"
-				data-plugin-slug="<?php echo \esc_attr( $seo_plugin_recommendation_slug ); ?>"
-				data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( $seo_plugin_recommendation_slug ) ? 'activate' : 'install'; ?>"
-				data-provider-id="<?php echo \esc_attr( self::PROVIDER_ID ); ?>"
-			></prpl-install-plugin>
-		<?php else : ?>
-			<p>
-				<?php
-				if ( \is_multisite() ) {
-					\esc_html_e( 'Plugin installation is disabled on this multisite installation.', 'progress-planner' );
-				} else {
-					\esc_html_e( 'You do not have permission to install plugins.', 'progress-planner' );
-				}
-				?>
-			</p>
-			<p>
-				<a href="<?php echo \esc_url( \admin_url( 'plugins.php' ) ); ?>" class="prpl-button prpl-button-primary">
-					<?php \esc_html_e( 'Go to Plugins', 'progress-planner' ); ?>
-				</a>
-			</p>
-		<?php endif; ?>
-		<?php
-	}
+	// Popover rendering methods removed - now handled by React CustomPopover component.
 
 	/**
 	 * Get plugin name from the data collector by slug.

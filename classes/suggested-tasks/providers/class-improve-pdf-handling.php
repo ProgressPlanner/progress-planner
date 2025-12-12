@@ -169,29 +169,7 @@ class Improve_Pdf_Handling extends Tasks_Interactive {
 		);
 	}
 
-	/**
-	 * The popover content.
-	 *
-	 * @return void
-	 */
-	public function the_popover_content() {
-		\progress_planner()->the_view(
-			'popovers/improve-pdf-handling.php',
-			[
-				'prpl_popover_id'  => static::POPOVER_ID,
-				'prpl_provider_id' => $this->get_provider_id(),
-			]
-		);
-	}
-
-	/**
-	 * Print the popover form contents.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		// The form is handled in the popovers/email-sending view.
-	}
+	// Popover rendering methods removed - now handled by React components (uses separate popover template which should also be removed).
 
 	/**
 	 * Add task actions specific to this task.

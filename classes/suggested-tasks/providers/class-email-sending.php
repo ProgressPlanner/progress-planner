@@ -307,35 +307,7 @@ class Email_Sending extends Tasks_Interactive {
 		$this->email_error = $e->get_error_message() ? $e->get_error_message() : \esc_html__( 'Unknown error', 'progress-planner' );
 	}
 
-	/**
-	 * The popover content.
-	 *
-	 * @return void
-	 */
-	public function the_popover_content() {
-		\progress_planner()->the_view(
-			'popovers/email-sending.php',
-			[
-				'prpl_popover_id'                      => static::POPOVER_ID,
-				'prpl_external_link_url'               => $this->get_external_link_url(),
-				'prpl_provider_id'                     => $this->get_provider_id(),
-				'prpl_email_subject'                   => $this->email_subject,
-				'prpl_email_error'                     => $this->email_error,
-				'prpl_troubleshooting_guide_url'       => $this->get_troubleshooting_guide_url(),
-				'prpl_is_there_sending_email_override' => $this->is_there_sending_email_override(),
-				'prpl_task_actions'                    => $this->get_task_actions(),
-			]
-		);
-	}
-
-	/**
-	 * Print the popover form contents.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		// The form is handled in the popovers/email-sending view.
-	}
+	// Popover rendering methods removed - now handled by React components (uses separate popover template which should also be removed).
 
 	/**
 	 * Add task actions specific to this task.

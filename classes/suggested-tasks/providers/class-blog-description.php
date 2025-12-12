@@ -95,41 +95,7 @@ class Blog_Description extends Tasks_Interactive {
 		return '' === \get_bloginfo( 'description' );
 	}
 
-	/**
-	 * Get the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'In a few words, explain what this site is about. This information is used in your website\'s schema and RSS feeds, and can be displayed on your site. The tagline typically is your site\'s mission statement.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		?>
-		<label>
-			<p><?php echo \wp_kses_post( $this->get_task_details()['description'] ); ?></p>
-			<input
-				name="blogdescription"
-				type="text"
-				id="blogdescription"
-				value="<?php echo \esc_attr( \get_bloginfo( 'description' ) ); ?>"
-				placeholder="<?php \esc_html_e( 'A catchy phrase to describe your website', 'progress-planner' ); ?>"
-			>
-		</label>
-		<div class="prpl-steps-nav-wrapper">
-			<button type="submit" class="prpl-button prpl-button-primary" disabled>
-				<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
-			</button>
-		</div>
-		<?php
-	}
+	// Popover rendering methods removed - now handled by React BlogDescriptionPopover component.
 
 	/**
 	 * Add task actions specific to this task.

@@ -7,6 +7,7 @@
 
 import { useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { doAction } from '@wordpress/hooks';
 
 /**
  * Task Actions component.
@@ -59,7 +60,7 @@ export default function TaskActions( {
 			} );
 		} );
 
-		// Handle popover triggers - intercept onclick and use showPopover.
+		// Handle popover triggers - intercept onclick and use doAction.
 		const popoverLinks = container.querySelectorAll(
 			'a[onclick*="showPopover"]'
 		);
@@ -71,16 +72,13 @@ export default function TaskActions( {
 			);
 			if ( match ) {
 				const popoverId = match[ 1 ];
+				// Extract task ID from popover ID (format: prpl-popover-{taskId})
+				const taskId = popoverId.replace( 'prpl-popover-', '' );
 				link.removeAttribute( 'onclick' );
 				link.addEventListener( 'click', ( e ) => {
 					e.preventDefault();
-					const popover = document.getElementById( popoverId );
-					if (
-						popover &&
-						typeof popover.showPopover === 'function'
-					) {
-						popover.showPopover();
-					}
+					// Trigger popover open via hook
+					doAction( 'prpl.popover.open', taskId, task );
 				} );
 			}
 		} );

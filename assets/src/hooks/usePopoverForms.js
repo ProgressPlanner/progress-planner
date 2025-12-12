@@ -115,27 +115,34 @@ function clearError( popoverId ) {
  * @param {Object}   options                      Options object.
  * @param {string}   options.settingAPIKey        The API key for the setting.
  * @param {string}   options.setting              The form field name.
- * @param {string}   options.popoverId            The popover ID.
+ * @param {string}   options.popoverId            The popover ID (for error display).
  * @param {Function} options.settingCallbackValue Optional callback to transform the value.
+ * @param {*}        options.value                The form value (if provided, skips DOM query).
  * @return {Promise} Promise resolving to the response.
  */
 export async function submitSiteSettings( {
 	settingAPIKey,
 	setting,
 	popoverId,
-	settingCallbackValue = ( value ) => value,
+	settingCallbackValue = ( val ) => val,
+	value: providedValue = null,
 } ) {
 	const formElement = document.querySelector( `#${ popoverId } form` );
-	if ( ! formElement ) {
-		throw new Error( 'Form not found' );
+	if ( ! formElement && providedValue === null ) {
+		throw new Error( 'Form not found and no value provided' );
 	}
 
-	showLoading( formElement );
+	if ( formElement ) {
+		showLoading( formElement );
+	}
 	clearError( popoverId );
 
 	try {
-		const formData = new FormData( formElement );
-		const settingValue = settingCallbackValue( formData.get( setting ) );
+		const formValue =
+			providedValue !== null
+				? providedValue
+				: new FormData( formElement ).get( setting );
+		const settingValue = settingCallbackValue( formValue );
 
 		const response = await apiFetch( {
 			path: '/wp/v2/settings',
@@ -143,10 +150,14 @@ export async function submitSiteSettings( {
 			data: { [ settingAPIKey ]: settingValue },
 		} );
 
-		hideLoading( formElement );
+		if ( formElement ) {
+			hideLoading( formElement );
+		}
 		return response;
 	} catch ( error ) {
-		hideLoading( formElement );
+		if ( formElement ) {
+			hideLoading( formElement );
+		}
 		showError( popoverId );
 		throw error;
 	}
@@ -158,9 +169,10 @@ export async function submitSiteSettings( {
  * @param {Object}   options                      Options object.
  * @param {string}   options.setting              The setting name.
  * @param {string}   options.settingPath          The setting path (JSON string).
- * @param {string}   options.popoverId            The popover ID.
+ * @param {string}   options.popoverId            The popover ID (for error display).
  * @param {string}   options.action               The AJAX action.
  * @param {Function} options.settingCallbackValue Optional callback to transform the value.
+ * @param {*}        options.value                The form value (if provided, skips DOM query).
  * @return {Promise} Promise resolving to the response.
  */
 export async function submitPluginSettings( {
@@ -168,19 +180,25 @@ export async function submitPluginSettings( {
 	settingPath = false,
 	popoverId,
 	action = 'prpl_interactive_task_submit',
-	settingCallbackValue = ( value ) => value,
+	settingCallbackValue = ( val ) => val,
+	value: providedValue = null,
 } ) {
 	const formElement = document.querySelector( `#${ popoverId } form` );
-	if ( ! formElement ) {
-		throw new Error( 'Form not found' );
+	if ( ! formElement && providedValue === null ) {
+		throw new Error( 'Form not found and no value provided' );
 	}
 
-	showLoading( formElement );
+	if ( formElement ) {
+		showLoading( formElement );
+	}
 	clearError( popoverId );
 
 	try {
-		const formData = new FormData( formElement );
-		const settingValue = settingCallbackValue( formData.get( setting ) );
+		const formValue =
+			providedValue !== null
+				? providedValue
+				: new FormData( formElement ).get( setting );
+		const settingValue = settingCallbackValue( formValue );
 
 		const ajaxUrl =
 			window.prplSuggestedTasksConfig?.ajaxUrl ||
@@ -209,7 +227,9 @@ export async function submitPluginSettings( {
 		} );
 
 		const data = await response.json();
-		hideLoading( formElement );
+		if ( formElement ) {
+			hideLoading( formElement );
+		}
 
 		if ( data.success !== true ) {
 			showError( popoverId );
@@ -218,7 +238,9 @@ export async function submitPluginSettings( {
 
 		return data;
 	} catch ( error ) {
-		hideLoading( formElement );
+		if ( formElement ) {
+			hideLoading( formElement );
+		}
 		showError( popoverId );
 		throw error;
 	}

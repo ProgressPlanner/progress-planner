@@ -99,25 +99,7 @@ class Archive_Date extends Yoast_Interactive_Provider {
 			&& \strpos( $permalink_structure, '%day%' ) === false;
 	}
 
-	/**
-	 * Get the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'Date archives are primarily useful for news sites and time-sensitive content. For most websites, they add unnecessary URLs that can dilute your SEO. Disable them unless your content is date-specific.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$this->print_submit_button( \__( 'Disable', 'progress-planner' ) );
-	}
+	// Popover rendering methods removed - now handled by React YoastPopover component.
 
 	/**
 	 * Add task actions specific to this task.

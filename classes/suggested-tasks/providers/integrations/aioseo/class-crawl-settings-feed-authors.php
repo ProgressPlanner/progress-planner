@@ -125,20 +125,7 @@ class Crawl_Settings_Feed_Authors extends AIOSEO_Interactive_Provider {
 	 *
 	 * @return void
 	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'The author feed on your site will be similar to your main feed if you have only one author, so there\'s no reason to have it.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$this->print_submit_button( \__( 'Disable author RSS feeds', 'progress-planner' ) );
-	}
+	// Popover rendering methods removed - now handled by React AIOSEOPopover component.
 
 	/**
 	 * Handle the interactive task submit.
