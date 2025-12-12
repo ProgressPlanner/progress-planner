@@ -58,10 +58,6 @@ final class Suggested_Tasks extends Widget {
 	 * @return array Widget configuration.
 	 */
 	public function get_widget_config() {
-		// Check if the request URI contains the parameter 'prpl_show_all_recommendations'.
-		$request_uri = isset( $_SERVER['REQUEST_URI'] ) ? \sanitize_text_field( \wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
-		$show_all    = false !== \strpos( $request_uri, 'prpl_show_all_recommendations' );
-
 		// Get widget title (may be custom branded or default).
 		$widget_title = \progress_planner()->get_ui__branding()->get_widget_title(
 			'suggested-tasks',
@@ -83,7 +79,6 @@ final class Suggested_Tasks extends Widget {
 			'perPage'          => self::PER_PAGE_DEFAULT,
 			'raviName'         => \progress_planner()->get_ui__branding()->get_ravi_name(),
 			'nonce'            => \wp_create_nonce( 'progress_planner' ),
-			'showAll'          => $show_all,
 			'ajaxUrl'          => \admin_url( 'admin-ajax.php' ),
 			'delayCelebration' => ! \progress_planner()->is_on_progress_planner_dashboard_page(),
 			'title'            => $widget_title,

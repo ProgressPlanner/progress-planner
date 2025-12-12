@@ -46,14 +46,16 @@ function buildQueryString( params ) {
  * @param {Object}   options                 Fetch options.
  * @param {string}   options.status          Task status (publish, pending, future, trash).
  * @param {number}   options.perPage         Number of tasks to fetch.
+ * @param {number}   options.page            Page number (1-based, defaults to 1).
  * @param {string}   options.excludeProvider Provider to exclude (e.g., 'user').
  * @param {string}   options.provider        Provider to include.
  * @param {number[]} options.excludeIds      Array of post IDs to exclude.
- * @return {Promise<Array>} Promise resolving to array of tasks.
+ * @return {Promise<Object>} Promise resolving to object with tasks array and pagination metadata.
  */
 export async function fetchTasks( {
 	status = 'publish',
-	perPage = 100,
+	perPage = 5,
+	page = 1,
 	excludeProvider,
 	provider,
 	excludeIds = [],
@@ -61,6 +63,7 @@ export async function fetchTasks( {
 	const params = {
 		status,
 		per_page: perPage,
+		page,
 		_embed: true,
 		'filter[orderby]': 'menu_order',
 		'filter[order]': 'ASC',
@@ -81,13 +84,32 @@ export async function fetchTasks( {
 	const query = buildQueryString( params );
 
 	try {
+		// Use apiFetch with custom parse to access response headers
 		const response = await apiFetch( {
 			path: `/wp/v2/prpl_recommendations?${ query }`,
+			parse: false, // Don't parse JSON automatically, we need the response object
 		} );
-		return response || [];
+
+		// apiFetch with parse: false returns the Response object
+		const tasks = await response.json();
+		const totalPages = parseInt(
+			response.headers.get( 'X-WP-TotalPages' ) || '1',
+			10
+		);
+
+		return {
+			tasks: tasks || [],
+			totalPages,
+			hasMore: page < totalPages,
+		};
 	} catch ( error ) {
 		console.error( 'Error fetching tasks:', error );
-		return [];
+		// Return empty result with no more pages on error
+		return {
+			tasks: [],
+			totalPages: 1,
+			hasMore: false,
+		};
 	}
 }
 

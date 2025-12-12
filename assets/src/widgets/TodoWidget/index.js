@@ -69,27 +69,27 @@ function TodoWidget( { config = {} } ) {
 		const loadTasks = async () => {
 			try {
 				// Fetch pending user tasks
-				const pending = await fetchTasks( {
+				const pendingResult = await fetchTasks( {
 					status: 'publish',
 					provider: 'user',
 					perPage: 100,
 				} );
 
 				// Fetch completed user tasks
-				const completed = await fetchTasks( {
+				const completedResult = await fetchTasks( {
 					status: 'trash',
 					provider: 'user',
 					perPage: 100,
 				} );
 
 				// Sort pending tasks: golden tasks (prpl_points === 1) first, then by menu_order
-				const sortedPending = sortTasksWithGoldenFirst( pending );
-				completed.sort(
+				const sortedPending = sortTasksWithGoldenFirst( pendingResult.tasks );
+				completedResult.tasks.sort(
 					( a, b ) => ( a.menu_order || 0 ) - ( b.menu_order || 0 )
 				);
 
 				setPendingTasks( sortedPending );
-				setCompletedTasks( completed );
+				setCompletedTasks( completedResult.tasks );
 			} catch ( error ) {
 				// eslint-disable-next-line no-console
 				console.error( 'Error loading tasks:', error );

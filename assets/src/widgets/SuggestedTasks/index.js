@@ -30,7 +30,9 @@ import { useCelebration } from '../../hooks/useCelebration';
 function SuggestedTasks( { config = {} } ) {
 	const [ tasks, setTasks ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
-	const [ showAll, setShowAll ] = useState( config?.showAll || false );
+	const [ currentPage, setCurrentPage ] = useState( 1 );
+	const [ hasMorePages, setHasMorePages ] = useState( false );
+	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
 	const [ celebratingTaskIds, setCelebratingTaskIds ] = useState( new Set() );
 	const listRef = useRef( null );
 	const injectedTaskIdsRef = useRef( new Set() );
@@ -47,42 +49,27 @@ function SuggestedTasks( { config = {} } ) {
 	useEffect( () => {
 		const loadTasks = async () => {
 			try {
-				const perPage = showAll ? 100 : config?.perPage || 5;
+				const perPage = config?.perPage || 5;
 
-				// Fetch published tasks (excluding user tasks).
-				const publishedTasks = await fetchTasks( {
-					status: 'publish',
-					perPage,
-					excludeProvider: 'user',
-				} );
-
-				// Track injected task IDs.
-				publishedTasks.forEach( ( task ) => {
-					injectedTaskIdsRef.current.add( task.id );
-				} );
-
-				setTasks( publishedTasks );
-				setIsLoading( false );
-
-				// Check for pending celebration tasks.
+				// First: Fetch pending celebration tasks (if not delayed).
 				if ( ! config?.delayCelebration ) {
-					const pendingTasks = await fetchTasks( {
+					const pendingResult = await fetchTasks( {
 						status: 'pending',
-						perPage,
+						perPage: 100, // Get all pending tasks for celebration
 						excludeProvider: 'user',
 					} );
 
-					if ( pendingTasks.length > 0 ) {
+					if ( pendingResult.tasks.length > 0 ) {
 						// Add pending tasks to the list.
-						setTasks( ( prev ) => [ ...prev, ...pendingTasks ] );
+						setTasks( pendingResult.tasks );
 
 						// Track pending task IDs.
-						pendingTasks.forEach( ( task ) => {
+						pendingResult.tasks.forEach( ( task ) => {
 							injectedTaskIdsRef.current.add( task.id );
 						} );
 
 						// Trash the pending tasks in the background.
-						pendingTasks.forEach( ( task ) => {
+						pendingResult.tasks.forEach( ( task ) => {
 							completeTask( task.id ).catch( () => {} );
 						} );
 
@@ -90,7 +77,7 @@ function SuggestedTasks( { config = {} } ) {
 						setTimeout( () => {
 							// Add celebrating class to pending tasks.
 							const pendingIds = new Set(
-								pendingTasks.map( ( t ) => t.id )
+								pendingResult.tasks.map( ( t ) => t.id )
 							);
 							setCelebratingTaskIds( pendingIds );
 
@@ -115,6 +102,24 @@ function SuggestedTasks( { config = {} } ) {
 					}
 				}
 
+				// Second: Fetch first page of published tasks.
+				const publishedResult = await fetchTasks( {
+					status: 'publish',
+					perPage,
+					page: 1,
+					excludeProvider: 'user',
+				} );
+
+				// Track injected task IDs.
+				publishedResult.tasks.forEach( ( task ) => {
+					injectedTaskIdsRef.current.add( task.id );
+				} );
+
+				// Add published tasks to the list (append if we already have pending tasks).
+				setTasks( ( prev ) => [ ...prev, ...publishedResult.tasks ] );
+				setHasMorePages( publishedResult.hasMore );
+				setIsLoading( false );
+
 				// Trigger grid resize.
 				setTimeout( () => {
 					window.dispatchEvent(
@@ -127,7 +132,7 @@ function SuggestedTasks( { config = {} } ) {
 		};
 
 		loadTasks();
-	}, [ showAll, config ] );
+	}, [ config ] );
 
 	/**
 	 * Handle task completion.
@@ -175,16 +180,17 @@ function SuggestedTasks( { config = {} } ) {
 				} );
 
 				// Fetch replacement task.
-				const replacementTasks = await fetchTasks( {
+				const replacementResult = await fetchTasks( {
 					status: 'publish',
 					perPage: 1,
+					page: 1,
 					excludeProvider: 'user',
 					excludeIds: Array.from( injectedTaskIdsRef.current ),
 				} );
 
-				if ( replacementTasks.length > 0 ) {
-					setTasks( ( prev ) => [ ...prev, replacementTasks[ 0 ] ] );
-					injectedTaskIdsRef.current.add( replacementTasks[ 0 ].id );
+				if ( replacementResult.tasks.length > 0 ) {
+					setTasks( ( prev ) => [ ...prev, replacementResult.tasks[ 0 ] ] );
+					injectedTaskIdsRef.current.add( replacementResult.tasks[ 0 ].id );
 				}
 
 				// Trigger grid resize.
@@ -214,16 +220,17 @@ function SuggestedTasks( { config = {} } ) {
 			setTasks( ( prev ) => prev.filter( ( t ) => t.id !== postId ) );
 
 			// Fetch replacement task.
-			const replacementTasks = await fetchTasks( {
+			const replacementResult = await fetchTasks( {
 				status: 'publish',
 				perPage: 1,
+				page: 1,
 				excludeProvider: 'user',
 				excludeIds: Array.from( injectedTaskIdsRef.current ),
 			} );
 
-			if ( replacementTasks.length > 0 ) {
-				setTasks( ( prev ) => [ ...prev, replacementTasks[ 0 ] ] );
-				injectedTaskIdsRef.current.add( replacementTasks[ 0 ].id );
+			if ( replacementResult.tasks.length > 0 ) {
+				setTasks( ( prev ) => [ ...prev, replacementResult.tasks[ 0 ] ] );
+				injectedTaskIdsRef.current.add( replacementResult.tasks[ 0 ].id );
 			}
 
 			// Trigger grid resize.
@@ -249,16 +256,17 @@ function SuggestedTasks( { config = {} } ) {
 			setTasks( ( prev ) => prev.filter( ( t ) => t.id !== postId ) );
 
 			// Fetch replacement task.
-			const replacementTasks = await fetchTasks( {
+			const replacementResult = await fetchTasks( {
 				status: 'publish',
 				perPage: 1,
+				page: 1,
 				excludeProvider: 'user',
 				excludeIds: Array.from( injectedTaskIdsRef.current ),
 			} );
 
-			if ( replacementTasks.length > 0 ) {
-				setTasks( ( prev ) => [ ...prev, replacementTasks[ 0 ] ] );
-				injectedTaskIdsRef.current.add( replacementTasks[ 0 ].id );
+			if ( replacementResult.tasks.length > 0 ) {
+				setTasks( ( prev ) => [ ...prev, replacementResult.tasks[ 0 ] ] );
+				injectedTaskIdsRef.current.add( replacementResult.tasks[ 0 ].id );
 			}
 
 			// Trigger grid resize.
@@ -319,25 +327,45 @@ function SuggestedTasks( { config = {} } ) {
 	);
 
 	/**
-	 * Handle show all/fewer toggle.
+	 * Handle load more button click.
 	 */
-	const handleToggleShowAll = useCallback( async () => {
-		const newShowAll = ! showAll;
-		setShowAll( newShowAll );
-		setIsLoading( true );
-
-		// Clear tracking.
-		injectedTaskIdsRef.current.clear();
-
-		// Update URL.
-		const url = new URL( window.location );
-		if ( newShowAll ) {
-			url.searchParams.set( 'prpl_show_all_recommendations', '' );
-		} else {
-			url.searchParams.delete( 'prpl_show_all_recommendations' );
+	const handleLoadMore = useCallback( async () => {
+		if ( isLoadingMore || ! hasMorePages ) {
+			return;
 		}
-		window.history.pushState( {}, '', url );
-	}, [ showAll ] );
+
+		setIsLoadingMore( true );
+		const nextPage = currentPage + 1;
+		const perPage = config?.perPage || 5;
+
+		try {
+			const result = await fetchTasks( {
+				status: 'publish',
+				perPage,
+				page: nextPage,
+				excludeProvider: 'user',
+			} );
+
+			// Track injected task IDs.
+			result.tasks.forEach( ( task ) => {
+				injectedTaskIdsRef.current.add( task.id );
+			} );
+
+			// Append new tasks to existing list.
+			setTasks( ( prev ) => [ ...prev, ...result.tasks ] );
+			setHasMorePages( result.hasMore );
+			setCurrentPage( nextPage );
+
+			// Trigger grid resize.
+			setTimeout( () => {
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+			}, 100 );
+		} catch ( error ) {
+			console.error( 'Error loading more tasks:', error );
+		} finally {
+			setIsLoadingMore( false );
+		}
+	}, [ currentPage, hasMorePages, isLoadingMore, config ] );
 
 	// Inline styles
 	const listStyle = {
@@ -479,20 +507,22 @@ function SuggestedTasks( { config = {} } ) {
 					/>
 				) ) }
 			</ul>
-			<p className="prpl-show-all-tasks">
-				<button
-					type="button"
-					id="prpl-toggle-all-recommendations"
-					className="prpl-toggle-all-recommendations-button"
-					style={ toggleButtonStyle }
-					data-show-all={ showAll ? '1' : '0' }
-					onClick={ handleToggleShowAll }
-				>
-					{ showAll
-						? __( 'Show fewer recommendations', 'progress-planner' )
-						: __( 'Show all recommendations', 'progress-planner' ) }
-				</button>
-			</p>
+			{ hasMorePages && (
+				<p className="prpl-show-all-tasks">
+					<button
+						type="button"
+						id="prpl-load-more-recommendations"
+						className="prpl-toggle-all-recommendations-button"
+						style={ toggleButtonStyle }
+						onClick={ handleLoadMore }
+						disabled={ isLoadingMore }
+					>
+						{ isLoadingMore
+							? __( 'Loading…', 'progress-planner' )
+							: __( 'Load more tasks', 'progress-planner' ) }
+					</button>
+				</p>
+			) }
 		</>
 	);
 }
