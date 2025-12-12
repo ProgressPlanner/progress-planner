@@ -14,3 +14,5 @@ auth.json
 # Environment variables
 .env
 .claude/
+
+coverage/
