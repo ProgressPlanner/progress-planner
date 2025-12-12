@@ -43,7 +43,7 @@ class Onboard_Wizard {
 		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
 
 		// Add admin toolbar items.
-		if ( \defined( 'PRPL_DEBUG' ) && PRPL_DEBUG && \current_user_can( 'manage_options' ) ) {
+		if ( \progress_planner()->get_base()->is_debug_mode_enabled() ) {
 			\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_items' ] );
 			\add_action( 'admin_init', [ $this, 'check_delete_onboarding_progress' ] );
 		}
