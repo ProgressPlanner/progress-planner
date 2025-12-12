@@ -84,7 +84,7 @@ class Disable_Comments extends Tasks_Interactive {
 	 * @return bool
 	 */
 	public function should_add_task() {
-		return ! \progress_planner()->get_plugin_installer()->is_plugin_activated( 'comment-free-zone' )
+		return ! \Progress_Planner\Utils\Plugin_Utils::is_plugin_activated( 'comment-free-zone' )
 			&& 10 > \wp_count_comments()->approved
 			&& 'open' === \get_default_comment_status();
 	}

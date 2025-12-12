@@ -16,6 +16,7 @@
 
 import { useState, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 
 export default function InstallPluginButton( {
 	pluginSlug,
@@ -37,46 +38,22 @@ export default function InstallPluginButton( {
 		setStatus( 'installing' );
 
 		try {
-			const ajaxUrl =
-				window.progressPlanner?.ajaxUrl ||
-				window.prplSuggestedTasksConfig?.ajaxUrl ||
-				'/wp-admin/admin-ajax.php';
-			const nonce =
-				window.progressPlanner?.nonce ||
-				window.prplSuggestedTasksConfig?.nonce ||
-				'';
-
-			const response = await fetch( ajaxUrl, {
+			await apiFetch( {
+				path: '/progress-planner/v1/plugins/install',
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-				},
-				body: new URLSearchParams( {
-					action: 'progress_planner_install_plugin',
+				data: {
 					plugin_slug: pluginSlug,
-					plugin_name: pluginName,
-					nonce,
-				} ),
-				credentials: 'same-origin',
+				},
 			} );
 
-			const data = await response.json();
-
-			if ( data.success ) {
-				// After installation, activate the plugin
-				await activatePlugin();
-			} else {
-				throw new Error(
-					data.data?.message ||
-						__( 'Installation failed', 'progress-planner' )
-				);
-			}
+			// After installation, activate the plugin
+			await activatePlugin();
 		} catch ( err ) {
 			console.error( 'Error installing plugin:', err ); // eslint-disable-line no-console
 			setStatus( 'idle' );
 			setIsLoading( false );
 		}
-	}, [ pluginSlug, pluginName, activatePlugin ] );
+	}, [ pluginSlug, activatePlugin ] );
 
 	/**
 	 * Activate plugin.
@@ -85,61 +62,33 @@ export default function InstallPluginButton( {
 		setStatus( 'activating' );
 
 		try {
-			const ajaxUrl =
-				window.progressPlanner?.ajaxUrl ||
-				window.prplSuggestedTasksConfig?.ajaxUrl ||
-				'/wp-admin/admin-ajax.php';
-			const nonce =
-				window.progressPlanner?.nonce ||
-				window.prplSuggestedTasksConfig?.nonce ||
-				'';
-
-			const response = await fetch( ajaxUrl, {
+			await apiFetch( {
+				path: '/progress-planner/v1/plugins/activate',
 				method: 'POST',
-				headers: {
-					'Content-Type': 'application/x-www-form-urlencoded',
-				},
-				body: new URLSearchParams( {
-					action: 'progress_planner_activate_plugin',
+				data: {
 					plugin_slug: pluginSlug,
-					plugin_name: pluginName,
-					nonce,
-				} ),
-				credentials: 'same-origin',
+				},
 			} );
 
-			const data = await response.json();
+			setStatus( 'activated' );
+			setCurrentAction( 'activated' );
 
-			if ( data.success ) {
-				setStatus( 'activated' );
-				setCurrentAction( 'activated' );
-
-				// Complete task if needed
-				if ( completeTask && providerId ) {
-					// Trigger task completion via hook
-					// This will be handled by the parent component or PopoverManager
-					if ( window.prplSuggestedTask?.maybeComplete ) {
-						// Find the task element and complete it
-						const taskElement = document.querySelector(
-							`#prpl-suggested-tasks-list .prpl-suggested-task[data-task-id="${ providerId }"]`
-						);
-						if ( taskElement ) {
-							const postId = parseInt(
-								taskElement.dataset.postId
-							);
-							if ( postId ) {
-								window.prplSuggestedTask.maybeComplete(
-									postId
-								);
-							}
+			// Complete task if needed
+			if ( completeTask && providerId ) {
+				// Trigger task completion via hook
+				// This will be handled by the parent component or PopoverManager
+				if ( window.prplSuggestedTask?.maybeComplete ) {
+					// Find the task element and complete it
+					const taskElement = document.querySelector(
+						`#prpl-suggested-tasks-list .prpl-suggested-task[data-task-id="${ providerId }"]`
+					);
+					if ( taskElement ) {
+						const postId = parseInt( taskElement.dataset.postId );
+						if ( postId ) {
+							window.prplSuggestedTask.maybeComplete( postId );
 						}
 					}
 				}
-			} else {
-				throw new Error(
-					data.data?.message ||
-						__( 'Activation failed', 'progress-planner' )
-				);
 			}
 		} catch ( err ) {
 			console.error( 'Error activating plugin:', err ); // eslint-disable-line no-console
@@ -147,7 +96,7 @@ export default function InstallPluginButton( {
 		} finally {
 			setIsLoading( false );
 		}
-	}, [ pluginSlug, pluginName, completeTask, providerId ] );
+	}, [ pluginSlug, completeTask, providerId ] );
 
 	/**
 	 * Handle button click.

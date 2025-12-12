@@ -24,6 +24,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Rest\Streak_Badges get_rest__streak_badges()
  * @method \Progress_Planner\Rest\Activity_Scores get_rest__activity_scores()
  * @method \Progress_Planner\Rest\Whats_New get_rest__whats_new()
+ * @method \Progress_Planner\Rest\Plugin_Installer get_rest__plugin_installer()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
  * @method \Progress_Planner\Utils\Playground get_utils__playground()
@@ -45,7 +46,6 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Suggested_Tasks_DB get_suggested_tasks_db()
  * @method \Progress_Planner\Utils\Deprecations get_utils__deprecations()
  * @method \Progress_Planner\UI\Branding get_ui__branding()
- * @method \Progress_Planner\Plugin_Installer get_plugin_installer()
  * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Content get_admin__widgets__badge_streak_content()
  * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Maintenance get_admin__widgets__badge_streak_maintenance()
  * @method \Progress_Planner\Admin\Enqueue get_admin__enqueue()
@@ -124,6 +124,7 @@ class Base {
 		$this->get_rest__streak_badges();
 		$this->get_rest__activity_scores();
 		$this->get_rest__whats_new();
+		$this->get_rest__plugin_installer();
 
 		// Onboarding.
 		$this->get_utils__onboard();
@@ -159,9 +160,6 @@ class Base {
 
 		// Plugin upgrade.
 		$this->get_plugin_migrations();
-
-		// Plugin installer.
-		$this->get_plugin_installer();
 
 		/**
 		 * Redirect on login.

@@ -34,8 +34,8 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				<?php /* If the user has the necessary permissions and Yoast SEO is active, but PDF Library is not activated, show the next step button. */ ?>
 				<?php
 				if ( ! \is_multisite() && \current_user_can( 'install_plugins' )
-						&& \progress_planner()->get_plugin_installer()->is_plugin_activated( 'wordpress-seo' )
-						&& ! \progress_planner()->get_plugin_installer()->is_plugin_activated( 'pdf-library' ) ) :
+						&& \Progress_Planner\Utils\Plugin_Utils::is_plugin_activated( 'wordpress-seo' )
+						&& ! \Progress_Planner\Utils\Plugin_Utils::is_plugin_activated( 'pdf-library' ) ) :
 					?>
 					<button class="prpl-button prpl-button-step" data-action="showPdfXmlSitemapStep">
 						<?php /* translators: %s is a forward arrow icon. */ ?>
@@ -67,7 +67,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					<prpl-install-plugin
 						data-plugin-name="XML Sitemap for PDFs for Yoast SEO"
 						data-plugin-slug="pdf-sitemap"
-						data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'pdf-sitemap' ) ? 'activate' : 'install'; ?>"
+						data-action="<?php echo \Progress_Planner\Utils\Plugin_Utils::is_plugin_installed( 'pdf-sitemap' ) ? 'activate' : 'install'; ?>"
 						data-complete-task="false"
 						data-provider-id="<?php echo \esc_attr( $prpl_provider_id ); ?>"
 					></prpl-install-plugin>

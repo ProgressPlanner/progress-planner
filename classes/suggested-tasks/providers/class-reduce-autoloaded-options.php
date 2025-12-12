@@ -206,7 +206,7 @@ class Reduce_Autoloaded_Options extends Tasks_Interactive {
 			<prpl-install-plugin
 				data-plugin-name="AAA Option Optimizer"
 				data-plugin-slug="aaa-option-optimizer"
-				data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'aaa-option-optimizer' ) ? 'activate' : 'install'; ?>"
+				data-action="<?php echo \Progress_Planner\Utils\Plugin_Utils::is_plugin_installed( 'aaa-option-optimizer' ) ? 'activate' : 'install'; ?>"
 				data-provider-id="<?php echo \esc_attr( self::PROVIDER_ID ); ?>"
 			></prpl-install-plugin>
 		<?php endif; ?>
