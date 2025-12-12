@@ -253,8 +253,8 @@ class Page {
 			}
 			$widget_asset = include $widget_asset_file;
 
-			// Widget scripts depend on dashboard script to ensure widgetRegistry is initialized
-			$widget_dependencies = array_merge(
+			// Widget scripts depend on dashboard script to ensure widgetRegistry is initialized.
+			$widget_dependencies = \array_merge(
 				$widget_asset['dependencies'],
 				[ 'progress-planner/dashboard' ]
 			);
@@ -385,12 +385,10 @@ class Page {
 		];
 
 		// Get badge URLs from enqueue class.
-		$enqueue = \progress_planner()->get_admin__enqueue();
+		$enqueue    = \progress_planner()->get_admin__enqueue();
 		$badge_urls = $enqueue->get_badge_urls();
-		if ( is_array( $badge_urls ) ) {
-			foreach ( $badge_urls as $context => $url ) {
-				$celebration_data[ $context . 'IconUrl' ] = $url;
-			}
+		foreach ( $badge_urls as $context => $url ) {
+			$celebration_data[ $context . 'IconUrl' ] = $url;
 		}
 
 		\wp_localize_script(
