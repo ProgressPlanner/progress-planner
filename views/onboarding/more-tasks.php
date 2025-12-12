@@ -54,7 +54,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 						<div class="prpl-task-item" data-popover="task" data-task-id="<?php echo \esc_attr( $prpl_task['task_id'] ); ?>">
 							<div class="prpl-task-item-button-wrapper">
-								<button class="prpl-complete-task-btn" prpl-open-task><?php echo \esc_html_e( 'Start', 'progress-planner' ); ?></button>
+								<button class="prpl-complete-task-btn" prpl-open-task><?php echo esc_html( $prpl_task['action_label'] ); ?></button>
 								<span class="prpl-suggested-task-points">
 									+1
 								</span>

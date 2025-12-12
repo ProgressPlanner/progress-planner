@@ -781,6 +781,15 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
+	 * Get the task action label.
+	 *
+	 * @return string
+	 */
+	public function get_task_action_label() {
+		return \esc_html__( 'Do it', 'progress-planner' );
+	}
+
+	/**
 	 * Check if the task has activity.
 	 *
 	 * @param string $task_id The task ID.

@@ -80,21 +80,18 @@ class Onboard_Wizard {
 		$tasks = [];
 
 		foreach ( $onboarding_tasks as $task_id ) {
-			$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
+			$task          = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
+			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id );
 
 			// If there is no task, create it.
-			if ( ! $task ) {
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id );
+			if ( ! $task && $task_provider ) {
+				$task_data = $task_provider->get_task_details();
 
-				if ( $task_provider ) {
-					$task_data = $task_provider->get_task_details();
+				// Task will not be inserted if it already exists.
+				\progress_planner()->get_suggested_tasks_db()->add( $task_data );
 
-					// Task will not be inserted if it already exists.
-					\progress_planner()->get_suggested_tasks_db()->add( $task_data );
-
-					// Now get the task.
-					$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
-				}
+				// Now get the task.
+				$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 			}
 
 			// Safety check: Skip if task could not be created or retrieved.
@@ -104,11 +101,12 @@ class Onboard_Wizard {
 			}
 
 			$task_formatted = [
-				'task_id'     => $task[0]->get_task_id(),
-				'title'       => $task[0]->post_title ?? '',
-				'url'         => $task[0]->url ?? '',
-				'provider_id' => $task[0]->get_provider_id(),
-				'points'      => $task[0]->points ?? 0,
+				'task_id'      => $task[0]->get_task_id(),
+				'title'        => $task[0]->post_title ?? '',
+				'url'          => $task[0]->url ?? '',
+				'provider_id'  => $task[0]->get_provider_id(),
+				'points'       => $task[0]->points ?? 0,
+				'action_label' => $task_provider ? $task_provider->get_task_action_label() : \esc_html__( 'Do it', 'progress-planner' ),
 			];
 
 			// Add task specific data.
@@ -174,8 +172,7 @@ class Onboard_Wizard {
 				'template_file_name' => 'more-tasks',
 				'template_data'      => [ 'tasks' => $tasks ],
 				'template_id'        => 'onboarding-step-more-tasks',
-				/* translators: Two-line step title: "Complete more tasks" on line 1, "Finish onboarding!" on line 2 */
-				'title'              => esc_html__( 'Complete more tasks', 'progress-planner' ) . '<br>' . esc_html__( 'Finish onboarding!', 'progress-planner' ),
+				'title'              => esc_html__( 'Finish onboarding!', 'progress-planner' ),
 			];
 		}
 	}

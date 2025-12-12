@@ -142,10 +142,19 @@ class Blog_Description extends Tasks_Interactive {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Set tagline', 'progress-planner' ) . '</a>',
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html( $this->get_task_action_label() ) . '</a>',
 		];
 
 		return $actions;
+	}
+
+	/**
+	 * Get the task action label.
+	 *
+	 * @return string
+	 */
+	public function get_task_action_label() {
+		return __( 'Set tagline', 'progress-planner' );
 	}
 
 	/**
