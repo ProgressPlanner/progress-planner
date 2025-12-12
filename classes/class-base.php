@@ -408,6 +408,7 @@ class Base {
 				if ( $get_contents ) {
 					return (string) \ob_get_clean();
 				}
+				break; // Exit the loop after the first file is found, covers the case when $get_contents is false.
 			}
 		}
 		return '';
