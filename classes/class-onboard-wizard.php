@@ -42,6 +42,14 @@ class Onboard_Wizard {
 	 */
 	public function maybe_register_popover_hooks() {
 
+		// Skip for existing installs that never started the new onboarding.
+		// If privacy policy is already accepted but no onboarding progress exists,
+		// this is an existing install - don't show the new onboarding.
+		if ( \progress_planner()->get_base()->is_privacy_policy_accepted()
+			&& ! \get_option( 'prpl_onboard_progress', false ) ) {
+			return;
+		}
+
 		// Register onboarding admin page (always, so it's accessible).
 		\add_action( 'admin_menu', [ $this, 'add_onboarding_page' ] );
 

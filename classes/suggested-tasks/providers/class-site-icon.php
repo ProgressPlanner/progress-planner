@@ -166,7 +166,7 @@ class Site_Icon extends Tasks_Interactive {
 	 * @return string
 	 */
 	public function get_task_action_label() {
-		return __( 'Set site icon', 'progress-planner' );
+		return \__( 'Set site icon', 'progress-planner' );
 	}
 
 	/**

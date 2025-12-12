@@ -786,7 +786,7 @@ abstract class Tasks implements Tasks_Interface {
 	 * @return string
 	 */
 	public function get_task_action_label() {
-		return \esc_html__( 'Do it', 'progress-planner' );
+		return \__( 'Do it', 'progress-planner' );
 	}
 
 	/**
