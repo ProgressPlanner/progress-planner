@@ -21,7 +21,7 @@ jobs:
       matrix:
         include:
           - php_version: '8.2'
-            wp_version: '6.2'
+            wp_version: '6.7'
             multisite: false
 
           - php_version: '8.2'
