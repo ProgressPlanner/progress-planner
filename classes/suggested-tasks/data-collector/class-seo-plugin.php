@@ -43,7 +43,7 @@ class SEO_Plugin extends Base_Data_Collector {
 			'constants' => [ 'AIOSEO_VERSION', 'AIOSEO_FILE' ],
 			'classes'   => [ 'AIOSEO\Plugin\AIOSEO', 'AIOSEOPro\Plugin\AIOSEO' ],
 		],
-		'surerank' => [
+		'surerank'            => [
 			'name'      => 'SureRank SEO',
 			'slug'      => 'surerank',
 			'constants' => [ 'SURERANK_VERSION', 'SURERANK_FILE' ],
