@@ -5,7 +5,6 @@
  * @package Progress_Planner
  */
 
-use Progress_Planner\Badges\Monthly;
 
 if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
@@ -36,13 +35,18 @@ foreach ( \progress_planner()->get_admin__widgets__monthly_badges()->get_previou
 		?>
 	</h3>
 
-	<?php $prpl_badges = Monthly::get_instances_for_year( $prpl_badges_year ); ?>
+	<?php
+	// Badge data is now handled in React via REST API.
+	// This template is kept for backward compatibility but renders empty.
+	$prpl_badges = [];
+	?>
 	<?php if ( $prpl_badges ) : ?>
 		<?php
 		if ( 'popover' !== $prpl_location && 3 < \count( $prpl_badges ) ) {
 			// If we have more than 3 badges, we need to show the current month badge and the previous 2 months badges.
-			$prpl_current_month_badge_id    = Monthly::get_badge_id_from_date( new \DateTime() );
-			$prpl_temp_badges               = [];
+			$now                        = new \DateTime();
+			$prpl_current_month_badge_id = 'monthly-' . $now->format( 'Y' ) . '-m' . $now->format( 'n' );
+			$prpl_temp_badges            = [];
 			$prpl_current_month_badge_index = 0;
 			foreach ( $prpl_badges as $prpl_badge ) {
 				$prpl_temp_badges[] = $prpl_badge;

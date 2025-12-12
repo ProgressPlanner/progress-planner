@@ -8,7 +8,6 @@
 namespace Progress_Planner\Admin\Widgets;
 
 use DateTime;
-use Progress_Planner\Badges\Monthly;
 
 /**
  * Monthly_Badges class.
@@ -41,34 +40,27 @@ final class Monthly_Badges extends Widget {
 			$score += $activity->get_points( $activity->date );
 		}
 
+		$target_points = 10; // TARGET_POINTS constant value.
+
 		return [
 			'score'        => (int) $score,
-			'target'       => (int) Monthly::TARGET_POINTS,
-			'target_score' => (int) \min( Monthly::TARGET_POINTS, \max( 0, \floor( $score ) ) ),
+			'target'       => $target_points,
+			'target_score' => (int) \min( $target_points, \max( 0, \floor( $score ) ) ),
 		];
 	}
 
 	/**
 	 * Get previous month badge.
 	 *
-	 * @return \Progress_Planner\Badges\Monthly[]
+	 * Note: This method is deprecated. Badge calculations are now handled in React.
+	 * Returns empty array as badge data is fetched via REST API.
+	 *
+	 * @return array Empty array (badges are handled in React).
 	 */
 	public function get_previous_incomplete_months_badges() {
-		$previous_incomplete_month_badges = [];
-
-		$minus_one_month       = ( new DateTime() )->modify( 'first day of previous month' );
-		$minus_one_month_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( $minus_one_month ) );
-		if ( $minus_one_month_badge && $minus_one_month_badge->progress_callback()['progress'] < 100 ) {
-			$previous_incomplete_month_badges[] = $minus_one_month_badge;
-		}
-
-		$minus_two_months       = ( new DateTime() )->modify( 'first day of previous month' )->modify( 'first day of previous month' );
-		$minus_two_months_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( $minus_two_months ) );
-		if ( $minus_two_months_badge && $minus_two_months_badge->progress_callback()['progress'] < 100 ) {
-			$previous_incomplete_month_badges[] = $minus_two_months_badge;
-		}
-
-		return $previous_incomplete_month_badges;
+		// Badge calculations are now handled in React via REST API.
+		// This method is kept for backward compatibility but returns empty array.
+		return [];
 	}
 
 	/**

@@ -12,7 +12,7 @@ import Badge from '../Badge';
  *
  * @param {Object} props                 - Component props.
  * @param {Array}  props.badges          - Array of badge objects.
- * @param {Object} props.config          - Badge config (brandingId, remoteServerUrl, placeholderUrl).
+ * @param {Object} props.config          - Badge config (brandingId).
  * @param {string} props.backgroundColor - Background color CSS variable.
  * @param {string} props.className       - Additional CSS class name.
  * @return {JSX.Element} The BadgeGrid component.
@@ -64,8 +64,6 @@ export default function BadgeGrid( {
 						badgeId={ badge.id }
 						badgeName={ badge.name }
 						brandingId={ config.brandingId }
-						remoteServerUrl={ config.remoteServerUrl }
-						placeholderUrl={ config.placeholderUrl }
 						isComplete={ badge.isComplete }
 					/>
 					<p style={ labelStyle }>{ badge.name }</p>

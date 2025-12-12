@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Admin;
 
-use Progress_Planner\Badges\Monthly;
 
 /**
  * Enqueue class.
@@ -220,25 +219,37 @@ class Enqueue {
 		$badge_urls = [];
 
 		// Get the monthly badge URL.
-		$monthly_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
+		$now        = new \DateTime();
+		$badge_id   = 'monthly-' . $now->format( 'Y' ) . '-m' . $now->format( 'n' );
+		$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge_id . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
 
-		if ( $monthly_badge ) {
-			$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id() . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
+		// Get the content and maintenance badge URLs from saved stats.
+		$settings = \progress_planner()->get_settings()->get( 'badges', [] );
+
+		// Content badges.
+		$content_badge_ids = [ 'content-curator', 'revision-ranger', 'purposeful-publisher' ];
+		foreach ( $content_badge_ids as $badge_id ) {
+			if ( isset( $settings[ $badge_id ] ) && (int) ( $settings[ $badge_id ]['progress'] ?? 0 ) >= 100 ) {
+				$badge_urls['content'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge_id . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
+				break;
+			}
+		}
+		if ( ! isset( $badge_urls['content'] ) ) {
+			// Fallback to the first badge in the set if no badge is completed.
+			$badge_urls['content'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=content-curator&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
 		}
 
-		// Get the content and maintenance badge URLs.
-		foreach ( [ 'content', 'maintenance' ] as $context ) {
-			$set_badges = \progress_planner()->get_badges()->get_badges( $context );
-			foreach ( $set_badges as $badge ) {
-				$progress = $badge->get_progress();
-				if ( $progress['progress'] > 100 ) {
-					$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge->get_id() . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
-				}
+		// Maintenance badges.
+		$maintenance_badge_ids = [ 'progress-padawan', 'maintenance-maniac', 'super-site-specialist' ];
+		foreach ( $maintenance_badge_ids as $badge_id ) {
+			if ( isset( $settings[ $badge_id ] ) && (int) ( $settings[ $badge_id ]['progress'] ?? 0 ) >= 100 ) {
+				$badge_urls['maintenance'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge_id . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
+				break;
 			}
-			if ( ! isset( $badge_urls[ $context ] ) ) {
-				// Fallback to the first badge in the set if no badge is completed.
-				$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $set_badges[0]->get_id() . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
-			}
+		}
+		if ( ! isset( $badge_urls['maintenance'] ) ) {
+			// Fallback to the first badge in the set if no badge is completed.
+			$badge_urls['maintenance'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=progress-padawan&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
 		}
 
 		return $badge_urls;

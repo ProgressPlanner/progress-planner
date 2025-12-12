@@ -5,7 +5,6 @@
  * @package Progress_Planner
  */
 
-use Progress_Planner\Badges\Monthly;
 
 if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
@@ -25,7 +24,10 @@ $prpl_title = \__( "We've added new recommendations to the Progress Planner plug
 
 $prpl_subtitle = \__( "Let's check if you've already done those tasks, this will take only a minute...", 'progress-planner' );
 
-$prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
+// Generate monthly badge ID directly.
+$now        = new \DateTime();
+$badge_id   = 'monthly-' . $now->format( 'Y' ) . '-m' . $now->format( 'n' );
+$prpl_badge = [ 'id' => $badge_id ]; // Simple array for template compatibility.
 ?>
 <div id="prpl-onboarding-tasks">
 	<strong class="prpl-onboarding-tasks-title"><?php echo \esc_html( $prpl_title ); ?></strong>
@@ -101,7 +103,7 @@ $prpl_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_i
 			<span class="prpl-onboarding-tasks-montly-badge">
 				<span class="prpl-onboarding-tasks-montly-badge-image">
 					<img
-						src="<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . \esc_attr( $prpl_badge->get_id() ) . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id() ); ?>"
+						src="<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . \esc_attr( $prpl_badge['id'] ) . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id() ); ?>"
 						alt="<?php \esc_attr_e( 'Badge', 'progress-planner' ); ?>"
 						onerror="this.onerror=null;this.src='<?php echo \esc_url( \progress_planner()->get_placeholder_svg() ); ?>';"
 					/>

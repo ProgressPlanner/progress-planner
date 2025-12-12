@@ -31,27 +31,16 @@ abstract class Badge_Streak extends Widget {
 	/**
 	 * Get the badge.
 	 *
+	 * Note: This method is deprecated. Badge calculations are now handled in React.
+	 * Returns false as badge data is fetched via REST API.
+	 *
 	 * @param string $context The context of the badges (content|maintenance|monthly).
 	 *
-	 * @return \Progress_Planner\Badges\Badge|false
+	 * @return false Always returns false (badges are handled in React).
 	 */
 	public function get_details( $context ) {
-		static $result = [];
-		if ( isset( $result[ $context ] ) && ! empty( $result[ $context ] ) ) {
-			return $result[ $context ];
-		}
-
-		$badges = \progress_planner()->get_badges()->get_badges( $context );
-
-		// Get the badge to display.
-		foreach ( $badges as $badge ) {
-			$progress = $badge->get_progress();
-			if ( 100 >= $progress['progress'] ) {
-				$result[ $context ] = $badge;
-				break;
-			}
-		}
-
-		return isset( $result[ $context ] ) ? $result[ $context ] : false;
+		// Badge calculations are now handled in React via REST API.
+		// This method is kept for backward compatibility but returns false.
+		return false;
 	}
 }

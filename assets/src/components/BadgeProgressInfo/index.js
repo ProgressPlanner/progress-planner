@@ -14,7 +14,7 @@ import Badge from '../Badge';
  *
  * @param {Object}   props                  - Component props.
  * @param {Object}   props.badge            - Current badge object.
- * @param {Object}   props.config           - Badge config (brandingId, remoteServerUrl, placeholderUrl).
+ * @param {Object}   props.config           - Badge config (brandingId).
  * @param {string}   props.backgroundColor  - Background color CSS variable for gauge.
  * @param {Function} props.getRemainingText - Function to get remaining text based on badge.remaining.
  * @return {JSX.Element} The BadgeProgressInfo component.
@@ -51,8 +51,6 @@ export default function BadgeProgressInfo( {
 					badgeId={ badge.id }
 					badgeName={ badge.name }
 					brandingId={ config.brandingId }
-					remoteServerUrl={ config.remoteServerUrl }
-					placeholderUrl={ config.placeholderUrl }
 					isComplete={ true }
 				/>
 			</Gauge>

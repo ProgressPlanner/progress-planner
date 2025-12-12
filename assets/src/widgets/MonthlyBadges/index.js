@@ -5,10 +5,17 @@
  * with real-time updates on task completion.
  */
 
-import { useState, useEffect, useCallback, useMemo } from '@wordpress/element';
+import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { doAction } from '@wordpress/hooks';
-import apiFetch from '@wordpress/api-fetch';
+import { useBadgeData } from '../../hooks/useBadgeData';
+import { useBadgeProgress } from '../../hooks/useBadgeProgress';
+import { useBadgeProgressSave } from '../../hooks/useBadgeProgressSave';
+import {
+	getMonthlyBadgeIdFromDate,
+	getMonthlyBadgeNameFromDate,
+	MONTHLY_BADGE_CONFIG,
+} from '../../config/badges';
 import Gauge from '../../components/Gauge';
 import Badge from '../../components/Badge';
 import BadgeProgressBar from '../../components/BadgeProgressBar';
@@ -22,22 +29,108 @@ import PointsCounter from './PointsCounter';
  * @return {JSX.Element} The MonthlyBadges widget.
  */
 function MonthlyBadges( { config = {} } ) {
-	const [ isLoading, setIsLoading ] = useState( true );
-	const [ error, setError ] = useState( null );
-	const [ gaugeValue, setGaugeValue ] = useState( 0 );
-	const [ maxPoints, setMaxPoints ] = useState( 10 );
-	const [ currentBadge, setCurrentBadge ] = useState( null );
-	const [ previousBadges, setPreviousBadges ] = useState( [] );
-	const [ widgetConfig, setWidgetConfig ] = useState( {
-		brandingId: config?.brandingId || 0,
-		remoteServerUrl: config?.remoteServerUrl || '',
-		placeholderUrl: config?.placeholderUrl || '',
+	const { isLoading, error, data } = useBadgeData();
+
+	// Get monthly badge date range function.
+	const getMonthlyBadgeDateRange = useCallback(
+		( badgeId ) => {
+			if ( ! badgeId.startsWith( 'monthly-' ) ) {
+				return null;
+			}
+
+			const parts = badgeId.split( '-' );
+			if ( parts.length !== 3 ) {
+				return null;
+			}
+
+			const year = parseInt( parts[1], 10 );
+			const monthStr = parts[2].replace( 'm', '' );
+			const month = parseInt( monthStr, 10 );
+
+			if ( ! year || month < 1 || month > 12 ) {
+				return null;
+			}
+
+			const startDate = new Date( year, month - 1, 1 );
+			startDate.setHours( 0, 0, 0, 0 );
+
+			const endDate = new Date( year, month, 0 );
+			endDate.setHours( 23, 59, 59, 999 );
+
+			return { startDate, endDate };
+		},
+		[]
+	);
+
+	// Calculate badge progress.
+	const badgeProgress = useBadgeProgress( {
+		activities: data?.activities || [],
+		savedStats: data?.savedStats || {},
+		totalPostsCount: data?.totalPostsCount || 0,
+		activationDate: data?.activationDate
+			? new Date( data.activationDate )
+			: null,
+		getMonthlyBadgeDateRange,
 	} );
+
+	// Automatically save progress when it changes.
+	useBadgeProgressSave( badgeProgress, data?.savedStats || {} );
+
+	// Get current month badge.
+	const currentBadge = useMemo( () => {
+		const now = new Date();
+		const badgeId = getMonthlyBadgeIdFromDate( now );
+		const badgeName = getMonthlyBadgeNameFromDate( now );
+		const progress = badgeProgress[ badgeId ] || {
+			progress: 0,
+			remaining: 10,
+			points: 0,
+		};
+
+		return {
+			id: badgeId,
+			name: badgeName,
+			progress,
+		};
+	}, [ badgeProgress ] );
+
+	// Get previous incomplete badges.
+	const previousBadges = useMemo( () => {
+		const now = new Date();
+		const currentMonth = now.getMonth();
+		const currentYear = now.getFullYear();
+		const incomplete = [];
+
+		// Check previous 12 months.
+		for ( let i = 1; i <= 12; i++ ) {
+			const checkDate = new Date( currentYear, currentMonth - i, 1 );
+			const badgeId = getMonthlyBadgeIdFromDate( checkDate );
+			const progress = badgeProgress[ badgeId ];
+
+			if ( progress && progress.progress < 100 ) {
+				const badgeName = getMonthlyBadgeNameFromDate( checkDate );
+				incomplete.push( {
+					id: badgeId,
+					name: badgeName,
+					points: progress.points || 0,
+					maxPoints: MONTHLY_BADGE_CONFIG.targetPoints,
+				} );
+			}
+		}
+
+		return incomplete;
+	}, [ badgeProgress ] );
+
+	const gaugeValue = currentBadge?.progress?.points || 0;
+	const maxPoints = MONTHLY_BADGE_CONFIG.targetPoints;
+	const widgetConfig = data?.config || {
+		brandingId: config?.brandingId || 0,
+	};
 
 	/**
 	 * Calculate if the current badge is complete.
 	 */
-	const isComplete = gaugeValue >= maxPoints;
+	const isComplete = ( currentBadge?.progress?.progress || 0 ) >= 100;
 
 	/**
 	 * Calculate remaining points and days remaining for previous badges.
@@ -80,103 +173,6 @@ function MonthlyBadges( { config = {} } ) {
 		} ) );
 	}, [ previousBadges, maxPoints, gaugeValue ] );
 
-	/**
-	 * Update progress when tasks are completed.
-	 * Fills gauge first, then overflows to previous month progress bars.
-	 *
-	 * @param {number} amount - Points to add.
-	 */
-	const updateProgress = useCallback(
-		( amount ) => {
-			let remaining = amount;
-
-			// First, fill the gauge
-			setGaugeValue( ( prevValue ) => {
-				const newValue = Math.min( prevValue + remaining, maxPoints );
-				remaining -= newValue - prevValue;
-				return newValue;
-			} );
-
-			// If there's overflow and previous badges exist, fill them
-			if ( remaining > 0 && previousBadges.length > 0 ) {
-				setPreviousBadges( ( prevBadges ) => {
-					return prevBadges.map( ( badge ) => {
-						if ( remaining <= 0 ) {
-							return badge;
-						}
-						const badgeMax = badge.maxPoints || 10;
-						const newPoints = Math.min(
-							badge.points + remaining,
-							badgeMax
-						);
-						remaining -= newPoints - badge.points;
-						return { ...badge, points: newPoints };
-					} );
-				} );
-			}
-		},
-		[ maxPoints, previousBadges.length ]
-	);
-
-	/**
-	 * Fetch initial data from REST API.
-	 */
-	useEffect( () => {
-		const fetchData = async () => {
-			try {
-				const response = await apiFetch( {
-					path: '/progress-planner/v1/monthly-badges',
-				} );
-
-				setGaugeValue( response.score?.score || 0 );
-				setMaxPoints( response.score?.target || 10 );
-				setCurrentBadge( response.currentBadge || null );
-				setPreviousBadges( response.previousIncompleteBadges || [] );
-				setWidgetConfig( {
-					brandingId: response.brandingId || config?.brandingId || 0,
-					remoteServerUrl:
-						response.remoteServerUrl ||
-						config?.remoteServerUrl ||
-						'',
-					placeholderUrl:
-						response.placeholderUrl || config?.placeholderUrl || '',
-				} );
-				setIsLoading( false );
-			} catch ( err ) {
-				setError(
-					err.message ||
-						__( 'Failed to load data', 'progress-planner' )
-				);
-				setIsLoading( false );
-			}
-		};
-
-		fetchData();
-	}, [
-		config?.brandingId,
-		config?.placeholderUrl,
-		config?.remoteServerUrl,
-	] );
-
-	/**
-	 * Listen for task completion events.
-	 */
-	useEffect( () => {
-		const handleTaskComplete = ( event ) => {
-			const { points } = event.detail || {};
-			if ( points && typeof points === 'number' ) {
-				updateProgress( points );
-			}
-		};
-
-		document.addEventListener( 'prpl-task-completed', handleTaskComplete );
-		return () => {
-			document.removeEventListener(
-				'prpl-task-completed',
-				handleTaskComplete
-			);
-		};
-	}, [ updateProgress ] );
 
 	const containerStyle = {
 		display: 'flex',
@@ -243,8 +239,6 @@ function MonthlyBadges( { config = {} } ) {
 							badgeId={ currentBadge.id }
 							badgeName={ currentBadge.name }
 							brandingId={ widgetConfig.brandingId }
-							remoteServerUrl={ widgetConfig.remoteServerUrl }
-							placeholderUrl={ widgetConfig.placeholderUrl }
 							isComplete={ isComplete }
 						/>
 					) }
@@ -297,12 +291,6 @@ function MonthlyBadges( { config = {} } ) {
 										}
 										daysRemaining={ badge.daysRemaining }
 										brandingId={ widgetConfig.brandingId }
-										remoteServerUrl={
-											widgetConfig.remoteServerUrl
-										}
-										placeholderUrl={
-											widgetConfig.placeholderUrl
-										}
 									/>
 								</div>
 							) ) }

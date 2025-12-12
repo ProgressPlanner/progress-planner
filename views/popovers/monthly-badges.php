@@ -22,7 +22,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		 *
 		 * This is an associative array where the key is the year and the elements are arrays of \Progress_Planner\Badges\Badge objects.
 		 */
-		$prpl_badges = \progress_planner()->get_badges()->get_badges( 'monthly' );
+		// Badge data is now handled in React via REST API.
+		// This template is kept for backward compatibility but renders empty.
+		$prpl_badges = [];
 
 		foreach ( $prpl_badges as $prpl_badges_year => $prpl_monthly_badges ) {
 			\progress_planner()->the_view(
@@ -49,7 +51,10 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					<?php echo \esc_html( $prpl_widget_title ); ?>
 				</h3>
 				<div class="prpl-badges-container-achievements">
-					<?php $prpl_group_badges = \progress_planner()->get_badges()->get_badges( $prpl_badge_group ); ?>
+					<?php
+					// Badge data is now handled in React via REST API.
+					$prpl_group_badges = [];
+					?>
 					<div class="progress-wrapper badge-group-<?php echo \esc_attr( $prpl_badge_group ); ?>">
 						<?php foreach ( $prpl_group_badges as $prpl_badge ) : ?>
 							<?php $prpl_badge_progress = $prpl_badge->get_progress(); ?>

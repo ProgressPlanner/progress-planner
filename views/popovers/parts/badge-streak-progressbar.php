@@ -10,7 +10,10 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$prpl_badges = \progress_planner()->get_badges()->get_badges( $prpl_context ); // @phpstan-ignore-line variable.undefined
+// Badge data is now handled in React via REST API.
+// This template is kept for backward compatibility but renders empty.
+// Badge display is handled by React components.
+$prpl_badges = [];
 
 if ( empty( $prpl_badges ) ) {
 	return;

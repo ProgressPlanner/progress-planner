@@ -19,8 +19,6 @@ import Badge from '../Badge';
  * @param {number} props.accumulatedRemaining - Accumulated remaining points across all badges.
  * @param {number} props.daysRemaining        - Days remaining in current month.
  * @param {number} props.brandingId           - Branding ID.
- * @param {string} props.remoteServerUrl      - Remote server URL for badge SVGs.
- * @param {string} props.placeholderUrl       - Placeholder image URL.
  * @return {JSX.Element} The BadgeProgressBar component.
  */
 export default function BadgeProgressBar( {
@@ -31,8 +29,6 @@ export default function BadgeProgressBar( {
 	accumulatedRemaining = 0,
 	daysRemaining = 0,
 	brandingId = 0,
-	remoteServerUrl,
-	placeholderUrl,
 } ) {
 	/**
 	 * Calculate progress percentage.
@@ -128,8 +124,6 @@ export default function BadgeProgressBar( {
 						badgeId={ badgeId }
 						badgeName={ badgeName }
 						brandingId={ brandingId }
-						remoteServerUrl={ remoteServerUrl }
-						placeholderUrl={ placeholderUrl }
 					/>
 					{ ! isComplete && (
 						<span

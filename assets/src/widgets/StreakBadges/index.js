@@ -71,7 +71,7 @@ function StreakBadges( { config = {} } ) {
 				</div>
 			</h2>
 			<SimpleBadgeWidget
-				endpoint="/progress-planner/v1/streak-badges"
+				badgeType="maintenance"
 				introText={ __(
 					'Execute at least one website maintenance task every week.',
 					'progress-planner'

@@ -50,21 +50,55 @@ class System_Status {
 			'checklist' => $activity_score->get_checklist_results(),
 		];
 
-		// Get the badges.
-		$badges = \array_merge(
-			\progress_planner()->get_badges()->get_badges( 'content' ),
-			\progress_planner()->get_badges()->get_badges( 'maintenance' ),
-			\progress_planner()->get_badges()->get_badges( 'monthly_flat' )
-		);
+		// Get the badges from saved stats.
+		// Badge calculations are now handled in React, so we return saved progress.
+		$settings = \progress_planner()->get_settings();
+		$saved_badges = $settings->get( 'badges', [] );
+
+		// Badge name mapping (for external API compatibility).
+		$badge_names = [
+			'content-curator'        => \__( 'Content Curator', 'progress-planner' ),
+			'revision-ranger'        => \__( 'Revision Ranger', 'progress-planner' ),
+			'purposeful-publisher'   => \__( 'Purposeful Publisher', 'progress-planner' ),
+			'progress-padawan'       => \__( 'Progress Padawan', 'progress-planner' ),
+			'maintenance-maniac'     => \__( 'Maintenance Maniac', 'progress-planner' ),
+			'super-site-specialist' => \__( 'Super Site Specialist', 'progress-planner' ),
+		];
 
 		$data['badges'] = [];
-		foreach ( $badges as $badge ) {
-			$data['badges'][ $badge->get_id() ] = \array_merge(
+		foreach ( $saved_badges as $badge_id => $badge_data ) {
+			// Get badge name (for monthly badges, generate from ID).
+			$badge_name = $badge_names[ $badge_id ] ?? '';
+			if ( empty( $badge_name ) && \str_starts_with( $badge_id, 'monthly-' ) ) {
+				// Generate monthly badge name from ID.
+				$parts = \explode( '-', \str_replace( 'monthly-', '', $badge_id ) );
+				if ( \count( $parts ) === 2 ) {
+					$year  = (int) $parts[0];
+					$month = (int) \str_replace( 'm', '', $parts[1] );
+					$months = [
+						1  => 'Jack January',
+						2  => 'Felix February',
+						3  => 'Mary March',
+						4  => 'Avery April',
+						5  => 'Matteo May',
+						6  => 'Jasmine June',
+						7  => 'Joey July',
+						8  => 'Abed August',
+						9  => 'Sam September',
+						10 => 'Oksana October',
+						11 => 'Noah November',
+						12 => 'Daisy December',
+					];
+					$badge_name = $months[ $month ] ?? '';
+				}
+			}
+
+			$data['badges'][ $badge_id ] = \array_merge(
 				[
-					'id'   => $badge->get_id(),
-					'name' => $badge->get_name(),
+					'id'   => $badge_id,
+					'name' => $badge_name,
 				],
-				$badge->progress_callback()
+				$badge_data
 			);
 		}
 

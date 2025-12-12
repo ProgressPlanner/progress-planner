@@ -19,10 +19,9 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Rest\Stats get_rest__stats()
  * @method \Progress_Planner\Rest\Tasks get_rest__tasks()
  * @method \Progress_Planner\Rest\Content_Activity get_rest__content_activity()
- * @method \Progress_Planner\Rest\Monthly_Badges get_rest__monthly_badges()
- * @method \Progress_Planner\Rest\Content_Badges get_rest__content_badges()
- * @method \Progress_Planner\Rest\Streak_Badges get_rest__streak_badges()
  * @method \Progress_Planner\Rest\Activity_Scores get_rest__activity_scores()
+ * @method \Progress_Planner\Rest\Activities get_rest__activities()
+ * @method \Progress_Planner\Rest\Badge_Stats get_rest__badge_stats()
  * @method \Progress_Planner\Rest\Whats_New get_rest__whats_new()
  * @method \Progress_Planner\Rest\Plugin_Installer get_rest__plugin_installer()
  * @method \Progress_Planner\Todo get_todo()
@@ -119,12 +118,11 @@ class Base {
 		$this->get_rest__stats();
 		$this->get_rest__tasks();
 		$this->get_rest__content_activity();
-		$this->get_rest__monthly_badges();
-		$this->get_rest__content_badges();
-		$this->get_rest__streak_badges();
 		$this->get_rest__activity_scores();
 		$this->get_rest__whats_new();
 		$this->get_rest__plugin_installer();
+		$this->get_rest__activities();
+		$this->get_rest__badge_stats();
 
 		// Onboarding.
 		$this->get_utils__onboard();

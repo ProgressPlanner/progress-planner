@@ -1,20 +1,19 @@
 /**
  * useBadgeData Hook
  *
- * Custom hook for fetching badge data from the REST API.
+ * Custom hook for fetching badge data (activities, stats, config).
  * Used by badge widgets (ContentBadges, StreakBadges, etc.).
  */
 
 import { useState, useEffect, useCallback } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
+import { fetchActivities, fetchBadgeStats } from '../services/badgeService';
 
 /**
  * Custom hook for fetching badge data.
  *
- * @param {string} endpoint - The REST API endpoint path.
  * @return {Object} { isLoading, error, data, refetch }
  */
-export function useBadgeData( endpoint ) {
+export function useBadgeData() {
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
 	const [ data, setData ] = useState( null );
@@ -24,15 +23,22 @@ export function useBadgeData( endpoint ) {
 			setIsLoading( true );
 			setError( null );
 
-			const response = await apiFetch( { path: endpoint } );
+			// Fetch activities and badge stats in parallel.
+			// Config is included in activities response.
+			const [ activitiesResponse, statsResponse ] = await Promise.all( [
+				fetchActivities(),
+				fetchBadgeStats(),
+			] );
 
 			setData( {
-				currentBadge: response.currentBadge,
-				allBadges: response.allBadges || [],
-				config: {
-					brandingId: response.brandingId || 0,
-					remoteServerUrl: response.remoteServerUrl || '',
-					placeholderUrl: response.placeholderUrl || '',
+				activities: activitiesResponse.activities || [],
+				totalPostsCount: activitiesResponse.totalPostsCount || 0,
+				activationDate: activitiesResponse.activationDate,
+				savedStats: statsResponse,
+				config: activitiesResponse.config || {
+					brandingId: 0,
+					remoteServerUrl: '',
+					placeholderUrl: '',
 				},
 			} );
 		} catch ( err ) {
@@ -40,7 +46,7 @@ export function useBadgeData( endpoint ) {
 		} finally {
 			setIsLoading( false );
 		}
-	}, [ endpoint ] );
+	}, [] );
 
 	useEffect( () => {
 		fetchData();

@@ -71,7 +71,7 @@ function ContentBadges( { config = {} } ) {
 				</div>
 			</h2>
 			<SimpleBadgeWidget
-				endpoint="/progress-planner/v1/content-badges"
+				badgeType="content"
 				introText={ __(
 					'The more you work on meaningful content, the sooner you unlock new badges.',
 					'progress-planner'
