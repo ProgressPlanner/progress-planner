@@ -32,8 +32,23 @@ class Onboard_Wizard {
 	 * @return void
 	 */
 	public function __construct() {
+		\add_action( 'init', [ $this, 'maybe_register_popover_hooks' ], 0 );
+	}
+
+	/**
+	 * Maybe register popover hooks.
+	 *
+	 * @return void
+	 */
+	public function maybe_register_popover_hooks() {
+
 		// Register onboarding admin page (always, so it's accessible).
 		\add_action( 'admin_menu', [ $this, 'add_onboarding_page' ] );
+
+		// Add popover on front end.
+		\add_action( 'wp_footer', [ $this, 'add_popover' ] );
+		\add_action( 'wp_footer', [ $this, 'add_popover_step_templates' ] );
+		\add_action( 'wp_enqueue_scripts', [ $this, 'add_popover_scripts' ] );
 
 		// Add popover on admin.
 		\add_action( 'admin_footer', [ $this, 'add_popover' ] );
