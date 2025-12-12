@@ -49,7 +49,10 @@ class Set_Page_Contact extends Set_Page_Task {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'The Contact page is a page that provides a way for your visitors to contact you. It is a great way to help your visitors get in touch with you and ask questions.', 'progress-planner' );
+		\esc_html_e( 'A Contact page makes it easy for visitors, customers, and potential partners to reach you. Include a contact form, email address, or other ways people can get in touch.', 'progress-planner' );
+		echo '</p>';
+		echo '<p>';
+		\esc_html_e( 'You can set this page from the Sidebar on the Page Edit screen.', 'progress-planner' );
 		echo '</p>';
 	}
 }

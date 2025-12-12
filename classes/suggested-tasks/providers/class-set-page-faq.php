@@ -49,7 +49,10 @@ class Set_Page_FAQ extends Set_Page_Task {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'The FAQ page is a page that provides answers to frequently asked questions about your website. It is a great way to help your visitors find the information they need quickly and easily.', 'progress-planner' );
+		\esc_html_e( 'An FAQ page answers common questions your visitors have, saving them time and reducing your support workload. It also helps with SEO by targeting long-tail search queries.', 'progress-planner' );
+		echo '</p>';
+		echo '<p>';
+		\esc_html_e( 'You can set this page from the Sidebar on the Page Edit screen.', 'progress-planner' );
 		echo '</p>';
 	}
 }
