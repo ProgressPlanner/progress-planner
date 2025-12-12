@@ -7,12 +7,10 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Tasks_Interface;
-
 /**
  * Add tasks to check if WP debug is enabled.
  */
-class Reduce_Autoloaded_Options extends Tasks {
+class Reduce_Autoloaded_Options extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -34,6 +32,13 @@ class Reduce_Autoloaded_Options extends Tasks {
 	 * @var string
 	 */
 	const PROVIDER_ID = 'reduce-autoloaded-options';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'reduce-autoloaded-options';
 
 	/**
 	 * Whether the task is dismissable.
@@ -71,9 +76,11 @@ class Reduce_Autoloaded_Options extends Tasks {
 	private $plugin_path = 'aaa-option-optimizer/aaa-option-optimizer.php';
 
 	/**
-	 * Constructor.
+	 * Initialize the task provider.
+	 *
+	 * @return void
 	 */
-	public function __construct() {
+	public function init() {
 		$this->url = \admin_url( '/plugin-install.php?tab=search&s=aaa+option+optimizer' );
 
 		/**
@@ -93,19 +100,6 @@ class Reduce_Autoloaded_Options extends Tasks {
 	 */
 	public function get_title() {
 		return \esc_html__( 'Reduce number of autoloaded options', 'progress-planner' );
-	}
-
-	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	public function get_description() {
-		return sprintf(
-			// translators: %d is the number of autoloaded options.
-			\esc_html__( 'There are %d autoloaded options. If you don\'t need them, consider disabling them by installing the "AAA Option Optimizer" plugin.', 'progress-planner' ),
-			$this->get_autoloaded_options_count(),
-		);
 	}
 
 	/**
@@ -142,8 +136,9 @@ class Reduce_Autoloaded_Options extends Tasks {
 	protected function is_plugin_active() {
 
 		if ( null === $this->is_plugin_active ) {
-			if ( ! function_exists( 'get_plugins' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore requireOnce.fileNotFound
+			if ( ! \function_exists( 'get_plugins' ) ) {
+				// @phpstan-ignore-next-line requireOnce.fileNotFound
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
 			}
 
 			$plugins                = get_plugins();
@@ -173,5 +168,55 @@ class Reduce_Autoloaded_Options extends Tasks {
 		}
 
 		return $this->autoloaded_options_count;
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\printf(
+			// translators: %d is the number of autoloaded options.
+			\esc_html__( 'There are %d autoloaded options. If you don\'t need them, consider reducing them by installing the "AAA Option Optimizer" plugin.', 'progress-planner' ),
+			(int) $this->get_autoloaded_options_count(),
+		);
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<?php if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) : ?>
+			<prpl-install-plugin
+				data-plugin-name="AAA Option Optimizer"
+				data-plugin-slug="aaa-option-optimizer"
+				data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'aaa-option-optimizer' ) ? 'activate' : 'install'; ?>"
+				data-provider-id="<?php echo \esc_attr( self::PROVIDER_ID ); ?>"
+			></prpl-install-plugin>
+		<?php endif; ?>
+		<?php
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Reduce', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }
