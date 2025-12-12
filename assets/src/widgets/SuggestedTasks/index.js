@@ -463,7 +463,6 @@ export default function SuggestedTasks( { config = {} } ) {
 				{ widgetDescription }
 			</p>
 			<PopoverManager
-				tasks={ tasks }
 				onComplete={ handleComplete }
 				config={ config }
 			/>

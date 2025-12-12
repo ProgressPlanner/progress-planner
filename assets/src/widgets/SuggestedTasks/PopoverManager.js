@@ -3,39 +3,50 @@
  *
  * Manages React popover components using @wordpress/hooks for communication.
  * Listens for popover open/close events and renders the appropriate React component.
- */
-
-import { useState, useEffect, useCallback } from '@wordpress/element';
-import { addAction, removeAction } from '@wordpress/hooks';
-import apiFetch from '@wordpress/api-fetch';
-import { deletePost } from '../../hooks/usePopoverForms';
-import { getPopoverComponent } from '../../components/Popovers/popoverRegistry';
-
-/**
- * PopoverManager component.
  *
  * @param {Object}   props            Component props.
  * @param {Function} props.onComplete Callback for completing a task.
  * @param {Object}   props.config     Widget configuration.
  * @return {JSX.Element} The popover manager component.
  */
+
+import { useState, useCallback } from '@wordpress/element';
+import { usePopoverHooks } from '../../hooks/usePopoverHooks';
+import { useCustomSubmitHandlers } from '../../hooks/useCustomSubmitHandlers';
+import { resolveTaskId } from '../../utils/taskIdResolver';
+import { getPopoverComponent } from '../../components/Popovers/popoverRegistry';
+
 export default function PopoverManager( { onComplete, config = {} } ) {
 	const [ openPopoverId, setOpenPopoverId ] = useState( null );
 	const [ openTask, setOpenTask ] = useState( null );
+
 	/**
 	 * Handle popover open event.
+	 *
+	 * @param {string} taskId The task ID.
+	 * @param {Object} task   The task object.
 	 */
 	const handlePopoverOpen = useCallback( ( taskId, task ) => {
+		if ( ! taskId || ! task ) {
+			// eslint-disable-next-line no-console
+			console.warn(
+				'PopoverManager: Invalid popover open event - missing taskId or task'
+			);
+			return;
+		}
 		setOpenPopoverId( taskId );
 		setOpenTask( task );
 	}, [] );
 
 	/**
 	 * Handle popover close event.
+	 *
+	 * @param {string} taskId The task ID to close.
 	 */
 	const handlePopoverClose = useCallback(
 		( taskId ) => {
-			if ( taskId === openPopoverId ) {
+			// Only close if the task ID matches the currently open popover
+			if ( taskId === openPopoverId || ! taskId ) {
 				setOpenPopoverId( null );
 				setOpenTask( null );
 			}
@@ -43,118 +54,68 @@ export default function PopoverManager( { onComplete, config = {} } ) {
 		[ openPopoverId ]
 	);
 
-	/**
-	 * Set up hook listeners.
-	 */
-	useEffect( () => {
-		addAction(
-			'prpl.popover.open',
-			'prpl/popover-manager',
-			handlePopoverOpen
-		);
-		addAction(
-			'prpl.popover.close',
-			'prpl/popover-manager',
-			handlePopoverClose
-		);
-
-		return () => {
-			removeAction( 'prpl.popover.open', 'prpl/popover-manager' );
-			removeAction( 'prpl.popover.close', 'prpl/popover-manager' );
-		};
-	}, [ handlePopoverOpen, handlePopoverClose ] );
+	// Set up WordPress hooks for popover communication
+	usePopoverHooks( handlePopoverOpen, handlePopoverClose );
 
 	/**
 	 * Handle popover form submission completion.
+	 *
+	 * @param {string|number} taskId The task ID.
+	 * @param {Object}        task   The task object.
 	 */
 	const handlePopoverSubmit = useCallback(
 		async ( taskId, task ) => {
-			await onComplete( task.id || taskId, task );
-			setOpenPopoverId( null );
-			setOpenTask( null );
+			if ( ! onComplete ) {
+				// eslint-disable-next-line no-console
+				console.warn(
+					'PopoverManager: onComplete callback not provided'
+				);
+				return;
+			}
+
+			try {
+				const finalTaskId = task?.id || taskId;
+				if ( ! finalTaskId ) {
+					throw new Error( 'Invalid task ID for submission' );
+				}
+
+				await onComplete( finalTaskId, task );
+				setOpenPopoverId( null );
+				setOpenTask( null );
+			} catch ( error ) {
+				// eslint-disable-next-line no-console
+				console.error(
+					'PopoverManager: Error submitting popover form:',
+					error
+				);
+				// Don't close popover on error - let user retry
+			}
 		},
 		[ onComplete ]
 	);
 
-	/**
-	 * Handle custom submit types.
-	 */
-	const handleCustomSubmit = useCallback( async ( taskId ) => {
-		switch ( taskId ) {
-			case 'hello-world': {
-				const postId = window.helloWorldData?.postId;
-				if ( postId ) {
-					await deletePost( postId, 'posts' );
-				}
-				return { success: true };
-			}
+	// Get custom submit handler for the current task
+	const handleCustomSubmit = useCustomSubmitHandlers( openTask );
 
-			case 'sample-page': {
-				const pageId = window.samplePageData?.postId;
-				if ( pageId ) {
-					await deletePost( pageId, 'pages' );
-				}
-				return { success: true };
-			}
-
-			case 'rename-uncategorized-category': {
-				// This will be handled by CustomPopover component
-				// Form data should be passed from the component
-				return { success: true };
-			}
-
-			case 'core-siteicon': {
-				// This is handled by SiteIconPopover component
-				return { success: true };
-			}
-
-			case 'yoast-organization-logo': {
-				// This is handled by SiteIconPopover component
-				return { success: true };
-			}
-
-			case 'update-term-description': {
-				// This will be handled by CustomPopover component
-				// Form data should be passed from the component
-				return { success: true };
-			}
-
-			case 'remove-terms-without-posts': {
-				const termIds =
-					window.removeTermsWithoutPostsData?.termIds || [];
-				const taxonomy =
-					window.removeTermsWithoutPostsData?.taxonomy || 'category';
-
-				const taxonomyEndpoint =
-					taxonomy === 'category' ? 'categories' : taxonomy;
-
-				// Delete each term
-				await Promise.all(
-					termIds.map( ( termId ) =>
-						apiFetch( {
-							path: `/wp/v2/${ taxonomyEndpoint }/${ termId }?force=true`,
-							method: 'DELETE',
-						} )
-					)
-				);
-				return { success: true };
-			}
-
-			default:
-				return { success: true };
-		}
-	}, [] );
+	// Resolve task ID for popover lookup
+	const taskIdForLookup = resolveTaskId( openTask, openPopoverId );
 
 	// Get the popover component for the open popover
-	// Try to find task ID from task object
-	const taskIdForLookup =
-		openTask?.slug || openTask?.prpl_provider?.slug || openPopoverId;
-
 	const PopoverComponent = taskIdForLookup
 		? getPopoverComponent( taskIdForLookup )
 		: null;
 
-	// Render the popover if one is open
+	// Error handling: If we have a task but no component, log a warning
+	if ( openTask && ! PopoverComponent ) {
+		// eslint-disable-next-line no-console
+		console.warn(
+			'PopoverManager: No popover component found for task ID:',
+			taskIdForLookup
+		);
+		return null;
+	}
+
+	// Render the popover if one is open and component is found
 	if ( ! PopoverComponent || ! openTask ) {
 		return null;
 	}
