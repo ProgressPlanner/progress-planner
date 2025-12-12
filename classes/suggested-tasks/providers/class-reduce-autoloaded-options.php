@@ -75,6 +75,15 @@ class Reduce_Autoloaded_Options extends Tasks {
 	 */
 	public function __construct() {
 		$this->url = \admin_url( '/plugin-install.php?tab=search&s=aaa+option+optimizer' );
+
+		/**
+		 * Filter the autoloaded options threshold.
+		 *
+		 * @param int $threshold The threshold.
+		 *
+		 * @return int
+		 */
+		$this->autoloaded_options_threshold = (int) \apply_filters( 'progress_planner_reduce_autoloaded_options_threshold', $this->autoloaded_options_threshold );
 	}
 
 	/**
