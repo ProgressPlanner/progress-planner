@@ -5,6 +5,7 @@ module.exports = {
 	...defaultConfig,
 	entry: {
 		dashboard: './assets/src/dashboard.js',
+		editor: './assets/src/editor/index.js',
 		'widget-suggested-tasks': './assets/src/widgets/SuggestedTasks/index.js',
 		'widget-todo': './assets/src/widgets/TodoWidget/index.js',
 		'widget-monthly-badges': './assets/src/widgets/MonthlyBadges/index.js',
