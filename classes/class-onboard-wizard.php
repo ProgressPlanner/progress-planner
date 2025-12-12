@@ -56,7 +56,7 @@ class Onboard_Wizard {
 		\add_action( 'admin_notices', [ $this, 'maybe_show_user_notification' ] );
 
 		// Maybe clean up the onboarding progress. -- TODO: When to cleanup the onboarding progress?
-		\add_action( 'current_screen', [ $this, 'maybe_clean_up_onboarding_progress' ] );
+		/* \add_action( 'current_screen', [ $this, 'maybe_clean_up_onboarding_progress' ] ); */
 	}
 
 	/**
