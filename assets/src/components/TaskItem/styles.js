@@ -179,3 +179,4 @@ export const checkboxInputStyle = {
 	margin: 0,
 	flexShrink: 0,
 };
+

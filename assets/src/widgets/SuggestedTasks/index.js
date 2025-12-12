@@ -375,25 +375,39 @@ export default function SuggestedTasks( { config = {} } ) {
 		fontFamily: 'inherit',
 	};
 
-	// Get title and description from config or use defaults.
-	const widgetTitle =
-		config?.title ||
-		sprintf(
-			/* translators: %s: Ravi's name. */
-			__( "%s's Recommendations", 'progress-planner' ),
-			config?.raviName || 'Ravi'
-		);
+	/**
+	 * Decode HTML entities in a string.
+	 *
+	 * @param {string} str The string to decode.
+	 * @return {string} The decoded string.
+	 */
+	const decodeHtmlEntities = ( str ) => {
+		const textarea = document.createElement( 'textarea' );
+		textarea.innerHTML = str;
+		return textarea.value;
+	};
 
-	const widgetDescription =
+	// Get title and description from config or use defaults.
+	const widgetTitle = decodeHtmlEntities(
+		config?.title ||
+			sprintf(
+				/* translators: %s: Ravi's name. */
+				__( "%s's Recommendations", 'progress-planner' ),
+				config?.raviName || 'Ravi'
+			)
+	);
+
+	const widgetDescription = decodeHtmlEntities(
 		config?.description ||
-		sprintf(
-			/* translators: %s: Ravi's name. */
-			__(
-				"Complete a task from %s's Recommendations to improve your site and earn points toward this month's badge!",
-				'progress-planner'
-			),
-			config?.raviName || 'Ravi'
-		);
+			sprintf(
+				/* translators: %s: Ravi's name. */
+				__(
+					"Complete a task from %s's Recommendations to improve your site and earn points toward this month's badge!",
+					'progress-planner'
+				),
+				config?.raviName || 'Ravi'
+			)
+	);
 
 	// Show loading state.
 	if ( isLoading ) {
