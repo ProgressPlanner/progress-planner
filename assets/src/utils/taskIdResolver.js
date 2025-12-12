@@ -15,8 +15,8 @@
  * 2. task.prpl_provider.slug - Slug from provider object
  * 3. popoverId - Fallback to provided popover ID
  *
- * @param {Object|null}   task      The task object containing task information.
- * @param {string|null}   popoverId The popover ID to use as fallback (optional).
+ * @param {Object|null} task      The task object containing task information.
+ * @param {string|null} popoverId The popover ID to use as fallback (optional).
  * @return {string|null} The resolved task ID or null if not found.
  *
  * @example
@@ -38,4 +38,3 @@ export function resolveTaskId( task, popoverId = null ) {
 
 	return popoverId || null;
 }
-

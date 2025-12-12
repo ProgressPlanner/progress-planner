@@ -31,6 +31,20 @@
 
 	.prpl-show-all-tasks {
 		display: none;
+
+		/* Base styles migrated to React inline in SuggestedTasks/index.js */
+		.prpl-toggle-all-recommendations-button {
+
+			/* Hover and disabled states - cannot be done inline in React */
+			&:hover {
+				color: var(--prpl-color-link-hover);
+			}
+
+			&:disabled {
+				opacity: 0.6;
+				cursor: not-allowed;
+			}
+		}
 	}
 
 	&:has(.prpl-suggested-tasks-list li) {
@@ -43,9 +57,23 @@
 	.prpl-widget-title {
 		display: none;
 	}
+
+	/* Base styles (background-color, padding) migrated to React inline in SuggestedTasks/index.js */
+
+	/* Display logic kept for CSS-only :has() features and PHP-rendered fallbacks */
+	.prpl-no-suggested-tasks,
+	.prpl-suggested-tasks-loading {
+		display: none;
+	}
+
+	.prpl-suggested-tasks-loading {
+		display: block;
+	}
 }
 
 /* Last item border removal - CSS-only feature */
+
+/* Base list styles (list-style, padding, margin) migrated to React inline in SuggestedTasks/index.js */
 .prpl-suggested-tasks-list {
 
 	&:not(:has(+ .prpl-suggested-tasks-list)) .prpl-suggested-task:last-child {

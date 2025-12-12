@@ -154,4 +154,3 @@ export default function SiteIconPopover( { task, onSubmit, onClose } ) {
 		</InteractiveTaskPopover>
 	);
 }
-

@@ -173,4 +173,3 @@ export default function TimezonePopover( { task, onSubmit, onClose } ) {
 		</InteractiveTaskPopover>
 	);
 }
-

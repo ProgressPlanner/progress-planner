@@ -124,4 +124,3 @@ export default function DisableCommentsPopover( { task, onSubmit, onClose } ) {
 		</InteractiveTaskPopover>
 	);
 }
-

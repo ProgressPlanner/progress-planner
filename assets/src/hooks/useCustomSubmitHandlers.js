@@ -17,9 +17,9 @@ import { deletePost } from './usePopoverForms';
  * Deletes the "Hello World!" post created by WordPress on installation.
  * Attempts to get post ID from task data, falling back to window object for compatibility.
  *
- * @param {Object} task The task object containing post ID information.
+ * @param {Object} task                         The task object containing post ID information.
  * @param {number} [task.prpl_task_data.postId] Post ID from task data.
- * @param {number} [task.postId] Post ID from task object.
+ * @param {number} [task.postId]                Post ID from task object.
  * @return {Promise<{success: boolean}>} Promise resolving to success response.
  */
 async function handleHelloWorld( task ) {
@@ -40,9 +40,9 @@ async function handleHelloWorld( task ) {
  * Deletes the "Sample Page" created by WordPress on installation.
  * Attempts to get page ID from task data, falling back to window object for compatibility.
  *
- * @param {Object} task The task object containing page ID information.
+ * @param {Object} task                         The task object containing page ID information.
  * @param {number} [task.prpl_task_data.pageId] Page ID from task data.
- * @param {number} [task.pageId] Page ID from task object.
+ * @param {number} [task.pageId]                Page ID from task object.
  * @return {Promise<{success: boolean}>} Promise resolving to success response.
  */
 async function handleSamplePage( task ) {
@@ -63,11 +63,11 @@ async function handleSamplePage( task ) {
  * Deletes taxonomy terms that have no associated posts.
  * Attempts to get term IDs and taxonomy from task data, falling back to window object.
  *
- * @param {Object} task The task object containing term information.
- * @param {number[]} [task.prpl_task_data.termIds] Array of term IDs from task data.
- * @param {number[]} [task.termIds] Array of term IDs from task object.
- * @param {string} [task.prpl_task_data.taxonomy] Taxonomy name from task data.
- * @param {string} [task.taxonomy] Taxonomy name from task object.
+ * @param {Object}   task                           The task object containing term information.
+ * @param {number[]} [task.prpl_task_data.termIds]  Array of term IDs from task data.
+ * @param {number[]} [task.termIds]                 Array of term IDs from task object.
+ * @param {string}   [task.prpl_task_data.taxonomy] Taxonomy name from task data.
+ * @param {string}   [task.taxonomy]                Taxonomy name from task object.
  * @return {Promise<{success: boolean}>} Promise resolving to success response.
  */
 async function handleRemoveTermsWithoutPosts( task ) {
@@ -87,8 +87,7 @@ async function handleRemoveTermsWithoutPosts( task ) {
 		return { success: true };
 	}
 
-	const taxonomyEndpoint =
-		taxonomy === 'category' ? 'categories' : taxonomy;
+	const taxonomyEndpoint = taxonomy === 'category' ? 'categories' : taxonomy;
 
 	// Delete each term
 	await Promise.all(
@@ -154,9 +153,7 @@ export function useCustomSubmitHandlers( task ) {
 
 		if ( ! taskId ) {
 			// eslint-disable-next-line no-console
-			console.warn(
-				'useCustomSubmitHandlers: No taskId provided'
-			);
+			console.warn( 'useCustomSubmitHandlers: No taskId provided' );
 			return { success: false };
 		}
 
@@ -171,4 +168,3 @@ export function useCustomSubmitHandlers( task ) {
 		return { success: true };
 	};
 }
-

@@ -566,4 +566,3 @@ export default function EmailSendingPopover( { task, onSubmit, onClose } ) {
 		</InteractiveTaskPopover>
 	);
 }
-

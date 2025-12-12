@@ -173,4 +173,3 @@ export default function LocalePopover( { task, onSubmit, onClose } ) {
 		</InteractiveTaskPopover>
 	);
 }
-

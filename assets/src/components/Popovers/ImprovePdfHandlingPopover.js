@@ -300,4 +300,3 @@ export default function ImprovePdfHandlingPopover( {
 		</InteractiveTaskPopover>
 	);
 }
-

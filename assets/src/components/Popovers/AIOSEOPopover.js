@@ -145,4 +145,3 @@ export default function AIOSEOPopover( { task, onSubmit, onClose } ) {
 		</InteractiveTaskPopover>
 	);
 }
-

@@ -66,4 +66,3 @@ export const POPOVER_REGISTRY = {
 export function getPopoverComponent( taskId ) {
 	return POPOVER_REGISTRY[ taskId ] || null;
 }
-

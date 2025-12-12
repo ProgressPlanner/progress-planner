@@ -368,7 +368,7 @@ export default function SuggestedTasks( { config = {} } ) {
 		background: 'none',
 		border: 'none',
 		padding: 0,
-		color: 'var(--wp-admin-theme-color, #2271b1)',
+		color: 'var(--prpl-color-link)',
 		textDecoration: 'underline',
 		cursor: 'pointer',
 		fontSize: 'inherit',
@@ -462,10 +462,7 @@ export default function SuggestedTasks( { config = {} } ) {
 			<p className="prpl-suggested-tasks-widget-description">
 				{ widgetDescription }
 			</p>
-			<PopoverManager
-				onComplete={ handleComplete }
-				config={ config }
-			/>
+			<PopoverManager onComplete={ handleComplete } config={ config } />
 			<ul style={ { display: 'none' } }></ul>
 			<ul
 				id="prpl-suggested-tasks-list"

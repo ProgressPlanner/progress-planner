@@ -151,4 +151,3 @@ export default function YoastPopover( { task, onSubmit, onClose } ) {
 		</InteractiveTaskPopover>
 	);
 }
-

@@ -52,4 +52,3 @@ export default function TaskPoints( { task, isUserTask, onDelete } ) {
 		</div>
 	);
 }
-

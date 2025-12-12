@@ -141,4 +141,3 @@ export default function BlogDescriptionPopover( { task, onSubmit, onClose } ) {
 		</InteractiveTaskPopover>
 	);
 }
-

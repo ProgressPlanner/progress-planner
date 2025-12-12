@@ -55,10 +55,7 @@ export function usePopoverHooks( onPopoverOpen, onPopoverClose ) {
 			addAction( closeAction, hookNamespace, handleClose );
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
-			console.error(
-				'Failed to register popover hooks:',
-				error
-			);
+			console.error( 'Failed to register popover hooks:', error );
 		}
 
 		return () => {
@@ -67,12 +64,8 @@ export function usePopoverHooks( onPopoverOpen, onPopoverClose ) {
 				removeAction( closeAction, hookNamespace );
 			} catch ( error ) {
 				// eslint-disable-next-line no-console
-				console.error(
-					'Failed to remove popover hooks:',
-					error
-				);
+				console.error( 'Failed to remove popover hooks:', error );
 			}
 		};
 	}, [ handleOpen, handleClose ] );
 }
-
