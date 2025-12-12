@@ -29,7 +29,11 @@ export function maybeComplete( postId ) {
 				console.warn(
 					`prplSuggestedTask.maybeComplete: Task element not found for post ID ${ postId }`
 				);
-				reject( new Error( `Task element not found for post ID ${ postId }` ) );
+				reject(
+					new Error(
+						`Task element not found for post ID ${ postId }`
+					)
+				);
 				return;
 			}
 
@@ -40,7 +44,8 @@ export function maybeComplete( postId ) {
 
 			if ( completeButton ) {
 				// Remove the inline onclick handler to prevent infinite loop.
-				const originalOnclick = completeButton.getAttribute( 'onclick' );
+				const originalOnclick =
+					completeButton.getAttribute( 'onclick' );
 				completeButton.removeAttribute( 'onclick' );
 
 				// Use setTimeout to ensure React's event listeners are set up
@@ -50,7 +55,10 @@ export function maybeComplete( postId ) {
 					completeButton.click();
 					// Restore onclick if it existed (though React's listener handles it now).
 					if ( originalOnclick ) {
-						completeButton.setAttribute( 'onclick', originalOnclick );
+						completeButton.setAttribute(
+							'onclick',
+							originalOnclick
+						);
 					}
 					resolve( { postId } );
 				}, 0 );
@@ -59,7 +67,9 @@ export function maybeComplete( postId ) {
 					`prplSuggestedTask.maybeComplete: Complete button not found for post ID ${ postId }`
 				);
 				reject(
-					new Error( `Complete button not found for post ID ${ postId }` )
+					new Error(
+						`Complete button not found for post ID ${ postId }`
+					)
 				);
 			}
 		} catch ( error ) {
@@ -94,7 +104,11 @@ export function snooze( postId, snoozeDuration ) {
 				console.warn(
 					`prplSuggestedTask.snooze: Task element not found for post ID ${ postId }`
 				);
-				reject( new Error( `Task element not found for post ID ${ postId }` ) );
+				reject(
+					new Error(
+						`Task element not found for post ID ${ postId }`
+					)
+				);
 				return;
 			}
 
@@ -114,10 +128,15 @@ export function snooze( postId, snoozeDuration ) {
 					// Set the value and trigger a change event which will be
 					// handled by React's event listener.
 					snoozeRadio.checked = true;
-					snoozeRadio.dispatchEvent( new Event( 'change', { bubbles: true } ) );
+					snoozeRadio.dispatchEvent(
+						new Event( 'change', { bubbles: true } )
+					);
 					// Restore onchange if it existed (though React's listener handles it now).
 					if ( originalOnchange ) {
-						snoozeRadio.setAttribute( 'onchange', originalOnchange );
+						snoozeRadio.setAttribute(
+							'onchange',
+							originalOnchange
+						);
 					}
 					resolve( { postId, snoozeDuration } );
 				}, 0 );
@@ -132,7 +151,10 @@ export function snooze( postId, snoozeDuration ) {
 				);
 			}
 		} catch ( error ) {
-			console.error( 'prplSuggestedTask.snooze: Error snoozing task', error );
+			console.error(
+				'prplSuggestedTask.snooze: Error snoozing task',
+				error
+			);
 			reject( error );
 		}
 	} );

@@ -44,10 +44,10 @@ import { useState, useCallback } from '@wordpress/element';
  * This hook provides a React-friendly interface for making POST requests
  * to WordPress admin-ajax.php endpoints or other endpoints that require FormData.
  *
- * @return {Object} Hook return value.
- * @return {Function} return.request - Function to make the AJAX request.
- * @return {boolean} return.loading - Whether a request is currently in progress.
- * @return {Error|null} return.error - Error object if the last request failed, null otherwise.
+ * @return {Object} Hook return value with properties:
+ *                  - {Function} request - Function to make the AJAX request.
+ *                  - {boolean} loading - Whether a request is currently in progress.
+ *                  - {Error|null} error - Error object if the last request failed, null otherwise.
  *
  * @example
  * ```jsx
@@ -68,9 +68,9 @@ export function useAjaxRequest() {
 	/**
 	 * Make an AJAX request using FormData.
 	 *
-	 * @param {Object}   params      Request parameters.
-	 * @param {string}   params.url  The URL to send the request to.
-	 * @param {Object}   params.data The data to send with the request.
+	 * @param {Object} params      Request parameters.
+	 * @param {string} params.url  The URL to send the request to.
+	 * @param {Object} params.data The data to send with the request.
 	 * @return {Promise<Object>} Promise resolving to the parsed JSON response.
 	 * @throws {Error} Rejects with the response object if status is not 200.
 	 */
@@ -101,7 +101,11 @@ export function useAjaxRequest() {
 			} catch ( parseError ) {
 				// If JSON parsing fails and status is not 200, log warning.
 				if ( ! response.ok ) {
-					console.warn( 'Failed to parse response:', response, parseError );
+					console.warn(
+						'Failed to parse response:',
+						response,
+						parseError
+					);
 					// Throw error with raw response text for non-200 status.
 					throw new Error( responseText || 'Request failed' );
 				}
@@ -128,4 +132,3 @@ export function useAjaxRequest() {
 
 	return { request, loading, error };
 }
-

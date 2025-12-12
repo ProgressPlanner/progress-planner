@@ -43,9 +43,9 @@
  * the modern fetch API instead of XMLHttpRequest. It's designed to work with
  * WordPress admin-ajax.php endpoints that require FormData.
  *
- * @param {Object}   params      Request parameters.
- * @param {string}   params.url  The URL to send the request to.
- * @param {Object}   params.data The data to send with the request.
+ * @param {Object} params      Request parameters.
+ * @param {string} params.url  The URL to send the request to.
+ * @param {Object} params.data The data to send with the request.
  * @return {Promise<Object>} Promise resolving to the parsed JSON response.
  * @throws {Error} Rejects with the response object if status is not 200.
  *
@@ -106,4 +106,3 @@ export async function ajaxRequest( { url, data } ) {
 	// Reject with the parsed response (matching original behavior).
 	throw parsedResponse;
 }
-

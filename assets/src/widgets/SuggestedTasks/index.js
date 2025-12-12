@@ -132,7 +132,7 @@ function SuggestedTasks( { config = {} } ) {
 		};
 
 		loadTasks();
-	}, [ config ] );
+	}, [ config, celebrate ] );
 
 	/**
 	 * Handle task completion.
@@ -140,71 +140,85 @@ function SuggestedTasks( { config = {} } ) {
 	 * @param {number} postId The post ID.
 	 * @param {Object} task   The task object.
 	 */
-	const handleComplete = useCallback( async ( postId, task ) => {
-		try {
-			// Add to celebrating set.
-			setCelebratingTaskIds( ( prev ) => new Set( [ ...prev, postId ] ) );
-
-			// Update task status via API.
-			await completeTask( postId );
-
-			// Send analytics action.
-			sendTaskAction( postId, 'complete' );
-
-			// Get task points.
-			const eventPoints = parseInt( task.prpl_points ) || 0;
-
-			// Update Ravi gauge if task has points.
-			if (
-				eventPoints > 0 &&
-				typeof window.prplUpdateRaviGauge === 'function'
-			) {
-				window.prplUpdateRaviGauge( eventPoints );
-			}
-
-			// Trigger celebration confetti.
-			if ( eventPoints > 0 && listRef.current ) {
-				const taskElement = listRef.current.querySelector(
-					`[data-post-id="${ postId }"]`
+	const handleComplete = useCallback(
+		async ( postId, task ) => {
+			try {
+				// Add to celebrating set.
+				setCelebratingTaskIds(
+					( prev ) => new Set( [ ...prev, postId ] )
 				);
-				celebrate( taskElement );
-			}
 
-			// Remove task after animation delay.
-			setTimeout( async () => {
-				setTasks( ( prev ) => prev.filter( ( t ) => t.id !== postId ) );
+				// Update task status via API.
+				await completeTask( postId );
+
+				// Send analytics action.
+				sendTaskAction( postId, 'complete' );
+
+				// Get task points.
+				const eventPoints = parseInt( task.prpl_points ) || 0;
+
+				// Update Ravi gauge if task has points.
+				if (
+					eventPoints > 0 &&
+					typeof window.prplUpdateRaviGauge === 'function'
+				) {
+					window.prplUpdateRaviGauge( eventPoints );
+				}
+
+				// Trigger celebration confetti.
+				if ( eventPoints > 0 && listRef.current ) {
+					const taskElement = listRef.current.querySelector(
+						`[data-post-id="${ postId }"]`
+					);
+					celebrate( taskElement );
+				}
+
+				// Remove task after animation delay.
+				setTimeout( async () => {
+					setTasks( ( prev ) =>
+						prev.filter( ( t ) => t.id !== postId )
+					);
+					setCelebratingTaskIds( ( prev ) => {
+						const next = new Set( prev );
+						next.delete( postId );
+						return next;
+					} );
+
+					// Fetch replacement task.
+					const replacementResult = await fetchTasks( {
+						status: 'publish',
+						perPage: 1,
+						page: 1,
+						excludeProvider: 'user',
+						excludeIds: Array.from( injectedTaskIdsRef.current ),
+					} );
+
+					if ( replacementResult.tasks.length > 0 ) {
+						setTasks( ( prev ) => [
+							...prev,
+							replacementResult.tasks[ 0 ],
+						] );
+						injectedTaskIdsRef.current.add(
+							replacementResult.tasks[ 0 ].id
+						);
+					}
+
+					// Trigger grid resize.
+					window.dispatchEvent(
+						new CustomEvent( 'prpl/grid/resize' )
+					);
+				}, 2000 );
+			} catch {
+				// Remove from celebrating on error.
 				setCelebratingTaskIds( ( prev ) => {
 					const next = new Set( prev );
 					next.delete( postId );
 					return next;
 				} );
-
-				// Fetch replacement task.
-				const replacementResult = await fetchTasks( {
-					status: 'publish',
-					perPage: 1,
-					page: 1,
-					excludeProvider: 'user',
-					excludeIds: Array.from( injectedTaskIdsRef.current ),
-				} );
-
-				if ( replacementResult.tasks.length > 0 ) {
-					setTasks( ( prev ) => [ ...prev, replacementResult.tasks[ 0 ] ] );
-					injectedTaskIdsRef.current.add( replacementResult.tasks[ 0 ].id );
-				}
-
-				// Trigger grid resize.
-				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-			}, 2000 );
-		} catch {
-			// Remove from celebrating on error.
-			setCelebratingTaskIds( ( prev ) => {
-				const next = new Set( prev );
-				next.delete( postId );
-				return next;
-			} );
-		}
-	}, [] );
+			}
+		},
+		[ celebrate ]
+	);
 
 	/**
 	 * Handle task snooze.
@@ -229,8 +243,13 @@ function SuggestedTasks( { config = {} } ) {
 			} );
 
 			if ( replacementResult.tasks.length > 0 ) {
-				setTasks( ( prev ) => [ ...prev, replacementResult.tasks[ 0 ] ] );
-				injectedTaskIdsRef.current.add( replacementResult.tasks[ 0 ].id );
+				setTasks( ( prev ) => [
+					...prev,
+					replacementResult.tasks[ 0 ],
+				] );
+				injectedTaskIdsRef.current.add(
+					replacementResult.tasks[ 0 ].id
+				);
 			}
 
 			// Trigger grid resize.
@@ -265,8 +284,13 @@ function SuggestedTasks( { config = {} } ) {
 			} );
 
 			if ( replacementResult.tasks.length > 0 ) {
-				setTasks( ( prev ) => [ ...prev, replacementResult.tasks[ 0 ] ] );
-				injectedTaskIdsRef.current.add( replacementResult.tasks[ 0 ].id );
+				setTasks( ( prev ) => [
+					...prev,
+					replacementResult.tasks[ 0 ],
+				] );
+				injectedTaskIdsRef.current.add(
+					replacementResult.tasks[ 0 ].id
+				);
 			}
 
 			// Trigger grid resize.

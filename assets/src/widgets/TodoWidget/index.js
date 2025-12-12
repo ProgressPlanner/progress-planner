@@ -83,7 +83,9 @@ function TodoWidget( { config = {} } ) {
 				} );
 
 				// Sort pending tasks: golden tasks (prpl_points === 1) first, then by menu_order
-				const sortedPending = sortTasksWithGoldenFirst( pendingResult.tasks );
+				const sortedPending = sortTasksWithGoldenFirst(
+					pendingResult.tasks
+				);
 				completedResult.tasks.sort(
 					( a, b ) => ( a.menu_order || 0 ) - ( b.menu_order || 0 )
 				);
@@ -221,7 +223,7 @@ function TodoWidget( { config = {} } ) {
 				console.error( 'Error toggling task:', error );
 			}
 		},
-		[ pendingTasks, completedTasks, sortTasksWithGoldenFirst ]
+		[ pendingTasks, completedTasks, sortTasksWithGoldenFirst, celebrate ]
 	);
 
 	/**

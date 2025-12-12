@@ -187,11 +187,6 @@ class Page {
 			];
 
 			if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-gauge' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-badge-progress-bar' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-bar' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-line' );
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-big-counter' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-tooltip' );
 				$this->enqueue_dashboard_script();
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );

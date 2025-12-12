@@ -22,8 +22,9 @@ export function useCelebration() {
 	 */
 	const celebrate = useCallback( ( element ) => {
 		// Get container element
-		const containerEl = element?.closest( '.prpl-suggested-tasks-list' )
-			|| document.querySelector(
+		const containerEl =
+			element?.closest( '.prpl-suggested-tasks-list' ) ||
+			document.querySelector(
 				'.prpl-widget-wrapper.prpl-suggested-tasks .prpl-suggested-tasks-list'
 			);
 

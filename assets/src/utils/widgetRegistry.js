@@ -17,10 +17,10 @@ const widgetRegistry = [];
 /**
  * Register a widget.
  *
- * @param {Object} widgetData - Widget registration data.
- * @param {string} widgetData.id - Unique widget ID.
+ * @param {Object}   widgetData           - Widget registration data.
+ * @param {string}   widgetData.id        - Unique widget ID.
  * @param {Function} widgetData.component - React component.
- * @param {number} widgetData.priority - Display priority (lower = earlier, default: 10).
+ * @param {number}   widgetData.priority  - Display priority (lower = earlier, default: 10).
  */
 function registerWidget( widgetData ) {
 	const { id, component, priority = 10 } = widgetData;
@@ -70,4 +70,3 @@ addAction(
 	'progress-planner/widget-registry',
 	registerWidget
 );
-
