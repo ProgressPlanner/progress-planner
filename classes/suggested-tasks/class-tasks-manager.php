@@ -40,7 +40,6 @@ use Progress_Planner\Suggested_Tasks\Providers\Select_Timezone;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Date_Format;
 use Progress_Planner\Suggested_Tasks\Providers\SEO_Plugin;
 use Progress_Planner\Suggested_Tasks\Providers\Improve_Pdf_Handling;
-use Progress_Planner\Suggested_Tasks\Providers\Set_Page_Home;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Page_About;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Page_FAQ;
 use Progress_Planner\Suggested_Tasks\Providers\Set_Page_Contact;
@@ -93,7 +92,6 @@ class Tasks_Manager {
 			new Set_Date_Format(),
 			new SEO_Plugin(),
 			new Improve_Pdf_Handling(),
-			new Set_Page_Home(),
 			new Set_Page_About(),
 			new Set_Page_FAQ(),
 			new Set_Page_Contact(),
