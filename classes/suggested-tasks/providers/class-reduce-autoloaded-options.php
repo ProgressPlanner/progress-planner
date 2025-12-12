@@ -66,7 +66,7 @@ class Reduce_Autoloaded_Options extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	private $autoloaded_options_threshold = 10; // TODO: 10 is just for testing purposes.
+	private $autoloaded_options_threshold = 500;
 
 	/**
 	 * The task priority.
