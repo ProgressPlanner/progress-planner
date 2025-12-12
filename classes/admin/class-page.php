@@ -324,8 +324,50 @@ class Page {
 			]
 		);
 
-		// Enqueue celebrate.js for confetti effects (used by multiple widgets).
-		\progress_planner()->get_admin__enqueue()->enqueue_script( 'celebrate' );
+		// Localize celebration data for confetti.
+		$confetti_options = [];
+		// Check if current date is between Feb 12-16 to use hearts confetti.
+		// February 12 will be (string) '0212', and when converted to int it will be 212.
+		// February 16 will be (string) '0216', and when converted to int it will be 216.
+		// The integer conversion makes it easier and faster to compare the dates.
+		$date_md = (int) \gmdate( 'md' );
+
+		if ( 212 <= $date_md && $date_md <= 216 ) {
+			$confetti_options = [
+				[
+					'particleCount' => 50,
+					'scalar'        => 2.2,
+					'shapes'        => [ 'heart' ],
+					'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
+				],
+				[
+					'particleCount' => 20,
+					'scalar'        => 3.2,
+					'shapes'        => [ 'heart' ],
+					'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
+				],
+			];
+		}
+
+		$celebration_data = [
+			'raviIconUrl'     => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg',
+			'confettiOptions' => $confetti_options,
+		];
+
+		// Get badge URLs from enqueue class.
+		$enqueue = \progress_planner()->get_admin__enqueue();
+		$badge_urls = $enqueue->get_badge_urls();
+		if ( is_array( $badge_urls ) ) {
+			foreach ( $badge_urls as $context => $url ) {
+				$celebration_data[ $context . 'IconUrl' ] = $url;
+			}
+		}
+
+		\wp_localize_script(
+			'progress-planner/dashboard',
+			'prplCelebrate',
+			$celebration_data
+		);
 	}
 
 	/**

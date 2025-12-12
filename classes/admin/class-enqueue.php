@@ -27,11 +27,7 @@ class Enqueue {
 	 * @var array
 	 */
 	const VENDOR_SCRIPTS = [
-		'vendor/tsparticles.confetti.bundle.min' => [
-			'handle'  => 'particles-confetti',
-			'version' => '2.11.0',
-		],
-		'vendor/driver.js.iife'                  => [
+		'vendor/driver.js.iife' => [
 			'handle'  => 'driver',
 			'version' => '1.3.1',
 		],
@@ -206,42 +202,6 @@ class Enqueue {
 				];
 				break;
 
-			case 'progress-planner/celebrate':
-				// Check if current date is between Feb 12-16 to use hearts confetti.
-				$confetti_options = [];
-				// February 12 will be (string) '0212', and when converted to int it will be 212.
-				// February 16 will be (string) '0216', and when converted to int it will be 216.
-				// The integer conversion makes it easier and faster to compare the dates.
-				$date_md = (int) \gmdate( 'md' );
-
-				if ( 212 <= $date_md && $date_md <= 216 ) {
-					$confetti_options = [
-						[
-							'particleCount' => 50,
-							'scalar'        => 2.2,
-							'shapes'        => [ 'heart' ],
-							'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
-						],
-						[
-							'particleCount' => 20,
-							'scalar'        => 3.2,
-							'shapes'        => [ 'heart' ],
-							'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
-						],
-					];
-				}
-				$localize_data = [
-					'name' => 'prplCelebrate',
-					'data' => [
-						'raviIconUrl'     => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg',
-						'confettiOptions' => $confetti_options,
-					],
-				];
-
-				foreach ( $this->get_badge_urls() as $context => $url ) {
-					$localize_data['data'][ $context . 'IconUrl' ] = $url;
-				}
-				break;
 		}
 
 		if ( ! $localize_data['name'] ) {
@@ -256,7 +216,7 @@ class Enqueue {
 	 *
 	 * @return string[] The badge URLs.
 	 */
-	private function get_badge_urls() {
+	public function get_badge_urls() {
 		// Get the monthly badge URL.
 		$monthly_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 

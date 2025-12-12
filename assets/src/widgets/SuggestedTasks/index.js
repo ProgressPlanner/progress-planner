@@ -17,6 +17,7 @@ import {
 	sendTaskAction,
 } from '../../hooks/useTasksApi';
 import { useGridMasonry } from '../../hooks/useGridMasonry';
+import { useCelebration } from '../../hooks/useCelebration';
 
 /**
  * Suggested Tasks widget component.
@@ -35,6 +36,9 @@ export default function SuggestedTasks( { config = {} } ) {
 
 	// Initialize grid masonry layout.
 	useGridMasonry();
+
+	// Get celebration functions.
+	const { celebrate } = useCelebration();
 
 	/**
 	 * Load tasks on component mount.
@@ -89,15 +93,8 @@ export default function SuggestedTasks( { config = {} } ) {
 							);
 							setCelebratingTaskIds( pendingIds );
 
-							// Dispatch celebration event.
-							document.dispatchEvent(
-								new CustomEvent( 'prpl/celebrateTasks' )
-							);
-
-							// Dispatch remove celebrated tasks event (for legacy compatibility).
-							document.dispatchEvent(
-								new CustomEvent( 'prpl/removeCelebratedTasks' )
-							);
+							// Trigger celebration confetti.
+							celebrate( listRef.current );
 
 							// Remove celebrated tasks after animation.
 							setTimeout( () => {
@@ -159,16 +156,12 @@ export default function SuggestedTasks( { config = {} } ) {
 				window.prplUpdateRaviGauge( eventPoints );
 			}
 
-			// Dispatch celebration event for confetti.
+			// Trigger celebration confetti.
 			if ( eventPoints > 0 && listRef.current ) {
 				const taskElement = listRef.current.querySelector(
 					`[data-post-id="${ postId }"]`
 				);
-				document.dispatchEvent(
-					new CustomEvent( 'prpl/celebrateTasks', {
-						detail: { element: taskElement },
-					} )
-				);
+				celebrate( taskElement );
 			}
 
 			// Remove task after animation delay.

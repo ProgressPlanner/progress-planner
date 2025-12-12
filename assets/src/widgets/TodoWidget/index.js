@@ -14,6 +14,7 @@ import {
 	deleteTask,
 } from '../../hooks/useTasksApi';
 import { useGridMasonry } from '../../hooks/useGridMasonry';
+import { useCelebration } from '../../hooks/useCelebration';
 
 /**
  * Todo Widget main component.
@@ -33,6 +34,9 @@ export default function TodoWidget( { config = {} } ) {
 
 	// Initialize grid masonry layout.
 	useGridMasonry();
+
+	// Get celebration functions.
+	const { celebrate } = useCelebration();
 
 	/**
 	 * Sort tasks: golden tasks first, then by menu_order.
@@ -204,11 +208,8 @@ export default function TodoWidget( { config = {} } ) {
 						) {
 							window.prplUpdateRaviGauge( task.prpl_points );
 						}
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/celebrateTasks', {
-								detail: {},
-							} )
-						);
+						// Trigger celebration confetti.
+						celebrate();
 					}
 				}
 
