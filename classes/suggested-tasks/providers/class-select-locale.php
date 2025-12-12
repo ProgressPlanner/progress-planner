@@ -307,7 +307,7 @@ class Select_Locale extends Tasks_Interactive {
 	 * @return string
 	 */
 	public function get_task_action_label() {
-		return __( 'Select locale', 'progress-planner' );
+		return \__( 'Select locale', 'progress-planner' );
 	}
 
 	/**

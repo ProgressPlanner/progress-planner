@@ -154,7 +154,7 @@ class Blog_Description extends Tasks_Interactive {
 	 * @return string
 	 */
 	public function get_task_action_label() {
-		return __( 'Set tagline', 'progress-planner' );
+		return \__( 'Set tagline', 'progress-planner' );
 	}
 
 	/**

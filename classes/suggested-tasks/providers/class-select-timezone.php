@@ -226,7 +226,7 @@ class Select_Timezone extends Tasks_Interactive {
 	 * @return string
 	 */
 	public function get_task_action_label() {
-		return __( 'Select timezone', 'progress-planner' );
+		return \__( 'Select timezone', 'progress-planner' );
 	}
 
 	/**
