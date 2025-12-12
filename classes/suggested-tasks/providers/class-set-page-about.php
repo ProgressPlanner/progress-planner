@@ -49,7 +49,7 @@ class Set_Page_About extends Set_Page_Task {
 	 */
 	public function print_popover_instructions() {
 		echo '<p>';
-		\esc_html_e( 'Your About page tells visitors who you are, what you do, and why they should trust you. Share your story, mission, and the people behind your website to build a personal connection with your audience.', 'progress-planner' );
+		\esc_html_e( 'Your About page tells your story. It tells your visitors who you are, what your business is, and why your website exists. It humanizes your business by telling visitors about yourself and your team.', 'progress-planner' );
 		echo '</p>';
 		echo '<p>';
 		\esc_html_e( 'You can set this page from the Sidebar on the Page Edit screen.', 'progress-planner' );
