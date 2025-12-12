@@ -357,6 +357,7 @@ class PrplOnboardTask {
 			.then( ( response ) => {
 				// Testing only, no need to display file name in production.
 				// statusDiv.textContent = `${ file.name } uploaded.`;
+				statusDiv.style.display = 'none';
 
 				// Update the file preview.
 				const previewDiv =

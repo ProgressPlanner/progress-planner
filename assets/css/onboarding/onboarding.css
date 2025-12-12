@@ -1030,6 +1030,54 @@
 	}
 
 	/* More Tasks Step */
+
+	#prpl-success-graphic {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		img, svg {
+			height: 250px;
+			max-width: 100%;
+		}
+	}
+
+	/* Intro substep */
+	.prpl-more-tasks-substep[data-substep="more-tasks-intro"] {
+		display: flex;
+		flex-direction: column;
+		gap: 1.5rem;
+	}
+
+	.prpl-more-tasks-intro-buttons {
+		margin-top: 1rem;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 1.5rem;
+		flex-wrap: wrap;
+	}
+
+	.prpl-finish-onboarding {
+		background: none;
+		border: none;
+		color: var(--prpl-color-link, #534786);
+		text-decoration: underline;
+		font-size: 16px;
+		cursor: pointer;
+		padding: 0.75rem 0;
+	}
+
+	.prpl-finish-onboarding:hover,
+	.prpl-finish-onboarding:focus {
+		color: var(--prpl-color-link-hover, #38296d);
+	}
+
+	/* Tasks substep */
+	.prpl-more-tasks-substep[data-substep="more-tasks-tasks"] .prpl-task-list {
+		margin: 0;
+	}
+
 	.prpl-column:has(.prpl-task-list) {
 		display: flex;
 		align-items: center;

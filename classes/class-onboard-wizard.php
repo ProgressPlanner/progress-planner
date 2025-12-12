@@ -174,7 +174,8 @@ class Onboard_Wizard {
 				'template_file_name' => 'more-tasks',
 				'template_data'      => [ 'tasks' => $tasks ],
 				'template_id'        => 'onboarding-step-more-tasks',
-				'title'              => esc_html__( 'Complete more tasks', 'progress-planner' ),
+				/* translators: Two-line step title: "Complete more tasks" on line 1, "Finish onboarding!" on line 2 */
+				'title'              => esc_html__( 'Complete more tasks', 'progress-planner' ) . '<br>' . esc_html__( 'Finish onboarding!', 'progress-planner' ),
 			];
 		}
 	}
@@ -612,7 +613,7 @@ class Onboard_Wizard {
 								?>
 								<li class="prpl-nav-step-item" data-step="<?php echo esc_attr( $i ); ?>">
 									<span class="prpl-step-icon"><?php echo esc_html( $i + 1 ); ?></span>
-									<span class="prpl-step-label"><?php echo esc_html( $step['title'] ); ?></span>
+									<span class="prpl-step-label"><?php echo \wp_kses( $step['title'], [ 'br' => [] ] ); ?></span>
 								</li>
 								<?php
 								++$i;
