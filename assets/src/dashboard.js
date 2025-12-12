@@ -7,6 +7,12 @@
 
 import { createRoot } from '@wordpress/element';
 import Dashboard from './components/Dashboard';
+import prplSuggestedTask from './utils/prplSuggestedTask';
+
+// Attach to window immediately so inline onclick handlers can access it.
+// This must be done before React renders to ensure it's available when
+// PHP-generated HTML with inline handlers is parsed.
+window.prplSuggestedTask = prplSuggestedTask;
 
 /**
  * Initialize the dashboard.
