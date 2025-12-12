@@ -1,3 +1,9 @@
+= 1.10.0 =
+
+Added these recommendations from Ravi:
+
+* Reduce number of autoloaded options
+
 = 1.9.0 =
 
 In this release we've added an integration with the **All In One Seo** plugin so you’ll now see personalized suggestions based on your current SEO configuration.
