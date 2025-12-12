@@ -17,17 +17,25 @@ prplInteractiveTaskFormListener.customSubmit( {
 			'#prpl-popover-rename-uncategorized-category input[name="prpl_uncategorized_category_slug"]'
 		);
 
-		fetch( progressPlanner.ajaxUrl, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/x-www-form-urlencoded',
-			},
-			body: new URLSearchParams( {
-				action: 'prpl_interactive_task_submit_rename-uncategorized-category',
-				nonce: progressPlanner.nonce,
-				uncategorized_category_name: name.value,
-				uncategorized_category_slug: slug.value,
-			} ),
+		return new Promise( ( resolve, reject ) => {
+			fetch( progressPlanner.ajaxUrl, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/x-www-form-urlencoded',
+				},
+				body: new URLSearchParams( {
+					action: 'prpl_interactive_task_submit_rename-uncategorized-category',
+					nonce: progressPlanner.nonce,
+					uncategorized_category_name: name.value,
+					uncategorized_category_slug: slug.value,
+				} ),
+			} )
+				.then( ( response ) => {
+					resolve( { response, success: true } );
+				} )
+				.catch( ( error ) => {
+					reject( { success: false, error } );
+				} );
 		} );
 	},
 } );

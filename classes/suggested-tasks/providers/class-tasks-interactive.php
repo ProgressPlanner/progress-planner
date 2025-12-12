@@ -164,6 +164,11 @@ abstract class Tasks_Interactive extends Tasks {
 	 * @return void
 	 */
 	public function add_popover() {
+
+		// Don't add the popover if the task is not published.
+		if ( ! $this->is_task_published() ) {
+			return;
+		}
 		?>
 		<div id="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>" class="prpl-popover prpl-popover-interactive" popover>
 			<?php $this->the_popover_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -207,6 +212,30 @@ abstract class Tasks_Interactive extends Tasks {
 	}
 
 	/**
+	 * Print the submit button.
+	 *
+	 * @param string $button_text The text for the button.
+	 *                           If empty, the default text "Submit" will be used.
+	 * @param string $css_class The CSS class for the wrapper.
+	 *
+	 * @return void
+	 */
+	protected function print_submit_button( $button_text = '', $css_class = '' ) {
+		if ( empty( $button_text ) ) {
+			$button_text = \__( 'Submit', 'progress-planner' );
+		}
+
+		$css_class = empty( $css_class ) ? 'prpl-steps-nav-wrapper' : 'prpl-steps-nav-wrapper ' . $css_class;
+		?>
+		<div class="<?php echo \esc_attr( $css_class ); ?>">
+			<button type="submit" class="prpl-button prpl-button-primary">
+				<?php echo \esc_html( $button_text ); ?>
+			</button>
+		</div>
+		<?php
+	}
+
+	/**
 	 * Print the popover form contents.
 	 *
 	 * @return void
@@ -232,6 +261,11 @@ abstract class Tasks_Interactive extends Tasks {
 			return;
 		}
 
+		// Don't enqueue the script if the task is not published.
+		if ( ! $this->is_task_published() ) {
+			return;
+		}
+
 		// Enqueue the web component.
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
 			'progress-planner/recommendations/' . $this->get_provider_id(),
@@ -246,5 +280,20 @@ abstract class Tasks_Interactive extends Tasks {
 	 */
 	protected function get_enqueue_data() {
 		return [];
+	}
+
+	/**
+	 * Check if the task is published.
+	 *
+	 * @return bool
+	 */
+	public function is_task_published() {
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'provider'    => $this->get_provider_id(),
+				'post_status' => 'publish',
+			]
+		);
+		return ! empty( $tasks );
 	}
 }

@@ -120,9 +120,11 @@ class Site_Icon extends Tasks_Interactive {
 			<?php \esc_html_e( 'Choose or Upload Image', 'progress-planner' ); ?>
 		</button>
 		<input type="hidden" name="site_icon" id="prpl-site-icon-id" value="<?php echo \esc_attr( $site_icon_id ); ?>">
-		<button type="submit" class="prpl-button prpl-button-primary" id="prpl-set-site-icon-button" <?php echo $site_icon_id ? '' : 'disabled'; ?>>
-			<?php \esc_html_e( 'Set site icon', 'progress-planner' ); ?>
-		</button>
+		<div class="prpl-steps-nav-wrapper prpl-steps-nav-wrapper-align-left">
+			<button type="submit" class="prpl-button prpl-button-primary" id="prpl-set-site-icon-button" <?php echo $site_icon_id ? '' : 'disabled'; ?>>
+				<?php \esc_html_e( 'Set site icon', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 

@@ -7,10 +7,14 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder;
+
 /**
  * Add task for Yoast SEO: set your organization logo.
  */
 class Organization_Logo extends Yoast_Interactive_Provider {
+
+	use Task_Action_Builder;
 
 	/**
 	 * The provider ID.
@@ -191,9 +195,11 @@ class Organization_Logo extends Yoast_Interactive_Provider {
 			<?php \esc_html_e( 'Choose or Upload Image', 'progress-planner' ); ?>
 		</button>
 		<input type="hidden" name="prpl_yoast_organization_logo_id" id="prpl-yoast-organization-logo-id" value="<?php echo \esc_attr( $organization_logo_id ); ?>">
-		<button type="submit" class="prpl-button prpl-button-primary" id="prpl-set-organization-logo-button" <?php echo $organization_logo_id ? '' : 'disabled'; ?>>
-			<?php \esc_html_e( 'Set logo', 'progress-planner' ); ?>
-		</button>
+		<div class="prpl-steps-nav-wrapper">
+			<button type="submit" class="prpl-button prpl-button-primary" id="prpl-set-organization-logo-button" <?php echo $organization_logo_id ? '' : 'disabled'; ?>>
+				<?php \esc_html_e( 'Set logo', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 
@@ -226,11 +232,6 @@ class Organization_Logo extends Yoast_Interactive_Provider {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
-			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Set logo', 'progress-planner' ) . '</a>',
-		];
-
-		return $actions;
+		return $this->add_popover_action( $actions, \__( 'Set logo', 'progress-planner' ) );
 	}
 }

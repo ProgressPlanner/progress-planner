@@ -8,11 +8,14 @@
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
 use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author;
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder;
 
 /**
  * Add task for Yoast SEO: Remove post authors feeds.
  */
 class Crawl_Settings_Feed_Authors extends Yoast_Interactive_Provider {
+
+	use Task_Action_Builder;
 
 	/**
 	 * The minimum number of posts with a post format to add the task.
@@ -136,11 +139,7 @@ class Crawl_Settings_Feed_Authors extends Yoast_Interactive_Provider {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		?>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Remove', 'progress-planner' ); ?>
-		</button>
-		<?php
+		$this->print_submit_button( \__( 'Remove', 'progress-planner' ) );
 	}
 
 	/**
@@ -152,11 +151,6 @@ class Crawl_Settings_Feed_Authors extends Yoast_Interactive_Provider {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
-			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Remove', 'progress-planner' ) . '</a>',
-		];
-
-		return $actions;
+		return $this->add_popover_action( $actions, \__( 'Remove', 'progress-planner' ) );
 	}
 }

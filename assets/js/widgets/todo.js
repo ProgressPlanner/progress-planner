@@ -1,10 +1,10 @@
-/* global prplSuggestedTask, prplTerms */
+/* global prplSuggestedTask, prplTerms, prplL10n */
 /*
  * Widget: Todo
  *
  * A widget that displays a todo list.
  *
- * Dependencies: wp-api, progress-planner/suggested-task, wp-util, wp-a11y, progress-planner/grid-masonry, progress-planner/celebrate, progress-planner/suggested-task-terms
+ * Dependencies: wp-api, progress-planner/suggested-task, wp-util, wp-a11y, progress-planner/celebrate, progress-planner/suggested-task-terms, progress-planner/l10n
  */
 
 const prplTodoWidget = {
@@ -160,6 +160,11 @@ const prplTodoWidget = {
 					// Remove the loader.
 					prplTodoWidget.removeLoader();
 
+					// Announce to screen readers.
+					prplTodoWidget.announceToScreenReader(
+						prplL10n( 'taskAddedSuccessfully' )
+					);
+
 					// Resize the grid items.
 					window.dispatchEvent(
 						new CustomEvent( 'prpl/grid/resize' )
@@ -175,11 +180,39 @@ const prplTodoWidget = {
 	},
 
 	/**
+	 * Announce to screen readers.
+	 *
+	 * @param {string} message  The message to announce.
+	 * @param {string} priority The priority ('polite' or 'assertive').
+	 */
+	announceToScreenReader: ( message, priority = 'polite' ) => {
+		// Use WordPress a11y speak if available.
+		if ( 'undefined' !== typeof wp && wp.a11y && wp.a11y.speak ) {
+			wp.a11y.speak( message, priority );
+		} else {
+			// Fallback to ARIA live region.
+			const liveRegion = document.getElementById(
+				'todo-aria-live-region'
+			);
+			if ( liveRegion ) {
+				liveRegion.textContent = message;
+				setTimeout( () => {
+					liveRegion.textContent = '';
+				}, 1000 );
+			}
+		}
+	},
+
+	/**
 	 * Add the loader.
 	 */
 	addLoader: () => {
 		const loader = document.createElement( 'span' );
+		const loadingTasksText = prplL10n( 'loadingTasks' );
 		loader.className = 'prpl-loader';
+		loader.setAttribute( 'role', 'status' );
+		loader.setAttribute( 'aria-live', 'polite' );
+		loader.innerHTML = `<span class="screen-reader-text">${ loadingTasksText }</span>`;
 		document.getElementById( 'todo-list' ).appendChild( loader );
 	},
 
@@ -220,12 +253,25 @@ const prplTodoWidget = {
 	 * Delete all completed tasks.
 	 */
 	deleteAllCompletedTasks: () => {
-		document
-			.querySelectorAll( '#todo-list-completed .prpl-suggested-task' )
-			.forEach( ( item ) => {
-				const postId = parseInt( item.getAttribute( 'data-post-id' ) );
-				prplSuggestedTask.trash( postId );
-			} );
+		const items = document.querySelectorAll(
+			'#todo-list-completed .prpl-suggested-task'
+		);
+		const itemCount = items.length;
+
+		items.forEach( ( item ) => {
+			const postId = parseInt( item.getAttribute( 'data-post-id' ) );
+			prplSuggestedTask.trash( postId );
+		} );
+
+		// Announce to screen readers.
+		const tasksWord =
+			itemCount === 1
+				? prplL10n( 'taskDeleted' )
+				: prplL10n( 'tasksDeleted' );
+		prplTodoWidget.announceToScreenReader(
+			`${ itemCount } ${ tasksWord }`,
+			'assertive'
+		);
 
 		// Resize event will be triggered by the trash function.
 	},
@@ -235,6 +281,27 @@ document
 	.getElementById( 'todo-list-completed-details' )
 	?.addEventListener( 'toggle', () => {
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+	} );
+
+// Add event listener for delete all button.
+document
+	.getElementById( 'todo-list-completed-delete-all' )
+	?.addEventListener( 'click', () => {
+		prplTodoWidget.showDeleteAllPopover();
+	} );
+
+// Add event listener for cancel button in delete all popover.
+document
+	.getElementById( 'todo-list-completed-delete-all-cancel' )
+	?.addEventListener( 'click', () => {
+		prplTodoWidget.closeDeleteAllPopover();
+	} );
+
+// Add event listener for confirm button in delete all popover.
+document
+	.getElementById( 'todo-list-completed-delete-all-confirm' )
+	?.addEventListener( 'click', () => {
+		prplTodoWidget.deleteAllCompletedTasksAndClosePopover();
 	} );
 
 document.addEventListener( 'prpl/suggestedTask/itemInjected', ( event ) => {

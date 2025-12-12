@@ -43,6 +43,9 @@
 				taxonomyElement: popover.querySelector(
 					'#prpl-delete-term-taxonomy'
 				),
+				taxonomyNameElement: popover.querySelector(
+					'#prpl-delete-term-taxonomy-name'
+				),
 				termIdField: popover.querySelector( '#prpl-delete-term-id' ),
 				taxonomyField: popover.querySelector( '#prpl-delete-taxonomy' ),
 			};
@@ -82,6 +85,9 @@
 				taxonomy: this.decodeHtmlEntities(
 					event.detail.target_taxonomy
 				),
+				taxonomyName: this.decodeHtmlEntities(
+					event.detail.target_taxonomy_name
+				),
 				termName: this.decodeHtmlEntities(
 					event.detail.target_term_name
 				),
@@ -97,6 +103,7 @@
 				this.currentTermData.termId,
 				this.currentTermData.taxonomy,
 				this.currentTermData.termName,
+				this.currentTermData.taxonomyName,
 				this.decodeHtmlEntities( event.detail.post_title )
 			);
 		}
@@ -104,12 +111,19 @@
 		/**
 		 * Update the popover content.
 		 *
-		 * @param {string} termId    The term ID.
-		 * @param {string} taxonomy  The taxonomy.
-		 * @param {string} termName  The term name.
-		 * @param {string} postTitle The post title.
+		 * @param {string} termId       The term ID.
+		 * @param {string} taxonomy     The taxonomy.
+		 * @param {string} termName     The term name.
+		 * @param {string} taxonomyName The taxonomy name.
+		 * @param {string} postTitle    The post title.
 		 */
-		updatePopoverContent( termId, taxonomy, termName, postTitle ) {
+		updatePopoverContent(
+			termId,
+			taxonomy,
+			termName,
+			taxonomyName,
+			postTitle
+		) {
 			if ( this.elements.popoverTitle ) {
 				this.elements.popoverTitle.textContent = postTitle;
 			}
@@ -120,6 +134,10 @@
 
 			if ( this.elements.taxonomyElement ) {
 				this.elements.taxonomyElement.textContent = taxonomy;
+			}
+
+			if ( this.elements.taxonomyNameElement ) {
+				this.elements.taxonomyNameElement.textContent = taxonomyName;
 			}
 
 			if ( this.elements.termIdField ) {
@@ -143,20 +161,30 @@
 				taskId: this.currentTaskElement.dataset.taskId,
 				popoverId: this.popoverId,
 				callback: () => {
-					fetch( progressPlanner.ajaxUrl, {
-						method: 'POST',
-						headers: {
-							'Content-Type': 'application/x-www-form-urlencoded',
-						},
-						body: new URLSearchParams( {
-							action: 'prpl_interactive_task_submit_remove-terms-without-posts',
-							nonce: progressPlanner.nonce,
-							term_id: this.elements.termIdField.value,
-							taxonomy: this.elements.taxonomyField.value,
-						} ),
-					} ).then( () => {
-						this.currentTaskElement = null;
-						this.currentTermData = null;
+					return new Promise( ( resolve, reject ) => {
+						fetch( progressPlanner.ajaxUrl, {
+							method: 'POST',
+							headers: {
+								'Content-Type':
+									'application/x-www-form-urlencoded',
+							},
+							body: new URLSearchParams( {
+								action: 'prpl_interactive_task_submit_remove-terms-without-posts',
+								nonce: progressPlanner.nonce,
+								term_id: this.elements.termIdField.value,
+								taxonomy: this.elements.taxonomyField.value,
+							} ),
+						} )
+							.then( () => {
+								this.currentTaskElement = null;
+								this.currentTermData = null;
+							} )
+							.then( ( response ) => {
+								resolve( { response, success: true } );
+							} )
+							.catch( ( error ) => {
+								reject( { success: false, error } );
+							} );
 					} );
 				},
 			} );

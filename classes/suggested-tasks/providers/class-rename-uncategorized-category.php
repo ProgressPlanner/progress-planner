@@ -128,7 +128,7 @@ class Rename_Uncategorized_Category extends Tasks_Interactive {
 		$uncategorized_category_id = $this->get_data_collector()->collect();
 		$uncategorized_category    = \get_term( $uncategorized_category_id, 'category' );
 
-		if ( ! $uncategorized_category || is_wp_error( $uncategorized_category ) ) {
+		if ( ! $uncategorized_category || \is_wp_error( $uncategorized_category ) ) {
 			return;
 		}
 		?>
@@ -177,8 +177,8 @@ class Rename_Uncategorized_Category extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing uncategorized category name or slug.', 'progress-planner' ) ] );
 		}
 
-		$uncategorized_category_name = trim( \sanitize_text_field( \wp_unslash( $_POST['uncategorized_category_name'] ) ) );
-		$uncategorized_category_slug = trim( \sanitize_text_field( \wp_unslash( $_POST['uncategorized_category_slug'] ) ) );
+		$uncategorized_category_name = \trim( \sanitize_text_field( \wp_unslash( $_POST['uncategorized_category_name'] ) ) );
+		$uncategorized_category_slug = \trim( \sanitize_text_field( \wp_unslash( $_POST['uncategorized_category_slug'] ) ) );
 
 		if ( empty( $uncategorized_category_name ) || empty( $uncategorized_category_slug ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid uncategorized category name or slug.', 'progress-planner' ) ] );
@@ -187,7 +187,7 @@ class Rename_Uncategorized_Category extends Tasks_Interactive {
 		$default_category_name = \__( 'Uncategorized' ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 		$default_category_slug = \sanitize_title( \_x( 'Uncategorized', 'Default category slug' ) ); // phpcs:ignore WordPress.WP.I18n.MissingArgDomain
 
-		$strtolower = function_exists( 'mb_strtolower' ) ? 'mb_strtolower' : 'strtolower';
+		$strtolower = \function_exists( 'mb_strtolower' ) ? 'mb_strtolower' : 'strtolower';
 		if ( $strtolower( $uncategorized_category_name ) === $strtolower( $default_category_name ) || $strtolower( $uncategorized_category_slug ) === $strtolower( $default_category_slug ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'You cannot use the default name or slug for the Uncategorized category.', 'progress-planner' ) ] );
 		}

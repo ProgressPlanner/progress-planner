@@ -20,8 +20,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		class="prpl-popover-close"
 		popovertarget="prpl-popover-<?php echo \esc_attr( $prpl_popover_id ); ?>"
 		popovertargetaction="hide"
+		aria-label="<?php \esc_attr_e( 'Close', 'progress-planner' ); ?>"
 	>
-		<span class="dashicons dashicons-no-alt"></span>
-		<span class="screen-reader-text"><?php \esc_html_e( 'Close', 'progress-planner' ); ?>
+		<span class="dashicons dashicons-no-alt" aria-hidden="true"></span>
+		<span class="screen-reader-text"><?php \esc_html_e( 'Close', 'progress-planner' ); ?></span>
 	</button>
 </div>

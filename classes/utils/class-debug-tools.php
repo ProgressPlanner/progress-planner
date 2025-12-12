@@ -52,9 +52,6 @@ class Debug_Tools {
 			\add_action( 'init', [ $this, 'check_toggle_placeholder_demo' ] );
 		}
 
-		// Initialize color customizer.
-		$this->get_color_customizer();
-
 		\add_filter( 'progress_planner_tasks_show_ui', [ $this, 'filter_tasks_show_ui' ] );
 	}
 
@@ -77,6 +74,16 @@ class Debug_Tools {
 			]
 		);
 
+		// Show all suggested tasks.
+		$admin_bar->add_node(
+			[
+				'id'     => 'prpl-show-all-suggested-tasks',
+				'parent' => 'prpl-debug',
+				'title'  => 'Show All Suggested Tasks',
+				'href'   => \add_query_arg( 'prpl_show_all_recommendations', $this->current_url ),
+			]
+		);
+
 		$this->add_delete_submenu_item( $admin_bar );
 
 		$this->add_upgrading_tasks_submenu_item( $admin_bar );
@@ -90,16 +97,6 @@ class Debug_Tools {
 		$this->add_toggle_migrations_submenu_item( $admin_bar );
 
 		$this->add_toggle_recommendations_ui_submenu_item( $admin_bar );
-
-		// Add color customizer item.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-color-customizer',
-				'parent' => 'prpl-debug',
-				'title'  => 'Color Customizer',
-				'href'   => \admin_url( 'admin.php?page=progress-planner-color-customizer' ),
-			]
-		);
 
 		$this->add_placeholder_demo_submenu_item( $admin_bar );
 	}
@@ -716,19 +713,6 @@ class Debug_Tools {
 		// Redirect to the same page without the parameter.
 		\wp_safe_redirect( \remove_query_arg( [ 'prpl_toggle_placeholder_demo', '_wpnonce' ] ) );
 		exit;
-	}
-
-	/**
-	 * Get color customizer instance.
-	 *
-	 * @return \Progress_Planner\Utils\Color_Customizer
-	 */
-	public function get_color_customizer() {
-		static $color_customizer = null;
-		if ( null === $color_customizer ) {
-			$color_customizer = new Color_Customizer();
-		}
-		return $color_customizer;
 	}
 
 	/**

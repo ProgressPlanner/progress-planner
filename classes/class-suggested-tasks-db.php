@@ -24,11 +24,40 @@ class Suggested_Tasks_DB {
 	const GET_TASKS_CACHE_GROUP = 'progress_planner_get_tasks';
 
 	/**
-	 * Add a recommendation.
+	 * Add a recommendation (suggested task).
 	 *
-	 * @param array $data The data to add.
+	 * Creates a new task post with proper locking to prevent race conditions when
+	 * multiple processes try to create the same task simultaneously.
 	 *
-	 * @return int
+	 * Locking mechanism:
+	 * - Uses WordPress options table as a distributed lock via add_option()
+	 * - add_option() is atomic: returns false if the option already exists
+	 * - Lock key format: "prpl_task_lock_{task_id}"
+	 * - Lock value: Current Unix timestamp (for staleness detection)
+	 * - Stale lock timeout: 30 seconds (prevents deadlocks from crashed processes)
+	 * - Lock is always released in finally block (even if insertion fails)
+	 *
+	 * This ensures only one process can create a specific task at a time,
+	 * preventing duplicate task creation in concurrent scenarios like:
+	 * - Multiple cron jobs running simultaneously
+	 * - AJAX requests firing in parallel
+	 * - Plugin activation on multisite networks
+	 *
+	 * @param array $data {
+	 *     The task data to add.
+	 *
+	 *     @type string $task_id      Required. The unique task ID (e.g., "update-core").
+	 *     @type string $post_title   Required. The task title shown to users.
+	 *     @type string $provider_id  Required. The provider ID (e.g., "update-core").
+	 *     @type string $description  Optional. The task description/content.
+	 *     @type int    $priority     Optional. Display priority (lower = higher priority).
+	 *     @type int    $order        Optional. Menu order (defaults to priority if not set).
+	 *     @type int    $parent       Optional. Parent task ID for hierarchical tasks.
+	 *     @type string $post_status  Optional. Task status: 'publish', 'pending', 'completed', 'trash', 'snoozed'.
+	 *     @type int    $time         Optional. Unix timestamp for snoozed tasks (when to show again).
+	 * }
+	 *
+	 * @return int The created post ID, or 0 if creation failed or task already exists.
 	 */
 	public function add( $data ) {
 		if ( empty( $data['post_title'] ) ) {
@@ -36,29 +65,37 @@ class Suggested_Tasks_DB {
 			return 0;
 		}
 
+		// Acquire a distributed lock to prevent race conditions during task creation.
 		$lock_key   = 'prpl_task_lock_' . $data['task_id'];
 		$lock_value = \time();
 
-		// add_option will return false if the option is already there.
+		// Try to create the lock atomically using add_option().
+		// This returns false if the option already exists, indicating another process holds the lock.
 		if ( ! \add_option( $lock_key, $lock_value, '', false ) ) {
 			$current = \get_option( $lock_key );
 
-			// If lock is stale (older than 30s), take over.
+			// Check if the lock is stale (older than 30 seconds).
+			// This prevents deadlocks if a process crashes while holding the lock.
 			if ( $current && ( $current < \time() - 30 ) ) {
 				\update_option( $lock_key, $lock_value );
 			} else {
-				return 0; // Other process is using it.
+				// Lock is held by another active process, abort to avoid duplicates.
+				return 0;
 			}
 		}
 
-		// Check if we have an existing task with the same title.
-		$posts         = $this->get_tasks_by(
+		// Check if we have an existing task with the same ID.
+		// Search across all post statuses since WordPress 'any' excludes trash and pending.
+		$posts = $this->get_tasks_by(
 			[
-				'post_status' => [ 'publish', 'trash', 'draft', 'future', 'pending' ], // 'any' doesn't include statuses which have 'exclude_from_search' set to true (trash and pending).
+				'post_status' => [ 'publish', 'trash', 'draft', 'future', 'pending' ],
 				'numberposts' => 1,
 				'name'        => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['task_id'] ),
 			]
 		);
+
+		// Also check for trashed tasks with the "__trashed" suffix.
+		// This suffix is appended when tasks are permanently removed to preserve history.
 		$posts_trashed = $this->get_tasks_by(
 			[
 				'post_status' => [ 'trash' ],
@@ -67,11 +104,12 @@ class Suggested_Tasks_DB {
 			]
 		);
 
+		// If no active task exists but a trashed one does, use the trashed one.
 		if ( empty( $posts ) && ! empty( $posts_trashed ) ) {
 			$posts = $posts_trashed;
 		}
 
-		// If we have an existing task, skip.
+		// If task already exists (in any status), return its ID without creating a duplicate.
 		if ( ! empty( $posts ) ) {
 			\delete_option( $lock_key );
 			return $posts[0]->ID;
@@ -153,7 +191,8 @@ class Suggested_Tasks_DB {
 				\update_post_meta( $post_id, "prpl_$key", $value );
 			}
 		} finally {
-			// Delete the lock. This executes always.
+			// Always release the lock, even if an exception occurred during post creation.
+			// This ensures the lock doesn't remain indefinitely and block future attempts.
 			\delete_option( $lock_key );
 		}
 
@@ -375,7 +414,7 @@ class Suggested_Tasks_DB {
 					)
 				)
 			);
-			$results         = array_merge( $results, $results_trashed );
+			$results         = \array_merge( $results, $results_trashed );
 		}
 
 		\wp_cache_set( $cache_key, $results, static::GET_TASKS_CACHE_GROUP );

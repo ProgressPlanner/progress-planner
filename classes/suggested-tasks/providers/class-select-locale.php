@@ -205,7 +205,8 @@ class Select_Locale extends Tasks_Interactive {
 	public function print_popover_form_contents() {
 
 		if ( ! \function_exists( 'wp_get_available_translations' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/translation-install.php'; // @phpstan-ignore requireOnce.fileNotFound
+			// @phpstan-ignore-next-line requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
 		}
 
 		$languages    = \get_available_languages();
@@ -225,11 +226,8 @@ class Select_Locale extends Tasks_Interactive {
 				'show_available_translations' => \current_user_can( 'install_languages' ) && \wp_can_install_language_pack(),
 			]
 		);
-		?>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Select locale', 'progress-planner' ); ?>
-		</button>
-		<?php
+
+		$this->print_submit_button( \__( 'Select locale', 'progress-planner' ), 'prpl-steps-nav-wrapper-align-left' );
 	}
 
 	/**
@@ -280,7 +278,8 @@ class Select_Locale extends Tasks_Interactive {
 
 		// Handle translation installation.
 		if ( \current_user_can( 'install_languages' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/translation-install.php'; // @phpstan-ignore requireOnce.fileNotFound
+			// @phpstan-ignore-next-line requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
 
 			if ( \wp_can_install_language_pack() ) {
 				$language = \wp_download_language_pack( $language_for_update );
