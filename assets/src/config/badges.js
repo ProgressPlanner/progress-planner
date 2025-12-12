@@ -140,7 +140,9 @@ export function getAllBadges() {
  */
 export function getBadgeById( badgeId ) {
 	// Check content badges.
-	const contentBadge = CONTENT_BADGES.find( ( badge ) => badge.id === badgeId );
+	const contentBadge = CONTENT_BADGES.find(
+		( badge ) => badge.id === badgeId
+	);
 	if ( contentBadge ) {
 		return contentBadge;
 	}
@@ -157,8 +159,8 @@ export function getBadgeById( badgeId ) {
 	if ( badgeId.startsWith( 'monthly-' ) ) {
 		const parts = badgeId.split( '-' );
 		if ( parts.length === 3 ) {
-			const year = parseInt( parts[1], 10 );
-			const monthStr = parts[2].replace( 'm', '' );
+			const year = parseInt( parts[ 1 ], 10 );
+			const monthStr = parts[ 2 ].replace( 'm', '' );
 			const month = parseInt( monthStr, 10 );
 			if ( year && month >= 1 && month <= 12 ) {
 				const date = new Date( year, month - 1, 1 );
@@ -178,4 +180,3 @@ export function getBadgeById( badgeId ) {
 
 	return null;
 }
-

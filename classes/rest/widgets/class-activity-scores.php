@@ -75,8 +75,8 @@ class Activity_Scores extends Base {
 		$range     = $request->get_param( 'range' ) ?? '-6 months';
 		$frequency = $request->get_param( 'frequency' ) ?? 'monthly';
 
-		$score = $this->get_score();
-		$record = $this->personal_record_callback();
+		$score     = $this->get_score();
+		$record    = $this->personal_record_callback();
 		$checklist = $this->get_checklist_results();
 
 		// Get chart data.
@@ -102,7 +102,7 @@ class Activity_Scores extends Base {
 				'count_callback' => fn( $activities, $date ) => \array_sum( \array_map( fn( $activity ) => $activity->get_points( $date ), $activities ) ) * 100 / Plugin_Base::SCORE_TARGET,
 				'normalized'     => true,
 				'max'            => 100,
-				'return_data'    => [ 'label', 'score' ], // Don't return color - that's presentation logic
+				'return_data'    => [ 'label', 'score' ], // Don't return color - that's presentation logic.
 			]
 		);
 
@@ -257,4 +257,3 @@ class Activity_Scores extends Base {
 		return $goal->get_streak();
 	}
 }
-

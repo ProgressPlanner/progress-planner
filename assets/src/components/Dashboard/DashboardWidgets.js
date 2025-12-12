@@ -84,11 +84,9 @@ function WidgetWrapper( {
 /**
  * DashboardWidgets component.
  *
- * @param {Object} props        - Component props.
- * @param {Object} props.config - Dashboard configuration (not used for widgets anymore).
  * @return {JSX.Element} The DashboardWidgets component.
  */
-export default function DashboardWidgets( { config } ) {
+export default function DashboardWidgets() {
 	const [ registeredWidgets, setRegisteredWidgets ] = useState( [] );
 
 	// Listen for widget registrations and update state

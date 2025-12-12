@@ -57,7 +57,7 @@ class Badge_Stats extends Base {
 	/**
 	 * Validate badge stats data.
 	 *
-	 * @param array $badges Badge stats data.
+	 * @param mixed $badges Badge stats data.
 	 *
 	 * @return bool
 	 */
@@ -148,4 +148,3 @@ class Badge_Stats extends Base {
 		);
 	}
 }
-

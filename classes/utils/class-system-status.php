@@ -52,29 +52,31 @@ class System_Status {
 
 		// Get the badges from saved stats.
 		// Badge calculations are now handled in React, so we return saved progress.
-		$settings = \progress_planner()->get_settings();
+		$settings     = \progress_planner()->get_settings();
 		$saved_badges = $settings->get( 'badges', [] );
 
 		// Badge name mapping (for external API compatibility).
 		$badge_names = [
-			'content-curator'        => \__( 'Content Curator', 'progress-planner' ),
-			'revision-ranger'        => \__( 'Revision Ranger', 'progress-planner' ),
-			'purposeful-publisher'   => \__( 'Purposeful Publisher', 'progress-planner' ),
-			'progress-padawan'       => \__( 'Progress Padawan', 'progress-planner' ),
-			'maintenance-maniac'     => \__( 'Maintenance Maniac', 'progress-planner' ),
+			'content-curator'       => \__( 'Content Curator', 'progress-planner' ),
+			'revision-ranger'       => \__( 'Revision Ranger', 'progress-planner' ),
+			'purposeful-publisher'  => \__( 'Purposeful Publisher', 'progress-planner' ),
+			'progress-padawan'      => \__( 'Progress Padawan', 'progress-planner' ),
+			'maintenance-maniac'    => \__( 'Maintenance Maniac', 'progress-planner' ),
 			'super-site-specialist' => \__( 'Super Site Specialist', 'progress-planner' ),
 		];
 
 		$data['badges'] = [];
 		foreach ( $saved_badges as $badge_id => $badge_data ) {
+			// Ensure badge_id is a string for array key access.
+			$badge_id = (string) $badge_id;
 			// Get badge name (for monthly badges, generate from ID).
 			$badge_name = $badge_names[ $badge_id ] ?? '';
 			if ( empty( $badge_name ) && \str_starts_with( $badge_id, 'monthly-' ) ) {
 				// Generate monthly badge name from ID.
 				$parts = \explode( '-', \str_replace( 'monthly-', '', $badge_id ) );
 				if ( \count( $parts ) === 2 ) {
-					$year  = (int) $parts[0];
-					$month = (int) \str_replace( 'm', '', $parts[1] );
+					$year   = (int) $parts[0];
+					$month  = (int) \str_replace( 'm', '', $parts[1] );
 					$months = [
 						1  => 'Jack January',
 						2  => 'Felix February',
@@ -89,7 +91,9 @@ class System_Status {
 						11 => 'Noah November',
 						12 => 'Daisy December',
 					];
-					$badge_name = $months[ $month ] ?? '';
+					if ( isset( $months[ $month ] ) ) {
+						$badge_name = $months[ $month ];
+					}
 				}
 			}
 

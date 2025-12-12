@@ -32,35 +32,32 @@ function MonthlyBadges( { config = {} } ) {
 	const { isLoading, error, data } = useBadgeData();
 
 	// Get monthly badge date range function.
-	const getMonthlyBadgeDateRange = useCallback(
-		( badgeId ) => {
-			if ( ! badgeId.startsWith( 'monthly-' ) ) {
-				return null;
-			}
+	const getMonthlyBadgeDateRange = useCallback( ( badgeId ) => {
+		if ( ! badgeId.startsWith( 'monthly-' ) ) {
+			return null;
+		}
 
-			const parts = badgeId.split( '-' );
-			if ( parts.length !== 3 ) {
-				return null;
-			}
+		const parts = badgeId.split( '-' );
+		if ( parts.length !== 3 ) {
+			return null;
+		}
 
-			const year = parseInt( parts[1], 10 );
-			const monthStr = parts[2].replace( 'm', '' );
-			const month = parseInt( monthStr, 10 );
+		const year = parseInt( parts[ 1 ], 10 );
+		const monthStr = parts[ 2 ].replace( 'm', '' );
+		const month = parseInt( monthStr, 10 );
 
-			if ( ! year || month < 1 || month > 12 ) {
-				return null;
-			}
+		if ( ! year || month < 1 || month > 12 ) {
+			return null;
+		}
 
-			const startDate = new Date( year, month - 1, 1 );
-			startDate.setHours( 0, 0, 0, 0 );
+		const startDate = new Date( year, month - 1, 1 );
+		startDate.setHours( 0, 0, 0, 0 );
 
-			const endDate = new Date( year, month, 0 );
-			endDate.setHours( 23, 59, 59, 999 );
+		const endDate = new Date( year, month, 0 );
+		endDate.setHours( 23, 59, 59, 999 );
 
-			return { startDate, endDate };
-		},
-		[]
-	);
+		return { startDate, endDate };
+	}, [] );
 
 	// Calculate badge progress.
 	const badgeProgress = useBadgeProgress( {
@@ -172,7 +169,6 @@ function MonthlyBadges( { config = {} } ) {
 			daysRemaining,
 		} ) );
 	}, [ previousBadges, maxPoints, gaugeValue ] );
-
 
 	const containerStyle = {
 		display: 'flex',

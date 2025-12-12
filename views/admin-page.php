@@ -44,7 +44,7 @@ if ( 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id() ) {
 		<?php
 		// Enqueue widget styles (scripts are now handled by dashboard.js).
 		// Widget styles are enqueued directly based on widget IDs.
-		$widget_style_handles = [
+		$prpl_widget_style_handles = [
 			'progress-planner/page-widgets/suggested-tasks',
 			'progress-planner/page-widgets/todo',
 			'progress-planner/page-widgets/monthly-badges',
@@ -53,8 +53,8 @@ if ( 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id() ) {
 			'progress-planner/page-widgets/content-activity',
 			'progress-planner/page-widgets/whats-new',
 		];
-		foreach ( $widget_style_handles as $style_handle ) {
-			\progress_planner()->get_admin__enqueue()->enqueue_style( $style_handle );
+		foreach ( $prpl_widget_style_handles as $prpl_style_handle ) {
+			\progress_planner()->get_admin__enqueue()->enqueue_style( $prpl_style_handle );
 		}
 		?>
 

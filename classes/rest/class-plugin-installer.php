@@ -273,4 +273,3 @@ class Plugin_Installer extends Base {
 		return \Progress_Planner\Utils\Plugin_Utils::get_plugin_path( $plugin_slug );
 	}
 }
-

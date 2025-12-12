@@ -103,7 +103,7 @@ class Badges {
 	public function get_latest_completed_badge() {
 		$settings = \progress_planner()->get_settings()->get( 'badges', [] );
 
-		$latest_date = null;
+		$latest_date  = null;
 		$latest_badge = null;
 
 		foreach ( $settings as $badge_id => $badge_data ) {

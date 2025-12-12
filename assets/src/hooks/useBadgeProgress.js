@@ -16,11 +16,11 @@ import { getBadgeById } from '../config/badges';
 /**
  * Custom hook for calculating badge progress.
  *
- * @param {Object}   params - Parameters.
- * @param {Array}    params.activities - Array of activity objects.
- * @param {Object}   params.savedStats - Saved badge progress stats from API.
- * @param {number}   params.totalPostsCount - Total number of published posts/pages.
- * @param {Date}     params.activationDate - Plugin activation date.
+ * @param {Object}   params                          - Parameters.
+ * @param {Array}    params.activities               - Array of activity objects.
+ * @param {Object}   params.savedStats               - Saved badge progress stats from API.
+ * @param {number}   params.totalPostsCount          - Total number of published posts/pages.
+ * @param {Date}     params.activationDate           - Plugin activation date.
  * @param {Function} params.getMonthlyBadgeDateRange - Function to get date range for monthly badge.
  * @return {Object} Badge progress data.
  */
@@ -104,7 +104,8 @@ export function useBadgeProgress( {
 				if ( saved.date ) {
 					const savedDate = new Date( saved.date );
 					const now = new Date();
-					const diffDays = ( now - savedDate ) / ( 1000 * 60 * 60 * 24 );
+					const diffDays =
+						( now - savedDate ) / ( 1000 * 60 * 60 * 24 );
 					if ( diffDays <= 2 ) {
 						badgeProgress[ badgeId ] = {
 							progress: saved.progress,
@@ -139,13 +140,21 @@ export function useBadgeProgress( {
 
 			// Add current month badge.
 			const now = new Date();
-			const currentMonthId = `monthly-${ now.getFullYear() }-m${ now.getMonth() + 1 }`;
+			const currentMonthId = `monthly-${ now.getFullYear() }-m${
+				now.getMonth() + 1
+			}`;
 			monthlyBadgeIds.add( currentMonthId );
 
 			// Add previous 12 months to check for incomplete badges.
 			for ( let i = 1; i <= 12; i++ ) {
-				const checkDate = new Date( now.getFullYear(), now.getMonth() - i, 1 );
-				const badgeId = `monthly-${ checkDate.getFullYear() }-m${ checkDate.getMonth() + 1 }`;
+				const checkDate = new Date(
+					now.getFullYear(),
+					now.getMonth() - i,
+					1
+				);
+				const badgeId = `monthly-${ checkDate.getFullYear() }-m${
+					checkDate.getMonth() + 1
+				}`;
 				monthlyBadgeIds.add( badgeId );
 			}
 
@@ -203,4 +212,3 @@ export function useBadgeProgress( {
 		getMonthlyBadgeDateRange,
 	] );
 }
-

@@ -5,7 +5,6 @@
  * @package Progress_Planner
  */
 
-
 if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -25,9 +24,9 @@ $prpl_title = \__( "We've added new recommendations to the Progress Planner plug
 $prpl_subtitle = \__( "Let's check if you've already done those tasks, this will take only a minute...", 'progress-planner' );
 
 // Generate monthly badge ID directly.
-$now        = new \DateTime();
-$badge_id   = 'monthly-' . $now->format( 'Y' ) . '-m' . $now->format( 'n' );
-$prpl_badge = [ 'id' => $badge_id ]; // Simple array for template compatibility.
+$prpl_now      = new \DateTime();
+$prpl_badge_id = 'monthly-' . $prpl_now->format( 'Y' ) . '-m' . $prpl_now->format( 'n' );
+$prpl_badge    = [ 'id' => $prpl_badge_id ]; // Simple array for template compatibility.
 ?>
 <div id="prpl-onboarding-tasks">
 	<strong class="prpl-onboarding-tasks-title"><?php echo \esc_html( $prpl_title ); ?></strong>
@@ -98,7 +97,10 @@ $prpl_badge = [ 'id' => $badge_id ]; // Simple array for template compatibility.
 	</ul>
 
 	<?php // Display badge and the points. ?>
-	<?php if ( $prpl_badge ) : ?>
+	<?php
+	// @phpstan-ignore-next-line isset.offset,booleanAnd.alwaysTrue,notIdentical.alwaysTrue
+	if ( isset( $prpl_badge['id'] ) && '' !== $prpl_badge['id'] ) :
+		?>
 		<div class="prpl-onboarding-tasks-footer">
 			<span class="prpl-onboarding-tasks-montly-badge">
 				<span class="prpl-onboarding-tasks-montly-badge-image">

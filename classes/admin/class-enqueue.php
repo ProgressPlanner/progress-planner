@@ -7,7 +7,6 @@
 
 namespace Progress_Planner\Admin;
 
-
 /**
  * Enqueue class.
  */
@@ -219,8 +218,8 @@ class Enqueue {
 		$badge_urls = [];
 
 		// Get the monthly badge URL.
-		$now        = new \DateTime();
-		$badge_id   = 'monthly-' . $now->format( 'Y' ) . '-m' . $now->format( 'n' );
+		$now                 = new \DateTime();
+		$badge_id            = 'monthly-' . $now->format( 'Y' ) . '-m' . $now->format( 'n' );
 		$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge_id . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
 
 		// Get the content and maintenance badge URLs from saved stats.

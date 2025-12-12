@@ -15,13 +15,20 @@ if ( ! \defined( 'ABSPATH' ) ) {
 // Badge display is handled by React components.
 $prpl_badges = [];
 
+// @phpstan-ignore-next-line empty.variable
 if ( empty( $prpl_badges ) ) {
 	return;
 }
+// This code is unreachable since $prpl_badges is always empty.
+// Kept for backward compatibility.
 ?>
 <div class="progress-badges">
 	<span class="badges-popover-progress-total">
-		<span style="width: <?php echo (int) \end( $prpl_badges )->get_progress()['progress']; ?>%"></span>
+		<?php
+		// @phpstan-ignore-next-line deadCode.unreachable
+		$prpl_last_badge = \end( $prpl_badges );
+		?>
+		<span style="width: <?php echo $prpl_last_badge ? (int) $prpl_last_badge->get_progress()['progress'] : 0; ?>%"></span>
 	</span>
 	<div class="indicators">
 		<?php foreach ( $prpl_badges as $prpl_badge ) : ?>

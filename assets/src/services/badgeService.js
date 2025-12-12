@@ -25,9 +25,7 @@ export async function fetchActivities() {
 				: new Date(),
 		};
 	} catch ( error ) {
-		throw new Error(
-			error.message || 'Failed to fetch activities'
-		);
+		throw new Error( error.message || 'Failed to fetch activities' );
 	}
 }
 
@@ -44,9 +42,7 @@ export async function fetchBadgeStats() {
 
 		return response.badges || {};
 	} catch ( error ) {
-		throw new Error(
-			error.message || 'Failed to fetch badge stats'
-		);
+		throw new Error( error.message || 'Failed to fetch badge stats' );
 	}
 }
 
@@ -68,9 +64,6 @@ export async function saveBadgeStats( badges ) {
 
 		return response.badges || {};
 	} catch ( error ) {
-		throw new Error(
-			error.message || 'Failed to save badge stats'
-		);
+		throw new Error( error.message || 'Failed to save badge stats' );
 	}
 }
-

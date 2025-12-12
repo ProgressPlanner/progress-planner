@@ -69,7 +69,7 @@ class Activities extends Base {
 
 			// For suggested_task activities, get points.
 			if ( $activity->category === 'suggested_task' ) {
-				$activity_date = $activity->date ? $activity->date : new \DateTime();
+				$activity_date           = $activity->date ? $activity->date : new \DateTime();
 				$activity_data['points'] = $activity->get_points( $activity_date );
 			}
 
@@ -83,7 +83,7 @@ class Activities extends Base {
 			->get_post_types_names();
 		foreach ( $post_types as $post_type ) {
 			$counts = \wp_count_posts( $post_type );
-			if ( $counts && isset( $counts->publish ) ) {
+			if ( isset( $counts->publish ) ) {
 				$total_posts_count += (int) $counts->publish;
 			}
 		}
@@ -104,11 +104,10 @@ class Activities extends Base {
 			'config'          => [
 				'brandingId'      => $branding_id,
 				'remoteServerUrl' => $remote_server_url,
-				'placeholderUrl' => $placeholder_url,
+				'placeholderUrl'  => $placeholder_url,
 			],
 		];
 
 		return new \WP_REST_Response( $response_data );
 	}
 }
-

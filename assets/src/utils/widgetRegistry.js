@@ -17,8 +17,8 @@ const widgetRegistry = [];
 /**
  * Register a widget.
  *
- * @param {Object}   widgetData                - Widget registration data.
- * @param {string}   widgetData.id             - Unique widget ID.
+ * @param {Object}   widgetData                 - Widget registration data.
+ * @param {string}   widgetData.id              - Unique widget ID.
  * @param {Function} widgetData.component       - React component.
  * @param {number}   widgetData.priority        - Display priority (lower = earlier, default: 10).
  * @param {number}   widgetData.width           - Widget width (1 or 2, default: 1).

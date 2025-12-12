@@ -1,4 +1,4 @@
-/* global customElements, HTMLElement, prplL10n, prplSuggestedTask, wpApiSettings */
+/* global customElements, HTMLElement, prplL10n, prplSuggestedTask */
 /*
  * Install Plugin
  *
@@ -86,8 +86,12 @@ customElements.define(
 				${ prplL10n( 'installing' ) }
 			`;
 
-			const restRoot = ( window.wpApiSettings && window.wpApiSettings.root ) || '/wp-json/';
-			const endpoint = restRoot.replace( /\/$/, '' ) + '/progress-planner/v1/plugins/install';
+			const restRoot =
+				( window.wpApiSettings && window.wpApiSettings.root ) ||
+				'/wp-json/';
+			const endpoint =
+				restRoot.replace( /\/$/, '' ) +
+				'/progress-planner/v1/plugins/install';
 
 			fetch( endpoint, {
 				method: 'POST',
@@ -103,7 +107,9 @@ customElements.define(
 				.then( ( response ) => {
 					if ( ! response.ok ) {
 						return response.json().then( ( error ) => {
-							throw new Error( error.message || 'Installation failed' );
+							throw new Error(
+								error.message || 'Installation failed'
+							);
 						} );
 					}
 					return response.json();
@@ -120,8 +126,12 @@ customElements.define(
 				${ prplL10n( 'activating' ) }
 			`;
 
-			const restRoot = ( window.wpApiSettings && window.wpApiSettings.root ) || '/wp-json/';
-			const endpoint = restRoot.replace( /\/$/, '' ) + '/progress-planner/v1/plugins/activate';
+			const restRoot =
+				( window.wpApiSettings && window.wpApiSettings.root ) ||
+				'/wp-json/';
+			const endpoint =
+				restRoot.replace( /\/$/, '' ) +
+				'/progress-planner/v1/plugins/activate';
 
 			fetch( endpoint, {
 				method: 'POST',
@@ -137,7 +147,9 @@ customElements.define(
 				.then( ( response ) => {
 					if ( ! response.ok ) {
 						return response.json().then( ( error ) => {
-							throw new Error( error.message || 'Activation failed' );
+							throw new Error(
+								error.message || 'Activation failed'
+							);
 						} );
 					}
 					return response.json();

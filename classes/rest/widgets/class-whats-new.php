@@ -392,4 +392,3 @@ class Whats_New extends Base {
 		return null;
 	}
 }
-

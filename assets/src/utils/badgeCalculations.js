@@ -8,10 +8,10 @@
 /**
  * Calculate content badge progress.
  *
- * @param {Object} badge - Badge definition.
- * @param {Array}  activities - Array of activity objects.
+ * @param {Object} badge           - Badge definition.
+ * @param {Array}  activities      - Array of activity objects.
  * @param {number} totalPostsCount - Total number of published posts/pages.
- * @param {Date}   activationDate - Plugin activation date.
+ * @param {Date}   activationDate  - Plugin activation date.
  * @return {Object} Progress object with progress and remaining.
  */
 export function calculateContentBadgeProgress(
@@ -26,7 +26,8 @@ export function calculateContentBadgeProgress(
 	if ( badge.id === 'content-curator' ) {
 		const existingRemaining = Math.max(
 			0,
-			thresholds.existingPosts - Math.min( thresholds.existingPosts, totalPostsCount )
+			thresholds.existingPosts -
+				Math.min( thresholds.existingPosts, totalPostsCount )
 		);
 
 		if ( existingRemaining === 0 ) {
@@ -76,10 +77,7 @@ export function calculateContentBadgeProgress(
 	activationDateDay.setHours( 0, 0, 0, 0 );
 
 	const newCount = activities.filter( ( activity ) => {
-		if (
-			activity.category !== 'content' ||
-			activity.type !== 'publish'
-		) {
+		if ( activity.category !== 'content' || activity.type !== 'publish' ) {
 			return false;
 		}
 		const activityDate = new Date( activity.date );
@@ -88,8 +86,14 @@ export function calculateContentBadgeProgress(
 	} ).length;
 
 	const threshold = thresholds.newPosts;
-	const percent = Math.min( 100, Math.floor( ( newCount / threshold ) * 100 ) );
-	const remaining = Math.max( 0, threshold - Math.min( threshold, newCount ) );
+	const percent = Math.min(
+		100,
+		Math.floor( ( newCount / threshold ) * 100 )
+	);
+	const remaining = Math.max(
+		0,
+		threshold - Math.min( threshold, newCount )
+	);
 
 	return {
 		progress: percent,
@@ -100,12 +104,16 @@ export function calculateContentBadgeProgress(
 /**
  * Calculate weekly streak from activities.
  *
- * @param {Array}  activities - Array of activity objects.
- * @param {Date}   startDate - Start date for streak calculation.
+ * @param {Array}  activities   - Array of activity objects.
+ * @param {Date}   startDate    - Start date for streak calculation.
  * @param {number} allowedBreak - Number of allowed breaks in streak.
  * @return {Object} Streak object with max_streak and current_streak.
  */
-export function calculateWeeklyStreak( activities, startDate, allowedBreak = 1 ) {
+export function calculateWeeklyStreak(
+	activities,
+	startDate,
+	allowedBreak = 1
+) {
 	// Group activities by week.
 	const weeks = new Map();
 
@@ -140,7 +148,8 @@ export function calculateWeeklyStreak( activities, startDate, allowedBreak = 1 )
 		allWeeks.push( {
 			weekKey,
 			weekStart: new Date( weekStart ),
-			hasActivity: weeks.has( weekKey ) && weeks.get( weekKey ).length > 0,
+			hasActivity:
+				weeks.has( weekKey ) && weeks.get( weekKey ).length > 0,
 		} );
 		currentDate.setDate( currentDate.getDate() + 7 );
 	}
@@ -188,8 +197,8 @@ function getWeekStart( date ) {
 /**
  * Calculate maintenance badge progress.
  *
- * @param {Object} badge - Badge definition.
- * @param {Array}  activities - Array of activity objects.
+ * @param {Object} badge          - Badge definition.
+ * @param {Array}  activities     - Array of activity objects.
  * @param {Date}   activationDate - Plugin activation date.
  * @return {Object} Progress object with progress and remaining.
  */
@@ -225,12 +234,12 @@ export function calculateMaintenanceBadgeProgress(
 /**
  * Calculate monthly badge progress.
  *
- * @param {Object} badge - Badge definition (monthly).
- * @param {Array}  activities - Array of activity objects with points.
- * @param {Date}   monthStart - Start date of the month.
- * @param {Date}   monthEnd - End date of the month.
- * @param {number} targetPoints - Target points for the month.
- * @param {Object} options - Calculation options.
+ * @param {Object}  badge                     - Badge definition (monthly).
+ * @param {Array}   activities                - Array of activity objects with points.
+ * @param {Date}    monthStart                - Start date of the month.
+ * @param {Date}    monthEnd                  - End date of the month.
+ * @param {number}  targetPoints              - Target points for the month.
+ * @param {Object}  options                   - Calculation options.
  * @param {boolean} options.noNextBadgePoints - If true, don't include excess from next badges.
  * @return {Object} Progress object with progress, remaining, and points.
  */
@@ -295,9 +304,15 @@ export function calculateMonthlyBadgeProgress(
 		return {
 			progress: Math.max(
 				0,
-				Math.min( 100, Math.floor( ( totalPoints / targetPoints ) * 100 ) )
+				Math.min(
+					100,
+					Math.floor( ( totalPoints / targetPoints ) * 100 )
+				)
 			),
-			remaining: Math.max( 0, Math.min( targetPoints - totalPoints, targetPoints ) ),
+			remaining: Math.max(
+				0,
+				Math.min( targetPoints - totalPoints, targetPoints )
+			),
 			points: totalPoints,
 		};
 	}
@@ -312,10 +327,10 @@ export function calculateMonthlyBadgeProgress(
  * Looks forward up to 2 months and calculates excess points that can overflow
  * to the current month badge.
  *
- * @param {Array}  activities - Array of activity objects.
+ * @param {Array}  activities      - Array of activity objects.
  * @param {Date}   currentMonthEnd - End date of current month.
- * @param {number} targetPoints - Target points per month.
- * @param {number} monthsForward - Number of months to look forward (typically 2).
+ * @param {number} targetPoints    - Target points per month.
+ * @param {number} monthsForward   - Number of months to look forward (typically 2).
  * @return {number} Excess points.
  */
 function getNextBadgesExcessPoints(
@@ -365,7 +380,9 @@ function getNextBadgesExcessPoints(
 
 		const next2Activities = activities.filter( ( activity ) => {
 			const activityDate = new Date( activity.date );
-			return activityDate >= next2MonthStart && activityDate <= next2MonthEnd;
+			return (
+				activityDate >= next2MonthStart && activityDate <= next2MonthEnd
+			);
 		} );
 
 		next2Activities.forEach( ( activity ) => {
@@ -387,7 +404,6 @@ function getNextBadgesExcessPoints(
 		// Does next1 need more points to reach target?
 		if ( next1BadgePoints < targetPoints ) {
 			// Use next2 excess to fill next1 first, then calculate remaining excess.
-			const neededForNext1 = targetPoints - next1BadgePoints;
 			badge2ExcessPoints = Math.max(
 				0,
 				next1BadgePoints + badge2ExcessPoints - targetPoints
@@ -397,4 +413,3 @@ function getNextBadgesExcessPoints(
 
 	return badge1ExcessPoints + badge2ExcessPoints;
 }
-

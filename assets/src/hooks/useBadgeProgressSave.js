@@ -12,7 +12,7 @@ import { saveBadgeStats } from '../services/badgeService';
  * Custom hook for automatically saving badge progress.
  *
  * @param {Object} badgeProgress - Calculated badge progress.
- * @param {Object} savedStats - Previously saved badge stats.
+ * @param {Object} savedStats    - Previously saved badge stats.
  * @return {void}
  */
 export function useBadgeProgressSave( badgeProgress, savedStats ) {
@@ -21,7 +21,11 @@ export function useBadgeProgressSave( badgeProgress, savedStats ) {
 
 	useEffect( () => {
 		// Don't save if already saving or if progress hasn't changed.
-		if ( isSavingRef.current || ! badgeProgress || Object.keys( badgeProgress ).length === 0 ) {
+		if (
+			isSavingRef.current ||
+			! badgeProgress ||
+			Object.keys( badgeProgress ).length === 0
+		) {
 			return;
 		}
 
@@ -56,7 +60,9 @@ export function useBadgeProgressSave( badgeProgress, savedStats ) {
 				progressToSave[ badgeId ] = {
 					progress: current.progress,
 					remaining: current.remaining,
-					...( current.points !== undefined && { points: current.points } ),
+					...( current.points !== undefined && {
+						points: current.points,
+					} ),
 				};
 
 				// If badge is newly completed, the API will add the completion date.
@@ -83,4 +89,3 @@ export function useBadgeProgressSave( badgeProgress, savedStats ) {
 		previousProgressRef.current = { ...badgeProgress };
 	}, [ badgeProgress, savedStats ] );
 }
-

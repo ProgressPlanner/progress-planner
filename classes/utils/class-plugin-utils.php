@@ -77,4 +77,3 @@ class Plugin_Utils {
 		return '';
 	}
 }
-

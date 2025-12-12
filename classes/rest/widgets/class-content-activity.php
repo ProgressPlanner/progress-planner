@@ -101,12 +101,12 @@ class Content_Activity extends Base {
 				->get_ui__chart()
 				->get_chart_data(
 					$this->get_chart_args_content_count(
-						$activity_type,
-						$activity_data['color'],
 						$start_date,
 						$end_date,
 						$frequency,
-						$tracked_post_types
+						$tracked_post_types,
+						$activity_type,
+						$activity_data['color']
 					)
 				);
 
@@ -176,16 +176,16 @@ class Content_Activity extends Base {
 	/**
 	 * Get the chart args for content count.
 	 *
-	 * @param string   $type              The type of activity.
-	 * @param string   $color             The color of the chart.
 	 * @param \DateTime $start_date        The start date.
 	 * @param \DateTime $end_date          The end date.
-	 * @param string   $frequency         The frequency.
-	 * @param array    $tracked_post_types The tracked post types.
+	 * @param string    $frequency         The frequency.
+	 * @param array     $tracked_post_types The tracked post types.
+	 * @param string    $type              The type of activity.
+	 * @param string    $color             The color of the chart.
 	 *
 	 * @return array The chart args.
 	 */
-	private function get_chart_args_content_count( $type = 'publish', $color = '#534786', $start_date, $end_date, $frequency, $tracked_post_types ) {
+	private function get_chart_args_content_count( $start_date, $end_date, $frequency, $tracked_post_types, $type = 'publish', $color = '#534786' ) {
 		return [
 			'type'           => 'line',
 			'items_callback' => fn( $start_date, $end_date ) => \progress_planner()->get_activities__query()->query_activities(
@@ -205,8 +205,8 @@ class Content_Activity extends Base {
 			'filter_results' => function ( $activities ) use ( $type, $tracked_post_types ) {
 				return $this->filter_activities( $activities, $type, $tracked_post_types );
 			},
-			'count_callback' => fn( $activities, $date = null ) => \count( $activities ),
-			'return_data'    => [ 'label', 'score' ], // Don't return color - that's presentation logic
+			'count_callback' => fn( $activities ) => \count( $activities ),
+			'return_data'    => [ 'label', 'score' ], // Don't return color - that's presentation logic.
 		];
 	}
 
@@ -222,11 +222,17 @@ class Content_Activity extends Base {
 	private function filter_activities( $activities, $type, $tracked_post_types ) {
 		return \array_filter(
 			$activities,
-			fn( $activity ) => 'delete' === $type
-				|| ( \is_object( $activity->get_post() )
-					&& \in_array( $activity->get_post()->post_type, $tracked_post_types, true )
-				)
+			function ( $activity ) use ( $type, $tracked_post_types ) {
+				if ( 'delete' === $type ) {
+					return true;
+				}
+				$post = $activity->get_post();
+				if ( ! \is_object( $post ) ) {
+					return false;
+				}
+				$post_type = \get_post_type( $post );
+				return \in_array( $post_type, $tracked_post_types, true );
+			}
 		);
 	}
 }
-

@@ -88,9 +88,9 @@ function getGaugeColor( score ) {
 /**
  * Get the color for a chart bar based on value and date label.
  *
- * @param {number}   value     - The value for this period.
- * @param {string}   label     - The label for this period (e.g., "Jan", "Feb" for monthly, or date string for weekly).
- * @param {string}   frequency - The frequency ('monthly' or 'weekly').
+ * @param {number} value     - The value for this period.
+ * @param {string} label     - The label for this period (e.g., "Jan", "Feb" for monthly, or date string for weekly).
+ * @param {string} frequency - The frequency ('monthly' or 'weekly').
  * @return {string} The color CSS variable.
  */
 function getChartColor( value, label, frequency ) {
@@ -99,7 +99,9 @@ function getChartColor( value, label, frequency ) {
 	// If monthly and the latest month, return gray (in progress).
 	if ( frequency === 'monthly' ) {
 		// Chart labels are formatted as 'M' which gives month abbreviations like "Jan", "Feb"
-		const currentMonth = now.toLocaleString( 'default', { month: 'short' } );
+		const currentMonth = now.toLocaleString( 'default', {
+			month: 'short',
+		} );
 		if ( label === currentMonth ) {
 			return 'var(--prpl-color-border)';
 		}
@@ -149,8 +151,8 @@ function ActivityScores( { config = {} } ) {
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
 	const [ data, setData ] = useState( null );
-	const [ range, setRange ] = useState( '-6 months' );
-	const [ frequency, setFrequency ] = useState( 'monthly' );
+	const [ range ] = useState( '-6 months' );
+	const [ frequency ] = useState( 'monthly' );
 
 	/**
 	 * Fetch activity scores data from REST API.
@@ -159,7 +161,9 @@ function ActivityScores( { config = {} } ) {
 		const fetchData = async () => {
 			try {
 				const response = await apiFetch( {
-					path: `/progress-planner/v1/widgets/activity-scores?range=${ encodeURIComponent( range ) }&frequency=${ encodeURIComponent( frequency ) }`,
+					path: `/progress-planner/v1/widgets/activity-scores?range=${ encodeURIComponent(
+						range
+					) }&frequency=${ encodeURIComponent( frequency ) }`,
 				} );
 
 				setData( response );
@@ -199,7 +203,9 @@ function ActivityScores( { config = {} } ) {
 	);
 
 	// Get title - will come from widget registry metadata
-	const widgetTitle = config?.title || __( 'Your website activity score', 'progress-planner' );
+	const widgetTitle =
+		config?.title ||
+		__( 'Your website activity score', 'progress-planner' );
 
 	// Get info icon SVG - will come from widget registry metadata
 	const infoIconSvg = config?.infoIconSvg || '';

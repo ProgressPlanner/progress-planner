@@ -34,7 +34,9 @@ function WhatsNew( { config = {} } ) {
 	}, [] );
 
 	// Get title - will come from widget registry metadata
-	const widgetTitle = config?.title || __( "What's new on the Progress Planner blog", 'progress-planner' );
+	const widgetTitle =
+		config?.title ||
+		__( "What's new on the Progress Planner blog", 'progress-planner' );
 
 	// Show loading state.
 	if ( isLoading ) {

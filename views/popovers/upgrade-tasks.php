@@ -5,7 +5,6 @@
  * @package Progress_Planner
  */
 
-
 // Exit if accessed directly.
 if ( ! \defined( 'ABSPATH' ) ) {
 	exit;

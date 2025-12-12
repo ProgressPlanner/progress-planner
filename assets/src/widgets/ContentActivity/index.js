@@ -70,7 +70,9 @@ function ContentActivity( { config = {} } ) {
 		const range = '-6 months';
 		const frequency = 'monthly';
 		apiFetch( {
-			path: `/progress-planner/v1/widgets/content-activity?range=${ encodeURIComponent( range ) }&frequency=${ encodeURIComponent( frequency ) }`,
+			path: `/progress-planner/v1/widgets/content-activity?range=${ encodeURIComponent(
+				range
+			) }&frequency=${ encodeURIComponent( frequency ) }`,
 		} )
 			.then( ( response ) => {
 				setData( response );
@@ -103,7 +105,8 @@ function ContentActivity( { config = {} } ) {
 	}
 
 	// Get title - will come from widget registry metadata
-	const widgetTitle = config?.title || __( 'Content activity', 'progress-planner' );
+	const widgetTitle =
+		config?.title || __( 'Content activity', 'progress-planner' );
 
 	const graphWrapperStyle = {
 		marginBottom: 'var(--prpl-padding)',

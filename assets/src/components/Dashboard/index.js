@@ -70,7 +70,7 @@ export default function Dashboard( { config } ) {
 					gridAutoFlow: 'dense',
 				} }
 			>
-				<DashboardWidgets config={ config } />
+				<DashboardWidgets />
 			</div>
 		</Fragment>
 	);
