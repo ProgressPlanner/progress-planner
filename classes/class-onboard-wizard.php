@@ -35,6 +35,10 @@ class Onboard_Wizard {
 		\add_action( 'admin_footer', [ $this, 'add_popover_step_templates' ] );
 		\add_action( 'admin_enqueue_scripts', [ $this, 'add_popover_scripts' ] );
 
+		// Trigger the onboarding wizard on the front end.
+		\add_action( 'wp_footer', [ $this, 'trigger_onboarding' ] );
+		\add_action( 'admin_footer', [ $this, 'trigger_onboarding' ] );
+
 		// Define steps and their order.
 		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
 
@@ -53,7 +57,7 @@ class Onboard_Wizard {
 		\add_filter( 'rest_pre_insert_attachment', [ $this, 'rest_pre_insert_attachment' ], 10, 2 );
 
 		// Maybe show user notification that tour is not finished.
-		\add_action( 'admin_notices', [ $this, 'maybe_show_user_notification' ] );
+		/* \add_action( 'admin_notices', [ $this, 'maybe_show_user_notification' ] ); */
 
 		// Maybe clean up the onboarding progress. -- TODO: When to cleanup the onboarding progress?
 		/* \add_action( 'current_screen', [ $this, 'maybe_clean_up_onboarding_progress' ] ); */
@@ -587,6 +591,37 @@ class Onboard_Wizard {
 		$page_settings->save_settings( $redirect_on_login );
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'All settings saved successfully.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Trigger the onboarding wizard on the front end.
+	 *
+	 * @return void
+	 */
+	public function trigger_onboarding() {
+
+		// If the request is an AJAX request, do not trigger the onboarding wizard.
+		if ( \wp_doing_ajax() ) {
+			return;
+		}
+
+		// Dont trigger it if user is not logged in and is not a admin.
+		if ( ! \is_user_logged_in() || ! \current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$get_saved_progress = $this->get_saved_progress();
+
+		// If there is no saved progress, trigger the onboarding wizard.
+		if ( ! $get_saved_progress ) {
+			?>
+			<script>
+				document.addEventListener('DOMContentLoaded', () => {
+					window.prplOnboardWizard.startOnboarding();
+				});
+			</script>
+			<?php
+		}
 	}
 
 	/**
