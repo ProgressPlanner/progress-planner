@@ -69,6 +69,16 @@ class Reduce_Autoloaded_Options extends Tasks_Interactive {
 	private $autoloaded_options_threshold = 10; // TODO: 10 is just for testing purposes.
 
 	/**
+	 * The task priority.
+	 *
+	 * Tasks are ordered from lowest to highest priority value (0 = highest priority, 100 = lowest priority).
+	 * Use the PRIORITY_* constants defined in this class for consistency.
+	 *
+	 * @var int
+	 */
+	protected $priority = 50;
+
+	/**
 	 * The plugin path.
 	 *
 	 * @var string
