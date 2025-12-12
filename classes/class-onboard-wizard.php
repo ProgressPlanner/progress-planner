@@ -35,10 +35,23 @@ class Onboard_Wizard {
 		// Register onboarding admin page (always, so it's accessible).
 		\add_action( 'admin_menu', [ $this, 'add_onboarding_page' ] );
 
+		// Add popover on admin.
+		\add_action( 'admin_footer', [ $this, 'add_popover' ] );
+		\add_action( 'admin_footer', [ $this, 'add_popover_step_templates' ] );
+		\add_action( 'admin_enqueue_scripts', [ $this, 'add_popover_scripts' ] );
+
+		// Trigger the onboarding wizard on the front end.
+		\add_action( 'wp_footer', [ $this, 'trigger_onboarding' ] );
+		\add_action( 'admin_footer', [ $this, 'trigger_onboarding' ] );
+
+		// Define steps and their order.
+		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
+
 		// Add admin toolbar items.
-		// TODO: Remove after testing.
-		\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_items' ] );
-		\add_action( 'admin_init', [ $this, 'check_delete_onboarding_progress' ] );
+		if ( \progress_planner()->get_base()->is_debug_mode_enabled() ) {
+			\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_items' ] );
+			\add_action( 'admin_init', [ $this, 'check_delete_onboarding_progress' ] );
+		}
 
 		// Define steps and their order (always needed for the onboarding page).
 		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
@@ -71,7 +84,10 @@ class Onboard_Wizard {
 		\add_action( 'admin_enqueue_scripts', [ $this, 'add_popover_scripts' ] );
 
 		// Maybe show user notification that tour is not finished.
-		\add_action( 'admin_notices', [ $this, 'maybe_show_user_notification' ] );
+		/* \add_action( 'admin_notices', [ $this, 'maybe_show_user_notification' ] ); */
+
+		// Maybe clean up the onboarding progress. -- TODO: When to cleanup the onboarding progress?
+		/* \add_action( 'current_screen', [ $this, 'maybe_clean_up_onboarding_progress' ] ); */
 	}
 
 	/**
@@ -96,21 +112,18 @@ class Onboard_Wizard {
 		$tasks = [];
 
 		foreach ( $onboarding_tasks as $task_id ) {
-			$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
+			$task          = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
+			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id );
 
 			// If there is no task, create it.
-			if ( ! $task ) {
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id );
+			if ( ! $task && $task_provider ) {
+				$task_data = $task_provider->get_task_details();
 
-				if ( $task_provider ) {
-					$task_data = $task_provider->get_task_details();
+				// Task will not be inserted if it already exists.
+				\progress_planner()->get_suggested_tasks_db()->add( $task_data );
 
-					// Task will not be inserted if it already exists.
-					\progress_planner()->get_suggested_tasks_db()->add( $task_data );
-
-					// Now get the task.
-					$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
-				}
+				// Now get the task.
+				$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 			}
 
 			// Safety check: Skip if task could not be created or retrieved.
@@ -120,11 +133,12 @@ class Onboard_Wizard {
 			}
 
 			$task_formatted = [
-				'task_id'     => $task[0]->get_task_id(),
-				'title'       => $task[0]->post_title ?? '',
-				'url'         => $task[0]->url ?? '',
-				'provider_id' => $task[0]->get_provider_id(),
-				'points'      => $task[0]->points ?? 0,
+				'task_id'      => $task[0]->get_task_id(),
+				'title'        => $task[0]->post_title ?? '',
+				'url'          => $task[0]->url ?? '',
+				'provider_id'  => $task[0]->get_provider_id(),
+				'points'       => $task[0]->points ?? 0,
+				'action_label' => $task_provider ? $task_provider->get_task_action_label() : \esc_html__( 'Do it', 'progress-planner' ),
 			];
 
 			// Add task specific data.
@@ -190,7 +204,7 @@ class Onboard_Wizard {
 				'template_file_name' => 'more-tasks',
 				'template_data'      => [ 'tasks' => $tasks ],
 				'template_id'        => 'onboarding-step-more-tasks',
-				'title'              => esc_html__( 'Complete more tasks', 'progress-planner' ),
+				'title'              => esc_html__( 'Finish onboarding!', 'progress-planner' ),
 			];
 		}
 	}
@@ -637,6 +651,37 @@ class Onboard_Wizard {
 	}
 
 	/**
+	 * Trigger the onboarding wizard on the front end.
+	 *
+	 * @return void
+	 */
+	public function trigger_onboarding() {
+
+		// If the request is an AJAX request, do not trigger the onboarding wizard.
+		if ( \wp_doing_ajax() ) {
+			return;
+		}
+
+		// Dont trigger it if user is not logged in and is not a admin.
+		if ( ! \is_user_logged_in() || ! \current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		$get_saved_progress = $this->get_saved_progress();
+
+		// If there is no saved progress, trigger the onboarding wizard.
+		if ( ! $get_saved_progress ) {
+			?>
+			<script>
+				document.addEventListener('DOMContentLoaded', () => {
+					window.prplOnboardWizard.startOnboarding();
+				});
+			</script>
+			<?php
+		}
+	}
+
+	/**
 	 * Add the popover.
 	 *
 	 * @return void
@@ -659,7 +704,7 @@ class Onboard_Wizard {
 								?>
 								<li class="prpl-nav-step-item" data-step="<?php echo esc_attr( $i ); ?>">
 									<span class="prpl-step-icon"><?php echo esc_html( $i + 1 ); ?></span>
-									<span class="prpl-step-label"><?php echo esc_html( $step['title'] ); ?></span>
+									<span class="prpl-step-label"><?php echo \wp_kses( $step['title'], [ 'br' => [] ] ); ?></span>
 								</li>
 								<?php
 								++$i;

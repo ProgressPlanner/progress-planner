@@ -115,6 +115,13 @@ interface Tasks_Interface {
 	public function add_task_actions( $data = [], $actions = [] );
 
 	/**
+	 * Get the task action label.
+	 *
+	 * @return string
+	 */
+	public function get_task_action_label();
+
+	/**
 	 * Check if the task has activity.
 	 *
 	 * @param string $task_id The task ID.

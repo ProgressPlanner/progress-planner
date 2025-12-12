@@ -2,15 +2,19 @@
  * More Tasks step - User completes additional tasks
  * Handles multiple tasks that can be completed in any order
  * Each task may open a sub-popover with its own form
+ * Split into 2 substeps: intro screen and task list
  */
 /* global OnboardingStep, PrplOnboardTask */
 
 class PrplMoreTasksStep extends OnboardingStep {
+	subSteps = [ 'more-tasks-intro', 'more-tasks-tasks' ];
+
 	constructor() {
 		super( {
 			templateId: 'onboarding-step-more-tasks',
 		} );
 		this.tasks = [];
+		this.currentSubStep = 0;
 	}
 
 	/**
@@ -20,6 +24,36 @@ class PrplMoreTasksStep extends OnboardingStep {
 	 * @return {Function} Cleanup function
 	 */
 	onMount( state ) {
+		// Always start from first sub-step
+		this.currentSubStep = 0;
+
+		// Hide footer initially (will show on tasks substep)
+		this.toggleStepFooter( false );
+
+		// Render the current sub-step
+		this.renderSubStep( state );
+
+		// Setup continue button listener
+		const continueBtn = this.popover.querySelector(
+			'.prpl-more-tasks-continue'
+		);
+		if ( continueBtn ) {
+			continueBtn.addEventListener( 'click', () => {
+				this.advanceSubStep( state );
+			} );
+		}
+
+		// Setup finish onboarding link in intro
+		const finishLink = this.popover.querySelector(
+			'.prpl-more-tasks-substep[data-substep="intro"] .prpl-finish-onboarding'
+		);
+		if ( finishLink ) {
+			finishLink.addEventListener( 'click', ( e ) => {
+				e.preventDefault();
+				this.wizard.finishOnboarding();
+			} );
+		}
+
 		// Initialize task completion tracking
 		const moreTasks = this.popover.querySelectorAll(
 			'.prpl-task-item[data-task-id]'
@@ -52,16 +86,57 @@ class PrplMoreTasksStep extends OnboardingStep {
 			this.popover.removeEventListener( 'taskCompleted', handler );
 			// Clean up task instances
 			this.tasks = [];
+			// Show footer when leaving this step
+			this.toggleStepFooter( true );
 		};
 	}
 
 	/**
-	 * User can only proceed if all tasks are completed
+	 * Render the current sub-step
 	 * @param {Object} state - Wizard state
-	 * @return {boolean} True if all tasks are completed
+	 */
+	renderSubStep( state ) {
+		const subStepName = this.subSteps[ this.currentSubStep ];
+
+		// Show/hide sub-step containers
+		this.subSteps.forEach( ( step ) => {
+			const container = this.popover.querySelector(
+				`.prpl-more-tasks-substep[data-substep="${ step }"]`
+			);
+			if ( container ) {
+				container.style.display = step === subStepName ? '' : 'none';
+			}
+		} );
+
+		// Show footer only on tasks substep
+		const isTasksSubStep = subStepName === 'more-tasks-tasks';
+		this.toggleStepFooter( isTasksSubStep );
+
+		// Update Next button state if on tasks sub-step
+		if ( isTasksSubStep ) {
+			this.updateNextButton();
+		}
+	}
+
+	/**
+	 * Advance to next sub-step
+	 * @param {Object} state - Wizard state
+	 */
+	advanceSubStep( state ) {
+		if ( this.currentSubStep < this.subSteps.length - 1 ) {
+			this.currentSubStep++;
+			this.renderSubStep( state );
+		}
+	}
+
+	/**
+	 * User can only proceed if on tasks substep
+	 * @param {Object} state - Wizard state
+	 * @return {boolean} True if can proceed
 	 */
 	canProceed( state ) {
-		return true; // All tasks are optional, so we can proceed if any are completed.
+		// Can only proceed if on tasks substep
+		return this.currentSubStep === this.subSteps.length - 1;
 	}
 }
 
