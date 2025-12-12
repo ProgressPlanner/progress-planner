@@ -84,9 +84,13 @@ function ContentBadges( { config = {} } ) {
 	);
 }
 
-// Register widget via hook
+// Register widget via hook with metadata
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'badge-streak-content',
 	component: ContentBadges,
 	priority: 10,
+	width: 1,
+	forceLastColumn: true,
+	title: __( 'Your content badges', 'progress-planner' ),
+	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );

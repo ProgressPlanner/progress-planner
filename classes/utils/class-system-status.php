@@ -8,7 +8,8 @@
 namespace Progress_Planner\Utils;
 
 use Progress_Planner\Base;
-use Progress_Planner\Admin\Widgets\Activity_Scores;
+use Progress_Planner\Goals\Goal_Recurring;
+use Progress_Planner\Goals\Goal;
 
 /**
  * System_Status class.
@@ -44,10 +45,9 @@ class System_Status {
 		);
 
 		// Get the website activity score.
-		$activity_score           = new Activity_Scores();
 		$data['website_activity'] = [
-			'score'     => $activity_score->get_score(),
-			'checklist' => $activity_score->get_checklist_results(),
+			'score'     => $this->get_activity_score(),
+			'checklist' => $this->get_checklist_results(),
 		];
 
 		// Get the badges from saved stats.
@@ -170,5 +170,86 @@ class System_Status {
 		$data['branding_id'] = (int) \progress_planner()->get_ui__branding()->get_branding_id();
 
 		return $data;
+	}
+
+	/**
+	 * Get the activity score.
+	 *
+	 * @return int The score.
+	 */
+	private function get_activity_score() {
+		$activities = \progress_planner()->get_activities__query()->query_activities(
+			// Use 31 days to take into account the activities score decay from previous activities.
+			[ 'start_date' => new \DateTime( '-31 days' ) ]
+		);
+
+		$score        = 0;
+		$current_date = new \DateTime();
+		foreach ( $activities as $activity ) {
+			$score += $activity->get_points( $current_date );
+		}
+		$score = \min( 100, \max( 0, $score ) );
+
+		// Get the number of pending updates.
+		$pending_updates = \wp_get_update_data()['counts']['total'];
+
+		// Reduce points for pending updates.
+		$score -= \min( \min( $score / 2, 25 ), $pending_updates * 5 );
+		return (int) \floor( $score );
+	}
+
+	/**
+	 * Get the checklist results.
+	 *
+	 * @return array<string, bool> The checklist results.
+	 */
+	private function get_checklist_results() {
+		$items   = $this->get_checklist();
+		$results = [];
+		foreach ( $items as $item ) {
+			$label             = (string) $item['label']; // @phpstan-ignore offsetAccess.invalidOffset
+			$results[ $label ] = $item['callback'](); // @phpstan-ignore offsetAccess.invalidOffset
+		}
+		return $results;
+	}
+
+	/**
+	 * Get the checklist items.
+	 *
+	 * @return array The checklist items.
+	 */
+	private function get_checklist() {
+		return [
+			[
+				'label'    => \esc_html__( 'published content', 'progress-planner' ),
+				'callback' => fn() => \count(
+					\progress_planner()->get_activities__query()->query_activities(
+						[
+							'start_date' => new \DateTime( '-7 days' ),
+							'category'   => 'content',
+							'type'       => 'publish',
+						]
+					)
+				) > 0,
+			],
+			[
+				'label'    => \esc_html__( 'updated content', 'progress-planner' ),
+				'callback' => fn() => \count(
+					\progress_planner()->get_activities__query()->query_activities(
+						[
+							'start_date' => new \DateTime( '-7 days' ),
+							'category'   => 'content',
+							'type'       => 'update',
+						]
+					)
+				) > 0,
+			],
+			[
+				'label'    => 0 === \wp_get_update_data()['counts']['total']
+					? \esc_html__( 'performed all updates', 'progress-planner' )
+					: '<a href="' . \esc_url( \admin_url( 'update-core.php' ) ) . '">' . \esc_html__( 'Perform all updates', 'progress-planner' ) . '</a>',
+				'callback' => fn() => ! \wp_get_update_data()['counts']['total'],
+			],
+		];
 	}
 }

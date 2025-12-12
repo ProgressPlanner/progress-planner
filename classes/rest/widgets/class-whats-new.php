@@ -1,46 +1,88 @@
 <?php
 /**
- * A widget class.
+ * REST API endpoint for What's New widget.
  *
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Admin\Widgets;
+namespace Progress_Planner\Rest\Widgets;
 
+use Progress_Planner\Rest\Base;
 use Progress_Planner\Utils\Cache;
 
 /**
- * Whats_New class.
+ * Whats_New REST API endpoint class.
  */
-final class Whats_New extends Widget {
+class Whats_New extends Base {
 
 	/**
-	 * The widget ID.
-	 *
-	 * @var string
-	 */
-	protected $id = 'whats-new';
-
-	/**
-	 * Enqueue scripts for the widget.
+	 * Register REST endpoint.
 	 *
 	 * @return void
 	 */
+	public function register_rest_endpoint() {
+		\register_rest_route(
+			'progress-planner/v1',
+			'/widgets/whats-new',
+			[
+				[
+					'methods'             => 'GET',
+					'callback'            => [ $this, 'get_whats_new' ],
+					'permission_callback' => [ $this, 'check_permissions' ],
+				],
+			]
+		);
+	}
+
 	/**
-	 * Get widget configuration.
+	 * Check if the current user has permission to access this endpoint.
 	 *
-	 * @return array Widget configuration.
+	 * @return bool
 	 */
-	public function get_widget_config() {
-		// Get widget title (may be custom branded or default).
-		$widget_title = \progress_planner()->get_ui__branding()->get_widget_title(
-			'whats-new',
-			\esc_html__( 'What\'s new on the Progress Planner blog', 'progress-planner' )
+	public function check_permissions() {
+		return \current_user_can( 'edit_posts' );
+	}
+
+	/**
+	 * Get what's new data.
+	 *
+	 * @param \WP_REST_Request $request The REST request object.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function get_whats_new( $request ) {
+		$posts = $this->get_blog_feed();
+
+		// Return empty array if no posts.
+		if ( empty( $posts ) ) {
+			return new \WP_REST_Response(
+				[
+					'posts'   => [],
+					'blogUrl' => '',
+				]
+			);
+		}
+
+		// Format posts for frontend.
+		$formatted_posts = \array_map(
+			function ( $post ) {
+				$image_url = $post['featured_media']['media_details']['sizes']['medium_large']['source_url'] ?? null;
+				return [
+					'title'    => $post['title']['rendered'],
+					'link'     => $post['link'],
+					'excerpt'  => \wp_trim_words( \wp_strip_all_tags( $post['content']['rendered'] ), 55 ),
+					'imageUrl' => $image_url,
+				];
+			},
+			$posts
 		);
 
-		return [
-			'title' => $widget_title,
-		];
+		return new \WP_REST_Response(
+			[
+				'posts'   => $formatted_posts,
+				'blogUrl' => \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/blog' ),
+			]
+		);
 	}
 
 	/**
@@ -48,14 +90,15 @@ final class Whats_New extends Widget {
 	 *
 	 * @return array
 	 */
-	public function get_blog_feed() {
-		$feed_data = \progress_planner()->get_utils__cache()->get( $this->get_cache_key() );
+	private function get_blog_feed() {
+		$cache_key = $this->get_cache_key();
+		$feed_data = \progress_planner()->get_utils__cache()->get( $cache_key );
 
 		// Migrate old feed to new format.
 		if ( \is_array( $feed_data ) && ! isset( $feed_data['expires'] ) && ! isset( $feed_data['feed'] ) ) {
 			$feed_data = [
 				'feed'    => $feed_data,
-				'expires' => \get_option( '_transient_timeout_' . Cache::CACHE_PREFIX . $this->get_cache_key(), 0 ),
+				'expires' => \get_option( '_transient_timeout_' . Cache::CACHE_PREFIX . $cache_key, 0 ),
 			];
 		}
 
@@ -98,10 +141,19 @@ final class Whats_New extends Widget {
 			}
 
 			// Transient uses 'expires' key to determine if it's expired.
-			\progress_planner()->get_utils__cache()->set( $this->get_cache_key(), $feed_data, 0 );
+			\progress_planner()->get_utils__cache()->set( $cache_key, $feed_data, 0 );
 		}
 
 		return $feed_data['feed'];
+	}
+
+	/**
+	 * Get the cache key.
+	 *
+	 * @return string
+	 */
+	private function get_cache_key() {
+		return 'blog_feed_' . \md5( \progress_planner()->get_ui__branding()->get_blog_feed_url() );
 	}
 
 	/**
@@ -231,14 +283,8 @@ final class Whats_New extends Widget {
 	/**
 	 * Extract image URL from HTML content.
 	 *
-	 * Checks for various HTML elements and attributes that can contain images:
-	 * - <img> tags (src, srcset, data-src)
-	 * - <picture> elements (source tags and img fallback)
-	 * - <figure> elements
-	 * - Background images in style attributes
-	 *
 	 * @param string $html                The HTML content to parse.
-	 * @param bool   $prioritize_featured Whether to prioritize featured images (wp-post-thumbnail, wp-post-image).
+	 * @param bool   $prioritize_featured Whether to prioritize featured images.
 	 * @return string|null The first image URL found, or null if none found.
 	 */
 	private function extract_image_from_html( $html, $prioritize_featured = false ) {
@@ -345,13 +391,5 @@ final class Whats_New extends Widget {
 
 		return null;
 	}
-
-	/**
-	 * Get the cache key.
-	 *
-	 * @return string
-	 */
-	public function get_cache_key() {
-		return 'blog_feed_' . \md5( \progress_planner()->get_ui__branding()->get_blog_feed_url() );
-	}
 }
+

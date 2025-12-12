@@ -5,7 +5,9 @@
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Rest;
+namespace Progress_Planner\Rest\Widgets;
+
+use Progress_Planner\Rest\Base;
 
 /**
  * Content_Activity REST API endpoint class.
@@ -20,7 +22,7 @@ class Content_Activity extends Base {
 	public function register_rest_endpoint() {
 		\register_rest_route(
 			'progress-planner/v1',
-			'/content-activity',
+			'/widgets/content-activity',
 			[
 				[
 					'methods'             => 'GET',
@@ -60,7 +62,8 @@ class Content_Activity extends Base {
 	 * @return \WP_REST_Response
 	 */
 	public function get_content_activity( $request ) {
-		$widget = \progress_planner()->get_admin__widgets__content_activity();
+		$range     = $request->get_param( 'range' ) ?? '-6 months';
+		$frequency = $request->get_param( 'frequency' ) ?? 'monthly';
 
 		// Activity types configuration.
 		$activity_types = [
@@ -90,13 +93,20 @@ class Content_Activity extends Base {
 			'filtersLabel' => '<strong>' . \__( 'show:', 'progress-planner' ) . '</strong>',
 		];
 
+		$start_date = \DateTime::createFromFormat( 'Y-m-d', \gmdate( 'Y-m-01' ) )->modify( $range );
+		$end_date   = new \DateTime();
+
 		foreach ( $activity_types as $activity_type => $activity_data ) {
 			$chart_data[ $activity_type ] = \progress_planner()
 				->get_ui__chart()
 				->get_chart_data(
-					$widget->get_chart_args_content_count(
+					$this->get_chart_args_content_count(
 						$activity_type,
-						$activity_data['color']
+						$activity_data['color'],
+						$start_date,
+						$end_date,
+						$frequency,
+						$tracked_post_types
 					)
 				);
 
@@ -162,4 +172,61 @@ class Content_Activity extends Base {
 
 		return new \WP_REST_Response( $response_data );
 	}
+
+	/**
+	 * Get the chart args for content count.
+	 *
+	 * @param string   $type              The type of activity.
+	 * @param string   $color             The color of the chart.
+	 * @param \DateTime $start_date        The start date.
+	 * @param \DateTime $end_date          The end date.
+	 * @param string   $frequency         The frequency.
+	 * @param array    $tracked_post_types The tracked post types.
+	 *
+	 * @return array The chart args.
+	 */
+	private function get_chart_args_content_count( $type = 'publish', $color = '#534786', $start_date, $end_date, $frequency, $tracked_post_types ) {
+		return [
+			'type'           => 'line',
+			'items_callback' => fn( $start_date, $end_date ) => \progress_planner()->get_activities__query()->query_activities(
+				[
+					'category'   => 'content',
+					'start_date' => $start_date,
+					'end_date'   => $end_date,
+					'type'       => $type,
+				]
+			),
+			'dates_params'   => [
+				'start_date' => $start_date,
+				'end_date'   => $end_date,
+				'frequency'  => $frequency,
+				'format'     => 'M',
+			],
+			'filter_results' => function ( $activities ) use ( $type, $tracked_post_types ) {
+				return $this->filter_activities( $activities, $type, $tracked_post_types );
+			},
+			'count_callback' => fn( $activities, $date = null ) => \count( $activities ),
+			'return_data'    => [ 'label', 'score' ], // Don't return color - that's presentation logic
+		];
+	}
+
+	/**
+	 * Callback to filter the activities.
+	 *
+	 * @param array  $activities         The activities array.
+	 * @param string $type               The activity type.
+	 * @param array  $tracked_post_types The tracked post types.
+	 *
+	 * @return array The filtered activities.
+	 */
+	private function filter_activities( $activities, $type, $tracked_post_types ) {
+		return \array_filter(
+			$activities,
+			fn( $activity ) => 'delete' === $type
+				|| ( \is_object( $activity->get_post() )
+					&& \in_array( $activity->get_post()->post_type, $tracked_post_types, true )
+				)
+		);
+	}
 }
+

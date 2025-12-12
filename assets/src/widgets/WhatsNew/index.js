@@ -22,7 +22,7 @@ function WhatsNew( { config = {} } ) {
 	const [ blogUrl, setBlogUrl ] = useState( '' );
 
 	useEffect( () => {
-		apiFetch( { path: '/progress-planner/v1/whats-new' } )
+		apiFetch( { path: '/progress-planner/v1/widgets/whats-new' } )
 			.then( ( response ) => {
 				setPosts( response.posts || [] );
 				setBlogUrl( response.blogUrl || '' );
@@ -33,10 +33,8 @@ function WhatsNew( { config = {} } ) {
 			} );
 	}, [] );
 
-	// Get title from config or use default.
-	const widgetTitle =
-		config?.title ||
-		__( "What's new on the Progress Planner blog", 'progress-planner' );
+	// Get title - will come from widget registry metadata
+	const widgetTitle = config?.title || __( "What's new on the Progress Planner blog", 'progress-planner' );
 
 	// Show loading state.
 	if ( isLoading ) {
@@ -153,9 +151,13 @@ function WhatsNew( { config = {} } ) {
 	);
 }
 
-// Register widget via hook
+// Register widget via hook with metadata
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'whats-new',
 	component: WhatsNew,
 	priority: 10,
+	width: 1,
+	forceLastColumn: false,
+	title: __( "What's new on the Progress Planner blog", 'progress-planner' ),
+	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );

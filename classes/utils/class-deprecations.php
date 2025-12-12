@@ -27,12 +27,6 @@ class Deprecations {
 		'Progress_Planner\Query'                           => [ 'Progress_Planner\Activities\Query', '1.1.1' ],
 		'Progress_Planner\Date'                            => [ 'Progress_Planner\Utils\Date', '1.1.1' ],
 		'Progress_Planner\Cache'                           => [ 'Progress_Planner\Utils\Cache', '1.1.1' ],
-		'Progress_Planner\Widgets\Activity_Scores'         => [ 'Progress_Planner\Admin\Widgets\Activity_Scores', '1.1.1' ],
-		'Progress_Planner\Widgets\Badge_Streak'            => [ 'Progress_Planner\Admin\Widgets\Badge_Streak', '1.1.1' ],
-		'Progress_Planner\Widgets\Published_Content'       => [ 'Progress_Planner\Admin\Widgets\Published_Content', '1.1.1' ],
-		'Progress_Planner\Widgets\Todo'                    => [ 'Progress_Planner\Admin\Widgets\Todo', '1.1.1' ],
-		'Progress_Planner\Widgets\Whats_New'               => [ 'Progress_Planner\Admin\Widgets\Whats_New', '1.1.1' ],
-		'Progress_Planner\Widgets\Widget'                  => [ 'Progress_Planner\Admin\Widgets\Widget', '1.1.1' ],
 		'Progress_Planner\Rest_API_Stats'                  => [ 'Progress_Planner\Rest\Stats', '1.1.1' ],
 		'Progress_Planner\Rest_API_Tasks'                  => [ 'Progress_Planner\Rest\Tasks', '1.1.1' ],
 		'Progress_Planner\Data_Collector\Base_Data_Collector' => [ 'Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector', '1.1.1' ],
@@ -49,7 +43,6 @@ class Deprecations {
 		'Progress_Planner\Onboard'                         => [ 'Progress_Planner\Utils\Onboard', '1.1.1' ],
 		'Progress_Planner\Playground'                      => [ 'Progress_Planner\Utils\Playground', '1.1.1' ],
 
-		'Progress_Planner\Admin\Widgets\Published_Content' => [ 'Progress_Planner\Admin\Widgets\Content_Activity', '1.3.0' ],
 
 		'Progress_Planner\Suggested_Tasks\Local_Tasks\Task_Local' => [ 'Progress_Planner\Suggested_Tasks\Task', '1.4.0' ],
 		'Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Local_Tasks_Interface' => [ 'Progress_Planner\Suggested_Tasks\Tasks_Interface', '1.4.0' ],
@@ -97,12 +90,6 @@ class Deprecations {
 	const BASE_METHODS = [
 		'get_query'                                  => [ 'get_activities__query', '1.1.1' ],
 		'get_date'                                   => [ 'get_utils__date', '1.1.1' ],
-		'get_widgets__suggested_tasks'               => [ 'get_admin__widgets__suggested_tasks', '1.1.1' ],
-		'get_widgets__activity_scores'               => [ 'get_admin__widgets__activity_scores', '1.1.1' ],
-		'get_widgets__todo'                          => [ 'get_admin__widgets__todo', '1.1.1' ],
-		'get_widgets__badge_streak'                  => [ 'get_admin__widgets__badge_streak', '1.1.1' ],
-		'get_widgets__published_content'             => [ 'get_admin__widgets__published_content', '1.1.1' ],
-		'get_widgets__whats_new'                     => [ 'get_admin__widgets__whats_new', '1.1.1' ],
 		'get_onboard'                                => [ 'get_utils__onboard', '1.1.1' ],
 		'get_cache'                                  => [ 'get_utils__cache', '1.1.1' ],
 		'get_rest_api_stats'                         => [ 'get_rest__stats', '1.1.1' ],
@@ -113,6 +100,5 @@ class Deprecations {
 		'get_chart'                                  => [ 'get_ui__chart', '1.1.1' ],
 		'get_popover'                                => [ 'get_ui__popover', '1.1.1' ],
 
-		'get_admin__widgets__published_content'      => [ 'get_admin__widgets__content_activity', '1.3.0' ],
 	];
 }

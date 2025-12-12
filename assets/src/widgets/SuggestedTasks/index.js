@@ -551,9 +551,13 @@ function SuggestedTasks( { config = {} } ) {
 	);
 }
 
-// Register widget via hook
+// Register widget via hook with metadata
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'suggested-tasks',
 	component: SuggestedTasks,
 	priority: 10,
+	width: 2,
+	forceLastColumn: false,
+	title: __( "Ravi's Recommendations", 'progress-planner' ), // Will be customized with branding if needed
+	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );

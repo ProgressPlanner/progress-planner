@@ -18,11 +18,11 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Page_Types get_page_types()
  * @method \Progress_Planner\Rest\Stats get_rest__stats()
  * @method \Progress_Planner\Rest\Tasks get_rest__tasks()
- * @method \Progress_Planner\Rest\Content_Activity get_rest__content_activity()
- * @method \Progress_Planner\Rest\Activity_Scores get_rest__activity_scores()
+ * @method \Progress_Planner\Rest\Widgets\Content_Activity get_rest__widgets__content_activity()
+ * @method \Progress_Planner\Rest\Widgets\Activity_Scores get_rest__widgets__activity_scores()
  * @method \Progress_Planner\Rest\Activities get_rest__activities()
  * @method \Progress_Planner\Rest\Badge_Stats get_rest__badge_stats()
- * @method \Progress_Planner\Rest\Whats_New get_rest__whats_new()
+ * @method \Progress_Planner\Rest\Widgets\Whats_New get_rest__widgets__whats_new()
  * @method \Progress_Planner\Rest\Plugin_Installer get_rest__plugin_installer()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
@@ -45,17 +45,10 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Suggested_Tasks_DB get_suggested_tasks_db()
  * @method \Progress_Planner\Utils\Deprecations get_utils__deprecations()
  * @method \Progress_Planner\UI\Branding get_ui__branding()
- * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Content get_admin__widgets__badge_streak_content()
- * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Maintenance get_admin__widgets__badge_streak_maintenance()
  * @method \Progress_Planner\Admin\Enqueue get_admin__enqueue()
- * @method \Progress_Planner\Admin\Widgets\Whats_New get_admin__widgets__whats_new()
- * @method \Progress_Planner\Admin\Widgets\ToDo get_admin__widgets__todo()
- * @method \Progress_Planner\Admin\Widgets\Monthly_Badges get_admin__widgets__monthly_badges()
  * @method \Progress_Planner\UI\Popover get_ui__popover()
- * @method \Progress_Planner\Admin\Widgets\Content_Activity get_admin__widgets__content_activity()
  * @method \Progress_Planner\UI\Chart get_ui__chart()
  * @method \Progress_Planner\Activities\Content_Helpers get_activities__content_helpers()
- * @method \Progress_Planner\Admin\Widgets\Activity_Scores get_admin__widgets__activity_scores()
  * @method \Progress_Planner\Utils\Date get_utils__date()
  */
 class Base {
@@ -117,9 +110,9 @@ class Base {
 		// REST API.
 		$this->get_rest__stats();
 		$this->get_rest__tasks();
-		$this->get_rest__content_activity();
-		$this->get_rest__activity_scores();
-		$this->get_rest__whats_new();
+		$this->get_rest__widgets__content_activity();
+		$this->get_rest__widgets__activity_scores();
+		$this->get_rest__widgets__whats_new();
 		$this->get_rest__plugin_installer();
 		$this->get_rest__activities();
 		$this->get_rest__badge_stats();
@@ -190,7 +183,7 @@ class Base {
 	 * get_admin__page()                   → Progress_Planner\Admin\Page
 	 * get_activities__query()             → Progress_Planner\Activities\Query
 	 * get_suggested_tasks_db()            → Progress_Planner\Suggested_Tasks_Db
-	 * get_admin__widgets__todo()          → Progress_Planner\Admin\Widgets\Todo
+	 * get_rest__widgets__activity_scores() → Progress_Planner\Rest\Widgets\Activity_Scores
 	 * ```
 	 *
 	 * Transformation process:

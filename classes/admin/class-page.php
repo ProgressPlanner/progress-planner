@@ -44,48 +44,6 @@ class Page {
 		\add_action( 'admin_footer', [ $this, 'admin_footer' ] );
 	}
 
-	/**
-	 * Get the widgets objects
-	 *
-	 * @return array<\Progress_Planner\Admin\Widgets\Widget>
-	 */
-	public function get_widgets() {
-		$widgets = [
-			\progress_planner()->get_admin__widgets__suggested_tasks(),
-			\progress_planner()->get_admin__widgets__todo(),
-			\progress_planner()->get_admin__widgets__monthly_badges(),
-			\progress_planner()->get_admin__widgets__badge_streak_content(),
-			\progress_planner()->get_admin__widgets__badge_streak_maintenance(),
-			\progress_planner()->get_admin__widgets__activity_scores(),
-			\progress_planner()->get_admin__widgets__content_activity(),
-			\progress_planner()->get_admin__widgets__whats_new(),
-		];
-
-		/**
-		 * Filter the widgets.
-		 *
-		 * @param array<\Progress_Planner\Admin\Widgets\Widget> $widgets The widgets.
-		 *
-		 * @return array<\Progress_Planner\Admin\Widgets\Widget>
-		 */
-		return \apply_filters( 'progress_planner_admin_widgets', $widgets ); // @phpstan-ignore-line parameter.phpDocType
-	}
-
-	/**
-	 * Get a widget object.
-	 *
-	 * @param string $id The widget ID.
-	 *
-	 * @return \Progress_Planner\Admin\Widgets\Widget|void
-	 */
-	public function get_widget( $id ) {
-		$widgets = $this->get_widgets();
-		foreach ( $widgets as $widget ) {
-			if ( $widget->get_id() === $id ) {
-				return $widget;
-			}
-		}
-	}
 
 	/**
 	 * Add the admin page.
@@ -270,20 +228,6 @@ class Page {
 			);
 		}
 
-		// Collect widget configurations.
-		$widgets        = $this->get_widgets();
-		$widget_configs = [];
-
-		foreach ( $widgets as $widget ) {
-			$widget_configs[] = [
-				'id'              => $widget->get_id(),
-				'width'           => $widget->get_width(),
-				'forceLastColumn' => $widget->get_force_last_column(),
-				'titleHtml'       => $widget->get_title_html(),
-				'config'          => $widget->get_widget_config(),
-			];
-		}
-
 		// Get header configuration.
 		// phpcs:disable WordPress.Security.NonceVerification.Recommended
 		$current_range     = isset( $_GET['range'] )
@@ -311,7 +255,6 @@ class Page {
 			'prplDashboardConfig',
 			[
 				'privacyPolicyAccepted' => \progress_planner()->is_privacy_policy_accepted(),
-				'widgets'               => $widget_configs,
 				// Header configuration.
 				'licenseKey'            => \get_option( 'progress_planner_license_key', 'no-license' ),
 				'branding'              => [
@@ -542,7 +485,7 @@ class Page {
 		}
 
 		// Clear the cache for the activity scores widget.
-		\progress_planner()->get_settings()->set( \progress_planner()->get_admin__widgets__activity_scores()->get_cache_key(), [] );
+		\progress_planner()->get_settings()->set( 'activities_weekly_post_record', [] );
 	}
 
 	/**

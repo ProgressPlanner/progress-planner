@@ -84,9 +84,13 @@ function StreakBadges( { config = {} } ) {
 	);
 }
 
-// Register widget via hook
+// Register widget via hook with metadata
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'badge-streak-maintenance',
 	component: StreakBadges,
 	priority: 10,
+	width: 1,
+	forceLastColumn: true,
+	title: __( 'Your streak badges', 'progress-planner' ),
+	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );

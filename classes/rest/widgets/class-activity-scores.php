@@ -1,66 +1,123 @@
 <?php
 /**
- * A widget class.
+ * REST API endpoint for Activity Scores widget.
  *
  * @package Progress_Planner
  */
 
-namespace Progress_Planner\Admin\Widgets;
+namespace Progress_Planner\Rest\Widgets;
 
+use Progress_Planner\Rest\Base;
+use Progress_Planner\Base as Plugin_Base;
 use Progress_Planner\Goals\Goal_Recurring;
 use Progress_Planner\Goals\Goal;
 
 /**
- * A widget class.
+ * Activity_Scores REST API endpoint class.
  */
-final class Activity_Scores extends Widget {
-
-	/**
-	 * The widget ID.
-	 *
-	 * @var string
-	 */
-	protected $id = 'activity-scores';
+class Activity_Scores extends Base {
 
 	/**
 	 * The cache key.
 	 *
 	 * @var string
 	 */
-	protected $cache_key = 'activities_weekly_post_record';
+	private const CACHE_KEY = 'activities_weekly_post_record';
 
 	/**
-	 * The color callback.
+	 * Register REST endpoint.
 	 *
-	 * @param int       $number The number to calculate the color for.
-	 * @param \DateTime $date   The date.
-	 *
-	 * @return string The color.
+	 * @return void
 	 */
-	public function get_color( $number, $date ) {
-		// If monthly and the latest month, return gray (in progress).
-		if (
-			'monthly' === $this->get_frequency() &&
-			\gmdate( 'Y-m-01' ) === $date->format( 'Y-m-01' )
-		) {
-			return 'var(--prpl-color-border)';
-		}
+	public function register_rest_endpoint() {
+		\register_rest_route(
+			'progress-planner/v1',
+			'/widgets/activity-scores',
+			[
+				[
+					'methods'             => 'GET',
+					'callback'            => [ $this, 'get_activity_scores' ],
+					'permission_callback' => [ $this, 'check_permissions' ],
+					'args'                => [
+						'range'     => [
+							'type'              => 'string',
+							'default'           => '-6 months',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+						'frequency' => [
+							'type'              => 'string',
+							'default'           => 'monthly',
+							'sanitize_callback' => 'sanitize_text_field',
+						],
+					],
+				],
+			]
+		);
+	}
 
-		// If weekly and the current week, return gray (in progress).
-		if (
-			'weekly' === $this->get_frequency() &&
-			\gmdate( 'Y-W' ) === $date->format( 'Y-W' )
-		) {
-			return 'var(--prpl-color-border)';
-		}
+	/**
+	 * Check if the current user has permission to access this endpoint.
+	 *
+	 * @return bool
+	 */
+	public function check_permissions() {
+		return \current_user_can( 'edit_posts' );
+	}
 
-		if ( $number > 90 ) {
-			return 'var(--prpl-graph-color-3)';
-		}
-		if ( $number > 30 ) {
-			return 'var(--prpl-color-monthly)';
-		}
-		return 'var(--prpl-graph-color-1)';
+	/**
+	 * Get activity scores data.
+	 *
+	 * @param \WP_REST_Request $request The REST request object.
+	 *
+	 * @return \WP_REST_Response
+	 */
+	public function get_activity_scores( $request ) {
+		$range     = $request->get_param( 'range' ) ?? '-6 months';
+		$frequency = $request->get_param( 'frequency' ) ?? 'monthly';
+
+		$score = $this->get_score();
+		$record = $this->personal_record_callback();
+		$checklist = $this->get_checklist_results();
+
+		// Get chart data.
+		$chart      = \progress_planner()->get_ui__chart();
+		$start_date = \DateTime::createFromFormat( 'Y-m-d', \gmdate( 'Y-m-01' ) )->modify( $range );
+		$end_date   = new \DateTime();
+
+		$chart_data = $chart->get_chart_data(
+			[
+				'type'           => 'bar',
+				'items_callback' => fn( $start_date, $end_date ) => \progress_planner()->get_activities__query()->query_activities(
+					[
+						'start_date' => $start_date,
+						'end_date'   => $end_date,
+					]
+				),
+				'dates_params'   => [
+					'start_date' => $start_date,
+					'end_date'   => $end_date,
+					'frequency'  => $frequency,
+					'format'     => 'M',
+				],
+				'count_callback' => fn( $activities, $date ) => \array_sum( \array_map( fn( $activity ) => $activity->get_points( $date ), $activities ) ) * 100 / Plugin_Base::SCORE_TARGET,
+				'normalized'     => true,
+				'max'            => 100,
+				'return_data'    => [ 'label', 'score' ], // Don't return color - that's presentation logic
+			]
+		);
+
+		// Build response data.
+		$response_data = [
+			'score'          => $score,
+			'chartData'      => $chart_data,
+			'personalRecord' => [
+				'maxStreak'     => (int) $record['max_streak'],
+				'currentStreak' => (int) $record['current_streak'],
+			],
+			'checklist'      => $checklist,
+		];
+
+		return new \WP_REST_Response( $response_data );
 	}
 
 	/**
@@ -68,7 +125,7 @@ final class Activity_Scores extends Widget {
 	 *
 	 * @return int The score.
 	 */
-	public function get_score() {
+	private function get_score() {
 		$activities = \progress_planner()->get_activities__query()->query_activities(
 			// Use 31 days to take into account the activities score decay from previous activities.
 			[ 'start_date' => new \DateTime( '-31 days' ) ]
@@ -94,7 +151,7 @@ final class Activity_Scores extends Widget {
 	 *
 	 * @return array<string, bool> The checklist results.
 	 */
-	public function get_checklist_results() {
+	private function get_checklist_results() {
 		$items   = $this->get_checklist();
 		$results = [];
 		foreach ( $items as $item ) {
@@ -109,7 +166,7 @@ final class Activity_Scores extends Widget {
 	 *
 	 * @return array The checklist items.
 	 */
-	public function get_checklist() {
+	private function get_checklist() {
 		return [
 			[
 				'label'    => \esc_html__( 'published content', 'progress-planner' ),
@@ -145,28 +202,11 @@ final class Activity_Scores extends Widget {
 	}
 
 	/**
-	 * Get the gauge color.
-	 *
-	 * @param int $score The score.
-	 *
-	 * @return string The color.
-	 */
-	public function get_gauge_color( $score ) {
-		if ( $score >= 75 ) {
-			return 'var(--prpl-graph-color-3)';
-		}
-		if ( $score >= 50 ) {
-			return 'var(--prpl-color-monthly)';
-		}
-		return 'var(--prpl-graph-color-1)';
-	}
-
-	/**
 	 * Get the personal record goal.
 	 *
 	 * @return array
 	 */
-	public function personal_record_callback() {
+	private function personal_record_callback() {
 		$goal = Goal_Recurring::get_instance(
 			'weekly_post_record',
 			[
@@ -178,7 +218,7 @@ final class Activity_Scores extends Widget {
 				'priority'    => 'low',
 				'evaluate'    => function ( $goal_object ) {
 					// Get the cached activities.
-					$cached_activities = \progress_planner()->get_settings()->get( $this->cache_key, [] );
+					$cached_activities = \progress_planner()->get_settings()->get( self::CACHE_KEY, [] );
 
 					// Get the weekly cache key.
 					$weekly_cache_key = $goal_object->get_details()['start_date']->format( 'Y-m-d' ) . '_' . $goal_object->get_details()['end_date']->format( 'Y-m-d' );
@@ -200,7 +240,7 @@ final class Activity_Scores extends Widget {
 
 					// Cache the activities.
 					$cached_activities[ $weekly_cache_key ] = (bool) \count( $activities );
-					\progress_planner()->get_settings()->set( $this->cache_key, $cached_activities );
+					\progress_planner()->get_settings()->set( self::CACHE_KEY, $cached_activities );
 
 					// Return the cached value.
 					return $cached_activities[ $weekly_cache_key ];
@@ -216,39 +256,5 @@ final class Activity_Scores extends Widget {
 
 		return $goal->get_streak();
 	}
-
-	/**
-	 * Get the cache key.
-	 *
-	 * @return string The cache key.
-	 */
-	public function get_cache_key() {
-		return $this->cache_key;
-	}
-
-	/**
-	 * Enqueue scripts for this widget.
-	 *
-	 * @return void
-	 */
-	/**
-	 * Get widget configuration.
-	 *
-	 * @return array Widget configuration.
-	 */
-	public function get_widget_config() {
-		// Get widget title (may be custom branded or default).
-		$widget_title = \progress_planner()->get_ui__branding()->get_widget_title(
-			'activity-scores',
-			\esc_html__( 'Your website activity score', 'progress-planner' )
-		);
-
-		// Get info icon SVG content.
-		$info_icon_svg = \progress_planner()->get_asset( 'images/icon_info.svg' );
-
-		return [
-			'title'       => $widget_title,
-			'infoIconSvg' => $info_icon_svg,
-		];
-	}
 }
+

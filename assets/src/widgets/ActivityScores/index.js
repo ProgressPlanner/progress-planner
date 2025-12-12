@@ -70,6 +70,75 @@ function getStreakMessage( maxStreak, currentStreak ) {
 }
 
 /**
+ * Get the gauge color based on score.
+ *
+ * @param {number} score - The score value.
+ * @return {string} The color CSS variable.
+ */
+function getGaugeColor( score ) {
+	if ( score >= 75 ) {
+		return 'var(--prpl-graph-color-3)';
+	}
+	if ( score >= 50 ) {
+		return 'var(--prpl-color-monthly)';
+	}
+	return 'var(--prpl-graph-color-1)';
+}
+
+/**
+ * Get the color for a chart bar based on value and date label.
+ *
+ * @param {number}   value     - The value for this period.
+ * @param {string}   label     - The label for this period (e.g., "Jan", "Feb" for monthly, or date string for weekly).
+ * @param {string}   frequency - The frequency ('monthly' or 'weekly').
+ * @return {string} The color CSS variable.
+ */
+function getChartColor( value, label, frequency ) {
+	const now = new Date();
+
+	// If monthly and the latest month, return gray (in progress).
+	if ( frequency === 'monthly' ) {
+		// Chart labels are formatted as 'M' which gives month abbreviations like "Jan", "Feb"
+		const currentMonth = now.toLocaleString( 'default', { month: 'short' } );
+		if ( label === currentMonth ) {
+			return 'var(--prpl-color-border)';
+		}
+	}
+
+	// If weekly and the current week, return gray (in progress).
+	if ( frequency === 'weekly' ) {
+		// For weekly, labels might be in date format - we'll check if it's the current week
+		// by checking if the label represents a date in the current week
+		try {
+			const labelDate = new Date( label );
+			if ( ! isNaN( labelDate.getTime() ) ) {
+				const weekStart = new Date( now );
+				weekStart.setDate( now.getDate() - now.getDay() );
+				weekStart.setHours( 0, 0, 0, 0 );
+				const weekEnd = new Date( weekStart );
+				weekEnd.setDate( weekStart.getDate() + 6 );
+				weekEnd.setHours( 23, 59, 59, 999 );
+
+				if ( labelDate >= weekStart && labelDate <= weekEnd ) {
+					return 'var(--prpl-color-border)';
+				}
+			}
+		} catch ( e ) {
+			// If label parsing fails, continue with value-based colors
+		}
+	}
+
+	// Value-based colors
+	if ( value > 90 ) {
+		return 'var(--prpl-graph-color-3)';
+	}
+	if ( value > 30 ) {
+		return 'var(--prpl-color-monthly)';
+	}
+	return 'var(--prpl-graph-color-1)';
+}
+
+/**
  * ActivityScores component.
  *
  * @param {Object} props        - Component props.
@@ -80,6 +149,8 @@ function ActivityScores( { config = {} } ) {
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ error, setError ] = useState( null );
 	const [ data, setData ] = useState( null );
+	const [ range, setRange ] = useState( '-6 months' );
+	const [ frequency, setFrequency ] = useState( 'monthly' );
 
 	/**
 	 * Fetch activity scores data from REST API.
@@ -88,7 +159,7 @@ function ActivityScores( { config = {} } ) {
 		const fetchData = async () => {
 			try {
 				const response = await apiFetch( {
-					path: '/progress-planner/v1/activity-scores',
+					path: `/progress-planner/v1/widgets/activity-scores?range=${ encodeURIComponent( range ) }&frequency=${ encodeURIComponent( frequency ) }`,
 				} );
 
 				setData( response );
@@ -100,7 +171,7 @@ function ActivityScores( { config = {} } ) {
 		};
 
 		fetchData();
-	}, [] );
+	}, [ range, frequency ] );
 
 	if ( isLoading ) {
 		return <p>{ __( 'Loading…', 'progress-planner' ) }</p>;
@@ -114,18 +185,23 @@ function ActivityScores( { config = {} } ) {
 		return <p>{ __( 'No data available.', 'progress-planner' ) }</p>;
 	}
 
-	const { score, gaugeColor, chartData, personalRecord } = data;
+	const { score, chartData, personalRecord } = data;
+	const gaugeColor = getGaugeColor( score );
+
+	// Add colors to chart data (presentation logic in React).
+	const chartDataWithColors = chartData.map( ( item ) => ( {
+		...item,
+		color: getChartColor( item.score, item.label, frequency ),
+	} ) );
 	const streakMessage = getStreakMessage(
 		personalRecord.maxStreak,
 		personalRecord.currentStreak
 	);
 
-	// Get title from config or use default.
-	const widgetTitle =
-		config?.title ||
-		__( 'Your website activity score', 'progress-planner' );
+	// Get title - will come from widget registry metadata
+	const widgetTitle = config?.title || __( 'Your website activity score', 'progress-planner' );
 
-	// Get info icon SVG from config.
+	// Get info icon SVG - will come from widget registry metadata
 	const infoIconSvg = config?.infoIconSvg || '';
 
 	return (
@@ -183,7 +259,7 @@ function ActivityScores( { config = {} } ) {
 				className="prpl-graph-wrapper"
 				style={ { maxHeight: '300px' } }
 			>
-				<BarChart data={ chartData } />
+				<BarChart data={ chartDataWithColors } />
 			</div>
 
 			<hr />
@@ -199,9 +275,13 @@ function ActivityScores( { config = {} } ) {
 	);
 }
 
-// Register widget via hook
+// Register widget via hook with metadata
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'activity-scores',
 	component: ActivityScores,
 	priority: 10,
+	width: 1,
+	forceLastColumn: false,
+	title: __( 'Your website activity score', 'progress-planner' ),
+	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );

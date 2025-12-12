@@ -28,10 +28,12 @@ const prplDriverObj = prplDriver( {
 		popover, // eslint-disable-line no-unused-vars
 		{ config, state } // eslint-disable-line no-unused-vars
 	) => {
+		// Monthly badges popover is no longer used (badges are in React widget).
+		// Tour step 5 is kept for backward compatibility but popover is optional.
 		const monthlyBadgesPopover = document.getElementById(
 			'prpl-popover-monthly-badges'
 		);
-		if ( state.activeIndex === 5 ) {
+		if ( state.activeIndex === 5 && monthlyBadgesPopover ) {
 			prplTourShowPopover( monthlyBadgesPopover );
 		}
 
@@ -68,17 +70,23 @@ function prplMakePopoverBackdropTransparent( popover ) {
 
 // eslint-disable-next-line no-unused-vars -- This is called on a few buttons.
 function prplStartTour() {
+	// Monthly badges popover is no longer used (badges are in React widget).
+	// Tour steps are kept for backward compatibility but popover is optional.
 	const monthlyBadgesPopover = document.getElementById(
 		'prpl-popover-monthly-badges'
 	);
 	const progressPlannerTourSteps = progressPlannerTour.steps;
 
 	progressPlannerTourSteps[ 4 ].popover.onNextClick = function () {
-		prplTourShowPopover( monthlyBadgesPopover );
+		if ( monthlyBadgesPopover ) {
+			prplTourShowPopover( monthlyBadgesPopover );
+		}
 		prplDriverObj.moveNext();
 	};
 	progressPlannerTourSteps[ 5 ].popover.onNextClick = function () {
-		prplTourHidePopover( monthlyBadgesPopover );
+		if ( monthlyBadgesPopover ) {
+			prplTourHidePopover( monthlyBadgesPopover );
+		}
 		prplDriverObj.moveNext();
 	};
 

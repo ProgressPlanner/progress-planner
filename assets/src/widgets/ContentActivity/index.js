@@ -67,7 +67,11 @@ function ContentActivity( { config = {} } ) {
 	const [ error, setError ] = useState( null );
 
 	useEffect( () => {
-		apiFetch( { path: '/progress-planner/v1/content-activity' } )
+		const range = '-6 months';
+		const frequency = 'monthly';
+		apiFetch( {
+			path: `/progress-planner/v1/widgets/content-activity?range=${ encodeURIComponent( range ) }&frequency=${ encodeURIComponent( frequency ) }`,
+		} )
 			.then( ( response ) => {
 				setData( response );
 				setError( null );
@@ -98,9 +102,8 @@ function ContentActivity( { config = {} } ) {
 		return null;
 	}
 
-	// Get title from config or use default.
-	const widgetTitle =
-		config?.title || __( 'Content activity', 'progress-planner' );
+	// Get title - will come from widget registry metadata
+	const widgetTitle = config?.title || __( 'Content activity', 'progress-planner' );
 
 	const graphWrapperStyle = {
 		marginBottom: 'var(--prpl-padding)',
@@ -139,9 +142,13 @@ function ContentActivity( { config = {} } ) {
 	);
 }
 
-// Register widget via hook
+// Register widget via hook with metadata
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'content-activity',
 	component: ContentActivity,
 	priority: 10,
+	width: 1,
+	forceLastColumn: false,
+	title: __( 'Content activity', 'progress-planner' ),
+	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );

@@ -25,7 +25,7 @@ final class Branding {
 	 * Constructor.
 	 */
 	public function __construct() {
-		\add_filter( 'progress_planner_admin_widgets', [ $this, 'filter_widgets' ] );
+		// Widget filtering is now handled in React via widget registry
 	}
 
 	/**
@@ -218,25 +218,6 @@ final class Branding {
 		return $body;
 	}
 
-	/**
-	 * Filter the widgets to be displayed on the admin page.
-	 *
-	 * @param array<\Progress_Planner\Admin\Widgets\Widget> $widgets The widgets.
-	 *
-	 * @return array<\Progress_Planner\Admin\Widgets\Widget>
-	 */
-	public function filter_widgets( $widgets ) {
-		if ( empty( $this->get_api_data() ) || ! isset( $this->get_api_data()['papers'] ) ) {
-			return $widgets;
-		}
-
-		$show_papers = $this->get_api_data()['papers'];
-		if ( ! $show_papers ) {
-			return $widgets;
-		}
-
-		return \array_filter( $widgets, fn( $widget ) => \in_array( $widget->get_id(), $show_papers, true ) );
-	}
 
 	/**
 	 * Get the widget title.

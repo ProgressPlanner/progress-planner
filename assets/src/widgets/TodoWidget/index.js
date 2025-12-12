@@ -740,9 +740,13 @@ function TodoWidget( { config = {} } ) {
 	);
 }
 
-// Register widget via hook
+// Register widget via hook with metadata
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'todo',
 	component: TodoWidget,
 	priority: 10,
+	width: 2,
+	forceLastColumn: false,
+	title: __( 'My to-do list', 'progress-planner' ),
+	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );

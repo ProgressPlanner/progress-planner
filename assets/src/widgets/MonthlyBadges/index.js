@@ -302,9 +302,13 @@ function MonthlyBadges( { config = {} } ) {
 	);
 }
 
-// Register widget via hook
+// Register widget via hook with metadata
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'monthly-badges',
 	component: MonthlyBadges,
 	priority: 10,
+	width: 1,
+	forceLastColumn: false,
+	title: __( 'Your monthly badge', 'progress-planner' ),
+	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );

@@ -85,11 +85,10 @@ function WidgetWrapper( {
  * DashboardWidgets component.
  *
  * @param {Object} props        - Component props.
- * @param {Object} props.config - Dashboard configuration.
+ * @param {Object} props.config - Dashboard configuration (not used for widgets anymore).
  * @return {JSX.Element} The DashboardWidgets component.
  */
 export default function DashboardWidgets( { config } ) {
-	const { widgets = [] } = config;
 	const [ registeredWidgets, setRegisteredWidgets ] = useState( [] );
 
 	// Listen for widget registrations and update state
@@ -113,49 +112,48 @@ export default function DashboardWidgets( { config } ) {
 	}, [] );
 
 	/**
-	 * Create a widget map from registered widgets.
+	 * Render a widget from registry.
 	 *
-	 * @return {Object<string, Function>} Map of widget ID to component.
-	 */
-	const createWidgetMap = () => {
-		const map = {};
-		registeredWidgets.forEach( ( widget ) => {
-			map[ widget.id ] = widget.component;
-		} );
-		return map;
-	};
-
-	/**
-	 * Render a widget by ID.
-	 *
-	 * @param {string} widgetId     - Widget ID.
-	 * @param {Object} widgetConfig - Widget configuration.
+	 * @param {Object} widget - Widget from registry.
 	 * @return {JSX.Element|null} The widget component.
 	 */
-	const renderWidget = ( widgetId, widgetConfig ) => {
-		const widgetMap = createWidgetMap();
-		const WidgetComponent = widgetMap[ widgetId ];
+	const renderWidget = ( widget ) => {
+		const WidgetComponent = widget.component;
 
 		if ( ! WidgetComponent ) {
 			return null;
 		}
 
+		// Build title HTML with info icon if available
+		let titleHtml = '';
+		if ( widget.title ) {
+			titleHtml = widget.title;
+			if ( widget.infoIconSvg ) {
+				titleHtml += `<div class="tooltip-actions"><prpl-tooltip><slot name="open-icon"><span class="icon prpl-info-icon">${ widget.infoIconSvg }<span class="screen-reader-text">More info</span></span></slot><slot name="content">${ widget.title }</slot></prpl-tooltip></div>`;
+			}
+		}
+
 		return (
 			<WidgetWrapper
-				key={ widgetId }
-				id={ widgetId }
-				width={ widgetConfig.width || 1 }
-				forceLastColumn={ widgetConfig.forceLastColumn || false }
-				titleHtml={ widgetConfig.titleHtml }
+				key={ widget.id }
+				id={ widget.id }
+				width={ widget.width || 1 }
+				forceLastColumn={ widget.forceLastColumn || false }
+				titleHtml={ titleHtml }
 			>
-				<WidgetComponent config={ widgetConfig.config || {} } />
+				<WidgetComponent
+					config={ {
+						title: widget.title,
+						infoIconSvg: widget.infoIconSvg,
+					} }
+				/>
 			</WidgetWrapper>
 		);
 	};
 
 	return (
 		<Fragment>
-			{ widgets.map( ( widget ) => renderWidget( widget.id, widget ) ) }
+			{ registeredWidgets.map( ( widget ) => renderWidget( widget ) ) }
 		</Fragment>
 	);
 }
