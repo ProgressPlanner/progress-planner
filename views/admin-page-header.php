@@ -25,7 +25,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<?php
 
 		// Render the subscribe form button and popover if the license key is not set.
-		if ( 'no-license' === \get_option( 'progress_planner_license_key', 'no-license' ) ) {
+		if ( 'no-license' === \progress_planner()->get_license_key() ) {
 			\progress_planner()->get_ui__popover()->the_popover( 'subscribe-form' )->render_button(
 				'',
 				\progress_planner()->get_asset( 'images/register_icon.svg' ) . '<span class="screen-reader-text">' . \esc_html__( 'Subscribe', 'progress-planner' ) . '</span>'
