@@ -10,7 +10,7 @@
  * @return {JSX.Element} The popover component.
  */
 
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
@@ -18,7 +18,7 @@ import { submitSiteSettings } from '../../hooks/usePopoverForms';
 
 export default function TimezonePopover( { task, onSubmit, onClose } ) {
 	const [ value, setValue ] = useState( '' );
-	const [ timezoneSelectRef, setTimezoneSelectRef ] = useState( null );
+	const timezoneSelectRef = useRef( null );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ isFetchingOptions, setIsFetchingOptions ] = useState( true );
 	const [ error, setError ] = useState( null );
@@ -48,25 +48,25 @@ export default function TimezonePopover( { task, onSubmit, onClose } ) {
 		)
 			.then( ( response ) => response.json() )
 			.then( ( data ) => {
-				if ( data.success && data.data && timezoneSelectRef ) {
-					timezoneSelectRef.innerHTML = data.data;
+				if ( data.success && data.data && timezoneSelectRef.current ) {
+					timezoneSelectRef.current.innerHTML = data.data;
 					// Set the value after options are loaded
 					if ( value ) {
-						timezoneSelectRef.value = value;
+						timezoneSelectRef.current.value = value;
 					}
 				}
 			} )
 			.catch( () => {
 				// Fallback: create a simple select
-				if ( timezoneSelectRef ) {
-					timezoneSelectRef.innerHTML =
+				if ( timezoneSelectRef.current ) {
+					timezoneSelectRef.current.innerHTML =
 						'<option value="">Select timezone</option>';
 				}
 			} )
 			.finally( () => {
 				setIsFetchingOptions( false );
 			} );
-	}, [ timezoneSelectRef, value ] );
+	}, [ value ] );
 
 	/**
 	 * Handle form submission.
@@ -133,7 +133,7 @@ export default function TimezonePopover( { task, onSubmit, onClose } ) {
 						<select
 							id="timezone"
 							name="timezone"
-							ref={ setTimezoneSelectRef }
+							ref={ timezoneSelectRef }
 							value={ value }
 							onChange={ ( e ) => setValue( e.target.value ) }
 							disabled={ isLoading || isFetchingOptions }

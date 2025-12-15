@@ -10,7 +10,7 @@
  * @return {JSX.Element} The popover component.
  */
 
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
@@ -18,7 +18,7 @@ import { submitSiteSettings } from '../../hooks/usePopoverForms';
 
 export default function LocalePopover( { task, onSubmit, onClose } ) {
 	const [ value, setValue ] = useState( '' );
-	const [ localeSelectRef, setLocaleSelectRef ] = useState( null );
+	const localeSelectRef = useRef( null );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ isFetchingOptions, setIsFetchingOptions ] = useState( true );
 	const [ error, setError ] = useState( null );
@@ -48,25 +48,25 @@ export default function LocalePopover( { task, onSubmit, onClose } ) {
 		)
 			.then( ( response ) => response.json() )
 			.then( ( data ) => {
-				if ( data.success && data.data && localeSelectRef ) {
-					localeSelectRef.innerHTML = data.data;
+				if ( data.success && data.data && localeSelectRef.current ) {
+					localeSelectRef.current.innerHTML = data.data;
 					// Set the value after options are loaded
 					if ( value ) {
-						localeSelectRef.value = value;
+						localeSelectRef.current.value = value;
 					}
 				}
 			} )
 			.catch( () => {
 				// Fallback
-				if ( localeSelectRef ) {
-					localeSelectRef.innerHTML =
+				if ( localeSelectRef.current ) {
+					localeSelectRef.current.innerHTML =
 						'<option value="">Select locale</option>';
 				}
 			} )
 			.finally( () => {
 				setIsFetchingOptions( false );
 			} );
-	}, [ localeSelectRef, value ] );
+	}, [ value ] );
 
 	/**
 	 * Handle form submission.
@@ -133,7 +133,7 @@ export default function LocalePopover( { task, onSubmit, onClose } ) {
 						<select
 							id="language"
 							name="language"
-							ref={ setLocaleSelectRef }
+							ref={ localeSelectRef }
 							value={ value }
 							onChange={ ( e ) => setValue( e.target.value ) }
 							disabled={ isLoading || isFetchingOptions }
