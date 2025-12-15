@@ -10,7 +10,7 @@
  * @return {JSX.Element} The popover component.
  */
 
-import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
+import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
@@ -18,7 +18,7 @@ import { submitSiteSettings } from '../../hooks/usePopoverForms';
 
 export default function TimezonePopover( { task, onSubmit, onClose } ) {
 	const [ value, setValue ] = useState( '' );
-	const timezoneSelectRef = useRef( null );
+	const [ timezoneOptions, setTimezoneOptions ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( false );
 	const [ isFetchingOptions, setIsFetchingOptions ] = useState( true );
 	const [ error, setError ] = useState( null );
@@ -37,36 +37,21 @@ export default function TimezonePopover( { task, onSubmit, onClose } ) {
 				// Ignore errors
 			} );
 
-		// Fetch timezone options HTML via AJAX
-		const ajaxUrl =
-			window.progressPlanner?.ajaxUrl || '/wp-admin/admin-ajax.php';
-		const nonce = window.progressPlanner?.nonce || '';
-
-		fetch(
-			`${ ajaxUrl }?action=prpl_get_timezone_options&_ajax_nonce=${ nonce }`,
-			{ credentials: 'same-origin' }
-		)
-			.then( ( response ) => response.json() )
-			.then( ( data ) => {
-				if ( data.success && data.data && timezoneSelectRef.current ) {
-					timezoneSelectRef.current.innerHTML = data.data;
-					// Set the value after options are loaded
-					if ( value ) {
-						timezoneSelectRef.current.value = value;
-					}
+		// Fetch timezone options via REST API
+		apiFetch( { path: '/progress-planner/v1/timezone-options' } )
+			.then( ( options ) => {
+				if ( Array.isArray( options ) ) {
+					setTimezoneOptions( options );
 				}
 			} )
 			.catch( () => {
-				// Fallback: create a simple select
-				if ( timezoneSelectRef.current ) {
-					timezoneSelectRef.current.innerHTML =
-						'<option value="">Select timezone</option>';
-				}
+				// On error, set empty array (will show empty select)
+				setTimezoneOptions( [] );
 			} )
 			.finally( () => {
 				setIsFetchingOptions( false );
 			} );
-	}, [ value ] );
+	}, [] );
 
 	/**
 	 * Handle form submission.
@@ -133,15 +118,23 @@ export default function TimezonePopover( { task, onSubmit, onClose } ) {
 						<select
 							id="timezone"
 							name="timezone"
-							ref={ timezoneSelectRef }
 							value={ value }
 							onChange={ ( e ) => setValue( e.target.value ) }
 							disabled={ isLoading || isFetchingOptions }
 						>
-							{ isFetchingOptions && (
+							{ isFetchingOptions ? (
 								<option value="">
 									{ __( 'Loading…', 'progress-planner' ) }
 								</option>
+							) : (
+								timezoneOptions.map( ( option ) => (
+									<option
+										key={ option.value }
+										value={ option.value }
+									>
+										{ option.label }
+									</option>
+								) )
 							) }
 						</select>
 					</label>
