@@ -34,10 +34,17 @@ class Onboard_Wizard {
 	 * @return void
 	 */
 	public function maybe_register_popover_hooks() {
+
+		// Add admin toolbar items.
+		if ( \progress_planner()->is_debug_mode_enabled() ) {
+			\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_items' ] );
+			\add_action( 'init', [ $this, 'check_delete_onboarding_progress' ] );
+		}
+
 		// Skip for existing installs that never started the new onboarding.
 		// If privacy policy is already accepted but no onboarding progress exists,
 		// this is an existing install - don't show the new onboarding.
-		if ( \progress_planner()->get_base()->is_privacy_policy_accepted()
+		if ( \progress_planner()->is_privacy_policy_accepted()
 			&& ! \get_option( 'prpl_onboard_progress', false ) ) {
 			return;
 		}
@@ -58,12 +65,6 @@ class Onboard_Wizard {
 
 		// Define steps and their order.
 		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
-
-		// Add admin toolbar items.
-		if ( \progress_planner()->get_base()->is_debug_mode_enabled() ) {
-			\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_items' ] );
-			\add_action( 'admin_init', [ $this, 'check_delete_onboarding_progress' ] );
-		}
 
 		// Note: AJAX action needs to be registered early (ie wrapping init in is_admin() check will be to late).
 		\add_action( 'wp_ajax_progress_planner_onboarding_complete_task', [ $this, 'ajax_complete_task' ] );
@@ -468,6 +469,9 @@ class Onboard_Wizard {
 		// Delete the onboarding progress.
 		\delete_option( 'prpl_onboard_progress' );
 
+		// Delete the option.
+		\delete_option( 'progress_planner_license_key' );
+
 		// Redirect to the same page without the parameter.
 		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_onboarding_progress', '_wpnonce' ] ) );
 		exit;
@@ -633,7 +637,7 @@ class Onboard_Wizard {
 		if ( ! $get_saved_progress ) {
 			?>
 			<script>
-				document.addEventListener('DOMContentLoaded', () => {
+				document.addEventListener( 'prplOnboardWizardReady', () => {
 					window.prplOnboardWizard.startOnboarding();
 				});
 			</script>
@@ -706,15 +710,24 @@ class Onboard_Wizard {
 		\progress_planner()->the_view( 'onboarding/quit-confirmation.php' );
 		?>
 		<script>
-			// Initialize tour when DOM is ready
-			document.addEventListener('DOMContentLoaded', () => {
+			( function () {
+				'use strict';
 
-				// Initialize tour instance
-				window.prplOnboardWizard = new ProgressPlannerOnboardWizard( window.ProgressPlannerOnboardData );
+				function init() {
+					// Initialize tour instance
+					window.prplOnboardWizard = new ProgressPlannerOnboardWizard( window.ProgressPlannerOnboardData );
 
-				// WIP: Dispatch event to notify that the onboarding wizard is ready.
-				document.dispatchEvent( new Event( 'prplOnboardWizardReady' ) );
-			});
+					// Dispatch event to notify that the onboarding wizard is ready.
+					document.dispatchEvent( new Event( 'prplOnboardWizardReady' ) );
+				}
+
+				// Initialize when DOM is ready
+				if ( document.readyState === 'loading') {
+					document.addEventListener( 'DOMContentLoaded', init );
+				} else {
+					init();
+				}
+			} )();
 		</script>
 		<?php
 	}
