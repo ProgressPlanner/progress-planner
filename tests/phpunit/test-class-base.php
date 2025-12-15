@@ -209,6 +209,15 @@ class Base_Test extends \WP_UnitTestCase {
 	public function test_is_debug_mode_enabled() {
 		// Test with option set.
 		\update_option( 'prpl_debug', true );
+
+		// Option is set, but the user does not have the manage_options capability.
+		$result = $this->base_instance->is_debug_mode_enabled();
+		$this->assertFalse( $result );
+
+		// Set the current user to a user with the manage_options capability.
+		wp_set_current_user( 1 );
+
+		// Option is set, and the user has the manage_options capability.
 		$result = $this->base_instance->is_debug_mode_enabled();
 		$this->assertTrue( $result );
 
@@ -217,6 +226,9 @@ class Base_Test extends \WP_UnitTestCase {
 		$result = $this->base_instance->is_debug_mode_enabled();
 		// Should be false unless PRPL_DEBUG constant is defined and true.
 		$this->assertIsBool( $result );
+
+		// Unset the current user.
+		wp_set_current_user( 0 );
 	}
 }
 
