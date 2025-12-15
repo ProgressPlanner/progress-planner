@@ -22,6 +22,21 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 	private $test_task_id = 'phpunit-cli-test-task';
 
 	/**
+	 * Set up test.
+	 *
+	 * @return void
+	 */
+	public function setUp(): void {
+		parent::setUp();
+
+		// Skip tests if WP-CLI is not available (e.g., in CI environments).
+		$result = $this->run_wp_cli( '--version' );
+		if ( 0 !== $result['code'] ) {
+			$this->markTestSkipped( 'WP-CLI is not available in this environment.' );
+		}
+	}
+
+	/**
 	 * Run a WP-CLI command.
 	 *
 	 * @param string $command The WP-CLI command to run (without 'wp' prefix).
