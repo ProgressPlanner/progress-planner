@@ -32,72 +32,6 @@ class Admin_Page_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test get_widgets returns array.
-	 *
-	 * @return void
-	 */
-	public function test_get_widgets() {
-		$widgets = $this->page_instance->get_widgets();
-
-		$this->assertIsArray( $widgets );
-		$this->assertNotEmpty( $widgets );
-	}
-
-	/**
-	 * Test get_widgets returns widget instances.
-	 *
-	 * @return void
-	 */
-	public function test_get_widgets_returns_widget_instances() {
-		$widgets = $this->page_instance->get_widgets();
-
-		foreach ( $widgets as $widget ) {
-			$this->assertInstanceOf( \Progress_Planner\Admin\Widgets\Widget::class, $widget );
-		}
-	}
-
-	/**
-	 * Test get_widgets applies filter.
-	 *
-	 * @return void
-	 */
-	public function test_get_widgets_applies_filter() {
-		\add_filter(
-			'progress_planner_admin_widgets',
-			function ( $widgets ) {
-				return \array_slice( $widgets, 0, 1 );
-			}
-		);
-
-		$widgets = $this->page_instance->get_widgets();
-
-		$this->assertCount( 1, $widgets );
-	}
-
-	/**
-	 * Test get_widget returns widget by ID.
-	 *
-	 * @return void
-	 */
-	public function test_get_widget() {
-		$widget = $this->page_instance->get_widget( 'suggested-tasks' );
-
-		$this->assertInstanceOf( \Progress_Planner\Admin\Widgets\Widget::class, $widget );
-		$this->assertEquals( 'suggested-tasks', $widget->get_id() );
-	}
-
-	/**
-	 * Test get_widget returns void for non-existent widget.
-	 *
-	 * @return void
-	 */
-	public function test_get_widget_not_found() {
-		$widget = $this->page_instance->get_widget( 'non-existent-widget' );
-
-		$this->assertNull( $widget );
-	}
-
-	/**
 	 * Test add_page registers admin menu.
 	 *
 	 * @return void
@@ -185,7 +119,7 @@ class Admin_Page_Test extends \WP_UnitTestCase {
 		$activity->category = 'content';
 
 		// Set a cache value.
-		$cache_key = \progress_planner()->get_admin__widgets__activity_scores()->get_cache_key();
+		$cache_key = 'activities_weekly_post_record';
 		\progress_planner()->get_settings()->set( $cache_key, [ 'test' => 'data' ] );
 
 		// Clear cache.
@@ -210,7 +144,7 @@ class Admin_Page_Test extends \WP_UnitTestCase {
 		$activity->category = 'maintenance';
 
 		// Set a cache value.
-		$cache_key = \progress_planner()->get_admin__widgets__activity_scores()->get_cache_key();
+		$cache_key = 'activities_weekly_post_record';
 		\progress_planner()->get_settings()->set( $cache_key, [ 'test' => 'data' ] );
 
 		// Clear cache.
