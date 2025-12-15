@@ -124,7 +124,25 @@ class Task_Command extends \WP_CLI_Command {
 		}
 
 		$format = isset( $assoc_args['format'] ) ? $assoc_args['format'] : 'table';
-		\WP_CLI\Utils\format_items( $format, [ $task ], \array_keys( $task ) ); // @phpstan-ignore-line
+		$fields = [ 'task_id', 'provider_id', 'date', 'post_status' ];
+
+		$formatted = [];
+		foreach ( $fields as $field ) {
+			switch ( $field ) {
+				case 'task_id':
+				case 'date':
+				case 'post_status':
+					$formatted[ $field ] = $task->$field ?? '';
+					break;
+				case 'provider_id':
+					$formatted[ $field ] = \is_object( $task->provider ?? null ) && isset( $task->provider->name ) ? $task->provider->name : '';
+					break;
+				default:
+					$formatted[ $field ] = $task->$field ?? '';
+			}
+		}
+
+		\WP_CLI\Utils\format_items( $format, [ $formatted ], $fields ); // @phpstan-ignore-line
 	}
 
 	/**
