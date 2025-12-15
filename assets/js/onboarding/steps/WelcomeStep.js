@@ -25,13 +25,13 @@ class PrplWelcomeStep extends OnboardingStep {
 			return () => {};
 		}
 
-		// Initialize state
-		if ( ! state.data.privacyAccepted ) {
-			state.data.privacyAccepted = false;
+		// Initialize state from checkbox if not already set in saved state
+		if ( state.data.privacyAccepted === undefined ) {
+			state.data.privacyAccepted = checkbox.checked;
+		} else {
+			// Set checkbox state from wizard state
+			checkbox.checked = state.data.privacyAccepted;
 		}
-
-		// Set checkbox state from wizard state
-		checkbox.checked = state.data.privacyAccepted;
 
 		const handler = ( e ) => {
 			state.data.privacyAccepted = e.target.checked;
