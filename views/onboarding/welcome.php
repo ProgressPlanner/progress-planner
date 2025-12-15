@@ -33,29 +33,34 @@ if ( ! \defined( 'ABSPATH' ) ) {
 					</p>
 				</div>
 
-				<div class="prpl-privacy-checkbox-wrapper">
-						<?php
-							\progress_planner()->the_view(
-								'onboarding/form-inputs/checkbox.php',
-								[
-									'name'          => 'privacy_accepted',
-									'current_value' => 0,
-									'options'       => [
-										[
-											'id'    => 'prpl-privacy-checkbox',
-											'label' => \sprintf(
-												/* translators: %1$s: progressplanner.com/privacy-policy link, %2$s: required indicator */
-												\esc_html__( 'I accept the %1$s and the essential data processing needed for the plugin. %2$s', 'progress-planner' ),
-												'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">' . \esc_html__( 'privacy policy', 'progress-planner' ) . '</a>',
-												'<span class="prpl-required-indicator">' . \esc_html__( 'Required', 'progress-planner' ) . '</span>'
-											),
-											'value' => 1,
-										],
+				<?php
+					// Hide privacy checkbox if license already exists (e.g., branded/hosted sites).
+				if ( false === \progress_planner()->get_license_key() ) :
+					?>
+					<div class="prpl-privacy-checkbox-wrapper">
+					<?php
+						\progress_planner()->the_view(
+							'onboarding/form-inputs/checkbox.php',
+							[
+								'name'          => 'privacy_accepted',
+								'current_value' => 0,
+								'options'       => [
+									[
+										'id'    => 'prpl-privacy-checkbox',
+										'label' => \sprintf(
+											/* translators: %1$s: progressplanner.com/privacy-policy link, %2$s: required indicator */
+											\esc_html__( 'I accept the %1$s and the essential data processing needed for the plugin. %2$s', 'progress-planner' ),
+											'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">' . \esc_html__( 'privacy policy', 'progress-planner' ) . '</a>',
+											'<span class="prpl-required-indicator">' . \esc_html__( 'Required', 'progress-planner' ) . '</span>'
+										),
+										'value' => 1,
 									],
-								]
-							);
-							?>
+								],
+							]
+						);
+					?>
 					</div>
+					<?php endif; ?>
 
 				<div class="tour-footer">
 					<div class="prpl-tour-next-wrapper">

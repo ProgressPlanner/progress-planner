@@ -41,11 +41,14 @@ class Onboard_Wizard {
 			\add_action( 'init', [ $this, 'check_delete_onboarding_progress' ] );
 		}
 
-		// Skip for existing installs that never started the new onboarding.
-		// If privacy policy is already accepted but no onboarding progress exists,
-		// this is an existing install - don't show the new onboarding.
+		// Show onboarding when:
+		// 1. Privacy not yet accepted (new install, non-branded).
+		// 2. Onboarding already in progress.
+		// 3. Branded site (privacy auto-accepted, but still needs onboarding).
+		$is_branded = 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id();
 		if ( \progress_planner()->is_privacy_policy_accepted()
-			&& ! \get_option( 'prpl_onboard_progress', false ) ) {
+			&& ! \get_option( 'prpl_onboard_progress', false )
+			&& ! $is_branded ) {
 			return;
 		}
 
@@ -278,6 +281,7 @@ class Onboard_Wizard {
 					'savedProgress'        => $saved_progress,
 					'lastStepRedirectUrl'  => \esc_url_raw( admin_url( 'admin.php?page=progress-planner' ) ),
 					'fullscreenMode'       => true, // Enable fullscreen takeover mode.
+					'hasLicense'           => false !== \progress_planner()->get_license_key(),
 					'l10n'                 => [
 						'next'                  => \esc_html__( 'Next', 'progress-planner' ),
 						'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),
