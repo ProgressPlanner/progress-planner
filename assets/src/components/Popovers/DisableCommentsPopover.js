@@ -58,7 +58,7 @@ export default function DisableCommentsPopover( { task, onSubmit, onClose } ) {
 					await submitPluginSettings( {
 						setting: 'blog_public',
 						popoverId,
-						action: 'prpl_interactive_task_submit',
+						// action parameter is deprecated, REST API is used automatically
 						settingCallbackValue: () => '1',
 						value: '1',
 					} );

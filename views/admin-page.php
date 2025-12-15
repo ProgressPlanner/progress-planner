@@ -34,12 +34,8 @@ if ( 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id() ) {
 		?>
 		<div id="prpl-dashboard-root"></div>
 		<?php
-		// Render the subscribe form popover if the license key is not set.
-		// The popover needs to be rendered in PHP for nonces and other server-side data.
-		// It's referenced by the React DashboardHeader component.
-		if ( 'no-license' === \get_option( 'progress_planner_license_key', 'no-license' ) ) {
-			\progress_planner()->get_ui__popover()->the_popover( 'subscribe-form' )->render();
-		}
+		// Subscribe form popover is now handled by React via PopoverManager.
+		// The popover will be triggered via WordPress hooks when needed.
 		?>
 		<?php
 		// Enqueue widget styles (scripts are now handled by dashboard.js).

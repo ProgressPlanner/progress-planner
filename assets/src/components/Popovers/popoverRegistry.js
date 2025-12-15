@@ -17,6 +17,9 @@ import AIOSEOPopover from './AIOSEOPopover';
 import CustomPopover from './CustomPopover';
 import EmailSendingPopover from './EmailSendingPopover';
 import ImprovePdfHandlingPopover from './ImprovePdfHandlingPopover';
+import BadgeStreakPopover from './BadgeStreakPopover';
+import SubscribeFormPopover from './SubscribeFormPopover';
+import UpgradeTasksPopover from './UpgradeTasksPopover';
 
 /**
  * Registry mapping task IDs to popover components.
@@ -55,6 +58,9 @@ export const POPOVER_REGISTRY = {
 	'sending-email': EmailSendingPopover,
 	'fewer-tags': CustomPopover,
 	'seo-plugin': CustomPopover,
+	'badge-streak': BadgeStreakPopover,
+	'subscribe-form': SubscribeFormPopover,
+	'upgrade-tasks': UpgradeTasksPopover,
 };
 
 /**

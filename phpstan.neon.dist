@@ -31,9 +31,6 @@ parameters:
     - '#Call to an undefined method Progress_Planner\\Base\:\:get_[a-zA-Z0-9\\_]+\(\).#'
     - '#Cannot call method modify\(\) on DateTime\|false.#'
     - '#Cannot call method format\(\) on DateTime\|false.#'
-    -
-      identifier: variable.undefined
-      path: views/popovers/email-sending.php
     - identifier: property.nonObject
       paths:
         - classes/suggested-tasks/data-collector/class-yoast-orphaned-content.php

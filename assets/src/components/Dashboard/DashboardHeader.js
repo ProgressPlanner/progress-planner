@@ -161,14 +161,37 @@ export default function DashboardHeader( { config } ) {
 								e.target.style.backgroundColor = '#fff';
 							} }
 							onClick={ () => {
-								const popover = document.getElementById(
-									'prpl-popover-subscribe-form'
-								);
+								// Trigger React popover via WordPress hook.
 								if (
-									popover &&
-									typeof popover.showPopover === 'function'
+									typeof wp !== 'undefined' &&
+									wp.hooks &&
+									wp.hooks.doAction
 								) {
-									popover.showPopover();
+									const task = {
+										id: 'subscribe-form',
+										slug: 'subscribe-form',
+										title: __(
+											'Subscribe to weekly emails',
+											'progress-planner'
+										),
+									};
+									wp.hooks.doAction(
+										'prpl.popover.open',
+										'subscribe-form',
+										task
+									);
+								} else {
+									// Fallback: try to show popover if it exists in DOM.
+									const popover = document.getElementById(
+										'prpl-popover-subscribe-form'
+									);
+									if (
+										popover &&
+										typeof popover.showPopover ===
+											'function'
+									) {
+										popover.showPopover();
+									}
 								}
 							} }
 						>

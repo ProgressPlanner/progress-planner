@@ -258,24 +258,26 @@ export async function submitInteractiveTask( {
 	value,
 	settingPath = [],
 } ) {
-	const nonce = window.prplSuggestedTasksConfig?.nonce || '';
-	const ajaxUrl =
-		window.prplSuggestedTasksConfig?.ajaxUrl || '/wp-admin/admin-ajax.php';
-
-	const formData = new FormData();
-	formData.append( 'action', 'prpl_interactive_task_submit' );
-	formData.append( 'setting', setting );
-	formData.append( 'value', value );
-	formData.append( 'setting_path', JSON.stringify( settingPath ) );
-	formData.append( 'nonce', nonce );
-
 	try {
-		const response = await fetch( ajaxUrl, {
+		// Use REST API endpoint instead of AJAX.
+		// Convert settingPath to JSON string if it's an array
+		let settingPathValue = '';
+		if ( settingPath && Array.isArray( settingPath ) ) {
+			settingPathValue = JSON.stringify( settingPath );
+		} else if ( typeof settingPath === 'string' ) {
+			settingPathValue = settingPath;
+		}
+
+		const response = await apiFetch( {
+			path: '/progress-planner/v1/popover/submit',
 			method: 'POST',
-			body: formData,
-			credentials: 'same-origin',
+			data: {
+				setting,
+				value,
+				setting_path: settingPathValue,
+			},
 		} );
-		return response.json();
+		return response;
 	} catch ( error ) {
 		console.error( 'Error submitting interactive task:', error );
 		throw error;

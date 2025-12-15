@@ -26,7 +26,8 @@ abstract class Tasks_Interactive extends Tasks {
 	 */
 	public function __construct() {
 		// Popover rendering is now handled by React components.
-		// No need to register popover rendering hooks.
+		// Form submissions are now handled via REST API (class-popover-actions.php).
+		// AJAX handler kept for backward compatibility during migration.
 		\add_action( 'wp_ajax_prpl_interactive_task_submit', [ $this, 'handle_interactive_task_submit' ] );
 	}
 

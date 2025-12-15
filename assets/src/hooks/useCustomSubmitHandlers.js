@@ -142,15 +142,10 @@ export function useCustomSubmitHandlers( task ) {
 	/**
 	 * Handle custom submit for a task.
 	 *
-	 * @param {string} taskId    The task ID to handle.
-	 * @param {string} popoverId Optional popover ID (for backward compatibility, not used).
+	 * @param {string} taskId The task ID to handle.
 	 * @return {Promise<{success: boolean}>} Promise resolving to success response.
 	 */
-	return async ( taskId, popoverId ) => {
-		// popoverId is accepted for backward compatibility but not used
-		// eslint-disable-next-line no-unused-vars
-		const _ = popoverId;
-
+	return async ( taskId ) => {
 		if ( ! taskId ) {
 			// eslint-disable-next-line no-console
 			console.warn( 'useCustomSubmitHandlers: No taskId provided' );

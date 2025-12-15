@@ -24,6 +24,9 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Rest\Badge_Stats get_rest__badge_stats()
  * @method \Progress_Planner\Rest\Widgets\Whats_New get_rest__widgets__whats_new()
  * @method \Progress_Planner\Rest\Plugin_Installer get_rest__plugin_installer()
+ * @method \Progress_Planner\Rest\Popover_Actions get_rest__popover_actions()
+ * @method \Progress_Planner\Rest\Email_Test get_rest__email_test()
+ * @method \Progress_Planner\Rest\Subscribe get_rest__subscribe()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
  * @method \Progress_Planner\Utils\Playground get_utils__playground()
@@ -116,6 +119,9 @@ class Base {
 		$this->get_rest__plugin_installer();
 		$this->get_rest__activities();
 		$this->get_rest__badge_stats();
+		$this->get_rest__popover_actions();
+		$this->get_rest__email_test();
+		$this->get_rest__subscribe();
 
 		// Onboarding.
 		$this->get_utils__onboard();

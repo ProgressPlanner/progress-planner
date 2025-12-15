@@ -98,7 +98,8 @@ class Email_Sending extends Tasks_Interactive {
 		// Enqueue the scripts.
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 
-		// Add the AJAX action.
+		// Email testing is now handled via REST API (class-email-test.php).
+		// AJAX handler kept for backward compatibility during migration.
 		\add_action( 'wp_ajax_prpl_test_email_sending', [ $this, 'ajax_test_email_sending' ] );
 
 		// Set the email error message.
@@ -199,17 +200,20 @@ class Email_Sending extends Tasks_Interactive {
 			return;
 		}
 
-		// Enqueue the web component.
-		\progress_planner()->get_admin__enqueue()->enqueue_script(
-			'progress-planner/web-components/prpl-task-' . $this->get_provider_id(),
+		// Web component removed - now using React EmailSendingPopover.
+		// Localize data for React component instead.
+		// Note: Script handle must match the one used in class-page.php.
+		\wp_localize_script(
+			'progress-planner/dashboard',
+			'prplEmailSending',
 			[
-				'name' => 'prplEmailSending',
-				'data' => [
-					'ajax_url'                  => \admin_url( 'admin-ajax.php' ),
-					'nonce'                     => \wp_create_nonce( 'progress_planner' ),
-					'unknown_error'             => \esc_html__( 'Unknown error', 'progress-planner' ),
-					'troubleshooting_guide_url' => $this->get_troubleshooting_guide_url(),
-				],
+				'ajax_url'                  => \admin_url( 'admin-ajax.php' ),
+				'nonce'                     => \wp_create_nonce( 'progress_planner' ),
+				'unknown_error'             => \esc_html__( 'Unknown error', 'progress-planner' ),
+				'troubleshooting_guide_url' => $this->get_troubleshooting_guide_url(),
+				'email_subject'             => $this->email_subject,
+				'has_email_override'        => $this->is_there_sending_email_override(),
+				'default_email'             => \wp_get_current_user()->user_email,
 			]
 		);
 	}

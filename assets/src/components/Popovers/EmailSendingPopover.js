@@ -12,6 +12,7 @@
 
 import { useState, useCallback, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
 
 const STEP_FORM = 'form';
@@ -84,49 +85,39 @@ export default function EmailSendingPopover( { task, onSubmit, onClose } ) {
 		setEmailError( null );
 
 		try {
-			const ajaxUrl =
-				window.prplEmailSending?.ajax_url ||
-				window.prplSuggestedTasksConfig?.ajaxUrl ||
-				window.progressPlanner?.ajaxUrl ||
-				'/wp-admin/admin-ajax.php';
-			const nonce =
-				window.prplEmailSending?.nonce ||
-				window.prplSuggestedTasksConfig?.nonce ||
-				window.progressPlanner?.nonce ||
-				'';
+			const taskId = task.slug || task.id || 'sending-email';
 
-			const formData = new FormData();
-			formData.append( 'action', 'prpl_test_email_sending' );
-			formData.append( 'email_address', emailAddress );
-			formData.append( '_wpnonce', nonce );
-
-			const response = await fetch( ajaxUrl, {
+			// Use REST API instead of AJAX
+			const response = await apiFetch( {
+				path: '/progress-planner/v1/popover/test-email',
 				method: 'POST',
-				body: formData,
-				credentials: 'same-origin',
+				data: {
+					email_address: emailAddress,
+					task_id: taskId,
+				},
 			} );
 
-			const data = await response.json();
-
-			if ( data.success ) {
+			if ( response.success ) {
 				setCurrentStep( STEP_RESULT );
 			} else {
 				setEmailError(
-					data.data?.message ||
-						data.data ||
+					response.message ||
 						__( 'Unknown error', 'progress-planner' )
 				);
 				setCurrentStep( STEP_ERROR );
 			}
 		} catch ( err ) {
-			setEmailError(
-				err.message || __( 'Unknown error', 'progress-planner' )
-			);
+			// Handle WP_Error from REST API
+			const errorMessage =
+				err?.message ||
+				err?.data?.message ||
+				__( 'Unknown error', 'progress-planner' );
+			setEmailError( errorMessage );
 			setCurrentStep( STEP_ERROR );
 		} finally {
 			setIsSending( false );
 		}
-	}, [ emailAddress ] );
+	}, [ emailAddress, task ] );
 
 	/**
 	 * Handle form submission.
