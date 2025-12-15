@@ -57,7 +57,7 @@ class Lessons {
 		$url = \add_query_arg(
 			[
 				'site'        => \get_site_url(),
-				'license_key' => \get_option( 'progress_planner_license_key' ),
+				'license_key' => \progress_planner()->get_license_key(),
 			],
 			$url
 		);
