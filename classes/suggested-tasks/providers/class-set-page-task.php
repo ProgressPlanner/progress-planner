@@ -24,7 +24,7 @@ abstract class Set_Page_Task extends Tasks_Interactive {
 	 *
 	 * @var int
 	 */
-	protected $priority = 3;
+	protected $priority = 10;
 
 	/**
 	 * Whether the generic script has been enqueued.

@@ -48,21 +48,11 @@ class Set_Valuable_Post_Types extends Tasks_Interactive {
 	protected $priority = 70;
 
 	/**
-	 * Get the task URL.
-	 *
-	 * @return string
-	 */
-	protected function get_url() {
-		return \admin_url( 'admin.php?page=progress-planner-settings' );
-	}
-
-	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
 	 */
 	public function init() {
-		\add_action( 'progress_planner_settings_form_options_stored', [ $this, 'remove_upgrade_option' ] );
 		\add_action( 'wp_ajax_prpl_interactive_task_submit_set-valuable-post-types', [ $this, 'handle_interactive_task_specific_submit' ] );
 
 		// On late init hook we need to check if the public post types are changed.
@@ -116,17 +106,6 @@ class Set_Valuable_Post_Types extends Tasks_Interactive {
 
 		// If we're here then we need to add it.
 		\progress_planner()->get_suggested_tasks_db()->add( $this->modify_injection_task_data( $this->get_task_details() ) );
-	}
-
-	/**
-	 * Remove the upgrade option.
-	 *
-	 * @return void
-	 */
-	public function remove_upgrade_option() {
-		if ( true === (bool) \get_option( 'progress_planner_set_valuable_post_types', false ) ) {
-			\delete_option( 'progress_planner_set_valuable_post_types' );
-		}
 	}
 
 	/**

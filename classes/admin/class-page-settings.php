@@ -15,42 +15,6 @@ use Progress_Planner\Page_Types;
 class Page_Settings {
 
 	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		// Add the admin menu page.
-		\add_action( 'admin_menu', [ $this, 'add_admin_menu_page' ] );
-
-		// Add AJAX hooks to save options.
-		\add_action( 'wp_ajax_prpl_settings_form', [ $this, 'store_settings_form_options' ] );
-	}
-
-	/**
-	 * Add admin-menu page, as a submenu in the progress-planner menu.
-	 *
-	 * @return void
-	 */
-	public function add_admin_menu_page() {
-		\add_submenu_page(
-			'progress-planner',
-			\esc_html__( 'Settings', 'progress-planner' ),
-			\esc_html__( 'Settings', 'progress-planner' ),
-			'manage_options',
-			'progress-planner-settings',
-			[ $this, 'add_admin_page_content' ]
-		);
-	}
-
-	/**
-	 * Add content to the admin page of the free plugin.
-	 *
-	 * @return void
-	 */
-	public function add_admin_page_content() {
-		require_once PROGRESS_PLANNER_DIR . '/views/admin-page-settings.php';
-	}
-
-	/**
 	 * Get an array of settings.
 	 *
 	 * @return array
@@ -121,44 +85,6 @@ class Page_Settings {
 		}
 
 		return true;
-	}
-
-	/**
-	 * Store the settings form options.
-	 *
-	 * @return void
-	 */
-	public function store_settings_form_options() {
-
-		if ( ! \current_user_can( 'manage_options' ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
-		}
-
-		// Use check_ajax_referer instead of check_admin_referer for AJAX handlers.
-		// check_admin_referer is designed for form submissions, not AJAX requests.
-		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
-		}
-
-		if ( isset( $_POST['pages'] ) ) {
-			// Sanitize the pages array at point of reception.
-			$pages = \map_deep( \wp_unslash( $_POST['pages'] ), 'sanitize_text_field' ); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-
-			$this->set_page_values( $pages );
-		}
-
-		// It's possible that none of the post types are selected, so we need to handle that case.
-		$post_types = isset( $_POST['prpl-post-types-include'] )
-		? \array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
-		: [];
-
-		$this->save_post_types( $post_types );
-
-		$this->save_settings();
-
-		\do_action( 'progress_planner_settings_form_options_stored' );
-
-		\wp_send_json_success( \esc_html__( 'Options stored successfully', 'progress-planner' ) );
 	}
 
 	/**

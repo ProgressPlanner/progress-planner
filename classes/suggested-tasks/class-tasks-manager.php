@@ -11,7 +11,6 @@ use Progress_Planner\Suggested_Tasks\Providers\Core_Update;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Create;
 use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
 use Progress_Planner\Suggested_Tasks\Providers\Blog_Description;
-use Progress_Planner\Suggested_Tasks\Providers\Settings_Saved;
 use Progress_Planner\Suggested_Tasks\Providers\Debug_Display;
 use Progress_Planner\Suggested_Tasks\Providers\Disable_Comments;
 use Progress_Planner\Suggested_Tasks\Providers\Disable_Comment_Pagination;
@@ -66,7 +65,6 @@ class Tasks_Manager {
 			new Content_Review(),
 			new Core_Update(),
 			new Blog_Description(),
-			new Settings_Saved(),
 			new Debug_Display(),
 			new Disable_Comments(),
 			new Disable_Comment_Pagination(),
