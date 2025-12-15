@@ -157,7 +157,7 @@ class Page {
 	 */
 	public function enqueue_assets( $hook ) {
 		$this->maybe_enqueue_focus_el_script( $hook );
-		if ( 'toplevel_page_progress-planner' !== $hook && 'progress-planner_page_progress-planner-settings' !== $hook ) {
+		if ( 'toplevel_page_progress-planner' !== $hook ) {
 			return;
 		}
 
@@ -201,20 +201,6 @@ class Page {
 			} else {
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboard', $default_localization_data );
 			}
-
-			\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
-		}
-
-		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
-			\progress_planner()->get_admin__enqueue()->enqueue_script(
-				'settings-page',
-				[
-					'name' => 'progressPlannerSettingsPage',
-					'data' => [
-						'siteUrl' => \get_site_url(),
-					],
-				]
-			);
 
 			\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
 		}
@@ -305,10 +291,6 @@ class Page {
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-tooltip' );
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-install-plugin' );
 
-		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
-			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/settings-page' );
-		}
-
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
 			// Enqueue ugprading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
 			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
@@ -329,7 +311,6 @@ class Page {
 			$current_screen->id,
 			[
 				'toplevel_page_progress-planner',
-				'progress-planner_page_progress-planner-settings',
 			],
 			true
 		) ) {

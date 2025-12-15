@@ -87,31 +87,6 @@ class Onboard_Wizard {
 
 		// Allow only images for the front-end upload.
 		\add_filter( 'rest_pre_insert_attachment', [ $this, 'rest_pre_insert_attachment' ], 10, 2 );
-
-		// Check if we're on the onboarding page (always load scripts there).
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
-		$is_onboarding_page = isset( $_GET['page'] ) && self::PAGE_SLUG === $_GET['page'];
-
-		// If onboarding is finished and we're not on the onboarding page, skip loading popover.
-		if ( $this->is_onboarding_finished() && ! $is_onboarding_page ) {
-			return;
-		}
-
-		// Add popover on front end.
-		\add_action( 'wp_footer', [ $this, 'add_popover' ] );
-		\add_action( 'wp_footer', [ $this, 'add_popover_step_templates' ] );
-		\add_action( 'wp_enqueue_scripts', [ $this, 'add_popover_scripts' ] );
-
-		// Add popover on admin.
-		\add_action( 'admin_footer', [ $this, 'add_popover' ] );
-		\add_action( 'admin_footer', [ $this, 'add_popover_step_templates' ] );
-		\add_action( 'admin_enqueue_scripts', [ $this, 'add_popover_scripts' ] );
-
-		// Maybe show user notification that tour is not finished.
-		/* \add_action( 'admin_notices', [ $this, 'maybe_show_user_notification' ] ); */
-
-		// Maybe clean up the onboarding progress. -- TODO: When to cleanup the onboarding progress?
-		/* \add_action( 'current_screen', [ $this, 'maybe_clean_up_onboarding_progress' ] ); */
 	}
 
 	/**
@@ -268,50 +243,6 @@ class Onboard_Wizard {
 		}
 
 		return $attachment;
-	}
-
-	/**
-	 * Maybe show user notification that tour is not finished.
-	 *
-	 * @return void
-	 */
-	public function maybe_show_user_notification() {
-		if ( ! \current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		if ( $this->is_onboarding_finished() ) {
-			return;
-		}
-
-		$screen = \get_current_screen();
-
-		if ( ! $screen ) {
-			return;
-		}
-
-		// If the user is on the Progress Planner dashboard or onboarding page, do not display the notification.
-		if ( 'toplevel_page_progress-planner' === $screen->id || 'settings_page_' . self::PAGE_SLUG === $screen->id ) {
-			return;
-		}
-
-		?>
-		<div class="notice notice-success is-dismissible">
-			<p>
-			<?php
-				printf(
-					/* Translators: %1$s: Opening the anchor tag. %2$s: Closing the anchor tag. */
-					\esc_html__( 'You haven\'t completed the onboarding yet. %1$s Complete the setup wizard %2$s to get started.', 'progress-planner' ),
-					'<a href="' . \esc_url( self::get_onboarding_page_url() ) . '">',
-					'</a>'
-				);
-			?>
-			</p>
-		</div>
-		<?php
-
-		// TODO: Clean up the onboarding progress.
-		$this->delete_onboarding_progress();
 	}
 
 	/**

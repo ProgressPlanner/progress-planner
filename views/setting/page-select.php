@@ -9,13 +9,12 @@
 if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
-
 $prpl_setting_value = isset( $prpl_setting['value'] ) ? $prpl_setting['value'] : '';
+$prpl_context       = isset( $context ) ? $context : '';
 
 // Default value for the radio button.
 $prpl_radio_value = '_no_page_needed' === $prpl_setting_value ? 'not-applicable' : 'no';
 $prpl_radio_value = \is_numeric( $prpl_setting_value ) && 0 < $prpl_setting_value ? 'yes' : $prpl_radio_value;
-
 ?>
 <div
 	class="prpl-pages-item prpl-pages-item-<?php echo \esc_attr( $prpl_setting['page'] ); ?>"
@@ -79,8 +78,8 @@ $prpl_radio_value = \is_numeric( $prpl_setting_value ) && 0 < $prpl_setting_valu
 						<?php if ( 'no' === $prpl_r_value ) : ?>
 							<div data-action="create">
 								<a
-									target="_blank"
-									class="prpl-button"
+									target="<?php echo ( 'popovers' === $prpl_context ) ? '_self' : '_blank'; ?>"
+									class="prpl-button-link"
 									href="<?php echo \esc_url( \admin_url( 'post-new.php?post_type=page&prpl_page_type=' . \esc_attr( $prpl_setting['page'] ) ) ); ?>"
 								>
 									<?php \esc_html_e( 'Create this page', 'progress-planner' ); ?>
