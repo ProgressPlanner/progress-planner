@@ -12,6 +12,31 @@ import DashboardWidgets from './DashboardWidgets';
 import Welcome from './Welcome';
 
 /**
+ * Style constants - extracted to prevent recreation on each render.
+ */
+const STYLES = {
+	skipLink: {
+		position: 'absolute',
+		top: '-40px',
+		left: 0,
+		background: 'var(--prpl-color-button-primary)',
+		color: 'var(--prpl-color-button-primary-text)',
+		padding: '8px 16px',
+		textDecoration: 'none',
+		borderRadius: 'var(--prpl-border-radius)',
+		zIndex: 100000,
+	},
+	widgetsContainer: {
+		display: 'grid',
+		gridTemplateColumns:
+			'repeat(auto-fit, minmax(var(--prpl-column-min-width), 1fr))',
+		columnGap: 'var(--prpl-gap)',
+		gridAutoRows: 'var(--prpl-gap)',
+		gridAutoFlow: 'dense',
+	},
+};
+
+/**
  * Dashboard component.
  *
  * @param {Object} props        - Component props.
@@ -32,17 +57,7 @@ export default function Dashboard( { config } ) {
 			<a
 				href="#prpl-main-content"
 				className="screen-reader-text prpl-skip-link"
-				style={ {
-					position: 'absolute',
-					top: '-40px',
-					left: 0,
-					background: 'var(--prpl-color-button-primary)',
-					color: 'var(--prpl-color-button-primary-text)',
-					padding: '8px 16px',
-					textDecoration: 'none',
-					borderRadius: 'var(--prpl-border-radius)',
-					zIndex: 100000,
-				} }
+				style={ STYLES.skipLink }
 				onFocus={ ( e ) => {
 					e.target.style.top = '10px';
 					e.target.style.left = '10px';
@@ -61,14 +76,7 @@ export default function Dashboard( { config } ) {
 			<div
 				id="prpl-main-content"
 				className="prpl-widgets-container"
-				style={ {
-					display: 'grid',
-					gridTemplateColumns:
-						'repeat(auto-fit, minmax(var(--prpl-column-min-width), 1fr))',
-					columnGap: 'var(--prpl-gap)',
-					gridAutoRows: 'var(--prpl-gap)',
-					gridAutoFlow: 'dense',
-				} }
+				style={ STYLES.widgetsContainer }
 			>
 				<DashboardWidgets />
 			</div>
