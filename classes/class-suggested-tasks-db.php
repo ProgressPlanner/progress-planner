@@ -24,11 +24,40 @@ class Suggested_Tasks_DB {
 	const GET_TASKS_CACHE_GROUP = 'progress_planner_get_tasks';
 
 	/**
-	 * Add a recommendation.
+	 * Add a recommendation (suggested task).
 	 *
-	 * @param array $data The data to add.
+	 * Creates a new task post with proper locking to prevent race conditions when
+	 * multiple processes try to create the same task simultaneously.
 	 *
-	 * @return int
+	 * Locking mechanism:
+	 * - Uses WordPress options table as a distributed lock via add_option()
+	 * - add_option() is atomic: returns false if the option already exists
+	 * - Lock key format: "prpl_task_lock_{task_id}"
+	 * - Lock value: Current Unix timestamp (for staleness detection)
+	 * - Stale lock timeout: 30 seconds (prevents deadlocks from crashed processes)
+	 * - Lock is always released in finally block (even if insertion fails)
+	 *
+	 * This ensures only one process can create a specific task at a time,
+	 * preventing duplicate task creation in concurrent scenarios like:
+	 * - Multiple cron jobs running simultaneously
+	 * - AJAX requests firing in parallel
+	 * - Plugin activation on multisite networks
+	 *
+	 * @param array $data {
+	 *     The task data to add.
+	 *
+	 *     @type string $task_id      Required. The unique task ID (e.g., "update-core").
+	 *     @type string $post_title   Required. The task title shown to users.
+	 *     @type string $provider_id  Required. The provider ID (e.g., "update-core").
+	 *     @type string $description  Optional. The task description/content.
+	 *     @type int    $priority     Optional. Display priority (lower = higher priority).
+	 *     @type int    $order        Optional. Menu order (defaults to priority if not set).
+	 *     @type int    $parent       Optional. Parent task ID for hierarchical tasks.
+	 *     @type string $post_status  Optional. Task status: 'publish', 'pending', 'completed', 'trash', 'snoozed'.
+	 *     @type int    $time         Optional. Unix timestamp for snoozed tasks (when to show again).
+	 * }
+	 *
+	 * @return int The created post ID, or 0 if creation failed or task already exists.
 	 */
 	public function add( $data ) {
 		if ( empty( $data['post_title'] ) ) {
@@ -36,37 +65,51 @@ class Suggested_Tasks_DB {
 			return 0;
 		}
 
+		// Acquire a distributed lock to prevent race conditions during task creation.
 		$lock_key   = 'prpl_task_lock_' . $data['task_id'];
 		$lock_value = \time();
 
-		// add_option will return false if the option is already there.
+		// Try to create the lock atomically using add_option().
+		// This returns false if the option already exists, indicating another process holds the lock.
 		if ( ! \add_option( $lock_key, $lock_value, '', false ) ) {
 			$current = \get_option( $lock_key );
 
-			// If lock is stale (older than 30s), take over.
+			// Check if the lock is stale (older than 30 seconds).
+			// This prevents deadlocks if a process crashes while holding the lock.
 			if ( $current && ( $current < \time() - 30 ) ) {
 				\update_option( $lock_key, $lock_value );
 			} else {
-				return 0; // Other process is using it.
+				// Lock is held by another active process, abort to avoid duplicates.
+				return 0;
 			}
 		}
 
-		// Check if we have an existing task with the same title.
+		// Check if we have an existing task with the same ID.
+		// Search across all post statuses since WordPress 'any' excludes trash and pending.
 		$posts = $this->get_tasks_by(
 			[
-				'post_status' => [ 'publish', 'trash', 'draft', 'future', 'pending' ], // 'any' doesn't include statuses which have 'exclude_from_search' set to true (trash and pending).
+				'post_status' => [ 'publish', 'trash', 'draft', 'future', 'pending' ],
 				'numberposts' => 1,
-				'meta_query'  => [ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
-					[
-						'key'     => 'prpl_task_id',
-						'value'   => $data['task_id'],
-						'compare' => '=',
-					],
-				],
+				'name'        => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['task_id'] ),
 			]
 		);
 
-		// If we have an existing task, skip.
+		// Also check for trashed tasks with the "__trashed" suffix.
+		// This suffix is appended when tasks are permanently removed to preserve history.
+		$posts_trashed = $this->get_tasks_by(
+			[
+				'post_status' => [ 'trash' ],
+				'numberposts' => 1,
+				'name'        => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['task_id'] ) . '__trashed',
+			]
+		);
+
+		// If no active task exists but a trashed one does, use the trashed one.
+		if ( empty( $posts ) && ! empty( $posts_trashed ) ) {
+			$posts = $posts_trashed;
+		}
+
+		// If task already exists (in any status), return its ID without creating a duplicate.
 		if ( ! empty( $posts ) ) {
 			\delete_option( $lock_key );
 			return $posts[0]->ID;
@@ -83,6 +126,7 @@ class Suggested_Tasks_DB {
 			'post_title'   => $data['post_title'],
 			'post_content' => $data['description'] ?? '',
 			'menu_order'   => $data['order'] ?? 0,
+			'post_name'    => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['task_id'] ),
 		];
 		switch ( $data['post_status'] ) {
 			case 'pending':
@@ -107,17 +151,11 @@ class Suggested_Tasks_DB {
 		try {
 			$post_id = \wp_insert_post( $args );
 
-			// Add terms if they don't exist.
-			foreach ( [ 'category', 'provider_id' ] as $context ) {
-				$taxonomy_name = \str_replace( '_id', '', $context );
-				$term          = \get_term_by( 'name', $data[ $context ], "prpl_recommendations_$taxonomy_name" );
-				if ( ! $term ) {
-					\wp_insert_term( $data[ $context ], "prpl_recommendations_$taxonomy_name" );
-				}
+			// Add provider term if it doesn't exist.
+			$term = \get_term_by( 'name', $data['provider_id'], 'prpl_recommendations_provider' );
+			if ( ! $term ) {
+				\wp_insert_term( $data['provider_id'], 'prpl_recommendations_provider' );
 			}
-
-			// Set the task category.
-			\wp_set_post_terms( $post_id, $data['category'], 'prpl_recommendations_category' );
 
 			// Set the task provider.
 			\wp_set_post_terms( $post_id, $data['provider_id'], 'prpl_recommendations_provider' );
@@ -140,7 +178,6 @@ class Suggested_Tasks_DB {
 				'title',
 				'description',
 				'status',
-				'category',
 				'provider_id',
 				'parent',
 				'order',
@@ -154,7 +191,8 @@ class Suggested_Tasks_DB {
 				\update_post_meta( $post_id, "prpl_$key", $value );
 			}
 		} finally {
-			// Delete the lock. This executes always.
+			// Always release the lock, even if an exception occurred during post creation.
+			// This ensures the lock doesn't remain indefinitely and block future attempts.
 			\delete_option( $lock_key );
 		}
 
@@ -179,9 +217,8 @@ class Suggested_Tasks_DB {
 		$update_results = [];
 		foreach ( $data as $key => $value ) {
 			switch ( $key ) {
-				case 'category':
 				case 'provider':
-					$update_terms[ "prpl_recommendations_$key" ] = $value;
+					$update_terms['prpl_recommendations_provider'] = $value;
 					break;
 
 				default:
@@ -271,10 +308,9 @@ class Suggested_Tasks_DB {
 					: $value;
 		}
 
-		foreach ( [ 'category', 'provider' ] as $context ) {
-			$terms                 = \wp_get_post_terms( $post_data['ID'], "prpl_recommendations_$context" );
-			$post_data[ $context ] = \is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
-		}
+		// Get provider taxonomy term.
+		$terms                 = \wp_get_post_terms( $post_data['ID'], 'prpl_recommendations_provider' );
+		$post_data['provider'] = \is_array( $terms ) && isset( $terms[0] ) ? $terms[0] : null;
 
 		$cached[ $post_data['ID'] ] = new Task( $post_data );
 		return $cached[ $post_data['ID'] ];
@@ -311,12 +347,9 @@ class Suggested_Tasks_DB {
 			switch ( $param ) {
 				case 'provider':
 				case 'provider_id':
-				case 'category':
 					$args['tax_query']   = isset( $args['tax_query'] ) ? $args['tax_query'] : []; // phpcs:ignore WordPress.DB.SlowDBQuery
 					$args['tax_query'][] = [
-						'taxonomy' => 'category' === $param
-							? 'prpl_recommendations_category'
-							: 'prpl_recommendations_provider',
+						'taxonomy' => 'prpl_recommendations_provider',
 						'field'    => 'slug',
 						'terms'    => (array) $value,
 					];
@@ -325,12 +358,7 @@ class Suggested_Tasks_DB {
 					break;
 
 				case 'task_id':
-					$args['meta_query']   = isset( $args['meta_query'] ) ? $args['meta_query'] : []; // phpcs:ignore WordPress.DB.SlowDBQuery
-					$args['meta_query'][] = [
-						'key'   => 'prpl_task_id',
-						'value' => $value,
-					];
-
+					$args['name'] = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $value );
 					unset( $params[ $param ] );
 					break;
 
@@ -371,6 +399,23 @@ class Suggested_Tasks_DB {
 		$results = $this->format_recommendations(
 			\get_posts( $args )
 		);
+		if ( ! empty( $args['post_status'] )
+			&& \in_array( 'trash', (array) $args['post_status'], true )
+			&& isset( $args['name'] )
+		) {
+			$results_trashed = $this->format_recommendations(
+				\get_posts(
+					\wp_parse_args(
+						$args,
+						[
+							'post_status' => [ 'trash' ],
+							'name'        => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $args['name'] ) . '__trashed',
+						]
+					)
+				)
+			);
+			$results         = \array_merge( $results, $results_trashed );
+		}
 
 		\wp_cache_set( $cache_key, $results, static::GET_TASKS_CACHE_GROUP );
 

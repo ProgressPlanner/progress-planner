@@ -8,11 +8,14 @@
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
 use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author;
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder;
 
 /**
  * Add task for Yoast SEO: disable the author archive.
  */
-class Archive_Author extends Yoast_Provider {
+class Archive_Author extends Yoast_Interactive_Provider {
+
+	use Task_Action_Builder;
 
 	/**
 	 * The minimum number of posts with a post format to add the task.
@@ -27,6 +30,13 @@ class Archive_Author extends Yoast_Provider {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'yoast-author-archive';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'yoast-author-archive';
 
 	/**
 	 * The data collector class name.
@@ -102,6 +112,26 @@ class Archive_Author extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'When your site has only one author, the author archive is redundant and creates duplicate content issues. Disabling it prevents search engines from indexing the same content multiple times.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		$this->print_submit_button( \__( 'Disable', 'progress-planner' ) );
+	}
+
+	/**
 	 * Add task actions specific to this task.
 	 *
 	 * @param array $data    The task data.
@@ -110,11 +140,6 @@ class Archive_Author extends Yoast_Provider {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
-			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/author-archives' ) . '" target="_self">' . \esc_html__( 'Disable', 'progress-planner' ) . '</a>',
-		];
-
-		return $actions;
+		return $this->add_popover_action( $actions, \__( 'Disable', 'progress-planner' ) );
 	}
 }

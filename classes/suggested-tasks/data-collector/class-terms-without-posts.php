@@ -85,35 +85,8 @@ class Terms_Without_Posts extends Base_Data_Collector {
 	protected function calculate_data() {
 		global $wpdb;
 
-		// Get registered and public taxonomies.
-		/**
-		 * Array of public taxonomy names where both keys and values are taxonomy names.
-		 *
-		 * @var array<string, string> $public_taxonomies
-		 */
-		$public_taxonomies = \get_taxonomies( [ 'public' => true ], 'names' );
-
-		/**
-		 * Array of public taxonomies to exclude from the terms without posts query.
-		 *
-		 * @var array<string> $exclude_public_taxonomies
-		 */
-		$exclude_public_taxonomies = \apply_filters(
-			'progress_planner_exclude_public_taxonomies',
-			[
-				'post_format',
-				'product_shipping_class',
-				'prpl_recommendations_category',
-				'prpl_recommendations_provider',
-				'gblocks_pattern_collections',
-			]
-		);
-
-		foreach ( $exclude_public_taxonomies as $taxonomy ) {
-			if ( isset( $public_taxonomies[ $taxonomy ] ) ) {
-				unset( $public_taxonomies[ $taxonomy ] );
-			}
-		}
+		// Get registered and public taxonomies with exclusions applied.
+		$public_taxonomies = $this->get_filtered_public_taxonomies();
 
 		/**
 		 * Array of term IDs to exclude from the terms without description query.

@@ -7,9 +7,9 @@
  * Plugin name:       Progress Planner
  * Plugin URI:        https://prpl.fyi/home
  * Description:       A plugin to help you fight procrastination and get things done.
- * Requires at least: 6.6
+ * Requires at least: 6.7
  * Requires PHP:      7.4
- * Version:           1.8.1
+ * Version:           1.9.0
  * Author:            Team Emilia Projects
  * Author URI:        https://prpl.fyi/about
  * License:           GPL-3.0+

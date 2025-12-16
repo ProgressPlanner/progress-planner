@@ -55,6 +55,13 @@ class Select_Locale extends Tasks_Interactive {
 	protected $is_dismissable = true;
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 8;
+
+	/**
 	 * Initialize the task.
 	 *
 	 * @return void
@@ -198,7 +205,8 @@ class Select_Locale extends Tasks_Interactive {
 	public function print_popover_form_contents() {
 
 		if ( ! \function_exists( 'wp_get_available_translations' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/translation-install.php'; // @phpstan-ignore requireOnce.fileNotFound
+			// @phpstan-ignore-next-line requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
 		}
 
 		$languages    = \get_available_languages();
@@ -218,11 +226,8 @@ class Select_Locale extends Tasks_Interactive {
 				'show_available_translations' => \current_user_can( 'install_languages' ) && \wp_can_install_language_pack(),
 			]
 		);
-		?>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Select locale', 'progress-planner' ); ?>
-		</button>
-		<?php
+
+		$this->print_submit_button( \__( 'Select locale', 'progress-planner' ), 'prpl-steps-nav-wrapper-align-left' );
 	}
 
 	/**
@@ -264,26 +269,13 @@ class Select_Locale extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing setting path.', 'progress-planner' ) ] );
 		}
 
-		$option_updated      = false;
 		$language_for_update = \sanitize_text_field( \wp_unslash( $_POST['value'] ) );
 
 		if ( empty( $language_for_update ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid language.', 'progress-planner' ) ] );
 		}
 
-		// Handle translation installation.
-		if ( \current_user_can( 'install_languages' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/translation-install.php'; // @phpstan-ignore requireOnce.fileNotFound
-
-			if ( \wp_can_install_language_pack() ) {
-				$language = \wp_download_language_pack( $language_for_update );
-				if ( $language ) {
-					$language_for_update = $language;
-
-					$option_updated = \update_option( 'WPLANG', $language_for_update );
-				}
-			}
-		}
+		$option_updated = $this->update_language( $language_for_update );
 
 		if ( $option_updated ) {
 			\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
@@ -303,9 +295,68 @@ class Select_Locale extends Tasks_Interactive {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Select locale', 'progress-planner' ) . '</a>',
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html( $this->get_task_action_label() ) . '</a>',
 		];
 
 		return $actions;
+	}
+
+	/**
+	 * Get the task action label.
+	 *
+	 * @return string
+	 */
+	public function get_task_action_label() {
+		return \__( 'Select locale', 'progress-planner' );
+	}
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function complete_task( $args = [], $task_id = '' ) {
+
+		if ( ! $this->capability_required() ) {
+			return false;
+		}
+
+		if ( ! isset( $args['language'] ) ) {
+			return false;
+		}
+
+		return $this->update_language( \sanitize_text_field( \wp_unslash( $args['language'] ) ) );
+	}
+
+	/**
+	 * Update the language.
+	 *
+	 * @param string $language_for_update The language to update.
+	 *
+	 * @return bool
+	 */
+	protected function update_language( $language_for_update ) {
+		// Handle translation installation.
+		if ( \current_user_can( 'install_languages' ) ) {
+			// @phpstan-ignore-next-line requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
+
+			if ( \wp_can_install_language_pack() ) {
+				$language = \wp_download_language_pack( $language_for_update );
+				if ( $language ) {
+					$language_for_update = $language;
+
+					// update_option will return false if the option value is the same as the one being set.
+					\update_option( 'WPLANG', $language_for_update );
+
+					return true;
+				}
+			}
+		}
+
+		return false;
 	}
 }

@@ -298,16 +298,19 @@ class Page_Types {
 	public function get_default_page_id_by_type( $page_type ) {
 		$homepage_id = \get_option( 'page_on_front' ) ?? 0;
 
-		// Early return for the homepage.
+		// Early return for the homepage (no searching needed).
 		if ( 'homepage' === $page_type ) {
 			return $homepage_id;
 		}
 
+		// Build candidate pages for each page type by searching titles.
+		// Keys are page types, values are arrays of matching page IDs.
 		$types_pages = [
 			'homepage' => [ $homepage_id ],
 			'contact'  => $this->get_posts_by_title( \__( 'Contact', 'progress-planner' ) ),
 			'about'    => $this->get_posts_by_title( \__( 'About', 'progress-planner' ) ),
 			'faq'      => \array_merge(
+				// FAQ can match either short form or long form.
 				$this->get_posts_by_title( \__( 'FAQ', 'progress-planner' ) ),
 				$this->get_posts_by_title( \__( 'Frequently Asked Questions', 'progress-planner' ) ),
 			),
@@ -315,29 +318,34 @@ class Page_Types {
 
 		$defined_page_types = \array_keys( $types_pages );
 
-		// If the page type is not among defined page types, return 0.
+		// Validate that the requested page type exists in our definitions.
 		if ( ! \in_array( $page_type, $defined_page_types, true ) ) {
 			return 0;
 		}
 
-		// Get the posts for the page-type.
+		// Get candidate pages for the requested page type.
 		$posts = $types_pages[ $page_type ];
 
-		// If we have no posts, return 0.
+		// No candidates found for this page type.
 		if ( empty( $posts ) ) {
 			return 0;
 		}
 
-		// Exclude the homepage and any pages that are already assigned to another page-type.
+		// Apply exclusion logic: Remove pages that are already assigned to OTHER page types.
+		// This ensures each page is only assigned to one page type, preventing conflicts.
+		// Example: If page ID 5 matches both "About" and "Contact", only the first checked type claims it.
 		foreach ( $defined_page_types as $defined_page_type ) {
-			// Skip the current page-type.
+			// Skip the current page-type (we don't want to exclude our own candidates).
 			if ( $page_type === $defined_page_type ) {
 				continue;
 			}
 
+			// Remove any page IDs that belong to other page types.
+			// array_diff removes values from $posts that exist in $types_pages[$defined_page_type].
 			$posts = \array_diff( $posts, $types_pages[ $defined_page_type ] );
 		}
 
+		// Return the first remaining candidate, or 0 if all were excluded.
 		return empty( $posts ) ? 0 : $posts[0];
 	}
 

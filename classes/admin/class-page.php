@@ -157,7 +157,7 @@ class Page {
 	 */
 	public function enqueue_assets( $hook ) {
 		$this->maybe_enqueue_focus_el_script( $hook );
-		if ( 'toplevel_page_progress-planner' !== $hook && 'progress-planner_page_progress-planner-settings' !== $hook ) {
+		if ( 'toplevel_page_progress-planner' !== $hook ) {
 			return;
 		}
 
@@ -180,8 +180,8 @@ class Page {
 			$default_localization_data = [
 				'name' => 'progressPlanner',
 				'data' => [
-					'onboardNonceURL' => \progress_planner()->get_utils__onboard()->get_remote_nonce_url(),
-					'onboardAPIUrl'   => \progress_planner()->get_utils__onboard()->get_remote_url(),
+					'onboardNonceURL' => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
+					'onboardAPIUrl'   => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
 					'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
 					'nonce'           => \wp_create_nonce( 'progress_planner' ),
 				],
@@ -204,20 +204,6 @@ class Page {
 
 			\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
 		}
-
-		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
-			\progress_planner()->get_admin__enqueue()->enqueue_script(
-				'settings-page',
-				[
-					'name' => 'progressPlannerSettingsPage',
-					'data' => [
-						'siteUrl' => \get_site_url(),
-					],
-				]
-			);
-
-			\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
-		}
 	}
 
 	/**
@@ -228,24 +214,26 @@ class Page {
 	 * @return void
 	 */
 	public function maybe_enqueue_focus_el_script( $hook ) {
+		// Get all registered task providers from the task manager.
 		$tasks_providers  = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers();
 		$tasks_details    = [];
 		$total_points     = 0;
 		$completed_points = 0;
-		foreach ( $tasks_providers as $provider ) {
-			if ( 'configuration' !== $provider->get_provider_category() ) {
-				continue;
-			}
 
+		// Filter providers to only those relevant to the current admin page.
+		foreach ( $tasks_providers as $provider ) {
 			$link_setting = $provider->get_link_setting();
+
+			// Skip tasks that aren't configured for this admin page.
 			if ( ! isset( $link_setting['hook'] ) ||
 				$hook !== $link_setting['hook']
 			) {
 				continue;
 			}
 
+			// Build task details for JavaScript.
 			$details = [
-				'link_setting' => $link_setting,
+				'link_setting' => $link_setting, // Contains selector, hook, and highlight config.
 				'task_id'      => $provider->get_task_id(),
 				'points'       => $provider->get_points(),
 				'is_complete'  => $provider->is_task_completed(),
@@ -258,11 +246,12 @@ class Page {
 			}
 		}
 
+		// No tasks for this page - don't enqueue the script.
 		if ( empty( $tasks_details ) ) {
 			return;
 		}
 
-		// Register the scripts.
+		// Enqueue the focus element script with task data.
 		\progress_planner()->get_admin__enqueue()->enqueue_script(
 			'focus-element',
 			[
@@ -302,22 +291,9 @@ class Page {
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-tooltip' );
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-install-plugin' );
 
-		if ( 'progress-planner_page_progress-planner-settings' === $current_screen->id ) {
-			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/settings-page' );
-		}
-
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
 			// Enqueue ugprading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
 			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
-		}
-
-		$prpl_privacy_policy_accepted = \progress_planner()->is_privacy_policy_accepted();
-		if ( ! $prpl_privacy_policy_accepted ) {
-			// Enqueue welcome styles.
-			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/welcome' );
-
-			// Enqueue onboarding styles.
-			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/onboard' );
 		}
 	}
 
@@ -335,7 +311,6 @@ class Page {
 			$current_screen->id,
 			[
 				'toplevel_page_progress-planner',
-				'progress-planner_page_progress-planner-settings',
 			],
 			true
 		) ) {

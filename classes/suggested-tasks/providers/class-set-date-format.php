@@ -34,6 +34,13 @@ class Set_Date_Format extends Tasks_Interactive {
 	protected $is_dismissable = true;
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 7;
+
+	/**
 	 * Initialize the task.
 	 *
 	 * @return void
@@ -112,6 +119,11 @@ class Set_Date_Format extends Tasks_Interactive {
 	 */
 	public function print_popover_instructions() {
 		$detected_date_format = $this->get_date_format_type();
+
+		if ( ! \function_exists( 'wp_get_available_translations' ) ) {
+			// @phpstan-ignore-next-line requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-admin/includes/translation-install.php';
+		}
 
 		// Get the site default language name.
 		$available_languages = \wp_get_available_translations();
@@ -235,10 +247,8 @@ class Set_Date_Format extends Tasks_Interactive {
 				</p>
 			</fieldset>
 		</div>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Set date format', 'progress-planner' ); ?>
-		</button>
 		<?php
+		$this->print_submit_button( \__( 'Set date format', 'progress-planner' ), 'prpl-steps-nav-wrapper-align-left' );
 	}
 
 	/**

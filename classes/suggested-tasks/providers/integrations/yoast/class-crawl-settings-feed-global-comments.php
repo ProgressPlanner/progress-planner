@@ -7,10 +7,14 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder;
+
 /**
  * Add task for Yoast SEO: Remove global comment feeds.
  */
-class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
+class Crawl_Settings_Feed_Global_Comments extends Yoast_Interactive_Provider {
+
+	use Task_Action_Builder;
 
 	/**
 	 * The provider ID.
@@ -18,6 +22,13 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'yoast-crawl-settings-feed-global-comments';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'yoast-crawl-settings-feed-global-comments';
 
 	/**
 	 * The external link URL.
@@ -81,6 +92,26 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	}
 
 	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'WordPress creates an RSS feed of all comments on your site. Unless you have active discussions that people want to follow, this feed is rarely used and creates an unnecessary URL.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		$this->print_submit_button( \__( 'Remove', 'progress-planner' ) );
+	}
+
+	/**
 	 * Add task actions specific to this task.
 	 *
 	 * @param array $data    The task data.
@@ -89,11 +120,6 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 * @return array
 	 */
 	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
-			'priority' => 10,
-			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'admin.php?page=wpseo_page_settings#/crawl-optimization#input-wpseo-remove_feed_global_comments' ) . '" target="_self">' . \esc_html__( 'Remove', 'progress-planner' ) . '</a>',
-		];
-
-		return $actions;
+		return $this->add_popover_action( $actions, \__( 'Remove', 'progress-planner' ) );
 	}
 }

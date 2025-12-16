@@ -41,6 +41,13 @@ class Blog_Description extends Tasks_Interactive {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-tagline';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 2;
+
+	/**
 	 * Get the task title.
 	 *
 	 * @return string
@@ -113,13 +120,14 @@ class Blog_Description extends Tasks_Interactive {
 				type="text"
 				id="blogdescription"
 				value="<?php echo \esc_attr( \get_bloginfo( 'description' ) ); ?>"
-				class="regular-text"
 				placeholder="<?php \esc_html_e( 'A catchy phrase to describe your website', 'progress-planner' ); ?>"
 			>
 		</label>
-		<button type="submit" class="prpl-button prpl-button-primary" disabled>
-			<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
-		</button>
+		<div class="prpl-steps-nav-wrapper">
+			<button type="submit" class="prpl-button prpl-button-primary" disabled>
+				<?php \esc_html_e( 'Save', 'progress-planner' ); ?>
+			</button>
+		</div>
 		<?php
 	}
 
@@ -134,9 +142,42 @@ class Blog_Description extends Tasks_Interactive {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Set tagline', 'progress-planner' ) . '</a>',
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html( $this->get_task_action_label() ) . '</a>',
 		];
 
 		return $actions;
+	}
+
+	/**
+	 * Get the task action label.
+	 *
+	 * @return string
+	 */
+	public function get_task_action_label() {
+		return \__( 'Set tagline', 'progress-planner' );
+	}
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function complete_task( $args = [], $task_id = '' ) {
+
+		if ( ! $this->capability_required() ) {
+			return false;
+		}
+
+		if ( ! isset( $args['blogdescription'] ) ) {
+			return false;
+		}
+
+		// update_option will return false if the option value is the same as the one being set.
+		\update_option( 'blogdescription', \sanitize_text_field( $args['blogdescription'] ) );
+
+		return true;
 	}
 }

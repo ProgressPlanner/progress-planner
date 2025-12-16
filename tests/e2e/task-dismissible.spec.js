@@ -53,7 +53,7 @@ test.describe( 'PRPL Dismissable Tasks', () => {
 
 			// Find the completed task
 			const completedTask = completedTasks.find(
-				( task ) => task.task_id === taskId
+				( task ) => task.post_name === taskId
 			);
 			expect( completedTask ).toBeDefined();
 			expect( completedTask.post_status ).toBe( 'trash' );

@@ -41,6 +41,13 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/disable-comment-pagination';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 10;
+
+	/**
 	 * Get the task URL.
 	 *
 	 * @return string
@@ -113,11 +120,7 @@ class Disable_Comment_Pagination extends Tasks_Interactive {
 	 * @return void
 	 */
 	public function print_popover_form_contents() {
-		?>
-		<button type="submit" class="prpl-button prpl-button-primary">
-			<?php \esc_html_e( 'Disable comment pagination', 'progress-planner' ); ?>
-		</button>
-		<?php
+		$this->print_submit_button( \__( 'Disable comment pagination', 'progress-planner' ) );
 	}
 
 	/**

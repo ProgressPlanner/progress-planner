@@ -63,7 +63,7 @@ class Task_Command extends \WP_CLI_Command {
 		}
 
 		$format = isset( $assoc_args['format'] ) ? $assoc_args['format'] : 'table';
-		$fields = isset( $assoc_args['fields'] ) ? \explode( ',', $assoc_args['fields'] ) : [ 'task_id', 'provider_id', 'category', 'date', 'post_status' ];
+		$fields = isset( $assoc_args['fields'] ) ? \explode( ',', $assoc_args['fields'] ) : [ 'task_id', 'provider_id', 'date', 'post_status' ];
 
 		$formatted_tasks = [];
 		foreach ( $tasks as $task ) {
@@ -81,9 +81,6 @@ class Task_Command extends \WP_CLI_Command {
 						break;
 					case 'provider_id':
 						$formatted[ $field ] = \is_object( $task->provider ?? null ) && isset( $task->provider->name ) ? $task->provider->name : '';
-						break;
-					case 'category':
-						$formatted[ $field ] = \is_object( $task->category ?? null ) && isset( $task->category->name ) ? $task->category->name : '';
 						break;
 					default:
 						$formatted[ $field ] = $task->$field ?? '';
@@ -127,7 +124,25 @@ class Task_Command extends \WP_CLI_Command {
 		}
 
 		$format = isset( $assoc_args['format'] ) ? $assoc_args['format'] : 'table';
-		\WP_CLI\Utils\format_items( $format, [ $task ], \array_keys( $task ) ); // @phpstan-ignore-line
+		$fields = [ 'task_id', 'provider_id', 'date', 'post_status' ];
+
+		$formatted = [];
+		foreach ( $fields as $field ) {
+			switch ( $field ) {
+				case 'task_id':
+				case 'date':
+				case 'post_status':
+					$formatted[ $field ] = $task->$field ?? '';
+					break;
+				case 'provider_id':
+					$formatted[ $field ] = \is_object( $task->provider ?? null ) && isset( $task->provider->name ) ? $task->provider->name : '';
+					break;
+				default:
+					$formatted[ $field ] = $task->$field ?? '';
+			}
+		}
+
+		\WP_CLI\Utils\format_items( $format, [ $formatted ], $fields ); // @phpstan-ignore-line
 	}
 
 	/**
@@ -296,9 +311,6 @@ class Task_Command extends \WP_CLI_Command {
 	 * [--provider_id=<provider_id>]
 	 * : The provider ID. Default: "collaborator"
 	 *
-	 * [--category=<category>]
-	 * : The task category. Default: "collaborator"
-	 *
 	 * [--status=<status>]
 	 * : The task status. Default: "pending"
 	 *
@@ -324,7 +336,6 @@ class Task_Command extends \WP_CLI_Command {
 		$description           = isset( $assoc_args['description'] ) ? $assoc_args['description'] : 'Test description ';
 		$points                = isset( $assoc_args['points'] ) ? (int) $assoc_args['points'] : 1;
 		$provider_id           = isset( $assoc_args['provider_id'] ) ? $assoc_args['provider_id'] : 'collaborator';
-		$category              = isset( $assoc_args['category'] ) ? $assoc_args['category'] : 'collaborator';
 		$status                = isset( $assoc_args['status'] ) ? $assoc_args['status'] : 'pending';
 		$is_completed_callback = isset( $assoc_args['is_completed_callback'] ) ? $assoc_args['is_completed_callback'] : null;
 		$dismissable           = isset( $assoc_args['dismissable'] ) ? $assoc_args['dismissable'] : true;
@@ -344,7 +355,6 @@ class Task_Command extends \WP_CLI_Command {
 				'description'           => $description,
 				'points'                => $points,
 				'provider_id'           => $provider_id,
-				'category'              => $category,
 				'status'                => $status,
 				'dismissable'           => $dismissable,
 				'snoozable'             => $snoozable,

@@ -18,8 +18,8 @@ class Playground {
 	public function __construct() {
 		\add_action( 'init', [ $this, 'register_hooks' ], 9 );
 		\add_action( 'plugins_loaded', [ $this, 'enable_debug_tools' ], 1 );
-		\add_filter( 'progress_planner_tasks_show_ui', '__return_true' );
 		\add_action( 'admin_footer', [ $this, 'inject_playground_js_patch' ] );
+		\add_action( 'init', [ $this, 'disable_upgrade_tasks_popover' ], 101 );
 	}
 
 	/**
@@ -28,7 +28,7 @@ class Playground {
 	 * @return void
 	 */
 	public function register_hooks() {
-		if ( ! \get_option( 'progress_planner_license_key', false ) && ! \get_option( 'progress_planner_demo_data_generated', false ) ) {
+		if ( ! \progress_planner()->get_license_key() && ! \get_option( 'progress_planner_demo_data_generated', false ) ) {
 			$this->generate_data();
 			\update_option( 'progress_planner_license_key', \str_replace( ' ', '-', $this->create_random_string( 20 ) ) );
 			\update_option( 'progress_planner_force_show_onboarding', false );
@@ -52,6 +52,22 @@ class Playground {
 		\add_action( 'wp_ajax_progress_planner_show_onboarding', [ $this, 'show_onboarding' ] );
 
 		\progress_planner()->get_settings()->set( 'activation_date', ( new \DateTime() )->modify( '-2 months' )->format( 'Y-m-d' ) );
+	}
+
+	/**
+	 * Disable the upgrade tasks popover.
+	 *
+	 * @return void
+	 */
+	public function disable_upgrade_tasks_popover() {
+		// This will make the plugin think it was activated, so the upgrade tasks popover will not be shown.
+		$onboard_task_provider_ids = \apply_filters( 'prpl_onboarding_task_providers', [] );
+
+		// Update 'progress_planner_previous_version_task_providers' option.
+		\update_option( 'progress_planner_previous_version_task_providers', \array_unique( $onboard_task_provider_ids ), SORT_REGULAR );
+
+		// Clear the upgrade popover task provider IDs, this are the 'newly' added task providers, so the upgrade tasks popover will not be shown.
+		\update_option( 'progress_planner_upgrade_popover_task_provider_ids', [] );
 	}
 
 	/**

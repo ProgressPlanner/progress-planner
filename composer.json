@@ -1,5 +1,5 @@
 {
-	"name": "emilia-capital/progress-planner",
+	"name": "progressplanner/progress-planner",
 	"description": "The Progress Planner WordPress plugin.",
 	"type": "wordpress-plugin",
 	"license": "GPL-3.0-or-later",
@@ -18,7 +18,12 @@
 		"szepeviktor/phpstan-wordpress": "^2.0",
 		"phpstan/extension-installer": "^1.4",
 		"yoast/yoastcs": "^3.0",
-		"friendsofphp/php-cs-fixer": "^3.75"
+		"friendsofphp/php-cs-fixer": "^3.75",
+		"wp-cli/wp-cli-bundle": "^2.11"
+	},
+	"suggest": {
+		"ext-pcov": "Recommended for fast code coverage generation (5x faster than Xdebug)",
+		"ext-xdebug": "Alternative for code coverage and debugging"
 	},
 	"scripts": {
 		"check-cs": [
@@ -37,6 +42,9 @@
 		],
 		"test": [
 			"@php ./vendor/phpunit/phpunit/phpunit --dont-report-useless-tests"
+		],
+		"coverage": [
+			"@php ./vendor/phpunit/phpunit/phpunit --coverage-html=coverage-html --coverage-text"
 		],
 		"phpstan": [
 			"@php ./vendor/bin/phpstan analyse --memory-limit=2048M"

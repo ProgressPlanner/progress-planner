@@ -34,6 +34,13 @@ class Debug_Display extends Tasks {
 	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/set-wp-debug';
 
 	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 10;
+
+	/**
 	 * Get the task title.
 	 *
 	 * @return string

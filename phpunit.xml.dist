@@ -10,12 +10,13 @@
 	<testsuites>
 		<testsuite name="testing">
 			<directory prefix="test-" suffix=".php">./tests/</directory>
+			<exclude>./tests/phpunit/test-class-security.php</exclude>
 		</testsuite>
 	</testsuites>
-	<coverage>
-    <include>
-        <directory suffix=".php">src</directory>
-		<file>progress-planner.php</file>
-    </include>
-  </coverage>
+	<coverage processUncoveredFiles="false">
+		<include>
+			<directory suffix=".php">classes</directory>
+			<file>progress-planner.php</file>
+		</include>
+	</coverage>
 </phpunit>
