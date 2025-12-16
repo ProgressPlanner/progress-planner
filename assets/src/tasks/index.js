@@ -22,6 +22,9 @@ import setPageContactTask from './SetPageContactTask';
 import unpublishedContentTask from './UnpublishedContentTask';
 import coreUpdateTask from './CoreUpdateTask';
 import contentCreateTask from './ContentCreateTask';
+import setValuablePostTypesTask from './SetValuablePostTypesTask';
+import emailSendingTask from './EmailSendingTask';
+import improvePdfHandlingTask from './ImprovePdfHandlingTask';
 
 // Register all task providers.
 registerTaskProvider( helloWorldTask );
@@ -40,3 +43,6 @@ registerTaskProvider( setPageContactTask );
 registerTaskProvider( unpublishedContentTask );
 registerTaskProvider( coreUpdateTask );
 registerTaskProvider( contentCreateTask );
+registerTaskProvider( setValuablePostTypesTask );
+registerTaskProvider( emailSendingTask );
+registerTaskProvider( improvePdfHandlingTask );
