@@ -290,6 +290,11 @@ async function processTask( taskInstance, taskData, TaskClass, priority = 50 ) {
 		// Check if task already exists
 		const existingTask = await checkTaskExists( taskId );
 		if ( existingTask ) {
+			// Ensure priority is set on existing task
+			if ( existingTask.prpl_priority === undefined ) {
+				existingTask.prpl_priority = priority;
+			}
+
 			// Task exists, render it (or queue if callback not ready)
 			if ( taskRenderCallback ) {
 				taskRenderCallback( existingTask, priority );
@@ -329,6 +334,11 @@ async function processTask( taskInstance, taskData, TaskClass, priority = 50 ) {
 				// Task created, now fetch it to render
 				const createdTask = await checkTaskExists( taskId );
 				if ( createdTask ) {
+					// Ensure priority is set on newly created task
+					if ( createdTask.prpl_priority === undefined ) {
+						createdTask.prpl_priority = priority;
+					}
+
 					// Render it (or queue if callback not ready)
 					if ( taskRenderCallback ) {
 						taskRenderCallback( createdTask, priority );
