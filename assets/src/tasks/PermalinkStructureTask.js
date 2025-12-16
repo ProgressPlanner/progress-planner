@@ -6,6 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { doAction } from '@wordpress/hooks';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -101,5 +102,12 @@ class PermalinkStructureTask extends InteractiveTaskProvider {
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
+
+// Self-register this task provider
+doAction(
+	'prpl.tasks.register',
+	PermalinkStructureTask,
+	PermalinkStructureTask.priority
+);
 
 export default PermalinkStructureTask;

@@ -6,6 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { doAction } from '@wordpress/hooks';
 import { fetchDataCollector } from '../hooks/useTasksApi';
 
 /**
@@ -99,5 +100,8 @@ class HelloWorldTask extends InteractiveTaskProvider {
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
+
+// Self-register this task provider
+doAction( 'prpl.tasks.register', HelloWorldTask, HelloWorldTask.priority );
 
 export default HelloWorldTask;

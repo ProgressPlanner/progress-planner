@@ -6,6 +6,7 @@
  */
 
 import { TaskProvider } from '../services/TaskProvider';
+import { doAction } from '@wordpress/hooks';
 import { fetchDataCollector } from '../hooks/useTasksApi';
 
 /**
@@ -79,5 +80,12 @@ class RemoveInactivePluginsTask extends TaskProvider {
 		};
 	}
 }
+
+// Self-register this task provider
+doAction(
+	'prpl.tasks.register',
+	RemoveInactivePluginsTask,
+	RemoveInactivePluginsTask.priority
+);
 
 export default RemoveInactivePluginsTask;

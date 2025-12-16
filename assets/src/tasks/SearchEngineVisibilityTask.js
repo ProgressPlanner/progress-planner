@@ -6,6 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { doAction } from '@wordpress/hooks';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -90,5 +91,12 @@ class SearchEngineVisibilityTask extends InteractiveTaskProvider {
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
+
+// Self-register this task provider
+doAction(
+	'prpl.tasks.register',
+	SearchEngineVisibilityTask,
+	SearchEngineVisibilityTask.priority
+);
 
 export default SearchEngineVisibilityTask;

@@ -6,6 +6,7 @@
  */
 
 import { TaskProvider } from '../services/TaskProvider';
+import { doAction } from '@wordpress/hooks';
 import { fetchDataCollector } from '../hooks/useTasksApi';
 
 /**
@@ -93,5 +94,12 @@ class ContentCreateTask extends TaskProvider {
 		};
 	}
 }
+
+// Self-register this task provider
+doAction(
+	'prpl.tasks.register',
+	ContentCreateTask,
+	ContentCreateTask.priority
+);
 
 export default ContentCreateTask;

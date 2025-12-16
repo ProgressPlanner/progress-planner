@@ -6,6 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { doAction } from '@wordpress/hooks';
 import { fetchDataCollector } from '../hooks/useTasksApi';
 
 /**
@@ -96,5 +97,8 @@ class SamplePageTask extends InteractiveTaskProvider {
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
+
+// Self-register this task provider
+doAction( 'prpl.tasks.register', SamplePageTask, SamplePageTask.priority );
 
 export default SamplePageTask;

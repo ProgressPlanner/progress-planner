@@ -6,6 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { doAction } from '@wordpress/hooks';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -94,5 +95,12 @@ class DisableCommentPaginationTask extends InteractiveTaskProvider {
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
+
+// Self-register this task provider
+doAction(
+	'prpl.tasks.register',
+	DisableCommentPaginationTask,
+	DisableCommentPaginationTask.priority
+);
 
 export default DisableCommentPaginationTask;
