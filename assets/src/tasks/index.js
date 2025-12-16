@@ -25,6 +25,10 @@ import contentCreateTask from './ContentCreateTask';
 import setValuablePostTypesTask from './SetValuablePostTypesTask';
 import emailSendingTask from './EmailSendingTask';
 import improvePdfHandlingTask from './ImprovePdfHandlingTask';
+import debugDisplayTask from './DebugDisplayTask';
+import phpVersionTask from './PhpVersionTask';
+import disableCommentsTask from './DisableCommentsTask';
+import reduceAutoloadedOptionsTask from './ReduceAutoloadedOptionsTask';
 
 // Register all task providers.
 registerTaskProvider( helloWorldTask );
@@ -46,3 +50,7 @@ registerTaskProvider( contentCreateTask );
 registerTaskProvider( setValuablePostTypesTask );
 registerTaskProvider( emailSendingTask );
 registerTaskProvider( improvePdfHandlingTask );
+registerTaskProvider( debugDisplayTask );
+registerTaskProvider( phpVersionTask );
+registerTaskProvider( disableCommentsTask );
+registerTaskProvider( reduceAutoloadedOptionsTask );

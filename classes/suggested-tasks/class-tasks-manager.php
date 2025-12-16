@@ -65,8 +65,8 @@ class Tasks_Manager {
 			new Content_Review(),
 			// Core_Update() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Blog_Description() - Migrated to React, registered in assets/src/tasks/index.js.
-			new Debug_Display(),
-			new Disable_Comments(),
+			// Debug_Display() - Migrated to React, registered in assets/src/tasks/index.js.
+			// Disable_Comments() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Disable_Comment_Pagination() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Sample_Page() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Hello_World() - Migrated to React, registered in assets/src/tasks/index.js.
@@ -74,9 +74,9 @@ class Tasks_Manager {
 			// Site_Icon() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Rename_Uncategorized_Category() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Permalink_Structure() - Migrated to React, registered in assets/src/tasks/index.js.
-			new Php_Version(),
+			// Php_Version() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Search_Engine_Visibility() - Migrated to React, registered in assets/src/tasks/index.js.
-			new Reduce_Autoloaded_Options(),
+			// Reduce_Autoloaded_Options() - Migrated to React, registered in assets/src/tasks/index.js.
 			new User_Tasks(),
 			// Email_Sending() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Set_Valuable_Post_Types() - Migrated to React, registered in assets/src/tasks/index.js.
