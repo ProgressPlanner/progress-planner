@@ -12,7 +12,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( false !== \get_option( 'progress_planner_license_key', false ) ) {
+if ( false !== \progress_planner()->get_license_key() ) {
 	return;
 }
 

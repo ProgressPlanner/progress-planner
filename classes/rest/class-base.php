@@ -86,7 +86,7 @@ abstract class Base {
 			return true;
 		}
 
-		$license_key = \get_option( 'progress_planner_license_key', false );
+		$license_key = \progress_planner()->get_license_key();
 		if ( ! $license_key || 'no-license' === $license_key ) {
 			// Increment failed attempts counter.
 			\set_transient( $rate_limit_key, $failed_attempts + 1, HOUR_IN_SECONDS );
