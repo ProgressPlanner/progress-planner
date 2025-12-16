@@ -30,6 +30,8 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Rest\Timezone_Options get_rest__timezone_options()
  * @method \Progress_Planner\Rest\Data_Collectors get_rest__data_collectors()
  * @method \Progress_Planner\Rest\Task_Evaluation get_rest__task_evaluation()
+ * @method \Progress_Planner\Rest\Page_Settings get_rest__page_settings()
+ * @method \Progress_Planner\Rest\Updates get_rest__updates()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
  * @method \Progress_Planner\Utils\Playground get_utils__playground()
@@ -136,6 +138,8 @@ class Base {
 		$this->get_rest__timezone_options();
 		$this->get_rest__data_collectors();
 		$this->get_rest__task_evaluation();
+		$this->get_rest__page_settings();
+		$this->get_rest__updates();
 
 		// Onboarding.
 		$this->get_utils__onboard();
