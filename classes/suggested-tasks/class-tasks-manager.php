@@ -292,6 +292,18 @@ class Tasks_Manager {
 	}
 
 	/**
+	 * Get all React provider IDs.
+	 *
+	 * Returns the list of provider IDs that have been migrated to React.
+	 * These are used to include React-created tasks in REST API queries.
+	 *
+	 * @return array<string> Array of React provider IDs.
+	 */
+	public function get_react_provider_ids(): array {
+		return self::REACT_PROVIDERS;
+	}
+
+	/**
 	 * Inject tasks.
 	 *
 	 * @return void

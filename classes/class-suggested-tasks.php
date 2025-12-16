@@ -462,6 +462,10 @@ class Suggested_Tasks {
 			$include_providers[] = $provider->get_provider_id();
 		}
 
+		// Also include React providers (migrated from PHP).
+		$react_providers   = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_react_provider_ids();
+		$include_providers = \array_unique( \array_merge( $include_providers, $react_providers ) );
+
 		// Include terms (matches any term in list).
 		if ( isset( $request['provider'] ) ) {
 			$request_providers = \explode( ',', $request['provider'] );
