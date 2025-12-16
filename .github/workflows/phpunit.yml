@@ -113,6 +113,7 @@ jobs:
             --dbuser=root \
             --dbpass='' \
             --dbhost=127.0.0.1:3306 \
+            --dbprefix=wptests_ \
             --skip-check
 
       - name: Run unit tests - single site
