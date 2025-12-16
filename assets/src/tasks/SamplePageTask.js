@@ -96,6 +96,15 @@ class SamplePageTask extends InteractiveTaskProvider {
 		// Add popover ID for interactive tasks.
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return 'Delete';
+	}
 }
 
 // Self-register this task provider

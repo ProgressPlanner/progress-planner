@@ -127,6 +127,68 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
+
+	/**
+	 * Add custom task actions for Update Term Description task.
+	 *
+	 * Adds a "Write description" action that opens the popover and dispatches
+	 * a custom event with task context data.
+	 * Note: Does not call super to avoid duplicate popover actions.
+	 * Standard actions (complete, snooze) are already in the actions array.
+	 *
+	 * @param {Object} taskData The task data.
+	 * @param {Array}  actions  The existing actions array (already contains complete, snooze, etc.).
+	 *
+	 * @return {Array} The modified actions array.
+	 */
+	addTaskActions( taskData = [], actions = [] ) {
+		const targetTermId =
+			taskData.target_term_id || taskData.meta?.target_term_id || null;
+		const targetTaxonomy =
+			taskData.target_taxonomy || taskData.meta?.target_taxonomy || null;
+
+		if ( ! targetTermId || ! targetTaxonomy ) {
+			// If we don't have term data, use default popover action from parent
+			return super.addTaskActions( taskData, actions );
+		}
+
+		// Build task context data for the custom event
+		const taskContext = {
+			post_title: taskData.title?.rendered || taskData.post_title || '',
+			target_term_id: targetTermId,
+			target_taxonomy: targetTaxonomy,
+			target_term_name: taskData.meta?.target_term_name || '',
+			target_taxonomy_name: taskData.meta?.target_taxonomy_name || '',
+		};
+
+		// Add custom "Write description" action with priority 10
+		// This replaces the default popover action from InteractiveTaskProvider
+		const popoverId = this.getPopoverId();
+		const taskContextJson = JSON.stringify( taskContext );
+		actions.push( {
+			priority: 10,
+			html: `<a href="#" class="prpl-tooltip-action-text prpl-update-term-description-action" role="button" data-task-context="${ this.escapeHtml(
+				taskContextJson
+			) }" onclick="event.preventDefault(); document.getElementById('${ this.escapeHtml(
+				popoverId
+			) }')?.showPopover(); this.dispatchEvent(new CustomEvent('prpl-interactive-task-action-update-term-description', { bubbles: true, detail: JSON.parse(this.dataset.taskContext) })); return false;">${ this.escapeHtml(
+				'Write description'
+			) }</a>`,
+		} );
+
+		// Return actions without calling super to avoid duplicate popover action
+		// Standard actions (complete, snooze, info) are already in the array
+		return actions;
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return 'Write description';
+	}
 }
 
 // Self-register this task provider

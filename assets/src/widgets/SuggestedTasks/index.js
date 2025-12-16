@@ -24,6 +24,7 @@ import WidgetHeader from '../../components/WidgetHeader';
 import {
 	setTaskRenderCallback,
 	setTaskContainer,
+	getTaskProviderInstance,
 } from '../../services/taskRegistry';
 
 // Import task registrations (tasks will self-register on import).
@@ -93,6 +94,123 @@ function SuggestedTasks( { config = {} } ) {
 	);
 
 	/**
+	 * Generate task actions if missing.
+	 *
+	 * @param {Object} taskData Task data from the API.
+	 * @return {Object} Task data with actions populated if missing.
+	 */
+	const ensureTaskActions = useCallback( ( taskData ) => {
+		// If actions are already provided, return as-is.
+		if (
+			taskData.prpl_task_actions &&
+			taskData.prpl_task_actions.length > 0
+		) {
+			return taskData;
+		}
+
+		// Try to generate actions from the task provider.
+		// Try multiple ways to get the provider ID:
+		// 1. From prpl_provider object (if embedded in REST response)
+		// 2. From provider_id field
+		// 3. From meta.provider_id
+		// 4. From task slug (often matches provider ID for React tasks)
+		// 5. Fetch term from prpl_recommendations_provider if it's an array
+		let providerId =
+			taskData.prpl_provider?.slug ||
+			taskData.provider_id ||
+			taskData.meta?.provider_id ||
+			'';
+
+		// Fallback: Use task slug as provider ID (common pattern for React tasks)
+		if ( ! providerId && taskData.slug ) {
+			// Use slug directly as provider ID
+			providerId = taskData.slug;
+		}
+
+		// Fallback: Try to get provider from embedded taxonomy terms or fetch it
+		if (
+			! providerId &&
+			taskData.prpl_recommendations_provider &&
+			Array.isArray( taskData.prpl_recommendations_provider )
+		) {
+			// If it's an array of term objects (from _embed)
+			const firstItem = taskData.prpl_recommendations_provider[ 0 ];
+			if (
+				firstItem &&
+				typeof firstItem === 'object' &&
+				firstItem.slug
+			) {
+				providerId = firstItem.slug;
+			} else if (
+				typeof firstItem === 'number' &&
+				taskData._embedded &&
+				taskData._embedded[ 'wp:term' ] &&
+				taskData._embedded[ 'wp:term' ][ 0 ]
+			) {
+				// Try to find the term in embedded data
+				const embeddedTerms = taskData._embedded[ 'wp:term' ].flat();
+				const term = embeddedTerms.find(
+					( t ) =>
+						t &&
+						t.taxonomy === 'prpl_recommendations_provider' &&
+						t.id === firstItem
+				);
+				if ( term && term.slug ) {
+					providerId = term.slug;
+				}
+			}
+		}
+
+		if ( ! providerId ) {
+			console.warn( 'ensureTaskActions: No providerId found for task:', {
+				...taskData,
+				prpl_provider: taskData.prpl_provider,
+				provider_id: taskData.provider_id,
+				slug: taskData.slug,
+				prpl_recommendations_provider:
+					taskData.prpl_recommendations_provider,
+			} );
+			return taskData;
+		}
+
+		const providerInstance = getTaskProviderInstance( providerId );
+		if ( ! providerInstance ) {
+			console.warn(
+				`ensureTaskActions: Provider instance not found for providerId "${ providerId }"`,
+				{ taskData }
+			);
+			return taskData;
+		}
+		if ( ! providerInstance.getTaskActions ) {
+			console.warn(
+				`ensureTaskActions: Provider "${ providerId }" does not have getTaskActions method`
+			);
+			return taskData;
+		}
+
+		try {
+			const actions = providerInstance.getTaskActions( taskData );
+			if ( actions && actions.length > 0 ) {
+				return {
+					...taskData,
+					prpl_task_actions: actions,
+				};
+			}
+			console.warn(
+				`ensureTaskActions: No actions generated for provider "${ providerId }"`,
+				{ taskData, providerInstance }
+			);
+		} catch ( error ) {
+			console.error(
+				`Error generating actions for task provider "${ providerId }":`,
+				error
+			);
+		}
+
+		return taskData;
+	}, [] );
+
+	/**
 	 * Render callback for streaming tasks.
 	 * Called by taskRegistry when a task is ready to render.
 	 *
@@ -112,9 +230,12 @@ function SuggestedTasks( { config = {} } ) {
 				taskData.prpl_priority = priority;
 			}
 
+			// Ensure task actions are generated if missing
+			const taskWithActions = ensureTaskActions( taskData );
+
 			// Insert in sorted position
 			setTasks( ( prev ) =>
-				insertTaskSorted( prev, taskData, priority )
+				insertTaskSorted( prev, taskWithActions, priority )
 			);
 
 			// Track task ID
@@ -126,7 +247,7 @@ function SuggestedTasks( { config = {} } ) {
 			// Mark as no longer loading after first task arrives
 			setIsLoading( false );
 		},
-		[ insertTaskSorted ]
+		[ insertTaskSorted, ensureTaskActions ]
 	);
 
 	/**
@@ -148,7 +269,7 @@ function SuggestedTasks( { config = {} } ) {
 			} )
 				.then( ( pendingResult ) => {
 					if ( pendingResult.tasks.length > 0 ) {
-						// Add pending tasks to the list
+						// Add pending tasks to the list (actions will be generated in handleTaskRender)
 						pendingResult.tasks.forEach( ( task ) => {
 							handleTaskRender( task, task.prpl_priority || 50 );
 						} );
@@ -263,7 +384,9 @@ function SuggestedTasks( { config = {} } ) {
 					} );
 
 					if ( replacementResult.tasks.length > 0 ) {
-						const replacementTask = replacementResult.tasks[ 0 ];
+						const replacementTask = ensureTaskActions(
+							replacementResult.tasks[ 0 ]
+						);
 						setTasks( ( prev ) =>
 							insertTaskSorted(
 								prev,
@@ -286,7 +409,7 @@ function SuggestedTasks( { config = {} } ) {
 				} );
 			}
 		},
-		[ celebrate, insertTaskSorted ]
+		[ celebrate, insertTaskSorted, ensureTaskActions ]
 	);
 
 	/**
@@ -314,7 +437,9 @@ function SuggestedTasks( { config = {} } ) {
 				} );
 
 				if ( replacementResult.tasks.length > 0 ) {
-					const replacementTask = replacementResult.tasks[ 0 ];
+					const replacementTask = ensureTaskActions(
+						replacementResult.tasks[ 0 ]
+					);
 					setTasks( ( prev ) =>
 						insertTaskSorted(
 							prev,
@@ -331,7 +456,7 @@ function SuggestedTasks( { config = {} } ) {
 				// Error handled silently.
 			}
 		},
-		[ insertTaskSorted ]
+		[ insertTaskSorted, ensureTaskActions ]
 	);
 
 	/**
@@ -361,7 +486,9 @@ function SuggestedTasks( { config = {} } ) {
 				} );
 
 				if ( replacementResult.tasks.length > 0 ) {
-					const replacementTask = replacementResult.tasks[ 0 ];
+					const replacementTask = ensureTaskActions(
+						replacementResult.tasks[ 0 ]
+					);
 					setTasks( ( prev ) =>
 						insertTaskSorted(
 							prev,
@@ -378,7 +505,7 @@ function SuggestedTasks( { config = {} } ) {
 				// Error handled silently.
 			}
 		},
-		[ insertTaskSorted ]
+		[ insertTaskSorted, ensureTaskActions ]
 	);
 
 	/**
@@ -449,13 +576,14 @@ function SuggestedTasks( { config = {} } ) {
 				excludeProvider: 'user',
 			} );
 
-			// Track injected task IDs.
-			result.tasks.forEach( ( task ) => {
+			// Track injected task IDs and ensure actions are generated.
+			const tasksWithActions = result.tasks.map( ( task ) => {
 				injectedTaskIdsRef.current.add( task.id );
+				return ensureTaskActions( task );
 			} );
 
 			// Append new tasks to existing list.
-			setTasks( ( prev ) => [ ...prev, ...result.tasks ] );
+			setTasks( ( prev ) => [ ...prev, ...tasksWithActions ] );
 			setHasMorePages( result.hasMore );
 			setCurrentPage( nextPage );
 
@@ -466,7 +594,13 @@ function SuggestedTasks( { config = {} } ) {
 		} finally {
 			setIsLoadingMore( false );
 		}
-	}, [ currentPage, hasMorePages, isLoadingMore, config ] );
+	}, [
+		currentPage,
+		hasMorePages,
+		isLoadingMore,
+		config,
+		ensureTaskActions,
+	] );
 
 	// Inline styles
 	const listStyle = {
@@ -504,11 +638,11 @@ function SuggestedTasks( { config = {} } ) {
 	 * @param {string} str The string to decode.
 	 * @return {string} The decoded string.
 	 */
-	const decodeHtmlEntities = ( str ) => {
+	const decodeHtmlEntities = useCallback( ( str ) => {
 		const textarea = document.createElement( 'textarea' );
 		textarea.innerHTML = str;
 		return textarea.value;
-	};
+	}, [] );
 
 	// Get title and description from config or use defaults.
 	const widgetTitle = decodeHtmlEntities(

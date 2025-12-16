@@ -512,12 +512,14 @@ class Suggested_Tasks {
 		$provider = false;
 		if ( $provider_term && ! \is_wp_error( $provider_term ) ) {
 			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
+			// Always set prpl_provider from the term, even if PHP provider doesn't exist (for React tasks).
+			// This allows React code to identify the provider and generate actions client-side.
+			$response->data['prpl_provider'] = $provider_term[0];
 		}
 
 		$response->data['slug'] = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $response->data['slug'] );
 
 		if ( $provider ) {
-			$response->data['prpl_provider'] = $provider_term[0];
 			// Link should be added during run time, since it is not added for users without required capability.
 			$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
 				? \esc_url( (string) $response->data['meta']['prpl_url'] )

@@ -311,5 +311,58 @@ function init() {
 	);
 }
 
+/**
+ * Get a task provider class by provider ID.
+ *
+ * @param {string} providerId The provider ID.
+ * @return {Function|null} The task provider class, or null if not found.
+ */
+export function getTaskProviderClass( providerId ) {
+	if ( ! providerId ) {
+		return null;
+	}
+	return taskProviders.get( providerId ) || null;
+}
+
+/**
+ * Get a task provider instance by provider ID.
+ *
+ * @param {string} providerId The provider ID.
+ * @return {Object|null} The task provider instance, or null if not found.
+ */
+export function getTaskProviderInstance( providerId ) {
+	if ( ! providerId ) {
+		return null;
+	}
+	const TaskClass = getTaskProviderClass( providerId );
+	if ( ! TaskClass ) {
+		// Debug: Log available provider IDs to help diagnose
+		const availableIds = Array.from( taskProviders.keys() );
+		console.warn(
+			`Task provider "${ providerId }" not found in registry. Available providers:`,
+			availableIds
+		);
+		return null;
+	}
+	try {
+		return new TaskClass();
+	} catch ( error ) {
+		console.error(
+			`Error creating instance of task provider "${ providerId }":`,
+			error
+		);
+		return null;
+	}
+}
+
+/**
+ * Get all registered provider IDs (for debugging).
+ *
+ * @return {Array<string>} Array of registered provider IDs.
+ */
+export function getRegisteredProviderIds() {
+	return Array.from( taskProviders.keys() );
+}
+
 // Initialize on module load
 init();

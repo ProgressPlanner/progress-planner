@@ -84,4 +84,66 @@ export class InteractiveTaskProvider extends TaskProvider {
 		// Child classes can override to add more options.
 		return [];
 	}
+
+	/**
+	 * Add custom task actions for interactive tasks.
+	 *
+	 * Interactive tasks add a popover trigger action (priority 10).
+	 * Child classes can override this to add additional actions.
+	 *
+	 * @param {Object} taskData The task data.
+	 * @param {Array}  actions  The existing actions array.
+	 *
+	 * @return {Array} The modified actions array.
+	 */
+	addTaskActions( taskData = [], actions = [] ) {
+		const StaticClass = this.constructor;
+		const popoverId = StaticClass.popoverId || this.config.popoverId || '';
+
+		if ( popoverId ) {
+			// Add popover trigger action with high priority (10).
+			// This matches the PHP implementation where interactive tasks
+			// add popover actions with priority 10.
+			const popoverActionLabel = this.getPopoverActionLabel();
+			actions.push( {
+				priority: 10,
+				html: `<a class="prpl-tooltip-action-text" href="#" role="button" onclick="event.preventDefault(); document.getElementById('${ this.escapeHtml(
+					this.getPopoverId()
+				) }')?.showPopover(); return false;">${ this.escapeHtml(
+					popoverActionLabel
+				) }</a>`,
+			} );
+		}
+
+		// Call parent implementation to allow further customization.
+		return super.addTaskActions( taskData, actions );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * Child classes can override this to customize the action label.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		// Default label - child classes can override for specific labels.
+		// For example, UpdateTermDescriptionTask uses "Write description".
+		return 'Complete';
+	}
+
+	/**
+	 * Escape HTML to prevent XSS.
+	 *
+	 * @param {string} text The text to escape.
+	 * @return {string} The escaped text.
+	 */
+	escapeHtml( text ) {
+		if ( typeof text !== 'string' ) {
+			return '';
+		}
+		const div = document.createElement( 'div' );
+		div.textContent = text;
+		return div.innerHTML;
+	}
 }

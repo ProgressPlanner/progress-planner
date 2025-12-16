@@ -104,6 +104,37 @@ class ContentReviewTask extends TaskProvider {
 			target_post_id: targetPostId,
 		};
 	}
+
+	/**
+	 * Add custom task actions for Content Review task.
+	 *
+	 * Adds a "Review" action that links to the post edit page.
+	 *
+	 * @param {Object} taskData The task data.
+	 * @param {Array}  actions  The existing actions array.
+	 *
+	 * @return {Array} The modified actions array.
+	 */
+	addTaskActions( taskData = [], actions = [] ) {
+		const targetPostId =
+			taskData.target_post_id || taskData.meta?.target_post_id || null;
+
+		if ( targetPostId ) {
+			const adminUrl =
+				window.prplSuggestedTasksConfig?.adminUrl || '/wp-admin/';
+			const separator = adminUrl.endsWith( '/' ) ? '' : '/';
+			const editUrl = `${ adminUrl }${ separator }post.php?action=edit&post=${ targetPostId }`;
+
+			actions.push( {
+				priority: 10,
+				html: `<a class="prpl-tooltip-action-text" href="${ this.escapeHtml(
+					editUrl
+				) }" target="_self">Review</a>`,
+			} );
+		}
+
+		return actions;
+	}
 }
 
 // Self-register this task provider

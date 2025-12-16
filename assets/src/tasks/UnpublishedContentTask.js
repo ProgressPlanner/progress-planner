@@ -102,6 +102,32 @@ class UnpublishedContentTask extends TaskProvider {
 				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 		};
 	}
+
+	/**
+	 * Add custom task actions for Unpublished Content task.
+	 *
+	 * Adds an "Edit" action that links to the task URL (draft posts list).
+	 *
+	 * @param {Object} taskData The task data.
+	 * @param {Array}  actions  The existing actions array.
+	 *
+	 * @return {Array} The modified actions array.
+	 */
+	addTaskActions( taskData = [], actions = [] ) {
+		// Check for URL in meta or task data
+		const url = taskData.meta?.prpl_url || taskData.url || null;
+
+		if ( url ) {
+			actions.push( {
+				priority: 10,
+				html: `<a class="prpl-tooltip-action-text" href="${ this.escapeHtml(
+					url
+				) }" target="_self">Edit</a>`,
+			} );
+		}
+
+		return actions;
+	}
 }
 
 // Self-register this task provider
