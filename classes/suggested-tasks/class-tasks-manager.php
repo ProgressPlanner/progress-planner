@@ -62,7 +62,7 @@ class Tasks_Manager {
 		// Instantiate task providers.
 		$this->task_providers = [
 			// Content_Create() - Migrated to React, registered in assets/src/tasks/index.js.
-			new Content_Review(),
+			// Content_Review() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Core_Update() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Blog_Description() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Debug_Display() - Migrated to React, registered in assets/src/tasks/index.js.
@@ -81,9 +81,9 @@ class Tasks_Manager {
 			// Email_Sending() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Set_Valuable_Post_Types() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Select_Locale() - Migrated to React, registered in assets/src/tasks/index.js.
-			new Remove_Terms_Without_Posts(),
-			new Fewer_Tags(),
-			new Update_Term_Description(),
+			// Remove_Terms_Without_Posts() - Migrated to React, registered in assets/src/tasks/index.js.
+			// Fewer_Tags() - Migrated to React, registered in assets/src/tasks/index.js.
+			// Update_Term_Description() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Unpublished_Content() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Collaborator(),
 			// Select_Timezone() - Migrated to React, registered in assets/src/tasks/index.js.

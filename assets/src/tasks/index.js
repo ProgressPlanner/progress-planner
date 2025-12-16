@@ -32,6 +32,10 @@ import reduceAutoloadedOptionsTask from './ReduceAutoloadedOptionsTask';
 import selectLocaleTask from './SelectLocaleTask';
 import selectTimezoneTask from './SelectTimezoneTask';
 import setDateFormatTask from './SetDateFormatTask';
+import fewerTagsTask from './FewerTagsTask';
+import contentReviewTask from './ContentReviewTask';
+import removeTermsWithoutPostsTask from './RemoveTermsWithoutPostsTask';
+import updateTermDescriptionTask from './UpdateTermDescriptionTask';
 
 // Register all task providers.
 registerTaskProvider( helloWorldTask );
@@ -60,3 +64,7 @@ registerTaskProvider( reduceAutoloadedOptionsTask );
 registerTaskProvider( selectLocaleTask );
 registerTaskProvider( selectTimezoneTask );
 registerTaskProvider( setDateFormatTask );
+registerTaskProvider( fewerTagsTask );
+registerTaskProvider( contentReviewTask );
+registerTaskProvider( removeTermsWithoutPostsTask );
+registerTaskProvider( updateTermDescriptionTask );
