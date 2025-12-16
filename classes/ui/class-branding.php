@@ -179,14 +179,14 @@ final class Branding {
 	/**
 	 * Get the admin-submenu position.
 	 *
-	 * @return string
+	 * @return int|null
 	 */
-	public function get_admin_submenu_position(): string {
+	public function get_admin_submenu_position(): int|null {
 		if ( $this->get_branding_id() !== 0 && $this->get_branding_id() !== 4958 ) {
-			return '-1000';
+			return -1000; // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
 		}
 
-		return '';
+		return null;
 	}
 
 	/**
