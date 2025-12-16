@@ -10,16 +10,21 @@
 	#############################################################################
 	-->
 
+	<!-- Include all PHP files in the project. -->
 	<file>.</file>
 
+	<!-- Explicitly include test directories to ensure they are checked. -->
+	<!-- PHPCS <file> tags support directories and will recursively scan them. -->
+	<file>tests/phpunit</file>
+
 	<!-- Exclude the Composer Vendor directory. -->
-	<exclude-pattern>/vendor/*</exclude-pattern>
+	<exclude-pattern>*/vendor/*</exclude-pattern>
 
 	<!-- Exclude the Node Modules directory. -->
-	<exclude-pattern>/node_modules/*</exclude-pattern>
+	<exclude-pattern>*/node_modules/*</exclude-pattern>
 
 	<!-- Exclude the Coverage output directory. -->
-	<exclude-pattern>/coverage/*</exclude-pattern>
+	<exclude-pattern>*/coverage/*</exclude-pattern>
 
 	<!-- Exclude Javascript & CSS files. -->
 	<exclude-pattern>*.js</exclude-pattern>

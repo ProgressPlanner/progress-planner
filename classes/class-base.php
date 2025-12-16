@@ -56,6 +56,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Admin\Widgets\Activity_Scores get_admin__widgets__activity_scores()
  * @method \Progress_Planner\Utils\Date get_utils__date()
  * @method \Progress_Planner\AI_Tasks get_ai_tasks()
+ * @method \Progress_Planner\Onboard_Wizard get_onboard_wizard()
  */
 class Base {
 
@@ -97,6 +98,14 @@ class Base {
 
 		if ( \defined( '\IS_PLAYGROUND_PREVIEW' ) && \constant( '\IS_PLAYGROUND_PREVIEW' ) === true ) {
 			$this->get_utils__playground();
+		}
+
+		$prpl_license_key = $this->get_license_key();
+		if ( ! $prpl_license_key && 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id() ) {
+			$prpl_license_key = \progress_planner()->get_utils__onboard()->make_remote_onboarding_request();
+			if ( '' !== $prpl_license_key ) {
+				\update_option( 'progress_planner_license_key', $prpl_license_key, false );
+			}
 		}
 
 		// Basic classes.
@@ -173,6 +182,9 @@ class Base {
 
 		// Init the enqueue class.
 		$this->get_admin__enqueue()->init();
+
+		// TODO: Decide when this needs to be initialized.
+		$this->get_onboard_wizard();
 	}
 
 	/**
@@ -302,7 +314,16 @@ class Base {
 	 * @return bool
 	 */
 	public function is_privacy_policy_accepted() {
-		return false !== \get_option( 'progress_planner_license_key', false );
+		return false !== $this->get_license_key();
+	}
+
+	/**
+	 * Get the license key.
+	 *
+	 * @return string|false
+	 */
+	public function get_license_key() {
+		return \get_option( 'progress_planner_license_key', false );
 	}
 
 	/**
@@ -405,6 +426,7 @@ class Base {
 				if ( $get_contents ) {
 					return (string) \ob_get_clean();
 				}
+				break; // Exit the loop after the first file is found, covers the case when $get_contents is false.
 			}
 		}
 		return '';
@@ -542,7 +564,7 @@ class Base {
 	 * @return bool
 	 */
 	public function is_debug_mode_enabled() {
-		return ( \defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' );
+		return ( ( \defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) && \current_user_can( 'manage_options' );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo
