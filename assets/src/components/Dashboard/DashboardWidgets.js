@@ -16,17 +16,10 @@ import { getRegisteredWidgets } from '../../utils/widgetRegistry';
  * @param {string}      props.id              - Widget ID.
  * @param {number}      props.width           - Widget width (1 or 2).
  * @param {boolean}     props.forceLastColumn - Force to last column.
- * @param {string}      props.titleHtml       - Widget title HTML.
  * @param {JSX.Element} props.children        - Widget content.
  * @return {JSX.Element} The widget wrapper.
  */
-function WidgetWrapper( {
-	id,
-	width = 1,
-	forceLastColumn = false,
-	titleHtml,
-	children,
-} ) {
+function WidgetWrapper( { id, width = 1, forceLastColumn = false, children } ) {
 	// Widget-specific styles
 	const widgetStyles = {};
 	const innerContainerStyles = {};
@@ -64,17 +57,6 @@ function WidgetWrapper( {
 				className="widget-inner-container"
 				style={ innerContainerStyles }
 			>
-				{ titleHtml && (
-					<div
-						className="prpl-widget-title"
-						dangerouslySetInnerHTML={ { __html: titleHtml } }
-						style={ {
-							marginTop: 0,
-							fontSize: '1.375rem',
-							lineHeight: 1.2,
-						} }
-					/>
-				) }
 				{ children }
 			</div>
 		</div>
@@ -122,22 +104,12 @@ export default function DashboardWidgets() {
 			return null;
 		}
 
-		// Build title HTML with info icon if available
-		let titleHtml = '';
-		if ( widget.title ) {
-			titleHtml = widget.title;
-			if ( widget.infoIconSvg ) {
-				titleHtml += `<div class="tooltip-actions"><prpl-tooltip><slot name="open-icon"><span class="icon prpl-info-icon">${ widget.infoIconSvg }<span class="screen-reader-text">More info</span></span></slot><slot name="content">${ widget.title }</slot></prpl-tooltip></div>`;
-			}
-		}
-
 		return (
 			<WidgetWrapper
 				key={ widget.id }
 				id={ widget.id }
 				width={ widget.width || 1 }
 				forceLastColumn={ widget.forceLastColumn || false }
-				titleHtml={ titleHtml }
 			>
 				<WidgetComponent
 					config={ {
