@@ -235,6 +235,12 @@ class Page {
 		// Get register/subscribe icon SVG.
 		$register_icon_svg = \progress_planner()->get_asset( 'images/register_icon.svg' );
 
+		// Get progress icon SVG for welcome page.
+		$progress_icon_svg = \progress_planner()->get_asset( 'images/icon_progress_planner.svg' );
+
+		// Get current user data for welcome/onboarding form.
+		$current_user = \wp_get_current_user();
+
 		// Localize dashboard config.
 		\wp_localize_script(
 			'progress-planner/dashboard',
@@ -243,10 +249,23 @@ class Page {
 				'privacyPolicyAccepted' => \progress_planner()->is_privacy_policy_accepted(),
 				// Header configuration.
 				'licenseKey'            => \progress_planner()->get_license_key() ? \progress_planner()->get_license_key() : 'no-license',
+				// Welcome/onboarding configuration.
+				'onboardNonceURL'       => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
+				'onboardAPIUrl'         => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
+				'ajaxUrl'               => \admin_url( 'admin-ajax.php' ),
+				'nonce'                 => \wp_create_nonce( 'progress_planner' ),
+				'userFirstName'         => $current_user->user_firstname,
+				'userEmail'             => $current_user->user_email,
+				'siteUrl'               => \site_url(),
+				'timezoneOffset'        => (float) \get_option( 'gmt_offset', 0 ),
+				'baseUrl'               => \constant( 'PROGRESS_PLANNER_URL' ),
 				'branding'              => [
-					'logoHtml'         => $logo_html,
-					'tourIconHtml'     => $tour_icon_svg ? $tour_icon_svg : '',
-					'registerIconHtml' => $register_icon_svg ? $register_icon_svg : '',
+					'logoHtml'          => $logo_html,
+					'tourIconHtml'      => $tour_icon_svg ? $tour_icon_svg : '',
+					'registerIconHtml'  => $register_icon_svg ? $register_icon_svg : '',
+					'progressIconHtml'  => $progress_icon_svg ? $progress_icon_svg : '',
+					'homeUrl'           => \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/home' ),
+					'privacyPolicyUrl'  => \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ),
 				],
 				'currentRange'          => $current_range,
 				'currentFrequency'      => $current_frequency,

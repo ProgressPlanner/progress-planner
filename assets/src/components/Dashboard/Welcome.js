@@ -195,8 +195,16 @@ export default function Welcome( { config } ) {
 		setWithEmail( value );
 	};
 
+	// Wrapper styles (migrated from .prpl-wrap.prpl-pp-not-accepted in welcome.css)
+	const wrapperStyle = {
+		padding: 0,
+		backgroundColor: 'var(--prpl-background-paper)',
+		border: '1px solid var(--prpl-color-border)',
+		borderRadius: 'var(--prpl-border-radius)',
+	};
+
 	return (
-		<div className="prpl-welcome">
+		<div className="prpl-welcome" style={ wrapperStyle }>
 			<div
 				className="welcome-header"
 				style={ {
@@ -238,8 +246,10 @@ export default function Welcome( { config } ) {
 							dangerouslySetInnerHTML={ {
 								__html: branding.progressIconHtml,
 							} }
+							className="prpl-welcome-icon"
 							style={ {
 								display: 'block',
+								height: '100px',
 							} }
 						/>
 					) }
