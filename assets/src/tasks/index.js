@@ -14,6 +14,7 @@ import siteIconTask from './SiteIconTask';
 import seoPluginTask from './SEOPluginTask';
 import removeInactivePluginsTask from './RemoveInactivePluginsTask';
 import permalinkStructureTask from './PermalinkStructureTask';
+import renameUncategorizedCategoryTask from './RenameUncategorizedCategoryTask';
 
 // Register all task providers.
 registerTaskProvider( helloWorldTask );
@@ -24,3 +25,4 @@ registerTaskProvider( siteIconTask );
 registerTaskProvider( seoPluginTask );
 registerTaskProvider( removeInactivePluginsTask );
 registerTaskProvider( permalinkStructureTask );
+registerTaskProvider( renameUncategorizedCategoryTask );
