@@ -7,8 +7,10 @@
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { doAction } from '@wordpress/hooks';
-import TaskItem from '../../components/TaskItem';
 import PopoverManager from './PopoverManager';
+import TaskList from './TaskList';
+import LoadMoreButton from './LoadMoreButton';
+import { STYLES } from './styles';
 import {
 	fetchTasks,
 	completeTask,
@@ -603,36 +605,6 @@ function SuggestedTasks( { config = {} } ) {
 		ensureTaskActions,
 	] );
 
-	// Inline styles
-	const listStyle = {
-		listStyle: 'none',
-		padding: 0,
-		margin: '0 0 var(--prpl-padding) 0',
-	};
-
-	const loadingStyle = {
-		display: 'block',
-		backgroundColor: 'var(--prpl-background-activity)',
-		padding: 'calc(var(--prpl-padding) / 2)',
-	};
-
-	const emptyStyle = {
-		display: 'block',
-		backgroundColor: 'var(--prpl-background-activity)',
-		padding: 'calc(var(--prpl-padding) / 2)',
-	};
-
-	const toggleButtonStyle = {
-		background: 'none',
-		border: 'none',
-		padding: 0,
-		color: 'var(--prpl-color-link)',
-		textDecoration: 'underline',
-		cursor: 'pointer',
-		fontSize: 'inherit',
-		fontFamily: 'inherit',
-	};
-
 	/**
 	 * Decode HTML entities in a string.
 	 *
@@ -677,7 +649,7 @@ function SuggestedTasks( { config = {} } ) {
 				</p>
 				<p
 					className="prpl-suggested-tasks-loading"
-					style={ loadingStyle }
+					style={ STYLES.loading }
 				>
 					{ __( 'Loading tasks…', 'progress-planner' ) }
 				</p>
@@ -696,10 +668,10 @@ function SuggestedTasks( { config = {} } ) {
 				<ul
 					id="prpl-suggested-tasks-list"
 					className="prpl-suggested-tasks-list"
-					style={ listStyle }
+					style={ STYLES.list }
 					ref={ listRef }
 				></ul>
-				<p className="prpl-no-suggested-tasks" style={ emptyStyle }>
+				<p className="prpl-no-suggested-tasks" style={ STYLES.empty }>
 					{ __(
 						'You have completed all recommended tasks.',
 						'progress-planner'
@@ -721,43 +693,22 @@ function SuggestedTasks( { config = {} } ) {
 				{ widgetDescription }
 			</p>
 			<PopoverManager onComplete={ handleComplete } config={ config } />
-			<ul style={ { display: 'none' } }></ul>
-			<ul
-				id="prpl-suggested-tasks-list"
-				className="prpl-suggested-tasks-list"
-				style={ listStyle }
+			<ul style={ STYLES.hiddenList }></ul>
+			<TaskList
 				ref={ listRef }
-			>
-				{ tasks.map( ( task, index ) => (
-					<TaskItem
-						key={ task.id }
-						task={ task }
-						index={ index }
-						isUserTask={ task.prpl_provider?.slug === 'user' }
-						isCelebrating={ celebratingTaskIds.has( task.id ) }
-						onComplete={ handleComplete }
-						onSnooze={ handleSnooze }
-						onDelete={ handleDelete }
-						onMove={ handleMove }
-						onTitleChange={ handleTitleChange }
-					/>
-				) ) }
-			</ul>
+				tasks={ tasks }
+				celebratingTaskIds={ celebratingTaskIds }
+				onComplete={ handleComplete }
+				onSnooze={ handleSnooze }
+				onDelete={ handleDelete }
+				onMove={ handleMove }
+				onTitleChange={ handleTitleChange }
+			/>
 			{ hasMorePages && (
-				<p className="prpl-show-all-tasks">
-					<button
-						type="button"
-						id="prpl-load-more-recommendations"
-						className="prpl-toggle-all-recommendations-button"
-						style={ toggleButtonStyle }
-						onClick={ handleLoadMore }
-						disabled={ isLoadingMore }
-					>
-						{ isLoadingMore
-							? __( 'Loading…', 'progress-planner' )
-							: __( 'Load more tasks', 'progress-planner' ) }
-					</button>
-				</p>
+				<LoadMoreButton
+					isLoading={ isLoadingMore }
+					onClick={ handleLoadMore }
+				/>
 			) }
 		</>
 	);
