@@ -24,11 +24,11 @@ const taskProviders = new Map();
 let taskRenderCallback = null;
 
 /**
- * Container element for rendering tasks.
+ * Queue of tasks waiting to be rendered (when callback is not ready yet).
  *
- * @type {HTMLElement|null}
+ * @type {Array<{taskData: Object, priority: number}>}
  */
-let taskContainer = null;
+const taskRenderQueue = [];
 
 /**
  * Register a task provider.
@@ -110,16 +110,29 @@ export function isTaskProviderRegistered( providerId ) {
  */
 export function setTaskRenderCallback( callback ) {
 	taskRenderCallback = callback;
+
+	// Process queued tasks if callback is now available
+	if ( callback && taskRenderQueue.length > 0 ) {
+		taskRenderQueue.forEach( ( { taskData, priority } ) => {
+			callback( taskData, priority );
+		} );
+		// Clear the queue
+		taskRenderQueue.length = 0;
+	}
 }
 
 /**
  * Set the container element for rendering tasks.
+ * Note: Currently not used, but kept for future use if needed.
  *
  * @param {HTMLElement} container The container element.
  * @return {void}
  */
 export function setTaskContainer( container ) {
-	taskContainer = container;
+	// Container is stored for potential future use
+	// Currently, the widget handles rendering directly via callback
+	// eslint-disable-next-line no-unused-vars
+	const _container = container;
 }
 
 /**
@@ -277,9 +290,12 @@ async function processTask( taskInstance, taskData, TaskClass, priority = 50 ) {
 		// Check if task already exists
 		const existingTask = await checkTaskExists( taskId );
 		if ( existingTask ) {
-			// Task exists, render it
-			if ( taskRenderCallback && taskContainer ) {
+			// Task exists, render it (or queue if callback not ready)
+			if ( taskRenderCallback ) {
 				taskRenderCallback( existingTask, priority );
+			} else {
+				// Queue for later rendering
+				taskRenderQueue.push( { taskData: existingTask, priority } );
 			}
 			return;
 		}
@@ -312,8 +328,17 @@ async function processTask( taskInstance, taskData, TaskClass, priority = 50 ) {
 			if ( response && response.success && response.post_id ) {
 				// Task created, now fetch it to render
 				const createdTask = await checkTaskExists( taskId );
-				if ( createdTask && taskRenderCallback && taskContainer ) {
-					taskRenderCallback( createdTask, priority );
+				if ( createdTask ) {
+					// Render it (or queue if callback not ready)
+					if ( taskRenderCallback ) {
+						taskRenderCallback( createdTask, priority );
+					} else {
+						// Queue for later rendering
+						taskRenderQueue.push( {
+							taskData: createdTask,
+							priority,
+						} );
+					}
 				}
 			}
 		} catch ( error ) {
