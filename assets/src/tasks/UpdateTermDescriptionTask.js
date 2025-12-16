@@ -15,22 +15,16 @@ import { fetchDataCollector } from '../hooks/useTasksApi';
  * Update Term Description Task Provider class.
  */
 class UpdateTermDescriptionTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'update-term-description',
-			capability: 'edit_others_posts',
-			isOnboardingTask: false,
-			priority: 80,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/taxonomy-terms-description',
-			popoverId: 'update-term-description',
-		} );
-	}
+	static providerId = 'update-term-description';
+	static capability = 'edit_others_posts';
+	static isOnboardingTask = false;
+	static priority = 80;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/taxonomy-terms-description';
+	static popoverId = 'update-term-description';
+	static isMultiTask = true;
 
 	/**
 	 * Check if the task should be added.
@@ -41,27 +35,48 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async shouldAddTask( taskData = {} ) {
 		try {
-			// The PHP version creates multiple tasks for terms without descriptions.
-			// This is complex multi-task logic.
-			// For React, we'll check if there are terms without descriptions.
-			const termsWithoutDescription = await fetchDataCollector(
-				'terms_without_description'
-			);
-
-			if (
-				termsWithoutDescription &&
-				termsWithoutDescription.length > 0
-			) {
-				return true;
-			}
-
-			return false;
+			const tasksToInject = await this.getTasksToInject();
+			return tasksToInject && tasksToInject.length > 0;
 		} catch ( error ) {
 			console.error(
 				'Error checking Update Term Description task condition:',
 				error
 			);
 			return false;
+		}
+	}
+
+	/**
+	 * Get tasks to inject.
+	 *
+	 * Returns an array of taskData items, one for each term without a description.
+	 *
+	 * @return {Promise<Array>} Promise resolving to array of taskData objects.
+	 */
+	async getTasksToInject() {
+		try {
+			const termsWithoutDescription = await fetchDataCollector(
+				'terms_without_description'
+			);
+
+			if (
+				! termsWithoutDescription ||
+				termsWithoutDescription.length === 0
+			) {
+				return [];
+			}
+
+			// Return array of taskData objects, one per term
+			return termsWithoutDescription.map( ( term ) => ( {
+				target_term_id: term.term_id,
+				target_taxonomy: term.taxonomy,
+			} ) );
+		} catch ( error ) {
+			console.error(
+				'Error getting tasks to inject for Update Term Description:',
+				error
+			);
+			return [];
 		}
 	}
 
@@ -88,6 +103,7 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }term.php?taxonomy=${ targetTaxonomy }&tag_ID=${ targetTermId }`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -95,11 +111,15 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_blank',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 			target_term_id: targetTermId,
 			target_taxonomy: targetTaxonomy,
 		};
@@ -108,6 +128,4 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 	}
 }
 
-const updateTermDescriptionTask = new UpdateTermDescriptionTask();
-
-export default updateTermDescriptionTask;
+export default UpdateTermDescriptionTask;

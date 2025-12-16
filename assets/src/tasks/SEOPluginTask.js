@@ -12,22 +12,15 @@ import { fetchDataCollector } from '../hooks/useTasksApi';
  * SEO Plugin Task Provider class.
  */
 class SEOPluginTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'seo-plugin',
-			capability: 'manage_options',
-			isOnboardingTask: true,
-			priority: 20,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/install-seo-plugin',
-			popoverId: 'seo-plugin',
-		} );
-	}
+	static providerId = 'seo-plugin';
+	static capability = 'manage_options';
+	static isOnboardingTask = true;
+	static priority = 20;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/install-seo-plugin';
+	static popoverId = 'seo-plugin';
 
 	/**
 	 * Check if the task should be added.
@@ -66,6 +59,7 @@ class SEOPluginTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }plugins.php`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -73,11 +67,15 @@ class SEOPluginTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 		};
 
 		// Add popover ID for interactive tasks.
@@ -85,7 +83,4 @@ class SEOPluginTask extends InteractiveTaskProvider {
 	}
 }
 
-// Create singleton instance.
-const seoPluginTask = new SEOPluginTask();
-
-export default seoPluginTask;
+export default SEOPluginTask;

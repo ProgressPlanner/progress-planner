@@ -11,23 +11,16 @@ import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
  * Email Sending Task Provider class.
  */
 class EmailSendingTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'sending-email',
-			capability: 'manage_options',
-			isOnboardingTask: false,
-			priority: 4,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl:
-				'https://prpl.fyi/check-if-your-websites-email-system-works',
-			popoverId: 'sending-email',
-		} );
-	}
+	static providerId = 'sending-email';
+	static capability = 'manage_options';
+	static isOnboardingTask = false;
+	static priority = 4;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl =
+		'https://prpl.fyi/check-if-your-websites-email-system-works';
+	static popoverId = 'sending-email';
 
 	/**
 	 * Check if the task should be added.
@@ -58,6 +51,7 @@ class EmailSendingTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }admin.php?page=progress-planner`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -65,17 +59,19 @@ class EmailSendingTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 		};
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
 
-const emailSendingTask = new EmailSendingTask();
-
-export default emailSendingTask;
+export default EmailSendingTask;

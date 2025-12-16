@@ -12,23 +12,16 @@ import apiFetch from '@wordpress/api-fetch';
  * Permalink Structure Task Provider class.
  */
 class PermalinkStructureTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'core-permalink-structure',
-			capability: 'manage_options',
-			isOnboardingTask: true,
-			priority: 3,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl:
-				'https://prpl.fyi/change-default-permalink-structure',
-			popoverId: 'core-permalink-structure',
-		} );
-	}
+	static providerId = 'core-permalink-structure';
+	static capability = 'manage_options';
+	static isOnboardingTask = true;
+	static priority = 3;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl =
+		'https://prpl.fyi/change-default-permalink-structure';
+	static popoverId = 'core-permalink-structure';
 
 	/**
 	 * Check if the task should be added.
@@ -84,6 +77,7 @@ class PermalinkStructureTask extends InteractiveTaskProvider {
 			iconEl: 'label[for="permalink-input-month-name"], label[for="permalink-input-post-name"]',
 		};
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -91,11 +85,15 @@ class PermalinkStructureTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 			link_setting: linkSetting,
 		};
 
@@ -104,7 +102,4 @@ class PermalinkStructureTask extends InteractiveTaskProvider {
 	}
 }
 
-// Create singleton instance.
-const permalinkStructureTask = new PermalinkStructureTask();
-
-export default permalinkStructureTask;
+export default PermalinkStructureTask;

@@ -14,21 +14,14 @@ import { TaskProvider } from '../services/TaskProvider';
  * Debug Display Task Provider class.
  */
 class DebugDisplayTask extends TaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'wp-debug-display',
-			capability: 'manage_options',
-			isOnboardingTask: true,
-			priority: 10,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/set-wp-debug',
-		} );
-	}
+	static providerId = 'wp-debug-display';
+	static capability = 'manage_options';
+	static isOnboardingTask = true;
+	static priority = 10;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/set-wp-debug';
 
 	/**
 	 * Check if the task should be added.
@@ -55,6 +48,7 @@ class DebugDisplayTask extends TaskProvider {
 	async getTaskDetails( taskData = {} ) {
 		const taskId = this.getTaskId( taskData );
 
+		const StaticClass = this.constructor;
 		return {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -62,15 +56,17 @@ class DebugDisplayTask extends TaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url: '',
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 		};
 	}
 }
 
-const debugDisplayTask = new DebugDisplayTask();
-
-export default debugDisplayTask;
+export default DebugDisplayTask;

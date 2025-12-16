@@ -12,21 +12,14 @@ import apiFetch from '@wordpress/api-fetch';
  * Set Date Format Task Provider class.
  */
 class SetDateFormatTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'set-date-format',
-			capability: 'manage_options',
-			isOnboardingTask: false,
-			priority: 7,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			popoverId: 'set-date-format',
-		} );
-	}
+	static providerId = 'set-date-format';
+	static capability = 'manage_options';
+	static isOnboardingTask = false;
+	static priority = 7;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static popoverId = 'set-date-format';
 
 	/**
 	 * Check if the task should be added.
@@ -73,6 +66,7 @@ class SetDateFormatTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }options-general.php?pp-focus-el=${ taskId }`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -81,11 +75,15 @@ class SetDateFormatTask extends InteractiveTaskProvider {
 				'Setting the date format correctly on your site is valuable. By setting the correct date format, you ensure the dates are displayed correctly in the admin area and the front end.',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 			link_setting: {
 				hook: 'options-general.php',
 				iconEl: 'tr:has(input[name="date_format"]) th',
@@ -96,6 +94,4 @@ class SetDateFormatTask extends InteractiveTaskProvider {
 	}
 }
 
-const setDateFormatTask = new SetDateFormatTask();
-
-export default setDateFormatTask;
+export default SetDateFormatTask;

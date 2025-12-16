@@ -12,22 +12,15 @@ import apiFetch from '@wordpress/api-fetch';
  * Blog Description Task Provider class.
  */
 class BlogDescriptionTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'core-blogdescription',
-			capability: 'manage_options',
-			isOnboardingTask: true,
-			priority: 2,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/set-tagline',
-			popoverId: 'core-blogdescription',
-		} );
-	}
+	static providerId = 'core-blogdescription';
+	static capability = 'manage_options';
+	static isOnboardingTask = true;
+	static priority = 2;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/set-tagline';
+	static popoverId = 'core-blogdescription';
 
 	/**
 	 * Check if the task should be added.
@@ -70,6 +63,7 @@ class BlogDescriptionTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }options-general.php?pp-focus-el=${ taskId }`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -78,11 +72,15 @@ class BlogDescriptionTask extends InteractiveTaskProvider {
 				'Set the tagline to make your website look more professional.',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 			link_setting: {
 				hook: 'options-general.php',
 				iconEl: 'th:has(+td #tagline-description)',
@@ -94,7 +92,4 @@ class BlogDescriptionTask extends InteractiveTaskProvider {
 	}
 }
 
-// Create singleton instance.
-const blogDescriptionTask = new BlogDescriptionTask();
-
-export default blogDescriptionTask;
+export default BlogDescriptionTask;

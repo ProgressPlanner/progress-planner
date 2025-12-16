@@ -12,22 +12,15 @@ import { fetchDataCollector } from '../hooks/useTasksApi';
  * Rename Uncategorized Category Task Provider class.
  */
 class RenameUncategorizedCategoryTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'rename-uncategorized-category',
-			capability: 'manage_categories',
-			isOnboardingTask: true,
-			priority: 60,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/rename-uncategorized-category',
-			popoverId: 'rename-uncategorized-category',
-		} );
-	}
+	static providerId = 'rename-uncategorized-category';
+	static capability = 'manage_categories';
+	static isOnboardingTask = true;
+	static priority = 60;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/rename-uncategorized-category';
+	static popoverId = 'rename-uncategorized-category';
 
 	/**
 	 * Check if the task should be added.
@@ -73,6 +66,7 @@ class RenameUncategorizedCategoryTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }term.php?taxonomy=category&tag_ID=${ uncategorizedCategoryId }`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -80,11 +74,15 @@ class RenameUncategorizedCategoryTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 		};
 
 		// Add popover ID for interactive tasks.
@@ -92,7 +90,4 @@ class RenameUncategorizedCategoryTask extends InteractiveTaskProvider {
 	}
 }
 
-// Create singleton instance.
-const renameUncategorizedCategoryTask = new RenameUncategorizedCategoryTask();
-
-export default renameUncategorizedCategoryTask;
+export default RenameUncategorizedCategoryTask;

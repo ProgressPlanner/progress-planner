@@ -12,22 +12,15 @@ import apiFetch from '@wordpress/api-fetch';
  * Site Icon Task Provider class.
  */
 class SiteIconTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'core-siteicon',
-			capability: 'manage_options',
-			isOnboardingTask: true,
-			priority: 1,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/set-site-icon',
-			popoverId: 'core-siteicon',
-		} );
-	}
+	static providerId = 'core-siteicon';
+	static capability = 'manage_options';
+	static isOnboardingTask = true;
+	static priority = 1;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/set-site-icon';
+	static popoverId = 'core-siteicon';
 
 	/**
 	 * Check if the task should be added.
@@ -68,6 +61,7 @@ class SiteIconTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }options-general.php?pp-focus-el=${ taskId }`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -75,11 +69,15 @@ class SiteIconTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 			link_setting: {
 				hook: 'options-general.php',
 				iconEl: '.site-icon-section th',
@@ -91,7 +89,4 @@ class SiteIconTask extends InteractiveTaskProvider {
 	}
 }
 
-// Create singleton instance.
-const siteIconTask = new SiteIconTask();
-
-export default siteIconTask;
+export default SiteIconTask;

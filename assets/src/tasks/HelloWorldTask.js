@@ -12,22 +12,15 @@ import { fetchDataCollector } from '../hooks/useTasksApi';
  * Hello World Task Provider class.
  */
 class HelloWorldTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'hello-world',
-			capability: 'edit_posts',
-			isOnboardingTask: true,
-			priority: 15,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/delete-hello-world-post',
-			popoverId: 'hello-world',
-		} );
-	}
+	static providerId = 'hello-world';
+	static capability = 'edit_posts';
+	static isOnboardingTask = true;
+	static priority = 15;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/delete-hello-world-post';
+	static popoverId = 'hello-world';
 
 	/**
 	 * Check if the task should be added.
@@ -83,6 +76,7 @@ class HelloWorldTask extends InteractiveTaskProvider {
 				? '<p>On install, WordPress creates a "Hello World!" post. This post does not add value to your website and solely exists to show what a post can look like. Therefore, "Hello World!" is not needed and should be deleted.</p>'
 				: 'On install, WordPress creates a "Hello World!" post. This post is not needed and should be deleted.';
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -90,11 +84,15 @@ class HelloWorldTask extends InteractiveTaskProvider {
 			description,
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 		};
 
 		// Add popover ID for interactive tasks.
@@ -102,7 +100,4 @@ class HelloWorldTask extends InteractiveTaskProvider {
 	}
 }
 
-// Create singleton instance.
-const helloWorldTask = new HelloWorldTask();
-
-export default helloWorldTask;
+export default HelloWorldTask;

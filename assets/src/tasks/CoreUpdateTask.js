@@ -12,22 +12,15 @@ import apiFetch from '@wordpress/api-fetch';
  * Core Update Task Provider class.
  */
 class CoreUpdateTask extends TaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'update-core',
-			capability: 'update_core',
-			isOnboardingTask: false,
-			priority: 20,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			isRepetitive: true,
-			externalLinkUrl: 'https://prpl.fyi/perform-all-updates',
-		} );
-	}
+	static providerId = 'update-core';
+	static capability = 'update_core';
+	static isOnboardingTask = false;
+	static priority = 20;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static isRepetitive = true;
+	static externalLinkUrl = 'https://prpl.fyi/perform-all-updates';
 
 	/**
 	 * Check if the task should be added.
@@ -82,6 +75,7 @@ class CoreUpdateTask extends TaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }update-core.php`;
 
+		const StaticClass = this.constructor;
 		return {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -89,15 +83,17 @@ class CoreUpdateTask extends TaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 		};
 	}
 }
 
-const coreUpdateTask = new CoreUpdateTask();
-
-export default coreUpdateTask;
+export default CoreUpdateTask;

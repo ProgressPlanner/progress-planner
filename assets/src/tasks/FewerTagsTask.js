@@ -12,22 +12,15 @@ import { fetchDataCollector } from '../hooks/useTasksApi';
  * Fewer Tags Task Provider class.
  */
 class FewerTagsTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'fewer-tags',
-			capability: 'manage_options',
-			isOnboardingTask: true,
-			priority: 32,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/install-fewer-tags',
-			popoverId: 'fewer-tags',
-		} );
-	}
+	static providerId = 'fewer-tags';
+	static capability = 'manage_options';
+	static isOnboardingTask = true;
+	static priority = 32;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/install-fewer-tags';
+	static popoverId = 'fewer-tags';
 
 	/**
 	 * Check if the task should be added.
@@ -77,6 +70,7 @@ class FewerTagsTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }plugin-install.php?tab=search&s=fewer+tags`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -84,17 +78,19 @@ class FewerTagsTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 		};
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
 
-const fewerTagsTask = new FewerTagsTask();
-
-export default fewerTagsTask;
+export default FewerTagsTask;

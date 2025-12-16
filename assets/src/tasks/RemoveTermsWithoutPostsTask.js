@@ -15,22 +15,16 @@ import { fetchDataCollector } from '../hooks/useTasksApi';
  * Remove Terms Without Posts Task Provider class.
  */
 class RemoveTermsWithoutPostsTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'remove-terms-without-posts',
-			capability: 'edit_others_posts',
-			isOnboardingTask: false,
-			priority: 60,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/remove-empty-taxonomy',
-			popoverId: 'remove-terms-without-posts',
-		} );
-	}
+	static providerId = 'remove-terms-without-posts';
+	static capability = 'edit_others_posts';
+	static isOnboardingTask = false;
+	static priority = 60;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/remove-empty-taxonomy';
+	static popoverId = 'remove-terms-without-posts';
+	static isMultiTask = true;
 
 	/**
 	 * Check if the task should be added.
@@ -41,24 +35,45 @@ class RemoveTermsWithoutPostsTask extends InteractiveTaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async shouldAddTask( taskData = {} ) {
 		try {
-			// The PHP version creates multiple tasks for terms without posts.
-			// This is complex multi-task logic.
-			// For React, we'll check if there are terms without posts.
-			const termsWithoutPosts = await fetchDataCollector(
-				'terms_without_posts'
-			);
-
-			if ( termsWithoutPosts && termsWithoutPosts.length > 0 ) {
-				return true;
-			}
-
-			return false;
+			const tasksToInject = await this.getTasksToInject();
+			return tasksToInject && tasksToInject.length > 0;
 		} catch ( error ) {
 			console.error(
 				'Error checking Remove Terms Without Posts task condition:',
 				error
 			);
 			return false;
+		}
+	}
+
+	/**
+	 * Get tasks to inject.
+	 *
+	 * Returns an array of taskData items, one for each term without posts.
+	 *
+	 * @return {Promise<Array>} Promise resolving to array of taskData objects.
+	 */
+	async getTasksToInject() {
+		try {
+			const termsWithoutPosts = await fetchDataCollector(
+				'terms_without_posts'
+			);
+
+			if ( ! termsWithoutPosts || termsWithoutPosts.length === 0 ) {
+				return [];
+			}
+
+			// Return array of taskData objects, one per term
+			return termsWithoutPosts.map( ( term ) => ( {
+				target_term_id: term.term_id,
+				target_taxonomy: term.taxonomy,
+			} ) );
+		} catch ( error ) {
+			console.error(
+				'Error getting tasks to inject for Remove Terms Without Posts:',
+				error
+			);
+			return [];
 		}
 	}
 
@@ -85,6 +100,7 @@ class RemoveTermsWithoutPostsTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }edit-tags.php?taxonomy=${ targetTaxonomy }`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -92,11 +108,15 @@ class RemoveTermsWithoutPostsTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_blank',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 			target_term_id: targetTermId,
 			target_taxonomy: targetTaxonomy,
 		};
@@ -105,6 +125,4 @@ class RemoveTermsWithoutPostsTask extends InteractiveTaskProvider {
 	}
 }
 
-const removeTermsWithoutPostsTask = new RemoveTermsWithoutPostsTask();
-
-export default removeTermsWithoutPostsTask;
+export default RemoveTermsWithoutPostsTask;

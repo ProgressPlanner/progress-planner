@@ -11,22 +11,15 @@ import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
  * Set Valuable Post Types Task Provider class.
  */
 class SetValuablePostTypesTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'set-valuable-post-types',
-			capability: 'manage_options',
-			isOnboardingTask: false,
-			priority: 70,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/valuable-content',
-			popoverId: 'set-valuable-post-types',
-		} );
-	}
+	static providerId = 'set-valuable-post-types';
+	static capability = 'manage_options';
+	static isOnboardingTask = false;
+	static priority = 70;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/valuable-content';
+	static popoverId = 'set-valuable-post-types';
 
 	/**
 	 * Check if the task should be added.
@@ -58,6 +51,7 @@ class SetValuablePostTypesTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }admin.php?page=progress-planner`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -65,17 +59,19 @@ class SetValuablePostTypesTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 		};
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
 
-const setValuablePostTypesTask = new SetValuablePostTypesTask();
-
-export default setValuablePostTypesTask;
+export default SetValuablePostTypesTask;

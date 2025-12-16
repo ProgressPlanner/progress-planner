@@ -12,22 +12,15 @@ import apiFetch from '@wordpress/api-fetch';
  * Disable Comments Task Provider class.
  */
 class DisableCommentsTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'disable-comments',
-			capability: 'manage_options',
-			isOnboardingTask: true,
-			priority: 9,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/disable-comments',
-			popoverId: 'disable-comments',
-		} );
-	}
+	static providerId = 'disable-comments';
+	static capability = 'manage_options';
+	static isOnboardingTask = true;
+	static priority = 9;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/disable-comments';
+	static popoverId = 'disable-comments';
 
 	/**
 	 * Check if the task should be added.
@@ -76,6 +69,7 @@ class DisableCommentsTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }options-discussion.php`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -83,11 +77,15 @@ class DisableCommentsTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 			link_setting: {
 				hook: 'options-discussion.php',
 				iconEl: 'label[for="default_comment_status"]',
@@ -98,6 +96,4 @@ class DisableCommentsTask extends InteractiveTaskProvider {
 	}
 }
 
-const disableCommentsTask = new DisableCommentsTask();
-
-export default disableCommentsTask;
+export default DisableCommentsTask;

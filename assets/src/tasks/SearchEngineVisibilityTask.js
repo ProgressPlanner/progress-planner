@@ -12,22 +12,15 @@ import apiFetch from '@wordpress/api-fetch';
  * Search Engine Visibility Task Provider class.
  */
 class SearchEngineVisibilityTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'search-engine-visibility',
-			capability: 'manage_options',
-			isOnboardingTask: true,
-			priority: 5,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/blog-indexing-settings',
-			popoverId: 'search-engine-visibility',
-		} );
-	}
+	static providerId = 'search-engine-visibility';
+	static capability = 'manage_options';
+	static isOnboardingTask = true;
+	static priority = 5;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/blog-indexing-settings';
+	static popoverId = 'search-engine-visibility';
 
 	/**
 	 * Check if the task should be added.
@@ -70,6 +63,7 @@ class SearchEngineVisibilityTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }options-reading.php`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -77,11 +71,15 @@ class SearchEngineVisibilityTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 			link_setting: {
 				hook: 'options-reading.php',
 				iconEl: 'label[for="blog_public"]',
@@ -93,7 +91,4 @@ class SearchEngineVisibilityTask extends InteractiveTaskProvider {
 	}
 }
 
-// Create singleton instance.
-const searchEngineVisibilityTask = new SearchEngineVisibilityTask();
-
-export default searchEngineVisibilityTask;
+export default SearchEngineVisibilityTask;

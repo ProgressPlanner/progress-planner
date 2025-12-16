@@ -15,21 +15,28 @@ const taskProviders = new Map();
 /**
  * Register a task provider.
  *
- * @param {Object}   providerConfig                The task provider configuration.
- * @param {string}   providerConfig.providerId     Unique identifier for the provider.
- * @param {Function} providerConfig.shouldAddTask  Function that evaluates if task should be added.
- * @param {Function} providerConfig.getTaskDetails Function that returns task details.
- * @param {Object}   providerConfig.config         Task configuration (priority, points, etc.).
+ * @param {Function|Object} providerConfig The task provider class or instance.
  * @return {void}
  */
 export function registerTaskProvider( providerConfig ) {
-	// Support both plain objects with providerId and class instances with getProviderId()
-	const providerId =
-		providerConfig.providerId ||
-		( providerConfig.getProviderId &&
+	// Support classes (with static properties), instances, and plain objects
+	let providerId = null;
+
+	// Check if it's a class (constructor function) with static providerId
+	if ( typeof providerConfig === 'function' && providerConfig.providerId ) {
+		providerId = providerConfig.providerId;
+	}
+	// Check if it's an instance with getProviderId method
+	else if (
+		providerConfig.getProviderId &&
 		typeof providerConfig.getProviderId === 'function'
-			? providerConfig.getProviderId()
-			: null );
+	) {
+		providerId = providerConfig.getProviderId();
+	}
+	// Check for direct providerId property (plain object or instance)
+	else if ( providerConfig.providerId ) {
+		providerId = providerConfig.providerId;
+	}
 
 	if ( ! providerId ) {
 		console.error(

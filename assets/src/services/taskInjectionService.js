@@ -48,10 +48,20 @@ export async function injectTasks() {
 
 	for ( const provider of providers ) {
 		try {
-			// Get provider ID.
+			// Handle both classes and instances
+			const ProviderClass =
+				typeof provider === 'function'
+					? provider
+					: provider.constructor;
+			const providerInstance =
+				typeof provider === 'function' ? new provider() : provider;
+
+			// Get provider ID from static property or instance method
 			const providerId =
-				provider.getProviderId?.() ||
-				provider.config?.providerId ||
+				ProviderClass.providerId ||
+				providerInstance.getProviderId?.() ||
+				providerInstance.config?.providerId ||
+				providerInstance.providerId ||
 				provider.providerId;
 
 			if ( ! providerId ) {
@@ -59,13 +69,24 @@ export async function injectTasks() {
 				continue;
 			}
 
+			// Check if this is a multi-task provider
+			const isMultiTask =
+				ProviderClass.isMultiTask !== undefined
+					? ProviderClass.isMultiTask
+					: providerInstance.config?.isMultiTask || false;
+			const hasGetTasksToInject =
+				providerInstance.getTasksToInject &&
+				typeof providerInstance.getTasksToInject === 'function';
+
 			// Check dependencies first.
 			if (
-				provider.areDependenciesSatisfied &&
-				typeof provider.areDependenciesSatisfied === 'function'
+				providerInstance.areDependenciesSatisfied &&
+				typeof providerInstance.areDependenciesSatisfied === 'function'
 			) {
 				const dependenciesSatisfied =
-					await provider.areDependenciesSatisfied( getTaskStatus );
+					await providerInstance.areDependenciesSatisfied(
+						getTaskStatus
+					);
 				if ( ! dependenciesSatisfied ) {
 					continue;
 				}
@@ -73,8 +94,8 @@ export async function injectTasks() {
 
 			// Evaluate if task should be added.
 			if (
-				! provider.shouldAddTask ||
-				typeof provider.shouldAddTask !== 'function'
+				! providerInstance.shouldAddTask ||
+				typeof providerInstance.shouldAddTask !== 'function'
 			) {
 				console.warn(
 					`Task provider "${ providerId }" missing shouldAddTask method`
@@ -82,67 +103,158 @@ export async function injectTasks() {
 				continue;
 			}
 
-			const shouldAdd = await provider.shouldAddTask();
+			const shouldAdd = await providerInstance.shouldAddTask();
 			if ( ! shouldAdd ) {
 				continue;
 			}
 
-			// Get task ID.
-			const taskId =
-				provider.getTaskId && typeof provider.getTaskId === 'function'
-					? provider.getTaskId()
-					: providerId;
-
-			// Check if task was already completed.
-			if ( await wasTaskCompleted( taskId ) ) {
-				continue;
-			}
-
-			// Get task details.
-			if (
-				! provider.getTaskDetails ||
-				typeof provider.getTaskDetails !== 'function'
-			) {
-				console.warn(
-					`Task provider "${ providerId }" missing getTaskDetails method`
-				);
-				continue;
-			}
-
-			const taskDetails = await provider.getTaskDetails();
-
-			// Ensure task_id is set.
-			if ( ! taskDetails.task_id ) {
-				taskDetails.task_id = taskId;
-			}
-
-			// Ensure provider_id is set.
-			if ( ! taskDetails.provider_id ) {
-				taskDetails.provider_id = providerId;
-			}
-
-			// Create task post via REST API.
-			try {
-				const response = await createTaskPost( taskDetails );
-
-				// Response will have success: true and post_id if successful.
-				// If task already exists or was completed, success will be false.
-				if ( response && response.success && response.post_id ) {
-					injectedTasks.push( response.post_id );
+			// Handle multi-task providers
+			if ( isMultiTask || hasGetTasksToInject ) {
+				if ( ! hasGetTasksToInject ) {
+					console.warn(
+						`Multi-task provider "${ providerId }" missing getTasksToInject method`
+					);
+					continue;
 				}
-			} catch ( error ) {
-				// Log error but continue with other tasks.
-				console.warn(
-					`Error creating task "${ taskDetails.task_id }":`,
-					error
-				);
+
+				// Get array of taskData items
+				const tasksToInject = await providerInstance.getTasksToInject();
+
+				if ( ! Array.isArray( tasksToInject ) ) {
+					console.warn(
+						`getTasksToInject() for provider "${ providerId }" must return an array`
+					);
+					continue;
+				}
+
+				// Create a task for each taskData item
+				for ( const taskData of tasksToInject ) {
+					try {
+						// Get task ID for this specific task
+						const taskId =
+							providerInstance.getTaskId &&
+							typeof providerInstance.getTaskId === 'function'
+								? providerInstance.getTaskId( taskData )
+								: `${ providerId }-${
+										taskData.target_post_id ||
+										taskData.target_term_id ||
+										'unknown'
+								  }`;
+
+						// Check if task was already completed
+						if ( await wasTaskCompleted( taskId ) ) {
+							continue;
+						}
+
+						// Get task details for this specific task
+						if (
+							! providerInstance.getTaskDetails ||
+							typeof providerInstance.getTaskDetails !==
+								'function'
+						) {
+							console.warn(
+								`Task provider "${ providerId }" missing getTaskDetails method`
+							);
+							continue;
+						}
+
+						const taskDetails =
+							await providerInstance.getTaskDetails( taskData );
+
+						// Ensure task_id is set
+						if ( ! taskDetails.task_id ) {
+							taskDetails.task_id = taskId;
+						}
+
+						// Ensure provider_id is set
+						if ( ! taskDetails.provider_id ) {
+							taskDetails.provider_id = providerId;
+						}
+
+						// Create task post via REST API
+						try {
+							const response =
+								await createTaskPost( taskDetails );
+
+							if (
+								response &&
+								response.success &&
+								response.post_id
+							) {
+								injectedTasks.push( response.post_id );
+							}
+						} catch ( error ) {
+							console.warn(
+								`Error creating task "${ taskDetails.task_id }":`,
+								error
+							);
+						}
+					} catch ( error ) {
+						console.warn(
+							`Error processing task data for provider "${ providerId }":`,
+							error
+						);
+					}
+				}
+			} else {
+				// Single-task provider - existing behavior
+				// Get task ID
+				const taskId =
+					providerInstance.getTaskId &&
+					typeof providerInstance.getTaskId === 'function'
+						? providerInstance.getTaskId()
+						: providerId;
+
+				// Check if task was already completed
+				if ( await wasTaskCompleted( taskId ) ) {
+					continue;
+				}
+
+				// Get task details
+				if (
+					! providerInstance.getTaskDetails ||
+					typeof providerInstance.getTaskDetails !== 'function'
+				) {
+					console.warn(
+						`Task provider "${ providerId }" missing getTaskDetails method`
+					);
+					continue;
+				}
+
+				const taskDetails = await providerInstance.getTaskDetails();
+
+				// Ensure task_id is set
+				if ( ! taskDetails.task_id ) {
+					taskDetails.task_id = taskId;
+				}
+
+				// Ensure provider_id is set
+				if ( ! taskDetails.provider_id ) {
+					taskDetails.provider_id = providerId;
+				}
+
+				// Create task post via REST API
+				try {
+					const response = await createTaskPost( taskDetails );
+
+					if ( response && response.success && response.post_id ) {
+						injectedTasks.push( response.post_id );
+					}
+				} catch ( error ) {
+					console.warn(
+						`Error creating task "${ taskDetails.task_id }":`,
+						error
+					);
+				}
 			}
 		} catch ( error ) {
 			console.error(
 				`Error injecting task for provider "${
 					provider.providerId ||
 					provider.config?.providerId ||
-					'unknown'
+					( typeof provider === 'function'
+						? provider.providerId
+						: 'unknown' )
 				}":`,
 				error
 			);

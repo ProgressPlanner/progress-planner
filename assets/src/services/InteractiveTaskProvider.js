@@ -17,14 +17,10 @@ export class InteractiveTaskProvider extends TaskProvider {
 	/**
 	 * Constructor.
 	 *
-	 * @param {Object} config Task provider configuration.
+	 * @param {Object} config Optional task provider configuration (for backward compatibility).
 	 */
-	constructor( config ) {
-		super( {
-			...config,
-			// Interactive tasks should have a popover ID.
-			popoverId: config.popoverId || '',
-		} );
+	constructor( config = {} ) {
+		super( config );
 	}
 
 	/**
@@ -33,7 +29,8 @@ export class InteractiveTaskProvider extends TaskProvider {
 	 * @return {string} The popover ID (with prpl-popover- prefix).
 	 */
 	getPopoverId() {
-		const popoverId = this.config.popoverId || '';
+		const StaticClass = this.constructor;
+		const popoverId = StaticClass.popoverId || this.config.popoverId || '';
 		return popoverId ? `prpl-popover-${ popoverId }` : '';
 	}
 
@@ -65,7 +62,9 @@ export class InteractiveTaskProvider extends TaskProvider {
 	 * @return {Object} Task details with popover_id added.
 	 */
 	addPopoverIdToTaskDetails( taskDetails ) {
-		if ( this.config.popoverId ) {
+		const StaticClass = this.constructor;
+		const popoverId = StaticClass.popoverId || this.config.popoverId || '';
+		if ( popoverId ) {
 			taskDetails.popover_id = this.getPopoverId();
 		}
 		return taskDetails;

@@ -14,22 +14,16 @@ import { TaskProvider } from '../services/TaskProvider';
  * Content Review Task Provider class.
  */
 class ContentReviewTask extends TaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'review-post',
-			capability: 'edit_others_posts',
-			isOnboardingTask: false,
-			priority: 10,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			isRepetitive: true,
-			externalLinkUrl: 'https://prpl.fyi/review-post',
-		} );
-	}
+	static providerId = 'review-post';
+	static capability = 'edit_others_posts';
+	static isOnboardingTask = false;
+	static priority = 10;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static isRepetitive = true;
+	static externalLinkUrl = 'https://prpl.fyi/review-post';
+	static isMultiTask = true;
 
 	/**
 	 * Check if the task should be added.
@@ -39,14 +33,32 @@ class ContentReviewTask extends TaskProvider {
 	 */
 	// eslint-disable-next-line no-unused-vars
 	async shouldAddTask( taskData = {} ) {
-		// The PHP version creates multiple tasks for posts that need review.
-		// This is complex multi-task logic that requires:
-		// - Querying posts that need review
-		// - Creating multiple tasks (one per post)
-		// For React, this would need special handling.
-		// TODO: Implement multi-task provider pattern for React.
-		// For now, return false (task won't show) until multi-task pattern is implemented.
-		return false;
+		// Check if there are any posts that need review.
+		// The getTasksToInject() method will return the actual list of posts.
+		try {
+			const tasksToInject = await this.getTasksToInject();
+			return tasksToInject && tasksToInject.length > 0;
+		} catch ( error ) {
+			console.error(
+				'Error checking Content Review task condition:',
+				error
+			);
+			return false;
+		}
+	}
+
+	/**
+	 * Get tasks to inject.
+	 *
+	 * Returns an array of taskData items, one for each post that needs review.
+	 *
+	 * @return {Promise<Array>} Promise resolving to array of taskData objects.
+	 */
+	async getTasksToInject() {
+		// TODO: Implement proper data collection to get posts that need review.
+		// For now, return empty array. This should be replaced with actual data collection.
+		// The PHP version queries posts older than 12 months (or 6 months for important pages).
+		return [];
 	}
 
 	/**
@@ -71,6 +83,7 @@ class ContentReviewTask extends TaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }post.php?post=${ targetPostId }&action=edit`;
 
+		const StaticClass = this.constructor;
 		return {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -78,16 +91,18 @@ class ContentReviewTask extends TaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_blank',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 			target_post_id: targetPostId,
 		};
 	}
 }
 
-const contentReviewTask = new ContentReviewTask();
-
-export default contentReviewTask;
+export default ContentReviewTask;

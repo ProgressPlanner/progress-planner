@@ -15,24 +15,82 @@ export class TaskProvider {
 	/**
 	 * Constructor.
 	 *
-	 * @param {Object} config Task provider configuration.
+	 * @param {Object} config Optional task provider configuration (for backward compatibility).
 	 */
-	constructor( config ) {
+	constructor( config = {} ) {
+		// Build config from static properties, with fallback to constructor params for backward compatibility
+		const StaticClass = this.constructor;
+
+		// Calculate isSnoozable separately to avoid nested ternary
+		let isSnoozable = true; // Default value
+		if ( StaticClass.isSnoozable !== undefined ) {
+			isSnoozable = StaticClass.isSnoozable;
+		} else if ( config.isSnoozable !== undefined ) {
+			isSnoozable = config.isSnoozable;
+		}
+
 		this.config = {
-			providerId: config.providerId || '',
-			capability: config.capability || 'manage_options',
-			isOnboardingTask: config.isOnboardingTask || false,
-			priority: config.priority || 50,
-			points: config.points || 1,
-			parent: config.parent || 0,
-			isDismissable: config.isDismissable || false,
-			isSnoozable:
-				config.isSnoozable !== undefined ? config.isSnoozable : true,
-			isRepetitive: config.isRepetitive || false,
-			dependencies: config.dependencies || [],
-			externalLinkUrl: config.externalLinkUrl || '',
-			popoverId: config.popoverId || '',
+			providerId: StaticClass.providerId || config.providerId || '',
+			capability:
+				StaticClass.capability || config.capability || 'manage_options',
+			isOnboardingTask:
+				StaticClass.isOnboardingTask !== undefined
+					? StaticClass.isOnboardingTask
+					: config.isOnboardingTask || false,
+			priority:
+				StaticClass.priority !== undefined
+					? StaticClass.priority
+					: config.priority || 50,
+			points:
+				StaticClass.points !== undefined
+					? StaticClass.points
+					: config.points || 1,
+			parent:
+				StaticClass.parent !== undefined
+					? StaticClass.parent
+					: config.parent || 0,
+			isDismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: config.isDismissable || false,
+			isSnoozable,
+			isRepetitive:
+				StaticClass.isRepetitive !== undefined
+					? StaticClass.isRepetitive
+					: config.isRepetitive || false,
+			dependencies: StaticClass.dependencies || config.dependencies || [],
+			externalLinkUrl:
+				StaticClass.externalLinkUrl || config.externalLinkUrl || '',
+			popoverId: StaticClass.popoverId || config.popoverId || '',
+			isMultiTask:
+				StaticClass.isMultiTask !== undefined
+					? StaticClass.isMultiTask
+					: config.isMultiTask || false,
 			...config,
+		};
+	}
+
+	/**
+	 * Get static config from the class.
+	 *
+	 * @return {Object} Configuration object from static properties.
+	 */
+	static getStaticConfig() {
+		return {
+			providerId: this.providerId || '',
+			capability: this.capability || 'manage_options',
+			isOnboardingTask: this.isOnboardingTask || false,
+			priority: this.priority !== undefined ? this.priority : 50,
+			points: this.points !== undefined ? this.points : 1,
+			parent: this.parent || 0,
+			isDismissable: this.isDismissable || false,
+			isSnoozable:
+				this.isSnoozable !== undefined ? this.isSnoozable : true,
+			isRepetitive: this.isRepetitive || false,
+			dependencies: this.dependencies || [],
+			externalLinkUrl: this.externalLinkUrl || '',
+			popoverId: this.popoverId || '',
+			isMultiTask: this.isMultiTask || false,
 		};
 	}
 
@@ -42,7 +100,8 @@ export class TaskProvider {
 	 * @return {string} The provider ID.
 	 */
 	getProviderId() {
-		return this.config.providerId;
+		const StaticClass = this.constructor;
+		return StaticClass.providerId || this.config.providerId || '';
 	}
 
 	/**
@@ -51,7 +110,10 @@ export class TaskProvider {
 	 * @return {number} The priority (lower = higher priority).
 	 */
 	getPriority() {
-		return this.config.priority;
+		const StaticClass = this.constructor;
+		return StaticClass.priority !== undefined
+			? StaticClass.priority
+			: this.config.priority || 50;
 	}
 
 	/**
@@ -60,7 +122,10 @@ export class TaskProvider {
 	 * @return {number} The points value.
 	 */
 	getPoints() {
-		return this.config.points;
+		const StaticClass = this.constructor;
+		return StaticClass.points !== undefined
+			? StaticClass.points
+			: this.config.points || 1;
 	}
 
 	/**
@@ -117,9 +182,13 @@ export class TaskProvider {
 	 * @return {string} The task ID.
 	 */
 	getTaskId( taskData = {} ) {
-		const parts = [ this.config.providerId ];
+		const StaticClass = this.constructor;
+		const providerId =
+			StaticClass.providerId || this.config.providerId || '';
+		const parts = [ providerId ];
 
 		// Add optional parts in order (important for consistency).
+		// Support both camelCase and snake_case formats.
 		if ( taskData.targetPostId ) {
 			parts.push( taskData.targetPostId );
 		}
@@ -129,7 +198,20 @@ export class TaskProvider {
 		if ( taskData.targetTaxonomy ) {
 			parts.push( taskData.targetTaxonomy );
 		}
-		if ( this.config.isRepetitive ) {
+		if ( taskData.target_post_id ) {
+			parts.push( taskData.target_post_id );
+		}
+		if ( taskData.target_term_id ) {
+			parts.push( taskData.target_term_id );
+		}
+		if ( taskData.target_taxonomy ) {
+			parts.push( taskData.target_taxonomy );
+		}
+		const isRepetitive =
+			StaticClass.isRepetitive !== undefined
+				? StaticClass.isRepetitive
+				: this.config.isRepetitive || false;
+		if ( isRepetitive ) {
 			// Add year-week format for repetitive tasks.
 			const now = new Date();
 			const year = now.getFullYear();
@@ -163,15 +245,15 @@ export class TaskProvider {
 	 * @return {Promise<boolean>} Promise resolving to true if dependencies are satisfied.
 	 */
 	async areDependenciesSatisfied( getTaskStatus ) {
-		if (
-			! this.config.dependencies ||
-			this.config.dependencies.length === 0
-		) {
+		const StaticClass = this.constructor;
+		const dependencies =
+			StaticClass.dependencies || this.config.dependencies || [];
+		if ( ! dependencies || dependencies.length === 0 ) {
 			return true;
 		}
 
 		// Check each dependency.
-		for ( const dependency of this.config.dependencies ) {
+		for ( const dependency of dependencies ) {
 			const taskId =
 				typeof dependency === 'string' ? dependency : dependency.taskId;
 			const requiredStatus =

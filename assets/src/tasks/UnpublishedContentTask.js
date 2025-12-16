@@ -12,22 +12,15 @@ import { fetchDataCollector } from '../hooks/useTasksApi';
  * Unpublished Content Task Provider class.
  */
 class UnpublishedContentTask extends TaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'unpublished-content',
-			capability: 'edit_others_posts',
-			isOnboardingTask: false,
-			priority: 55,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			isRepetitive: false,
-			externalLinkUrl: 'https://prpl.fyi/check-unpublished-content',
-		} );
-	}
+	static providerId = 'unpublished-content';
+	static capability = 'edit_others_posts';
+	static isOnboardingTask = false;
+	static priority = 55;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static isRepetitive = false;
+	static externalLinkUrl = 'https://prpl.fyi/check-unpublished-content';
 
 	/**
 	 * Check if the task should be added.
@@ -89,6 +82,7 @@ class UnpublishedContentTask extends TaskProvider {
 				  } that might need attention.`
 				: '';
 
+		const StaticClass = this.constructor;
 		return {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -96,15 +90,17 @@ class UnpublishedContentTask extends TaskProvider {
 			description,
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 		};
 	}
 }
 
-const unpublishedContentTask = new UnpublishedContentTask();
-
-export default unpublishedContentTask;
+export default UnpublishedContentTask;

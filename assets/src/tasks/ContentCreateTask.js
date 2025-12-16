@@ -12,22 +12,15 @@ import { fetchDataCollector } from '../hooks/useTasksApi';
  * Content Create Task Provider class.
  */
 class ContentCreateTask extends TaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'create-post',
-			capability: 'edit_others_posts',
-			isOnboardingTask: false,
-			priority: 50,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			isRepetitive: true,
-			externalLinkUrl: 'https://prpl.fyi/valuable-content',
-		} );
-	}
+	static providerId = 'create-post';
+	static capability = 'edit_others_posts';
+	static isOnboardingTask = false;
+	static priority = 50;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static isRepetitive = true;
+	static externalLinkUrl = 'https://prpl.fyi/valuable-content';
 
 	/**
 	 * Check if the task should be added.
@@ -79,6 +72,7 @@ class ContentCreateTask extends TaskProvider {
 		);
 		const targetPostId = lastPublishedPost?.post_id || null;
 
+		const StaticClass = this.constructor;
 		return {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -86,16 +80,18 @@ class ContentCreateTask extends TaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url: 'https://prpl.fyi/valuable-content',
 			url_target: '_blank',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 			target_post_id: targetPostId,
 		};
 	}
 }
 
-const contentCreateTask = new ContentCreateTask();
-
-export default contentCreateTask;
+export default ContentCreateTask;

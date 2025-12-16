@@ -12,22 +12,15 @@ import apiFetch from '@wordpress/api-fetch';
  * Select Locale Task Provider class.
  */
 class SelectLocaleTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'select-locale',
-			capability: 'install_languages',
-			isOnboardingTask: false,
-			priority: 8,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/set-locale',
-			popoverId: 'select-locale',
-		} );
-	}
+	static providerId = 'select-locale';
+	static capability = 'install_languages';
+	static isOnboardingTask = false;
+	static priority = 8;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/set-locale';
+	static popoverId = 'select-locale';
 
 	/**
 	 * Check if the task should be added.
@@ -78,6 +71,7 @@ class SelectLocaleTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }options-general.php`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -85,11 +79,15 @@ class SelectLocaleTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 			link_setting: {
 				hook: 'options-general.php',
 				iconEl: 'label[for="WPLANG"]',
@@ -100,6 +98,4 @@ class SelectLocaleTask extends InteractiveTaskProvider {
 	}
 }
 
-const selectLocaleTask = new SelectLocaleTask();
-
-export default selectLocaleTask;
+export default SelectLocaleTask;

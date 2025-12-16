@@ -11,21 +11,14 @@ import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
  * Reduce Autoloaded Options Task Provider class.
  */
 class ReduceAutoloadedOptionsTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'reduce-autoloaded-options',
-			capability: 'manage_options',
-			isOnboardingTask: false,
-			priority: 50,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			popoverId: 'reduce-autoloaded-options',
-		} );
-	}
+	static providerId = 'reduce-autoloaded-options';
+	static capability = 'manage_options';
+	static isOnboardingTask = false;
+	static priority = 50;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static popoverId = 'reduce-autoloaded-options';
 
 	/**
 	 * Check if the task should be added.
@@ -59,6 +52,7 @@ class ReduceAutoloadedOptionsTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }plugin-install.php?tab=search&s=aaa+option+optimizer`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -66,17 +60,19 @@ class ReduceAutoloadedOptionsTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 		};
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
 
-const reduceAutoloadedOptionsTask = new ReduceAutoloadedOptionsTask();
-
-export default reduceAutoloadedOptionsTask;
+export default ReduceAutoloadedOptionsTask;

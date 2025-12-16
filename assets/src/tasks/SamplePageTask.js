@@ -12,22 +12,15 @@ import { fetchDataCollector } from '../hooks/useTasksApi';
  * Sample Page Task Provider class.
  */
 class SamplePageTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'sample-page',
-			capability: 'edit_pages',
-			isOnboardingTask: true,
-			priority: 14,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			externalLinkUrl: 'https://prpl.fyi/delete-sample-page',
-			popoverId: 'sample-page',
-		} );
-	}
+	static providerId = 'sample-page';
+	static capability = 'edit_pages';
+	static isOnboardingTask = true;
+	static priority = 14;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/delete-sample-page';
+	static popoverId = 'sample-page';
 
 	/**
 	 * Check if the task should be added.
@@ -80,6 +73,7 @@ class SamplePageTask extends InteractiveTaskProvider {
 				? '<p>On install, WordPress creates a "Sample Page" page. This page does not add value to your website and solely exists to show what a page can look like. Therefore, "Sample Page" is not needed and should be deleted.</p>'
 				: 'On install, WordPress creates a "Sample Page" page. This page does not add value to your website and solely exists to show what a page can look like. Therefore, "Sample Page" is not needed and should be deleted.';
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -87,11 +81,15 @@ class SamplePageTask extends InteractiveTaskProvider {
 			description,
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 		};
 
 		// Add popover ID for interactive tasks.
@@ -99,7 +97,4 @@ class SamplePageTask extends InteractiveTaskProvider {
 	}
 }
 
-// Create singleton instance.
-const samplePageTask = new SamplePageTask();
-
-export default samplePageTask;
+export default SamplePageTask;

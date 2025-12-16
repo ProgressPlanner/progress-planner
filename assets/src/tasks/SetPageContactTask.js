@@ -12,21 +12,14 @@ import apiFetch from '@wordpress/api-fetch';
  * Set Page Contact Task Provider class.
  */
 class SetPageContactTask extends InteractiveTaskProvider {
-	/**
-	 * Constructor.
-	 */
-	constructor() {
-		super( {
-			providerId: 'set-page-contact',
-			capability: 'manage_options',
-			isOnboardingTask: false,
-			priority: 50,
-			points: 1,
-			isDismissable: true,
-			isSnoozable: true,
-			popoverId: 'set-page-contact',
-		} );
-	}
+	static providerId = 'set-page-contact';
+	static capability = 'manage_options';
+	static isOnboardingTask = false;
+	static priority = 50;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static popoverId = 'set-page-contact';
 
 	/**
 	 * Check if the task should be added.
@@ -70,6 +63,7 @@ class SetPageContactTask extends InteractiveTaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }edit.php?post_type=page`;
 
+		const StaticClass = this.constructor;
 		const taskDetails = {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
@@ -77,17 +71,19 @@ class SetPageContactTask extends InteractiveTaskProvider {
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
-			parent: this.config.parent,
+			parent: StaticClass.parent || 0,
 			url,
 			url_target: '_self',
-			dismissable: this.config.isDismissable,
-			external_link_url: this.config.externalLinkUrl,
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 		};
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
 
-const setPageContactTask = new SetPageContactTask();
-
-export default setPageContactTask;
+export default SetPageContactTask;
