@@ -1,7 +1,18 @@
 /**
- * TODOs widget.
+ * TODO Widget CSS.
  *
- * Core list/form styles migrated to React inline in TodoWidget/index.js
+ * MIGRATION STATUS: Partial
+ * - React inline: list/form styles (TodoWidget/index.js)
+ * - React inline: TaskItem component styles
+ * - Must keep: CSS :has() features, delete-all popover, dashboard widget overrides
+ *
+ * These styles cannot be migrated to React because:
+ * - CSS :has() selectors for golden/silver task highlighting
+ * - CSS :has() for completed tasks visibility and delete-all button
+ * - PHP-rendered delete-all popover with confirmation dialog
+ * - :hover pseudo-classes for completed task actions
+ * - Dashboard widget specific overrides (#progress_planner_dashboard_widget_todo)
+ *
  * Dependencies: progress-planner/suggested-task
  */
 

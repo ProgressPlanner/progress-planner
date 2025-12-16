@@ -1,6 +1,16 @@
-/* React .progress-wrapper styles migrated to StreakBadges/index.js */
+/**
+ * Badge Streak Widget CSS.
+ *
+ * MIGRATION STATUS: Partial
+ * - React inline: .progress-wrapper styles (StreakBadges/index.js)
+ * - Must keep: PHP popover styles, widget wrapper layout
+ *
+ * These styles cannot be migrated to React because:
+ * - PHP-rendered popovers require CSS styling
+ * - Widget wrapper layout used by PHP fallback
+ */
 
-/* PHP-rendered popover styles - keep until migrated to React */
+/* PHP-rendered popover styles */
 #popover-badge-streak-content,
 #popover-badge-streak-maintenance {
 	display: grid;

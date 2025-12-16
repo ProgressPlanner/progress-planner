@@ -1,9 +1,19 @@
 /* stylelint-disable max-line-length */
 
 /**
- * Suggested tasks widget.
+ * Suggested Tasks Widget CSS.
  *
- * Core list/loading/empty styles migrated to React inline in SuggestedTasks/index.js
+ * MIGRATION STATUS: Partial
+ * - React inline: list/loading/empty styles (SuggestedTasks/index.js)
+ * - React inline: TaskItem component styles
+ * - Must keep: PHP popover forms, CSS :has() features, interactive task popovers
+ *
+ * These styles cannot be migrated to React because:
+ * - CSS :has() selectors for conditional display (.prpl-no-suggested-tasks, .prpl-show-all-tasks)
+ * - PHP-rendered interactive task popovers with forms (inputs, checkboxes, radios)
+ * - :hover/:disabled pseudo-classes for buttons
+ * - Complex popover layout with flex columns and dividers
+ *
  * Dependencies: progress-planner/suggested-task, progress-planner/web-components/prpl-badge
  */
 

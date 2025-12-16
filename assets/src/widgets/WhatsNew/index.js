@@ -4,12 +4,119 @@
  * Displays blog posts from the Progress Planner blog RSS feed.
  */
 
-import { Fragment } from '@wordpress/element';
+import { Fragment, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { doAction } from '@wordpress/hooks';
 import { useApiData } from '../../hooks/useApiData';
 import { LoadingState } from '../../components/WidgetStates';
 import WidgetHeader from '../../components/WidgetHeader';
+
+/**
+ * BlogPostImage component with hover state.
+ *
+ * @param {Object} props      - Component props.
+ * @param {string} props.link - Link URL.
+ * @param {string} props.url  - Image URL.
+ * @return {JSX.Element} The blog post image.
+ */
+function BlogPostImage( { link, url } ) {
+	const [ isHovered, setIsHovered ] = useState( false );
+
+	const baseStyle = {
+		width: '100%',
+		minHeight: '120px',
+		aspectRatio: '3 / 2',
+		backgroundSize: 'cover',
+		marginBottom: '0.75rem',
+		borderRadius: 'var(--prpl-border-radius-big)',
+		border: '1px solid var(--prpl-color-border)',
+		backgroundColor: 'var(--prpl-color-gauge-remain)',
+		transition: 'transform 0.2s, box-shadow 0.2s',
+		backgroundImage: `url(${ url })`,
+	};
+
+	const hoverStyle = isHovered
+		? {
+				transform: 'scale(1.01)',
+				boxShadow: '4px 4px 8px 0 rgba(0, 0, 0, 0.2)',
+		  }
+		: {};
+
+	return (
+		<a href={ link } target="_blank" rel="noopener noreferrer">
+			<div
+				className="prpl-blog-post-image"
+				style={ { ...baseStyle, ...hoverStyle } }
+				onMouseEnter={ () => setIsHovered( true ) }
+				onMouseLeave={ () => setIsHovered( false ) }
+			/>
+		</a>
+	);
+}
+
+/**
+ * PostTitleLink component with hover state.
+ *
+ * @param {Object} props          - Component props.
+ * @param {string} props.link     - Link URL.
+ * @param {string} props.children - Link text.
+ * @return {JSX.Element} The post title link.
+ */
+function PostTitleLink( { link, children } ) {
+	const [ isHovered, setIsHovered ] = useState( false );
+
+	const style = {
+		color: isHovered
+			? 'var(--prpl-color-link)'
+			: 'var(--prpl-color-headings)',
+		textDecoration: isHovered ? 'underline' : 'none',
+	};
+
+	return (
+		<a
+			href={ link }
+			target="_blank"
+			rel="noopener noreferrer"
+			style={ style }
+			onMouseEnter={ () => setIsHovered( true ) }
+			onMouseLeave={ () => setIsHovered( false ) }
+		>
+			{ children }
+		</a>
+	);
+}
+
+/**
+ * FooterLink component with hover state.
+ *
+ * @param {Object} props          - Component props.
+ * @param {string} props.link     - Link URL.
+ * @param {string} props.children - Link text.
+ * @return {JSX.Element} The footer link.
+ */
+function FooterLink( { link, children } ) {
+	const [ isHovered, setIsHovered ] = useState( false );
+
+	const style = {
+		color: isHovered
+			? 'var(--prpl-color-link-hover)'
+			: 'var(--prpl-color-link)',
+		textDecoration: isHovered ? 'none' : 'underline',
+	};
+
+	return (
+		<a
+			href={ link }
+			target="_blank"
+			rel="noopener noreferrer"
+			style={ style }
+			onMouseEnter={ () => setIsHovered( true ) }
+			onMouseLeave={ () => setIsHovered( false ) }
+		>
+			{ children }
+		</a>
+	);
+}
 
 /**
  * What's New widget component.
@@ -63,11 +170,6 @@ function WhatsNew( { config = {} } ) {
 		marginBottom: '6px',
 	};
 
-	const titleLinkStyle = {
-		color: 'var(--prpl-color-headings)',
-		textDecoration: 'none',
-	};
-
 	const excerptStyle = {
 		margin: 0,
 	};
@@ -75,23 +177,6 @@ function WhatsNew( { config = {} } ) {
 	const footerStyle = {
 		display: 'flex',
 		justifyContent: 'flex-end',
-	};
-
-	const footerLinkStyle = {
-		color: 'var(--prpl-color-link)',
-		textDecoration: 'underline',
-	};
-
-	const blogPostImageStyle = {
-		width: '100%',
-		minHeight: '120px',
-		aspectRatio: '3 / 2',
-		backgroundSize: 'cover',
-		marginBottom: '0.75rem',
-		borderRadius: 'var(--prpl-border-radius-big)',
-		border: '1px solid var(--prpl-color-border)',
-		backgroundColor: 'var(--prpl-color-gauge-remain)',
-		transition: 'transform 0.2s, box-shadow 0.2s',
 	};
 
 	return (
@@ -102,29 +187,15 @@ function WhatsNew( { config = {} } ) {
 				{ posts.map( ( post, index ) => (
 					<li key={ index }>
 						{ post.imageUrl && (
-							<a
-								href={ post.link }
-								target="_blank"
-								rel="noopener noreferrer"
-							>
-								<div
-									className="prpl-blog-post-image"
-									style={ {
-										...blogPostImageStyle,
-										backgroundImage: `url(${ post.imageUrl })`,
-									} }
-								/>
-							</a>
+							<BlogPostImage
+								link={ post.link }
+								url={ post.imageUrl }
+							/>
 						) }
 						<h3 style={ titleStyle }>
-							<a
-								href={ post.link }
-								target="_blank"
-								rel="noopener noreferrer"
-								style={ titleLinkStyle }
-							>
+							<PostTitleLink link={ post.link }>
 								{ post.title }
-							</a>
+							</PostTitleLink>
 						</h3>
 						<p style={ excerptStyle }>{ post.excerpt }</p>
 						<hr />
@@ -132,14 +203,9 @@ function WhatsNew( { config = {} } ) {
 				) ) }
 			</ul>
 			<div className="prpl-widget-footer" style={ footerStyle }>
-				<a
-					href={ blogUrl }
-					target="_blank"
-					rel="noopener noreferrer"
-					style={ footerLinkStyle }
-				>
+				<FooterLink link={ blogUrl }>
 					{ __( 'Read all posts', 'progress-planner' ) }
-				</a>
+				</FooterLink>
 			</div>
 		</Fragment>
 	);
