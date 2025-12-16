@@ -144,15 +144,15 @@ class Page {
 				],
 			];
 
+			// Always enqueue dashboard - React handles both welcome and dashboard states.
+			$this->enqueue_dashboard_script();
+
 			if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-tooltip' );
 				// Enqueue prpl-badge web component for React Badge components.
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-badge' );
-				$this->enqueue_dashboard_script();
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'upgrade-tasks' );
-			} else {
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboard', $default_localization_data );
 			}
 
 			\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
