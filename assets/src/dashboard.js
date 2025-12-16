@@ -10,8 +10,6 @@ import Dashboard from './components/Dashboard';
 import prplSuggestedTask from './utils/prplSuggestedTask';
 // Initialize widget registry (sets up hook listener for widget registrations)
 import './utils/widgetRegistry';
-// Initialize task completion events utility (provides window.prplUpdateRaviGauge)
-import './utils/taskCompletionEvents';
 
 // Attach to window immediately so inline onclick handlers can access it.
 // This must be done before React renders to ensure it's available when

@@ -318,14 +318,6 @@ function TodoWidget( { config = {} } ) {
 					if ( task.prpl_points > 0 ) {
 						// Notify context about task completion.
 						onTaskCompleted( task, task.prpl_points );
-
-						// Legacy: Update Ravi gauge via window (for backward compatibility).
-						// TODO: Remove this once all widgets use context.
-						if (
-							typeof window.prplUpdateRaviGauge === 'function'
-						) {
-							window.prplUpdateRaviGauge( task.prpl_points );
-						}
 						// Trigger celebration confetti.
 						celebrate();
 					}

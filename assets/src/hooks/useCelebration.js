@@ -105,28 +105,6 @@ export function useCelebration() {
 	}, [] );
 
 	/**
-	 * Remove celebrated tasks from the DOM.
-	 *
-	 * This function is kept for backward compatibility but is no longer needed
-	 * as React components handle task removal themselves.
-	 */
-	const removeCelebratedTasks = useCallback( () => {
-		// This is now handled by React components directly
-		// Keeping for backward compatibility if needed
-	}, [] );
-
-	/**
-	 * Update the Ravi gauge with earned points.
-	 *
-	 * @param {number} points The points to add to the gauge.
-	 */
-	const updateRaviGauge = useCallback( ( points ) => {
-		if ( typeof window.prplUpdateRaviGauge === 'function' ) {
-			window.prplUpdateRaviGauge( points );
-		}
-	}, [] );
-
-	/**
 	 * Trigger grid resize event.
 	 *
 	 * This dispatches the 'prpl/grid/resize' event which is handled
@@ -138,8 +116,6 @@ export function useCelebration() {
 
 	return {
 		celebrate,
-		removeCelebratedTasks,
-		updateRaviGauge,
 		triggerGridResize,
 	};
 }

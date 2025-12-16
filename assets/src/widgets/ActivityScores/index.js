@@ -5,6 +5,7 @@
  * and personal record.
  */
 
+import { useMemo } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { doAction } from '@wordpress/hooks';
 import Gauge from '../../components/Gauge';
@@ -17,6 +18,7 @@ import {
 	EmptyState,
 } from '../../components/WidgetStates';
 import { useApiData } from '../../hooks/useApiData';
+import { useDashboard } from '../../context/DashboardContext';
 
 /**
  * Get the streak message based on the current and max streak values.
@@ -153,6 +155,9 @@ function getChartColor( value, label, frequency ) {
  * @return {JSX.Element} The ActivityScores component.
  */
 function ActivityScores( { config = {} } ) {
+	// Get session points from context for real-time updates.
+	const { sessionPoints } = useDashboard();
+
 	const range = '-6 months';
 	const frequency = 'monthly';
 	const apiPath = `/progress-planner/v1/widgets/activity-scores?range=${ encodeURIComponent(
@@ -164,6 +169,15 @@ function ActivityScores( { config = {} } ) {
 		[],
 		'Failed to load activity data'
 	);
+
+	// Calculate effective score by adding session points to API score.
+	const effectiveScore = useMemo( () => {
+		if ( ! data?.score ) {
+			return 0;
+		}
+		// Cap at 100 since it's a percentage.
+		return Math.min( 100, data.score + sessionPoints );
+	}, [ data?.score, sessionPoints ] );
 
 	if ( isLoading ) {
 		return <LoadingState simple />;
@@ -177,8 +191,8 @@ function ActivityScores( { config = {} } ) {
 		return <EmptyState />;
 	}
 
-	const { score, chartData, personalRecord } = data;
-	const gaugeColor = getGaugeColor( score );
+	const { chartData, personalRecord } = data;
+	const gaugeColor = getGaugeColor( effectiveScore );
 
 	// Add colors to chart data (presentation logic in React).
 	const chartDataWithColors = chartData.map( ( item ) => ( {
@@ -211,14 +225,14 @@ function ActivityScores( { config = {} } ) {
 
 			<div style={ { '--background': 'var(--prpl-background-monthly)' } }>
 				<Gauge
-					value={ score }
+					value={ effectiveScore }
 					max={ 100 }
 					backgroundColor="var(--prpl-background-activity)"
 					color={ gaugeColor }
 					color2={ gaugeColor }
 					contentFontSize="var(--prpl-font-size-6xl)"
 				>
-					{ score }
+					{ effectiveScore }
 				</Gauge>
 			</div>
 

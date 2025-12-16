@@ -355,15 +355,6 @@ function SuggestedTasks( { config = {} } ) {
 					onTaskCompleted( task, eventPoints );
 				}
 
-				// Legacy: Update Ravi gauge via window (for backward compatibility).
-				// TODO: Remove this once all widgets use context.
-				if (
-					eventPoints > 0 &&
-					typeof window.prplUpdateRaviGauge === 'function'
-				) {
-					window.prplUpdateRaviGauge( eventPoints );
-				}
-
 				// Trigger celebration confetti.
 				if ( eventPoints > 0 && listRef.current ) {
 					const taskElement = listRef.current.querySelector(

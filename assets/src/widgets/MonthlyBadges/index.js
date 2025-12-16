@@ -22,6 +22,7 @@ import BadgeProgressBar from '../../components/BadgeProgressBar';
 import PointsCounter from './PointsCounter';
 import { LoadingState, ErrorState } from '../../components/WidgetStates';
 import WidgetHeader from '../../components/WidgetHeader';
+import { useDashboard } from '../../context/DashboardContext';
 
 /**
  * MonthlyBadges widget component.
@@ -31,6 +32,9 @@ import WidgetHeader from '../../components/WidgetHeader';
  * @return {JSX.Element} The MonthlyBadges widget.
  */
 function MonthlyBadges( { config = {} } ) {
+	// Get session points from context for real-time updates.
+	const { sessionPoints } = useDashboard();
+
 	const { isLoading, error, data } = useBadgeData();
 
 	// Get monthly badge date range function.
@@ -120,16 +124,18 @@ function MonthlyBadges( { config = {} } ) {
 		return incomplete;
 	}, [ badgeProgress ] );
 
-	const gaugeValue = currentBadge?.progress?.points || 0;
+	// Calculate effective gauge value by adding session points.
+	const baseGaugeValue = currentBadge?.progress?.points || 0;
+	const gaugeValue = baseGaugeValue + sessionPoints;
 	const maxPoints = MONTHLY_BADGE_CONFIG.targetPoints;
 	const widgetConfig = data?.config || {
 		brandingId: config?.brandingId || 0,
 	};
 
 	/**
-	 * Calculate if the current badge is complete.
+	 * Calculate if the current badge is complete (including session points).
 	 */
-	const isComplete = ( currentBadge?.progress?.progress || 0 ) >= 100;
+	const isComplete = gaugeValue >= maxPoints;
 
 	/**
 	 * Calculate remaining points and days remaining for previous badges.
