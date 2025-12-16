@@ -19,6 +19,7 @@ import disableCommentPaginationTask from './DisableCommentPaginationTask';
 import setPageAboutTask from './SetPageAboutTask';
 import setPageFAQTask from './SetPageFAQTask';
 import setPageContactTask from './SetPageContactTask';
+import unpublishedContentTask from './UnpublishedContentTask';
 
 // Register all task providers.
 registerTaskProvider( helloWorldTask );
@@ -34,3 +35,4 @@ registerTaskProvider( disableCommentPaginationTask );
 registerTaskProvider( setPageAboutTask );
 registerTaskProvider( setPageFAQTask );
 registerTaskProvider( setPageContactTask );
+registerTaskProvider( unpublishedContentTask );

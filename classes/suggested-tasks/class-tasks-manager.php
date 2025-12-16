@@ -84,7 +84,7 @@ class Tasks_Manager {
 			new Remove_Terms_Without_Posts(),
 			new Fewer_Tags(),
 			new Update_Term_Description(),
-			new Unpublished_Content(),
+			// Unpublished_Content() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Collaborator(),
 			new Select_Timezone(),
 			new Set_Date_Format(),
