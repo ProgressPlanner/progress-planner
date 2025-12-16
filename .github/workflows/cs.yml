@@ -3,6 +3,11 @@ name: CS
 on:
   # Run on all relevant pushes (except to main) and on all relevant pull requests.
   push:
+    branches:
+      - main
+      - develop
+      - 'release/[0-9]+.[0-9]+*'
+      - 'hotfix/[0-9]+.[0-9]+*'
     paths:
       - '**.php'
       - 'composer.json'
