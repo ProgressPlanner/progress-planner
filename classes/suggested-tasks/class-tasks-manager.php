@@ -78,8 +78,8 @@ class Tasks_Manager {
 			// Search_Engine_Visibility() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Reduce_Autoloaded_Options(),
 			new User_Tasks(),
-			new Email_Sending(),
-			new Set_Valuable_Post_Types(),
+			// Email_Sending() - Migrated to React, registered in assets/src/tasks/index.js.
+			// Set_Valuable_Post_Types() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Select_Locale(),
 			new Remove_Terms_Without_Posts(),
 			new Fewer_Tags(),
@@ -89,7 +89,7 @@ class Tasks_Manager {
 			new Select_Timezone(),
 			new Set_Date_Format(),
 			// SEO_Plugin() - Migrated to React, registered in assets/src/tasks/index.js.
-			new Improve_Pdf_Handling(),
+			// Improve_Pdf_Handling() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Set_Page_About() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Set_Page_FAQ() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Set_Page_Contact() - Migrated to React, registered in assets/src/tasks/index.js.
