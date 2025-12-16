@@ -22,7 +22,7 @@ import BadgeProgressBar from '../../components/BadgeProgressBar';
 import PointsCounter from './PointsCounter';
 import { LoadingState, ErrorState } from '../../components/WidgetStates';
 import WidgetHeader from '../../components/WidgetHeader';
-import { useDashboard } from '../../context/DashboardContext';
+import { useDashboardStore } from '../../stores/dashboardStore';
 
 /**
  * MonthlyBadges widget component.
@@ -32,8 +32,8 @@ import { useDashboard } from '../../context/DashboardContext';
  * @return {JSX.Element} The MonthlyBadges widget.
  */
 function MonthlyBadges( { config = {} } ) {
-	// Get session points from context for real-time updates.
-	const { sessionPoints } = useDashboard();
+	// Get session points from Zustand store for real-time updates.
+	const sessionPoints = useDashboardStore( ( state ) => state.sessionPoints );
 
 	const { isLoading, error, data } = useBadgeData();
 

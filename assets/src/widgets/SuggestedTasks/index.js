@@ -28,7 +28,7 @@ import {
 	setTaskContainer,
 	getTaskProviderInstance,
 } from '../../services/taskRegistry';
-import { useDashboard } from '../../context/DashboardContext';
+import { useDashboardStore } from '../../stores/dashboardStore';
 
 // Import task registrations (tasks will self-register on import).
 import '../../tasks';
@@ -57,8 +57,10 @@ function SuggestedTasks( { config = {} } ) {
 	// Get celebration functions.
 	const { celebrate } = useCelebration();
 
-	// Get dashboard context for cross-widget communication.
-	const { onTaskCompleted } = useDashboard();
+	// Get onTaskCompleted from Zustand store for cross-widget communication.
+	const onTaskCompleted = useDashboardStore(
+		( state ) => state.onTaskCompleted
+	);
 
 	/**
 	 * Insert task in sorted position by priority.

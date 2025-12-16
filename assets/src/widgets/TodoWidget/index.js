@@ -18,7 +18,7 @@ import { useGridMasonry } from '../../hooks/useGridMasonry';
 import { useCelebration } from '../../hooks/useCelebration';
 import { dispatchGridResize } from '../../utils/gridResize';
 import WidgetHeader from '../../components/WidgetHeader';
-import { useDashboard } from '../../context/DashboardContext';
+import { useDashboardStore } from '../../stores/dashboardStore';
 
 /**
  * Style constants - extracted to prevent recreation on each render.
@@ -146,8 +146,10 @@ function TodoWidget( { config = {} } ) {
 	// Get celebration functions.
 	const { celebrate } = useCelebration();
 
-	// Get dashboard context for cross-widget communication.
-	const { onTaskCompleted } = useDashboard();
+	// Get onTaskCompleted from Zustand store for cross-widget communication.
+	const onTaskCompleted = useDashboardStore(
+		( state ) => state.onTaskCompleted
+	);
 
 	/**
 	 * Sort tasks: golden tasks first, then by menu_order.

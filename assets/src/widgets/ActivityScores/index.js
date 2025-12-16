@@ -18,7 +18,7 @@ import {
 	EmptyState,
 } from '../../components/WidgetStates';
 import { useApiData } from '../../hooks/useApiData';
-import { useDashboard } from '../../context/DashboardContext';
+import { useDashboardStore } from '../../stores/dashboardStore';
 
 /**
  * Get the streak message based on the current and max streak values.
@@ -155,8 +155,8 @@ function getChartColor( value, label, frequency ) {
  * @return {JSX.Element} The ActivityScores component.
  */
 function ActivityScores( { config = {} } ) {
-	// Get session points from context for real-time updates.
-	const { sessionPoints } = useDashboard();
+	// Get session points from Zustand store for real-time updates.
+	const sessionPoints = useDashboardStore( ( state ) => state.sessionPoints );
 
 	const range = '-6 months';
 	const frequency = 'monthly';

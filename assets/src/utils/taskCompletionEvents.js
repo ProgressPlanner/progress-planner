@@ -1,28 +1,28 @@
 /**
  * Task Completion Events Utility
  *
- * @deprecated Since React migration. Use DashboardContext instead for cross-widget
+ * @deprecated Since React migration. Use useDashboardStore instead for cross-widget
  * communication. This file is kept for backward compatibility with any legacy
  * code that might still call window.prplUpdateRaviGauge.
  *
  * React components should use:
- * - `useDashboard()` hook from `context/DashboardContext.js`
- * - `onTaskCompleted(task, points)` action from context
+ * - `useDashboardStore()` hook from `stores/dashboardStore.js`
+ * - `onTaskCompleted(task, points)` action from store
  *
- * @see assets/src/context/DashboardContext.js
+ * @see assets/src/stores/dashboardStore.js
  */
 
 /**
  * Dispatch task completion event for React components.
  *
- * @deprecated Use DashboardContext.onTaskCompleted() instead.
+ * @deprecated Use useDashboardStore().onTaskCompleted() instead.
  * @param {number} points - The points earned from the completed task.
  * @return {void}
  */
 export function dispatchTaskCompletedEvent( points ) {
 	// eslint-disable-next-line no-console
 	console.warn(
-		'dispatchTaskCompletedEvent is deprecated. Use DashboardContext.onTaskCompleted() instead.'
+		'dispatchTaskCompletedEvent is deprecated. Use useDashboardStore().onTaskCompleted() instead.'
 	);
 
 	if ( ! points || typeof points !== 'number' ) {
@@ -40,14 +40,14 @@ export function dispatchTaskCompletedEvent( points ) {
 /**
  * Update Ravi gauge (legacy function name for backward compatibility).
  *
- * @deprecated Use DashboardContext.onTaskCompleted() instead.
+ * @deprecated Use useDashboardStore().onTaskCompleted() instead.
  * @param {number} pointsDiff - The points difference.
  * @return {void}
  */
 export function prplUpdateRaviGauge( pointsDiff ) {
 	// eslint-disable-next-line no-console
 	console.warn(
-		'window.prplUpdateRaviGauge is deprecated. Use DashboardContext.onTaskCompleted() instead.'
+		'window.prplUpdateRaviGauge is deprecated. Use useDashboardStore().onTaskCompleted() instead.'
 	);
 	dispatchTaskCompletedEvent( pointsDiff );
 }
