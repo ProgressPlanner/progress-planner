@@ -73,7 +73,6 @@ class Deprecations {
 		'Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Sample_Page' => [ 'Progress_Planner\Suggested_Tasks\Providers\Sample_Page', '1.4.0' ],
 		'Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Search_Engine_Visibility' => [ 'Progress_Planner\Suggested_Tasks\Providers\Search_Engine_Visibility', '1.4.0' ],
 		'Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Set_Valuable_Post_Types' => [ 'Progress_Planner\Suggested_Tasks\Providers\Set_Valuable_Post_Types', '1.4.0' ],
-		'Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Settings_Saved' => [ 'Progress_Planner\Suggested_Tasks\Providers\Settings_Saved', '1.4.0' ],
 		'Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\One_Time\Site_Icon' => [ 'Progress_Planner\Suggested_Tasks\Providers\Site_Icon', '1.4.0' ],
 		'Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Core_Update' => [ 'Progress_Planner\Suggested_Tasks\Providers\Core_Update', '1.4.0' ],
 		'Progress_Planner\Suggested_Tasks\Local_Tasks\Providers\Repetitive\Create' => [ 'Progress_Planner\Suggested_Tasks\Providers\Repetitive\Create', '1.4.0' ],
