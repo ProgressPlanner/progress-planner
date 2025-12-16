@@ -68,7 +68,7 @@ class Tasks_Manager {
 			new Debug_Display(),
 			new Disable_Comments(),
 			new Disable_Comment_Pagination(),
-			new Sample_Page(),
+			// Sample_Page() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Hello_World() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Remove_Inactive_Plugins(),
 			new Site_Icon(),
