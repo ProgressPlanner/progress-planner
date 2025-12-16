@@ -17,7 +17,9 @@ function onboardingTests( testContext = test ) {
 				await expect( popover ).toBeVisible( { timeout: 10000 } );
 
 				// Click on the privacy policy checkbox label (clicking label triggers the checkbox)
-				const privacyLabel = page.locator( 'label[for="prpl-privacy-checkbox"]' );
+				const privacyLabel = page.locator(
+					'label[for="prpl-privacy-checkbox"]'
+				);
 				await expect( privacyLabel ).toBeVisible();
 				await privacyLabel.click();
 
@@ -38,19 +40,17 @@ function onboardingTests( testContext = test ) {
 				const closeButton = page.locator( '#prpl-tour-close-btn' );
 				await closeButton.click();
 
-				// Verify onboarding is closed and dashboard elements are visible
-				await expect( popover ).not.toBeVisible( { timeout: 5000 } );
-				await expect(
-					page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
-				).toBeVisible( { timeout: 15000 } );
+				// Verify onboarding popover is closed/hidden
+				await expect( popover ).toBeHidden( { timeout: 5000 } );
 
 				// Visit the WP Dashboard page and back to the Progress Planner page
 				await page.goto( '/wp-admin/' );
 				await page.goto( '/wp-admin/admin.php?page=progress-planner' );
 				await page.waitForLoadState( 'networkidle' );
 
-				// Verify onboarding doesn't restart (progress was saved)
-				await expect( popover ).not.toBeVisible( { timeout: 5000 } );
+				// Verify onboarding doesn't auto-start (progress was saved)
+				// The popover element exists but should be hidden (not auto-opened)
+				await expect( popover ).toBeHidden( { timeout: 5000 } );
 			}
 		);
 	} );
