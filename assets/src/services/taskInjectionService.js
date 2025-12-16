@@ -1,8 +1,12 @@
 /**
  * Task Injection Service.
  *
- * Handles evaluation and injection of React-registered tasks.
- * This replaces the PHP-based task injection logic.
+ * @deprecated This service is no longer used. Tasks now self-register via
+ * WordPress hooks and handle their own lifecycle through taskRegistry.
+ * See: assets/src/services/taskRegistry.js for the new streaming architecture.
+ *
+ * This file is kept for reference but should not be imported or used.
+ * All task lifecycle management is now handled by taskRegistry.js.
  */
 
 import { getAllTaskProviders } from './taskRegistry';
