@@ -1,6 +1,6 @@
 <?php
 /**
- * Class Settings_Saved_Test
+ * Class Search_Engine_Visibility_Test
  *
  * @package Progress_Planner
  */

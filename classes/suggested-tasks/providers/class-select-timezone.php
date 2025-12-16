@@ -195,6 +195,8 @@ class Select_Timezone extends Tasks_Interactive {
 		$option_updated = $this->update_timezone( $timezone_string );
 
 		if ( $option_updated ) {
+
+			// We're not checking for the return value of the update_option calls, because it will return false if the value is the same (for example if gmt_offset is already set to '').
 			\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
 		}
 
@@ -212,10 +214,19 @@ class Select_Timezone extends Tasks_Interactive {
 	public function add_task_actions( $data = [], $actions = [] ) {
 		$actions[] = [
 			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Select timezone', 'progress-planner' ) . '</a>',
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html( $this->get_task_action_label() ) . '</a>',
 		];
 
 		return $actions;
+	}
+
+	/**
+	 * Get the task action label.
+	 *
+	 * @return string
+	 */
+	public function get_task_action_label() {
+		return \__( 'Select timezone', 'progress-planner' );
 	}
 
 	/**

@@ -19,7 +19,6 @@ class Improve_Pdf_Handling extends Tasks_Interactive {
 	 */
 	protected const IS_ONBOARDING_TASK = false;
 
-
 	/**
 	 * The minimum number of PDF files.
 	 *
