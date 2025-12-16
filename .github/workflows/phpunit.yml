@@ -77,7 +77,6 @@ jobs:
           php-version: ${{ matrix.php_version }}
           ini-values: zend.assertions=1, error_reporting=-1, display_errors=On
           coverage: none
-          tools: wp-cli
 
       # Install SVN.
       - name: Install SVN
@@ -101,23 +100,6 @@ jobs:
       - name: Install WP
         shell: bash
         run: tests/bin/install-wp-tests.sh wordpress_tests root '' 127.0.0.1:3306 ${{ matrix.wp_version }}
-
-      - name: Symlink plugin into WordPress installation
-        run: ln -s "$GITHUB_WORKSPACE" /tmp/wordpress/wp-content/plugins/progress-planner
-
-      - name: Create wp-config.php for WP-CLI tests
-        run: |
-          wp config create \
-            --path=/tmp/wordpress \
-            --dbname=wordpress_tests \
-            --dbuser=root \
-            --dbpass='' \
-            --dbhost=127.0.0.1:3306 \
-            --dbprefix=wptests_ \
-            --skip-check
-
-      - name: Activate plugin for WP-CLI tests
-        run: wp plugin activate progress-planner --path=/tmp/wordpress
 
       - name: Run unit tests - single site
         run: composer test

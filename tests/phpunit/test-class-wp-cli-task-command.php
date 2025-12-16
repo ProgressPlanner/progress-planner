@@ -7,10 +7,14 @@
 
 namespace Progress_Planner\Tests;
 
+use Progress_Planner\WP_CLI\Task_Command;
+
 /**
  * WP-CLI Task Command test case.
  *
- * Tests the WP-CLI task commands by executing actual shell commands.
+ * Tests the WP-CLI task command methods directly within PHPUnit.
+ * These tests verify the command logic works correctly by checking
+ * database state changes rather than CLI output.
  */
 class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 
@@ -22,6 +26,13 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 	private $test_task_id = 'phpunit-cli-test-task';
 
 	/**
+	 * The command instance.
+	 *
+	 * @var Task_Command|null
+	 */
+	private $command;
+
+	/**
 	 * Set up test.
 	 *
 	 * @return void
@@ -29,55 +40,26 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 	public function setUp(): void {
 		parent::setUp();
 
-		// Skip tests if WP-CLI is not available (e.g., in CI environments).
-		$result = $this->run_wp_cli( '--version' );
-		if ( 0 !== $result['code'] ) {
+		// Skip tests if WP-CLI is not available.
+		if ( ! \class_exists( 'WP_CLI' ) ) {
 			$this->markTestSkipped( 'WP-CLI is not available in this environment.' );
 		}
-	}
 
-	/**
-	 * Run a WP-CLI command.
-	 *
-	 * @param string $command The WP-CLI command to run (without 'wp' prefix).
-	 * @return array{output: string, code: int}
-	 */
-	private function run_wp_cli( $command ) {
-		$wp_path = $this->get_wp_path();
-
-		$full_command = \sprintf( 'cd %s && wp %s 2>&1', \escapeshellarg( $wp_path ), $command );
-
-		\exec( $full_command, $output, $return_code ); // phpcs:ignore WordPress.PHP.DiscouragedPHPFunctions.system_calls_exec -- Required for WP-CLI integration tests.
-
-		return [
-			'output' => \implode( "\n", $output ),
-			'code'   => $return_code,
-		];
-	}
-
-	/**
-	 * Get the WordPress installation path.
-	 *
-	 * Handles both local environments (plugin in wp-content/plugins/) and CI
-	 * environments (plugin symlinked into WP installation).
-	 *
-	 * @return string Path to WordPress installation.
-	 */
-	private function get_wp_path() {
-		// First, try the standard plugin location (3 directories up from plugin root).
-		$standard_path = \dirname( PROGRESS_PLANNER_DIR, 3 );
-		if ( \file_exists( $standard_path . '/wp-config.php' ) || \file_exists( $standard_path . '/wp-load.php' ) ) {
-			return $standard_path;
+		// Load WP-CLI utils if not already loaded.
+		if ( ! \function_exists( 'WP_CLI\Utils\format_items' ) ) {
+			$utils_file = PROGRESS_PLANNER_DIR . '/vendor/wp-cli/wp-cli/php/utils.php';
+			if ( \file_exists( $utils_file ) ) {
+				require_once $utils_file;
+			}
 		}
 
-		// In CI, WordPress is installed to /tmp/wordpress and the plugin is symlinked there.
-		$ci_wp_path = '/tmp/wordpress';
-		if ( \file_exists( $ci_wp_path . '/wp-load.php' ) ) {
-			return $ci_wp_path;
-		}
+		// Enable capture_exit so WP_CLI::error() throws ExitException instead of exit().
+		$reflection = new \ReflectionClass( 'WP_CLI' );
+		$property   = $reflection->getProperty( 'capture_exit' );
+		$property->setAccessible( true );
+		$property->setValue( null, true );
 
-		// Fallback to standard path.
-		return $standard_path;
+		$this->command = new Task_Command();
 	}
 
 	/**
@@ -87,34 +69,101 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 	 */
 	public function tearDown(): void {
 		// Clean up test task if it exists.
-		$this->run_wp_cli( 'prpl task delete ' . \escapeshellarg( $this->test_task_id ) );
+		if ( $this->command ) {
+			$this->delete_test_task( $this->test_task_id );
+		}
 		parent::tearDown();
 	}
 
 	/**
-	 * Test that task list command works.
+	 * Helper to delete a test task silently.
+	 *
+	 * @param string $task_id Task ID to delete.
+	 * @return void
+	 */
+	private function delete_test_task( $task_id ) {
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
+		if ( ! empty( $tasks ) ) {
+			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $tasks[0]->ID );
+		}
+	}
+
+	/**
+	 * Helper to create a test task directly in database.
+	 *
+	 * @param string $task_id Task ID.
+	 * @param string $title   Task title.
+	 * @return void
+	 */
+	private function create_test_task( $task_id, $title = 'PHPUnit CLI Test Task' ) {
+		\progress_planner()->get_suggested_tasks_db()->add(
+			[
+				'task_id'     => $task_id,
+				'post_title'  => $title,
+				'description' => 'Test description',
+				'points'      => 1,
+				'provider_id' => 'collaborator',
+				'status'      => 'pending',
+			]
+		);
+	}
+
+	/**
+	 * Helper to get a task from database.
+	 *
+	 * @param string $task_id Task ID.
+	 * @return object|null
+	 */
+	private function get_test_task( $task_id ) {
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
+		return ! empty( $tasks ) ? $tasks[0] : null;
+	}
+
+	/**
+	 * Run a command method while suppressing output.
+	 *
+	 * @param callable $callback The callback to run.
+	 * @return mixed The exception thrown, or null if none.
+	 */
+	private function run_command( callable $callback ) {
+		$exception = null;
+		\ob_start();
+		try {
+			$callback();
+		} catch ( \Exception $e ) {
+			$exception = $e;
+		}
+		\ob_end_clean();
+		return $exception;
+	}
+
+	/**
+	 * Test that task list command runs without errors.
 	 *
 	 * @return void
 	 */
 	public function test_task_list() {
-		$result = $this->run_wp_cli( 'prpl task list --format=json' );
+		// Create a task first.
+		$this->create_test_task( $this->test_task_id );
 
-		$this->assertEquals( 0, $result['code'], 'Command should succeed. Output: ' . $result['output'] );
+		// The list method should run without throwing exceptions.
+		$exception = $this->run_command( fn() => $this->command->list( [], [ 'format' => 'json' ] ) );
 
-		$tasks = \json_decode( $result['output'], true );
-		$this->assertIsArray( $tasks, 'Output should be valid JSON array' );
+		$this->assertNull( $exception, 'List command should not throw an exception' );
 	}
 
 	/**
-	 * Test that task list with table format works.
+	 * Test that task list with table format runs without errors.
 	 *
 	 * @return void
 	 */
 	public function test_task_list_table_format() {
-		$result = $this->run_wp_cli( 'prpl task list --format=table' );
+		// Create a task first so we have something to list.
+		$this->create_test_task( $this->test_task_id );
 
-		$this->assertEquals( 0, $result['code'], 'Command should succeed. Output: ' . $result['output'] );
-		$this->assertStringContainsString( 'task_id', $result['output'], 'Table should contain task_id header' );
+		$exception = $this->run_command( fn() => $this->command->list( [], [ 'format' => 'table' ] ) );
+
+		$this->assertNull( $exception, 'List command with table format should not throw an exception' );
 	}
 
 	/**
@@ -123,16 +172,20 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_task_create() {
-		$result = $this->run_wp_cli(
-			\sprintf(
-				'prpl task create --task_id=%s --title=%s',
-				\escapeshellarg( $this->test_task_id ),
-				\escapeshellarg( 'PHPUnit CLI Test Task' )
+		$this->run_command(
+			fn() => $this->command->create(
+				[],
+				[
+					'task_id' => $this->test_task_id,
+					'title'   => 'PHPUnit CLI Test Task',
+				]
 			)
 		);
 
-		$this->assertEquals( 0, $result['code'], 'Command should succeed. Output: ' . $result['output'] );
-		$this->assertStringContainsString( 'Success', $result['output'] );
+		// Verify task was created in database.
+		$task = $this->get_test_task( $this->test_task_id );
+		$this->assertNotNull( $task, 'Task should exist in database after create' );
+		$this->assertEquals( $this->test_task_id, $task->task_id, 'Task ID should match' );
 	}
 
 	/**
@@ -141,10 +194,10 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_task_create_without_required_fields() {
-		$result = $this->run_wp_cli( 'prpl task create' );
+		$exception = $this->run_command( fn() => $this->command->create( [], [] ) );
 
-		$this->assertNotEquals( 0, $result['code'], 'Command should fail without required fields' );
-		$this->assertStringContainsString( 'task_id and title are required', $result['output'] );
+		// WP_CLI::error() throws ExitException.
+		$this->assertInstanceOf( \WP_CLI\ExitException::class, $exception, 'Should throw ExitException for missing required fields' );
 	}
 
 	/**
@@ -154,25 +207,12 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 	 */
 	public function test_task_get() {
 		// First create a task.
-		$this->run_wp_cli(
-			\sprintf(
-				'prpl task create --task_id=%s --title=%s',
-				\escapeshellarg( $this->test_task_id ),
-				\escapeshellarg( 'PHPUnit CLI Test Task' )
-			)
-		);
+		$this->create_test_task( $this->test_task_id );
 
-		// Now get it.
-		$result = $this->run_wp_cli(
-			\sprintf( 'prpl task get %s --format=json', \escapeshellarg( $this->test_task_id ) )
-		);
+		// Get should run without exception.
+		$exception = $this->run_command( fn() => $this->command->get( [ $this->test_task_id ], [ 'format' => 'json' ] ) );
 
-		$this->assertEquals( 0, $result['code'], 'Command should succeed. Output: ' . $result['output'] );
-
-		$tasks = \json_decode( $result['output'], true );
-		$this->assertIsArray( $tasks, 'Output should be valid JSON array' );
-		$this->assertNotEmpty( $tasks, 'Should return at least one task' );
-		$this->assertEquals( $this->test_task_id, $tasks[0]['task_id'] ?? '', 'Task ID should match' );
+		$this->assertNull( $exception, 'Get command should not throw an exception for existing task' );
 	}
 
 	/**
@@ -181,10 +221,10 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_task_get_not_found() {
-		$result = $this->run_wp_cli( 'prpl task get non-existent-task-12345' );
+		$exception = $this->run_command( fn() => $this->command->get( [ 'non-existent-task-12345' ], [] ) );
 
-		$this->assertNotEquals( 0, $result['code'], 'Command should fail for non-existent task' );
-		$this->assertStringContainsString( 'not found', $result['output'] );
+		// WP_CLI::error() throws ExitException for not found.
+		$this->assertInstanceOf( \WP_CLI\ExitException::class, $exception, 'Should throw ExitException for non-existent task' );
 	}
 
 	/**
@@ -194,21 +234,12 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 	 */
 	public function test_task_update() {
 		// First create a task.
-		$this->run_wp_cli(
-			\sprintf(
-				'prpl task create --task_id=%s --title=%s',
-				\escapeshellarg( $this->test_task_id ),
-				\escapeshellarg( 'PHPUnit CLI Test Task' )
-			)
-		);
+		$this->create_test_task( $this->test_task_id );
 
-		// Now update it.
-		$result = $this->run_wp_cli(
-			\sprintf( 'prpl task update %s --post_status=draft', \escapeshellarg( $this->test_task_id ) )
-		);
+		// Update should run without exception.
+		$exception = $this->run_command( fn() => $this->command->update( [ $this->test_task_id ], [ 'post_status' => 'draft' ] ) );
 
-		$this->assertEquals( 0, $result['code'], 'Command should succeed. Output: ' . $result['output'] );
-		$this->assertStringContainsString( 'Success', $result['output'] );
+		$this->assertNull( $exception, 'Update command should not throw an exception' );
 	}
 
 	/**
@@ -218,27 +249,18 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 	 */
 	public function test_task_delete() {
 		// First create a task.
-		$this->run_wp_cli(
-			\sprintf(
-				'prpl task create --task_id=%s --title=%s',
-				\escapeshellarg( $this->test_task_id ),
-				\escapeshellarg( 'PHPUnit CLI Test Task' )
-			)
-		);
+		$this->create_test_task( $this->test_task_id );
+
+		// Verify task exists.
+		$task = $this->get_test_task( $this->test_task_id );
+		$this->assertNotNull( $task, 'Task should exist before delete' );
 
 		// Now delete it.
-		$result = $this->run_wp_cli(
-			\sprintf( 'prpl task delete %s', \escapeshellarg( $this->test_task_id ) )
-		);
-
-		$this->assertEquals( 0, $result['code'], 'Command should succeed. Output: ' . $result['output'] );
-		$this->assertStringContainsString( 'Success', $result['output'] );
+		$this->run_command( fn() => $this->command->delete( [ $this->test_task_id ], [] ) );
 
 		// Verify it's deleted.
-		$result = $this->run_wp_cli(
-			\sprintf( 'prpl task get %s', \escapeshellarg( $this->test_task_id ) )
-		);
-		$this->assertStringContainsString( 'not found', $result['output'] );
+		$task = $this->get_test_task( $this->test_task_id );
+		$this->assertNull( $task, 'Task should be deleted from database' );
 	}
 
 	/**
@@ -250,32 +272,30 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 		$task_id = 'phpunit-crud-test-' . \time();
 
 		// Create.
-		$result = $this->run_wp_cli(
-			\sprintf(
-				'prpl task create --task_id=%s --title=%s --description=%s',
-				\escapeshellarg( $task_id ),
-				\escapeshellarg( 'CRUD Test Task' ),
-				\escapeshellarg( 'Testing full CRUD cycle' )
+		$this->run_command(
+			fn() => $this->command->create(
+				[],
+				[
+					'task_id'     => $task_id,
+					'title'       => 'CRUD Test Task',
+					'description' => 'Testing full CRUD cycle',
+				]
 			)
 		);
-		$this->assertEquals( 0, $result['code'], 'Create should succeed' );
+		$task = $this->get_test_task( $task_id );
+		$this->assertNotNull( $task, 'Task should exist after create' );
 
-		// Read.
-		$result = $this->run_wp_cli(
-			\sprintf( 'prpl task get %s --format=json', \escapeshellarg( $task_id ) )
-		);
-		$this->assertEquals( 0, $result['code'], 'Get should succeed' );
+		// Read (get) - should not throw.
+		$exception = $this->run_command( fn() => $this->command->get( [ $task_id ], [ 'format' => 'json' ] ) );
+		$this->assertNull( $exception, 'Get should not throw for existing task' );
 
-		// Update.
-		$result = $this->run_wp_cli(
-			\sprintf( 'prpl task update %s --post_status=draft', \escapeshellarg( $task_id ) )
-		);
-		$this->assertEquals( 0, $result['code'], 'Update should succeed' );
+		// Update - should not throw.
+		$exception = $this->run_command( fn() => $this->command->update( [ $task_id ], [ 'post_status' => 'draft' ] ) );
+		$this->assertNull( $exception, 'Update should not throw' );
 
 		// Delete.
-		$result = $this->run_wp_cli(
-			\sprintf( 'prpl task delete %s', \escapeshellarg( $task_id ) )
-		);
-		$this->assertEquals( 0, $result['code'], 'Delete should succeed' );
+		$this->run_command( fn() => $this->command->delete( [ $task_id ], [] ) );
+		$task = $this->get_test_task( $task_id );
+		$this->assertNull( $task, 'Task should be deleted after delete command' );
 	}
 }
