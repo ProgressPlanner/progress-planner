@@ -80,14 +80,14 @@ class Tasks_Manager {
 			new User_Tasks(),
 			// Email_Sending() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Set_Valuable_Post_Types() - Migrated to React, registered in assets/src/tasks/index.js.
-			new Select_Locale(),
+			// Select_Locale() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Remove_Terms_Without_Posts(),
 			new Fewer_Tags(),
 			new Update_Term_Description(),
 			// Unpublished_Content() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Collaborator(),
-			new Select_Timezone(),
-			new Set_Date_Format(),
+			// Select_Timezone() - Migrated to React, registered in assets/src/tasks/index.js.
+			// Set_Date_Format() - Migrated to React, registered in assets/src/tasks/index.js.
 			// SEO_Plugin() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Improve_Pdf_Handling() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Set_Page_About() - Migrated to React, registered in assets/src/tasks/index.js.

@@ -29,6 +29,9 @@ import debugDisplayTask from './DebugDisplayTask';
 import phpVersionTask from './PhpVersionTask';
 import disableCommentsTask from './DisableCommentsTask';
 import reduceAutoloadedOptionsTask from './ReduceAutoloadedOptionsTask';
+import selectLocaleTask from './SelectLocaleTask';
+import selectTimezoneTask from './SelectTimezoneTask';
+import setDateFormatTask from './SetDateFormatTask';
 
 // Register all task providers.
 registerTaskProvider( helloWorldTask );
@@ -54,3 +57,6 @@ registerTaskProvider( debugDisplayTask );
 registerTaskProvider( phpVersionTask );
 registerTaskProvider( disableCommentsTask );
 registerTaskProvider( reduceAutoloadedOptionsTask );
+registerTaskProvider( selectLocaleTask );
+registerTaskProvider( selectTimezoneTask );
+registerTaskProvider( setDateFormatTask );
