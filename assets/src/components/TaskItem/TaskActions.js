@@ -6,10 +6,39 @@
  * If prpl_task_actions is missing, generates actions from the task provider.
  */
 
-import { useEffect, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useRef, useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { doAction } from '@wordpress/hooks';
 import { getTaskProviderInstance } from '../../services/taskRegistry';
+
+/**
+ * Style constants - extracted to prevent recreation on each render.
+ */
+const STYLES = {
+	actions: {
+		paddingTop: '2px',
+		gap: '0.4rem',
+		alignItems: 'baseline',
+	},
+	action: {
+		display: 'inline-flex',
+		position: 'relative',
+		textDecoration: 'none',
+	},
+	actionText: {
+		lineHeight: 1,
+		fontSize: 'var(--prpl-font-size-small)',
+		color: 'var(--prpl-color-link)',
+	},
+	button: {
+		textDecoration: 'none',
+		padding: 0,
+		lineHeight: 1,
+		background: 'none',
+		border: 'none',
+		cursor: 'pointer',
+	},
+};
 
 /**
  * Task Actions component.
@@ -30,6 +59,42 @@ export default function TaskActions( {
 	onDelete,
 } ) {
 	const actionsRef = useRef( null );
+	// Store references to event handlers for proper cleanup.
+	const handlersRef = useRef( [] );
+
+	/**
+	 * Create memoized event handler factories to ensure stable references.
+	 */
+	const createCompleteHandler = useCallback(
+		( taskId, taskObj ) => ( e ) => {
+			e.preventDefault();
+			onComplete( taskId, taskObj );
+		},
+		[ onComplete ]
+	);
+
+	const createSnoozeHandler = useCallback(
+		( taskId ) => ( e ) => {
+			onSnooze( taskId, e.target.value );
+		},
+		[ onSnooze ]
+	);
+
+	const createPopoverHandler = useCallback(
+		( taskId, taskObj ) => ( e ) => {
+			e.preventDefault();
+			doAction( 'prpl.popover.open', taskId, taskObj );
+		},
+		[]
+	);
+
+	const createDeleteHandler = useCallback(
+		( taskId ) => ( e ) => {
+			e.preventDefault();
+			onDelete( taskId );
+		},
+		[ onDelete ]
+	);
 
 	/**
 	 * Set up event handlers for the rendered HTML actions.
@@ -40,15 +105,20 @@ export default function TaskActions( {
 		}
 
 		const container = actionsRef.current;
+		// Clear previous handlers array.
+		handlersRef.current = [];
 
 		// Handle complete button clicks.
 		const completeButtons = container.querySelectorAll(
 			'[data-action="complete"]'
 		);
 		completeButtons.forEach( ( button ) => {
-			button.addEventListener( 'click', ( e ) => {
-				e.preventDefault();
-				onComplete( task.id, task );
+			const handler = createCompleteHandler( task.id, task );
+			button.addEventListener( 'click', handler );
+			handlersRef.current.push( {
+				element: button,
+				type: 'click',
+				handler,
 			} );
 		} );
 
@@ -57,8 +127,12 @@ export default function TaskActions( {
 			'.prpl-snooze-duration-radio-group input[type="radio"]'
 		);
 		snoozeRadios.forEach( ( radio ) => {
-			radio.addEventListener( 'change', () => {
-				onSnooze( task.id, radio.value );
+			const handler = createSnoozeHandler( task.id );
+			radio.addEventListener( 'change', handler );
+			handlersRef.current.push( {
+				element: radio,
+				type: 'change',
+				handler,
 			} );
 		} );
 
@@ -77,10 +151,12 @@ export default function TaskActions( {
 				// Extract task ID from popover ID (format: prpl-popover-{taskId})
 				const taskId = popoverId.replace( 'prpl-popover-', '' );
 				link.removeAttribute( 'onclick' );
-				link.addEventListener( 'click', ( e ) => {
-					e.preventDefault();
-					// Trigger popover open via hook
-					doAction( 'prpl.popover.open', taskId, task );
+				const handler = createPopoverHandler( taskId, task );
+				link.addEventListener( 'click', handler );
+				handlersRef.current.push( {
+					element: link,
+					type: 'click',
+					handler,
 				} );
 			}
 		} );
@@ -90,22 +166,29 @@ export default function TaskActions( {
 			'.prpl-suggested-task-button.trash'
 		);
 		deleteButtons.forEach( ( button ) => {
-			button.addEventListener( 'click', ( e ) => {
-				e.preventDefault();
-				onDelete( task.id );
+			const handler = createDeleteHandler( task.id );
+			button.addEventListener( 'click', handler );
+			handlersRef.current.push( {
+				element: button,
+				type: 'click',
+				handler,
 			} );
 		} );
 
-		// Cleanup event listeners on unmount.
+		// Cleanup: properly remove all event listeners on unmount.
 		return () => {
-			completeButtons.forEach( ( button ) => {
-				button.replaceWith( button.cloneNode( true ) );
+			handlersRef.current.forEach( ( { element, type, handler } ) => {
+				element.removeEventListener( type, handler );
 			} );
-			snoozeRadios.forEach( ( radio ) => {
-				radio.replaceWith( radio.cloneNode( true ) );
-			} );
+			handlersRef.current = [];
 		};
-	}, [ task, onComplete, onSnooze, onDelete ] );
+	}, [
+		task,
+		createCompleteHandler,
+		createSnoozeHandler,
+		createPopoverHandler,
+		createDeleteHandler,
+	] );
 
 	// Get task actions from API response, or generate from task provider if missing.
 	const taskActions = useMemo( () => {
@@ -216,43 +299,15 @@ export default function TaskActions( {
 		}
 	}, [ task ] );
 
-	// Inline styles.
-	const actionsStyle = {
-		paddingTop: '2px',
-		gap: '0.4rem',
-		alignItems: 'baseline',
-	};
-
-	const actionStyle = {
-		display: 'inline-flex',
-		position: 'relative',
-		textDecoration: 'none',
-	};
-
-	const actionTextStyle = {
-		lineHeight: 1,
-		fontSize: 'var(--prpl-font-size-small)',
-		color: 'var(--prpl-color-link)',
-	};
-
-	const buttonStyle = {
-		textDecoration: 'none',
-		padding: 0,
-		lineHeight: 1,
-		background: 'none',
-		border: 'none',
-		cursor: 'pointer',
-	};
-
 	// If no actions and not a user task, return empty.
 	if ( taskActions.length === 0 && ! isUserTask ) {
-		return <div className="tooltip-actions" style={ actionsStyle }></div>;
+		return <div className="tooltip-actions" style={ STYLES.actions }></div>;
 	}
 
 	return (
 		<div
 			className="tooltip-actions"
-			style={ actionsStyle }
+			style={ STYLES.actions }
 			ref={ actionsRef }
 		>
 			{ /* Render pre-built HTML actions from the API */ }
@@ -260,25 +315,25 @@ export default function TaskActions( {
 				<span
 					key={ actionIndex }
 					className="tooltip-action"
-					style={ actionStyle }
+					style={ STYLES.action }
 					dangerouslySetInnerHTML={ { __html: actionHTML } }
 				/>
 			) ) }
 
 			{ /* Add delete button for user tasks */ }
 			{ isUserTask && (
-				<span className="tooltip-action" style={ actionStyle }>
+				<span className="tooltip-action" style={ STYLES.action }>
 					<button
 						type="button"
 						className="prpl-suggested-task-button trash"
-						style={ buttonStyle }
+						style={ STYLES.button }
 						data-post-id={ task.id }
 						title={ __( 'Delete', 'progress-planner' ) }
 						onClick={ () => onDelete( task.id ) }
 					>
 						<span
 							className="prpl-tooltip-action-text"
-							style={ actionTextStyle }
+							style={ STYLES.actionText }
 						>
 							{ __( 'Delete', 'progress-planner' ) }
 						</span>
