@@ -515,7 +515,7 @@ class Debug_Tools {
 		);
 
 		// Free license info.
-		$prpl_free_license_key = \get_option( 'progress_planner_license_key', false );
+		$prpl_free_license_key = \progress_planner()->get_license_key();
 		$admin_bar->add_node(
 			[
 				'id'     => 'prpl-free-license',

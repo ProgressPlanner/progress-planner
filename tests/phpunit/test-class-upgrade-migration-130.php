@@ -47,7 +47,6 @@ class Upgrade_Migrations_130_Test extends \WP_UnitTestCase {
 			'review-post-2810-202517',
 			'review-post-4467-202517',
 			'update-core-202401',
-			'settings-saved-202501',
 			'review-post-4530-202517',
 			'review-post-4477-202517',
 			'review-post-4569-202517',
