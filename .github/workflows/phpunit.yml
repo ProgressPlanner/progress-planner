@@ -105,6 +105,16 @@ jobs:
       - name: Symlink plugin into WordPress installation
         run: ln -s "$GITHUB_WORKSPACE" /tmp/wordpress/wp-content/plugins/progress-planner
 
+      - name: Create wp-config.php for WP-CLI tests
+        run: |
+          wp config create \
+            --path=/tmp/wordpress \
+            --dbname=wordpress_tests \
+            --dbuser=root \
+            --dbpass='' \
+            --dbhost=127.0.0.1:3306 \
+            --skip-check
+
       - name: Run unit tests - single site
         run: composer test
 
