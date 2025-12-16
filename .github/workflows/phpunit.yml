@@ -116,6 +116,9 @@ jobs:
             --dbprefix=wptests_ \
             --skip-check
 
+      - name: Activate plugin for WP-CLI tests
+        run: wp plugin activate progress-planner --path=/tmp/wordpress
+
       - name: Run unit tests - single site
         run: composer test
 
