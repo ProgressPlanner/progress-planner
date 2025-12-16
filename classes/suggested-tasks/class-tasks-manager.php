@@ -91,8 +91,8 @@ class Tasks_Manager {
 			// SEO_Plugin() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Improve_Pdf_Handling(),
 			// Set_Page_About() - Migrated to React, registered in assets/src/tasks/index.js.
-			new Set_Page_FAQ(),
-			new Set_Page_Contact(),
+			// Set_Page_FAQ() - Migrated to React, registered in assets/src/tasks/index.js.
+			// Set_Page_Contact() - Migrated to React, registered in assets/src/tasks/index.js.
 		];
 
 		// Add the plugin integration.

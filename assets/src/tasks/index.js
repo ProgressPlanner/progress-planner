@@ -17,6 +17,8 @@ import permalinkStructureTask from './PermalinkStructureTask';
 import renameUncategorizedCategoryTask from './RenameUncategorizedCategoryTask';
 import disableCommentPaginationTask from './DisableCommentPaginationTask';
 import setPageAboutTask from './SetPageAboutTask';
+import setPageFAQTask from './SetPageFAQTask';
+import setPageContactTask from './SetPageContactTask';
 
 // Register all task providers.
 registerTaskProvider( helloWorldTask );
@@ -30,3 +32,5 @@ registerTaskProvider( permalinkStructureTask );
 registerTaskProvider( renameUncategorizedCategoryTask );
 registerTaskProvider( disableCommentPaginationTask );
 registerTaskProvider( setPageAboutTask );
+registerTaskProvider( setPageFAQTask );
+registerTaskProvider( setPageContactTask );
