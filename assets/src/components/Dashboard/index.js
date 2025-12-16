@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import DashboardHeader from './DashboardHeader';
 import DashboardWidgets from './DashboardWidgets';
 import Welcome from './Welcome';
+import { DashboardProvider } from '../../context/DashboardContext';
 
 /**
  * Style constants - extracted to prevent recreation on each render.
@@ -51,35 +52,37 @@ export default function Dashboard( { config } ) {
 		return <Welcome config={ config } />;
 	}
 
-	// Show main dashboard
+	// Show main dashboard wrapped in context provider
 	return (
-		<Fragment>
-			<a
-				href="#prpl-main-content"
-				className="screen-reader-text prpl-skip-link"
-				style={ STYLES.skipLink }
-				onFocus={ ( e ) => {
-					e.target.style.top = '10px';
-					e.target.style.left = '10px';
-				} }
-				onBlur={ ( e ) => {
-					e.target.style.top = '-40px';
-					e.target.style.left = '0';
-				} }
-			>
-				{ __( 'Skip to main content', 'progress-planner' ) }
-			</a>
-			<h1 className="screen-reader-text">
-				{ __( 'Progress Planner', 'progress-planner' ) }
-			</h1>
-			<DashboardHeader config={ config } />
-			<div
-				id="prpl-main-content"
-				className="prpl-widgets-container"
-				style={ STYLES.widgetsContainer }
-			>
-				<DashboardWidgets />
-			</div>
-		</Fragment>
+		<DashboardProvider>
+			<Fragment>
+				<a
+					href="#prpl-main-content"
+					className="screen-reader-text prpl-skip-link"
+					style={ STYLES.skipLink }
+					onFocus={ ( e ) => {
+						e.target.style.top = '10px';
+						e.target.style.left = '10px';
+					} }
+					onBlur={ ( e ) => {
+						e.target.style.top = '-40px';
+						e.target.style.left = '0';
+					} }
+				>
+					{ __( 'Skip to main content', 'progress-planner' ) }
+				</a>
+				<h1 className="screen-reader-text">
+					{ __( 'Progress Planner', 'progress-planner' ) }
+				</h1>
+				<DashboardHeader config={ config } />
+				<div
+					id="prpl-main-content"
+					className="prpl-widgets-container"
+					style={ STYLES.widgetsContainer }
+				>
+					<DashboardWidgets />
+				</div>
+			</Fragment>
+		</DashboardProvider>
 	);
 }
