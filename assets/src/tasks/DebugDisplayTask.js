@@ -9,6 +9,7 @@
  */
 
 import { TaskProvider } from '../services/TaskProvider';
+import { doAction } from '@wordpress/hooks';
 
 /**
  * Debug Display Task Provider class.
@@ -68,5 +69,8 @@ class DebugDisplayTask extends TaskProvider {
 		};
 	}
 }
+
+// Self-register this task provider
+doAction( 'prpl.tasks.register', DebugDisplayTask, DebugDisplayTask.priority );
 
 export default DebugDisplayTask;

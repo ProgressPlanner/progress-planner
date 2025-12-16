@@ -6,6 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { doAction } from '@wordpress/hooks';
 
 /**
  * Improve PDF Handling Task Provider class.
@@ -73,5 +74,12 @@ class ImprovePdfHandlingTask extends InteractiveTaskProvider {
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
+
+// Self-register this task provider
+doAction(
+	'prpl.tasks.register',
+	ImprovePdfHandlingTask,
+	ImprovePdfHandlingTask.priority
+);
 
 export default ImprovePdfHandlingTask;

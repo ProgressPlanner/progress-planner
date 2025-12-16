@@ -6,6 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { doAction } from '@wordpress/hooks';
 
 /**
  * Set Valuable Post Types Task Provider class.
@@ -73,5 +74,12 @@ class SetValuablePostTypesTask extends InteractiveTaskProvider {
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
+
+// Self-register this task provider
+doAction(
+	'prpl.tasks.register',
+	SetValuablePostTypesTask,
+	SetValuablePostTypesTask.priority
+);
 
 export default SetValuablePostTypesTask;

@@ -9,6 +9,7 @@
  */
 
 import { TaskProvider } from '../services/TaskProvider';
+import { doAction } from '@wordpress/hooks';
 
 /**
  * PHP Version Task Provider class.
@@ -68,5 +69,8 @@ class PhpVersionTask extends TaskProvider {
 		};
 	}
 }
+
+// Self-register this task provider
+doAction( 'prpl.tasks.register', PhpVersionTask, PhpVersionTask.priority );
 
 export default PhpVersionTask;

@@ -6,6 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { doAction } from '@wordpress/hooks';
 
 /**
  * Email Sending Task Provider class.
@@ -73,5 +74,8 @@ class EmailSendingTask extends InteractiveTaskProvider {
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
+
+// Self-register this task provider
+doAction( 'prpl.tasks.register', EmailSendingTask, EmailSendingTask.priority );
 
 export default EmailSendingTask;

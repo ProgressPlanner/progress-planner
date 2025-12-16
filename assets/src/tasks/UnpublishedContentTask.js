@@ -6,6 +6,7 @@
  */
 
 import { TaskProvider } from '../services/TaskProvider';
+import { doAction } from '@wordpress/hooks';
 import { fetchDataCollector } from '../hooks/useTasksApi';
 
 /**
@@ -102,5 +103,12 @@ class UnpublishedContentTask extends TaskProvider {
 		};
 	}
 }
+
+// Self-register this task provider
+doAction(
+	'prpl.tasks.register',
+	UnpublishedContentTask,
+	UnpublishedContentTask.priority
+);
 
 export default UnpublishedContentTask;
