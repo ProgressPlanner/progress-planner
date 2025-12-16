@@ -8,7 +8,9 @@
 import { registerTaskProvider } from '../services/taskRegistry';
 import helloWorldTask from './HelloWorldTask';
 import samplePageTask from './SamplePageTask';
+import blogDescriptionTask from './BlogDescriptionTask';
 
 // Register all task providers.
 registerTaskProvider( helloWorldTask );
 registerTaskProvider( samplePageTask );
+registerTaskProvider( blogDescriptionTask );

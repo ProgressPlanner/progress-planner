@@ -64,7 +64,7 @@ class Tasks_Manager {
 			new Content_Create(),
 			new Content_Review(),
 			new Core_Update(),
-			new Blog_Description(),
+			// Blog_Description() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Debug_Display(),
 			new Disable_Comments(),
 			new Disable_Comment_Pagination(),
