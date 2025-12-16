@@ -18,6 +18,7 @@ import { useGridMasonry } from '../../hooks/useGridMasonry';
 import { useCelebration } from '../../hooks/useCelebration';
 import { dispatchGridResize } from '../../utils/gridResize';
 import WidgetHeader from '../../components/WidgetHeader';
+import { useDashboard } from '../../context/DashboardContext';
 
 /**
  * Style constants - extracted to prevent recreation on each render.
@@ -144,6 +145,9 @@ function TodoWidget( { config = {} } ) {
 
 	// Get celebration functions.
 	const { celebrate } = useCelebration();
+
+	// Get dashboard context for cross-widget communication.
+	const { onTaskCompleted } = useDashboard();
 
 	/**
 	 * Sort tasks: golden tasks first, then by menu_order.
@@ -312,6 +316,11 @@ function TodoWidget( { config = {} } ) {
 
 					// Trigger celebration if has points
 					if ( task.prpl_points > 0 ) {
+						// Notify context about task completion.
+						onTaskCompleted( task, task.prpl_points );
+
+						// Legacy: Update Ravi gauge via window (for backward compatibility).
+						// TODO: Remove this once all widgets use context.
 						if (
 							typeof window.prplUpdateRaviGauge === 'function'
 						) {
@@ -329,7 +338,13 @@ function TodoWidget( { config = {} } ) {
 				console.error( 'Error toggling task:', error );
 			}
 		},
-		[ pendingTasks, completedTasks, sortTasksWithGoldenFirst, celebrate ]
+		[
+			pendingTasks,
+			completedTasks,
+			sortTasksWithGoldenFirst,
+			celebrate,
+			onTaskCompleted,
+		]
 	);
 
 	/**

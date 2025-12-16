@@ -26,6 +26,7 @@ import {
 	setTaskContainer,
 	getTaskProviderInstance,
 } from '../../services/taskRegistry';
+import { useDashboard } from '../../context/DashboardContext';
 
 // Import task registrations (tasks will self-register on import).
 import '../../tasks';
@@ -53,6 +54,9 @@ function SuggestedTasks( { config = {} } ) {
 
 	// Get celebration functions.
 	const { celebrate } = useCelebration();
+
+	// Get dashboard context for cross-widget communication.
+	const { onTaskCompleted } = useDashboard();
 
 	/**
 	 * Insert task in sorted position by priority.
@@ -346,7 +350,13 @@ function SuggestedTasks( { config = {} } ) {
 				// Get task points.
 				const eventPoints = parseInt( task.prpl_points ) || 0;
 
-				// Update Ravi gauge if task has points.
+				// Notify context about task completion (for cross-widget updates).
+				if ( eventPoints > 0 ) {
+					onTaskCompleted( task, eventPoints );
+				}
+
+				// Legacy: Update Ravi gauge via window (for backward compatibility).
+				// TODO: Remove this once all widgets use context.
 				if (
 					eventPoints > 0 &&
 					typeof window.prplUpdateRaviGauge === 'function'
@@ -409,7 +419,7 @@ function SuggestedTasks( { config = {} } ) {
 				} );
 			}
 		},
-		[ celebrate, insertTaskSorted, ensureTaskActions ]
+		[ celebrate, insertTaskSorted, ensureTaskActions, onTaskCompleted ]
 	);
 
 	/**
