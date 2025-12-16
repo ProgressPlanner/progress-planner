@@ -9,6 +9,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { doAction } from '@wordpress/hooks';
 import { fetchDataCollector } from '../hooks/useTasksApi';
 
 /**
@@ -127,5 +128,12 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
+
+// Self-register this task provider
+doAction(
+	'prpl.tasks.register',
+	UpdateTermDescriptionTask,
+	UpdateTermDescriptionTask.priority
+);
 
 export default UpdateTermDescriptionTask;

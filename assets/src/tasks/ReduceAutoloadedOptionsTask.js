@@ -6,6 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { doAction } from '@wordpress/hooks';
 
 /**
  * Reduce Autoloaded Options Task Provider class.
@@ -74,5 +75,12 @@ class ReduceAutoloadedOptionsTask extends InteractiveTaskProvider {
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
+
+// Self-register this task provider
+doAction(
+	'prpl.tasks.register',
+	ReduceAutoloadedOptionsTask,
+	ReduceAutoloadedOptionsTask.priority
+);
 
 export default ReduceAutoloadedOptionsTask;

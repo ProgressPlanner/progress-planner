@@ -6,6 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { doAction } from '@wordpress/hooks';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -97,5 +98,8 @@ class SelectLocaleTask extends InteractiveTaskProvider {
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
+
+// Self-register this task provider
+doAction( 'prpl.tasks.register', SelectLocaleTask, SelectLocaleTask.priority );
 
 export default SelectLocaleTask;

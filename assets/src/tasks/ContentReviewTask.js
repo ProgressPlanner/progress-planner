@@ -9,6 +9,7 @@
  */
 
 import { TaskProvider } from '../services/TaskProvider';
+import { doAction } from '@wordpress/hooks';
 
 /**
  * Content Review Task Provider class.
@@ -104,5 +105,12 @@ class ContentReviewTask extends TaskProvider {
 		};
 	}
 }
+
+// Self-register this task provider
+doAction(
+	'prpl.tasks.register',
+	ContentReviewTask,
+	ContentReviewTask.priority
+);
 
 export default ContentReviewTask;

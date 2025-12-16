@@ -9,6 +9,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { doAction } from '@wordpress/hooks';
 import { fetchDataCollector } from '../hooks/useTasksApi';
 
 /**
@@ -124,5 +125,12 @@ class RemoveTermsWithoutPostsTask extends InteractiveTaskProvider {
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
 }
+
+// Self-register this task provider
+doAction(
+	'prpl.tasks.register',
+	RemoveTermsWithoutPostsTask,
+	RemoveTermsWithoutPostsTask.priority
+);
 
 export default RemoveTermsWithoutPostsTask;
