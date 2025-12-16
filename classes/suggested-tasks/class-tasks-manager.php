@@ -49,6 +49,48 @@ use Progress_Planner\Suggested_Tasks\Providers\Set_Page_Contact;
 class Tasks_Manager {
 
 	/**
+	 * React provider IDs.
+	 *
+	 * These providers have been migrated to React and should not be
+	 * cleaned up or evaluated by PHP. PHP will skip tasks from these
+	 * providers in cleanup_pending_tasks() and evaluate_task().
+	 *
+	 * @var array<string>
+	 */
+	private const REACT_PROVIDERS = [
+		'core-blogdescription',
+		'core-permalink-structure',
+		'core-siteicon',
+		'create-post',
+		'disable-comment-pagination',
+		'disable-comments',
+		'fewer-tags',
+		'hello-world',
+		'improve-pdf-handling',
+		'php-version',
+		'reduce-autoloaded-options',
+		'remove-inactive-plugins',
+		'remove-terms-without-posts',
+		'rename-uncategorized-category',
+		'review-post',
+		'sample-page',
+		'search-engine-visibility',
+		'select-locale',
+		'select-timezone',
+		'sending-email',
+		'seo-plugin',
+		'set-date-format',
+		'set-page-about',
+		'set-page-contact',
+		'set-page-faq',
+		'set-valuable-post-types',
+		'unpublished-content',
+		'update-core',
+		'update-term-description',
+		'wp-debug-display',
+	];
+
+	/**
 	 * The task providers.
 	 *
 	 * @var array
@@ -236,6 +278,20 @@ class Tasks_Manager {
 	}
 
 	/**
+	 * Check if a provider ID belongs to a React provider.
+	 *
+	 * React providers are registered in JavaScript and their tasks
+	 * should not be cleaned up or evaluated by PHP.
+	 *
+	 * @param string $provider_id The provider ID to check.
+	 *
+	 * @return bool True if this is a React provider, false otherwise.
+	 */
+	private function is_react_provider( string $provider_id ): bool {
+		return \in_array( $provider_id, self::REACT_PROVIDERS, true );
+	}
+
+	/**
 	 * Inject tasks.
 	 *
 	 * @return void
@@ -284,7 +340,16 @@ class Tasks_Manager {
 			return false;
 		}
 		$task_provider = $this->get_task_provider( $task->provider->slug );
-		if ( ! $task_provider || ! $task_provider->is_task_relevant() ) {
+		if ( ! $task_provider ) {
+			// Skip React providers - they handle their own evaluation.
+			if ( $this->is_react_provider( $task->provider->slug ) ) {
+				return false;
+			}
+			// Unknown provider - delete orphan task.
+			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
+			return false;
+		}
+		if ( ! $task_provider->is_task_relevant() ) {
 			// Remove the task from the published tasks.
 			\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 			return false;
@@ -314,7 +379,12 @@ class Tasks_Manager {
 
 			$task_provider = $this->get_task_provider( $task->get_provider_id() );
 
-			// Should we delete the task? Delete tasks which don't have a task provider or repetitive tasks which were created in the previous week.
+			// Skip React providers - they manage their own cleanup.
+			if ( ! $task_provider && $this->is_react_provider( $task->get_provider_id() ) ) {
+				continue;
+			}
+
+			// Delete tasks without provider (orphans) or stale repetitive tasks.
 			if ( ! $task_provider || ( $task_provider->is_repetitive() && ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) ) ) {
 				\progress_planner()->get_suggested_tasks_db()->delete_recommendation( $task->ID );
 			}
@@ -344,6 +414,11 @@ class Tasks_Manager {
 		}
 
 		$task_provider = $this->get_task_provider( $task->get_provider_id() );
+
+		// Skip React providers - they manage their own cleanup.
+		if ( ! $task_provider && $this->is_react_provider( $task->get_provider_id() ) ) {
+			return;
+		}
 
 		// Delete tasks which don't have a task provider or repetitive tasks which were created in the previous week.
 		if ( ! $task_provider || ( $task_provider->is_repetitive() && ( ! $task->date || \gmdate( 'YW' ) !== (string) $task->date ) ) ) {
