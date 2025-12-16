@@ -11,6 +11,7 @@ import LineChart from '../../components/LineChart';
 import ActivityTable from './ActivityTable';
 import { LoadingState, ErrorState } from '../../components/WidgetStates';
 import { useApiData } from '../../hooks/useApiData';
+import WidgetHeader from '../../components/WidgetHeader';
 
 /**
  * ContentActivity widget component.
@@ -59,7 +60,7 @@ function ContentActivity( { config = {} } ) {
 
 	return (
 		<div className="prpl-content-activity">
-			<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+			<WidgetHeader title={ widgetTitle } />
 			<p>
 				{ data.i18n?.description ||
 					__(

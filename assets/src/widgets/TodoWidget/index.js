@@ -17,6 +17,7 @@ import {
 import { useGridMasonry } from '../../hooks/useGridMasonry';
 import { useCelebration } from '../../hooks/useCelebration';
 import { dispatchGridResize } from '../../utils/gridResize';
+import WidgetHeader from '../../components/WidgetHeader';
 
 /**
  * Todo Widget main component.
@@ -456,7 +457,7 @@ function TodoWidget( { config = {} } ) {
 
 	return (
 		<>
-			<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+			<WidgetHeader title={ widgetTitle } />
 			<p className="prpl-widget-description">
 				<span className="prpl-todo-golden-task-description">
 					{ goldenTaskDescription }

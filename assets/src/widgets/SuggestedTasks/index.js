@@ -20,6 +20,7 @@ import {
 import { useGridMasonry } from '../../hooks/useGridMasonry';
 import { useCelebration } from '../../hooks/useCelebration';
 import { dispatchGridResize } from '../../utils/gridResize';
+import WidgetHeader from '../../components/WidgetHeader';
 
 /**
  * Suggested Tasks widget component.
@@ -448,7 +449,7 @@ function SuggestedTasks( { config = {} } ) {
 	if ( isLoading ) {
 		return (
 			<>
-				<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+				<WidgetHeader title={ widgetTitle } />
 				<p className="prpl-suggested-tasks-widget-description">
 					{ widgetDescription }
 				</p>
@@ -466,7 +467,7 @@ function SuggestedTasks( { config = {} } ) {
 	if ( tasks.length === 0 ) {
 		return (
 			<>
-				<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+				<WidgetHeader title={ widgetTitle } />
 				<p className="prpl-suggested-tasks-widget-description">
 					{ widgetDescription }
 				</p>
@@ -493,7 +494,7 @@ function SuggestedTasks( { config = {} } ) {
 
 	return (
 		<>
-			<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+			<WidgetHeader title={ widgetTitle } />
 			<p className="prpl-suggested-tasks-widget-description">
 				{ widgetDescription }
 			</p>

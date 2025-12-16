@@ -9,6 +9,7 @@ import { __ } from '@wordpress/i18n';
 import { doAction } from '@wordpress/hooks';
 import { useApiData } from '../../hooks/useApiData';
 import { LoadingState } from '../../components/WidgetStates';
+import WidgetHeader from '../../components/WidgetHeader';
 
 /**
  * What's New widget component.
@@ -31,7 +32,7 @@ function WhatsNew( { config = {} } ) {
 	if ( isLoading ) {
 		return (
 			<Fragment>
-				<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+				<WidgetHeader title={ widgetTitle } />
 				<hr />
 				<LoadingState simple className="prpl-whats-new__loading" />
 			</Fragment>
@@ -95,7 +96,7 @@ function WhatsNew( { config = {} } ) {
 
 	return (
 		<Fragment>
-			<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+			<WidgetHeader title={ widgetTitle } />
 			<hr />
 			<ul style={ listStyle }>
 				{ posts.map( ( post, index ) => (

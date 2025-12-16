@@ -21,6 +21,7 @@ import Badge from '../../components/Badge';
 import BadgeProgressBar from '../../components/BadgeProgressBar';
 import PointsCounter from './PointsCounter';
 import { LoadingState, ErrorState } from '../../components/WidgetStates';
+import WidgetHeader from '../../components/WidgetHeader';
 
 /**
  * MonthlyBadges widget component.
@@ -184,7 +185,7 @@ function MonthlyBadges( { config = {} } ) {
 	if ( isLoading ) {
 		return (
 			<>
-				<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+				<WidgetHeader title={ widgetTitle } />
 				<LoadingState
 					className="prpl-monthly-badges prpl-monthly-badges--loading"
 					style={ { minHeight: '200px' } }
@@ -196,7 +197,7 @@ function MonthlyBadges( { config = {} } ) {
 	if ( error ) {
 		return (
 			<>
-				<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+				<WidgetHeader title={ widgetTitle } />
 				<ErrorState
 					message={ error }
 					className="prpl-monthly-badges prpl-monthly-badges--error"
@@ -212,7 +213,7 @@ function MonthlyBadges( { config = {} } ) {
 
 	return (
 		<>
-			<h2 className="prpl-widget-title">{ widgetTitle }</h2>
+			<WidgetHeader title={ widgetTitle } />
 			<div className="prpl-monthly-badges" style={ containerStyle }>
 				{ /* Main gauge with current badge */ }
 				<Gauge value={ gaugeValue } max={ maxPoints }>
