@@ -28,6 +28,8 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Rest\Email_Test get_rest__email_test()
  * @method \Progress_Planner\Rest\Subscribe get_rest__subscribe()
  * @method \Progress_Planner\Rest\Timezone_Options get_rest__timezone_options()
+ * @method \Progress_Planner\Rest\Data_Collectors get_rest__data_collectors()
+ * @method \Progress_Planner\Rest\Task_Evaluation get_rest__task_evaluation()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
  * @method \Progress_Planner\Utils\Playground get_utils__playground()
@@ -132,6 +134,8 @@ class Base {
 		$this->get_rest__email_test();
 		$this->get_rest__subscribe();
 		$this->get_rest__timezone_options();
+		$this->get_rest__data_collectors();
+		$this->get_rest__task_evaluation();
 
 		// Onboarding.
 		$this->get_utils__onboard();

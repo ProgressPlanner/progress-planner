@@ -21,6 +21,10 @@ import { useGridMasonry } from '../../hooks/useGridMasonry';
 import { useCelebration } from '../../hooks/useCelebration';
 import { dispatchGridResize } from '../../utils/gridResize';
 import WidgetHeader from '../../components/WidgetHeader';
+import { injectTasks } from '../../services/taskInjectionService';
+
+// Import task registrations.
+import '../../tasks';
 
 /**
  * Suggested Tasks widget component.
@@ -51,6 +55,13 @@ function SuggestedTasks( { config = {} } ) {
 	useEffect( () => {
 		const loadTasks = async () => {
 			try {
+				// Inject React-registered tasks first.
+				try {
+					await injectTasks();
+				} catch ( error ) {
+					console.error( 'Error injecting tasks:', error );
+				}
+
 				const perPage = config?.perPage || 5;
 
 				// First: Fetch pending celebration tasks (if not delayed).

@@ -297,3 +297,32 @@ export async function updateSiteSettings( settings ) {
 		data: settings,
 	} );
 }
+
+/**
+ * Create a task post via task evaluation endpoint.
+ *
+ * @param {Object} taskDetails The task details object.
+ * @return {Promise<Object>} Promise resolving to the created task response.
+ */
+export async function createTaskPost( taskDetails ) {
+	return apiFetch( {
+		path: '/progress-planner/v1/tasks/evaluate',
+		method: 'POST',
+		data: {
+			task_details: taskDetails,
+		},
+	} );
+}
+
+/**
+ * Fetch data from a data collector.
+ *
+ * @param {string} collectorId The data collector ID (DATA_KEY).
+ * @return {Promise<*>} Promise resolving to the collected data.
+ */
+export async function fetchDataCollector( collectorId ) {
+	const response = await apiFetch( {
+		path: `/progress-planner/v1/data-collectors/${ collectorId }`,
+	} );
+	return response.data;
+}

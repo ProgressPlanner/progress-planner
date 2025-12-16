@@ -69,7 +69,7 @@ class Tasks_Manager {
 			new Disable_Comments(),
 			new Disable_Comment_Pagination(),
 			new Sample_Page(),
-			new Hello_World(),
+			// Hello_World() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Remove_Inactive_Plugins(),
 			new Site_Icon(),
 			new Rename_Uncategorized_Category(),
