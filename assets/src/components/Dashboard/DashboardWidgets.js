@@ -8,6 +8,7 @@
 import { Fragment, useState, useEffect } from '@wordpress/element';
 import { addAction } from '@wordpress/hooks';
 import { getRegisteredWidgets } from '../../utils/widgetRegistry';
+import ErrorBoundary from '../ErrorBoundary';
 
 /**
  * Widget wrapper component.
@@ -111,12 +112,14 @@ export default function DashboardWidgets() {
 				width={ widget.width || 1 }
 				forceLastColumn={ widget.forceLastColumn || false }
 			>
-				<WidgetComponent
-					config={ {
-						title: widget.title,
-						infoIconSvg: widget.infoIconSvg,
-					} }
-				/>
+				<ErrorBoundary widgetName={ widget.title }>
+					<WidgetComponent
+						config={ {
+							title: widget.title,
+							infoIconSvg: widget.infoIconSvg,
+						} }
+					/>
+				</ErrorBoundary>
 			</WidgetWrapper>
 		);
 	};
