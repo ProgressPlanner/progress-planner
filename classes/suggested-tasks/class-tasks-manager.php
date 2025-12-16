@@ -75,7 +75,7 @@ class Tasks_Manager {
 			new Rename_Uncategorized_Category(),
 			// Permalink_Structure() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Php_Version(),
-			new Search_Engine_Visibility(),
+			// Search_Engine_Visibility() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Reduce_Autoloaded_Options(),
 			new User_Tasks(),
 			new Email_Sending(),
