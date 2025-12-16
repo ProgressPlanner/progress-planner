@@ -11,48 +11,7 @@ import apiFetch from '@wordpress/api-fetch';
 import BigCounter from '../../components/BigCounter';
 import LineChart from '../../components/LineChart';
 import ActivityTable from './ActivityTable';
-
-/**
- * Loading spinner component.
- *
- * @return {JSX.Element} The loading spinner.
- */
-function LoadingSpinner() {
-	const spinnerStyle = {
-		display: 'flex',
-		justifyContent: 'center',
-		alignItems: 'center',
-		padding: '2em',
-	};
-
-	return (
-		<div className="prpl-content-activity__loading" style={ spinnerStyle }>
-			{ __( 'Loading…', 'progress-planner' ) }
-		</div>
-	);
-}
-
-/**
- * Error display component.
- *
- * @param {Object} props         - Component props.
- * @param {string} props.message - Error message.
- * @return {JSX.Element} The error display.
- */
-function ErrorDisplay( { message } ) {
-	const errorStyle = {
-		padding: '1em',
-		backgroundColor: 'var(--prpl-color-error-background, #fee)',
-		color: 'var(--prpl-color-error, #c00)',
-		borderRadius: 'var(--prpl-border-radius)',
-	};
-
-	return (
-		<div className="prpl-content-activity__error" style={ errorStyle }>
-			{ message }
-		</div>
-	);
-}
+import { LoadingState, ErrorState } from '../../components/WidgetStates';
 
 /**
  * ContentActivity widget component.
@@ -93,11 +52,16 @@ function ContentActivity( { config = {} } ) {
 	}, [] );
 
 	if ( loading ) {
-		return <LoadingSpinner />;
+		return <LoadingState className="prpl-content-activity__loading" />;
 	}
 
 	if ( error ) {
-		return <ErrorDisplay message={ error } />;
+		return (
+			<ErrorState
+				message={ error }
+				className="prpl-content-activity__error"
+			/>
+		);
 	}
 
 	if ( ! data ) {

@@ -13,6 +13,11 @@ import { useBadgeProgressSave } from '../../hooks/useBadgeProgressSave';
 import { CONTENT_BADGES, MAINTENANCE_BADGES } from '../../config/badges';
 import BadgeProgressInfo from '../../components/BadgeProgressInfo';
 import BadgeGrid from '../../components/BadgeGrid';
+import {
+	LoadingState,
+	ErrorState,
+	EmptyState,
+} from '../../components/WidgetStates';
 
 /**
  * SimpleBadgeWidget component.
@@ -86,15 +91,19 @@ export default function SimpleBadgeWidget( {
 	}, [ badges, badgeProgress ] );
 
 	if ( isLoading ) {
-		return <p>{ __( 'Loading…', 'progress-planner' ) }</p>;
+		return <LoadingState simple />;
 	}
 
 	if ( error ) {
-		return <p>{ error }</p>;
+		return <ErrorState message={ error } simple />;
 	}
 
 	if ( ! currentBadge ) {
-		return <p>{ __( 'No badge data available.', 'progress-planner' ) }</p>;
+		return (
+			<EmptyState
+				message={ __( 'No badge data available.', 'progress-planner' ) }
+			/>
+		);
 	}
 
 	return (

@@ -13,6 +13,11 @@ import Gauge from '../../components/Gauge';
 import BarChart from '../../components/BarChart';
 import BigCounter from '../../components/BigCounter';
 import WidgetHeader from '../../components/WidgetHeader';
+import {
+	LoadingState,
+	ErrorState,
+	EmptyState,
+} from '../../components/WidgetStates';
 
 /**
  * Get the streak message based on the current and max streak values.
@@ -179,15 +184,15 @@ function ActivityScores( { config = {} } ) {
 	}, [ range, frequency ] );
 
 	if ( isLoading ) {
-		return <p>{ __( 'Loading…', 'progress-planner' ) }</p>;
+		return <LoadingState simple />;
 	}
 
 	if ( error ) {
-		return <p>{ error }</p>;
+		return <ErrorState message={ error } simple />;
 	}
 
 	if ( ! data ) {
-		return <p>{ __( 'No data available.', 'progress-planner' ) }</p>;
+		return <EmptyState />;
 	}
 
 	const { score, chartData, personalRecord } = data;

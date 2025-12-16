@@ -20,6 +20,7 @@ import Gauge from '../../components/Gauge';
 import Badge from '../../components/Badge';
 import BadgeProgressBar from '../../components/BadgeProgressBar';
 import PointsCounter from './PointsCounter';
+import { LoadingState, ErrorState } from '../../components/WidgetStates';
 
 /**
  * MonthlyBadges widget component.
@@ -176,22 +177,6 @@ function MonthlyBadges( { config = {} } ) {
 		gap: '1rem',
 	};
 
-	const loadingStyle = {
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-		minHeight: '200px',
-		color: 'var(--prpl-color-text)',
-	};
-
-	const errorStyle = {
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-		minHeight: '200px',
-		color: 'var(--prpl-color-alert-error)',
-	};
-
 	// Get title from config or use default.
 	const widgetTitle =
 		config?.title || __( 'Your monthly badge', 'progress-planner' );
@@ -200,12 +185,10 @@ function MonthlyBadges( { config = {} } ) {
 		return (
 			<>
 				<h2 className="prpl-widget-title">{ widgetTitle }</h2>
-				<div
+				<LoadingState
 					className="prpl-monthly-badges prpl-monthly-badges--loading"
-					style={ loadingStyle }
-				>
-					{ __( 'Loading…', 'progress-planner' ) }
-				</div>
+					style={ { minHeight: '200px' } }
+				/>
 			</>
 		);
 	}
@@ -214,12 +197,15 @@ function MonthlyBadges( { config = {} } ) {
 		return (
 			<>
 				<h2 className="prpl-widget-title">{ widgetTitle }</h2>
-				<div
+				<ErrorState
+					message={ error }
 					className="prpl-monthly-badges prpl-monthly-badges--error"
-					style={ errorStyle }
-				>
-					{ error }
-				</div>
+					style={ {
+						minHeight: '200px',
+						backgroundColor: 'transparent',
+						color: 'var(--prpl-color-alert-error)',
+					} }
+				/>
 			</>
 		);
 	}
