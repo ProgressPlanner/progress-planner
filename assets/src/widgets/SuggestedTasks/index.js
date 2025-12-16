@@ -21,9 +21,12 @@ import { useGridMasonry } from '../../hooks/useGridMasonry';
 import { useCelebration } from '../../hooks/useCelebration';
 import { dispatchGridResize } from '../../utils/gridResize';
 import WidgetHeader from '../../components/WidgetHeader';
-import { injectTasks } from '../../services/taskInjectionService';
+import {
+	setTaskRenderCallback,
+	setTaskContainer,
+} from '../../services/taskRegistry';
 
-// Import task registrations.
+// Import task registrations (tasks will self-register on import).
 import '../../tasks';
 
 /**
@@ -42,6 +45,7 @@ function SuggestedTasks( { config = {} } ) {
 	const [ celebratingTaskIds, setCelebratingTaskIds ] = useState( new Set() );
 	const listRef = useRef( null );
 	const injectedTaskIdsRef = useRef( new Set() );
+	const tasksMapRef = useRef( new Map() ); // Map of task ID to task object for quick lookup
 
 	// Initialize grid masonry layout.
 	useGridMasonry();
@@ -50,96 +54,153 @@ function SuggestedTasks( { config = {} } ) {
 	const { celebrate } = useCelebration();
 
 	/**
-	 * Load tasks on component mount.
+	 * Insert task in sorted position by priority.
+	 *
+	 * @param {Array}  currentTasks Current tasks array.
+	 * @param {Object} newTask      New task to insert.
+	 * @param {number} priority     Task priority (lower = higher priority).
+	 * @return {Array} New tasks array with task inserted in sorted position.
+	 */
+	const insertTaskSorted = useCallback(
+		( currentTasks, newTask, priority ) => {
+			// Skip if task already exists
+			if ( tasksMapRef.current.has( newTask.id ) ) {
+				return currentTasks;
+			}
+
+			// Add to map
+			tasksMapRef.current.set( newTask.id, newTask );
+
+			// Find insertion point (tasks are sorted by priority ascending)
+			let insertIndex = currentTasks.length;
+			for ( let i = 0; i < currentTasks.length; i++ ) {
+				const taskPriority =
+					currentTasks[ i ].prpl_priority !== undefined
+						? currentTasks[ i ].prpl_priority
+						: 50;
+				if ( priority < taskPriority ) {
+					insertIndex = i;
+					break;
+				}
+			}
+
+			// Insert task
+			const newTasks = [ ...currentTasks ];
+			newTasks.splice( insertIndex, 0, newTask );
+			return newTasks;
+		},
+		[]
+	);
+
+	/**
+	 * Render callback for streaming tasks.
+	 * Called by taskRegistry when a task is ready to render.
+	 *
+	 * @param {Object} taskData Task data from the API.
+	 * @param {number} priority Task priority.
+	 * @return {void}
+	 */
+	const handleTaskRender = useCallback(
+		( taskData, priority = 50 ) => {
+			// Skip if already rendered
+			if ( tasksMapRef.current.has( taskData.id ) ) {
+				return;
+			}
+
+			// Add priority to task data if not present
+			if ( taskData.prpl_priority === undefined ) {
+				taskData.prpl_priority = priority;
+			}
+
+			// Insert in sorted position
+			setTasks( ( prev ) =>
+				insertTaskSorted( prev, taskData, priority )
+			);
+
+			// Track task ID
+			injectedTaskIdsRef.current.add( taskData.id );
+
+			// Trigger grid resize
+			dispatchGridResize( 100 );
+
+			// Mark as no longer loading after first task arrives
+			setIsLoading( false );
+		},
+		[ insertTaskSorted ]
+	);
+
+	/**
+	 * Set up streaming on component mount.
 	 */
 	useEffect( () => {
-		const loadTasks = async () => {
-			try {
-				// Inject React-registered tasks first.
-				try {
-					await injectTasks();
-				} catch ( error ) {
-					console.error( 'Error injecting tasks:', error );
-				}
+		// Set up render callback and container for task registry
+		setTaskRenderCallback( handleTaskRender );
+		if ( listRef.current ) {
+			setTaskContainer( listRef.current );
+		}
 
-				const perPage = config?.perPage || 5;
-
-				// First: Fetch pending celebration tasks (if not delayed).
-				if ( ! config?.delayCelebration ) {
-					const pendingResult = await fetchTasks( {
-						status: 'pending',
-						perPage: 100, // Get all pending tasks for celebration
-						excludeProvider: 'user',
-					} );
-
+		// Handle pending celebration tasks (if not delayed)
+		if ( ! config?.delayCelebration ) {
+			fetchTasks( {
+				status: 'pending',
+				perPage: 100,
+				excludeProvider: 'user',
+			} )
+				.then( ( pendingResult ) => {
 					if ( pendingResult.tasks.length > 0 ) {
-						// Add pending tasks to the list.
-						setTasks( pendingResult.tasks );
-
-						// Track pending task IDs.
+						// Add pending tasks to the list
 						pendingResult.tasks.forEach( ( task ) => {
-							injectedTaskIdsRef.current.add( task.id );
+							handleTaskRender( task, task.prpl_priority || 50 );
 						} );
 
-						// Trash the pending tasks in the background.
+						// Trash the pending tasks in the background
 						pendingResult.tasks.forEach( ( task ) => {
 							completeTask( task.id ).catch( () => {} );
 						} );
 
-						// Trigger celebration after 3 seconds.
+						// Trigger celebration after 3 seconds
 						setTimeout( () => {
-							// Add celebrating class to pending tasks.
 							const pendingIds = new Set(
 								pendingResult.tasks.map( ( t ) => t.id )
 							);
 							setCelebratingTaskIds( pendingIds );
-
-							// Trigger celebration confetti.
 							celebrate( listRef.current );
 
-							// Remove celebrated tasks after animation.
+							// Remove celebrated tasks after animation
 							setTimeout( () => {
 								setTasks( ( prev ) =>
 									prev.filter(
 										( t ) => ! pendingIds.has( t.id )
 									)
 								);
+								pendingIds.forEach( ( id ) => {
+									tasksMapRef.current.delete( id );
+								} );
 								setCelebratingTaskIds( new Set() );
-
-								// Trigger grid resize.
 								dispatchGridResize();
 							}, 2000 );
 						}, 3000 );
+					} else {
+						setIsLoading( false );
 					}
-				}
-
-				// Second: Fetch first page of published tasks.
-				const publishedResult = await fetchTasks( {
-					status: 'publish',
-					perPage,
-					page: 1,
-					excludeProvider: 'user',
+				} )
+				.catch( () => {
+					setIsLoading( false );
 				} );
-
-				// Track injected task IDs.
-				publishedResult.tasks.forEach( ( task ) => {
-					injectedTaskIdsRef.current.add( task.id );
-				} );
-
-				// Add published tasks to the list (append if we already have pending tasks).
-				setTasks( ( prev ) => [ ...prev, ...publishedResult.tasks ] );
-				setHasMorePages( publishedResult.hasMore );
+		} else {
+			// If celebration is delayed, mark as not loading
+			// Tasks will stream in via handleTaskRender
+			setTimeout( () => {
 				setIsLoading( false );
+			}, 1000 ); // Give tasks time to start streaming
+		}
 
-				// Trigger grid resize.
-				dispatchGridResize( 100 );
-			} catch {
-				setIsLoading( false );
-			}
+		// Cleanup
+		return () => {
+			setTaskRenderCallback( null );
+			setTaskContainer( null );
 		};
-
-		loadTasks();
-	}, [ config, celebrate ] );
+	}, [ config, celebrate, handleTaskRender ] );
 
 	/**
 	 * Handle task completion.
@@ -185,6 +246,7 @@ function SuggestedTasks( { config = {} } ) {
 					setTasks( ( prev ) =>
 						prev.filter( ( t ) => t.id !== postId )
 					);
+					tasksMapRef.current.delete( postId );
 					setCelebratingTaskIds( ( prev ) => {
 						const next = new Set( prev );
 						next.delete( postId );
@@ -201,13 +263,15 @@ function SuggestedTasks( { config = {} } ) {
 					} );
 
 					if ( replacementResult.tasks.length > 0 ) {
-						setTasks( ( prev ) => [
-							...prev,
-							replacementResult.tasks[ 0 ],
-						] );
-						injectedTaskIdsRef.current.add(
-							replacementResult.tasks[ 0 ].id
+						const replacementTask = replacementResult.tasks[ 0 ];
+						setTasks( ( prev ) =>
+							insertTaskSorted(
+								prev,
+								replacementTask,
+								replacementTask.prpl_priority || 50
+							)
 						);
+						injectedTaskIdsRef.current.add( replacementTask.id );
 					}
 
 					// Trigger grid resize.
@@ -222,7 +286,7 @@ function SuggestedTasks( { config = {} } ) {
 				} );
 			}
 		},
-		[ celebrate ]
+		[ celebrate, insertTaskSorted ]
 	);
 
 	/**
@@ -231,79 +295,91 @@ function SuggestedTasks( { config = {} } ) {
 	 * @param {number} postId   The post ID.
 	 * @param {string} duration The snooze duration.
 	 */
-	const handleSnooze = useCallback( async ( postId, duration ) => {
-		try {
-			await snoozeTask( postId, duration );
+	const handleSnooze = useCallback(
+		async ( postId, duration ) => {
+			try {
+				await snoozeTask( postId, duration );
 
-			// Remove task from list.
-			setTasks( ( prev ) => prev.filter( ( t ) => t.id !== postId ) );
+				// Remove task from list.
+				setTasks( ( prev ) => prev.filter( ( t ) => t.id !== postId ) );
+				tasksMapRef.current.delete( postId );
 
-			// Fetch replacement task.
-			const replacementResult = await fetchTasks( {
-				status: 'publish',
-				perPage: 1,
-				page: 1,
-				excludeProvider: 'user',
-				excludeIds: Array.from( injectedTaskIdsRef.current ),
-			} );
+				// Fetch replacement task.
+				const replacementResult = await fetchTasks( {
+					status: 'publish',
+					perPage: 1,
+					page: 1,
+					excludeProvider: 'user',
+					excludeIds: Array.from( injectedTaskIdsRef.current ),
+				} );
 
-			if ( replacementResult.tasks.length > 0 ) {
-				setTasks( ( prev ) => [
-					...prev,
-					replacementResult.tasks[ 0 ],
-				] );
-				injectedTaskIdsRef.current.add(
-					replacementResult.tasks[ 0 ].id
-				);
+				if ( replacementResult.tasks.length > 0 ) {
+					const replacementTask = replacementResult.tasks[ 0 ];
+					setTasks( ( prev ) =>
+						insertTaskSorted(
+							prev,
+							replacementTask,
+							replacementTask.prpl_priority || 50
+						)
+					);
+					injectedTaskIdsRef.current.add( replacementTask.id );
+				}
+
+				// Trigger grid resize.
+				dispatchGridResize();
+			} catch {
+				// Error handled silently.
 			}
-
-			// Trigger grid resize.
-			dispatchGridResize();
-		} catch {
-			// Error handled silently.
-		}
-	}, [] );
+		},
+		[ insertTaskSorted ]
+	);
 
 	/**
 	 * Handle task deletion.
 	 *
 	 * @param {number} postId The post ID.
 	 */
-	const handleDelete = useCallback( async ( postId ) => {
-		try {
-			await deleteTask( postId );
+	const handleDelete = useCallback(
+		async ( postId ) => {
+			try {
+				await deleteTask( postId );
 
-			// Send analytics action.
-			sendTaskAction( postId, 'delete' );
+				// Send analytics action.
+				sendTaskAction( postId, 'delete' );
 
-			// Remove task from list.
-			setTasks( ( prev ) => prev.filter( ( t ) => t.id !== postId ) );
+				// Remove task from list.
+				setTasks( ( prev ) => prev.filter( ( t ) => t.id !== postId ) );
+				tasksMapRef.current.delete( postId );
 
-			// Fetch replacement task.
-			const replacementResult = await fetchTasks( {
-				status: 'publish',
-				perPage: 1,
-				page: 1,
-				excludeProvider: 'user',
-				excludeIds: Array.from( injectedTaskIdsRef.current ),
-			} );
+				// Fetch replacement task.
+				const replacementResult = await fetchTasks( {
+					status: 'publish',
+					perPage: 1,
+					page: 1,
+					excludeProvider: 'user',
+					excludeIds: Array.from( injectedTaskIdsRef.current ),
+				} );
 
-			if ( replacementResult.tasks.length > 0 ) {
-				setTasks( ( prev ) => [
-					...prev,
-					replacementResult.tasks[ 0 ],
-				] );
-				injectedTaskIdsRef.current.add(
-					replacementResult.tasks[ 0 ].id
-				);
+				if ( replacementResult.tasks.length > 0 ) {
+					const replacementTask = replacementResult.tasks[ 0 ];
+					setTasks( ( prev ) =>
+						insertTaskSorted(
+							prev,
+							replacementTask,
+							replacementTask.prpl_priority || 50
+						)
+					);
+					injectedTaskIdsRef.current.add( replacementTask.id );
+				}
+
+				// Trigger grid resize.
+				dispatchGridResize( 500 );
+			} catch {
+				// Error handled silently.
 			}
-
-			// Trigger grid resize.
-			dispatchGridResize( 500 );
-		} catch {
-			// Error handled silently.
-		}
-	}, [] );
+		},
+		[ insertTaskSorted ]
+	);
 
 	/**
 	 * Handle task title change (for user tasks).
