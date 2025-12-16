@@ -141,8 +141,11 @@ export default function Welcome( { config } ) {
 
 		try {
 			// Get nonce first using fetch (onboardNonceURL is external)
+			const nonceFormData = new FormData();
+			nonceFormData.append( 'site', siteUrl );
 			const nonceResponse = await fetch( onboardNonceURL, {
-				method: 'GET',
+				method: 'POST',
+				body: nonceFormData,
 			} ).then( ( res ) => res.json() );
 
 			if ( nonceResponse.status === 'ok' ) {
