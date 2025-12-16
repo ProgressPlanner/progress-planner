@@ -63,7 +63,7 @@ class Tasks_Manager {
 		$this->task_providers = [
 			new Content_Create(),
 			new Content_Review(),
-			new Core_Update(),
+			// Core_Update() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Blog_Description() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Debug_Display(),
 			new Disable_Comments(),
