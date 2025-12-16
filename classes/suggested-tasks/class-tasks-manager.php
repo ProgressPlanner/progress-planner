@@ -72,7 +72,7 @@ class Tasks_Manager {
 			// Hello_World() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Remove_Inactive_Plugins() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Site_Icon() - Migrated to React, registered in assets/src/tasks/index.js.
-			new Rename_Uncategorized_Category(),
+			// Rename_Uncategorized_Category() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Permalink_Structure() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Php_Version(),
 			// Search_Engine_Visibility() - Migrated to React, registered in assets/src/tasks/index.js.
