@@ -43,8 +43,7 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 	 * @return array{output: string, code: int}
 	 */
 	private function run_wp_cli( $command ) {
-		// Calculate WordPress root from plugin directory (wp-content/plugins/progress-planner).
-		$wp_path = \dirname( PROGRESS_PLANNER_DIR, 3 );
+		$wp_path = $this->get_wp_path();
 
 		$full_command = \sprintf( 'cd %s && wp %s 2>&1', \escapeshellarg( $wp_path ), $command );
 
@@ -54,6 +53,31 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 			'output' => \implode( "\n", $output ),
 			'code'   => $return_code,
 		];
+	}
+
+	/**
+	 * Get the WordPress installation path.
+	 *
+	 * Handles both local environments (plugin in wp-content/plugins/) and CI
+	 * environments (plugin symlinked into WP installation).
+	 *
+	 * @return string Path to WordPress installation.
+	 */
+	private function get_wp_path() {
+		// First, try the standard plugin location (3 directories up from plugin root).
+		$standard_path = \dirname( PROGRESS_PLANNER_DIR, 3 );
+		if ( \file_exists( $standard_path . '/wp-config.php' ) || \file_exists( $standard_path . '/wp-load.php' ) ) {
+			return $standard_path;
+		}
+
+		// In CI, WordPress is installed to /tmp/wordpress and the plugin is symlinked there.
+		$ci_wp_path = '/tmp/wordpress';
+		if ( \file_exists( $ci_wp_path . '/wp-load.php' ) ) {
+			return $ci_wp_path;
+		}
+
+		// Fallback to standard path.
+		return $standard_path;
 	}
 
 	/**
