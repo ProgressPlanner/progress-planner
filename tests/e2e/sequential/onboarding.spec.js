@@ -16,10 +16,10 @@ function onboardingTests( testContext = test ) {
 				const popover = page.locator( '#prpl-popover-onboarding' );
 				await expect( popover ).toBeVisible( { timeout: 10000 } );
 
-				// Check the privacy policy checkbox
-				const privacyCheckbox = page.locator( '#prpl-privacy-checkbox' );
-				await expect( privacyCheckbox ).toBeVisible();
-				await privacyCheckbox.check();
+				// Click on the privacy policy checkbox label (clicking label triggers the checkbox)
+				const privacyLabel = page.locator( 'label[for="prpl-privacy-checkbox"]' );
+				await expect( privacyLabel ).toBeVisible();
+				await privacyLabel.click();
 
 				// Click "Start onboarding" button to accept privacy and proceed
 				const startButton = popover.locator( '.prpl-tour-next' );
