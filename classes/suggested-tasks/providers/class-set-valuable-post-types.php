@@ -188,48 +188,6 @@ class Set_Valuable_Post_Types extends Tasks_Interactive {
 	}
 
 	/**
-	 * Print the popover instructions.
-	 *
-	 * @return void
-	 */
-	public function print_popover_instructions() {
-		echo '<p>';
-		\esc_html_e( 'You\'re in control of what counts as valuable content. We\'ll track and reward activity only for the post types you select here.', 'progress-planner' );
-		echo '</p>';
-	}
-
-	/**
-	 * Print the popover form contents.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$prpl_saved_settings = \progress_planner()->get_settings()->get_post_types_names();
-		$prpl_post_types     = \progress_planner()->get_settings()->get_public_post_types();
-
-		// Early exit if there are no public post types.
-		if ( empty( $prpl_post_types ) ) {
-			return;
-		}
-		?>
-		<div class="prpl-post-types-selection">
-			<?php foreach ( $prpl_post_types as $prpl_post_type ) : ?>
-			<label>
-				<input
-					type="checkbox"
-					name="prpl-post-types-include[]"
-					value="<?php echo \esc_attr( $prpl_post_type ); ?>"
-					<?php \checked( \in_array( $prpl_post_type, $prpl_saved_settings, true ) ); ?>
-				/>
-				<?php echo \esc_html( \get_post_type_object( $prpl_post_type )->labels->name ); // @phpstan-ignore-line property.nonObject ?>
-			</label>
-			<?php endforeach; ?>
-		</div>
-		<?php
-		$this->print_submit_button( \__( 'Set', 'progress-planner' ) );
-	}
-
-	/**
 	 * Add task actions specific to this task.
 	 *
 	 * @param array $data    The task data.

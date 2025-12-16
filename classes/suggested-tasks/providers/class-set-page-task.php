@@ -27,61 +27,13 @@ abstract class Set_Page_Task extends Tasks_Interactive {
 	protected $priority = 10;
 
 	/**
-	 * Whether the generic script has been enqueued.
-	 *
-	 * @var bool
-	 */
-	private static $script_enqueued = false;
-
-	/**
-	 * Whether the AJAX action has been registered.
-	 *
-	 * @var bool
-	 */
-	private static $ajax_action_registered = false;
-
-	/**
 	 * Initialize the task.
 	 *
 	 * @return void
 	 */
 	public function init() {
-		// Register AJAX action only once for all page tasks.
-		if ( ! self::$ajax_action_registered ) {
-			\add_action( 'wp_ajax_prpl_interactive_task_submit_set-page', [ __CLASS__, 'handle_interactive_task_specific_submit' ] );
-			self::$ajax_action_registered = true;
-		}
-	}
-
-	/**
-	 * Enqueue the scripts.
-	 *
-	 * Override parent method to ensure the generic set-page.js is only enqueued once.
-	 *
-	 * @param string $hook The current admin page.
-	 *
-	 * @return void
-	 */
-	public function enqueue_scripts( $hook ) {
-
-		// Don't enqueue the script if the user is not at least an editor, since we dont want to enqueue scripts on WP Dashboard page.
-		if ( ! \current_user_can( 'edit_others_posts' ) ) {
-			return;
-		}
-
-		// Enqueue the script only on Progress Planner and WP dashboard pages.
-		if ( 'toplevel_page_progress-planner' !== $hook && 'index.php' !== $hook ) {
-			return;
-		}
-
-		// Enqueue the generic set-page script only once for all page tasks.
-		if ( ! self::$script_enqueued ) {
-			\progress_planner()->get_admin__enqueue()->enqueue_script(
-				'progress-planner/recommendations/set-page',
-				$this->get_enqueue_data()
-			);
-			self::$script_enqueued = true;
-		}
+		// Register AJAX action for all page tasks.
+		\add_action( 'wp_ajax_prpl_interactive_task_submit_set-page', [ __CLASS__, 'handle_interactive_task_specific_submit' ] );
 	}
 
 	/**
@@ -98,25 +50,6 @@ abstract class Set_Page_Task extends Tasks_Interactive {
 		}
 
 		return 'no' === $pages[ static::PAGE_NAME ]['isset'];
-	}
-
-	/**
-	 * Print the popover input field for the form.
-	 *
-	 * @return void
-	 */
-	public function print_popover_form_contents() {
-		$pages = \progress_planner()->get_admin__page_settings()->get_settings();
-		$page  = $pages[ static::PAGE_NAME ];
-
-		\progress_planner()->the_view(
-			'setting/page-select.php',
-			[
-				'prpl_setting' => $page,
-				'context'      => 'popover',
-			]
-		);
-		$this->print_submit_button( \__( 'Set page', 'progress-planner' ) );
 	}
 
 	/**
