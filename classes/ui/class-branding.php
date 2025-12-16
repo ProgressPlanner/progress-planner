@@ -181,9 +181,9 @@ final class Branding {
 	 *
 	 * @return int|null
 	 */
-	public function get_admin_submenu_position(): int|null {
+	public function get_admin_submenu_position(): mixed {
 		if ( $this->get_branding_id() !== 0 && $this->get_branding_id() !== 4958 ) {
-			return -1000; // phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison
+			return -1000;
 		}
 
 		return null;
