@@ -23,11 +23,18 @@ const taskProviders = new Map();
  * @return {void}
  */
 export function registerTaskProvider( providerConfig ) {
-	const { providerId } = providerConfig;
+	// Support both plain objects with providerId and class instances with getProviderId()
+	const providerId =
+		providerConfig.providerId ||
+		( providerConfig.getProviderId &&
+		typeof providerConfig.getProviderId === 'function'
+			? providerConfig.getProviderId()
+			: null );
 
 	if ( ! providerId ) {
 		console.error(
-			'Task provider registration failed: providerId is required'
+			'Task provider registration failed: providerId is required',
+			providerConfig
 		);
 		return;
 	}
