@@ -205,6 +205,8 @@ export default function Welcome( { config } ) {
 
 	return (
 		<div className="prpl-welcome" style={ wrapperStyle }>
+			{ /* Inline CSS for SVG sizing - can't be done with React inline styles */ }
+			<style>{ `.prpl-welcome-icon svg { height: 100px; }` }</style>
 			<div
 				className="welcome-header"
 				style={ {
