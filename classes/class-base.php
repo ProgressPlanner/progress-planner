@@ -97,6 +97,14 @@ class Base {
 			$this->get_utils__playground();
 		}
 
+		$prpl_license_key = $this->get_license_key();
+		if ( ! $prpl_license_key && 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id() ) {
+			$prpl_license_key = \progress_planner()->get_utils__onboard()->make_remote_onboarding_request();
+			if ( '' !== $prpl_license_key ) {
+				\update_option( 'progress_planner_license_key', $prpl_license_key, false );
+			}
+		}
+
 		// Basic classes.
 		if ( \is_admin() && \current_user_can( 'edit_others_posts' ) ) {
 			$this->get_admin__page();
@@ -301,7 +309,16 @@ class Base {
 	 * @return bool
 	 */
 	public function is_privacy_policy_accepted() {
-		return false !== \get_option( 'progress_planner_license_key', false );
+		return false !== $this->get_license_key();
+	}
+
+	/**
+	 * Get the license key.
+	 *
+	 * @return string|false
+	 */
+	public function get_license_key() {
+		return \get_option( 'progress_planner_license_key', false );
 	}
 
 	/**

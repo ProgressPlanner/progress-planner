@@ -28,7 +28,7 @@ class Playground {
 	 * @return void
 	 */
 	public function register_hooks() {
-		if ( ! \get_option( 'progress_planner_license_key', false ) && ! \get_option( 'progress_planner_demo_data_generated', false ) ) {
+		if ( ! \progress_planner()->get_license_key() && ! \get_option( 'progress_planner_demo_data_generated', false ) ) {
 			$this->generate_data();
 			\update_option( 'progress_planner_license_key', \str_replace( ' ', '-', $this->create_random_string( 20 ) ) );
 			\update_option( 'progress_planner_force_show_onboarding', false );

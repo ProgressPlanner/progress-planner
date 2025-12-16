@@ -87,24 +87,24 @@ class Timezone_Options extends Base {
 		$processor = new \WP_HTML_Tag_Processor( $html );
 		while ( $processor->next_tag( 'option' ) ) {
 			$value = $processor->get_attribute( 'value' );
-			
+
 			// Extract text content by moving through tokens after the opening tag.
 			// Collect all text nodes until we hit the closing </option> tag.
 			$label = '';
 			while ( $processor->next_token() ) {
 				$token_name = $processor->get_token_name();
-				
+
 				// If we hit the closing option tag, we're done collecting text.
 				if ( 'OPTION' === $token_name && $processor->is_tag_closer() ) {
 					break;
 				}
-				
+
 				// Collect text from text nodes (decoded automatically by get_modifiable_text).
 				if ( '#text' === $token_name ) {
 					$label .= $processor->get_modifiable_text();
 				}
 			}
-			
+
 			$label = \trim( $label );
 
 			// Skip empty options (like the "Select a city" placeholder).

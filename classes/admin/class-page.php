@@ -242,7 +242,7 @@ class Page {
 			[
 				'privacyPolicyAccepted' => \progress_planner()->is_privacy_policy_accepted(),
 				// Header configuration.
-				'licenseKey'            => \get_option( 'progress_planner_license_key', 'no-license' ),
+				'licenseKey'            => \progress_planner()->get_license_key() ? \progress_planner()->get_license_key() : 'no-license',
 				'branding'              => [
 					'logoHtml'         => $logo_html,
 					'tourIconHtml'     => $tour_icon_svg ? $tour_icon_svg : '',
