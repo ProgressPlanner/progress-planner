@@ -80,19 +80,30 @@ class PrplWelcomeStep extends OnboardingStep {
 
 	/**
 	 * User can only proceed if privacy policy is accepted
+	 * Sites with existing license bypass this check (no privacy checkbox shown).
 	 * @param {Object} state - Wizard state
-	 * @return {boolean} True if privacy is accepted
+	 * @return {boolean} True if privacy is accepted or license exists
 	 */
 	canProceed( state ) {
+		// Sites with license already skip the privacy checkbox.
+		if ( ProgressPlannerOnboardData.hasLicense ) {
+			return true;
+		}
 		return !! state.data.privacyAccepted;
 	}
 
 	/**
 	 * Called before advancing to next step
 	 * Generates license and shows spinner
+	 * Branded sites with existing license skip this step.
 	 * @return {Promise} Resolves when license is generated
 	 */
 	async beforeNextStep() {
+		// Skip license generation if site already has a license (branded sites).
+		if ( ProgressPlannerOnboardData.hasLicense ) {
+			return;
+		}
+
 		if ( this.isGeneratingLicense ) {
 			return;
 		}

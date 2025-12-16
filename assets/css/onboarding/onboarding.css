@@ -1264,10 +1264,40 @@ body.prpl-onboarding-active {
 		border-color: var(--prpl-color-field-border-active);
 	}
 
+	/* When an image has been uploaded. */
+	.prpl-file-drop-zone.has-image {
+		border-color: var(--prpl-color-field-border-active);
+		background-color: var(--prpl-background-field-active);
+
+		& > .prpl-icon-image,
+		& > p,
+		& > .prpl-file-upload-hints {
+			display: none;
+		}
+
+		.prpl-file-preview img {
+			border: 2px solid var(--prpl-color-field-border);
+			border-radius: 8px;
+			padding: 8px;
+			background: var(--prpl-color-background-white);
+		}
+	}
+
 	.prpl-file-browse-link {
 		color: var(--prpl-color-link);
 		text-decoration: underline;
 		cursor: pointer;
+	}
+
+	.prpl-file-remove-btn {
+		border: none;
+		background: none;
+		cursor: pointer;
+		padding: 0;
+		margin: 12px 0 0;
+		font-size: 16px;
+		color: var(--prpl-color-link);
+		text-decoration: underline;
 	}
 
 	.prpl-file-upload-hints {

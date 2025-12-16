@@ -29,7 +29,7 @@ class Onboard {
 		// Detect domain changes.
 		\add_action( 'shutdown', [ $this, 'detect_site_url_changes' ] );
 
-		if ( \get_option( 'progress_planner_license_key' ) ) {
+		if ( \progress_planner()->get_license_key() ) {
 			return;
 		}
 
@@ -194,7 +194,7 @@ class Onboard {
 			return;
 		}
 
-		$saved_license_key = \get_option( 'progress_planner_license_key', false );
+		$saved_license_key = \progress_planner()->get_license_key();
 
 		// Bail early if the license key is not set, or if the site URL has not changed.
 		if ( ! $saved_license_key || $saved_site_url === $current_site_url ) {

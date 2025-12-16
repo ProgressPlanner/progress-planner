@@ -42,17 +42,37 @@ class Onboard_Wizard {
 	 */
 	public function maybe_register_popover_hooks() {
 
-		// Add admin toolbar items.
-		if ( \progress_planner()->is_debug_mode_enabled() ) {
-			\add_action( 'admin_bar_menu', [ $this, 'add_admin_toolbar_items' ] );
-			\add_action( 'init', [ $this, 'check_delete_onboarding_progress' ] );
+		// Only show onboarding to users who can manage options.
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			return;
 		}
 
-		// Skip for existing installs that never started the new onboarding.
-		// If privacy policy is already accepted but no onboarding progress exists,
-		// this is an existing install - don't show the new onboarding.
-		if ( \progress_planner()->is_privacy_policy_accepted()
-			&& ! \get_option( 'prpl_onboard_progress', false ) ) {
+		// Register AJAX actions early - these must be available even after privacy is accepted
+		// during the first step, so subsequent steps can still make AJAX calls.
+		\add_action( 'wp_ajax_progress_planner_onboarding_complete_task', [ $this, 'ajax_complete_task' ] );
+		\add_action( 'wp_ajax_progress_planner_onboarding_save_progress', [ $this, 'ajax_save_onboarding_progress' ] );
+		\add_action( 'wp_ajax_prpl_save_all_onboarding_settings', [ $this, 'ajax_save_all_onboarding_settings' ] );
+
+		// Show onboarding when:
+		// 1. Privacy not yet accepted (new install, non-branded).
+		// 2. Onboarding already in progress.
+		// 3. Branded site (privacy auto-accepted, but still needs onboarding).
+		$is_branded      = 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id();
+		$skip_onboarding = \progress_planner()->is_privacy_policy_accepted()
+			&& ! \get_option( 'prpl_onboard_progress', false )
+			&& ! $is_branded;
+
+		/**
+		 * Filter whether to skip the onboarding wizard.
+		 *
+		 * Hosting integrations can use this filter to force showing
+		 * or hiding the onboarding wizard.
+		 *
+		 * @param bool $skip_onboarding Whether to skip showing the onboarding wizard.
+		 */
+		$skip_onboarding = \apply_filters( 'progress_planner_skip_onboarding', $skip_onboarding );
+
+		if ( $skip_onboarding ) {
 			return;
 		}
 
@@ -75,15 +95,6 @@ class Onboard_Wizard {
 
 		// Define steps and their order.
 		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
-
-		// Define steps and their order (always needed for the onboarding page).
-		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
-
-		// AJAX actions need to be registered early.
-		// Note: AJAX action needs to be registered early (ie wrapping init in is_admin() check will be to late).
-		\add_action( 'wp_ajax_progress_planner_onboarding_complete_task', [ $this, 'ajax_complete_task' ] );
-		\add_action( 'wp_ajax_progress_planner_onboarding_save_progress', [ $this, 'ajax_save_onboarding_progress' ] );
-		\add_action( 'wp_ajax_prpl_save_all_onboarding_settings', [ $this, 'ajax_save_all_onboarding_settings' ] );
 
 		// Allow only images for the front-end upload.
 		\add_filter( 'rest_pre_insert_attachment', [ $this, 'rest_pre_insert_attachment' ], 10, 2 );
@@ -302,6 +313,7 @@ class Onboard_Wizard {
 					'isOnboardingPage'     => $is_onboarding_page,
 					'onboardingCompleted'  => (bool) $onboarding_completed,
 					'fullscreenMode'       => true, // Enable fullscreen takeover mode.
+					'hasLicense'           => false !== \progress_planner()->get_license_key(),
 					'l10n'                 => [
 						'next'                  => \esc_html__( 'Next', 'progress-planner' ),
 						'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),
@@ -338,29 +350,6 @@ class Onboard_Wizard {
 		}
 
 		return $decoded;
-	}
-
-	/**
-	 * Clean up the onboarding progress.
-	 *
-	 * @return void
-	 */
-	public function delete_onboarding_progress() {
-		\delete_option( 'prpl_onboard_progress' );
-	}
-
-	/**
-	 * Check if the onboarding is finished.
-	 *
-	 * @return bool
-	 */
-	public function is_onboarding_finished() {
-		$onboarding_progress = $this->get_saved_progress();
-		if ( ! $onboarding_progress ) {
-			return false;
-		}
-
-		return isset( $onboarding_progress['data'] ) && isset( $onboarding_progress['data']['finished'] ) && $onboarding_progress['data']['finished'];
 	}
 
 	/**
@@ -408,67 +397,18 @@ class Onboard_Wizard {
 	}
 
 	/**
-	 * Add admin toolbar item callback.
-	 *
-	 * @param \WP_Admin_Bar $admin_bar The admin bar.
-	 * @return void
-	 */
-	public function add_admin_toolbar_items_callback( $admin_bar ) {
-		$admin_bar->add_node(
-			[
-				'id'    => 'progress-planner-onboarding',
-				'title' => 'Progress Planner Onboarding',
-				'href'  => self::get_onboarding_page_url(),
-			]
-		);
-
-		if ( ! isset( $_SERVER['REQUEST_URI'] ) ) {
-			return;
-		}
-
-		$current_url = \wp_nonce_url( \esc_url_raw( \wp_unslash( $_SERVER['REQUEST_URI'] ) ), 'prpl_onboarding_wizard' );
-
-		// Add Delete License submenu item.
-		$admin_bar->add_node(
-			[
-				'id'     => 'progress-planner-onboarding-delete-progress',
-				'parent' => 'progress-planner-onboarding',
-				'title'  => 'Delete Onboarding Progress',
-				'href'   => \add_query_arg( 'prpl_delete_onboarding_progress', '1', $current_url ),
-			]
-		);
-	}
-
-	/**
-	 * Check and process the delete single task action.
-	 *
-	 * Deletes a single task if the appropriate query parameter is set
-	 * and user has required capabilities.
+	 * Verify AJAX security (capability and nonce).
 	 *
 	 * @return void
 	 */
-	public function check_delete_onboarding_progress() {
-		if (
-			! isset( $_GET['prpl_delete_onboarding_progress'] ) || // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-			! \current_user_can( 'manage_options' )
-		) {
-			return;
+	protected function verify_ajax_security() {
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to perform this action.', 'progress-planner' ) ] );
 		}
 
-		// Verify nonce for security.
-		if ( ! isset( $_GET['_wpnonce'] ) || ! \wp_verify_nonce( \wp_unslash( $_GET['_wpnonce'] ), 'prpl_onboarding_wizard' ) ) { //  phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-			\wp_die( \esc_html__( 'Security check failed', 'progress-planner' ) );
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
 		}
-
-		// Delete the onboarding progress.
-		$this->delete_onboarding_progress();
-
-		// Delete the option.
-		\delete_option( 'progress_planner_license_key' );
-
-		// Redirect to the same page without the parameter.
-		\wp_safe_redirect( \remove_query_arg( [ 'prpl_delete_onboarding_progress', '_wpnonce' ] ) );
-		exit;
 	}
 
 	/**
@@ -477,14 +417,12 @@ class Onboard_Wizard {
 	 * @return void
 	 */
 	public function ajax_save_onboarding_progress() {
-		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
-		}
+		$this->verify_ajax_security();
 
-		if ( ! isset( $_POST['state'] ) ) {
+		if ( ! isset( $_POST['state'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_ajax_security().
 			\wp_send_json_error( [ 'message' => \esc_html__( 'State is required.', 'progress-planner' ) ] );
 		}
-		$progress = \sanitize_text_field( \wp_unslash( $_POST['state'] ) );
+		$progress = \sanitize_text_field( \wp_unslash( $_POST['state'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_ajax_security().
 
 		\error_log( print_r( $progress, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r, WordPress.PHP.DevelopmentFunctions.error_log_error_log
 
@@ -500,25 +438,18 @@ class Onboard_Wizard {
 	 * @return void
 	 */
 	public function ajax_complete_task() {
+		$this->verify_ajax_security();
 
-		if ( ! \current_user_can( 'manage_options' ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to complete this task.', 'progress-planner' ) ] );
-		}
-
-		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
-		}
-
-		if ( ! isset( $_POST['task_id'] ) ) {
+		if ( ! isset( $_POST['task_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_ajax_security().
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task ID is required.', 'progress-planner' ) ] );
 		}
 
-		$task_id = \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) );
+		$task_id = \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_ajax_security().
 
 		// Aditional data for the task, besides the task ID.
 		$form_values = [];
-		if ( isset( $_POST['form_values'] ) ) {
-			$form_values = \sanitize_text_field( \wp_unslash( $_POST['form_values'] ) );
+		if ( isset( $_POST['form_values'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_ajax_security().
+			$form_values = \sanitize_text_field( \wp_unslash( $_POST['form_values'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_ajax_security().
 			$form_values = \json_decode( $form_values, true );
 		}
 
@@ -560,15 +491,7 @@ class Onboard_Wizard {
 	 * @return void
 	 */
 	public function ajax_save_all_onboarding_settings() {
-		// Check if the user has the necessary capabilities.
-		if ( ! \current_user_can( 'manage_options' ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
-		}
-
-		// Check the nonce.
-		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
-		}
+		$this->verify_ajax_security();
 
 		$page_settings = \progress_planner()->get_admin__page_settings();
 

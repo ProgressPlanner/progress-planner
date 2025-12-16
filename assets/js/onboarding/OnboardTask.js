@@ -322,6 +322,13 @@ class PrplOnboardTask {
 				);
 			}
 		} );
+
+		// Remove button handler.
+		const removeBtn = uploadContainer.querySelector( '.prpl-file-remove-btn' );
+		const previewDiv = uploadContainer.querySelector( '.prpl-file-preview' );
+		removeBtn?.addEventListener( 'click', () => {
+			this.removeUploadedFile( uploadContainer, previewDiv );
+		} );
 	}
 
 	async uploadFile( file, statusDiv ) {
@@ -365,6 +372,22 @@ class PrplOnboardTask {
 				if ( previewDiv ) {
 					previewDiv.innerHTML = `<img src="${ response.source_url }" alt="${ file.name }" />`;
 					previewDiv.style.display = 'block';
+
+					// Add has-image class to drop zone to update styling.
+					const dropZone = this.taskContent.querySelector(
+						'.prpl-file-drop-zone'
+					);
+					if ( dropZone ) {
+						dropZone.classList.add( 'has-image' );
+
+						// Show the remove button.
+						const removeBtn = dropZone.querySelector(
+							'.prpl-file-remove-btn'
+						);
+						if ( removeBtn ) {
+							removeBtn.hidden = false;
+						}
+					}
 				}
 				return response;
 			} )
@@ -401,5 +424,47 @@ class PrplOnboardTask {
 			}
 			return false;
 		} );
+	}
+
+	/**
+	 * Remove uploaded file and reset the drop zone state.
+	 * @param {HTMLElement} dropZone   The drop zone element.
+	 * @param {HTMLElement} previewDiv The preview container element.
+	 */
+	removeUploadedFile( dropZone, previewDiv ) {
+		// Clear the preview.
+		previewDiv.innerHTML = '';
+		previewDiv.style.display = 'none';
+
+		// Remove has-image class.
+		dropZone.classList.remove( 'has-image' );
+
+		// Hide the remove button.
+		const removeBtn = dropZone.querySelector( '.prpl-file-remove-btn' );
+		if ( removeBtn ) {
+			removeBtn.hidden = true;
+		}
+
+		// Clear the file input.
+		const fileInput = dropZone.querySelector( 'input[type="file"]' );
+		if ( fileInput ) {
+			fileInput.value = '';
+		}
+
+		// Clear the hidden post_id input and trigger validation.
+		const postIdInput = dropZone.querySelector( 'input[name="post_id"]' );
+		if ( postIdInput ) {
+			postIdInput.value = '';
+			postIdInput.dispatchEvent(
+				new CustomEvent( 'change', { bubbles: true } )
+			);
+		}
+
+		// Show status div again.
+		const statusDiv = dropZone.querySelector( '.prpl-upload-status' );
+		if ( statusDiv ) {
+			statusDiv.style.display = '';
+			statusDiv.textContent = '';
+		}
 	}
 }
