@@ -42,19 +42,19 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 				'provider_id' => 'update-core',
 			],
 			[
-				'post_title'  => 'settings-saved-' . \gmdate( 'YW' ),
-				'task_id'     => 'settings-saved-' . \gmdate( 'YW' ),
+				'post_title'  => 'core-siteicon-' . \gmdate( 'YW' ),
+				'task_id'     => 'core-siteicon-' . \gmdate( 'YW' ),
 				'date'        => \gmdate( 'YW' ),
-				'provider_id' => 'settings-saved',
+				'provider_id' => 'core-siteicon',
 				'category'    => 'configuration',
 			],
 
 			// Not repetitive task, but with past date.
 			[
-				'post_title'  => 'settings-saved-202451',
-				'task_id'     => 'settings-saved-202451',
+				'post_title'  => 'core-siteicon-202451',
+				'task_id'     => 'core-siteicon-202451',
 				'date'        => '202451',
-				'provider_id' => 'settings-saved',
+				'provider_id' => 'core-siteicon',
 				'category'    => 'configuration',
 			],
 

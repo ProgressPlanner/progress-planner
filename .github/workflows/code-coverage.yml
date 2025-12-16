@@ -2,9 +2,6 @@ name: Code Coverage
 
 on:
   pull_request:
-    branches:
-      - develop
-      - main
   push:
     branches:
       - develop
@@ -46,8 +43,10 @@ jobs:
           coverage: xdebug  # Use Xdebug for coverage (PCOV was causing PHP to crash)
           tools: composer
 
-      - name: Install SVN
-        run: sudo apt-get install subversion
+      - name: Install SVN and XML tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y subversion libxml2-utils
 
       - name: Install Composer dependencies
         uses: ramsey/composer-install@v2
@@ -74,12 +73,22 @@ jobs:
           # Run PHPUnit with coverage - allow test failures but ensure coverage is generated
           # test-class-security.php is excluded via phpunit.xml.dist to avoid output contamination
           set +e
+          # Run PHPUnit and capture both test output and coverage text separately
           php -d memory_limit=512M -d max_execution_time=300 \
             vendor/bin/phpunit --configuration phpunit.xml.dist \
             --coverage-clover=coverage.xml \
-            --coverage-text 2>&1 | tee phpunit-output.log
+            --coverage-text --colors=never > phpunit-with-coverage.log 2>&1
           PHPUNIT_EXIT=$?
           set -e
+
+          # Extract test output (everything before coverage section) for debugging
+          # Coverage section typically starts with a line like "Code Coverage Report:" or summary table
+          # Extract everything up to (but not including) the coverage section
+          awk '/Code Coverage Report:|^Summary|^  Classes:|^  Methods:|^  Lines:/{exit} {print}' phpunit-with-coverage.log > phpunit-output.log || cat phpunit-with-coverage.log > phpunit-output.log
+
+          # Extract coverage text output (the coverage section)
+          # Coverage section starts with summary or "Code Coverage Report"
+          awk '/Code Coverage Report:|^Summary|^  Classes:|^  Methods:|^  Lines:/{flag=1} flag' phpunit-with-coverage.log > current-coverage-full.txt || tail -200 phpunit-with-coverage.log > current-coverage-full.txt
 
           echo "End time: $(date)"
           echo "Memory after: $(free -h | grep Mem)"
@@ -117,14 +126,36 @@ jobs:
       - name: Generate coverage report summary
         id: coverage
         run: |
-          # Generate coverage text report and save it
-          vendor/bin/phpunit --coverage-text --colors=never > current-coverage-full.txt 2>&1 || true
+          # Extract overall coverage from coverage.xml (Clover format)
+          # This avoids running PHPUnit twice - we already have coverage.xml from the first run
+          if [ -f coverage.xml ]; then
+            # Extract metrics from Clover XML using xmllint
+            # Fallback to Python if xmllint fails
+            STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@statements)' coverage.xml 2>/dev/null || python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); metrics = tree.find('.//project/metrics'); print(metrics.get('statements', '0') if metrics is not None else '0')" 2>/dev/null || echo "0")
+            COVERED_STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@coveredstatements)' coverage.xml 2>/dev/null || python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('coverage.xml'); metrics = tree.find('.//project/metrics'); print(metrics.get('coveredstatements', '0') if metrics is not None else '0')" 2>/dev/null || echo "0")
 
-          # Extract overall coverage from the text report (the summary line, not per-class lines)
-          # Look for the line that starts with "  Lines:" (two spaces at the start)
-          COVERAGE=$(grep "^  Lines:" current-coverage-full.txt | tail -1 | awk '{print $2}' | sed 's/%//' || echo "0")
-          echo "current_coverage=$COVERAGE" >> $GITHUB_OUTPUT
-          echo "Current code coverage: $COVERAGE%"
+            # Calculate coverage percentage
+            if [ "$STATEMENTS" != "0" ] && [ -n "$STATEMENTS" ] && [ -n "$COVERED_STATEMENTS" ]; then
+              COVERAGE=$(echo "scale=2; ($COVERED_STATEMENTS * 100) / $STATEMENTS" | bc)
+            else
+              COVERAGE="0"
+            fi
+
+            echo "current_coverage=$COVERAGE" >> $GITHUB_OUTPUT
+            echo "Current code coverage: $COVERAGE% (from coverage.xml)"
+            echo "Statements: $COVERED_STATEMENTS / $STATEMENTS"
+          else
+            echo "ERROR: coverage.xml not found!"
+            echo "current_coverage=0" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
+          # Coverage text output was already extracted from phpunit-with-coverage.log in the previous step
+          # If extraction failed, try to generate it again as fallback
+          if [ ! -s current-coverage-full.txt ]; then
+            echo "Warning: Could not extract coverage text from phpunit-with-coverage.log, generating separately..."
+            vendor/bin/phpunit --configuration phpunit.xml.dist --coverage-text --colors=never > current-coverage-full.txt 2>&1 || true
+          fi
 
           # Save detailed per-file coverage for later comparison
           # PHPUnit outputs class name on one line, stats on the next line
@@ -162,12 +193,34 @@ jobs:
         if: github.event_name == 'pull_request'
         id: base_coverage
         run: |
-          # Generate coverage for base branch
-          vendor/bin/phpunit --coverage-text --colors=never > base-coverage-full.txt 2>&1 || true
-          # Extract overall coverage (summary line starting with "  Lines:")
-          BASE_COVERAGE=$(grep "^  Lines:" base-coverage-full.txt | tail -1 | awk '{print $2}' | sed 's/%//' || echo "0")
-          echo "base_coverage=$BASE_COVERAGE" >> $GITHUB_OUTPUT
-          echo "Base branch code coverage: $BASE_COVERAGE%"
+          # Generate coverage for base branch (including coverage.xml)
+          vendor/bin/phpunit --configuration phpunit.xml.dist \
+            --coverage-clover=base-coverage.xml \
+            --coverage-text --colors=never > base-coverage-full.txt 2>&1 || true
+
+          # Extract overall coverage from base-coverage.xml (Clover format)
+          if [ -f base-coverage.xml ]; then
+            # Extract metrics from Clover XML using xmllint
+            # Fallback to Python if xmllint fails
+            STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@statements)' base-coverage.xml 2>/dev/null || python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('base-coverage.xml'); metrics = tree.find('.//project/metrics'); print(metrics.get('statements', '0') if metrics is not None else '0')" 2>/dev/null || echo "0")
+            COVERED_STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@coveredstatements)' base-coverage.xml 2>/dev/null || python3 -c "import xml.etree.ElementTree as ET; tree = ET.parse('base-coverage.xml'); metrics = tree.find('.//project/metrics'); print(metrics.get('coveredstatements', '0') if metrics is not None else '0')" 2>/dev/null || echo "0")
+
+            # Calculate coverage percentage
+            if [ "$STATEMENTS" != "0" ] && [ -n "$STATEMENTS" ] && [ -n "$COVERED_STATEMENTS" ]; then
+              BASE_COVERAGE=$(echo "scale=2; ($COVERED_STATEMENTS * 100) / $STATEMENTS" | bc)
+            else
+              BASE_COVERAGE="0"
+            fi
+
+            echo "base_coverage=$BASE_COVERAGE" >> $GITHUB_OUTPUT
+            echo "Base branch code coverage: $BASE_COVERAGE% (from base-coverage.xml)"
+            echo "Statements: $COVERED_STATEMENTS / $STATEMENTS"
+          else
+            # Fallback to text extraction if XML not available
+            BASE_COVERAGE=$(grep "^  Lines:" base-coverage-full.txt | tail -1 | awk '{print $2}' | sed 's/%//' || echo "0")
+            echo "base_coverage=$BASE_COVERAGE" >> $GITHUB_OUTPUT
+            echo "Base branch code coverage: $BASE_COVERAGE% (from text fallback)"
+          fi
 
           # Extract per-file coverage for comparison
           # PHPUnit outputs class name on one line, stats on the next line

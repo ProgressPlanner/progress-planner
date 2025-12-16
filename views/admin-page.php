@@ -11,14 +11,6 @@ if ( ! \defined( 'ABSPATH' ) ) {
 }
 
 $prpl_privacy_policy_accepted = \progress_planner()->is_privacy_policy_accepted();
-
-if ( 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id() ) {
-	$prpl_license_key = \progress_planner()->get_utils__onboard()->make_remote_onboarding_request();
-	if ( '' !== $prpl_license_key ) {
-		\update_option( 'progress_planner_license_key', $prpl_license_key );
-		$prpl_privacy_policy_accepted = true;
-	}
-}
 ?>
 
 <div class="wrap prpl-wrap <?php echo \esc_attr( $prpl_privacy_policy_accepted ? '' : 'prpl-pp-not-accepted' ); ?>">
@@ -42,7 +34,14 @@ if ( 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id() ) {
 			\do_action( 'progress_planner_admin_page_after_widgets' );
 		?>
 	<?php else : ?>
-		<?php \progress_planner()->the_view( 'welcome.php' ); ?>
+		<div class="prpl-start-onboarding-container">
+			<div class="prpl-start-onboarding-graphic">
+				<?php \progress_planner()->the_file( 'assets/images/onboarding/thumbs_up_ravi_rtl.svg' ); ?>
+			</div>
+			<button class="prpl-button-primary" id="prpl-start-onboarding-button" onclick="window.prplOnboardWizard.startOnboarding();return false;">
+				<?php \esc_html_e( 'Are you ready to work on your site?', 'progress-planner' ); ?>
+			</button>
+		</div>
 	<?php endif; ?>
 </div>
 <div class="prpl-overlay" id="prpl-overlay" style="display: none;"></div>

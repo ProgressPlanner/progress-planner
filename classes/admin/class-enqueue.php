@@ -425,8 +425,8 @@ class Enqueue {
 			return;
 		}
 
-		// Inject the script only on the Progress Planner Dashboard, Progress Planner Settings and the WordPress dashboard pages.
-		if ( 'toplevel_page_progress-planner' !== $screen->id && 'progress-planner_page_progress-planner-settings' !== $screen->id && 'dashboard' !== $screen->id ) {
+		// Inject the script only on the Progress Planner Dashboard and the WordPress dashboard pages.
+		if ( 'toplevel_page_progress-planner' !== $screen->id && 'dashboard' !== $screen->id ) {
 			return;
 		}
 		?>
