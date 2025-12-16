@@ -20,6 +20,110 @@ import { dispatchGridResize } from '../../utils/gridResize';
 import WidgetHeader from '../../components/WidgetHeader';
 
 /**
+ * Style constants - extracted to prevent recreation on each render.
+ */
+const STYLES = {
+	list: {
+		listStyle: 'none',
+		padding: 0,
+		margin: 0,
+	},
+	form: {
+		display: 'flex',
+		gap: '0.5rem',
+		marginTop: 'var(--prpl-padding)',
+	},
+	input: {
+		flex: 1,
+		minWidth: 0,
+	},
+	addButton: {
+		padding: '0.5rem',
+		background: 'var(--prpl-color-button-secondary-background)',
+		border: '1px solid var(--prpl-color-button-secondary-border)',
+		borderRadius: 'var(--prpl-border-radius)',
+		cursor: 'pointer',
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'center',
+	},
+	details: {
+		marginTop: 'var(--prpl-padding)',
+		borderTop: '1px solid var(--prpl-color-border)',
+		paddingTop: 'var(--prpl-padding)',
+	},
+	summary: {
+		cursor: 'pointer',
+		fontWeight: 500,
+		display: 'flex',
+		alignItems: 'center',
+		justifyContent: 'space-between',
+		padding: '0.5rem 0',
+	},
+	summaryIcon: {
+		marginLeft: '0.5rem',
+		transition: 'transform 0.2s',
+		width: '1rem',
+		height: '1rem',
+	},
+	deleteAllWrapper: {
+		marginTop: '0.5rem',
+		marginBottom: '0.5rem',
+		borderBottom: '1px solid var(--prpl-color-border)',
+		paddingBottom: '0.5rem',
+	},
+	deleteAllButton: {
+		display: 'flex',
+		alignItems: 'center',
+		gap: '0.5rem',
+		padding: '0.5rem',
+		background: 'none',
+		border: 'none',
+		cursor: 'pointer',
+		color: 'var(--prpl-color-text)',
+		fontSize: 'var(--prpl-font-size-small)',
+	},
+	deleteAllIcon: {
+		display: 'inline-block',
+		width: '18px',
+		height: '18px',
+	},
+	tooltipActions: {
+		display: 'inline-flex',
+		verticalAlign: 'text-top',
+	},
+	srOnly: {
+		position: 'absolute',
+		left: '-9999px',
+	},
+	popover: {
+		position: 'fixed',
+		top: '50%',
+		left: '50%',
+		transform: 'translate(-50%, -50%)',
+		zIndex: 10000,
+		background: 'white',
+		padding: '20px',
+		borderRadius: '8px',
+		boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+	},
+	popoverButtons: {
+		display: 'flex',
+		gap: '2rem',
+		marginTop: '15px',
+	},
+	overlay: {
+		position: 'fixed',
+		top: 0,
+		left: 0,
+		right: 0,
+		bottom: 0,
+		background: 'rgba(0,0,0,0.3)',
+		zIndex: 9999,
+	},
+};
+
+/**
  * Todo Widget main component.
  *
  * @param {Object} props        - Component props.
@@ -362,76 +466,6 @@ function TodoWidget( { config = {} } ) {
 		);
 	}
 
-	// Inline styles
-	const listStyle = {
-		listStyle: 'none',
-		padding: 0,
-		margin: 0,
-	};
-
-	const formStyle = {
-		display: 'flex',
-		gap: '0.5rem',
-		marginTop: 'var(--prpl-padding)',
-	};
-
-	const inputStyle = {
-		flex: 1,
-		minWidth: 0,
-	};
-
-	const addButtonStyle = {
-		padding: '0.5rem',
-		background: 'var(--prpl-color-button-secondary-background)',
-		border: '1px solid var(--prpl-color-button-secondary-border)',
-		borderRadius: 'var(--prpl-border-radius)',
-		cursor: 'pointer',
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'center',
-	};
-
-	const detailsStyle = {
-		marginTop: 'var(--prpl-padding)',
-		borderTop: '1px solid var(--prpl-color-border)',
-		paddingTop: 'var(--prpl-padding)',
-	};
-
-	const summaryStyle = {
-		cursor: 'pointer',
-		fontWeight: 500,
-		display: 'flex',
-		alignItems: 'center',
-		justifyContent: 'space-between',
-		padding: '0.5rem 0',
-	};
-
-	const summaryIconStyle = {
-		marginLeft: '0.5rem',
-		transition: 'transform 0.2s',
-		width: '1rem',
-		height: '1rem',
-	};
-
-	const deleteAllWrapperStyle = {
-		marginTop: '0.5rem',
-		marginBottom: '0.5rem',
-		borderBottom: '1px solid var(--prpl-color-border)',
-		paddingBottom: '0.5rem',
-	};
-
-	const deleteAllButtonStyle = {
-		display: 'flex',
-		alignItems: 'center',
-		gap: '0.5rem',
-		padding: '0.5rem',
-		background: 'none',
-		border: 'none',
-		cursor: 'pointer',
-		color: 'var(--prpl-color-text)',
-		fontSize: 'var(--prpl-font-size-small)',
-	};
-
 	// Get title, descriptions, and tooltip from config or use defaults.
 	const widgetTitle =
 		config?.title || __( 'My to-do list', 'progress-planner' );
@@ -467,10 +501,7 @@ function TodoWidget( { config = {} } ) {
 				</span>
 				<span
 					className="tooltip-actions"
-					style={ {
-						display: 'inline-flex',
-						verticalAlign: 'text-top',
-					} }
+					style={ STYLES.tooltipActions }
 				>
 					<prpl-tooltip>
 						<slot name="open-icon">
@@ -495,13 +526,13 @@ function TodoWidget( { config = {} } ) {
 			<div
 				id="todo-aria-live-region"
 				aria-live="polite"
-				style={ { position: 'absolute', left: '-9999px' } }
+				style={ STYLES.srOnly }
 			></div>
 
 			<ul
 				id="todo-list"
 				className="prpl-todo-list prpl-suggested-tasks-list"
-				style={ listStyle }
+				style={ STYLES.list }
 			>
 				{ pendingTasks.map( ( task, index ) => (
 					<TaskItem
@@ -534,14 +565,14 @@ function TodoWidget( { config = {} } ) {
 
 			<form
 				id="create-todo-item"
-				style={ formStyle }
+				style={ STYLES.form }
 				onSubmit={ handleCreateTask }
 			>
 				<input
 					ref={ inputRef }
 					type="text"
 					id="new-todo-content"
-					style={ inputStyle }
+					style={ STYLES.input }
 					placeholder={ __( 'Add a new task', 'progress-planner' ) }
 					aria-label={ __( 'Add a new task', 'progress-planner' ) }
 					required
@@ -550,7 +581,7 @@ function TodoWidget( { config = {} } ) {
 				/>
 				<button
 					type="submit"
-					style={ addButtonStyle }
+					style={ STYLES.addButton }
 					aria-label={ __( 'Add task', 'progress-planner' ) }
 				>
 					<span
@@ -566,13 +597,13 @@ function TodoWidget( { config = {} } ) {
 			{ completedTasks.length > 0 && (
 				<details
 					id="todo-list-completed-details"
-					style={ detailsStyle }
+					style={ STYLES.details }
 				>
-					<summary style={ summaryStyle }>
+					<summary style={ STYLES.summary }>
 						{ __( 'Completed tasks', 'progress-planner' ) }
 						<span
 							className="prpl-todo-list-completed-summary-icon"
-							style={ summaryIconStyle }
+							style={ STYLES.summaryIcon }
 						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
@@ -591,20 +622,14 @@ function TodoWidget( { config = {} } ) {
 					</summary>
 					<div
 						id="todo-list-completed-delete-all-wrapper"
-						style={ deleteAllWrapperStyle }
+						style={ STYLES.deleteAllWrapper }
 					>
 						<button
 							id="todo-list-completed-delete-all"
-							style={ deleteAllButtonStyle }
+							style={ STYLES.deleteAllButton }
 							onClick={ () => setShowDeletePopover( true ) }
 						>
-							<span
-								style={ {
-									display: 'inline-block',
-									width: '18px',
-									height: '18px',
-								} }
-							>
+							<span style={ STYLES.deleteAllIcon }>
 								<svg
 									role="img"
 									aria-hidden="true"
@@ -626,7 +651,7 @@ function TodoWidget( { config = {} } ) {
 					<ul
 						id="todo-list-completed"
 						className="prpl-todo-list prpl-suggested-tasks-list"
-						style={ listStyle }
+						style={ STYLES.list }
 					>
 						{ completedTasks.map( ( task, index ) => (
 							<TaskItem
@@ -652,17 +677,7 @@ function TodoWidget( { config = {} } ) {
 				<div
 					id="todo-list-completed-delete-all-popover"
 					className="prpl-popover"
-					style={ {
-						position: 'fixed',
-						top: '50%',
-						left: '50%',
-						transform: 'translate(-50%, -50%)',
-						zIndex: 10000,
-						background: 'white',
-						padding: '20px',
-						borderRadius: '8px',
-						boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-					} }
+					style={ STYLES.popover }
 				>
 					<div className="prpl-note">
 						<span className="prpl-note-icon">
@@ -688,11 +703,7 @@ function TodoWidget( { config = {} } ) {
 
 					<div
 						className="prpl-buttons-wrapper"
-						style={ {
-							display: 'flex',
-							gap: '2rem',
-							marginTop: '15px',
-						} }
+						style={ STYLES.popoverButtons }
 					>
 						<button
 							id="todo-list-completed-delete-all-cancel"
@@ -721,15 +732,7 @@ function TodoWidget( { config = {} } ) {
 					role="button"
 					tabIndex={ 0 }
 					aria-label={ __( 'Close dialog', 'progress-planner' ) }
-					style={ {
-						position: 'fixed',
-						top: 0,
-						left: 0,
-						right: 0,
-						bottom: 0,
-						background: 'rgba(0,0,0,0.3)',
-						zIndex: 9999,
-					} }
+					style={ STYLES.overlay }
 					onClick={ () => setShowDeletePopover( false ) }
 					onKeyDown={ ( e ) => {
 						if ( e.key === 'Enter' || e.key === ' ' ) {
