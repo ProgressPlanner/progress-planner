@@ -61,7 +61,7 @@ class Tasks_Manager {
 	public function __construct() {
 		// Instantiate task providers.
 		$this->task_providers = [
-			new Content_Create(),
+			// Content_Create() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Content_Review(),
 			// Core_Update() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Blog_Description() - Migrated to React, registered in assets/src/tasks/index.js.

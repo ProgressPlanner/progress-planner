@@ -21,6 +21,7 @@ import setPageFAQTask from './SetPageFAQTask';
 import setPageContactTask from './SetPageContactTask';
 import unpublishedContentTask from './UnpublishedContentTask';
 import coreUpdateTask from './CoreUpdateTask';
+import contentCreateTask from './ContentCreateTask';
 
 // Register all task providers.
 registerTaskProvider( helloWorldTask );
@@ -38,3 +39,4 @@ registerTaskProvider( setPageFAQTask );
 registerTaskProvider( setPageContactTask );
 registerTaskProvider( unpublishedContentTask );
 registerTaskProvider( coreUpdateTask );
+registerTaskProvider( contentCreateTask );
