@@ -12,6 +12,7 @@ import apiFetch from '@wordpress/api-fetch';
 import Gauge from '../../components/Gauge';
 import BarChart from '../../components/BarChart';
 import BigCounter from '../../components/BigCounter';
+import WidgetHeader from '../../components/WidgetHeader';
 
 /**
  * Get the streak message based on the current and max streak values.
@@ -212,33 +213,14 @@ function ActivityScores( { config = {} } ) {
 
 	return (
 		<>
-			<h2 className="prpl-widget-title">
-				{ widgetTitle }
-				<div className="tooltip-actions">
-					<prpl-tooltip>
-						<slot name="open-icon">
-							<span className="icon prpl-info-icon">
-								{ infoIconSvg && (
-									<span
-										dangerouslySetInnerHTML={ {
-											__html: infoIconSvg,
-										} }
-									/>
-								) }
-								<span className="screen-reader-text">
-									{ __( 'More info', 'progress-planner' ) }
-								</span>
-							</span>
-						</slot>
-						<slot name="content">
-							{ __(
-								'Your website activity score is based on the amount of website maintenance work you have done over the past 30 days.',
-								'progress-planner'
-							) }
-						</slot>
-					</prpl-tooltip>
-				</div>
-			</h2>
+			<WidgetHeader
+				title={ widgetTitle }
+				infoIconSvg={ infoIconSvg }
+				tooltipContent={ __(
+					'Your website activity score is based on the amount of website maintenance work you have done over the past 30 days.',
+					'progress-planner'
+				) }
+			/>
 
 			<div style={ { '--background': 'var(--prpl-background-monthly)' } }>
 				<Gauge

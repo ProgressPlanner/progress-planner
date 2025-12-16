@@ -19,6 +19,7 @@ import {
 } from '../../hooks/useTasksApi';
 import { useGridMasonry } from '../../hooks/useGridMasonry';
 import { useCelebration } from '../../hooks/useCelebration';
+import { dispatchGridResize } from '../../utils/gridResize';
 
 /**
  * Suggested Tasks widget component.
@@ -94,9 +95,7 @@ function SuggestedTasks( { config = {} } ) {
 								setCelebratingTaskIds( new Set() );
 
 								// Trigger grid resize.
-								window.dispatchEvent(
-									new CustomEvent( 'prpl/grid/resize' )
-								);
+								dispatchGridResize();
 							}, 2000 );
 						}, 3000 );
 					}
@@ -121,11 +120,7 @@ function SuggestedTasks( { config = {} } ) {
 				setIsLoading( false );
 
 				// Trigger grid resize.
-				setTimeout( () => {
-					window.dispatchEvent(
-						new CustomEvent( 'prpl/grid/resize' )
-					);
-				}, 100 );
+				dispatchGridResize( 100 );
 			} catch {
 				setIsLoading( false );
 			}
@@ -204,9 +199,7 @@ function SuggestedTasks( { config = {} } ) {
 					}
 
 					// Trigger grid resize.
-					window.dispatchEvent(
-						new CustomEvent( 'prpl/grid/resize' )
-					);
+					dispatchGridResize();
 				}, 2000 );
 			} catch {
 				// Remove from celebrating on error.
@@ -253,7 +246,7 @@ function SuggestedTasks( { config = {} } ) {
 			}
 
 			// Trigger grid resize.
-			window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+			dispatchGridResize();
 		} catch {
 			// Error handled silently.
 		}
@@ -294,9 +287,7 @@ function SuggestedTasks( { config = {} } ) {
 			}
 
 			// Trigger grid resize.
-			setTimeout( () => {
-				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-			}, 500 );
+			dispatchGridResize( 500 );
 		} catch {
 			// Error handled silently.
 		}
@@ -381,9 +372,7 @@ function SuggestedTasks( { config = {} } ) {
 			setCurrentPage( nextPage );
 
 			// Trigger grid resize.
-			setTimeout( () => {
-				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-			}, 100 );
+			dispatchGridResize( 100 );
 		} catch ( error ) {
 			console.error( 'Error loading more tasks:', error );
 		} finally {

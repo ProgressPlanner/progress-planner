@@ -8,6 +8,7 @@ import { Fragment } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { doAction } from '@wordpress/hooks';
 import SimpleBadgeWidget from '../shared/SimpleBadgeWidget';
+import WidgetHeader from '../../components/WidgetHeader';
 
 /**
  * Get the remaining text for content badges.
@@ -43,33 +44,14 @@ function ContentBadges( { config = {} } ) {
 
 	return (
 		<Fragment>
-			<h2 className="prpl-widget-title">
-				{ widgetTitle }
-				<div className="tooltip-actions">
-					<prpl-tooltip>
-						<slot name="open-icon">
-							<span className="icon prpl-info-icon">
-								{ infoIconSvg && (
-									<span
-										dangerouslySetInnerHTML={ {
-											__html: infoIconSvg,
-										} }
-									/>
-								) }
-								<span className="screen-reader-text">
-									{ __( 'More info', 'progress-planner' ) }
-								</span>
-							</span>
-						</slot>
-						<slot name="content">
-							{ __(
-								'Your content badges are based on the amount of content you have created over the past 30 days.',
-								'progress-planner'
-							) }
-						</slot>
-					</prpl-tooltip>
-				</div>
-			</h2>
+			<WidgetHeader
+				title={ widgetTitle }
+				infoIconSvg={ infoIconSvg }
+				tooltipContent={ __(
+					'Your content badges are based on the amount of content you have created over the past 30 days.',
+					'progress-planner'
+				) }
+			/>
 			<SimpleBadgeWidget
 				badgeType="content"
 				introText={ __(

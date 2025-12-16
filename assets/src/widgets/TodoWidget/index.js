@@ -16,6 +16,7 @@ import {
 } from '../../hooks/useTasksApi';
 import { useGridMasonry } from '../../hooks/useGridMasonry';
 import { useCelebration } from '../../hooks/useCelebration';
+import { dispatchGridResize } from '../../utils/gridResize';
 
 /**
  * Todo Widget main component.
@@ -98,7 +99,7 @@ function TodoWidget( { config = {} } ) {
 			} finally {
 				setIsLoading( false );
 				// Trigger grid resize
-				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+				dispatchGridResize();
 			}
 		};
 
@@ -148,7 +149,7 @@ function TodoWidget( { config = {} } ) {
 				inputRef.current?.focus();
 
 				// Trigger grid resize
-				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+				dispatchGridResize();
 			} catch ( error ) {
 				// eslint-disable-next-line no-console
 				console.error( 'Error creating task:', error );
@@ -217,7 +218,7 @@ function TodoWidget( { config = {} } ) {
 				}
 
 				// Trigger grid resize
-				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+				dispatchGridResize();
 			} catch ( error ) {
 				// eslint-disable-next-line no-console
 				console.error( 'Error toggling task:', error );
@@ -240,7 +241,7 @@ function TodoWidget( { config = {} } ) {
 			);
 
 			// Trigger grid resize
-			window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+			dispatchGridResize();
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Error deleting task:', error );
@@ -292,7 +293,7 @@ function TodoWidget( { config = {} } ) {
 			}
 
 			// Trigger grid resize
-			window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+			dispatchGridResize();
 		},
 		[ pendingTasks, sortTasksWithGoldenFirst ]
 	);
@@ -345,7 +346,7 @@ function TodoWidget( { config = {} } ) {
 			}
 
 			// Trigger grid resize
-			window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+			dispatchGridResize();
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Error deleting completed tasks:', error );

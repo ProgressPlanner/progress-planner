@@ -6,6 +6,7 @@
 
 import { useCallback } from '@wordpress/element';
 import confetti from 'canvas-confetti';
+import { dispatchGridResize } from '../utils/gridResize';
 
 /**
  * Custom hook for task celebration functionality.
@@ -132,7 +133,7 @@ export function useCelebration() {
 	 * by the grid masonry layout to recalculate item positions.
 	 */
 	const triggerGridResize = useCallback( () => {
-		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+		dispatchGridResize();
 	}, [] );
 
 	return {
