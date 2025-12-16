@@ -70,10 +70,10 @@ class Tasks_Manager {
 			new Disable_Comment_Pagination(),
 			// Sample_Page() - Migrated to React, registered in assets/src/tasks/index.js.
 			// Hello_World() - Migrated to React, registered in assets/src/tasks/index.js.
-			new Remove_Inactive_Plugins(),
-			new Site_Icon(),
+			// Remove_Inactive_Plugins() - Migrated to React, registered in assets/src/tasks/index.js.
+			// Site_Icon() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Rename_Uncategorized_Category(),
-			new Permalink_Structure(),
+			// Permalink_Structure() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Php_Version(),
 			new Search_Engine_Visibility(),
 			new Reduce_Autoloaded_Options(),
@@ -88,7 +88,7 @@ class Tasks_Manager {
 			new Collaborator(),
 			new Select_Timezone(),
 			new Set_Date_Format(),
-			new SEO_Plugin(),
+			// SEO_Plugin() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Improve_Pdf_Handling(),
 			new Set_Page_About(),
 			new Set_Page_FAQ(),

@@ -9,8 +9,18 @@ import { registerTaskProvider } from '../services/taskRegistry';
 import helloWorldTask from './HelloWorldTask';
 import samplePageTask from './SamplePageTask';
 import blogDescriptionTask from './BlogDescriptionTask';
+import searchEngineVisibilityTask from './SearchEngineVisibilityTask';
+import siteIconTask from './SiteIconTask';
+import seoPluginTask from './SEOPluginTask';
+import removeInactivePluginsTask from './RemoveInactivePluginsTask';
+import permalinkStructureTask from './PermalinkStructureTask';
 
 // Register all task providers.
 registerTaskProvider( helloWorldTask );
 registerTaskProvider( samplePageTask );
 registerTaskProvider( blogDescriptionTask );
+registerTaskProvider( searchEngineVisibilityTask );
+registerTaskProvider( siteIconTask );
+registerTaskProvider( seoPluginTask );
+registerTaskProvider( removeInactivePluginsTask );
+registerTaskProvider( permalinkStructureTask );
