@@ -16,6 +16,7 @@ import removeInactivePluginsTask from './RemoveInactivePluginsTask';
 import permalinkStructureTask from './PermalinkStructureTask';
 import renameUncategorizedCategoryTask from './RenameUncategorizedCategoryTask';
 import disableCommentPaginationTask from './DisableCommentPaginationTask';
+import setPageAboutTask from './SetPageAboutTask';
 
 // Register all task providers.
 registerTaskProvider( helloWorldTask );
@@ -28,3 +29,4 @@ registerTaskProvider( removeInactivePluginsTask );
 registerTaskProvider( permalinkStructureTask );
 registerTaskProvider( renameUncategorizedCategoryTask );
 registerTaskProvider( disableCommentPaginationTask );
+registerTaskProvider( setPageAboutTask );

@@ -90,7 +90,7 @@ class Tasks_Manager {
 			new Set_Date_Format(),
 			// SEO_Plugin() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Improve_Pdf_Handling(),
-			new Set_Page_About(),
+			// Set_Page_About() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Set_Page_FAQ(),
 			new Set_Page_Contact(),
 		];
