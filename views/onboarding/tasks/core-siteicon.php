@@ -43,6 +43,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<input type="hidden" name="post_id" value="" data-validate="required">
 			<div class="prpl-upload-status"></div> <!-- WIP -->
 			<div class="prpl-file-preview"></div>
+			<button type="button" class="prpl-file-remove-btn" hidden><?php \esc_html_e( 'Remove icon', 'progress-planner' ); ?></button>
 		</div>
 		<button type="button" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-secondary">
 			<?php \esc_html_e( 'Set site icon', 'progress-planner' ); ?>
