@@ -4,10 +4,11 @@
  * Displays blog posts from the Progress Planner blog RSS feed.
  */
 
-import { useState, useEffect, Fragment } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
+import { Fragment } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { doAction } from '@wordpress/hooks';
+import { useApiData } from '../../hooks/useApiData';
+import { LoadingState } from '../../components/WidgetStates';
 
 /**
  * What's New widget component.
@@ -17,21 +18,9 @@ import { doAction } from '@wordpress/hooks';
  * @return {JSX.Element|null} The widget component or null if no posts.
  */
 function WhatsNew( { config = {} } ) {
-	const [ isLoading, setIsLoading ] = useState( true );
-	const [ posts, setPosts ] = useState( [] );
-	const [ blogUrl, setBlogUrl ] = useState( '' );
-
-	useEffect( () => {
-		apiFetch( { path: '/progress-planner/v1/widgets/whats-new' } )
-			.then( ( response ) => {
-				setPosts( response.posts || [] );
-				setBlogUrl( response.blogUrl || '' );
-				setIsLoading( false );
-			} )
-			.catch( () => {
-				setIsLoading( false );
-			} );
-	}, [] );
+	const { isLoading, data } = useApiData(
+		'/progress-planner/v1/widgets/whats-new'
+	);
 
 	// Get title - will come from widget registry metadata
 	const widgetTitle =
@@ -44,12 +33,14 @@ function WhatsNew( { config = {} } ) {
 			<Fragment>
 				<h2 className="prpl-widget-title">{ widgetTitle }</h2>
 				<hr />
-				<p className="prpl-whats-new__loading">
-					{ __( 'Loading…', 'progress-planner' ) }
-				</p>
+				<LoadingState simple className="prpl-whats-new__loading" />
 			</Fragment>
 		);
 	}
+
+	// Extract data
+	const posts = data?.posts || [];
+	const blogUrl = data?.blogUrl || '';
 
 	// Return null if no posts (widget should not render content).
 	if ( posts.length === 0 ) {

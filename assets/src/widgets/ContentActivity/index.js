@@ -4,14 +4,13 @@
  * Main widget component for displaying content activity statistics.
  */
 
-import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { doAction } from '@wordpress/hooks';
-import apiFetch from '@wordpress/api-fetch';
 import BigCounter from '../../components/BigCounter';
 import LineChart from '../../components/LineChart';
 import ActivityTable from './ActivityTable';
 import { LoadingState, ErrorState } from '../../components/WidgetStates';
+import { useApiData } from '../../hooks/useApiData';
 
 /**
  * ContentActivity widget component.
@@ -21,37 +20,19 @@ import { LoadingState, ErrorState } from '../../components/WidgetStates';
  * @return {JSX.Element} The ContentActivity widget.
  */
 function ContentActivity( { config = {} } ) {
-	const [ data, setData ] = useState( null );
-	const [ loading, setLoading ] = useState( true );
-	const [ error, setError ] = useState( null );
+	const range = '-6 months';
+	const frequency = 'monthly';
+	const apiPath = `/progress-planner/v1/widgets/content-activity?range=${ encodeURIComponent(
+		range
+	) }&frequency=${ encodeURIComponent( frequency ) }`;
 
-	useEffect( () => {
-		const range = '-6 months';
-		const frequency = 'monthly';
-		apiFetch( {
-			path: `/progress-planner/v1/widgets/content-activity?range=${ encodeURIComponent(
-				range
-			) }&frequency=${ encodeURIComponent( frequency ) }`,
-		} )
-			.then( ( response ) => {
-				setData( response );
-				setError( null );
-			} )
-			.catch( ( err ) => {
-				setError(
-					err.message ||
-						__(
-							'Failed to load content activity data.',
-							'progress-planner'
-						)
-				);
-			} )
-			.finally( () => {
-				setLoading( false );
-			} );
-	}, [] );
+	const { isLoading, error, data } = useApiData(
+		apiPath,
+		[],
+		__( 'Failed to load content activity data.', 'progress-planner' )
+	);
 
-	if ( loading ) {
+	if ( isLoading ) {
 		return <LoadingState className="prpl-content-activity__loading" />;
 	}
 

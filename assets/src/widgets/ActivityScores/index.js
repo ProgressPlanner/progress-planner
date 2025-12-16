@@ -5,10 +5,8 @@
  * and personal record.
  */
 
-import { useState, useEffect } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
 import { doAction } from '@wordpress/hooks';
-import apiFetch from '@wordpress/api-fetch';
 import Gauge from '../../components/Gauge';
 import BarChart from '../../components/BarChart';
 import BigCounter from '../../components/BigCounter';
@@ -18,6 +16,7 @@ import {
 	ErrorState,
 	EmptyState,
 } from '../../components/WidgetStates';
+import { useApiData } from '../../hooks/useApiData';
 
 /**
  * Get the streak message based on the current and max streak values.
@@ -154,34 +153,17 @@ function getChartColor( value, label, frequency ) {
  * @return {JSX.Element} The ActivityScores component.
  */
 function ActivityScores( { config = {} } ) {
-	const [ isLoading, setIsLoading ] = useState( true );
-	const [ error, setError ] = useState( null );
-	const [ data, setData ] = useState( null );
-	const [ range ] = useState( '-6 months' );
-	const [ frequency ] = useState( 'monthly' );
+	const range = '-6 months';
+	const frequency = 'monthly';
+	const apiPath = `/progress-planner/v1/widgets/activity-scores?range=${ encodeURIComponent(
+		range
+	) }&frequency=${ encodeURIComponent( frequency ) }`;
 
-	/**
-	 * Fetch activity scores data from REST API.
-	 */
-	useEffect( () => {
-		const fetchData = async () => {
-			try {
-				const response = await apiFetch( {
-					path: `/progress-planner/v1/widgets/activity-scores?range=${ encodeURIComponent(
-						range
-					) }&frequency=${ encodeURIComponent( frequency ) }`,
-				} );
-
-				setData( response );
-				setIsLoading( false );
-			} catch ( err ) {
-				setError( err.message || 'Failed to load activity data' );
-				setIsLoading( false );
-			}
-		};
-
-		fetchData();
-	}, [ range, frequency ] );
+	const { isLoading, error, data } = useApiData(
+		apiPath,
+		[],
+		'Failed to load activity data'
+	);
 
 	if ( isLoading ) {
 		return <LoadingState simple />;
