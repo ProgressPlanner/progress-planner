@@ -304,6 +304,11 @@ class Onboard_Wizard {
 		\add_filter(
 			'progress_planner_dashboard_config',
 			function ( $config ) use ( $steps_formatted, $saved_progress, $pages_formatted, $post_types_formatted ) {
+				// Capture logo HTML.
+				\ob_start();
+				\progress_planner()->get_ui__branding()->the_logo();
+				$logo_html = \ob_get_clean();
+
 				$config['onboardingWizard'] = [
 					'enabled'             => true,
 					'steps'               => $steps_formatted,
@@ -318,6 +323,7 @@ class Onboard_Wizard {
 					'hasLicense'          => false !== \progress_planner()->get_license_key(),
 					'pages'               => $pages_formatted,
 					'postTypes'           => $post_types_formatted,
+					'logoHtml'            => $logo_html,
 					'l10n'                => [
 						'next'                  => \esc_html__( 'Next', 'progress-planner' ),
 						'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),

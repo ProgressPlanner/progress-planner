@@ -13,12 +13,14 @@
  * @param {Array}    props.steps       - Array of step definitions.
  * @param {number}   props.currentStep - Current step index.
  * @param {Function} props.onStepClick - Callback when step is clicked.
+ * @param {string}   props.logoHtml    - Logo HTML from PHP.
  * @return {JSX.Element} Navigation component.
  */
 export default function OnboardingNavigation( {
 	steps,
 	currentStep,
 	onStepClick,
+	logoHtml,
 } ) {
 	return (
 		<div className="prpl-onboarding-navigation">
@@ -57,9 +59,10 @@ export default function OnboardingNavigation( {
 					} ) }
 				</ol>
 			</div>
-			<div className="prpl-onboarding-logo">
-				{ /* Logo will be rendered by PHP */ }
-			</div>
+			<div
+				className="prpl-onboarding-logo"
+				dangerouslySetInnerHTML={ { __html: logoHtml || '' } }
+			/>
 		</div>
 	);
 }

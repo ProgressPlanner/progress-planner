@@ -31,8 +31,8 @@ class Data_Collectors extends Base {
 					'permission_callback' => [ $this, 'permission_callback' ],
 					'args'                => [
 						'collector_id' => [
-							'required' => true,
-							'type'     => 'string',
+							'required'          => true,
+							'type'              => 'string',
 							'sanitize_callback' => 'sanitize_key',
 						],
 					],
@@ -113,19 +113,19 @@ class Data_Collectors extends Base {
 	 */
 	protected function get_collector_map() {
 		$map = [
-			'hello_world_post_id'        => \Progress_Planner\Suggested_Tasks\Data_Collector\Hello_World::class,
-			'sample_page_id'             => \Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page::class,
-			'inactive_plugins_count'     => \Progress_Planner\Suggested_Tasks\Data_Collector\Inactive_Plugins::class,
-			'uncategorized_category_id'  => \Progress_Planner\Suggested_Tasks\Data_Collector\Uncategorized_Category::class,
-			'post_author_count'          => \Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author::class,
-			'last_published_post_id'     => \Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post::class,
-			'archive_format_count'       => \Progress_Planner\Suggested_Tasks\Data_Collector\Archive_Format::class,
-			'terms_without_posts'        => \Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Posts::class,
-			'terms_without_description'  => \Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Description::class,
-			'post_tag_count'             => \Progress_Planner\Suggested_Tasks\Data_Collector\Post_Tag_Count::class,
-			'published_post_count'       => \Progress_Planner\Suggested_Tasks\Data_Collector\Published_Post_Count::class,
-			'unpublished_content'        => \Progress_Planner\Suggested_Tasks\Data_Collector\Unpublished_Content::class,
-			'seo_plugin_installed'       => \Progress_Planner\Suggested_Tasks\Data_Collector\SEO_Plugin::class,
+			'hello_world_post_id'       => \Progress_Planner\Suggested_Tasks\Data_Collector\Hello_World::class,
+			'sample_page_id'            => \Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page::class,
+			'inactive_plugins_count'    => \Progress_Planner\Suggested_Tasks\Data_Collector\Inactive_Plugins::class,
+			'uncategorized_category_id' => \Progress_Planner\Suggested_Tasks\Data_Collector\Uncategorized_Category::class,
+			'post_author_count'         => \Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author::class,
+			'last_published_post_id'    => \Progress_Planner\Suggested_Tasks\Data_Collector\Last_Published_Post::class,
+			'archive_format_count'      => \Progress_Planner\Suggested_Tasks\Data_Collector\Archive_Format::class,
+			'terms_without_posts'       => \Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Posts::class,
+			'terms_without_description' => \Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Description::class,
+			'post_tag_count'            => \Progress_Planner\Suggested_Tasks\Data_Collector\Post_Tag_Count::class,
+			'published_post_count'      => \Progress_Planner\Suggested_Tasks\Data_Collector\Published_Post_Count::class,
+			'unpublished_content'       => \Progress_Planner\Suggested_Tasks\Data_Collector\Unpublished_Content::class,
+			'seo_plugin_installed'      => \Progress_Planner\Suggested_Tasks\Data_Collector\SEO_Plugin::class,
 		];
 
 		/**

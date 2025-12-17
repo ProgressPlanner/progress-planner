@@ -108,14 +108,14 @@ class Updates extends Base {
 			$response['themes'] = \array_map(
 				function ( $stylesheet, $data ) {
 					return [
-						'stylesheet' => $stylesheet,
+						'stylesheet'  => $stylesheet,
 						// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-						'name'       => $data->Name ?? '',
+						'name'        => $data->Name ?? '',
 						// phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-						'version'    => $data->Version ?? '',
+						'version'     => $data->Version ?? '',
 						'new_version' => $data->update['new_version'] ?? '',
-						'url'        => $data->update['url'] ?? '',
-						'package'    => $data->update['package'] ?? '',
+						'url'         => $data->update['url'] ?? '',
+						'package'     => $data->update['package'] ?? '',
 					];
 				},
 				\array_keys( $theme_updates ),

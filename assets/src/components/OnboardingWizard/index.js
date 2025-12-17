@@ -162,6 +162,7 @@ export default function OnboardingWizard( { config } ) {
 						steps={ steps }
 						currentStep={ currentStep }
 						onStepClick={ goToStep }
+						logoHtml={ onboardingWizard.logoHtml }
 					/>
 					<div className="prpl-onboarding-content">
 						<div className="tour-content-wrapper">
