@@ -172,6 +172,22 @@ export default function MoreTasksStep( props ) {
 	};
 
 	/**
+	 * Handle next button click.
+	 */
+	const handleNext = () => {
+		// If on intro sub-step, continue to tasks.
+		if ( currentSubStep === 0 ) {
+			handleContinue();
+			return;
+		}
+
+		// If on tasks sub-step, finish onboarding.
+		if ( currentSubStep === SUB_STEPS.length - 1 ) {
+			handleFinish();
+		}
+	};
+
+	/**
 	 * Check if can proceed.
 	 *
 	 * @return {boolean} True if on tasks sub-step.
@@ -181,7 +197,7 @@ export default function MoreTasksStep( props ) {
 	};
 
 	return (
-		<OnboardingStep { ...props } canProceed={ canProceed }>
+		<OnboardingStep { ...props } canProceed={ canProceed } onNext={ handleNext }>
 			<div className="tour-content">
 				{ renderSubStep() }
 			</div>

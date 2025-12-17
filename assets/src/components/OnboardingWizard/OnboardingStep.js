@@ -68,7 +68,8 @@ export default function OnboardingStep( {
 	// Update button state when canProceed changes.
 	useEffect( () => {
 		updateNextButton();
-	}, [ wizardState, canProceed ] );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ wizardState ] );
 
 	return (
 		<div className="onboarding-step">

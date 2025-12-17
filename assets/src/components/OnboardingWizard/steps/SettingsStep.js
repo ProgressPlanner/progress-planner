@@ -146,7 +146,15 @@ export default function SettingsStep( props ) {
 					<div className="prpl-setting-item" data-page={ subStepName }>
 						<h3>
 							{ __( 'Settings:', 'progress-planner' ) }{ ' ' }
-							{ __( subStepName.charAt( 0 ).toUpperCase() + subStepName.slice( 1 ), 'progress-planner' ) }
+							{ subStepName === 'homepage'
+								? __( 'Home page', 'progress-planner' )
+								: subStepName === 'about'
+								? __( 'About page', 'progress-planner' )
+								: subStepName === 'contact'
+								? __( 'Contact page', 'progress-planner' )
+								: subStepName === 'faq'
+								? __( 'FAQ page', 'progress-planner' )
+								: subStepName }
 							<span className="prpl-settings-progress">
 								{ currentSubStep + 1 }/{ SUB_STEPS.length }
 							</span>
