@@ -85,6 +85,41 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 		},
 	} ) );
 
+	/**
+	 * Safely show the popover with retry mechanism.
+	 * Waits for the popover element to be ready before showing it.
+	 *
+	 * @param {number} retries - Number of retries remaining.
+	 * @return {void}
+	 */
+	const showPopoverSafely = ( retries = 10 ) => {
+		if ( retries <= 0 ) {
+			// Max retries reached, give up silently
+			return;
+		}
+
+		if (
+			popoverRef.current &&
+			typeof popoverRef.current.showPopover === 'function'
+		) {
+			// Popover is ready, show it
+			popoverRef.current.showPopover();
+			setIsOpen( true );
+
+			// Move focus to popover for keyboard accessibility
+			setTimeout( () => {
+				if ( popoverRef.current ) {
+					popoverRef.current.focus();
+				}
+			}, 0 );
+		} else {
+			// Popover not ready yet, retry after a short delay
+			setTimeout( () => {
+				showPopoverSafely( retries - 1 );
+			}, 50 );
+		}
+	};
+
 	// Auto-open wizard if there's no saved progress (like develop's trigger_onboarding).
 	// This happens regardless of privacy status.
 	useEffect( () => {
@@ -100,27 +135,21 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 
 		// Show wizard if:
 		// 1. There's saved progress (user is resuming)
-		// 2. No saved progress (auto-start like develop's trigger_onboarding)
+		// 2. No saved progress and privacy not accepted (auto-start like develop)
 		// Note: When privacy is accepted and no saved progress, wizard should NOT auto-start
 		// (only show if manually started or if there's saved progress)
 		if ( savedProgress ) {
 			// User is resuming - always show
-			if (
-				popoverRef.current &&
-				typeof popoverRef.current.showPopover === 'function'
-			) {
-				popoverRef.current.showPopover();
-			}
-			setIsOpen( true );
+			// Use requestAnimationFrame to ensure DOM is ready, then retry if needed
+			requestAnimationFrame( () => {
+				showPopoverSafely();
+			} );
 		} else if ( ! config.privacyPolicyAccepted ) {
 			// No saved progress and privacy not accepted - auto-start (like develop)
-			if (
-				popoverRef.current &&
-				typeof popoverRef.current.showPopover === 'function'
-			) {
-				popoverRef.current.showPopover();
-			}
-			setIsOpen( true );
+			// Use requestAnimationFrame to ensure DOM is ready, then retry if needed
+			requestAnimationFrame( () => {
+				showPopoverSafely();
+			} );
 		}
 		// If privacy is accepted and no saved progress, wizard stays closed (user can start manually)
 	}, [
