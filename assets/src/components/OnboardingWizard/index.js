@@ -167,6 +167,7 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	/**
 	 * Ref callback to detect when popover element is mounted.
 	 * Checks Zustand store for auto-start flag and handles auto-start.
+	 * Also sets up toggle event listener to sync isOpen state.
 	 *
 	 * @param {HTMLElement|null} element - The popover element or null when unmounted.
 	 * @return {void}
@@ -188,12 +189,42 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 			} );
 
 			// Store ref for imperative handle
+			const previousElement = popoverRef.current;
 			popoverRef.current = element;
+
+			// Clean up toggle listener from previous element if it changed
+			if ( previousElement && previousElement !== element ) {
+				const previousToggleHandler = previousElement.__prplToggleHandler;
+				if ( previousToggleHandler ) {
+					previousElement.removeEventListener( 'toggle', previousToggleHandler );
+					delete previousElement.__prplToggleHandler;
+				}
+			}
 
 			// Only proceed if element is mounted and wizard is enabled
 			if ( ! element ) {
 				console.log( '[OnboardingWizard] Ref callback: No element, returning' );
 				return;
+			}
+
+			// Set up toggle event listener to sync isOpen state with popover's actual state
+			if ( ! element.__prplToggleHandler ) {
+				/**
+				 * Handle popover toggle event to sync isOpen state.
+				 *
+				 * @param {Event} event - Toggle event.
+				 */
+				const handleToggle = ( event ) => {
+					console.log( '[OnboardingWizard] Popover toggle event', {
+						newState: event.newState,
+						isOpen: event.newState === 'open',
+						popoverMatches: element.matches( ':popover-open' ),
+					} );
+					setIsOpen( event.newState === 'open' );
+				};
+
+				element.addEventListener( 'toggle', handleToggle );
+				element.__prplToggleHandler = handleToggle;
 			}
 
 			if ( ! onboardingWizard?.enabled ) {
@@ -277,32 +308,6 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 		]
 	);
 
-	// Set up toggle event listener to sync isOpen state with popover's actual state
-	useEffect( () => {
-		const element = popoverRef.current;
-		if ( ! element ) {
-			return;
-		}
-
-		/**
-		 * Handle popover toggle event to sync isOpen state.
-		 *
-		 * @param {Event} event - Toggle event.
-		 */
-		const handleToggle = ( event ) => {
-			console.log( '[OnboardingWizard] Popover toggle event', {
-				newState: event.newState,
-				isOpen: event.newState === 'open',
-			} );
-			setIsOpen( event.newState === 'open' );
-		};
-
-		element.addEventListener( 'toggle', handleToggle );
-
-		return () => {
-			element.removeEventListener( 'toggle', handleToggle );
-		};
-	}, [] );
 
 	// Handle keyboard navigation (Escape key to close).
 	useEffect( () => {
@@ -339,6 +344,12 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	 * Handle quit confirmation.
 	 */
 	const handleQuit = () => {
+		console.log( '[OnboardingWizard] handleQuit called', {
+			hasPopoverRef: !! popoverRef.current,
+			hasHidePopover: popoverRef.current && typeof popoverRef.current.hidePopover === 'function',
+			isOpen,
+		} );
+
 		setShowQuitConfirmation( false );
 		
 		// Save progress before closing.
@@ -351,8 +362,26 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 			popoverRef.current &&
 			typeof popoverRef.current.hidePopover === 'function'
 		) {
-			popoverRef.current.hidePopover();
+			console.log( '[OnboardingWizard] Calling hidePopover()' );
+			try {
+				popoverRef.current.hidePopover();
+				console.log( '[OnboardingWizard] hidePopover() called successfully' );
+				
+				// Force update isOpen state after a short delay to ensure it's synced
+				setTimeout( () => {
+					if ( popoverRef.current && ! popoverRef.current.matches( ':popover-open' ) ) {
+						console.log( '[OnboardingWizard] Popover is closed, syncing isOpen state' );
+						setIsOpen( false );
+					} else {
+						console.warn( '[OnboardingWizard] Popover still appears to be open after hidePopover()' );
+					}
+				}, 100 );
+			} catch ( error ) {
+				console.error( '[OnboardingWizard] Error calling hidePopover()', error );
+				setIsOpen( false );
+			}
 		} else {
+			console.warn( '[OnboardingWizard] hidePopover not available, using fallback' );
 			// Fallback if hidePopover is not available
 			setIsOpen( false );
 		}
