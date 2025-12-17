@@ -100,7 +100,7 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	 * @param {HTMLElement|null} element - The popover element or null when unmounted.
 	 * @return {void}
 	 */
-	const popoverRefCallback = useCallback(
+		const popoverRefCallback = useCallback(
 		( element ) => {
 			// Store ref for imperative handle
 			popoverRef.current = element;
@@ -112,6 +112,11 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 
 			// Don't auto-start if wizard is already finished
 			if ( wizardState.data.finished ) {
+				return;
+			}
+
+			// Don't auto-start if popover is already open
+			if ( isOpen ) {
 				return;
 			}
 
@@ -149,6 +154,7 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 			savedProgress,
 			shouldAutoStartWizard,
 			setShouldAutoStartWizard,
+			isOpen,
 		]
 	);
 
