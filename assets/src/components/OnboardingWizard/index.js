@@ -87,7 +87,7 @@ export default function OnboardingWizard( { config } ) {
 		 */
 		const handleKeyDown = ( event ) => {
 			if ( event.key === 'Escape' && ! showQuitConfirmation ) {
-				handleClose();
+				setShowQuitConfirmation( true );
 			}
 		};
 
