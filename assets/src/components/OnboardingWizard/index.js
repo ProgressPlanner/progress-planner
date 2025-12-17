@@ -171,7 +171,7 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	 * @param {HTMLElement|null} element - The popover element or null when unmounted.
 	 * @return {void}
 	 */
-		const popoverRefCallback = useCallback(
+	const popoverRefCallback = useCallback(
 		( element ) => {
 			console.log( '[OnboardingWizard] popoverRefCallback called', {
 				element: !! element,
@@ -208,8 +208,9 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 			}
 
 			// Don't auto-start if popover is already open
-			if ( isOpen ) {
-				console.log( '[OnboardingWizard] Ref callback: Popover already open, returning' );
+			if ( element.matches( ':popover-open' ) ) {
+				console.log( '[OnboardingWizard] Ref callback: Popover already open, syncing state' );
+				setIsOpen( true );
 				return;
 			}
 
@@ -276,6 +277,33 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 		]
 	);
 
+	// Set up toggle event listener to sync isOpen state with popover's actual state
+	useEffect( () => {
+		const element = popoverRef.current;
+		if ( ! element ) {
+			return;
+		}
+
+		/**
+		 * Handle popover toggle event to sync isOpen state.
+		 *
+		 * @param {Event} event - Toggle event.
+		 */
+		const handleToggle = ( event ) => {
+			console.log( '[OnboardingWizard] Popover toggle event', {
+				newState: event.newState,
+				isOpen: event.newState === 'open',
+			} );
+			setIsOpen( event.newState === 'open' );
+		};
+
+		element.addEventListener( 'toggle', handleToggle );
+
+		return () => {
+			element.removeEventListener( 'toggle', handleToggle );
+		};
+	}, [] );
+
 	// Handle keyboard navigation (Escape key to close).
 	useEffect( () => {
 		if ( ! isOpen ) {
@@ -311,18 +339,23 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	 * Handle quit confirmation.
 	 */
 	const handleQuit = () => {
+		setShowQuitConfirmation( false );
+		
+		// Save progress before closing.
+		progressHooks.saveProgress( wizardState ).catch( () => {
+			// Silently fail.
+		} );
+
+		// Hide popover - toggle event will update isOpen state
 		if (
 			popoverRef.current &&
 			typeof popoverRef.current.hidePopover === 'function'
 		) {
 			popoverRef.current.hidePopover();
+		} else {
+			// Fallback if hidePopover is not available
+			setIsOpen( false );
 		}
-		setIsOpen( false );
-		setShowQuitConfirmation( false );
-		// Save progress before closing.
-		progressHooks.saveProgress( wizardState ).catch( () => {
-			// Silently fail.
-		} );
 	};
 
 	/**
