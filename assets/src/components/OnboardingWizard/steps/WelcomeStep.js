@@ -6,7 +6,7 @@
  * @package
  */
 
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, Fragment } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import OnboardingStep from '../OnboardingStep';
 import { useLicenseGenerator } from '../../../hooks/useLicenseGenerator';
