@@ -34,6 +34,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Rest\Updates get_rest__updates()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
+ * @method \Progress_Planner\Onboard_Wizard get_onboard_wizard()
  * @method \Progress_Planner\Utils\Playground get_utils__playground()
  * @method \Progress_Planner\Admin\Page get_admin__page()
  * @method \Progress_Planner\Admin\Tour get_admin__tour()
@@ -143,6 +144,7 @@ class Base {
 
 		// Onboarding.
 		$this->get_utils__onboard();
+		$this->get_onboard_wizard();
 
 		// To-do.
 		$this->get_todo();
