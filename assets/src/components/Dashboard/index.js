@@ -10,6 +10,7 @@ import { __ } from '@wordpress/i18n';
 import DashboardHeader from './DashboardHeader';
 import DashboardWidgets from './DashboardWidgets';
 import Welcome from './Welcome';
+import OnboardingWizard from '../OnboardingWizard';
 
 /**
  * Style constants - extracted to prevent recreation on each render.
@@ -80,6 +81,7 @@ export default function Dashboard( { config } ) {
 			>
 				<DashboardWidgets />
 			</div>
+			<OnboardingWizard config={ config } />
 		</Fragment>
 	);
 }

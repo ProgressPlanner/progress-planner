@@ -70,11 +70,14 @@ export default function FirstTaskStep( props ) {
 		return isCompleted;
 	};
 
-	if ( ! task ) {
-		// No task available, skip this step.
-		useEffect( () => {
+	// Skip step if no task available.
+	useEffect( () => {
+		if ( ! task ) {
 			onNext();
-		}, [] );
+		}
+	}, [ task, onNext ] );
+
+	if ( ! task ) {
 		return null;
 	}
 

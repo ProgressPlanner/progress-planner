@@ -439,8 +439,15 @@ class Page {
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-install-plugin' );
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
-			// Enqueue ugprading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
+			// Enqueue upgrading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
 			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
+			// Enqueue onboarding wizard CSS.
+			\wp_enqueue_style(
+				'progress-planner-onboarding',
+				\constant( 'PROGRESS_PLANNER_URL' ) . '/assets/css/onboarding/onboarding.css',
+				[],
+				\progress_planner()->get_plugin_version()
+			);
 		}
 	}
 
