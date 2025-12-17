@@ -24,6 +24,13 @@ function init() {
 	if ( container ) {
 		const root = createRoot( container );
 		const config = window.prplDashboardConfig || {};
+		console.log( '[Dashboard Entry] Initializing with config', {
+			hasConfig: !! config,
+			hasOnboardingWizard: !! config.onboardingWizard,
+			onboardingWizard: config.onboardingWizard,
+			privacyPolicyAccepted: config.privacyPolicyAccepted,
+			configKeys: Object.keys( config ),
+		} );
 		root.render( <Dashboard config={ config } /> );
 	}
 }

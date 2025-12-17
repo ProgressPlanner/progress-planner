@@ -32,8 +32,10 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Rest\Task_Evaluation get_rest__task_evaluation()
  * @method \Progress_Planner\Rest\Page_Settings get_rest__page_settings()
  * @method \Progress_Planner\Rest\Updates get_rest__updates()
+ * @method \Progress_Planner\Rest\Wizard_Config get_rest__wizard_config()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
+ * @method \Progress_Planner\Onboard_Wizard get_onboard_wizard()
  * @method \Progress_Planner\Utils\Playground get_utils__playground()
  * @method \Progress_Planner\Admin\Page get_admin__page()
  * @method \Progress_Planner\Admin\Tour get_admin__tour()
@@ -58,6 +60,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\UI\Chart get_ui__chart()
  * @method \Progress_Planner\Activities\Content_Helpers get_activities__content_helpers()
  * @method \Progress_Planner\Utils\Date get_utils__date()
+ * @method \Progress_Planner\Onboard_Wizard get_onboard_wizard()
  */
 class Base {
 
@@ -140,9 +143,11 @@ class Base {
 		$this->get_rest__task_evaluation();
 		$this->get_rest__page_settings();
 		$this->get_rest__updates();
+		$this->get_rest__wizard_config();
 
 		// Onboarding.
 		$this->get_utils__onboard();
+		$this->get_onboard_wizard();
 
 		// To-do.
 		$this->get_todo();
@@ -188,6 +193,9 @@ class Base {
 
 		// Init the enqueue class.
 		$this->get_admin__enqueue()->init();
+
+		// TODO: Decide when this needs to be initialized.
+		$this->get_onboard_wizard();
 	}
 
 	/**
@@ -567,7 +575,7 @@ class Base {
 	 * @return bool
 	 */
 	public function is_debug_mode_enabled() {
-		return ( \defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' );
+		return ( ( \defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) && \current_user_can( 'manage_options' );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo

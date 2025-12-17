@@ -242,66 +242,71 @@ class Page {
 		$current_user = \wp_get_current_user();
 
 		// Localize dashboard config.
+		$dashboard_config = [
+			'privacyPolicyAccepted' => \progress_planner()->is_privacy_policy_accepted(),
+			// Header configuration.
+			'licenseKey'            => \progress_planner()->get_license_key() ? \progress_planner()->get_license_key() : 'no-license',
+			// Welcome/onboarding configuration.
+			'onboardNonceURL'       => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
+			'onboardAPIUrl'         => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
+			'ajaxUrl'               => \admin_url( 'admin-ajax.php' ),
+			'nonce'                 => \wp_create_nonce( 'progress_planner' ),
+			'userFirstName'         => $current_user->user_firstname,
+			'userEmail'             => $current_user->user_email,
+			'siteUrl'               => \site_url(),
+			'timezoneOffset'        => (float) \get_option( 'gmt_offset', 0 ),
+			'baseUrl'               => \constant( 'PROGRESS_PLANNER_URL' ),
+			'branding'              => [
+				'logoHtml'         => $logo_html,
+				'tourIconHtml'     => $tour_icon_svg ? $tour_icon_svg : '',
+				'registerIconHtml' => $register_icon_svg ? $register_icon_svg : '',
+				'progressIconHtml' => $progress_icon_svg ? $progress_icon_svg : '',
+				'homeUrl'          => \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/home' ),
+				'privacyPolicyUrl' => \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ),
+			],
+			'currentRange'          => $current_range,
+			'currentFrequency'      => $current_frequency,
+			'rangeOptions'          => [
+				[
+					'value' => '-3 months',
+					'label' => \__( 'Activity over the past 3 months', 'progress-planner' ),
+				],
+				[
+					'value' => '-6 months',
+					'label' => \__( 'Activity over the past 6 months', 'progress-planner' ),
+				],
+				[
+					'value' => '-12 months',
+					'label' => \__( 'Activity over the past 12 months', 'progress-planner' ),
+				],
+				[
+					'value' => '-18 months',
+					'label' => \__( 'Activity over the past 18 months', 'progress-planner' ),
+				],
+				[
+					'value' => '-24 months',
+					'label' => \__( 'Activity over the past 24 months', 'progress-planner' ),
+				],
+			],
+			'frequencyOptions'      => [
+				[
+					'value' => 'weekly',
+					'label' => \__( 'Weekly', 'progress-planner' ),
+				],
+				[
+					'value' => 'monthly',
+					'label' => \__( 'Monthly', 'progress-planner' ),
+				],
+			],
+		];
+
+		// Apply filter to allow Onboard_Wizard to add wizard config.
+		$dashboard_config = \apply_filters( 'progress_planner_dashboard_config', $dashboard_config );
+
 		\wp_localize_script(
 			'progress-planner/dashboard',
 			'prplDashboardConfig',
-			[
-				'privacyPolicyAccepted' => \progress_planner()->is_privacy_policy_accepted(),
-				// Header configuration.
-				'licenseKey'            => \progress_planner()->get_license_key() ? \progress_planner()->get_license_key() : 'no-license',
-				// Welcome/onboarding configuration.
-				'onboardNonceURL'       => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
-				'onboardAPIUrl'         => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
-				'ajaxUrl'               => \admin_url( 'admin-ajax.php' ),
-				'nonce'                 => \wp_create_nonce( 'progress_planner' ),
-				'userFirstName'         => $current_user->user_firstname,
-				'userEmail'             => $current_user->user_email,
-				'siteUrl'               => \site_url(),
-				'timezoneOffset'        => (float) \get_option( 'gmt_offset', 0 ),
-				'baseUrl'               => \constant( 'PROGRESS_PLANNER_URL' ),
-				'branding'              => [
-					'logoHtml'          => $logo_html,
-					'tourIconHtml'      => $tour_icon_svg ? $tour_icon_svg : '',
-					'registerIconHtml'  => $register_icon_svg ? $register_icon_svg : '',
-					'progressIconHtml'  => $progress_icon_svg ? $progress_icon_svg : '',
-					'homeUrl'           => \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/home' ),
-					'privacyPolicyUrl'  => \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ),
-				],
-				'currentRange'          => $current_range,
-				'currentFrequency'      => $current_frequency,
-				'rangeOptions'          => [
-					[
-						'value' => '-3 months',
-						'label' => \__( 'Activity over the past 3 months', 'progress-planner' ),
-					],
-					[
-						'value' => '-6 months',
-						'label' => \__( 'Activity over the past 6 months', 'progress-planner' ),
-					],
-					[
-						'value' => '-12 months',
-						'label' => \__( 'Activity over the past 12 months', 'progress-planner' ),
-					],
-					[
-						'value' => '-18 months',
-						'label' => \__( 'Activity over the past 18 months', 'progress-planner' ),
-					],
-					[
-						'value' => '-24 months',
-						'label' => \__( 'Activity over the past 24 months', 'progress-planner' ),
-					],
-				],
-				'frequencyOptions'      => [
-					[
-						'value' => 'weekly',
-						'label' => \__( 'Weekly', 'progress-planner' ),
-					],
-					[
-						'value' => 'monthly',
-						'label' => \__( 'Monthly', 'progress-planner' ),
-					],
-				],
-			]
+			$dashboard_config
 		);
 
 		// Localize celebration data for confetti.
@@ -434,8 +439,15 @@ class Page {
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-install-plugin' );
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
-			// Enqueue ugprading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
+			// Enqueue upgrading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
 			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
+			// Enqueue onboarding wizard CSS.
+			\wp_enqueue_style(
+				'progress-planner-onboarding',
+				\constant( 'PROGRESS_PLANNER_URL' ) . '/assets/css/onboarding/onboarding.css',
+				[],
+				\progress_planner()->get_plugin_version()
+			);
 		}
 	}
 
