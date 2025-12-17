@@ -343,56 +343,23 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 
 	/**
 	 * Handle quit confirmation.
+	 * Matches develop branch's closeTour() behavior: hide popover first, then save progress.
 	 */
 	const handleQuit = () => {
-		console.log( '[OnboardingWizard] handleQuit called', {
-			hasPopoverRef: !! popoverRef.current,
-			hasHidePopover: popoverRef.current && typeof popoverRef.current.hidePopover === 'function',
-			isOpen,
-			popoverIsOpen: popoverRef.current?.matches( ':popover-open' ),
-		} );
-
+		// Hide quit confirmation UI
 		setShowQuitConfirmation( false );
-		
-		// Save progress before closing (don't wait for it).
-		progressHooks.saveProgress( wizardState ).catch( () => {
-			// Silently fail.
-		} );
 
-		// Hide popover - toggle event will update isOpen state
+		// Hide popover first (like develop branch's closeTour)
 		const element = popoverRef.current;
 		if ( element && typeof element.hidePopover === 'function' ) {
-			console.log( '[OnboardingWizard] Calling hidePopover()' );
-			try {
-				element.hidePopover();
-				console.log( '[OnboardingWizard] hidePopover() called successfully' );
-				
-				// Immediately set isOpen to false - toggle event will confirm or correct it
-				setIsOpen( false );
-				
-				// Verify it actually closed after a short delay
-				setTimeout( () => {
-					if ( element && element.matches( ':popover-open' ) ) {
-						console.warn( '[OnboardingWizard] Popover still open after hidePopover(), forcing close' );
-						// Force close by removing the popover attribute temporarily
-						element.removeAttribute( 'popover' );
-						setTimeout( () => {
-							element.setAttribute( 'popover', 'manual' );
-							setIsOpen( false );
-						}, 0 );
-					} else {
-						console.log( '[OnboardingWizard] Popover closed successfully' );
-					}
-				}, 50 );
-			} catch ( error ) {
-				console.error( '[OnboardingWizard] Error calling hidePopover()', error );
-				setIsOpen( false );
-			}
-		} else {
-			console.warn( '[OnboardingWizard] hidePopover not available, using fallback' );
-			// Fallback if hidePopover is not available
-			setIsOpen( false );
+			element.hidePopover();
 		}
+		setIsOpen( false );
+
+		// Save progress to server (like develop branch's saveProgressToServer)
+		progressHooks.saveProgress( wizardState ).catch( () => {
+			// Silently fail - progress save shouldn't block closing
+		} );
 	};
 
 	/**
