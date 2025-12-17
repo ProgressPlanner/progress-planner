@@ -140,30 +140,19 @@ export default function WelcomeStep( props ) {
 												'I agree to the %s.',
 												'progress-planner'
 											),
-											`<a href="${ config.privacyPolicyUrl || 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' }" target="_blank">${ __( 'Privacy policy', 'progress-planner' ) }</a>`
-										)
-											.split( '<a' )
-											.map( ( part, i ) => {
-												if ( i === 0 ) {
-													return part;
-												}
-												const [ , rest ] = part.split( '</a>' );
-												return (
-													<span key={ i }>
-														<a
-															href={
-																config.privacyPolicyUrl ||
-																'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy'
-															}
-															target="_blank"
-															rel="noopener noreferrer"
-														>
-															{ __( 'Privacy policy', 'progress-planner' ) }
-														</a>
-														{ rest }
-													</span>
-												);
-											} ) }
+											<Fragment key="privacy-link">
+												<a
+													href={
+														config.privacyPolicyUrl ||
+														'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy'
+													}
+													target="_blank"
+													rel="noopener noreferrer"
+												>
+													{ __( 'Privacy policy', 'progress-planner' ) }
+												</a>
+											</Fragment>
+										) }
 									</span>
 								</label>
 							</div>
