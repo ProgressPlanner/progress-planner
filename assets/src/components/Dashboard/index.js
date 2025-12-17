@@ -54,17 +54,10 @@ export default function Dashboard( { config } ) {
 	// Set auto-start flag when privacy is not accepted (like develop branch)
 	// Note: Saved progress check is now handled by the wizard component after it fetches config from REST API
 	useEffect( () => {
-		console.log( '[Dashboard] Auto-start useEffect running', {
-			privacyPolicyAccepted,
-		} );
-
 		// Auto-start if privacy not accepted (fresh install)
 		// Saved progress check is handled by wizard component after it fetches config from REST API
 		if ( ! privacyPolicyAccepted ) {
-			console.log( '[Dashboard] Setting shouldAutoStartWizard to true (privacy not accepted)' );
 			setShouldAutoStartWizard( true );
-		} else {
-			console.log( '[Dashboard] NOT setting auto-start flag (privacy accepted, wizard will check saved progress)' );
 		}
 	}, [ privacyPolicyAccepted, setShouldAutoStartWizard ] );
 

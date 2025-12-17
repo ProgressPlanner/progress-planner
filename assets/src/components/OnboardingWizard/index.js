@@ -51,8 +51,6 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 
 	// Fetch wizard config from REST API on mount.
 	useEffect( () => {
-		console.log( '[OnboardingWizard] Fetching wizard config from REST API' );
-
 		const fetchWizardConfig = async () => {
 			try {
 				setIsLoadingConfig( true );
@@ -62,20 +60,10 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 					path: '/progress-planner/v1/onboarding-wizard/config',
 				} );
 
-				console.log( '[OnboardingWizard] Wizard config fetched from REST API', {
-					enabled: response.enabled,
-					hasSteps: !! response.steps,
-					stepsCount: response.steps?.length || 0,
-					hasSavedProgress: !! response.savedProgress,
-				} );
-
 				setWizardConfig( response );
 			} catch ( error ) {
-				console.error( '[OnboardingWizard] Error fetching wizard config from REST API', error );
-
 				// Fallback to config.onboardingWizard if available.
 				if ( fallbackWizard ) {
-					console.log( '[OnboardingWizard] Using fallback config from props' );
 					setWizardConfig( fallbackWizard );
 				} else {
 					setConfigError( error );
@@ -119,27 +107,6 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 		( state ) => state.setShouldAutoStartWizard
 	);
 
-	// Log Zustand store state changes
-	useEffect( () => {
-		console.log( '[OnboardingWizard] Zustand shouldAutoStartWizard changed', {
-			shouldAutoStartWizard,
-			wizardEnabled: onboardingWizard?.enabled,
-			wizardFinished: wizardState.data.finished,
-			isOpen,
-		} );
-	}, [ shouldAutoStartWizard, onboardingWizard?.enabled, wizardState.data.finished, isOpen ] );
-
-	// Log component mount and initial state
-	useEffect( () => {
-		console.log( '[OnboardingWizard] Component mounted/updated', {
-			wizardEnabled: onboardingWizard?.enabled,
-			wizardFinished: wizardState.data.finished,
-			privacyPolicyAccepted: config.privacyPolicyAccepted,
-			hasSavedProgress: !! savedProgress,
-			shouldAutoStartWizard,
-			isOpen,
-		} );
-	}, [] );
 
 	// Expose startOnboarding method via ref (like develop's window.prplOnboardWizard.startOnboarding).
 	useImperativeHandle( ref, () => ( {
@@ -175,20 +142,6 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	 */
 	const popoverRefCallback = useCallback(
 		( element ) => {
-			console.log( '[OnboardingWizard] popoverRefCallback called', {
-				element: !! element,
-				elementId: element?.id,
-				hasShowPopover: element && typeof element.showPopover === 'function',
-				wizardEnabled: onboardingWizard?.enabled,
-				wizardFinished: wizardState.data.finished,
-				isOpen,
-				shouldAutoStartWizard,
-				savedProgress: !! savedProgress,
-				savedProgressKeys: savedProgress
-					? Object.keys( savedProgress )
-					: [],
-			} );
-
 			// Store ref for imperative handle
 			const previousElement = popoverRef.current;
 			popoverRef.current = element;
@@ -204,7 +157,6 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 
 			// Only proceed if element is mounted and wizard is enabled
 			if ( ! element ) {
-				console.log( '[OnboardingWizard] Ref callback: No element, returning' );
 				return;
 			}
 
@@ -216,11 +168,6 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 				 * @param {Event} event - Toggle event.
 				 */
 				const handleToggle = ( event ) => {
-					console.log( '[OnboardingWizard] Popover toggle event', {
-						newState: event.newState,
-						isOpen: event.newState === 'open',
-						popoverMatches: element.matches( ':popover-open' ),
-					} );
 					setIsOpen( event.newState === 'open' );
 				};
 
@@ -229,26 +176,22 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 			}
 
 			if ( ! onboardingWizard?.enabled ) {
-				console.log( '[OnboardingWizard] Ref callback: Wizard not enabled, returning' );
 				return;
 			}
 
 			// Don't auto-start if wizard is already finished
 			if ( wizardState.data.finished ) {
-				console.log( '[OnboardingWizard] Ref callback: Wizard already finished, returning' );
 				return;
 			}
 
 			// Don't auto-start if popover is already open
 			if ( element.matches( ':popover-open' ) ) {
-				console.log( '[OnboardingWizard] Ref callback: Popover already open, syncing state' );
 				setIsOpen( true );
 				return;
 			}
 
 			// Don't auto-start if user has manually quit (prevents re-opening after quit)
 			if ( hasManuallyQuitRef.current ) {
-				console.log( '[OnboardingWizard] Ref callback: User manually quit, not auto-starting' );
 				return;
 			}
 
@@ -257,14 +200,6 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 				savedProgress &&
 				Object.keys( savedProgress ).length > 0;
 
-			console.log( '[OnboardingWizard] Ref callback: Checking auto-start conditions', {
-				shouldAutoStartWizard,
-				hasSavedProgress,
-				hasManuallyQuit: hasManuallyQuitRef.current,
-				savedProgressKeys: savedProgress ? Object.keys( savedProgress ) : [],
-				willAutoStart: shouldAutoStartWizard && ! hasSavedProgress && ! hasManuallyQuitRef.current,
-			} );
-
 			// Auto-start ONLY when there's NO saved progress (matches develop branch logic)
 			// Develop branch: if ( ! $get_saved_progress ) { startOnboarding(); }
 			// Conditions:
@@ -272,19 +207,14 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 			// 2. There is NO saved progress (user hasn't quit before)
 			// 3. User hasn't manually quit in this session
 			if ( shouldAutoStartWizard && ! hasSavedProgress && ! hasManuallyQuitRef.current ) {
-				console.log( '[OnboardingWizard] Ref callback: Attempting to show popover' );
-
 				// Popover element is now in DOM, safe to show
 				if ( typeof element.showPopover === 'function' ) {
-					console.log( '[OnboardingWizard] Ref callback: Calling showPopover()' );
 					try {
 						element.showPopover();
 						setIsOpen( true );
-						console.log( '[OnboardingWizard] Ref callback: showPopover() called successfully, isOpen set to true' );
 
 						// Clear the Zustand flag after starting
 						if ( shouldAutoStartWizard ) {
-							console.log( '[OnboardingWizard] Ref callback: Clearing shouldAutoStartWizard flag' );
 							setShouldAutoStartWizard( false );
 						}
 
@@ -292,21 +222,12 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 						setTimeout( () => {
 							if ( element ) {
 								element.focus();
-								console.log( '[OnboardingWizard] Ref callback: Focus moved to popover' );
 							}
 						}, 0 );
 					} catch ( error ) {
 						console.error( '[OnboardingWizard] Ref callback: Error calling showPopover()', error );
 					}
-				} else {
-					console.warn( '[OnboardingWizard] Ref callback: element.showPopover is not a function', {
-						element,
-						showPopover: element.showPopover,
-						typeof: typeof element.showPopover,
-					} );
 				}
-			} else {
-				console.log( '[OnboardingWizard] Ref callback: Auto-start conditions not met, not showing popover' );
 			}
 		},
 		[
@@ -348,7 +269,6 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	 * Handle close button click.
 	 */
 	const handleClose = () => {
-		console.log( '[OnboardingWizard] handleClose called (close button clicked)' );
 		setShowQuitConfirmation( true );
 	};
 
@@ -438,34 +358,19 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 
 	// Show loading state while fetching config.
 	if ( isLoadingConfig ) {
-		console.log( '[OnboardingWizard] Loading wizard config...' );
 		return null; // Don't render while loading.
 	}
 
 	// Show error state if config failed to load and no fallback.
 	if ( configError && ! fallbackWizard ) {
-		console.error( '[OnboardingWizard] Failed to load wizard config', configError );
 		return null; // Don't render on error.
 	}
 
 	// Always render wizard (like develop's add_popover), but control visibility via isOpen.
 	// If wizard is not enabled, don't render at all.
 	if ( ! onboardingWizard?.enabled ) {
-		console.log( '[OnboardingWizard] Not rendering: wizard not enabled', {
-			onboardingWizard: !! onboardingWizard,
-			enabled: onboardingWizard?.enabled,
-		} );
 		return null;
 	}
-
-	console.log( '[OnboardingWizard] Rendering wizard', {
-		wizardEnabled: onboardingWizard?.enabled,
-		wizardFinished: wizardState.data.finished,
-		isOpen,
-		shouldAutoStartWizard,
-		hasSavedProgress: !! savedProgress,
-		currentStep,
-	} );
 
 	return (
 		<>

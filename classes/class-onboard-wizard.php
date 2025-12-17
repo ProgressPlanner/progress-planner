@@ -323,8 +323,6 @@ class Onboard_Wizard {
 		}
 		$progress = \sanitize_text_field( \wp_unslash( $_POST['state'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_ajax_security().
 
-		\error_log( print_r( $progress, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r, WordPress.PHP.DevelopmentFunctions.error_log_error_log
-
 		// Save as user meta?
 		\update_option( 'prpl_onboard_progress', $progress );
 

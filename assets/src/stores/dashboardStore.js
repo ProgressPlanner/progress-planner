@@ -123,14 +123,9 @@ export const useDashboardStore = create( ( set, get ) => ( {
 	 *
 	 * @param {boolean} value - Whether to auto-start the wizard.
 	 */
-	setShouldAutoStartWizard: ( value ) => {
-		console.log( '[Zustand Store] setShouldAutoStartWizard called', {
-			value,
-			currentState: get().shouldAutoStartWizard,
-		} );
-		set( { shouldAutoStartWizard: value } );
-		console.log( '[Zustand Store] shouldAutoStartWizard updated to', get().shouldAutoStartWizard );
-	},
+		setShouldAutoStartWizard: ( value ) => {
+			set( { shouldAutoStartWizard: value } );
+		},
 } ) );
 
 /**
