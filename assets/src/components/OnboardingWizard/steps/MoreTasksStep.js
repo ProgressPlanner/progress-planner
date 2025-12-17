@@ -22,7 +22,7 @@ const SUB_STEPS = [ 'intro', 'tasks' ];
  * @return {JSX.Element} MoreTasks step component.
  */
 export default function MoreTasksStep( props ) {
-	const { wizardState, updateState, onNext, stepData, config } = props;
+	const { wizardState, updateState, stepData, config } = props;
 
 	const [ currentSubStep, setCurrentSubStep ] = useState( 0 );
 	const [ completedTasks, setCompletedTasks ] = useState( {} );
