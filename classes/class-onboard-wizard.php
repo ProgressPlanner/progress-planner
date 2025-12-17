@@ -65,17 +65,13 @@ class Onboard_Wizard {
 		 */
 		$skip_onboarding = \apply_filters( 'progress_planner_skip_onboarding', $skip_onboarding );
 
-		// For React implementation, we'll always pass config to dashboard (React controls visibility).
+		// For React implementation, we'll ALWAYS pass config to dashboard (React controls visibility).
 		// The React components will handle the wizard UI and visibility based on skip_onboarding flag.
+		// We need the config to be added even if skip_onboarding is true, so React can render the component.
 		\add_action( 'admin_enqueue_scripts', [ $this, 'add_wizard_config' ] );
 
-		// If skip_onboarding is true, we still add the config but with enabled: false
-		// so React can handle it appropriately. The config is needed for the component to render.
-		if ( $skip_onboarding ) {
-			// Note: We still add the config, but React will check skip_onboarding flag
-			// The add_wizard_config method will receive skip_onboarding via closure or we can pass it.
-			return;
-		}
+		// Note: We no longer return early if skip_onboarding is true.
+		// The config will be added with enabled: false when skip_onboarding is true, and React will handle visibility.
 
 		// Define steps and their order.
 		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
