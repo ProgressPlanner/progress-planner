@@ -8,7 +8,7 @@
  */
 
 import { useState, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { ajaxRequest } from '../../../utils/ajaxRequest';
 import OnboardingStep from '../OnboardingStep';
 

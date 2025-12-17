@@ -53,10 +53,13 @@ export default function OnboardingWizard( { config } ) {
 
 	// Auto-open wizard if there's saved progress or if it should start.
 	useEffect( () => {
-		if ( savedProgress || ! config.privacyPolicyAccepted ) {
+		// Show wizard if:
+		// 1. There's saved progress (user is resuming)
+		// 2. Privacy policy is accepted but wizard hasn't been completed
+		if ( savedProgress || ( config.privacyPolicyAccepted && onboardingWizard?.enabled ) ) {
 			setIsOpen( true );
 		}
-	}, [ savedProgress, config.privacyPolicyAccepted ] );
+	}, [ savedProgress, config.privacyPolicyAccepted, onboardingWizard?.enabled ] );
 
 	/**
 	 * Handle close button click.
