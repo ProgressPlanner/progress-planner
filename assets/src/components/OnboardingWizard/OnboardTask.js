@@ -176,13 +176,18 @@ export default function OnboardTask( { task, config, onComplete } ) {
 									) {
 										const form = target.closest( 'form' );
 										if ( form ) {
-											const formData = new FormData( form );
+											const formData = new FormData(
+												form
+											);
 											setFormValues(
 												Object.fromEntries(
 													formData.entries()
 												)
 											);
-											setTimeout( () => handleComplete(), 0 );
+											setTimeout(
+												() => handleComplete(),
+												0
+											);
 										}
 									}
 								}

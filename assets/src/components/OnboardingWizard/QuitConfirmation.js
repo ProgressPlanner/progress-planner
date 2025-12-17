@@ -25,6 +25,9 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 	return (
 		<div
 			className="prpl-quit-confirmation-overlay"
+			role="dialog"
+			aria-modal="true"
+			aria-labelledby="prpl-quit-confirmation-title"
 			style={ {
 				position: 'fixed',
 				top: 0,
@@ -38,6 +41,11 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 				zIndex: 100000,
 			} }
 			onClick={ onCancel }
+			onKeyDown={ ( e ) => {
+				if ( e.key === 'Escape' ) {
+					onCancel();
+				}
+			} }
 		>
 			<div
 				className="prpl-quit-confirmation-dialog"
@@ -50,6 +58,7 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 					boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
 				} }
 				onClick={ ( e ) => e.stopPropagation() }
+				onKeyDown={ ( e ) => e.stopPropagation() }
 			>
 				<div className="prpl-columns-wrapper-flex prpl-columns-2-1">
 					<div className="prpl-column">
@@ -71,7 +80,7 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 									</svg>
 								</span>
 								<div>
-									<h3>
+									<h3 id="prpl-quit-confirmation-title">
 										{ __(
 											'Are you sure you want to quit?',
 											'progress-planner'
@@ -90,34 +99,28 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 								</div>
 							</div>
 							<div className="prpl-quit-actions">
-								<a
-									href="#"
+								<button
+									type="button"
 									id="prpl-quit-yes"
 									className="prpl-quit-link"
-									onClick={ ( e ) => {
-										e.preventDefault();
-										onConfirm();
-									} }
+									onClick={ onConfirm }
 								>
 									{ __(
 										'Yes, quit the onboarding (for now)',
 										'progress-planner'
 									) }
-								</a>
-								<a
-									href="#"
+								</button>
+								<button
+									type="button"
 									id="prpl-quit-no"
 									className="prpl-quit-link prpl-quit-link-primary"
-									onClick={ ( e ) => {
-										e.preventDefault();
-										onCancel();
-									} }
+									onClick={ onCancel }
 								>
 									{ __(
 										"No, let's finish the onboarding!",
 										'progress-planner'
 									) }
-								</a>
+								</button>
 							</div>
 						</div>
 					</div>
@@ -135,7 +138,10 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 									color: '#999',
 								} }
 							>
-								{ __( 'Graphic placeholder', 'progress-planner' ) }
+								{ __(
+									'Graphic placeholder',
+									'progress-planner'
+								) }
 							</div>
 						</div>
 					</div>

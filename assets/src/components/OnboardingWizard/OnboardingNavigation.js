@@ -41,9 +41,20 @@ export default function OnboardingNavigation( {
 									isActive ? 'prpl-active' : ''
 								} ${ isCompleted ? 'prpl-completed' : '' }` }
 								data-step={ index }
+								role="button"
+								tabIndex={ onStepClick ? 0 : -1 }
 								onClick={ () =>
 									onStepClick && onStepClick( index )
 								}
+								onKeyDown={ ( e ) => {
+									if (
+										onStepClick &&
+										( e.key === 'Enter' || e.key === ' ' )
+									) {
+										e.preventDefault();
+										onStepClick( index );
+									}
+								} }
 								style={ {
 									cursor: onStepClick ? 'pointer' : 'default',
 								} }

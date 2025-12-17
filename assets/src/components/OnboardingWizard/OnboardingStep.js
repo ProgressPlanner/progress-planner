@@ -29,7 +29,6 @@ import { __ } from '@wordpress/i18n';
  */
 export default function OnboardingStep( {
 	wizardState,
-	updateState,
 	onNext,
 	onBack,
 	canProceed = () => true,
@@ -55,17 +54,6 @@ export default function OnboardingStep( {
 		} else {
 			nextButtonRef.current.classList.add( 'prpl-btn-disabled' );
 			nextButtonRef.current.disabled = true;
-		}
-	};
-
-	/**
-	 * Toggle footer visibility.
-	 *
-	 * @param {boolean} show - Whether to show footer.
-	 */
-	const toggleStepFooter = ( show = true ) => {
-		if ( footerRef.current ) {
-			footerRef.current.style.display = show ? '' : 'none';
 		}
 	};
 
