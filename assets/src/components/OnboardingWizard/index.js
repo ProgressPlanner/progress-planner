@@ -252,7 +252,7 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 				return;
 			}
 
-			// Check if we should auto-start (from Zustand store or saved progress)
+			// Check if we should auto-start (only when there's NO saved progress, like develop branch)
 			const hasSavedProgress =
 				savedProgress &&
 				Object.keys( savedProgress ).length > 0;
@@ -262,14 +262,16 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 				hasSavedProgress,
 				hasManuallyQuit: hasManuallyQuitRef.current,
 				savedProgressKeys: savedProgress ? Object.keys( savedProgress ) : [],
-				willAutoStart: ( shouldAutoStartWizard || hasSavedProgress ) && ! hasManuallyQuitRef.current,
+				willAutoStart: shouldAutoStartWizard && ! hasSavedProgress && ! hasManuallyQuitRef.current,
 			} );
 
-			// Auto-start if:
-			// 1. Zustand flag is set (privacy not accepted)
-			// 2. There's saved progress (resuming)
-			// 3. User hasn't manually quit
-			if ( ( shouldAutoStartWizard || hasSavedProgress ) && ! hasManuallyQuitRef.current ) {
+			// Auto-start ONLY when there's NO saved progress (matches develop branch logic)
+			// Develop branch: if ( ! $get_saved_progress ) { startOnboarding(); }
+			// Conditions:
+			// 1. Zustand flag is set (privacy not accepted - fresh install)
+			// 2. There is NO saved progress (user hasn't quit before)
+			// 3. User hasn't manually quit in this session
+			if ( shouldAutoStartWizard && ! hasSavedProgress && ! hasManuallyQuitRef.current ) {
 				console.log( '[OnboardingWizard] Ref callback: Attempting to show popover' );
 
 				// Popover element is now in DOM, safe to show

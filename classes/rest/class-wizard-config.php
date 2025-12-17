@@ -163,4 +163,3 @@ class Wizard_Config extends Base {
 		return new \WP_REST_Response( $config, 200 );
 	}
 }
-
