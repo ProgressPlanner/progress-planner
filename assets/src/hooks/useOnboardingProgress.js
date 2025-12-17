@@ -12,9 +12,9 @@ import { ajaxRequest } from '../utils/ajaxRequest';
 /**
  * Hook for managing onboarding progress persistence.
  *
- * @param {Object} config        - Configuration object.
+ * @param {Object} config         - Configuration object.
  * @param {string} config.ajaxUrl - AJAX URL for saving progress.
- * @param {string} config.nonce  - Nonce for AJAX requests.
+ * @param {string} config.nonce   - Nonce for AJAX requests.
  * @return {Object} Progress management functions.
  */
 export function useOnboardingProgress( { ajaxUrl, nonce } ) {
@@ -45,7 +45,9 @@ export function useOnboardingProgress( { ajaxUrl, nonce } ) {
 				if ( response.success ) {
 					return response;
 				}
-				throw new Error( response.data?.message || 'Failed to save progress' );
+				throw new Error(
+					response.data?.message || 'Failed to save progress'
+				);
 			} catch ( err ) {
 				setError( err.message || 'Failed to save progress' );
 				throw err;
@@ -62,4 +64,3 @@ export function useOnboardingProgress( { ajaxUrl, nonce } ) {
 		error,
 	};
 }
-

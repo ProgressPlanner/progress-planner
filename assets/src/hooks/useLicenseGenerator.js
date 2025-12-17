@@ -12,13 +12,13 @@ import { ajaxRequest } from '../utils/ajaxRequest';
 /**
  * Hook for generating license keys during onboarding.
  *
- * @param {Object} config              - Configuration object.
+ * @param {Object} config                 - Configuration object.
  * @param {string} config.onboardNonceURL - URL to get nonce.
  * @param {string} config.onboardAPIUrl   - URL to generate license.
- * @param {string} config.ajaxUrl        - AJAX URL for saving license.
- * @param {string} config.nonce          - Nonce for AJAX requests.
- * @param {string} config.siteUrl        - Site URL.
- * @param {number} config.timezoneOffset - Timezone offset.
+ * @param {string} config.ajaxUrl         - AJAX URL for saving license.
+ * @param {string} config.nonce           - Nonce for AJAX requests.
+ * @param {string} config.siteUrl         - Site URL.
+ * @param {number} config.timezoneOffset  - Timezone offset.
  * @return {Object} License generation functions.
  */
 export function useLicenseGenerator( {
@@ -108,4 +108,3 @@ export function useLicenseGenerator( {
 		error,
 	};
 }
-

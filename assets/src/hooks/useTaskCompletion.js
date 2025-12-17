@@ -12,9 +12,9 @@ import { ajaxRequest } from '../utils/ajaxRequest';
 /**
  * Hook for completing tasks during onboarding.
  *
- * @param {Object} config        - Configuration object.
+ * @param {Object} config         - Configuration object.
  * @param {string} config.ajaxUrl - AJAX URL for task completion.
- * @param {string} config.nonce  - Nonce for AJAX requests.
+ * @param {string} config.nonce   - Nonce for AJAX requests.
  * @return {Object} Task completion functions.
  */
 export function useTaskCompletion( { ajaxUrl, nonce } ) {
@@ -47,7 +47,9 @@ export function useTaskCompletion( { ajaxUrl, nonce } ) {
 				if ( response.success ) {
 					return response;
 				}
-				throw new Error( response.data?.message || 'Failed to complete task' );
+				throw new Error(
+					response.data?.message || 'Failed to complete task'
+				);
 			} catch ( err ) {
 				setError( err.message || 'Failed to complete task' );
 				throw err;
@@ -64,4 +66,3 @@ export function useTaskCompletion( { ajaxUrl, nonce } ) {
 		error,
 	};
 }
-

@@ -12,10 +12,10 @@ import { useOnboardingProgress } from './useOnboardingProgress';
 /**
  * Hook for managing onboarding wizard state.
  *
- * @param {Object} config              - Configuration object.
- * @param {Array}  config.steps        - Array of step definitions.
+ * @param {Object} config               - Configuration object.
+ * @param {Array}  config.steps         - Array of step definitions.
  * @param {Object} config.savedProgress - Saved progress from server.
- * @param {Object} progressHooks       - Progress management hooks.
+ * @param {Object} progressHooks        - Progress management hooks.
  * @return {Object} Wizard state and navigation functions.
  */
 export function useOnboardingWizard( config, progressHooks ) {
@@ -100,12 +100,18 @@ export function useOnboardingWizard( config, progressHooks ) {
 	 *
 	 * @param {number} stepIndex - Step index to navigate to.
 	 */
-	const goToStep = useCallback( ( stepIndex ) => {
-		setWizardState( ( prev ) => ( {
-			...prev,
-			currentStep: Math.max( 0, Math.min( stepIndex, steps.length - 1 ) ),
-		} ) );
-	}, [ steps.length ] );
+	const goToStep = useCallback(
+		( stepIndex ) => {
+			setWizardState( ( prev ) => ( {
+				...prev,
+				currentStep: Math.max(
+					0,
+					Math.min( stepIndex, steps.length - 1 )
+				),
+			} ) );
+		},
+		[ steps.length ]
+	);
 
 	/**
 	 * Auto-save progress after state changes.
@@ -131,4 +137,3 @@ export function useOnboardingWizard( config, progressHooks ) {
 		totalSteps: steps.length,
 	};
 }
-
