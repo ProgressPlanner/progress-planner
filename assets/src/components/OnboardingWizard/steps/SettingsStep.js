@@ -29,7 +29,13 @@ const SUB_STEPS = [
  */
 export default function SettingsStep( props ) {
 	const { wizardState, updateState, config } = props;
-	const { ajaxUrl, nonce, pages = [], postTypes = [] } = config;
+	const {
+		ajaxUrl,
+		nonce,
+		pages = [],
+		postTypes = [],
+		pageTypes = {},
+	} = config;
 
 	const [ currentSubStep, setCurrentSubStep ] = useState( 0 );
 	const [ settings, setSettings ] = useState( () => {
@@ -154,84 +160,111 @@ export default function SettingsStep( props ) {
 			case 'homepage':
 			case 'about':
 			case 'contact':
-			case 'faq':
+			case 'faq': {
+				const pageType = pageTypes[ subStepName ] || {};
+				const pageTitle =
+					pageType.title ||
+					( subStepName === 'homepage'
+						? __( 'Home page', 'progress-planner' )
+						: subStepName === 'about'
+						? __( 'About page', 'progress-planner' )
+						: subStepName === 'contact'
+						? __( 'Contact page', 'progress-planner' )
+						: subStepName === 'faq'
+						? __( 'FAQ page', 'progress-planner' )
+						: subStepName );
+				const pageDescription =
+					pageType.description ||
+					__( 'Select a page', 'progress-planner' );
+
 				return (
 					<div
 						className="prpl-setting-item"
 						data-page={ subStepName }
 					>
-						<h3>
-							{ __( 'Settings:', 'progress-planner' ) }{ ' ' }
-							{ subStepName === 'homepage'
-								? __( 'Home page', 'progress-planner' )
-								: subStepName === 'about'
-								? __( 'About page', 'progress-planner' )
-								: subStepName === 'contact'
-								? __( 'Contact page', 'progress-planner' )
-								: subStepName === 'faq'
-								? __( 'FAQ page', 'progress-planner' )
-								: subStepName }
-							<span className="prpl-settings-progress">
-								{ currentSubStep + 1 }/{ SUB_STEPS.length }
-							</span>
-						</h3>
-						<div className="prpl-select-page">
-							<select
-								name={ `pages[${ subStepName }][id]` }
-								value={ subStepData.pageId || '' }
-								onChange={ ( e ) =>
-									setSettings( ( prev ) => ( {
-										...prev,
-										[ subStepName ]: {
-											...prev[ subStepName ],
-											pageId:
-												parseInt(
-													e.target.value,
-													10
-												) || null,
-										},
-									} ) )
-								}
-							>
-								<option value="">
-									{ __(
-										'— Select page —',
-										'progress-planner'
-									) }
-								</option>
-								{ pages.map( ( page ) => (
-									<option key={ page.id } value={ page.id }>
-										{ page.title }
-									</option>
-								) ) }
-							</select>
+						<div className="prpl-columns-wrapper-flex prpl-columns-1-2">
+							<div className="prpl-column">
+								<div className="prpl-background-content">
+									<p>{ pageDescription }</p>
+								</div>
+							</div>
+							<div className="prpl-column">
+								<div className="prpl-setting-header">
+									<h3 className="prpl-setting-title">
+										{ __( 'Settings:', 'progress-planner' ) }{ ' ' }
+										{ pageTitle }
+										<span className="prpl-settings-progress">
+											{ currentSubStep + 1 }/{ SUB_STEPS.length }
+										</span>
+									</h3>
+								</div>
+								<div className="prpl-setting-content">
+									<div className="prpl-select-page">
+										<select
+											name={ `pages[${ subStepName }][id]` }
+											value={ subStepData.pageId || '' }
+											onChange={ ( e ) =>
+												setSettings( ( prev ) => ( {
+													...prev,
+													[ subStepName ]: {
+														...prev[ subStepName ],
+														pageId:
+															parseInt(
+																e.target.value,
+																10
+															) || null,
+													},
+												} ) )
+											}
+										>
+											<option value="">
+												{ __(
+													'— Select page —',
+													'progress-planner'
+												) }
+											</option>
+											{ pages.map( ( page ) => (
+												<option
+													key={ page.id }
+													value={ page.id }
+												>
+													{ page.title }
+												</option>
+											) ) }
+										</select>
+									</div>
+									<div className="prpl-checkbox-wrapper">
+										<label>
+											<input
+												type="checkbox"
+												id={ `prpl-no-${ subStepName }-page` }
+												checked={ ! subStepData.hasPage }
+												onChange={ ( e ) =>
+													setSettings( ( prev ) => ( {
+														...prev,
+														[ subStepName ]: {
+															...prev[ subStepName ],
+															hasPage: ! e.target.checked,
+														},
+													} ) )
+												}
+											/>
+											{ sprintf(
+												/* translators: %s: page type title */
+												__(
+													"I don't have a %s yet",
+													'progress-planner'
+												),
+												pageTitle
+											) }
+										</label>
+									</div>
+								</div>
+							</div>
 						</div>
-						<label>
-							<input
-								type="checkbox"
-								id={ `prpl-no-${ subStepName }-page` }
-								checked={ ! subStepData.hasPage }
-								onChange={ ( e ) =>
-									setSettings( ( prev ) => ( {
-										...prev,
-										[ subStepName ]: {
-											...prev[ subStepName ],
-											hasPage: ! e.target.checked,
-										},
-									} ) )
-								}
-							/>
-							{ sprintf(
-								/* translators: %s: page type */
-								__(
-									"I don't have a %s yet",
-									'progress-planner'
-								),
-								subStepName
-							) }
-						</label>
 					</div>
 				);
+			}
 
 			case 'post-types':
 				return (

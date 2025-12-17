@@ -304,6 +304,30 @@ class Onboard_Wizard {
 			];
 		}
 
+		// Page type descriptions for SettingsStep.
+		$page_types = [
+			'homepage' => [
+				'id'          => 'homepage',
+				'title'       => \esc_html__( 'Home page', 'progress-planner' ),
+				'description' => \esc_html__( 'Help us understand your site a little better so we can give you more useful recommendations. Let\'s start with the home page.', 'progress-planner' ),
+			],
+			'about'    => [
+				'id'          => 'about',
+				'title'       => \esc_html__( 'About page', 'progress-planner' ),
+				'description' => \esc_html__( 'Next up, pick the page you use as your about page.', 'progress-planner' ),
+			],
+			'contact'  => [
+				'id'          => 'contact',
+				'title'       => \esc_html__( 'Contact page', 'progress-planner' ),
+				'description' => \esc_html__( 'Now choose the page you use as your contact page.', 'progress-planner' ),
+			],
+			'faq'      => [
+				'id'          => 'faq',
+				'title'       => \esc_html__( 'FAQ page', 'progress-planner' ),
+				'description' => \esc_html__( 'Next, pick the page you use as your FAQ page.', 'progress-planner' ),
+			],
+		];
+
 		// Get post types for settings step.
 		$post_types           = \progress_planner()->get_settings()->get_public_post_types();
 		$post_types_formatted = [];
@@ -320,7 +344,7 @@ class Onboard_Wizard {
 		// Add wizard config to existing prplDashboardConfig via filter.
 		\add_filter(
 			'progress_planner_dashboard_config',
-			function ( $config ) use ( $steps_formatted, $saved_progress, $pages_formatted, $post_types_formatted ) {
+			function ( $config ) use ( $steps_formatted, $saved_progress, $pages_formatted, $post_types_formatted, $page_types ) {
 				// Capture logo HTML.
 				\ob_start();
 				\progress_planner()->get_ui__branding()->the_logo();
@@ -340,6 +364,7 @@ class Onboard_Wizard {
 					'hasLicense'          => false !== \progress_planner()->get_license_key(),
 					'pages'               => $pages_formatted,
 					'postTypes'           => $post_types_formatted,
+					'pageTypes'           => $page_types,
 					'logoHtml'            => $logo_html,
 					'l10n'                => [
 						'next'                  => \esc_html__( 'Next', 'progress-planner' ),
