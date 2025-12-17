@@ -10,7 +10,6 @@
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useTaskCompletion } from '../../hooks/useTaskCompletion';
-import { useTaskTemplate } from '../../hooks/useTaskTemplate';
 
 /**
  * OnboardTask component.
@@ -33,12 +32,42 @@ export default function OnboardTask( { task, config, onComplete } ) {
 	const [ formValues, setFormValues ] = useState( {} );
 	const taskContentRef = useRef( null );
 
-	// Fetch task template HTML if task has a template.
-	const { templateHtml, isLoading: isLoadingTemplate } = useTaskTemplate(
-		{ ajaxUrl, nonce },
-		task?.task_id,
-		task
-	);
+	// Use template HTML from task data if available, otherwise fetch it.
+	const [ templateHtml, setTemplateHtml ] = useState( task?.template_html || '' );
+	const [ isLoadingTemplate, setIsLoadingTemplate ] = useState( false );
+
+	// Fetch template if not provided in task data.
+	useEffect( () => {
+		if ( ! task?.task_id || task?.template_html ) {
+			return;
+		}
+
+		const fetchTemplate = async () => {
+			setIsLoadingTemplate( true );
+			try {
+				const formData = new FormData();
+				formData.append( 'action', 'progress_planner_get_task_template' );
+				formData.append( 'nonce', nonce );
+				formData.append( 'task_id', task.task_id );
+				formData.append( 'task_data', JSON.stringify( task ) );
+
+				const response = await fetch( ajaxUrl, {
+					method: 'POST',
+					body: formData,
+				} ).then( ( res ) => res.json() );
+
+				if ( response.success && response.data?.html ) {
+					setTemplateHtml( response.data.html );
+				}
+			} catch ( error ) {
+				console.error( 'Failed to fetch task template:', error );
+			} finally {
+				setIsLoadingTemplate( false );
+			}
+		};
+
+		fetchTemplate();
+	}, [ task?.task_id, task?.template_html, ajaxUrl, nonce ] );
 
 	/**
 	 * Handle task completion.
