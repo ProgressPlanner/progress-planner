@@ -14,6 +14,7 @@ import {
 	useRef,
 	useCallback,
 } from '@wordpress/element';
+import { createPortal } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { useDashboardStore } from '../../stores/dashboardStore';
@@ -511,13 +512,15 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 				</button>
 			</div>
 
-			{ showQuitConfirmation && (
-				<QuitConfirmation
-					onConfirm={ handleQuit }
-					onCancel={ handleCancelQuit }
-					config={ onboardingWizard }
-				/>
-			) }
+			{ showQuitConfirmation &&
+				createPortal(
+					<QuitConfirmation
+						onConfirm={ handleQuit }
+						onCancel={ handleCancelQuit }
+						config={ onboardingWizard }
+					/>,
+					document.body
+				) }
 		</>
 	);
 } );

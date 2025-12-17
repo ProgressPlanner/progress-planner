@@ -44,7 +44,7 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 				display: 'flex',
 				alignItems: 'center',
 				justifyContent: 'center',
-				zIndex: 100000,
+				zIndex: 2147483647, // Maximum z-index to ensure it's above popover backdrop
 			} }
 			onClick={ ( e ) => {
 				// Only cancel if clicking directly on the overlay, not on child elements
