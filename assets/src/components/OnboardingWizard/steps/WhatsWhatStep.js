@@ -22,25 +22,44 @@ export default function WhatsWhatStep( props ) {
 	return (
 		<OnboardingStep { ...props } canProceed={ () => true }>
 			<div className="tour-content">
-				<div className="prpl-columns-wrapper-flex prpl-columns-2-1">
+				<div className="prpl-columns-wrapper-flex">
 					<div className="prpl-column">
 						<div className="prpl-background-content">
-							<h3 className="tour-title">
-								{ __( "What's what?", 'progress-planner' ) }
+							<h3>
+								{ __( 'Recommendations', 'progress-planner' ) }
 							</h3>
 							<p>
-								{ sprintf(
-									/* translators: %s: Progress Planner name */
-									__(
-										"%s helps you set clear, focused goals for your website. Let's go through a few simple steps to get everything set up.",
-										'progress-planner'
-									),
-									brandingName
+								{ __(
+									'Tasks that show you what to work on next.',
+									'progress-planner'
 								) }
 							</p>
 							<p>
 								{ __(
-									'This will only take a few minutes.',
+									'These actions help you improve your site step by step, without having to guess where to start.',
+									'progress-planner'
+								) }
+							</p>
+						</div>
+					</div>
+					<div className="prpl-column">
+						<div className="prpl-background-content">
+							<h3>
+								{ __( 'Badges', 'progress-planner' ) }
+							</h3>
+							<p>
+								<span className="prpl-suggested-task-points">
+									+1
+								</span>
+								{ ' ' }
+								{ __(
+									'You earn points for every completed task.',
+									'progress-planner'
+								) }
+							</p>
+							<p>
+								{ __(
+									'Collect badges as you make progress, which keeps things fun and helps you stay motivated!',
 									'progress-planner'
 								) }
 							</p>
