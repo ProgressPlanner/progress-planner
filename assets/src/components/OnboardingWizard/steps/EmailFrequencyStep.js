@@ -130,6 +130,8 @@ export default function EmailFrequencyStep( props ) {
 			{ ...props }
 			canProceed={ canProceed }
 			onNext={ handleNext }
+			buttonText={ __( 'Got it', 'progress-planner' ) }
+			buttonClass="prpl-btn-secondary"
 		>
 			<div className="tour-content">
 				<h3 className="tour-title">

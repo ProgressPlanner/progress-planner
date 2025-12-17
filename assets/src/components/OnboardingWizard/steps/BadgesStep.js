@@ -43,7 +43,12 @@ export default function BadgesStep( props ) {
 	}, [ wizardState.data.firstTaskCompleted, badgeData ] );
 
 	return (
-		<OnboardingStep { ...props } canProceed={ () => true }>
+		<OnboardingStep
+			{ ...props }
+			canProceed={ () => true }
+			buttonText={ __( 'Got it', 'progress-planner' ) }
+			buttonClass="prpl-btn-secondary"
+		>
 			<div className="tour-content">
 				<div className="prpl-columns-wrapper-flex prpl-columns-2-1">
 					<div className="prpl-column">

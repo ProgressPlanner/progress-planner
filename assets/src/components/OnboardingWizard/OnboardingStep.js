@@ -22,6 +22,8 @@ import { __ } from '@wordpress/i18n';
  * @param {Function} props.onNext      - Callback when next is clicked.
  * @param {Function} props.onBack      - Callback when back is clicked.
  * @param {Function} props.canProceed  - Function to check if step can proceed.
+ * @param {string}   props.buttonText  - Custom button text (defaults to "Next").
+ * @param {string}   props.buttonClass - Custom button class (defaults to "prpl-btn-primary").
  * @param {Object}   props.children    - Step content.
  * @return {JSX.Element} Step component.
  */
@@ -31,6 +33,8 @@ export default function OnboardingStep( {
 	onNext,
 	onBack,
 	canProceed = () => true,
+	buttonText,
+	buttonClass = 'prpl-btn-primary',
 	children,
 } ) {
 	const nextButtonRef = useRef( null );
@@ -89,11 +93,15 @@ export default function OnboardingStep( {
 					<button
 						ref={ nextButtonRef }
 						type="button"
-						className="prpl-btn prpl-btn-primary prpl-tour-next"
+						className={ `prpl-btn ${ buttonClass } prpl-tour-next` }
 						onClick={ onNext }
 					>
-						{ /* translators: Next button */ }
-						{ __( 'Next', 'progress-planner' ) } →
+						{ buttonText || (
+							<>
+								{ /* translators: Next button */ }
+								{ __( 'Next', 'progress-planner' ) } →
+							</>
+						) }
 					</button>
 				</div>
 			</div>
