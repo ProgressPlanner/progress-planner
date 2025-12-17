@@ -1,0 +1,102 @@
+/**
+ * OnboardingStep Base Component
+ *
+ * Base component for all onboarding wizard steps.
+ * Provides common functionality like canProceed, updateNextButton, etc.
+ *
+ * @package
+ */
+
+import { useEffect, useRef } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Base step component.
+ *
+ * This is a utility component that provides common step functionality.
+ * Individual step components should use these utilities.
+ *
+ * @param {Object} props              - Component props.
+ * @param {Object} props.wizardState  - Current wizard state.
+ * @param {Function} props.updateState - Function to update wizard state.
+ * @param {Function} props.onNext     - Callback when next is clicked.
+ * @param {Function} props.onBack     - Callback when back is clicked.
+ * @param {Function} props.canProceed - Function to check if step can proceed.
+ * @param {Object} props.children     - Step content.
+ * @return {JSX.Element} Step component.
+ */
+export default function OnboardingStep( {
+	wizardState,
+	updateState,
+	onNext,
+	onBack,
+	canProceed = () => true,
+	children,
+} ) {
+	const nextButtonRef = useRef( null );
+	const footerRef = useRef( null );
+
+	/**
+	 * Update next button state based on canProceed.
+	 */
+	const updateNextButton = () => {
+		if ( ! nextButtonRef.current ) {
+			return;
+		}
+
+		const canAdvance = canProceed( wizardState );
+		if ( canAdvance ) {
+			nextButtonRef.current.classList.remove( 'prpl-btn-disabled' );
+			nextButtonRef.current.disabled = false;
+		} else {
+			nextButtonRef.current.classList.add( 'prpl-btn-disabled' );
+			nextButtonRef.current.disabled = true;
+		}
+	};
+
+	/**
+	 * Toggle footer visibility.
+	 *
+	 * @param {boolean} show - Whether to show footer.
+	 */
+	const toggleStepFooter = ( show = true ) => {
+		if ( footerRef.current ) {
+			footerRef.current.style.display = show ? '' : 'none';
+		}
+	};
+
+	// Update button state when canProceed changes.
+	useEffect( () => {
+		updateNextButton();
+	}, [ wizardState, canProceed ] );
+
+	return (
+		<div className="onboarding-step">
+			{ children }
+			<div ref={ footerRef } className="tour-footer">
+				<div className="prpl-tour-next-wrapper">
+					{ onBack && (
+						<button
+							type="button"
+							className="prpl-btn prpl-btn-secondary"
+							onClick={ onBack }
+						>
+							{ /* translators: Back button */ }
+							← { __( 'Back', 'progress-planner' ) }
+						</button>
+					) }
+					<button
+						ref={ nextButtonRef }
+						type="button"
+						className="prpl-btn prpl-btn-primary prpl-tour-next"
+						onClick={ onNext }
+					>
+						{ /* translators: Next button */ }
+						{ __( 'Next', 'progress-planner' ) } →
+					</button>
+				</div>
+			</div>
+		</div>
+	);
+}
+
