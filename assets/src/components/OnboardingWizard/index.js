@@ -30,13 +30,13 @@ import QuitConfirmation from './QuitConfirmation';
 export default function OnboardingWizard( { config } ) {
 	const { onboardingWizard } = config;
 
-	if ( ! onboardingWizard?.enabled ) {
-		return null;
-	}
+	// Initialize hooks before early return to comply with React hooks rules.
+	const { steps, savedProgress, ajaxUrl, nonce } = onboardingWizard || {};
 
-	const { steps, savedProgress, ajaxUrl, nonce } = onboardingWizard;
-
-	const progressHooks = useOnboardingProgress( { ajaxUrl, nonce } );
+	const progressHooks = useOnboardingProgress( {
+		ajaxUrl: ajaxUrl || '',
+		nonce: nonce || '',
+	} );
 	const {
 		wizardState,
 		updateState,
@@ -45,11 +45,14 @@ export default function OnboardingWizard( { config } ) {
 		goToStep,
 		currentStep,
 		currentStepData,
-		totalSteps,
-	} = useOnboardingWizard( onboardingWizard, progressHooks );
+	} = useOnboardingWizard( onboardingWizard || {}, progressHooks );
 
 	const [ showQuitConfirmation, setShowQuitConfirmation ] = useState( false );
 	const [ isOpen, setIsOpen ] = useState( false );
+
+	if ( ! onboardingWizard?.enabled ) {
+		return null;
+	}
 
 	// Auto-open wizard if there's saved progress or if it should start.
 	useEffect( () => {

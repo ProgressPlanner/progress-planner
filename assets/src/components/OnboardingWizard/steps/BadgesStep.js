@@ -67,7 +67,7 @@ export default function BadgesStep( props ) {
 							</p>
 							<p>
 								{ __(
-									'You're off to a great start!',
+									"You're off to a great start!",
 									'progress-planner'
 								) }
 							</p>

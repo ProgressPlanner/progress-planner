@@ -18,9 +18,11 @@ import { useTaskCompletion } from '../../../hooks/useTaskCompletion';
  * @return {JSX.Element} FirstTask step component.
  */
 export default function FirstTaskStep( props ) {
-	const { wizardState, updateState, onNext, stepData } = props;
-	const { config } = props;
+	const { wizardState, updateState, onNext, stepData, config } = props;
 	const { ajaxUrl, nonce } = config;
+	const brandingName =
+		config?.l10n?.brandingName ||
+		__( 'Progress Planner', 'progress-planner' );
 
 	const { completeTask, isCompleting } = useTaskCompletion( {
 		ajaxUrl,
@@ -81,11 +83,6 @@ export default function FirstTaskStep( props ) {
 	if ( ! task ) {
 		return null;
 	}
-
-	const { config } = props;
-	const brandingName =
-		config?.l10n?.brandingName ||
-		__( 'Progress Planner', 'progress-planner' );
 
 	return (
 		<OnboardingStep { ...props } canProceed={ canProceed }>
