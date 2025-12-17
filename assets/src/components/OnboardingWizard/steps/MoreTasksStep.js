@@ -100,41 +100,77 @@ export default function MoreTasksStep( props ) {
 		if ( currentSubStep === 0 ) {
 			// Intro sub-step.
 			return (
-				<div className="prpl-more-tasks-substep" data-substep="intro">
-					<h3 className="tour-title">
-						{ __( 'Finish onboarding!', 'progress-planner' ) }
-					</h3>
-					<p>
-						{ __(
-							'Complete a few more tasks to get your site in great shape.',
-							'progress-planner'
-						) }
-					</p>
-					<button
-						type="button"
-						className="prpl-btn prpl-btn-primary prpl-more-tasks-continue"
-						onClick={ handleContinue }
-					>
-						{ __( 'Continue', 'progress-planner' ) }
-					</button>
-					<button
-						type="button"
-						className="prpl-finish-onboarding"
-						onClick={ handleFinish }
-						style={ {
-							background: 'none',
-							border: 'none',
-							color: 'var(--prpl-color-text)',
-							textDecoration: 'underline',
-							cursor: 'pointer',
-							marginTop: '1rem',
-						} }
-					>
-						{ __(
-							'Skip and finish onboarding',
-							'progress-planner'
-						) }
-					</button>
+				<div
+					className="prpl-more-tasks-substep"
+					data-substep="more-tasks-intro"
+				>
+					<div className="prpl-columns-wrapper-flex prpl-columns-2-1">
+						<div className="prpl-column">
+							<div className="prpl-background-content">
+								<p>
+									<strong>
+										{ __(
+											'Well done! Great work so far!',
+											'progress-planner'
+										) }
+									</strong>
+								</p>
+								<p>
+									{ __(
+										'You can take on a few more recommendations if you feel like it, or jump straight to your dashboard.',
+										'progress-planner'
+									) }
+								</p>
+							</div>
+							<div className="prpl-more-tasks-intro-buttons">
+								<a
+									href={
+										config?.lastStepRedirectUrl ||
+										'/wp-admin/admin.php?page=progress-planner'
+									}
+									className="prpl-finish-onboarding"
+									onClick={ ( e ) => {
+										e.preventDefault();
+										handleFinish();
+									} }
+								>
+									{ __(
+										'Take me to the dashboard',
+										'progress-planner'
+									) }
+								</a>
+								<button
+									type="button"
+									className="prpl-btn prpl-btn-secondary prpl-more-tasks-continue"
+									onClick={ handleContinue }
+								>
+									{ __(
+										"Yes! Let's tackle more tasks",
+										'progress-planner'
+									) }{ ' ' }
+									&rsaquo;
+								</button>
+							</div>
+						</div>
+						<div className="prpl-column prpl-hide-on-mobile">
+							<div id="prpl-success-graphic">
+								{ /* Graphic would be rendered here - success_ravi.svg */ }
+								<div
+									style={ {
+										width: '100%',
+										height: '200px',
+										backgroundColor: '#f0f0f0',
+										display: 'flex',
+										alignItems: 'center',
+										justifyContent: 'center',
+										color: '#999',
+									} }
+								>
+									{ __( 'Graphic placeholder', 'progress-planner' ) }
+								</div>
+							</div>
+						</div>
+					</div>
 				</div>
 			);
 		}
