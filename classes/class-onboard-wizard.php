@@ -189,10 +189,12 @@ class Onboard_Wizard {
 
 		// Add more-tasks step if there are remaining tasks.
 		if ( ! empty( $tasks ) ) {
+			// Convert tasks object to array for React.
+			$tasks_array = \array_values( $tasks );
 			$this->steps[] = [
 				'script_file_name'   => 'MoreTasksStep',
 				'template_file_name' => 'more-tasks',
-				'template_data'      => [ 'tasks' => $tasks ],
+				'template_data'      => [ 'tasks' => $tasks_array ],
 				'template_id'        => 'onboarding-step-more-tasks',
 				'title'              => esc_html__( 'Finish onboarding!', 'progress-planner' ),
 			];

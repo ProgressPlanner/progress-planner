@@ -10,6 +10,7 @@
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useTaskCompletion } from '../../hooks/useTaskCompletion';
+import { useTaskTemplate } from '../../hooks/useTaskTemplate';
 
 /**
  * OnboardTask component.
@@ -31,6 +32,13 @@ export default function OnboardTask( { task, config, onComplete } ) {
 	const [ isCompleted, setIsCompleted ] = useState( false );
 	const [ formValues, setFormValues ] = useState( {} );
 	const taskContentRef = useRef( null );
+
+	// Fetch task template HTML if task has a template.
+	const { templateHtml, isLoading: isLoadingTemplate } = useTaskTemplate(
+		{ ajaxUrl, nonce },
+		task?.task_id,
+		task
+	);
 
 	/**
 	 * Handle task completion.
@@ -88,17 +96,38 @@ export default function OnboardTask( { task, config, onComplete } ) {
 					</button>
 				</div>
 				<div className="prpl-task-form">
-					{ /* Task form content will be rendered here */ }
-					{ task.title && <h4>{ task.title }</h4> }
-					{ task.url && (
-						<a
-							href={ task.url }
-							target="_blank"
-							rel="noopener noreferrer"
-							className="prpl-button-primary"
-						>
-							{ task.action_label || __( 'Do it', 'progress-planner' ) }
-						</a>
+					{ isLoadingTemplate ? (
+						<div className="prpl-spinner">
+							<span className="spinner" style={ { visibility: 'visible' } }></span>
+						</div>
+					) : templateHtml ? (
+						<div
+							dangerouslySetInnerHTML={ { __html: templateHtml } }
+							onClick={ ( e ) => {
+								// Handle form submission and file uploads.
+								if ( e.target.classList.contains( 'prpl-complete-task-btn' ) ) {
+									const form = e.target.closest( 'form' );
+									if ( form ) {
+										const formData = new FormData( form );
+										setFormValues( Object.fromEntries( formData.entries() ) );
+									}
+								}
+							} }
+						/>
+					) : (
+						<>
+							{ task.title && <h4>{ task.title }</h4> }
+							{ task.url && (
+								<a
+									href={ task.url }
+									target="_blank"
+									rel="noopener noreferrer"
+									className="prpl-button-primary"
+								>
+									{ task.action_label || __( 'Do it', 'progress-planner' ) }
+								</a>
+							) }
+						</>
 					) }
 				</div>
 			</div>
