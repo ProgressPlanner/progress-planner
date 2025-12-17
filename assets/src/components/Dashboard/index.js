@@ -5,11 +5,10 @@
  * or the main dashboard with header and widgets.
  */
 
-import { Fragment } from '@wordpress/element';
+import { Fragment, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import DashboardHeader from './DashboardHeader';
 import DashboardWidgets from './DashboardWidgets';
-import Welcome from './Welcome';
 import OnboardingWizard from '../OnboardingWizard';
 
 /**
@@ -46,10 +45,51 @@ const STYLES = {
  */
 export default function Dashboard( { config } ) {
 	const { privacyPolicyAccepted = false } = config;
+	const wizardRef = useRef( null );
 
-	// Show welcome/onboarding if privacy policy not accepted
+	/**
+	 * Handle start onboarding button click.
+	 */
+	const handleStartOnboarding = () => {
+		if (
+			wizardRef.current &&
+			typeof wizardRef.current.startOnboarding === 'function'
+		) {
+			wizardRef.current.startOnboarding();
+		}
+	};
+
+	// Show start button when privacy not accepted (like develop branch)
 	if ( ! privacyPolicyAccepted ) {
-		return <Welcome config={ config } />;
+		return (
+			<Fragment>
+				<div className="prpl-start-onboarding-container">
+					<div className="prpl-start-onboarding-graphic">
+						<img
+							src={ `${
+								config.baseUrl || ''
+							}/assets/images/onboarding/thumbs_up_ravi_rtl.svg` }
+							alt=""
+							style={ {
+								maxWidth: '100%',
+								height: 'auto',
+							} }
+						/>
+					</div>
+					<button
+						className="prpl-button-primary"
+						id="prpl-start-onboarding-button"
+						onClick={ handleStartOnboarding }
+					>
+						{ __(
+							'Are you ready to work on your site?',
+							'progress-planner'
+						) }
+					</button>
+				</div>
+				<OnboardingWizard config={ config } ref={ wizardRef } />
+			</Fragment>
+		);
 	}
 
 	// Show main dashboard (Zustand store provides cross-widget state)
@@ -81,7 +121,7 @@ export default function Dashboard( { config } ) {
 			>
 				<DashboardWidgets />
 			</div>
-			<OnboardingWizard config={ config } />
+			<OnboardingWizard config={ config } ref={ wizardRef } />
 		</Fragment>
 	);
 }

@@ -62,6 +62,29 @@ export default function OnboardingStep( {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ wizardState ] );
 
+	/**
+	 * Handle disabled button click (show error indicator).
+	 *
+	 * @param {Event} e - Click event.
+	 */
+	const handleDisabledClick = ( e ) => {
+		if (
+			nextButtonRef.current?.classList.contains( 'prpl-btn-disabled' )
+		) {
+			e.preventDefault();
+			e.stopPropagation();
+			// Show error indicator (used by WelcomeStep for privacy checkbox).
+			const requiredIndicator = document.querySelector(
+				'.prpl-privacy-checkbox-wrapper .prpl-required-indicator'
+			);
+			if ( requiredIndicator ) {
+				requiredIndicator.classList.add(
+					'prpl-required-indicator-active'
+				);
+			}
+		}
+	};
+
 	return (
 		<div className="onboarding-step">
 			{ children }
@@ -81,7 +104,16 @@ export default function OnboardingStep( {
 						ref={ nextButtonRef }
 						type="button"
 						className={ `prpl-btn ${ buttonClass } prpl-tour-next` }
-						onClick={ onNext }
+						onClick={ ( e ) => {
+							handleDisabledClick( e );
+							if (
+								! nextButtonRef.current?.classList.contains(
+									'prpl-btn-disabled'
+								)
+							) {
+								onNext();
+							}
+						} }
 					>
 						{ buttonText || (
 							<>

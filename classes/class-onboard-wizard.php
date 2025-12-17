@@ -366,6 +366,8 @@ class Onboard_Wizard {
 					'postTypes'           => $post_types_formatted,
 					'pageTypes'           => $page_types,
 					'logoHtml'            => $logo_html,
+					'baseUrl'             => \constant( 'PROGRESS_PLANNER_URL' ),
+					'privacyPolicyUrl'    => \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ),
 					'l10n'                => [
 						'next'                  => \esc_html__( 'Next', 'progress-planner' ),
 						'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),

@@ -28,6 +28,8 @@ export default function WelcomeStep( props ) {
 		timezoneOffset,
 		hasLicense,
 		l10n,
+		baseUrl,
+		privacyPolicyUrl,
 	} = config;
 
 	const { generateLicense, isGenerating } = useLicenseGenerator( {
@@ -93,6 +95,13 @@ export default function WelcomeStep( props ) {
 			{ ...props }
 			onNext={ handleNext }
 			canProceed={ canProceed }
+			buttonText={
+				<>
+					{ __( 'Start onboarding', 'progress-planner' ) }
+					<span className="dashicons dashicons-arrow-right-alt2"></span>
+				</>
+			}
+			buttonClass="prpl-btn-secondary"
 		>
 			<div className="tour-content">
 				<div className="prpl-columns-wrapper-flex prpl-columns-2-1">
@@ -135,33 +144,51 @@ export default function WelcomeStep( props ) {
 										id="prpl-privacy-checkbox"
 										type="checkbox"
 										checked={ privacyAccepted }
-										onChange={ ( e ) =>
+										onChange={ ( e ) => {
 											setPrivacyAccepted(
 												e.target.checked
-											)
-										}
+											);
+											// Remove active class from required indicator (like develop).
+											const requiredIndicator =
+												document.querySelector(
+													'.prpl-privacy-checkbox-wrapper .prpl-required-indicator'
+												);
+											if ( requiredIndicator ) {
+												requiredIndicator.classList.remove(
+													'prpl-required-indicator-active'
+												);
+											}
+										} }
 									/>
 									<span>
 										{ sprintf(
-											/* translators: %s: Privacy policy link */
+											/* translators: %1$s: progressplanner.com/privacy-policy link, %2$s: required indicator */
 											__(
-												'I agree to the %s.',
+												'I accept the %1$s and the essential data processing needed for the plugin. %2$s',
 												'progress-planner'
 											),
 											<Fragment key="privacy-link">
 												<a
 													href={
-														config.privacyPolicyUrl ||
+														privacyPolicyUrl ||
 														'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy'
 													}
 													target="_blank"
 													rel="noopener noreferrer"
 												>
 													{ __(
-														'Privacy policy',
+														'privacy policy',
 														'progress-planner'
 													) }
 												</a>
+											</Fragment>,
+											<Fragment key="required-indicator">
+												<span className="prpl-required-indicator">
+													{ __(
+														'Required',
+														'progress-planner'
+													) }
+												</span>
 											</Fragment>
 										) }
 									</span>
@@ -180,23 +207,16 @@ export default function WelcomeStep( props ) {
 					</div>
 					<div className="prpl-column prpl-hide-on-mobile">
 						<div id="prpl-welcome-graphic">
-							{ /* Graphic would be rendered here - thumbs_up_ravi_rtl.svg */ }
-							<div
+							<img
+								src={ `${
+									baseUrl || ''
+								}/assets/images/onboarding/thumbs_up_ravi_rtl.svg` }
+								alt=""
 								style={ {
-									width: '100%',
-									height: '200px',
-									backgroundColor: '#f0f0f0',
-									display: 'flex',
-									alignItems: 'center',
-									justifyContent: 'center',
-									color: '#999',
+									maxWidth: '100%',
+									height: 'auto',
 								} }
-							>
-								{ __(
-									'Graphic placeholder',
-									'progress-planner'
-								) }
-							</div>
+							/>
 						</div>
 					</div>
 				</div>
