@@ -18,7 +18,6 @@ import { __ } from '@wordpress/i18n';
  *
  * @param {Object}   props             - Component props.
  * @param {Object}   props.wizardState - Current wizard state.
- * @param {Function} props.updateState - Function to update wizard state.
  * @param {Function} props.onNext      - Callback when next is clicked.
  * @param {Function} props.onBack      - Callback when back is clicked.
  * @param {Function} props.canProceed  - Function to check if step can proceed.

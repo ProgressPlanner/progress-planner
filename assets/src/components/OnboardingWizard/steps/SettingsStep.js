@@ -92,10 +92,10 @@ export default function SettingsStep( props ) {
 	const saveAllSettings = async () => {
 		setIsSaving( true );
 		try {
-			const pages = {};
+			const pagesData = {};
 			[ 'homepage', 'about', 'contact', 'faq' ].forEach( ( pageType ) => {
 				if ( settings[ pageType ] ) {
-					pages[ pageType ] = {
+					pagesData[ pageType ] = {
 						id: settings[ pageType ].pageId || 0,
 						have_page: settings[ pageType ].hasPage
 							? 'yes'
@@ -109,7 +109,7 @@ export default function SettingsStep( props ) {
 				data: {
 					action: 'prpl_save_all_onboarding_settings',
 					nonce,
-					pages: JSON.stringify( pages ),
+					pages: JSON.stringify( pagesData ),
 					'prpl-post-types-include':
 						settings[ 'post-types' ]?.selectedTypes || [],
 					'prpl-redirect-on-login': settings[ 'login-destination' ]
@@ -162,17 +162,20 @@ export default function SettingsStep( props ) {
 			case 'contact':
 			case 'faq': {
 				const pageType = pageTypes[ subStepName ] || {};
-				const pageTitle =
-					pageType.title ||
-					( subStepName === 'homepage'
-						? __( 'Home page', 'progress-planner' )
-						: subStepName === 'about'
-						? __( 'About page', 'progress-planner' )
-						: subStepName === 'contact'
-						? __( 'Contact page', 'progress-planner' )
-						: subStepName === 'faq'
-						? __( 'FAQ page', 'progress-planner' )
-						: subStepName );
+				let pageTitle = pageType.title;
+				if ( ! pageTitle ) {
+					if ( subStepName === 'homepage' ) {
+						pageTitle = __( 'Home page', 'progress-planner' );
+					} else if ( subStepName === 'about' ) {
+						pageTitle = __( 'About page', 'progress-planner' );
+					} else if ( subStepName === 'contact' ) {
+						pageTitle = __( 'Contact page', 'progress-planner' );
+					} else if ( subStepName === 'faq' ) {
+						pageTitle = __( 'FAQ page', 'progress-planner' );
+					} else {
+						pageTitle = subStepName;
+					}
+				}
 				const pageDescription =
 					pageType.description ||
 					__( 'Select a page', 'progress-planner' );
@@ -238,7 +241,7 @@ export default function SettingsStep( props ) {
 										</select>
 									</div>
 									<div className="prpl-checkbox-wrapper">
-										<label>
+										<label htmlFor={ `prpl-no-${ subStepName }-page` }>
 											<input
 												type="checkbox"
 												id={ `prpl-no-${ subStepName }-page` }
@@ -295,6 +298,7 @@ export default function SettingsStep( props ) {
 							{ postTypes.map( ( postType ) => (
 								<label
 									key={ postType.id }
+									htmlFor={ `prpl-post-type-${ postType.id }` }
 									style={ {
 										display: 'block',
 										marginBottom: '0.5rem',
@@ -302,6 +306,7 @@ export default function SettingsStep( props ) {
 								>
 									<input
 										type="checkbox"
+										id={ `prpl-post-type-${ postType.id }` }
 										value={ postType.id }
 										checked={
 											subStepData.selectedTypes?.includes(
@@ -356,7 +361,7 @@ export default function SettingsStep( props ) {
 								{ currentSubStep + 1 }/{ SUB_STEPS.length }
 							</span>
 						</h3>
-						<label>
+						<label htmlFor="prpl-redirect-on-login">
 							<input
 								type="checkbox"
 								id="prpl-redirect-on-login"
