@@ -55,6 +55,11 @@ export const useDashboardStore = create( ( set ) => ( {
 	 */
 	cacheInvalidatedAt: null,
 
+	/**
+	 * Flag to indicate if the onboarding wizard should auto-start.
+	 */
+	shouldAutoStartWizard: false,
+
 	// Actions
 
 	/**
@@ -112,6 +117,14 @@ export const useDashboardStore = create( ( set ) => ( {
 	 * Invalidate cache to trigger widget refetch.
 	 */
 	invalidateCache: () => set( { cacheInvalidatedAt: Date.now() } ),
+
+	/**
+	 * Set whether the onboarding wizard should auto-start.
+	 *
+	 * @param {boolean} value - Whether to auto-start the wizard.
+	 */
+	setShouldAutoStartWizard: ( value ) =>
+		set( { shouldAutoStartWizard: value } ),
 } ) );
 
 /**

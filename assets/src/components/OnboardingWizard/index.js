@@ -12,8 +12,10 @@ import {
 	useImperativeHandle,
 	forwardRef,
 	useRef,
+	useCallback,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useDashboardStore } from '../../stores/dashboardStore';
 import { useOnboardingWizard } from '../../hooks/useOnboardingWizard';
 import { useOnboardingProgress } from '../../hooks/useOnboardingProgress';
 import WelcomeStep from './steps/WelcomeStep';
@@ -60,6 +62,12 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	const [ showQuitConfirmation, setShowQuitConfirmation ] = useState( false );
 	const [ isOpen, setIsOpen ] = useState( false );
 	const popoverRef = useRef( null );
+	const shouldAutoStartWizard = useDashboardStore(
+		( state ) => state.shouldAutoStartWizard
+	);
+	const setShouldAutoStartWizard = useDashboardStore(
+		( state ) => state.setShouldAutoStartWizard
+	);
 
 	// Expose startOnboarding method via ref (like develop's window.prplOnboardWizard.startOnboarding).
 	useImperativeHandle( ref, () => ( {
@@ -86,78 +94,63 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	} ) );
 
 	/**
-	 * Safely show the popover with retry mechanism.
-	 * Waits for the popover element to be ready before showing it.
+	 * Ref callback to detect when popover element is mounted.
+	 * Checks Zustand store for auto-start flag and handles auto-start.
 	 *
-	 * @param {number} retries - Number of retries remaining.
+	 * @param {HTMLElement|null} element - The popover element or null when unmounted.
 	 * @return {void}
 	 */
-	const showPopoverSafely = ( retries = 10 ) => {
-		if ( retries <= 0 ) {
-			// Max retries reached, give up silently
-			return;
-		}
+	const popoverRefCallback = useCallback(
+		( element ) => {
+			// Store ref for imperative handle
+			popoverRef.current = element;
 
-		if (
-			popoverRef.current &&
-			typeof popoverRef.current.showPopover === 'function'
-		) {
-			// Popover is ready, show it
-			popoverRef.current.showPopover();
-			setIsOpen( true );
+			// Only proceed if element is mounted and wizard is enabled
+			if ( ! element || ! onboardingWizard?.enabled ) {
+				return;
+			}
 
-			// Move focus to popover for keyboard accessibility
-			setTimeout( () => {
-				if ( popoverRef.current ) {
-					popoverRef.current.focus();
+			// Don't auto-start if wizard is already finished
+			if ( wizardState.data.finished ) {
+				return;
+			}
+
+			// Check if we should auto-start (from Zustand store or saved progress)
+			const hasSavedProgress =
+				savedProgress &&
+				Object.keys( savedProgress ).length > 0;
+
+			// Auto-start if:
+			// 1. Zustand flag is set (privacy not accepted or resuming)
+			// 2. There's saved progress (resuming)
+			if ( shouldAutoStartWizard || hasSavedProgress ) {
+				// Popover element is now in DOM, safe to show
+				if ( typeof element.showPopover === 'function' ) {
+					element.showPopover();
+					setIsOpen( true );
+
+					// Clear the Zustand flag after starting
+					if ( shouldAutoStartWizard ) {
+						setShouldAutoStartWizard( false );
+					}
+
+					// Move focus to popover for keyboard accessibility
+					setTimeout( () => {
+						if ( element ) {
+							element.focus();
+						}
+					}, 0 );
 				}
-			}, 0 );
-		} else {
-			// Popover not ready yet, retry after a short delay
-			setTimeout( () => {
-				showPopoverSafely( retries - 1 );
-			}, 50 );
-		}
-	};
-
-	// Auto-open wizard if there's no saved progress (like develop's trigger_onboarding).
-	// This happens regardless of privacy status.
-	useEffect( () => {
-		// Don't show if wizard is already finished.
-		if ( wizardState.data.finished ) {
-			return;
-		}
-
-		// Don't show if wizard is not enabled.
-		if ( ! onboardingWizard?.enabled ) {
-			return;
-		}
-
-		// Show wizard if:
-		// 1. There's saved progress (user is resuming)
-		// 2. No saved progress and privacy not accepted (auto-start like develop)
-		// Note: When privacy is accepted and no saved progress, wizard should NOT auto-start
-		// (only show if manually started or if there's saved progress)
-		if ( savedProgress ) {
-			// User is resuming - always show
-			// Use requestAnimationFrame to ensure DOM is ready, then retry if needed
-			requestAnimationFrame( () => {
-				showPopoverSafely();
-			} );
-		} else if ( ! config.privacyPolicyAccepted ) {
-			// No saved progress and privacy not accepted - auto-start (like develop)
-			// Use requestAnimationFrame to ensure DOM is ready, then retry if needed
-			requestAnimationFrame( () => {
-				showPopoverSafely();
-			} );
-		}
-		// If privacy is accepted and no saved progress, wizard stays closed (user can start manually)
-	}, [
-		savedProgress,
-		config.privacyPolicyAccepted,
-		onboardingWizard?.enabled,
-		wizardState.data.finished,
-	] );
+			}
+		},
+		[
+			onboardingWizard?.enabled,
+			wizardState.data.finished,
+			savedProgress,
+			shouldAutoStartWizard,
+			setShouldAutoStartWizard,
+		]
+	);
 
 	// Handle keyboard navigation (Escape key to close).
 	useEffect( () => {
@@ -265,7 +258,7 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	return (
 		<>
 			<div
-				ref={ popoverRef }
+				ref={ popoverRefCallback }
 				id="prpl-popover-onboarding"
 				className="prpl-popover-onboarding"
 				popover="manual"

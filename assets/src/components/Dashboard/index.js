@@ -5,8 +5,9 @@
  * or the main dashboard with header and widgets.
  */
 
-import { Fragment, useRef } from '@wordpress/element';
+import { Fragment, useRef, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { useDashboardStore } from '../../stores/dashboardStore';
 import DashboardHeader from './DashboardHeader';
 import DashboardWidgets from './DashboardWidgets';
 import OnboardingWizard from '../OnboardingWizard';
@@ -46,6 +47,24 @@ const STYLES = {
 export default function Dashboard( { config } ) {
 	const { privacyPolicyAccepted = false } = config;
 	const wizardRef = useRef( null );
+	const setShouldAutoStartWizard = useDashboardStore(
+		( state ) => state.setShouldAutoStartWizard
+	);
+
+	// Set auto-start flag when privacy is not accepted (like develop branch)
+	useEffect( () => {
+		// Check if there's saved progress (resuming)
+		const hasSavedProgress =
+			config.onboardingWizard?.savedProgress &&
+			Object.keys( config.onboardingWizard.savedProgress ).length > 0;
+
+		// Auto-start if:
+		// 1. Privacy not accepted (fresh install)
+		// 2. There's saved progress (resuming)
+		if ( ! privacyPolicyAccepted || hasSavedProgress ) {
+			setShouldAutoStartWizard( true );
+		}
+	}, [ privacyPolicyAccepted, config.onboardingWizard?.savedProgress, setShouldAutoStartWizard ] );
 
 	/**
 	 * Handle start onboarding button click.
