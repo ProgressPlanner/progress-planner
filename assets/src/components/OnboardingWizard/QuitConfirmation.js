@@ -46,9 +46,16 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 				justifyContent: 'center',
 				zIndex: 100000,
 			} }
-			onClick={ onCancel }
+			onClick={ ( e ) => {
+				// Only cancel if clicking directly on the overlay, not on child elements
+				if ( e.target === e.currentTarget ) {
+					console.log( '[QuitConfirmation] Overlay clicked (outside dialog), canceling' );
+					onCancel();
+				}
+			} }
 			onKeyDown={ ( e ) => {
 				if ( e.key === 'Escape' ) {
+					console.log( '[QuitConfirmation] Escape key pressed, canceling' );
 					onCancel();
 				}
 			} }
@@ -62,8 +69,13 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 					maxWidth: '1200px',
 					width: '80vw',
 					boxShadow: '0 4px 6px rgba(0, 0, 0, 0.1)',
+					position: 'relative',
+					zIndex: 100001,
 				} }
-				onClick={ ( e ) => e.stopPropagation() }
+				onClick={ ( e ) => {
+					console.log( '[QuitConfirmation] Dialog clicked', { target: e.target.tagName } );
+					e.stopPropagation();
+				} }
 				onKeyDown={ ( e ) => e.stopPropagation() }
 			>
 				<div className="prpl-columns-wrapper-flex prpl-columns-2-1">
