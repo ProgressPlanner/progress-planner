@@ -66,4 +66,3 @@ export function useTaskCompletion( { ajaxUrl, nonce } ) {
 		error,
 	};
 }
-

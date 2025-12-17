@@ -64,4 +64,3 @@ export function useOnboardingProgress( { ajaxUrl, nonce } ) {
 		error,
 	};
 }
-
