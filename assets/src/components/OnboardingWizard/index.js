@@ -185,6 +185,7 @@ export default function OnboardingWizard( { config } ) {
 				<QuitConfirmation
 					onConfirm={ handleQuit }
 					onCancel={ handleCancelQuit }
+					config={ onboardingWizard }
 				/>
 			) }
 		</>
