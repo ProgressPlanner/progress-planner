@@ -133,14 +133,15 @@ export default function OnboardTask( { task, config, onComplete } ) {
 					</button>
 				</div>
 				<div className="prpl-task-form">
-					{ isLoadingTemplate ? (
+					{ isLoadingTemplate && (
 						<div className="prpl-spinner">
 							<span
 								className="spinner"
 								style={ { visibility: 'visible' } }
 							></span>
 						</div>
-					) : templateHtml ? (
+					) }
+					{ ! isLoadingTemplate && templateHtml && (
 						<div
 							dangerouslySetInnerHTML={ { __html: templateHtml } }
 							onClick={ ( e ) => {
