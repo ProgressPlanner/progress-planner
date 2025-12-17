@@ -150,6 +150,8 @@ export default function OnboardingWizard( { config } ) {
 			<div
 				id="prpl-popover-onboarding"
 				className="prpl-popover-onboarding"
+				popover="manual"
+				tabIndex={ -1 }
 				data-prpl-step={ currentStep }
 				role="dialog"
 				aria-modal="true"
