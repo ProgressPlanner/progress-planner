@@ -53,16 +53,33 @@ export default function Dashboard( { config } ) {
 
 	// Set auto-start flag when privacy is not accepted (like develop branch)
 	useEffect( () => {
+		console.log( '[Dashboard] Auto-start useEffect running', {
+			privacyPolicyAccepted,
+			hasOnboardingWizard: !! config.onboardingWizard,
+			savedProgress: config.onboardingWizard?.savedProgress,
+		} );
+
 		// Check if there's saved progress (resuming)
 		const hasSavedProgress =
 			config.onboardingWizard?.savedProgress &&
 			Object.keys( config.onboardingWizard.savedProgress ).length > 0;
 
+		console.log( '[Dashboard] Checking auto-start conditions', {
+			privacyPolicyAccepted,
+			hasSavedProgress,
+			savedProgressKeys: config.onboardingWizard?.savedProgress
+				? Object.keys( config.onboardingWizard.savedProgress )
+				: [],
+		} );
+
 		// Auto-start if:
 		// 1. Privacy not accepted (fresh install)
 		// 2. There's saved progress (resuming)
 		if ( ! privacyPolicyAccepted || hasSavedProgress ) {
+			console.log( '[Dashboard] Setting shouldAutoStartWizard to true' );
 			setShouldAutoStartWizard( true );
+		} else {
+			console.log( '[Dashboard] NOT setting auto-start flag (conditions not met)' );
 		}
 	}, [ privacyPolicyAccepted, config.onboardingWizard?.savedProgress, setShouldAutoStartWizard ] );
 

@@ -69,6 +69,28 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 		( state ) => state.setShouldAutoStartWizard
 	);
 
+	// Log Zustand store state changes
+	useEffect( () => {
+		console.log( '[OnboardingWizard] Zustand shouldAutoStartWizard changed', {
+			shouldAutoStartWizard,
+			wizardEnabled: onboardingWizard?.enabled,
+			wizardFinished: wizardState.data.finished,
+			isOpen,
+		} );
+	}, [ shouldAutoStartWizard, onboardingWizard?.enabled, wizardState.data.finished, isOpen ] );
+
+	// Log component mount and initial state
+	useEffect( () => {
+		console.log( '[OnboardingWizard] Component mounted/updated', {
+			wizardEnabled: onboardingWizard?.enabled,
+			wizardFinished: wizardState.data.finished,
+			privacyPolicyAccepted: config.privacyPolicyAccepted,
+			hasSavedProgress: !! savedProgress,
+			shouldAutoStartWizard,
+			isOpen,
+		} );
+	}, [] );
+
 	// Expose startOnboarding method via ref (like develop's window.prplOnboardWizard.startOnboarding).
 	useImperativeHandle( ref, () => ( {
 		startOnboarding() {
@@ -102,21 +124,43 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	 */
 		const popoverRefCallback = useCallback(
 		( element ) => {
+			console.log( '[OnboardingWizard] popoverRefCallback called', {
+				element: !! element,
+				elementId: element?.id,
+				hasShowPopover: element && typeof element.showPopover === 'function',
+				wizardEnabled: onboardingWizard?.enabled,
+				wizardFinished: wizardState.data.finished,
+				isOpen,
+				shouldAutoStartWizard,
+				savedProgress: !! savedProgress,
+				savedProgressKeys: savedProgress
+					? Object.keys( savedProgress )
+					: [],
+			} );
+
 			// Store ref for imperative handle
 			popoverRef.current = element;
 
 			// Only proceed if element is mounted and wizard is enabled
-			if ( ! element || ! onboardingWizard?.enabled ) {
+			if ( ! element ) {
+				console.log( '[OnboardingWizard] Ref callback: No element, returning' );
+				return;
+			}
+
+			if ( ! onboardingWizard?.enabled ) {
+				console.log( '[OnboardingWizard] Ref callback: Wizard not enabled, returning' );
 				return;
 			}
 
 			// Don't auto-start if wizard is already finished
 			if ( wizardState.data.finished ) {
+				console.log( '[OnboardingWizard] Ref callback: Wizard already finished, returning' );
 				return;
 			}
 
 			// Don't auto-start if popover is already open
 			if ( isOpen ) {
+				console.log( '[OnboardingWizard] Ref callback: Popover already open, returning' );
 				return;
 			}
 
@@ -125,27 +169,51 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 				savedProgress &&
 				Object.keys( savedProgress ).length > 0;
 
+			console.log( '[OnboardingWizard] Ref callback: Checking auto-start conditions', {
+				shouldAutoStartWizard,
+				hasSavedProgress,
+				willAutoStart: shouldAutoStartWizard || hasSavedProgress,
+			} );
+
 			// Auto-start if:
 			// 1. Zustand flag is set (privacy not accepted or resuming)
 			// 2. There's saved progress (resuming)
 			if ( shouldAutoStartWizard || hasSavedProgress ) {
+				console.log( '[OnboardingWizard] Ref callback: Attempting to show popover' );
+
 				// Popover element is now in DOM, safe to show
 				if ( typeof element.showPopover === 'function' ) {
-					element.showPopover();
-					setIsOpen( true );
+					console.log( '[OnboardingWizard] Ref callback: Calling showPopover()' );
+					try {
+						element.showPopover();
+						setIsOpen( true );
+						console.log( '[OnboardingWizard] Ref callback: showPopover() called successfully, isOpen set to true' );
 
-					// Clear the Zustand flag after starting
-					if ( shouldAutoStartWizard ) {
-						setShouldAutoStartWizard( false );
-					}
-
-					// Move focus to popover for keyboard accessibility
-					setTimeout( () => {
-						if ( element ) {
-							element.focus();
+						// Clear the Zustand flag after starting
+						if ( shouldAutoStartWizard ) {
+							console.log( '[OnboardingWizard] Ref callback: Clearing shouldAutoStartWizard flag' );
+							setShouldAutoStartWizard( false );
 						}
-					}, 0 );
+
+						// Move focus to popover for keyboard accessibility
+						setTimeout( () => {
+							if ( element ) {
+								element.focus();
+								console.log( '[OnboardingWizard] Ref callback: Focus moved to popover' );
+							}
+						}, 0 );
+					} catch ( error ) {
+						console.error( '[OnboardingWizard] Ref callback: Error calling showPopover()', error );
+					}
+				} else {
+					console.warn( '[OnboardingWizard] Ref callback: element.showPopover is not a function', {
+						element,
+						showPopover: element.showPopover,
+						typeof: typeof element.showPopover,
+					} );
 				}
+			} else {
+				console.log( '[OnboardingWizard] Ref callback: Auto-start conditions not met, not showing popover' );
 			}
 		},
 		[
@@ -258,8 +326,21 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	// Always render wizard (like develop's add_popover), but control visibility via isOpen.
 	// If wizard is not enabled, don't render at all.
 	if ( ! onboardingWizard?.enabled ) {
+		console.log( '[OnboardingWizard] Not rendering: wizard not enabled', {
+			onboardingWizard: !! onboardingWizard,
+			enabled: onboardingWizard?.enabled,
+		} );
 		return null;
 	}
+
+	console.log( '[OnboardingWizard] Rendering wizard', {
+		wizardEnabled: onboardingWizard?.enabled,
+		wizardFinished: wizardState.data.finished,
+		isOpen,
+		shouldAutoStartWizard,
+		hasSavedProgress: !! savedProgress,
+		currentStep,
+	} );
 
 	return (
 		<>
