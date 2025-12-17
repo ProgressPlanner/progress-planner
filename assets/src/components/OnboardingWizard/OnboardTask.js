@@ -72,6 +72,7 @@ export default function OnboardTask( { task, config, onComplete } ) {
 		};
 
 		fetchTemplate();
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ task?.task_id, task?.template_html, ajaxUrl, nonce ] );
 
 	/**
