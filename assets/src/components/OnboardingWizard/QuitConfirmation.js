@@ -18,6 +18,12 @@ import { __, sprintf } from '@wordpress/i18n';
  * @return {JSX.Element} Quit confirmation dialog.
  */
 export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
+	console.log( '[QuitConfirmation] Component rendered', {
+		hasOnConfirm: typeof onConfirm === 'function',
+		hasOnCancel: typeof onCancel === 'function',
+		hasConfig: !! config,
+	} );
+
 	const brandingName =
 		config?.l10n?.brandingName ||
 		__( 'Progress Planner', 'progress-planner' );
@@ -103,7 +109,18 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 									type="button"
 									id="prpl-quit-yes"
 									className="prpl-quit-link"
-									onClick={ onConfirm }
+									onClick={ ( e ) => {
+										console.log( '[QuitConfirmation] Yes button clicked', {
+											hasOnConfirm: typeof onConfirm === 'function',
+										} );
+										e.preventDefault();
+										e.stopPropagation();
+										if ( typeof onConfirm === 'function' ) {
+											onConfirm();
+										} else {
+											console.error( '[QuitConfirmation] onConfirm is not a function', onConfirm );
+										}
+									} }
 								>
 									{ __(
 										'Yes, quit the onboarding (for now)',
@@ -114,7 +131,14 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 									type="button"
 									id="prpl-quit-no"
 									className="prpl-quit-link prpl-quit-link-primary"
-									onClick={ onCancel }
+									onClick={ ( e ) => {
+										console.log( '[QuitConfirmation] No button clicked' );
+										e.preventDefault();
+										e.stopPropagation();
+										if ( typeof onCancel === 'function' ) {
+											onCancel();
+										}
+									} }
 								>
 									{ __(
 										"No, let's finish the onboarding!",
