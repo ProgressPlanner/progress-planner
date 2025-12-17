@@ -34,6 +34,11 @@ class Editor {
 			return;
 		}
 
+		// Only load on Page edit screen and if the user can edit others posts.
+		if ( 'page' !== \get_post_type() || ! \current_user_can( 'edit_others_posts' ) ) {
+			return;
+		}
+
 		$page_types = \progress_planner()->get_page_types()->get_page_types();
 
 		// Check if the page-type is set in the URL (user is coming from the Settings page).
