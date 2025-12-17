@@ -8,6 +8,7 @@
 
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 import OnboardingStep from '../OnboardingStep';
 
 /**
@@ -17,8 +18,8 @@ import OnboardingStep from '../OnboardingStep';
  * @return {JSX.Element} EmailFrequency step component.
  */
 export default function EmailFrequencyStep( props ) {
-	const { wizardState, updateState, config } = props;
-	const { userFirstName = '', userEmail = '' } = config;
+	const { wizardState, updateState, config, onNext } = props;
+	const { userFirstName = '', userEmail = '', site, timezoneOffset } = config;
 
 	const [ emailFrequency, setEmailFrequency ] = useState(
 		wizardState.data.emailFrequency || {
@@ -27,6 +28,9 @@ export default function EmailFrequencyStep( props ) {
 			email: userEmail,
 		}
 	);
+
+	const [ isSubscribing, setIsSubscribing ] = useState( false );
+	const [ subscriptionError, setSubscriptionError ] = useState( null );
 
 	// Update wizard state when email frequency changes.
 	useEffect( () => {
@@ -44,6 +48,11 @@ export default function EmailFrequencyStep( props ) {
 	 * @return {boolean} True if can proceed.
 	 */
 	const canProceed = () => {
+		// Disable button while subscribing.
+		if ( isSubscribing ) {
+			return false;
+		}
+
 		if ( ! emailFrequency.choice ) {
 			return false;
 		}
@@ -61,8 +70,67 @@ export default function EmailFrequencyStep( props ) {
 		return false;
 	};
 
+	/**
+	 * Handle next button click.
+	 * Subscribes user if they chose weekly emails, then proceeds to next step.
+	 */
+	const handleNext = async () => {
+		// If user chose "don't email", proceed immediately without API call.
+		if ( emailFrequency.choice === 'none' ) {
+			onNext();
+			return;
+		}
+
+		// If user chose "weekly", subscribe via REST API first.
+		if ( emailFrequency.choice === 'weekly' ) {
+			setIsSubscribing( true );
+			setSubscriptionError( null );
+
+			try {
+				const siteUrl = site || window.location.origin;
+				const tzOffset = timezoneOffset !== undefined
+					? timezoneOffset
+					: new Date().getTimezoneOffset() / -60; // Convert to hours
+
+				const response = await apiFetch( {
+					path: '/progress-planner/v1/popover/subscribe',
+					method: 'POST',
+					data: {
+						name: emailFrequency.name.trim(),
+						email: emailFrequency.email.trim(),
+						site: siteUrl,
+						timezone_offset: tzOffset,
+						with_email: 'yes',
+					},
+				} );
+
+				if ( response.success ) {
+					// Subscription successful, proceed to next step.
+					onNext();
+				} else {
+					throw new Error(
+						response.message ||
+							__( 'Failed to subscribe. Please try again.', 'progress-planner' )
+					);
+				}
+			} catch ( error ) {
+				console.error( 'Failed to subscribe:', error );
+				setSubscriptionError(
+					error.message ||
+						__( 'Failed to subscribe. Please try again.', 'progress-planner' )
+				);
+			} finally {
+				setIsSubscribing( false );
+			}
+		}
+	};
+
 	return (
-		<OnboardingStep { ...props } canProceed={ canProceed }>
+		<OnboardingStep
+			{ ...props }
+			canProceed={ canProceed }
+			onNext={ handleNext }
+		>
 			<div className="tour-content">
 				<h3 className="tour-title">
 					{ __( 'Email Frequency', 'progress-planner' ) }
@@ -73,6 +141,22 @@ export default function EmailFrequencyStep( props ) {
 						'progress-planner'
 					) }
 				</p>
+
+				{ subscriptionError && (
+					<div
+						className="prpl-error-message"
+						style={ {
+							padding: '0.75rem',
+							marginBottom: '1rem',
+							backgroundColor: '#fee',
+							border: '1px solid #fcc',
+							borderRadius: '4px',
+							color: '#c33',
+						} }
+					>
+						{ subscriptionError }
+					</div>
+				) }
 
 				<div className="prpl-email-frequency-options">
 					<label
@@ -85,12 +169,13 @@ export default function EmailFrequencyStep( props ) {
 							name="email-frequency"
 							value="weekly"
 							checked={ emailFrequency.choice === 'weekly' }
-							onChange={ ( e ) =>
+							onChange={ ( e ) => {
 								setEmailFrequency( {
 									...emailFrequency,
 									choice: e.target.value,
-								} )
-							}
+								} );
+								setSubscriptionError( null );
+							} }
 						/>
 						<span>
 							{ __( 'Email me weekly', 'progress-planner' ) }
@@ -107,12 +192,13 @@ export default function EmailFrequencyStep( props ) {
 							name="email-frequency"
 							value="none"
 							checked={ emailFrequency.choice === 'none' }
-							onChange={ ( e ) =>
+							onChange={ ( e ) => {
 								setEmailFrequency( {
 									...emailFrequency,
 									choice: e.target.value,
-								} )
-							}
+								} );
+								setSubscriptionError( null );
+							} }
 						/>
 						<span>
 							{ __( "Don't email me", 'progress-planner' ) }

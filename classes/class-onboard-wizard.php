@@ -198,7 +198,7 @@ class Onboard_Wizard {
 		// Add more-tasks step if there are remaining tasks.
 		if ( ! empty( $tasks ) ) {
 			// Convert tasks object to array for React.
-			$tasks_array = \array_values( $tasks );
+			$tasks_array   = \array_values( $tasks );
 			$this->steps[] = [
 				'script_file_name'   => 'MoreTasksStep',
 				'template_file_name' => 'more-tasks',
@@ -273,7 +273,12 @@ class Onboard_Wizard {
 		}
 
 		// Get pages for settings step.
-		$pages = \get_pages( [ 'sort_column' => 'post_title', 'sort_order' => 'ASC' ] );
+		$pages           = \get_pages(
+			[
+				'sort_column' => 'post_title',
+				'sort_order'  => 'ASC',
+			]
+		);
 		$pages_formatted = [];
 		foreach ( $pages as $page ) {
 			$pages_formatted[] = [
@@ -283,7 +288,7 @@ class Onboard_Wizard {
 		}
 
 		// Get post types for settings step.
-		$post_types = \progress_planner()->get_settings()->get_public_post_types();
+		$post_types           = \progress_planner()->get_settings()->get_public_post_types();
 		$post_types_formatted = [];
 		foreach ( $post_types as $post_type ) {
 			$post_type_obj = \get_post_type_object( $post_type );
@@ -300,20 +305,20 @@ class Onboard_Wizard {
 			'progress_planner_dashboard_config',
 			function ( $config ) use ( $steps_formatted, $saved_progress, $pages_formatted, $post_types_formatted ) {
 				$config['onboardingWizard'] = [
-					'enabled'          => true,
-					'steps'            => $steps_formatted,
-					'savedProgress'    => $saved_progress,
-					'ajaxUrl'          => \admin_url( 'admin-ajax.php' ),
-					'nonce'            => \wp_create_nonce( 'progress_planner' ),
-					'onboardAPIUrl'    => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
-					'onboardNonceURL'  => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
-					'site'             => \esc_attr( \set_url_scheme( \site_url() ) ),
-					'timezoneOffset'   => (float) ( \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600 ),
+					'enabled'             => true,
+					'steps'               => $steps_formatted,
+					'savedProgress'       => $saved_progress,
+					'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
+					'nonce'               => \wp_create_nonce( 'progress_planner' ),
+					'onboardAPIUrl'       => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
+					'onboardNonceURL'     => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
+					'site'                => \esc_attr( \set_url_scheme( \site_url() ) ),
+					'timezoneOffset'      => (float) ( \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600 ),
 					'lastStepRedirectUrl' => \esc_url_raw( \admin_url( 'admin.php?page=progress-planner' ) ),
-					'hasLicense'       => false !== \progress_planner()->get_license_key(),
-					'pages'            => $pages_formatted,
-					'postTypes'        => $post_types_formatted,
-					'l10n'             => [
+					'hasLicense'          => false !== \progress_planner()->get_license_key(),
+					'pages'               => $pages_formatted,
+					'postTypes'           => $post_types_formatted,
+					'l10n'                => [
 						'next'                  => \esc_html__( 'Next', 'progress-planner' ),
 						'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),
 						/* translators: %s: Progress Planner name. */
@@ -500,8 +505,8 @@ class Onboard_Wizard {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task ID is required.', 'progress-planner' ) ] );
 		}
 
-		$task_id = \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$task_data = isset( $_POST['task_data'] ) ? \json_decode( \wp_unslash( $_POST['task_data'] ), true ) : []; // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$task_id   = \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+		$task_data = isset( $_POST['task_data'] ) ? \json_decode( \sanitize_text_field( \wp_unslash( $_POST['task_data'] ) ), true ) : []; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON data is decoded and validated
 
 		$template_file = \constant( 'PROGRESS_PLANNER_DIR' ) . '/views/onboarding/tasks/' . $task_id . '.php';
 		if ( ! \file_exists( $template_file ) ) {
