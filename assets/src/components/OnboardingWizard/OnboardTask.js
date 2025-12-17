@@ -165,6 +165,30 @@ export default function OnboardTask( { task, config, onComplete } ) {
 									}
 								}
 							} }
+							onKeyDown={ ( e ) => {
+								if ( e.key === 'Enter' || e.key === ' ' ) {
+									e.preventDefault();
+									const target = e.target;
+									if (
+										target.classList.contains(
+											'prpl-complete-task-btn'
+										)
+									) {
+										const form = target.closest( 'form' );
+										if ( form ) {
+											const formData = new FormData( form );
+											setFormValues(
+												Object.fromEntries(
+													formData.entries()
+												)
+											);
+											setTimeout( () => handleComplete(), 0 );
+										}
+									}
+								}
+							} }
+							role="document"
+							tabIndex={ -1 }
 							ref={ ( el ) => {
 								if ( el && templateHtml ) {
 									// Re-initialize file upload handlers after template is rendered.
@@ -172,14 +196,16 @@ export default function OnboardTask( { task, config, onComplete } ) {
 										el.querySelectorAll(
 											'input[type="file"]'
 										);
-									fileInputs.forEach( ( input ) => {
-										// File upload handling will be done by existing JavaScript if available.
-										// The PHP template includes the necessary data attributes.
+									// File upload handling will be done by existing JavaScript if available.
+									// eslint-disable-next-line no-unused-vars
+									fileInputs.forEach( () => {
+										// File inputs are handled by existing event listeners.
 									} );
 								}
 							} }
 						/>
-					) : (
+					) }
+					{ ! isLoadingTemplate && ! templateHtml && (
 						<>
 							{ task.title && <h4>{ task.title }</h4> }
 							{ task.url && (
