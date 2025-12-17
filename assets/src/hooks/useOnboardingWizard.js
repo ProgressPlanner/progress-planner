@@ -7,7 +7,6 @@
  */
 
 import { useState, useCallback, useEffect } from '@wordpress/element';
-import { useOnboardingProgress } from './useOnboardingProgress';
 
 /**
  * Hook for managing onboarding wizard state.
@@ -90,8 +89,8 @@ export function useOnboardingWizard( config, progressHooks ) {
 	 */
 	const prevStep = useCallback( () => {
 		setWizardState( ( prev ) => {
-			const prevStep = Math.max( prev.currentStep - 1, 0 );
-			return { ...prev, currentStep: prevStep };
+			const previousStep = Math.max( prev.currentStep - 1, 0 );
+			return { ...prev, currentStep: previousStep };
 		} );
 	}, [] );
 

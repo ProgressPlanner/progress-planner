@@ -192,7 +192,10 @@ export default function WelcomeStep( props ) {
 									color: '#999',
 								} }
 							>
-								{ __( 'Graphic placeholder', 'progress-planner' ) }
+								{ __(
+									'Graphic placeholder',
+									'progress-planner'
+								) }
 							</div>
 						</div>
 					</div>

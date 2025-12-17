@@ -191,10 +191,14 @@ export default function SettingsStep( props ) {
 							<div className="prpl-column">
 								<div className="prpl-setting-header">
 									<h3 className="prpl-setting-title">
-										{ __( 'Settings:', 'progress-planner' ) }{ ' ' }
+										{ __(
+											'Settings:',
+											'progress-planner'
+										) }{ ' ' }
 										{ pageTitle }
 										<span className="prpl-settings-progress">
-											{ currentSubStep + 1 }/{ SUB_STEPS.length }
+											{ currentSubStep + 1 }/
+											{ SUB_STEPS.length }
 										</span>
 									</h3>
 								</div>
@@ -238,13 +242,19 @@ export default function SettingsStep( props ) {
 											<input
 												type="checkbox"
 												id={ `prpl-no-${ subStepName }-page` }
-												checked={ ! subStepData.hasPage }
+												checked={
+													! subStepData.hasPage
+												}
 												onChange={ ( e ) =>
 													setSettings( ( prev ) => ( {
 														...prev,
 														[ subStepName ]: {
-															...prev[ subStepName ],
-															hasPage: ! e.target.checked,
+															...prev[
+																subStepName
+															],
+															hasPage:
+																! e.target
+																	.checked,
 														},
 													} ) )
 												}

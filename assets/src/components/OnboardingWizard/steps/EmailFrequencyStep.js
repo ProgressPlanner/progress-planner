@@ -88,9 +88,10 @@ export default function EmailFrequencyStep( props ) {
 
 			try {
 				const siteUrl = site || window.location.origin;
-				const tzOffset = timezoneOffset !== undefined
-					? timezoneOffset
-					: new Date().getTimezoneOffset() / -60; // Convert to hours
+				const tzOffset =
+					timezoneOffset !== undefined
+						? timezoneOffset
+						: new Date().getTimezoneOffset() / -60; // Convert to hours
 
 				const response = await apiFetch( {
 					path: '/progress-planner/v1/popover/subscribe',
@@ -110,14 +111,20 @@ export default function EmailFrequencyStep( props ) {
 				} else {
 					throw new Error(
 						response.message ||
-							__( 'Failed to subscribe. Please try again.', 'progress-planner' )
+							__(
+								'Failed to subscribe. Please try again.',
+								'progress-planner'
+							)
 					);
 				}
 			} catch ( error ) {
 				console.error( 'Failed to subscribe:', error );
 				setSubscriptionError(
 					error.message ||
-						__( 'Failed to subscribe. Please try again.', 'progress-planner' )
+						__(
+							'Failed to subscribe. Please try again.',
+							'progress-planner'
+						)
 				);
 			} finally {
 				setIsSubscribing( false );
@@ -173,103 +180,125 @@ export default function EmailFrequencyStep( props ) {
 						) }
 
 						<div className="prpl-email-frequency-options">
-					<label
-						htmlFor="prpl-email-weekly"
-						style={ { display: 'block', marginBottom: '1rem' } }
-					>
-						<input
-							id="prpl-email-weekly"
-							type="radio"
-							name="email-frequency"
-							value="weekly"
-							checked={ emailFrequency.choice === 'weekly' }
-							onChange={ ( e ) => {
-								setEmailFrequency( {
-									...emailFrequency,
-									choice: e.target.value,
-								} );
-								setSubscriptionError( null );
-							} }
-						/>
-						<span>
-							{ __( 'Email me weekly', 'progress-planner' ) }
-						</span>
-					</label>
+							<label
+								htmlFor="prpl-email-weekly"
+								style={ {
+									display: 'block',
+									marginBottom: '1rem',
+								} }
+							>
+								<input
+									id="prpl-email-weekly"
+									type="radio"
+									name="email-frequency"
+									value="weekly"
+									checked={
+										emailFrequency.choice === 'weekly'
+									}
+									onChange={ ( e ) => {
+										setEmailFrequency( {
+											...emailFrequency,
+											choice: e.target.value,
+										} );
+										setSubscriptionError( null );
+									} }
+								/>
+								<span>
+									{ __(
+										'Email me weekly',
+										'progress-planner'
+									) }
+								</span>
+							</label>
 
-					<label
-						htmlFor="prpl-dont-email"
-						style={ { display: 'block', marginBottom: '1rem' } }
-					>
-						<input
-							id="prpl-dont-email"
-							type="radio"
-							name="email-frequency"
-							value="none"
-							checked={ emailFrequency.choice === 'none' }
-							onChange={ ( e ) => {
-								setEmailFrequency( {
-									...emailFrequency,
-									choice: e.target.value,
-								} );
-								setSubscriptionError( null );
-							} }
-						/>
-						<span>
-							{ __( "Don't email me", 'progress-planner' ) }
-						</span>
-					</label>
-				</div>
+							<label
+								htmlFor="prpl-dont-email"
+								style={ {
+									display: 'block',
+									marginBottom: '1rem',
+								} }
+							>
+								<input
+									id="prpl-dont-email"
+									type="radio"
+									name="email-frequency"
+									value="none"
+									checked={ emailFrequency.choice === 'none' }
+									onChange={ ( e ) => {
+										setEmailFrequency( {
+											...emailFrequency,
+											choice: e.target.value,
+										} );
+										setSubscriptionError( null );
+									} }
+								/>
+								<span>
+									{ __(
+										"Don't email me",
+										'progress-planner'
+									) }
+								</span>
+							</label>
+						</div>
 
-				{ emailFrequency.choice === 'weekly' && (
-					<div id="prpl-email-form" style={ { marginTop: '1rem' } }>
-						<label
-							htmlFor="prpl-email-name"
-							style={ {
-								display: 'grid',
-								gridTemplateColumns: '1fr 3fr',
-								marginBottom: '0.5em',
-								gap: 'var(--prpl-padding)',
-							} }
-						>
-							<span>
-								{ __( 'First name', 'progress-planner' ) }
-							</span>
-							<input
-								id="prpl-email-name"
-								type="text"
-								value={ emailFrequency.name }
-								onChange={ ( e ) =>
-									setEmailFrequency( {
-										...emailFrequency,
-										name: e.target.value.trim(),
-									} )
-								}
-							/>
-						</label>
-						<label
-							htmlFor="prpl-email-address"
-							style={ {
-								display: 'grid',
-								gridTemplateColumns: '1fr 3fr',
-								marginBottom: '0.5em',
-								gap: 'var(--prpl-padding)',
-							} }
-						>
-							<span>{ __( 'Email', 'progress-planner' ) }</span>
-							<input
-								id="prpl-email-address"
-								type="email"
-								value={ emailFrequency.email }
-								onChange={ ( e ) =>
-									setEmailFrequency( {
-										...emailFrequency,
-										email: e.target.value.trim(),
-									} )
-								}
-							/>
-						</label>
-					</div>
-				) }
+						{ emailFrequency.choice === 'weekly' && (
+							<div
+								id="prpl-email-form"
+								style={ { marginTop: '1rem' } }
+							>
+								<label
+									htmlFor="prpl-email-name"
+									style={ {
+										display: 'grid',
+										gridTemplateColumns: '1fr 3fr',
+										marginBottom: '0.5em',
+										gap: 'var(--prpl-padding)',
+									} }
+								>
+									<span>
+										{ __(
+											'First name',
+											'progress-planner'
+										) }
+									</span>
+									<input
+										id="prpl-email-name"
+										type="text"
+										value={ emailFrequency.name }
+										onChange={ ( e ) =>
+											setEmailFrequency( {
+												...emailFrequency,
+												name: e.target.value.trim(),
+											} )
+										}
+									/>
+								</label>
+								<label
+									htmlFor="prpl-email-address"
+									style={ {
+										display: 'grid',
+										gridTemplateColumns: '1fr 3fr',
+										marginBottom: '0.5em',
+										gap: 'var(--prpl-padding)',
+									} }
+								>
+									<span>
+										{ __( 'Email', 'progress-planner' ) }
+									</span>
+									<input
+										id="prpl-email-address"
+										type="email"
+										value={ emailFrequency.email }
+										onChange={ ( e ) =>
+											setEmailFrequency( {
+												...emailFrequency,
+												email: e.target.value.trim(),
+											} )
+										}
+									/>
+								</label>
+							</div>
+						) }
 					</div>
 				</div>
 			</div>

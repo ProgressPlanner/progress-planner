@@ -6,7 +6,7 @@
  * @package
  */
 
-import { __, sprintf } from '@wordpress/i18n';
+import { __ } from '@wordpress/i18n';
 import OnboardingStep from '../OnboardingStep';
 
 /**
@@ -16,8 +16,6 @@ import OnboardingStep from '../OnboardingStep';
  * @return {JSX.Element} WhatsWhat step component.
  */
 export default function WhatsWhatStep( props ) {
-	const { config } = props;
-	const brandingName = config?.l10n?.brandingName || 'Progress Planner';
 
 	return (
 		<OnboardingStep { ...props } canProceed={ () => true }>
@@ -44,14 +42,11 @@ export default function WhatsWhatStep( props ) {
 					</div>
 					<div className="prpl-column">
 						<div className="prpl-background-content">
-							<h3>
-								{ __( 'Badges', 'progress-planner' ) }
-							</h3>
+							<h3>{ __( 'Badges', 'progress-planner' ) }</h3>
 							<p>
 								<span className="prpl-suggested-task-points">
 									+1
-								</span>
-								{ ' ' }
+								</span>{ ' ' }
 								{ __(
 									'You earn points for every completed task.',
 									'progress-planner'

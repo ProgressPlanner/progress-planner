@@ -163,7 +163,10 @@ export default function MoreTasksStep( props ) {
 										color: '#999',
 									} }
 								>
-									{ __( 'Graphic placeholder', 'progress-planner' ) }
+									{ __(
+										'Graphic placeholder',
+										'progress-planner'
+									) }
 								</div>
 							</div>
 						</div>

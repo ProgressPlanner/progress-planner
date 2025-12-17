@@ -28,13 +28,12 @@ export default function BadgesStep( props ) {
 			if ( gauge && badgeData.badgeId && badgeData.badgeName ) {
 				// Increment badge points after first task completion.
 				setTimeout( () => {
-					if (
-						gauge &&
-						wizardState.data.firstTaskCompleted
-					) {
+					if ( gauge && wizardState.data.firstTaskCompleted ) {
 						gauge.setAttribute(
 							'data-value',
-							( parseFloat( gauge.getAttribute( 'data-value' ) ) || 0 ) + 1
+							( parseFloat(
+								gauge.getAttribute( 'data-value' )
+							) || 0 ) + 1
 						);
 					}
 				}, 1500 );
@@ -87,7 +86,9 @@ export default function BadgesStep( props ) {
 									data-value={ badgeData.currentValue || 0 }
 									data-badge-id={ badgeData.badgeId }
 									data-badge-name={ badgeData.badgeName }
-									data-branding-id={ badgeData.brandingId || '' }
+									data-branding-id={
+										badgeData.brandingId || ''
+									}
 								>
 									{ /* Badge will be loaded dynamically */ }
 								</prpl-gauge>
