@@ -123,7 +123,7 @@ class Onboard_Wizard {
 				'url'          => $task[0]->url ?? '',
 				'provider_id'  => $task[0]->get_provider_id(),
 				'points'       => $task[0]->points ?? 0,
-				'action_label' => $task_provider && \method_exists( $task_provider, 'get_task_action_label' ) ? $task_provider->get_task_action_label() : \esc_html__( 'Do it', 'progress-planner' ),
+				'action_label' => $task_provider ? $task_provider->get_task_action_label() : \esc_html__( 'Do it', 'progress-planner' ),
 			];
 
 			// Add task specific data.
@@ -172,15 +172,15 @@ class Onboard_Wizard {
 		// Get badge data for BadgesStep.
 		$badge_data = [];
 		if ( \class_exists( '\Progress_Planner\Badges\Monthly' ) ) {
-			$badge = \Progress_Planner\Badges\Monthly::get_instance_from_id(
+			$badge       = \Progress_Planner\Badges\Monthly::get_instance_from_id(
 				\Progress_Planner\Badges\Monthly::get_badge_id_from_date( new \DateTime() )
 			);
 			$badge_score = \progress_planner()->get_admin__widgets__monthly_badges()->get_score();
-			$badge_data = [
-				'badgeId'     => $badge->get_id(),
-				'badgeName'   => $badge->get_name(),
-				'brandingId'  => (int) \progress_planner()->get_ui__branding()->get_branding_id(),
-				'maxPoints'   => (int) \constant( '\Progress_Planner\Badges\Monthly::TARGET_POINTS' ),
+			$badge_data  = [
+				'badgeId'      => $badge->get_id(),
+				'badgeName'    => $badge->get_name(),
+				'brandingId'   => (int) \progress_planner()->get_ui__branding()->get_branding_id(),
+				'maxPoints'    => (int) \constant( '\Progress_Planner\Badges\Monthly::TARGET_POINTS' ),
 				'currentValue' => (float) $badge_score['target_score'],
 			];
 		}
@@ -368,10 +368,10 @@ class Onboard_Wizard {
 		}
 
 		// Complete the task.
-		$task_completed = \method_exists( $provider, 'complete_task' ) ? $provider->complete_task( $form_values, $task_id ) : false;
+		$task_completed = $provider->complete_task( $form_values, $task_id );
 
 		// It will skip the celebration and set the task's post status to trash.
-		$task_post_marked_as_completed = \method_exists( \progress_planner()->get_suggested_tasks(), 'mark_task_as_completed' ) ? \progress_planner()->get_suggested_tasks()->mark_task_as_completed( $task_id, null, true ) : false;
+		$task_post_marked_as_completed = \progress_planner()->get_suggested_tasks()->mark_task_as_completed( $task_id, null, true );
 
 		if ( ! $task_completed || ! $task_post_marked_as_completed ) {
 			\error_log( 'Task not completed: ' . $task_id ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
@@ -422,11 +422,10 @@ class Onboard_Wizard {
 		$page_settings->save_post_types( $include_post_types );
 
 		// Handle login destination.
-		// Note: save_settings() reads from $_POST directly, so we set it here.
-		if ( isset( $_POST['prpl-redirect-on-login'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			$_POST['prpl-redirect-on-login'] = \sanitize_text_field( \wp_unslash( $_POST['prpl-redirect-on-login'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		}
-		$page_settings->save_settings();
+		$redirect_on_login = isset( $_POST['prpl-redirect-on-login'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			? (bool) \sanitize_text_field( \wp_unslash( $_POST['prpl-redirect-on-login'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			: false;
+		$page_settings->save_settings( $redirect_on_login );
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'All settings saved successfully.', 'progress-planner' ) ] );
 	}

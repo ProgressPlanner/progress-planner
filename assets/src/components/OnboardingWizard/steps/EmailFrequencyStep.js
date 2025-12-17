@@ -40,6 +40,7 @@ export default function EmailFrequencyStep( props ) {
 				emailFrequency,
 			},
 		} );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ emailFrequency ] );
 
 	/**

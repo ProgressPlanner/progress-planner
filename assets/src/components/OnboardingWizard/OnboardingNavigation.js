@@ -41,30 +41,46 @@ export default function OnboardingNavigation( {
 									isActive ? 'prpl-active' : ''
 								} ${ isCompleted ? 'prpl-completed' : '' }` }
 								data-step={ index }
-								role="button"
-								tabIndex={ onStepClick ? 0 : -1 }
-								onClick={ () =>
-									onStepClick && onStepClick( index )
-								}
-								onKeyDown={ ( e ) => {
-									if (
-										onStepClick &&
-										( e.key === 'Enter' || e.key === ' ' )
-									) {
-										e.preventDefault();
-										onStepClick( index );
-									}
-								} }
-								style={ {
-									cursor: onStepClick ? 'pointer' : 'default',
-								} }
 							>
-								<span className="prpl-step-icon">
-									{ isCompleted ? '✓' : stepNumber }
-								</span>
-								<span className="prpl-step-label">
-									{ step.title }
-								</span>
+								{ onStepClick ? (
+									<button
+										type="button"
+										className="prpl-nav-step-button"
+										tabIndex={ 0 }
+										onClick={ () => onStepClick( index ) }
+										onKeyDown={ ( e ) => {
+											if (
+												onStepClick &&
+												( e.key === 'Enter' ||
+													e.key === ' ' )
+											) {
+												e.preventDefault();
+												onStepClick( index );
+											}
+										} }
+										style={ {
+											cursor: onStepClick
+												? 'pointer'
+												: 'default',
+										} }
+									>
+										<span className="prpl-step-icon">
+											{ isCompleted ? '✓' : stepNumber }
+										</span>
+										<span className="prpl-step-label">
+											{ step.title }
+										</span>
+									</button>
+								) : (
+									<>
+										<span className="prpl-step-icon">
+											{ isCompleted ? '✓' : stepNumber }
+										</span>
+										<span className="prpl-step-label">
+											{ step.title }
+										</span>
+									</>
+								) }
 							</li>
 						);
 					} ) }

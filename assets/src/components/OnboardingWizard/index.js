@@ -107,7 +107,6 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 		( state ) => state.setShouldAutoStartWizard
 	);
 
-
 	// Expose startOnboarding method via ref (like develop's window.prplOnboardWizard.startOnboarding).
 	useImperativeHandle( ref, () => ( {
 		startOnboarding() {
@@ -148,9 +147,13 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 
 			// Clean up toggle listener from previous element if it changed
 			if ( previousElement && previousElement !== element ) {
-				const previousToggleHandler = previousElement.__prplToggleHandler;
+				const previousToggleHandler =
+					previousElement.__prplToggleHandler;
 				if ( previousToggleHandler ) {
-					previousElement.removeEventListener( 'toggle', previousToggleHandler );
+					previousElement.removeEventListener(
+						'toggle',
+						previousToggleHandler
+					);
 					delete previousElement.__prplToggleHandler;
 				}
 			}
@@ -197,8 +200,7 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 
 			// Check if we should auto-start (only when there's NO saved progress, like develop branch)
 			const hasSavedProgress =
-				savedProgress &&
-				Object.keys( savedProgress ).length > 0;
+				savedProgress && Object.keys( savedProgress ).length > 0;
 
 			// Auto-start ONLY when there's NO saved progress (matches develop branch logic)
 			// Develop branch: if ( ! $get_saved_progress ) { startOnboarding(); }
@@ -206,7 +208,11 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 			// 1. Zustand flag is set (privacy not accepted - fresh install)
 			// 2. There is NO saved progress (user hasn't quit before)
 			// 3. User hasn't manually quit in this session
-			if ( shouldAutoStartWizard && ! hasSavedProgress && ! hasManuallyQuitRef.current ) {
+			if (
+				shouldAutoStartWizard &&
+				! hasSavedProgress &&
+				! hasManuallyQuitRef.current
+			) {
 				// Popover element is now in DOM, safe to show
 				if ( typeof element.showPopover === 'function' ) {
 					try {
@@ -225,7 +231,10 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 							}
 						}, 0 );
 					} catch ( error ) {
-						console.error( '[OnboardingWizard] Ref callback: Error calling showPopover()', error );
+						console.error(
+							'[OnboardingWizard] Ref callback: Error calling showPopover()',
+							error
+						);
 					}
 				}
 			}
@@ -236,10 +245,8 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 			savedProgress,
 			shouldAutoStartWizard,
 			setShouldAutoStartWizard,
-			isOpen,
 		]
 	);
-
 
 	// Handle keyboard navigation (Escape key to close).
 	useEffect( () => {

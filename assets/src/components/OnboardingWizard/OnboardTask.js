@@ -145,6 +145,7 @@ export default function OnboardTask( { task, config, onComplete } ) {
 					{ ! isLoadingTemplate && templateHtml && (
 						<div
 							dangerouslySetInnerHTML={ { __html: templateHtml } }
+							role="presentation"
 							onClick={ ( e ) => {
 								// Handle form submission and file uploads.
 								if (
@@ -192,7 +193,6 @@ export default function OnboardTask( { task, config, onComplete } ) {
 									}
 								}
 							} }
-							role="document"
 							tabIndex={ -1 }
 							ref={ ( el ) => {
 								if ( el && templateHtml ) {

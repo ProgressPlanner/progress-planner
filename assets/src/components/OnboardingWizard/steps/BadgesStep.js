@@ -6,7 +6,7 @@
  * @package
  */
 
-import { useEffect, useRef } from '@wordpress/element';
+import { useEffect, useRef, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import OnboardingStep from '../OnboardingStep';
 
@@ -19,7 +19,7 @@ import OnboardingStep from '../OnboardingStep';
 export default function BadgesStep( props ) {
 	const { wizardState, stepData } = props;
 	const gaugeRef = useRef( null );
-	const badgeData = stepData?.data || {};
+	const badgeData = useMemo( () => stepData?.data || {}, [ stepData?.data ] );
 
 	useEffect( () => {
 		// Initialize badge gauge component if available.

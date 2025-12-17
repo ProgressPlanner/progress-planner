@@ -14,7 +14,7 @@ import { create } from 'zustand';
  * State is automatically shared across all React roots because
  * Zustand stores are global singletons.
  */
-export const useDashboardStore = create( ( set, get ) => ( {
+export const useDashboardStore = create( ( set ) => ( {
 	// State
 
 	/**
@@ -123,9 +123,9 @@ export const useDashboardStore = create( ( set, get ) => ( {
 	 *
 	 * @param {boolean} value - Whether to auto-start the wizard.
 	 */
-		setShouldAutoStartWizard: ( value ) => {
-			set( { shouldAutoStartWizard: value } );
-		},
+	setShouldAutoStartWizard: ( value ) => {
+		set( { shouldAutoStartWizard: value } );
+	},
 } ) );
 
 /**
