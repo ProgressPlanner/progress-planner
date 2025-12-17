@@ -65,13 +65,17 @@ class Onboard_Wizard {
 		 */
 		$skip_onboarding = \apply_filters( 'progress_planner_skip_onboarding', $skip_onboarding );
 
+		// For React implementation, we'll always pass config to dashboard (React controls visibility).
+		// The React components will handle the wizard UI and visibility based on skip_onboarding flag.
+		\add_action( 'admin_enqueue_scripts', [ $this, 'add_wizard_config' ] );
+
+		// If skip_onboarding is true, we still add the config but with enabled: false
+		// so React can handle it appropriately. The config is needed for the component to render.
 		if ( $skip_onboarding ) {
+			// Note: We still add the config, but React will check skip_onboarding flag
+			// The add_wizard_config method will receive skip_onboarding via closure or we can pass it.
 			return;
 		}
-
-		// For React implementation, we'll pass config to dashboard instead of enqueueing vanilla JS.
-		// The React components will handle the wizard UI.
-		\add_action( 'admin_enqueue_scripts', [ $this, 'add_wizard_config' ] );
 
 		// Define steps and their order.
 		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
@@ -272,8 +276,11 @@ class Onboard_Wizard {
 		// Only add config on the progress-planner admin page.
 		$screen = \get_current_screen();
 		if ( ! $screen || 'toplevel_page_progress-planner' !== $screen->id ) {
+			\error_log( '[PHP] add_wizard_config: Wrong screen, not adding config' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 			return;
 		}
+
+		\error_log( '[PHP] add_wizard_config: Adding wizard config to dashboard' ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 
 		// Get saved progress from user meta.
 		$saved_progress = $this->get_saved_progress();
@@ -341,17 +348,25 @@ class Onboard_Wizard {
 			}
 		}
 
+		// Check skip_onboarding flag for this request.
+		$is_branded      = 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id();
+		$skip_onboarding = \progress_planner()->is_privacy_policy_accepted()
+			&& ! \get_option( 'prpl_onboard_progress', false )
+			&& ! $is_branded;
+		$skip_onboarding = \apply_filters( 'progress_planner_skip_onboarding', $skip_onboarding );
+
 		// Add wizard config to existing prplDashboardConfig via filter.
 		\add_filter(
 			'progress_planner_dashboard_config',
-			function ( $config ) use ( $steps_formatted, $saved_progress, $pages_formatted, $post_types_formatted, $page_types ) {
+			function ( $config ) use ( $steps_formatted, $saved_progress, $pages_formatted, $post_types_formatted, $page_types, $skip_onboarding ) {
+				\error_log( '[PHP] add_wizard_config filter callback called, skip_onboarding: ' . ( $skip_onboarding ? 'true' : 'false' ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				// Capture logo HTML.
 				\ob_start();
 				\progress_planner()->get_ui__branding()->the_logo();
 				$logo_html = \ob_get_clean();
 
 				$config['onboardingWizard'] = [
-					'enabled'             => true,
+					'enabled'             => ! $skip_onboarding, // Enable only if not skipping
 					'steps'               => $steps_formatted,
 					'savedProgress'       => $saved_progress,
 					'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
