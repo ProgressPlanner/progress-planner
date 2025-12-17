@@ -60,6 +60,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\UI\Chart get_ui__chart()
  * @method \Progress_Planner\Activities\Content_Helpers get_activities__content_helpers()
  * @method \Progress_Planner\Utils\Date get_utils__date()
+ * @method \Progress_Planner\Onboard_Wizard get_onboard_wizard()
  */
 class Base {
 
@@ -192,6 +193,9 @@ class Base {
 
 		// Init the enqueue class.
 		$this->get_admin__enqueue()->init();
+
+		// TODO: Decide when this needs to be initialized.
+		$this->get_onboard_wizard();
 	}
 
 	/**
@@ -571,7 +575,7 @@ class Base {
 	 * @return bool
 	 */
 	public function is_debug_mode_enabled() {
-		return ( \defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' );
+		return ( ( \defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) && \current_user_can( 'manage_options' );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo
