@@ -74,6 +74,30 @@ export default function OnboardingWizard( { config } ) {
 		wizardState.data.finished,
 	] );
 
+	// Handle keyboard navigation (Escape key to close).
+	useEffect( () => {
+		if ( ! isOpen ) {
+			return;
+		}
+
+		/**
+		 * Handle Escape key press.
+		 *
+		 * @param {KeyboardEvent} event - Keyboard event.
+		 */
+		const handleKeyDown = ( event ) => {
+			if ( event.key === 'Escape' && ! showQuitConfirmation ) {
+				handleClose();
+			}
+		};
+
+		document.addEventListener( 'keydown', handleKeyDown );
+
+		return () => {
+			document.removeEventListener( 'keydown', handleKeyDown );
+		};
+	}, [ isOpen, showQuitConfirmation ] );
+
 	/**
 	 * Handle close button click.
 	 */
