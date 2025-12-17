@@ -14,7 +14,6 @@ import {
 	useRef,
 	useCallback,
 } from '@wordpress/element';
-import { createPortal } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import { useDashboardStore } from '../../stores/dashboardStore';
@@ -404,11 +403,23 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	};
 
 	/**
-	 * Render current step component.
+	 * Render current step component or quit confirmation.
 	 *
-	 * @return {JSX.Element} Current step component.
+	 * @return {JSX.Element} Current step component or quit confirmation.
 	 */
 	const renderStep = () => {
+		// Show quit confirmation if requested
+		if ( showQuitConfirmation ) {
+			return (
+				<QuitConfirmation
+					onConfirm={ handleQuit }
+					onCancel={ handleCancelQuit }
+					config={ onboardingWizard }
+				/>
+			);
+		}
+
+		// Otherwise show current step
 		if ( ! currentStepData ) {
 			return null;
 		}
@@ -489,12 +500,14 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 				aria-labelledby="prpl-onboarding-title"
 			>
 				<div className="prpl-onboarding-layout">
-					<OnboardingNavigation
-						steps={ steps }
-						currentStep={ currentStep }
-						onStepClick={ goToStep }
-						logoHtml={ onboardingWizard.logoHtml }
-					/>
+					{ ! showQuitConfirmation && (
+						<OnboardingNavigation
+							steps={ steps }
+							currentStep={ currentStep }
+							onStepClick={ goToStep }
+							logoHtml={ onboardingWizard.logoHtml }
+						/>
+					) }
 					<div className="prpl-onboarding-content">
 						<div className="tour-content-wrapper">
 							{ renderStep() }
@@ -502,25 +515,17 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 					</div>
 				</div>
 
-				<button
-					id="prpl-tour-close-btn"
-					className="prpl-popover-close"
-					onClick={ handleClose }
-					aria-label={ __( 'Close', 'progress-planner' ) }
-				>
-					<span className="dashicons dashicons-no-alt"></span>
-				</button>
-			</div>
-
-			{ showQuitConfirmation &&
-				createPortal(
-					<QuitConfirmation
-						onConfirm={ handleQuit }
-						onCancel={ handleCancelQuit }
-						config={ onboardingWizard }
-					/>,
-					document.body
+				{ ! showQuitConfirmation && (
+					<button
+						id="prpl-tour-close-btn"
+						className="prpl-popover-close"
+						onClick={ handleClose }
+						aria-label={ __( 'Close', 'progress-planner' ) }
+					>
+						<span className="dashicons dashicons-no-alt"></span>
+					</button>
 				) }
+			</div>
 		</>
 	);
 } );
