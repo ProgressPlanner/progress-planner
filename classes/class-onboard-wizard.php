@@ -398,6 +398,19 @@ class Onboard_Wizard {
 	}
 
 	/**
+	 * Get wizard steps.
+	 *
+	 * @return array
+	 */
+	public function get_steps() {
+		// Ensure steps are defined.
+		if ( empty( $this->steps ) ) {
+			$this->define_steps_and_order();
+		}
+		return $this->steps;
+	}
+
+	/**
 	 * Get saved progress from user meta.
 	 *
 	 * @return array|null

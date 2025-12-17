@@ -15,6 +15,7 @@ import {
 	useCallback,
 } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 import { useDashboardStore } from '../../stores/dashboardStore';
 import { useOnboardingWizard } from '../../hooks/useOnboardingWizard';
 import { useOnboardingProgress } from '../../hooks/useOnboardingProgress';
@@ -40,7 +41,55 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	{ config },
 	ref
 ) {
-	const { onboardingWizard } = config;
+	// State for wizard config fetched from REST API.
+	const [ wizardConfig, setWizardConfig ] = useState( null );
+	const [ isLoadingConfig, setIsLoadingConfig ] = useState( true );
+	const [ configError, setConfigError ] = useState( null );
+
+	// Fallback to config.onboardingWizard if available (for backwards compatibility).
+	const fallbackWizard = config.onboardingWizard;
+
+	// Fetch wizard config from REST API on mount.
+	useEffect( () => {
+		console.log( '[OnboardingWizard] Fetching wizard config from REST API' );
+
+		const fetchWizardConfig = async () => {
+			try {
+				setIsLoadingConfig( true );
+				setConfigError( null );
+
+				const response = await apiFetch( {
+					path: '/progress-planner/v1/onboarding-wizard/config',
+				} );
+
+				console.log( '[OnboardingWizard] Wizard config fetched from REST API', {
+					enabled: response.enabled,
+					hasSteps: !! response.steps,
+					stepsCount: response.steps?.length || 0,
+					hasSavedProgress: !! response.savedProgress,
+				} );
+
+				setWizardConfig( response );
+			} catch ( error ) {
+				console.error( '[OnboardingWizard] Error fetching wizard config from REST API', error );
+
+				// Fallback to config.onboardingWizard if available.
+				if ( fallbackWizard ) {
+					console.log( '[OnboardingWizard] Using fallback config from props' );
+					setWizardConfig( fallbackWizard );
+				} else {
+					setConfigError( error );
+				}
+			} finally {
+				setIsLoadingConfig( false );
+			}
+		};
+
+		fetchWizardConfig();
+	}, [ fallbackWizard ] );
+
+	// Use fetched config or fallback.
+	const onboardingWizard = wizardConfig || fallbackWizard;
 
 	// Initialize hooks before early return to comply with React hooks rules.
 	const { steps, savedProgress, ajaxUrl, nonce } = onboardingWizard || {};
@@ -172,11 +221,12 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 			console.log( '[OnboardingWizard] Ref callback: Checking auto-start conditions', {
 				shouldAutoStartWizard,
 				hasSavedProgress,
+				savedProgressKeys: savedProgress ? Object.keys( savedProgress ) : [],
 				willAutoStart: shouldAutoStartWizard || hasSavedProgress,
 			} );
 
 			// Auto-start if:
-			// 1. Zustand flag is set (privacy not accepted or resuming)
+			// 1. Zustand flag is set (privacy not accepted)
 			// 2. There's saved progress (resuming)
 			if ( shouldAutoStartWizard || hasSavedProgress ) {
 				console.log( '[OnboardingWizard] Ref callback: Attempting to show popover' );
@@ -322,6 +372,18 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 				return null;
 		}
 	};
+
+	// Show loading state while fetching config.
+	if ( isLoadingConfig ) {
+		console.log( '[OnboardingWizard] Loading wizard config...' );
+		return null; // Don't render while loading.
+	}
+
+	// Show error state if config failed to load and no fallback.
+	if ( configError && ! fallbackWizard ) {
+		console.error( '[OnboardingWizard] Failed to load wizard config', configError );
+		return null; // Don't render on error.
+	}
 
 	// Always render wizard (like develop's add_popover), but control visibility via isOpen.
 	// If wizard is not enabled, don't render at all.
