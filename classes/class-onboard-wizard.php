@@ -272,10 +272,33 @@ class Onboard_Wizard {
 			];
 		}
 
+		// Get pages for settings step.
+		$pages = \get_pages( [ 'sort_column' => 'post_title', 'sort_order' => 'ASC' ] );
+		$pages_formatted = [];
+		foreach ( $pages as $page ) {
+			$pages_formatted[] = [
+				'id'    => $page->ID,
+				'title' => $page->post_title,
+			];
+		}
+
+		// Get post types for settings step.
+		$post_types = \progress_planner()->get_settings()->get_public_post_types();
+		$post_types_formatted = [];
+		foreach ( $post_types as $post_type ) {
+			$post_type_obj = \get_post_type_object( $post_type );
+			if ( $post_type_obj ) {
+				$post_types_formatted[] = [
+					'id'    => $post_type,
+					'title' => $post_type_obj->labels->name,
+				];
+			}
+		}
+
 		// Add wizard config to existing prplDashboardConfig via filter.
 		\add_filter(
 			'progress_planner_dashboard_config',
-			function ( $config ) use ( $steps_formatted, $saved_progress ) {
+			function ( $config ) use ( $steps_formatted, $saved_progress, $pages_formatted, $post_types_formatted ) {
 				$config['onboardingWizard'] = [
 					'enabled'          => true,
 					'steps'            => $steps_formatted,
@@ -288,6 +311,8 @@ class Onboard_Wizard {
 					'timezoneOffset'   => (float) ( \wp_timezone()->getOffset( new \DateTime( 'midnight' ) ) / 3600 ),
 					'lastStepRedirectUrl' => \esc_url_raw( \admin_url( 'admin.php?page=progress-planner' ) ),
 					'hasLicense'       => false !== \progress_planner()->get_license_key(),
+					'pages'            => $pages_formatted,
+					'postTypes'        => $post_types_formatted,
 					'l10n'             => [
 						'next'                  => \esc_html__( 'Next', 'progress-planner' ),
 						'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),

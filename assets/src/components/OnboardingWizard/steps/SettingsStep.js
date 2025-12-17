@@ -22,7 +22,7 @@ const SUB_STEPS = [ 'homepage', 'about', 'contact', 'faq', 'post-types', 'login-
  */
 export default function SettingsStep( props ) {
 	const { wizardState, updateState, config } = props;
-	const { ajaxUrl, nonce } = config;
+	const { ajaxUrl, nonce, pages = [], postTypes = [] } = config;
 
 	const [ currentSubStep, setCurrentSubStep ] = useState( 0 );
 	const [ settings, setSettings ] = useState( () => {
@@ -116,10 +116,13 @@ export default function SettingsStep( props ) {
 		// Save current sub-step.
 		await saveSubStep( subStepName, subStepData );
 
-		// If last sub-step, save all settings.
+		// If last sub-step, save all settings and advance to next step.
 		if ( currentSubStep === SUB_STEPS.length - 1 ) {
 			await saveAllSettings();
-			props.onNext();
+			// Small delay to ensure settings are saved before advancing.
+			setTimeout( () => {
+				props.onNext();
+			}, 100 );
 		} else {
 			setCurrentSubStep( currentSubStep + 1 );
 		}
@@ -165,7 +168,11 @@ export default function SettingsStep( props ) {
 								<option value="">
 									{ __( '— Select page —', 'progress-planner' ) }
 								</option>
-								{ /* Pages will be populated from PHP */ }
+								{ pages.map( ( page ) => (
+									<option key={ page.id } value={ page.id }>
+										{ page.title }
+									</option>
+								) ) }
 							</select>
 						</div>
 						<label>
@@ -207,9 +214,33 @@ export default function SettingsStep( props ) {
 								'progress-planner'
 							) }
 						</p>
-						{ /* Post types will be populated from PHP */ }
 						<div className="prpl-post-types-selection">
-							{ /* Checkboxes for post types */ }
+							{ postTypes.map( ( postType ) => (
+								<label key={ postType.id } style={ { display: 'block', marginBottom: '0.5rem' } }>
+									<input
+										type="checkbox"
+										value={ postType.id }
+										checked={
+											subStepData.selectedTypes?.includes( postType.id ) || false
+										}
+										onChange={ ( e ) => {
+											const isChecked = e.target.checked;
+											setSettings( ( prev ) => ( {
+												...prev,
+												'post-types': {
+													selectedTypes: isChecked
+														? [ ...( prev[ 'post-types' ]?.selectedTypes || [] ), postType.id ]
+														: ( prev[ 'post-types' ]?.selectedTypes || [] ).filter(
+															( id ) => id !== postType.id
+														),
+												},
+											} ) );
+										} }
+									/>
+									{ ' ' }
+									{ postType.title }
+								</label>
+							) ) }
 						</div>
 					</div>
 				);

@@ -39,6 +39,10 @@ export default function OnboardingNavigation( {
 									isActive ? 'prpl-active' : ''
 								} ${ isCompleted ? 'prpl-completed' : '' }` }
 								data-step={ index }
+								onClick={ () => onStepClick && onStepClick( index ) }
+								style={ {
+									cursor: onStepClick ? 'pointer' : 'default',
+								} }
 							>
 								<span className="prpl-step-icon">
 									{ isCompleted ? '✓' : stepNumber }
