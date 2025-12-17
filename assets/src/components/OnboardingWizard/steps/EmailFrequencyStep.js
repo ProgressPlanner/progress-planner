@@ -134,33 +134,45 @@ export default function EmailFrequencyStep( props ) {
 			buttonClass="prpl-btn-secondary"
 		>
 			<div className="tour-content">
-				<h3 className="tour-title">
-					{ __( 'Email Frequency', 'progress-planner' ) }
-				</h3>
-				<p>
-					{ __(
-						"Choose how often you'd like to receive email updates.",
-						'progress-planner'
-					) }
-				</p>
-
-				{ subscriptionError && (
-					<div
-						className="prpl-error-message"
-						style={ {
-							padding: '0.75rem',
-							marginBottom: '1rem',
-							backgroundColor: '#fee',
-							border: '1px solid #fcc',
-							borderRadius: '4px',
-							color: '#c33',
-						} }
-					>
-						{ subscriptionError }
+				<div className="prpl-columns-wrapper-flex prpl-columns-1-2">
+					<div className="prpl-column">
+						<div className="prpl-background-content">
+							<p>
+								{ __(
+									'Stay on track with emails that include recommendations, updates and useful news.',
+									'progress-planner'
+								) }
+							</p>
+							<p>
+								{ __(
+									'Choose how often you want a little nudge to keep your site moving forward.',
+									'progress-planner'
+								) }
+							</p>
+						</div>
 					</div>
-				) }
+					<div className="prpl-column">
+						<h3 className="tour-title">
+							{ __( 'Email Frequency', 'progress-planner' ) }
+						</h3>
 
-				<div className="prpl-email-frequency-options">
+						{ subscriptionError && (
+							<div
+								className="prpl-error-message"
+								style={ {
+									padding: '0.75rem',
+									marginBottom: '1rem',
+									backgroundColor: '#fee',
+									border: '1px solid #fcc',
+									borderRadius: '4px',
+									color: '#c33',
+								} }
+							>
+								{ subscriptionError }
+							</div>
+						) }
+
+						<div className="prpl-email-frequency-options">
 					<label
 						htmlFor="prpl-email-weekly"
 						style={ { display: 'block', marginBottom: '1rem' } }
@@ -258,6 +270,8 @@ export default function EmailFrequencyStep( props ) {
 						</label>
 					</div>
 				) }
+					</div>
+				</div>
 			</div>
 		</OnboardingStep>
 	);
