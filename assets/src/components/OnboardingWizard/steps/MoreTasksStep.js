@@ -12,6 +12,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import OnboardingStep from '../OnboardingStep';
 import OnboardTask from '../OnboardTask';
+import { useOnboardingProgress } from '../../../hooks/useOnboardingProgress';
 
 const SUB_STEPS = [ 'intro', 'tasks' ];
 
@@ -23,6 +24,9 @@ const SUB_STEPS = [ 'intro', 'tasks' ];
  */
 export default function MoreTasksStep( props ) {
 	const { wizardState, updateState, onNext, stepData, config } = props;
+	const { ajaxUrl, nonce } = config;
+
+	const progressHooks = useOnboardingProgress( { ajaxUrl, nonce } );
 
 	const [ currentSubStep, setCurrentSubStep ] = useState( 0 );
 	const [ completedTasks, setCompletedTasks ] = useState( {} );
@@ -69,7 +73,29 @@ export default function MoreTasksStep( props ) {
 	/**
 	 * Handle finish onboarding.
 	 */
-	const handleFinish = () => {
+	const handleFinish = async () => {
+		// Mark wizard as finished.
+		updateState( {
+			data: {
+				...wizardState.data,
+				finished: true,
+			},
+		} );
+
+		// Save progress before redirecting.
+		try {
+			await progressHooks.saveProgress( {
+				...wizardState,
+				data: {
+					...wizardState.data,
+					finished: true,
+				},
+			} );
+		} catch ( error ) {
+			// Silently fail - we'll redirect anyway.
+			console.error( 'Failed to save final progress:', error );
+		}
+
 		// Finish onboarding - redirect to dashboard.
 		window.location.href = config?.lastStepRedirectUrl || '/wp-admin/admin.php?page=progress-planner';
 	};

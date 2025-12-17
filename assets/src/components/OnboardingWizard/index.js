@@ -53,13 +53,18 @@ export default function OnboardingWizard( { config } ) {
 
 	// Auto-open wizard if there's saved progress or if it should start.
 	useEffect( () => {
+		// Don't show if wizard is already finished.
+		if ( wizardState.data.finished ) {
+			return;
+		}
+
 		// Show wizard if:
 		// 1. There's saved progress (user is resuming)
 		// 2. Privacy policy is accepted but wizard hasn't been completed
 		if ( savedProgress || ( config.privacyPolicyAccepted && onboardingWizard?.enabled ) ) {
 			setIsOpen( true );
 		}
-	}, [ savedProgress, config.privacyPolicyAccepted, onboardingWizard?.enabled ] );
+	}, [ savedProgress, config.privacyPolicyAccepted, onboardingWizard?.enabled, wizardState.data.finished ] );
 
 	/**
 	 * Handle close button click.
@@ -106,6 +111,19 @@ export default function OnboardingWizard( { config } ) {
 			stepData: currentStepData,
 		};
 
+		// Check if we've reached the last step and should finish.
+		if ( currentStep === totalSteps - 1 ) {
+			// Mark as finished when reaching the last step.
+			if ( ! wizardState.data.finished ) {
+				updateState( {
+					data: {
+						...wizardState.data,
+						finished: true,
+					},
+				} );
+			}
+		}
+
 		switch ( currentStepData.id ) {
 			case 'onboarding-step-welcome':
 				return <WelcomeStep { ...stepProps } />;
@@ -139,6 +157,13 @@ export default function OnboardingWizard( { config } ) {
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="prpl-onboarding-title"
+				style={ {
+					position: 'fixed',
+					top: '50%',
+					left: '50%',
+					transform: 'translate(-50%, -50%)',
+					zIndex: 100000,
+				} }
 			>
 				<div className="prpl-onboarding-layout">
 					<OnboardingNavigation

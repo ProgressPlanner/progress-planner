@@ -31,6 +31,7 @@ export function useOnboardingWizard( config, progressHooks ) {
 					privacyAccepted: false,
 					firstTaskCompleted: false,
 					moreTasksCompleted: {},
+					finished: false,
 					emailFrequency: {
 						choice: null,
 						name: '',
@@ -47,6 +48,7 @@ export function useOnboardingWizard( config, progressHooks ) {
 				privacyAccepted: false,
 				firstTaskCompleted: false,
 				moreTasksCompleted: {},
+				finished: false,
 				emailFrequency: {
 					choice: null,
 					name: '',
