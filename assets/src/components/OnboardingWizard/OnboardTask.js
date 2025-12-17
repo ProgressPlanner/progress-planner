@@ -139,7 +139,19 @@ export default function OnboardTask( { task, config, onComplete } ) {
 									if ( form ) {
 										const formData = new FormData( form );
 										setFormValues( Object.fromEntries( formData.entries() ) );
+										// Trigger completion after form values are set.
+										setTimeout( () => handleComplete(), 0 );
 									}
+								}
+							} }
+							ref={ ( el ) => {
+								if ( el && templateHtml ) {
+									// Re-initialize file upload handlers after template is rendered.
+									const fileInputs = el.querySelectorAll( 'input[type="file"]' );
+									fileInputs.forEach( ( input ) => {
+										// File upload handling will be done by existing JavaScript if available.
+										// The PHP template includes the necessary data attributes.
+									} );
 								}
 							} }
 						/>

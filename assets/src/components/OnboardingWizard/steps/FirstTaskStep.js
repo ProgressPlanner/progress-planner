@@ -75,7 +75,8 @@ export default function FirstTaskStep( props ) {
 		if ( ! task ) {
 			onNext();
 		}
-	}, [ task, onNext ] );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ task ] );
 
 	if ( ! task ) {
 		return null;

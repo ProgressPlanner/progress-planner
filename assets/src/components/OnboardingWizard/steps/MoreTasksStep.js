@@ -34,6 +34,7 @@ export default function MoreTasksStep( props ) {
 		if ( wizardState.data.moreTasksCompleted ) {
 			setCompletedTasks( wizardState.data.moreTasksCompleted );
 		}
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [] );
 
 	/**

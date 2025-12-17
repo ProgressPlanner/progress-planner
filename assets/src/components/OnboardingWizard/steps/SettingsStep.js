@@ -46,6 +46,7 @@ export default function SettingsStep( props ) {
 				settings,
 			},
 		} );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [ settings ] );
 
 	/**
