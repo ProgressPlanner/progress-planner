@@ -12,7 +12,6 @@ import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import OnboardingStep from '../OnboardingStep';
 import OnboardTask from '../OnboardTask';
-import { useOnboardingProgress } from '../../../hooks/useOnboardingProgress';
 
 const SUB_STEPS = [ 'intro', 'tasks' ];
 
@@ -83,21 +82,13 @@ export default function MoreTasksStep( props ) {
 		} );
 
 		// Save progress before redirecting.
-		try {
-			await progressHooks.saveProgress( {
-				...wizardState,
-				data: {
-					...wizardState.data,
-					finished: true,
-				},
-			} );
-		} catch ( error ) {
-			// Silently fail - we'll redirect anyway.
-			console.error( 'Failed to save final progress:', error );
-		}
+		// Note: Progress saving is handled by the parent wizard component.
+		// We just mark as finished and redirect.
 
 		// Finish onboarding - redirect to dashboard.
-		window.location.href = config?.lastStepRedirectUrl || '/wp-admin/admin.php?page=progress-planner';
+		window.location.href =
+			config?.lastStepRedirectUrl ||
+			'/wp-admin/admin.php?page=progress-planner';
 	};
 
 	/**
@@ -109,10 +100,7 @@ export default function MoreTasksStep( props ) {
 		if ( currentSubStep === 0 ) {
 			// Intro sub-step.
 			return (
-				<div
-					className="prpl-more-tasks-substep"
-					data-substep="intro"
-				>
+				<div className="prpl-more-tasks-substep" data-substep="intro">
 					<h3 className="tour-title">
 						{ __( 'Finish onboarding!', 'progress-planner' ) }
 					</h3>
@@ -142,7 +130,10 @@ export default function MoreTasksStep( props ) {
 							marginTop: '1rem',
 						} }
 					>
-						{ __( 'Skip and finish onboarding', 'progress-planner' ) }
+						{ __(
+							'Skip and finish onboarding',
+							'progress-planner'
+						) }
 					</button>
 				</div>
 			);
@@ -150,10 +141,7 @@ export default function MoreTasksStep( props ) {
 
 		// Tasks sub-step.
 		return (
-			<div
-				className="prpl-more-tasks-substep"
-				data-substep="tasks"
-			>
+			<div className="prpl-more-tasks-substep" data-substep="tasks">
 				<h3 className="tour-title">
 					{ __( 'Complete more tasks', 'progress-planner' ) }
 				</h3>
@@ -197,11 +185,12 @@ export default function MoreTasksStep( props ) {
 	};
 
 	return (
-		<OnboardingStep { ...props } canProceed={ canProceed } onNext={ handleNext }>
-			<div className="tour-content">
-				{ renderSubStep() }
-			</div>
+		<OnboardingStep
+			{ ...props }
+			canProceed={ canProceed }
+			onNext={ handleNext }
+		>
+			<div className="tour-content">{ renderSubStep() }</div>
 		</OnboardingStep>
 	);
 }
-

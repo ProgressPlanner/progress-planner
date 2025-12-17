@@ -61,10 +61,18 @@ export default function OnboardingWizard( { config } ) {
 		// Show wizard if:
 		// 1. There's saved progress (user is resuming)
 		// 2. Privacy policy is accepted but wizard hasn't been completed
-		if ( savedProgress || ( config.privacyPolicyAccepted && onboardingWizard?.enabled ) ) {
+		if (
+			savedProgress ||
+			( config.privacyPolicyAccepted && onboardingWizard?.enabled )
+		) {
 			setIsOpen( true );
 		}
-	}, [ savedProgress, config.privacyPolicyAccepted, onboardingWizard?.enabled, wizardState.data.finished ] );
+	}, [
+		savedProgress,
+		config.privacyPolicyAccepted,
+		onboardingWizard?.enabled,
+		wizardState.data.finished,
+	] );
 
 	/**
 	 * Handle close button click.
@@ -177,4 +185,3 @@ export default function OnboardingWizard( { config } ) {
 		</>
 	);
 }
-

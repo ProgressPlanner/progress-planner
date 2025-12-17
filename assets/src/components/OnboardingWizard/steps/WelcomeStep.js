@@ -100,7 +100,7 @@ export default function WelcomeStep( props ) {
 						<div className="prpl-background-content">
 							<h3 className="tour-title">
 								{ __(
-									'Hi there! Ready to push your website forward? Let\'s go!',
+									"Hi there! Ready to push your website forward? Let's go!",
 									'progress-planner'
 								) }
 							</h3>
@@ -108,14 +108,17 @@ export default function WelcomeStep( props ) {
 								{ sprintf(
 									/* translators: %s: Progress Planner name */
 									__(
-										'%s helps you set clear, focused goals for your website. Let\'s go through a few simple steps to get everything set up.',
+										"%s helps you set clear, focused goals for your website. Let's go through a few simple steps to get everything set up.",
 										'progress-planner'
 									),
 									l10n?.brandingName || 'Progress Planner'
 								) }
 							</p>
 							<p>
-								{ __( 'This will only take a few minutes.', 'progress-planner' ) }
+								{ __(
+									'This will only take a few minutes.',
+									'progress-planner'
+								) }
 							</p>
 						</div>
 
@@ -123,14 +126,19 @@ export default function WelcomeStep( props ) {
 							<div className="prpl-privacy-checkbox-wrapper">
 								<label
 									htmlFor="prpl-privacy-checkbox"
-									style={ { display: 'flex', alignItems: 'baseline' } }
+									style={ {
+										display: 'flex',
+										alignItems: 'baseline',
+									} }
 								>
 									<input
 										id="prpl-privacy-checkbox"
 										type="checkbox"
 										checked={ privacyAccepted }
 										onChange={ ( e ) =>
-											setPrivacyAccepted( e.target.checked )
+											setPrivacyAccepted(
+												e.target.checked
+											)
 										}
 									/>
 									<span>
@@ -149,7 +157,10 @@ export default function WelcomeStep( props ) {
 													target="_blank"
 													rel="noopener noreferrer"
 												>
-													{ __( 'Privacy policy', 'progress-planner' ) }
+													{ __(
+														'Privacy policy',
+														'progress-planner'
+													) }
 												</a>
 											</Fragment>
 										) }
@@ -160,7 +171,10 @@ export default function WelcomeStep( props ) {
 
 						{ isGenerating && (
 							<div className="prpl-spinner">
-								<span className="spinner" style={ { visibility: 'visible' } }></span>
+								<span
+									className="spinner"
+									style={ { visibility: 'visible' } }
+								></span>
 							</div>
 						) }
 					</div>
@@ -169,4 +183,3 @@ export default function WelcomeStep( props ) {
 		</OnboardingStep>
 	);
 }
-

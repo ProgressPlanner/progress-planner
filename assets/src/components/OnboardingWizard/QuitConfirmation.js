@@ -11,7 +11,7 @@ import { __ } from '@wordpress/i18n';
 /**
  * QuitConfirmation component.
  *
- * @param {Object} props          - Component props.
+ * @param {Object}   props           - Component props.
  * @param {Function} props.onConfirm - Callback when user confirms quit.
  * @param {Function} props.onCancel  - Callback when user cancels quit.
  * @return {JSX.Element} Quit confirmation dialog.
@@ -52,7 +52,13 @@ export default function QuitConfirmation( { onConfirm, onCancel } ) {
 						'progress-planner'
 					) }
 				</p>
-				<div style={ { display: 'flex', gap: '1rem', marginTop: '1.5rem' } }>
+				<div
+					style={ {
+						display: 'flex',
+						gap: '1rem',
+						marginTop: '1.5rem',
+					} }
+				>
 					<button
 						type="button"
 						className="prpl-btn prpl-btn-secondary"
@@ -72,4 +78,3 @@ export default function QuitConfirmation( { onConfirm, onCancel } ) {
 		</div>
 	);
 }
-

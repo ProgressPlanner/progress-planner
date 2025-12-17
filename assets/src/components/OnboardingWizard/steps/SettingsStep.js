@@ -12,7 +12,14 @@ import { __, sprintf } from '@wordpress/i18n';
 import { ajaxRequest } from '../../../utils/ajaxRequest';
 import OnboardingStep from '../OnboardingStep';
 
-const SUB_STEPS = [ 'homepage', 'about', 'contact', 'faq', 'post-types', 'login-destination' ];
+const SUB_STEPS = [
+	'homepage',
+	'about',
+	'contact',
+	'faq',
+	'post-types',
+	'login-destination',
+];
 
 /**
  * SettingsStep component.
@@ -26,14 +33,16 @@ export default function SettingsStep( props ) {
 
 	const [ currentSubStep, setCurrentSubStep ] = useState( 0 );
 	const [ settings, setSettings ] = useState( () => {
-		return wizardState.data.settings || {
-			homepage: { hasPage: true, pageId: null },
-			about: { hasPage: true, pageId: null },
-			contact: { hasPage: true, pageId: null },
-			faq: { hasPage: true, pageId: null },
-			'post-types': { selectedTypes: [] },
-			'login-destination': { redirectOnLogin: false },
-		};
+		return (
+			wizardState.data.settings || {
+				homepage: { hasPage: true, pageId: null },
+				about: { hasPage: true, pageId: null },
+				contact: { hasPage: true, pageId: null },
+				faq: { hasPage: true, pageId: null },
+				'post-types': { selectedTypes: [] },
+				'login-destination': { redirectOnLogin: false },
+			}
+		);
 	} );
 
 	const [ isSaving, setIsSaving ] = useState( false );
@@ -82,7 +91,9 @@ export default function SettingsStep( props ) {
 				if ( settings[ pageType ] ) {
 					pages[ pageType ] = {
 						id: settings[ pageType ].pageId || 0,
-						have_page: settings[ pageType ].hasPage ? 'yes' : 'not-applicable',
+						have_page: settings[ pageType ].hasPage
+							? 'yes'
+							: 'not-applicable',
 					};
 				}
 			} );
@@ -93,8 +104,10 @@ export default function SettingsStep( props ) {
 					action: 'prpl_save_all_onboarding_settings',
 					nonce,
 					pages: JSON.stringify( pages ),
-					'prpl-post-types-include': settings[ 'post-types' ]?.selectedTypes || [],
-					'prpl-redirect-on-login': settings[ 'login-destination' ]?.redirectOnLogin
+					'prpl-post-types-include':
+						settings[ 'post-types' ]?.selectedTypes || [],
+					'prpl-redirect-on-login': settings[ 'login-destination' ]
+						?.redirectOnLogin
 						? '1'
 						: '',
 				},
@@ -143,7 +156,10 @@ export default function SettingsStep( props ) {
 			case 'contact':
 			case 'faq':
 				return (
-					<div className="prpl-setting-item" data-page={ subStepName }>
+					<div
+						className="prpl-setting-item"
+						data-page={ subStepName }
+					>
 						<h3>
 							{ __( 'Settings:', 'progress-planner' ) }{ ' ' }
 							{ subStepName === 'homepage'
@@ -168,13 +184,20 @@ export default function SettingsStep( props ) {
 										...prev,
 										[ subStepName ]: {
 											...prev[ subStepName ],
-											pageId: parseInt( e.target.value, 10 ) || null,
+											pageId:
+												parseInt(
+													e.target.value,
+													10
+												) || null,
 										},
 									} ) )
 								}
 							>
 								<option value="">
-									{ __( '— Select page —', 'progress-planner' ) }
+									{ __(
+										'— Select page —',
+										'progress-planner'
+									) }
 								</option>
 								{ pages.map( ( page ) => (
 									<option key={ page.id } value={ page.id }>
@@ -200,7 +223,10 @@ export default function SettingsStep( props ) {
 							/>
 							{ sprintf(
 								/* translators: %s: page type */
-								__( 'I don\'t have a %s yet', 'progress-planner' ),
+								__(
+									"I don't have a %s yet",
+									'progress-planner'
+								),
 								subStepName
 							) }
 						</label>
@@ -224,12 +250,20 @@ export default function SettingsStep( props ) {
 						</p>
 						<div className="prpl-post-types-selection">
 							{ postTypes.map( ( postType ) => (
-								<label key={ postType.id } style={ { display: 'block', marginBottom: '0.5rem' } }>
+								<label
+									key={ postType.id }
+									style={ {
+										display: 'block',
+										marginBottom: '0.5rem',
+									} }
+								>
 									<input
 										type="checkbox"
 										value={ postType.id }
 										checked={
-											subStepData.selectedTypes?.includes( postType.id ) || false
+											subStepData.selectedTypes?.includes(
+												postType.id
+											) || false
 										}
 										onChange={ ( e ) => {
 											const isChecked = e.target.checked;
@@ -237,15 +271,29 @@ export default function SettingsStep( props ) {
 												...prev,
 												'post-types': {
 													selectedTypes: isChecked
-														? [ ...( prev[ 'post-types' ]?.selectedTypes || [] ), postType.id ]
-														: ( prev[ 'post-types' ]?.selectedTypes || [] ).filter(
-															( id ) => id !== postType.id
-														),
+														? [
+																...( prev[
+																	'post-types'
+																]
+																	?.selectedTypes ||
+																	[] ),
+																postType.id,
+														  ]
+														: (
+																prev[
+																	'post-types'
+																]
+																	?.selectedTypes ||
+																[]
+														  ).filter(
+																( id ) =>
+																	id !==
+																	postType.id
+														  ),
 												},
 											} ) );
 										} }
-									/>
-									{ ' ' }
+									/>{ ' ' }
 									{ postType.title }
 								</label>
 							) ) }
@@ -255,7 +303,10 @@ export default function SettingsStep( props ) {
 
 			case 'login-destination':
 				return (
-					<div className="prpl-setting-item" data-page="login-destination">
+					<div
+						className="prpl-setting-item"
+						data-page="login-destination"
+					>
 						<h3>
 							{ __( 'Login Destination', 'progress-planner' ) }
 							<span className="prpl-settings-progress">
@@ -276,7 +327,10 @@ export default function SettingsStep( props ) {
 									} ) )
 								}
 							/>
-							{ __( 'Redirect to Progress Planner on login', 'progress-planner' ) }
+							{ __(
+								'Redirect to Progress Planner on login',
+								'progress-planner'
+							) }
 						</label>
 					</div>
 				);
@@ -298,7 +352,7 @@ export default function SettingsStep( props ) {
 						disabled={ isSaving }
 					>
 						{ isSaving
-							? __( 'Saving...', 'progress-planner' )
+							? __( 'Saving…', 'progress-planner' )
 							: __( 'Save & Continue', 'progress-planner' ) }
 					</button>
 				) }
@@ -306,4 +360,3 @@ export default function SettingsStep( props ) {
 		</OnboardingStep>
 	);
 }
-

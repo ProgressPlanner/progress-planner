@@ -16,13 +16,13 @@ import { __ } from '@wordpress/i18n';
  * This is a utility component that provides common step functionality.
  * Individual step components should use these utilities.
  *
- * @param {Object} props              - Component props.
- * @param {Object} props.wizardState  - Current wizard state.
+ * @param {Object}   props             - Component props.
+ * @param {Object}   props.wizardState - Current wizard state.
  * @param {Function} props.updateState - Function to update wizard state.
- * @param {Function} props.onNext     - Callback when next is clicked.
- * @param {Function} props.onBack     - Callback when back is clicked.
- * @param {Function} props.canProceed - Function to check if step can proceed.
- * @param {Object} props.children     - Step content.
+ * @param {Function} props.onNext      - Callback when next is clicked.
+ * @param {Function} props.onBack      - Callback when back is clicked.
+ * @param {Function} props.canProceed  - Function to check if step can proceed.
+ * @param {Object}   props.children    - Step content.
  * @return {JSX.Element} Step component.
  */
 export default function OnboardingStep( {
@@ -82,8 +82,8 @@ export default function OnboardingStep( {
 							className="prpl-btn prpl-btn-secondary"
 							onClick={ onBack }
 						>
-							{ /* translators: Back button */ }
-							← { __( 'Back', 'progress-planner' ) }
+							{ /* translators: Back button */ }←{ ' ' }
+							{ __( 'Back', 'progress-planner' ) }
 						</button>
 					) }
 					<button
@@ -100,4 +100,3 @@ export default function OnboardingStep( {
 		</div>
 	);
 }
-

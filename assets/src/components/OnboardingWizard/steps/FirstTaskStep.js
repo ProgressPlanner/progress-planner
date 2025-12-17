@@ -90,7 +90,7 @@ export default function FirstTaskStep( props ) {
 				</h3>
 				<p>
 					{ __(
-						'Let\'s start by completing your first recommended task.',
+						"Let's start by completing your first recommended task.",
 						'progress-planner'
 					) }
 				</p>
@@ -104,7 +104,8 @@ export default function FirstTaskStep( props ) {
 							rel="noopener noreferrer"
 							className="prpl-button-primary"
 						>
-							{ task.action_label || __( 'Do it', 'progress-planner' ) }
+							{ task.action_label ||
+								__( 'Do it', 'progress-planner' ) }
 						</a>
 					) }
 					<button
@@ -114,7 +115,7 @@ export default function FirstTaskStep( props ) {
 						disabled={ isCompleting }
 					>
 						{ isCompleting
-							? __( 'Completing...', 'progress-planner' )
+							? __( 'Completing…', 'progress-planner' )
 							: __( 'Mark as complete', 'progress-planner' ) }
 					</button>
 				</div>
@@ -122,4 +123,3 @@ export default function FirstTaskStep( props ) {
 		</OnboardingStep>
 	);
 }
-

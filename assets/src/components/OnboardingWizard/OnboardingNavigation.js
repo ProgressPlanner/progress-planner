@@ -9,9 +9,9 @@
 /**
  * OnboardingNavigation component.
  *
- * @param {Object} props            - Component props.
- * @param {Array}  props.steps      - Array of step definitions.
- * @param {number} props.currentStep - Current step index.
+ * @param {Object}   props             - Component props.
+ * @param {Array}    props.steps       - Array of step definitions.
+ * @param {number}   props.currentStep - Current step index.
  * @param {Function} props.onStepClick - Callback when step is clicked.
  * @return {JSX.Element} Navigation component.
  */
@@ -39,7 +39,9 @@ export default function OnboardingNavigation( {
 									isActive ? 'prpl-active' : ''
 								} ${ isCompleted ? 'prpl-completed' : '' }` }
 								data-step={ index }
-								onClick={ () => onStepClick && onStepClick( index ) }
+								onClick={ () =>
+									onStepClick && onStepClick( index )
+								}
 								style={ {
 									cursor: onStepClick ? 'pointer' : 'default',
 								} }
@@ -47,7 +49,9 @@ export default function OnboardingNavigation( {
 								<span className="prpl-step-icon">
 									{ isCompleted ? '✓' : stepNumber }
 								</span>
-								<span className="prpl-step-label">{ step.title }</span>
+								<span className="prpl-step-label">
+									{ step.title }
+								</span>
 							</li>
 						);
 					} ) }
@@ -59,4 +63,3 @@ export default function OnboardingNavigation( {
 		</div>
 	);
 }
-

@@ -24,8 +24,10 @@ export default function BadgesStep( props ) {
 		// Initialize badge gauge component if available.
 		if ( gaugeRef.current && window.customElements?.get( 'prpl-badge' ) ) {
 			const badgeId = gaugeRef.current.getAttribute( 'data-badge-id' );
-			const badgeName = gaugeRef.current.getAttribute( 'data-badge-name' );
-			const brandingId = gaugeRef.current.getAttribute( 'data-branding-id' );
+			const badgeName =
+				gaugeRef.current.getAttribute( 'data-badge-name' );
+			const brandingId =
+				gaugeRef.current.getAttribute( 'data-branding-id' );
 
 			if ( badgeId && badgeName ) {
 				gaugeRef.current.innerHTML = `
@@ -71,4 +73,3 @@ export default function BadgesStep( props ) {
 		</OnboardingStep>
 	);
 }
-

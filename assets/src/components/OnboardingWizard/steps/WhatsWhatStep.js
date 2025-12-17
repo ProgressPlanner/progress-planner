@@ -26,22 +26,24 @@ export default function WhatsWhatStep( props ) {
 					<div className="prpl-column">
 						<div className="prpl-background-content">
 							<h3 className="tour-title">
-								{ __(
-									'What\'s what?',
-									'progress-planner'
-								) }
+								{ __( "What's what?", 'progress-planner' ) }
 							</h3>
 							<p>
 								{ sprintf(
 									/* translators: %s: Progress Planner name */
 									__(
-										'%s helps you set clear, focused goals for your website. Let\'s go through a few simple steps to get everything set up.',
+										"%s helps you set clear, focused goals for your website. Let's go through a few simple steps to get everything set up.",
 										'progress-planner'
 									),
 									brandingName
 								) }
 							</p>
-							<p>{ __( 'This will only take a few minutes.', 'progress-planner' ) }</p>
+							<p>
+								{ __(
+									'This will only take a few minutes.',
+									'progress-planner'
+								) }
+							</p>
 						</div>
 					</div>
 				</div>
@@ -49,4 +51,3 @@ export default function WhatsWhatStep( props ) {
 		</OnboardingStep>
 	);
 }
-

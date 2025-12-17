@@ -69,7 +69,7 @@ export default function EmailFrequencyStep( props ) {
 				</h3>
 				<p>
 					{ __(
-						'Choose how often you\'d like to receive email updates.',
+						"Choose how often you'd like to receive email updates.",
 						'progress-planner'
 					) }
 				</p>
@@ -92,7 +92,9 @@ export default function EmailFrequencyStep( props ) {
 								} )
 							}
 						/>
-						<span>{ __( 'Email me weekly', 'progress-planner' ) }</span>
+						<span>
+							{ __( 'Email me weekly', 'progress-planner' ) }
+						</span>
 					</label>
 
 					<label
@@ -113,7 +115,7 @@ export default function EmailFrequencyStep( props ) {
 							}
 						/>
 						<span>
-							{ __( 'Don\'t email me', 'progress-planner' ) }
+							{ __( "Don't email me", 'progress-planner' ) }
 						</span>
 					</label>
 				</div>
@@ -129,7 +131,9 @@ export default function EmailFrequencyStep( props ) {
 								gap: 'var(--prpl-padding)',
 							} }
 						>
-							<span>{ __( 'First name', 'progress-planner' ) }</span>
+							<span>
+								{ __( 'First name', 'progress-planner' ) }
+							</span>
 							<input
 								id="prpl-email-name"
 								type="text"
@@ -170,4 +174,3 @@ export default function EmailFrequencyStep( props ) {
 		</OnboardingStep>
 	);
 }
-
