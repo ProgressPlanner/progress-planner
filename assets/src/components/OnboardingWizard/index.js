@@ -111,6 +111,7 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	const [ showQuitConfirmation, setShowQuitConfirmation ] = useState( false );
 	const [ isOpen, setIsOpen ] = useState( false );
 	const popoverRef = useRef( null );
+	const hasManuallyQuitRef = useRef( false ); // Track if user manually quit to prevent auto-restart
 	const shouldAutoStartWizard = useDashboardStore(
 		( state ) => state.shouldAutoStartWizard
 	);
@@ -245,6 +246,12 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 				return;
 			}
 
+			// Don't auto-start if user has manually quit (prevents re-opening after quit)
+			if ( hasManuallyQuitRef.current ) {
+				console.log( '[OnboardingWizard] Ref callback: User manually quit, not auto-starting' );
+				return;
+			}
+
 			// Check if we should auto-start (from Zustand store or saved progress)
 			const hasSavedProgress =
 				savedProgress &&
@@ -253,14 +260,16 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 			console.log( '[OnboardingWizard] Ref callback: Checking auto-start conditions', {
 				shouldAutoStartWizard,
 				hasSavedProgress,
+				hasManuallyQuit: hasManuallyQuitRef.current,
 				savedProgressKeys: savedProgress ? Object.keys( savedProgress ) : [],
-				willAutoStart: shouldAutoStartWizard || hasSavedProgress,
+				willAutoStart: ( shouldAutoStartWizard || hasSavedProgress ) && ! hasManuallyQuitRef.current,
 			} );
 
 			// Auto-start if:
 			// 1. Zustand flag is set (privacy not accepted)
 			// 2. There's saved progress (resuming)
-			if ( shouldAutoStartWizard || hasSavedProgress ) {
+			// 3. User hasn't manually quit
+			if ( ( shouldAutoStartWizard || hasSavedProgress ) && ! hasManuallyQuitRef.current ) {
 				console.log( '[OnboardingWizard] Ref callback: Attempting to show popover' );
 
 				// Popover element is now in DOM, safe to show
@@ -346,6 +355,9 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	 * Matches develop branch's closeTour() behavior: hide popover first, then save progress.
 	 */
 	const handleQuit = () => {
+		// Mark that user manually quit to prevent auto-restart
+		hasManuallyQuitRef.current = true;
+
 		// Hide quit confirmation UI
 		setShowQuitConfirmation( false );
 
