@@ -23,9 +23,6 @@ const SUB_STEPS = [ 'intro', 'tasks' ];
  */
 export default function MoreTasksStep( props ) {
 	const { wizardState, updateState, onNext, stepData, config } = props;
-	const { ajaxUrl, nonce } = config;
-
-	const progressHooks = useOnboardingProgress( { ajaxUrl, nonce } );
 
 	const [ currentSubStep, setCurrentSubStep ] = useState( 0 );
 	const [ completedTasks, setCompletedTasks ] = useState( {} );
