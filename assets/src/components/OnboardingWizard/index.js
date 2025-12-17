@@ -110,11 +110,13 @@ export default function OnboardingWizard( { config } ) {
 			return null;
 		}
 
+		const handleBack = currentStep > 0 ? prevStep : null;
+
 		const stepProps = {
 			wizardState,
 			updateState,
 			onNext: nextStep,
-			onBack: currentStep > 0 ? prevStep : null,
+			onBack: handleBack,
 			config: onboardingWizard,
 			stepData: currentStepData,
 		};
