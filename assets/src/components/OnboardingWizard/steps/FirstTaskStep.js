@@ -7,7 +7,7 @@
  */
 
 import { useState, useEffect } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import OnboardingStep from '../OnboardingStep';
 import { useTaskCompletion } from '../../../hooks/useTaskCompletion';
 
@@ -82,42 +82,72 @@ export default function FirstTaskStep( props ) {
 		return null;
 	}
 
+	const { config } = props;
+	const brandingName =
+		config?.l10n?.brandingName ||
+		__( 'Progress Planner', 'progress-planner' );
+
 	return (
 		<OnboardingStep { ...props } canProceed={ canProceed }>
 			<div className="tour-content">
-				<h3 className="tour-title">
-					{ __( 'Complete your first task!', 'progress-planner' ) }
-				</h3>
-				<p>
-					{ __(
-						"Let's start by completing your first recommended task.",
-						'progress-planner'
-					) }
-				</p>
-				{ /* Task content will be rendered here - using existing task components */ }
-				<div className="prpl-first-task-content">
-					{ task.title && <h4>{ task.title }</h4> }
-					{ task.url && (
-						<a
-							href={ task.url }
-							target="_blank"
-							rel="noopener noreferrer"
-							className="prpl-button-primary"
-						>
-							{ task.action_label ||
-								__( 'Do it', 'progress-planner' ) }
-						</a>
-					) }
-					<button
-						type="button"
-						className="prpl-complete-task-btn"
-						onClick={ () => handleCompleteTask() }
-						disabled={ isCompleting }
-					>
-						{ isCompleting
-							? __( 'Completing…', 'progress-planner' )
-							: __( 'Mark as complete', 'progress-planner' ) }
-					</button>
+				<div className="prpl-columns-wrapper-flex">
+					<div className="prpl-column">
+						<div className="prpl-background-content">
+							<h3>
+								{ __(
+									'Ready for your first task and your first point?',
+									'progress-planner'
+								) }
+							</h3>
+							<p>
+								{ sprintf(
+									/* translators: %s: Progress Planner name */
+									__(
+										'This is an example of a recommendation in %s. It\'s a task that helps improve your website. Most recommendations can be completed in under five minutes. Once you\'ve completed a recommendation, we\'ll celebrate your success together and provide you with a new recommendation.',
+										'progress-planner'
+									),
+									brandingName
+								) }
+							</p>
+							<p>
+								{ __( "Let's give it a try!", 'progress-planner' ) }
+							</p>
+						</div>
+					</div>
+					<div className="prpl-column">
+						{ task.template_html ? (
+							<div
+								dangerouslySetInnerHTML={ {
+									__html: task.template_html,
+								} }
+							/>
+						) : (
+							<div className="prpl-first-task-content">
+								{ task.title && <h4>{ task.title }</h4> }
+								{ task.url && (
+									<a
+										href={ task.url }
+										target="_blank"
+										rel="noopener noreferrer"
+										className="prpl-button-primary"
+									>
+										{ task.action_label ||
+											__( 'Do it', 'progress-planner' ) }
+									</a>
+								) }
+								<button
+									type="button"
+									className="prpl-complete-task-btn"
+									onClick={ () => handleCompleteTask() }
+									disabled={ isCompleting }
+								>
+									{ isCompleting
+										? __( 'Completing…', 'progress-planner' )
+										: __( 'Mark as complete', 'progress-planner' ) }
+								</button>
+							</div>
+						) }
+					</div>
 				</div>
 			</div>
 		</OnboardingStep>
