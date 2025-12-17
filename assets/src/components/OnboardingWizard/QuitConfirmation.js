@@ -121,13 +121,26 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 									type="button"
 									id="prpl-quit-yes"
 									className="prpl-quit-link"
+									style={ {
+										position: 'relative',
+										zIndex: 100002,
+										pointerEvents: 'auto',
+										cursor: 'pointer',
+									} }
+									onMouseDown={ ( e ) => {
+										console.log( '[QuitConfirmation] Yes button mousedown' );
+										e.stopPropagation();
+									} }
 									onClick={ ( e ) => {
 										console.log( '[QuitConfirmation] Yes button clicked', {
 											hasOnConfirm: typeof onConfirm === 'function',
+											target: e.target,
+											currentTarget: e.currentTarget,
 										} );
 										e.preventDefault();
 										e.stopPropagation();
 										if ( typeof onConfirm === 'function' ) {
+											console.log( '[QuitConfirmation] Calling onConfirm' );
 											onConfirm();
 										} else {
 											console.error( '[QuitConfirmation] onConfirm is not a function', onConfirm );
@@ -143,6 +156,16 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 									type="button"
 									id="prpl-quit-no"
 									className="prpl-quit-link prpl-quit-link-primary"
+									style={ {
+										position: 'relative',
+										zIndex: 100002,
+										pointerEvents: 'auto',
+										cursor: 'pointer',
+									} }
+									onMouseDown={ ( e ) => {
+										console.log( '[QuitConfirmation] No button mousedown' );
+										e.stopPropagation();
+									} }
 									onClick={ ( e ) => {
 										console.log( '[QuitConfirmation] No button clicked' );
 										e.preventDefault();
