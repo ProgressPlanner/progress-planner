@@ -337,6 +337,7 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 	 * Handle close button click.
 	 */
 	const handleClose = () => {
+		console.log( '[OnboardingWizard] handleClose called (close button clicked)' );
 		setShowQuitConfirmation( true );
 	};
 
@@ -348,34 +349,41 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 			hasPopoverRef: !! popoverRef.current,
 			hasHidePopover: popoverRef.current && typeof popoverRef.current.hidePopover === 'function',
 			isOpen,
+			popoverIsOpen: popoverRef.current?.matches( ':popover-open' ),
 		} );
 
 		setShowQuitConfirmation( false );
 		
-		// Save progress before closing.
+		// Save progress before closing (don't wait for it).
 		progressHooks.saveProgress( wizardState ).catch( () => {
 			// Silently fail.
 		} );
 
 		// Hide popover - toggle event will update isOpen state
-		if (
-			popoverRef.current &&
-			typeof popoverRef.current.hidePopover === 'function'
-		) {
+		const element = popoverRef.current;
+		if ( element && typeof element.hidePopover === 'function' ) {
 			console.log( '[OnboardingWizard] Calling hidePopover()' );
 			try {
-				popoverRef.current.hidePopover();
+				element.hidePopover();
 				console.log( '[OnboardingWizard] hidePopover() called successfully' );
 				
-				// Force update isOpen state after a short delay to ensure it's synced
+				// Immediately set isOpen to false - toggle event will confirm or correct it
+				setIsOpen( false );
+				
+				// Verify it actually closed after a short delay
 				setTimeout( () => {
-					if ( popoverRef.current && ! popoverRef.current.matches( ':popover-open' ) ) {
-						console.log( '[OnboardingWizard] Popover is closed, syncing isOpen state' );
-						setIsOpen( false );
+					if ( element && element.matches( ':popover-open' ) ) {
+						console.warn( '[OnboardingWizard] Popover still open after hidePopover(), forcing close' );
+						// Force close by removing the popover attribute temporarily
+						element.removeAttribute( 'popover' );
+						setTimeout( () => {
+							element.setAttribute( 'popover', 'manual' );
+							setIsOpen( false );
+						}, 0 );
 					} else {
-						console.warn( '[OnboardingWizard] Popover still appears to be open after hidePopover()' );
+						console.log( '[OnboardingWizard] Popover closed successfully' );
 					}
-				}, 100 );
+				}, 50 );
 			} catch ( error ) {
 				console.error( '[OnboardingWizard] Error calling hidePopover()', error );
 				setIsOpen( false );
