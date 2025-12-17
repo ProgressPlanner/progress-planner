@@ -68,7 +68,8 @@ class Onboard_Wizard {
 		// For React implementation, we'll ALWAYS pass config to dashboard (React controls visibility).
 		// The React components will handle the wizard UI and visibility based on skip_onboarding flag.
 		// We need the config to be added even if skip_onboarding is true, so React can render the component.
-		\add_action( 'admin_enqueue_scripts', [ $this, 'add_wizard_config' ] );
+		// Priority 5 ensures this runs before Page::enqueue_assets() (priority 10) so the filter is registered.
+		\add_action( 'admin_enqueue_scripts', [ $this, 'add_wizard_config' ], 5 );
 
 		// Note: We no longer return early if skip_onboarding is true.
 		// The config will be added with enabled: false when skip_onboarding is true, and React will handle visibility.
@@ -356,6 +357,7 @@ class Onboard_Wizard {
 			'progress_planner_dashboard_config',
 			function ( $config ) use ( $steps_formatted, $saved_progress, $pages_formatted, $post_types_formatted, $page_types, $skip_onboarding ) {
 				\error_log( '[PHP] add_wizard_config filter callback called, skip_onboarding: ' . ( $skip_onboarding ? 'true' : 'false' ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				\error_log( '[PHP] Config before adding wizard: ' . \wp_json_encode( \array_keys( $config ) ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				// Capture logo HTML.
 				\ob_start();
 				\progress_planner()->get_ui__branding()->the_logo();
@@ -388,6 +390,8 @@ class Onboard_Wizard {
 						'backToRecommendations' => \esc_html__( 'Back to recommendations', 'progress-planner' ),
 					],
 				];
+				\error_log( '[PHP] Config after adding wizard: ' . \wp_json_encode( \array_keys( $config ) ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+				\error_log( '[PHP] onboardingWizard enabled: ' . ( $config['onboardingWizard']['enabled'] ? 'true' : 'false' ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				return $config;
 			}
 		);
