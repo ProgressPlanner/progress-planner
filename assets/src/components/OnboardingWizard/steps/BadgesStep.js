@@ -17,58 +17,80 @@ import OnboardingStep from '../OnboardingStep';
  * @return {JSX.Element} Badges step component.
  */
 export default function BadgesStep( props ) {
-	const { wizardState } = props;
+	const { wizardState, stepData } = props;
 	const gaugeRef = useRef( null );
+	const badgeData = stepData?.data || {};
 
 	useEffect( () => {
 		// Initialize badge gauge component if available.
-		if ( gaugeRef.current && window.customElements?.get( 'prpl-badge' ) ) {
-			const badgeId = gaugeRef.current.getAttribute( 'data-badge-id' );
-			const badgeName =
-				gaugeRef.current.getAttribute( 'data-badge-name' );
-			const brandingId =
-				gaugeRef.current.getAttribute( 'data-branding-id' );
-
-			if ( badgeId && badgeName ) {
-				gaugeRef.current.innerHTML = `
-					<prpl-badge
-						complete="true"
-						badge-id="${ badgeId }"
-						badge-name="${ badgeName }"
-						branding-id="${ brandingId || '' }"
-					></prpl-badge>
-				`;
-
+		if ( gaugeRef.current && window.customElements?.get( 'prpl-gauge' ) ) {
+			const gauge = gaugeRef.current.querySelector( 'prpl-gauge' );
+			if ( gauge && badgeData.badgeId && badgeData.badgeName ) {
 				// Increment badge points after first task completion.
 				setTimeout( () => {
 					if (
-						gaugeRef.current &&
+						gauge &&
 						wizardState.data.firstTaskCompleted
 					) {
-						gaugeRef.current.value =
-							( gaugeRef.current.value || 0 ) + 1;
+						gauge.setAttribute(
+							'data-value',
+							( parseFloat( gauge.getAttribute( 'data-value' ) ) || 0 ) + 1
+						);
 					}
 				}, 1500 );
 			}
 		}
-	}, [ wizardState.data.firstTaskCompleted ] );
+	}, [ wizardState.data.firstTaskCompleted, badgeData ] );
 
 	return (
 		<OnboardingStep { ...props } canProceed={ () => true }>
 			<div className="tour-content">
-				<div
-					id="prpl-gauge-onboarding"
-					ref={ gaugeRef }
-					data-badge-id=""
-					data-badge-name=""
-					data-branding-id=""
-				/>
-				<p>
-					{ __(
-						'Complete tasks to earn badges and track your progress!',
-						'progress-planner'
-					) }
-				</p>
+				<div className="prpl-columns-wrapper-flex prpl-columns-2-1">
+					<div className="prpl-column">
+						<div className="prpl-background-content">
+							<h3>
+								{ __(
+									'Whoohoo, nice one! You just earned your first point!',
+									'progress-planner'
+								) }
+							</h3>
+							<p>
+								{ __(
+									'Gather ten points this month to unlock your special badge.',
+									'progress-planner'
+								) }
+							</p>
+							<p>
+								{ __(
+									'You're off to a great start!',
+									'progress-planner'
+								) }
+							</p>
+						</div>
+					</div>
+					<div className="prpl-column">
+						<div className="prpl-gauge-wrapper" ref={ gaugeRef }>
+							{ badgeData.badgeId && badgeData.badgeName && (
+								<prpl-gauge
+									id="prpl-gauge-onboarding"
+									background="#fff"
+									color="var(--prpl-color-monthly)"
+									contentFontSize="3rem"
+									contentPadding="20px"
+									marginBottom="0"
+									data-max={ badgeData.maxPoints || 10 }
+									data-value={ badgeData.currentValue || 0 }
+									data-badge-id={ badgeData.badgeId }
+									data-badge-name={ badgeData.badgeName }
+									data-branding-id={ badgeData.brandingId || '' }
+								>
+									{ /* Badge will be loaded dynamically */ }
+								</prpl-gauge>
+							) }
+							{ __( 'Monthly badge', 'progress-planner' ) }
+						</div>
+					</div>
+				</div>
 			</div>
 		</OnboardingStep>
 	);

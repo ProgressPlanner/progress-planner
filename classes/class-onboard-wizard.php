@@ -174,10 +174,27 @@ class Onboard_Wizard {
 			];
 		}
 
+		// Get badge data for BadgesStep.
+		$badge_data = [];
+		if ( \class_exists( '\Progress_Planner\Badges\Monthly' ) ) {
+			$badge = \Progress_Planner\Badges\Monthly::get_instance_from_id(
+				\Progress_Planner\Badges\Monthly::get_badge_id_from_date( new \DateTime() )
+			);
+			$badge_score = \progress_planner()->get_admin__widgets__monthly_badges()->get_score();
+			$badge_data = [
+				'badgeId'     => $badge->get_id(),
+				'badgeName'   => $badge->get_name(),
+				'brandingId'  => (int) \progress_planner()->get_ui__branding()->get_branding_id(),
+				'maxPoints'   => (int) \constant( '\Progress_Planner\Badges\Monthly::TARGET_POINTS' ),
+				'currentValue' => (float) $badge_score['target_score'],
+			];
+		}
+
 		$this->steps[] = [
 			'script_file_name'   => 'BadgesStep',
 			'template_file_name' => 'badges',
 			'template_id'        => 'onboarding-step-badges',
+			'template_data'      => $badge_data,
 			'title'              => esc_html__( 'Our badges are waiting for you', 'progress-planner' ),
 		];
 
