@@ -178,6 +178,24 @@ export default function WelcomeStep( props ) {
 							</div>
 						) }
 					</div>
+					<div className="prpl-column prpl-hide-on-mobile">
+						<div id="prpl-welcome-graphic">
+							{ /* Graphic would be rendered here - thumbs_up_ravi_rtl.svg */ }
+							<div
+								style={ {
+									width: '100%',
+									height: '200px',
+									backgroundColor: '#f0f0f0',
+									display: 'flex',
+									alignItems: 'center',
+									justifyContent: 'center',
+									color: '#999',
+								} }
+							>
+								{ __( 'Graphic placeholder', 'progress-planner' ) }
+							</div>
+						</div>
+					</div>
 				</div>
 			</div>
 		</OnboardingStep>
