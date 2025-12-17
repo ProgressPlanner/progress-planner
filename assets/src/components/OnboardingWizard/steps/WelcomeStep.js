@@ -18,7 +18,7 @@ import { useLicenseGenerator } from '../../../hooks/useLicenseGenerator';
  * @return {JSX.Element} Welcome step component.
  */
 export default function WelcomeStep( props ) {
-	const { wizardState, updateState, onNext, config } = props;
+	const { wizardState, updateState, config } = props;
 	const {
 		onboardNonceURL,
 		onboardAPIUrl,
@@ -72,7 +72,7 @@ export default function WelcomeStep( props ) {
 			}
 		}
 
-		onNext();
+		props.onNext();
 	};
 
 	/**
