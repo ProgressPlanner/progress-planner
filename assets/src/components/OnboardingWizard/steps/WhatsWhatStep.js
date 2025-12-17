@@ -16,7 +16,6 @@ import OnboardingStep from '../OnboardingStep';
  * @return {JSX.Element} WhatsWhat step component.
  */
 export default function WhatsWhatStep( props ) {
-
 	return (
 		<OnboardingStep { ...props } canProceed={ () => true }>
 			<div className="tour-content">

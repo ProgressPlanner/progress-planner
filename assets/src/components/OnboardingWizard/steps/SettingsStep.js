@@ -241,7 +241,9 @@ export default function SettingsStep( props ) {
 										</select>
 									</div>
 									<div className="prpl-checkbox-wrapper">
-										<label htmlFor={ `prpl-no-${ subStepName }-page` }>
+										<label
+											htmlFor={ `prpl-no-${ subStepName }-page` }
+										>
 											<input
 												type="checkbox"
 												id={ `prpl-no-${ subStepName }-page` }
