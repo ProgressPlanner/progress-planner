@@ -168,28 +168,59 @@ class Task_Evaluation extends Base {
 	}
 
 	/**
-	 * Create multiple tasks in a batch.
+	 * Create multiple tasks in a batch with optimized database operations.
+	 *
+	 * Optimizations over sequential processing:
+	 * - Single lock for entire batch (vs per-task locks)
+	 * - Bulk existence check with one query (vs per-task queries)
+	 * - Pre-fetch all provider terms at once (vs per-task term lookups)
+	 * - Direct response building (no internal REST calls)
 	 *
 	 * @param \WP_REST_Request $request The REST request object.
 	 * @return \WP_REST_Response The REST response object.
 	 */
 	public function create_tasks_batch( $request ) {
-		$tasks   = $request->get_param( 'tasks' );
-		$results = [];
+		$tasks = $request->get_param( 'tasks' );
+		if ( empty( $tasks ) ) {
+			return new \WP_REST_Response(
+				[
+					'success' => true,
+					'tasks'   => [],
+				],
+				200
+			);
+		}
 
+		// Sanitize all tasks first.
+		$sanitized_tasks = [];
 		foreach ( $tasks as $task_details ) {
-			// Sanitize each task's details.
-			$sanitized = $this->sanitize_task_details( $task_details, $request, 'tasks' );
-			$result    = $this->create_single_task( $sanitized );
+			$sanitized_tasks[] = $this->sanitize_task_details( $task_details, $request, 'tasks' );
+		}
 
-			if ( \is_wp_error( $result ) ) {
-				$results[] = [
-					'success' => false,
-					'message' => $result->get_error_message(),
-				];
-			} else {
-				$results[] = $result;
+		// Acquire a single lock for the entire batch.
+		$lock_key   = 'prpl_batch_lock_' . \md5( \wp_json_encode( \array_column( $sanitized_tasks, 'task_id' ) ) );
+		$lock_value = \time();
+
+		if ( ! \add_option( $lock_key, $lock_value, '', false ) ) {
+			$current = \get_option( $lock_key );
+			if ( ! $current || $current >= \time() - 30 ) {
+				// Lock is held by another active process.
+				return new \WP_REST_Response(
+					[
+						'success' => false,
+						'message' => \esc_html__( 'Batch creation in progress by another process.', 'progress-planner' ),
+					],
+					409
+				);
 			}
+			// Stale lock, take it over.
+			\update_option( $lock_key, $lock_value );
+		}
+
+		try {
+			$results = $this->process_batch_tasks( $sanitized_tasks );
+		} finally {
+			\delete_option( $lock_key );
 		}
 
 		return new \WP_REST_Response(
@@ -199,6 +230,283 @@ class Task_Evaluation extends Base {
 			],
 			201
 		);
+	}
+
+	/**
+	 * Process batch tasks with optimized database operations.
+	 *
+	 * @param array $sanitized_tasks Array of sanitized task details.
+	 * @return array Array of results for each task.
+	 */
+	private function process_batch_tasks( $sanitized_tasks ) {
+		$results = [];
+
+		// Step 1: Bulk check for existing tasks (single query).
+		$task_ids     = \array_column( $sanitized_tasks, 'task_id' );
+		$existing_map = $this->bulk_check_existing_tasks( $task_ids );
+
+		// Step 2: Pre-fetch/create all needed provider terms.
+		$provider_ids = \array_unique( \array_column( $sanitized_tasks, 'provider_id' ) );
+		$term_map     = $this->ensure_provider_terms( $provider_ids );
+
+		// Step 3: Process each task - create only those that don't exist.
+		foreach ( $sanitized_tasks as $task_details ) {
+			$task_id = (string) $task_details['task_id'];
+
+			// Check if task exists from our bulk query.
+			if ( isset( $existing_map[ $task_id ] ) ) {
+				$existing  = $existing_map[ $task_id ];
+				$results[] = [
+					'success' => true,
+					'post_id' => $existing->ID,
+					'task'    => $this->build_task_response_from_post( $existing ),
+					'message' => \esc_html__( 'Task already exists.', 'progress-planner' ),
+				];
+				continue;
+			}
+
+			// Prepare task data.
+			$task_data = [
+				'task_id'           => $task_details['task_id'],
+				'provider_id'       => $task_details['provider_id'],
+				'post_title'        => $task_details['post_title'],
+				'description'       => $task_details['description'] ?? '',
+				'priority'          => $task_details['priority'] ?? 50,
+				'points'            => $task_details['points'] ?? 1,
+				'parent'            => $task_details['parent'] ?? 0,
+				'order'             => $task_details['order'] ?? ( $task_details['priority'] ?? 50 ),
+				'url'               => $task_details['url'] ?? '',
+				'url_target'        => $task_details['url_target'] ?? '_self',
+				'external_link_url' => $task_details['external_link_url'] ?? '',
+				'dismissable'       => $task_details['dismissable'] ?? false,
+				'post_status'       => 'publish',
+			];
+
+			if ( isset( $task_details['link_setting'] ) && \is_array( $task_details['link_setting'] ) ) {
+				$task_data['link_setting'] = $task_details['link_setting'];
+			}
+
+			// Create the task post directly (bypass Suggested_Tasks_DB::add() to avoid per-task locking).
+			$post_id = $this->create_task_post( $task_data, $term_map );
+
+			if ( ! $post_id ) {
+				$results[] = [
+					'success' => false,
+					'message' => \esc_html__( 'Failed to create task.', 'progress-planner' ),
+				];
+				continue;
+			}
+
+			$results[] = [
+				'success' => true,
+				'post_id' => $post_id,
+				'task'    => $this->build_task_response( $post_id, $task_data ),
+				'message' => \esc_html__( 'Task created successfully.', 'progress-planner' ),
+			];
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Bulk check for existing tasks with a single database query.
+	 *
+	 * @param string[] $task_ids Array of task IDs to check.
+	 * @return array<string, \WP_Post> Map of task_id => WP_Post for existing tasks.
+	 */
+	private function bulk_check_existing_tasks( array $task_ids ) {
+		if ( empty( $task_ids ) ) {
+			return [];
+		}
+
+		// Convert task IDs to post slugs.
+		$slugs         = [];
+		$trashed_slugs = [];
+		foreach ( $task_ids as $task_id ) {
+			$slug            = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task_id );
+			$slugs[]         = $slug;
+			$trashed_slugs[] = $slug . '__trashed';
+		}
+
+		// Single query for all tasks (including trashed).
+		$all_slugs = \array_merge( $slugs, $trashed_slugs );
+		$posts     = \get_posts(
+			[
+				'post_type'      => 'prpl_recommendations',
+				'post_status'    => [ 'publish', 'trash', 'draft', 'future', 'pending' ],
+				'post_name__in'  => $all_slugs,
+				'posts_per_page' => \count( $all_slugs ),
+				'no_found_rows'  => true,
+			]
+		);
+
+		// Build map of task_id => post.
+		$map = [];
+		foreach ( $posts as $post ) {
+			// Find the original task_id this post belongs to.
+			$slug = $post->post_name;
+			// Remove __trashed suffix if present.
+			$clean_slug = \preg_replace( '/__trashed$/', '', $slug );
+
+			// Find matching task_id.
+			foreach ( $task_ids as $task_id ) {
+				$expected_slug = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task_id );
+				if ( $clean_slug === $expected_slug ) {
+					$map[ $task_id ] = $post;
+					break;
+				}
+			}
+		}
+
+		return $map;
+	}
+
+	/**
+	 * Ensure all provider terms exist, creating any that don't.
+	 *
+	 * @param string[] $provider_ids Array of provider IDs.
+	 * @return array<string, int> Map of provider_id => term_id.
+	 */
+	private function ensure_provider_terms( array $provider_ids ) {
+		if ( empty( $provider_ids ) ) {
+			return [];
+		}
+
+		$taxonomy = 'prpl_recommendations_provider';
+		$term_map = [];
+
+		// Get all existing terms in one query.
+		$existing_terms = \get_terms(
+			[
+				'taxonomy'   => $taxonomy,
+				'name'       => $provider_ids,
+				'hide_empty' => false,
+			]
+		);
+
+		if ( ! \is_wp_error( $existing_terms ) ) {
+			foreach ( $existing_terms as $term ) {
+				$term_map[ $term->name ] = $term->term_id;
+			}
+		}
+
+		// Create any missing terms.
+		foreach ( $provider_ids as $provider_id ) {
+			if ( ! isset( $term_map[ $provider_id ] ) ) {
+				$result = \wp_insert_term( $provider_id, $taxonomy );
+				if ( ! \is_wp_error( $result ) ) {
+					$term_map[ $provider_id ] = $result['term_id'];
+				}
+			}
+		}
+
+		return $term_map;
+	}
+
+	/**
+	 * Create a task post directly (optimized for batch processing).
+	 *
+	 * @param array<string, mixed> $task_data The task data.
+	 * @param array<string, int>   $term_map  Map of provider_id => term_id.
+	 * @return int|false The post ID or false on failure.
+	 */
+	private function create_task_post( array $task_data, array $term_map ) {
+		$args = [
+			'post_type'    => 'prpl_recommendations',
+			'post_title'   => $task_data['post_title'],
+			'post_content' => $task_data['description'] ?? '',
+			'post_status'  => 'publish',
+			'menu_order'   => $task_data['order'] ?? 0,
+			'post_name'    => \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( (string) $task_data['task_id'] ),
+		];
+
+		$post_id = \wp_insert_post( $args );
+		if ( ! $post_id ) {
+			return false;
+		}
+
+		// Set provider term using pre-fetched term_id.
+		$provider_id = (string) $task_data['provider_id'];
+		if ( isset( $term_map[ $provider_id ] ) ) {
+			\wp_set_post_terms( $post_id, [ $term_map[ $provider_id ] ], 'prpl_recommendations_provider' );
+		}
+
+		// Set meta fields.
+		$meta_fields = [
+			'task_id',
+			'priority',
+			'points',
+			'url',
+			'url_target',
+			'external_link_url',
+			'dismissable',
+			'link_setting',
+		];
+
+		foreach ( $meta_fields as $field ) {
+			if ( isset( $task_data[ $field ] ) ) {
+				\update_post_meta( $post_id, "prpl_$field", $task_data[ $field ] );
+			}
+		}
+
+		return $post_id;
+	}
+
+	/**
+	 * Build task response from an existing post object.
+	 *
+	 * @param \WP_Post $post The post object.
+	 * @return array The task response data.
+	 */
+	private function build_task_response_from_post( $post ) {
+		// Fetch all meta values.
+		$priority      = \get_post_meta( $post->ID, 'prpl_priority', true );
+		$points        = \get_post_meta( $post->ID, 'prpl_points', true );
+		$url           = \get_post_meta( $post->ID, 'prpl_url', true );
+		$url_target    = \get_post_meta( $post->ID, 'prpl_url_target', true );
+		$external_link = \get_post_meta( $post->ID, 'prpl_external_link_url', true );
+		$link_setting  = \get_post_meta( $post->ID, 'prpl_link_setting', true );
+
+		return [
+			'id'                 => $post->ID,
+			'date'               => $post->post_date,
+			'date_gmt'           => $post->post_date_gmt,
+			'modified'           => $post->post_modified,
+			'modified_gmt'       => $post->post_modified_gmt,
+			'slug'               => $post->post_name,
+			'status'             => $post->post_status,
+			'type'               => $post->post_type,
+			'link'               => \get_permalink( $post->ID ),
+			'title'              => [
+				'rendered' => $post->post_title,
+			],
+			'content'            => [
+				'rendered' => $post->post_content,
+			],
+			'menu_order'         => $post->menu_order,
+			'prpl_priority'      => $priority ? $priority : 50,
+			'prpl_points'        => $points ? $points : 1,
+			'prpl_url'           => $url ? $url : '',
+			'prpl_url_target'    => $url_target ? $url_target : '_self',
+			'prpl_external_link' => $external_link ? $external_link : '',
+			'prpl_dismissable'   => (bool) \get_post_meta( $post->ID, 'prpl_dismissable', true ),
+			'prpl_link_setting'  => $link_setting ? $link_setting : null,
+			'prpl_provider'      => $this->get_post_provider( $post->ID ),
+		];
+	}
+
+	/**
+	 * Get the provider ID for a post.
+	 *
+	 * @param int $post_id The post ID.
+	 * @return string|null The provider ID or null.
+	 */
+	private function get_post_provider( $post_id ) {
+		$terms = \wp_get_post_terms( $post_id, 'prpl_recommendations_provider' );
+		if ( ! empty( $terms ) && ! \is_wp_error( $terms ) ) {
+			return $terms[0]->name;
+		}
+		return null;
 	}
 
 	/**
