@@ -221,3 +221,5 @@ doAction( 'prpl.dashboard.registerWidget', {
 	title: __( "What's new on the Progress Planner blog", 'progress-planner' ),
 	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );
+
+export default WhatsNew;

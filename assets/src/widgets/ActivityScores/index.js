@@ -274,3 +274,5 @@ doAction( 'prpl.dashboard.registerWidget', {
 	title: __( 'Your website activity score', 'progress-planner' ),
 	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );
+
+export default ActivityScores;

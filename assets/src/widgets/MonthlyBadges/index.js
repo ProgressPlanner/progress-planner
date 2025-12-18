@@ -301,3 +301,5 @@ doAction( 'prpl.dashboard.registerWidget', {
 	title: __( 'Your monthly badge', 'progress-planner' ),
 	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );
+
+export default MonthlyBadges;

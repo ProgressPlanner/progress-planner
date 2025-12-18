@@ -764,3 +764,5 @@ doAction( 'prpl.dashboard.registerWidget', {
 	title: __( 'My to-do list', 'progress-planner' ),
 	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );
+
+export default TodoWidget;

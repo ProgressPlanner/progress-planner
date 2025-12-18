@@ -76,3 +76,5 @@ doAction( 'prpl.dashboard.registerWidget', {
 	title: __( 'Your streak badges', 'progress-planner' ),
 	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );
+
+export default StreakBadges;

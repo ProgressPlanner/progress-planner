@@ -721,3 +721,5 @@ doAction( 'prpl.dashboard.registerWidget', {
 	title: __( "Ravi's Recommendations", 'progress-planner' ), // Will be customized with branding if needed
 	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );
+
+export default SuggestedTasks;
