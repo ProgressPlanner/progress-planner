@@ -12,6 +12,16 @@ jest.mock( '@wordpress/i18n', () => ( {
 // Mock TrashIcon
 jest.mock( '../icons/TrashIcon', () => () => <svg data-testid="trash-icon" /> );
 
+// Mock taskUtils with a function that returns prpl_points or default to 0
+jest.mock( '../../../utils/taskUtils', () => ( {
+	getTaskPoints: ( task ) => {
+		if ( task.prpl_points !== undefined && task.prpl_points !== null ) {
+			return parseInt( task.prpl_points, 10 ) || 0;
+		}
+		return 0; // Default to 0 in tests for predictable behavior
+	},
+} ) );
+
 // Import after mocks
 import TaskPoints from '../TaskPoints';
 

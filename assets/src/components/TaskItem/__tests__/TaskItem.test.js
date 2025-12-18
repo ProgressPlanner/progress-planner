@@ -11,6 +11,17 @@ jest.mock( '../../../services/taskRegistry', () => ( {
 	getTaskProviderInstance: jest.fn( () => null ),
 	registerTaskProvider: jest.fn(),
 	getRegisteredProviders: jest.fn( () => [] ),
+	getTaskProviderClass: jest.fn( () => null ),
+} ) );
+
+// Mock taskUtils
+jest.mock( '../../../utils/taskUtils', () => ( {
+	getTaskPoints: ( task ) => {
+		if ( task.prpl_points !== undefined && task.prpl_points !== null ) {
+			return parseInt( task.prpl_points, 10 ) || 0;
+		}
+		return 1;
+	},
 } ) );
 
 // Helper to create a mock task

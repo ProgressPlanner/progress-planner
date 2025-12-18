@@ -52,6 +52,16 @@ jest.mock( '../../../utils/gridResize', () => ( {
 	dispatchGridResize: jest.fn(),
 } ) );
 
+// Mock taskUtils to avoid importing taskRegistry which uses addAction
+jest.mock( '../../../utils/taskUtils', () => ( {
+	getTaskPoints: ( task ) => {
+		if ( task.prpl_points !== undefined && task.prpl_points !== null ) {
+			return parseInt( task.prpl_points, 10 ) || 0;
+		}
+		return 1; // Default to 1 point
+	},
+} ) );
+
 // Mock child components
 jest.mock( '../../../components/WidgetHeader', () => ( props ) => (
 	<div data-testid="widget-header">{ props.title }</div>
