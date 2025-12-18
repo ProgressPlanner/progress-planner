@@ -87,6 +87,7 @@ class Tasks_Manager {
 		'unpublished-content',
 		'update-core',
 		'update-term-description',
+		'user',
 		'wp-debug-display',
 	];
 

@@ -153,6 +153,14 @@ function TodoWidget( { config = {} } ) {
 		( state ) => state.onTaskCompleted
 	);
 
+	// Get terms functionality from dashboardStore (mirrors develop branch's prplTerms).
+	const userProviderId = useDashboardStore( ( state ) =>
+		state.getProviderTermId( 'user' )
+	);
+	const fetchProviderTerms = useDashboardStore(
+		( state ) => state.fetchProviderTerms
+	);
+
 	/**
 	 * Sort tasks: golden tasks first, then by menu_order.
 	 *
@@ -220,6 +228,14 @@ function TodoWidget( { config = {} } ) {
 	}, [ sortTasksWithGoldenFirst ] );
 
 	/**
+	 * Fetch provider terms on mount.
+	 * This ensures we have the 'user' term ID for creating tasks.
+	 */
+	useEffect( () => {
+		fetchProviderTerms();
+	}, [ fetchProviderTerms ] );
+
+	/**
 	 * Create a new task.
 	 */
 	const handleCreateTask = useCallback(
@@ -241,7 +257,7 @@ function TodoWidget( { config = {} } ) {
 				const newTask = await createTask( {
 					title: newTaskTitle,
 					menuOrder: highestOrder + 1,
-					providerId: config?.userProviderId,
+					providerId: userProviderId,
 					points: 0,
 				} );
 
@@ -270,12 +286,7 @@ function TodoWidget( { config = {} } ) {
 				setIsCreatingTask( false );
 			}
 		},
-		[
-			newTaskTitle,
-			pendingTasks,
-			sortTasksWithGoldenFirst,
-			config?.userProviderId,
-		]
+		[ newTaskTitle, pendingTasks, sortTasksWithGoldenFirst, userProviderId ]
 	);
 
 	/**

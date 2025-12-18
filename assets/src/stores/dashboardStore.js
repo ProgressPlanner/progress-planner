@@ -7,6 +7,7 @@
  */
 
 import { create } from 'zustand';
+import apiFetch from '@wordpress/api-fetch';
 
 /**
  * Dashboard store.
@@ -14,7 +15,7 @@ import { create } from 'zustand';
  * State is automatically shared across all React roots because
  * Zustand stores are global singletons.
  */
-export const useDashboardStore = create( ( set ) => ( {
+export const useDashboardStore = create( ( set, get ) => ( {
 	// State
 
 	/**
@@ -59,6 +60,22 @@ export const useDashboardStore = create( ( set ) => ( {
 	 * Flag to indicate if the onboarding wizard should auto-start.
 	 */
 	shouldAutoStartWizard: false,
+
+	/**
+	 * Provider taxonomy terms (keyed by slug).
+	 * Used to get term IDs for task creation.
+	 */
+	providerTerms: {},
+
+	/**
+	 * Whether provider terms are being loaded.
+	 */
+	termsLoading: false,
+
+	/**
+	 * Whether provider terms have been loaded.
+	 */
+	termsLoaded: false,
 
 	// Actions
 
@@ -125,6 +142,75 @@ export const useDashboardStore = create( ( set ) => ( {
 	 */
 	setShouldAutoStartWizard: ( value ) => {
 		set( { shouldAutoStartWizard: value } );
+	},
+
+	/**
+	 * Get provider term ID by slug.
+	 *
+	 * @param {string} slug - The term slug (e.g., 'user').
+	 * @return {number|null} The term ID, or null if not found.
+	 */
+	getProviderTermId: ( slug ) => {
+		const state = get();
+		return state.providerTerms[ slug ]?.id || null;
+	},
+
+	/**
+	 * Fetch provider taxonomy terms from REST API.
+	 * Creates 'user' term if it doesn't exist (matches develop branch behavior).
+	 *
+	 * @return {Promise<Object>} Promise resolving to terms object.
+	 */
+	fetchProviderTerms: async () => {
+		const state = get();
+		if ( state.termsLoaded || state.termsLoading ) {
+			return state.providerTerms;
+		}
+
+		set( { termsLoading: true } );
+
+		try {
+			const data = await apiFetch( {
+				path: '/wp/v2/prpl_recommendations_provider?per_page=100',
+			} );
+
+			const terms = {};
+			let userTermFound = false;
+
+			data.forEach( ( term ) => {
+				terms[ term.slug ] = term;
+				if ( term.slug === 'user' ) {
+					userTermFound = true;
+				}
+			} );
+
+			// If 'user' term doesn't exist, create it (matches develop branch)
+			if ( ! userTermFound ) {
+				try {
+					const newTerm = await apiFetch( {
+						path: '/wp/v2/prpl_recommendations_provider',
+						method: 'POST',
+						data: { slug: 'user', name: 'user' },
+					} );
+					terms.user = newTerm;
+				} catch ( createError ) {
+					// eslint-disable-next-line no-console
+					console.error( 'Error creating user term:', createError );
+				}
+			}
+
+			set( {
+				providerTerms: terms,
+				termsLoading: false,
+				termsLoaded: true,
+			} );
+			return terms;
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Error fetching provider terms:', error );
+			set( { termsLoading: false } );
+			return {};
+		}
 	},
 } ) );
 

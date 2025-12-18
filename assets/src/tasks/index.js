@@ -42,3 +42,6 @@ import './DisableCommentPaginationTask';
 // Performance tasks - optimization related
 import './ImprovePdfHandlingTask';
 import './ReduceAutoloadedOptionsTask';
+
+// User tasks - user-created todo items
+import './UserTask';
