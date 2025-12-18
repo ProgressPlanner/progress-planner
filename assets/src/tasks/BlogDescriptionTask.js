@@ -58,35 +58,18 @@ class BlogDescriptionTask extends InteractiveTaskProvider {
 	async getTaskDetails( taskData = {} ) {
 		const taskId = this.getTaskId( taskData );
 
-		// Build URL to options-general.php with focus element.
-		const adminUrl =
-			window.prplSuggestedTasksConfig?.adminUrl || '/wp-admin/';
-		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
-		const url = `${ adminUrl }${ separator }options-general.php?pp-focus-el=${ taskId }`;
-
-		const StaticClass = this.constructor;
-		const taskDetails = {
-			task_id: taskId,
-			provider_id: this.getProviderId(),
+		const taskDetails = this.buildTaskDetails( taskData, {
 			post_title: 'Set tagline',
 			description:
 				'Set the tagline to make your website look more professional.',
-			priority: this.getPriority(),
-			points: this.getPoints(),
-			parent: StaticClass.parent || 0,
-			url,
-			url_target: '_self',
-			dismissable:
-				StaticClass.isDismissable !== undefined
-					? StaticClass.isDismissable
-					: this.config.isDismissable,
-			external_link_url:
-				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
+			url: this.buildAdminUrl( 'options-general.php', {
+				'pp-focus-el': taskId,
+			} ),
 			link_setting: {
 				hook: 'options-general.php',
 				iconEl: 'th:has(+td #tagline-description)',
 			},
-		};
+		} );
 
 		// Add popover ID for interactive tasks.
 		return this.addPopoverIdToTaskDetails( taskDetails );

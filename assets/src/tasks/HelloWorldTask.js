@@ -56,45 +56,26 @@ class HelloWorldTask extends InteractiveTaskProvider {
 			'hello_world_post_id'
 		);
 
-		// Get the task ID.
-		const taskId = this.getTaskId( taskData );
-
 		// Build URL if we have a post ID.
-		let url = '';
-		if ( helloWorldPostId && helloWorldPostId !== 0 ) {
-			// Build edit post URL - WordPress admin URL format.
-			const adminUrl =
-				window.prplSuggestedTasksConfig?.adminUrl || '/wp-admin/';
-			const separator = adminUrl.endsWith( '/' ) ? '' : '/';
-			url = `${ adminUrl }${ separator }post.php?post=${ helloWorldPostId }&action=edit`;
-		}
+		const url =
+			helloWorldPostId && helloWorldPostId !== 0
+				? this.buildAdminUrl( 'post.php', {
+						post: helloWorldPostId,
+						action: 'edit',
+				  } )
+				: '';
 
 		// Build description.
-		// Note: The full description with post URL would require fetching the permalink from the server.
-		// For now, use a simplified description that matches the PHP version's fallback.
 		const description =
 			helloWorldPostId && helloWorldPostId !== 0
 				? '<p>On install, WordPress creates a "Hello World!" post. This post does not add value to your website and solely exists to show what a post can look like. Therefore, "Hello World!" is not needed and should be deleted.</p>'
 				: 'On install, WordPress creates a "Hello World!" post. This post is not needed and should be deleted.';
 
-		const StaticClass = this.constructor;
-		const taskDetails = {
-			task_id: taskId,
-			provider_id: this.getProviderId(),
+		const taskDetails = this.buildTaskDetails( taskData, {
 			post_title: 'Delete the "Hello World!" post.',
 			description,
-			priority: this.getPriority(),
-			points: this.getPoints(),
-			parent: StaticClass.parent || 0,
 			url,
-			url_target: '_self',
-			dismissable:
-				StaticClass.isDismissable !== undefined
-					? StaticClass.isDismissable
-					: this.config.isDismissable,
-			external_link_url:
-				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
-		};
+		} );
 
 		// Add popover ID for interactive tasks.
 		return this.addPopoverIdToTaskDetails( taskDetails );

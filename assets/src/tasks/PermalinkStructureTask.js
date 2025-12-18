@@ -63,40 +63,14 @@ class PermalinkStructureTask extends InteractiveTaskProvider {
 	 */
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
-		const taskId = this.getTaskId( taskData );
-
-		// Build URL to options-permalink.php.
-		const adminUrl =
-			window.prplSuggestedTasksConfig?.adminUrl || '/wp-admin/';
-		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
-		const url = `${ adminUrl }${ separator }options-permalink.php`;
-
-		// Determine icon element based on current permalink structure.
-		// This would need to be fetched from settings, but for now use default.
-		const linkSetting = {
-			hook: 'options-permalink.php',
-			iconEl: 'label[for="permalink-input-month-name"], label[for="permalink-input-post-name"]',
-		};
-
-		const StaticClass = this.constructor;
-		const taskDetails = {
-			task_id: taskId,
-			provider_id: this.getProviderId(),
+		const taskDetails = this.buildTaskDetails( taskData, {
 			post_title: 'Set permalink structure',
-			description: '',
-			priority: this.getPriority(),
-			points: this.getPoints(),
-			parent: StaticClass.parent || 0,
-			url,
-			url_target: '_self',
-			dismissable:
-				StaticClass.isDismissable !== undefined
-					? StaticClass.isDismissable
-					: this.config.isDismissable,
-			external_link_url:
-				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
-			link_setting: linkSetting,
-		};
+			url: this.buildAdminUrl( 'options-permalink.php' ),
+			link_setting: {
+				hook: 'options-permalink.php',
+				iconEl: 'label[for="permalink-input-month-name"], label[for="permalink-input-post-name"]',
+			},
+		} );
 
 		// Add popover ID for interactive tasks.
 		return this.addPopoverIdToTaskDetails( taskDetails );
