@@ -12,6 +12,7 @@ import TaskTitle from './TaskTitle';
 import TaskPoints from './TaskPoints';
 import TaskMoveButtons from './TaskMoveButtons';
 import { getTaskItemStyle, actionsWrapperStyle } from './styles';
+import { getTaskPoints } from '../../utils/taskUtils';
 
 /**
  * Task Item component.
@@ -164,7 +165,7 @@ export default function TaskItem( {
 			data-post-id={ task.id }
 			data-task-action={ getTaskAction() }
 			data-task-provider-id={ providerSlug }
-			data-task-points={ task.prpl_points || 0 }
+			data-task-points={ getTaskPoints( task ) }
 			data-task-order={ task.menu_order || 0 }
 		>
 			<TaskCheckbox

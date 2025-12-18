@@ -16,9 +16,10 @@ import {
 	pointsBadgeStyle,
 	trashButtonStyle,
 } from './styles';
+import { getTaskPoints } from '../../utils/taskUtils';
 
 export default function TaskPoints( { task, isUserTask, onDelete } ) {
-	const points = task.prpl_points || 0;
+	const points = getTaskPoints( task );
 
 	return (
 		<div

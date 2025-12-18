@@ -22,6 +22,7 @@ import {
 import { useGridMasonry } from '../../hooks/useGridMasonry';
 import { useCelebration } from '../../hooks/useCelebration';
 import { dispatchGridResize } from '../../utils/gridResize';
+import { getTaskPoints } from '../../utils/taskUtils';
 import WidgetHeader from '../../components/WidgetHeader';
 import SuggestedTasksSkeleton from './SuggestedTasksSkeleton';
 import {
@@ -348,7 +349,7 @@ function SuggestedTasks( { config = {} } ) {
 				sendTaskAction( postId, 'complete' );
 
 				// Get task points.
-				const eventPoints = parseInt( task.prpl_points ) || 0;
+				const eventPoints = getTaskPoints( task );
 
 				// Notify context about task completion (for cross-widget updates).
 				if ( eventPoints > 0 ) {

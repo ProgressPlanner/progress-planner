@@ -17,6 +17,7 @@ import {
 import { useGridMasonry } from '../../hooks/useGridMasonry';
 import { useCelebration } from '../../hooks/useCelebration';
 import { dispatchGridResize } from '../../utils/gridResize';
+import { getTaskPoints } from '../../utils/taskUtils';
 import WidgetHeader from '../../components/WidgetHeader';
 import TodoWidgetSkeleton from './TodoWidgetSkeleton';
 import { useDashboardStore } from '../../stores/dashboardStore';
@@ -160,8 +161,8 @@ function TodoWidget( { config = {} } ) {
 	 */
 	const sortTasksWithGoldenFirst = useCallback( ( tasks ) => {
 		return [ ...tasks ].sort( ( a, b ) => {
-			const aIsGolden = ( a.prpl_points || 0 ) === 1;
-			const bIsGolden = ( b.prpl_points || 0 ) === 1;
+			const aIsGolden = getTaskPoints( a ) === 1;
+			const bIsGolden = getTaskPoints( b ) === 1;
 
 			// Golden tasks come first
 			if ( aIsGolden && ! bIsGolden ) {
@@ -318,9 +319,10 @@ function TodoWidget( { config = {} } ) {
 					] );
 
 					// Trigger celebration if has points
-					if ( task.prpl_points > 0 ) {
+					const points = getTaskPoints( task );
+					if ( points > 0 ) {
 						// Notify context about task completion.
-						onTaskCompleted( task, task.prpl_points );
+						onTaskCompleted( task, points );
 						// Trigger celebration confetti.
 						celebrate();
 					}
