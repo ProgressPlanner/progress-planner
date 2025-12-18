@@ -105,8 +105,8 @@ function MonthlyBadges( { config = {} } ) {
 		const currentYear = now.getFullYear();
 		const incomplete = [];
 
-		// Check previous 12 months.
-		for ( let i = 1; i <= 12; i++ ) {
+		// Check previous 2 months (matches PHP overflow logic).
+		for ( let i = 1; i <= 2; i++ ) {
 			const checkDate = new Date( currentYear, currentMonth - i, 1 );
 			const badgeId = getMonthlyBadgeIdFromDate( checkDate );
 			const progress = badgeProgress[ badgeId ];

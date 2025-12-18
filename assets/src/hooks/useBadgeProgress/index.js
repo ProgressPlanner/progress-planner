@@ -145,8 +145,8 @@ export function useBadgeProgress( {
 			}`;
 			monthlyBadgeIds.add( currentMonthId );
 
-			// Add previous 12 months to check for incomplete badges.
-			for ( let i = 1; i <= 12; i++ ) {
+			// Add previous 2 months to check for incomplete badges (matches PHP overflow logic).
+			for ( let i = 1; i <= 2; i++ ) {
 				const checkDate = new Date(
 					now.getFullYear(),
 					now.getMonth() - i,
