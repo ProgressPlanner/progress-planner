@@ -4,12 +4,12 @@
  * React implementation of the Debug Display task.
  * Migrated from classes/suggested-tasks/providers/class-debug-display.php
  *
- * Note: This requires server-side checking of PHP constants (WP_DEBUG, WP_DEBUG_DISPLAY).
- * A data collector or REST API endpoint would be needed for full implementation.
+ * Checks if WP_DEBUG and WP_DEBUG_DISPLAY are both enabled (security concern).
  */
 
 import { TaskProvider } from '../services/TaskProvider';
 import { doAction } from '@wordpress/hooks';
+import { fetchDataCollector } from '../hooks/useTasksApi';
 
 /**
  * Debug Display Task Provider class.
@@ -27,16 +27,29 @@ class DebugDisplayTask extends TaskProvider {
 	/**
 	 * Check if the task should be added.
 	 *
+	 * Task should be added if both WP_DEBUG and WP_DEBUG_DISPLAY are enabled.
+	 *
 	 * @param {Object} taskData Optional task-specific data.
 	 * @return {Promise<boolean>} Promise resolving to true if task should be added.
 	 */
 	// eslint-disable-next-line no-unused-vars
 	async shouldAddTask( taskData = {} ) {
-		// The PHP version checks: defined('WP_DEBUG') && WP_DEBUG && defined('WP_DEBUG_DISPLAY') && WP_DEBUG_DISPLAY
-		// This requires server-side checking of PHP constants.
-		// TODO: Create data collector or REST API endpoint to check WP_DEBUG and WP_DEBUG_DISPLAY.
-		// For now, return false (task won't show) until data collector is implemented.
-		return false;
+		try {
+			const debugStatus = await fetchDataCollector( 'wp_debug_status' );
+
+			if ( ! debugStatus ) {
+				return false;
+			}
+
+			// Task should be shown if debug display is publicly visible.
+			return debugStatus.should_fix === true;
+		} catch ( error ) {
+			console.error(
+				'Error checking Debug Display task condition:',
+				error
+			);
+			return false;
+		}
 	}
 
 	/**

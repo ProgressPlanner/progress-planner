@@ -45,8 +45,8 @@ class SetPageAboutTask extends InteractiveTaskProvider {
 				return response.about.isset === 'no';
 			}
 
-			// Fallback: return true to show task (can be refined when endpoint is available).
-			return true;
+			// If API fails or about not in response, don't show the task.
+			return false;
 		} catch ( error ) {
 			console.error(
 				'Error checking Set Page About task condition:',

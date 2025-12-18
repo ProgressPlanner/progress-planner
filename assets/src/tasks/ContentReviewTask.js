@@ -4,12 +4,13 @@
  * React implementation of the Content Review task.
  * Migrated from classes/suggested-tasks/providers/class-content-review.php
  *
- * Note: This is a multi-task provider that creates multiple tasks.
- * Basic implementation - can be refined with proper data collection.
+ * Multi-task provider that creates tasks for posts that need review.
+ * Important pages are checked after 6 months, regular posts after 12 months.
  */
 
 import { TaskProvider } from '../services/TaskProvider';
 import { doAction } from '@wordpress/hooks';
+import { fetchDataCollector } from '../hooks/useTasksApi';
 
 /**
  * Content Review Task Provider class.
@@ -56,10 +57,25 @@ class ContentReviewTask extends TaskProvider {
 	 * @return {Promise<Array>} Promise resolving to array of taskData objects.
 	 */
 	async getTasksToInject() {
-		// TODO: Implement proper data collection to get posts that need review.
-		// For now, return empty array. This should be replaced with actual data collection.
-		// The PHP version queries posts older than 12 months (or 6 months for important pages).
-		return [];
+		try {
+			const postsForReview = await fetchDataCollector(
+				'old_posts_for_review'
+			);
+
+			if ( ! postsForReview || postsForReview.length === 0 ) {
+				return [];
+			}
+
+			// Map posts to taskData objects for multi-task injection.
+			return postsForReview.map( ( post ) => ( {
+				target_post_id: post.ID,
+				target_post_title: post.post_title,
+				target_post_type: post.post_type,
+			} ) );
+		} catch ( error ) {
+			console.error( 'Error getting posts for review:', error );
+			return [];
+		}
 	}
 
 	/**
@@ -72,6 +88,7 @@ class ContentReviewTask extends TaskProvider {
 	async getTaskDetails( taskData = {} ) {
 		const taskId = this.getTaskId( taskData );
 		const targetPostId = taskData?.target_post_id || null;
+		const targetPostTitle = taskData?.target_post_title || null;
 
 		if ( ! targetPostId ) {
 			throw new Error(
@@ -84,11 +101,16 @@ class ContentReviewTask extends TaskProvider {
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		const url = `${ adminUrl }${ separator }post.php?post=${ targetPostId }&action=edit`;
 
+		// Use post title if available, otherwise fall back to generic title.
+		const postTitle = targetPostTitle
+			? `Review: ${ targetPostTitle }`
+			: `Review post #${ targetPostId }`;
+
 		const StaticClass = this.constructor;
 		return {
 			task_id: taskId,
 			provider_id: this.getProviderId(),
-			post_title: `Review post #${ targetPostId }`,
+			post_title: postTitle,
 			description: '',
 			priority: this.getPriority(),
 			points: this.getPoints(),
