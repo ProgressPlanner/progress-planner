@@ -180,6 +180,10 @@ class Page {
 			true
 		);
 
+		// Preload REST API data to eliminate initial API request waterfalls.
+		// Must be called after script is enqueued but before it runs.
+		$this->preload_rest_data();
+
 		// Enqueue individual widget scripts.
 		$widget_scripts = [
 			'widget-suggested-tasks',
@@ -473,6 +477,86 @@ class Page {
 
 		\remove_all_actions( 'admin_notices' );
 		\remove_all_actions( 'all_admin_notices' );
+	}
+
+	/**
+	 * Get REST API paths to preload for dashboard.
+	 *
+	 * These endpoints are fetched server-side and injected into the page
+	 * to eliminate initial API request waterfalls.
+	 *
+	 * @return string[] Array of REST API paths to preload.
+	 */
+	private function get_preload_paths(): array {
+		// Get current range/frequency from URL params or defaults.
+		// phpcs:disable WordPress.Security.NonceVerification.Recommended
+		$current_range     = isset( $_GET['range'] )
+			? \sanitize_text_field( \wp_unslash( $_GET['range'] ) )
+			: '-6 months';
+		$current_frequency = isset( $_GET['frequency'] )
+			? \sanitize_text_field( \wp_unslash( $_GET['frequency'] ) )
+			: 'monthly';
+		// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+		return [
+			'/progress-planner/v1/activities',
+			'/progress-planner/v1/badge-stats',
+			'/progress-planner/v1/widgets/activity-scores?range=' . \rawurlencode( $current_range ) . '&frequency=' . \rawurlencode( $current_frequency ),
+			'/wp/v2/prpl_recommendations?status=publish&per_page=10&_embed=true',
+			'/wp/v2/settings',
+		];
+	}
+
+	/**
+	 * Preload REST API data and inject into page.
+	 *
+	 * Fetches critical REST API data server-side and injects it as inline JSON.
+	 * JavaScript middleware then intercepts apiFetch calls and returns this
+	 * preloaded data instantly, bypassing network requests.
+	 *
+	 * @return void
+	 */
+	private function preload_rest_data(): void {
+		$paths        = $this->get_preload_paths();
+		$preload_data = [];
+
+		foreach ( $paths as $path ) {
+			// Parse the path to separate route from query params.
+			$parsed     = \wp_parse_url( $path );
+			$route_path = \is_array( $parsed ) && isset( $parsed['path'] ) ? $parsed['path'] : $path;
+
+			// Create REST request.
+			$request = new \WP_REST_Request( 'GET', $route_path );
+
+			// Set query params if present.
+			if ( ! empty( $parsed['query'] ) ) {
+				\parse_str( $parsed['query'], $query_params );
+				foreach ( $query_params as $key => $value ) {
+					$request->set_param( $key, $value );
+				}
+			}
+
+			// Execute the request internally.
+			$response = \rest_do_request( $request );
+
+			// Only store successful responses.
+			if ( ! $response->is_error() ) {
+				// Use the full path (with query params) as the key for JS to match.
+				$preload_data[ $path ] = [
+					'body'    => $response->get_data(),
+					'headers' => $response->get_headers(),
+				];
+			}
+		}
+
+		// Inject preloaded data as inline script BEFORE the dashboard script runs.
+		if ( ! empty( $preload_data ) ) {
+			\wp_add_inline_script(
+				'progress-planner/dashboard',
+				'window.prplPreloadedData = ' . \wp_json_encode( $preload_data ) . ';',
+				'before'
+			);
+		}
 	}
 
 	/**

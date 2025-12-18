@@ -5,9 +5,17 @@
  * Mounts the Dashboard component to the DOM.
  */
 
+import apiFetch from '@wordpress/api-fetch';
 import { createRoot } from '@wordpress/element';
 import Dashboard from './components/Dashboard';
 import prplSuggestedTask from './utils/prplSuggestedTask';
+import { createPreloadingMiddleware } from './services/preloadingMiddleware';
+
+// Register preloading middleware BEFORE any API calls are made.
+// This intercepts apiFetch calls and returns preloaded data instantly.
+if ( window.prplPreloadedData ) {
+	apiFetch.use( createPreloadingMiddleware( window.prplPreloadedData ) );
+}
 // Initialize widget registry (sets up hook listener for widget registrations)
 import './utils/widgetRegistry';
 
