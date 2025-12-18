@@ -433,7 +433,7 @@ jobs:
           fi
 
       - name: Comment PR with coverage
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && always()
         uses: actions/github-script@v7
         env:
           COVERAGE_CHANGES: ${{ steps.coverage_diff.outputs.coverage_changes }}
