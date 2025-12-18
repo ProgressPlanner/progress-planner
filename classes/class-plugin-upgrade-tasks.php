@@ -23,7 +23,7 @@ class Plugin_Upgrade_Tasks {
 		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_updated' ], 10 );
 
 		// Check if the plugin was upgraded or new plugin was activated.
-		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 100 ); // We need to run this after the Local_Tasks_Manager::init() is called.
+		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 100 ); // We need to run this after the Tasks_Manager::init() is called.
 
 		// Add the action to add the upgrade tasks popover.
 		\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_upgrade_tasks_popover' ] );
