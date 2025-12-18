@@ -4,6 +4,9 @@
  * Configures global mocks for WordPress packages and browser globals.
  */
 
+// Add jest-dom matchers
+import '@testing-library/jest-dom';
+
 // Mock @wordpress/api-fetch
 jest.mock( '@wordpress/api-fetch', () => {
 	const mockApiFetch = jest.fn();

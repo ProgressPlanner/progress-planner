@@ -15,6 +15,8 @@
 	},
 	"devDependencies": {
 		"@playwright/test": "*",
+		"@testing-library/jest-dom": "^6.9.1",
+		"@testing-library/react": "^16.3.1",
 		"@wordpress/scripts": "*",
 		"@wordpress/stylelint-config": "*",
 		"dotenv": "*",
