@@ -9,7 +9,7 @@
  */
 
 import apiFetch from '@wordpress/api-fetch';
-import { deletePost } from './usePopoverForms';
+import { deletePost } from '../usePopoverForms';
 
 /**
  * Handle hello-world task submission.

@@ -7,7 +7,7 @@
  */
 
 import { useState, useCallback } from '@wordpress/element';
-import { ajaxRequest } from '../utils/ajaxRequest';
+import { ajaxRequest } from '../../utils/ajaxRequest';
 
 /**
  * Hook for managing onboarding progress persistence.

@@ -35,7 +35,10 @@
 		"test:e2e:debug": "playwright test --debug",
 		"test:sequential": "npx playwright test --project=sequential",
 		"test:parallel": "npx playwright test --project=parallel",
-		"test": "npm run test:sequential && npm run test:parallel"
+		"test": "npm run test:sequential && npm run test:parallel",
+		"test:unit": "wp-scripts test-unit-js",
+		"test:unit:watch": "wp-scripts test-unit-js --watch",
+		"test:unit:coverage": "wp-scripts test-unit-js --coverage"
 	},
 	"dependencies": {
 		"@wordpress/api-fetch": "*",

@@ -6,7 +6,7 @@
  */
 
 import { useEffect, useRef } from '@wordpress/element';
-import { saveBadgeStats } from '../services/badgeService';
+import { saveBadgeStats } from '../../services/badgeService';
 
 /**
  * Custom hook for automatically saving badge progress.

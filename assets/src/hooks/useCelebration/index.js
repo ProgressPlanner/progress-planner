@@ -6,7 +6,7 @@
 
 import { useCallback } from '@wordpress/element';
 import confetti from 'canvas-confetti';
-import { dispatchGridResize } from '../utils/gridResize';
+import { dispatchGridResize } from '../../utils/gridResize';
 
 /**
  * Custom hook for task celebration functionality.

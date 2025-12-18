@@ -6,7 +6,7 @@
  */
 
 import { useState, useEffect, useCallback } from '@wordpress/element';
-import { fetchActivities, fetchBadgeStats } from '../services/badgeService';
+import { fetchActivities, fetchBadgeStats } from '../../services/badgeService';
 
 /**
  * Custom hook for fetching badge data.

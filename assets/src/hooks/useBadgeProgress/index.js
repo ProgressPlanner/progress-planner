@@ -10,8 +10,8 @@ import {
 	calculateContentBadgeProgress,
 	calculateMaintenanceBadgeProgress,
 	calculateMonthlyBadgeProgress,
-} from '../utils/badgeCalculations';
-import { getBadgeById } from '../config/badges';
+} from '../../utils/badgeCalculations';
+import { getBadgeById } from '../../config/badges';
 
 /**
  * Custom hook for calculating badge progress.
