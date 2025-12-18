@@ -221,14 +221,6 @@ class Task_Evaluation extends Base {
 			];
 		}
 
-		// Check if task was previously completed.
-		if ( \progress_planner()->get_suggested_tasks()->was_task_completed( $task_details['task_id'] ) ) {
-			return [
-				'success' => false,
-				'message' => \esc_html__( 'Task was already completed.', 'progress-planner' ),
-			];
-		}
-
 		// Prepare data for task creation.
 		$task_data = [
 			'task_id'           => $task_details['task_id'],
