@@ -1,20 +1,44 @@
 /**
  * Task Registration.
  *
- * Import all React task providers organized by domain.
+ * Import all React task providers.
  * Tasks self-register via doAction('prpl.tasks.register') when imported.
- *
- * Domain organization enables future code splitting if needed.
  */
 
 // Core tasks - basic WordPress setup and configuration
-import './core';
+import './HelloWorldTask';
+import './SamplePageTask';
+import './BlogDescriptionTask';
+import './SiteIconTask';
+import './PermalinkStructureTask';
+import './SelectLocaleTask';
+import './SelectTimezoneTask';
+import './SetDateFormatTask';
+import './SearchEngineVisibilityTask';
 
 // Content tasks - content creation, management, and SEO
-import './content';
+import './ContentCreateTask';
+import './ContentReviewTask';
+import './UnpublishedContentTask';
+import './SetPageAboutTask';
+import './SetPageFAQTask';
+import './SetPageContactTask';
+import './SetValuablePostTypesTask';
+import './RenameUncategorizedCategoryTask';
+import './FewerTagsTask';
+import './RemoveTermsWithoutPostsTask';
+import './UpdateTermDescriptionTask';
+import './SEOPluginTask';
 
 // Maintenance tasks - WordPress updates and housekeeping
-import './maintenance';
+import './CoreUpdateTask';
+import './RemoveInactivePluginsTask';
+import './DebugDisplayTask';
+import './PhpVersionTask';
+import './EmailSendingTask';
+import './DisableCommentsTask';
+import './DisableCommentPaginationTask';
 
 // Performance tasks - optimization related
-import './performance';
+import './ImprovePdfHandlingTask';
+import './ReduceAutoloadedOptionsTask';
