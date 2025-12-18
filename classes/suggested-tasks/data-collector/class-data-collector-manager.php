@@ -21,6 +21,9 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Published_Post_Count;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Unpublished_Content;
 use Progress_Planner\Suggested_Tasks\Data_Collector\SEO_Plugin;
+use Progress_Planner\Suggested_Tasks\Data_Collector\PHP_Version;
+use Progress_Planner\Suggested_Tasks\Data_Collector\WP_Debug;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Old_Posts_For_Review;
 
 /**
  * Base data collector.
@@ -54,6 +57,9 @@ class Data_Collector_Manager {
 			new Published_Post_Count(),
 			new Unpublished_Content(),
 			new SEO_Plugin(),
+			new PHP_Version(),
+			new WP_Debug(),
+			new Old_Posts_For_Review(),
 		];
 
 		// Add the plugin integration.
