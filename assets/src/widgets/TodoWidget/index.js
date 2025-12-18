@@ -195,6 +195,7 @@ function TodoWidget( { config = {} } ) {
 					status: 'publish',
 					provider: 'user',
 					perPage: 100,
+					needsPagination: false,
 				} );
 
 				// Fetch completed user tasks
@@ -202,6 +203,7 @@ function TodoWidget( { config = {} } ) {
 					status: 'trash',
 					provider: 'user',
 					perPage: 100,
+					needsPagination: false,
 				} );
 
 				// Sort pending tasks: golden tasks (prpl_points === 1) first, then by menu_order

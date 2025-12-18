@@ -318,6 +318,7 @@ function SuggestedTasks( { config = {} } ) {
 						status: 'pending',
 						perPage: 100,
 						excludeProvider: 'user',
+						needsPagination: false,
 					} );
 
 					if ( pendingResult.tasks.length > 0 && mounted ) {

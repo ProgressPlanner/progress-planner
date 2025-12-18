@@ -26,9 +26,16 @@ class Page {
 		'/progress-planner/v1/badge-stats',
 		'/wp/v2/settings',
 
-		// Tasks.
-		'/wp/v2/prpl_recommendations?status=publish&per_page=100&_embed=true',
+		// Tasks - main prefetch for taskRegistry (all statuses for completion tracking).
+		'/wp/v2/prpl_recommendations?status=publish,trash,future&per_page=100&_embed=true',
 		'/wp/v2/prpl_recommendations_provider?per_page=100',
+
+		// SuggestedTasks - pending celebration tasks.
+		'/wp/v2/prpl_recommendations?status=pending&per_page=100&page=1&_embed=true&filter%5Borderby%5D=menu_order&filter%5Border%5D=ASC&exclude_provider=user',
+
+		// TodoWidget - user tasks (publish and trash).
+		'/wp/v2/prpl_recommendations?status=publish&per_page=100&page=1&_embed=true&filter%5Borderby%5D=menu_order&filter%5Border%5D=ASC&provider=user',
+		'/wp/v2/prpl_recommendations?status=trash&per_page=100&page=1&_embed=true&filter%5Borderby%5D=menu_order&filter%5Border%5D=ASC&provider=user',
 		'/progress-planner/v1/page-settings',
 
 		// Data-collectors for task evaluation.

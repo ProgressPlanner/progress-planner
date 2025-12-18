@@ -50,6 +50,8 @@ function buildQueryString( params ) {
  * @param {string}   options.excludeProvider Provider to exclude (e.g., 'user').
  * @param {string}   options.provider        Provider to include.
  * @param {number[]} options.excludeIds      Array of post IDs to exclude.
+ * @param {boolean}  options.needsPagination Whether pagination info is needed (default true).
+ *                                           Set to false to enable preloading support.
  * @return {Promise<Object>} Promise resolving to object with tasks array and pagination metadata.
  */
 export async function fetchTasks( {
@@ -59,6 +61,7 @@ export async function fetchTasks( {
 	excludeProvider,
 	provider,
 	excludeIds = [],
+	needsPagination = true,
 } = {} ) {
 	const params = {
 		status,
@@ -84,6 +87,18 @@ export async function fetchTasks( {
 	const query = buildQueryString( params );
 
 	try {
+		// If pagination not needed, use simple fetch (supports preloading)
+		if ( ! needsPagination ) {
+			const tasks = await apiFetch( {
+				path: `/wp/v2/prpl_recommendations?${ query }`,
+			} );
+			return {
+				tasks: tasks || [],
+				totalPages: 1,
+				hasMore: false,
+			};
+		}
+
 		// Use apiFetch with custom parse to access response headers
 		const response = await apiFetch( {
 			path: `/wp/v2/prpl_recommendations?${ query }`,
@@ -302,7 +317,7 @@ export async function updateSiteSettings( settings ) {
  * Create a task post via task evaluation endpoint.
  *
  * @param {Object} taskDetails The task details object.
- * @return {Promise<Object>} Promise resolving to the created task response.
+ * @return {Promise<Object>} Promise resolving to the created task response (includes full task data).
  */
 export async function createTaskPost( taskDetails ) {
 	return apiFetch( {
@@ -310,6 +325,22 @@ export async function createTaskPost( taskDetails ) {
 		method: 'POST',
 		data: {
 			task_details: taskDetails,
+		},
+	} );
+}
+
+/**
+ * Create multiple task posts in a batch.
+ *
+ * @param {Array<Object>} tasksDetails Array of task details objects.
+ * @return {Promise<Object>} Promise resolving to batch response with tasks array.
+ */
+export async function createTasksBatch( tasksDetails ) {
+	return apiFetch( {
+		path: '/progress-planner/v1/tasks/evaluate-batch',
+		method: 'POST',
+		data: {
+			tasks: tasksDetails,
 		},
 	} );
 }

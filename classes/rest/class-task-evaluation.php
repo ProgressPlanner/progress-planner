@@ -16,11 +16,12 @@ namespace Progress_Planner\Rest;
 class Task_Evaluation extends Base {
 
 	/**
-	 * Register the REST API endpoint.
+	 * Register the REST API endpoints.
 	 *
 	 * @return void
 	 */
 	public function register_rest_endpoint() {
+		// Single task creation endpoint.
 		\register_rest_route(
 			'progress-planner/v1',
 			'/tasks/evaluate',
@@ -35,6 +36,25 @@ class Task_Evaluation extends Base {
 							'type'              => 'object',
 							'validate_callback' => [ $this, 'validate_task_details' ],
 							'sanitize_callback' => [ $this, 'sanitize_task_details' ],
+						],
+					],
+				],
+			]
+		);
+
+		// Batch task creation endpoint.
+		\register_rest_route(
+			'progress-planner/v1',
+			'/tasks/evaluate-batch',
+			[
+				[
+					'methods'             => 'POST',
+					'callback'            => [ $this, 'create_tasks_batch' ],
+					'permission_callback' => [ $this, 'permission_callback' ],
+					'args'                => [
+						'tasks' => [
+							'required' => true,
+							'type'     => 'array',
 						],
 					],
 				],
@@ -137,30 +157,76 @@ class Task_Evaluation extends Base {
 	 */
 	public function create_task( $request ) {
 		$task_details = $request->get_param( 'task_details' );
+		$result       = $this->create_single_task( $task_details );
 
+		if ( \is_wp_error( $result ) ) {
+			return $result;
+		}
+
+		$status_code = isset( $result['post_id'] ) && $result['message'] === \esc_html__( 'Task created successfully.', 'progress-planner' ) ? 201 : 200;
+		return new \WP_REST_Response( $result, $status_code );
+	}
+
+	/**
+	 * Create multiple tasks in a batch.
+	 *
+	 * @param \WP_REST_Request $request The REST request object.
+	 * @return \WP_REST_Response The REST response object.
+	 */
+	public function create_tasks_batch( $request ) {
+		$tasks   = $request->get_param( 'tasks' );
+		$results = [];
+
+		foreach ( $tasks as $task_details ) {
+			// Sanitize each task's details.
+			$sanitized = $this->sanitize_task_details( $task_details, $request, 'tasks' );
+			$result    = $this->create_single_task( $sanitized );
+
+			if ( \is_wp_error( $result ) ) {
+				$results[] = [
+					'success' => false,
+					'message' => $result->get_error_message(),
+				];
+			} else {
+				$results[] = $result;
+			}
+		}
+
+		return new \WP_REST_Response(
+			[
+				'success' => true,
+				'tasks'   => $results,
+			],
+			201
+		);
+	}
+
+	/**
+	 * Create a single task (internal helper).
+	 *
+	 * @param array $task_details The task details.
+	 * @return array|\WP_Error Result array with task data or WP_Error.
+	 */
+	private function create_single_task( $task_details ) {
 		// Check if task already exists.
 		$existing_task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_details['task_id'] );
 		if ( $existing_task ) {
-			// Task already exists, return its ID.
-			return new \WP_REST_Response(
-				[
-					'success' => true,
-					'post_id' => $existing_task->ID,
-					'message' => \esc_html__( 'Task already exists.', 'progress-planner' ),
-				],
-				200
-			);
+			// Task already exists, return full task data.
+			$task_data = $this->get_full_task_data( $existing_task->ID );
+			return [
+				'success' => true,
+				'post_id' => $existing_task->ID,
+				'task'    => $task_data,
+				'message' => \esc_html__( 'Task already exists.', 'progress-planner' ),
+			];
 		}
 
 		// Check if task was previously completed.
 		if ( \progress_planner()->get_suggested_tasks()->was_task_completed( $task_details['task_id'] ) ) {
-			return new \WP_REST_Response(
-				[
-					'success' => false,
-					'message' => \esc_html__( 'Task was already completed.', 'progress-planner' ),
-				],
-				200
-			);
+			return [
+				'success' => false,
+				'message' => \esc_html__( 'Task was already completed.', 'progress-planner' ),
+			];
 		}
 
 		// Prepare data for task creation.
@@ -196,13 +262,32 @@ class Task_Evaluation extends Base {
 			);
 		}
 
-		return new \WP_REST_Response(
-			[
-				'success' => true,
-				'post_id' => $post_id,
-				'message' => \esc_html__( 'Task created successfully.', 'progress-planner' ),
-			],
-			201
-		);
+		// Fetch and return full task data.
+		$full_task_data = $this->get_full_task_data( $post_id );
+
+		return [
+			'success' => true,
+			'post_id' => $post_id,
+			'task'    => $full_task_data,
+			'message' => \esc_html__( 'Task created successfully.', 'progress-planner' ),
+		];
+	}
+
+	/**
+	 * Get full task data via REST API internal request.
+	 *
+	 * @param int $post_id The post ID.
+	 * @return array|null The task data or null on error.
+	 */
+	private function get_full_task_data( $post_id ) {
+		$request = new \WP_REST_Request( 'GET', '/wp/v2/prpl_recommendations/' . $post_id );
+		$request->set_param( '_embed', true );
+		$response = \rest_do_request( $request );
+
+		if ( $response->is_error() ) {
+			return null;
+		}
+
+		return $response->get_data();
 	}
 }
