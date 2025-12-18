@@ -7,7 +7,7 @@
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
-import apiFetch from '@wordpress/api-fetch';
+import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
  * Set Page About Task Provider class.
@@ -37,7 +37,7 @@ class SetPageAboutTask extends InteractiveTaskProvider {
 			// For now, we'll need to create a data collector or REST endpoint for this.
 			// As a temporary solution, we'll check via a custom endpoint if available.
 			// TODO: Create data collector or REST endpoint for page settings.
-			const response = await apiFetch( {
+			const response = await cachedApiFetch( {
 				path: '/progress-planner/v1/page-settings',
 			} ).catch( () => null );
 

@@ -7,7 +7,7 @@
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
-import apiFetch from '@wordpress/api-fetch';
+import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
  * Set Page Contact Task Provider class.
@@ -31,7 +31,7 @@ class SetPageContactTask extends InteractiveTaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async shouldAddTask( taskData = {} ) {
 		try {
-			const response = await apiFetch( {
+			const response = await cachedApiFetch( {
 				path: '/progress-planner/v1/page-settings',
 			} ).catch( () => null );
 

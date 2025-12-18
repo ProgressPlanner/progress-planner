@@ -7,7 +7,7 @@
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
-import apiFetch from '@wordpress/api-fetch';
+import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
  * Set Page FAQ Task Provider class.
@@ -32,7 +32,7 @@ class SetPageFAQTask extends InteractiveTaskProvider {
 	async shouldAddTask( taskData = {} ) {
 		try {
 			// Check page settings via Progress Planner REST API.
-			const response = await apiFetch( {
+			const response = await cachedApiFetch( {
 				path: '/progress-planner/v1/page-settings',
 			} ).catch( () => null );
 
