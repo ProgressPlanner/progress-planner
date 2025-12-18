@@ -6,6 +6,7 @@
  */
 
 import apiFetch from '@wordpress/api-fetch';
+import { cachedApiFetch } from '../../services/apiFetchCache';
 
 /**
  * Snooze duration map (duration key to days).
@@ -347,12 +348,13 @@ export async function createTasksBatch( tasksDetails ) {
 
 /**
  * Fetch data from a data collector.
+ * Uses cachedApiFetch to leverage preloaded data and response caching.
  *
  * @param {string} collectorId The data collector ID (DATA_KEY).
  * @return {Promise<*>} Promise resolving to the collected data.
  */
 export async function fetchDataCollector( collectorId ) {
-	const response = await apiFetch( {
+	const response = await cachedApiFetch( {
 		path: `/progress-planner/v1/data-collectors/${ collectorId }`,
 	} );
 	return response.data;
