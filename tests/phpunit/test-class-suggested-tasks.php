@@ -280,4 +280,125 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 			'React provider count should match expected. Update test if providers were added/removed.'
 		);
 	}
+
+	/**
+	 * Test evaluate_tasks returns array.
+	 *
+	 * @return void
+	 */
+	public function test_evaluate_tasks_returns_array() {
+		$result = $this->tasks_manager->evaluate_tasks();
+		$this->assertIsArray( $result );
+	}
+
+	/**
+	 * Test evaluate_task returns false for user tasks.
+	 *
+	 * @return void
+	 */
+	public function test_evaluate_task_skips_user_tasks() {
+		// Create a user task.
+		$task_data = [
+			'post_title'  => 'user-task-evaluate-test',
+			'task_id'     => 'user-task-evaluate-test',
+			'provider_id' => 'user',
+			'category'    => 'user',
+		];
+		$post_id   = \progress_planner()->get_suggested_tasks_db()->add( $task_data );
+
+		// Get the task (get_post already returns a Task object).
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( 'user-task-evaluate-test' );
+
+		// Evaluate should return false for user tasks.
+		$result = $this->tasks_manager->evaluate_task( $task );
+		$this->assertFalse( $result );
+	}
+
+	/**
+	 * Test evaluate_task returns false for React provider tasks.
+	 *
+	 * @return void
+	 */
+	public function test_evaluate_task_skips_react_provider_tasks() {
+		// Create a task with React provider.
+		$task_data = [
+			'post_title'  => 'react-task-evaluate-test',
+			'task_id'     => 'react-task-evaluate-test',
+			'provider_id' => 'search-engine-visibility', // This is a React provider.
+			'category'    => 'configuration',
+		];
+		$post_id   = \progress_planner()->get_suggested_tasks_db()->add( $task_data );
+
+		// Get the task (get_post already returns a Task object).
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( 'react-task-evaluate-test' );
+
+		// Evaluate should return false for React provider tasks (they handle their own evaluation).
+		$result = $this->tasks_manager->evaluate_task( $task );
+		$this->assertFalse( $result );
+
+		// Verify task still exists (not deleted).
+		$task_after = \progress_planner()->get_suggested_tasks_db()->get_post( 'react-task-evaluate-test' );
+		$this->assertNotNull( $task_after, 'React provider task should not be deleted during evaluation' );
+	}
+
+	/**
+	 * Test evaluate_task deletes tasks with unknown providers.
+	 *
+	 * @return void
+	 */
+	public function test_evaluate_task_deletes_unknown_provider_tasks() {
+		// Create a task with unknown provider.
+		$task_data = [
+			'post_title'  => 'unknown-provider-task',
+			'task_id'     => 'unknown-provider-task',
+			'provider_id' => 'non-existent-provider',
+			'category'    => 'test',
+		];
+		$post_id   = \progress_planner()->get_suggested_tasks_db()->add( $task_data );
+
+		// Get the task (get_post already returns a Task object).
+		$task = \progress_planner()->get_suggested_tasks_db()->get_post( 'unknown-provider-task' );
+
+		// Evaluate should return false and delete the orphan task.
+		$result = $this->tasks_manager->evaluate_task( $task );
+		$this->assertFalse( $result );
+
+		// Verify task was deleted (get_post returns false when not found).
+		\wp_cache_flush_group( \Progress_Planner\Suggested_Tasks_DB::GET_TASKS_CACHE_GROUP );
+		$task_after = \progress_planner()->get_suggested_tasks_db()->get_post( 'unknown-provider-task' );
+		$this->assertFalse( $task_after, 'Task with unknown provider should be deleted' );
+	}
+
+	/**
+	 * Test get_task_providers_available_for_user returns providers based on capability.
+	 *
+	 * @return void
+	 */
+	public function test_get_task_providers_available_for_user() {
+		// Create an admin user.
+		$admin_id = $this->factory->user->create( [ 'role' => 'administrator' ] );
+		\wp_set_current_user( $admin_id );
+
+		$providers = $this->tasks_manager->get_task_providers_available_for_user();
+
+		$this->assertIsArray( $providers );
+		// Admin should have access to all providers.
+		$this->assertNotEmpty( $providers );
+	}
+
+	/**
+	 * Test get_task_providers_available_for_user with limited capabilities.
+	 *
+	 * @return void
+	 */
+	public function test_get_task_providers_available_for_user_limited_capability() {
+		// Create a subscriber user (limited capabilities).
+		$subscriber_id = $this->factory->user->create( [ 'role' => 'subscriber' ] );
+		\wp_set_current_user( $subscriber_id );
+
+		$providers = $this->tasks_manager->get_task_providers_available_for_user();
+
+		$this->assertIsArray( $providers );
+		// Result may be empty or limited based on provider capabilities.
+	}
 }
