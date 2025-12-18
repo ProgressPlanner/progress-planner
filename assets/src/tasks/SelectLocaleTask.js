@@ -7,7 +7,7 @@
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { doAction } from '@wordpress/hooks';
-import apiFetch from '@wordpress/api-fetch';
+import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
  * Select Locale Task Provider class.
@@ -42,7 +42,7 @@ class SelectLocaleTask extends InteractiveTaskProvider {
 				typeof window !== 'undefined' && window.navigator?.language
 					? window.navigator.language.split( '-' )[ 0 ]
 					: null;
-			const settings = await apiFetch( {
+			const settings = await cachedApiFetch( {
 				path: '/wp/v2/settings',
 			} );
 

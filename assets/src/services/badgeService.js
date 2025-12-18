@@ -1,45 +1,20 @@
 /**
  * Badge Service
  *
- * Handles API calls for activities and badge stats with caching
- * to prevent redundant API calls from multiple badge widgets.
+ * Handles API calls for activities and badge stats.
+ * Uses the centralized apiFetchCache for caching and request deduplication.
  */
 
 import apiFetch from '@wordpress/api-fetch';
+import { cachedApiFetch, clearCacheFor, setCacheFor } from './apiFetchCache';
 
 /**
- * Simple cache for badge service data.
- */
-const serviceCache = {
-	activities: null,
-	activitiesTimestamp: 0,
-	badgeStats: null,
-	badgeStatsTimestamp: 0,
-};
-
-/**
- * Cache TTL in milliseconds (5 minutes).
- */
-const CACHE_TTL = 5 * 60 * 1000;
-
-/**
- * Check if cached data is still valid.
- *
- * @param {number} timestamp - Cache timestamp.
- * @return {boolean} True if cache is valid.
- */
-function isCacheValid( timestamp ) {
-	return Date.now() - timestamp < CACHE_TTL;
-}
-
-/**
- * Clear all service cache.
+ * Clear badge service cache.
+ * Delegates to the centralized cache service.
  */
 export function clearBadgeServiceCache() {
-	serviceCache.activities = null;
-	serviceCache.activitiesTimestamp = 0;
-	serviceCache.badgeStats = null;
-	serviceCache.badgeStatsTimestamp = 0;
+	clearCacheFor( '/progress-planner/v1/activities' );
+	clearCacheFor( '/progress-planner/v1/badge-stats' );
 }
 
 /**
@@ -49,21 +24,14 @@ export function clearBadgeServiceCache() {
  * @return {Promise<Object>} Activities data with activities array, totalPostsCount, and activationDate.
  */
 export async function fetchActivities( bypassCache = false ) {
-	// Return cached data if valid.
-	if (
-		! bypassCache &&
-		serviceCache.activities &&
-		isCacheValid( serviceCache.activitiesTimestamp )
-	) {
-		return serviceCache.activities;
-	}
-
 	try {
-		const response = await apiFetch( {
-			path: '/progress-planner/v1/activities',
-		} );
+		const response = await cachedApiFetch(
+			{ path: '/progress-planner/v1/activities' },
+			{ skipCache: bypassCache }
+		);
 
-		const data = {
+		// Transform the response data.
+		return {
 			activities: response.activities || [],
 			totalPostsCount: response.totalPostsCount || 0,
 			activationDate: response.activationDate
@@ -75,12 +43,6 @@ export async function fetchActivities( bypassCache = false ) {
 				placeholderUrl: '',
 			},
 		};
-
-		// Cache the response.
-		serviceCache.activities = data;
-		serviceCache.activitiesTimestamp = Date.now();
-
-		return data;
 	} catch ( error ) {
 		throw new Error( error.message || 'Failed to fetch activities' );
 	}
@@ -93,27 +55,13 @@ export async function fetchActivities( bypassCache = false ) {
  * @return {Promise<Object>} Badge stats object.
  */
 export async function fetchBadgeStats( bypassCache = false ) {
-	// Return cached data if valid.
-	if (
-		! bypassCache &&
-		serviceCache.badgeStats &&
-		isCacheValid( serviceCache.badgeStatsTimestamp )
-	) {
-		return serviceCache.badgeStats;
-	}
-
 	try {
-		const response = await apiFetch( {
-			path: '/progress-planner/v1/badge-stats',
-		} );
+		const response = await cachedApiFetch(
+			{ path: '/progress-planner/v1/badge-stats' },
+			{ skipCache: bypassCache }
+		);
 
-		const data = response.badges || {};
-
-		// Cache the response.
-		serviceCache.badgeStats = data;
-		serviceCache.badgeStatsTimestamp = Date.now();
-
-		return data;
+		return response.badges || {};
 	} catch ( error ) {
 		throw new Error( error.message || 'Failed to fetch badge stats' );
 	}
@@ -136,13 +84,10 @@ export async function saveBadgeStats( badges ) {
 			},
 		} );
 
-		const data = response.badges || {};
+		// Write-through cache: store the response for subsequent GET requests.
+		setCacheFor( '/progress-planner/v1/badge-stats', response );
 
-		// Update cache with new data.
-		serviceCache.badgeStats = data;
-		serviceCache.badgeStatsTimestamp = Date.now();
-
-		return data;
+		return response.badges || {};
 	} catch ( error ) {
 		throw new Error( error.message || 'Failed to save badge stats' );
 	}

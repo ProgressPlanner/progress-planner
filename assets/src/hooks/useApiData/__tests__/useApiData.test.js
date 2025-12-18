@@ -5,13 +5,14 @@
 import { renderHook, waitFor, act } from '@testing-library/react';
 import apiFetch from '@wordpress/api-fetch';
 import { useApiData, clearApiCache } from '../index';
+import { clearCache } from '../../../services/apiFetchCache';
 
 // apiFetch is already mocked in setup.js
 
 describe( 'useApiData', () => {
 	beforeEach( () => {
 		apiFetch.mockReset();
-		clearApiCache(); // Clear cache between tests
+		clearCache(); // Clear centralized cache between tests
 	} );
 
 	describe( 'initial state', () => {
@@ -251,7 +252,7 @@ describe( 'useApiData', () => {
 			expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 
 			// Refetch without bypassing cache
-			act( () => {
+			await act( async () => {
 				result.current.refetch( false );
 			} );
 

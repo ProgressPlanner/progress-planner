@@ -1,18 +1,16 @@
 /**
  * useApiData Hook
  *
- * Shared hook for fetching data from the REST API with loading/error states
- * and optional caching to prevent redundant API calls.
+ * Shared hook for fetching data from the REST API with loading/error states.
+ * Uses the centralized apiFetchCache service for caching and request deduplication.
  */
 
 import { useState, useEffect, useCallback } from '@wordpress/element';
-import apiFetch from '@wordpress/api-fetch';
-
-/**
- * Simple in-memory cache for API responses.
- * Keyed by API path with timestamp for TTL checking.
- */
-const apiCache = new Map();
+import {
+	cachedApiFetch,
+	clearCache,
+	clearCacheFor,
+} from '../../services/apiFetchCache';
 
 /**
  * Default cache TTL in milliseconds (5 minutes).
@@ -20,51 +18,16 @@ const apiCache = new Map();
 const DEFAULT_CACHE_TTL = 5 * 60 * 1000;
 
 /**
- * Get cached data if valid.
- *
- * @param {string} path - The API endpoint path (cache key).
- * @param {number} ttl  - Time to live in milliseconds.
- * @return {Object|null} Cached data or null if expired/missing.
- */
-function getCachedData( path, ttl ) {
-	const cached = apiCache.get( path );
-	if ( ! cached ) {
-		return null;
-	}
-
-	const now = Date.now();
-	if ( now - cached.timestamp > ttl ) {
-		// Cache expired, remove it.
-		apiCache.delete( path );
-		return null;
-	}
-
-	return cached.data;
-}
-
-/**
- * Set cached data with timestamp.
- *
- * @param {string} path - The API endpoint path (cache key).
- * @param {Object} data - The data to cache.
- */
-function setCachedData( path, data ) {
-	apiCache.set( path, {
-		data,
-		timestamp: Date.now(),
-	} );
-}
-
-/**
  * Clear cache for a specific path or all paths.
+ * Delegates to the centralized cache service.
  *
  * @param {string|null} path - The API endpoint path to clear, or null for all.
  */
 export function clearApiCache( path = null ) {
 	if ( path ) {
-		apiCache.delete( path );
+		clearCacheFor( path );
 	} else {
-		apiCache.clear();
+		clearCache();
 	}
 }
 
@@ -109,28 +72,18 @@ export function useApiData(
 				return;
 			}
 
-			// Check cache first (unless force refresh or cache disabled).
-			if ( cache && ! forceRefresh && ! skipCache ) {
-				const cachedData = getCachedData( path, cacheTtl );
-				if ( cachedData !== null ) {
-					setData( cachedData );
-					setIsLoading( false );
-					setError( null );
-					return;
-				}
-			}
-
 			setIsLoading( true );
 			setError( null );
 
 			try {
-				const response = await apiFetch( { path } );
+				const response = await cachedApiFetch(
+					{ path },
+					{
+						skipCache: forceRefresh || skipCache || ! cache,
+						ttl: cacheTtl,
+					}
+				);
 				setData( response );
-
-				// Cache the response if caching is enabled.
-				if ( cache ) {
-					setCachedData( path, response );
-				}
 			} catch ( err ) {
 				const message =
 					err.message ||

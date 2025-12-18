@@ -7,7 +7,7 @@
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { doAction } from '@wordpress/hooks';
-import apiFetch from '@wordpress/api-fetch';
+import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
  * Search Engine Visibility Task Provider class.
@@ -33,7 +33,7 @@ class SearchEngineVisibilityTask extends InteractiveTaskProvider {
 	async shouldAddTask( taskData = {} ) {
 		try {
 			// Fetch WordPress settings to check if blog_public is 0 (discouraged).
-			const settings = await apiFetch( {
+			const settings = await cachedApiFetch( {
 				path: '/wp/v2/settings',
 			} );
 

@@ -7,7 +7,7 @@
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { doAction } from '@wordpress/hooks';
-import apiFetch from '@wordpress/api-fetch';
+import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
  * Permalink Structure Task Provider class.
@@ -34,7 +34,7 @@ class PermalinkStructureTask extends InteractiveTaskProvider {
 	async shouldAddTask( taskData = {} ) {
 		try {
 			// Fetch WordPress settings to check permalink structure.
-			const settings = await apiFetch( {
+			const settings = await cachedApiFetch( {
 				path: '/wp/v2/settings',
 			} );
 

@@ -7,7 +7,7 @@
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { doAction } from '@wordpress/hooks';
-import apiFetch from '@wordpress/api-fetch';
+import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
  * Select Timezone Task Provider class.
@@ -37,7 +37,7 @@ class SelectTimezoneTask extends InteractiveTaskProvider {
 			// If activity doesn't exist, task should be added.
 			// TODO: Check activities via REST API or data collector.
 			// For now, check if timezone is set to UTC (default).
-			const settings = await apiFetch( {
+			const settings = await cachedApiFetch( {
 				path: '/wp/v2/settings',
 			} );
 

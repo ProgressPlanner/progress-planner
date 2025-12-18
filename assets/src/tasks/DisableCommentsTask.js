@@ -7,7 +7,7 @@
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { doAction } from '@wordpress/hooks';
-import apiFetch from '@wordpress/api-fetch';
+import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
  * Disable Comments Task Provider class.
@@ -38,7 +38,7 @@ class DisableCommentsTask extends InteractiveTaskProvider {
 			// - get_default_comment_status() === 'open'
 			// For React, we'll check comment status via REST API.
 			// Plugin check and comment count would need data collector or REST endpoint.
-			const settings = await apiFetch( {
+			const settings = await cachedApiFetch( {
 				path: '/wp/v2/settings',
 			} );
 

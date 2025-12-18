@@ -7,7 +7,7 @@
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { doAction } from '@wordpress/hooks';
-import apiFetch from '@wordpress/api-fetch';
+import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
  * Disable Comment Pagination Task Provider class.
@@ -35,7 +35,7 @@ class DisableCommentPaginationTask extends InteractiveTaskProvider {
 			// Check if dependencies are satisfied (disable-comments task must be completed).
 			// For now, we'll check if page_comments is enabled, which is the condition.
 			// The dependency check would require checking task completion status via REST API.
-			const settings = await apiFetch( {
+			const settings = await cachedApiFetch( {
 				path: '/wp/v2/settings',
 			} );
 

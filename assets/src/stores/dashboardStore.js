@@ -8,8 +8,7 @@
 
 import { create } from 'zustand';
 import apiFetch from '@wordpress/api-fetch';
-import { clearApiCache } from '../hooks/useApiData';
-import { clearBadgeServiceCache } from '../services/badgeService';
+import { clearCache } from '../services/apiFetchCache';
 
 /**
  * Dashboard store.
@@ -134,11 +133,10 @@ export const useDashboardStore = create( ( set, get ) => ( {
 
 	/**
 	 * Invalidate cache to trigger widget refetch.
-	 * Clears both useApiData and badgeService caches.
+	 * Clears the centralized API cache.
 	 */
 	invalidateCache: () => {
-		clearApiCache();
-		clearBadgeServiceCache();
+		clearCache();
 		set( { cacheInvalidatedAt: Date.now() } );
 	},
 

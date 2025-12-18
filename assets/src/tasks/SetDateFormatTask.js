@@ -7,7 +7,7 @@
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { doAction } from '@wordpress/hooks';
-import apiFetch from '@wordpress/api-fetch';
+import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
  * Set Date Format Task Provider class.
@@ -36,7 +36,7 @@ class SetDateFormatTask extends InteractiveTaskProvider {
 			// If activity doesn't exist, task should be added.
 			// Also checks if date_format is 'wp_default' (default value).
 			// TODO: Check activities via REST API or data collector.
-			const settings = await apiFetch( {
+			const settings = await cachedApiFetch( {
 				path: '/wp/v2/settings',
 			} );
 
