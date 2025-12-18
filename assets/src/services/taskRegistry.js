@@ -264,29 +264,29 @@ async function evaluateForCollection( TaskClass, priority ) {
 		// Single-task provider
 		const taskId = taskInstance.getTaskId?.() || providerId;
 
-		// QUICK SKIP: Check if task was already completed/snoozed
+		// Check cache first - skip evaluation for tasks we already know about
 		const cached = existingTasksCache.get( taskId );
+
+		// QUICK SKIP: Task was completed (trash) or snoozed (future) - skip entirely
 		if ( cached && ! cached._isActive ) {
-			// Task was completed (trash) or snoozed (future) - skip entirely
 			return {};
 		}
 
-		// FULL EVALUATION: shouldAddTask() runs data-collector checks (server-side)
+		// QUICK RETURN: Active task already exists - return immediately (NO evaluation needed!)
+		if ( cached && cached._isActive ) {
+			if ( cached.prpl_priority === undefined ) {
+				cached.prpl_priority = priority;
+			}
+			return { existing: { task: cached, priority } };
+		}
+
+		// Task doesn't exist in cache - run full evaluation
 		if ( ! taskInstance.shouldAddTask ) {
 			return {};
 		}
 		const shouldAdd = await taskInstance.shouldAddTask();
 		if ( ! shouldAdd ) {
 			return {};
-		}
-
-		// Task should be shown - check if it exists in DB
-		if ( cached && cached._isActive ) {
-			// Active task already exists - return for immediate rendering
-			if ( cached.prpl_priority === undefined ) {
-				cached.prpl_priority = priority;
-			}
-			return { existing: { task: cached, priority } };
 		}
 
 		// Task doesn't exist - collect details for batch creation
