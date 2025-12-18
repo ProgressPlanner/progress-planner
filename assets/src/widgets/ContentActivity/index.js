@@ -9,9 +9,10 @@ import { doAction } from '@wordpress/hooks';
 import BigCounter from '../../components/BigCounter';
 import LineChart from '../../components/LineChart';
 import ActivityTable from './ActivityTable';
-import { LoadingState, ErrorState } from '../../components/WidgetStates';
+import { ErrorState } from '../../components/WidgetStates';
 import { useApiData } from '../../hooks/useApiData';
 import WidgetHeader from '../../components/WidgetHeader';
+import ContentActivitySkeleton from './ContentActivitySkeleton';
 
 /**
  * ContentActivity widget component.
@@ -33,8 +34,17 @@ function ContentActivity( { config = {} } ) {
 		__( 'Failed to load content activity data.', 'progress-planner' )
 	);
 
+	// Get title - defined early for use in loading state.
+	const widgetTitle =
+		config?.title || __( 'Content activity', 'progress-planner' );
+
 	if ( isLoading ) {
-		return <LoadingState className="prpl-content-activity__loading" />;
+		return (
+			<>
+				<WidgetHeader title={ widgetTitle } />
+				<ContentActivitySkeleton />
+			</>
+		);
 	}
 
 	if ( error ) {
@@ -49,10 +59,6 @@ function ContentActivity( { config = {} } ) {
 	if ( ! data ) {
 		return null;
 	}
-
-	// Get title - will come from widget registry metadata
-	const widgetTitle =
-		config?.title || __( 'Content activity', 'progress-planner' );
 
 	const graphWrapperStyle = {
 		marginBottom: 'var(--prpl-padding)',

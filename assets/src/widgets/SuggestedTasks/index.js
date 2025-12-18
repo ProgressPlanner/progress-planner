@@ -23,6 +23,7 @@ import { useGridMasonry } from '../../hooks/useGridMasonry';
 import { useCelebration } from '../../hooks/useCelebration';
 import { dispatchGridResize } from '../../utils/gridResize';
 import WidgetHeader from '../../components/WidgetHeader';
+import SuggestedTasksSkeleton from './SuggestedTasksSkeleton';
 import {
 	setTaskRenderCallback,
 	getTaskProviderInstance,
@@ -641,15 +642,7 @@ function SuggestedTasks( { config = {} } ) {
 		return (
 			<>
 				<WidgetHeader title={ widgetTitle } />
-				<p className="prpl-suggested-tasks-widget-description">
-					{ widgetDescription }
-				</p>
-				<p
-					className="prpl-suggested-tasks-loading"
-					style={ STYLES.loading }
-				>
-					{ __( 'Loading tasks…', 'progress-planner' ) }
-				</p>
+				<SuggestedTasksSkeleton count={ 4 } />
 			</>
 		);
 	}

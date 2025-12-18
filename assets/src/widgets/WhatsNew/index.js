@@ -8,8 +8,8 @@ import { Fragment, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { doAction } from '@wordpress/hooks';
 import { useApiData } from '../../hooks/useApiData';
-import { LoadingState } from '../../components/WidgetStates';
 import WidgetHeader from '../../components/WidgetHeader';
+import WhatsNewSkeleton from './WhatsNewSkeleton';
 
 /**
  * BlogPostImage component with hover state.
@@ -141,7 +141,7 @@ function WhatsNew( { config = {} } ) {
 			<Fragment>
 				<WidgetHeader title={ widgetTitle } />
 				<hr />
-				<LoadingState simple className="prpl-whats-new__loading" />
+				<WhatsNewSkeleton posts={ 2 } />
 			</Fragment>
 		);
 	}

@@ -18,6 +18,7 @@ import { useGridMasonry } from '../../hooks/useGridMasonry';
 import { useCelebration } from '../../hooks/useCelebration';
 import { dispatchGridResize } from '../../utils/gridResize';
 import WidgetHeader from '../../components/WidgetHeader';
+import TodoWidgetSkeleton from './TodoWidgetSkeleton';
 import { useDashboardStore } from '../../stores/dashboardStore';
 
 /**
@@ -467,17 +468,18 @@ function TodoWidget( { config = {} } ) {
 		}
 	}, [ completedTasks ] );
 
-	if ( isLoading ) {
-		return (
-			<p id="prpl-todo-list-loading">
-				{ __( 'Loading items…', 'progress-planner' ) }
-			</p>
-		);
-	}
-
-	// Get title, descriptions, and tooltip from config or use defaults.
+	// Get title - defined early for use in loading state.
 	const widgetTitle =
 		config?.title || __( 'My to-do list', 'progress-planner' );
+
+	if ( isLoading ) {
+		return (
+			<>
+				<WidgetHeader title={ widgetTitle } />
+				<TodoWidgetSkeleton count={ 3 } />
+			</>
+		);
+	}
 	const goldenTaskDescription =
 		config?.goldenTaskDescription ||
 		__(

@@ -13,11 +13,8 @@ import { useBadgeProgressSave } from '../../hooks/useBadgeProgressSave';
 import { CONTENT_BADGES, MAINTENANCE_BADGES } from '../../config/badges';
 import BadgeProgressInfo from '../../components/BadgeProgressInfo';
 import BadgeGrid from '../../components/BadgeGrid';
-import {
-	LoadingState,
-	ErrorState,
-	EmptyState,
-} from '../../components/WidgetStates';
+import { ErrorState, EmptyState } from '../../components/WidgetStates';
+import SimpleBadgeWidgetSkeleton from './SimpleBadgeWidgetSkeleton';
 
 /**
  * SimpleBadgeWidget component.
@@ -91,7 +88,9 @@ export default function SimpleBadgeWidget( {
 	}, [ badges, badgeProgress ] );
 
 	if ( isLoading ) {
-		return <LoadingState simple />;
+		return (
+			<SimpleBadgeWidgetSkeleton backgroundColor={ backgroundColor } />
+		);
 	}
 
 	if ( error ) {

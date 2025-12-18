@@ -20,7 +20,8 @@ import Gauge from '../../components/Gauge';
 import Badge from '../../components/Badge';
 import BadgeProgressBar from '../../components/BadgeProgressBar';
 import PointsCounter from './PointsCounter';
-import { LoadingState, ErrorState } from '../../components/WidgetStates';
+import { ErrorState } from '../../components/WidgetStates';
+import MonthlyBadgesSkeleton from './MonthlyBadgesSkeleton';
 import WidgetHeader from '../../components/WidgetHeader';
 import { useDashboardStore } from '../../stores/dashboardStore';
 
@@ -192,10 +193,7 @@ function MonthlyBadges( { config = {} } ) {
 		return (
 			<>
 				<WidgetHeader title={ widgetTitle } />
-				<LoadingState
-					className="prpl-monthly-badges prpl-monthly-badges--loading"
-					style={ { minHeight: '200px' } }
-				/>
+				<MonthlyBadgesSkeleton />
 			</>
 		);
 	}

@@ -12,11 +12,8 @@ import Gauge from '../../components/Gauge';
 import BarChart from '../../components/BarChart';
 import BigCounter from '../../components/BigCounter';
 import WidgetHeader from '../../components/WidgetHeader';
-import {
-	LoadingState,
-	ErrorState,
-	EmptyState,
-} from '../../components/WidgetStates';
+import { ErrorState, EmptyState } from '../../components/WidgetStates';
+import ActivityScoresSkeleton from './ActivityScoresSkeleton';
 import { useApiData } from '../../hooks/useApiData';
 import { useDashboardStore } from '../../stores/dashboardStore';
 
@@ -170,6 +167,11 @@ function ActivityScores( { config = {} } ) {
 		'Failed to load activity data'
 	);
 
+	// Get title - defined early for use in loading state.
+	const widgetTitle =
+		config?.title ||
+		__( 'Your website activity score', 'progress-planner' );
+
 	// Calculate effective score by adding session points to API score.
 	const effectiveScore = useMemo( () => {
 		if ( ! data?.score ) {
@@ -180,7 +182,12 @@ function ActivityScores( { config = {} } ) {
 	}, [ data?.score, sessionPoints ] );
 
 	if ( isLoading ) {
-		return <LoadingState simple />;
+		return (
+			<>
+				<WidgetHeader title={ widgetTitle } />
+				<ActivityScoresSkeleton />
+			</>
+		);
 	}
 
 	if ( error ) {
@@ -204,12 +211,7 @@ function ActivityScores( { config = {} } ) {
 		personalRecord.currentStreak
 	);
 
-	// Get title - will come from widget registry metadata
-	const widgetTitle =
-		config?.title ||
-		__( 'Your website activity score', 'progress-planner' );
-
-	// Get info icon SVG - will come from widget registry metadata
+	// Get info icon SVG - will come from widget registry metadata.
 	const infoIconSvg = config?.infoIconSvg || '';
 
 	return (
