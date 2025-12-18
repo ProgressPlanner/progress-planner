@@ -60,12 +60,21 @@ class RemoveTermsWithoutPostsTask extends InteractiveTaskProvider {
 				'terms_without_posts'
 			);
 
-			if ( ! termsWithoutPosts || termsWithoutPosts.length === 0 ) {
+			if ( ! termsWithoutPosts ) {
+				return [];
+			}
+
+			// Normalize to array - data collector returns single object, not array
+			const termsArray = Array.isArray( termsWithoutPosts )
+				? termsWithoutPosts
+				: [ termsWithoutPosts ];
+
+			if ( termsArray.length === 0 ) {
 				return [];
 			}
 
 			// Return array of taskData objects, one per term
-			return termsWithoutPosts.map( ( term ) => ( {
+			return termsArray.map( ( term ) => ( {
 				target_term_id: term.term_id,
 				target_taxonomy: term.taxonomy,
 			} ) );

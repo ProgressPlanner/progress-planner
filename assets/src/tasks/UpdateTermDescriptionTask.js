@@ -60,15 +60,21 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 				'terms_without_description'
 			);
 
-			if (
-				! termsWithoutDescription ||
-				termsWithoutDescription.length === 0
-			) {
+			if ( ! termsWithoutDescription ) {
+				return [];
+			}
+
+			// Normalize to array - data collector returns single object, not array
+			const termsArray = Array.isArray( termsWithoutDescription )
+				? termsWithoutDescription
+				: [ termsWithoutDescription ];
+
+			if ( termsArray.length === 0 ) {
 				return [];
 			}
 
 			// Return array of taskData objects, one per term
-			return termsWithoutDescription.map( ( term ) => ( {
+			return termsArray.map( ( term ) => ( {
 				target_term_id: term.term_id,
 				target_taxonomy: term.taxonomy,
 			} ) );
