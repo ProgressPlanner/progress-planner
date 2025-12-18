@@ -103,10 +103,15 @@ describe( 'ContentActivity', () => {
 
 			render( <ContentActivity /> );
 
-			expect( screen.getByTestId( 'loading-state' ) ).toBeInTheDocument();
+			// Widget header should be visible during loading
+			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
+			// Main content should not be visible
+			expect(
+				screen.queryByText( 'pieces of content managed' )
+			).not.toBeInTheDocument();
 		} );
 
-		it( 'loading state has correct class', () => {
+		it( 'shows widget header during loading', () => {
 			useApiData.mockReturnValue( {
 				isLoading: true,
 				error: null,
@@ -115,9 +120,7 @@ describe( 'ContentActivity', () => {
 
 			render( <ContentActivity /> );
 
-			expect( screen.getByTestId( 'loading-state' ) ).toHaveClass(
-				'prpl-content-activity__loading'
-			);
+			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
 		} );
 	} );
 

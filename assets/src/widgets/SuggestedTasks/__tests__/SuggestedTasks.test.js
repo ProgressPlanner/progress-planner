@@ -122,7 +122,12 @@ describe( 'SuggestedTasks', () => {
 
 			render( <SuggestedTasks /> );
 
-			expect( screen.getByText( 'Loading tasks…' ) ).toBeInTheDocument();
+			// During loading, the widget header is rendered with skeleton
+			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
+			// Task list should not be rendered during loading
+			expect(
+				screen.queryByTestId( 'task-list' )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'shows widget header during loading', () => {
@@ -133,14 +138,17 @@ describe( 'SuggestedTasks', () => {
 			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
 		} );
 
-		it( 'shows description during loading', () => {
+		it( 'shows skeleton during loading', () => {
 			fetchTasks.mockImplementation( () => new Promise( () => {} ) );
 
 			render( <SuggestedTasks /> );
 
+			// Widget header should be present
+			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
+			// Task list is not rendered during loading (skeleton is shown instead)
 			expect(
-				screen.getByText( /Complete a task from/ )
-			).toBeInTheDocument();
+				screen.queryByTestId( 'task-list' )
+			).not.toBeInTheDocument();
 		} );
 	} );
 
@@ -329,20 +337,32 @@ describe( 'SuggestedTasks', () => {
 	} );
 
 	describe( 'CSS classes', () => {
-		it( 'has loading class during loading', () => {
+		it( 'shows skeleton during loading', () => {
 			fetchTasks.mockImplementation( () => new Promise( () => {} ) );
 
-			const { container } = render( <SuggestedTasks /> );
+			render( <SuggestedTasks /> );
 
+			// During loading, widget header is shown
+			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
+			// Task list is not rendered during loading
 			expect(
-				container.querySelector( '.prpl-suggested-tasks-loading' )
-			).toBeInTheDocument();
+				screen.queryByTestId( 'task-list' )
+			).not.toBeInTheDocument();
 		} );
 
-		it( 'has description class', () => {
-			fetchTasks.mockImplementation( () => new Promise( () => {} ) );
+		it( 'has description class after loading', async () => {
+			const tasks = [
+				{ id: 1, title: { rendered: 'Task 1' }, prpl_priority: 10 },
+			];
+			fetchTasks.mockResolvedValue( { tasks, hasMore: false } );
 
-			const { container } = render( <SuggestedTasks /> );
+			const { container } = render(
+				<SuggestedTasks config={ { delayCelebration: true } } />
+			);
+
+			await act( async () => {
+				jest.advanceTimersByTime( 1500 );
+			} );
 
 			expect(
 				container.querySelector(

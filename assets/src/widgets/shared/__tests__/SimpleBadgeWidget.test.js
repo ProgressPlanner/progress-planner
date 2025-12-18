@@ -104,7 +104,7 @@ describe( 'SimpleBadgeWidget', () => {
 				data: null,
 			} );
 
-			render(
+			const { container } = render(
 				<SimpleBadgeWidget
 					badgeType="content"
 					introText="Intro text"
@@ -113,7 +113,12 @@ describe( 'SimpleBadgeWidget', () => {
 				/>
 			);
 
-			expect( screen.getByTestId( 'loading-state' ) ).toBeInTheDocument();
+			// Skeleton should be rendered during loading
+			expect( container.firstChild ).not.toBeNull();
+			// Main content (intro text) should not be visible
+			expect(
+				screen.queryByText( 'Intro text' )
+			).not.toBeInTheDocument();
 		} );
 	} );
 

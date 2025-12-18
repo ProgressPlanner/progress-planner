@@ -59,16 +59,9 @@ class UnpublishedContentTask extends TaskProvider {
 	 */
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
-		const taskId = this.getTaskId( taskData );
 		const unpublishedContent = await fetchDataCollector(
 			'unpublished_content'
 		);
-
-		// Build URL to posts list with draft filter.
-		const adminUrl =
-			window.prplSuggestedTasksConfig?.adminUrl || '/wp-admin/';
-		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
-		const url = `${ adminUrl }${ separator }edit.php?post_status=draft&post_type=post`;
 
 		// Get count of unpublished items for description.
 		const count =
@@ -83,24 +76,14 @@ class UnpublishedContentTask extends TaskProvider {
 				  } that might need attention.`
 				: '';
 
-		const StaticClass = this.constructor;
-		return {
-			task_id: taskId,
-			provider_id: this.getProviderId(),
+		return this.buildTaskDetails( taskData, {
 			post_title: 'Review unpublished content',
 			description,
-			priority: this.getPriority(),
-			points: this.getPoints(),
-			parent: StaticClass.parent || 0,
-			url,
-			url_target: '_self',
-			dismissable:
-				StaticClass.isDismissable !== undefined
-					? StaticClass.isDismissable
-					: this.config.isDismissable,
-			external_link_url:
-				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
-		};
+			url: this.buildAdminUrl( 'edit.php', {
+				post_status: 'draft',
+				post_type: 'post',
+			} ),
+		} );
 	}
 
 	/**
@@ -114,15 +97,16 @@ class UnpublishedContentTask extends TaskProvider {
 	 * @return {Array} The modified actions array.
 	 */
 	addTaskActions( taskData = [], actions = [] ) {
-		// Check for URL in meta or task data
+		// Check for URL in meta or task data.
 		const url = taskData.meta?.prpl_url || taskData.url || null;
 
 		if ( url ) {
 			actions.push( {
+				type: 'link',
 				priority: 10,
-				html: `<a class="prpl-tooltip-action-text" href="${ this.escapeHtml(
-					url
-				) }" target="_self">Edit</a>`,
+				href: url,
+				label: 'Edit',
+				target: '_self',
 			} );
 		}
 

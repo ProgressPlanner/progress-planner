@@ -164,7 +164,10 @@ describe( 'MonthlyBadges', () => {
 
 			render( <MonthlyBadges /> );
 
-			expect( screen.getByTestId( 'loading-state' ) ).toBeInTheDocument();
+			// Widget header should be visible during loading
+			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
+			// Main content (gauge) should not be visible
+			expect( screen.queryByTestId( 'gauge' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'shows widget header during loading', () => {

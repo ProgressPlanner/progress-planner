@@ -69,31 +69,10 @@ class CoreUpdateTask extends TaskProvider {
 	 */
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
-		const taskId = this.getTaskId( taskData );
-
-		const adminUrl =
-			window.prplSuggestedTasksConfig?.adminUrl || '/wp-admin/';
-		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
-		const url = `${ adminUrl }${ separator }update-core.php`;
-
-		const StaticClass = this.constructor;
-		return {
-			task_id: taskId,
-			provider_id: this.getProviderId(),
+		return this.buildTaskDetails( taskData, {
 			post_title: 'Perform all updates',
-			description: '',
-			priority: this.getPriority(),
-			points: this.getPoints(),
-			parent: StaticClass.parent || 0,
-			url,
-			url_target: '_self',
-			dismissable:
-				StaticClass.isDismissable !== undefined
-					? StaticClass.isDismissable
-					: this.config.isDismissable,
-			external_link_url:
-				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
-		};
+			url: this.buildAdminUrl( 'update-core.php' ),
+		} );
 	}
 }
 

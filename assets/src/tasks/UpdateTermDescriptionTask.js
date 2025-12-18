@@ -95,7 +95,6 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 	 */
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
-		const taskId = this.getTaskId( taskData );
 		const targetTermId = taskData?.target_term_id || null;
 		const targetTaxonomy = taskData?.target_taxonomy || null;
 
@@ -105,31 +104,16 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 			);
 		}
 
-		const adminUrl =
-			window.prplSuggestedTasksConfig?.adminUrl || '/wp-admin/';
-		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
-		const url = `${ adminUrl }${ separator }term.php?taxonomy=${ targetTaxonomy }&tag_ID=${ targetTermId }`;
-
-		const StaticClass = this.constructor;
-		const taskDetails = {
-			task_id: taskId,
-			provider_id: this.getProviderId(),
+		const taskDetails = this.buildTaskDetails( taskData, {
 			post_title: `Write description for term #${ targetTermId }`,
-			description: '',
-			priority: this.getPriority(),
-			points: this.getPoints(),
-			parent: StaticClass.parent || 0,
-			url,
+			url: this.buildAdminUrl( 'term.php', {
+				taxonomy: targetTaxonomy,
+				tag_ID: targetTermId,
+			} ),
 			url_target: '_blank',
-			dismissable:
-				StaticClass.isDismissable !== undefined
-					? StaticClass.isDismissable
-					: this.config.isDismissable,
-			external_link_url:
-				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
 			target_term_id: targetTermId,
 			target_taxonomy: targetTaxonomy,
-		};
+		} );
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
@@ -154,11 +138,11 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 			taskData.target_taxonomy || taskData.meta?.target_taxonomy || null;
 
 		if ( ! targetTermId || ! targetTaxonomy ) {
-			// If we don't have term data, use default popover action from parent
+			// If we don't have term data, use default popover action from parent.
 			return super.addTaskActions( taskData, actions );
 		}
 
-		// Build task context data for the custom event
+		// Build task context data for the custom event.
 		const taskContext = {
 			post_title: taskData.title?.rendered || taskData.post_title || '',
 			target_term_id: targetTermId,
@@ -167,23 +151,19 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 			target_taxonomy_name: taskData.meta?.target_taxonomy_name || '',
 		};
 
-		// Add custom "Write description" action with priority 10
-		// This replaces the default popover action from InteractiveTaskProvider
-		const popoverId = this.getPopoverId();
-		const taskContextJson = JSON.stringify( taskContext );
+		// Add custom "Write description" popover action with priority 10.
+		// This replaces the default popover action from InteractiveTaskProvider.
 		actions.push( {
+			type: 'popover',
 			priority: 10,
-			html: `<a href="#" class="prpl-tooltip-action-text prpl-update-term-description-action" role="button" data-task-context="${ this.escapeHtml(
-				taskContextJson
-			) }" onclick="event.preventDefault(); document.getElementById('${ this.escapeHtml(
-				popoverId
-			) }')?.showPopover(); this.dispatchEvent(new CustomEvent('prpl-interactive-task-action-update-term-description', { bubbles: true, detail: JSON.parse(this.dataset.taskContext) })); return false;">${ this.escapeHtml(
-				'Write description'
-			) }</a>`,
+			popoverId: this.getPopoverId(),
+			label: 'Write description',
+			taskContext,
+			eventName: 'prpl-interactive-task-action-update-term-description',
 		} );
 
-		// Return actions without calling super to avoid duplicate popover action
-		// Standard actions (complete, snooze, info) are already in the array
+		// Return actions without calling super to avoid duplicate popover action.
+		// Standard actions (complete, snooze, info) are already in the array.
 		return actions;
 	}
 

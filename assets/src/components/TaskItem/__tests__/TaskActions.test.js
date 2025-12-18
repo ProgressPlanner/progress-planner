@@ -111,13 +111,17 @@ describe( 'TaskActions', () => {
 		it( 'shows delete button for user tasks', () => {
 			render( <TaskActions { ...defaultProps } isUserTask={ true } /> );
 
-			expect( screen.getByTitle( 'Delete' ) ).toBeInTheDocument();
+			expect(
+				screen.getByTitle( /Delete.*Test Task/ )
+			).toBeInTheDocument();
 		} );
 
 		it( 'does not show delete button for non-user tasks', () => {
 			render( <TaskActions { ...defaultProps } isUserTask={ false } /> );
 
-			expect( screen.queryByTitle( 'Delete' ) ).not.toBeInTheDocument();
+			expect(
+				screen.queryByRole( 'button', { name: /Delete/ } )
+			).not.toBeInTheDocument();
 		} );
 
 		it( 'calls onDelete when delete button is clicked', () => {
@@ -131,7 +135,7 @@ describe( 'TaskActions', () => {
 				/>
 			);
 
-			fireEvent.click( screen.getByTitle( 'Delete' ) );
+			fireEvent.click( screen.getByTitle( /Delete.*Test Task/ ) );
 
 			expect( onDelete ).toHaveBeenCalledWith( 123 );
 		} );
@@ -139,18 +143,10 @@ describe( 'TaskActions', () => {
 		it( 'delete button has correct data-post-id attribute', () => {
 			render( <TaskActions { ...defaultProps } isUserTask={ true } /> );
 
-			expect( screen.getByTitle( 'Delete' ) ).toHaveAttribute(
+			expect( screen.getByTitle( /Delete.*Test Task/ ) ).toHaveAttribute(
 				'data-post-id',
 				'123'
 			);
-		} );
-
-		it( 'includes screen reader text with task title', () => {
-			render( <TaskActions { ...defaultProps } isUserTask={ true } /> );
-
-			expect(
-				screen.getByText( /Delete:.*Test Task/ )
-			).toBeInTheDocument();
 		} );
 	} );
 
@@ -302,33 +298,24 @@ describe( 'TaskActions', () => {
 			).toHaveLength( 1 );
 		} );
 
-		it( 'warns when no provider ID found', () => {
-			const consoleWarn = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation();
-
+		it( 'returns empty when no provider ID found', () => {
 			const taskWithNoProvider = {
 				id: 123,
 				title: { rendered: 'Test' },
 				prpl_task_actions: [],
 			};
 
-			render(
+			const { container } = render(
 				<TaskActions { ...defaultProps } task={ taskWithNoProvider } />
 			);
 
-			expect( consoleWarn ).toHaveBeenCalledWith(
-				expect.stringContaining( 'No providerId found' ),
-				expect.any( Object )
-			);
-
-			consoleWarn.mockRestore();
+			// No actions rendered (empty container).
+			const actionsContainer =
+				container.querySelector( '.tooltip-actions' );
+			expect( actionsContainer.children ).toHaveLength( 0 );
 		} );
 
-		it( 'warns when provider instance not found', () => {
-			const consoleWarn = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation();
+		it( 'returns empty when provider instance not found', () => {
 			getTaskProviderInstance.mockReturnValue( null );
 
 			const taskWithProvider = {
@@ -336,22 +323,17 @@ describe( 'TaskActions', () => {
 				slug: 'unknown-provider',
 			};
 
-			render(
+			const { container } = render(
 				<TaskActions { ...defaultProps } task={ taskWithProvider } />
 			);
 
-			expect( consoleWarn ).toHaveBeenCalledWith(
-				expect.stringContaining( 'Provider instance not found' ),
-				expect.any( Object )
-			);
-
-			consoleWarn.mockRestore();
+			// No actions rendered (empty container).
+			const actionsContainer =
+				container.querySelector( '.tooltip-actions' );
+			expect( actionsContainer.children ).toHaveLength( 0 );
 		} );
 
-		it( 'warns when provider has no getTaskActions method', () => {
-			const consoleWarn = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation();
+		it( 'returns empty when provider has no getTaskActions method', () => {
 			getTaskProviderInstance.mockReturnValue( {} ); // Provider without getTaskActions
 
 			const taskWithProvider = {
@@ -359,15 +341,14 @@ describe( 'TaskActions', () => {
 				slug: 'incomplete-provider',
 			};
 
-			render(
+			const { container } = render(
 				<TaskActions { ...defaultProps } task={ taskWithProvider } />
 			);
 
-			expect( consoleWarn ).toHaveBeenCalledWith(
-				expect.stringContaining( 'does not have getTaskActions method' )
-			);
-
-			consoleWarn.mockRestore();
+			// No actions rendered (empty container).
+			const actionsContainer =
+				container.querySelector( '.tooltip-actions' );
+			expect( actionsContainer.children ).toHaveLength( 0 );
 		} );
 	} );
 

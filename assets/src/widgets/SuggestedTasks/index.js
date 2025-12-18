@@ -241,6 +241,36 @@ function SuggestedTasks( { config = {} } ) {
 	}, [] );
 
 	/**
+	 * Fetch a replacement task after completing/snoozing/deleting.
+	 * Extracted to avoid repetition in handleComplete, handleSnooze, handleDelete.
+	 *
+	 * @return {Promise<void>}
+	 */
+	const fetchAndInsertReplacementTask = useCallback( async () => {
+		const replacementResult = await fetchTasks( {
+			status: 'publish',
+			perPage: 1,
+			page: 1,
+			excludeProvider: 'user',
+			excludeIds: Array.from( injectedTaskIdsRef.current ),
+		} );
+
+		if ( replacementResult.tasks.length > 0 ) {
+			const replacementTask = ensureTaskActions(
+				replacementResult.tasks[ 0 ]
+			);
+			setTasks( ( prev ) =>
+				insertTaskSorted(
+					prev,
+					replacementTask,
+					replacementTask.prpl_priority || 50
+				)
+			);
+			injectedTaskIdsRef.current.add( replacementTask.id );
+		}
+	}, [ insertTaskSorted, ensureTaskActions ] );
+
+	/**
 	 * Render callback for streaming tasks.
 	 * Called by taskRegistry when a task is ready to render.
 	 *
@@ -398,27 +428,7 @@ function SuggestedTasks( { config = {} } ) {
 					} );
 
 					// Fetch replacement task.
-					const replacementResult = await fetchTasks( {
-						status: 'publish',
-						perPage: 1,
-						page: 1,
-						excludeProvider: 'user',
-						excludeIds: Array.from( injectedTaskIdsRef.current ),
-					} );
-
-					if ( replacementResult.tasks.length > 0 ) {
-						const replacementTask = ensureTaskActions(
-							replacementResult.tasks[ 0 ]
-						);
-						setTasks( ( prev ) =>
-							insertTaskSorted(
-								prev,
-								replacementTask,
-								replacementTask.prpl_priority || 50
-							)
-						);
-						injectedTaskIdsRef.current.add( replacementTask.id );
-					}
+					await fetchAndInsertReplacementTask();
 
 					// Trigger grid resize.
 					dispatchGridResize();
@@ -432,7 +442,7 @@ function SuggestedTasks( { config = {} } ) {
 				} );
 			}
 		},
-		[ celebrate, insertTaskSorted, ensureTaskActions, onTaskCompleted ]
+		[ celebrate, fetchAndInsertReplacementTask, onTaskCompleted ]
 	);
 
 	/**
@@ -451,27 +461,7 @@ function SuggestedTasks( { config = {} } ) {
 				tasksMapRef.current.delete( postId );
 
 				// Fetch replacement task.
-				const replacementResult = await fetchTasks( {
-					status: 'publish',
-					perPage: 1,
-					page: 1,
-					excludeProvider: 'user',
-					excludeIds: Array.from( injectedTaskIdsRef.current ),
-				} );
-
-				if ( replacementResult.tasks.length > 0 ) {
-					const replacementTask = ensureTaskActions(
-						replacementResult.tasks[ 0 ]
-					);
-					setTasks( ( prev ) =>
-						insertTaskSorted(
-							prev,
-							replacementTask,
-							replacementTask.prpl_priority || 50
-						)
-					);
-					injectedTaskIdsRef.current.add( replacementTask.id );
-				}
+				await fetchAndInsertReplacementTask();
 
 				// Trigger grid resize.
 				dispatchGridResize();
@@ -479,7 +469,7 @@ function SuggestedTasks( { config = {} } ) {
 				// Error handled silently.
 			}
 		},
-		[ insertTaskSorted, ensureTaskActions ]
+		[ fetchAndInsertReplacementTask ]
 	);
 
 	/**
@@ -500,27 +490,7 @@ function SuggestedTasks( { config = {} } ) {
 				tasksMapRef.current.delete( postId );
 
 				// Fetch replacement task.
-				const replacementResult = await fetchTasks( {
-					status: 'publish',
-					perPage: 1,
-					page: 1,
-					excludeProvider: 'user',
-					excludeIds: Array.from( injectedTaskIdsRef.current ),
-				} );
-
-				if ( replacementResult.tasks.length > 0 ) {
-					const replacementTask = ensureTaskActions(
-						replacementResult.tasks[ 0 ]
-					);
-					setTasks( ( prev ) =>
-						insertTaskSorted(
-							prev,
-							replacementTask,
-							replacementTask.prpl_priority || 50
-						)
-					);
-					injectedTaskIdsRef.current.add( replacementTask.id );
-				}
+				await fetchAndInsertReplacementTask();
 
 				// Trigger grid resize.
 				dispatchGridResize( 500 );
@@ -528,7 +498,7 @@ function SuggestedTasks( { config = {} } ) {
 				// Error handled silently.
 			}
 		},
-		[ insertTaskSorted, ensureTaskActions ]
+		[ fetchAndInsertReplacementTask ]
 	);
 
 	/**

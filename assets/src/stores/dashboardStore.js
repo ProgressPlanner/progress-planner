@@ -8,6 +8,8 @@
 
 import { create } from 'zustand';
 import apiFetch from '@wordpress/api-fetch';
+import { clearApiCache } from '../hooks/useApiData';
+import { clearBadgeServiceCache } from '../services/badgeService';
 
 /**
  * Dashboard store.
@@ -132,8 +134,13 @@ export const useDashboardStore = create( ( set, get ) => ( {
 
 	/**
 	 * Invalidate cache to trigger widget refetch.
+	 * Clears both useApiData and badgeService caches.
 	 */
-	invalidateCache: () => set( { cacheInvalidatedAt: Date.now() } ),
+	invalidateCache: () => {
+		clearApiCache();
+		clearBadgeServiceCache();
+		set( { cacheInvalidatedAt: Date.now() } );
+	},
 
 	/**
 	 * Set whether the onboarding wizard should auto-start.

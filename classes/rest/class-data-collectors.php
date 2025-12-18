@@ -126,6 +126,9 @@ class Data_Collectors extends Base {
 			'published_post_count'      => \Progress_Planner\Suggested_Tasks\Data_Collector\Published_Post_Count::class,
 			'unpublished_content'       => \Progress_Planner\Suggested_Tasks\Data_Collector\Unpublished_Content::class,
 			'seo_plugin_installed'      => \Progress_Planner\Suggested_Tasks\Data_Collector\SEO_Plugin::class,
+			'php_version'               => \Progress_Planner\Suggested_Tasks\Data_Collector\PHP_Version::class,
+			'wp_debug_status'           => \Progress_Planner\Suggested_Tasks\Data_Collector\WP_Debug::class,
+			'old_posts_for_review'      => \Progress_Planner\Suggested_Tasks\Data_Collector\Old_Posts_For_Review::class,
 		];
 
 		/**
