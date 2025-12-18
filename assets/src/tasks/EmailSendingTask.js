@@ -6,7 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 
 /**
  * Email Sending Task Provider class.
@@ -57,6 +57,6 @@ class EmailSendingTask extends InteractiveTaskProvider {
 }
 
 // Self-register this task provider
-doAction( 'prpl.tasks.register', EmailSendingTask, EmailSendingTask.priority );
+registerTask( EmailSendingTask );
 
 export default EmailSendingTask;

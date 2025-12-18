@@ -1,16 +1,22 @@
 /**
- * Tests for taskRegistry Service
+ * Tests for taskRegistry Service - Lazy Evaluation System
  */
 
 import {
-	setTaskRenderCallback,
+	registerTask,
+	evaluateTasksUntil,
+	resetEvaluationState,
+	getEvaluationProgress,
+	hasMoreTasksToEvaluate,
 	getTaskProviderClass,
 	getTaskProviderInstance,
+	getBufferSize,
 } from '../taskRegistry';
 
 // Mock @wordpress/hooks
 jest.mock( '@wordpress/hooks', () => ( {
-	addAction: jest.fn(),
+	addFilter: jest.fn(),
+	applyFilters: jest.fn( () => new Map() ),
 } ) );
 
 // Mock useTasksApi
@@ -24,34 +30,104 @@ jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 describe( 'taskRegistry', () => {
 	beforeEach( () => {
 		jest.clearAllMocks();
+		resetEvaluationState();
 	} );
 
-	describe( 'setTaskRenderCallback', () => {
-		it( 'accepts a callback function', () => {
-			const callback = jest.fn();
+	describe( 'registerTask', () => {
+		it( 'registers a task class with providerId', () => {
+			const { addFilter } = require( '@wordpress/hooks' );
 
-			// Should not throw
-			expect( () => {
-				setTaskRenderCallback( callback );
-			} ).not.toThrow();
+			class MockTask {
+				static providerId = 'test-task';
+				static priority = 10;
+			}
+
+			registerTask( MockTask );
+
+			expect( addFilter ).toHaveBeenCalledWith(
+				'prpl.tasks.classes',
+				'prpl/task/test-task',
+				expect.any( Function ),
+				10
+			);
 		} );
 
-		it( 'accepts null to clear callback', () => {
-			// Should not throw
-			expect( () => {
-				setTaskRenderCallback( null );
-			} ).not.toThrow();
+		it( 'uses default priority of 50 when not specified', () => {
+			const { addFilter } = require( '@wordpress/hooks' );
+
+			class MockTaskNoPriority {
+				static providerId = 'no-priority-task';
+			}
+
+			registerTask( MockTaskNoPriority );
+
+			expect( addFilter ).toHaveBeenCalledWith(
+				'prpl.tasks.classes',
+				'prpl/task/no-priority-task',
+				expect.any( Function ),
+				50
+			);
 		} );
 
-		it( 'replaces existing callback', () => {
-			const callback1 = jest.fn();
-			const callback2 = jest.fn();
+		it( 'warns and skips tasks without providerId', () => {
+			const warnSpy = jest
+				.spyOn( console, 'warn' )
+				.mockImplementation( () => {} );
+			const { addFilter } = require( '@wordpress/hooks' );
 
-			// Should not throw when replacing
-			expect( () => {
-				setTaskRenderCallback( callback1 );
-				setTaskRenderCallback( callback2 );
-			} ).not.toThrow();
+			class TaskWithoutId {}
+
+			registerTask( TaskWithoutId );
+
+			expect( warnSpy ).toHaveBeenCalledWith(
+				expect.stringContaining( 'missing providerId' ),
+				expect.anything()
+			);
+			expect( addFilter ).not.toHaveBeenCalled();
+
+			warnSpy.mockRestore();
+		} );
+	} );
+
+	describe( 'getBufferSize', () => {
+		it( 'returns the buffer size constant', () => {
+			const bufferSize = getBufferSize();
+			expect( typeof bufferSize ).toBe( 'number' );
+			expect( bufferSize ).toBeGreaterThan( 0 );
+		} );
+	} );
+
+	describe( 'resetEvaluationState', () => {
+		it( 'resets evaluation state', () => {
+			resetEvaluationState();
+
+			const progress = getEvaluationProgress();
+			expect( progress.current ).toBe( 0 );
+			expect( progress.isEvaluating ).toBe( false );
+		} );
+	} );
+
+	describe( 'getEvaluationProgress', () => {
+		it( 'returns progress information', () => {
+			const progress = getEvaluationProgress();
+
+			expect( progress ).toHaveProperty( 'current' );
+			expect( progress ).toHaveProperty( 'total' );
+			expect( progress ).toHaveProperty( 'complete' );
+			expect( progress ).toHaveProperty( 'isEvaluating' );
+		} );
+
+		it( 'starts with current at 0', () => {
+			resetEvaluationState();
+			const progress = getEvaluationProgress();
+			expect( progress.current ).toBe( 0 );
+		} );
+	} );
+
+	describe( 'hasMoreTasksToEvaluate', () => {
+		it( 'returns true initially (before pre-fetch)', () => {
+			resetEvaluationState();
+			expect( hasMoreTasksToEvaluate() ).toBe( true );
 		} );
 	} );
 
@@ -84,19 +160,8 @@ describe( 'taskRegistry', () => {
 
 	describe( 'getTaskProviderInstance', () => {
 		it( 'returns null for non-existent provider', () => {
-			const warnSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
-
 			const result = getTaskProviderInstance( 'non-existent-provider' );
-
 			expect( result ).toBeNull();
-			expect( warnSpy ).toHaveBeenCalledWith(
-				expect.stringContaining( 'not found in registry' ),
-				expect.any( Array )
-			);
-
-			warnSpy.mockRestore();
 		} );
 
 		it( 'returns null for null providerId', () => {
@@ -113,35 +178,48 @@ describe( 'taskRegistry', () => {
 			const result = getTaskProviderInstance( '' );
 			expect( result ).toBeNull();
 		} );
+	} );
 
-		it( 'logs warning with available provider IDs', () => {
-			const warnSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
+	describe( 'evaluateTasksUntil', () => {
+		it( 'returns an object with complete and tasksAdded', async () => {
+			const apiFetch = require( '@wordpress/api-fetch' );
+			apiFetch.mockResolvedValue( [] );
 
-			getTaskProviderInstance( 'missing-provider' );
+			const onTaskReady = jest.fn();
+			const result = await evaluateTasksUntil( 5, onTaskReady );
 
-			expect( warnSpy ).toHaveBeenCalledWith(
-				expect.stringContaining( 'Available providers:' ),
-				expect.any( Array )
-			);
-
-			warnSpy.mockRestore();
+			expect( result ).toHaveProperty( 'complete' );
+			expect( result ).toHaveProperty( 'tasksAdded' );
 		} );
 
-		it( 'does not log warning for falsy providerId', () => {
-			const warnSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
+		it( 'pre-fetches existing tasks on first call', async () => {
+			const apiFetch = require( '@wordpress/api-fetch' );
+			apiFetch.mockResolvedValue( [] );
 
-			getTaskProviderInstance( null );
-			getTaskProviderInstance( undefined );
-			getTaskProviderInstance( '' );
+			const onTaskReady = jest.fn();
+			await evaluateTasksUntil( 5, onTaskReady );
 
-			// Should not warn for falsy values - just returns null
-			expect( warnSpy ).not.toHaveBeenCalled();
+			expect( apiFetch ).toHaveBeenCalledWith(
+				expect.objectContaining( {
+					path: expect.stringContaining( 'prpl_recommendations' ),
+				} )
+			);
+		} );
 
-			warnSpy.mockRestore();
+		it( 'does not make duplicate pre-fetch calls', async () => {
+			const apiFetch = require( '@wordpress/api-fetch' );
+			apiFetch.mockResolvedValue( [] );
+
+			const onTaskReady = jest.fn();
+
+			// First call
+			await evaluateTasksUntil( 5, onTaskReady );
+
+			// Second call
+			await evaluateTasksUntil( 5, onTaskReady );
+
+			// Should only have called apiFetch once for pre-fetch
+			expect( apiFetch ).toHaveBeenCalledTimes( 1 );
 		} );
 	} );
 
@@ -157,14 +235,8 @@ describe( 'taskRegistry', () => {
 		} );
 
 		it( 'getTaskProviderInstance handles special characters in ID', () => {
-			const warnSpy = jest
-				.spyOn( console, 'warn' )
-				.mockImplementation( () => {} );
-
 			const result = getTaskProviderInstance( 'provider/with/slashes' );
 			expect( result ).toBeNull();
-
-			warnSpy.mockRestore();
 		} );
 	} );
 } );

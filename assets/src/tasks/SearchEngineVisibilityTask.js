@@ -6,7 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
@@ -71,10 +71,6 @@ class SearchEngineVisibilityTask extends InteractiveTaskProvider {
 }
 
 // Self-register this task provider
-doAction(
-	'prpl.tasks.register',
-	SearchEngineVisibilityTask,
-	SearchEngineVisibilityTask.priority
-);
+registerTask( SearchEngineVisibilityTask );
 
 export default SearchEngineVisibilityTask;

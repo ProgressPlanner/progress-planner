@@ -6,7 +6,7 @@
  */
 
 import { TaskProvider } from '../services/TaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -77,6 +77,6 @@ class CoreUpdateTask extends TaskProvider {
 }
 
 // Self-register this task provider
-doAction( 'prpl.tasks.register', CoreUpdateTask, CoreUpdateTask.priority );
+registerTask( CoreUpdateTask );
 
 export default CoreUpdateTask;

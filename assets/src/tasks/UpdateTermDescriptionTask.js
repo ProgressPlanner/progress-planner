@@ -9,7 +9,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
 
 /**
@@ -178,10 +178,6 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 }
 
 // Self-register this task provider
-doAction(
-	'prpl.tasks.register',
-	UpdateTermDescriptionTask,
-	UpdateTermDescriptionTask.priority
-);
+registerTask( UpdateTermDescriptionTask );
 
 export default UpdateTermDescriptionTask;

@@ -8,7 +8,7 @@
  */
 
 import { TaskProvider } from '../services/TaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
 
 /**
@@ -67,6 +67,6 @@ class DebugDisplayTask extends TaskProvider {
 }
 
 // Self-register this task provider
-doAction( 'prpl.tasks.register', DebugDisplayTask, DebugDisplayTask.priority );
+registerTask( DebugDisplayTask );
 
 export default DebugDisplayTask;

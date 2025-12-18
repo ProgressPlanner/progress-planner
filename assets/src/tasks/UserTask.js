@@ -10,7 +10,7 @@
  */
 
 import { __ } from '@wordpress/i18n';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 import { TaskProvider } from '../services/TaskProvider';
 
 /**
@@ -92,6 +92,6 @@ class UserTask extends TaskProvider {
 }
 
 // Self-register this task provider
-doAction( 'prpl.tasks.register', UserTask, UserTask.priority );
+registerTask( UserTask );
 
 export default UserTask;

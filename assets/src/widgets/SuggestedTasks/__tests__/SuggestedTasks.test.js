@@ -2,7 +2,7 @@
  * Tests for SuggestedTasks Widget
  */
 
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 
 // Mock WordPress packages
 jest.mock( '@wordpress/i18n', () => ( {
@@ -34,11 +34,13 @@ jest.mock( '../../../hooks/useGridMasonry', () => ( {
 	useGridMasonry: jest.fn(),
 } ) );
 
-jest.mock( '../../../hooks/useCelebration', () => ( {
-	useCelebration: jest.fn( () => ( {
-		celebrate: jest.fn(),
-	} ) ),
-} ) );
+jest.mock( '../../../hooks/useCelebration', () => {
+	// Create stable mock function to avoid useEffect dependency changes
+	const mockCelebrate = jest.fn();
+	return {
+		useCelebration: jest.fn( () => ( { celebrate: mockCelebrate } ) ),
+	};
+} );
 
 jest.mock( '../../../utils/gridResize', () => ( {
 	dispatchGridResize: jest.fn(),
@@ -49,8 +51,21 @@ jest.mock( '../../../stores/dashboardStore', () => ( {
 } ) );
 
 jest.mock( '../../../services/taskRegistry', () => ( {
-	setTaskRenderCallback: jest.fn(),
+	registerTask: jest.fn(),
+	evaluateTasksUntil: jest.fn( () =>
+		Promise.resolve( { complete: true, tasksAdded: 0 } )
+	),
+	resetEvaluationState: jest.fn(),
+	getEvaluationProgress: jest.fn( () => ( {
+		current: 0,
+		total: 0,
+		complete: true,
+		isEvaluating: false,
+	} ) ),
+	hasMoreTasksToEvaluate: jest.fn( () => false ),
+	getTaskProviderClass: jest.fn(),
 	getTaskProviderInstance: jest.fn(),
+	getBufferSize: jest.fn( () => 3 ),
 } ) );
 
 // Mock tasks registration
@@ -93,37 +108,62 @@ jest.mock( '../LoadMoreButton', () => ( props ) => (
 	</button>
 ) );
 
+jest.mock( '../SuggestedTasksSkeleton', () => () => (
+	<div data-testid="skeleton">Loading skeleton</div>
+) );
+
 // Import after mocks
 import SuggestedTasks from '../index';
 import { fetchTasks } from '../../../hooks/useTasksApi';
-import { setTaskRenderCallback } from '../../../services/taskRegistry';
+import {
+	evaluateTasksUntil,
+	hasMoreTasksToEvaluate,
+} from '../../../services/taskRegistry';
 
 describe( 'SuggestedTasks', () => {
 	beforeEach( () => {
+		// Clear mock call history but preserve implementations
 		jest.clearAllMocks();
-		jest.useFakeTimers();
+		// Use real timers by default for async tests
+		jest.useRealTimers();
 
-		// Default: pending tasks returns empty, triggers loading false
+		// Re-setup mock implementations that may have been changed by previous tests
 		fetchTasks.mockResolvedValue( {
 			tasks: [],
 			hasMore: false,
 			total: 0,
 		} );
+
+		evaluateTasksUntil.mockResolvedValue( {
+			complete: true,
+			tasksAdded: 0,
+		} );
+
+		hasMoreTasksToEvaluate.mockReturnValue( false );
 	} );
 
 	afterEach( () => {
-		jest.useRealTimers();
+		// Ensure evaluateTasksUntil mock is restored after each test
+		// This prevents tests that use mockImplementation with never-resolving promises
+		// from affecting subsequent tests
+		evaluateTasksUntil.mockResolvedValue( {
+			complete: true,
+			tasksAdded: 0,
+		} );
 	} );
 
 	describe( 'loading state', () => {
 		it( 'renders loading state initially', () => {
-			// Prevent fetchTasks from resolving immediately
-			fetchTasks.mockImplementation( () => new Promise( () => {} ) );
+			// Prevent evaluateTasksUntil from resolving immediately
+			evaluateTasksUntil.mockImplementation(
+				() => new Promise( () => {} )
+			);
 
-			render( <SuggestedTasks /> );
+			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
 			// During loading, the widget header is rendered with skeleton
 			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
+			expect( screen.getByTestId( 'skeleton' ) ).toBeInTheDocument();
 			// Task list should not be rendered during loading
 			expect(
 				screen.queryByTestId( 'task-list' )
@@ -131,21 +171,27 @@ describe( 'SuggestedTasks', () => {
 		} );
 
 		it( 'shows widget header during loading', () => {
-			fetchTasks.mockImplementation( () => new Promise( () => {} ) );
+			evaluateTasksUntil.mockImplementation(
+				() => new Promise( () => {} )
+			);
 
-			render( <SuggestedTasks /> );
+			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
 			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
 		} );
 
 		it( 'shows skeleton during loading', () => {
-			fetchTasks.mockImplementation( () => new Promise( () => {} ) );
+			evaluateTasksUntil.mockImplementation(
+				() => new Promise( () => {} )
+			);
 
-			render( <SuggestedTasks /> );
+			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
 			// Widget header should be present
 			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
-			// Task list is not rendered during loading (skeleton is shown instead)
+			// Skeleton is shown during loading
+			expect( screen.getByTestId( 'skeleton' ) ).toBeInTheDocument();
+			// Task list is not rendered during loading
 			expect(
 				screen.queryByTestId( 'task-list' )
 			).not.toBeInTheDocument();
@@ -153,20 +199,31 @@ describe( 'SuggestedTasks', () => {
 	} );
 
 	describe( 'empty state', () => {
+		beforeEach( () => {
+			// Ensure evaluateTasksUntil resolves for empty state tests
+			evaluateTasksUntil.mockResolvedValue( {
+				complete: true,
+				tasksAdded: 0,
+			} );
+			hasMoreTasksToEvaluate.mockReturnValue( false );
+		} );
+
 		it( 'shows empty message when no tasks', async () => {
 			fetchTasks.mockResolvedValue( { tasks: [], hasMore: false } );
 
 			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
-			// Advance timers inside act to properly handle state updates
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
-
-			// Text is split by <br> so use regex to match partial content
-			expect(
-				screen.getByText( /You have completed all recommended tasks/ )
-			).toBeInTheDocument();
+			// Wait for the component to finish loading
+			await waitFor(
+				() => {
+					expect(
+						screen.getByText(
+							/You have completed all recommended tasks/
+						)
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 
 		it( 'shows check back later message', async () => {
@@ -174,14 +231,14 @@ describe( 'SuggestedTasks', () => {
 
 			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
-
-			// Text is split by <br> so use regex to match partial content
-			expect(
-				screen.getByText( /Check back later for new tasks/ )
-			).toBeInTheDocument();
+			await waitFor(
+				() => {
+					expect(
+						screen.getByText( /Check back later for new tasks/ )
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 
 		it( 'shows widget header in empty state', async () => {
@@ -189,9 +246,16 @@ describe( 'SuggestedTasks', () => {
 
 			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
+			await waitFor(
+				() => {
+					expect(
+						screen.queryByText(
+							/You have completed all recommended tasks/
+						)
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 
 			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
 		} );
@@ -203,13 +267,14 @@ describe( 'SuggestedTasks', () => {
 				<SuggestedTasks config={ { delayCelebration: true } } />
 			);
 
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
-
-			expect(
-				container.querySelector( '.prpl-suggested-tasks-list' )
-			).toBeInTheDocument();
+			await waitFor(
+				() => {
+					expect(
+						container.querySelector( '.prpl-suggested-tasks-list' )
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 	} );
 
@@ -217,13 +282,14 @@ describe( 'SuggestedTasks', () => {
 		it( 'renders widget header with default title', async () => {
 			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
-
-			expect(
-				screen.getByText( "Ravi's Recommendations" )
-			).toBeInTheDocument();
+			await waitFor(
+				() => {
+					expect(
+						screen.getByText( "Ravi's Recommendations" )
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 
 		it( 'uses custom title from config', async () => {
@@ -236,13 +302,14 @@ describe( 'SuggestedTasks', () => {
 				/>
 			);
 
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
-
-			expect(
-				screen.getByText( 'Custom Recommendations' )
-			).toBeInTheDocument();
+			await waitFor(
+				() => {
+					expect(
+						screen.getByText( 'Custom Recommendations' )
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 
 		it( 'uses custom raviName in default title', async () => {
@@ -252,13 +319,14 @@ describe( 'SuggestedTasks', () => {
 				/>
 			);
 
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
-
-			expect(
-				screen.getByText( "Bob's Recommendations" )
-			).toBeInTheDocument();
+			await waitFor(
+				() => {
+					expect(
+						screen.getByText( "Bob's Recommendations" )
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 
 		it( 'uses custom description from config', async () => {
@@ -271,35 +339,45 @@ describe( 'SuggestedTasks', () => {
 				/>
 			);
 
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
-
-			expect(
-				screen.getByText( 'Custom description text' )
-			).toBeInTheDocument();
+			await waitFor(
+				() => {
+					expect(
+						screen.getByText( 'Custom description text' )
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 	} );
 
-	describe( 'task streaming', () => {
-		it( 'sets up task render callback on mount', async () => {
-			render( <SuggestedTasks /> );
+	describe( 'lazy task evaluation', () => {
+		it( 'calls evaluateTasksUntil on mount', async () => {
+			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
-			await act( async () => {
-				jest.advanceTimersByTime( 100 );
-			} );
-
-			expect( setTaskRenderCallback ).toHaveBeenCalledWith(
-				expect.any( Function )
+			await waitFor(
+				() => {
+					expect( evaluateTasksUntil ).toHaveBeenCalledWith(
+						expect.any( Number ),
+						expect.any( Function )
+					);
+				},
+				{ timeout: 3000 }
 			);
 		} );
 
-		it( 'clears task render callback on unmount', () => {
-			const { unmount } = render( <SuggestedTasks /> );
+		it( 'evaluates tasks with correct target count', async () => {
+			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
-			unmount();
-
-			expect( setTaskRenderCallback ).toHaveBeenLastCalledWith( null );
+			await waitFor(
+				() => {
+					// Should evaluate initial limit (5) + buffer size (3) = 8
+					expect( evaluateTasksUntil ).toHaveBeenCalledWith(
+						8,
+						expect.any( Function )
+					);
+				},
+				{ timeout: 3000 }
+			);
 		} );
 	} );
 
@@ -307,25 +385,32 @@ describe( 'SuggestedTasks', () => {
 		it( 'fetches pending tasks on mount when no delayCelebration', async () => {
 			render( <SuggestedTasks /> );
 
-			await act( async () => {
-				jest.advanceTimersByTime( 100 );
-			} );
-
-			expect( fetchTasks ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					status: 'pending',
-					perPage: 100,
-					excludeProvider: 'user',
-				} )
+			await waitFor(
+				() => {
+					expect( fetchTasks ).toHaveBeenCalledWith(
+						expect.objectContaining( {
+							status: 'pending',
+							perPage: 100,
+							excludeProvider: 'user',
+						} )
+					);
+				},
+				{ timeout: 3000 }
 			);
 		} );
 
 		it( 'skips pending tasks fetch when delayCelebration is true', async () => {
 			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
-			await act( async () => {
-				jest.advanceTimersByTime( 100 );
-			} );
+			await waitFor(
+				() => {
+					// Wait for component to finish loading
+					expect(
+						screen.getByTestId( 'widget-header' )
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 
 			// Should not call fetchTasks with pending status
 			expect( fetchTasks ).not.toHaveBeenCalledWith(
@@ -338,12 +423,16 @@ describe( 'SuggestedTasks', () => {
 
 	describe( 'CSS classes', () => {
 		it( 'shows skeleton during loading', () => {
-			fetchTasks.mockImplementation( () => new Promise( () => {} ) );
+			evaluateTasksUntil.mockImplementation(
+				() => new Promise( () => {} )
+			);
 
-			render( <SuggestedTasks /> );
+			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
 			// During loading, widget header is shown
 			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
+			// Skeleton is shown during loading
+			expect( screen.getByTestId( 'skeleton' ) ).toBeInTheDocument();
 			// Task list is not rendered during loading
 			expect(
 				screen.queryByTestId( 'task-list' )
@@ -351,6 +440,11 @@ describe( 'SuggestedTasks', () => {
 		} );
 
 		it( 'has description class after loading', async () => {
+			// Reset mock for this async test
+			evaluateTasksUntil.mockResolvedValue( {
+				complete: true,
+				tasksAdded: 0,
+			} );
 			const tasks = [
 				{ id: 1, title: { rendered: 'Task 1' }, prpl_priority: 10 },
 			];
@@ -360,31 +454,39 @@ describe( 'SuggestedTasks', () => {
 				<SuggestedTasks config={ { delayCelebration: true } } />
 			);
 
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
-
-			expect(
-				container.querySelector(
-					'.prpl-suggested-tasks-widget-description'
-				)
-			).toBeInTheDocument();
+			await waitFor(
+				() => {
+					expect(
+						container.querySelector(
+							'.prpl-suggested-tasks-widget-description'
+						)
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 
 		it( 'has no-suggested-tasks class in empty state', async () => {
+			// Reset mock for this async test
+			evaluateTasksUntil.mockResolvedValue( {
+				complete: true,
+				tasksAdded: 0,
+			} );
+			hasMoreTasksToEvaluate.mockReturnValue( false );
 			fetchTasks.mockResolvedValue( { tasks: [], hasMore: false } );
 
 			const { container } = render(
 				<SuggestedTasks config={ { delayCelebration: true } } />
 			);
 
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
-
-			expect(
-				container.querySelector( '.prpl-no-suggested-tasks' )
-			).toBeInTheDocument();
+			await waitFor(
+				() => {
+					expect(
+						container.querySelector( '.prpl-no-suggested-tasks' )
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 	} );
 
@@ -392,21 +494,27 @@ describe( 'SuggestedTasks', () => {
 		it( 'handles empty config object', async () => {
 			render( <SuggestedTasks config={ {} } /> );
 
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
-
-			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
+			await waitFor(
+				() => {
+					expect(
+						screen.getByTestId( 'widget-header' )
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 
 		it( 'handles undefined config', async () => {
 			render( <SuggestedTasks /> );
 
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
-
-			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
+			await waitFor(
+				() => {
+					expect(
+						screen.getByTestId( 'widget-header' )
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 
 		it( 'handles fetch error gracefully', async () => {
@@ -414,12 +522,13 @@ describe( 'SuggestedTasks', () => {
 
 			render( <SuggestedTasks /> );
 
-			await act( async () => {
-				jest.advanceTimersByTime( 100 );
-			} );
-
-			// Should set loading to false on error
-			expect( fetchTasks ).toHaveBeenCalled();
+			await waitFor(
+				() => {
+					// Should set loading to false on error
+					expect( fetchTasks ).toHaveBeenCalled();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 	} );
 
@@ -429,13 +538,14 @@ describe( 'SuggestedTasks', () => {
 				useGridMasonry,
 			} = require( '../../../hooks/useGridMasonry' );
 
-			render( <SuggestedTasks /> );
+			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
-			await act( async () => {
-				jest.advanceTimersByTime( 100 );
-			} );
-
-			expect( useGridMasonry ).toHaveBeenCalled();
+			await waitFor(
+				() => {
+					expect( useGridMasonry ).toHaveBeenCalled();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 
 		it( 'calls useCelebration on mount', async () => {
@@ -443,13 +553,14 @@ describe( 'SuggestedTasks', () => {
 				useCelebration,
 			} = require( '../../../hooks/useCelebration' );
 
-			render( <SuggestedTasks /> );
+			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
-			await act( async () => {
-				jest.advanceTimersByTime( 100 );
-			} );
-
-			expect( useCelebration ).toHaveBeenCalled();
+			await waitFor(
+				() => {
+					expect( useCelebration ).toHaveBeenCalled();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 
 		it( 'calls useDashboardStore on mount', async () => {
@@ -457,13 +568,14 @@ describe( 'SuggestedTasks', () => {
 				useDashboardStore,
 			} = require( '../../../stores/dashboardStore' );
 
-			render( <SuggestedTasks /> );
+			render( <SuggestedTasks config={ { delayCelebration: true } } /> );
 
-			await act( async () => {
-				jest.advanceTimersByTime( 100 );
-			} );
-
-			expect( useDashboardStore ).toHaveBeenCalled();
+			await waitFor(
+				() => {
+					expect( useDashboardStore ).toHaveBeenCalled();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 	} );
 
@@ -478,13 +590,14 @@ describe( 'SuggestedTasks', () => {
 				/>
 			);
 
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
-
-			expect(
-				screen.getByText( 'Tasks & Recommendations' )
-			).toBeInTheDocument();
+			await waitFor(
+				() => {
+					expect(
+						screen.getByText( 'Tasks & Recommendations' )
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 
 		it( 'decodes HTML entities in description', async () => {
@@ -497,13 +610,14 @@ describe( 'SuggestedTasks', () => {
 				/>
 			);
 
-			await act( async () => {
-				jest.advanceTimersByTime( 1500 );
-			} );
-
-			expect(
-				screen.getByText( 'Complete & earn points' )
-			).toBeInTheDocument();
+			await waitFor(
+				() => {
+					expect(
+						screen.getByText( 'Complete & earn points' )
+					).toBeInTheDocument();
+				},
+				{ timeout: 3000 }
+			);
 		} );
 	} );
 } );

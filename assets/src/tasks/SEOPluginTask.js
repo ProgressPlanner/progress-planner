@@ -6,7 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
 
 /**
@@ -63,6 +63,6 @@ class SEOPluginTask extends InteractiveTaskProvider {
 }
 
 // Self-register this task provider
-doAction( 'prpl.tasks.register', SEOPluginTask, SEOPluginTask.priority );
+registerTask( SEOPluginTask );
 
 export default SEOPluginTask;

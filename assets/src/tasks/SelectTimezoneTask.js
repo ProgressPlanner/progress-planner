@@ -6,7 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
@@ -79,10 +79,6 @@ class SelectTimezoneTask extends InteractiveTaskProvider {
 }
 
 // Self-register this task provider
-doAction(
-	'prpl.tasks.register',
-	SelectTimezoneTask,
-	SelectTimezoneTask.priority
-);
+registerTask( SelectTimezoneTask );
 
 export default SelectTimezoneTask;

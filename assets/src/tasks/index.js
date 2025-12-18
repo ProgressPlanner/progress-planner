@@ -2,7 +2,7 @@
  * Task Registration.
  *
  * Import all React task providers.
- * Tasks self-register via doAction('prpl.tasks.register') when imported.
+ * Tasks self-register via registerTask() when imported.
  */
 
 // Core tasks - basic WordPress setup and configuration

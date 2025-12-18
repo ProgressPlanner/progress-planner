@@ -6,7 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 
 /**
  * Improve PDF Handling Task Provider class.
@@ -57,10 +57,6 @@ class ImprovePdfHandlingTask extends InteractiveTaskProvider {
 }
 
 // Self-register this task provider
-doAction(
-	'prpl.tasks.register',
-	ImprovePdfHandlingTask,
-	ImprovePdfHandlingTask.priority
-);
+registerTask( ImprovePdfHandlingTask );
 
 export default ImprovePdfHandlingTask;

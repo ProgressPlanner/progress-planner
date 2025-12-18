@@ -6,7 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
@@ -80,10 +80,6 @@ class SetDateFormatTask extends InteractiveTaskProvider {
 }
 
 // Self-register this task provider
-doAction(
-	'prpl.tasks.register',
-	SetDateFormatTask,
-	SetDateFormatTask.priority
-);
+registerTask( SetDateFormatTask );
 
 export default SetDateFormatTask;

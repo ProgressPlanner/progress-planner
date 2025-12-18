@@ -6,7 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 import apiFetch from '@wordpress/api-fetch';
 
 /**
@@ -75,6 +75,6 @@ class SetPageAboutTask extends InteractiveTaskProvider {
 }
 
 // Self-register this task provider
-doAction( 'prpl.tasks.register', SetPageAboutTask, SetPageAboutTask.priority );
+registerTask( SetPageAboutTask );
 
 export default SetPageAboutTask;

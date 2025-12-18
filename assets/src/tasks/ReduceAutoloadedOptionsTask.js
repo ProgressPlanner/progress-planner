@@ -6,7 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 
 /**
  * Reduce Autoloaded Options Task Provider class.
@@ -59,10 +59,6 @@ class ReduceAutoloadedOptionsTask extends InteractiveTaskProvider {
 }
 
 // Self-register this task provider
-doAction(
-	'prpl.tasks.register',
-	ReduceAutoloadedOptionsTask,
-	ReduceAutoloadedOptionsTask.priority
-);
+registerTask( ReduceAutoloadedOptionsTask );
 
 export default ReduceAutoloadedOptionsTask;

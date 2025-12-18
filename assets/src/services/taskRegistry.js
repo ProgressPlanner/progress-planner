@@ -1,198 +1,275 @@
 /**
  * Task Registry Service.
  *
- * Central registry for React task providers. Tasks self-register via WordPress hooks.
- * This replaces the PHP-based task registration system.
+ * Central registry for React task providers with lazy evaluation.
+ * Tasks register via `registerTask()` but are only evaluated on-demand.
  */
 
-import { addAction } from '@wordpress/hooks';
+import { addFilter, applyFilters } from '@wordpress/hooks';
+import apiFetch from '@wordpress/api-fetch';
 import { createTaskPost } from '../hooks/useTasksApi';
 
 /**
- * Registry storage for task providers.
+ * Registry storage for task provider classes.
+ * Populated during import, before any evaluation.
  *
- * @type {Map<string, Object>}
+ * @type {Map<string, Function>}
  */
 const taskProviders = new Map();
 
 /**
- * Callback function for rendering a task into the DOM.
- * This is set by the widget and called when tasks are ready to render.
+ * Pre-fetched existing task slugs from the database.
+ * Used to avoid per-task existence checks.
  *
- * @type {Function|null}
+ * @type {Map<string, Object>}
  */
-let taskRenderCallback = null;
+let existingTasksCache = new Map();
 
 /**
- * Queue of tasks waiting to be rendered (when callback is not ready yet).
+ * Sorted array of task classes by priority.
+ * Computed once after all tasks are registered.
  *
- * @type {Array<{taskData: Object, priority: number}>}
+ * @type {Array<{TaskClass: Function, priority: number, providerId: string}>}
  */
-const taskRenderQueue = [];
+let sortedTaskClasses = [];
 
 /**
- * Set the callback function for rendering tasks.
- *
- * @param {Function} callback The callback function that receives task data and renders it.
- * @return {void}
+ * Evaluation state tracking.
  */
-export function setTaskRenderCallback( callback ) {
-	taskRenderCallback = callback;
-
-	// Process queued tasks if callback is now available
-	if ( callback && taskRenderQueue.length > 0 ) {
-		taskRenderQueue.forEach( ( { taskData, priority } ) => {
-			callback( taskData, priority );
-		} );
-		// Clear the queue
-		taskRenderQueue.length = 0;
-	}
-}
+const evaluationState = {
+	isPreFetchComplete: false,
+	isEvaluating: false,
+	currentIndex: 0,
+};
 
 /**
- * Check if a task post exists in the database.
- *
- * @param {string} taskId The task ID to check (becomes post_name/slug).
- * @return {Promise<Object|null>} Promise resolving to task data if exists, null otherwise.
+ * Buffer size for pre-evaluated tasks.
  */
-async function checkTaskExists( taskId ) {
-	try {
-		// Import apiFetch dynamically to avoid circular dependencies
-		const { default: apiFetch } = await import( '@wordpress/api-fetch' );
-
-		// Try to fetch the task by slug (task_id becomes post_name)
-		// WordPress REST API allows fetching by slug
-		try {
-			const task = await apiFetch( {
-				path: `/wp/v2/prpl_recommendations?slug=${ encodeURIComponent(
-					taskId
-				) }&status=publish`,
-			} );
-
-			// apiFetch returns an array for collection endpoints
-			if ( Array.isArray( task ) && task.length > 0 ) {
-				return task[ 0 ];
-			}
-
-			return null;
-		} catch ( fetchError ) {
-			// Task doesn't exist or error fetching
-			return null;
-		}
-	} catch ( error ) {
-		console.error( 'Error checking if task exists:', error );
-		return null;
-	}
-}
+const BUFFER_SIZE = 3;
 
 /**
- * Handle task lifecycle: evaluate, create post if needed, and render.
+ * Register a task class for lazy evaluation.
+ * This collects the task class without triggering any evaluation.
  *
- * @param {Function} TaskClass The task provider class.
- * @param {number}   priority  The task priority (for sorting).
- * @return {Promise<void>}
+ * @param {Function} TaskClass The task class to register.
  */
-async function handleTaskLifecycle( TaskClass, priority = 50 ) {
+export function registerTask( TaskClass ) {
 	const providerId = TaskClass.providerId;
 	if ( ! providerId ) {
 		console.warn( 'Task class missing providerId, skipping:', TaskClass );
 		return;
 	}
 
-	// Skip if already registered
-	if ( taskProviders.has( providerId ) ) {
-		return;
+	const priority = TaskClass.priority || 50;
+
+	addFilter(
+		'prpl.tasks.classes',
+		`prpl/task/${ providerId }`,
+		( taskClasses ) => {
+			if ( ! taskClasses.has( providerId ) ) {
+				taskClasses.set( providerId, { TaskClass, priority } );
+			}
+			return taskClasses;
+		},
+		priority
+	);
+
+	// Also store in taskProviders for getTaskProviderClass/Instance
+	taskProviders.set( providerId, TaskClass );
+}
+
+/**
+ * Pre-fetch all existing task recommendations from the database.
+ * Called once before evaluation begins.
+ *
+ * @return {Promise<Map<string, Object>>} Map of slug -> task data.
+ */
+async function preFetchExistingTasks() {
+	try {
+		const response = await apiFetch( {
+			path: '/wp/v2/prpl_recommendations?status=publish&per_page=100&_embed=true',
+		} );
+
+		const tasksMap = new Map();
+		if ( Array.isArray( response ) ) {
+			response.forEach( ( task ) => {
+				if ( task.slug ) {
+					tasksMap.set( task.slug, task );
+				}
+			} );
+		}
+
+		return tasksMap;
+	} catch ( error ) {
+		console.error( 'Error pre-fetching existing tasks:', error );
+		return new Map();
+	}
+}
+
+/**
+ * Initialize the sorted task classes array.
+ * Called once after all tasks have registered.
+ */
+function initializeSortedTaskClasses() {
+	const registered = applyFilters( 'prpl.tasks.classes', new Map() );
+
+	sortedTaskClasses = Array.from( registered.entries() )
+		.map( ( [ providerId, { TaskClass, priority } ] ) => ( {
+			TaskClass,
+			priority,
+			providerId,
+		} ) )
+		.sort( ( a, b ) => a.priority - b.priority );
+}
+
+/**
+ * Evaluate tasks lazily until we have enough ready to display.
+ *
+ * @param {number}   targetCount Number of tasks needed (visible + buffer).
+ * @param {Function} onTaskReady Callback when a task is ready: (taskData, priority) => void.
+ * @return {Promise<{complete: boolean, tasksAdded: number}>} Evaluation result.
+ */
+export async function evaluateTasksUntil( targetCount, onTaskReady ) {
+	// Pre-fetch existing tasks if not done
+	if ( ! evaluationState.isPreFetchComplete ) {
+		existingTasksCache = await preFetchExistingTasks();
+		evaluationState.isPreFetchComplete = true;
+		initializeSortedTaskClasses();
 	}
 
-	// Register the provider
-	taskProviders.set( providerId, TaskClass );
+	// Prevent concurrent evaluation
+	if ( evaluationState.isEvaluating ) {
+		return { complete: false, tasksAdded: 0 };
+	}
+
+	evaluationState.isEvaluating = true;
+	let tasksAdded = 0;
 
 	try {
-		// Create instance
-		const taskInstance = new TaskClass();
-
-		// Check dependencies
-		if (
-			taskInstance.areDependenciesSatisfied &&
-			typeof taskInstance.areDependenciesSatisfied === 'function'
+		while (
+			tasksAdded < targetCount &&
+			evaluationState.currentIndex < sortedTaskClasses.length
 		) {
-			// For now, skip dependency checking - can be implemented later
-			// const dependenciesSatisfied = await taskInstance.areDependenciesSatisfied( getTaskStatus );
-			// if ( ! dependenciesSatisfied ) {
-			// 	return;
-			// }
+			const { TaskClass, priority } =
+				sortedTaskClasses[ evaluationState.currentIndex ];
+			evaluationState.currentIndex++;
+
+			const results = await evaluateSingleTask( TaskClass, priority );
+
+			if ( results.tasks && results.tasks.length > 0 ) {
+				for ( const taskData of results.tasks ) {
+					onTaskReady( taskData, priority );
+					tasksAdded++;
+				}
+			}
 		}
+	} finally {
+		evaluationState.isEvaluating = false;
+	}
+
+	return {
+		complete: evaluationState.currentIndex >= sortedTaskClasses.length,
+		tasksAdded,
+	};
+}
+
+/**
+ * Evaluate a single task provider.
+ *
+ * @param {Function} TaskClass The task class to evaluate.
+ * @param {number}   priority  The task priority.
+ * @return {Promise<{tasks: Array}>} Evaluated task data.
+ */
+async function evaluateSingleTask( TaskClass, priority ) {
+	const providerId = TaskClass.providerId;
+	const tasks = [];
+
+	try {
+		const taskInstance = new TaskClass();
 
 		// Check if task should be added
 		if (
 			! taskInstance.shouldAddTask ||
 			typeof taskInstance.shouldAddTask !== 'function'
 		) {
-			console.warn(
-				`Task provider "${ providerId }" missing shouldAddTask method`
-			);
-			return;
+			return { tasks };
 		}
 
 		const shouldAdd = await taskInstance.shouldAddTask();
 		if ( ! shouldAdd ) {
-			return;
+			return { tasks };
 		}
 
 		// Handle multi-task providers
-		const isMultiTask =
-			TaskClass.isMultiTask !== undefined ? TaskClass.isMultiTask : false;
+		const isMultiTask = TaskClass.isMultiTask || false;
 		const hasGetTasksToInject =
 			taskInstance.getTasksToInject &&
 			typeof taskInstance.getTasksToInject === 'function';
 
 		if ( isMultiTask || hasGetTasksToInject ) {
 			if ( ! hasGetTasksToInject ) {
-				console.warn(
-					`Multi-task provider "${ providerId }" missing getTasksToInject method`
-				);
-				return;
+				return { tasks };
 			}
 
 			const tasksToInject = await taskInstance.getTasksToInject();
 			if ( ! Array.isArray( tasksToInject ) ) {
-				console.warn(
-					`getTasksToInject() for provider "${ providerId }" must return an array`
-				);
-				return;
+				return { tasks };
 			}
 
-			// Process each task
-			for ( const taskData of tasksToInject ) {
-				await processTask(
-					taskInstance,
-					taskData,
-					TaskClass,
-					priority
-				);
-			}
+			// Process each task in parallel for multi-task providers
+			const results = await Promise.all(
+				tasksToInject.map( ( taskData ) =>
+					processSingleTask(
+						taskInstance,
+						taskData,
+						TaskClass,
+						priority
+					)
+				)
+			);
+
+			results.forEach( ( result ) => {
+				if ( result ) {
+					tasks.push( result );
+				}
+			} );
 		} else {
 			// Single-task provider
-			await processTask( taskInstance, {}, TaskClass, priority );
+			const result = await processSingleTask(
+				taskInstance,
+				{},
+				TaskClass,
+				priority
+			);
+			if ( result ) {
+				tasks.push( result );
+			}
 		}
 	} catch ( error ) {
 		console.error(
-			`Error handling lifecycle for task provider "${ providerId }":`,
+			`Error evaluating task provider "${ providerId }":`,
 			error
 		);
 	}
+
+	return { tasks };
 }
 
 /**
- * Process a single task: check existence, create if needed, render.
+ * Process a single task: check existence in cache, create if needed.
  *
  * @param {Object}   taskInstance The task instance.
  * @param {Object}   taskData     Optional task-specific data.
  * @param {Function} TaskClass    The task class.
- * @param {number}   priority     The task priority (for sorting).
- * @return {Promise<void>}
+ * @param {number}   priority     The task priority.
+ * @return {Promise<Object|null>} Task data if successful, null otherwise.
  */
-async function processTask( taskInstance, taskData, TaskClass, priority = 50 ) {
+async function processSingleTask(
+	taskInstance,
+	taskData,
+	TaskClass,
+	priority
+) {
 	try {
 		// Get task ID
 		const taskId =
@@ -201,25 +278,17 @@ async function processTask( taskInstance, taskData, TaskClass, priority = 50 ) {
 				? taskInstance.getTaskId( taskData )
 				: TaskClass.providerId;
 
-		// Check if task already exists
-		const existingTask = await checkTaskExists( taskId );
-		if ( existingTask ) {
-			// Ensure priority is set on existing task
+		// Check pre-fetched cache first (no API call needed!)
+		if ( existingTasksCache.has( taskId ) ) {
+			const existingTask = existingTasksCache.get( taskId );
+			// Ensure priority is set
 			if ( existingTask.prpl_priority === undefined ) {
 				existingTask.prpl_priority = priority;
 			}
-
-			// Task exists, render it (or queue if callback not ready)
-			if ( taskRenderCallback ) {
-				taskRenderCallback( existingTask, priority );
-			} else {
-				// Queue for later rendering
-				taskRenderQueue.push( { taskData: existingTask, priority } );
-			}
-			return;
+			return existingTask;
 		}
 
-		// Get task details
+		// Task doesn't exist, get details and create it
 		if (
 			! taskInstance.getTaskDetails ||
 			typeof taskInstance.getTaskDetails !== 'function'
@@ -227,7 +296,7 @@ async function processTask( taskInstance, taskData, TaskClass, priority = 50 ) {
 			console.warn(
 				`Task provider "${ TaskClass.providerId }" missing getTaskDetails method`
 			);
-			return;
+			return null;
 		}
 
 		const taskDetails = await taskInstance.getTaskDetails( taskData );
@@ -245,24 +314,16 @@ async function processTask( taskInstance, taskData, TaskClass, priority = 50 ) {
 			const response = await createTaskPost( taskDetails );
 
 			if ( response && response.success && response.post_id ) {
-				// Task created, now fetch it to render
-				const createdTask = await checkTaskExists( taskId );
+				// Fetch the created task to get full data
+				const createdTask = await fetchTaskBySlug( taskId );
 				if ( createdTask ) {
-					// Ensure priority is set on newly created task
+					// Ensure priority is set
 					if ( createdTask.prpl_priority === undefined ) {
 						createdTask.prpl_priority = priority;
 					}
-
-					// Render it (or queue if callback not ready)
-					if ( taskRenderCallback ) {
-						taskRenderCallback( createdTask, priority );
-					} else {
-						// Queue for later rendering
-						taskRenderQueue.push( {
-							taskData: createdTask,
-							priority,
-						} );
-					}
+					// Add to cache for future reference
+					existingTasksCache.set( taskId, createdTask );
+					return createdTask;
 				}
 			}
 		} catch ( error ) {
@@ -271,30 +332,74 @@ async function processTask( taskInstance, taskData, TaskClass, priority = 50 ) {
 				error
 			);
 		}
+
+		return null;
 	} catch ( error ) {
 		console.error( 'Error processing task:', error );
+		return null;
 	}
 }
 
 /**
- * Initialize the task registry to listen for registration actions.
+ * Fetch a task by its slug.
  *
- * @return {void}
+ * @param {string} slug The task slug.
+ * @return {Promise<Object|null>} Task data or null.
  */
-function init() {
-	// Listen for task registration actions
-	// Note: We use a fixed priority here. Tasks pass their priority as a parameter.
-	addAction(
-		'prpl.tasks.register',
-		'prpl/task-registry',
-		( TaskClass, priority = 50 ) => {
-			// Handle task lifecycle with the task's priority
-			handleTaskLifecycle( TaskClass, priority ).catch( ( error ) => {
-				console.error( 'Error in task lifecycle:', error );
-			} );
-		},
-		10 // Fixed priority for the listener
-	);
+async function fetchTaskBySlug( slug ) {
+	try {
+		const response = await apiFetch( {
+			path: `/wp/v2/prpl_recommendations?slug=${ encodeURIComponent(
+				slug
+			) }&status=publish&_embed=true`,
+		} );
+
+		if ( Array.isArray( response ) && response.length > 0 ) {
+			return response[ 0 ];
+		}
+		return null;
+	} catch ( error ) {
+		console.error( `Error fetching task "${ slug }":`, error );
+		return null;
+	}
+}
+
+/**
+ * Reset evaluation state (useful for testing).
+ */
+export function resetEvaluationState() {
+	evaluationState.isPreFetchComplete = false;
+	evaluationState.isEvaluating = false;
+	evaluationState.currentIndex = 0;
+	existingTasksCache = new Map();
+	sortedTaskClasses = [];
+}
+
+/**
+ * Get evaluation progress information.
+ *
+ * @return {Object} Progress info: { current, total, complete }.
+ */
+export function getEvaluationProgress() {
+	return {
+		current: evaluationState.currentIndex,
+		total: sortedTaskClasses.length,
+		complete: evaluationState.currentIndex >= sortedTaskClasses.length,
+		isEvaluating: evaluationState.isEvaluating,
+	};
+}
+
+/**
+ * Check if there are more tasks to evaluate.
+ *
+ * @return {boolean} True if more tasks can be evaluated.
+ */
+export function hasMoreTasksToEvaluate() {
+	// If not initialized yet, assume there are more
+	if ( ! evaluationState.isPreFetchComplete ) {
+		return true;
+	}
+	return evaluationState.currentIndex < sortedTaskClasses.length;
 }
 
 /**
@@ -322,12 +427,6 @@ export function getTaskProviderInstance( providerId ) {
 	}
 	const TaskClass = getTaskProviderClass( providerId );
 	if ( ! TaskClass ) {
-		// Debug: Log available provider IDs to help diagnose
-		const availableIds = Array.from( taskProviders.keys() );
-		console.warn(
-			`Task provider "${ providerId }" not found in registry. Available providers:`,
-			availableIds
-		);
 		return null;
 	}
 	try {
@@ -341,5 +440,11 @@ export function getTaskProviderInstance( providerId ) {
 	}
 }
 
-// Initialize on module load
-init();
+/**
+ * Get the buffer size constant.
+ *
+ * @return {number} Buffer size.
+ */
+export function getBufferSize() {
+	return BUFFER_SIZE;
+}

@@ -8,7 +8,7 @@
  */
 
 import { TaskProvider } from '../services/TaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
 
 /**
@@ -124,6 +124,6 @@ class PhpVersionTask extends TaskProvider {
 }
 
 // Self-register this task provider
-doAction( 'prpl.tasks.register', PhpVersionTask, PhpVersionTask.priority );
+registerTask( PhpVersionTask );
 
 export default PhpVersionTask;

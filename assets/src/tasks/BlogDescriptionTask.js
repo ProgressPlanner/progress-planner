@@ -6,7 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 import { cachedApiFetch } from '../services/apiFetchCache';
 
 /**
@@ -77,10 +77,6 @@ class BlogDescriptionTask extends InteractiveTaskProvider {
 }
 
 // Self-register this task provider
-doAction(
-	'prpl.tasks.register',
-	BlogDescriptionTask,
-	BlogDescriptionTask.priority
-);
+registerTask( BlogDescriptionTask );
 
 export default BlogDescriptionTask;

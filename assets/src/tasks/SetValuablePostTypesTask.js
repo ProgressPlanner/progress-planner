@@ -6,7 +6,7 @@
  */
 
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
-import { doAction } from '@wordpress/hooks';
+import { registerTask } from '../services/taskRegistry';
 
 /**
  * Set Valuable Post Types Task Provider class.
@@ -57,10 +57,6 @@ class SetValuablePostTypesTask extends InteractiveTaskProvider {
 }
 
 // Self-register this task provider
-doAction(
-	'prpl.tasks.register',
-	SetValuablePostTypesTask,
-	SetValuablePostTypesTask.priority
-);
+registerTask( SetValuablePostTypesTask );
 
 export default SetValuablePostTypesTask;

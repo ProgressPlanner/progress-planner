@@ -2,6 +2,7 @@
  * Suggested Tasks Widget Component.
  *
  * Displays a list of suggested tasks (recommendations) for improving the site.
+ * Uses lazy evaluation to load tasks on-demand for better performance.
  */
 
 import {
@@ -32,7 +33,9 @@ import { getTaskPoints } from '../../utils/taskUtils';
 import WidgetHeader from '../../components/WidgetHeader';
 import SuggestedTasksSkeleton from './SuggestedTasksSkeleton';
 import {
-	setTaskRenderCallback,
+	evaluateTasksUntil,
+	hasMoreTasksToEvaluate,
+	getBufferSize,
 	getTaskProviderInstance,
 } from '../../services/taskRegistry';
 import { useDashboardStore } from '../../stores/dashboardStore';
@@ -57,17 +60,19 @@ function SuggestedTasks( { config = {} } ) {
 	const [ visibleTaskLimit, setVisibleTaskLimit ] =
 		useState( TASKS_INITIAL_LIMIT );
 	const [ celebratingTaskIds, setCelebratingTaskIds ] = useState( new Set() );
+	const [ hasMoreToEvaluate, setHasMoreToEvaluate ] = useState( true );
 	const listRef = useRef( null );
-	const injectedTaskIdsRef = useRef( new Set() );
 	const tasksMapRef = useRef( new Map() ); // Map of task ID to task object for quick lookup
+	const evaluatedCountRef = useRef( 0 ); // Track how many tasks we've evaluated and added
 
 	// Derive visible tasks and button states
 	const visibleTasks = useMemo( () => {
 		return tasks.slice( 0, visibleTaskLimit );
 	}, [ tasks, visibleTaskLimit ] );
 
-	const hasMoreTasks = tasks.length > visibleTaskLimit;
-	const isShowingAll = visibleTaskLimit >= tasks.length;
+	const hasMoreTasks = hasMoreToEvaluate || tasks.length > visibleTaskLimit;
+	const isShowingAll =
+		visibleTaskLimit >= tasks.length && ! hasMoreToEvaluate;
 	const canCollapse =
 		visibleTaskLimit > TASKS_INITIAL_LIMIT &&
 		isShowingAll &&
@@ -139,31 +144,23 @@ function SuggestedTasks( { config = {} } ) {
 		}
 
 		// Try to generate actions from the task provider.
-		// Try multiple ways to get the provider ID:
-		// 1. From prpl_provider object (if embedded in REST response)
-		// 2. From provider_id field
-		// 3. From meta.provider_id
-		// 4. From task slug (often matches provider ID for React tasks)
-		// 5. Fetch term from prpl_recommendations_provider if it's an array
 		let providerId =
 			taskData.prpl_provider?.slug ||
 			taskData.provider_id ||
 			taskData.meta?.provider_id ||
 			'';
 
-		// Fallback: Use task slug as provider ID (common pattern for React tasks)
+		// Fallback: Use task slug as provider ID
 		if ( ! providerId && taskData.slug ) {
-			// Use slug directly as provider ID
 			providerId = taskData.slug;
 		}
 
-		// Fallback: Try to get provider from embedded taxonomy terms or fetch it
+		// Fallback: Try to get provider from embedded taxonomy terms
 		if (
 			! providerId &&
 			taskData.prpl_recommendations_provider &&
 			Array.isArray( taskData.prpl_recommendations_provider )
 		) {
-			// If it's an array of term objects (from _embed)
 			const firstItem = taskData.prpl_recommendations_provider[ 0 ];
 			if (
 				firstItem &&
@@ -177,7 +174,6 @@ function SuggestedTasks( { config = {} } ) {
 				taskData._embedded[ 'wp:term' ] &&
 				taskData._embedded[ 'wp:term' ][ 0 ]
 			) {
-				// Try to find the term in embedded data
 				const embeddedTerms = taskData._embedded[ 'wp:term' ].flat();
 				const term = embeddedTerms.find(
 					( t ) =>
@@ -192,29 +188,11 @@ function SuggestedTasks( { config = {} } ) {
 		}
 
 		if ( ! providerId ) {
-			console.warn( 'ensureTaskActions: No providerId found for task:', {
-				...taskData,
-				prpl_provider: taskData.prpl_provider,
-				provider_id: taskData.provider_id,
-				slug: taskData.slug,
-				prpl_recommendations_provider:
-					taskData.prpl_recommendations_provider,
-			} );
 			return taskData;
 		}
 
 		const providerInstance = getTaskProviderInstance( providerId );
-		if ( ! providerInstance ) {
-			console.warn(
-				`ensureTaskActions: Provider instance not found for providerId "${ providerId }"`,
-				{ taskData }
-			);
-			return taskData;
-		}
-		if ( ! providerInstance.getTaskActions ) {
-			console.warn(
-				`ensureTaskActions: Provider "${ providerId }" does not have getTaskActions method`
-			);
+		if ( ! providerInstance || ! providerInstance.getTaskActions ) {
 			return taskData;
 		}
 
@@ -226,10 +204,6 @@ function SuggestedTasks( { config = {} } ) {
 					prpl_task_actions: actions,
 				};
 			}
-			console.warn(
-				`ensureTaskActions: No actions generated for provider "${ providerId }"`,
-				{ taskData, providerInstance }
-			);
 		} catch ( error ) {
 			console.error(
 				`Error generating actions for task provider "${ providerId }":`,
@@ -241,46 +215,14 @@ function SuggestedTasks( { config = {} } ) {
 	}, [] );
 
 	/**
-	 * Fetch a replacement task after completing/snoozing/deleting.
-	 * Extracted to avoid repetition in handleComplete, handleSnooze, handleDelete.
+	 * Add a task to the state.
 	 *
-	 * @return {Promise<void>}
-	 */
-	const fetchAndInsertReplacementTask = useCallback( async () => {
-		const replacementResult = await fetchTasks( {
-			status: 'publish',
-			perPage: 1,
-			page: 1,
-			excludeProvider: 'user',
-			excludeIds: Array.from( injectedTaskIdsRef.current ),
-		} );
-
-		if ( replacementResult.tasks.length > 0 ) {
-			const replacementTask = ensureTaskActions(
-				replacementResult.tasks[ 0 ]
-			);
-			setTasks( ( prev ) =>
-				insertTaskSorted(
-					prev,
-					replacementTask,
-					replacementTask.prpl_priority || 50
-				)
-			);
-			injectedTaskIdsRef.current.add( replacementTask.id );
-		}
-	}, [ insertTaskSorted, ensureTaskActions ] );
-
-	/**
-	 * Render callback for streaming tasks.
-	 * Called by taskRegistry when a task is ready to render.
-	 *
-	 * @param {Object} taskData Task data from the API.
+	 * @param {Object} taskData Task data.
 	 * @param {number} priority Task priority.
-	 * @return {void}
 	 */
-	const handleTaskRender = useCallback(
-		( taskData, priority = 50 ) => {
-			// Skip if already rendered
+	const addTask = useCallback(
+		( taskData, priority ) => {
+			// Skip if already in state
 			if ( tasksMapRef.current.has( taskData.id ) ) {
 				return;
 			}
@@ -290,7 +232,7 @@ function SuggestedTasks( { config = {} } ) {
 				taskData.prpl_priority = priority;
 			}
 
-			// Ensure task actions are generated if missing
+			// Ensure task actions are generated
 			const taskWithActions = ensureTaskActions( taskData );
 
 			// Insert in sorted position
@@ -298,37 +240,81 @@ function SuggestedTasks( { config = {} } ) {
 				insertTaskSorted( prev, taskWithActions, priority )
 			);
 
-			// Track task ID
-			injectedTaskIdsRef.current.add( taskData.id );
-
-			// Trigger grid resize
-			dispatchGridResize( 100 );
-
-			// Mark as no longer loading after first task arrives
-			setIsLoading( false );
+			evaluatedCountRef.current++;
 		},
-		[ insertTaskSorted, ensureTaskActions ]
+		[ ensureTaskActions, insertTaskSorted ]
 	);
 
 	/**
-	 * Set up streaming on component mount.
+	 * Evaluate more tasks until we have enough.
+	 *
+	 * @param {number} targetCount Target number of tasks needed.
+	 * @return {Promise<void>}
+	 */
+	const evaluateMoreTasks = useCallback(
+		async ( targetCount ) => {
+			if ( ! hasMoreTasksToEvaluate() ) {
+				setHasMoreToEvaluate( false );
+				return;
+			}
+
+			const needed = targetCount - evaluatedCountRef.current;
+			if ( needed <= 0 ) {
+				return;
+			}
+
+			const result = await evaluateTasksUntil( needed, addTask );
+			setHasMoreToEvaluate( ! result.complete );
+		},
+		[ addTask ]
+	);
+
+	/**
+	 * Fetch a replacement task after completing/snoozing/deleting.
+	 * Uses lazy evaluation to get the next task if available.
+	 *
+	 * @return {Promise<void>}
+	 */
+	const fetchAndInsertReplacementTask = useCallback( async () => {
+		// First, check if we have buffered tasks ready
+		const bufferSize = getBufferSize();
+		const currentBuffer = tasks.length - visibleTaskLimit;
+
+		// If buffer is depleted and more tasks are available, evaluate more
+		if ( currentBuffer <= 0 && hasMoreToEvaluate ) {
+			await evaluateMoreTasks(
+				evaluatedCountRef.current + bufferSize + 1
+			);
+		}
+	}, [
+		tasks.length,
+		visibleTaskLimit,
+		hasMoreToEvaluate,
+		evaluateMoreTasks,
+	] );
+
+	/**
+	 * Initialize tasks with lazy evaluation.
 	 */
 	useEffect( () => {
-		// Set up render callback for task registry
-		setTaskRenderCallback( handleTaskRender );
+		let mounted = true;
 
-		// Handle pending celebration tasks (if not delayed)
-		if ( ! config?.delayCelebration ) {
-			fetchTasks( {
-				status: 'pending',
-				perPage: 100,
-				excludeProvider: 'user',
-			} )
-				.then( ( pendingResult ) => {
-					if ( pendingResult.tasks.length > 0 ) {
-						// Add pending tasks to the list (actions will be generated in handleTaskRender)
+		async function initializeTasks() {
+			setIsLoading( true );
+
+			// Handle pending celebration tasks first
+			if ( ! config?.delayCelebration ) {
+				try {
+					const pendingResult = await fetchTasks( {
+						status: 'pending',
+						perPage: 100,
+						excludeProvider: 'user',
+					} );
+
+					if ( pendingResult.tasks.length > 0 && mounted ) {
+						// Add pending tasks to the list
 						pendingResult.tasks.forEach( ( task ) => {
-							handleTaskRender( task, task.prpl_priority || 50 );
+							addTask( task, task.prpl_priority || 50 );
 						} );
 
 						// Trash the pending tasks in the background
@@ -338,6 +324,9 @@ function SuggestedTasks( { config = {} } ) {
 
 						// Trigger celebration after 3 seconds
 						setTimeout( () => {
+							if ( ! mounted ) {
+								return;
+							}
 							const pendingIds = new Set(
 								pendingResult.tasks.map( ( t ) => t.id )
 							);
@@ -346,6 +335,9 @@ function SuggestedTasks( { config = {} } ) {
 
 							// Remove celebrated tasks after animation
 							setTimeout( () => {
+								if ( ! mounted ) {
+									return;
+								}
 								setTasks( ( prev ) =>
 									prev.filter(
 										( t ) => ! pendingIds.has( t.id )
@@ -353,31 +345,42 @@ function SuggestedTasks( { config = {} } ) {
 								);
 								pendingIds.forEach( ( id ) => {
 									tasksMapRef.current.delete( id );
+									evaluatedCountRef.current--;
 								} );
 								setCelebratingTaskIds( new Set() );
 								dispatchGridResize();
 							}, 2000 );
 						}, 3000 );
-					} else {
-						setIsLoading( false );
 					}
-				} )
-				.catch( () => {
-					setIsLoading( false );
-				} );
-		} else {
-			// If celebration is delayed, mark as not loading
-			// Tasks will stream in via handleTaskRender
-			setTimeout( () => {
+				} catch {
+					// Continue with evaluation even if pending fetch fails
+				}
+			}
+
+			// Evaluate tasks lazily until we have initial + buffer
+			const targetCount = TASKS_INITIAL_LIMIT + getBufferSize();
+			const result = await evaluateTasksUntil(
+				targetCount,
+				( taskData, priority ) => {
+					if ( mounted ) {
+						addTask( taskData, priority );
+					}
+				}
+			);
+
+			if ( mounted ) {
+				setHasMoreToEvaluate( ! result.complete );
 				setIsLoading( false );
-			}, 1000 ); // Give tasks time to start streaming
+				dispatchGridResize( 100 );
+			}
 		}
 
-		// Cleanup
+		initializeTasks();
+
 		return () => {
-			setTaskRenderCallback( null );
+			mounted = false;
 		};
-	}, [ config, celebrate, handleTaskRender ] );
+	}, [ config, celebrate, addTask ] );
 
 	/**
 	 * Handle task completion.
@@ -427,7 +430,7 @@ function SuggestedTasks( { config = {} } ) {
 						return next;
 					} );
 
-					// Fetch replacement task.
+					// Evaluate more tasks to refill buffer.
 					await fetchAndInsertReplacementTask();
 
 					// Trigger grid resize.
@@ -460,7 +463,7 @@ function SuggestedTasks( { config = {} } ) {
 				setTasks( ( prev ) => prev.filter( ( t ) => t.id !== postId ) );
 				tasksMapRef.current.delete( postId );
 
-				// Fetch replacement task.
+				// Evaluate more tasks to refill buffer.
 				await fetchAndInsertReplacementTask();
 
 				// Trigger grid resize.
@@ -489,7 +492,7 @@ function SuggestedTasks( { config = {} } ) {
 				setTasks( ( prev ) => prev.filter( ( t ) => t.id !== postId ) );
 				tasksMapRef.current.delete( postId );
 
-				// Fetch replacement task.
+				// Evaluate more tasks to refill buffer.
 				await fetchAndInsertReplacementTask();
 
 				// Trigger grid resize.
@@ -551,13 +554,23 @@ function SuggestedTasks( { config = {} } ) {
 
 	/**
 	 * Handle load more button click.
-	 * Increases the visible task limit to show more tasks.
+	 * Shows more tasks and evaluates more if needed.
 	 */
-	const handleLoadMore = useCallback( () => {
-		setVisibleTaskLimit( ( prev ) => prev + TASKS_LOAD_INCREMENT );
+	const handleLoadMore = useCallback( async () => {
+		const newLimit = visibleTaskLimit + TASKS_LOAD_INCREMENT;
+		setVisibleTaskLimit( newLimit );
+
+		// Evaluate more tasks if needed to fill buffer
+		const bufferSize = getBufferSize();
+		const targetCount = newLimit + bufferSize;
+
+		if ( evaluatedCountRef.current < targetCount && hasMoreToEvaluate ) {
+			await evaluateMoreTasks( targetCount );
+		}
+
 		// Trigger grid resize after showing more tasks
 		dispatchGridResize( 100 );
-	}, [] );
+	}, [ visibleTaskLimit, hasMoreToEvaluate, evaluateMoreTasks ] );
 
 	/**
 	 * Handle collapse button click.
@@ -614,7 +627,7 @@ function SuggestedTasks( { config = {} } ) {
 	}
 
 	// Show empty state.
-	if ( tasks.length === 0 ) {
+	if ( tasks.length === 0 && ! hasMoreToEvaluate ) {
 		return (
 			<>
 				<WidgetHeader title={ widgetTitle } />
@@ -677,8 +690,8 @@ doAction( 'prpl.dashboard.registerWidget', {
 	priority: 10,
 	width: 2,
 	forceLastColumn: false,
-	title: __( "Ravi's Recommendations", 'progress-planner' ), // Will be customized with branding if needed
-	infoIconSvg: '', // Can be fetched from REST API if needed for branding
+	title: __( "Ravi's Recommendations", 'progress-planner' ),
+	infoIconSvg: '',
 } );
 
 export default SuggestedTasks;
