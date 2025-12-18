@@ -97,15 +97,16 @@ class UnpublishedContentTask extends TaskProvider {
 	 * @return {Array} The modified actions array.
 	 */
 	addTaskActions( taskData = [], actions = [] ) {
-		// Check for URL in meta or task data
+		// Check for URL in meta or task data.
 		const url = taskData.meta?.prpl_url || taskData.url || null;
 
 		if ( url ) {
 			actions.push( {
+				type: 'link',
 				priority: 10,
-				html: `<a class="prpl-tooltip-action-text" href="${ this.escapeHtml(
-					url
-				) }" target="_self">Edit</a>`,
+				href: url,
+				label: 'Edit',
+				target: '_self',
 			} );
 		}
 

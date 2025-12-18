@@ -80,11 +80,12 @@ class UserTask extends TaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	addTaskActions( taskData = {}, actions = [] ) {
 		actions.push( {
+			type: 'link',
 			priority: 10,
-			html: `<a class="prpl-tooltip-action-text" href="#" onclick="event.preventDefault();this.closest('li.prpl-suggested-task').querySelector('.prpl-task-title span').focus();">${ __(
-				'Edit',
-				'progress-planner'
-			) }</a>`,
+			href: '#',
+			label: __( 'Edit', 'progress-planner' ),
+			// Special flag for inline edit - handled by TaskActions component.
+			inlineEdit: true,
 		} );
 		return actions;
 	}

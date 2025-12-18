@@ -337,14 +337,14 @@ export class TaskProvider {
 	}
 
 	/**
-	 * Get task actions HTML buttons/links for display in the UI.
+	 * Get task actions as configuration objects for React rendering.
 	 *
-	 * Generates an array of HTML action buttons that users can interact with for each task.
-	 * Actions are ordered by priority (lower numbers appear first).
+	 * Returns an array of action config objects that TaskActions component
+	 * uses to render the appropriate React components.
 	 *
 	 * Standard actions include:
 	 * - Complete button (priority 20): Marks task as complete and awards points
-	 * - Snooze button (priority 30): Postpones task for specified duration (1 week to forever)
+	 * - Snooze button (priority 30): Postpones task for specified duration
 	 * - Info/External link (priority 40): Educational content about the task
 	 * - Custom actions: Child classes can add via addTaskActions()
 	 *
@@ -357,32 +357,24 @@ export class TaskProvider {
 	 * - 1000: Default for actions without explicit priority
 	 *
 	 * @param {Object} taskData The task data from the REST API response.
-	 * @return {Array<string>} Array of HTML strings for action buttons/links, ordered by priority.
+	 * @return {Array<Object>} Array of action config objects, ordered by priority.
 	 */
 	getTaskActions( taskData = {} ) {
 		const actions = [];
 		const StaticClass = this.constructor;
 
-		// Safety check: if taskData is invalid, use empty object
+		// Safety check: if taskData is invalid, use empty object.
 		if ( ! taskData || typeof taskData !== 'object' ) {
 			taskData = {};
 		}
 
 		const providerId = this.getProviderId();
-
-		// Debug logging (can be removed in production)
-		if ( typeof window !== 'undefined' && window.prplDebug ) {
-			console.log( 'getTaskActions called:', {
-				providerId,
-				config: this.config,
-				taskData: {
-					id: taskData.id,
-					slug: taskData.slug,
-					title: taskData.title,
-					prpl_provider: taskData.prpl_provider,
-				},
-			} );
-		}
+		const taskId = taskData.slug || taskData.id || '';
+		const taskTitle =
+			taskData.title?.rendered ||
+			taskData.title ||
+			taskData.post_title ||
+			'';
 
 		// Add "Mark as complete" button for dismissable tasks (except user-created tasks).
 		if (
@@ -390,66 +382,21 @@ export class TaskProvider {
 			this.config.isDismissable &&
 			providerId !== 'user'
 		) {
-			const taskId = taskData.slug || taskData.id || '';
-			const taskTitle =
-				taskData.title?.rendered ||
-				taskData.title ||
-				taskData.post_title ||
-				'';
-			const postId = taskData.id || taskData.post_id || '';
-
 			actions.push( {
+				type: 'complete',
 				priority: 20,
-				html: `<button type="button" class="prpl-suggested-task-button" data-task-id="${ this.escapeHtml(
-					taskId
-				) }" data-task-title="${ this.escapeHtml(
-					taskTitle
-				) }" data-action="complete" data-target="complete" title="Mark as complete"><span class="prpl-tooltip-action-text">Mark as complete</span><span class="screen-reader-text">Mark as complete</span></button>`,
-				postId, // Store postId for event handler attachment
+				taskId,
+				taskTitle,
 			} );
 		}
 
-		// Add "Snooze" button with duration options for snoozable tasks.
+		// Add "Snooze" button for snoozable tasks.
 		if ( this.capabilityRequired() && this.config.isSnoozable ) {
-			const taskId = taskData.slug || taskData.id || '';
-			const taskTitle =
-				taskData.title?.rendered ||
-				taskData.title ||
-				taskData.post_title ||
-				'';
-			const postId = taskData.id || taskData.post_id || '';
-
-			const snoozeDurations = [
-				{ key: '1-week', label: '1 week' },
-				{ key: '1-month', label: '1 month' },
-				{ key: '3-months', label: '3 months' },
-				{ key: '6-months', label: '6 months' },
-				{ key: '1-year', label: '1 year' },
-				{ key: 'forever', label: 'forever' },
-			];
-
-			let snoozeHtml = `<prpl-tooltip class="prpl-suggested-task-snooze"><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="${ this.escapeHtml(
-				taskId
-			) }" data-task-title="${ this.escapeHtml(
-				taskTitle
-			) }" data-action="snooze" data-target="snooze" title="Snooze"><span class="prpl-tooltip-action-text">Snooze</span><span class="screen-reader-text">Snooze</span></button></slot><slot name="content">`;
-			snoozeHtml += `<fieldset><legend><span>Snooze this task?</span><button type="button" class="prpl-toggle-radio-group" onclick="this.closest('.prpl-suggested-task-snooze').classList.toggle('prpl-toggle-radio-group-open');"><span class="prpl-toggle-radio-group-text">How long?</span><span class="prpl-toggle-radio-group-arrow">&rsaquo;</span></button></legend><div class="prpl-snooze-duration-radio-group">`;
-
-			// Generate radio buttons for snooze duration options.
-			snoozeDurations.forEach( ( duration ) => {
-				snoozeHtml += `<label><input type="radio" name="snooze-duration-${ this.escapeHtml(
-					taskId
-				) }" value="${ this.escapeHtml(
-					duration.key
-				) }">${ this.escapeHtml( duration.label ) }</label>`;
-			} );
-
-			snoozeHtml += `</div></fieldset></slot></prpl-tooltip>`;
-
 			actions.push( {
+				type: 'snooze',
 				priority: 30,
-				html: snoozeHtml,
-				postId, // Store postId for event handler attachment
+				taskId,
+				taskTitle,
 			} );
 		}
 
@@ -461,31 +408,21 @@ export class TaskProvider {
 		);
 		if ( this.config.externalLinkUrl ) {
 			actions.push( {
+				type: 'info',
 				priority: 40,
-				html: `<a class="prpl-tooltip-action-text" href="${ this.escapeHtml(
-					this.config.externalLinkUrl
-				) }" target="_blank">Why is this important?</a>`,
+				externalUrl: this.config.externalLinkUrl,
 			} );
 		} else if (
 			! isInteractiveTask &&
 			taskData.content?.rendered &&
 			taskData.content.rendered !== ''
 		) {
-			const taskId = taskData.slug || taskData.id || '';
-			const taskTitle =
-				taskData.title?.rendered ||
-				taskData.title ||
-				taskData.post_title ||
-				'';
-			const content = taskData.content.rendered;
-
 			actions.push( {
+				type: 'info',
 				priority: 40,
-				html: `<prpl-tooltip><slot name="open"><button type="button" class="prpl-suggested-task-button" data-task-id="${ this.escapeHtml(
-					taskId
-				) }" data-task-title="${ this.escapeHtml(
-					taskTitle
-				) }" data-action="info" data-target="info" title="Info"><span class="prpl-tooltip-action-text">Info</span><span class="screen-reader-text">Info</span></button></slot><slot name="content">${ content }</slot></prpl-tooltip>`,
+				taskId,
+				taskTitle,
+				content: taskData.content.rendered,
 			} );
 		}
 
@@ -493,32 +430,30 @@ export class TaskProvider {
 		if ( this.capabilityRequired() ) {
 			const modifiedActions = this.addTaskActions( taskData, actions );
 
-			// Ensure all actions have priority set and filter out empty actions.
+			// Ensure all actions have priority set and filter out empty/invalid actions.
 			const validActions = modifiedActions
 				.map( ( action ) => {
-					// Ensure priority is set
+					// Ensure priority is set.
 					if ( ! action.priority ) {
 						action.priority = 1000;
 					}
 					return action;
 				} )
 				.filter( ( action ) => {
-					// Remove empty actions
-					return action.html && action.html !== '';
+					// Remove empty actions - must have type or html (for backward compat).
+					return action.type || ( action.html && action.html !== '' );
 				} );
 
 			// Sort actions by priority (ascending: lower priority values appear first).
 			validActions.sort( ( a, b ) => a.priority - b.priority );
 
-			// Extract just the HTML strings (discard priority metadata).
-			return validActions.map( ( action ) => action.html );
+			return validActions;
 		}
 
 		// Sort actions by priority (ascending: lower priority values appear first).
 		actions.sort( ( a, b ) => a.priority - b.priority );
 
-		// Extract just the HTML strings (discard priority metadata).
-		return actions.map( ( action ) => action.html );
+		return actions;
 	}
 
 	/**
@@ -537,20 +472,5 @@ export class TaskProvider {
 		// eslint-disable-next-line no-unused-vars
 		const _taskData = taskData;
 		return actions;
-	}
-
-	/**
-	 * Escape HTML to prevent XSS.
-	 *
-	 * @param {string} text The text to escape.
-	 * @return {string} The escaped text.
-	 */
-	escapeHtml( text ) {
-		if ( typeof text !== 'string' ) {
-			return '';
-		}
-		const div = document.createElement( 'div' );
-		div.textContent = text;
-		return div.innerHTML;
 	}
 }

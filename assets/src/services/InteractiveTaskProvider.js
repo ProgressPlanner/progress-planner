@@ -104,14 +104,11 @@ export class InteractiveTaskProvider extends TaskProvider {
 			// Add popover trigger action with high priority (10).
 			// This matches the PHP implementation where interactive tasks
 			// add popover actions with priority 10.
-			const popoverActionLabel = this.getPopoverActionLabel();
 			actions.push( {
+				type: 'popover',
 				priority: 10,
-				html: `<a class="prpl-tooltip-action-text" href="#" role="button" onclick="event.preventDefault(); document.getElementById('${ this.escapeHtml(
-					this.getPopoverId()
-				) }')?.showPopover(); return false;">${ this.escapeHtml(
-					popoverActionLabel
-				) }</a>`,
+				popoverId: this.getPopoverId(),
+				label: this.getPopoverActionLabel(),
 			} );
 		}
 
@@ -130,20 +127,5 @@ export class InteractiveTaskProvider extends TaskProvider {
 		// Default label - child classes can override for specific labels.
 		// For example, UpdateTermDescriptionTask uses "Write description".
 		return 'Complete';
-	}
-
-	/**
-	 * Escape HTML to prevent XSS.
-	 *
-	 * @param {string} text The text to escape.
-	 * @return {string} The escaped text.
-	 */
-	escapeHtml( text ) {
-		if ( typeof text !== 'string' ) {
-			return '';
-		}
-		const div = document.createElement( 'div' );
-		div.textContent = text;
-		return div.innerHTML;
 	}
 }

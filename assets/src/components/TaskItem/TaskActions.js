@@ -2,14 +2,20 @@
  * Task Actions Component.
  *
  * Renders action buttons for a task (complete, snooze, info, etc.).
- * Uses the prpl_task_actions array from the API which contains pre-rendered HTML.
- * If prpl_task_actions is missing, generates actions from the task provider.
+ * Supports both:
+ * - Config objects from React task providers (rendered as React components)
+ * - HTML strings from PHP (rendered with dangerouslySetInnerHTML for backward compatibility)
  */
 
 import { useEffect, useRef, useMemo, useCallback } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
 import { doAction } from '@wordpress/hooks';
 import { getTaskProviderInstance } from '../../services/taskRegistry';
+import TaskActionComplete from './TaskActionComplete';
+import TaskActionSnooze from './TaskActionSnooze';
+import TaskActionInfo from './TaskActionInfo';
+import TaskActionLink from './TaskActionLink';
+import TaskActionPopover from './TaskActionPopover';
+import TaskActionDelete from './TaskActionDelete';
 
 /**
  * Style constants - extracted to prevent recreation on each render.
@@ -25,20 +31,104 @@ const STYLES = {
 		position: 'relative',
 		textDecoration: 'none',
 	},
-	actionText: {
-		lineHeight: 1,
-		fontSize: 'var(--prpl-font-size-small)',
-		color: 'var(--prpl-color-link)',
-	},
-	button: {
-		textDecoration: 'none',
-		padding: 0,
-		lineHeight: 1,
-		background: 'none',
-		border: 'none',
-		cursor: 'pointer',
-	},
 };
+
+/**
+ * Render a single action based on its type.
+ *
+ * @param {Object}   action     The action config object.
+ * @param {Object}   task       The task object.
+ * @param {Function} onComplete Complete handler.
+ * @param {Function} onSnooze   Snooze handler.
+ * @param {Function} onDelete   Delete handler.
+ * @return {JSX.Element|null} The rendered action component.
+ */
+function renderAction( action, task, onComplete, onSnooze, onDelete ) {
+	const taskTitle = task.title?.rendered || task.title || '';
+
+	switch ( action.type ) {
+		case 'complete':
+			return (
+				<TaskActionComplete
+					taskId={ action.taskId }
+					taskTitle={ action.taskTitle || taskTitle }
+					onClick={ () => onComplete( task.id, task ) }
+				/>
+			);
+
+		case 'snooze':
+			return (
+				<TaskActionSnooze
+					taskId={ action.taskId }
+					taskTitle={ action.taskTitle || taskTitle }
+					onSnooze={ ( duration ) => onSnooze( task.id, duration ) }
+				/>
+			);
+
+		case 'info':
+			return (
+				<TaskActionInfo
+					taskId={ action.taskId }
+					taskTitle={ action.taskTitle || taskTitle }
+					externalUrl={ action.externalUrl }
+					content={ action.content }
+				/>
+			);
+
+		case 'link':
+			// Handle special inline edit action for user tasks.
+			if ( action.inlineEdit ) {
+				return (
+					<TaskActionLink
+						href="#"
+						label={ action.label }
+						onClick={ ( e ) => {
+							e.preventDefault();
+							// Find the task title span and focus it for inline editing.
+							const taskElement = e.target.closest(
+								'li.prpl-suggested-task'
+							);
+							const titleSpan = taskElement?.querySelector(
+								'.prpl-task-title span'
+							);
+							titleSpan?.focus();
+						} }
+					/>
+				);
+			}
+			return (
+				<TaskActionLink
+					href={ action.href }
+					label={ action.label }
+					target={ action.target }
+					className={ action.className }
+				/>
+			);
+
+		case 'popover':
+			return (
+				<TaskActionPopover
+					popoverId={ action.popoverId }
+					label={ action.label }
+					task={ task }
+					taskContext={ action.taskContext }
+					eventName={ action.eventName }
+				/>
+			);
+
+		case 'delete':
+			return (
+				<TaskActionDelete
+					postId={ task.id }
+					taskTitle={ taskTitle }
+					onClick={ () => onDelete( task.id ) }
+				/>
+			);
+
+		default:
+			return null;
+	}
+}
 
 /**
  * Task Actions component.
@@ -59,11 +149,11 @@ export default function TaskActions( {
 	onDelete,
 } ) {
 	const actionsRef = useRef( null );
-	// Store references to event handlers for proper cleanup.
+	// Store references to event handlers for proper cleanup (for HTML actions).
 	const handlersRef = useRef( [] );
 
 	/**
-	 * Create memoized event handler factories to ensure stable references.
+	 * Create memoized event handler factories for HTML-based actions.
 	 */
 	const createCompleteHandler = useCallback(
 		( taskId, taskObj ) => ( e ) => {
@@ -96,8 +186,86 @@ export default function TaskActions( {
 		[ onDelete ]
 	);
 
+	// Get task actions from API response, or generate from task provider.
+	const taskActions = useMemo( () => {
+		// If actions are already provided from the API and not empty, use them.
+		// PHP-generated actions are HTML strings, React-generated are objects.
+		if (
+			task.prpl_task_actions &&
+			Array.isArray( task.prpl_task_actions ) &&
+			task.prpl_task_actions.length > 0
+		) {
+			// Mark these as HTML strings for rendering.
+			return task.prpl_task_actions.map( ( action ) =>
+				typeof action === 'string'
+					? { type: 'html', html: action }
+					: action
+			);
+		}
+
+		// Otherwise, try to generate actions from the task provider.
+		let providerId =
+			task.prpl_provider?.slug ||
+			task.provider_id ||
+			task.meta?.provider_id ||
+			'';
+
+		// Fallback: Use task slug as provider ID.
+		if ( ! providerId && task.slug ) {
+			providerId = task.slug;
+		}
+
+		// Fallback: Try to get provider from embedded taxonomy terms.
+		if (
+			! providerId &&
+			task.prpl_recommendations_provider &&
+			Array.isArray( task.prpl_recommendations_provider )
+		) {
+			const firstItem = task.prpl_recommendations_provider[ 0 ];
+			if (
+				firstItem &&
+				typeof firstItem === 'object' &&
+				firstItem.slug
+			) {
+				providerId = firstItem.slug;
+			} else if (
+				typeof firstItem === 'number' &&
+				task._embedded?.[ 'wp:term' ]?.[ 0 ]
+			) {
+				const embeddedTerms = task._embedded[ 'wp:term' ].flat();
+				const term = embeddedTerms.find(
+					( t ) =>
+						t?.taxonomy === 'prpl_recommendations_provider' &&
+						t.id === firstItem
+				);
+				if ( term?.slug ) {
+					providerId = term.slug;
+				}
+			}
+		}
+
+		if ( ! providerId ) {
+			return [];
+		}
+
+		const providerInstance = getTaskProviderInstance( providerId );
+		if ( ! providerInstance?.getTaskActions ) {
+			return [];
+		}
+
+		try {
+			return providerInstance.getTaskActions( task ) || [];
+		} catch ( error ) {
+			console.error(
+				`Error generating actions for task provider "${ providerId }":`,
+				error
+			);
+			return [];
+		}
+	}, [ task ] );
+
 	/**
-	 * Set up event handlers for the rendered HTML actions.
+	 * Set up event handlers for HTML-based actions (backward compatibility).
 	 */
 	useEffect( () => {
 		if ( ! actionsRef.current ) {
@@ -105,8 +273,13 @@ export default function TaskActions( {
 		}
 
 		const container = actionsRef.current;
-		// Clear previous handlers array.
 		handlersRef.current = [];
+
+		// Only set up handlers for HTML-based actions.
+		const hasHtmlActions = taskActions.some( ( a ) => a.type === 'html' );
+		if ( ! hasHtmlActions ) {
+			return;
+		}
 
 		// Handle complete button clicks.
 		const completeButtons = container.querySelectorAll(
@@ -136,19 +309,17 @@ export default function TaskActions( {
 			} );
 		} );
 
-		// Handle popover triggers - intercept onclick and use doAction.
+		// Handle popover triggers.
 		const popoverLinks = container.querySelectorAll(
 			'a[onclick*="showPopover"]'
 		);
 		popoverLinks.forEach( ( link ) => {
-			// Extract popover ID from onclick attribute.
 			const onclickAttr = link.getAttribute( 'onclick' );
 			const match = onclickAttr?.match(
 				/getElementById\(['"]([^'"]+)['"]\)/
 			);
 			if ( match ) {
 				const popoverId = match[ 1 ];
-				// Extract task ID from popover ID (format: prpl-popover-{taskId})
 				const taskId = popoverId.replace( 'prpl-popover-', '' );
 				link.removeAttribute( 'onclick' );
 				const handler = createPopoverHandler( taskId, task );
@@ -161,7 +332,7 @@ export default function TaskActions( {
 			}
 		} );
 
-		// Handle delete buttons for user tasks.
+		// Handle delete buttons.
 		const deleteButtons = container.querySelectorAll(
 			'.prpl-suggested-task-button.trash'
 		);
@@ -175,7 +346,7 @@ export default function TaskActions( {
 			} );
 		} );
 
-		// Cleanup: properly remove all event listeners on unmount.
+		// Cleanup event listeners.
 		return () => {
 			handlersRef.current.forEach( ( { element, type, handler } ) => {
 				element.removeEventListener( type, handler );
@@ -184,122 +355,14 @@ export default function TaskActions( {
 		};
 	}, [
 		task,
+		taskActions,
 		createCompleteHandler,
 		createSnoozeHandler,
 		createPopoverHandler,
 		createDeleteHandler,
 	] );
 
-	// Get task actions from API response, or generate from task provider if missing.
-	const taskActions = useMemo( () => {
-		// If actions are already provided from the API and not empty, use them.
-		// Note: Empty array means we should generate actions client-side.
-		if (
-			task.prpl_task_actions &&
-			Array.isArray( task.prpl_task_actions ) &&
-			task.prpl_task_actions.length > 0
-		) {
-			return task.prpl_task_actions;
-		}
-
-		// Otherwise, try to generate actions from the task provider.
-		// Try multiple ways to get the provider ID:
-		// 1. From prpl_provider object (if embedded in REST response)
-		// 2. From provider_id field
-		// 3. From meta.provider_id
-		// 4. From task slug (often matches provider ID for React tasks)
-		// 5. Fetch term from prpl_recommendations_provider if it's an array of IDs
-		let providerId =
-			task.prpl_provider?.slug ||
-			task.provider_id ||
-			task.meta?.provider_id ||
-			'';
-
-		// Fallback: Use task slug as provider ID (common pattern for React tasks)
-		if ( ! providerId && task.slug ) {
-			providerId = task.slug;
-		}
-
-		// Fallback: Try to get provider from embedded taxonomy terms or fetch it
-		if (
-			! providerId &&
-			task.prpl_recommendations_provider &&
-			Array.isArray( task.prpl_recommendations_provider )
-		) {
-			// If it's an array of term objects (from _embed)
-			const firstItem = task.prpl_recommendations_provider[ 0 ];
-			if (
-				firstItem &&
-				typeof firstItem === 'object' &&
-				firstItem.slug
-			) {
-				providerId = firstItem.slug;
-			} else if (
-				typeof firstItem === 'number' &&
-				task._embedded &&
-				task._embedded[ 'wp:term' ] &&
-				task._embedded[ 'wp:term' ][ 0 ]
-			) {
-				// Try to find the term in embedded data
-				const embeddedTerms = task._embedded[ 'wp:term' ].flat();
-				const term = embeddedTerms.find(
-					( t ) =>
-						t &&
-						t.taxonomy === 'prpl_recommendations_provider' &&
-						t.id === firstItem
-				);
-				if ( term && term.slug ) {
-					providerId = term.slug;
-				}
-			}
-		}
-
-		if ( ! providerId ) {
-			console.warn( 'TaskActions: No providerId found for task:', {
-				...task,
-				prpl_provider: task.prpl_provider,
-				provider_id: task.provider_id,
-				slug: task.slug,
-				prpl_recommendations_provider:
-					task.prpl_recommendations_provider,
-			} );
-			return [];
-		}
-
-		const providerInstance = getTaskProviderInstance( providerId );
-		if ( ! providerInstance ) {
-			console.warn(
-				`TaskActions: Provider instance not found for providerId "${ providerId }"`,
-				{ task }
-			);
-			return [];
-		}
-		if ( ! providerInstance.getTaskActions ) {
-			console.warn(
-				`TaskActions: Provider "${ providerId }" does not have getTaskActions method`
-			);
-			return [];
-		}
-
-		try {
-			const actions = providerInstance.getTaskActions( task );
-			if ( ! actions || actions.length === 0 ) {
-				console.warn(
-					`TaskActions: No actions generated for provider "${ providerId }"`,
-					{ task, providerInstance }
-				);
-			}
-			return actions || [];
-		} catch ( error ) {
-			console.error(
-				`Error generating actions for task provider "${ providerId }":`,
-				error
-			);
-			return [];
-		}
-	}, [ task ] );
-
-	// If no actions and not a user task, return empty.
+	// If no actions and not a user task, return empty container.
 	if ( taskActions.length === 0 && ! isUserTask ) {
 		return <div className="tooltip-actions" style={ STYLES.actions }></div>;
 	}
@@ -310,38 +373,38 @@ export default function TaskActions( {
 			style={ STYLES.actions }
 			ref={ actionsRef }
 		>
-			{ /* Render pre-built HTML actions from the API */ }
-			{ taskActions.map( ( actionHTML, actionIndex ) => (
+			{ taskActions.map( ( action, index ) => (
 				<span
-					key={ actionIndex }
+					key={ index }
 					className="tooltip-action"
 					style={ STYLES.action }
-					dangerouslySetInnerHTML={ { __html: actionHTML } }
-				/>
+				>
+					{ action.type === 'html' ? (
+						// Render HTML string (backward compatibility with PHP).
+						<span
+							dangerouslySetInnerHTML={ { __html: action.html } }
+						/>
+					) : (
+						// Render React component based on action type.
+						renderAction(
+							action,
+							task,
+							onComplete,
+							onSnooze,
+							onDelete
+						)
+					) }
+				</span>
 			) ) }
 
 			{ /* Add delete button for user tasks */ }
 			{ isUserTask && (
 				<span className="tooltip-action" style={ STYLES.action }>
-					<button
-						type="button"
-						className="prpl-suggested-task-button trash"
-						style={ STYLES.button }
-						data-post-id={ task.id }
-						title={ __( 'Delete', 'progress-planner' ) }
+					<TaskActionDelete
+						postId={ task.id }
+						taskTitle={ task.title?.rendered || task.title }
 						onClick={ () => onDelete( task.id ) }
-					>
-						<span
-							className="prpl-tooltip-action-text"
-							style={ STYLES.actionText }
-						>
-							{ __( 'Delete', 'progress-planner' ) }
-						</span>
-						<span className="screen-reader-text">
-							{ __( 'Delete', 'progress-planner' ) }:{ ' ' }
-							{ task.title?.rendered || task.title }
-						</span>
-					</button>
+					/>
 				</span>
 			) }
 		</div>

@@ -126,16 +126,15 @@ class ContentReviewTask extends TaskProvider {
 			taskData.target_post_id || taskData.meta?.target_post_id || null;
 
 		if ( targetPostId ) {
-			const editUrl = this.buildAdminUrl( 'post.php', {
-				action: 'edit',
-				post: targetPostId,
-			} );
-
 			actions.push( {
+				type: 'link',
 				priority: 10,
-				html: `<a class="prpl-tooltip-action-text" href="${ this.escapeHtml(
-					editUrl
-				) }" target="_self">Review</a>`,
+				href: this.buildAdminUrl( 'post.php', {
+					action: 'edit',
+					post: targetPostId,
+				} ),
+				label: 'Review',
+				target: '_self',
 			} );
 		}
 
