@@ -262,8 +262,8 @@ class Task_Evaluation extends Base {
 			);
 		}
 
-		// Fetch and return full task data.
-		$full_task_data = $this->get_full_task_data( $post_id );
+		// Build response directly from task data (avoids expensive internal REST call).
+		$full_task_data = $this->build_task_response( $post_id, $task_data );
 
 		return [
 			'success' => true,
@@ -275,6 +275,7 @@ class Task_Evaluation extends Base {
 
 	/**
 	 * Get full task data via REST API internal request.
+	 * Used for existing tasks where we don't have the original data.
 	 *
 	 * @param int $post_id The post ID.
 	 * @return array|null The task data or null on error.
@@ -289,5 +290,47 @@ class Task_Evaluation extends Base {
 		}
 
 		return $response->get_data();
+	}
+
+	/**
+	 * Build task response directly from task data (avoids internal REST call).
+	 *
+	 * @param int   $post_id   The post ID.
+	 * @param array $task_data The task data used to create the post.
+	 * @return array The task response data.
+	 */
+	private function build_task_response( $post_id, $task_data ) {
+		$post = \get_post( $post_id );
+		if ( ! $post ) {
+			return null;
+		}
+
+		// Build response matching REST API format.
+		return [
+			'id'                 => $post_id,
+			'date'               => $post->post_date,
+			'date_gmt'           => $post->post_date_gmt,
+			'modified'           => $post->post_modified,
+			'modified_gmt'       => $post->post_modified_gmt,
+			'slug'               => $post->post_name,
+			'status'             => $post->post_status,
+			'type'               => $post->post_type,
+			'link'               => \get_permalink( $post_id ),
+			'title'              => [
+				'rendered' => $task_data['post_title'],
+			],
+			'content'            => [
+				'rendered' => $task_data['description'] ?? '',
+			],
+			'menu_order'         => $post->menu_order,
+			'prpl_priority'      => $task_data['priority'] ?? 50,
+			'prpl_points'        => $task_data['points'] ?? 1,
+			'prpl_url'           => $task_data['url'] ?? '',
+			'prpl_url_target'    => $task_data['url_target'] ?? '_self',
+			'prpl_external_link' => $task_data['external_link_url'] ?? '',
+			'prpl_dismissable'   => $task_data['dismissable'] ?? false,
+			'prpl_link_setting'  => $task_data['link_setting'] ?? null,
+			'prpl_provider'      => $task_data['provider_id'],
+		];
 	}
 }
