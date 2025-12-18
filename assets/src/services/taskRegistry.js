@@ -8,7 +8,30 @@
 
 import { addFilter, applyFilters } from '@wordpress/hooks';
 import apiFetch from '@wordpress/api-fetch';
-import { createTasksBatch } from '../hooks/useTasksApi';
+import { createTasksBatch, fetchDataCollector } from '../hooks/useTasksApi';
+
+/**
+ * All data collector IDs used by task providers.
+ * Pre-fetching these in parallel ensures shouldAddTask() calls are instant.
+ */
+const DATA_COLLECTOR_IDS = [
+	'hello_world_post_id',
+	'sample_page_id',
+	'inactive_plugins_count',
+	'uncategorized_category_id',
+	'post_author_count',
+	'last_published_post_id',
+	'archive_format_count',
+	'terms_without_posts',
+	'terms_without_description',
+	'post_tag_count',
+	'published_post_count',
+	'unpublished_content',
+	'seo_plugin_installed',
+	'php_version',
+	'wp_debug_status',
+	'old_posts_for_review',
+];
 
 /**
  * Registry storage for task provider classes.
@@ -147,9 +170,18 @@ function initializeSortedTaskClasses() {
  * @return {Promise<{complete: boolean, tasksAdded: number}>} Evaluation result.
  */
 export async function evaluateTasksUntil( targetCount, onTaskReady ) {
-	// Phase 0: Pre-fetch ALL existing tasks (all statuses)
+	// Phase 0: Pre-fetch ALL existing tasks and data collectors (all in parallel)
 	if ( ! evaluationState.isPreFetchComplete ) {
-		existingTasksCache = await preFetchExistingTasks();
+		// Fetch existing tasks and all data collectors in parallel
+		// Data collectors are preloaded, but this ensures they're in cachedApiFetch cache
+		const [ existingTasks ] = await Promise.all( [
+			preFetchExistingTasks(),
+			// Pre-fetch all data collectors in parallel - populates cache for shouldAddTask() calls
+			...DATA_COLLECTOR_IDS.map( ( id ) =>
+				fetchDataCollector( id ).catch( () => null )
+			),
+		] );
+		existingTasksCache = existingTasks;
 		evaluationState.isPreFetchComplete = true;
 		initializeSortedTaskClasses();
 	}
