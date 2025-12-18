@@ -155,9 +155,12 @@ describe( 'TodoWidget', () => {
 
 			render( <TodoWidget /> );
 
+			// During loading, the widget header is rendered with skeleton
+			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
+			// The task list should not be rendered yet
 			expect(
-				screen.getByText( 'Loading items\u2026' )
-			).toBeInTheDocument();
+				screen.queryByRole( 'list', { name: /todo/i } )
+			).not.toBeInTheDocument();
 		} );
 	} );
 

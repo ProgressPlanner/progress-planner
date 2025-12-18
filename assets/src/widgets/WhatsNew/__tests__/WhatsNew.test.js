@@ -75,7 +75,10 @@ describe( 'WhatsNew', () => {
 
 			render( <WhatsNew /> );
 
-			expect( screen.getByTestId( 'loading-state' ) ).toBeInTheDocument();
+			// Widget header should be visible during loading
+			expect( screen.getByTestId( 'widget-header' ) ).toBeInTheDocument();
+			// Post links should not be visible during loading (skeleton is shown)
+			expect( screen.queryByRole( 'link' ) ).not.toBeInTheDocument();
 		} );
 
 		it( 'shows widget header during loading', () => {
