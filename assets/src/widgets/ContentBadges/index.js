@@ -70,7 +70,7 @@ function ContentBadges( { config = {} } ) {
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'badge-streak-content',
 	component: ContentBadges,
-	priority: 10,
+	priority: 6,
 	width: 1,
 	forceLastColumn: true,
 	title: __( 'Your content badges', 'progress-planner' ),

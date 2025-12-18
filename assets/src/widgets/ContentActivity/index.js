@@ -101,7 +101,7 @@ function ContentActivity( { config = {} } ) {
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'content-activity',
 	component: ContentActivity,
-	priority: 10,
+	priority: 5,
 	width: 1,
 	forceLastColumn: false,
 	title: __( 'Content activity', 'progress-planner' ),

@@ -70,7 +70,7 @@ function StreakBadges( { config = {} } ) {
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'badge-streak-maintenance',
 	component: StreakBadges,
-	priority: 10,
+	priority: 7,
 	width: 1,
 	forceLastColumn: true,
 	title: __( 'Your streak badges', 'progress-planner' ),

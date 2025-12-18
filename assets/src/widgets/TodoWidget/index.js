@@ -773,7 +773,7 @@ function TodoWidget( { config = {} } ) {
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'todo',
 	component: TodoWidget,
-	priority: 10,
+	priority: 3,
 	width: 2,
 	forceLastColumn: false,
 	title: __( 'My to-do list', 'progress-planner' ),

@@ -293,7 +293,7 @@ function MonthlyBadges( { config = {} } ) {
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'monthly-badges',
 	component: MonthlyBadges,
-	priority: 10,
+	priority: 2,
 	width: 1,
 	forceLastColumn: false,
 	title: __( 'Your monthly badge', 'progress-planner' ),

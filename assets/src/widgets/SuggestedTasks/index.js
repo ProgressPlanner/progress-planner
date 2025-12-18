@@ -709,7 +709,7 @@ function SuggestedTasks( { config = {} } ) {
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'suggested-tasks',
 	component: SuggestedTasks,
-	priority: 10,
+	priority: 1,
 	width: 2,
 	forceLastColumn: false,
 	title: __( "Ravi's Recommendations", 'progress-planner' ),

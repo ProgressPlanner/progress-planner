@@ -270,7 +270,7 @@ function ActivityScores( { config = {} } ) {
 doAction( 'prpl.dashboard.registerWidget', {
 	id: 'activity-scores',
 	component: ActivityScores,
-	priority: 10,
+	priority: 4,
 	width: 1,
 	forceLastColumn: false,
 	title: __( 'Your website activity score', 'progress-planner' ),
