@@ -15,28 +15,37 @@ use WP_UnitTestCase;
 class Onboarding_Tasks_Test extends \WP_UnitTestCase {
 
 	/**
-	 * Test that all expected onboarding tasks are registered.
+	 * Test that onboarding tasks filter works.
+	 *
+	 * Note: Most onboarding task providers have been migrated to React.
+	 * This test now verifies the filter mechanism works correctly.
 	 */
-	public function test_onboarding_tasks_are_registered() {
-		$expected_tasks = [
-			'core-blogdescription',
-			'wp-debug-display',
-			'disable-comments',
-			'sample-page',
-			'hello-world',
-			'core-siteicon',
-			'core-permalink-structure',
-			'php-version',
-			'search-engine-visibility',
-			'rename-uncategorized-category',
-			'fewer-tags',
-		];
+	public function test_onboarding_tasks_filter_works() {
+		$onboard_task_provider_ids = \apply_filters( 'prpl_onboarding_task_providers', [] );
+
+		// The filter should return an array.
+		$this->assertIsArray( $onboard_task_provider_ids );
+
+		// PHP-based providers (Yoast, AIOSEO) may add onboarding tasks if plugins are active.
+		// We can't test for specific React-migrated tasks here since they're handled client-side.
+	}
+
+	/**
+	 * Test that custom providers can register via filter.
+	 */
+	public function test_custom_onboarding_tasks_can_register() {
+		// Add a custom provider via filter.
+		\add_filter(
+			'prpl_onboarding_task_providers',
+			function ( $providers ) {
+				$providers[] = 'test-custom-provider';
+				return $providers;
+			}
+		);
 
 		$onboard_task_provider_ids = \apply_filters( 'prpl_onboarding_task_providers', [] );
 
-		// Check that all expected tasks are registered.
-		foreach ( $expected_tasks as $task_id ) {
-			$this->assertContains( $task_id, $onboard_task_provider_ids, "Task provider {$task_id} is not registered" );
-		}
+		// The custom provider should be in the list.
+		$this->assertContains( 'test-custom-provider', $onboard_task_provider_ids );
 	}
 }

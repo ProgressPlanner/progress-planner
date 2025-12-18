@@ -15,11 +15,17 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 	/**
 	 * Test the task_cleanup method.
 	 *
+	 * Note: Most task providers have been migrated to React. React providers
+	 * handle their own cleanup, so PHP cleanup skips them entirely.
+	 * This test now uses PHP-only providers for tasks that should be removed.
+	 *
 	 * @return void
 	 */
 	public function test_task_cleanup() {
 		// Tasks that should not be removed.
+		// React provider tasks are skipped by PHP cleanup (they handle their own).
 		$tasks_to_keep = [
+			// React provider tasks (current week) - kept because React providers are skipped.
 			[
 				'post_title'  => 'review-post-14-' . \gmdate( 'YW' ),
 				'task_id'     => 'review-post-14-' . \gmdate( 'YW' ),
@@ -41,24 +47,15 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 				'category'    => 'maintenance',
 				'provider_id' => 'update-core',
 			],
+			// React provider with past date - still kept because React providers are skipped.
 			[
-				'post_title'  => 'core-siteicon-' . \gmdate( 'YW' ),
-				'task_id'     => 'core-siteicon-' . \gmdate( 'YW' ),
-				'date'        => \gmdate( 'YW' ),
-				'provider_id' => 'core-siteicon',
-				'category'    => 'configuration',
-			],
-
-			// Not repetitive task, but with past date.
-			[
-				'post_title'  => 'core-siteicon-202451',
-				'task_id'     => 'core-siteicon-202451',
+				'post_title'  => 'update-core-202451',
+				'task_id'     => 'update-core-202451',
 				'date'        => '202451',
-				'provider_id' => 'core-siteicon',
-				'category'    => 'configuration',
+				'category'    => 'maintenance',
+				'provider_id' => 'update-core',
 			],
-
-			// User task, with past date.
+			// User task with past date - kept because user tasks are skipped.
 			[
 				'post_title'  => 'user-task-1',
 				'task_id'     => 'user-task-1',
@@ -73,18 +70,9 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 		}
 
 		// Tasks that should be removed.
+		// Only tasks with invalid/unknown providers (not React) are removed.
 		$tasks_to_remove = [
-
-			// Repetitive task with past date.
-			[
-				'post_title'  => 'update-core-202451',
-				'task_id'     => 'update-core-202451',
-				'date'        => '202451',
-				'category'    => 'maintenance',
-				'provider_id' => 'update-core',
-			],
-
-			// Task with invalid provider.
+			// Task with invalid provider (not React, not PHP) - will be deleted.
 			[
 				'post_title'  => 'invalid-task-1',
 				'task_id'     => 'invalid-task-1',

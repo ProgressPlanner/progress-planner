@@ -119,51 +119,26 @@ class Onboard_Wizard_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test maybe_register_popover_hooks skips when privacy accepted and no progress.
+	 * Test maybe_register_popover_hooks registers AJAX handlers when privacy not accepted.
 	 *
 	 * @return void
 	 */
-	public function test_maybe_register_popover_hooks_skips_when_complete() {
+	public function test_maybe_register_popover_hooks_registers_ajax_handlers() {
 		// Set admin user.
 		\wp_set_current_user( $this->admin_user_id );
 
-		// Set privacy accepted (license key exists).
-		\update_option( 'progress_planner_license_key', 'test-license-key' );
-
-		// Ensure no onboarding progress.
-		\delete_option( 'prpl_onboard_progress' );
+		// Ensure privacy is not accepted.
+		\delete_option( 'progress_planner_license_key' );
 
 		$wizard = new Onboard_Wizard();
 		$wizard->maybe_register_popover_hooks();
 
-		// Footer hooks should NOT be registered when onboarding is complete.
-		$this->assertFalse(
-			\has_action( 'wp_footer', [ $wizard, 'add_popover' ] )
-		);
-	}
-
-	/**
-	 * Test maybe_register_popover_hooks registers hooks when onboarding in progress.
-	 *
-	 * @return void
-	 */
-	public function test_maybe_register_popover_hooks_with_progress() {
-		// Set admin user.
-		\wp_set_current_user( $this->admin_user_id );
-
-		// Set privacy accepted but onboarding in progress.
-		\update_option( 'progress_planner_license_key', 'test-license-key' );
-		\update_option( 'prpl_onboard_progress', \wp_json_encode( [ 'currentStep' => 2 ] ) );
-
-		$wizard = new Onboard_Wizard();
-		$wizard->maybe_register_popover_hooks();
-
-		// Footer hooks SHOULD be registered when onboarding is in progress.
+		// AJAX handlers should be registered for admin users.
 		$this->assertNotFalse(
-			\has_action( 'wp_footer', [ $wizard, 'add_popover' ] )
+			\has_action( 'wp_ajax_progress_planner_onboarding_complete_task', [ $wizard, 'ajax_complete_task' ] )
 		);
 		$this->assertNotFalse(
-			\has_action( 'admin_footer', [ $wizard, 'add_popover' ] )
+			\has_action( 'wp_ajax_progress_planner_onboarding_save_progress', [ $wizard, 'ajax_save_onboarding_progress' ] )
 		);
 	}
 
@@ -336,7 +311,7 @@ class Onboard_Wizard_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test skip_onboarding filter.
+	 * Test skip_onboarding filter affects step definition registration.
 	 *
 	 * @return void
 	 */
@@ -353,133 +328,12 @@ class Onboard_Wizard_Test extends \WP_UnitTestCase {
 		$wizard = new Onboard_Wizard();
 		$wizard->maybe_register_popover_hooks();
 
-		// Footer hooks should NOT be registered when filter skips onboarding.
-		$this->assertFalse(
-			\has_action( 'wp_footer', [ $wizard, 'add_popover' ] )
+		// AJAX handlers should still be registered (they're needed for React).
+		$this->assertNotFalse(
+			\has_action( 'wp_ajax_progress_planner_onboarding_complete_task', [ $wizard, 'ajax_complete_task' ] )
 		);
 
 		// Remove filter.
 		\remove_filter( 'progress_planner_skip_onboarding', '__return_true' );
-	}
-
-	/**
-	 * Test trigger_onboarding does nothing during AJAX.
-	 *
-	 * @return void
-	 */
-	public function test_trigger_onboarding_skips_ajax() {
-		// Set admin user.
-		\wp_set_current_user( $this->admin_user_id );
-
-		// Simulate AJAX request.
-		\add_filter( 'wp_doing_ajax', '__return_true' );
-
-		$wizard = new Onboard_Wizard();
-
-		// Capture output.
-		\ob_start();
-		$wizard->trigger_onboarding();
-		$output = \ob_get_clean();
-
-		// Should not output anything during AJAX.
-		$this->assertEmpty( $output );
-
-		// Remove filter.
-		\remove_filter( 'wp_doing_ajax', '__return_true' );
-	}
-
-	/**
-	 * Test trigger_onboarding does nothing for non-admin users.
-	 *
-	 * @return void
-	 */
-	public function test_trigger_onboarding_skips_non_admin() {
-		// Set non-admin user.
-		$subscriber_id = $this->factory->user->create( [ 'role' => 'subscriber' ] );
-		\wp_set_current_user( $subscriber_id );
-
-		$wizard = new Onboard_Wizard();
-
-		// Capture output.
-		\ob_start();
-		$wizard->trigger_onboarding();
-		$output = \ob_get_clean();
-
-		// Should not output anything for non-admin.
-		$this->assertEmpty( $output );
-	}
-
-	/**
-	 * Test trigger_onboarding outputs script when no saved progress.
-	 *
-	 * @return void
-	 */
-	public function test_trigger_onboarding_outputs_script() {
-		// Set admin user.
-		\wp_set_current_user( $this->admin_user_id );
-
-		// Ensure no progress saved.
-		\delete_option( 'prpl_onboard_progress' );
-
-		$wizard = new Onboard_Wizard();
-
-		// Capture output.
-		\ob_start();
-		$wizard->trigger_onboarding();
-		$output = \ob_get_clean();
-
-		// Should output script to start onboarding.
-		$this->assertStringContainsString( '<script>', $output );
-		$this->assertStringContainsString( 'prplOnboardWizardReady', $output );
-		$this->assertStringContainsString( 'startOnboarding', $output );
-	}
-
-	/**
-	 * Test trigger_onboarding does not output script when progress exists.
-	 *
-	 * @return void
-	 */
-	public function test_trigger_onboarding_skips_when_progress_exists() {
-		// Set admin user.
-		\wp_set_current_user( $this->admin_user_id );
-
-		// Set progress.
-		\update_option( 'prpl_onboard_progress', \wp_json_encode( [ 'currentStep' => 1 ] ) );
-
-		$wizard = new Onboard_Wizard();
-
-		// Capture output.
-		\ob_start();
-		$wizard->trigger_onboarding();
-		$output = \ob_get_clean();
-
-		// Should not output script when progress exists.
-		$this->assertEmpty( $output );
-	}
-
-	/**
-	 * Test add_popover outputs popover HTML.
-	 *
-	 * @return void
-	 */
-	public function test_add_popover_outputs_html() {
-		// Set admin user.
-		\wp_set_current_user( $this->admin_user_id );
-
-		$wizard = new Onboard_Wizard();
-
-		// Initialize steps (required for add_popover to work).
-		$wizard->define_steps_and_order();
-
-		// Capture output.
-		\ob_start();
-		$wizard->add_popover();
-		$output = \ob_get_clean();
-
-		// Should output popover HTML.
-		$this->assertStringContainsString( 'id="prpl-popover-onboarding"', $output );
-		$this->assertStringContainsString( 'class="prpl-popover-onboarding"', $output );
-		$this->assertStringContainsString( 'prpl-onboarding-layout', $output );
-		$this->assertStringContainsString( 'prpl-tour-close-btn', $output );
 	}
 }

@@ -76,6 +76,11 @@ trait Task_Provider_Test_Trait {
 	 * @return void
 	 */
 	public function test_task_provider() {
+		// Skip if task provider is not available (migrated to React).
+		if ( null === $this->task_provider ) {
+			$this->markTestSkipped( "Task provider '{$this->task_provider_id}' has been migrated to React." );
+		}
+
 		// Test that the blog description is empty.
 		$this->assertTrue( $this->task_provider->should_add_task() );
 
