@@ -25,7 +25,6 @@ import { dispatchGridResize } from '../../utils/gridResize';
 import WidgetHeader from '../../components/WidgetHeader';
 import {
 	setTaskRenderCallback,
-	setTaskContainer,
 	getTaskProviderInstance,
 } from '../../services/taskRegistry';
 import { useDashboardStore } from '../../stores/dashboardStore';
@@ -262,11 +261,8 @@ function SuggestedTasks( { config = {} } ) {
 	 * Set up streaming on component mount.
 	 */
 	useEffect( () => {
-		// Set up render callback and container for task registry
+		// Set up render callback for task registry
 		setTaskRenderCallback( handleTaskRender );
-		if ( listRef.current ) {
-			setTaskContainer( listRef.current );
-		}
 
 		// Handle pending celebration tasks (if not delayed)
 		if ( ! config?.delayCelebration ) {
@@ -327,7 +323,6 @@ function SuggestedTasks( { config = {} } ) {
 		// Cleanup
 		return () => {
 			setTaskRenderCallback( null );
-			setTaskContainer( null );
 		};
 	}, [ config, celebrate, handleTaskRender ] );
 

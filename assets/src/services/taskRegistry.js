@@ -50,20 +50,6 @@ export function setTaskRenderCallback( callback ) {
 }
 
 /**
- * Set the container element for rendering tasks.
- * Note: Currently not used, but kept for future use if needed.
- *
- * @param {HTMLElement} container The container element.
- * @return {void}
- */
-export function setTaskContainer( container ) {
-	// Container is stored for potential future use
-	// Currently, the widget handles rendering directly via callback
-	// eslint-disable-next-line no-unused-vars
-	const _container = container;
-}
-
-/**
  * Check if a task post exists in the database.
  *
  * @param {string} taskId The task ID to check (becomes post_name/slug).
@@ -353,15 +339,6 @@ export function getTaskProviderInstance( providerId ) {
 		);
 		return null;
 	}
-}
-
-/**
- * Get all registered provider IDs (for debugging).
- *
- * @return {Array<string>} Array of registered provider IDs.
- */
-export function getRegisteredProviderIds() {
-	return Array.from( taskProviders.keys() );
 }
 
 // Initialize on module load
