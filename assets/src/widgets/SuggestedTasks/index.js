@@ -4,7 +4,13 @@
  * Displays a list of suggested tasks (recommendations) for improving the site.
  */
 
-import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
+import {
+	useState,
+	useEffect,
+	useRef,
+	useCallback,
+	useMemo,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { doAction } from '@wordpress/hooks';
 import PopoverManager from './PopoverManager';
@@ -34,6 +40,10 @@ import { useDashboardStore } from '../../stores/dashboardStore';
 // Import task registrations (tasks will self-register on import).
 import '../../tasks';
 
+// Configuration constants for task limiting
+const TASKS_INITIAL_LIMIT = 5;
+const TASKS_LOAD_INCREMENT = 5;
+
 /**
  * Suggested Tasks widget component.
  *
@@ -44,13 +54,24 @@ import '../../tasks';
 function SuggestedTasks( { config = {} } ) {
 	const [ tasks, setTasks ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
-	const [ currentPage, setCurrentPage ] = useState( 1 );
-	const [ hasMorePages, setHasMorePages ] = useState( false );
-	const [ isLoadingMore, setIsLoadingMore ] = useState( false );
+	const [ visibleTaskLimit, setVisibleTaskLimit ] =
+		useState( TASKS_INITIAL_LIMIT );
 	const [ celebratingTaskIds, setCelebratingTaskIds ] = useState( new Set() );
 	const listRef = useRef( null );
 	const injectedTaskIdsRef = useRef( new Set() );
 	const tasksMapRef = useRef( new Map() ); // Map of task ID to task object for quick lookup
+
+	// Derive visible tasks and button states
+	const visibleTasks = useMemo( () => {
+		return tasks.slice( 0, visibleTaskLimit );
+	}, [ tasks, visibleTaskLimit ] );
+
+	const hasMoreTasks = tasks.length > visibleTaskLimit;
+	const isShowingAll = visibleTaskLimit >= tasks.length;
+	const canCollapse =
+		visibleTaskLimit > TASKS_INITIAL_LIMIT &&
+		isShowingAll &&
+		tasks.length > TASKS_INITIAL_LIMIT;
 
 	// Initialize grid masonry layout.
 	useGridMasonry();
@@ -560,49 +581,23 @@ function SuggestedTasks( { config = {} } ) {
 
 	/**
 	 * Handle load more button click.
+	 * Increases the visible task limit to show more tasks.
 	 */
-	const handleLoadMore = useCallback( async () => {
-		if ( isLoadingMore || ! hasMorePages ) {
-			return;
-		}
+	const handleLoadMore = useCallback( () => {
+		setVisibleTaskLimit( ( prev ) => prev + TASKS_LOAD_INCREMENT );
+		// Trigger grid resize after showing more tasks
+		dispatchGridResize( 100 );
+	}, [] );
 
-		setIsLoadingMore( true );
-		const nextPage = currentPage + 1;
-		const perPage = config?.perPage || 5;
-
-		try {
-			const result = await fetchTasks( {
-				status: 'publish',
-				perPage,
-				page: nextPage,
-				excludeProvider: 'user',
-			} );
-
-			// Track injected task IDs and ensure actions are generated.
-			const tasksWithActions = result.tasks.map( ( task ) => {
-				injectedTaskIdsRef.current.add( task.id );
-				return ensureTaskActions( task );
-			} );
-
-			// Append new tasks to existing list.
-			setTasks( ( prev ) => [ ...prev, ...tasksWithActions ] );
-			setHasMorePages( result.hasMore );
-			setCurrentPage( nextPage );
-
-			// Trigger grid resize.
-			dispatchGridResize( 100 );
-		} catch ( error ) {
-			console.error( 'Error loading more tasks:', error );
-		} finally {
-			setIsLoadingMore( false );
-		}
-	}, [
-		currentPage,
-		hasMorePages,
-		isLoadingMore,
-		config,
-		ensureTaskActions,
-	] );
+	/**
+	 * Handle collapse button click.
+	 * Resets the visible task limit to show only the initial tasks.
+	 */
+	const handleCollapse = useCallback( () => {
+		setVisibleTaskLimit( TASKS_INITIAL_LIMIT );
+		// Trigger grid resize after collapsing
+		dispatchGridResize( 100 );
+	}, [] );
 
 	/**
 	 * Decode HTML entities in a string.
@@ -687,7 +682,7 @@ function SuggestedTasks( { config = {} } ) {
 			<ul style={ STYLES.hiddenList }></ul>
 			<TaskList
 				ref={ listRef }
-				tasks={ tasks }
+				tasks={ visibleTasks }
 				celebratingTaskIds={ celebratingTaskIds }
 				onComplete={ handleComplete }
 				onSnooze={ handleSnooze }
@@ -695,12 +690,12 @@ function SuggestedTasks( { config = {} } ) {
 				onMove={ handleMove }
 				onTitleChange={ handleTitleChange }
 			/>
-			{ hasMorePages && (
-				<LoadMoreButton
-					isLoading={ isLoadingMore }
-					onClick={ handleLoadMore }
-				/>
-			) }
+			<LoadMoreButton
+				hasMore={ hasMoreTasks }
+				canCollapse={ canCollapse }
+				onLoadMore={ handleLoadMore }
+				onCollapse={ handleCollapse }
+			/>
 		</>
 	);
 }
