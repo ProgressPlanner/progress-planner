@@ -129,6 +129,72 @@ export class TaskProvider {
 	}
 
 	/**
+	 * Build an admin URL with optional path and query parameters.
+	 *
+	 * Centralizes URL building logic to reduce code duplication across task providers.
+	 * Handles trailing slash normalization and query parameter encoding.
+	 *
+	 * @param {string} path   The path relative to wp-admin (e.g., 'post.php', 'edit-tags.php').
+	 * @param {Object} params Query parameters as key-value pairs.
+	 * @return {string} The complete admin URL.
+	 */
+	buildAdminUrl( path = '', params = {} ) {
+		const adminUrl =
+			window.prplSuggestedTasksConfig?.adminUrl || '/wp-admin/';
+		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
+		let url = path ? `${ adminUrl }${ separator }${ path }` : adminUrl;
+
+		// Add query parameters if any.
+		const queryParams = Object.entries( params )
+			.filter( ( [ , value ] ) => value !== undefined && value !== null )
+			.map(
+				( [ key, value ] ) =>
+					`${ encodeURIComponent( key ) }=${ encodeURIComponent(
+						value
+					) }`
+			)
+			.join( '&' );
+
+		if ( queryParams ) {
+			url += ( url.includes( '?' ) ? '&' : '?' ) + queryParams;
+		}
+
+		return url;
+	}
+
+	/**
+	 * Build standard task details object with common fields.
+	 *
+	 * Centralizes task details building logic to reduce code duplication.
+	 * Uses static class properties and config as defaults, with overrides for custom values.
+	 *
+	 * @param {Object} taskData  Task-specific data used for ID generation.
+	 * @param {Object} overrides Custom fields to override or add to the standard details.
+	 * @return {Object} Complete task details object.
+	 */
+	buildTaskDetails( taskData = {}, overrides = {} ) {
+		const StaticClass = this.constructor;
+		return {
+			task_id: this.getTaskId( taskData ),
+			provider_id: this.getProviderId(),
+			post_title: '', // Should be overridden
+			description: '',
+			priority: this.getPriority(),
+			points: this.getPoints(),
+			parent: StaticClass.parent || 0,
+			url: '',
+			url_target: '_self',
+			dismissable:
+				StaticClass.isDismissable !== undefined
+					? StaticClass.isDismissable
+					: this.config.isDismissable,
+			external_link_url:
+				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
+			...overrides,
+		};
+	}
+
+	/**
 	 * Check if the user has the required capability.
 	 *
 	 * @return {boolean} True if user has capability.

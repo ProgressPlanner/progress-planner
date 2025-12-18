@@ -22,16 +22,22 @@ jest.mock( '../styles', () => ( {
 } ) );
 
 describe( 'LoadMoreButton', () => {
-	const mockOnClick = jest.fn();
+	const mockOnLoadMore = jest.fn();
+	const mockOnCollapse = jest.fn();
 
 	beforeEach( () => {
 		jest.clearAllMocks();
 	} );
 
-	describe( 'basic rendering', () => {
+	describe( 'when hasMore is true', () => {
 		it( 'renders without crashing', () => {
 			const { container } = render(
-				<LoadMoreButton isLoading={ false } onClick={ mockOnClick } />
+				<LoadMoreButton
+					hasMore={ true }
+					canCollapse={ false }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
 			);
 
 			expect(
@@ -41,7 +47,12 @@ describe( 'LoadMoreButton', () => {
 
 		it( 'renders button element', () => {
 			render(
-				<LoadMoreButton isLoading={ false } onClick={ mockOnClick } />
+				<LoadMoreButton
+					hasMore={ true }
+					canCollapse={ false }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
 			);
 
 			expect( screen.getByRole( 'button' ) ).toBeInTheDocument();
@@ -49,7 +60,12 @@ describe( 'LoadMoreButton', () => {
 
 		it( 'has correct button id', () => {
 			const { container } = render(
-				<LoadMoreButton isLoading={ false } onClick={ mockOnClick } />
+				<LoadMoreButton
+					hasMore={ true }
+					canCollapse={ false }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
 			);
 
 			expect(
@@ -59,7 +75,12 @@ describe( 'LoadMoreButton', () => {
 
 		it( 'has toggle button class', () => {
 			const { container } = render(
-				<LoadMoreButton isLoading={ false } onClick={ mockOnClick } />
+				<LoadMoreButton
+					hasMore={ true }
+					canCollapse={ false }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
 			);
 
 			expect(
@@ -68,96 +89,59 @@ describe( 'LoadMoreButton', () => {
 				)
 			).toBeInTheDocument();
 		} );
-	} );
 
-	describe( 'button text', () => {
-		it( 'shows "Load more tasks" when not loading', () => {
+		it( 'shows "Load more tasks" text', () => {
 			render(
-				<LoadMoreButton isLoading={ false } onClick={ mockOnClick } />
+				<LoadMoreButton
+					hasMore={ true }
+					canCollapse={ false }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
 			);
 
 			expect( screen.getByText( 'Load more tasks' ) ).toBeInTheDocument();
 		} );
 
-		it( 'shows "Loading…" when loading', () => {
+		it( 'calls onLoadMore when clicked', () => {
 			render(
-				<LoadMoreButton isLoading={ true } onClick={ mockOnClick } />
-			);
-
-			expect( screen.getByText( 'Loading…' ) ).toBeInTheDocument();
-		} );
-	} );
-
-	describe( 'button state', () => {
-		it( 'is enabled when not loading', () => {
-			render(
-				<LoadMoreButton isLoading={ false } onClick={ mockOnClick } />
-			);
-
-			const button = screen.getByRole( 'button' );
-			expect( button ).not.toBeDisabled();
-		} );
-
-		it( 'is disabled when loading', () => {
-			render(
-				<LoadMoreButton isLoading={ true } onClick={ mockOnClick } />
-			);
-
-			const button = screen.getByRole( 'button' );
-			expect( button ).toBeDisabled();
-		} );
-	} );
-
-	describe( 'click handling', () => {
-		it( 'calls onClick when clicked', () => {
-			render(
-				<LoadMoreButton isLoading={ false } onClick={ mockOnClick } />
+				<LoadMoreButton
+					hasMore={ true }
+					canCollapse={ false }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
 			);
 
 			const button = screen.getByRole( 'button' );
 			fireEvent.click( button );
 
-			expect( mockOnClick ).toHaveBeenCalled();
+			expect( mockOnLoadMore ).toHaveBeenCalled();
+			expect( mockOnLoadMore ).toHaveBeenCalledTimes( 1 );
 		} );
 
-		it( 'calls onClick only once per click', () => {
-			render(
-				<LoadMoreButton isLoading={ false } onClick={ mockOnClick } />
-			);
-
-			const button = screen.getByRole( 'button' );
-			fireEvent.click( button );
-
-			expect( mockOnClick ).toHaveBeenCalledTimes( 1 );
-		} );
-
-		it( 'does not call onClick when disabled', () => {
-			render(
-				<LoadMoreButton isLoading={ true } onClick={ mockOnClick } />
-			);
-
-			const button = screen.getByRole( 'button' );
-			fireEvent.click( button );
-
-			expect( mockOnClick ).not.toHaveBeenCalled();
-		} );
-	} );
-
-	describe( 'button type', () => {
 		it( 'has type="button"', () => {
 			render(
-				<LoadMoreButton isLoading={ false } onClick={ mockOnClick } />
+				<LoadMoreButton
+					hasMore={ true }
+					canCollapse={ false }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
 			);
 
 			const button = screen.getByRole( 'button' );
 			expect( button ).toHaveAttribute( 'type', 'button' );
 		} );
-	} );
 
-	describe( 'wrapper element', () => {
 		it( 'wraps button in paragraph element', () => {
 			const { container } = render(
-				<LoadMoreButton isLoading={ false } onClick={ mockOnClick } />
+				<LoadMoreButton
+					hasMore={ true }
+					canCollapse={ false }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
 			);
 
 			const paragraph = container.querySelector(
@@ -166,12 +150,15 @@ describe( 'LoadMoreButton', () => {
 			expect( paragraph ).toBeInTheDocument();
 			expect( paragraph.querySelector( 'button' ) ).toBeInTheDocument();
 		} );
-	} );
 
-	describe( 'inline styles', () => {
 		it( 'applies cursor style from STYLES.toggleButton', () => {
 			const { container } = render(
-				<LoadMoreButton isLoading={ false } onClick={ mockOnClick } />
+				<LoadMoreButton
+					hasMore={ true }
+					canCollapse={ false }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
 			);
 
 			const button = container.querySelector( 'button' );
@@ -179,35 +166,152 @@ describe( 'LoadMoreButton', () => {
 		} );
 	} );
 
-	describe( 'loading state transitions', () => {
-		it( 'transitions from loading to not loading', () => {
-			const { rerender } = render(
-				<LoadMoreButton isLoading={ true } onClick={ mockOnClick } />
+	describe( 'when canCollapse is true', () => {
+		it( 'renders collapse button', () => {
+			const { container } = render(
+				<LoadMoreButton
+					hasMore={ false }
+					canCollapse={ true }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
 			);
 
-			expect( screen.getByText( 'Loading…' ) ).toBeInTheDocument();
-			expect( screen.getByRole( 'button' ) ).toBeDisabled();
-
-			rerender(
-				<LoadMoreButton isLoading={ false } onClick={ mockOnClick } />
-			);
-
-			expect( screen.getByText( 'Load more tasks' ) ).toBeInTheDocument();
-			expect( screen.getByRole( 'button' ) ).not.toBeDisabled();
+			expect(
+				container.querySelector( '.prpl-show-all-tasks' )
+			).toBeInTheDocument();
 		} );
 
-		it( 'transitions from not loading to loading', () => {
+		it( 'has correct button id for collapse', () => {
+			const { container } = render(
+				<LoadMoreButton
+					hasMore={ false }
+					canCollapse={ true }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
+			);
+
+			expect(
+				container.querySelector( '#prpl-collapse-recommendations' )
+			).toBeInTheDocument();
+		} );
+
+		it( 'shows "Show top 5" text', () => {
+			render(
+				<LoadMoreButton
+					hasMore={ false }
+					canCollapse={ true }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
+			);
+
+			expect( screen.getByText( 'Show top 5' ) ).toBeInTheDocument();
+		} );
+
+		it( 'calls onCollapse when clicked', () => {
+			render(
+				<LoadMoreButton
+					hasMore={ false }
+					canCollapse={ true }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
+			);
+
+			const button = screen.getByRole( 'button' );
+			fireEvent.click( button );
+
+			expect( mockOnCollapse ).toHaveBeenCalled();
+			expect( mockOnCollapse ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
+	describe( 'when neither hasMore nor canCollapse is true', () => {
+		it( 'returns null', () => {
+			const { container } = render(
+				<LoadMoreButton
+					hasMore={ false }
+					canCollapse={ false }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
+			);
+
+			expect(
+				container.querySelector( '.prpl-show-all-tasks' )
+			).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'hasMore takes priority over canCollapse', () => {
+		it( 'shows load more button when both hasMore and canCollapse are true', () => {
+			render(
+				<LoadMoreButton
+					hasMore={ true }
+					canCollapse={ true }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
+			);
+
+			expect( screen.getByText( 'Load more tasks' ) ).toBeInTheDocument();
+			expect(
+				screen.queryByText( 'Show top 5' )
+			).not.toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'state transitions', () => {
+		it( 'transitions from hasMore to canCollapse', () => {
 			const { rerender } = render(
-				<LoadMoreButton isLoading={ false } onClick={ mockOnClick } />
+				<LoadMoreButton
+					hasMore={ true }
+					canCollapse={ false }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
 			);
 
 			expect( screen.getByText( 'Load more tasks' ) ).toBeInTheDocument();
 
 			rerender(
-				<LoadMoreButton isLoading={ true } onClick={ mockOnClick } />
+				<LoadMoreButton
+					hasMore={ false }
+					canCollapse={ true }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
 			);
 
-			expect( screen.getByText( 'Loading…' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Show top 5' ) ).toBeInTheDocument();
+		} );
+
+		it( 'transitions from canCollapse to hidden', () => {
+			const { rerender, container } = render(
+				<LoadMoreButton
+					hasMore={ false }
+					canCollapse={ true }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
+			);
+
+			expect( screen.getByText( 'Show top 5' ) ).toBeInTheDocument();
+
+			rerender(
+				<LoadMoreButton
+					hasMore={ false }
+					canCollapse={ false }
+					onLoadMore={ mockOnLoadMore }
+					onCollapse={ mockOnCollapse }
+				/>
+			);
+
+			expect(
+				container.querySelector( '.prpl-show-all-tasks' )
+			).not.toBeInTheDocument();
 		} );
 	} );
 } );

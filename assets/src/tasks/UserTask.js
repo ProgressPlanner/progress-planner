@@ -48,18 +48,11 @@ class UserTask extends TaskProvider {
 	 */
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
-		return {
-			task_id: this.getTaskId( taskData ),
-			provider_id: this.getProviderId(),
+		return this.buildTaskDetails( taskData, {
 			post_title: taskData.title?.rendered || taskData.title || '',
 			description: taskData.content?.rendered || '',
-			priority: this.getPriority(),
 			points: this.getPoints( taskData ),
-			url: '',
-			url_target: '_self',
-			dismissable: true,
-			external_link_url: '',
-		};
+		} );
 	}
 
 	/**

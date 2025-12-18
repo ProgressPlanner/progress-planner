@@ -59,32 +59,14 @@ class RenameUncategorizedCategoryTask extends InteractiveTaskProvider {
 		const uncategorizedCategoryId = await fetchDataCollector(
 			'uncategorized_category_id'
 		);
-		const taskId = this.getTaskId( taskData );
 
-		// Build URL to category edit page.
-		const adminUrl =
-			window.prplSuggestedTasksConfig?.adminUrl || '/wp-admin/';
-		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
-		const url = `${ adminUrl }${ separator }term.php?taxonomy=category&tag_ID=${ uncategorizedCategoryId }`;
-
-		const StaticClass = this.constructor;
-		const taskDetails = {
-			task_id: taskId,
-			provider_id: this.getProviderId(),
+		const taskDetails = this.buildTaskDetails( taskData, {
 			post_title: 'Rename Uncategorized category',
-			description: '',
-			priority: this.getPriority(),
-			points: this.getPoints(),
-			parent: StaticClass.parent || 0,
-			url,
-			url_target: '_self',
-			dismissable:
-				StaticClass.isDismissable !== undefined
-					? StaticClass.isDismissable
-					: this.config.isDismissable,
-			external_link_url:
-				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
-		};
+			url: this.buildAdminUrl( 'term.php', {
+				taxonomy: 'category',
+				tag_ID: uncategorizedCategoryId,
+			} ),
+		} );
 
 		// Add popover ID for interactive tasks.
 		return this.addPopoverIdToTaskDetails( taskDetails );

@@ -63,33 +63,16 @@ class SelectTimezoneTask extends InteractiveTaskProvider {
 	async getTaskDetails( taskData = {} ) {
 		const taskId = this.getTaskId( taskData );
 
-		const adminUrl =
-			window.prplSuggestedTasksConfig?.adminUrl || '/wp-admin/';
-		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
-		const url = `${ adminUrl }${ separator }options-general.php?pp-focus-el=${ taskId }`;
-
-		const StaticClass = this.constructor;
-		const taskDetails = {
-			task_id: taskId,
-			provider_id: this.getProviderId(),
+		const taskDetails = this.buildTaskDetails( taskData, {
 			post_title: 'Set site timezone',
-			description: '',
-			priority: this.getPriority(),
-			points: this.getPoints(),
-			parent: StaticClass.parent || 0,
-			url,
-			url_target: '_self',
-			dismissable:
-				StaticClass.isDismissable !== undefined
-					? StaticClass.isDismissable
-					: this.config.isDismissable,
-			external_link_url:
-				StaticClass.externalLinkUrl || this.config.externalLinkUrl,
+			url: this.buildAdminUrl( 'options-general.php', {
+				'pp-focus-el': taskId,
+			} ),
 			link_setting: {
 				hook: 'options-general.php',
 				iconEl: 'label[for="timezone_string"]',
 			},
-		};
+		} );
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
 	}
