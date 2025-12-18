@@ -1,11 +1,13 @@
 /**
  * TaskList Component
  *
- * Renders the list of suggested tasks with support for celebration animations.
+ * Renders the list of suggested tasks with support for celebration animations
+ * and skeleton placeholders for progressive loading.
  */
 
 import { forwardRef } from '@wordpress/element';
 import TaskItem from '../../components/TaskItem';
+import TaskItemSkeleton from '../../components/TaskItem/TaskItemSkeleton';
 import { STYLES } from './styles';
 
 /**
@@ -14,6 +16,7 @@ import { STYLES } from './styles';
  * @param {Object}   props                    - Component props.
  * @param {Array}    props.tasks              - Array of task objects.
  * @param {Set}      props.celebratingTaskIds - Set of task IDs currently celebrating.
+ * @param {number}   props.skeletonCount      - Number of skeleton placeholders to show.
  * @param {Function} props.onComplete         - Handler for task completion.
  * @param {Function} props.onSnooze           - Handler for task snooze.
  * @param {Function} props.onDelete           - Handler for task deletion.
@@ -26,6 +29,7 @@ const TaskList = forwardRef( function TaskList(
 	{
 		tasks,
 		celebratingTaskIds,
+		skeletonCount = 0,
 		onComplete,
 		onSnooze,
 		onDelete,
@@ -55,6 +59,16 @@ const TaskList = forwardRef( function TaskList(
 					onTitleChange={ onTitleChange }
 				/>
 			) ) }
+			{ /* Render skeleton placeholders for tasks still loading */ }
+			{ skeletonCount > 0 &&
+				Array( skeletonCount )
+					.fill( 0 )
+					.map( ( _, i ) => (
+						<TaskItemSkeleton
+							key={ `skeleton-${ i }` }
+							index={ tasks.length + i }
+						/>
+					) ) }
 		</ul>
 	);
 } );

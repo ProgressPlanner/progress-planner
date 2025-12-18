@@ -70,6 +70,15 @@ function SuggestedTasks( { config = {} } ) {
 		return tasks.slice( 0, visibleTaskLimit );
 	}, [ tasks, visibleTaskLimit ] );
 
+	// Calculate skeleton count for progressive loading
+	// Show skeletons only when we have tasks but haven't filled the initial limit yet
+	const skeletonCount = useMemo( () => {
+		if ( isLoading || ! hasMoreToEvaluate ) {
+			return 0;
+		}
+		return Math.max( 0, TASKS_INITIAL_LIMIT - visibleTasks.length );
+	}, [ isLoading, hasMoreToEvaluate, visibleTasks.length ] );
+
 	const hasMoreTasks = hasMoreToEvaluate || tasks.length > visibleTaskLimit;
 	const isShowingAll =
 		visibleTaskLimit >= tasks.length && ! hasMoreToEvaluate;
@@ -359,19 +368,31 @@ function SuggestedTasks( { config = {} } ) {
 
 			// Evaluate tasks lazily until we have initial + buffer
 			const targetCount = TASKS_INITIAL_LIMIT + getBufferSize();
+			let firstTaskShown = false;
+
 			const result = await evaluateTasksUntil(
 				targetCount,
 				( taskData, priority ) => {
 					if ( mounted ) {
 						addTask( taskData, priority );
+
+						// Show widget after first task instead of waiting for all
+						if ( ! firstTaskShown ) {
+							firstTaskShown = true;
+							setIsLoading( false );
+							dispatchGridResize( 100 );
+						}
 					}
 				}
 			);
 
 			if ( mounted ) {
 				setHasMoreToEvaluate( ! result.complete );
-				setIsLoading( false );
-				dispatchGridResize( 100 );
+				// Only set loading false here if no tasks were found at all
+				if ( ! firstTaskShown ) {
+					setIsLoading( false );
+					dispatchGridResize( 100 );
+				}
 			}
 		}
 
@@ -667,6 +688,7 @@ function SuggestedTasks( { config = {} } ) {
 				ref={ listRef }
 				tasks={ visibleTasks }
 				celebratingTaskIds={ celebratingTaskIds }
+				skeletonCount={ skeletonCount }
 				onComplete={ handleComplete }
 				onSnooze={ handleSnooze }
 				onDelete={ handleDelete }
