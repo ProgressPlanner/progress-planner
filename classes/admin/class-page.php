@@ -13,6 +13,49 @@ namespace Progress_Planner\Admin;
 class Page {
 
 	/**
+	 * REST API paths to preload for dashboard performance.
+	 *
+	 * These endpoints are fetched server-side and injected into the page
+	 * to eliminate initial API request waterfalls.
+	 *
+	 * @var string[]
+	 */
+	private const PRELOAD_PATHS = [
+		// Core dashboard data.
+		'/progress-planner/v1/activities',
+		'/progress-planner/v1/badge-stats',
+		'/wp/v2/settings',
+
+		// Tasks.
+		'/wp/v2/prpl_recommendations?status=publish&per_page=100&_embed=true',
+		'/wp/v2/prpl_recommendations_provider?per_page=100',
+		'/progress-planner/v1/page-settings',
+
+		// Data-collectors for task evaluation.
+		'/progress-planner/v1/data-collectors/hello_world_post_id',
+		'/progress-planner/v1/data-collectors/sample_page_id',
+		'/progress-planner/v1/data-collectors/inactive_plugins_count',
+		'/progress-planner/v1/data-collectors/uncategorized_category_id',
+		'/progress-planner/v1/data-collectors/post_author_count',
+		'/progress-planner/v1/data-collectors/last_published_post_id',
+		'/progress-planner/v1/data-collectors/archive_format_count',
+		'/progress-planner/v1/data-collectors/terms_without_posts',
+		'/progress-planner/v1/data-collectors/terms_without_description',
+		'/progress-planner/v1/data-collectors/post_tag_count',
+		'/progress-planner/v1/data-collectors/published_post_count',
+		'/progress-planner/v1/data-collectors/unpublished_content',
+		'/progress-planner/v1/data-collectors/seo_plugin_installed',
+		'/progress-planner/v1/data-collectors/php_version',
+		'/progress-planner/v1/data-collectors/wp_debug_status',
+		'/progress-planner/v1/data-collectors/old_posts_for_review',
+
+		// Popovers and misc.
+		'/wp/v2/updates',
+		'/progress-planner/v1/timezone-options',
+		'/progress-planner/v1/onboarding-wizard/config',
+	];
+
+	/**
 	 * Whether the branding inline styles have been added.
 	 *
 	 * @var boolean
@@ -482,8 +525,8 @@ class Page {
 	/**
 	 * Get REST API paths to preload for dashboard.
 	 *
-	 * These endpoints are fetched server-side and injected into the page
-	 * to eliminate initial API request waterfalls.
+	 * Combines static paths from PRELOAD_PATHS constant with dynamic paths
+	 * that depend on URL parameters.
 	 *
 	 * @return string[] Array of REST API paths to preload.
 	 */
@@ -498,13 +541,10 @@ class Page {
 			: 'monthly';
 		// phpcs:enable WordPress.Security.NonceVerification.Recommended
 
-		return [
-			'/progress-planner/v1/activities',
-			'/progress-planner/v1/badge-stats',
-			'/progress-planner/v1/widgets/activity-scores?range=' . \rawurlencode( $current_range ) . '&frequency=' . \rawurlencode( $current_frequency ),
-			'/wp/v2/prpl_recommendations?status=publish&per_page=10&_embed=true',
-			'/wp/v2/settings',
-		];
+		// Merge static paths with dynamic activity-scores path.
+		$preload_paths   = self::PRELOAD_PATHS;
+		$preload_paths[] = '/progress-planner/v1/widgets/activity-scores?range=' . \rawurlencode( $current_range ) . '&frequency=' . \rawurlencode( $current_frequency );
+		return $preload_paths;
 	}
 
 	/**
