@@ -79,7 +79,12 @@ jobs:
         run: |
           set -euxo pipefail
           ARTIFACT_URL="https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/${{ github.event.repository.name }}.zip"
-          PR_LABELS='${{ toJson(github.event.pull_request.labels) }}'
+
+          # Fetch PR labels from GitHub API
+          PR_LABELS_JSON=$(curl -s \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            "https://api.github.com/repos/${{ github.repository }}/pulls/${{ github.event.number }}/labels")
 
           # Use Node.js to parse, modify, and stringify the JSON
           BLUEPRINT=$(node -e "
@@ -92,22 +97,30 @@ jobs:
             );
 
             // Extract plugin slugs from PR labels that start with 'plugin:'
-            const prLabels = JSON.parse(process.env.PR_LABELS || '[]');
+            const prLabelsJson = process.env.PR_LABELS_JSON || '[]';
+            let prLabels = [];
+            try {
+              prLabels = JSON.parse(prLabelsJson);
+            } catch (e) {
+              console.error('Error parsing PR labels JSON:', e);
+              console.error('Raw JSON:', prLabelsJson);
+            }
+            console.log('PR Labels:', JSON.stringify(prLabels, null, 2));
+
             const pluginSlugs = prLabels
               .filter(label => label.name && label.name.startsWith('plugin:'))
               .map(label => label.name.replace(/^plugin:/, ''));
+            console.log('Plugin slugs:', JSON.stringify(pluginSlugs, null, 2));
 
             // Add plugin slugs to the plugins array (avoid duplicates)
             pluginSlugs.forEach(slug => {
-              console.log('slug', slug);
-              console.log('blueprint.plugins', blueprint.plugins);
               if (!blueprint.plugins.includes(slug)) {
                 blueprint.plugins.push(slug);
               }
             });
 
             console.log(JSON.stringify(blueprint));
-          " PR_LABELS="$PR_LABELS")
+          " PR_LABELS_JSON="$PR_LABELS_JSON")
 
           # Base64 encode the blueprint
           ENCODED_BLUEPRINT=$(echo -n "$BLUEPRINT" | base64 -w 0)
