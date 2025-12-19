@@ -24,6 +24,9 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\SEO_Plugin;
 use Progress_Planner\Suggested_Tasks\Data_Collector\PHP_Version;
 use Progress_Planner\Suggested_Tasks\Data_Collector\WP_Debug;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Old_Posts_For_Review;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Permalink_Has_Date;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Options;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Premium_Status;
 
 /**
  * Base data collector.
@@ -60,6 +63,7 @@ class Data_Collector_Manager {
 			new PHP_Version(),
 			new WP_Debug(),
 			new Old_Posts_For_Review(),
+			new Permalink_Has_Date(),
 		];
 
 		// Add the plugin integration.
@@ -81,6 +85,8 @@ class Data_Collector_Manager {
 		// Yoast SEO integration.
 		if ( \function_exists( 'YoastSEO' ) ) {
 			$this->data_collectors[] = new Yoast_Orphaned_Content();
+			$this->data_collectors[] = new Yoast_Options();
+			$this->data_collectors[] = new Yoast_Premium_Status();
 		}
 	}
 

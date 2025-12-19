@@ -129,6 +129,10 @@ class Data_Collectors extends Base {
 			'php_version'               => \Progress_Planner\Suggested_Tasks\Data_Collector\PHP_Version::class,
 			'wp_debug_status'           => \Progress_Planner\Suggested_Tasks\Data_Collector\WP_Debug::class,
 			'old_posts_for_review'      => \Progress_Planner\Suggested_Tasks\Data_Collector\Old_Posts_For_Review::class,
+			'permalink_has_date'        => \Progress_Planner\Suggested_Tasks\Data_Collector\Permalink_Has_Date::class,
+			'yoast_options'             => \Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Options::class,
+			'yoast_premium_status'      => \Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Premium_Status::class,
+			'yoast_orphaned_content'    => \Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content::class,
 		];
 
 		/**

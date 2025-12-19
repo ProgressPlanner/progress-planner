@@ -59,6 +59,18 @@ class Tasks_Manager {
 		'update-term-description',
 		'user',
 		'wp-debug-display',
+		// Yoast SEO integration tasks.
+		'yoast-author-archive',
+		'yoast-date-archive',
+		'yoast-format-archive',
+		'yoast-media-pages',
+		'yoast-crawl-settings-emoji-scripts',
+		'yoast-crawl-settings-feed-authors',
+		'yoast-crawl-settings-feed-global-comments',
+		'yoast-organization-logo',
+		'yoast-cornerstone-workout',
+		'yoast-orphaned-content-workout',
+		'yoast-fix-orphaned-content',
 	];
 
 	/**

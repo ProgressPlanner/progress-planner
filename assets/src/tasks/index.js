@@ -45,3 +45,6 @@ import './ReduceAutoloadedOptionsTask';
 
 // User tasks - user-created todo items
 import './UserTask';
+
+// Yoast SEO integration tasks
+import './yoast';
