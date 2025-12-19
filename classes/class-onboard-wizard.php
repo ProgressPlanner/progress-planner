@@ -97,23 +97,10 @@ class Onboard_Wizard {
 		$tasks = [];
 
 		foreach ( $onboarding_tasks as $task_id ) {
-			$task          = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
-			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id );
+			$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
-			// If there is no task, create it.
-			if ( ! $task && $task_provider ) {
-				$task_data = $task_provider->get_task_details();
-
-				// Task will not be inserted if it already exists.
-				\progress_planner()->get_suggested_tasks_db()->add( $task_data );
-
-				// Now get the task.
-				$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
-			}
-
-			// Safety check: Skip if task could not be created or retrieved.
+			// Tasks are created by React. Skip if task doesn't exist yet.
 			if ( empty( $task ) ) {
-				\error_log( 'Onboarding: Could not retrieve or create task: ' . $task_id ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 				continue;
 			}
 
@@ -123,7 +110,7 @@ class Onboard_Wizard {
 				'url'          => $task[0]->url ?? '',
 				'provider_id'  => $task[0]->get_provider_id(),
 				'points'       => $task[0]->points ?? 0,
-				'action_label' => $task_provider ? $task_provider->get_task_action_label() : \esc_html__( 'Do it', 'progress-planner' ),
+				'action_label' => \esc_html__( 'Do it', 'progress-planner' ),
 			];
 
 			// Add task specific data.
@@ -361,24 +348,13 @@ class Onboard_Wizard {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
 		}
 
-		// To get the provider and complete the task, we need to use the provider.
-		$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task->get_provider_id() );
-		if ( ! $provider ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Provider not found.', 'progress-planner' ) ] );
-		}
-
-		// Complete the task.
-		$task_completed = $provider->complete_task( $form_values, $task_id );
-
-		// It will skip the celebration and set the task's post status to trash.
+		// Mark the task as completed (skips celebration and sets post status to trash).
 		$task_post_marked_as_completed = \progress_planner()->get_suggested_tasks()->mark_task_as_completed( $task_id, null, true );
 
-		if ( ! $task_completed || ! $task_post_marked_as_completed ) {
-			\error_log( 'Task not completed: ' . $task_id ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
+		if ( ! $task_post_marked_as_completed ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not completed.', 'progress-planner' ) ] );
 		}
 
-		\error_log( 'Task completed: ' . $task_id ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Task completed.', 'progress-planner' ) ] );
 	}
 

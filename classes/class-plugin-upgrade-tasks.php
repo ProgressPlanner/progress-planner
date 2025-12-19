@@ -23,7 +23,7 @@ class Plugin_Upgrade_Tasks {
 		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_updated' ], 10 );
 
 		// Check if the plugin was upgraded or new plugin was activated.
-		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 100 ); // We need to run this after the Tasks_Manager::init() is called.
+		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 100 );
 
 		// Add the action to add the upgrade tasks popover.
 		\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_upgrade_tasks_popover' ] );
@@ -143,26 +143,9 @@ class Plugin_Upgrade_Tasks {
 	public function get_newly_added_task_providers() {
 		static $newly_added_task_providers;
 
-		if ( ! $this->should_show_upgrade_popover() ) {
-			return [];
-		}
-
-		if ( null === $newly_added_task_providers ) {
-			$task_provider_ids = $this->get_upgrade_popover_task_provider_ids();
-
-			$task_providers = [];
-
-			foreach ( $task_provider_ids as $task_provider_id ) {
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
-				if ( $task_provider ) { // @phpstan-ignore-line
-					$task_providers[] = $task_provider;
-				}
-			}
-
-			$newly_added_task_providers = $task_providers;
-		}
-
-		return $newly_added_task_providers;
+		// Task providers are now handled by React, so we don't have PHP provider objects.
+		// Return empty array since upgrade popovers are no longer needed.
+		return [];
 	}
 
 	/**

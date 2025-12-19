@@ -30,11 +30,11 @@ class Plugin_Migration_Helpers {
 
 			// Check if the task ID ends with a '-12345' or not, if not that would be mostly one time tasks.
 			if ( $last_pos === false || ! \preg_match( '/-\d+$/', $task_id ) ) {
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_id );
+				// One-time task - task_id is the provider_id.
 				return new Task(
 					[
 						'task_id'     => $task_id,
-						'provider_id' => $task_provider ? $task_provider->get_provider_id() : '',
+						'provider_id' => $task_id,
 					]
 				);
 			}
@@ -47,12 +47,10 @@ class Plugin_Migration_Helpers {
 				$task_provider_id = 'create-post';
 			}
 
-			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_provider_id );
-
 			return new Task(
 				[
 					'task_id'     => $task_id,
-					'provider_id' => $task_provider ? $task_provider->get_provider_id() : '',
+					'provider_id' => $task_provider_id,
 					'date'        => \substr( $task_id, $last_pos + 1 ),
 				]
 			);
