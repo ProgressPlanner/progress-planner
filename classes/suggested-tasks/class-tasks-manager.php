@@ -71,6 +71,13 @@ class Tasks_Manager {
 		'yoast-cornerstone-workout',
 		'yoast-orphaned-content-workout',
 		'yoast-fix-orphaned-content',
+		// AIOSEO integration tasks.
+		'aioseo-organization-logo',
+		'aioseo-author-archive',
+		'aioseo-date-archive',
+		'aioseo-media-pages',
+		'aioseo-crawl-settings-feed-authors',
+		'aioseo-crawl-settings-feed-comments',
 	];
 
 	/**

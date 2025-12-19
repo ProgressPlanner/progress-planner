@@ -133,6 +133,7 @@ class Data_Collectors extends Base {
 			'yoast_options'             => \Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Options::class,
 			'yoast_premium_status'      => \Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Premium_Status::class,
 			'yoast_orphaned_content'    => \Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content::class,
+			'aioseo_options'            => \Progress_Planner\Suggested_Tasks\Data_Collector\AIOSEO_Options::class,
 		];
 
 		/**

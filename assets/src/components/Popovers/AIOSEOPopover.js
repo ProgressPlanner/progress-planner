@@ -36,8 +36,9 @@ export default function AIOSEOPopover( { task, onSubmit, onClose } ) {
 				// Get config from POPOVER_CONFIG
 				const configs = {
 					'aioseo-author-archive': {
-						setting: 'aioseo_options_search_appearance',
+						setting: 'aioseo_options',
 						settingPath: JSON.stringify( [
+							'searchAppearance',
 							'archives',
 							'author',
 							'show',
@@ -45,8 +46,9 @@ export default function AIOSEOPopover( { task, onSubmit, onClose } ) {
 						settingCallbackValue: () => false,
 					},
 					'aioseo-date-archive': {
-						setting: 'aioseo_options_search_appearance',
+						setting: 'aioseo_options',
 						settingPath: JSON.stringify( [
+							'searchAppearance',
 							'archives',
 							'date',
 							'show',
@@ -54,35 +56,77 @@ export default function AIOSEOPopover( { task, onSubmit, onClose } ) {
 						settingCallbackValue: () => false,
 					},
 					'aioseo-media-pages': {
-						setting: 'aioseo_options_search_appearance',
+						setting: 'aioseo_options_dynamic',
 						settingPath: JSON.stringify( [
+							'searchAppearance',
 							'postTypes',
 							'attachment',
-							'show',
+							'redirectAttachmentUrls',
+						] ),
+						settingCallbackValue: () => 'attachment',
+					},
+					'aioseo-crawl-settings-feed-authors': {
+						setting: 'aioseo_options',
+						settingPath: JSON.stringify( [
+							'searchAppearance',
+							'advanced',
+							'crawlCleanup',
+							'feeds',
+							'authors',
 						] ),
 						settingCallbackValue: () => false,
 					},
-					'aioseo-crawl-settings-feed-authors': {
-						setting: 'aioseo_options_rss_content',
-						settingPath: JSON.stringify( [ 'authorFeed' ] ),
-						settingCallbackValue: () => false,
-					},
 					'aioseo-crawl-settings-feed-comments': {
-						setting: 'aioseo_options_rss_content',
-						settingPath: JSON.stringify( [ 'commentFeed' ] ),
-						settingCallbackValue: () => false,
+						// This task needs to update TWO settings.
+						multiUpdate: true,
+						updates: [
+							{
+								setting: 'aioseo_options',
+								settingPath: JSON.stringify( [
+									'searchAppearance',
+									'advanced',
+									'crawlCleanup',
+									'feeds',
+									'globalComments',
+								] ),
+								value: false,
+							},
+							{
+								setting: 'aioseo_options',
+								settingPath: JSON.stringify( [
+									'searchAppearance',
+									'advanced',
+									'crawlCleanup',
+									'feeds',
+									'postComments',
+								] ),
+								value: false,
+							},
+						],
 					},
 				};
 
 				const config = configs[ taskId ];
 				if ( config ) {
-					await submitPluginSettings( {
-						setting: config.setting,
-						settingPath: config.settingPath,
-						popoverId,
-						settingCallbackValue: config.settingCallbackValue,
-						value: config.settingCallbackValue(),
-					} );
+					if ( config.multiUpdate && config.updates ) {
+						// Handle multi-update case (e.g., Feed Comments).
+						for ( const update of config.updates ) {
+							await submitPluginSettings( {
+								setting: update.setting,
+								settingPath: update.settingPath,
+								popoverId,
+								value: update.value,
+							} );
+						}
+					} else {
+						await submitPluginSettings( {
+							setting: config.setting,
+							settingPath: config.settingPath,
+							popoverId,
+							settingCallbackValue: config.settingCallbackValue,
+							value: config.settingCallbackValue(),
+						} );
+					}
 				}
 
 				if ( onSubmit ) {

@@ -27,6 +27,7 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Old_Posts_For_Review;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Permalink_Has_Date;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Options;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Premium_Status;
+use Progress_Planner\Suggested_Tasks\Data_Collector\AIOSEO_Options;
 
 /**
  * Base data collector.
@@ -87,6 +88,11 @@ class Data_Collector_Manager {
 			$this->data_collectors[] = new Yoast_Orphaned_Content();
 			$this->data_collectors[] = new Yoast_Options();
 			$this->data_collectors[] = new Yoast_Premium_Status();
+		}
+
+		// AIOSEO integration.
+		if ( \function_exists( 'aioseo' ) ) {
+			$this->data_collectors[] = new AIOSEO_Options();
 		}
 	}
 

@@ -48,3 +48,6 @@ import './UserTask';
 
 // Yoast SEO integration tasks
 import './yoast';
+
+// AIOSEO integration tasks
+import './aioseo';
