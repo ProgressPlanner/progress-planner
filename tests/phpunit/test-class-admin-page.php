@@ -271,13 +271,13 @@ class Admin_Page_Test extends \WP_UnitTestCase {
 		$wp_scripts = new \WP_Scripts();
 
 		// Get initial script count.
-		$initial_count = count( $wp_scripts->queue );
+		$initial_count = \count( $wp_scripts->queue );
 
 		// Call enqueue_assets with different hook.
 		$this->page_instance->enqueue_assets( 'index.php' );
 
 		// No new scripts should be enqueued.
-		$this->assertLessThanOrEqual( $initial_count + 1, count( $wp_scripts->queue ) );
+		$this->assertLessThanOrEqual( $initial_count + 1, \count( $wp_scripts->queue ) );
 	}
 
 	/**

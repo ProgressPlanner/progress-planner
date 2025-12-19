@@ -32,7 +32,7 @@ if ( ! \in_array( $prpl_locale, $prpl_languages, true ) ) {
 
 <div class="prpl-onboarding-task">
 	<h3 class="prpl-onboarding-task-title">
-		<?php echo esc_html( $task['title'] ); ?>
+		<?php echo \esc_html( $task['title'] ); ?>
 	</h3>
 	<p>
 		Venenatis parturient suspendisse massa cursus litora dapibus auctor, et vestibulum blandit condimentum quis ultrices sagittis aliquam.
@@ -53,7 +53,7 @@ if ( ! \in_array( $prpl_locale, $prpl_languages, true ) ) {
 				]
 			);
 			?>
-		<button type="button" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-secondary">
+		<button type="button" data-task-id="<?php echo \esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-secondary">
 			<?php \esc_html_e( 'Set the locale', 'progress-planner' ); ?>
 		</button>
 	</form>

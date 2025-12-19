@@ -154,7 +154,7 @@ class Wizard_Config extends Base {
 				'next'                  => \esc_html__( 'Next', 'progress-planner' ),
 				'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),
 				/* translators: %s: Progress Planner name. */
-				'privacyPolicyError'    => sprintf( \esc_html__( 'You need to agree with the privacy policy to use the %s plugin.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) ),
+				'privacyPolicyError'    => \sprintf( \esc_html__( 'You need to agree with the privacy policy to use the %s plugin.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) ),
 				'dashboard'             => \esc_html__( 'Take me to the dashboard', 'progress-planner' ),
 				'backToRecommendations' => \esc_html__( 'Back to recommendations', 'progress-planner' ),
 			],

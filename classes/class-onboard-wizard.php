@@ -135,13 +135,13 @@ class Onboard_Wizard {
 				'template_file_name' => 'welcome',
 				'template_id'        => 'onboarding-step-welcome',
 				/* translators: %s: Progress Planner name. */
-				'title'              => sprintf( esc_html__( 'Welcome to %s', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) ),
+				'title'              => \sprintf( \esc_html__( 'Welcome to %s', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) ),
 			],
 			[
 				'script_file_name'   => 'WhatsWhatStep',
 				'template_file_name' => 'whats-what',
 				'template_id'        => 'onboarding-step-whats-what',
-				'title'              => esc_html__( 'What\'s what?', 'progress-planner' ),
+				'title'              => \esc_html__( 'What\'s what?', 'progress-planner' ),
 			],
 		];
 
@@ -152,7 +152,7 @@ class Onboard_Wizard {
 				'template_file_name' => 'first-task',
 				'template_data'      => ! $was_first_task_completed ? [ 'task' => \array_shift( $tasks ) ] : [],
 				'template_id'        => 'onboarding-step-first-task',
-				'title'              => esc_html__( 'Complete your first task!', 'progress-planner' ),
+				'title'              => \esc_html__( 'Complete your first task!', 'progress-planner' ),
 			];
 		}
 
@@ -177,21 +177,21 @@ class Onboard_Wizard {
 			'template_file_name' => 'badges',
 			'template_id'        => 'onboarding-step-badges',
 			'template_data'      => $badge_data,
-			'title'              => esc_html__( 'Our badges are waiting for you', 'progress-planner' ),
+			'title'              => \esc_html__( 'Our badges are waiting for you', 'progress-planner' ),
 		];
 
 		$this->steps[] = [
 			'script_file_name'   => 'EmailFrequencyStep',
 			'template_file_name' => 'email-frequency',
 			'template_id'        => 'onboarding-step-email-frequency',
-			'title'              => esc_html__( 'Email Frequency', 'progress-planner' ),
+			'title'              => \esc_html__( 'Email Frequency', 'progress-planner' ),
 		];
 
 		$this->steps[] = [
 			'script_file_name'   => 'SettingsStep',
 			'template_file_name' => 'settings',
 			'template_id'        => 'onboarding-step-settings',
-			'title'              => esc_html__( 'Settings', 'progress-planner' ),
+			'title'              => \esc_html__( 'Settings', 'progress-planner' ),
 		];
 
 		// Add more-tasks step if there are remaining tasks.
@@ -203,7 +203,7 @@ class Onboard_Wizard {
 				'template_file_name' => 'more-tasks',
 				'template_data'      => [ 'tasks' => $tasks_array ],
 				'template_id'        => 'onboarding-step-more-tasks',
-				'title'              => esc_html__( 'Finish onboarding!', 'progress-planner' ),
+				'title'              => \esc_html__( 'Finish onboarding!', 'progress-planner' ),
 			];
 		}
 	}
@@ -225,7 +225,7 @@ class Onboard_Wizard {
 			if ( empty( $files['file'] ) ) {
 				return new \WP_Error(
 					'rest_no_file',
-					__( 'No file uploaded.', 'progress-planner' ),
+					\__( 'No file uploaded.', 'progress-planner' ),
 					[ 'status' => 400 ]
 				);
 			}
@@ -233,10 +233,10 @@ class Onboard_Wizard {
 			$file = $files['file'];
 
 			// Check MIME type.
-			if ( strpos( $file['type'], 'image/' ) !== 0 ) {
+			if ( \strpos( $file['type'], 'image/' ) !== 0 ) {
 				return new \WP_Error(
 					'rest_invalid_file_type',
-					__( 'Only images are allowed for this upload.', 'progress-planner' ),
+					\__( 'Only images are allowed for this upload.', 'progress-planner' ),
 					[ 'status' => 400 ]
 				);
 			}
