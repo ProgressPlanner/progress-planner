@@ -9,8 +9,6 @@
 
 namespace Progress_Planner\Rest;
 
-use Progress_Planner\Suggested_Tasks\Providers\Tasks_Interactive;
-
 /**
  * Popover Actions REST API controller.
  */
