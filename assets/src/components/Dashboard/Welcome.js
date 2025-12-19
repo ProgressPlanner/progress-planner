@@ -659,7 +659,7 @@ export default function Welcome( { config } ) {
 					<img
 						src={ `${
 							config.baseUrl || ''
-						}/assets/images/image_onboaring_block.png` }
+						}/assets/images/image_onboarding_block.png` }
 						alt=""
 						className="onboarding"
 						style={ {

@@ -113,7 +113,7 @@ describe( 'Welcome', () => {
 
 			const img = container.querySelector( 'img.onboarding' );
 			expect( img ).toBeInTheDocument();
-			expect( img.src ).toContain( 'image_onboaring_block.png' );
+			expect( img.src ).toContain( 'image_onboarding_block.png' );
 		} );
 	} );
 

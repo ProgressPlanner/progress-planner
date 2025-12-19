@@ -7,41 +7,11 @@
 
 namespace Progress_Planner\Suggested_Tasks;
 
-use Progress_Planner\Suggested_Tasks\Providers\Core_Update;
-use Progress_Planner\Suggested_Tasks\Providers\Content_Create;
-use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
-use Progress_Planner\Suggested_Tasks\Providers\Blog_Description;
-use Progress_Planner\Suggested_Tasks\Providers\Debug_Display;
-use Progress_Planner\Suggested_Tasks\Providers\Disable_Comments;
-use Progress_Planner\Suggested_Tasks\Providers\Disable_Comment_Pagination;
-use Progress_Planner\Suggested_Tasks\Providers\Sample_Page;
-use Progress_Planner\Suggested_Tasks\Providers\Hello_World;
-use Progress_Planner\Suggested_Tasks\Providers\Remove_Inactive_Plugins;
-use Progress_Planner\Suggested_Tasks\Providers\Site_Icon;
-use Progress_Planner\Suggested_Tasks\Providers\Rename_Uncategorized_Category;
-use Progress_Planner\Suggested_Tasks\Providers\Permalink_Structure;
-use Progress_Planner\Suggested_Tasks\Providers\Php_Version;
-use Progress_Planner\Suggested_Tasks\Providers\Search_Engine_Visibility;
 use Progress_Planner\Suggested_Tasks\Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\AIOSEO\Add_AIOSEO_Providers;
 use Progress_Planner\Suggested_Tasks\Providers\User as User_Tasks;
-use Progress_Planner\Suggested_Tasks\Providers\Email_Sending;
-use Progress_Planner\Suggested_Tasks\Providers\Set_Valuable_Post_Types;
-use Progress_Planner\Suggested_Tasks\Providers\Select_Locale;
-use Progress_Planner\Suggested_Tasks\Providers\Fewer_Tags;
-use Progress_Planner\Suggested_Tasks\Providers\Remove_Terms_Without_Posts;
-use Progress_Planner\Suggested_Tasks\Providers\Update_Term_Description;
-use Progress_Planner\Suggested_Tasks\Providers\Reduce_Autoloaded_Options;
-use Progress_Planner\Suggested_Tasks\Providers\Unpublished_Content;
 use Progress_Planner\Suggested_Tasks\Providers\Collaborator;
-use Progress_Planner\Suggested_Tasks\Providers\Select_Timezone;
-use Progress_Planner\Suggested_Tasks\Providers\Set_Date_Format;
-use Progress_Planner\Suggested_Tasks\Providers\SEO_Plugin;
-use Progress_Planner\Suggested_Tasks\Providers\Improve_Pdf_Handling;
-use Progress_Planner\Suggested_Tasks\Providers\Set_Page_About;
-use Progress_Planner\Suggested_Tasks\Providers\Set_Page_FAQ;
-use Progress_Planner\Suggested_Tasks\Providers\Set_Page_Contact;
 
 /**
  * Tasks_Manager class.
@@ -103,39 +73,10 @@ class Tasks_Manager {
 	 */
 	public function __construct() {
 		// Instantiate task providers.
+		// Note: Most providers have been migrated to React (see REACT_PROVIDERS constant).
 		$this->task_providers = [
-			// Content_Create() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Content_Review() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Core_Update() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Blog_Description() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Debug_Display() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Disable_Comments() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Disable_Comment_Pagination() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Sample_Page() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Hello_World() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Remove_Inactive_Plugins() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Site_Icon() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Rename_Uncategorized_Category() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Permalink_Structure() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Php_Version() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Search_Engine_Visibility() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Reduce_Autoloaded_Options() - Migrated to React, registered in assets/src/tasks/index.js.
 			new User_Tasks(),
-			// Email_Sending() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Set_Valuable_Post_Types() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Select_Locale() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Remove_Terms_Without_Posts() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Fewer_Tags() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Update_Term_Description() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Unpublished_Content() - Migrated to React, registered in assets/src/tasks/index.js.
 			new Collaborator(),
-			// Select_Timezone() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Set_Date_Format() - Migrated to React, registered in assets/src/tasks/index.js.
-			// SEO_Plugin() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Improve_Pdf_Handling() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Set_Page_About() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Set_Page_FAQ() - Migrated to React, registered in assets/src/tasks/index.js.
-			// Set_Page_Contact() - Migrated to React, registered in assets/src/tasks/index.js.
 		];
 
 		// Add the plugin integration.
