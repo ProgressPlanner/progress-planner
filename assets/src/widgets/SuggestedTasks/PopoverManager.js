@@ -10,11 +10,12 @@
  * @return {JSX.Element} The popover manager component.
  */
 
-import { useState, useCallback } from '@wordpress/element';
+import { useState, useCallback, Suspense } from '@wordpress/element';
 import { usePopoverHooks } from '../../hooks/usePopoverHooks';
 import { useCustomSubmitHandlers } from '../../hooks/useCustomSubmitHandlers';
 import { resolveTaskId } from '../../utils/taskIdResolver';
 import { getPopoverComponent } from '../../components/Popovers/popoverRegistry';
+import PopoverLoadingState from '../../components/Popovers/PopoverLoadingState';
 
 export default function PopoverManager( { onComplete, config = {} } ) {
 	const [ openPopoverId, setOpenPopoverId ] = useState( null );
@@ -120,13 +121,16 @@ export default function PopoverManager( { onComplete, config = {} } ) {
 		return null;
 	}
 
+	// Wrap in Suspense for lazy-loaded popover components
 	return (
-		<PopoverComponent
-			task={ openTask }
-			onSubmit={ handlePopoverSubmit }
-			onClose={ () => handlePopoverClose( openPopoverId ) }
-			onCustomSubmit={ handleCustomSubmit }
-			config={ config }
-		/>
+		<Suspense fallback={ <PopoverLoadingState /> }>
+			<PopoverComponent
+				task={ openTask }
+				onSubmit={ handlePopoverSubmit }
+				onClose={ () => handlePopoverClose( openPopoverId ) }
+				onCustomSubmit={ handleCustomSubmit }
+				config={ config }
+			/>
+		</Suspense>
 	);
 }

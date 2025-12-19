@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
 import { resolveTaskId } from '../../utils/taskIdResolver';
 
@@ -33,27 +34,63 @@ export default function UpgradeTasksPopover( { task, onClose } ) {
 	const [ taskProviders, setTaskProviders ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( true );
 	const [ totalPoints, setTotalPoints ] = useState( 0 );
+	const [ config, setConfig ] = useState( {
+		brandingId: 0,
+		remoteServerUrl: 'https://progressplanner.com',
+		placeholderSvg: '',
+		badgeId: '',
+	} );
 
 	/**
-	 * Load task providers from localized data.
-	 * The data should be provided by PHP via wp_localize_script.
+	 * Load task providers from REST API.
 	 */
 	useEffect( () => {
-		// Get task providers from window object (localized by PHP)
-		const providers =
-			window.prplUpgradeTasks?.taskProviders ||
-			window.prplUpgradeTasksData?.taskProviders ||
-			[];
+		let isMounted = true;
 
-		setTaskProviders( providers );
-		setIsLoading( false );
+		apiFetch( {
+			path: '/progress-planner/v1/popover/upgrade-tasks-config',
+		} )
+			.then( ( response ) => {
+				if ( ! isMounted ) {
+					return;
+				}
 
-		// Calculate total points
-		const points = providers.reduce(
-			( sum, provider ) => sum + ( provider.points || 0 ),
-			0
-		);
-		setTotalPoints( points );
+				const providers = response.taskProviders || [];
+				setTaskProviders( providers );
+
+				// Calculate total points
+				const points = providers.reduce(
+					( sum, provider ) => sum + ( provider.points || 0 ),
+					0
+				);
+				setTotalPoints( points );
+
+				// Set config data
+				setConfig( {
+					brandingId: response.brandingId || 0,
+					remoteServerUrl:
+						response.remoteServerUrl ||
+						'https://progressplanner.com',
+					placeholderSvg: response.placeholderSvg || '',
+					badgeId: response.badgeId || '',
+				} );
+			} )
+			.catch( () => {
+				if ( ! isMounted ) {
+					return;
+				}
+				// Fallback to empty on error
+				setTaskProviders( [] );
+			} )
+			.finally( () => {
+				if ( isMounted ) {
+					setIsLoading( false );
+				}
+			} );
+
+		return () => {
+			isMounted = false;
+		};
 	}, [] );
 
 	/**
@@ -67,28 +104,8 @@ export default function UpgradeTasksPopover( { task, onClose } ) {
 		}
 	}, [ onClose ] );
 
-	/**
-	 * Get monthly badge ID.
-	 *
-	 * @return {string} Badge ID.
-	 */
-	const getMonthlyBadgeId = () => {
-		const now = new Date();
-		const year = now.getFullYear();
-		const month = now.getMonth() + 1;
-		return `monthly-${ year }-m${ month }`;
-	};
-
-	const badgeId = getMonthlyBadgeId();
-	const brandingId =
-		window.prplUpgradeTasks?.brandingId ||
-		window.prplUpgradeTasksData?.brandingId ||
-		0;
-	const remoteServerUrl =
-		window.prplUpgradeTasks?.remoteServerUrl ||
-		window.prplUpgradeTasksData?.remoteServerUrl ||
-		'https://progressplanner.com';
-	const badgeImageUrl = `${ remoteServerUrl }/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ badgeId }&branding_id=${ brandingId }`;
+	// Build badge image URL from config
+	const badgeImageUrl = `${ config.remoteServerUrl }/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=${ config.badgeId }&branding_id=${ config.brandingId }`;
 
 	const title = __(
 		"We've added new recommendations to the Progress Planner plugin",
@@ -162,7 +179,7 @@ export default function UpgradeTasksPopover( { task, onClose } ) {
 							} ) }
 						</ul>
 
-						{ badgeId && (
+						{ config.badgeId && (
 							<div className="prpl-onboarding-tasks-footer">
 								<span className="prpl-onboarding-tasks-montly-badge">
 									<span className="prpl-onboarding-tasks-montly-badge-image">
@@ -175,11 +192,7 @@ export default function UpgradeTasksPopover( { task, onClose } ) {
 											onError={ ( e ) => {
 												e.target.onerror = null;
 												e.target.src =
-													window.prplUpgradeTasks
-														?.placeholderSvg ||
-													window.prplUpgradeTasksData
-														?.placeholderSvg ||
-													'';
+													config.placeholderSvg || '';
 											} }
 										/>
 									</span>

@@ -27,8 +27,8 @@ class Add_Yoast_Providers {
 	 * @var array<string, array{focus_tasks: array, relevance_check: string|null, relevance_threshold: int}>
 	 */
 	private const FOCUS_TASKS_CONFIG = [
-		'yoast-author-archive'                    => [
-			'focus_tasks'        => [
+		'yoast-author-archive'                      => [
+			'focus_tasks'         => [
 				[
 					'iconElement'  => '.yst-toggle-field__header',
 					'valueElement' => [
@@ -39,11 +39,11 @@ class Add_Yoast_Providers {
 					],
 				],
 			],
-			'relevance_check'    => 'post_author_count',
+			'relevance_check'     => 'post_author_count',
 			'relevance_threshold' => 1,
 		],
-		'yoast-date-archive'                      => [
-			'focus_tasks'        => [
+		'yoast-date-archive'                        => [
+			'focus_tasks'         => [
 				[
 					'iconElement'  => '.yst-toggle-field__header',
 					'valueElement' => [
@@ -54,11 +54,11 @@ class Add_Yoast_Providers {
 					],
 				],
 			],
-			'relevance_check'    => 'permalink_has_date',
+			'relevance_check'     => 'permalink_has_date',
 			'relevance_threshold' => 0, // 0 means permalink should NOT have date.
 		],
-		'yoast-format-archive'                    => [
-			'focus_tasks'        => [
+		'yoast-format-archive'                      => [
+			'focus_tasks'         => [
 				[
 					'iconElement'  => '.yst-toggle-field__header',
 					'valueElement' => [
@@ -69,11 +69,11 @@ class Add_Yoast_Providers {
 					],
 				],
 			],
-			'relevance_check'    => 'archive_format_count',
+			'relevance_check'     => 'archive_format_count',
 			'relevance_threshold' => 3,
 		],
-		'yoast-crawl-settings-emoji-scripts'      => [
-			'focus_tasks'        => [
+		'yoast-crawl-settings-emoji-scripts'        => [
+			'focus_tasks'         => [
 				[
 					'iconElement'  => '.yst-toggle-field__header',
 					'valueElement' => [
@@ -84,11 +84,11 @@ class Add_Yoast_Providers {
 					],
 				],
 			],
-			'relevance_check'    => null, // Always relevant.
+			'relevance_check'     => null, // Always relevant.
 			'relevance_threshold' => 0,
 		],
-		'yoast-crawl-settings-feed-authors'       => [
-			'focus_tasks'        => [
+		'yoast-crawl-settings-feed-authors'         => [
+			'focus_tasks'         => [
 				[
 					'iconElement'  => '.yst-toggle-field__header',
 					'valueElement' => [
@@ -99,11 +99,11 @@ class Add_Yoast_Providers {
 					],
 				],
 			],
-			'relevance_check'    => 'post_author_count',
+			'relevance_check'     => 'post_author_count',
 			'relevance_threshold' => 1,
 		],
 		'yoast-crawl-settings-feed-global-comments' => [
-			'focus_tasks'        => [
+			'focus_tasks'         => [
 				[
 					'iconElement'  => '.yst-toggle-field__header',
 					'valueElement' => [
@@ -114,11 +114,11 @@ class Add_Yoast_Providers {
 					],
 				],
 			],
-			'relevance_check'    => null, // Always relevant.
+			'relevance_check'     => null, // Always relevant.
 			'relevance_threshold' => 0,
 		],
-		'yoast-media-pages'                       => [
-			'focus_tasks'        => [
+		'yoast-media-pages'                         => [
+			'focus_tasks'         => [
 				[
 					'iconElement'  => '.yst-toggle-field__header',
 					'valueElement' => [
@@ -129,11 +129,11 @@ class Add_Yoast_Providers {
 					],
 				],
 			],
-			'relevance_check'    => null, // Always relevant.
+			'relevance_check'     => null, // Always relevant.
 			'relevance_threshold' => 0,
 		],
-		'yoast-organization-logo'                 => [
-			'focus_tasks'        => [
+		'yoast-organization-logo'                   => [
+			'focus_tasks'         => [
 				[
 					'iconElement'  => 'legend.yst-label',
 					'valueElement' => [
@@ -153,7 +153,7 @@ class Add_Yoast_Providers {
 					],
 				],
 			],
-			'relevance_check'    => null, // Always relevant (complex check handled by React).
+			'relevance_check'     => null, // Always relevant (complex check handled by React).
 			'relevance_threshold' => 0,
 		],
 	];

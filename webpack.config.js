@@ -18,6 +18,8 @@ module.exports = {
 	output: {
 		path: path.resolve( __dirname, 'build' ),
 		filename: '[name].js',
+		chunkFilename: '[name].chunk.js', // Dynamic chunks for React.lazy()
+		publicPath: 'auto', // Auto-detect URL path for dynamic imports
 	},
 	optimization: {
 		...defaultConfig.optimization,

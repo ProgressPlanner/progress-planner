@@ -200,68 +200,10 @@ class Plugin_Upgrade_Tasks {
 	public function add_upgrade_tasks_popover() {
 		if ( $this->should_show_upgrade_popover() ) {
 			// Popover is now handled by React via PopoverManager.
-			// Localize data for React component.
-			$this->localize_upgrade_tasks_data();
-
+			// Data is fetched via REST API when popover opens.
 			// Trigger popover via WordPress hook after a short delay to ensure React is loaded.
 			\add_action( 'admin_footer', [ $this, 'trigger_upgrade_tasks_popover' ], 999 );
 		}
-	}
-
-	/**
-	 * Localize upgrade tasks data for React component.
-	 *
-	 * @return void
-	 */
-	protected function localize_upgrade_tasks_data() {
-		$task_providers = $this->get_newly_added_task_providers();
-
-		// Build task providers data for React.
-		$task_providers_data = [];
-		foreach ( $task_providers as $task_provider ) {
-			$task_data = [
-				'task_id'     => $task_provider->get_task_id(),
-				'provider_id' => $task_provider->get_provider_id(),
-			];
-
-			// Get task details.
-			$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_data['task_id'] );
-
-			// If task doesn't exist, add it.
-			if ( ! $task ) {
-				$task_post_id = \progress_planner()->get_suggested_tasks_db()->add( $task_provider->get_task_details( $task_data ) );
-				if ( $task_post_id ) {
-					$task = \progress_planner()->get_suggested_tasks_db()->get_post( $task_post_id );
-				}
-			}
-
-			if ( $task ) {
-				$task_completed = $task_provider->evaluate_task( $task_data['task_id'] );
-
-				$task_providers_data[] = [
-					'task_id'   => $task_data['task_id'],
-					'title'     => $task->post_title,
-					'points'    => $task->points ?? 0,
-					'completed' => $task_completed,
-				];
-			}
-		}
-
-		// Generate monthly badge ID.
-		$now      = new \DateTime();
-		$badge_id = 'monthly-' . $now->format( 'Y' ) . '-m' . $now->format( 'n' );
-
-		// Localize data for React component.
-		\wp_localize_script(
-			'progress-planner/dashboard',
-			'prplUpgradeTasks',
-			[
-				'taskProviders'   => $task_providers_data,
-				'brandingId'      => (int) \progress_planner()->get_ui__branding()->get_branding_id(),
-				'remoteServerUrl' => \progress_planner()->get_remote_server_root_url(),
-				'placeholderSvg'  => \progress_planner()->get_placeholder_svg(),
-			]
-		);
 	}
 
 	/**

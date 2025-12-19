@@ -26,6 +26,8 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Rest\Plugin_Installer get_rest__plugin_installer()
  * @method \Progress_Planner\Rest\Popover_Actions get_rest__popover_actions()
  * @method \Progress_Planner\Rest\Email_Test get_rest__email_test()
+ * @method \Progress_Planner\Rest\Email_Sending_Config get_rest__email_sending_config()
+ * @method \Progress_Planner\Rest\Upgrade_Tasks_Config get_rest__upgrade_tasks_config()
  * @method \Progress_Planner\Rest\Subscribe get_rest__subscribe()
  * @method \Progress_Planner\Rest\Timezone_Options get_rest__timezone_options()
  * @method \Progress_Planner\Rest\Data_Collectors get_rest__data_collectors()
@@ -137,6 +139,8 @@ class Base {
 		$this->get_rest__badge_stats();
 		$this->get_rest__popover_actions();
 		$this->get_rest__email_test();
+		$this->get_rest__email_sending_config();
+		$this->get_rest__upgrade_tasks_config();
 		$this->get_rest__subscribe();
 		$this->get_rest__timezone_options();
 		$this->get_rest__data_collectors();

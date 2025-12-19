@@ -1,1 +1,1 @@
-<?php return array('dependencies' => array('react', 'react-jsx-runtime', 'wp-api-fetch', 'wp-element', 'wp-hooks', 'wp-i18n'), 'version' => 'b733a8c0617ef19bd7ab', 'handle' => 'undefined-widget-suggested-tasks');
+<?php return array('dependencies' => array('react', 'react-jsx-runtime', 'wp-api-fetch', 'wp-element', 'wp-hooks', 'wp-i18n'), 'version' => 'ca04ebd72414c04f16c6', 'handle' => 'undefined-widget-suggested-tasks');

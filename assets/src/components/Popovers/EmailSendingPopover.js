@@ -32,45 +32,64 @@ export default function EmailSendingPopover( { task, onSubmit, onClose } ) {
 	const [ hasEmailOverride, setHasEmailOverride ] = useState( false );
 
 	/**
-	 * Load initial data.
+	 * Load initial data from REST API.
+	 * This effect runs once on mount to fetch configuration.
 	 */
 	useEffect( () => {
-		// Get current user email
+		// Track if component is still mounted
+		let isMounted = true;
+
+		// Fetch config from REST API (lazy-loaded when popover opens)
+		apiFetch( {
+			path: '/progress-planner/v1/popover/email-sending-config',
+		} )
+			.then( ( response ) => {
+				if ( ! isMounted ) {
+					return;
+				}
+				if ( response.email_subject ) {
+					setEmailSubject( response.email_subject );
+				}
+				if ( response.troubleshooting_guide_url ) {
+					setTroubleshootingGuideUrl(
+						response.troubleshooting_guide_url
+					);
+				}
+				if ( response.has_email_override !== undefined ) {
+					setHasEmailOverride( response.has_email_override );
+				}
+				if ( response.default_email ) {
+					// Only set default email if not already set by WP data store
+					setEmailAddress( ( prev ) =>
+						prev ? prev : response.default_email
+					);
+				}
+			} )
+			.catch( () => {
+				if ( ! isMounted ) {
+					return;
+				}
+				// Fallback to defaults on error
+				setEmailSubject(
+					__(
+						'Your Progress Planner test message!',
+						'progress-planner'
+					)
+				);
+			} );
+
+		// Also try to get current user email from WordPress data store
 		const currentUser = window.wp?.data
 			?.select( 'core' )
 			?.getCurrentUser?.();
 		if ( currentUser?.email ) {
 			setEmailAddress( currentUser.email );
-		} else if ( window.prplEmailSending?.default_email ) {
-			setEmailAddress( window.prplEmailSending.default_email );
 		}
 
-		// Get email subject and troubleshooting URL from localized data
-		// Note: This data should be provided by PHP via wp_localize_script
-		// The Email_Sending provider should localize prplEmailSending with:
-		// - email_subject
-		// - troubleshooting_guide_url
-		// - has_email_override (from is_there_sending_email_override())
-		if ( window.prplEmailSending ) {
-			setEmailSubject(
-				window.prplEmailSending.email_subject ||
-					__(
-						'Your Progress Planner test message!',
-						'progress-planner'
-					)
-			);
-			setTroubleshootingGuideUrl(
-				window.prplEmailSending.troubleshooting_guide_url || ''
-			);
-			setHasEmailOverride(
-				window.prplEmailSending.has_email_override || false
-			);
-		} else {
-			// Fallback if data not localized
-			setEmailSubject(
-				__( 'Your Progress Planner test message!', 'progress-planner' )
-			);
-		}
+		// Cleanup function
+		return () => {
+			isMounted = false;
+		};
 	}, [] );
 
 	/**

@@ -2,29 +2,84 @@
  * Popover Registry.
  *
  * Maps task IDs to their React popover components.
- * This centralizes popover component configuration.
+ * Uses React.lazy() for code splitting - each popover is loaded on-demand.
  */
 
-import BlogDescriptionPopover from './BlogDescriptionPopover';
-import DateFormatPopover from './DateFormatPopover';
-import TimezonePopover from './TimezonePopover';
-import PermalinkStructurePopover from './PermalinkStructurePopover';
-import SiteIconPopover from './SiteIconPopover';
-import LocalePopover from './LocalePopover';
-import DisableCommentsPopover from './DisableCommentsPopover';
-import YoastPopover from './YoastPopover';
-import AIOSEOPopover from './AIOSEOPopover';
-import CustomPopover from './CustomPopover';
-import EmailSendingPopover from './EmailSendingPopover';
-import ImprovePdfHandlingPopover from './ImprovePdfHandlingPopover';
-import BadgeStreakPopover from './BadgeStreakPopover';
-import SubscribeFormPopover from './SubscribeFormPopover';
-import UpgradeTasksPopover from './UpgradeTasksPopover';
+import { lazy } from '@wordpress/element';
+
+// Lazy-load all popover components for code splitting
+// webpackChunkName comments ensure descriptive filenames for chunks
+const BlogDescriptionPopover = lazy( () =>
+	import(
+		/* webpackChunkName: "BlogDescriptionPopover" */ './BlogDescriptionPopover'
+	)
+);
+const DateFormatPopover = lazy( () =>
+	import( /* webpackChunkName: "DateFormatPopover" */ './DateFormatPopover' )
+);
+const TimezonePopover = lazy( () =>
+	import( /* webpackChunkName: "TimezonePopover" */ './TimezonePopover' )
+);
+const PermalinkStructurePopover = lazy( () =>
+	import(
+		/* webpackChunkName: "PermalinkStructurePopover" */ './PermalinkStructurePopover'
+	)
+);
+const SiteIconPopover = lazy( () =>
+	import( /* webpackChunkName: "SiteIconPopover" */ './SiteIconPopover' )
+);
+const LocalePopover = lazy( () =>
+	import( /* webpackChunkName: "LocalePopover" */ './LocalePopover' )
+);
+const DisableCommentsPopover = lazy( () =>
+	import(
+		/* webpackChunkName: "DisableCommentsPopover" */ './DisableCommentsPopover'
+	)
+);
+const YoastPopover = lazy( () =>
+	import( /* webpackChunkName: "YoastPopover" */ './YoastPopover' )
+);
+const AIOSEOPopover = lazy( () =>
+	import( /* webpackChunkName: "AIOSEOPopover" */ './AIOSEOPopover' )
+);
+const CustomPopover = lazy( () =>
+	import( /* webpackChunkName: "CustomPopover" */ './CustomPopover' )
+);
+const EmailSendingPopover = lazy( () =>
+	import(
+		/* webpackChunkName: "EmailSendingPopover" */ './EmailSendingPopover'
+	)
+);
+const ImprovePdfHandlingPopover = lazy( () =>
+	import(
+		/* webpackChunkName: "ImprovePdfHandlingPopover" */ './ImprovePdfHandlingPopover'
+	)
+);
+const BadgeStreakPopover = lazy( () =>
+	import(
+		/* webpackChunkName: "BadgeStreakPopover" */ './BadgeStreakPopover'
+	)
+);
+const SubscribeFormPopover = lazy( () =>
+	import(
+		/* webpackChunkName: "SubscribeFormPopover" */ './SubscribeFormPopover'
+	)
+);
+const UpgradeTasksPopover = lazy( () =>
+	import(
+		/* webpackChunkName: "UpgradeTasksPopover" */ './UpgradeTasksPopover'
+	)
+);
+const MonthlyBadgesPopover = lazy( () =>
+	import(
+		/* webpackChunkName: "MonthlyBadgesPopover" */ './MonthlyBadgesPopover'
+	)
+);
 
 /**
  * Registry mapping task IDs to popover components.
  *
- * @type {Object<string, import('react').ComponentType>}
+ * @type {Object<string, import('react').LazyExoticComponent>}
  */
 export const POPOVER_REGISTRY = {
 	'core-blogdescription': BlogDescriptionPopover,
@@ -61,13 +116,14 @@ export const POPOVER_REGISTRY = {
 	'badge-streak': BadgeStreakPopover,
 	'subscribe-form': SubscribeFormPopover,
 	'upgrade-tasks': UpgradeTasksPopover,
+	'monthly-badges': MonthlyBadgesPopover,
 };
 
 /**
  * Get popover component for a task ID.
  *
  * @param {string} taskId The task ID.
- * @return {import('react').ComponentType|null} The popover component or null if not found.
+ * @return {import('react').LazyExoticComponent|null} The popover component or null if not found.
  */
 export function getPopoverComponent( taskId ) {
 	return POPOVER_REGISTRY[ taskId ] || null;
