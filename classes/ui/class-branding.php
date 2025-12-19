@@ -22,13 +22,6 @@ final class Branding {
 	];
 
 	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		// Widget filtering is now handled in React via widget registry.
-	}
-
-	/**
 	 * Get the branding ID.
 	 *
 	 * @return int

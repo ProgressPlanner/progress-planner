@@ -85,8 +85,6 @@
 #todo-list,
 #todo-list-completed {
 
-	> *:first-child .move-up,
-	> *:last-child .move-down,
 	> *:first-child .prpl-move-up,
 	> *:last-child .prpl-move-down {
 		visibility: hidden;

@@ -138,13 +138,11 @@ class Plugin_Upgrade_Tasks {
 	/**
 	 * Get the newly added task providers.
 	 *
-	 * @return array
+	 * @deprecated Task providers are now handled by React. This method returns empty array.
+	 *
+	 * @return array Always returns empty array.
 	 */
 	public function get_newly_added_task_providers() {
-		static $newly_added_task_providers;
-
-		// Task providers are now handled by React, so we don't have PHP provider objects.
-		// Return empty array since upgrade popovers are no longer needed.
 		return [];
 	}
 

@@ -405,31 +405,4 @@ class Onboard_Wizard {
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'All settings saved successfully.', 'progress-planner' ) ] );
 	}
-
-	/**
-	 * AJAX handler to get task template HTML.
-	 *
-	 * @return void
-	 */
-	public function ajax_get_task_template() {
-		$this->verify_ajax_security();
-
-		if ( ! isset( $_POST['task_id'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_ajax_security().
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Task ID is required.', 'progress-planner' ) ] );
-		}
-
-		$task_id   = \sanitize_text_field( \wp_unslash( $_POST['task_id'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		$task_data = isset( $_POST['task_data'] ) ? \json_decode( \sanitize_text_field( \wp_unslash( $_POST['task_data'] ) ), true ) : []; // phpcs:ignore WordPress.Security.NonceVerification.Missing, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- JSON data is decoded and validated
-
-		$template_file = \constant( 'PROGRESS_PLANNER_DIR' ) . '/views/onboarding/tasks/' . $task_id . '.php';
-		if ( ! \file_exists( $template_file ) ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Task template not found.', 'progress-planner' ) ] );
-		}
-
-		\ob_start();
-		\progress_planner()->the_view( 'onboarding/tasks/' . $task_id . '.php', [ 'task' => $task_data ] );
-		$html = \ob_get_clean();
-
-		\wp_send_json_success( [ 'html' => $html ] );
-	}
 }
