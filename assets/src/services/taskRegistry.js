@@ -248,7 +248,13 @@ export async function evaluateTasksUntil( targetCount, onTaskReady ) {
 					} );
 				}
 			} catch ( error ) {
-				console.error( 'Error creating task batch:', error );
+				// Suppress 409 Conflict errors - these are expected when multiple
+				// widgets try to create tasks simultaneously. The locking mechanism
+				// is working correctly.
+				if ( error?.data?.status !== 409 ) {
+					// eslint-disable-next-line no-console
+					console.error( 'Error creating task batch:', error );
+				}
 			}
 		}
 	} finally {

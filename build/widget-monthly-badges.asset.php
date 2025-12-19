@@ -1,1 +1,1 @@
-<?php return array('dependencies' => array('react', 'react-jsx-runtime', 'wp-api-fetch', 'wp-element', 'wp-hooks', 'wp-i18n'), 'version' => 'd6db4d078f76a54a6372', 'handle' => 'undefined-widget-monthly-badges');
+<?php return array('dependencies' => array('react', 'react-jsx-runtime', 'wp-api-fetch', 'wp-element', 'wp-hooks', 'wp-i18n'), 'version' => '4d14fbe8826fa9f771e9', 'handle' => 'undefined-widget-monthly-badges');

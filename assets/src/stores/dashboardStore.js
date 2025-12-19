@@ -199,8 +199,30 @@ export const useDashboardStore = create( ( set, get ) => ( {
 					} );
 					terms.user = newTerm;
 				} catch ( createError ) {
-					// eslint-disable-next-line no-console
-					console.error( 'Error creating user term:', createError );
+					// Handle term_exists gracefully - fetch the existing term
+					if (
+						createError.code === 'term_exists' &&
+						createError.data?.term_id
+					) {
+						try {
+							const existingTerm = await apiFetch( {
+								path: `/wp/v2/prpl_recommendations_provider/${ createError.data.term_id }`,
+							} );
+							terms.user = existingTerm;
+						} catch ( fetchError ) {
+							// eslint-disable-next-line no-console
+							console.error(
+								'Error fetching existing user term:',
+								fetchError
+							);
+						}
+					} else {
+						// eslint-disable-next-line no-console
+						console.error(
+							'Error creating user term:',
+							createError
+						);
+					}
 				}
 			}
 
