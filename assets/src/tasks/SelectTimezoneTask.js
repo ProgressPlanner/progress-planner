@@ -62,17 +62,9 @@ class SelectTimezoneTask extends InteractiveTaskProvider {
 	 */
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
-		const taskId = this.getTaskId( taskData );
-
 		const taskDetails = this.buildTaskDetails( taskData, {
 			post_title: __( 'Set site timezone', 'progress-planner' ),
-			url: this.buildAdminUrl( 'options-general.php', {
-				'pp-focus-el': taskId,
-			} ),
-			link_setting: {
-				hook: 'options-general.php',
-				iconEl: 'label[for="timezone_string"]',
-			},
+			url: this.buildAdminUrl( 'options-general.php' ),
 		} );
 
 		return this.addPopoverIdToTaskDetails( taskDetails );

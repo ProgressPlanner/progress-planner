@@ -61,21 +61,13 @@ class SetDateFormatTask extends InteractiveTaskProvider {
 	 */
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
-		const taskId = this.getTaskId( taskData );
-
 		const taskDetails = this.buildTaskDetails( taskData, {
 			post_title: __( 'Set site date format', 'progress-planner' ),
 			description: __(
 				'Setting the date format correctly on your site is valuable. By setting the correct date format, you ensure the dates are displayed correctly in the admin area and the front end.',
 				'progress-planner'
 			),
-			url: this.buildAdminUrl( 'options-general.php', {
-				'pp-focus-el': taskId,
-			} ),
-			link_setting: {
-				hook: 'options-general.php',
-				iconEl: 'tr:has(input[name="date_format"]) th',
-			},
+			url: this.buildAdminUrl( 'options-general.php' ),
 		} );
 
 		return this.addPopoverIdToTaskDetails( taskDetails );

@@ -57,21 +57,13 @@ class BlogDescriptionTask extends InteractiveTaskProvider {
 	 */
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
-		const taskId = this.getTaskId( taskData );
-
 		const taskDetails = this.buildTaskDetails( taskData, {
 			post_title: __( 'Set tagline', 'progress-planner' ),
 			description: __(
 				'Set the tagline to make your website look more professional.',
 				'progress-planner'
 			),
-			url: this.buildAdminUrl( 'options-general.php', {
-				'pp-focus-el': taskId,
-			} ),
-			link_setting: {
-				hook: 'options-general.php',
-				iconEl: 'th:has(+td #tagline-description)',
-			},
+			url: this.buildAdminUrl( 'options-general.php' ),
 		} );
 
 		// Add popover ID for interactive tasks.
