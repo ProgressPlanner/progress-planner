@@ -7,10 +7,6 @@
 
 namespace Progress_Planner\WP_CLI;
 
-use WP_CLI, WP_CLI_Command;
-
-use Progress_Planner\Base;
-
 if ( ! \class_exists( 'WP_CLI_Command' ) ) {
 	return;
 }
