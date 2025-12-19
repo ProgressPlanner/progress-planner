@@ -28,15 +28,6 @@ const prplDriverObj = prplDriver( {
 		popover, // eslint-disable-line no-unused-vars
 		{ config, state } // eslint-disable-line no-unused-vars
 	) => {
-		// Monthly badges popover is no longer used (badges are in React widget).
-		// Tour step 5 is kept for backward compatibility but popover is optional.
-		const monthlyBadgesPopover = document.getElementById(
-			'prpl-popover-monthly-badges'
-		);
-		if ( state.activeIndex === 5 && monthlyBadgesPopover ) {
-			prplTourShowPopover( monthlyBadgesPopover );
-		}
-
 		// Update URL with current step.
 		const newUrl = new URL( window.location );
 		newUrl.searchParams.set( 'tour_step', state.activeIndex );
@@ -44,52 +35,8 @@ const prplDriverObj = prplDriver( {
 	},
 } );
 
-function prplTourShowPopover( popover ) {
-	popover.showPopover();
-	prplMakePopoverBackdropTransparent( popover );
-}
-
-function prplTourHidePopover( popover ) {
-	popover.hidePopover();
-	document.getElementById( popover.id + '-backdrop-transparency' ).remove();
-}
-
-// Function to make the backdrop of a popover transparent.
-function prplMakePopoverBackdropTransparent( popover ) {
-	if ( popover ) {
-		const style = document.createElement( 'style' );
-		style.id = popover.id + '-backdrop-transparency';
-		style.innerHTML = `
-					#${ popover.id }::backdrop {
-							background-color: transparent !important;
-					}
-			`;
-		document.head.appendChild( style );
-	}
-}
-
 // eslint-disable-next-line no-unused-vars -- This is called on a few buttons.
 function prplStartTour() {
-	// Monthly badges popover is no longer used (badges are in React widget).
-	// Tour steps are kept for backward compatibility but popover is optional.
-	const monthlyBadgesPopover = document.getElementById(
-		'prpl-popover-monthly-badges'
-	);
-	const progressPlannerTourSteps = progressPlannerTour.steps;
-
-	progressPlannerTourSteps[ 4 ].popover.onNextClick = function () {
-		if ( monthlyBadgesPopover ) {
-			prplTourShowPopover( monthlyBadgesPopover );
-		}
-		prplDriverObj.moveNext();
-	};
-	progressPlannerTourSteps[ 5 ].popover.onNextClick = function () {
-		if ( monthlyBadgesPopover ) {
-			prplTourHidePopover( monthlyBadgesPopover );
-		}
-		prplDriverObj.moveNext();
-	};
-
 	// Check URL parameters.
 	const urlParams = new URLSearchParams( window.location.search );
 	const savedStepIndex = urlParams.get( 'tour_step' );

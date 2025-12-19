@@ -81,24 +81,6 @@ body.toplevel_page_progress-planner {
 }
 
 /*------------------------------------*\
-	Styles for the container of the page when the privacy policy is not accepted.
-\*------------------------------------*/
-.prpl-pp-not-accepted {
-
-	.prpl-start-onboarding-container {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		justify-content: center;
-		gap: var(--prpl-padding);
-	}
-
-	.prpl-start-onboarding-graphic {
-		width: 250px;
-	}
-}
-
-/*------------------------------------*\
 	Generic styles.
 \*------------------------------------*/
 .prpl-wrap p {
