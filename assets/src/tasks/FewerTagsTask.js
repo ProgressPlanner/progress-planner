@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-fewer-tags.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
@@ -65,7 +66,10 @@ class FewerTagsTask extends InteractiveTaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Install Fewer Tags and clean up your tags',
+			post_title: __(
+				'Install Fewer Tags and clean up your tags',
+				'progress-planner'
+			),
 			url: this.buildAdminUrl( 'plugin-install.php', {
 				tab: 'search',
 				s: 'fewer tags',
@@ -73,6 +77,15 @@ class FewerTagsTask extends InteractiveTaskProvider {
 		} );
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Install plugin', 'progress-planner' );
 	}
 }
 

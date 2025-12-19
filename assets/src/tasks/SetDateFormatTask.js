@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-set-date-format.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { cachedApiFetch } from '../services/apiFetchCache';
@@ -63,9 +64,11 @@ class SetDateFormatTask extends InteractiveTaskProvider {
 		const taskId = this.getTaskId( taskData );
 
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Set site date format',
-			description:
+			post_title: __( 'Set site date format', 'progress-planner' ),
+			description: __(
 				'Setting the date format correctly on your site is valuable. By setting the correct date format, you ensure the dates are displayed correctly in the admin area and the front end.',
+				'progress-planner'
+			),
 			url: this.buildAdminUrl( 'options-general.php', {
 				'pp-focus-el': taskId,
 			} ),
@@ -76,6 +79,15 @@ class SetDateFormatTask extends InteractiveTaskProvider {
 		} );
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Set date format', 'progress-planner' );
 	}
 }
 

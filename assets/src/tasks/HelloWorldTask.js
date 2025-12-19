@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-hello-world.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
@@ -68,11 +69,22 @@ class HelloWorldTask extends InteractiveTaskProvider {
 		// Build description.
 		const description =
 			helloWorldPostId && helloWorldPostId !== 0
-				? '<p>On install, WordPress creates a "Hello World!" post. This post does not add value to your website and solely exists to show what a post can look like. Therefore, "Hello World!" is not needed and should be deleted.</p>'
-				: 'On install, WordPress creates a "Hello World!" post. This post is not needed and should be deleted.';
+				? '<p>' +
+				  __(
+						'On install, WordPress creates a "Hello World!" post. This post does not add value to your website and solely exists to show what a post can look like. Therefore, "Hello World!" is not needed and should be deleted.',
+						'progress-planner'
+				  ) +
+				  '</p>'
+				: __(
+						'On install, WordPress creates a "Hello World!" post. This post is not needed and should be deleted.',
+						'progress-planner'
+				  );
 
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Delete the "Hello World!" post.',
+			post_title: __(
+				'Delete the "Hello World!" post.',
+				'progress-planner'
+			),
 			description,
 			url,
 		} );
@@ -87,7 +99,7 @@ class HelloWorldTask extends InteractiveTaskProvider {
 	 * @return {string} The action label.
 	 */
 	getPopoverActionLabel() {
-		return 'Delete';
+		return __( 'Delete', 'progress-planner' );
 	}
 }
 

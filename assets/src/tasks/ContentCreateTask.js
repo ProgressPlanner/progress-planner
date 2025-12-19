@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-content-create.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { TaskProvider } from '../services/TaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
@@ -72,11 +73,29 @@ class ContentCreateTask extends TaskProvider {
 		const targetPostId = lastPublishedPost?.post_id || null;
 
 		return this.buildTaskDetails( taskData, {
-			post_title: 'Create valuable content',
+			post_title: __( 'Create valuable content', 'progress-planner' ),
 			url: 'https://prpl.fyi/valuable-content',
 			url_target: '_blank',
 			target_post_id: targetPostId,
 		} );
+	}
+
+	/**
+	 * Add task actions for this task.
+	 *
+	 * @param {Object} taskData Task data object.
+	 * @param {Array}  actions  Existing actions array.
+	 * @return {Array} Modified actions array.
+	 */
+	addTaskActions( taskData, actions ) {
+		actions.push( {
+			type: 'link',
+			priority: 10,
+			href: this.buildAdminUrl( 'post-new.php' ),
+			label: __( 'Create new post', 'progress-planner' ),
+			target: '_self',
+		} );
+		return actions;
 	}
 }
 

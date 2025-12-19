@@ -7,6 +7,7 @@
  * Checks if WP_DEBUG and WP_DEBUG_DISPLAY are both enabled (security concern).
  */
 
+import { __ } from '@wordpress/i18n';
 import { TaskProvider } from '../services/TaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
@@ -61,7 +62,10 @@ class DebugDisplayTask extends TaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
 		return this.buildTaskDetails( taskData, {
-			post_title: 'Disable public display of PHP errors',
+			post_title: __(
+				'Disable public display of PHP errors',
+				'progress-planner'
+			),
 		} );
 	}
 }

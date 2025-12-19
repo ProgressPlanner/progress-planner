@@ -60,7 +60,9 @@ export default function LocalePopover( { task, onSubmit, onClose } ) {
 				// Fallback
 				if ( localeSelectRef.current ) {
 					localeSelectRef.current.innerHTML =
-						'<option value="">Select locale</option>';
+						'<option value="">' +
+						__( 'Select locale', 'progress-planner' ) +
+						'</option>';
 				}
 			} )
 			.finally( () => {

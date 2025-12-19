@@ -8,6 +8,7 @@
  * Basic implementation - can be refined with proper data collection.
  */
 
+import { __, sprintf } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
@@ -105,7 +106,11 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 		}
 
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: `Write description for term #${ targetTermId }`,
+			post_title: sprintf(
+				/* translators: %d: term ID */
+				__( 'Write description for term #%d', 'progress-planner' ),
+				targetTermId
+			),
 			url: this.buildAdminUrl( 'term.php', {
 				taxonomy: targetTaxonomy,
 				tag_ID: targetTermId,
@@ -157,7 +162,7 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 			type: 'popover',
 			priority: 10,
 			popoverId: this.getPopoverId(),
-			label: 'Write description',
+			label: __( 'Write description', 'progress-planner' ),
 			taskContext,
 			eventName: 'prpl-interactive-task-action-update-term-description',
 		} );
@@ -173,7 +178,7 @@ class UpdateTermDescriptionTask extends InteractiveTaskProvider {
 	 * @return {string} The action label.
 	 */
 	getPopoverActionLabel() {
-		return 'Write description';
+		return __( 'Write description', 'progress-planner' );
 	}
 }
 

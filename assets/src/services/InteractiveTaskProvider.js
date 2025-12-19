@@ -5,6 +5,7 @@
  * Interactive tasks have popovers that allow users to complete tasks through forms.
  */
 
+import { __ } from '@wordpress/i18n';
 import { TaskProvider } from './TaskProvider';
 
 /**
@@ -126,6 +127,6 @@ export class InteractiveTaskProvider extends TaskProvider {
 	getPopoverActionLabel() {
 		// Default label - child classes can override for specific labels.
 		// For example, UpdateTermDescriptionTask uses "Write description".
-		return 'Complete';
+		return __( 'Complete', 'progress-planner' );
 	}
 }

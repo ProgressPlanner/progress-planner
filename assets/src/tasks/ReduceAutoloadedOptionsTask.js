@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-reduce-autoloaded-options.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 
@@ -47,7 +48,10 @@ class ReduceAutoloadedOptionsTask extends InteractiveTaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Reduce number of autoloaded options',
+			post_title: __(
+				'Reduce number of autoloaded options',
+				'progress-planner'
+			),
 			url: this.buildAdminUrl( 'plugin-install.php', {
 				tab: 'search',
 				s: 'aaa option optimizer',
@@ -55,6 +59,15 @@ class ReduceAutoloadedOptionsTask extends InteractiveTaskProvider {
 		} );
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Reduce', 'progress-planner' );
 	}
 }
 

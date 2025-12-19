@@ -6,6 +6,7 @@
 import { PluginPostStatusInfo } from '@wordpress/edit-post';
 import { Button } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
+import { __ } from '@wordpress/i18n';
 import ProgressPlannerIcon from './ProgressPlannerIcon';
 
 export default function PostStatus() {
@@ -33,7 +34,7 @@ export default function PostStatus() {
 					href="#"
 					onClick={ handleClick }
 				>
-					Progress Planner
+					{ __( 'Progress Planner', 'progress-planner' ) }
 				</Button>
 			</PluginPostStatusInfo>
 			<PluginPostStatusInfo></PluginPostStatusInfo>

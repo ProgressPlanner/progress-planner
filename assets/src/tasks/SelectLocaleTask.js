@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-select-locale.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { cachedApiFetch } from '../services/apiFetchCache';
@@ -66,7 +67,7 @@ class SelectLocaleTask extends InteractiveTaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Select your site locale',
+			post_title: __( 'Select your site locale', 'progress-planner' ),
 			url: this.buildAdminUrl( 'options-general.php' ),
 			link_setting: {
 				hook: 'options-general.php',
@@ -75,6 +76,15 @@ class SelectLocaleTask extends InteractiveTaskProvider {
 		} );
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Select locale', 'progress-planner' );
 	}
 }
 

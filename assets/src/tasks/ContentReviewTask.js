@@ -8,6 +8,7 @@
  * Important pages are checked after 6 months, regular posts after 12 months.
  */
 
+import { __, sprintf } from '@wordpress/i18n';
 import { TaskProvider } from '../services/TaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
@@ -97,8 +98,16 @@ class ContentReviewTask extends TaskProvider {
 
 		// Use post title if available, otherwise fall back to generic title.
 		const postTitle = targetPostTitle
-			? `Review: ${ targetPostTitle }`
-			: `Review post #${ targetPostId }`;
+			? sprintf(
+					/* translators: %s: post title */
+					__( 'Review: %s', 'progress-planner' ),
+					targetPostTitle
+			  )
+			: sprintf(
+					/* translators: %d: post ID */
+					__( 'Review post #%d', 'progress-planner' ),
+					targetPostId
+			  );
 
 		return this.buildTaskDetails( taskData, {
 			post_title: postTitle,
@@ -133,7 +142,7 @@ class ContentReviewTask extends TaskProvider {
 					action: 'edit',
 					post: targetPostId,
 				} ),
-				label: 'Review',
+				label: __( 'Review', 'progress-planner' ),
 				target: '_self',
 			} );
 		}

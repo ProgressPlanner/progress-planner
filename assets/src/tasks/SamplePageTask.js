@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-sample-page.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
@@ -65,11 +66,19 @@ class SamplePageTask extends InteractiveTaskProvider {
 		// Build description.
 		const description =
 			samplePageId && samplePageId !== 0
-				? '<p>On install, WordPress creates a "Sample Page" page. This page does not add value to your website and solely exists to show what a page can look like. Therefore, "Sample Page" is not needed and should be deleted.</p>'
-				: 'On install, WordPress creates a "Sample Page" page. This page does not add value to your website and solely exists to show what a page can look like. Therefore, "Sample Page" is not needed and should be deleted.';
+				? '<p>' +
+				  __(
+						'On install, WordPress creates a "Sample Page" page. This page does not add value to your website and solely exists to show what a page can look like. Therefore, "Sample Page" is not needed and should be deleted.',
+						'progress-planner'
+				  ) +
+				  '</p>'
+				: __(
+						'On install, WordPress creates a "Sample Page" page. This page does not add value to your website and solely exists to show what a page can look like. Therefore, "Sample Page" is not needed and should be deleted.',
+						'progress-planner'
+				  );
 
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Delete "Sample Page"',
+			post_title: __( 'Delete "Sample Page"', 'progress-planner' ),
 			description,
 			url,
 		} );
@@ -84,7 +93,7 @@ class SamplePageTask extends InteractiveTaskProvider {
 	 * @return {string} The action label.
 	 */
 	getPopoverActionLabel() {
-		return 'Delete';
+		return __( 'Delete', 'progress-planner' );
 	}
 }
 

@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-disable-comments.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { cachedApiFetch } from '../services/apiFetchCache';
@@ -64,7 +65,7 @@ class DisableCommentsTask extends InteractiveTaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Disable comments',
+			post_title: __( 'Disable comments', 'progress-planner' ),
 			url: this.buildAdminUrl( 'options-discussion.php' ),
 			link_setting: {
 				hook: 'options-discussion.php',
@@ -73,6 +74,15 @@ class DisableCommentsTask extends InteractiveTaskProvider {
 		} );
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Disable comments', 'progress-planner' );
 	}
 }
 

@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-remove-inactive-plugins.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { TaskProvider } from '../services/TaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
@@ -53,11 +54,31 @@ class RemoveInactivePluginsTask extends TaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
 		return this.buildTaskDetails( taskData, {
-			post_title: 'Remove inactive plugins',
+			post_title: __( 'Remove inactive plugins', 'progress-planner' ),
 			url: this.buildAdminUrl( 'plugins.php', {
 				plugin_status: 'inactive',
 			} ),
 		} );
+	}
+
+	/**
+	 * Add task actions for this task.
+	 *
+	 * @param {Object} taskData Task data object.
+	 * @param {Array}  actions  Existing actions array.
+	 * @return {Array} Modified actions array.
+	 */
+	addTaskActions( taskData, actions ) {
+		actions.push( {
+			type: 'link',
+			priority: 10,
+			href: this.buildAdminUrl( 'plugins.php', {
+				plugin_status: 'inactive',
+			} ),
+			label: __( 'Go to the "Plugins" page', 'progress-planner' ),
+			target: '_self',
+		} );
+		return actions;
 	}
 }
 

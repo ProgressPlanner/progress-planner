@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-unpublished-content.php
  */
 
+import { __, sprintf, _n } from '@wordpress/i18n';
 import { TaskProvider } from '../services/TaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
@@ -71,13 +72,20 @@ class UnpublishedContentTask extends TaskProvider {
 
 		const description =
 			count > 0
-				? `You have ${ count } unpublished ${
-						count === 1 ? 'item' : 'items'
-				  } that might need attention.`
+				? sprintf(
+						/* translators: %d: number of unpublished items */
+						_n(
+							'You have %d unpublished item that might need attention.',
+							'You have %d unpublished items that might need attention.',
+							count,
+							'progress-planner'
+						),
+						count
+				  )
 				: '';
 
 		return this.buildTaskDetails( taskData, {
-			post_title: 'Review unpublished content',
+			post_title: __( 'Review unpublished content', 'progress-planner' ),
 			description,
 			url: this.buildAdminUrl( 'edit.php', {
 				post_status: 'draft',
@@ -105,7 +113,7 @@ class UnpublishedContentTask extends TaskProvider {
 				type: 'link',
 				priority: 10,
 				href: url,
-				label: 'Edit',
+				label: __( 'Edit', 'progress-planner' ),
 				target: '_self',
 			} );
 		}

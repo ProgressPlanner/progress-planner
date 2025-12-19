@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-set-valuable-post-types.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 
@@ -46,13 +47,22 @@ class SetValuablePostTypesTask extends InteractiveTaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Set valuable content types',
+			post_title: __( 'Set valuable content types', 'progress-planner' ),
 			url: this.buildAdminUrl( 'admin.php', {
 				page: 'progress-planner',
 			} ),
 		} );
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Set', 'progress-planner' );
 	}
 }
 

@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-core-update.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { TaskProvider } from '../services/TaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import apiFetch from '@wordpress/api-fetch';
@@ -70,9 +71,27 @@ class CoreUpdateTask extends TaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
 		return this.buildTaskDetails( taskData, {
-			post_title: 'Perform all updates',
+			post_title: __( 'Perform all updates', 'progress-planner' ),
 			url: this.buildAdminUrl( 'update-core.php' ),
 		} );
+	}
+
+	/**
+	 * Add task actions for this task.
+	 *
+	 * @param {Object} taskData Task data object.
+	 * @param {Array}  actions  Existing actions array.
+	 * @return {Array} Modified actions array.
+	 */
+	addTaskActions( taskData, actions ) {
+		actions.push( {
+			type: 'link',
+			priority: 10,
+			href: this.buildAdminUrl( 'update-core.php' ),
+			label: __( 'Go to the Updates page', 'progress-planner' ),
+			target: '_self',
+		} );
+		return actions;
 	}
 }
 

@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-blog-description.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { cachedApiFetch } from '../services/apiFetchCache';
@@ -59,9 +60,11 @@ class BlogDescriptionTask extends InteractiveTaskProvider {
 		const taskId = this.getTaskId( taskData );
 
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Set tagline',
-			description:
+			post_title: __( 'Set tagline', 'progress-planner' ),
+			description: __(
 				'Set the tagline to make your website look more professional.',
+				'progress-planner'
+			),
 			url: this.buildAdminUrl( 'options-general.php', {
 				'pp-focus-el': taskId,
 			} ),
@@ -73,6 +76,15 @@ class BlogDescriptionTask extends InteractiveTaskProvider {
 
 		// Add popover ID for interactive tasks.
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Set tagline', 'progress-planner' );
 	}
 }
 

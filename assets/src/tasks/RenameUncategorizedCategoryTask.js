@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-rename-uncategorized-category.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
@@ -61,7 +62,10 @@ class RenameUncategorizedCategoryTask extends InteractiveTaskProvider {
 		);
 
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Rename Uncategorized category',
+			post_title: __(
+				'Rename Uncategorized category',
+				'progress-planner'
+			),
 			url: this.buildAdminUrl( 'term.php', {
 				taxonomy: 'category',
 				tag_ID: uncategorizedCategoryId,
@@ -70,6 +74,15 @@ class RenameUncategorizedCategoryTask extends InteractiveTaskProvider {
 
 		// Add popover ID for interactive tasks.
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Rename', 'progress-planner' );
 	}
 }
 

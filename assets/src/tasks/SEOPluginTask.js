@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-seo-plugin.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { fetchDataCollector } from '../hooks/useTasksApi';
@@ -53,12 +54,21 @@ class SEOPluginTask extends InteractiveTaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Install an SEO plugin',
+			post_title: __( 'Install an SEO plugin', 'progress-planner' ),
 			url: this.buildAdminUrl( 'plugins.php' ),
 		} );
 
 		// Add popover ID for interactive tasks.
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Install plugin', 'progress-planner' );
 	}
 }
 

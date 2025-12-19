@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-set-page-faq.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { cachedApiFetch } from '../services/apiFetchCache';
@@ -60,11 +61,20 @@ class SetPageFAQTask extends InteractiveTaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Set the FAQ page',
+			post_title: __( 'Set the FAQ page', 'progress-planner' ),
 			url: this.buildAdminUrl( 'edit.php', { post_type: 'page' } ),
 		} );
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Set', 'progress-planner' );
 	}
 }
 

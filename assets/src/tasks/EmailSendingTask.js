@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-email-sending.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 
@@ -46,13 +47,25 @@ class EmailSendingTask extends InteractiveTaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: "Check if your website's email system works",
+			post_title: __(
+				"Check if your website's email system works",
+				'progress-planner'
+			),
 			url: this.buildAdminUrl( 'admin.php', {
 				page: 'progress-planner',
 			} ),
 		} );
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Test email sending', 'progress-planner' );
 	}
 }
 

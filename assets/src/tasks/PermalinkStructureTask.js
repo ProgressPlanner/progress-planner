@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-permalink-structure.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { cachedApiFetch } from '../services/apiFetchCache';
@@ -64,7 +65,7 @@ class PermalinkStructureTask extends InteractiveTaskProvider {
 	// eslint-disable-next-line no-unused-vars
 	async getTaskDetails( taskData = {} ) {
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Set permalink structure',
+			post_title: __( 'Set permalink structure', 'progress-planner' ),
 			url: this.buildAdminUrl( 'options-permalink.php' ),
 			link_setting: {
 				hook: 'options-permalink.php',
@@ -74,6 +75,15 @@ class PermalinkStructureTask extends InteractiveTaskProvider {
 
 		// Add popover ID for interactive tasks.
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Select permalink structure', 'progress-planner' );
 	}
 }
 

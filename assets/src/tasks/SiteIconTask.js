@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-site-icon.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { cachedApiFetch } from '../services/apiFetchCache';
@@ -57,7 +58,7 @@ class SiteIconTask extends InteractiveTaskProvider {
 		const taskId = this.getTaskId( taskData );
 
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Set site icon',
+			post_title: __( 'Set site icon', 'progress-planner' ),
 			url: this.buildAdminUrl( 'options-general.php', {
 				'pp-focus-el': taskId,
 			} ),
@@ -69,6 +70,15 @@ class SiteIconTask extends InteractiveTaskProvider {
 
 		// Add popover ID for interactive tasks.
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Set site icon', 'progress-planner' );
 	}
 }
 

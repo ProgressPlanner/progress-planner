@@ -5,6 +5,7 @@
  * Migrated from classes/suggested-tasks/providers/class-select-timezone.php
  */
 
+import { __ } from '@wordpress/i18n';
 import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
 import { registerTask } from '../services/taskRegistry';
 import { cachedApiFetch } from '../services/apiFetchCache';
@@ -64,7 +65,7 @@ class SelectTimezoneTask extends InteractiveTaskProvider {
 		const taskId = this.getTaskId( taskData );
 
 		const taskDetails = this.buildTaskDetails( taskData, {
-			post_title: 'Set site timezone',
+			post_title: __( 'Set site timezone', 'progress-planner' ),
 			url: this.buildAdminUrl( 'options-general.php', {
 				'pp-focus-el': taskId,
 			} ),
@@ -75,6 +76,15 @@ class SelectTimezoneTask extends InteractiveTaskProvider {
 		} );
 
 		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Select timezone', 'progress-planner' );
 	}
 }
 
