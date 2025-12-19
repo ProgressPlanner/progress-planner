@@ -78,16 +78,33 @@ jobs:
         run: |
           set -euxo pipefail
           ARTIFACT_URL="https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/${{ github.event.repository.name }}.zip"
+          PR_LABELS='${{ toJson(github.event.pull_request.labels) }}'
 
           # Use Node.js to parse, modify, and stringify the JSON
           BLUEPRINT=$(node -e "
             const fs = require('fs');
             const blueprint = JSON.parse(fs.readFileSync('.wordpress-org/blueprints/playground.json', 'utf8'));
+
+            // Replace the current plugin with artifact URL
             blueprint.plugins = blueprint.plugins.map(plugin =>
               plugin === '${{ github.event.repository.name }}' ? '$ARTIFACT_URL' : plugin
             );
+
+            // Extract plugin slugs from PR labels that start with 'plugin:'
+            const prLabels = JSON.parse(process.env.PR_LABELS || '[]');
+            const pluginSlugs = prLabels
+              .filter(label => label.name && label.name.startsWith('plugin:'))
+              .map(label => label.name.replace(/^plugin:/, ''));
+
+            // Add plugin slugs to the plugins array (avoid duplicates)
+            pluginSlugs.forEach(slug => {
+              if (!blueprint.plugins.includes(slug)) {
+                blueprint.plugins.push(slug);
+              }
+            });
+
             console.log(JSON.stringify(blueprint));
-          ")
+          " PR_LABELS="$PR_LABELS")
 
           # Base64 encode the blueprint
           ENCODED_BLUEPRINT=$(echo -n "$BLUEPRINT" | base64 -w 0)
@@ -109,5 +126,5 @@ jobs:
         with:
           message: |
             **Test on Playground**
-            [Test this pull request on the Playground](https://playground.wordpress.net/#${{ steps.blueprint.outputs.blueprint }})
+            [Test this pull request on the Playground](https://playground.progressplanner.com/#${{ steps.blueprint.outputs.blueprint }})
             or [download the zip](https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/${{ github.event.repository.name }}.zip)
