@@ -18,7 +18,7 @@ class SetPageContactTask extends InteractiveTaskProvider {
 	static isOnboardingTask = false;
 	static priority = 50;
 	static points = 1;
-	static isDismissable = true;
+	static isDismissable = false;
 	static isSnoozable = true;
 	static popoverId = 'set-page-contact';
 

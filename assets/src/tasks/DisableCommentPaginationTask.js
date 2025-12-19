@@ -18,7 +18,7 @@ class DisableCommentPaginationTask extends InteractiveTaskProvider {
 	static isOnboardingTask = true;
 	static priority = 10;
 	static points = 1;
-	static isDismissable = true;
+	static isDismissable = false;
 	static isSnoozable = true;
 	static externalLinkUrl = 'https://prpl.fyi/disable-comment-pagination';
 	static popoverId = 'disable-comment-pagination';

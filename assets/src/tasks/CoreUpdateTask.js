@@ -18,7 +18,7 @@ class CoreUpdateTask extends TaskProvider {
 	static isOnboardingTask = false;
 	static priority = 20;
 	static points = 1;
-	static isDismissable = true;
+	static isDismissable = false;
 	static isSnoozable = true;
 	static isRepetitive = true;
 	static externalLinkUrl = 'https://prpl.fyi/perform-all-updates';

@@ -17,7 +17,7 @@ class SetValuablePostTypesTask extends InteractiveTaskProvider {
 	static isOnboardingTask = false;
 	static priority = 70;
 	static points = 1;
-	static isDismissable = true;
+	static isDismissable = false;
 	static isSnoozable = true;
 	static externalLinkUrl = 'https://prpl.fyi/valuable-content';
 	static popoverId = 'set-valuable-post-types';

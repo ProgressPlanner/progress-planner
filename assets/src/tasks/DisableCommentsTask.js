@@ -18,7 +18,7 @@ class DisableCommentsTask extends InteractiveTaskProvider {
 	static isOnboardingTask = true;
 	static priority = 9;
 	static points = 1;
-	static isDismissable = true;
+	static isDismissable = false;
 	static isSnoozable = true;
 	static externalLinkUrl = 'https://prpl.fyi/disable-comments';
 	static popoverId = 'disable-comments';

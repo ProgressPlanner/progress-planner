@@ -18,7 +18,7 @@ class ContentCreateTask extends TaskProvider {
 	static isOnboardingTask = false;
 	static priority = 50;
 	static points = 1;
-	static isDismissable = true;
+	static isDismissable = false;
 	static isSnoozable = true;
 	static isRepetitive = true;
 	static externalLinkUrl = 'https://prpl.fyi/valuable-content';

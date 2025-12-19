@@ -18,7 +18,7 @@ class SamplePageTask extends InteractiveTaskProvider {
 	static isOnboardingTask = true;
 	static priority = 14;
 	static points = 1;
-	static isDismissable = true;
+	static isDismissable = false;
 	static isSnoozable = true;
 	static externalLinkUrl = 'https://prpl.fyi/delete-sample-page';
 	static popoverId = 'sample-page';

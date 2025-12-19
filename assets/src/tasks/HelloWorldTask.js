@@ -18,7 +18,7 @@ class HelloWorldTask extends InteractiveTaskProvider {
 	static isOnboardingTask = true;
 	static priority = 15;
 	static points = 1;
-	static isDismissable = true;
+	static isDismissable = false;
 	static isSnoozable = true;
 	static externalLinkUrl = 'https://prpl.fyi/delete-hello-world-post';
 	static popoverId = 'hello-world';

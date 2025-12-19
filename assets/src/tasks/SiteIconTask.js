@@ -18,7 +18,7 @@ class SiteIconTask extends InteractiveTaskProvider {
 	static isOnboardingTask = true;
 	static priority = 1;
 	static points = 1;
-	static isDismissable = true;
+	static isDismissable = false;
 	static isSnoozable = true;
 	static externalLinkUrl = 'https://prpl.fyi/set-site-icon';
 	static popoverId = 'core-siteicon';

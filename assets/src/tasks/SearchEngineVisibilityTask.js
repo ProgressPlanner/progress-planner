@@ -18,7 +18,7 @@ class SearchEngineVisibilityTask extends InteractiveTaskProvider {
 	static isOnboardingTask = true;
 	static priority = 5;
 	static points = 1;
-	static isDismissable = true;
+	static isDismissable = false;
 	static isSnoozable = true;
 	static externalLinkUrl = 'https://prpl.fyi/blog-indexing-settings';
 	static popoverId = 'search-engine-visibility';

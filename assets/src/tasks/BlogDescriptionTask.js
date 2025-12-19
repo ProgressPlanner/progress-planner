@@ -18,7 +18,7 @@ class BlogDescriptionTask extends InteractiveTaskProvider {
 	static isOnboardingTask = true;
 	static priority = 2;
 	static points = 1;
-	static isDismissable = true;
+	static isDismissable = false;
 	static isSnoozable = true;
 	static externalLinkUrl = 'https://prpl.fyi/set-tagline';
 	static popoverId = 'core-blogdescription';
