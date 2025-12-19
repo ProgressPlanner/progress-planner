@@ -11,7 +11,7 @@
 [![WordPress Plugin Rating](https://img.shields.io/wordpress/plugin/stars/progress-planner.svg)](https://wordpress.org/support/plugin/progress-planner/reviews/)
 [![GitHub](https://img.shields.io/github/license/ProgressPlanner/progress-planner.svg)](https://github.com/ProgressPlanner/progress-planner/blob/main/LICENSE)
 
-[![Try Progress Planner on the WordPress playground](https://img.shields.io/badge/Try%20Progress%20Planner%20on%20the%20WordPress%20Playground-%23117AC9.svg?style=for-the-badge&logo=WordPress&logoColor=ddd)](https://playground.progressplanner.com/?blueprint-url=https%3A%2F%2Fprogressplanner.com%2Fresearch%2Fblueprint-pp.php%3Frepo%3DProgressPlanner/progress-planner)
+[![Try Progress Planner on the WordPress playground](https://img.shields.io/badge/Try%20Progress%20Planner%20on%20the%20WordPress%20Playground-%23117AC9.svg?style=for-the-badge&logo=WordPress&logoColor=ddd)](https://playground.wordpress.net/?blueprint-url=https%3A%2F%2Fprogressplanner.com%2Fresearch%2Fblueprint-pp.php%3Frepo%3DProgressPlanner/progress-planner)
 
 # Progress Planner
 

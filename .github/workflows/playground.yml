@@ -99,6 +99,8 @@ jobs:
 
             // Add plugin slugs to the plugins array (avoid duplicates)
             pluginSlugs.forEach(slug => {
+              console.log('slug', slug);
+              console.log('blueprint.plugins', blueprint.plugins);
               if (!blueprint.plugins.includes(slug)) {
                 blueprint.plugins.push(slug);
               }
@@ -127,5 +129,5 @@ jobs:
         with:
           message: |
             **Test on Playground**
-            [Test this pull request on the Playground](https://playground.progressplanner.com/#${{ steps.blueprint.outputs.blueprint }})
+            [Test this pull request on the Playground](https://playground.wordpress.net/#${{ steps.blueprint.outputs.blueprint }})
             or [download the zip](https://nightly.link/${{ github.repository }}/actions/runs/${{ github.run_id }}/${{ github.event.repository.name }}.zip)
