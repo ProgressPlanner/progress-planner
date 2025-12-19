@@ -139,8 +139,7 @@ export class TaskProvider {
 	 * @return {string} The complete admin URL.
 	 */
 	buildAdminUrl( path = '', params = {} ) {
-		const adminUrl =
-			window.prplSuggestedTasksConfig?.adminUrl || '/wp-admin/';
+		const adminUrl = window.prplDashboardConfig?.adminUrl || '/wp-admin/';
 		const separator = adminUrl.endsWith( '/' ) ? '' : '/';
 		let url = path ? `${ adminUrl }${ separator }${ path }` : adminUrl;
 

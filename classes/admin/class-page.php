@@ -234,6 +234,20 @@ class Page {
 		// Must be called after script is enqueued but before it runs.
 		$this->preload_rest_data();
 
+		// Enqueue webpack runtime (shared across all entry points).
+		// This ensures modules like Zustand store are instantiated only once.
+		$runtime_asset_file = \PROGRESS_PLANNER_DIR . '/build/runtime.asset.php';
+		if ( \file_exists( $runtime_asset_file ) ) {
+			$runtime_asset = include $runtime_asset_file;
+			\wp_enqueue_script(
+				'progress-planner/runtime',
+				\constant( 'PROGRESS_PLANNER_URL' ) . '/build/runtime.js',
+				$runtime_asset['dependencies'],
+				$runtime_asset['version'],
+				true
+			);
+		}
+
 		// Enqueue individual widget scripts.
 		$widget_scripts = [
 			'widget-suggested-tasks',
@@ -253,10 +267,10 @@ class Page {
 			}
 			$widget_asset = include $widget_asset_file;
 
-			// Widget scripts depend on dashboard script to ensure widgetRegistry is initialized.
+			// Widget scripts depend on dashboard and runtime to ensure shared modules.
 			$widget_dependencies = \array_merge(
 				$widget_asset['dependencies'],
-				[ 'progress-planner/dashboard' ]
+				[ 'progress-planner/dashboard', 'progress-planner/runtime' ]
 			);
 
 			\wp_enqueue_script(

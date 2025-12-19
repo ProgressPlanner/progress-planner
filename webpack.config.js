@@ -19,4 +19,10 @@ module.exports = {
 		path: path.resolve( __dirname, 'build' ),
 		filename: '[name].js',
 	},
+	optimization: {
+		...defaultConfig.optimization,
+		// Share runtime across all entry points to ensure modules
+		// (like Zustand store) are instantiated only once.
+		runtimeChunk: 'single',
+	},
 };

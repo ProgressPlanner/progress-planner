@@ -99,11 +99,11 @@ export default function CustomPopover( {
 				if ( taskId === 'rename-uncategorized-category' ) {
 					// Submit category rename via AJAX
 					const ajaxUrl =
-						window.prplSuggestedTasksConfig?.ajaxUrl ||
+						window.prplDashboardConfig?.ajaxUrl ||
 						window.progressPlanner?.ajaxUrl ||
 						'/wp-admin/admin-ajax.php';
 					const nonce =
-						window.prplSuggestedTasksConfig?.nonce ||
+						window.prplDashboardConfig?.nonce ||
 						window.progressPlanner?.nonce ||
 						'';
 
@@ -134,11 +134,11 @@ export default function CustomPopover( {
 				} else if ( taskId === 'update-term-description' ) {
 					// Submit term description via AJAX
 					const ajaxUrl =
-						window.prplSuggestedTasksConfig?.ajaxUrl ||
+						window.prplDashboardConfig?.ajaxUrl ||
 						window.progressPlanner?.ajaxUrl ||
 						'/wp-admin/admin-ajax.php';
 					const nonce =
-						window.prplSuggestedTasksConfig?.nonce ||
+						window.prplDashboardConfig?.nonce ||
 						window.progressPlanner?.nonce ||
 						'';
 

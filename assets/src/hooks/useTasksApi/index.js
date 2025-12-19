@@ -237,9 +237,9 @@ export async function updateTask( postId, data ) {
  * @return {Promise<Object>} Promise resolving to the response.
  */
 export async function sendTaskAction( postId, actionType ) {
-	const nonce = window.prplSuggestedTasksConfig?.nonce || '';
+	const nonce = window.prplDashboardConfig?.nonce || '';
 	const ajaxUrl =
-		window.prplSuggestedTasksConfig?.ajaxUrl || '/wp-admin/admin-ajax.php';
+		window.prplDashboardConfig?.ajaxUrl || '/wp-admin/admin-ajax.php';
 
 	const formData = new FormData();
 	formData.append( 'action', 'progress_planner_suggested_task_action' );

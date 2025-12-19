@@ -47,10 +47,9 @@ export default function ImprovePdfHandlingPopover( {
 			try {
 				// Check if we're on multisite
 				const isMultisite =
-					window.prplSuggestedTasksConfig?.isMultisite || false;
+					window.prplDashboardConfig?.isMultisite || false;
 				const canInstallPlugins =
-					window.prplSuggestedTasksConfig?.canInstallPlugins !==
-					false;
+					window.prplDashboardConfig?.canInstallPlugins !== false;
 
 				if ( isMultisite || ! canInstallPlugins ) {
 					setCanShowPdfSitemapStep( false );
@@ -62,11 +61,11 @@ export default function ImprovePdfHandlingPopover( {
 				// The Improve_Pdf_Handling provider should localize this data or
 				// we should create an AJAX endpoint to check plugin status
 				const yoastActive =
-					window.prplSuggestedTasksConfig?.plugins?.yoast ||
+					window.prplDashboardConfig?.plugins?.yoast ||
 					task.prpl_task_data?.plugins?.yoast ||
 					false;
 				const pdfLibraryActive =
-					window.prplSuggestedTasksConfig?.plugins?.pdfLibrary ||
+					window.prplDashboardConfig?.plugins?.pdfLibrary ||
 					task.prpl_task_data?.plugins?.pdfLibrary ||
 					false;
 
@@ -74,7 +73,7 @@ export default function ImprovePdfHandlingPopover( {
 
 				// Check if PDF sitemap is installed
 				const pdfSitemapInstalled =
-					window.prplSuggestedTasksConfig?.plugins?.pdfSitemap ||
+					window.prplDashboardConfig?.plugins?.pdfSitemap ||
 					task.prpl_task_data?.plugins?.pdfSitemap ||
 					false;
 				setIsPdfSitemapInstalled( pdfSitemapInstalled );

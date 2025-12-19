@@ -52,12 +52,9 @@ Object.assign( global.window, {
 		contentIconUrl: '/content.svg',
 		maintenanceIconUrl: '/maintenance.svg',
 	},
-	prplSuggestedTasksConfig: {
-		nonce: 'test-nonce',
-		ajaxUrl: '/wp-admin/admin-ajax.php',
-	},
 	prplDashboardConfig: {
 		restUrl: '/wp-json/',
 		nonce: 'test-nonce',
+		ajaxUrl: '/wp-admin/admin-ajax.php',
 	},
 } );

@@ -361,7 +361,7 @@ describe( 'useTasksApi', () => {
 		} );
 
 		it( 'uses nonce from config', async () => {
-			window.prplSuggestedTasksConfig = {
+			window.prplDashboardConfig = {
 				nonce: 'test-nonce-123',
 				ajaxUrl: '/custom-ajax.php',
 			};
