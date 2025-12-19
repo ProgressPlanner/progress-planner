@@ -11,7 +11,6 @@ use Progress_Planner\Suggested_Tasks\Tasks_Interface;
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast\Add_Yoast_Providers;
 use Progress_Planner\Suggested_Tasks\Providers\Integrations\AIOSEO\Add_AIOSEO_Providers;
 use Progress_Planner\Suggested_Tasks\Providers\User as User_Tasks;
-use Progress_Planner\Suggested_Tasks\Providers\Collaborator;
 
 /**
  * Tasks_Manager class.
@@ -95,7 +94,6 @@ class Tasks_Manager {
 		// Note: Most providers have been migrated to React (see REACT_PROVIDERS constant).
 		$this->task_providers = [
 			new User_Tasks(),
-			new Collaborator(),
 		];
 
 		// Add the plugin integration.

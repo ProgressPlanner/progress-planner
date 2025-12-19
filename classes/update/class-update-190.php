@@ -202,7 +202,6 @@ class Update_190 {
 			'aioseo-date-archive'                       => 20,
 			'php-version'                               => 25,
 			'fewer-tags'                                => 32,
-			'collaborator'                              => 50,
 			'user'                                      => 50,
 			'create-post'                               => 50,
 			'unpublished-content'                       => 55,

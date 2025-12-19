@@ -470,8 +470,7 @@ abstract class Tasks implements Tasks_Interface {
 
 		// Handle non-repetitive (one-time) tasks.
 		if ( ! $this->is_repetitive() ) {
-			// Collaborator tasks have custom task_ids, so strpos check does not work for them.
-			if ( ! $task->post_name || ( 0 !== \strpos( $task->post_name, $this->get_task_id() ) && 'collaborator' !== $this->get_provider_id() ) ) {
+			if ( ! $task->post_name || 0 !== \strpos( $task->post_name, $this->get_task_id() ) ) {
 				return false;
 			}
 			return $this->is_task_completed( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) ) ? $task : false;

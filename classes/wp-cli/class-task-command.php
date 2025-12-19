@@ -309,7 +309,7 @@ class Task_Command extends \WP_CLI_Command {
 	 * : The points value for the task. Default: 1
 	 *
 	 * [--provider_id=<provider_id>]
-	 * : The provider ID. Default: "collaborator"
+	 * : The provider ID. Default: "user"
 	 *
 	 * [--status=<status>]
 	 * : The task status. Default: "pending"
@@ -335,7 +335,7 @@ class Task_Command extends \WP_CLI_Command {
 		$title                 = isset( $assoc_args['title'] ) ? $assoc_args['title'] : '';
 		$description           = isset( $assoc_args['description'] ) ? $assoc_args['description'] : 'Test description ';
 		$points                = isset( $assoc_args['points'] ) ? (int) $assoc_args['points'] : 1;
-		$provider_id           = isset( $assoc_args['provider_id'] ) ? $assoc_args['provider_id'] : 'collaborator';
+		$provider_id           = isset( $assoc_args['provider_id'] ) ? $assoc_args['provider_id'] : 'user';
 		$status                = isset( $assoc_args['status'] ) ? $assoc_args['status'] : 'pending';
 		$is_completed_callback = isset( $assoc_args['is_completed_callback'] ) ? $assoc_args['is_completed_callback'] : null;
 		$dismissable           = isset( $assoc_args['dismissable'] ) ? $assoc_args['dismissable'] : true;

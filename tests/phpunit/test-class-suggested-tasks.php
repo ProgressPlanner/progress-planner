@@ -159,7 +159,6 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 		// These providers are PHP-only.
 		$php_only_providers = [
 			'user',
-			'collaborator',
 		];
 
 		foreach ( $php_only_providers as $provider ) {
