@@ -330,15 +330,23 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
 		}
 
-		$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task->get_provider_id() );
+		$provider_id       = $task->get_provider_id();
+		$is_react_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->is_react_provider( $provider_id );
 
-		if ( ! $provider ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Provider not found.', 'progress-planner' ) ] );
-		}
+		if ( ! $is_react_provider ) {
+			// PHP provider - need to check capability via provider instance.
+			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_id );
 
-		if ( ! $provider->capability_required() ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to complete this task.', 'progress-planner' ) ] );
+			if ( ! $provider ) {
+				\wp_send_json_error( [ 'message' => \esc_html__( 'Provider not found.', 'progress-planner' ) ] );
+			}
+
+			if ( ! $provider->capability_required() ) {
+				\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to complete this task.', 'progress-planner' ) ] );
+			}
 		}
+		// React providers: capability was already checked client-side before task was shown
+		// and user must be logged in with edit_others_posts to reach this endpoint.
 
 		$updated = false;
 

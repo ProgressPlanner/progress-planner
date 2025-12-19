@@ -288,7 +288,7 @@ class Tasks_Manager {
 	 *
 	 * @return bool True if this is a React provider, false otherwise.
 	 */
-	private function is_react_provider( string $provider_id ): bool {
+	public function is_react_provider( string $provider_id ): bool {
 		return \in_array( $provider_id, self::REACT_PROVIDERS, true );
 	}
 
