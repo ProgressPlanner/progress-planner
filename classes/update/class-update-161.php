@@ -1,6 +1,6 @@
 <?php
 /**
- * Update class for version 1.5.0.
+ * Update class for version 1.6.1.
  *
  * @package Progress_Planner
  */
@@ -8,11 +8,11 @@
 namespace Progress_Planner\Update;
 
 /**
- * Update class for version 1.5.0.
+ * Update class for version 1.6.1.
  *
  * @package Progress_Planner
  */
-class Update_161 {
+class Update_161 extends Update {
 
 	const VERSION = '1.6.1';
 
@@ -39,7 +39,6 @@ class Update_161 {
 		$badges = \progress_planner()->get_settings()->get( 'badges', [] );
 
 		foreach ( $badges as $badge_id => $badge ) {
-
 			// We are only migrating monthly badges.
 			if ( 0 !== \strpos( $badge_id, 'monthly-' ) ) {
 				continue;
@@ -102,12 +101,12 @@ class Update_161 {
 		if ( 'user' === $task['provider_id'] ) {
 			// User tasks have different data structure, so we can copy directly.
 			$task_details = [
-				'post_title'  => $task['title'],
+				'post_title'  => isset( $task['title'] ) ? $task['title'] : '',
 				'description' => '',
-				'points'      => $task['points'],
+				'points'      => isset( $task['points'] ) ? $task['points'] : 0,
 				'provider_id' => 'user',
 				'category'    => 'user',
-				'task_id'     => $task['task_id'],
+				'task_id'     => isset( $task['task_id'] ) ? $task['task_id'] : '',
 				'post_status' => 'pending' === $task['status'] ? 'publish' : $task['status'],
 				'dismissable' => true,
 				'snoozable'   => false,

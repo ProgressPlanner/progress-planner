@@ -7,10 +7,14 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder;
+
 /**
  * Add task for Yoast SEO: disable the date archive.
  */
-class Archive_Date extends Yoast_Provider {
+class Archive_Date extends Yoast_Interactive_Provider {
+
+	use Task_Action_Builder;
 
 	/**
 	 * The provider ID.
@@ -18,6 +22,20 @@ class Archive_Date extends Yoast_Provider {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'yoast-date-archive';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'yoast-date-archive';
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/yoast-date-archive';
 
 	/**
 	 * Get the task URL.
@@ -35,19 +53,6 @@ class Archive_Date extends Yoast_Provider {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: disable the date archive', 'progress-planner' );
-	}
-
-	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Yoast SEO can disable the date archive, which is really only useful for news sites and blogs. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-date-archive" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Date Archive', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
 	}
 
 	/**
@@ -76,7 +81,7 @@ class Archive_Date extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		// If the date archive is already disabled, we don't need to add the task.
-		return $this->is_task_relevant() && \YoastSEO()->helpers->options->get( 'disable-date' ) !== true;
+		return $this->is_task_relevant() && \YoastSEO()->helpers->options->get( 'disable-date' ) !== true; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**
@@ -92,5 +97,37 @@ class Archive_Date extends Yoast_Provider {
 		return \strpos( $permalink_structure, '%year%' ) === false
 			&& \strpos( $permalink_structure, '%monthnum%' ) === false
 			&& \strpos( $permalink_structure, '%day%' ) === false;
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'Date archives are primarily useful for news sites and time-sensitive content. For most websites, they add unnecessary URLs that can dilute your SEO. Disable them unless your content is date-specific.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		$this->print_submit_button( \__( 'Disable', 'progress-planner' ) );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		return $this->add_popover_action( $actions, \__( 'Disable', 'progress-planner' ) );
 	}
 }

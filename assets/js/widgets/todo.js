@@ -1,10 +1,10 @@
-/* global prplSuggestedTask, prplTerms */
+/* global prplSuggestedTask, prplTerms, prplL10n */
 /*
  * Widget: Todo
  *
  * A widget that displays a todo list.
  *
- * Dependencies: wp-api, progress-planner/suggested-task, wp-util, wp-a11y, progress-planner/grid-masonry, progress-planner/celebrate, progress-planner/suggested-task-terms
+ * Dependencies: wp-api, progress-planner/suggested-task, wp-util, wp-a11y, progress-planner/celebrate, progress-planner/suggested-task-terms, progress-planner/l10n
  */
 
 const prplTodoWidget = {
@@ -45,35 +45,36 @@ const prplTodoWidget = {
 		// If preloaded tasks are available, inject them.
 		if ( 'undefined' !== typeof prplSuggestedTask.tasks ) {
 			// Inject the tasks.
-			if ( Object.keys( prplSuggestedTask.tasks.userTasks ).length ) {
-				Object.values( prplSuggestedTask.tasks.userTasks ).forEach(
-					( item ) => {
-						// Inject the items into the DOM.
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/suggestedTask/injectItem', {
-								detail: {
-									item,
-									insertPosition:
-										1 === item?.meta?.prpl_points
-											? 'afterbegin' // Add golden task to the start of the list.
-											: 'beforeend',
-									listId:
-										item.status === 'publish'
-											? 'todo-list'
-											: 'todo-list-completed',
-								},
-							} )
-						);
-						prplSuggestedTask.injectedItemIds.push( item.id );
-					}
-				);
+			if (
+				Array.isArray( prplSuggestedTask.tasks.userTasks ) &&
+				prplSuggestedTask.tasks.userTasks.length
+			) {
+				prplSuggestedTask.tasks.userTasks.forEach( ( item ) => {
+					// Inject the items into the DOM.
+					document.dispatchEvent(
+						new CustomEvent( 'prpl/suggestedTask/injectItem', {
+							detail: {
+								item,
+								insertPosition:
+									1 === item?.prpl_points
+										? 'afterbegin' // Add golden task to the start of the list.
+										: 'beforeend',
+								listId:
+									item.status === 'publish'
+										? 'todo-list'
+										: 'todo-list-completed',
+							},
+						} )
+					);
+					prplSuggestedTask.injectedItemIds.push( item.id );
+				} );
 			}
 			prplTodoWidget.removeLoadingItems();
 		} else {
 			// Otherwise, inject tasks from the API.
 			prplSuggestedTask
 				.fetchItems( {
-					category: 'user',
+					provider: 'user',
 					status: [ 'publish', 'trash' ],
 					per_page: 100,
 				} )
@@ -89,7 +90,7 @@ const prplTodoWidget = {
 								detail: {
 									item,
 									insertPosition:
-										1 === item?.meta?.prpl_points
+										1 === item?.prpl_points
 											? 'afterbegin' // Add golden task to the start of the list.
 											: 'beforeend',
 									listId:
@@ -111,7 +112,7 @@ const prplTodoWidget = {
 		// add a new todo item to the list
 		document
 			.getElementById( 'create-todo-item' )
-			.addEventListener( 'submit', ( event ) => {
+			?.addEventListener( 'submit', ( event ) => {
 				event.preventDefault();
 
 				// Add the loader.
@@ -122,17 +123,10 @@ const prplTodoWidget = {
 					// Set the post title.
 					title: document.getElementById( 'new-todo-content' ).value,
 					status: 'publish',
-					// Set the `prpl_recommendations_category` term.
-					prpl_recommendations_category:
-						prplTerms.get( 'category' ).user.id,
 					// Set the `prpl_recommendations_provider` term.
 					prpl_recommendations_provider:
 						prplTerms.get( 'provider' ).user.id,
 					menu_order: prplTodoWidget.getHighestItemOrder() + 1,
-					meta: {
-						prpl_snoozable: false,
-						prpl_dismissable: true,
-					},
 				} );
 				post.save().then( ( response ) => {
 					if ( ! response.id ) {
@@ -141,16 +135,12 @@ const prplTodoWidget = {
 					const newTask = {
 						...response,
 						meta: {
-							prpl_points: 0,
-							prpl_snoozable: false,
-							prpl_dismissable: true,
 							prpl_url: '',
-							prpl_url_target: '_self',
 							...( response.meta || {} ),
 						},
 						provider: 'user',
-						category: 'user',
 						order: prplTodoWidget.getHighestItemOrder() + 1,
+						prpl_points: 0,
 					};
 
 					// Inject the new task into the DOM.
@@ -170,6 +160,11 @@ const prplTodoWidget = {
 					// Remove the loader.
 					prplTodoWidget.removeLoader();
 
+					// Announce to screen readers.
+					prplTodoWidget.announceToScreenReader(
+						prplL10n( 'taskAddedSuccessfully' )
+					);
+
 					// Resize the grid items.
 					window.dispatchEvent(
 						new CustomEvent( 'prpl/grid/resize' )
@@ -185,11 +180,39 @@ const prplTodoWidget = {
 	},
 
 	/**
+	 * Announce to screen readers.
+	 *
+	 * @param {string} message  The message to announce.
+	 * @param {string} priority The priority ('polite' or 'assertive').
+	 */
+	announceToScreenReader: ( message, priority = 'polite' ) => {
+		// Use WordPress a11y speak if available.
+		if ( 'undefined' !== typeof wp && wp.a11y && wp.a11y.speak ) {
+			wp.a11y.speak( message, priority );
+		} else {
+			// Fallback to ARIA live region.
+			const liveRegion = document.getElementById(
+				'todo-aria-live-region'
+			);
+			if ( liveRegion ) {
+				liveRegion.textContent = message;
+				setTimeout( () => {
+					liveRegion.textContent = '';
+				}, 1000 );
+			}
+		}
+	},
+
+	/**
 	 * Add the loader.
 	 */
 	addLoader: () => {
 		const loader = document.createElement( 'span' );
+		const loadingTasksText = prplL10n( 'loadingTasks' );
 		loader.className = 'prpl-loader';
+		loader.setAttribute( 'role', 'status' );
+		loader.setAttribute( 'aria-live', 'polite' );
+		loader.innerHTML = `<span class="screen-reader-text">${ loadingTasksText }</span>`;
 		document.getElementById( 'todo-list' ).appendChild( loader );
 	},
 
@@ -199,12 +222,86 @@ const prplTodoWidget = {
 	removeLoader: () => {
 		document.querySelector( '#todo-list .prpl-loader' )?.remove();
 	},
+
+	/**
+	 * Show the delete all popover.
+	 */
+	showDeleteAllPopover: () => {
+		document
+			.getElementById( 'todo-list-completed-delete-all-popover' )
+			.showPopover();
+	},
+
+	/**
+	 * Close the delete all popover.
+	 */
+	closeDeleteAllPopover: () => {
+		document
+			.getElementById( 'todo-list-completed-delete-all-popover' )
+			.hidePopover();
+	},
+
+	/**
+	 * Delete all completed tasks and close the popover.
+	 */
+	deleteAllCompletedTasksAndClosePopover: () => {
+		prplTodoWidget.deleteAllCompletedTasks();
+		prplTodoWidget.closeDeleteAllPopover();
+	},
+
+	/**
+	 * Delete all completed tasks.
+	 */
+	deleteAllCompletedTasks: () => {
+		const items = document.querySelectorAll(
+			'#todo-list-completed .prpl-suggested-task'
+		);
+		const itemCount = items.length;
+
+		items.forEach( ( item ) => {
+			const postId = parseInt( item.getAttribute( 'data-post-id' ) );
+			prplSuggestedTask.trash( postId );
+		} );
+
+		// Announce to screen readers.
+		const tasksWord =
+			itemCount === 1
+				? prplL10n( 'taskDeleted' )
+				: prplL10n( 'tasksDeleted' );
+		prplTodoWidget.announceToScreenReader(
+			`${ itemCount } ${ tasksWord }`,
+			'assertive'
+		);
+
+		// Resize event will be triggered by the trash function.
+	},
 };
 
 document
 	.getElementById( 'todo-list-completed-details' )
-	.addEventListener( 'toggle', () => {
+	?.addEventListener( 'toggle', () => {
 		window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
+	} );
+
+// Add event listener for delete all button.
+document
+	.getElementById( 'todo-list-completed-delete-all' )
+	?.addEventListener( 'click', () => {
+		prplTodoWidget.showDeleteAllPopover();
+	} );
+
+// Add event listener for cancel button in delete all popover.
+document
+	.getElementById( 'todo-list-completed-delete-all-cancel' )
+	?.addEventListener( 'click', () => {
+		prplTodoWidget.closeDeleteAllPopover();
+	} );
+
+// Add event listener for confirm button in delete all popover.
+document
+	.getElementById( 'todo-list-completed-delete-all-confirm' )
+	?.addEventListener( 'click', () => {
+		prplTodoWidget.deleteAllCompletedTasksAndClosePopover();
 	} );
 
 document.addEventListener( 'prpl/suggestedTask/itemInjected', ( event ) => {

@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 /**
  * Add task for Email sending.
  */
-class Email_Sending extends Tasks {
+class Email_Sending extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -27,25 +27,18 @@ class Email_Sending extends Tasks {
 	const PROVIDER_ID = 'sending-email';
 
 	/**
-	 * The provider type.
-	 *
-	 * @var string
-	 */
-	const CATEGORY = 'configuration';
-
-	/**
-	 * Whether the task is interactive.
-	 *
-	 * @var bool
-	 */
-	const IS_INTERACTIVE = true;
-
-	/**
 	 * The popover ID.
 	 *
 	 * @var string
 	 */
 	const POPOVER_ID = 'sending-email';
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/check-if-your-websites-email-system-works';
 
 	/**
 	 * Whether the task is dismissable.
@@ -59,7 +52,7 @@ class Email_Sending extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = 1;
+	protected $priority = 4;
 
 	/**
 	 * The email title.
@@ -97,19 +90,11 @@ class Email_Sending extends Tasks {
 	protected $is_wp_mail_overridden = false;
 
 	/**
-	 * The troubleshooting guide URL.
-	 *
-	 * @var string
-	 */
-	protected $troubleshooting_guide_url = 'https://prpl.fyi/troubleshoot-smtp';
-
-	/**
 	 * Initialize the task provider.
 	 *
 	 * @return void
 	 */
 	public function init() {
-
 		// Enqueue the scripts.
 		\add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_scripts' ] );
 
@@ -124,11 +109,26 @@ class Email_Sending extends Tasks {
 		\add_action( 'init', [ $this, 'check_if_wp_mail_has_override' ], PHP_INT_MAX );
 
 		$this->email_subject = \esc_html__( 'Your Progress Planner test message!', 'progress-planner' );
+
+		// Generate a secure token for the completion link to prevent CSRF.
+		$user_id = \get_current_user_id();
+		$token   = \progress_planner()->get_suggested_tasks()->generate_task_completion_token( $this->get_task_id(), $user_id );
+
 		$this->email_content = \sprintf(
 			// translators: %1$s the admin URL.
-			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_blank">Click here to mark Ravi\'s Recommendation as completed</a>.', 'progress-planner' ),
-			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() )
+			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_self">Click here to mark %2$s\'s Recommendation as completed</a>.', 'progress-planner' ),
+			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() . '&token=' . $token ),
+			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
 		);
+	}
+
+	/**
+	 * Get the troubleshooting guide URL.
+	 *
+	 * @return string
+	 */
+	protected function get_troubleshooting_guide_url() {
+		return \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://prpl.fyi/troubleshoot-smtp' ) );
 	}
 
 	/**
@@ -184,9 +184,16 @@ class Email_Sending extends Tasks {
 	/**
 	 * Enqueue the scripts.
 	 *
+	 * @param string $hook The current admin page.
+	 *
 	 * @return void
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts( $hook ) {
+		// Enqueue the script only on Progress Planner and WP dashboard pages.
+		if ( 'toplevel_page_progress-planner' !== $hook && 'index.php' !== $hook ) {
+			return;
+		}
+
 		// Don't enqueue the script if the task is already completed.
 		if ( true === \progress_planner()->get_suggested_tasks()->was_task_completed( $this->get_task_id() ) ) {
 			return;
@@ -201,7 +208,7 @@ class Email_Sending extends Tasks {
 					'ajax_url'                  => \admin_url( 'admin-ajax.php' ),
 					'nonce'                     => \wp_create_nonce( 'progress_planner' ),
 					'unknown_error'             => \esc_html__( 'Unknown error', 'progress-planner' ),
-					'troubleshooting_guide_url' => $this->troubleshooting_guide_url,
+					'troubleshooting_guide_url' => $this->get_troubleshooting_guide_url(),
 				],
 			]
 		);
@@ -215,7 +222,7 @@ class Email_Sending extends Tasks {
 	public function check_if_wp_mail_is_filtered() {
 		global $wp_filter;
 		foreach ( [ 'phpmailer_init', 'pre_wp_mail' ] as $filter ) {
-			$has_filter                = isset( $wp_filter[ $filter ] ) && ! empty( $wp_filter[ $filter ]->callbacks ) ? true : false;
+			$has_filter                = isset( $wp_filter[ $filter ] ) && ! empty( $wp_filter[ $filter ]->callbacks ) ? true : false; // @phpstan-ignore-line property.nonObject
 			$this->is_wp_mail_filtered = $this->is_wp_mail_filtered || $has_filter;
 		}
 	}
@@ -246,21 +253,42 @@ class Email_Sending extends Tasks {
 	/**
 	 * Test email sending.
 	 *
+	 * Use check_ajax_referer and get email from $_POST.
+	 *
 	 * @return void
 	 */
 	public function ajax_test_email_sending() {
-		// Check the nonce.
-		\check_admin_referer( 'progress_planner' );
 
-		$email_address = isset( $_GET['email_address'] ) ? \sanitize_email( \wp_unslash( $_GET['email_address'] ) ) : '';
+		if ( ! $this->capability_required() ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to test email sending.', 'progress-planner' ) ] );
+		}
+
+		// Use check_ajax_referer for AJAX handlers.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
+
+		// Get email from POST data (AJAX request).
+		$email_address = isset( $_POST['email_address'] ) ? \sanitize_email( \wp_unslash( $_POST['email_address'] ) ) : '';
 
 		if ( ! $email_address ) {
 			\wp_send_json_error( \esc_html__( 'Invalid email address.', 'progress-planner' ) );
 		}
 
+		// Regenerate email content with fresh token for current user.
+		$user_id = \get_current_user_id();
+		$token   = \progress_planner()->get_suggested_tasks()->generate_task_completion_token( $this->get_task_id(), $user_id );
+
+		$email_content = \sprintf(
+			// translators: %1$s the admin URL.
+			\__( 'You just used Progress Planner to verify if sending email works on your website. <br><br> The good news; it does! <a href="%1$s" target="_self">Click here to mark %2$s\'s Recommendation as completed</a>.', 'progress-planner' ),
+			\admin_url( 'admin.php?page=progress-planner&prpl_complete_task=' . $this->get_task_id() . '&token=' . $token ),
+			\esc_html( \progress_planner()->get_ui__branding()->get_ravi_name() )
+		);
+
 		$headers = [ 'Content-Type: text/html; charset=UTF-8' ];
 
-		$result = \wp_mail( $email_address, $this->email_subject, $this->email_content, $headers );
+		$result = \wp_mail( $email_address, $this->email_subject, $email_content, $headers );
 
 		if ( $result ) {
 			\wp_send_json_success( \esc_html__( 'Email sent successfully.', 'progress-planner' ) );
@@ -289,12 +317,40 @@ class Email_Sending extends Tasks {
 			'popovers/email-sending.php',
 			[
 				'prpl_popover_id'                      => static::POPOVER_ID,
+				'prpl_external_link_url'               => $this->get_external_link_url(),
 				'prpl_provider_id'                     => $this->get_provider_id(),
 				'prpl_email_subject'                   => $this->email_subject,
 				'prpl_email_error'                     => $this->email_error,
-				'prpl_troubleshooting_guide_url'       => $this->troubleshooting_guide_url,
+				'prpl_troubleshooting_guide_url'       => $this->get_troubleshooting_guide_url(),
 				'prpl_is_there_sending_email_override' => $this->is_there_sending_email_override(),
+				'prpl_task_actions'                    => $this->get_task_actions(),
 			]
 		);
+	}
+
+	/**
+	 * Print the popover form contents.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		// The form is handled in the popovers/email-sending view.
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Test email sending', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

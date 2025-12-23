@@ -34,14 +34,14 @@ class Post_Author extends Base_Data_Collector {
 	/**
 	 * Update the cache when the post author changes.
 	 *
-	 * @param int      $post_id The post ID.
-	 * @param \WP_Post $post_after The post object following the update.
-	 * @param \WP_Post $post_before The post object before the update.
+	 * @param int           $post_id The post ID.
+	 * @param \WP_Post|null $post_after The post object following the update.
+	 * @param \WP_Post      $post_before The post object before the update.
 	 *
 	 * @return void
 	 */
 	public function update_post_author_on_change( $post_id, $post_after, $post_before ) {
-		if ( $post_after->post_author !== $post_before->post_author ) {
+		if ( $post_after && $post_after->post_author !== $post_before->post_author ) {
 			$this->update_cache();
 		}
 	}
@@ -70,12 +70,10 @@ class Post_Author extends Base_Data_Collector {
 		global $wpdb;
 
 		$author_ids = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			"
-			SELECT DISTINCT post_author
+			"SELECT DISTINCT post_author
 			FROM {$wpdb->posts}
 			WHERE post_status = 'publish'
-			AND post_type = 'post'
-		"
+			AND post_type = 'post'"
 		);
 
 		return \count( $author_ids );

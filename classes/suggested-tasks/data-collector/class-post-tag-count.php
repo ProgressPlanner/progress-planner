@@ -40,8 +40,7 @@ class Post_Tag_Count extends Base_Data_Collector {
 		global $wpdb;
 
 		$result = $wpdb->get_var( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			"
-			SELECT COUNT( * ) as tag_count
+			"SELECT COUNT( * ) as tag_count
 			FROM {$wpdb->terms} AS t
 			INNER JOIN {$wpdb->term_taxonomy} AS tt ON t.term_id = tt.term_id
 			WHERE tt.taxonomy = 'post_tag'

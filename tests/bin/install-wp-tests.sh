@@ -80,7 +80,6 @@ fi
 set -ex
 
 install_wp() {
-
 	if [ -d $WP_CORE_DIR ]; then
 		return;
 	fi
@@ -170,7 +169,6 @@ create_db() {
 }
 
 install_db() {
-
 	if [ ${SKIP_DB_CREATE} = "true" ]; then
 		return 0
 	fi
@@ -195,8 +193,14 @@ install_db() {
 	if [ $(mysql --user="$DB_USER" --password="$DB_PASS"$EXTRA --execute='show databases;' | grep ^$DB_NAME$) ]
 	then
 		echo "Reinstalling will delete the existing test database ($DB_NAME)"
-		read -p 'Are you sure you want to proceed? [y/N]: ' DELETE_EXISTING_DB
-		recreate_db $DELETE_EXISTING_DB
+		# In CI environments, automatically proceed without prompting
+		if [ -n "$CI" ] || [ -n "$GITHUB_ACTIONS" ]; then
+			echo "CI environment detected, automatically recreating database..."
+			recreate_db "y"
+		else
+			read -p 'Are you sure you want to proceed? [y/N]: ' DELETE_EXISTING_DB
+			recreate_db $DELETE_EXISTING_DB
+		fi
 	else
 		create_db
 	fi

@@ -1,10 +1,109 @@
+= 1.10.0 =
+
+Added these recommendations from Ravi:
+
+* Reduce number of autoloaded options
+
+= 1.9.0 =
+
+In this release we've added an integration with the **All In One Seo** plugin so you’ll now see personalized suggestions based on your current SEO configuration.
+
+Added these recommendations from Ravi:
+
+* Install an SEO plugin
+* Improve PDF handling if the site has many PDFs
+* All In One SEO: [noindex the author archive](https://prpl.fyi/aioseo-author-archive)
+* All In One SEO: [noindex the date archive](https://prpl.fyi/aioseo-date-archive)
+* All In One SEO: [Remove post authors feeds](https://prpl.fyi/aioseo-crawl-optimization-feed-authors)
+* All In One SEO: [Remove comment feeds](https://prpl.fyi/aioseo-crawl-optimization-feed-comments)
+* All In One SEO: [disable the media pages](https://prpl.fyi/aioseo-media-pages)
+* All In One SEO: set your [organization](https://prpl.fyi/aioseo-organization-logo) or [person](https://prpl.fyi/aioseo-person-logo) logo
+
+Enhancements:
+
+* Add "Show all Recommendations" button to the "Ravi's Recommendations" widget
+* Performance improvements
+* Removed the "Latest Badge" widget from the plugin page
+* Styling improvements
+* Improved task prioritization
+* Converted many tasks to be "Interactive", improving user-experience.
+* Dont display tasks to users which dont't have capability to complete them
+* Proactively ran a complete security audit of the plugin, and strengthened security
+
+Bugs we fixed:
+
+* Fix missing content and streak badges after they are all completed.
+* Fix issue when point is sometimes not awarded for completing "Remove term without posts" task.
+* "Yoast SEO: set your organization logo" task detects site logo as fallback, same as Yoast SEO does.
+
+= 1.8.1 =
+
+- Security fix: Privilege escalation via an AJAX call where authenticated users could update arbitrary site options.
+- Added capability checks.
+- Thanks to [NumeX](https://github.com/NumeXx) for responsibly disclosing via the Patchstack Bug Bounty Program.
+
+= 1.8.0 =
+
+Enhancements:
+
+* Redesign of the admin pages.
+* Improved capability checks.
+* a11y improvements.
+
+Added these recommendations from Ravi:
+
+* Set date format.
+
+Bugs we fixed:
+
+* Fix redirecting to Progress Planner Dashboard after login.
+
+= 1.7.2 =
+
+* Backported some features from the Progress Planner Pro plugin.
+
+= 1.7.1 =
+
+Bugs we fixed:
+
+* Fix weird interactive task popover behaviour on small screens
+* Fix missing pages (page types) from the Settings screen
+* Clear WP API model schema cache in session storage
+* Make interactive tasks work on WP dashboard screen
+* Exclude taxonomies which are marked as not indexable in Yoast SEO
+* Improve completed task check for "Unpublished content" task
+* Remove awarded point if the golden todo task is set back to pending status
+* Fix "Delete the 'Sample Page' page" interactive task
+* Remove 3rd party plugin tasks if they are deactivated.
+
 = 1.7.0 =
+
+Added these recommendations from Ravi:
+* Select site timezone.
+* Select site locale.
+* Disable comment pagination.
+* Check unpublished content.
+
+Following recommendations are now interactive:
+* Set tagline.
+* Disable comments.
+* Delete the "Hello World!" post.
+* Delete "Sample Page".
+* Select site timezone.
+* Select site locale.
 
 Bugs we fixed:
 
 * Fix issue where "Perform all updates" task was incorrectly marked as completed.
 * Prevent new lines to be added when user task title is edited.
 
+Enhancements:
+
+* Styling improvements
+* Refactored charts
+* Change the link of the "Rename uncategorized" task to the taxonomy-term edit screen instead of the taxonomy terms list
+* Check tasks when snooze period is over
+* Added a plugin-installer component for recommendations
 
 = 1.6.3 =
 

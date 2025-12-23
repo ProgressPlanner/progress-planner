@@ -15,18 +15,18 @@ use Progress_Planner\Suggested_Tasks\Providers\Tasks;
 abstract class Yoast_Provider extends Tasks {
 
 	/**
-	 * The provider type.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'configuration';
-
-	/**
 	 * Whether the task is an onboarding task.
 	 *
 	 * @var bool
 	 */
 	protected const IS_ONBOARDING_TASK = false;
+
+	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 20;
 
 	/**
 	 * Get the focus tasks.

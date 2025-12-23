@@ -14,7 +14,7 @@
 		grid-gap: calc(var(--prpl-gap) / 2);
 
 		> div {
-			border: 1px solid var(--prpl-color-gray-2);
+			border: 1px solid var(--prpl-color-border);
 			border-radius: var(--prpl-border-radius);
 			font-size: 0.875rem;
 			text-align: center;

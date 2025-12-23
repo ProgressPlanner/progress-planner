@@ -8,11 +8,14 @@
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
 use Progress_Planner\Suggested_Tasks\Data_Collector\Post_Author;
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder;
 
 /**
  * Add task for Yoast SEO: disable the author archive.
  */
-class Archive_Author extends Yoast_Provider {
+class Archive_Author extends Yoast_Interactive_Provider {
+
+	use Task_Action_Builder;
 
 	/**
 	 * The minimum number of posts with a post format to add the task.
@@ -29,11 +32,25 @@ class Archive_Author extends Yoast_Provider {
 	protected const PROVIDER_ID = 'yoast-author-archive';
 
 	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'yoast-author-archive';
+
+	/**
 	 * The data collector class name.
 	 *
 	 * @var string
 	 */
 	protected const DATA_COLLECTOR_CLASS = Post_Author::class;
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/yoast-author-archive';
 
 	/**
 	 * Get the task URL.
@@ -51,19 +68,6 @@ class Archive_Author extends Yoast_Provider {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: disable the author archive', 'progress-planner' );
-	}
-
-	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Yoast SEO can disable the author archive when you have only one author, as it is the same as the homepage. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-author-archive" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Author Archive', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
 	}
 
 	/**
@@ -92,7 +96,7 @@ class Archive_Author extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		return $this->is_task_relevant()
-			&& \YoastSEO()->helpers->options->get( 'disable-author' ) !== true;
+			&& \YoastSEO()->helpers->options->get( 'disable-author' ) !== true; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**
@@ -105,5 +109,37 @@ class Archive_Author extends Yoast_Provider {
 	public function is_task_relevant() {
 		// If there is more than one author, we don't need to add the task.
 		return $this->get_data_collector()->collect() <= self::MINIMUM_AUTHOR_WITH_POSTS;
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'When your site has only one author, the author archive is redundant and creates duplicate content issues. Disabling it prevents search engines from indexing the same content multiple times.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		$this->print_submit_button( \__( 'Disable', 'progress-planner' ) );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		return $this->add_popover_action( $actions, \__( 'Disable', 'progress-planner' ) );
 	}
 }

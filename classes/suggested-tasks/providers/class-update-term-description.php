@@ -7,13 +7,13 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
-use Progress_Planner\Suggested_Tasks\Providers\Tasks;
+use Progress_Planner\Suggested_Tasks\Providers\Tasks_Interactive;
 use Progress_Planner\Suggested_Tasks\Data_Collector\Terms_Without_Description as Terms_Without_Description_Data_Collector;
 
 /**
  * Add task to update term description.
  */
-class Update_Term_Description extends Tasks {
+class Update_Term_Description extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -30,11 +30,11 @@ class Update_Term_Description extends Tasks {
 	protected const PROVIDER_ID = 'update-term-description';
 
 	/**
-	 * The provider category.
+	 * The popover ID.
 	 *
 	 * @var string
 	 */
-	protected const CATEGORY = 'content-update';
+	const POPOVER_ID = 'update-term-description';
 
 	/**
 	 * The capability required to perform the task.
@@ -49,6 +49,13 @@ class Update_Term_Description extends Tasks {
 	 * @var string
 	 */
 	protected const DATA_COLLECTOR_CLASS = Terms_Without_Description_Data_Collector::class;
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/taxonomy-terms-description';
 
 	/**
 	 * Whether the task is dismissable.
@@ -84,8 +91,9 @@ class Update_Term_Description extends Tasks {
 	public function init() {
 		// Maybe remove tasks when term is deleted.
 		\add_action( 'delete_term', [ $this, 'maybe_remove_irrelevant_tasks' ], 10, 5 );
-
 		\add_filter( 'progress_planner_terms_without_description_exclude_term_ids', [ $this, 'exclude_completed_terms' ] );
+
+		\add_action( 'wp_ajax_prpl_interactive_task_submit_update-term-description', [ $this, 'handle_interactive_task_submit' ] );
 	}
 
 	/**
@@ -99,6 +107,14 @@ class Update_Term_Description extends Tasks {
 	 * @return void
 	 */
 	public function maybe_remove_irrelevant_tasks( $term, $tt_id, $taxonomy, $deleted_term, $object_ids ) {
+
+		$taxonomy_object = \get_taxonomy( $taxonomy );
+
+		// Check if the taxonomy is public, we are not interested in non-public taxonomies (also our data collector doesn't track non-public taxonomies).
+		if ( ! $taxonomy_object || ! $taxonomy_object->public ) {
+			return;
+		}
+
 		$pending_tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => $this->get_provider_id() ] );
 
 		if ( ! $pending_tasks ) {
@@ -120,29 +136,15 @@ class Update_Term_Description extends Tasks {
 	 * @return string
 	 */
 	protected function get_title_with_data( $task_data = [] ) {
+		if ( ! isset( $task_data['target_term_id'] ) || ! isset( $task_data['target_taxonomy'] ) ) {
+			return '';
+		}
+
 		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return $term && ! \is_wp_error( $term ) ? \sprintf(
 			/* translators: %s: The term name */
 			\esc_html__( 'Write a description for term named "%s"', 'progress-planner' ),
 			\esc_html( $term->name )
-		) : '';
-	}
-
-	/**
-	 * Get the description.
-	 *
-	 * @param array $task_data The task data.
-	 *
-	 * @return string
-	 */
-	public function get_description_with_data( $task_data = [] ) {
-		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
-
-		return $term && ! \is_wp_error( $term ) ? \sprintf(
-			/* translators: %1$s: The term name, %2$s <a href="https://prpl.fyi/taxonomy-terms-description" target="_blank">Read more</a> link */
-			\esc_html__( 'Your "%1$s" archives probably show the description of that specific term. %2$s', 'progress-planner' ),
-			$term->name,
-			'<a href="https://prpl.fyi/taxonomy-terms-description" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the writing a description for taxonomy terms.', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
 		) : '';
 	}
 
@@ -154,6 +156,10 @@ class Update_Term_Description extends Tasks {
 	 * @return string
 	 */
 	protected function get_url_with_data( $task_data = [] ) {
+		if ( ! isset( $task_data['target_term_id'] ) || ! isset( $task_data['target_taxonomy'] ) ) {
+			return '';
+		}
+
 		$term = \get_term( $task_data['target_term_id'], $task_data['target_taxonomy'] );
 		return $term && ! \is_wp_error( $term )
 			? \admin_url( 'term.php?taxonomy=' . $term->taxonomy . '&tag_ID=' . $term->term_id )
@@ -199,11 +205,11 @@ class Update_Term_Description extends Tasks {
 			return [];
 		}
 
-		$data    = $this->get_data_collector()->collect();
+		$data    = $this->transform_collector_data( $this->get_data_collector()->collect() );
 		$task_id = $this->get_task_id(
 			[
-				'term_id'  => $data['term_id'],
-				'taxonomy' => $data['taxonomy'],
+				'target_term_id'  => $data['target_term_id'],
+				'target_taxonomy' => $data['target_taxonomy'],
 			]
 		);
 
@@ -214,7 +220,7 @@ class Update_Term_Description extends Tasks {
 		// Transform the data to match the task data structure.
 		$task_data = $this->modify_injection_task_data(
 			$this->get_task_details(
-				$this->transform_collector_data( $data )
+				$data
 			)
 		);
 
@@ -297,5 +303,161 @@ class Update_Term_Description extends Tasks {
 	 */
 	public function exclude_completed_terms( $exclude_term_ids ) {
 		return \array_merge( $exclude_term_ids, $this->get_completed_term_ids() );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		if ( ! isset( $data['slug'] ) ) {
+			return $actions;
+		}
+
+		$term = $this->get_term_from_task_id( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $data['slug'] ) );
+
+		// If the term is not found, return the actions.
+		if ( ! $term ) {
+			return $actions;
+		}
+
+		$task_data = [
+			'target_term_id'   => $term->term_id,
+			'target_taxonomy'  => $term->taxonomy,
+			'target_term_name' => $term->name,
+		];
+
+		$task_details = $this->get_task_details( $task_data );
+
+		$taxonomy = \get_taxonomy( $term->taxonomy );
+
+		$actions[] = [
+			'priority' => 10,
+			'html'     => \sprintf(
+				'<a href="#" class="prpl-tooltip-action-text prpl-update-term-description-action" role="button"
+					data-task-context=\'%s\'
+					onclick="event.preventDefault(); document.getElementById(\'prpl-popover-%s\')?.showPopover(); this.dispatchEvent(new CustomEvent(\'prpl-interactive-task-action-update-term-description\', { bubbles: true, detail: JSON.parse(this.dataset.taskContext) }));">
+					%s
+				</a>',
+				\htmlspecialchars(
+					\wp_json_encode(
+						[
+							'post_title'           => $task_details['post_title'],
+							'target_term_id'       => $task_data['target_term_id'],
+							'target_taxonomy'      => $task_data['target_taxonomy'],
+							'target_taxonomy_name' => $taxonomy ? $taxonomy->label : '',
+							'target_term_name'     => $task_data['target_term_name'],
+						]
+					),
+					ENT_QUOTES,
+					'UTF-8'
+				),
+				\esc_attr( static::POPOVER_ID ),
+				\esc_html__( 'Write description', 'progress-planner' )
+			),
+		];
+
+		return $actions;
+	}
+
+	/**
+	 * Print the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'Term descriptions appear on category and tag archive pages, helping visitors understand what to expect. They also provide important context for search engines, which can improve your SEO.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover form contents.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		?>
+		<div class="prpl-update-term-info" style="margin-bottom: 15px;">
+			<p style="margin: 0 0 5px 0;">
+				<strong><?php \esc_html_e( 'Term:', 'progress-planner' ); ?></strong>
+				<span id="prpl-update-term-name"></span>
+			</p>
+			<p style="margin: 0 0 10px 0; font-size: 12px; color: #646970;">
+				<?php
+				\printf(
+					/* translators: %1$s: The taxonomy name, %2$s: The term slug */
+					\esc_html__( 'You are updating the term which belongs to the "%1$s" (slug "%2$s").', 'progress-planner' ),
+					'<span id="prpl-update-term-taxonomy-name"></span>',
+					'<span id="prpl-update-term-taxonomy"></span>'
+				);
+				?>
+			</p>
+		</div>
+		<textarea
+			name="description"
+			id="prpl-term-description"
+			rows="5"
+			style="width: 100%; margin-bottom: 15px;"
+			placeholder="<?php \esc_attr_e( 'Enter term description...', 'progress-planner' ); ?>"
+		></textarea>
+		<input type="hidden" name="term_id" id="prpl-update-term-id" value="">
+		<input type="hidden" name="taxonomy" id="prpl-update-taxonomy" value="">
+		<div class="prpl-steps-nav-wrapper">
+			<button type="submit" class="prpl-button prpl-button-primary" id="prpl-update-term-description-button">
+				<?php \esc_html_e( 'Save description', 'progress-planner' ); ?>
+			</button>
+		</div>
+		<?php
+	}
+
+	/**
+	 * Handle the interactive task submit for term description update.
+	 *
+	 * @return void
+	 */
+	public function handle_interactive_task_submit() {
+		// Check if the user has the necessary capabilities.
+		if ( ! \current_user_can( static::CAPABILITY ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update terms.', 'progress-planner' ) ] );
+		}
+
+		// Check the nonce.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
+
+		if ( ! isset( $_POST['term_id'] ) || ! isset( $_POST['taxonomy'] ) || ! isset( $_POST['description'] ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Missing term information.', 'progress-planner' ) ] );
+		}
+
+		$term_id     = \absint( \wp_unslash( $_POST['term_id'] ) );
+		$taxonomy    = \sanitize_text_field( \wp_unslash( $_POST['taxonomy'] ) );
+		$description = \wp_kses_post( \wp_unslash( $_POST['description'] ) );
+
+		// Verify the term exists.
+		$term = \get_term( $term_id, $taxonomy );
+		if ( ! $term || \is_wp_error( $term ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Term not found.', 'progress-planner' ) ] );
+		}
+
+		// Update the term description.
+		$result = \wp_update_term(
+			$term_id,
+			$taxonomy,
+			[
+				'description' => $description,
+			]
+		);
+
+		if ( \is_wp_error( $result ) ) {
+			\wp_send_json_error( [ 'message' => $result->get_error_message() ] );
+		}
+
+		\wp_send_json_success( [ 'message' => \esc_html__( 'Term description updated successfully.', 'progress-planner' ) ] );
 	}
 }

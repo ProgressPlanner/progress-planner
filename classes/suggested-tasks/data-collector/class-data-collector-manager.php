@@ -8,6 +8,8 @@
 namespace Progress_Planner\Suggested_Tasks\Data_Collector;
 
 use Progress_Planner\Suggested_Tasks\Data_Collector\Yoast_Orphaned_Content;
+use Progress_Planner\Suggested_Tasks\Data_Collector\Unpublished_Content;
+use Progress_Planner\Suggested_Tasks\Data_Collector\SEO_Plugin;
 
 /**
  * Manages the collection and initialization of data collectors.

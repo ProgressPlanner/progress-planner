@@ -18,8 +18,8 @@ class Playground {
 	public function __construct() {
 		\add_action( 'init', [ $this, 'register_hooks' ], 9 );
 		\add_action( 'plugins_loaded', [ $this, 'enable_debug_tools' ], 1 );
-		\add_filter( 'progress_planner_tasks_show_ui', '__return_true' );
 		\add_action( 'admin_footer', [ $this, 'inject_playground_js_patch' ] );
+		\add_action( 'init', [ $this, 'disable_upgrade_tasks_popover' ], 101 );
 	}
 
 	/**
@@ -28,7 +28,7 @@ class Playground {
 	 * @return void
 	 */
 	public function register_hooks() {
-		if ( ! \get_option( 'progress_planner_license_key', false ) && ! \get_option( 'progress_planner_demo_data_generated', false ) ) {
+		if ( ! \progress_planner()->get_license_key() && ! \get_option( 'progress_planner_demo_data_generated', false ) ) {
 			$this->generate_data();
 			\update_option( 'progress_planner_license_key', \str_replace( ' ', '-', $this->create_random_string( 20 ) ) );
 			\update_option( 'progress_planner_force_show_onboarding', false );
@@ -52,6 +52,22 @@ class Playground {
 		\add_action( 'wp_ajax_progress_planner_show_onboarding', [ $this, 'show_onboarding' ] );
 
 		\progress_planner()->get_settings()->set( 'activation_date', ( new \DateTime() )->modify( '-2 months' )->format( 'Y-m-d' ) );
+	}
+
+	/**
+	 * Disable the upgrade tasks popover.
+	 *
+	 * @return void
+	 */
+	public function disable_upgrade_tasks_popover() {
+		// This will make the plugin think it was activated, so the upgrade tasks popover will not be shown.
+		$onboard_task_provider_ids = \apply_filters( 'prpl_onboarding_task_providers', [] );
+
+		// Update 'progress_planner_previous_version_task_providers' option.
+		\update_option( 'progress_planner_previous_version_task_providers', \array_unique( $onboard_task_provider_ids ), SORT_REGULAR );
+
+		// Clear the upgrade popover task provider IDs, this are the 'newly' added task providers, so the upgrade tasks popover will not be shown.
+		\update_option( 'progress_planner_upgrade_popover_task_provider_ids', [] );
 	}
 
 	/**
@@ -162,12 +178,21 @@ class Playground {
 	 * @return void
 	 */
 	public function generate_data() {
+		// Insert 24 posts.
 		for ( $i = 0; $i < 24; $i++ ) {
 			$this->create_random_post();
 		}
+
+		// Insert 10 draft posts.
+		for ( $i = 0; $i < 10; $i++ ) {
+			$this->create_random_post( true, 'post', 'draft' );
+		}
+
+		// Insert 5 pages.
 		for ( $i = 0; $i < 5; $i++ ) {
 			$this->create_random_post( true, 'page' );
 		}
+
 		// One post for today.
 		$this->create_random_post( false );
 	}
@@ -177,16 +202,17 @@ class Playground {
 	 *
 	 * @param bool   $random_date Whether to use a random date or not.
 	 * @param string $post_type   The post type to create.
+	 * @param string $post_status The post status to create.
 	 *
 	 * @return int Post ID.
 	 */
-	private function create_random_post( $random_date = true, $post_type = 'post' ) {
+	private function create_random_post( $random_date = true, $post_type = 'post', $post_status = 'publish' ) {
 		$postarr = [
 			'post_title'   => \str_replace( '.', '', $this->create_random_string( 5 ) ),
 			'post_content' => $this->create_random_string( \wp_rand( 200, 500 ) ),
-			'post_status'  => 'publish',
+			'post_status'  => $post_status,
 			'post_type'    => $post_type,
-			'post_date'    => $this->get_random_date_last_12_months(),
+			'post_date'    => $this->get_random_date_last_x_months( 18 ),
 		];
 
 		if ( ! $random_date ) {
@@ -196,20 +222,22 @@ class Playground {
 	}
 
 	/**
-	 * Generate a random date within the last 12 months.
+	 * Generate a random date within the last x months.
+	 *
+	 * @param int $months Number of months to go back.
 	 *
 	 * @return string Random date in 'Y-m-d H:i:s' format.
 	 */
-	private function get_random_date_last_12_months() {
+	private function get_random_date_last_x_months( $months ) {
 		// Current time.
 		// phpcs:ignore WordPress.DateTime.CurrentTimeTimestamp.Requested -- This works fine for these purposes.
 		$now = \current_time( 'timestamp' );
 
-		// Timestamp for 12 months ago.
-		$last_year = \strtotime( '-12 months', $now );
+		// Timestamp for x months ago.
+		$last_year = \strtotime( "-{$months} months", $now );
 
 		// Generate a random timestamp between last year and now.
-		$random_timestamp = \wp_rand( $last_year, $now );
+		$random_timestamp = \wp_rand( $last_year, $now ); // @phpstan-ignore-line argument.type
 
 		// Format the random timestamp as a MySQL datetime string.
 		return \gmdate( 'Y-m-d H:i:s', $random_timestamp );
@@ -258,7 +286,6 @@ class Playground {
 		?>
 		<script>
 			( function waitForWp() {
-
 				if ( ! window.wp || ! wp.api?.models?.Prpl_recommendations ) {
 					return setTimeout(waitForWp, 50);
 				}

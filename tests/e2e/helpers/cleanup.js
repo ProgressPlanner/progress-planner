@@ -12,7 +12,9 @@ const SELECTORS = require( '../constants/selectors' );
  */
 async function cleanUpPlannerTasks( { page, context, baseUrl } ) {
 	try {
-		if ( page.isClosed?.() ) return;
+		if ( page.isClosed?.() ) {
+			return;
+		}
 
 		await page.goto(
 			`${ baseUrl }/wp-admin/admin.php?page=progress-planner`
@@ -23,7 +25,9 @@ async function cleanUpPlannerTasks( { page, context, baseUrl } ) {
 		const todoItems = page.locator( SELECTORS.TODO_ITEM );
 		while ( ( await todoItems.count() ) > 0 ) {
 			const firstItem = todoItems.first();
-			const trash = firstItem.locator( '.trash' );
+			const trash = firstItem.locator(
+				'.prpl-suggested-task-actions-wrapper .trash'
+			);
 
 			try {
 				console.log(
@@ -57,7 +61,9 @@ async function cleanUpPlannerTasks( { page, context, baseUrl } ) {
 			);
 			while ( ( await completedItems.count() ) > 0 ) {
 				const firstCompleted = completedItems.first();
-				const trash = firstCompleted.locator( '.trash' );
+				const trash = firstCompleted.locator(
+					'.prpl-suggested-task-points-wrapper .trash'
+				);
 
 				try {
 					console.log(

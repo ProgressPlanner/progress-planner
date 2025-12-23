@@ -4,9 +4,9 @@ module.exports = {
 		'plugin:eslint-comments/recommended',
 	],
 	parserOptions: {
-		ecmaVersion: "latest",
+		ecmaVersion: 'latest',
 	},
 	rules: {
-		"no-console": "off",
+		'no-console': 'off',
 	},
 };

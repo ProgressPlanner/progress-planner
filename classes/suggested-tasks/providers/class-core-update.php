@@ -13,13 +13,6 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 class Core_Update extends Tasks {
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'maintenance';
-
-	/**
 	 * The provider ID.
 	 *
 	 * @var string
@@ -34,6 +27,13 @@ class Core_Update extends Tasks {
 	protected const CAPABILITY = 'update_core';
 
 	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/perform-all-updates';
+
+	/**
 	 * Whether the task is repetitive.
 	 *
 	 * @var bool
@@ -45,7 +45,7 @@ class Core_Update extends Tasks {
 	 *
 	 * @var int
 	 */
-	protected $priority = 0;
+	protected $priority = 20;
 
 	/**
 	 * Get the task URL.
@@ -77,19 +77,6 @@ class Core_Update extends Tasks {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s:<a href="http://prpl.fyi/perform-all-updates" target="_blank">See why we recommend this</a> link */
-			\esc_html__( 'Regular updates improve security and performance. %s.', 'progress-planner' ),
-			'<a href="http://prpl.fyi/perform-all-updates" target="_blank">' . \esc_html__( 'See why we recommend this', 'progress-planner' ) . '</a>'
-		);
-	}
-
-	/**
 	 * Add the link to the Progress Planner Dashboard to the update complete actions.
 	 *
 	 * @param array $update_actions The update actions.
@@ -100,7 +87,7 @@ class Core_Update extends Tasks {
 		// All updates are completed and there is a 'update-core' task in the published tasks.
 		if ( $this->is_task_completed() ) {
 			foreach ( \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'post_status' => 'publish' ] ) as $task ) {
-				if ( $this->get_task_id() === $task->task_id ) {
+				if ( $this->get_task_id() === \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) ) {
 					$update_actions['prpl_core_update'] =
 						'<img src="' . \esc_attr( \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg' ) . '" style="width:1rem;padding-left:0.25rem;padding-right:0.25rem;vertical-align:middle;" alt="Progress Planner" />' .
 						'<a href="' . \esc_url( \admin_url( 'admin.php?page=progress-planner' ) ) . '" target="_parent">' . \esc_html__( 'Click here to celebrate your completed task!', 'progress-planner' ) . '</a>';
@@ -120,7 +107,8 @@ class Core_Update extends Tasks {
 	public function should_add_task() {
 		// Without this \wp_get_update_data() might not return correct data for the core updates (depending on the timing).
 		if ( ! \function_exists( 'get_core_updates' ) ) {
-			require_once ABSPATH . 'wp-admin/includes/update.php'; // @phpstan-ignore requireOnce.fileNotFound
+			// @phpstan-ignore-next-line requireOnce.fileNotFound
+			require_once ABSPATH . 'wp-admin/includes/update.php';
 		}
 
 		// For wp_get_update_data() to return correct data it needs to be called after the 'admin_init' action (with priority 10).
@@ -136,5 +124,22 @@ class Core_Update extends Tasks {
 	 */
 	public function is_task_completed( $task_id = '' ) {
 		return \wp_doing_ajax() ? false : ! $this->should_add_task();
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a class="prpl-tooltip-action-text" href="' . \admin_url( 'update-core.php' ) . '" target="_self">' . \esc_html__( 'Go to the Updates page', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

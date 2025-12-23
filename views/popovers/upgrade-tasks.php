@@ -12,4 +12,4 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-\progress_planner()->the_view( 'popovers/parts/upgrade-tasks.php', [ 'context' => 'upgrade' ] );
+\progress_planner()->the_view( 'popovers/parts/upgrade-tasks.php' );

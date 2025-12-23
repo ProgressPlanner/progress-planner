@@ -14,7 +14,7 @@ use Progress_Planner\Suggested_Tasks\Data_Collector\Published_Post_Count;
 /**
  * Add tasks to check if Fewer Tags plugin is installed.
  */
-class Fewer_Tags extends Tasks {
+class Fewer_Tags extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -24,13 +24,6 @@ class Fewer_Tags extends Tasks {
 	protected const IS_ONBOARDING_TASK = true;
 
 	/**
-	 * The provider type.
-	 *
-	 * @var string
-	 */
-	const CATEGORY = 'configuration';
-
-	/**
 	 * The provider ID.
 	 *
 	 * @var string
@@ -38,11 +31,25 @@ class Fewer_Tags extends Tasks {
 	const PROVIDER_ID = 'fewer-tags';
 
 	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'fewer-tags';
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/install-fewer-tags';
+
+	/**
 	 * The task priority.
 	 *
 	 * @var int
 	 */
-	protected $priority = 10;
+	protected $priority = 32;
 
 	/**
 	 * The plugin active state.
@@ -80,9 +87,11 @@ class Fewer_Tags extends Tasks {
 	protected $is_dismissable = true;
 
 	/**
-	 * Constructor.
+	 * Initialize the task provider.
+	 *
+	 * @return void
 	 */
-	public function __construct() {
+	public function init() {
 		// Data collectors.
 		$this->post_tag_count_data_collector       = new Post_Tag_Count();
 		$this->published_post_count_data_collector = new Published_Post_Count();
@@ -104,21 +113,6 @@ class Fewer_Tags extends Tasks {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Install Fewer Tags and clean up your tags', 'progress-planner' );
-	}
-
-	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			// translators: %1$s is the number of tags, %2$s is the number of published posts, %3$s <a href="https://prpl.fyi/install-fewer-tags" target="_blank">Read more</a> link.
-			\esc_html__( 'We detected that you have %1$s tags and %2$s published posts. Consider installing the "Fewer Tags" plugin. %3$s', 'progress-planner' ),
-			$this->post_tag_count_data_collector->collect(),
-			$this->published_post_count_data_collector->collect(),
-			'<a href="https://prpl.fyi/install-fewer-tags" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Fewer Tags plugin', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
 	}
 
 	/**
@@ -160,7 +154,8 @@ class Fewer_Tags extends Tasks {
 	protected function is_plugin_active() {
 		if ( null === $this->is_plugin_active ) {
 			if ( ! \function_exists( 'get_plugins' ) ) {
-				require_once ABSPATH . 'wp-admin/includes/plugin.php'; // @phpstan-ignore requireOnce.fileNotFound
+				// @phpstan-ignore-next-line requireOnce.fileNotFound
+				require_once ABSPATH . 'wp-admin/includes/plugin.php';
 			}
 
 			$plugins                = \get_plugins();
@@ -168,5 +163,55 @@ class Fewer_Tags extends Tasks {
 		}
 
 		return $this->is_plugin_active;
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\printf(
+			// translators: %1$s is the number of tags, %2$s is the number of published posts.
+			\esc_html__( 'Your site has %1$s tags across %2$s published posts. Having too many tags can dilute your content organization and hurt SEO. The "Fewer Tags" plugin helps you consolidate similar tags.', 'progress-planner' ),
+			(int) $this->post_tag_count_data_collector->collect(),
+			(int) $this->published_post_count_data_collector->collect(),
+		);
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		if ( ! \is_multisite() && \current_user_can( 'install_plugins' ) ) : ?>
+			<prpl-install-plugin
+				data-plugin-name="Fewer Tags"
+				data-plugin-slug="fewer-tags"
+				data-action="<?php echo \progress_planner()->get_plugin_installer()->is_plugin_installed( 'fewer-tags' ) ? 'activate' : 'install'; ?>"
+				data-provider-id="<?php echo \esc_attr( self::PROVIDER_ID ); ?>"
+			></prpl-install-plugin>
+			<?php
+		endif;
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Install plugin', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

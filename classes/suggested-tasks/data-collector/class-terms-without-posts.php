@@ -85,34 +85,8 @@ class Terms_Without_Posts extends Base_Data_Collector {
 	protected function calculate_data() {
 		global $wpdb;
 
-		// Get registered and public taxonomies.
-		/**
-		 * Array of public taxonomy names where both keys and values are taxonomy names.
-		 *
-		 * @var array<string, string> $public_taxonomies
-		 */
-		$public_taxonomies = \get_taxonomies( [ 'public' => true ], 'names' );
-
-		/**
-		 * Array of public taxonomies to exclude from the terms without posts query.
-		 *
-		 * @var array<string> $exclude_public_taxonomies
-		 */
-		$exclude_public_taxonomies = \apply_filters(
-			'progress_planner_exclude_public_taxonomies',
-			[
-				'post_format',
-				'product_shipping_class',
-				'prpl_recommendations_category',
-				'prpl_recommendations_provider',
-			]
-		);
-
-		foreach ( $exclude_public_taxonomies as $taxonomy ) {
-			if ( isset( $public_taxonomies[ $taxonomy ] ) ) {
-				unset( $public_taxonomies[ $taxonomy ] );
-			}
-		}
+		// Get registered and public taxonomies with exclusions applied.
+		$public_taxonomies = $this->get_filtered_public_taxonomies();
 
 		/**
 		 * Array of term IDs to exclude from the terms without description query.
@@ -131,8 +105,7 @@ class Terms_Without_Posts extends Base_Data_Collector {
 			// If the default taxonomy term (which cannot be removed) is set, we need to query 2 terms.
 			$query_limit = $default_taxonomy_term_id ? 2 : 1;
 
-			$query = "
-				SELECT t.term_id, t.name, tt.count, tt.taxonomy
+			$query = "SELECT t.term_id, t.name, tt.count, tt.taxonomy
 				FROM {$wpdb->terms} AS t
 				INNER JOIN {$wpdb->term_taxonomy} AS tt ON t.term_id = tt.term_id
 				WHERE tt.taxonomy = %s AND tt.count <= %d
@@ -152,7 +125,7 @@ class Terms_Without_Posts extends Base_Data_Collector {
 			if ( ! empty( $terms ) ) {
 				foreach ( $terms as $term ) {
 					// Default categories can not be removed.
-					if ( $default_taxonomy_term_id !== (int) $term->term_id ) {
+					if ( $default_taxonomy_term_id !== (int) $term->term_id ) { // @phpstan-ignore-line property.nonObject
 						$result = (array) $term;
 						break 2; // We have found the term, break out of both foreach loops.
 					}

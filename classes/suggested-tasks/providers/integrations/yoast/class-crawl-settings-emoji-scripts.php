@@ -7,10 +7,14 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder;
+
 /**
  * Add task for Yoast SEO: Remove emoji scripts.
  */
-class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
+class Crawl_Settings_Emoji_Scripts extends Yoast_Interactive_Provider {
+
+	use Task_Action_Builder;
 
 	/**
 	 * The provider ID.
@@ -18,6 +22,20 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'yoast-crawl-settings-emoji-scripts';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'yoast-crawl-settings-emoji-scripts';
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/yoast-crawl-optimization-emoji-scripts';
 
 	/**
 	 * Get the task URL.
@@ -35,19 +53,6 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: remove emoji scripts', 'progress-planner' );
-	}
-
-	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Remove JavaScript used for converting emoji characters in older browsers. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-crawl-optimization-emoji-scripts" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Crawl Optimization Emoji Scripts', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
 	}
 
 	/**
@@ -84,5 +89,37 @@ class Crawl_Settings_Emoji_Scripts extends Yoast_Provider {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'WordPress loads extra JavaScript to support emojis in older browsers. Modern browsers (and most of your visitors) don\'t need this, so removing it improves your site\'s loading speed.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		$this->print_submit_button( \__( 'Remove', 'progress-planner' ) );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		return $this->add_popover_action( $actions, \__( 'Remove', 'progress-planner' ) );
 	}
 }

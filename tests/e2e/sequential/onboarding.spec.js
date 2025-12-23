@@ -12,73 +12,45 @@ function onboardingTests( testContext = test ) {
 				await page.goto( '/wp-admin/admin.php?page=progress-planner' );
 				await page.waitForLoadState( 'networkidle' );
 
-				// Verify onboarding element is present
-				const onboardingElement = page.locator( '.prpl-welcome' );
-				await expect( onboardingElement ).toBeVisible();
+				// Wait for the onboarding popover to be visible
+				const popover = page.locator( '#prpl-popover-onboarding' );
+				await expect( popover ).toBeVisible( { timeout: 10000 } );
 
-				// Fill in the onboarding form
-				const form = page.locator( '#prpl-onboarding-form' );
-				await expect( form ).toBeVisible();
+				// Click on the privacy policy checkbox label (clicking label triggers the checkbox)
+				const privacyLabel = page.locator(
+					'label[for="prpl-privacy-checkbox"]'
+				);
+				await expect( privacyLabel ).toBeVisible();
+				await privacyLabel.click();
 
-				// Submit button should be disabled
-				const submitButtonWrapper = form.locator(
-					'#prpl-onboarding-submit-wrapper'
+				// Click "Start onboarding" button to accept privacy and proceed
+				const startButton = popover.locator( '.prpl-tour-next' );
+				await expect( startButton ).toBeVisible();
+				await startButton.click();
+
+				// Wait for step to advance (license generation happens in background)
+				// We should now be on step 1 or later
+				await expect( popover ).toHaveAttribute(
+					'data-prpl-step',
+					/^[1-9]/,
+					{ timeout: 15000 }
 				);
 
-				// Select "no" for email and accept privacy policy
-				await form
-					.locator( 'input[name="with-email"][value="no"]' )
-					.click();
+				// Click the close button to exit onboarding
+				const closeButton = page.locator( '#prpl-tour-close-btn' );
+				await closeButton.click();
 
-				// Verify submit button is stilldisabled
-				await expect( submitButtonWrapper ).toHaveClass(
-					'prpl-disabled'
-				);
+				// Verify onboarding popover is closed/hidden
+				await expect( popover ).toBeHidden( { timeout: 5000 } );
 
-				await form.locator( 'input[name="privacy-policy"]' ).check();
-
-				// Accept privacy policy and verify button becomes enabled
-				await expect( submitButtonWrapper ).not.toHaveClass(
-					'prpl-disabled'
-				);
-
-				// Submit the form
-				await form
-					.locator(
-						'input[type="submit"].prpl-button-secondary--no-email'
-					)
-					.click();
-
-				// Wait for continue button and verify it becomes enabled
-				const continueButton = page.locator(
-					'#prpl-onboarding-continue-button'
-				);
-				await continueButton.waitFor( { state: 'visible' } );
-				await page.waitForSelector(
-					'#prpl-onboarding-continue-button:not(.prpl-disabled)'
-				);
-				await continueButton.click();
-
-				// Verify onboarding completion by checking for expected elements
-				await expect(
-					page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
-				).toBeVisible( { timeout: 5000 } );
-				await expect(
-					page.locator(
-						'.prpl-widget-wrapper.prpl-suggested-tasks .prpl-suggested-tasks-list'
-					)
-				).toBeVisible( {
-					timeout: 5000,
-				} );
-
-				// Visit the WP Dashboard page and back to the Progress Planner page.
+				// Visit the WP Dashboard page and back to the Progress Planner page
 				await page.goto( '/wp-admin/' );
 				await page.goto( '/wp-admin/admin.php?page=progress-planner' );
 				await page.waitForLoadState( 'networkidle' );
 
-				await expect(
-					page.locator( '#prpl-onboarding-tasks' )
-				).toHaveCount( 0 );
+				// Verify onboarding doesn't auto-start (progress was saved)
+				// The popover element exists but should be hidden (not auto-opened)
+				await expect( popover ).toBeHidden( { timeout: 5000 } );
 			}
 		);
 	} );

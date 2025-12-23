@@ -20,13 +20,6 @@ class Collaborator extends Tasks {
 	protected const IS_ONBOARDING_TASK = false;
 
 	/**
-	 * The provider category.
-	 *
-	 * @var string
-	 */
-	protected const CATEGORY = 'collaborator';
-
-	/**
 	 * The provider ID.
 	 *
 	 * @var string
@@ -90,19 +83,18 @@ class Collaborator extends Tasks {
 			return \wp_parse_args(
 				$task,
 				[
-					'task_id'      => '',
-					'title'        => '',
-					'parent'       => 0,
-					'provider_id'  => $this->get_provider_id(),
-					'category'     => $this->get_provider_category(),
-					'priority'     => 'medium',
-					'points'       => 0,
-					'url'          => '',
-					'url_target'   => '_self',
-					'description'  => '',
-					'link_setting' => [],
-					'dismissable'  => true,
-					'snoozable'    => false,
+					'task_id'           => '',
+					'title'             => '',
+					'parent'            => 0,
+					'provider_id'       => $this->get_provider_id(),
+					'priority'          => 'medium',
+					'points'            => 0,
+					'url'               => '',
+					'url_target'        => '_self',
+					'description'       => '',
+					'link_setting'      => [],
+					'dismissable'       => true,
+					'external_link_url' => $this->get_external_link_url(),
 				]
 			);
 		}

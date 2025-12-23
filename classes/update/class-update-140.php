@@ -12,7 +12,7 @@ namespace Progress_Planner\Update;
  *
  * @package Progress_Planner
  */
-class Update_140 {
+class Update_140 extends Update {
 
 	const VERSION = '1.4.0';
 
@@ -41,10 +41,12 @@ class Update_140 {
 		// This is to ensure that we don't lose any tasks, and at the same time we don't have duplicate tasks.
 		$tasks = [];
 		foreach ( $new_tasks as $new_task ) {
-			$tasks[ isset( $new_task['task_id'] ) ? $new_task['task_id'] : \md5( \maybe_serialize( $new_task ) ) ] = $new_task;
+			$key           = isset( $new_task['task_id'] ) ? (string) $new_task['task_id'] : \md5( \maybe_serialize( $new_task ) ); // @phpstan-ignore offsetAccess.invalidOffset
+			$tasks[ $key ] = $new_task;
 		}
 		foreach ( $old_tasks as $old_task ) {
-			$tasks[ isset( $old_task['task_id'] ) ? $old_task['task_id'] : \md5( \maybe_serialize( $old_task ) ) ] = $old_task;
+			$key           = isset( $old_task['task_id'] ) ? (string) $old_task['task_id'] : \md5( \maybe_serialize( $old_task ) ); // @phpstan-ignore offsetAccess.invalidOffset
+			$tasks[ $key ] = $old_task;
 		}
 
 		// Set the tasks option.
