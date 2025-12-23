@@ -1,4 +1,4 @@
-/* global prplSuggestedTask, progressPlannerAjaxRequest, progressPlanner */
+/* global prplSuggestedTask, progressPlannerAjaxRequest, progressPlanner, prplL10n */
 
 /*
  * Core Blog Description recommendation.
@@ -35,6 +35,8 @@ const prplInteractiveTaskFormListener = {
 		formElement.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
 
+			prplInteractiveTaskFormListener.showLoading( formElement );
+
 			// Get the form data.
 			const formData = new FormData( formElement );
 			const settingsToPass = {};
@@ -50,16 +52,19 @@ const prplInteractiveTaskFormListener = {
 			wp.api.loadPromise.done( () => {
 				const settings = new wp.api.models.Settings( settingsToPass );
 
-				settings.save().then( () => {
-					// Close popover.
-					document.getElementById( popoverId ).hidePopover();
+				settings.save().then( ( response ) => {
 					const postId = parseInt( taskEl.dataset.postId );
 					if ( ! postId ) {
-						return;
+						return response;
 					}
 
+					prplInteractiveTaskFormListener.hideLoading( formElement );
+
 					// This will trigger the celebration event (confetti) as well.
-					prplSuggestedTask.maybeComplete( postId );
+					prplSuggestedTask.maybeComplete( postId ).then( () => {
+						// Close popover.
+						document.getElementById( popoverId ).hidePopover();
+					} );
 				} );
 			} );
 		} );
@@ -72,26 +77,58 @@ const prplInteractiveTaskFormListener = {
 			return;
 		}
 
-		// Add a form listener to the form.
-		formElement.addEventListener( 'submit', ( event ) => {
+		const formSubmitHandler = ( event ) => {
 			event.preventDefault();
 
-			callback();
+			prplInteractiveTaskFormListener.showLoading( formElement );
 
-			const taskEl = document.querySelector(
-				`.prpl-suggested-task[data-task-id="${ taskId }"]`
-			);
+			callback()
+				.then( ( response ) => {
+					if ( true !== response.success ) {
+						// Show error to the user.
+						prplInteractiveTaskFormListener.showError(
+							response,
+							popoverId
+						);
 
-			// Close popover.
-			document.getElementById( popoverId ).hidePopover();
-			const postId = parseInt( taskEl.dataset.postId );
-			if ( ! postId ) {
-				return;
-			}
+						return response;
+					}
 
-			// This will trigger the celebration event (confetti) as well.
-			prplSuggestedTask.maybeComplete( postId );
-		} );
+					const taskEl = document.querySelector(
+						`.prpl-suggested-task[data-task-id="${ taskId }"]`
+					);
+					const postId = parseInt( taskEl.dataset.postId );
+					if ( ! postId ) {
+						return;
+					}
+
+					// This will trigger the celebration event (confetti) as well.
+					prplSuggestedTask.maybeComplete( postId ).then( () => {
+						// Close popover.
+						document.getElementById( popoverId ).hidePopover();
+					} );
+				} )
+				.catch( ( error ) => {
+					// Show error to the user.
+					prplInteractiveTaskFormListener.showError(
+						error,
+						popoverId
+					);
+				} )
+				.finally( () => {
+					// Hide loading state.
+					prplInteractiveTaskFormListener.hideLoading( formElement );
+
+					// Remove the form listener once the callback is executed.
+					formElement.removeEventListener(
+						'submit',
+						formSubmitHandler
+					);
+				} );
+		};
+
+		// Add a form listener to the form.
+		formElement.addEventListener( 'submit', formSubmitHandler );
 	},
 
 	settings: ( {
@@ -111,6 +148,8 @@ const prplInteractiveTaskFormListener = {
 		formElement.addEventListener( 'submit', ( event ) => {
 			event.preventDefault();
 
+			prplInteractiveTaskFormListener.showLoading( formElement );
+
 			const formData = new FormData( formElement );
 			const settingsToPass = {};
 			settingsToPass[ setting ] = settingCallbackValue(
@@ -127,25 +166,134 @@ const prplInteractiveTaskFormListener = {
 					value: settingsToPass[ setting ],
 					setting_path: settingPath,
 				},
-			} ).then( () => {
-				const taskEl = document.querySelector(
-					`.prpl-suggested-task[data-task-id="${ taskId }"]`
-				);
+			} )
+				.then( ( response ) => {
+					if ( true !== response.success ) {
+						// Show error to the user.
+						prplInteractiveTaskFormListener.showError(
+							response,
+							popoverId
+						);
 
-				if ( ! taskEl ) {
-					return;
-				}
+						return response;
+					}
 
-				// Close popover.
-				document.getElementById( popoverId ).hidePopover();
-				const postId = parseInt( taskEl.dataset.postId );
-				if ( ! postId ) {
-					return;
-				}
+					const taskEl = document.querySelector(
+						`.prpl-suggested-task[data-task-id="${ taskId }"]`
+					);
 
-				// This will trigger the celebration event (confetti) as well.
-				prplSuggestedTask.maybeComplete( postId );
-			} );
+					if ( ! taskEl ) {
+						return response;
+					}
+
+					const postId = parseInt( taskEl.dataset.postId );
+					if ( ! postId ) {
+						return response;
+					}
+
+					// This will trigger the celebration event (confetti) as well.
+					prplSuggestedTask.maybeComplete( postId ).then( () => {
+						// Close popover.
+						document.getElementById( popoverId ).hidePopover();
+					} );
+				} )
+				.catch( ( error ) => {
+					// Show error to the user.
+					prplInteractiveTaskFormListener.showError(
+						error,
+						popoverId
+					);
+				} )
+				.finally( () => {
+					// Hide loading state.
+					prplInteractiveTaskFormListener.hideLoading( formElement );
+				} );
 		} );
+	},
+
+	/**
+	 * Helper which shows user an error message.
+	 * For now the error message is generic.
+	 *
+	 * @param {Object} error     - The error object.
+	 * @param {string} popoverId - The ID of the popover.
+	 * @return {void}
+	 */
+	showError: ( error, popoverId ) => {
+		const formElement = document.querySelector( `#${ popoverId } form` );
+
+		if ( ! formElement ) {
+			return;
+		}
+
+		console.error( 'Error in interactive task callback:', error );
+
+		// Check if there's already an error message <p> element right after the form
+		const existingErrorElement = formElement.parentNode.querySelector(
+			'p.prpl-interactive-task-error-message'
+		);
+
+		if ( ! existingErrorElement ) {
+			// Add paragraph with error message.
+			const errorParagraph = document.createElement( 'p' );
+			errorParagraph.classList.add(
+				'prpl-note',
+				'prpl-note-error',
+				'prpl-interactive-task-error-message'
+			);
+			errorParagraph.textContent = prplL10n( 'somethingWentWrong' );
+
+			// Append after the form element.
+			formElement.insertAdjacentElement( 'afterend', errorParagraph );
+		}
+	},
+
+	/**
+	 * Show loading state.
+	 *
+	 * @param {HTMLFormElement} formElement - The form element.
+	 * @return {void}
+	 */
+	showLoading: ( formElement ) => {
+		let submitButton = formElement.querySelector( 'button[type="submit"]' );
+
+		if ( ! submitButton ) {
+			submitButton = formElement.querySelector(
+				'button[data-action="completeTask"]'
+			);
+		}
+
+		submitButton.disabled = true;
+
+		// Add spinner.
+		const spinner = document.createElement( 'span' );
+		spinner.classList.add( 'prpl-spinner' );
+		spinner.innerHTML =
+			'<span class="spinner" style="visibility: visible;"></span>'; // WP spinner.
+
+		// Append spinner after submit button.
+		submitButton.after( spinner );
+	},
+
+	/**
+	 * Hide loading state.
+	 *
+	 * @param {HTMLFormElement} formElement - The form element.
+	 * @return {void}
+	 */
+	hideLoading: ( formElement ) => {
+		let submitButton = formElement.querySelector( 'button[type="submit"]' );
+
+		if ( ! submitButton ) {
+			submitButton = formElement.querySelector(
+				'button[data-action="completeTask"]'
+			);
+		}
+
+		submitButton.disabled = false;
+		const spinner = formElement.querySelector( 'span.prpl-spinner' );
+		if ( spinner ) {
+			spinner.remove();
+		}
 	},
 };

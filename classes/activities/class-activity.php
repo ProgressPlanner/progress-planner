@@ -76,16 +76,15 @@ class Activity {
 	 * @return void
 	 */
 	public function save() {
-		$existing = \progress_planner()->get_activities__query()->query_activities(
+		$existing = \progress_planner()->get_activities__query()->query_activities_get_raw(
 			[
 				'category' => $this->category,
 				'type'     => $this->type,
 				'data_id'  => (string) $this->data_id,
-			],
-			'RAW'
+			]
 		);
 		if ( ! empty( $existing ) ) {
-			\progress_planner()->get_activities__query()->update_activity( $existing[0]->id, $this );
+			\progress_planner()->get_activities__query()->update_activity( $existing[0]->id, $this ); // @phpstan-ignore-line property.nonObject
 			return;
 		}
 		\progress_planner()->get_activities__query()->insert_activity( $this );

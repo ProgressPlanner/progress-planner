@@ -55,7 +55,7 @@ class Query {
 	private function create_activities_table() {
 		global $wpdb;
 
-		$table_name      = $wpdb->prefix . static::TABLE_NAME;
+		$table_name      = $wpdb->prefix . static::TABLE_NAME; // @phpstan-ignore-line property.nonObject
 		$charset_collate = $wpdb->get_charset_collate();
 
 		/**
@@ -84,12 +84,22 @@ class Query {
 	/**
 	 * Query the database for activities.
 	 *
-	 * @param array  $args        The arguments for the query.
-	 * @param string $return_type The type of the return value. Can be "RAW" or "ACTIVITIES".
+	 * @param array $args The arguments for the query.
+	 *
+	 * @return \Progress_Planner\Activities\Activity[] The activities.
+	 */
+	public function query_activities( $args ) {
+		return $this->get_activities_from_results( $this->query_activities_get_raw( $args ) );
+	}
+
+	/**
+	 * Query the database for activities.
+	 *
+	 * @param array $args        The arguments for the query.
 	 *
 	 * @return array The activities.
 	 */
-	public function query_activities( $args, $return_type = 'ACTIVITIES' ) {
+	public function query_activities_get_raw( $args ) {
 		global $wpdb;
 
 		$defaults = [
@@ -147,7 +157,7 @@ class Query {
 			$results = ( empty( $where_args ) )
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 				? $wpdb->get_results(
-					$wpdb->prepare( 'SELECT * FROM %i ORDER BY date', $wpdb->prefix . static::TABLE_NAME )
+					$wpdb->prepare( 'SELECT * FROM %i ORDER BY date', $wpdb->prefix . static::TABLE_NAME ) // @phpstan-ignore-line property.nonObject
 				)
 				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 				: $wpdb->get_results(
@@ -158,7 +168,7 @@ class Query {
 							\implode( ' AND ', $where_args )
 						),
 						\array_merge(
-							[ $wpdb->prefix . static::TABLE_NAME ],
+							[ $wpdb->prefix . static::TABLE_NAME ], // @phpstan-ignore-line property.nonObject
 							$prepare_args
 						)
 					)
@@ -171,22 +181,33 @@ class Query {
 			return [];
 		}
 
-		// Remove duplicates. This could be removed in a future release.
+		// Remove duplicate activities and clean up the database.
+		// Duplicates can occur due to race conditions in concurrent processes.
+		// This cleanup routine identifies duplicates by creating a unique key from:
+		// - category (e.g., 'content', 'maintenance')
+		// - type (e.g., 'post_publish', 'plugin_update')
+		// - data_id (e.g., post ID, plugin slug)
+		// - date (Y-m-d format)
+		// When duplicates are found, only the first occurrence is kept, and subsequent
+		// duplicates are permanently deleted from the database.
+		// This could be removed in a future release once all legacy duplicates are cleaned up.
 		$results_unique = [];
 		foreach ( $results as $key => $result ) {
-			$result_key = $result->category . $result->type . $result->data_id . $result->date;
-			// Cleanup any duplicates that may exist.
+			// Generate unique key for this activity based on its core identifying attributes.
+			$result_key = $result->category . $result->type . $result->data_id . $result->date; // @phpstan-ignore-line property.nonObject
+
+			// If we've already seen an activity with this key, it's a duplicate - delete it.
 			if ( isset( $results_unique[ $result_key ] ) ) {
-				$this->delete_activity_by_id( $result->id );
+				$this->delete_activity_by_id( $result->id ); // @phpstan-ignore-line property.nonObject
 				continue;
 			}
-			$results_unique[ $result->category . $result->type . $result->data_id . $result->date ] = $result;
-		}
-		$results = \array_values( $results_unique );
 
-		return 'RAW' === $return_type
-			? $results
-			: $this->get_activities_from_results( $results );
+			// First occurrence of this activity - keep it.
+			$results_unique[ $result_key ] = $result;
+		}
+
+		// Return array values to reset numeric keys (0, 1, 2...) after filtering.
+		return \array_values( $results_unique );
 	}
 
 	/**
@@ -223,7 +244,7 @@ class Query {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$result = $wpdb->insert(
-			$wpdb->prefix . static::TABLE_NAME,
+			$wpdb->prefix . static::TABLE_NAME, // @phpstan-ignore-line property.nonObject
 			[
 				'date'     => $activity->date ? $activity->date->format( 'Y-m-d H:i:s' ) : ( new \DateTime() )->format( 'Y-m-d H:i:s' ),
 				'category' => $activity->category,
@@ -246,7 +267,7 @@ class Query {
 
 		\wp_cache_flush_group( static::CACHE_GROUP );
 
-		return (int) $wpdb->insert_id;
+		return (int) $wpdb->insert_id; // @phpstan-ignore-line property.nonObject
 	}
 
 	/**
@@ -259,7 +280,7 @@ class Query {
 	private function get_activities_from_results( $results ) {
 		$activities = [];
 		foreach ( $results as $result ) {
-			$class_name         = $this->get_activity_class_name( $result->category );
+			$class_name         = $this->get_activity_class_name( $result->category ); // @phpstan-ignore-line property.nonObject
 			$activity           = new $class_name();
 			$activity->date     = new \DateTime( $result->date ); // @phpstan-ignore-line property.notFound
 			$activity->category = $result->category; // @phpstan-ignore-line property.notFound
@@ -286,7 +307,7 @@ class Query {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$wpdb->update(
-			$wpdb->prefix . static::TABLE_NAME,
+			$wpdb->prefix . static::TABLE_NAME, // @phpstan-ignore-line property.nonObject
 			[
 				'date'     => $activity->date ? $activity->date->format( 'Y-m-d H:i:s' ) : ( new \DateTime() )->format( 'Y-m-d H:i:s' ),
 				'category' => $activity->category,
@@ -344,7 +365,7 @@ class Query {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$wpdb->delete(
-			$wpdb->prefix . static::TABLE_NAME,
+			$wpdb->prefix . static::TABLE_NAME, // @phpstan-ignore-line property.nonObject
 			[ 'id' => $id ],
 			[ '%d' ]
 		);
@@ -364,7 +385,7 @@ class Query {
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery
 		$wpdb->delete(
-			$wpdb->prefix . static::TABLE_NAME,
+			$wpdb->prefix . static::TABLE_NAME, // @phpstan-ignore-line property.nonObject
 			[ 'category' => $category ],
 			[ '%s' ]
 		);
@@ -386,7 +407,7 @@ class Query {
 		$results = $wpdb->get_results(
 			$wpdb->prepare(
 				'SELECT * FROM %i ORDER BY date DESC LIMIT %d',
-				$wpdb->prefix . static::TABLE_NAME,
+				$wpdb->prefix . static::TABLE_NAME, // @phpstan-ignore-line property.nonObject
 				$limit
 			)
 		);
@@ -410,7 +431,7 @@ class Query {
 		$result = $wpdb->get_row(
 			$wpdb->prepare(
 				'SELECT * FROM %i ORDER BY date ASC LIMIT 1',
-				$wpdb->prefix . static::TABLE_NAME
+				$wpdb->prefix . static::TABLE_NAME // @phpstan-ignore-line property.nonObject
 			)
 		);
 
@@ -418,7 +439,7 @@ class Query {
 			return null;
 		}
 
-		$class_name         = $this->get_activity_class_name( $result->category );
+		$class_name         = $this->get_activity_class_name( $result->category ); // @phpstan-ignore-line property.nonObject
 		$activity           = new $class_name();
 		$activity->date     = new \DateTime( $result->date ); // @phpstan-ignore-line property.notFound
 		$activity->category = $result->category; // @phpstan-ignore-line property.notFound
@@ -488,11 +509,13 @@ class Query {
 	private function upgrade_20241011() {
 		global $wpdb;
 
-		$table_name = $wpdb->prefix . static::TABLE_NAME;
+		$table_name = $wpdb->prefix . static::TABLE_NAME; // @phpstan-ignore-line property.nonObject
 
-		foreach ( $wpdb->get_results( "DESCRIBE $table_name" ) as $column ) {
-			if ( 'data_id' === $column->Field && \str_contains( \strtolower( $column->Type ), 'int' ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
-				$wpdb->query( "ALTER TABLE $table_name CHANGE COLUMN data_id data_id VARCHAR(255)" );
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		foreach ( $wpdb->get_results( $wpdb->prepare( 'DESCRIBE %i', $table_name ) ) as $column ) { // @phpstan-ignore-line
+			if ( 'data_id' === $column->Field && \str_contains( \strtolower( $column->Type ), 'int' ) ) { // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase, @phpstan-ignore-line property.nonObject
+				// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.DirectDatabaseQuery.SchemaChange
+				$wpdb->query( $wpdb->prepare( 'ALTER TABLE %i CHANGE COLUMN data_id data_id VARCHAR(255)', $table_name ) ); // @phpstan-ignore-line
 			}
 		}
 	}

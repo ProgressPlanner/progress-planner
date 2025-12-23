@@ -77,21 +77,11 @@ class Plugin_Migrations {
 		if ( ! \is_array( $updates_files ) ) {
 			return;
 		}
-		$updates = \array_map(
-			function ( $file ) {
-				return \str_replace( 'class-update-', '', \basename( $file, '.php' ) );
-			},
-			$updates_files
-		);
+		$updates = \array_map( fn( $file ) => \str_replace( 'class-update-', '', \basename( $file, '.php' ) ), $updates_files );
 		\sort( $updates );
 
 		// Remove "class-update" from the updates.
-		$updates = \array_filter(
-			$updates,
-			function ( $update ) {
-				return $update !== 'class-update';
-			}
-		);
+		$updates = \array_filter( $updates, fn( $update ) => $update !== 'class-update' );
 
 		// Run the upgrades.
 		foreach ( $updates as $version_int ) {

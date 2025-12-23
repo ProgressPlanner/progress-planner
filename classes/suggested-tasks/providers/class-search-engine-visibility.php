@@ -10,7 +10,7 @@ namespace Progress_Planner\Suggested_Tasks\Providers;
 /**
  * Add task to allow search engines to index the site.
  */
-class Search_Engine_Visibility extends Tasks {
+class Search_Engine_Visibility extends Tasks_Interactive {
 
 	/**
 	 * Whether the task is an onboarding task.
@@ -25,6 +25,36 @@ class Search_Engine_Visibility extends Tasks {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'search-engine-visibility';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'search-engine-visibility';
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/blog-indexing-settings';
+
+	/**
+	 * The task priority.
+	 *
+	 * @var int
+	 */
+	protected $priority = 5;
+
+	/**
+	 * Initialize the task.
+	 *
+	 * @return void
+	 */
+	public function init() {
+		\add_action( 'wp_ajax_prpl_interactive_task_submit_search-engine-visibility', [ $this, 'handle_interactive_task_specific_submit' ] );
+	}
 
 	/**
 	 * Get the task URL.
@@ -57,24 +87,76 @@ class Search_Engine_Visibility extends Tasks {
 	}
 
 	/**
-	 * Get the task description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %1$s <a href="https://prpl.fyi/blog-indexing-settings" target="_blank">allowing search engines</a> link */
-			\esc_html__( 'Your site is not currently visible to search engines. Consider %1$s to index your site.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/blog-indexing-settings" target="_blank">' . \esc_html__( 'allowing search engines', 'progress-planner' ) . '</a>',
-		);
-	}
-
-	/**
 	 * Check if the task should be added.
 	 *
 	 * @return bool
 	 */
 	public function should_add_task() {
 		return 0 === (int) \get_option( 'blog_public' );
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'Your site is currently hidden from search engines like Google and Bing. This setting is useful during development, but prevents people from finding your content through search. If your site is ready to go live, you should enable search engine visibility.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		$this->print_submit_button( \__( 'Allow search engines to index your site', 'progress-planner' ) );
+	}
+
+	/**
+	 * Handle the interactive task submit.
+	 *
+	 * This is only for interactive tasks that change non-core settings.
+	 * The $_POST data is expected to be:
+	 * - blog_public: (string) The blog public to update.
+	 * - nonce: (string) The nonce.
+	 *
+	 * @return void
+	 */
+	public function handle_interactive_task_specific_submit() {
+
+		// Check if the user has the necessary capabilities.
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
+		}
+
+		// Check the nonce.
+		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
+		}
+
+		// We're not checking for the return value of the update_option calls, because it will return false if the value is the same.
+		\update_option( 'blog_public', '1' );
+
+		\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Allow', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }

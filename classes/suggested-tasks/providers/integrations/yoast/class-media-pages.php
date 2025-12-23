@@ -7,10 +7,14 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder;
+
 /**
  * Add task for Yoast SEO: disable the media pages.
  */
-class Media_Pages extends Yoast_Provider {
+class Media_Pages extends Yoast_Interactive_Provider {
+
+	use Task_Action_Builder;
 
 	/**
 	 * The provider ID.
@@ -18,6 +22,21 @@ class Media_Pages extends Yoast_Provider {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'yoast-media-pages';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'yoast-media-pages';
+
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/yoast-media-pages';
 
 	/**
 	 * Get the task URL.
@@ -35,19 +54,6 @@ class Media_Pages extends Yoast_Provider {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: disable the media pages', 'progress-planner' );
-	}
-
-	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Yoast SEO can disable the media / attachment pages, which are the pages that show the media files. You really don\'t need them, except when you are displaying photos or art on your site through them. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-media-pages" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Media Pages', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
 	}
 
 	/**
@@ -76,6 +82,38 @@ class Media_Pages extends Yoast_Provider {
 	 */
 	public function should_add_task() {
 		// If the media pages are already disabled, we don't need to add the task.
-		return \YoastSEO()->helpers->options->get( 'disable-attachment' ) !== true;
+		return \YoastSEO()->helpers->options->get( 'disable-attachment' ) !== true; // @phpstan-ignore-line property.nonObject
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'WordPress creates individual pages for every image you upload. These attachment pages rarely provide value and can cause thin content issues for SEO. Disable them unless you\'re running a photography or art portfolio site where the attachment pages themselves are important.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		$this->print_submit_button( \__( 'Disable', 'progress-planner' ) );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		return $this->add_popover_action( $actions, \__( 'Disable', 'progress-planner' ) );
 	}
 }

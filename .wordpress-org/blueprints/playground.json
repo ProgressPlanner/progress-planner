@@ -1,0 +1,31 @@
+{
+    "landingPage": "/wp-admin/admin.php?page=progress-planner",
+    "features": {
+        "networking": true
+    },
+    "plugins": [
+        "progress-planner",
+        "wordpress-seo"
+    ],
+    "steps": [
+        {
+            "step": "login"
+        },
+        {
+            "step": "setSiteOptions",
+            "options": {
+                "wpseo": "a:5:{s:22:\"show_onboarding_notice\";b:0;s:36:\"dismiss_configuration_workout_notice\";b:1;s:18:\"first_time_install\";b:0;s:34:\"activation_redirect_timestamp_free\";i:1652258756;s:34:\"should_redirect_after_install_free\";b:0;}"
+            }
+        },
+        {
+            "step": "defineWpConfigConsts",
+            "consts": {
+                "IS_PLAYGROUND_PREVIEW": true,
+                "WPSEO_PREMIUM_FILE": "override",
+                "WPSEO_PREMIUM_VERSION": "24.8.1",
+                "YOAST_ENVIRONMENT": "development",
+                "WP_ENVIRONMENT_TYPE": "development"
+            }
+        }
+    ]
+}

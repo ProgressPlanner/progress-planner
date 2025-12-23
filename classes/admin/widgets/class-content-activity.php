@@ -31,9 +31,8 @@ final class Content_Activity extends Widget {
 		return \array_merge(
 			$this->get_chart_args( $type, $color ),
 			[
-				'count_callback' => function ( $activities, $date = null ) { // phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
-					return \count( $activities );
-				},
+				// phpcs:ignore Generic.CodeAnalysis.UnusedFunctionParameter.FoundAfterLastUsed
+				'count_callback' => fn( $activities, $date = null ) => \count( $activities ),
 				'return_data'    => [ 'label', 'score' ],
 			]
 		);
@@ -50,16 +49,14 @@ final class Content_Activity extends Widget {
 	public function get_chart_args( $type = 'publish', $color = '#534786' ) {
 		return [
 			'type'           => 'line',
-			'items_callback' => function ( $start_date, $end_date ) use ( $type ) {
-				return \progress_planner()->get_activities__query()->query_activities(
-					[
-						'category'   => 'content',
-						'start_date' => $start_date,
-						'end_date'   => $end_date,
-						'type'       => $type,
-					]
-				);
-			},
+			'items_callback' => fn( $start_date, $end_date ) => \progress_planner()->get_activities__query()->query_activities(
+				[
+					'category'   => 'content',
+					'start_date' => $start_date,
+					'end_date'   => $end_date,
+					'type'       => $type,
+				]
+			),
 			'dates_params'   => [
 				'start_date' => \DateTime::createFromFormat( 'Y-m-d', \gmdate( 'Y-m-01' ) )->modify( $this->get_range() ),
 				'end_date'   => new \DateTime(),
@@ -67,9 +64,7 @@ final class Content_Activity extends Widget {
 				'format'     => 'M',
 			],
 			'filter_results' => [ $this, 'filter_activities' ],
-			'color'          => function () use ( $color ) {
-				return $color;
-			},
+			'color'          => fn() => $color,
 		];
 	}
 
@@ -83,11 +78,10 @@ final class Content_Activity extends Widget {
 	public function filter_activities( $activities ) {
 		return \array_filter(
 			$activities,
-			function ( $activity ) {
-				$post = $activity->get_post();
-				return 'delete' === $activity->type || ( \is_object( $post )
-					&& \in_array( $post->post_type, \progress_planner()->get_activities__content_helpers()->get_post_types_names(), true ) );
-			}
+			fn( $activity ) => 'delete' === $activity->type
+				|| ( \is_object( $activity->get_post() )
+					&& \in_array( $activity->get_post()->post_type, \progress_planner()->get_activities__content_helpers()->get_post_types_names(), true )
+				)
 		);
 	}
 }

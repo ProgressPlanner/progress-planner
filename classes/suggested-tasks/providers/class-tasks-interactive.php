@@ -61,6 +61,12 @@ abstract class Tasks_Interactive extends Tasks {
 	 * @return void
 	 */
 	public function handle_interactive_task_submit() {
+
+		// Check if the user has the necessary capabilities.
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to update settings.', 'progress-planner' ) ] );
+		}
+
 		// Check the nonce.
 		if ( ! \check_ajax_referer( 'progress_planner', 'nonce', false ) ) {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid nonce.', 'progress-planner' ) ] );
@@ -82,6 +88,18 @@ abstract class Tasks_Interactive extends Tasks {
 		$value        = \sanitize_text_field( \wp_unslash( $_POST['value'] ) );
 		$setting_path = \json_decode( \sanitize_text_field( \wp_unslash( $_POST['setting_path'] ) ), true );
 
+		// Whitelist allowed options to prevent arbitrary options update.
+		// This prevents privilege escalation by restricting which options can be updated.
+		$allowed_options = $this->get_allowed_interactive_options();
+
+		if ( ! \in_array( $setting, $allowed_options, true ) ) {
+			\wp_send_json_error(
+				[
+					'message' => \esc_html__( 'Invalid setting. This option cannot be updated through interactive tasks.', 'progress-planner' ),
+				]
+			);
+		}
+
 		if ( ! empty( $setting_path ) ) {
 			$setting_value = \get_option( $setting );
 			\_wp_array_set( $setting_value, $setting_path, $value );
@@ -100,11 +118,57 @@ abstract class Tasks_Interactive extends Tasks {
 	}
 
 	/**
+	 * Get the list of allowed options that can be updated via interactive tasks.
+	 *
+	 * This whitelist prevents privilege escalation by ensuring only specific
+	 * WordPress options can be modified through the interactive task interface.
+	 *
+	 * @return array List of allowed option names.
+	 */
+	protected function get_allowed_interactive_options() {
+		$allowed_options = [
+			// Core WordPress settings that are safe to update via interactive tasks.
+			'blogdescription',          // Site tagline.
+			'default_comment_status',   // Comment settings.
+			'default_ping_status',      // Pingback settings.
+			'timezone_string',          // Site timezone.
+			'WPLANG',                   // Site language/locale (deprecated since WP 4.0, but still used by class-select-locale.php).
+			'date_format',              // Date format.
+			'time_format',              // Time format.
+			'default_pingback_flag',    // Pingback flag.
+			'comment_registration',     // Comment registration.
+			'close_comments_for_old_posts', // Close comments for old posts.
+			'thread_comments',          // Threaded comments.
+			'comments_per_page',        // Comments per page.
+			'comment_order',            // Comment order.
+			'page_comments',            // Paginate comments.
+		];
+
+		/**
+		 * Filter the list of allowed options for interactive tasks.
+		 *
+		 * WARNING: Be very careful when extending this list. Adding sensitive
+		 * options like 'admin_email', 'users_can_register', or plugin-specific
+		 * options that control access or permissions could create security vulnerabilities.
+		 *
+		 * @param array $allowed_options List of allowed option names.
+		 *
+		 * @return array Modified list of allowed option names.
+		 */
+		return \apply_filters( 'progress_planner_interactive_task_allowed_options', $allowed_options );
+	}
+
+	/**
 	 * Add the popover.
 	 *
 	 * @return void
 	 */
 	public function add_popover() {
+
+		// Don't add the popover if the task is not published.
+		if ( ! $this->is_task_published() ) {
+			return;
+		}
 		?>
 		<div id="prpl-popover-<?php echo \esc_attr( static::POPOVER_ID ); ?>" class="prpl-popover prpl-popover-interactive" popover>
 			<?php $this->the_popover_content(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
@@ -124,9 +188,11 @@ abstract class Tasks_Interactive extends Tasks {
 				'/views/popovers/interactive-task.php',
 			],
 			[
-				'prpl_task_object' => $this,
-				'prpl_popover_id'  => static::POPOVER_ID,
-				'prpl_provider_id' => $this->get_provider_id(),
+				'prpl_task_object'       => $this,
+				'prpl_popover_id'        => static::POPOVER_ID,
+				'prpl_external_link_url' => $this->get_external_link_url(),
+				'prpl_provider_id'       => $this->get_provider_id(),
+				'prpl_task_actions'      => $this->get_task_actions(),
 			]
 		);
 	}
@@ -137,7 +203,36 @@ abstract class Tasks_Interactive extends Tasks {
 	 * @return void
 	 */
 	public function print_popover_instructions() {
-		echo '<p>' . \wp_kses_post( $this->get_description() ) . '</p>';
+		$description = $this->get_description();
+		if ( empty( $description ) ) {
+			return;
+		}
+
+		echo '<p>' . \wp_kses_post( $description ) . '</p>';
+	}
+
+	/**
+	 * Print the submit button.
+	 *
+	 * @param string $button_text The text for the button.
+	 *                           If empty, the default text "Submit" will be used.
+	 * @param string $css_class The CSS class for the wrapper.
+	 *
+	 * @return void
+	 */
+	protected function print_submit_button( $button_text = '', $css_class = '' ) {
+		if ( empty( $button_text ) ) {
+			$button_text = \__( 'Submit', 'progress-planner' );
+		}
+
+		$css_class = empty( $css_class ) ? 'prpl-steps-nav-wrapper' : 'prpl-steps-nav-wrapper ' . $css_class;
+		?>
+		<div class="<?php echo \esc_attr( $css_class ); ?>">
+			<button type="submit" class="prpl-button prpl-button-primary">
+				<?php echo \esc_html( $button_text ); ?>
+			</button>
+		</div>
+		<?php
 	}
 
 	/**
@@ -155,8 +250,19 @@ abstract class Tasks_Interactive extends Tasks {
 	 * @return void
 	 */
 	public function enqueue_scripts( $hook ) {
+
+		// Don't enqueue the script if the user is not at least an editor, since we dont want to enqueue scripts on WP Dashboard page.
+		if ( ! \current_user_can( 'edit_others_posts' ) ) {
+			return;
+		}
+
 		// Enqueue the script only on Progress Planner and WP dashboard pages.
 		if ( 'toplevel_page_progress-planner' !== $hook && 'index.php' !== $hook ) {
+			return;
+		}
+
+		// Don't enqueue the script if the task is not published.
+		if ( ! $this->is_task_published() ) {
 			return;
 		}
 
@@ -174,5 +280,20 @@ abstract class Tasks_Interactive extends Tasks {
 	 */
 	protected function get_enqueue_data() {
 		return [];
+	}
+
+	/**
+	 * Check if the task is published.
+	 *
+	 * @return bool
+	 */
+	public function is_task_published() {
+		$tasks = \progress_planner()->get_suggested_tasks_db()->get_tasks_by(
+			[
+				'provider'    => $this->get_provider_id(),
+				'post_status' => 'publish',
+			]
+		);
+		return ! empty( $tasks );
 	}
 }

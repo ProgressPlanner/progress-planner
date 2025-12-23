@@ -7,10 +7,14 @@
 
 namespace Progress_Planner\Suggested_Tasks\Providers\Integrations\Yoast;
 
+use Progress_Planner\Suggested_Tasks\Providers\Traits\Task_Action_Builder;
+
 /**
  * Add task for Yoast SEO: Remove global comment feeds.
  */
-class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
+class Crawl_Settings_Feed_Global_Comments extends Yoast_Interactive_Provider {
+
+	use Task_Action_Builder;
 
 	/**
 	 * The provider ID.
@@ -18,6 +22,20 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 * @var string
 	 */
 	protected const PROVIDER_ID = 'yoast-crawl-settings-feed-global-comments';
+
+	/**
+	 * The popover ID.
+	 *
+	 * @var string
+	 */
+	const POPOVER_ID = 'yoast-crawl-settings-feed-global-comments';
+
+	/**
+	 * The external link URL.
+	 *
+	 * @var string
+	 */
+	protected const EXTERNAL_LINK_URL = 'https://prpl.fyi/yoast-crawl-optimization-feed-global-comments';
 
 	/**
 	 * Get the task URL.
@@ -35,19 +53,6 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 	 */
 	protected function get_title() {
 		return \esc_html__( 'Yoast SEO: remove global comment feeds', 'progress-planner' );
-	}
-
-	/**
-	 * Get the description.
-	 *
-	 * @return string
-	 */
-	protected function get_description() {
-		return \sprintf(
-			/* translators: %s: "Read more" link. */
-			\esc_html__( 'Remove URLs which provide an overview of recent comments on your site. %s.', 'progress-planner' ),
-			'<a href="https://prpl.fyi/yoast-crawl-optimization-feed-global-comments" target="_blank" data-prpl_accessibility_text="' . \esc_attr__( 'Read more about the Yoast SEO Crawl Optimization Feed Global Comments', 'progress-planner' ) . '">' . \esc_html__( 'Read more', 'progress-planner' ) . '</a>'
-		);
 	}
 
 	/**
@@ -84,5 +89,37 @@ class Crawl_Settings_Feed_Global_Comments extends Yoast_Provider {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Get the popover instructions.
+	 *
+	 * @return void
+	 */
+	public function print_popover_instructions() {
+		echo '<p>';
+		\esc_html_e( 'WordPress creates an RSS feed of all comments on your site. Unless you have active discussions that people want to follow, this feed is rarely used and creates an unnecessary URL.', 'progress-planner' );
+		echo '</p>';
+	}
+
+	/**
+	 * Print the popover input field for the form.
+	 *
+	 * @return void
+	 */
+	public function print_popover_form_contents() {
+		$this->print_submit_button( \__( 'Remove', 'progress-planner' ) );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		return $this->add_popover_action( $actions, \__( 'Remove', 'progress-planner' ) );
 	}
 }

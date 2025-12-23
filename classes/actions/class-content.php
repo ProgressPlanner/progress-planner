@@ -187,10 +187,23 @@ class Content {
 	/**
 	 * Check if there is a recent activity for this post.
 	 *
+	 * Prevents duplicate activity records by checking if a similar activity was already recorded.
+	 * Different activity types use different timeframes:
+	 *
+	 * Update activities (±12 hours):
+	 * - Uses a 24-hour window (±12 hours from modification time) to group related updates
+	 * - Prevents multiple update records when a post is saved repeatedly during editing
+	 * - Example: Editing a post at 3 PM won't create new activities if one exists between 3 AM and 3 AM next day
+	 * - The window accounts for timezone differences and allows one update record per day
+	 *
+	 * Other activities (exact match):
+	 * - Publish, trash, delete, etc. check for exact type/post matches
+	 * - No date window needed since these are discrete, one-time events
+	 *
 	 * @param \WP_Post $post The post object.
 	 * @param string   $type The type of activity (ie publish, update, trash, delete etc).
 	 *
-	 * @return bool
+	 * @return bool True if a recent activity exists (skip recording), false otherwise (record new activity).
 	 */
 	private function is_there_recent_activity( $post, $type ) {
 		// Query arguments.
@@ -200,17 +213,16 @@ class Content {
 			'data_id'  => (string) $post->ID,
 		];
 
-		// If it's an update add the start and end date. We don't want to add multiple update activities for the same post on the same day.
+		// For updates, use a ±12 hour window to prevent duplicate update records during editing sessions.
+		// This groups all updates within a 24-hour period into a single activity.
+		// Other activity types (publish, trash, delete) don't need a window since they're one-time events.
 		if ( 'update' === $type ) {
 			$query_args['start_date'] = \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '-12 hours' );
 			$query_args['end_date']   = \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '+12 hours' );
 		}
 
 		// Check if there is an activity for this post.
-		$existing = \progress_planner()->get_activities__query()->query_activities(
-			$query_args,
-			'RAW'
-		);
+		$existing = \progress_planner()->get_activities__query()->query_activities_get_raw( $query_args );
 
 		// If there is an activity for this post, bail.
 		return ! empty( $existing ) ? true : false;
@@ -228,13 +240,12 @@ class Content {
 		// Post was updated to publish for the first time, ie draft was published.
 		if ( 'update' === $type && 'publish' === $post->post_status ) {
 			// Check if there is a publish activity for this post.
-			$existing = \progress_planner()->get_activities__query()->query_activities(
+			$existing = \progress_planner()->get_activities__query()->query_activities_get_raw(
 				[
 					'category' => 'content',
 					'type'     => 'publish',
 					'data_id'  => (string) $post->ID,
-				],
-				'RAW'
+				]
 			);
 
 			// If there is no publish activity for this post, add it.
@@ -247,14 +258,13 @@ class Content {
 		// Post was updated, but it was published previously.
 		if ( 'update' === $type ) {
 			// Check if there are any activities for this post, on this date.
-			$existing = \progress_planner()->get_activities__query()->query_activities(
+			$existing = \progress_planner()->get_activities__query()->query_activities_get_raw(
 				[
 					'category'   => 'content',
 					'data_id'    => (string) $post->ID,
 					'start_date' => \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '-12 hours' ),
 					'end_date'   => \progress_planner()->get_utils__date()->get_datetime_from_mysql_date( $post->post_modified )->modify( '+12 hours' ),
-				],
-				'RAW'
+				]
 			);
 
 			// If there are activities for this post, on this date, bail.
@@ -268,13 +278,12 @@ class Content {
 		// Update the badges.
 		if ( 'publish' === $type ) {
 			// Check if there is a publish activity for this post.
-			$existing = \progress_planner()->get_activities__query()->query_activities(
+			$existing = \progress_planner()->get_activities__query()->query_activities_get_raw(
 				[
 					'category' => 'content',
 					'type'     => 'publish',
 					'data_id'  => (string) $post->ID,
-				],
-				'RAW'
+				]
 			);
 
 			// If there is no publish activity for this post, add it.

@@ -214,11 +214,27 @@ class Enqueue {
 					$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
 				}
 
-				// Get tasks from task providers.
+				// Get the providers available for the user.
+				$include_providers            = [];
+				$providers_available_for_user = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers_available_for_user();
+				foreach ( $providers_available_for_user as $provider ) {
+					// Skip user provider.
+					if ( 'user' === $provider->get_provider_id() ) {
+						continue;
+					}
+					$include_providers[] = $provider->get_provider_id();
+				}
+
+				// Check if user wants to see all recommendations.
+				$show_all_recommendations = isset( $_GET['prpl_show_all_recommendations'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$tasks_per_page           = $show_all_recommendations ? -1 : \Progress_Planner\Admin\Widgets\Suggested_Tasks::PER_PAGE_DEFAULT;
+
+				// Get tasks from task providers (limited to 5 by default, or unlimited if showing all).
 				$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
 					[
 						'post_status'      => 'publish',
-						'exclude_provider' => [ 'user' ],
+						'posts_per_page'   => $tasks_per_page,
+						'include_provider' => $include_providers, // User provider is already excluded.
 					]
 				);
 				// Get pending celebration tasks.
@@ -226,7 +242,7 @@ class Enqueue {
 					[
 						'post_status'      => 'pending',
 						'posts_per_page'   => 100,
-						'exclude_provider' => [ 'user' ],
+						'include_provider' => $include_providers, // User provider is already excluded.
 					]
 				);
 
@@ -253,18 +269,19 @@ class Enqueue {
 				$localize_data = [
 					'name' => 'prplSuggestedTask',
 					'data' => [
-						'nonce'               => \wp_create_nonce( 'progress_planner' ),
-						'assets'              => [
+						'nonce'            => \wp_create_nonce( 'progress_planner' ),
+						'assets'           => [
 							'infoIcon'   => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_info.svg',
 							'snoozeIcon' => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_snooze.svg',
 						],
-						'tasks'               => [
+						'tasks'            => [
 							'pendingTasks'            => $tasks,
 							'pendingCelebrationTasks' => $pending_celebration_tasks,
-							'userTasks'               => isset( $user_tasks['user'] ) ? $user_tasks['user'] : [],
+							'userTasks'               => $user_tasks,
 						],
-						'maxItemsPerCategory' => \progress_planner()->get_suggested_tasks()->get_max_items_per_category(),
-						'delayCelebration'    => $delay_celebration,
+						'delayCelebration' => $delay_celebration,
+						'tasksPerPage'     => $tasks_per_page,
+						'perPageDefault'   => \Progress_Planner\Admin\Widgets\Suggested_Tasks::PER_PAGE_DEFAULT,
 					],
 				];
 				break;
@@ -324,7 +341,7 @@ class Enqueue {
 		$monthly_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
 
 		if ( $monthly_badge ) {
-			$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id();
+			$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id() . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
 		}
 
 		// Get the content and maintenance badge URLs.
@@ -333,12 +350,12 @@ class Enqueue {
 			foreach ( $set_badges as $badge ) {
 				$progress = $badge->get_progress();
 				if ( $progress['progress'] > 100 ) {
-					$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge->get_id();
+					$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge->get_id() . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
 				}
 			}
 			if ( ! isset( $badge_urls[ $context ] ) ) {
 				// Fallback to the first badge in the set if no badge is completed.
-				$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $set_badges[0]->get_id();
+				$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $set_badges[0]->get_id() . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
 			}
 		}
 
@@ -353,6 +370,10 @@ class Enqueue {
 	public function get_localized_strings() {
 		// Strings alphabetically ordered.
 		return [
+			'activated'                      => \esc_html__( 'Activated', 'progress-planner' ),
+			/* translators: %s: The plugin name. */
+			'activatePlugin'                 => \esc_html__( 'Activate plugin "%s"', 'progress-planner' ),
+			'activating'                     => \esc_html__( 'Activating...', 'progress-planner' ),
 			'badge'                          => \esc_html__( 'Badge', 'progress-planner' ),
 			'checklistProgressDescription'   => \sprintf(
 				/* translators: %s: the checkmark icon. */
@@ -360,13 +381,25 @@ class Enqueue {
 				'<span style="background-color:#14b8a6;padding:0.35em;margin:0 0.25em;border-radius:50%;display:inline-block;"></span>'
 			),
 			'close'                          => \esc_html__( 'Close', 'progress-planner' ),
+			'delete'                         => \esc_html__( 'Delete', 'progress-planner' ),
+			'disabledRRCheckboxTooltip'      => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),
 			'doneBtnText'                    => \esc_html__( 'Finish', 'progress-planner' ),
+			/* translators: %d: The number of points. */
+			'fixThisIssue'                   => \esc_html__( 'Fix this issue for %d points', 'progress-planner' ),
 			'howLong'                        => \esc_html__( 'How long?', 'progress-planner' ),
 			'info'                           => \esc_html__( 'Info', 'progress-planner' ),
+			'installed'                      => \esc_html__( 'Installed', 'progress-planner' ),
+			'installing'                     => \esc_html__( 'Installing...', 'progress-planner' ),
+			/* translators: %s: The plugin name. */
+			'installPlugin'                  => \esc_html__( 'Install and activate the "%s" plugin', 'progress-planner' ),
+			'loadingTasks'                   => \esc_html__( 'Loading tasks...', 'progress-planner' ),
 			'markAsComplete'                 => \esc_html__( 'Mark as completed', 'progress-planner' ),
+			'moveDown'                       => \esc_html__( 'Move down', 'progress-planner' ),
+			'moveUp'                         => \esc_html__( 'Move up', 'progress-planner' ),
 			'nextBtnText'                    => \esc_html__( 'Next &rarr;', 'progress-planner' ),
-			'prevBtnText'                    => \esc_html__( '&larr; Previous', 'progress-planner' ),
+			'opensInNewWindow'               => \esc_html__( 'Opens in new window', 'progress-planner' ),
 			'pageType'                       => \esc_html__( 'Page type', 'progress-planner' ),
+			'prevBtnText'                    => \esc_html__( '&larr; Previous', 'progress-planner' ),
 			'progressPlannerSidebar'         => \esc_html__( 'Progress Planner Sidebar', 'progress-planner' ),
 			'progressText'                   => \sprintf(
 				/* translators: %1$s: The current step number. %2$s: The total number of steps. */
@@ -374,21 +407,31 @@ class Enqueue {
 				'{{current}}',
 				'{{total}}'
 			),
+			'remindMeToReviewContent'        => \esc_html__( 'Remind me to review content', 'progress-planner' ),
+			'remindMeToReviewContentDate'    => \esc_html__( 'Reminder date', 'progress-planner' ),
+			'remindMeToReviewContentError'   => \esc_html__( 'Failed to set reminder. Please try again.', 'progress-planner' ),
+			'remindMeToReviewContentSetting' => \esc_html__( 'Setting reminder...', 'progress-planner' ),
+			'remindMeToReviewContentSuccess' => \esc_html__( 'Reminder set for:', 'progress-planner' ),
 			'saving'                         => \esc_html__( 'Saving...', 'progress-planner' ),
+			'showAllRecommendations'         => \esc_html__( 'Show all recommendations', 'progress-planner' ),
+			'showFewerRecommendations'       => \esc_html__( 'Show fewer recommendations', 'progress-planner' ),
 			'snooze'                         => \esc_html__( 'Snooze', 'progress-planner' ),
-			'snoozeDurationOneWeek'          => \esc_html__( '1 week', 'progress-planner' ),
-			'snoozeDurationOneMonth'         => \esc_html__( '1 month', 'progress-planner' ),
-			'snoozeDurationThreeMonths'      => \esc_html__( '3 months', 'progress-planner' ),
-			'snoozeDurationSixMonths'        => \esc_html__( '6 months', 'progress-planner' ),
-			'snoozeDurationOneYear'          => \esc_html__( '1 year', 'progress-planner' ),
 			'snoozeDurationForever'          => \esc_html__( 'forever', 'progress-planner' ),
+			'snoozeDurationOneMonth'         => \esc_html__( '1 month', 'progress-planner' ),
+			'snoozeDurationOneWeek'          => \esc_html__( '1 week', 'progress-planner' ),
+			'snoozeDurationOneYear'          => \esc_html__( '1 year', 'progress-planner' ),
+			'snoozeDurationSixMonths'        => \esc_html__( '6 months', 'progress-planner' ),
+			'snoozeDurationThreeMonths'      => \esc_html__( '3 months', 'progress-planner' ),
 			'snoozeThisTask'                 => \esc_html__( 'Snooze this task?', 'progress-planner' ),
+			'somethingWentWrong'             => \esc_html__( 'Something went wrong.', 'progress-planner' ),
 			'subscribed'                     => \esc_html__( 'Subscribed...', 'progress-planner' ),
 			'subscribing'                    => \esc_html__( 'Subscribing...', 'progress-planner' ),
+			'taskAddedSuccessfully'          => \esc_html__( 'Task added successfully', 'progress-planner' ),
 			/* translators: %s: The task content. */
 			'taskCompleted'                  => \esc_html__( "Task '%s' completed and moved to the bottom", 'progress-planner' ),
 			/* translators: %s: The task content. */
 			'taskDelete'                     => \esc_html__( "Delete task '%s'", 'progress-planner' ),
+			'taskDeleted'                    => \esc_html__( 'Completed task deleted', 'progress-planner' ),
 			'taskMovedDown'                  => \esc_html__( 'Task moved down', 'progress-planner' ),
 			'taskMovedUp'                    => \esc_html__( 'Task moved up', 'progress-planner' ),
 			/* translators: %s: The task content. */
@@ -397,26 +440,10 @@ class Enqueue {
 			'taskMoveUp'                     => \esc_html__( "Move task '%s' up", 'progress-planner' ),
 			/* translators: %s: The task content. */
 			'taskNotCompleted'               => \esc_html__( "Task '%s' marked as not completed and moved to the top", 'progress-planner' ),
+			'tasksDeleted'                   => \esc_html__( 'Completed tasks deleted', 'progress-planner' ),
 			'video'                          => \esc_html__( 'Video', 'progress-planner' ),
 			'watchVideo'                     => \esc_html__( 'Watch video', 'progress-planner' ),
-			'disabledRRCheckboxTooltip'      => \esc_html__( 'Don\'t worry! This task will be checked off automatically when you\'ve completed it.', 'progress-planner' ),
-			'remindMeToReviewContent'        => \esc_html__( 'Remind me to review content', 'progress-planner' ),
-			'remindMeToReviewContentDate'    => \esc_html__( 'Reminder date', 'progress-planner' ),
-			'remindMeToReviewContentSuccess' => \esc_html__( 'Reminder set for:', 'progress-planner' ),
-			'remindMeToReviewContentError'   => \esc_html__( 'Failed to set reminder. Please try again.', 'progress-planner' ),
-			'remindMeToReviewContentSetting' => \esc_html__( 'Setting reminder...', 'progress-planner' ),
-			'opensInNewWindow'               => \esc_html__( 'Opens in new window', 'progress-planner' ),
-			/* translators: %s: The plugin name. */
-			'installPlugin'                  => \esc_html__( 'Install and activate the "%s" plugin', 'progress-planner' ),
-			/* translators: %s: The plugin name. */
-			'activatePlugin'                 => \esc_html__( 'Activate plugin "%s"', 'progress-planner' ),
-			'installing'                     => \esc_html__( 'Installing...', 'progress-planner' ),
-			'installed'                      => \esc_html__( 'Installed', 'progress-planner' ),
-			'alreadyInstalled'               => \esc_html__( 'Already installed', 'progress-planner' ),
-			'installFailed'                  => \esc_html__( 'Install failed', 'progress-planner' ),
-			'activating'                     => \esc_html__( 'Activating...', 'progress-planner' ),
-			'activated'                      => \esc_html__( 'Activated', 'progress-planner' ),
-			'activateFailed'                 => \esc_html__( 'Activation failed', 'progress-planner' ),
+			'whyIsThisImportant'             => \esc_html__( 'Why is this important?', 'progress-planner' ),
 		];
 	}
 
@@ -427,14 +454,14 @@ class Enqueue {
 	 * @return void
 	 */
 	public function maybe_empty_session_storage() {
-		$screen = get_current_screen();
+		$screen = \get_current_screen();
 
 		if ( ! $screen ) {
 			return;
 		}
 
-		// Inject the script only on the Progress Planner Dashboard, Progress Planner Settings and the WordPress dashboard pages.
-		if ( 'toplevel_page_progress-planner' !== $screen->id && 'progress-planner_page_progress-planner-settings' !== $screen->id && 'dashboard' !== $screen->id ) {
+		// Inject the script only on the Progress Planner Dashboard and the WordPress dashboard pages.
+		if ( 'toplevel_page_progress-planner' !== $screen->id && 'dashboard' !== $screen->id ) {
 			return;
 		}
 		?>
@@ -442,15 +469,12 @@ class Enqueue {
 			if ( 'sessionStorage' in window ) {
 				try {
 					for ( const key in sessionStorage ) {
-						if ( -1 < key.indexOf( 'wp-api-schema-model' ) ) {
-							const item = sessionStorage.getItem( key );
-							if (
-								-1 === item.indexOf( '/wp/v2/prpl_recommendations' )
-							) {
-								sessionStorage.removeItem( key );
-
-								break;
-							}
+						if (
+							-1 < key.indexOf( 'wp-api-schema-model' ) &&
+							-1 === sessionStorage.getItem( key ).indexOf( '/wp/v2/prpl_recommendations' )
+						) {
+							sessionStorage.removeItem( key );
+							break;
 						}
 					}
 				} catch ( er ) {}

@@ -59,13 +59,6 @@ interface Tasks_Interface {
 	public function get_link_setting();
 
 	/**
-	 * Get the provider category.
-	 *
-	 * @return string
-	 */
-	public function get_provider_category();
-
-	/**
 	 * Get the provider ID.
 	 *
 	 * @return string
@@ -94,4 +87,56 @@ interface Tasks_Interface {
 	 * @return bool
 	 */
 	public function is_repetitive();
+
+	/**
+	 * Get the task actions.
+	 *
+	 * @param array $data The task data.
+	 *
+	 * @return array
+	 */
+	public function get_task_actions( $data = [] );
+
+	/**
+	 * Get the popover ID.
+	 *
+	 * @return string
+	 */
+	public function get_popover_id();
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] );
+
+	/**
+	 * Get the task action label.
+	 *
+	 * @return string
+	 */
+	public function get_task_action_label();
+
+	/**
+	 * Check if the task has activity.
+	 *
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function task_has_activity( $task_id = '' );
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function complete_task( $args = [], $task_id = '' );
 }

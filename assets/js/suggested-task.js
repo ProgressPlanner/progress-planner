@@ -1,4 +1,4 @@
-/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplTerms, prplSuggestedTasksWidget */
+/* global HTMLElement, prplSuggestedTask, prplL10n, prplUpdateRaviGauge, prplTerms */
 /*
  * Suggested Task scripts & helpers.
  *
@@ -14,16 +14,11 @@ prplSuggestedTask = {
 		moveUp: prplL10n( 'moveUp' ),
 		moveDown: prplL10n( 'moveDown' ),
 		snooze: prplL10n( 'snooze' ),
-		snoozeThisTask: prplL10n( 'snoozeThisTask' ),
-		howLong: prplL10n( 'howLong' ),
-		snoozeDurationOneWeek: prplL10n( 'snoozeDurationOneWeek' ),
-		snoozeDurationOneMonth: prplL10n( 'snoozeDurationOneMonth' ),
-		snoozeDurationThreeMonths: prplL10n( 'snoozeDurationThreeMonths' ),
-		snoozeDurationSixMonths: prplL10n( 'snoozeDurationSixMonths' ),
-		snoozeDurationOneYear: prplL10n( 'snoozeDurationOneYear' ),
-		snoozeDurationForever: prplL10n( 'snoozeDurationForever' ),
 		disabledRRCheckboxTooltip: prplL10n( 'disabledRRCheckboxTooltip' ),
 		markAsComplete: prplL10n( 'markAsComplete' ),
+		taskDelete: prplL10n( 'taskDelete' ),
+		delete: prplL10n( 'delete' ),
+		whyIsThisImportant: prplL10n( 'whyIsThisImportant' ),
 	},
 
 	/**
@@ -39,7 +34,7 @@ prplSuggestedTask = {
 
 		const fetchData = {
 			status: args.status,
-			per_page: args.per_page || 1,
+			per_page: args.per_page || 100,
 			_embed: true,
 			exclude: prplSuggestedTask.injectedItemIds,
 			filter: {
@@ -47,57 +42,19 @@ prplSuggestedTask = {
 				order: 'ASC',
 			},
 		};
-		if ( args.category ) {
-			fetchData[ prplTerms.category ] =
-				prplTerms.get( 'category' )[ args.category ].id;
+
+		// Pass through provider and exclude_provider if provided.
+		if ( args.provider ) {
+			fetchData.provider = args.provider;
+		}
+		if ( args.exclude_provider ) {
+			fetchData.exclude_provider = args.exclude_provider;
 		}
 
 		return prplSuggestedTask
 			.getPostsCollectionPromise( { data: fetchData } )
 			.then( ( response ) => response.data );
 	},
-
-	/**
-	 * Inject items from a category.
-	 *
-	 * @param {string}   taskCategorySlug The task category slug.
-	 * @param {string[]} taskStatus       The task status.
-	 */
-	injectItemsFromCategory: ( args ) =>
-		prplSuggestedTask
-			.fetchItems( {
-				category: args.category,
-				status: args.status || [ 'publish' ],
-				per_page: args.per_page || 1,
-			} )
-			.then( ( data ) => {
-				if ( data.length ) {
-					// Inject the items into the DOM.
-					data.forEach( ( item ) => {
-						document.dispatchEvent(
-							new CustomEvent( 'prpl/suggestedTask/injectItem', {
-								detail: {
-									item,
-									listId: 'prpl-suggested-tasks-list',
-									insertPosition: 'beforeend',
-								},
-							} )
-						);
-						prplSuggestedTask.injectedItemIds.push( item.id );
-					} );
-				}
-
-				return data;
-			} )
-			.then( ( data ) => {
-				// Toggle the "Loading..." text.
-				prplSuggestedTasksWidget.removeLoadingItems();
-
-				// Trigger the grid resize event.
-				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
-
-				return data;
-			} ),
 
 	/**
 	 * Inject items.
@@ -146,23 +103,12 @@ prplSuggestedTask = {
 	/**
 	 * Render a new item.
 	 *
-	 * @param {Object}  post        The post object.
-	 * @param {boolean} useCheckbox Whether to use a checkbox.
+	 * @param {Object} post The post object.
 	 */
-	getNewItemTemplatePromise: ( {
-		post = {},
-		useCheckbox = true,
-		listId = '',
-	} ) =>
+	getNewItemTemplatePromise: ( { post = {}, listId = '' } ) =>
 		new Promise( ( resolve ) => {
-			const {
-				prpl_recommendations_provider,
-				prpl_recommendations_category,
-			} = post;
-			const terms = {
-				prpl_recommendations_provider,
-				prpl_recommendations_category,
-			};
+			const { prpl_recommendations_provider } = post;
+			const terms = { prpl_recommendations_provider };
 
 			Object.values( prplTerms.get( 'provider' ) ).forEach( ( term ) => {
 				if ( term.id === terms[ prplTerms.provider ][ 0 ] ) {
@@ -170,17 +116,10 @@ prplSuggestedTask = {
 				}
 			} );
 
-			Object.values( prplTerms.get( 'category' ) ).forEach( ( term ) => {
-				if ( term.id === terms[ prplTerms.category ][ 0 ] ) {
-					terms[ prplTerms.category ] = term;
-				}
-			} );
-
 			const template = wp.template( 'prpl-suggested-task' );
 			const data = {
 				post,
 				terms,
-				useCheckbox,
 				listId,
 				assets: prplSuggestedTask.assets,
 				action: 'pending' === post.status ? 'celebrate' : '',
@@ -223,6 +162,10 @@ prplSuggestedTask = {
 			post.destroy( { url } ).then( () => {
 				// Remove the task from the todo list.
 				prplSuggestedTask.removeTaskElement( postId );
+
+				// Fetch and inject a replacement task
+				prplSuggestedTask.fetchAndInjectReplacementTask();
+
 				setTimeout(
 					() =>
 						window.dispatchEvent(
@@ -242,58 +185,153 @@ prplSuggestedTask = {
 	 * @param {number} postId The post ID.
 	 */
 	maybeComplete: ( postId ) => {
-		// Get the task.
-		const post = new wp.api.models.Prpl_recommendations( { id: postId } );
-		post.fetch().then( ( postData ) => {
-			const taskProviderId = prplTerms.getTerm(
-				postData?.[ prplTerms.provider ],
-				prplTerms.provider
-			).slug;
-			const taskCategorySlug = prplTerms.getTerm(
-				postData?.[ prplTerms.category ],
-				prplTerms.category
-			).slug;
+		// Return the promise chain so callers can wait for completion
+		return new Promise( ( resolve, reject ) => {
+			// Get the task.
+			const post = new wp.api.models.Prpl_recommendations( {
+				id: postId,
+			} );
+			post.fetch()
+				.then( ( postData ) => {
+					const taskProviderId = prplTerms.getTerm(
+						postData?.[ prplTerms.provider ],
+						prplTerms.provider
+					).slug;
 
-			const el = prplSuggestedTask.getTaskElement( postId );
+					const el = prplSuggestedTask.getTaskElement( postId );
 
-			// Dismissable tasks don't have pending status, it's either publish or trash.
-			const newStatus =
-				'publish' === postData.status ? 'trash' : 'publish';
+					// Dismissable tasks don't have pending status, it's either publish or trash.
+					const newStatus =
+						'publish' === postData.status ? 'trash' : 'publish';
 
-			// Disable the checkbox for RR tasks, to prevent multiple clicks.
-			el.querySelector( '.prpl-suggested-task-checkbox' ).setAttribute(
-				'disabled',
-				'disabled'
-			);
+					// Disable the checkbox for RR tasks, to prevent multiple clicks.
+					el.querySelector(
+						'.prpl-suggested-task-checkbox'
+					)?.setAttribute( 'disabled', 'disabled' );
 
-			post.set( 'status', newStatus )
-				.save()
-				.then( () => {
-					prplSuggestedTask.runTaskAction(
-						postId,
-						'trash' === newStatus ? 'complete' : 'pending'
-					);
-					const eventPoints = parseInt( postData?.meta?.prpl_points );
-
-					// Task is trashed, check if we need to celebrate.
-					if ( 'trash' === newStatus ) {
-						el.setAttribute( 'data-task-action', 'celebrate' );
-						if ( 'user' === taskProviderId ) {
-							// Set class to trigger strike through animation.
-							el.classList.add(
-								'prpl-suggested-task-celebrated'
+					post.set( 'status', newStatus )
+						.save()
+						.then( () => {
+							prplSuggestedTask.runTaskAction(
+								postId,
+								'trash' === newStatus ? 'complete' : 'pending'
+							);
+							const eventPoints = parseInt(
+								postData?.prpl_points
 							);
 
-							setTimeout( () => {
-								// Move task from published to trash.
-								document
-									.getElementById( 'todo-list-completed' )
-									.insertAdjacentElement( 'beforeend', el );
-
-								// Remove the class to trigger the strike through animation.
-								el.classList.remove(
-									'prpl-suggested-task-celebrated'
+							// Task is trashed, check if we need to celebrate.
+							if ( 'trash' === newStatus ) {
+								el.setAttribute(
+									'data-task-action',
+									'celebrate'
 								);
+								if ( 'user' === taskProviderId ) {
+									// Set class to trigger strike through animation.
+									el.classList.add(
+										'prpl-suggested-task-celebrated'
+									);
+
+									setTimeout( () => {
+										// Move task from published to trash.
+										document
+											.getElementById(
+												'todo-list-completed'
+											)
+											.insertAdjacentElement(
+												'beforeend',
+												el
+											);
+
+										// Remove the class to trigger the strike through animation.
+										el.classList.remove(
+											'prpl-suggested-task-celebrated'
+										);
+
+										window.dispatchEvent(
+											new CustomEvent(
+												'prpl/grid/resize'
+											)
+										);
+
+										// Remove the disabled attribute for user tasks, so they can be clicked again.
+										el.querySelector(
+											'.prpl-suggested-task-checkbox'
+										)?.removeAttribute( 'disabled' );
+
+										// Resolve the promise after the timeout completes
+										resolve( {
+											postId,
+											newStatus,
+											eventPoints,
+										} );
+									}, 2000 );
+								} else {
+									// Check the chekcbox, since completing task can be triggered in different ways ("Mark as done" button), without triggering the onchange event.
+									const checkbox = el.querySelector(
+										'.prpl-suggested-task-checkbox'
+									);
+									if ( checkbox ) {
+										checkbox.checked = true;
+									}
+
+									/**
+									 * Strike completed tasks and remove them from the DOM.
+									 */
+									document.dispatchEvent(
+										new CustomEvent(
+											'prpl/removeCelebratedTasks'
+										)
+									);
+
+									// Fetch and inject a replacement task for non-user tasks
+									prplSuggestedTask.fetchAndInjectReplacementTask();
+
+									// Resolve immediately for non-user tasks
+									resolve( {
+										postId,
+										newStatus,
+										eventPoints,
+									} );
+								}
+
+								// We trigger celebration only if the task has points.
+								if ( 0 < eventPoints ) {
+									prplUpdateRaviGauge( eventPoints );
+
+									// Trigger the celebration event (confetti).
+									document.dispatchEvent(
+										new CustomEvent(
+											'prpl/celebrateTasks',
+											{
+												detail: { element: el },
+											}
+										)
+									);
+								}
+							} else if (
+								'publish' === newStatus &&
+								'user' === taskProviderId
+							) {
+								// This is only possible for user tasks.
+								// Set the task action to publish.
+								el.setAttribute(
+									'data-task-action',
+									'publish'
+								);
+
+								// Update the Ravi gauge.
+								prplUpdateRaviGauge( 0 - eventPoints );
+
+								// Move task from trash to published, tasks with points go to the beginning of the list.
+								document
+									.getElementById( 'todo-list' )
+									.insertAdjacentElement(
+										0 < eventPoints
+											? 'afterbegin'
+											: 'beforeend',
+										el
+									);
 
 								window.dispatchEvent(
 									new CustomEvent( 'prpl/grid/resize' )
@@ -302,60 +340,15 @@ prplSuggestedTask = {
 								// Remove the disabled attribute for user tasks, so they can be clicked again.
 								el.querySelector(
 									'.prpl-suggested-task-checkbox'
-								).removeAttribute( 'disabled' );
-							}, 2000 );
-						} else {
-							/**
-							 * Strike completed tasks and remove them from the DOM.
-							 */
-							document.dispatchEvent(
-								new CustomEvent( 'prpl/removeCelebratedTasks' )
-							);
+								)?.removeAttribute( 'disabled' );
 
-							// Inject more tasks from the same category.
-							prplSuggestedTask.injectItemsFromCategory( {
-								category: taskCategorySlug,
-								status: [ 'publish' ],
-							} );
-						}
-
-						// We trigger celebration only if the task has points.
-						if ( 0 < eventPoints ) {
-							prplUpdateRaviGauge( eventPoints );
-
-							// Trigger the celebration event (confetti).
-							document.dispatchEvent(
-								new CustomEvent( 'prpl/celebrateTasks', {
-									detail: { element: el },
-								} )
-							);
-						}
-					} else if (
-						'publish' === newStatus &&
-						'user' === taskProviderId
-					) {
-						// This is only possible for user tasks.
-						// Set the task action to publish.
-						el.setAttribute( 'data-task-action', 'publish' );
-
-						// Update the Ravi gauge.
-						prplUpdateRaviGauge( 0 - eventPoints );
-
-						// Move task from trash to published.
-						document
-							.getElementById( 'todo-list' )
-							.insertAdjacentElement( 'beforeend', el );
-
-						window.dispatchEvent(
-							new CustomEvent( 'prpl/grid/resize' )
-						);
-
-						// Remove the disabled attribute for user tasks, so they can be clicked again.
-						el.querySelector(
-							'.prpl-suggested-task-checkbox'
-						).removeAttribute( 'disabled' );
-					}
-				} );
+								// Resolve immediately for publish actions
+								resolve( { postId, newStatus, eventPoints } );
+							}
+						} )
+						.catch( reject );
+				} )
+				.catch( reject );
 		} );
 	},
 
@@ -388,19 +381,11 @@ prplSuggestedTask = {
 			date,
 			date_gmt: date,
 		} );
-		postModelToSave.save().then( ( postData ) => {
-			const taskCategorySlug = prplTerms.getTerm(
-				postData?.[ prplTerms.category ],
-				prplTerms.category
-			).slug;
-
+		postModelToSave.save().then( () => {
 			prplSuggestedTask.removeTaskElement( postId );
 
-			// Inject more tasks from the same category.
-			prplSuggestedTask.injectItemsFromCategory( {
-				category: taskCategorySlug,
-				status: [ 'publish' ],
-			} );
+			// Fetch and inject a replacement task
+			prplSuggestedTask.fetchAndInjectReplacementTask();
 		} );
 	},
 
@@ -504,6 +489,7 @@ prplSuggestedTask = {
 		if ( event.key === 'Enter' ) {
 			event.preventDefault();
 			event.stopPropagation();
+			event.target.blur();
 			return false;
 		}
 	},
@@ -526,6 +512,42 @@ prplSuggestedTask = {
 	 */
 	removeTaskElement: ( postId ) =>
 		prplSuggestedTask.getTaskElement( postId )?.remove(),
+
+	/**
+	 * Fetch and inject a replacement task after one is removed.
+	 *
+	 * Replacement tasks are always fetched for the suggested-tasks-list,
+	 * which excludes user tasks (user tasks have their own todo list).
+	 */
+	fetchAndInjectReplacementTask: () => {
+		// Collect all currently visible task IDs from the DOM
+		const visibleTaskIds = Array.from(
+			document.querySelectorAll( '.prpl-suggested-task[data-post-id]' )
+		).map( ( el ) => parseInt( el.getAttribute( 'data-post-id' ) ) );
+
+		// Combine with injectedItemIds to ensure we have a complete exclusion list
+		const allTaskIds = [
+			...new Set( [
+				...prplSuggestedTask.injectedItemIds,
+				...visibleTaskIds,
+			] ),
+		];
+
+		// Update injectedItemIds to include any tasks that might have been missed
+		prplSuggestedTask.injectedItemIds = allTaskIds;
+
+		const fetchArgs = {
+			status: 'publish',
+			per_page: 1,
+			exclude_provider: 'user', // Always exclude user tasks from suggested-tasks-list
+		};
+
+		prplSuggestedTask.fetchItems( fetchArgs ).then( ( items ) => {
+			if ( items && items.length > 0 ) {
+				prplSuggestedTask.injectItems( items );
+			}
+		} );
+	},
 };
 
 /**
@@ -552,6 +574,9 @@ document.addEventListener( 'prpl/suggestedTask/injectItem', ( event ) => {
 						event.detail.insertPosition,
 						itemHTML
 					);
+
+				// Trigger the grid resize event.
+				window.dispatchEvent( new CustomEvent( 'prpl/grid/resize' ) );
 
 				return;
 			}

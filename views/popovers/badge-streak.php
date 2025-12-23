@@ -30,7 +30,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		<div id="popover-badge-streak-maintenance">
 		<?php \progress_planner()->the_view( 'popovers/parts/badge-streak-badge.php', [ 'prpl_category' => 'content' ] ); ?>
 		</div>
-		<?php \progress_planner()->the_view( 'popovers/parts/badge-streak-progressbar.php', [ 'prpl_context' => 'maintenance' ] ); ?>
+		<?php \progress_planner()->the_view( 'popovers/parts/badge-streak-progressbar.php', [ 'prpl_context' => 'content' ] ); ?>
 	</div>
 </div>
 <div class="footer">

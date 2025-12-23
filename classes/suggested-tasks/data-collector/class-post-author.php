@@ -70,12 +70,10 @@ class Post_Author extends Base_Data_Collector {
 		global $wpdb;
 
 		$author_ids = $wpdb->get_col( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-			"
-			SELECT DISTINCT post_author
+			"SELECT DISTINCT post_author
 			FROM {$wpdb->posts}
 			WHERE post_status = 'publish'
-			AND post_type = 'post'
-		"
+			AND post_type = 'post'"
 		);
 
 		return \count( $author_ids );

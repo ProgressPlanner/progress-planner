@@ -10,7 +10,7 @@ namespace Progress_Planner\Admin\Widgets;
 /**
  * Badge_Streak class.
  */
-final class Badge_Streak extends Widget {
+abstract class Badge_Streak extends Widget {
 
 	/**
 	 * The widget ID.
@@ -18,6 +18,15 @@ final class Badge_Streak extends Widget {
 	 * @var string
 	 */
 	protected $id = 'badge-streak';
+
+	/**
+	 * Enqueue styles.
+	 *
+	 * @return void
+	 */
+	public function enqueue_styles() {
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/page-widgets/badge-streak' );
+	}
 
 	/**
 	 * Get the badge.
@@ -37,7 +46,7 @@ final class Badge_Streak extends Widget {
 		// Get the badge to display.
 		foreach ( $badges as $badge ) {
 			$progress = $badge->get_progress();
-			if ( 100 > $progress['progress'] ) {
+			if ( 100 >= $progress['progress'] ) {
 				$result[ $context ] = $badge;
 				break;
 			}

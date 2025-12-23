@@ -68,7 +68,9 @@ function todoTests( testContext = test ) {
 			const deleteItem = page.locator( SELECTORS.TODO_ITEM );
 			await deleteItem.hover();
 			await deleteItem.waitFor( { state: 'visible' } );
-			await deleteItem.locator( '.trash' ).click();
+			await deleteItem
+				.locator( '.prpl-suggested-task-actions-wrapper .trash' )
+				.click();
 			await page.waitForTimeout( 1500 );
 
 			// Verify the todo was deleted

@@ -21,11 +21,7 @@ class Upgrade_Migrations_130_Test extends \WP_UnitTestCase {
 	public function test_recreating_tasks_from_activities() {
 		// Delete all activities.
 		\progress_planner()->get_activities__query()->delete_activities(
-			\progress_planner()->get_activities__query()->query_activities(
-				[
-					'category' => 'suggested_task',
-				]
-			)
+			\progress_planner()->get_activities__query()->query_activities( [ 'category' => 'suggested_task' ] )
 		);
 
 		// Delete all tasks.
@@ -51,7 +47,6 @@ class Upgrade_Migrations_130_Test extends \WP_UnitTestCase {
 			'review-post-2810-202517',
 			'review-post-4467-202517',
 			'update-core-202401',
-			'settings-saved-202501',
 			'review-post-4530-202517',
 			'review-post-4477-202517',
 			'review-post-4569-202517',
@@ -107,13 +102,7 @@ class Upgrade_Migrations_130_Test extends \WP_UnitTestCase {
 
 		// Verify that every value in the $activity_ids array is present in the $tasks array and has completed status.
 		foreach ( $activity_ids as $activity_id ) {
-			$matching_tasks = \array_filter(
-				$tasks,
-				function ( $task ) use ( $activity_id ) {
-					return isset( $task['task_id'] ) &&
-						$task['task_id'] === $activity_id;
-				}
-			);
+			$matching_tasks = \array_filter( $tasks, fn( $task ) => isset( $task['task_id'] ) && $task['task_id'] === $activity_id );
 
 			$this->assertNotEmpty(
 				$matching_tasks,

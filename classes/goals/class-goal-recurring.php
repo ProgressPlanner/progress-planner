@@ -143,35 +143,68 @@ class Goal_Recurring {
 	}
 
 	/**
-	 * Get the streak for weekly posts.
+	 * Calculate streak statistics for recurring goals.
 	 *
-	 * @return array
+	 * Streak calculation algorithm:
+	 * 1. Iterate through all goal occurrences in chronological order
+	 * 2. For each occurrence, check if the goal was met (evaluate() returns true)
+	 * 3. If met: Increment current streak counter and update max streak if needed
+	 * 4. If not met: Check if "allowed breaks" remain
+	 *    - If yes: Use one allowed break and continue streak (decrement allowed_break)
+	 *    - If no: Reset current streak to 0 (streak is broken)
+	 *
+	 * Allowed breaks feature:
+	 * - Provides flexibility by allowing streaks to survive missed goals
+	 * - Example: With 1 allowed break, missing one week won't reset the streak
+	 * - The $allowed_break value is modified during iteration (decremented when used)
+	 * - Once all breaks are consumed, any further miss resets the streak
+	 *
+	 * Streak types:
+	 * - Current streak: Consecutive goals met from the most recent occurrence backwards
+	 * - Max streak: Longest consecutive run of met goals in the entire history
+	 *
+	 * Example:
+	 * Goals: [✓, ✓, ✗, ✓, ✓, ✓] with 1 allowed break
+	 * - Current streak: 3 (last 3 goals met)
+	 * - Max streak: 5 (streak continues through the ✗ using the allowed break)
+	 *
+	 * @return array {
+	 *     Streak statistics and goal metadata.
+	 *
+	 *     @type int    $max_streak     The longest streak achieved (consecutive goals met).
+	 *     @type int    $current_streak Current active streak (from most recent backwards).
+	 *     @type string $title          The goal title.
+	 *     @type string $description    The goal description.
+	 * }
 	 */
 	public function get_streak() {
-		// Reverse the order of the occurences.
+		// Get all occurrences of this recurring goal.
 		$occurences = $this->get_occurences();
 
-		// Calculate the streak number.
-		$streak_nr  = 0;
-		$max_streak = 0;
+		// Initialize streak counters.
+		$streak_nr  = 0; // Current ongoing streak.
+		$max_streak = 0; // Best streak ever achieved.
+
 		foreach ( $occurences as $occurence ) {
-			/**
-			 * Evaluate the occurence.
-			 * If the occurence is true, then increment the streak number.
-			 * Otherwise, reset the streak number.
-			 */
+			// Check if this occurrence's goal was met.
 			$evaluation = $occurence->evaluate();
+
 			if ( $evaluation ) {
+				// Goal was met: Increment streak and track if it's a new record.
 				++$streak_nr;
 				$max_streak = \max( $max_streak, $streak_nr );
 				continue;
 			}
 
+			// Goal was not met: Check if we can use an allowed break.
 			if ( $this->allowed_break > 0 ) {
+				// Use one allowed break to keep the streak alive.
+				// This prevents the streak from resetting for this missed goal.
 				--$this->allowed_break;
 				continue;
 			}
 
+			// No allowed breaks remaining: Streak is broken, reset to 0.
 			$streak_nr = 0;
 		}
 

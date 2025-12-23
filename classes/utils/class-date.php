@@ -18,10 +18,7 @@ class Date {
 	 * @param \DateTime $start_date The start date.
 	 * @param \DateTime $end_date   The end date.
 	 *
-	 * @return array [
-	 *                 'start_date' => \DateTime,
-	 *                 'end_date'   => \DateTime,
-	 *               ].
+	 * @return array <array<string, \DateTime>>
 	 */
 	public function get_range( $start_date, $end_date ) {
 		$dates = \iterator_to_array( new \DatePeriod( $start_date, new \DateInterval( 'P1D' ), $end_date ), false );
@@ -38,7 +35,7 @@ class Date {
 	 * @param \DateTime $end_date   The end date.
 	 * @param string    $frequency  The frequency. Can be 'daily', 'weekly', 'monthly'.
 	 *
-	 * @return array
+	 * @return array <array{start_date: \DateTime, end_date: \DateTime}>
 	 */
 	public function get_periods( $start_date, $end_date, $frequency ) {
 		$end_date->modify( '+1 day' );
@@ -71,8 +68,15 @@ class Date {
 		if ( empty( $date_ranges ) ) {
 			return [];
 		}
-		if ( $end_date->format( 'z' ) !== \end( $date_ranges )['end_date']->format( 'z' ) ) {
-			$final_end     = clone \end( $date_ranges )['end_date'];
+		$last_range = \end( $date_ranges );
+		/**
+		 * The end date of the last range.
+		 *
+		 * @var \DateTime $last_end_date
+		 */
+		$last_end_date = $last_range['end_date'];
+		if ( $end_date->format( 'z' ) !== $last_end_date->format( 'z' ) ) {
+			$final_end     = clone $last_end_date;
 			$date_ranges[] = $this->get_range( $final_end->modify( '+1 day' ), $end_date );
 		}
 

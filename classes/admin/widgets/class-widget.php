@@ -7,12 +7,32 @@
 
 namespace Progress_Planner\Admin\Widgets;
 
+use Progress_Planner\Utils\Traits\Input_Sanitizer;
+
 /**
  * Widgets class.
  *
  * All widgets should extend this class.
  */
 abstract class Widget {
+
+	use Input_Sanitizer;
+
+	/**
+	 * The widget width.
+	 *
+	 * Can be 1 or 2.
+	 *
+	 * @var int
+	 */
+	protected $width = 1;
+
+	/**
+	 * Whether the widget should be forced to the last column.
+	 *
+	 * @var bool
+	 */
+	protected $force_last_column = false;
 
 	/**
 	 * Constructor.
@@ -42,11 +62,7 @@ abstract class Widget {
 	 * @return string
 	 */
 	public function get_range() {
-		// phpcs:ignore WordPress.Security.NonceVerification
-		return isset( $_GET['range'] )
-			// phpcs:ignore WordPress.Security.NonceVerification
-			? \sanitize_text_field( \wp_unslash( $_GET['range'] ) )
-			: '-6 months';
+		return $this->get_sanitized_get( 'range', '-6 months' );
 	}
 
 	/**
@@ -55,11 +71,7 @@ abstract class Widget {
 	 * @return string
 	 */
 	public function get_frequency() {
-		// phpcs:ignore WordPress.Security.NonceVerification
-		return isset( $_GET['frequency'] )
-			// phpcs:ignore WordPress.Security.NonceVerification
-			? \sanitize_text_field( \wp_unslash( $_GET['frequency'] ) )
-			: 'monthly';
+		return $this->get_sanitized_get( 'frequency', 'monthly' );
 	}
 
 	/**
@@ -71,7 +83,10 @@ abstract class Widget {
 		$this->enqueue_styles();
 		$this->enqueue_scripts();
 		?>
-		<div class="prpl-widget-wrapper prpl-<?php echo \esc_attr( $this->id ); ?>">
+		<div
+			class="prpl-widget-wrapper prpl-<?php echo \esc_attr( $this->id ); ?> prpl-widget-width-<?php echo (int) $this->width; ?>"
+			data-force-last-column="<?php echo (int) $this->force_last_column; ?>"
+		>
 			<div class="widget-inner-container">
 				<?php \progress_planner()->the_view( "page-widgets/{$this->id}.php" ); ?>
 			</div>

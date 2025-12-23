@@ -12,19 +12,12 @@
 
 namespace Progress_Planner\Rest;
 
-use Progress_Planner\Base;
 use Progress_Planner\Admin\Widgets\Activity_Scores;
 
 /**
  * Rest_API_Stats class.
  */
-class Stats {
-	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-		\add_action( 'rest_api_init', [ $this, 'register_rest_endpoint' ] );
-	}
+class Stats extends Base {
 
 	/**
 	 * Register the REST-API endpoint.
@@ -62,25 +55,5 @@ class Stats {
 		$system_status = new \Progress_Planner\Utils\System_Status();
 
 		return new \WP_REST_Response( $system_status->get_system_status() );
-	}
-
-	/**
-	 * Validate the token.
-	 *
-	 * @param string $token The token.
-	 *
-	 * @return bool
-	 */
-	public function validate_token( $token ) {
-		$token = \str_replace( 'token/', '', $token );
-		if ( \progress_planner()->is_pro_site() && $token === \get_option( 'progress_planner_pro_license_key' ) ) {
-			return true;
-		}
-		$license_key = \get_option( 'progress_planner_license_key', false );
-		if ( ! $license_key || 'no-license' === $license_key ) {
-			return false;
-		}
-
-		return $token === $license_key;
 	}
 }
