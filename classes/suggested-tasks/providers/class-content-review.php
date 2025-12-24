@@ -545,7 +545,9 @@ class Content_Review extends Tasks {
 			$notes_resolved = $this->all_notes_resolved( $target_post_id );
 
 			// If notes exist and all are resolved, task is complete.
+			// Clean up the notes so new ones can be created in the next review cycle.
 			if ( true === $notes_resolved ) {
+				$this->delete_notes( $target_post_id );
 				return true;
 			}
 

@@ -335,4 +335,45 @@ class Content_Review_Test extends \WP_UnitTestCase {
 	public function test_note_prefix_constant() {
 		$this->assertEquals( '[PRPL]', Content_Review::NOTE_PREFIX );
 	}
+
+	/**
+	 * Test that notes are cleaned up when task is completed.
+	 *
+	 * @return void
+	 */
+	public function test_notes_cleaned_up_on_task_completion() {
+		// Create and resolve a note.
+		$note_id = $this->content_review->create_note( $this->test_post_id, Content_Review::NOTE_PREFIX . ' Test note' );
+		\wp_update_comment(
+			[
+				'comment_ID'       => $note_id,
+				'comment_approved' => 1, // Resolved.
+			]
+		);
+
+		// Verify note exists before completion check.
+		$notes_before = $this->content_review->get_notes( $this->test_post_id, 'all' );
+		$this->assertCount( 1, $notes_before );
+
+		// Create a task in the database so is_specific_task_completed can find it.
+		$task_id   = 'review-post-' . $this->test_post_id;
+		$task_data = [
+			'task_id'        => $task_id,
+			'provider_id'    => 'review-post',
+			'target_post_id' => $this->test_post_id,
+		];
+		\progress_planner()->get_suggested_tasks_db()->add( $task_data );
+
+		// Call the method that checks completion (this should trigger cleanup).
+		$reflection = new \ReflectionClass( $this->content_review );
+		$method     = $reflection->getMethod( 'is_specific_task_completed' );
+		$method->setAccessible( true );
+		$is_completed = $method->invoke( $this->content_review, $task_id );
+
+		$this->assertTrue( $is_completed );
+
+		// Notes should be cleaned up after task completion.
+		$notes_after = $this->content_review->get_notes( $this->test_post_id, 'all' );
+		$this->assertCount( 0, $notes_after );
+	}
 }
