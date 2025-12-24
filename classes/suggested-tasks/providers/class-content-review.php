@@ -124,9 +124,11 @@ class Content_Review extends Tasks {
 
 		$this->init_dismissable_task();
 
-		// Handle note injection.
+		// Handle note injection and avatar customization.
 		if ( $this->supports_notes() ) {
 			\add_action( 'load-post.php', [ $this, 'maybe_inject_notes' ] );
+			\add_filter( 'pre_get_avatar_data', [ $this, 'filter_note_avatar' ], 10, 2 );
+			\add_action( 'admin_head', [ $this, 'add_note_avatar_styles' ] );
 		}
 	}
 
@@ -654,6 +656,64 @@ class Content_Review extends Tasks {
 	public function supports_notes() {
 		global $wp_version;
 		return \version_compare( $wp_version, '6.9', '>=' );
+	}
+
+	/**
+	 * Filter avatar data for PRPL notes to show Progress Planner logo.
+	 *
+	 * @param array $args        Arguments passed to get_avatar_data().
+	 * @param mixed $id_or_email User ID, email, WP_User, WP_Post, or WP_Comment.
+	 *
+	 * @return array Modified arguments.
+	 */
+	public function filter_note_avatar( $args, $id_or_email ) {
+		// Only process WP_Comment objects.
+		if ( ! $id_or_email instanceof \WP_Comment ) {
+			return $args;
+		}
+
+		// Check if this is a note with our prefix.
+		if ( 'note' !== $id_or_email->comment_type ) {
+			return $args;
+		}
+
+		if ( false === \strpos( $id_or_email->comment_content, static::NOTE_PREFIX ) ) {
+			return $args;
+		}
+
+		// Use Progress Planner logo as avatar.
+		$args['url']          = \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg';
+		$args['found_avatar'] = true;
+
+		return $args;
+	}
+
+	/**
+	 * Add CSS styles for PRPL note avatars in the editor.
+	 *
+	 * @return void
+	 */
+	public function add_note_avatar_styles() {
+		$screen = \get_current_screen();
+		if ( ! $screen || 'post' !== $screen->base ) {
+			return;
+		}
+
+		$logo_url = \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg';
+		?>
+		<style>
+			/* Fix Progress Planner note avatars to be perfect circles */
+			img[src="<?php echo \esc_url( $logo_url ); ?>"] {
+				width: 32px !important;
+				height: 32px !important;
+				object-fit: contain !important;
+				background: #f0f0f1 !important;
+				padding: 4px !important;
+				box-sizing: border-box !important;
+				border-radius: 50% !important;
+			}
+		</style>
+		<?php
 	}
 
 	/**
