@@ -50,8 +50,8 @@ class Onboard_Wizard {
 		// 1. Privacy not yet accepted (new install, non-branded).
 		// 2. Onboarding already in progress.
 		// 3. Branded site (privacy auto-accepted, but still needs onboarding).
-		$is_branded       = 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id();
-		$show_onboarding  = ! \progress_planner()->is_privacy_policy_accepted()
+		$is_branded      = 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id();
+		$show_onboarding = ! \progress_planner()->is_privacy_policy_accepted()
 			|| \get_option( 'prpl_onboard_progress', false )
 			|| $is_branded;
 
