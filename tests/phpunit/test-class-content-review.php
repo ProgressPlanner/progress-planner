@@ -342,6 +342,11 @@ class Content_Review_Test extends \WP_UnitTestCase {
 	 * @return void
 	 */
 	public function test_notes_cleaned_up_on_task_completion() {
+		// Skip test if notes are not supported (WP < 6.9).
+		if ( ! $this->content_review->supports_notes() ) {
+			$this->markTestSkipped( 'Notes feature requires WordPress 6.9+' );
+		}
+
 		// Create and resolve a note.
 		$note_id = $this->content_review->create_note( $this->test_post_id, Content_Review::NOTE_PREFIX . ' Test note' );
 		\wp_update_comment(
@@ -361,6 +366,7 @@ class Content_Review_Test extends \WP_UnitTestCase {
 			'task_id'        => $task_id,
 			'provider_id'    => 'review-post',
 			'target_post_id' => $this->test_post_id,
+			'post_title'     => 'Review Test Post',
 		];
 		\progress_planner()->get_suggested_tasks_db()->add( $task_data );
 
