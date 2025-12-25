@@ -12,14 +12,7 @@ import { __, sprintf } from '@wordpress/i18n';
 import { ajaxRequest } from '../../../utils/ajaxRequest';
 import OnboardingStep from '../OnboardingStep';
 
-const SUB_STEPS = [
-	'homepage',
-	'about',
-	'contact',
-	'faq',
-	'post-types',
-	'login-destination',
-];
+const SUB_STEPS = [ 'homepage', 'about', 'contact', 'faq', 'post-types' ];
 
 /**
  * SettingsStep component.
@@ -39,16 +32,21 @@ export default function SettingsStep( props ) {
 
 	const [ currentSubStep, setCurrentSubStep ] = useState( 0 );
 	const [ settings, setSettings ] = useState( () => {
-		return (
-			wizardState.data.settings || {
-				homepage: { hasPage: true, pageId: null },
-				about: { hasPage: true, pageId: null },
-				contact: { hasPage: true, pageId: null },
-				faq: { hasPage: true, pageId: null },
-				'post-types': { selectedTypes: [] },
-				'login-destination': { redirectOnLogin: false },
-			}
-		);
+		// Default: hasPage: true means checkbox is unchecked (user has a page).
+		// Default: all post types selected.
+		const allPostTypeIds = postTypes.map( ( pt ) => pt.id );
+		const defaults = {
+			homepage: { hasPage: true, pageId: null },
+			about: { hasPage: true, pageId: null },
+			contact: { hasPage: true, pageId: null },
+			faq: { hasPage: true, pageId: null },
+			'post-types': { selectedTypes: allPostTypeIds },
+		};
+		// Merge with saved settings, but ensure hasPage defaults are respected.
+		if ( wizardState.data.settings ) {
+			return { ...defaults, ...wizardState.data.settings };
+		}
+		return defaults;
 	} );
 
 	const [ isSaving, setIsSaving ] = useState( false );
@@ -112,10 +110,6 @@ export default function SettingsStep( props ) {
 					pages: JSON.stringify( pagesData ),
 					'prpl-post-types-include':
 						settings[ 'post-types' ]?.selectedTypes || [],
-					'prpl-redirect-on-login': settings[ 'login-destination' ]
-						?.redirectOnLogin
-						? '1'
-						: '',
 				},
 			} );
 		} catch ( error ) {
@@ -206,10 +200,17 @@ export default function SettingsStep( props ) {
 									</h3>
 								</div>
 								<div className="prpl-setting-content">
-									<div className="prpl-select-page">
+									<div
+										className={ `prpl-select-page${
+											! subStepData.hasPage
+												? ' prpl-disabled'
+												: ''
+										}` }
+									>
 										<select
 											name={ `pages[${ subStepName }][id]` }
 											value={ subStepData.pageId || '' }
+											disabled={ ! subStepData.hasPage }
 											onChange={ ( e ) =>
 												setSettings( ( prev ) => ( {
 													...prev,
@@ -250,19 +251,25 @@ export default function SettingsStep( props ) {
 												checked={
 													! subStepData.hasPage
 												}
-												onChange={ ( e ) =>
+												onChange={ ( e ) => {
+													const noPage =
+														e.target.checked;
 													setSettings( ( prev ) => ( {
 														...prev,
 														[ subStepName ]: {
 															...prev[
 																subStepName
 															],
-															hasPage:
-																! e.target
-																	.checked,
+															hasPage: ! noPage,
+															// Reset pageId when checkbox is checked.
+															pageId: noPage
+																? null
+																: prev[
+																		subStepName
+																  ]?.pageId,
 														},
-													} ) )
-												}
+													} ) );
+												} }
 											/>
 											{ sprintf(
 												/* translators: %s: page type title */
@@ -351,62 +358,52 @@ export default function SettingsStep( props ) {
 					</div>
 				);
 
-			case 'login-destination':
-				return (
-					<div
-						className="prpl-setting-item"
-						data-page="login-destination"
-					>
-						<h3>
-							{ __( 'Login Destination', 'progress-planner' ) }
-							<span className="prpl-settings-progress">
-								{ currentSubStep + 1 }/{ SUB_STEPS.length }
-							</span>
-						</h3>
-						<label htmlFor="prpl-redirect-on-login">
-							<input
-								type="checkbox"
-								id="prpl-redirect-on-login"
-								checked={ subStepData.redirectOnLogin || false }
-								onChange={ ( e ) =>
-									setSettings( ( prev ) => ( {
-										...prev,
-										'login-destination': {
-											redirectOnLogin: e.target.checked,
-										},
-									} ) )
-								}
-							/>
-							{ __(
-								'Redirect to Progress Planner on login',
-								'progress-planner'
-							) }
-						</label>
-					</div>
-				);
-
 			default:
 				return null;
 		}
 	};
 
+	/**
+	 * Check if current sub-step can proceed.
+	 * Page sub-steps require either a page selection OR checkbox checked.
+	 * Post-types sub-step requires at least one post type selected.
+	 *
+	 * @return {boolean} True if can proceed.
+	 */
+	const canProceed = () => {
+		if ( isSaving ) {
+			return false;
+		}
+
+		const subStepName = SUB_STEPS[ currentSubStep ];
+		const subStepData = settings[ subStepName ] || {};
+
+		// For page selection sub-steps.
+		if (
+			[ 'homepage', 'about', 'contact', 'faq' ].includes( subStepName )
+		) {
+			// Can proceed if checkbox is checked (no page) OR a page is selected.
+			return ! subStepData.hasPage || !! subStepData.pageId;
+		}
+
+		// For post-types, require at least one selected.
+		if ( subStepName === 'post-types' ) {
+			return (
+				subStepData.selectedTypes &&
+				subStepData.selectedTypes.length > 0
+			);
+		}
+
+		return true;
+	};
+
 	return (
-		<OnboardingStep { ...props } canProceed={ () => true }>
-			<div className="tour-content">
-				{ renderSubStep() }
-				{ currentSubStep < SUB_STEPS.length - 1 && (
-					<button
-						type="button"
-						className="prpl-btn prpl-btn-primary"
-						onClick={ handleNextSubStep }
-						disabled={ isSaving }
-					>
-						{ isSaving
-							? __( 'Saving…', 'progress-planner' )
-							: __( 'Save & Continue', 'progress-planner' ) }
-					</button>
-				) }
-			</div>
+		<OnboardingStep
+			{ ...props }
+			canProceed={ canProceed }
+			onNext={ handleNextSubStep }
+		>
+			<div className="tour-content">{ renderSubStep() }</div>
 		</OnboardingStep>
 	);
 }

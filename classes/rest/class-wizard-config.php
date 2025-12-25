@@ -84,26 +84,27 @@ class Wizard_Config extends Base {
 		}
 
 		// Page type descriptions for SettingsStep.
+		// Use __() instead of esc_html__() to avoid HTML entity encoding in JSON.
 		$page_types = [
 			'homepage' => [
 				'id'          => 'homepage',
-				'title'       => \esc_html__( 'Home page', 'progress-planner' ),
-				'description' => \esc_html__( 'Help us understand your site a little better so we can give you more useful recommendations. Let\'s start with the home page.', 'progress-planner' ),
+				'title'       => \__( 'Home page', 'progress-planner' ),
+				'description' => \__( 'Help us understand your site a little better so we can give you more useful recommendations. Let\'s start with the home page.', 'progress-planner' ),
 			],
 			'about'    => [
 				'id'          => 'about',
-				'title'       => \esc_html__( 'About page', 'progress-planner' ),
-				'description' => \esc_html__( 'Next up, pick the page you use as your about page.', 'progress-planner' ),
+				'title'       => \__( 'About page', 'progress-planner' ),
+				'description' => \__( 'Next up, pick the page you use as your about page.', 'progress-planner' ),
 			],
 			'contact'  => [
 				'id'          => 'contact',
-				'title'       => \esc_html__( 'Contact page', 'progress-planner' ),
-				'description' => \esc_html__( 'Now choose the page you use as your contact page.', 'progress-planner' ),
+				'title'       => \__( 'Contact page', 'progress-planner' ),
+				'description' => \__( 'Now choose the page you use as your contact page.', 'progress-planner' ),
 			],
 			'faq'      => [
 				'id'          => 'faq',
-				'title'       => \esc_html__( 'FAQ page', 'progress-planner' ),
-				'description' => \esc_html__( 'Next, pick the page you use as your FAQ page.', 'progress-planner' ),
+				'title'       => \__( 'FAQ page', 'progress-planner' ),
+				'description' => \__( 'Next, pick the page you use as your FAQ page.', 'progress-planner' ),
 			],
 		];
 
