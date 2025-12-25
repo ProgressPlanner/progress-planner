@@ -66,10 +66,9 @@ export default function WelcomeStep( props ) {
 				await generateLicense( {
 					'with-email': 'no', // Default for wizard
 				} );
-				// Reload page to get new license state.
-				window.location.reload();
-				return;
+				// Continue to next step (don't reload - matches develop branch behavior).
 			} catch ( error ) {
+				// eslint-disable-next-line no-console
 				console.error( 'Failed to generate license:', error );
 				return;
 			}
