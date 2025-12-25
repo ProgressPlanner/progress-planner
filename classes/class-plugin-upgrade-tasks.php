@@ -83,8 +83,9 @@ class Plugin_Upgrade_Tasks {
 	 * @return void
 	 */
 	protected function add_initial_onboarding_tasks() {
-		// Privacy policy is not accepted, so it's a fresh install.
-		$fresh_install = ! \progress_planner()->is_privacy_policy_accepted();
+		// Check if this is a fresh install (not a re-activation).
+		// If the option doesn't exist, it's a fresh install.
+		$fresh_install = false === \get_option( 'progress_planner_previous_version_task_providers', false );
 
 		// If this is the first time the plugin is installed, save the task providers.
 		if ( $fresh_install ) {

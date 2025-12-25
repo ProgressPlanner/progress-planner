@@ -51,19 +51,19 @@ class Onboard_Wizard {
 		// 2. Onboarding already in progress.
 		// 3. Branded site (privacy auto-accepted, but still needs onboarding).
 		$is_branded      = 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id();
-		$skip_onboarding = \progress_planner()->is_privacy_policy_accepted()
-			&& ! \get_option( 'prpl_onboard_progress', false )
-			&& ! $is_branded;
+		$show_onboarding = ! \progress_planner()->is_privacy_policy_accepted()
+			|| \get_option( 'prpl_onboard_progress', false )
+			|| $is_branded;
 
 		/**
-		 * Filter whether to skip the onboarding wizard.
+		 * Filter whether to show the onboarding wizard.
 		 *
 		 * Hosting integrations can use this filter to force showing
 		 * or hiding the onboarding wizard.
 		 *
-		 * @param bool $skip_onboarding Whether to skip showing the onboarding wizard.
+		 * @param bool $show_onboarding Whether to show the onboarding wizard.
 		 */
-		$skip_onboarding = \apply_filters( 'progress_planner_skip_onboarding', $skip_onboarding );
+		$show_onboarding = \apply_filters( 'progress_planner_show_onboarding', $show_onboarding );
 
 		// Wizard config is now provided via REST API endpoint (/progress-planner/v1/onboarding-wizard/config)
 		// React components fetch the config directly from the API.
