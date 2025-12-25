@@ -40,6 +40,8 @@ export default function OnboardingStep( {
 
 	/**
 	 * Update next button state based on canProceed.
+	 * Note: We only use CSS class, not HTML disabled attribute,
+	 * so click events still fire and we can show error messages.
 	 */
 	const updateNextButton = () => {
 		if ( ! nextButtonRef.current ) {
@@ -49,10 +51,8 @@ export default function OnboardingStep( {
 		const canAdvance = canProceed( wizardState );
 		if ( canAdvance ) {
 			nextButtonRef.current.classList.remove( 'prpl-btn-disabled' );
-			nextButtonRef.current.disabled = false;
 		} else {
 			nextButtonRef.current.classList.add( 'prpl-btn-disabled' );
-			nextButtonRef.current.disabled = true;
 		}
 	};
 

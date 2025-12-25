@@ -90,21 +90,25 @@ class Wizard_Config extends Base {
 				'id'          => 'homepage',
 				'title'       => \__( 'Home page', 'progress-planner' ),
 				'description' => \__( 'Help us understand your site a little better so we can give you more useful recommendations. Let\'s start with the home page.', 'progress-planner' ),
+				'note'        => \__( 'A Home page is important. We\'ll remind you to make one at a later time.', 'progress-planner' ),
 			],
 			'about'    => [
 				'id'          => 'about',
 				'title'       => \__( 'About page', 'progress-planner' ),
 				'description' => \__( 'Next up, pick the page you use as your about page.', 'progress-planner' ),
+				'note'        => \__( 'An About page is important. We\'ll remind you to make one at a later time.', 'progress-planner' ),
 			],
 			'contact'  => [
 				'id'          => 'contact',
 				'title'       => \__( 'Contact page', 'progress-planner' ),
 				'description' => \__( 'Now choose the page you use as your contact page.', 'progress-planner' ),
+				'note'        => \__( 'A Contact page is important. We\'ll remind you to make one at a later time.', 'progress-planner' ),
 			],
 			'faq'      => [
 				'id'          => 'faq',
 				'title'       => \__( 'FAQ page', 'progress-planner' ),
 				'description' => \__( 'Next, pick the page you use as your FAQ page.', 'progress-planner' ),
+				'note'        => \__( 'An FAQ page is important. We\'ll remind you to make one at a later time.', 'progress-planner' ),
 			],
 		];
 

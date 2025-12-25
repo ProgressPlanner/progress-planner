@@ -922,7 +922,7 @@
 		}
 
 		.prpl-setting-note {
-			display: none;
+			display: flex;
 			gap: 10px;
 			border-radius: 12px;
 			padding: 1rem;
@@ -939,6 +939,10 @@
 				height: 20px;
 				border-radius: 50%;
 				color: var(--prpl-color-field-border-active);
+			}
+
+			p {
+				margin: 0;
 			}
 		}
 

@@ -281,6 +281,24 @@ export default function SettingsStep( props ) {
 											) }
 										</label>
 									</div>
+									{ /* Note shown when checkbox is checked */ }
+									{ ! subStepData.hasPage &&
+										pageType.note && (
+											<div className="prpl-setting-note">
+												<span className="prpl-setting-note-icon">
+													<svg
+														width="20"
+														height="20"
+														viewBox="0 0 20 20"
+														fill="currentColor"
+														xmlns="http://www.w3.org/2000/svg"
+													>
+														<path d="M10 0C4.48 0 0 4.48 0 10s4.48 10 10 10 10-4.48 10-10S15.52 0 10 0zm1 15H9v-6h2v6zm0-8H9V5h2v2z" />
+													</svg>
+												</span>
+												<p>{ pageType.note }</p>
+											</div>
+										) }
 								</div>
 							</div>
 						</div>
