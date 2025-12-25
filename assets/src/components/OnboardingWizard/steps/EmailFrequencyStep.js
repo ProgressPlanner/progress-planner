@@ -21,13 +21,14 @@ export default function EmailFrequencyStep( props ) {
 	const { wizardState, updateState, config, onNext } = props;
 	const { userFirstName = '', userEmail = '', site, timezoneOffset } = config;
 
-	const [ emailFrequency, setEmailFrequency ] = useState(
-		wizardState.data.emailFrequency || {
-			choice: 'weekly',
-			name: userFirstName,
-			email: userEmail,
-		}
-	);
+	const [ emailFrequency, setEmailFrequency ] = useState( () => {
+		const saved = wizardState.data.emailFrequency;
+		return {
+			choice: saved?.choice || 'weekly',
+			name: saved?.name || userFirstName,
+			email: saved?.email || userEmail,
+		};
+	} );
 
 	const [ isSubscribing, setIsSubscribing ] = useState( false );
 	const [ subscriptionError, setSubscriptionError ] = useState( null );

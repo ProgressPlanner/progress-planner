@@ -19,7 +19,6 @@ import { __ } from '@wordpress/i18n';
  * @param {Object}   props             - Component props.
  * @param {Object}   props.wizardState - Current wizard state.
  * @param {Function} props.onNext      - Callback when next is clicked.
- * @param {Function} props.onBack      - Callback when back is clicked.
  * @param {Function} props.canProceed  - Function to check if step can proceed.
  * @param {string}   props.buttonText  - Custom button text (defaults to "Next").
  * @param {string}   props.buttonClass - Custom button class (defaults to "prpl-btn-primary").
@@ -29,7 +28,6 @@ import { __ } from '@wordpress/i18n';
 export default function OnboardingStep( {
 	wizardState,
 	onNext,
-	onBack,
 	canProceed = () => true,
 	buttonText,
 	buttonClass = 'prpl-btn-primary',
@@ -90,16 +88,6 @@ export default function OnboardingStep( {
 			{ children }
 			<div ref={ footerRef } className="tour-footer">
 				<div className="prpl-tour-next-wrapper">
-					{ onBack && (
-						<button
-							type="button"
-							className="prpl-btn prpl-btn-secondary"
-							onClick={ onBack }
-						>
-							{ /* translators: Back button */ }←{ ' ' }
-							{ __( 'Back', 'progress-planner' ) }
-						</button>
-					) }
 					<button
 						ref={ nextButtonRef }
 						type="button"
