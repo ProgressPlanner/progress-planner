@@ -137,12 +137,17 @@ class Wizard_Config extends Base {
 		\progress_planner()->get_ui__branding()->the_logo();
 		$logo_html = \ob_get_clean();
 
+		// Get current user data for email frequency step.
+		$current_user = \wp_get_current_user();
+
 		$config = [
 			'enabled'             => ! $skip_onboarding,
 			'steps'               => $steps_formatted,
 			'savedProgress'       => $saved_progress,
 			'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
 			'nonce'               => \wp_create_nonce( 'progress_planner' ),
+			'userFirstName'       => $current_user->first_name ? $current_user->first_name : $current_user->display_name,
+			'userEmail'           => $current_user->user_email,
 			'onboardAPIUrl'       => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
 			'onboardNonceURL'     => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
 			'site'                => \esc_attr( \set_url_scheme( \site_url() ) ),
