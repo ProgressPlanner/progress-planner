@@ -10,6 +10,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import OnboardingStep from '../OnboardingStep';
+import { CustomRadio } from '../../FormInputs';
 
 /**
  * EmailFrequencyStep component.
@@ -182,65 +183,41 @@ export default function EmailFrequencyStep( props ) {
 						) }
 
 						<div className="prpl-email-frequency-options">
-							<label
-								htmlFor="prpl-email-weekly"
-								style={ {
-									display: 'block',
-									marginBottom: '1rem',
+							<CustomRadio
+								id="prpl-email-weekly"
+								name="email-frequency"
+								value="weekly"
+								checked={ emailFrequency.choice === 'weekly' }
+								onChange={ ( e ) => {
+									setEmailFrequency( {
+										...emailFrequency,
+										choice: e.target.value,
+									} );
+									setSubscriptionError( null );
 								} }
-							>
-								<input
-									id="prpl-email-weekly"
-									type="radio"
-									name="email-frequency"
-									value="weekly"
-									checked={
-										emailFrequency.choice === 'weekly'
-									}
-									onChange={ ( e ) => {
-										setEmailFrequency( {
-											...emailFrequency,
-											choice: e.target.value,
-										} );
-										setSubscriptionError( null );
-									} }
-								/>
-								<span>
-									{ __(
-										'Email me weekly',
-										'progress-planner'
-									) }
-								</span>
-							</label>
+								label={ __(
+									'Email me weekly',
+									'progress-planner'
+								) }
+							/>
 
-							<label
-								htmlFor="prpl-dont-email"
-								style={ {
-									display: 'block',
-									marginBottom: '1rem',
+							<CustomRadio
+								id="prpl-dont-email"
+								name="email-frequency"
+								value="none"
+								checked={ emailFrequency.choice === 'none' }
+								onChange={ ( e ) => {
+									setEmailFrequency( {
+										...emailFrequency,
+										choice: e.target.value,
+									} );
+									setSubscriptionError( null );
 								} }
-							>
-								<input
-									id="prpl-dont-email"
-									type="radio"
-									name="email-frequency"
-									value="none"
-									checked={ emailFrequency.choice === 'none' }
-									onChange={ ( e ) => {
-										setEmailFrequency( {
-											...emailFrequency,
-											choice: e.target.value,
-										} );
-										setSubscriptionError( null );
-									} }
-								/>
-								<span>
-									{ __(
-										"Don't email me",
-										'progress-planner'
-									) }
-								</span>
-							</label>
+								label={ __(
+									"Don't email me",
+									'progress-planner'
+								) }
+							/>
 						</div>
 
 						{ emailFrequency.choice === 'weekly' && (

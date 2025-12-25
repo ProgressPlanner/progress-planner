@@ -229,6 +229,14 @@ class Page {
 			true
 		);
 
+		// Enqueue dashboard styles (includes FormInputs component styles).
+		\wp_enqueue_style(
+			'progress-planner/dashboard',
+			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/dashboard.css',
+			[],
+			$asset['version']
+		);
+
 		// Preload REST API data to eliminate initial API request waterfalls.
 		// Must be called after script is enqueued but before it runs.
 		$this->preload_rest_data();

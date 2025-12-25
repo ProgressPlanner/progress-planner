@@ -11,6 +11,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ajaxRequest } from '../../../utils/ajaxRequest';
 import OnboardingStep from '../OnboardingStep';
+import { CustomCheckbox, ToggleSwitch } from '../../FormInputs';
 
 const SUB_STEPS = [ 'homepage', 'about', 'contact', 'faq', 'post-types' ];
 
@@ -242,36 +243,26 @@ export default function SettingsStep( props ) {
 										</select>
 									</div>
 									<div className="prpl-checkbox-wrapper">
-										<label
-											htmlFor={ `prpl-no-${ subStepName }-page` }
-										>
-											<input
-												type="checkbox"
-												id={ `prpl-no-${ subStepName }-page` }
-												checked={
-													! subStepData.hasPage
-												}
-												onChange={ ( e ) => {
-													const noPage =
-														e.target.checked;
-													setSettings( ( prev ) => ( {
-														...prev,
-														[ subStepName ]: {
-															...prev[
-																subStepName
-															],
-															hasPage: ! noPage,
-															// Reset pageId when checkbox is checked.
-															pageId: noPage
-																? null
-																: prev[
-																		subStepName
-																  ]?.pageId,
-														},
-													} ) );
-												} }
-											/>
-											{ sprintf(
+										<CustomCheckbox
+											id={ `prpl-no-${ subStepName }-page` }
+											checked={ ! subStepData.hasPage }
+											onChange={ ( e ) => {
+												const noPage = e.target.checked;
+												setSettings( ( prev ) => ( {
+													...prev,
+													[ subStepName ]: {
+														...prev[ subStepName ],
+														hasPage: ! noPage,
+														// Reset pageId when checkbox is checked.
+														pageId: noPage
+															? null
+															: prev[
+																	subStepName
+															  ]?.pageId,
+													},
+												} ) );
+											} }
+											label={ sprintf(
 												/* translators: %s: page type title */
 												__(
 													"I don't have a %s yet",
@@ -279,7 +270,7 @@ export default function SettingsStep( props ) {
 												),
 												pageTitle
 											) }
-										</label>
+										/>
 									</div>
 									{ /* Note shown when checkbox is checked */ }
 									{ ! subStepData.hasPage &&
@@ -321,56 +312,45 @@ export default function SettingsStep( props ) {
 								'progress-planner'
 							) }
 						</p>
-						<div className="prpl-post-types-selection">
+						<div id="prpl-post-types-include-wrapper">
 							{ postTypes.map( ( postType ) => (
-								<label
+								<ToggleSwitch
 									key={ postType.id }
-									htmlFor={ `prpl-post-type-${ postType.id }` }
-									style={ {
-										display: 'block',
-										marginBottom: '0.5rem',
+									id={ `prpl-post-type-${ postType.id }` }
+									name="prpl-post-types-include[]"
+									value={ postType.id }
+									checked={
+										subStepData.selectedTypes?.includes(
+											postType.id
+										) || false
+									}
+									onChange={ ( e ) => {
+										const isChecked = e.target.checked;
+										setSettings( ( prev ) => ( {
+											...prev,
+											'post-types': {
+												selectedTypes: isChecked
+													? [
+															...( prev[
+																'post-types'
+															]?.selectedTypes ||
+																[] ),
+															postType.id,
+													  ]
+													: (
+															prev[ 'post-types' ]
+																?.selectedTypes ||
+															[]
+													  ).filter(
+															( id ) =>
+																id !==
+																postType.id
+													  ),
+											},
+										} ) );
 									} }
-								>
-									<input
-										type="checkbox"
-										id={ `prpl-post-type-${ postType.id }` }
-										value={ postType.id }
-										checked={
-											subStepData.selectedTypes?.includes(
-												postType.id
-											) || false
-										}
-										onChange={ ( e ) => {
-											const isChecked = e.target.checked;
-											setSettings( ( prev ) => ( {
-												...prev,
-												'post-types': {
-													selectedTypes: isChecked
-														? [
-																...( prev[
-																	'post-types'
-																]
-																	?.selectedTypes ||
-																	[] ),
-																postType.id,
-														  ]
-														: (
-																prev[
-																	'post-types'
-																]
-																	?.selectedTypes ||
-																[]
-														  ).filter(
-																( id ) =>
-																	id !==
-																	postType.id
-														  ),
-												},
-											} ) );
-										} }
-									/>{ ' ' }
-									{ postType.title }
-								</label>
+									label={ postType.title }
+								/>
 							) ) }
 						</div>
 					</div>

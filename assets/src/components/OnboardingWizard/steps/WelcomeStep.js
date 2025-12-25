@@ -10,6 +10,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import OnboardingStep from '../OnboardingStep';
 import { useLicenseGenerator } from '../../../hooks/useLicenseGenerator';
+import { CustomCheckbox } from '../../FormInputs';
 
 /**
  * WelcomeStep component.
@@ -134,63 +135,54 @@ export default function WelcomeStep( props ) {
 
 						{ ! hasLicense && (
 							<div className="prpl-privacy-checkbox-wrapper">
-								<label
-									htmlFor="prpl-privacy-checkbox"
-									style={ {
-										display: 'flex',
-										alignItems: 'baseline',
-									} }
-								>
-									<input
-										id="prpl-privacy-checkbox"
-										type="checkbox"
-										checked={ privacyAccepted }
-										onChange={ ( e ) => {
-											setPrivacyAccepted(
-												e.target.checked
+								<CustomCheckbox
+									id="prpl-privacy-checkbox"
+									checked={ privacyAccepted }
+									onChange={ ( e ) => {
+										setPrivacyAccepted( e.target.checked );
+										// Remove active class from required indicator (like develop).
+										const requiredIndicator =
+											document.querySelector(
+												'.prpl-privacy-checkbox-wrapper .prpl-required-indicator'
 											);
-											// Remove active class from required indicator (like develop).
-											const requiredIndicator =
-												document.querySelector(
-													'.prpl-privacy-checkbox-wrapper .prpl-required-indicator'
-												);
-											if ( requiredIndicator ) {
-												requiredIndicator.classList.remove(
-													'prpl-required-indicator-active'
-												);
-											}
-										} }
-									/>
-									<span>
-										{ __(
-											'I accept the',
-											'progress-planner'
-										) }{ ' ' }
-										<a
-											href={
-												privacyPolicyUrl ||
-												'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy'
-											}
-											target="_blank"
-											rel="noopener noreferrer"
-										>
+										if ( requiredIndicator ) {
+											requiredIndicator.classList.remove(
+												'prpl-required-indicator-active'
+											);
+										}
+									} }
+									label={
+										<>
 											{ __(
-												'privacy policy',
+												'I accept the',
 												'progress-planner'
-											) }
-										</a>{ ' ' }
-										{ __(
-											'and the essential data processing needed for the plugin.',
-											'progress-planner'
-										) }{ ' ' }
-										<span className="prpl-required-indicator">
+											) }{ ' ' }
+											<a
+												href={
+													privacyPolicyUrl ||
+													'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy'
+												}
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												{ __(
+													'privacy policy',
+													'progress-planner'
+												) }
+											</a>{ ' ' }
 											{ __(
-												'Required',
+												'and the essential data processing needed for the plugin.',
 												'progress-planner'
-											) }
-										</span>
-									</span>
-								</label>
+											) }{ ' ' }
+											<span className="prpl-required-indicator">
+												{ __(
+													'Required',
+													'progress-planner'
+												) }
+											</span>
+										</>
+									}
+								/>
 							</div>
 						) }
 					</div>

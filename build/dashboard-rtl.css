@@ -1,0 +1,206 @@
+/*!*****************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/css-loader/dist/cjs.js??ruleSet[1].rules[2].use[1]!./node_modules/postcss-loader/dist/cjs.js??ruleSet[1].rules[2].use[2]!./assets/src/components/FormInputs/FormInputs.css ***!
+  \*****************************************************************************************************************************************************************************************************/
+/**
+ * Custom Form Input Components Styles
+ *
+ * Styles for CustomCheckbox, CustomRadio, and ToggleSwitch components.
+ * These styles are self-contained so components can be reused anywhere.
+ */
+
+/* Hide the default input */
+.prpl-custom-checkbox input[type="checkbox"],
+.prpl-custom-radio input[type="radio"] {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+}
+
+/* Shared styles for the custom radios and checkboxes */
+.prpl-custom-control {
+	display: inline-block;
+	vertical-align: middle;
+	margin-left: 12px;
+	width: 20px;
+	height: 20px;
+	box-sizing: border-box;
+	position: relative;
+	transition: border-color 0.2s, background 0.2s;
+	flex-shrink: 0;
+}
+
+/* Label styling */
+.prpl-custom-checkbox,
+.prpl-custom-radio {
+	display: flex;
+	align-items: center;
+	margin-bottom: 0.5rem;
+	cursor: pointer;
+	-webkit-user-select: none;
+	   -moz-user-select: none;
+	        user-select: none;
+}
+
+/* Checkbox styles */
+.prpl-custom-checkbox .prpl-custom-control {
+	border: 1px solid var(--prpl-color-selection-controls-inactive, #9ca3af);
+	background-color: var(--prpl-onboarding-popover-background, #fff);
+}
+
+.prpl-custom-checkbox input[type="checkbox"]:checked + .prpl-custom-control {
+	background: var(--prpl-color-selection-controls, #534786);
+	border-color: var(--prpl-color-selection-controls, #534786);
+}
+
+/* Checkmark */
+.prpl-custom-checkbox .prpl-custom-control::after {
+	content: "";
+	position: absolute;
+	right: 6px;
+	top: 2px;
+	width: 4px;
+	height: 9px;
+	border: solid var(--prpl-onboarding-popover-background, #fff);
+	border-width: 0 0 2px 2px;
+	opacity: 0;
+	transform: scale(0.8) rotate(-45deg);
+	transition: opacity 0.2s, transform 0.2s;
+}
+
+.prpl-custom-checkbox input[type="checkbox"]:checked + .prpl-custom-control::after {
+	opacity: 1;
+	transform: scale(1) rotate(-45deg);
+}
+
+/* Radio styles */
+.prpl-custom-radio .prpl-custom-control {
+	border: 1px solid var(--prpl-color-selection-controls-inactive, #9ca3af);
+	border-radius: 50%;
+	background-color: var(--prpl-onboarding-popover-background, #fff);
+}
+
+.prpl-custom-radio input[type="radio"]:checked + .prpl-custom-control {
+	background: var(--prpl-color-selection-controls, #534786);
+	border-color: var(--prpl-color-selection-controls, #534786);
+}
+
+/* Radio dot */
+.prpl-custom-radio .prpl-custom-control::after {
+	content: "";
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	width: 8px;
+	height: 8px;
+	background-color: var(--prpl-onboarding-popover-background, #fff);
+	border-radius: 50%;
+	opacity: 0;
+	transition: opacity 0.2s;
+}
+
+.prpl-custom-radio input[type="radio"]:checked + .prpl-custom-control::after {
+	opacity: 1;
+}
+
+/* Toggle Switch styles */
+.prpl-post-type-toggle-wrapper {
+	display: flex;
+	align-items: center;
+}
+
+.prpl-post-type-toggle-label {
+	display: flex;
+	align-items: center;
+	gap: 0.75rem;
+	cursor: pointer;
+	position: relative;
+}
+
+.prpl-post-type-toggle-input {
+	position: absolute;
+	opacity: 0;
+	width: 0;
+	height: 0;
+	margin: 0;
+	padding: 0;
+}
+
+.prpl-post-type-toggle-switch {
+	position: relative;
+	width: 44px;
+	height: 24px;
+	border-radius: 12px;
+	background-color: var(--prpl-color-selection-controls-inactive, #9ca3af);
+	transition: background-color 0.2s;
+	flex-shrink: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.prpl-post-type-toggle-switch::after {
+	content: '';
+	position: absolute;
+	top: 2px;
+	right: 2px;
+	width: 20px;
+	height: 20px;
+	border-radius: 50%;
+	background-color: var(--prpl-onboarding-popover-background, #fff);
+	transition: transform 0.2s;
+	z-index: 1;
+}
+
+.prpl-post-type-toggle-switch svg {
+	position: absolute;
+	width: 12px;
+	height: 12px;
+	top: 50%;
+	right: 6px;
+	transform: translateY(-50%);
+	z-index: 2;
+	transition: opacity 0.2s, right 0.2s, color 0.2s;
+	color: var(--prpl-color-ui-icon, #6b7280);
+}
+
+.prpl-post-type-toggle-switch .prpl-toggle-icon-check {
+	display: none;
+}
+
+.prpl-post-type-toggle-switch .prpl-toggle-icon-x {
+	display: block;
+}
+
+.prpl-post-type-toggle-label:hover .prpl-post-type-toggle-switch svg {
+	opacity: 0.6;
+}
+
+.prpl-post-type-toggle-input:checked ~ .prpl-post-type-toggle-switch {
+	background-color: var(--prpl-background-step-active, #534786);
+}
+
+.prpl-post-type-toggle-input:checked ~ .prpl-post-type-toggle-switch::after {
+	transform: translateX(-20px);
+}
+
+.prpl-post-type-toggle-input:checked ~ .prpl-post-type-toggle-switch svg {
+	right: 26px;
+	color: var(--prpl-background-step-active, #534786);
+	transform: translateY(-50%);
+}
+
+.prpl-post-type-toggle-input:checked ~ .prpl-post-type-toggle-switch .prpl-toggle-icon-check {
+	display: block;
+}
+
+.prpl-post-type-toggle-input:checked ~ .prpl-post-type-toggle-switch .prpl-toggle-icon-x {
+	display: none;
+}
+
+.prpl-post-type-toggle-text {
+	font-size: 16px;
+	line-height: 1.5;
+	transition: opacity 0.2s;
+}
+
