@@ -62,7 +62,7 @@ class Wizard_Config extends Base {
 		foreach ( $steps as $index => $step ) {
 			$steps_formatted[] = [
 				'id'       => $step['template_id'],
-				'title'    => $step['title'],
+				'title'    => \html_entity_decode( $step['title'], ENT_QUOTES, 'UTF-8' ),
 				'template' => $step['template_file_name'],
 				'data'     => isset( $step['template_data'] ) ? $step['template_data'] : [],
 			];

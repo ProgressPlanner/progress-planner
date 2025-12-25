@@ -6,7 +6,7 @@
  * @package
  */
 
-import { useState, useEffect, Fragment } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import OnboardingStep from '../OnboardingStep';
 import { useLicenseGenerator } from '../../../hooks/useLicenseGenerator';
@@ -162,36 +162,33 @@ export default function WelcomeStep( props ) {
 										} }
 									/>
 									<span>
-										{ sprintf(
-											/* translators: %1$s: progressplanner.com/privacy-policy link, %2$s: required indicator */
-											__(
-												'I accept the %1$s and the essential data processing needed for the plugin. %2$s',
+										{ __(
+											'I accept the',
+											'progress-planner'
+										) }{ ' ' }
+										<a
+											href={
+												privacyPolicyUrl ||
+												'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy'
+											}
+											target="_blank"
+											rel="noopener noreferrer"
+										>
+											{ __(
+												'privacy policy',
 												'progress-planner'
-											),
-											<Fragment key="privacy-link">
-												<a
-													href={
-														privacyPolicyUrl ||
-														'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy'
-													}
-													target="_blank"
-													rel="noopener noreferrer"
-												>
-													{ __(
-														'privacy policy',
-														'progress-planner'
-													) }
-												</a>
-											</Fragment>,
-											<Fragment key="required-indicator">
-												<span className="prpl-required-indicator">
-													{ __(
-														'Required',
-														'progress-planner'
-													) }
-												</span>
-											</Fragment>
-										) }
+											) }
+										</a>{ ' ' }
+										{ __(
+											'and the essential data processing needed for the plugin.',
+											'progress-planner'
+										) }{ ' ' }
+										<span className="prpl-required-indicator">
+											{ __(
+												'Required',
+												'progress-planner'
+											) }
+										</span>
 									</span>
 								</label>
 							</div>

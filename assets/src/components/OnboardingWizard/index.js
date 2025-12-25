@@ -91,7 +91,6 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 		updateState,
 		nextStep,
 		prevStep,
-		goToStep,
 		currentStep,
 		currentStepData,
 	} = useOnboardingWizard( onboardingWizard || {}, progressHooks );
@@ -397,7 +396,6 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 						<OnboardingNavigation
 							steps={ steps }
 							currentStep={ currentStep }
-							onStepClick={ goToStep }
 							logoHtml={ onboardingWizard.logoHtml }
 						/>
 					) }

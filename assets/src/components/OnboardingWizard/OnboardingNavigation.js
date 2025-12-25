@@ -2,6 +2,7 @@
  * OnboardingNavigation Component
  *
  * Left sidebar navigation showing wizard steps.
+ * Steps are display-only indicators, not clickable buttons.
  *
  * @package
  */
@@ -9,17 +10,15 @@
 /**
  * OnboardingNavigation component.
  *
- * @param {Object}   props             - Component props.
- * @param {Array}    props.steps       - Array of step definitions.
- * @param {number}   props.currentStep - Current step index.
- * @param {Function} props.onStepClick - Callback when step is clicked.
- * @param {string}   props.logoHtml    - Logo HTML from PHP.
+ * @param {Object} props             - Component props.
+ * @param {Array}  props.steps       - Array of step definitions.
+ * @param {number} props.currentStep - Current step index.
+ * @param {string} props.logoHtml    - Logo HTML from PHP.
  * @return {JSX.Element} Navigation component.
  */
 export default function OnboardingNavigation( {
 	steps,
 	currentStep,
-	onStepClick,
 	logoHtml,
 } ) {
 	return (
@@ -42,45 +41,12 @@ export default function OnboardingNavigation( {
 								} ${ isCompleted ? 'prpl-completed' : '' }` }
 								data-step={ index }
 							>
-								{ onStepClick ? (
-									<button
-										type="button"
-										className="prpl-nav-step-button"
-										tabIndex={ 0 }
-										onClick={ () => onStepClick( index ) }
-										onKeyDown={ ( e ) => {
-											if (
-												onStepClick &&
-												( e.key === 'Enter' ||
-													e.key === ' ' )
-											) {
-												e.preventDefault();
-												onStepClick( index );
-											}
-										} }
-										style={ {
-											cursor: onStepClick
-												? 'pointer'
-												: 'default',
-										} }
-									>
-										<span className="prpl-step-icon">
-											{ isCompleted ? '✓' : stepNumber }
-										</span>
-										<span className="prpl-step-label">
-											{ step.title }
-										</span>
-									</button>
-								) : (
-									<>
-										<span className="prpl-step-icon">
-											{ isCompleted ? '✓' : stepNumber }
-										</span>
-										<span className="prpl-step-label">
-											{ step.title }
-										</span>
-									</>
-								) }
+								<span className="prpl-step-icon">
+									{ isCompleted ? '✓' : stepNumber }
+								</span>
+								<span className="prpl-step-label">
+									{ step.title }
+								</span>
 							</li>
 						);
 					} ) }
