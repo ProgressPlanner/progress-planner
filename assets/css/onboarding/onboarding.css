@@ -677,6 +677,9 @@
 		color: var(--prpl-color-link);
 		text-decoration: underline;
 		cursor: pointer;
+		background: none;
+		border: none;
+		padding: 0;
 
 		&.prpl-quit-link-primary {
 			font-weight: 600;
