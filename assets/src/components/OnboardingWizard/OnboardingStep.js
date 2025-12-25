@@ -22,6 +22,7 @@ import { __ } from '@wordpress/i18n';
  * @param {Function} props.canProceed  - Function to check if step can proceed.
  * @param {string}   props.buttonText  - Custom button text (defaults to "Next").
  * @param {string}   props.buttonClass - Custom button class (defaults to "prpl-btn-primary").
+ * @param {boolean}  props.isLoading   - Whether to show loading spinner.
  * @param {Object}   props.children    - Step content.
  * @return {JSX.Element} Step component.
  */
@@ -31,6 +32,7 @@ export default function OnboardingStep( {
 	canProceed = () => true,
 	buttonText,
 	buttonClass = 'prpl-btn-primary',
+	isLoading = false,
 	children,
 } ) {
 	const nextButtonRef = useRef( null );
@@ -88,6 +90,12 @@ export default function OnboardingStep( {
 			{ children }
 			<div ref={ footerRef } className="tour-footer">
 				<div className="prpl-tour-next-wrapper">
+					{ isLoading && (
+						<span
+							className="spinner"
+							style={ { visibility: 'visible' } }
+						></span>
+					) }
 					<button
 						ref={ nextButtonRef }
 						type="button"
@@ -102,6 +110,7 @@ export default function OnboardingStep( {
 								onNext();
 							}
 						} }
+						disabled={ isLoading }
 					>
 						{ buttonText || (
 							<>

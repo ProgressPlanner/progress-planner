@@ -95,6 +95,7 @@ export default function WelcomeStep( props ) {
 			{ ...props }
 			onNext={ handleNext }
 			canProceed={ canProceed }
+			isLoading={ isGenerating }
 			buttonText={
 				<>
 					{ __( 'Start onboarding', 'progress-planner' ) }
@@ -190,15 +191,6 @@ export default function WelcomeStep( props ) {
 										</span>
 									</span>
 								</label>
-							</div>
-						) }
-
-						{ isGenerating && (
-							<div className="prpl-spinner">
-								<span
-									className="spinner"
-									style={ { visibility: 'visible' } }
-								></span>
 							</div>
 						) }
 					</div>

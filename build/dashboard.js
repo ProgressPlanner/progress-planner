@@ -1014,6 +1014,7 @@ __webpack_require__.r(__webpack_exports__);
  * @param {Function} props.canProceed  - Function to check if step can proceed.
  * @param {string}   props.buttonText  - Custom button text (defaults to "Next").
  * @param {string}   props.buttonClass - Custom button class (defaults to "prpl-btn-primary").
+ * @param {boolean}  props.isLoading   - Whether to show loading spinner.
  * @param {Object}   props.children    - Step content.
  * @return {JSX.Element} Step component.
  */
@@ -1024,6 +1025,7 @@ function OnboardingStep({
   canProceed = () => true,
   buttonText,
   buttonClass = 'prpl-btn-primary',
+  isLoading = false,
   children
 }) {
   const nextButtonRef = (0,_wordpress_element__WEBPACK_IMPORTED_MODULE_0__.useRef)(null);
@@ -1073,9 +1075,14 @@ function OnboardingStep({
     children: [children, /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
       ref: footerRef,
       className: "tour-footer",
-      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("div", {
+      children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)("div", {
         className: "prpl-tour-next-wrapper",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
+        children: [isLoading && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("span", {
+          className: "spinner",
+          style: {
+            visibility: 'visible'
+          }
+        }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsx)("button", {
           ref: nextButtonRef,
           type: "button",
           className: `prpl-btn ${buttonClass} prpl-tour-next`,
@@ -1085,10 +1092,11 @@ function OnboardingStep({
               onNext();
             }
           },
+          disabled: isLoading,
           children: buttonText || /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_2__.Fragment, {
             children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Next', 'progress-planner'), " \u2192"]
           })
-        })
+        })]
       })
     })]
   });
@@ -2771,6 +2779,7 @@ function SettingsStep(props) {
     ...props,
     canProceed: canProceed,
     onNext: handleNextSubStep,
+    isLoading: isSaving,
     children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
       className: "tour-content",
       children: renderSubStep()
@@ -2896,6 +2905,7 @@ function WelcomeStep(props) {
     ...props,
     onNext: handleNext,
     canProceed: canProceed,
+    isLoading: isGenerating,
     buttonText: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsxs)(react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.Fragment, {
       children: [(0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Start onboarding', 'progress-planner'), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
         className: "dashicons dashicons-arrow-right-alt2"
@@ -2950,14 +2960,6 @@ function WelcomeStep(props) {
                   children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Required', 'progress-planner')
                 })]
               })]
-            })
-          }), isGenerating && /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
-            className: "prpl-spinner",
-            children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("span", {
-              className: "spinner",
-              style: {
-                visibility: 'visible'
-              }
             })
           })]
         }), /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {

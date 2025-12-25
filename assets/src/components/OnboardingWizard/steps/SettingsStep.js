@@ -402,6 +402,7 @@ export default function SettingsStep( props ) {
 			{ ...props }
 			canProceed={ canProceed }
 			onNext={ handleNextSubStep }
+			isLoading={ isSaving }
 		>
 			<div className="tour-content">{ renderSubStep() }</div>
 		</OnboardingStep>
