@@ -90,7 +90,7 @@ class Playground {
 		}
 
 		// Delete onboarding progress to trigger fresh onboarding.
-		\delete_option( 'prpl_onboard_progress' );
+		\Progress_Planner\Onboard_Wizard::delete_progress();
 		// Delete the license key to trigger onboarding (privacy not accepted).
 		\delete_option( 'progress_planner_license_key' );
 

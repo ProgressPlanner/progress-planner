@@ -13,11 +13,27 @@ namespace Progress_Planner;
 class Onboard_Wizard {
 
 	/**
+	 * Option name for storing onboarding progress.
+	 *
+	 * @var string
+	 */
+	public const PROGRESS_OPTION_NAME = 'prpl_onboard_progress';
+
+	/**
 	 * Steps and their order.
 	 *
 	 * @var array
 	 */
 	protected $steps = [];
+
+	/**
+	 * Delete the onboarding progress option.
+	 *
+	 * @return bool True if the option was deleted, false otherwise.
+	 */
+	public static function delete_progress() {
+		return \delete_option( self::PROGRESS_OPTION_NAME );
+	}
 
 	/**
 	 * Constructor.
@@ -52,7 +68,7 @@ class Onboard_Wizard {
 		// 3. Branded site (privacy auto-accepted, but still needs onboarding).
 		$is_branded      = 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id();
 		$show_onboarding = ! \progress_planner()->is_privacy_policy_accepted()
-			|| \get_option( 'prpl_onboard_progress', false )
+			|| \get_option( self::PROGRESS_OPTION_NAME, false )
 			|| $is_branded;
 
 		/**
@@ -319,7 +335,7 @@ class Onboard_Wizard {
 			return null;
 		}
 
-		$onboarding_progress = \get_option( 'prpl_onboard_progress', true );
+		$onboarding_progress = \get_option( self::PROGRESS_OPTION_NAME, true );
 		if ( ! $onboarding_progress ) {
 			return null;
 		}
@@ -363,7 +379,7 @@ class Onboard_Wizard {
 		\error_log( print_r( $progress, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r, WordPress.PHP.DevelopmentFunctions.error_log_error_log
 
 		// Save as user meta?
-		\update_option( 'prpl_onboard_progress', $progress );
+		\update_option( self::PROGRESS_OPTION_NAME, $progress );
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Tour progress saved.', 'progress-planner' ) ] );
 	}
