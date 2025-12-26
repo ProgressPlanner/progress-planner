@@ -63,12 +63,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-      - name: Install Node.js & Playwright
+      - name: Install Node.js & dependencies
         uses: actions/setup-node@v3
         with:
-          node-version: 18
-      - run: npm install -D @playwright/test
-      - run: npx playwright install --with-deps
+          node-version: 20
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
 
       - name: Complete WordPress installation
         run: |
@@ -109,7 +109,7 @@ jobs:
           docker exec $WP_CONTAINER wp plugin install wordpress-seo --activate --allow-root
 
       - name: Run Playwright Tests
-        run: npx playwright test tests/e2e/
+        run: npm run test:e2e
 
       # Begin Yoast SEO Premium tests
       - name: Install PHP & Composer on host
@@ -148,8 +148,8 @@ jobs:
           # Save the updated option
           docker exec $WP_CONTAINER wp option update wpseo_premium "$UPDATED_OPTION" --format=json --allow-root
 
-      - name: Run Yoast Focus Element Test Again
-        run: npx playwright test tests/e2e/yoast-focus-element.spec.js
+      - name: Run Yoast Integration Tests with Premium
+        run: npx playwright test --project=parallel --grep="Yoast"
       # End Yoast SEO Premium tests
 
       - name: Upload Playwright Report
