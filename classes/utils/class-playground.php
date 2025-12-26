@@ -31,8 +31,6 @@ class Playground {
 		if ( ! \progress_planner()->get_license_key() && ! \get_option( 'progress_planner_demo_data_generated', false ) ) {
 			$this->generate_data();
 			\update_option( 'progress_planner_license_key', \str_replace( ' ', '-', $this->create_random_string( 20 ) ) );
-			// Hide onboarding by default in the Playground demo.
-			\update_option( 'progress_planner_playground_hide_onboarding', true );
 			\update_option(
 				'progress_planner_todo',
 				[
@@ -49,11 +47,7 @@ class Playground {
 			\update_option( 'progress_planner_demo_data_generated', true );
 		}
 		\add_action( 'progress_planner_admin_page_header_before', [ $this, 'show_header_notice' ] );
-		\add_action( 'wp_ajax_progress_planner_hide_onboarding', [ $this, 'hide_onboarding' ] );
 		\add_action( 'wp_ajax_progress_planner_show_onboarding', [ $this, 'show_onboarding' ] );
-
-		// Filter to control onboarding visibility in Playground.
-		\add_filter( 'progress_planner_show_onboarding', [ $this, 'filter_show_onboarding' ] );
 
 		\progress_planner()->get_settings()->set( 'activation_date', ( new \DateTime() )->modify( '-2 months' )->format( 'Y-m-d' ) );
 	}
@@ -84,85 +78,23 @@ class Playground {
 	}
 
 	/**
-	 * Check if onboarding would currently be shown.
-	 *
-	 * Mirrors the logic in Onboard_Wizard::maybe_register_popover_hooks().
-	 *
-	 * @return bool
-	 */
-	private function is_onboarding_shown() {
-		$is_branded      = 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id();
-		$show_onboarding = ! \progress_planner()->is_privacy_policy_accepted()
-			|| \get_option( 'prpl_onboard_progress', false )
-			|| $is_branded;
-
-		return (bool) \apply_filters( 'progress_planner_show_onboarding', $show_onboarding );
-	}
-
-	/**
-	 * Toggle the onboarding visibility in the Playground environment.
-	 *
-	 * @param string $action Either 'show' or 'hide'.
-	 *
-	 * @return void
-	 */
-	private function toggle_onboarding( $action ) {
-		$nonce_action = "progress_planner_{$action}_onboarding";
-		\check_ajax_referer( $nonce_action, 'nonce' );
-
-		if ( ! \current_user_can( 'manage_options' ) ) {
-			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'progress-planner' ) );
-		}
-
-		// Always delete onboarding progress to reset the state.
-		\delete_option( 'prpl_onboard_progress' );
-
-		if ( $action === 'hide' ) {
-			// Add a license key to mark privacy as accepted.
-			\update_option( 'progress_planner_license_key', \str_replace( ' ', '-', $this->create_random_string( 20 ) ) );
-			// Use filter to force hide onboarding.
-			\update_option( 'progress_planner_playground_hide_onboarding', true );
-			$message = \esc_html__( 'Onboarding hidden successfully', 'progress-planner' );
-		} else {
-			// Delete the license key to trigger onboarding (privacy not accepted).
-			\delete_option( 'progress_planner_license_key' );
-			// Remove the force hide filter.
-			\delete_option( 'progress_planner_playground_hide_onboarding' );
-			$message = \esc_html__( 'Onboarding shown successfully', 'progress-planner' );
-		}
-
-		\wp_send_json_success( [ 'message' => $message ] );
-	}
-
-	/**
-	 * Filter to force hide onboarding in Playground when the option is set.
-	 *
-	 * @param bool $show_onboarding Whether to show the onboarding wizard.
-	 * @return bool
-	 */
-	public function filter_show_onboarding( $show_onboarding ) {
-		if ( \get_option( 'progress_planner_playground_hide_onboarding', false ) ) {
-			return false;
-		}
-		return $show_onboarding;
-	}
-
-	/**
-	 * Hide the onboarding in the Playground environment.
-	 *
-	 * @return void
-	 */
-	public function hide_onboarding() {
-		$this->toggle_onboarding( 'hide' );
-	}
-
-	/**
 	 * Show the onboarding in the Playground environment.
 	 *
 	 * @return void
 	 */
 	public function show_onboarding() {
-		$this->toggle_onboarding( 'show' );
+		\check_ajax_referer( 'progress_planner_show_onboarding', 'nonce' );
+
+		if ( ! \current_user_can( 'manage_options' ) ) {
+			\wp_die( \esc_html__( 'You do not have sufficient permissions to access this page.', 'progress-planner' ) );
+		}
+
+		// Delete onboarding progress to trigger fresh onboarding.
+		\delete_option( 'prpl_onboard_progress' );
+		// Delete the license key to trigger onboarding (privacy not accepted).
+		\delete_option( 'progress_planner_license_key' );
+
+		\wp_send_json_success( [ 'message' => \esc_html__( 'Onboarding shown successfully', 'progress-planner' ) ] );
 	}
 
 	/**
@@ -176,10 +108,7 @@ class Playground {
 			return;
 		}
 
-		$show_onboarding = $this->is_onboarding_shown();
-		$button_text     = $show_onboarding ? \__( 'Hide onboarding', 'progress-planner' ) : \__( 'Show onboarding', 'progress-planner' );
-		$action          = $show_onboarding ? 'hide' : 'show';
-		$nonce           = \wp_create_nonce( "progress_planner_{$action}_onboarding" );
+		$nonce = \wp_create_nonce( 'progress_planner_show_onboarding' );
 		?>
 
 		<div class="prpl-widget-wrapper prpl-top-notice" id="prpl-playground-notice">
@@ -191,16 +120,16 @@ class Playground {
 			<div class="inner-content">
 				<h1><?php \esc_html_e( 'Progress Planner demo', 'progress-planner' ); ?></h1>
 
-				<button id="progress-planner-toggle-onboarding" class="prpl-button-primary" style="margin-top: 20px; width:250px; float:right;">
-					<?php echo \esc_html( $button_text ); ?>
+				<button id="progress-planner-show-onboarding" class="prpl-button-primary" style="margin-top: 20px; width:250px; float:right;">
+					<?php \esc_html_e( 'Show onboarding', 'progress-planner' ); ?>
 				</button>
 
 				<p style="max-width:680px;">
 					<?php \esc_html_e( 'This is a demo of Progress Planner. We\'ve prefilled this site with some content to show you what the reports in Progress Planner look like. We\'ve also added a few to-do\'s for you, you can see these here and on your dashoard.', 'progress-planner' ); ?>
 				</p>
 				<script>
-				document.getElementById( 'progress-planner-toggle-onboarding' ).addEventListener( 'click', function() {
-					const request = wp.ajax.post( 'progress_planner_<?php echo \esc_attr( $action ); ?>_onboarding', {
+				document.getElementById( 'progress-planner-show-onboarding' ).addEventListener( 'click', function() {
+					const request = wp.ajax.post( 'progress_planner_show_onboarding', {
 						_ajax_nonce: '<?php echo \esc_attr( $nonce ); ?>',
 					} );
 					request.done( () => {
