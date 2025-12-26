@@ -374,10 +374,10 @@ class ProgressPlannerOnboardWizard {
 						this.state.currentStep === this.tourSteps.length - 1;
 					this.closeTour();
 
-					// If on PP Dashboard page and privacy is accepted, refresh the page
-					// to properly initialize dashboard components.
+					// If on PP Dashboard page and privacy was accepted during onboarding,
+					// refresh the page to properly initialize dashboard components.
 					if (
-						this.config.hasLicense &&
+						this.state.data.privacyAccepted &&
 						window.location.href.includes(
 							'admin.php?page=progress-planner'
 						)
