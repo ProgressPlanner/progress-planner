@@ -373,6 +373,17 @@ class ProgressPlannerOnboardWizard {
 					this.state.data.finished =
 						this.state.currentStep === this.tourSteps.length - 1;
 					this.closeTour();
+
+					// If on PP Dashboard page and privacy is accepted, refresh the page
+					// to properly initialize dashboard components.
+					if (
+						this.config.hasLicense &&
+						window.location.href.includes(
+							'admin.php?page=progress-planner'
+						)
+					) {
+						window.location.reload();
+					}
 				} );
 			}
 		} else {
