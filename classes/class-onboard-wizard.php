@@ -25,7 +25,7 @@ class Onboard_Wizard {
 	 * @return void
 	 */
 	public function __construct() {
-		\add_action( 'init', [ $this, 'maybe_register_popover_hooks' ], 0 );
+		\add_action( 'init', [ $this, 'maybe_register_popover_hooks' ], 10 ); // Wait for the Playground to register its hooks.
 	}
 
 	/**
