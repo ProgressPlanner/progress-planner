@@ -1,55 +1,75 @@
-import { test, expect } from '../fixtures/base.fixture';
+import { test, expect } from '@playwright/test';
 
-test.describe('Yoast SEO Integration', () => {
-  test('should show Ravi icon on Yoast crawl optimization page', async ({ yoastSettings }) => {
-    await test.step('Navigate to crawl optimization page', async () => {
-      await yoastSettings.gotoCrawlOptimization();
-    });
+test.describe('Yoast Focus Element', () => {
+  test('should add Ravi icon to the feed comments toggle', async ({ page }) => {
+    await page.goto('/wp-admin/admin.php?page=wpseo_page_settings#/crawl-optimization');
 
-    await test.step('Find feed comments toggle', async () => {
-      const toggleHeader = await yoastSettings.getFeedCommentsToggleHeader();
-      await expect(toggleHeader).toBeVisible();
-    });
+    // Skip if Yoast settings page doesn't load (not installed or wrong version)
+    if (await page.locator('text=Sorry, you are not allowed').isVisible()) {
+      test.skip();
+      return;
+    }
 
-    await test.step('Verify Ravi icon is present', async () => {
-      const toggleHeader = await yoastSettings.getFeedCommentsToggleHeader();
-      await yoastSettings.verifyRaviIcon(toggleHeader);
-    });
+    // If there is a modal with overlay (which prevents clicks), close it.
+    const closeButton = page.locator('button.yst-modal__close-button');
+    if (await closeButton.isVisible()) {
+      await closeButton.click();
+    }
+
+    // Wait for the page to load and the toggle to be visible
+    await page.waitForSelector('button[data-id="input-wpseo-remove_feed_global_comments"]');
+
+    // Find the toggle input
+    const toggleInput = page.locator('button[data-id="input-wpseo-remove_feed_global_comments"]');
+
+    // Find the parent toggle field header
+    const toggleHeader = toggleInput.locator('xpath=ancestor::div[contains(@class, "yst-toggle-field__header")]');
+
+    // Verify the Ravi icon exists within the toggle header
+    const raviIconWrapper = toggleHeader.locator('[data-prpl-element="ravi-icon"]');
+    await expect(raviIconWrapper).toBeVisible();
+
+    // Verify the icon image exists and has correct attributes
+    const iconImg = raviIconWrapper.locator('img');
+    await expect(iconImg).toBeVisible();
+    await expect(iconImg).toHaveAttribute('alt', 'Ravi');
+    await expect(iconImg).toHaveAttribute('width', '16');
+    await expect(iconImg).toHaveAttribute('height', '16');
+
+    // Verify that the icon is not checked
+    await expect(raviIconWrapper.locator('.prpl-form-row-points')).toHaveText('+1');
+
+    // Now click the toggle
+    await toggleInput.click();
+
+    // Verify that the icon is now checked
+    await expect(raviIconWrapper.locator('.prpl-form-row-points')).toHaveText('✓');
   });
 
-  test('should show Ravi icon on Yoast site representation page', async ({ yoastSettings }) => {
-    await test.step('Navigate to site representation page', async () => {
-      await yoastSettings.gotoSiteRepresentation();
-    });
+  test('should add Ravi icon to the company logo upload field', async ({ page }) => {
+    await page.goto('/wp-admin/admin.php?page=wpseo_page_settings#/site-representation');
 
-    await test.step('Find company logo label', async () => {
-      const logoLabel = await yoastSettings.getCompanyLogoLabel();
-      await expect(logoLabel).toBeVisible();
-    });
+    // Skip if Yoast settings page doesn't load
+    if (await page.locator('text=Sorry, you are not allowed').isVisible()) {
+      test.skip();
+      return;
+    }
 
-    await test.step('Verify Ravi icon is present', async () => {
-      const logoLabel = await yoastSettings.getCompanyLogoLabel();
-      await yoastSettings.verifyRaviIcon(logoLabel);
-    });
-  });
+    // Wait for the company logo label to be visible
+    await page.waitForSelector('#wpseo_titles-company_logo legend.yst-label');
 
-  test('should update Ravi icon state after completing task', async ({ yoastSettings }) => {
-    await test.step('Navigate to crawl optimization page', async () => {
-      await yoastSettings.gotoCrawlOptimization();
-    });
+    // Find the label element
+    const logoLabel = page.locator('#wpseo_titles-company_logo legend.yst-label');
 
-    await test.step('Verify initial uncompleted state', async () => {
-      const toggleHeader = await yoastSettings.getFeedCommentsToggleHeader();
-      await yoastSettings.verifyRaviIconUncompleted(toggleHeader);
-    });
+    // Verify the Ravi icon exists within the label
+    const raviIcon = logoLabel.locator('[data-prpl-element="ravi-icon"]');
+    await expect(raviIcon).toBeVisible();
 
-    await test.step('Toggle the setting', async () => {
-      await yoastSettings.clickFeedCommentsToggle();
-    });
-
-    await test.step('Verify completed state', async () => {
-      const toggleHeader = await yoastSettings.getFeedCommentsToggleHeader();
-      await yoastSettings.verifyRaviIconCompleted(toggleHeader);
-    });
+    // Verify the icon image exists and has correct attributes
+    const iconImg = raviIcon.locator('img');
+    await expect(iconImg).toBeVisible();
+    await expect(iconImg).toHaveAttribute('alt', 'Ravi');
+    await expect(iconImg).toHaveAttribute('width', '16');
+    await expect(iconImg).toHaveAttribute('height', '16');
   });
 });

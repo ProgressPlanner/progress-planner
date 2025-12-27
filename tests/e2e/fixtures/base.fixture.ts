@@ -68,12 +68,15 @@ export const test = base.extend<ProgressPlannerFixtures>({
     await use(dashboard);
 
     // Cleanup after test if enabled
+    // Note: Cleanup is best-effort and should not affect test results
     if (cleanupAfterTest) {
-      try {
-        await dashboard.deleteAllTodos();
-      } catch (err) {
-        console.warn('[Fixture Cleanup] Failed:', err);
-      }
+      // Set a short timeout for the entire cleanup operation
+      await Promise.race([
+        dashboard.deleteAllTodos().catch((err) => {
+          console.warn('[Fixture Cleanup] Failed:', (err as Error).message);
+        }),
+        new Promise((resolve) => setTimeout(resolve, 10000)), // 10s max for cleanup
+      ]);
     }
   },
 

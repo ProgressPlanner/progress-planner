@@ -95,14 +95,8 @@ export class DashboardPage extends BasePage {
 
   async createTodo(text: string): Promise<{ taskId: string; element: Locator }> {
     await this.newTodoInput.fill(text);
-
-    // Wait for the API response when pressing Enter
-    await this.waitForApiResponse(
-      '/progress-planner/v1/',
-      async () => {
-        await this.page.keyboard.press('Enter');
-      }
-    );
+    await this.page.keyboard.press('Enter');
+    await this.page.waitForTimeout(500);
 
     // Find the newly created task
     const todoItem = this.page.locator(SELECTORS.todoItem).first();
@@ -138,53 +132,30 @@ export class DashboardPage extends BasePage {
 
     const trashButton = item.locator(`${SELECTORS.taskActionsWrapper} ${SELECTORS.taskTrashButton}`);
     await trashButton.waitFor({ state: 'visible' });
-
-    await this.waitForApiResponse(
-      '/progress-planner/v1/',
-      async () => {
-        await trashButton.click();
-      }
-    );
+    await trashButton.click();
+    await this.page.waitForTimeout(1500);
   }
 
   async completeTodo(item: Locator): Promise<void> {
     const label = item.locator(SELECTORS.taskCheckboxLabel);
-
-    await this.waitForApiResponse(
-      '/progress-planner/v1/',
-      async () => {
-        await label.click();
-      }
-    );
-
-    // Wait for the celebration animation
-    await this.waitForAnimation(item);
+    await label.click();
+    await this.page.waitForTimeout(1000);
   }
 
   async moveTodoDown(item: Locator): Promise<void> {
     await item.hover();
     const moveDownButton = item.locator(SELECTORS.taskMoveDownButton);
     await moveDownButton.waitFor({ state: 'visible' });
-
-    await this.waitForApiResponse(
-      '/progress-planner/v1/',
-      async () => {
-        await moveDownButton.click();
-      }
-    );
+    await moveDownButton.click();
+    await this.page.waitForTimeout(1500);
   }
 
   async moveTodoUp(item: Locator): Promise<void> {
     await item.hover();
     const moveUpButton = item.locator(SELECTORS.taskMoveUpButton);
     await moveUpButton.waitFor({ state: 'visible' });
-
-    await this.waitForApiResponse(
-      '/progress-planner/v1/',
-      async () => {
-        await moveUpButton.click();
-      }
-    );
+    await moveUpButton.click();
+    await this.page.waitForTimeout(1500);
   }
 
   // ==================
@@ -236,16 +207,10 @@ export class DashboardPage extends BasePage {
 
     // Click the label (parent of checkbox)
     const label = firstCheckbox.locator('..');
-
-    await this.waitForApiResponse(
-      '/progress-planner/v1/',
-      async () => {
-        await label.click();
-      }
-    );
+    await label.click();
 
     // Wait for animation
-    await this.waitForAnimation(taskItem);
+    await this.page.waitForTimeout(3000);
 
     return { taskId, previousCount: initialCount };
   }
@@ -266,16 +231,17 @@ export class DashboardPage extends BasePage {
     const radioGroup = taskItem.locator(SELECTORS.snoozeRadioGroup);
     await radioGroup.click();
 
-    // Select duration
-    const durationRadio = taskItem.locator(`${SELECTORS.snoozeDurationRadio}[value="${duration}"]`);
-    const label = durationRadio.locator('xpath=ancestor::label[1]');
+    // Select duration using page.evaluate like the original test
+    await this.page.evaluate(({ id, dur }) => {
+      const radio = document.querySelector(
+        `li[data-task-id="${id}"] .prpl-snooze-duration-radio-group input[type="radio"][value="${dur}"]`
+      ) as HTMLInputElement;
+      const label = radio?.closest('label');
+      label?.click();
+    }, { id: taskId, dur: duration });
 
-    await this.waitForApiResponse(
-      '/progress-planner/v1/',
-      async () => {
-        await label.click();
-      }
-    );
+    await this.page.waitForLoadState('networkidle');
+    await this.page.waitForTimeout(1000);
   }
 
   // ==================
@@ -381,57 +347,45 @@ export class DashboardPage extends BasePage {
     }
 
     // Delete active tasks
-    let todoItems = await this.getTodoItems();
+    const todoItems = this.page.locator(SELECTORS.todoItem);
+    while ((await todoItems.count()) > 0) {
+      const firstItem = todoItems.first();
+      const trash = firstItem.locator(`${SELECTORS.taskActionsWrapper} ${SELECTORS.taskTrashButton}`);
 
-    while (todoItems.length > 0) {
       try {
-        await this.deleteTodoQuiet(todoItems[0]);
+        await firstItem.scrollIntoViewIfNeeded();
+        await firstItem.hover();
+        await trash.waitFor({ state: 'visible', timeout: 3000 });
+        await trash.click();
+        await this.page.waitForTimeout(1500);
       } catch (err) {
-        console.warn('[Cleanup] Failed to delete todo:', (err as Error).message);
+        console.warn('[Cleanup] Failed to delete active todo item:', (err as Error).message);
         break;
       }
-      todoItems = await this.getTodoItems();
     }
 
     // Delete completed tasks
-    await this.openCompletedTasks();
+    const completedDetails = this.page.locator(SELECTORS.todoCompletedDetails);
+    if (await completedDetails.isVisible().catch(() => false)) {
+      await completedDetails.click();
+      await this.page.waitForTimeout(500);
 
-    let completedItems = await this.getCompletedItems();
-    while (completedItems.length > 0) {
-      try {
-        const item = completedItems[0];
-        await item.hover();
-        const trash = item.locator('.prpl-suggested-task-points-wrapper .trash');
-        await trash.waitFor({ state: 'visible', timeout: 3000 });
-        await trash.click();
-        await this.page.waitForResponse(
-          (r) => r.url().includes('/progress-planner/v1/'),
-          { timeout: 5000 }
-        );
-      } catch (err) {
-        console.warn('[Cleanup] Failed to delete completed todo:', (err as Error).message);
-        break;
+      const completedItems = this.page.locator(SELECTORS.todoCompletedItem);
+      while ((await completedItems.count()) > 0) {
+        const firstCompleted = completedItems.first();
+        const trash = firstCompleted.locator('.prpl-suggested-task-points-wrapper .trash');
+
+        try {
+          await firstCompleted.scrollIntoViewIfNeeded();
+          await firstCompleted.hover();
+          await trash.waitFor({ state: 'visible', timeout: 3000 });
+          await trash.click();
+          await this.page.waitForTimeout(1500);
+        } catch (err) {
+          console.warn('[Cleanup] Failed to delete completed todo item:', (err as Error).message);
+          break;
+        }
       }
-      completedItems = await this.getCompletedItems();
     }
-  }
-
-  /**
-   * Delete a todo without throwing on failure (for cleanup).
-   */
-  private async deleteTodoQuiet(item: Locator): Promise<void> {
-    await this.scrollToAndWait(item);
-    await item.hover();
-
-    const trashButton = item.locator(`${SELECTORS.taskActionsWrapper} ${SELECTORS.taskTrashButton}`);
-    await trashButton.waitFor({ state: 'visible', timeout: 3000 });
-
-    await Promise.all([
-      this.page.waitForResponse(
-        (r) => r.url().includes('/progress-planner/v1/'),
-        { timeout: 5000 }
-      ),
-      trashButton.click(),
-    ]);
   }
 }

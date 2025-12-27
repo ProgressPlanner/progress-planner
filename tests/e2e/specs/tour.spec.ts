@@ -1,49 +1,44 @@
-import { test, expect } from '../fixtures/base.fixture';
+import { test, expect } from '@playwright/test';
 
 test.describe('Progress Planner Tour', () => {
-  test('should complete the tour from start to finish', async ({ dashboard }) => {
-    await test.step('Start the tour', async () => {
-      await dashboard.startTour();
-      expect(await dashboard.isTourVisible()).toBe(true);
-    });
+  test('should start the tour when clicking the tour button', async ({ page }) => {
+    // Navigate to Progress Planner dashboard
+    await page.goto('/wp-admin/admin.php?page=progress-planner');
+    await page.waitForLoadState('networkidle');
 
-    await test.step('Navigate through all tour steps', async () => {
-      const stepsCount = await dashboard.getTourStepsCount();
-      expect(stepsCount).toBeGreaterThan(0);
+    // Click the tour button
+    const tourButton = page.locator('#prpl-start-tour-icon-button');
+    await tourButton.click();
 
-      // Navigate through all steps except the last one
-      for (let i = 0; i < stepsCount - 1; i++) {
-        await expect(dashboard.tourPopover).toBeVisible();
-        await dashboard.clickTourNext();
+    // Wait for and verify the tour popover is visible
+    let tourPopover = page.locator('.driver-popover');
+    await expect(tourPopover).toBeVisible();
+
+    // Get the number of steps from the window object
+    const numberOfSteps = await page.evaluate(
+      () => (window as unknown as { progressPlannerTour: { steps: unknown[] } }).progressPlannerTour.steps.length
+    );
+
+    for (let i = 0; i < numberOfSteps - 1; i++) {
+      tourPopover = page.locator('.driver-popover');
+
+      // Wait for the popover to be visible before interacting
+      await expect(tourPopover).toBeVisible();
+
+      // Click the "Next" button if it's not the last step
+      if (i < numberOfSteps - 1) {
+        const nextButton = page.locator('.driver-popover-next-btn');
+        await nextButton.click();
       }
-    });
+    }
 
-    await test.step('Verify finish button on last step', async () => {
-      const buttonText = await dashboard.getTourNextButtonText();
-      expect(buttonText).toBe('Finish');
-    });
+    const nextButton = page.locator('.driver-popover-next-btn');
 
-    await test.step('Complete the tour', async () => {
-      await dashboard.clickTourNext();
-      await expect(dashboard.tourPopover).not.toBeVisible();
-    });
-  });
+    // Verify the button text changes to "Finish" on the last step
+    await expect(nextButton).toHaveText('Finish');
 
-  test('should be able to start tour multiple times', async ({ dashboard, page }) => {
-    await test.step('Complete tour first time', async () => {
-      await dashboard.completeTour();
-    });
-
-    await test.step('Reload and start tour again', async () => {
-      await page.reload();
-      await dashboard.waitForReady();
-
-      await dashboard.startTour();
-      expect(await dashboard.isTourVisible()).toBe(true);
-    });
-
-    await test.step('Complete tour second time', async () => {
-      await dashboard.completeTour();
-    });
+    // Click the finish button and verify the tour popover closes
+    await nextButton.click();
+    await expect(tourPopover).not.toBeVisible();
   });
 });

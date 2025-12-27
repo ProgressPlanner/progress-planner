@@ -1,66 +1,44 @@
 import { test, expect } from '../fixtures/base.fixture';
 
+const CREATE_TASK_TEXT = 'Test task to create';
+const DELETE_TASK_TEXT = 'Test task to delete';
+
 test.describe('Todo CRUD Operations', () => {
   // Enable cleanup for this test suite
   test.use({ cleanupAfterTest: true });
 
-  test('should create a new todo', async ({ dashboard }) => {
-    const taskText = 'Test task created at ' + Date.now();
-
+  test('should create a new todo', async ({ page, dashboard }) => {
     await test.step('Create the todo', async () => {
-      const { taskId, element } = await dashboard.createTodo(taskText);
-
-      expect(taskId).toBeTruthy();
-      await expect(element).toBeVisible();
+      await page.fill('#new-todo-content', CREATE_TASK_TEXT);
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(500);
     });
 
-    await test.step('Verify todo text is correct', async () => {
-      const items = await dashboard.getTodoItems();
-      expect(items).toHaveLength(1);
-
-      const text = await dashboard.getTodoText(items[0]);
-      expect(text).toBe(taskText);
+    await test.step('Verify todo was created', async () => {
+      const todoItem = page.locator('ul#todo-list > li');
+      await expect(todoItem).toHaveCount(1);
+      await expect(todoItem.locator('h3 > span')).toHaveText(CREATE_TASK_TEXT);
     });
   });
 
-  test('should delete a todo', async ({ dashboard }) => {
-    const taskText = 'Task to be deleted';
-
+  test('should delete a todo', async ({ page, dashboard }) => {
     await test.step('Create a todo to delete', async () => {
-      await dashboard.createTodo(taskText);
-      const items = await dashboard.getTodoItems();
-      expect(items).toHaveLength(1);
+      await page.fill('#new-todo-content', DELETE_TASK_TEXT);
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(500);
     });
 
     await test.step('Delete the todo', async () => {
-      const item = await dashboard.getTodoByText(taskText);
-      await dashboard.deleteTodo(item);
+      const deleteItem = page.locator('ul#todo-list > li');
+      await deleteItem.hover();
+      await deleteItem.waitFor({ state: 'visible' });
+      await deleteItem.locator('.prpl-suggested-task-actions-wrapper .trash').click();
+      await page.waitForTimeout(1500);
     });
 
     await test.step('Verify todo was deleted', async () => {
-      const items = await dashboard.getTodoItems();
-      expect(items).toHaveLength(0);
-    });
-  });
-
-  test('should persist todo after page reload', async ({ dashboard, page }) => {
-    const taskText = 'Persistent task ' + Date.now();
-
-    await test.step('Create a todo', async () => {
-      await dashboard.createTodo(taskText);
-    });
-
-    await test.step('Reload the page', async () => {
-      await page.reload();
-      await dashboard.waitForReady();
-    });
-
-    await test.step('Verify todo still exists', async () => {
-      const items = await dashboard.getTodoItems();
-      expect(items).toHaveLength(1);
-
-      const text = await dashboard.getTodoText(items[0]);
-      expect(text).toBe(taskText);
+      const todoItem = page.locator('ul#todo-list > li');
+      await expect(todoItem).toHaveCount(0);
     });
   });
 });

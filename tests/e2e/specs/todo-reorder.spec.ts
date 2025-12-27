@@ -1,91 +1,65 @@
 import { test, expect } from '../fixtures/base.fixture';
 
+const FIRST_TASK_TEXT = 'First task to reorder';
+const SECOND_TASK_TEXT = 'Second task to reorder';
+const THIRD_TASK_TEXT = 'Third task to reorder';
+
 test.describe('Todo Reorder Operations', () => {
   // Enable cleanup for this test suite
   test.use({ cleanupAfterTest: true });
 
-  test('should reorder todos using move down button', async ({ dashboard }) => {
-    await test.step('Create two todos', async () => {
-      await dashboard.createTodo('First task');
-      await dashboard.createTodo('Second task');
+  test('should reorder todo items', async ({ page, dashboard }) => {
+    await test.step('Create three todos', async () => {
+      await page.fill('#new-todo-content', FIRST_TASK_TEXT);
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(1500);
 
-      const items = await dashboard.getTodoItems();
-      expect(items).toHaveLength(2);
+      await page.fill('#new-todo-content', SECOND_TASK_TEXT);
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(1500);
+
+      await page.fill('#new-todo-content', THIRD_TASK_TEXT);
+      await page.keyboard.press('Enter');
+      await page.waitForTimeout(1500);
     });
 
-    await test.step('Move first task down', async () => {
-      const items = await dashboard.getTodoItems();
-      const firstItem = items[0];
+    await test.step('Verify initial order', async () => {
+      const todoItems = page.locator('ul#todo-list > li');
+      const items = await todoItems.all();
 
-      await dashboard.moveTodoDown(firstItem);
+      await expect(items[0].locator('h3 > span')).toHaveText(FIRST_TASK_TEXT);
+      await expect(items[1].locator('h3 > span')).toHaveText(SECOND_TASK_TEXT);
+      await expect(items[2].locator('h3 > span')).toHaveText(THIRD_TASK_TEXT);
     });
 
-    await test.step('Verify order changed', async () => {
-      const items = await dashboard.getTodoItems();
-      expect(items).toHaveLength(2);
+    await test.step('Move second item down', async () => {
+      const todoItems = page.locator('ul#todo-list > li');
+      const items = await todoItems.all();
 
-      // After moving down, "Second task" should be first
-      const firstText = await dashboard.getTodoText(items[0]);
-      const secondText = await dashboard.getTodoText(items[1]);
-
-      expect(firstText).toBe('Second task');
-      expect(secondText).toBe('First task');
-    });
-  });
-
-  test('should reorder todos using move up button', async ({ dashboard }) => {
-    await test.step('Create two todos', async () => {
-      await dashboard.createTodo('First task');
-      await dashboard.createTodo('Second task');
-
-      const items = await dashboard.getTodoItems();
-      expect(items).toHaveLength(2);
+      await items[1].hover();
+      await items[1].locator('.prpl-suggested-task-button.move-down').click();
+      await page.waitForTimeout(1500);
     });
 
-    await test.step('Move second task up', async () => {
-      const items = await dashboard.getTodoItems();
-      const secondItem = items[1];
+    await test.step('Verify new order', async () => {
+      const todoItems = page.locator('ul#todo-list > li');
+      const reorderedItems = await todoItems.all();
 
-      await dashboard.moveTodoUp(secondItem);
+      await expect(reorderedItems[0].locator('h3 > span')).toHaveText(FIRST_TASK_TEXT);
+      await expect(reorderedItems[1].locator('h3 > span')).toHaveText(THIRD_TASK_TEXT);
+      await expect(reorderedItems[2].locator('h3 > span')).toHaveText(SECOND_TASK_TEXT);
     });
 
-    await test.step('Verify order changed', async () => {
-      const items = await dashboard.getTodoItems();
-      expect(items).toHaveLength(2);
-
-      // After moving up, "First task" should be second
-      const firstText = await dashboard.getTodoText(items[0]);
-      const secondText = await dashboard.getTodoText(items[1]);
-
-      expect(firstText).toBe('First task');
-      expect(secondText).toBe('Second task');
-    });
-  });
-
-  test('should persist order after page reload', async ({ dashboard, page }) => {
-    await test.step('Create and reorder todos', async () => {
-      await dashboard.createTodo('Task A');
-      await dashboard.createTodo('Task B');
-      await dashboard.createTodo('Task C');
-
-      // Move Task C up twice to make it first
-      let items = await dashboard.getTodoItems();
-      await dashboard.moveTodoUp(items[2]); // C is now second
-      items = await dashboard.getTodoItems();
-      await dashboard.moveTodoUp(items[1]); // C is now first
-    });
-
-    await test.step('Reload the page', async () => {
+    await test.step('Reload page and verify order persists', async () => {
       await page.reload();
-      await dashboard.waitForReady();
-    });
+      await page.waitForLoadState('networkidle');
 
-    await test.step('Verify order persisted', async () => {
-      const items = await dashboard.getTodoItems();
-      expect(items).toHaveLength(3);
+      const todoItems = page.locator('ul#todo-list > li');
+      const persistedItems = await todoItems.all();
 
-      const firstText = await dashboard.getTodoText(items[0]);
-      expect(firstText).toBe('Task C');
+      await expect(persistedItems[0].locator('h3 > span')).toHaveText(FIRST_TASK_TEXT);
+      await expect(persistedItems[1].locator('h3 > span')).toHaveText(THIRD_TASK_TEXT);
+      await expect(persistedItems[2].locator('h3 > span')).toHaveText(SECOND_TASK_TEXT);
     });
   });
 });

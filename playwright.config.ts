@@ -61,12 +61,19 @@ export default defineConfig({
 
   // Configure projects for different browsers
   projects: [
-    // Sequential tests that must run in order (e.g., onboarding)
-    // Note: In CI, onboarding runs first on fresh WordPress install
-    // For local dev with existing site, run only parallel: npm run test:parallel
+    // Sequential tests that must run in order
+    // Includes: onboarding (must run first on fresh install),
+    // todo tests (create/delete/complete/reorder - share state),
+    // task-tagline (modifies WordPress settings)
     {
       name: 'sequential',
-      testMatch: '**/onboarding.spec.ts',
+      testMatch: [
+        '**/onboarding.spec.ts',
+        '**/todo-crud.spec.ts',
+        '**/todo-complete.spec.ts',
+        '**/todo-reorder.spec.ts',
+        '**/task-tagline.spec.ts',
+      ],
       use: { ...devices['Desktop Chrome'] },
       fullyParallel: false,
       workers: 1,
@@ -76,18 +83,23 @@ export default defineConfig({
     // Depends on sequential in CI (fresh install needs onboarding first)
     {
       name: 'parallel',
-      testIgnore: '**/onboarding.spec.ts',
+      testIgnore: [
+        '**/onboarding.spec.ts',
+        '**/todo-crud.spec.ts',
+        '**/todo-complete.spec.ts',
+        '**/todo-reorder.spec.ts',
+        '**/task-tagline.spec.ts',
+      ],
       dependencies: process.env.CI ? ['sequential'] : [],
       use: { ...devices['Desktop Chrome'] },
     },
   ],
 
-  // Run local WordPress server before starting the tests
-  // Uncomment to use WP Playground
-  // webServer: {
-  //   command: 'npx @wp-playground/cli@latest server --auto-mount --port=8080 --login',
-  //   url: 'http://localhost:8080',
-  //   reuseExistingServer: !process.env.CI,
-  //   timeout: 120 * 1000,
-  // },
+  // Run WP Playground server before starting the tests
+  webServer: {
+    command: 'npx @wp-playground/cli server --mount=.:/wordpress/wp-content/plugins/progress-planner --blueprint=tests/e2e/blueprint.json --port=8080',
+    url: 'http://localhost:8080',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+  },
 });
