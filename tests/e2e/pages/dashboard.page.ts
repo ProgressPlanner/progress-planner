@@ -194,6 +194,10 @@ export class DashboardPage extends BasePage {
   async openCompletedTasks(): Promise<void> {
     const details = this.page.locator(SELECTORS.todoCompletedDetails);
 
+    // Check if details element exists and is visible
+    const isVisible = await details.isVisible().catch(() => false);
+    if (!isVisible) return;
+
     // Check if already open
     const isOpen = await details.getAttribute('open');
     if (isOpen !== null) return;
@@ -368,14 +372,22 @@ export class DashboardPage extends BasePage {
   // ==================
 
   async deleteAllTodos(): Promise<void> {
+    // Verify page is still accessible
+    try {
+      await this.page.waitForLoadState('domcontentloaded', { timeout: 2000 });
+    } catch {
+      console.warn('[Cleanup] Page not accessible, skipping cleanup');
+      return;
+    }
+
     // Delete active tasks
     let todoItems = await this.getTodoItems();
 
     while (todoItems.length > 0) {
       try {
-        await this.deleteTodo(todoItems[0]);
+        await this.deleteTodoQuiet(todoItems[0]);
       } catch (err) {
-        console.warn('[Cleanup] Failed to delete todo:', err);
+        console.warn('[Cleanup] Failed to delete todo:', (err as Error).message);
         break;
       }
       todoItems = await this.getTodoItems();
@@ -392,12 +404,34 @@ export class DashboardPage extends BasePage {
         const trash = item.locator('.prpl-suggested-task-points-wrapper .trash');
         await trash.waitFor({ state: 'visible', timeout: 3000 });
         await trash.click();
-        await this.page.waitForResponse((r) => r.url().includes('/progress-planner/v1/'));
+        await this.page.waitForResponse(
+          (r) => r.url().includes('/progress-planner/v1/'),
+          { timeout: 5000 }
+        );
       } catch (err) {
-        console.warn('[Cleanup] Failed to delete completed todo:', err);
+        console.warn('[Cleanup] Failed to delete completed todo:', (err as Error).message);
         break;
       }
       completedItems = await this.getCompletedItems();
     }
+  }
+
+  /**
+   * Delete a todo without throwing on failure (for cleanup).
+   */
+  private async deleteTodoQuiet(item: Locator): Promise<void> {
+    await this.scrollToAndWait(item);
+    await item.hover();
+
+    const trashButton = item.locator(`${SELECTORS.taskActionsWrapper} ${SELECTORS.taskTrashButton}`);
+    await trashButton.waitFor({ state: 'visible', timeout: 3000 });
+
+    await Promise.all([
+      this.page.waitForResponse(
+        (r) => r.url().includes('/progress-planner/v1/'),
+        { timeout: 5000 }
+      ),
+      trashButton.click(),
+    ]);
   }
 }
