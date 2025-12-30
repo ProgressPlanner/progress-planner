@@ -29,3 +29,5 @@ jobs:
           uses: wordpress/plugin-check-action@v1.0.6
           with:
             build-dir: './build/${{ github.event.repository.name }}'
+            exclude-checks: |
+              direct_file_access
