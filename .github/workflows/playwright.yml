@@ -56,9 +56,9 @@ jobs:
             test-results/
 
   # Yoast Premium tests require Docker (for Composer/premium plugin installation)
+  # Runs in parallel with e2e-tests - Docker spins up while Playground tests run
   yoast-premium-tests:
     runs-on: ubuntu-latest
-    needs: e2e-tests
 
     services:
       mysql:
