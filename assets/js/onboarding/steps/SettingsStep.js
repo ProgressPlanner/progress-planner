@@ -1,18 +1,11 @@
 /**
- * Settings step - Configure About, Contact, FAQ pages, Post Types, and Login Destination
+ * Settings step - Configure About, Contact, FAQ pages, and Post Types
  * Multi-step process with 5 sub-steps
  */
 /* global OnboardingStep, ProgressPlannerOnboardData */
 
 class PrplSettingsStep extends OnboardingStep {
-	subSteps = [
-		'homepage',
-		'about',
-		'contact',
-		'faq',
-		'post-types',
-		'login-destination',
-	];
+	subSteps = [ 'homepage', 'about', 'contact', 'faq', 'post-types' ];
 
 	defaultSettings = {
 		homepage: {
@@ -33,9 +26,6 @@ class PrplSettingsStep extends OnboardingStep {
 		},
 		'post-types': {
 			selectedTypes: [], // Array of selected post type slugs
-		},
-		'login-destination': {
-			redirectOnLogin: false, // Checkbox state
 		},
 	};
 
@@ -137,7 +127,7 @@ class PrplSettingsStep extends OnboardingStep {
 
 	/**
 	 * Setup event listeners for a sub-step
-	 * @param {string} subStepName - Name of sub-step (about/contact/faq/post-types/login-destination)
+	 * @param {string} subStepName - Name of sub-step (about/contact/faq/post-types)
 	 * @param {Object} subStepData - Data for this sub-step
 	 * @param {Object} state       - Wizard state
 	 */
@@ -153,16 +143,6 @@ class PrplSettingsStep extends OnboardingStep {
 		// Handle post types sub-step
 		if ( subStepName === 'post-types' ) {
 			this.setupPostTypesListeners( subStepName, subStepData, state );
-			return;
-		}
-
-		// Handle login destination sub-step
-		if ( subStepName === 'login-destination' ) {
-			this.setupLoginDestinationListeners(
-				subStepName,
-				subStepData,
-				state
-			);
 		}
 	}
 
@@ -343,60 +323,6 @@ class PrplSettingsStep extends OnboardingStep {
 	}
 
 	/**
-	 * Setup event listeners for login destination sub-step
-	 * @param {string} subStepName - Name of sub-step
-	 * @param {Object} subStepData - Data for this sub-step
-	 * @param {Object} state       - Wizard state
-	 */
-	setupLoginDestinationListeners( subStepName, subStepData, state ) {
-		const container = this.popover.querySelector(
-			`.prpl-setting-item[data-page="${ subStepName }"]`
-		);
-		const saveButton = this.popover.querySelector(
-			`#prpl-save-${ subStepName }-setting`
-		);
-
-		if ( ! container || ! saveButton ) {
-			return;
-		}
-
-		// Get checkbox
-		const checkbox = container.querySelector(
-			'input[type="checkbox"][name="prpl-redirect-on-login"]'
-		);
-
-		if ( ! checkbox ) {
-			return;
-		}
-
-		// Initialize from checkbox that is already set in template, or from saved data
-		if ( subStepData.redirectOnLogin === undefined ) {
-			subStepData.redirectOnLogin = checkbox.checked;
-		} else {
-			checkbox.checked = subStepData.redirectOnLogin;
-		}
-
-		// Add change listener
-		checkbox.addEventListener( 'change', ( e ) => {
-			subStepData.redirectOnLogin = e.target.checked;
-			this.updateSaveButtonState( saveButton, subStepData );
-
-			// Update Next/Dashboard button if on last sub-step
-			if ( this.currentSubStep === this.subSteps.length - 1 ) {
-				this.updateNextButton();
-			}
-		} );
-
-		// Save button handler - just advances to next sub-step
-		saveButton.addEventListener( 'click', () => {
-			this.advanceSubStep( state );
-		} );
-
-		// Initial button state
-		this.updateSaveButtonState( saveButton, subStepData );
-	}
-
-	/**
 	 * Advance to next sub-step
 	 * @param {Object} state - Wizard state
 	 */
@@ -443,11 +369,6 @@ class PrplSettingsStep extends OnboardingStep {
 		// Handle post types sub-step - at least one must be selected
 		if ( subStepData.selectedTypes !== undefined ) {
 			return subStepData.selectedTypes.length > 0;
-		}
-
-		// Handle login destination sub-step - always valid (checkbox is optional)
-		if ( subStepData.redirectOnLogin !== undefined ) {
-			return true;
 		}
 
 		return false;
@@ -523,12 +444,6 @@ class PrplSettingsStep extends OnboardingStep {
 				postTypesData.selectedTypes.forEach( ( postType ) => {
 					formDataObj.append( 'prpl-post-types-include[]', postType );
 				} );
-			}
-
-			// Add login destination
-			const loginData = state.data.settings[ 'login-destination' ];
-			if ( loginData && loginData.redirectOnLogin ) {
-				formDataObj.append( 'prpl-redirect-on-login', '1' );
 			}
 
 			// Send single AJAX request
