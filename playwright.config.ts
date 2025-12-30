@@ -99,7 +99,8 @@ export default defineConfig({
   webServer: {
     command: 'npx @wp-playground/cli server --mount=.:/wordpress/wp-content/plugins/progress-planner --blueprint=tests/e2e/blueprint.json --port=8080',
     url: 'http://localhost:8080',
-    reuseExistingServer: !process.env.CI,
+    // Always reuse if server is already running (needed for Yoast tests which use Docker WordPress)
+    reuseExistingServer: true,
     timeout: 120 * 1000,
   },
 });
