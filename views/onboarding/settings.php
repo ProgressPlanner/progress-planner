@@ -42,10 +42,7 @@ $prpl_page_types = [
 $prpl_saved_settings = \progress_planner()->get_settings()->get_post_types_names();
 $prpl_post_types     = \progress_planner()->get_settings()->get_public_post_types();
 
-// Get redirect on login setting.
-$prpl_redirect_on_login = \get_user_meta( \get_current_user_id(), 'prpl_redirect_on_login', true );
-
-$prpl_total_number_of_steps = 6;
+$prpl_total_number_of_steps = 5;
 $prpl_current_step_number   = 0;
 
 ?>
@@ -200,70 +197,6 @@ $prpl_current_step_number   = 0;
 				</div>
 			</div>
 		<?php endif; ?>
-
-		<!-- Login Destination sub-step -->
-		<?php ++$prpl_current_step_number; ?>
-		<div class="prpl-setting-item" data-page="login-destination">
-			<div class="prpl-columns-wrapper-flex">
-				<div class="prpl-column">
-					<div class="prpl-background-content">
-						<p><?php echo \esc_html( $prpl_page_type['description'] ); ?></p>
-					</div>
-				</div>
-				<div class="prpl-column">
-					<div class="prpl-setting-header">
-						<h3 class="prpl-setting-title">
-							<?php \esc_html_e( 'Settings:', 'progress-planner' ); ?> <?php \esc_html_e( 'Default login destination', 'progress-planner' ); ?>
-							<span class="prpl-settings-progress"><?php echo \esc_html( $prpl_current_step_number ); ?>/<?php echo \esc_html( $prpl_total_number_of_steps ); ?></span>
-						</h3>
-						<p>
-							<?php
-							/* translators: %s: Progress Planner name. */
-							\printf( \esc_html__( 'Do you want to land on the %s dashboard after logging in? So you can start improving your site straight away!', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
-							?>
-						</p>
-					</div>
-
-					<div class="prpl-setting-content">
-						<div class="prpl-settings-wrapper">
-							<p>
-								<?php \esc_html_e( 'Where do you want to start when you login to your site?', 'progress-planner' ); ?>
-							</p>
-
-							<?php
-							\progress_planner()->the_view(
-								'onboarding/form-inputs/checkbox.php',
-								[
-									'name'          => 'redirect_on_login',
-									'current_value' => '',
-									'options'       => [
-										[
-											'id'    => 'prpl-setting-redirect-on-login',
-											'label' => \sprintf(
-												/* translators: %s: Progress Planner name. */
-												\esc_html__( 'Show the %s dashboard after login.', 'progress-planner' ),
-												\esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() )
-											),
-											'value' => '1',
-										],
-									],
-								]
-							);
-							?>
-						</div>
-					</div>
-					<div class="prpl-setting-footer">
-						<button
-							type="button"
-							id="prpl-save-login-destination-setting"
-							class="prpl-btn prpl-save-setting-btn"
-						>
-							<?php \esc_html_e( 'Save setting', 'progress-planner' ); ?>
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
 	</div>
 	<div class="tour-footer">
 		<div class="prpl-tour-next-wrapper">

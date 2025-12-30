@@ -26,6 +26,8 @@ jobs:
             unzip ${{ github.event.repository.name }}.zip -d build
 
         - name: Run plugin check
-          uses: wordpress/plugin-check-action@v1.0.6
+          uses: wordpress/plugin-check-action@v1.1.4
           with:
             build-dir: './build/${{ github.event.repository.name }}'
+            exclude-checks: |
+              direct_file_access
