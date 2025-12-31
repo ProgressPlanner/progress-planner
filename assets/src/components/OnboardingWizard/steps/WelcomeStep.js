@@ -9,6 +9,7 @@
 import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import OnboardingStep from '../OnboardingStep';
+import NextButton from '../NextButton';
 import { useLicenseGenerator } from '../../../hooks/useLicenseGenerator';
 import { CustomCheckbox } from '../../FormInputs';
 
@@ -92,19 +93,7 @@ export default function WelcomeStep( props ) {
 	};
 
 	return (
-		<OnboardingStep
-			{ ...props }
-			onNext={ handleNext }
-			canProceed={ canProceed }
-			isLoading={ isGenerating }
-			buttonText={
-				<>
-					{ __( 'Start onboarding', 'progress-planner' ) }
-					<span className="dashicons dashicons-arrow-right-alt2"></span>
-				</>
-			}
-			buttonClass="prpl-btn-secondary"
-		>
+		<OnboardingStep { ...props } hideFooter>
 			<div className="tour-content">
 				<div className="prpl-columns-wrapper-flex prpl-columns-2-1">
 					<div className="prpl-column">
@@ -185,6 +174,23 @@ export default function WelcomeStep( props ) {
 								/>
 							</div>
 						) }
+
+						<NextButton
+							onNext={ handleNext }
+							canProceed={ canProceed }
+							wizardState={ wizardState }
+							isLoading={ isGenerating }
+							buttonText={
+								<>
+									{ __(
+										'Start onboarding',
+										'progress-planner'
+									) }
+									<span className="dashicons dashicons-arrow-right-alt2"></span>
+								</>
+							}
+							buttonClass="prpl-btn-secondary"
+						/>
 					</div>
 					<div className="prpl-column prpl-hide-on-mobile">
 						<div id="prpl-welcome-graphic">

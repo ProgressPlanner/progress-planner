@@ -11,9 +11,8 @@
 import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import OnboardingStep from '../OnboardingStep';
+import NextButton from '../NextButton';
 import OnboardTask from '../OnboardTask';
-
-const SUB_STEPS = [ 'intro', 'tasks' ];
 
 /**
  * MoreTasksStep component.
@@ -166,56 +165,47 @@ export default function MoreTasksStep( props ) {
 
 		// Tasks sub-step.
 		return (
-			<div className="prpl-more-tasks-substep" data-substep="tasks">
-				<h3 className="tour-title">
-					{ __( 'Complete more tasks', 'progress-planner' ) }
-				</h3>
-				<div className="prpl-task-list">
-					{ tasks.map( ( task ) => (
-						<OnboardTask
-							key={ task.task_id }
-							task={ task }
-							config={ config }
-							onComplete={ handleTaskComplete }
-						/>
-					) ) }
+			<div
+				className="prpl-more-tasks-substep prpl-columns-wrapper-flex"
+				data-substep="more-tasks-tasks"
+			>
+				<div className="prpl-column">
+					<ul className="prpl-task-list">
+						{ tasks.map( ( task ) => (
+							<OnboardTask
+								key={ task.task_id }
+								task={ task }
+								config={ config }
+								onComplete={ handleTaskComplete }
+							/>
+						) ) }
+					</ul>
 				</div>
 			</div>
 		);
 	};
 
-	/**
-	 * Handle next button click.
-	 */
-	const handleNext = () => {
-		// If on intro sub-step, continue to tasks.
-		if ( currentSubStep === 0 ) {
-			handleContinue();
-			return;
-		}
-
-		// If on tasks sub-step, finish onboarding.
-		if ( currentSubStep === SUB_STEPS.length - 1 ) {
-			handleFinish();
-		}
-	};
-
-	/**
-	 * Check if can proceed.
-	 *
-	 * @return {boolean} True if on tasks sub-step.
-	 */
-	const canProceed = () => {
-		return currentSubStep === SUB_STEPS.length - 1;
-	};
-
 	return (
-		<OnboardingStep
-			{ ...props }
-			canProceed={ canProceed }
-			onNext={ handleNext }
-		>
+		<OnboardingStep { ...props } hideFooter>
 			<div className="tour-content">{ renderSubStep() }</div>
+			{ /* Show footer only on tasks sub-step */ }
+			{ currentSubStep === 1 && (
+				<NextButton
+					onNext={ handleFinish }
+					canProceed={ () => true }
+					wizardState={ wizardState }
+					buttonText={
+						<>
+							{ __(
+								'Take me to the dashboard',
+								'progress-planner'
+							) }{ ' ' }
+							&rsaquo;
+						</>
+					}
+					buttonClass="prpl-btn-secondary"
+				/>
+			) }
 		</OnboardingStep>
 	);
 }

@@ -11,6 +11,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { ajaxRequest } from '../../../utils/ajaxRequest';
 import OnboardingStep from '../OnboardingStep';
+import NextButton from '../NextButton';
 import { CustomCheckbox, ToggleSwitch } from '../../FormInputs';
 
 const SUB_STEPS = [ 'homepage', 'about', 'contact', 'faq', 'post-types' ];
@@ -272,6 +273,8 @@ export default function SettingsStep( props ) {
 											) }
 										/>
 									</div>
+								</div>
+								<div className="prpl-setting-footer">
 									{ /* Note shown when checkbox is checked */ }
 									{ ! subStepData.hasPage &&
 										pageType.note && (
@@ -290,6 +293,21 @@ export default function SettingsStep( props ) {
 												<p>{ pageType.note }</p>
 											</div>
 										) }
+									<button
+										type="button"
+										className={ `prpl-btn prpl-save-setting-btn${
+											! canProceed()
+												? ' prpl-btn-disabled'
+												: ''
+										}` }
+										onClick={ handleNextSubStep }
+										disabled={ isSaving }
+									>
+										{ __(
+											'Save setting',
+											'progress-planner'
+										) }
+									</button>
 								</div>
 							</div>
 						</div>
@@ -300,58 +318,109 @@ export default function SettingsStep( props ) {
 			case 'post-types':
 				return (
 					<div className="prpl-setting-item" data-page="post-types">
-						<h3>
-							{ __( 'Post Types', 'progress-planner' ) }
-							<span className="prpl-settings-progress">
-								{ currentSubStep + 1 }/{ SUB_STEPS.length }
-							</span>
-						</h3>
-						<p>
-							{ __(
-								'Select which post types to include in your activity tracking.',
-								'progress-planner'
-							) }
-						</p>
-						<div id="prpl-post-types-include-wrapper">
-							{ postTypes.map( ( postType ) => (
-								<ToggleSwitch
-									key={ postType.id }
-									id={ `prpl-post-type-${ postType.id }` }
-									name="prpl-post-types-include[]"
-									value={ postType.id }
-									checked={
-										subStepData.selectedTypes?.includes(
-											postType.id
-										) || false
-									}
-									onChange={ ( e ) => {
-										const isChecked = e.target.checked;
-										setSettings( ( prev ) => ( {
-											...prev,
-											'post-types': {
-												selectedTypes: isChecked
-													? [
-															...( prev[
-																'post-types'
-															]?.selectedTypes ||
-																[] ),
-															postType.id,
-													  ]
-													: (
-															prev[ 'post-types' ]
-																?.selectedTypes ||
-															[]
-													  ).filter(
-															( id ) =>
-																id !==
-																postType.id
-													  ),
-											},
-										} ) );
-									} }
-									label={ postType.title }
-								/>
-							) ) }
+						<div className="prpl-columns-wrapper-flex">
+							<div className="prpl-column">
+								<div className="prpl-background-content">
+									<p>
+										{ __(
+											'Choose the post types you actively use for your content.',
+											'progress-planner'
+										) }
+									</p>
+								</div>
+							</div>
+							<div className="prpl-column">
+								<div className="prpl-setting-header">
+									<h3 className="prpl-setting-title">
+										{ __(
+											'Settings:',
+											'progress-planner'
+										) }{ ' ' }
+										{ __(
+											'Valuable post types',
+											'progress-planner'
+										) }
+										<span className="prpl-settings-progress">
+											{ currentSubStep + 1 }/
+											{ SUB_STEPS.length }
+										</span>
+									</h3>
+									<p>
+										{ __(
+											"We'll track and reward progress only on the ones you select.",
+											'progress-planner'
+										) }
+									</p>
+								</div>
+								<div className="prpl-setting-content">
+									<div className="prpl-settings-wrapper">
+										<p>
+											{ __(
+												'Which post types do you want us to track?',
+												'progress-planner'
+											) }
+										</p>
+										<div id="prpl-post-types-include-wrapper">
+											{ postTypes.map( ( postType ) => (
+												<ToggleSwitch
+													key={ postType.id }
+													id={ `prpl-post-type-${ postType.id }` }
+													name="prpl-post-types-include[]"
+													value={ postType.id }
+													checked={
+														subStepData.selectedTypes?.includes(
+															postType.id
+														) || false
+													}
+													onChange={ ( e ) => {
+														const isChecked =
+															e.target.checked;
+														setSettings(
+															( prev ) => ( {
+																...prev,
+																'post-types': {
+																	selectedTypes:
+																		isChecked
+																			? [
+																					...( prev[
+																						'post-types'
+																					]
+																						?.selectedTypes ||
+																						[] ),
+																					postType.id,
+																			  ]
+																			: (
+																					prev[
+																						'post-types'
+																					]
+																						?.selectedTypes ||
+																					[]
+																			  ).filter(
+																					(
+																						id
+																					) =>
+																						id !==
+																						postType.id
+																			  ),
+																},
+															} )
+														);
+													} }
+													label={ postType.title }
+												/>
+											) ) }
+										</div>
+									</div>
+								</div>
+								<div className="prpl-setting-footer">
+									<NextButton
+										onNext={ handleNextSubStep }
+										canProceed={ canProceed }
+										wizardState={ wizardState }
+										isLoading={ isSaving }
+									/>
+								</div>
+							</div>
 						</div>
 					</div>
 				);
@@ -396,12 +465,7 @@ export default function SettingsStep( props ) {
 	};
 
 	return (
-		<OnboardingStep
-			{ ...props }
-			canProceed={ canProceed }
-			onNext={ handleNextSubStep }
-			isLoading={ isSaving }
-		>
+		<OnboardingStep { ...props } hideFooter>
 			<div className="tour-content">{ renderSubStep() }</div>
 		</OnboardingStep>
 	);
