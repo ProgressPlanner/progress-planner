@@ -1407,6 +1407,7 @@ function QuitConfirmation({
   config
 }) {
   const brandingName = config?.l10n?.brandingName || (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Progress Planner', 'progress-planner');
+  const baseUrl = config?.baseUrl || '';
   return /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsxs)("div", {
     className: "prpl-columns-wrapper-flex prpl-columns-2-1",
     children: [/*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
@@ -1468,17 +1469,9 @@ function QuitConfirmation({
       className: "prpl-column prpl-hide-on-mobile",
       children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
         id: "prpl-quit-confirmation-graphic",
-        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("div", {
-          style: {
-            width: '100%',
-            height: '200px',
-            backgroundColor: '#f0f0f0',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: '#999'
-          },
-          children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_0__.__)('Graphic placeholder', 'progress-planner')
+        children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_1__.jsx)("img", {
+          src: `${baseUrl || ''}/assets/images/onboarding/neglected_site_ravi.svg`,
+          alt: ""
         })
       })
     })]
@@ -2599,17 +2592,9 @@ function MoreTasksStep(props) {
             className: "prpl-column prpl-hide-on-mobile",
             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
               id: "prpl-success-graphic",
-              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("div", {
-                style: {
-                  width: '100%',
-                  height: '200px',
-                  backgroundColor: '#f0f0f0',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  color: '#999'
-                },
-                children: (0,_wordpress_i18n__WEBPACK_IMPORTED_MODULE_1__.__)('Graphic placeholder', 'progress-planner')
+              children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_4__.jsx)("img", {
+                src: `${config?.baseUrl || ''}/assets/images/onboarding/success_ravi.svg`,
+                alt: ""
               })
             })
           })]
@@ -3220,11 +3205,7 @@ function WelcomeStep(props) {
             id: "prpl-welcome-graphic",
             children: /*#__PURE__*/(0,react_jsx_runtime__WEBPACK_IMPORTED_MODULE_5__.jsx)("img", {
               src: `${baseUrl || ''}/assets/images/onboarding/thumbs_up_ravi_rtl.svg`,
-              alt: "",
-              style: {
-                maxWidth: '100%',
-                height: 'auto'
-              }
+              alt: ""
             })
           })
         })]

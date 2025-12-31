@@ -193,10 +193,6 @@ export default function WelcomeStep( props ) {
 									baseUrl || ''
 								}/assets/images/onboarding/thumbs_up_ravi_rtl.svg` }
 								alt=""
-								style={ {
-									maxWidth: '100%',
-									height: 'auto',
-								} }
 							/>
 						</div>
 					</div>

@@ -151,23 +151,12 @@ export default function MoreTasksStep( props ) {
 						</div>
 						<div className="prpl-column prpl-hide-on-mobile">
 							<div id="prpl-success-graphic">
-								{ /* Graphic would be rendered here - success_ravi.svg */ }
-								<div
-									style={ {
-										width: '100%',
-										height: '200px',
-										backgroundColor: '#f0f0f0',
-										display: 'flex',
-										alignItems: 'center',
-										justifyContent: 'center',
-										color: '#999',
-									} }
-								>
-									{ __(
-										'Graphic placeholder',
-										'progress-planner'
-									) }
-								</div>
+								<img
+									src={ `${
+										config?.baseUrl || ''
+									}/assets/images/onboarding/success_ravi.svg` }
+									alt=""
+								/>
 							</div>
 						</div>
 					</div>
