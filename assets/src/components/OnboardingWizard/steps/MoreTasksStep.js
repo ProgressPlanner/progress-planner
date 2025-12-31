@@ -25,6 +25,7 @@ export default function MoreTasksStep( props ) {
 
 	const [ currentSubStep, setCurrentSubStep ] = useState( 0 );
 	const [ completedTasks, setCompletedTasks ] = useState( {} );
+	const [ openTaskId, setOpenTaskId ] = useState( null );
 
 	const tasks = stepData?.data?.tasks || [];
 
@@ -164,6 +165,34 @@ export default function MoreTasksStep( props ) {
 		}
 
 		// Tasks sub-step.
+		// If a task is open, only show that task's expanded view.
+		if ( openTaskId ) {
+			const openTask = tasks.find( ( t ) => t.task_id === openTaskId );
+			if ( openTask ) {
+				return (
+					<div
+						className="prpl-more-tasks-substep"
+						data-substep="more-tasks-tasks"
+					>
+						<OnboardTask
+							key={ openTask.task_id }
+							task={ openTask }
+							config={ config }
+							onComplete={ handleTaskComplete }
+							onOpenChange={ ( isOpen ) =>
+								setOpenTaskId(
+									isOpen ? openTask.task_id : null
+								)
+							}
+							forceOpen
+							disableActionButton
+						/>
+					</div>
+				);
+			}
+		}
+
+		// Show task list when no task is open.
 		return (
 			<div
 				className="prpl-more-tasks-substep prpl-columns-wrapper-flex"
@@ -171,14 +200,55 @@ export default function MoreTasksStep( props ) {
 			>
 				<div className="prpl-column">
 					<ul className="prpl-task-list">
-						{ tasks.map( ( task ) => (
-							<OnboardTask
-								key={ task.task_id }
-								task={ task }
-								config={ config }
-								onComplete={ handleTaskComplete }
-							/>
-						) ) }
+						{ tasks.map( ( task ) => {
+							const isTaskCompleted =
+								completedTasks[ task.task_id ];
+							return (
+								<li
+									key={ task.task_id }
+									className="prpl-complete-task-item"
+								>
+									<span className="task-title">
+										<span className="prpl-task-arrow">
+											&rarr;
+										</span>
+										{ task.title }
+									</span>
+									<div
+										className={ `prpl-task-item${
+											isTaskCompleted
+												? ' prpl-task-completed'
+												: ''
+										}` }
+									>
+										<div className="prpl-task-item-button-wrapper">
+											<button
+												type="button"
+												className="prpl-complete-task-btn"
+												onClick={ () =>
+													setOpenTaskId(
+														task.task_id
+													)
+												}
+												disabled={ isTaskCompleted }
+											>
+												{ task.action_label ||
+													__(
+														'Do it',
+														'progress-planner'
+													) }
+											</button>
+											<span className="prpl-suggested-task-points">
+												+1
+											</span>
+										</div>
+										<span className="prpl-task-completed-icon">
+											{ '\u2713' }
+										</span>
+									</div>
+								</li>
+							);
+						} ) }
 					</ul>
 				</div>
 			</div>
@@ -188,8 +258,8 @@ export default function MoreTasksStep( props ) {
 	return (
 		<OnboardingStep { ...props } hideFooter>
 			<div className="tour-content">{ renderSubStep() }</div>
-			{ /* Show footer only on tasks sub-step */ }
-			{ currentSubStep === 1 && (
+			{ /* Show footer only on tasks sub-step when no task is open */ }
+			{ currentSubStep === 1 && ! openTaskId && (
 				<NextButton
 					onNext={ handleFinish }
 					canProceed={ () => true }

@@ -112,6 +112,14 @@ class Onboard_Wizard {
 
 		$tasks = [];
 
+		// Action labels for onboarding tasks.
+		$action_labels = [
+			'core-blogdescription' => \esc_html__( 'Verify tagline', 'progress-planner' ),
+			'select-timezone'      => \esc_html__( 'Set the timezone', 'progress-planner' ),
+			'select-locale'        => \esc_html__( 'Set the locale', 'progress-planner' ),
+			'core-siteicon'        => \esc_html__( 'Set site icon', 'progress-planner' ),
+		];
+
 		foreach ( $onboarding_tasks as $task_id ) {
 			$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
@@ -126,7 +134,7 @@ class Onboard_Wizard {
 				'url'          => $task[0]->url ?? '',
 				'provider_id'  => $task[0]->get_provider_id(),
 				'points'       => $task[0]->points ?? 0,
-				'action_label' => \esc_html__( 'Do it', 'progress-planner' ),
+				'action_label' => $action_labels[ $task_id ],
 			];
 
 			// Add task specific data.

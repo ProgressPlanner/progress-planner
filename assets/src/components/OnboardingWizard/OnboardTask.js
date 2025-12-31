@@ -14,20 +14,30 @@ import { useTaskCompletion } from '../../hooks/useTaskCompletion';
 /**
  * OnboardTask component.
  *
- * @param {Object}   props            - Component props.
- * @param {Object}   props.task       - Task data.
- * @param {Object}   props.config     - Wizard configuration.
- * @param {Function} props.onComplete - Callback when task is completed.
+ * @param {Object}   props                     - Component props.
+ * @param {Object}   props.task                - Task data.
+ * @param {Object}   props.config              - Wizard configuration.
+ * @param {Function} props.onComplete          - Callback when task is completed.
+ * @param {Function} props.onOpenChange        - Callback when task open state changes.
+ * @param {boolean}  props.forceOpen           - If true, render in open state.
+ * @param {boolean}  props.disableActionButton - If true, disable the template's action button by default.
  * @return {JSX.Element} OnboardTask component.
  */
-export default function OnboardTask( { task, config, onComplete } ) {
+export default function OnboardTask( {
+	task,
+	config,
+	onComplete,
+	onOpenChange,
+	forceOpen = false,
+	disableActionButton = false,
+} ) {
 	const { ajaxUrl, nonce } = config;
-	const { completeTask, isCompleting } = useTaskCompletion( {
+	const { completeTask } = useTaskCompletion( {
 		ajaxUrl,
 		nonce,
 	} );
 
-	const [ isOpen, setIsOpen ] = useState( false );
+	const [ isOpen, setIsOpen ] = useState( forceOpen );
 	const [ isCompleted, setIsCompleted ] = useState( false );
 	const [ formValues, setFormValues ] = useState( {} );
 	const taskContentRef = useRef( null );
@@ -86,6 +96,9 @@ export default function OnboardTask( { task, config, onComplete } ) {
 		try {
 			await completeTask( task.task_id, formValues );
 			setIsCompleted( true );
+			// Close the task view and return to task list.
+			setIsOpen( false );
+			onOpenChange?.( false );
 			onComplete?.( task.task_id );
 		} catch ( error ) {
 			console.error( 'Failed to complete task:', error );
@@ -97,6 +110,7 @@ export default function OnboardTask( { task, config, onComplete } ) {
 	 */
 	const handleOpen = () => {
 		setIsOpen( true );
+		onOpenChange?.( true );
 	};
 
 	/**
@@ -104,35 +118,12 @@ export default function OnboardTask( { task, config, onComplete } ) {
 	 */
 	const handleClose = () => {
 		setIsOpen( false );
+		onOpenChange?.( false );
 	};
 
 	if ( isOpen ) {
 		return (
 			<div className="prpl-task-content-active" ref={ taskContentRef }>
-				<div className="prpl-task-buttons">
-					<button
-						type="button"
-						className="prpl-btn prpl-task-close-btn"
-						onClick={ handleClose }
-					>
-						<span className="dashicons dashicons-arrow-left-alt2"></span>
-						{ config?.l10n?.backToRecommendations ||
-							__(
-								'Back to recommendations',
-								'progress-planner'
-							) }
-					</button>
-					<button
-						type="button"
-						className="prpl-complete-task-btn"
-						onClick={ handleComplete }
-						disabled={ isCompleting }
-					>
-						{ isCompleting
-							? __( 'Completing…', 'progress-planner' )
-							: __( 'Complete', 'progress-planner' ) }
-					</button>
-				</div>
 				<div className="prpl-task-form">
 					{ isLoadingTemplate && (
 						<div className="prpl-spinner">
@@ -196,16 +187,99 @@ export default function OnboardTask( { task, config, onComplete } ) {
 							tabIndex={ -1 }
 							ref={ ( el ) => {
 								if ( el && templateHtml ) {
-									// Re-initialize file upload handlers after template is rendered.
-									const fileInputs =
-										el.querySelectorAll(
-											'input[type="file"]'
+									// Prevent duplicate button creation on re-renders.
+									if (
+										el.querySelector( '.prpl-task-buttons' )
+									) {
+										return;
+									}
+
+									const actionBtn = el.querySelector(
+										'.prpl-complete-task-btn'
+									);
+
+									if ( actionBtn ) {
+										// Create button wrapper like develop branch does.
+										const buttonWrapper =
+											document.createElement( 'div' );
+										buttonWrapper.className =
+											'prpl-task-buttons';
+
+										// Create close button.
+										const closeBtn =
+											document.createElement( 'button' );
+										closeBtn.type = 'button';
+										closeBtn.className =
+											'prpl-btn prpl-task-close-btn';
+										closeBtn.innerHTML =
+											'<span class="dashicons dashicons-arrow-left-alt2"></span> ' +
+											( config?.l10n
+												?.backToRecommendations ||
+												'Back to recommendations' );
+										closeBtn.addEventListener(
+											'click',
+											handleClose
 										);
-									// File upload handling will be done by existing JavaScript if available.
-									// eslint-disable-next-line no-unused-vars
-									fileInputs.forEach( () => {
-										// File inputs are handled by existing event listeners.
-									} );
+
+										// Insert wrapper before action button, then move buttons into it.
+										actionBtn.parentNode.insertBefore(
+											buttonWrapper,
+											actionBtn
+										);
+										buttonWrapper.appendChild( closeBtn );
+										buttonWrapper.appendChild( actionBtn );
+
+										// Disable action button by default if requested.
+										if ( disableActionButton ) {
+											actionBtn.disabled = true;
+											actionBtn.classList.add(
+												'prpl-btn-disabled'
+											);
+
+											// Enable button when user makes a selection.
+											const enableButton = () => {
+												actionBtn.disabled = false;
+												actionBtn.classList.remove(
+													'prpl-btn-disabled'
+												);
+											};
+
+											// Watch for form input changes.
+											const inputs = el.querySelectorAll(
+												'input, select, textarea'
+											);
+											inputs.forEach( ( input ) => {
+												input.addEventListener(
+													'change',
+													enableButton
+												);
+												input.addEventListener(
+													'input',
+													enableButton
+												);
+											} );
+
+											// Watch for file uploads.
+											const fileInputs =
+												el.querySelectorAll(
+													'input[type="file"]'
+												);
+											fileInputs.forEach(
+												( fileInput ) => {
+													fileInput.addEventListener(
+														'change',
+														enableButton
+													);
+												}
+											);
+
+											// Watch for custom events (e.g., from media uploader).
+											el.addEventListener(
+												'prpl-task-input-changed',
+												enableButton
+											);
+										}
+									}
 								}
 							} }
 						/>
