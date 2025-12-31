@@ -64,7 +64,7 @@ export default function FirstTaskStep( props ) {
 		}
 	};
 
-	// Attach click handler to task button after render (for template_html).
+	// Attach click handler after render.
 	useEffect( () => {
 		if ( ! taskContentRef.current ) {
 			return;

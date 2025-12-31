@@ -121,6 +121,227 @@ export default function OnboardTask( {
 		onOpenChange?.( false );
 	};
 
+	/**
+	 * Validate if file matches the accepted file types from the input.
+	 *
+	 * @param {File}             file      - The file to validate.
+	 * @param {HTMLInputElement} fileInput - The file input element.
+	 * @return {boolean} True if file extension is supported.
+	 */
+	const isValidFile = ( file, fileInput ) => {
+		if ( ! fileInput || ! fileInput.accept ) {
+			return true;
+		}
+
+		const acceptedTypes = fileInput.accept
+			.split( ',' )
+			.map( ( type ) => type.trim() );
+		const fileName = file.name.toLowerCase();
+
+		return acceptedTypes.some( ( type ) => {
+			if ( type.startsWith( '.' ) ) {
+				return fileName.endsWith( type );
+			} else if ( type.includes( '/' ) ) {
+				return file.type === type;
+			}
+			return false;
+		} );
+	};
+
+	/**
+	 * Upload file to WordPress media library.
+	 *
+	 * @param {File}        file      - The file to upload.
+	 * @param {HTMLElement} statusDiv - The status div element.
+	 * @param {HTMLElement} el        - The container element.
+	 * @return {Promise} Promise resolving to the uploaded file response.
+	 */
+	const uploadFile = async ( file, statusDiv, el ) => {
+		const fileInput = el.querySelector( 'input[type="file"]' );
+
+		if ( ! isValidFile( file, fileInput ) ) {
+			const acceptedTypes = fileInput?.accept || 'supported file types';
+			statusDiv.textContent = `Invalid file type. Please upload: ${ acceptedTypes }`;
+			return null;
+		}
+
+		statusDiv.textContent = `Uploading ${ file.name }...`;
+		statusDiv.style.display = '';
+
+		const formData = new FormData();
+		formData.append( 'file', file );
+		formData.append( 'prplFileUpload', '1' );
+
+		try {
+			const response = await fetch( '/wp-json/wp/v2/media', {
+				method: 'POST',
+				headers: {
+					'X-WP-Nonce': config.nonceWPAPI,
+				},
+				body: formData,
+				credentials: 'same-origin',
+			} );
+
+			if ( response.status !== 201 ) {
+				throw new Error( 'Failed to upload file' );
+			}
+
+			const result = await response.json();
+			statusDiv.style.display = 'none';
+
+			// Update file preview.
+			const previewDiv = el.querySelector( '.prpl-file-preview' );
+			if ( previewDiv ) {
+				previewDiv.innerHTML = `<img src="${ result.source_url }" alt="${ file.name }" />`;
+				previewDiv.style.display = 'block';
+			}
+
+			// Update drop zone styling.
+			const dropZone = el.querySelector( '.prpl-file-drop-zone' );
+			if ( dropZone ) {
+				dropZone.classList.add( 'has-image' );
+				const removeBtn = dropZone.querySelector(
+					'.prpl-file-remove-btn'
+				);
+				if ( removeBtn ) {
+					removeBtn.hidden = false;
+				}
+			}
+
+			return result;
+		} catch ( error ) {
+			// eslint-disable-next-line no-console
+			console.error( 'Upload error:', error );
+			statusDiv.textContent = `Error: ${ error.message }`;
+			return null;
+		}
+	};
+
+	/**
+	 * Remove uploaded file and reset drop zone.
+	 *
+	 * @param {HTMLElement} dropZone   - The drop zone element.
+	 * @param {HTMLElement} previewDiv - The preview div element.
+	 */
+	const removeUploadedFile = ( dropZone, previewDiv ) => {
+		previewDiv.innerHTML = '';
+		previewDiv.style.display = 'none';
+
+		dropZone.classList.remove( 'has-image' );
+
+		const removeBtn = dropZone.querySelector( '.prpl-file-remove-btn' );
+		if ( removeBtn ) {
+			removeBtn.hidden = true;
+		}
+
+		const fileInput = dropZone.querySelector( 'input[type="file"]' );
+		if ( fileInput ) {
+			fileInput.value = '';
+		}
+
+		const postIdInput = dropZone.querySelector( 'input[name="post_id"]' );
+		if ( postIdInput ) {
+			postIdInput.value = '';
+			postIdInput.dispatchEvent(
+				new CustomEvent( 'change', { bubbles: true } )
+			);
+		}
+
+		const statusDiv = dropZone.querySelector( '.prpl-upload-status' );
+		if ( statusDiv ) {
+			statusDiv.style.display = '';
+			statusDiv.textContent = '';
+		}
+	};
+
+	/**
+	 * Set up file upload functionality for drop zone.
+	 *
+	 * @param {HTMLElement} el - The container element.
+	 */
+	const setupFileUpload = ( el ) => {
+		const uploadContainer = el.querySelector( '[data-upload-field]' );
+		if ( ! uploadContainer ) {
+			return;
+		}
+
+		// Prevent duplicate event listener setup.
+		if ( uploadContainer.dataset.uploadInitialized ) {
+			return;
+		}
+		uploadContainer.dataset.uploadInitialized = 'true';
+
+		const fileInput = uploadContainer.querySelector( 'input[type="file"]' );
+		const statusDiv = uploadContainer.querySelector(
+			'.prpl-upload-status'
+		);
+		const previewDiv =
+			uploadContainer.querySelector( '.prpl-file-preview' );
+
+		// Drag and drop visual feedback.
+		[ 'dragenter', 'dragover' ].forEach( ( eventName ) => {
+			uploadContainer.addEventListener( eventName, ( e ) => {
+				e.preventDefault();
+				e.stopPropagation();
+				uploadContainer.classList.add( 'dragover' );
+			} );
+		} );
+
+		// Handle dragleave.
+		uploadContainer.addEventListener( 'dragleave', ( e ) => {
+			e.preventDefault();
+			e.stopPropagation();
+			uploadContainer.classList.remove( 'dragover' );
+		} );
+
+		// Handle drop.
+		uploadContainer.addEventListener( 'drop', async ( e ) => {
+			e.preventDefault();
+			e.stopPropagation();
+			uploadContainer.classList.remove( 'dragover' );
+			const file = e.dataTransfer.files[ 0 ];
+			if ( file ) {
+				const result = await uploadFile( file, statusDiv, el );
+				if ( result && fileInput ) {
+					// Update hidden post_id input for site icon task.
+					const postIdInput = fileInput.nextElementSibling;
+					if ( postIdInput && postIdInput.name === 'post_id' ) {
+						postIdInput.value = result.id;
+						postIdInput.dispatchEvent(
+							new CustomEvent( 'change', { bubbles: true } )
+						);
+					}
+				}
+			}
+		} );
+
+		// Handle file input change.
+		fileInput?.addEventListener( 'change', async ( e ) => {
+			const file = e.target.files[ 0 ];
+			if ( file ) {
+				const result = await uploadFile( file, statusDiv, el );
+				if ( result ) {
+					// Update hidden post_id input for site icon task.
+					const postIdInput = fileInput.nextElementSibling;
+					if ( postIdInput && postIdInput.name === 'post_id' ) {
+						postIdInput.value = result.id;
+						postIdInput.dispatchEvent(
+							new CustomEvent( 'change', { bubbles: true } )
+						);
+					}
+				}
+			}
+		} );
+
+		// Handle remove button.
+		const removeBtn = uploadContainer.querySelector(
+			'.prpl-file-remove-btn'
+		);
+		removeBtn?.addEventListener( 'click', () => {
+			removeUploadedFile( uploadContainer, previewDiv );
+		} );
+	};
+
 	if ( isOpen ) {
 		return (
 			<div className="prpl-task-content-active" ref={ taskContentRef }>
@@ -187,6 +408,9 @@ export default function OnboardTask( {
 							tabIndex={ -1 }
 							ref={ ( el ) => {
 								if ( el && templateHtml ) {
+									// Set up file upload functionality (has its own guard).
+									setupFileUpload( el );
+
 									// Prevent duplicate button creation on re-renders.
 									if (
 										el.querySelector( '.prpl-task-buttons' )

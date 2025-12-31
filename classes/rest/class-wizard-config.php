@@ -146,6 +146,7 @@ class Wizard_Config extends Base {
 			'savedProgress'       => $saved_progress,
 			'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
 			'nonce'               => \wp_create_nonce( 'progress_planner' ),
+			'nonceWPAPI'          => \wp_create_nonce( 'wp_rest' ),
 			'userFirstName'       => $current_user->first_name ? $current_user->first_name : $current_user->display_name,
 			'userEmail'           => $current_user->user_email,
 			'onboardAPIUrl'       => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
