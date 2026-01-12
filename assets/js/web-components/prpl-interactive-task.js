@@ -48,6 +48,16 @@ class PrplInteractiveTask extends HTMLElement {
 	}
 
 	/**
+	 * Runs when the popover is added to the DOM.
+	 */
+	popoverAddedToDOM() {}
+
+	/**
+	 * Runs when the popover is opening.
+	 */
+	popoverOpening() {}
+
+	/**
 	 * Runs when the popover is closing.
 	 */
 	popoverClosing() {}
