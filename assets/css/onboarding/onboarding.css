@@ -32,7 +32,7 @@
 	--prpl-color-alert-error: #e73136; /* already exists in variables-color.css */
 
 	/* General error */
-	--prpl-background-alert-error: #fef2f2;/* already exists in variables-color.css */
+	--prpl-background-alert-error: #fdeded;/* already exists in variables-color.css */
 	--prpl-color-alert-error-text: #7f1d1d; /* already exists in variables-color.css */
 
 	/* Custom contros (inputs, radio, checkbox) */
@@ -56,7 +56,8 @@
 	max-width: 80vw;
 	color: var(--prpl-color-text);
 	background-color: var(--prpl-onboarding-popover-background);
-	border: 1px solid var(--prpl-color-ui-icon);
+	border: 1px solid var(--prpl-color-border);
+	box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.07),-2px 0 6px rgba(0, 0, 0, 0.07);
 
 	/* Popover backdrop. */
 	&::backdrop {
@@ -101,7 +102,7 @@
 	h3 {
 		font-family: system-ui, Arial, sans-serif;
 		margin-top: 0;
-		margin-bottom: 1rem;
+		margin-bottom: 0.5rem;
 		font-size: 1rem;
 		font-weight: 600;
 		color: var(--prpl-color-text);
@@ -283,7 +284,7 @@
 		width: 340px;
 		background: var(--prpl-background-steps);
 		border-right: none;
-		padding: 2rem 1.5rem;
+		padding: 2rem 1.5rem 1.5rem 1.5rem;
 		flex-shrink: 0;
 		display: flex;
 		flex-direction: column;
@@ -571,7 +572,6 @@
 		background: var(--prpl-background-alert-error);
 		padding: 20px;
 		border-radius: 6px;
-		border-left: 4px solid var(--prpl-color-alert-error);
 
 		.prpl-error-icon {
 			color: var(--prpl-color-alert-error);
@@ -594,8 +594,8 @@
 
 		p {
 			margin: 0;
-			font-size: 15px;
-			line-height: 1.6;
+			font-size: 16px;
+			line-height: 1.4;
 			color: var(--prpl-color-alert-error-text);
 		}
 	}
@@ -706,6 +706,11 @@
 				height: 250px; /* Set height since it is what we do in the PP dashboard. */
 				max-width: 100%;
 			}
+		}
+
+		.prpl-welcome-note{
+			font-size: var(--prpl-font-size-small);
+			font-style: italic;
 		}
 	}
 
