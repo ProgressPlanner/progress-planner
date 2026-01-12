@@ -35,7 +35,7 @@ if ( ! \in_array( $prpl_locale, $prpl_languages, true ) ) {
 		<?php echo esc_html( $task['title'] ); ?>
 	</h3>
 	<p>
-		Venenatis parturient suspendisse massa cursus litora dapibus auctor, et vestibulum blandit condimentum quis ultrices sagittis aliquam.
+		Your locale determines the language and formatting your visitors see, such as date structures and currency. Setting this helps your audience feel right at home. Choose your preferred language and region.
 	</p>
 	<form class="prpl-onboarding-task-form" onsubmit="return false;">
 		<?php
