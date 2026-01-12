@@ -21,7 +21,7 @@ $prpl_tzstring       = \get_option( 'timezone_string' );
 		<?php echo esc_html( $task['title'] ); ?>
 	</h3>
 	<p>
-		Setting your timezone ensures that scheduled posts and automated updates happen exactly when you expect them to. It keeps your site's clock synced with your local time. Pick your city or offset now!
+		<?php \esc_html_e( 'Setting your timezone ensures that scheduled posts and automated updates happen exactly when you expect them to. It keeps your site\'s clock synced with your local time. Pick your city or offset now!', 'progress-planner' ); ?>
 	</p>
 	<form class="prpl-onboarding-task-form" onsubmit="return false;">
 		<select id="timezone" name="timezone" data-validate="required">
