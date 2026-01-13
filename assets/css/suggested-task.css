@@ -18,10 +18,88 @@
 		display: inline-block;
 	}
 
-	/* Snooze dropdown - PHP rendered */
+	/* Snooze dropdown - styles for the prpl-tooltip web component wrapper */
 	.prpl-suggested-task-snooze {
 
-		&.prpl-toggle-radio-group-open {
+		/* Target the tooltip content container created by the web component */
+		.prpl-tooltip {
+
+			legend {
+				display: block;
+				width: 100%;
+
+				/* Title text */
+				> span {
+					display: block;
+					font-weight: 500;
+					margin-bottom: 0.25rem;
+				}
+
+				.prpl-toggle-radio-group {
+					display: flex;
+					justify-content: space-between;
+					width: 100%;
+					margin-top: 0.5rem;
+					padding: 0.5rem;
+					background-color: #fff;
+					border: 1px solid #dcdcde;
+					border-radius: var(--prpl-border-radius);
+					line-height: 1;
+					text-align: start;
+					cursor: pointer;
+
+					.prpl-toggle-radio-group-arrow {
+						transform: rotate(90deg);
+						transition: transform 0.2s ease;
+					}
+				}
+			}
+
+			label {
+				display: block;
+				background-color: #fff;
+				padding: 0.5rem;
+				cursor: pointer;
+
+				&:hover {
+					background-color: var(--prpl-color-gauge-remain);
+				}
+
+				input[type="radio"] {
+					display: none;
+				}
+			}
+
+			.prpl-snooze-duration-radio-group {
+				display: none;
+				margin-top: 0.75rem;
+
+				label {
+					border-top: 1px solid #dcdcde;
+
+					&:first-child {
+						border-top-left-radius: var(--prpl-border-radius);
+						border-top-right-radius: var(--prpl-border-radius);
+						border-top: none;
+					}
+
+					&:last-child {
+						border-bottom-left-radius: var(--prpl-border-radius);
+						border-bottom-right-radius: var(--prpl-border-radius);
+					}
+				}
+			}
+
+			/* Fieldset reset */
+			fieldset {
+				border: none;
+				padding: 0;
+				margin: 0;
+			}
+		}
+
+		/* Open state - must come after display:none rules to override them */
+		&.prpl-toggle-radio-group-open .prpl-tooltip {
 
 			.prpl-snooze-duration-radio-group {
 				display: block;
@@ -30,62 +108,6 @@
 			.prpl-toggle-radio-group-arrow {
 				transform: rotate(270deg);
 			}
-		}
-
-		legend {
-			display: block;
-			width: 100%;
-
-			.prpl-toggle-radio-group {
-				display: flex;
-				justify-content: space-between;
-				width: 100%;
-				margin-top: 0.5rem;
-				padding: 0.5rem;
-				background-color: #fff;
-				border-radius: var(--prpl-border-radius);
-				line-height: 1;
-				text-align: start;
-
-				.prpl-toggle-radio-group-arrow {
-					transform: rotate(90deg);
-				}
-			}
-		}
-
-		label {
-			display: block;
-			background-color: #fff;
-			padding: 0.5rem;
-
-			&:hover {
-				background-color: var(--prpl-color-gauge-remain);
-			}
-
-			input[type="radio"] {
-				display: none;
-			}
-		}
-
-		.prpl-snooze-duration-radio-group {
-			display: none;
-			margin-top: 0.75rem;
-
-			label {
-				border-top: 1px solid #dcdcde;
-
-				&:first-child {
-					border-top-left-radius: var(--prpl-border-radius);
-					border-top-right-radius: var(--prpl-border-radius);
-					border-top: none;
-				}
-
-				&:last-child {
-					border-bottom-left-radius: var(--prpl-border-radius);
-					border-bottom-right-radius: var(--prpl-border-radius);
-				}
-			}
-
 		}
 	}
 
