@@ -51,7 +51,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\UI\Popover get_ui__popover()
  * @method \Progress_Planner\Admin\Widgets\Content_Activity get_admin__widgets__content_activity()
  * @method \Progress_Planner\UI\Chart get_ui__chart()
- * @method \Progress_Planner\Activities\Content_Helpers get_activities__content_helpers()
+ * @method \Progress_Planner\Activities\Content_Helpers|null get_activities__content_helpers()
  * @method \Progress_Planner\Admin\Widgets\Challenge get_admin__widgets__challenge()
  * @method \Progress_Planner\Admin\Widgets\Activity_Scores get_admin__widgets__activity_scores()
  * @method \Progress_Planner\Utils\Date get_utils__date()
