@@ -421,10 +421,12 @@ class Onboard_Wizard {
 			}
 		}
 
-		// Handle post types.
-		$include_post_types = isset( $_POST['prpl-post-types-include'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		? \array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
-		: [];
+		// Handle post types (sent as comma-separated string via FormData).
+		$include_post_types = [];
+		if ( ! empty( $_POST['prpl-post-types-include'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$raw_post_types     = \sanitize_text_field( \wp_unslash( $_POST['prpl-post-types-include'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$include_post_types = \explode( ',', $raw_post_types );
+		}
 		$page_settings->save_post_types( $include_post_types );
 
 		// Handle login destination.
