@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
 import { resolveTaskId } from '../../utils/taskIdResolver';
@@ -126,10 +127,11 @@ export default function SubscribeFormPopover( { task, onSubmit, onClose } ) {
 		[ name, email, task, onSubmit ]
 	);
 
-	const taskTitle =
+	const taskTitle = decodeEntities(
 		task.title?.rendered ||
-		task.title ||
-		__( 'Subscribe to weekly emails', 'progress-planner' );
+			task.title ||
+			__( 'Subscribe to weekly emails', 'progress-planner' )
+	);
 	const taskId = resolveTaskId( task, 'subscribe-form' );
 
 	return (
