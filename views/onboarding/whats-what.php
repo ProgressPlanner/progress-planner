@@ -26,7 +26,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 						?>
 					</p>
 					<p>
-						<?php \esc_html_e( 'These actions help you improve your site step by step, without having to guess where to start.', 'progress-planner' ); ?>
+						<?php \esc_html_e( 'These actions help you improve your site step by step, without having to guess where to start. Most recommendations can be completed in under five minutes.', 'progress-planner' ); ?>
 					</p>
 				</div>
 			</div>
