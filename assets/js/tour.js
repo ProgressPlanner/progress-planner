@@ -57,7 +57,10 @@ function prplStartTour() {
 	);
 }
 
-// Add event listener for tour button.
-document
-	.getElementById( 'prpl-start-tour-icon-button' )
-	?.addEventListener( 'click', prplStartTour );
+// Add event listener for tour button using event delegation.
+// This is necessary because the button is rendered by React after this script loads.
+document.addEventListener( 'click', ( event ) => {
+	if ( event.target.closest( '#prpl-start-tour-icon-button' ) ) {
+		prplStartTour();
+	}
+} );
