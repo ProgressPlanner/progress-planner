@@ -155,8 +155,10 @@ function ActivityScores( { config = {} } ) {
 	// Get session points from Zustand store for real-time updates.
 	const sessionPoints = useDashboardStore( ( state ) => state.sessionPoints );
 
-	const range = '-6 months';
-	const frequency = 'monthly';
+	// Get range and frequency from global config (set by URL params via PHP)
+	const globalConfig = window.prplDashboardConfig || {};
+	const range = globalConfig.currentRange || '-6 months';
+	const frequency = globalConfig.currentFrequency || 'monthly';
 	const apiPath = `/progress-planner/v1/widgets/activity-scores?range=${ encodeURIComponent(
 		range
 	) }&frequency=${ encodeURIComponent( frequency ) }`;

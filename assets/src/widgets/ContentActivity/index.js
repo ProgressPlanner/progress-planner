@@ -22,8 +22,10 @@ import ContentActivitySkeleton from './ContentActivitySkeleton';
  * @return {JSX.Element} The ContentActivity widget.
  */
 function ContentActivity( { config = {} } ) {
-	const range = '-6 months';
-	const frequency = 'monthly';
+	// Get range and frequency from global config (set by URL params via PHP)
+	const globalConfig = window.prplDashboardConfig || {};
+	const range = globalConfig.currentRange || '-6 months';
+	const frequency = globalConfig.currentFrequency || 'monthly';
 	const apiPath = `/progress-planner/v1/widgets/content-activity?range=${ encodeURIComponent(
 		range
 	) }&frequency=${ encodeURIComponent( frequency ) }`;
