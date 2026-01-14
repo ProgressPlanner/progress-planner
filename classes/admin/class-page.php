@@ -59,7 +59,8 @@ class Page {
 		// Popovers and misc.
 		'/wp/v2/updates',
 		'/progress-planner/v1/timezone-options',
-		'/progress-planner/v1/onboarding-wizard/config',
+		// Note: onboarding-wizard/config is NOT preloaded because React needs to
+		// create onboarding tasks first before fetching the config.
 	];
 
 	/**

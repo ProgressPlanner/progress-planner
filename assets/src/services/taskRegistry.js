@@ -516,3 +516,74 @@ export function getTaskProviderInstance( providerId ) {
 export function getBufferSize() {
 	return BUFFER_SIZE;
 }
+
+/**
+ * Onboarding task IDs that need to be created before the onboarding wizard starts.
+ */
+const ONBOARDING_TASK_IDS = [
+	'core-siteicon',
+	'core-blogdescription',
+	'select-timezone',
+	'select-locale',
+];
+
+/**
+ * Evaluate and create onboarding tasks.
+ *
+ * This function is called before the onboarding wizard fetches its config,
+ * ensuring that the tasks exist in the database before PHP tries to load them.
+ *
+ * @return {Promise<void>}
+ */
+export async function evaluateOnboardingTasks() {
+	// Ensure task providers are initialized
+	if ( sortedTaskClasses.length === 0 ) {
+		initializeSortedTaskClasses();
+	}
+
+	const tasksToCreate = [];
+
+	for ( const taskId of ONBOARDING_TASK_IDS ) {
+		const TaskClass = taskProviders.get( taskId );
+		if ( ! TaskClass ) {
+			continue;
+		}
+
+		try {
+			const taskInstance = new TaskClass();
+
+			// Get task details (we create regardless of shouldAddTask for onboarding)
+			if ( ! taskInstance.getTaskDetails ) {
+				continue;
+			}
+
+			const taskDetails = await taskInstance.getTaskDetails();
+			if ( ! taskDetails ) {
+				continue;
+			}
+
+			// Ensure required fields
+			taskDetails.task_id = taskDetails.task_id || taskId;
+			taskDetails.provider_id = taskDetails.provider_id || taskId;
+
+			tasksToCreate.push( taskDetails );
+		} catch ( error ) {
+			console.error(
+				`Error preparing onboarding task "${ taskId }":`,
+				error
+			);
+		}
+	}
+
+	// Batch create all onboarding tasks
+	if ( tasksToCreate.length > 0 ) {
+		try {
+			await createTasksBatch( tasksToCreate );
+		} catch ( error ) {
+			// 409 Conflict is expected if tasks already exist
+			if ( error?.data?.status !== 409 ) {
+				console.error( 'Error creating onboarding tasks:', error );
+			}
+		}
+	}
+}

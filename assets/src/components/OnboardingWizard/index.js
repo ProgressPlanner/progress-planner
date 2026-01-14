@@ -19,6 +19,10 @@ import apiFetch from '@wordpress/api-fetch';
 import { useDashboardStore } from '../../stores/dashboardStore';
 import { useOnboardingWizard } from '../../hooks/useOnboardingWizard';
 import { useOnboardingProgress } from '../../hooks/useOnboardingProgress';
+import { evaluateOnboardingTasks } from '../../services/taskRegistry';
+
+// Import tasks so providers are registered before evaluateOnboardingTasks runs.
+import '../../tasks';
 import WelcomeStep from './steps/WelcomeStep';
 import WhatsWhatStep from './steps/WhatsWhatStep';
 import FirstTaskStep from './steps/FirstTaskStep';
@@ -55,6 +59,10 @@ const OnboardingWizard = forwardRef( function OnboardingWizard(
 			try {
 				setIsLoadingConfig( true );
 				setConfigError( null );
+
+				// Ensure onboarding tasks exist before fetching config.
+				// This creates tasks in the database so PHP can find them.
+				await evaluateOnboardingTasks();
 
 				const response = await apiFetch( {
 					path: '/progress-planner/v1/onboarding-wizard/config',

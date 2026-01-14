@@ -84,9 +84,6 @@ class Onboard_Wizard {
 		// Wizard config is now provided via REST API endpoint (/progress-planner/v1/onboarding-wizard/config)
 		// React components fetch the config directly from the API.
 
-		// Define steps and their order.
-		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
-
 		// Allow only images for the front-end upload.
 		\add_filter( 'rest_pre_insert_attachment', [ $this, 'rest_pre_insert_attachment' ], 10, 2 );
 	}

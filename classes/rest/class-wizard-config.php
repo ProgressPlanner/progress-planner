@@ -54,6 +54,11 @@ class Wizard_Config extends Base {
 		// Get saved progress from user meta.
 		$saved_progress = $wizard->get_saved_progress();
 
+		// Force re-calculation of steps.
+		// Tasks may have been created by React just before this request,
+		// so we need fresh data instead of cached steps from the init hook.
+		$wizard->define_steps_and_order();
+
 		// Get steps using public method.
 		$steps = $wizard->get_steps();
 
