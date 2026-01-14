@@ -301,7 +301,7 @@ export default function SettingsStep( props ) {
 												: ''
 										}` }
 										onClick={ handleNextSubStep }
-										disabled={ isSaving }
+										disabled={ ! canProceed() }
 									>
 										{ __(
 											'Save setting',
