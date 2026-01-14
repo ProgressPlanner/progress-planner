@@ -6,9 +6,11 @@
  * @package
  */
 
-import { useEffect, useRef, useMemo } from '@wordpress/element';
+import { useEffect, useMemo, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import OnboardingStep from '../OnboardingStep';
+import Gauge from '../../Gauge';
+import Badge from '../../Badge';
 
 /**
  * BadgesStep component.
@@ -18,28 +20,22 @@ import OnboardingStep from '../OnboardingStep';
  */
 export default function BadgesStep( props ) {
 	const { wizardState, stepData } = props;
-	const gaugeRef = useRef( null );
 	const badgeData = useMemo( () => stepData?.data || {}, [ stepData?.data ] );
 
+	// State for animated gauge value.
+	const initialValue = badgeData.currentValue || 0;
+	const [ gaugeValue, setGaugeValue ] = useState( initialValue );
+
+	// Increment badge points after first task completion (with delay for animation).
 	useEffect( () => {
-		// Initialize badge gauge component if available.
-		if ( gaugeRef.current && window.customElements?.get( 'prpl-gauge' ) ) {
-			const gauge = gaugeRef.current.querySelector( 'prpl-gauge' );
-			if ( gauge && badgeData.badgeId && badgeData.badgeName ) {
-				// Increment badge points after first task completion.
-				setTimeout( () => {
-					if ( gauge && wizardState.data.firstTaskCompleted ) {
-						gauge.setAttribute(
-							'data-value',
-							( parseFloat(
-								gauge.getAttribute( 'data-value' )
-							) || 0 ) + 1
-						);
-					}
-				}, 1500 );
-			}
+		if ( wizardState.data.firstTaskCompleted && badgeData.badgeId ) {
+			const timer = setTimeout( () => {
+				setGaugeValue( ( prev ) => prev + 1 );
+			}, 1500 );
+
+			return () => clearTimeout( timer );
 		}
-	}, [ wizardState.data.firstTaskCompleted, badgeData ] );
+	}, [ wizardState.data.firstTaskCompleted, badgeData.badgeId ] );
 
 	return (
 		<OnboardingStep
@@ -73,27 +69,43 @@ export default function BadgesStep( props ) {
 						</div>
 					</div>
 					<div className="prpl-column">
-						<div className="prpl-gauge-wrapper" ref={ gaugeRef }>
-							{ badgeData.badgeId && badgeData.badgeName && (
-								<prpl-gauge
-									id="prpl-gauge-onboarding"
-									background="#fff"
+						<div className="prpl-gauge-wrapper">
+							{ badgeData.badgeId && badgeData.badgeName ? (
+								<Gauge
+									value={ gaugeValue }
+									max={ badgeData.maxPoints || 10 }
+									backgroundColor="#fff"
 									color="var(--prpl-color-monthly)"
+									color2="var(--prpl-color-monthly)"
 									contentFontSize="3rem"
-									contentPadding="20px"
-									marginBottom="0"
-									data-max={ badgeData.maxPoints || 10 }
-									data-value={ badgeData.currentValue || 0 }
-									data-badge-id={ badgeData.badgeId }
-									data-badge-name={ badgeData.badgeName }
-									data-branding-id={
-										badgeData.brandingId || ''
-									}
 								>
-									{ /* Badge will be loaded dynamically */ }
-								</prpl-gauge>
+									<Badge
+										badgeId={ badgeData.badgeId }
+										badgeName={ badgeData.badgeName }
+										brandingId={ badgeData.brandingId || 0 }
+										isComplete={ true }
+									/>
+								</Gauge>
+							) : (
+								<Gauge
+									value={ gaugeValue }
+									max={ 10 }
+									backgroundColor="#fff"
+									color="var(--prpl-color-monthly)"
+									color2="var(--prpl-color-monthly)"
+									contentFontSize="3rem"
+								>
+									{ gaugeValue }
+								</Gauge>
 							) }
-							{ __( 'Monthly badge', 'progress-planner' ) }
+							<p
+								style={ {
+									textAlign: 'center',
+									marginTop: '0',
+								} }
+							>
+								{ __( 'Monthly badge', 'progress-planner' ) }
+							</p>
 						</div>
 					</div>
 				</div>
