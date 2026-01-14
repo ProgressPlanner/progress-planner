@@ -11,8 +11,8 @@ test.describe( 'Task Snooze', () => {
 		// Wait for the page to settle
 		await page.waitForTimeout( 2000 );
 
-		// Use a known task that should always be available: settings-saved
-		const snoozeTaskId = 'settings-saved';
+		// Use a known task that should always be available: core-siteicon
+		const snoozeTaskId = 'core-siteicon';
 
 		// Verify the task exists and is active
 		const task = await tasksApi.getTask( snoozeTaskId );
