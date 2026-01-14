@@ -33,7 +33,7 @@ export default function WhatsWhatStep( props ) {
 							</p>
 							<p>
 								{ __(
-									'These actions help you improve your site step by step, without having to guess where to start.',
+									'These actions help you improve your site step by step, without having to guess where to start. Most recommendations can be completed in under five minutes.',
 									'progress-planner'
 								) }
 							</p>
