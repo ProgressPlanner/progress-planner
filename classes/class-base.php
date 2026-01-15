@@ -184,6 +184,19 @@ class Base {
 
 		// TODO: Decide when this needs to be initialized.
 		$this->get_onboard_wizard();
+
+		// WIP: Initialize guided tour for hosting partners (on init to avoid early translation loading).
+		\add_action( 'init', [ $this, 'init_guided_tour' ] );
+	}
+
+	/**
+	 * Initialize the guided tour system.
+	 *
+	 * @return void
+	 */
+	public function init_guided_tour() {
+		require_once PROGRESS_PLANNER_DIR . '/guided-tour/class-integration.php';
+		\Progress_Planner\Guided_Tour\Integration::init();
 	}
 
 	/**

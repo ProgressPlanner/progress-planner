@@ -1,0 +1,1303 @@
+/**
+ * Progress Planner - Multi-screen Guided Tours
+ *
+ * Handles guided tours that span multiple WordPress admin pages, frontend,
+ * and block editor using driver.js with server-side state persistence.
+ *
+ * This is for hosting partner installations, distinct from the plugin onboarding.
+ */
+
+( function() {
+	'use strict';
+
+	// Bail if config is missing.
+	if ( typeof window.ppGuidedTour === 'undefined' ) {
+		return;
+	}
+
+	const config = window.ppGuidedTour;
+	const context = config.context || 'admin';
+
+	/**
+	 * Tour Manager - handles all tour operations.
+	 */
+	const TourManager = {
+		driverInstance: null,
+		isNavigating: false,
+
+		/**
+		 * Initialize the tour manager.
+		 */
+		init() {
+			// Route to appropriate handler based on context.
+			switch ( context ) {
+				case 'frontend':
+					this.initFrontend();
+					break;
+				case 'editor':
+					this.initEditor();
+					break;
+				case 'admin':
+				default:
+					this.initAdmin();
+					break;
+			}
+		},
+
+		/**
+		 * Initialize frontend context (homepage welcome card).
+		 */
+		initFrontend() {
+			// Wait for driver.js to be ready, then bind events.
+			this.waitForDriver( () => {
+				this.bindFrontendEvents();
+			} );
+		},
+
+		/**
+		 * Initialize block editor context.
+		 */
+		initEditor() {
+			console.log( 'PP Guided Tour: Initializing editor context', config );
+
+			// Wait for editor to be ready.
+			if ( typeof wp !== 'undefined' && wp.domReady ) {
+				wp.domReady( () => {
+					console.log( 'PP Guided Tour: wp.domReady fired' );
+					// Open Progress Planner sidebar.
+					this.openProgressPlannerSidebar();
+					// Wait for driver.js and editor to be ready.
+					this.waitForDriver( () => {
+						setTimeout( () => this.resumeEditorTour(), 1000 );
+					} );
+				} );
+			} else {
+				// Fallback.
+				console.log( 'PP Guided Tour: Using fallback timeout' );
+				this.openProgressPlannerSidebar();
+				this.waitForDriver( () => {
+					setTimeout( () => this.resumeEditorTour(), 2000 );
+				} );
+			}
+		},
+
+		/**
+		 * Open the Progress Planner sidebar in the block editor.
+		 */
+		openProgressPlannerSidebar() {
+			// Find the Progress Planner sidebar toggle button.
+			const sidebarButton = document.querySelector(
+				'button[aria-label="Progress Planner Sidebar"]'
+			);
+
+			if ( ! sidebarButton ) {
+				// Button not found yet, retry after a short delay.
+				setTimeout( () => this.openProgressPlannerSidebar(), 500 );
+				return;
+			}
+
+			// Check if sidebar is already open.
+			if ( sidebarButton.getAttribute( 'aria-expanded' ) === 'true' ) {
+				return;
+			}
+
+			// Click to open the sidebar.
+			sidebarButton.click();
+		},
+
+		/**
+		 * Wait for driver.js to be available.
+		 *
+		 * @param {Function} callback Callback when ready.
+		 * @param {number} attempts Number of attempts.
+		 */
+		waitForDriver( callback, attempts = 0 ) {
+			const driver = this.getDriver();
+			if ( driver ) {
+				callback();
+				return;
+			}
+
+			if ( attempts > 20 ) {
+				console.error( 'PP Guided Tour: driver.js not available after 20 attempts' );
+				return;
+			}
+
+			console.log( 'PP Guided Tour: Waiting for driver.js...', window.driver );
+			setTimeout( () => this.waitForDriver( callback, attempts + 1 ), 250 );
+		},
+
+		/**
+		 * Get the driver function from window.driver.
+		 *
+		 * @return {Function|null} The driver function or null.
+		 */
+		getDriver() {
+			// Try different possible locations
+			if ( typeof window.driver === 'function' ) {
+				return window.driver;
+			}
+			if ( typeof window.driver?.driver === 'function' ) {
+				return window.driver.driver;
+			}
+			if ( typeof window.driver?.js?.driver === 'function' ) {
+				return window.driver.js.driver;
+			}
+			return null;
+		},
+
+		/**
+		 * Initialize admin context.
+		 */
+		initAdmin() {
+			// Driver.js will be checked when needed.
+
+			// Check if there's an active tour.
+			if ( config.state?.active && config.activeTour ) {
+				this.resumeTour();
+			}
+
+			// Set up event listeners for tour triggers.
+			this.bindEvents();
+		},
+
+		/**
+		 * Bind frontend event listeners.
+		 */
+		bindFrontendEvents() {
+			const welcomeCard = document.getElementById( 'pp-guided-tour-welcome' );
+			if ( ! welcomeCard ) {
+				return;
+			}
+
+			// Close button.
+			const closeBtn = welcomeCard.querySelector( '.pp-guided-tour-welcome-close' );
+			if ( closeBtn ) {
+				closeBtn.addEventListener( 'click', () => this.skipTour() );
+			}
+
+			// Skip button.
+			const skipBtn = welcomeCard.querySelector( '.pp-guided-tour-welcome-skip' );
+			if ( skipBtn ) {
+				skipBtn.addEventListener( 'click', () => this.skipTour() );
+			}
+
+			// Click on the card content to highlight the Edit Page link.
+			const cardContent = welcomeCard.querySelector( '.pp-guided-tour-welcome-text' );
+			if ( cardContent ) {
+				cardContent.style.cursor = 'pointer';
+				cardContent.addEventListener( 'click', () => this.highlightEditPageLink() );
+			}
+
+			// Watch for clicks on admin bar "Edit Page" link.
+			const editPageLink = document.querySelector( '#wp-admin-bar-edit a' );
+			if ( editPageLink ) {
+				editPageLink.addEventListener( 'click', async ( e ) => {
+					e.preventDefault();
+					const href = editPageLink.href;
+
+					// Destroy any active driver instance.
+					if ( this.driverInstance ) {
+						this.driverInstance.destroy();
+					}
+
+					// Update progress to next step before navigating.
+					await this.updateProgress( 1 );
+
+					// Navigate to the editor.
+					window.location.href = href;
+				} );
+			}
+		},
+
+		/**
+		 * Highlight the Edit Page link in the admin bar.
+		 */
+		highlightEditPageLink() {
+			const driver = this.getDriver();
+			if ( ! driver ) {
+				console.error( 'PP Guided Tour: driver.js not available for highlight' );
+				return;
+			}
+
+			const editPageLink = document.querySelector( '#wp-admin-bar-edit' );
+			if ( ! editPageLink ) {
+				console.error( 'PP Guided Tour: Edit Page link not found in admin bar' );
+				return;
+			}
+
+			// Hide the welcome card.
+			const welcomeCard = document.getElementById( 'pp-guided-tour-welcome' );
+			if ( welcomeCard ) {
+				welcomeCard.style.display = 'none';
+			}
+
+			// Add active class to body to adjust z-indexes.
+			document.body.classList.add( 'pp-guided-tour-active' );
+
+			// Track if user completed via Done button vs closed via X.
+			let completedViaDone = false;
+
+			// Use driver.js to highlight the Edit Page link.
+			this.driverInstance = driver( {
+				showProgress: false,
+				steps: [
+					{
+						element: '#wp-admin-bar-edit',
+						popover: {
+							title: config.i18n.editPageTitle || 'Edit Page',
+							description: config.i18n.editPageDesc || 'Click here to edit your homepage.',
+							side: 'bottom',
+							align: 'center',
+						},
+					},
+				],
+				popoverClass: 'pp-guided-tour-popover',
+				stagePadding: 4,
+				stageRadius: 4,
+				allowClose: true,
+				onNextClick: () => {
+					// Done button clicked - user wants to proceed.
+					completedViaDone = true;
+					document.body.classList.remove( 'pp-guided-tour-active' );
+					if ( this.driverInstance ) {
+						this.driverInstance.destroy();
+					}
+					// Don't show welcome card - user is ready to click Edit Page.
+				},
+				onCloseClick: () => {
+					// X button clicked - user wants to dismiss temporarily.
+					document.body.classList.remove( 'pp-guided-tour-active' );
+					if ( this.driverInstance ) {
+						this.driverInstance.destroy();
+					}
+					// Show the welcome card again.
+					if ( welcomeCard ) {
+						welcomeCard.style.display = 'block';
+					}
+				},
+				onDestroyStarted: () => {
+					// Only show welcome card if not completed via Done.
+					document.body.classList.remove( 'pp-guided-tour-active' );
+					if ( ! completedViaDone && welcomeCard ) {
+						welcomeCard.style.display = 'block';
+					}
+				},
+			} );
+
+			this.driverInstance.drive();
+		},
+
+		/**
+		 * Resume tour in block editor.
+		 */
+		resumeEditorTour() {
+			console.log( 'PP Guided Tour: resumeEditorTour called', {
+				activeTour: config.activeTour,
+				state: config.state,
+			} );
+
+			if ( ! config.activeTour || ! config.state?.active ) {
+				console.log( 'PP Guided Tour: No active tour, exiting' );
+				return;
+			}
+
+			const currentStepIndex = config.state.step || 0;
+			const step = config.activeTour.steps[ currentStepIndex ];
+
+			console.log( 'PP Guided Tour: Current step', { currentStepIndex, step } );
+
+			if ( ! step || step.context !== 'editor' ) {
+				console.log( 'PP Guided Tour: Step not for editor context, exiting' );
+				return;
+			}
+
+			// Find the element based on step configuration.
+			const result = this.findEditorElement( step.element );
+
+			console.log( 'PP Guided Tour: Found element', { elementType: step.element, result } );
+
+			if ( ! result.element ) {
+				console.warn( 'Guided Tour: Could not find element:', step.element );
+				// Show a fallback popover or skip to next step.
+				this.showEditorFallbackPopover( step );
+				return;
+			}
+
+			// Show popover - handle iframe case differently.
+			if ( result.isInIframe ) {
+				this.showEditorPopoverForIframe( result, step, currentStepIndex );
+			} else {
+				this.showEditorPopover( result.element, step, currentStepIndex );
+			}
+		},
+
+		/**
+		 * Find element in block editor.
+		 *
+		 * @param {string} elementType Type of element to find.
+		 * @return {Object} Object with element, isInIframe, and iframe reference.
+		 */
+		findEditorElement( elementType ) {
+			const editorCanvas = document.querySelector( 'iframe[name="editor-canvas"]' );
+			const isInIframe = !! editorCanvas;
+			const doc = editorCanvas ? editorCanvas.contentDocument : document;
+
+			let element = null;
+
+			switch ( elementType ) {
+				case 'first-heading':
+					// Look for first heading block in editor.
+					element = doc.querySelector(
+						'.wp-block-heading, ' +
+						'[data-type="core/heading"], ' +
+						'.editor-post-title__input, ' +
+						'.wp-block-post-title'
+					);
+					break;
+
+				case 'first-paragraph':
+					// Look for first paragraph block in editor.
+					element = doc.querySelector(
+						'.wp-block-paragraph, ' +
+						'[data-type="core/paragraph"]'
+					);
+					break;
+
+				case 'first-image':
+					// Look for first image block in editor.
+					element = doc.querySelector(
+						'.wp-block-image, ' +
+						'[data-type="core/image"], ' +
+						'.wp-block-cover, ' +
+						'[data-type="core/cover"]'
+					);
+					break;
+
+				case 'save-button':
+					// Save/Update button is in the main document, not the iframe.
+					element = document.querySelector(
+						'.editor-post-publish-button, ' +
+						'.editor-post-save-draft, ' +
+						'button.editor-post-publish-button__button'
+					);
+					// Return early with isInIframe false since save button is in main UI.
+					return {
+						element,
+						isInIframe: false,
+						iframe: null,
+						doc: document,
+					};
+
+				default:
+					// Try as a CSS selector.
+					element = doc.querySelector( elementType );
+			}
+
+			return {
+				element,
+				isInIframe,
+				iframe: editorCanvas,
+				doc,
+			};
+		},
+
+		/**
+		 * Show popover for editor step when content is in an iframe.
+		 *
+		 * @param {Object} result Result from findEditorElement.
+		 * @param {Object} step Step configuration.
+		 * @param {number} stepIndex Current step index.
+		 */
+		showEditorPopoverForIframe( result, step, stepIndex ) {
+			const { element, iframe, doc } = result;
+
+			// Add highlight class to element inside iframe.
+			element.classList.add( 'pp-guided-tour-highlight' );
+
+			// Inject highlight styles into iframe if not already there.
+			if ( ! doc.getElementById( 'pp-guided-tour-iframe-styles' ) ) {
+				const style = doc.createElement( 'style' );
+				style.id = 'pp-guided-tour-iframe-styles';
+				style.textContent = `
+					.pp-guided-tour-highlight {
+						outline: 3px solid #667eea !important;
+						outline-offset: 4px !important;
+						border-radius: 4px !important;
+						animation: pp-highlight-pulse 1.5s ease-in-out infinite !important;
+					}
+					@keyframes pp-highlight-pulse {
+						0%, 100% { outline-color: #667eea; }
+						50% { outline-color: #764ba2; }
+					}
+				`;
+				doc.head.appendChild( style );
+			}
+
+			// Scroll element into view.
+			element.scrollIntoView( { behavior: 'smooth', block: 'center' } );
+
+			// Create custom popover positioned relative to iframe.
+			this.showCustomEditorPopover( element, iframe, step, stepIndex );
+		},
+
+		/**
+		 * Show custom popover for iframe editor.
+		 *
+		 * @param {HTMLElement} element Target element inside iframe.
+		 * @param {HTMLElement} iframe The iframe element.
+		 * @param {Object} step Step configuration.
+		 * @param {number} stepIndex Current step index.
+		 */
+		showCustomEditorPopover( element, iframe, step, stepIndex ) {
+			// Remove any existing custom popover.
+			const existingPopover = document.getElementById( 'pp-guided-tour-custom-popover' );
+			if ( existingPopover ) {
+				existingPopover.remove();
+			}
+
+			// Build description with optional hint.
+			let hintHtml = '';
+			if ( step.hint ) {
+				hintHtml = `<div class="pp-guided-tour-hint">${step.hint}</div>`;
+			}
+
+			// Check if there are more steps.
+			const hasMoreSteps = config.activeTour.steps.length > stepIndex + 1;
+
+			// Create popover element.
+			const popover = document.createElement( 'div' );
+			popover.id = 'pp-guided-tour-custom-popover';
+			popover.className = 'pp-guided-tour-custom-popover';
+			popover.innerHTML = `
+				<div class="pp-guided-tour-custom-popover-content">
+					<button type="button" class="pp-guided-tour-custom-popover-close" aria-label="Close">&times;</button>
+					<h4 class="pp-guided-tour-custom-popover-title">${step.title}</h4>
+					<p class="pp-guided-tour-custom-popover-description">${step.description}</p>
+					${hintHtml}
+					<div class="pp-guided-tour-custom-popover-footer">
+						<button type="button" class="pp-guided-tour-custom-popover-skip">${config.i18n.skipStep}</button>
+						<button type="button" class="pp-guided-tour-custom-popover-next">${hasMoreSteps ? config.i18n.next : config.i18n.done}</button>
+					</div>
+				</div>
+			`;
+
+			document.body.appendChild( popover );
+
+			// Position the popover.
+			this.positionCustomPopover( popover, element, iframe );
+
+			// Bind events.
+			popover.querySelector( '.pp-guided-tour-custom-popover-close' ).addEventListener( 'click', () => {
+				this.cleanupIframeHighlight( element );
+				popover.remove();
+				this.skipTour();
+			} );
+
+			popover.querySelector( '.pp-guided-tour-custom-popover-skip' ).addEventListener( 'click', () => {
+				this.cleanupIframeHighlight( element );
+				popover.remove();
+				this.handleEditorStepComplete( stepIndex );
+			} );
+
+			popover.querySelector( '.pp-guided-tour-custom-popover-next' ).addEventListener( 'click', () => {
+				this.cleanupIframeHighlight( element );
+				popover.remove();
+				this.handleEditorStepComplete( stepIndex );
+			} );
+
+			// Reposition on scroll/resize.
+			const repositionHandler = () => this.positionCustomPopover( popover, element, iframe );
+			window.addEventListener( 'resize', repositionHandler );
+			iframe.contentWindow?.addEventListener( 'scroll', repositionHandler );
+
+			// Store cleanup function.
+			this.customPopoverCleanup = () => {
+				window.removeEventListener( 'resize', repositionHandler );
+				iframe.contentWindow?.removeEventListener( 'scroll', repositionHandler );
+			};
+		},
+
+		/**
+		 * Position custom popover relative to iframe element.
+		 *
+		 * @param {HTMLElement} popover The popover element.
+		 * @param {HTMLElement} element Target element inside iframe.
+		 * @param {HTMLElement} iframe The iframe element.
+		 */
+		positionCustomPopover( popover, element, iframe ) {
+			const iframeRect = iframe.getBoundingClientRect();
+			const elementRect = element.getBoundingClientRect();
+
+			// Calculate position relative to viewport.
+			const top = iframeRect.top + elementRect.top;
+			const left = iframeRect.left + elementRect.left;
+			const width = elementRect.width;
+			const height = elementRect.height;
+
+			// Position popover to the right of the element.
+			popover.style.position = 'fixed';
+			popover.style.top = `${top}px`;
+			popover.style.left = `${left + width + 20}px`;
+			popover.style.zIndex = '100001';
+
+			// If popover goes off screen to the right, position it to the left.
+			const popoverRect = popover.getBoundingClientRect();
+			if ( popoverRect.right > window.innerWidth ) {
+				popover.style.left = `${left - popoverRect.width - 20}px`;
+			}
+
+			// If popover goes off screen at bottom, adjust top.
+			if ( popoverRect.bottom > window.innerHeight ) {
+				popover.style.top = `${window.innerHeight - popoverRect.height - 20}px`;
+			}
+		},
+
+		/**
+		 * Clean up iframe highlight.
+		 *
+		 * @param {HTMLElement} element The highlighted element.
+		 */
+		cleanupIframeHighlight( element ) {
+			if ( element ) {
+				element.classList.remove( 'pp-guided-tour-highlight' );
+			}
+			if ( this.customPopoverCleanup ) {
+				this.customPopoverCleanup();
+				this.customPopoverCleanup = null;
+			}
+		},
+
+		/**
+		 * Show popover for editor step (non-iframe).
+		 *
+		 * @param {HTMLElement} element Target element.
+		 * @param {Object} step Step configuration.
+		 * @param {number} stepIndex Current step index.
+		 */
+		showEditorPopover( element, step, stepIndex ) {
+			const driver = this.getDriver();
+			if ( ! driver ) {
+				console.error( 'PP Guided Tour: driver.js not available' );
+				this.showEditorFallbackPopover( step );
+				return;
+			}
+
+			// Build description with optional hint.
+			let description = step.description;
+			if ( step.hint ) {
+				description += `<p class="pp-guided-tour-hint">${step.hint}</p>`;
+			}
+
+			// Check if there are more steps after this one
+			const hasMoreSteps = config.activeTour.steps.length > stepIndex + 1;
+
+			this.driverInstance = driver( {
+				showProgress: false,
+				showButtons: [ 'next', 'close' ],
+				steps: [
+					{
+						element: element,
+						popover: {
+							title: step.title,
+							description: description,
+							side: step.side || 'right',
+							align: step.align || 'start',
+						},
+					},
+				],
+				nextBtnText: config.i18n.next,
+				doneBtnText: hasMoreSteps ? config.i18n.next : config.i18n.done,
+				popoverClass: 'pp-guided-tour-popover pp-guided-tour-editor-popover',
+				stagePadding: 10,
+				stageRadius: 8,
+				allowClose: true,
+				// Allow clicking on highlighted element to edit
+				disableActiveInteraction: false,
+				// Don't close on overlay click - let user edit
+				overlayClickBehavior: 'none',
+
+				onNextClick: () => {
+					this.handleEditorStepComplete( stepIndex );
+				},
+
+				onCloseClick: () => {
+					this.skipTour();
+				},
+
+				onPopoverRender: ( popover ) => {
+					this.addEditorPopoverButtons( popover.wrapper, stepIndex );
+				},
+			} );
+
+			this.driverInstance.drive();
+		},
+
+		/**
+		 * Add custom buttons to editor popover.
+		 *
+		 * @param {HTMLElement} wrapper Popover wrapper.
+		 * @param {number} stepIndex Current step index.
+		 */
+		addEditorPopoverButtons( wrapper, stepIndex ) {
+			const footer = wrapper.querySelector( '.driver-popover-footer' );
+			if ( ! footer ) {
+				return;
+			}
+
+			// Add skip button.
+			const skipBtn = document.createElement( 'button' );
+			skipBtn.className = 'pp-guided-tour-skip';
+			skipBtn.textContent = config.i18n.skipStep;
+			skipBtn.type = 'button';
+
+			skipBtn.addEventListener( 'click', ( e ) => {
+				e.preventDefault();
+				e.stopPropagation();
+				this.handleEditorStepComplete( stepIndex );
+			} );
+
+			footer.insertBefore( skipBtn, footer.firstChild );
+		},
+
+		/**
+		 * Handle editor step completion.
+		 *
+		 * @param {number} stepIndex Completed step index.
+		 */
+		async handleEditorStepComplete( stepIndex ) {
+			if ( this.driverInstance ) {
+				this.driverInstance.destroy();
+			}
+
+			const nextIndex = stepIndex + 1;
+			const tour = config.activeTour;
+
+			// Check if tour is complete.
+			if ( ! tour.steps[ nextIndex ] ) {
+				this.completeTour();
+				return;
+			}
+
+			// Update progress.
+			await this.updateProgress( nextIndex );
+
+			// Check if next step is also in editor.
+			const nextStep = tour.steps[ nextIndex ];
+			if ( nextStep.context === 'editor' && nextStep.page === 'front_page' ) {
+				// Show next step.
+				config.state.step = nextIndex;
+				setTimeout( () => this.resumeEditorTour(), 100 );
+			} else {
+				// Need to navigate elsewhere - show continue prompt or auto-navigate.
+				this.showContinuePrompt( nextStep );
+			}
+		},
+
+		/**
+		 * Show fallback popover when element not found.
+		 *
+		 * @param {Object} step Step configuration.
+		 */
+		showEditorFallbackPopover( step ) {
+			// Use fallback description if available, otherwise use regular description.
+			const description = step.fallback_description || step.description;
+
+			const currentStepIndex = config.state.step || 0;
+			const hasMoreSteps = config.activeTour.steps.length > currentStepIndex + 1;
+			const nextButtonText = hasMoreSteps ? config.i18n.next : config.i18n.done;
+
+			// Create a floating popover without highlighting.
+			const popover = document.createElement( 'div' );
+			popover.className = 'pp-guided-tour-fallback-popover';
+			popover.innerHTML = `
+				<div class="pp-guided-tour-fallback-content">
+					<h4>${ step.title }</h4>
+					<p>${ description }</p>
+					${ step.hint ? `<p class="pp-guided-tour-hint">${ step.hint }</p>` : '' }
+					<div class="pp-guided-tour-fallback-actions">
+						<button type="button" class="pp-guided-tour-fallback-next">${ nextButtonText }</button>
+						<button type="button" class="pp-guided-tour-fallback-skip">${ config.i18n.skipStep }</button>
+					</div>
+				</div>
+			`;
+
+			document.body.appendChild( popover );
+
+			popover.querySelector( '.pp-guided-tour-fallback-next' ).addEventListener( 'click', () => {
+				popover.remove();
+				this.handleEditorStepComplete( currentStepIndex );
+			} );
+
+			popover.querySelector( '.pp-guided-tour-fallback-skip' ).addEventListener( 'click', () => {
+				popover.remove();
+				this.handleEditorStepComplete( currentStepIndex );
+			} );
+		},
+
+		/**
+		 * Bind event listeners (admin context).
+		 */
+		bindEvents() {
+			// Tour starter buttons.
+			document.querySelectorAll( '[data-start-tour]' ).forEach( btn => {
+				btn.addEventListener( 'click', ( e ) => {
+					e.preventDefault();
+					const tourId = btn.dataset.startTour;
+					this.startTour( tourId );
+				} );
+			} );
+
+			// Continue prompt buttons.
+			const continueBtn = document.querySelector( '.pp-guided-tour-continue-btn' );
+			const dismissBtn = document.querySelector( '.pp-guided-tour-continue-dismiss' );
+
+			if ( continueBtn ) {
+				continueBtn.addEventListener( 'click', () => this.navigateToNextStep() );
+			}
+			if ( dismissBtn ) {
+				dismissBtn.addEventListener( 'click', () => this.skipTour() );
+			}
+
+			// Handle page visibility changes (tab switching).
+			document.addEventListener( 'visibilitychange', () => {
+				if ( ! document.hidden && config.state?.active ) {
+					this.resumeTour();
+				}
+			} );
+		},
+
+		/**
+		 * Start a new tour.
+		 *
+		 * @param {string} tourId Tour identifier.
+		 */
+		async startTour( tourId ) {
+			try {
+				const response = await this.apiCall( 'start', { tour_id: tourId } );
+
+				if ( response.success ) {
+					config.state = response.data.state;
+					config.activeTour = response.data.tour;
+
+					// Navigate to first step's page if different.
+					const firstStep = response.data.tour.steps[0];
+					if ( firstStep ) {
+						this.navigateToStep( firstStep );
+					}
+				}
+			} catch ( error ) {
+				console.error( 'Failed to start tour:', error );
+			}
+		},
+
+		/**
+		 * Navigate to a step's location.
+		 *
+		 * @param {Object} step Step configuration.
+		 */
+		navigateToStep( step ) {
+			const stepContext = step.context || 'admin';
+
+			switch ( stepContext ) {
+				case 'frontend':
+					if ( step.page === 'front_page' ) {
+						window.location.href = config.adminUrl.replace( '/wp-admin/', '/' );
+					}
+					break;
+
+				case 'editor':
+					if ( step.page === 'front_page' && config.frontPageEditUrl ) {
+						window.location.href = config.frontPageEditUrl;
+					}
+					break;
+
+				case 'admin':
+				default:
+					window.location.href = config.adminUrl + step.page;
+					break;
+			}
+		},
+
+		/**
+		 * Resume an active tour (admin context).
+		 */
+		resumeTour() {
+			if ( ! config.activeTour || ! config.state?.active ) {
+				return;
+			}
+
+			const currentStep = config.state.step || 0;
+			const step = config.activeTour.steps[ currentStep ];
+
+			if ( ! step ) {
+				this.completeTour();
+				return;
+			}
+
+			// Check context matches.
+			const stepContext = step.context || 'admin';
+			if ( stepContext !== 'admin' ) {
+				// Show continue prompt to navigate to correct context.
+				this.showContinuePrompt( step );
+				return;
+			}
+
+			// Check if we're on the correct page for this step.
+			if ( this.isOnPage( step.page ) ) {
+				// Small delay to ensure DOM is ready.
+				setTimeout( () => this.runStep( currentStep ), 100 );
+			} else {
+				// Show continue prompt.
+				this.showContinuePrompt( step );
+			}
+		},
+
+		/**
+		 * Run a specific tour step (admin context).
+		 *
+		 * @param {number} stepIndex Step index.
+		 */
+		runStep( stepIndex ) {
+			const driver = this.getDriver();
+			if ( ! driver ) {
+				console.error( 'PP Guided Tour: driver.js not available for admin step' );
+				return;
+			}
+			const tour = config.activeTour;
+			const step = tour.steps[ stepIndex ];
+
+			if ( ! step ) {
+				this.completeTour();
+				return;
+			}
+
+			// Check if element exists.
+			const element = document.querySelector( step.element );
+			if ( ! element ) {
+				console.warn( `Element not found: ${step.element}. Skipping to next step.` );
+				// Element doesn't exist, try next step on same page or show continue prompt.
+				const nextStep = tour.steps[ stepIndex + 1 ];
+				if ( nextStep && this.isOnPage( nextStep.page ) ) {
+					this.updateProgress( stepIndex + 1 );
+					this.runStep( stepIndex + 1 );
+				} else if ( nextStep ) {
+					config.state.step = stepIndex + 1;
+					this.showContinuePrompt( nextStep );
+				} else {
+					this.completeTour();
+				}
+				return;
+			}
+
+			// Configure driver.js.
+			this.driverInstance = driver( {
+				showProgress: true,
+				showButtons: [ 'next', 'close' ],
+				steps: this.buildDriverSteps( tour.steps, stepIndex ),
+				progressText: `{{current}} / {{total}}`,
+				nextBtnText: config.i18n.next,
+				doneBtnText: config.i18n.done,
+				popoverClass: 'pp-guided-tour-popover',
+				stagePadding: 10,
+				stageRadius: 8,
+
+				onNextClick: ( element, step, opts ) => {
+					const nextIndex = stepIndex + opts.state.activeIndex + 1;
+					this.handleStepTransition( nextIndex );
+				},
+
+				onCloseClick: () => {
+					this.skipTour();
+				},
+
+				onDestroyStarted: () => {
+					// Called when tour is being destroyed.
+				},
+
+				onDestroyed: () => {
+					// Cleanup.
+				},
+
+				onPopoverRender: ( popover, opts ) => {
+					// Add skip button to popover.
+					this.addSkipButton( popover.wrapper );
+				},
+			} );
+
+			// Start the tour.
+			this.driverInstance.drive();
+		},
+
+		/**
+		 * Build driver.js steps array for current page.
+		 *
+		 * @param {Array} allSteps All tour steps.
+		 * @param {number} startIndex Starting index.
+		 * @return {Array} Steps for driver.js.
+		 */
+		buildDriverSteps( allSteps, startIndex ) {
+			const driverSteps = [];
+			const currentPageSteps = [];
+
+			// Collect consecutive steps on the same page.
+			for ( let i = startIndex; i < allSteps.length; i++ ) {
+				const step = allSteps[ i ];
+				const stepContext = step.context || 'admin';
+
+				if ( stepContext === 'admin' && this.isOnPage( step.page ) && document.querySelector( step.element ) ) {
+					currentPageSteps.push( {
+						index: i,
+						step: step,
+					} );
+				} else {
+					break;
+				}
+			}
+
+			// Convert to driver.js format.
+			currentPageSteps.forEach( ( { step }, idx ) => {
+				driverSteps.push( {
+					element: step.element,
+					popover: {
+						title: step.title,
+						description: step.description,
+						side: step.side || 'bottom',
+						align: step.align || 'center',
+					},
+				} );
+			} );
+
+			return driverSteps;
+		},
+
+		/**
+		 * Handle transition between steps.
+		 *
+		 * @param {number} nextIndex Next step index.
+		 */
+		async handleStepTransition( nextIndex ) {
+			if ( this.isNavigating ) {
+				return;
+			}
+
+			const tour = config.activeTour;
+			const nextStep = tour.steps[ nextIndex ];
+
+			// Tour completed.
+			if ( ! nextStep ) {
+				if ( this.driverInstance ) {
+					this.driverInstance.destroy();
+				}
+				this.completeTour();
+				return;
+			}
+
+			// Update server state.
+			await this.updateProgress( nextIndex );
+
+			const nextContext = nextStep.context || 'admin';
+
+			// Check if next step is on current page and same context.
+			if ( nextContext === 'admin' && this.isOnPage( nextStep.page ) ) {
+				// Just move driver to next step (it handles this internally).
+				if ( this.driverInstance ) {
+					this.driverInstance.moveNext();
+				}
+			} else {
+				// Need to navigate to different page/context.
+				if ( this.driverInstance ) {
+					this.driverInstance.destroy();
+				}
+				this.navigateToStep( nextStep );
+			}
+		},
+
+		/**
+		 * Update tour progress on server.
+		 *
+		 * @param {number} step Step index.
+		 * @return {Promise} API response.
+		 */
+		async updateProgress( step ) {
+			config.state.step = step;
+
+			try {
+				const response = await this.apiCall( 'update', { step } );
+				return response;
+			} catch ( error ) {
+				console.error( 'Failed to update progress:', error );
+			}
+		},
+
+		/**
+		 * Skip/dismiss the current tour.
+		 */
+		async skipTour() {
+			if ( this.driverInstance ) {
+				this.driverInstance.destroy();
+			}
+
+			this.hideContinuePrompt();
+			this.hideWelcomeCard();
+
+			try {
+				await this.apiCall( 'skip' );
+				config.state.active = false;
+			} catch ( error ) {
+				console.error( 'Failed to skip tour:', error );
+			}
+		},
+
+		/**
+		 * Complete the current tour.
+		 */
+		async completeTour() {
+			if ( this.driverInstance ) {
+				this.driverInstance.destroy();
+			}
+
+			this.hideContinuePrompt();
+
+			try {
+				await this.apiCall( 'complete' );
+				config.state.active = false;
+
+				// Show completion message.
+				this.showCompletionMessage();
+			} catch ( error ) {
+				console.error( 'Failed to complete tour:', error );
+			}
+		},
+
+		/**
+		 * Show continue prompt when next step is on different page.
+		 *
+		 * @param {Object} nextStep Next step configuration.
+		 */
+		showContinuePrompt( nextStep ) {
+			const prompt = document.getElementById( 'pp-guided-tour-continue-prompt' );
+			if ( ! prompt ) {
+				return;
+			}
+
+			const title = prompt.querySelector( '.pp-guided-tour-continue-title' );
+			const message = prompt.querySelector( '.pp-guided-tour-continue-message' );
+
+			if ( title ) {
+				title.textContent = config.i18n.continueTitle;
+			}
+			if ( message ) {
+				message.textContent = config.i18n.continueMessage;
+			}
+
+			prompt.style.display = 'block';
+
+			// Determine next page URL based on context.
+			const nextContext = nextStep.context || 'admin';
+			let nextPageUrl = '';
+
+			switch ( nextContext ) {
+				case 'frontend':
+					if ( nextStep.page === 'front_page' ) {
+						nextPageUrl = config.adminUrl.replace( '/wp-admin/', '/' );
+					}
+					break;
+
+				case 'editor':
+					if ( nextStep.page === 'front_page' ) {
+						nextPageUrl = config.frontPageEditUrl;
+					}
+					break;
+
+				case 'admin':
+				default:
+					nextPageUrl = config.adminUrl + nextStep.page;
+					break;
+			}
+
+			prompt.dataset.nextPage = nextPageUrl;
+		},
+
+		/**
+		 * Hide continue prompt.
+		 */
+		hideContinuePrompt() {
+			const prompt = document.getElementById( 'pp-guided-tour-continue-prompt' );
+			if ( prompt ) {
+				prompt.style.display = 'none';
+			}
+		},
+
+		/**
+		 * Hide welcome card (frontend).
+		 */
+		hideWelcomeCard() {
+			const card = document.getElementById( 'pp-guided-tour-welcome' );
+			if ( card ) {
+				card.style.display = 'none';
+			}
+		},
+
+		/**
+		 * Navigate to the next step's page.
+		 */
+		navigateToNextStep() {
+			const prompt = document.getElementById( 'pp-guided-tour-continue-prompt' );
+			if ( prompt && prompt.dataset.nextPage ) {
+				window.location.href = prompt.dataset.nextPage;
+			}
+		},
+
+		/**
+		 * Navigate to a specific page (admin context).
+		 *
+		 * @param {string} page Page path.
+		 */
+		navigateToPage( page ) {
+			this.isNavigating = true;
+			window.location.href = config.adminUrl + page;
+		},
+
+		/**
+		 * Check if current page matches a step's page.
+		 *
+		 * @param {string} stepPage Step page path.
+		 * @return {boolean} True if on the same page.
+		 */
+		isOnPage( stepPage ) {
+			const current = config.currentPage;
+
+			// Parse both URLs for comparison.
+			const currentParams = this.parsePageUrl( current );
+			const stepParams = this.parsePageUrl( stepPage );
+
+			// Must match base page.
+			if ( currentParams.base !== stepParams.base ) {
+				return false;
+			}
+
+			// Check required query params from step.
+			for ( const [ key, value ] of Object.entries( stepParams.params ) ) {
+				if ( currentParams.params[ key ] !== value ) {
+					return false;
+				}
+			}
+
+			return true;
+		},
+
+		/**
+		 * Parse a page URL into base and params.
+		 *
+		 * @param {string} url URL string.
+		 * @return {Object} Parsed URL.
+		 */
+		parsePageUrl( url ) {
+			const [ base, queryString ] = url.split( '?' );
+			const params = {};
+
+			if ( queryString ) {
+				queryString.split( '&' ).forEach( pair => {
+					const [ key, value ] = pair.split( '=' );
+					params[ key ] = value;
+				} );
+			}
+
+			return { base, params };
+		},
+
+		/**
+		 * Add skip button to popover.
+		 *
+		 * @param {HTMLElement} wrapper Popover wrapper element.
+		 */
+		addSkipButton( wrapper ) {
+			// Check if already added.
+			if ( wrapper.querySelector( '.pp-guided-tour-skip' ) ) {
+				return;
+			}
+
+			const skipBtn = document.createElement( 'button' );
+			skipBtn.className = 'pp-guided-tour-skip';
+			skipBtn.textContent = config.i18n.skip;
+			skipBtn.type = 'button';
+
+			skipBtn.addEventListener( 'click', ( e ) => {
+				e.preventDefault();
+				e.stopPropagation();
+				this.skipTour();
+			} );
+
+			const footer = wrapper.querySelector( '.driver-popover-footer' );
+			if ( footer ) {
+				footer.insertBefore( skipBtn, footer.firstChild );
+			}
+		},
+
+		/**
+		 * Show tour completion message.
+		 */
+		showCompletionMessage() {
+			// Create a simple notification.
+			const notification = document.createElement( 'div' );
+			notification.className = 'pp-guided-tour-complete-notice notice notice-success is-dismissible';
+			notification.innerHTML = `
+				<p><strong>${config.activeTour?.title || 'Tour'} completed!</strong></p>
+				<button type="button" class="notice-dismiss">
+					<span class="screen-reader-text">Dismiss this notice.</span>
+				</button>
+			`;
+
+			// Insert after the first h1 or at start of content.
+			const target = document.querySelector( '.wrap h1' ) || document.querySelector( '#wpbody-content' );
+			if ( target ) {
+				target.parentNode.insertBefore( notification, target.nextSibling );
+
+				// Handle dismiss.
+				notification.querySelector( '.notice-dismiss' ).addEventListener( 'click', () => {
+					notification.remove();
+				} );
+
+				// Auto-dismiss after 5 seconds.
+				setTimeout( () => notification.remove(), 5000 );
+			}
+		},
+
+		/**
+		 * Make API call to tour endpoints.
+		 *
+		 * @param {string} action Action name.
+		 * @param {Object} data Additional data.
+		 * @return {Promise} Response promise.
+		 */
+		async apiCall( action, data = {} ) {
+			const formData = new FormData();
+			formData.append( 'action', `pp_guided_tour_${action}` );
+			formData.append( 'nonce', config.nonce );
+
+			Object.entries( data ).forEach( ( [ key, value ] ) => {
+				formData.append( key, value );
+			} );
+
+			const response = await fetch( config.ajaxUrl, {
+				method: 'POST',
+				credentials: 'same-origin',
+				body: formData,
+			} );
+
+			return response.json();
+		},
+	};
+
+	// Initialize when DOM is ready.
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', () => TourManager.init() );
+	} else {
+		TourManager.init();
+	}
+
+	// Expose for external use.
+	window.ppGuidedTourManager = TourManager;
+
+} )();

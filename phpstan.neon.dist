@@ -4,6 +4,7 @@ parameters:
   paths:
     - ./classes
     - ./views
+    - ./guided-tour
     - ./progress-planner.php
     - ./uninstall.php
   ignoreErrors:

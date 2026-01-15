@@ -1,0 +1,734 @@
+/**
+ * Progress Planner - Guided Tour Styles
+ *
+ * Styles for the hosting partner guided tour system.
+ */
+
+/* ==========================================================================
+   Driver.js Customizations
+   ========================================================================== */
+
+.pp-guided-tour-popover {
+	--driver-popover-bg: #fff;
+	--driver-popover-title-color: #1e1e1e;
+	--driver-popover-description-color: #50575e;
+	--driver-popover-border-radius: 8px;
+}
+
+/* Popover styling */
+.driver-popover.pp-guided-tour-popover {
+	box-shadow: 0 4px 24px rgba( 0, 0, 0, 0.15 );
+	border: 1px solid #e0e0e0;
+	max-width: 380px;
+	z-index: 100001 !important;
+}
+
+/* Ensure arrow is visible above admin bar */
+.driver-popover.pp-guided-tour-popover .driver-popover-arrow {
+	z-index: 100002 !important;
+	border: 8px solid transparent;
+}
+
+.driver-popover.pp-guided-tour-popover .driver-popover-title {
+	font-size: 16px;
+	font-weight: 600;
+	margin-bottom: 8px;
+	line-height: 1.4;
+	color: var( --driver-popover-title-color );
+}
+
+.driver-popover.pp-guided-tour-popover .driver-popover-description {
+	font-size: 14px;
+	line-height: 1.6;
+	color: var( --driver-popover-description-color );
+}
+
+/* Progress indicator */
+.driver-popover.pp-guided-tour-popover .driver-popover-progress-text {
+	font-size: 12px;
+	color: #757575;
+	margin-top: 12px;
+}
+
+/* Buttons */
+.driver-popover.pp-guided-tour-popover .driver-popover-footer {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-top: 16px;
+	padding-top: 12px;
+	border-top: 1px solid #f0f0f0;
+}
+
+.driver-popover.pp-guided-tour-popover .driver-popover-navigation-btns {
+	display: flex;
+	gap: 8px;
+	margin-left: auto;
+}
+
+.driver-popover.pp-guided-tour-popover .driver-popover-prev-btn,
+.driver-popover.pp-guided-tour-popover .driver-popover-next-btn {
+	padding: 8px 16px;
+	font-size: 13px;
+	font-weight: 500;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	text-shadow: none;
+	box-shadow: none;
+}
+
+.driver-popover.pp-guided-tour-popover .driver-popover-prev-btn {
+	background: #f6f7f7;
+	border: 1px solid #dcdcde;
+	color: #50575e;
+}
+
+.driver-popover.pp-guided-tour-popover .driver-popover-prev-btn:hover {
+	background: #f0f0f1;
+	border-color: #c3c4c7;
+}
+
+.driver-popover.pp-guided-tour-popover .driver-popover-next-btn {
+	background: #2271b1;
+	border: 1px solid #2271b1;
+	color: #fff;
+}
+
+.driver-popover.pp-guided-tour-popover .driver-popover-next-btn:hover {
+	background: #135e96;
+	border-color: #135e96;
+}
+
+/* Close button */
+.driver-popover.pp-guided-tour-popover .driver-popover-close-btn {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	width: 24px;
+	height: 24px;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent;
+	border: none;
+	border-radius: 4px;
+	color: #757575;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.driver-popover.pp-guided-tour-popover .driver-popover-close-btn:hover {
+	background: #f0f0f1;
+	color: #1e1e1e;
+}
+
+/* Skip button */
+.pp-guided-tour-skip {
+	padding: 6px 12px;
+	font-size: 12px;
+	font-weight: 500;
+	color: #757575;
+	background: transparent;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.pp-guided-tour-skip:hover {
+	color: #1e1e1e;
+	background: #f0f0f1;
+}
+
+/* Arrow styling */
+.driver-popover.pp-guided-tour-popover .driver-popover-arrow-side-left {
+	border-right-color: #fff;
+}
+
+.driver-popover.pp-guided-tour-popover .driver-popover-arrow-side-right {
+	border-left-color: #fff;
+}
+
+.driver-popover.pp-guided-tour-popover .driver-popover-arrow-side-top {
+	border-bottom-color: #fff;
+}
+
+.driver-popover.pp-guided-tour-popover .driver-popover-arrow-side-bottom {
+	border-top-color: #fff;
+}
+
+/* Stage highlight */
+.driver-active-element {
+	z-index: 100000 !important;
+}
+
+/* Ensure driver.js overlay is above WP admin bar (z-index: 9990) */
+.driver-overlay {
+	z-index: 99999 !important;
+}
+
+/* Force WP admin bar to be below driver.js when tour is active */
+body.pp-guided-tour-active #wpadminbar {
+	z-index: 99998 !important;
+}
+
+/* ==========================================================================
+   Frontend Welcome Card (Step 0 - Homepage)
+   ========================================================================== */
+
+.pp-guided-tour-welcome {
+	position: fixed;
+	bottom: 32px;
+	right: 32px;
+	z-index: 99999;
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+	animation: pp-slide-in 0.4s ease-out;
+}
+
+.pp-guided-tour-welcome-content {
+	position: relative;
+	background: #fff;
+	border-radius: 12px;
+	box-shadow: 0 8px 32px rgba( 0, 0, 0, 0.15 ), 0 2px 8px rgba( 0, 0, 0, 0.1 );
+	padding: 24px;
+	max-width: 380px;
+	display: flex;
+	flex-direction: column;
+	gap: 16px;
+}
+
+.pp-guided-tour-welcome-close {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	width: 28px;
+	height: 28px;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent;
+	border: none;
+	border-radius: 4px;
+	color: #757575;
+	font-size: 20px;
+	line-height: 1;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.pp-guided-tour-welcome-close:hover {
+	background: #f0f0f1;
+	color: #1e1e1e;
+}
+
+.pp-guided-tour-welcome-badge {
+	display: flex;
+	justify-content: center;
+}
+
+.pp-guided-tour-badge-placeholder {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	color: #667eea;
+}
+
+.pp-guided-tour-badge-progress {
+	font-size: 12px;
+	font-weight: 600;
+	color: #667eea;
+}
+
+.pp-guided-tour-welcome-text {
+	text-align: center;
+}
+
+.pp-guided-tour-welcome-title {
+	font-size: 18px;
+	font-weight: 600;
+	color: #1e1e1e;
+	margin: 0 0 8px 0;
+	line-height: 1.4;
+}
+
+.pp-guided-tour-welcome-description {
+	font-size: 14px;
+	line-height: 1.6;
+	color: #50575e;
+	margin: 0;
+}
+
+.pp-guided-tour-welcome-hint {
+	display: inline-block;
+	font-size: 13px;
+	line-height: 1.5;
+	font-weight: 500;
+	color: #fff;
+	margin: 12px 0 0 0;
+	padding: 10px 20px;
+	background: #2271b1;
+	border: 1px solid #2271b1;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	text-decoration: none;
+}
+
+.pp-guided-tour-welcome-hint:hover {
+	background: #135e96;
+	border-color: #135e96;
+	color: #fff;
+}
+
+.pp-guided-tour-welcome-actions {
+	display: flex;
+	justify-content: center;
+	margin-top: 8px;
+}
+
+.pp-guided-tour-welcome-skip {
+	padding: 8px 16px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #757575;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	transition: color 0.2s ease;
+}
+
+.pp-guided-tour-welcome-skip:hover {
+	color: #1e1e1e;
+}
+
+/* ==========================================================================
+   Editor Popover Styles
+   ========================================================================== */
+
+.pp-guided-tour-editor-popover .pp-guided-tour-hint {
+	font-size: 12px;
+	line-height: 1.5;
+	color: #757575;
+	margin: 12px 0 0 0;
+	padding: 10px 12px;
+	background: #f6f7f7;
+	border-radius: 4px;
+	border-left: 3px solid #667eea;
+}
+
+/* Fallback popover for when elements aren't found */
+.pp-guided-tour-fallback-popover {
+	position: fixed;
+	bottom: 32px;
+	right: 32px;
+	z-index: 100000;
+	animation: pp-slide-in 0.3s ease-out;
+}
+
+.pp-guided-tour-fallback-content {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 4px 24px rgba( 0, 0, 0, 0.15 );
+	border: 1px solid #e0e0e0;
+	padding: 20px;
+	max-width: 360px;
+}
+
+.pp-guided-tour-fallback-content h4 {
+	font-size: 16px;
+	font-weight: 600;
+	color: #1e1e1e;
+	margin: 0 0 8px 0;
+}
+
+.pp-guided-tour-fallback-content p {
+	font-size: 14px;
+	line-height: 1.6;
+	color: #50575e;
+	margin: 0 0 12px 0;
+}
+
+.pp-guided-tour-fallback-content .pp-guided-tour-hint {
+	font-size: 12px;
+	color: #757575;
+	padding: 10px 12px;
+	background: #f6f7f7;
+	border-radius: 4px;
+	border-left: 3px solid #667eea;
+	margin-bottom: 16px;
+}
+
+.pp-guided-tour-fallback-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.pp-guided-tour-fallback-next {
+	flex: 1;
+	padding: 10px 16px;
+	font-size: 14px;
+	font-weight: 500;
+	color: #fff;
+	background: #2271b1;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background 0.2s ease;
+}
+
+.pp-guided-tour-fallback-next:hover {
+	background: #135e96;
+}
+
+.pp-guided-tour-fallback-skip {
+	padding: 10px 16px;
+	font-size: 14px;
+	font-weight: 500;
+	color: #757575;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+}
+
+.pp-guided-tour-fallback-skip:hover {
+	color: #1e1e1e;
+}
+
+/* ==========================================================================
+   Custom Editor Popover (for iframe editors)
+   ========================================================================== */
+
+.pp-guided-tour-custom-popover {
+	position: fixed;
+	z-index: 100001;
+	animation: pp-slide-in 0.3s ease-out;
+}
+
+.pp-guided-tour-custom-popover-content {
+	position: relative;
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 4px 24px rgba( 0, 0, 0, 0.15 );
+	border: 1px solid #e0e0e0;
+	padding: 20px;
+	max-width: 340px;
+	min-width: 280px;
+}
+
+.pp-guided-tour-custom-popover-close {
+	position: absolute;
+	top: 8px;
+	right: 8px;
+	width: 28px;
+	height: 28px;
+	padding: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: transparent;
+	border: none;
+	border-radius: 4px;
+	color: #757575;
+	font-size: 20px;
+	line-height: 1;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.pp-guided-tour-custom-popover-close:hover {
+	background: #f0f0f1;
+	color: #1e1e1e;
+}
+
+.pp-guided-tour-custom-popover-title {
+	font-size: 16px;
+	font-weight: 600;
+	color: #1e1e1e;
+	margin: 0 0 8px 0;
+	padding-right: 24px;
+}
+
+.pp-guided-tour-custom-popover-description {
+	font-size: 14px;
+	line-height: 1.6;
+	color: #50575e;
+	margin: 0 0 12px 0;
+}
+
+.pp-guided-tour-custom-popover .pp-guided-tour-hint {
+	font-size: 12px;
+	line-height: 1.5;
+	color: #757575;
+	margin: 0 0 16px 0;
+	padding: 10px 12px;
+	background: #f6f7f7;
+	border-radius: 4px;
+	border-left: 3px solid #667eea;
+}
+
+.pp-guided-tour-custom-popover-footer {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding-top: 12px;
+	border-top: 1px solid #f0f0f0;
+}
+
+.pp-guided-tour-custom-popover-skip {
+	padding: 8px 12px;
+	font-size: 13px;
+	font-weight: 500;
+	color: #757575;
+	background: transparent;
+	border: none;
+	cursor: pointer;
+	transition: color 0.2s ease;
+}
+
+.pp-guided-tour-custom-popover-skip:hover {
+	color: #1e1e1e;
+}
+
+.pp-guided-tour-custom-popover-next {
+	padding: 10px 20px;
+	font-size: 14px;
+	font-weight: 500;
+	color: #fff;
+	background: #2271b1;
+	border: none;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: background 0.2s ease;
+}
+
+.pp-guided-tour-custom-popover-next:hover {
+	background: #135e96;
+}
+
+/* ==========================================================================
+   Continue Prompt
+   ========================================================================== */
+
+.pp-guided-tour-continue {
+	position: fixed;
+	bottom: 32px;
+	right: 32px;
+	z-index: 100000;
+	animation: pp-slide-in 0.3s ease-out;
+}
+
+@keyframes pp-slide-in {
+
+	from {
+		opacity: 0;
+		transform: translateY( 20px );
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY( 0 );
+	}
+}
+
+.pp-guided-tour-continue-content {
+	background: #fff;
+	border-radius: 8px;
+	box-shadow: 0 4px 24px rgba( 0, 0, 0, 0.15 );
+	border: 1px solid #e0e0e0;
+	padding: 20px 24px;
+	max-width: 320px;
+}
+
+.pp-guided-tour-continue-title {
+	font-size: 15px;
+	font-weight: 600;
+	color: #1e1e1e;
+	margin: 0 0 8px 0;
+}
+
+.pp-guided-tour-continue-message {
+	font-size: 13px;
+	line-height: 1.5;
+	color: #50575e;
+	margin: 0 0 16px 0;
+}
+
+.pp-guided-tour-continue-actions {
+	display: flex;
+	gap: 8px;
+}
+
+.pp-guided-tour-continue-btn {
+	flex: 1;
+}
+
+.pp-guided-tour-continue-dismiss {
+	flex-shrink: 0;
+}
+
+/* ==========================================================================
+   Tour Launcher Widget
+   ========================================================================== */
+
+.pp-guided-tour-launcher {
+	background: linear-gradient( 135deg, #667eea 0%, #764ba2 100% );
+	border-radius: 8px;
+	padding: 20px;
+	color: #fff;
+	margin-bottom: 20px;
+}
+
+.pp-guided-tour-launcher-title {
+	font-size: 16px;
+	font-weight: 600;
+	margin: 0 0 8px 0;
+}
+
+.pp-guided-tour-launcher-description {
+	font-size: 14px;
+	opacity: 0.9;
+	margin: 0 0 16px 0;
+	line-height: 1.5;
+}
+
+.pp-guided-tour-launcher-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+.pp-guided-tour-launcher-item {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 12px 16px;
+	background: rgba( 255, 255, 255, 0.15 );
+	border-radius: 6px;
+	margin-bottom: 8px;
+	transition: background 0.2s ease;
+}
+
+.pp-guided-tour-launcher-item:last-child {
+	margin-bottom: 0;
+}
+
+.pp-guided-tour-launcher-item:hover {
+	background: rgba( 255, 255, 255, 0.25 );
+}
+
+.pp-guided-tour-launcher-item-info {
+	flex: 1;
+}
+
+.pp-guided-tour-launcher-item-title {
+	font-weight: 500;
+	margin-bottom: 2px;
+}
+
+.pp-guided-tour-launcher-item-meta {
+	font-size: 12px;
+	opacity: 0.8;
+}
+
+.pp-guided-tour-launcher-start-btn {
+	background: #fff;
+	color: #667eea;
+	border: none;
+	padding: 8px 16px;
+	border-radius: 4px;
+	font-size: 13px;
+	font-weight: 500;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+
+.pp-guided-tour-launcher-start-btn:hover {
+	transform: translateY( -1px );
+	box-shadow: 0 2px 8px rgba( 0, 0, 0, 0.15 );
+}
+
+/* ==========================================================================
+   Completion Notice
+   ========================================================================== */
+
+.pp-guided-tour-complete-notice {
+	animation: pp-notice-in 0.3s ease-out;
+}
+
+@keyframes pp-notice-in {
+
+	from {
+		opacity: 0;
+		transform: translateY( -10px );
+	}
+
+	to {
+		opacity: 1;
+		transform: translateY( 0 );
+	}
+}
+
+/* ==========================================================================
+   Responsive Adjustments
+   ========================================================================== */
+
+@media screen and ( max-width: 782px ) {
+
+	.pp-guided-tour-welcome {
+		bottom: 16px;
+		right: 16px;
+		left: 16px;
+	}
+
+	.pp-guided-tour-welcome-content {
+		max-width: none;
+	}
+
+	.pp-guided-tour-continue {
+		bottom: 16px;
+		right: 16px;
+		left: 16px;
+	}
+
+	.pp-guided-tour-continue-content {
+		max-width: none;
+	}
+
+	.driver-popover.pp-guided-tour-popover {
+		max-width: calc( 100vw - 32px );
+	}
+}
+
+/* ==========================================================================
+   Dark Mode Support (if theme supports it)
+   ========================================================================== */
+
+@media ( prefers-color-scheme: dark ) {
+
+	body.admin-color-modern .pp-guided-tour-popover {
+		--driver-popover-bg: #2c3338;
+		--driver-popover-title-color: #f0f0f1;
+		--driver-popover-description-color: #c3c4c7;
+	}
+
+	body.admin-color-modern .driver-popover.pp-guided-tour-popover {
+		border-color: #3c434a;
+	}
+
+	body.admin-color-modern .pp-guided-tour-continue-content {
+		background: #2c3338;
+		border-color: #3c434a;
+	}
+
+	body.admin-color-modern .pp-guided-tour-continue-title {
+		color: #f0f0f1;
+	}
+
+	body.admin-color-modern .pp-guided-tour-continue-message {
+		color: #c3c4c7;
+	}
+}
