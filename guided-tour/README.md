@@ -282,6 +282,41 @@ For tours spanning frontend and editor:
 5. Special elements resolved inside iframe canvas when applicable
 6. Final step highlights Save button, tour completes
 
+## Testing
+
+### Local Development
+
+1. Add this filter to enable the tour:
+   ```php
+   add_filter( 'progress_planner_is_hosting_install', '__return_true' );
+   ```
+
+2. Visit the site's homepage (not wp-admin) while logged in as admin
+
+3. A welcome card appears in the bottom-right corner - click it to start the tour
+
+4. Follow the tour: Edit Page link → heading → paragraph → image → Save button
+
+5. To reset and test again:
+   ```php
+   delete_user_meta( get_current_user_id(), 'pp_guided_tour_state' );
+   ```
+
+### Playground / Admin Bar Testing
+
+On the frontend homepage, an admin bar link provides easy tour control:
+
+| Tour State | Admin Bar Link | Action |
+|------------|----------------|--------|
+| No active tour | **Start Guided Tour** | Starts the `go-to-publish` tour |
+| Tour in progress | **Reset Tour** | Clears tour state, allows restart |
+
+**URLs used:**
+- Start tour: `?pp_start_tour=go-to-publish`
+- Reset tour: `?pp_reset_tour=1`
+
+This allows testing without code changes - simply click the admin bar link to start or reset the tour.
+
 ## Browser Support
 
 - Chrome 80+

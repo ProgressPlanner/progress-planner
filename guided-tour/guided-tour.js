@@ -241,6 +241,7 @@
 			// Use driver.js to highlight the Edit Page link.
 			this.driverInstance = driver( {
 				showProgress: false,
+				showButtons: [ 'next', 'close' ],
 				steps: [
 					{
 						element: '#wp-admin-bar-edit',
