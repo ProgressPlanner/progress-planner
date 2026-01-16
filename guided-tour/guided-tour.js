@@ -71,35 +71,68 @@
 		},
 
 		/**
-		 * Close the Extendify AI assistant via localStorage.
+		 * Close the Extendify AI assistant.
 		 * Used for YourHosting installations to avoid UI overlap with the tour.
 		 */
 		closeExtendifyAssistant() {
 			try {
-				// Check if localStorage is available.
-				if ( typeof localStorage === 'undefined' ) {
-					return;
-				}
-
-				// Find any localStorage key matching the Extendify agent pattern.
-				const keys = Object.keys( localStorage );
-				for ( const key of keys ) {
-					if ( key.startsWith( 'extendify-agent-global-' ) ) {
-						try {
-							const data = JSON.parse( localStorage.getItem( key ) );
-							if ( data && data.state ) {
-								data.state.open = false;
-								data.state.minimized = true;
-								localStorage.setItem( key, JSON.stringify( data ) );
+				// First, try to update localStorage to prevent future opens.
+				if ( typeof localStorage !== 'undefined' ) {
+					const keys = Object.keys( localStorage );
+					for ( const key of keys ) {
+						if ( key.startsWith( 'extendify-agent-global-' ) ) {
+							try {
+								const data = JSON.parse( localStorage.getItem( key ) );
+								if ( data && data.state ) {
+									data.state.open = false;
+									data.state.minimized = true;
+									localStorage.setItem( key, JSON.stringify( data ) );
+								}
+							} catch ( e ) {
+								// Ignore parse errors for individual keys.
 							}
-						} catch ( e ) {
-							// Ignore parse errors for individual keys.
 						}
 					}
 				}
+
+				// Then, click the close button if the popup is already open.
+				this.clickExtendifyCloseButton();
 			} catch ( e ) {
 				// Silently fail - don't break tour if Extendify handling fails.
 				console.warn( 'PP Guided Tour: Could not close Extendify assistant', e );
+			}
+		},
+
+		/**
+		 * Click the Extendify popup close button if it exists.
+		 * Retries multiple times since Extendify may load after our script.
+		 *
+		 * @param {number} attempt Current attempt number.
+		 */
+		clickExtendifyCloseButton( attempt = 0 ) {
+			const maxAttempts = 10;
+			const delay = 500; // 500ms between attempts = 5 seconds total
+
+			try {
+				// Find the Extendify close button by its text content.
+				const allButtons = document.querySelectorAll( 'button' );
+				for ( const btn of allButtons ) {
+					const text = ( btn.textContent || '' ).trim().toLowerCase();
+
+					// Match the Extendify close button by text.
+					if ( text === 'venster sluiten' || text === 'close window' ) {
+						btn.click();
+						console.log( 'PP Guided Tour: Clicked Extendify close button (attempt ' + attempt + ')' );
+						return;
+					}
+				}
+
+				// If not found and we haven't exceeded max attempts, retry.
+				if ( attempt < maxAttempts ) {
+					setTimeout( () => this.clickExtendifyCloseButton( attempt + 1 ), delay );
+				}
+			} catch ( e ) {
+				console.warn( 'PP Guided Tour: Could not click Extendify close button', e );
 			}
 		},
 
