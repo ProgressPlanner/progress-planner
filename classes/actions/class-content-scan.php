@@ -59,12 +59,18 @@ class Content_Scan extends Content {
 			return;
 		}
 
+		// Bail if content helpers are not available (can happen during plugin updates).
+		$content_helpers = \progress_planner()->get_activities__content_helpers();
+		if ( null === $content_helpers ) {
+			return;
+		}
+
 		// Get posts.
 		$posts = \get_posts(
 			[
 				'posts_per_page' => static::SCAN_POSTS_PER_PAGE,
 				'paged'          => $current_page,
-				'post_type'      => \progress_planner()->get_activities__content_helpers()->get_post_types_names(),
+				'post_type'      => $content_helpers->get_post_types_names(),
 				'post_status'    => 'publish',
 			]
 		);
@@ -88,9 +94,15 @@ class Content_Scan extends Content {
 	 * @return int
 	 */
 	public function get_total_pages() {
+		// Bail if content helpers are not available (can happen during plugin updates).
+		$content_helpers = \progress_planner()->get_activities__content_helpers();
+		if ( null === $content_helpers ) {
+			return 0;
+		}
+
 		// Get the total number of posts.
 		$total_posts_count = 0;
-		foreach ( \progress_planner()->get_activities__content_helpers()->get_post_types_names() as $post_type ) {
+		foreach ( $content_helpers->get_post_types_names() as $post_type ) {
 			$total_posts_count += \wp_count_posts( $post_type )->publish;
 		}
 		// Calculate the total pages to scan.
