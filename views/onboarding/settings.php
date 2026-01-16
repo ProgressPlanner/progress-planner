@@ -119,7 +119,10 @@ $prpl_current_step_number   = 0;
 								class="prpl-btn prpl-save-setting-btn"
 								disabled
 							>
-								<?php \esc_html_e( 'Save setting', 'progress-planner' ); ?>
+								<?php
+								/* translators: %s: arrow icon */
+								printf( \esc_html__( 'Save setting %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
+								?>
 							</button>
 						</div>
 					</div>
@@ -134,7 +137,12 @@ $prpl_current_step_number   = 0;
 				<div class="prpl-columns-wrapper-flex">
 					<div class="prpl-column">
 						<div class="prpl-background-content">
-							<p><?php echo \esc_html( $prpl_page_type['description'] ); ?></p>
+							<p>
+								<?php \esc_html_e( 'Choose the post types you actively use for your content.', 'progress-planner' ); ?>
+							</p>
+							<p>
+								<?php \esc_html_e( 'We\'ll track and reward progress only on the ones you select.', 'progress-planner' ); ?>
+							</p>
 						</div>
 					</div>
 					<div class="prpl-column">
@@ -143,12 +151,6 @@ $prpl_current_step_number   = 0;
 								<?php \esc_html_e( 'Settings:', 'progress-planner' ); ?> <?php \esc_html_e( 'Valuable post types', 'progress-planner' ); ?>
 								<span class="prpl-settings-progress"><?php echo \esc_html( $prpl_current_step_number ); ?>/<?php echo \esc_html( $prpl_total_number_of_steps ); ?></span>
 							</h3>
-							<p>
-								<?php \esc_html_e( 'Choose the post types you actively use for your content.', 'progress-planner' ); ?>
-							</p>
-							<p>
-								<?php \esc_html_e( 'We\'ll track and reward progress only on the ones you select.', 'progress-planner' ); ?>
-							</p>
 						</div>
 
 						<div class="prpl-setting-content">
@@ -190,7 +192,10 @@ $prpl_current_step_number   = 0;
 								class="prpl-btn prpl-save-setting-btn"
 								disabled
 							>
-								<?php \esc_html_e( 'Save setting', 'progress-planner' ); ?>
+								<?php
+								/* translators: %s: arrow icon */
+								printf( \esc_html__( 'Save setting %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
+								?>
 							</button>
 						</div>
 					</div>
@@ -200,7 +205,12 @@ $prpl_current_step_number   = 0;
 	</div>
 	<div class="tour-footer">
 		<div class="prpl-tour-next-wrapper">
-			<button class="prpl-tour-next prpl-btn prpl-btn-secondary"><?php \esc_html_e( 'Next', 'progress-planner' ); ?></button>
+			<button class="prpl-tour-next prpl-btn prpl-btn-secondary">
+				<?php
+				/* translators: %s: arrow icon */
+				printf( \esc_html__( 'Next %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
+				?>
+			</button>
 		</div>
 	</div>
 </script>
