@@ -183,24 +183,30 @@
 		/**
 		 * Close the Extendify editor sidebar (AI Tools button).
 		 * Used for YourHosting installations to show PP sidebar instead.
+		 * Retries multiple times since Extendify may open after wp.domReady.
+		 *
+		 * @param {number} attempt Current attempt number.
 		 */
-		closeExtendifyEditorSidebar() {
+		closeExtendifyEditorSidebar( attempt = 0 ) {
+			const maxAttempts = 20; // 20 attempts * 500ms = 10 seconds total
+			const delay = 500;
+
 			try {
-				// Find the Extendify AI Tools button.
+				// Find the Extendify AI Tools button that's open.
 				const extendifyButton = document.querySelector(
-					'button[aria-controls^="extendify-draft"]'
+					'button[aria-controls^="extendify-draft"][aria-expanded="true"]'
 				);
 
-				if ( ! extendifyButton ) {
-					// Button not found yet, retry after a short delay.
-					setTimeout( () => this.closeExtendifyEditorSidebar(), 500 );
+				if ( extendifyButton ) {
+					// Sidebar is open, click to close it.
+					extendifyButton.click();
+					console.log( 'PP Guided Tour: Closed Extendify editor sidebar (attempt ' + attempt + ')' );
 					return;
 				}
 
-				// Check if sidebar is open.
-				if ( extendifyButton.getAttribute( 'aria-expanded' ) === 'true' ) {
-					// Click to close the sidebar.
-					extendifyButton.click();
+				// Sidebar not open yet, retry if we haven't exceeded max attempts.
+				if ( attempt < maxAttempts ) {
+					setTimeout( () => this.closeExtendifyEditorSidebar( attempt + 1 ), delay );
 				}
 			} catch ( e ) {
 				// Silently fail - don't break tour if Extendify handling fails.
@@ -1583,6 +1589,19 @@
 			console.log( 'PP Guided Tour: showYourHostingCompletionMessage called' );
 
 			try {
+				// Determine publish URL - try admin bar first, then construct directly.
+				let publishUrl = '';
+				const adminBarPublish = document.querySelector( '#wp-admin-bar-iwp_migration_btn a' );
+
+				if ( adminBarPublish ) {
+					publishUrl = adminBarPublish.href;
+				} else if ( config.adminUrl ) {
+					// Construct publish URL directly (works in editor where admin bar isn't visible).
+					publishUrl = config.adminUrl + 'admin.php?page=iwp_migrate_content';
+				}
+
+				console.log( 'PP Guided Tour: Publish URL', publishUrl );
+
 				const notification = document.createElement( 'div' );
 				notification.className = 'pp-guided-tour-complete-notice pp-guided-tour-yourhosting-complete';
 				notification.innerHTML = `
@@ -1590,31 +1609,12 @@
 						<button type="button" class="pp-guided-tour-yourhosting-complete-close" aria-label="Close">&times;</button>
 						<h3>Great work! You're ready to go live!</h3>
 						<p>You now know your way around your website. Time to share it with the world!</p>
-						<a href="#" class="pp-guided-tour-yourhosting-publish-btn" id="pp-yourhosting-publish-btn">
-							Publish Your Site
-						</a>
+						${ publishUrl ? `<a href="${ publishUrl }" class="pp-guided-tour-yourhosting-publish-btn">Publish Your Site</a>` : '' }
 					</div>
 				`;
 
 				document.body.appendChild( notification );
 				console.log( 'PP Guided Tour: YourHosting completion message appended to body' );
-
-				// Find and link to the publish button (with safeguard).
-				const publishBtn = notification.querySelector( '#pp-yourhosting-publish-btn' );
-				const adminBarPublish = document.querySelector( '#wp-admin-bar-iwp_migration_btn a' );
-
-				console.log( 'PP Guided Tour: Publish button elements', {
-					publishBtn: !! publishBtn,
-					adminBarPublish: !! adminBarPublish,
-					adminBarPublishHref: adminBarPublish?.href,
-				} );
-
-				if ( publishBtn && adminBarPublish ) {
-					publishBtn.href = adminBarPublish.href;
-				} else if ( publishBtn ) {
-					// Hide button if publish link not found (local testing, etc.).
-					publishBtn.style.display = 'none';
-				}
 
 				// Close button handler (with safeguard).
 				const closeBtn = notification.querySelector( '.pp-guided-tour-yourhosting-complete-close' );
