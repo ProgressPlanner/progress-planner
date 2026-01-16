@@ -60,7 +60,7 @@
 		 */
 		initFrontend() {
 			// Close Extendify AI assistant for YourHosting (branding ID 5159).
-			if ( config.brandingId && config.brandingId === 5159 ) {
+			if ( config.brandingId && parseInt( config.brandingId, 10 ) === 5159 ) {
 				this.closeExtendifyAssistant();
 			}
 
@@ -110,7 +110,7 @@
 			console.log( 'PP Guided Tour: Initializing editor context', config );
 
 			// Close Extendify AI assistant for YourHosting (branding ID 5159).
-			if ( config.brandingId && config.brandingId === 5159 ) {
+			if ( config.brandingId && parseInt( config.brandingId, 10 ) === 5159 ) {
 				this.closeExtendifyAssistant();
 			}
 
@@ -120,7 +120,7 @@
 					console.log( 'PP Guided Tour: wp.domReady fired' );
 
 					// Close Extendify editor sidebar for YourHosting.
-					if ( config.brandingId && config.brandingId === 5159 ) {
+					if ( config.brandingId && parseInt( config.brandingId, 10 ) === 5159 ) {
 						this.closeExtendifyEditorSidebar();
 					}
 
@@ -136,7 +136,7 @@
 				console.log( 'PP Guided Tour: Using fallback timeout' );
 
 				// Close Extendify editor sidebar for YourHosting.
-				if ( config.brandingId && config.brandingId === 5159 ) {
+				if ( config.brandingId && parseInt( config.brandingId, 10 ) === 5159 ) {
 					this.closeExtendifyEditorSidebar();
 				}
 
@@ -1498,13 +1498,15 @@
 		 * Show tour completion message.
 		 */
 		showCompletionMessage() {
+			const brandingIdNum = config.brandingId ? parseInt( config.brandingId, 10 ) : 0;
 			console.log( 'PP Guided Tour: showCompletionMessage called', {
 				brandingId: config.brandingId,
-				isYourHosting: config.brandingId === 5159,
+				brandingIdNum: brandingIdNum,
+				isYourHosting: brandingIdNum === 5159,
 			} );
 
 			// Check for YourHosting branding (with safeguard).
-			if ( config.brandingId && config.brandingId === 5159 ) {
+			if ( brandingIdNum === 5159 ) {
 				this.showYourHostingCompletionMessage();
 				return;
 			}
