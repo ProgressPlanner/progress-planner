@@ -109,10 +109,21 @@
 		initEditor() {
 			console.log( 'PP Guided Tour: Initializing editor context', config );
 
+			// Close Extendify AI assistant for YourHosting (branding ID 5159).
+			if ( config.brandingId && config.brandingId === 5159 ) {
+				this.closeExtendifyAssistant();
+			}
+
 			// Wait for editor to be ready.
 			if ( typeof wp !== 'undefined' && wp.domReady ) {
 				wp.domReady( () => {
 					console.log( 'PP Guided Tour: wp.domReady fired' );
+
+					// Close Extendify editor sidebar for YourHosting.
+					if ( config.brandingId && config.brandingId === 5159 ) {
+						this.closeExtendifyEditorSidebar();
+					}
+
 					// Open Progress Planner sidebar.
 					this.openProgressPlannerSidebar();
 					// Wait for driver.js and editor to be ready.
@@ -123,10 +134,44 @@
 			} else {
 				// Fallback.
 				console.log( 'PP Guided Tour: Using fallback timeout' );
+
+				// Close Extendify editor sidebar for YourHosting.
+				if ( config.brandingId && config.brandingId === 5159 ) {
+					this.closeExtendifyEditorSidebar();
+				}
+
 				this.openProgressPlannerSidebar();
 				this.waitForDriver( () => {
 					setTimeout( () => this.resumeEditorTour(), 2000 );
 				} );
+			}
+		},
+
+		/**
+		 * Close the Extendify editor sidebar (AI Tools button).
+		 * Used for YourHosting installations to show PP sidebar instead.
+		 */
+		closeExtendifyEditorSidebar() {
+			try {
+				// Find the Extendify AI Tools button.
+				const extendifyButton = document.querySelector(
+					'button[aria-controls^="extendify-draft"]'
+				);
+
+				if ( ! extendifyButton ) {
+					// Button not found yet, retry after a short delay.
+					setTimeout( () => this.closeExtendifyEditorSidebar(), 500 );
+					return;
+				}
+
+				// Check if sidebar is open.
+				if ( extendifyButton.getAttribute( 'aria-expanded' ) === 'true' ) {
+					// Click to close the sidebar.
+					extendifyButton.click();
+				}
+			} catch ( e ) {
+				// Silently fail - don't break tour if Extendify handling fails.
+				console.warn( 'PP Guided Tour: Could not close Extendify editor sidebar', e );
 			}
 		},
 
@@ -1453,6 +1498,11 @@
 		 * Show tour completion message.
 		 */
 		showCompletionMessage() {
+			console.log( 'PP Guided Tour: showCompletionMessage called', {
+				brandingId: config.brandingId,
+				isYourHosting: config.brandingId === 5159,
+			} );
+
 			// Check for YourHosting branding (with safeguard).
 			if ( config.brandingId && config.brandingId === 5159 ) {
 				this.showYourHostingCompletionMessage();
@@ -1495,6 +1545,8 @@
 		 * Show YourHosting-specific completion message with publish CTA.
 		 */
 		showYourHostingCompletionMessage() {
+			console.log( 'PP Guided Tour: showYourHostingCompletionMessage called' );
+
 			try {
 				const notification = document.createElement( 'div' );
 				notification.className = 'pp-guided-tour-complete-notice pp-guided-tour-yourhosting-complete';
@@ -1510,10 +1562,17 @@
 				`;
 
 				document.body.appendChild( notification );
+				console.log( 'PP Guided Tour: YourHosting completion message appended to body' );
 
 				// Find and link to the publish button (with safeguard).
 				const publishBtn = notification.querySelector( '#pp-yourhosting-publish-btn' );
 				const adminBarPublish = document.querySelector( '#wp-admin-bar-iwp_migration_btn a' );
+
+				console.log( 'PP Guided Tour: Publish button elements', {
+					publishBtn: !! publishBtn,
+					adminBarPublish: !! adminBarPublish,
+					adminBarPublishHref: adminBarPublish?.href,
+				} );
 
 				if ( publishBtn && adminBarPublish ) {
 					publishBtn.href = adminBarPublish.href;
