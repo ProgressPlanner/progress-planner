@@ -59,10 +59,48 @@
 		 * Initialize frontend context (homepage welcome card).
 		 */
 		initFrontend() {
+			// Close Extendify AI assistant for YourHosting (branding ID 5159).
+			if ( config.brandingId && config.brandingId === 5159 ) {
+				this.closeExtendifyAssistant();
+			}
+
 			// Wait for driver.js to be ready, then bind events.
 			this.waitForDriver( () => {
 				this.bindFrontendEvents();
 			} );
+		},
+
+		/**
+		 * Close the Extendify AI assistant via localStorage.
+		 * Used for YourHosting installations to avoid UI overlap with the tour.
+		 */
+		closeExtendifyAssistant() {
+			try {
+				// Check if localStorage is available.
+				if ( typeof localStorage === 'undefined' ) {
+					return;
+				}
+
+				// Find any localStorage key matching the Extendify agent pattern.
+				const keys = Object.keys( localStorage );
+				for ( const key of keys ) {
+					if ( key.startsWith( 'extendify-agent-global-' ) ) {
+						try {
+							const data = JSON.parse( localStorage.getItem( key ) );
+							if ( data && data.state ) {
+								data.state.open = false;
+								data.state.minimized = true;
+								localStorage.setItem( key, JSON.stringify( data ) );
+							}
+						} catch ( e ) {
+							// Ignore parse errors for individual keys.
+						}
+					}
+				}
+			} catch ( e ) {
+				// Silently fail - don't break tour if Extendify handling fails.
+				console.warn( 'PP Guided Tour: Could not close Extendify assistant', e );
+			}
 		},
 
 		/**
@@ -1415,6 +1453,19 @@
 		 * Show tour completion message.
 		 */
 		showCompletionMessage() {
+			// Check for YourHosting branding (with safeguard).
+			if ( config.brandingId && config.brandingId === 5159 ) {
+				this.showYourHostingCompletionMessage();
+				return;
+			}
+
+			this.showDefaultCompletionMessage();
+		},
+
+		/**
+		 * Show the default tour completion message.
+		 */
+		showDefaultCompletionMessage() {
 			// Create a simple notification.
 			const notification = document.createElement( 'div' );
 			notification.className = 'pp-guided-tour-complete-notice notice notice-success is-dismissible';
@@ -1437,6 +1488,49 @@
 
 				// Auto-dismiss after 5 seconds.
 				setTimeout( () => notification.remove(), 5000 );
+			}
+		},
+
+		/**
+		 * Show YourHosting-specific completion message with publish CTA.
+		 */
+		showYourHostingCompletionMessage() {
+			try {
+				const notification = document.createElement( 'div' );
+				notification.className = 'pp-guided-tour-complete-notice pp-guided-tour-yourhosting-complete';
+				notification.innerHTML = `
+					<div class="pp-guided-tour-yourhosting-complete-content">
+						<button type="button" class="pp-guided-tour-yourhosting-complete-close" aria-label="Close">&times;</button>
+						<h3>Great work! You're ready to go live!</h3>
+						<p>You now know your way around your website. Time to share it with the world!</p>
+						<a href="#" class="pp-guided-tour-yourhosting-publish-btn" id="pp-yourhosting-publish-btn">
+							Publish Your Site
+						</a>
+					</div>
+				`;
+
+				document.body.appendChild( notification );
+
+				// Find and link to the publish button (with safeguard).
+				const publishBtn = notification.querySelector( '#pp-yourhosting-publish-btn' );
+				const adminBarPublish = document.querySelector( '#wp-admin-bar-iwp_migration_btn a' );
+
+				if ( publishBtn && adminBarPublish ) {
+					publishBtn.href = adminBarPublish.href;
+				} else if ( publishBtn ) {
+					// Hide button if publish link not found (local testing, etc.).
+					publishBtn.style.display = 'none';
+				}
+
+				// Close button handler (with safeguard).
+				const closeBtn = notification.querySelector( '.pp-guided-tour-yourhosting-complete-close' );
+				if ( closeBtn ) {
+					closeBtn.addEventListener( 'click', () => notification.remove() );
+				}
+			} catch ( e ) {
+				console.warn( 'PP Guided Tour: Could not show YourHosting completion message', e );
+				// Fall back to default completion message.
+				this.showDefaultCompletionMessage();
 			}
 		},
 

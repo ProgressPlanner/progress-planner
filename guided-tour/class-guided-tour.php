@@ -561,6 +561,7 @@ class Guided_Tour {
 				'nonce'            => wp_create_nonce( 'pp_guided_tour' ),
 				'adminUrl'         => admin_url(),
 				'frontPageEditUrl' => $front_page_edit_url,
+				'brandingId'       => (int) \progress_planner()->get_ui__branding()->get_branding_id(),
 				'i18n'             => [
 					'next'            => __( 'Next', 'progress-planner' ),
 					'prev'            => __( 'Previous', 'progress-planner' ),
