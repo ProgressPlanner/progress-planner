@@ -173,7 +173,7 @@ class Guided_Tour {
 						'title'       => __( 'Yesssssss! Welcome to your website!', 'progress-planner' ),
 						'description' => __( 'And now we\'re going to improve and customize it together so it\'s ready for the world. Are you ready to get started?', 'progress-planner' ),
 						'cta'         => __( 'Edit Page', 'progress-planner' ),
-						'cta_hint'    => __( 'Click here to star the guided tour.', 'progress-planner' ),
+						'cta_hint'    => __( 'Click here to start the guided tour.', 'progress-planner' ),
 					],
 					// Step 1: Check the title in block editor.
 					[
