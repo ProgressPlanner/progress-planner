@@ -24,6 +24,17 @@
 	const TourManager = {
 		driverInstance: null,
 		isNavigating: false,
+		currentStepElement: null,
+
+		/**
+		 * Click the current step's target element (called from hint button).
+		 */
+		clickCurrentElement() {
+			if ( this.currentStepElement ) {
+				this.currentStepElement.click();
+				this.currentStepElement.focus();
+			}
+		},
 
 		/**
 		 * Initialize the tour manager.
@@ -325,9 +336,12 @@
 				return;
 			}
 
-			// Show popover - handle iframe case differently.
+			// Show popover - handle different cases.
 			if ( result.isInIframe ) {
 				this.showEditorPopoverForIframe( result, step, currentStepIndex );
+			} else if ( result.useFixedPopover ) {
+				// Use fixed popover with simple highlight (no overlay).
+				this.showFixedPopoverWithHighlight( result.element, step, currentStepIndex );
 			} else {
 				this.showEditorPopover( result.element, step, currentStepIndex );
 			}
@@ -374,6 +388,42 @@
 						'[data-type="core/cover"]'
 					);
 					break;
+
+				case 'list-view-button':
+					// List View / Document Overview button in editor toolbar (for reordering blocks).
+					// This is in the main document, not the iframe.
+					element = document.querySelector(
+						'.editor-document-tools__document-overview-toggle, ' +
+						'.edit-post-header-toolbar__document-overview-toggle, ' +
+						'button[aria-label="Document Overview"], ' +
+						'button[aria-label="List View"], ' +
+						'.edit-post-header-toolbar__list-view-toggle'
+					);
+					return {
+						element,
+						isInIframe: false,
+						iframe: null,
+						doc: document,
+						useFixedPopover: true, // Use fixed popover without overlay.
+					};
+
+				case 'block-inserter':
+					// Block inserter (+ button) in editor toolbar.
+					// This is in the main document, not the iframe.
+					element = document.querySelector(
+						'button[aria-label="Block Inserter"], ' +
+						'.editor-document-tools__inserter-toggle, ' +
+						'.edit-post-header-toolbar__inserter-toggle, ' +
+						'button[aria-label="Toggle block inserter"], ' +
+						'.block-editor-inserter__toggle'
+					);
+					return {
+						element,
+						isInIframe: false,
+						iframe: null,
+						doc: document,
+						useFixedPopover: true, // Use fixed popover without overlay.
+					};
 
 				case 'save-button':
 					// Save/Update button is in the main document, not the iframe.
@@ -457,10 +507,10 @@
 				existingPopover.remove();
 			}
 
-			// Build description with optional hint.
+			// Build description with optional hint (clickable).
 			let hintHtml = '';
 			if ( step.hint ) {
-				hintHtml = `<div class="pp-guided-tour-hint">${step.hint}</div>`;
+				hintHtml = `<button type="button" class="pp-guided-tour-hint pp-guided-tour-hint-clickable">${step.hint}</button>`;
 			}
 
 			// Check if there are more steps.
@@ -506,6 +556,18 @@
 				popover.remove();
 				this.handleEditorStepComplete( stepIndex );
 			} );
+
+			// Make hint clickable to interact with the target element.
+			const hintBtn = popover.querySelector( '.pp-guided-tour-hint-clickable' );
+			if ( hintBtn ) {
+				hintBtn.addEventListener( 'click', () => {
+					// Click the target element to activate it.
+					if ( element ) {
+						element.click();
+						element.focus();
+					}
+				} );
+			}
 
 			// Reposition on scroll/resize.
 			const repositionHandler = () => this.positionCustomPopover( popover, element, iframe );
@@ -584,10 +646,13 @@
 				return;
 			}
 
-			// Build description with optional hint.
+			// Store element reference for hint click handler.
+			this.currentStepElement = element;
+
+			// Build description with optional hint (clickable button).
 			let description = step.description;
 			if ( step.hint ) {
-				description += `<p class="pp-guided-tour-hint">${step.hint}</p>`;
+				description += `<button type="button" class="pp-guided-tour-hint pp-guided-tour-hint-clickable" onclick="window.ppGuidedTourManager.clickCurrentElement()">${step.hint}</button>`;
 			}
 
 			// Check if there are more steps after this one
@@ -632,6 +697,116 @@
 			} );
 
 			this.driverInstance.drive();
+		},
+
+		/**
+		 * Show fixed popover with simple highlight (no overlay).
+		 * Used for toolbar buttons like List View and Block Inserter.
+		 *
+		 * @param {HTMLElement} element Target element.
+		 * @param {Object} step Step configuration.
+		 * @param {number} stepIndex Current step index.
+		 */
+		showFixedPopoverWithHighlight( element, step, stepIndex ) {
+			// Add highlight class to the element.
+			element.classList.add( 'pp-guided-tour-highlight' );
+
+			// Inject highlight styles into document if not already there.
+			if ( ! document.getElementById( 'pp-guided-tour-highlight-styles' ) ) {
+				const style = document.createElement( 'style' );
+				style.id = 'pp-guided-tour-highlight-styles';
+				style.textContent = `
+					.pp-guided-tour-highlight {
+						outline: 3px solid #667eea !important;
+						outline-offset: 4px !important;
+						border-radius: 4px !important;
+						animation: pp-highlight-pulse 1.5s ease-in-out infinite !important;
+					}
+					@keyframes pp-highlight-pulse {
+						0%, 100% { outline-color: #667eea; }
+						50% { outline-color: #764ba2; }
+					}
+				`;
+				document.head.appendChild( style );
+			}
+
+			// Store element for cleanup.
+			this.currentHighlightedElement = element;
+
+			// Remove any existing fixed popover.
+			const existingPopover = document.getElementById( 'pp-guided-tour-fixed-popover' );
+			if ( existingPopover ) {
+				existingPopover.remove();
+			}
+
+			// Build hint HTML (clickable).
+			let hintHtml = '';
+			if ( step.hint ) {
+				hintHtml = `<button type="button" class="pp-guided-tour-hint pp-guided-tour-hint-clickable">${step.hint}</button>`;
+			}
+
+			// Check if there are more steps.
+			const hasMoreSteps = config.activeTour.steps.length > stepIndex + 1;
+
+			// Create fixed popover element.
+			const popover = document.createElement( 'div' );
+			popover.id = 'pp-guided-tour-fixed-popover';
+			popover.className = 'pp-guided-tour-fixed-popover';
+			popover.innerHTML = `
+				<div class="pp-guided-tour-fixed-popover-content">
+					<button type="button" class="pp-guided-tour-fixed-popover-close" aria-label="Close">&times;</button>
+					<h4 class="pp-guided-tour-fixed-popover-title">${step.title}</h4>
+					<p class="pp-guided-tour-fixed-popover-description">${step.description}</p>
+					${hintHtml}
+					<div class="pp-guided-tour-fixed-popover-footer">
+						<button type="button" class="pp-guided-tour-fixed-popover-skip">${config.i18n.skipStep}</button>
+						<button type="button" class="pp-guided-tour-fixed-popover-next">${hasMoreSteps ? config.i18n.next : config.i18n.done}</button>
+					</div>
+				</div>
+			`;
+
+			document.body.appendChild( popover );
+
+			// Bind events.
+			popover.querySelector( '.pp-guided-tour-fixed-popover-close' ).addEventListener( 'click', () => {
+				this.cleanupFixedPopover( element );
+				popover.remove();
+				this.skipTour();
+			} );
+
+			popover.querySelector( '.pp-guided-tour-fixed-popover-skip' ).addEventListener( 'click', () => {
+				this.cleanupFixedPopover( element );
+				popover.remove();
+				this.handleEditorStepComplete( stepIndex );
+			} );
+
+			popover.querySelector( '.pp-guided-tour-fixed-popover-next' ).addEventListener( 'click', () => {
+				this.cleanupFixedPopover( element );
+				popover.remove();
+				this.handleEditorStepComplete( stepIndex );
+			} );
+
+			// Make hint clickable to interact with the target element.
+			const hintBtn = popover.querySelector( '.pp-guided-tour-hint-clickable' );
+			if ( hintBtn ) {
+				hintBtn.addEventListener( 'click', () => {
+					if ( element ) {
+						element.click();
+						element.focus();
+					}
+				} );
+			}
+		},
+
+		/**
+		 * Clean up fixed popover highlight.
+		 *
+		 * @param {HTMLElement} element The highlighted element.
+		 */
+		cleanupFixedPopover( element ) {
+			if ( element ) {
+				element.classList.remove( 'pp-guided-tour-highlight' );
+			}
 		},
 
 		/**

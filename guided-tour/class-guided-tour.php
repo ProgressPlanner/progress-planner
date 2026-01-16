@@ -205,13 +205,34 @@ class Guided_Tour {
 						'fallback_description' => __( 'We couldn\'t find any images on this page yet. Consider adding some authentic photos to make your homepage more engaging! You can add an image block using the + button in the editor.', 'progress-planner' ),
 						'side'                 => 'right',
 					],
-					// Step 4: Save the changes.
+					// Step 4: Reorder blocks.
+					[
+						'context'     => 'editor',
+						'page'        => 'front_page',
+						'element'     => 'list-view-button',
+						'title'       => __( 'Reorder your blocks', 'progress-planner' ),
+						'description' => __( 'The page consists of a number of blocks. You can change the order of these blocks. Are your blocks in the order you want them to be? Try reordering them!', 'progress-planner' ),
+						'hint'        => __( 'Click here to open the List View where you can drag and drop blocks to reorder them.', 'progress-planner' ),
+						'side'        => 'bottom',
+					],
+					// Step 5: Add or remove blocks.
+					[
+						'context'     => 'editor',
+						'page'        => 'front_page',
+						'element'     => 'block-inserter',
+						'title'       => __( 'Add or remove blocks', 'progress-planner' ),
+						'description' => __( 'Perhaps you want to delete some of the blocks. Or add some! Check whether you need all the blocks that are now on your homepage.', 'progress-planner' ),
+						'hint'        => __( 'Click the + button to add new blocks, or select a block and press Delete to remove it.', 'progress-planner' ),
+						'side'        => 'bottom',
+					],
+					// Step 6: Save the changes.
 					[
 						'context'     => 'editor',
 						'page'        => 'front_page',
 						'element'     => 'save-button',
 						'title'       => __( 'Save your changes', 'progress-planner' ),
 						'description' => __( 'Great job! Now click the Save button to publish your changes and make them live on your website.', 'progress-planner' ),
+						'hint'        => __( 'Your changes won\'t be visible to visitors until you save them.', 'progress-planner' ),
 						'side'        => 'bottom',
 					],
 				],
