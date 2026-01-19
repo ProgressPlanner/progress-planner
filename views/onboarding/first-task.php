@@ -31,7 +31,15 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			</div>
 			<div class="prpl-column">
 				<?php if ( isset( $task ) ) : ?>
-					<?php \progress_planner()->the_view( 'onboarding/tasks/' . $task['task_id'] . '.php', [ 'task' => $task ] ); ?>
+					<?php
+					\progress_planner()->the_view(
+						'onboarding/tasks/' . $task['task_id'] . '.php',
+						[
+							'task'         => $task,
+							'show_chevron' => true,
+						]
+					);
+					?>
 				<?php endif; ?>
 			</div>
 		</div>
