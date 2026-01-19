@@ -191,14 +191,17 @@
 
 		/**
 		 * Wait for FSE (Full Site Editor) content to be fully loaded.
-		 * In FSE themes, the editor loads inside an iframe and content loads async.
+		 * In FSE themes, the editor initially loads as regular Gutenberg, then AJAX
+		 * replaces the content with the FSE template view (Header, Content, Footer).
 		 *
 		 * @param {Function} callback Callback when content is ready.
 		 * @param {number} attempts Number of attempts made.
 		 */
 		waitForFSEContent( callback, attempts = 0 ) {
-			const maxAttempts = 30; // 30 attempts * 500ms = 15 seconds total
+			const maxAttempts = 40; // 40 attempts * 500ms = 20 seconds total
 			const delay = 500;
+
+			console.log( 'PP Guided Tour: waitForFSEContent (attempt ' + attempts + ')' );
 
 			// Check if iframe exists and has content.
 			const editorCanvas = document.querySelector( 'iframe[name="editor-canvas"]' );
@@ -206,42 +209,65 @@
 			if ( editorCanvas && editorCanvas.contentDocument ) {
 				const doc = editorCanvas.contentDocument;
 
-				// Check if the document body has content.
-				// In FSE, we need to wait for the post-content or content wrapper to appear.
-				const contentReady =
-					doc.body &&
-					doc.body.children.length > 0 &&
-					(
-						// Look for content indicators - the page content block or any block.
-						doc.querySelector( '.wp-block-post-content' ) ||
-						doc.querySelector( '.is-root-container' ) ||
-						doc.querySelector( '[data-type="core/post-content"]' ) ||
-						doc.querySelector( '.wp-block' )
-					);
+				// Check for FSE template indicators - these appear after AJAX replacement.
+				// The key indicators are template parts (header/footer) or the post-content wrapper.
+				const hasFSETemplate =
+					doc.querySelector( '.wp-block-template-part' ) || // Header/Footer template parts
+					doc.querySelector( '[data-type="core/template-part"]' ) ||
+					doc.querySelector( '.wp-block-post-content' ) || // Page content wrapper
+					doc.querySelector( '[data-type="core/post-content"]' );
 
-				if ( contentReady ) {
-					console.log( 'PP Guided Tour: FSE content ready (attempt ' + attempts + ')' );
-					// Add a small delay to ensure all content is rendered.
+				// Also check that content inside post-content has rendered (not empty).
+				const postContent = doc.querySelector( '.wp-block-post-content, [data-type="core/post-content"]' );
+				const hasContentInside = postContent && postContent.children.length > 0;
+
+				if ( hasFSETemplate && hasContentInside ) {
+					console.log( 'PP Guided Tour: FSE template fully loaded (attempt ' + attempts + ')', {
+						hasTemplateParts: !! doc.querySelector( '.wp-block-template-part' ),
+						hasPostContent: !! postContent,
+						contentChildCount: postContent ? postContent.children.length : 0,
+					} );
+					// Add a delay to ensure all content is rendered.
 					setTimeout( callback, 500 );
 					return;
 				}
+
+				// If we have template structure but no content inside yet, keep waiting.
+				if ( hasFSETemplate && ! hasContentInside ) {
+					console.log( 'PP Guided Tour: FSE template found but content not loaded yet...' );
+				}
 			}
 
-			// Also check if we're in regular block editor mode (not site editor).
-			// Some FSE themes still use regular block editor for page editing.
+			// Check if we're still in regular block editor mode (before AJAX replacement).
+			// If we see .edit-post-visual-editor without the iframe, the AJAX hasn't happened yet.
 			const regularEditor = document.querySelector( '.edit-post-visual-editor' );
-			if ( regularEditor && ! editorCanvas ) {
-				console.log( 'PP Guided Tour: Regular editor detected in block theme (attempt ' + attempts + ')' );
-				setTimeout( callback, 1000 );
+			const hasIframe = !! editorCanvas;
+
+			if ( regularEditor && ! hasIframe && attempts < maxAttempts ) {
+				// Still in regular editor mode, waiting for AJAX replacement.
+				console.log( 'PP Guided Tour: Regular editor mode, waiting for FSE AJAX replacement...' );
+				setTimeout( () => this.waitForFSEContent( callback, attempts + 1 ), delay );
 				return;
 			}
 
-			if ( attempts < maxAttempts ) {
-				console.log( 'PP Guided Tour: Waiting for FSE content... (attempt ' + attempts + ')' );
+			// If iframe exists but content not ready yet, keep polling.
+			if ( editorCanvas && attempts < maxAttempts ) {
 				setTimeout( () => this.waitForFSEContent( callback, attempts + 1 ), delay );
-			} else {
+				return;
+			}
+
+			// Fallback: If no iframe after many attempts, might be a non-FSE block theme.
+			if ( ! editorCanvas && regularEditor ) {
+				console.log( 'PP Guided Tour: No iframe detected, using regular editor mode' );
+				setTimeout( callback, 500 );
+				return;
+			}
+
+			if ( attempts >= maxAttempts ) {
 				console.warn( 'PP Guided Tour: FSE content not found after ' + maxAttempts + ' attempts, proceeding anyway' );
 				callback();
+			} else {
+				setTimeout( () => this.waitForFSEContent( callback, attempts + 1 ), delay );
 			}
 		},
 
@@ -433,13 +459,11 @@
 			// Add active class to body to adjust z-indexes.
 			document.body.classList.add( 'pp-guided-tour-active' );
 
-			// Track if user completed via Done button vs closed via X.
-			let completedViaDone = false;
-
 			// Use driver.js to highlight the Edit Page link.
+			// Only show close button - user should click the Edit Page link directly.
 			this.driverInstance = driver( {
 				showProgress: false,
-				showButtons: [ 'next', 'close' ],
+				showButtons: [ 'close' ],
 				steps: [
 					{
 						element: '#wp-admin-bar-edit',
@@ -455,15 +479,6 @@
 				stagePadding: 4,
 				stageRadius: 4,
 				allowClose: true,
-				onNextClick: () => {
-					// Done button clicked - user wants to proceed.
-					completedViaDone = true;
-					document.body.classList.remove( 'pp-guided-tour-active' );
-					if ( this.driverInstance ) {
-						this.driverInstance.destroy();
-					}
-					// Don't show welcome card - user is ready to click Edit Page.
-				},
 				onCloseClick: () => {
 					// X button clicked - user wants to dismiss temporarily.
 					document.body.classList.remove( 'pp-guided-tour-active' );
@@ -476,9 +491,9 @@
 					}
 				},
 				onDestroyStarted: () => {
-					// Only show welcome card if not completed via Done.
+					// Show welcome card when popover is dismissed.
 					document.body.classList.remove( 'pp-guided-tour-active' );
-					if ( ! completedViaDone && welcomeCard ) {
+					if ( welcomeCard ) {
 						welcomeCard.style.display = 'block';
 					}
 				},
