@@ -512,7 +512,7 @@ class Guided_Tour {
 			'pp-guided-tour',
 			$base_url . '/guided-tour.css',
 			[ 'driver-js' ],
-			'1.0'
+			'1.1'
 		);
 
 		// Our guided tour scripts.
@@ -527,7 +527,7 @@ class Guided_Tour {
 			'pp-guided-tour',
 			$base_url . '/guided-tour.js',
 			$script_deps,
-			'1.0',
+			'1.2',
 			true
 		);
 

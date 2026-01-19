@@ -580,9 +580,43 @@
 			const doc = editorCanvas ? editorCanvas.contentDocument : document;
 
 			// In FSE themes, page content is inside .wp-block-post-content.
-			// We need to look there first to avoid finding elements in header/footer.
+			// We need to look there ONLY to avoid finding elements in header/footer template parts.
 			const isFSE = config.isBlockTheme && isInIframe;
-			const contentContainer = isFSE ? doc.querySelector( '.wp-block-post-content, [data-type="core/post-content"]' ) : null;
+
+			// Try multiple selectors for the content container.
+			// In FSE, the page content is wrapped in .wp-block-post-content which is
+			// separate from the header/footer template parts.
+			let contentContainer = null;
+			if ( isFSE && doc ) {
+				// Primary selector for FSE post content block.
+				contentContainer = doc.querySelector( '.wp-block-post-content' );
+
+				// Fallback selectors.
+				if ( ! contentContainer ) {
+					contentContainer = doc.querySelector( '[data-type="core/post-content"]' );
+				}
+				if ( ! contentContainer ) {
+					contentContainer = doc.querySelector( '.entry-content' );
+				}
+
+				// Debug: Log all potential content containers found.
+				console.log( 'PP Guided Tour: FSE content container search', {
+					postContent: !! doc.querySelector( '.wp-block-post-content' ),
+					postContentDataType: !! doc.querySelector( '[data-type="core/post-content"]' ),
+					entryContent: !! doc.querySelector( '.entry-content' ),
+					templateParts: doc.querySelectorAll( '.wp-block-template-part' ).length,
+				} );
+			}
+
+			console.log( 'PP Guided Tour: findEditorElement', {
+				elementType,
+				isFSE,
+				isInIframe,
+				isBlockTheme: config.isBlockTheme,
+				hasContentContainer: !! contentContainer,
+				contentContainerClass: contentContainer?.className,
+				contentContainerChildCount: contentContainer?.children?.length || 0,
+			} );
 
 			let element = null;
 
@@ -590,14 +624,16 @@
 				case 'first-heading':
 					// Look for first heading block in editor.
 					if ( isFSE && contentContainer ) {
-						// In FSE, look specifically within the post content block.
+						// In FSE, look ONLY within the post content block.
 						element = contentContainer.querySelector(
 							'.wp-block-heading, ' +
-							'[data-type="core/heading"]'
+							'[data-type="core/heading"], ' +
+							'h1, h2, h3'
 						);
+						console.log( 'PP Guided Tour: FSE heading search in content container', { found: !! element } );
 					}
-					// Fallback to searching the whole document.
-					if ( ! element ) {
+					// Only use fallback for non-FSE themes.
+					if ( ! element && ! isFSE ) {
 						element = doc.querySelector(
 							'.wp-block-heading, ' +
 							'[data-type="core/heading"], ' +
@@ -610,14 +646,16 @@
 				case 'first-paragraph':
 					// Look for first paragraph block in editor.
 					if ( isFSE && contentContainer ) {
-						// In FSE, look specifically within the post content block.
+						// In FSE, look ONLY within the post content block.
 						element = contentContainer.querySelector(
 							'.wp-block-paragraph, ' +
-							'[data-type="core/paragraph"]'
+							'[data-type="core/paragraph"], ' +
+							'p'
 						);
+						console.log( 'PP Guided Tour: FSE paragraph search in content container', { found: !! element } );
 					}
-					// Fallback to searching the whole document.
-					if ( ! element ) {
+					// Only use fallback for non-FSE themes.
+					if ( ! element && ! isFSE ) {
 						element = doc.querySelector(
 							'.wp-block-paragraph, ' +
 							'[data-type="core/paragraph"]'
@@ -628,16 +666,18 @@
 				case 'first-image':
 					// Look for first image block in editor.
 					if ( isFSE && contentContainer ) {
-						// In FSE, look specifically within the post content block.
+						// In FSE, look ONLY within the post content block.
 						element = contentContainer.querySelector(
 							'.wp-block-image, ' +
 							'[data-type="core/image"], ' +
 							'.wp-block-cover, ' +
-							'[data-type="core/cover"]'
+							'[data-type="core/cover"], ' +
+							'img'
 						);
+						console.log( 'PP Guided Tour: FSE image search in content container', { found: !! element } );
 					}
-					// Fallback to searching the whole document.
-					if ( ! element ) {
+					// Only use fallback for non-FSE themes.
+					if ( ! element && ! isFSE ) {
 						element = doc.querySelector(
 							'.wp-block-image, ' +
 							'[data-type="core/image"], ' +
@@ -700,11 +740,12 @@
 
 				default:
 					// Try as a CSS selector.
-					// In FSE, try content container first.
+					// In FSE, try content container ONLY.
 					if ( isFSE && contentContainer ) {
 						element = contentContainer.querySelector( elementType );
 					}
-					if ( ! element ) {
+					// Only use fallback for non-FSE themes.
+					if ( ! element && ! isFSE ) {
 						element = doc.querySelector( elementType );
 					}
 			}
