@@ -238,8 +238,8 @@
 		 * @param {number} attempts Number of attempts made.
 		 */
 		waitForFSEContent( callback, attempts = 0 ) {
-			const maxAttempts = 30; // 30 attempts * 300ms = 9 seconds max
-			const delay = 300;
+			const maxAttempts = 50; // 50 attempts * 200ms = 10 seconds max
+			const delay = 200;
 
 			console.log( 'PP Guided Tour: waitForFSEContent (attempt ' + ( attempts + 1 ) + ')' );
 
@@ -255,10 +255,8 @@
 			// Check for FSE template indicators - these appear after AJAX replacement.
 			// The key indicators are template parts (header/footer) which indicate FSE mode.
 			// These selectors work both in iframe and direct document modes.
-			const hasFSETemplateParts =
-				doc.querySelector( '.wp-block-template-part' ) || // Header/Footer template parts
-				doc.querySelector( '[data-type="core/template-part"]' ) ||
-				doc.querySelector( '.block-editor-block-list__layout [data-type="core/template-part"]' );
+			const templateParts = doc.querySelectorAll( '.wp-block-template-part, [data-type="core/template-part"]' );
+			const hasFSETemplateParts = templateParts.length > 0;
 
 			// Also check for post-content wrapper which contains the actual page content.
 			const postContent =
@@ -266,27 +264,53 @@
 				doc.querySelector( '[data-type="core/post-content"]' );
 			const hasContentInside = postContent && postContent.children.length > 0;
 
-			// FSE mode is confirmed when we have template parts (Header/Footer blocks).
-			if ( hasFSETemplateParts ) {
-				// Check if the content inside post-content has rendered.
-				if ( hasContentInside ) {
-					console.log( 'PP Guided Tour: FSE template fully loaded (attempt ' + ( attempts + 1 ) + ')', {
-						hasTemplateParts: true,
-						hasPostContent: !! postContent,
-						contentChildCount: postContent ? postContent.children.length : 0,
-						hasIframe: hasIframe,
-					} );
-					// Add a small delay to ensure all content is rendered.
-					setTimeout( callback, 300 );
-					return;
+			// Check if the HEADER template part has loaded its content.
+			// The header loading after content causes layout shifts.
+			let headerHasContent = false;
+			if ( templateParts.length > 0 ) {
+				// Find header template part (usually the first one, or one containing nav/site-title)
+				for ( const part of templateParts ) {
+					const hasNav = part.querySelector( '.wp-block-navigation, [data-type="core/navigation"]' );
+					const hasSiteTitle = part.querySelector( '.wp-block-site-title, [data-type="core/site-title"]' );
+					const hasLogo = part.querySelector( '.wp-block-site-logo, [data-type="core/site-logo"]' );
+					const hasHeaderContent = part.children.length > 0 && ( hasNav || hasSiteTitle || hasLogo || part.querySelector( 'header, .wp-block-group' ) );
+
+					if ( hasHeaderContent ) {
+						headerHasContent = true;
+						break;
+					}
 				}
 
-				// If we have template structure but no content inside yet, keep waiting.
-				if ( attempts < maxAttempts ) {
-					console.log( 'PP Guided Tour: FSE template parts found but content not loaded yet...' );
-					setTimeout( () => this.waitForFSEContent( callback, attempts + 1 ), delay );
-					return;
+				// If we found template parts but none look like a header with content,
+				// check if the first template part at least has some children.
+				if ( ! headerHasContent && templateParts[ 0 ] ) {
+					headerHasContent = templateParts[ 0 ].children.length > 2; // Has substantial content
 				}
+			}
+
+			// FSE mode is confirmed when we have template parts (Header/Footer blocks).
+			if ( hasFSETemplateParts && hasContentInside && headerHasContent ) {
+				console.log( 'PP Guided Tour: FSE template fully loaded (attempt ' + ( attempts + 1 ) + ')', {
+					templatePartsCount: templateParts.length,
+					hasPostContent: !! postContent,
+					contentChildCount: postContent ? postContent.children.length : 0,
+					headerHasContent: headerHasContent,
+					hasIframe: hasIframe,
+				} );
+				// Add a delay to ensure layout has settled after all content loads.
+				setTimeout( callback, 500 );
+				return;
+			}
+
+			// If we have template structure but header not loaded yet, keep waiting.
+			if ( hasFSETemplateParts && attempts < maxAttempts ) {
+				console.log( 'PP Guided Tour: FSE template parts found but waiting for header...', {
+					templatePartsCount: templateParts.length,
+					hasContentInside,
+					headerHasContent,
+				} );
+				setTimeout( () => this.waitForFSEContent( callback, attempts + 1 ), delay );
+				return;
 			}
 
 			// Check if we're in regular block editor mode (non-FSE theme).
