@@ -190,6 +190,46 @@
 		},
 
 		/**
+		 * Wait for element position to stabilize (no layout shifts).
+		 * This prevents the highlight from being misaligned due to late-loading content.
+		 *
+		 * @param {HTMLElement} element Element to track.
+		 * @param {Function} callback Callback when position is stable.
+		 * @param {number} checks Number of consecutive stable checks required.
+		 */
+		waitForStablePosition( element, callback, checks = 0 ) {
+			const requiredStableChecks = 3; // Need 3 consecutive stable readings
+			const checkInterval = 100; // Check every 100ms
+			const maxChecks = 30; // Max 3 seconds total
+
+			if ( checks >= maxChecks ) {
+				console.log( 'PP Guided Tour: Max position checks reached, proceeding' );
+				callback();
+				return;
+			}
+
+			const rect = element.getBoundingClientRect();
+			const currentPos = `${rect.top},${rect.left},${rect.width},${rect.height}`;
+
+			if ( this.lastElementPosition === currentPos ) {
+				this.stablePositionCount = ( this.stablePositionCount || 0 ) + 1;
+
+				if ( this.stablePositionCount >= requiredStableChecks ) {
+					console.log( 'PP Guided Tour: Element position stable after ' + checks + ' checks' );
+					this.lastElementPosition = null;
+					this.stablePositionCount = 0;
+					callback();
+					return;
+				}
+			} else {
+				this.stablePositionCount = 0;
+			}
+
+			this.lastElementPosition = currentPos;
+			setTimeout( () => this.waitForStablePosition( element, callback, checks + 1 ), checkInterval );
+		},
+
+		/**
 		 * Wait for FSE (Full Site Editor) content to be fully loaded.
 		 * In FSE themes, the editor initially loads as regular Gutenberg, then AJAX
 		 * replaces the content with the FSE template view (Header, Content, Footer).
@@ -578,14 +618,25 @@
 				return;
 			}
 
-			// Show popover - handle different cases.
-			if ( result.isInIframe ) {
-				this.showEditorPopoverForIframe( result, step, currentStepIndex );
-			} else if ( result.useFixedPopover ) {
-				// Use fixed popover with simple highlight (no overlay).
-				this.showFixedPopoverWithHighlight( result.element, step, currentStepIndex );
+			// Wait for element position to stabilize before showing popover.
+			// This prevents highlight from being misaligned due to layout shifts.
+			const showPopover = () => {
+				if ( result.isInIframe ) {
+					this.showEditorPopoverForIframe( result, step, currentStepIndex );
+				} else if ( result.useFixedPopover ) {
+					// Use fixed popover with simple highlight (no overlay).
+					this.showFixedPopoverWithHighlight( result.element, step, currentStepIndex );
+				} else {
+					this.showEditorPopover( result.element, step, currentStepIndex );
+				}
+			};
+
+			// For FSE themes without iframe, wait for position to stabilize.
+			// This handles late-loading images and layout shifts.
+			if ( config.isBlockTheme && ! result.isInIframe ) {
+				this.waitForStablePosition( result.element, showPopover );
 			} else {
-				this.showEditorPopover( result.element, step, currentStepIndex );
+				showPopover();
 			}
 		},
 
@@ -603,13 +654,15 @@
 
 			// In FSE themes, page content is inside .wp-block-post-content.
 			// We need to look there ONLY to avoid finding elements in header/footer template parts.
-			const isFSE = config.isBlockTheme && isInIframe;
+			// Note: FSE can work with or without iframe - check isBlockTheme regardless.
+			const isFSE = config.isBlockTheme;
 
 			// Try multiple selectors for the content container.
 			// In FSE, the page content is wrapped in .wp-block-post-content which is
 			// separate from the header/footer template parts.
+			// This works both with iframe and without (direct DOM in FSE themes).
 			let contentContainer = null;
-			if ( isFSE && doc ) {
+			if ( isFSE ) {
 				// Primary selector for FSE post content block.
 				contentContainer = doc.querySelector( '.wp-block-post-content' );
 
@@ -627,6 +680,7 @@
 					postContentDataType: !! doc.querySelector( '[data-type="core/post-content"]' ),
 					entryContent: !! doc.querySelector( '.entry-content' ),
 					templateParts: doc.querySelectorAll( '.wp-block-template-part' ).length,
+					hasIframe: isInIframe,
 				} );
 			}
 

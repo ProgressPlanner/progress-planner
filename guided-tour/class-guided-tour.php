@@ -527,7 +527,7 @@ class Guided_Tour {
 			'pp-guided-tour',
 			$base_url . '/guided-tour.js',
 			$script_deps,
-			'1.4',
+			'1.5',
 			true
 		);
 
