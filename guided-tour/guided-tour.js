@@ -161,7 +161,12 @@
 					this.openProgressPlannerSidebar();
 					// Wait for driver.js and editor to be ready.
 					this.waitForDriver( () => {
-						setTimeout( () => this.resumeEditorTour(), 1000 );
+						// For FSE themes, wait for the editor canvas to be fully loaded.
+						if ( config.isBlockTheme ) {
+							this.waitForFSEContent( () => this.resumeEditorTour() );
+						} else {
+							setTimeout( () => this.resumeEditorTour(), 1000 );
+						}
 					} );
 				} );
 			} else {
@@ -175,8 +180,68 @@
 
 				this.openProgressPlannerSidebar();
 				this.waitForDriver( () => {
-					setTimeout( () => this.resumeEditorTour(), 2000 );
+					if ( config.isBlockTheme ) {
+						this.waitForFSEContent( () => this.resumeEditorTour() );
+					} else {
+						setTimeout( () => this.resumeEditorTour(), 2000 );
+					}
 				} );
+			}
+		},
+
+		/**
+		 * Wait for FSE (Full Site Editor) content to be fully loaded.
+		 * In FSE themes, the editor loads inside an iframe and content loads async.
+		 *
+		 * @param {Function} callback Callback when content is ready.
+		 * @param {number} attempts Number of attempts made.
+		 */
+		waitForFSEContent( callback, attempts = 0 ) {
+			const maxAttempts = 30; // 30 attempts * 500ms = 15 seconds total
+			const delay = 500;
+
+			// Check if iframe exists and has content.
+			const editorCanvas = document.querySelector( 'iframe[name="editor-canvas"]' );
+
+			if ( editorCanvas && editorCanvas.contentDocument ) {
+				const doc = editorCanvas.contentDocument;
+
+				// Check if the document body has content.
+				// In FSE, we need to wait for the post-content or content wrapper to appear.
+				const contentReady =
+					doc.body &&
+					doc.body.children.length > 0 &&
+					(
+						// Look for content indicators - the page content block or any block.
+						doc.querySelector( '.wp-block-post-content' ) ||
+						doc.querySelector( '.is-root-container' ) ||
+						doc.querySelector( '[data-type="core/post-content"]' ) ||
+						doc.querySelector( '.wp-block' )
+					);
+
+				if ( contentReady ) {
+					console.log( 'PP Guided Tour: FSE content ready (attempt ' + attempts + ')' );
+					// Add a small delay to ensure all content is rendered.
+					setTimeout( callback, 500 );
+					return;
+				}
+			}
+
+			// Also check if we're in regular block editor mode (not site editor).
+			// Some FSE themes still use regular block editor for page editing.
+			const regularEditor = document.querySelector( '.edit-post-visual-editor' );
+			if ( regularEditor && ! editorCanvas ) {
+				console.log( 'PP Guided Tour: Regular editor detected in block theme (attempt ' + attempts + ')' );
+				setTimeout( callback, 1000 );
+				return;
+			}
+
+			if ( attempts < maxAttempts ) {
+				console.log( 'PP Guided Tour: Waiting for FSE content... (attempt ' + attempts + ')' );
+				setTimeout( () => this.waitForFSEContent( callback, attempts + 1 ), delay );
+			} else {
+				console.warn( 'PP Guided Tour: FSE content not found after ' + maxAttempts + ' attempts, proceeding anyway' );
+				callback();
 			}
 		},
 
@@ -424,11 +489,18 @@
 
 		/**
 		 * Resume tour in block editor.
+		 *
+		 * @param {number} retryAttempt Current retry attempt for FSE themes.
 		 */
-		resumeEditorTour() {
+		resumeEditorTour( retryAttempt = 0 ) {
+			const maxRetries = config.isBlockTheme ? 10 : 3; // More retries for FSE themes.
+			const retryDelay = 500;
+
 			console.log( 'PP Guided Tour: resumeEditorTour called', {
 				activeTour: config.activeTour,
 				state: config.state,
+				isBlockTheme: config.isBlockTheme,
+				retryAttempt,
 			} );
 
 			if ( ! config.activeTour || ! config.state?.active ) {
@@ -449,10 +521,21 @@
 			// Find the element based on step configuration.
 			const result = this.findEditorElement( step.element );
 
-			console.log( 'PP Guided Tour: Found element', { elementType: step.element, result } );
+			console.log( 'PP Guided Tour: Found element', {
+				elementType: step.element,
+				result,
+				hasElement: !! result.element,
+			} );
 
 			if ( ! result.element ) {
-				console.warn( 'Guided Tour: Could not find element:', step.element );
+				// In FSE themes, content may still be loading. Retry a few times.
+				if ( retryAttempt < maxRetries ) {
+					console.log( 'PP Guided Tour: Element not found, retrying... (attempt ' + ( retryAttempt + 1 ) + '/' + maxRetries + ')' );
+					setTimeout( () => this.resumeEditorTour( retryAttempt + 1 ), retryDelay );
+					return;
+				}
+
+				console.warn( 'Guided Tour: Could not find element after ' + maxRetries + ' attempts:', step.element );
 				// Show a fallback popover or skip to next step.
 				this.showEditorFallbackPopover( step );
 				return;
@@ -471,6 +554,7 @@
 
 		/**
 		 * Find element in block editor.
+		 * Handles both classic block editor and FSE (Full Site Editor) themes.
 		 *
 		 * @param {string} elementType Type of element to find.
 		 * @return {Object} Object with element, isInIframe, and iframe reference.
@@ -480,35 +564,72 @@
 			const isInIframe = !! editorCanvas;
 			const doc = editorCanvas ? editorCanvas.contentDocument : document;
 
+			// In FSE themes, page content is inside .wp-block-post-content.
+			// We need to look there first to avoid finding elements in header/footer.
+			const isFSE = config.isBlockTheme && isInIframe;
+			const contentContainer = isFSE ? doc.querySelector( '.wp-block-post-content, [data-type="core/post-content"]' ) : null;
+
 			let element = null;
 
 			switch ( elementType ) {
 				case 'first-heading':
 					// Look for first heading block in editor.
-					element = doc.querySelector(
-						'.wp-block-heading, ' +
-						'[data-type="core/heading"], ' +
-						'.editor-post-title__input, ' +
-						'.wp-block-post-title'
-					);
+					if ( isFSE && contentContainer ) {
+						// In FSE, look specifically within the post content block.
+						element = contentContainer.querySelector(
+							'.wp-block-heading, ' +
+							'[data-type="core/heading"]'
+						);
+					}
+					// Fallback to searching the whole document.
+					if ( ! element ) {
+						element = doc.querySelector(
+							'.wp-block-heading, ' +
+							'[data-type="core/heading"], ' +
+							'.editor-post-title__input, ' +
+							'.wp-block-post-title'
+						);
+					}
 					break;
 
 				case 'first-paragraph':
 					// Look for first paragraph block in editor.
-					element = doc.querySelector(
-						'.wp-block-paragraph, ' +
-						'[data-type="core/paragraph"]'
-					);
+					if ( isFSE && contentContainer ) {
+						// In FSE, look specifically within the post content block.
+						element = contentContainer.querySelector(
+							'.wp-block-paragraph, ' +
+							'[data-type="core/paragraph"]'
+						);
+					}
+					// Fallback to searching the whole document.
+					if ( ! element ) {
+						element = doc.querySelector(
+							'.wp-block-paragraph, ' +
+							'[data-type="core/paragraph"]'
+						);
+					}
 					break;
 
 				case 'first-image':
 					// Look for first image block in editor.
-					element = doc.querySelector(
-						'.wp-block-image, ' +
-						'[data-type="core/image"], ' +
-						'.wp-block-cover, ' +
-						'[data-type="core/cover"]'
-					);
+					if ( isFSE && contentContainer ) {
+						// In FSE, look specifically within the post content block.
+						element = contentContainer.querySelector(
+							'.wp-block-image, ' +
+							'[data-type="core/image"], ' +
+							'.wp-block-cover, ' +
+							'[data-type="core/cover"]'
+						);
+					}
+					// Fallback to searching the whole document.
+					if ( ! element ) {
+						element = doc.querySelector(
+							'.wp-block-image, ' +
+							'[data-type="core/image"], ' +
+							'.wp-block-cover, ' +
+							'[data-type="core/cover"]'
+						);
+					}
 					break;
 
 				case 'list-view-button':
@@ -564,7 +685,13 @@
 
 				default:
 					// Try as a CSS selector.
-					element = doc.querySelector( elementType );
+					// In FSE, try content container first.
+					if ( isFSE && contentContainer ) {
+						element = contentContainer.querySelector( elementType );
+					}
+					if ( ! element ) {
+						element = doc.querySelector( elementType );
+					}
 			}
 
 			return {

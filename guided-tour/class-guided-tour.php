@@ -562,6 +562,7 @@ class Guided_Tour {
 				'adminUrl'         => admin_url(),
 				'frontPageEditUrl' => $front_page_edit_url,
 				'brandingId'       => (int) \progress_planner()->get_ui__branding()->get_branding_id(),
+				'isBlockTheme'     => (bool) wp_is_block_theme(),
 				'i18n'             => [
 					'next'            => __( 'Next', 'progress-planner' ),
 					'prev'            => __( 'Previous', 'progress-planner' ),
