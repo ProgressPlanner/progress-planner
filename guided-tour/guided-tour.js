@@ -198,77 +198,87 @@
 		 * @param {number} attempts Number of attempts made.
 		 */
 		waitForFSEContent( callback, attempts = 0 ) {
-			const maxAttempts = 40; // 40 attempts * 500ms = 20 seconds total
-			const delay = 500;
+			const maxAttempts = 30; // 30 attempts * 300ms = 9 seconds max
+			const delay = 300;
 
-			console.log( 'PP Guided Tour: waitForFSEContent (attempt ' + attempts + ')' );
+			console.log( 'PP Guided Tour: waitForFSEContent (attempt ' + ( attempts + 1 ) + ')' );
 
 			// Check if iframe exists and has content.
 			const editorCanvas = document.querySelector( 'iframe[name="editor-canvas"]' );
+			const hasIframe = !! editorCanvas;
+			let doc = document;
 
-			if ( editorCanvas && editorCanvas.contentDocument ) {
-				const doc = editorCanvas.contentDocument;
+			if ( hasIframe && editorCanvas.contentDocument ) {
+				doc = editorCanvas.contentDocument;
+			}
 
-				// Check for FSE template indicators - these appear after AJAX replacement.
-				// The key indicators are template parts (header/footer) or the post-content wrapper.
-				const hasFSETemplate =
-					doc.querySelector( '.wp-block-template-part' ) || // Header/Footer template parts
-					doc.querySelector( '[data-type="core/template-part"]' ) ||
-					doc.querySelector( '.wp-block-post-content' ) || // Page content wrapper
-					doc.querySelector( '[data-type="core/post-content"]' );
+			// Check for FSE template indicators - these appear after AJAX replacement.
+			// The key indicators are template parts (header/footer) which indicate FSE mode.
+			// These selectors work both in iframe and direct document modes.
+			const hasFSETemplateParts =
+				doc.querySelector( '.wp-block-template-part' ) || // Header/Footer template parts
+				doc.querySelector( '[data-type="core/template-part"]' ) ||
+				doc.querySelector( '.block-editor-block-list__layout [data-type="core/template-part"]' );
 
-				// Also check that content inside post-content has rendered (not empty).
-				const postContent = doc.querySelector( '.wp-block-post-content, [data-type="core/post-content"]' );
-				const hasContentInside = postContent && postContent.children.length > 0;
+			// Also check for post-content wrapper which contains the actual page content.
+			const postContent =
+				doc.querySelector( '.wp-block-post-content' ) ||
+				doc.querySelector( '[data-type="core/post-content"]' );
+			const hasContentInside = postContent && postContent.children.length > 0;
 
-				if ( hasFSETemplate && hasContentInside ) {
-					console.log( 'PP Guided Tour: FSE template fully loaded (attempt ' + attempts + ')', {
-						hasTemplateParts: !! doc.querySelector( '.wp-block-template-part' ),
+			// FSE mode is confirmed when we have template parts (Header/Footer blocks).
+			if ( hasFSETemplateParts ) {
+				// Check if the content inside post-content has rendered.
+				if ( hasContentInside ) {
+					console.log( 'PP Guided Tour: FSE template fully loaded (attempt ' + ( attempts + 1 ) + ')', {
+						hasTemplateParts: true,
 						hasPostContent: !! postContent,
 						contentChildCount: postContent ? postContent.children.length : 0,
+						hasIframe: hasIframe,
 					} );
-					// Add a delay to ensure all content is rendered.
-					setTimeout( callback, 500 );
+					// Add a small delay to ensure all content is rendered.
+					setTimeout( callback, 300 );
 					return;
 				}
 
 				// If we have template structure but no content inside yet, keep waiting.
-				if ( hasFSETemplate && ! hasContentInside ) {
-					console.log( 'PP Guided Tour: FSE template found but content not loaded yet...' );
+				if ( attempts < maxAttempts ) {
+					console.log( 'PP Guided Tour: FSE template parts found but content not loaded yet...' );
+					setTimeout( () => this.waitForFSEContent( callback, attempts + 1 ), delay );
+					return;
 				}
 			}
 
-			// Check if we're still in regular block editor mode (before AJAX replacement).
-			// If we see .edit-post-visual-editor without the iframe, the AJAX hasn't happened yet.
+			// Check if we're in regular block editor mode (non-FSE theme).
+			// For non-FSE themes, we can proceed when the editor has blocks loaded.
 			const regularEditor = document.querySelector( '.edit-post-visual-editor' );
-			const hasIframe = !! editorCanvas;
 
-			if ( regularEditor && ! hasIframe && attempts < maxAttempts ) {
-				// Still in regular editor mode, waiting for AJAX replacement.
-				console.log( 'PP Guided Tour: Regular editor mode, waiting for FSE AJAX replacement...' );
+			if ( regularEditor && ! config.isBlockTheme ) {
+				// For non-FSE themes, check if the editor content is ready.
+				const hasBlocks = doc.querySelector( '.wp-block' ) ||
+					doc.querySelector( '[data-type]' ) ||
+					doc.querySelector( '.block-editor-block-list__layout' );
+
+				if ( hasBlocks ) {
+					console.log( 'PP Guided Tour: Non-FSE editor with blocks ready (attempt ' + ( attempts + 1 ) + ')' );
+					setTimeout( callback, 300 );
+					return;
+				}
+			}
+
+			// For FSE themes without iframe, keep waiting for template parts to appear.
+			// The editor starts as regular Gutenberg, then AJAX replaces with FSE structure.
+			if ( config.isBlockTheme && attempts < maxAttempts ) {
+				console.log( 'PP Guided Tour: FSE theme, waiting for template parts... (attempt ' + ( attempts + 1 ) + ')' );
 				setTimeout( () => this.waitForFSEContent( callback, attempts + 1 ), delay );
 				return;
 			}
 
-			// If iframe exists but content not ready yet, keep polling.
-			if ( editorCanvas && attempts < maxAttempts ) {
-				setTimeout( () => this.waitForFSEContent( callback, attempts + 1 ), delay );
-				return;
-			}
-
-			// Fallback: If no iframe after many attempts, might be a non-FSE block theme.
-			if ( ! editorCanvas && regularEditor ) {
-				console.log( 'PP Guided Tour: No iframe detected, using regular editor mode' );
-				setTimeout( callback, 500 );
-				return;
-			}
-
+			// Max attempts reached or unexpected state.
 			if ( attempts >= maxAttempts ) {
 				console.warn( 'PP Guided Tour: FSE content not found after ' + maxAttempts + ' attempts, proceeding anyway' );
-				callback();
-			} else {
-				setTimeout( () => this.waitForFSEContent( callback, attempts + 1 ), delay );
 			}
+			callback();
 		},
 
 		/**
@@ -291,7 +301,10 @@
 				if ( extendifyButton ) {
 					// Sidebar is open, click to close it.
 					extendifyButton.click();
-					console.log( 'PP Guided Tour: Closed Extendify editor sidebar (attempt ' + attempt + ')' );
+					console.log( 'PP Guided Tour: Closed Extendify editor sidebar (attempt ' + ( attempt + 1 ) + ')' );
+
+					// Open Progress Planner sidebar after a short delay.
+					setTimeout( () => this.openProgressPlannerSidebar(), 300 );
 					return;
 				}
 
@@ -307,26 +320,35 @@
 
 		/**
 		 * Open the Progress Planner sidebar in the block editor.
+		 *
+		 * @param {number} attempt Current attempt number.
 		 */
-		openProgressPlannerSidebar() {
+		openProgressPlannerSidebar( attempt = 0 ) {
+			const maxAttempts = 10;
+
 			// Find the Progress Planner sidebar toggle button.
-			const sidebarButton = document.querySelector(
-				'button[aria-label="Progress Planner Sidebar"]'
-			);
+			// Use multiple selectors to handle different languages/versions.
+			const sidebarButton =
+				document.querySelector( 'button[aria-label*="Progress Planner"]' ) ||
+				document.querySelector( 'button[aria-controls*="progress-planner"]' );
 
 			if ( ! sidebarButton ) {
 				// Button not found yet, retry after a short delay.
-				setTimeout( () => this.openProgressPlannerSidebar(), 500 );
+				if ( attempt < maxAttempts ) {
+					setTimeout( () => this.openProgressPlannerSidebar( attempt + 1 ), 500 );
+				}
 				return;
 			}
 
 			// Check if sidebar is already open.
 			if ( sidebarButton.getAttribute( 'aria-expanded' ) === 'true' ) {
+				console.log( 'PP Guided Tour: Progress Planner sidebar already open' );
 				return;
 			}
 
 			// Click to open the sidebar.
 			sidebarButton.click();
+			console.log( 'PP Guided Tour: Opened Progress Planner sidebar' );
 		},
 
 		/**
