@@ -34,7 +34,7 @@ const prplGetPageTypeSlugFromId = ( id ) => {
 	}
 
 	if ( ! id ) {
-		id = parseInt( progressPlannerEditor.defaultPageType );
+		id = parseInt( progressPlannerEditor.defaultPageType ) || 0;
 	}
 
 	return progressPlannerEditor.pageTypes.find(
@@ -54,7 +54,7 @@ const PrplRenderPageTypeSelector = () => {
 			select( 'core/editor' ).getEditedPostAttribute( TAXONOMY );
 		return pageTypeArr && 0 < pageTypeArr.length
 			? parseInt( pageTypeArr[ 0 ] )
-			: parseInt( progressPlannerEditor.defaultPageType );
+			: parseInt( progressPlannerEditor.defaultPageType ) || 0;
 	}, [] );
 
 	// Bail early if the page types are not set.
@@ -224,10 +224,10 @@ const PrplLessonItemsHTML = () => {
 		processedLesson.content_update_cycle = {
 			...processedLesson.content_update_cycle,
 			text: processedLesson.content_update_cycle.text
-				.replace( /\{page_type\}/g, lesson.name )
+				.replace( /\{page_type\}/g, processedLesson.name )
 				.replace(
 					/\{update_cycle\}/g,
-					lesson.content_update_cycle.update_cycle
+					processedLesson.content_update_cycle.update_cycle
 				),
 		};
 	}
@@ -374,14 +374,22 @@ const PrplTodoProgress = ( lessonSection, pageTodos ) => {
 	}
 
 	// Get an array of completed todo items.
-	const completedToDos = pageTodos
-		.split( ',' )
-		.filter( ( item ) => requiredToDos.includes( item ) );
+	// Normalize empty strings to empty arrays to avoid [''] from ''.split(',')
+	const todosArray = pageTodos
+		? pageTodos.split( ',' ).filter( Boolean )
+		: [];
+	const completedToDos = todosArray.filter( ( item ) =>
+		requiredToDos.includes( item )
+	);
 
 	// Get the percentage of completed todo items.
-	const percentageComplete = Math.round(
-		( completedToDos.length / requiredToDos.length ) * 100
-	);
+	// Guard against division by zero.
+	const percentageComplete =
+		requiredToDos.length > 0
+			? Math.round(
+					( completedToDos.length / requiredToDos.length ) * 100
+			  )
+			: 0;
 
 	return el(
 		'div',
@@ -448,7 +456,9 @@ const PrplCheckListItem = ( item, pageTodos ) =>
 			key: item.id,
 		},
 		el( CheckboxControl, {
-			checked: pageTodos.split( ',' ).includes( item.id ),
+			checked: pageTodos
+				? pageTodos.split( ',' ).filter( Boolean ).includes( item.id )
+				: false,
 			label: item.todo_name,
 			className: item.todo_required
 				? 'progress-planner-todo-item required'
@@ -459,11 +469,17 @@ const PrplCheckListItem = ( item, pageTodos ) =>
 				},
 			} ),
 			onChange: ( checked ) => {
-				const toDos = pageTodos.split( ',' );
+				// Normalize empty strings to empty arrays.
+				const toDos = pageTodos
+					? pageTodos.split( ',' ).filter( Boolean )
+					: [];
 				if ( checked ) {
 					toDos.push( item.id );
 				} else {
-					toDos.splice( toDos.indexOf( item.id ), 1 );
+					const index = toDos.indexOf( item.id );
+					if ( index > -1 ) {
+						toDos.splice( index, 1 );
+					}
 				}
 				// Update the `progress_planner_page_todos` meta value.
 				wp.data.dispatch( 'core/editor' ).editPost( {
@@ -569,12 +585,30 @@ const PrplPostStatus = () =>
 					},
 					variant: 'secondary',
 					href: '#',
-					onClick: () =>
-						wp.data
-							.dispatch( 'core/edit-post' )
-							.openGeneralSidebar(
+					onClick: () => {
+						// Try unified API first (WordPress 6.6+), fallback to deprecated API.
+						const editorDispatch =
+							wp.data.dispatch( 'core/editor' );
+						const editPostDispatch =
+							wp.data.dispatch( 'core/edit-post' );
+						if (
+							editorDispatch &&
+							typeof editorDispatch.openGeneralSidebar ===
+								'function'
+						) {
+							editorDispatch.openGeneralSidebar(
 								'progress-planner-sidebar/progress-planner-sidebar'
-							),
+							);
+						} else if (
+							editPostDispatch &&
+							typeof editPostDispatch.openGeneralSidebar ===
+								'function'
+						) {
+							editPostDispatch.openGeneralSidebar(
+								'progress-planner-sidebar/progress-planner-sidebar'
+							);
+						}
+					},
 				},
 				'Progress Planner'
 			)
