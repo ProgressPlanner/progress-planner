@@ -1,6 +1,6 @@
 <?php
 /**
- * Add tasks for settings saved.
+ * Add tasks for set valuable post types.
  *
  * @package Progress_Planner
  */
@@ -8,7 +8,7 @@
 namespace Progress_Planner\Suggested_Tasks\Providers;
 
 /**
- * Add tasks for settings saved.
+ * Add tasks for set valuable post types.
  */
 class Set_Valuable_Post_Types extends Tasks_Interactive {
 
@@ -119,21 +119,22 @@ class Set_Valuable_Post_Types extends Tasks_Interactive {
 
 	/**
 	 * Check if the task should be added.
-	 * We add tasks only to users who have have completed "Fill the settings page" task
-	 * and have upgraded from v1.2 or have 'include_post_types' option empty.
+	 * We add tasks only to users who have upgraded from v1.2 or have 'include_post_types' option empty.
 	 * Reason being that this option was migrated,
 	 * but it could be missed, and post type selection should be revisited.
 	 *
 	 * @return bool
 	 */
 	public function should_add_task() {
-		$saved_posts = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'provider_id' => 'settings-saved' ] );
-		if ( empty( $saved_posts ) ) {
+		$activity = \progress_planner()->get_activities__query()->query_activities(
+			[
+				'category' => 'suggested_task',
+				'data_id'  => static::PROVIDER_ID,
+			]
+		);
+		if ( ! empty( $activity ) ) {
 			return false;
 		}
-
-		// Is the task trashed?
-		$post_trashed = 'trash' === $saved_posts[0]->post_status;
 
 		// Upgraded from <= 1.2?
 		$upgraded = (bool) \get_option( 'progress_planner_set_valuable_post_types', false );
@@ -141,8 +142,8 @@ class Set_Valuable_Post_Types extends Tasks_Interactive {
 		// Include post types option empty?
 		$include_post_types = \progress_planner()->get_settings()->get( 'include_post_types', [] );
 
-		// Add the task only to users who have completed the "Settings saved" task and have upgraded from v1.2 or have 'include_post_types' option empty.
-		return $post_trashed && ( true === $upgraded || empty( $include_post_types ) );
+		// Add the task only to users who have upgraded from v1.2 or have 'include_post_types' option empty.
+		return ( true === $upgraded || empty( $include_post_types ) );
 	}
 
 	/**

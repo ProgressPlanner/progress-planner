@@ -18,14 +18,14 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<div class="prpl-quit-confirmation">
 				<div class="prpl-error-box">
 					<span class="prpl-error-icon">
-						<?php \progress_planner()->the_asset( 'images/icon_exclamation_circle.svg' ); ?>
+						<?php \progress_planner()->the_asset( 'images/icon_exclamation_circle_solid.svg' ); ?>
 					</span>
 					<div>
 						<h3><?php \esc_html_e( 'Are you sure you want to quit?', 'progress-planner' ); ?></h3>
 						<p>
 							<?php
 							/* translators: %s: Progress Planner name. */
-							\printf( \esc_html__( 'You need to finish the onboarding before you can work with the %s and start improving your site.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
+							\printf( \esc_html__( 'You need to finish the onboarding before you can work with the %s plugin and start improving your site.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
 							?>
 						</p>
 					</div>
