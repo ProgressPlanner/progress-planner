@@ -29,15 +29,19 @@ const prplGetPageTypeSlugFromId = ( id ) => {
 		id = 0;
 	} else if ( typeof id === 'string' ) {
 		id = parseInt( id );
+		// Handle NaN from parseInt on invalid strings.
+		if ( isNaN( id ) ) {
+			id = 0;
+		}
 	} else if ( typeof id !== 'number' ) {
 		id = 0;
 	}
 
-	if ( ! id ) {
+	if ( ! id || isNaN( id ) ) {
 		id = parseInt( progressPlannerEditor.defaultPageType ) || 0;
 	}
 
-	return progressPlannerEditor.pageTypes.find(
+	return progressPlannerEditor.pageTypes?.find(
 		( pageTypeItem ) => parseInt( pageTypeItem.id ) === parseInt( id )
 	)?.slug;
 };
@@ -69,8 +73,8 @@ const PrplRenderPageTypeSelector = () => {
 	const pageTypes = [];
 	progressPlannerEditor.pageTypes.forEach( ( term ) => {
 		pageTypes.push( {
-			label: term.title,
-			value: term.id,
+			label: term.title || '',
+			value: term.id || '',
 		} );
 	} );
 
@@ -123,7 +127,7 @@ const PrplSectionVideo = ( lessonSection ) => {
 					},
 				},
 				lessonSection.video_button_label
-					? lessonSection.video_button_text
+					? lessonSection.video_button_text || ''
 					: prplL10n( 'watchVideo' )
 			),
 			isOpen &&
@@ -145,7 +149,7 @@ const PrplSectionVideo = ( lessonSection ) => {
 						el( 'div', {
 							key: 'progress-planner-sidebar-video-modal-content-inner',
 							dangerouslySetInnerHTML: {
-								__html: lessonSection.video,
+								__html: lessonSection.video || '',
 							},
 						} )
 					)
@@ -160,7 +164,7 @@ const PrplSectionHTML = ( lesson, sectionId, wrapperEl = 'div' ) => {
 				wrapperEl,
 				{
 					key: `progress-planner-sidebar-lesson-section-${ sectionId }`,
-					title: lesson[ sectionId ].heading,
+					title: lesson[ sectionId ].heading || '',
 					initialOpen: false,
 				},
 				lesson[ sectionId ].video
@@ -170,7 +174,7 @@ const PrplSectionHTML = ( lesson, sectionId, wrapperEl = 'div' ) => {
 					? el( 'div', {
 							key: `progress-planner-sidebar-lesson-section-${ sectionId }-content`,
 							dangerouslySetInnerHTML: {
-								__html: lesson[ sectionId ].text,
+								__html: lesson[ sectionId ].text || '',
 							},
 					  } )
 					: el( 'div', {}, '' )
@@ -207,7 +211,7 @@ const PrplLessonItemsHTML = () => {
 	}
 
 	const lesson = progressPlannerEditor.lessons.find(
-		( lessonItem ) => lessonItem.settings.id === pageType
+		( lessonItem ) => lessonItem.settings?.id === pageType
 	);
 
 	// Bail early if lesson not found.
@@ -224,10 +228,10 @@ const PrplLessonItemsHTML = () => {
 		processedLesson.content_update_cycle = {
 			...processedLesson.content_update_cycle,
 			text: processedLesson.content_update_cycle.text
-				.replace( /\{page_type\}/g, processedLesson.name )
+				.replace( /\{page_type\}/g, processedLesson.name || '' )
 				.replace(
 					/\{update_cycle\}/g,
-					processedLesson.content_update_cycle.update_cycle
+					processedLesson.content_update_cycle.update_cycle || ''
 				),
 		};
 	}
@@ -249,7 +253,7 @@ const PrplLessonItemsHTML = () => {
 					PanelBody,
 					{
 						key: `progress-planner-sidebar-lesson-section-checklist-content`,
-						title: processedLesson.checklist.heading,
+						title: processedLesson.checklist.heading || '',
 						initialOpen: false,
 					},
 					el(
@@ -365,11 +369,13 @@ const PrplTodoProgress = ( lessonSection, pageTodos ) => {
 	const requiredToDos = [];
 	if ( lessonSection.todos ) {
 		lessonSection.todos.forEach( ( toDoGroup ) => {
-			toDoGroup.group_todos.forEach( ( item ) => {
-				if ( item.todo_required ) {
-					requiredToDos.push( item.id );
-				}
-			} );
+			if ( toDoGroup.group_todos ) {
+				toDoGroup.group_todos.forEach( ( item ) => {
+					if ( item.todo_required && item.id ) {
+						requiredToDos.push( item.id );
+					}
+				} );
+			}
 		} );
 	}
 
@@ -453,19 +459,23 @@ const PrplCheckListItem = ( item, pageTodos ) =>
 	el(
 		'div',
 		{
-			key: item.id,
+			key: item.id || '',
 		},
 		el( CheckboxControl, {
-			checked: pageTodos
-				? pageTodos.split( ',' ).filter( Boolean ).includes( item.id )
-				: false,
-			label: item.todo_name,
+			checked:
+				pageTodos && item.id
+					? pageTodos
+							.split( ',' )
+							.filter( Boolean )
+							.includes( item.id )
+					: false,
+			label: item.todo_name || '',
 			className: item.todo_required
 				? 'progress-planner-todo-item required'
 				: 'progress-planner-todo-item',
 			help: el( 'div', {
 				dangerouslySetInnerHTML: {
-					__html: item.todo_description,
+					__html: item.todo_description || '',
 				},
 			} ),
 			onChange: ( checked ) => {
@@ -473,9 +483,9 @@ const PrplCheckListItem = ( item, pageTodos ) =>
 				const toDos = pageTodos
 					? pageTodos.split( ',' ).filter( Boolean )
 					: [];
-				if ( checked ) {
+				if ( checked && item.id ) {
 					toDos.push( item.id );
-				} else {
+				} else if ( item.id ) {
 					const index = toDos.indexOf( item.id );
 					if ( index > -1 ) {
 						toDos.splice( index, 1 );
@@ -498,26 +508,38 @@ const PrplCheckListItem = ( item, pageTodos ) =>
  * @param {string} pageTodos
  * @return {Element} Element to render.
  */
-const PrplCheckList = ( lessonSection, pageTodos ) =>
-	lessonSection.todos.map( ( toDoGroup ) =>
+const PrplCheckList = ( lessonSection, pageTodos ) => {
+	// Bail early if todos are not set.
+	if ( ! lessonSection.todos || ! Array.isArray( lessonSection.todos ) ) {
+		return [];
+	}
+
+	return lessonSection.todos.map( ( toDoGroup ) =>
 		el(
 			PanelBody,
 			{
-				key: `progress-planner-sidebar-lesson-section-${ toDoGroup.group_heading }`,
-				title: toDoGroup.group_heading,
+				key: `progress-planner-sidebar-lesson-section-${
+					toDoGroup.group_heading || ''
+				}`,
+				title: toDoGroup.group_heading || '',
 				initialOpen: false,
 			},
 			el(
 				'div',
 				{
-					key: `progress-planner-sidebar-lesson-section-${ toDoGroup.group_heading }-todos`,
+					key: `progress-planner-sidebar-lesson-section-${
+						toDoGroup.group_heading || ''
+					}-todos`,
 				},
-				toDoGroup.group_todos.map( ( item ) =>
-					PrplCheckListItem( item, pageTodos )
-				)
+				toDoGroup.group_todos && Array.isArray( toDoGroup.group_todos )
+					? toDoGroup.group_todos.map( ( item ) =>
+							PrplCheckListItem( item, pageTodos )
+					  )
+					: []
 			)
 		)
 	);
+};
 
 // Register the sidebar.
 registerPlugin( 'progress-planner-sidebar', {
