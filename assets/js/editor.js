@@ -264,8 +264,33 @@ const PrplLessonItemsHTML = () => {
  *
  * @return {Element} Element to render.
  */
-const PrplProgressPlannerSidebar = () =>
-	el(
+const PrplProgressPlannerSidebar = () => {
+	// Use useSelect to reactively detect what's being edited
+	// Include both postType and postId so component re-renders when switching posts
+	// eslint-disable-next-line no-unused-vars
+	const { isEditingPost, postId, postType } = useSelect( ( select ) => {
+		const editor = select( 'core/editor' );
+		const currentPostType = editor.getCurrentPostType();
+		const currentPostId = editor.getCurrentPostId();
+
+		// Templates have post types 'wp_template' or 'wp_template_part'
+		const isTemplate =
+			currentPostType === 'wp_template' ||
+			currentPostType === 'wp_template_part';
+
+		return {
+			isEditingPost: ! isTemplate && !! currentPostType,
+			postId: currentPostId,
+			postType: currentPostType,
+		};
+	}, [] );
+
+	// Don't render sidebar at all if not editing a post/page
+	if ( ! isEditingPost ) {
+		return null;
+	}
+
+	return el(
 		Fragment,
 		{},
 		el(
@@ -298,6 +323,7 @@ const PrplProgressPlannerSidebar = () =>
 			)
 		)
 	);
+};
 
 /**
  * Render the todo items progressbar.
