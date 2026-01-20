@@ -38,10 +38,26 @@ const prplGetPageTypeSlugFromId = ( id ) => {
 	}
 
 	if ( ! id || isNaN( id ) ) {
-		id = parseInt( progressPlannerEditor.defaultPageType ) || 0;
+		// Check if progressPlannerEditor exists before accessing its properties.
+		if (
+			typeof progressPlannerEditor !== 'undefined' &&
+			progressPlannerEditor.defaultPageType
+		) {
+			id = parseInt( progressPlannerEditor.defaultPageType ) || 0;
+		} else {
+			id = 0;
+		}
 	}
 
-	return progressPlannerEditor.pageTypes?.find(
+	// Check if progressPlannerEditor exists before accessing pageTypes.
+	if (
+		typeof progressPlannerEditor === 'undefined' ||
+		! progressPlannerEditor.pageTypes
+	) {
+		return undefined;
+	}
+
+	return progressPlannerEditor.pageTypes.find(
 		( pageTypeItem ) => parseInt( pageTypeItem.id ) === parseInt( id )
 	)?.slug;
 };
@@ -126,8 +142,8 @@ const PrplSectionVideo = ( lessonSection ) => {
 						boxShadow: 'inset 0 0 0 1px #38296D',
 					},
 				},
-				lessonSection.video_button_label
-					? lessonSection.video_button_text || ''
+				lessonSection.video_button_text
+					? lessonSection.video_button_text
 					: prplL10n( 'watchVideo' )
 			),
 			isOpen &&
@@ -202,8 +218,10 @@ const PrplLessonItemsHTML = () => {
 	const pageTodos = pageTodosMeta || '';
 
 	// Bail early if the page type or lessons are not set.
+	// Check if progressPlannerEditor exists before accessing its properties.
 	if (
 		! pageType ||
+		typeof progressPlannerEditor === 'undefined' ||
 		! progressPlannerEditor.lessons ||
 		0 === progressPlannerEditor.lessons.length
 	) {
@@ -285,7 +303,8 @@ const PrplLessonItemsHTML = () => {
 const PrplProgressPlannerSidebar = () => {
 	// Use useSelect to reactively detect what's being edited
 	// Include both postType and postId so component re-renders when switching posts
-	// eslint-disable-next-line no-unused-vars
+	// postId and postType are destructured but intentionally unused - they're needed
+	// for reactivity when switching between posts in the site editor.
 	const { isEditingPost, postId, postType } = useSelect( ( select ) => {
 		const editor = select( 'core/editor' );
 
@@ -316,6 +335,8 @@ const PrplProgressPlannerSidebar = () => {
 			postType: currentPostType,
 		};
 	}, [] );
+	// eslint-disable-next-line no-unused-vars
+	const _unusedForReactivity = { postId, postType };
 
 	// Don't render sidebar at all if not editing a post/page.
 	if ( ! isEditingPost ) {
@@ -608,25 +629,27 @@ const PrplPostStatus = () =>
 					variant: 'secondary',
 					href: '#',
 					onClick: () => {
-						// Try unified API first (WordPress 6.6+), fallback to deprecated API.
-						const editorDispatch =
-							wp.data.dispatch( 'core/editor' );
+						// openGeneralSidebar is in core/edit-post store, not core/editor.
+						// Try core/edit-post first (where the method is defined),
+						// then fallback to core/editor if available in future versions.
 						const editPostDispatch =
 							wp.data.dispatch( 'core/edit-post' );
+						const editorDispatch =
+							wp.data.dispatch( 'core/editor' );
 						if (
-							editorDispatch &&
-							typeof editorDispatch.openGeneralSidebar ===
-								'function'
-						) {
-							editorDispatch.openGeneralSidebar(
-								'progress-planner-sidebar/progress-planner-sidebar'
-							);
-						} else if (
 							editPostDispatch &&
 							typeof editPostDispatch.openGeneralSidebar ===
 								'function'
 						) {
 							editPostDispatch.openGeneralSidebar(
+								'progress-planner-sidebar/progress-planner-sidebar'
+							);
+						} else if (
+							editorDispatch &&
+							typeof editorDispatch.openGeneralSidebar ===
+								'function'
+						) {
+							editorDispatch.openGeneralSidebar(
 								'progress-planner-sidebar/progress-planner-sidebar'
 							);
 						}
