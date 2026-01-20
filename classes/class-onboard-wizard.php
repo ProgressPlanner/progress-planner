@@ -315,7 +315,8 @@ class Onboard_Wizard {
 						'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),
 						/* translators: %s: Progress Planner name. */
 						'privacyPolicyError'    => sprintf( \esc_html__( 'You need to agree with the privacy policy to use the %s plugin.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) ),
-						'dashboard'             => \esc_html__( 'Take me to the dashboard', 'progress-planner' ),
+						/* translators: %s: arrow icon */
+						'dashboard'             => sprintf( \esc_html__( 'Take me to the dashboard %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' ),
 						'backToRecommendations' => \esc_html__( 'Back to recommendations', 'progress-planner' ),
 					],
 					'errorIcon'            => \progress_planner()->get_asset( 'images/icon_exclamation_circle.svg' ),
