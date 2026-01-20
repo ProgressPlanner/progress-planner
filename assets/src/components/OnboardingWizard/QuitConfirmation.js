@@ -21,6 +21,7 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 	const brandingName =
 		config?.l10n?.brandingName ||
 		__( 'Progress Planner', 'progress-planner' );
+	const baseUrl = config?.baseUrl || '';
 
 	return (
 		<div className="prpl-columns-wrapper-flex prpl-columns-2-1">
@@ -98,20 +99,12 @@ export default function QuitConfirmation( { onConfirm, onCancel, config } ) {
 			</div>
 			<div className="prpl-column prpl-hide-on-mobile">
 				<div id="prpl-quit-confirmation-graphic">
-					{ /* Graphic would be rendered here - neglected_site_ravi.svg */ }
-					<div
-						style={ {
-							width: '100%',
-							height: '200px',
-							backgroundColor: '#f0f0f0',
-							display: 'flex',
-							alignItems: 'center',
-							justifyContent: 'center',
-							color: '#999',
-						} }
-					>
-						{ __( 'Graphic placeholder', 'progress-planner' ) }
-					</div>
+					<img
+						src={ `${
+							baseUrl || ''
+						}/assets/images/onboarding/neglected_site_ravi.svg` }
+						alt=""
+					/>
 				</div>
 			</div>
 		</div>

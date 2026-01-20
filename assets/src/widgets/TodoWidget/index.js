@@ -221,8 +221,6 @@ function TodoWidget( { config = {} } ) {
 				console.error( 'Error loading tasks:', error );
 			} finally {
 				setIsLoading( false );
-				// Trigger grid resize
-				dispatchGridResize();
 			}
 		};
 
@@ -236,6 +234,16 @@ function TodoWidget( { config = {} } ) {
 	useEffect( () => {
 		fetchProviderTerms();
 	}, [ fetchProviderTerms ] );
+
+	/**
+	 * Trigger grid resize when tasks change.
+	 * This ensures the masonry layout updates after React has rendered the new content.
+	 */
+	useEffect( () => {
+		if ( ! isLoading ) {
+			dispatchGridResize();
+		}
+	}, [ pendingTasks, completedTasks, isLoading ] );
 
 	/**
 	 * Create a new task.
@@ -278,9 +286,6 @@ function TodoWidget( { config = {} } ) {
 
 				// Focus input
 				inputRef.current?.focus();
-
-				// Trigger grid resize
-				dispatchGridResize();
 			} catch ( error ) {
 				// eslint-disable-next-line no-console
 				console.error( 'Error creating task:', error );
@@ -340,9 +345,6 @@ function TodoWidget( { config = {} } ) {
 						celebrate();
 					}
 				}
-
-				// Trigger grid resize
-				dispatchGridResize();
 			} catch ( error ) {
 				// eslint-disable-next-line no-console
 				console.error( 'Error toggling task:', error );
@@ -369,9 +371,6 @@ function TodoWidget( { config = {} } ) {
 			setCompletedTasks( ( prev ) =>
 				prev.filter( ( t ) => t.id !== taskId )
 			);
-
-			// Trigger grid resize
-			dispatchGridResize();
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Error deleting task:', error );
@@ -421,9 +420,6 @@ function TodoWidget( { config = {} } ) {
 				// eslint-disable-next-line no-console
 				console.error( 'Error saving task order:', error );
 			}
-
-			// Trigger grid resize
-			dispatchGridResize();
 		},
 		[ pendingTasks, sortTasksWithGoldenFirst ]
 	);
@@ -474,9 +470,6 @@ function TodoWidget( { config = {} } ) {
 					'assertive'
 				);
 			}
-
-			// Trigger grid resize
-			dispatchGridResize();
 		} catch ( error ) {
 			// eslint-disable-next-line no-console
 			console.error( 'Error deleting completed tasks:', error );

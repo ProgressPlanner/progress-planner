@@ -311,19 +311,19 @@ class Onboard_Wizard_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test skip_onboarding filter affects step definition registration.
+	 * Test show_onboarding filter.
 	 *
 	 * @return void
 	 */
-	public function test_skip_onboarding_filter() {
+	public function test_show_onboarding_filter() {
 		// Set admin user.
 		\wp_set_current_user( $this->admin_user_id );
 
 		// Ensure privacy is not accepted (would normally show onboarding).
 		\delete_option( 'progress_planner_license_key' );
 
-		// Add filter to skip onboarding.
-		\add_filter( 'progress_planner_skip_onboarding', '__return_true' );
+		// Add filter to hide onboarding.
+		\add_filter( 'progress_planner_show_onboarding', '__return_false' );
 
 		$wizard = new Onboard_Wizard();
 		$wizard->maybe_register_popover_hooks();
@@ -334,7 +334,7 @@ class Onboard_Wizard_Test extends \WP_UnitTestCase {
 		);
 
 		// Remove filter.
-		\remove_filter( 'progress_planner_skip_onboarding', '__return_true' );
+		\remove_filter( 'progress_planner_show_onboarding', '__return_false' );
 	}
 
 	/**

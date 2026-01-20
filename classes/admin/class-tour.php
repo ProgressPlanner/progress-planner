@@ -63,25 +63,7 @@ class Tour {
 				],
 			],
 			[
-				'element' => '#prpl-popover-monthly-badges-trigger',
-				'popover' => [
-					'title'       => \esc_html__( 'Monthly badges', 'progress-planner' ),
-					'description' => \esc_html__( 'With this button you can open the monthly badges.', 'progress-planner' ),
-					'side'        => 'top',
-					'align'       => 'center',
-				],
-			],
-			[
-				'element' => '#prpl-popover-monthly-badges',
-				'popover' => [
-					'title'       => \esc_html__( 'Your badges', 'progress-planner' ),
-					'description' => \esc_html__( 'As you progress and are more active on your website, you can earn badges. These badges are displayed here!', 'progress-planner' ),
-					'side'        => 'top',
-					'align'       => 'center',
-				],
-			],
-			[
-				'element' => '.prpl-widget-wrapper.prpl-badge-streak .prpl-info-icon',
+				'element' => '.prpl-widget-wrapper.prpl-badge-streak-maintenance .prpl-info-icon',
 				'popover' => [
 					'title'       => \esc_html__( 'Your badge progress', 'progress-planner' ),
 					'description' => \esc_html__( 'Clicking the info icon will show you more information about your badge progress. You can also learn about streak freezes here.', 'progress-planner' ),

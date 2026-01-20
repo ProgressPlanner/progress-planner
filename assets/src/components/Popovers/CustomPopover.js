@@ -13,6 +13,7 @@
 
 import { useState, useCallback, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
 
@@ -200,7 +201,7 @@ export default function CustomPopover( {
 		]
 	);
 
-	const taskTitle = task.title?.rendered || task.title;
+	const taskTitle = decodeEntities( task.title?.rendered || task.title );
 	const taskDescription =
 		task.description?.rendered || task.description || '';
 

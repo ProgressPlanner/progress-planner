@@ -12,6 +12,7 @@
 
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
 import { resolveTaskId } from '../../utils/taskIdResolver';
@@ -78,12 +79,30 @@ export default function SubscribeFormPopover( { task, onSubmit, onClose } ) {
 
 				if ( response.success ) {
 					setSuccess( true );
-					// Call onSubmit after a short delay to show success message
-					setTimeout( () => {
-						if ( onSubmit ) {
-							onSubmit( task.id, task );
+
+					// Save license key locally via WordPress AJAX and reload page.
+					if ( response.license_key ) {
+						const { ajaxUrl = '', nonce = '' } =
+							window.prplDashboardConfig || {};
+
+						if ( ajaxUrl && nonce ) {
+							const saveFormData = new FormData();
+							saveFormData.append(
+								'action',
+								'progress_planner_save_onboard_data'
+							);
+							saveFormData.append( '_ajax_nonce', nonce );
+							saveFormData.append( 'key', response.license_key );
+
+							await fetch( ajaxUrl, {
+								method: 'POST',
+								body: saveFormData,
+							} );
 						}
-					}, 1500 );
+
+						// Reload page to reflect the new license state.
+						window.location.reload();
+					}
 				} else {
 					throw new Error(
 						response.message ||
@@ -108,10 +127,11 @@ export default function SubscribeFormPopover( { task, onSubmit, onClose } ) {
 		[ name, email, task, onSubmit ]
 	);
 
-	const taskTitle =
+	const taskTitle = decodeEntities(
 		task.title?.rendered ||
-		task.title ||
-		__( 'Subscribe to weekly emails', 'progress-planner' );
+			task.title ||
+			__( 'Subscribe to weekly emails', 'progress-planner' )
+	);
 	const taskId = resolveTaskId( task, 'subscribe-form' );
 
 	return (

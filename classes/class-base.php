@@ -60,7 +60,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Admin\Enqueue get_admin__enqueue()
  * @method \Progress_Planner\UI\Popover get_ui__popover()
  * @method \Progress_Planner\UI\Chart get_ui__chart()
- * @method \Progress_Planner\Activities\Content_Helpers get_activities__content_helpers()
+ * @method \Progress_Planner\Activities\Content_Helpers|null get_activities__content_helpers()
  * @method \Progress_Planner\Utils\Date get_utils__date()
  * @method \Progress_Planner\Onboard_Wizard get_onboard_wizard()
  */

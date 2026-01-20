@@ -2,13 +2,13 @@
  * FirstTaskStep Component
  *
  * Step for completing the first onboarding task.
+ * The Next button is hidden - user advances by completing the task.
  *
  * @package
  */
 
-import { useState, useEffect } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import OnboardingStep from '../OnboardingStep';
 import { useTaskCompletion } from '../../../hooks/useTaskCompletion';
 
 /**
@@ -24,30 +24,31 @@ export default function FirstTaskStep( props ) {
 		config?.l10n?.brandingName ||
 		__( 'Progress Planner', 'progress-planner' );
 
-	const { completeTask, isCompleting } = useTaskCompletion( {
+	const { completeTask } = useTaskCompletion( {
 		ajaxUrl,
 		nonce,
 	} );
 
-	const [ isCompleted, setIsCompleted ] = useState(
-		wizardState.data.firstTaskCompleted || false
-	);
+	const [ isCompleting, setIsCompleting ] = useState( false );
+	const taskContentRef = useRef( null );
 
 	const task = stepData?.data?.task;
 
 	/**
 	 * Handle task completion.
 	 *
+	 * @param {string} taskId     - Task ID.
 	 * @param {Object} formValues - Form values from task.
 	 */
-	const handleCompleteTask = async ( formValues = {} ) => {
-		if ( ! task?.task_id ) {
+	const handleCompleteTask = async ( taskId, formValues = {} ) => {
+		if ( ! taskId || isCompleting ) {
 			return;
 		}
 
+		setIsCompleting( true );
+
 		try {
-			await completeTask( task.task_id, formValues );
-			setIsCompleted( true );
+			await completeTask( taskId, formValues );
 			updateState( {
 				data: {
 					...wizardState.data,
@@ -55,22 +56,49 @@ export default function FirstTaskStep( props ) {
 				},
 			} );
 			// Auto-advance to next step.
-			setTimeout( () => {
-				onNext();
-			}, 500 );
+			onNext();
 		} catch ( error ) {
+			// eslint-disable-next-line no-console
 			console.error( 'Failed to complete task:', error );
+			setIsCompleting( false );
 		}
 	};
 
-	/**
-	 * Check if can proceed.
-	 *
-	 * @return {boolean} True if task is completed.
-	 */
-	const canProceed = () => {
-		return isCompleted;
-	};
+	// Attach click handler after render.
+	useEffect( () => {
+		if ( ! taskContentRef.current ) {
+			return;
+		}
+
+		const btn = taskContentRef.current.querySelector(
+			'.prpl-complete-task-btn'
+		);
+		if ( ! btn ) {
+			return;
+		}
+
+		const handleClick = ( e ) => {
+			e.preventDefault();
+			const button = e.target.closest( 'button' );
+			const taskId = button?.dataset?.taskId || task?.task_id;
+			const form = button?.closest( 'form' );
+
+			let formValues = {};
+			if ( form ) {
+				const formData = new FormData( form );
+				formValues = Object.fromEntries( formData.entries() );
+			}
+
+			handleCompleteTask( taskId, formValues );
+		};
+
+		btn.addEventListener( 'click', handleClick );
+
+		return () => {
+			btn.removeEventListener( 'click', handleClick );
+		};
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ task ] );
 
 	// Skip step if no task available.
 	useEffect( () => {
@@ -85,7 +113,7 @@ export default function FirstTaskStep( props ) {
 	}
 
 	return (
-		<OnboardingStep { ...props } canProceed={ canProceed }>
+		<div className="onboarding-step">
 			<div className="tour-content">
 				<div className="prpl-columns-wrapper-flex">
 					<div className="prpl-column">
@@ -114,7 +142,7 @@ export default function FirstTaskStep( props ) {
 							</p>
 						</div>
 					</div>
-					<div className="prpl-column">
+					<div className="prpl-column" ref={ taskContentRef }>
 						{ task.template_html ? (
 							<div
 								dangerouslySetInnerHTML={ {
@@ -124,21 +152,10 @@ export default function FirstTaskStep( props ) {
 						) : (
 							<div className="prpl-first-task-content">
 								{ task.title && <h4>{ task.title }</h4> }
-								{ task.url && (
-									<a
-										href={ task.url }
-										target="_blank"
-										rel="noopener noreferrer"
-										className="prpl-button-primary"
-									>
-										{ task.action_label ||
-											__( 'Do it', 'progress-planner' ) }
-									</a>
-								) }
 								<button
 									type="button"
-									className="prpl-complete-task-btn"
-									onClick={ () => handleCompleteTask() }
+									className="prpl-complete-task-btn prpl-btn prpl-btn-secondary"
+									data-task-id={ task.task_id }
 									disabled={ isCompleting }
 								>
 									{ isCompleting
@@ -146,7 +163,8 @@ export default function FirstTaskStep( props ) {
 												'Completing…',
 												'progress-planner'
 										  )
-										: __(
+										: task.action_label ||
+										  __(
 												'Mark as complete',
 												'progress-planner'
 										  ) }
@@ -156,6 +174,7 @@ export default function FirstTaskStep( props ) {
 					</div>
 				</div>
 			</div>
-		</OnboardingStep>
+			{ /* No footer/Next button - user advances by completing the task */ }
+		</div>
 	);
 }

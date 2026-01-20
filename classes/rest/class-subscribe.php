@@ -127,7 +127,9 @@ class Subscribe extends Base {
 			);
 		}
 
-		// License key is already saved by make_remote_onboarding_request.
+		// Save the license key to the database.
+		\update_option( 'progress_planner_license_key', $license_key, false );
+
 		return new \WP_REST_Response(
 			[
 				'success'     => true,

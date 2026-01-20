@@ -50,6 +50,10 @@ const SNOOZE_DURATIONS = [
 export default function TaskActionSnooze( { taskId, taskTitle, onSnooze } ) {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 
+	const wrapperClassName = `prpl-suggested-task-snooze${
+		isExpanded ? ' prpl-toggle-radio-group-open' : ''
+	}`;
+
 	const handleDurationChange = ( e ) => {
 		const duration = e.target.value;
 		onSnooze?.( duration );
@@ -61,69 +65,74 @@ export default function TaskActionSnooze( { taskId, taskTitle, onSnooze } ) {
 		setIsExpanded( ! isExpanded );
 	};
 
+	// Wrapper span needed because React's className prop doesn't work on custom elements (web components).
 	return (
-		<prpl-tooltip
-			className={ `prpl-suggested-task-snooze${
-				isExpanded ? ' prpl-toggle-radio-group-open' : ''
-			}` }
-		>
-			<slot name="open">
-				<button
-					type="button"
-					className="prpl-suggested-task-button"
-					style={ STYLES.button }
-					data-task-id={ taskId }
-					data-task-title={ taskTitle }
-					data-action="snooze"
-					data-target="snooze"
-					title={ __( 'Snooze', 'progress-planner' ) }
-				>
-					<span
-						className="prpl-tooltip-action-text"
-						style={ STYLES.actionText }
+		<span className={ wrapperClassName }>
+			<prpl-tooltip>
+				<slot name="open">
+					<button
+						type="button"
+						className="prpl-suggested-task-button"
+						style={ STYLES.button }
+						data-task-id={ taskId }
+						data-task-title={ taskTitle }
+						data-action="snooze"
+						data-target="snooze"
+						title={ __( 'Snooze', 'progress-planner' ) }
 					>
-						{ __( 'Snooze', 'progress-planner' ) }
-					</span>
-				</button>
-			</slot>
-			<slot name="content">
-				<fieldset>
-					<legend>
-						<span>
-							{ __( 'Snooze this task?', 'progress-planner' ) }
-						</span>
-						<button
-							type="button"
-							className="prpl-toggle-radio-group"
-							onClick={ toggleExpanded }
+						<span
+							className="prpl-tooltip-action-text"
+							style={ STYLES.actionText }
 						>
-							<span className="prpl-toggle-radio-group-text">
-								{ __( 'How long?', 'progress-planner' ) }
+							{ __( 'Snooze', 'progress-planner' ) }
+						</span>
+					</button>
+				</slot>
+				<slot name="content">
+					<fieldset>
+						<legend>
+							<span>
+								{ __(
+									'Snooze this task?',
+									'progress-planner'
+								) }
 							</span>
-							<span className="prpl-toggle-radio-group-arrow">
-								&rsaquo;
-							</span>
-						</button>
-					</legend>
-					<div className="prpl-snooze-duration-radio-group">
-						{ SNOOZE_DURATIONS.map( ( duration ) => {
-							const inputId = `snooze-${ taskId }-${ duration.key }`;
-							return (
-								<label key={ duration.key } htmlFor={ inputId }>
-									<input
-										type="radio"
-										id={ inputId }
-										name={ `snooze-duration-${ taskId }` }
-										value={ duration.key }
-										onChange={ handleDurationChange }
-									/>
-									{ duration.label }
-								</label>
-							);
-						} ) }
-					</div>
-				</fieldset>
-			</slot>
-		</prpl-tooltip>
+							<button
+								type="button"
+								className="prpl-toggle-radio-group"
+								onClick={ toggleExpanded }
+							>
+								<span className="prpl-toggle-radio-group-text">
+									{ __( 'How long?', 'progress-planner' ) }
+								</span>
+								<span className="prpl-toggle-radio-group-arrow">
+									&rsaquo;
+								</span>
+							</button>
+						</legend>
+						<div className="prpl-snooze-duration-radio-group">
+							{ SNOOZE_DURATIONS.map( ( duration ) => {
+								const inputId = `snooze-${ taskId }-${ duration.key }`;
+								return (
+									<label
+										key={ duration.key }
+										htmlFor={ inputId }
+									>
+										<input
+											type="radio"
+											id={ inputId }
+											name={ `snooze-duration-${ taskId }` }
+											value={ duration.key }
+											onChange={ handleDurationChange }
+										/>
+										{ duration.label }
+									</label>
+								);
+							} ) }
+						</div>
+					</fieldset>
+				</slot>
+			</prpl-tooltip>
+		</span>
 	);
 }

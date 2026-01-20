@@ -13,6 +13,7 @@
 
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
 import { submitSiteSettings } from '../../hooks/usePopoverForms';
@@ -211,7 +212,7 @@ export default function DateFormatPopover( {
 		};
 	}, [] );
 
-	const taskTitle = task.title?.rendered || task.title;
+	const taskTitle = decodeEntities( task.title?.rendered || task.title );
 
 	return (
 		<InteractiveTaskPopover

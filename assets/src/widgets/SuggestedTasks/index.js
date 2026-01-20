@@ -13,6 +13,7 @@ import {
 	useMemo,
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import { doAction } from '@wordpress/hooks';
 import PopoverManager from './PopoverManager';
 import TaskList from './TaskList';
@@ -604,20 +605,8 @@ function SuggestedTasks( { config = {} } ) {
 		dispatchGridResize( 100 );
 	}, [] );
 
-	/**
-	 * Decode HTML entities in a string.
-	 *
-	 * @param {string} str The string to decode.
-	 * @return {string} The decoded string.
-	 */
-	const decodeHtmlEntities = useCallback( ( str ) => {
-		const textarea = document.createElement( 'textarea' );
-		textarea.innerHTML = str;
-		return textarea.value;
-	}, [] );
-
 	// Get title and description from config or use defaults.
-	const widgetTitle = decodeHtmlEntities(
+	const widgetTitle = decodeEntities(
 		config?.title ||
 			sprintf(
 				/* translators: %s: Ravi's name. */
@@ -626,7 +615,7 @@ function SuggestedTasks( { config = {} } ) {
 			)
 	);
 
-	const widgetDescription = decodeHtmlEntities(
+	const widgetDescription = decodeEntities(
 		config?.description ||
 			sprintf(
 				/* translators: %s: Ravi's name. */

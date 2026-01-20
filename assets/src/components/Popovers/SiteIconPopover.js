@@ -12,6 +12,7 @@
 
 import { useState, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
 
@@ -90,7 +91,7 @@ export default function SiteIconPopover( { task, onSubmit, onClose } ) {
 		[ iconId, task, onSubmit ]
 	);
 
-	const taskTitle = task.title?.rendered || task.title;
+	const taskTitle = decodeEntities( task.title?.rendered || task.title );
 
 	return (
 		<InteractiveTaskPopover

@@ -105,9 +105,27 @@ function MonthlyBadges( { config = {} } ) {
 		const currentYear = now.getFullYear();
 		const incomplete = [];
 
+		// Get activation date to filter out months before user was active.
+		const activationDate = data?.activationDate
+			? new Date( data.activationDate )
+			: null;
+
 		// Check previous 2 months (matches PHP overflow logic).
 		for ( let i = 1; i <= 2; i++ ) {
 			const checkDate = new Date( currentYear, currentMonth - i, 1 );
+
+			// Skip months before user's activation date.
+			if ( activationDate ) {
+				const activationMonthStart = new Date(
+					activationDate.getFullYear(),
+					activationDate.getMonth(),
+					1
+				);
+				if ( checkDate < activationMonthStart ) {
+					continue;
+				}
+			}
+
 			const badgeId = getMonthlyBadgeIdFromDate( checkDate );
 			const progress = badgeProgress[ badgeId ];
 
@@ -123,7 +141,7 @@ function MonthlyBadges( { config = {} } ) {
 		}
 
 		return incomplete;
-	}, [ badgeProgress ] );
+	}, [ badgeProgress, data?.activationDate ] );
 
 	// Calculate effective gauge value by adding session points.
 	const baseGaugeValue = currentBadge?.progress?.points || 0;

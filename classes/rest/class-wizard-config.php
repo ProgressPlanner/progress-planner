@@ -54,6 +54,11 @@ class Wizard_Config extends Base {
 		// Get saved progress from user meta.
 		$saved_progress = $wizard->get_saved_progress();
 
+		// Force re-calculation of steps.
+		// Tasks may have been created by React just before this request,
+		// so we need fresh data instead of cached steps from the init hook.
+		$wizard->define_steps_and_order();
+
 		// Get steps using public method.
 		$steps = $wizard->get_steps();
 
@@ -62,7 +67,7 @@ class Wizard_Config extends Base {
 		foreach ( $steps as $index => $step ) {
 			$steps_formatted[] = [
 				'id'       => $step['template_id'],
-				'title'    => $step['title'],
+				'title'    => \html_entity_decode( $step['title'], ENT_QUOTES, 'UTF-8' ),
 				'template' => $step['template_file_name'],
 				'data'     => isset( $step['template_data'] ) ? $step['template_data'] : [],
 			];
@@ -84,26 +89,31 @@ class Wizard_Config extends Base {
 		}
 
 		// Page type descriptions for SettingsStep.
+		// Use __() instead of esc_html__() to avoid HTML entity encoding in JSON.
 		$page_types = [
 			'homepage' => [
 				'id'          => 'homepage',
-				'title'       => \esc_html__( 'Home page', 'progress-planner' ),
-				'description' => \esc_html__( 'Help us understand your site a little better so we can give you more useful recommendations. Let\'s start with the home page.', 'progress-planner' ),
+				'title'       => \__( 'Home page', 'progress-planner' ),
+				'description' => \__( 'Help us understand your site a little better so we can give you more useful recommendations. Let\'s start with the home page.', 'progress-planner' ),
+				'note'        => \__( 'A Home page is important. We\'ll remind you to make one at a later time.', 'progress-planner' ),
 			],
 			'about'    => [
 				'id'          => 'about',
-				'title'       => \esc_html__( 'About page', 'progress-planner' ),
-				'description' => \esc_html__( 'Next up, pick the page you use as your about page.', 'progress-planner' ),
+				'title'       => \__( 'About page', 'progress-planner' ),
+				'description' => \__( 'Next up, pick the page you use as your about page.', 'progress-planner' ),
+				'note'        => \__( 'An About page is important. We\'ll remind you to make one at a later time.', 'progress-planner' ),
 			],
 			'contact'  => [
 				'id'          => 'contact',
-				'title'       => \esc_html__( 'Contact page', 'progress-planner' ),
-				'description' => \esc_html__( 'Now choose the page you use as your contact page.', 'progress-planner' ),
+				'title'       => \__( 'Contact page', 'progress-planner' ),
+				'description' => \__( 'Now choose the page you use as your contact page.', 'progress-planner' ),
+				'note'        => \__( 'A Contact page is important. We\'ll remind you to make one at a later time.', 'progress-planner' ),
 			],
 			'faq'      => [
 				'id'          => 'faq',
-				'title'       => \esc_html__( 'FAQ page', 'progress-planner' ),
-				'description' => \esc_html__( 'Next, pick the page you use as your FAQ page.', 'progress-planner' ),
+				'title'       => \__( 'FAQ page', 'progress-planner' ),
+				'description' => \__( 'Next, pick the page you use as your FAQ page.', 'progress-planner' ),
+				'note'        => \__( 'An FAQ page is important. We\'ll remind you to make one at a later time.', 'progress-planner' ),
 			],
 		];
 
@@ -132,12 +142,18 @@ class Wizard_Config extends Base {
 		\progress_planner()->get_ui__branding()->the_logo();
 		$logo_html = \ob_get_clean();
 
+		// Get current user data for email frequency step.
+		$current_user = \wp_get_current_user();
+
 		$config = [
 			'enabled'             => ! $skip_onboarding,
 			'steps'               => $steps_formatted,
 			'savedProgress'       => $saved_progress,
 			'ajaxUrl'             => \admin_url( 'admin-ajax.php' ),
 			'nonce'               => \wp_create_nonce( 'progress_planner' ),
+			'nonceWPAPI'          => \wp_create_nonce( 'wp_rest' ),
+			'userFirstName'       => $current_user->first_name ? $current_user->first_name : $current_user->display_name,
+			'userEmail'           => $current_user->user_email,
 			'onboardAPIUrl'       => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
 			'onboardNonceURL'     => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
 			'site'                => \esc_attr( \set_url_scheme( \site_url() ) ),

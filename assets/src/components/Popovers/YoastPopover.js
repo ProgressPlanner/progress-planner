@@ -12,6 +12,7 @@
 
 import { useState, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import { decodeEntities } from '@wordpress/html-entities';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
 import { submitPluginSettings } from '../../hooks/usePopoverForms';
 
@@ -108,7 +109,7 @@ export default function YoastPopover( { task, onSubmit, onClose } ) {
 		[ task, onSubmit ]
 	);
 
-	const taskTitle = task.title?.rendered || task.title;
+	const taskTitle = decodeEntities( task.title?.rendered || task.title );
 	const taskDescription =
 		task.description?.rendered || task.description || '';
 

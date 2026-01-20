@@ -66,7 +66,11 @@ class UserTask extends TaskProvider {
 	 */
 	getPoints( taskData = {} ) {
 		// Check for GOLDEN marker in excerpt
-		const excerpt = taskData.excerpt?.rendered || taskData.excerpt || '';
+		// Handle both REST API format (object with rendered) and simple string
+		const excerpt =
+			typeof taskData.excerpt === 'string'
+				? taskData.excerpt
+				: taskData.excerpt?.rendered ?? '';
 		return excerpt.includes( 'GOLDEN' ) ? 1 : 0;
 	}
 

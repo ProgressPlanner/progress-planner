@@ -13,6 +13,13 @@ namespace Progress_Planner;
 class Onboard_Wizard {
 
 	/**
+	 * Option name for storing onboarding progress.
+	 *
+	 * @var string
+	 */
+	public const PROGRESS_OPTION_NAME = 'prpl_onboard_progress';
+
+	/**
 	 * Steps and their order.
 	 *
 	 * @var array
@@ -20,12 +27,21 @@ class Onboard_Wizard {
 	protected $steps = [];
 
 	/**
+	 * Delete the onboarding progress option.
+	 *
+	 * @return bool True if the option was deleted, false otherwise.
+	 */
+	public static function delete_progress() {
+		return \delete_option( self::PROGRESS_OPTION_NAME );
+	}
+
+	/**
 	 * Constructor.
 	 *
 	 * @return void
 	 */
 	public function __construct() {
-		\add_action( 'init', [ $this, 'maybe_register_popover_hooks' ], 0 );
+		\add_action( 'init', [ $this, 'maybe_register_popover_hooks' ], 10 ); // Wait for the Playground to register its hooks.
 	}
 
 	/**
@@ -51,25 +67,22 @@ class Onboard_Wizard {
 		// 2. Onboarding already in progress.
 		// 3. Branded site (privacy auto-accepted, but still needs onboarding).
 		$is_branded      = 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id();
-		$skip_onboarding = \progress_planner()->is_privacy_policy_accepted()
-			&& ! \get_option( 'prpl_onboard_progress', false )
-			&& ! $is_branded;
+		$show_onboarding = ! \progress_planner()->is_privacy_policy_accepted()
+			|| \get_option( self::PROGRESS_OPTION_NAME, false )
+			|| $is_branded;
 
 		/**
-		 * Filter whether to skip the onboarding wizard.
+		 * Filter whether to show the onboarding wizard.
 		 *
 		 * Hosting integrations can use this filter to force showing
 		 * or hiding the onboarding wizard.
 		 *
-		 * @param bool $skip_onboarding Whether to skip showing the onboarding wizard.
+		 * @param bool $show_onboarding Whether to show the onboarding wizard.
 		 */
-		$skip_onboarding = \apply_filters( 'progress_planner_skip_onboarding', $skip_onboarding );
+		$show_onboarding = \apply_filters( 'progress_planner_show_onboarding', $show_onboarding );
 
 		// Wizard config is now provided via REST API endpoint (/progress-planner/v1/onboarding-wizard/config)
 		// React components fetch the config directly from the API.
-
-		// Define steps and their order.
-		\add_action( 'init', [ $this, 'define_steps_and_order' ], 101 );
 
 		// Allow only images for the front-end upload.
 		\add_filter( 'rest_pre_insert_attachment', [ $this, 'rest_pre_insert_attachment' ], 10, 2 );
@@ -96,6 +109,14 @@ class Onboard_Wizard {
 
 		$tasks = [];
 
+		// Action labels for onboarding tasks.
+		$action_labels = [
+			'core-blogdescription' => \esc_html__( 'Verify tagline', 'progress-planner' ),
+			'select-timezone'      => \esc_html__( 'Set the timezone', 'progress-planner' ),
+			'select-locale'        => \esc_html__( 'Set the locale', 'progress-planner' ),
+			'core-siteicon'        => \esc_html__( 'Set site icon', 'progress-planner' ),
+		];
+
 		foreach ( $onboarding_tasks as $task_id ) {
 			$task = \progress_planner()->get_suggested_tasks_db()->get_tasks_by( [ 'task_id' => $task_id ] );
 
@@ -110,7 +131,7 @@ class Onboard_Wizard {
 				'url'          => $task[0]->url ?? '',
 				'provider_id'  => $task[0]->get_provider_id(),
 				'points'       => $task[0]->points ?? 0,
-				'action_label' => \esc_html__( 'Do it', 'progress-planner' ),
+				'action_label' => $action_labels[ $task_id ],
 			];
 
 			// Add task specific data.
@@ -157,20 +178,29 @@ class Onboard_Wizard {
 		}
 
 		// Get badge data for BadgesStep.
-		$badge_data = [];
-		if ( \class_exists( '\Progress_Planner\Badges\Monthly' ) ) {
-			$badge       = \Progress_Planner\Badges\Monthly::get_instance_from_id(
-				\Progress_Planner\Badges\Monthly::get_badge_id_from_date( new \DateTime() )
-			);
-			$badge_score = \progress_planner()->get_admin__widgets__monthly_badges()->get_score();
-			$badge_data  = [
-				'badgeId'      => $badge->get_id(),
-				'badgeName'    => $badge->get_name(),
-				'brandingId'   => (int) \progress_planner()->get_ui__branding()->get_branding_id(),
-				'maxPoints'    => (int) \constant( '\Progress_Planner\Badges\Monthly::TARGET_POINTS' ),
-				'currentValue' => (float) $badge_score['target_score'],
-			];
+		// Generate badge data for current month's badge.
+		$now           = new \DateTime();
+		$year          = $now->format( 'Y' );
+		$month         = $now->format( 'n' );
+		$badge_id      = "monthly-{$year}-m{$month}";
+		$badge_name    = $now->format( 'F' ); // Full month name.
+		$branding_id   = (int) \progress_planner()->get_ui__branding()->get_branding_id();
+		$max_points    = 10; // Target points for monthly badges.
+		$current_value = 0;
+
+		// Get current badge progress from saved stats.
+		$badges = \progress_planner()->get_settings()->get( 'badges', [] );
+		if ( isset( $badges[ $badge_id ]['points'] ) ) {
+			$current_value = (float) $badges[ $badge_id ]['points'];
 		}
+
+		$badge_data = [
+			'badgeId'      => $badge_id,
+			'badgeName'    => $badge_name,
+			'brandingId'   => $branding_id,
+			'maxPoints'    => $max_points,
+			'currentValue' => $current_value,
+		];
 
 		$this->steps[] = [
 			'script_file_name'   => 'BadgesStep',
@@ -269,7 +299,7 @@ class Onboard_Wizard {
 			return null;
 		}
 
-		$onboarding_progress = \get_option( 'prpl_onboard_progress', true );
+		$onboarding_progress = \get_option( self::PROGRESS_OPTION_NAME, true );
 		if ( ! $onboarding_progress ) {
 			return null;
 		}
@@ -311,7 +341,7 @@ class Onboard_Wizard {
 		$progress = \sanitize_text_field( \wp_unslash( $_POST['state'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing -- Nonce verified in verify_ajax_security().
 
 		// Save as user meta?
-		\update_option( 'prpl_onboard_progress', $progress );
+		\update_option( self::PROGRESS_OPTION_NAME, $progress );
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Tour progress saved.', 'progress-planner' ) ] );
 	}
@@ -391,10 +421,12 @@ class Onboard_Wizard {
 			}
 		}
 
-		// Handle post types.
-		$include_post_types = isset( $_POST['prpl-post-types-include'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
-		? \array_map( 'sanitize_text_field', \wp_unslash( $_POST['prpl-post-types-include'] ) ) // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.NonceVerification.Missing
-		: [];
+		// Handle post types (sent as comma-separated string via FormData).
+		$include_post_types = [];
+		if ( ! empty( $_POST['prpl-post-types-include'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$raw_post_types     = \sanitize_text_field( \wp_unslash( $_POST['prpl-post-types-include'] ) ); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+			$include_post_types = \explode( ',', $raw_post_types );
+		}
 		$page_settings->save_post_types( $include_post_types );
 
 		// Handle login destination.

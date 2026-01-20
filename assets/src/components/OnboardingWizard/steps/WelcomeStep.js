@@ -6,10 +6,12 @@
  * @package
  */
 
-import { useState, useEffect, Fragment } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import OnboardingStep from '../OnboardingStep';
+import NextButton from '../NextButton';
 import { useLicenseGenerator } from '../../../hooks/useLicenseGenerator';
+import { CustomCheckbox } from '../../FormInputs';
 
 /**
  * WelcomeStep component.
@@ -66,10 +68,9 @@ export default function WelcomeStep( props ) {
 				await generateLicense( {
 					'with-email': 'no', // Default for wizard
 				} );
-				// Reload page to get new license state.
-				window.location.reload();
-				return;
+				// Continue to next step (don't reload - matches develop branch behavior).
 			} catch ( error ) {
+				// eslint-disable-next-line no-console
 				console.error( 'Failed to generate license:', error );
 				return;
 			}
@@ -92,18 +93,7 @@ export default function WelcomeStep( props ) {
 	};
 
 	return (
-		<OnboardingStep
-			{ ...props }
-			onNext={ handleNext }
-			canProceed={ canProceed }
-			buttonText={
-				<>
-					{ __( 'Start onboarding', 'progress-planner' ) }
-					<span className="dashicons dashicons-arrow-right-alt2"></span>
-				</>
-			}
-			buttonClass="prpl-btn-secondary"
-		>
+		<OnboardingStep { ...props } hideFooter>
 			<div className="tour-content">
 				<div className="prpl-columns-wrapper-flex prpl-columns-2-1">
 					<div className="prpl-column">
@@ -134,77 +124,73 @@ export default function WelcomeStep( props ) {
 
 						{ ! hasLicense && (
 							<div className="prpl-privacy-checkbox-wrapper">
-								<label
-									htmlFor="prpl-privacy-checkbox"
-									style={ {
-										display: 'flex',
-										alignItems: 'baseline',
-									} }
-								>
-									<input
-										id="prpl-privacy-checkbox"
-										type="checkbox"
-										checked={ privacyAccepted }
-										onChange={ ( e ) => {
-											setPrivacyAccepted(
-												e.target.checked
+								<CustomCheckbox
+									id="prpl-privacy-checkbox"
+									checked={ privacyAccepted }
+									onChange={ ( e ) => {
+										setPrivacyAccepted( e.target.checked );
+										// Remove active class from required indicator (like develop).
+										const requiredIndicator =
+											document.querySelector(
+												'.prpl-privacy-checkbox-wrapper .prpl-required-indicator'
 											);
-											// Remove active class from required indicator (like develop).
-											const requiredIndicator =
-												document.querySelector(
-													'.prpl-privacy-checkbox-wrapper .prpl-required-indicator'
-												);
-											if ( requiredIndicator ) {
-												requiredIndicator.classList.remove(
-													'prpl-required-indicator-active'
-												);
-											}
-										} }
-									/>
-									<span>
-										{ sprintf(
-											/* translators: %1$s: progressplanner.com/privacy-policy link, %2$s: required indicator */
-											__(
-												'I accept the %1$s and the essential data processing needed for the plugin. %2$s',
+										if ( requiredIndicator ) {
+											requiredIndicator.classList.remove(
+												'prpl-required-indicator-active'
+											);
+										}
+									} }
+									label={
+										<>
+											{ __(
+												'I accept the',
 												'progress-planner'
-											),
-											<Fragment key="privacy-link">
-												<a
-													href={
-														privacyPolicyUrl ||
-														'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy'
-													}
-													target="_blank"
-													rel="noopener noreferrer"
-												>
-													{ __(
-														'privacy policy',
-														'progress-planner'
-													) }
-												</a>
-											</Fragment>,
-											<Fragment key="required-indicator">
-												<span className="prpl-required-indicator">
-													{ __(
-														'Required',
-														'progress-planner'
-													) }
-												</span>
-											</Fragment>
-										) }
-									</span>
-								</label>
+											) }{ ' ' }
+											<a
+												href={
+													privacyPolicyUrl ||
+													'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy'
+												}
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												{ __(
+													'privacy policy',
+													'progress-planner'
+												) }
+											</a>{ ' ' }
+											{ __(
+												'and the essential data processing needed for the plugin.',
+												'progress-planner'
+											) }{ ' ' }
+											<span className="prpl-required-indicator">
+												{ __(
+													'Required',
+													'progress-planner'
+												) }
+											</span>
+										</>
+									}
+								/>
 							</div>
 						) }
 
-						{ isGenerating && (
-							<div className="prpl-spinner">
-								<span
-									className="spinner"
-									style={ { visibility: 'visible' } }
-								></span>
-							</div>
-						) }
+						<NextButton
+							onNext={ handleNext }
+							canProceed={ canProceed }
+							wizardState={ wizardState }
+							isLoading={ isGenerating }
+							buttonText={
+								<>
+									{ __(
+										'Start onboarding',
+										'progress-planner'
+									) }
+									<span className="dashicons dashicons-arrow-right-alt2"></span>
+								</>
+							}
+							buttonClass="prpl-btn-secondary"
+						/>
 					</div>
 					<div className="prpl-column prpl-hide-on-mobile">
 						<div id="prpl-welcome-graphic">
@@ -213,10 +199,6 @@ export default function WelcomeStep( props ) {
 									baseUrl || ''
 								}/assets/images/onboarding/thumbs_up_ravi_rtl.svg` }
 								alt=""
-								style={ {
-									maxWidth: '100%',
-									height: 'auto',
-								} }
 							/>
 						</div>
 					</div>
