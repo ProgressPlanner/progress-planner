@@ -2,7 +2,7 @@
 /**
  * Editor script.
  *
- * Dependencies: wp-plugins, wp-editor, wp-element, progress-planner/l10n
+ * Dependencies: wp-plugins, wp-editor, wp-element, wp-components, wp-data, progress-planner/l10n
  */
 const { createElement: el, Fragment, useState } = wp.element;
 const { registerPlugin } = wp.plugins;
