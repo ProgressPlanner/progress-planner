@@ -70,15 +70,39 @@ const prplGetPageTypeSlugFromId = ( id ) => {
 const PrplRenderPageTypeSelector = () => {
 	// Get the current term from the TAXONOMY using useSelect hook.
 	const currentPageType = useSelect( ( select ) => {
-		const pageTypeArr =
-			select( 'core/editor' ).getEditedPostAttribute( TAXONOMY );
-		return pageTypeArr && 0 < pageTypeArr.length
-			? parseInt( pageTypeArr[ 0 ] )
-			: parseInt( progressPlannerEditor.defaultPageType ) || 0;
+		// Defensive check: ensure select and editor store exist.
+		if ( ! select || typeof select !== 'function' ) {
+			return 0;
+		}
+		const editor = select( 'core/editor' );
+		if ( ! editor || typeof editor.getEditedPostAttribute !== 'function' ) {
+			// Fallback to default if editor store is not available.
+			if (
+				typeof progressPlannerEditor !== 'undefined' &&
+				progressPlannerEditor.defaultPageType
+			) {
+				return parseInt( progressPlannerEditor.defaultPageType ) || 0;
+			}
+			return 0;
+		}
+		const pageTypeArr = editor.getEditedPostAttribute( TAXONOMY );
+		if ( pageTypeArr && 0 < pageTypeArr.length ) {
+			return parseInt( pageTypeArr[ 0 ] );
+		}
+		// Check if progressPlannerEditor exists before accessing its properties.
+		if (
+			typeof progressPlannerEditor !== 'undefined' &&
+			progressPlannerEditor.defaultPageType
+		) {
+			return parseInt( progressPlannerEditor.defaultPageType ) || 0;
+		}
+		return 0;
 	}, [] );
 
 	// Bail early if the page types are not set.
+	// Check if progressPlannerEditor exists before accessing its properties.
 	if (
+		typeof progressPlannerEditor === 'undefined' ||
 		! progressPlannerEditor.pageTypes ||
 		0 === progressPlannerEditor.pageTypes.length
 	) {
@@ -102,7 +126,16 @@ const PrplRenderPageTypeSelector = () => {
 			// Update the TAXONOMY term value.
 			const data = {};
 			data[ TAXONOMY ] = value;
-			wp.data.dispatch( 'core/editor' ).editPost( data );
+			// Defensive check: ensure wp.data and dispatch exist before calling.
+			if ( wp.data && typeof wp.data.dispatch === 'function' ) {
+				const editorDispatch = wp.data.dispatch( 'core/editor' );
+				if (
+					editorDispatch &&
+					typeof editorDispatch.editPost === 'function'
+				) {
+					editorDispatch.editPost( data );
+				}
+			}
 		},
 	} );
 };
@@ -204,15 +237,29 @@ const PrplSectionHTML = ( lesson, sectionId, wrapperEl = 'div' ) => {
  * @return {Element} Element to render.
  */
 const PrplLessonItemsHTML = () => {
-	const pageTypeID = useSelect(
-		( select ) =>
-			select( 'core/editor' ).getEditedPostAttribute( TAXONOMY ),
-		[]
-	);
+	const pageTypeID = useSelect( ( select ) => {
+		// Defensive check: ensure select and editor store exist.
+		if ( ! select || typeof select !== 'function' ) {
+			return null;
+		}
+		const editor = select( 'core/editor' );
+		if ( ! editor || typeof editor.getEditedPostAttribute !== 'function' ) {
+			return null;
+		}
+		return editor.getEditedPostAttribute( TAXONOMY );
+	}, [] );
 	const pageType = prplGetPageTypeSlugFromId( pageTypeID );
 
 	const pageTodosMeta = useSelect( ( select ) => {
-		const meta = select( 'core/editor' ).getEditedPostAttribute( 'meta' );
+		// Defensive check: ensure select and editor store exist.
+		if ( ! select || typeof select !== 'function' ) {
+			return '';
+		}
+		const editor = select( 'core/editor' );
+		if ( ! editor || typeof editor.getEditedPostAttribute !== 'function' ) {
+			return '';
+		}
+		const meta = editor.getEditedPostAttribute( 'meta' );
 		return meta ? meta.progress_planner_page_todos : '';
 	}, [] );
 	const pageTodos = pageTodosMeta || '';
@@ -513,11 +560,20 @@ const PrplCheckListItem = ( item, pageTodos ) =>
 					}
 				}
 				// Update the `progress_planner_page_todos` meta value.
-				wp.data.dispatch( 'core/editor' ).editPost( {
-					meta: {
-						progress_planner_page_todos: toDos.join( ',' ),
-					},
-				} );
+				// Defensive check: ensure wp.data and dispatch exist before calling.
+				if ( wp.data && typeof wp.data.dispatch === 'function' ) {
+					const editorDispatch = wp.data.dispatch( 'core/editor' );
+					if (
+						editorDispatch &&
+						typeof editorDispatch.editPost === 'function'
+					) {
+						editorDispatch.editPost( {
+							meta: {
+								progress_planner_page_todos: toDos.join( ',' ),
+							},
+						} );
+					}
+				}
 			},
 		} )
 	);
