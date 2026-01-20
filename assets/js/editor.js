@@ -48,6 +48,15 @@ const prplGetPageTypeSlugFromId = ( id ) => {
  * @return {Element} Element to render.
  */
 const PrplRenderPageTypeSelector = () => {
+	// Get the current term from the TAXONOMY using useSelect hook.
+	const currentPageType = useSelect( ( select ) => {
+		const pageTypeArr =
+			select( 'core/editor' ).getEditedPostAttribute( TAXONOMY );
+		return pageTypeArr && 0 < pageTypeArr.length
+			? parseInt( pageTypeArr[ 0 ] )
+			: parseInt( progressPlannerEditor.defaultPageType );
+	}, [] );
+
 	// Bail early if the page types are not set.
 	if (
 		! progressPlannerEditor.pageTypes ||
@@ -67,14 +76,7 @@ const PrplRenderPageTypeSelector = () => {
 
 	return el( SelectControl, {
 		label: prplL10n( 'pageType' ),
-		// Get the current term from the TAXONOMY.
-		value: wp.data.useSelect( ( select ) => {
-			const pageTypeArr =
-				select( 'core/editor' ).getEditedPostAttribute( TAXONOMY );
-			return pageTypeArr && 0 < pageTypeArr.length
-				? parseInt( pageTypeArr[ 0 ] )
-				: parseInt( progressPlannerEditor.defaultPageType );
-		}, [] ),
+		value: currentPageType,
 		options: pageTypes,
 		onChange: ( value ) => {
 			// Update the TAXONOMY term value.
@@ -208,17 +210,26 @@ const PrplLessonItemsHTML = () => {
 		( lessonItem ) => lessonItem.settings.id === pageType
 	);
 
-	if ( lesson.content_update_cycle.text ) {
-		lesson.content_update_cycle.text =
-			lesson.content_update_cycle.text.replace(
-				/\{page_type\}/g,
-				lesson.name
-			);
-		lesson.content_update_cycle.text =
-			lesson.content_update_cycle.text.replace(
-				/\{update_cycle\}/g,
-				lesson.content_update_cycle.update_cycle
-			);
+	// Bail early if lesson not found.
+	if ( ! lesson ) {
+		return el( 'div', {}, '' );
+	}
+
+	// Create a processed copy of the lesson to avoid mutating the original.
+	const processedLesson = { ...lesson };
+	if (
+		processedLesson.content_update_cycle &&
+		processedLesson.content_update_cycle.text
+	) {
+		processedLesson.content_update_cycle = {
+			...processedLesson.content_update_cycle,
+			text: processedLesson.content_update_cycle.text
+				.replace( /\{page_type\}/g, lesson.name )
+				.replace(
+					/\{update_cycle\}/g,
+					lesson.content_update_cycle.update_cycle
+				),
+		};
 	}
 
 	return el(
@@ -227,34 +238,37 @@ const PrplLessonItemsHTML = () => {
 			key: 'progress-planner-sidebar-lesson-items',
 		},
 		// Update cycle content.
-		PrplSectionHTML( lesson, 'content_update_cycle', 'div' ),
+		PrplSectionHTML( processedLesson, 'content_update_cycle', 'div' ),
 
 		// Intro video & content.
-		PrplSectionHTML( lesson, 'intro', PanelBody ),
+		PrplSectionHTML( processedLesson, 'intro', PanelBody ),
 
 		// Checklist video & content.
-		lesson.checklist
+		processedLesson.checklist
 			? el(
 					PanelBody,
 					{
 						key: `progress-planner-sidebar-lesson-section-checklist-content`,
-						title: lesson.checklist.heading,
+						title: processedLesson.checklist.heading,
 						initialOpen: false,
 					},
 					el(
 						'div',
 						{},
-						lesson.checklist.video
-							? PrplSectionVideo( lesson.checklist )
+						processedLesson.checklist.video
+							? PrplSectionVideo( processedLesson.checklist )
 							: el( 'div', {}, '' ),
-						PrplTodoProgress( lesson.checklist, pageTodos ),
-						PrplCheckList( lesson.checklist, pageTodos )
+						PrplTodoProgress(
+							processedLesson.checklist,
+							pageTodos
+						),
+						PrplCheckList( processedLesson.checklist, pageTodos )
 					)
 			  )
 			: el( 'div', {}, '' ),
 
 		// Writers block video & content.
-		PrplSectionHTML( lesson, 'writers_block', PanelBody )
+		PrplSectionHTML( processedLesson, 'writers_block', PanelBody )
 	);
 };
 
@@ -270,10 +284,24 @@ const PrplProgressPlannerSidebar = () => {
 	// eslint-disable-next-line no-unused-vars
 	const { isEditingPost, postId, postType } = useSelect( ( select ) => {
 		const editor = select( 'core/editor' );
+
+		// Make sure the editor store and methods exist.
+		if (
+			! editor ||
+			typeof editor.getCurrentPostType !== 'function' ||
+			typeof editor.getCurrentPostId !== 'function'
+		) {
+			return {
+				isEditingPost: false,
+				postId: null,
+				postType: null,
+			};
+		}
+
 		const currentPostType = editor.getCurrentPostType();
 		const currentPostId = editor.getCurrentPostId();
 
-		// Templates have post types 'wp_template' or 'wp_template_part'
+		// Templates have post types 'wp_template' or 'wp_template_part'.
 		const isTemplate =
 			currentPostType === 'wp_template' ||
 			currentPostType === 'wp_template_part';
@@ -285,7 +313,7 @@ const PrplProgressPlannerSidebar = () => {
 		};
 	}, [] );
 
-	// Don't render sidebar at all if not editing a post/page
+	// Don't render sidebar at all if not editing a post/page.
 	if ( ! isEditingPost ) {
 		return null;
 	}
