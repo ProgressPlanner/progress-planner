@@ -87,7 +87,7 @@ trait Dismissable_Task {
 
 		// Store the task dismissal data.
 		$dismissal_data = [
-			'date'      => \gmdate( 'YW' ),
+			'date'      => \gmdate( 'oW' ),
 			'timestamp' => \time(),
 		];
 
@@ -157,7 +157,7 @@ trait Dismissable_Task {
 		$dismissal_data = $dismissed_tasks[ $provider_key ][ $task_identifier ];
 
 		// If the task was dismissed in the current week, don't show it again.
-		if ( $dismissal_data['date'] === \gmdate( 'YW' ) ) {
+		if ( $dismissal_data['date'] === \gmdate( 'oW' ) ) {
 			return true;
 		}
 
