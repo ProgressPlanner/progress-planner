@@ -432,43 +432,60 @@ const PrplProgressPlannerSidebar = () => {
 	// eslint-disable-next-line no-unused-vars
 	const _unusedForReactivity = { postId, postType };
 
-	// Always render the sidebar structure to ensure hooks are called consistently.
-	// Child components will handle conditional rendering internally.
+	// Always render the child components to ensure hooks are called consistently.
+	// Render them in a hidden wrapper when not editing a post to maintain hook order.
+	const sidebarContent = el(
+		'div',
+		{
+			key: 'progress-planner-sidebar-page-type-selector-wrapper',
+			style: {
+				padding: '15px',
+				borderBottom: '1px solid #ddd',
+			},
+		},
+		// Always render these components so hooks are always called
+		PrplRenderPageTypeSelector(),
+		PrplLessonItemsHTML()
+	);
+
+	// Only render the PluginSidebar (and its icon) when editing a post
 	return el(
 		Fragment,
 		{},
-		isEditingPost &&
-			el(
-				PluginSidebarMoreMenuItem,
-				{
-					target: 'progress-planner-sidebar',
-					key: 'progress-planner-sidebar-menu-item',
-				},
-				prplL10n( 'progressPlannerSidebar' )
-			),
-		el(
-			PluginSidebar,
-			{
-				name: 'progress-planner-sidebar',
-				key: 'progress-planner-sidebar-sidebar',
-				title: prplL10n( 'progressPlannerSidebar' ),
-				icon: PrplIcon(),
-			},
+		// Render child components in a hidden wrapper when not editing to maintain hook order
+		! isEditingPost &&
 			el(
 				'div',
 				{
-					key: 'progress-planner-sidebar-page-type-selector-wrapper',
-					style: {
-						padding: '15px',
-						borderBottom: '1px solid #ddd',
-						display: isEditingPost ? 'block' : 'none',
-					},
+					key: 'progress-planner-sidebar-hidden-wrapper',
+					style: { display: 'none' },
 				},
-				// Always render these components so hooks are always called
-				PrplRenderPageTypeSelector(),
-				PrplLessonItemsHTML()
+				sidebarContent
+			),
+		// Only show sidebar icon and panel when editing a post
+		isEditingPost &&
+			el(
+				Fragment,
+				{},
+				el(
+					PluginSidebarMoreMenuItem,
+					{
+						target: 'progress-planner-sidebar',
+						key: 'progress-planner-sidebar-menu-item',
+					},
+					prplL10n( 'progressPlannerSidebar' )
+				),
+				el(
+					PluginSidebar,
+					{
+						name: 'progress-planner-sidebar',
+						key: 'progress-planner-sidebar-sidebar',
+						title: prplL10n( 'progressPlannerSidebar' ),
+						icon: PrplIcon(),
+					},
+					sidebarContent
+				)
 			)
-		)
 	);
 };
 
