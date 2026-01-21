@@ -149,24 +149,6 @@ const PrplRenderPageTypeSelector = () => {
  * @return {Element} Element to render.
  */
 const PrplSectionVideo = ( props ) => {
-	// #region agent log
-	fetch(
-		'http://127.0.0.1:7242/ingest/07393749-f52c-49a5-88f8-1034764392a2',
-		{
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify( {
-				location: 'editor.js:151',
-				message: 'PrplSectionVideo hook called',
-				data: { hasVideo: !! props?.lessonSection?.video },
-				timestamp: Date.now(),
-				sessionId: 'debug-session',
-				runId: 'run1',
-				hypothesisId: 'A',
-			} ),
-		}
-	).catch( () => {} );
-	// #endregion
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
@@ -377,24 +359,6 @@ const PrplLessonItemsHTML = () => {
  * @return {Element} Element to render.
  */
 const PrplProgressPlannerSidebar = () => {
-	// #region agent log
-	fetch(
-		'http://127.0.0.1:7242/ingest/07393749-f52c-49a5-88f8-1034764392a2',
-		{
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify( {
-				location: 'editor.js:355',
-				message: 'PrplProgressPlannerSidebar render start',
-				data: {},
-				timestamp: Date.now(),
-				sessionId: 'debug-session',
-				runId: 'run1',
-				hypothesisId: 'C',
-			} ),
-		}
-	).catch( () => {} );
-	// #endregion
 	// Use useSelect to reactively detect what's being edited
 	// Include both postType and postId so component re-renders when switching posts
 	// postId and postType are destructured but intentionally unused - they're needed
