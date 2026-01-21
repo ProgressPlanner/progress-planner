@@ -144,13 +144,40 @@ const PrplRenderPageTypeSelector = () => {
  * Render the video section.
  * This will display a button to open a modal with the video.
  *
- * @param {Object} lessonSection The lesson section.
+ * @param {Object} props Component props.
+ * @param {Object} props.lessonSection The lesson section.
  * @return {Element} Element to render.
  */
-const PrplSectionVideo = ( lessonSection ) => {
+const PrplSectionVideo = ( props ) => {
+	// #region agent log
+	fetch(
+		'http://127.0.0.1:7242/ingest/07393749-f52c-49a5-88f8-1034764392a2',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify( {
+				location: 'editor.js:151',
+				message: 'PrplSectionVideo hook called',
+				data: { hasVideo: !! props?.lessonSection?.video },
+				timestamp: Date.now(),
+				sessionId: 'debug-session',
+				runId: 'run1',
+				hypothesisId: 'A',
+			} ),
+		}
+	).catch( () => {} );
+	// #endregion
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
+
+	// Handle both direct prop and nested prop for backward compatibility
+	const lessonSection = props?.lessonSection || props;
+
+	// If no video, return null (component always renders, but conditionally shows content)
+	if ( ! lessonSection || ! lessonSection.video ) {
+		return null;
+	}
 
 	return el(
 		'div',
@@ -216,9 +243,9 @@ const PrplSectionHTML = ( lesson, sectionId, wrapperEl = 'div' ) => {
 					title: lesson[ sectionId ].heading || '',
 					initialOpen: false,
 				},
-				lesson[ sectionId ].video
-					? PrplSectionVideo( lesson[ sectionId ] )
-					: el( 'div', {}, '' ),
+				// Always render PrplSectionVideo as a component (not conditionally)
+				// The component handles the conditional logic internally to avoid hook violations
+				el( PrplSectionVideo, { lessonSection: lesson[ sectionId ] } ),
 				lesson[ sectionId ].text
 					? el( 'div', {
 							key: `progress-planner-sidebar-lesson-section-${ sectionId }-content`,
@@ -324,9 +351,11 @@ const PrplLessonItemsHTML = () => {
 					el(
 						'div',
 						{},
-						processedLesson.checklist.video
-							? PrplSectionVideo( processedLesson.checklist )
-							: el( 'div', {}, '' ),
+						// Always render PrplSectionVideo as a component (not conditionally)
+						// The component handles the conditional logic internally to avoid hook violations
+						el( PrplSectionVideo, {
+							lessonSection: processedLesson.checklist,
+						} ),
 						PrplTodoProgress(
 							processedLesson.checklist,
 							pageTodos
@@ -348,6 +377,24 @@ const PrplLessonItemsHTML = () => {
  * @return {Element} Element to render.
  */
 const PrplProgressPlannerSidebar = () => {
+	// #region agent log
+	fetch(
+		'http://127.0.0.1:7242/ingest/07393749-f52c-49a5-88f8-1034764392a2',
+		{
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify( {
+				location: 'editor.js:355',
+				message: 'PrplProgressPlannerSidebar render start',
+				data: {},
+				timestamp: Date.now(),
+				sessionId: 'debug-session',
+				runId: 'run1',
+				hypothesisId: 'C',
+			} ),
+		}
+	).catch( () => {} );
+	// #endregion
 	// Use useSelect to reactively detect what's being edited
 	// Include both postType and postId so component re-renders when switching posts
 	// postId and postType are destructured but intentionally unused - they're needed
@@ -385,22 +432,20 @@ const PrplProgressPlannerSidebar = () => {
 	// eslint-disable-next-line no-unused-vars
 	const _unusedForReactivity = { postId, postType };
 
-	// Don't render sidebar at all if not editing a post/page.
-	if ( ! isEditingPost ) {
-		return null;
-	}
-
+	// Always render the sidebar structure to ensure hooks are called consistently.
+	// Child components will handle conditional rendering internally.
 	return el(
 		Fragment,
 		{},
-		el(
-			PluginSidebarMoreMenuItem,
-			{
-				target: 'progress-planner-sidebar',
-				key: 'progress-planner-sidebar-menu-item',
-			},
-			prplL10n( 'progressPlannerSidebar' )
-		),
+		isEditingPost &&
+			el(
+				PluginSidebarMoreMenuItem,
+				{
+					target: 'progress-planner-sidebar',
+					key: 'progress-planner-sidebar-menu-item',
+				},
+				prplL10n( 'progressPlannerSidebar' )
+			),
 		el(
 			PluginSidebar,
 			{
@@ -416,8 +461,10 @@ const PrplProgressPlannerSidebar = () => {
 					style: {
 						padding: '15px',
 						borderBottom: '1px solid #ddd',
+						display: isEditingPost ? 'block' : 'none',
 					},
 				},
+				// Always render these components so hooks are always called
 				PrplRenderPageTypeSelector(),
 				PrplLessonItemsHTML()
 			)
