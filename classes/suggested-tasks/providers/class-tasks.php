@@ -727,7 +727,7 @@ abstract class Tasks implements Tasks_Interface {
 			$snooze_html .= '</div></fieldset></slot></prpl-tooltip>';
 			$actions[]    = [
 				'priority' => 30,
-				'html'     => $snooze_html,
+				'html'     => '',
 			];
 		}
 
