@@ -47,6 +47,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		</div>
 		<button type="button" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-secondary">
 			<?php \esc_html_e( 'Set site icon', 'progress-planner' ); ?>
+			<?php if ( ! empty( $show_chevron ) ) : ?>
+				<span class="dashicons dashicons-arrow-right-alt2"></span>
+			<?php endif; ?>
 		</button>
 	</form>
 </div>

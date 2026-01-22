@@ -96,7 +96,12 @@ $prpl_user_email   = $prpl_current_user->user_email ?? '';
 	</div>
 	<div class="tour-footer">
 		<div class="prpl-tour-next-wrapper">
-			<button class="prpl-tour-next prpl-btn prpl-btn-secondary"><?php \esc_html_e( 'Got it', 'progress-planner' ); ?></button>
+			<button class="prpl-tour-next prpl-btn prpl-btn-secondary">
+				<?php
+				/* translators: %s: arrow icon */
+				printf( \esc_html__( 'Got it %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
+				?>
+			</button>
 		</div>
 	</div>
 </script>

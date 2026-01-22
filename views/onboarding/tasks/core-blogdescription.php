@@ -30,6 +30,9 @@ if ( ! \defined( 'ABSPATH' ) ) {
 			<?php else : ?>
 				<?php \esc_html_e( 'Set tagline', 'progress-planner' ); ?>
 			<?php endif; ?>
+			<?php if ( ! empty( $show_chevron ) ) : ?>
+				<span class="dashicons dashicons-arrow-right-alt2"></span>
+			<?php endif; ?>
 		</button>
 	</form>
 </div>
