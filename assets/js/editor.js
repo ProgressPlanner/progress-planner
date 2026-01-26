@@ -144,7 +144,7 @@ const PrplRenderPageTypeSelector = () => {
  * Render the video section.
  * This will display a button to open a modal with the video.
  *
- * @param {Object} props Component props.
+ * @param {Object} props               Component props.
  * @param {Object} props.lessonSection The lesson section.
  * @return {Element} Element to render.
  */
