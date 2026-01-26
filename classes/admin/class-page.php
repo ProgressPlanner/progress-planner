@@ -295,6 +295,15 @@ class Page {
 			// Enqueue ugprading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
 			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
 		}
+
+		$prpl_privacy_policy_accepted = \progress_planner()->is_privacy_policy_accepted();
+		if ( ! $prpl_privacy_policy_accepted ) {
+			// Enqueue welcome styles.
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/welcome' );
+
+			// Enqueue onboarding styles.
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/onboard' );
+		}
 	}
 
 	/**

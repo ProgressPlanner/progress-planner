@@ -68,15 +68,8 @@ class Date {
 		if ( empty( $date_ranges ) ) {
 			return [];
 		}
-		$last_range = \end( $date_ranges );
-		/**
-		 * The end date of the last range.
-		 *
-		 * @var \DateTime $last_end_date
-		 */
-		$last_end_date = $last_range['end_date'];
-		if ( $end_date->format( 'z' ) !== $last_end_date->format( 'z' ) ) {
-			$final_end     = clone $last_end_date;
+		if ( $end_date->format( 'z' ) !== \end( $date_ranges )['end_date']->format( 'z' ) ) {
+			$final_end     = clone \end( $date_ranges )['end_date'];
 			$date_ranges[] = $this->get_range( $final_end->modify( '+1 day' ), $end_date );
 		}
 
