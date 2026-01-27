@@ -559,7 +559,7 @@ class Base {
 	 * @return bool
 	 */
 	public function is_debug_mode_enabled() {
-		return ( \defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' );
+		return ( ( \defined( 'PRPL_DEBUG' ) && PRPL_DEBUG ) || \get_option( 'prpl_debug' ) ) && \current_user_can( 'manage_options' );
 	}
 }
 // phpcs:enable Generic.Commenting.Todo
