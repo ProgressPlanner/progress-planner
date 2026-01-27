@@ -47,9 +47,10 @@ class Editor {
 			[
 				'name' => 'progressPlannerEditor',
 				'data' => [
-					'lessons'         => \progress_planner()->get_lessons()->get_items(),
-					'pageTypes'       => $page_types,
-					'defaultPageType' => $prpl_preselected_page_type,
+					'lessons'          => \progress_planner()->get_lessons()->get_items(),
+					'pageTypes'        => $page_types,
+					'defaultPageType'  => $prpl_preselected_page_type,
+					'adminMenuIconSvg' => \progress_planner()->get_ui__branding()->get_admin_menu_icon( true ),
 				],
 			]
 		);
