@@ -199,7 +199,11 @@ button.prpl-info-icon {
 	align-items: center;
 
 	.prpl-header-logo img {
-		height: 100px;
+		max-width: 300px;
+		max-height: 100px;
+		width: auto;
+		height: auto;
+		vertical-align: bottom;
 	}
 }
 
