@@ -138,17 +138,14 @@ class Page_Settings {
 	}
 
 	/**
-	 * Save the settings.
+	 * Save the redirect on login setting.
+	 *
+	 * @param bool $redirect_on_login Whether to redirect on login.
 	 *
 	 * @return void
 	 */
-	public function save_settings() {
-		// Nonce is already checked in store_settings_form_options() which calls this method.
-		$redirect_on_login = isset( $_POST['prpl-redirect-on-login'] ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			? \sanitize_text_field( \wp_unslash( $_POST['prpl-redirect-on-login'] ) ) // phpcs:ignore WordPress.Security.NonceVerification.Missing
-			: false;
-
-		\update_user_meta( \get_current_user_id(), 'prpl_redirect_on_login', (bool) $redirect_on_login );
+	public function save_redirect_on_login( $redirect_on_login = false ) {
+		\update_user_meta( \get_current_user_id(), 'prpl_redirect_on_login', $redirect_on_login );
 	}
 
 	/**
