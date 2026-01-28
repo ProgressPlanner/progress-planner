@@ -109,6 +109,11 @@ class Chart {
 		 */
 		$previous_period_activities = [];
 		if ( $args['normalized'] ) {
+			/**
+			 * The start date of the first period.
+			 *
+			 * @var \DateTime $first_period_start
+			 */
 			$first_period_start         = $periods[0]['start_date'];
 			$previous_month_start       = ( clone $first_period_start )->modify( '-1 month' );
 			$previous_month_end         = ( clone $first_period_start )->modify( '-1 day' );
