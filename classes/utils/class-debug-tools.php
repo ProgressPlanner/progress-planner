@@ -791,7 +791,7 @@ class Debug_Tools {
 		$this->verify_nonce();
 
 		// Delete the onboarding progress.
-		\delete_option( 'prpl_onboard_progress' );
+		\Progress_Planner\Onboard_Wizard::delete_progress();
 
 		// Delete the license key.
 		\delete_option( 'progress_planner_license_key' );

@@ -13,6 +13,13 @@ namespace Progress_Planner;
 class Onboard_Wizard {
 
 	/**
+	 * Option name for storing onboarding progress.
+	 *
+	 * @var string
+	 */
+	public const PROGRESS_OPTION_NAME = 'prpl_onboard_progress';
+
+	/**
 	 * Steps and their order.
 	 *
 	 * @var array
@@ -20,12 +27,21 @@ class Onboard_Wizard {
 	protected $steps = [];
 
 	/**
+	 * Delete the onboarding progress option.
+	 *
+	 * @return bool True if the option was deleted, false otherwise.
+	 */
+	public static function delete_progress() {
+		return \delete_option( self::PROGRESS_OPTION_NAME );
+	}
+
+	/**
 	 * Constructor.
 	 *
 	 * @return void
 	 */
 	public function __construct() {
-		\add_action( 'init', [ $this, 'maybe_register_popover_hooks' ], 0 );
+		\add_action( 'init', [ $this, 'maybe_register_popover_hooks' ], 10 ); // Wait for the Playground to register its hooks.
 	}
 
 	/**
@@ -51,21 +67,21 @@ class Onboard_Wizard {
 		// 2. Onboarding already in progress.
 		// 3. Branded site (privacy auto-accepted, but still needs onboarding).
 		$is_branded      = 0 !== (int) \progress_planner()->get_ui__branding()->get_branding_id();
-		$skip_onboarding = \progress_planner()->is_privacy_policy_accepted()
-			&& ! \get_option( 'prpl_onboard_progress', false )
-			&& ! $is_branded;
+		$show_onboarding = ! \progress_planner()->is_privacy_policy_accepted()
+			|| \get_option( self::PROGRESS_OPTION_NAME, false )
+			|| $is_branded;
 
 		/**
-		 * Filter whether to skip the onboarding wizard.
+		 * Filter whether to show the onboarding wizard.
 		 *
 		 * Hosting integrations can use this filter to force showing
 		 * or hiding the onboarding wizard.
 		 *
-		 * @param bool $skip_onboarding Whether to skip showing the onboarding wizard.
+		 * @param bool $show_onboarding Whether to show the onboarding wizard.
 		 */
-		$skip_onboarding = \apply_filters( 'progress_planner_skip_onboarding', $skip_onboarding );
+		$show_onboarding = \apply_filters( 'progress_planner_show_onboarding', $show_onboarding );
 
-		if ( $skip_onboarding ) {
+		if ( ! $show_onboarding ) {
 			return;
 		}
 
@@ -299,7 +315,8 @@ class Onboard_Wizard {
 						'startOnboarding'       => \esc_html__( 'Start onboarding', 'progress-planner' ),
 						/* translators: %s: Progress Planner name. */
 						'privacyPolicyError'    => sprintf( \esc_html__( 'You need to agree with the privacy policy to use the %s plugin.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) ),
-						'dashboard'             => \esc_html__( 'Take me to the dashboard', 'progress-planner' ),
+						/* translators: %s: arrow icon */
+						'dashboard'             => sprintf( \esc_html__( 'Take me to the dashboard %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' ),
 						'backToRecommendations' => \esc_html__( 'Back to recommendations', 'progress-planner' ),
 					],
 					'errorIcon'            => \progress_planner()->get_asset( 'images/icon_exclamation_circle.svg' ),
@@ -319,7 +336,7 @@ class Onboard_Wizard {
 			return null;
 		}
 
-		$onboarding_progress = \get_option( 'prpl_onboard_progress', true );
+		$onboarding_progress = \get_option( self::PROGRESS_OPTION_NAME, true );
 		if ( ! $onboarding_progress ) {
 			return null;
 		}
@@ -363,7 +380,7 @@ class Onboard_Wizard {
 		\error_log( print_r( $progress, true ) ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r, WordPress.PHP.DevelopmentFunctions.error_log_error_log
 
 		// Save as user meta?
-		\update_option( 'prpl_onboard_progress', $progress );
+		\update_option( self::PROGRESS_OPTION_NAME, $progress );
 
 		\wp_send_json_success( [ 'message' => \esc_html__( 'Tour progress saved.', 'progress-planner' ) ] );
 	}

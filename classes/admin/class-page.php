@@ -104,7 +104,8 @@ class Page {
 			'manage_options',
 			$page_identifier,
 			'__return_empty_string',
-			\progress_planner()->get_ui__branding()->get_admin_menu_icon()
+			\progress_planner()->get_ui__branding()->get_admin_menu_icon(),
+			\progress_planner()->get_ui__branding()->get_admin_submenu_position()
 		);
 
 		\add_submenu_page(
