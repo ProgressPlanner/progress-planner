@@ -300,7 +300,7 @@ class OnboardingStep {
 			const dashboardText =
 				this.wizard.config?.l10n?.dashboard ||
 				'Take me to the Recommendations dashboard';
-			this.nextBtn.textContent = dashboardText;
+			this.nextBtn.innerHTML = dashboardText;
 		}
 	}
 

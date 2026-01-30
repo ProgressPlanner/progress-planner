@@ -25,15 +25,6 @@ class Editor {
 	 * @return void
 	 */
 	public function enqueue_editor_script() {
-		// Bail early when we're on the site-editor.php page.
-		$request = \filter_input( INPUT_SERVER, 'REQUEST_URI' );
-		if ( ! $request && isset( $_SERVER['REQUEST_URI'] ) ) {
-			$request = \sanitize_text_field( \wp_unslash( $_SERVER['REQUEST_URI'] ) );
-		}
-		if ( $request && \str_contains( $request, 'site-editor.php' ) ) {
-			return;
-		}
-
 		$page_types = \progress_planner()->get_page_types()->get_page_types();
 
 		// Check if the page-type is set in the URL (user is coming from the Settings page).
@@ -56,9 +47,10 @@ class Editor {
 			[
 				'name' => 'progressPlannerEditor',
 				'data' => [
-					'lessons'         => \progress_planner()->get_lessons()->get_items(),
-					'pageTypes'       => $page_types,
-					'defaultPageType' => $prpl_preselected_page_type,
+					'lessons'          => \progress_planner()->get_lessons()->get_items(),
+					'pageTypes'        => $page_types,
+					'defaultPageType'  => $prpl_preselected_page_type,
+					'adminMenuIconSvg' => \progress_planner()->get_ui__branding()->get_admin_menu_icon( true ),
 				],
 			]
 		);
