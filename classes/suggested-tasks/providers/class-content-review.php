@@ -289,7 +289,7 @@ class Content_Review extends Tasks {
 				'provider_id'       => $this->get_provider_id(),
 				'target_post_id'    => $task_data['target_post_id'],
 				'target_post_type'  => $task_data['target_post_type'],
-				'date'              => \gmdate( 'YW' ),
+				'date'              => \gmdate( 'oW' ),
 				'post_title'        => $this->get_title_with_data( $task_data ),
 				'url'               => $this->get_url_with_data( $task_data ),
 				'url_target'        => $this->get_url_target(),
