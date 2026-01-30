@@ -18,6 +18,8 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Page_Types get_page_types()
  * @method \Progress_Planner\Rest\Stats get_rest__stats()
  * @method \Progress_Planner\Rest\Tasks get_rest__tasks()
+ * @method \Progress_Planner\Rest\Remote_Status get_rest__remote_status()
+ * @method \Progress_Planner\Rest\Remote_Recommendations get_rest__remote_recommendations()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
  * @method \Progress_Planner\Utils\Playground get_utils__playground()
@@ -130,6 +132,8 @@ class Base {
 		// REST API.
 		$this->get_rest__stats();
 		$this->get_rest__tasks();
+		$this->get_rest__remote_status();
+		$this->get_rest__remote_recommendations();
 
 		// Onboarding.
 		$this->get_utils__onboard();
