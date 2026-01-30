@@ -29,7 +29,7 @@ namespace Progress_Planner\Suggested_Tasks;
  * @property int|null $target_term_id The target term ID for the task
  * @property string|null $target_taxonomy The target taxonomy for the task
  * @property string|null $target_term_name The target term name for the task
- * @property string|null $date The task date in YW format (year-week)
+ * @property string|null $date The task date in oW format (ISO year + ISO week)
  */
 class Task {
 	/**

@@ -26,7 +26,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 						?>
 					</p>
 					<p>
-						<?php \esc_html_e( 'These actions help you improve your site step by step, without having to guess where to start.', 'progress-planner' ); ?>
+						<?php \esc_html_e( 'These actions help you improve your site step by step, without having to guess where to start. Most recommendations can be completed in under five minutes.', 'progress-planner' ); ?>
 					</p>
 				</div>
 			</div>
@@ -52,7 +52,12 @@ if ( ! \defined( 'ABSPATH' ) ) {
 	</div>
 	<div class="tour-footer">
 		<div class="prpl-tour-next-wrapper">
-			<button class="prpl-tour-next prpl-btn prpl-btn-secondary"><?php \esc_html_e( 'Next', 'progress-planner' ); ?></button>
+			<button class="prpl-tour-next prpl-btn prpl-btn-secondary">
+				<?php
+				/* translators: %s: arrow icon */
+				printf( \esc_html__( 'Got it %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
+				?>
+			</button>
 		</div>
 	</div>
 </script>

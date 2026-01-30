@@ -118,17 +118,25 @@ const prplInteractiveTaskFormListener = {
 				.finally( () => {
 					// Hide loading state.
 					prplInteractiveTaskFormListener.hideLoading( formElement );
-
-					// Remove the form listener once the callback is executed.
-					formElement.removeEventListener(
-						'submit',
-						formSubmitHandler
-					);
 				} );
 		};
 
 		// Add a form listener to the form.
 		formElement.addEventListener( 'submit', formSubmitHandler );
+
+		// Remove the form listener when the popover is closed.
+		document.getElementById( popoverId ).addEventListener(
+			'toggle',
+			( toggleEvent ) => {
+				if ( toggleEvent.newState === 'closed' ) {
+					formElement.removeEventListener(
+						'submit',
+						formSubmitHandler
+					);
+				}
+			},
+			{ once: true }
+		);
 	},
 
 	settings: ( {
