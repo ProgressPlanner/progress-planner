@@ -295,7 +295,9 @@ abstract class Tasks implements Tasks_Interface {
 		$parts[] = $task_data['target_taxonomy'] ?? false;
 		// If the task is repetitive, add the date as the last part (format: YYYYWW, e.g., 202542 for week 42 of 2025).
 		// This creates a new task instance each week for repetitive tasks.
-		$parts[] = $this->is_repetitive() ? \gmdate( 'YW' ) : false;
+		// Note: We use 'oW' format (ISO year + ISO week) instead of 'YW' to handle year boundaries correctly.
+		// For example, Dec 29, 2025 is ISO week 01 of 2026, so 'oW' returns '202601' while 'YW' would incorrectly return '202501'.
+		$parts[] = $this->is_repetitive() ? \gmdate( 'oW' ) : false;
 
 		// Remove empty parts to keep IDs clean.
 		$parts = \array_filter( $parts );
@@ -447,7 +449,7 @@ abstract class Tasks implements Tasks_Interface {
 	 * - Returns the task object if completed, false otherwise
 	 *
 	 * Repetitive tasks:
-	 * - Must be completed within the same week they were created (using YW format: year + week number)
+	 * - Must be completed within the same week they were created (using oW format: ISO year + ISO week number)
 	 * - For example, a task created in week 42 of 2025 must be completed in 2025W42
 	 * - This prevents tasks from previous weeks being marked as complete
 	 * - Allows child classes to add completion data (e.g., post_id for "create post" tasks)
@@ -483,8 +485,8 @@ abstract class Tasks implements Tasks_Interface {
 			$task->provider &&
 			$task->provider->slug === $this->get_provider_id() &&
 			\DateTime::createFromFormat( 'Y-m-d H:i:s', $task->post_date ) &&
-			// Check if the task was created in the current week (YW format: e.g., 202542 = week 42 of 2025).
-			\gmdate( 'YW' ) === \gmdate( 'YW', \DateTime::createFromFormat( 'Y-m-d H:i:s', $task->post_date )->getTimestamp() ) && // @phpstan-ignore-line
+			// Check if the task was created in the current week (oW format: ISO year + ISO week, e.g., 202542 = week 42 of 2025).
+			\gmdate( 'oW' ) === \gmdate( 'oW', \DateTime::createFromFormat( 'Y-m-d H:i:s', $task->post_date )->getTimestamp() ) && // @phpstan-ignore-line
 			$this->is_task_completed( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) )
 		) {
 			// Allow adding more data, for example in case of 'create-post' tasks we are adding the post_id.
@@ -599,7 +601,7 @@ abstract class Tasks implements Tasks_Interface {
 			'parent'            => $this->get_parent(),
 			'priority'          => $this->get_priority(),
 			'points'            => $this->get_points(),
-			'date'              => \gmdate( 'YW' ),
+			'date'              => \gmdate( 'oW' ),
 			'url'               => $this->get_url_with_data( $task_data ),
 			'url_target'        => $this->get_url_target(),
 			'link_setting'      => $this->get_link_setting(),
@@ -781,6 +783,15 @@ abstract class Tasks implements Tasks_Interface {
 	}
 
 	/**
+	 * Get the task action label.
+	 *
+	 * @return string
+	 */
+	public function get_task_action_label() {
+		return \__( 'Do it', 'progress-planner' );
+	}
+
+	/**
 	 * Check if the task has activity.
 	 *
 	 * @param string $task_id The task ID.
@@ -800,5 +811,17 @@ abstract class Tasks implements Tasks_Interface {
 		);
 
 		return ! empty( $activity );
+	}
+
+	/**
+	 * Complete the task.
+	 *
+	 * @param array  $args The task data.
+	 * @param string $task_id The task ID.
+	 *
+	 * @return bool
+	 */
+	public function complete_task( $args = [], $task_id = '' ) {
+		return false;
 	}
 }

@@ -1,6 +1,6 @@
 <?php
 /**
- * Class Settings_Saved_Test
+ * Class Disable_Comments_Test
  *
  * @package Progress_Planner
  */

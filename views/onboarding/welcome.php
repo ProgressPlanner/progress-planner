@@ -1,0 +1,83 @@
+<?php
+/**
+ * Tour step view.
+ *
+ * @package Progress_Planner
+ */
+
+// Exit if accessed directly.
+if ( ! \defined( 'ABSPATH' ) ) {
+	exit;
+}
+?>
+
+<!-- Tour step welcome -->
+<script type="text/template" id="onboarding-step-welcome">
+	<div class="tour-content">
+		<div class="prpl-columns-wrapper-flex prpl-columns-2-1">
+			<div class="prpl-column">
+				<div class="prpl-background-content">
+					<h3 class="tour-title">
+						<?php
+						\esc_html_e( 'Hi there! Ready to push your website forward? Let\'s go!', 'progress-planner' );
+						?>
+					</h3>
+					<p>
+						<?php
+						/* translators: %s: Progress Planner name. */
+						\printf( \esc_html__( '%s helps you set clear, focused goals for your website. Let\'s go through a few simple steps to get everything set up.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
+						?>
+					</p>
+					<p class="prpl-welcome-note">
+						<?php \esc_html_e( 'This will only take a few minutes.', 'progress-planner' ); ?>
+					</p>
+				</div>
+
+				<?php
+					// Hide privacy checkbox if license already exists (e.g., branded/hosted sites).
+				if ( false === \progress_planner()->get_license_key() ) :
+					?>
+					<div class="prpl-privacy-checkbox-wrapper">
+					<?php
+						\progress_planner()->the_view(
+							'onboarding/form-inputs/checkbox.php',
+							[
+								'name'          => 'privacy_accepted',
+								'current_value' => 0,
+								'options'       => [
+									[
+										'id'    => 'prpl-privacy-checkbox',
+										'label' => \sprintf(
+											/* translators: %1$s: progressplanner.com/privacy-policy link, %2$s: required indicator */
+											\esc_html__( 'I accept the %1$s and the essential data processing needed for the plugin. %2$s', 'progress-planner' ),
+											'<a href="' . \esc_url( \progress_planner()->get_ui__branding()->get_url( 'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy' ) ) . '" target="_blank">' . \esc_html__( 'privacy policy', 'progress-planner' ) . '</a>',
+											'<span class="prpl-required-indicator">' . \esc_html__( 'Required', 'progress-planner' ) . '</span>'
+										),
+										'value' => 1,
+									],
+								],
+							]
+						);
+					?>
+					</div>
+					<?php endif; ?>
+
+				<div class="tour-footer">
+					<div class="prpl-tour-next-wrapper">
+						<button class="prpl-tour-next prpl-btn prpl-btn-secondary">
+							<?php
+							/* translators: %s: arrow icon */
+							printf( \esc_html__( 'Start onboarding %s', 'progress-planner' ), '<span class="dashicons dashicons-arrow-right-alt2"></span>' );
+							?>
+						</button>
+					</div>
+				</div>
+			</div>
+			<div class="prpl-column prpl-hide-on-mobile">
+				<div id="prpl-welcome-graphic">
+					<?php \progress_planner()->the_file( 'assets/images/onboarding/thumbs_up_ravi_rtl.svg' ); ?>
+				</div>
+			</div>
+		</div>
+	</div>
+</script>

@@ -2,7 +2,7 @@
 /**
  * Editor script.
  *
- * Dependencies: wp-plugins, wp-edit-post, wp-element, progress-planner/l10n
+ * Dependencies: wp-plugins, wp-editor, wp-element, wp-components, wp-data, progress-planner/l10n
  */
 const { createElement: el, Fragment, useState } = wp.element;
 const { registerPlugin } = wp.plugins;
@@ -29,12 +29,32 @@ const prplGetPageTypeSlugFromId = ( id ) => {
 		id = 0;
 	} else if ( typeof id === 'string' ) {
 		id = parseInt( id );
+		// Handle NaN from parseInt on invalid strings.
+		if ( isNaN( id ) ) {
+			id = 0;
+		}
 	} else if ( typeof id !== 'number' ) {
 		id = 0;
 	}
 
-	if ( ! id ) {
-		id = parseInt( progressPlannerEditor.defaultPageType );
+	if ( ! id || isNaN( id ) ) {
+		// Check if progressPlannerEditor exists before accessing its properties.
+		if (
+			typeof progressPlannerEditor !== 'undefined' &&
+			progressPlannerEditor.defaultPageType
+		) {
+			id = parseInt( progressPlannerEditor.defaultPageType ) || 0;
+		} else {
+			id = 0;
+		}
+	}
+
+	// Check if progressPlannerEditor exists before accessing pageTypes.
+	if (
+		typeof progressPlannerEditor === 'undefined' ||
+		! progressPlannerEditor.pageTypes
+	) {
+		return undefined;
 	}
 
 	return progressPlannerEditor.pageTypes.find(
@@ -48,8 +68,41 @@ const prplGetPageTypeSlugFromId = ( id ) => {
  * @return {Element} Element to render.
  */
 const PrplRenderPageTypeSelector = () => {
+	// Get the current term from the TAXONOMY using useSelect hook.
+	const currentPageType = useSelect( ( select ) => {
+		// Defensive check: ensure select and editor store exist.
+		if ( ! select || typeof select !== 'function' ) {
+			return 0;
+		}
+		const editor = select( 'core/editor' );
+		if ( ! editor || typeof editor.getEditedPostAttribute !== 'function' ) {
+			// Fallback to default if editor store is not available.
+			if (
+				typeof progressPlannerEditor !== 'undefined' &&
+				progressPlannerEditor.defaultPageType
+			) {
+				return parseInt( progressPlannerEditor.defaultPageType ) || 0;
+			}
+			return 0;
+		}
+		const pageTypeArr = editor.getEditedPostAttribute( TAXONOMY );
+		if ( pageTypeArr && 0 < pageTypeArr.length ) {
+			return parseInt( pageTypeArr[ 0 ] );
+		}
+		// Check if progressPlannerEditor exists before accessing its properties.
+		if (
+			typeof progressPlannerEditor !== 'undefined' &&
+			progressPlannerEditor.defaultPageType
+		) {
+			return parseInt( progressPlannerEditor.defaultPageType ) || 0;
+		}
+		return 0;
+	}, [] );
+
 	// Bail early if the page types are not set.
+	// Check if progressPlannerEditor exists before accessing its properties.
 	if (
+		typeof progressPlannerEditor === 'undefined' ||
 		! progressPlannerEditor.pageTypes ||
 		0 === progressPlannerEditor.pageTypes.length
 	) {
@@ -60,27 +113,29 @@ const PrplRenderPageTypeSelector = () => {
 	const pageTypes = [];
 	progressPlannerEditor.pageTypes.forEach( ( term ) => {
 		pageTypes.push( {
-			label: term.title,
-			value: term.id,
+			label: term.title || '',
+			value: term.id || '',
 		} );
 	} );
 
 	return el( SelectControl, {
 		label: prplL10n( 'pageType' ),
-		// Get the current term from the TAXONOMY.
-		value: wp.data.useSelect( ( select ) => {
-			const pageTypeArr =
-				select( 'core/editor' ).getEditedPostAttribute( TAXONOMY );
-			return pageTypeArr && 0 < pageTypeArr.length
-				? parseInt( pageTypeArr[ 0 ] )
-				: parseInt( progressPlannerEditor.defaultPageType );
-		}, [] ),
+		value: currentPageType,
 		options: pageTypes,
 		onChange: ( value ) => {
 			// Update the TAXONOMY term value.
 			const data = {};
 			data[ TAXONOMY ] = value;
-			wp.data.dispatch( 'core/editor' ).editPost( data );
+			// Defensive check: ensure wp.data and dispatch exist before calling.
+			if ( wp.data && typeof wp.data.dispatch === 'function' ) {
+				const editorDispatch = wp.data.dispatch( 'core/editor' );
+				if (
+					editorDispatch &&
+					typeof editorDispatch.editPost === 'function'
+				) {
+					editorDispatch.editPost( data );
+				}
+			}
 		},
 	} );
 };
@@ -89,13 +144,22 @@ const PrplRenderPageTypeSelector = () => {
  * Render the video section.
  * This will display a button to open a modal with the video.
  *
- * @param {Object} lessonSection The lesson section.
+ * @param {Object} props               Component props.
+ * @param {Object} props.lessonSection The lesson section.
  * @return {Element} Element to render.
  */
-const PrplSectionVideo = ( lessonSection ) => {
+const PrplSectionVideo = ( props ) => {
 	const [ isOpen, setOpen ] = useState( false );
 	const openModal = () => setOpen( true );
 	const closeModal = () => setOpen( false );
+
+	// Handle both direct prop and nested prop for backward compatibility
+	const lessonSection = props?.lessonSection || props;
+
+	// If no video, return null (component always renders, but conditionally shows content)
+	if ( ! lessonSection || ! lessonSection.video ) {
+		return null;
+	}
 
 	return el(
 		'div',
@@ -120,7 +184,7 @@ const PrplSectionVideo = ( lessonSection ) => {
 						boxShadow: 'inset 0 0 0 1px #38296D',
 					},
 				},
-				lessonSection.video_button_label
+				lessonSection.video_button_text
 					? lessonSection.video_button_text
 					: prplL10n( 'watchVideo' )
 			),
@@ -143,7 +207,7 @@ const PrplSectionVideo = ( lessonSection ) => {
 						el( 'div', {
 							key: 'progress-planner-sidebar-video-modal-content-inner',
 							dangerouslySetInnerHTML: {
-								__html: lessonSection.video,
+								__html: lessonSection.video || '',
 							},
 						} )
 					)
@@ -158,17 +222,17 @@ const PrplSectionHTML = ( lesson, sectionId, wrapperEl = 'div' ) => {
 				wrapperEl,
 				{
 					key: `progress-planner-sidebar-lesson-section-${ sectionId }`,
-					title: lesson[ sectionId ].heading,
+					title: lesson[ sectionId ].heading || '',
 					initialOpen: false,
 				},
-				lesson[ sectionId ].video
-					? PrplSectionVideo( lesson[ sectionId ] )
-					: el( 'div', {}, '' ),
+				// Always render PrplSectionVideo as a component (not conditionally)
+				// The component handles the conditional logic internally to avoid hook violations
+				el( PrplSectionVideo, { lessonSection: lesson[ sectionId ] } ),
 				lesson[ sectionId ].text
 					? el( 'div', {
 							key: `progress-planner-sidebar-lesson-section-${ sectionId }-content`,
 							dangerouslySetInnerHTML: {
-								__html: lesson[ sectionId ].text,
+								__html: lesson[ sectionId ].text || '',
 							},
 					  } )
 					: el( 'div', {}, '' )
@@ -182,22 +246,38 @@ const PrplSectionHTML = ( lesson, sectionId, wrapperEl = 'div' ) => {
  * @return {Element} Element to render.
  */
 const PrplLessonItemsHTML = () => {
-	const pageTypeID = useSelect(
-		( select ) =>
-			select( 'core/editor' ).getEditedPostAttribute( TAXONOMY ),
-		[]
-	);
+	const pageTypeID = useSelect( ( select ) => {
+		// Defensive check: ensure select and editor store exist.
+		if ( ! select || typeof select !== 'function' ) {
+			return null;
+		}
+		const editor = select( 'core/editor' );
+		if ( ! editor || typeof editor.getEditedPostAttribute !== 'function' ) {
+			return null;
+		}
+		return editor.getEditedPostAttribute( TAXONOMY );
+	}, [] );
 	const pageType = prplGetPageTypeSlugFromId( pageTypeID );
 
 	const pageTodosMeta = useSelect( ( select ) => {
-		const meta = select( 'core/editor' ).getEditedPostAttribute( 'meta' );
+		// Defensive check: ensure select and editor store exist.
+		if ( ! select || typeof select !== 'function' ) {
+			return '';
+		}
+		const editor = select( 'core/editor' );
+		if ( ! editor || typeof editor.getEditedPostAttribute !== 'function' ) {
+			return '';
+		}
+		const meta = editor.getEditedPostAttribute( 'meta' );
 		return meta ? meta.progress_planner_page_todos : '';
 	}, [] );
 	const pageTodos = pageTodosMeta || '';
 
 	// Bail early if the page type or lessons are not set.
+	// Check if progressPlannerEditor exists before accessing its properties.
 	if (
 		! pageType ||
+		typeof progressPlannerEditor === 'undefined' ||
 		! progressPlannerEditor.lessons ||
 		0 === progressPlannerEditor.lessons.length
 	) {
@@ -205,20 +285,29 @@ const PrplLessonItemsHTML = () => {
 	}
 
 	const lesson = progressPlannerEditor.lessons.find(
-		( lessonItem ) => lessonItem.settings.id === pageType
+		( lessonItem ) => lessonItem.settings?.id === pageType
 	);
 
-	if ( lesson.content_update_cycle.text ) {
-		lesson.content_update_cycle.text =
-			lesson.content_update_cycle.text.replace(
-				/\{page_type\}/g,
-				lesson.name
-			);
-		lesson.content_update_cycle.text =
-			lesson.content_update_cycle.text.replace(
-				/\{update_cycle\}/g,
-				lesson.content_update_cycle.update_cycle
-			);
+	// Bail early if lesson not found.
+	if ( ! lesson ) {
+		return el( 'div', {}, '' );
+	}
+
+	// Create a processed copy of the lesson to avoid mutating the original.
+	const processedLesson = { ...lesson };
+	if (
+		processedLesson.content_update_cycle &&
+		processedLesson.content_update_cycle.text
+	) {
+		processedLesson.content_update_cycle = {
+			...processedLesson.content_update_cycle,
+			text: processedLesson.content_update_cycle.text
+				.replace( /\{page_type\}/g, processedLesson.name || '' )
+				.replace(
+					/\{update_cycle\}/g,
+					processedLesson.content_update_cycle.update_cycle || ''
+				),
+		};
 	}
 
 	return el(
@@ -227,34 +316,39 @@ const PrplLessonItemsHTML = () => {
 			key: 'progress-planner-sidebar-lesson-items',
 		},
 		// Update cycle content.
-		PrplSectionHTML( lesson, 'content_update_cycle', 'div' ),
+		PrplSectionHTML( processedLesson, 'content_update_cycle', 'div' ),
 
 		// Intro video & content.
-		PrplSectionHTML( lesson, 'intro', PanelBody ),
+		PrplSectionHTML( processedLesson, 'intro', PanelBody ),
 
 		// Checklist video & content.
-		lesson.checklist
+		processedLesson.checklist
 			? el(
 					PanelBody,
 					{
 						key: `progress-planner-sidebar-lesson-section-checklist-content`,
-						title: lesson.checklist.heading,
+						title: processedLesson.checklist.heading || '',
 						initialOpen: false,
 					},
 					el(
 						'div',
 						{},
-						lesson.checklist.video
-							? PrplSectionVideo( lesson.checklist )
-							: el( 'div', {}, '' ),
-						PrplTodoProgress( lesson.checklist, pageTodos ),
-						PrplCheckList( lesson.checklist, pageTodos )
+						// Always render PrplSectionVideo as a component (not conditionally)
+						// The component handles the conditional logic internally to avoid hook violations
+						el( PrplSectionVideo, {
+							lessonSection: processedLesson.checklist,
+						} ),
+						PrplTodoProgress(
+							processedLesson.checklist,
+							pageTodos
+						),
+						PrplCheckList( processedLesson.checklist, pageTodos )
 					)
 			  )
 			: el( 'div', {}, '' ),
 
 		// Writers block video & content.
-		PrplSectionHTML( lesson, 'writers_block', PanelBody )
+		PrplSectionHTML( processedLesson, 'writers_block', PanelBody )
 	);
 };
 
@@ -264,40 +358,100 @@ const PrplLessonItemsHTML = () => {
  *
  * @return {Element} Element to render.
  */
-const PrplProgressPlannerSidebar = () =>
-	el(
+const PrplProgressPlannerSidebar = () => {
+	// Use useSelect to reactively detect what's being edited
+	// Include both postType and postId so component re-renders when switching posts
+	// postId and postType are destructured but intentionally unused - they're needed
+	// for reactivity when switching between posts in the site editor.
+	const { isEditingPost, postId, postType } = useSelect( ( select ) => {
+		const editor = select( 'core/editor' );
+
+		// Make sure the editor store and methods exist.
+		if (
+			! editor ||
+			typeof editor.getCurrentPostType !== 'function' ||
+			typeof editor.getCurrentPostId !== 'function'
+		) {
+			return {
+				isEditingPost: false,
+				postId: null,
+				postType: null,
+			};
+		}
+
+		const currentPostType = editor.getCurrentPostType();
+		const currentPostId = editor.getCurrentPostId();
+
+		// Templates have post types 'wp_template' or 'wp_template_part'.
+		const isTemplate =
+			currentPostType === 'wp_template' ||
+			currentPostType === 'wp_template_part';
+
+		return {
+			isEditingPost: ! isTemplate && !! currentPostType,
+			postId: currentPostId,
+			postType: currentPostType,
+		};
+	}, [] );
+	// eslint-disable-next-line no-unused-vars
+	const _unusedForReactivity = { postId, postType };
+
+	// Always render the child components to ensure hooks are called consistently.
+	// Render them in a hidden wrapper when not editing a post to maintain hook order.
+	const sidebarContent = el(
+		'div',
+		{
+			key: 'progress-planner-sidebar-page-type-selector-wrapper',
+			style: {
+				padding: '15px',
+				borderBottom: '1px solid #ddd',
+			},
+		},
+		// Always render these components so hooks are always called
+		PrplRenderPageTypeSelector(),
+		PrplLessonItemsHTML()
+	);
+
+	// Only render the PluginSidebar (and its icon) when editing a post
+	return el(
 		Fragment,
 		{},
-		el(
-			PluginSidebarMoreMenuItem,
-			{
-				target: 'progress-planner-sidebar',
-				key: 'progress-planner-sidebar-menu-item',
-			},
-			prplL10n( 'progressPlannerSidebar' )
-		),
-		el(
-			PluginSidebar,
-			{
-				name: 'progress-planner-sidebar',
-				key: 'progress-planner-sidebar-sidebar',
-				title: prplL10n( 'progressPlannerSidebar' ),
-				icon: PrplIcon(),
-			},
+		// Render child components in a hidden wrapper when not editing to maintain hook order
+		! isEditingPost &&
 			el(
 				'div',
 				{
-					key: 'progress-planner-sidebar-page-type-selector-wrapper',
-					style: {
-						padding: '15px',
-						borderBottom: '1px solid #ddd',
-					},
+					key: 'progress-planner-sidebar-hidden-wrapper',
+					style: { display: 'none' },
 				},
-				PrplRenderPageTypeSelector(),
-				PrplLessonItemsHTML()
+				sidebarContent
+			),
+		// Only show sidebar icon and panel when editing a post
+		isEditingPost &&
+			el(
+				Fragment,
+				{},
+				el(
+					PluginSidebarMoreMenuItem,
+					{
+						target: 'progress-planner-sidebar',
+						key: 'progress-planner-sidebar-menu-item',
+					},
+					prplL10n( 'progressPlannerSidebar' )
+				),
+				el(
+					PluginSidebar,
+					{
+						name: 'progress-planner-sidebar',
+						key: 'progress-planner-sidebar-sidebar',
+						title: prplL10n( 'progressPlannerSidebar' ),
+						icon: PrplIcon(),
+					},
+					sidebarContent
+				)
 			)
-		)
 	);
+};
 
 /**
  * Render the todo items progressbar.
@@ -311,23 +465,33 @@ const PrplTodoProgress = ( lessonSection, pageTodos ) => {
 	const requiredToDos = [];
 	if ( lessonSection.todos ) {
 		lessonSection.todos.forEach( ( toDoGroup ) => {
-			toDoGroup.group_todos.forEach( ( item ) => {
-				if ( item.todo_required ) {
-					requiredToDos.push( item.id );
-				}
-			} );
+			if ( toDoGroup.group_todos ) {
+				toDoGroup.group_todos.forEach( ( item ) => {
+					if ( item.todo_required && item.id ) {
+						requiredToDos.push( item.id );
+					}
+				} );
+			}
 		} );
 	}
 
 	// Get an array of completed todo items.
-	const completedToDos = pageTodos
-		.split( ',' )
-		.filter( ( item ) => requiredToDos.includes( item ) );
+	// Normalize empty strings to empty arrays to avoid [''] from ''.split(',')
+	const todosArray = pageTodos
+		? pageTodos.split( ',' ).filter( Boolean )
+		: [];
+	const completedToDos = todosArray.filter( ( item ) =>
+		requiredToDos.includes( item )
+	);
 
 	// Get the percentage of completed todo items.
-	const percentageComplete = Math.round(
-		( completedToDos.length / requiredToDos.length ) * 100
-	);
+	// Guard against division by zero.
+	const percentageComplete =
+		requiredToDos.length > 0
+			? Math.round(
+					( completedToDos.length / requiredToDos.length ) * 100
+			  )
+			: 0;
 
 	return el(
 		'div',
@@ -391,32 +555,53 @@ const PrplCheckListItem = ( item, pageTodos ) =>
 	el(
 		'div',
 		{
-			key: item.id,
+			key: item.id || '',
 		},
 		el( CheckboxControl, {
-			checked: pageTodos.split( ',' ).includes( item.id ),
-			label: item.todo_name,
+			checked:
+				pageTodos && item.id
+					? pageTodos
+							.split( ',' )
+							.filter( Boolean )
+							.includes( item.id )
+					: false,
+			label: item.todo_name || '',
 			className: item.todo_required
 				? 'progress-planner-todo-item required'
 				: 'progress-planner-todo-item',
 			help: el( 'div', {
 				dangerouslySetInnerHTML: {
-					__html: item.todo_description,
+					__html: item.todo_description || '',
 				},
 			} ),
 			onChange: ( checked ) => {
-				const toDos = pageTodos.split( ',' );
-				if ( checked ) {
+				// Normalize empty strings to empty arrays.
+				const toDos = pageTodos
+					? pageTodos.split( ',' ).filter( Boolean )
+					: [];
+				if ( checked && item.id ) {
 					toDos.push( item.id );
-				} else {
-					toDos.splice( toDos.indexOf( item.id ), 1 );
+				} else if ( item.id ) {
+					const index = toDos.indexOf( item.id );
+					if ( index > -1 ) {
+						toDos.splice( index, 1 );
+					}
 				}
 				// Update the `progress_planner_page_todos` meta value.
-				wp.data.dispatch( 'core/editor' ).editPost( {
-					meta: {
-						progress_planner_page_todos: toDos.join( ',' ),
-					},
-				} );
+				// Defensive check: ensure wp.data and dispatch exist before calling.
+				if ( wp.data && typeof wp.data.dispatch === 'function' ) {
+					const editorDispatch = wp.data.dispatch( 'core/editor' );
+					if (
+						editorDispatch &&
+						typeof editorDispatch.editPost === 'function'
+					) {
+						editorDispatch.editPost( {
+							meta: {
+								progress_planner_page_todos: toDos.join( ',' ),
+							},
+						} );
+					}
+				}
 			},
 		} )
 	);
@@ -428,26 +613,38 @@ const PrplCheckListItem = ( item, pageTodos ) =>
  * @param {string} pageTodos
  * @return {Element} Element to render.
  */
-const PrplCheckList = ( lessonSection, pageTodos ) =>
-	lessonSection.todos.map( ( toDoGroup ) =>
+const PrplCheckList = ( lessonSection, pageTodos ) => {
+	// Bail early if todos are not set.
+	if ( ! lessonSection.todos || ! Array.isArray( lessonSection.todos ) ) {
+		return [];
+	}
+
+	return lessonSection.todos.map( ( toDoGroup ) =>
 		el(
 			PanelBody,
 			{
-				key: `progress-planner-sidebar-lesson-section-${ toDoGroup.group_heading }`,
-				title: toDoGroup.group_heading,
+				key: `progress-planner-sidebar-lesson-section-${
+					toDoGroup.group_heading || ''
+				}`,
+				title: toDoGroup.group_heading || '',
 				initialOpen: false,
 			},
 			el(
 				'div',
 				{
-					key: `progress-planner-sidebar-lesson-section-${ toDoGroup.group_heading }-todos`,
+					key: `progress-planner-sidebar-lesson-section-${
+						toDoGroup.group_heading || ''
+					}-todos`,
 				},
-				toDoGroup.group_todos.map( ( item ) =>
-					PrplCheckListItem( item, pageTodos )
-				)
+				toDoGroup.group_todos && Array.isArray( toDoGroup.group_todos )
+					? toDoGroup.group_todos.map( ( item ) =>
+							PrplCheckListItem( item, pageTodos )
+					  )
+					: []
 			)
 		)
 	);
+};
 
 // Register the sidebar.
 registerPlugin( 'progress-planner-sidebar', {
@@ -455,40 +652,24 @@ registerPlugin( 'progress-planner-sidebar', {
 } );
 
 /**
- * SVG Icon Component.
+ * Icon Component using branding admin menu icon.
+ *
+ * Renders raw SVG inline so it can be styled with CSS (e.g., currentColor).
  *
  * @return {Element} Element to render.
  */
 const PrplIcon = () =>
-	el(
-		'svg',
-		{
-			role: 'img',
-			className: 'progress-planner-icon',
-			xmlns: 'http://www.w3.org/2000/svg',
-			viewBox: '0 0 500 500',
+	el( 'span', {
+		className: 'progress-planner-icon',
+		style: {
+			display: 'inline-flex',
+			width: '20px',
+			height: '20px',
 		},
-		[
-			el( 'path', {
-				key: 'path1',
-				id: 'path1',
-				stroke: 'none',
-				d: 'M 283.460022 172.899994 C 286.670013 173.02002 289.429993 174.640015 291.190002 177.049988 C 289.320007 166.809998 280.550018 158.880005 269.710022 158.48999 C 257.190002 158.039978 246.679993 167.820007 246.229996 180.339996 C 245.779999 192.859985 255.559998 203.369995 268.080017 203.820007 C 277.480011 204.160004 285.75 198.720001 289.480011 190.690002 C 287.649994 192.200012 285.300018 193.109985 282.740021 193.02002 C 277.190002 192.820007 272.850006 188.160004 273.050018 182.609985 C 273.25 177.059998 277.910004 172.720001 283.460022 172.919983 Z M 307.51001 305.839996 C 308.089996 307.76001 308.640015 309.700012 309.240021 311.609985 C 323.279999 356.579987 343.179993 400.359985 365.660004 435.880005 L 433.410004 305.839996 L 307.51001 305.839996 Z M 363.959991 205.970001 C 376.079987 201.470001 387.5 198.789978 397.600006 197.01001 C 375.089996 174.73999 336.359985 169.950012 336.130005 169.919983 C 337.399994 176.089996 336.709991 185.720001 333.690002 196.380005 C 330.390015 208.039978 324.309998 220.919983 314.990021 231.859985 C 311.540009 235.919983 307.630005 239.690002 303.26001 243.049988 L 303.330017 243.049988 L 303.330017 243.039978 C 303.490021 243.660004 303.710022 244.240005 303.910004 244.830002 C 306.649994 253.100006 312.52002 258.570007 318.839996 261.970001 C 325.320007 265.459991 332.209991 266.799988 336.519989 266.799988 C 342.920013 266.799988 348.399994 263.01001 350.950012 257.579987 C 351.920013 255.520004 352.5 253.25 352.5 250.820007 C 352.5 246.970001 351.079987 243.47998 348.809998 240.720001 C 346.890015 238.390015 344.350006 236.640015 341.420013 235.690002 L 386.23999 227.039978 C 379.609985 220.919983 371.519989 215.450012 363.51001 210.809998 C 361.540009 209.669983 361.820007 206.76001 363.959991 205.970001 Z',
-			} ),
-			el( 'path', {
-				key: 'path2',
-				id: 'path2',
-				stroke: 'none',
-				d: 'M 347.369995 458.369995 C 321.579987 419.529999 298.690002 370.329987 282.919983 319.829987 C 281.470001 315.200012 280.089996 310.519989 278.75 305.839996 C 277.630005 301.899994 276.529999 297.959991 275.5 294.040009 C 273.410004 286.119995 266.220001 280.579987 258.019989 280.579987 L 230.070007 280.579987 C 221.869995 280.579987 214.679993 286.109985 212.589996 294.029999 C 210.309998 302.679993 207.809998 311.350006 205.169998 319.820007 C 189.399994 370.320007 166.519989 419.519989 140.720001 458.359985 C 136.709991 464.390015 138.940002 469.98999 140.080002 472.119995 C 142.479996 476.589996 146.940002 479.26001 152.019989 479.26001 L 218.029999 479.26001 L 222 486.179993 C 226.539993 494.079987 234.990005 498.98999 244.050003 498.98999 C 253.110001 498.98999 261.559998 494.079987 266.109985 486.179993 L 270.089996 479.26001 L 336.089996 479.26001 C 339.309998 479.26001 342.279999 478.179993 344.640015 476.23999 C 345.98999 475.130005 347.149994 473.75 348.019989 472.109985 C 348.589996 471.040009 349.440002 469.089996 349.630005 466.649994 C 349.820007 464.23999 349.369995 461.339996 347.380005 458.339996 Z',
-			} ),
-			el( 'path', {
-				key: 'path3',
-				id: 'path3',
-				stroke: 'none',
-				d: 'M 361.700012 76.059998 C 354.160004 64.01001 329.320007 77.059998 302.160004 78.919983 C 287.119995 79.950012 265.110016 -31.710022 230.389999 21.929993 C 190.830002 83.029999 151.270004 -22.75 141.730011 6.100006 C 120.620003 49.369995 166.880005 90.709991 166.880005 90.709991 C 166.880005 90.709991 154.040009 98.630005 146.25 104.640015 C 140.779999 108.809998 135.430008 113.290009 130.220001 118.149994 C 109.770004 137.179993 94.18 158.470001 83.450005 182.01001 C 72.720001 205.549988 67.110001 229.589996 66.620003 254.149994 C 66.129997 278.709991 70.629997 303.25 80.160004 327.779999 C 89.68 352.309998 104.330002 375.200012 124.110001 396.459991 C 128.130005 400.779999 132.230011 404.869995 136.419998 408.76001 C 140.520004 402.450012 144.389999 396.019989 148.059998 389.5 C 152.449997 381.700012 156.559998 373.779999 160.309998 365.720001 C 159.980011 365.369995 159.650009 365.029999 159.320007 364.690002 C 159.150009 364.51001 158.980011 364.339996 158.809998 364.160004 C 143.279999 347.470001 131.639999 329.570007 123.880005 310.440002 C 116.110001 291.309998 112.380005 272.190002 112.68 253.080002 C 112.970001 233.97998 117.150002 215.399994 125.209999 197.359985 C 133.270004 179.309998 145.230011 162.910004 161.110001 148.140015 C 175.100006 135.119995 189.949997 125.309998 205.660004 118.730011 C 221.360001 112.140015 237.289993 108.75 253.419998 108.549988 C 262.470001 108.440002 272.529999 109.700012 282.929993 113.049988 C 293.25 117.320007 302.149994 122.48999 309.559998 128.399994 C 319.75 136.529999 327.170013 146.049988 331.779999 156.5 C 333.690002 160.820007 335.149994 165.299988 336.100006 169.910004 C 352.369995 141.640015 372.850006 93.950012 361.670013 76.080017 Z',
-			} ),
-		]
-	);
+		dangerouslySetInnerHTML: {
+			__html: progressPlannerEditor.adminMenuIconSvg,
+		},
+	} );
 
 /**
  * Render the Progress Planner post status.
@@ -515,12 +696,32 @@ const PrplPostStatus = () =>
 					},
 					variant: 'secondary',
 					href: '#',
-					onClick: () =>
-						wp.data
-							.dispatch( 'core/edit-post' )
-							.openGeneralSidebar(
+					onClick: () => {
+						// openGeneralSidebar is in core/edit-post store, not core/editor.
+						// Try core/edit-post first (where the method is defined),
+						// then fallback to core/editor if available in future versions.
+						const editPostDispatch =
+							wp.data.dispatch( 'core/edit-post' );
+						const editorDispatch =
+							wp.data.dispatch( 'core/editor' );
+						if (
+							editPostDispatch &&
+							typeof editPostDispatch.openGeneralSidebar ===
+								'function'
+						) {
+							editPostDispatch.openGeneralSidebar(
 								'progress-planner-sidebar/progress-planner-sidebar'
-							),
+							);
+						} else if (
+							editorDispatch &&
+							typeof editorDispatch.openGeneralSidebar ===
+								'function'
+						) {
+							editorDispatch.openGeneralSidebar(
+								'progress-planner-sidebar/progress-planner-sidebar'
+							);
+						}
+					},
 				},
 				'Progress Planner'
 			)

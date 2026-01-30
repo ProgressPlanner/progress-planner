@@ -21,40 +21,40 @@ class CPT_Recommendations_Test extends \WP_UnitTestCase {
 		// Tasks that should not be removed.
 		$tasks_to_keep = [
 			[
-				'post_title'  => 'review-post-14-' . \gmdate( 'YW' ),
-				'task_id'     => 'review-post-14-' . \gmdate( 'YW' ),
-				'date'        => \gmdate( 'YW' ),
+				'post_title'  => 'review-post-14-' . \gmdate( 'oW' ),
+				'task_id'     => 'review-post-14-' . \gmdate( 'oW' ),
+				'date'        => \gmdate( 'oW' ),
 				'category'    => 'content-update',
 				'provider_id' => 'review-post',
 			],
 			[
-				'post_title'  => 'create-post-' . \gmdate( 'YW' ),
-				'task_id'     => 'create-post-' . \gmdate( 'YW' ),
-				'date'        => \gmdate( 'YW' ),
+				'post_title'  => 'create-post-' . \gmdate( 'oW' ),
+				'task_id'     => 'create-post-' . \gmdate( 'oW' ),
+				'date'        => \gmdate( 'oW' ),
 				'category'    => 'content-new',
 				'provider_id' => 'create-post',
 			],
 			[
-				'post_title'  => 'update-core-' . \gmdate( 'YW' ),
-				'task_id'     => 'update-core-' . \gmdate( 'YW' ),
-				'date'        => \gmdate( 'YW' ),
+				'post_title'  => 'update-core-' . \gmdate( 'oW' ),
+				'task_id'     => 'update-core-' . \gmdate( 'oW' ),
+				'date'        => \gmdate( 'oW' ),
 				'category'    => 'maintenance',
 				'provider_id' => 'update-core',
 			],
 			[
-				'post_title'  => 'settings-saved-' . \gmdate( 'YW' ),
-				'task_id'     => 'settings-saved-' . \gmdate( 'YW' ),
-				'date'        => \gmdate( 'YW' ),
-				'provider_id' => 'settings-saved',
+				'post_title'  => 'core-siteicon-' . \gmdate( 'oW' ),
+				'task_id'     => 'core-siteicon-' . \gmdate( 'oW' ),
+				'date'        => \gmdate( 'oW' ),
+				'provider_id' => 'core-siteicon',
 				'category'    => 'configuration',
 			],
 
 			// Not repetitive task, but with past date.
 			[
-				'post_title'  => 'settings-saved-202451',
-				'task_id'     => 'settings-saved-202451',
+				'post_title'  => 'core-siteicon-202451',
+				'task_id'     => 'core-siteicon-202451',
 				'date'        => '202451',
-				'provider_id' => 'settings-saved',
+				'provider_id' => 'core-siteicon',
 				'category'    => 'configuration',
 			],
 

@@ -128,6 +128,11 @@ class Maintenance {
 	 * @return void
 	 */
 	protected function create_maintenance_activity( $type ) {
+		// Bail if the class doesn't exist (can happen during plugin updates).
+		if ( ! \class_exists( Activities_Maintenance::class ) ) {
+			return;
+		}
+
 		$activity       = new Activities_Maintenance();
 		$activity->type = $type;
 		$activity->save();

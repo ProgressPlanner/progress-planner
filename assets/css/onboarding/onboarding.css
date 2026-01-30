@@ -1,0 +1,1359 @@
+.prpl-popover-onboarding {
+
+	--prpl-color-text: #4b5563;
+
+	/* Paper */
+	--prpl-onboarding-popover-background: var(--prpl-background-paper, #fff);
+
+	/* Steps navigation */
+	--prpl-background-steps: var(--prpl-background, #f6f7f9);
+	--prpl-background-info: var(--prpl-background-content, #f6f5fb);
+	--prpl-background-step-active: var(--prpl-graph-color-4, #534786);
+	--prpl-color-number-step-active: var(--prpl-background-paper, #fff);
+	--prpl-color-ui-icon: #6b7280; /* already exists in variables-color.css */
+	--prpl-color-text-step-active: var(--prpl-color-headings, #38296d);
+	--prpl-color-border: #d1d5db; /* already exists in variables-color.css */
+
+	/* Button secondary */
+	--prpl-color-button-secondary: var(--prpl-background-point, #f9b23c );
+	--prpl-color-button-secondary-hover: var(--prpl-color-monthly, #faa310);
+	--prpl-color-button-secondary-text: #374151;
+	--prpl-color-button-secondary-icon: var(--prpl-color-button-secondary-text);
+
+	/* Button disabled */
+	--prpl-color-button-inactive: var(--prpl-color-gauge-remain, #e1e3e7 );
+	--prpl-color-button-inactive-text: var(--prpl-color-text, #4b5563);
+
+	--prpl-background-step-label: var(--prpl-background-step-active);
+	--prpl-color-step-label: var(--prpl-background-paper, #fff);
+
+	/* Required text */
+	--prpl-color-text-error: var(--prpl-color-button-primary, #dd324f);
+	--prpl-color-alert-error: #e73136; /* already exists in variables-color.css */
+
+	/* General error */
+	--prpl-background-alert-error: #fdeded;/* already exists in variables-color.css */
+	--prpl-color-alert-error-text: #7f1d1d; /* already exists in variables-color.css */
+
+	/* Custom contros (inputs, radio, checkbox) */
+	--prpl-color-selection-controls-inactive: #9ca3af;
+	--prpl-color-selection-controls: var(--prpl-graph-color-4, #534786);
+
+	--prpl-color-field-border: var(--prpl-color-border);
+	--prpl-color-field-border-active: var(--prpl-color-alert-info, #2563eb);
+	--prpl-background-field-active: var(--prpl-background-alert-info, #eff6ff);
+
+
+	font-family: system-ui, Arial, sans-serif;
+	font-size: 16px;
+
+	padding: 0;
+	box-sizing: border-box;
+
+	border-radius: 8px;
+	font-weight: 400;
+	max-height: 82vh;
+	width: 1200px;
+	max-width: 80vw;
+	color: var(--prpl-color-text);
+	background-color: var(--prpl-onboarding-popover-background);
+	border: 1px solid var(--prpl-color-border);
+	box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.07),-2px 0 6px rgba(0, 0, 0, 0.07);
+
+	/* Popover backdrop. */
+	&::backdrop {
+		background: rgba(0, 0, 0, 0.5);
+	}
+
+	/* Popover close button. */
+	.prpl-popover-close {
+		position: absolute;
+		top: 5px;
+		right: 5px;
+		padding: 8px;
+		cursor: pointer;
+		background: none;
+		border: none;
+		color: var(--prpl-color-text);
+		z-index: 10;
+	}
+
+	/* General styles. */
+	& * {
+		box-sizing: border-box;
+	}
+
+	p {
+		font-size: 16px;
+		margin-top: 0;
+		margin-bottom: 8px;
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	h2 {
+		font-family: system-ui, Arial, sans-serif;
+		margin-top: 0;
+		margin-bottom: 12px;
+		font-size: 20px;
+	}
+
+	h3 {
+		font-family: system-ui, Arial, sans-serif;
+		margin-top: 0;
+		margin-bottom: 8px;
+		font-size: 16px;
+		font-weight: 600;
+		color: var(--prpl-color-text);
+
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
+
+	/* Copied from WP Core CSS. */
+	select {
+		font-size: 14px;
+		line-height: 2;
+		color: #2c3338;
+		border-color: var(--prpl-color-field-border);
+		box-shadow: none;
+		border-radius: 3px;
+		padding: 0 24px 0 8px;
+		min-height: 30px;
+
+		/* max-width: 400px; */
+		width: 100%;
+		-webkit-appearance: none;
+		background: #fff url(data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23555%22%2F%3E%3C%2Fsvg%3E) no-repeat right 5px top 55%;
+		background-size: 16px 16px;
+		cursor: pointer;
+		vertical-align: middle;
+	}
+
+	input[type="text"],
+	input[type="email"] {
+		width: 100%;
+		padding: 8px;
+		border: 1px solid var(--prpl-color-field-border);
+		border-radius: 4px;
+		font-size: 14px;
+		line-height: 1.4;
+		color: var(--prpl-color-text);
+	}
+
+	/* Used for radio and checkbox inputs. */
+	.prpl-custom-inputs-wrapper{
+		padding-left: 3px;
+
+		/* To prevent custom radio and checkbox from being cut off. */
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+
+		.prpl-checkbox-wrapper,
+		.prpl-radio-wrapper {
+			display: flex;
+			flex-direction: column;
+			justify-content: flex-start;
+		}
+
+		/* Hide the default input, because WP has it's own styles (which include pseudo-elements). */
+		.prpl-custom-checkbox input[type="checkbox"],
+		.prpl-custom-radio input[type="radio"] {
+			position: absolute;
+			opacity: 0;
+			width: 0;
+			height: 0;
+		}
+
+		/* Shared styles for the custom radios and checkboxes. */
+		.prpl-custom-control {
+			display: inline-block;
+			vertical-align: middle;
+			margin-right: 12px;
+			width: 20px;
+			height: 20px;
+			box-sizing: border-box;
+			position: relative;
+			transition: border-color 0.2s, background 0.2s;
+			flex-shrink: 0;
+		}
+
+		/* Label text styling */
+		.prpl-custom-checkbox,
+		.prpl-custom-radio {
+			display: flex;
+			align-items: center;
+			margin-bottom: 8px;
+			cursor: pointer;
+			user-select: none;
+		}
+
+		/* Checkbox styles */
+		.prpl-custom-checkbox {
+
+			.prpl-custom-control {
+				border: 1px solid var(--prpl-color-selection-controls-inactive);
+
+				/* border-radius: 6px; */
+				background-color: var(--prpl-onboarding-popover-background);
+			}
+
+			input[type="checkbox"] {
+
+				/* Checkbox checked (on) */
+				&:checked+.prpl-custom-control {
+					background: var(--prpl-color-selection-controls);
+					border-color: var(--prpl-color-selection-controls);
+				}
+			}
+
+			/* Checkmark */
+			.prpl-custom-control::after {
+				content: "";
+				position: absolute;
+				left: 6px;
+				top: 2px;
+				width: 4px;
+				height: 9px;
+				border: solid var(--prpl-onboarding-popover-background);
+				border-width: 0 2px 2px 0;
+				opacity: 0;
+				transform: scale(0.8) rotate(45deg);
+				transition: opacity 0.2s, transform 0.2s;
+			}
+
+			input[type="checkbox"]:checked+.prpl-custom-control::after {
+				opacity: 1;
+				transform: scale(1) rotate(45deg);
+			}
+		}
+
+		/* Radio styles */
+		.prpl-custom-radio {
+
+			.prpl-custom-control {
+				border: 1px solid var(--prpl-color-selection-controls-inactive);
+				border-radius: 50%;
+				background-color: var(--prpl-onboarding-popover-background);
+			}
+
+			/* Radio hover (off) */
+			input[type="radio"] {
+
+				/* Radio checked (on) */
+				&:checked+.prpl-custom-control {
+					background: var(--prpl-color-selection-controls);
+					border-color: var(--prpl-color-selection-controls);
+				}
+			}
+
+			/* Radio dot */
+			.prpl-custom-control::after {
+				content: "";
+				position: absolute;
+				top: 5px;
+				left: 5px;
+				width: 8px;
+				height: 8px;
+				background-color: var(--prpl-onboarding-popover-background);
+				border-radius: 50%;
+				opacity: 0;
+				transition: opacity 0.2s;
+			}
+
+			input[type="radio"]:checked+.prpl-custom-control::after {
+				opacity: 1;
+				background-color: var(--prpl-onboarding-popover-background);
+			}
+		}
+	}
+
+	/* Main layout container */
+	.prpl-onboarding-layout {
+		display: flex;
+
+		/* gap: 24px; */
+		min-height: 350px;
+	}
+
+	/* Left column: Step navigation */
+	.prpl-onboarding-navigation {
+		width: 340px;
+		background: var(--prpl-background-steps);
+		border-right: none;
+		padding: 32px 24px 24px 24px;
+		flex-shrink: 0;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		gap: 24px;
+	}
+
+	.prpl-onboarding-logo {
+		height: 60px;
+		max-height: 100%;
+
+		img, svg {
+			height: 100%;
+			width: auto;
+			max-width: 100%;
+		}
+	}
+
+	.prpl-step-list {
+		list-style: none;
+		margin: 0;
+		padding: 0;
+	}
+
+	.prpl-nav-step-item {
+		margin-top: 10px;
+		display: flex;
+		align-items: flex-start;
+		gap: 14px;
+		padding: 0;
+		margin-bottom: 4px;
+		cursor: default;
+
+		&:first-child {
+			margin-top: 0;
+		}
+	}
+
+	.prpl-step-icon {
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		border: 1px solid var(--prpl-color-border);
+		color: var(--prpl-color-text);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		flex-shrink: 0;
+		margin-top: 2px;
+		font-size: 14px;
+	}
+
+	.prpl-nav-step-item.prpl-active .prpl-step-icon {
+		background: var(--prpl-background-step-active);
+		border-color: var(--prpl-background-step-active);
+		color: var(--prpl-color-number-step-active);
+	}
+
+	.prpl-nav-step-item.prpl-completed .prpl-step-icon {
+		background: var(--prpl-color-ui-icon);
+		border-color: var(--prpl-color-ui-icon);
+		color: var(--prpl-background-paper);
+	}
+
+	.prpl-step-label {
+		font-size: 15px;
+		color: var(--prpl-color-ui-icon);
+		line-height: 1.5;
+	}
+
+	.prpl-nav-step-item.prpl-active .prpl-step-label {
+		color: var(--prpl-color-text-step-active);
+		font-weight: 700;
+	}
+
+	.prpl-nav-step-item.prpl-completed .prpl-step-label {
+		color: var(--prpl-color-text-step-active);
+	}
+
+	#prpl-onboarding-mobile-step-label {
+		display: none;
+		margin-bottom: 4px;
+		font-size: 14px;
+		color: var(--prpl-background-step-active);
+		font-weight: 600;
+	}
+
+	/* Right section: Content area */
+	.prpl-onboarding-content {
+		padding: 32px 24px;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+
+		/* gap: 24px; */
+	}
+
+	.tour-content-wrapper {
+		flex: 1;
+
+		/* overflow-y: auto; */
+	}
+
+	.tour-header {
+
+		.tour-title {
+			color: var(--prpl-background-step-active);
+			font-weight: 600;
+		}
+	}
+
+	.tour-footer {
+		margin-top: 16px;
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 10px;
+		width: 100%;
+
+		.prpl-tour-next-wrapper {
+			margin-left: auto;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+	}
+
+	.tour-content {
+		font-size: 16px;
+		line-height: 1.5;
+
+		img {
+			max-width: 100%;
+			height: auto;
+		}
+
+	}
+
+	.prpl-columns-wrapper-flex {
+		display: flex;
+		gap: 24px;
+
+		/* overflow: hidden; */
+
+		/* padding-bottom: 10px; */
+
+		.prpl-background-content {
+			padding: 20px;
+			border-radius: 12px;
+			background-color: var(--prpl-background-info);
+		}
+
+		.prpl-column {
+			flex-grow: 1;
+			flex-basis: 50%;
+			flex-direction: column;
+		}
+
+		&.prpl-columns-2-1 {
+
+			.prpl-column:first-child {
+				flex: 2 1 0;
+				min-width: 0;
+			}
+
+			.prpl-column:last-child {
+				flex: 1 1 0;
+				min-width: 0;
+			}
+		}
+
+		&.prpl-columns-1-2 {
+
+			.prpl-column:first-child {
+				flex: 1 1 0;
+				min-width: 0;
+			}
+
+			.prpl-column:last-child {
+				flex: 2 1 0;
+				min-width: 0;
+			}
+		}
+	}
+
+	.prpl-btn {
+		display: inline-block;
+		margin: 0;
+		padding: 12px 20px;
+
+		text-decoration: none;
+		cursor: pointer;
+		font-size: 16px;
+
+		/* color: var(--prpl-color-button-primary-text); */
+
+		/* background: var(--prpl-color-button-primary); */
+		background-color: var(--prpl-color-button-secondary);
+		color: var(--prpl-color-button-secondary-text);
+		line-height: 1.25;
+		box-shadow: none;
+		border: none;
+		border-radius: 6px;
+		transition: all 0.25s  ease-in-out;
+		font-weight: 600;
+		text-align: center;
+		box-sizing: border-box;
+		position: relative;
+		z-index: 1;
+
+		flex-shrink: 0;
+
+		/* &:not([disabled]):hover,
+				&:not([disabled]):focus {
+					background: var(--prpl-color-button-primary-hover);
+				} */
+
+		&.prpl-btn-secondary {
+			background-color: var(--prpl-color-button-secondary);
+			color: var(--prpl-color-button-secondary-text);
+
+			&:not([disabled]):not(.prpl-btn-disabled):hover,
+			&:not([disabled]):not(.prpl-btn-disabled):focus {
+				background-color: var(--prpl-color-button-secondary-hover);
+				color: var(--prpl-color-button-secondary-text);
+			}
+		}
+
+		&.prpl-btn-disabled,
+		&:disabled {
+
+			&,
+			&:hover{
+				color: var(--prpl-color-button-inactive-text);
+				color: rgb(from var(--prpl-color-button-inactive-text) r g b / 0.88);
+				background-color: var(--prpl-color-button-inactive);
+				cursor: not-allowed;
+			}
+		}
+	}
+
+	.prpl-complete-task-btn:not(.prpl-btn) {
+		border: none;
+		background: none;
+		cursor: pointer;
+		padding: 0;
+		margin: 0;
+		font-size: 16px;
+		color: var(--prpl-color-link);
+	}
+
+/*
+	.prpl-complete-task-btn-completed:not(.prpl-btn) {
+		color: #059669;
+		pointer-events: none;
+		opacity: 0.5;
+	} */
+
+	.prpl-complete-task-btn-error {
+		color: #9f0712;
+	}
+
+	/* Generic error message (reusable for all steps) */
+	.prpl-error-message {
+		animation: prpl-slide-down 0.3s ease-out;
+	}
+
+	@keyframes prpl-slide-down {
+
+		from {
+			opacity: 0;
+			transform: translateY(-10px);
+		}
+
+		to {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+
+	.prpl-error-box {
+		display: flex;
+		align-items: flex-start;
+		gap: 15px;
+		background: var(--prpl-background-alert-error);
+		padding: 20px;
+		border-radius: 6px;
+
+		.prpl-error-icon {
+			color: var(--prpl-color-alert-error);
+			width: 20px;
+			height: 20px;
+			flex-shrink: 0;
+
+			img, svg {
+				width: 100%;
+				height: 100%;
+			}
+		}
+
+		h3 {
+			margin: 0 0 8px 0;
+			font-size: 16px;
+			font-weight: 700;
+			color: var(--prpl-color-alert-error-text);
+		}
+
+		p {
+			margin: 0;
+			font-size: 16px;
+			line-height: 1.4;
+			color: var(--prpl-color-alert-error-text);
+		}
+	}
+
+	/* Popover: Quit confirmation */
+	&:has(.prpl-quit-confirmation) {
+
+		#prpl-tour-close-btn,
+		.prpl-onboarding-navigation {
+			display: none;
+		}
+	}
+
+	.prpl-column:has(.prpl-quit-confirmation) {
+		justify-content: flex-start !important;
+	}
+
+	.prpl-quit-confirmation {
+		display: flex;
+		flex-direction: column;
+		gap: 30px;
+	}
+
+	.prpl-quit-message {
+		display: flex;
+		align-items: flex-start;
+		gap: 15px;
+		background: var(--prpl-background-alert-error);
+		padding: 20px;
+		border-radius: 6px;
+		border-left: 4px solid var(--prpl-color-alert-error);
+
+		h3 {
+			font-size: 18px;
+			font-weight: 700;
+		}
+
+		p {
+			font-size: 15px;
+			line-height: 1.6;
+		}
+	}
+
+	.prpl-quit-actions {
+		display: flex;
+		gap: 40px;
+		justify-content: space-between;
+		align-items: center;
+	}
+
+	.prpl-quit-link {
+		font-size: 15px;
+		color: var(--prpl-color-link);
+		text-decoration: underline;
+		cursor: pointer;
+
+		&.prpl-quit-link-primary {
+			font-weight: 600;
+			font-size: 16px;
+		}
+	}
+
+	#prpl-quit-confirmation-graphic {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		img,
+		svg {
+			height: 250px;
+
+			/* Set height since it is what we do in the PP dashboard. */
+			max-width: 100%;
+		}
+	}
+
+	/* Form for onboarding tasks. */
+	.prpl-onboarding-task-form {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		border: none;
+		padding: 0;
+		margin: 0;
+		background: none;
+
+		.prpl-complete-task-btn {
+			flex-shrink: 0;
+			margin-top: 16px;
+		}
+	}
+
+	/* Welcome Step */
+	&[data-prpl-step="0"] {
+
+		.prpl-column:not(.prpl-column-content) {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+		}
+
+		#prpl-welcome-graphic {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+
+			img, svg {
+				height: 250px; /* Set height since it is what we do in the PP dashboard. */
+				max-width: 100%;
+			}
+		}
+
+		.prpl-welcome-note{
+			font-size: 14px;
+			font-style: italic;
+		}
+	}
+
+	/* Privacy checkbox */
+	.prpl-privacy-checkbox-wrapper {
+		margin-top: 20px;
+
+		label {
+			gap: 10px;
+			cursor: pointer;
+			font-size: 15px;
+			color: var(--prpl-color-text);
+		}
+
+		input[type="checkbox"] {
+			width: 18px;
+			height: 18px;
+			cursor: pointer;
+		}
+
+		a {
+			color: var(--prpl-color-link);
+			text-decoration: underline;
+		}
+
+		.prpl-required-indicator {
+			font-size: 14px;
+			font-style: italic;
+
+			&::before {
+				content: '(';
+			}
+
+			&::after {
+				content: ')';
+			}
+
+			&.prpl-required-indicator-active {
+				color: var(--prpl-color-text-error);
+				font-size: 16px;
+				font-style: normal;
+
+				&::before {
+					display: inline-flex;
+					align-items: center;
+					justify-content: center;
+					content: '!';
+					width: 16px;
+					height: 16px;
+					border-radius: 50%;
+					background-color: var(--prpl-color-alert-error);
+					color: #fff;
+					font-size: 12px;
+					margin-right: 5px;
+				}
+
+				&::after {
+					content: '!';
+				}
+			}
+		}
+	}
+
+	/* What's Next Step */
+	.prpl-suggested-task-points {
+		font-size: var(--prpl-font-size-xs, 12px);
+		font-weight: 700;
+		color: var(--prpl-text-point);
+		background-color: var(--prpl-background-point);
+		width: 24px;
+		height: 24px;
+		border-radius: 50%;
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+	/* First Task Step */
+	.prpl-onboarding-task {
+		display: flex;
+		flex-direction: column;
+		align-items: flex-start;
+		gap: 10px;
+
+		/* .prpl-onboarding-task-title {
+			margin: 0 0 16px 0;
+			font-size: 18px;
+			font-weight: 600;
+		} */
+
+		.prpl-onboarding-task-form {
+			margin-top: 16px;
+			width: 100%;
+			flex-direction: column;
+
+			.prpl-complete-task-btn {
+				align-self: flex-end;
+
+				&.prpl-complete-task-btn-completed {
+					opacity: 0.5;
+					pointer-events: none;
+				}
+			}
+		}
+	}
+
+	/* Badges Step */
+	.prpl-gauge-wrapper {
+		max-width: 100%;
+		text-align: center;
+	}
+
+	/* Email Frequency Step */
+
+	/* .prpl-email-frequency-options {
+
+		.
+		display: flex;
+		gap: 10px;
+		flex-direction: column;
+	} */
+
+	#prpl-email-form {
+		margin-top: 16px;
+
+		.prpl-form-field {
+			margin-top: 16px;
+
+			&:first-child {
+				margin-top: 0;
+			}
+
+			label {
+				display: inline-block;
+				margin-bottom: 8px;
+			}
+		}
+	}
+
+	/* Settings Step */
+	.tour-content-wrapper:has(.prpl-setting-item) {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+
+		.tour-content,
+		.prpl-setting-item,
+		.prpl-setting-content {
+			display: flex;
+			flex-direction: column;
+			flex-grow: 1;
+			gap: 24px;
+		}
+
+		.prpl-setting-title {
+			margin: 0 0 16px 0;
+		}
+
+		.prpl-settings-progress {
+			font-size: 14px;
+			color: var(--prpl-color-step-label);
+			padding: 4px 8px;
+			border-radius: 20px;
+			background-color: var(--prpl-background-step-active);
+		}
+
+		.prpl-setting-footer {
+			display: flex;
+			justify-content: flex-end;
+			align-items: flex-start;
+			gap: 10px;
+			margin-top: 16px;
+
+			.prpl-save-setting-btn {
+				flex-shrink: 0;
+			}
+		}
+
+		.prpl-select-page {
+
+			&.prpl-disabled {
+				opacity: 0.5;
+				pointer-events: none;
+			}
+		}
+
+		.prpl-setting-note {
+			display: none;
+			gap: 10px;
+			border-radius: 12px;
+			padding: 16px;
+			color: var(--prpl-color-field-border-active);
+			font-size: 14px;
+			background-color: var(--prpl-background-field-active);
+
+			.prpl-setting-note-icon {
+				flex-shrink: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				color: var(--prpl-color-field-border-active);
+			}
+		}
+
+		/* Post types sub-step */
+		#prpl-post-types-include-wrapper {
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+		}
+
+		/* Toggle checkbox for post types. */
+		.prpl-post-type-toggle-wrapper {
+			display: flex;
+			align-items: center;
+		}
+
+		.prpl-post-type-toggle-label {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+			cursor: pointer;
+			position: relative;
+		}
+
+		.prpl-post-type-toggle-input {
+			position: absolute;
+			opacity: 0;
+			width: 0;
+			height: 0;
+			margin: 0;
+			padding: 0;
+		}
+
+		.prpl-post-type-toggle-switch {
+			position: relative;
+			width: 44px;
+			height: 24px;
+			border-radius: 12px;
+			background-color: var(--prpl-color-selection-controls-inactive);
+			transition: background-color 0.2s;
+			flex-shrink: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+
+			&::after {
+				content: '';
+				position: absolute;
+				top: 2px;
+				left: 2px;
+				width: 20px;
+				height: 20px;
+				border-radius: 50%;
+				background-color: var(--prpl-onboarding-popover-background);
+				transition: transform 0.2s;
+				z-index: 1;
+			}
+
+			svg {
+				position: absolute;
+				width: 12px;
+				height: 12px;
+				top: 50%;
+				left: 6px;
+				transform: translateY(-50%);
+				z-index: 2;
+				transition: opacity 0.2s, left 0.2s, color 0.2s;
+				color: var(--prpl-color-ui-icon);
+			}
+
+			.prpl-toggle-icon-check {
+				display: none;
+			}
+
+			.prpl-toggle-icon-x {
+				display: block;
+			}
+		}
+
+		.prpl-post-type-toggle-label:hover .prpl-post-type-toggle-switch svg {
+			opacity: 0.6;
+		}
+
+		.prpl-post-type-toggle-input:checked ~ .prpl-post-type-toggle-switch {
+			background-color: var(--prpl-background-step-active);
+
+			&::after {
+				transform: translateX(20px);
+			}
+
+			svg {
+				left: 26px;
+				color: var(--prpl-background-step-active);
+				transform: translateY(-50%);
+			}
+
+			.prpl-toggle-icon-check {
+				display: block;
+			}
+
+			.prpl-toggle-icon-x {
+				display: none;
+			}
+		}
+
+		.prpl-post-type-toggle-text {
+			font-size: 16px;
+			line-height: 1.5;
+			transition: opacity 0.2s;
+		}
+
+		.prpl-post-type-toggle-input:not(:checked) ~ .prpl-post-type-toggle-text {
+			opacity: 0.78;
+		}
+
+		.prpl-post-type-toggle-input:checked ~ .prpl-post-type-toggle-text {
+			opacity: 1;
+		}
+	}
+
+	/* More Tasks Step */
+
+	#prpl-success-graphic {
+		display: flex;
+		justify-content: center;
+		align-items: center;
+
+		img, svg {
+			height: 250px;
+			max-width: 100%;
+		}
+	}
+
+	/* Intro substep */
+	.prpl-more-tasks-substep[data-substep="more-tasks-intro"] {
+		display: flex;
+		flex-direction: column;
+		gap: 24px;
+	}
+
+	.prpl-more-tasks-intro-buttons {
+		margin-top: 16px;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 24px;
+		flex-wrap: wrap;
+	}
+
+	.prpl-finish-onboarding {
+		background: none;
+		border: none;
+		color: var(--prpl-color-link, #534786);
+		text-decoration: underline;
+		font-size: 16px;
+		cursor: pointer;
+		padding: 12px 0;
+	}
+
+	.prpl-finish-onboarding:hover,
+	.prpl-finish-onboarding:focus {
+		color: var(--prpl-color-link-hover, #38296d);
+	}
+
+	/* Tasks substep */
+	.prpl-more-tasks-substep[data-substep="more-tasks-tasks"] .prpl-task-list {
+		margin: 0;
+	}
+
+	.prpl-column:has(.prpl-task-list) {
+		display: flex;
+		align-items: center;
+	}
+
+	.prpl-task-list {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		width: 100%;
+		border: 1px solid #ccc;
+
+		li {
+			padding: 7px 5px;
+			margin: 0;
+
+			&:nth-child(odd) {
+				background-color: var(--prpl-background-steps);
+			}
+
+			.task-title {
+				color: var(--prpl-color-text);
+				font-weight: 500;
+			}
+		}
+	}
+
+	.prpl-complete-task-item {
+		display: flex;
+		gap: 30px;
+		justify-content: space-between;
+	}
+
+	.prpl-task-arrow {
+		padding-right: 8px;
+	}
+
+	.prpl-task-item-button-wrapper {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-shrink: 0;
+	}
+
+	.prpl-task-completed-icon {
+		display: none;
+		width: 20px;
+		height: 20px;
+		border-radius: 50%;
+		align-items: center;
+		justify-content: center;
+		color: #fff;
+		background-color: #059669;
+	}
+
+	.prpl-task-completed {
+
+		/* Show the completed icon. */
+		.prpl-task-completed-icon {
+			display: inline-flex;
+		}
+
+		/* Hide the trigger button and +1. */
+		.prpl-task-item-button-wrapper {
+			display: none;
+		}
+	}
+
+	.tour-content-wrapper:has(.prpl-task-content-active) {
+		display: flex;
+		flex-direction: column;
+		flex-grow: 1;
+
+		/* Task content active, TOOD: change markup so this is simpler. */
+		.prpl-task-content-active {
+			display: flex;
+			flex-direction: column;
+			flex-grow: 1;
+			gap: 24px;
+			width: 100%;
+
+			.prpl-onboarding-task {
+				display: flex;
+				flex-direction: column;
+				flex-grow: 1;
+
+				.prpl-onboarding-task-form,
+				.tour-content {
+					display: flex;
+					flex-direction: column;
+					flex-grow: 1;
+				}
+
+				.prpl-onboarding-task-form {
+					justify-content: space-between;
+					gap: 48px;
+				}
+			}
+		}
+
+		/* Task buttons. */
+		.prpl-task-buttons {
+			display: flex;
+			justify-content: flex-end;
+			gap: 16px;
+			width: 100%;
+
+			.prpl-btn {
+				margin-top: 0;
+				margin-bottom: 0;
+
+				&.prpl-task-close-btn {
+					background-color: var(--prpl-background-banner);
+					color: var(--prpl-color-text);
+				}
+			}
+		}
+	}
+
+	/* File drop zone. */
+	.prpl-file-drop-zone {
+		width: 100%;
+		border-radius: 12px;
+		padding: 40px;
+		text-align: center;
+		color: var(--prpl-color-text);
+		transition: background 0.2s, border-color 0.2s;
+		cursor: pointer;
+		border: 2px dashed var(--prpl-color-field-border);
+
+		svg {
+
+			path {
+				stroke: var(--prpl-color-ui-icon);
+			}
+		}
+	}
+
+	.prpl-file-drop-zone.dragover {
+		background-color: var(--prpl-background-field-active);
+		border-color: var(--prpl-color-field-border-active);
+	}
+
+	/* When an image has been uploaded. */
+	.prpl-file-drop-zone.has-image {
+		border-color: var(--prpl-color-field-border-active);
+		background-color: var(--prpl-background-field-active);
+
+		& > .prpl-icon-image,
+		& > p,
+		& > .prpl-file-upload-hints {
+			display: none;
+		}
+
+		.prpl-file-preview img {
+			border: 2px solid var(--prpl-color-field-border);
+			border-radius: 8px;
+			padding: 8px;
+			background: var(--prpl-color-background-white);
+		}
+	}
+
+	.prpl-file-browse-link {
+		color: var(--prpl-color-link);
+		text-decoration: underline;
+		cursor: pointer;
+	}
+
+	.prpl-file-remove-btn {
+		border: none;
+		background: none;
+		cursor: pointer;
+		padding: 0;
+		margin: 12px 0 0;
+		font-size: 16px;
+		color: var(--prpl-color-link);
+		text-decoration: underline;
+	}
+
+	.prpl-file-upload-hints {
+		display: flex;
+		flex-direction: column;
+		font-size: 14px;
+		color: var(--prpl-color-ui-icon);
+	}
+
+	/* WIP */
+	#prpl-upload-status {
+		margin-top: 10px;
+		font-family: monospace;
+	}
+
+	.prpl-file-preview {
+		display: none; /* Hidden by default. */
+		margin-top: 10px;
+		margin-left: auto;
+		margin-right: auto;
+		max-width: 200px;
+		height: auto;
+	}
+}
+
+@media (max-width: 1023px) {
+
+	.prpl-popover-onboarding {
+		--prpl-mobile-nav-height: 60px;
+		max-width: 90vw;
+		inset: 0 0 var(--prpl-mobile-nav-height) 0; /* TODO: Adjust this for smallest screen sizes. */
+		margin: auto auto var(--prpl-mobile-nav-height) auto; /* Center in available space above nav */
+
+		/* Hide graphics */
+		.prpl-hide-on-mobile {
+			display: none !important;
+		}
+
+		/* Quit confirmation */
+		.prpl-quit-actions {
+			flex-direction: column;
+			gap: 16px;
+		}
+
+		/* Naviation section */
+		.prpl-onboarding-navigation {
+			position: fixed;
+			left: 0;
+			bottom: 0;
+			width: 100%;
+			height: var(--prpl-mobile-nav-height);
+			z-index: 1000;
+
+			flex-direction: row;
+			gap: 16px;
+			justify-content: center;
+			align-items: center;
+			padding: 8px;
+
+			.prpl-step-list {
+				display: flex;
+				gap: 8px;
+
+				.prpl-nav-step-item {
+					margin: 0;
+				}
+
+				.prpl-step-label {
+					display: none;
+				}
+			}
+
+			#prpl-onboarding-mobile-step-label {
+				display: block;
+			}
+		}
+
+		/* Content section */
+		.prpl-columns-wrapper-flex {
+			flex-direction: column;
+		}
+
+		.prpl-setting-footer, /* On the settings steps */
+		.tour-footer {
+			flex-direction: column; /* So the info / error message is on top of the button. */
+		}
+
+		/* Badges step */
+		.prpl-gauge-wrapper {
+			max-width: 400px;
+			margin-left: auto;
+			margin-right: auto;
+		}
+	}
+}
