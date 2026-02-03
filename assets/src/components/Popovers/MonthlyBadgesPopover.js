@@ -217,11 +217,11 @@ export default function MonthlyBadgesPopover( { task, onClose } ) {
 
 							{ /* Content & Maintenance Badges */ }
 							<div className="prpl-popover-column">
-								{ /* Writing (Content) Badges */ }
+								{ /* Content Badges */ }
 								<div className="prpl-widget-wrapper prpl-widget-wrapper-content in-popover prpl-badge-streak">
 									<h3 className="prpl-widget-title">
 										{ __(
-											'Writing badges',
+											'Content badges',
 											'progress-planner'
 										) }
 									</h3>

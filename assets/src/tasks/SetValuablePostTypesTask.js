@@ -31,10 +31,17 @@ class SetValuablePostTypesTask extends InteractiveTaskProvider {
 	 */
 	// eslint-disable-next-line no-unused-vars
 	async shouldAddTask( taskData = {} ) {
-		// The PHP version checks if public post types have changed.
-		// This is complex logic that monitors post type changes.
-		// For React, we'll return true to show the task.
-		// This can be refined with proper REST API endpoint or data collector.
+		// TODO: Implement proper condition logic. The PHP version (develop branch) does the following:
+		// 1. Query activities for category 'suggested_task' with data_id matching this provider.
+		//    If any activity exists, the task has already been completed — return false.
+		// 2. Check if user upgraded from <= v1.2 via get_option('progress_planner_set_valuable_post_types').
+		// 3. Check if the 'include_post_types' setting is empty.
+		// 4. Return true only if the user upgraded from v1.2 OR include_post_types is empty.
+		//
+		// This needs a REST API endpoint or data collector to expose:
+		// - Whether an activity exists for this provider.
+		// - The 'progress_planner_set_valuable_post_types' option value.
+		// - The 'include_post_types' setting value.
 		return true;
 	}
 

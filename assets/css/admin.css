@@ -191,8 +191,20 @@ button.prpl-info-icon {
 /*------------------------------------*\
 	Header & logo.
 \*------------------------------------*/
-.prpl-header-logo img {
-	height: 100px;
+.prpl-header {
+	margin-bottom: 2rem;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	align-items: center;
+
+	.prpl-header-logo img {
+		max-width: 300px;
+		max-height: 100px;
+		width: auto;
+		height: auto;
+		vertical-align: bottom;
+	}
 }
 
 .prpl-header-logo svg {

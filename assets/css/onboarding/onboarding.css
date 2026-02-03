@@ -58,7 +58,7 @@
 	--prpl-color-alert-error: #e73136; /* already exists in variables-color.css */
 
 	/* General error */
-	--prpl-background-alert-error: #fef2f2;/* already exists in variables-color.css */
+	--prpl-background-alert-error: #fdeded;/* already exists in variables-color.css */
 	--prpl-color-alert-error-text: #7f1d1d; /* already exists in variables-color.css */
 
 	/* Custom contros (inputs, radio, checkbox) */
@@ -71,6 +71,7 @@
 
 
 	font-family: system-ui, Arial, sans-serif;
+	font-size: 16px;
 
 	padding: 0;
 	box-sizing: border-box;
@@ -82,7 +83,8 @@
 	max-width: 80vw;
 	color: var(--prpl-color-text);
 	background-color: var(--prpl-onboarding-popover-background);
-	border: 1px solid var(--prpl-color-ui-icon);
+	border: 1px solid var(--prpl-color-border);
+	box-shadow: 4px 4px 10px rgba(0, 0, 0, 0.07),-2px 0 6px rgba(0, 0, 0, 0.07);
 
 	/* Popover backdrop. */
 	&::backdrop {
@@ -94,7 +96,7 @@
 		position: absolute;
 		top: 5px;
 		right: 5px;
-		padding: 0.5em;
+		padding: 8px;
 		cursor: pointer;
 		background: none;
 		border: none;
@@ -108,9 +110,9 @@
 	}
 
 	p {
-		font-size: 1rem;
+		font-size: 16px;
 		margin-top: 0;
-		margin-bottom: 0.5rem;
+		margin-bottom: 8px;
 
 		&:last-child {
 			margin-bottom: 0;
@@ -120,15 +122,15 @@
 	h2 {
 		font-family: system-ui, Arial, sans-serif;
 		margin-top: 0;
-		margin-bottom: 0.75rem;
-		font-size: 1.25rem;
+		margin-bottom: 12px;
+		font-size: 20px;
 	}
 
 	h3 {
 		font-family: system-ui, Arial, sans-serif;
 		margin-top: 0;
-		margin-bottom: 1rem;
-		font-size: 1rem;
+		margin-bottom: 8px;
+		font-size: 16px;
 		font-weight: 600;
 		color: var(--prpl-color-text);
 
@@ -148,7 +150,7 @@
 		padding: 0 24px 0 8px;
 		min-height: 30px;
 
-		/* max-width: 25rem; */
+		/* max-width: 400px; */
 		width: 100%;
 		-webkit-appearance: none;
 		background: #fff url(data:image/svg+xml;charset=US-ASCII,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%3Cpath%20d%3D%22M5%206l5%205%205-5%202%201-7%207-7-7%202-1z%22%20fill%3D%22%23555%22%2F%3E%3C%2Fsvg%3E) no-repeat right 5px top 55%;
@@ -160,9 +162,9 @@
 	input[type="text"],
 	input[type="email"] {
 		width: 100%;
-		padding: 0.5rem;
+		padding: 8px;
 		border: 1px solid var(--prpl-color-field-border);
-		border-radius: 0.25rem;
+		border-radius: 4px;
 		font-size: 14px;
 		line-height: 1.4;
 		color: var(--prpl-color-text);
@@ -175,7 +177,7 @@
 		/* To prevent custom radio and checkbox from being cut off. */
 		display: flex;
 		flex-direction: column;
-		gap: 0.5rem;
+		gap: 8px;
 
 		.prpl-checkbox-wrapper,
 		.prpl-radio-wrapper {
@@ -211,7 +213,7 @@
 		.prpl-custom-radio {
 			display: flex;
 			align-items: center;
-			margin-bottom: 0.5rem;
+			margin-bottom: 8px;
 			cursor: pointer;
 			user-select: none;
 		}
@@ -300,7 +302,7 @@
 	.prpl-onboarding-layout {
 		display: flex;
 
-		/* gap: 1.5rem; */
+		/* gap: 24px; */
 		min-height: 350px;
 	}
 
@@ -309,12 +311,12 @@
 		width: 340px;
 		background: var(--prpl-background-steps);
 		border-right: none;
-		padding: 2rem 1.5rem;
+		padding: 32px 24px 24px 24px;
 		flex-shrink: 0;
 		display: flex;
 		flex-direction: column;
 		justify-content: space-between;
-		gap: 1.5rem;
+		gap: 24px;
 	}
 
 	.prpl-onboarding-logo {
@@ -391,7 +393,7 @@
 
 	#prpl-onboarding-mobile-step-label {
 		display: none;
-		margin-bottom: 0.25rem;
+		margin-bottom: 4px;
 		font-size: 14px;
 		color: var(--prpl-background-step-active);
 		font-weight: 600;
@@ -399,12 +401,12 @@
 
 	/* Right section: Content area */
 	.prpl-onboarding-content {
-		padding: 2rem 1.5rem;
+		padding: 32px 24px;
 		flex: 1;
 		display: flex;
 		flex-direction: column;
 
-		/* gap: 1.5rem; */
+		/* gap: 24px; */
 	}
 
 	.tour-content-wrapper {
@@ -422,7 +424,7 @@
 	}
 
 	.tour-footer {
-		margin-top: 1rem;
+		margin-top: 16px;
 		display: flex;
 		justify-content: space-between;
 		align-items: flex-start;
@@ -450,7 +452,7 @@
 
 	.prpl-columns-wrapper-flex {
 		display: flex;
-		gap: 1.5rem;
+		gap: 24px;
 
 		/* overflow: hidden; */
 
@@ -498,7 +500,7 @@
 	.prpl-btn {
 		display: inline-block;
 		margin: 0;
-		padding: 0.75rem 1.25rem;
+		padding: 12px 20px;
 
 		text-decoration: none;
 		cursor: pointer;
@@ -597,7 +599,6 @@
 		background: var(--prpl-background-alert-error);
 		padding: 20px;
 		border-radius: 6px;
-		border-left: 4px solid var(--prpl-color-alert-error);
 
 		.prpl-error-icon {
 			color: var(--prpl-color-alert-error);
@@ -620,8 +621,8 @@
 
 		p {
 			margin: 0;
-			font-size: 15px;
-			line-height: 1.6;
+			font-size: 16px;
+			line-height: 1.4;
 			color: var(--prpl-color-alert-error-text);
 		}
 	}
@@ -705,7 +706,7 @@
 	.prpl-onboarding-task-form {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 8px;
 		border: none;
 		padding: 0;
 		margin: 0;
@@ -713,7 +714,7 @@
 
 		.prpl-complete-task-btn {
 			flex-shrink: 0;
-			margin-top: 1rem;
+			margin-top: 16px;
 		}
 	}
 
@@ -735,6 +736,11 @@
 				height: 250px; /* Set height since it is what we do in the PP dashboard. */
 				max-width: 100%;
 			}
+		}
+
+		.prpl-welcome-note{
+			font-size: 14px;
+			font-style: italic;
 		}
 	}
 
@@ -761,7 +767,7 @@
 		}
 
 		.prpl-required-indicator {
-			font-size: 0.875rem;
+			font-size: 14px;
 			font-style: italic;
 
 			&::before {
@@ -774,7 +780,7 @@
 
 			&.prpl-required-indicator-active {
 				color: var(--prpl-color-text-error);
-				font-size: 1rem;
+				font-size: 16px;
 				font-style: normal;
 
 				&::before {
@@ -804,8 +810,8 @@
 		font-weight: 700;
 		color: var(--prpl-text-point);
 		background-color: var(--prpl-background-point);
-		width: 1.5rem;
-		height: 1.5rem;
+		width: 24px;
+		height: 24px;
 		border-radius: 50%;
 		display: inline-flex;
 		align-items: center;
@@ -820,13 +826,13 @@
 		gap: 10px;
 
 		/* .prpl-onboarding-task-title {
-			margin: 0 0 1rem 0;
+			margin: 0 0 16px 0;
 			font-size: 18px;
 			font-weight: 600;
 		} */
 
 		.prpl-onboarding-task-form {
-			margin-top: 1rem;
+			margin-top: 16px;
 			width: 100%;
 			flex-direction: column;
 
@@ -858,10 +864,10 @@
 	} */
 
 	#prpl-email-form {
-		margin-top: 1rem;
+		margin-top: 16px;
 
 		.prpl-form-field {
-			margin-top: 1rem;
+			margin-top: 16px;
 
 			&:first-child {
 				margin-top: 0;
@@ -869,7 +875,7 @@
 
 			label {
 				display: inline-block;
-				margin-bottom: 0.5rem;
+				margin-bottom: 8px;
 			}
 		}
 	}
@@ -886,7 +892,7 @@
 			display: flex;
 			flex-direction: column;
 			flex-grow: 1;
-			gap: 1.5rem;
+			gap: 24px;
 		}
 
 		.prpl-setting-title {
@@ -909,7 +915,7 @@
 			justify-content: flex-end;
 			align-items: flex-start;
 			gap: 10px;
-			margin-top: 1rem;
+			margin-top: 16px;
 
 			.prpl-save-setting-btn {
 				flex-shrink: 0;
@@ -928,7 +934,7 @@
 			display: flex;
 			gap: 10px;
 			border-radius: 12px;
-			padding: 1rem;
+			padding: 16px;
 			color: var(--prpl-color-field-border-active);
 			font-size: 14px;
 			background-color: var(--prpl-background-field-active);
@@ -953,7 +959,7 @@
 		#prpl-post-types-include-wrapper {
 			display: flex;
 			flex-direction: column;
-			gap: 0.75rem;
+			gap: 12px;
 		}
 
 		/* Toggle checkbox for post types. */
@@ -965,7 +971,7 @@
 		.prpl-post-type-toggle-label {
 			display: flex;
 			align-items: center;
-			gap: 0.75rem;
+			gap: 12px;
 			cursor: pointer;
 			position: relative;
 		}
@@ -1083,15 +1089,15 @@
 	.prpl-more-tasks-substep[data-substep="more-tasks-intro"] {
 		display: flex;
 		flex-direction: column;
-		gap: 1.5rem;
+		gap: 24px;
 	}
 
 	.prpl-more-tasks-intro-buttons {
-		margin-top: 1rem;
+		margin-top: 16px;
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		gap: 1.5rem;
+		gap: 24px;
 		flex-wrap: wrap;
 	}
 
@@ -1102,7 +1108,7 @@
 		text-decoration: underline;
 		font-size: 16px;
 		cursor: pointer;
-		padding: 0.75rem 0;
+		padding: 12px 0;
 	}
 
 	.prpl-finish-onboarding:hover,
@@ -1149,13 +1155,13 @@
 	}
 
 	.prpl-task-arrow {
-		padding-right: 0.5rem;
+		padding-right: 8px;
 	}
 
 	.prpl-task-item-button-wrapper {
 		display: flex;
 		align-items: center;
-		gap: 0.5rem;
+		gap: 8px;
 		flex-shrink: 0;
 	}
 
@@ -1193,7 +1199,7 @@
 			display: flex;
 			flex-direction: column;
 			flex-grow: 1;
-			gap: 1.5rem;
+			gap: 24px;
 			width: 100%;
 
 			.prpl-onboarding-task {
@@ -1210,7 +1216,7 @@
 
 				.prpl-onboarding-task-form {
 					justify-content: space-between;
-					gap: 3rem;
+					gap: 48px;
 				}
 			}
 		}
@@ -1219,7 +1225,7 @@
 		.prpl-task-buttons {
 			display: flex;
 			justify-content: flex-end;
-			gap: 1rem;
+			gap: 16px;
 			width: 100%;
 
 			.prpl-btn {
@@ -1333,7 +1339,7 @@
 		/* Quit confirmation */
 		.prpl-quit-actions {
 			flex-direction: column;
-			gap: 1rem;
+			gap: 16px;
 		}
 
 		/* Naviation section */
@@ -1346,14 +1352,14 @@
 			z-index: 1000;
 
 			flex-direction: row;
-			gap: 1rem;
+			gap: 16px;
 			justify-content: center;
 			align-items: center;
-			padding: 0.5rem;
+			padding: 8px;
 
 			.prpl-step-list {
 				display: flex;
-				gap: 0.5rem;
+				gap: 8px;
 
 				.prpl-nav-step-item {
 					margin: 0;

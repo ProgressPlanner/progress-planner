@@ -275,7 +275,11 @@ class Enqueue {
 			'nextBtnText'                  => \esc_html__( 'Next &rarr;', 'progress-planner' ),
 			'prevBtnText'                  => \esc_html__( '&larr; Previous', 'progress-planner' ),
 			'pageType'                     => \esc_html__( 'Page type', 'progress-planner' ),
-			'progressPlannerSidebar'       => \esc_html__( 'Progress Planner Sidebar', 'progress-planner' ),
+			'progressPlannerSidebar'       => \sprintf(
+				/* translators: %s: The plugin name. */
+				\esc_html__( '%s Sidebar', 'progress-planner' ),
+				\progress_planner()->get_ui__branding()->get_admin_menu_name()
+			),
 			'progressText'                 => \sprintf(
 				/* translators: %1$s: The current step number. %2$s: The total number of steps. */
 				\esc_html__( 'Step %1$s of %2$s', 'progress-planner' ),

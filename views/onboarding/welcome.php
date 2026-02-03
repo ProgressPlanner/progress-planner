@@ -28,7 +28,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 						\printf( \esc_html__( '%s helps you set clear, focused goals for your website. Let\'s go through a few simple steps to get everything set up.', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) );
 						?>
 					</p>
-					<p>
+					<p class="prpl-welcome-note">
 						<?php \esc_html_e( 'This will only take a few minutes.', 'progress-planner' ); ?>
 					</p>
 				</div>
