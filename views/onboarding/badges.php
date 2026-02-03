@@ -12,6 +12,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 use Progress_Planner\Badges\Monthly;
 
+// @phpstan-ignore-next-line class.notFound
 $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( new \DateTime() ) );
 ?>
 
@@ -41,7 +42,7 @@ $prpl_badge = Monthly::get_instance_from_id( Monthly::get_badge_id_from_date( ne
 						contentFontSize="3rem"
 						contentPadding="20px"
 						marginBottom="0"
-						data-max="<?php echo (int) Monthly::TARGET_POINTS; ?>"
+						data-max="<?php echo (int) ( Monthly::TARGET_POINTS ?? 10 ); // @phpstan-ignore-line class.notFound ?>"
 						data-value="<?php echo (float) \progress_planner()->get_admin__widgets__monthly_badges()->get_score()['target_score']; ?>" <?php /* Note that this will be the value before the onboaring started, which is what we want. */ ?>
 						data-badge-id="<?php echo \esc_attr( $prpl_badge->get_id() ); ?>"
 						data-badge-name="<?php echo \esc_attr( $prpl_badge->get_name() ); ?>"

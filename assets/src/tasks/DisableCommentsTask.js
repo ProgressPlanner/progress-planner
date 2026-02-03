@@ -1,0 +1,92 @@
+/**
+ * Disable Comments Task Provider.
+ *
+ * React implementation of the Disable Comments task.
+ * Migrated from classes/suggested-tasks/providers/class-disable-comments.php
+ */
+
+import { __ } from '@wordpress/i18n';
+import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { registerTask } from '../services/taskRegistry';
+import { cachedApiFetch } from '../services/apiFetchCache';
+
+/**
+ * Disable Comments Task Provider class.
+ */
+class DisableCommentsTask extends InteractiveTaskProvider {
+	static providerId = 'disable-comments';
+	static capability = 'manage_options';
+	static isOnboardingTask = true;
+	static priority = 9;
+	static points = 1;
+	static isDismissable = false;
+	static isSnoozable = true;
+	static externalLinkUrl = 'https://prpl.fyi/disable-comments';
+	static popoverId = 'disable-comments';
+
+	/**
+	 * Check if the task should be added.
+	 *
+	 * @param {Object} taskData Optional task-specific data.
+	 * @return {Promise<boolean>} Promise resolving to true if task should be added.
+	 */
+	// eslint-disable-next-line no-unused-vars
+	async shouldAddTask( taskData = {} ) {
+		try {
+			// The PHP version checks:
+			// - !is_plugin_activated('comment-free-zone')
+			// - wp_count_comments()->approved < 10
+			// - get_default_comment_status() === 'open'
+			// For React, we'll check comment status via REST API.
+			// Plugin check and comment count would need data collector or REST endpoint.
+			const settings = await cachedApiFetch( {
+				path: '/wp/v2/settings',
+			} );
+
+			// Check if default comment status is 'open'.
+			const defaultCommentStatus =
+				settings?.default_comment_status || 'open';
+			return defaultCommentStatus === 'open';
+		} catch ( error ) {
+			console.error(
+				'Error checking Disable Comments task condition:',
+				error
+			);
+			return false;
+		}
+	}
+
+	/**
+	 * Get task details.
+	 *
+	 * @param {Object} taskData Optional task-specific data.
+	 * @return {Promise<Object>} Promise resolving to task details object.
+	 */
+	// eslint-disable-next-line no-unused-vars
+	async getTaskDetails( taskData = {} ) {
+		const taskDetails = this.buildTaskDetails( taskData, {
+			post_title: __( 'Disable comments', 'progress-planner' ),
+			url: this.buildAdminUrl( 'options-discussion.php' ),
+			link_setting: {
+				hook: 'options-discussion.php',
+				iconEl: 'label[for="default_comment_status"]',
+			},
+		} );
+
+		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Disable comments', 'progress-planner' );
+	}
+}
+
+// Self-register this task provider
+registerTask( DisableCommentsTask );
+
+export default DisableCommentsTask;

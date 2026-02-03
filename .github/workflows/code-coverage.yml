@@ -55,6 +55,15 @@ jobs:
           composer-options: "--prefer-dist --with-dependencies"
           custom-cache-suffix: $(date -u -d "-0 month -$(($(date +%d)-1)) days" "+%F")-codecov-v2
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install npm dependencies
+        run: npm ci
+
       - name: Install WordPress Test Suite
         shell: bash
         run: tests/bin/install-wp-tests.sh wordpress_tests root root 127.0.0.1:3306 latest
@@ -122,6 +131,39 @@ jobs:
           name: phpunit-output
           path: phpunit-output.log
           retention-days: 7
+
+      - name: Run Jest tests with coverage
+        id: jest_coverage_current
+        run: |
+          set +e
+          npm run test:unit:coverage -- --coverage --coverageReporters=clover --coverageReporters=text > jest-coverage.log 2>&1
+          JEST_EXIT=$?
+          set -e
+
+          echo "=== Jest test output ==="
+          cat jest-coverage.log
+
+          if [ -f coverage/clover.xml ]; then
+            # Extract coverage from Jest Clover XML
+            STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@statements)' coverage/clover.xml 2>/dev/null || echo "0")
+            COVERED=$(xmllint --xpath 'string(//project/metrics/@coveredstatements)' coverage/clover.xml 2>/dev/null || echo "0")
+
+            if [ "$STATEMENTS" != "0" ] && [ -n "$STATEMENTS" ] && [ -n "$COVERED" ]; then
+              JEST_COVERAGE=$(echo "scale=2; ($COVERED * 100) / $STATEMENTS" | bc)
+            else
+              JEST_COVERAGE="0"
+            fi
+
+            echo "jest_coverage=$JEST_COVERAGE" >> $GITHUB_OUTPUT
+            echo "Jest coverage: $JEST_COVERAGE%"
+
+            # Save for base branch comparison
+            cp coverage/clover.xml jest-coverage.xml
+          else
+            echo "jest_coverage=0" >> $GITHUB_OUTPUT
+            echo "No Jest coverage generated"
+          fi
+        continue-on-error: true
 
       - name: Generate coverage report summary
         id: coverage
@@ -235,6 +277,33 @@ jobs:
 
           echo "=== Base coverage details saved ==="
           head -20 base-coverage-details.txt || true
+        continue-on-error: true
+
+      - name: Generate Jest coverage for base branch
+        if: github.event_name == 'pull_request'
+        id: base_jest_coverage
+        run: |
+          # Install npm dependencies on base branch
+          npm ci || true
+
+          # Run Jest coverage
+          npm run test:unit:coverage -- --coverage --coverageReporters=clover > base-jest-coverage.log 2>&1 || true
+
+          if [ -f coverage/clover.xml ]; then
+            STATEMENTS=$(xmllint --xpath 'string(//project/metrics/@statements)' coverage/clover.xml 2>/dev/null || echo "0")
+            COVERED=$(xmllint --xpath 'string(//project/metrics/@coveredstatements)' coverage/clover.xml 2>/dev/null || echo "0")
+
+            if [ "$STATEMENTS" != "0" ] && [ -n "$STATEMENTS" ] && [ -n "$COVERED" ]; then
+              BASE_JEST_COVERAGE=$(echo "scale=2; ($COVERED * 100) / $STATEMENTS" | bc)
+            else
+              BASE_JEST_COVERAGE="0"
+            fi
+            echo "base_jest_coverage=$BASE_JEST_COVERAGE" >> $GITHUB_OUTPUT
+            echo "Base Jest coverage: $BASE_JEST_COVERAGE%"
+          else
+            echo "base_jest_coverage=0" >> $GITHUB_OUTPUT
+            echo "No base Jest coverage generated"
+          fi
         continue-on-error: true
 
       - name: Generate coverage diff report
@@ -364,19 +433,27 @@ jobs:
           fi
 
       - name: Comment PR with coverage
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && always()
         uses: actions/github-script@v7
         env:
           COVERAGE_CHANGES: ${{ steps.coverage_diff.outputs.coverage_changes }}
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
+            // PHP Coverage
             const current = parseFloat('${{ steps.coverage.outputs.current_coverage }}') || 0;
             const base = parseFloat('${{ steps.base_coverage.outputs.base_coverage }}') || 0;
             const diff = (current - base).toFixed(2);
             const diffEmoji = diff >= 0 ? '📈' : '📉';
             const coverageEmoji = current >= 80 ? '🎉' : current >= 60 ? '📈' : current >= 40 ? '📊' : '📉';
             const status = diff >= -0.5 ? '✅' : '⚠️';
+
+            // Jest Coverage
+            const jestCurrent = parseFloat('${{ steps.jest_coverage_current.outputs.jest_coverage }}') || 0;
+            const jestBase = parseFloat('${{ steps.base_jest_coverage.outputs.base_jest_coverage }}') || 0;
+            const jestDiff = (jestCurrent - jestBase).toFixed(2);
+            const jestDiffEmoji = jestDiff >= 0 ? '📈' : '📉';
+            const jestCoverageEmoji = jestCurrent >= 80 ? '🎉' : jestCurrent >= 60 ? '📈' : jestCurrent >= 40 ? '📊' : '📉';
 
             // Parse coverage changes JSON from environment variable
             let changesJson = {};
@@ -441,24 +518,39 @@ jobs:
 
             const comment = `## ${status} Code Coverage Report
 
+            ### PHP Coverage (PHPUnit)
+
             | Metric | Value |
             |--------|-------|
-            | **Total Coverage** | **${current.toFixed(2)}%** ${coverageEmoji} |
-            | Base Coverage | ${base.toFixed(2)}% |
-            | Difference | ${diffEmoji} **${diff}%** |
+            | **Current** | **${current.toFixed(2)}%** ${coverageEmoji} |
+            | Base | ${base.toFixed(2)}% |
+            | Change | ${diffEmoji} **${diff}%** |
 
-            ${current >= 40 ? '✅ Coverage meets minimum threshold (40%)' : '⚠️ Coverage below recommended 40% threshold'}
+            ${current >= 40 ? '✅ PHP coverage meets threshold (40%)' : '⚠️ PHP coverage below 40%'}
 
-            ${diff < -0.5 ? '⚠️ **Warning:** Coverage dropped by more than 0.5%. Please add tests.' : ''}
-            ${diff >= 0 ? '🎉 Great job maintaining/improving code coverage!' : ''}
+            ### JavaScript Coverage (Jest)
+
+            | Metric | Value |
+            |--------|-------|
+            | **Current** | **${jestCurrent.toFixed(2)}%** ${jestCoverageEmoji} |
+            | Base | ${jestBase.toFixed(2)}% |
+            | Change | ${jestDiffEmoji} **${jestDiff}%** |
+
+            ${jestCurrent >= 40 ? '✅ Jest coverage meets threshold (40%)' : '⚠️ Jest coverage below 40%'}
+
+            ---
+
+            ${diff < -0.5 ? '⚠️ **Warning:** PHP coverage dropped by more than 0.5%. Please add tests.' : ''}
+            ${diff >= 0 ? '🎉 Great job maintaining/improving PHP coverage!' : ''}
 
             ${detailedChanges}
 
             <details>
             <summary>ℹ️ About this report</summary>
 
-            - All tests run in a single job with Xdebug coverage
-            - Security tests excluded from coverage to prevent output issues
+            - PHP tests run with Xdebug coverage
+            - Jest tests run with built-in coverage
+            - Security tests excluded from PHP coverage
             - Coverage calculated from line coverage percentages
 
             </details>
@@ -506,4 +598,12 @@ jobs:
         with:
           name: coverage-report
           path: coverage-html/
+          retention-days: 30
+
+      - name: Upload Jest coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: jest-coverage-report
+          path: coverage/
           retention-days: 30

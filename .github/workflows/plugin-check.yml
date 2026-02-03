@@ -22,8 +22,8 @@ jobs:
         - name: Build plugin
           run: |
             wp dist-archive . ./${{ github.event.repository.name }}.zip
-            mkdir build
-            unzip ${{ github.event.repository.name }}.zip -d build
+            mkdir -p plugin-check-build
+            unzip ${{ github.event.repository.name }}.zip -d plugin-check-build
 
         - name: Run plugin check
           uses: wordpress/plugin-check-action@v1.1.5

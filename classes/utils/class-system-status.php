@@ -8,7 +8,8 @@
 namespace Progress_Planner\Utils;
 
 use Progress_Planner\Base;
-use Progress_Planner\Admin\Widgets\Activity_Scores;
+use Progress_Planner\Goals\Goal_Recurring;
+use Progress_Planner\Goals\Goal;
 
 /**
  * System_Status class.
@@ -44,27 +45,64 @@ class System_Status {
 		);
 
 		// Get the website activity score.
-		$activity_score           = new Activity_Scores();
 		$data['website_activity'] = [
-			'score'     => $activity_score->get_score(),
-			'checklist' => $activity_score->get_checklist_results(),
+			'score'     => $this->get_activity_score(),
+			'checklist' => $this->get_checklist_results(),
 		];
 
-		// Get the badges.
-		$badges = \array_merge(
-			\progress_planner()->get_badges()->get_badges( 'content' ),
-			\progress_planner()->get_badges()->get_badges( 'maintenance' ),
-			\progress_planner()->get_badges()->get_badges( 'monthly_flat' )
-		);
+		// Get the badges from saved stats.
+		// Badge calculations are now handled in React, so we return saved progress.
+		$settings     = \progress_planner()->get_settings();
+		$saved_badges = $settings->get( 'badges', [] );
+
+		// Badge name mapping (for external API compatibility).
+		$badge_names = [
+			'content-curator'       => \__( 'Content Curator', 'progress-planner' ),
+			'revision-ranger'       => \__( 'Revision Ranger', 'progress-planner' ),
+			'purposeful-publisher'  => \__( 'Purposeful Publisher', 'progress-planner' ),
+			'progress-padawan'      => \__( 'Progress Padawan', 'progress-planner' ),
+			'maintenance-maniac'    => \__( 'Maintenance Maniac', 'progress-planner' ),
+			'super-site-specialist' => \__( 'Super Site Specialist', 'progress-planner' ),
+		];
 
 		$data['badges'] = [];
-		foreach ( $badges as $badge ) {
-			$data['badges'][ $badge->get_id() ] = \array_merge(
+		foreach ( $saved_badges as $badge_id => $badge_data ) {
+			// Ensure badge_id is a string for array key access.
+			$badge_id = (string) $badge_id;
+			// Get badge name (for monthly badges, generate from ID).
+			$badge_name = $badge_names[ $badge_id ] ?? '';
+			if ( empty( $badge_name ) && \str_starts_with( $badge_id, 'monthly-' ) ) {
+				// Generate monthly badge name from ID.
+				$parts = \explode( '-', \str_replace( 'monthly-', '', $badge_id ) );
+				if ( \count( $parts ) === 2 ) {
+					$year   = (int) $parts[0];
+					$month  = (int) \str_replace( 'm', '', $parts[1] );
+					$months = [
+						1  => 'Jack January',
+						2  => 'Felix February',
+						3  => 'Mary March',
+						4  => 'Avery April',
+						5  => 'Matteo May',
+						6  => 'Jasmine June',
+						7  => 'Joey July',
+						8  => 'Abed August',
+						9  => 'Sam September',
+						10 => 'Oksana October',
+						11 => 'Noah November',
+						12 => 'Daisy December',
+					];
+					if ( isset( $months[ $month ] ) ) {
+						$badge_name = $months[ $month ];
+					}
+				}
+			}
+
+			$data['badges'][ $badge_id ] = \array_merge(
 				[
-					'id'   => $badge->get_id(),
-					'name' => $badge->get_name(),
+					'id'   => $badge_id,
+					'name' => $badge_name,
 				],
-				$badge->progress_callback()
+				$badge_data
 			);
 		}
 
@@ -136,5 +174,86 @@ class System_Status {
 		$data['branding_id'] = (int) \progress_planner()->get_ui__branding()->get_branding_id();
 
 		return $data;
+	}
+
+	/**
+	 * Get the activity score.
+	 *
+	 * @return int The score.
+	 */
+	private function get_activity_score() {
+		$activities = \progress_planner()->get_activities__query()->query_activities(
+			// Use 31 days to take into account the activities score decay from previous activities.
+			[ 'start_date' => new \DateTime( '-31 days' ) ]
+		);
+
+		$score        = 0;
+		$current_date = new \DateTime();
+		foreach ( $activities as $activity ) {
+			$score += $activity->get_points( $current_date );
+		}
+		$score = \min( 100, \max( 0, $score ) );
+
+		// Get the number of pending updates.
+		$pending_updates = \wp_get_update_data()['counts']['total'];
+
+		// Reduce points for pending updates.
+		$score -= \min( \min( $score / 2, 25 ), $pending_updates * 5 );
+		return (int) \floor( $score );
+	}
+
+	/**
+	 * Get the checklist results.
+	 *
+	 * @return array<string, bool> The checklist results.
+	 */
+	private function get_checklist_results() {
+		$items   = $this->get_checklist();
+		$results = [];
+		foreach ( $items as $item ) {
+			$label             = (string) $item['label']; // @phpstan-ignore offsetAccess.invalidOffset
+			$results[ $label ] = $item['callback'](); // @phpstan-ignore offsetAccess.invalidOffset
+		}
+		return $results;
+	}
+
+	/**
+	 * Get the checklist items.
+	 *
+	 * @return array The checklist items.
+	 */
+	private function get_checklist() {
+		return [
+			[
+				'label'    => \esc_html__( 'published content', 'progress-planner' ),
+				'callback' => fn() => \count(
+					\progress_planner()->get_activities__query()->query_activities(
+						[
+							'start_date' => new \DateTime( '-7 days' ),
+							'category'   => 'content',
+							'type'       => 'publish',
+						]
+					)
+				) > 0,
+			],
+			[
+				'label'    => \esc_html__( 'updated content', 'progress-planner' ),
+				'callback' => fn() => \count(
+					\progress_planner()->get_activities__query()->query_activities(
+						[
+							'start_date' => new \DateTime( '-7 days' ),
+							'category'   => 'content',
+							'type'       => 'update',
+						]
+					)
+				) > 0,
+			],
+			[
+				'label'    => 0 === \wp_get_update_data()['counts']['total']
+					? \esc_html__( 'performed all updates', 'progress-planner' )
+					: '<a href="' . \esc_url( \admin_url( 'update-core.php' ) ) . '">' . \esc_html__( 'Perform all updates', 'progress-planner' ) . '</a>',
+				'callback' => fn() => ! \wp_get_update_data()['counts']['total'],
+			],
+		];
 	}
 }

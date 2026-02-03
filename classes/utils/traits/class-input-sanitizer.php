@@ -21,6 +21,8 @@ namespace Progress_Planner\Utils\Traits;
  *
  * Can be used in providers, widgets, admin classes, or any class
  * that needs to safely handle user input.
+ *
+ * @phpstan-ignore-next-line trait.unused
  */
 trait Input_Sanitizer {
 

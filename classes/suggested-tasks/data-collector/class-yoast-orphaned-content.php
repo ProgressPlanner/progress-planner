@@ -8,8 +8,6 @@
 namespace Progress_Planner\Suggested_Tasks\Data_Collector;
 
 use Progress_Planner\Suggested_Tasks\Data_Collector\Base_Data_Collector;
-use Progress_Planner\Suggested_Tasks\Data_Collector\Hello_World;
-use Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page;
 
 /**
  * Post author data collector class.

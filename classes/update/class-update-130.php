@@ -68,6 +68,35 @@ class Update_130 extends Update {
 	}
 
 	/**
+	 * Provider IDs that have been migrated to React and should not be restored.
+	 *
+	 * @var array
+	 */
+	private const REACT_MIGRATED_PROVIDERS = [
+		'wp-debug-display',
+		'php-version',
+		'search-engine-visibility',
+		'update-core',
+		'create-post',
+		'rename-uncategorized-category',
+		'core-permalink-structure',
+		'core-blogdescription',
+		'core-siteicon',
+		'disable-comments',
+		'fewer-tags',
+		'hello-world',
+		'sample-page',
+		'sending-email',
+		'set-page-about',
+		'set-page-contact',
+		'set-page-faq',
+		'set-valuable-post-types',
+		'core-timezone',
+		'core-locale',
+		'core-date-format',
+	];
+
+	/**
 	 * Restore the completed tasks.
 	 *
 	 * @return void
@@ -108,6 +137,11 @@ class Update_130 extends Update {
 
 			// Don't import back tasks that don't have a provider_id.
 			if ( empty( $data['provider_id'] ) ) {
+				continue;
+			}
+
+			// Don't import back tasks whose providers have been migrated to React.
+			if ( \in_array( $data['provider_id'], self::REACT_MIGRATED_PROVIDERS, true ) ) {
 				continue;
 			}
 
@@ -182,9 +216,6 @@ class Update_130 extends Update {
 	 * @return Task The task object.
 	 */
 	private function handle_legacy_review_post_tasks( $task_object ) {
-		// Review provider.
-		$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( 'review-post' );
-
 		// Get the post ID and date from the task ID.
 		$parts = \explode( '-', $task_object->get_task_id() );
 
@@ -192,7 +223,7 @@ class Update_130 extends Update {
 			'task_id'     => $task_object->get_task_id(),
 			'post_id'     => $parts[2],
 			'date'        => $parts[3],
-			'provider_id' => $task_provider ? $task_provider->get_provider_id() : 'review-post',
+			'provider_id' => 'review-post',
 		];
 
 		$task_object->set_data( $data );

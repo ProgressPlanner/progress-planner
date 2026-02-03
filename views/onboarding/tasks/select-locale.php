@@ -32,7 +32,7 @@ if ( ! \in_array( $prpl_locale, $prpl_languages, true ) ) {
 
 <div class="prpl-onboarding-task">
 	<h3 class="prpl-onboarding-task-title">
-		<?php echo esc_html( $task['title'] ); ?>
+		<?php echo \esc_html( $task['title'] ); ?>
 	</h3>
 	<p>
 		<?php \esc_html_e( 'Your locale determines the language and formatting your visitors see, such as date structures and currency. Setting this helps your audience feel right at home. Choose your preferred language and region.', 'progress-planner' ); ?>
@@ -53,7 +53,7 @@ if ( ! \in_array( $prpl_locale, $prpl_languages, true ) ) {
 				]
 			);
 			?>
-		<button type="button" data-task-id="<?php echo esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-secondary">
+		<button type="button" data-task-id="<?php echo \esc_attr( $task['task_id'] ); ?>" class="prpl-complete-task-btn prpl-btn prpl-btn-secondary">
 			<?php \esc_html_e( 'Set the locale', 'progress-planner' ); ?>
 			<?php if ( ! empty( $show_chevron ) ) : ?>
 				<span class="dashicons dashicons-arrow-right-alt2"></span>

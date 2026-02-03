@@ -119,51 +119,26 @@ class Onboard_Wizard_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test maybe_register_popover_hooks skips when privacy accepted and no progress.
+	 * Test maybe_register_popover_hooks registers AJAX handlers when privacy not accepted.
 	 *
 	 * @return void
 	 */
-	public function test_maybe_register_popover_hooks_skips_when_complete() {
+	public function test_maybe_register_popover_hooks_registers_ajax_handlers() {
 		// Set admin user.
 		\wp_set_current_user( $this->admin_user_id );
 
-		// Set privacy accepted (license key exists).
-		\update_option( 'progress_planner_license_key', 'test-license-key' );
-
-		// Ensure no onboarding progress.
-		\delete_option( 'prpl_onboard_progress' );
+		// Ensure privacy is not accepted.
+		\delete_option( 'progress_planner_license_key' );
 
 		$wizard = new Onboard_Wizard();
 		$wizard->maybe_register_popover_hooks();
 
-		// Footer hooks should NOT be registered when onboarding is complete.
-		$this->assertFalse(
-			\has_action( 'wp_footer', [ $wizard, 'add_popover' ] )
-		);
-	}
-
-	/**
-	 * Test maybe_register_popover_hooks registers hooks when onboarding in progress.
-	 *
-	 * @return void
-	 */
-	public function test_maybe_register_popover_hooks_with_progress() {
-		// Set admin user.
-		\wp_set_current_user( $this->admin_user_id );
-
-		// Set privacy accepted but onboarding in progress.
-		\update_option( 'progress_planner_license_key', 'test-license-key' );
-		\update_option( 'prpl_onboard_progress', \wp_json_encode( [ 'currentStep' => 2 ] ) );
-
-		$wizard = new Onboard_Wizard();
-		$wizard->maybe_register_popover_hooks();
-
-		// Footer hooks SHOULD be registered when onboarding is in progress.
+		// AJAX handlers should be registered for admin users.
 		$this->assertNotFalse(
-			\has_action( 'wp_footer', [ $wizard, 'add_popover' ] )
+			\has_action( 'wp_ajax_progress_planner_onboarding_complete_task', [ $wizard, 'ajax_complete_task' ] )
 		);
 		$this->assertNotFalse(
-			\has_action( 'admin_footer', [ $wizard, 'add_popover' ] )
+			\has_action( 'wp_ajax_progress_planner_onboarding_save_progress', [ $wizard, 'ajax_save_onboarding_progress' ] )
 		);
 	}
 
@@ -353,9 +328,9 @@ class Onboard_Wizard_Test extends \WP_UnitTestCase {
 		$wizard = new Onboard_Wizard();
 		$wizard->maybe_register_popover_hooks();
 
-		// Footer hooks should NOT be registered when filter hides onboarding.
-		$this->assertFalse(
-			\has_action( 'wp_footer', [ $wizard, 'add_popover' ] )
+		// AJAX handlers should still be registered (they're needed for React).
+		$this->assertNotFalse(
+			\has_action( 'wp_ajax_progress_planner_onboarding_complete_task', [ $wizard, 'ajax_complete_task' ] )
 		);
 
 		// Remove filter.
@@ -363,123 +338,246 @@ class Onboard_Wizard_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test trigger_onboarding does nothing during AJAX.
+	 * Test verify_ajax_security method exists and is protected.
 	 *
 	 * @return void
 	 */
-	public function test_trigger_onboarding_skips_ajax() {
+	public function test_verify_ajax_security_method_exists() {
+		$wizard     = new Onboard_Wizard();
+		$reflection = new \ReflectionClass( $wizard );
+
+		$this->assertTrue( $reflection->hasMethod( 'verify_ajax_security' ) );
+
+		$method = $reflection->getMethod( 'verify_ajax_security' );
+		$this->assertTrue( $method->isProtected() );
+	}
+
+	/**
+	 * Test get_steps returns array with expected structure.
+	 *
+	 * @return void
+	 */
+	public function test_get_steps_returns_expected_structure() {
 		// Set admin user.
 		\wp_set_current_user( $this->admin_user_id );
 
-		// Simulate AJAX request.
-		\add_filter( 'wp_doing_ajax', '__return_true' );
-
 		$wizard = new Onboard_Wizard();
+		$wizard->maybe_register_popover_hooks();
+		$steps = $wizard->get_steps();
 
-		// Capture output.
-		\ob_start();
-		$wizard->trigger_onboarding();
-		$output = \ob_get_clean();
+		$this->assertIsArray( $steps );
+		$this->assertNotEmpty( $steps );
 
-		// Should not output anything during AJAX.
-		$this->assertEmpty( $output );
-
-		// Remove filter.
-		\remove_filter( 'wp_doing_ajax', '__return_true' );
+		// Check that each step has required keys.
+		foreach ( $steps as $step ) {
+			$this->assertArrayHasKey( 'script_file_name', $step );
+			$this->assertArrayHasKey( 'template_file_name', $step );
+			$this->assertArrayHasKey( 'template_id', $step );
+			$this->assertArrayHasKey( 'title', $step );
+		}
 	}
 
 	/**
-	 * Test trigger_onboarding does nothing for non-admin users.
+	 * Test get_steps returns steps even when steps are empty.
 	 *
 	 * @return void
 	 */
-	public function test_trigger_onboarding_skips_non_admin() {
-		// Set non-admin user.
-		$subscriber_id = $this->factory->user->create( [ 'role' => 'subscriber' ] );
-		\wp_set_current_user( $subscriber_id );
-
-		$wizard = new Onboard_Wizard();
-
-		// Capture output.
-		\ob_start();
-		$wizard->trigger_onboarding();
-		$output = \ob_get_clean();
-
-		// Should not output anything for non-admin.
-		$this->assertEmpty( $output );
-	}
-
-	/**
-	 * Test trigger_onboarding outputs script when no saved progress.
-	 *
-	 * @return void
-	 */
-	public function test_trigger_onboarding_outputs_script() {
-		// Set admin user.
-		\wp_set_current_user( $this->admin_user_id );
-
-		// Ensure no progress saved.
-		\delete_option( 'prpl_onboard_progress' );
-
-		$wizard = new Onboard_Wizard();
-
-		// Capture output.
-		\ob_start();
-		$wizard->trigger_onboarding();
-		$output = \ob_get_clean();
-
-		// Should output script to start onboarding.
-		$this->assertStringContainsString( '<script>', $output );
-		$this->assertStringContainsString( 'prplOnboardWizardReady', $output );
-		$this->assertStringContainsString( 'startOnboarding', $output );
-	}
-
-	/**
-	 * Test trigger_onboarding does not output script when progress exists.
-	 *
-	 * @return void
-	 */
-	public function test_trigger_onboarding_skips_when_progress_exists() {
-		// Set admin user.
-		\wp_set_current_user( $this->admin_user_id );
-
-		// Set progress.
-		\update_option( 'prpl_onboard_progress', \wp_json_encode( [ 'currentStep' => 1 ] ) );
-
-		$wizard = new Onboard_Wizard();
-
-		// Capture output.
-		\ob_start();
-		$wizard->trigger_onboarding();
-		$output = \ob_get_clean();
-
-		// Should not output script when progress exists.
-		$this->assertEmpty( $output );
-	}
-
-	/**
-	 * Test add_popover outputs popover HTML.
-	 *
-	 * @return void
-	 */
-	public function test_add_popover_outputs_html() {
+	public function test_get_steps_defines_steps_if_empty() {
 		// Set admin user.
 		\wp_set_current_user( $this->admin_user_id );
 
 		$wizard = new Onboard_Wizard();
 
-		// Initialize steps (required for add_popover to work).
+		// Get steps directly (should auto-define).
+		$steps = $wizard->get_steps();
+
+		$this->assertIsArray( $steps );
+		$this->assertNotEmpty( $steps );
+	}
+
+	/**
+	 * Test rest_pre_insert_attachment rejects non-image files.
+	 *
+	 * @return void
+	 */
+	public function test_rest_pre_insert_attachment_rejects_non_image() {
+		$wizard = new Onboard_Wizard();
+
+		// Create mock request with non-image file.
+		$request = new \WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'prplFileUpload', true );
+		$request->set_file_params(
+			[
+				'file' => [
+					'name' => 'test.pdf',
+					'type' => 'application/pdf',
+				],
+			]
+		);
+
+		$result = $wizard->rest_pre_insert_attachment( [], $request );
+
+		$this->assertInstanceOf( \WP_Error::class, $result );
+		$this->assertEquals( 'rest_invalid_file_type', $result->get_error_code() );
+	}
+
+	/**
+	 * Test rest_pre_insert_attachment accepts image files.
+	 *
+	 * @return void
+	 */
+	public function test_rest_pre_insert_attachment_accepts_image() {
+		$wizard = new Onboard_Wizard();
+
+		// Create mock request with image file.
+		$request = new \WP_REST_Request( 'POST', '/wp/v2/media' );
+		$request->set_param( 'prplFileUpload', true );
+		$request->set_file_params(
+			[
+				'file' => [
+					'name' => 'test.png',
+					'type' => 'image/png',
+				],
+			]
+		);
+
+		$attachment = [ 'test' => 'data' ];
+		$result     = $wizard->rest_pre_insert_attachment( $attachment, $request );
+
+		$this->assertEquals( $attachment, $result );
+	}
+
+	/**
+	 * Test define_steps_and_order creates badge step.
+	 *
+	 * @return void
+	 */
+	public function test_define_steps_includes_badge_step() {
+		// Set admin user.
+		\wp_set_current_user( $this->admin_user_id );
+
+		$wizard = new Onboard_Wizard();
+		$wizard->maybe_register_popover_hooks();
 		$wizard->define_steps_and_order();
 
-		// Capture output.
-		\ob_start();
-		$wizard->add_popover();
-		$output = \ob_get_clean();
+		$steps          = $wizard->get_steps();
+		$step_templates = \array_column( $steps, 'template_file_name' );
 
-		// Should output popover HTML.
-		$this->assertStringContainsString( 'id="prpl-popover-onboarding"', $output );
-		$this->assertStringContainsString( 'class="prpl-popover-onboarding"', $output );
-		$this->assertStringContainsString( 'prpl-onboarding-layout', $output );
-		$this->assertStringContainsString( 'prpl-tour-close-btn', $output );
+		$this->assertContains( 'badges', $step_templates );
+	}
+
+	/**
+	 * Test define_steps_and_order includes email frequency step.
+	 *
+	 * @return void
+	 */
+	public function test_define_steps_includes_email_frequency_step() {
+		// Set admin user.
+		\wp_set_current_user( $this->admin_user_id );
+
+		$wizard = new Onboard_Wizard();
+		$wizard->maybe_register_popover_hooks();
+		$wizard->define_steps_and_order();
+
+		$steps          = $wizard->get_steps();
+		$step_templates = \array_column( $steps, 'template_file_name' );
+
+		$this->assertContains( 'email-frequency', $step_templates );
+	}
+
+	/**
+	 * Test saved progress is preserved across instances.
+	 *
+	 * @return void
+	 */
+	public function test_saved_progress_persistence() {
+		// Set admin user.
+		\wp_set_current_user( $this->admin_user_id );
+
+		// Save progress.
+		$progress = [
+			'currentStep' => 5,
+			'data'        => [
+				'firstTaskCompleted' => true,
+				'someOtherData'      => 'value',
+			],
+		];
+		\update_option( 'prpl_onboard_progress', \wp_json_encode( $progress ) );
+
+		// Create new wizard instance and get progress.
+		$wizard = new Onboard_Wizard();
+
+		$reflection = new \ReflectionClass( $wizard );
+		$method     = $reflection->getMethod( 'get_saved_progress' );
+		$method->setAccessible( true );
+
+		$result = $method->invoke( $wizard );
+
+		$this->assertIsArray( $result );
+		$this->assertEquals( 5, $result['currentStep'] );
+		$this->assertTrue( $result['data']['firstTaskCompleted'] );
+		$this->assertEquals( 'value', $result['data']['someOtherData'] );
+	}
+
+	/**
+	 * Test onboarding registers all expected AJAX actions.
+	 *
+	 * @return void
+	 */
+	public function test_all_ajax_actions_registered() {
+		// Set admin user.
+		\wp_set_current_user( $this->admin_user_id );
+
+		// Ensure privacy is not accepted.
+		\delete_option( 'progress_planner_license_key' );
+
+		$wizard = new Onboard_Wizard();
+		$wizard->maybe_register_popover_hooks();
+
+		// Check all AJAX actions are registered.
+		$expected_actions = [
+			'progress_planner_onboarding_complete_task' => 'ajax_complete_task',
+			'progress_planner_onboarding_save_progress' => 'ajax_save_onboarding_progress',
+			'prpl_save_all_onboarding_settings'         => 'ajax_save_all_onboarding_settings',
+		];
+
+		foreach ( $expected_actions as $action => $method ) {
+			$this->assertNotFalse(
+				\has_action( 'wp_ajax_' . $action, [ $wizard, $method ] ),
+				"Expected AJAX action {$action} to be registered"
+			);
+		}
+	}
+
+	/**
+	 * Test steps have correct template IDs.
+	 *
+	 * @return void
+	 */
+	public function test_steps_have_correct_template_ids() {
+		// Set admin user.
+		\wp_set_current_user( $this->admin_user_id );
+
+		$wizard = new Onboard_Wizard();
+		$wizard->maybe_register_popover_hooks();
+		$steps = $wizard->get_steps();
+
+		$expected_ids = [
+			'onboarding-step-welcome',
+			'onboarding-step-whats-what',
+			'onboarding-step-badges',
+			'onboarding-step-email-frequency',
+			'onboarding-step-settings',
+		];
+
+		$template_ids = \array_column( $steps, 'template_id' );
+
+		foreach ( $expected_ids as $expected_id ) {
+			$this->assertContains(
+				$expected_id,
+				$template_ids,
+				"Expected template ID {$expected_id} not found"
+			);
+		}
 	}
 }

@@ -182,8 +182,9 @@ class Goal_Recurring {
 		$occurences = $this->get_occurences();
 
 		// Initialize streak counters.
-		$streak_nr  = 0; // Current ongoing streak.
-		$max_streak = 0; // Best streak ever achieved.
+		$streak_nr        = 0; // Current ongoing streak.
+		$max_streak       = 0; // Best streak ever achieved.
+		$remaining_breaks = $this->allowed_break; // Local copy to avoid mutating instance property.
 
 		foreach ( $occurences as $occurence ) {
 			// Check if this occurrence's goal was met.
@@ -197,10 +198,10 @@ class Goal_Recurring {
 			}
 
 			// Goal was not met: Check if we can use an allowed break.
-			if ( $this->allowed_break > 0 ) {
+			if ( $remaining_breaks > 0 ) {
 				// Use one allowed break to keep the streak alive.
 				// This prevents the streak from resetting for this missed goal.
-				--$this->allowed_break;
+				--$remaining_breaks;
 				continue;
 			}
 

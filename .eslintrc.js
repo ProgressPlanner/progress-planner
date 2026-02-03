@@ -5,8 +5,23 @@ module.exports = {
 	],
 	parserOptions: {
 		ecmaVersion: 'latest',
+		ecmaFeatures: {
+			jsx: true,
+		},
 	},
 	rules: {
 		'no-console': 'off',
 	},
+	overrides: [
+		{
+			files: [
+				'**/__tests__/**/*.js',
+				'**/tests/**/*.js',
+				'assets/src/__tests__/*.js',
+			],
+			env: {
+				jest: true,
+			},
+		},
+	],
 };

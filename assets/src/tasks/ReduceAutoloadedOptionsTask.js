@@ -1,0 +1,77 @@
+/**
+ * Reduce Autoloaded Options Task Provider.
+ *
+ * React implementation of the Reduce Autoloaded Options task.
+ * Migrated from classes/suggested-tasks/providers/class-reduce-autoloaded-options.php
+ */
+
+import { __ } from '@wordpress/i18n';
+import { InteractiveTaskProvider } from '../services/InteractiveTaskProvider';
+import { registerTask } from '../services/taskRegistry';
+
+/**
+ * Reduce Autoloaded Options Task Provider class.
+ */
+class ReduceAutoloadedOptionsTask extends InteractiveTaskProvider {
+	static providerId = 'reduce-autoloaded-options';
+	static capability = 'manage_options';
+	static isOnboardingTask = false;
+	static priority = 50;
+	static points = 1;
+	static isDismissable = true;
+	static isSnoozable = true;
+	static popoverId = 'reduce-autoloaded-options';
+
+	/**
+	 * Check if the task should be added.
+	 *
+	 * @param {Object} taskData Optional task-specific data.
+	 * @return {Promise<boolean>} Promise resolving to true if task should be added.
+	 */
+	// eslint-disable-next-line no-unused-vars
+	async shouldAddTask( taskData = {} ) {
+		// The PHP version checks:
+		// - !is_plugin_active('aaa-option-optimizer/aaa-option-optimizer.php')
+		// - get_autoloaded_options_count() > 500
+		// This requires server-side checking (database query and plugin check).
+		// TODO: Create data collector or REST API endpoint.
+		// For now, return false (task won't show) until data collector is implemented.
+		return false;
+	}
+
+	/**
+	 * Get task details.
+	 *
+	 * @param {Object} taskData Optional task-specific data.
+	 * @return {Promise<Object>} Promise resolving to task details object.
+	 */
+	// eslint-disable-next-line no-unused-vars
+	async getTaskDetails( taskData = {} ) {
+		const taskDetails = this.buildTaskDetails( taskData, {
+			post_title: __(
+				'Reduce number of autoloaded options',
+				'progress-planner'
+			),
+			url: this.buildAdminUrl( 'plugin-install.php', {
+				tab: 'search',
+				s: 'aaa option optimizer',
+			} ),
+		} );
+
+		return this.addPopoverIdToTaskDetails( taskDetails );
+	}
+
+	/**
+	 * Get the label for the popover action.
+	 *
+	 * @return {string} The action label.
+	 */
+	getPopoverActionLabel() {
+		return __( 'Reduce', 'progress-planner' );
+	}
+}
+
+// Self-register this task provider
+registerTask( ReduceAutoloadedOptionsTask );
+
+export default ReduceAutoloadedOptionsTask;

@@ -23,7 +23,7 @@ class Plugin_Upgrade_Tasks {
 		\add_action( 'progress_planner_plugin_updated', [ $this, 'plugin_updated' ], 10 );
 
 		// Check if the plugin was upgraded or new plugin was activated.
-		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 100 ); // We need to run this after the Local_Tasks_Manager::init() is called.
+		\add_action( 'init', [ $this, 'handle_activation_or_upgrade' ], 100 );
 
 		// Add the action to add the upgrade tasks popover.
 		\add_action( 'progress_planner_admin_page_after_widgets', [ $this, 'add_upgrade_tasks_popover' ] );
@@ -139,31 +139,12 @@ class Plugin_Upgrade_Tasks {
 	/**
 	 * Get the newly added task providers.
 	 *
-	 * @return array
+	 * @deprecated Task providers are now handled by React. This method returns empty array.
+	 *
+	 * @return array Always returns empty array.
 	 */
 	public function get_newly_added_task_providers() {
-		static $newly_added_task_providers;
-
-		if ( ! $this->should_show_upgrade_popover() ) {
-			return [];
-		}
-
-		if ( null === $newly_added_task_providers ) {
-			$task_provider_ids = $this->get_upgrade_popover_task_provider_ids();
-
-			$task_providers = [];
-
-			foreach ( $task_provider_ids as $task_provider_id ) {
-				$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
-				if ( $task_provider ) { // @phpstan-ignore-line
-					$task_providers[] = $task_provider;
-				}
-			}
-
-			$newly_added_task_providers = $task_providers;
-		}
-
-		return $newly_added_task_providers;
+		return [];
 	}
 
 	/**
@@ -200,7 +181,39 @@ class Plugin_Upgrade_Tasks {
 	 */
 	public function add_upgrade_tasks_popover() {
 		if ( $this->should_show_upgrade_popover() ) {
-			\progress_planner()->get_ui__popover()->the_popover( 'upgrade-tasks' )->render();
+			// Popover is now handled by React via PopoverManager.
+			// Data is fetched via REST API when popover opens.
+			// Trigger popover via WordPress hook after a short delay to ensure React is loaded.
+			\add_action( 'admin_footer', [ $this, 'trigger_upgrade_tasks_popover' ], 999 );
 		}
+	}
+
+	/**
+	 * Trigger upgrade tasks popover via WordPress hook.
+	 *
+	 * @return void
+	 */
+	public function trigger_upgrade_tasks_popover() {
+		// Delete upgrade popover task providers when popover is shown.
+		// This matches the original PHP template behavior.
+		$this->delete_upgrade_popover_task_providers();
+
+		// Create a task object for the popover.
+		$task = [
+			'id'    => 'upgrade-tasks',
+			'slug'  => 'upgrade-tasks',
+			'title' => \__( "We've added new recommendations to the Progress Planner plugin", 'progress-planner' ),
+		];
+
+		// Trigger popover via WordPress hook.
+		?>
+		<script>
+		( function() {
+			if ( typeof wp !== 'undefined' && wp.hooks && wp.hooks.doAction ) {
+				wp.hooks.doAction( 'prpl.popover.open', 'upgrade-tasks', <?php echo \wp_json_encode( $task ); ?> );
+			}
+		} )();
+		</script>
+		<?php
 	}
 }

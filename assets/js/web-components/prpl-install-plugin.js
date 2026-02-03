@@ -1,4 +1,4 @@
-/* global customElements, HTMLElement, prplL10n, progressPlanner, progressPlannerAjaxRequest, prplSuggestedTask */
+/* global customElements, HTMLElement, prplL10n, prplSuggestedTask */
 /*
  * Install Plugin
  *
@@ -86,15 +86,34 @@ customElements.define(
 				${ prplL10n( 'installing' ) }
 			`;
 
-			progressPlannerAjaxRequest( {
-				url: progressPlanner.ajaxUrl,
-				data: {
-					action: 'progress_planner_install_plugin',
-					plugin_slug: this.pluginSlug,
-					plugin_name: this.pluginName,
-					nonce: progressPlanner.nonce,
+			const restRoot =
+				( window.wpApiSettings && window.wpApiSettings.root ) ||
+				'/wp-json/';
+			const endpoint =
+				restRoot.replace( /\/$/, '' ) +
+				'/progress-planner/v1/plugins/install';
+
+			fetch( endpoint, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-WP-Nonce': window.wpApiSettings?.nonce || '',
 				},
+				credentials: 'same-origin',
+				body: JSON.stringify( {
+					plugin_slug: this.pluginSlug,
+				} ),
 			} )
+				.then( ( response ) => {
+					if ( ! response.ok ) {
+						return response.json().then( ( error ) => {
+							throw new Error(
+								error.message || 'Installation failed'
+							);
+						} );
+					}
+					return response.json();
+				} )
 				.then( () => thisObj.activatePlugin() )
 				.catch( ( error ) => console.error( error ) );
 		}
@@ -107,15 +126,34 @@ customElements.define(
 				${ prplL10n( 'activating' ) }
 			`;
 
-			progressPlannerAjaxRequest( {
-				url: progressPlanner.ajaxUrl,
-				data: {
-					action: 'progress_planner_activate_plugin',
-					plugin_slug: thisObj.pluginSlug,
-					plugin_name: thisObj.pluginName,
-					nonce: progressPlanner.nonce,
+			const restRoot =
+				( window.wpApiSettings && window.wpApiSettings.root ) ||
+				'/wp-json/';
+			const endpoint =
+				restRoot.replace( /\/$/, '' ) +
+				'/progress-planner/v1/plugins/activate';
+
+			fetch( endpoint, {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json',
+					'X-WP-Nonce': window.wpApiSettings?.nonce || '',
 				},
+				credentials: 'same-origin',
+				body: JSON.stringify( {
+					plugin_slug: thisObj.pluginSlug,
+				} ),
 			} )
+				.then( ( response ) => {
+					if ( ! response.ok ) {
+						return response.json().then( ( error ) => {
+							throw new Error(
+								error.message || 'Activation failed'
+							);
+						} );
+					}
+					return response.json();
+				} )
 				.then( () => {
 					button.innerHTML = prplL10n( 'activated' );
 

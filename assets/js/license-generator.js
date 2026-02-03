@@ -42,7 +42,6 @@ class LicenseGenerator {
 	 * @return {Promise} Promise that resolves when license is saved
 	 */
 	static saveLicenseKey( licenseKey ) {
-		console.log( 'License key: ' + licenseKey );
 		return LicenseGenerator.ajaxRequest( {
 			url: LicenseGenerator.config.adminAjaxUrl,
 			data: {

@@ -1,9 +1,21 @@
 /**
- * Suggested tasks widget.
+ * Monthly Badges Widget CSS.
+ *
+ * MIGRATION STATUS: Partial
+ * - React inline: PointsCounter styles (MonthlyBadges/PointsCounter.js)
+ * - React inline: Gauge/Badge/BadgeProgressBar components
+ * - Must keep: PHP popover styles, grid layout media queries, PHP widget wrappers
+ *
+ * These styles cannot be migrated to React because:
+ * - PHP-rendered popovers (#prpl-popover-monthly-badges) require CSS styling
+ * - Media queries for grid positioning need CSS
+ * - PHP widget wrapper layout used by fallback rendering
+ * - CSS :has() selectors for conditional styling
  *
  * Dependencies: progress-planner/web-components/prpl-badge
  */
 
+/* Grid positioning - keep for layout */
 @media all and (min-width: 1400px) {
 
 	.prpl-widget-wrapper.prpl-monthly-badges {
@@ -12,6 +24,7 @@
 	}
 }
 
+/* PHP-rendered widget wrapper styles */
 .prpl-widget-wrapper.prpl-monthly-badges {
 
 	/* Remove styling from the widget wrapper (but not in popover view). */
@@ -47,21 +60,10 @@
 			margin-bottom: 0;
 		}
 	}
-
-	.prpl-widget-content-points {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-
-		.prpl-widget-content-points-number {
-			font-size: var(--prpl-font-size-3xl);
-			font-weight: 600;
-		}
-	}
 }
 
 /*------------------------------------*\
-	Popover styles.
+	Popover styles - PHP rendered.
 \*------------------------------------*/
 #prpl-popover-monthly-badges {
 
@@ -105,7 +107,7 @@
 	}
 }
 
-/* This is the badge streak widget. */
+/* PHP-rendered badge streak widget in monthly-badges context */
 .prpl-widget-wrapper.prpl-badge-streak {
 	display: flex;
 	flex-direction: column;

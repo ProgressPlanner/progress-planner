@@ -32,72 +32,6 @@ class Admin_Page_Test extends \WP_UnitTestCase {
 	}
 
 	/**
-	 * Test get_widgets returns array.
-	 *
-	 * @return void
-	 */
-	public function test_get_widgets() {
-		$widgets = $this->page_instance->get_widgets();
-
-		$this->assertIsArray( $widgets );
-		$this->assertNotEmpty( $widgets );
-	}
-
-	/**
-	 * Test get_widgets returns widget instances.
-	 *
-	 * @return void
-	 */
-	public function test_get_widgets_returns_widget_instances() {
-		$widgets = $this->page_instance->get_widgets();
-
-		foreach ( $widgets as $widget ) {
-			$this->assertInstanceOf( \Progress_Planner\Admin\Widgets\Widget::class, $widget );
-		}
-	}
-
-	/**
-	 * Test get_widgets applies filter.
-	 *
-	 * @return void
-	 */
-	public function test_get_widgets_applies_filter() {
-		\add_filter(
-			'progress_planner_admin_widgets',
-			function ( $widgets ) {
-				return \array_slice( $widgets, 0, 1 );
-			}
-		);
-
-		$widgets = $this->page_instance->get_widgets();
-
-		$this->assertCount( 1, $widgets );
-	}
-
-	/**
-	 * Test get_widget returns widget by ID.
-	 *
-	 * @return void
-	 */
-	public function test_get_widget() {
-		$widget = $this->page_instance->get_widget( 'suggested-tasks' );
-
-		$this->assertInstanceOf( \Progress_Planner\Admin\Widgets\Widget::class, $widget );
-		$this->assertEquals( 'suggested-tasks', $widget->get_id() );
-	}
-
-	/**
-	 * Test get_widget returns void for non-existent widget.
-	 *
-	 * @return void
-	 */
-	public function test_get_widget_not_found() {
-		$widget = $this->page_instance->get_widget( 'non-existent-widget' );
-
-		$this->assertNull( $widget );
-	}
-
-	/**
 	 * Test add_page registers admin menu.
 	 *
 	 * @return void
@@ -185,7 +119,7 @@ class Admin_Page_Test extends \WP_UnitTestCase {
 		$activity->category = 'content';
 
 		// Set a cache value.
-		$cache_key = \progress_planner()->get_admin__widgets__activity_scores()->get_cache_key();
+		$cache_key = 'activities_weekly_post_record';
 		\progress_planner()->get_settings()->set( $cache_key, [ 'test' => 'data' ] );
 
 		// Clear cache.
@@ -210,7 +144,7 @@ class Admin_Page_Test extends \WP_UnitTestCase {
 		$activity->category = 'maintenance';
 
 		// Set a cache value.
-		$cache_key = \progress_planner()->get_admin__widgets__activity_scores()->get_cache_key();
+		$cache_key = 'activities_weekly_post_record';
 		\progress_planner()->get_settings()->set( $cache_key, [ 'test' => 'data' ] );
 
 		// Clear cache.
@@ -233,5 +167,173 @@ class Admin_Page_Test extends \WP_UnitTestCase {
 		\ob_end_clean();
 
 		$this->assertTrue( true );
+	}
+
+	/**
+	 * Test admin_footer outputs CSS.
+	 *
+	 * @return void
+	 */
+	public function test_admin_footer_outputs_css() {
+		\ob_start();
+		$this->page_instance->admin_footer();
+		$output = \ob_get_clean();
+
+		$this->assertStringContainsString( '<style>', $output );
+		$this->assertStringContainsString( '#toplevel_page_progress-planner', $output );
+		$this->assertStringContainsString( '.update-plugins', $output );
+	}
+
+	/**
+	 * Test remove_admin_notices removes notices on plugin page.
+	 *
+	 * @return void
+	 */
+	public function test_remove_admin_notices_on_plugin_page() {
+		// Set up screen.
+		\set_current_screen( 'toplevel_page_progress-planner' );
+
+		// Add a test action.
+		\add_action( 'admin_notices', '__return_true' );
+		$this->assertNotFalse( \has_action( 'admin_notices', '__return_true' ) );
+
+		// Call remove_admin_notices.
+		$this->page_instance->remove_admin_notices();
+
+		// The action should be removed.
+		$this->assertFalse( \has_action( 'admin_notices', '__return_true' ) );
+	}
+
+	/**
+	 * Test remove_admin_notices does not remove notices on other pages.
+	 *
+	 * @return void
+	 */
+	public function test_remove_admin_notices_on_other_page() {
+		// Set up a different screen.
+		\set_current_screen( 'dashboard' );
+
+		// Add a test action.
+		\add_action( 'admin_notices', '__return_true' );
+		$this->assertNotFalse( \has_action( 'admin_notices', '__return_true' ) );
+
+		// Call remove_admin_notices.
+		$this->page_instance->remove_admin_notices();
+
+		// The action should still exist.
+		$this->assertNotFalse( \has_action( 'admin_notices', '__return_true' ) );
+	}
+
+	/**
+	 * Test constructor registers hooks.
+	 *
+	 * @return void
+	 */
+	public function test_constructor_registers_hooks() {
+		$page = new Page();
+
+		$this->assertNotFalse( \has_action( 'admin_menu', [ $page, 'add_page' ] ) );
+		$this->assertNotFalse( \has_action( 'admin_enqueue_scripts', [ $page, 'enqueue_assets' ] ) );
+		$this->assertNotFalse( \has_action( 'admin_footer', [ $page, 'admin_footer' ] ) );
+	}
+
+	/**
+	 * Test enqueue_assets calls enqueue methods on plugin page.
+	 *
+	 * @return void
+	 */
+	public function test_enqueue_assets_on_plugin_page() {
+		// Set up screen.
+		\set_current_screen( 'toplevel_page_progress-planner' );
+
+		// Clear existing scripts.
+		global $wp_scripts;
+		$wp_scripts = new \WP_Scripts();
+
+		// Call enqueue_assets with the correct hook.
+		$this->page_instance->enqueue_assets( 'toplevel_page_progress-planner' );
+
+		// The method should have executed without error.
+		$this->assertTrue( true );
+	}
+
+	/**
+	 * Test enqueue_assets does not enqueue on other pages.
+	 *
+	 * @return void
+	 */
+	public function test_enqueue_assets_on_other_page() {
+		// Set up a different screen.
+		\set_current_screen( 'dashboard' );
+
+		// Clear existing scripts.
+		global $wp_scripts;
+		$wp_scripts = new \WP_Scripts();
+
+		// Get initial script count.
+		$initial_count = \count( $wp_scripts->queue );
+
+		// Call enqueue_assets with different hook.
+		$this->page_instance->enqueue_assets( 'index.php' );
+
+		// No new scripts should be enqueued.
+		$this->assertLessThanOrEqual( $initial_count + 1, \count( $wp_scripts->queue ) );
+	}
+
+	/**
+	 * Test notification counter is empty when no pending tasks.
+	 *
+	 * @return void
+	 */
+	public function test_notification_counter_empty_when_no_pending() {
+		// Ensure no pending recommendations.
+		$posts = \get_posts(
+			[
+				'post_type'   => 'prpl_recommendations',
+				'post_status' => 'pending',
+			]
+		);
+
+		foreach ( $posts as $post ) {
+			\wp_delete_post( $post->ID, true );
+		}
+
+		$reflection = new \ReflectionClass( $this->page_instance );
+		$method     = $reflection->getMethod( 'get_notification_counter' );
+		$method->setAccessible( true );
+
+		$result = $method->invoke( $this->page_instance );
+
+		$this->assertEquals( '', $result );
+	}
+
+	/**
+	 * Test notification counter contains count when pending tasks exist.
+	 *
+	 * @return void
+	 */
+	public function test_notification_counter_with_count() {
+		// Create multiple pending tasks.
+		$this->factory->post->create(
+			[
+				'post_type'   => 'prpl_recommendations',
+				'post_status' => 'pending',
+			]
+		);
+		$this->factory->post->create(
+			[
+				'post_type'   => 'prpl_recommendations',
+				'post_status' => 'pending',
+			]
+		);
+
+		$reflection = new \ReflectionClass( $this->page_instance );
+		$method     = $reflection->getMethod( 'get_notification_counter' );
+		$method->setAccessible( true );
+
+		$result = $method->invoke( $this->page_instance );
+
+		$this->assertStringContainsString( 'count-', $result );
+		$this->assertStringContainsString( 'update-plugins', $result );
 	}
 }

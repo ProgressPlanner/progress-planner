@@ -18,13 +18,29 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Page_Types get_page_types()
  * @method \Progress_Planner\Rest\Stats get_rest__stats()
  * @method \Progress_Planner\Rest\Tasks get_rest__tasks()
+ * @method \Progress_Planner\Rest\Widgets\Content_Activity get_rest__widgets__content_activity()
+ * @method \Progress_Planner\Rest\Widgets\Activity_Scores get_rest__widgets__activity_scores()
+ * @method \Progress_Planner\Rest\Activities get_rest__activities()
+ * @method \Progress_Planner\Rest\Badge_Stats get_rest__badge_stats()
+ * @method \Progress_Planner\Rest\Widgets\Whats_New get_rest__widgets__whats_new()
+ * @method \Progress_Planner\Rest\Plugin_Installer get_rest__plugin_installer()
+ * @method \Progress_Planner\Rest\Popover_Actions get_rest__popover_actions()
+ * @method \Progress_Planner\Rest\Email_Test get_rest__email_test()
+ * @method \Progress_Planner\Rest\Email_Sending_Config get_rest__email_sending_config()
+ * @method \Progress_Planner\Rest\Upgrade_Tasks_Config get_rest__upgrade_tasks_config()
+ * @method \Progress_Planner\Rest\Subscribe get_rest__subscribe()
+ * @method \Progress_Planner\Rest\Timezone_Options get_rest__timezone_options()
+ * @method \Progress_Planner\Rest\Data_Collectors get_rest__data_collectors()
+ * @method \Progress_Planner\Rest\Task_Evaluation get_rest__task_evaluation()
+ * @method \Progress_Planner\Rest\Page_Settings get_rest__page_settings()
+ * @method \Progress_Planner\Rest\Updates get_rest__updates()
+ * @method \Progress_Planner\Rest\Wizard_Config get_rest__wizard_config()
  * @method \Progress_Planner\Todo get_todo()
  * @method \Progress_Planner\Utils\Onboard get_utils__onboard()
+ * @method \Progress_Planner\Onboard_Wizard get_onboard_wizard()
  * @method \Progress_Planner\Utils\Playground get_utils__playground()
  * @method \Progress_Planner\Admin\Page get_admin__page()
  * @method \Progress_Planner\Admin\Tour get_admin__tour()
- * @method \Progress_Planner\Admin\Dashboard_Widget_Score get_admin__dashboard_widget_score()
- * @method \Progress_Planner\Admin\Dashboard_Widget_Todo get_admin__dashboard_widget_todo()
  * @method \Progress_Planner\Admin\Editor get_admin__editor()
  * @method \Progress_Planner\Actions\Content get_actions__content()
  * @method \Progress_Planner\Actions\Content_Scan get_actions__content_scan()
@@ -41,19 +57,10 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Suggested_Tasks_DB get_suggested_tasks_db()
  * @method \Progress_Planner\Utils\Deprecations get_utils__deprecations()
  * @method \Progress_Planner\UI\Branding get_ui__branding()
- * @method \Progress_Planner\Plugin_Installer get_plugin_installer()
- * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Content get_admin__widgets__badge_streak_content()
- * @method \Progress_Planner\Admin\Widgets\Badge_Streak_Maintenance get_admin__widgets__badge_streak_maintenance()
  * @method \Progress_Planner\Admin\Enqueue get_admin__enqueue()
- * @method \Progress_Planner\Admin\Widgets\Whats_New get_admin__widgets__whats_new()
- * @method \Progress_Planner\Admin\Widgets\ToDo get_admin__widgets__todo()
- * @method \Progress_Planner\Admin\Widgets\Monthly_Badges get_admin__widgets__monthly_badges()
  * @method \Progress_Planner\UI\Popover get_ui__popover()
- * @method \Progress_Planner\Admin\Widgets\Content_Activity get_admin__widgets__content_activity()
  * @method \Progress_Planner\UI\Chart get_ui__chart()
  * @method \Progress_Planner\Activities\Content_Helpers|null get_activities__content_helpers()
- * @method \Progress_Planner\Admin\Widgets\Challenge get_admin__widgets__challenge()
- * @method \Progress_Planner\Admin\Widgets\Activity_Scores get_admin__widgets__activity_scores()
  * @method \Progress_Planner\Utils\Date get_utils__date()
  * @method \Progress_Planner\Onboard_Wizard get_onboard_wizard()
  */
@@ -111,12 +118,6 @@ class Base {
 		if ( \is_admin() && \current_user_can( 'edit_others_posts' ) ) {
 			$this->get_admin__page();
 			$this->get_admin__tour();
-
-			// Dont add the widget if the privacy policy is not accepted.
-			if ( true === $this->is_privacy_policy_accepted() ) {
-				$this->get_admin__dashboard_widget_score();
-				$this->get_admin__dashboard_widget_todo();
-			}
 		}
 
 		$this->get_suggested_tasks();
@@ -130,9 +131,27 @@ class Base {
 		// REST API.
 		$this->get_rest__stats();
 		$this->get_rest__tasks();
+		$this->get_rest__widgets__content_activity();
+		$this->get_rest__widgets__activity_scores();
+		$this->get_rest__widgets__whats_new();
+		$this->get_rest__plugin_installer();
+		$this->get_rest__activities();
+		$this->get_rest__badge_stats();
+		$this->get_rest__popover_actions();
+		$this->get_rest__email_test();
+		$this->get_rest__email_sending_config();
+		$this->get_rest__upgrade_tasks_config();
+		$this->get_rest__subscribe();
+		$this->get_rest__timezone_options();
+		$this->get_rest__data_collectors();
+		$this->get_rest__task_evaluation();
+		$this->get_rest__page_settings();
+		$this->get_rest__updates();
+		$this->get_rest__wizard_config();
 
 		// Onboarding.
 		$this->get_utils__onboard();
+		$this->get_onboard_wizard();
 
 		// To-do.
 		$this->get_todo();
@@ -166,9 +185,6 @@ class Base {
 		// Plugin upgrade.
 		$this->get_plugin_migrations();
 
-		// Plugin installer.
-		$this->get_plugin_installer();
-
 		/**
 		 * Redirect on login.
 		 */
@@ -181,9 +197,6 @@ class Base {
 
 		// Init the enqueue class.
 		$this->get_admin__enqueue()->init();
-
-		// TODO: Decide when this needs to be initialized.
-		$this->get_onboard_wizard();
 	}
 
 	/**
@@ -203,7 +216,7 @@ class Base {
 	 * get_admin__page()                   → Progress_Planner\Admin\Page
 	 * get_activities__query()             → Progress_Planner\Activities\Query
 	 * get_suggested_tasks_db()            → Progress_Planner\Suggested_Tasks_Db
-	 * get_admin__widgets__todo()          → Progress_Planner\Admin\Widgets\Todo
+	 * get_rest__widgets__activity_scores() → Progress_Planner\Rest\Widgets\Activity_Scores
 	 * ```
 	 *
 	 * Transformation process:

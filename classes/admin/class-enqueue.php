@@ -7,8 +7,6 @@
 
 namespace Progress_Planner\Admin;
 
-use Progress_Planner\Badges\Monthly;
-
 /**
  * Enqueue class.
  */
@@ -27,11 +25,7 @@ class Enqueue {
 	 * @var array
 	 */
 	const VENDOR_SCRIPTS = [
-		'vendor/tsparticles.confetti.bundle.min' => [
-			'handle'  => 'particles-confetti',
-			'version' => '2.11.0',
-		],
-		'vendor/driver.js.iife'                  => [
+		'vendor/driver.js.iife' => [
 			'handle'  => 'driver',
 			'version' => '1.3.1',
 		],
@@ -206,110 +200,6 @@ class Enqueue {
 				];
 				break;
 
-			case 'progress-planner/suggested-task':
-				// Celebrate only on the Progress Planner Dashboard page.
-				$delay_celebration = true;
-				if ( \progress_planner()->is_on_progress_planner_dashboard_page() ) {
-					// should_show_upgrade_popover() also checks if we're on the Progress Planner Dashboard page - but let's be explicit since that method might change in the future.
-					$delay_celebration = \progress_planner()->get_plugin_upgrade_tasks()->should_show_upgrade_popover();
-				}
-
-				// Get the providers available for the user.
-				$include_providers            = [];
-				$providers_available_for_user = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers_available_for_user();
-				foreach ( $providers_available_for_user as $provider ) {
-					// Skip user provider.
-					if ( 'user' === $provider->get_provider_id() ) {
-						continue;
-					}
-					$include_providers[] = $provider->get_provider_id();
-				}
-
-				// Check if user wants to see all recommendations.
-				$show_all_recommendations = isset( $_GET['prpl_show_all_recommendations'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$tasks_per_page           = $show_all_recommendations ? -1 : \Progress_Planner\Admin\Widgets\Suggested_Tasks::PER_PAGE_DEFAULT;
-
-				// Get tasks from task providers (limited to 5 by default, or unlimited if showing all).
-				$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
-					[
-						'post_status'      => 'publish',
-						'posts_per_page'   => $tasks_per_page,
-						'include_provider' => $include_providers, // User provider is already excluded.
-					]
-				);
-				// Get pending celebration tasks.
-				$pending_celebration_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
-					[
-						'post_status'      => 'pending',
-						'posts_per_page'   => 100,
-						'include_provider' => $include_providers, // User provider is already excluded.
-					]
-				);
-
-				// Get user tasks.
-				$user_tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
-					[
-						'post_status'      => [ 'publish', 'trash' ],
-						'include_provider' => [ 'user' ],
-					]
-				);
-
-				$localize_data = [
-					'name' => 'prplSuggestedTask',
-					'data' => [
-						'nonce'            => \wp_create_nonce( 'progress_planner' ),
-						'assets'           => [
-							'infoIcon'   => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_info.svg',
-							'snoozeIcon' => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_snooze.svg',
-						],
-						'tasks'            => [
-							'pendingTasks'            => $tasks,
-							'pendingCelebrationTasks' => $pending_celebration_tasks,
-							'userTasks'               => $user_tasks,
-						],
-						'delayCelebration' => $delay_celebration,
-						'tasksPerPage'     => $tasks_per_page,
-						'perPageDefault'   => \Progress_Planner\Admin\Widgets\Suggested_Tasks::PER_PAGE_DEFAULT,
-					],
-				];
-				break;
-
-			case 'progress-planner/celebrate':
-				// Check if current date is between Feb 12-16 to use hearts confetti.
-				$confetti_options = [];
-				// February 12 will be (string) '0212', and when converted to int it will be 212.
-				// February 16 will be (string) '0216', and when converted to int it will be 216.
-				// The integer conversion makes it easier and faster to compare the dates.
-				$date_md = (int) \gmdate( 'md' );
-
-				if ( 212 <= $date_md && $date_md <= 216 ) {
-					$confetti_options = [
-						[
-							'particleCount' => 50,
-							'scalar'        => 2.2,
-							'shapes'        => [ 'heart' ],
-							'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
-						],
-						[
-							'particleCount' => 20,
-							'scalar'        => 3.2,
-							'shapes'        => [ 'heart' ],
-							'colors'        => [ 'FFC0CB', 'FF69B4', 'FF1493', 'C71585' ],
-						],
-					];
-				}
-				$localize_data = [
-					'name' => 'prplCelebrate',
-					'data' => [
-						'raviIconUrl'     => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg',
-						'confettiOptions' => $confetti_options,
-					],
-				];
-
-				foreach ( $this->get_badge_urls() as $context => $url ) {
-					$localize_data['data'][ $context . 'IconUrl' ] = $url;
-				}
-				break;
 		}
 
 		if ( ! $localize_data['name'] ) {
@@ -324,27 +214,41 @@ class Enqueue {
 	 *
 	 * @return string[] The badge URLs.
 	 */
-	private function get_badge_urls() {
-		// Get the monthly badge URL.
-		$monthly_badge = \progress_planner()->get_badges()->get_badge( Monthly::get_badge_id_from_date( new \DateTime() ) );
+	public function get_badge_urls() {
+		$badge_urls = [];
 
-		if ( $monthly_badge ) {
-			$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $monthly_badge->get_id() . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
+		// Get the monthly badge URL.
+		$now                 = new \DateTime();
+		$badge_id            = 'monthly-' . $now->format( 'Y' ) . '-m' . $now->format( 'n' );
+		$badge_urls['month'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge_id . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
+
+		// Get the content and maintenance badge URLs from saved stats.
+		$settings = \progress_planner()->get_settings()->get( 'badges', [] );
+
+		// Content badges.
+		$content_badge_ids = [ 'content-curator', 'revision-ranger', 'purposeful-publisher' ];
+		foreach ( $content_badge_ids as $badge_id ) {
+			if ( isset( $settings[ $badge_id ] ) && (int) ( $settings[ $badge_id ]['progress'] ?? 0 ) >= 100 ) {
+				$badge_urls['content'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge_id . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
+				break;
+			}
+		}
+		if ( ! isset( $badge_urls['content'] ) ) {
+			// Fallback to the first badge in the set if no badge is completed.
+			$badge_urls['content'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=content-curator&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
 		}
 
-		// Get the content and maintenance badge URLs.
-		foreach ( [ 'content', 'maintenance' ] as $context ) {
-			$set_badges = \progress_planner()->get_badges()->get_badges( $context );
-			foreach ( $set_badges as $badge ) {
-				$progress = $badge->get_progress();
-				if ( $progress['progress'] > 100 ) {
-					$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge->get_id() . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
-				}
+		// Maintenance badges.
+		$maintenance_badge_ids = [ 'progress-padawan', 'maintenance-maniac', 'super-site-specialist' ];
+		foreach ( $maintenance_badge_ids as $badge_id ) {
+			if ( isset( $settings[ $badge_id ] ) && (int) ( $settings[ $badge_id ]['progress'] ?? 0 ) >= 100 ) {
+				$badge_urls['maintenance'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $badge_id . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
+				break;
 			}
-			if ( ! isset( $badge_urls[ $context ] ) ) {
-				// Fallback to the first badge in the set if no badge is completed.
-				$badge_urls[ $context ] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=' . $set_badges[0]->get_id() . '&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
-			}
+		}
+		if ( ! isset( $badge_urls['maintenance'] ) ) {
+			// Fallback to the first badge in the set if no badge is completed.
+			$badge_urls['maintenance'] = \progress_planner()->get_remote_server_root_url() . '/wp-json/progress-planner-saas/v1/badge-svg/?badge_id=progress-padawan&branding_id=' . (int) \progress_planner()->get_ui__branding()->get_branding_id();
 		}
 
 		return $badge_urls;
@@ -429,8 +333,8 @@ class Enqueue {
 			return;
 		}
 
-		// Inject the script only on the Progress Planner Dashboard and the WordPress dashboard pages.
-		if ( 'toplevel_page_progress-planner' !== $screen->id && 'dashboard' !== $screen->id ) {
+		// Inject the script only on the Progress Planner Dashboard, Progress Planner Settings and the WordPress dashboard pages.
+		if ( 'toplevel_page_progress-planner' !== $screen->id ) {
 			return;
 		}
 		?>

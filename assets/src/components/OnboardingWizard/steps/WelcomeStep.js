@@ -1,0 +1,209 @@
+/**
+ * WelcomeStep Component
+ *
+ * First step: Privacy policy acceptance and license generation.
+ *
+ * @package
+ */
+
+import { useState, useEffect } from '@wordpress/element';
+import { __, sprintf } from '@wordpress/i18n';
+import OnboardingStep from '../OnboardingStep';
+import NextButton from '../NextButton';
+import { useLicenseGenerator } from '../../../hooks/useLicenseGenerator';
+import { CustomCheckbox } from '../../FormInputs';
+
+/**
+ * WelcomeStep component.
+ *
+ * @param {Object} props - Component props.
+ * @return {JSX.Element} Welcome step component.
+ */
+export default function WelcomeStep( props ) {
+	const { wizardState, updateState, config } = props;
+	const {
+		onboardNonceURL,
+		onboardAPIUrl,
+		ajaxUrl,
+		nonce,
+		site,
+		timezoneOffset,
+		hasLicense,
+		l10n,
+		baseUrl,
+		privacyPolicyUrl,
+	} = config;
+
+	const { generateLicense, isGenerating } = useLicenseGenerator( {
+		onboardNonceURL,
+		onboardAPIUrl,
+		ajaxUrl,
+		nonce,
+		siteUrl: site,
+		timezoneOffset,
+	} );
+
+	const [ privacyAccepted, setPrivacyAccepted ] = useState(
+		wizardState.data.privacyAccepted || false
+	);
+
+	// Update wizard state when privacy acceptance changes.
+	useEffect( () => {
+		updateState( {
+			data: {
+				...wizardState.data,
+				privacyAccepted,
+			},
+		} );
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [ privacyAccepted ] );
+
+	/**
+	 * Handle next button click.
+	 */
+	const handleNext = async () => {
+		// If no license and privacy accepted, generate license first.
+		if ( ! hasLicense && privacyAccepted ) {
+			try {
+				await generateLicense( {
+					'with-email': 'no', // Default for wizard
+				} );
+				// Continue to next step (don't reload - matches develop branch behavior).
+			} catch ( error ) {
+				// eslint-disable-next-line no-console
+				console.error( 'Failed to generate license:', error );
+				return;
+			}
+		}
+
+		props.onNext();
+	};
+
+	/**
+	 * Check if can proceed.
+	 *
+	 * @return {boolean} True if can proceed.
+	 */
+	const canProceed = () => {
+		// Sites with license can always proceed.
+		if ( hasLicense ) {
+			return true;
+		}
+		return privacyAccepted;
+	};
+
+	return (
+		<OnboardingStep { ...props } hideFooter>
+			<div className="tour-content">
+				<div className="prpl-columns-wrapper-flex prpl-columns-2-1">
+					<div className="prpl-column">
+						<div className="prpl-background-content">
+							<h3 className="tour-title">
+								{ __(
+									"Hi there! Ready to push your website forward? Let's go!",
+									'progress-planner'
+								) }
+							</h3>
+							<p>
+								{ sprintf(
+									/* translators: %s: Progress Planner name */
+									__(
+										"%s helps you set clear, focused goals for your website. Let's go through a few simple steps to get everything set up.",
+										'progress-planner'
+									),
+									l10n?.brandingName || 'Progress Planner'
+								) }
+							</p>
+							<p>
+								{ __(
+									'This will only take a few minutes.',
+									'progress-planner'
+								) }
+							</p>
+						</div>
+
+						{ ! hasLicense && (
+							<div className="prpl-privacy-checkbox-wrapper">
+								<CustomCheckbox
+									id="prpl-privacy-checkbox"
+									checked={ privacyAccepted }
+									onChange={ ( e ) => {
+										setPrivacyAccepted( e.target.checked );
+										// Remove active class from required indicator (like develop).
+										const requiredIndicator =
+											document.querySelector(
+												'.prpl-privacy-checkbox-wrapper .prpl-required-indicator'
+											);
+										if ( requiredIndicator ) {
+											requiredIndicator.classList.remove(
+												'prpl-required-indicator-active'
+											);
+										}
+									} }
+									label={
+										<>
+											{ __(
+												'I accept the',
+												'progress-planner'
+											) }{ ' ' }
+											<a
+												href={
+													privacyPolicyUrl ||
+													'https://progressplanner.com/privacy-policy/#h-plugin-privacy-policy'
+												}
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												{ __(
+													'privacy policy',
+													'progress-planner'
+												) }
+											</a>{ ' ' }
+											{ __(
+												'and the essential data processing needed for the plugin.',
+												'progress-planner'
+											) }{ ' ' }
+											<span className="prpl-required-indicator">
+												{ __(
+													'Required',
+													'progress-planner'
+												) }
+											</span>
+										</>
+									}
+								/>
+							</div>
+						) }
+
+						<NextButton
+							onNext={ handleNext }
+							canProceed={ canProceed }
+							wizardState={ wizardState }
+							isLoading={ isGenerating }
+							buttonText={
+								<>
+									{ __(
+										'Start onboarding',
+										'progress-planner'
+									) }
+									<span className="dashicons dashicons-arrow-right-alt2"></span>
+								</>
+							}
+							buttonClass="prpl-btn-secondary"
+						/>
+					</div>
+					<div className="prpl-column prpl-hide-on-mobile">
+						<div id="prpl-welcome-graphic">
+							<img
+								src={ `${
+									baseUrl || ''
+								}/assets/images/onboarding/thumbs_up_ravi_rtl.svg` }
+								alt=""
+							/>
+						</div>
+					</div>
+				</div>
+			</div>
+		</OnboardingStep>
+	);
+}

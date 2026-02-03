@@ -193,16 +193,13 @@ class Debug_Tools {
 		$onboard_task_provider_ids = \apply_filters( 'prpl_onboarding_task_providers', [] );
 
 		foreach ( $onboard_task_provider_ids as $task_provider_id ) {
-			$task_provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task_provider_id ); // @phpstan-ignore-line method.nonObject
-			if ( $task_provider ) { // @phpstan-ignore-line
-				$admin_bar->add_node(
-					[
-						'id'     => 'prpl-upgrading-task-' . $task_provider_id,
-						'parent' => 'prpl-upgrading-tasks',
-						'title'  => $task_provider_id,
-					]
-				);
-			}
+			$admin_bar->add_node(
+				[
+					'id'     => 'prpl-upgrading-task-' . $task_provider_id,
+					'parent' => 'prpl-upgrading-tasks',
+					'title'  => $task_provider_id,
+				]
+			);
 		}
 	}
 
@@ -743,19 +740,6 @@ class Debug_Tools {
 				'id'     => 'prpl-onboarding',
 				'parent' => 'prpl-debug',
 				'title'  => 'Onboarding',
-			]
-		);
-
-		// Start onboarding.
-		$admin_bar->add_node(
-			[
-				'id'     => 'prpl-start-onboarding',
-				'parent' => 'prpl-onboarding',
-				'title'  => 'Start Onboarding',
-				'href'   => '#',
-				'meta'   => [
-					'onclick' => 'window.prplOnboardWizard.startOnboarding(); return false;',
-				],
 			]
 		);
 

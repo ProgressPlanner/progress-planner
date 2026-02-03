@@ -1,9 +1,22 @@
 /**
- * TODOs widget.
+ * TODO Widget CSS.
+ *
+ * MIGRATION STATUS: Partial
+ * - React inline: list/form styles (TodoWidget/index.js)
+ * - React inline: TaskItem component styles
+ * - Must keep: CSS :has() features, delete-all popover, dashboard widget overrides
+ *
+ * These styles cannot be migrated to React because:
+ * - CSS :has() selectors for golden/silver task highlighting
+ * - CSS :has() for completed tasks visibility and delete-all button
+ * - PHP-rendered delete-all popover with confirmation dialog
+ * - :hover pseudo-classes for completed task actions
+ * - Dashboard widget specific overrides (#progress_planner_dashboard_widget_todo)
  *
  * Dependencies: progress-planner/suggested-task
  */
 
+/* Widget wrapper padding - PHP context */
 .prpl-widget-wrapper.prpl-todo {
 	padding-left: 0;
 
@@ -16,7 +29,7 @@
 		display: none;
 	}
 
-	/* Silver task */
+	/* Silver task - CSS-only :has() feature */
 	&:not(:has(#todo-list li[data-task-points="1"])) {
 
 		.prpl-todo-silver-task-description {
@@ -47,7 +60,7 @@
 		}
 	}
 
-	/* Golden task */
+	/* Golden task - CSS-only :has() feature */
 	&:has(#todo-list li[data-task-points="1"]) {
 
 		.prpl-todo-silver-task-description {
@@ -68,56 +81,18 @@
 	}
 }
 
-#create-todo-item {
-	display: flex;
-	align-items: center;
-	flex-direction: row-reverse;
-	gap: 1em;
-
-	button {
-		border: 1.5px solid;
-		border-radius: 50%;
-		background: none;
-		box-shadow: none;
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		padding: 0.2em;
-		margin-inline-start: 0.3rem;
-		color: var(--prpl-color-ui-icon);
-
-		.dashicons {
-			font-size: 0.825em;
-			width: 1em;
-			height: 1em;
-		}
-	}
-}
-
-#new-todo-content {
-	flex: 1;
-	min-width: 0;
-}
-
+/* Hide first/last move buttons - CSS-only feature */
 #todo-list,
 #todo-list-completed {
-	list-style: none;
-	padding: 0;
 
-	/* max-height: 30em; */
-
-	/* overflow-y: auto; */
-
-	/* margin: 0 0 0.5em calc(var(--prpl-padding) * -1); */
-
-	> *:first-child .move-up,
-	> *:last-child .move-down {
+	> *:first-child .prpl-move-up,
+	> *:last-child .prpl-move-down {
 		visibility: hidden;
 	}
 }
 
 /*------------------------------------*\
-	Progress Planner TODO Dashboard widget styles.
+	Dashboard widget styles - PHP context
 \*------------------------------------*/
 #progress_planner_dashboard_widget_todo {
 
@@ -185,13 +160,10 @@
 	}
 }
 
+/* Completed tasks list specific styles */
 #todo-list-completed {
 
 	.prpl-suggested-task {
-
-		h3 {
-			text-decoration: line-through;
-		}
 
 		.prpl-suggested-task-actions-wrapper,
 		.prpl-move-buttons-wrapper,
@@ -201,74 +173,14 @@
 	}
 }
 
+/* Completed details section - CSS-only features */
 #todo-list-completed-details {
-	margin-top: 1rem;
-	border: 1px solid var(--prpl-color-border);
-	border-radius: 0.5rem;
-
-	summary {
-		padding: 0.5rem;
-		font-weight: 500;
-		display: flex;
-
-		& > .prpl-todo-list-completed-summary-icon {
-			margin-inline-start: auto;
-			display: block;
-			width: 20px;
-			height: 20px;
-
-			transition: transform 0.3s ease-in-out;
-
-			svg {
-				stroke: var(--prpl-color-ui-icon);
-			}
-		}
-	}
-
-	&[open] {
-
-		summary > .prpl-todo-list-completed-summary-icon {
-			transform: rotate(180deg);
-		}
-	}
 
 	&:not(:has(.prpl-suggested-task)) {
 		display: none;
 	}
 
-	#todo-list-completed-delete-all-wrapper {
-		margin: 0.25rem 0.5rem 0.75rem 0.5rem;
-		border-top: 1px solid var(--prpl-color-border);
-		display: none;
-
-		#todo-list-completed-delete-all {
-			display: flex;
-			align-items: center;
-			gap: 0.5rem;
-			background-color: transparent;
-			border: none;
-			padding: 0;
-			margin: 0.5rem 0 0 0;
-			cursor: pointer;
-			color: var(--prpl-color-link);
-			font-size: var(--prpl-font-size-small);
-
-			svg path {
-				fill: var(--prpl-color-ui-icon);
-			}
-
-			&:hover {
-				text-decoration: underline;
-
-				svg path {
-					fill: var(--prpl-color-ui-icon-hover-delete);
-				}
-			}
-
-		}
-	}
-
-	/* Show the delete all button if there are at least 3 completed tasks */
+	/* Show delete all button when 3+ completed tasks */
 	&:has(.prpl-suggested-task:nth-of-type(3)) #todo-list-completed-delete-all-wrapper {
 		display: block;
 	}
@@ -309,6 +221,7 @@
 		}
 	}
 
+	/* Hover effects for completed tasks */
 	.prpl-suggested-task:hover {
 
 		.prpl-suggested-task-points {
@@ -323,6 +236,7 @@
 	}
 }
 
+/* Loading state overlay */
 #todo-list {
 
 	&:has(.prpl-loader) {
@@ -342,7 +256,7 @@
 	}
 }
 
-
+/* Delete all popover - keep as CSS for complex layout */
 #todo-list-completed-delete-all-popover {
 	max-width: 600px;
 

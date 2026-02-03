@@ -69,7 +69,7 @@ class SEO_Plugin extends Base_Data_Collector {
 		// Check each SEO plugin.
 		foreach ( $this->seo_plugins as $plugin_data ) {
 			// First, check if the plugin is activated by slug.
-			if ( \progress_planner()->get_plugin_installer()->is_plugin_activated( $plugin_data['slug'] ) ) {
+			if ( \Progress_Planner\Utils\Plugin_Utils::is_plugin_activated( $plugin_data['slug'] ) ) {
 				return true;
 			}
 

@@ -9,6 +9,9 @@ namespace Progress_Planner\UI;
 
 /**
  * Popover base class.
+ *
+ * Note: This class is deprecated for interactive task popovers, which now use React components.
+ * It is still used for plugin deactivation popover and other non-task popovers.
  */
 class Popover {
 

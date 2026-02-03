@@ -102,7 +102,7 @@ class WP_CLI_Task_Command_Test extends \WP_UnitTestCase {
 				'post_title'  => $title,
 				'description' => 'Test description',
 				'points'      => 1,
-				'provider_id' => 'collaborator',
+				'provider_id' => 'user',
 				'status'      => 'pending',
 			]
 		);

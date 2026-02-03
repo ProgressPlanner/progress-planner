@@ -8,8 +8,6 @@
 namespace Progress_Planner;
 
 use Progress_Planner\Activities\Suggested_Task as Suggested_Task_Activity;
-use Progress_Planner\Suggested_Tasks\Tasks_Manager;
-use Progress_Planner\Suggested_Tasks\Providers\Content_Review;
 
 /**
  * Recommendations class.
@@ -32,21 +30,10 @@ class Suggested_Tasks {
 	];
 
 	/**
-	 * An object containing tasks.
-	 *
-	 * @var \Progress_Planner\Suggested_Tasks\Tasks_Manager
-	 */
-	private Tasks_Manager $tasks_manager;
-
-	/**
 	 * Constructor.
 	 */
 	public function __construct() {
-		$this->tasks_manager = new Tasks_Manager();
-
 		if ( \is_admin() ) {
-			\add_action( 'admin_init', [ $this, 'init' ], 20 ); // Wait for the post types to be initialized and transients to be set.
-
 			// Check GET parameter and maybe set task as pending.
 			\add_action( 'init', [ $this, 'maybe_complete_task' ] );
 		}
@@ -68,28 +55,6 @@ class Suggested_Tasks {
 		\add_filter( 'rest_prepare_prpl_recommendations', [ $this, 'rest_prepare_recommendation' ], 10, 2 );
 
 		\add_filter( 'wp_trash_post_days', [ $this, 'change_trashed_posts_lifetime' ], 10, 2 );
-	}
-
-	/**
-	 * Run the tasks.
-	 *
-	 * @return void
-	 */
-	public function init(): void {
-		// Check for completed tasks.
-		$completed_tasks = $this->tasks_manager->evaluate_tasks();
-
-		foreach ( $completed_tasks as $task ) {
-			if ( ! $task->post_name && $task->ID ) {
-				continue;
-			}
-
-			// Change the task status to pending.
-			$task->celebrate();
-
-			// Insert an activity.
-			$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $task->post_name ) );
-		}
 	}
 
 	/**
@@ -157,15 +122,6 @@ class Suggested_Tasks {
 
 		// Insert an activity.
 		$this->insert_activity( \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $pending_tasks[0]->post_name ) );
-	}
-
-	/**
-	 * Get the tasks manager.
-	 *
-	 * @return \Progress_Planner\Suggested_Tasks\Tasks_Manager
-	 */
-	public function get_tasks_manager(): Tasks_Manager {
-		return $this->tasks_manager;
 	}
 
 	/**
@@ -330,15 +286,8 @@ class Suggested_Tasks {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Task not found.', 'progress-planner' ) ] );
 		}
 
-		$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $task->get_provider_id() );
-
-		if ( ! $provider ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'Provider not found.', 'progress-planner' ) ] );
-		}
-
-		if ( ! $provider->capability_required() ) {
-			\wp_send_json_error( [ 'message' => \esc_html__( 'You do not have permission to complete this task.', 'progress-planner' ) ] );
-		}
+		// Capability is checked client-side before task was shown,
+		// and user must be logged in with edit_others_posts to reach this endpoint.
 
 		$updated = false;
 
@@ -467,7 +416,7 @@ class Suggested_Tasks {
 	public function rest_api_tax_query( $args, $request ) {
 		$tax_query = [];
 
-		// Exclude terms.
+		// Exclude providers.
 		if ( isset( $request['exclude_provider'] ) ) {
 			$tax_query[] = [
 				'taxonomy' => 'prpl_recommendations_provider',
@@ -477,26 +426,19 @@ class Suggested_Tasks {
 			];
 		}
 
-		$include_providers            = [];
-		$providers_available_for_user = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_providers_available_for_user();
-		foreach ( $providers_available_for_user as $provider ) {
-			$include_providers[] = $provider->get_provider_id();
-		}
-
-		// Include terms (matches any term in list).
+		// Include specific providers if requested.
 		if ( isset( $request['provider'] ) ) {
-			$request_providers = \explode( ',', $request['provider'] );
-			$include_providers = \array_intersect( $include_providers, $request_providers );
+			$tax_query[] = [
+				'taxonomy' => 'prpl_recommendations_provider',
+				'field'    => 'slug',
+				'terms'    => \explode( ',', $request['provider'] ),
+				'operator' => 'IN',
+			];
 		}
 
-		$tax_query[] = [
-			'taxonomy' => 'prpl_recommendations_provider',
-			'field'    => 'slug',
-			'terms'    => $include_providers,
-			'operator' => 'IN',
-		];
-
-		$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		if ( ! empty( $tax_query ) ) {
+			$args['tax_query'] = $tax_query; // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+		}
 
 		// Handle sorting parameters.
 		if ( isset( $request['filter']['orderby'] ) ) {
@@ -526,41 +468,13 @@ class Suggested_Tasks {
 		if ( ! isset( $response->data['meta'] ) ) {
 			$response->data['meta'] = [];
 		}
-		$provider = false;
+
 		if ( $provider_term && ! \is_wp_error( $provider_term ) ) {
-			$provider = \progress_planner()->get_suggested_tasks()->get_tasks_manager()->get_task_provider( $provider_term[0]->slug );
+			// Set prpl_provider from the term so React can identify the provider and generate actions client-side.
+			$response->data['prpl_provider'] = $provider_term[0];
 		}
 
 		$response->data['slug'] = \progress_planner()->get_suggested_tasks()->get_task_id_from_slug( $response->data['slug'] );
-
-		if ( $provider ) {
-			$response->data['prpl_provider'] = $provider_term[0];
-			// Link should be added during run time, since it is not added for users without required capability.
-			$response->data['meta']['prpl_url'] = $response->data['meta']['prpl_url'] && $provider->capability_required()
-				? \esc_url( (string) $response->data['meta']['prpl_url'] )
-				: '';
-
-			$response->data['prpl_popover_id'] = $provider->get_popover_id();
-			$response->data['prpl_points']     = $provider->get_points();
-
-			/*
-			 * Check if task was completed before - for example, comments were disabled and then re-enabled, and remove points if so.
-			 * Those are tasks which are completed by toggling an option, so non repetitive & not user tasks.
-			 */
-			if ( ! \has_term( 'user', 'prpl_recommendations_provider', $post->ID ) && ! $provider->is_repetitive() && $provider->task_has_activity( $response->data['slug'] ) ) {
-				$response->data['prpl_points'] = 0;
-			}
-
-			// Assign point only to golden user task.
-			if ( 'user' === $provider->get_provider_id() ) {
-				$response->data['prpl_points'] = ( ! empty( $post->post_excerpt ) && \str_contains( $post->post_excerpt, 'GOLDEN' ) ) ? 1 : 0;
-			}
-
-			// This has to be the last item to be added because actions use data from previous items.
-			$response->data['prpl_task_actions'] = $provider->get_task_actions( $response->data );
-		}
-
-		// Category taxonomy removed - no longer adding prpl_category to response.
 
 		return $response;
 	}

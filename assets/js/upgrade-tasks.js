@@ -93,26 +93,21 @@ const prplOnboardRedirect = () => {
 	}
 };
 
-// Trigger the onboarding tasks popover if it is in the DOM.
+// Trigger the onboarding tasks animation if the React component is rendered.
+// The React component will handle the popover display, but we can still animate tasks.
 prplDocumentReady( function () {
-	const popover = document.getElementById( 'prpl-popover-upgrade-tasks' );
-	if ( popover ) {
-		popover.showPopover();
-
-		prplOnboardTasks().then( () => {
-			document
-				.getElementById( 'prpl-onboarding-continue-button' )
-				.classList.remove( 'prpl-disabled' );
-		} );
-
-		// Click on the close popover button should also redirect to the PP Dashboard page.
-		const closePopoverButton = document.querySelector(
-			'#prpl-popover-upgrade-tasks .prpl-popover-close'
-		);
-		if ( closePopoverButton ) {
-			closePopoverButton.addEventListener( 'click', () => {
-				prplOnboardRedirect();
+	// Wait for React to render, then animate tasks.
+	setTimeout( () => {
+		const tasksElement = document.getElementById( 'prpl-onboarding-tasks' );
+		if ( tasksElement ) {
+			prplOnboardTasks().then( () => {
+				const continueButton = document.getElementById(
+					'prpl-onboarding-continue-button'
+				);
+				if ( continueButton ) {
+					continueButton.classList.remove( 'prpl-disabled' );
+				}
 			} );
 		}
-	}
+	}, 500 );
 } );

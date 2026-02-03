@@ -7,7 +7,6 @@
 	/* Paper */
 	--prpl-background-paper: #fff;
 	--prpl-color-border: #d1d5db;
-	--prpl-color-divider: var(--prpl-color-border);
 	--prpl-color-shadow-paper: #000;
 
 	/* Graph */
@@ -44,7 +43,6 @@
 
 	/* Topics */
 	--prpl-color-monthly: #faa310;
-	--prpl-color-monthly-2: #faa310;
 	--prpl-color-streak: var(--prpl-color-monthly);
 	--prpl-color-content-badge: var(--prpl-color-monthly);
 	--prpl-background-monthly: #fff9f0;
@@ -76,18 +74,7 @@
 	/* Button */
 	--prpl-color-button-primary: #dd324f;
 	--prpl-color-button-primary-hover: #cf2441;
-	--prpl-color-button-primary-shadow: var(--prpl-color-shadow-paper);
-	--prpl-color-button-primary-border: none;
 	--prpl-color-button-primary-text: var(--prpl-background-paper);
-
-	/* Settings page */
-	--prpl-color-setting-pages-icon: var(--prpl-color-monthly);
-	--prpl-color-setting-posts-icon: var(--prpl-graph-color-4);
-	--prpl-color-setting-login-icon: var(--prpl-graph-color-3);
-	--prpl-background-setting-pages: var(--prpl-background-monthly);
-	--prpl-background-setting-posts: var(--prpl-background-content);
-	--prpl-background-setting-login: var(--prpl-background-activity);
-	--prpl-color-border-settings: var(--prpl-color-border);
 
 	/* Input field dropdown */
 	--prpl-color-field-border: var(--prpl-color-border);
