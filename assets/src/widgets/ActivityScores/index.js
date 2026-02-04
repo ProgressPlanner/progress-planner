@@ -7,7 +7,7 @@
 
 import { useMemo } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { doAction } from '@wordpress/hooks';
+import { registerWidget } from '../../utils/widgetRegistry';
 import Gauge from '../../components/Gauge';
 import BarChart from '../../components/BarChart';
 import BigCounter from '../../components/BigCounter';
@@ -268,8 +268,8 @@ function ActivityScores( { config = {} } ) {
 	);
 }
 
-// Register widget via hook with metadata
-doAction( 'prpl.dashboard.registerWidget', {
+// Register widget
+registerWidget( {
 	id: 'activity-scores',
 	component: ActivityScores,
 	priority: 4,

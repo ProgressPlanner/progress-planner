@@ -6,7 +6,7 @@
 
 import { useState, useEffect, useRef, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { doAction } from '@wordpress/hooks';
+import { registerWidget } from '../../utils/widgetRegistry';
 import TaskItem from '../../components/TaskItem';
 import {
 	fetchTasks,
@@ -698,8 +698,8 @@ function TodoWidget( { config = {} } ) {
 	);
 }
 
-// Register widget via hook with metadata
-doAction( 'prpl.dashboard.registerWidget', {
+// Register widget
+registerWidget( {
 	id: 'todo',
 	component: TodoWidget,
 	priority: 3,

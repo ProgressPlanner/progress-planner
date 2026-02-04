@@ -14,7 +14,7 @@ import {
 } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import { doAction } from '@wordpress/hooks';
+import { registerWidget } from '../../utils/widgetRegistry';
 import PopoverManager from './PopoverManager';
 import TaskList from './TaskList';
 import LoadMoreButton from './LoadMoreButton';
@@ -695,8 +695,8 @@ function SuggestedTasks( { config = {} } ) {
 	);
 }
 
-// Register widget via hook with metadata
-doAction( 'prpl.dashboard.registerWidget', {
+// Register widget
+registerWidget( {
 	id: 'suggested-tasks',
 	component: SuggestedTasks,
 	priority: 1,

@@ -7,7 +7,7 @@
 
 import { useCallback, useMemo } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { doAction } from '@wordpress/hooks';
+import { registerWidget } from '../../utils/widgetRegistry';
 import { useBadgeData } from '../../hooks/useBadgeData';
 import { useBadgeProgress } from '../../hooks/useBadgeProgress';
 import { useBadgeProgressSave } from '../../hooks/useBadgeProgressSave';
@@ -307,8 +307,8 @@ function MonthlyBadges( { config = {} } ) {
 	);
 }
 
-// Register widget via hook with metadata
-doAction( 'prpl.dashboard.registerWidget', {
+// Register widget
+registerWidget( {
 	id: 'monthly-badges',
 	component: MonthlyBadges,
 	priority: 2,

@@ -6,7 +6,7 @@
 
 import { Fragment } from '@wordpress/element';
 import { __, _n, sprintf } from '@wordpress/i18n';
-import { doAction } from '@wordpress/hooks';
+import { registerWidget } from '../../utils/widgetRegistry';
 import SimpleBadgeWidget from '../shared/SimpleBadgeWidget';
 import WidgetHeader from '../../components/WidgetHeader';
 
@@ -66,8 +66,8 @@ function ContentBadges( { config = {} } ) {
 	);
 }
 
-// Register widget via hook with metadata
-doAction( 'prpl.dashboard.registerWidget', {
+// Register widget
+registerWidget( {
 	id: 'badge-streak-content',
 	component: ContentBadges,
 	priority: 6,

@@ -5,7 +5,7 @@
  */
 
 import { __ } from '@wordpress/i18n';
-import { doAction } from '@wordpress/hooks';
+import { registerWidget } from '../../utils/widgetRegistry';
 import BigCounter from '../../components/BigCounter';
 import LineChart from '../../components/LineChart';
 import ActivityTable from './ActivityTable';
@@ -99,8 +99,8 @@ function ContentActivity( { config = {} } ) {
 	);
 }
 
-// Register widget via hook with metadata
-doAction( 'prpl.dashboard.registerWidget', {
+// Register widget
+registerWidget( {
 	id: 'content-activity',
 	component: ContentActivity,
 	priority: 5,

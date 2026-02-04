@@ -6,7 +6,7 @@
 
 import { Fragment, useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import { doAction } from '@wordpress/hooks';
+import { registerWidget } from '../../utils/widgetRegistry';
 import { useApiData } from '../../hooks/useApiData';
 import WidgetHeader from '../../components/WidgetHeader';
 import WhatsNewSkeleton from './WhatsNewSkeleton';
@@ -198,8 +198,8 @@ function WhatsNew( { config = {} } ) {
 	);
 }
 
-// Register widget via hook with metadata
-doAction( 'prpl.dashboard.registerWidget', {
+// Register widget
+registerWidget( {
 	id: 'whats-new',
 	component: WhatsNew,
 	priority: 10,
