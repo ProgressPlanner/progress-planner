@@ -10,32 +10,17 @@
  * @return {JSX.Element} The popover component.
  */
 
-import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
 import PopoverLoadingState from './PopoverLoadingState';
 import { resolveTaskId } from '../../utils/taskIdResolver';
+import { useApiData } from '../../hooks/useApiData';
 
 export default function BadgeStreakPopover( { task, onClose } ) {
-	const [ badgeStats, setBadgeStats ] = useState( null );
-	const [ isLoading, setIsLoading ] = useState( true );
-
-	/**
-	 * Load badge stats from REST API.
-	 */
-	useEffect( () => {
-		apiFetch( { path: '/progress-planner/v1/badge-stats' } )
-			.then( ( response ) => {
-				setBadgeStats( response.badges || {} );
-			} )
-			.catch( () => {
-				setBadgeStats( {} );
-			} )
-			.finally( () => {
-				setIsLoading( false );
-			} );
-	}, [] );
+	const { data: badgeData, isLoading } = useApiData(
+		'/progress-planner/v1/badge-stats'
+	);
+	const badgeStats = badgeData?.badges || ( badgeData ? {} : null );
 
 	/**
 	 * Get badge progress for a category.

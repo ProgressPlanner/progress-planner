@@ -9,9 +9,8 @@
  * @return {JSX.Element} The popover component.
  */
 
-import { useState, useEffect, useMemo, useCallback } from '@wordpress/element';
+import { useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
-import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
 import PopoverLoadingState from './PopoverLoadingState';
 import Badge from '../Badge';
@@ -21,34 +20,15 @@ import {
 	CONTENT_BADGES,
 	MAINTENANCE_BADGES,
 } from '../../config/badges';
+import { useApiData } from '../../hooks/useApiData';
+import { getBrandingId } from '../../config/dashboardConfig';
 
 export default function MonthlyBadgesPopover( { task, onClose } ) {
-	const [ badgeStats, setBadgeStats ] = useState( null );
-	const [ isLoading, setIsLoading ] = useState( true );
-
-	/**
-	 * Load badge stats from REST API.
-	 */
-	useEffect( () => {
-		apiFetch( { path: '/progress-planner/v1/badge-stats' } )
-			.then( ( response ) => {
-				setBadgeStats( response.badges || {} );
-			} )
-			.catch( () => {
-				setBadgeStats( {} );
-			} )
-			.finally( () => {
-				setIsLoading( false );
-			} );
-	}, [] );
-
-	/**
-	 * Get branding ID and remote server URL from config.
-	 */
-	const brandingId =
-		window.prplDashboardConfig?.brandingId ||
-		window.progressPlannerAdmin?.brandingId ||
-		0;
+	const { data: badgeData, isLoading } = useApiData(
+		'/progress-planner/v1/badge-stats'
+	);
+	const badgeStats = badgeData?.badges || ( badgeData ? {} : null );
+	const brandingId = getBrandingId();
 	/**
 	 * Get monthly badges grouped by year.
 	 *
