@@ -1,0 +1,26 @@
+{
+  "$schema": "https://playground.wordpress.net/blueprint-schema.json",
+  "landingPage": "/wp-admin/",
+  "login": true,
+  "steps": [
+    {
+      "step": "defineWpConfigConsts",
+      "consts": {
+        "IS_PLAYGROUND_PREVIEW": true
+      }
+    },
+    {
+      "step": "setSiteOptions",
+      "options": {
+        "progress_planner_test_token": "0220a2de67fc29094281088395939f58",
+        "progress_planner_license_key": "test-license-for-e2e-testing",
+        "progress_planner_demo_data_generated": "1",
+        "prpl_debug": "1"
+      }
+    },
+    {
+      "step": "wp-cli",
+      "command": "wp plugin activate progress-planner"
+    }
+  ]
+}

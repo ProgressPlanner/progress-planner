@@ -1,10 +1,9 @@
-const { test, expect } = require( '@playwright/test' );
-const { makeAuthenticatedRequest } = require( './utils' );
+import { test, expect } from '../fixtures/base.fixture';
 
-test.describe( 'PRPL Dismissable Tasks', () => {
-	test( 'Complete dismissable task if present', async ( {
+test.describe( 'Dismissible Tasks', () => {
+	test( 'should complete dismissible task if present', async ( {
 		page,
-		request,
+		tasksApi,
 	} ) => {
 		// Navigate to Progress Planner dashboard
 		await page.goto( '/wp-admin/admin.php?page=progress-planner' );
@@ -26,11 +25,11 @@ test.describe( 'PRPL Dismissable Tasks', () => {
 
 			// Get the task ID from the button
 			const taskId = await completeButton
-				.locator( 'xpath=ancestor::li[1]' ) // .closest("li"), but playwright doesn't support it
+				.locator( 'xpath=ancestor::li[1]' )
 				.getAttribute( 'data-task-id' );
 
-			// Click the on the parent of the checkbox (label, because it intercepts pointer events)
-			await completeButton.locator( '..' ).click(); // parent(), but playwright doesn't support it
+			// Click on the parent of the checkbox (label, because it intercepts pointer events)
+			await completeButton.locator( '..' ).click();
 
 			// Wait for animation
 			await page.waitForTimeout( 3000 );
@@ -44,19 +43,9 @@ test.describe( 'PRPL Dismissable Tasks', () => {
 			expect( finalCount ).toBe( initialCount - 1 );
 
 			// Check the final task status via REST API
-			const completedResponse = await makeAuthenticatedRequest(
-				page,
-				request,
-				`${ process.env.WORDPRESS_URL }/?rest_route=/progress-planner/v1/tasks`
-			);
-			const completedTasks = await completedResponse.json();
-
-			// Find the completed task
-			const completedTask = completedTasks.find(
-				( task ) => task.post_name === taskId
-			);
-			expect( completedTask ).toBeDefined();
-			expect( completedTask.post_status ).toBe( 'trash' );
+			if ( taskId ) {
+				await tasksApi.expectTaskStatus( taskId, 'trash' );
+			}
 		}
 	} );
 } );

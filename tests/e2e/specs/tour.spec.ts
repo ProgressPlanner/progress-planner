@@ -1,7 +1,7 @@
-const { test, expect } = require( '@playwright/test' );
+import { test, expect } from '@playwright/test';
 
-test.describe( 'PRPL Tour', () => {
-	test( 'Should start the tour when clicking the tour button', async ( {
+test.describe( 'Progress Planner Tour', () => {
+	test( 'should start the tour when clicking the tour button', async ( {
 		page,
 	} ) => {
 		// Navigate to Progress Planner dashboard
@@ -18,7 +18,12 @@ test.describe( 'PRPL Tour', () => {
 
 		// Get the number of steps from the window object
 		const numberOfSteps = await page.evaluate(
-			() => window.progressPlannerTour.steps.length
+			() =>
+				(
+					window as unknown as {
+						progressPlannerTour: { steps: unknown[] };
+					}
+				 ).progressPlannerTour.steps.length
 		);
 
 		for ( let i = 0; i < numberOfSteps - 1; i++ ) {
