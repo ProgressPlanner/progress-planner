@@ -48,11 +48,6 @@ export default function MonthlyBadgesPopover( { task, onClose } ) {
 		window.prplDashboardConfig?.brandingId ||
 		window.progressPlannerAdmin?.brandingId ||
 		0;
-	const remoteServerUrl =
-		window.prplDashboardConfig?.remoteServerUrl ||
-		window.progressPlannerAdmin?.remoteServerUrl ||
-		'https://progressplanner.com';
-
 	/**
 	 * Get monthly badges grouped by year.
 	 *
@@ -163,11 +158,10 @@ export default function MonthlyBadgesPopover( { task, onClose } ) {
 				data-value={ badge.progress }
 			>
 				<Badge
-					id={ badge.id }
-					name={ badge.name || badge.id }
+					badgeId={ badge.id }
+					badgeName={ badge.name || badge.id }
 					isComplete={ isComplete }
 					brandingId={ brandingId }
-					remoteServerUrl={ remoteServerUrl }
 				/>
 				{ badge.name && <p>{ badge.name }</p> }
 			</span>
