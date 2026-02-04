@@ -16,6 +16,9 @@ import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
+import FormErrorMessage from './FormErrorMessage';
+import SubmitButton from './SubmitButton';
+import { getAjaxUrl, getNonce } from '../../config/dashboardConfig';
 
 export default function CustomPopover( {
 	task,
@@ -99,14 +102,8 @@ export default function CustomPopover( {
 
 				if ( taskId === 'rename-uncategorized-category' ) {
 					// Submit category rename via AJAX
-					const ajaxUrl =
-						window.prplDashboardConfig?.ajaxUrl ||
-						window.progressPlanner?.ajaxUrl ||
-						'/wp-admin/admin-ajax.php';
-					const nonce =
-						window.prplDashboardConfig?.nonce ||
-						window.progressPlanner?.nonce ||
-						'';
+					const ajaxUrl = getAjaxUrl();
+					const nonce = getNonce();
 
 					const body = new URLSearchParams( {
 						action: 'prpl_interactive_task_submit_rename-uncategorized-category',
@@ -134,14 +131,8 @@ export default function CustomPopover( {
 					}
 				} else if ( taskId === 'update-term-description' ) {
 					// Submit term description via AJAX
-					const ajaxUrl =
-						window.prplDashboardConfig?.ajaxUrl ||
-						window.progressPlanner?.ajaxUrl ||
-						'/wp-admin/admin-ajax.php';
-					const nonce =
-						window.prplDashboardConfig?.nonce ||
-						window.progressPlanner?.nonce ||
-						'';
+					const ajaxUrl = getAjaxUrl();
+					const nonce = getNonce();
 
 					const body = new URLSearchParams( {
 						action: 'prpl_interactive_task_submit_update-term-description',
@@ -296,31 +287,17 @@ export default function CustomPopover( {
 			<div className="prpl-column">
 				<form onSubmit={ handleSubmit }>
 					{ renderFormInputs() }
-					{ error && (
-						<p className="prpl-note prpl-note-error prpl-interactive-task-error-message">
-							{ error }
-						</p>
-					) }
+					<FormErrorMessage error={ error } />
 					<div className="prpl-steps-nav-wrapper prpl-steps-nav-wrapper-align-left">
-						<button
-							type="submit"
-							className="prpl-button prpl-button-primary"
+						<SubmitButton
+							isLoading={ isLoading }
 							disabled={
-								isLoading ||
-								( taskId === 'rename-uncategorized-category' &&
-									( ! categoryName.trim() ||
-										! categorySlug.trim() ) )
+								taskId === 'rename-uncategorized-category' &&
+								( ! categoryName.trim() ||
+									! categorySlug.trim() )
 							}
-						>
-							{ isLoading ? (
-								<span
-									className="spinner"
-									style={ { visibility: 'visible' } }
-								></span>
-							) : (
-								__( 'Submit', 'progress-planner' )
-							) }
-						</button>
+							label={ __( 'Submit', 'progress-planner' ) }
+						/>
 					</div>
 				</form>
 			</div>

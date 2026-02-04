@@ -3,10 +3,9 @@
  *
  * Handles subscription form for weekly emails.
  *
- * @param {Object}   props          Component props.
- * @param {Object}   props.task     The task object.
- * @param {Function} props.onSubmit Callback when form is submitted.
- * @param {Function} props.onClose  Callback when popover is closed.
+ * @param {Object}   props         Component props.
+ * @param {Object}   props.task    The task object.
+ * @param {Function} props.onClose Callback when popover is closed.
  * @return {JSX.Element} The popover component.
  */
 
@@ -15,9 +14,12 @@ import { __, sprintf } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
+import FormErrorMessage from './FormErrorMessage';
+import SubmitButton from './SubmitButton';
 import { resolveTaskId } from '../../utils/taskIdResolver';
+import { getAjaxUrl, getNonce } from '../../config/dashboardConfig';
 
-export default function SubscribeFormPopover( { task, onSubmit, onClose } ) {
+export default function SubscribeFormPopover( { task, onClose } ) {
 	const [ name, setName ] = useState( '' );
 	const [ email, setEmail ] = useState( '' );
 	const [ isLoading, setIsLoading ] = useState( false );
@@ -82,8 +84,8 @@ export default function SubscribeFormPopover( { task, onSubmit, onClose } ) {
 
 					// Save license key locally via WordPress AJAX and reload page.
 					if ( response.license_key ) {
-						const { ajaxUrl = '', nonce = '' } =
-							window.prplDashboardConfig || {};
+						const ajaxUrl = getAjaxUrl();
+						const nonce = getNonce();
 
 						if ( ajaxUrl && nonce ) {
 							const saveFormData = new FormData();
@@ -124,7 +126,7 @@ export default function SubscribeFormPopover( { task, onSubmit, onClose } ) {
 				setIsLoading( false );
 			}
 		},
-		[ name, email, task, onSubmit ]
+		[ name, email ]
 	);
 
 	const taskTitle = decodeEntities(
@@ -207,28 +209,12 @@ export default function SubscribeFormPopover( { task, onSubmit, onClose } ) {
 								/>
 							</label>
 						</div>
-						{ error && (
-							<p className="prpl-note prpl-note-error prpl-interactive-task-error-message">
-								{ error }
-							</p>
-						) }
-						<button
-							id="submit-license-key"
-							type="submit"
-							className="prpl-button prpl-button-primary"
-							disabled={
-								isLoading || ! name.trim() || ! email.trim()
-							}
-						>
-							{ isLoading ? (
-								<span
-									className="spinner"
-									style={ { visibility: 'visible' } }
-								></span>
-							) : (
-								__( 'Subscribe', 'progress-planner' )
-							) }
-						</button>
+						<FormErrorMessage error={ error } />
+						<SubmitButton
+							isLoading={ isLoading }
+							disabled={ ! name.trim() || ! email.trim() }
+							label={ __( 'Subscribe', 'progress-planner' ) }
+						/>
 					</form>
 				) }
 			</div>
