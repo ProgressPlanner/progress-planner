@@ -104,7 +104,8 @@ class Page {
 			'manage_options',
 			$page_identifier,
 			'__return_empty_string',
-			\progress_planner()->get_ui__branding()->get_admin_menu_icon()
+			\progress_planner()->get_ui__branding()->get_admin_menu_icon(),
+			\progress_planner()->get_ui__branding()->get_admin_submenu_position()
 		);
 
 		\add_submenu_page(
@@ -294,6 +295,15 @@ class Page {
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
 			// Enqueue ugprading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.
 			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
+		}
+
+		$prpl_privacy_policy_accepted = \progress_planner()->is_privacy_policy_accepted();
+		if ( ! $prpl_privacy_policy_accepted ) {
+			// Enqueue welcome styles.
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/welcome' );
+
+			// Enqueue onboarding styles.
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/onboard' );
 		}
 	}
 
