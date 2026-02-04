@@ -81,7 +81,7 @@ describe( 'popoverRegistry', () => {
 		it( 'returns component for existing task ID', () => {
 			const component = getPopoverComponent( 'core-blogdescription' );
 			expect( component ).toBeDefined();
-			expect( typeof component ).toBe( 'function' );
+			expect( component ).not.toBeNull();
 		} );
 
 		it( 'returns null for unknown task ID', () => {

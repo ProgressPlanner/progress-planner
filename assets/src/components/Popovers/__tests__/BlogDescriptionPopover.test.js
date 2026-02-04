@@ -15,6 +15,7 @@ import BlogDescriptionPopover from '../BlogDescriptionPopover';
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 jest.mock( '@wordpress/hooks', () => ( {
 	doAction: jest.fn(),
+	addAction: jest.fn(),
 } ) );
 
 // Mock the usePopoverForms submitSiteSettings
@@ -442,9 +443,7 @@ describe( 'BlogDescriptionPopover', () => {
 			} );
 
 			await waitFor( () => {
-				expect(
-					screen.getByText( /something went wrong/i )
-				).toBeInTheDocument();
+				expect( screen.getByText( 'Failed' ) ).toBeInTheDocument();
 			} );
 		} );
 
@@ -479,9 +478,7 @@ describe( 'BlogDescriptionPopover', () => {
 			} );
 
 			await waitFor( () => {
-				expect(
-					screen.getByText( /something went wrong/i )
-				).toBeInTheDocument();
+				expect( screen.getByText( 'Failed' ) ).toBeInTheDocument();
 			} );
 
 			expect( mockOnSubmit ).not.toHaveBeenCalled();

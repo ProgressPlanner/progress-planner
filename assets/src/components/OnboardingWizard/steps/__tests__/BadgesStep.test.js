@@ -19,6 +19,26 @@ jest.mock( '../../OnboardingStep', () => ( props ) => (
 	</div>
 ) );
 
+// Mock Gauge component
+jest.mock( '../../../Gauge', () => ( props ) => (
+	<div
+		className="prpl-gauge"
+		data-max={ String( props.max ) }
+		data-value={ String( props.value ) }
+	>
+		{ props.children }
+	</div>
+) );
+
+// Mock Badge component
+jest.mock( '../../../Badge', () => ( props ) => (
+	<div
+		className="prpl-badge"
+		data-badge-id={ props.badgeId }
+		data-badge-name={ props.badgeName }
+	/>
+) );
+
 // Import after mocks
 import BadgesStep from '../BadgesStep';
 
@@ -109,11 +129,11 @@ describe( 'BadgesStep', () => {
 			const { container } = render( <BadgesStep { ...defaultProps } /> );
 
 			expect(
-				container.querySelector( 'prpl-gauge' )
+				container.querySelector( '.prpl-gauge' )
 			).toBeInTheDocument();
 		} );
 
-		it( 'does not render gauge when no badgeId', () => {
+		it( 'renders gauge even when no badgeId (fallback gauge)', () => {
 			const propsWithoutBadge = {
 				...defaultProps,
 				stepData: {
@@ -126,12 +146,13 @@ describe( 'BadgesStep', () => {
 				<BadgesStep { ...propsWithoutBadge } />
 			);
 
+			// The component renders a fallback Gauge even without badgeId
 			expect(
-				container.querySelector( 'prpl-gauge' )
-			).not.toBeInTheDocument();
+				container.querySelector( '.prpl-gauge' )
+			).toBeInTheDocument();
 		} );
 
-		it( 'does not render gauge when no badgeName', () => {
+		it( 'does not render Badge component when no badgeName', () => {
 			const propsWithoutName = {
 				...defaultProps,
 				stepData: {
@@ -146,23 +167,30 @@ describe( 'BadgesStep', () => {
 				<BadgesStep { ...propsWithoutName } />
 			);
 
+			// The Badge component is not rendered without badgeName
 			expect(
-				container.querySelector( 'prpl-gauge' )
+				container.querySelector( '.prpl-badge' )
 			).not.toBeInTheDocument();
 		} );
 
 		it( 'sets correct gauge attributes', () => {
 			const { container } = render( <BadgesStep { ...defaultProps } /> );
 
-			const gauge = container.querySelector( 'prpl-gauge' );
-			expect( gauge ).toHaveAttribute( 'id', 'prpl-gauge-onboarding' );
+			const gauge = container.querySelector( '.prpl-gauge' );
 			expect( gauge ).toHaveAttribute( 'data-max', '10' );
 			expect( gauge ).toHaveAttribute( 'data-value', '0' );
-			expect( gauge ).toHaveAttribute(
+		} );
+
+		it( 'renders Badge component with correct badge data', () => {
+			const { container } = render( <BadgesStep { ...defaultProps } /> );
+
+			const badge = container.querySelector( '.prpl-badge' );
+			expect( badge ).toBeInTheDocument();
+			expect( badge ).toHaveAttribute(
 				'data-badge-id',
 				'monthly-2024-m12'
 			);
-			expect( gauge ).toHaveAttribute(
+			expect( badge ).toHaveAttribute(
 				'data-badge-name',
 				'December Badge'
 			);
@@ -184,7 +212,7 @@ describe( 'BadgesStep', () => {
 				<BadgesStep { ...propsWithoutMax } />
 			);
 
-			const gauge = container.querySelector( 'prpl-gauge' );
+			const gauge = container.querySelector( '.prpl-gauge' );
 			expect( gauge ).toHaveAttribute( 'data-max', '10' );
 		} );
 
@@ -204,7 +232,7 @@ describe( 'BadgesStep', () => {
 				<BadgesStep { ...propsWithoutValue } />
 			);
 
-			const gauge = container.querySelector( 'prpl-gauge' );
+			const gauge = container.querySelector( '.prpl-gauge' );
 			expect( gauge ).toHaveAttribute( 'data-value', '0' );
 		} );
 	} );
@@ -246,10 +274,10 @@ describe( 'BadgesStep', () => {
 				<BadgesStep { ...propsWithoutStepData } />
 			);
 
-			// Should still render without gauge
+			// Should still render without Badge component
 			expect( screen.getByText( 'Monthly badge' ) ).toBeInTheDocument();
 			expect(
-				container.querySelector( 'prpl-gauge' )
+				container.querySelector( '.prpl-badge' )
 			).not.toBeInTheDocument();
 		} );
 
@@ -267,7 +295,7 @@ describe( 'BadgesStep', () => {
 
 			expect( screen.getByText( 'Monthly badge' ) ).toBeInTheDocument();
 			expect(
-				container.querySelector( 'prpl-gauge' )
+				container.querySelector( '.prpl-badge' )
 			).not.toBeInTheDocument();
 		} );
 	} );

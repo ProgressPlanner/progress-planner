@@ -8,6 +8,7 @@ import InteractiveTaskPopover from '../InteractiveTaskPopover';
 // Mock WordPress hooks
 jest.mock( '@wordpress/hooks', () => ( {
 	doAction: jest.fn(),
+	addAction: jest.fn(),
 } ) );
 
 describe( 'InteractiveTaskPopover', () => {

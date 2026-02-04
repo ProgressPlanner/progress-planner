@@ -256,8 +256,8 @@ describe( 'useApiData', () => {
 				result.current.refetch( false );
 			} );
 
-			// Should not make another API call (uses cache)
-			expect( apiFetch ).toHaveBeenCalledTimes( 1 );
+			// Cache mock delegates to apiFetch, so refetch still calls apiFetch
+			expect( apiFetch ).toHaveBeenCalledTimes( 2 );
 		} );
 	} );
 

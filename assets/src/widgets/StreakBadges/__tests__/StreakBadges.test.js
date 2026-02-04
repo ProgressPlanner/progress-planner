@@ -19,6 +19,7 @@ jest.mock( '@wordpress/i18n', () => ( {
 
 jest.mock( '@wordpress/hooks', () => ( {
 	doAction: jest.fn(),
+	addAction: jest.fn(),
 } ) );
 
 // Mock child components

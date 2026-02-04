@@ -15,6 +15,7 @@ import {
 
 // Mock @wordpress/hooks
 jest.mock( '@wordpress/hooks', () => ( {
+	addAction: jest.fn(),
 	addFilter: jest.fn(),
 	applyFilters: jest.fn( () => new Map() ),
 } ) );
@@ -22,6 +23,8 @@ jest.mock( '@wordpress/hooks', () => ( {
 // Mock useTasksApi
 jest.mock( '../../hooks/useTasksApi', () => ( {
 	createTaskPost: jest.fn(),
+	createTasksBatch: jest.fn(),
+	fetchDataCollector: jest.fn( () => Promise.resolve( null ) ),
 } ) );
 
 // Mock @wordpress/api-fetch

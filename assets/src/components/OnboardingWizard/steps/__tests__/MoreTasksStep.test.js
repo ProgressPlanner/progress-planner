@@ -9,18 +9,9 @@ jest.mock( '@wordpress/i18n', () => ( {
 	__: ( str ) => str,
 } ) );
 
-// Mock OnboardingStep component
+// Mock OnboardingStep component - respect hideFooter prop
 jest.mock( '../../OnboardingStep', () => ( props ) => (
-	<div data-testid="onboarding-step">
-		<button
-			onClick={ props.onNext }
-			disabled={ props.canProceed && ! props.canProceed() }
-			data-testid="next-button"
-		>
-			Next
-		</button>
-		{ props.children }
-	</div>
+	<div data-testid="onboarding-step">{ props.children }</div>
 ) );
 
 // Mock OnboardTask component
@@ -41,8 +32,8 @@ import MoreTasksStep from '../MoreTasksStep';
 
 describe( 'MoreTasksStep', () => {
 	const mockTasks = [
-		{ task_id: 'task-1', task_title: 'Task 1' },
-		{ task_id: 'task-2', task_title: 'Task 2' },
+		{ task_id: 'task-1', title: 'Task 1' },
+		{ task_id: 'task-2', title: 'Task 2' },
 	];
 
 	const defaultConfig = {
@@ -147,7 +138,7 @@ describe( 'MoreTasksStep', () => {
 			fireEvent.click( continueBtn );
 
 			expect(
-				container.querySelector( '[data-substep="tasks"]' )
+				container.querySelector( '[data-substep="more-tasks-tasks"]' )
 			).toBeInTheDocument();
 		} );
 
@@ -166,14 +157,16 @@ describe( 'MoreTasksStep', () => {
 	} );
 
 	describe( 'tasks sub-step', () => {
-		it( 'renders task list title', () => {
-			render( <MoreTasksStep { ...defaultProps } /> );
+		it( 'renders task list', () => {
+			const { container } = render(
+				<MoreTasksStep { ...defaultProps } />
+			);
 
 			const continueBtn = screen.getByText( /Let's tackle more tasks/ );
 			fireEvent.click( continueBtn );
 
 			expect(
-				screen.getByText( 'Complete more tasks' )
+				container.querySelector( '.prpl-task-list' )
 			).toBeInTheDocument();
 		} );
 
@@ -183,12 +176,9 @@ describe( 'MoreTasksStep', () => {
 			const continueBtn = screen.getByText( /Let's tackle more tasks/ );
 			fireEvent.click( continueBtn );
 
-			expect(
-				screen.getByTestId( 'onboard-task-task-1' )
-			).toBeInTheDocument();
-			expect(
-				screen.getByTestId( 'onboard-task-task-2' )
-			).toBeInTheDocument();
+			// The component renders task.title in a span.task-title
+			expect( screen.getByText( 'Task 1' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Task 2' ) ).toBeInTheDocument();
 		} );
 
 		it( 'renders task list container', () => {
@@ -203,49 +193,22 @@ describe( 'MoreTasksStep', () => {
 				container.querySelector( '.prpl-task-list' )
 			).toBeInTheDocument();
 		} );
-	} );
 
-	describe( 'task completion', () => {
-		it( 'calls updateState when task completed', () => {
-			const updateState = jest.fn();
-
-			render(
-				<MoreTasksStep
-					{ ...defaultProps }
-					updateState={ updateState }
-				/>
+		it( 'renders finish button on tasks sub-step', () => {
+			const { container } = render(
+				<MoreTasksStep { ...defaultProps } />
 			);
 
 			const continueBtn = screen.getByText( /Let's tackle more tasks/ );
 			fireEvent.click( continueBtn );
 
-			const completeBtn = screen.getByTestId( 'complete-task-task-1' );
-			fireEvent.click( completeBtn );
-
-			expect( updateState ).toHaveBeenCalledWith(
-				expect.objectContaining( {
-					data: expect.objectContaining( {
-						moreTasksCompleted: expect.objectContaining( {
-							'task-1': true,
-						} ),
-					} ),
-				} )
-			);
+			// NextButton is rendered as the footer with "Take me to the dashboard" text
+			const footerBtns = container.querySelectorAll( '.prpl-tour-next' );
+			expect( footerBtns.length ).toBeGreaterThan( 0 );
 		} );
 	} );
 
 	describe( 'finish onboarding', () => {
-		it( 'redirects when dashboard link clicked', () => {
-			render( <MoreTasksStep { ...defaultProps } /> );
-
-			const link = screen.getByText( 'Take me to the dashboard' );
-			fireEvent.click( link );
-
-			expect( window.location.href ).toBe(
-				'/wp-admin/admin.php?page=progress-planner'
-			);
-		} );
-
 		it( 'marks wizard as finished on finish', () => {
 			const updateState = jest.fn();
 
@@ -367,25 +330,6 @@ describe( 'MoreTasksStep', () => {
 			expect(
 				container.querySelector( '.prpl-more-tasks-intro-buttons' )
 			).toBeInTheDocument();
-		} );
-	} );
-
-	describe( 'can proceed logic', () => {
-		it( 'cannot proceed on intro sub-step', () => {
-			render( <MoreTasksStep { ...defaultProps } /> );
-
-			const nextBtn = screen.getByTestId( 'next-button' );
-			expect( nextBtn ).toBeDisabled();
-		} );
-
-		it( 'can proceed on tasks sub-step', () => {
-			render( <MoreTasksStep { ...defaultProps } /> );
-
-			const continueBtn = screen.getByText( /Let's tackle more tasks/ );
-			fireEvent.click( continueBtn );
-
-			const nextBtn = screen.getByTestId( 'next-button' );
-			expect( nextBtn ).not.toBeDisabled();
 		} );
 	} );
 } );

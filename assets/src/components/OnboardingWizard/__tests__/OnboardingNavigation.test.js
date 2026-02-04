@@ -2,7 +2,7 @@
  * Tests for OnboardingNavigation Component
  */
 
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import OnboardingNavigation from '../OnboardingNavigation';
 
 describe( 'OnboardingNavigation', () => {
@@ -168,67 +168,26 @@ describe( 'OnboardingNavigation', () => {
 		} );
 	} );
 
-	describe( 'step click handling', () => {
-		it( 'calls onStepClick when step is clicked', () => {
+	describe( 'step rendering', () => {
+		it( 'renders steps as list items (display-only, not clickable)', () => {
 			const { container } = render(
 				<OnboardingNavigation
 					steps={ mockSteps }
 					currentStep={ 0 }
-					onStepClick={ mockOnStepClick }
 					logoHtml=""
 				/>
 			);
 
-			const buttons = container.querySelectorAll(
-				'.prpl-nav-step-button'
-			);
-			fireEvent.click( buttons[ 1 ] );
-
-			expect( mockOnStepClick ).toHaveBeenCalledWith( 1 );
+			// The component renders <li> items, not buttons
+			const items = container.querySelectorAll( '.prpl-nav-step-item' );
+			expect( items ).toHaveLength( 3 );
 		} );
 
-		it( 'calls onStepClick on keyboard Enter', () => {
+		it( 'does not render clickable buttons', () => {
 			const { container } = render(
 				<OnboardingNavigation
 					steps={ mockSteps }
 					currentStep={ 0 }
-					onStepClick={ mockOnStepClick }
-					logoHtml=""
-				/>
-			);
-
-			const buttons = container.querySelectorAll(
-				'.prpl-nav-step-button'
-			);
-			fireEvent.keyDown( buttons[ 2 ], { key: 'Enter' } );
-
-			expect( mockOnStepClick ).toHaveBeenCalledWith( 2 );
-		} );
-
-		it( 'calls onStepClick on keyboard Space', () => {
-			const { container } = render(
-				<OnboardingNavigation
-					steps={ mockSteps }
-					currentStep={ 0 }
-					onStepClick={ mockOnStepClick }
-					logoHtml=""
-				/>
-			);
-
-			const buttons = container.querySelectorAll(
-				'.prpl-nav-step-button'
-			);
-			fireEvent.keyDown( buttons[ 0 ], { key: ' ' } );
-
-			expect( mockOnStepClick ).toHaveBeenCalledWith( 0 );
-		} );
-
-		it( 'renders without buttons when onStepClick is null', () => {
-			const { container } = render(
-				<OnboardingNavigation
-					steps={ mockSteps }
-					currentStep={ 0 }
-					onStepClick={ null }
 					logoHtml=""
 				/>
 			);

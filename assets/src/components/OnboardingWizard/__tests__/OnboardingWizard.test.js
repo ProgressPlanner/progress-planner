@@ -23,6 +23,12 @@ jest.mock( '@wordpress/i18n', () => ( {
 
 jest.mock( '@wordpress/api-fetch', () => jest.fn() );
 
+// Mock task registry and tasks
+jest.mock( '../../../services/taskRegistry', () => ( {
+	evaluateOnboardingTasks: jest.fn().mockResolvedValue( undefined ),
+} ) );
+jest.mock( '../../../tasks', () => {} );
+
 // Mock dashboardStore
 jest.mock( '../../../stores/dashboardStore', () => ( {
 	useDashboardStore: jest.fn( () => false ),

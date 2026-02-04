@@ -11,7 +11,6 @@ describe( 'OnboardingStep', () => {
 	};
 
 	const mockOnNext = jest.fn();
-	const mockOnBack = jest.fn();
 
 	beforeEach( () => {
 		jest.clearAllMocks();
@@ -143,28 +142,11 @@ describe( 'OnboardingStep', () => {
 	} );
 
 	describe( 'back button', () => {
-		it( 'renders back button when onBack is provided', () => {
+		it( 'does not render a back button', () => {
 			render(
 				<OnboardingStep
 					wizardState={ mockWizardState }
 					onNext={ mockOnNext }
-					onBack={ mockOnBack }
-				>
-					<p>Content</p>
-				</OnboardingStep>
-			);
-
-			expect(
-				screen.getByRole( 'button', { name: /back/i } )
-			).toBeInTheDocument();
-		} );
-
-		it( 'does not render back button when onBack is null', () => {
-			render(
-				<OnboardingStep
-					wizardState={ mockWizardState }
-					onNext={ mockOnNext }
-					onBack={ null }
 				>
 					<p>Content</p>
 				</OnboardingStep>
@@ -173,38 +155,6 @@ describe( 'OnboardingStep', () => {
 			expect(
 				screen.queryByRole( 'button', { name: /back/i } )
 			).not.toBeInTheDocument();
-		} );
-
-		it( 'calls onBack when back button clicked', () => {
-			render(
-				<OnboardingStep
-					wizardState={ mockWizardState }
-					onNext={ mockOnNext }
-					onBack={ mockOnBack }
-				>
-					<p>Content</p>
-				</OnboardingStep>
-			);
-
-			const backButton = screen.getByRole( 'button', { name: /back/i } );
-			fireEvent.click( backButton );
-
-			expect( mockOnBack ).toHaveBeenCalled();
-		} );
-
-		it( 'back button has secondary class', () => {
-			const { container } = render(
-				<OnboardingStep
-					wizardState={ mockWizardState }
-					onNext={ mockOnNext }
-					onBack={ mockOnBack }
-				>
-					<p>Content</p>
-				</OnboardingStep>
-			);
-
-			const backButton = container.querySelector( '.prpl-btn-secondary' );
-			expect( backButton ).toBeInTheDocument();
 		} );
 	} );
 
@@ -224,8 +174,8 @@ describe( 'OnboardingStep', () => {
 			expect( nextButton ).not.toBeDisabled();
 		} );
 
-		it( 'disables next button when canProceed returns false', () => {
-			render(
+		it( 'adds disabled class when canProceed returns false', () => {
+			const { container } = render(
 				<OnboardingStep
 					wizardState={ mockWizardState }
 					onNext={ mockOnNext }
@@ -235,8 +185,8 @@ describe( 'OnboardingStep', () => {
 				</OnboardingStep>
 			);
 
-			const nextButton = screen.getByRole( 'button', { name: /next/i } );
-			expect( nextButton ).toBeDisabled();
+			const nextButton = container.querySelector( '.prpl-tour-next' );
+			expect( nextButton ).toHaveClass( 'prpl-btn-disabled' );
 		} );
 
 		it( 'passes wizardState to canProceed', () => {
@@ -346,19 +296,18 @@ describe( 'OnboardingStep', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'has prpl-btn class on buttons', () => {
+		it( 'has prpl-btn class on next button', () => {
 			const { container } = render(
 				<OnboardingStep
 					wizardState={ mockWizardState }
 					onNext={ mockOnNext }
-					onBack={ mockOnBack }
 				>
 					<p>Content</p>
 				</OnboardingStep>
 			);
 
 			const buttons = container.querySelectorAll( '.prpl-btn' );
-			expect( buttons ).toHaveLength( 2 );
+			expect( buttons ).toHaveLength( 1 );
 		} );
 	} );
 

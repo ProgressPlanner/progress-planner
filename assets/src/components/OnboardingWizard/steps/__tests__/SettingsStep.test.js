@@ -71,6 +71,23 @@ describe( 'SettingsStep', () => {
 		stepData: { id: 'onboarding-step-settings' },
 	};
 
+	/**
+	 * Helper: advance one sub-step by checking the "I don't have a page" checkbox
+	 * then clicking Save setting.
+	 */
+	const advanceSubStep = async () => {
+		// Check the "I don't have a ..." checkbox to enable the Save button
+		const checkbox = screen.getByRole( 'checkbox' );
+		fireEvent.click( checkbox );
+
+		const saveBtn = screen.getByRole( 'button', {
+			name: /Save setting/,
+		} );
+		await act( async () => {
+			fireEvent.click( saveBtn );
+		} );
+	};
+
 	beforeEach( () => {
 		jest.clearAllMocks();
 	} );
@@ -101,16 +118,23 @@ describe( 'SettingsStep', () => {
 		} );
 
 		it( 'renders progress indicator', () => {
-			render( <SettingsStep { ...defaultProps } /> );
+			const { container } = render(
+				<SettingsStep { ...defaultProps } />
+			);
 
-			expect( screen.getByText( /1\/6/ ) ).toBeInTheDocument();
+			// SUB_STEPS has 5 items, so progress is "1/5"
+			const progressSpan = container.querySelector(
+				'.prpl-settings-progress'
+			);
+			expect( progressSpan ).toBeInTheDocument();
+			expect( progressSpan ).toHaveTextContent( '1/5' );
 		} );
 
 		it( 'renders save button', () => {
 			render( <SettingsStep { ...defaultProps } /> );
 
 			expect(
-				screen.getByRole( 'button', { name: /Save & Continue/ } )
+				screen.getByRole( 'button', { name: /Save setting/ } )
 			).toBeInTheDocument();
 		} );
 	} );
@@ -165,12 +189,7 @@ describe( 'SettingsStep', () => {
 				<SettingsStep { ...defaultProps } />
 			);
 
-			const saveBtn = screen.getByRole( 'button', {
-				name: /Save & Continue/,
-			} );
-			await act( async () => {
-				fireEvent.click( saveBtn );
-			} );
+			await advanceSubStep();
 
 			expect(
 				container.querySelector( '[data-page="about"]' )
@@ -178,16 +197,16 @@ describe( 'SettingsStep', () => {
 		} );
 
 		it( 'updates progress indicator', async () => {
-			render( <SettingsStep { ...defaultProps } /> );
+			const { container } = render(
+				<SettingsStep { ...defaultProps } />
+			);
 
-			const saveBtn = screen.getByRole( 'button', {
-				name: /Save & Continue/,
-			} );
-			await act( async () => {
-				fireEvent.click( saveBtn );
-			} );
+			await advanceSubStep();
 
-			expect( screen.getByText( /2\/6/ ) ).toBeInTheDocument();
+			const progressSpan = container.querySelector(
+				'.prpl-settings-progress'
+			);
+			expect( progressSpan ).toHaveTextContent( '2/5' );
 		} );
 
 		it( 'advances through all page sub-steps', async () => {
@@ -195,6 +214,7 @@ describe( 'SettingsStep', () => {
 				<SettingsStep { ...defaultProps } />
 			);
 
+			// SUB_STEPS: homepage, about, contact, faq, post-types
 			const pageTypes = [ 'homepage', 'about', 'contact', 'faq' ];
 
 			for ( let index = 0; index < pageTypes.length; index++ ) {
@@ -205,31 +225,21 @@ describe( 'SettingsStep', () => {
 				).toBeInTheDocument();
 
 				if ( index < pageTypes.length - 1 ) {
-					const saveBtn = screen.getByRole( 'button', {
-						name: /Save & Continue/,
-					} );
-					await act( async () => {
-						fireEvent.click( saveBtn );
-					} );
+					await advanceSubStep();
 				}
 			}
 		} );
 	} );
 
 	describe( 'post-types sub-step', () => {
-		it( 'renders post types heading', async () => {
+		it( 'renders post types sub-step', async () => {
 			const { container } = render(
 				<SettingsStep { ...defaultProps } />
 			);
 
-			// Navigate to post-types (5th sub-step)
+			// Navigate through 4 page sub-steps to reach post-types
 			for ( let i = 0; i < 4; i++ ) {
-				const saveBtn = screen.getByRole( 'button', {
-					name: /Save & Continue/,
-				} );
-				await act( async () => {
-					fireEvent.click( saveBtn );
-				} );
+				await advanceSubStep();
 			}
 
 			expect(
@@ -237,79 +247,17 @@ describe( 'SettingsStep', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'renders post type checkboxes', async () => {
+		it( 'renders post type toggle switches', async () => {
 			render( <SettingsStep { ...defaultProps } /> );
 
-			// Navigate to post-types
+			// Navigate through 4 page sub-steps to reach post-types
 			for ( let i = 0; i < 4; i++ ) {
-				const saveBtn = screen.getByRole( 'button', {
-					name: /Save & Continue/,
-				} );
-				await act( async () => {
-					fireEvent.click( saveBtn );
-				} );
+				await advanceSubStep();
 			}
 
-			expect( screen.getByLabelText( 'Posts' ) ).toBeInTheDocument();
-			expect( screen.getByLabelText( 'Pages' ) ).toBeInTheDocument();
-		} );
-	} );
-
-	describe( 'login-destination sub-step', () => {
-		it( 'renders login destination checkbox', async () => {
-			const { container } = render(
-				<SettingsStep { ...defaultProps } />
-			);
-
-			// Navigate to login-destination (6th sub-step)
-			for ( let i = 0; i < 5; i++ ) {
-				const saveBtn = screen.getByRole( 'button', {
-					name: /Save & Continue/,
-				} );
-				await act( async () => {
-					fireEvent.click( saveBtn );
-				} );
-			}
-
-			expect(
-				container.querySelector( '[data-page="login-destination"]' )
-			).toBeInTheDocument();
-		} );
-
-		it( 'renders redirect checkbox', async () => {
-			render( <SettingsStep { ...defaultProps } /> );
-
-			// Navigate to login-destination
-			for ( let i = 0; i < 5; i++ ) {
-				const saveBtn = screen.getByRole( 'button', {
-					name: /Save & Continue/,
-				} );
-				await act( async () => {
-					fireEvent.click( saveBtn );
-				} );
-			}
-
-			expect(
-				screen.getByLabelText( /Redirect to Progress Planner/ )
-			).toBeInTheDocument();
-		} );
-
-		it( 'hides save button on last sub-step', async () => {
-			render( <SettingsStep { ...defaultProps } /> );
-
-			// Navigate to login-destination
-			for ( let i = 0; i < 5; i++ ) {
-				const saveBtn = screen.getByRole( 'button', {
-					name: /Save & Continue/,
-				} );
-				await act( async () => {
-					fireEvent.click( saveBtn );
-				} );
-			}
-
-			expect(
-				screen.queryByRole( 'button', { name: /Save & Continue/ } )
-			).not.toBeInTheDocument();
+			// ToggleSwitch renders labels with post type titles
+			expect( screen.getByText( 'Posts' ) ).toBeInTheDocument();
+			expect( screen.getByText( 'Pages' ) ).toBeInTheDocument();
 		} );
 	} );
 

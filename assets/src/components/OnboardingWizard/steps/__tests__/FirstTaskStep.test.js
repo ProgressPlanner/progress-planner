@@ -24,20 +24,6 @@ jest.mock( '../../../../hooks/useTaskCompletion', () => ( {
 	} ) ),
 } ) );
 
-// Mock OnboardingStep component
-jest.mock( '../../OnboardingStep', () => ( props ) => (
-	<div data-testid="onboarding-step">
-		<button
-			onClick={ props.onNext }
-			disabled={ props.canProceed && ! props.canProceed() }
-			data-testid="next-button"
-		>
-			Next
-		</button>
-		{ props.children }
-	</div>
-) );
-
 // Import after mocks
 import FirstTaskStep from '../FirstTaskStep';
 import { useTaskCompletion } from '../../../../hooks/useTaskCompletion';
@@ -76,23 +62,20 @@ describe( 'FirstTaskStep', () => {
 
 	beforeEach( () => {
 		jest.clearAllMocks();
-		jest.useFakeTimers();
 		useTaskCompletion.mockReturnValue( {
 			completeTask: jest.fn().mockResolvedValue( {} ),
 			isCompleting: false,
 		} );
 	} );
 
-	afterEach( () => {
-		jest.useRealTimers();
-	} );
-
 	describe( 'basic rendering', () => {
 		it( 'renders onboarding step wrapper', () => {
-			render( <FirstTaskStep { ...defaultProps } /> );
+			const { container } = render(
+				<FirstTaskStep { ...defaultProps } />
+			);
 
 			expect(
-				screen.getByTestId( 'onboarding-step' )
+				container.querySelector( '.onboarding-step' )
 			).toBeInTheDocument();
 		} );
 
@@ -130,37 +113,11 @@ describe( 'FirstTaskStep', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'renders task action link', () => {
+		it( 'renders task action button with action label', () => {
 			render( <FirstTaskStep { ...defaultProps } /> );
 
 			expect(
-				screen.getByRole( 'link', { name: 'Complete Task' } )
-			).toBeInTheDocument();
-		} );
-
-		it( 'task link has correct href', () => {
-			render( <FirstTaskStep { ...defaultProps } /> );
-
-			const link = screen.getByRole( 'link', { name: 'Complete Task' } );
-			expect( link ).toHaveAttribute(
-				'href',
-				'https://example.com/first-task'
-			);
-		} );
-
-		it( 'task link opens in new tab', () => {
-			render( <FirstTaskStep { ...defaultProps } /> );
-
-			const link = screen.getByRole( 'link', { name: 'Complete Task' } );
-			expect( link ).toHaveAttribute( 'target', '_blank' );
-			expect( link ).toHaveAttribute( 'rel', 'noopener noreferrer' );
-		} );
-
-		it( 'renders mark as complete button', () => {
-			render( <FirstTaskStep { ...defaultProps } /> );
-
-			expect(
-				screen.getByRole( 'button', { name: 'Mark as complete' } )
+				screen.getByRole( 'button', { name: 'Complete Task' } )
 			).toBeInTheDocument();
 		} );
 
@@ -181,7 +138,7 @@ describe( 'FirstTaskStep', () => {
 			);
 
 			expect(
-				screen.getByRole( 'link', { name: 'Do it' } )
+				screen.getByRole( 'button', { name: 'Mark as complete' } )
 			).toBeInTheDocument();
 		} );
 	} );
@@ -197,7 +154,7 @@ describe( 'FirstTaskStep', () => {
 			render( <FirstTaskStep { ...defaultProps } /> );
 
 			const button = screen.getByRole( 'button', {
-				name: 'Mark as complete',
+				name: 'Complete Task',
 			} );
 			await act( async () => {
 				fireEvent.click( button );
@@ -222,7 +179,7 @@ describe( 'FirstTaskStep', () => {
 			);
 
 			const button = screen.getByRole( 'button', {
-				name: 'Mark as complete',
+				name: 'Complete Task',
 			} );
 			await act( async () => {
 				fireEvent.click( button );
@@ -248,68 +205,50 @@ describe( 'FirstTaskStep', () => {
 			render( <FirstTaskStep { ...defaultProps } onNext={ onNext } /> );
 
 			const button = screen.getByRole( 'button', {
-				name: 'Mark as complete',
+				name: 'Complete Task',
 			} );
 			await act( async () => {
 				fireEvent.click( button );
 			} );
 
-			await act( async () => {
-				jest.advanceTimersByTime( 500 );
-			} );
-
 			expect( onNext ).toHaveBeenCalled();
 		} );
 
-		it( 'shows completing state', () => {
+		it( 'shows completing state while task is being completed', async () => {
+			let resolveComplete;
+			const mockCompleteTask = jest.fn(
+				() =>
+					new Promise( ( resolve ) => {
+						resolveComplete = resolve;
+					} )
+			);
 			useTaskCompletion.mockReturnValue( {
-				completeTask: jest.fn(),
-				isCompleting: true,
+				completeTask: mockCompleteTask,
+				isCompleting: false,
 			} );
 
 			render( <FirstTaskStep { ...defaultProps } /> );
 
+			const button = screen.getByRole( 'button', {
+				name: 'Complete Task',
+			} );
+
+			await act( async () => {
+				fireEvent.click( button );
+			} );
+
+			// Button should now show completing state
 			expect(
 				screen.getByRole( 'button', { name: 'Completing…' } )
 			).toBeInTheDocument();
-		} );
-
-		it( 'disables button while completing', () => {
-			useTaskCompletion.mockReturnValue( {
-				completeTask: jest.fn(),
-				isCompleting: true,
-			} );
-
-			render( <FirstTaskStep { ...defaultProps } /> );
-
 			expect(
 				screen.getByRole( 'button', { name: 'Completing…' } )
 			).toBeDisabled();
-		} );
-	} );
 
-	describe( 'can proceed logic', () => {
-		it( 'cannot proceed when task not completed', () => {
-			render( <FirstTaskStep { ...defaultProps } /> );
-
-			const nextBtn = screen.getByTestId( 'next-button' );
-			expect( nextBtn ).toBeDisabled();
-		} );
-
-		it( 'can proceed when task already completed in state', () => {
-			const propsWithCompleted = {
-				...defaultProps,
-				wizardState: {
-					data: {
-						firstTaskCompleted: true,
-					},
-				},
-			};
-
-			render( <FirstTaskStep { ...propsWithCompleted } /> );
-
-			const nextBtn = screen.getByTestId( 'next-button' );
-			expect( nextBtn ).not.toBeDisabled();
+			// Clean up the pending promise
+			await act( async () => {
+				resolveComplete( {} );
+			} );
 		} );
 	} );
 

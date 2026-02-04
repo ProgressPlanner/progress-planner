@@ -25,18 +25,9 @@ jest.mock( '../../../../hooks/useLicenseGenerator', () => ( {
 	} ) ),
 } ) );
 
-// Mock OnboardingStep component
+// Mock OnboardingStep component - respect hideFooter prop
 jest.mock( '../../OnboardingStep', () => ( props ) => (
-	<div data-testid="onboarding-step">
-		<button
-			onClick={ props.onNext }
-			disabled={ props.canProceed && ! props.canProceed() }
-			data-testid="next-button"
-		>
-			{ props.buttonText }
-		</button>
-		{ props.children }
-	</div>
+	<div data-testid="onboarding-step">{ props.children }</div>
 ) );
 
 // Import after mocks
@@ -112,9 +103,11 @@ describe( 'WelcomeStep', () => {
 		} );
 
 		it( 'renders next button', () => {
-			render( <WelcomeStep { ...defaultProps } /> );
+			const { container } = render( <WelcomeStep { ...defaultProps } /> );
 
-			expect( screen.getByTestId( 'next-button' ) ).toBeInTheDocument();
+			expect(
+				container.querySelector( '.prpl-tour-next' )
+			).toBeInTheDocument();
 		} );
 
 		it( 'renders welcome graphic image', () => {
@@ -135,18 +128,20 @@ describe( 'WelcomeStep', () => {
 		} );
 
 		it( 'can proceed without privacy acceptance when has license', () => {
-			render( <WelcomeStep { ...defaultProps } /> );
+			const { container } = render( <WelcomeStep { ...defaultProps } /> );
 
-			const button = screen.getByTestId( 'next-button' );
-			expect( button ).not.toBeDisabled();
+			const button = container.querySelector( '.prpl-tour-next' );
+			expect( button ).not.toHaveClass( 'prpl-btn-disabled' );
 		} );
 
 		it( 'calls onNext when button clicked with license', async () => {
 			const onNext = jest.fn();
 
-			render( <WelcomeStep { ...defaultProps } onNext={ onNext } /> );
+			const { container } = render(
+				<WelcomeStep { ...defaultProps } onNext={ onNext } />
+			);
 
-			const button = screen.getByTestId( 'next-button' );
+			const button = container.querySelector( '.prpl-tour-next' );
 			await act( async () => {
 				fireEvent.click( button );
 			} );
@@ -179,20 +174,24 @@ describe( 'WelcomeStep', () => {
 		} );
 
 		it( 'cannot proceed without privacy acceptance', () => {
-			render( <WelcomeStep { ...propsWithoutLicense } /> );
+			const { container } = render(
+				<WelcomeStep { ...propsWithoutLicense } />
+			);
 
-			const button = screen.getByTestId( 'next-button' );
-			expect( button ).toBeDisabled();
+			const button = container.querySelector( '.prpl-tour-next' );
+			expect( button ).toHaveClass( 'prpl-btn-disabled' );
 		} );
 
 		it( 'can proceed after accepting privacy', () => {
-			render( <WelcomeStep { ...propsWithoutLicense } /> );
+			const { container } = render(
+				<WelcomeStep { ...propsWithoutLicense } />
+			);
 
 			const checkbox = screen.getByRole( 'checkbox' );
 			fireEvent.click( checkbox );
 
-			const button = screen.getByTestId( 'next-button' );
-			expect( button ).not.toBeDisabled();
+			const button = container.querySelector( '.prpl-tour-next' );
+			expect( button ).not.toHaveClass( 'prpl-btn-disabled' );
 		} );
 
 		it( 'updates wizard state when privacy accepted', () => {
@@ -257,14 +256,11 @@ describe( 'WelcomeStep', () => {
 				isGenerating: false,
 			} );
 
-			// Mock window.location.reload
-			const originalReload = window.location.reload;
-			delete window.location;
-			window.location = { reload: jest.fn() };
+			const { container } = render(
+				<WelcomeStep { ...propsWithoutLicense } />
+			);
 
-			render( <WelcomeStep { ...propsWithoutLicense } /> );
-
-			const button = screen.getByTestId( 'next-button' );
+			const button = container.querySelector( '.prpl-tour-next' );
 			await act( async () => {
 				fireEvent.click( button );
 			} );
@@ -272,9 +268,6 @@ describe( 'WelcomeStep', () => {
 			expect( mockGenerateLicense ).toHaveBeenCalledWith( {
 				'with-email': 'no',
 			} );
-
-			// Restore
-			window.location.reload = originalReload;
 		} );
 
 		it( 'shows spinner when generating license', () => {
