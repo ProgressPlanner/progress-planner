@@ -27,7 +27,10 @@ export default function MonthlyBadgesPopover( { task, onClose } ) {
 	const { data: badgeData, isLoading } = useApiData(
 		'/progress-planner/v1/badge-stats'
 	);
-	const badgeStats = badgeData?.badges || ( badgeData ? {} : null );
+	const badgeStats = useMemo(
+		() => badgeData?.badges || ( badgeData ? {} : null ),
+		[ badgeData ]
+	);
 	const brandingId = getBrandingId();
 	/**
 	 * Get monthly badges grouped by year.
