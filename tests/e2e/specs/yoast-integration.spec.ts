@@ -1,6 +1,3 @@
-/**
- * External dependencies
- */
 import { test, expect } from '@playwright/test';
 
 test.describe( 'Yoast Focus Element', () => {
@@ -11,7 +8,15 @@ test.describe( 'Yoast Focus Element', () => {
 			'/wp-admin/admin.php?page=wpseo_page_settings#/crawl-optimization'
 		);
 
-		// If there is an modal with overlay (which prevents clicks), close it.
+		// Skip if Yoast settings page doesn't load (not installed or wrong version)
+		if (
+			await page.locator( 'text=Sorry, you are not allowed' ).isVisible()
+		) {
+			test.skip();
+			return;
+		}
+
+		// If there is a modal with overlay (which prevents clicks), close it.
 		const closeButton = page.locator( 'button.yst-modal__close-button' );
 		if ( await closeButton.isVisible() ) {
 			await closeButton.click();
@@ -65,6 +70,14 @@ test.describe( 'Yoast Focus Element', () => {
 		await page.goto(
 			'/wp-admin/admin.php?page=wpseo_page_settings#/site-representation'
 		);
+
+		// Skip if Yoast settings page doesn't load
+		if (
+			await page.locator( 'text=Sorry, you are not allowed' ).isVisible()
+		) {
+			test.skip();
+			return;
+		}
 
 		// Wait for the company logo label to be visible
 		await page.waitForSelector(
