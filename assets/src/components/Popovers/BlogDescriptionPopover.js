@@ -10,71 +10,45 @@
  * @return {JSX.Element} The popover component.
  */
 
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
+import FormErrorMessage from './FormErrorMessage';
+import SubmitButton from './SubmitButton';
+import { usePopoverSubmit } from '../../hooks/usePopoverSubmit';
+import { useWpSettings } from '../../hooks/useWpSettings';
 import { submitSiteSettings } from '../../hooks/usePopoverForms';
 
 export default function BlogDescriptionPopover( { task, onSubmit, onClose } ) {
 	const [ value, setValue ] = useState( '' );
-	const [ isLoading, setIsLoading ] = useState( false );
-	const [ error, setError ] = useState( null );
+	const { settings } = useWpSettings( [ 'description' ] );
 
-	/**
-	 * Load current blog description on mount.
-	 */
+	// Seed local state from fetched settings.
 	useEffect( () => {
-		apiFetch( { path: '/wp/v2/settings' } )
-			.then( ( settings ) => {
-				setValue( settings.description || '' );
-			} )
-			.catch( () => {
-				// Ignore errors, use empty string
-			} );
-	}, [] );
+		if ( settings.description ) {
+			setValue( settings.description );
+		}
+	}, [ settings.description ] );
 
-	/**
-	 * Handle form submission.
-	 */
-	const handleSubmit = useCallback(
-		async ( e ) => {
-			e.preventDefault();
+	const { isLoading, error, handleSubmit } = usePopoverSubmit( async () => {
+		if ( ! value.trim() ) {
+			return;
+		}
 
-			if ( ! value.trim() ) {
-				return;
-			}
+		const popoverId = `prpl-popover-${ task.slug || task.id }`;
+		await submitSiteSettings( {
+			settingAPIKey: 'description',
+			setting: 'blogdescription',
+			popoverId,
+			settingCallbackValue: () => value.trim(),
+			value: value.trim(),
+		} );
 
-			setIsLoading( true );
-			setError( null );
-
-			try {
-				const popoverId = `prpl-popover-${ task.slug || task.id }`;
-				await submitSiteSettings( {
-					settingAPIKey: 'description',
-					setting: 'blogdescription',
-					popoverId,
-					settingCallbackValue: () => value.trim(),
-					value: value.trim(),
-				} );
-
-				if ( onSubmit ) {
-					await onSubmit( task.id, task );
-				}
-			} catch ( err ) {
-				setError(
-					__(
-						'Something went wrong. Please try again.',
-						'progress-planner'
-					)
-				);
-			} finally {
-				setIsLoading( false );
-			}
-		},
-		[ value, task, onSubmit ]
-	);
+		if ( onSubmit ) {
+			await onSubmit( task.id, task );
+		}
+	}, [ value, task, onSubmit ] );
 
 	const taskTitle = decodeEntities( task.title?.rendered || task.title );
 	const taskDescription =
@@ -116,26 +90,13 @@ export default function BlogDescriptionPopover( { task, onSubmit, onClose } ) {
 							disabled={ isLoading }
 						/>
 					</label>
-					{ error && (
-						<p className="prpl-note prpl-note-error prpl-interactive-task-error-message">
-							{ error }
-						</p>
-					) }
+					<FormErrorMessage error={ error } />
 					<div className="prpl-steps-nav-wrapper">
-						<button
-							type="submit"
-							className="prpl-button prpl-button-primary"
-							disabled={ isLoading || ! value.trim() }
-						>
-							{ isLoading ? (
-								<span
-									className="spinner"
-									style={ { visibility: 'visible' } }
-								></span>
-							) : (
-								__( 'Save', 'progress-planner' )
-							) }
-						</button>
+						<SubmitButton
+							isLoading={ isLoading }
+							disabled={ ! value.trim() }
+							label={ __( 'Save', 'progress-planner' ) }
+						/>
 					</div>
 				</form>
 			</div>

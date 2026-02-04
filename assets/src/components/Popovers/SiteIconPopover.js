@@ -15,12 +15,13 @@ import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
 import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
+import FormErrorMessage from './FormErrorMessage';
+import SubmitButton from './SubmitButton';
+import { usePopoverSubmit } from '../../hooks/usePopoverSubmit';
 
 export default function SiteIconPopover( { task, onSubmit, onClose } ) {
 	const [ iconId, setIconId ] = useState( null );
 	const [ iconUrl, setIconUrl ] = useState( '' );
-	const [ isLoading, setIsLoading ] = useState( false );
-	const [ error, setError ] = useState( null );
 
 	/**
 	 * Handle media uploader.
@@ -53,43 +54,21 @@ export default function SiteIconPopover( { task, onSubmit, onClose } ) {
 		uploader.open();
 	}, [] );
 
-	/**
-	 * Handle form submission.
-	 */
-	const handleSubmit = useCallback(
-		async ( e ) => {
-			e.preventDefault();
+	const { isLoading, error, handleSubmit } = usePopoverSubmit( async () => {
+		if ( ! iconId ) {
+			return;
+		}
 
-			if ( ! iconId ) {
-				return;
-			}
+		await apiFetch( {
+			path: '/wp/v2/settings',
+			method: 'POST',
+			data: { site_icon: parseInt( iconId ) },
+		} );
 
-			setIsLoading( true );
-			setError( null );
-
-			try {
-				await apiFetch( {
-					path: '/wp/v2/settings',
-					method: 'POST',
-					data: { site_icon: parseInt( iconId ) },
-				} );
-
-				if ( onSubmit ) {
-					await onSubmit( task.id, task );
-				}
-			} catch ( err ) {
-				setError(
-					__(
-						'Something went wrong. Please try again.',
-						'progress-planner'
-					)
-				);
-			} finally {
-				setIsLoading( false );
-			}
-		},
-		[ iconId, task, onSubmit ]
-	);
+		if ( onSubmit ) {
+			await onSubmit( task.id, task );
+		}
+	}, [ iconId, task, onSubmit ] );
 
 	const taskTitle = decodeEntities( task.title?.rendered || task.title );
 
@@ -129,26 +108,13 @@ export default function SiteIconPopover( { task, onSubmit, onClose } ) {
 						name="site_icon"
 						value={ iconId || '' }
 					/>
-					{ error && (
-						<p className="prpl-note prpl-note-error prpl-interactive-task-error-message">
-							{ error }
-						</p>
-					) }
+					<FormErrorMessage error={ error } />
 					<div className="prpl-steps-nav-wrapper">
-						<button
-							type="submit"
-							className="prpl-button prpl-button-primary"
-							disabled={ isLoading || ! iconId }
-						>
-							{ isLoading ? (
-								<span
-									className="spinner"
-									style={ { visibility: 'visible' } }
-								></span>
-							) : (
-								__( 'Save', 'progress-planner' )
-							) }
-						</button>
+						<SubmitButton
+							isLoading={ isLoading }
+							disabled={ ! iconId }
+							label={ __( 'Save', 'progress-planner' ) }
+						/>
 					</div>
 				</form>
 			</div>

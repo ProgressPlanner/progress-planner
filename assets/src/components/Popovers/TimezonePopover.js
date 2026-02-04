@@ -10,90 +10,49 @@
  * @return {JSX.Element} The popover component.
  */
 
-import { useState, useEffect, useCallback } from '@wordpress/element';
+import { useState, useEffect } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
+import FormErrorMessage from './FormErrorMessage';
+import SubmitButton from './SubmitButton';
+import { usePopoverSubmit } from '../../hooks/usePopoverSubmit';
+import { useWpSettings } from '../../hooks/useWpSettings';
+import { useApiData } from '../../hooks/useApiData';
 import { submitSiteSettings } from '../../hooks/usePopoverForms';
 
 export default function TimezonePopover( { task, onSubmit, onClose } ) {
 	const [ value, setValue ] = useState( '' );
-	const [ timezoneOptions, setTimezoneOptions ] = useState( [] );
-	const [ isLoading, setIsLoading ] = useState( false );
-	const [ isFetchingOptions, setIsFetchingOptions ] = useState( true );
-	const [ error, setError ] = useState( null );
-
-	/**
-	 * Load current timezone and options on mount.
-	 */
-	useEffect( () => {
-		// Fetch current settings
-		apiFetch( { path: '/wp/v2/settings' } )
-			.then( ( settings ) => {
-				const tzstring = settings.timezone_string || '';
-				setValue( tzstring );
-			} )
-			.catch( () => {
-				// Ignore errors
-			} );
-
-		// Fetch timezone options via REST API
-		apiFetch( { path: '/progress-planner/v1/timezone-options' } )
-			.then( ( options ) => {
-				if ( Array.isArray( options ) ) {
-					setTimezoneOptions( options );
-				}
-			} )
-			.catch( () => {
-				// On error, set empty array (will show empty select)
-				setTimezoneOptions( [] );
-			} )
-			.finally( () => {
-				setIsFetchingOptions( false );
-			} );
-	}, [] );
-
-	/**
-	 * Handle form submission.
-	 */
-	const handleSubmit = useCallback(
-		async ( e ) => {
-			e.preventDefault();
-
-			if ( ! value ) {
-				return;
-			}
-
-			setIsLoading( true );
-			setError( null );
-
-			try {
-				const popoverId = `prpl-popover-${ task.slug || task.id }`;
-				await submitSiteSettings( {
-					settingAPIKey: 'timezone_string',
-					setting: 'timezone_string',
-					popoverId,
-					settingCallbackValue: () => value,
-					value,
-				} );
-
-				if ( onSubmit ) {
-					await onSubmit( task.id, task );
-				}
-			} catch ( err ) {
-				setError(
-					__(
-						'Something went wrong. Please try again.',
-						'progress-planner'
-					)
-				);
-			} finally {
-				setIsLoading( false );
-			}
-		},
-		[ value, task, onSubmit ]
+	const { settings } = useWpSettings( [ 'timezone_string' ] );
+	const { data: timezoneOptions, isLoading: isFetchingOptions } = useApiData(
+		'/progress-planner/v1/timezone-options'
 	);
+
+	// Seed local state from fetched settings.
+	useEffect( () => {
+		if ( settings.timezone_string ) {
+			setValue( settings.timezone_string );
+		}
+	}, [ settings.timezone_string ] );
+
+	const { isLoading, error, handleSubmit } = usePopoverSubmit( async () => {
+		if ( ! value ) {
+			return;
+		}
+
+		const popoverId = `prpl-popover-${ task.slug || task.id }`;
+		await submitSiteSettings( {
+			settingAPIKey: 'timezone_string',
+			setting: 'timezone_string',
+			popoverId,
+			settingCallbackValue: () => value,
+			value,
+		} );
+
+		if ( onSubmit ) {
+			await onSubmit( task.id, task );
+		}
+	}, [ value, task, onSubmit ] );
 
 	const taskTitle = decodeEntities( task.title?.rendered || task.title );
 
@@ -128,7 +87,10 @@ export default function TimezonePopover( { task, onSubmit, onClose } ) {
 									{ __( 'Loading…', 'progress-planner' ) }
 								</option>
 							) : (
-								timezoneOptions.map( ( option ) => (
+								( Array.isArray( timezoneOptions )
+									? timezoneOptions
+									: []
+								).map( ( option ) => (
 									<option
 										key={ option.value }
 										value={ option.value }
@@ -139,28 +101,16 @@ export default function TimezonePopover( { task, onSubmit, onClose } ) {
 							) }
 						</select>
 					</label>
-					{ error && (
-						<p className="prpl-note prpl-note-error prpl-interactive-task-error-message">
-							{ error }
-						</p>
-					) }
+					<FormErrorMessage error={ error } />
 					<div className="prpl-steps-nav-wrapper prpl-steps-nav-wrapper-align-left">
-						<button
-							type="submit"
-							className="prpl-button prpl-button-primary"
-							disabled={
-								isLoading || ! value || isFetchingOptions
-							}
-						>
-							{ isLoading ? (
-								<span
-									className="spinner"
-									style={ { visibility: 'visible' } }
-								></span>
-							) : (
-								__( 'Set site timezone', 'progress-planner' )
+						<SubmitButton
+							isLoading={ isLoading }
+							disabled={ ! value || isFetchingOptions }
+							label={ __(
+								'Set site timezone',
+								'progress-planner'
 							) }
-						</button>
+						/>
 					</div>
 				</form>
 			</div>
