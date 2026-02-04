@@ -7,7 +7,6 @@
  * @param {Object}   props.task     The task object.
  * @param {Function} props.onSubmit Callback when form is submitted.
  * @param {Function} props.onClose  Callback when popover is closed.
- * @param {Object}   props.config   Widget configuration.
  * @return {JSX.Element} The popover component.
  */
 

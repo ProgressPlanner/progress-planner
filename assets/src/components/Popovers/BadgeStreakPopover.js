@@ -3,10 +3,9 @@
  *
  * Displays badge streak information with progress bars.
  *
- * @param {Object}   props          Component props.
- * @param {Object}   props.task     The task object.
- * @param {Function} props.onSubmit Callback when form is submitted.
- * @param {Function} props.onClose  Callback when popover is closed.
+ * @param {Object}   props         Component props.
+ * @param {Object}   props.task    The task object.
+ * @param {Function} props.onClose Callback when popover is closed.
  * @return {JSX.Element} The popover component.
  */
 
