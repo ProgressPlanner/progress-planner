@@ -38,7 +38,6 @@ class Deprecations {
 		'Progress_Planner\Data_Collector\Sample_Page'      => [ 'Progress_Planner\Suggested_Tasks\Data_Collector\Sample_Page', '1.1.1' ],
 		'Progress_Planner\Data_Collector\Uncategorized_Category' => [ 'Progress_Planner\Suggested_Tasks\Data_Collector\Uncategorized_Category', '1.1.1' ],
 		'Progress_Planner\Chart'                           => [ 'Progress_Planner\UI\Chart', '1.1.1' ],
-		'Progress_Planner\Popover'                         => [ 'Progress_Planner\UI\Popover', '1.1.1' ],
 		'Progress_Planner\Debug_Tools'                     => [ 'Progress_Planner\Utils\Debug_Tools', '1.1.1' ],
 		'Progress_Planner\Onboard'                         => [ 'Progress_Planner\Utils\Onboard', '1.1.1' ],
 		'Progress_Planner\Playground'                      => [ 'Progress_Planner\Utils\Playground', '1.1.1' ],
@@ -60,7 +59,5 @@ class Deprecations {
 		'get_debug_tools'                            => [ 'get_utils__debug_tools', '1.1.1' ],
 		'get_playground'                             => [ 'get_utils__playground', '1.1.1' ],
 		'get_chart'                                  => [ 'get_ui__chart', '1.1.1' ],
-		'get_popover'                                => [ 'get_ui__popover', '1.1.1' ],
-
 	];
 }
