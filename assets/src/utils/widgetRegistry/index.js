@@ -26,7 +26,7 @@ const widgetRegistry = [];
  * @param {string}   widgetData.title           - Widget title (default: '').
  * @param {string}   widgetData.infoIconSvg     - Info icon SVG content (default: '').
  */
-function registerWidget( widgetData ) {
+export function registerWidget( widgetData ) {
 	const {
 		id,
 		component,
