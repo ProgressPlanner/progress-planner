@@ -14,47 +14,37 @@
 import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
+import FormErrorMessage from './FormErrorMessage';
+import SubmitButton from './SubmitButton';
+import { usePopoverSubmit } from '../../hooks/usePopoverSubmit';
+import { useWpSettings } from '../../hooks/useWpSettings';
+import { getAjaxUrl, getNonce } from '../../config/dashboardConfig';
 import { submitSiteSettings } from '../../hooks/usePopoverForms';
 
-export default function DateFormatPopover( {
-	task,
-	onSubmit,
-	onClose,
-	config = {},
-} ) {
+export default function DateFormatPopover( { task, onSubmit, onClose } ) {
 	const [ selectedFormat, setSelectedFormat ] = useState( '' );
 	const [ customFormat, setCustomFormat ] = useState( '' );
 	const [ preview, setPreview ] = useState( '' );
 	const [ dateFormats, setDateFormats ] = useState( [] );
-	const [ isLoading, setIsLoading ] = useState( false );
 	const [ isFetchingFormats, setIsFetchingFormats ] = useState( true );
-	const [ error, setError ] = useState( null );
 	const debounceTimeoutRef = useRef( null );
+	const { settings } = useWpSettings( [ 'date_format' ] );
 
-	/**
-	 * Load current date format and available formats on mount.
-	 */
+	// Seed local state from fetched settings.
 	useEffect( () => {
-		// Fetch current settings
-		apiFetch( { path: '/wp/v2/settings' } )
-			.then( ( settings ) => {
-				const currentFormat = settings.date_format || 'F j, Y';
-				setSelectedFormat( currentFormat );
-				setCustomFormat( currentFormat );
-				updatePreview( currentFormat );
-			} )
-			.catch( () => {
-				// Ignore errors
-			} );
+		if ( settings.date_format ) {
+			const currentFormat = settings.date_format;
+			setSelectedFormat( currentFormat );
+			setCustomFormat( currentFormat );
+			updatePreview( currentFormat );
+		}
+	}, [ settings.date_format, updatePreview ] );
 
-		// Fetch date formats via AJAX
-		const ajaxUrl =
-			config?.ajaxUrl ||
-			window.progressPlanner?.ajaxUrl ||
-			'/wp-admin/admin-ajax.php';
-		const nonce = config?.nonce || window.progressPlanner?.nonce || '';
+	// Fetch date formats via AJAX on mount.
+	useEffect( () => {
+		const ajaxUrl = getAjaxUrl();
+		const nonce = getNonce();
 
 		fetch(
 			`${ ajaxUrl }?action=prpl_get_date_formats&_ajax_nonce=${ nonce }`,
@@ -88,45 +78,38 @@ export default function DateFormatPopover( {
 			.finally( () => {
 				setIsFetchingFormats( false );
 			} );
-	}, [ config, updatePreview ] );
+	}, [] );
 
 	/**
 	 * Update preview via AJAX.
 	 */
-	const updatePreview = useCallback(
-		( format ) => {
-			if ( ! format ) {
-				return;
-			}
+	const updatePreview = useCallback( ( format ) => {
+		if ( ! format ) {
+			return;
+		}
 
-			clearTimeout( debounceTimeoutRef.current );
+		clearTimeout( debounceTimeoutRef.current );
 
-			debounceTimeoutRef.current = setTimeout( async () => {
-				const ajaxUrl =
-					config?.ajaxUrl ||
-					window.progressPlanner?.ajaxUrl ||
-					'/wp-admin/admin-ajax.php';
-				const nonce =
-					config?.nonce || window.progressPlanner?.nonce || '';
+		debounceTimeoutRef.current = setTimeout( async () => {
+			const ajaxUrl = getAjaxUrl();
+			const nonce = getNonce();
 
-				try {
-					const response = await fetch(
-						`${ ajaxUrl }?action=prpl_date_format_preview&format=${ encodeURIComponent(
-							format
-						) }&_ajax_nonce=${ nonce }`,
-						{ credentials: 'same-origin' }
-					);
-					const data = await response.json();
-					if ( data.success && data.data ) {
-						setPreview( data.data );
-					}
-				} catch {
-					// Preview update failed, ignore
+			try {
+				const response = await fetch(
+					`${ ajaxUrl }?action=prpl_date_format_preview&format=${ encodeURIComponent(
+						format
+					) }&_ajax_nonce=${ nonce }`,
+					{ credentials: 'same-origin' }
+				);
+				const data = await response.json();
+				if ( data.success && data.data ) {
+					setPreview( data.data );
 				}
-			}, 300 );
-		},
-		[ config ]
-	);
+			} catch {
+				// Preview update failed, ignore
+			}
+		}, 300 );
+	}, [] );
 
 	/**
 	 * Handle radio button change.
@@ -157,49 +140,27 @@ export default function DateFormatPopover( {
 		[ selectedFormat, updatePreview ]
 	);
 
-	/**
-	 * Handle form submission.
-	 */
-	const handleSubmit = useCallback(
-		async ( e ) => {
-			e.preventDefault();
+	const { isLoading, error, handleSubmit } = usePopoverSubmit( async () => {
+		const formatToSubmit =
+			selectedFormat === 'custom' ? customFormat : selectedFormat;
 
-			const formatToSubmit =
-				selectedFormat === 'custom' ? customFormat : selectedFormat;
+		if ( ! formatToSubmit ) {
+			return;
+		}
 
-			if ( ! formatToSubmit ) {
-				return;
-			}
+		const popoverId = `prpl-popover-${ task.slug || task.id }`;
+		await submitSiteSettings( {
+			settingAPIKey: 'date_format',
+			setting: 'date_format',
+			popoverId,
+			settingCallbackValue: () => formatToSubmit,
+			value: formatToSubmit,
+		} );
 
-			setIsLoading( true );
-			setError( null );
-
-			try {
-				const popoverId = `prpl-popover-${ task.slug || task.id }`;
-				await submitSiteSettings( {
-					settingAPIKey: 'date_format',
-					setting: 'date_format',
-					popoverId,
-					settingCallbackValue: () => formatToSubmit,
-					value: formatToSubmit,
-				} );
-
-				if ( onSubmit ) {
-					await onSubmit( task.id, task );
-				}
-			} catch ( err ) {
-				setError(
-					__(
-						'Something went wrong. Please try again.',
-						'progress-planner'
-					)
-				);
-			} finally {
-				setIsLoading( false );
-			}
-		},
-		[ selectedFormat, customFormat, task, onSubmit ]
-	);
+		if ( onSubmit ) {
+			await onSubmit( task.id, task );
+		}
+	}, [ selectedFormat, customFormat, task, onSubmit ] );
 
 	/**
 	 * Cleanup debounce timeout.
@@ -387,26 +348,16 @@ export default function DateFormatPopover( {
 							) }
 						</fieldset>
 					</div>
-					{ error && (
-						<p className="prpl-note prpl-note-error prpl-interactive-task-error-message">
-							{ error }
-						</p>
-					) }
+					<FormErrorMessage error={ error } />
 					<div className="prpl-steps-nav-wrapper prpl-steps-nav-wrapper-align-left">
-						<button
-							type="submit"
-							className="prpl-button prpl-button-primary"
-							disabled={ isLoading || ! selectedFormat }
-						>
-							{ isLoading ? (
-								<span
-									className="spinner"
-									style={ { visibility: 'visible' } }
-								></span>
-							) : (
-								__( 'Set date format', 'progress-planner' )
+						<SubmitButton
+							isLoading={ isLoading }
+							disabled={ ! selectedFormat }
+							label={ __(
+								'Set date format',
+								'progress-planner'
 							) }
-						</button>
+						/>
 					</div>
 				</form>
 			</div>

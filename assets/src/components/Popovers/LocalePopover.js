@@ -10,38 +10,34 @@
  * @return {JSX.Element} The popover component.
  */
 
-import { useState, useEffect, useCallback, useRef } from '@wordpress/element';
+import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
+import FormErrorMessage from './FormErrorMessage';
+import SubmitButton from './SubmitButton';
+import { usePopoverSubmit } from '../../hooks/usePopoverSubmit';
+import { useWpSettings } from '../../hooks/useWpSettings';
+import { getAjaxUrl, getNonce } from '../../config/dashboardConfig';
 import { submitSiteSettings } from '../../hooks/usePopoverForms';
 
 export default function LocalePopover( { task, onSubmit, onClose } ) {
 	const [ value, setValue ] = useState( '' );
 	const localeSelectRef = useRef( null );
-	const [ isLoading, setIsLoading ] = useState( false );
 	const [ isFetchingOptions, setIsFetchingOptions ] = useState( true );
-	const [ error, setError ] = useState( null );
+	const { settings } = useWpSettings( [ 'WPLANG' ] );
 
-	/**
-	 * Load current locale and options on mount.
-	 */
+	// Seed local state from fetched settings.
 	useEffect( () => {
-		// Fetch current settings
-		apiFetch( { path: '/wp/v2/settings' } )
-			.then( ( settings ) => {
-				const locale = settings.WPLANG || '';
-				setValue( locale );
-			} )
-			.catch( () => {
-				// Ignore errors
-			} );
+		if ( settings.WPLANG !== undefined ) {
+			setValue( settings.WPLANG );
+		}
+	}, [ settings.WPLANG ] );
 
-		// Fetch locale options HTML via AJAX
-		const ajaxUrl =
-			window.progressPlanner?.ajaxUrl || '/wp-admin/admin-ajax.php';
-		const nonce = window.progressPlanner?.nonce || '';
+	// Fetch locale options HTML via AJAX.
+	useEffect( () => {
+		const ajaxUrl = getAjaxUrl();
+		const nonce = getNonce();
 
 		fetch(
 			`${ ajaxUrl }?action=prpl_get_locale_options&_ajax_nonce=${ nonce }`,
@@ -71,46 +67,24 @@ export default function LocalePopover( { task, onSubmit, onClose } ) {
 			} );
 	}, [ value ] );
 
-	/**
-	 * Handle form submission.
-	 */
-	const handleSubmit = useCallback(
-		async ( e ) => {
-			e.preventDefault();
+	const { isLoading, error, handleSubmit } = usePopoverSubmit( async () => {
+		if ( ! value ) {
+			return;
+		}
 
-			if ( ! value ) {
-				return;
-			}
+		const popoverId = `prpl-popover-${ task.slug || task.id }`;
+		await submitSiteSettings( {
+			settingAPIKey: 'WPLANG',
+			setting: 'WPLANG',
+			popoverId,
+			settingCallbackValue: () => value,
+			value,
+		} );
 
-			setIsLoading( true );
-			setError( null );
-
-			try {
-				const popoverId = `prpl-popover-${ task.slug || task.id }`;
-				await submitSiteSettings( {
-					settingAPIKey: 'WPLANG',
-					setting: 'WPLANG',
-					popoverId,
-					settingCallbackValue: () => value,
-					value,
-				} );
-
-				if ( onSubmit ) {
-					await onSubmit( task.id, task );
-				}
-			} catch ( err ) {
-				setError(
-					__(
-						'Something went wrong. Please try again.',
-						'progress-planner'
-					)
-				);
-			} finally {
-				setIsLoading( false );
-			}
-		},
-		[ value, task, onSubmit ]
-	);
+		if ( onSubmit ) {
+			await onSubmit( task.id, task );
+		}
+	}, [ value, task, onSubmit ] );
 
 	const taskTitle = decodeEntities( task.title?.rendered || task.title );
 
@@ -148,28 +122,13 @@ export default function LocalePopover( { task, onSubmit, onClose } ) {
 							) }
 						</select>
 					</label>
-					{ error && (
-						<p className="prpl-note prpl-note-error prpl-interactive-task-error-message">
-							{ error }
-						</p>
-					) }
+					<FormErrorMessage error={ error } />
 					<div className="prpl-steps-nav-wrapper prpl-steps-nav-wrapper-align-left">
-						<button
-							type="submit"
-							className="prpl-button prpl-button-primary"
-							disabled={
-								isLoading || ! value || isFetchingOptions
-							}
-						>
-							{ isLoading ? (
-								<span
-									className="spinner"
-									style={ { visibility: 'visible' } }
-								></span>
-							) : (
-								__( 'Select locale', 'progress-planner' )
-							) }
-						</button>
+						<SubmitButton
+							isLoading={ isLoading }
+							disabled={ ! value || isFetchingOptions }
+							label={ __( 'Select locale', 'progress-planner' ) }
+						/>
 					</div>
 				</form>
 			</div>

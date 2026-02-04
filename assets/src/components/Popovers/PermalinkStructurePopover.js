@@ -13,8 +13,12 @@
 import { useState, useEffect, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { decodeEntities } from '@wordpress/html-entities';
-import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
+import FormErrorMessage from './FormErrorMessage';
+import SubmitButton from './SubmitButton';
+import { usePopoverSubmit } from '../../hooks/usePopoverSubmit';
+import { useWpSettings } from '../../hooks/useWpSettings';
+import { getAjaxUrl, getNonce } from '../../config/dashboardConfig';
 import { submitSiteSettings } from '../../hooks/usePopoverForms';
 
 export default function PermalinkStructurePopover( {
@@ -25,29 +29,21 @@ export default function PermalinkStructurePopover( {
 	const [ selectedStructure, setSelectedStructure ] = useState( '' );
 	const [ customStructure, setCustomStructure ] = useState( '' );
 	const [ structures, setStructures ] = useState( [] );
-	const [ isLoading, setIsLoading ] = useState( false );
 	const [ isFetchingStructures, setIsFetchingStructures ] = useState( true );
-	const [ error, setError ] = useState( null );
+	const { settings } = useWpSettings( [ 'permalink_structure' ] );
 
-	/**
-	 * Load current permalink structure and available structures on mount.
-	 */
+	// Seed local state from fetched settings.
 	useEffect( () => {
-		// Fetch current settings
-		apiFetch( { path: '/wp/v2/settings' } )
-			.then( ( settings ) => {
-				const currentStructure = settings.permalink_structure || '';
-				setSelectedStructure( currentStructure );
-				setCustomStructure( currentStructure );
-			} )
-			.catch( () => {
-				// Ignore errors
-			} );
+		if ( settings.permalink_structure ) {
+			setSelectedStructure( settings.permalink_structure );
+			setCustomStructure( settings.permalink_structure );
+		}
+	}, [ settings.permalink_structure ] );
 
-		// Fetch structures via AJAX
-		const ajaxUrl =
-			window.progressPlanner?.ajaxUrl || '/wp-admin/admin-ajax.php';
-		const nonce = window.progressPlanner?.nonce || '';
+	// Fetch structures via AJAX on mount.
+	useEffect( () => {
+		const ajaxUrl = getAjaxUrl();
+		const nonce = getNonce();
 
 		fetch(
 			`${ ajaxUrl }?action=prpl_get_permalink_structures&_ajax_nonce=${ nonce }`,
@@ -79,51 +75,29 @@ export default function PermalinkStructurePopover( {
 		}
 	}, [] );
 
-	/**
-	 * Handle form submission.
-	 */
-	const handleSubmit = useCallback(
-		async ( e ) => {
-			e.preventDefault();
+	const { isLoading, error, handleSubmit } = usePopoverSubmit( async () => {
+		const structureToSubmit =
+			selectedStructure === 'custom'
+				? customStructure
+				: selectedStructure;
 
-			const structureToSubmit =
-				selectedStructure === 'custom'
-					? customStructure
-					: selectedStructure;
+		if ( ! structureToSubmit ) {
+			return;
+		}
 
-			if ( ! structureToSubmit ) {
-				return;
-			}
+		const popoverId = `prpl-popover-${ task.slug || task.id }`;
+		await submitSiteSettings( {
+			settingAPIKey: 'permalink_structure',
+			setting: 'permalink_structure',
+			popoverId,
+			settingCallbackValue: () => structureToSubmit,
+			value: structureToSubmit,
+		} );
 
-			setIsLoading( true );
-			setError( null );
-
-			try {
-				const popoverId = `prpl-popover-${ task.slug || task.id }`;
-				await submitSiteSettings( {
-					settingAPIKey: 'permalink_structure',
-					setting: 'permalink_structure',
-					popoverId,
-					settingCallbackValue: () => structureToSubmit,
-					value: structureToSubmit,
-				} );
-
-				if ( onSubmit ) {
-					await onSubmit( task.id, task );
-				}
-			} catch ( err ) {
-				setError(
-					__(
-						'Something went wrong. Please try again.',
-						'progress-planner'
-					)
-				);
-			} finally {
-				setIsLoading( false );
-			}
-		},
-		[ selectedStructure, customStructure, task, onSubmit ]
-	);
+		if ( onSubmit ) {
+			await onSubmit( task.id, task );
+		}
+	}, [ selectedStructure, customStructure, task, onSubmit ] );
 
 	const taskTitle = decodeEntities( task.title?.rendered || task.title );
 	const defaultStructures =
@@ -308,29 +282,16 @@ export default function PermalinkStructurePopover( {
 							) }
 						</fieldset>
 					</div>
-					{ error && (
-						<p className="prpl-note prpl-note-error prpl-interactive-task-error-message">
-							{ error }
-						</p>
-					) }
+					<FormErrorMessage error={ error } />
 					<div className="prpl-steps-nav-wrapper prpl-steps-nav-wrapper-align-left">
-						<button
-							type="submit"
-							className="prpl-button prpl-button-primary"
-							disabled={ isLoading || ! selectedStructure }
-						>
-							{ isLoading ? (
-								<span
-									className="spinner"
-									style={ { visibility: 'visible' } }
-								></span>
-							) : (
-								__(
-									'Set permalink structure',
-									'progress-planner'
-								)
+						<SubmitButton
+							isLoading={ isLoading }
+							disabled={ ! selectedStructure }
+							label={ __(
+								'Set permalink structure',
+								'progress-planner'
 							) }
-						</button>
+						/>
 					</div>
 				</form>
 			</div>
