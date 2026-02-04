@@ -192,75 +192,6 @@ class Select_Timezone extends Tasks_Interactive {
 			\wp_send_json_error( [ 'message' => \esc_html__( 'Invalid timezone.', 'progress-planner' ) ] );
 		}
 
-		$option_updated = $this->update_timezone( $timezone_string );
-
-		if ( $option_updated ) {
-
-			// We're not checking for the return value of the update_option calls, because it will return false if the value is the same (for example if gmt_offset is already set to '').
-			\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
-		}
-
-		\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to update setting.', 'progress-planner' ) ] );
-	}
-
-	/**
-	 * Add task actions specific to this task.
-	 *
-	 * @param array $data    The task data.
-	 * @param array $actions The existing actions.
-	 *
-	 * @return array
-	 */
-	public function add_task_actions( $data = [], $actions = [] ) {
-		$actions[] = [
-			'priority' => 10,
-			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html( $this->get_task_action_label() ) . '</a>',
-		];
-
-		return $actions;
-	}
-
-	/**
-	 * Get the task action label.
-	 *
-	 * @return string
-	 */
-	public function get_task_action_label() {
-		return \__( 'Select timezone', 'progress-planner' );
-	}
-
-	/**
-	 * Complete the task.
-	 *
-	 * @param array  $args The task data.
-	 * @param string $task_id The task ID.
-	 *
-	 * @return bool
-	 */
-	public function complete_task( $args = [], $task_id = '' ) {
-
-		if ( ! $this->capability_required() ) {
-			return false;
-		}
-
-		if ( ! isset( $args['timezone'] ) ) {
-			return false;
-		}
-
-		$timezone_string = \sanitize_text_field( \wp_unslash( $args['timezone'] ) );
-
-		return $this->update_timezone( $timezone_string );
-	}
-
-	/**
-	 * Update the timezone.
-	 *
-	 * @param string $timezone_string The timezone string to update.
-	 *
-	 * @return bool
-	 */
-	protected function update_timezone( $timezone_string ) {
-
 		$update_options = false;
 
 		// Map UTC+- timezones to gmt_offsets and set timezone_string to empty.
@@ -283,9 +214,27 @@ class Select_Timezone extends Tasks_Interactive {
 			\update_option( 'timezone_string', $timezone_string );
 			\update_option( 'gmt_offset', $gmt_offset );
 
-			return true;
+			// We're not checking for the return value of the update_option calls, because it will return false if the value is the same (for example if gmt_offset is already set to '').
+			\wp_send_json_success( [ 'message' => \esc_html__( 'Setting updated.', 'progress-planner' ) ] );
 		}
 
-		return false;
+		\wp_send_json_error( [ 'message' => \esc_html__( 'Failed to update setting.', 'progress-planner' ) ] );
+	}
+
+	/**
+	 * Add task actions specific to this task.
+	 *
+	 * @param array $data    The task data.
+	 * @param array $actions The existing actions.
+	 *
+	 * @return array
+	 */
+	public function add_task_actions( $data = [], $actions = [] ) {
+		$actions[] = [
+			'priority' => 10,
+			'html'     => '<a href="#" class="prpl-tooltip-action-text" role="button" onclick="document.getElementById(\'prpl-popover-' . \esc_attr( static::POPOVER_ID ) . '\')?.showPopover()">' . \esc_html__( 'Select timezone', 'progress-planner' ) . '</a>',
+		];
+
+		return $actions;
 	}
 }
