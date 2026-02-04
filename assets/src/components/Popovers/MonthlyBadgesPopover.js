@@ -13,6 +13,7 @@ import { useState, useEffect, useMemo, useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
+import PopoverLoadingState from './PopoverLoadingState';
 import Badge from '../Badge';
 import { resolveTaskId } from '../../utils/taskIdResolver';
 import {
@@ -185,7 +186,7 @@ export default function MonthlyBadgesPopover( { task, onClose } ) {
 			<div className="prpl-column">
 				<div className="prpl-widgets-container in-popover">
 					{ isLoading ? (
-						<p>{ __( 'Loading…', 'progress-planner' ) }</p>
+						<PopoverLoadingState />
 					) : (
 						<>
 							{ /* Monthly Badges */ }

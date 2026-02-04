@@ -14,6 +14,7 @@ import { useState, useEffect } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
 import InteractiveTaskPopover from './InteractiveTaskPopover';
+import PopoverLoadingState from './PopoverLoadingState';
 import { resolveTaskId } from '../../utils/taskIdResolver';
 
 export default function BadgeStreakPopover( { task, onClose } ) {
@@ -201,7 +202,7 @@ export default function BadgeStreakPopover( { task, onClose } ) {
 							) }
 						</p>
 						{ isLoading ? (
-							<p>{ __( 'Loading…', 'progress-planner' ) }</p>
+							<PopoverLoadingState />
 						) : (
 							<div id="popover-badge-streak-content">
 								{ maintenanceProgress && (
@@ -227,7 +228,7 @@ export default function BadgeStreakPopover( { task, onClose } ) {
 							) }
 						</p>
 						{ isLoading ? (
-							<p>{ __( 'Loading…', 'progress-planner' ) }</p>
+							<PopoverLoadingState />
 						) : (
 							<div id="popover-badge-streak-maintenance">
 								{ contentProgress && (
