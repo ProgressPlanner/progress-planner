@@ -55,53 +55,30 @@ function BlogPostImage( { link, url } ) {
 }
 
 /**
- * PostTitleLink component with hover state.
+ * HoverLink component with hover color transition.
  *
- * @param {Object} props          - Component props.
- * @param {string} props.link     - Link URL.
- * @param {string} props.children - Link text.
- * @return {JSX.Element} The post title link.
+ * @param {Object} props                     - Component props.
+ * @param {string} props.link                - Link URL.
+ * @param {string} props.color               - Default color.
+ * @param {string} props.hoverColor          - Color on hover.
+ * @param {string} props.textDecoration      - Default text-decoration.
+ * @param {string} props.hoverTextDecoration - Text-decoration on hover.
+ * @param {string} props.children            - Link text.
+ * @return {JSX.Element} The link element.
  */
-function PostTitleLink( { link, children } ) {
+function HoverLink( {
+	link,
+	color,
+	hoverColor,
+	textDecoration = 'none',
+	hoverTextDecoration = 'underline',
+	children,
+} ) {
 	const [ isHovered, setIsHovered ] = useState( false );
 
 	const style = {
-		color: isHovered
-			? 'var(--prpl-color-link)'
-			: 'var(--prpl-color-headings)',
-		textDecoration: isHovered ? 'underline' : 'none',
-	};
-
-	return (
-		<a
-			href={ link }
-			target="_blank"
-			rel="noopener noreferrer"
-			style={ style }
-			onMouseEnter={ () => setIsHovered( true ) }
-			onMouseLeave={ () => setIsHovered( false ) }
-		>
-			{ children }
-		</a>
-	);
-}
-
-/**
- * FooterLink component with hover state.
- *
- * @param {Object} props          - Component props.
- * @param {string} props.link     - Link URL.
- * @param {string} props.children - Link text.
- * @return {JSX.Element} The footer link.
- */
-function FooterLink( { link, children } ) {
-	const [ isHovered, setIsHovered ] = useState( false );
-
-	const style = {
-		color: isHovered
-			? 'var(--prpl-color-link-hover)'
-			: 'var(--prpl-color-link)',
-		textDecoration: isHovered ? 'none' : 'underline',
+		color: isHovered ? hoverColor : color,
+		textDecoration: isHovered ? hoverTextDecoration : textDecoration,
 	};
 
 	return (
@@ -193,9 +170,13 @@ function WhatsNew( { config = {} } ) {
 							/>
 						) }
 						<h3 style={ titleStyle }>
-							<PostTitleLink link={ post.link }>
+							<HoverLink
+								link={ post.link }
+								color="var(--prpl-color-headings)"
+								hoverColor="var(--prpl-color-link)"
+							>
 								{ post.title }
-							</PostTitleLink>
+							</HoverLink>
 						</h3>
 						<p style={ excerptStyle }>{ post.excerpt }</p>
 						<hr />
@@ -203,9 +184,15 @@ function WhatsNew( { config = {} } ) {
 				) ) }
 			</ul>
 			<div className="prpl-widget-footer" style={ footerStyle }>
-				<FooterLink link={ blogUrl }>
+				<HoverLink
+					link={ blogUrl }
+					color="var(--prpl-color-link)"
+					hoverColor="var(--prpl-color-link-hover)"
+					textDecoration="underline"
+					hoverTextDecoration="none"
+				>
 					{ __( 'Read all posts', 'progress-planner' ) }
-				</FooterLink>
+				</HoverLink>
 			</div>
 		</Fragment>
 	);
