@@ -19,6 +19,7 @@ import { useCelebration } from '../../hooks/useCelebration';
 import { dispatchGridResize } from '../../utils/gridResize';
 import { getTaskPoints } from '../../utils/taskUtils';
 import WidgetHeader from '../../components/WidgetHeader';
+import ConfirmDialog from '../../components/ConfirmDialog';
 import TodoWidgetSkeleton from './TodoWidgetSkeleton';
 import { useDashboardStore } from '../../stores/dashboardStore';
 
@@ -98,31 +99,6 @@ const STYLES = {
 	srOnly: {
 		position: 'absolute',
 		left: '-9999px',
-	},
-	popover: {
-		position: 'fixed',
-		top: '50%',
-		left: '50%',
-		transform: 'translate(-50%, -50%)',
-		zIndex: 10000,
-		background: 'white',
-		padding: '20px',
-		borderRadius: '8px',
-		boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-	},
-	popoverButtons: {
-		display: 'flex',
-		gap: '2rem',
-		marginTop: '15px',
-	},
-	overlay: {
-		position: 'fixed',
-		top: 0,
-		left: 0,
-		right: 0,
-		bottom: 0,
-		background: 'rgba(0,0,0,0.3)',
-		zIndex: 9999,
 	},
 };
 
@@ -692,74 +668,32 @@ function TodoWidget( { config = {} } ) {
 				</details>
 			) }
 
-			{ showDeletePopover && (
-				<div
-					id="todo-list-completed-delete-all-popover"
-					className="prpl-popover"
-					style={ STYLES.popover }
-				>
-					<div className="prpl-note">
-						<span className="prpl-note-icon">
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								viewBox="0 0 24 24"
-								fill="currentColor"
-							>
-								<path
-									fillRule="evenodd"
-									d="M9.401 3.003c1.155-2 4.043-2 5.197 0l7.355 12.748c1.154 2-.29 4.5-2.599 4.5H4.645c-2.309 0-3.752-2.5-2.598-4.5L9.4 3.003ZM12 8.25a.75.75 0 0 1 .75.75v3.75a.75.75 0 0 1-1.5 0V9a.75.75 0 0 1 .75-.75Zm0 8.25a.75.75 0 1 0 0-1.5.75.75 0 0 0 0 1.5Z"
-									clipRule="evenodd"
-								/>
-							</svg>
-						</span>
-						<span className="prpl-note-text">
-							{ __(
-								'Are you sure you want to delete all completed tasks? This action cannot be undone.',
-								'progress-planner'
-							) }
-						</span>
-					</div>
-
-					<div
-						className="prpl-buttons-wrapper"
-						style={ STYLES.popoverButtons }
-					>
-						<button
-							id="todo-list-completed-delete-all-cancel"
-							onClick={ () => setShowDeletePopover( false ) }
-						>
-							<strong>{ __( 'No', 'progress-planner' ) }</strong>
-							{ ', ' }
-							{ __( 'keep this list', 'progress-planner' ) }
-						</button>
-						<button
-							id="todo-list-completed-delete-all-confirm"
-							onClick={ handleDeleteAllCompleted }
-						>
-							<strong>{ __( 'Yes', 'progress-planner' ) }</strong>
-							{ ', ' }
-							{ __(
-								'delete all completed tasks',
-								'progress-planner'
-							) }
-						</button>
-					</div>
-				</div>
-			) }
-			{ showDeletePopover && (
-				<div
-					role="button"
-					tabIndex={ 0 }
-					aria-label={ __( 'Close dialog', 'progress-planner' ) }
-					style={ STYLES.overlay }
-					onClick={ () => setShowDeletePopover( false ) }
-					onKeyDown={ ( e ) => {
-						if ( e.key === 'Enter' || e.key === ' ' ) {
-							setShowDeletePopover( false );
-						}
-					} }
-				/>
-			) }
+			<ConfirmDialog
+				isOpen={ showDeletePopover }
+				message={ __(
+					'Are you sure you want to delete all completed tasks? This action cannot be undone.',
+					'progress-planner'
+				) }
+				cancel={
+					<>
+						<strong>{ __( 'No', 'progress-planner' ) }</strong>
+						{ ', ' }
+						{ __( 'keep this list', 'progress-planner' ) }
+					</>
+				}
+				confirm={
+					<>
+						<strong>{ __( 'Yes', 'progress-planner' ) }</strong>
+						{ ', ' }
+						{ __(
+							'delete all completed tasks',
+							'progress-planner'
+						) }
+					</>
+				}
+				onConfirm={ handleDeleteAllCompleted }
+				onCancel={ () => setShowDeletePopover( false ) }
+			/>
 		</>
 	);
 }
