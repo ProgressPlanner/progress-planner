@@ -5,6 +5,8 @@
  * Replicates the exact behavior of the web component (prpl-badge).
  */
 
+import './badge.css';
+
 /**
  * Badge component.
  *
