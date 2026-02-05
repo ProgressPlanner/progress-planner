@@ -5,21 +5,9 @@
  */
 
 import { __ } from '@wordpress/i18n';
+import TaskActionButton from './TaskActionButton';
 import Tooltip from '../Tooltip';
-
-/**
- * Button styles.
- */
-const STYLES = {
-	actionText: {
-		lineHeight: 1,
-		fontSize: 'var(--prpl-font-size-small)',
-		color: 'var(--prpl-color-link)',
-	},
-	link: {
-		textDecoration: 'none',
-	},
-};
+import { taskActionTooltipStyle, taskActionArrowStyle } from './styles';
 
 /**
  * Task Info Action component.
@@ -33,15 +21,14 @@ export default function TaskActionInfo( { externalUrl, content } ) {
 	// Render external link if URL provided.
 	if ( externalUrl ) {
 		return (
-			<a
-				className="prpl-tooltip-action-text"
-				style={ { ...STYLES.actionText, ...STYLES.link } }
+			<TaskActionButton
+				as="a"
 				href={ externalUrl }
 				target="_blank"
 				rel="noopener noreferrer"
 			>
 				{ __( 'Why is this important?', 'progress-planner' ) }
-			</a>
+			</TaskActionButton>
 		);
 	}
 
@@ -49,14 +36,9 @@ export default function TaskActionInfo( { externalUrl, content } ) {
 	if ( content ) {
 		return (
 			<Tooltip
-				triggerContent={
-					<span
-						className="prpl-tooltip-action-text"
-						style={ STYLES.actionText }
-					>
-						{ __( 'Info', 'progress-planner' ) }
-					</span>
-				}
+				triggerContent={ __( 'Info', 'progress-planner' ) }
+				tooltipStyle={ taskActionTooltipStyle }
+				arrowStyle={ taskActionArrowStyle }
 			>
 				{ /* Content is pre-rendered HTML from API */ }
 				<div dangerouslySetInnerHTML={ { __html: content } } />

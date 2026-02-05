@@ -5,25 +5,7 @@
  */
 
 import { __ } from '@wordpress/i18n';
-
-/**
- * Button styles.
- */
-const STYLES = {
-	button: {
-		textDecoration: 'none',
-		padding: 0,
-		lineHeight: 1,
-		background: 'none',
-		border: 'none',
-		cursor: 'pointer',
-	},
-	actionText: {
-		lineHeight: 1,
-		fontSize: 'var(--prpl-font-size-small)',
-		color: 'var(--prpl-color-link)',
-	},
-};
+import TaskActionButton from './TaskActionButton';
 
 /**
  * Task Complete Action component.
@@ -41,10 +23,7 @@ export default function TaskActionComplete( { taskId, taskTitle, onClick } ) {
 	};
 
 	return (
-		<button
-			type="button"
-			className="prpl-suggested-task-button"
-			style={ STYLES.button }
+		<TaskActionButton
 			data-task-id={ taskId }
 			data-task-title={ taskTitle }
 			data-action="complete"
@@ -52,12 +31,7 @@ export default function TaskActionComplete( { taskId, taskTitle, onClick } ) {
 			title={ __( 'Mark as complete', 'progress-planner' ) }
 			onClick={ handleClick }
 		>
-			<span
-				className="prpl-tooltip-action-text"
-				style={ STYLES.actionText }
-			>
-				{ __( 'Mark as complete', 'progress-planner' ) }
-			</span>
-		</button>
+			{ __( 'Mark as complete', 'progress-planner' ) }
+		</TaskActionButton>
 	);
 }

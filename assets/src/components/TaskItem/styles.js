@@ -179,3 +179,22 @@ export const checkboxInputStyle = {
 	margin: 0,
 	flexShrink: 0,
 };
+
+/**
+ * Tooltip position override for task-context tooltips.
+ * Used by TaskActionInfo and TaskActionSnooze to position
+ * the tooltip panel relative to the action button.
+ */
+export const taskActionTooltipStyle = {
+	transform: 'translate(-20%, calc(100% + 10px))',
+};
+
+/**
+ * Arrow position override for task-context tooltips.
+ * Positions the arrow at the top-left instead of the default top-right.
+ */
+export const taskActionArrowStyle = {
+	left: 25,
+	right: 'auto',
+	transform: 'translate(-5px, -10px) rotate(90deg)',
+};

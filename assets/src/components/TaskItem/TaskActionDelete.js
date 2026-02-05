@@ -5,25 +5,7 @@
  */
 
 import { __ } from '@wordpress/i18n';
-
-/**
- * Button styles.
- */
-const STYLES = {
-	button: {
-		textDecoration: 'none',
-		padding: 0,
-		lineHeight: 1,
-		background: 'none',
-		border: 'none',
-		cursor: 'pointer',
-	},
-	actionText: {
-		lineHeight: 1,
-		fontSize: 'var(--prpl-font-size-small)',
-		color: 'var(--prpl-color-link)',
-	},
-};
+import TaskActionButton from './TaskActionButton';
 
 /**
  * Task Delete Action component.
@@ -41,20 +23,13 @@ export default function TaskActionDelete( { postId, taskTitle, onClick } ) {
 	};
 
 	return (
-		<button
-			type="button"
+		<TaskActionButton
 			className="prpl-suggested-task-button trash"
-			style={ STYLES.button }
 			data-post-id={ postId }
 			title={ `${ __( 'Delete', 'progress-planner' ) }: ${ taskTitle }` }
 			onClick={ handleClick }
 		>
-			<span
-				className="prpl-tooltip-action-text"
-				style={ STYLES.actionText }
-			>
-				{ __( 'Delete', 'progress-planner' ) }
-			</span>
-		</button>
+			{ __( 'Delete', 'progress-planner' ) }
+		</TaskActionButton>
 	);
 }

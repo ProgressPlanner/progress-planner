@@ -4,17 +4,7 @@
  * Renders a generic link action (Edit, Review, etc.).
  */
 
-/**
- * Link styles.
- */
-const STYLES = {
-	link: {
-		textDecoration: 'none',
-		lineHeight: 1,
-		fontSize: 'var(--prpl-font-size-small)',
-		color: 'var(--prpl-color-link)',
-	},
-};
+import TaskActionButton from './TaskActionButton';
 
 /**
  * Task Link Action component.
@@ -42,17 +32,15 @@ export default function TaskActionLink( {
 	};
 
 	return (
-		<a
-			className={ `prpl-tooltip-action-text${
-				className ? ` ${ className }` : ''
-			}` }
-			style={ STYLES.link }
+		<TaskActionButton
+			as="a"
+			className={ className || undefined }
 			href={ href || '#' }
 			target={ target }
 			rel={ target === '_blank' ? 'noopener noreferrer' : undefined }
 			onClick={ onClick ? handleClick : undefined }
 		>
 			{ label }
-		</a>
+		</TaskActionButton>
 	);
 }

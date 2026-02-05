@@ -5,22 +5,7 @@
  */
 
 import { doAction } from '@wordpress/hooks';
-
-/**
- * Link styles.
- */
-const STYLES = {
-	link: {
-		textDecoration: 'none',
-		lineHeight: 1,
-		fontSize: 'var(--prpl-font-size-small)',
-		color: 'var(--prpl-color-link)',
-		background: 'none',
-		border: 'none',
-		cursor: 'pointer',
-		padding: 0,
-	},
-};
+import TaskActionButton from './TaskActionButton';
 
 /**
  * Task Popover Action component.
@@ -65,13 +50,6 @@ export default function TaskActionPopover( {
 	};
 
 	return (
-		<button
-			type="button"
-			className="prpl-tooltip-action-text"
-			style={ STYLES.link }
-			onClick={ handleClick }
-		>
-			{ label }
-		</button>
+		<TaskActionButton onClick={ handleClick }>{ label }</TaskActionButton>
 	);
 }
