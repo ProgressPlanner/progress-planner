@@ -289,6 +289,17 @@ class Page {
 				$widget_asset['version'],
 				true
 			);
+
+			// Enqueue the corresponding CSS file if it exists.
+			$widget_css_file = \PROGRESS_PLANNER_DIR . '/build/' . $script_handle . '.css';
+			if ( \file_exists( $widget_css_file ) ) {
+				\wp_enqueue_style(
+					'progress-planner/' . $script_handle,
+					\constant( 'PROGRESS_PLANNER_URL' ) . '/build/' . $script_handle . '.css',
+					[ 'progress-planner/dashboard' ],
+					$widget_asset['version']
+				);
+			}
 		}
 
 		// Get header configuration.
