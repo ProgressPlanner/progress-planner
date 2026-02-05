@@ -152,28 +152,25 @@ class Onboard_Wizard {
 
 		$this->steps = [
 			[
-				'script_file_name'   => 'WelcomeStep',
-				'template_file_name' => 'welcome',
-				'template_id'        => 'onboarding-step-welcome',
+				'script_file_name' => 'WelcomeStep',
+				'template_id'      => 'onboarding-step-welcome',
 				/* translators: %s: Progress Planner name. */
-				'title'              => \sprintf( \esc_html__( 'Welcome to %s', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) ),
+				'title'            => \sprintf( \esc_html__( 'Welcome to %s', 'progress-planner' ), \esc_html( \progress_planner()->get_ui__branding()->get_admin_menu_name() ) ),
 			],
 			[
-				'script_file_name'   => 'WhatsWhatStep',
-				'template_file_name' => 'whats-what',
-				'template_id'        => 'onboarding-step-whats-what',
-				'title'              => \esc_html__( 'What\'s what?', 'progress-planner' ),
+				'script_file_name' => 'WhatsWhatStep',
+				'template_id'      => 'onboarding-step-whats-what',
+				'title'            => \esc_html__( 'What\'s what?', 'progress-planner' ),
 			],
 		];
 
 		// Add first task step if there are tasks or if the first task is already completed.
 		if ( ! empty( $tasks ) || $was_first_task_completed ) {
 			$this->steps[] = [
-				'script_file_name'   => 'FirstTaskStep',
-				'template_file_name' => 'first-task',
-				'template_data'      => ! $was_first_task_completed ? [ 'task' => \array_shift( $tasks ) ] : [],
-				'template_id'        => 'onboarding-step-first-task',
-				'title'              => \esc_html__( 'Complete your first task!', 'progress-planner' ),
+				'script_file_name' => 'FirstTaskStep',
+				'template_data'    => ! $was_first_task_completed ? [ 'task' => \array_shift( $tasks ) ] : [],
+				'template_id'      => 'onboarding-step-first-task',
+				'title'            => \esc_html__( 'Complete your first task!', 'progress-planner' ),
 			];
 		}
 
@@ -203,25 +200,22 @@ class Onboard_Wizard {
 		];
 
 		$this->steps[] = [
-			'script_file_name'   => 'BadgesStep',
-			'template_file_name' => 'badges',
-			'template_id'        => 'onboarding-step-badges',
-			'template_data'      => $badge_data,
-			'title'              => \esc_html__( 'Our badges are waiting for you', 'progress-planner' ),
+			'script_file_name' => 'BadgesStep',
+			'template_id'      => 'onboarding-step-badges',
+			'template_data'    => $badge_data,
+			'title'            => \esc_html__( 'Our badges are waiting for you', 'progress-planner' ),
 		];
 
 		$this->steps[] = [
-			'script_file_name'   => 'EmailFrequencyStep',
-			'template_file_name' => 'email-frequency',
-			'template_id'        => 'onboarding-step-email-frequency',
-			'title'              => \esc_html__( 'Email Frequency', 'progress-planner' ),
+			'script_file_name' => 'EmailFrequencyStep',
+			'template_id'      => 'onboarding-step-email-frequency',
+			'title'            => \esc_html__( 'Email Frequency', 'progress-planner' ),
 		];
 
 		$this->steps[] = [
-			'script_file_name'   => 'SettingsStep',
-			'template_file_name' => 'settings',
-			'template_id'        => 'onboarding-step-settings',
-			'title'              => \esc_html__( 'Settings', 'progress-planner' ),
+			'script_file_name' => 'SettingsStep',
+			'template_id'      => 'onboarding-step-settings',
+			'title'            => \esc_html__( 'Settings', 'progress-planner' ),
 		];
 
 		// Add more-tasks step if there are remaining tasks.
@@ -229,11 +223,10 @@ class Onboard_Wizard {
 			// Convert tasks object to array for React.
 			$tasks_array   = \array_values( $tasks );
 			$this->steps[] = [
-				'script_file_name'   => 'MoreTasksStep',
-				'template_file_name' => 'more-tasks',
-				'template_data'      => [ 'tasks' => $tasks_array ],
-				'template_id'        => 'onboarding-step-more-tasks',
-				'title'              => \esc_html__( 'Finish onboarding!', 'progress-planner' ),
+				'script_file_name' => 'MoreTasksStep',
+				'template_data'    => [ 'tasks' => $tasks_array ],
+				'template_id'      => 'onboarding-step-more-tasks',
+				'title'            => \esc_html__( 'Finish onboarding!', 'progress-planner' ),
 			];
 		}
 	}
