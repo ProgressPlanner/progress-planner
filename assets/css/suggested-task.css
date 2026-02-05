@@ -212,7 +212,7 @@
 	visibility: visible;
 }
 
-.prpl-suggested-task .tooltip-actions:has([data-tooltip-visible]) {
+.prpl-suggested-task .tooltip-actions:has(.prpl-tooltip-visible) {
 	visibility: visible;
 }
 
