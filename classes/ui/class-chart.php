@@ -13,22 +13,6 @@ namespace Progress_Planner\UI;
 class Chart {
 
 	/**
-	 * Build a chart for the stats.
-	 *
-	 * @param array $args {
-	 *     The arguments for the chart. See `get_chart_data` for all available parameters.
-	 *
-	 *     @type string $type Chart type (e.g., 'line', 'bar').
-	 * }
-	 *
-	 * @return void
-	 */
-	public function the_chart( $args = [] ) {
-		// Render the chart.
-		$this->render_chart( $args['type'], $this->get_chart_data( $args ) );
-	}
-
-	/**
 	 * Get data for the chart.
 	 *
 	 * Normalized charts:
@@ -201,18 +185,5 @@ class Chart {
 			'color'                      => $args['color']( $period_score, $period['start_date'] ),
 			'previous_period_activities' => $previous_period_activities,
 		];
-	}
-
-	/**
-	 * Render the charts.
-	 *
-	 * @param string $type The type of chart.
-	 * @param array  $data The data for the chart.
-	 *
-	 * @return void
-	 */
-	public function render_chart( $type, $data ) {
-		$type = $type ? $type : 'line';
-		echo '<prpl-chart-' . \esc_attr( $type ) . ' data="' . \esc_attr( (string) \wp_json_encode( $data ) ) . '"></prpl-chart-' . \esc_attr( $type ) . '>';
 	}
 }
