@@ -90,9 +90,6 @@ class Page {
 		// Clear the cache for the activity scores widget.
 		\add_action( 'progress_planner_activity_saved', [ $this, 'clear_activity_scores_cache' ] );
 		\add_action( 'progress_planner_activity_deleted', [ $this, 'clear_activity_scores_cache' ] );
-
-		// Add a custom admin footer.
-		\add_action( 'admin_footer', [ $this, 'admin_footer' ] );
 	}
 
 
@@ -165,6 +162,12 @@ class Page {
 	 * @return void
 	 */
 	public function enqueue_assets( $hook ) {
+		// Menu badge positioning styles - needed on all admin pages.
+		\wp_add_inline_style(
+			'wp-admin',
+			'#toplevel_page_progress-planner{position:relative}#toplevel_page_progress-planner .update-plugins{position:absolute;left:18px;bottom:0;min-width:15px;height:15px;line-height:1.5}#toplevel_page_progress-planner .wp-submenu .update-plugins{display:none}'
+		);
+
 		if ( 'toplevel_page_progress-planner' !== $hook ) {
 			return;
 		}
@@ -583,34 +586,5 @@ class Page {
 
 		// Clear the cache for the activity scores widget.
 		\progress_planner()->get_settings()->set( 'activities_weekly_post_record', [] );
-	}
-
-	/**
-	 * Add a custom admin footer.
-	 *
-	 * @return void
-	 */
-	public function admin_footer() {
-		?>
-		<style>
-			#toplevel_page_progress-planner {
-				position: relative;
-				.update-plugins {
-					position: absolute;
-					left: 18px;
-					bottom: 0px;
-					min-width: 15px;
-					height: 15px;
-					line-height: 1.5;
-				}
-
-				.wp-submenu {
-					.update-plugins {
-						display: none;
-					}
-				}
-			}
-		</style>
-		<?php
 	}
 }

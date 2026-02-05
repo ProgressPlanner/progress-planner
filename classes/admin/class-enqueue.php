@@ -47,7 +47,6 @@ class Enqueue {
 	 * @return void
 	 */
 	public function init() {
-		\add_action( 'admin_head', [ $this, 'maybe_empty_session_storage' ], 1 );
 	}
 
 	/**
@@ -307,41 +306,5 @@ class Enqueue {
 			/* translators: %d: The number of points. */
 			'fixThisIssue'                 => \esc_html__( 'Fix this issue for %d points', 'progress-planner' ),
 		];
-	}
-
-	/**
-	 * Maybe empty the session storage for the prpl_recommendations post type.
-	 * We need to do it early, before the WP API script reads the cached data from the browser.
-	 *
-	 * @return void
-	 */
-	public function maybe_empty_session_storage() {
-		$screen = \get_current_screen();
-
-		if ( ! $screen ) {
-			return;
-		}
-
-		// Inject the script only on the Progress Planner Dashboard, Progress Planner Settings and the WordPress dashboard pages.
-		if ( 'toplevel_page_progress-planner' !== $screen->id ) {
-			return;
-		}
-		?>
-		<script type="text/javascript">
-			if ( 'sessionStorage' in window ) {
-				try {
-					for ( const key in sessionStorage ) {
-						if (
-							-1 < key.indexOf( 'wp-api-schema-model' ) &&
-							-1 === sessionStorage.getItem( key ).indexOf( '/wp/v2/prpl_recommendations' )
-						) {
-							sessionStorage.removeItem( key );
-							break;
-						}
-					}
-				} catch ( er ) {}
-			}
-		</script>
-		<?php
 	}
 }

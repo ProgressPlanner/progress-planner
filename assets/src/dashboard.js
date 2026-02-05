@@ -5,6 +5,24 @@
  * Mounts the Dashboard component to the DOM.
  */
 
+// Clear stale WP API schema cache from sessionStorage.
+// Must run synchronously before any apiFetch calls.
+if ( 'sessionStorage' in window ) {
+	try {
+		for ( const key in window.sessionStorage ) {
+			if (
+				key.indexOf( 'wp-api-schema-model' ) > -1 &&
+				window.sessionStorage
+					.getItem( key )
+					.indexOf( '/wp/v2/prpl_recommendations' ) === -1
+			) {
+				window.sessionStorage.removeItem( key );
+				break;
+			}
+		}
+	} catch ( e ) {} // eslint-disable-line no-empty
+}
+
 import apiFetch from '@wordpress/api-fetch';
 import { createRoot } from '@wordpress/element';
 import Dashboard from './components/Dashboard';
