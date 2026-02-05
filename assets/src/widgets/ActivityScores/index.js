@@ -213,14 +213,10 @@ function ActivityScores( { config = {} } ) {
 		personalRecord.currentStreak
 	);
 
-	// Get info icon SVG - will come from widget registry metadata.
-	const infoIconSvg = config?.infoIconSvg || '';
-
 	return (
 		<>
 			<WidgetHeader
 				title={ widgetTitle }
-				infoIconSvg={ infoIconSvg }
 				tooltipContent={ __(
 					'Your website activity score is based on the amount of website maintenance work you have done over the past 30 days.',
 					'progress-planner'
@@ -276,7 +272,6 @@ registerWidget( {
 	width: 1,
 	forceLastColumn: false,
 	title: __( 'Your website activity score', 'progress-planner' ),
-	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );
 
 export default ActivityScores;

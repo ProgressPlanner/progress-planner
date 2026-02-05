@@ -703,7 +703,6 @@ registerWidget( {
 	width: 2,
 	forceLastColumn: false,
 	title: __( "Ravi's Recommendations", 'progress-planner' ),
-	infoIconSvg: '',
 } );
 
 export default SuggestedTasks;

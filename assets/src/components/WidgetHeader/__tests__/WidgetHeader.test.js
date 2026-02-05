@@ -78,57 +78,37 @@ describe( 'WidgetHeader', () => {
 	} );
 
 	describe( 'tooltip rendering', () => {
-		const mockSvg = '<svg><circle cx="10" cy="10" r="5"/></svg>';
-
-		it( 'shows tooltip when both icon and content provided', () => {
-			const { container } = render(
-				<WidgetHeader
-					title="Test"
-					infoIconSvg={ mockSvg }
-					tooltipContent="Helpful info"
-				/>
-			);
-
-			expect(
-				container.querySelector( '.tooltip-actions' )
-			).toBeInTheDocument();
-		} );
-
-		it( 'hides tooltip when only icon provided', () => {
-			const { container } = render(
-				<WidgetHeader title="Test" infoIconSvg={ mockSvg } />
-			);
-
-			expect(
-				container.querySelector( '.tooltip-actions' )
-			).not.toBeInTheDocument();
-		} );
-
-		it( 'hides tooltip when only content provided', () => {
+		it( 'shows tooltip when tooltipContent provided', () => {
 			const { container } = render(
 				<WidgetHeader title="Test" tooltipContent="Helpful info" />
 			);
 
 			expect(
-				container.querySelector( '.tooltip-actions' )
-			).not.toBeInTheDocument();
+				container.querySelector( '.prpl-tooltip-wrapper' )
+			).toBeInTheDocument();
 		} );
 
-		it( 'hides tooltip when neither icon nor content provided', () => {
+		it( 'hides tooltip when no tooltipContent', () => {
 			const { container } = render( <WidgetHeader title="Test" /> );
 
 			expect(
-				container.querySelector( '.tooltip-actions' )
+				container.querySelector( '.prpl-tooltip-wrapper' )
+			).not.toBeInTheDocument();
+		} );
+
+		it( 'hides tooltip when tooltipContent is empty string', () => {
+			const { container } = render(
+				<WidgetHeader title="Test" tooltipContent="" />
+			);
+
+			expect(
+				container.querySelector( '.prpl-tooltip-wrapper' )
 			).not.toBeInTheDocument();
 		} );
 
 		it( 'renders Tooltip component with correct structure', () => {
 			const { container } = render(
-				<WidgetHeader
-					title="Test"
-					infoIconSvg={ mockSvg }
-					tooltipContent="Info"
-				/>
+				<WidgetHeader title="Test" tooltipContent="Info" />
 			);
 
 			expect(
@@ -139,25 +119,21 @@ describe( 'WidgetHeader', () => {
 			).toBeInTheDocument();
 		} );
 
-		it( 'renders SVG inside icon span', () => {
+		it( 'renders info icon SVG', () => {
 			const { container } = render(
-				<WidgetHeader
-					title="Test"
-					infoIconSvg={ mockSvg }
-					tooltipContent="Info"
-				/>
+				<WidgetHeader title="Test" tooltipContent="Info" />
 			);
 
-			const iconSpan = container.querySelector( '.prpl-info-icon span' );
-			expect( iconSpan.innerHTML ).toContain( '<svg>' );
-			expect( iconSpan.innerHTML ).toContain( 'circle' );
+			const svg = container.querySelector(
+				'.prpl-info-icon svg[viewBox="0 0 64 64"]'
+			);
+			expect( svg ).toBeInTheDocument();
 		} );
 
 		it( 'renders tooltip content', () => {
 			render(
 				<WidgetHeader
 					title="Test"
-					infoIconSvg={ mockSvg }
 					tooltipContent="Detailed information here"
 				/>
 			);
@@ -169,11 +145,7 @@ describe( 'WidgetHeader', () => {
 
 		it( 'includes screen reader text for accessibility', () => {
 			const { container } = render(
-				<WidgetHeader
-					title="Test"
-					infoIconSvg={ mockSvg }
-					tooltipContent="Info"
-				/>
+				<WidgetHeader title="Test" tooltipContent="Info" />
 			);
 
 			expect(
@@ -200,30 +172,6 @@ describe( 'WidgetHeader', () => {
 			expect(
 				screen.getByText( "Title & <Special> 'Characters'" )
 			).toBeInTheDocument();
-		} );
-
-		it( 'handles complex SVG icons', () => {
-			const complexSvg = `
-				<svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-					<circle cx="12" cy="12" r="10"/>
-					<path d="M12 16v-4"/>
-					<path d="M12 8h.01"/>
-				</svg>
-			`;
-
-			const { container } = render(
-				<WidgetHeader
-					title="Test"
-					infoIconSvg={ complexSvg }
-					tooltipContent="Info"
-				/>
-			);
-
-			const iconSpan = container.querySelector( '.prpl-info-icon span' );
-			expect( iconSpan.innerHTML ).toContain( '<svg' );
-			expect( iconSpan.innerHTML ).toContain( 'viewBox="0 0 24 24"' );
-			expect( iconSpan.innerHTML ).toContain( 'circle' );
-			expect( iconSpan.innerHTML ).toContain( 'path' );
 		} );
 	} );
 } );

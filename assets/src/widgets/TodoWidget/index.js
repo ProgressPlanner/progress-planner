@@ -97,7 +97,17 @@ const STYLES = {
 	},
 	tooltipActions: {
 		display: 'inline-flex',
+		justifyContent: 'flex-start',
+		flexWrap: 'wrap',
+		position: 'relative',
 		verticalAlign: 'text-top',
+	},
+	icon: {
+		width: '1.25rem',
+		height: '1.25rem',
+		display: 'inline-block',
+		verticalAlign: 'bottom',
+		color: '#6b7280',
 	},
 	srOnly: {
 		position: 'absolute',
@@ -479,7 +489,6 @@ function TodoWidget( { config = {} } ) {
 			"Write down all your tasks you want to get done on your website! The top task will become your 'golden task' next week.",
 			'progress-planner'
 		);
-	const infoIconSvg = config?.infoIconSvg;
 	const tooltipContent =
 		config?.tooltipContent ||
 		__(
@@ -497,20 +506,11 @@ function TodoWidget( { config = {} } ) {
 				<span className="prpl-todo-silver-task-description">
 					{ silverTaskDescription }
 				</span>
-				<span
-					className="tooltip-actions"
-					style={ STYLES.tooltipActions }
-				>
+				<span style={ STYLES.tooltipActions }>
 					<Tooltip
 						triggerContent={
-							<span className="icon prpl-info-icon">
-								{ infoIconSvg && (
-									<span
-										dangerouslySetInnerHTML={ {
-											__html: infoIconSvg,
-										} }
-									/>
-								) }
+							<span style={ STYLES.icon }>
+								<Icon name="info" />
 								<span className="screen-reader-text">
 									{ __( 'More info', 'progress-planner' ) }
 								</span>
@@ -688,7 +688,6 @@ registerWidget( {
 	width: 2,
 	forceLastColumn: false,
 	title: __( 'My to-do list', 'progress-planner' ),
-	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );
 
 export default TodoWidget;

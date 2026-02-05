@@ -107,7 +107,6 @@ registerWidget( {
 	width: 1,
 	forceLastColumn: false,
 	title: __( 'Content activity', 'progress-planner' ),
-	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );
 
 export default ContentActivity;

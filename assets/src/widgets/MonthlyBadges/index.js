@@ -315,7 +315,6 @@ registerWidget( {
 	width: 1,
 	forceLastColumn: false,
 	title: __( 'Your monthly badge', 'progress-planner' ),
-	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );
 
 export default MonthlyBadges;

@@ -116,7 +116,6 @@ export default function DashboardWidgets() {
 					<WidgetComponent
 						config={ {
 							title: widget.title,
-							infoIconSvg: widget.infoIconSvg,
 						} }
 					/>
 				</ErrorBoundary>

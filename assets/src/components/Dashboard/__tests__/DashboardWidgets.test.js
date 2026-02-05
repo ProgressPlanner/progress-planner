@@ -308,29 +308,6 @@ describe( 'DashboardWidgets', () => {
 				'Config Widget Title'
 			);
 		} );
-
-		it( 'passes infoIconSvg in config', () => {
-			const MockWidget = ( { config } ) => (
-				<div data-testid="widget-icon">
-					{ config.infoIconSvg ? 'Has Icon' : 'No Icon' }
-				</div>
-			);
-
-			getRegisteredWidgets.mockReturnValue( [
-				{
-					id: 'icon-widget',
-					title: 'Icon Widget',
-					component: MockWidget,
-					infoIconSvg: '<svg></svg>',
-				},
-			] );
-
-			render( <DashboardWidgets /> );
-
-			expect( screen.getByTestId( 'widget-icon' ) ).toHaveTextContent(
-				'Has Icon'
-			);
-		} );
 	} );
 
 	describe( 'special widget styles', () => {

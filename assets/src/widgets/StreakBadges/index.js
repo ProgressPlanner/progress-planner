@@ -40,13 +40,10 @@ function StreakBadges( { config = {} } ) {
 	// Get title and info icon from config or use defaults.
 	const widgetTitle =
 		config?.title || __( 'Your streak badges', 'progress-planner' );
-	const infoIconSvg = config?.infoIconSvg;
-
 	return (
 		<Fragment>
 			<WidgetHeader
 				title={ widgetTitle }
-				infoIconSvg={ infoIconSvg }
 				tooltipContent={ __(
 					'Your streak badges are based on the amount of website maintenance work you have done over the past 30 days.',
 					'progress-planner'
@@ -74,7 +71,6 @@ registerWidget( {
 	width: 1,
 	forceLastColumn: true,
 	title: __( 'Your streak badges', 'progress-planner' ),
-	infoIconSvg: '', // Can be fetched from REST API if needed for branding
 } );
 
 export default StreakBadges;
