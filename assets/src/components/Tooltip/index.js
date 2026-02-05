@@ -43,13 +43,63 @@ const TRIGGER_STYLE = {
 	color: 'var(--prpl-color-link)',
 };
 
+const WRAPPER_STYLE = {
+	display: 'inline-flex',
+	alignItems: 'center',
+	position: 'relative',
+};
+
+const TOOLTIP_STYLE = {
+	display: 'block',
+	position: 'absolute',
+	bottom: 0,
+	left: '100%',
+	transform: 'translate(-100%, calc(100% + 10px))',
+	padding: '0.75rem 1.5rem 0.75rem 0.75rem',
+	width: 150,
+	background: 'var(--prpl-background-activity)',
+	borderRadius: 'var(--prpl-border-radius)',
+	zIndex: 2,
+	visibility: 'hidden',
+	fontSize: '1rem',
+	fontWeight: 400,
+	color: 'var(--prpl-color-text)',
+};
+
+const TOOLTIP_VISIBLE_STYLE = {
+	visibility: 'visible',
+	zIndex: 10,
+};
+
+const CLOSE_BUTTON_STYLE = {
+	position: 'absolute',
+	top: 0,
+	right: 0,
+	padding: '0.1rem',
+	lineHeight: 0,
+	margin: 0,
+	background: 'none',
+	border: 'none',
+	cursor: 'pointer',
+};
+
+const OVERLAY_STYLE = {
+	display: 'block',
+	position: 'fixed',
+	top: 0,
+	left: 0,
+	width: '100%',
+	height: '100%',
+	zIndex: 9,
+	backgroundColor: 'rgba(0, 0, 0, 0.5)',
+};
+
 /**
  * Tooltip component.
  *
  * @param {Object}      props                - Component props.
  * @param {JSX.Element} props.triggerContent - Content for the trigger button.
  * @param {JSX.Element} props.children       - Tooltip body content.
- * @param {string}      props.className      - Optional wrapper class name.
  * @param {Object}      props.tooltipStyle   - Optional styles spread onto tooltip panel.
  * @param {Object}      props.arrowStyle     - Optional styles spread onto arrow span.
  * @param {Function}    props.onClose        - Optional callback fired when the tooltip closes.
@@ -58,7 +108,6 @@ const TRIGGER_STYLE = {
 export default function Tooltip( {
 	triggerContent,
 	children,
-	className = '',
 	tooltipStyle,
 	arrowStyle,
 	onClose,
@@ -88,17 +137,13 @@ export default function Tooltip( {
 		return () => document.removeEventListener( 'keydown', handleKeyDown );
 	}, [ isVisible, close ] );
 
-	const wrapperClass = `prpl-tooltip-wrapper${
-		className ? ` ${ className }` : ''
-	}`;
-
 	const triggerStyle = {
 		...TRIGGER_STYLE,
 		textDecoration: isTriggerHovered ? 'underline' : 'none',
 	};
 
 	return (
-		<span className={ wrapperClass }>
+		<span className="prpl-tooltip-wrapper" style={ WRAPPER_STYLE }>
 			<button
 				type="button"
 				className="prpl-info-icon"
@@ -112,30 +157,32 @@ export default function Tooltip( {
 			</button>
 			{ isVisible && (
 				<span
-					className="prpl-overlay"
 					role="presentation"
 					onClick={ close }
+					style={ OVERLAY_STYLE }
 				/>
 			) }
 			<span
 				ref={ tooltipRef }
 				id={ tooltipId }
-				className={ `prpl-tooltip${
-					isVisible ? ' prpl-tooltip-visible' : ''
-				}` }
+				className="prpl-tooltip"
 				role="tooltip"
 				aria-hidden={ ! isVisible }
-				style={ tooltipStyle }
+				style={ {
+					...TOOLTIP_STYLE,
+					...( isVisible ? TOOLTIP_VISIBLE_STYLE : {} ),
+					...tooltipStyle,
+				} }
 			>
 				<span
-					className="prpl-tooltip-arrow"
+					data-testid="tooltip-arrow"
 					style={ { ...DEFAULT_ARROW_STYLE, ...arrowStyle } }
 				/>
 				{ children }
 				<button
 					type="button"
-					className="prpl-tooltip-close"
 					onClick={ close }
+					style={ CLOSE_BUTTON_STYLE }
 				>
 					<span className="dashicons dashicons-no-alt"></span>
 					<span className="screen-reader-text">

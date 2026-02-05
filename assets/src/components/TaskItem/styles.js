@@ -133,6 +133,9 @@ export const trashButtonStyle = {
  * Move buttons wrapper style.
  */
 export const moveButtonsWrapperStyle = {
+	display: 'flex',
+	justifyContent: 'flex-start',
+	flexWrap: 'wrap',
 	position: 'absolute',
 	left: 'calc(-8px - 0.5rem)',
 	top: '50%',

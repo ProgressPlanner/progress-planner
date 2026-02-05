@@ -350,8 +350,9 @@ describe( 'TaskItem', () => {
 			const { container } = render( <TaskItem { ...defaultProps } /> );
 
 			const listItem = screen.getByRole( 'listitem' );
-			const actionsContainer =
-				container.querySelector( '.tooltip-actions' );
+			const actionsContainer = container.querySelector(
+				'.prpl-suggested-task-actions-wrapper > div'
+			);
 
 			// Actions hidden by default.
 			expect( actionsContainer ).toHaveStyle( {
@@ -377,8 +378,9 @@ describe( 'TaskItem', () => {
 			);
 
 			const listItem = screen.getByRole( 'listitem' );
-			const actionsContainer =
-				container.querySelector( '.tooltip-actions' );
+			const actionsContainer = container.querySelector(
+				'.prpl-suggested-task-actions-wrapper > div'
+			);
 
 			// Focus on the li triggers onFocusCapture.
 			fireEvent.focus( listItem );

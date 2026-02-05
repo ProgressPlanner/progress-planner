@@ -36,7 +36,9 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const arrow = container.querySelector( '.prpl-tooltip-arrow' );
+			const arrow = container.querySelector(
+				'[data-testid="tooltip-arrow"]'
+			);
 			expect( arrow ).toBeInTheDocument();
 			expect( arrow.tagName ).toBe( 'SPAN' );
 		} );
@@ -80,7 +82,7 @@ describe( 'Tooltip', () => {
 		} );
 
 		it( 'hides tooltip on overlay click', () => {
-			const { container } = render(
+			render(
 				<Tooltip triggerContent={ <span>Open</span> }>
 					<p>Tooltip body</p>
 				</Tooltip>
@@ -90,7 +92,7 @@ describe( 'Tooltip', () => {
 			fireEvent.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
 			// Close via overlay
-			const overlay = container.querySelector( '.prpl-overlay' );
+			const overlay = screen.getByRole( 'presentation' );
 			fireEvent.click( overlay );
 
 			expect(
@@ -178,23 +180,6 @@ describe( 'Tooltip', () => {
 		} );
 	} );
 
-	describe( 'className passthrough', () => {
-		it( 'applies custom className to wrapper', () => {
-			const { container } = render(
-				<Tooltip
-					triggerContent={ <span>Open</span> }
-					className="custom-class"
-				>
-					<p>Body</p>
-				</Tooltip>
-			);
-
-			expect(
-				container.querySelector( '.prpl-tooltip-wrapper.custom-class' )
-			).toBeInTheDocument();
-		} );
-	} );
-
 	describe( 'tooltipStyle passthrough', () => {
 		it( 'applies tooltipStyle to the tooltip panel', () => {
 			const customStyle = {
@@ -231,7 +216,9 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const arrow = container.querySelector( '.prpl-tooltip-arrow' );
+			const arrow = container.querySelector(
+				'[data-testid="tooltip-arrow"]'
+			);
 			expect( arrow ).toHaveStyle( { left: '25px', right: 'auto' } );
 		} );
 
@@ -242,7 +229,9 @@ describe( 'Tooltip', () => {
 				</Tooltip>
 			);
 
-			const arrow = container.querySelector( '.prpl-tooltip-arrow' );
+			const arrow = container.querySelector(
+				'[data-testid="tooltip-arrow"]'
+			);
 			expect( arrow ).toHaveStyle( {
 				position: 'absolute',
 				top: '0',
@@ -273,7 +262,7 @@ describe( 'Tooltip', () => {
 
 		it( 'calls onClose when overlay is clicked', () => {
 			const onClose = jest.fn();
-			const { container } = render(
+			render(
 				<Tooltip
 					triggerContent={ <span>Open</span> }
 					onClose={ onClose }
@@ -286,7 +275,7 @@ describe( 'Tooltip', () => {
 			fireEvent.click( screen.getByRole( 'button', { name: 'Open' } ) );
 
 			// Close via overlay.
-			const overlay = container.querySelector( '.prpl-overlay' );
+			const overlay = screen.getByRole( 'presentation' );
 			fireEvent.click( overlay );
 			expect( onClose ).toHaveBeenCalledTimes( 1 );
 		} );

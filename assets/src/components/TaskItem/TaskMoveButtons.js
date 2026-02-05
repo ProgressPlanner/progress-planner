@@ -27,7 +27,7 @@ export default function TaskMoveButtons( {
 
 	return (
 		<div
-			className="tooltip-actions prpl-move-buttons-wrapper"
+			className="prpl-move-buttons-wrapper"
 			style={ moveButtonsWrapperStyle }
 		>
 			<span className="prpl-move-buttons" style={ moveButtonsStyle }>

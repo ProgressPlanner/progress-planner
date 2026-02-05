@@ -61,9 +61,7 @@ describe( 'TaskActions', () => {
 		it( 'renders tooltip-actions container', () => {
 			const { container } = render( <TaskActions { ...defaultProps } /> );
 
-			expect(
-				container.querySelector( '.tooltip-actions' )
-			).toBeInTheDocument();
+			expect( container.firstChild ).toBeInTheDocument();
 		} );
 
 		it( 'renders actions from prpl_task_actions array', () => {
@@ -80,8 +78,7 @@ describe( 'TaskActions', () => {
 				<TaskActions { ...defaultProps } isActionsVisible={ true } />
 			);
 
-			const actionsContainer =
-				container.querySelector( '.tooltip-actions' );
+			const actionsContainer = container.firstChild;
 			expect( actionsContainer ).toHaveStyle( {
 				visibility: 'visible',
 			} );
@@ -92,8 +89,7 @@ describe( 'TaskActions', () => {
 				<TaskActions { ...defaultProps } isActionsVisible={ false } />
 			);
 
-			const actionsContainer =
-				container.querySelector( '.tooltip-actions' );
+			const actionsContainer = container.firstChild;
 			expect( actionsContainer ).toHaveStyle( {
 				visibility: 'hidden',
 			} );
@@ -104,8 +100,7 @@ describe( 'TaskActions', () => {
 				<TaskActions { ...defaultProps } isCelebrating={ true } />
 			);
 
-			const actionsContainer =
-				container.querySelector( '.tooltip-actions' );
+			const actionsContainer = container.firstChild;
 			expect( actionsContainer ).toHaveStyle( {
 				pointerEvents: 'none',
 			} );
@@ -393,8 +388,7 @@ describe( 'TaskActions', () => {
 			);
 
 			// No actions rendered (empty container).
-			const actionsContainer =
-				container.querySelector( '.tooltip-actions' );
+			const actionsContainer = container.firstChild;
 			expect( actionsContainer.children ).toHaveLength( 0 );
 		} );
 
@@ -411,8 +405,7 @@ describe( 'TaskActions', () => {
 			);
 
 			// No actions rendered (empty container).
-			const actionsContainer =
-				container.querySelector( '.tooltip-actions' );
+			const actionsContainer = container.firstChild;
 			expect( actionsContainer.children ).toHaveLength( 0 );
 		} );
 
@@ -429,8 +422,7 @@ describe( 'TaskActions', () => {
 			);
 
 			// No actions rendered (empty container).
-			const actionsContainer =
-				container.querySelector( '.tooltip-actions' );
+			const actionsContainer = container.firstChild;
 			expect( actionsContainer.children ).toHaveLength( 0 );
 		} );
 	} );
@@ -451,8 +443,7 @@ describe( 'TaskActions', () => {
 		it( 'applies inline styles to container', () => {
 			const { container } = render( <TaskActions { ...defaultProps } /> );
 
-			const actionsContainer =
-				container.querySelector( '.tooltip-actions' );
+			const actionsContainer = container.firstChild;
 			expect( actionsContainer ).toHaveStyle( { paddingTop: '2px' } );
 		} );
 	} );
@@ -472,8 +463,7 @@ describe( 'TaskActions', () => {
 				/>
 			);
 
-			const actionsContainer =
-				container.querySelector( '.tooltip-actions' );
+			const actionsContainer = container.firstChild;
 			expect( actionsContainer.children ).toHaveLength( 0 );
 		} );
 	} );

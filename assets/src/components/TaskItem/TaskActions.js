@@ -37,6 +37,10 @@ const SEPARATOR_STYLE = {
  */
 function getActionsStyle( isActionsVisible, isCelebrating ) {
 	return {
+		display: 'flex',
+		justifyContent: 'flex-start',
+		flexWrap: 'wrap',
+		position: 'relative',
 		paddingTop: '2px',
 		gap: '0.4rem',
 		alignItems: 'baseline',
@@ -388,7 +392,7 @@ export default function TaskActions( {
 
 	// If no actions and not a user task, return empty container.
 	if ( taskActions.length === 0 && ! isUserTask ) {
-		return <div className="tooltip-actions" style={ actionsStyle }></div>;
+		return <div style={ actionsStyle }></div>;
 	}
 
 	// Collect all action elements into a flat array.
@@ -437,11 +441,7 @@ export default function TaskActions( {
 	} );
 
 	return (
-		<div
-			className="tooltip-actions"
-			style={ actionsStyle }
-			ref={ actionsRef }
-		>
+		<div style={ actionsStyle } ref={ actionsRef }>
 			{ withSeparators }
 		</div>
 	);
