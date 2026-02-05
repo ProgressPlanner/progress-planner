@@ -199,8 +199,6 @@ class Page {
 			$this->enqueue_dashboard_script();
 
 			if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
-				// Enqueue prpl-badge web component for React Badge components.
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-badge' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'upgrade-tasks' );
 			}
@@ -426,6 +424,16 @@ class Page {
 			'progress-planner/dashboard',
 			'prplCelebrate',
 			$celebration_data
+		);
+
+		// Localize badge configuration for React Badge component.
+		\wp_localize_script(
+			'progress-planner/dashboard',
+			'progressPlannerBadge',
+			[
+				'remoteServerRootUrl' => \progress_planner()->get_remote_server_root_url(),
+				'placeholderImageUrl' => \progress_planner()->get_placeholder_svg(),
+			]
 		);
 	}
 
