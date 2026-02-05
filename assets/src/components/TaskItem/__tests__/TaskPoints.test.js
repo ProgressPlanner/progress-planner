@@ -9,8 +9,10 @@ jest.mock( '@wordpress/i18n', () => ( {
 	__: ( str ) => str,
 } ) );
 
-// Mock TrashIcon
-jest.mock( '../icons/TrashIcon', () => () => <svg data-testid="trash-icon" /> );
+// Mock Icon component
+jest.mock( '../../Icon', () => ( props ) => (
+	<svg data-testid={ 'icon-' + props.name } />
+) );
 
 // Mock taskUtils with a function that returns prpl_points or default to 0
 jest.mock( '../../../utils/taskUtils', () => ( {
@@ -145,7 +147,7 @@ describe( 'TaskPoints', () => {
 		it( 'renders trash icon', () => {
 			render( <TaskPoints { ...defaultProps } isUserTask={ true } /> );
 
-			expect( screen.getByTestId( 'trash-icon' ) ).toBeInTheDocument();
+			expect( screen.getByTestId( 'icon-trash' ) ).toBeInTheDocument();
 		} );
 
 		it( 'has screen reader text', () => {

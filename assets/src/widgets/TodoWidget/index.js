@@ -20,6 +20,7 @@ import { dispatchGridResize } from '../../utils/gridResize';
 import { getTaskPoints } from '../../utils/taskUtils';
 import WidgetHeader from '../../components/WidgetHeader';
 import ConfirmDialog from '../../components/ConfirmDialog';
+import Icon from '../../components/Icon';
 import TodoWidgetSkeleton from './TodoWidgetSkeleton';
 import { useDashboardStore } from '../../stores/dashboardStore';
 
@@ -91,6 +92,7 @@ const STYLES = {
 		display: 'inline-block',
 		width: '18px',
 		height: '18px',
+		color: 'var(--prpl-color-ui-icon)',
 	},
 	tooltipActions: {
 		display: 'inline-flex',
@@ -600,19 +602,7 @@ function TodoWidget( { config = {} } ) {
 							className="prpl-todo-list-completed-summary-icon"
 							style={ STYLES.summaryIcon }
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								strokeWidth="1.5"
-								stroke="currentColor"
-							>
-								<path
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									d="m19.5 8.25-7.5 7.5-7.5-7.5"
-								/>
-							</svg>
+							<Icon name="chevronDown" />
 						</span>
 					</summary>
 					<div
@@ -625,17 +615,7 @@ function TodoWidget( { config = {} } ) {
 							onClick={ () => setShowDeletePopover( true ) }
 						>
 							<span style={ STYLES.deleteAllIcon }>
-								<svg
-									role="img"
-									aria-hidden="true"
-									xmlns="http://www.w3.org/2000/svg"
-									viewBox="0 0 48 48"
-								>
-									<path
-										fill="#9ca3af"
-										d="M32.99 47.88H15.01c-3.46 0-6.38-2.7-6.64-6.15L6.04 11.49l-.72.12c-.82.14-1.59-.41-1.73-1.22-.14-.82.41-1.59 1.22-1.73.79-.14 1.57-.26 2.37-.38h.02c2.21-.33 4.46-.6 6.69-.81v-.72c0-3.56 2.74-6.44 6.25-6.55 2.56-.08 5.15-.08 7.71 0 3.5.11 6.25 2.99 6.25 6.55v.72c2.24.2 4.48.47 6.7.81.79.12 1.59.25 2.38.39.82.14 1.36.92 1.22 1.73-.14.82-.92 1.36-1.73 1.22l-.72-.12-2.33 30.24c-.27 3.45-3.18 6.15-6.64 6.15Z"
-									/>
-								</svg>
+								<Icon name="trash" />
 							</span>
 							{ __(
 								'Delete all completed tasks',

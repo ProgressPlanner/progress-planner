@@ -10,7 +10,7 @@
  * @return {JSX.Element} The points component.
  */
 import { __ } from '@wordpress/i18n';
-import TrashIcon from './icons/TrashIcon';
+import Icon from '../Icon';
 import {
 	pointsWrapperStyle,
 	pointsBadgeStyle,
@@ -44,7 +44,7 @@ export default function TaskPoints( { task, isUserTask, onDelete } ) {
 					title={ __( 'Delete', 'progress-planner' ) }
 					onClick={ onDelete }
 				>
-					<TrashIcon />
+					<Icon name="trash" />
 					<span className="screen-reader-text">
 						{ __( 'Delete', 'progress-planner' ) }
 					</span>

@@ -13,7 +13,7 @@
  */
 
 import { __ } from '@wordpress/i18n';
-import ArrowIcon from './icons/ArrowIcon';
+import Icon from '../Icon';
 import { checkboxWrapperStyle, checkboxInputStyle } from './styles';
 
 export default function TaskCheckbox( {
@@ -53,7 +53,13 @@ export default function TaskCheckbox( {
 			className="prpl-suggested-task-checkbox-wrapper"
 			style={ checkboxWrapperStyle }
 		>
-			<ArrowIcon />
+			<Icon
+				name="arrow"
+				style={ {
+					width: '0.75rem',
+					color: 'var(--prpl-color-ui-icon)',
+				} }
+			/>
 		</div>
 	);
 }
