@@ -454,7 +454,6 @@ class Page {
 			\wp_add_inline_style( 'progress-planner/admin', \progress_planner()->get_ui__branding()->get_custom_css() );
 			static::$branding_inline_styles_added = true;
 		}
-		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-install-plugin' );
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {
 			// Enqueue upgrading (onboarding) tasks styles, these are needed both when privacy policy is accepted and when it is not.

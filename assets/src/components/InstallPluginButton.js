@@ -17,6 +17,7 @@
 import { useState, useCallback } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import apiFetch from '@wordpress/api-fetch';
+import './InstallPluginButton.css';
 
 export default function InstallPluginButton( {
 	pluginSlug,
