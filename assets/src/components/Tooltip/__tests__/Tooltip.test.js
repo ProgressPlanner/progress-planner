@@ -28,6 +28,18 @@ describe( 'Tooltip', () => {
 				screen.getByRole( 'tooltip', { hidden: true } )
 			).toHaveAttribute( 'aria-hidden', 'true' );
 		} );
+
+		it( 'renders arrow span element', () => {
+			const { container } = render(
+				<Tooltip triggerContent={ <span>Open</span> }>
+					<p>Body</p>
+				</Tooltip>
+			);
+
+			const arrow = container.querySelector( '.prpl-tooltip-arrow' );
+			expect( arrow ).toBeInTheDocument();
+			expect( arrow.tagName ).toBe( 'SPAN' );
+		} );
 	} );
 
 	describe( 'visibility toggle', () => {
@@ -180,6 +192,158 @@ describe( 'Tooltip', () => {
 			expect(
 				container.querySelector( '.prpl-tooltip-wrapper.custom-class' )
 			).toBeInTheDocument();
+		} );
+	} );
+
+	describe( 'tooltipStyle passthrough', () => {
+		it( 'applies tooltipStyle to the tooltip panel', () => {
+			const customStyle = {
+				transform: 'translate(-20%, calc(100% + 10px))',
+			};
+
+			render(
+				<Tooltip
+					triggerContent={ <span>Open</span> }
+					tooltipStyle={ customStyle }
+				>
+					<p>Body</p>
+				</Tooltip>
+			);
+
+			const tooltip = screen.getByRole( 'tooltip', { hidden: true } );
+			expect( tooltip ).toHaveStyle( customStyle );
+		} );
+	} );
+
+	describe( 'arrowStyle passthrough', () => {
+		it( 'applies arrowStyle to the arrow span', () => {
+			const customArrowStyle = {
+				left: '25px',
+				right: 'auto',
+			};
+
+			const { container } = render(
+				<Tooltip
+					triggerContent={ <span>Open</span> }
+					arrowStyle={ customArrowStyle }
+				>
+					<p>Body</p>
+				</Tooltip>
+			);
+
+			const arrow = container.querySelector( '.prpl-tooltip-arrow' );
+			expect( arrow ).toHaveStyle( { left: '25px', right: 'auto' } );
+		} );
+
+		it( 'arrow has default styles when no arrowStyle provided', () => {
+			const { container } = render(
+				<Tooltip triggerContent={ <span>Open</span> }>
+					<p>Body</p>
+				</Tooltip>
+			);
+
+			const arrow = container.querySelector( '.prpl-tooltip-arrow' );
+			expect( arrow ).toHaveStyle( {
+				position: 'absolute',
+				top: '0',
+				right: '0',
+			} );
+		} );
+	} );
+
+	describe( 'onClose callback', () => {
+		it( 'calls onClose when close button is clicked', () => {
+			const onClose = jest.fn();
+			render(
+				<Tooltip
+					triggerContent={ <span>Open</span> }
+					onClose={ onClose }
+				>
+					<p>Body</p>
+				</Tooltip>
+			);
+
+			// Open.
+			fireEvent.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			// Close via close button.
+			fireEvent.click( screen.getByRole( 'button', { name: /close/i } ) );
+			expect( onClose ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'calls onClose when overlay is clicked', () => {
+			const onClose = jest.fn();
+			const { container } = render(
+				<Tooltip
+					triggerContent={ <span>Open</span> }
+					onClose={ onClose }
+				>
+					<p>Body</p>
+				</Tooltip>
+			);
+
+			// Open.
+			fireEvent.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			// Close via overlay.
+			const overlay = container.querySelector( '.prpl-overlay' );
+			fireEvent.click( overlay );
+			expect( onClose ).toHaveBeenCalledTimes( 1 );
+		} );
+
+		it( 'calls onClose when Escape key is pressed', () => {
+			const onClose = jest.fn();
+			render(
+				<Tooltip
+					triggerContent={ <span>Open</span> }
+					onClose={ onClose }
+				>
+					<p>Body</p>
+				</Tooltip>
+			);
+
+			// Open.
+			fireEvent.click( screen.getByRole( 'button', { name: 'Open' } ) );
+
+			// Close via Escape.
+			fireEvent.keyDown( document, { key: 'Escape' } );
+			expect( onClose ).toHaveBeenCalledTimes( 1 );
+		} );
+	} );
+
+	describe( 'trigger hover underline', () => {
+		it( 'shows underline on trigger hover', () => {
+			render(
+				<Tooltip triggerContent={ <span>Open</span> }>
+					<p>Body</p>
+				</Tooltip>
+			);
+
+			const trigger = screen.getByRole( 'button', { name: 'Open' } );
+
+			expect( trigger ).toHaveStyle( { textDecoration: 'none' } );
+
+			fireEvent.mouseEnter( trigger );
+			expect( trigger ).toHaveStyle( {
+				textDecoration: 'underline',
+			} );
+
+			fireEvent.mouseLeave( trigger );
+			expect( trigger ).toHaveStyle( { textDecoration: 'none' } );
+		} );
+
+		it( 'trigger has base styles', () => {
+			render(
+				<Tooltip triggerContent={ <span>Open</span> }>
+					<p>Body</p>
+				</Tooltip>
+			);
+
+			const trigger = screen.getByRole( 'button', { name: 'Open' } );
+			expect( trigger ).toHaveStyle( {
+				padding: '0',
+				cursor: 'pointer',
+			} );
 		} );
 	} );
 } );
