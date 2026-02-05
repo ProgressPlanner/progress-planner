@@ -17,8 +17,7 @@ module.exports = {
 		'widget-content-activity':
 			'./assets/src/widgets/ContentActivity/index.js',
 		'widget-whats-new': './assets/src/widgets/WhatsNew/index.js',
-		'plugin-deactivation':
-			'./assets/src/plugin-deactivation/index.js',
+		'plugin-deactivation': './assets/src/plugin-deactivation/index.js',
 	},
 	output: {
 		path: path.resolve( __dirname, 'build' ),
@@ -33,9 +32,7 @@ module.exports = {
 		// Exclude plugin-deactivation since it runs on a different page.
 		runtimeChunk: {
 			name: ( entrypoint ) =>
-				entrypoint.name === 'plugin-deactivation'
-					? false
-					: 'runtime',
+				entrypoint.name === 'plugin-deactivation' ? false : 'runtime',
 		},
 	},
 };
