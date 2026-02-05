@@ -40,17 +40,7 @@ class Plugin_Deactivation {
 		if ( ! \function_exists( 'get_current_screen' ) || ! \get_current_screen() || 'plugins' !== \get_current_screen()->id ) {
 			return;
 		}
-		$this->the_popover();
-		$this->the_inline_script();
-		$this->the_inline_style();
-	}
 
-	/**
-	 * The popover.
-	 *
-	 * @return void
-	 */
-	protected function the_popover() {
 		$reasons = [
 			[
 				'id'                   => 'unexpected-behavior',
@@ -107,210 +97,34 @@ class Plugin_Deactivation {
 			'feedback_type'        => false,
 		];
 
-		?>
-		<div id="<?php echo \esc_attr( self::PLUGIN_SLUG ); ?>-popover" popover>
-			<h1><?php \esc_html_e( "We're sorry to see you go", 'progress-planner' ); ?></h1>
-			<p><?php \esc_html_e( 'If you have a moment, please let us know why you are deactivating this plugin:', 'progress-planner' ); ?></p>
-			<form>
-				<?php foreach ( $reasons as $reason ) : ?>
-					<div class="reason-wrapper" data-reason="<?php echo \esc_attr( $reason['id'] ); ?>">
-						<span class="radio-wrapper">
-							<input
-								id="deactivate-plugin-reason-<?php echo \esc_attr( $reason['id'] ); ?>"
-								type="radio"
-								name="reason"
-								value="<?php echo \esc_attr( $reason['id'] ); ?>"
-							>
-							<label for="deactivate-plugin-reason-<?php echo \esc_attr( $reason['id'] ); ?>">
-								<?php echo \esc_html( $reason['label'] ); ?>
-							</label>
-						</span>
-						<?php if ( $reason['feedback_type'] ) : ?>
-							<div class="feedback-wrapper">
-								<?php if ( 'textarea' === $reason['feedback_type'] ) : ?>
-									<textarea
-										id="deactivate-plugin-reason-<?php echo \esc_attr( $reason['id'] ); ?>-feedback"
-										name="feedback"
-										placeholder="<?php echo \esc_attr( $reason['feedback_placeholder'] ); ?>"
-									></textarea>
-								<?php else : ?>
-									<input
-										id="deactivate-plugin-reason-<?php echo \esc_attr( $reason['id'] ); ?>-feedback"
-										type="text"
-										name="feedback"
-										placeholder="<?php echo \esc_attr( $reason['feedback_placeholder'] ); ?>"
-									>
-								<?php endif; ?>
-							</div>
-						<?php endif; ?>
-					</div>
-				<?php endforeach; ?>
+		// Enqueue the React script.
+		$asset_file = \constant( 'PROGRESS_PLANNER_DIR' ) . '/build/plugin-deactivation.asset.php';
+		$asset      = \file_exists( $asset_file ) ? require $asset_file : [ // @phpstan-ignore requireOnce.fileNotFound
+			'dependencies' => [],
+			'version'      => '1.0.0',
+		];
 
-				<div class="actions">
-					<button type="button" class="submit"><?php \esc_html_e( 'Submit & Deactivate', 'progress-planner' ); ?></button>
-					<button type="button" class="dismiss"><?php \esc_html_e( 'Skip & Deactivate', 'progress-planner' ); ?></button>
-				</div>
-			</form>
-		</div>
-		<?php
-	}
+		\wp_enqueue_script(
+			'progress-planner/plugin-deactivation',
+			\constant( 'PROGRESS_PLANNER_URL' ) . '/build/plugin-deactivation.js',
+			$asset['dependencies'],
+			$asset['version'],
+			true
+		);
 
-	/**
-	 * The inline script.
-	 *
-	 * @return void
-	 */
-	protected function the_inline_script() {
-		?>
-		<script>
-			// A helper function to make AJAX requests.
-			const deactivatePluginFeedbackAjaxRequest = ( { url, data, action } ) => {
-				const http = new XMLHttpRequest();
-				http.open( 'POST', url, true );
-				http.onreadystatechange = () => {
-					let response;
-					try {
-						response = JSON.parse( http.response );
-					} catch ( e ) {}
-					return action( response );
-				};
-				const dataForm = new FormData();
-				for ( let [ key, value ] of Object.entries( data ) ) {
-					dataForm.append( key, value );
-				}
-				http.send( dataForm );
-			}
+		\wp_localize_script(
+			'progress-planner/plugin-deactivation',
+			'prplDeactivationConfig',
+			[
+				'reasons'         => $reasons,
+				'remoteServerUrl' => \progress_planner()->get_remote_server_root_url(),
+				'deactivateUrl'   => \wp_nonce_url( 'plugins.php?action=deactivate&plugin=' . \rawurlencode( \plugin_basename( \constant( 'PROGRESS_PLANNER_FILE' ) ) ), 'deactivate-plugin_' . \plugin_basename( \constant( 'PROGRESS_PLANNER_FILE' ) ) ),
+				'pluginSlug'      => self::PLUGIN_SLUG,
+				'siteUrl'         => \esc_attr( \get_site_url() ),
+			]
+		);
 
-			// Add an event listener to the deactivate button.
-			const deactivateButton = document.getElementById( 'deactivate-<?php echo \esc_attr( self::PLUGIN_SLUG ); ?>' );
-			const deactivationPopover = document.getElementById( '<?php echo \esc_attr( self::PLUGIN_SLUG ); ?>-popover' );
-			if ( deactivateButton && deactivationPopover ) {
-				deactivateButton.addEventListener( 'click', function( e ) {
-					e.preventDefault();
-					deactivationPopover.showPopover();
-				} );
-
-				// Show/hide the feedback fields based on the selected reason.
-				deactivationPopover.querySelectorAll( '.reason-wrapper' ).forEach( function( reasonWrapper ) {
-					reasonWrapper.addEventListener( 'click', function( changeEvent ) {
-						const feedbackWrapper = reasonWrapper.querySelector( '.feedback-wrapper' );
-						// Hide any existing feedback fields.
-						deactivationPopover.querySelectorAll( '.feedback-wrapper' ).forEach( function( feedbackWrapper ) {
-							feedbackWrapper.style.display = 'none';
-						} );
-						if ( feedbackWrapper ) {
-							reasonWrapper.querySelector( '.feedback-wrapper' ).style.display = 'block';
-						}
-					} );
-				} );
-
-				// Handle clicking on the dismiss button.
-				deactivationPopover.querySelector( 'button.dismiss' ).addEventListener( 'click', function( dismissEvent ) {
-					dismissEvent.preventDefault();
-					window.location.href = deactivateButton.href;
-				} );
-
-				// Handle clicking on the submit button.
-				deactivationPopover.querySelector( 'button.submit' ).addEventListener( 'click', function( submitEvent ) {
-					submitEvent.preventDefault();
-					const requestData = {
-						action: 'plugin_deactivation',
-						plugin: '<?php echo \esc_attr( self::PLUGIN_SLUG ); ?>',
-						site: '<?php echo \esc_attr( \get_site_url() ); ?>',
-					};
-					deactivatePluginFeedbackAjaxRequest( {
-						// Get a nonce from the remote server.
-						url: '<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() ); ?>/?rest_route=/deactivation-feedback-server/v1/get-nonce',
-						data: requestData,
-						action: ( response ) => {
-							response = response || {};
-							// Add the nonce to the request data, and build the data object for the feedback.
-							requestData.nonce = response.nonce;
-							const formData = new FormData( deactivationPopover.querySelector( 'form' ) );
-							requestData.reason = formData.get( 'reason' );
-							const feedbackEl = document.getElementById( `deactivate-plugin-reason-${requestData.reason}-feedback` );
-							requestData.feedback = feedbackEl ? feedbackEl.value : '';
-
-							// Make the request to the remote server to submit the feedback.
-							deactivatePluginFeedbackAjaxRequest( {
-								url: '<?php echo \esc_url( \progress_planner()->get_remote_server_root_url() ); ?>/?rest_route=/deactivation-feedback-server/v1/submit-feedback',
-								data: requestData,
-								action: ( response ) => {
-									window.location.href = deactivateButton.href;
-								},
-							} );
-						},
-					} );
-
-					// Submit the form.
-					deactivationPopover.hidePopover();
-				} );
-			}
-		</script>
-		<?php
-	}
-
-	/**
-	 * The inline style.
-	 *
-	 * @return void
-	 */
-	protected function the_inline_style() {
-		?>
-		<style>
-			#<?php echo \esc_attr( self::PLUGIN_SLUG ); ?>-popover::backdrop {
-				background-color: rgba( 0, 0, 0, 0.5 );
-			}
-			#<?php echo \esc_attr( self::PLUGIN_SLUG ); ?>-popover {
-				border: 1px solid #ccc;
-				padding: 2rem;
-				border-radius: 8px;
-
-				form {
-					display: flex;
-					flex-direction: column;
-					gap: 1rem;
-
-					.reason-wrapper {
-						display: flex;
-						gap: 1rem;
-						flex-direction: column;
-
-						.feedback-wrapper {
-							display: none;
-
-							textarea, input {
-								width: 100%;
-								border: 1px solid #ccc;
-								border-radius: 4px;
-								padding: 0.5rem;
-							}
-						}
-					}
-
-					.actions {
-						display: flex;
-						gap: 1rem;
-					}
-
-					button {
-						padding: 0.5rem 1rem;
-						border-radius: 4px;
-						border: 1px solid #ccc;
-						background-color: green;
-						cursor: pointer;
-						color: #fff;
-						margin: 0;
-
-						&.dismiss {
-							background-color: #fff;
-							cursor: pointer;
-							color: #000;
-						}
-					}
-				}
-			}
-		</style>
-		<?php
+		// Render mount container.
+		echo '<div id="prpl-deactivation-root"></div>';
 	}
 }
