@@ -90,7 +90,7 @@ class YoastCornerstoneWorkoutTask extends TaskProvider {
 			type: 'link',
 			priority: 10,
 			label: __( 'Run workout', 'progress-planner' ),
-			url: this.buildAdminUrl(
+			href: this.buildAdminUrl(
 				'admin.php?page=wpseo_workouts#cornerstone'
 			),
 			target: '_self',

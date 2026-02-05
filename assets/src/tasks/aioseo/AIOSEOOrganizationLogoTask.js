@@ -86,7 +86,7 @@ class AIOSEOOrganizationLogoTask extends TaskProvider {
 			type: 'link',
 			priority: 10,
 			label: __( 'Set logo', 'progress-planner' ),
-			url: this.buildAdminUrl(
+			href: this.buildAdminUrl(
 				'admin.php?page=aioseo-search-appearance#/'
 			),
 			target: '_self',

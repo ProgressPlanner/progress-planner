@@ -139,7 +139,7 @@ class YoastFixOrphanedContentTask extends TaskProvider {
 				'Learn more about internal linking',
 				'progress-planner'
 			),
-			url: 'https://prpl.fyi/fix-orphaned-content',
+			href: 'https://prpl.fyi/fix-orphaned-content',
 			target: '_blank',
 		} );
 
