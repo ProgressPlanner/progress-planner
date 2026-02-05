@@ -5,6 +5,7 @@
  */
 
 import { __ } from '@wordpress/i18n';
+import Tooltip from '../Tooltip';
 
 /**
  * WidgetHeader component.
@@ -33,8 +34,8 @@ export default function WidgetHeader( {
 			{ title }
 			{ hasTooltip && (
 				<div className="tooltip-actions">
-					<prpl-tooltip>
-						<slot name="open-icon">
+					<Tooltip
+						triggerContent={
 							<span className="icon prpl-info-icon">
 								<span
 									dangerouslySetInnerHTML={ {
@@ -45,9 +46,10 @@ export default function WidgetHeader( {
 									{ __( 'More info', 'progress-planner' ) }
 								</span>
 							</span>
-						</slot>
-						<slot name="content">{ tooltipContent }</slot>
-					</prpl-tooltip>
+						}
+					>
+						{ tooltipContent }
+					</Tooltip>
 				</div>
 			) }
 		</h2>

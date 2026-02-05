@@ -122,7 +122,7 @@ describe( 'WidgetHeader', () => {
 			).not.toBeInTheDocument();
 		} );
 
-		it( 'renders prpl-tooltip custom element', () => {
+		it( 'renders Tooltip component with correct structure', () => {
 			const { container } = render(
 				<WidgetHeader
 					title="Test"
@@ -132,7 +132,10 @@ describe( 'WidgetHeader', () => {
 			);
 
 			expect(
-				container.querySelector( 'prpl-tooltip' )
+				container.querySelector( '.prpl-tooltip-wrapper' )
+			).toBeInTheDocument();
+			expect(
+				screen.getByRole( 'tooltip', { hidden: true } )
 			).toBeInTheDocument();
 		} );
 
@@ -150,7 +153,7 @@ describe( 'WidgetHeader', () => {
 			expect( iconSpan.innerHTML ).toContain( 'circle' );
 		} );
 
-		it( 'renders tooltip content in slot', () => {
+		it( 'renders tooltip content', () => {
 			render(
 				<WidgetHeader
 					title="Test"
@@ -197,20 +200,6 @@ describe( 'WidgetHeader', () => {
 			expect(
 				screen.getByText( "Title & <Special> 'Characters'" )
 			).toBeInTheDocument();
-		} );
-
-		it( 'handles HTML in tooltip content', () => {
-			const { container } = render(
-				<WidgetHeader
-					title="Test"
-					infoIconSvg="<svg></svg>"
-					tooltipContent="<strong>Bold</strong> text"
-				/>
-			);
-
-			// Content is rendered as text, not HTML
-			const slot = container.querySelector( 'slot[name="content"]' );
-			expect( slot.textContent ).toContain( '<strong>Bold</strong>' );
 		} );
 
 		it( 'handles complex SVG icons', () => {

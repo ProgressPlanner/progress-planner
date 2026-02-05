@@ -199,7 +199,6 @@ class Page {
 			$this->enqueue_dashboard_script();
 
 			if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
-				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-tooltip' );
 				// Enqueue prpl-badge web component for React Badge components.
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-badge' );
 				\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );
@@ -447,7 +446,6 @@ class Page {
 			\wp_add_inline_style( 'progress-planner/admin', \progress_planner()->get_ui__branding()->get_custom_css() );
 			static::$branding_inline_styles_added = true;
 		}
-		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-tooltip' );
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-install-plugin' );
 
 		if ( 'toplevel_page_progress-planner' === $current_screen->id ) {

@@ -9,8 +9,29 @@
 		width: 1.25rem;
 		height: 1.25rem;
 		display: inline-block;
-		vertical-align: bottom; /* align with the text */
+		vertical-align: bottom;
 	}
+}
+
+.prpl-tooltip-wrapper {
+	display: inline-flex;
+	align-items: center;
+	position: relative;
+
+	.prpl-tooltip {
+
+		p {
+			margin-bottom: 0;
+		}
+
+		p:first-child {
+			margin-top: 0;
+		}
+	}
+}
+
+span.prpl-tooltip {
+	display: block;
 }
 
 .prpl-tooltip {
@@ -23,14 +44,14 @@
 	width: 150px;
 	background: var(--prpl-background-activity);
 	border-radius: var(--prpl-border-radius);
-	z-index: 2; /* above the gauges */
-	visibility: hidden; /* hidden by default */
+	z-index: 2;
+	visibility: hidden;
 
 	font-size: 1rem;
 	font-weight: 400;
 	color: var(--prpl-color-text);
 
-	&[data-tooltip-visible="true"] {
+	&.prpl-tooltip-visible {
 		visibility: visible;
 		z-index: 10;
 	}
@@ -64,29 +85,11 @@
 	}
 }
 
-prpl-tooltip {
-	display: inline-flex;
-	align-items: center;
-	position: relative;
-
-	.prpl-tooltip {
-
-		p {
-			margin-bottom: 0;
-		}
-
-		p:first-child {
-			margin-top: 0;
-		}
-	}
+span.prpl-overlay {
+	display: block;
 }
 
-.prpl-overlay {
-	display: none;
-}
-
-body:has([data-tooltip-visible="true"]) .prpl-overlay {
-	display: block !important;
+.prpl-tooltip-wrapper > .prpl-overlay {
 	position: fixed;
 	top: 0;
 	left: 0;

@@ -46,14 +46,3 @@ if ( ! \defined( 'ABSPATH' ) ) {
 		\do_action( 'progress_planner_admin_page_after_widgets' );
 	?>
 </div>
-<div class="prpl-overlay" id="prpl-overlay" style="display: none;"></div>
-
-<script>
-// Add event listener for overlay click to close tooltips.
-document.getElementById( 'prpl-overlay' )?.addEventListener( 'click', function() {
-	const visibleTooltip = document.querySelector( '[data-tooltip-visible=true]' );
-	if ( visibleTooltip ) {
-		visibleTooltip.removeAttribute( 'data-tooltip-visible' );
-	}
-} );
-</script>

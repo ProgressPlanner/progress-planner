@@ -21,6 +21,7 @@ import { getTaskPoints } from '../../utils/taskUtils';
 import WidgetHeader from '../../components/WidgetHeader';
 import ConfirmDialog from '../../components/ConfirmDialog';
 import Icon from '../../components/Icon';
+import Tooltip from '../../components/Tooltip';
 import TodoWidgetSkeleton from './TodoWidgetSkeleton';
 import { useDashboardStore } from '../../stores/dashboardStore';
 
@@ -500,8 +501,8 @@ function TodoWidget( { config = {} } ) {
 					className="tooltip-actions"
 					style={ STYLES.tooltipActions }
 				>
-					<prpl-tooltip>
-						<slot name="open-icon">
+					<Tooltip
+						triggerContent={
 							<span className="icon prpl-info-icon">
 								{ infoIconSvg && (
 									<span
@@ -514,9 +515,10 @@ function TodoWidget( { config = {} } ) {
 									{ __( 'More info', 'progress-planner' ) }
 								</span>
 							</span>
-						</slot>
-						<slot name="content">{ tooltipContent }</slot>
-					</prpl-tooltip>
+						}
+					>
+						{ tooltipContent }
+					</Tooltip>
 				</span>
 			</p>
 

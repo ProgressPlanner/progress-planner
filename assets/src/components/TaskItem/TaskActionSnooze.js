@@ -6,19 +6,12 @@
 
 import { useState } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
+import Tooltip from '../Tooltip';
 
 /**
  * Button styles.
  */
 const STYLES = {
-	button: {
-		textDecoration: 'none',
-		padding: 0,
-		lineHeight: 1,
-		background: 'none',
-		border: 'none',
-		cursor: 'pointer',
-	},
 	actionText: {
 		lineHeight: 1,
 		fontSize: 'var(--prpl-font-size-small)',
@@ -41,13 +34,12 @@ const SNOOZE_DURATIONS = [
 /**
  * Task Snooze Action component.
  *
- * @param {Object}   props           Component props.
- * @param {string}   props.taskId    The task ID.
- * @param {string}   props.taskTitle The task title for accessibility.
- * @param {Function} props.onSnooze  Snooze handler (receives duration key).
+ * @param {Object}   props          Component props.
+ * @param {string}   props.taskId   The task ID.
+ * @param {Function} props.onSnooze Snooze handler (receives duration key).
  * @return {JSX.Element} The snooze action with tooltip.
  */
-export default function TaskActionSnooze( { taskId, taskTitle, onSnooze } ) {
+export default function TaskActionSnooze( { taskId, onSnooze } ) {
 	const [ isExpanded, setIsExpanded ] = useState( false );
 
 	const wrapperClassName = `prpl-suggested-task-snooze${
@@ -65,74 +57,55 @@ export default function TaskActionSnooze( { taskId, taskTitle, onSnooze } ) {
 		setIsExpanded( ! isExpanded );
 	};
 
-	// Wrapper span needed because React's className prop doesn't work on custom elements (web components).
 	return (
 		<span className={ wrapperClassName }>
-			<prpl-tooltip>
-				<slot name="open">
-					<button
-						type="button"
-						className="prpl-suggested-task-button"
-						style={ STYLES.button }
-						data-task-id={ taskId }
-						data-task-title={ taskTitle }
-						data-action="snooze"
-						data-target="snooze"
-						title={ __( 'Snooze', 'progress-planner' ) }
+			<Tooltip
+				triggerContent={
+					<span
+						className="prpl-tooltip-action-text"
+						style={ STYLES.actionText }
 					>
-						<span
-							className="prpl-tooltip-action-text"
-							style={ STYLES.actionText }
-						>
-							{ __( 'Snooze', 'progress-planner' ) }
+						{ __( 'Snooze', 'progress-planner' ) }
+					</span>
+				}
+			>
+				<fieldset>
+					<legend>
+						<span>
+							{ __( 'Snooze this task?', 'progress-planner' ) }
 						</span>
-					</button>
-				</slot>
-				<slot name="content">
-					<fieldset>
-						<legend>
-							<span>
-								{ __(
-									'Snooze this task?',
-									'progress-planner'
-								) }
+						<button
+							type="button"
+							className="prpl-toggle-radio-group"
+							onClick={ toggleExpanded }
+						>
+							<span className="prpl-toggle-radio-group-text">
+								{ __( 'How long?', 'progress-planner' ) }
 							</span>
-							<button
-								type="button"
-								className="prpl-toggle-radio-group"
-								onClick={ toggleExpanded }
-							>
-								<span className="prpl-toggle-radio-group-text">
-									{ __( 'How long?', 'progress-planner' ) }
-								</span>
-								<span className="prpl-toggle-radio-group-arrow">
-									&rsaquo;
-								</span>
-							</button>
-						</legend>
-						<div className="prpl-snooze-duration-radio-group">
-							{ SNOOZE_DURATIONS.map( ( duration ) => {
-								const inputId = `snooze-${ taskId }-${ duration.key }`;
-								return (
-									<label
-										key={ duration.key }
-										htmlFor={ inputId }
-									>
-										<input
-											type="radio"
-											id={ inputId }
-											name={ `snooze-duration-${ taskId }` }
-											value={ duration.key }
-											onChange={ handleDurationChange }
-										/>
-										{ duration.label }
-									</label>
-								);
-							} ) }
-						</div>
-					</fieldset>
-				</slot>
-			</prpl-tooltip>
+							<span className="prpl-toggle-radio-group-arrow">
+								&rsaquo;
+							</span>
+						</button>
+					</legend>
+					<div className="prpl-snooze-duration-radio-group">
+						{ SNOOZE_DURATIONS.map( ( duration ) => {
+							const inputId = `snooze-${ taskId }-${ duration.key }`;
+							return (
+								<label key={ duration.key } htmlFor={ inputId }>
+									<input
+										type="radio"
+										id={ inputId }
+										name={ `snooze-duration-${ taskId }` }
+										value={ duration.key }
+										onChange={ handleDurationChange }
+									/>
+									{ duration.label }
+								</label>
+							);
+						} ) }
+					</div>
+				</fieldset>
+			</Tooltip>
 		</span>
 	);
 }

@@ -1,1 +1,1 @@
-<?php return array('dependencies' => array('react-jsx-runtime', 'wp-api-fetch', 'wp-element', 'wp-hooks', 'wp-i18n'), 'version' => '95c07beb5e4dead04d9f', 'handle' => 'undefined-widget-streak-badges');
+<?php return array('dependencies' => array('react-jsx-runtime', 'wp-api-fetch', 'wp-element', 'wp-hooks', 'wp-i18n'), 'version' => '55be06d3a03cddc4ac17', 'handle' => 'undefined-widget-streak-badges');
