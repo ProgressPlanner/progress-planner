@@ -134,17 +134,9 @@ class Onboard_Wizard {
 				'action_label' => $action_labels[ $task_id ],
 			];
 
-			// Add task specific data.
+			// Add task specific data for React form components.
 			if ( 'core-blogdescription' === $task_id ) {
 				$task_formatted['site_description'] = \get_bloginfo( 'description' );
-			}
-
-			// Render task template HTML for React.
-			$template_file = \constant( 'PROGRESS_PLANNER_DIR' ) . '/views/onboarding/tasks/' . $task_id . '.php';
-			if ( \file_exists( $template_file ) ) {
-				\ob_start();
-				\progress_planner()->the_view( 'onboarding/tasks/' . $task_id . '.php', [ 'task' => $task_formatted ] );
-				$task_formatted['template_html'] = \ob_get_clean();
 			}
 
 			$tasks[ $task_id ] = $task_formatted;

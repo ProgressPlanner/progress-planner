@@ -10,6 +10,7 @@
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { useTaskCompletion } from '../../../hooks/useTaskCompletion';
+import TASK_FORMS from '../TaskForms';
 
 /**
  * FirstTaskStep component.
@@ -33,6 +34,9 @@ export default function FirstTaskStep( props ) {
 	const taskContentRef = useRef( null );
 
 	const task = stepData?.data?.task;
+
+	// Look up React form component for this task.
+	const TaskFormComponent = task?.task_id ? TASK_FORMS[ task.task_id ] : null;
 
 	/**
 	 * Handle task completion.
@@ -64,8 +68,25 @@ export default function FirstTaskStep( props ) {
 		}
 	};
 
-	// Attach click handler after render.
+	/**
+	 * Handle React form submission.
+	 *
+	 * @param {Event} e - The form submit event.
+	 */
+	const handleFormSubmit = ( e ) => {
+		e.preventDefault();
+		const formData = new FormData( e.target );
+		const formValues = Object.fromEntries( formData.entries() );
+		handleCompleteTask( task.task_id, formValues );
+	};
+
+	// Attach click handler after render (for dangerouslySetInnerHTML fallback).
 	useEffect( () => {
+		// Skip if using React form component.
+		if ( TaskFormComponent ) {
+			return;
+		}
+
 		if ( ! taskContentRef.current ) {
 			return;
 		}
@@ -98,7 +119,7 @@ export default function FirstTaskStep( props ) {
 			btn.removeEventListener( 'click', handleClick );
 		};
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [ task ] );
+	}, [ task, TaskFormComponent ] );
 
 	// Skip step if no task available.
 	useEffect( () => {
@@ -111,6 +132,65 @@ export default function FirstTaskStep( props ) {
 	if ( ! task ) {
 		return null;
 	}
+
+	/**
+	 * Render the task content column.
+	 *
+	 * @return {JSX.Element} Task content.
+	 */
+	const renderTaskContent = () => {
+		// Use React form component if available.
+		if ( TaskFormComponent ) {
+			return (
+				<form
+					className="prpl-onboarding-task-form"
+					onSubmit={ handleFormSubmit }
+				>
+					<TaskFormComponent task={ task } />
+					<button
+						type="submit"
+						className="prpl-complete-task-btn prpl-btn prpl-btn-secondary"
+						data-task-id={ task.task_id }
+						disabled={ isCompleting }
+					>
+						{ isCompleting
+							? __( 'Completing…', 'progress-planner' )
+							: task.action_label ||
+							  __( 'Mark as complete', 'progress-planner' ) }
+						<span className="dashicons dashicons-arrow-right-alt2"></span>
+					</button>
+				</form>
+			);
+		}
+
+		// Fallback: render dangerouslySetInnerHTML or plain button.
+		if ( task.template_html ) {
+			return (
+				<div
+					dangerouslySetInnerHTML={ {
+						__html: task.template_html,
+					} }
+				/>
+			);
+		}
+
+		return (
+			<div className="prpl-first-task-content">
+				{ task.title && <h4>{ task.title }</h4> }
+				<button
+					type="button"
+					className="prpl-complete-task-btn prpl-btn prpl-btn-secondary"
+					data-task-id={ task.task_id }
+					disabled={ isCompleting }
+				>
+					{ isCompleting
+						? __( 'Completing…', 'progress-planner' )
+						: task.action_label ||
+						  __( 'Mark as complete', 'progress-planner' ) }
+				</button>
+			</div>
+		);
+	};
 
 	return (
 		<div className="onboarding-step">
@@ -143,34 +223,7 @@ export default function FirstTaskStep( props ) {
 						</div>
 					</div>
 					<div className="prpl-column" ref={ taskContentRef }>
-						{ task.template_html ? (
-							<div
-								dangerouslySetInnerHTML={ {
-									__html: task.template_html,
-								} }
-							/>
-						) : (
-							<div className="prpl-first-task-content">
-								{ task.title && <h4>{ task.title }</h4> }
-								<button
-									type="button"
-									className="prpl-complete-task-btn prpl-btn prpl-btn-secondary"
-									data-task-id={ task.task_id }
-									disabled={ isCompleting }
-								>
-									{ isCompleting
-										? __(
-												'Completing…',
-												'progress-planner'
-										  )
-										: task.action_label ||
-										  __(
-												'Mark as complete',
-												'progress-planner'
-										  ) }
-								</button>
-							</div>
-						) }
+						{ renderTaskContent() }
 					</div>
 				</div>
 			</div>

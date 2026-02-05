@@ -30,6 +30,7 @@ use Progress_Planner\Utils\Deprecations;
  * @method \Progress_Planner\Rest\Upgrade_Tasks_Config get_rest__upgrade_tasks_config()
  * @method \Progress_Planner\Rest\Subscribe get_rest__subscribe()
  * @method \Progress_Planner\Rest\Timezone_Options get_rest__timezone_options()
+ * @method \Progress_Planner\Rest\Locale_Options get_rest__locale_options()
  * @method \Progress_Planner\Rest\Data_Collectors get_rest__data_collectors()
  * @method \Progress_Planner\Rest\Task_Evaluation get_rest__task_evaluation()
  * @method \Progress_Planner\Rest\Page_Settings get_rest__page_settings()
@@ -142,6 +143,7 @@ class Base {
 		$this->get_rest__upgrade_tasks_config();
 		$this->get_rest__subscribe();
 		$this->get_rest__timezone_options();
+		$this->get_rest__locale_options();
 		$this->get_rest__data_collectors();
 		$this->get_rest__task_evaluation();
 		$this->get_rest__page_settings();

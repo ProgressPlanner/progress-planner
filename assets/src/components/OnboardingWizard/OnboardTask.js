@@ -10,6 +10,7 @@
 import { useState, useEffect, useRef } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useTaskCompletion } from '../../hooks/useTaskCompletion';
+import TASK_FORMS from './TaskForms';
 
 /**
  * OnboardTask component.
@@ -342,7 +343,71 @@ export default function OnboardTask( {
 		} );
 	};
 
+	// Look up React form component for this task.
+	const TaskFormComponent = task?.task_id ? TASK_FORMS[ task.task_id ] : null;
+
+	/**
+	 * Handle React form submission.
+	 *
+	 * @param {Event} e - The form submit event.
+	 */
+	const handleFormSubmit = ( e ) => {
+		e.preventDefault();
+		const formData = new FormData( e.target );
+		setFormValues( Object.fromEntries( formData.entries() ) );
+		setTimeout( () => handleComplete(), 0 );
+	};
+
 	if ( isOpen ) {
+		// Render with native React form component if available.
+		if ( TaskFormComponent ) {
+			return (
+				<div
+					className="prpl-task-content-active"
+					ref={ taskContentRef }
+				>
+					<div className="prpl-task-form">
+						<form
+							className="prpl-onboarding-task-form"
+							onSubmit={ handleFormSubmit }
+							ref={ ( el ) => {
+								if ( el ) {
+									setupFileUpload( el );
+								}
+							} }
+						>
+							<TaskFormComponent task={ task } />
+							<div className="prpl-task-buttons">
+								<button
+									type="button"
+									className="prpl-btn prpl-task-close-btn"
+									onClick={ handleClose }
+								>
+									<span className="dashicons dashicons-arrow-left-alt2"></span>{ ' ' }
+									{ config?.l10n?.backToRecommendations ||
+										__(
+											'Back to recommendations',
+											'progress-planner'
+										) }
+								</button>
+								<button
+									type="submit"
+									className="prpl-complete-task-btn prpl-btn prpl-btn-secondary"
+									data-task-id={ task.task_id }
+								>
+									{ task.action_label ||
+										__(
+											'Mark as complete',
+											'progress-planner'
+										) }
+								</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			);
+		}
+
 		return (
 			<div className="prpl-task-content-active" ref={ taskContentRef }>
 				<div className="prpl-task-form">
