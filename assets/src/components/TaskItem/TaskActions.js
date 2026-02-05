@@ -18,19 +18,40 @@ import TaskActionPopover from './TaskActionPopover';
 import TaskActionDelete from './TaskActionDelete';
 
 /**
- * Style constants - extracted to prevent recreation on each render.
+ * Separator style between action items.
  */
-const STYLES = {
-	actions: {
+const SEPARATOR_STYLE = {
+	display: 'inline-block',
+	width: 1,
+	height: '0.75rem',
+	background: 'var(--prpl-color-text)',
+	alignSelf: 'center',
+};
+
+/**
+ * Get container styles based on visibility and celebrating state.
+ *
+ * @param {boolean} isActionsVisible Whether actions should be visible.
+ * @param {boolean} isCelebrating    Whether the task is celebrating.
+ * @return {Object} Style object for the actions container.
+ */
+function getActionsStyle( isActionsVisible, isCelebrating ) {
+	return {
 		paddingTop: '2px',
 		gap: '0.4rem',
 		alignItems: 'baseline',
-	},
-	action: {
-		display: 'inline-flex',
-		position: 'relative',
-		textDecoration: 'none',
-	},
+		visibility: isActionsVisible ? 'visible' : 'hidden',
+		pointerEvents: isCelebrating ? 'none' : undefined,
+	};
+}
+
+/**
+ * Style for individual action wrapper.
+ */
+const ACTION_STYLE = {
+	display: 'inline-flex',
+	position: 'relative',
+	textDecoration: 'none',
 };
 
 /**
@@ -60,7 +81,6 @@ function renderAction( action, task, onComplete, onSnooze, onDelete ) {
 			return (
 				<TaskActionSnooze
 					taskId={ action.taskId }
-					taskTitle={ action.taskTitle || taskTitle }
 					onSnooze={ ( duration ) => onSnooze( task.id, duration ) }
 				/>
 			);
@@ -68,8 +88,6 @@ function renderAction( action, task, onComplete, onSnooze, onDelete ) {
 		case 'info':
 			return (
 				<TaskActionInfo
-					taskId={ action.taskId }
-					taskTitle={ action.taskTitle || taskTitle }
 					externalUrl={ action.externalUrl }
 					content={ action.content }
 				/>
@@ -133,17 +151,21 @@ function renderAction( action, task, onComplete, onSnooze, onDelete ) {
 /**
  * Task Actions component.
  *
- * @param {Object}   props            Component props.
- * @param {Object}   props.task       The task object.
- * @param {boolean}  props.isUserTask Whether this is a user task.
- * @param {Function} props.onComplete Callback for completing a task.
- * @param {Function} props.onSnooze   Callback for snoozing a task.
- * @param {Function} props.onDelete   Callback for deleting a task.
+ * @param {Object}   props                  Component props.
+ * @param {Object}   props.task             The task object.
+ * @param {boolean}  props.isUserTask       Whether this is a user task.
+ * @param {boolean}  props.isActionsVisible Whether actions should be visible.
+ * @param {boolean}  props.isCelebrating    Whether the task is celebrating.
+ * @param {Function} props.onComplete       Callback for completing a task.
+ * @param {Function} props.onSnooze         Callback for snoozing a task.
+ * @param {Function} props.onDelete         Callback for deleting a task.
  * @return {JSX.Element} The task actions component.
  */
 export default function TaskActions( {
 	task,
 	isUserTask,
+	isActionsVisible = false,
+	isCelebrating = false,
 	onComplete,
 	onSnooze,
 	onDelete,
@@ -362,51 +384,65 @@ export default function TaskActions( {
 		createDeleteHandler,
 	] );
 
+	const actionsStyle = getActionsStyle( isActionsVisible, isCelebrating );
+
 	// If no actions and not a user task, return empty container.
 	if ( taskActions.length === 0 && ! isUserTask ) {
-		return <div className="tooltip-actions" style={ STYLES.actions }></div>;
+		return <div className="tooltip-actions" style={ actionsStyle }></div>;
 	}
+
+	// Collect all action elements into a flat array.
+	const actionElements = taskActions.map( ( action, index ) => (
+		<span key={ index } className="tooltip-action" style={ ACTION_STYLE }>
+			{ action.type === 'html' ? (
+				// Render HTML string (backward compatibility with PHP).
+				<span dangerouslySetInnerHTML={ { __html: action.html } } />
+			) : (
+				// Render React component based on action type.
+				renderAction( action, task, onComplete, onSnooze, onDelete )
+			) }
+		</span>
+	) );
+
+	// Add delete button for user tasks.
+	if ( isUserTask ) {
+		actionElements.push(
+			<span
+				key="user-delete"
+				className="tooltip-action"
+				style={ ACTION_STYLE }
+			>
+				<TaskActionDelete
+					postId={ task.id }
+					taskTitle={ task.title?.rendered || task.title }
+					onClick={ () => onDelete( task.id ) }
+				/>
+			</span>
+		);
+	}
+
+	// Interleave separator spans between action elements.
+	const withSeparators = [];
+	actionElements.forEach( ( element, index ) => {
+		if ( index > 0 ) {
+			withSeparators.push(
+				<span
+					key={ `sep-${ index }` }
+					className="prpl-action-separator"
+					style={ SEPARATOR_STYLE }
+				/>
+			);
+		}
+		withSeparators.push( element );
+	} );
 
 	return (
 		<div
 			className="tooltip-actions"
-			style={ STYLES.actions }
+			style={ actionsStyle }
 			ref={ actionsRef }
 		>
-			{ taskActions.map( ( action, index ) => (
-				<span
-					key={ index }
-					className="tooltip-action"
-					style={ STYLES.action }
-				>
-					{ action.type === 'html' ? (
-						// Render HTML string (backward compatibility with PHP).
-						<span
-							dangerouslySetInnerHTML={ { __html: action.html } }
-						/>
-					) : (
-						// Render React component based on action type.
-						renderAction(
-							action,
-							task,
-							onComplete,
-							onSnooze,
-							onDelete
-						)
-					) }
-				</span>
-			) ) }
-
-			{ /* Add delete button for user tasks */ }
-			{ isUserTask && (
-				<span className="tooltip-action" style={ STYLES.action }>
-					<TaskActionDelete
-						postId={ task.id }
-						taskTitle={ task.title?.rendered || task.title }
-						onClick={ () => onDelete( task.id ) }
-					/>
-				</span>
-			) }
+			{ withSeparators }
 		</div>
 	);
 }

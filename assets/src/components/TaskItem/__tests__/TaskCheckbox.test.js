@@ -195,6 +195,40 @@ describe( 'TaskCheckbox', () => {
 		} );
 	} );
 
+	describe( 'disabled checkbox inline styles', () => {
+		it( 'applies disabled styles when celebrating', () => {
+			render(
+				<TaskCheckbox
+					{ ...defaultProps }
+					isUserTask={ true }
+					isCelebrating={ true }
+				/>
+			);
+
+			const checkbox = screen.getByRole( 'checkbox' );
+			expect( checkbox ).toHaveStyle( {
+				opacity: '0.5',
+				borderColor: '#0773bf',
+				backgroundColor: '#effbfe',
+			} );
+		} );
+
+		it( 'does not apply disabled styles when not celebrating', () => {
+			render(
+				<TaskCheckbox
+					{ ...defaultProps }
+					isUserTask={ true }
+					isCelebrating={ false }
+				/>
+			);
+
+			const checkbox = screen.getByRole( 'checkbox' );
+			expect( checkbox ).not.toHaveStyle( {
+				opacity: '0.5',
+			} );
+		} );
+	} );
+
 	describe( 'wrapper styling', () => {
 		it( 'has wrapper class', () => {
 			render( <TaskCheckbox { ...defaultProps } isUserTask={ true } /> );

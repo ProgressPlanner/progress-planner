@@ -45,6 +45,8 @@ describe( 'TaskActions', () => {
 	const defaultProps = {
 		task: mockTask,
 		isUserTask: false,
+		isActionsVisible: true,
+		isCelebrating: false,
 		onComplete: jest.fn(),
 		onSnooze: jest.fn(),
 		onDelete: jest.fn(),
@@ -69,6 +71,86 @@ describe( 'TaskActions', () => {
 
 			const actions = container.querySelectorAll( '.tooltip-action' );
 			expect( actions ).toHaveLength( 1 );
+		} );
+	} );
+
+	describe( 'visibility and celebrating', () => {
+		it( 'applies visible visibility when isActionsVisible is true', () => {
+			const { container } = render(
+				<TaskActions { ...defaultProps } isActionsVisible={ true } />
+			);
+
+			const actionsContainer =
+				container.querySelector( '.tooltip-actions' );
+			expect( actionsContainer ).toHaveStyle( {
+				visibility: 'visible',
+			} );
+		} );
+
+		it( 'applies hidden visibility when isActionsVisible is false', () => {
+			const { container } = render(
+				<TaskActions { ...defaultProps } isActionsVisible={ false } />
+			);
+
+			const actionsContainer =
+				container.querySelector( '.tooltip-actions' );
+			expect( actionsContainer ).toHaveStyle( {
+				visibility: 'hidden',
+			} );
+		} );
+
+		it( 'applies pointer-events none when celebrating', () => {
+			const { container } = render(
+				<TaskActions { ...defaultProps } isCelebrating={ true } />
+			);
+
+			const actionsContainer =
+				container.querySelector( '.tooltip-actions' );
+			expect( actionsContainer ).toHaveStyle( {
+				pointerEvents: 'none',
+			} );
+		} );
+	} );
+
+	describe( 'separator spans', () => {
+		it( 'renders separator between multiple actions', () => {
+			const taskWithActions = {
+				...mockTask,
+				prpl_task_actions: [
+					'<button data-action="complete">Complete</button>',
+					'<a href="#">Info</a>',
+				],
+			};
+
+			const { container } = render(
+				<TaskActions { ...defaultProps } task={ taskWithActions } />
+			);
+
+			const separators = container.querySelectorAll(
+				'.prpl-action-separator'
+			);
+			expect( separators ).toHaveLength( 1 );
+		} );
+
+		it( 'does not render separator for single action', () => {
+			const { container } = render( <TaskActions { ...defaultProps } /> );
+
+			const separators = container.querySelectorAll(
+				'.prpl-action-separator'
+			);
+			expect( separators ).toHaveLength( 0 );
+		} );
+
+		it( 'renders separator between actions and user delete button', () => {
+			const { container } = render(
+				<TaskActions { ...defaultProps } isUserTask={ true } />
+			);
+
+			// 1 action + 1 delete = 1 separator
+			const separators = container.querySelectorAll(
+				'.prpl-action-separator'
+			);
+			expect( separators ).toHaveLength( 1 );
 		} );
 	} );
 

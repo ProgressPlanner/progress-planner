@@ -5,7 +5,7 @@
  * Shared between SuggestedTasks and TodoWidget.
  */
 
-import { useRef, useCallback, useEffect } from '@wordpress/element';
+import { useState, useRef, useCallback, useEffect } from '@wordpress/element';
 import TaskActions from './TaskActions';
 import TaskCheckbox from './TaskCheckbox';
 import TaskTitle from './TaskTitle';
@@ -48,6 +48,8 @@ export default function TaskItem( {
 } ) {
 	const titleRef = useRef( null );
 	const debounceTimeoutRef = useRef( null );
+	const [ isHovered, setIsHovered ] = useState( false );
+	const [ isFocused, setIsFocused ] = useState( false );
 
 	/**
 	 * Determine task action based on status.
@@ -167,6 +169,10 @@ export default function TaskItem( {
 			data-task-provider-id={ providerSlug }
 			data-task-points={ getTaskPoints( task ) }
 			data-task-order={ task.menu_order || 0 }
+			onMouseEnter={ () => setIsHovered( true ) }
+			onMouseLeave={ () => setIsHovered( false ) }
+			onFocusCapture={ () => setIsFocused( true ) }
+			onBlurCapture={ () => setIsFocused( false ) }
 		>
 			<TaskCheckbox
 				isUserTask={ isUserTask }
@@ -209,6 +215,8 @@ export default function TaskItem( {
 					<TaskActions
 						task={ task }
 						isUserTask={ isUserTask }
+						isActionsVisible={ isHovered || isFocused }
+						isCelebrating={ isCelebrating }
 						onComplete={ onComplete }
 						onSnooze={ onSnooze }
 						onDelete={ onDelete }

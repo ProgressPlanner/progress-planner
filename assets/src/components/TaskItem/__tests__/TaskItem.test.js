@@ -345,6 +345,49 @@ describe( 'TaskItem', () => {
 		} );
 	} );
 
+	describe( 'hover and focus visibility', () => {
+		it( 'makes actions visible on mouse enter', () => {
+			const { container } = render( <TaskItem { ...defaultProps } /> );
+
+			const listItem = screen.getByRole( 'listitem' );
+			const actionsContainer =
+				container.querySelector( '.tooltip-actions' );
+
+			// Actions hidden by default.
+			expect( actionsContainer ).toHaveStyle( {
+				visibility: 'hidden',
+			} );
+
+			// Hover shows actions.
+			fireEvent.mouseEnter( listItem );
+			expect( actionsContainer ).toHaveStyle( {
+				visibility: 'visible',
+			} );
+
+			// Leave hides actions.
+			fireEvent.mouseLeave( listItem );
+			expect( actionsContainer ).toHaveStyle( {
+				visibility: 'hidden',
+			} );
+		} );
+
+		it( 'makes actions visible on focus within', () => {
+			const { container } = render(
+				<TaskItem { ...defaultProps } isUserTask={ true } />
+			);
+
+			const listItem = screen.getByRole( 'listitem' );
+			const actionsContainer =
+				container.querySelector( '.tooltip-actions' );
+
+			// Focus on the li triggers onFocusCapture.
+			fireEvent.focus( listItem );
+			expect( actionsContainer ).toHaveStyle( {
+				visibility: 'visible',
+			} );
+		} );
+	} );
+
 	describe( 'styling', () => {
 		it( 'getTaskItemStyle returns alternating backgrounds based on index', () => {
 			// Test the style function directly since JSDOM doesn't handle CSS vars

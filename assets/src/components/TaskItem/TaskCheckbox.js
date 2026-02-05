@@ -35,7 +35,16 @@ export default function TaskCheckbox( {
 						type="checkbox"
 						className="prpl-suggested-task-checkbox"
 						onChange={ onChange }
-						style={ checkboxInputStyle }
+						style={ {
+							...checkboxInputStyle,
+							...( isCelebrating
+								? {
+										opacity: 0.5,
+										borderColor: '#0773bf',
+										backgroundColor: '#effbfe',
+								  }
+								: {} ),
+						} }
 						checked={ taskIsCompleted }
 						disabled={ isCelebrating }
 					/>
