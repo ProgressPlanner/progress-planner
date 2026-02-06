@@ -58,7 +58,7 @@ class Lessons {
 			[
 				'site'        => \get_site_url(),
 				'license_key' => \progress_planner()->get_license_key(),
-				'locale'      => apply_filters( 'prpl_lesson_locale', \get_locale() ),
+				'locale'      => \apply_filters( 'prpl_lesson_locale', \get_locale() ),
 			],
 			$url
 		);
