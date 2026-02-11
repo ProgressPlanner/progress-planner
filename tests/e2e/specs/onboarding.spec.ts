@@ -37,46 +37,33 @@ test.describe( 'Progress Planner Onboarding', () => {
 			);
 		} );
 
-		await test.step( 'Complete onboarding via AJAX', async () => {
-			// Save the license key directly via the WP AJAX handler.
-			// The remote API (progressplanner.com) is unreachable in Playground,
-			// so we call the local save endpoint directly using XMLHttpRequest
-			// (fetch() fails in Playground's service worker environment).
-			const result = await page.evaluate( () => {
-				return new Promise< boolean >( ( resolve ) => {
-					const xhr = new XMLHttpRequest();
-					xhr.open(
-						'POST',
-						( window as any ).progressPlanner.ajaxUrl,
-						true
-					);
-					xhr.onreadystatechange = () => {
-						if ( xhr.readyState === 4 ) {
-							resolve( xhr.status === 200 );
-						}
-					};
-					xhr.onerror = () => resolve( false );
+		await test.step( 'Complete onboarding', async () => {
+			// The remote API (progressplanner.com) is unreachable in WP Playground
+			// because page.route() cannot intercept requests handled by its
+			// service worker. Use Playwright's request API to call the local
+			// WP AJAX endpoint directly — it bypasses the service worker and
+			// shares the page's auth cookies.
+			const nonce = await page.evaluate(
+				() => ( window as any ).progressPlanner.nonce
+			);
 
-					const formData = new FormData();
-					formData.append(
-						'action',
-						'progress_planner_save_onboard_data'
-					);
-					formData.append(
-						'_ajax_nonce',
-						( window as any ).progressPlanner.nonce
-					);
-					formData.append( 'key', 'test-license-for-e2e-testing' );
-					xhr.send( formData );
-				} );
-			} );
+			const response = await page.request.post(
+				'/wp-admin/admin-ajax.php',
+				{
+					form: {
+						action: 'progress_planner_save_onboard_data',
+						_ajax_nonce: nonce,
+						key: 'test-license-for-e2e-testing',
+					},
+				}
+			);
 
-			expect( result ).toBe( true );
+			expect( response.ok() ).toBe( true );
 
 			// Reload to see the dashboard.
 			await page.reload( { waitUntil: 'networkidle' } );
 
-			// Verify onboarding completion - dashboard should now be visible.
+			// Verify onboarding completion — dashboard should now be visible.
 			await expect(
 				page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
 			).toBeVisible( { timeout: 15000 } );
