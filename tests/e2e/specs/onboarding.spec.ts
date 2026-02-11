@@ -62,13 +62,18 @@ test.describe( 'Progress Planner Onboarding', () => {
 		} );
 
 		await test.step( 'Submit the form', async () => {
-			await form
-				.locator(
-					'input[type="submit"].prpl-button-secondary--no-email'
-				)
-				.click();
+			// Click submit and wait for the page to reload after the license key is saved.
+			await Promise.all( [
+				page.waitForEvent( 'load' ),
+				form
+					.locator(
+						'input[type="submit"].prpl-button-secondary--no-email'
+					)
+					.click(),
+			] );
+			await page.waitForLoadState( 'networkidle' );
 
-			// Verify onboarding completion
+			// Verify onboarding completion - dashboard should now be visible.
 			await expect(
 				page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
 			).toBeVisible( { timeout: 15000 } );
