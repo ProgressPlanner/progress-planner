@@ -40,24 +40,35 @@ test.describe( 'Progress Planner Onboarding', () => {
 		await test.step( 'Complete onboarding via AJAX', async () => {
 			// Save the license key directly via the WP AJAX handler.
 			// The remote API (progressplanner.com) is unreachable in Playground,
-			// so we call the local save endpoint directly.
-			const result = await page.evaluate( async () => {
-				const formData = new FormData();
-				formData.append( 'action', 'progress_planner_save_onboard_data' );
-				formData.append(
-					'_ajax_nonce',
-					( window as any ).progressPlanner.nonce
-				);
-				formData.append( 'key', 'test-license-for-e2e-testing' );
+			// so we call the local save endpoint directly using XMLHttpRequest
+			// (fetch() fails in Playground's service worker environment).
+			const result = await page.evaluate( () => {
+				return new Promise< boolean >( ( resolve ) => {
+					const xhr = new XMLHttpRequest();
+					xhr.open(
+						'POST',
+						( window as any ).progressPlanner.ajaxUrl,
+						true
+					);
+					xhr.onreadystatechange = () => {
+						if ( xhr.readyState === 4 ) {
+							resolve( xhr.status === 200 );
+						}
+					};
+					xhr.onerror = () => resolve( false );
 
-				const response = await fetch(
-					( window as any ).progressPlanner.ajaxUrl,
-					{
-						method: 'POST',
-						body: formData,
-					}
-				);
-				return response.ok;
+					const formData = new FormData();
+					formData.append(
+						'action',
+						'progress_planner_save_onboard_data'
+					);
+					formData.append(
+						'_ajax_nonce',
+						( window as any ).progressPlanner.nonce
+					);
+					formData.append( 'key', 'test-license-for-e2e-testing' );
+					xhr.send( formData );
+				} );
 			} );
 
 			expect( result ).toBe( true );
