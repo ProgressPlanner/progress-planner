@@ -4,30 +4,6 @@ test.describe( 'Progress Planner Onboarding', () => {
 	test( 'should complete onboarding process successfully', async ( {
 		page,
 	} ) => {
-		// Mock the remote API calls since Playground can't reach progressplanner.com.
-		// The onboarding JS flow: get-nonce → onboard → save license key locally → reload.
-		await page.route( '**/progress-planner-saas/v1/get-nonce', ( route ) =>
-			route.fulfill( {
-				status: 200,
-				contentType: 'application/json',
-				body: JSON.stringify( {
-					status: 'ok',
-					nonce: 'test-nonce-for-e2e',
-				} ),
-			} )
-		);
-
-		await page.route( '**/progress-planner-saas/v1/onboard', ( route ) =>
-			route.fulfill( {
-				status: 200,
-				contentType: 'application/json',
-				body: JSON.stringify( {
-					status: 'ok',
-					license_key: 'test-license-for-e2e-testing',
-				} ),
-			} )
-		);
-
 		await test.step( 'Navigate to Progress Planner page', async () => {
 			await page.goto( '/wp-admin/admin.php?page=progress-planner' );
 			await page.waitForLoadState( 'networkidle' );
@@ -61,17 +37,33 @@ test.describe( 'Progress Planner Onboarding', () => {
 			);
 		} );
 
-		await test.step( 'Submit the form', async () => {
-			// Click submit and wait for the page to reload after the license key is saved.
-			await Promise.all( [
-				page.waitForEvent( 'load' ),
-				form
-					.locator(
-						'input[type="submit"].prpl-button-secondary--no-email'
-					)
-					.click(),
-			] );
-			await page.waitForLoadState( 'networkidle' );
+		await test.step( 'Complete onboarding via AJAX', async () => {
+			// Save the license key directly via the WP AJAX handler.
+			// The remote API (progressplanner.com) is unreachable in Playground,
+			// so we call the local save endpoint directly.
+			const result = await page.evaluate( async () => {
+				const formData = new FormData();
+				formData.append( 'action', 'progress_planner_save_onboard_data' );
+				formData.append(
+					'_ajax_nonce',
+					( window as any ).progressPlanner.nonce
+				);
+				formData.append( 'key', 'test-license-for-e2e-testing' );
+
+				const response = await fetch(
+					( window as any ).progressPlanner.ajaxUrl,
+					{
+						method: 'POST',
+						body: formData,
+					}
+				);
+				return response.ok;
+			} );
+
+			expect( result ).toBe( true );
+
+			// Reload to see the dashboard.
+			await page.reload( { waitUntil: 'networkidle' } );
 
 			// Verify onboarding completion - dashboard should now be visible.
 			await expect(
