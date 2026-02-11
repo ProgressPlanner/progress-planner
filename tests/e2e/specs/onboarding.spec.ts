@@ -4,6 +4,30 @@ test.describe( 'Progress Planner Onboarding', () => {
 	test( 'should complete onboarding process successfully', async ( {
 		page,
 	} ) => {
+		// Mock the remote API calls since Playground can't reach progressplanner.com.
+		// The onboarding JS flow: get-nonce → onboard → save license key locally → reload.
+		await page.route( '**/progress-planner-saas/v1/get-nonce', ( route ) =>
+			route.fulfill( {
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					status: 'ok',
+					nonce: 'test-nonce-for-e2e',
+				} ),
+			} )
+		);
+
+		await page.route( '**/progress-planner-saas/v1/onboard', ( route ) =>
+			route.fulfill( {
+				status: 200,
+				contentType: 'application/json',
+				body: JSON.stringify( {
+					status: 'ok',
+					license_key: 'test-license-for-e2e-testing',
+				} ),
+			} )
+		);
+
 		await test.step( 'Navigate to Progress Planner page', async () => {
 			await page.goto( '/wp-admin/admin.php?page=progress-planner' );
 			await page.waitForLoadState( 'networkidle' );
