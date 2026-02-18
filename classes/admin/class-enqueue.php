@@ -227,7 +227,7 @@ class Enqueue {
 
 				// Check if user wants to see all recommendations.
 				$show_all_recommendations = isset( $_GET['prpl_show_all_recommendations'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-				$tasks_per_page           = $show_all_recommendations ? -1 : \Progress_Planner\Admin\Widgets\Suggested_Tasks::PER_PAGE_DEFAULT;
+				$tasks_per_page           = $show_all_recommendations ? -1 : \Progress_Planner\Admin\Widgets\Suggested_Tasks::get_per_page();
 
 				// Get tasks from task providers (limited to 5 by default, or unlimited if showing all).
 				$tasks = \progress_planner()->get_suggested_tasks()->get_tasks_in_rest_format(
@@ -269,7 +269,7 @@ class Enqueue {
 						],
 						'delayCelebration' => $delay_celebration,
 						'tasksPerPage'     => $tasks_per_page,
-						'perPageDefault'   => \Progress_Planner\Admin\Widgets\Suggested_Tasks::PER_PAGE_DEFAULT,
+						'perPageDefault'   => \Progress_Planner\Admin\Widgets\Suggested_Tasks::get_per_page(),
 					],
 				];
 				break;
