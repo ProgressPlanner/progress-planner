@@ -27,7 +27,8 @@ class Dashboard_Widget_Todo extends Dashboard_Widget {
 	 * @return string
 	 */
 	protected function get_title() {
-		return \esc_html__( 'To-do list Progress Planner', 'progress-planner' );
+		/* translators: %s: plugin name */
+		return \sprintf( \esc_html__( 'To-do list %s', 'progress-planner' ), \progress_planner()->get_ui__branding()->get_admin_menu_name() );
 	}
 
 	/**
