@@ -25,7 +25,7 @@ if ( false !== \progress_planner()->get_license_key() ) {
 		<h1><?php \esc_html_e( 'Welcome to the Progress Planner plugin!', 'progress-planner' ); ?></h1>
 		<span class="welcome-header-icon">
 			<span class="slant"></span>
-			<?php \progress_planner()->the_asset( 'images/icon_progress_planner.svg' ); ?>
+			<?php echo \progress_planner()->get_ui__branding()->get_admin_menu_icon( true ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- SVG markup. ?>
 		</span>
 	</div>
 	<div class="inner-content">

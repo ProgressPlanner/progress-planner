@@ -301,7 +301,7 @@ class Enqueue {
 				$localize_data = [
 					'name' => 'prplCelebrate',
 					'data' => [
-						'raviIconUrl'     => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets/images/icon_progress_planner.svg',
+						'raviIconUrl'     => \progress_planner()->get_ui__branding()->get_admin_menu_icon(),
 						'confettiOptions' => $confetti_options,
 					],
 				];

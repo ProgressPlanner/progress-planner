@@ -28,7 +28,7 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 require_once PROGRESS_PLANNER_DIR . '/autoload.php';
 
-if ( ! function_exists( 'progress_planner' ) ) {
+if ( ! \function_exists( 'progress_planner' ) ) {
 	/**
 	 * Get the progress planner instance.
 	 *

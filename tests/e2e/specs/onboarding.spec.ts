@@ -37,14 +37,33 @@ test.describe( 'Progress Planner Onboarding', () => {
 			);
 		} );
 
-		await test.step( 'Submit the form', async () => {
-			await form
-				.locator(
-					'input[type="submit"].prpl-button-secondary--no-email'
-				)
-				.click();
+		await test.step( 'Complete onboarding', async () => {
+			// The remote API (progressplanner.com) is unreachable in WP Playground
+			// because page.route() cannot intercept requests handled by its
+			// service worker. Use Playwright's request API to call the local
+			// WP AJAX endpoint directly — it bypasses the service worker and
+			// shares the page's auth cookies.
+			const nonce = await page.evaluate(
+				() => ( window as any ).progressPlanner.nonce
+			);
 
-			// Verify onboarding completion
+			const response = await page.request.post(
+				'/wp-admin/admin-ajax.php',
+				{
+					form: {
+						action: 'progress_planner_save_onboard_data',
+						_ajax_nonce: nonce,
+						key: 'test-license-for-e2e-testing',
+					},
+				}
+			);
+
+			expect( response.ok() ).toBe( true );
+
+			// Reload to see the dashboard.
+			await page.reload( { waitUntil: 'networkidle' } );
+
+			// Verify onboarding completion — dashboard should now be visible.
 			await expect(
 				page.locator( '.prpl-widget-wrapper.prpl-suggested-tasks' )
 			).toBeVisible( { timeout: 15000 } );

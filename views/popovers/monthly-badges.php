@@ -70,5 +70,6 @@ if ( ! \defined( 'ABSPATH' ) ) {
 				</div>
 			</div>
 		<?php endforeach; ?>
+		<?php \do_action( 'progress_planner_popover_after_badge_groups' ); ?>
 	</div>
 </div>
