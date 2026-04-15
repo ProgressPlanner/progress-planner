@@ -31,7 +31,7 @@ final class ToDo extends Widget {
 	 *
 	 * @return void
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles(): void {
 		parent::enqueue_styles();
 		\wp_add_inline_style(
 			"progress-planner/page-widgets/{$this->id}",

@@ -2,11 +2,18 @@
 /**
  * Base class for widgets.
  *
+ * Since Phase 4 of the wp-admin-ui extraction, this class extends the
+ * kit's Widget base. Rendering mechanics (wrapper div, CSS class naming,
+ * view loading) now live in the kit. Progress-planner-specific additions
+ * (range/frequency getters, stylesheet-dependency helper) stay here.
+ *
  * @package Progress_Planner
  */
 
 namespace Progress_Planner\Admin\Widgets;
 
+use ProgressPlanner\AdminUI\Widgets\Widget as Kit_Widget;
+use Progress_Planner\Admin\Admin_UI_Instance;
 use Progress_Planner\Utils\Traits\Input_Sanitizer;
 
 /**
@@ -14,7 +21,7 @@ use Progress_Planner\Utils\Traits\Input_Sanitizer;
  *
  * All widgets should extend this class.
  */
-abstract class Widget {
+abstract class Widget extends Kit_Widget {
 
 	use Input_Sanitizer;
 
@@ -35,12 +42,6 @@ abstract class Widget {
 	protected $force_last_column = false;
 
 	/**
-	 * Constructor.
-	 */
-	public function __construct() {
-	}
-
-	/**
 	 * The widget ID.
 	 *
 	 * @var string
@@ -48,67 +49,41 @@ abstract class Widget {
 	protected $id;
 
 	/**
-	 * Get the widget ID.
-	 *
-	 * @return string
+	 * Concrete widgets are instantiated via Base::__call() which passes an
+	 * empty args array to the constructor. We forward the kit's required
+	 * AdminUI dependency from the progress-planner singleton.
 	 */
-	public function get_id() {
-		return $this->id;
+	public function __construct() {
+		parent::__construct( Admin_UI_Instance::get() );
 	}
 
 	/**
 	 * Get the widget range.
-	 *
-	 * @return string
 	 */
-	public function get_range() {
+	public function get_range(): string {
 		return $this->get_sanitized_get( 'range', '-6 months' );
 	}
 
 	/**
 	 * Get the widget frequency.
-	 *
-	 * @return string
 	 */
-	public function get_frequency() {
+	public function get_frequency(): string {
 		return $this->get_sanitized_get( 'frequency', 'monthly' );
 	}
 
 	/**
-	 * Render the widget.
-	 *
-	 * @return void
+	 * Enqueue this widget's stylesheet via progress-planner's legacy path
+	 * (kept for backwards compatibility — a number of widgets override this
+	 * and still expect the 'progress-planner/page-widgets/{id}' handle).
 	 */
-	public function render() {
-		$this->enqueue_styles();
-		$this->enqueue_scripts();
-		?>
-		<div
-			class="prpl-widget-wrapper prpl-<?php echo \esc_attr( $this->id ); ?> prpl-widget-width-<?php echo (int) $this->width; ?>"
-			data-force-last-column="<?php echo (int) $this->force_last_column; ?>"
-		>
-			<div class="widget-inner-container">
-				<?php \progress_planner()->the_view( "page-widgets/{$this->id}.php" ); ?>
-			</div>
-		</div>
-		<?php
-	}
-
-	/**
-	 * Enqueue styles.
-	 *
-	 * @return void
-	 */
-	public function enqueue_styles() {
+	public function enqueue_styles(): void {
 		\progress_planner()->get_admin__enqueue()->enqueue_style( "progress-planner/page-widgets/{$this->id}" );
 	}
 
 	/**
-	 * Enqueue scripts.
-	 *
-	 * @return void
+	 * Enqueue this widget's script (legacy path).
 	 */
-	public function enqueue_scripts() {
+	public function enqueue_scripts(): void {
 		\progress_planner()->get_admin__enqueue()->enqueue_script( 'widgets/' . $this->id );
 	}
 

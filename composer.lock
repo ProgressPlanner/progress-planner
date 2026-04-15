@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "git@github.com:ProgressPlanner/wp-admin-ui.git",
-                "reference": "b293a882e0aaab71c8c3c0b20ae21575e8fdae73"
+                "reference": "56f949ea8ac3808537104cd48570142edf4b3b0d"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ProgressPlanner/wp-admin-ui/zipball/b293a882e0aaab71c8c3c0b20ae21575e8fdae73",
-                "reference": "b293a882e0aaab71c8c3c0b20ae21575e8fdae73",
+                "url": "https://api.github.com/repos/ProgressPlanner/wp-admin-ui/zipball/56f949ea8ac3808537104cd48570142edf4b3b0d",
+                "reference": "56f949ea8ac3808537104cd48570142edf4b3b0d",
                 "shasum": ""
             },
             "require": {
@@ -48,7 +48,7 @@
                 "source": "https://github.com/ProgressPlanner/wp-admin-ui/tree/main",
                 "issues": "https://github.com/ProgressPlanner/wp-admin-ui/issues"
             },
-            "time": "2026-04-15T19:27:46+00:00"
+            "time": "2026-04-15T19:30:36+00:00"
         }
     ],
     "packages-dev": [

@@ -24,7 +24,7 @@ abstract class Badge_Streak extends Widget {
 	 *
 	 * @return void
 	 */
-	public function enqueue_styles() {
+	public function enqueue_styles(): void {
 		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/page-widgets/badge-streak' );
 	}
 

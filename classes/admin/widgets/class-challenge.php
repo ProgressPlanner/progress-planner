@@ -66,7 +66,7 @@ final class Challenge extends Widget {
 	 *
 	 * @return void
 	 */
-	public function render() {
+	public function render(): void {
 		if ( empty( $this->get_challenge() ) ) {
 			return;
 		}
