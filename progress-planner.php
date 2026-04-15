@@ -28,6 +28,26 @@ if ( ! \defined( 'ABSPATH' ) ) {
 
 require_once PROGRESS_PLANNER_DIR . '/autoload.php';
 
+// Load the Composer autoloader if present — currently only used by the
+// optional wp-admin-ui package integration (Phase 2 dual-load).
+if ( \file_exists( PROGRESS_PLANNER_DIR . '/vendor/autoload.php' ) ) {
+	require_once PROGRESS_PLANNER_DIR . '/vendor/autoload.php';
+}
+
+// Dual-load the extracted admin-ui kit behind a feature flag so we can
+// validate it boots cleanly in the host context without changing any
+// existing behavior. Off by default — define the constant to true in
+// wp-config.php to see the shadow page at
+// /wp-admin/admin.php?page=progress-planner-adminui.
+if (
+	\defined( 'PROGRESS_PLANNER_USE_ADMIN_UI_PKG' )
+	&& \constant( 'PROGRESS_PLANNER_USE_ADMIN_UI_PKG' )
+	&& \class_exists( \ProgressPlanner\AdminUI\AdminUI::class )
+) {
+	require_once PROGRESS_PLANNER_DIR . '/classes/admin/class-admin-ui-pkg-shadow.php';
+	\add_action( 'plugins_loaded', [ \Progress_Planner\Admin\Admin_UI_Pkg_Shadow::class, 'boot' ], 20 );
+}
+
 if ( ! \function_exists( 'progress_planner' ) ) {
 	/**
 	 * Get the progress planner instance.

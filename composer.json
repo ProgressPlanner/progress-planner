@@ -9,6 +9,15 @@
 			"email": "info@emilia.capital"
 		}
 	],
+	"repositories": [
+		{
+			"type": "vcs",
+			"url": "https://github.com/ProgressPlanner/wp-admin-ui"
+		}
+	],
+	"require": {
+		"progressplanner/wp-admin-ui": "dev-main"
+	},
 	"require-dev": {
 		"wp-coding-standards/wpcs": "^3.1",
 		"phpcompatibility/phpcompatibility-wp": "*",

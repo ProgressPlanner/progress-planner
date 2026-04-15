@@ -4,8 +4,53 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ed426f84147000579a3ac5a541a79b90",
-    "packages": [],
+    "content-hash": "2dcb4c586d6de5d4fee4780f1f47ed73",
+    "packages": [
+        {
+            "name": "progressplanner/wp-admin-ui",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "git@github.com:ProgressPlanner/wp-admin-ui.git",
+                "reference": "0cddd0b71320d4f9e6e52ca3c68ab380227329dd"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/ProgressPlanner/wp-admin-ui/zipball/0cddd0b71320d4f9e6e52ca3c68ab380227329dd",
+                "reference": "0cddd0b71320d4f9e6e52ca3c68ab380227329dd",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=7.4"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^9.6",
+                "szepeviktor/phpstan-wordpress": "^1.3"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "ProgressPlanner\\AdminUI\\": "src/"
+                }
+            },
+            "autoload-dev": {
+                "psr-4": {
+                    "ProgressPlanner\\AdminUI\\Tests\\": "tests/phpunit/"
+                }
+            },
+            "license": [
+                "GPL-3.0-or-later"
+            ],
+            "description": "Reusable admin UI kit for WordPress plugins — CSS tokens, web components, page framework.",
+            "homepage": "https://github.com/progressplanner/wp-admin-ui",
+            "support": {
+                "source": "https://github.com/ProgressPlanner/wp-admin-ui/tree/main",
+                "issues": "https://github.com/ProgressPlanner/wp-admin-ui/issues"
+            },
+            "time": "2026-04-15T19:10:21+00:00"
+        }
+    ],
     "packages-dev": [
         {
             "name": "antecedent/patchwork",
@@ -9392,7 +9437,9 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": {
+        "progressplanner/wp-admin-ui": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {},
@@ -9400,5 +9447,5 @@
     "platform-overrides": {
         "php": "8.3"
     },
-    "plugin-api-version": "2.9.0"
+    "plugin-api-version": "2.6.0"
 }
