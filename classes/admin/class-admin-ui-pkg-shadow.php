@@ -1,10 +1,21 @@
 <?php
 /**
- * Phase 2 shadow boot: instantiate the extracted wp-admin-ui kit on a
- * throwaway admin page so we can verify the package autoloads cleanly and
- * renders in the host context, without touching any existing behavior.
+ * Integrates progress-planner's admin UI with the wp-admin-ui kit when
+ * {@see PROGRESS_PLANNER_USE_ADMIN_UI_PKG} is defined and truthy.
  *
- * Behind the PROGRESS_PLANNER_USE_ADMIN_UI_PKG constant — off by default.
+ * When the flag is on:
+ * - {@see Admin_UI_Instance::get()} boots the kit with register_page=true,
+ *   so the kit's PageRegistrar owns the top-level admin menu.
+ * - This class adds progress-planner's widgets to the kit instance and
+ *   wires the plugin's legacy UI bits (notification counter,
+ *   welcome/privacy gate, tour button, subscribe popover, JS templates,
+ *   overlay script) into the kit's action/filter hooks.
+ *
+ * When the flag is off, nothing in this class fires.
+ *
+ * NOTE: the filename still says "shadow" for history — Phase 2 used this
+ * file for a separate shadow page. Phase 5 repurposed the flag to flip
+ * the real page to the kit; the class was renamed accordingly.
  *
  * @package Progress_Planner
  */
@@ -12,77 +23,116 @@
 namespace Progress_Planner\Admin;
 
 use ProgressPlanner\AdminUI\AdminUI;
-use ProgressPlanner\AdminUI\Config;
-use ProgressPlanner\AdminUI\Widgets\Widget;
 
 /**
- * Wires up a shadow admin page that boots the kit alongside the real
- * progress-planner page.
+ * Attaches progress-planner UI onto the kit's admin page.
  */
 final class Admin_UI_Pkg_Shadow {
 
+	/**
+	 * Plugin bootstrap entry point (hooked from progress-planner.php on
+	 * plugins_loaded when the flag is on).
+	 */
 	public static function boot(): void {
-		$package_root = PROGRESS_PLANNER_DIR . '/vendor/progressplanner/wp-admin-ui';
+		if ( ! Admin_UI_Instance::kit_renders_page() ) {
+			return;
+		}
 
-		// Hand off the SaaS-resolved branding VO from progress-planner to
-		// the kit — verifies the Phase 3B branding bridge works end-to-end.
-		$branding = \progress_planner()->get_ui__branding()->to_kit_branding();
+		$ui = Admin_UI_Instance::get();
 
-		$config = new Config(
-			'progress-planner',
-			'progress-planner-adminui',
-			'prplpkg',
-			'progress_planner',
-			'progress-planner/v1',
-			'PRPL (kit shadow)',
-			'Dashboard (kit shadow)',
-			$branding,
-			$package_root . '/assets',
-			\plugin_dir_url( PROGRESS_PLANNER_FILE ) . 'vendor/progressplanner/wp-admin-ui/assets',
-			// For Phase 2 we deliberately point host_assets_path at a non-
-			// existent directory so the kit resolves every asset against the
-			// package only. Progress-planner's own assets/ dir has files
-			// with legacy `progress-planner/` prefixed Dependencies headers
-			// that the kit's enqueuer can't resolve — that gets fixed in
-			// Phase 3 when we refactor those headers.
-			PROGRESS_PLANNER_DIR . '/_no_host_assets_phase2',
-			\constant( 'PROGRESS_PLANNER_URL' ) . '/_no_host_assets_phase2',
-			$package_root . '/views'
+		// Register all progress-planner widgets with the kit — the kit's
+		// admin-page view iterates $ui->widgets() when rendering.
+		foreach ( \progress_planner()->get_admin__page()->get_widgets() as $prpl_widget ) {
+			$ui->add_widget( $prpl_widget );
+		}
+
+		$prefix = $ui->config()->asset_prefix; // 'progress-planner'.
+
+		\add_filter( $prefix . '_admin_ui_menu_title_suffix', [ self::class, 'menu_title_suffix' ] );
+		\add_action( $prefix . '_admin_ui_before_content', [ self::class, 'maybe_render_welcome' ] );
+		\add_action( $prefix . '_admin_ui_header_right', [ self::class, 'render_header_right' ] );
+		\add_action( $prefix . '_admin_ui_after_widgets', [ self::class, 'render_after_widgets' ] );
+	}
+
+	/**
+	 * Append the pending-celebrations count bubble to the top-level menu title.
+	 *
+	 * @param string $suffix Existing suffix (other filter callbacks may have added to it).
+	 */
+	public static function menu_title_suffix( $suffix ): string {
+		$count = (int) \wp_count_posts( 'prpl_recommendations' )->pending;
+		if ( 0 === $count ) {
+			return $suffix;
+		}
+
+		/* translators: Hidden accessibility text; %s: number of notifications. */
+		$a11y = \sprintf( \_n( '%s pending celebration', '%s pending celebrations', $count, 'progress-planner' ), \number_format_i18n( $count ) );
+
+		return $suffix . \sprintf(
+			'<span class="update-plugins count-%1$d" style="background-color:var(--prpl-background-banner);color:#38296d;"><span class="plugin-count" aria-hidden="true">%1$d</span><span class="screen-reader-text">%2$s</span></span>',
+			$count,
+			$a11y
 		);
-
-		$ui = AdminUI::boot( $config );
-		$ui->add_widget( new Admin_UI_Pkg_Shadow_Widget( $ui ) );
-	}
-}
-
-/**
- * Trivial smoke-test widget. Confirms the kit's Widget base + AssetEnqueuer
- * work when loaded inside progress-planner's PHP + asset environment.
- */
-final class Admin_UI_Pkg_Shadow_Widget extends Widget {
-
-	protected $id = 'kit-shadow';
-
-	public function enqueue_styles(): void {
-		// No widget-specific CSS — kit defaults only.
 	}
 
-	public function enqueue_scripts(): void {
-		$this->ui->enqueuer()->enqueue_script( 'web-components/prpl-gauge' );
+	/**
+	 * Render the welcome/privacy-policy gate before the widgets container
+	 * when the user hasn't accepted the privacy policy yet.
+	 */
+	public static function maybe_render_welcome(): void {
+		if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
+			return;
+		}
+		\progress_planner()->the_view( 'welcome.php' );
 	}
 
-	public function render(): void {
-		$this->enqueue_scripts();
+	/**
+	 * Render the tour button + subscribe popover in the header's right column.
+	 */
+	public static function render_header_right(): void {
+		if ( true !== \progress_planner()->is_privacy_policy_accepted() ) {
+			return;
+		}
 		?>
-		<div class="prpl-widget-wrapper prpl-<?php echo \esc_attr( $this->id ); ?> prpl-widget-width-1">
-			<div class="widget-inner-container">
-				<h2 class="prpl-widget-title">Kit shadow smoke test</h2>
-				<p>If you can see a gauge below, <code>progressplanner/wp-admin-ui</code> autoloaded and rendered inside progress-planner's PHP environment.</p>
-				<div style="max-width:220px;margin:0 auto;">
-					<prpl-gauge data-max="100" data-value="67" background="#ededed" color="#38296d"></prpl-gauge>
-				</div>
-			</div>
-		</div>
+		<button class="prpl-info-icon" id="prpl-start-tour-icon-button">
+			<?php \progress_planner()->the_asset( 'images/icon_tour.svg' ); ?>
+			<span class="screen-reader-text"><?php \esc_html_e( 'Start tour', 'progress-planner' ); ?></span>
+		</button>
 		<?php
+		if ( 'no-license' === \progress_planner()->get_license_key() ) {
+			\progress_planner()->get_ui__popover()->the_popover( 'subscribe-form' )->render_button(
+				'',
+				\progress_planner()->get_asset( 'images/register_icon.svg' ) . '<span class="screen-reader-text">' . \esc_html__( 'Subscribe', 'progress-planner' ) . '</span>'
+			);
+			\progress_planner()->get_ui__popover()->the_popover( 'subscribe-form' )->render();
+		}
+	}
+
+	/**
+	 * Render the tooltip-overlay click handler + JS templates after the
+	 * widgets container.
+	 */
+	public static function render_after_widgets(): void {
+		if ( true !== \progress_planner()->is_privacy_policy_accepted() ) {
+			return;
+		}
+		?>
+		<script>
+		document.getElementById( 'prpl-overlay' )?.addEventListener( 'click', function() {
+			const visibleTooltip = document.querySelector( '[data-tooltip-visible=true]' );
+			if ( visibleTooltip ) {
+				visibleTooltip.removeAttribute( 'data-tooltip-visible' );
+			}
+		} );
+		</script>
+		<?php
+		\progress_planner()->the_view( 'js-templates/suggested-task.html' );
+
+		/**
+		 * Legacy action preserved for third-party integrations.
+		 *
+		 * @since 1.1.1
+		 */
+		\do_action( 'progress_planner_admin_page_after_widgets' );
 	}
 }

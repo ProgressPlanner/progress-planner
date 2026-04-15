@@ -7,6 +7,8 @@
 
 namespace Progress_Planner\Admin;
 
+use Progress_Planner\Admin\Admin_UI_Instance;
+
 /**
  * Admin page class.
  */
@@ -94,6 +96,12 @@ class Page {
 	 * @return void
 	 */
 	public function add_page() {
+		// When the wp-admin-ui kit renders the page, its PageRegistrar owns
+		// the menu registration. Bail so we don't register a duplicate page.
+		if ( Admin_UI_Instance::kit_renders_page() ) {
+			return;
+		}
+
 		global $admin_page_hooks;
 
 		$page_identifier = 'progress-planner';
@@ -146,7 +154,7 @@ class Page {
 	 * @return void
 	 */
 	public function render_page() {
-		\progress_planner()->the_view( 'admin-page.php' );
+		\progress_planner()->the_view( 'legacy-admin-page.php' );
 	}
 
 	/**
@@ -162,8 +170,60 @@ class Page {
 			return;
 		}
 
+		// When the kit renders the page it already enqueues its base tokens +
+		// layout CSS + grid-masonry via PageRegistrar, and the legacy
+		// privacy-gate + welcome/onboard branch is served by the kit's hooks
+		// (see Admin_UI_Kit_Integration). We still enqueue widget-specific
+		// scripts/styles needed for widgets rendered inside the kit view.
+		if ( Admin_UI_Instance::kit_renders_page() ) {
+			$this->enqueue_widget_assets();
+			return;
+		}
+
 		$this->enqueue_scripts();
 		$this->enqueue_styles();
+	}
+
+	/**
+	 * Enqueue just the scripts/styles needed for widgets when the kit
+	 * renders the page. The kit handles tokens + layout + masonry itself.
+	 *
+	 * @return void
+	 */
+	private function enqueue_widget_assets(): void {
+		$default_localization_data = [
+			'name' => 'progressPlanner',
+			'data' => [
+				'onboardNonceURL' => \progress_planner()->get_utils__onboard()->get_remote_url( 'get-nonce' ),
+				'onboardAPIUrl'   => \progress_planner()->get_utils__onboard()->get_remote_url( 'onboard' ),
+				'ajaxUrl'         => \admin_url( 'admin-ajax.php' ),
+				'nonce'           => \wp_create_nonce( 'progress_planner' ),
+			],
+		];
+
+		if ( true === \progress_planner()->is_privacy_policy_accepted() ) {
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-gauge' );
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-badge-progress-bar' );
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-bar' );
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-chart-line' );
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-big-counter' );
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'web-components/prpl-tooltip' );
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'header-filters', $default_localization_data );
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'settings', $default_localization_data );
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'upgrade-tasks' );
+		} else {
+			\progress_planner()->get_admin__enqueue()->enqueue_script( 'onboard', $default_localization_data );
+		}
+
+		\progress_planner()->get_admin__enqueue()->enqueue_script( 'external-link-accessibility-helper' );
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-tooltip' );
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/web-components/prpl-install-plugin' );
+		\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/upgrade-tasks' );
+
+		if ( ! \progress_planner()->is_privacy_policy_accepted() ) {
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/welcome' );
+			\progress_planner()->get_admin__enqueue()->enqueue_style( 'progress-planner/onboard' );
+		}
 	}
 
 	/**

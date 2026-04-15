@@ -17,7 +17,7 @@ $prpl_privacy_policy_accepted = \progress_planner()->is_privacy_policy_accepted(
 	<?php if ( true === $prpl_privacy_policy_accepted ) : ?>
 		<a href="#prpl-main-content" class="screen-reader-text prpl-skip-link"><?php \esc_html_e( 'Skip to main content', 'progress-planner' ); ?></a>
 		<h1 class="screen-reader-text"><?php \esc_html_e( 'Progress Planner', 'progress-planner' ); ?></h1>
-		<?php \progress_planner()->the_view( 'admin-page-header.php' ); ?>
+		<?php \progress_planner()->the_view( 'legacy-admin-page-header.php' ); ?>
 		<div id="prpl-main-content" class="prpl-widgets-container">
 			<?php foreach ( \progress_planner()->get_admin__page()->get_widgets() as $prpl_admin_widget ) : ?>
 				<?php $prpl_admin_widget->render(); ?>

@@ -1,15 +1,22 @@
 <?php
 /**
  * Singleton accessor for the kit's AdminUI instance used inside
- * progress-planner (Phase 4+).
+ * progress-planner.
  *
- * The kit is booted with register_page: false so its PageRegistrar does
- * not register an admin menu — progress-planner's own Admin\Page class
- * continues to own menu registration. The kit instance is used for:
+ * Two boot modes, keyed off {@see PROGRESS_PLANNER_USE_ADMIN_UI_PKG}:
  *
- * - The Widget base class (Progress_Planner\Admin\Widgets\Widget extends
- *   it and needs an AdminUI in its constructor).
- * - Future phases where the kit's page rendering takes over.
+ * - Off (default, Phase 4-style): register_page = false. The kit is used
+ *   only as a back-end for the Widget base class and AssetEnqueuer.
+ *   progress-planner's own Admin\Page class renders the admin page and
+ *   enqueues assets. No behavior change.
+ *
+ * - On (Phase 5): register_page = true. The kit's PageRegistrar takes
+ *   over the top-level admin menu and renders views/admin-page.php from
+ *   the kit (with progress-planner views/host overrides where present).
+ *   Progress-planner's Admin\Page::add_page() short-circuits, and
+ *   progress-planner-specific UI (notification counter, welcome/privacy
+ *   gate, tour, subscribe, JS templates) attaches via the kit's
+ *   {asset_prefix}_admin_ui_* filters/actions.
  *
  * @package Progress_Planner
  */
@@ -28,6 +35,14 @@ final class Admin_UI_Instance {
 	 * @var AdminUI|null
 	 */
 	private static $instance = null;
+
+	/**
+	 * Whether the kit should render the admin page itself.
+	 */
+	public static function kit_renders_page(): bool {
+		return \defined( 'PROGRESS_PLANNER_USE_ADMIN_UI_PKG' )
+			&& (bool) \constant( 'PROGRESS_PLANNER_USE_ADMIN_UI_PKG' );
+	}
 
 	public static function get(): AdminUI {
 		if ( null !== self::$instance ) {
@@ -54,9 +69,9 @@ final class Admin_UI_Instance {
 			$package_root . '/views',
 			\constant( 'PROGRESS_PLANNER_DIR' ) . '/views',
 			'manage_options',
-			null,
-			false,
-			false // register_page — progress-planner owns its own admin page.
+			\progress_planner()->get_ui__branding()->get_admin_submenu_position(),
+			true, // show_range_filter — matches progress-planner's existing header.
+			self::kit_renders_page()
 		);
 
 		self::$instance = AdminUI::boot( $config );

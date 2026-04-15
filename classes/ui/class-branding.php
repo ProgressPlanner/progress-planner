@@ -337,16 +337,22 @@ final class Branding {
 		$this->the_logo();
 		$logo_html = (string) \ob_get_clean();
 
+
+		// Pass null for every color override — progress-planner's own
+		// variables-color.css owns these tokens and the kit's inline CSS
+		// overrides would clobber them (e.g. --prpl-background-monthly
+		// defaulting to #faa310 instead of #fff9f0). SaaS-driven custom
+		// CSS still flows through via $custom_css.
 		return new \ProgressPlanner\AdminUI\Branding(
 			$this->get_admin_menu_name(),
 			$this->get_admin_submenu_name(),
 			$this->get_admin_menu_icon( true ),
 			$logo_html,
-			'#dd324f', // --prpl-color-button-primary (kit default; SaaS doesn't currently override).
 			null,
-			'#ffffff',
-			'#38296d', // --prpl-color-headings.
-			'#faa310', // --prpl-background-monthly.
+			null,
+			null,
+			null,
+			null,
 			$this->get_custom_css()
 		);
 	}

@@ -91,6 +91,15 @@ class Enqueue {
 				],
 				static function ( $file_path ) {
 					return \progress_planner()->get_file_version( $file_path );
+				},
+				// Fire progress-planner's localize_script() switch for every
+				// script the kit enqueues (including transitive deps), so
+				// wp_localize_script() payloads like prplL10nStrings,
+				// progressPlannerBadge, prplSuggestedTask get attached to
+				// l10n / prpl-badge / suggested-task no matter how they
+				// entered the enqueue chain.
+				function ( string $handle ): void {
+					$this->localize_script( $handle );
 				}
 			);
 
