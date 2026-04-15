@@ -16,7 +16,7 @@
 		}
 	],
 	"require": {
-		"progressplanner/wp-admin-ui": "dev-main"
+		"progressplanner/wp-admin-ui": "^0.1.0"
 	},
 	"require-dev": {
 		"wp-coding-standards/wpcs": "^3.1",
