@@ -12,7 +12,6 @@
 namespace Progress_Planner\Admin;
 
 use ProgressPlanner\AdminUI\AdminUI;
-use ProgressPlanner\AdminUI\Branding;
 use ProgressPlanner\AdminUI\Config;
 use ProgressPlanner\AdminUI\Widgets\Widget;
 
@@ -25,7 +24,9 @@ final class Admin_UI_Pkg_Shadow {
 	public static function boot(): void {
 		$package_root = PROGRESS_PLANNER_DIR . '/vendor/progressplanner/wp-admin-ui';
 
-		$branding_svg = \progress_planner()->get_ui__branding()->get_admin_menu_icon( true );
+		// Hand off the SaaS-resolved branding VO from progress-planner to
+		// the kit — verifies the Phase 3B branding bridge works end-to-end.
+		$branding = \progress_planner()->get_ui__branding()->to_kit_branding();
 
 		$config = new Config(
 			'progress-planner',
@@ -35,12 +36,7 @@ final class Admin_UI_Pkg_Shadow {
 			'progress-planner/v1',
 			'PRPL (kit shadow)',
 			'Dashboard (kit shadow)',
-			new Branding(
-				'Progress Planner (kit shadow)',
-				'Dashboard (kit shadow)',
-				$branding_svg,
-				'<strong style="font-size:1.5rem;color:#38296d;">Progress Planner — kit shadow page</strong>'
-			),
+			$branding,
 			$package_root . '/assets',
 			\plugin_dir_url( PROGRESS_PLANNER_FILE ) . 'vendor/progressplanner/wp-admin-ui/assets',
 			// For Phase 2 we deliberately point host_assets_path at a non-

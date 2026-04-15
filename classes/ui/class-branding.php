@@ -324,4 +324,30 @@ final class Branding {
 			? 'wordpress-seo'
 			: $this->get_api_data()['seo_plugin_recommendation_slug'];
 	}
+
+	/**
+	 * Export a kit-compatible {@see \ProgressPlanner\AdminUI\Branding} VO
+	 * populated with the currently-resolved SaaS values.
+	 *
+	 * Kit code (the wp-admin-ui package) takes a plain Branding VO and does
+	 * no remote calls of its own — this method is the handoff point.
+	 */
+	public function to_kit_branding(): \ProgressPlanner\AdminUI\Branding {
+		\ob_start();
+		$this->the_logo();
+		$logo_html = (string) \ob_get_clean();
+
+		return new \ProgressPlanner\AdminUI\Branding(
+			$this->get_admin_menu_name(),
+			$this->get_admin_submenu_name(),
+			$this->get_admin_menu_icon( true ),
+			$logo_html,
+			'#dd324f', // --prpl-color-button-primary (kit default; SaaS doesn't currently override).
+			null,
+			'#ffffff',
+			'#38296d', // --prpl-color-headings.
+			'#faa310', // --prpl-background-monthly.
+			$this->get_custom_css()
+		);
+	}
 }
