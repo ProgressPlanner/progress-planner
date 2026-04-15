@@ -2,12 +2,24 @@
 /**
  * Assets class.
  *
+ * Since Phase 3A of the wp-admin-ui extraction, this class is a thin
+ * adapter around {@see \ProgressPlanner\AdminUI\Assets\AssetEnqueuer}.
+ * Script/style resolution, dependency parsing, and mtime versioning
+ * all live in the kit now. This class only retains:
+ *
+ * - Progress Planner-specific vendor-script handling (particles-confetti,
+ *   driver.js) that doesn't fit the kit's generic {prefix}/{handle} model.
+ * - `localize_script()` with its domain-specific switch (badges, tasks,
+ *   celebrate), which will keep living here for the foreseeable future.
+ * - `maybe_empty_session_storage()` — a Progress Planner admin-head shim.
+ *
  * @package Progress_Planner
  */
 
 namespace Progress_Planner\Admin;
 
 use Progress_Planner\Badges\Monthly;
+use ProgressPlanner\AdminUI\Assets\AssetEnqueuer;
 
 /**
  * Enqueue class.
@@ -15,16 +27,13 @@ use Progress_Planner\Badges\Monthly;
 class Enqueue {
 
 	/**
-	 * Have the scripts been registered?
-	 *
-	 * @var boolean
-	 */
-	protected static $scripts_registered = false;
-
-	/**
 	 * Vendor scripts.
 	 *
-	 * @var array
+	 * Internal file-path stem → { WP handle, hard-coded version }. These
+	 * don't live at /assets/js/{handle}.js so they can't go through the
+	 * kit's generic resolver.
+	 *
+	 * @var array<string,array{handle:string,version:string}>
 	 */
 	const VENDOR_SCRIPTS = [
 		'vendor/tsparticles.confetti.bundle.min' => [
@@ -38,14 +47,18 @@ class Enqueue {
 	];
 
 	/**
-	 * Enqueued assets.
+	 * Shared kit enqueuer — single instance per Enqueue instance.
 	 *
-	 * @var array
+	 * @var AssetEnqueuer|null
 	 */
-	protected $enqueued_assets = [
-		'js'  => [],
-		'css' => [],
-	];
+	private $kit_enqueuer = null;
+
+	/**
+	 * Vendor handles already enqueued (guards against double enqueue).
+	 *
+	 * @var array<string,true>
+	 */
+	private $registered_vendors = [];
 
 	/**
 	 * Init.
@@ -54,6 +67,46 @@ class Enqueue {
 	 */
 	public function init() {
 		\add_action( 'admin_head', [ $this, 'maybe_empty_session_storage' ], 1 );
+	}
+
+	/**
+	 * Lazily build the kit enqueuer.
+	 *
+	 * handle_prefix is set to 'progress-planner' so existing `Dependencies:
+	 * progress-planner/foo` file headers across the plugin round-trip
+	 * cleanly through the kit's resolver.
+	 *
+	 * version_strategy delegates to Progress_Planner\Base::get_file_version()
+	 * so debug-mode behavior is preserved.
+	 */
+	private function get_kit_enqueuer(): AssetEnqueuer {
+		if ( null === $this->kit_enqueuer ) {
+			$this->kit_enqueuer = new AssetEnqueuer(
+				'progress-planner',
+				[
+					[
+						'path' => \constant( 'PROGRESS_PLANNER_DIR' ) . '/assets',
+						'url'  => \constant( 'PROGRESS_PLANNER_URL' ) . '/assets',
+					],
+				],
+				static function ( $file_path ) {
+					return \progress_planner()->get_file_version( $file_path );
+				}
+			);
+
+			// Register vendor bundles as external handles with a resolver.
+			// When the kit encounters them as a dep of another script, the
+			// resolver fires and we wp_enqueue_script() the vendor file —
+			// keeping loads lazy.
+			foreach ( self::VENDOR_SCRIPTS as $file_handle => $vendor_meta ) {
+				$resolver = function () use ( $file_handle, $vendor_meta ): void {
+					$this->enqueue_vendor_script( $file_handle, $vendor_meta );
+				};
+				$this->kit_enqueuer->register_external( $vendor_meta['handle'], $resolver );
+			}
+		}
+
+		return $this->kit_enqueuer;
 	}
 
 	/**
@@ -70,27 +123,26 @@ class Enqueue {
 	 * @return void
 	 */
 	public function enqueue_script( $handle, $localize_data = [] ) {
-		$file_details = $this->get_file_details( 'js', $handle );
-		if ( empty( $file_details ) ) {
-			return;
+		$lookup = $handle;
+		if ( \str_starts_with( $lookup, 'progress-planner/' ) ) {
+			$lookup = \substr( $lookup, \strlen( 'progress-planner/' ) );
 		}
 
-		$this->enqueued_assets['js'][] = $file_details['handle'];
-		$final_dependencies            = [];
-
-		// Enqueue the script dependencies.
-		foreach ( $file_details['dependencies'] as $dependency ) {
-			if ( ! \in_array( $dependency, $this->enqueued_assets['js'], true ) ) {
-				$this->enqueue_script( $dependency );
-				$final_dependencies[] = $dependency;
+		// Vendor scripts use a fixed path/version — enqueue them directly.
+		foreach ( self::VENDOR_SCRIPTS as $file_handle => $vendor_meta ) {
+			if ( $vendor_meta['handle'] === $lookup || $file_handle === $lookup ) {
+				$this->enqueue_vendor_script( $file_handle, $vendor_meta );
+				$this->localize_script( $vendor_meta['handle'], $localize_data );
+				return;
 			}
 		}
 
-		// Enqueue the stylesheet.
-		\wp_enqueue_script( $file_details['handle'], $file_details['file_url'], $final_dependencies, $file_details['version'], true );
+		// Everything else goes through the kit.
+		$this->get_kit_enqueuer()->enqueue_script( $handle );
 
-		// Localize the script.
-		$this->localize_script( $file_details['handle'], $localize_data );
+		// Pass the kit-prefixed handle to localize_script() so existing
+		// switch-cases match (they already use 'progress-planner/xxx').
+		$this->localize_script( 'progress-planner/' . $lookup, $localize_data );
 	}
 
 	/**
@@ -101,79 +153,28 @@ class Enqueue {
 	 * @return void
 	 */
 	public function enqueue_style( $handle ) {
-		$file_details = $this->get_file_details( 'css', $handle );
-		if ( empty( $file_details ) ) {
-			return;
-		}
-
-		$this->enqueued_assets['css'][] = $file_details['handle'];
-		$final_dependencies             = [];
-
-		// Enqueue the script dependencies.
-		foreach ( $file_details['dependencies'] as $dependency ) {
-			if ( ! \in_array( $dependency, $this->enqueued_assets['css'], true ) ) {
-				$this->enqueue_style( $dependency );
-			}
-		}
-		// Enqueue the stylesheet.
-		\wp_enqueue_style( $file_details['handle'], $file_details['file_url'], $final_dependencies, $file_details['version'] );
+		$this->get_kit_enqueuer()->enqueue_style( $handle );
 	}
 
 	/**
-	 * Get file details.
+	 * Enqueue a vendor script (plain wp_enqueue_script, no dep resolution).
 	 *
-	 * @param string $context The context of the file ( `css` or `js` ).
-	 * @param string $handle The handle of the file.
-	 *
-	 * @return array
+	 * @param string                                $file_handle The internal file stem, e.g. 'vendor/driver.js.iife'.
+	 * @param array{handle:string,version:string}   $vendor_meta Handle + version.
 	 */
-	public function get_file_details( $context, $handle ) {
-		if ( \str_starts_with( $handle, 'progress-planner/' ) ) {
-			$handle = \str_replace( 'progress-planner/', '', $handle );
+	private function enqueue_vendor_script( $file_handle, $vendor_meta ): void {
+		if ( isset( $this->registered_vendors[ $vendor_meta['handle'] ] ) ) {
+			return;
 		}
+		$this->registered_vendors[ $vendor_meta['handle'] ] = true;
 
-		if ( 'js' === $context ) {
-			foreach ( self::VENDOR_SCRIPTS as $vendor_script_handle => $vendor_script ) {
-				if ( $vendor_script['handle'] === $handle ) {
-					$handle = $vendor_script_handle;
-					break;
-				}
-			}
-		}
-		// The file path.
-		$file_path = \constant( 'PROGRESS_PLANNER_DIR' ) . "/assets/{$context}/{$handle}.{$context}";
-
-		// If the file does not exist, bail early.
-		if ( ! \file_exists( $file_path ) ) {
-			return [];
-		}
-
-		// The file URL.
-		$file_url = \constant( 'PROGRESS_PLANNER_URL' ) . "/assets/{$context}/{$handle}.{$context}";
-
-		// The handle.
-		$handle = 'js' === $context && isset( self::VENDOR_SCRIPTS[ $handle ] )
-			? self::VENDOR_SCRIPTS[ $handle ]['handle']
-			: 'progress-planner/' . $handle;
-
-		// The version.
-		$version = 'js' === $context && isset( self::VENDOR_SCRIPTS[ $handle ] )
-			? self::VENDOR_SCRIPTS[ $handle ]['version']
-			: \progress_planner()->get_file_version( $file_path );
-
-		// The dependencies.
-		$headers      = \get_file_data( $file_path, [ 'dependencies' => 'Dependencies' ] );
-		$dependencies = isset( $headers['dependencies'] )
-			? \array_filter( \array_map( 'trim', \explode( ',', $headers['dependencies'] ) ) )
-			: [];
-
-		return [
-			'file_path'    => $file_path,
-			'file_url'     => $file_url,
-			'handle'       => $handle,
-			'version'      => $version,
-			'dependencies' => $dependencies,
-		];
+		\wp_enqueue_script(
+			$vendor_meta['handle'],
+			\constant( 'PROGRESS_PLANNER_URL' ) . "/assets/js/{$file_handle}.js",
+			[],
+			$vendor_meta['version'],
+			true
+		);
 	}
 
 	/**
